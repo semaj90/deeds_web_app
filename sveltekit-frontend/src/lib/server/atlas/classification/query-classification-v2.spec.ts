@@ -49,6 +49,7 @@ describe('QueryClassificationV2 and RetrievalPlanV1', () => {
     expect(plan.graphHops).toBe(2);
     expect(plan.rerankTopK).toBe(25);
     expect(plan.exactPromotionRequired).toBe(true);
+    expect(classification.evidenceAuthority).toBe(false);
   });
 
   it('broadens semantic recall when the classifier abstains', () => {

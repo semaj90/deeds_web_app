@@ -152,23 +152,6 @@ Rules:
 Tags:`;
 }
 
-async function callOllama(prompt) {
-  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: OLLAMA_MODEL,
-      prompt,
-      stream: false,
-      options: { temperature: 0.1, num_predict: 60 }
-    }),
-    signal: AbortSignal.timeout(90_000),
-  });
-  if (!res.ok) throw new Error(`Ollama ${res.status}`);
-  const data = await res.json();
-  return data.response ?? '';
-}
-
 // TurboQuant (llama-server :8090) — OpenAI-compatible /v1/chat/completions with strict JSON system prompt
 async function callTurbo(prompt) {
   const sysPrompt = `Return STRICT JSON only matching this schema, no prose, no markdown fences:\n{"tags":["atom1","atom2"],"language":"typescript","confidence":0.0}\n\nValid tags (use only these, lowercase, exact match):\n${ATOMS.join(', ')}`;
@@ -176,7 +159,7 @@ async function callTurbo(prompt) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma4-rotorquant:latest',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       messages: [
         { role: 'system', content: sysPrompt },
         { role: 'user',   content: prompt },
@@ -239,7 +222,7 @@ async function processChunk(chunk, stats) {
   let tags = [];
   try {
     const prompt = buildPrompt({ ...chunk, language });
-    const raw = USE_TURBO ? await callTurbo(prompt) : await callOllama(prompt);
+    const raw = await callTurbo(prompt);
     tags = parseTags(raw);
     if (tags.length === 0) {
       stats.noTags++;

@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.doc-17-hot-bucket-descriptor.v1",
+  "gate": "DOC-17",
+  "status": "DOC_17_DESCRIPTOR_FIXTURE_PROVEN_VALKEY_WRITE_OPEN",
+  "owner": "packages/parent-atlas-retrieval/src/bifrost/residency-scheduler.ts",
+  "checks": {
+    "schema_owner_exists": true,
+    "builder_owner_exists": true,
+    "revision_qualified": true,
+    "descriptor_only_references": true,
+    "noncanonical_write_free": true,
+    "bounded_references": true
+  },
+  "descriptor": {
+    "schema": "atlas.hot-bucket-descriptor.v1",
+    "bucketId": "doc:cuda:13.2:ampere",
+    "workspaceRevision": "workspace:r1",
+    "sourceRevision": "source:r1",
+    "candidateSnapshotChecksum": "sha256:candidates",
+    "representationRevision": "semantic_768:v1",
+    "residencyPolicyRevision": "bitfrost-residency-policy:v1",
+    "tier": "WARM",
+    "candidateOrdinals": [
+      1,
+      7
+    ],
+    "docChunkIds": [
+      "chunk-a",
+      "chunk-b"
+    ],
+    "conceptIds": [
+      "concept:cuda"
+    ],
+    "centroidIds": [
+      "centroid:3"
+    ],
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "inputChecksum": "a9a60e74fac61697d41991ea88918b8169c3963cd1ffe3484759bd82a6ec5c80",
+  "policy": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "valkeyReadbackProven": false
+  },
+  "nextGate": "DOC_17_VALKEY_DESCRIPTOR_READBACK_WITH_EXPLICIT_APPROVAL"
+}

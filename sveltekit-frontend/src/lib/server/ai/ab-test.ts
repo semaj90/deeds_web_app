@@ -20,6 +20,7 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import type { RoutingDecision } from './model-router.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -76,10 +77,10 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
     'legal-model-test',
     {
       experimentId: 'legal-model-test',
-      description: 'Compare gemma4-rotorquant:latest (full) vs gemma3:270m (fast) for legal Q&A',
+      description: 'Compare the local llama-server chat model (full) vs gemma3:270m (fast) for legal Q&A',
       active: true,
       variants: [
-        { variantId: 'control', label: 'Legal VLM (full)', model: 'gemma4-rotorquant:latest', pct: 70 },
+        { variantId: 'control', label: 'Legal VLM (full)', model: SERVER_CHAT_MODEL, pct: 70 },
         { variantId: 'fast',    label: 'Gemma3 270M (fast)', model: 'gemma3:270m', pct: 30 },
       ],
     },
@@ -91,7 +92,7 @@ const EXPERIMENTS: Map<string, AbExperiment> = new Map([
       description: 'TurboQuant (:8090) vs Ollama (:11434) latency comparison',
       active: true,
       variants: [
-        { variantId: 'turboquant', label: 'TurboQuant', model: 'gemma4-rotorquant:latest', pct: 50, backendHint: 'turboquant' },
+        { variantId: 'turboquant', label: 'TurboQuant', model: SERVER_CHAT_MODEL, pct: 50, backendHint: 'turboquant' },
         { variantId: 'ollama',     label: 'Ollama',     model: 'gemma4-rotorquant:latest', pct: 50, backendHint: 'ollama' },
       ],
     },

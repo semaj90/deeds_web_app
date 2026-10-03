@@ -27,29 +27,34 @@ not yet built.
   only resolves once the actor reaches `consuming`, which requires
   `initializeManager` (`rabbitmq.initialize()` → `setupInfrastructure()`) to
   have completed first.
-- [ ] RUNTIME-QUEUE-02 Verify there is exactly **one** topology-declaration
-  path at startup, not two competing ones. Currently confirmed live:
-  `topology.ts::declareTopology()` (the modern `atlas.q.*` / `atlas.work.*`
-  taxonomy) has real callers (`code-evidence-outbox-consumer.ts`,
-  `code-evidence-projection-worker.ts`) but is **not** what
-  `hooks.server.ts` calls at boot — boot instead goes through
-  `rabbitmq-xstate-integration.ts` → `RabbitMQManager.initialize()`, which
-  has its own independent `this.queues`/`this.exchanges` registry (legacy
-  dotted names: `cache.invalidate`, `document.embed`, etc.) unrelated to
-  `topology.ts`'s `atlas.q.*` names. These are two real, live, separately-
-  declared topologies serving different queue families today, not a
-  redundant duplicate — confirm this is intentional (legacy simple-name
-  queues vs. newer `atlas.work.*` queues) before consolidating anything,
-  and document the boundary once confirmed. Do not merge them speculatively.
-- [ ] RUNTIME-QUEUE-03 Truthful worker readiness. `hooks.server.ts`
-  currently logs `${stats.started}/${stats.started + stats.failed} started`
-  from `WorkerRegistry.startAll()` — verify this reflects an actual
-  per-worker `consume()` success/failure outcome (not just "start function
-  was invoked"). Add explicit `READY | DEGRADED | FAILED | DISABLED` states
-  if the current stats object collapses failure modes. RabbitMQ
-  unavailability must continue to be non-fatal to HTTP startup (already
-  true — `hooks.server.ts`'s `.catch()` on the RabbitMQ pipeline chain
-  only warns).
+- [x] RUNTIME-QUEUE-02 **Startup topology boundary audited (2026-09-23, read-only).**
+  There are **two active startup declarations**, not one: legacy workload queues
+  (`hooks.server.ts` → `startRabbitMQPipeline` → `RabbitMQManager.initialize` →
+  `setupInfrastructure`) and the newer task/event topology (`hooks.server.ts` →
+  `startEventFabricWorker` → `declareTopology`). Their exchange and queue name
+  sets are disjoint. The event-fabric source explicitly separates notification
+  traffic from `WorkCommand`; therefore these are separate workload/event
+  domains, not competing declarations of the same broker objects. Preserve
+  both; do not consolidate speculatively. A third `packages/atlas-core` topology
+  source has no current first-party import/call site and shares
+  `atlas.tasks.v1`/`atlas.tasks.dlx.v1` with the app topology while declaring the
+  DLX as `fanout` instead of `direct`; do not activate it before owner/contract
+  reconciliation. Repeatable source audit: `scripts/atlas/audit-rabbitmq-topology-ownership-v1.mjs`;
+  receipt: `docs/reports/rabbitmq-topology-ownership-v1.json` (`writesPerformed=false`,
+  `brokerTouched=false`). This closes the boundary audit, not any broker migration.
+- [x] RUNTIME-QUEUE-03 **Worker readiness now reflects consumer registration outcomes (2026-09-23).**
+  `QueueWorker.start()` previously swallowed `rabbitmq.consume()` failures, so
+  `Promise.allSettled()` could count the worker as started despite no consumer.
+  Startup errors now set `FAILED` + `startError` and propagate to the registry;
+  `READY` is set only after `consume()` resolves. Registry state distinguishes
+  `NOT_STARTED`, `READY`, `DEGRADED`, `FAILED`, and `DISABLED`, and the boot log
+  reports ready/total plus failed/disabled counts. RabbitMQ remains non-fatal
+  to HTTP startup: the registry settles worker failures and the boot chain keeps
+  its warning-only failure handlers. Proof: `queue-worker-readiness.spec.ts`
+  (5/5; consume success/failure, disabled consumer, aggregate states); focused
+  typecheck found no diagnostics in the changed worker or readiness spec. The
+  broader selected roots reported 15 pre-existing diagnostics in hooks locals
+  augmentation/imported files, none at the changed boot log line.
 
 ## DAG-CONTRACT / DAG-FETCH / DAG-WEB / DAG-REPLAY — audit correction (2026-08-30)
 
@@ -147,16 +152,23 @@ implied when `atlas/research/*` looked like the live planner substrate.
 
 ## DAG-CONTRACT — typed envelope
 
-- [ ] DAG-CONTRACT-01 **Superseded in spirit by `research-kernel-contract-v1.ts`
-  + `local-research-circuit-v1.ts`** — see audit correction above. Remaining
-  work, if any, is aligning naming/routing, not authoring a new contract
-  from scratch. Do not check this off until the callback-tracing task above
-  is done. (Checked `packages/parent-atlas` and `packages/atlas-core` for an
-  `EvidenceManifestV1`/`TypedEvidenceEnvelope` name too — no match; the fan-
-  in concept only exists today as `atlas/research/*`'s card-dedup, not a
-  separately-named packages/-level contract.)
+- [x] DAG-CONTRACT-01 **Typed adaptive DAG plan contract exists and is tested (2026-09-23).**
+  `packages/parent-atlas/src/core/adaptive-dag-plan-v1.ts` owns the full
+  `AdaptiveDagPlanV1` and `DagActionKind` contract; it is not supplied by the
+  narrower web-research circuit. The action catalog covers Postgres, Qdrant,
+  file, AST, SIMD-JSON, graph, web search, rerank, context build, synthesis,
+  and latent fetch. Actions carry typed inputs/checksums, parameter artifact
+  references/checksums, output contracts, mutation policy, timeout, and
+  failure policy. The plan binds planner/classification revisions and a
+  checksum, validates dependencies, and hard-codes `canonicalAuthority=false`.
+  Focused tests: `adaptive-dag-plan-v1.spec.ts` (3),
+  `kernel-bound-dag-planner-v1.spec.ts` (5), and
+  `kernel-bound-dag-executor-v1.spec.ts` (2), all passing in the current
+  package tree. This proves the typed contract/planner/executor fixtures, not
+  live tool execution or canonical promotion.
 
-  **Narrower gap confirmed 2026-08-31 (found while scoping OAK-07 in
+  **Historical note (superseded by the implementation above):** the narrower
+  gap was confirmed 2026-08-31 (found while scoping OAK-07 in
   `parent-atlas-ontology-kernel`): `DagActionKind` and `AdaptiveDagPlanV1`
   themselves — not just the queue-envelope/session-wrapper names covered
   above — do not exist as code anywhere in the repo, under any name.**
@@ -184,11 +196,29 @@ implied when `atlas/research/*` looked like the live planner substrate.
 
 ## DAG-FETCH — deterministic fan-in
 
-- [ ] DAG-FETCH-01 **Largely covered** by `runLocalResearchCircuitV1()` +
-  `selectAceCardsV2()` (dedup by `cardId`, checksum-sealed selection) — see
-  audit correction above. Confirm this fan-in is genuinely evidence-identity
-  deduped (not just card-id deduped, which could mask duplicate underlying
-  evidence under different card ids) before treating this as done.
+- [ ] DAG-FETCH-01 **Fetch-plan coalescing remains open; selection must preserve card identity.**
+  Audit found no current `FetchParameterPlanV1` implementation/caller. The
+  circuit invokes `search()` per unique synthesized query, merges returned
+  cards by `cardId`, then selects cards. A concurrent selection patch had
+  deduplicated by `(sourceRef, sourceRevision, sorted unique evidenceRefs)` and
+  discarded a distinct card; that was not an upstream fetch dedupe. The unsafe
+  selection-level drop is removed and regression tests now require distinct
+  cards to survive, including equivalent evidence tuples, while different
+  revisions/evidence sets remain distinct. Still required before closure:
+  define/wire a fetch-plan boundary in the existing circuit (or identify its
+  actual owner), prove equivalent request tuples cause one upstream fetch and
+  one payload reuse, and prove revision/evidence changes do not coalesce. No
+  canonical authority or persistence is involved.
+  **Fixture progress (2026-09-23):** `buildResearchFetchPlanV1()` is now wired
+  before the circuit's injected `search()` callback. The callback receives the
+  full revision-qualified request tuple. Focused tests prove normalized
+  equivalent queries produce one callback invocation and two aliases to one
+  fetched payload, while workspace/candidate/ordinal revision changes produce
+  four distinct requests. ACE selector tests also prove distinct cards with
+  equivalent evidence references and cards with changed source revision or
+  evidence sets remain distinct. These are deterministic fixture proofs only;
+  no production retrieval caller is wired to this local circuit, so the gate
+  remains open for caller-level integration/readback.
 
 ## DAG-STRUCT — ast-grep as evidence node
 
@@ -297,7 +327,21 @@ implied when `atlas/research/*` looked like the live planner substrate.
   stable. Do not start this before DAG-CONTRACT-01 through DAG-REPLAY-01
   are real and proven; introducing a second broker before the first
   contract is even defined is the exact anti-pattern this change exists to
-  avoid.
+  avoid. **Current classification (2026-09-23): OPTIONAL_OBSERVABILITY_FOLLOWUP; not an execution dependency.**
+  Correction to the prior blocker note: Compose defines NATS in the `full`
+  profile and `legal-ai-nats` is running with JetStream enabled. Read-only
+  monitoring reports 0 streams, 0 consumers, 0 stored messages, and 0 live
+  connections. NATS client code also exists for other Core NATS subjects; that
+  does not establish a `PARENT_ATLAS_EVENTS` producer/consumer. RabbitMQ remains
+  the work-dispatch owner; PostgreSQL `workflow_events`/outbox remains durable
+  event authority; the existing Valkey stream is explicitly transport-only.
+  Therefore NATS is an optional observability/replay projection, not a DAG
+  execution prerequisite. Keep this checkbox open: no stream or event bridge
+  was provisioned, and enabling one requires a separately bounded operator
+  decision. The legacy spec's `WorkQueue` retention wording is not reconciled
+  with independent replay/audit consumers; settle that before configuration.
+  No jobs may be dispatched through JetStream here. Evidence:
+  `docs/reports/adaptive-dag-nats-event-ownership-v1.json`.
 ## LLAMA-SERVER-ORNITH-RUNTIME-OWNER-01 — live model identity
 
 - [x] Route the existing decomposition, synthesis/enrichment, pattern-reranking,
@@ -310,9 +354,12 @@ implied when `atlas/research/*` looked like the live planner substrate.
   synthesis; the sklearn NLP sidecar remains the domain-classifier owner;
   `:8121` remains the separate PyTorch neural-decoder lane; Ollama remains
   the embedding lane.
-- [ ] Live Ornith identity and output parity remain environment-dependent and
-  require a running `:8090` health/model probe. The workstation policy is
-  `LOADED_ACTIVE` with an `ornith-1.5` family allowlist; deployments may use
-  `CONFIGURED_VERIFY` to fail closed on model drift. No canonical writes,
-  classifier promotion, Graphify execution, or hidden-state persistence is
-  implied by this wiring.
+- [x] Live Ornith identity and chat output verified 2026-09-23. `GET
+  http://127.0.0.1:8090/v1/models` returned `ornith-1.5-9b`; a bounded
+  non-streaming `/v1/chat/completions` request using that returned ID completed
+  with `finish_reason=stop` and the expected `READY` response. The workstation
+  policy is `LOADED_ACTIVE` with an `ornith-1.5` family allowlist; deployments
+  may use `CONFIGURED_VERIFY` to fail closed on model drift. This is a live
+  identity/endpoint smoke proof, not a quality/parity benchmark; no canonical
+  writes, classifier promotion, Graphify execution, or hidden-state persistence
+  is implied.

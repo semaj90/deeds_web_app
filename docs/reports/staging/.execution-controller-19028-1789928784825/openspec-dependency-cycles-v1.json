@@ -1,0 +1,7 @@
+{
+  "schema": "atlas.openspec-dependency-cycles.v1",
+  "generatedAt": "2026-09-20T18:26:25.049Z",
+  "status": "NO_DECLARED_CYCLES",
+  "cycles": [],
+  "writesPerformed": false
+}

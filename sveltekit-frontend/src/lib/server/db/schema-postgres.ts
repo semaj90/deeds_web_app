@@ -4433,6 +4433,33 @@ export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** GPU-enriched codebase chunk index — mirrors codebase_chunk_index in Postgres */
+export interface CodebaseChunkSummaryProvenanceV1 {
+	schema: 'atlas.codebase-chunk-summary-provenance.v1';
+	sourceIdentityKey: string | null;
+	workspaceRevision: string | null;
+	sourceRef: string | null;
+	sourceRevision: string | null;
+	chunkId: string | null;
+	chunkCanonicalId: string | null;
+	chunkRowId: string | null;
+	chunkRevisionOrChecksum: string | null;
+	inputTextSha256: string | null;
+	inputByteLength: number | null;
+	modelId: string | null;
+	modelRevision: string | null;
+	modelParameterCount: number | null;
+	runtimeBuildRevision: string | null;
+	promptTemplateRevision: string | null;
+	summarySchemaRevision: string | null;
+	generationParameters: Record<string, unknown> | null;
+	summarySha256: string | null;
+	latencyMs: number | null;
+	usage: Record<string, unknown> | null;
+	evidenceRefs: string[];
+	lineageState: 'REVISION_QUALIFIED' | 'UNQUALIFIED' | 'PROPOSAL_ONLY';
+	canonicalAuthority: false;
+}
+
 export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	id: uuid('id').default(sql`gen_random_uuid()`).primaryKey().notNull(),
 	qdrantId: varchar('qdrant_id', { length: 64 }),
@@ -4440,6 +4467,9 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 
 	repoId: uuid('repo_id'),
 	relativePath: text('relative_path').notNull(),
+	// Live column, previously undeclared here (schema/DB drift) -- added because the new
+	// fileContentHashIdx below needs it; not a broader drift-remediation pass.
+	sourceRef: text('source_ref'),
 	symbol: varchar('symbol', { length: 255 }),
 	kind: varchar('kind', { length: 50 }),
 	domain: varchar('domain', { length: 50 }),
@@ -4451,8 +4481,28 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	tokenCount: integer('token_count'),
 
 	content: text('content'),
-	contentHash: text('content_hash'),
+	contentHash: text('content_hash'), // NOTE: chunk-scoped, sometimes truncated to 16 hex chars -- see fileContentHash below for whole-file-comparable identity
 	signature: text('summary'), // summary field doubles as chunk signature
+
+	// Additive whole-file-hash contract (openspec/changes/parent-atlas-chunk-index-whole-file-hash,
+	// drizzle/manual/20260915_codebase_chunk_index_whole_file_hash.sql). Never redefines contentHash
+	// above; fileContentHash is always full 64-char untruncated SHA-256 of the whole source file,
+	// joinable exactly against graphify_files/graphify_execution_file_membership_v2.content_hash.
+	fileContentHash: text('file_content_hash'),
+	// Nullable current-source lineage mirror. These values are admitted only by
+	// an exact workspace/source/packet/chunk proof; historical rows stay NULL.
+	workspaceRevision: text('workspace_revision'),
+	sourceRevision: text('source_revision'),
+	representationRevision: text('representation_revision'),
+	lineageBindingChecksum: text('lineage_binding_checksum'),
+	lineageProducerRevision: text('lineage_producer_revision'),
+	// Describes contentHash's (not fileContentHash's) per-row provenance -- populated only once a
+	// row's writer has been read and confirmed (see that change's tasks.md task 2.3); NULL means
+	// unconfirmed, never inferred from the hash string's length or shape alone.
+	contentHashScope: text('content_hash_scope'), // 'chunk' | 'whole_file' | null
+	contentHashAlgorithm: text('content_hash_algorithm'),
+	contentHashLength: integer('content_hash_length'),
+	contentHashVersion: integer('content_hash_version'),
 
 	gpuCluster: integer('gpu_cluster'),
 	somCluster: integer('som_cluster'),
@@ -4475,37 +4525,49 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	 * Schema matches CodeLlmOutputMeta from code_llm_index.
 	 */
 	outputMeta: jsonb('output_meta').notNull().default(sql`'{}'::jsonb`),
+	// Dedicated chunk summary text. The legacy `summary` column above is mapped
+	// as `signature` and must not be treated as an admitted summary.
+	summaryText: text('summary_text'),
 
 	embeddingModel: varchar('embedding_model', { length: 100 }),
 	summaryModel: varchar('summary_model', { length: 100 }),
+	// Nullable, revision-bound provenance for chunk summaries. Proposals and
+	// unknown model/prompt/generation details remain NULL until proven.
+	summaryHash: text('summary_hash'),
+	summaryProvenance: jsonb('summary_provenance').$type<CodebaseChunkSummaryProvenanceV1 | null>(),
 
 	// halfvec(768) embeddings — live column type verified 2026-07-22
 	// Use halfvec_cosine_ops HNSW index for ANN queries (see schema DDL)
 	contentEmbedding: halfvec('content_embedding', { dimensions: 768 }),
 	summaryEmbedding: halfvec('summary_embedding', { dimensions: 768 }),
 	signatureEmbedding: halfvec('signature_embedding', { dimensions: 768 }),
+	// Existing nullable vector lanes declared here for Drizzle read-model parity.
+	// These declarations do not authorize new writers, migrations, or promotion.
+	contentEmbedding768: vector('content_embedding_768', { dimensions: 768 }),
+	summaryEmbedding384: vector('summary_embedding_384', { dimensions: 384 }),
+	errorEmbedding: halfvec('error_embedding', { dimensions: 768 }),
+	errorEmbeddingLatent256: halfvec('error_embedding_latent_256', { dimensions: 256 }),
+	errorEmbeddingLatent128: halfvec('error_embedding_latent_128', { dimensions: 128 }),
+	errorEmbeddingLatent64: vector('error_embedding_latent_64', { dimensions: 64 }),
+	latent128: halfvec('latent_128', { dimensions: 128 }),
 
-	// Learned nested-autoencoder representation (2026-08-29). NOT a prefix truncation of
-	// content_embedding -- an actual model forward pass (NestedSemanticAutoencoder.encode()).
-	// canonical_authority: false always -- routing/reranking lane only, never the primary
-	// retrieval authority.
-	// See openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md for the recall
-	// comparison that justified this column (latent_256 beats semantic_mrl_256, 0.8957 vs 0.8575).
+	// Candidate nested-autoencoder storage types. The current candidate architecture is
+	// semantic_768 -> learned latent_256 -> learned latent_128 -> normalized latent_64
+	// prefix of latent_128. Historical rows in these columns may have been produced by
+	// older checkpoint/derivation contracts; column presence is not provenance. Do not
+	// project them as candidate outputs without matching per-row input and model revisions.
+	// These are derived routing representations, never canonical semantic truth.
 	latent256: halfvec('latent_256', { dimensions: 256 }),
 	// Model checksum from the training receipt that produced latent_256 for this row.
 	// A future retrain must not silently mix generations -- a mismatch here means the row
 	// needs re-encoding, not that the column is stale/broken.
 	latent256CheckpointRevision: varchar('latent_256_checkpoint_revision', { length: 64 }),
 
-	// latent_64 (2026-09-02 LATENT-SCHEMA-ALIGN-01 correction): this file previously claimed
-	// latent_128/latent_64 "are NOT stored separately: they're free prefix+renormalize views of
-	// latent_256" -- that was false against live Postgres. `python/backfill_latent_256.py`
-	// persists latent_64 as its own learned-model output (same NestedSemanticAutoencoder forward
-	// pass, not a prefix of latent_256), and the column has been live and indexed
-	// (idx_codebase_chunk_latent64_hnsw) since before this correction. latent_128 genuinely has
-	// no Postgres column (in-memory only, per that script's own docstring) -- the claim was only
-	// half wrong. Declaration alignment only, no migration: every column below already exists on
-	// the live table. Live HNSW/checksum indexes (idx_codebase_chunk_latent64_hnsw,
+	// These legacy physical columns exist, but their contents are not promoted as outputs of
+	// atlas.latent-ae.768-512-256-128.v2. Historical latent_64 values must not be re-labelled as
+	// the candidate normalized prefix of latent_128. This is declaration alignment only; no
+	// migration or data rewrite is authorized here. Live HNSW/checksum indexes
+	// (idx_codebase_chunk_latent64_hnsw,
 	// idx_codebase_chunk_latent_valid, idx_codebase_chunk_latent_256_hnsw,
 	// idx_codebase_chunk_latent_256_checkpoint_revision) are intentionally not declared here,
 	// consistent with this repo's existing convention of keeping HNSW/GIN indexes in manual SQL
@@ -4542,6 +4604,9 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	extensionIdx: index('codebase_chunk_index_extension_idx').on(table.extension),
 	centroidIdx:  index('codebase_chunk_index_centroid_idx').on(table.centroidId),
 	routingTierIdx: index('codebase_chunk_index_routing_tier_idx').on(table.routingTier),
+	// Declared here to match drizzle/manual/20260915_codebase_chunk_index_whole_file_hash.sql,
+	// which is the actual applier (partial index, CREATE INDEX CONCURRENTLY -- not yet run).
+	fileContentHashIdx: index('idx_codebase_chunk_index_file_content_hash').on(table.sourceRef, table.fileContentHash),
 }));
 
 /** Cluster-level LLM summaries — one row per (repo_id, gpu_cluster) pair */
@@ -5010,6 +5075,32 @@ export const featureStructuralFacts = pgTable('feature_structural_facts', {
 export type FeatureStructuralFacts = typeof featureStructuralFacts.$inferSelect;
 export type NewFeatureStructuralFacts = typeof featureStructuralFacts.$inferInsert;
 
+// Concept vocabulary root for the OAKLIB-equivalent resolution boundary
+// (openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap Phase 1).
+// Previously live in Postgres with NO Drizzle declaration at all (a real
+// schema/DB drift found while auditing field parity 2026-09-15, same class
+// of gap as `source_ref`'s pre-existing drift on featureOntologyTuples noted
+// above) -- added here so schema.ts and the live table finally agree.
+export const atlasDomainOntology = pgTable('atlas_domain_ontology', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  groupId: varchar('group_id', { length: 255 }).notNull().unique(),
+  groupLabel: varchar('group_label', { length: 255 }).notNull(),
+  parentGroupId: varchar('parent_group_id', { length: 255 }),
+  description: text('description'),
+  taxonomyLevel: integer('taxonomy_level').default(0),
+  confidence: real('confidence').default(1.0),
+  examples: text('examples').array(),
+  createdAt: timestamp('created_at', { withTimezone: true }).default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
+}, (t) => [
+  index('idx_domain_ontology_group_id').on(t.groupId),
+  index('idx_domain_ontology_level').on(t.taxonomyLevel),
+  index('idx_domain_ontology_parent').on(t.parentGroupId),
+]);
+
+export type AtlasDomainOntology = typeof atlasDomainOntology.$inferSelect;
+export type NewAtlasDomainOntology = typeof atlasDomainOntology.$inferInsert;
+
 export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   packetKey: text('packet_key').notNull(),
@@ -5029,6 +5120,13 @@ export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   validFrom: timestamp('valid_from', { withTimezone: true }),
   validTo: timestamp('valid_to', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  // Phase 2 of parent-atlas-ontology-oaklib-fanout-bitmap (2026-09-15,
+  // drizzle/manual/20260915_feature_ontology_tuples_resolution_columns.sql).
+  // Additive/nullable-by-default -- existing 539,124 rows default to
+  // resolvedConceptId=null/resolutionState='UNRESOLVED' per design.md D2
+  // (forward-only cutover, no mass backfill).
+  resolvedConceptId: text('resolved_concept_id'),
+  resolutionState: text('resolution_state').notNull().default('UNRESOLVED'),
 }, (t) => [
   unique('feature_ontology_tuples_unique').on(
     t.packetKey,
@@ -5044,6 +5142,7 @@ export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
   index('feature_ontology_tuples_subject_idx').on(t.subjectType, t.subjectId),
   index('feature_ontology_tuples_predicate_idx').on(t.predicate),
   index('feature_ontology_tuples_object_idx').on(t.objectType, t.objectId),
+  index('feature_ontology_tuples_resolved_concept_id_idx').on(t.resolvedConceptId),
 ]);
 
 export type FeatureOntologyTuples = typeof featureOntologyTuples.$inferSelect;
@@ -5384,6 +5483,7 @@ export * from './schema/atlas-packets.js';
 export * from './schema/packet-binary-registry.js';
 export * from './schema/atlas-artifacts.js';
 export * from './schema/atlas-semantic-diffs.js';
+export * from './schema/workspace-events.js';
 
 // ---------------------------------------------------------------------------
 // Agent workflow tables (Step 3 of integration order)

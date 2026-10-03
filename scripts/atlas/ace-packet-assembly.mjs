@@ -28,6 +28,14 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import Redis from 'ioredis';
+
+// DEPRECATED (ACE3-00): this assembler joins historical summary layers, has no revision tuple, writes derived
+// envelopes into canonical atlas_packets.metadata and caches under bitfrost:ace:{packet_key} with a flat TTL.
+// Superseded by atlas.ace-packet.v3 (packages/parent-atlas) + revision-qualified BitFrost identity. Dry-run stays available.
+if (process.argv.includes('--apply') && process.env.ACE_LEGACY_ASSEMBLER_ALLOW !== '1') {
+  console.error('ace-packet-assembly --apply is deprecated (ACE3-00). Set ACE_LEGACY_ASSEMBLER_ALLOW=1 to override knowingly.');
+  process.exit(78);
+}
 import { loadRepoEnv, REPO_ROOT, resolveRedisConfig } from './connection-config.mjs';
 
 const { Pool } = pg;

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.cuda-cutile-simt-probe.v1",
+  "generatedAt": "2026-09-11T00:00:00Z",
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": [8, 6],
+    "torch": "2.14.0+cu132",
+    "torchCuda": "13.2",
+    "cuTile": "1.5.0",
+    "tileCompiler": "13.2.78"
+  },
+  "simtTorchFp16Gemm": {
+    "shape": [512, 256, 256],
+    "finite": true,
+    "latencyMs": 214.037
+  },
+  "cuTileVectorAdd": {
+    "shape": [1024],
+    "finiteAndCorrect": true,
+    "latencyMs": 343.069
+  },
+  "peakTorchMiB": 9.38,
+  "writes": false,
+  "canonicalAuthority": false,
+  "status": "SIMT_RUNTIME_FINITE_PROVEN",
+  "limitations": [
+    "bounded GEMM/vector fixture only",
+    "not neural decoder LibTorch or N-API parity",
+    "not production promotion"
+  ]
+}

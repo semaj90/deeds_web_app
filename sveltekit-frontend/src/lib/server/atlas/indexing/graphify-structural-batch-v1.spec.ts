@@ -39,6 +39,8 @@ function result(
 describe('runGraphifyStructuralBatchV1', () => {
   it('isolates one failed parse without aborting neighboring files', async () => {
     const calls: string[] = [];
+    let activeMaterializations = 0;
+    let peakMaterializations = 0;
     const receipt = await runGraphifyStructuralBatchV1(
       {
         workspaceRevision: 'workspace:test',
@@ -46,33 +48,49 @@ describe('runGraphifyStructuralBatchV1', () => {
         inputMode: 'FULL_SCAN',
         entries: [
           { sourceRef: 'src/valid-a.ts', action: 'UPSERT', source: 'export const a = 1;' },
-          { sourceRef: 'src/broken.ts', action: 'UPSERT', source: 'export function broken( {' },
+          { sourceRef: 'src/recovered.ts', action: 'UPSERT', source: 'export function recovered( {' },
+          { sourceRef: 'src/failed.ts', action: 'UPSERT', source: 'export function failed( {' },
           { sourceRef: 'src/valid-b.ts', action: 'UPSERT', source: 'export const b = 2;' },
         ],
       },
       {
         async materialize(input) {
           calls.push(input.sourceRef);
-          if (input.sourceRef === 'src/broken.ts') throw new Error('fixture parser failure');
-          return result(input.sourceRef);
+          activeMaterializations += 1;
+          peakMaterializations = Math.max(peakMaterializations, activeMaterializations);
+          try {
+            if (input.sourceRef === 'src/recovered.ts') {
+              return result(input.sourceRef, 'RECOVERED_WITH_ERRORS', ['ChunkingError: Tree-sitter recovered syntax error']);
+            }
+            if (input.sourceRef === 'src/failed.ts') throw new Error('ChunkingError: fixture parser failure');
+            return result(input.sourceRef);
+          } finally {
+            activeMaterializations -= 1;
+          }
         },
       },
     );
 
-    expect(calls).toEqual(['src/valid-a.ts', 'src/broken.ts', 'src/valid-b.ts']);
-    expect(receipt.failedFiles).toBe(1);
+    expect(calls).toEqual(['src/valid-a.ts', 'src/recovered.ts', 'src/failed.ts', 'src/valid-b.ts']);
+    expect(peakMaterializations).toBe(1);
+    expect(receipt.totalInputs).toBe(4);
+    expect(receipt.processedFiles).toBe(4);
     expect(receipt.provenFiles).toBe(2);
+    expect(receipt.recoveredFiles).toBe(1);
+    expect(receipt.failedFiles).toBe(1);
     expect(receipt.isolatedFailurePass).toBe(true);
     expect(receipt.revisionAuthorityPass).toBe(false);
     expect(receipt.files.map((item) => [item.sourceRef, item.status])).toEqual([
       ['src/valid-a.ts', 'PROVEN'],
-      ['src/broken.ts', 'FAILED'],
+      ['src/recovered.ts', 'RECOVERED_WITH_ERRORS'],
+      ['src/failed.ts', 'FAILED'],
       ['src/valid-b.ts', 'PROVEN'],
     ]);
     expect(receipt.files[0]?.canonicalPromotionAllowed).toBe(false);
     expect(receipt.files[0]?.sourceRevision).toBeNull();
     expect(receipt.files[0]?.sourceRevisionAuthority).toBe('CONTENT_ANCHOR_ONLY');
-    expect(receipt.files[1]?.diagnostics).toContain('fixture parser failure');
+    expect(receipt.files[1]?.diagnostics).toContain('ChunkingError: Tree-sitter recovered syntax error');
+    expect(receipt.files[2]?.diagnostics).toContain('ChunkingError: fixture parser failure');
     expect(receipt.outputChecksum).toMatch(/^[a-f0-9]{64}$/);
   });
 

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.bounded-nlp-stage-run.v1",
+  "runId": "nlp-stage-1791003142132-8592",
+  "status": "STAGING_FAILED_CLOSED",
+  "readOnly": false,
+  "canonicalAuthority": false,
+  "writes": {
+    "analysisPassLedger": false,
+    "canonicalFeatureState": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "input": {
+    "suppliedPacketKey": "packet:b13af559f410",
+    "resolvedStoragePacketKey": "packet:b13af559f410",
+    "packetIdentityResolution": "DIRECT_STORAGE_ROW",
+    "sourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+    "sourceRevision": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+    "workspaceRevision": null,
+    "workspaceRevisionDisposition": "OMITTED_LEGACY_ZERO",
+    "sourceBytes": 6237,
+    "sourceChecksum": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+    "passSelection": [
+      "linguistic"
+    ]
+  },
+  "result": null,
+  "readback": null,
+  "error": "STAGING_READBACK_NOT_UNIQUE"
+}

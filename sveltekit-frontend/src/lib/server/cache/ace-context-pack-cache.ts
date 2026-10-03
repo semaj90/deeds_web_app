@@ -210,12 +210,7 @@ export async function setAceContextPackPointer(key: string, pack: AceContextPack
   // Record metric for the pointer set operation. Use 'postgres' when DB write succeeded,
   // otherwise mark as 'redis' if Redis wrote, falling back to 'local-json' semantics.
   try {
-    const source: 'redis' | 'postgres' | 'local-json' =
-      pgRes.status === 'fulfilled'
-        ? 'postgres'
-        : redisRes.status === 'fulfilled'
-          ? 'redis'
-          : 'local-json';
+    const source = classifyAceContextPackPointerSource(pgRes, redisRes);
     // best-effort metric emit
     await recordAceContextPackAccess(normalized, source, true);
   } catch {
@@ -230,6 +225,7 @@ export async function setAceContextPackPointer(key: string, pack: AceContextPack
     const status = {
       redis: redisRes.status,
       postgres: pgRes.status,
+      postgresPersisted: pgRes.status === 'fulfilled' && pgRes.value !== null,
       ts: new Date().toISOString(),
       normalizedAuthority: normalized.authority ?? null,
       cacheKey,
@@ -571,6 +567,15 @@ function sanitizeCacheKey(key: string): string {
  */
 export async function auditAceContextPackToPostgres(pack: AceContextPack): Promise<string | null> {
   return persistAceContextPackAuditRow(pack);
+}
+
+export function classifyAceContextPackPointerSource(
+  postgresResult: PromiseSettledResult<string | null>,
+  redisResult: PromiseSettledResult<void>,
+): 'postgres' | 'redis' | 'local-json' {
+  if (postgresResult.status === 'fulfilled' && postgresResult.value !== null) return 'postgres';
+  if (redisResult.status === 'fulfilled') return 'redis';
+  return 'local-json';
 }
 
 export async function persistAceContextPackAuditRow(pack: AceContextPack): Promise<string | null> {

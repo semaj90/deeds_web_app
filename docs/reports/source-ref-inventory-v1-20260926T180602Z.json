@@ -1,0 +1,545 @@
+{
+  "schema": "atlas.source-ref-inventory.v1",
+  "status": "SOURCE_REF_INVENTORY_LIVE_READ_ONLY",
+  "generatedAt": "2026-09-26T18:06:04.171Z",
+  "proofLevel": "LIVE_READ_ONLY",
+  "transaction": {
+    "isolation": "REPEATABLE READ",
+    "readOnly": true,
+    "rolledBack": true
+  },
+  "columnsPresent": [
+    "source_ref",
+    "source_ref_key",
+    "canonical_source_ref"
+  ],
+  "sourceRefKeyColumnExists": true,
+  "conceptsKeptDistinct": {
+    "source_ref": "original producer reference; spelling/case preserved",
+    "source_ref_key": "normalized comparison key (not authority)",
+    "canonical_source_ref": "admitted authority-selected reference (lowercased today)"
+  },
+  "totals": {
+    "total": 61718,
+    "null_refs": 0,
+    "blank_refs": 1,
+    "uppercase_refs": 23534,
+    "bracket_route_refs": 921,
+    "paren_group_refs": 1310,
+    "plus_refs": 6371,
+    "non_ascii_or_control_refs": 2,
+    "refs_with_space": 83,
+    "contains_dotdot_text_census_only": 20,
+    "rejected_by_legacy_rule": 56724
+  },
+  "forms": [
+    {
+      "form": "PATH_WITH_DIRECTORY",
+      "n": 61425
+    },
+    {
+      "form": "ROOT_LEVEL_FILE_WITH_EXTENSION",
+      "n": 224
+    },
+    {
+      "form": "SCHEME_NAMESPACE",
+      "n": 62
+    },
+    {
+      "form": "NO_PATH_STRUCTURE",
+      "n": 6
+    },
+    {
+      "form": "BLANK",
+      "n": 1
+    }
+  ],
+  "schemes": [
+    {
+      "scheme": "proto",
+      "n": 61
+    },
+    {
+      "scheme": "cluster",
+      "n": 1
+    }
+  ],
+  "extensions": {
+    "distinct": 492,
+    "top": [
+      {
+        "extension": "json",
+        "n": 14041
+      },
+      {
+        "extension": "md",
+        "n": 10138
+      },
+      {
+        "extension": "ts",
+        "n": 8568
+      },
+      {
+        "extension": "<none>",
+        "n": 4121
+      },
+      {
+        "extension": "svelte",
+        "n": 2667
+      },
+      {
+        "extension": "py",
+        "n": 2516
+      },
+      {
+        "extension": "mjs",
+        "n": 2407
+      },
+      {
+        "extension": "png",
+        "n": 1487
+      },
+      {
+        "extension": "any-backup",
+        "n": 972
+      },
+      {
+        "extension": "timestamp",
+        "n": 942
+      },
+      {
+        "extension": "jsonl",
+        "n": 909
+      },
+      {
+        "extension": "txt",
+        "n": 846
+      },
+      {
+        "extension": "d",
+        "n": 821
+      },
+      {
+        "extension": "disabled",
+        "n": 808
+      },
+      {
+        "extension": "rmeta",
+        "n": 749
+      },
+      {
+        "extension": "rlib",
+        "n": 588
+      },
+      {
+        "extension": "sql",
+        "n": 539
+      },
+      {
+        "extension": "h",
+        "n": 438
+      },
+      {
+        "extension": "batch1000-backup",
+        "n": 429
+      },
+      {
+        "extension": "err",
+        "n": 397
+      },
+      {
+        "extension": "out",
+        "n": 394
+      },
+      {
+        "extension": "cpp",
+        "n": 360
+      },
+      {
+        "extension": "woff2",
+        "n": 325
+      },
+      {
+        "extension": "log",
+        "n": 299
+      },
+      {
+        "extension": "ps1",
+        "n": 285
+      },
+      {
+        "extension": "pyi",
+        "n": 269
+      },
+      {
+        "extension": "tlog",
+        "n": 239
+      },
+      {
+        "extension": "js",
+        "n": 208
+      },
+      {
+        "extension": "tcl",
+        "n": 201
+      },
+      {
+        "extension": "cu",
+        "n": 192
+      },
+      {
+        "extension": "sh",
+        "n": 160
+      },
+      {
+        "extension": "comp",
+        "n": 155
+      },
+      {
+        "extension": "msg",
+        "n": 145
+      },
+      {
+        "extension": "bak",
+        "n": 138
+      },
+      {
+        "extension": "o",
+        "n": 121
+      },
+      {
+        "extension": "ndjson",
+        "n": 121
+      },
+      {
+        "extension": "dat",
+        "n": 112
+      },
+      {
+        "extension": "proto",
+        "n": 111
+      },
+      {
+        "extension": "lib",
+        "n": 109
+      },
+      {
+        "extension": "cjs",
+        "n": 106
+      },
+      {
+        "extension": "csv",
+        "n": 103
+      },
+      {
+        "extension": "cl",
+        "n": 102
+      },
+      {
+        "extension": "tmp",
+        "n": 84
+      },
+      {
+        "extension": "exp",
+        "n": 84
+      },
+      {
+        "extension": "enc",
+        "n": 80
+      },
+      {
+        "extension": "pdb",
+        "n": 79
+      },
+      {
+        "extension": "dll",
+        "n": 76
+      },
+      {
+        "extension": "yml",
+        "n": 75
+      },
+      {
+        "extension": "cuh",
+        "n": 73
+      },
+      {
+        "extension": "exe",
+        "n": 72
+      },
+      {
+        "extension": "cmake",
+        "n": 67
+      },
+      {
+        "extension": "f90",
+        "n": 61
+      },
+      {
+        "extension": "obj",
+        "n": 59
+      },
+      {
+        "extension": "vcxproj",
+        "n": 59
+      },
+      {
+        "extension": "webp",
+        "n": 59
+      },
+      {
+        "extension": "c",
+        "n": 55
+      },
+      {
+        "extension": "hpp",
+        "n": 55
+      },
+      {
+        "extension": "pdf",
+        "n": 54
+      },
+      {
+        "extension": "bin",
+        "n": 52
+      },
+      {
+        "extension": "wgsl",
+        "n": 51
+      }
+    ]
+  },
+  "firstSegments": [
+    {
+      "segment": "sveltekit-frontend",
+      "n": 19956
+    },
+    {
+      "segment": "scripts",
+      "n": 8845
+    },
+    {
+      "segment": "neschrom97",
+      "n": 8178
+    },
+    {
+      "segment": ".python311",
+      "n": 4140
+    },
+    {
+      "segment": "crates",
+      "n": 3749
+    },
+    {
+      "segment": "src",
+      "n": 3260
+    },
+    {
+      "segment": "simd-bridge",
+      "n": 3075
+    },
+    {
+      "segment": "llama-cpp-turboquant-gemma4",
+      "n": 2381
+    },
+    {
+      "segment": "docs",
+      "n": 1679
+    },
+    {
+      "segment": "turbovec",
+      "n": 1163
+    },
+    {
+      "segment": ".tmp",
+      "n": 1063
+    },
+    {
+      "segment": "claude-mem",
+      "n": 807
+    },
+    {
+      "segment": ".svelte-error-fixes-backup",
+      "n": 692
+    },
+    {
+      "segment": "logs",
+      "n": 512
+    },
+    {
+      "segment": "memory",
+      "n": 233
+    },
+    {
+      "segment": "next_steps",
+      "n": 190
+    },
+    {
+      "segment": "qdrant-windows",
+      "n": 182
+    },
+    {
+      "segment": "storage",
+      "n": 174
+    },
+    {
+      "segment": "packages",
+      "n": 163
+    },
+    {
+      "segment": ".error-brain",
+      "n": 85
+    },
+    {
+      "segment": "scratch",
+      "n": 77
+    },
+    {
+      "segment": "drizzle",
+      "n": 73
+    },
+    {
+      "segment": "minio-data",
+      "n": 69
+    },
+    {
+      "segment": ".vscode",
+      "n": 64
+    },
+    {
+      "segment": "services",
+      "n": 61
+    }
+  ],
+  "roles": {
+    "canonical_null": 3352,
+    "canonical_equals_lower_source_ref": 38407,
+    "canonical_differs_from_lower_source_ref": 19959,
+    "uppercase_source_ref_equal_to_canonical": 61
+  },
+  "keyRoles": {
+    "key_null": 58,
+    "key_equals_lower_source_ref": 36337,
+    "key_differs_from_lower_source_ref": 25323
+  },
+  "legacyRejectedSample": {
+    "groupedDistinctInSample": 500,
+    "artifact": {
+      "path": ".tmp\\atlas\\source-ref-inventory-v1\\20260926T180602Z\\legacy-rejected-sample.json",
+      "sha256": "sha256:842e64e656a366d74e354a0301d17fae827a1f6c8501eef8f57857a0328bf3da"
+    },
+    "first25": [
+      {
+        "source_ref": "",
+        "n": 1
+      },
+      {
+        "source_ref": "$lib/utils/file-reader.ts",
+        "n": 1
+      },
+      {
+        "source_ref": "1",
+        "n": 1
+      },
+      {
+        "source_ref": "61026__.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_10_libtorch_review.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_10_todo_parentatlas.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_11_26_mem.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_11_26_phase5_cannonical_.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_11_todo.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_13_26_todo.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_13_26__.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "___6_13-codexout_.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_13_opencode_validation_skills.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_14_26_codexended_614.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_14_26__todo_find_schema_matching.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_14_26__to_do_parent_atlas_registery.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_15_hyperrag_tod.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "618__25todo.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_18_todopt2.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_18_todo_pt3.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_19_26_pt1.2_todo.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "619_nextsteps_todopt1.3.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_19_todo_pt1.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "6_20_26__todo_.txt",
+        "n": 1
+      },
+      {
+        "source_ref": "620_26.txt",
+        "n": 1
+      }
+    ]
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "writes": {
+    "postgres": 0,
+    "redis": 0,
+    "nats": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "atlas.codebase-chunk-index-writer-audit.v1",
+  "generatedAt": "2026-09-15T00:00:00.000Z",
+  "mode": "READ_ONLY",
+  "owner": "openspec/changes/parent-atlas-chunk-index-whole-file-hash",
+  "gate": "task 1.1-1.5 (writer-completeness audit)",
+  "supersedesCorrects": {
+    "priorClaim": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md's LEGACY-HASH-WRITER-IDENTIFICATION-01 (2026-09-15, earlier same day) stated codebase-semantic-indexer.ts writes 'content_hash: chunk.contentHash straight to the column' in codebase_chunk_index.",
+    "correction": "FALSE. Verified by reading the full file: codebase-semantic-indexer.ts contains zero Postgres references (no 'pg', 'Pool', 'INSERT INTO' anywhere in the file). Its content_hash write (line 677) is a QDRANT PAYLOAD field on a point later sent via upsertPoints() -- never a direct Postgres write. The underlying HASH FORMULA attribution (SHA-256 truncated to 16 hex chars, of one chunk's text) was correct; only the write-path description (direct vs Qdrant-mediated) was wrong.",
+    "realMechanism": "codebase-semantic-indexer.ts writes points into Qdrant collection 'codebase_chunks_768' with payload.content_hash = 16-char truncated SHA-256 of chunk text. A SEPARATE script, sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts, scrolls that SAME Qdrant collection ('codebase_chunks_768', confirmed matching default) and upserts payload.content_hash verbatim into Postgres codebase_chunk_index.content_hash (line ~338: textOrNull(payload.content_hash)). This is a two-hop pipeline, not a direct write."
+  },
+  "confirmedWriters": [
+    {
+      "writer": "scripts/atlas/index-full-repo-for-search.mjs",
+      "line": 514,
+      "mechanism": "DIRECT Postgres write via real parameterized INSERT ... ON CONFLICT (qdrant_id) DO UPDATE",
+      "formula": "sha256(`${relPath}:${idx}:${c.text}`) -- full 64-char hex, no truncation",
+      "scope": "chunk (composite string, not whole-file)",
+      "algorithm": "sha256",
+      "length": 64,
+      "classification": "WRITES_CONTENT_HASH",
+      "confidence": "CONFIRMED_BY_READING_FULL_INSERT_STATEMENT"
+    },
+    {
+      "writer": "sveltekit-frontend/scripts/codebase-semantic-indexer.ts + sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts (two-hop pair)",
+      "lines": { "indexer": [556, 567, 584, 663, 677], "mirror": [4, 29, 310, 338] },
+      "mechanism": "INDIRECT Postgres write: indexer writes SHA-256(chunk text).slice(0,16) into a Qdrant point payload (collection codebase_chunks_768); mirror script separately scrolls that collection and copies payload.content_hash verbatim into Postgres via INSERT ... ON CONFLICT (qdrant_id) DO UPDATE SET content_hash = EXCLUDED.content_hash",
+      "formula": "createHash('sha256').update(chunkText).digest('hex').slice(0, 16)",
+      "scope": "chunk",
+      "algorithm": "sha256",
+      "length": 16,
+      "classification": "WRITES_CONTENT_HASH",
+      "confidence": "CONFIRMED_BY_READING_BOTH_FILES_AND_MATCHING_COLLECTION_NAME"
+    },
+    {
+      "writer": "sveltekit-frontend/scripts/atlas/apply-null-content-hash-metadata-repair.mjs",
+      "line": 313,
+      "mechanism": "DIRECT Postgres write, gated: UPDATE codebase_chunk_index SET content_hash = $2 WHERE id = $1 AND content_hash IS NULL (only fills NULL rows, never overwrites an existing value; requires --apply flag)",
+      "formula": "shortContentHash(text) = createHash('sha256').update(Buffer.from(text,'utf8')).digest('hex').slice(0, 16), computed over pgRow.content (the chunk row's own content column)",
+      "scope": "chunk",
+      "algorithm": "sha256",
+      "length": 16,
+      "classification": "WRITES_CONTENT_HASH",
+      "confidence": "CONFIRMED_BY_READING_FULL_UPDATE_STATEMENT_AND_HASH_FUNCTION",
+      "note": "Uses the identical 16-char-truncated-chunk-SHA256 convention as the indexer/mirror pair above -- reinforces this is a systemic convention across 3 code paths, not an isolated mistake."
+    }
+  ],
+  "confirmedNonWriters": [
+    { "file": "scripts/atlas/audit-atlas-packets-content-hash-source.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Read-only audit of atlas_packets.content_hash (a different table/column); reads codebase_chunk_index.content_hash only as a join reference. Its own header independently confirms atlas_packets.content_hash has 'no live writer' except an unrun demo script -- useful cross-reference, not in scope here." },
+    { "file": "scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Read-only SELECT COUNT audit across 4 tables." },
+    { "file": "scripts/atlas/apply-lineage-qdrant-projection-from-postgres-v1.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Reads codebase_chunk_index by (source_ref, content_hash) to project TO Qdrant; does not write the column." },
+    { "file": "scripts/atlas/backfill-qdrant-point-id-from-chunks.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Uses content_hash as a read-only join key to backfill a different column (qdrant_point_id)." },
+    { "file": "scripts/atlas/atlas-packets-content-hash-backfill-v1.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Writes atlas_packets.content_hash (different table), reading codebase_chunk_index.content_hash only as the source value for single-chunk-file packets." },
+    { "file": "sveltekit-frontend/scripts/atlas/backfill-chunk-id-from-content-hash.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Writes chunk_id (derived as 'card:'||source_ref||':'||content_hash); requires content_hash IS NOT NULL as a precondition but never writes to it. Its own header (lines 24-26) already correctly ruled out index-full-repo-for-search.mjs as the 16-hex writer and left the real writer 'not resolved' -- this audit resolves that open item." },
+    { "file": "sveltekit-frontend/scripts/atlas/packet-key-grain-audit.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Read-only audit; docstring comment only." },
+    { "file": "sveltekit-frontend/scripts/atlas/audit-null-content-hash-repairability.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Read-only audit per its own docstring; SELECT-only." },
+    { "file": "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs", "classification": "DOES_NOT_WRITE_CONTENT_HASH", "reason": "Zero matches for content_hash/contentHash/createHash (confirmed same-day, earlier session turn)." }
+  ],
+  "graphifyFilesWriterConfirmed": {
+    "chain": "sveltekit-frontend/scripts/atlas/observe-workspace-source-binding.mts (reads whole file via node:fs readFile) -> deriveCodeSourceRevisionV1() in sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts -> sveltekit-frontend/scripts/atlas/materialize-graphify-source-inventory.mts (INSERT INTO graphify_files)",
+    "formula": "createHash('sha256').update(Buffer.from(source, 'utf8')).digest('hex') -- full 64-char hex, NO truncation, computed over the ENTIRE file content read from disk",
+    "scope": "whole_file",
+    "algorithm": "sha256",
+    "length": 64,
+    "confidence": "CONFIRMED_BY_READING_FULL_DERIVATION_FUNCTION",
+    "confirmsDesignAssumption": "Confirms design.md's assumption that graphify_files/graphify_execution_file_membership_v2.content_hash is genuinely whole-file scoped, not merely observed-as-uniformly-64-char. No line-ending or other normalization is applied before hashing -- relevant to design.md's first Open Question."
+  },
+  "scopeHonesty": {
+    "tightCandidateListFullyClassified": true,
+    "tightCandidateListSize": 24,
+    "looseReferenceUniverseSize": "150+ files reference 'codebase_chunk_index' across scripts/atlas and sveltekit-frontend/scripts for many unrelated reasons (embedding backfills, kmeans clustering, sparse encoding, phase-N summary pipelines, etc.)",
+    "looseReferenceUniverseExhaustivelyRead": false,
+    "mitigatingEvidence": "59 of those files were confirmed via grep to contain a real INSERT/UPDATE statement against the table; of those, only files also matching a tight content_hash-proximity filter (24 files) were individually read. The remaining ~35 write-capable files were not read this pass and are NOT classified -- they write other columns (embeddings, clusters, tags, summaries) per their filenames, but this is an inference from naming, not a confirmed read.",
+    "honestConclusion": "WRITER_AUDIT_PARTIAL, not WRITER_AUDIT_COMPLETE. Both hash-length buckets (16-char and 64-char) now have confirmed, read-verified writers. A residual, unquantified risk remains that an unread file among the ~35 unclassified write-capable candidates writes content_hash using a third convention -- this cannot be ruled out from this pass alone."
+  },
+  "authority": false,
+  "writesPerformed": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false
+}

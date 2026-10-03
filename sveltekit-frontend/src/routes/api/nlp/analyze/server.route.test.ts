@@ -35,6 +35,14 @@ describe('/api/nlp/analyze', () => {
         tree_sitter: true,
         ast_grep: true,
         torch: false,
+        classification_helper: true,
+      },
+      classification_proposal: {
+        schema: 'atlas.nlp-classification-proposal.v1',
+        sourceRevision: 'sha256:' + '1'.repeat(64),
+        workspaceRevision: 'sha256:' + '2'.repeat(64),
+        canonicalAuthority: false,
+        writesPerformed: false,
       },
       pass_results: [
         {
@@ -91,6 +99,9 @@ describe('/api/nlp/analyze', () => {
         extractionMode: 'full',
         documentId: 'doc-1',
         packetKey: 'packet-1',
+        sourceRef: 'src/lib/example.ts',
+        sourceRevision: 'sha256:' + '1'.repeat(64),
+        workspaceRevision: 'sha256:' + '2'.repeat(64),
         passes: ['structural', 'semantic', 'sequence'],
         groundedExtractionRequired: true,
       }),
@@ -105,6 +116,9 @@ describe('/api/nlp/analyze', () => {
         passes: ['structural', 'semantic', 'sequence'],
         groundedExtractionRequired: true,
         packetKey: 'packet-1',
+        sourceRef: 'src/lib/example.ts',
+        sourceRevision: 'sha256:' + '1'.repeat(64),
+        workspaceRevision: 'sha256:' + '2'.repeat(64),
       }),
     );
 
@@ -114,5 +128,39 @@ describe('/api/nlp/analyze', () => {
     expect(body.structured.control5.structural).toBe(true);
     expect(body.structured.experiment_feature_matrix.featureRevision).toBe('nlp-feature-compiler-v1');
     expect(body.structured.event_hypergraph.events).toHaveLength(1);
+    expect(body.classification_proposal.schema).toBe('atlas.nlp-classification-proposal.v1');
+    expect(body.classification_proposal.sourceRevision).toBe('sha256:' + '1'.repeat(64));
+    expect(body.classification_proposal.canonicalAuthority).toBe(false);
+  });
+
+  it.each(['entities', 'relationships', 'concepts', 'full'] as const)(
+    'preserves the supported extraction mode %s',
+    async (extractionMode) => {
+      const { POST } = await import('./+server.js');
+      const request = new Request('http://localhost/api/nlp/analyze', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: 'fixture text', extractionMode }),
+      });
+
+      const response = await POST({ request, locals: { user: { id: 'u1' } } } as any);
+
+      expect(response.status).toBe(200);
+      expect(mocks.analyze).toHaveBeenCalledWith(expect.objectContaining({ extractionMode }));
+    },
+  );
+
+  it('accepts the existing classify pass exposed by the sidecar contract', async () => {
+    const { POST } = await import('./+server.js');
+    const request = new Request('http://localhost/api/nlp/analyze', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: 'fixture text', passes: ['classify'] }),
+    });
+
+    const response = await POST({ request, locals: { user: { id: 'u1' } } } as any);
+
+    expect(response.status).toBe(200);
+    expect(mocks.analyze).toHaveBeenCalledWith(expect.objectContaining({ passes: ['classify'] }));
   });
 });

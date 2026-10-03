@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.native-concurrency-proof.v1",
+  "status": "NAPI_WORKER_CONCURRENCY_FIXTURE_PROVEN",
+  "executor": "native_libtorch_bridge",
+  "workerProtocol": "gpu-worker.mjs",
+  "jobs": [
+    {
+      "job": 0,
+      "inputChecksum": "sha256:4b0c15b337367b2ece24fa6ce0eb2da44f5afc5bf4c88646c5a8ac047aad6224",
+      "outputChecksum": "sha256:08ff5a4fd9f22aef9e5403897b3c02e3b36cc6dd611b61403fddb04958e7d469",
+      "maxAbsDelta": 1.4901161193847656e-8,
+      "meanAbsDelta": 3.1241143005900085e-9,
+      "rowCount": 64,
+      "dimensions": 768
+    },
+    {
+      "job": 1,
+      "inputChecksum": "sha256:97acdbcf759ad5b14f6da497cc57354505068ae9626038ba54b38bdce637ab36",
+      "outputChecksum": "sha256:20957c9e9f057033eacd237d562d5197410cc47a4ce16179da683b1827ba5cce",
+      "maxAbsDelta": 2.2351741790771484e-8,
+      "meanAbsDelta": 4.529738362180069e-9,
+      "rowCount": 64,
+      "dimensions": 768
+    }
+  ],
+  "concurrency": {
+    "requestedJobs": 2,
+    "completedJobs": 2,
+    "wallMs": 2105
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "tensorsPersisted": false,
+  "liveCorpus": false,
+  "promotionAuthorized": false
+}

@@ -19,6 +19,7 @@
 import fs      from 'node:fs';
 import path    from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -63,20 +64,8 @@ ${text.slice(0, 800)}
 3 SEARCH QUERIES:`;
 
   try {
-    const r = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: EXPAND_MODEL,
-        prompt,
-        stream: false,
-        options: { temperature: 0.3 }
-      }),
-      signal: AbortSignal.timeout(10000)
-    });
-    if (!r.ok) throw new Error(`Ollama expand error ${r.status}`);
-    const data = await r.json();
-    const queries = data.response
+    const resp = await llamaChat(prompt, { maxTokens: 200, temperature: 0.3, timeoutMs: 30000 });
+    const queries = resp
       .split('\n')
       .map(q => q.replace(/^\d+\.\s*/, '').trim())
       .filter(q => q.length > 10);

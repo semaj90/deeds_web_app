@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.wfu-topology-ownership.v1",
+  "generatedAt": "2026-09-23T19:45:35Z",
+  "gate": "TOPO-01/TOPO-02",
+  "result": "TOPOLOGY_OWNERSHIP_CLASSIFIED_NO_SHARED_CANONICAL_DAG_OWNER",
+  "scope": "Static implementation and caller-role classification. Does not claim live execution or canonical graph authority.",
+  "implementations": [
+    { "name": "typed-graph-runtime", "path": "python/atlas_compute/typed_graph_runtime.py", "classification": "BACKEND", "role": "Typed graph algorithms; NetworkX reference and optional cuGraph backend.", "canonicalIdentityOwner": false },
+    { "name": "graph-snapshot-parity-pipeline", "path": ["python/graph_snapshot_parity_networkx_oracle.py", "python/graph_snapshot_parity_cugraph_oracle.py"], "classification": "EXPERIMENT", "role": "Paired parity/oracle commands compare derived graph outputs.", "canonicalIdentityOwner": false },
+    { "name": "spectral-multihop", "path": "python/parent_atlas_spectral_multihop.py", "classification": "EXPERIMENT", "role": "Bounded spectral/topological derived representation.", "canonicalIdentityOwner": false },
+    { "name": "oak-kernel", "path": "python/atlas_oak_kernel.py", "classification": "ADAPTER", "role": "Existing OAK/PostgreSQL lookup and traversal integration.", "canonicalIdentityOwner": false },
+    { "name": "error-fix-dag-builder", "path": "scripts/atlas/build-error-fix-dag.mjs", "classification": "ADAPTER", "role": "Diagnostic-to-repair-plan construction; does not authorize apply.", "canonicalIdentityOwner": false },
+    { "name": "kag-dag-runner", "path": "sveltekit-frontend/src/lib/server/features/ai/ace/kag-dag-runner.ts", "classification": "ADAPTER", "role": "KAG-specific named-node execution and receipts.", "canonicalIdentityOwner": false },
+    { "name": "document-citation-dag", "path": "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts", "classification": "ADAPTER", "role": "Document citation/dependency ordering.", "canonicalIdentityOwner": false },
+    { "name": "s-graph-taxonomy", "path": "sveltekit-frontend/src/lib/server/atlas/graph/s-graph-taxonomy.ts", "classification": "ADAPTER", "role": "Typed graph algorithms and serialization over supplied graph facts.", "canonicalIdentityOwner": false },
+    { "name": "agentic-fix-proposal", "path": "sveltekit-frontend/src/lib/server/analysis/agentic-fix-proposal.ts", "classification": "ADAPTER", "role": "Evidence-grounded repair proposal; delegates ordering to registered toposort tool.", "canonicalIdentityOwner": false },
+    { "name": "workboard-dependency-metadata", "path": "scripts/atlas/lib/wfu-metadata.mjs", "classification": "ADAPTER", "role": "Task-ledger declaration parsing, task identity resolution, and dependency-cycle validation.", "canonicalIdentityOwner": false }
+  ],
+  "sharedHelperAssessment": {
+    "path": "scripts/atlas/lib/frozen-dag-v1.mjs",
+    "classification": "FIXTURE_ONLY",
+    "callerEvidence": "Repository source search found its proof consumer in scripts/atlas/prove-frozen-dag-v1.mjs; no production caller was established.",
+    "compatibility": false,
+    "reason": "Frozen execution DAG checksums, generations, and lifecycle states are distinct from WFU declaration parsing and task-key resolution."
+  },
+  "decision": {
+    "typescriptHelpers": "PER_PURPOSE",
+    "wfuKahnHelper": "KEEP_LOCAL",
+    "rationale": "Distinct node/edge schemas and side-effect boundaries; algorithm-name similarity does not establish a safe shared owner or compatible API.",
+    "newCanonicalOwner": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "validation": {
+    "runtimeOwnershipAudit": "PASS; 20 capabilities checked; 0 violations; 36 existing warnings. Audit validates capability owners; the additive inventory section is explicitly non-authoritative.",
+    "focusedTests": {
+      "node": "PASS 19/19: scripts/atlas/audit-runtime-ownership.test.mjs and scripts/atlas/lib/wfu-metadata.test.mjs",
+      "vitest": "PASS 9/9: kag-dag-runner.spec.ts and s-graph-taxonomy.spec.ts",
+      "python": "PASS 5/5: python/tests/test_typed_graph_runtime.py"
+    },
+    "openspecStrict": "PASS: parent-atlas-workboard-feature-utility-fabric",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "mutations": {
+    "database": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "containers": 0
+  }
+}

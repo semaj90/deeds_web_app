@@ -1,0 +1,13 @@
+{
+  "schema": "atlas.admit-packets-current-live-identity.v1",
+  "mode": "rehearsal",
+  "manifestDir": "docs\\reports\\packet-admission-v1\\64122168e998c85c3ac0bd6a97621cd090a7a94938f9029699d584884a1b61da",
+  "manifestEntryCount": 7259,
+  "mintedCount": 7259,
+  "packetKeyRecipe": "CURRENT_LIVE_IDENTITY: packet:<sha256(source_ref).slice(0,12)>",
+  "intraBatchCollisions": 0,
+  "liveTableCollisions": 0,
+  "inserted": 7259,
+  "readback": 7259,
+  "committed": false
+}

@@ -1,0 +1,222 @@
+{
+  "schema": "atlas.prefill-memory-current-critical-path.v1",
+  "generatedDate": "2026-09-27",
+  "status": "READ_ONLY_AUDIT_COMPLETE_IMPLEMENTATION_NOT_STARTED",
+  "scope": {
+    "repository": "C:/Users/james/Videos/deeds-web-app",
+    "changesReviewed": [
+      "parent-atlas-neural-prefill-encoder",
+      "parent-atlas-prefill-routing-residency-convergence",
+      "parent-atlas-memory-architecture-freeze",
+      "parent-atlas-kv-cache-adaptation-research",
+      "parent-atlas-pca-svd-representation-baseline"
+    ],
+    "gateCoverage": {
+      "prefillRoutingResidencyUnchecked": 27,
+      "memoryArchitectureFreezeUnchecked": 12,
+      "directEncoderPrefillUnchecked": 8,
+      "directKvPrefixCacheUnchecked": 7,
+      "totalIndividuallyClassified": 54,
+      "encoderFilter": "Only gates directly on semantic input/lineage, prefill caller, decoder parity, prefill quality, and promotion were included from the very large neural-prefill ledger. Unrelated latent training, QLoRA, lexical, storage cleanup, and broad corpus tasks were not reclassified.",
+      "kvFilter": "Only active model/runtime cache identity, prefix reuse, and the sampled ACE packet revision gates were included. QLoRA/adaptation, Code Mode, MCP operations, and unrelated packet format experiments remain outside this critical path.",
+      "pcaSvdFilter": "Reviewed for dependency/ownership overlap; its 11 unchecked tasks are not prerequisites for the selected prefill/cache slice. PCA/SVD remains an optional derived-representation challenger behind identity, artifact, and quality gates."
+    },
+    "mutations": {
+      "sourceOrTaskLedgerEdits": false,
+      "databaseWrites": false,
+      "valkeyWrites": false,
+      "qdrantWrites": false,
+      "graphifyApply": false,
+      "modelInference": false,
+      "productionEnablement": false,
+      "onlyFileWritten": "docs/reports/prefill-memory-current-critical-path-v1.json"
+    }
+  },
+  "summary": {
+    "classifications": {
+      "PROVEN": 3,
+      "CLOSED_NEGATIVE": 0,
+      "BLOCKED_IDENTITY": 4,
+      "BLOCKED_LINEAGE": 10,
+      "BLOCKED_RUNTIME": 7,
+      "BLOCKED_QUALITY": 3,
+      "OPTIONAL_RESEARCH": 25,
+      "READY_TO_IMPLEMENT": 2
+    },
+    "interpretation": "The ledgers mix executable gates with explicit deferrals and governance criteria. PROVEN is scoped to the exact receipt/contract claim, not production promotion. OPTIONAL_RESEARCH is not a blocker for the selected vertical slice."
+  },
+  "ownershipSeparation": {
+    "semanticIdentity": {
+      "owner": "canonical source/chunk and candidate lineage contracts",
+      "fields": ["canonicalId", "sourceRef", "sourceRevision", "workspaceRevision", "candidateSnapshotRevision", "ordinalMapChecksum"],
+      "rule": "An execution/cache ID or CandidateOrdinal does not replace canonical identity. Missing source/workspace lineage blocks semantic admission."
+    },
+    "representation": {
+      "owner": "semantic representation/embedding contract and its immutable artifact receipt",
+      "fields": ["representationId", "representationRevision", "modelArtifactRevision", "contentSelectionRevision", "dimensions", "dtype", "vectorChecksum"],
+      "rule": "semantic_768 is the canonical logical representation; PCA/SVD/latent outputs are derived representations and cannot repair or redefine semantic identity."
+    },
+    "execution": {
+      "owner": "existing prefill/decoder caller and runtime-specific executors",
+      "rule": "The neural decoder caller is a shadow execution seam. CPU, CUDA, LibTorch, TensorRT, and llama-server execution receipts are not representation or identity owners."
+    },
+    "cacheAndBitFrostControl": {
+      "owner": "revision/checksum-qualified BitFrost/Valkey descriptors and residency policy",
+      "rule": "Cache metadata may select or describe reusable prompt prefixes; it is not canonical content or model state. No arbitrary KV tensor, hidden reasoning, or recurrent state is persisted."
+    },
+    "modelMemory": {
+      "owner": "the active inference runtime",
+      "classes": ["attention KV state", "model-specific recurrent/SSM state", "server-managed prompt/prefix cache"],
+      "rule": "Keep these three runtime state classes distinct; do not treat server prompt-cache reuse as portable model memory or a BitFrost payload."
+    }
+  },
+  "overlapReconciliation": [
+    {
+      "finding": "Neural-prefill and prefill/residency converge at the existing prefill identity and decoder caller; they are not separate decoder or cache owners.",
+      "evidence": ["sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.ts", "sveltekit-frontend/src/lib/server/atlas/prefill/prefill-contracts-v1.ts", "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts"]
+    },
+    {
+      "finding": "The one low-level neural decoder caller is already used by the shadow wrapper and the OAK DAG latent handler. Both call the same function in SHADOW_READONLY mode; do not add a second HTTP client/caller.",
+      "evidence": ["sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.ts", "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-neural-latent-handler-v1.ts", "sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.spec.ts"]
+    },
+    {
+      "finding": "A live shadow caller receipt exists, but it proves bounded shadow replay only. The separate readiness receipt is older and reports missing caller identity; reconcile by treating the newer shadow proof as caller-path evidence, while retaining canonical lineage and production promotion blocks.",
+      "evidence": ["docs/reports/atlas-neural-decoder-prefill-live-shadow-proof-20260911.json", "docs/reports/neural-decoder-service-readiness-v1.json"]
+    },
+    {
+      "finding": "GPU residency policy and lease contracts exist, but cross-executor claimant accounting is explicitly NOT_YET_WIRED; the policy fixture does not prove process-wide VRAM reservation or pre-OOM enforcement.",
+      "evidence": ["docs/reports/gpu-residency-budget-v1.json", "openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md: MEM-01..05"]
+    },
+    {
+      "finding": "Prefill routing has a current control-plane candidate, but the reconciled report records a tensor-width conflict and PrefillRoutingDecisionV1 status NOT_DEFINED. Do not introduce a second RetrievalPlan owner.",
+      "evidence": ["docs/reports/prefill-routing-plan-owner-reconciliation-v1.json"]
+    },
+    {
+      "finding": "Existing ContextPrefixIdentityV1 is the prefix identity contract to reconcile against; a separately named OrnithPrefixIdentityV1 should not be created as a duplicate. Runtime cache reuse remains a separate measured observation.",
+      "evidence": ["sveltekit-frontend/src/lib/server/atlas/prefill/context-prefix-identity-v1.ts", "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-capability-v1.ts", "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md: 5.4"]
+    },
+    {
+      "finding": "The current semantic input work is not automatically production eligible: prior canaries used provisional first-4000-character truncation, which is not a frozen content-selection policy; exact embedded bytes must be bound before scale-up.",
+      "evidence": ["scripts/atlas/sem-input-02-mixed-canary-v1.mjs", "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md: CONTENT-POLICY-01"]
+    }
+  ],
+  "existingNeuralDecoderCaller": {
+    "singleLowLevelCaller": "sveltekit-frontend/src/lib/server/ai/neural-decoder-prefill-caller-v1.ts#runNeuralDecoderPrefillCallerV1",
+    "consumers": [
+      "sveltekit-frontend/src/lib/server/ace/neural-decoder-prefill-shadow.ts#runNeuralDecoderPrefillShadowForManifest",
+      "sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-neural-latent-handler-v1.ts#createOakDagNeuralLatentHandlerV1"
+    ],
+    "modes": "Both production-facing wrappers call the shared seam in SHADOW_READONLY mode; environment/identity checks can return no result, and decoder failure preserves the original prefill checksum.",
+    "focusedTests": "The caller spec covers disabled mode, unavailable/rejected decoder, HIT/MISS, stable resolved prefill checksum, and repeat HIT behavior. Tests were inspected, not rerun in this read-only pass.",
+    "liveReceipt": {
+      "path": "docs/reports/atlas-neural-decoder-prefill-live-shadow-proof-20260911.json",
+      "status": "LIVE_SHADOW_CALLER_PROVEN",
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "scopeLimit": "One shadow replay receipt; not production decoder promotion, full current lineage, or GPU/native parity."
+    },
+    "decision": "Reuse this caller. Do not propose or implement another decoder caller."
+  },
+  "gates": {
+    "prefillRoutingResidency": [
+      {"id":"ROUTE-04","status":"BLOCKED_LINEAGE","reason":"Task ledger says training requires a revision-qualified labeled query corpus; current audit records CLASSIFIER_LINEAGE_BLOCKED and training-ready false."},
+      {"id":"ROUTE-05","status":"BLOCKED_QUALITY","reason":"Cannot compare MLP and XGBoost until both use the same frozen, revision-qualified split/tensor and reviewed labels."},
+      {"id":"MEM-04","status":"BLOCKED_RUNTIME","reason":"Single budget/lease contract exists, but cross-executor VRAM claims are NOT_YET_WIRED."},
+      {"id":"MEM-05","status":"BLOCKED_RUNTIME","reason":"Pre-OOM GPU_RESIDENCY_BUDGET_EXCEEDED behavior has not been proven across participating processes/executors."},
+      {"id":"NAPI-05","status":"OPTIONAL_RESEARCH","reason":"CPU LibTorch parity is a challenger gate; no need to add another execution layer before the bounded shadow path and identity prerequisites close."},
+      {"id":"NAPI-06","status":"OPTIONAL_RESEARCH","reason":"LibTorch CUDA parity depends on CPU reference parity and a validated runtime/toolchain; not a prerequisite for the read-only cache-owner slice."},
+      {"id":"TRT-01","status":"BLOCKED_RUNTIME","reason":"TensorRT-RTX installation and compatibility are not established; active RAPIDS toolchain must remain untouched."},
+      {"id":"TRT-03","status":"OPTIONAL_RESEARCH","reason":"ONNX export is a later challenger and requires a proven bounded PyTorch component."},
+      {"id":"TRT-04","status":"OPTIONAL_RESEARCH","reason":"Engine receipt depends on an exported, frozen ONNX artifact."},
+      {"id":"TRT-05","status":"OPTIONAL_RESEARCH","reason":"Portable engine build depends on compatible TensorRT-RTX capability and frozen ONNX input."},
+      {"id":"TRT-06","status":"OPTIONAL_RESEARCH","reason":"Engine checksum/SDK receipt is downstream of an optional engine build."},
+      {"id":"TRT-07","status":"OPTIONAL_RESEARCH","reason":"RTX runtime execution is downstream of a compatible engine and runtime installation."},
+      {"id":"TRT-08","status":"OPTIONAL_RESEARCH","reason":"JIT-cache persistence/identity is a runtime-specific challenger concern, not BitFrost canonical state."},
+      {"id":"TRT-09","status":"OPTIONAL_RESEARCH","reason":"First-run versus steady-state benchmarking is downstream of a valid runtime execution."},
+      {"id":"TRT-10","status":"OPTIONAL_RESEARCH","reason":"FP32 parity must precede any precision or performance promotion."},
+      {"id":"TRT-11","status":"OPTIONAL_RESEARCH","reason":"Shape-range behavior is an engine-admission gate, not a prerequisite for current prefill identity."},
+      {"id":"TRT-12","status":"OPTIONAL_RESEARCH","reason":"Peak VRAM measurement is downstream of a runnable bounded engine."},
+      {"id":"TRT-13","status":"OPTIONAL_RESEARCH","reason":"Cross-executor benchmark requires the same frozen model/input and a proven TensorRT-RTX path."},
+      {"id":"TRT-14","status":"OPTIONAL_RESEARCH","reason":"Promotion-quality criterion applies only after the heavier selected component is frozen and benchmarked."},
+      {"id":"TRT-15","status":"OPTIONAL_RESEARCH","reason":"Reduced precision is explicitly sequenced after reference parity."},
+      {"id":"TRT-16","status":"OPTIONAL_RESEARCH","reason":"Quality/rank/calibration delta depends on a valid reduced-precision challenger."},
+      {"id":"TRT-17","status":"OPTIONAL_RESEARCH","reason":"CUDA Graphs are a later optimization after ordinary runtime correctness."},
+      {"id":"TRT-18","status":"OPTIONAL_RESEARCH","reason":"Torch-TensorRT-RTX must remain experimental/noncanonical; this is a boundary, not current production work."},
+      {"id":"ANN-03","status":"BLOCKED_LINEAGE","reason":"Same semantic_768 matrix and identity manifest are required; full cohort current lineage/materialization is not proven."},
+      {"id":"ANN-04","status":"BLOCKED_QUALITY","reason":"Recall/overlap/latency/build/VRAM comparison needs an admitted common corpus and exact executor receipts."},
+      {"id":"PROMOTE-02","status":"PROVEN","reason":"The governance receipt distinguishes WIRED from WRITTEN and requires a real runtime call path; this proves the promotion rule, not that every challenger is wired."},
+      {"id":"PROMOTE-03","status":"PROVEN","reason":"The governance receipt distinguishes PROVEN and requires replay plus receipt; this proves the policy rule, not production completion."}
+    ],
+    "memoryArchitectureFreeze": [
+      {"id":"2.5","status":"OPTIONAL_RESEARCH","reason":"Candidate membership bitmap is explicitly conditional and would add a Valkey key family; no need for prefill/memory ownership closure."},
+      {"id":"2.6","status":"READY_TO_IMPLEMENT","reason":"Small read-only version-specific check of torch.from_file pinning; the ledger already says current staging avoids the trap. It can be closed without code or datastore changes, but is lower priority than cache identity."},
+      {"id":"2.8","status":"BLOCKED_IDENTITY","reason":"The v1/v2 tensor-residency source and archive/canonicalization decision is unresolved; do not select either silently."},
+      {"id":"2.12","status":"OPTIONAL_RESEARCH","reason":"CAGRA tuning and full-scale benchmark are deferred until a real corpus-scale experiment has a free, measured GPU budget."},
+      {"id":"2.14","status":"BLOCKED_IDENTITY","reason":"Operator choice is required for parent_atlas_tensor's relationship to the live LibTorch reranker before further integration gates."},
+      {"id":"4.1","status":"OPTIONAL_RESEARCH","reason":"Tang-inspired shortlist math is explicitly out of scope for this governance change and has no authority over evidence truth."},
+      {"id":"4.2","status":"OPTIONAL_RESEARCH","reason":"The listed existing context/LOD/bitmap owners are explicitly protected from edits in this recording-only change."},
+      {"id":"5.4","status":"BLOCKED_IDENTITY","reason":"Do not create a duplicate OrnithPrefixIdentityV1. ContextPrefixIdentityV1 is the existing owner candidate, but exact parity with the proposal's ContextManifest identity/model/template fields is not yet proven; reconcile fields, then reuse or narrowly extend the existing owner."},
+      {"id":"5.5","status":"OPTIONAL_RESEARCH","reason":"LexicalFingerprint/IDF is conditional on held-out evidence of benefit over existing FTS/pg_trgm."},
+      {"id":"5.6","status":"OPTIONAL_RESEARCH","reason":"SearchSnapshot is a separate external discovery/evidence feature; web snippets cannot become canonical evidence."},
+      {"id":"5.7","status":"OPTIONAL_RESEARCH","reason":"QueryFingerprint is only a routing hint and is not needed for cache/model-memory ownership."},
+      {"id":"5.8","status":"BLOCKED_IDENTITY","reason":"The additive memory-freeze items have not been assigned to the frozen P0-P4 sequence; the ledger explicitly reserves ordering as an operator decision."}
+    ],
+    "directEncoderPrefill": [
+      {"id":"NE-11","status":"BLOCKED_LINEAGE","reason":"Exporting canonical semantic_768 plus prefill features requires current source/chunk identity and representation-qualified cohort readback; a bounded canary is not full-cohort proof."},
+      {"id":"DOC-INTEGRITY-RANKER-01","status":"BLOCKED_LINEAGE","reason":"File top-k integrity ranking must first verify source/file/document revisions, packet identity, and graph/topology lineage; no ranking can repair missing lineage."},
+      {"id":"DOC-INTEGRITY-STATUS-01","status":"BLOCKED_LINEAGE","reason":"Per-candidate verified/partial/unverified status depends on the same exact evidence joins; unverified candidates remain diagnostic-only."},
+      {"id":"ENCODER-PREFILL-CHAIN-01","status":"BLOCKED_LINEAGE","reason":"The AST/Graphify -> LangExtract -> feature matrix -> semantic_768 -> prefill chain cannot be promoted while source revision/producer evidence is incomplete and the embedded bytes policy is not fully bound."},
+      {"id":"NEURAL-DECODER-BINDING-01","status":"PROVEN","reason":"Shared caller, shadow wrappers, caller tests, and a live shadow receipt prove the bounded caller/receipt behavior. Scope excludes production enablement and full canonical semantic/source lineage."},
+      {"id":"ENCODER-DECODER-PARITY-01","status":"BLOCKED_RUNTIME","reason":"The live shadow receipt is not CPU/LibTorch/CUDA/native parity on a frozen current fixture; runtime/backend comparison remains open."},
+      {"id":"PREFILL-QUALITY-01","status":"BLOCKED_QUALITY","reason":"The ledger records 313/313 blank judgments, zero hard negatives, no revision-bound query/candidate pool, and no compatible current 768 manifest."},
+      {"id":"PREFILL-PROMOTION-01","status":"BLOCKED_LINEAGE","reason":"Promotion requires accepted lineage, cache, replay, and quality receipts; governance explicitly keeps promotion unauthorized until those prerequisites exist."}
+    ],
+    "directKvPrefixCache": [
+      {"id":"ORNITH-CACHE-01","status":"READY_TO_IMPLEMENT","reason":"The existing read-only capability probe already reads /v1/models and /props without inference. A bounded receipt can classify prompt cache, attention KV, and recurrent state separately; absent immutable model digest must remain null/unproven, not inferred."},
+      {"id":"ORNITH-CACHE-02","status":"BLOCKED_RUNTIME","reason":"Requires same-identity repeated-prefix measurements from the active llama-server and observed reuse telemetry; the contract alone does not prove reuse."},
+      {"id":"KV-05","status":"BLOCKED_RUNTIME","reason":"Long-prefix reuse behavior is measured, but the sub-256-token identical-repeat zero-cache case remains unexplained and needs a controlled inference/telemetry experiment, excluded from this pass."},
+      {"id":"KV-06","status":"BLOCKED_RUNTIME","reason":"Bifrost does not expose llama-server cache_n/timings; the direct llama-server or /slots measurement path must be proven and receipt-bound."},
+      {"id":"KV-04e","status":"BLOCKED_LINEAGE","reason":"The compact-versus-full packet answer-parity experiment needs a stable admitted ContextManifest/prefix; sampled packet revisions are null, so token-only evidence cannot qualify it."},
+      {"id":"KV-04f","status":"BLOCKED_LINEAGE","reason":"The populated-packet mixed reasoning/tool-call rerun is blocked because the current sampled corpus has no populated summary/vector evidence with admitted representation revisions."},
+      {"id":"ACE-REV-01/02/03","status":"BLOCKED_LINEAGE","reason":"Sampled ACE v3 records have null representation/feature/graph revisions and null summary text; do not label their token measurements as final ContextManifest or cache admission evidence."}
+    ]
+  },
+  "oneSmallestCompleteVerticalSlice": {
+    "gate": "ORNITH-CACHE-01",
+    "title": "Read-only runtime cache-state and active-model capability receipt",
+    "whyThisSlice": "It is the smallest end-to-end check across the overlapping prefill/memory boundary that reuses an existing owner, needs no inference, and can return a useful fail-closed result without touching canonical stores or enabling a feature.",
+    "prerequisites": [
+      "Use the existing probeOrnithCacheCapabilityV1 implementation and schema; do not add a second capability owner.",
+      "Read active llama-server model/build metadata and configured cache flags without issuing a generation request.",
+      "Record modelSha256 as null/UNPROVEN if the runtime cannot provide an immutable artifact digest; never infer it from a mutable model name.",
+      "Classify attention KV tensors, model-specific recurrent state, and server-managed prompt/prefix cache as separate runtime-owned state.",
+      "Receipt must state writesPerformed=false, canonicalAuthority=false, inferencePerformed=false, and no tensor/state payload persisted."
+    ],
+    "notIncluded": ["cache warming", "Valkey/BitFrost writes", "KV tensor export/import", "decoder production enablement", "semantic materialization", "GPU residency changes", "Graphify apply"],
+    "expectedExit": "CAPABILITY_OBSERVED_WITH_EXPLICIT_UNPROVEN_FIELDS or BLOCKED_RUNTIME; either is a complete read-only diagnostic outcome, not production readiness.",
+    "implementationStarted": false
+  },
+  "adjacentChangeDisposition": {
+    "parent-atlas-kv-cache-adaptation-research": "Only the seven directly cache/prefix/packet-identity gates above are on this critical path. QLoRA, training, Code Mode, and Bifrost operations are separate workstreams.",
+    "parent-atlas-pca-svd-representation-baseline": "No PCA/SVD task is a prerequisite to stable semantic identity, prefill caller reuse, or server-managed prefix measurement. Keep projections as derived representations; registry admission and DB writes remain separately gated.",
+    "parent-atlas-neural-prefill-encoder": "Do not equate the 8-row semantic/vector/V4 canaries or decoder shadow receipt with full-cohort materialization, current lineage, ranking quality, or production promotion."
+  },
+  "likely_cause": "The work appears blocked because several distinct owners and proof levels were blended: semantic identity/representation lineage is incomplete, the prefill caller is only shadow-proven, and runtime cache/residency behavior lacks current cross-owner measurement.",
+  "evidence": [
+    "OpenSpec unchecked-gate census: prefill routing/residency 27; memory architecture freeze 12; direct encoder/prefill 8; direct prefix/cache 7.",
+    "docs/reports/prefill-routing-plan-owner-reconciliation-v1.json: tensor-width conflict; PrefillRoutingDecisionV1 status NOT_DEFINED; canonicalAuthority=false; writesPerformed=false.",
+    "docs/reports/gpu-residency-budget-v1.json: GPU_RESIDENCY_POLICY_PROVEN_READ_ONLY; crossExecutorAccounting=NOT_YET_WIRED.",
+    "docs/reports/atlas-neural-decoder-prefill-live-shadow-proof-20260911.json: LIVE_SHADOW_CALLER_PROVEN; canonicalAuthority=false; writesPerformed=false.",
+    "docs/reports/neural-decoder-service-readiness-v1.json is older (2026-08-31) and says caller identity was unavailable; it is not treated as overriding the newer shadow proof, nor as production closure.",
+    "docs/reports/prefill-promotion-governance-v1.json: GOVERNANCE_RULES_PROVEN_PROMOTION_BLOCKED; next gate CURRENT_SOURCE_AUTHORITY_AND_LIVE_EXECUTOR_READBACK.",
+    "docs/reports/golden-relevance-review-queue-validation-v1.json and docs/reports/golden-review-corpus-compatibility-v1.json are cited by the task ledger for zero completed grades and missing compatible 768 evidence.",
+    "sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-capability-v1.ts explicitly says metadata endpoints do not prove prompt reuse or checkpoint restore; modelSha256 is nullable.",
+    "sveltekit-frontend/src/lib/server/atlas/prefill/context-prefix-identity-v1.ts owns stable-prefix checksum identity without persisting raw prefix or KV tensors."
+  ],
+  "patch_targets": [
+    "docs/reports/prefill-memory-current-critical-path-v1.json"
+  ],
+  "safe_next_command": "rg -n 'probeOrnithCacheCapabilityV1|ContextPrefixIdentityV1|modelSha256|promptCacheSupported|recurrentCheckpointSupported' sveltekit-frontend/src/lib/server/atlas/prefill/ornith-cache-capability-v1.ts sveltekit-frontend/src/lib/server/atlas/prefill/context-prefix-identity-v1.ts",
+  "smoke_command": "node -e \"JSON.parse(require('fs').readFileSync('docs/reports/prefill-memory-current-critical-path-v1.json','utf8')); console.log('prefill-memory report valid JSON')\"",
+  "report_path": "docs/reports/prefill-memory-current-critical-path-v1.json"
+}

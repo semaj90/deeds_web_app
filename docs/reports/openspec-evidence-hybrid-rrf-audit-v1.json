@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-evidence-hybrid-rrf-audit.v1",
+  "mode": "READ_ONLY_OWNER_AUDIT",
+  "status": "RRF_OWNER_CONTRACT_PROVEN_RUNTIME_UNEXECUTED",
+  "source": {
+    "retrievalPlan": "docs/reports/openspec-evidence-retrieval-plan-v1.json",
+    "rrfOwner": "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts",
+    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004"
+  },
+  "lanes": [
+    {
+      "lane": "rg_exact",
+      "owner": "repository source search",
+      "role": "exact lexical candidate discovery"
+    },
+    {
+      "lane": "postgres_fts",
+      "owner": "PostgreSQL evidence-content FTS",
+      "role": "lexical candidate discovery"
+    },
+    {
+      "lane": "postgres_trigram",
+      "owner": "PostgreSQL task-text trigram index",
+      "role": "fuzzy lexical candidate discovery"
+    },
+    {
+      "lane": "semantic_768",
+      "owner": "PostgreSQL semantic_768 oracle",
+      "role": "revision-qualified semantic candidate discovery"
+    },
+    {
+      "lane": "dependency_graph",
+      "owner": "OpenSpecDependencyGraphV1",
+      "role": "bounded dependency expansion"
+    }
+  ],
+  "fusion": {
+    "k": 60,
+    "canonicalIdentity": "taskId or revision-qualified canonical evidence identity",
+    "withinLaneDedup": true,
+    "oneVotePerLogicalLane": true,
+    "exactPromotionAfterRrf": true
+  },
+  "checks": {
+    "retrievalOracleDesigned": true,
+    "logicalLaneMappingPresent": true,
+    "perLogicalLaneScoreMapPresent": true,
+    "physicalLaneSupportSeparate": true,
+    "oneBestVoteGuardPresent": true,
+    "canonicalPromotionAfterFusion": true
+  },
+  "policy": {
+    "noNewFusionOwner": true,
+    "projectionVotesCollapsed": true,
+    "graphFeaturesCannotCreateIdentity": true,
+    "proofStateFromRrf": false,
+    "writesPerformed": false
+  },
+  "likely_cause": "Hybrid retrieval must reuse the existing SearchRuntime RRF owner while preventing Qdrant, TurboVec, and graph executors from inflating one logical lane.",
+  "evidence": [
+    "docs/reports/openspec-evidence-retrieval-plan-v1.json",
+    "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
+    "sveltekit-frontend/src/lib/server/retrieval/rrf-combiner.ts"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-retrieval-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-hybrid-rrf-audit-v1.json",
+  "generatedAt": "2026-10-02T04:47:37.031Z",
+  "checksum": "sha256:121254d530d685e5833c6d7f3b59cab32fe82cfe9cf9a5c93e22f40488777dbd"
+}

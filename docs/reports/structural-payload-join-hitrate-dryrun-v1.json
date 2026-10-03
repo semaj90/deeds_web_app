@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.structural-payload-join-hitrate-dryrun.v1",
+  "generatedAt": "2026-09-12T19:46:57.788Z",
+  "mode": "READ_ONLY_MEASUREMENT",
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "qdrantModified": false,
+    "postgresModified": false
+  },
+  "atlasObservationRecordsTableExists": false,
+  "astObservationRowCount": 0,
+  "distinctSourceRefsWithAstObservation": 0,
+  "status": "NO_STRUCTURAL_EVIDENCE_TO_JOIN",
+  "explanation": "atlas_observation_records table does not exist in the live schema -- the persisted-observation half of this pipeline has not been applied yet, only the in-memory adapter/schema code exists."
+}

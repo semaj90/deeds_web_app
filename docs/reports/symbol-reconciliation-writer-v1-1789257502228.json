@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.symbol-reconciliation-writer-receipt.v1",
+  "generatedAt": "2026-09-12T23:58:22.227Z",
+  "targetWorkspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+  "allowCreate": false,
+  "apply": false,
+  "gate": {
+    "status": "BLOCKED_ON_EMPTY_SYMBOL_SOURCE",
+    "workspaceRevision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+    "boundSourceRefCount": 111
+  },
+  "action": "NO_WRITES_PERFORMED",
+  "reason": "workspace_revision sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9 has 111 bound source_refs, but graphify_symbols has zero rows for any of them (graphify_symbols is empty repo-wide as of this run) -- there is no structural evidence to canonicalize yet."
+}

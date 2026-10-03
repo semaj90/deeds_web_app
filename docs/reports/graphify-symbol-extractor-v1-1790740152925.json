@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-30T03:49:12.924Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 5,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 5,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 5,
+  "supportedCandidatePoolRows": 5,
+  "precheckRowsExamined": 5,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 5,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 5
+  },
+  "filesProcessed": 5,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 24,
+  "totalSymbolsInserted": 24,
+  "plan": [
+    {
+      "fileId": "b2f75842-176d-4c8a-9d8c-ced7f12ff876",
+      "sourceRef": "scripts/opencode/smoke-searxng.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:de5924a876ac8437da38835ee65c12193432c626a1062bb37c2696cddf7343fe",
+      "sourceDigest": "sha256:de5924a876ac8437da38835ee65c12193432c626a1062bb37c2696cddf7343fe",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "5ec8d96d-0c3e-41dd-a24e-92543d2df0fa",
+      "sourceRef": "scripts/opencode/smoke-task-payload.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:15ca8478d57cc1a90cba9c552b2bd64f3d9c969e040229370b193eb02b1b87fa",
+      "sourceDigest": "sha256:15ca8478d57cc1a90cba9c552b2bd64f3d9c969e040229370b193eb02b1b87fa",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "6e24f678-8b11-48af-b997-ecbce891d0ad",
+      "sourceRef": "scripts/opencode/smoke-tool-schema.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:9ad9f0ffb6071b7e1a36f788c5873442b5dd05b2ecec52be548c758c3ef73b3f",
+      "sourceDigest": "sha256:9ad9f0ffb6071b7e1a36f788c5873442b5dd05b2ecec52be548c758c3ef73b3f",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "d65a1f61-853c-4de8-8179-687ead317a4c",
+      "sourceRef": "scripts/opencode/smoke-validate.js",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:8c181c6da6f5b144971cef04b7d58fd57751c4cb28b1909191f43d601c6b7be2",
+      "sourceDigest": "sha256:8c181c6da6f5b144971cef04b7d58fd57751c4cb28b1909191f43d601c6b7be2",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "b7288a90-c648-4900-a900-41d8357de32b",
+      "sourceRef": "scripts/opencode/smoke-validation-test.mjs",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:5a23c44953cd14bb8bc7e9b394a270ad5a54c10e5a2b9b397c21824bf707cb0f",
+      "sourceDigest": "sha256:5a23c44953cd14bb8bc7e9b394a270ad5a54c10e5a2b9b397c21824bf707cb0f",
+      "fileKind": "ts_js",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    }
+  ]
+}

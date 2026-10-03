@@ -14,8 +14,8 @@ import {
 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.js';
 
 const ROOT = resolve(import.meta.dirname, '../..');
-const DATABASE_URL = process.env.DATABASE_URL?.trim()
-  ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const DATABASE_URL = process.env.DATABASE_URL?.trim();
+if (!DATABASE_URL) throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_OPEN_DATABASE_URL_REQUIRED');
 const WORKSPACE_ID = '625743d2-092b-4fa8-abe0-9dc094920c80';
 const AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const admissionPath = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
@@ -106,6 +106,16 @@ async function main() {
     await client.connect();
     await acquireCoordinatorLock(client);
     locked = true;
+    const existingTerminal = await client.query(
+      `SELECT count(*)::int AS count
+         FROM public.graphify_executions
+        WHERE workspace_revision = $1
+          AND status IN ('COMPLETED', 'COMPLETED_REUSED')`,
+      [admission.workspaceRevision],
+    );
+    if (Number(existingTerminal.rows[0]?.count ?? 0) > 0) {
+      throw new Error('GRAPHIFY_SNAPSHOT_NATIVE_TERMINAL_EXECUTION_ALREADY_EXISTS');
+    }
     await client.query('BEGIN');
     transactionStarted = true;
     const opened = await openExecution(client, {

@@ -1,549 +1,178 @@
-# Phase 10B → Phase 16 Roadmap: TurboVec Compression, Parent Atlas, Feature Mapping, and Gemma4 ACE Memory
+# Phase 10B–16 Roadmap: Parent Atlas, Streaming Indexing, and Ornith 1.5
+
+**Status:** implementation roadmap, not a completion claim. Component availability, a successful fixture, or a running service does not prove end-to-end production wiring. The current owners and admission receipts remain authoritative.
 
 ## Goal
 
-Build a comprehensive source-of-truth system for the codebase where Gemma4/OpenCode can answer multi-hop engineering questions using compact ACE packets instead of repeatedly scanning thousands of files.
+Build a revision-qualified source and evidence fabric for the workstation so that OpenCode and bounded agents can retrieve compact, grounded context and use **Ornith-1.5-9B through the existing llama-server at `http://127.0.0.1:8090`** for synthesis and tool-use proposals. PostgreSQL and admitted source bindings own identity and durable evidence. Models propose; deterministic owners validate and record what happened.
 
-The system should support:
+The active model must be resolved from the configured runtime (`/v1/models` or the existing model resolver), not inferred from a filename or compatibility symbol. A live read-only `/v1/models` check during this revision reported `ornith-1.5-9b`. Gemma4 names in old files may describe lineage, historical artifacts, or compatibility APIs; they are not the active synthesis authority unless runtime evidence says otherwise.
 
-- More than 1,000 `.md` / `.txt` / source files
-- Large JSON maps over 30 MB
-- Parent Atlas indexing
-- Qdrant semantic retrieval
-- Postgres durable graph truth
-- Redis hot ACE packet cache
-- TurboVec optional compression/rerank lane
-- LangExtract-style structured extraction
-- LangGraph validation and failure recovery
-- Future cuVS / CUDA acceleration without breaking correctness
+## Current ownership spine
 
-Core rule:
-
-```txt
-Accelerators improve latency, never correctness.
+```text
+admitted workspace + source_ref + source_revision
+                    │
+                    ▼
+       source-role and eligibility policy
+                    │
+       ┌────────────┴────────────┐
+       ▼                         ▼
+ code: Tree-sitter/AST      data/docs: bounded,
+ and AST-grep               schema-aware extraction
+       └────────────┬────────────┘
+                    ▼
+ existing Graphify/source/chunk/packet owners
+                    ▼
+ PostgreSQL 18 canonical identity and evidence
+                    ▼
+ EmbeddingGemma semantic_768 canonical writer
+                    ▼
+ one logical semantic lane (SearchRuntime)
+  pgvector exact/HNSW | Qdrant | cuVS/CAGRA | TurboVec
+                    ▼
+ identity normalization + CandidateOrdinalMap checksum
+                    ▼
+ bounded AST/graph/ontology/features and ranking
+                    ▼
+ canonical admitted resolver → AcePacketV3
+                    ▼
+ ContextManifest / PromptPlan → optional BitFrost residency
+                    ▼
+ llama-server :8090 → Ornith-1.5 synthesis
+                    ▼
+ validated tool proposal/action → execution receipt
 ```
 
----
+PostgreSQL remains the canonical owner for admitted identity, revisions, source/chunk/packet bindings, and durable evidence. Qdrant, TurboVec, cuVS/CAGRA, Neo4j/cuGraph, and Valkey/BitFrost are projections or executors. They do not create identity or extra semantic retrieval votes.
 
-## System Layout
+## Runtime and streaming facts
 
-```txt
-repo files / docs / json maps
-  ↓
-Parent Atlas indexer
-  ↓
-Postgres atlas_chunks + graph fields
-  ↓
-Qdrant semantic vector store
-  ↓
-TurboVec optional compressed rerank lane
-  ↓
-Redis ACE packet cache
-  ↓
-Gemma4 / Bifrost synthesis
-  ↓
-OpenCode + Svelte SSE UI
+- **Synthesis:** llama-server `:8090`, OpenAI-compatible `/v1/chat/completions`; resolve the loaded ID using `/v1/models`/the existing resolver. Streaming generation is transport behavior, not evidence admission.
+- **Classification/NLP:** the FastAPI sidecar is `:8095`, through `/analyze` with `passes: ["classify"]`; callers must pass exact source identity/revision. Results are proposals, not canonical labels.
+- **Embedding:** Go EmbeddingGemma service is `:8097`; `semantic_768` is the canonical representation contract. Executor availability is not proof of canonical write lineage.
+- **Latent:** `:8121` and the historical `.pt` checkpoint are a separate, non-promoted lane. Do not load the retired 768→384→256 artifact as the current candidate. Current candidate definition is 768→512→256→128; `latent_64` is a normalized prefix of `latent_128`; `topology_4d` is separate.
+- **JSONL helper:** `scripts/atlas/lib/stream-jsonl-batches-v1.mjs` provides bounded parsing/transport (default 1 MiB line and 256 records per batch; hard limits 4 MiB and 2,000 records). It does not classify, chunk semantically, extract AST, embed, or write stores.
+- **Daily Graphify directory stream:** `scripts/atlas/daily-graphify-directory-stream.mjs` currently emits a planned JSONL stage plan. Planned AST/chunk/embed stages are not proof that those stages ran. Confirm each stage has an existing owner, frozen inputs, execution receipt, and readback before calling it indexed.
+- **The cap is not the ingestion architecture.** Streaming limits memory and bounds work; SourceRole/observation policy controls semantic cardinality. JSON arrays must not become millions of pseudo-symbols. Route source code to structural parsers, JSONL to record streams, known structured documents to schema-aware extraction, and generated artifacts to metadata-only or exclusion as policy requires.
+- **Chunking is not established merely by streaming.** Prove the existing canonical chunk producer, stable chunk identity, source/workspace revision binding, lineage readback, and downstream embedding eligibility. Do not introduce a parallel chunk authority.
+
+## Retrieval and context rules
+
+There is one logical `semantic_768` lane. PostgreSQL exact search is the correctness oracle; pgvector HNSW, Qdrant, cuVS/CAGRA, and TurboVec are selectable executors/projections. Normalize and deduplicate candidates against canonical identity before feature joins, ranking, or top-K. Candidate ordinal is meaningful only with its sealed map checksum.
+
+Qdrant stores a rebuildable semantic projection; its point ID is not packet/source identity. TurboVec is not search-ready solely because a process owns a port: require a non-empty index, declared transport/health, identity mapping, filter parity, and exact-oracle comparison. The older `8791/8792/8793` port map is stale. Engram is stdio-driven; optional services must not become mandatory folder-open TCP checks. Resolve transport through the current registry/audit.
+
+The admitted context path is:
+
+```text
+retrieval candidates
+ → canonical admitted resolver
+ → exact packet/source/workspace revisions and evidence spans
+ → AcePacketV3 builder + validator
+ → ContextManifest / PromptPlan
+ → bounded Ornith request
 ```
 
----
-
-## Where TurboVec Comes Into Play
-
-TurboVec should **not** replace Qdrant or Postgres.
-
-Use TurboVec as an optional compression and reranking lane when the context set becomes too large, especially when working with:
-
-- Thousands of `.md` and `.txt` files
-- Large generated `.llms.txt` maps
-- Large JSON feature maps over 30 MB
-- Parent Atlas chunks with many near-duplicate summaries
-- Multi-hop retrieval where Qdrant returns too many candidates
-
-Correct TurboVec role:
-
-```txt
-Qdrant/Postgres produce candidate chunks
-→ TurboVec compresses/reranks candidates
-→ ACE packet receives compact ranked cards
-→ Gemma4 sees only the best evidence
-```
-
-Fallback rule:
-
-```txt
-If TurboVec is offline, use Qdrant ranking order.
-If Qdrant is offline, use Postgres hybrid search.
-If Redis is offline, build packet without cache.
-```
-
----
-
-## Large File Strategy: >1K Markdown/Text Files and >30MB JSON Maps
-
-### Problem
-
-Raw context is too large for Gemma4 to use directly.
-
-Bad pattern:
-
-```txt
-Load all markdown files → send to Gemma4
-```
-
-Good pattern:
-
-```txt
-chunk → summarize → tag → embed → graph-link → compress → cache → synthesize
-```
-
-### Processing Pipeline
-
-```txt
-1. Scan files
-2. Chunk by heading/function/section
-3. Create chunk_id
-4. Extract features/env vars/routes/tables/tools
-5. Summarize chunks
-6. Store in Postgres atlas_chunks
-7. Upsert embeddings into Qdrant
-8. Build parent/child graph links
-9. Use TurboVec to compress/rerank large candidate sets
-10. Save compact ACE packets to Redis
-```
-
----
-
-## `atlas_chunks` Source-of-Truth Shape
-
-Recommended fields:
-
-```sql
-atlas_chunks (
-  id uuid primary key,
-  chunk_id text not null,
-  path text not null,
-  language text,
-  feature_family text,
-  parent_id uuid,
-  summary text,
-  content text,
-  source_refs jsonb,
-  chunk_ids jsonb,
-  cluster_tags jsonb,
-  env_vars jsonb,
-  tools jsonb,
-  routes jsonb,
-  tables jsonb,
-  dominant_tags jsonb,
-  audit_score numeric,
-  som_bmu_row integer,
-  som_bmu_col integer,
-  embedding vector(768),
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-```
-
-Indexes:
-
-```sql
-CREATE INDEX IF NOT EXISTS atlas_chunks_path_idx ON atlas_chunks(path);
-CREATE INDEX IF NOT EXISTS atlas_chunks_parent_idx ON atlas_chunks(parent_id);
-CREATE INDEX IF NOT EXISTS atlas_chunks_feature_family_idx ON atlas_chunks(feature_family);
-CREATE INDEX IF NOT EXISTS atlas_chunks_source_refs_gin ON atlas_chunks USING gin(source_refs);
-CREATE INDEX IF NOT EXISTS atlas_chunks_chunk_ids_gin ON atlas_chunks USING gin(chunk_ids);
-CREATE INDEX IF NOT EXISTS atlas_chunks_cluster_tags_gin ON atlas_chunks USING gin(cluster_tags);
-CREATE INDEX IF NOT EXISTS atlas_chunks_env_vars_gin ON atlas_chunks USING gin(env_vars);
-CREATE INDEX IF NOT EXISTS atlas_chunks_summary_trgm ON atlas_chunks USING gin(summary gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS atlas_chunks_embedding_hnsw ON atlas_chunks USING hnsw(embedding vector_cosine_ops);
-```
-
----
-
-## ACE Packet Format
-
-Compact packet for Gemma4:
-
-```json
-{
-  "cartridgeId": "ace:packet:<runId>",
-  "queryHash": "...",
-  "intent": "failure|code|graph|hybrid",
-  "clusterTags": ["atlas", "feature-map", "multi-hop"],
-  "topoClass": "feature-synthesis",
-  "sourceRefs": [],
-  "rankedCards": [],
-  "subgraph": {
-    "nodes": [],
-    "edges": []
-  },
-  "failureHints": [],
-  "nextActions": [],
-  "degraded": false,
-  "ttlSeconds": 3600
-}
-```
-
-Required validation:
-
-```txt
-No sourceRefs = degraded
-No commands = degraded
-No feature label = incomplete
-No path = invalid card
-No chunk_id = invalid retrieval card
-```
-
----
-
-## LangExtract-Style Structured Extraction
-
-Use structured extraction before summarization so feature maps are stable.
-
-Extract from each file/chunk:
-
-```json
-{
-  "feature": "ace-cache",
-  "language": "ts",
-  "paths": [],
-  "envVars": [],
-  "routes": [],
-  "apiEndpoints": [],
-  "databaseTables": [],
-  "mcpTools": [],
-  "natsSubjects": [],
-  "sourceRefs": [],
-  "commands": [],
-  "dependencies": [],
-  "risks": [],
-  "missingFeatures": []
-}
-```
-
-This gives Gemma4 a structured feature map instead of raw prose.
-
----
-
-## Multi-Hop Cache Traversal
-
-Example query:
-
-```txt
-Where is auth wired and how does it connect to ACE packet streaming?
-```
-
-Traversal:
-
-```txt
-query
-→ Redis ace:packet cache check
-→ Qdrant semantic search
-→ Postgres graph expansion by feature_family/source_refs/chunk_ids
-→ TurboVec rerank if candidate count is high
-→ LangExtract feature cards
-→ ACE packet
-→ Gemma4 synthesis
-→ Redis trace store
-```
-
-Transition memory:
-
-```json
-{
-  "from": "qdrant_hit",
-  "to": "graph_expand",
-  "intent": "feature-mapping",
-  "success": true,
-  "frequency": 12
-}
-```
-
-Later, these transitions can train/rerank traversal paths.
-
----
-
-# Phase TODOs
-
-## Phase 10B — TurboVec + Qdrant Optimization
-
-- [ ] Find actual gitignored GGUF path:
-
-```powershell
-rg --files -uu | rg -i "gemma|rotor|quant|gguf"
-```
-
-- [ ] Fix `ensure-llama-server.mjs` model candidate resolution.
-- [ ] Normalize sidecar ports:
-
-```txt
-8791 = atlas/OpenCode MCP
-8792 = TurboVec rerank sidecar
-8793 = RotorQuant helper
-8090 = llama-server Gemma4
-4222 = NATS
-6333 = Qdrant
-6379 = Redis
-5432/5434 = Postgres
-```
-
-- [ ] Add `retrieval.turbovec.rerank` NATS subject.
-- [ ] Add fallback: TurboVec offline → Qdrant order.
-- [ ] Enable Qdrant quantization before custom GPU search.
-- [ ] Add test query:
-
-```bash
-npm run ace:packet -- "where is auth?"
-```
-
----
-
-## Phase 11 — cuVS / CUDA Sidecar Benchmark
-
-- [ ] Create Python cuVS benchmark sidecar.
-- [ ] Do not use C++ N-API yet.
-- [ ] Add NATS subjects:
-
-```txt
-gpu.cuvs.search
-gpu.cuda.rank
-```
-
-- [ ] Benchmark Qdrant vs cuVS on atlas chunks.
-- [ ] Store benchmark traces in Redis/Postgres.
-- [ ] Keep cuVS behind feature flag:
-
-```txt
-ENABLE_CUVS_SEARCH=false
-```
-
-Rule:
-
-```txt
-cuVS offline must not break retrieval.
-```
-
----
-
-## Phase 12 — CUDA Streams / Tensor Bridge / RNN Experiments
-
-- [ ] Export transition memory from Redis.
-- [ ] Build sequence memory dataset:
-
-```txt
-cache_miss → atlas_lookup
-atlas_lookup → qdrant_hit
-qdrant_hit → graph_expand
-graph_expand → turbovec_rerank
-turbovec_rerank → gemma4_response
-```
-
-- [ ] Prototype CUDA/RNN reranker as experimental lane only.
-- [ ] Add flag:
-
-```txt
-ENABLE_CUDA_RANKER=false
-```
-
-- [ ] Do not block retrieval on CUDA.
-- [ ] Do not send raw prompts to CUDA lane; send IDs/scores only.
-
----
-
-## Phase 13 — Graph Synthesis + Feature MapReduce
-
-- [ ] Build feature graph from:
-  - paths
-  - imports
-  - env vars
-  - routes
-  - API endpoints
-  - DB tables
-  - MCP tools
-  - NATS subjects
-  - OpenCode tools
-  - package scripts
-
-- [ ] Add MapReduce summaries:
-  - chunk summary
-  - file summary
-  - folder summary
-  - feature summary
-  - system summary
-
-- [ ] Store summary layers in:
-
-```txt
-atlas_chunks.summary
-atlas_chunks.sub_summaries
-atlas_feature_cards
-atlas_feature_edges
-```
-
-- [ ] Add command:
-
-```bash
-npm run atlas:graph:synthesize
-```
-
-- [ ] Output feature cards with:
-  - paths
-  - sourceRefs
-  - commands
-  - envVars
-  - qdrantTags
-  - chunkIds
-  - parentIds
-
----
-
-## Phase 14 — DuckDB + LangGraph + Langfuse
-
-- [ ] Use DuckDB for offline analytics only.
-- [ ] Export traces from Redis/Postgres to DuckDB.
-- [ ] Add LangGraph run IDs to every ACE packet.
-- [ ] Add Langfuse tracing for:
-  - retrieval events
-  - cache hits/misses
-  - Qdrant latency
-  - TurboVec rerank latency
-  - Gemma4 latency
-  - failureLookup retries
-
-Rule:
-
-```txt
-DuckDB and Langfuse observe the system.
-They do not sit in the request-critical correctness path.
-```
-
----
-
-## Phase 15 — Feature Labeling + Pruning
-
-- [ ] Label every major feature:
-
-```txt
-auth
-ace-cache
-qdrant-search
-postgres-atlas
-opencode-tools
-sse-chat
-bifrost-gemma4
-turbovec-rerank
-langgraph-dag
-nats-sidecars
-feature-mapreduce
-browser-cache
-```
-
-- [ ] Detect orphaned files with no feature label.
-- [ ] Detect duplicate feature implementations.
-- [ ] Detect stale scripts.
-- [ ] Detect stale docs.
-- [ ] Add pruning report:
-
-```bash
-npm run atlas:feature:prune-report
-```
-
-Rule:
-
-```txt
-Never delete automatically.
-Only output review lists.
-```
-
----
-
-## Phase 16 — Implement Missing Features
-
-- [ ] Convert prune report into missing-feature backlog.
-- [ ] For each missing feature, require:
-  - feature card
-  - sourceRefs
-  - env vars
-  - commands
-  - tests
-  - rollback notes
-
-- [ ] Gemma4/OpenCode agent must call:
-
-```txt
-ace:packet
-atlas.search
-failureLookup
-trace.store
-```
-
-- [ ] Required checks:
-
-```bash
-npm run ci:all
-npm run smoke:mcp:opencode-sidecars
-npm run ace:packet -- "<feature query>"
-```
-
----
-
-## OpenCode Agent Guardrails
-
-OpenCode/Gemma4 must not claim success unless:
-
-```txt
-sourceRefs.length > 0
-commands.length > 0
-paths.length > 0
-chunkIds.length > 0
-```
-
-Failure routing:
-
-```txt
-missing_sourceRefs → failureLookup → synthesize once → END
-generic_answer → failureLookup → synthesize once → END
-duplicate_tool_call → failureLookup → synthesize once → END
-max_attempts → END
-```
-
----
-
-## Recommended Scripts
-
-```jsonc
-{
-  "scripts": {
-    "ace:packet": "node scripts/ace/build-packet.mjs",
-    "ace:ask": "node scripts/ace/ask-gemma4.mjs",
-    "ace:stream": "node scripts/ace/stream-gemma4.mjs",
-    "atlas:graph:synthesize": "node scripts/atlas/graph-synthesize.mjs",
-    "atlas:feature:prune-report": "node scripts/atlas/feature-prune-report.mjs",
-    "qdrant:quantize": "node scripts/qdrant/enable-quantization.mjs",
-    "turbovec:rerank:test": "node scripts/atlas/test-turbovec-rerank.mjs",
-    "phase10b:test": "npm run ace:packet -- \"where is auth?\" && npm run smoke:mcp:opencode-sidecars"
-  }
-}
-```
-
----
-
-## Final Architecture Principle
-
-```txt
-Postgres = truth
-Qdrant = canonical semantic recall
-Redis = hot ACE/prompt/trace cache
-TurboVec = optional compression/rerank for large candidate sets
-LangExtract = structured feature extraction
-LangGraph = stateful routing and failure control
-Gemma4/Bifrost = synthesis
-cuVS/CUDA/TensorRT = later acceleration lanes
-DuckDB/Langfuse = analytics and observability
-OpenCode = agent/tool caller
-Svelte SSE = live UI visibility
-```
-
-The goal is not just faster search.
-
-The goal is a durable, multi-hop, feature-aware source-of-truth layer that lets Gemma4 reason over the codebase using compact, traceable, cached context packets.
+Do not pass raw retrieval hits to the model. Do not resurrect the legacy cartridge/ranked-card/subgraph JSON as a competing ACE contract. BitFrost/Valkey is derived residency, only after context identity/checksum is established; never persist hidden thoughts, tensors, or model KV state there.
+
+## Work phases and exit evidence
+
+### Phase 10B — Semantic retrieval and executor convergence
+
+- [ ] Identify the canonical `semantic_768` writer and all callers/mirrors/legacy writers; keep broad writes fail-closed until one qualified owner is proven.
+- [ ] Bind each admitted input to source/workspace revision, input digest, immutable EmbeddingGemma model/tokenizer/runtime identity, representation revision, vector digest, and independent PostgreSQL readback.
+- [ ] Establish one `DenseExecutor` contract and exact-search oracle; compare pgvector/Qdrant/TurboVec without multiplying semantic votes.
+- [ ] For TurboVec, resolve actual transport, usable health, non-empty indexed corpus, canonical external-ID mapping, filter parity, and bounded recall/latency receipt.
+- [ ] Keep Qdrant as a rebuildable projection and prove same-cohort payload/readback before promotion.
+
+**Exit:** a frozen cohort and receipt bind canonical inputs to vector outputs and executor readbacks; unavailable challengers fail over within the same logical lane.
+
+### Phase 11 — cuVS/CAGRA benchmark
+
+- [ ] Use the exact frozen `semantic_768` cohort and canonical identity mapping.
+- [ ] Compare approximate results to bounded exact CPU/pgvector oracle; report recall, filters, latency, and resource use.
+- [ ] Keep WSL2/RAPIDS executor capability separate from Windows serving; runtime installation/ABI must be checked before claiming live GPU parity.
+
+**Exit:** replayable benchmark receipt; no canonical writes or additional retrieval vote.
+
+### Phase 12 — Derived routing and topology
+
+- [ ] Revision-qualify KMeans/SOM/RFF/latent/topology inputs, algorithms, outputs, and ordinal-map checksum.
+- [ ] Keep clusters, coordinates, PageRank, and learned recommendations as features only—not identity, ontology truth, or independent retrieval votes.
+- [ ] Require CPU/reference parity before GPU promotion and held-out evaluation before any learned policy promotion.
+
+**Exit:** derived snapshot checksums align to the same admitted cohort and remain safely discardable/rebuildable.
+
+### Phase 13 — Structural graph, chunking, and feature synthesis
+
+- [ ] Compare the daily stream planner with the workstation's actual source inventory, Graphify extractor, canonical chunk owner, and PostgreSQL packet/chunk lineage. Record which stages execute versus merely emit plans.
+- [ ] Define source-role routing for code, documentation, structured JSON, JSONL/NDJSON, generated artifacts, and unsupported/oversized sources; keep stream limits separate from semantic eligibility.
+- [ ] Prove bounded chunk streaming through the existing chunk owner: frozen manifest, exact revision recheck, deterministic chunk IDs/spans, resumable batches, terminal outcomes, and independent lineage readback.
+- [ ] Use existing `AstMiniRecordV1`/AST observation owners and revision-qualified evidence; add only missing bounded helpers (DAG relation builder, named label features, deterministic label proposals) where no owner exists.
+- [ ] Keep POS/NLP/LangExtract and `:8095` classification as grounded enrichment; propagate `sourceRef`, `sourceRevision`, and workspace revision where available.
+- [ ] Treat NetworkX as a small/reference oracle; Neo4j/cuGraph as derived graph executors. Seal edge/hyperedge inputs and ordinal mapping before graph algorithms.
+- [ ] Stream large intermediate records as bounded JSONL/NDJSON; use Arrow/Parquet or mmap for dense matrices, not JSON vectors.
+
+**Exit:** every frozen input has a typed terminal outcome and each emitted fact/chunk has source revision, producer revision, and readback evidence. A plan file alone does not pass this phase.
+
+### Phase 14 — Workflow and observability
+
+- [ ] Carry request, workspace, source, context, model, and policy revisions through bounded workflow actions.
+- [ ] Record tool, retrieval, cache, synthesis, validation, and execution receipts; telemetry is diagnostic and never substitutes for correctness evidence.
+- [ ] Add watchdog limits for repeated failures, stalled progress, unauthorized effects, and resource budgets.
+
+**Exit:** an execution can be replayed/audited from receipts without storing hidden reasoning or runtime KV/tensors.
+
+### Phase 15 — Taxonomy, labeling, and ontology alignment
+
+- [ ] Reuse the existing domain vocabulary and classification schema; do not create a parallel domain enum/registry.
+- [ ] Keep deterministic path/AST/schema rules as the baseline, existing sklearn sidecar as a revision-qualified challenger, and future PyTorch heads as shadow candidates.
+- [ ] Emit label proposals with taxonomy/model/provider revisions and evidence refs; resolve/promote only through existing ontology ownership and review gates.
+- [ ] Use `.okf` as validated vocabulary/rule input: schema validation, semantic validation, canonical serialization, and checksum before use.
+
+**Exit:** classification coverage/evaluation is measured on frozen, reviewed labels; classifiers cannot set canonical identity or ontology truth.
+
+### Phase 16 — OaK, MCP, and governed agent execution
+
+- [ ] Resolve capabilities from the existing OaK registry; DSPy may compose registered capabilities, and GEPA may optimize instructions/tool descriptions offline or in shadow replay only.
+- [ ] Validate a bounded acyclic DAG against typed schemas, dependencies, policies, and effects before execution.
+- [ ] Route evidence through the canonical resolver → AcePacketV3 → ContextManifest before Ornith synthesis; verify an actual production caller and grounded readback, not merely adapter tests.
+- [ ] Keep MCP as typed transport and execution receipts as records of what happened. No model output directly mutates canonical stores.
+- [ ] After ACE grounding and identity checks pass, perform only an explicitly authorized, reversible BitFrost canary with SET/GET and byte/checksum readback.
+
+**Exit:** replayable query-to-context and tool execution receipts; unauthorized writes are zero; cache remains derived and disposable.
+
+## Current gaps to reconcile before declaring phases complete
+
+The latest saved canonical projection audit reviewed for this roadmap is **5/11 PASS** (2026-10-01). A subsequent live refresh attempt failed before producing a new audit because the PostgreSQL protocol connection terminated; do not call that a refreshed result. The saved report's remaining predicates are:
+
+- `SYMBOLS_RESOLVED`: incomplete exact-revision extraction/readback.
+- `SEMANTIC_OWNER_PROVEN`: unique writer and per-row source/model/tokenizer/input/representation lineage plus independent readback.
+- `LATENT_FAMILY_PROVEN`: canonical semantic input cohort lineage and separate evaluation/promotion decision; candidate status is not promotion.
+- `PROJECTIONS_CHECKSUM_ALIGNED`: no receipt yet binds the same admitted cohort, ordinal map, representation inputs, and projection readbacks.
+- `ACE_EVIDENCE_GROUNDED`: live retrieval-to-admitted-resolver-to-AcePacketV3-to-ContextManifest grounding/readback is not proven.
+- `BITFROST_KEYS_DERIVABLE`: admitted key producer and identity/checksum-bound cache readback not proven; wait until ACE grounding.
+
+`ORDINAL_MAP_SEALED` is now reported PASS for packet grain (16,151/16,151); do not repeat the stale physical-chunk gap as an ordinal-map failure. Physical chunk crosswalk/materialization remains a separate owner question. Do not use broad reindexing, infer revisions, train the autoencoder from unproven inputs, warm BitFrost early, or add a replacement schema merely to turn a predicate green.
+
+## Recommended next steps
+
+1. Restore/verify PostgreSQL protocol access and run the read-only canonical projection audit; save a timestamped report. Do not restart Docker/database services without an explicit operational diagnosis.
+2. Reconcile the frozen admitted source set with the existing Graphify inventory and canonical chunk owner. Separate transport/plan output from actual chunk execution; produce a read-only, revision-guarded manifest and reason-coded outcomes first.
+3. Close exact-revision symbol extraction/readback only for authorized, eligible rows; preserve drift, identity conflicts, resource deferrals, and parse failures as distinct terminal outcomes.
+4. Complete static census of every 768-D writer, then converge through one qualified writer and bounded independent readback before AE training or broad embedding work.
+5. Freeze the semantic training-input manifest; evaluate the current 768→512→256→128 candidate separately from promotion. Keep `latent_64` derived from `latent_128` and 4-D topology separate.
+6. Produce cross-projection alignment evidence from existing owners for the same cohort/checksum; do not add a second registry/table without proving no existing receipt owner fits.
+7. Wire the live SearchRuntime route to the admitted resolver and existing AcePacketV3/ContextManifest bridge; run a no-write bounded query and independent identity/span/checksum readback.
+8. Only after ACE grounding passes, prove deterministic BitFrost key derivation and run an authorized reversible cache canary.
+
+## External runtime references
+
+- [Ornith-1.5-9B model card](https://huggingface.co/ornith-ai/Ornith-1.5-9B)
+- [Ornith 1.5 official announcement](https://ornith.ai/ornith_1_5.html)
+- [llama.cpp server API and streaming](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)
+- [EmbeddingGemma model card and Matryoshka dimensions](https://ai.google.dev/gemma/docs/embeddinggemma/model_card)
+- [pgvector exact and approximate search](https://github.com/pgvector/pgvector)
+
+These references describe component capabilities; Parent Atlas admission still requires local owner, revision, checksum, and readback evidence.

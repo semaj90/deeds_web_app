@@ -46,8 +46,9 @@
  *   legal.similar_cases          — find cases similar to a reference case
  *   legal.batch_ingest           — publish document URLs to document.embed queue
  *
- * Architecture note — tools are READ-ONLY except the four ops.* tools which require an
- * operator_token to execute. Batch writes flow through graphify:* npm scripts outside the ACE hot path.
+ * Architecture note — tools are READ-ONLY except the operator-gated ops.* tools which require an
+ * operator_token. There is no generic shell/process tool exposed to models. Internal subprocesses
+ * are restricted to typed operations. Batch writes flow through governed paths outside the ACE hot path.
  *
  * TODO (optional future sidecar):
  *   LangGraph can orchestrate long-running graphify → verify → human-approval → patch workflows
@@ -68,6 +69,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
+import { resolveRerankEndpoint } from '../lib/server/search/rerank-endpoint.js';
 import { ensureOpenTelemetry } from '../lib/server/observability/opentelemetry.js';
 import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.js';
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
@@ -117,10 +119,62 @@ import { registerPhase109aTools } from '$lib/server/mcp/phase109a-mcp-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
+import { registerOpenSpecEvidenceTools } from './openspec-evidence-tools.js';
+import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
+import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
+import {
+  atlasCoverageInputSchema,
+  atlasPacketDenseSearchInputSchema,
+  atlasPacketSearchInputSchema,
+  featureDocumentReadInputSchema,
+  FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
+  FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
+  FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES,
+  featureEvidenceTuplesInputSchema,
+  FEATURE_EVIDENCE_STATEMENT_TIMEOUT_MS,
+  engramMemoryRecentInputSchema,
+  ENGRAM_MEMORY_STATEMENT_TIMEOUT_MS,
+  buildGraphNeighborhoodFailureV1,
+  GRAPH_EXPAND_NEO4J_TIMEOUT_MS,
+  atlasGraphPageRankInputSchema,
+  graphCommunityForNodeInputSchema,
+  graphExpandNeighborhoodInputSchema,
+  graphPageRankTopInputSchema,
+  turbovecRankChunksInputSchema,
+  ATLAS_COVERAGE_STATEMENT_TIMEOUT_MS,
+  graphSemanticPathInputSchema,
+  graphShortestPathInputSchema,
+  hypergraphSearchInputSchema,
+  clusterMembersInputSchema,
+  CLUSTER_MEMBERS_STATEMENT_TIMEOUT_MS,
+  postgresFtsSearchInputSchema,
+  POSTGRES_FTS_STATEMENT_TIMEOUT_MS,
+  traceExplainRetrievalInputSchema,
+  TRACE_EXPLAIN_COMMAND_TIMEOUT_MS,
+  TRACE_EXPLAIN_MAX_KEYS,
+  TRACE_EXPLAIN_MAX_SCANNED_KEYS,
+  TRACE_EXPLAIN_MAX_VALUE_BYTES,
+  TRACE_EXPLAIN_SCAN_MAX_PAGES,
+  TRACE_EXPLAIN_SCAN_PAGE_SIZE,
+  TRACE_EXPLAIN_TOTAL_TIMEOUT_MS,
+  selectTraceScanKeysV1,
+  traceValueMatchesQueryV1,
+  notecardSearchInputSchema,
+  knowledgeMinifiedMapInputSchema,
+  KNOWLEDGE_MAP_STATEMENT_TIMEOUT_MS,
+  MCP_UPSTREAM_READ_TIMEOUT_MS,
+  PACKET_SEARCH_CLIENT_TIMEOUT_MS,
+  PACKET_SEARCH_STATEMENT_TIMEOUT_MS,
+  readBoundedJsonResponse,
+  serializeBoundedReadResult,
+} from './read-tool-bounds.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
+import { runPacketDenseSearch } from '../lib/server/retrieval/packet-dense-search.js';
+import type { QdrantPointsQueryFn } from '../lib/server/retrieval/packet-dense-rerank.js';
+import { embedQueryForLane } from '../lib/server/retrieval/embedding-service.js';
 import { buildAcePacketFromSource } from '../lib/server/ace/source-to-packet.js';
 import { buildIndexedSourcePacket } from '../lib/server/ace/indexed-source-packet.js';
 import { populateFeatureDocuments } from '../lib/server/atlas/feature-doc-population.js';
@@ -153,7 +207,7 @@ const PG_URL            = ENV.DATABASE_URL;
 const TOPO_URL          = ENV.TOPOLOGY_SEARCH_URL;
 const GO_SEARCH_URL     = ENV.GO_SEARCH_URL;
 const GO_RETRIEVAL_URL  = ENV.RETRIEVAL_HTTP_URL;
-const RERANK_URL        = ENV.RERANK_URL;
+const RERANK_URL        = resolveRerankEndpoint(ENV);
 const TURBOQUANT_URL    = ENV.TURBOQUANT_URL;
 const OLLAMA_BASE       = ENV.OLLAMA_BASE_URL;
 const OLLAMA_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
@@ -564,6 +618,7 @@ registerSkillTools(server, dispatcherMiddleware);
 registerLegalSkillsTools(server);
 registerEngramTools(server, REDIS_URL, dispatcherMiddleware);
 registerAtlasEmbeddingTools(server, REDIS_URL, dispatcherMiddleware);
+registerOpenSpecEvidenceTools(server);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server, dispatcherMiddleware);
   registerResearchTools(server, dispatcherMiddleware);
@@ -595,6 +650,29 @@ registerLdrResearchTools(server, pool);
 // server.ts via a manual per-name dispatch switch. Registration only — reuses
 // the existing SQL-function-backed handlers, no duplicated lifecycle logic.
 registerPhase109aTools(server);
+
+// Native diagnostics are lazy-loaded and fixture-bounded. The tools expose no
+// store or gRPC handles and do not reset process-wide execution counters.
+registerNativeAccelerationTools(server, async () => {
+  const { getAddonInternal } = await import('../lib/server/gpu/libtorch-bridge.js');
+  const addon = getAddonInternal() as null | {
+    getBackendInfo?: () => unknown;
+    getExecutionCounters?: () => unknown;
+    batchCosineTopK?: (query: Float32Array, corpus: Float32Array, rows: number, dimensions: number, topK: number) => {
+      indices: ArrayLike<number>;
+      scores: ArrayLike<number>;
+      backend: string;
+    };
+  };
+  if (!addon?.getBackendInfo || !addon.getExecutionCounters || !addon.batchCosineTopK) {
+    throw new Error('NATIVE_ACCELERATION_DIAGNOSTICS_UNAVAILABLE');
+  }
+  return {
+    backendInfo: () => addon.getBackendInfo!(),
+    executionCounters: () => addon.getExecutionCounters!(),
+    exactTopK: (query, corpus, rows, dimensions, topK) => addon.batchCosineTopK!(query, corpus, rows, dimensions, topK),
+  };
+});
 
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same
@@ -630,7 +708,7 @@ async function getEmbedRedis() {
  * Redis being offline does not flood stderr with "Unhandled error event".
  * Caller is responsible for `redis.quit()` when done.
  */
-function makeRedis() {
+function makeRedis(options: { commandTimeoutMs?: number } = {}) {
   // Sync Redis() works fine without a dynamic import here — `Redis` is
   // already imported at the top of this file via the static import chain.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -641,6 +719,7 @@ function makeRedis() {
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     connectTimeout: 2_000,
+    ...(options.commandTimeoutMs ? { commandTimeout: options.commandTimeoutMs } : {}),
     retryStrategy: () => null,
   });
   r.on('error', () => {
@@ -962,10 +1041,16 @@ function normalizeTopologyHits(
 // Returns the same `{ row: unknown[] }[]` shape the old HTTP transaction API
 // produced, so none of the call sites below need to change.
 
-async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) {
+async function neo4jQuery(
+  cypher: string,
+  params: Record<string, unknown> = {},
+  options: { readOnly?: boolean; timeoutMs?: number } = {},
+) {
   const neo4j = (await import('neo4j-driver')).default;
   const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
-  const session = getNeo4jDriver().session();
+  const session = getNeo4jDriver().session(
+    options.readOnly ? { defaultAccessMode: neo4j.session.READ } : undefined,
+  );
   try {
     // Cypher clauses like LIMIT/SKIP require a Neo4j Integer, not a JS float —
     // the driver otherwise serializes `3` as `3.0` and Neo4j rejects it.
@@ -975,7 +1060,11 @@ async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) 
         typeof value === 'number' && Number.isInteger(value) ? neo4j.int(value) : value,
       ]),
     );
-    const result = await session.run(cypher, intSafeParams);
+    const result = await session.run(
+      cypher,
+      intSafeParams,
+      options.timeoutMs ? { timeout: options.timeoutMs } : undefined,
+    );
     return result.records.map((record) => ({
       row: record.keys.map((key) => record.get(key)),
     }));
@@ -1309,47 +1398,7 @@ server.registerTool(
   {
     description:
       'Expands graph neighborhood from sourceRefs (read-only). Supports legacy stableKey/depth args for backward compatibility.',
-    inputSchema: z.object({
-      sourceRefs: z
-        .array(z.string())
-        .optional()
-        .describe(
-          'Primary source references (file paths or stable keys). Preferred over legacy stableKey.'
-        ),
-      stableKey: z.string().optional().describe('Legacy single center stable key.'),
-      depth: z
-        .number()
-        .int()
-        .min(1)
-        .max(3)
-        .default(2)
-        .optional()
-        .describe('Legacy hop depth (1–3).'),
-      maxHops: z
-        .number()
-        .int()
-        .min(1)
-        .max(2)
-        .optional()
-        .describe('Hop depth for sourceRefs flow (1–2).'),
-      limit: z.number().int().min(1).max(100).default(40).describe('Max neighbors returned'),
-      query: z
-        .string()
-        .optional()
-        .describe('Optional free-text query used only for deterministic seed-envelope labeling'),
-      route: z
-        .string()
-        .optional()
-        .describe('Optional route used only for deterministic seed-envelope labeling'),
-      symbol: z
-        .string()
-        .optional()
-        .describe('Optional symbol used only for deterministic seed-envelope labeling'),
-      filePath: z
-        .string()
-        .optional()
-        .describe('Optional explicit file path when the stable key is not a file:* key'),
-    }),
+    inputSchema: graphExpandNeighborhoodInputSchema,
   },
   async ({ sourceRefs, stableKey, depth, maxHops, limit, query, route, symbol, filePath }) => {
     const normalizeStableKey = (value: string): string => {
@@ -1458,7 +1507,7 @@ server.registerTool(
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify(
+            text: serializeBoundedReadResult(
               {
                 ok: true,
                 nodes: Array.from(nodesById.values()),
@@ -1479,16 +1528,14 @@ server.registerTool(
                   stable_key: n.stableKey,
                   pagerank: n.pagerank ?? n.pageRank ?? null,
                 })),
-              },
-              null,
-              2
+              }
             ),
           },
         ],
       };
     } catch {
       // Fall back to direct Neo4j
-      const rows = await neo4jQuery(
+      const queryResult = await neo4jQuery(
         `MATCH (c)-[r*1..${hops}]-(n)
          WHERE coalesce(c.stableKey, c.stable_key) IN $keys
          RETURN DISTINCT coalesce(n.stableKey, n.stable_key) AS stableKey,
@@ -1497,8 +1544,25 @@ server.registerTool(
                 type(last(r)) AS lastRelation,
                 coalesce(c.stableKey, c.stable_key) AS fromStableKey
          LIMIT $limit`,
-        { keys: seedKeys, limit }
+        { keys: seedKeys, limit },
+        { readOnly: true, timeoutMs: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
+      ).then(
+        (rows) => ({ rows }),
+        (error: unknown) => ({ error }),
       );
+      if ('error' in queryResult) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: serializeBoundedReadResult(
+                buildGraphNeighborhoodFailureV1(queryResult.error, center, hops)
+              ),
+            },
+          ],
+        };
+      }
+      const rows = queryResult.rows;
       const neighbors = rows.map((d: { row?: unknown[] }) => {
         const stable = String(d.row?.[0] ?? '');
         return {
@@ -1535,7 +1599,7 @@ server.registerTool(
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify(
+            text: serializeBoundedReadResult(
               {
                 ok: true,
                 nodes,
@@ -1549,9 +1613,7 @@ server.registerTool(
                 center,
                 seedEnvelope,
                 neighbors: neighbors.map((n) => ({ stable_key: n.stableKey, pagerank: null })),
-              },
-              null,
-              2
+              }
             ),
           },
         ],
@@ -1564,33 +1626,9 @@ server.registerTool(
   'turbovec.rank_chunks',
   {
     description: 'Read-only RotorQuant blended rerank for sourceRefs. No writes.',
-    inputSchema: z.object({
-      query: z.string().min(1).describe('User query or retrieval intent text'),
-      sourceRefs: z.array(z.string()).min(1).describe('Source refs to rerank'),
-      limit: z.number().int().min(1).max(30).default(10).optional(),
-      trustBuckets: z
-        .record(z.string(), z.string())
-        .optional()
-        .describe(
-          'Optional per-ref trust bucket map (local_verified, external_verified, synthetic, web_unverified)'
-        ),
-      trustTiers: z
-        .record(z.string(), z.number())
-        .optional()
-        .describe('Optional per-ref trust tier map (-1..+2)'),
-      recency: z
-        .record(z.string(), z.number())
-        .optional()
-        .describe('Optional per-ref recency score (0..1)'),
-      vectorScores: z
-        .record(z.string(), z.number())
-        .optional()
-        .describe('Optional per-ref vector score (0..1)'),
-      graphScores: z
-        .record(z.string(), z.number())
-        .optional()
-        .describe('Optional per-ref graph score (0..1)'),
-    }),
+    inputSchema: turbovecRankChunksInputSchema.describe(
+      'Bounded read-only local rerank over at most 200 source references and score-map entries.'
+    ),
   },
   async ({
     query,
@@ -1663,16 +1701,14 @@ server.registerTool(
       content: [
         {
           type: 'text' as const,
-          text: JSON.stringify(
+          text: serializeBoundedReadResult(
             {
               ok: true,
               formula: '0.45*vector + 0.25*graph + 0.20*trust + 0.10*recency',
               ranked,
               sourceRefs: ranked.map((item) => item.sourceRef),
               furtherResearch,
-            },
-            null,
-            2
+            }
           ),
         },
       ],
@@ -1684,53 +1720,53 @@ server.registerTool(
   'engram.chat_memory_recent',
   {
     description: 'Read-only recent chat memory lookup from engram_cards.',
-    inputSchema: z.object({
-      userId: z.string().optional().describe('Optional user id to scope memoryId=chat:{userId}'),
-      sourceRefs: z.array(z.string()).optional().describe('Optional sourceRef filter'),
-      limit: z.number().int().min(1).max(40).default(8).optional(),
-    }),
+    inputSchema: engramMemoryRecentInputSchema.describe(
+      'Read-only memory lookup bounded by user id, source-reference filters, result count, statement time, and response size.'
+    ),
   },
   async ({ userId, sourceRefs, limit }) => {
     const maxRows = Math.min(limit ?? 8, 40);
     const scopedMemoryId = userId && userId.trim().length > 0 ? `chat:${userId.trim()}` : null;
-    const rows = scopedMemoryId
-      ? await pool.query(
-          `SELECT memory_id, scope, summary, source_refs, created_at
-           FROM engram_cards
-           WHERE memory_id = $1
-           ORDER BY created_at DESC
-           LIMIT $2`,
-          [scopedMemoryId, maxRows]
-        )
-      : await pool.query(
-          `SELECT memory_id, scope, summary, source_refs, created_at
-           FROM engram_cards
-           WHERE scope = 'user'
-           ORDER BY created_at DESC
-           LIMIT $1`,
-          [maxRows * 2]
-        );
+    try {
+      const rows = await withCanonicalReadOnlyQueryBudget(ENGRAM_MEMORY_STATEMENT_TIMEOUT_MS, () =>
+        scopedMemoryId
+          ? tracedQuery(
+              'engram.chat_memory_recent',
+              `SELECT memory_id, scope, summary, source_refs, created_at
+               FROM engram_cards
+               WHERE memory_id = $1
+               ORDER BY created_at DESC
+               LIMIT $2`,
+              [scopedMemoryId, maxRows],
+            )
+          : tracedQuery(
+              'engram.chat_memory_recent',
+              `SELECT memory_id, scope, summary, source_refs, created_at
+               FROM engram_cards
+               WHERE scope = 'user'
+               ORDER BY created_at DESC
+               LIMIT $1`,
+              [maxRows * 2],
+            )
+      );
 
-    const refs = Array.isArray(sourceRefs)
-      ? Array.from(new Set(sourceRefs.map((ref) => String(ref)).filter(Boolean)))
-      : [];
-    const filtered = refs.length
-      ? rows.rows.filter((row) => {
-          const rowRefs = Array.isArray(row.source_refs)
-            ? row.source_refs.map(String)
-            : typeof row.source_refs === 'string'
-              ? [row.source_refs]
-              : [];
-          return refs.some((ref) => rowRefs.some((rowRef) => rowRef.includes(ref)));
-        })
-      : rows.rows;
+      const refs = Array.from(new Set(sourceRefs ?? []));
+      const filtered = refs.length
+        ? rows.rows.filter((row) => {
+            const rowRefs = Array.isArray(row.source_refs)
+              ? row.source_refs.map(String)
+              : typeof row.source_refs === 'string'
+                ? [row.source_refs]
+                : [];
+            return refs.some((ref) => rowRefs.some((rowRef) => rowRef.includes(ref)));
+          })
+        : rows.rows;
 
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: JSON.stringify(
-            {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: serializeBoundedReadResult({
               ok: true,
               count: Math.min(filtered.length, maxRows),
               memories: filtered.slice(0, maxRows).map((row) => ({
@@ -1740,13 +1776,26 @@ server.registerTool(
                 sourceRefs: Array.isArray(row.source_refs) ? row.source_refs : [],
                 createdAt: row.created_at,
               })),
-            },
-            null,
-            2
-          ),
-        },
-      ],
-    };
+            }),
+          },
+        ],
+      };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: serializeBoundedReadResult({
+              ok: false,
+              count: 0,
+              memories: [],
+              error: message.slice(0, 500),
+            }),
+          },
+        ],
+      };
+    }
   }
 );
 
@@ -1756,11 +1805,7 @@ server.registerTool(
   'graph.shortest_path',
   {
     description: 'Finds the shortest path between two graph nodes.',
-    inputSchema: z.object({
-      fromKey: z.string().describe('Source node stableKey'),
-      toKey: z.string().describe('Target node stableKey'),
-      maxHops: z.number().int().min(1).max(8).default(5).describe('Maximum path length'),
-    }),
+    inputSchema: graphShortestPathInputSchema,
   },
   async ({ fromKey, toKey, maxHops }) => {
     const rows = await neo4jQuery(
@@ -1770,12 +1815,13 @@ server.registerTool(
        RETURN [n IN nodes(p) | n.stableKey] AS path,
               length(p) AS hops,
               [r IN relationships(p) | type(r)] AS relations`,
-      { from: fromKey, to: toKey }
+      { from: fromKey, to: toKey },
+      { readOnly: true, timeoutMs: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
     );
     const result = rows.length
-      ? { path: rows[0].row?.[0], hops: rows[0].row?.[1], relations: rows[0].row?.[2] }
-      : { path: null, hops: null, message: 'No path found within hop limit' };
-    return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      ? { ok: true, found: true, from: fromKey, to: toKey, path: rows[0].row?.[0], hops: rows[0].row?.[1], relations: rows[0].row?.[2] }
+      : { ok: true, found: false, from: fromKey, to: toKey, path: null, hops: null, relations: [], message: 'No path found within hop limit' };
+    return { content: [{ type: 'text' as const, text: serializeBoundedReadResult(result) }] };
   }
 );
 
@@ -1786,11 +1832,7 @@ server.registerTool(
   {
     description:
       'Synthesizes a semantic narrative along the shortest structural path between nodes.',
-    inputSchema: z.object({
-      startKey: z.string().describe('Source node stableKey'),
-      endKey: z.string().describe('Target node stableKey'),
-      maxHops: z.number().int().min(1).max(10).default(6),
-    }),
+    inputSchema: graphSemanticPathInputSchema,
   },
   async ({ startKey, endKey, maxHops }) => {
     try {
@@ -1799,23 +1841,48 @@ server.registerTool(
         `MATCH p = shortestPath((a {stableKey: $from})-[*..${maxHops}]-(b {stableKey: $to}))
          RETURN [n IN nodes(p) | n.stableKey] AS path,
                 [r IN relationships(p) | type(r)] AS relations`,
-        { from: startKey, to: endKey }
+        { from: startKey, to: endKey },
+        { readOnly: true, timeoutMs: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
       );
 
       if (!rows.length || !rows[0].row?.[0]) {
-        return { content: [{ type: 'text', text: 'No structural path found' }] };
+        return { content: [{ type: 'text', text: serializeBoundedReadResult({
+          ok: true, found: false, startKey, endKey, maxHops, path: [], relations: [], steps: [],
+          message: 'No structural path found within hop limit',
+        }) }] };
       }
 
       const pathKeys = rows[0].row[0] as string[];
       const relations = rows[0].row[1] as string[];
+      if (!Array.isArray(pathKeys) || pathKeys.length > maxHops + 1 || !Array.isArray(relations) || relations.length !== pathKeys.length - 1) {
+        throw new Error('GRAPH_SEMANTIC_PATH_RESULT_SHAPE_INVALID');
+      }
 
       // 2. Semantic Hydration (Postgres)
-      const hydratedNodes = await pool.query(
-        `SELECT chunk_id, summary_text, output_meta, som_bmu_row, som_bmu_col, pagerank_score, risk_score
-         FROM embedded_summaries
-         WHERE chunk_id = ANY($1)`,
-        [pathKeys]
-      );
+      const hydratedNodes = await (async () => {
+        const hydrationClient = await pool.connect();
+        let hydrationTransactionOpen = false;
+        try {
+          await hydrationClient.query('BEGIN READ ONLY');
+          hydrationTransactionOpen = true;
+          await hydrationClient.query("SELECT set_config('statement_timeout', $1, true)", [
+            `${FEATURE_EVIDENCE_STATEMENT_TIMEOUT_MS}ms`,
+          ]);
+          const result = await hydrationClient.query(
+            `SELECT chunk_id, summary_text, output_meta, som_bmu_row, som_bmu_col, pagerank_score, risk_score
+             FROM embedded_summaries
+             WHERE chunk_id = ANY($1)
+             LIMIT $2`,
+            [pathKeys, maxHops + 1],
+          );
+          await hydrationClient.query('ROLLBACK');
+          hydrationTransactionOpen = false;
+          return result;
+        } finally {
+          if (hydrationTransactionOpen) await hydrationClient.query('ROLLBACK').catch(() => undefined);
+          hydrationClient.release();
+        }
+      })();
 
       const nodeMap = new Map(hydratedNodes.rows.map((n) => [n.chunk_id, n]));
 
@@ -1867,9 +1934,14 @@ server.registerTool(
         narrative: `Synthesized structural path of ${steps.length} steps. Identified ${sharedTags.length} shared tags and ${leaps.length} cluster leaps.`,
       };
 
-      return { content: [{ type: 'text', text: JSON.stringify(synthesis, null, 2) }] };
+      return { content: [{ type: 'text', text: serializeBoundedReadResult({
+        ok: true, found: true, startKey, endKey, maxHops, ...synthesis,
+      }) }] };
     } catch (err) {
-      return { content: [{ type: 'text', text: String(err) }], isError: true };
+      const error = err instanceof Error ? err.message : String(err);
+      return { content: [{ type: 'text', text: serializeBoundedReadResult({
+        ok: false, found: false, startKey, endKey, maxHops, error: error.slice(0, 500),
+      }) }], isError: true };
     }
   }
 );
@@ -1880,68 +1952,73 @@ server.registerTool(
   'graph.community_for_node',
   {
     description: 'Returns the community/cluster membership for a specific node.',
-    inputSchema: z.object({
-      stableKey: z.string().describe('Node stableKey to find community for'),
-    }),
+    inputSchema: graphCommunityForNodeInputSchema,
   },
   async ({ stableKey }) => {
+    const input = graphCommunityForNodeInputSchema.parse({ stableKey });
     // Neo4j CodebaseFile nodes key on filePath (without "src/" prefix), not stableKey.
     // Accept multiple input shapes: "src/foo.ts", "foo.ts", "file:src/foo.ts:Symbol".
-    const stripped = stableKey.replace(/^file:/, '').replace(/:[^/]*$/, '');
+    const stripped = input.stableKey.replace(/^file:/, '').replace(/:[^/]*$/, '');
     const candidates = Array.from(
-      new Set([stableKey, stripped, stripped.replace(/^src\//, ''), `src/${stripped}`])
+      new Set([input.stableKey, stripped, stripped.replace(/^src\//, ''), `src/${stripped}`])
     );
-    const rows = await neo4jQuery(
-      `MATCH (n:CodebaseFile)
-       WHERE n.filePath IN $keys OR n.id IN $keys
-       OPTIONAL MATCH (n)-[:MEMBER_OF]->(c:GPUCluster)
-       OPTIONAL MATCH (n)-[:BELONGS_TO_COMMUNITY]->(cm:Community)
-       RETURN n.filePath        AS filePath,
-              n.gpuCluster      AS gpuCluster,
-              n.communityId     AS communityId,
-              c.clusterId       AS clusterNodeId,
-              cm.communityId    AS communityNodeId,
-              n.clusterKey      AS clusterKey
-       LIMIT 1`,
-      { keys: candidates }
-    );
-    const row = rows[0]?.row ?? [];
-    if (row.length === 0) {
-      return {
-        content: [
-          {
+    try {
+      const rows = await neo4jQuery(
+        `MATCH (n:CodebaseFile)
+         WHERE n.filePath IN $keys OR n.id IN $keys
+         OPTIONAL MATCH (n)-[:MEMBER_OF]->(c:GPUCluster)
+         OPTIONAL MATCH (n)-[:BELONGS_TO_COMMUNITY]->(cm:Community)
+         RETURN n.filePath        AS filePath,
+                n.gpuCluster      AS gpuCluster,
+                n.communityId     AS communityId,
+                c.clusterId       AS clusterNodeId,
+                cm.communityId    AS communityNodeId,
+                n.clusterKey      AS clusterKey
+         LIMIT 1`,
+        { keys: candidates },
+        { readOnly: true, timeoutMs: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
+      );
+      const row = rows[0]?.row ?? [];
+      if (row.length === 0) {
+        return {
+          content: [{
             type: 'text' as const,
-            text: JSON.stringify(
-              {
-                stableKey,
-                error: 'no community found — node not in Neo4j',
-              },
-              null,
-              2
-            ),
-          },
-        ],
+            text: serializeBoundedReadResult({
+              ok: false,
+              stableKey: input.stableKey,
+              error: 'NO_COMMUNITY_FOUND',
+            }),
+          }],
+        };
+      }
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({
+            ok: true,
+            stableKey: input.stableKey,
+            filePath: row[0],
+            gpuCluster: row[1],
+            communityId: row[2] ?? row[4], // prefer node prop, fall back to relationship
+            clusterNodeId: row[3],
+            clusterKey: row[5],
+          }),
+        }],
+      };
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({
+            ok: false,
+            stableKey: input.stableKey,
+            error: error.slice(0, 500),
+          }),
+        }],
+        isError: true,
       };
     }
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: JSON.stringify(
-            {
-              stableKey,
-              filePath: row[0],
-              gpuCluster: row[1],
-              communityId: row[2] ?? row[4], // prefer node prop, fall back to relationship
-              clusterNodeId: row[3],
-              clusterKey: row[5],
-            },
-            null,
-            2
-          ),
-        },
-      ],
-    };
   }
 );
 
@@ -1951,46 +2028,60 @@ server.registerTool(
   'graph.pagerank_top',
   {
     description: 'Lists the top authoritative nodes in the graph by PageRank score.',
-    inputSchema: z.object({
-      limit: z.number().int().min(1).max(50).default(20).describe('Number of top nodes'),
-      nodeType: z.string().optional().describe('Filter by Neo4j label, e.g. "CodebaseFile"'),
-    }),
+    inputSchema: graphPageRankTopInputSchema,
   },
-  async ({ limit, nodeType }) => {
+  async (input: Record<string, unknown>) => {
+    const { limit, nodeType } = graphPageRankTopInputSchema.parse(input);
     // Redis cache stores raw file paths (no `codebasefile:` prefix); skip cache when
     // a label filter is supplied since Neo4j is the only source that carries labels.
-    if (!nodeType) {
-      try {
-        const { default: Redis } = await import('ioredis');
-        const redis = makeRedis();
-        await redis.connect().catch(() => {});
-        const raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
-        await redis.quit().catch(() => {});
-        if (raw) {
-          const scores: Record<string, number> = JSON.parse(raw);
-          const entries = Object.entries(scores)
-            .map(([k, v]) => ({ stableKey: k, pageRank: v }))
-            .sort((a, b) => b.pageRank - a.pageRank)
-            .slice(0, limit);
-          return { content: [{ type: 'text' as const, text: JSON.stringify(entries, null, 2) }] };
+    try {
+      if (!nodeType) {
+        try {
+          const redis = makeRedis({ commandTimeoutMs: 2_500 });
+          let raw: string | null = null;
+          try {
+            await redis.connect().catch(() => {});
+            raw = (await redis.get('couchdb:pagerank_scores')) as string | null;
+          } finally {
+            await redis.quit().catch(() => {});
+          }
+          // Avoid parsing/sorting unexpectedly large legacy cache values.
+          if (raw && Buffer.byteLength(raw, 'utf8') <= 1_048_576) {
+            const parsed: unknown = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              const entries = Object.entries(parsed as Record<string, unknown>)
+                .filter((entry): entry is [string, number] => typeof entry[1] === 'number' && Number.isFinite(entry[1]))
+                .map(([k, v]) => ({ stableKey: k, pageRank: v }))
+                .sort((a, b) => b.pageRank - a.pageRank)
+                .slice(0, limit);
+              return { content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: true, results: entries }) }] };
+            }
+          }
+        } catch {
+          // Unavailable/malformed legacy cache is not authoritative; use the graph read below.
         }
-      } catch {
-        /* fall through to Neo4j */
       }
-    }
 
-    // Routed through the canonical GraphAnalyticsPort (graph-retrieval-adapter.ts)
-    // instead of a duplicate inline Cypher query — same coalesce-to-identity
-    // logic (stableKey/filePath/relativePath/path), now shared with
-    // getTopAuthorityNodes() in neo4j-gds.ts.
-    const { getTopPageRankBounded } = await import('../lib/server/graph/graph-retrieval-adapter.js');
-    const nodes = await getTopPageRankBounded(limit, nodeType);
-    const results = nodes.map((n) => ({
-      stableKey: n.stableKey,
-      pageRank: n.graphPageRank,
-      label: n.labels?.[0],
-    }));
-    return { content: [{ type: 'text' as const, text: JSON.stringify(results, null, 2) }] };
+      // Routed through the canonical GraphAnalyticsPort (graph-retrieval-adapter.ts)
+      // instead of a duplicate inline Cypher query.
+      const { getTopPageRankBounded } = await import('../lib/server/graph/graph-retrieval-adapter.js');
+      const nodes = await getTopPageRankBounded(limit, nodeType);
+      const results = nodes.map((n) => ({
+        stableKey: n.stableKey,
+        pageRank: n.graphPageRank,
+        label: n.labels?.[0],
+      }));
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: true, results }) }] };
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : String(err);
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({ ok: false, error: error.slice(0, 500) }),
+        }],
+        isError: true,
+      };
+    }
   }
 );
 
@@ -2626,40 +2717,41 @@ server.registerTool(
   'kb.search_notecards',
   {
     description: 'Searches for identity-spine notecards matching a query.',
-    inputSchema: z.object({
-      query: z.string().describe('Search for identity-spine notecards'),
-      limit: z.number().int().min(1).max(20).default(5),
-    }),
+    inputSchema: notecardSearchInputSchema.describe('Bounded local identity-spine notecard search.'),
   },
-  async ({ query, limit }) => {
+  async (rawInput: Record<string, unknown>) => {
     try {
+      const { query, limit } = notecardSearchInputSchema.parse(rawInput);
       const cards = await searchNotecards({ query, limit });
       return {
         content: [
           {
-            type: 'text',
-            text: JSON.stringify(
-              {
-                query,
-                count: cards.length,
-                cards: cards.map((card) => ({
-                  chunk_id: card.card_id,
-                  source_path: card.source_path,
-                  score: card.score,
-                  why: card.why,
-                  kind: card.kind,
-                  tags: card.tags,
-                  content: card.context_text.slice(0, 600),
-                })),
-              },
-              null,
-              2
-            ),
+            type: 'text' as const,
+            text: serializeBoundedReadResult({
+              ok: true,
+              query,
+              count: cards.length,
+              cards: cards.map((card) => ({
+                chunk_id: card.card_id,
+                source_path: card.source_path.slice(0, 1024),
+                score: card.score,
+                why: card.why.slice(0, 8),
+                kind: card.kind.slice(0, 64),
+                tags: card.tags.slice(0, 16).map((tag) => tag.slice(0, 64)),
+                content: card.context_text.slice(0, 600),
+              })),
+            }),
           },
         ],
       };
     } catch (err) {
-      return { content: [{ type: 'text', text: String(err) }], isError: true };
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({ ok: false, count: 0, cards: [], error: String(err).slice(0, 500) }),
+        }],
+        isError: true,
+      };
     }
   }
 );
@@ -3055,19 +3147,19 @@ server.registerTool(
   'clusters.get_members',
   {
     description: 'Returns the member nodes for a specific cluster.',
-    inputSchema: z.object({
-      clusterKey: z.string().describe('Cluster key (e.g. "gpu:998" or "dir:src/lib/server/ace")'),
-      limit: z.number().int().min(1).max(200).default(50).describe('Max files returned'),
-    }),
+    inputSchema: clusterMembersInputSchema.describe('Bounded cluster-member read request'),
   },
-  async ({ clusterKey, limit }) => {
+  async (rawInput: Record<string, unknown>) => {
+    const { clusterKey, limit } = clusterMembersInputSchema.parse(rawInput);
     // qdrant_cluster_members is the canonical cluster→file map (cluster_key="gpu:N"|"dir:..."|"som:N").
     // Falls back to codebase_chunk_index when membership table is empty by parsing the prefix.
-    const rows = await pool.query<{
+    const rows = await withCanonicalReadOnlyQueryBudget(CLUSTER_MEMBERS_STATEMENT_TIMEOUT_MS, () =>
+      tracedQuery<{
       stable_key: string;
       rel_path: string;
       page_rank_score: number | null;
     }>(
+      'clusters.get_members',
       `SELECT m.stable_key,
               COALESCE(m.file_path, c.relative_path) AS rel_path,
               c.page_rank_score
@@ -3077,12 +3169,13 @@ server.registerTool(
        ORDER BY c.page_rank_score DESC NULLS LAST, m.membership_score DESC
        LIMIT $2`,
       [clusterKey, limit]
+      ),
     );
     return {
       content: [
         {
           type: 'text' as const,
-          text: JSON.stringify({ clusterKey, count: rows.rowCount, members: rows.rows }, null, 2),
+          text: serializeBoundedReadResult({ clusterKey, count: rows.rowCount, members: rows.rows }),
         },
       ],
     };
@@ -3096,39 +3189,70 @@ server.registerTool(
 server.registerTool(
   'trace.explain_retrieval',
   {
-    description: 'Explains the retrieval trace for a specific query.',
-    inputSchema: z.object({
-      query: z.string().describe('Query string to look up cached retrieval trace for'),
-    }),
+    description: 'Explains a bounded, read-only cached retrieval trace for a specific query.',
+    inputSchema: traceExplainRetrievalInputSchema,
   },
   async ({ query }) => {
+    let redis: ReturnType<typeof makeRedis> | undefined;
+    let redisDeadline: ReturnType<typeof setTimeout> | undefined;
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
+      redis = makeRedis({ commandTimeoutMs: TRACE_EXPLAIN_COMMAND_TIMEOUT_MS });
+      redisDeadline = setTimeout(() => redis?.disconnect(), TRACE_EXPLAIN_TOTAL_TIMEOUT_MS);
       await redis.connect().catch(() => {});
-      // Look for the most recent ACE trace for this query prefix
-      const keys = await redis.keys(`ace:trace:*`);
-      let found: string | null = null;
-      for (const k of keys.slice(0, 20)) {
-        const val = (await redis.get(k)) as string | null;
-        if (val?.includes(query.slice(0, 30))) {
-          found = val;
-          break;
+      const keys: string[] = [];
+      let cursor = '0';
+      for (let page = 0; page < TRACE_EXPLAIN_SCAN_MAX_PAGES; page++) {
+        const [nextCursor, pageKeys] = await redis.scan(
+          cursor,
+          'MATCH',
+          'ace:trace:*',
+          'COUNT',
+          String(TRACE_EXPLAIN_SCAN_PAGE_SIZE),
+        );
+        cursor = nextCursor;
+        keys.push(...pageKeys.slice(0, TRACE_EXPLAIN_MAX_SCANNED_KEYS - keys.length));
+        if (cursor === '0' || keys.length >= TRACE_EXPLAIN_MAX_SCANNED_KEYS) break;
+      }
+      let trace: unknown = null;
+      let found = false;
+      for (const key of selectTraceScanKeysV1(keys)) {
+        const valueBytes = Number(await redis.strlen(key));
+        if (!Number.isSafeInteger(valueBytes) || valueBytes < 0 || valueBytes > TRACE_EXPLAIN_MAX_VALUE_BYTES) {
+          continue;
         }
+        if (valueBytes === 0) continue;
+        const value = await redis.getrange(key, 0, TRACE_EXPLAIN_MAX_VALUE_BYTES - 1);
+        if (!value || new TextEncoder().encode(value).byteLength !== valueBytes || !traceValueMatchesQueryV1(value, query)) continue;
+        try {
+          trace = JSON.parse(value) as unknown;
+          found = true;
+        } catch {
+          continue;
+        }
+        break;
       }
       await redis.quit().catch(() => {});
+      redis = undefined;
       return {
         content: [
           {
             type: 'text' as const,
-            text: found
-              ? JSON.stringify(JSON.parse(found), null, 2)
-              : JSON.stringify({ message: 'No cached retrieval trace found for this query' }),
+            text: serializeBoundedReadResult(found
+              ? { found: true, trace }
+              : { found: false, trace: null, message: 'No cached retrieval trace found for this query' }),
           },
         ],
       };
     } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({ found: false, trace: null, error: String(err).slice(0, 500) }),
+        }],
+      };
+    } finally {
+      if (redisDeadline) clearTimeout(redisDeadline);
+      if (redis) await redis.quit().catch(() => {});
     }
   }
 );
@@ -3165,37 +3289,29 @@ server.registerTool(
   'search.postgres_fts',
   {
     description: 'Code search using PostgreSQL Full Text Search.',
-    inputSchema: z.object({
-      query: z.string().describe('Code search query — preserves camelCase, dots, file paths'),
-      limit: z.number().int().min(1).max(50).default(20).optional(),
-      topo_class: z
-        .string()
-        .optional()
-        .describe('Filter by topology class (e.g. "infrastructure", "ui")'),
-    }),
+    inputSchema: postgresFtsSearchInputSchema.describe('Bounded read-only PostgreSQL full-text search.'),
   },
-  async ({ query, limit = 20, topo_class }) => {
+  async (rawInput: Record<string, unknown>) => {
+    const { query, limit, topo_class } = postgresFtsSearchInputSchema.parse(rawInput);
     try {
-      const client = await pool.connect();
-      try {
-        const { rows } = await client.query('SELECT * FROM search_code_lexical($1, $2, $3)', [
+      const result = await withCanonicalReadOnlyQueryBudget(POSTGRES_FTS_STATEMENT_TIMEOUT_MS, () =>
+        tracedQuery<Record<string, unknown>>('search.postgres_fts',
+          'SELECT * FROM search_code_lexical($1, $2, $3)', [
           query,
           limit,
           topo_class ?? null,
-        ]);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ results: rows, count: rows.length, mode: 'lexical' }, null, 2),
-            },
-          ],
-        };
-      } finally {
-        client.release();
-      }
+        ]),
+      );
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult({ results: result.rows, count: result.rows.length, mode: 'lexical' }),
+        }],
+      };
     } catch (err) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
+      return {
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult({ error: String(err).slice(0, 500) }) }],
+      };
     }
   }
 );
@@ -6025,45 +6141,27 @@ server.registerTool(
   'hypergraph.search',
   {
     description: 'Semantic search across the hypergraph edges.',
-    inputSchema: z.object({
-      query: z.string().max(500).describe('Natural language query (1-500 chars)'),
-      edge_types: z
-        .array(z.string())
-        .optional()
-        .describe('Filter by edge_type (LLMS.md, cluster_summary, codebase_chunk, generic)'),
-      limit: z.number().int().min(1).max(50).optional().describe('Max results 1-50 (default 10)'),
-      min_confidence: z
-        .number()
-        .min(0)
-        .max(1)
-        .optional()
-        .describe('Minimum confidence threshold 0-1'),
-    }),
+    inputSchema: hypergraphSearchInputSchema.describe(
+      'Read-only hypergraph search with bounded query, edge-type fanout, executor deadline, and response size.'
+    ),
   },
-  async ({ query, edge_types, limit, min_confidence }) => {
-    const safeQuery = String(query ?? '')
-      .slice(0, 500)
-      .trim();
-    if (!safeQuery)
-      return {
-        content: [
-          { type: 'text' as const, text: JSON.stringify({ ok: false, error: 'query required' }) },
-        ],
-      };
+  async (rawInput: Record<string, unknown>) => {
+    const { query, edge_types, limit, min_confidence } = hypergraphSearchInputSchema.parse(rawInput);
     try {
       const res = await fetch(`${SVELTEKIT}/api/hypergraph/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-mcp-internal': '1' },
         body: JSON.stringify({
-          query: safeQuery,
-          edgeTypes: Array.isArray(edge_types) ? edge_types : undefined,
-          limit: typeof limit === 'number' ? Math.min(Math.max(1, limit), 50) : 10,
-          minConfidence: typeof min_confidence === 'number' ? min_confidence : undefined,
+          query,
+          edgeTypes: edge_types,
+          limit: limit ?? 10,
+          minConfidence: min_confidence,
           includeMembers: true,
         }),
+        signal: AbortSignal.timeout(MCP_UPSTREAM_READ_TIMEOUT_MS),
       });
-      const data = await res.json();
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const data: unknown = await readBoundedJsonResponse(res);
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult(data) }] };
     } catch (err) {
       return {
         content: [
@@ -6105,7 +6203,10 @@ server.registerTool(
       };
     try {
       const url = `${SVELTEKIT}/api/hypergraph/edge/${encodeURIComponent(hash)}${expand ? '?expand=true' : ''}`;
-      const res = await fetch(url, { headers: { 'x-mcp-internal': '1' } });
+      const res = await fetch(url, {
+        headers: { 'x-mcp-internal': '1' },
+        signal: AbortSignal.timeout(MCP_UPSTREAM_READ_TIMEOUT_MS),
+      });
       if (res.status === 404)
         return {
           content: [
@@ -6115,8 +6216,8 @@ server.registerTool(
             },
           ],
         };
-      const data = await res.json();
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const data = await readBoundedJsonResponse(res);
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult(data) }] };
     } catch (err) {
       return {
         content: [
@@ -6201,15 +6302,18 @@ server.registerTool(
       };
     try {
       const url = `${SVELTEKIT}/api/hypergraph/edge/${encodeURIComponent(hash)}?expand=true`;
-      const res = await fetch(url, { headers: { 'x-mcp-internal': '1' } });
+      const res = await fetch(url, {
+        headers: { 'x-mcp-internal': '1' },
+        signal: AbortSignal.timeout(MCP_UPSTREAM_READ_TIMEOUT_MS),
+      });
       if (res.status === 404)
         return {
           content: [
             { type: 'text' as const, text: JSON.stringify({ ok: false, error: 'edge not found' }) },
           ],
         };
-      const data = await res.json();
-      return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
+      const data = await readBoundedJsonResponse(res);
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult(data) }] };
     } catch (err) {
       return {
         content: [
@@ -6228,29 +6332,12 @@ server.registerTool(
   'knowledge.get_minified_map',
   {
     description: 'Returns a minified architectural map for a specific directory.',
-    inputSchema: z.object({
-      directory: z
-        .string()
-        .max(200)
-        .optional()
-        .describe('Relative directory path (e.g. "src/lib/server/ai")'),
-      max_edges: z
-        .number()
-        .int()
-        .min(1)
-        .max(20)
-        .optional()
-        .describe('Max hyperedges to include (default 5)'),
-      max_agents: z
-        .number()
-        .int()
-        .min(1)
-        .max(10)
-        .optional()
-        .describe('Max LLMS.md directives to include (default 3)'),
-    }),
+    inputSchema: knowledgeMinifiedMapInputSchema.describe(
+      'Read-only architectural map lookup with bounded edge/agent results, query deadline, and response size.'
+    ),
   },
-  async ({ directory, max_edges, max_agents }) => {
+  async (rawInput: Record<string, unknown>) => {
+    const { directory, max_edges, max_agents } = knowledgeMinifiedMapInputSchema.parse(rawInput);
     const dir = String(directory ?? '')
       .slice(0, 200)
       .trim();
@@ -6267,19 +6354,27 @@ server.registerTool(
           limit: edgeLimit,
           includeMembers: false,
         }),
+        signal: AbortSignal.timeout(MCP_UPSTREAM_READ_TIMEOUT_MS),
       });
-      const edgeData = edgeRes.ok ? await edgeRes.json() : { results: [] };
+      const edgeData: unknown = edgeRes.ok ? await readBoundedJsonResponse(edgeRes) : { results: [] };
+      const edgeResults = edgeData && typeof edgeData === 'object' && 'results' in edgeData
+        && Array.isArray(edgeData.results)
+        ? edgeData.results
+        : [];
 
       // 2. LLMS.md context for the directory (Redis key agents:dir:<dir>)
       let agentsMd: string[] = [];
       try {
-        const agentRes = await pool.query<{ title: string; summary: string; rules: unknown[] }>(
+        const agentRes = await withCanonicalReadOnlyQueryBudget(KNOWLEDGE_MAP_STATEMENT_TIMEOUT_MS, () =>
+          tracedQuery<{ title: string; summary: string; rules: unknown[] }>(
+          'knowledge.get_minified_map',
           `SELECT title, summary, rules
            FROM agent_context_files
            WHERE file_path ILIKE $1
            ORDER BY confidence DESC
            LIMIT $2`,
-          [`%${dir}%`, agentLimit]
+          [`%${dir}%`, agentLimit],
+        )
         );
         agentsMd = agentRes.rows.map((r) => {
           const lines = [`## ${r.title ?? 'Context'}`];
@@ -6301,7 +6396,7 @@ server.registerTool(
 
       const map = {
         directory: dir || '(root)',
-        topEdges: (edgeData.results ?? [])
+        topEdges: edgeResults
           .slice(0, edgeLimit)
           .map(
             (r: {
@@ -6323,7 +6418,7 @@ server.registerTool(
         agentsMd,
         generatedAt: new Date().toISOString(),
       };
-      return { content: [{ type: 'text' as const, text: JSON.stringify(map, null, 2) }] };
+      return { content: [{ type: 'text' as const, text: serializeBoundedReadResult(map) }] };
     } catch (err) {
       return {
         content: [
@@ -8782,13 +8877,29 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
   try {
     await server.connect(transport);
     await transport.handleRequest(req, res);
-    // Wait for client to close before disconnecting (SSE may still be writing
-    // after handleRequest resolves); detach so the next queued request can call
-    // connect() without "Already connected" rejection.
-    await new Promise<void>((resolve) => {
-      if (res.writableEnded) resolve();
-      else res.on('close', () => resolve());
-    });
+    // Wait until the SDK has handed the response body to Node before closing
+    // this stateless transport. `handleRequest()` may return after headers/body
+    // are scheduled but before `finish`; closing immediately can produce a 200
+    // with an empty SSE body. Do not wait for keep-alive `close`, which may never
+    // arrive after a successful POST. The timeout keeps one malformed request
+    // from wedging the serialized MCP queue.
+    if (!res.writableFinished) {
+      await new Promise<void>((resolve) => {
+        let settled = false;
+        const settle = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          res.off('finish', settle);
+          res.off('close', settle);
+          resolve();
+        };
+        const timer = setTimeout(settle, 5000);
+        res.on('finish', settle);
+        res.on('close', settle);
+        if (res.writableFinished) settle();
+      });
+    }
   } catch (err: any) {
     console.error('[MCP per-request handler threw]', {
       url: req.url,
@@ -9325,16 +9436,7 @@ server.registerTool(
       'feature_id, concept_id membership, or free-text summary match. ' +
       'Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. ' +
       'Use this to find which packets are associated with a file or feature before querying Qdrant.',
-    inputSchema: z.object({
-      source_ref: z.string().optional().describe(
-        'File path (any form: absolute, repo-relative, with/without sveltekit-frontend/ prefix). ' +
-        'Variants are tried automatically via canonicalization.'
-      ),
-      feature_id: z.string().optional().describe('Exact feature_id to filter on.'),
-      concept_id: z.string().optional().describe('Filter to packets whose concept_ids array contains this value.'),
-      summary_query: z.string().optional().describe('Full-text search against packet summaries.'),
-      limit: z.number().int().min(1).max(50).default(20).optional(),
-    }),
+    inputSchema: atlasPacketSearchInputSchema,
   },
   async ({ source_ref, feature_id, concept_id, summary_query, limit = 20 }) => {
     try {
@@ -9400,15 +9502,36 @@ server.registerTool(
       `;
       params.push(limit ?? 20);
 
-      const result = await pool.query(sql, params);
+      const client = await pool.connect();
+      let readOnlyTransactionOpen = false;
+      let result;
+      try {
+        await client.query('BEGIN READ ONLY');
+        readOnlyTransactionOpen = true;
+        await client.query("SELECT set_config('statement_timeout', $1, true)", [
+          `${PACKET_SEARCH_STATEMENT_TIMEOUT_MS}ms`,
+        ]);
+        result = await client.query({
+          text: sql,
+          values: params,
+          query_timeout: PACKET_SEARCH_CLIENT_TIMEOUT_MS,
+        });
+        await client.query('ROLLBACK');
+        readOnlyTransactionOpen = false;
+      } finally {
+        if (readOnlyTransactionOpen) {
+          await client.query('ROLLBACK').catch(() => undefined);
+        }
+        client.release();
+      }
       return {
         content: [{
           type: 'text' as const,
-          text: JSON.stringify({
+          text: serializeBoundedReadResult({
             count: result.rowCount,
             packets: result.rows,
             filters: { source_ref, feature_id, concept_id, summary_query },
-          }, null, 2),
+          }),
         }],
       };
     } catch (err) {
@@ -9419,6 +9542,99 @@ server.registerTool(
     }
   }
 );
+
+// ── atlas.packet_dense_search ────────────────────────────────────────────────
+// Two-stage retrieval: (1) Postgres bitmap-prefilter over atlas_packets, reusing the table's
+// existing GIN/btree indexes (feature_id/tags/concept_ids/domain_class/workspace_revision) so
+// the planner can choose an appropriate indexed plan; AIO/bitmap behavior is recorded as
+// read-only evidence, not asserted as the cause of end-to-end speedup. (2) Qdrant ANN restricted
+// to the candidate source_ref set via a payload filter, never an unfiltered collection-wide sweep. Complements
+// atlas.packet_search (structural/FTS-only) — this tool adds dense semantic ranking on top of a
+// cheap structural narrowing. See openspec/changes/parent-atlas-packet-dense-bitmap-search/.
+//
+// Candidate lane note for future RRF fusion: this tool's output is a candidate lane
+// (`atlas_packet_dense_bitmap`) for the still-design-only
+// parent-atlas-rrf-weight-table-lane-registry-consolidation RRF weight-table registry. No
+// fusion code here — this is a standalone two-stage tool, not routed through
+// phase1-rrf-semantic-fusion (incomplete/untested) or the governance-gated phase18 reranker.
+server.registerTool(
+  'atlas.packet_dense_search',
+  {
+    description:
+      'Bitmap-prefiltered structural narrowing over atlas_packets (using existing GIN/btree indexes, ' +
+      'PG18 AIO-accelerated) followed by a Qdrant dense-ANN rerank restricted to the prefiltered ' +
+      'candidate set, joined back to atlas_packets by packet_key. Requires at least one of feature_id, ' +
+      'source_ref, concept_id, or tags (domain_class/workspace_revision alone are rejected — not ' +
+      'selective enough). Requires an explicit target Qdrant collection — codebase_chunks_768 (older, ' +
+      'richer payload) or codebase_chunks_768_v2 (leaner, EMB3A target); this tool does not default to ' +
+      'either. Provide either query_text (embedded via embeddinggemma) or query_vector directly. ' +
+      'Returns results in the compact packet-control-word projection with full payload attached only ' +
+      'to the top expand_top_k results.',
+    inputSchema: atlasPacketDenseSearchInputSchema.describe(
+      'Bounded dense packet search: selective packet filter plus exactly one finite semantic_768 query input.'
+    ),
+  },
+  async ({
+    feature_id, source_ref, concept_id, tags, domain_class, workspace_revision,
+    collection, query_text, query_vector, candidate_cap, dense_limit, score_threshold, expand_top_k,
+  }) => {
+    try {
+      if (!query_vector?.length && !query_text) {
+        throw new Error('Provide either query_text or query_vector.');
+      }
+
+      let vector = query_vector;
+      if (!vector?.length) {
+        const embedded = await embedQueryForLane(query_text!, 'dense_768');
+        vector = Array.from(embedded.vector);
+      }
+
+      const response = await runPacketDenseSearch(
+        {
+          db: pool,
+          queryQdrantPoints: async (col, body) => {
+            const r = await fetch(`${QDRANT_URL}/collections/${col}/points/query`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(8_000),
+            });
+            return (await r.json()) as Awaited<ReturnType<QdrantPointsQueryFn>>;
+          },
+        },
+        {
+          featureId: feature_id,
+          sourceRef: source_ref,
+          conceptId: concept_id,
+          tags,
+          domainClass: domain_class,
+          workspaceRevision: workspace_revision,
+          collection,
+          queryVector: vector!,
+          candidateCap: candidate_cap,
+          denseLimit: dense_limit,
+          scoreThreshold: score_threshold,
+          expandTopK: expand_top_k,
+        }
+      );
+
+      return {
+        content: [{
+          type: 'text' as const,
+          text: serializeBoundedReadResult(response, (_key, value) =>
+            typeof value === 'bigint' ? value.toString() : value,
+          ),
+        }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 500) }) }],
+        isError: true,
+      };
+    }
+  }
+);
+
 // ── atlas.coverage ────────────────────────────────────────────────────────────
 // Phase 3I verification gate: reports coverage metrics for atlas_packets.
 // Gate: packet_key >= 95%, source_ref >= 90% before Phase 4A RRF can start.
@@ -9431,13 +9647,20 @@ server.registerTool(
       'summary coverage %, embedding coverage %, and duplicate sha256 count. ' +
       'Gate: source_ref >= 90% is the ONLY value that gates phase4a_ready. feature_id and summary ' +
       'coverage/gate fields are reported for visibility only and do not block phase4a_ready.',
-    inputSchema: z.object({
-      verbose: z.boolean().default(false).optional().describe('Include per-artifact_id breakdown'),
-    }),
+    inputSchema: atlasCoverageInputSchema.describe('Bounded read-only coverage summary; optional breakdown is capped at twenty artifact groups.'),
   },
-  async ({ verbose = false }) => {
+  async (input: unknown) => {
+    let client: any;
+    let transactionOpen = false;
     try {
-      const metrics = await pool.query(`
+      const { verbose } = atlasCoverageInputSchema.parse(input);
+      client = await pool.connect();
+      await client.query('BEGIN READ ONLY');
+      transactionOpen = true;
+      await client.query("SELECT set_config('statement_timeout', $1, true)", [
+        `${ATLAS_COVERAGE_STATEMENT_TIMEOUT_MS}ms`,
+      ]);
+      const metrics = await client.query({ text: `
         SELECT
           COUNT(*)                                                    AS total,
           COUNT(source_ref)                                           AS has_source_ref,
@@ -9451,14 +9674,14 @@ server.registerTool(
           ROUND(COUNT(summary)::numeric / NULLIF(COUNT(*), 0) * 100, 1)    AS summary_pct,
           ROUND(COUNT(embedding)::numeric / NULLIF(COUNT(*), 0) * 100, 1)  AS embedding_pct
         FROM atlas_packets
-      `);
+      `, query_timeout: PACKET_SEARCH_CLIENT_TIMEOUT_MS });
 
-      const dupes = await pool.query(`
+      const dupes = await client.query({ text: `
         SELECT COUNT(*) AS dupe_count
         FROM (
           SELECT sha256 FROM atlas_packets WHERE sha256 IS NOT NULL GROUP BY sha256 HAVING COUNT(*) > 1
         ) d
-      `);
+      `, query_timeout: PACKET_SEARCH_CLIENT_TIMEOUT_MS });
 
       const row = metrics.rows[0];
       // Only source_ref_pct is an enforced gate for phase4a_ready. feature_id_ok
@@ -9495,23 +9718,30 @@ server.registerTool(
       };
 
       if (verbose) {
-        const breakdown = await pool.query(`
+        const breakdown = await client.query({ text: `
           SELECT artifact_id, COUNT(*) as cnt,
                  COUNT(source_ref) as has_src, COUNT(feature_id) as has_feat
           FROM atlas_packets
           GROUP BY artifact_id ORDER BY cnt DESC LIMIT 20
-        `);
+        `, query_timeout: PACKET_SEARCH_CLIENT_TIMEOUT_MS });
         result.artifact_breakdown = breakdown.rows;
       }
 
+      await client.query('ROLLBACK');
+      transactionOpen = false;
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult(result) }],
       };
     } catch (err) {
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err).slice(0, 500) }) }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: String(err).slice(0, 500) }) }],
         isError: true,
       };
+    } finally {
+      if (client) {
+        if (transactionOpen) await client.query('ROLLBACK').catch(() => undefined);
+        client.release();
+      }
     }
   }
 );
@@ -9526,13 +9756,13 @@ server.registerTool(
       'List the top authoritative nodes in the codebase by PageRank score (computed by Neo4j GDS). ' +
       'Returns paginated results with packet_key, pageRank score, and rank. ' +
       'Used by agents to identify high-authority code areas for focus.',
-    inputSchema: z.object({
-      limit: z.number().int().min(1).max(1000).default(100).describe('Max results to return (1-1000)'),
-      offset: z.number().int().min(0).default(0).describe('Pagination offset (0+)'),
-    }),
+    inputSchema: atlasGraphPageRankInputSchema.describe(
+      'Bounded PageRank pagination; graph scores are projection evidence, not canonical identity.'
+    ),
   },
-  async ({ limit = 100, offset = 0 }) => {
+  async (input: unknown) => {
     try {
+      const { limit, offset } = atlasGraphPageRankInputSchema.parse(input);
       // Dynamic import to avoid circular deps at module init time
       const { invokeTool } = await import('$lib/server/ace/atlas-tool-registry.js');
       const permissionGrant = createTraceMcpGraphReadGrant();
@@ -9545,11 +9775,11 @@ server.registerTool(
       );
 
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult(result) }],
       };
     } catch (err) {
       return {
-        content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err).slice(0, 500) }, null, 2) }],
+        content: [{ type: 'text' as const, text: serializeBoundedReadResult({ error: String(err).slice(0, 500) }) }],
         isError: true,
       };
     }
@@ -9587,21 +9817,25 @@ server.registerTool(
       'Return feature-scoped document evidence readiness for Parent Atlas. ' +
       'Checks docs/features notes, docs/<feature_id> bundles, manifest validity, official docs coverage, ' +
       'and Atlas canonical spine counts before ingestion/ranking promotion.',
-    inputSchema: z.object({
-      featureId: z.string().min(1).describe('Canonical feature_id to inspect'),
-    }),
+    inputSchema: featureDocumentReadInputSchema.describe('Bounded feature_id for read-only document evidence status.'),
   },
   async (input: Record<string, unknown>) => {
     try {
-      const featureId = String(input.featureId ?? '').trim();
-      const evidence = await getFeatureDocumentEvidence(featureId);
-      return {
+      const { featureId } = featureDocumentReadInputSchema.parse(input);
+      const evidence = await withCanonicalReadOnlyQueryBudget(
+        FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
+        () => getFeatureDocumentEvidence(featureId, {
+          maxManifestBytes: FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
+          maxDirectoryEntries: FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES,
+        }),
+      );
+      return JSON.parse(serializeBoundedReadResult({
         status: 'success',
         feature: evidence,
-      };
+      }));
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      return { status: 'error', error: errorMsg.slice(0, 500) };
+      return JSON.parse(serializeBoundedReadResult({ status: 'error', error: errorMsg.slice(0, 500) }));
     }
   }
 );
@@ -9672,14 +9906,19 @@ server.registerTool(
       'Return the validated ingestion plan for a feature docs bundle. ' +
       'Reads docs/<feature>/manifest.json, filters officialDocs through SSRF-safe URL validation, ' +
       'and reports the exact URLs that can be sent through the existing library crawl pipeline.',
-    inputSchema: z.object({
-      featureId: z.string().min(1).describe('Canonical feature_id to inspect for docs ingestion'),
-    }),
+    inputSchema: featureDocumentReadInputSchema.describe('Bounded feature_id for read-only document ingestion-plan inspection.'),
   },
   async (input: Record<string, unknown>) => {
     try {
-      const { plan, evidence } = await buildFeatureDocumentIngestionPlan(String(input.featureId ?? ''));
-      return {
+      const { featureId } = featureDocumentReadInputSchema.parse(input);
+      const { plan, evidence } = await withCanonicalReadOnlyQueryBudget(
+        FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
+        () => buildFeatureDocumentIngestionPlan(featureId, {
+          maxManifestBytes: FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
+          maxDirectoryEntries: FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES,
+        }),
+      );
+      return JSON.parse(serializeBoundedReadResult({
         status: 'success',
         featureId: plan.featureId,
         title: plan.title,
@@ -9693,10 +9932,10 @@ server.registerTool(
         storage: plan.storage,
         warnings: plan.warnings,
         evidence_status: evidence.status,
-      };
+      }));
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      return { status: 'error', error: errorMsg.slice(0, 500) };
+      return JSON.parse(serializeBoundedReadResult({ status: 'error', error: errorMsg.slice(0, 500) }));
     }
   }
 );
@@ -9707,14 +9946,19 @@ server.registerTool(
     description:
       'Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. ' +
       'Validates feature-doc sources, folds in linked Atlas source_refs, and returns bounded extraction, retrieval, storage, and model intents.',
-    inputSchema: z.object({
-      featureId: z.string().min(1).describe('Canonical feature_id to plan enrichment for'),
-    }),
+    inputSchema: featureDocumentReadInputSchema.describe('Bounded feature_id for read-only document enrichment-plan inspection.'),
   },
   async (input: Record<string, unknown>) => {
     try {
-      const { plan, evidence } = await buildFeatureDocumentEnrichmentPlan(String(input.featureId ?? ''));
-      return {
+      const { featureId } = featureDocumentReadInputSchema.parse(input);
+      const { plan, evidence } = await withCanonicalReadOnlyQueryBudget(
+        FEATURE_DOCUMENT_READ_STATEMENT_TIMEOUT_MS,
+        () => buildFeatureDocumentEnrichmentPlan(featureId, {
+          maxManifestBytes: FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
+          maxDirectoryEntries: FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES,
+        }),
+      );
+      return JSON.parse(serializeBoundedReadResult({
         status: 'success',
         featureId: plan.featureId,
         schema_version: plan.schemaVersion,
@@ -9730,10 +9974,10 @@ server.registerTool(
         warnings: plan.warnings,
         next_commands: plan.nextCommands,
         evidence_status: evidence.status,
-      };
+      }));
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      return { status: 'error', error: errorMsg.slice(0, 500) };
+      return JSON.parse(serializeBoundedReadResult({ status: 'error', error: errorMsg.slice(0, 500) }));
     }
   }
 );
@@ -9744,28 +9988,35 @@ server.registerTool(
     description:
       'Read-only tuple materializer for Parent Atlas feature-document evidence. ' +
       'Links feature docs to canonical packet_key, source_ref, tree_node_id, and fact-table provenance without writing any new rows.',
-    inputSchema: z.object({
-      featureId: z.string().min(1).describe('Canonical feature_id to materialize tuple previews for'),
-      maxTuples: z.number().int().min(1).max(64).default(16).describe('Maximum tuple previews to return'),
-    }),
+    inputSchema: featureEvidenceTuplesInputSchema.describe('Bounded read-only tuple preview from existing packet evidence.'),
   },
   async (input: Record<string, unknown>) => {
     try {
-      const result = await materializeFeatureEvidenceTuples(String(input.featureId ?? ''), {
-        maxTuples: typeof input.maxTuples === 'number' ? input.maxTuples : undefined,
-      });
-      return {
+      const boundedInput = featureEvidenceTuplesInputSchema.parse(input);
+      const result = await withCanonicalReadOnlyQueryBudget(
+        FEATURE_EVIDENCE_STATEMENT_TIMEOUT_MS,
+        () => materializeFeatureEvidenceTuples(boundedInput.featureId, {
+          maxTuples: boundedInput.maxTuples,
+          readBounds: {
+            maxManifestBytes: FEATURE_DOCUMENT_MANIFEST_MAX_BYTES,
+            maxDirectoryEntries: FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES,
+          },
+        }),
+      );
+      return JSON.parse(serializeBoundedReadResult({
         status: 'success',
+        canonicalAuthority: false,
+        writesPerformed: false,
         featureId: result.plan.featureId,
         schema_version: result.plan.schemaVersion,
         evidence_state: result.plan.evidenceState,
         tuple_count: result.tuples.length,
         tuples: result.tuples,
         warnings: result.plan.warnings,
-      };
+      }));
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      return { status: 'error', error: errorMsg.slice(0, 500) };
+      return JSON.parse(serializeBoundedReadResult({ status: 'error', error: errorMsg.slice(0, 500) }));
     }
   }
 );
@@ -10477,15 +10728,28 @@ server.registerTool(
       'audit gap: graph/cluster/topK/hypergraph/taxonomy tools all existed, domain classification did not.',
     inputSchema: z.object({
       text: z.string().min(1).describe('Text to classify'),
-      sourceRef: z.string().optional(),
+      sourceRef: z.string().min(1).describe('Exact canonical source_ref from the admitted binding'),
+      workspaceRevision: z.string().min(1).describe('Exact admitted workspace revision'),
       packetKey: z.string().optional(),
     }),
   },
   async (input: Record<string, unknown>) => {
+    const { resolveAdmittedSourceRevisionV1 } = await import('$lib/server/atlas/identity/admitted-source-revision-resolver-v1.js');
+    let admitted;
+    try {
+      admitted = await resolveAdmittedSourceRevisionV1({
+        sourceRef: String(input.sourceRef ?? ''),
+        workspaceRevision: String(input.workspaceRevision ?? ''),
+      });
+    } catch (error) {
+      return { status: 'blocked', error: `source revision admission failed: ${error instanceof Error ? error.message : String(error)}`, canonicalAuthority: false, writesPerformed: false };
+    }
     const client = getMiniforgeClient();
     const result = await client.analyze({
       text: String(input.text ?? ''),
-      sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
+      sourceRef: admitted.sourceRef,
+      sourceRevision: admitted.sourceRevision,
+      workspaceRevision: admitted.workspaceRevision,
       packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
       passes: ['classify'],
     });
@@ -10501,6 +10765,12 @@ server.registerTool(
       device: classifyResult.device,
       features: classifyResult.features,
       artifacts: classifyResult.artifacts,
+      sourceRef: admitted.sourceRef,
+      sourceRevision: admitted.sourceRevision,
+      workspaceRevision: admitted.workspaceRevision,
+      bindingChecksum: admitted.bindingChecksum,
+      canonicalAuthority: false,
+      writesPerformed: false,
       warnings: classifyResult.warnings,
     };
   }
@@ -10564,54 +10834,6 @@ server.registerTool(
       metadata: result.metadata,
       processing_time: result.processing_time,
     };
-  }
-);
-
-// ── Shell Tool Wrapper (Safe bash execution for Gemma4) ────────────────────────
-server.registerTool(
-  'shell.run',
-  {
-    description:
-      'Run a bash command and return output. Used by Gemma4 to safely invoke shell operations. ' +
-      'Output is truncated to 10KB to stay within context limits.',
-    inputSchema: z.object({
-      command: z.string().describe('Bash command to run'),
-      timeout_ms: z.number().int().positive().default(10000).describe('Timeout in milliseconds (max 30000)'),
-      cwd: z.string().optional().describe('Working directory for command'),
-    }),
-  },
-  async (input: Record<string, unknown>) => {
-    const { exec } = await import('child_process');
-    const { promisify } = await import('util');
-    const execAsync = promisify(exec);
-
-    const command = String(input.command ?? '').slice(0, 500);
-    const timeoutMs = Math.min(Number(input.timeout_ms ?? 10000), 30000);
-    const cwd = String(input.cwd ?? process.cwd()).slice(0, 255);
-
-    try {
-      const { stdout, stderr } = await execAsync(command, {
-        timeout: timeoutMs,
-        cwd,
-        maxBuffer: 1024 * 1024, // 1MB buffer
-      });
-
-      return {
-        status: 'success',
-        command,
-        stdout: String(stdout).slice(0, 10240),
-        stderr: String(stderr).slice(0, 5120),
-        truncated: stdout.length > 10240 || stderr.length > 5120,
-      };
-    } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      return {
-        status: 'error',
-        command,
-        error: errorMsg.slice(0, 5120),
-        hint: errorMsg.includes('timeout') ? 'Command exceeded timeout limit' : undefined,
-      };
-    }
   }
 );
 

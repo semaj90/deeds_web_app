@@ -1,0 +1,62 @@
+{
+  "schema": "atlas.ace-feature-source-owner-readonly-join.v1",
+  "generatedAt": "2026-09-26T23:47:03Z",
+  "status": "BLOCKED_FEATURE_ROWS_NOT_SNAPSHOT_QUALIFIED",
+  "mode": "REPEATABLE_READ_READ_ONLY",
+  "candidateSnapshot": {
+    "source": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T175013.896Z/candidate-ordinal-map-v1.json",
+    "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+    "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+    "candidateCount": 16151
+  },
+  "featureRowOwner": "public.atlas_observation_feature_rows",
+  "counts": {
+    "featureRowsRead": 1808,
+    "uniqueFeaturePacketKeys": 1808,
+    "packetKeyMatches": 9,
+    "exactPacketAndSourceRefMatches": 9,
+    "fullyRevisionQualifiedMatches": 0,
+    "candidateOrdinalsWithoutAnyPacketKeyFeatureRow": 16142,
+    "featureRowsMissingWorkspaceRevision": 1808,
+    "featureRowsMissingSourceVersionReceipt": 1808,
+    "featureRowsMissingRepresentationIdentity": 1808
+  },
+  "matchedCandidateOrdinals": [4, 24, 26, 51, 52, 58, 64, 69, 82],
+  "unmatchedCandidateOrdinalRangesInclusive": [
+    [0, 3],
+    [5, 23],
+    [25, 25],
+    [27, 50],
+    [53, 57],
+    [59, 63],
+    [65, 68],
+    [70, 81],
+    [83, 16150]
+  ],
+  "ninePacketAndSourceMatches": {
+    "sourceRefExact": 9,
+    "workspaceRevision": "NULL on persisted feature row; candidate requires sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "sourceVersionReceiptId": "NULL on all 9",
+    "representationIdAndRevision": "NULL on all 9",
+    "featureRevision": "atlas-ast-entity-prefill-v2"
+  },
+  "tableShapeFinding": "The reviewed DDL declares workspace_revision INTEGER, while the pinned CandidateOrdinalMapV1 uses a content-addressed sha256 workspace revision. Do not cast, truncate, or silently coerce this coordinate.",
+  "searchRuntimeBinding": "NOT_PERFORMED: this audit joins the pinned CandidateOrdinalMapV1 to the persisted feature-row owner; it does not claim a genuine SearchRuntime result was supplied to the ACE production adapter.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "datastoreWrites": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "disposition": "Keep ACE-FSO-02 blocked. No rows qualify for CandidateFeatureSnapshotV1/ACE resolver admission. The 9 packet/source matches are not admitted feature rows; the remaining 16142 ordinals have no exact packet-key row in this owner. Do not synthesize rows or change identity/revision semantics.",
+  "evidence": [
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T175013.896Z.json",
+    "sveltekit-frontend/drizzle/manual/20260819_atlas_observation_feature_rows.sql",
+    "scripts/atlas/materialize-observation-feature-rows.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-resolver-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-ace-production-source-adapter-v1.ts"
+  ]
+}

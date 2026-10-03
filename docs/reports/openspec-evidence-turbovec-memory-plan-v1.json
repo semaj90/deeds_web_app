@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.openspec-evidence-turbovec-memory-plan.v1",
+  "milestone": "EVF-18",
+  "mode": "READ_ONLY_MEMORY_EXPERIMENT_PLAN",
+  "status": "BLOCKED_FROZEN_TRUTH_SET_GATE",
+  "source": {
+    "projectionParityPlan": "docs/reports/openspec-evidence-projection-parity-plan-v1.json"
+  },
+  "prerequisites": {
+    "frozenSemantic768TruthSet": false,
+    "canonicalIdentityParity": false,
+    "revisionQualifiedCandidates": false,
+    "productionProjectionWrites": false
+  },
+  "benchmark": {
+    "candidateScope": "bounded candidates selected from canonical semantic_768 truth set",
+    "comparisons": [
+      "PostgreSQL exact oracle",
+      "pgvector HNSW",
+      "Qdrant",
+      "cuVS/CAGRA when proven"
+    ],
+    "metrics": [
+      "ram_bytes",
+      "ingest_rows_per_second",
+      "recall_at_k",
+      "mrr",
+      "p50_latency_ms",
+      "p95_latency_ms",
+      "filter_behavior"
+    ],
+    "filters": [
+      "change_id",
+      "task_id",
+      "workspace_revision",
+      "proof_state",
+      "source_revision"
+    ],
+    "rerank": "exact-promote selected candidates against canonical evidence",
+    "extraRrfVote": false
+  },
+  "contract": {
+    "role": "bounded candidate retrieval/reranking only",
+    "authority": "PostgreSQL canonical task/evidence ledger",
+    "identity": "task/evidence identity plus workspace and representation revisions",
+    "writesPerformed": false,
+    "promotionAllowed": false
+  },
+  "likely_cause": "TurboVec memory claims are not meaningful until retrieval quality and identity are compared against a frozen canonical truth set.",
+  "evidence": [
+    "docs/reports/openspec-evidence-projection-parity-plan-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/plan-openspec-evidence-turbovec-memory-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-turbovec-memory-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-turbovec-memory-plan-v1.json",
+  "generatedAt": "2026-10-02T04:47:38.211Z",
+  "checksum": "sha256:0a67bbb2a623308fcbfbe2b919df0062508cb4465cf63a4c3285c62f9e1064be"
+}

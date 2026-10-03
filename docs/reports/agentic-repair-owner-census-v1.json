@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.agentic-repair-owner-census.v1",
+  "task": "T17-67",
+  "title": "Existing owner reconciliation before new repair mechanisms",
+  "authority": "NAVIGATION_ONLY",
+  "ownerDecision": "REUSE_EXISTING_OWNERS",
+  "newMechanismDesigned": false,
+  "writesPerformed": false,
+  "graphifyRefreshed": false,
+  "canonicalPromotionAuthorized": false,
+  "owners": [
+    { "path": "sveltekit-frontend/src/lib/server/search/quaternion-manifold.ts", "exists": true, "lineCount": 553, "sha256": "60ba2a05235fb7e8dae7f56798396a9d8668eb9b3c1843c954f111182aea7fea" },
+    { "path": "sveltekit-frontend/src/lib/server/features/cases/hypergraph-4d.ts", "exists": true, "lineCount": 1357, "sha256": "ea10035710ec4ed148868e38634cb50a01042e2de27eda77e492c1aaa210e8f6" },
+    { "path": "sveltekit-frontend/src/lib/server/retrieval/manifold4-search.ts", "exists": true, "lineCount": 182, "sha256": "f5334627b3dc06e41388a67bcd2e9ceed3c7a7c9374cf4a3d0f200e82e99c545" },
+    { "path": "sveltekit-frontend/src/lib/server/retrieval/centroid-cache.ts", "exists": true, "lineCount": 527, "sha256": "f466aac3c2d70b2daa0e9ea743a6288b0b5c3024f0486b01bbe6d654c4cfa2df" },
+    { "path": "sveltekit-frontend/src/lib/server/token-map/token-map-service.ts", "exists": true, "lineCount": 319, "sha256": "6c4f6e6a6e4cbdaeec270984b02372be144d7284f8d55b69ac99092b59b693b2" },
+    { "path": "sveltekit-frontend/src/lib/server/token-map/token-map-mapper.ts", "exists": true, "lineCount": 109, "sha256": "2d7fdaeb4a42ef2fa805e234987c8debdf3fcdd2cf266d827a096e35dba1117e" },
+    { "path": "sveltekit-frontend/src/lib/server/token-map/token-map-types.ts", "exists": true, "lineCount": 62, "sha256": "38b177c5c17377cb15ada76c20e598fb60353134c2b3c64d5c1edbe5be75762b" },
+    { "path": "sveltekit-frontend/src/lib/server/cartridge/glyph-tile-engine.ts", "exists": true, "lineCount": 368, "sha256": "8f389ff3b7bb5c61bf540d6fe35cef89e8ef8a7e497db80a612328699a8e0dc5" },
+    { "path": "sveltekit-frontend/src/lib/server/cartridge/glyph-mappers.ts", "exists": true, "lineCount": 448, "sha256": "2e5a1130213d08efa584b7ccbfb1c57ef674898cc8b40a3749221506c900d139" },
+    { "path": "sveltekit-frontend/src/lib/server/glyph/glyph-mappers.ts", "exists": true, "lineCount": 120, "sha256": "716408a2f00e6c9720bf36a5f12e81429ce6a1a45e8c5e00dfe0f195bb06abf7" },
+    { "path": "sveltekit-frontend/src/lib/server/search/engram-bigram.ts", "exists": true, "lineCount": 133, "sha256": "ebf5edcaf35038dec5ac304815a161a4d6c2efcdc62bbefdc190a044f2af2aad" },
+    { "path": "sveltekit-frontend/src/lib/server/ai/engram-memory.ts", "exists": true, "lineCount": 138, "sha256": "7b33d06489e9602c8897eeacf2a5da0b402586d681da0e2234c1553350ec9387" },
+    { "path": "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts", "exists": true, "lineCount": 143, "sha256": "85c793f18a28308c5538345802d53f30aacbc9badb93594440e2347c89c7c518" },
+    { "path": "sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml", "exists": true, "lineCount": 648, "sha256": "09897e45aa0a9f8e856861c26e5df26e92ba83e4c984cde616612c1016e47b3e" },
+    { "path": "docs/okf/parent-atlas/index.md", "exists": true, "lineCount": 58, "sha256": "79ffbf212c4286f52274f718e0b977fdd8507fbd9cb25dfdd7bb14d55cebfee6" }
+  ],
+  "missingExpectedPaths": [
+    "sveltekit-frontend/src/lib/types/glyph.ts"
+  ],
+  "notes": [
+    "Existing manifold, hypergraph, token-map, glyph, Engram, and OKF modules are navigation evidence and existing owners.",
+    "The missing glyph type path requires separate reconciliation; it is not replaced by a new type or mechanism in this census.",
+    "This receipt does not prove runtime readiness, canonical identity, Graphify freshness, or persistence ownership."
+  ]
+}

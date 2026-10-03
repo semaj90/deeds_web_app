@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.workspace-event-head-sidecar-apply.v1",
+  "migrationFile": "sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql",
+  "migrationChecksum": "sha256:40d24f68fb0a6cf1a5678ef417f84362b5f6b2718c69782c0251bdb5307d7cb2",
+  "mode": "DRY_RUN",
+  "authorization": {
+    "applyFlag": false,
+    "rollbackCanaryFlag": true,
+    "environmentPresent": false,
+    "required": "ATLAS_AUTHORIZE_WORKSPACE_EVENT_HEAD_SIDECAR=1"
+  },
+  "writesPerformed": false,
+  "readbackProven": false,
+  "canonicalAuthority": false,
+  "status": "READY_FOR_AUTHORIZATION",
+  "note": "No DDL was executed. Supply --apply and the exact authorization environment variable only after migration-owner review."
+}

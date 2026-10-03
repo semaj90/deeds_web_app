@@ -1,0 +1,53 @@
+{
+  "schema": "atlas.openspec-controlled-task-mutation-preflight.v1",
+  "milestone": "EVF-20",
+  "mode": "READ_ONLY_MUTATION_PREFLIGHT",
+  "status": "BLOCKED_FAIL_CLOSED",
+  "source": {
+    "reconciliation": "docs/reports/openspec-workboard-evidence-reconciliation-v1.json",
+    "evidenceHealth": "docs/reports/openspec-evidence-health-v1.json",
+    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004"
+  },
+  "gates": {
+    "workboardParity": false,
+    "evidencePromotionEligible": false,
+    "taskMutationContractEnabled": false,
+    "independentReparseRequired": true,
+    "authorizationProvided": false
+  },
+  "protocol": [
+    "APPLY_PROVEN evidence state is required before proposing checkbox changes.",
+    "Generate a bounded proposed tasks.md patch; never infer authorization from a checked state.",
+    "Require explicit authorization bound to the exact workspace revision and patch checksum.",
+    "Write only the authorized patch, then reparse tasks.md independently.",
+    "Emit an independent post-write receipt and reject parity drift."
+  ],
+  "mutation": {
+    "proposedPatchGenerated": false,
+    "authorizationRequested": false,
+    "writeAttempted": false,
+    "taskLedgersMutated": false,
+    "checkboxChanges": 0,
+    "receiptEmitted": false
+  },
+  "contract": {
+    "sourceOfClaim": "tasks.md",
+    "sourceOfProof": "revision-bound evidence receipts",
+    "workboardRole": "derived projection only",
+    "noImplicitAuthorization": true,
+    "archiveInsteadOfDelete": true
+  },
+  "likely_cause": "Controlled checkbox mutation is unsafe while workboard parity, evidence promotion, and explicit authorization are absent.",
+  "evidence": [
+    "docs/reports/openspec-workboard-evidence-reconciliation-v1.json",
+    "docs/reports/openspec-evidence-health-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/preflight-openspec-controlled-task-mutation-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/preflight-openspec-controlled-task-mutation-v1.mjs",
+  "report_path": "docs/reports/openspec-controlled-task-mutation-preflight-v1.json",
+  "generatedAt": "2026-10-02T04:47:40.446Z",
+  "checksum": "sha256:bc155849f6ccff6d310800277d418210c71acd1458d42b4009e0c97dbdbea86f"
+}

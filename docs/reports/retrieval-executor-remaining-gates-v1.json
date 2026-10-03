@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.retrieval-executor-remaining-gates.v1",
+  "change": "parent-atlas-retrieval-executor-compatibility-convergence",
+  "status": "WAITING_EXTERNAL_OR_AUTHORITY_GATES",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "remainingTasks": [
+    {
+      "taskId": "2.2",
+      "gate": "POSTGRES_FTS_REVISION_QUALIFIED_REPLAY",
+      "state": "WAITING_ON_CURRENT_SOURCE_AUTHORITY",
+      "releaseEvent": "revision-qualified source/packet rows read back",
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence"
+    },
+    {
+      "taskId": "2.3",
+      "gate": "PGVECTOR_EXACT_HNSW_FILTERED_PARITY",
+      "state": "WAITING_ON_CURRENT_SOURCE_AUTHORITY",
+      "releaseEvent": "same revision-qualified candidate snapshot available for exact and HNSW replay",
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence"
+    },
+    {
+      "taskId": "5.1",
+      "gate": "TENSORRT_RTX_CAPABILITY_PACKAGE",
+      "state": "WAITING_ON_EXTERNAL_TOOLCHAIN",
+      "releaseEvent": "TensorRT-RTX package/version/checksum and support-matrix compatibility are observed",
+      "owner": "parent-atlas-prefill-routing-residency-convergence"
+    },
+    {
+      "taskId": "5.3",
+      "gate": "TENSORRT_RTX_AOT_ENGINE",
+      "state": "WAITING_ON_EXTERNAL_TOOLCHAIN",
+      "releaseEvent": "capability receipt proves compatible TensorRT-RTX runtime",
+      "owner": "parent-atlas-prefill-routing-residency-convergence"
+    },
+    {
+      "taskId": "5.4",
+      "gate": "TENSORRT_RTX_JIT_RUNTIME_CACHE",
+      "state": "WAITING_ON_AOT_ENGINE",
+      "releaseEvent": "portable AOT engine exists with checksum binding"
+    },
+    {
+      "taskId": "5.5",
+      "gate": "TENSORRT_RTX_REFERENCE_PARITY",
+      "state": "WAITING_ON_RUNTIME_EXECUTION",
+      "releaseEvent": "device execution and PyTorch/ONNX reference outputs are available"
+    },
+    {
+      "taskId": "5.6",
+      "gate": "TENSORRT_RTX_ROLLBACK",
+      "state": "WAITING_ON_RUNTIME_EXECUTION",
+      "releaseEvent": "TensorRT lane has a proven opt-in execution path"
+    },
+    {
+      "taskId": "8.3",
+      "gate": "LATER_MUTATION_AUTHORIZATION",
+      "state": "WAITING_ON_OPERATOR_AUTHORITY",
+      "releaseEvent": "explicit approval for DDL/backfill/projection/cache/model/promotion mutation"
+    }
+  ],
+  "retryPolicy": "Do not retry unchanged gates; reschedule only when the listed release event changes.",
+  "notes": [
+    "No CUDA/RAPIDS upgrade, TensorRT engine build, database index creation, packet backfill, Qdrant mutation, or Valkey promotion was attempted.",
+    "The :8090 llama-server and Ollama embedding ownership are already reconciled; they are not remaining blockers in this change."
+  ]
+}

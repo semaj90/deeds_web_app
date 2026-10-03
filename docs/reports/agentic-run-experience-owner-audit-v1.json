@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.agentic-run-experience-owner-audit.v1",
+  "generatedAt": "2026-09-19T03:15:04.997Z",
+  "ownerDecision": {
+    "rawRunIdentityOwner": "WorkflowActionEventV1",
+    "contextAssemblyOwner": "ContextManifest_CompiledContext",
+    "curatedExperienceDigestOwner": "NOT_CURRENTLY_DEFINED",
+    "newObservationTypeDefined": false
+  },
+  "status": "RECONCILIATION_COMPLETE_CURATED_DIGEST_GAP_REMAINS",
+  "workflowIdentity": {
+    "schema": true,
+    "evidenceRefs": true,
+    "artifactRefs": true,
+    "filesEdited": true,
+    "openspecChange": true,
+    "rawEventOwner": true
+  },
+  "contextAssembly": {
+    "compiledContext": true,
+    "manifest": true,
+    "selectedCandidates": true,
+    "rejectedCandidates": true,
+    "promptPackets": true,
+    "evidenceRevisionIdentity": false,
+    "contextAssemblyOwner": true
+  },
+  "curatedDigestCoverage": {
+    "observedFacts": false,
+    "decisions": false,
+    "unresolved": false,
+    "outcomes": true
+  },
+  "recommendation": {
+    "currentChangeOwns": "run receipt identity and evidence binding",
+    "memoryArchitectureOwns": "future curated post-run experience digest placement",
+    "doNotCreateParallelRunIdentity": true,
+    "nextDesignGate": "define a noncanonical digest only after memory-layer owner review"
+  },
+  "evidence": {
+    "workflowEvent": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts",
+      "exists": true,
+      "checksum": "sha256:17fa66df77b9f1119138ac0201f8a0534b1af11ee209548558bffbb3b05ff306"
+    },
+    "contextCompiler": {
+      "path": "sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.ts",
+      "exists": true,
+      "checksum": "sha256:be74e8c2b007e89ab7e41d1a4212df01d1ee43dac0db7515bb668c37dd67938f"
+    },
+    "contextManifest": {
+      "path": "sveltekit-frontend/src/lib/server/atlas/graph/graph-runtime-contracts.ts",
+      "exists": true,
+      "checksum": "sha256:6bf6c6de2f2cdcc80e0033a28a06a8e92aded7c8509caaeab9acb230fd710fb8"
+    },
+    "changeTasks": {
+      "path": "openspec/changes/parent-atlas-agentic-run-receipt-binding/tasks.md",
+      "exists": true,
+      "checksum": "sha256:65754a5811203ded8e9ef445a022d4ff54482a6110a362fb4718c2cc8aff5afd"
+    }
+  },
+  "tasksLedgerContainsExistingT5Question": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

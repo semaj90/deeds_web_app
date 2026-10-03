@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.agentic-retrieval-verification-guard.v1",
+  "gate": "AGENTIC-RETRIEVAL-VERIFICATION-GUARD-01",
+  "status": "FIXTURE_PROVEN",
+  "tests": {
+    "suite": "atlas-mastra-workflow.spec.ts",
+    "passed": 4,
+    "writesPerformed": false
+  },
+  "verificationOwner": "validatePacketFromGo",
+  "blockedInputs": [
+    "NO_RETRIEVED_PACKETS_TO_VERIFY",
+    "RETRIEVED_PACKET_KEY_REQUIRED",
+    "PACKET_CANONICAL_VALIDATION_FAILED",
+    "VALIDATOR_UNAVAILABLE_OR_ERROR"
+  ],
+  "synthesisRequires": "every retrieved packet returns valid=true",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "liveRepairAuthorized": false,
+  "recoveryCannotReportCompletion": true,
+  "remainingBlockers": [
+    "DUPLICATE_EQUIVALENT_GRAPHIFY_EXECUTIONS",
+    "PACKET_DIGEST_BRIDGE_MISSING",
+    "SOURCE_PACKET_CHUNK_LINEAGE_UNPROVEN",
+    "SEMANTIC_CORPUS_NOT_ADMITTED",
+    "CANONICAL_DURABLE_EVENT_LIVE_READBACK_OPEN"
+  ],
+  "reportPath": "docs/reports/agentic-retrieval-verification-guard-v1.json"
+}

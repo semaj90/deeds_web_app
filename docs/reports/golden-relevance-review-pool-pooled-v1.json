@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.golden-relevance-review-pool-pooled-v1",
+  "status": "POOLED_REVIEW_POOL_PREPARED",
+  "canonicalAuthority": false,
+  "sampledQueries": 60,
+  "poolKPerRun": 12,
+  "denseRuns": [
+    "RAW_RAW",
+    "RAW_TITLED",
+    "PREFIXED_TITLED",
+    "CODE_PREFIX_TITLED"
+  ],
+  "lexicalBaseline": true,
+  "freshScoringRuns": [
+    "FRESH_RAW_RAW",
+    "FRESH_RAW_TITLED",
+    "FRESH_PREFIXED_TITLED",
+    "FRESH_PREFIXED_RAW",
+    "FRESH_CODE_TITLED"
+  ],
+  "candidateCount": 2482,
+  "blankGrades": 2482,
+  "reviewerFileHidesProvenance": true,
+  "databaseWrites": false,
+  "productionActivation": false,
+  "inputChecksum": "sha256:65a3fb542405452e33e0340640c9a7b98d8d3a220692681a5d273de03e95359b",
+  "reviewFileChecksum": "sha256:ce2101ed49cef1ec8665cf722455ac9fe3d6f95d8a2f82c787b71b3d67249c32",
+  "nextRequiredStep": "Blind 0-3 grading of the reviewer file; then run --evaluate."
+}

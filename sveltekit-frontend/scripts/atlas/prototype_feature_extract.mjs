@@ -6,7 +6,10 @@ import fs from 'fs/promises';
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const addonPath = path.resolve(__dirname, '../../..', 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+const addonPath = [
+  path.resolve(__dirname, '../../..', 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+  path.resolve(__dirname, '../../..', 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+].find((p) => { try { require.resolve(p); return true; } catch { return false; } });
 
 async function main() {
   try {

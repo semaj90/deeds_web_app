@@ -9,6 +9,7 @@ Usage:
   ranked_results = ranker.rank(query, candidates)
 """
 
+import os
 import requests
 import logging
 from typing import List, Dict, Any, Optional
@@ -204,7 +205,7 @@ def example_ldr_pipeline():
         search_engines=['searxng', 'arxiv'],
         llm='ollama',
         llm_url='http://127.0.0.1:8090/v1',
-        model='gemma4-legal-iq4xs-direct.gguf',
+        model=os.environ.get("LLAMA_SERVER_MODEL", "ornith-1.5-9b"),
     )
 
     # Initialize ML ranker

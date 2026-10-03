@@ -13,6 +13,7 @@
  */
 
 #include "gpu_error_codes.h"
+#include "native_execution_counters.h"
 
 #include <torch/torch.h>
 #include <cstring>
@@ -48,8 +49,9 @@ extern "C" int pageRankGPU(
 
         // Build row-normalised column-stochastic transition matrix P
         auto A = torch::from_blob(const_cast<float*>(adj), {n, n}, opts).to(dev);
-        auto row_sum = A.sum(/*dim=*/1, /*keepdim=*/true).clamp_min(1e-8f);
-        auto P = (A / row_sum).t();  // P[j,i] = probability of walking i→j
+        auto row_sum = A.sum(/*dim=*/1, /*keepdim=*/true);
+        auto dangling_mask = (row_sum < 1e-8f).to(torch::kFloat32);
+        auto P = (A / row_sum.clamp_min(1e-8f)).t();  // P[j,i] = probability of walking i→j
 
         // Uniform initial rank
         auto r = torch::full({n, 1}, 1.0f / n,
@@ -58,11 +60,13 @@ extern "C" int pageRankGPU(
                                     torch::TensorOptions().dtype(torch::kFloat32).device(dev));
 
         for (int i = 0; i < iters; ++i) {
-            r = damping * torch::mm(P, r) + teleport;
+            auto dangling_mass = torch::sum(r * dangling_mask);
+            r = damping * (torch::mm(P, r) + dangling_mass / n) + teleport;
         }
 
         auto cpu_r = r.squeeze().to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_r.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -100,6 +104,7 @@ extern "C" int attentionScoreGPU(
 
         auto cpu_w = weights.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_w.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -137,6 +142,7 @@ extern "C" int rewardScoreGPU(
 
         auto cpu_s = scores.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_s.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -165,6 +171,7 @@ extern "C" int softmaxGPU(
 
         auto cpu_s = s.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_s.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -232,6 +239,7 @@ extern "C" int kmeansWithCentroids(
         auto cpu_c = centroids.to(torch::kCPU).contiguous();
         std::memcpy(centroids_out, cpu_c.data_ptr<float>(), k * dim * sizeof(float));
 
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -324,6 +332,7 @@ extern "C" int trainSOM(
         std::memcpy(weights_out, cpu_W.data_ptr<float>(), neurons * dim * sizeof(float));
         std::memcpy(bmu_out, bmu_all.data_ptr<int32_t>(), n * sizeof(int32_t));
 
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -363,6 +372,7 @@ extern "C" int autoencoderEncodeGPU(
 
         auto cpu_e = encoded.to(torch::kCPU).contiguous();
         std::memcpy(output, cpu_e.data_ptr<float>(), n * hidden * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -400,6 +410,7 @@ extern "C" int autoencoderDecodeGPU(
 
         auto cpu_r = recon.to(torch::kCPU).contiguous();
         std::memcpy(output, cpu_r.data_ptr<float>(), n * output_dim * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -440,6 +451,7 @@ extern "C" int pcaProjectGPU(
 
         auto cpu_p = projected.to(torch::kCPU).contiguous();
         std::memcpy(output, cpu_p.data_ptr<float>(), n * k * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -472,6 +484,7 @@ extern "C" int topKIndicesGPU(
         // Convert int64 indices to int32 for N-API compatibility
         auto cpu_idx = indices.to(torch::kCPU).to(torch::kInt32).contiguous();
         std::memcpy(out, cpu_idx.data_ptr<int32_t>(), k * sizeof(int32_t));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;

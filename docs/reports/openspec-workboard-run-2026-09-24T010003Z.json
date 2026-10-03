@@ -1,0 +1,23 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:00:03Z",
+  "reason": "parent-atlas-analysis-pass-ornith-adapter is 24/25; its only remaining task is an explicit operator choice concerning a three-way Engram-memory/dead-code ownership question, so no owner was selected or modified.",
+  "sourceChange": {
+    "name": "parent-atlas-analysis-pass-ornith-adapter",
+    "completed": 24,
+    "total": 25,
+    "remainingGate": "operator decision on Engram-memory/dead-code ownership"
+  },
+  "nextChange": {
+    "name": "parent-atlas-rrf-fusion-consolidation",
+    "reason": "Near-complete retrieval-fusion change selected for inspection of its last task; preserve one logical semantic lane and one vote."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

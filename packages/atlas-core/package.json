@@ -8,7 +8,9 @@
     "./packet": "./dist/packet/index.js",
     "./rpc": "./dist/rpc/index.js",
     "./validation": "./dist/validation/index.js",
+    "./identity": "./dist/identity/atlas-coordinate-v1.js",
     "./evidence": "./dist/evidence/index.js",
+    "./langgraph/ornith-prompt-plan-adapter": "./dist/langgraph/ornith-prompt-plan-adapter.js",
     "./gpu": "./dist/gpu/index.js",
     "./types": "./dist/types/index.js",
     "./packet-reader": "./dist/packet-reader.js",
@@ -19,6 +21,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:prompt-adapter": "tsc -p tsconfig.prompt-adapter.json",
     "test": "vitest",
     "lint": "eslint src",
     "type-check": "tsc --noEmit"

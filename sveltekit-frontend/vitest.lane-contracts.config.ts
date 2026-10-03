@@ -17,6 +17,7 @@ export default defineConfig({
 	},
   test: {
     environment: 'node',
+    setupFiles: ['src/test-runtime-env-setup.ts'],
     // These Arrow helpers are repository-owned ESM scripts imported by the
     // SvelteKit readback spec. Inline them so Vitest does not hand the
     // workspace .mjs files to its external CJS loader.
@@ -26,15 +27,24 @@ export default defineConfig({
       },
     },
     include: [
+      '../tests/canonical-source-inventory-hygiene.spec.ts',
       'tests/lane-contracts/**/*.spec.ts',
       'tests/hyperrag/**/*.spec.ts',
       'src/lib/server/atlas/**/*.spec.ts',
+      'src/lib/server/atlas/**/*.test.ts',
+      'src/lib/server/ace/**/*.spec.ts',
+      'src/lib/server/retrieval/packet-bitmap-prefilter.spec.ts',
+      'src/lib/server/retrieval/packet-dense-search.spec.ts',
+      'src/lib/server/cache/ace-top-retrieval-cache.spec.ts',
 		'src/lib/server/queue/**/*.spec.ts',
       'src/lib/server/analysis/ast-grep-extractor.lineage.spec.ts',
+      'src/lib/server/analysis/analysis-pass-results.idempotency.spec.ts',
+	  'src/lib/server/db/schema/analysis-pass-results.identity.spec.ts',
 		'src/lib/server/nlp/nlp-observation-lineage-v1.spec.ts',
 		'src/lib/server/embedding/semantic-embedding-cache-key-v2.spec.ts',
-		'src/lib/server/graph/**/*.spec.ts',
+      'src/lib/server/graph/**/*.spec.ts',
       'src/lib/server/hyperrag/**/*.spec.ts',
+      'src/lib/server/ml/phase17-provider-admission.spec.ts',
       'src/routes/api/admin/atlas/**/*.spec.ts',
     ],
     exclude: ['node_modules/**'],

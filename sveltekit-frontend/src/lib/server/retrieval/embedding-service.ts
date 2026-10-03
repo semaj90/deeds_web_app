@@ -249,7 +249,9 @@ async function embedViaCanonicalRuntime(
     modelArtifactRevision,
     tokenizerRevision,
     inputPolicyRevision,
-    baseUrl: ENV.EMBEDDING_BASE_URL,
+    // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL
+    // (see env.server.ts's field comment for why these must stay distinct).
+    baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
     timeoutMs: config.timeout_ms,
   });
   return {

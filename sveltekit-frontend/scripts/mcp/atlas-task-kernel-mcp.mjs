@@ -12,6 +12,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 const INTERNAL_SERVER = path.join(ROOT, 'sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs');
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'atlas-task-kernel', version: '1.0.0' };
+// Stay inside OpenCode's configured 60s request deadline so callers receive a
+// useful MCP error rather than the client silently timing out first.
+const INTERNAL_CALL_TIMEOUT_MS = 55_000;
 
 const TOOLS = [
   { name: 'atlas_context', description: 'Build a bounded canonicalized Atlas context packet. Cache and retrieval implementations remain internal.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 50 }, domainFilter: { type: 'string' } }, required: ['query'], additionalProperties: false } },
@@ -34,29 +37,60 @@ const IMPLEMENTATIONS = {
 let nextId = 1;
 const pending = new Map();
 const child = spawn(process.execPath, [INTERNAL_SERVER], { cwd: ROOT, stdio: ['pipe', 'pipe', 'inherit'], env: { ...process.env, ATLAS_TASK_KERNEL_INTERNAL: '1' } });
+
+function rejectPending(error) {
+  for (const [id, waiter] of pending) {
+    clearTimeout(waiter.timer);
+    pending.delete(id);
+    waiter.reject(error);
+  }
+}
+
 createInterface({ input: child.stdout }).on('line', (line) => {
   try {
     const message = JSON.parse(line);
     const waiter = pending.get(message.id);
     if (!waiter) return;
     pending.delete(message.id);
-    message.error ? waiter.reject(new Error(message.error.message || 'Internal Atlas error')) : waiter.resolve(message.result);
+    clearTimeout(waiter.timer);
+    message.error ? waiter.reject(Object.assign(new Error(message.error.message || 'Internal Atlas error'), { code: message.error.code })) : waiter.resolve(message.result);
   } catch { /* non-protocol child output */ }
+});
+child.on('error', (error) => rejectPending(new Error(`Internal Atlas server failed to start: ${error.message}`)));
+child.on('exit', (code, signal) => {
+  rejectPending(new Error(`Internal Atlas server exited (code=${code ?? 'null'}, signal=${signal ?? 'none'})`));
 });
 
 function callInternal(method, params) {
   const id = nextId++;
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve, reject });
-    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n');
+    const timer = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`Internal Atlas ${method} timed out after ${INTERNAL_CALL_TIMEOUT_MS}ms`));
+    }, INTERNAL_CALL_TIMEOUT_MS);
+    pending.set(id, { resolve, reject, timer });
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n', (error) => {
+      if (!error) return;
+      const waiter = pending.get(id);
+      if (!waiter) return;
+      pending.delete(id);
+      clearTimeout(waiter.timer);
+      waiter.reject(new Error(`Internal Atlas ${method} request could not be sent: ${error.message}`));
+    });
   });
 }
 
+let readyPromise;
 async function ensureInternalReady() {
-  if (ensureInternalReady.ready) return;
-  await callInternal('initialize', { protocolVersion: PROTOCOL_VERSION, capabilities: {}, clientInfo: { name: 'atlas-task-kernel-facade', version: '1.0.0' } });
-  child.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized', params: {} }) + '\n');
-  ensureInternalReady.ready = true;
+  if (readyPromise) return readyPromise;
+  readyPromise = (async () => {
+    await callInternal('initialize', { protocolVersion: PROTOCOL_VERSION, capabilities: {}, clientInfo: { name: 'atlas-task-kernel-facade', version: '1.0.0' } });
+    child.stdin.write(JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized', params: {} }) + '\n');
+  })().catch((error) => {
+    readyPromise = undefined;
+    throw error;
+  });
+  return readyPromise;
 }
 
 async function dispatch(method, params) {

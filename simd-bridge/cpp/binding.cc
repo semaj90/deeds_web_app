@@ -20,6 +20,7 @@
  */
 
 #include <cassert>
+#include "native_execution_counters.h"
 #if __has_include(<node_api.h>)
 #include <node_api.h>
 #else
@@ -67,9 +68,102 @@ napi_status napi_create_object(napi_env, napi_value*);
 
 #include <unordered_map>
 #include <vector>
+#include <string>
 #include <cstring>
+#include <initializer_list>
 
 #include "gpu_error_codes.h"
+#include "native_runtime_info.h"
+
+extern "C" napi_callback atlas_core_napi_page_rank_callback(void);
+
+static std::vector<std::string> g_registered_exports;
+
+struct ExportBackendClassification {
+  const char* backend;
+  const char* basis;
+};
+
+static bool exportNameIn(const std::string& name,
+                         std::initializer_list<const char*> names) {
+  for (const char* candidate : names) {
+    if (name == candidate) return true;
+  }
+  return false;
+}
+
+// This is the configured/available implementation class, not proof that a
+// function executed on that backend. P1.3 counters provide execution evidence.
+static ExportBackendClassification classifyExportBackend(
+    const std::string& name,
+    const AtlasCudaRuntimeInfo& runtime_info,
+    bool torch_cuda_available) {
+  if (name == "atlasPageRank") {
+    return {"cpu_reference", "atlas_core_c_abi_cpu_implementation"};
+  }
+
+  if (exportNameIn(name, {
+        "graphSimilarity", "graphSimilarityHalf", "clusterEmbeddings",
+        "computeCaseEmbedding", "poolStats", "simdJsonParse",
+        "simdJsonValidate", "simdJsonExtractNumbers", "simdJsonBackend",
+        "getBackendInfo", "checkCudaAvailable"})) {
+    return {"cpu_fallback", "source_declares_cpu_implementation"};
+  }
+
+  if (exportNameIn(name, {"getExecutionCounters", "resetExecutionCounters"})) {
+    return {"cpu_fallback", "host_counter_control_only"};
+  }
+
+  if (name == "batchCosineSimilarity" || name == "batchCosineTopK") {
+#if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
+    return torch_cuda_available
+      ? ExportBackendClassification{"libtorch_cuda", "libtorch_cuda_runtime_available"}
+      : ExportBackendClassification{"cpu_fallback", "libtorch_cpu_or_scalar_fallback"};
+#else
+    return {"cpu_fallback", "no_libtorch_scalar_fallback"};
+#endif
+  }
+
+  if (exportNameIn(name, {
+        "pageRankGPU", "attentionScoreGPU", "rewardScoreGPU", "softmaxGPU",
+        "topKIndicesGPU", "kmeansWithCentroids", "trainSOM",
+        "autoencoderEncode", "autoencoderDecode", "pcaProject",
+        "attentionScoreGPU_fp16", "rewardScoreGPU_fp16",
+        "batchCosineSimilarity_fp16"})) {
+#if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
+    return torch_cuda_available
+      ? ExportBackendClassification{"libtorch_cuda", "libtorch_cuda_runtime_available"}
+      : ExportBackendClassification{"cpu_fallback", "libtorch_cpu_runtime_available"};
+#else
+    return {"no_libtorch_stub", "libtorch_translation_unit_not_linked"};
+#endif
+  }
+
+  if (exportNameIn(name, {"lstmAdd", "dotProduct", "scale", "relu", "somCache"})) {
+    return runtime_info.cuda_runtime_available
+      ? ExportBackendClassification{"cuda_kernel", "cuda_runtime_device_available"}
+      : ExportBackendClassification{"cpu_fallback", "cpu_fallback_translation_unit"};
+  }
+
+  if (exportNameIn(name, {"captureGraph", "replayGraph", "replayGraphOnStream", "cudaGraphCount"})) {
+    return runtime_info.cuda_runtime_available
+      ? ExportBackendClassification{"cuda_kernel", "cuda_runtime_device_available"}
+      : ExportBackendClassification{"unavailable", "cuda_graph_requires_runtime_device"};
+  }
+
+  if (name == "getCudaMemory") {
+    return runtime_info.cuda_runtime_available
+      ? ExportBackendClassification{"cpu_fallback", "host_cuda_runtime_query"}
+      : ExportBackendClassification{"unavailable", "cuda_runtime_unavailable"};
+  }
+
+  if (exportNameIn(name, {"bridgeSIMD", "cuvsCompressEmbedding"})) {
+    return {"unavailable", "implementation_missing_or_known_stub"};
+  }
+
+  // Fail closed if a future export is added without an audited mapping.
+  return {"unavailable", "unmapped_export_fail_closed"};
+}
 
 // External C functions from other compilation units
 extern "C" int bridgeSIMDToTensorRT(const char* json);
@@ -86,6 +180,8 @@ extern "C" int attentionScoreGPU_fp16(const float* query, int dim, const float* 
 extern "C" int rewardScoreGPU_fp16(const float* gen, const float* ref, int n, int dim, float* out, int out_len);
 extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
 extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
+extern "C" int batchCosineTopK(const float* query, const float* corpus, int n, int dim, int k,
+                               int32_t* indices, float* scores, int output_len, int* backend_out);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
                                     float* centroids_out, int centroids_len,
@@ -269,7 +365,9 @@ static napi_status registerFn(napi_env env, napi_value exports,
   napi_value fn;
   napi_status s = napi_create_function(env, name, NAPI_AUTO_LENGTH, cb, nullptr, &fn);
   if (s != napi_ok) return s;
-  return napi_set_named_property(env, exports, name, fn);
+  s = napi_set_named_property(env, exports, name, fn);
+  if (s == napi_ok) g_registered_exports.emplace_back(name);
+  return s;
 }
 
 // ── BridgeSIMD(json: string) → number ───────────────────────────────
@@ -687,6 +785,51 @@ static napi_value BatchCosineSimilarityWrapper(napi_env env, napi_callback_info 
   int rc = batchCosineSimilarity((const float*)q_data, dim, (const float*)c_data, n, (float*)s_data, scores_len);
   napi_value result;
   napi_create_int32(env, rc, &result);
+  return result;
+}
+
+static napi_value BatchCosineTopKWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5;
+  napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 5) return throw_type_error(env, "batchCosineTopK(query, corpus, n, dim, k)");
+  napi_typedarray_type query_type, corpus_type;
+  size_t query_len = 0, corpus_len = 0;
+  void *query_data = nullptr, *corpus_data = nullptr;
+  if (napi_get_typedarray_info(env, argv[0], &query_type, &query_len, &query_data, nullptr, nullptr) != napi_ok ||
+      napi_get_typedarray_info(env, argv[1], &corpus_type, &corpus_len, &corpus_data, nullptr, nullptr) != napi_ok ||
+      query_type != napi_float32_array || corpus_type != napi_float32_array)
+    return throw_type_error(env, "query and corpus must be Float32Array");
+  int32_t n, dim, k;
+  if (napi_get_value_int32(env, argv[2], &n) != napi_ok ||
+      napi_get_value_int32(env, argv[3], &dim) != napi_ok ||
+      napi_get_value_int32(env, argv[4], &k) != napi_ok ||
+      n <= 0 || dim <= 0 || k <= 0 || k > n ||
+      query_len < static_cast<size_t>(dim) ||
+      static_cast<size_t>(n) > SIZE_MAX / static_cast<size_t>(dim) ||
+      static_cast<size_t>(n) * static_cast<size_t>(dim) > SIZE_MAX / sizeof(float) ||
+      corpus_len < static_cast<size_t>(n) * static_cast<size_t>(dim))
+    return throw_type_error(env, "invalid batchCosineTopK dimensions or typed-array lengths");
+
+  void *indices_data = nullptr, *scores_data = nullptr;
+  napi_value indices_ab, scores_ab;
+  if (create_pooled_ab(env, static_cast<size_t>(k) * sizeof(int32_t), &indices_data, &indices_ab) != napi_ok ||
+      create_pooled_ab(env, static_cast<size_t>(k) * sizeof(float), &scores_data, &scores_ab) != napi_ok)
+    return throw_error(env, "batchCosineTopK output allocation failed");
+  int backend = 0;
+  const int rc = batchCosineTopK(static_cast<const float*>(query_data), static_cast<const float*>(corpus_data),
+      n, dim, k, static_cast<int32_t*>(indices_data), static_cast<float*>(scores_data), k, &backend);
+  if (rc != 0) return throw_error(env, "batchCosineTopK native execution failed");
+
+  napi_value result, indices, scores, backend_value;
+  napi_create_object(env, &result);
+  napi_create_typedarray(env, napi_int32_array, k, indices_ab, 0, &indices);
+  napi_create_typedarray(env, napi_float32_array, k, scores_ab, 0, &scores);
+  const char* backend_name = backend == 1 ? "cuda_cublas" : "cpu";
+  napi_create_string_utf8(env, backend_name, NAPI_AUTO_LENGTH, &backend_value);
+  napi_set_named_property(env, result, "indices", indices);
+  napi_set_named_property(env, result, "scores", scores);
+  napi_set_named_property(env, result, "backend", backend_value);
   return result;
 }
 
@@ -1245,8 +1388,6 @@ static napi_value CudaGraphCountWrapper(napi_env env, napi_callback_info info) {
 }
 
 // ── Backend Info (P1.2) ─────────────────────────────────────────────
-// Returns: { addon_version, build_commit, libtorch_version, cuda_available, cuda_capability, libtorch_built, cublas_available }
-//
 static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
   (void)info;
 
@@ -1258,11 +1399,30 @@ static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
   napi_create_string_utf8(env, "1.0.0", NAPI_AUTO_LENGTH, &v_version);
   napi_set_named_property(env, obj, "addon_version", v_version);
 
-  // Build commit (compile-time constant if available, else placeholder)
+  // Build identity is useful for forensics, but a dirty source tree is not
+  // represented by the commit alone.
 #ifdef TENSORRT_BRIDGE_BUILD_COMMIT
   napi_value v_commit;
   napi_create_string_utf8(env, TENSORRT_BRIDGE_BUILD_COMMIT, NAPI_AUTO_LENGTH, &v_commit);
   napi_set_named_property(env, obj, "build_commit", v_commit);
+
+#ifdef TENSORRT_BRIDGE_BUILD_DIRTY
+  napi_value v_build_dirty;
+  napi_create_int32(env, TENSORRT_BRIDGE_BUILD_DIRTY, &v_build_dirty);
+#else
+  napi_value v_build_dirty;
+  napi_create_int32(env, -1, &v_build_dirty);
+#endif
+  napi_set_named_property(env, obj, "build_dirty", v_build_dirty);
+
+#ifdef NDEBUG
+  napi_value v_build_type;
+  napi_create_string_utf8(env, "release", NAPI_AUTO_LENGTH, &v_build_type);
+#else
+  napi_value v_build_type;
+  napi_create_string_utf8(env, "debug_or_unoptimized", NAPI_AUTO_LENGTH, &v_build_type);
+#endif
+  napi_set_named_property(env, obj, "build_type", v_build_type);
 #else
   napi_value v_commit;
   napi_create_string_utf8(env, "unknown", NAPI_AUTO_LENGTH, &v_commit);
@@ -1270,30 +1430,64 @@ static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
 #endif
 
   // LibTorch version
-#if defined(LIBTORCH_VERSION_MAJOR)
-  char version_str[64];
-  snprintf(version_str, sizeof(version_str), "%d.%d.%d",
-           LIBTORCH_VERSION_MAJOR, LIBTORCH_VERSION_MINOR, LIBTORCH_VERSION_PATCH);
+#if defined(TENSORRT_BRIDGE_LIBTORCH_VERSION)
   napi_value v_libtorch_version;
-  napi_create_string_utf8(env, version_str, NAPI_AUTO_LENGTH, &v_libtorch_version);
+  napi_create_string_utf8(env, TENSORRT_BRIDGE_LIBTORCH_VERSION, NAPI_AUTO_LENGTH, &v_libtorch_version);
 #else
   napi_value v_libtorch_version;
   napi_create_string_utf8(env, "not-linked", NAPI_AUTO_LENGTH, &v_libtorch_version);
 #endif
   napi_set_named_property(env, obj, "libtorch_version", v_libtorch_version);
 
-  // CUDA available
-  int cuda_avail = checkCudaAvailable();
+  // Runtime device facts come from a .cu translation unit; __CUDA_ARCH__ is
+  // a compile-time kernel target, not the active device's compute capability.
+  AtlasCudaRuntimeInfo runtime_info{};
+  atlasGetCudaRuntimeInfo(&runtime_info);
+  const int torch_cuda_available = checkCudaAvailable();
+
   napi_value v_cuda_available;
-  napi_create_int32(env, cuda_avail, &v_cuda_available);
+  napi_create_int32(env, torch_cuda_available, &v_cuda_available);
   napi_set_named_property(env, obj, "cuda_available", v_cuda_available);
 
-  // CUDA capability (compute capability, e.g., 86 for Ampere)
-#ifdef __CUDA_ARCH__
+  napi_value v_cuda_compiled;
+  napi_create_int32(env, runtime_info.cuda_compiled, &v_cuda_compiled);
+  napi_set_named_property(env, obj, "cuda_compiled", v_cuda_compiled);
+
+  napi_value v_cuda_runtime_available;
+  napi_create_int32(env, runtime_info.cuda_runtime_available, &v_cuda_runtime_available);
+  napi_set_named_property(env, obj, "cuda_runtime_available", v_cuda_runtime_available);
+
+  napi_value v_runtime_version;
+  napi_create_int32(env, runtime_info.cuda_runtime_version, &v_runtime_version);
+  napi_set_named_property(env, obj, "cuda_runtime_version", v_runtime_version);
+
+  napi_value v_driver_version;
+  napi_create_int32(env, runtime_info.cuda_driver_version, &v_driver_version);
+  napi_set_named_property(env, obj, "cuda_driver_version", v_driver_version);
+
+  napi_value v_device_index;
+  napi_create_int32(env, runtime_info.device_index, &v_device_index);
+  napi_set_named_property(env, obj, "cuda_device_index", v_device_index);
+
+  napi_value v_device_name;
+  napi_create_string_utf8(env, runtime_info.device_name, NAPI_AUTO_LENGTH, &v_device_name);
+  napi_set_named_property(env, obj, "cuda_device_name", v_device_name);
+
   napi_value v_cuda_cap;
-  napi_create_int32(env, __CUDA_ARCH__, &v_cuda_cap);
+  napi_create_int32(env, runtime_info.compute_major * 10 + runtime_info.compute_minor, &v_cuda_cap);
   napi_set_named_property(env, obj, "cuda_compute_capability", v_cuda_cap);
-#endif
+
+  napi_value v_free_bytes;
+  napi_create_double(env, static_cast<double>(runtime_info.free_bytes), &v_free_bytes);
+  napi_set_named_property(env, obj, "cuda_free_bytes", v_free_bytes);
+
+  napi_value v_total_bytes;
+  napi_create_double(env, static_cast<double>(runtime_info.total_bytes), &v_total_bytes);
+  napi_set_named_property(env, obj, "cuda_total_bytes", v_total_bytes);
+
+  napi_value v_runtime_query_status;
+  napi_create_int32(env, runtime_info.query_status, &v_runtime_query_status);
+  napi_set_named_property(env, obj, "cuda_runtime_query_status", v_runtime_query_status);
 
   // LibTorch built flag
 #if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
@@ -1306,7 +1500,7 @@ static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
   napi_set_named_property(env, obj, "libtorch_built", v_libtorch_built);
 
   // cuBLAS availability (compile-time detection)
-#if defined(HAVE_CUBLAS)
+#if defined(SIMD_HAVE_CUBLAS) && SIMD_HAVE_CUBLAS
   napi_value v_cublas;
   napi_create_int32(env, 1, &v_cublas);
 #else
@@ -1315,12 +1509,77 @@ static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
 #endif
   napi_set_named_property(env, obj, "cublas_available", v_cublas);
 
+#if defined(SIMD_HAVE_CUDNN) && SIMD_HAVE_CUDNN
+  napi_value v_cudnn;
+  napi_create_int32(env, 1, &v_cudnn);
+#else
+  napi_value v_cudnn;
+  napi_create_int32(env, 0, &v_cudnn);
+#endif
+  napi_set_named_property(env, obj, "cudnn_available", v_cudnn);
+
+#if defined(SIMD_HAVE_TENSORRT) && SIMD_HAVE_TENSORRT
+  napi_value v_tensorrt;
+  napi_create_int32(env, 1, &v_tensorrt);
+#else
+  napi_value v_tensorrt;
+  napi_create_int32(env, 0, &v_tensorrt);
+#endif
+  napi_set_named_property(env, obj, "tensorrt_available", v_tensorrt);
+
+  // Export presence is known at module initialization. The backend class is
+  // derived from linked implementation + runtime capability; execution is
+  // deliberately unobserved until P1.3 counters are wired.
+  napi_value per_export_backend;
+  napi_create_object(env, &per_export_backend);
+  for (const auto& export_name : g_registered_exports) {
+    const ExportBackendClassification classification =
+      classifyExportBackend(export_name, runtime_info, torch_cuda_available != 0);
+    napi_value backend_state;
+    napi_create_object(env, &backend_state);
+    napi_value backend_name;
+    napi_create_string_utf8(env, classification.backend, NAPI_AUTO_LENGTH, &backend_name);
+    napi_set_named_property(env, backend_state, "backend", backend_name);
+    napi_value basis;
+    napi_create_string_utf8(env, classification.basis, NAPI_AUTO_LENGTH, &basis);
+    napi_set_named_property(env, backend_state, "basis", basis);
+    napi_value execution_observed;
+    napi_get_boolean(env, false, &execution_observed);
+    napi_set_named_property(env, backend_state, "execution_observed", execution_observed);
+    napi_set_named_property(env, per_export_backend, export_name.c_str(), backend_state);
+  }
+  napi_set_named_property(env, obj, "per_export_backend", per_export_backend);
+
   return obj;
+}
+
+static napi_value GetExecutionCountersWrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+  std::uint64_t values[static_cast<std::size_t>(AtlasExecutionCounter::count)]{};
+  atlasNativeCounterSnapshot(values, static_cast<std::size_t>(AtlasExecutionCounter::count));
+  napi_value obj;
+  napi_create_object(env, &obj);
+  const char* names[] = {"cuda_execution", "cpu_fallback", "stub_invocation", "cuda_error_fallback", "oom_fallback"};
+  for (std::size_t i = 0; i < static_cast<std::size_t>(AtlasExecutionCounter::count); ++i) {
+    napi_value value;
+    napi_create_double(env, static_cast<double>(values[i]), &value);
+    napi_set_named_property(env, obj, names[i], value);
+  }
+  return obj;
+}
+
+static napi_value ResetExecutionCountersWrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+  atlasNativeCounterReset();
+  napi_value result;
+  napi_get_undefined(env, &result);
+  return result;
 }
 
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
+  registerFn(env, exports, "atlasPageRank", atlas_core_napi_page_rank_callback());
   registerFn(env, exports, "bridgeSIMD", BridgeSIMD);
   registerFn(env, exports, "checkCudaAvailable", CheckCuda);
   registerFn(env, exports, "graphSimilarity", GraphSimilarityWrapper);
@@ -1334,6 +1593,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   // GPU memory + advanced graph ops
   registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
   registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
+  registerFn(env, exports, "batchCosineTopK", BatchCosineTopKWrapper);
   registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
   // pytorch_graph: graph analysis + ML ops
   registerFn(env, exports, "pageRankGPU", PageRankGPUWrapper);
@@ -1352,8 +1612,6 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "pcaProject", PcaProjectWrapper);
   // ArrayBuffer pool telemetry
   registerFn(env, exports, "poolStats", PoolStatsWrapper);
-  // Backend metadata (P1.2)
-  registerFn(env, exports, "getBackendInfo", GetBackendInfoWrapper);
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
@@ -1365,6 +1623,10 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "replayGraphOnStream", ReplayGraphOnStreamWrapper);
   registerFn(env, exports, "cudaGraphCount", CudaGraphCountWrapper);
   registerFn(env, exports, "cuvsCompressEmbedding", RegisterCuvsCompress);
+  registerFn(env, exports, "getExecutionCounters", GetExecutionCountersWrapper);
+  registerFn(env, exports, "resetExecutionCounters", ResetExecutionCountersWrapper);
+  // Register last so getBackendInfo can enumerate every other native export.
+  registerFn(env, exports, "getBackendInfo", GetBackendInfoWrapper);
   return exports;
 }
 

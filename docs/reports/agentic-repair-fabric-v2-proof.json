@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.agentic-repair-fabric-v2-proof",
+  "mode": "READ_ONLY_CONTRACT_PROOF",
+  "owners": {
+    "oak": "sveltekit-frontend/src/lib/server/atlas/agentic/oak-resolution-evidence-client.ts",
+    "hypergraph": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-hypergraph-expansion-v1.ts",
+    "actionFeatures": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.ts",
+    "dag": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/agentic-dag-synthesis-v1.ts",
+    "parameters": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+    "repairFixture": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/repair-loop-fixture-v1.ts",
+    "receiptProjection": "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/execution-receipt-hyperedge-v1.ts"
+  },
+  "focusedSpecs": [
+    "src/lib/server/atlas/agentic/oak-resolution-evidence-client.spec.ts",
+    "src/lib/server/atlas/agentic/oak-query-enrichment-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/agentic-dag-synthesis-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/agentic-hypergraph-expansion-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/repair-loop-fixture-v1.spec.ts",
+    "src/lib/server/atlas/agentic/contracts/execution-receipt-hyperedge-v1.spec.ts"
+  ],
+  "testResult": {
+    "passedFiles": 8,
+    "passedTests": 25,
+    "error": null
+  },
+  "boundaries": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "toolsExecuted": false,
+    "sourcePatchApplied": false,
+    "databaseWrites": false,
+    "cacheWrites": false,
+    "graphWrites": false
+  },
+  "proven": true,
+  "open": [
+    "Live Go Retrieval is reachable, but sampled results lack chunk_id/source_revision lineage and remain non-promotable.",
+    "Live OAK transport is reachable in READ_ONLY_SHADOW mode, but the bounded fixture returned no ontology matches.",
+    "Repair execution remains approval-gated; the TS2345 fixture is plan-only.",
+    "Canonical source/symbol/ontology authority remains upstream of promotion."
+  ],
+  "outputTail": "pec.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\n·····stdout | src/lib/server/atlas/agentic/oak-resolution-evidence-client.spec.ts\n🧪 Property-based testing environment cleaned up\n\n·······stdout | src/lib/server/atlas/agentic/contracts/repair-loop-fixture-v1.spec.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/atlas/agentic/contracts/execution-receipt-hyperedge-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\n··stdout | src/lib/server/atlas/agentic/contracts/repair-loop-fixture-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\nstdout | src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\n·····stdout | src/lib/server/atlas/agentic/contracts/agentic-hypergraph-expansion-v1.spec.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.spec.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/atlas/agentic/contracts/agentic-hypergraph-expansion-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\n··stdout | src/lib/server/atlas/agentic/contracts/agentic-dag-synthesis-v1.spec.ts\n🧪 Property-based testing environment initialized\n   Fast-check version: 4.4.0\n   Default numRuns: 100\n\nstdout | src/lib/server/atlas/agentic/contracts/agentic-action-feature-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\nstdout | src/lib/server/atlas/agentic/contracts/agentic-dag-synthesis-v1.spec.ts\n🧪 Property-based testing environment cleaned up\n\n····\n\n Test Files  8 passed (8)\n      Tests  25 passed (25)\n   Start at  13:35:19\n   Duration  29.64s (transform 1.03s, setup 46.97s, collect 4.78s, tests 722ms, environment 121.82s, prepare 30.14s)\n\n",
+  "receiptChecksum": "sha256:a7ac612f765459269f756f99980a37f9aa8d5f2fe131f052b40e587e67264723"
+}

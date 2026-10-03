@@ -1,0 +1,86 @@
+{
+  "schema": "atlas.july-gemma4-layer-vector-provenance.v1",
+  "gate": "JULY_GEMMA4_VECTOR_PROVENANCE_01",
+  "mode": "READ_ONLY",
+  "evidenceLevel": "LEVEL_1_MEMBERSHIP_PLUS_LAYER_VECTOR_EQUALITY_HINT",
+  "laneCFilter": "atlas_summary_layers.layer_type = 'gemma4_offline' (all summary levels; the layer table has no 'provenance' column)",
+  "placeholderRule": "vector shared by >1% of all embedded packets (same rule as audit-july-summary-provenance-v1.mjs)",
+  "ledgerPath": ".tmp/atlas/july-gemma4-layer-ledger-v1/ledger-20260926T053109Z.ndjson",
+  "ledgerSha256": "18ab1a16219fab1ad5a176a9ec22c055e15209c5c693064dabfcd28e03e22f4d",
+  "counters": {
+    "lane_c_layers": 3977,
+    "lane_c_distinct_packets": 3465,
+    "lane_c_packets_multiple_layers": 447,
+    "lane_c_packets_with_real_vector": 3448,
+    "lane_c_packets_with_placeholder": 17,
+    "lane_c_packets_without_vector": 0,
+    "A_lane_c_and_real_vector": 3448,
+    "B_lane_c_and_real_vector_and_source_revision": 985,
+    "layers_raw_equal_packet_with_real_vector": 1057,
+    "layers_differ_packet_with_real_vector": 2903,
+    "layers_with_own_embedding": 3746,
+    "layers_own_embedding_equals_packet_vector": 0
+  },
+  "classCounts": {
+    "VECTOR_PLACEHOLDER": 17,
+    "LAYER_DIFFERS_PACKET_SUMMARY_WITH_REAL_VECTOR": 2903,
+    "VECTOR_REAL_LINEAGE_UNPROVEN": 3960,
+    "SOURCE_REVISION_MISSING": 2833,
+    "MULTIPLE_LAYERS_FOR_PACKET": 959,
+    "LAYER_EQUALS_PACKET_SUMMARY_WITH_REAL_VECTOR": 1057
+  },
+  "gates": {
+    "JULY_C_LAYER_CLASSIFICATION_TOTAL_01": {
+      "expected": 3977,
+      "classified": 3977,
+      "unclassified": 0,
+      "pass": true
+    },
+    "JULY_C_PACKET_CLASSIFICATION_TOTAL_01": {
+      "distinctPackets": 3465,
+      "layerRows": 3977,
+      "multiLayerPacketsReported": 447,
+      "pass": true
+    },
+    "JULY_C_READ_ONLY_GUARD_01": {
+      "populations": {
+        "layers": {
+          "before": 18437,
+          "after": 18437,
+          "unchanged": true
+        },
+        "packets": {
+          "before": 61718,
+          "after": 61718,
+          "unchanged": true
+        },
+        "chunk_summary_text": {
+          "before": 0,
+          "after": 0,
+          "unchanged": true
+        },
+        "chunk_summary_embedding": {
+          "before": 1160,
+          "after": 1160,
+          "unchanged": true
+        },
+        "packet_embeddings": {
+          "before": 61659,
+          "after": 61659,
+          "unchanged": true
+        }
+      },
+      "pass": true,
+      "databaseWrites": 0,
+      "qdrantWrites": 0,
+      "cacheWrites": 0,
+      "packetMutations": 0,
+      "summaryMutations": 0
+    }
+  },
+  "notProven": [
+    "which text was actually embedded (levels 3-4 need historical code/log/receipt and model replay)",
+    "Qdrant/go-retrieval indexing input"
+  ],
+  "generatedAt": "2026-09-26T05:31:09.105Z"
+}

@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.phase78-cluster-assignment-replacement-plan.v1",
+  "gate": "PHASE78-CLUSTER-ASSIGNMENT-REPLACEMENT-PLAN-01",
+  "status": "REPLACEMENT_PLAN_READY_FOR_EXPLICIT_AUTHORIZATION",
+  "startedAt": "2026-09-14T23:46:43.276Z",
+  "finishedAt": "2026-09-14T23:46:43.323Z",
+  "databaseSnapshot": "6578109:6578109:",
+  "target": {
+    "table": "error_events",
+    "predicate": "cluster_id IS NOT NULL",
+    "assignedEvents": 148,
+    "distinctClusters": 1,
+    "exactCohortChecksum": "sha256:eba2094fe601d0dc23df6b5abaa485ee5704e493691b9620efc6db50c5ecc2af",
+    "parentClusterRows": "error_clusters",
+    "missingParentClusters": []
+  },
+  "algorithm": {
+    "implementation": "sveltekit-frontend/scripts/phase78-kmeans.ts",
+    "algorithmRevision": "phase78-kmeans-deterministic-farthest-point-v1",
+    "targetClusterCount": 20,
+    "inputOrder": "stable event id order"
+  },
+  "proposedTransaction": {
+    "authorizationRequired": true,
+    "safeToApply": false,
+    "writesPerformed": false,
+    "rollbackRequired": true,
+    "steps": [
+      "BEGIN ISOLATION LEVEL REPEATABLE READ",
+      "re-read predicate and require exactCohortChecksum before mutation",
+      "archive exact affected rows and the parent cluster row",
+      "clear cluster_id only for the checksum-bound affected event IDs",
+      "recompute replacement assignments with the deterministic algorithm",
+      "read back assignment distribution and verify no unrelated rows changed",
+      "ROLLBACK unless a separately authorized apply receipt is present"
+    ],
+    "forbiddenShortcuts": [
+      "UPDATE error_events SET cluster_id = NULL without the exact cohort checksum",
+      "DELETE all error_clusters",
+      "treat the current single cluster as relevance or repair evidence",
+      "authorize mutation from this plan alone"
+    ]
+  },
+  "evidenceRefs": [
+    "docs/reports/phase78-cluster-assignment-cohort-v1.json",
+    "sveltekit-frontend/scripts/phase78-kmeans.ts"
+  ]
+}

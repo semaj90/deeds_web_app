@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.ace-route-cache-admission-report.v1",
+  "generatedAt": "2026-09-15T17:50:00.000Z",
+  "route": "sveltekit-frontend/src/routes/api/ace/stream/+server.ts",
+  "status": "ROUTE_ADMISSION_SCAFFOLD_PROVEN",
+  "identityOwner": "AceBitfrostCacheIdentityV1",
+  "missingIdentity": "BLOCKED_IDENTITY",
+  "invalidIdentity": "BLOCKED_IDENTITY",
+  "completeAcePacketIdentity": "ADMITTED",
+  "requestHashBinding": "REQUIRED_AND_CHECKED_FULL_ROUTE_HASH",
+  "manifestToPacketIdentityBridge": "PURE_SCAFFOLD_PROVEN",
+  "contextManifestCallerAdapter": "PURE_SCAFFOLD_PROVEN",
+  "searchRuntimePacketIdentityExposure": "CODE_PATH_PROVEN_NO_LIVE_CALLER",
+  "manifestAdmissionTests": "PASS",
+  "searchRuntimeManifestTests": "PASS",
+  "legacyQueryOnlyCache": "NOT_USED_OR_WARMED_BY_ROUTE",
+  "liveCanonicalSearchRuntimeHandoff": "OPEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "tests": {
+    "aceRouteAdmission": "PASS",
+    "retrievalCacheIdentity": "PASS",
+    "aceTopRetrievalCache": "PASS",
+    "openspecStrict": "PASS",
+    "diffCheck": "PASS",
+    "fullSvelteCheck": "NOT_COMPLETED_TERMINATED_AFTER_TIMEOUT"
+  },
+  "nextGate": "LIVE_ACE_IDENTITY_HANDOFF_READBACK",
+  "reason": "The route now requires a complete revision-qualified ACE packet identity, and the pure manifest-to-packet bridge is tested, but no live SearchRuntime/ContextManifest caller has yet been proven to supply it."
+}

@@ -1,8 +1,142 @@
 import { z } from 'zod';
+import { adaptiveSemanticMemoryChecksum } from './adaptive-semantic-memory.js';
 
 const id = z.string().min(1);
 const revision = z.string().min(1);
 const checksum = z.string().regex(/^[a-f0-9]{64}$/);
+
+export const TRI_ENGRAM_SCHEMA_V1 = 'atlas.tri-engram.v1' as const;
+
+const triEngramFactSchema = z.enum([
+  'SOURCE_IDENTITY',
+  'PACKET_IDENTITY',
+  'SYMBOL_IDENTITY',
+  'WORKSPACE_SOURCE_REVISIONS',
+  'ONTOLOGY_TUPLES',
+]);
+
+const triEngramProjectionSchema = z.enum([
+  'QDRANT',
+  'GRAPHIFY',
+  'NEO4J_CUGRAPH',
+  'ACE',
+  'BITFROST',
+  'CENTROIDS',
+  'CLUSTERS',
+]);
+
+const triEngramRuntimeStateSchema = z.enum([
+  'ATTENTION_KV',
+  'DELTANET_RECURRENT_STATE',
+  'PROMPT_PREFIX_CACHE',
+]);
+
+export const triEngramV1Schema = z
+  .object({
+    schema: z.literal(TRI_ENGRAM_SCHEMA_V1).default(TRI_ENGRAM_SCHEMA_V1),
+    E1: z
+      .object({
+        plane: z.literal('CANONICAL_KNOWLEDGE'),
+        owner: z.literal('POSTGRES'),
+        facts: z.array(triEngramFactSchema).min(1),
+        canonicalAuthority: z.literal(true),
+      })
+      .strict(),
+    E2: z
+      .object({
+        plane: z.literal('RETRIEVAL_RESIDENCY'),
+        participants: z.array(triEngramProjectionSchema).min(1),
+        derived: z.literal(true),
+        canonicalAuthority: z.literal(false),
+      })
+      .strict(),
+    E3: z
+      .object({
+        plane: z.literal('MODEL_EXECUTION'),
+        owner: z.literal('LLAMA_SERVER'),
+        stateKinds: z.array(triEngramRuntimeStateSchema).min(1),
+        lifecycle: z.literal('EPHEMERAL'),
+        canonicalAuthority: z.literal(false),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type TriEngramV1 = z.infer<typeof triEngramV1Schema>;
+
+export const TRI_ENGRAM_V1: TriEngramV1 = triEngramV1Schema.parse({
+  E1: {
+    plane: 'CANONICAL_KNOWLEDGE',
+    owner: 'POSTGRES',
+    facts: [
+      'SOURCE_IDENTITY',
+      'PACKET_IDENTITY',
+      'SYMBOL_IDENTITY',
+      'WORKSPACE_SOURCE_REVISIONS',
+      'ONTOLOGY_TUPLES',
+    ],
+    canonicalAuthority: true,
+  },
+  E2: {
+    plane: 'RETRIEVAL_RESIDENCY',
+    participants: [
+      'QDRANT',
+      'GRAPHIFY',
+      'NEO4J_CUGRAPH',
+      'ACE',
+      'BITFROST',
+      'CENTROIDS',
+      'CLUSTERS',
+    ],
+    derived: true,
+    canonicalAuthority: false,
+  },
+  E3: {
+    plane: 'MODEL_EXECUTION',
+    owner: 'LLAMA_SERVER',
+    stateKinds: ['ATTENTION_KV', 'DELTANET_RECURRENT_STATE', 'PROMPT_PREFIX_CACHE'],
+    lifecycle: 'EPHEMERAL',
+    canonicalAuthority: false,
+  },
+});
+
+export const ORNITH_PREFIX_IDENTITY_SCHEMA_V1 = 'atlas.ornith-prefix-identity.v1' as const;
+
+const ornithPrefixIdentityMaterialSchema = z
+  .object({
+    modelRevision: revision,
+    chatTemplateRevision: revision,
+    toolSchemaRevision: revision,
+    systemPromptRevision: revision,
+    contextManifestPrefixChecksum: checksum,
+  })
+  .strict();
+
+export const ornithPrefixIdentityV1Schema = z
+  .object({
+    schema: z.literal(ORNITH_PREFIX_IDENTITY_SCHEMA_V1).default(ORNITH_PREFIX_IDENTITY_SCHEMA_V1),
+    modelRevision: revision,
+    chatTemplateRevision: revision,
+    toolSchemaRevision: revision,
+    systemPromptRevision: revision,
+    contextManifestPrefixChecksum: checksum,
+    prefixIdentityChecksum: checksum,
+    canonicalAuthority: z.literal(false).default(false),
+  })
+  .strict();
+
+export type OrnithPrefixIdentityV1 = z.infer<typeof ornithPrefixIdentityV1Schema>;
+
+export function buildOrnithPrefixIdentityV1(
+  input: z.input<typeof ornithPrefixIdentityMaterialSchema>
+): OrnithPrefixIdentityV1 {
+  const material = ornithPrefixIdentityMaterialSchema.parse(input);
+  return ornithPrefixIdentityV1Schema.parse({
+    ...material,
+    prefixIdentityChecksum: adaptiveSemanticMemoryChecksum(material),
+    canonicalAuthority: false,
+  });
+}
 
 export const testTimeMemoryObservationSchema = z.object({
   schema: z.literal('atlas.test-time-memory-observation.v1').default('atlas.test-time-memory-observation.v1'),

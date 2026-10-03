@@ -227,7 +227,8 @@ async function embedText(text: string): Promise<number[] | null> {
         modelArtifactRevision: ENV.EMBEDDING_MODEL_ARTIFACT_REVISION ?? '',
         tokenizerRevision: ENV.EMBEDDING_TOKENIZER_REVISION ?? '',
         inputPolicyRevision: ENV.EMBEDDING_INPUT_POLICY_REVISION ?? 'semantic-input-v1',
-        baseUrl: ENV.EMBEDDING_BASE_URL ?? 'http://127.0.0.1:8081',
+        // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
+        baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
       });
       return result.embedding;
     }

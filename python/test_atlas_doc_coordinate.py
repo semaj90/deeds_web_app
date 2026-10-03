@@ -93,42 +93,41 @@ def test_chunk_document_without_coordinate_is_unaffected():
     assert chunks[0].to_dict()["doc_coordinate"] is None
 
 
-def test_chunk_document_with_coordinate_threads_per_chunk_section_anchor():
-    """Real integration proof for DOC-02: each chunk gets its own DocCoordinateV1 with a
-    section_anchor matching its own heading path, all sharing the same
-    provider/product/product_version/url identity.
-    """
-    base = _coord(url="https://docs.nvidia.com/cuda/tile-ir/13.2/")
+def _page_coord(text: str, **overrides: object) -> DocCoordinateV1:
+    """Page coordinate whose content_hash is the hash of the SAME normalized text chunk_document addresses."""
+    from atlas_external_docs import _normalize_ws, _sha
+
+    return _coord(content_hash=_sha(_normalize_ws(text)), **overrides)
+
+
+def test_chunk_document_carries_the_page_coordinate_unchanged_into_every_chunk():
+    """EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01: DocCoordinateV1 is PAGE/VERSION identity. It is carried unchanged into
+    every child chunk (no per-chunk section_anchor/content_hash rewrite); heading stays chunk metadata."""
+    text = "# Intro\nSome text about tile programming on Ampere.\n\n# Details\nMore detail about sm_86."
+    base = _page_coord(text, url="https://docs.nvidia.com/cuda/tile-ir/13.2/")
     chunks = chunk_document(
-        source_id="src1",
-        source_revision="sha256:" + "d" * 64,
-        source_url=base.url,
-        title="Tile IR",
-        text="# Intro\nSome text about tile programming on Ampere.\n\n# Details\nMore detail about sm_86.",
-        doc_coordinate=base,
+        source_id="src1", source_revision="sha256:" + "d" * 64, source_url=base.url, title="Tile IR", text=text, doc_coordinate=base,
     )
     assert len(chunks) >= 2
     for chunk in chunks:
-        assert chunk.doc_coordinate is not None
+        assert chunk.doc_coordinate is base or chunk.doc_coordinate == base
         assert isinstance(chunk.doc_coordinate, DocCoordinateV1)
-        assert chunk.doc_coordinate.provider == base.provider
-        assert chunk.doc_coordinate.product == base.product
-        assert chunk.doc_coordinate.product_version == base.product_version
-        assert chunk.doc_coordinate.url == base.url
-        # content_hash is rebound to the whole-document checksum, not the base's placeholder
         assert chunk.doc_coordinate.content_hash == chunk.document_checksum
+        assert chunk.doc_coordinate.section_anchor is None  # page coordinate; not rewritten per chunk
+    assert {chunk.doc_coordinate.evidence_revision for chunk in chunks} == {base.evidence_revision}
+    assert {chunk.heading_path for chunk in chunks} >= {("Intro",), ("Details",)}
+    # ...while every chunk still has its OWN evidence identity.
+    assert len({chunk.chunk_evidence_revision for chunk in chunks}) == len(chunks)
 
-    anchors = {chunk.doc_coordinate.section_anchor for chunk in chunks}
-    assert "Intro" in anchors
-    assert "Details" in anchors
-    # Different section anchors -> different evidence_revision per chunk, even though
-    # provider/product/product_version/url are identical -- proves section-level identity works.
-    revisions = {chunk.doc_coordinate.evidence_revision for chunk in chunks}
-    assert len(revisions) == len(chunks)
+
+def test_chunk_document_rejects_a_page_coordinate_hashed_over_different_text():
+    base = _coord(content_hash="a" * 64)  # not the hash of the text below
+    with pytest.raises(ValueError, match="DOC_COORDINATE_CONTENT_HASH_MISMATCH"):
+        chunk_document(source_id="s", source_revision="r", source_url=base.url, title="T", text="# A\nbody", doc_coordinate=base)
 
 
 def test_chunk_document_serializes_doc_coordinate_in_to_dict():
-    base = _coord()
+    base = _page_coord("# Intro\nSome text.")
     chunks = chunk_document(
         source_id="src1",
         source_revision="sha256:" + "d" * 64,

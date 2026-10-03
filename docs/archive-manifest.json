@@ -1,5 +1,45 @@
 [
   {
+    "path": "scripts/atlas/pca-baseline-768-to-384.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-12/pca-baseline-768-to-384.mjs.broken",
+    "sha256": null,
+    "archived": "2026-09-12T00:00:00Z",
+    "reason": "BROKEN, not merely superseded -- its SimplePCA._powerIteration() generated random Math.random() vectors and Gram-Schmidt-orthogonalized them, never computing real eigenvectors or an actual SVD of the data's covariance structure. Its output report (docs/vector-governance/pca-baseline-report.json) never existed on disk, confirming it was never run to a saved, kept result. Replaced by python/pca_svd_representation_baseline_v1.py (real sklearn.decomposition.TruncatedSVD) and python/freeze_pca_svd_basis_v1.py (frozen, reload-verified bases at 64/128/256d), both real and empirically proven this session -- see openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md.",
+    "recovery": "Not recommended -- the archived file's math is incorrect, not just outdated. If ever needed for historical reference only, restore via `mv deeds_labs/archive/2026-09-12/pca-baseline-768-to-384.mjs.broken scripts/atlas/pca-baseline-768-to-384.mjs`, but do not treat its output as a valid PCA baseline."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots/9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5 (directory, complete snapshot, 25,271 sources, 438MB)",
+    "archive_path": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2",
+    "sha256": null,
+    "archived": "2026-09-12T00:00:00Z",
+    "reason": "Historical (superseded) complete workspace-source snapshot, flagged HISTORICAL_REVISION_REVIEW_ONLY by scripts/atlas/audit-workspace-source-snapshot-retention-v1.mjs (read-only, writesPerformed=false at audit time). Archived alongside c11d261f16a90ba8... (below) to clear npm run graphify:daily's snapshot-retention cap (GRAPHIFY_SNAPSHOT_RETENTION_REVIEW_REQUIRED:complete=3:max=2 in scripts/startup/run-graphify-daily-startup.mjs's assertSnapshotRetentionBudget(), MAX_MATERIALIZED_SNAPSHOTS=2). Newest complete snapshot (06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36) retained live, not archived. Content is a materialized copy of already-hashed source files (per-file content digests verified at materialization time by materialize-workspace-source-snapshot-v1.mts) -- reproducible from the source repos at the same revision if ever needed again.",
+    "recovery": "Reproducible: re-run the workspace-source snapshot capture/materialize pipeline against the same source revision. Or restore via `mv deeds_labs/archive/2026-09-12/workspace-source-snapshot-9b61929b85a6c4e2 .tmp/workspace-source-snapshots/9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5`."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots/c11d261f16a90ba80a8772f5ea10b24d0e2d28a27ef93afcee1f8398898c06ad (directory, complete snapshot, 25,267 sources, 438MB)",
+    "archive_path": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8",
+    "sha256": null,
+    "archived": "2026-09-12T00:00:00Z",
+    "reason": "Historical (superseded) complete workspace-source snapshot, flagged HISTORICAL_REVISION_REVIEW_ONLY by scripts/atlas/audit-workspace-source-snapshot-retention-v1.mjs. Archived alongside 9b61929b85a6c4e2... (above), same reason and same retention-cap trigger.",
+    "recovery": "Reproducible: re-run the workspace-source snapshot capture/materialize pipeline against the same source revision. Or restore via `mv deeds_labs/archive/2026-09-12/workspace-source-snapshot-c11d261f16a90ba8 .tmp/workspace-source-snapshots/c11d261f16a90ba80a8772f5ea10b24d0e2d28a27ef93afcee1f8398898c06ad`."
+  },
+  {
+    "path": ".tmp/workspace-source-snapshots/48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8.partial-12564 (directory, not a single file -- 3,645 files, 65MB)",
+    "archive_path": "deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564",
+    "sha256": null,
+    "archived": "2026-09-12T00:00:00Z",
+    "reason": "Incomplete multi-repo workspace snapshot (crashed/interrupted capture, PID 12564, ~Sep 11 per file mtimes) blocking npm run graphify:daily's snapshot-retention gate (GRAPHIFY_SNAPSHOT_RETENTION_REVIEW_REQUIRED:partial=1 in scripts/startup/run-graphify-daily-startup.mjs's assertSnapshotRetentionBudget()). Investigated before moving, not assumed safe: scripts/atlas/audit-workspace-source-snapshot-retention-v1.mjs (read-only) confirmed writesPerformed=false and flagged it as the sole partial among 4 snapshot directories; only 3,645/~25,000 files present (died ~15% through), no .materialization.json marker (consistent with a genuine crash, not a clean completion). Content is entirely a copy of source files that still exist untouched in their real repositories -- no unique data. The exact writer script that produced this specific artifact was not conclusively identified (contains sibling-repo directories like deeds_lab/, karpathy-wiki/, mcp-server-mcp/, suggesting an older or since-removed multi-repo capture tool, not the current single-repo materialize-workspace-source-snapshot-v1.mts, which was already designed from its one commit onward to avoid exactly this per-PID partial-accumulation failure mode via a comment explicitly stating that design intent).",
+    "recovery": "Not needed -- this is a disposable derived copy of files that still exist in their source locations. If ever needed for forensic review of the crash itself, restore via `mv deeds_labs/archive/2026-09-12/workspace-source-snapshot-partial-12564 .tmp/workspace-source-snapshots/48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8.partial-12564`."
+  },
+  {
+    "path": "codebase_chunk_index.error_embedding (pre-migration snapshot, column stays live post-migration -- this is a data snapshot, not a file archival)",
+    "archive_path": "deeds_labs/archive/2026-09-12/error_embedding_384_backup.csv",
+    "sha256": "88aa7886cf55962cc6fe678aefb60c2b8c792587864537b6c886862145f2287b",
+    "archived": "2026-09-12T00:00:00Z",
+    "reason": "Pre-migration export for openspec/changes/parent-atlas-error-embedding-768-migration task 1.1, per this repo's archive-not-delete convention, ahead of `ALTER TABLE codebase_chunk_index ALTER COLUMN error_embedding TYPE halfvec(768) USING NULL` in drizzle/manual/20260912_error_embedding_768.sql (proposed, not yet applied -- human review required per Drizzle Safety Rule). Verified live via `\\copy ... WHERE error_embedding IS NOT NULL` immediately before export: 0/55853 rows populated (header-only CSV) -- confirms the proposal's own claim that this column is write-only/unread and currently empty, so the migration's `USING NULL` reset discards no real data.",
+    "recovery": "Column is additive-in-spirit (same column, wider type); rollback is `ALTER COLUMN error_embedding TYPE vector(384) USING NULL` plus restoring rows from this CSV if any existed (none did at snapshot time)."
+  },
+  {
     "path": "scripts/atlas/audit-openspec-portfolio-v1.mjs",
     "archive_path": "deeds_labs/archive/2026-09-04/audit-openspec-portfolio-v1.mjs.root-duplicate.bak",
     "sha256": "7a0516213033099e05406308b7ef2d304ab9582c79668fd179afafa08669a584",
@@ -434,5 +474,103 @@
     },
     "archived": "2026-09-08T00:00:00Z",
     "reason": "Root-tree duplicate of sveltekit-frontend/openspec/changes/phase-2f1-real-evaluation-corpus/ -- the same cross-tree duplication pattern already recorded elsewhere in this manifest (audit-openspec-portfolio-v1.mjs entry above), found this time via a directory-name diff between the two OpenSpec portfolios (root: 92 change dirs, sveltekit-frontend: 14; exactly 2 exact-name overlaps, this one and the inert `archive/` directory). Both copies' `.openspec.yaml` share an identical `created: 2026-07-12` timestamp, meaning this root copy originated as a fork/copy of the sveltekit-frontend original rather than an independently-conceived duplicate. The sveltekit-frontend copy is the real, actively-implemented one: `stage: implementing`, `status: in_progress` (status.json), a 300+ line tasks.md with 6 completed task groups including real Drizzle migrations (0055_evaluation_results.sql among others) and real data population (33,398 evidence items: 23,415 AST + 5,592 routes + 3,810 tests + 581 schemas; 52 evaluation_queries; verified live against real Postgres, not just claimed), plus design.md, evidence/, and 4 separate capability spec files (deterministic-judgments, feature-envelope-contract, real-evaluation-corpus, rrf-ablations). This root copy has NO tasks.md at all (`npx openspec list` reports it as \"No tasks\"), no evidence/, no design.md, and only a single combined spec.md -- its proposal.md was edited once more on 2026-08-08 (nearly a month after the shared creation date) with substantially the same problem statement and solution shape as the sveltekit-frontend original (diffed directly, not assumed), reworded/restructured but not meaningfully advanced, and never actioned into any task file. Archived as the redundant, un-implemented duplicate; the sveltekit-frontend copy remains the canonical, in-progress change -- continue any future work there, not here."
+  },
+  {
+    "path": "scripts/atlas/index-engine.ts",
+    "archive_path": "deeds_labs/archive/2026-09-13/index-engine.ts.broken",
+    "sha256": "9a9b92651d00402c292e275f28bfc493cfb079ddbc2005df60cb00a961f4faa6",
+    "archived": "2026-09-13T00:00:00Z",
+    "reason": "Dead, broken scaffold with a false self-attribution: its header comment claims 'Phase 110 Stage 1-2 indexing path', but the real Phase 110 in this repo (openspec/changes/phase-110-consolidated-integration-plan.md) is an unrelated SearXNG/Crawl4AI external-discovery pipeline -- no real spec ever scoped this file's stated purpose. Confirmed via `tsc --noEmit` that it fails to parse at all: an unterminated string literal on its own line 14 (`from '$lib/server/db/schema/graphify.js` -- missing closing quote/semicolon), a verbatim-duplicated import block (lines 6-7 repeated at 11-12), and literal `<task_progress>`/`>>>>` markers pasted directly into the function body (lines 53-74) -- leaked agent-tool scratch output committed as if it were source code. Its one export (`runIndexEngine`) has zero callers anywhere in the repo. Its import of `$lib/server/db/schema/graphify.js` resolves to nothing (no such schema module exists). `git log --all -- scripts/atlas/index-engine.ts` shows exactly one commit (`94f82622f`), whose message is an unrelated garbage string, consistent with this file being swept into a large bulk commit without review. Superseded by `scripts/atlas/graphify-symbol-extractor-v1.mts` -- a real, type-checking, tested replacement that populates the same target table (`graphify_symbols`) correctly. Do not restore or build on this file; it never worked."
+  },
+  {
+    "path": "scripts/atlas/lib/encoding.mjs",
+    "archive_path": "deeds_labs/archive/2026-09-13/encoding.mjs.superseded",
+    "sha256": "2f10d237ec3a96c39b93ec2f971cf909e3552d62d5b380d53e0e2db82d521c18",
+    "archived": "2026-09-13T00:00:00Z",
+    "reason": "Superseded by scripts/atlas/lib/source-text-envelope.mjs (SOURCE-TEXT-ENCODING-01): the new module supersedes this one's role with a fail-closed BOM-based detection contract (UTF-8/UTF-16LE/UTF-16BE via BOM only, no NUL-byte heuristic guessing for unmarked UTF-16), always-UTF-8 parserBuffer normalization, and an LSP-compatible byteOffsetToPosition() UTF-16 code-unit converter -- capabilities this file did not provide. Archived on disk during the same session that built the replacement but the manifest entry was missed at the time; added here to close that gap per this repo's archive-not-delete convention (every archived file must have a manifest entry)."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+    "archive_path": "deeds_labs/archive/2026-09-13/router-matrix.ts.superseded",
+    "sha256": "39e0d2f2ff32564fab0c7ac84ee2d4c0b11c9bb37ea1fe3962da4a321c8d5c23",
+    "archived": "2026-09-13T00:00:00Z",
+    "reason": "Dead compatibility vocabulary, confirmed 0 live imports repo-wide (re-checked directly: no `from '...router-matrix'` or `require('...router-matrix')` hits anywhere under sveltekit-frontend). Exported `DEFAULT_ROUTER_MATRIX` / `getSignalMatrix()` were never wired to the live `routing/query-router-4x4.ts`, which has its own separately hardcoded, inlined copy of the routing weight table (getRouterMatrix()) -- the only reference to this file anywhere in query-router-4x4.ts is a stale prose comment ('will be populated by the logic in router-matrix.ts') that was never acted on. Matches the independent census in openspec/changes/parent-atlas-search-classifier-sidecar/tasks.md (repeated 4+ times 2026-09-09 through 2026-09-12): query-router-4x4.ts is the canonical, executable router (2 live consumers); retrieval-candidate-feature-matrix-v1.ts is feature data (9-10 consumers), not a competing router; this file alone had 0 consumers. Do not restore or wire this file in; if the router-matrix vocabulary is ever needed, extend query-router-4x4.ts's own inlined table instead of resurrecting a second source of truth."
+  },
+  {
+    "path": "scripts/phase79-agentic-repair.mts",
+    "archive_path": "deeds_labs/archive/2026-09-14/phase79-agentic-repair.mts.bak",
+    "sha256": "f7950245e66de026b00c9b0bfe19b941ee2c4f4096b4c09cb6d91b03d5e09706",
+    "archived": "2026-09-14T00:00:00Z",
+    "reason": "Orphaned, broken, dangerous same-named duplicate of the real, safe `sveltekit-frontend/scripts/phase79-agentic-repair.mts` (1255 lines, exact-preimage-checked, post-write-hash-verified, git-diff-checked, rollback-capable). This root-level file (233 lines) is a much older, cruder prototype: `toolApplyPatch()` does a naive `content.replace(search_content, replace_content)` and calls `fs.writeFile()` directly with zero preimage check, zero post-write verification, zero git diff check, and zero rollback. Confirmed dead as written, not merely risky: it imports `db`/`errorEvents`/`errorSuggestions`/`errorSuggestionStates` from `../src/lib/server/db/schema-postgres` (the root-level `src/` tree, not sveltekit-frontend), but that schema file does not export those names, and its own `main()` only ever runs against hardcoded mock data -- the real DB query is commented out. Git history explains why: commit `a2e4dab329` ('wip(atlas): restore orphaned root src tree, retire Atlas v1 in favor of v2/semantic_768 alignment') explicitly marks the entire root `src/` tree this script depends on as orphaned and being retired. Confirmed zero references anywhere in the repo (no npm script, VS Code task, or doc mentions `scripts/phase79-agentic-repair.mts` at the root path) before archiving. Found during a live reachability-trace audit of the agentic repair architecture (2026-09-14) that also verified the review's other P0 claims (WorkflowActionEventV1 has 4 divergent schema owners, not 3; `preflightFileMutation` has zero production callers; the safe sveltekit-frontend Phase 79 bypasses FileMutationPlanV1/MutationApprovalReceiptV1 entirely and uses env-var-only authorization). Do not restore or reference this file -- if a root-level repair script is ever needed again, it must be built against the safe sveltekit-frontend Phase 79's preimage/rollback/verification pattern, not this one."
+  },
+  {
+    "path": "scripts/okf-docs-crawl.py",
+    "archive_path": "deeds_labs/archive/2026-09-23/okf-docs-crawl.py",
+    "sha256": "c769e29568b10daba414e6bad02925c793d603e7f82beef21a842efc332ceeb1",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-issue-5792-hnsw-opclass-push.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-issue-5792-hnsw-opclass-push.md",
+    "sha256": "79bc761d1dc7fa0c052b94230f35478a7ec329a2f089a29f50e1db47d09d52d8",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-postgresql-extensions.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-postgresql-extensions.md",
+    "sha256": "9d30ab8864bf027b64e9d363e278add6d0dbfa30e7227cb1417e4e1017f5bfc6",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/drizzle-vector-similarity-search.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/drizzle-vector-similarity-search.md",
+    "sha256": "b315e09fcdf52fc9b48a0313028949b75867860ca5ebd64050ad586c2f284df6",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/pgvector-hnsw-postgres18-tuning.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/pgvector-hnsw-postgres18-tuning.md",
+    "sha256": "fc3d04b00d250b2878ba329863abdb0ead1aeeec4909de59d8fd009dcc4febab",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/pgvector-readme.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/pgvector-readme.md",
+    "sha256": "03202bbcb6a42635e52907738268dfc2c4d6e1123a981228522ceb1fb1a777a9",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": ".okf/docs/supabase-hnsw-indexes.md",
+    "archive_path": "deeds_labs/archive/2026-09-23/supabase-hnsw-indexes.md",
+    "sha256": "03c5a7f1f58179afee7677a280bfab67cc6f24a9155c363ddefc0e66cdaeb569",
+    "archived": "2026-09-23T16:17:29Z",
+    "reason": "superseded by manifest-driven pipeline (python/atlas_okf_docs_pipeline.py + docs/.okf/dev/pinned-docs.manifest.json); duplicate BeautifulSoup crawler and wrong output namespace (.okf/docs vs docs/.okf/)"
+  },
+  {
+    "path": "docs/.okf/pinned/fetch-receipt-okf-pinned-docs-r1.json",
+    "archive_path": "deeds_labs/archive/2026-09-23/fetch-receipt-okf-pinned-docs-r1.json",
+    "sha256": "04e30b7dc63f09275368cc9a1cac2d79db1ab9369582689287d0346562b52e12",
+    "archived": "2026-09-23T17:19:46Z",
+    "reason": "stale scratch receipt from the first 21-page inline fetch (6 sources); superseded by docs/reports/external-doc-admission-envelopes-v1.json from the manifest-driven builder. Not consumed by any validator."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/helper-eligibility-v1.spec.ts",
+    "archive_path": "deeds_labs/archive/2026-09-27/helper-eligibility-v1.spec.ts.orphaned-by-collision.bak",
+    "sha256": "6dd9970b88e1c941ca19344ed5ccc341d7223879cb25ce483c2f6156d1eb4976",
+    "archived": "2026-09-27",
+    "reason": "orphaned by a concurrent write that replaced helper-registry-v1.ts/keyword-recognition-v1.ts/helper-eligibility-v1.ts with a different implementation; original design preserved as the -v2 files for review, per explicit instruction. NOTE: this entry was found appended as a malformed stray object after the manifest array had already closed (invalid JSON as a whole file) and was repaired into the array here on 2026-09-27, same reason/archive_path preserved."
+  },
+  {
+    "path": "scripts/atlas/gemma4-semantic-embedding-cache.mts",
+    "archive_path": "deeds_labs/archive/2026-09-27/gemma4-semantic-embedding-cache.mts.bak",
+    "sha256": "309b6bf2cfa30eb8168a2f1f85f18b10af33100778bee4f201b155b5743f91bd",
+    "archived": "2026-09-27",
+    "reason": "never worked since inception: two module/endpoint bugs fixed during testing (require(crypto) vs top-level await module-type conflict; wrong Qdrant endpoint /points instead of /points/scroll), but all 4 GPU call sites (pageRankGPU/attentionScoreGPU/kmeansWithCentroids/trainSOM) pass arguments in the wrong shape and have never produced valid output. Duplicates the already-correct, already-canonical karpathy-gpu-enrich.mjs Karpathy GPU Authority Blend pipeline. See CLAUDE.md LIBTORCH-DEPENDENCY-CENSUS-01 for the full investigation trail."
   }
 ]

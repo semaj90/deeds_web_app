@@ -2,7 +2,7 @@ import {
   checksumOakExecutionValueV1,
   oakExecutionLineageV1Schema,
   type OakExecutionLineageV1,
-} from '@deeds/parent-atlas';
+} from '@deeds/parent-atlas/core/oak-execution-lineage-v1';
 import type { OakExecutionReceiptV1 } from './oak-dag-execution-adapter-v1.js';
 
 export type OakLineageBoundExecutionReceiptV1 = Readonly<{

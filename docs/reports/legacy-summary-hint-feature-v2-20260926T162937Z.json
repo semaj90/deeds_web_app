@@ -1,0 +1,103 @@
+{
+  "schema": "atlas.legacy-summary-hint-feature.v2",
+  "status": "STANDALONE_HINT_FEATURE_MECHANICS_PROVEN",
+  "generatedAt": "2026-09-26T16:29:38.003Z",
+  "featureName": "legacy_summary_cosine_max",
+  "canonicalAuthority": false,
+  "retrievalVote": false,
+  "rankingPromotion": false,
+  "rfContract": {
+    "registryTouched": false,
+    "rf04Admitted": false,
+    "rf05Replayed": false,
+    "nextGate": "REVIEW_THEN_RF-04-CONTRACT-EXTENSION-01"
+  },
+  "query": {
+    "text": "trace the current Graphify packet to chunk and AST lineage",
+    "textDigest": "sha256:e65e8bf5f8e801e9e8d70977b5ab67cf585205dd5368484ae3db51233b81f157",
+    "endpoint": "http://127.0.0.1:8097/embed",
+    "taskPrefix": "NONE_RAW",
+    "service": {
+      "status": "healthy",
+      "model_loaded": "true",
+      "device": "cpu",
+      "timestamp": 1790440175
+    },
+    "modelRevision": "NOT_REPORTED_BY_SERVICE",
+    "dimension": 768,
+    "embeddingDigest": "sha256:7e3c1be35252de5b191d3aa2361f7573ecf582d1db5441ec192d315b0f94a8f6"
+  },
+  "bindings": {
+    "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+    "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+    "cei24OverlayChecksum": "860e3050b8787b6c92a5d64f9ada516c827139ad8c37861c677d2793721c4eb2",
+    "historicalEvidenceOverlaySetChecksum": "6c44641f52ceb6195b06aa82d5c01e617a137ea55f9863dd34e999bc8132a7cb",
+    "hintCensusChecksum": "sha256:66ffbe64d95a039e89ccf235aa04593a2f4c6af5ef351388dea1e846279cc5c2",
+    "qualityPolicyRevision": "sha256:3e31c6b9962469bb6fb7460ed83bcee435edb0bc84a82fba9f39f89e0a177ca6",
+    "hintVectorArtifactChecksum": "sha256:1c32d021ed5bca49a100f0cc9ee53063c8280f33a7ad0625e9cacbfa05b8f362",
+    "queryEmbeddingDigest": "sha256:7e3c1be35252de5b191d3aa2361f7573ecf582d1db5441ec192d315b0f94a8f6",
+    "aggregationPolicyRevision": "MAX_CHUNK_COSINE_V1",
+    "producerScriptDigest": "sha256:20ad3a3ebf3695591d38691d08a318db82cb4c140a4695ec268d6d317971641a"
+  },
+  "producerRevision": "sha256:4c942f64237f448dde3e375eb5a2b638aa8e9bf4e5c066d618f6d2c59e571c8e",
+  "featureChecksum": "2495aa47227c2247ee173f9a474211825aa3ee0ab09f9257acac26640eb01525",
+  "coverage": {
+    "derived": 178,
+    "unavailable": 15973,
+    "total": 16151
+  },
+  "hints": {
+    "overlaysInput": 330,
+    "exactChunkScored": 322,
+    "excludedStates": {
+      "CURRENT_PACKET_NOT_FOUND": 8
+    }
+  },
+  "invariants": {
+    "exactChunkScoresProduced": 322,
+    "excludedHintsNeverScored": 8,
+    "distinctCandidateOrdinalsDerived": 178,
+    "distinctOrdinalsFromChunkScores": 178,
+    "unavailable": 15973,
+    "totalStates": 16151,
+    "noDuplicateOrMissingCandidateState": true,
+    "unavailableRowsCarryNull": true,
+    "ordinalMatrixRowConflated": false,
+    "ordinalDiffersFromMatrixRowOnRows": 16151,
+    "cosineMin": 0.1700655891617889,
+    "cosineMax": 0.47319283052135863,
+    "score01Correct": true,
+    "replayIdentical": true,
+    "queryDeterministic": true
+  },
+  "scoreSummary": {
+    "min": 0.21025041448065312,
+    "median": 0.3099970379661852,
+    "max": 0.47319283052135863
+  },
+  "artifacts": {
+    "featureRows": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-feature-v2\\20260926T162937Z\\feature-rows.ndjson",
+      "sha256": "sha256:580e400717445d239d9ba9b8beeb58689cab9dba31c759c931269654ad2dd94f",
+      "bytes": 16044096
+    },
+    "chunkScores": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-feature-v2\\20260926T162937Z\\chunk-scores.ndjson",
+      "sha256": "sha256:726391ac9fb29b637b026633c8ba3aff7fe35b57182cab221c391a1168716015",
+      "bytes": 126192
+    },
+    "queryVector": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-feature-v2\\20260926T162937Z\\query-vector.f32",
+      "sha256": "sha256:7e3c1be35252de5b191d3aa2361f7573ecf582d1db5441ec192d315b0f94a8f6",
+      "bytes": 3072
+    }
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "semantics": "Query-conditioned, chunk-summary HINT evidence aggregated to packet candidates by MAX cosine; no relevance-lift claim (0 graded labels)."
+}

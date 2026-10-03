@@ -36,6 +36,8 @@ export function buildQdrantSyncPayload(packet: Record<string, unknown>): Record<
   if (!p.packetKey || !p.sourceRef || !p.featureId || !p.workspaceId) {
     throw new Error(`Invalid identity: ${p.packetKey ?? p.packet_key ?? 'unknown'}`);
   }
+  const canonicalId = optionalNonEmpty(p.canonicalId ?? p.canonical_id);
+  if (!canonicalId) throw new Error('Missing canonical_id for canonical Qdrant payload');
 
   const workspaceRevision = requireContentRevision(
     p.canonicalWorkspaceRevision ?? p.canonical_workspace_revision ?? p.workspaceRevision ?? p.workspace_revision,
@@ -76,7 +78,7 @@ export function buildQdrantSyncPayload(packet: Record<string, unknown>): Record<
     recovery_lane: p.recoveryLane,
     domain_class: p.domainClass,
     tree_node_id: p.treeNodeId ?? p.tree_node_id,
-    canonical_id: p.canonicalId ?? p.canonical_id,
+    canonical_id: canonicalId,
     symbol_version_id: p.symbolVersionId ?? p.symbol_version_id,
     graph_revision: p.graphRevision ?? p.graph_revision,
     ontology_revision: p.ontologyRevision ?? p.ontology_revision,

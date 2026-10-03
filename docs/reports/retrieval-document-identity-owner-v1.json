@@ -1,0 +1,115 @@
+{
+  "schema": "atlas.retrieval-document-identity-owner-audit.v1",
+  "status": "CANONICAL_OWNER_PROVEN_PROJECTION_COORDINATES_SEPARATED",
+  "owner": {
+    "canonical": "POSTGRES_PACKET_SOURCE_IDENTITY",
+    "fields": [
+      "packet_key",
+      "source_ref",
+      "source_revision",
+      "workspace_revision"
+    ],
+    "authorityChanged": false
+  },
+  "projectionCoordinates": [
+    "qdrant_point_id",
+    "codebase_chunk_index.qdrant_id",
+    "candidateOrdinal",
+    "graphOrdinal",
+    "cacheKey"
+  ],
+  "evidence": {
+    "qdrantCollectionRoles": {
+      "path": "docs/reports/qdrant-collection-roles-v1.json",
+      "status": "QDRANT_COLLECTION_ROLES_PROVEN"
+    },
+    "qdrantProjectionIdOwner": {
+      "path": "docs/reports/qdrant-projection-id-owner-v2.json",
+      "canonicalIdentityOwner": "POSTGRES_PACKET_SOURCE_IDENTITY"
+    }
+  },
+  "files": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/search/qdrant-search.ts",
+      "exists": true,
+      "identityFields": [
+        "packetKey",
+        "sourceRef",
+        "workspaceRevision"
+      ],
+      "projectionCoordinates": [
+        "qdrant_id"
+      ],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "exists": true,
+      "identityFields": [],
+      "projectionCoordinates": [],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/search/turbovec-search.ts",
+      "exists": true,
+      "identityFields": [],
+      "projectionCoordinates": [
+        "qdrant_id"
+      ],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+      "exists": true,
+      "identityFields": [
+        "packetKey",
+        "sourceRef"
+      ],
+      "projectionCoordinates": [
+        "cacheKey"
+      ],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+      "exists": true,
+      "identityFields": [
+        "packetKey",
+        "sourceRef",
+        "sourceRevision",
+        "workspaceRevision"
+      ],
+      "projectionCoordinates": [
+        "qdrantPointId",
+        "cacheKey"
+      ],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "exists": true,
+      "identityFields": [
+        "packetKey",
+        "sourceRef",
+        "sourceRevision",
+        "workspaceRevision"
+      ],
+      "projectionCoordinates": [
+        "qdrant_point_id",
+        "qdrant_id",
+        "cacheKey"
+      ],
+      "forbiddenSignals": [],
+      "status": "IDENTITY_METADATA_SURFACE_PRESENT"
+    }
+  ],
+  "violations": [],
+  "writesPerformed": false,
+  "canonicalAuthorityChanged": false,
+  "promotionAuthorized": false
+}

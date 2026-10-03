@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T18:27:26Z",
+  "pivot": {
+    "fromChange": "parent-atlas-transport-memory-boundaries",
+    "fromProgress": { "complete": 38, "total": 93, "remaining": 55 },
+    "toChange": "parent-atlas-workboard-feature-utility-fabric",
+    "toProgress": { "complete": 16, "total": 68, "remaining": 52 },
+    "reason": "Returned from the A2A-04 implementation review to the active OpenSpec workboard objective. The next WFU-02 language-registry contract work was locally implementable without DB/cache mutations or container rebuilds."
+  },
+  "workboardSnapshot": {
+    "changes": 96,
+    "completeTasks": 6173,
+    "totalTasks": 9399,
+    "openTasks": 3226,
+    "source": "openspec list --json, freshly measured"
+  },
+  "selectedTask": {
+    "id": "WFU-02",
+    "statusAtPivot": "OPEN",
+    "observedDrift": "Source owners expose overlapping but non-equivalent content-language, parser-language, grammar-ID, and file-extension vocabularies. A shared enum or guessed alias would erase distinctions; the task note called for a provenance-bearing contract with explicit ambiguity and unsupported outcomes."
+  },
+  "execution": {
+    "result": "WFU-02_OPEN_WFU-07_PARTIAL_TOPO-03_06_PROVEN_TOPO-05_PROVEN",
+    "progressAfter": { "complete": 21, "total": 68, "remaining": 47 },
+    "lastMeasuredAt": "2026-09-23T18:51:30Z",
+    "workboardAfter": {
+      "changes": 96,
+      "completeTasks": 6278,
+      "totalTasks": 9533,
+      "openTasks": 3255,
+      "taskFiles": 93,
+      "countMethod": "Direct checkbox recount across OpenSpec change tasks.md files; includes task files not represented in the older openspec list aggregate.",
+      "attributableCheckedTasksThisRun": 5,
+      "concurrentTaskChangesAttribution": "This pivot run includes WFU-07 btree_gin decision, WFU-08 FeaturePacketV1 proof, TOPO-03 invariants, TOPO-06 graph contract, and TOPO-05 OAK traversal owner. WFU-07 Bitmap/AIO remains partial; WFU-02 source adapters remain open."
+    },
+    "evidence": {
+      "implementation": "packages/parent-atlas/src/core/language-registry-v1.ts: namespaced owner vocabularies and explicit provenance-bearing alias bindings; RESOLVED/UNMAPPED/UNSUPPORTED/AMBIGUOUS states; read-only and noncanonical output",
+      "focusedValidation": "Parent Atlas TypeScript build passed; language-registry-v1.test.mjs passed 4/4",
+      "btreeGinDecision": "Read-only PG query confirmed btree_gin absent, pg_trgm 1.6 and vector 0.8.3 present; no canonical topic search relation or mixed multicolumn GIN need exists. WFU-07 extension decision closed as NOT NEEDED; Bitmap/AIO plan proof stays open.",
+      "featurePacket": "Added FeaturePacketV1 in the existing semantic-contracts owner over DomainFeaturePacketSchema; lineage fields, topic/domain/language evidence, packet-key and feature-revision parity, noncanonical flags, and deterministic checksum are tested. Shared canonicalHashJSON was corrected to recursively sort keys and preserve nested fields. TypeScript build and focused tests pass 7/7.",
+      "taxonomyInvariants": "Live read-only taxonomy audit: 5,527 unique nodes, one root, 0 missing parents, 0 hierarchy cycles; branching-forest true. Each typed relation is acyclic; multi-parent targets PART_OF=408, IS_A=8, INHERITS_FROM=8. TOPO-06 records the per-relation contract; focused fixtures 3/3 passed.",
+      "bitmapAio": "A rolled-back 32,768-row temporary fixture selected BitmapAnd by default across independent domain_id and language_id B-tree indexes; FTS and active remained residual filters. PG 18.4 worker AIO capability confirmed, pg_aios in-flight count 0; AIO execution not observed. Live domain_taxonomy_v1 and atlas_packets canonical=true cohorts are empty, so WFU-07 remains partial. Receipt: docs/reports/wfu-bitmap-aio-fixture-v1.json.",
+      "oakTopology": "TOPO-05 proved: atlas_oak_kernel.py routes through its read-only PostgreSQL traversal or OboGraphInterface; oaklib 0.7.4 has a NetworkX conversion bridge but no registered NetworkX adapter. Added route-spy test; 9/9 OAK tests pass. Receipt: docs/reports/topology-oaklib-owner-v1.json.",
+      "openSpecValidation": "npx openspec validate parent-atlas-workboard-feature-utility-fabric --strict — valid",
+      "diffCheck": "git diff --check on the scoped files — passed",
+      "scopeLimit": "No language owner adapters or production detection call sites are wired. WFU-02 remains unchecked until existing owner vocabularies are ingested without duplicating their alias maps.",
+      "nextGate": "LANGUAGE_REGISTRY_SOURCE_VOCABULARY_ADAPTERS_PROVEN; WFU-07 needs a production-shaped active domain/source cohort and cold AIO observation"
+    },
+    "writes": {
+      "postgres": 0,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0,
+      "graphify": 0,
+      "canonicalAuthority": false,
+      "promotionAuthorized": false,
+      "containerRebuilds": 0
+    },
+    "patchTargets": [
+      "packages/parent-atlas/src/core/language-registry-v1.ts",
+      "packages/parent-atlas/src/index.ts",
+      "packages/parent-atlas/test/language-registry-v1.test.mjs",
+      "docs/reports/language-registry-v1.json",
+      "docs/reports/feature-packet-v1.json",
+      "docs/reports/wfu-btree-gin-decision-v1.json",
+      "scripts/atlas/audit-taxonomy-forest-invariants-v1.mjs",
+      "scripts/atlas/taxonomy-forest-invariants-v1.mjs",
+      "scripts/atlas/taxonomy-forest-invariants-v1.test.mjs",
+      "docs/reports/taxonomy-forest-invariants-v1.json",
+      "docs/reports/wfu-bitmap-aio-fixture-v1.json",
+      "docs/reports/topology-oaklib-owner-v1.json",
+      "python/test_atlas_oak_kernel.py",
+      "openspec/changes/parent-atlas-workboard-feature-utility-fabric/tasks.md"
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.agentic-error-fixing-openspec-alignment.v2",
+  "status": "PROVEN_READ_ONLY",
+  "scope": "plan-and-smoke-only",
+  "controller": {
+    "source": "docs/reports/openspec-execution-controller-v1.json",
+    "population": "allTasks",
+    "selectionRule": "ACTIONABLE-only plus completion-envelope and authority-text revalidation",
+    "completionEnvelopeValidation": true,
+    "controllerSummary": {
+      "totalTasks": 9143,
+      "proven": 5816,
+      "actionable": 2309,
+      "waiting": 912,
+      "deferred": 106,
+      "writesPerformed": false
+    },
+    "currentP10Selection": "WAITING_ON_AUTHORITY"
+  },
+  "auth": {
+    "sessionRequired": true,
+    "explicitDevelopmentBypass": "ERROR_AGENT_DEV_BYPASS=true",
+    "bodyUserMismatchRejected": true,
+    "fallbackUserIdRemoved": true
+  },
+  "gan": {
+    "created": true,
+    "wired": true,
+    "proven": true,
+    "done": false,
+    "proofRefs": [
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.ts",
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.spec.ts",
+      "sveltekit-frontend/src/lib/server/ai/error-agent/openspec-controller.integration.test.ts",
+      "sveltekit-frontend/src/routes/api/ai/error-agent/+server.ts",
+      "focused-vitest:12-pass",
+      "okf-node-test:2-pass"
+    ],
+    "promotionAuthorized": false
+  },
+  "okfClaimAudit": {
+    "report": "docs/reports/okf-claim-freshness-v1.json",
+    "totalClaims": 34,
+    "validClaims": 0,
+    "unresolvedClaims": 34,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "safety": {
+    "checkboxesChanged": false,
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "arbitrarySmokeCommandsAccepted": false,
+    "planOnly": true
+  },
+  "validation": {
+    "focusedVitest": "12 passed",
+    "okfAuditTests": "2 passed",
+    "controllerProducerSyntax": "passed",
+    "okfAuditSyntax": "passed",
+    "strictOpenSpec": {
+      "graphRetrievalProof": "passed",
+      "openspecTasksAuditFabric": "passed",
+      "prefillRoutingResidency": "passed",
+      "groundedKnowledgeFabric": "blocked: change has no parsed delta specs"
+    },
+    "gitDiffCheck": "no new functional whitespace failure observed"
+  },
+  "nextGate": "PROVE_CURRENT_CONTROLLER_RECONCILIATION_OR_OPERATOR_ACCEPTANCE",
+  "generatedAt": "2026-09-19"
+}

@@ -175,5 +175,46 @@ not applied, still needs explicit go-ahead given the blast radius)**:
 
 - [ ] Decide whether to fix `chrrom/predictor.ts`'s eager singleton (operator call — this pattern
       may be intentional for production warm-start behavior, needs review before changing).
-- [ ] Re-run the FULL 791-file `tests/routes/auto/**` tree (not just the 137-file repaired
+- [x] Re-run the FULL 791-file `tests/routes/auto/**` tree (not just the 137-file repaired
       subtree) after G8 closes, to get a true updated baseline replacing the stale 674/117 number.
+      Interim run 2026-09-21: `tests/routes/auto` (787 files found, not 791): first run 4,273 tests =
+      1,172 pass / 14 fail / 3,087 `it.todo` stubs (about 72% placeholders, not coverage), 11 failing
+      files. After fixes the full-tree rerun = 1,185 pass / 1 fail; that 1
+      (`api/v1/chat/completions` stream test) was then fixed (2 consecutive isolated passes). Full
+      tree not re-run after that last fix at the time.
+      Causes: 2 production bugs (`api/retrieval/go` Zod `.extend()` -> `.safeExtend()`, crashed at import;
+      `lib/server/ai/tool-selection.ts` read `d.points` instead of `d.result.points`, Qdrant tool lane always
+      empty); 4 hook timeouts (`vitest.config.ts` `hookTimeout: 30000`, bare `STACK_TRACE_ERROR`); 8 stale/
+      order-dependent tests (select-tools auth + mock shape, outbox-worker 384->768, system/health port 8080->8090,
+      api/health `not_configured`, gds-status needs `apply:true`, contextual-chat mock path, chat/completions
+      stream test depended on live Redis cache state — now mocked). tsgo: no errors in the two touched sources.
+
+      **Real final baseline, re-run for real (2026-09-22)**: `npx vitest run tests/routes/auto
+      --reporter=json` — 2,646 test suites (2,637 passed / 9 reported failed at the suite level),
+      4,273 tests total = **1,183 pass / 3 fail / 3,087 `it.todo`**. All 3 failures were
+      `STACK_TRACE_ERROR` inside `beforeEach` (`api/evidence/upload`, `api/synthesis/generate`,
+      `api/trpc/[...procedure]`'s 401-unauth tests) — the exact hook-timeout-under-load symptom
+      this file's own Lessons section already documents. **Verified not a regression, not
+      assumed**: re-ran all 3 files in isolation (`npx vitest run <3 files>`) — all 3 pass cleanly,
+      5.4s/6.2s/9.6s respectively, well inside the 30s hook timeout when not contending with 787
+      other files for CPU. **Real, confirmed full-tree result: 1,186/1,186 non-todo tests pass
+      (1,183 + the 3 isolated-confirmed), 0 genuine failures.** This is a real improvement over the
+      prior interim 1,185/1 baseline, not just a re-confirmation — the previously-open
+      `api/v1/chat/completions` fix held, and no new regression was introduced since. `git log`
+      confirms `runtime-contract.ts`'s `ROTORQUANT_MODEL_PATH` eager throw (still present in source,
+      unfixed — see the caller-audit finding immediately below) did not fire in this run because
+      this dev environment's `.env` has the variable set; this remains a fresh-clone risk, not a
+      currently-observable test failure.
+
+      **`runtime-contract.ts` importer census (2026-09-22, read-only, blocks the "correct, complete
+      fix" item above)**: grepped for real importers (`from '$lib/server/llm/runtime-contract'` and
+      equivalent relative-path forms) across `src` and `scripts` — **152 files import this module**,
+      far more than practical to individually audit for reliance on the eager-throw-as-fail-fast-
+      guard behavior in one pass. The task's own caveat ("Requires auditing every current importer
+      first — this pass did not enumerate them") was correct to flag this as unfinished; it is now
+      enumerated (152 files) but **not** individually checked. **Not fixing the lazy-Proxy pattern
+      in this pass** — the surface is too large to safely convert without that per-file check, and
+      an incorrect conversion (removing a guard some caller genuinely depends on) is exactly the
+      kind of silent regression this repo's Duplication Prevention / evidence-laundering rules
+      exist to prevent. Left as a real, now-better-scoped next step, not attempted.
+- [x] TTS-PIPER-WASM-UNRESOLVED-01 (2026-09-21 diagnosed; fixed 2026-09-22 via option (b) from this task's own list — genuinely optional import, no new dependency, no capability decision needed, per CLAUDE.md's "UI bugs are HOT" rule). `sveltekit-frontend/src/lib/services/tts.ts`: replaced the static `import type { PiperWasm } from 'piper-wasm'` with a local `PiperWasmInstance`/`PiperWasmModule` interface (matches only the two members this file actually calls), and replaced the literal `await import('piper-wasm')` with a non-literal-specifier `/* @vite-ignore */` dynamic import (same pattern already used in `granite-docling.ts` for `pdfjs-dist`/`@napi-rs/canvas`), wrapped in its own try/catch that throws a clear "package is not installed" error instead of letting Vite's import-analysis pass fail the whole module. Evidence: `npx tsgo --noEmit` (project-wide) reports zero diagnostics for `tts.ts` (previously 3: unresolvable module, ArrayBufferLike/ArrayBuffer mismatch, unused-type warning — all fixed). Live-verified against the running dev server: `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5173/src/lib/services/tts.ts` now returns `200` (was the reported `500`), and the served module body contains no `Failed to resolve import` text. Options (a) and (c) from this task's original list were not taken — no new dependency declared, `SimpleWorkingChat.svelte`'s import of `ttsService` is unchanged.

@@ -1,0 +1,3121 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:32:32.985Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 500,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 500,
+  "skippedUnsupported": 57,
+  "byFileKind": {
+    "markdown": 391,
+    "json": 52
+  },
+  "filesProcessed": 443,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 14030,
+  "totalSymbolsInserted": 14030,
+  "plan": [
+    {
+      "fileId": "5c3658de-f918-49ef-bf1c-318d3e030f3f",
+      "sourceRef": "docs/CONSOLIDATION-COMPLETION-REPORT-JUNE-15.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "361bdb31-ee15-4020-adc0-b035e3fb9e19",
+      "sourceRef": "docs/CONSOLIDATION-DOCKER-HARDENING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "c93b2143-4147-45ff-ab4f-d78f502bef89",
+      "sourceRef": "docs/CONSOLIDATION-GEMMA4-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 62
+    },
+    {
+      "fileId": "58498c61-19e9-4fd1-9e9b-54f1fa2af4df",
+      "sourceRef": "docs/CONSOLIDATION-IMPLEMENTATION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 48
+    },
+    {
+      "fileId": "0e3aa0e2-3628-4404-9fb6-08e1bcd1d2c9",
+      "sourceRef": "docs/CONSOLIDATION-PASS-1-AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "6f1f658d-91ff-4d17-9ae8-924fba8324e7",
+      "sourceRef": "docs/CONSOLIDATION-PHASE-B-TYPESCRIPT-MODULES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "f347e1a1-731f-4f25-8699-46e7c8482fcb",
+      "sourceRef": "docs/CONSOLIDATION-PHASE-OPTION-B-REPO-SCANNING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "54f7f772-5b5d-4c9b-bb0d-0ee2eb67a15d",
+      "sourceRef": "docs/contracts/latent64.okf.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 90
+    },
+    {
+      "fileId": "32301e24-72a1-479b-9774-f3cef1e2e3a5",
+      "sourceRef": "docs/contracts/qdrant-payload-v2.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "c1983432-c0b5-4ed7-91ec-5a2d86ae9312",
+      "sourceRef": "docs/contracts/qdrant-payload-v2.schema.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 97
+    },
+    {
+      "fileId": "7060170e-f843-49da-af25-2832a665273f",
+      "sourceRef": "docs/contracts/retrieval-contract.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "db4a5788-7492-4acc-8eeb-698c8d9299de",
+      "sourceRef": "docs/contracts/SCHEMA-DEPENDENCY-INTELLIGENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "e790603b-d574-41b9-ae02-f4292dc60394",
+      "sourceRef": "docs/contracts/tool-router-hmm.okf.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "2b1393f5-22f8-4631-b45e-788d0b7cd4f4",
+      "sourceRef": "docs/CRITICAL-BLOCKERS-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "d4aa902f-f725-4f01-bcfd-bd3e91ae4aab",
+      "sourceRef": "docs/CRITICAL-CORRECTIONS-CANONICAL-IDENTITY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "23f05131-a5e6-4240-b964-c74adb457c6e",
+      "sourceRef": "docs/CROSS-DIRECTORY-SCRIPT-AUDIT-2026-07-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "baca4996-5f27-4572-afec-64c321e155e0",
+      "sourceRef": "docs/CROSSENCODER-RERANKER-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "59d311c7-9a36-4a93-a378-a00dd43c9f93",
+      "sourceRef": "docs/CUVS-RESEARCH-INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "c2b5e8e1-0bbe-46fb-a9dc-b72f9f780be5",
+      "sourceRef": "docs/DAILY-GRAPHIFY-MASTRA-WORKFLOW.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "5c9ecf55-f285-48b6-be9a-fde0dd778474",
+      "sourceRef": "docs/DASHBOARD-KV-CACHE-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "a31d5002-1661-43b9-804f-14956130e64a",
+      "sourceRef": "docs/DEEP-RESEARCH-ADMIN-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "546085ec-313a-4cec-88e2-255023d1b1bc",
+      "sourceRef": "docs/DEEP-RESEARCH-COMPLETION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "2b717206-4bbc-4a5b-b4cf-de75b44db4af",
+      "sourceRef": "docs/DEEP-RESEARCH-INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 46
+    },
+    {
+      "fileId": "0d9f3af6-5497-453c-a7c9-a56daf507e6b",
+      "sourceRef": "docs/DEEP-RESEARCH-OPTION-B-MINIMAL-SWAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "80fb4139-5459-41d7-84b4-be423269e395",
+      "sourceRef": "docs/DEEP-RESEARCH-SEARXNG-COMPILATION-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "57e8d4e7-ded8-44da-b413-8a924ae30a24",
+      "sourceRef": "docs/DEEP-RESEARCH-TASK-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "844a8b16-8b91-44e1-9c0b-aee05c9c6e64",
+      "sourceRef": "docs/DEPLOYMENT-SUMMARY-THREE-TIER-SEARCH.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "dcd6798d-0ffd-4c43-bf7b-d8ec77cfa94a",
+      "sourceRef": "docs/design/subgraph-instruction-programming-kag-ace-topology-todo.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "6577b5b6-bc49-46f3-9ee8-1bdbb1504f89",
+      "sourceRef": "docs/DEVELOPER_STRATEGY_GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "0032939c-48d2-4af6-a259-08533335e021",
+      "sourceRef": "docs/devtools_rg.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "6d714be8-7be3-4023-9529-26c502607928",
+      "sourceRef": "docs/dimension-policy.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "d9dc1103-1fcf-469a-ae11-2baf531e0eb6",
+      "sourceRef": "docs/DISK-SPACE-INCIDENT-ANALYSIS-2026-07-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "72481f4c-2688-4baa-b435-620a41fa9c85",
+      "sourceRef": "docs/DISPATCHER-9-NODE-PIPELINE-EXPLAINED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "9fe666e3-920f-4cdd-bf8a-53638d00757d",
+      "sourceRef": "docs/DOCKER_CONTAINER_STACK_2026-06-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "4df48741-5c0e-4806-b3fc-01794a3d2d65",
+      "sourceRef": "docs/DOCKER_DOCUMENTATION_INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "c3b8657e-16da-4968-b00a-b352e6e19cfa",
+      "sourceRef": "docs/DOCKER-INCIDENT-AUDIT-JUNE-28-2026.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "34371913-7aa3-44de-9b43-cf51382436f4",
+      "sourceRef": "docs/DOCKER_PREVENTION_AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "16d25baa-eebf-44d5-97dc-b509890c96d8",
+      "sourceRef": "docs/DOCKER_STARTUP_GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 60
+    },
+    {
+      "fileId": "1b49710d-1f42-473a-8b24-243dbf9204fa",
+      "sourceRef": "docs/DOCKER_STATUS_LIVE_2026-06-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "f32d3b3f-4593-4a57-8c3a-762d85d7cf37",
+      "sourceRef": "docs/DUCKDB-ATLAS-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 50
+    },
+    {
+      "fileId": "5ccc9f8c-750b-4329-8807-8d8e6709e137",
+      "sourceRef": "docs/DUPLICATE-DIRECTORY-ARCHIVAL-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "74cfa4a5-9ca3-4884-a514-dbb04464711a",
+      "sourceRef": "docs/EMBEDDING-CONSOLIDATION-ACTION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "84ae68b7-df83-41e1-88e1-3d8542a421aa",
+      "sourceRef": "docs/EMBEDDING-DIMENSION-AUDIT-2026-06-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "eaf0aa9d-6677-4041-85a0-9b6f0bacab5b",
+      "sourceRef": "docs/EMBEDDING-DIMENSION-CONSOLIDATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "b6e81a4b-039a-493f-a34f-d6218eb81139",
+      "sourceRef": "docs/EMBEDDINGGEMMA-COMPLETE-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "87226bb2-bf61-480c-9b4b-cc54a8444934",
+      "sourceRef": "docs/EMBEDDINGGEMMA-DIMENSION-MATRIX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "7989ee15-a79c-4d03-b4c0-5ca5683ca26c",
+      "sourceRef": "docs/EMBEDDINGGEMMA-VARIANTS-INVENTORY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 49
+    },
+    {
+      "fileId": "69518204-2cc9-439e-adac-32eef5c03381",
+      "sourceRef": "docs/EMBEDDINGGEMMA-VERIFICATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 85
+    },
+    {
+      "fileId": "5f40cea9-cd64-44f2-bc00-133706498ea6",
+      "sourceRef": "docs/EMBEDDING-GPU-ACCELERATION-OPTIONS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "324d3542-6563-43dc-96e4-7d9d892c2e8e",
+      "sourceRef": "docs/EMBEDDING-MODEL-DIMENSION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "a03aed8d-501e-445a-b860-0dd44a3d8fa1",
+      "sourceRef": "docs/EMBEDDING-PIPELINE-VALIDATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "e05a2d01-8bd6-45cc-a7e8-85e2bdd4e1b7",
+      "sourceRef": "docs/EMBEDDING-SERVICE-ARCHITECTURE-REVIEW.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "4bd2cdb4-ea6d-4a91-94dc-9d1d7b166727",
+      "sourceRef": "docs/EMBEDDING-SERVICE-BOUNDARY-PROBE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "613b93da-0527-465c-8818-1b52022a1eff",
+      "sourceRef": "docs/EMBEDDING-SERVICE-FIX-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "771aee39-69ad-434f-94c7-24d2b3a6b1a2",
+      "sourceRef": "docs/EMBEDDING-SERVICE-ONNX-INTEGRATION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "37e5150f-b71e-4727-9666-65e1e6674e80",
+      "sourceRef": "docs/EMBEDDING-SERVICE-P0-FINGERPRINT-WIRED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "60be90b6-d44f-4892-bad2-d2fbfa86bbfe",
+      "sourceRef": "docs/EMBEDDING-SERVICE-PHASE-106-ALIGNMENT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "90935389-c0e0-4aac-8978-aca67307b433",
+      "sourceRef": "docs/EMBEDDINGS-ONLY-OLLAMA-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "601a1a65-ae6d-488f-a314-8db44d89a1b7",
+      "sourceRef": "docs/EMBEDDINGS-ONLY-OLLAMA-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "502422a5-a54f-46ae-9809-e6fbdab5b6f5",
+      "sourceRef": "docs/EMBEDDING-TRUNCATION-STRATEGY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "e3a27875-3653-4b68-915c-b18c8234c435",
+      "sourceRef": "docs/ENGINEERING_RULES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "60f9c9e0-1904-488c-b4ee-5413f17c772c",
+      "sourceRef": "docs/ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "39afde56-bc96-4920-aefc-b0434c792761",
+      "sourceRef": "docs/engram-cache-architecture.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "d3ff07de-d73c-4ad6-a8dc-ef81d441c10f",
+      "sourceRef": "docs/ENGRAM-FILES-INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 40
+    },
+    {
+      "fileId": "32e9024f-6d03-4014-b55f-faaa956c8b15",
+      "sourceRef": "docs/engram-offline-processing-pipeline.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 170
+    },
+    {
+      "fileId": "7dd6e886-20ea-443a-9748-4cbdb2357743",
+      "sourceRef": "docs/ENV-FIXES-QUICK-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "f2195973-f895-482d-9bd7-c233660b37c8",
+      "sourceRef": "docs/ENV-FIXES-QUICK-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "e982a4dc-9815-4a27-94ea-7ee2d45d3344",
+      "sourceRef": "docs/ENVIRONMENT_CONNECTION_REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 94
+    },
+    {
+      "fileId": "b99fa1ed-6817-4eb4-a0a2-e386b390da8e",
+      "sourceRef": "docs/ENV-SERVICE-DEPENDENCIES-DIAGNOSTIC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 65
+    },
+    {
+      "fileId": "e3a0c864-c050-47a0-b791-0765b6dad7fd",
+      "sourceRef": "docs/ENV-SERVICE-DEPENDENCIES-DIAGNOSTIC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 65
+    },
+    {
+      "fileId": "7878923e-46a6-47cb-ab28-133c83164457",
+      "sourceRef": "docs/error-analysis-architecture.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "524de334-d630-415a-ba63-3b6dedbb2811",
+      "sourceRef": "docs/EXECUTION-READINESS-FINAL.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 80
+    },
+    {
+      "fileId": "e898e14f-81f1-462e-b174-9ce4801ee4c3",
+      "sourceRef": "docs/FEATURE-ALIGNMENT-SPECIFICATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "55b1310a-8436-4678-a863-b2886ab772d0",
+      "sourceRef": "docs/feature-pillar-barrel-migration.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "bcf2ebf6-4535-4884-afc3-473937747a8f",
+      "sourceRef": "docs/FEATURE-TRACKING-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "7f1628cc-4711-485b-ac96-c2a288739872",
+      "sourceRef": "docs/feedback-loops-a-b.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "c312ecd6-e784-4f8d-af2a-a4105b01fdc5",
+      "sourceRef": "docs/FINAL-SESSION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "25e7007f-fe2a-4260-a81e-2ed757351ffa",
+      "sourceRef": "docs/FOUR-LANE-PROOF-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "b3fee947-b745-4748-a9ee-8faefcca20a6",
+      "sourceRef": "docs/FOUR-LANE-PROOF-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "a4803987-bf17-49df-8e92-3b5d28adab96",
+      "sourceRef": "docs/GAN-DEEP-AUDIT-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "7d5763d7-9979-48b3-8e80-ea8b0870d185",
+      "sourceRef": "docs/GATE-12-EXECUTION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "0316cac7-9e16-421a-8532-25f4e8ab9474",
+      "sourceRef": "docs/GATES-1-5-COMPLETION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "bc2f7f4c-43ce-496f-b565-446d0ed96bd7",
+      "sourceRef": "docs/GEMMA4-ACCELERATION-STRATEGIES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 96
+    },
+    {
+      "fileId": "66025769-4e70-4254-bfa5-e9db73f3581f",
+      "sourceRef": "docs/GEMMA4-FEATURE-REGISTRY-COMPREHENSIVE-ANALYSIS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "7289f68c-0a41-46a7-917d-32332e115aa6",
+      "sourceRef": "docs/gemma4-function-calling-setup.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 47
+    },
+    {
+      "fileId": "2aba42c9-bf94-405f-a522-185449497b57",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "f97fb9f4-9103-45df-96f4-ec6e30ce3e2a",
+      "sourceRef": "docs/GEMMA4-ROTORQUANT-PRODUCTION-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 63
+    },
+    {
+      "fileId": "232aa2d3-b27e-46d0-9530-f93d16661306",
+      "sourceRef": "docs/GEMMA4-TRACE-MCP-TOOLSETS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "0ad86d2d-56c2-47ba-b867-d02670af8416",
+      "sourceRef": "docs/GO-EMBEDDING-SERVICE-VALKEY-AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "74752642-43c1-4054-ad8c-073510583204",
+      "sourceRef": "docs/go-retrieval-engine-architecture.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "292169d4-461b-4739-b9a1-b701a98a637e",
+      "sourceRef": "docs/GO-RETRIEVAL-FACADE-WIRING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "e0200be2-e276-44c3-85ae-92b323b44580",
+      "sourceRef": "docs/GO-RETRIEVAL-INTEGRATION-WIRED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "194fc244-43e3-48de-ace1-dbc6868e043c",
+      "sourceRef": "docs/GO-RETRIEVAL-INTEGRATION-WIRED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "621f679f-1c4a-471b-a3dd-ede9ee7d71c1",
+      "sourceRef": "docs/graph/atlas-write-manifest.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "c953f87d-d0aa-4899-bb45-1150228c7c3a",
+      "sourceRef": "docs/graph/atlas-write-scale-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "61f716e9-1c81-4f16-a531-f2f46820daa8",
+      "sourceRef": "docs/graph/batch-gpu-analysis-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "200ccd7e-3559-42e3-a8ba-b4d4d01e25e0",
+      "sourceRef": "docs/graph/batch-gpu-analysis-report.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "d3e58004-cd5d-45d7-bf50-5b11d146f188",
+      "sourceRef": "docs/graph/codebase-feature-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1591
+    },
+    {
+      "fileId": "788aa693-f887-4b55-923c-a655e41c9829",
+      "sourceRef": "docs/graph/codebase-semantics-neo4j-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "d60d556e-972e-4db4-b706-d2cb3f73c53c",
+      "sourceRef": "docs/graph/contract-error-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "653d3229-4fe3-4be6-b37e-5b9a2d34d925",
+      "sourceRef": "docs/graph/directory-role-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "2eb448ca-d664-4c02-8e46-0d90739f6b59",
+      "sourceRef": "docs/graph/error-fix-proposals.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "d14c8328-b28d-42ae-a415-dcbcc4d5392d",
+      "sourceRef": "docs/GRAPHIFY-DOWNSTREAM-ORCHESTRATOR.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 48
+    },
+    {
+      "fileId": "874cbbeb-9ae0-4c7d-b463-008b61b0264b",
+      "sourceRef": "docs/GRAPHIFY-GSD-INTEGRATION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 54
+    },
+    {
+      "fileId": "8b576de9-912c-4614-bff1-da5d8779a380",
+      "sourceRef": "docs/GRAPHIFY-IMPLEMENTATION-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 56
+    },
+    {
+      "fileId": "4672f953-f6c8-4c66-a954-fc22b3dd77ed",
+      "sourceRef": "docs/GRAPHIFY-IMPLEMENTATION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "fdb5d4a3-c922-4e3b-b0aa-5fedff385c2b",
+      "sourceRef": "docs/GRAPHIFY-SAFETY-ENHANCEMENTS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "cb88b3c7-dbe8-4988-bb3c-442c14b4ffeb",
+      "sourceRef": "docs/GRAPHIFY-SCHEMA-VALIDATION-DEDUPLICATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "f88d3bff-2553-4ac1-b5e4-a2f134d580f4",
+      "sourceRef": "docs/GRAPHIFY-STAGE-0-5-EXECUTION-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "846c453d-64e6-49cf-b2be-cef67ec575d1",
+      "sourceRef": "docs/GRAPHIFY-STAGES-0-5-EXECUTION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "84f6e3e7-92c6-454e-86a0-12173c076bf1",
+      "sourceRef": "docs/GRAPHIFY-STAGES-0-5-GATE-STATUS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "927fcf83-1717-40ce-b19e-8a990f365517",
+      "sourceRef": "docs/GRAPHIFY-WIRING-COMPLETE-MANIFEST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "5b326f05-8ed9-441a-81c7-65bc98169cc6",
+      "sourceRef": "docs/GRAPHIFY-WORKFLOW-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "dda76dab-aa16-4d1a-bc23-a34acf7d8f11",
+      "sourceRef": "docs/graph/kanban-board.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "86c2a5f3-dc61-41a8-893d-df617a9a983d",
+      "sourceRef": "docs/graph/karpathy-synthesis-scale-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "67320b11-b786-4665-a4d1-2b679ab399ee",
+      "sourceRef": "docs/graph/missing-features-path-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "60cd08e5-3d23-4798-b600-1785d653267b",
+      "sourceRef": "docs/graph/missing-features-path-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "dd42c7c9-0e2c-46bd-bef4-1ee03646a3d9",
+      "sourceRef": "docs/graph/programming-doc-feature-gap-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "b773a281-4cf0-4af3-a2eb-b93bc158056b",
+      "sourceRef": "docs/graph/programming-docs-ingestion-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "b107bde9-db7f-449f-ac9b-955850c4e5b2",
+      "sourceRef": "docs/graph/programming-doc-sources.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "620dfb32-bee2-4579-a495-3fd2275b1cb3",
+      "sourceRef": "docs/graph/qdrant-cluster-tag-audit.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "c75679f7-659a-4c23-b55d-d3a579c70aae",
+      "sourceRef": "docs/graph/qdrant-cluster-tag-audit.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "bf71625c-f35e-4653-aed5-5f45a73d4e6b",
+      "sourceRef": "docs/graph/repo-engram-memory-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "d6f7d105-115a-4482-aae8-e00be8a6658f",
+      "sourceRef": "docs/graph/repo-engram-memory-report.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "3939df16-3e42-49d8-bbdc-66d8355f812c",
+      "sourceRef": "docs/graph/repo-env-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 587
+    },
+    {
+      "fileId": "d29d8fed-03ed-4f0e-afa6-3282a49d36a7",
+      "sourceRef": "docs/graph/repo-env-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "6cc278f2-53ec-4c52-8c09-629d956830b7",
+      "sourceRef": "docs/graph/repo-import-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "dc6c1059-0885-4a16-ab10-4375416f2690",
+      "sourceRef": "docs/graph/repo-import-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "44bba098-766d-4384-8df8-996e8d80085d",
+      "sourceRef": "docs/graph/repo-language-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "bf36b64b-415a-43d0-a71a-8efbfe8bc0c3",
+      "sourceRef": "docs/graph/repo-language-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "54f1786b-03c1-483b-9613-7fc8d92e8b99",
+      "sourceRef": "docs/graph/repo-neo4j-graphrag-report.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "180e06e6-38fd-4a83-8752-ed85c4232df5",
+      "sourceRef": "docs/graph/repo-neo4j-graphrag-report.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "d365d1e4-8fcc-43e3-b2bf-0da5bd0cb93e",
+      "sourceRef": "docs/graph/repo-qdrant-payload-atlas.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "79b24590-83a5-4bbc-af80-fcc21a3dc6dd",
+      "sourceRef": "docs/graph/repo-qdrant-payload-atlas.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "d7716810-9103-461e-a987-a4eb88abc864",
+      "sourceRef": "docs/graph/repo-redis-ace-cards.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "944ed35b-af9a-4a15-8c0d-05a8cfb26716",
+      "sourceRef": "docs/graph/repo-redis-ace-cards.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "ccc29a3c-52f5-4cd0-9424-71aad3e5d418",
+      "sourceRef": "docs/graph/repo-root-atlas.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "556d169d-4aa8-440c-a65c-85f700ee6154",
+      "sourceRef": "docs/graph/repo-sveltekit-route-atlas.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "90c2674a-a281-4d34-b6d7-640c5006b2ed",
+      "sourceRef": "docs/graph/repo-workspace-map.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "6706bb33-c038-48f1-b50e-09aac924aaf3",
+      "sourceRef": "docs/graph/repo-workspace-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "91ac24a8-2a73-4b00-b197-69ba75ac4d11",
+      "sourceRef": "docs/GRPC-PROTO-ALIGNMENT-FIXED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "7fcc5460-878f-4495-961a-3fee5ccff04d",
+      "sourceRef": "docs/guides/proof_depth_track_checklist.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "5086c45d-e1f7-49be-b59e-f6ce748452b9",
+      "sourceRef": "docs/guides/TOOL_GATEWAY_DIAGNOSTICS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "dfd3bac1-9754-40ba-b43c-c4c337745835",
+      "sourceRef": "docs/HANDLER-TODO-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "356c75de-20ec-45b3-8630-324dd269877f",
+      "sourceRef": "docs/HYPERRAG-PROOF-ROADMAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "f0408f11-faf4-4b07-b02f-750766f8d5fd",
+      "sourceRef": "docs/HYPERRAG-PROOF-ROADMAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "7eac0701-7163-4005-9433-11c938f6be35",
+      "sourceRef": "docs/INDEX-REPO-ROOT-FIX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "f6eec80e-c0f0-4f73-866b-0871eadc885f",
+      "sourceRef": "docs/INFRASTRUCTURE-AUDIT-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 51
+    },
+    {
+      "fileId": "1231455b-5012-4857-bfea-edac1a202deb",
+      "sourceRef": "docs/INFRASTRUCTURE-AUDIT-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 51
+    },
+    {
+      "fileId": "25929f9d-c003-4720-87dd-47ec4945b218",
+      "sourceRef": "docs/INFRASTRUCTURE-AUDIT-INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "ebac6a42-5cf0-4ab1-99bf-b62902592dfa",
+      "sourceRef": "docs/INFRASTRUCTURE-AUDIT-INTEGRATION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 57
+    },
+    {
+      "fileId": "14d22cfe-b39c-40e1-95af-e07051b104db",
+      "sourceRef": "docs/INFRASTRUCTURE-GAPS-AUDIT-FIXES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "fd6a3a33-f709-47c0-90d3-c8e7c2b4e9e8",
+      "sourceRef": "docs/INFRASTRUCTURE-ROADMAP-SESSION-80.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "06b8701d-8cb3-4502-8c83-56377f0657e1",
+      "sourceRef": "docs/INFRASTRUCTURE-UPDATE-SUMMARY-JUL29.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "cbedcebc-f60e-435f-aaaf-3d480d743aec",
+      "sourceRef": "docs/INTEGRATION-KITS-SUMMARY-JUL29.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "7ba1d05a-7449-49a9-a170-05cd30d79ad7",
+      "sourceRef": "docs/integration-summary-feedback-loops.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "b20781e0-e18c-4f81-8359-2d89d6c7459a",
+      "sourceRef": "docs/KARPATHY_PIPELINE_ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "d4e7914c-db7c-407b-9de0-bd142d7f0ab5",
+      "sourceRef": "docs/KARPATHY_PIPELINE_ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "e7279c4d-3fa6-43d8-8925-4d393ed61d31",
+      "sourceRef": "docs/KV-CACHE-STREAMING-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 40
+    },
+    {
+      "fileId": "702ea052-a727-44f1-9399-ca1e4c40cf1b",
+      "sourceRef": "docs/lane-12-2-rpc-search-integration.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "cd2b5c57-e641-4964-8246-691456fc4783",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "27ba3bb4-39ca-494a-8b6d-fdc65300e92c",
+      "sourceRef": "docs/LANGGRAPH-OPTIONALIZATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "8f301d6e-6b40-4840-8329-1d87c73e864b",
+      "sourceRef": "docs/LAYER-2-FEATURE-TRACKING-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 58
+    },
+    {
+      "fileId": "ade397f6-f7b6-4e7a-a8cf-802477e4cffd",
+      "sourceRef": "docs/LEARNING-CIRCUIT-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "d6de4a50-f750-4c4d-96be-5f131e49f36a",
+      "sourceRef": "docs/LEARNING-CIRCUIT-OPERATIONAL-STATUS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "7fb5ae30-8ad7-480b-bba8-e9a8be9af862",
+      "sourceRef": "docs/legacy-reference/ai-server-README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "c1276741-9969-4d07-a8a9-d5cee42976df",
+      "sourceRef": "docs/legacy-reference/ARCHIVE_INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "e98b03ed-3207-4704-b123-ad01d6c47498",
+      "sourceRef": "docs/legacy-reference/ARCHIVE_MANIFEST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "c8429a25-c55d-4c7a-b290-d65f2b943d3c",
+      "sourceRef": "docs/legacy-reference/granite-docling-worker-README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 68
+    },
+    {
+      "fileId": "0f3187c1-75d4-460e-96ae-f7ebf1228625",
+      "sourceRef": "docs/legacy-reference/HUGGINGFACE_MODELS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "27c4822b-3fd7-4439-958e-d9d1cb166c3a",
+      "sourceRef": "docs/legacy-reference/ingestion-phase66-README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 75
+    },
+    {
+      "fileId": "8cb21412-4600-48c2-9df0-3982763e87e7",
+      "sourceRef": "docs/legacy-reference/PRODUCTION_AUDIT_2026-03-09.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "97815c6e-9dcb-47be-a7ab-1298070f1011",
+      "sourceRef": "docs/legacy-reference/PRODUCTION_AUDIT_2026-03-15.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "d15ed09b-8eac-48ac-86b7-ebb285f41f39",
+      "sourceRef": "docs/legacy-reference/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "b55ed634-5919-4acc-901b-b9c7101f79ff",
+      "sourceRef": "docs/LEGAL-GGUF-BIFROST-ATLAS-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 46
+    },
+    {
+      "fileId": "b38c7e51-0b90-4536-8eec-8794ec584c95",
+      "sourceRef": "docs/LEGAL-GGUF-BIFROST-ATLAS-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 46
+    },
+    {
+      "fileId": "53b8a4ef-40be-48ec-b423-c45e9d498859",
+      "sourceRef": "docs/LLAMA-SERVER-TURBOQUANT-GATE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "2aae1507-63eb-4c7d-bcca-8eceb2ae1c3a",
+      "sourceRef": "docs/llms/gguf-model-lanes.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "d692df09-ac28-48e6-b293-e8e2af8f8a2d",
+      "sourceRef": "docs/llms/gguf-model-upgrade-plan.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "fcb36a77-9322-42bd-a961-71e1986d3545",
+      "sourceRef": "docs/MASTER-AGENTIC-ORCHESTRATION-SPEC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "ca14b5b4-a7b7-47a1-a835-e73f3d01bd22",
+      "sourceRef": "docs/MASTER-TOC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "003be8c0-e702-4fcf-919e-4cd2b81d6a9f",
+      "sourceRef": "docs/MASTER-TOC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "06868f97-54fc-4aed-a0de-bb82553cf3e6",
+      "sourceRef": "docs/MCP-PHASE-111-SERVER-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "f7d1a550-4adf-40ab-ae8e-1ac4cbd7845f",
+      "sourceRef": "docs/mcp_tool_update_notice.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "352cca90-5421-48a4-9e01-4fce11b90a03",
+      "sourceRef": "docs/mcp-validation-hints.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "af6b6368-2750-4704-99a9-f644a8c4605a",
+      "sourceRef": "docs/metadata-contract-schema.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 63
+    },
+    {
+      "fileId": "f5b23ed6-84c8-4a57-aacc-8ce8da27f717",
+      "sourceRef": "docs/ML-SIDECAR-SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 60
+    },
+    {
+      "fileId": "e45e8d8d-d548-4dd4-a148-a3d872cdabd1",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-EXECUTION-ORDER.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "7baab255-a5d4-4c6e-ae0b-d24fac3cdba0",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-FINAL-STATUS-JUNE-14.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "ffabe8cc-dd96-42f0-8003-723271ad28a6",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-FINAL-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "1d2bdc00-0e7b-4d54-8cfb-ba02eb993bf7",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-GENERATOR-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "e8498a7f-0718-4c4f-b456-a90e6ebf1033",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-NEXT-STEPS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 45
+    },
+    {
+      "fileId": "6138d2aa-3a0f-48d3-9f77-ef1991a052cf",
+      "sourceRef": "docs/MULTIHOP-ENRICHMENT-NEXT-STEPS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 45
+    },
+    {
+      "fileId": "d3552217-c937-496c-8e14-bf74dd91edf8",
+      "sourceRef": "docs/MULTI-VECTOR-EMBEDDING-STRATEGY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 76
+    },
+    {
+      "fileId": "a8f70cdd-afa8-4de1-a2b8-22a3f95f3cfb",
+      "sourceRef": "docs/native/native-gpu-primitives-map.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "bbf2581b-707b-4e71-bf20-cbb7c44f8e44",
+      "sourceRef": "docs/NATS-HANDLER-CONTRACT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "c6b14bc7-63d6-444b-9258-964dc2631282",
+      "sourceRef": "docs/NATS-WORKER-DIAGNOSTICS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 49
+    },
+    {
+      "fileId": "5cc3c950-ef46-4a72-93dc-b388ea889edc",
+      "sourceRef": "docs/NEO4J-AUDIT-QUERIES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "3448af87-6db8-47e9-b8fc-5741f1f4dd1a",
+      "sourceRef": "docs/NEO4J-AUTHENTICATION-TROUBLESHOOTING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "4d0f6407-8c94-4e0a-a90b-7a2f56478921",
+      "sourceRef": "docs/NEO4J-TOPOLOGY-AUDIT-FINDINGS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "100960cd-774c-493e-9257-7d5addd77fb1",
+      "sourceRef": "docs/NEXT-ACTIONS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 54
+    },
+    {
+      "fileId": "ef2c3f70-303b-48ab-a7c1-fe375acb4e2a",
+      "sourceRef": "docs/NEXT-ACTIONS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 54
+    },
+    {
+      "fileId": "819df050-9a3e-485c-9c4b-14eeea21b776",
+      "sourceRef": "docs/NEXT-PRIORITIES-POST-PHASE-DE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "f10dba80-d398-428a-8c33-5b6823e73292",
+      "sourceRef": "docs/NEXT-SESSION-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "fa67abf2-e236-4c15-862b-d41605813231",
+      "sourceRef": "docs/NEXT-STEPS-IMPLEMENTATION-2026-05-29.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "fbe35f77-377a-44c0-b182-ee7b2c210eb2",
+      "sourceRef": "docs/next_steps/litert-conversion-pathway.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "1aee0c7d-6ef6-427f-9266-45b12ba316be",
+      "sourceRef": "docs/OFFLINE-SUMMARY-OPTIMIZATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 79
+    },
+    {
+      "fileId": "5cf57f11-389b-4ee2-8979-f2a74d33fbfe",
+      "sourceRef": "docs/OFFLINE-SUMMARY-OPTIMIZATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 79
+    },
+    {
+      "fileId": "ddb58f5a-cff7-4ec2-9583-3a1c212f80a7",
+      "sourceRef": "docs/.okf/dev/atlas-doc-fabric.manifest.example.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "b7355d81-66b3-49bc-a129-d2c64c823e92",
+      "sourceRef": "docs/.okf/dev/gsd.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "f64f4bd4-f2b2-4c0c-a0d7-5edf41b78df7",
+      "sourceRef": "docs/.okf/dev/index.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "c952d735-0941-4478-bb5d-7b8fae20199d",
+      "sourceRef": "docs/.okf/dev/local-source-inventory.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "7eb4716e-0197-40aa-b282-266f89733111",
+      "sourceRef": "docs/.okf/dev/manifest.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "2d2dad1e-4476-46a9-94bc-95b268e11f86",
+      "sourceRef": "docs/.okf/dev/openwiki-dev-corpus-spec.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "e10a4b21-4e3b-4ba8-b9d8-e0f9a7f161fb",
+      "sourceRef": "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "0ce0ec3a-8504-4ee4-83af-5b7b21193e51",
+      "sourceRef": "docs/.okf/dev/raw/firecrawl/docs-firecrawl-dev-api-reference-introduction-introduction.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "0061ff05-51ba-4c46-a10a-fc636b4bfac9",
+      "sourceRef": "docs/.okf/dev/rtx-louvain-parity.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "c87646de-a86e-48fd-acc3-b2475187639f",
+      "sourceRef": "docs/.okf/dev/summary.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "fe92db08-a250-4a8b-b724-3b3cf8b87e56",
+      "sourceRef": "docs/.okf/dev/symbol-summary.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "d21cce75-72cc-4dfc-9e5b-00e8bc85b247",
+      "sourceRef": "docs/.okf/IMPLEMENTATION_GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "9d920730-373b-4da5-a0fd-89df2352362b",
+      "sourceRef": "docs/.okf/langextract/manifest.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "840c08ff-fec6-4f65-8473-c843438a1d7a",
+      "sourceRef": "docs/.okf/langextract/raw/longer-text-example.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "03ed2c89-3eab-4054-bf50-acc27612c658",
+      "sourceRef": "docs/.okf/langextract/raw/longer-text-example.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "f4ce4d13-bcbc-4ae0-a373-a3b5bdf63e97",
+      "sourceRef": "docs/.okf/langextract/raw/providers.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 46
+    },
+    {
+      "fileId": "8d1014b6-b489-44b5-aa06-b894ebcab210",
+      "sourceRef": "docs/.okf/langextract/raw/providers.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "16531bd6-b12c-411b-9f92-0532705f5a52",
+      "sourceRef": "docs/.okf/langextract/raw/pypi.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "932f7e87-5ed3-4979-b4d7-712dcb46aa55",
+      "sourceRef": "docs/.okf/langextract/raw/pypi.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "53e733f2-cebc-40da-989b-ac718ccc5d29",
+      "sourceRef": "docs/.okf/langextract/raw/pyproject.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "26483b16-bd66-4313-bc3e-f431d26f2da0",
+      "sourceRef": "docs/.okf/langextract/raw/pyproject.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "58ab80e2-c899-4481-9224-9842643dd530",
+      "sourceRef": "docs/.okf/langextract/raw/readme.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "cfa447ad-d0e7-4f98-9fba-d2e1fe2be4e5",
+      "sourceRef": "docs/.okf/langextract/raw/readme.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "0a3a095d-80e1-4bf1-b5e5-81deb56751fb",
+      "sourceRef": "docs/.okf/langextract/raw/releases.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "6325fb66-c71c-441e-99f2-50bed8b007fb",
+      "sourceRef": "docs/.okf/langextract/raw/releases.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "d4f44398-4978-45c6-8513-e1e0d9dbc05c",
+      "sourceRef": "docs/.okf/langextract/raw/repository.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "fab2d0c8-b7b4-46bd-9e9e-fa21898ab7bd",
+      "sourceRef": "docs/.okf/langextract/raw/repository.md.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "082d2b37-51d4-46e6-a8c4-18f053dd80b6",
+      "sourceRef": "docs/.okf/legacy/deeds_lab/archive-plan.example.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "cfc1d7de-52a2-4d07-a17b-e38c6834eb29",
+      "sourceRef": "docs/.okf/library-module-index/index.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "f3103f25-b197-4f7c-8ef7-c737aca5b704",
+      "sourceRef": "docs/.okf/library-module-index/summary.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "d0929a92-4eb8-4c31-8197-6fe5bcd09cca",
+      "sourceRef": "docs/okf/library-module-sources.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "d2e634ff-2424-4d47-a83f-e5f9f74d2774",
+      "sourceRef": "docs/okf/parent-atlas/agent-runtime.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "5ad642e0-3555-4ce4-bbbf-5d0a71ea3d3f",
+      "sourceRef": "docs/okf/parent-atlas/architecture/canonical-authority.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "5bbd3eaa-28cf-464c-ad86-dc3a298fa762",
+      "sourceRef": "docs/okf/parent-atlas/concepts-and-ontology.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "6206744f-d3ee-4724-addf-0e108d754acd",
+      "sourceRef": "docs/okf/parent-atlas/domains-identity.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "174ca653-a44f-418d-8762-fb252a6acb3d",
+      "sourceRef": "docs/okf/parent-atlas/event-pipeline.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "e36d3c36-64c8-462c-9e8d-73a8b8f44198",
+      "sourceRef": "docs/okf/parent-atlas/gaps/agentic-error-fixing.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "8b7d17d1-3c37-4fa3-a85a-77fbc36f7643",
+      "sourceRef": "docs/okf/parent-atlas/gaps/fragmented-representations.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "1565289b-c401-4ff4-9156-545ac737bc4c",
+      "sourceRef": "docs/okf/parent-atlas/gaps/missing-cluster-run-lineage.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "f081aaa0-ce3b-4fcb-982a-9a77610d3101",
+      "sourceRef": "docs/okf/parent-atlas/gaps/missing-concept-edge-ledger.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "eaf517a0-e996-4148-a564-39f29a82d4e6",
+      "sourceRef": "docs/okf/parent-atlas/gaps/missing-domain-lineage.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "9335e7ea-90be-4e8f-818f-db6f8d9f18bb",
+      "sourceRef": "docs/okf/parent-atlas/gaps/missing-library-review.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "e4bb9791-a51b-417c-9b23-1131017a05fc",
+      "sourceRef": "docs/okf/parent-atlas/gaps/missing-som-run-lineage.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "0da9c755-691c-40b5-b1e2-f45986f159c5",
+      "sourceRef": "docs/okf/parent-atlas/gaps/mock-stub-resolution.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "1e41a4fc-81e4-4b6f-a89b-0b5cbdd1c609",
+      "sourceRef": "docs/okf/parent-atlas/gaps/topology-schema-drift.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "21acfd2a-0800-4b87-9590-398062abd94b",
+      "sourceRef": "docs/okf/parent-atlas/graph-analytics.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "f7107411-521e-420e-9fd7-4c8ab3f1314f",
+      "sourceRef": "docs/okf/parent-atlas/index.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "42088ce9-c16d-473e-a380-589bb42f5ccd",
+      "sourceRef": "docs/okf/parent-atlas/integrations/kafka-debezium.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "96b9eb9d-74f5-4a5c-b733-7408bb2a1139",
+      "sourceRef": "docs/okf/parent-atlas/integrations/langfuse.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "a296d52f-a64f-4375-a183-6266d2d26662",
+      "sourceRef": "docs/okf/parent-atlas/integrations/neo4j.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "b0da07bc-f8fe-44df-8f54-f4c88425d9ba",
+      "sourceRef": "docs/okf/parent-atlas/integrations/opentelemetry.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "26e8020c-6919-471d-9f32-5b7b6ad01487",
+      "sourceRef": "docs/okf/parent-atlas/integrations/postgres.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "72ee626f-b8a2-4fab-832f-952fd98d2558",
+      "sourceRef": "docs/okf/parent-atlas/integrations/qdrant.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "e79da011-f780-495f-9913-ee23b3289690",
+      "sourceRef": "docs/okf/parent-atlas/integrations/redis-bitfrost.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "d6954d35-85c3-449b-bb23-0ab3d531fbcb",
+      "sourceRef": "docs/okf/parent-atlas/integrations/trace-mcp.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "9e9d4bbd-995e-4dd5-b910-4b58fcd08db9",
+      "sourceRef": "docs/okf/parent-atlas/log.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "cf332d5f-f26d-48d1-8b20-1880e2dda789",
+      "sourceRef": "docs/okf/parent-atlas/observability.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "8c81bd05-75be-4c5f-8ac4-5d82c2ee57ce",
+      "sourceRef": "docs/okf/parent-atlas/parser-and-symbols.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "610f07e1-0a64-4c03-bf40-01754bc0da9f",
+      "sourceRef": "docs/okf/parent-atlas/representations.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "319d6797-0b4f-4f3c-bbd3-2f02594cf5a5",
+      "sourceRef": "docs/okf/parent-atlas/retrieval-lanes.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "5a267ba7-2579-4a89-9b5b-fd54df0f4da6",
+      "sourceRef": "docs/okf/parent-atlas/topology.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "1baebde1-ff49-45c5-9b87-402b5ad48459",
+      "sourceRef": "docs/okf/parent-atlas/workflows/openwiki-crawl-index.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "cafb3d20-81c4-48b0-9bd8-741ec20e5ec3",
+      "sourceRef": "docs/okf/parent-atlas/workflows/repository-audit.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "af6e620b-6325-476e-90b7-0770fa3a22fb",
+      "sourceRef": "docs/okf/parent-atlas/workflows/wsl2-rapids-source-ref-agentic-workflows.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "56c8600e-19e7-4482-ba33-4cfbadb74b74",
+      "sourceRef": "docs/.okf/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "0383b45b-db19-432f-8ebf-6ccceec06ee7",
+      "sourceRef": "docs/OPENCODE-DISPATCHER-REAL-EXECUTION-PATH.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "67322c8c-701c-4b22-aeef-f4832455ef84",
+      "sourceRef": "docs/opencode-engram-memory-corrected.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "33b81545-0796-4e9c-b764-81aefb1c4c6a",
+      "sourceRef": "docs/opencode-mcp-fixes.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "f5d163d0-0061-46d0-ad54-60e2c2b9bb9d",
+      "sourceRef": "docs/OPENCODE-PHASE-1-ROUTE-ONLY-PROVEN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "352faa7f-4085-4d4a-9dee-cdddd69f80f6",
+      "sourceRef": "docs/opencode/POST_MEMORY_PLUGIN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 0
+    },
+    {
+      "fileId": "0c1401c7-43e5-4801-9401-4352026b7b79",
+      "sourceRef": "docs/opencode/REDIS8_DOCKER.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "e5ce03e2-40d2-4195-9e90-4a7173e30463",
+      "sourceRef": "docs/opencode/SUB-MASTER-FEATURE-TODO-2026-05-27.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "ee0be33e-b760-4de4-87c9-527ad8293d46",
+      "sourceRef": "docs/opencode/TODO.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "ba3299d1-9b18-42b9-818a-402ab1e2e98e",
+      "sourceRef": "docs/OPENCODE-TOOL-CALLING-FIX-AND-WORKFLOW.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "f06a38ce-627f-4532-9625-24f116f425f9",
+      "sourceRef": "docs/opencode/VECTOR_CACHE_SETUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "0bfc61d7-da91-42c3-b901-1bc4a681772a",
+      "sourceRef": "docs/open-lanes/lane-agent-policy.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "2e93dfe1-6a0c-408d-a5c0-3e087ca96d4a",
+      "sourceRef": "docs/open-lanes/lane-contextual-tree.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "2647193c-7165-4b93-9662-8682122cc561",
+      "sourceRef": "docs/open-lanes/lane-memory.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "f14f5a1b-fe05-4ff1-a884-fd2b63b47280",
+      "sourceRef": "docs/open-lanes/lane-packet-contract.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "d5a5d917-6066-40d6-b5ab-fefe993dcf5d",
+      "sourceRef": "docs/open-lanes/lane-packet-enrichment.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "c3fc161b-518d-4d14-96f5-87e16bb56dec",
+      "sourceRef": "docs/open-lanes/lane-retrieval-ranking.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "c0672cae-52de-48e2-80d9-4a47104b7295",
+      "sourceRef": "docs/open-lanes/neo4j-gds-gemma4-orchestration.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "2d3df238-de49-48bd-9a60-28c7c5271703",
+      "sourceRef": "docs/open-lanes/phase-17i-binary-transport-gpu-json.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "6acfa0d6-d5ea-40e0-a27b-46d8460d5e2a",
+      "sourceRef": "docs/open-lanes/phase-3e-1-concept-telemetry.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "b70b8133-5126-4bdb-8030-c1c5fdcbb905",
+      "sourceRef": "docs/open-lanes/phase-3f-agent-trace-distillation.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "3d3fc082-7040-4239-b80a-e84a40a43fe9",
+      "sourceRef": "docs/open-lanes/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 45
+    },
+    {
+      "fileId": "4c0b404c-9020-4578-a82d-3dc1384ae492",
+      "sourceRef": "docs/openspec/BATCH-A-STRUCTURAL-MATERIALIZER.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "c868a2bc-bcb7-4d75-8d51-6b9e33ee343c",
+      "sourceRef": "docs/openspec/BATCH-EXECUTION-STARTUP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 89
+    },
+    {
+      "fileId": "ce782afa-4192-4fdc-b895-08d1b24b2b9a",
+      "sourceRef": "docs/OPENSPEC-CHEATSHEET.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 137
+    },
+    {
+      "fileId": "59982066-db9d-4ae6-b4e3-2c3abffa7c9a",
+      "sourceRef": "docs/OPENSPEC-DUPLICATE-DIRECTORY-AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "5218b342-a4c6-49d5-a7e9-c5d13d0c4645",
+      "sourceRef": "docs/OPENSPEC-INSTALLATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 153
+    },
+    {
+      "fileId": "42d61649-c4a5-4553-90bd-81522f863062",
+      "sourceRef": "docs/OPENSPEC-INTEGRATION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "bc36efad-a24c-4471-bc3e-9593f34d3feb",
+      "sourceRef": "docs/openspec/README.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "1b1aa91f-d6e1-482e-96de-498fa15208b5",
+      "sourceRef": "docs/OPENSPEC-READY-FOR-SESSION-95.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 48
+    },
+    {
+      "fileId": "5201a566-5e90-44dc-a8bf-dc2e4ab649fa",
+      "sourceRef": "docs/OPENSPEC-RETRIEVAL-PIPELINE-2026-07-22.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "3e137fa2-a1c6-4156-a670-a541ff7f0c74",
+      "sourceRef": "docs/openspec/STRUCTURAL-IDENTITY-BATCH-ROADMAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 89
+    },
+    {
+      "fileId": "069aa553-4de8-4216-a3fa-2c5457af7bd8",
+      "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "71890961-9efa-48c0-90e4-7c186dda53e7",
+      "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "7f56d003-1b43-4407-b3bc-740187ccbc95",
+      "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "95e8c212-b13c-489c-9f6d-e84269bf1636",
+      "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "911a6fa0-0678-4233-9026-3dccd3d76729",
+      "sourceRef": "docs/operations/stack-audit-playbook.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "0c1271d2-d7d9-4f99-beef-5f92d999522a",
+      "sourceRef": "docs/operator/atlas-production-roadmap.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "5a41a18b-5656-4474-b52f-1d169cb36792",
+      "sourceRef": "docs/operator/DEPLOYMENT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "39761e51-9353-413d-8fa7-52d792d8e6c9",
+      "sourceRef": "docs/operator/HYPERRAG_INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "c4043282-e86d-4e33-b237-8613b31e5f7f",
+      "sourceRef": "docs/operator/OPERATOR_RUNBOOK.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "a8136d72-ec6f-45b2-80d9-ac0df4d14de8",
+      "sourceRef": "docs/operator/PHASE_18_MESSY_QUERY_ROUTING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "8b28a95d-4a76-49a4-afc7-eab6fd787a79",
+      "sourceRef": "docs/operator/RESILIENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "1a7f5ece-70cb-483b-b2f8-f213dcf60915",
+      "sourceRef": "docs/P0A-COMPLETION-CHECKPOINT-JUNE-15.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "4a1f6194-10c2-4b77-a4f7-2b96bb5e84a6",
+      "sourceRef": "docs/P0-COMPLETION-CHECKPOINT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "aec2cc44-2580-4be5-b7af-45828c6da52a",
+      "sourceRef": "docs/P0-COMPLETION-SUMMARY-JUNE-15.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "8553caa3-36b2-49bc-9770-6e70f7d90c82",
+      "sourceRef": "docs/P0-P1-TRANSITION-CHECKPOINT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "cfef8862-0e31-4763-8b3a-8ae642670f5b",
+      "sourceRef": "docs/P0-P4-PRIORITY-ORGANIZATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "1838813c-2faf-41f7-80c1-ed2a743ef499",
+      "sourceRef": "docs/P1-AGENTIC-ERROR-FIXING-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "7949ebe7-8cdb-4f10-904b-129404df8d70",
+      "sourceRef": "docs/P1-CONSOLIDATION-PROGRESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "38542904-63ba-465c-bb07-1c0158c20fbc",
+      "sourceRef": "docs/P1-ERROR-COLLECTION-WIRING.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "d3fe4d8d-89ad-4f53-ab89-624d433c21b5",
+      "sourceRef": "docs/P1-F-G-H-COMPLETION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "d20b69a4-6fd5-4387-bf97-32a1d8df0203",
+      "sourceRef": "docs/P1H-COMPLETION-JUNE-23.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 18
+    },
+    {
+      "fileId": "70b9c2e1-70df-43bb-8e64-28ff439874a1",
+      "sourceRef": "docs/P1-IMPLEMENTATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "22f62e0c-f91a-43b4-b7d2-1620fe3ca3f0",
+      "sourceRef": "docs/P1-IMPLEMENTATION-TASKS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "3394d173-4200-449c-aace-4d3349543fb1",
+      "sourceRef": "docs/P1-INFRASTRUCTURE-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "092b6c5c-8eaa-4edf-9218-7d814bf7e1f4",
+      "sourceRef": "docs/P1-P2-P3-COMPLETION-JUNE-23.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "64f4f651-825c-4c93-8e8c-1cf238185453",
+      "sourceRef": "docs/P1-PACKAGE-CONSOLIDATION-IN-PROGRESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "8323bad8-1ffc-476d-b717-948fbdc8d220",
+      "sourceRef": "docs/P1-PACKAGE-CONSOLIDATION-IN-PROGRESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "eb8697fd-cd88-49c9-837c-95ed48962016",
+      "sourceRef": "docs/P1-PHASE-2A-TREE-NODES-FIXED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "006fc935-a4b1-4c3a-a036-f74a2619c9a5",
+      "sourceRef": "docs/P1-PRODUCTION-HARDENING-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "89b52a2f-26d1-43c7-977b-c4335a405d76",
+      "sourceRef": "docs/P1-SESSION-86-FINAL-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 29
+    },
+    {
+      "fileId": "7cb89efd-25a5-40d8-b221-0922207416ca",
+      "sourceRef": "docs/P1-TASK-1-QDRANT-TRANSPORT-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "f32a992b-cbf5-45cc-85d7-73ac22df3033",
+      "sourceRef": "docs/P2A-CANONICAL-AST-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "9af43cef-8070-4228-8871-aa301e61cb94",
+      "sourceRef": "docs/P2-CANONICAL-PIPELINE-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 46
+    },
+    {
+      "fileId": "fab5c168-d967-4eef-94f9-08befee4f6bb",
+      "sourceRef": "docs/P2E-EXECUTION-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 96
+    },
+    {
+      "fileId": "63cf4f45-cd94-4eaa-9977-25421a3b5b24",
+      "sourceRef": "docs/P2E-GPU-ENRICHMENT-FLOW.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "d038f761-2169-414c-9f2a-21f9e56f2c0b",
+      "sourceRef": "docs/P2-PHASE-COMPLETION-MASTER.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 47
+    },
+    {
+      "fileId": "e933718b-1992-4496-8e8d-a3b1173d3058",
+      "sourceRef": "docs/P2-PHASE-EXECUTION-READY-SESSION-136-FINAL.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "9c19f773-fa94-4421-8708-f400b88c0c3e",
+      "sourceRef": "docs/P2-PHASE-EXECUTION-SESSION-138.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 47
+    },
+    {
+      "fileId": "f56ec995-7e21-4671-9e90-201d2e13d38d",
+      "sourceRef": "docs/P2-PHASE-EXECUTION-VALIDATED-SESSION-137.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "d3c14bca-3c2a-415b-88c5-30a3bdf3a28b",
+      "sourceRef": "docs/P2-SESSION-136-CONTINUATION-STATUS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "e7aa6897-88a3-436c-910f-eba9214e7144",
+      "sourceRef": "docs/P3G-ACP-AUDIT-CLASSIFY-PIPELINE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "e57c0239-1468-4fa4-948c-a14a9f9aabc0",
+      "sourceRef": "docs/P3G-BACKFILL-ROADMAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "0d3585ea-7bec-4ca0-b765-97a3ece86785",
+      "sourceRef": "docs/P3G-BLOCKING-ISSUES-DECISION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "693f1cfb-c0f3-4044-81c1-3a851125b9ce",
+      "sourceRef": "docs/P3G-CLASSIFICATION-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "e1156849-b5ac-43f1-81b5-066a42060839",
+      "sourceRef": "docs/P3G-EXECUTION-PIPELINE-MAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 39
+    },
+    {
+      "fileId": "b412d77c-eff0-45b1-9f5c-e7f943e43877",
+      "sourceRef": "docs/P3g-EXECUTION-READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "726032c3-118f-4e64-b84b-55238c9cf4cf",
+      "sourceRef": "docs/P3G-LANE-VERIFICATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "0db46547-a50c-472a-b17c-57bef5385d1e",
+      "sourceRef": "docs/P3G-MULTI-VECTOR-METADATA-GAP-ANALYSIS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "98b9f9e1-5860-4aa0-a2eb-a9a5aacde2cd",
+      "sourceRef": "docs/P4-1-ALIGNMENT-AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "7d96483c-2373-48f1-b162-ac4fd03489df",
+      "sourceRef": "docs/P4-ACE-MCP-INTEGRATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 76
+    },
+    {
+      "fileId": "101492b5-c299-4c6d-bf45-c0fe297873c2",
+      "sourceRef": "docs/P4-ACE-MCP-INTEGRATION-GUIDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 76
+    },
+    {
+      "fileId": "57a12439-0878-476a-be89-41c04206da4d",
+      "sourceRef": "docs/P4-EXECUTION-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 52
+    },
+    {
+      "fileId": "c1909538-9b9f-465a-b3e4-7ec7d8d9bf01",
+      "sourceRef": "docs/P4-EXECUTION-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 52
+    },
+    {
+      "fileId": "782defe0-73f0-4414-b51b-a197a7054f0f",
+      "sourceRef": "docs/P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 63
+    },
+    {
+      "fileId": "d45f0af8-9bb0-4e3b-ae46-d52d636dd0e1",
+      "sourceRef": "docs/P4-GRAPH-REFRESH-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "309d9b6e-28cc-4143-aa9e-e5846982269f",
+      "sourceRef": "docs/P4-NEXT-STEPS-COMPLETE-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 126
+    },
+    {
+      "fileId": "c2936dcb-2827-4273-89b7-64e95d58993e",
+      "sourceRef": "docs/P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 57
+    },
+    {
+      "fileId": "59af4a33-a002-4b5e-98ec-16579a9fd822",
+      "sourceRef": "docs/P4-SESSION-81-COMPLETION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "3fbc1ffe-40e8-40b3-8769-d506b4baaf69",
+      "sourceRef": "docs/P4-SESSION-81-COMPLETION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "0850a98f-bc11-4d07-91ba-415a8d1fc623",
+      "sourceRef": "docs/PACKET-CENTRIC-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "221d5b4e-1d2f-43f6-a40b-3ba52ffb7a10",
+      "sourceRef": "docs/PACKET-CENTRIC-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "1ad6e4ef-3b3f-470a-8c6f-f511e7b7bb66",
+      "sourceRef": "docs/packets/rg-toc.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "0f0fe51b-a20f-437b-aa20-f7a222dc7c91",
+      "sourceRef": "docs/parent-atlas-100pct-next-steps.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "e612be1f-8d71-47a5-9c71-2d7c6169f781",
+      "sourceRef": "docs/PARENT-ATLAS-ACCELERATION-AUDIT-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "703deaf0-4433-4754-9d2f-4d6b24079c66",
+      "sourceRef": "docs/parent-atlas/alt-cuda-implementation-notes.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "49849155-0c85-4699-8069-c7d2e3acedd2",
+      "sourceRef": "docs/PARENT-ATLAS-COMPLETION-STATUS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "50e3add8-763a-4e53-892e-277691b987bc",
+      "sourceRef": "docs/PARENT-ATLAS-COMPLETION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "791baf6c-9bdc-4fa8-84c2-5935baae5a38",
+      "sourceRef": "docs/parent-atlas/CONSOLIDATION-CANONICAL-ENVELOPES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "b6c6cd7b-4f2b-4079-8ae1-877397f64e62",
+      "sourceRef": "docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 64
+    },
+    {
+      "fileId": "1838ad66-aec9-4dd8-98a6-6feafb8c4b17",
+      "sourceRef": "docs/PARENT-ATLAS-CONTRACT-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "049802fc-5627-4497-bfd6-2afd64ec5680",
+      "sourceRef": "docs/parent-atlas-graph-algorithm-router.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "30476571-d0fb-4fb4-aa27-32e2e83477a4",
+      "sourceRef": "docs/parent-atlas-hypergraph-rag-integration.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "cc7fce97-beba-4683-b3d7-b17713dc118c",
+      "sourceRef": "docs/PARENT-ATLAS-IDENTITY-OS-LOCKED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "09c8554e-e86a-4d4c-8837-bf051864f11c",
+      "sourceRef": "docs/PARENT-ATLAS-IDENTITY-RECONCILIATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "ce010e36-c165-4321-8a6d-31f89fce6e23",
+      "sourceRef": "docs/parent-atlas/ingestion/INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "8e12fd4a-1ce1-4c6d-87ff-1abc18f8a83d",
+      "sourceRef": "docs/PARENT-ATLAS-KANBAN-CORRECTED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "b9779f1a-e3bf-47c2-9748-20e46723327a",
+      "sourceRef": "docs/parent-atlas/MCP_TOOL_REGISTRY_AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "c17e1fee-715d-4555-bd7f-4234f5b7d007",
+      "sourceRef": "docs/PARENT-ATLAS-OPERATIONAL-COMPLETION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "b33f9dc2-847a-4a6d-96fb-902593824763",
+      "sourceRef": "docs/PARENT-ATLAS-PACKAGE-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "e672666e-101f-4aa5-bd09-ad53d31d6670",
+      "sourceRef": "docs/PARENT-ATLAS-PACKAGE-INTEGRATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 31
+    },
+    {
+      "fileId": "076cf12f-df9d-4205-89e8-7dbf853e1499",
+      "sourceRef": "docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 40
+    },
+    {
+      "fileId": "2532a098-4090-4316-82b9-99908501bb30",
+      "sourceRef": "docs/PARENT-ATLAS-PLUGIN-SCHEMA.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "88951d67-73b1-473e-b81a-a003b39de541",
+      "sourceRef": "docs/PARENT-ATLAS-RUNTIME-IMPLEMENTATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "59b26d0b-f1f5-478f-9e0c-f06962b045a0",
+      "sourceRef": "docs/PARENT-ATLAS-SCHEMA-RECONCILIATION-GATE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "dc4f5008-8d81-4689-bd6c-21cefcb1087e",
+      "sourceRef": "docs/PARENT-ATLAS-STUDIO-REFERENCE-FRAMEWORKS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "ab8b0dc2-fd2f-433b-bd07-619b42478918",
+      "sourceRef": "docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "b04d5926-16ee-4277-9510-32529325ec58",
+      "sourceRef": "docs/PARENT-ATLAS-WIRING-IN-PROGRESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "b5c5d478-b11b-470c-bc96-1f5dc1d3cdd6",
+      "sourceRef": "docs/parent-atlas-workstation-finish-plan.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "b3dbba6d-0e36-4c53-ae03-4628fae34756",
+      "sourceRef": "docs/parent-atlas-workstation-gpu-runtime-backlog.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "17cad5a9-1d2b-4930-9d9b-35438fc0a61d",
+      "sourceRef": "docs/parent-atlas-workstation-todo.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "a8810cea-43de-451f-9a96-23eb90fdf358",
+      "sourceRef": "docs/parent-atlas-workstation-todo.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "7111ae97-b32b-459e-9faa-fa6598eceb8b",
+      "sourceRef": "docs/PASS-1-ALIGNMENT-GLYPH-PACKETS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "a0dc56d6-21d7-43dd-b290-80feb6c7613e",
+      "sourceRef": "docs/PG18-INDEXING-AUDIT-2026-06-28.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "dda2dbfb-6bc2-4880-aef2-00ea7bbcf40a",
+      "sourceRef": "docs/PGVECTOR-AUDIT-NEXT-STEPS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "d9106f7e-0109-4b09-abb2-6512651b087c",
+      "sourceRef": "docs/PGVECTOR-AUDIT-OPERATOR-RUNBOOK.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 99
+    },
+    {
+      "fileId": "6ad4dcff-d5af-40dc-9e56-adb3093b800f",
+      "sourceRef": "docs/PHASE-0-BLOCKER-RESOLUTION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "fa73aafb-800d-4f2a-bbee-d28f66a21eed",
+      "sourceRef": "docs/PHASE-0-DDL-GATE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 17
+    },
+    {
+      "fileId": "b8447d5d-a2bf-41e9-9388-0a76cfcc7d65",
+      "sourceRef": "docs/phase100/consolidation-recommendations.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "5b63b124-0590-435f-952e-29328ad5b6ac",
+      "sourceRef": "docs/phase100/feature-graph-cycles.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "ddc0d222-80db-4659-848e-dd65b9708bc8",
+      "sourceRef": "docs/phase100/feature-graph.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "12c93abe-4a62-4143-95c7-d53914178ed3",
+      "sourceRef": "docs/phase100/feature-recommendations.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "cdf54715-b3f5-4ca6-b724-7e1adedc2555",
+      "sourceRef": "docs/phase100/feature-recommendations.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "f46a51f8-8001-4e9d-bb35-1ee3a0352860",
+      "sourceRef": "docs/phase100/file-consolidation-audit.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "312be1b3-e3db-4f90-a999-72f49e3083b5",
+      "sourceRef": "docs/phase100/nes-multihop-cold-archive-pipeline.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 64
+    },
+    {
+      "fileId": "7d264b72-eb4f-461e-b768-7b0708389baf",
+      "sourceRef": "docs/phase100/source-feature-connections.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 42
+    },
+    {
+      "fileId": "f91f2ea7-7fea-4827-b03d-8312a58f4809",
+      "sourceRef": "docs/PHASE-102-NOUN-RERANKER-OBSERVABILITY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 25
+    },
+    {
+      "fileId": "089ab04e-9271-43b0-a71a-4486e3674b08",
+      "sourceRef": "docs/phase-102-packet-architecture-summary.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "ba66495a-f2be-4718-b45d-d3defa863329",
+      "sourceRef": "docs/PHASE-102-UNIFIED-RETRIEVAL-STACK.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 32
+    },
+    {
+      "fileId": "42561a14-d8fa-449d-b4f7-781bb186d87c",
+      "sourceRef": "docs/PHASE-106-107-EXECUTION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 36
+    },
+    {
+      "fileId": "de83a336-bb79-4999-94d8-8fd3d8a91828",
+      "sourceRef": "docs/PHASE-106-107-EXECUTION-FINAL.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "fdb7edb6-36d5-4fa4-b179-36f2f1837dcb",
+      "sourceRef": "docs/PHASE-106-107-FINAL-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "aab6326b-55cc-422e-aa3d-f80e5686ad50",
+      "sourceRef": "docs/PHASE-106-107-GSD-SPEC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 40
+    },
+    {
+      "fileId": "59735f93-b9a9-482a-b11a-9637986159b2",
+      "sourceRef": "docs/PHASE-106-CANONICAL-INGESTION-ARCHITECTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "ea92df45-1ade-4138-a8a4-57a912544868",
+      "sourceRef": "docs/PHASE-106-EXECUTION-DECISION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "990cef2f-a577-4b90-8b22-bd2b638ddcd0",
+      "sourceRef": "docs/PHASE-106-FINAL-READINESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "96bdc5f6-972f-4fbd-afbe-d80b939f3e27",
+      "sourceRef": "docs/PHASE-106-IMPLEMENTATION-READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "9adb9b24-bdc9-45fc-af79-35188a2b0c26",
+      "sourceRef": "docs/PHASE-106-READINESS-CHECKLIST.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "09de0d79-dc51-47c2-bb17-5def039726db",
+      "sourceRef": "docs/PHASE-106-RETRIEVAL-ARBITRATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "1355a34e-7d15-478f-8449-1123ab1ed93c",
+      "sourceRef": "docs/PHASE-106-STAGE-4-COMPLETION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "b259a4a2-9d45-453a-8076-abf39273d635",
+      "sourceRef": "docs/PHASE-106-STAGE-4-EXECUTION-IN-PROGRESS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 19
+    },
+    {
+      "fileId": "93022eb2-7adc-4fd8-bbe9-97b74d0a3bbb",
+      "sourceRef": "docs/PHASE-106-STAGE-4-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "b798c19b-6643-433c-be7a-7353a41eb4f3",
+      "sourceRef": "docs/PHASE-107A-AUDIT-FINAL.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "aa785841-3576-4c46-950d-666b3d4b9d86",
+      "sourceRef": "docs/phase107-operations/execution-results.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "57d43169-6b6f-4bc5-879b-e773731950c0",
+      "sourceRef": "docs/phase107-operations/execution-summary.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "be2cda9c-52cd-4e70-8c4c-d7c8fe795a21",
+      "sourceRef": "docs/PHASE-107-OPERATIONS-SCHEMA-RECONCILIATION-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "6bc16e7d-2153-4ccc-bcee-c20bfa2887b9",
+      "sourceRef": "docs/PHASE-107-ROADMAP.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 52
+    },
+    {
+      "fileId": "0838b943-b655-4c93-9f62-c104668d0e83",
+      "sourceRef": "docs/PHASE-108-109-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 27
+    },
+    {
+      "fileId": "4c49fb8d-6120-458c-91f4-8904ccbe36b5",
+      "sourceRef": "docs/PHASE-108-111-DEPLOYMENT-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "97eac5c7-2089-465d-9431-ee96ade85558",
+      "sourceRef": "docs/PHASE-108-COMPLETION-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "9494edf7-511e-40f9-8543-84c6f8c60e02",
+      "sourceRef": "docs/PHASE-108D-EXTENDED-IMPLEMENTATION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "9bc4e51f-5305-4272-87bc-68cc2bf5627d",
+      "sourceRef": "docs/PHASE-108D-EXTENDED-IMPLEMENTATION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "a6710896-3bb5-4a9c-81a1-a15512f70550",
+      "sourceRef": "docs/PHASE-108D-FINAL-EXECUTION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 22
+    },
+    {
+      "fileId": "d1970917-c6e6-4c9c-80c3-44ffa5f24628",
+      "sourceRef": "docs/PHASE-108D-INFRASTRUCTURE-VALIDATION-REPORT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "d5438604-9fbd-42de-8118-59625873537f",
+      "sourceRef": "docs/PHASE-108D-PROOF-MATRIX-RESULTS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "67e0218f-c6d3-40f9-8147-6bc0f4d6756d",
+      "sourceRef": "docs/PHASE-108D-SEMANTIC-INTERLINKS-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "64aae2fa-04ee-44eb-8bc1-528651cc7324",
+      "sourceRef": "docs/PHASE-108D-TO-PHASE-17-ALIGNMENT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 53
+    },
+    {
+      "fileId": "1e0a394b-bc0a-4eb0-a480-2f2e77a4fbae",
+      "sourceRef": "docs/PHASE-108E-EXECUTION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    },
+    {
+      "fileId": "2fdffc02-3c44-4f33-843e-4cc8cda9ea41",
+      "sourceRef": "docs/PHASE-108E-SCHEMA-ALIGNMENT-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "e4f768e2-ce64-444d-a444-9bca799ea181",
+      "sourceRef": "docs/PHASE-108-EXECUTION-READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    }
+  ]
+}

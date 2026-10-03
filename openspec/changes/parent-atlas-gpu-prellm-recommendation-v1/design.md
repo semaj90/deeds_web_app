@@ -103,11 +103,10 @@ Not applicable — additive-only, no existing file modified, nothing wired into 
 
 ## Open Questions
 
-- Should the V1 classification lineage (`query-classifier.ts`/`retrieval-plan.ts`) eventually be
-  retired in favor of V2, or are both intentionally permanent parallel lanes? Left to the operator
-  — out of scope here. (As of this addendum, this question is also now entangled with a concurrent
-  session actively rewriting `agentic-file-compiler/`'s `taxonomy-scope-v1.ts`/`query-expansion-v1.ts`/
-  `retrieval-plan.ts`/`prompt-plan.ts` — see Addendum 1 below.)
+- **Resolved 2026-09-24:** retain V1 (`query-classifier.ts`/`retrieval-plan.ts`) as the current
+  production owner. Do not retire it or promote V2 until V2 identity/provenance and shadow parity
+  are proven and a separate cutover is authorized. Current source confirms the HyperRAG route
+  imports V1 while V2 is not wired to a production route.
 - Which of the suggested `AFC-05I`..`AFC-05P`/`RTX-UI-01` proof gates (if any) should be opened
   next, and in what order relative to `parent-atlas-retrieval-lod-algorithm-taxonomy`'s existing
   `BF-LOD-03`–`06` work? Not decided in this change.

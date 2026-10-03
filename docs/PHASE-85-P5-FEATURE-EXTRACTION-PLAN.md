@@ -1,6 +1,6 @@
 # Phase 85 P5: Feature Label Extraction — Implementation Plan
 
-**Objective**: Extract feature labels from packets using existing AST logic + Gemma4 synthesis
+**Objective**: Extract feature labels from packets using existing AST logic + ornith 1.5 llama-server 8090 Gemma4 synthesis
 
 **Effort**: 2-3 hours | **Status**: Ready to execute
 
@@ -87,7 +87,7 @@ Store to atlas_artifacts:
 ### Step 1: Create P5 Audit Script (30 min)
 **File**: scripts/phase85/p5-feature-label-extraction.mjs
 
-**Purpose**: 
+**Purpose**:
 - Count packets with extractable features
 - Test feature-builder on sample packets
 - Report coverage gaps
@@ -150,7 +150,7 @@ Store to atlas_artifacts:
 | Packets with labels | >15,000 (85%) | TBD |
 | Average confidence | 0.7-0.9 | TBD |
 | Symbol coverage | >50% | TBD |
-| Gemma4 usage | <20% | TBD |
+| ORNITh 1.5, not update 9/29/26 Gemma4 usage | <20% | TBD |
 | Hard errors | 0 | TBD |
 | Backfill time | <1h | TBD |
 
@@ -184,8 +184,7 @@ Store to atlas_artifacts:
 **Tier 3 (Infrastructure)**:
 - feature-labels/+server.ts → SvelteKit route only (HTTP boundary)
 
----
 
-**Owner**: Phase 85 P5  
-**Last Updated**: June 28, 2026  
+**Owner**: Phase 85 P5
+**Last Updated**: June 28, 2026
 **Next**: P6 GAN Validation (1.5-2h)

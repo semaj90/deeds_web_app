@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.packet-source-revision-repair-apply-receipt.v1",
+  "manifestRootSha256": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "batchSize": 5,
+  "maxEntries": 5,
+  "intendedTotal": 5,
+  "batches": [
+    {
+      "ordinal": 0,
+      "intended": 5,
+      "applied": 5,
+      "alreadyApplied": 0,
+      "preChecksum": "27e78f21473fd2f8e357d2faab7a8e449d6984fd7ec90f4412d1eae8fdff4a69",
+      "postChecksum": "b01eae4edf9390ea64a6aef08744ef9cf85eb5366ae2f092266481705d29efab",
+      "txid": "6800223",
+      "readback": "PASS",
+      "committed": true,
+      "cumulativeQualified": 5
+    }
+  ],
+  "committedPackets": 5,
+  "alreadyAppliedPackets": 0,
+  "aborted": null,
+  "inverseRootSha256": "0525aa519f2f1cc3236b8ee1c1ed4a3a1485e8f9aa6d653405b294eac5345ac5",
+  "inverseDir": "docs\\reports\\packet-source-revision-repair-v1\\e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3\\inverse-0525aa519f2f1cc3236b8ee1c1ed4a3a1485e8f9aa6d653405b294eac5345ac5",
+  "status": "SOURCE_AUTHORITY_APPLY_COMPLETE"
+}

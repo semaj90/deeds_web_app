@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.july-gemma4-summary-trace.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "tracedAt": "2026-09-25T21:11:19.215Z",
+  "userContext": "early July 2026 Gemma4 batch summaries; Colab batch; upsert into PostgreSQL 18; go-retrieval dense-search indexing after index+embedding",
+  "lanes": [
+    {
+      "lane": "A: codebase_chunk_index Phase 7 RabbitMQ workers",
+      "rows": 39151,
+      "evidence": {
+        "writer": "sveltekit-frontend/scripts/atlas/phase7-rabbitmq-summary-queue.mjs (UPDATE codebase_chunk_index SET summary, updated_at only, WHERE summary empty)",
+        "model": "summary_model NULL on all 39,151 (writer never sets it); worker default env is ornith-1.5-9b today, hforf/gemma4 in July",
+        "chunkIds": "39,114 start with \"card:\", 37 have null source_ref",
+        "indexedAt": "2026-04-20..2026-05-15 (chunks); updated_at bumped 2026-08-25 (17,993) and 2026-09-13 (21,121) by later passes, so updated_at is NOT the generation date",
+        "summaryHash": "sha256 64-hex present on all (derived later)",
+        "revision": "source_revision/workspace_revision NULL on all 39,151",
+        "sourceRefForm": "sveltekit-frontend-relative (\"src/lib/...\"); only 232 rows match the repo-root cohort exactly, 35,309 match only after prepending \"sveltekit-frontend/\" (diagnostic, not used as identity)",
+        "distinctSourceRefs": 3201,
+        "packetLink": "all 39,151 have an atlas_packets row with the same source_ref, but packet.summary equals chunk summary on 0 rows: chunk summaries were never propagated to packets"
+      }
+    },
+    {
+      "lane": "B: phase8-5 sanitizer + quarantine",
+      "rows": 10416,
+      "evidence": {
+        "script": "scripts/atlas/phase8-5-sanitize-summaries.mjs (committed 2026-07-02)",
+        "quarantinedAt": "2026-07-03T05:28Z",
+        "reason": "gemma4_reasoning_or_meta_leak (<|channel>thought... in summary text)",
+        "state": "metadata.summary_status=REGENERATE on all 10,416; summary text was rewritten in place (current md5 differs from recorded leaked md5 on all; 0 still leak) but rows were never regenerated",
+        "residual": "63 unquarantined rows still match leak/meta markers"
+      }
+    },
+    {
+      "lane": "C: atlas_summary_layers gemma4_offline (Colab/offline)",
+      "rows": 3459,
+      "evidence": {
+        "generatedAt": "2026-07-04 (3,459 rows, 3,344 packets)",
+        "model": "gemma4-legal-iq4xs-direct.gguf, layer_type gemma4_offline",
+        "writerCandidate": "sveltekit-frontend/scripts/atlas/import-colab-summaries.mts (writes atlas_summary_layers + analysis_pass_results keyed by packet_key; committed 2026-06-30); not confirmed as the exact writer",
+        "colabBundle": ".tmp/colab-parent-atlas/ exported 2026-06-30 (atlas_summary_layers.ndjson 85MB); no colab-export/summaries.jsonl on disk",
+        "packetLink": "all 3,459 join a packet that has a summary; packet.summary equals layer summary on only 388; all 3,459 packets have embedding_eligible=false; 949 have source_revision",
+        "quality": "sampled rows contain meta text (\"Example 1 (Concise)\", \"How would you describe...\") and are for backup/fixture files"
+      }
+    }
+  ],
+  "tableTotals": {
+    "codebase_chunk_index": {
+      "total": 274465,
+      "summarized": 40306,
+      "noModel": 39151,
+      "gemma4Named": 1155,
+      "withSourceRevision": 0
+    },
+    "atlas_summary_layers": {
+      "total": 18437,
+      "distinctPackets": 13272,
+      "withPacketSourceRevision": 5210
+    }
+  },
+  "claimsCorrected": [
+    "CLAUDE.md July 4 \"39,151 summarized, 0 contaminated, 100% clean\" checked only <end_of_turn>/<thinking>/<start_of_turn>; the quarantine run one day earlier had already flagged 10,416 (26.6%) for <|channel>thought leakage",
+    "\"summary present\" on chunks carries no revision, so it cannot be revision-qualified"
+  ],
+  "hypothesis_unproven": "The ~3,295 real packet embeddings (qualified cohort) plausibly derive from the 3,459 July-4 layer summaries copied to packets; only 388 are byte-identical so lineage is unproven",
+  "openQuestions": [
+    "which script/notebook produced the 2026-07-04 atlas_summary_layers batch and whether go-retrieval indexed them",
+    "how summaries reached atlas_packets.summary for the 3,459 packets and whether embeddings were built from them",
+    "whether the 12,399 placeholder-vector packets ever had summaries"
+  ],
+  "implication": "The July corpus is chunk-level, modelless, unrevisioned, and partly quarantined; it can seed a cohort for regeneration but cannot be counted as revision-qualified summaries. Regeneration must be lineage-bound (source_revision) per CEI-05.",
+  "july4SpoolFileFound": {
+    "file": ".tmp/gemma4-summaries-5k.ndjson (gitignored; 4.1 MB; mtime 2026-07-04)",
+    "rows": 4998,
+    "keys": [
+      "packet_key",
+      "source_ref",
+      "summary",
+      "status",
+      "provenance"
+    ],
+    "provenance": {
+      "source": "gemma4-llama-server (4998)",
+      "endpoint": "http://127.0.0.1:8090/v1/completions (raw completions, not chat)",
+      "status": "success on all"
+    },
+    "match": {
+      "layerRowsJuly4": 3060,
+      "coveredByFile": 3060,
+      "textEqual": 3060,
+      "note": "every July-4 atlas_summary_layers row is text-identical to a row of this file; 1,938 further rows in the file never reached the July-4 layer"
+    },
+    "packetLink": {
+      "packetsResolved": 4998,
+      "packetSummaryEqualsFileText": 388,
+      "packetsWithSourceRevision": 1350
+    },
+    "qualityFinding": {
+      "promptScaffoldLeak": {
+        "inFile": "4,397 of 4,998 (88%)",
+        "july4LayerRows": "2,756 of 3,060 (90%)",
+        "allLayers": "3,380 of 7,654",
+        "packetSummaries": "1,101 of 6,886 (16%)",
+        "chunkSummaries": "150 of 40,306"
+      },
+      "pattern": "few-shot prompt echoed by the raw completions endpoint: \"Example of a good summary\", \"Your turn: Feature: ...\", \"---\" separators",
+      "consequence": "embeddings built from these summaries (2026-07-20/21) inherit the contamination; the existing detectors (summary-enrichment detectThoughtLeakage, phase8-5 sanitizer) target reasoning/thinking markers, not this scaffold pattern"
+    }
+  },
+  "earlierClaimsCorrected": [
+    "CEI-14 said the ~2,410 source summaries were missing from disk: they are in .tmp/gemma4-summaries-5k.ndjson",
+    "Lane C is text-derived from that file; the exact writer of the layer rows is still not stamped in metadata (embeddinggemma-batch-worker embedded them)"
+  ],
+  "colabInputShards": {
+    "dir": "Desktop\\colab_630\\summary-shards",
+    "files": "colab-summary-shard-01..08-of-08.ndjson + local-summary-backlog.ndjson",
+    "rows": 44425,
+    "bytes": "about 220 MB total for the 8 shards (2026-07-01)",
+    "contents": "INPUT rows: packet_key, source_ref, source_text, source_text_hash, source_text_status, source_disk_path, classification fields; no summary field",
+    "use": "a verified-input candidate: source_text_hash can be compared to the current admitted hash to find unchanged files"
+  },
+  "colabNotebook": {
+    "path": "Desktop\\colab_630\\upload-parent-atlas\\Copy_of_colab_parent_atlas_notebook.ipynb (also colab_630\\*.backup-*.ipynb)",
+    "outputPattern": "parent-atlas-gemma4-summaries-shard*.ndjson in /content/drive/MyDrive/colab_630/colab-parent-atlas/outputs/ with manifests; no such output file was found locally (searched Desktop, Downloads, Documents, OneDrive, repo temp dirs to depth 5)"
+  }
+}

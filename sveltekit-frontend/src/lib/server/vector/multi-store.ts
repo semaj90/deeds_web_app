@@ -238,7 +238,7 @@ export class MultiVectorStore {
 		const results = await qdrantBreaker.call(() =>
 			retry(
 				() =>
-					qdrant.client.search(collection, {
+					qdrant.search(collection, {
 						vector: { name: 'content', vector: embedding },
 						limit: topK,
 						with_payload: true

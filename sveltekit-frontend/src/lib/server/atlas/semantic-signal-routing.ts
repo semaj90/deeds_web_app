@@ -532,7 +532,7 @@ export function buildSemanticSignalPacket(input: SemanticRoutingInput & {
   const loopObservation = buildLoopObservation({
     state: input.loopState ?? 'PLAN',
     tool: input.loopTool ?? 'atlas.inspect_runtime',
-    result: input.loopResult ?? 'PASS',
+    result: input.loopResult ?? 'PENDING',
     evidenceCoverage: input.loopEvidenceCoverage ?? 0,
     tokenPressure: input.loopTokenPressure ?? 0,
     subjectId: input.subjectId,

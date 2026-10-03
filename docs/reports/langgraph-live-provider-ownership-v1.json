@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.langgraph-live-provider-ownership-audit.v1",
+  "generatedAt": "2026-09-20T07:47:35.904Z",
+  "endpoints": {
+    "synthesis": "http://127.0.0.1:8091/health/summary",
+    "chat": "http://127.0.0.1:8090/v1/models",
+    "embedding": "http://127.0.0.1:11434/api/tags"
+  },
+  "checks": [
+    {
+      "id": "LANGGRAPH_HEALTHY",
+      "passed": true,
+      "detail": "status=ok"
+    },
+    {
+      "id": "STRICT_MSGPACK_ENABLED",
+      "passed": true,
+      "detail": "strict=true"
+    },
+    {
+      "id": "CHECKPOINT_NAMESPACE_ISOLATED",
+      "passed": true,
+      "detail": "{\"enabled\":false,\"status\":\"disabled\",\"schema\":\"langgraph_py\",\"setup_performed\":false}"
+    },
+    {
+      "id": "LLAMA_CHAT_OWNER",
+      "passed": true,
+      "detail": "owner=llama-server model=ornith-1.5-9b"
+    },
+    {
+      "id": "OLLAMA_EMBEDDING_OWNER",
+      "passed": true,
+      "detail": "owner=ollama models=embeddinggemma:latest,ibm/granite-docling:258m,nomic-embed-text:latest"
+    }
+  ],
+  "failures": [],
+  "summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "status": "LIVE_PROVIDER_OWNERSHIP_PROVEN"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

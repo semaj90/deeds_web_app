@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.symbol-reconciliation-writer-receipt.v1",
+  "generatedAt": "2026-09-13T03:53:13.525Z",
+  "targetWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "allowCreate": true,
+  "apply": true,
+  "gate": {
+    "status": "GROUNDED",
+    "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "boundSourceRefCount": 23369,
+    "symbolRowCount": 194
+  },
+  "action": "CANONICALIZATION_APPLIED",
+  "receipt": {
+    "schema": "atlas.gis-canonicalization-receipt.v1",
+    "source_ref": "multi",
+    "source_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+    "nomination_count": 194,
+    "canonical_symbol_count": 194,
+    "unresolved_symbol_count": 0,
+    "ambiguous_symbol_count": 0,
+    "symbol_version_count": 194,
+    "reference_fact_count": 0,
+    "canonical_reference_count": 0,
+    "degraded_reference_count": 0,
+    "unresolved_reference_count": 0,
+    "evidence_entity_fact_count": 194,
+    "canonical_identity_created": true,
+    "producer_revision": "symbol-reconciliation-writer-v1"
+  }
+}

@@ -90,9 +90,20 @@ async function main() {
       }
 
       if (APPLY) {
+        // Fixed 2026-09-13: the SELECT above (line ~74) picks a row if ANY of
+        // entities/lexical_features/used_concepts is empty -- but this UPDATE used to
+        // unconditionally overwrite all three together, so a row selected only because
+        // `entities` was empty could have its already-populated `lexical_features`/
+        // `used_concepts` clobbered too. Per-column CASE preserves whichever of the three
+        // already has data (from this or any of the other 3 live writers of these columns --
+        // see openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md's "lexical_features
+        // audited" entry), only filling genuinely empty ones.
         await pool.query(
           `UPDATE atlas_packet_features
-              SET entities = $1, lexical_features = $2, used_concepts = $3, updated_at = NOW()
+              SET entities = CASE WHEN COALESCE(array_length(entities, 1), 0) = 0 THEN $1::text[] ELSE entities END,
+                  lexical_features = CASE WHEN COALESCE(array_length(lexical_features, 1), 0) = 0 THEN $2::text[] ELSE lexical_features END,
+                  used_concepts = CASE WHEN COALESCE(array_length(used_concepts, 1), 0) = 0 THEN $3::text[] ELSE used_concepts END,
+                  updated_at = NOW()
             WHERE packet_key = $4`,
           [derived.entities, derived.lexicalFeatures, derived.usedConcepts, row.packet_key],
         );

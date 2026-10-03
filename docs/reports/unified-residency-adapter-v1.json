@@ -1,0 +1,25 @@
+{
+  "schema": "atlas.unified-residency-proof.v1",
+  "status": "CONTRACT_PROVEN",
+  "tests": {
+    "passed": 9,
+    "failed": 0,
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/retrieval/search-runtime-adapter-qas.spec.ts src/lib/server/atlas/tensors/unified-residency-ace-bridge-v1.spec.ts src/lib/server/atlas/tensors/unified-residency-adapter-v1.spec.ts"
+  },
+  "capabilities": {
+    "revisionQualifiedDescriptor": true,
+    "providerKindAndBufferValidation": true,
+    "domainLutRevisionRouting": true,
+    "typedTilePacking": true,
+    "ropeValidation": true,
+    "stateTransitionsAndLru": true,
+    "gpuStatePersistenceGuard": true,
+    "aceFeatureSnapshotBridge": true,
+    "searchRuntimeAceResidencyBridge": true
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "liveGpuExecution": false,
+  "promotionEligible": false,
+  "openGates": ["UNIFIED-RESIDENCY-LIVE-01", "UNIFIED-RESIDENCY-PARITY-01"]
+}

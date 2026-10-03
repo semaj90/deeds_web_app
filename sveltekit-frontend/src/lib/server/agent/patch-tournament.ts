@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 
 export interface PatchTournamentCheck {
   name: string;
@@ -9,6 +9,9 @@ export interface PatchTournamentCheck {
 
 export interface PatchTournamentCandidateInput {
   candidateId: string;
+  runId: string;
+  sourceRevision: string;
+  patchDigest: string;
   branchName: string;
   worktreePath: string;
   patchSummary: string;
@@ -84,7 +87,21 @@ function countPassed(checks: PatchTournamentCheck[]): number {
 }
 
 function stableDigest(value: string): string {
-  return createHash('sha256').update(value).digest('hex').slice(0, 16);
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function validateRequest(request: PatchTournamentRequest): void {
+  if (request.candidates.length !== 3) throw new Error('PATCH_TOURNAMENT_REQUIRES_EXACTLY_THREE_CANDIDATES');
+  const candidateIds = new Set(request.candidates.map((candidate) => candidate.candidateId));
+  if (candidateIds.size !== request.candidates.length) throw new Error('PATCH_TOURNAMENT_DUPLICATE_CANDIDATE_ID');
+  for (const candidate of request.candidates) {
+    if (!candidate.runId.trim() || !candidate.sourceRevision.trim() || !candidate.patchDigest.trim()) {
+      throw new Error('PATCH_TOURNAMENT_CANDIDATE_IDENTITY_INCOMPLETE');
+    }
+    if (candidate.compileError !== request.compileError) {
+      throw new Error('PATCH_TOURNAMENT_COMPILE_ERROR_MISMATCH');
+    }
+  }
 }
 
 function scoreCandidate(candidate: PatchTournamentCandidateInput): RankedPatchTournamentCandidate {
@@ -152,6 +169,7 @@ function compareRanked(a: RankedPatchTournamentCandidate, b: RankedPatchTourname
 }
 
 export function buildPatchTournamentPlan(request: PatchTournamentRequest): PatchTournamentPlan {
+  validateRequest(request);
   const ranked = request.candidates.map(scoreCandidate).sort(compareRanked);
   const normalized = ranked.map((candidate, index) => ({
     ...candidate,
@@ -159,8 +177,21 @@ export function buildPatchTournamentPlan(request: PatchTournamentRequest): Patch
   }));
 
   const topCandidate = normalized[0] ?? null;
-  const packetId = randomUUID();
-  const compileErrorDigest = stableDigest(request.compileError);
+  const tournamentIdentity = JSON.stringify({
+    objective: request.objective,
+    workspaceId: request.workspaceId,
+    workspaceRevision: request.workspaceRevision,
+    baseBranch: request.baseBranch,
+    compileError: request.compileError,
+    candidates: request.candidates.map((candidate) => ({
+      candidateId: candidate.candidateId,
+      runId: candidate.runId,
+      sourceRevision: candidate.sourceRevision,
+      patchDigest: candidate.patchDigest,
+    })).sort((a, b) => a.candidateId.localeCompare(b.candidateId)),
+  });
+  const packetId = `tournament:${stableDigest(tournamentIdentity)}`;
+  const compileErrorDigest = `sha256:${stableDigest(request.compileError)}`;
   const safeNextCommand = topCandidate
     ? `review ${topCandidate.candidateId} in ${topCandidate.worktreePath}`
     : 'review tournament candidates in isolated worktrees';

@@ -16,7 +16,18 @@ import {
   materializeCandidateFeatureSnapshotFromQasRowsV1,
   type CandidateFeatureLaneV1,
 } from '../features/retrieval-router-to-candidate-feature-snapshot-v1.js';
-import { buildAceContextManifestAdmissionV1 } from '../context/ace-context-manifest-admission-v1.js';
+import {
+  buildAceContextManifestAdmissionV1,
+  retrievalCacheIdentityFromAceManifestV1,
+} from '../context/ace-context-manifest-admission-v1.js';
+import { buildAceTopRetrievalQueryHash } from '$lib/server/cache/ace-top-retrieval-cache.js';
+import type { RetrievalCacheIdentityV1 } from '$lib/server/ace/cache-keys.js';
+import { hashQuery } from '$lib/server/cache/ace-packet-cache.js';
+import { bridgeAceContextManifestToPacketIdentityV1 } from '$lib/server/ace/ace-route-context-manifest-bridge-v1.js';
+import { prepareUnifiedResidencyAceBridgeV1, type UnifiedResidencyAceBridgeInputV1 } from '../tensors/unified-residency-ace-bridge-v1.js';
+import { materializeCandidateFeatureColumnar } from '../features/candidate-feature-columnar-v1.js';
+import { materializeCandidateFeatureGpuPack } from '../features/candidate-feature-gpu-pack-v1.js';
+import { prepareUnifiedResidencyFeaturePackBatchV1 } from '../tensors/unified-residency-feature-pack-v1.js';
 
 export interface AtlasSearchRequest {
   query: string;
@@ -36,7 +47,7 @@ export interface AtlasSearchResponse {
   topPacketKeys: string[];
   metadata: SearchResult['metadata'];
   provenance: SearchResult['provenance'];
-  /** Graph candidates seeded from topPacketKeys. Only populated when withGraphExpansion=true. */
+  /** Graph candidates seeded only from SearchRuntime's pre-fusion canonical dense lane. */
   graphExpanded?: GraphCandidate[];
 }
 
@@ -58,7 +69,20 @@ export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
   ontologyRevision?: string | null;
   modelRevision?: string | null;
   promptTemplateRevision?: string | null;
+  /** Explicit runtime fields needed to derive a revisioned retrieval-cache identity. */
+  retrievalCacheModel?: string;
+  retrievalCacheDim?: number;
+  contextPolicyRevision?: string;
+  /** Optional packet-cache handoff fields; omitted means no packet admission. */
+  graphRevision?: string | null;
+  packetRepresentationId?: string;
+  packetNormalizationPolicyRevision?: string;
+  packetArtifactChecksum?: string;
 }
+
+export type SearchRuntimeUnifiedResidencyOptions = AtlasSearchAceManifestOptions
+  & Pick<UnifiedResidencyAceBridgeInputV1, 'domain' | 'lutRevision' | 'lut' | 'tokenizerRevision' | 'ropeRevision' | 'artifactChecksum' | 'dtype'>
+  & { modelRevision: string };
 
 export interface SearchRuntimeQasProjectionResult {
   requestId: string;
@@ -249,17 +273,18 @@ export function createAtlasSearchAdapter(config?: {
         .map(p => (p as Record<string, unknown>).packet_key ?? (p as Record<string, unknown>).chunk_id ?? '')
         .filter((k): k is string => typeof k === 'string' && k.length > 0)
         .slice(0, 5);
+      const denseSeedPacketKeys = result.denseSeedPacketKeys ?? [];
 
       let graphExpanded: GraphCandidate[] | undefined;
-      if (req.withGraphExpansion && topPacketKeys.length > 0) {
+      if (req.withGraphExpansion && denseSeedPacketKeys.length > 0) {
         try {
           graphExpanded = await graphRetrieve({
-            seedPacketKeys: topPacketKeys,
+            seedPacketKeys: denseSeedPacketKeys,
             allowedRelationships: ['IMPORTS', 'CALLS', 'SIMILAR_TOPOLOGY', 'USES_CONCEPT'],
-            maxDepth: 1,
+            maxDepth: 2,
             maxCandidates: 20,
           });
-          // Remove seeds that already appear in main result to avoid duplicates
+          // Remove results already present in the main fused response.
           const existingKeys = new Set(topPacketKeys);
           graphExpanded = graphExpanded.filter(g => !existingKeys.has(g.packetKey));
         } catch {
@@ -313,20 +338,89 @@ export function createAtlasSearchAdapter(config?: {
         representationRevision: options.representationRevision,
         acePlaybookRevision: options.acePlaybookRevision,
         tokenBudget: options.tokenBudget,
-        graphRevision: null,
+        graphRevision: options.graphRevision ?? null,
         laneMaskByCanonicalId: options.laneMaskByCanonicalId,
         producerRevision: options.producerRevision,
         ontologyRevision: options.ontologyRevision,
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
+      const retrievalCacheIdentity = options.retrievalCacheModel && options.retrievalCacheDim && options.contextPolicyRevision
+        ? retrievalCacheIdentityFromAceManifestV1(ace, {
+            queryHash: buildAceTopRetrievalQueryHash(req.query),
+            model: options.retrievalCacheModel,
+            dim: options.retrievalCacheDim,
+            workspaceRevision: options.workspaceRevision,
+            contextPolicyRevision: options.contextPolicyRevision,
+          })
+        : null;
+      const acePacketCacheIdentity = retrievalCacheIdentity && options.packetRepresentationId
+        && options.packetNormalizationPolicyRevision && options.packetArtifactChecksum
+          ? bridgeAceContextManifestToPacketIdentityV1({
+            admission: ace,
+            queryHash: retrievalCacheIdentity.queryHash,
+            requestHash: hashQuery(req.query),
+            model: options.retrievalCacheModel,
+            dim: options.retrievalCacheDim,
+            workspaceRevision: options.workspaceRevision,
+            contextPolicyRevision: options.contextPolicyRevision,
+            representationId: options.packetRepresentationId,
+            producerRevision: options.producerRevision,
+            normalizationPolicyRevision: options.packetNormalizationPolicyRevision,
+            artifactChecksum: options.packetArtifactChecksum,
+          })
+        : null;
       return {
         ...result,
         snapshot: ace.snapshot,
         admission: ace,
+        retrievalCacheIdentity,
+        acePacketCacheIdentity,
         writesPerformed: false as const,
         canonicalAuthority: false as const,
       };
+    },
+    /**
+     * Opt-in read-only composition from the canonical SearchRuntime/ACE path
+     * into logical residency descriptors. Physical providers are supplied
+     * later; no buffer or GPU handle is retained here.
+     */
+    async searchWithUnifiedResidency(
+      req: AtlasSearchRequest,
+      options: SearchRuntimeUnifiedResidencyOptions,
+    ) {
+      const admitted = await this.searchWithAceManifest(req, options);
+      const residency = prepareUnifiedResidencyAceBridgeV1({
+        snapshot: admitted.snapshot,
+        admission: admitted.admission,
+        domain: options.domain,
+        lutRevision: options.lutRevision,
+        lut: options.lut,
+        representationRevision: options.representationRevision,
+        modelRevision: options.modelRevision,
+        tokenizerRevision: options.tokenizerRevision,
+        ropeRevision: options.ropeRevision,
+        artifactChecksum: options.artifactChecksum,
+        dtype: options.dtype,
+      });
+      return { ...admitted, residency, writesPerformed: false as const, canonicalAuthority: false as const };
+    },
+    /** Lower the admitted snapshot through the existing GPU-pack owner. */
+    async searchWithUnifiedResidencyFeaturePack(
+      req: AtlasSearchRequest,
+      options: SearchRuntimeUnifiedResidencyOptions & { rowAlignment?: number },
+    ) {
+      const admitted = await this.searchWithAceManifest(req, options);
+      const columnar = materializeCandidateFeatureColumnar({ snapshot: admitted.snapshot, producerRevision: options.producerRevision });
+      const pack = materializeCandidateFeatureGpuPack({ columnar, rowAlignment: options.rowAlignment, producerRevision: options.producerRevision });
+      const residencies = prepareUnifiedResidencyFeaturePackBatchV1({
+        pack,
+        representationRevision: options.representationRevision,
+        modelRevision: options.modelRevision,
+        tokenizerRevision: options.tokenizerRevision,
+        ropeRevision: options.ropeRevision,
+      });
+      return { ...admitted, pack, residencies, writesPerformed: false as const, canonicalAuthority: false as const };
     },
   };
 }

@@ -24,7 +24,7 @@ import { buildPolicyStateFromRerankSignals } from '../analysis/hmm-policy-bridge
 import { buildPolicyStateVector } from '../atlas/policy/policy-state.js';
 import { budgetFor } from '../atlas/policy/execution-budget.js';
 import { routePolicy } from '../atlas/policy/policy-router.js';
-import { appendSearchRuntimeTrainingRow } from '../atlas/policy/policy-training.js';
+import { appendSearchRuntimeTrainingRow, hasNonPlaceholderPolicyTrainingRevisions } from '../atlas/policy/policy-training.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '../vector/embedding-dimension-guard.js';
 import { normalizeRetrievalLane } from './retrieval-lane-aliases.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
@@ -321,6 +321,8 @@ export interface RetrievalProofSummary {
  */
 export interface SearchResult {
   packets: FeatureEnvelope[];
+  /** Canonical candidates from the raw dense lane, selected before cross-lane fusion. */
+  denseSeedPacketKeys?: string[];
   proof?: RetrievalProofSummary;
   metadata: {
     query: string;
@@ -519,6 +521,7 @@ export class SearchRuntime {
       const retrieveStart = Date.now();
       const candidates = await this.retrieveCandidates(query, { includeVectorLanes: embeddingHealthy });
       stageTiming.retrieve = Date.now() - retrieveStart;
+      const denseSeedPacketKeys = selectDenseSearchSeedPacketKeys(candidates);
 
       if (candidates.length === 0) {
         return {
@@ -601,6 +604,7 @@ export class SearchRuntime {
 
         return {
           packets: topPackets,
+          ...(denseSeedPacketKeys.length > 0 ? { denseSeedPacketKeys } : {}),
           metadata: {
             query: query.text,
             candidatesRetrieved: candidates.length,
@@ -819,6 +823,7 @@ export class SearchRuntime {
 
       return {
         packets: finalPackets,
+        ...(denseSeedPacketKeys.length > 0 ? { denseSeedPacketKeys } : {}),
         metadata: {
           query: query.text,
           candidatesRetrieved: candidates.length,
@@ -1034,51 +1039,55 @@ export class SearchRuntime {
     }
 
     if (!this.readOnly) {
-      void appendSearchRuntimeTrainingRow({
-        traceId: query.spanContext?.traceId ?? createHash('sha256').update(query.text).digest('hex').slice(0, 16),
-        query: query.text,
-        queryHash: createHash('sha256').update(query.text.toLowerCase()).digest('hex').slice(0, 16),
-        policyState,
-        policyDecision,
-        rerankProvenance: result.provenance,
-        revisions: {
-          workspaceRevision: query.workspaceRevision ?? 'unknown',
-          sourceRevision: query.sourceRevision ?? 'unknown',
-          representationRevision: String(query.representationRevision ?? 'unknown'),
-          featureRevision: policyState.featureRevision,
-        },
-        labelProvenance: {
-          source: result.provenance.crossEncoderUsed ? 'EXECUTION' : 'REPLAY',
-          sourceRevision: result.provenance.modelVersion,
-          sourceRefs: result.results.slice(0, 3).map((entry) => String(
-            (entry as any).source_ref ??
-            (entry as any).sourceRef ??
+      const trainingRevisions = {
+        workspaceRevision: query.workspaceRevision ?? '',
+        sourceRevision: query.sourceRevision ?? '',
+        representationRevision: String(query.representationRevision ?? ''),
+        featureRevision: policyState.featureRevision,
+      };
+
+      if (hasNonPlaceholderPolicyTrainingRevisions(trainingRevisions)) {
+        void appendSearchRuntimeTrainingRow({
+          traceId: query.spanContext?.traceId ?? createHash('sha256').update(query.text).digest('hex').slice(0, 16),
+          query: query.text,
+          queryHash: createHash('sha256').update(query.text.toLowerCase()).digest('hex').slice(0, 16),
+          policyState,
+          policyDecision,
+          rerankProvenance: result.provenance,
+          revisions: trainingRevisions,
+          labelProvenance: {
+            source: result.provenance.crossEncoderUsed ? 'EXECUTION' : 'REPLAY',
+            sourceRevision: result.provenance.modelVersion,
+            sourceRefs: result.results.slice(0, 3).map((entry) => String(
+              (entry as any).source_ref ??
+              (entry as any).sourceRef ??
+              (entry as any).packet_key ??
+              (entry as any).packetKey ??
+              (entry as any).feature_id ??
+              (entry as any).featureId ??
+              ''
+            )).filter((value) => value.length > 0),
+          },
+          candidatePacketKeys: result.results.slice(0, 10).map((entry) => String(
             (entry as any).packet_key ??
             (entry as any).packetKey ??
             (entry as any).feature_id ??
             (entry as any).featureId ??
             ''
           )).filter((value) => value.length > 0),
-        },
-        candidatePacketKeys: result.results.slice(0, 10).map((entry) => String(
-          (entry as any).packet_key ??
-          (entry as any).packetKey ??
-          (entry as any).feature_id ??
-          (entry as any).featureId ??
-          ''
-        )).filter((value) => value.length > 0),
-        sourceRefs: result.results.slice(0, 5).map((entry) => String(
-          (entry as any).source_ref ??
-          (entry as any).sourceRef ??
-          (entry as any).packet_key ??
-          (entry as any).packetKey ??
-          ''
-        )).filter((value) => value.length > 0),
-        executionId: result.provenance.cacheKey ?? undefined,
-        labelConfidence: result.results.length > 0 ? 1 : 0.5,
-      }).catch((error) => {
-        console.warn('[stage:rerank] policy training export skipped:', error);
-      });
+          sourceRefs: result.results.slice(0, 5).map((entry) => String(
+            (entry as any).source_ref ??
+            (entry as any).sourceRef ??
+            (entry as any).packet_key ??
+            (entry as any).packetKey ??
+            ''
+          )).filter((value) => value.length > 0),
+          executionId: result.provenance.cacheKey ?? undefined,
+          labelConfidence: result.results.length > 0 ? 1 : 0.5,
+        }).catch((error) => {
+          console.warn('[stage:rerank] policy training export skipped:', error);
+        });
+      }
     }
 
     return result.results;
@@ -1259,6 +1268,31 @@ function getFusionLogicalLane(candidate: Candidate): LogicalRetrievalLane {
     default:
       return 'lexical';
   }
+}
+
+/** Selects exact-identity dense candidates before RRF for bounded downstream graph seeding. */
+export function selectDenseSearchSeedPacketKeys(candidates: Candidate[], limit = 5): string[] {
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20) return [];
+
+  const denseByPacket = new Map<string, Candidate>();
+  for (const candidate of candidates) {
+    const packetKey = candidate.packetKey?.trim();
+    if (
+      !packetKey ||
+      candidate.identityStatus !== 'canonical' ||
+      getFusionLogicalLane(candidate) !== 'dense' ||
+      !Number.isFinite(candidate.score)
+    ) continue;
+    const previous = denseByPacket.get(packetKey);
+    if (!previous || candidate.score > previous.score) denseByPacket.set(packetKey, candidate);
+  }
+
+  return Array.from(denseByPacket.entries())
+    .sort(([packetKeyA, candidateA], [packetKeyB, candidateB]) =>
+      candidateB.score - candidateA.score || packetKeyA.localeCompare(packetKeyB),
+    )
+    .slice(0, limit)
+    .map(([packetKey]) => packetKey);
 }
 
 function compareIdentityKeys(a: Candidate, b: Candidate): number {

@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.afc-owner-manual-mapping-01-partial.v1",
+  "createdAt": "2026-09-27T02:45:00.000Z",
+  "scope": "Second bounded slice: clarifies ast-grep-structural and ts-morph-symbol (both UNIT_PROVEN_NOT_LIVE) by tracing the real live candidate producers for the 'ast' and 'exact' fusion lanes.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "runtimeCallsPerformed": false,
+  "method": "Grepped for real (non-test) scoreSource:'exact_symbol'/'ast_tree' assignments; found and read both in sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts (lines ~558-570, ~628-640).",
+  "findings": [
+    {
+      "topic": "The 'ast' and 'exact' fusion lanes ARE live, but NOT via the registered ast-grep-structural/ts-morph-symbol helpers",
+      "detail": "retrieve-candidates.ts issues real, live Postgres queries that read pre-existing tree_node_id/metadata/output_meta columns and tag results scoreSource:'exact_symbol' or 'ast_tree' -- these feed the real 'exact' and 'ast' getFusionLogicalLane() branches at request time. This is a genuinely LIVE lane. But the executor is a Postgres SELECT reading previously-backfilled columns, not a live call to ast-grep or ts-morph. The registered helpers (ast-grep-structural: src/lib/server/atlas/features/semantic-input-compiler-v1.ts; ts-morph-symbol: packages/parent-atlas/src/core/structured-value-ast.ts) are real, tested (this session), but are NOT the runtime producer of these candidates -- some separate offline backfill process (this session's own earlier finding: scripts/atlas/backfill-ast-symbols.mjs and similar) populated those Postgres columns previously.",
+      "conclusion": "ast-grep-structural and ts-morph-symbol stay UNIT_PROVEN_NOT_LIVE (unchanged) -- the offline module is real and tested, but it is not the live request-time executor for the 'ast'/'exact' lanes. The TRUE live owner of those two lanes is retrieve-candidates.ts's own SQL query functions, reading offline-backfilled metadata. This is the same 'registry executor label is not evidence of a request-time owner' pattern already found for rg-exact.",
+      "routerSignalCandidateForBothLanes": "code_symbol_context",
+      "routerSignalCandidateConfidence": "PLAUSIBLE_NOT_OWNER_CONFIRMED",
+      "verifiedLogicalLanes": { "exact_symbol_query": "exact", "ast_tree_query": "ast" }
+    }
+  ],
+  "notDone": "lsp-definition, lsp-references, tree-sitter-chunk, semantic-768, graph-ppr not re-examined in this slice. No registry promoted, no code wired.",
+  "nextGate": "Same as afc-owner-manual-mapping-01-partial-v1: operator decision on whether registry ownerRef fields should point at the ACTUAL live producer (retrieve-candidates.ts) instead of the offline module, or whether the registry should distinguish 'capability owner' (the module) from 'live lane executor' (the SQL query) as two separate fields."
+}

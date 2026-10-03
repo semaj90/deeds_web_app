@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { classifyAtlasQuery } from './query-classifier.js';
 import { buildQueryExpansionBundleV1 } from './query-expansion-v1.js';
 import { buildQueryFingerprintV1 } from './query-fingerprint-v1.js';
-import { buildRetrievalPlan } from './retrieval-plan.js';
+import { buildRetrievalPlan, buildRetrievalPlanPhasesV1 } from './retrieval-plan.js';
 import { compileTaxonomyScopeV1 } from './taxonomy-scope-v1.js';
 
 describe('buildRetrievalPlan', () => {
@@ -25,5 +25,35 @@ describe('buildRetrievalPlan', () => {
     expect(plan.queryFingerprintRef).toBe(`query-fingerprint:${fingerprint.checksum}`);
     expect(plan.queryFingerprintChecksum).toBe(fingerprint.checksum);
     expect(plan.tokenBudget).toBe(2048);
+  });
+
+  it('attaches phased scheduling additive to the flat lane list (AFC-PLAN-01)', () => {
+    const classification = classifyAtlasQuery({ requestId: 'plan-2', query: 'implement cache adapter using CAGRA evidence' });
+    const plan = buildRetrievalPlan({ classification, workspaceRevision: 'w1' });
+    expect(plan.phases).toBeDefined();
+    const laneSetAcrossPhases = new Set(plan.phases!.flatMap((phase) => phase.lanes));
+    expect([...laneSetAcrossPhases].sort()).toEqual([...plan.lanes].sort());
+  });
+});
+
+describe('buildRetrievalPlanPhasesV1', () => {
+  it('orders phases cheap -> structural -> expensive -> extraction-escalation', () => {
+    const phases = buildRetrievalPlanPhasesV1({ lanes: ['graph', 'lexical', 'semantic', 'ast'] });
+    expect(phases.map((phase) => phase.tier)).toEqual(['CHEAP_LEXICAL', 'STRUCTURAL', 'EXPENSIVE_SEMANTIC_GRAPH', 'EXTRACTION_ESCALATION']);
+    expect(phases.find((phase) => phase.tier === 'EXPENSIVE_SEMANTIC_GRAPH')?.lanes.sort()).toEqual(['graph', 'semantic']);
+  });
+
+  it('always includes the EXTRACTION_ESCALATION phase with continueWhen ALWAYS, even with no lanes assigned to it', () => {
+    const phases = buildRetrievalPlanPhasesV1({ lanes: ['lexical'] });
+    const escalation = phases.find((phase) => phase.tier === 'EXTRACTION_ESCALATION');
+    expect(escalation).toBeDefined();
+    expect(escalation!.lanes).toEqual([]);
+    expect(escalation!.continueWhen).toBe('ALWAYS');
+  });
+
+  it('clamps minConfidence into [0,1] and floors minCandidates at 1', () => {
+    const phases = buildRetrievalPlanPhasesV1({ lanes: ['lexical'], minCandidates: 0, minConfidence: 5 });
+    expect(phases[0]!.minCandidates).toBe(1);
+    expect(phases[0]!.minConfidence).toBe(1);
   });
 });

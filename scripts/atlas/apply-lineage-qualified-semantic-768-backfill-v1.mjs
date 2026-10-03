@@ -9,6 +9,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
+import { pathToFileURL } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 const env = loadRepoEnv(process.env);
@@ -23,9 +24,51 @@ const sha256 = (value) => crypto.createHash('sha256').update(String(value), 'utf
 const clean = (value) => String(value ?? '').trim();
 const vectorLiteral = (vector) => `[${vector.join(',')}]`;
 const embeddingText = (row) => [row.relative_path, row.symbol, row.kind, row.summary, row.content, Array.isArray(row.ast_symbols) ? row.ast_symbols.join(' ') : ''].filter(Boolean).join('\n').trim().slice(0, 12_000);
+function contentHash(candidate) {
+  const reference = (candidate?.evidenceRefs ?? []).find((value) => String(value).startsWith('chunk:'));
+  const hash = String(reference ?? '').split(':').at(-1)?.toLowerCase();
+  return /^[0-9a-f]{64}$/.test(hash ?? '') ? hash : null;
+}
 
 function validateVector(vector) {
   if (!Array.isArray(vector) || vector.length !== 768 || vector.some((value) => !Number.isFinite(value))) throw new Error(`SEMANTIC_768_VECTOR_INVALID:${Array.isArray(vector) ? vector.length : 'non-array'}`);
+}
+
+export function buildLineageQualifiedQdrantPointV1({ candidate, row, vector, model, candidateSnapshotRevision, ordinalMapChecksum }) {
+  validateVector(vector);
+  for (const [field, value] of Object.entries({
+    canonicalId: candidate?.canonicalId,
+    packetKey: candidate?.packetKey,
+    sourceRef: candidate?.sourceRef,
+    sourceRevision: candidate?.sourceRevision,
+    workspaceRevision: candidate?.workspaceRevision,
+    rowId: row?.id,
+    contentHash: row?.content_hash,
+    model,
+    candidateSnapshotRevision,
+    ordinalMapChecksum,
+  })) {
+    if (typeof value !== 'string' || !value.trim()) throw new Error(`QDRANT_PROJECTION_IDENTITY_REQUIRED:${field}`);
+  }
+  if (clean(row.source_ref) !== clean(candidate.sourceRef)) throw new Error('QDRANT_PROJECTION_SOURCE_REF_MISMATCH');
+  if (clean(row.content_hash).toLowerCase() !== contentHash(candidate)) throw new Error('QDRANT_PROJECTION_CONTENT_HASH_MISMATCH');
+  return {
+    id: row.id,
+    vector: { content: vector },
+    payload: {
+      canonical_id: candidate.canonicalId,
+      packet_key: candidate.packetKey,
+      source_ref: candidate.sourceRef,
+      source_revision: candidate.sourceRevision,
+      workspace_revision: candidate.workspaceRevision,
+      content_hash: row.content_hash,
+      representation_id: 'semantic_768',
+      representation_revision: `semantic_768:${model}:${sha256(String(row.content_hash))}`,
+      embedding_model: model,
+      embedding_dimension: 768,
+      projection_revision: `candidate-map:${sha256(`${candidateSnapshotRevision}\0${ordinalMapChecksum}`)}`,
+    },
+  };
 }
 
 async function embed(texts) {
@@ -50,8 +93,22 @@ async function qdrantReadback(packetKeys) {
   return Array.isArray(body?.result?.points) ? body.result.points : [];
 }
 
+function assertSemanticWriterProvenanceReady() {
+  // This 15-row canary does not yet satisfy the current semantic-owner contract:
+  // /api/embed returns a mutable model label, modelRevision below is synthesized
+  // from content hashes, no tokenizer/input/vector provenance receipt is persisted,
+  // and Qdrant point upsert can replace unspecified named vectors/payload. Keep the
+  // writer disabled until those contracts and independent readbacks are implemented.
+  throw new Error(
+    'SEMANTIC_768_APPLY_BLOCKED:CANONICAL_WRITER_PROVENANCE_INCOMPLETE:' +
+      ' immutable model/tokenizer identity, durable per-row input/vector lineage, ' +
+      'and non-destructive Qdrant update/readback are required',
+  );
+}
+
 async function main() {
   if (process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+  assertSemanticWriterProvenanceReady();
   const map = JSON.parse(await fs.readFile(mapPath, 'utf8'));
   const candidates = Array.isArray(map.candidates) ? map.candidates : [];
   if (candidates.length !== 15) throw new Error(`FROZEN_CANARY_COUNT_REQUIRED:expected=15:actual=${candidates.length}`);
@@ -87,12 +144,19 @@ async function main() {
     const readback = await pool.query(`SELECT id::text AS id, source_ref, content_embedding_768, embedding_model, embedding_version, embedding_dimension, embedding_normalized, encoder_id FROM public.codebase_chunk_index WHERE id = ANY($1::uuid[]) AND content_embedding_768 IS NOT NULL`, [rows.map((item) => item.row.id)]);
     report.counts.postgresReadback = readback.rows.length;
     if (readback.rows.length !== rows.length || readback.rows.some((row) => Number(row.embedding_dimension) !== 768 || row.embedding_model !== model || row.embedding_normalized !== true)) throw new Error('POSTGRES_SEMANTIC_768_READBACK_FAILED');
-    const points = rows.map((item, index) => ({ id: item.row.id, vector: { content: vectors[index] }, payload: { packet_key: item.candidate.packetKey, source_ref: item.candidate.sourceRef, source_revision: item.candidate.sourceRevision, workspace_revision: item.candidate.workspaceRevision, content_hash: item.row.content_hash, representation_id: 'semantic_768', representation_revision: `semantic_768:${model}:${sha256(String(item.row.content_hash))}`, embedding_model: model, embedding_dimension: 768, projection_revision: null } }));
+    const points = rows.map((item, index) => buildLineageQualifiedQdrantPointV1({
+      candidate: item.candidate,
+      row: item.row,
+      vector: vectors[index],
+      model,
+      candidateSnapshotRevision: map.candidateSnapshotRevision,
+      ordinalMapChecksum: map.ordinalMapChecksum,
+    }));
     await qdrantUpsert(points);
     report.counts.qdrantUpserted = points.length;
     report.writes.qdrantWrites = true;
     const qdrantRows = await qdrantReadback(rows.map((item) => item.candidate.packetKey));
-    const exact = qdrantRows.filter((point) => rows.some((item) => { const payload = point.payload ?? {}; return clean(payload.packet_key) === clean(item.candidate.packetKey) && clean(payload.source_ref) === clean(item.candidate.sourceRef) && clean(payload.source_revision) === clean(item.candidate.sourceRevision) && clean(payload.workspace_revision) === clean(item.candidate.workspaceRevision) && clean(payload.representation_id) === 'semantic_768' && clean(payload.embedding_model) === model; }));
+    const exact = qdrantRows.filter((point) => rows.some((item) => { const payload = point.payload ?? {}; return clean(payload.canonical_id) === clean(item.candidate.canonicalId) && clean(payload.packet_key) === clean(item.candidate.packetKey) && clean(payload.source_ref) === clean(item.candidate.sourceRef) && clean(payload.source_revision) === clean(item.candidate.sourceRevision) && clean(payload.workspace_revision) === clean(item.candidate.workspaceRevision) && clean(payload.representation_id) === 'semantic_768' && clean(payload.embedding_model) === model; }));
     report.counts.qdrantReadback = exact.length;
     if (exact.length !== rows.length) throw new Error(`QDRANT_SEMANTIC_768_READBACK_FAILED:${exact.length}/${rows.length}`);
     report.status = 'SEMANTIC_768_BACKFILL_AND_PROJECTION_PROVEN';
@@ -104,4 +168,6 @@ async function main() {
   if (report.status !== 'SEMANTIC_768_BACKFILL_AND_PROJECTION_PROVEN') process.exitCode = 1;
 }
 
-main().catch((error) => { console.error(error?.stack || error); process.exitCode = 1; });
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch((error) => { console.error(error?.stack || error); process.exitCode = 1; });
+}

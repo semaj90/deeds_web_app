@@ -39,7 +39,7 @@ const ROOT = resolve(__dirname, '..', '..');
 const MCP_BASE     = process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788';
 const TURBO_BASE   = process.env.TURBO_BASE    ?? 'http://127.0.0.1:8090';
 const OLLAMA_BASE  = process.env.OLLAMA_BASE   ?? 'http://127.0.0.1:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL  ?? 'gemma4-rotorquant:latest';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL  ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 const RERANK_CONFIDENCE_THRESHOLD = 0.6;   // below → trigger KAG/web_search fallback
 const MAX_LANE1_HITS              = 12;
@@ -161,15 +161,8 @@ async function gemmaChat(messages, { maxTokens = 256, temperature = 0.2, timeout
     }
     dbg('turboquant', r.status);
   } catch (e) { dbg('turboquant fail', e.message); }
-  // Ollama fallback
-  const r = await fetch(`${OLLAMA_BASE}/api/chat`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: OLLAMA_MODEL, messages, stream: false, options: { temperature, num_predict: maxTokens } }),
-    signal: AbortSignal.timeout(timeoutMs),
-  });
-  if (!r.ok) throw new Error(`gemma cascade exhausted: ollama ${r.status}`);
-  const j = await r.json();
-  return { backend: 'ollama', content: j?.message?.content ?? '', usage: { prompt_tokens: j?.prompt_eval_count, completion_tokens: j?.eval_count } };
+  // Ollama chat fallback removed: Ollama is embeddings-only.
+  throw new Error('llama-server cascade exhausted (no Ollama chat fallback)');
 }
 
 // ── run state ───────────────────────────────────────────────────────

@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.gan-readonly-live-proof.v2",
+  "generatedAt": "2026-09-26T18:52:11.268Z",
+  "proofMode": true,
+  "dryRun": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "writes": {
+    "postgres": 0,
+    "redis": 0,
+    "nats": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "status": "BLOCKED_DATABASE_READ",
+  "blocker": "DB_UNAVAILABLE_OR_QUERY_FAILED",
+  "error": "structuralLineage is not defined"
+}

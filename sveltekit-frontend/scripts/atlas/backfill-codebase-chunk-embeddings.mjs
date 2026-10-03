@@ -21,7 +21,9 @@
  * Flags:
  *   --dry-run        Show what would be embedded, don't write
  *   --apply          Execute the backfill (also requires
- *                    ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1)
+ *                    ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1). Currently fail-closed until
+ *                    this legacy path consumes an exact-revision lineage manifest and emits
+ *                    independent vector readback; the authorization flag alone is insufficient.
  *   --batch-size=N   Embeddings per gRPC/HTTP request (default: 48)
  *   --limit=N        Max eligible chunks to process (default: all current eligible rows)
  *   --checkpoint=N   Progress log interval (default: 100)
@@ -372,6 +374,12 @@ async function main() {
 
     if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
       throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
+    }
+
+    if (APPLY) {
+      throw new Error(
+        'SEMANTIC_768_LINEAGE_GATE_BLOCKED: this full-corpus writer does not consume a frozen exact-revision input manifest or emit independent per-row provenance/readback; use --dry-run only until a canonical producer is implemented',
+      );
     }
 
     if (DRY_RUN) {

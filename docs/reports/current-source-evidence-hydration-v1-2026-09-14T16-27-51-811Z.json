@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.current-source-evidence-hydration.v1",
+  "mode": "READ_ONLY_SOURCE_EVIDENCE_OWNER_AUDIT",
+  "inputSource": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
+  "inputRows": 24181,
+  "exactRevisionMatches": 23397,
+  "contentHydrated": 906,
+  "authoritativeNamespaces": 0,
+  "namespaceStatus": "MISSING",
+  "evidenceSpanReady": 0,
+  "revisionBoundSpanOwner": 0,
+  "astCandidateRows": 168,
+  "astRevisionQualifiedRows": 48,
+  "classifierReady": 0,
+  "ownerCandidates": {
+    "atlas_ast_nodes": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": false,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_packets": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_source_refs": {
+      "present": true,
+      "hasSourceRevision": false,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": true,
+      "hasSourceNamespace": false
+    },
+    "atlas_workspace_source_bindings": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    },
+    "codebase_chunk_index": {
+      "present": true,
+      "hasSourceRevision": false,
+      "hasContent": true,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    },
+    "graphify_files": {
+      "present": true,
+      "hasSourceRevision": true,
+      "hasContent": false,
+      "hasContentHash": true,
+      "hasEvidenceSpan": false,
+      "hasSourceNamespace": false
+    }
+  },
+  "missingByReason": {
+    "CANONICAL_CHUNK_OWNER_MISSING": 23275,
+    "CHUNK_OWNER_HAS_CONTENT_BUT_NO_SOURCE_REVISION": 906
+  },
+  "writes": 0,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "neo4jWrites": false,
+  "valkeyWrites": false,
+  "canonicalAuthority": false,
+  "status": "SOURCE_EVIDENCE_HYDRATION_BLOCKED",
+  "nextGate": "RESOLVE_REVISION_BOUND_CONTENT_AND_SOURCE_NAMESPACE_AUTHORITY",
+  "reportChecksum": "bff73d9457dcc18df9a556df0ca2f4349e7c80911070c7c33363c2d937cfd7d1",
+  "stableReportWriteError": "UNKNOWN: unknown error, open 'C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\current-source-evidence-hydration-v1.json'"
+}

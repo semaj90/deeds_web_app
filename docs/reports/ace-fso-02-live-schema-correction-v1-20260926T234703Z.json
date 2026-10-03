@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.ace-feature-source-owner-live-schema-correction.v1",
+  "generatedAt": "2026-09-26T23:47:03Z",
+  "supersedesFindingIn": "docs/reports/ace-fso-02-readonly-feature-row-join-v1-20260926T234703Z.json",
+  "correction": "The historical migration source declares workspace_revision INTEGER, but the live PostgreSQL column is TEXT. The earlier receipt described migration-source drift, not the current live column type. No live type mismatch exists.",
+  "liveReadOnlyEvidence": {
+    "transaction": "REPEATABLE READ READ ONLY",
+    "table": "public.atlas_observation_feature_rows",
+    "workspaceRevisionDataType": "text",
+    "sourceVersionReceiptIdDataType": "text",
+    "representationIdDataType": "text",
+    "representationRevisionDataType": "text",
+    "rowCount": 1808,
+    "workspaceRevisionNonNull": 0,
+    "sourceVersionReceiptIdNonNull": 0,
+    "representationFieldsNonNull": 0
+  },
+  "remainingAceFsoBlocker": "The live column can hold sha256 workspace revisions, but all 1808 persisted rows lack them; all also lack source-version receipts and representation identity. Only 9 of the 16151 pinned packet keys join, and those 9 are not admissible feature rows. The other 16142 candidate ordinals have no matching packet-key row.",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

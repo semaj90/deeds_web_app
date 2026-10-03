@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
@@ -49,7 +50,7 @@
 
 			status = {
 				active: false,
-				model: 'gemma4-legal:latest',
+				model: SERVER_CHAT_MODEL,
 				epoch: 0,
 				totalEpochs: 0,
 				loss: 0,

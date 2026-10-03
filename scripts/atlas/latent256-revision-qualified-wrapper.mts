@@ -64,7 +64,9 @@ import pg from 'pg';
 
 import {
   RepresentationArtifactV1Schema,
+  assertRepresentationArtifactDigestV1,
   assertPromotionReadyRepresentationArtifact,
+  buildRepresentationArtifactV1,
   type RepresentationArtifactV1,
 } from '../../sveltekit-frontend/src/lib/server/atlas/tensors/representation-artifact-v1.js';
 import {
@@ -508,10 +510,10 @@ async function main(): Promise<void> {
       canonicalAuthority: false as const,
     };
 
-    const artifactDigest = `sha256:${sha256(JSON.stringify(artifactBase))}`;
-    const artifact: RepresentationArtifactV1 = { ...artifactBase, artifactDigest };
-
-    const parsed = RepresentationArtifactV1Schema.parse(artifact);
+    const artifact: RepresentationArtifactV1 = buildRepresentationArtifactV1(artifactBase);
+    const parsed = assertRepresentationArtifactDigestV1(
+      RepresentationArtifactV1Schema.parse(artifact)
+    );
     assertPromotionReadyRepresentationArtifact(parsed);
 
     const runId = new Date().toISOString().replace(/[:.]/g, '-');

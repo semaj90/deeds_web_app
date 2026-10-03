@@ -25,6 +25,9 @@ export default {
     '!admin_telemetry', '!agent_actions', '!agent_context_files', '!agent_context_files_history',
     '!agent_context_relations', '!case_statute_links', '!chat_document_attachments',
     '!citation_collections', '!code_relations_v1', '!code_retrieval_chunks',
+    // Existing external-doc tables are declared for runtime Drizzle typing;
+    // their generated-column and GIN/HNSW DDL remains in the registered manual sidecar.
+    '!atlas_external_doc_pages', '!atlas_external_doc_chunks',
     '!collection_citations', '!directory_context_bindings', '!document_topics',
     '!feature_dependency_edges', '!file_hotness_scores', '!file_summaries', '!fix_attempts',
     '!fixer_patterns', '!fixer_run_log', '!hypergraph_edge_members', '!indexing_jobs',

@@ -1,0 +1,174 @@
+{
+  "schema": "atlas.qdrant-representation-parity.v2",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY",
+  "sampleRequested": 300,
+  "threshold": 0.995,
+  "collections": {
+    "codebase_chunks_768": {
+      "payloadCensus": {
+        "actualPointCount": 328348,
+        "documentedPointCount": 105762,
+        "uuidIdCount": 55270,
+        "sourceRefPresentCount": 328348,
+        "badSourceRefCount": 1,
+        "contentHashPresentCount": 325550,
+        "packetKeyPresentCount": 328348,
+        "sourceRevisionPresentCount": 30,
+        "workspaceRevisionPresentCount": 30,
+        "representationRevisionPresentCount": 219251,
+        "modelRevisionPresentCount": 271601,
+        "producerEras": {
+          "qdrant-backfill-v1": 1000,
+          "(none)": 326772,
+          "graphify-signature-768-v1": 528,
+          "graphify-content-768-v1": 48
+        },
+        "identityShapes": {
+          "uuid|badref|hash": 1,
+          "nouuid|ref|hash": 270287,
+          "uuid|ref|hash": 55262,
+          "nouuid|ref|nohash": 2791,
+          "uuid|ref|nohash": 7
+        }
+      },
+      "sample": {
+        "size": 300,
+        "buckets": 8,
+        "perBucket": 37
+      },
+      "identityClassHistogram": {
+        "SOURCE_REF_CORRUPT": 1,
+        "SOURCE_REF_AND_CONTENT_HASH_FALLBACK": 181,
+        "QDRANT_PAYLOAD_INCOMPLETE": 69,
+        "EXACT_ID_HASH_MISMATCH": 41,
+        "EXACT_ID_AND_CONTENT_HASH": 5,
+        "POSTGRES_ROW_MISSING": 3
+      },
+      "eligibleForRepresentationInference": 143,
+      "recipeHistogramEligible": {
+        "UNKNOWN": 103,
+        "raw": 40
+      },
+      "recipeHistogramByProducerEra": {
+        "qdrant-backfill-v1": {
+          "UNKNOWN": 42
+        },
+        "(none)": {
+          "raw": 40,
+          "UNKNOWN": 13
+        },
+        "graphify-content-768-v1": {
+          "UNKNOWN": 48
+        }
+      },
+      "freshRecipeCosineEligible": {
+        "raw": {
+          "n": 143,
+          "min": 0.282,
+          "avg": 0.7621,
+          "ge_threshold": 40
+        },
+        "title_none": {
+          "n": 143,
+          "min": 0.3057,
+          "avg": 0.7442,
+          "ge_threshold": 0
+        },
+        "title_relative_path": {
+          "n": 143,
+          "min": 0.319,
+          "avg": 0.7681,
+          "ge_threshold": 0
+        }
+      },
+      "vectorRecipe": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN",
+      "vectorRecipeReason": "COHORTS_DISAGREE",
+      "interchangeableExecutorProven": false,
+      "interchangeableExecutorBlockers": [
+        "representation_revision present on <90 percent of points",
+        "model_revision present on <90 percent of points",
+        "source_revision present on <90 percent of points",
+        "workspace_revision present on <90 percent of points"
+      ]
+    },
+    "codebase_chunks_768_v2": {
+      "payloadCensus": {
+        "actualPointCount": 52816,
+        "documentedPointCount": 52380,
+        "uuidIdCount": 52380,
+        "sourceRefPresentCount": 52815,
+        "badSourceRefCount": 0,
+        "contentHashPresentCount": 45472,
+        "packetKeyPresentCount": 6747,
+        "sourceRevisionPresentCount": 6746,
+        "workspaceRevisionPresentCount": 434,
+        "representationRevisionPresentCount": 0,
+        "modelRevisionPresentCount": 0,
+        "producerEras": {
+          "v2_uuid_clean": 52380,
+          "(none)": 436
+        },
+        "identityShapes": {
+          "uuid|ref|hash": 45472,
+          "uuid|ref|nohash": 6908,
+          "nouuid|ref|nohash": 435,
+          "nouuid|noref|nohash": 1
+        }
+      },
+      "sample": {
+        "size": 300,
+        "buckets": 4,
+        "perBucket": 75
+      },
+      "identityClassHistogram": {
+        "EXACT_ID_AND_CONTENT_HASH": 100,
+        "QDRANT_PAYLOAD_INCOMPLETE": 200
+      },
+      "eligibleForRepresentationInference": 100,
+      "recipeHistogramEligible": {
+        "raw": 34,
+        "UNKNOWN": 66
+      },
+      "recipeHistogramByProducerEra": {
+        "v2_uuid_clean": {
+          "raw": 34,
+          "UNKNOWN": 66
+        }
+      },
+      "freshRecipeCosineEligible": {
+        "raw": {
+          "n": 100,
+          "min": 0.6815,
+          "avg": 0.9515,
+          "ge_threshold": 34
+        },
+        "title_none": {
+          "n": 100,
+          "min": 0.6655,
+          "avg": 0.9285,
+          "ge_threshold": 0
+        },
+        "title_relative_path": {
+          "n": 100,
+          "min": 0.823,
+          "avg": 0.9467,
+          "ge_threshold": 0
+        }
+      },
+      "vectorRecipe": "QDRANT_REPRESENTATION_MIXED_OR_UNKNOWN",
+      "vectorRecipeReason": "UNKNOWN_REMAINDER",
+      "interchangeableExecutorProven": false,
+      "interchangeableExecutorBlockers": [
+        "representation_revision present on <90 percent of points",
+        "model_revision present on <90 percent of points",
+        "packet_key present on <90 percent of points",
+        "source_revision present on <90 percent of points",
+        "workspace_revision present on <90 percent of points",
+        "content_hash present on <90 percent of points"
+      ]
+    }
+  },
+  "databaseWrites": false,
+  "qdrantWrites": false
+}

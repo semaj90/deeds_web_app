@@ -818,7 +818,7 @@ def _resolve_original_chunk_span(
 
 
 def _diagnostics_have_errors(diagnostics: list[str]) -> bool:
-    return any(not item.startswith("CONSILIENCY_LF_OFFSET_REMAP:") for item in diagnostics)
+    return bool(legacy._fatal_structural_diagnostics(diagnostics))
 
 
 def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
@@ -1034,6 +1034,7 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         edges.extend(fallback_edges)
         diagnostics.extend(edge_diagnostics)
 
+    fatal_diagnostics = legacy._fatal_structural_diagnostics(diagnostics)
     return AstEvidenceResponseV2(
         schema="atlas.ast.evidence.v1",
         engine="treesitter-chunker",
@@ -1044,8 +1045,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         chunks=evidence_chunks,
         edges=edges,
         diagnostics=diagnostics,
-        error_tag="ChunkingError" if any(item.startswith("ChunkingError:") for item in diagnostics) else None,
-        syntax_status="RECOVERED_WITH_ERRORS" if _diagnostics_have_errors(diagnostics) else "CLEAN",
+        error_tag="ChunkingError" if fatal_diagnostics else None,
+        syntax_status="RECOVERED_WITH_ERRORS" if fatal_diagnostics else "CLEAN",
     )
 
 
@@ -1082,6 +1083,11 @@ def analyze(req: legacy.AnalyzeRequest) -> legacy.AnalyzeResponse:
 @app.post("/extract", response_model=legacy.ExtractResponse)
 def extract(req: legacy.AnalyzeRequest) -> legacy.ExtractResponse:
     return legacy._extract(req)
+
+
+@app.post("/pos", response_model=legacy.PosTagResponse)
+def pos_tag(req: legacy.PosTagRequest) -> legacy.PosTagResponse:
+    return legacy._spacy_pos_tags(legacy._safe_text(req.text, legacy.MAX_TEXT_CHARS))
 
 
 @app.post("/extract/documentation-facts", response_model=DocumentationFactResponseV1)

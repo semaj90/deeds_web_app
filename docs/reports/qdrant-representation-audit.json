@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-08-28T18:05:14.758Z",
+  "timestamp": "2026-09-19T17:04:39.546Z",
   "qdrantUrl": "http://127.0.0.1:6333",
-  "totalCollections": 43,
+  "totalCollections": 48,
   "byClassification": {
     "UNCLASSIFIED": [
       {
@@ -12,7 +12,7 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 5
+        "pointCount": 11
       },
       {
         "collectionName": "agent_memory_observations",
@@ -68,7 +68,7 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 0
+        "pointCount": 11
       },
       {
         "collectionName": "cluster_narratives",
@@ -100,7 +100,17 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 53379
+        "pointCount": 53380
+      },
+      {
+        "collectionName": "codebase_chunks_latent256",
+        "vectorDimensions": 256,
+        "namedVectors": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 55169
       },
       {
         "collectionName": "codebase_chunks_sparse_test_v1",
@@ -183,6 +193,36 @@
         "pointCount": 0
       },
       {
+        "collectionName": "error_embedding_mrl_128",
+        "vectorDimensions": 128,
+        "namedVectors": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 20
+      },
+      {
+        "collectionName": "error_embedding_mrl_256",
+        "vectorDimensions": 256,
+        "namedVectors": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 20
+      },
+      {
+        "collectionName": "error_embedding_mrl_512",
+        "vectorDimensions": 512,
+        "namedVectors": null,
+        "classification": "UNCLASSIFIED",
+        "representationId": "unknown",
+        "confidence": 0,
+        "notes": [],
+        "pointCount": 20
+      },
+      {
         "collectionName": "error_embeddings",
         "vectorDimensions": 768,
         "namedVectors": [
@@ -192,7 +232,7 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 6
+        "pointCount": 13
       },
       {
         "collectionName": "evidence_items",
@@ -318,7 +358,7 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 9
+        "pointCount": 14
       },
       {
         "collectionName": "poi_profiles",
@@ -342,7 +382,7 @@
         "representationId": "unknown",
         "confidence": 0,
         "notes": [],
-        "pointCount": 326
+        "pointCount": 1025
       },
       {
         "collectionName": "sc_deedssocraticode_metadata",
@@ -412,7 +452,7 @@
         "notes": [
           "Name suggests 768-dim, consistent with native EmbeddingGemma"
         ],
-        "pointCount": 109129
+        "pointCount": 328348
       },
       {
         "collectionName": "codebase_chunks_768_v2",
@@ -428,7 +468,7 @@
         "notes": [
           "Name suggests 768-dim, consistent with native EmbeddingGemma"
         ],
-        "pointCount": 52380
+        "pointCount": 52816
       }
     ],
     "LIKELY_768": [
@@ -521,6 +561,18 @@
           "Name and actual dimensions confirm 768-dim"
         ],
         "pointCount": 8
+      },
+      {
+        "collectionName": "taxonomy_nodes_768",
+        "vectorDimensions": 768,
+        "namedVectors": null,
+        "classification": "LIKELY_768",
+        "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+        "confidence": 0.9,
+        "notes": [
+          "Name and actual dimensions confirm 768-dim"
+        ],
+        "pointCount": 5527
       }
     ]
   },
@@ -548,6 +600,7 @@
         "cluster_narratives",
         "code_llm_outputs",
         "codebase_chunks_512",
+        "codebase_chunks_latent256",
         "codebase_chunks_sparse_test_v1",
         "codebase_topology_128",
         "codebase_topology_64",
@@ -555,6 +608,9 @@
         "diagnosis_embeddings",
         "document_tags",
         "embedding_cache",
+        "error_embedding_mrl_128",
+        "error_embedding_mrl_256",
+        "error_embedding_mrl_512",
         "error_embeddings",
         "evidence_items",
         "evidence_items_clip_512",
@@ -585,7 +641,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 5
+      "pointCount": 11
     },
     {
       "collectionName": "agent_memory_observations",
@@ -641,7 +697,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 0
+      "pointCount": 11
     },
     {
       "collectionName": "cluster_narratives",
@@ -703,7 +759,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 53379
+      "pointCount": 53380
     },
     {
       "collectionName": "codebase_chunks_768",
@@ -719,7 +775,7 @@
       "notes": [
         "Name suggests 768-dim, consistent with native EmbeddingGemma"
       ],
-      "pointCount": 109129
+      "pointCount": 328348
     },
     {
       "collectionName": "codebase_chunks_768_v2",
@@ -735,7 +791,17 @@
       "notes": [
         "Name suggests 768-dim, consistent with native EmbeddingGemma"
       ],
-      "pointCount": 52380
+      "pointCount": 52816
+    },
+    {
+      "collectionName": "codebase_chunks_latent256",
+      "vectorDimensions": 256,
+      "namedVectors": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 55169
     },
     {
       "collectionName": "codebase_chunks_sparse_test_v1",
@@ -830,6 +896,36 @@
       "pointCount": 0
     },
     {
+      "collectionName": "error_embedding_mrl_128",
+      "vectorDimensions": 128,
+      "namedVectors": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 20
+    },
+    {
+      "collectionName": "error_embedding_mrl_256",
+      "vectorDimensions": 256,
+      "namedVectors": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 20
+    },
+    {
+      "collectionName": "error_embedding_mrl_512",
+      "vectorDimensions": 512,
+      "namedVectors": null,
+      "classification": "UNCLASSIFIED",
+      "representationId": "unknown",
+      "confidence": 0,
+      "notes": [],
+      "pointCount": 20
+    },
+    {
       "collectionName": "error_embeddings",
       "vectorDimensions": 768,
       "namedVectors": [
@@ -839,7 +935,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 6
+      "pointCount": 13
     },
     {
       "collectionName": "evidence_items",
@@ -989,7 +1085,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 9
+      "pointCount": 14
     },
     {
       "collectionName": "phase110_baseline_768",
@@ -1039,7 +1135,7 @@
       "representationId": "unknown",
       "confidence": 0,
       "notes": [],
-      "pointCount": 326
+      "pointCount": 1025
     },
     {
       "collectionName": "sc_deedssocraticode_metadata",
@@ -1078,6 +1174,18 @@
         "Name and actual dimensions confirm 768-dim"
       ],
       "pointCount": 8
+    },
+    {
+      "collectionName": "taxonomy_nodes_768",
+      "vectorDimensions": 768,
+      "namedVectors": null,
+      "classification": "LIKELY_768",
+      "representationId": "embeddinggemma_300m_768_native_ollama_v1",
+      "confidence": 0.9,
+      "notes": [
+        "Name and actual dimensions confirm 768-dim"
+      ],
+      "pointCount": 5527
     },
     {
       "collectionName": "topic_clusters",

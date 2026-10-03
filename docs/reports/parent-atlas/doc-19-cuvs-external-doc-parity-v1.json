@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.doc-19.cuvs-external-doc-parity.v1",
+  "gate": "DOC-19",
+  "status": "DOC_19_CUVS_EXTERNAL_DOC_EXACT_PARITY_PROVEN",
+  "cohort": {
+    "table": "atlas_external_doc_chunks",
+    "rows": 852,
+    "dimensions": 768,
+    "queryOrdinals": [
+      0,
+      425,
+      851
+    ],
+    "topK": 10
+  },
+  "corpusChecksum": "sha256:55da114cc8860dfbe3f858c22d1d09d51e73d960a166f901bbd5d039329601a6",
+  "artifactChecksum": "sha256:67f8c69b32e89df10bb7c7a1029ff66ef218eacf4e49817c2c8f1121c5900694",
+  "parity": [
+    {
+      "queryOrdinal": 0,
+      "queryChunkId": "doc:bits-ui:679d17152be486da:0",
+      "actualCount": 10,
+      "expectedCount": 10,
+      "exactSetParity": true,
+      "exactRankParity": true,
+      "maxDistanceDelta": 1.1176955305725045e-7,
+      "scoreTolerance": 0.00001,
+      "withinScoreTolerance": true
+    },
+    {
+      "queryOrdinal": 425,
+      "queryChunkId": "doc:postgresql-18:38d5e74bafb89df8:45",
+      "actualCount": 10,
+      "expectedCount": 10,
+      "exactSetParity": true,
+      "exactRankParity": true,
+      "maxDistanceDelta": 1.1920928955078125e-7,
+      "scoreTolerance": 0.00001,
+      "withinScoreTolerance": true
+    },
+    {
+      "queryOrdinal": 851,
+      "queryChunkId": "doc:sveltekit:e650ae13a0841739:9",
+      "actualCount": 10,
+      "expectedCount": 10,
+      "exactSetParity": true,
+      "exactRankParity": true,
+      "maxDistanceDelta": 1.1920928955078125e-7,
+      "scoreTolerance": 0.00001,
+      "withinScoreTolerance": true
+    }
+  ],
+  "checks": {
+    "readOnlyTransaction": true,
+    "expectedCanonicalRows": true,
+    "uniqueChunkIds": true,
+    "revisionQualified": true,
+    "dimensions768": true,
+    "finiteNonzeroVectors": true,
+    "liveCudaExecutor": true,
+    "artifactReadbackChecksum": true,
+    "exactTopKSetParity": true,
+    "exactTopKRankParity": true,
+    "distanceParity": true,
+    "executionOnlyNoCanonicalAuthority": true
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "canonicalCorpus": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "filesystem": {
+    "arrowArtifact": "docs/reports/parent-atlas/doc-19-cuvs-external-doc-vectors.arrow",
+    "receipt": "docs/reports/parent-atlas/doc-19-cuvs-external-doc-parity-v1.json",
+    "writesAreNoncanonicalExecutionArtifacts": true
+  },
+  "canonicalAuthority": false,
+  "logicalLaneVote": "NONE",
+  "errors": [],
+  "httpApiHealth": {
+    "ok": true,
+    "service": "atlas-gpu-8098",
+    "executionOnly": true,
+    "cudaAvailable": true,
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "torchAvailable": false,
+    "writes": {
+      "postgres": false,
+      "qdrant": false,
+      "valkey": false
+    }
+  },
+  "executor": {
+    "kind": "CUVS_BRUTE_FORCE",
+    "version": "26.08.00",
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "invocation": "docker exec into existing atlas-gpu-8098; no rebuild",
+    "executionApiProof": false,
+    "apiBlocker": "HTTP wrapper health reports torchAvailable=false; direct library execution used without altering the running image."
+  }
+}

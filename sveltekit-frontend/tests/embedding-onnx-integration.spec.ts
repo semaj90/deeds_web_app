@@ -15,6 +15,36 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { generateEmbeddings, generateSingleEmbedding } from '../src/lib/server/grpc/embedding-client';
 import type { EmbeddingResult, EmbeddingSource } from '../src/lib/server/grpc/embedding-client';
+import { digestEmbeddingInputV1 } from '../src/lib/server/atlas/embedding/embedding-context-plan-v1';
+
+function embeddingPlan(text: string) {
+  const renderedInput = `DOCUMENT: ${text}`;
+  return {
+    schema: 'atlas.embedding-context-plan.v1' as const,
+    planRevision: 'onnx-integration-plan-v1',
+    representationId: 'semantic_768' as const,
+    representationRevision: 'onnx-integration-requested-revision',
+    modelRevision: 'embeddinggemma-model-unverified',
+    tokenizerRevision: 'embeddinggemma-tokenizer-unverified',
+    promptRevision: 'document-prefix-v1',
+    role: 'RETRIEVAL_DOCUMENT' as const,
+    text,
+    title: null,
+    inputTextChecksum: digestEmbeddingInputV1(text),
+    renderedInput,
+    renderedInputChecksum: digestEmbeddingInputV1(renderedInput),
+    estimatedTokens: 4,
+    poolingPolicy: 'MEAN' as const,
+    normalizationPolicy: 'L2' as const,
+    sourceRef: null,
+    sourceRevision: null,
+    workspaceRevision: null,
+    packetKey: null,
+    candidateOrdinal: null,
+    canonicalAuthority: false as const,
+    planChecksum: `sha256:${'0'.repeat(64)}`,
+  };
+}
 
 describe('P1: ONNX Embedding Integration', () => {
   // Test 1: Verify ONNX availability and 768-dim contract
@@ -22,7 +52,7 @@ describe('P1: ONNX Embedding Integration', () => {
     it('should have ONNX embedding available', async () => {
       const { isOnnxEmbedAvailable } = await import('../src/lib/server/embedding/onnx-embed');
       expect(typeof isOnnxEmbedAvailable).toBe('function');
-      const available = isOnnxEmbedAvailable();
+      const available = await isOnnxEmbedAvailable();
       expect(typeof available).toBe('boolean');
     });
 
@@ -40,12 +70,18 @@ describe('P1: ONNX Embedding Integration', () => {
 
     it('should return 768-dim from batchEmbedOnnx', async () => {
       const { batchEmbedOnnx } = await import('../src/lib/server/embedding/onnx-embed');
-      const vecs = await batchEmbedOnnx(['text1', 'text2', 'text3']);
+      const results = await batchEmbedOnnx(['text1', 'text2', 'text3'].map(embeddingPlan));
 
-      expect(vecs).toHaveLength(3);
-      for (const vec of vecs) {
-        if (vec !== null) {
-          expect(vec).toHaveLength(768);
+      expect(results).toHaveLength(3);
+      for (const result of results) {
+        if (result.status === 'COMPLETE') {
+          expect(result.vector).toHaveLength(768);
+          expect(result.executorId).toBe('ONNX_CPU_CHALLENGER');
+          expect(result.executionProvider).toBe('CPUExecutionProvider');
+          expect(result.canonicalAuthority).toBe(false);
+          expect(result.promotionEligible).toBe(false);
+          expect(result.semanticSpaceParity).toBe('UNPROVEN');
+          expect(result.planChecksumVerified).toBe(false);
         }
       }
     });

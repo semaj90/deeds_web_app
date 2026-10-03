@@ -23,6 +23,64 @@
  *     time a request reaches this module; packetKey here is always final)
  */
 
+import { createHash } from 'node:crypto';
+import { z } from 'zod';
+
+const sha256Digest = z.string().regex(/^[a-f0-9]{64}$/i);
+const qualifiedRevision = z.string().regex(/^sha256:[a-f0-9]{64}$/i);
+
+/** Read-only whole-source identity for the packet digest bridge. */
+export const canonicalPacketContentIdentityV1Schema = z.object({
+	schema: z.literal('atlas.canonical-packet-content-identity.v1'),
+	packetKey: z.string().min(1),
+	sourceRef: z.string().min(1),
+	workspaceRevision: qualifiedRevision,
+	sourceRevision: qualifiedRevision,
+	contentDigest: sha256Digest,
+	byteLength: z.number().int().nonnegative(),
+	producerRevision: z.string().min(1),
+	readOnlyObservation: z.literal(true),
+	canonicalAuthority: z.literal(false),
+	checksum: sha256Digest,
+}).strict();
+
+export type CanonicalPacketContentIdentityV1 = z.infer<typeof canonicalPacketContentIdentityV1Schema>;
+
+function stableJson(value: Record<string, unknown>): string {
+	return JSON.stringify(Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b))));
+}
+
+function sha256(value: Uint8Array | string): string {
+	return createHash('sha256').update(value).digest('hex');
+}
+
+/** Build a deterministic bridge identity from exact bytes and an admitted revision. */
+export function buildCanonicalPacketContentIdentityV1(input: {
+	packetKey: string;
+	sourceRef: string;
+	workspaceRevision: string;
+	bytes: Uint8Array;
+	producerRevision: string;
+}): CanonicalPacketContentIdentityV1 {
+	const contentDigest = sha256(input.bytes);
+	const payload = {
+		schema: 'atlas.canonical-packet-content-identity.v1' as const,
+		packetKey: input.packetKey,
+		sourceRef: input.sourceRef,
+		workspaceRevision: input.workspaceRevision,
+		sourceRevision: `sha256:${contentDigest}`,
+		contentDigest,
+		byteLength: input.bytes.byteLength,
+		producerRevision: input.producerRevision,
+		readOnlyObservation: true as const,
+		canonicalAuthority: false as const,
+	};
+	return canonicalPacketContentIdentityV1Schema.parse({
+		...payload,
+		checksum: sha256(stableJson(payload)),
+	});
+}
+
 export type PacketWriteDecisionKind =
 	| 'INSERT_NEW'
 	| 'IDEMPOTENT_REPLAY'
@@ -100,6 +158,15 @@ export function decidePacketWrite(
 		currentSourceRevision: current.exists ? current.sourceRevision : null,
 		requestedSourceRevision: request.sourceRevision,
 	};
+
+	if (!current.exists && (request.sourceRevision === null || request.sourceRevision === undefined
+		|| request.workspaceRevision === null || request.workspaceRevision === undefined)) {
+		return {
+			...base,
+			decision: 'REVISION_UNPROVEN',
+			reason: 'New canonical packets require both sourceRevision and workspaceRevision; an unqualified insert is rejected.',
+		};
+	}
 
 	if (!current.exists) {
 		return {

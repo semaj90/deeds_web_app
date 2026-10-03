@@ -45,12 +45,12 @@ class NoOpLangGraphBridge implements Omit<LangGraphBridge, 'constructor'> {
     return state; // Passthrough, no constraints
   }
 
-  async invokeTool(
-    toolName: string,
-    toolResult: Record<string, unknown>,
-    currentState: DispatcherState
-  ): Promise<{ result: unknown; updatedState: DispatcherState }> {
-    return { result: toolResult, updatedState: currentState }; // Passthrough
+  async applyToolResult(input: {
+    state: DispatcherState;
+    toolCall: { toolName: string; toolCallId: string };
+    resultEnvelope: unknown;
+  }): Promise<{ result: unknown; updatedState: DispatcherState }> {
+    return { result: input.resultEnvelope, updatedState: input.state }; // Passthrough
   }
 
   async persistStateToDB(state: DispatcherState, sessionId: string): Promise<void> {
@@ -151,11 +151,11 @@ export class DispatcherMiddleware {
         let constrainedResult = result;
 
         if (this.langgraphEnabled) {
-          const { result: cResult, updatedState } = await this.langgraphBridge.invokeTool(
-            toolName,
-            typeof result === 'object' ? (result as Record<string, unknown>) : { raw: String(result) },
-            headroomed
-          );
+          const { result: cResult, updatedState } = await this.langgraphBridge.applyToolResult({
+            state: headroomed,
+            toolCall: { toolName, toolCallId },
+            resultEnvelope: result,
+          });
           constrainedResult = cResult;
           currentState = { ...updatedState, action: 'complete' };
         } else {

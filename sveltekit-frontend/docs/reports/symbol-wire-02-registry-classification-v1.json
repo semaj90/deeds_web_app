@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.symbol-wire-02-registry-classification.v1",
+  "generatedAt": "2026-09-22T20:10:26.215Z",
+  "corpusManifestUsed": {
+    "workspaceRevision": "1ec451233a652de4fe081dcd7aa0feb541e081ae",
+    "corpusSize": 300
+  },
+  "databaseSnapshot": {
+    "note": "atlas_symbol_versions/atlas_symbol_registry are a real but apparently stale/partial snapshot (many rows reference deeds_labs/archive/scaffolds/... paths that no longer exist in the live tree) -- verified 2026-09-22, not assumed.",
+    "totalAtlasSymbolVersionsRows": 10504,
+    "distinctRegisteredFilesUnderSrcPrefix": 15,
+    "corpusEligibleFiles": 5557,
+    "registryCoverageOfEligibleCorpus": 0.002699298182472557
+  },
+  "filesParsed": 300,
+  "filesFailed": 0,
+  "filesWithAnyRegistryRow": 0,
+  "filesWithZeroRegistryRows": 300,
+  "totalObservations": 13502,
+  "bucketCounts": {
+    "EXACT": 0,
+    "SPAN_MISMATCH": 0,
+    "REVISION_MISMATCH": 0,
+    "AMBIGUOUS": 0,
+    "REGISTRY_MISSING": 13502,
+    "PARSE_FAILED": 0
+  },
+  "bucketRates": {
+    "EXACT": 0,
+    "SPAN_MISMATCH": 0,
+    "REVISION_MISMATCH": 0,
+    "AMBIGUOUS": 0,
+    "REGISTRY_MISSING": 1,
+    "PARSE_FAILED": 0
+  },
+  "examples": {
+    "EXACT": [],
+    "SPAN_MISMATCH": [],
+    "REVISION_MISMATCH": [],
+    "AMBIGUOUS": []
+  },
+  "sourceRefConventionsChecked": [
+    "<relPath as in corpus, e.g. src/lib/...>",
+    "sveltekit-frontend/<relPath>"
+  ],
+  "runtimeProof": {
+    "treeSitterVersion": "0.25.1",
+    "treeSitterTypescriptVersion": "0.23.2"
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "notes": [
+    "Read-only against Postgres (SELECT only). No INSERT/UPDATE/DELETE, no promotion, no registry writes.",
+    "REGISTRY_MISSING dominating (100% in this run) is an expected, honest finding, not a bug: only 15 distinct files under a src/ prefix have ANY atlas_symbol_versions row at all (verified live), out of 5557 eligible corpus files -- a 300-file deterministic stride sample not hitting any of those handful of registered files is plausible, not evidence of a classification bug. This is the measurement the review asked for: \"UNKNOWN reaching canonical promotion\" is a genuinely different, far smaller number than raw observation counts, and this run shows the registry is far too sparse to answer that question on this sample -- rerun against the specific registered files (or a corpus built FROM atlas_symbol_versions.source_ref instead of a fresh git-tracked sample) for a non-trivial result.",
+    "STOP CONDITION (unchanged from SYMBOL-WIRE-01): no SymbolVersion promotion, no POS linkage, no retrieval/BitFrost/ACE wiring performed or proposed by this script."
+  ]
+}

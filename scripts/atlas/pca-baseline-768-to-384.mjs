@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * PCA Baseline: 768→384 Dimensionality Reduction
+ * Experimental PCA challenger: semantic_768 → pca_384_experimental
  *
  * Establish a simple dimensionality reduction baseline before considering autoencoder training.
  * Measure reconstruction error and cosine similarity preservation.
@@ -242,6 +242,9 @@ async function execute() {
     baseline_type: 'PCA',
     input_dimension: 768,
     output_dimension: 384,
+    input_representation_id: 'semantic_768',
+    output_representation_id: 'pca_384_experimental',
+    canonical_authority: false,
     sample_size: sampleSize,
     evaluation_metrics: {
       reconstruction_mse: avgMSE,
@@ -249,7 +252,7 @@ async function execute() {
       recommendation: avgCosineSim > 0.95 ? 'ACCEPTABLE' : avgCosineSim > 0.90 ? 'MARGINAL' : 'POOR'
     },
     next_steps: [
-      'Compare with native EmbeddingGemma 384-dim embedding quality',
+      'Compare only as an experimental PCA challenger against semantic_768, semantic_mrl_512/256/128, and learned latent_256/128/64 under a frozen held-out cohort',
       'If PCA insufficient, evaluate autoencoder training',
       'Measure retrieval recall (NDCG@5, NDCG@10) for both paths',
       'Establish decision threshold for AE training authorization'
@@ -268,8 +271,8 @@ async function execute() {
   console.log('\n═══════════════════════════════════════════════════════════');
   console.log('✓ PCA BASELINE EVALUATION COMPLETE');
   console.log('═══════════════════════════════════════════════════════════\n');
-  console.log('Next: Compare against native 384-dim EmbeddingGemma path');
-  console.log('Gate: Do not train autoencoder until evaluation comparison complete\n');
+  console.log('Next: Compare this noncanonical PCA challenger against qualified semantic_768 / MRL / learned-latent lanes');
+  console.log('Gate: no retrieval promotion from reconstruction metrics alone; require held-out retrieval evaluation\n');
 }
 
 execute().catch(err => {

@@ -1,5 +1,9 @@
-import { z } from 'zod';
-import { redisGetAcePacket, redisSetAcePacket, hashQuery } from '$lib/server/cache/ace-packet-cache.js';
+import {
+  redisGetRevisionedAcePacketV1,
+  redisSetRevisionedAcePacketV1,
+  hashQuery,
+} from '$lib/server/cache/ace-packet-cache.js';
+import { admitAceRouteCacheIdentityV1 } from '$lib/server/ace/ace-route-cache-admission-v1.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
 import { buildStreamPreamble } from '$lib/server/mcp/atlas-tools-client.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
@@ -11,12 +15,9 @@ import {
   deriveTokenMapCartridgePayloadFromAcePacket,
   persistTokenMapCartridge,
 } from '$lib/server/token-map/token-map-service.js';
+import { aceStreamRequestV1Schema } from '$lib/server/ace/ace-stream-request-v1.js';
 
 const execAsync = promisify(exec);
-
-const postSchema = z.object({
-  query: z.string().min(1),
-});
 
 function makeRequestFromUrl(url: URL) {
   const query = url.searchParams.get('q') ?? url.searchParams.get('query') ?? '';
@@ -96,7 +97,7 @@ export async function POST({ request, locals }) {
     return new Response(JSON.stringify({ error: 'Invalid JSON body' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
 
-  const parsed = postSchema.safeParse(body);
+  const parsed = aceStreamRequestV1Schema.safeParse(body);
   if (!parsed.success) {
     return new Response(JSON.stringify({ error: 'Invalid input parameters', details: parsed.error.format() }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
@@ -113,6 +114,10 @@ export async function POST({ request, locals }) {
       
       const cacheKey = hashQuery(query);
       const queryHash = cacheKey.split(':').pop() ?? `query-${Date.now()}`;
+      // Do not accept a cache identity from client JSON. The live route still
+      // assembles a legacy packet; revisioned BitFrost access remains blocked
+      // until a server-owned admitted ContextManifest/V3 bridge is connected.
+      const cacheAdmission = admitAceRouteCacheIdentityV1(undefined, cacheKey);
 
       // ── Atlas-tools preamble (classify intent + RAG context) ─────────────────
       // Runs in parallel with cache lookup. Fails silently — stream continues.
@@ -121,8 +126,19 @@ export async function POST({ request, locals }) {
         return null;
       });
 
-      const cached = await redisGetAcePacket(cacheKey).catch(() => null);
+      const cached = cacheAdmission.status === 'ADMITTED'
+        ? await redisGetRevisionedAcePacketV1(cacheAdmission.identity).catch(() => null)
+        : null;
       let packetToUse = cached;
+
+      if (cacheAdmission.status !== 'ADMITTED') {
+        send({
+          type: 'cache.blocked',
+          reason: cacheAdmission.reason,
+          degraded: true,
+          canonicalAuthority: false,
+        });
+      }
 
       const preamble = await preamblePromise;
       if (preamble) {
@@ -138,9 +154,13 @@ export async function POST({ request, locals }) {
       }
 
       if (cached) {
-        send({ type: 'cache.hit', key: cacheKey });
+        send({ type: 'cache.hit', key: cacheAdmission.cacheKey });
       } else {
-        send({ type: 'cache.miss', key: cacheKey });
+        send({
+          type: 'cache.miss',
+          key: cacheAdmission.status === 'ADMITTED' ? cacheAdmission.cacheKey : cacheKey,
+          degraded: cacheAdmission.status !== 'ADMITTED',
+        });
         send({ type: 'retrieval.start', strategy: 'qdrant_postgres_hybrid' });
         
         const packet = await buildAcePacket(query);
@@ -153,7 +173,9 @@ export async function POST({ request, locals }) {
           varianceRecovery: packet.varianceRecovery
         });
         
-        await redisSetAcePacket(cacheKey, packet).catch(() => null);
+        if (cacheAdmission.status === 'ADMITTED') {
+          await redisSetRevisionedAcePacketV1(cacheAdmission.identity, packet).catch(() => null);
+        }
       }
 
       const tokenMapPayload = deriveTokenMapCartridgePayloadFromAcePacket(query, packetToUse ?? {});

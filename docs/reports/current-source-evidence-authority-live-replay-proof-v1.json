@@ -5,36 +5,47 @@
   "bothSucceeded": {
     "schema": "atlas.current-source-evidence-authority.v1",
     "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
-    "generatedAt": "2026-09-08T23:52:28.315Z",
+    "generatedAt": "2026-09-17T22:30:11.392Z",
     "mode": "READ_ONLY",
     "canonicalAuthority": false,
     "writesPerformed": false,
     "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
     "toleranceWindow": {
       "toleranceMs": 300000,
-      "nowMs": 1788911533851,
-      "checkedAt": "2026-09-08T23:52:13.851Z"
+      "nowMs": 1789684195269,
+      "checkedAt": "2026-09-17T22:29:55.269Z"
     },
     "currentWorkspace": {
       "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-      "workspaceRevision": "sha256:f84acc8363b344cc9e6cb3c7d4a2774aaa4a0a859e1e1f9855c74ac281f254fa",
-      "sourceManifestDigest": "f84acc8363b344cc9e6cb3c7d4a2774aaa4a0a859e1e1f9855c74ac281f254fa",
-      "sourceCount": 24094,
+      "workspaceRevision": "sha256:05fa828db4ab5bc1b84e00ec44f34279e820c31e933ff6e4d0589afd8eacee75",
+      "sourceManifestDigest": "05fa828db4ab5bc1b84e00ec44f34279e820c31e933ff6e4d0589afd8eacee75",
+      "sourceCount": 24665,
       "repositoryId": "semaj90/deeds_web_app",
-      "baseCommitOid": "8fdbcb53619b5ef5551c097948906ebdd6b01188",
+      "baseCommitOid": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
       "dirty": true
     },
     "runCounts": {
-      "totalRuns": 19,
-      "completed": 12,
+      "totalRuns": 20,
+      "completed": 13,
       "running": 0,
       "completedBound": 4,
-      "completedUnbound": 8,
+      "completedUnbound": 9,
       "runningBound": 0,
       "runningUnbound": 0
     },
     "ambiguityCount": 0,
     "rejectedRuns": [
+      {
+        "runId": "01a8d8fc-2507-4f39-868e-039039237b98",
+        "runStatus": "COMPLETED",
+        "bindingStatus": "UNBOUND",
+        "reasons": [
+          "UNBOUND_NEVER_SOURCE_AUTHORITY",
+          "STALE_WORKSPACE_REVISION",
+          "SOURCE_MANIFEST_DIGEST_MISMATCH"
+        ],
+        "ageMsAtCheck": 174293269
+      },
       {
         "runId": "6daa5fc9-6b76-4774-a376-013a1bb8190e",
         "runStatus": "SUPERSEDED",
@@ -45,7 +56,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "575d5428-0154-43e7-a353-307b2443cbba",
@@ -57,7 +68,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "14643371-f6f2-4131-906b-235a5c06619a",
@@ -69,7 +80,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
@@ -80,7 +91,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
@@ -91,7 +102,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
@@ -103,7 +114,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
@@ -115,7 +126,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 841851
+        "ageMsAtCheck": 773503269
       },
       {
         "runId": "e9b9c13d-8acb-4e9f-801f-58a78a5f5441",
@@ -126,7 +137,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 66672851
+        "ageMsAtCheck": 839334269
       },
       {
         "runId": "6c9d9642-e572-4d00-91bf-bd8370b238f1",
@@ -137,7 +148,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 82652851
+        "ageMsAtCheck": 855314269
       },
       {
         "runId": "48485685-e773-4433-a1f8-00f5524cca44",
@@ -147,7 +158,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 261914851
+        "ageMsAtCheck": 1034576269
       },
       {
         "runId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
@@ -157,7 +168,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 262596851
+        "ageMsAtCheck": 1035258269
       },
       {
         "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
@@ -167,7 +178,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 262908851
+        "ageMsAtCheck": 1035570269
       },
       {
         "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
@@ -178,7 +189,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 263214851
+        "ageMsAtCheck": 1035876269
       },
       {
         "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
@@ -189,7 +200,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 372784851
+        "ageMsAtCheck": 1145446269
       },
       {
         "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
@@ -200,7 +211,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 441015851
+        "ageMsAtCheck": 1213677269
       },
       {
         "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
@@ -211,7 +222,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 443966851
+        "ageMsAtCheck": 1216628269
       },
       {
         "runId": "862b952b-7623-434e-818e-407c1531abaf",
@@ -222,7 +233,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 500277851
+        "ageMsAtCheck": 1272939269
       },
       {
         "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
@@ -233,7 +244,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 501247851
+        "ageMsAtCheck": 1273909269
       },
       {
         "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
@@ -243,7 +254,7 @@
           "STALE_WORKSPACE_REVISION",
           "SOURCE_MANIFEST_DIGEST_MISMATCH"
         ],
-        "ageMsAtCheck": 514582851
+        "ageMsAtCheck": 1287244269
       }
     ],
     "selection": null,
@@ -255,13 +266,13 @@
   "secondStatus": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
   "selectedRunId": null,
   "ambiguityCount": 0,
-  "currentWorkspaceRevision": "sha256:f84acc8363b344cc9e6cb3c7d4a2774aaa4a0a859e1e1f9855c74ac281f254fa",
+  "currentWorkspaceRevision": "sha256:05fa828db4ab5bc1b84e00ec44f34279e820c31e933ff6e4d0589afd8eacee75",
   "runCounts": {
-    "totalRuns": 19,
-    "completed": 12,
+    "totalRuns": 20,
+    "completed": 13,
     "running": 0,
     "completedBound": 4,
-    "completedUnbound": 8,
+    "completedUnbound": 9,
     "runningBound": 0,
     "runningUnbound": 0
   },
@@ -272,5 +283,5 @@
     "scripts/atlas/select-current-source-evidence-authority-v1.mts",
     "docs/reports/current-source-evidence-authority-v1.json"
   ],
-  "proofChecksum": "sha256:c6db137634f09ceeb25235c7895a3ebce9b549d97ab6b17460608371093d964d"
+  "proofChecksum": "sha256:d6ee9212b1aa1a60f009f12d50042d1a2479fa79eb6d87a5bf5fbc9aa8b38c21"
 }

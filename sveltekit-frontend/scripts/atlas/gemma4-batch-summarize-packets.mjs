@@ -127,7 +127,7 @@ Respond with ONLY the summary, no additional text.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
+        model: process.env.GEMMA4_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 160,
         temperature: 0.3,

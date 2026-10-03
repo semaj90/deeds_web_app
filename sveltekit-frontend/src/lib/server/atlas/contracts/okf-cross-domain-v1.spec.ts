@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DomainClassificationV1Schema,
+  OkfDocumentFileDerivationGraphV1Schema,
   OkfFeatureMatrix4x6V1Schema,
   OkfRecommendationV1Schema,
 } from './okf-cross-domain-v1.js';
@@ -109,5 +110,46 @@ describe('OKF cross-domain contracts', () => {
     expect(tuple.lifecycle).toBe('OBSERVED');
     expect(tuple.evidenceSpan?.sourceRef).toBe('src/one.ts');
     expect(tuple).not.toHaveProperty('symbolId');
+  });
+
+  it('binds document/file derivation edges to one source revision and evidence refs', () => {
+    const graph = OkfDocumentFileDerivationGraphV1Schema.parse({
+      schemaVersion: 'atlas.okf.document-file-derivation-graph.v1',
+      graphId: 'derivation:one',
+      graphRevision: 'derivation:r1',
+      workspaceRevision: 'workspace:r1',
+      sourceRevision: 'source:r1',
+      producerId: 'okf-audit',
+      producerRevision: 'okf-audit:r1',
+      replayEvidenceRefs: ['report:graphify:r1'],
+      nodes: [
+        { nodeId: 'file:one', kind: 'source_file', subjectRef: 'file:one', sourceRef: 'src/one.ts', sourceRevision: 'source:r1', evidenceRefs: ['span:one'], lifecycle: 'OBSERVED' },
+        { nodeId: 'symbol:one', kind: 'symbol', subjectRef: 'symbol:one', sourceRef: 'src/one.ts', sourceRevision: 'source:r1', treeNodeId: 'tree:one', evidenceRefs: ['span:one'], lifecycle: 'DERIVED' },
+        { nodeId: 'feature:one', kind: 'feature_row', subjectRef: 'feature:one', sourceRef: 'src/one.ts', sourceRevision: 'source:r1', evidenceRefs: ['span:one'], lifecycle: 'DERIVED' },
+      ],
+      edges: [
+        { edgeId: 'edge:one', fromNodeId: 'file:one', toNodeId: 'symbol:one', relation: 'SOURCE_FILE_DEFINES_SYMBOL', relationRevision: 'relations:r1', sourceRevision: 'source:r1', evidenceRefs: ['span:one'], lifecycle: 'DERIVED' },
+        { edgeId: 'edge:two', fromNodeId: 'symbol:one', toNodeId: 'feature:one', relation: 'SYMBOL_SUPPORTS_FEATURE', relationRevision: 'relations:r1', sourceRevision: 'source:r1', evidenceRefs: ['span:one'], lifecycle: 'DERIVED' },
+      ],
+      canonicalAuthority: false,
+      promotionAuthorized: false,
+      writesPerformed: false,
+    });
+
+    expect(graph.nodes).toHaveLength(3);
+    expect(graph.edges[0].evidenceRefs).toContain('span:one');
+    expect(graph.canonicalAuthority).toBe(false);
+  });
+
+  it('rejects cross-revision derivation edges', () => {
+    expect(() => OkfDocumentFileDerivationGraphV1Schema.parse({
+      schemaVersion: 'atlas.okf.document-file-derivation-graph.v1',
+      graphId: 'derivation:bad', graphRevision: 'derivation:r1', workspaceRevision: 'workspace:r1',
+      sourceRevision: 'source:r1', producerId: 'okf-audit', producerRevision: 'okf-audit:r1',
+      replayEvidenceRefs: ['report:graphify:r1'],
+      nodes: [{ nodeId: 'file:one', kind: 'source_file', subjectRef: 'file:one', sourceRef: 'src/one.ts', sourceRevision: 'source:r1', evidenceRefs: ['span:one'], lifecycle: 'OBSERVED' }],
+      edges: [{ edgeId: 'edge:bad', fromNodeId: 'file:one', toNodeId: 'file:one', relation: 'SOURCE_FILE_RELATES_TO_FILE', relationRevision: 'relations:r1', sourceRevision: 'source:r2', evidenceRefs: ['span:one'], lifecycle: 'DERIVED' }],
+      canonicalAuthority: false, promotionAuthorized: false, writesPerformed: false,
+    })).toThrow();
   });
 });

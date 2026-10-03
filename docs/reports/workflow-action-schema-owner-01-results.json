@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.workflow-action-schema-owner-01-results.v1",
+  "test": "WORKFLOW-ACTION-SCHEMA-OWNER-01",
+  "read_only": false,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "writesPerformed": false,
+  "summary": "Reconciled four independent TypeScript/Zod definitions that all declared the schema identity literal 'atlas.workflow-action.v1' with materially different field shapes. Extended packages/parent-atlas/src/core/workflow-action-event.ts's workflowActionEventSchema into a lossless superset (the canonical owner), added a cross-workspace package export subpath, and added bidirectional adapter functions in each of the three sveltekit-frontend definitions. Zero production callers of any of the four original shapes existed before this change, so this was a zero-live-migration-risk convergence.",
+  "consumerCensusBeforeChange": {
+    "packages/parent-atlas/src/core/workflow-action-event.ts": "zero real consumers outside its own barrel re-export (src/index.ts) and test/workflow-action-event.test.mjs",
+    "sveltekit-frontend/.../workflow/workflow-action-event-v1.ts": "zero real consumers outside its own workflow-action-event-v1.spec.ts",
+    "sveltekit-frontend/.../agentic-file-compiler/contracts.ts (WorkflowActionEventSchema)": "one consumer, workflow-action-event-adapter.ts, which itself has zero further consumers outside its own barrel index.ts",
+    "sveltekit-frontend/.../workflow/context-tool-dag-contracts.ts (WorkflowActionEventV1Schema)": "the FILE has 2 real production consumers (route-head-dag-builder-v1.ts, atlas-kernel-session.ts) but neither imports WorkflowActionEventV1Schema specifically -- both use only ContextToolDagV1Schema/ContextToolDagNodeV1Schema from the same file"
+  },
+  "canonicalOwner": {
+    "file": "packages/parent-atlas/src/core/workflow-action-event.ts",
+    "export": "workflowActionEventSchema",
+    "packageExportSubpath": "@deeds/parent-atlas/core/workflow-action-event",
+    "addedFields": [
+      "kind (enum union widened to include suspended/resumed/validated/materialized)",
+      "runId", "executor", "revisions", "inputRefs", "outputRefs", "errorRef",
+      "state", "operation", "progress", "target", "visual",
+      "canonicalIds", "toolName", "mutationRequested", "validationRequired", "checksum"
+    ],
+    "allNewFieldsOptionalOrDefaulted": true
+  },
+  "perFileDisposition": [
+    { "file": "packages/parent-atlas/src/core/workflow-action-event.ts", "disposition": "CANONICAL_OWNER", "changed": true },
+    { "file": "packages/parent-atlas/src/core/workflow-action-adapters.ts", "disposition": "ADAPTER", "changed": false, "note": "already correct, re-verified via test run" },
+    { "file": "packages/parent-atlas/src/core/temporal-action-workflow-adapter.ts", "disposition": "ADAPTER", "changed": true, "note": "ledgerState() switch statement was no longer exhaustive after the canonical kind enum widened -- fixed by mapping the 4 new kinds (suspended/resumed/validated/materialized) to the existing PROGRESS ledger state, matching how progress/artifact/blocked already map. This was a REAL regression the additive schema change caused, not purely additive as design.md originally assumed for this file." },
+    { "file": "packages/parent-atlas/src/core/agentic-workflow-control-plane.ts", "disposition": "ADAPTER", "changed": false, "note": "already correct, re-verified via test run" },
+    { "file": "packages/parent-atlas/src/core/a2a-wire-v1.ts", "disposition": "ADAPTER", "changed": false, "note": "already correct, re-verified via test run" },
+    { "file": "packages/parent-atlas/src/core/jetstream-workflow-envelope-v1.ts", "disposition": "ADAPTER", "changed": false, "note": "already correct, re-verified via test run" },
+    { "file": "packages/parent-atlas/src/core/workflow-execution-coordinates-v1.ts", "disposition": "COMPATIBILITY_ANCHOR", "changed": false, "note": "already correctly references the schema literal only, never redefined it; docstring already asserted WorkflowActionEventV1 is the identity owner" },
+    { "file": "sveltekit-frontend/src/lib/server/atlas/workflow/workflow-action-event-v1.ts", "disposition": "ADAPTER", "changed": true, "note": "added toCanonicalWorkflowActionEvent/fromCanonicalWorkflowActionEvent; local schema field kept (see design.md implementation note) since it is not a runtime collision" },
+    { "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/contracts.ts", "disposition": "ADAPTER", "changed": true, "note": "added toCanonicalWorkflowActionEvent/fromCanonicalWorkflowActionEvent" },
+    { "file": "sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/workflow-action-event-adapter.ts", "disposition": "ADAPTER", "changed": false, "note": "re-verified via live smoke import -- unaffected, still produces correct writeActionAtomically request shape" },
+    { "file": "sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts", "disposition": "ADAPTER", "changed": true, "note": "added toCanonicalWorkflowActionEvent/fromCanonicalWorkflowActionEvent alongside the pre-existing workflowActionFromDagNode() producer" }
+  ],
+  "testResults": {
+    "packages/parent-atlas": {
+      "workflow-action-event.test.mjs": "3/3 pass, unchanged",
+      "a2a-wire-v1.test.mjs + agentic-workflow-control-plane.test.mjs + jetstream-workflow-envelope-v1.test.mjs + workflow-action-adapters.test.mjs + workflow-execution-coordinates-v1.test.mjs": "21/21 pass, unchanged",
+      "tsc -p tsconfig.json": "clean except one PRE-EXISTING, UNRELATED failure in src/core/knowledge/knowledge-page-dag-binding-v1.spec.ts (confirmed untouched by this change via git status; different domain entirely -- FILE_EXECUTOR/KnowledgePageJobV1 enums)"
+    },
+    "sveltekit-frontend": {
+      "workflow-action-event-v1.spec.ts": "9/9 pass (6 pre-existing unchanged + 3 new round-trip/guard tests)",
+      "context-tool-dag-contracts.spec.ts": "5/5 pass (3 pre-existing unchanged + 2 new round-trip/guard tests)",
+      "contracts-workflow-action-canonical-adapter.spec.ts (new)": "2/2 pass",
+      "atlas-kernel-session.spec.ts": "5/5 pass, unchanged (real production consumer of the same file, re-verified)",
+      "workflow-action-event-adapter.ts live smoke import": "confirmed working, unaffected by contracts.ts changes"
+    },
+    "crossWorkspaceImportProof": "live: import('@deeds/parent-atlas/core/workflow-action-event') resolves from sveltekit-frontend and workflowActionEventSchema.parse() accepts a new kind value ('suspended') -- proven, not assumed"
+  },
+  "realBugFoundAndFixed": {
+    "file": "packages/parent-atlas/src/core/temporal-action-workflow-adapter.ts",
+    "description": "ledgerState()'s switch statement over WorkflowActionEventV1['kind'] became non-exhaustive once the canonical kind enum was widened -- TypeScript correctly flagged 'Function lacks ending return statement'. This falsifies design.md's original claim that extending the kind enum would be purely non-breaking for every existing file; it was non-breaking for schema validation but NOT for exhaustive-switch consumers. Fixed by mapping the 4 new kinds to the existing PROGRESS ledger state."
+  },
+  "openQuestionsCarriedForward": [
+    "Who wires a real Phase 78/79/Kanban/A2A caller to construct/consume canonical WorkflowActionEventV1 events at runtime -- not done in this change, Phase 79 still emits none of these shapes.",
+    "Whether workflow-action-event-adapter.ts's writeActionAtomically boundary should eventually accept a canonical WorkflowActionEventV1 directly -- deferred, no real caller exists yet to inform the decision.",
+    "Whether the embedded 'checksum' field (new, optional) and workflowActionEventReceiptSchema.event_checksum (pre-existing, externally computed) should be reconciled into one -- deferred, documented inline in the canonical schema's checksum field comment."
+  ],
+  "RESULT": "DRY_RUN_PROVEN"
+}

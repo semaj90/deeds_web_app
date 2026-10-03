@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T23:15:54Z",
+  "pivot": {
+    "from": "parent-atlas-adaptive-dag-fabric",
+    "to": "parent-atlas-versioned-doc-intelligence / Phase V deterministic validation spine",
+    "reason": "The current priority is to finish and checkpoint VAL-01 through VAL-05 and VAL-02B before resuming unrelated OpenSpec lanes; container rebuilds remain deferred until the end."
+  },
+  "selectedChange": {
+    "change": "parent-atlas-versioned-doc-intelligence",
+    "schema": "spec-driven",
+    "scope": "Phase V",
+    "progressAtStart": "4/10",
+    "progressAtEnd": "5/10",
+    "completedThisRun": ["VAL-05"],
+    "remainingPhaseV": ["VAL-06", "VAL-07", "VAL-08", "VAL-09", "VAL-10"]
+  },
+  "workThisRun": {
+    "verifiedComplete": [
+      "Aligned the strict Python wire mirror's source-span status enum with the SvelteKit Zod owner: CLAIMED/VERIFIED/REJECTED are accepted; obsolete UNVERIFIED is rejected.",
+      "Implemented VAL-05 exact chunk identity/revision and UTF-8 byte-span verifier in a separate Python module; it has no datastore client and no latest-row fallback.",
+      "Replayed one bounded SELECT against the live canonical PostgreSQL external-doc corpus: exact chunk bytes verified and a wrong revision rejected.",
+      "Revalidated VAL-02B Python/TypeScript checksum parity and the VAL-01 TypeScript fixtures."
+    ],
+    "focusedProof": {
+      "pythonValidatorPytest": "21/21 passed across VAL-02/03/04/05 focused files",
+      "pythonCanonicalHashUnittest": "10/10 passed",
+      "typescriptCanonicalHashAndContractVitest": "15/15 passed",
+      "pythonSyntaxCompilation": "passed",
+      "openspecStrict": "passed",
+      "scopedDiffCheck": "passed"
+    },
+    "liveSpanReadback": {
+      "query": "single-row SELECT by deterministic shortest-row ordering; no writes",
+      "chunkId": "doc:pgvector:ca39935f7857789b:1",
+      "chunkEvidenceRevision": "sha256:399d4ab96dcab93bad98595bfaca281283994645de96131ed8775341177508b4",
+      "canonicalUtf8Bytes": 6,
+      "verifiedSpanBytes": [0, 6],
+      "exactResult": "VERIFIED / EXACT_REVISION_AND_BYTES",
+      "negativeRevisionResult": "REJECTED / REVISION_MISMATCH"
+    },
+    "notClaimed": [
+      "VAL-06 judge input contract",
+      "VAL-07 model judge",
+      "VAL-08 OaK assertion execution",
+      "VAL-09 admission decision policy",
+      "VAL-10 19-chunk replay or summary apply eligibility",
+      "resolution of the VAL-03 omission-to-REVIEW policy question"
+    ]
+  },
+  "blockers": [
+    {
+      "id": "VAL-03_OMISSION_POLICY_REVIEW",
+      "condition": "Current focused test and task contract treat omitted key identifiers as REVIEW. A proposed non-gating omission signal has not been adopted; do not change shared uncommitted validator logic without reconciling its owner."
+    },
+    {
+      "id": "VAL-06_TO_VAL-10",
+      "condition": "Judge boundary, judge, OaK, deterministic resolution, and corpus replay remain open and out of this run."
+    }
+  ],
+  "writes": {
+    "postgres": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "nats": 0,
+    "modelCalls": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "filesystem": "contract-support module/tests, OpenSpec task evidence, and this receipt only"
+  },
+  "nextGate": "VAL-03_OMISSION_POLICY_RECONCILIATION_THEN_LDR_VALIDATION_SPINE_CHECKPOINT"
+}

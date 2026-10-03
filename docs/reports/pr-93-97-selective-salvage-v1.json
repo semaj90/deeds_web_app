@@ -1,0 +1,115 @@
+{
+  "schema": "atlas.pr-93-97-selective-salvage.v1",
+  "generatedAt": "2026-09-20",
+  "phase": "PR-RECON-01",
+  "baseRef": "origin/main",
+  "candidateRef": "origin/agent/packet-chunk-lineage-migration-owner-20260915",
+  "candidateCommit": "bfef7528f2659e57b115b4a4ddcd76245f1ce43a",
+  "policy": {
+    "defaultForSharedFiles": "KEEP_MAIN",
+    "wholeMergePerformed": false,
+    "canonicalWrites": false,
+    "migrationApplyAuthorized": false,
+    "sourceAuthorityChanged": false
+  },
+  "adopted": [
+    {
+      "file": "scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs",
+      "classification": "USEFUL_READ_ONLY_AUDIT",
+      "rationale": "Branch-only authority-oriented packet-to-chunk bridge audit; read-only and fail-closed."
+    },
+    {
+      "file": "scripts/atlas/audit-current-packet-chunk-lineage-deployment-v1.mjs",
+      "classification": "USEFUL_READ_ONLY_AUDIT",
+      "rationale": "Branch-only deployment preflight distinguishes absent, partial, and proven lineage without applying migration."
+    },
+    {
+      "file": "scripts/atlas/audit-packet-chunk-lineage-migration-owner-v1.mjs",
+      "classification": "USEFUL_READ_ONLY_AUDIT",
+      "rationale": "Branch-only migration ownership audit records registration, checksum, ledger, and apply blockers without mutation."
+    }
+  ],
+  "superseded": [
+    {
+      "files": [
+        "scripts/atlas/admit-workspace-revision-tournament-v1.mts",
+        "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+        "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+        "scripts/atlas/audit-current-workspace-packet-chunk-join-v1.mjs",
+        "scripts/atlas/audit-graphify-canary-expectation-v1.mts",
+        "scripts/atlas/audit-graphify-snapshot-consumer-preflight-v1.mts",
+        "scripts/atlas/audit-graphify-tournament-admission-v1.mts",
+        "scripts/atlas/audit-workspace-revision-tournament-source-authority-v1.mts",
+        "scripts/atlas/build-graphify-canary-expectation-v1.mts",
+        "scripts/atlas/graphify-daily-snapshot-native-open-v1.mts",
+        "scripts/atlas/plan-graphify-source-selection-from-snapshot-v1.mts",
+        "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+        "scripts/atlas/audit-canonical-source-inventory-hygiene-v1.mts",
+        "scripts/atlas/audit-workspace-revision-admission-single-owner-v1.mts",
+        "scripts/atlas/lib/canonical-source-inventory-hygiene-v1.mts",
+        "scripts/atlas/lib/current-workspace-frame-selector-v1.mjs",
+        "scripts/atlas/lib/whole-codebase-source-exclusions.mjs",
+        "scripts/atlas/test-current-workspace-frame-selector-v1.mjs",
+        "tests/canonical-source-inventory-hygiene.spec.ts"
+      ],
+      "classification": "SUPERSEDED",
+      "rationale": "Shared with main and covered by newer local hardening; branch versions must not replace current source-frame or exclusion owners."
+    }
+  ],
+  "duplicateOwners": [
+    {
+      "file": "scripts/atlas/index-engine.ts",
+      "classification": "DUPLICATE_OWNER",
+      "rationale": "Branch-only indexing implementation is unrelated to the selective lineage salvage and risks introducing another indexing owner."
+    },
+    {
+      "files": [
+        "docs/reports/feature-ontology-current-cohort-v1.json",
+        "docs/reports/feature-ontology-packet-lineage-v1.json"
+      ],
+      "classification": "OLDER_CONTRACT",
+      "rationale": "Historical reports use older workspace revisions and cannot be promoted into the current source-authority cohort."
+    }
+  ],
+  "testsOnly": [],
+  "blocked": [
+    {
+      "key": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+      "reason": "Current source frame remains unadmitted; selective audits cannot authorize lineage or migration writes."
+    },
+    {
+      "key": "PACKET_CHUNK_LINEAGE_MIGRATION_OWNER",
+      "reason": "Registration, live ledger, checksum binding, and operator authorization remain unresolved."
+    },
+    {
+      "key": "PR_RECON_02_VALIDATION",
+      "reason": "Adopted audits require local syntax and read-only execution validation before being marked proven."
+    }
+  ],
+  "rationale": [
+    "PR #93 establishes the source-admission foundation; #94 depends on it.",
+    "PR #95 depends on #94 for current revision selection; #96 depends on #95.",
+    "PR #97 is the stack tip and supplies three branch-only audits, but shared owners remain main-owned.",
+    "No older selector, source-exclusion, graphify-run, snapshot-authority, packet-join, or packet-upsert implementation was imported.",
+    "The branch-only audits preserve fail-closed, read-only behavior and do not create a second authority."
+  ],
+  "validation": {
+    "gitDiffCheck": "PASS",
+    "focusedTests": "NOT_RUN: integration worktree has no installed pg dependency; node syntax validation passed",
+    "openSpecStrict": "PASS",
+    "nodeSyntax": "PASS for all three adopted audits",
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "migrationApplied": false
+  },
+  "sources": [
+    "https://github.com/semaj90/deeds_web_app/pull/93",
+    "https://github.com/semaj90/deeds_web_app/pull/94",
+    "https://github.com/semaj90/deeds_web_app/pull/95",
+    "https://github.com/semaj90/deeds_web_app/pull/96",
+    "https://github.com/semaj90/deeds_web_app/pull/97"
+  ]
+}
+

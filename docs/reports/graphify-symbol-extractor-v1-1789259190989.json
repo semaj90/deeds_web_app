@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T00:26:30.988Z",
+  "apply": true,
+  "limit": 200,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 200,
+  "skippedNonTsJs": 199,
+  "filesProcessed": 1,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 11,
+  "totalSymbolsInserted": 11,
+  "plan": [
+    {
+      "fileId": "e2cb4bbb-8624-48a0-9825-1db83a2c8d9f",
+      "sourceRef": "datasets/organize-jsonl-files.mjs",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    }
+  ]
+}

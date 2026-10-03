@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.contract-parity-summary.v1",
+  "contract": "atlas.recommendation-outcome-receipt.v1",
+  "schemaVersion": "1",
+  "status": "ZOD_PYDANTIC_PARITY_PROVEN",
+  "scope": "SEALED_FIXTURES_ONLY",
+  "sealedBundle": {
+    "manifestChecksum": "sha256:1dad607c953ed9afb5f53c533ac2f9688db75cf55f2d04fa57429cecc050a9e9",
+    "schemaChecksum": "sha256:42dc933ba5d9bef58dff47d43b14185461a33dc28d00b407ec03b013cce81561",
+    "fixtureManifestChecksum": "sha256:e00b98e443a8f47659b788b0f1388782cf0847d2ae319fb3c1c8e0c0f1a224a2",
+    "producerRevision": "sha256:bc6aa19c57004fa402a858c9cfa910eaa6a6ffcb9f4eaa633d0e52990af4ac50"
+  },
+  "runnerReceipt": ".tmp/atlas/contract-parity-v1/learning-outcome-receipt-20260927T214901Z.json",
+  "proofs": {
+    "schemaIdAndVersionIdentical": true,
+    "propertySetsIdentical": true,
+    "enumSetsIdentical": true,
+    "requiredFieldsIdentical": true,
+    "extraPropertiesRejected": true,
+    "fixtureVerdictsIdentical": true,
+    "wrongVerdictDetected": true,
+    "droppedPropertyDetected": true,
+    "tamperedSchemaChecksumDetected": true
+  },
+  "fixtures": {
+    "total": 15,
+    "accept": 4,
+    "reject": 11,
+    "crossFieldParityMode": "NONE_DECLARED",
+    "crossFieldFixtures": 0
+  },
+  "realRows": {
+    "checked": 0,
+    "rejected": 0
+  },
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "limitations": [
+    "This proves parity between the existing Zod receipt contract and the Pydantic boundary mirror on sealed fixtures only.",
+    "No live outcome rows, producer lineage, persistence path, learned feedback behavior, scorer improvement, or model inference was exercised.",
+    "The receipt contract is not evidence that Titans-style online learning or any other learning system is implemented."
+  ]
+}

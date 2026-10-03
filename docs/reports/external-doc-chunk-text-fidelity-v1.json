@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.external-doc-chunk-text-fidelity.v1",
+  "generatedAt": "2026-09-23T18:06:19.868542+00:00",
+  "gate": "EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY",
+  "headAtGeneration": "54c2b6efb9f484aa4ab8ea81f81900425307a50c",
+  "fix": "python/atlas_external_docs.py _normalize_ws is now fence-aware (lines inside ``` fences keep indentation; prose still collapses); idempotent on extract_structured_text output",
+  "before": {
+    "pagesWhereStoredTextDiffersFromChunkedText": 23,
+    "chunkCount": 847,
+    "source": "external-doc-chunk-evidence-identity-v1.json"
+  },
+  "after": {
+    "pageCount": 30,
+    "chunkCount": 852,
+    "pagesWhereStoredTextDiffersFromChunkedText": 0,
+    "pagesDifferingUnderOldNormalizer": 23,
+    "pagesWithIndentedFencedCode": 23,
+    "indentedFencedLinesInStoredPages": 3414,
+    "indentedFencedLinesInChunks": 1717,
+    "chunkByteSpanSliceMismatches": 0,
+    "pageContentHashEqualsSha256OfStoredText": true,
+    "uniqueChunkEvidenceRevisions": 852,
+    "uniqueChunkIds": 852
+  },
+  "note": "chunk count changed (847 -> 852) because chunk windows now measure real indentation; every content hash changed for pages with fenced code, so identity/hash replay is re-run here (0 duplicate chunk evidence revisions). The chunk-level indented-line count is informational only: chunk boundaries can start or end inside a fence, so a per-chunk fence scan is not comparable to the page-level count; exact fidelity is proven by the byte-span slice check.",
+  "result": "EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

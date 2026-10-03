@@ -45,7 +45,9 @@ export async function embedEmbeddingGemmaTaskV1(input: {
   const native = await input.executor.embedNative768(formatted.formattedText);
   assertEmbeddingGemmaNative768(native.vector);
 
-  const requested = [...new Set(input.dimensions ?? [768])];
+  const requested: EmbeddingGemmaMrlDimension[] = Array.from(
+    new Set<EmbeddingGemmaMrlDimension>(input.dimensions ?? [768]),
+  );
   if (!requested.includes(768)) requested.push(768);
   const projected: Partial<Record<EmbeddingGemmaMrlDimension, Float32Array>> = {};
   const lineage = requested

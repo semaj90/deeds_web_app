@@ -24,6 +24,10 @@
 import { Pool } from 'pg';
 import { z } from 'zod';
 import { createHash } from 'node:crypto';
+import {
+  buildEngramRepresentationUnavailable,
+  type EngramRepresentationUnavailable,
+} from './engram-representation-result.js';
 
 export const EngramObservationSchema = z.object({
   observation_id: z.string().uuid().optional(),
@@ -42,6 +46,10 @@ export const EngramObservationSchema = z.object({
 });
 
 export type EngramObservation = z.infer<typeof EngramObservationSchema>;
+
+export type EngramHnswSearchResult =
+  | { status: 'READY'; observations: EngramObservation[]; writesPerformed: false }
+  | EngramRepresentationUnavailable;
 
 export class EngramMemoryBridge {
   private pool: Pool;
@@ -186,10 +194,24 @@ export class EngramMemoryBridge {
 
     const client = await this.pool.connect();
     try {
+      const columnResult = await client.query(
+        `SELECT 1 FROM information_schema.columns
+         WHERE table_schema = current_schema() AND table_name = $1 AND column_name = $2`,
+        [this.tableName, columnName]
+      );
+      if (columnResult.rowCount === 0) {
+        throw new Error(`Embedding column unavailable: ${columnName}`);
+      }
+      const optional512Selection = await client.query(
+        `SELECT 1 FROM information_schema.columns
+         WHERE table_schema = current_schema() AND table_name = $1 AND column_name = 'hnsw_embedding_512'`,
+        [this.tableName]
+      );
+      const hnsw512Selection = optional512Selection.rowCount > 0 ? ', hnsw_embedding_512' : '';
       const result = await client.query(
         `SELECT
            observation_id, agent_name, tool_name, input_hash, output_summary,
-           decision_context, confidence, bm25_tags, hnsw_embedding, hnsw_embedding_512,
+           decision_context, confidence, bm25_tags, hnsw_embedding${hnsw512Selection},
            embedding_lane, created_at
          FROM ${this.tableName}
          WHERE ${columnName} IS NOT NULL
@@ -221,6 +243,25 @@ export class EngramMemoryBridge {
       }));
     } finally {
       client.release();
+    }
+  }
+
+  /**
+   * Caller-facing result for optional representation lanes. Missing optional
+   * schema is an explicit unavailable capability, not a thrown control-flow
+   * error and never triggers DDL or a guessed lower-dimensional vector.
+   */
+  async searchMemoryByHNSWResult(embedding: number[], limit = 10): Promise<EngramHnswSearchResult> {
+    const representation = embedding?.length === 512 ? 'hnsw_embedding_512' : 'hnsw_embedding';
+    try {
+      const observations = await this.searchMemoryByHNSW(embedding, limit);
+      return { status: 'READY', observations, writesPerformed: false };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message === `Embedding column unavailable: ${representation}`) {
+        return buildEngramRepresentationUnavailable(representation, message);
+      }
+      throw error;
     }
   }
 
@@ -272,12 +313,22 @@ export class EngramMemoryBridge {
           WITH (m = 16, ef_construction = 64);
       `);
 
-      // Create HNSW vector index for 512-dim fallback (cosine distance)
-      await client.query(`
-        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_hnsw_512
-          ON ${this.tableName} USING hnsw (hnsw_embedding_512 vector_cosine_ops)
-          WITH (m = 16, ef_construction = 64);
-      `);
+      // The 512-dim fallback is legacy/optional. Existing tables may predate the
+      // column; do not turn an optional capability into startup failure.
+      const fallbackColumn = await client.query(
+        `SELECT 1 FROM information_schema.columns
+         WHERE table_schema = current_schema() AND table_name = $1 AND column_name = 'hnsw_embedding_512'`,
+        [this.tableName]
+      );
+      if (fallbackColumn.rowCount > 0) {
+        await client.query(`
+          CREATE INDEX IF NOT EXISTS idx_${this.tableName}_hnsw_512
+            ON ${this.tableName} USING hnsw (hnsw_embedding_512 vector_cosine_ops)
+            WITH (m = 16, ef_construction = 64);
+        `);
+      } else {
+        console.warn('[EngramMemoryBridge] Optional hnsw_embedding_512 column is absent; 512-dim search disabled.');
+      }
 
       // Create lookup index on agent_name + tool_name (frequent filters)
       await client.query(`

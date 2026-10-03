@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.packet-writer-lineage.v1",
+  "generatedAt": "2026-09-24T22:43:11.574Z",
+  "mode": "READ_ONLY_SOURCE_CENSUS",
+  "gate": "PACKET-WRITER-LINEAGE-01",
+  "writesPerformed": false,
+  "canonicalDigestNamespace": "atlas_packets.content_hash",
+  "legacyDigestNamespaces": [
+    "atlas_packets.sha256"
+  ],
+  "liveSchemaDependency": {
+    "sourceRevisionColumn": "PRESENT_BUT_UNPOPULATED",
+    "workspaceRevision": "PRESENT_BUT_HISTORICAL_DEFAULT_SHAPED",
+    "contentHash": "PRESENT_BUT_SPARSE"
+  },
+  "writers": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "owner": "CANONICAL_SEMANTIC_WRITER",
+      "exists": true,
+      "entrypoints": [
+        "persistCanonicalSemanticPacketEmbedding"
+      ],
+      "sourceChecksum": "sha256:54d732834c51f48a87f275d2d87d3fc0f2738128687167c30674e7ebfc98fd3c",
+      "referencedLineageFields": [
+        "source_revision"
+      ],
+      "classification": "REVISION_BOUND_CONTRACT_PRESENT",
+      "promotionEligible": true,
+      "writesPerformed": false,
+      "reason": "Source contains all required revision/content field names; live schema and caller input still require independent proof."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts",
+      "owner": "ACP_MATERIALIZER",
+      "exists": true,
+      "entrypoints": [
+        "INSERT INTO atlas_packets"
+      ],
+      "sourceChecksum": "sha256:93bef1c647cd9fc473fea048c4d92986c6903e2080507b3bd1cc72dc16c2602b",
+      "referencedLineageFields": [
+        "packet_key",
+        "source_ref"
+      ],
+      "classification": "UNQUALIFIED_OR_SCHEMA_DRIFT_BLOCKED",
+      "promotionEligible": false,
+      "writesPerformed": false,
+      "reason": "Writer does not prove current workspace/source/content identity at its mutation boundary."
+    },
+    {
+      "path": "scripts/atlas/sync-parent-atlas-packets-to-postgres.mjs",
+      "owner": "LEGACY_NDJSON_SYNC",
+      "exists": true,
+      "entrypoints": [
+        "INSERT INTO atlas_packets"
+      ],
+      "sourceChecksum": "sha256:bccdc37588f90b2bb31921c33304124159af306008e1f7ff713e61a1b2b7d942",
+      "referencedLineageFields": [
+        "packet_key",
+        "source_ref"
+      ],
+      "classification": "UNQUALIFIED_OR_SCHEMA_DRIFT_BLOCKED",
+      "promotionEligible": false,
+      "writesPerformed": false,
+      "reason": "Writer does not prove current workspace/source/content identity at its mutation boundary."
+    },
+    {
+      "path": "scripts/atlas/index-parent-atlas-packets.mjs",
+      "owner": "LEGACY_INDEXER",
+      "exists": true,
+      "entrypoints": [
+        "INSERT INTO atlas_packets"
+      ],
+      "sourceChecksum": "sha256:99843976e1488afaae7a36d24eae47072c41e820889c8580b7f69314ad2215ac",
+      "referencedLineageFields": [
+        "packet_key",
+        "source_ref",
+        "sha256"
+      ],
+      "classification": "LEGACY_SHA256_ONLY",
+      "promotionEligible": false,
+      "writesPerformed": false,
+      "reason": "sha256 is a legacy packet/artifact namespace and is not canonical whole-source content identity."
+    },
+    {
+      "path": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+      "owner": "LEGACY_WHOLE_CODEBASE_UPSERT",
+      "exists": true,
+      "entrypoints": [
+        "INSERT INTO atlas_packets"
+      ],
+      "sourceChecksum": "sha256:b9d8fa509704f67dcf0a9c725714800b033e6a5a7e19a1f95cb353d7dc4eb801",
+      "referencedLineageFields": [
+        "packet_key",
+        "source_ref",
+        "sha256"
+      ],
+      "classification": "LEGACY_SHA256_ONLY",
+      "promotionEligible": false,
+      "writesPerformed": false,
+      "reason": "sha256 is a legacy packet/artifact namespace and is not canonical whole-source content identity."
+    }
+  ],
+  "summary": {
+    "totalWriters": 5,
+    "revisionBoundContractPresent": 1,
+    "partialEvidence": 0,
+    "legacySha256Only": 2,
+    "unqualifiedOrSchemaDriftBlocked": 2
+  },
+  "verdict": "PACKET_WRITER_CURRENT_LINEAGE_NOT_PROVEN",
+  "nextGate": "PACKET-DIGEST-BRIDGE-ADMISSION-01",
+  "requiredBeforeApply": [
+    "one canonical writer accepts admitted workspaceRevision and independently proven source content digest",
+    "live atlas_packets schema exposes the fields used by that writer, or an explicitly approved equivalent contract exists",
+    "legacy writers are quarantined from current-corpus apply paths",
+    "bounded write/readback proves packet digest and workspace/source lineage against the selected execution"
+  ]
+}

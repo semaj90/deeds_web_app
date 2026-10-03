@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.opencode-mcp-request-timeout-fix.v1",
+  "observedAt": "2026-09-28T20:43:13-07:00",
+  "status": "CONFIGURATION_VERIFIED_SLOW_TOOL_UNVERIFIED",
+  "likelyCause": "OpenCode 1.18.18 had per-server catalog timeouts configured but no global MCP request timeout override, leaving MCP calls at the observed 30000ms default.",
+  "change": {
+    "file": "opencode.json",
+    "setting": "experimental.mcp_timeout",
+    "valueMs": 60000,
+    "alignment": "atlas-task-kernel internal call deadline is 55000ms"
+  },
+  "evidence": {
+    "openCodeVersion": "1.18.18",
+    "resolvedConfigContainsMcpTimeout": true,
+    "resolvedMcpTimeoutMs": 60000,
+    "mcpList": {
+      "atlasTools": "connected",
+      "atlasTaskKernel": "connected"
+    },
+    "projectJsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "limitations": {
+    "slowToolExecutionRetried": false,
+    "currentOpenCodeSessionRestarted": false,
+    "timedOutInternalOperationCancelled": false,
+    "rawAtlasToolsServerStillEnabled": true
+  },
+  "canonicalAuthority": false,
+  "externalWrites": false
+}

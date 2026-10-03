@@ -90,6 +90,71 @@ export const phase17OutputSchema = z.object({
 
 export type Phase17Output = z.infer<typeof phase17OutputSchema>;
 
+/**
+ * Phase 17 provider admission is a derived feature boundary. Providers may
+ * report an unavailable/degraded result, but they cannot invent lineage or
+ * turn a partial observation into a current feature snapshot.
+ */
+export const phase17FeatureProviderStatusSchema = z.enum([
+  'AVAILABLE',
+  'DEGRADED',
+  'BLOCKED',
+  'UNAVAILABLE',
+]);
+
+export const revisionQualifiedFeatureInputSchema = z.object({
+  candidateOrdinal: z.number().int().nonnegative(),
+  canonicalId: z.string().min(1),
+  packetKey: z.string().min(1).nullable(),
+  sourceRef: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  representationRevision: z.string().min(1).nullable(),
+  graphRevision: z.string().min(1).nullable(),
+  evidenceRefs: z.array(z.string().min(1)),
+}).strict();
+
+export type RevisionQualifiedFeatureInputV1 = z.infer<typeof revisionQualifiedFeatureInputSchema>;
+
+export const phase17FeatureProviderSchema = z.object({
+  providerId: z.string().min(1),
+  providerRevision: z.string().min(1),
+  requiredInputs: z.array(z.string().min(1)),
+  producedFeatures: z.array(z.string().min(1)),
+  status: phase17FeatureProviderStatusSchema,
+}).strict();
+
+export type Phase17FeatureProviderV1 = z.infer<typeof phase17FeatureProviderSchema>;
+
+export type Phase17FeatureAdmissionV1 =
+  | { status: 'ADMITTED'; provider: Phase17FeatureProviderV1; input: RevisionQualifiedFeatureInputV1 }
+  | { status: 'BLOCKED' | 'UNAVAILABLE'; provider: Phase17FeatureProviderV1; input: RevisionQualifiedFeatureInputV1; reason: string };
+
+/** Pure admission check for a provider invocation; it performs no persistence. */
+export function admitPhase17FeatureProviderV1(input: {
+  provider: z.input<typeof phase17FeatureProviderSchema>;
+  featureInput: z.input<typeof revisionQualifiedFeatureInputSchema>;
+}): Phase17FeatureAdmissionV1 {
+  const provider = phase17FeatureProviderSchema.parse(input.provider);
+  const featureInput = revisionQualifiedFeatureInputSchema.parse(input.featureInput);
+  if (provider.status === 'UNAVAILABLE') {
+    return { status: 'UNAVAILABLE', provider, input: featureInput, reason: 'PROVIDER_UNAVAILABLE' };
+  }
+  if (provider.status !== 'AVAILABLE') {
+    return { status: 'BLOCKED', provider, input: featureInput, reason: `PROVIDER_${provider.status}` };
+  }
+  if (provider.requiredInputs.includes('packetKey') && featureInput.packetKey === null) {
+    return { status: 'BLOCKED', provider, input: featureInput, reason: 'PACKET_KEY_REQUIRED' };
+  }
+  if (provider.requiredInputs.includes('representationRevision') && featureInput.representationRevision === null) {
+    return { status: 'BLOCKED', provider, input: featureInput, reason: 'REPRESENTATION_REVISION_REQUIRED' };
+  }
+  if (provider.requiredInputs.includes('graphRevision') && featureInput.graphRevision === null) {
+    return { status: 'BLOCKED', provider, input: featureInput, reason: 'GRAPH_REVISION_REQUIRED' };
+  }
+  return { status: 'ADMITTED', provider, input: featureInput };
+}
+
 // ══════════════════════════════════════════════════════════════
 // HELPER: Generate human-readable feature labels
 // ══════════════════════════════════════════════════════════════

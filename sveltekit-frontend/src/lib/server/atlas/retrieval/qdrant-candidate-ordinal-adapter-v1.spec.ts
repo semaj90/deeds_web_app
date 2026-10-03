@@ -55,6 +55,9 @@ function receiptFixture(): QdrantSemanticScoreReceiptV1 {
     embeddingCached: true,
     embeddingExecMs: 1,
     queryVector: Array.from({ length: 768 }, () => 0),
+    identityManifestChecksum: null,
+    matrixChecksum: null,
+    manifestStatus: 'BLOCKED_SOURCE_REVISION_AUTHORITY',
     scores: [
       {
         packetKey: 'packet:b',

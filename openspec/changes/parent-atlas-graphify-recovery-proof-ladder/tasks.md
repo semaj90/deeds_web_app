@@ -521,15 +521,46 @@ receipt, and tighten the acceptance gates.
 
 ### To-do list
 
-- [ ] Verify the existing Qdrant projection contract still owns `packetKey`, `sourceRef`,
-      `featureId`, `communityId`, `pageRank`, and `graphRevision`, and does not derive
-      identity from Neo4j or Qdrant node IDs.
-- [ ] Confirm `graph-projection-manifest.ts` remains the canonical place for
-      `projectionRevision` / `graphRevision` metadata, and reuse it rather than introducing a
-      new projection-manifest type.
-- [ ] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or
+- [x] Verify the existing Qdrant projection contract's identity fields and confirm identity is
+      not derived from Neo4j or Qdrant internal IDs.
+      **Proven 2026-09-24 (static contract review + 8 focused tests):**
+      `sveltekit-frontend/src/lib/server/atlas/qdrant-collection-contracts.ts` owns
+      `packet_key`, `source_ref`, and the `graph_revision` payload index. `community_id` and
+      `page_rank` are optional payload properties only; `feature_id` and `projection_revision`
+      are not part of this Qdrant contract. The old task's field list incorrectly combined
+      payload identity with optional projection analytics, so it is narrowed rather than adding
+      unneeded indexes. The contract keeps packet/source identity and graph revision separate
+      from Qdrant point IDs and Neo4j internal IDs. Tests:
+      `sveltekit-frontend/src/lib/server/atlas/qdrant-collection-contracts.spec.ts` (8/8).
+- [x] Confirm the existing projection-manifest owners are layered by responsibility; reuse
+      them rather than introducing another manifest.
+      **Proven 2026-09-24 (static import/contract census + 16 focused tests):**
+      `sveltekit-frontend/src/lib/server/graph/graph-projection-manifest.ts` owns GDS relationship
+      projection configuration, revision freshness, and relationship count. The sibling
+      `graph-projection-manifest-v1.ts` owns snapshot membership/ordinal checksums and node/edge
+      counts. `sveltekit-frontend/src/lib/server/atlas/graph/graph-projection-manifest.ts` remains
+      the ALT/precompute executor manifest. The fan-out receipt is a distinct run artifact, not
+      another manifest. The incompatible runtime receipt interface now has a distinct schema/type
+      identity; the strict Zod receipt owner is
+      `sveltekit-frontend/src/lib/server/atlas/graph/graph-projection-receipt-v1.ts`.
+      Focused manifest/receipt tests passed 16/16.
+- [x] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or
       `proof-only`; do not add a new fan-out service if the existing scripts already cover the
       path.
+      **Done 2026-09-21 (static evidence only — no script was run):**
+
+      | Script | Lines | Dry/apply flags | Readback refs | npm alias | Other importers | Class |
+      |---|---|---|---|---|---|---|
+      | `project-neo4j-graphrag.mjs` | 168 | 1 | 0 | none | none | `created` (orphan) |
+      | `project-feature-matrix-neo4j.mjs` | 199 | 2 | 3 | none | 2 scripts mention it | `created` |
+      | `sync-atlas-feature-map-from-qdrant.mjs` | 281 | 3 | 1 | `atlas:qdrant:feature-map-sync` | 2 (`packet-materializer-lib`, `reingest-parent-atlas`) | `wired` |
+      | `neo4j-cluster-fanout.mjs` | 225 | 2 | 4 | `atlas:neo4j:cluster-fanout` | none | `wired` |
+      | `validate-qdrant-bridge.mjs` | 115 | 0 | 0 | `atlas:index:registry:init` | none | `proof-only` (alias name says init) |
+      | `validate-qdrant-bridge-v2.mjs` | 129 | 0 | 0 | `atlas:index:qdrant:build` | none | `proof-only` (alias name says build) |
+
+      No new fan-out service is needed. Naming mismatch: two `validate-*` scripts are aliased as init/build
+      commands with no dry-run gate — review before anyone runs those aliases. Tasks below (dry-run, apply,
+      idempotence) remain open and write to Neo4j/Qdrant, so they need explicit approval.
 - [ ] Add or reuse a `GraphProjectionReceipt`-shaped report for the fan-out run, including
       `graphRevision`, `projectionRevision`, `sourceRef`, `packetKey`, `featureId`,
       `communityId`, `pageRank`, and row counts.
@@ -541,8 +572,11 @@ receipt, and tighten the acceptance gates.
       rows and no duplicate canonical records.
 - [ ] Expand the fan-out only after the bounded proof passes; keep the path event/revision-driven
       rather than reindexing on every query.
-- [ ] Keep Postgres canonical; treat Neo4j and Qdrant as rebuildable projections/mirrors for
+- [x] Keep Postgres canonical; treat Neo4j and Qdrant as rebuildable projections/mirrors for
       this lane.
+      **Confirmed 2026-09-24 (owner layering/design review):** the new design keeps packet,
+      source, and revision truth in PostgreSQL; Qdrant and Neo4j remain disposable projections.
+      No projection execution or datastore write was performed in this contract tranche.
 
 ### Acceptance gates
 

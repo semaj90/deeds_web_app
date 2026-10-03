@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.cei24-candidate-chunk-overlay-receipt.v1",
+  "generatedAt": "2026-09-26T16:10:55.785Z",
+  "canonicalAuthority": false,
+  "inputs": {
+    "matrixDir": ".tmp\\atlas\\candidate-feature-matrix-v1\\20260926T150456Z",
+    "matrixOrdinalFileSha256": "sha256:dcdbec415e4e131a4595f8118bb21da217bf0edc42e3509fdfb1191f9a2d59b2",
+    "matrixRows": 16151,
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+  },
+  "cei24a": {
+    "owner": "atlas_packets.packet_id (convention of scripts/atlas/materialize-candidate-ordinal-corpus-v1.mts)",
+    "exactTupleJoin": "packet_key + COALESCE(canonical_source_ref, source_ref) + source_revision + workspace_revision_key (atlas_packets.workspace_revision is legacy integer 0)",
+    "unresolved": 13551,
+    "ambiguous": 0,
+    "duplicatePacketIds": 0,
+    "packetIdEqualsPacketKeyRows": 2474,
+    "packetIdDiffersFromPacketKeyRows": 126,
+    "verdict": "CEI_PACKET_CANONICAL_ID_OWNER_MISSING"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "status": "BLOCKED_CEI_PACKET_ID_OWNER_MISSING"
+}

@@ -65,7 +65,7 @@ const pool = new Pool({
 // llama-server (TurboQuant Gemma4) — NOT Ollama (embedding-only)
 // Ollama is embeddinggemma only; batch LLM work uses llama-server @ :8090
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 /**
  * Validate packet has required identity fields

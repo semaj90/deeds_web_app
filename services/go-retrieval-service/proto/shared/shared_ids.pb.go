@@ -132,6 +132,274 @@ func (x *RunIds) GetEmbeddingDim() int32 {
 	return 0
 }
 
+// AtlasRequestContext carries caller-owned identity into an adapter boundary.
+// Empty values are invalid for Stage 13 receipt admission; proto3 optional
+// fields are reserved for values that are genuinely unavailable.
+type AtlasRequestContextV2 struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	ToolCallId        string                 `protobuf:"bytes,1,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
+	RunId             string                 `protobuf:"bytes,2,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	WorkspaceId       string                 `protobuf:"bytes,3,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	WorkspaceRevision string                 `protobuf:"bytes,4,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
+	PacketKey         string                 `protobuf:"bytes,5,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	PacketRevision    string                 `protobuf:"bytes,6,opt,name=packet_revision,json=packetRevision,proto3" json:"packet_revision,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *AtlasRequestContextV2) Reset() {
+	*x = AtlasRequestContextV2{}
+	mi := &file_shared_ids_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AtlasRequestContextV2) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtlasRequestContextV2) ProtoMessage() {}
+
+func (x *AtlasRequestContextV2) ProtoReflect() protoreflect.Message {
+	mi := &file_shared_ids_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtlasRequestContextV2.ProtoReflect.Descriptor instead.
+func (*AtlasRequestContextV2) Descriptor() ([]byte, []int) {
+	return file_shared_ids_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *AtlasRequestContextV2) GetToolCallId() string {
+	if x != nil {
+		return x.ToolCallId
+	}
+	return ""
+}
+
+func (x *AtlasRequestContextV2) GetRunId() string {
+	if x != nil {
+		return x.RunId
+	}
+	return ""
+}
+
+func (x *AtlasRequestContextV2) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *AtlasRequestContextV2) GetWorkspaceRevision() string {
+	if x != nil {
+		return x.WorkspaceRevision
+	}
+	return ""
+}
+
+func (x *AtlasRequestContextV2) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *AtlasRequestContextV2) GetPacketRevision() string {
+	if x != nil {
+		return x.PacketRevision
+	}
+	return ""
+}
+
+// AtlasToolReceipt is an observation projection, not a canonical write owner.
+type AtlasToolReceiptV2 struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Schema              string                 `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
+	ToolCallId          string                 `protobuf:"bytes,2,opt,name=tool_call_id,json=toolCallId,proto3" json:"tool_call_id,omitempty"`
+	ToolName            string                 `protobuf:"bytes,3,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
+	RunId               string                 `protobuf:"bytes,4,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	WorkspaceId         string                 `protobuf:"bytes,5,opt,name=workspace_id,json=workspaceId,proto3" json:"workspace_id,omitempty"`
+	WorkspaceRevision   string                 `protobuf:"bytes,6,opt,name=workspace_revision,json=workspaceRevision,proto3" json:"workspace_revision,omitempty"`
+	PacketKey           string                 `protobuf:"bytes,7,opt,name=packet_key,json=packetKey,proto3" json:"packet_key,omitempty"`
+	PacketRevision      string                 `protobuf:"bytes,8,opt,name=packet_revision,json=packetRevision,proto3" json:"packet_revision,omitempty"`
+	Succeeded           bool                   `protobuf:"varint,9,opt,name=succeeded,proto3" json:"succeeded,omitempty"`
+	RetrievalConfidence *float32               `protobuf:"fixed32,10,opt,name=retrieval_confidence,json=retrievalConfidence,proto3,oneof" json:"retrieval_confidence,omitempty"`
+	EvidenceCount       int32                  `protobuf:"varint,11,opt,name=evidence_count,json=evidenceCount,proto3" json:"evidence_count,omitempty"`
+	ValidationStatus    string                 `protobuf:"bytes,12,opt,name=validation_status,json=validationStatus,proto3" json:"validation_status,omitempty"`
+	OutputChecksum      *string                `protobuf:"bytes,13,opt,name=output_checksum,json=outputChecksum,proto3,oneof" json:"output_checksum,omitempty"`
+	ErrorCode           *string                `protobuf:"bytes,14,opt,name=error_code,json=errorCode,proto3,oneof" json:"error_code,omitempty"`
+	CanonicalAuthority  bool                   `protobuf:"varint,15,opt,name=canonical_authority,json=canonicalAuthority,proto3" json:"canonical_authority,omitempty"`
+	WritesPerformed     bool                   `protobuf:"varint,16,opt,name=writes_performed,json=writesPerformed,proto3" json:"writes_performed,omitempty"`
+	ReceiptId           string                 `protobuf:"bytes,17,opt,name=receipt_id,json=receiptId,proto3" json:"receipt_id,omitempty"`
+	ReceiptChecksum     string                 `protobuf:"bytes,18,opt,name=receipt_checksum,json=receiptChecksum,proto3" json:"receipt_checksum,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *AtlasToolReceiptV2) Reset() {
+	*x = AtlasToolReceiptV2{}
+	mi := &file_shared_ids_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AtlasToolReceiptV2) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtlasToolReceiptV2) ProtoMessage() {}
+
+func (x *AtlasToolReceiptV2) ProtoReflect() protoreflect.Message {
+	mi := &file_shared_ids_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtlasToolReceiptV2.ProtoReflect.Descriptor instead.
+func (*AtlasToolReceiptV2) Descriptor() ([]byte, []int) {
+	return file_shared_ids_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AtlasToolReceiptV2) GetSchema() string {
+	if x != nil {
+		return x.Schema
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetToolCallId() string {
+	if x != nil {
+		return x.ToolCallId
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetToolName() string {
+	if x != nil {
+		return x.ToolName
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetRunId() string {
+	if x != nil {
+		return x.RunId
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetWorkspaceId() string {
+	if x != nil {
+		return x.WorkspaceId
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetWorkspaceRevision() string {
+	if x != nil {
+		return x.WorkspaceRevision
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetPacketKey() string {
+	if x != nil {
+		return x.PacketKey
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetPacketRevision() string {
+	if x != nil {
+		return x.PacketRevision
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetSucceeded() bool {
+	if x != nil {
+		return x.Succeeded
+	}
+	return false
+}
+
+func (x *AtlasToolReceiptV2) GetRetrievalConfidence() float32 {
+	if x != nil && x.RetrievalConfidence != nil {
+		return *x.RetrievalConfidence
+	}
+	return 0
+}
+
+func (x *AtlasToolReceiptV2) GetEvidenceCount() int32 {
+	if x != nil {
+		return x.EvidenceCount
+	}
+	return 0
+}
+
+func (x *AtlasToolReceiptV2) GetValidationStatus() string {
+	if x != nil {
+		return x.ValidationStatus
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetOutputChecksum() string {
+	if x != nil && x.OutputChecksum != nil {
+		return *x.OutputChecksum
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetErrorCode() string {
+	if x != nil && x.ErrorCode != nil {
+		return *x.ErrorCode
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetCanonicalAuthority() bool {
+	if x != nil {
+		return x.CanonicalAuthority
+	}
+	return false
+}
+
+func (x *AtlasToolReceiptV2) GetWritesPerformed() bool {
+	if x != nil {
+		return x.WritesPerformed
+	}
+	return false
+}
+
+func (x *AtlasToolReceiptV2) GetReceiptId() string {
+	if x != nil {
+		return x.ReceiptId
+	}
+	return ""
+}
+
+func (x *AtlasToolReceiptV2) GetReceiptChecksum() string {
+	if x != nil {
+		return x.ReceiptChecksum
+	}
+	return ""
+}
+
 // ArtifactRef is a pointer to a file written under memory/runs/<run_id>/
 type ArtifactRef struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -149,7 +417,7 @@ type ArtifactRef struct {
 
 func (x *ArtifactRef) Reset() {
 	*x = ArtifactRef{}
-	mi := &file_shared_ids_proto_msgTypes[1]
+	mi := &file_shared_ids_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -161,7 +429,7 @@ func (x *ArtifactRef) String() string {
 func (*ArtifactRef) ProtoMessage() {}
 
 func (x *ArtifactRef) ProtoReflect() protoreflect.Message {
-	mi := &file_shared_ids_proto_msgTypes[1]
+	mi := &file_shared_ids_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -174,7 +442,7 @@ func (x *ArtifactRef) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArtifactRef.ProtoReflect.Descriptor instead.
 func (*ArtifactRef) Descriptor() ([]byte, []int) {
-	return file_shared_ids_proto_rawDescGZIP(), []int{1}
+	return file_shared_ids_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ArtifactRef) GetRunId() string {
@@ -233,7 +501,43 @@ const file_shared_ids_proto_rawDesc = "" +
 	"error_hash\x18\x05 \x01(\tR\terrorHash\x12!\n" +
 	"\fcontent_hash\x18\x06 \x01(\tR\vcontentHash\x12'\n" +
 	"\x0fembedding_model\x18\a \x01(\tR\x0eembeddingModel\x12#\n" +
-	"\rembedding_dim\x18\b \x01(\x05R\fembeddingDim\"\xcb\x01\n" +
+	"\rembedding_dim\x18\b \x01(\x05R\fembeddingDim\"\xea\x01\n" +
+	"\x15AtlasRequestContextV2\x12 \n" +
+	"\ftool_call_id\x18\x01 \x01(\tR\n" +
+	"toolCallId\x12\x15\n" +
+	"\x06run_id\x18\x02 \x01(\tR\x05runId\x12!\n" +
+	"\fworkspace_id\x18\x03 \x01(\tR\vworkspaceId\x12-\n" +
+	"\x12workspace_revision\x18\x04 \x01(\tR\x11workspaceRevision\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\x05 \x01(\tR\tpacketKey\x12'\n" +
+	"\x0fpacket_revision\x18\x06 \x01(\tR\x0epacketRevision\"\xfa\x05\n" +
+	"\x12AtlasToolReceiptV2\x12\x16\n" +
+	"\x06schema\x18\x01 \x01(\tR\x06schema\x12 \n" +
+	"\ftool_call_id\x18\x02 \x01(\tR\n" +
+	"toolCallId\x12\x1b\n" +
+	"\ttool_name\x18\x03 \x01(\tR\btoolName\x12\x15\n" +
+	"\x06run_id\x18\x04 \x01(\tR\x05runId\x12!\n" +
+	"\fworkspace_id\x18\x05 \x01(\tR\vworkspaceId\x12-\n" +
+	"\x12workspace_revision\x18\x06 \x01(\tR\x11workspaceRevision\x12\x1d\n" +
+	"\n" +
+	"packet_key\x18\a \x01(\tR\tpacketKey\x12'\n" +
+	"\x0fpacket_revision\x18\b \x01(\tR\x0epacketRevision\x12\x1c\n" +
+	"\tsucceeded\x18\t \x01(\bR\tsucceeded\x126\n" +
+	"\x14retrieval_confidence\x18\n" +
+	" \x01(\x02H\x00R\x13retrievalConfidence\x88\x01\x01\x12%\n" +
+	"\x0eevidence_count\x18\v \x01(\x05R\revidenceCount\x12+\n" +
+	"\x11validation_status\x18\f \x01(\tR\x10validationStatus\x12,\n" +
+	"\x0foutput_checksum\x18\r \x01(\tH\x01R\x0eoutputChecksum\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"error_code\x18\x0e \x01(\tH\x02R\terrorCode\x88\x01\x01\x12/\n" +
+	"\x13canonical_authority\x18\x0f \x01(\bR\x12canonicalAuthority\x12)\n" +
+	"\x10writes_performed\x18\x10 \x01(\bR\x0fwritesPerformed\x12\x1d\n" +
+	"\n" +
+	"receipt_id\x18\x11 \x01(\tR\treceiptId\x12)\n" +
+	"\x10receipt_checksum\x18\x12 \x01(\tR\x0freceiptChecksumB\x17\n" +
+	"\x15_retrieval_confidenceB\x12\n" +
+	"\x10_output_checksumB\r\n" +
+	"\v_error_code\"\xcb\x01\n" +
 	"\vArtifactRef\x12\x15\n" +
 	"\x06run_id\x18\x01 \x01(\tR\x05runId\x12#\n" +
 	"\rrelative_path\x18\x02 \x01(\tR\frelativePath\x12\x16\n" +
@@ -255,10 +559,12 @@ func file_shared_ids_proto_rawDescGZIP() []byte {
 	return file_shared_ids_proto_rawDescData
 }
 
-var file_shared_ids_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_shared_ids_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_shared_ids_proto_goTypes = []any{
-	(*RunIds)(nil),      // 0: yorha.shared.RunIds
-	(*ArtifactRef)(nil), // 1: yorha.shared.ArtifactRef
+	(*RunIds)(nil),                // 0: yorha.shared.RunIds
+	(*AtlasRequestContextV2)(nil), // 1: yorha.shared.AtlasRequestContextV2
+	(*AtlasToolReceiptV2)(nil),    // 2: yorha.shared.AtlasToolReceiptV2
+	(*ArtifactRef)(nil),           // 3: yorha.shared.ArtifactRef
 }
 var file_shared_ids_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -273,13 +579,14 @@ func file_shared_ids_proto_init() {
 	if File_shared_ids_proto != nil {
 		return
 	}
+	file_shared_ids_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_shared_ids_proto_rawDesc), len(file_shared_ids_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

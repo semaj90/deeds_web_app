@@ -462,6 +462,9 @@ async function runBenchmark(testNum, testCase) {
     testNum,
     query: testCase.query,
     type: testCase.type,
+    diagnosticOnly: true,
+    promotionEligible: false,
+    syntheticInputs: true,
     stages: [],
     totalElapsed: 0,
     allPassed: false,
@@ -522,7 +525,8 @@ async function runBenchmark(testNum, testCase) {
     result.stages.push(stage6);
 
     result.totalElapsed = Date.now() - globalStartMs;
-    result.allPassed = result.stages.every((s) => s.passed !== false);
+    result.allPassed = false;
+    result.status = 'DIAGNOSTIC_ONLY_SYNTHETIC_HARNESS';
 
     if (config.verbose) {
       console.log(`\n✓ Test ${testNum}: ${testCase.query}`);

@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.current-graphify-execution-owner-decision.v1",
+  "generatedAt": "2026-09-21T20:13:30.443Z",
+  "gate": "GRAPHIFY-EXECUTION-SNAPSHOT-OWNER-02",
+  "mode": "REHEARSAL_ROLLED_BACK",
+  "authorityTableOwner": "graphify_execution_authority",
+  "chosenExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "otherCandidateExecutionIds": [
+    "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+  ],
+  "authorizedEnvVarPresent": false,
+  "applyFlagPresent": false,
+  "writesPerformed": false,
+  "before": [
+    {
+      "execution_id": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+      "canonical_authority": false,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    },
+    {
+      "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+      "canonical_authority": true,
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    }
+  ],
+  "after": null,
+  "readbackVerified": true,
+  "rehearsal": {
+    "legacy": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      }
+    ],
+    "authority": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authority_state": "SELECTED",
+        "selected_by": "REHEARSAL",
+        "selection_receipt": "REHEARSAL-NOT-A-RECEIPT",
+        "imported_at": null,
+        "import_receipt": null
+      }
+    ],
+    "previousAuthority": [
+      {
+        "execution_id": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "authority_state": "LEGACY_IMPORTED"
+      }
+    ]
+  },
+  "reportChecksum": "792b56fd943d37b7fbace2f30a912859c8df7fd6182ac448444a455e056c79cb"
+}

@@ -1,0 +1,752 @@
+{
+  "schema": "atlas.summary-claim-judge-replay.v1",
+  "generatedAt": "2026-09-23T23:39:42.187794+00:00",
+  "gate": "VAL-07 live replay",
+  "backend": {
+    "kind": "llama-server (NOT Ollama)",
+    "url": "http://127.0.0.1:8090",
+    "resolvedModel": {
+      "id": "ornith-1.5-9b",
+      "revision": "ornith-1.5-9b:hforf.gguf"
+    },
+    "promptRevision": "summary-claim-judge-prompt:val-07-v1",
+    "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE (weak second signal)"
+  },
+  "chunks": 19,
+  "claims": 51,
+  "verdictCounts": {
+    "SUPPORTED": 50,
+    "UNSUPPORTED_CLAIM": 1
+  },
+  "judgeErrors": 0,
+  "elapsedSeconds": 25,
+  "judgeSaidSupportedDespiteDeterministicFail": [],
+  "items": [
+    {
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "claimOrdinal": 0,
+      "claim": "Components supporting the `child` snippet typically implement logic that destructures `child`, `children`, and other props from `$props()`, creates a trigger via `makeTrigger()`, and merges internal props with user props using `$derived(mergeProps(restProps, trigger.props))`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "4e8eb2a02132f02582958072715f211b903872e13f4275de0fd1f4abb7743623",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:6b3cf8151e01df1d:5",
+      "claimOrdinal": 1,
+      "claim": "When `child` is present, it renders `child` with the merged props; otherwise, it renders a `<button>` with the merged props and the rendered `children`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "9a03e479642d44e9f7849902a8bafaa7845d9c1b5108ad290fb5298dbf3adb6a",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "claimOrdinal": 0,
+      "claim": "This chunk introduces the Getting Started section of the Bits UI documentation, which explains how to begin using Bits in your app.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "2c7371aa0c36525cebcbe5d801aeb1d68e741ab3f387e10c1d4cb12bf9ff18ae",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "claimOrdinal": 1,
+      "claim": "It notes that this section may contain examples, demos, and other useful information related to a specific part of Bits UI.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "653c8e6f2006f5235b119e2bd1f01e6d15b73d8abc068269ab9a6899ff951912",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:679d17152be486da:0",
+      "claimOrdinal": 2,
+      "claim": "When helping users, you can ignore the classnames applied to the demos unless they are relevant to the user's issue.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "500ef21e049e86c571c2404f2b11b52f071f0480c5c358d0a6c9ddd9b626b9e6",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "claimOrdinal": 0,
+      "claim": "You can override the default outside-interaction behavior of a Dialog by passing the `onInteractOutside` prop to `Dialog.Content`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "e6af8c18e1b5c4f89490ced91e3f130d0aee0aaaf862a269f31b6cf1a30dcb99",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "claimOrdinal": 1,
+      "claim": "The handler receives an event, so you can call `e.preventDefault()` to stop the default action and run your own logic instead.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "a7138c7044e72e67b49d542fbdeba17d37653597cbfd803ca31f50a9ae86d738",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:bits-ui:933224c7e6a17940:40",
+      "claimOrdinal": 2,
+      "claim": "This lets you define custom behavior when users interact outside the Dialog content.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "53453fed929592ec8cf68e0fc85d76b7766fad858c539966f8d0ac1efbe64dc4",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "claimOrdinal": 0,
+      "claim": "The `drizzle-kit migrate` command applies SQL migrations generated by `drizzle-kit generate` for the code-first approach to managing Drizzle migrations.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "10993b132f318367f891ec1fc4362c002990ec8bf0ced76963b0f23a10315804",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-kit:0608a335e55cd6ac:0",
+      "claimOrdinal": 1,
+      "claim": "It reads all `.sql` files from the migration folder, connects to the database to fetch entries from the drizzle migrations log table, decides which new migrations to run based on previously applied ones, then runs the SQL migrations and logs them to the drizzle migrations table.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "eb2133cde64abf0c7273a3af9f5282bab891d7a012ceb018ecfb355949e0af3f",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "claimOrdinal": 0,
+      "claim": "You can set custom migration file names by providing the `--name` CLI option to `drizzle-kit generate`, as shown in `npx drizzle-kit generate --name=init`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "cc2fb1d70fd5ae6bc0ec0cead84e43c94609bfb655366f7c6f21a659e4d2d29b",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-kit:83cd7433d94e8f78:4",
+      "claimOrdinal": 1,
+      "claim": "This creates a migration folder named after the provided value, such as `20242409125510_init`, containing `snapshot.json` and `migration.sql` files.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "96b2e8fef301b412c80ed94816e7771823151360fa7e53150eb461aee77986ef",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "claimOrdinal": 0,
+      "claim": "Drizzle ORM does not provide code to create the `pg_vector` extension within the schema, assuming it is already installed in your PostgreSQL database.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "53df8bd3322756de68917665d5138913fb18462d8ad7743b3ba9ddc4ef5bbeca",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "claimOrdinal": 1,
+      "claim": "The `pg_vector` extension is an open-source vector similarity search solution for Postgres that stores vectors alongside your other data.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "0eb40373fbaf0aecf82066f1693063828242e8143c176d752ecc81efeae29b5e",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-orm:477678292a4e8b9a:0",
+      "claimOrdinal": 2,
+      "claim": "It supports exact and approximate nearest neighbor search across single-precision, half-precision, binary, and sparse vectors, with distance metrics including L2, inner product, cosine, L1, Hamming, and Jaccard.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "25aeabfeca5ca530be944c45810712ce7d6ead5eb88866bdacebaaff4c476ee9",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "claimOrdinal": 0,
+      "claim": "pgvector requires an explicit operator class for HNSW and IVFFlat indexes because no default exists.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "b19a33da609d5598d38b164aab07ed6f3f39541c6ba59a0309b6ffdf466497ca",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:drizzle-orm:d1b6909995c31bb5:9",
+      "claimOrdinal": 1,
+      "claim": "This requirement affects anyone using pgvector with Drizzle's `push` workflow.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "999a7c208f2ac8f375f56e19cc0ef6bad4adf18b527476179ccfd3f408e1f4bd",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "claimOrdinal": 0,
+      "claim": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "5de15247c3fa680d7c4d690bb281c4bde45c6efc754e04c25e56c11c2d857eab",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "claimOrdinal": 1,
+      "claim": "It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can cover multiple columns.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "be81a3ec3c8b12cd899077c1ff892fbbce47be15881d198fb8e4d02c76c532ab",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "claimOrdinal": 2,
+      "claim": "For low-selectivity filters, exact indexes work well, but approximate indexes like HNSW may perform better, with filtering applied after the index scan.",
+      "deterministicStatuses": {
+        "technical": "FAIL",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "6083401bf4329b63593a6b31ac4867709b6f7acd3ce831d35c8afb4d923d74f1",
+      "verdict": "UNSUPPORTED_CLAIM",
+      "status": "JUDGED",
+      "unsupportedFragment": "low-selectivity"
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "claimOrdinal": 3,
+      "claim": "To handle cases where few rows match, you can enable iterative index scans by setting `hnsw.iterative_scan = strict_order`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "de445fdad5f9eab506ffe16586f59c3c82331b2accedf4ef17b2905215b20513",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "claimOrdinal": 4,
+      "claim": "For filtering by a few distinct values, partial indexing is suggested, while partitioning is recommended when filtering by many different values.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "b6b506ec618ea07ade70d402ece4af7e4d65a71b0ad2e9810a79b3295fa25766",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "claimOrdinal": 0,
+      "claim": "Starting with pgvector 0.8.0, iterative index scans automatically scan more of an approximate index until enough results are found, bounded by `hnsw.max_scan_tuples` or `ivfflat.max_probes`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "7342c41bbe137c1e6f210203813ab5c25191a79d6eec7975cf311f5983b643f5",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "claimOrdinal": 1,
+      "claim": "Scans can use strict ordering via `SET hnsw.iterative_scan = strict_order;` for exact distance order, or relaxed ordering via `SET hnsw.iterative_scan = relaxed_order;` or `SET ivfflat.iterative_scan = relaxed_order;` for better recall.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "1601e2fff4c35d2b520d237d5f678f62b7ff017919f3054d1e5773b977df58de",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:24",
+      "claimOrdinal": 2,
+      "claim": "With relaxed ordering, a materialized CTE can restore strict ordering, requiring `+ 0` for Postgres 17+, and distance filters should be placed outside the CTE for best performance.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "fce645ddec234f8e3fcb564775f58b846970b276713ac1d8aab2f4d9b2672d50",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "claimOrdinal": 0,
+      "claim": "The `hnsw.max_scan_tuples` setting specifies the maximum number of tuples to visit during an iterative scan, defaulting to 20,000, and is approximate without affecting the initial scan.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "e3dc16de5ca3ad532bfff87722517fe893cdc25baf819caa87b1b47a6e5b96ea",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:26",
+      "claimOrdinal": 1,
+      "claim": "The `hnsw.scan_mem_multiplier` setting specifies the maximum memory to use as a multiple of `work_mem`, defaulting to 1, and should be increased if raising `hnsw.max_scan_tuples` does not improve recall.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "6e602b48b95e18eddf67eb83fcdcb5e280a1f3ee490f3a6fbcc6485be1228bd7",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "claimOrdinal": 0,
+      "claim": "PostgreSQL 18 adds an asynchronous I/O subsystem that lets backends queue multiple read requests for more efficient sequential scans, bitmap heap scans, and vacuums, controlled by the server variables `io_method`, `io_combine_limit`, and `io_max_combine_limit`, while also enabling `effective_io_concurrency` and `maintenance_io_concurrency` values greater than zero on systems without `fadvise()` support and exposing file handles through the new system view `pg_aios`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "a891946bb95fbc2118857fed8b069916710730388eb938410d599f4423722ce1",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "claimOrdinal": 1,
+      "claim": "It also improves locking performance for queries accessing many relations, enhances hash joins and `GROUP BY` performance and reduces their memory usage, allows normal vacuums to freeze all-visible pages to reduce later full-relation freezing overhead via the `vacuum_max_eager_freeze_failure_rate` setting, and adds the `vacuum_truncate` server variable to control file truncation during `VACUUM`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "d467d83d3bb861f2b47a6a6ef3a54de2f751313b21d9194cc31b79a70fb3009a",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:10",
+      "claimOrdinal": 2,
+      "claim": "Finally, the default values for `effective_io_concurrency` and `maintenance_io_concurrency` are increased to 16.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "37c26e5ba77ce657798c0d89dad1480b1fb5f862d7a173032156da30b700dbd3",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "claimOrdinal": 0,
+      "claim": "PostgreSQL 18 introduces an asynchronous I/O (AIO) subsystem that improves performance of sequential scans, bitmap heap scans, vacuums, and other operations.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "aa7ba7297433d05132230711aa472a044923067f411f90521b2bec87f7254f74",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "claimOrdinal": 1,
+      "claim": "It also adds features such as `pg_upgrade` retaining optimizer statistics, \"skip scan\" lookups for multicolumn B-tree indexes, a `uuidv7()` function for timestamp-ordered UUIDs, virtual generated columns (now the default), OAuth authentication support, `OLD` and `NEW` support in `RETURNING` clauses for INSERT, UPDATE, DELETE, and MERGE commands, and temporal constraints for PRIMARY KEY, UNIQUE, and FOREIGN KEY constraints.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "8f9db05247e84212bddaaa4148de22806a32acc620b1b6d13df03aa1f1a17916",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:2",
+      "claimOrdinal": 2,
+      "claim": "These new features are explained in more detail in the sections below.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "fee7ea560f0653779d9a6b7fb4e0c215045964acdd0db1131e30f65fa7f7ced1",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "claimOrdinal": 0,
+      "claim": "PostgreSQL 18 adds the `casefold()` function for more sophisticated case-insensitive matching that handles characters with multiple upper or lower case equivalents and conversions that change character counts.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "2cf8267a3d89407cd1f8b239a1cc9a5fa788b890a4083adfe99edf7f5ea422dd",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "claimOrdinal": 1,
+      "claim": "It also allows `MIN()`/`MAX()` aggregates on arrays and composite types, adds a `WEEK` option to `EXTRACT()` with improved negative value output for `EXTRACT(QUARTER ...)`, and adds roman numeral support to `to_number()` via the `RN` pattern.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "318e94364aeae20d87a935a472da7a6f4576557d0c69eb792b3d830721ca0e11",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:postgresql-18:38d5e74bafb89df8:26",
+      "claimOrdinal": 2,
+      "claim": "Additionally, it introduces the temporally sortable `uuidv7()` function with a `uuidv4()` alias, adds `crc32()` and `crc32c()` for CRC computation, adds `gamma()` and `lgamma()` math functions, allows `=>` syntax for named cursor arguments in PL/pgSQL, and permits named arguments for various `regexp_*()` functions.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "41dcf814ecea98d0d3cfbbb00dfac6979aae0391a424a2fff583f1954ea6287d",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "claimOrdinal": 0,
+      "claim": "This chunk lists the Svelte runes, which are `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "8f217715b71944c86d496276e2b9f56adbf5bd9a8a00ab62de63b76e6eb8a07e",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:05fda9b18acd27b3:1",
+      "claimOrdinal": 1,
+      "claim": "It appears in the Introduction > Runes section of the Svelte docs page about `$props`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "5df32fd4774d7e9e97f5b9d58146f6280d4ff1021e4f2663f2002b90b0ecf299",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "claimOrdinal": 0,
+      "claim": "Runes are a set of symbols in Svelte that include `$state`, `$derived`, `$effect`, `$props`, `$bindable`, `$inspect`, and `$host`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "e8520ec547b1d74f177764142142b3bef1902c7425387418e70277f51a6270ff",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:1",
+      "claimOrdinal": 1,
+      "claim": "These are listed as part of the introduction to runes in the Svelte documentation.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "005e0d8f0667a17bf34e4ed0547f636e6fc4c928e284cfb47790a0265cd638fc",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "claimOrdinal": 0,
+      "claim": "The `$effect` automatically tracks reactive values (`$state`, `$derived`, `$props`) that are synchronously read inside its function body and schedules a re-run when they change.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "9718bcf6612aa68dd85308468bba74ee7fcb5cca146e2d8ddb172f20a2116633",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "claimOrdinal": 1,
+      "claim": "Values read asynchronously—after an `await` or inside a `setTimeout`—are not tracked, and `$state`/`$derived` used directly inside the `$effect` are not treated as dependencies.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "5dda63712f152af4545c22e24ac3b426b689e004f8649fd6f28aed8ec0071011",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:svelte5-runes:4606958abe2e620d:13",
+      "claimOrdinal": 2,
+      "claim": "The effect runs after the DOM is updated, does not run during server-side rendering, and any returned cleanup function is called before the effect re-runs or when the component unmounts.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "f2452a35ed27779aba74f38b31ca2df1a1b04fc95125d709af736e9d09873b80",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "claimOrdinal": 0,
+      "claim": "In SvelteKit, layout `load` functions can provide data to child pages, which is accessible via the `data` prop in the page component.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "ec1fc8fb7628c761e2f76d1738552f3631c4b35c7eb728cd692931956d7c6fe5",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:62e6dd9932a74b58:15",
+      "claimOrdinal": 1,
+      "claim": "When multiple `load` functions return data with the same key, the last one wins, so a layout `load` returning `{ a: 1, b: 2 }` combined with a page `load` returning `{ b: 3, c: 4 }` results in `{ a: 1, b: 3, c: 4 }`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "05da8c3ee545006717517ae4643e7f32901b830fd9f2afb9ea910167066681ad",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "claimOrdinal": 0,
+      "claim": "SvelteKit reuses existing layout and page components when navigating between routes, so the `data` prop updates rather than the components being recreated.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "d01d3c834d69d7e1900b79add620ea92e44db8c310104c360cc12675cd2d1904",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "claimOrdinal": 1,
+      "claim": "Because the code doesn't rerun, lifecycle methods like `onMount` and `onDestroy` won't rerun and values like `estimatedReadingTime` won't be recalculated.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "1cbcc3861bedc4ba5643f02fddd137fde6c7fd8f44819b8c30c475ced32b86ad",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:19",
+      "claimOrdinal": 2,
+      "claim": "To fix this, you need to make the value reactive using `$derived`.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "58d8abf2b77675cdc672706b66575e4550651e2b58d6078bd27406225f248b39",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "claimOrdinal": 0,
+      "claim": "In SvelteKit, component and page state is preserved across navigation, so you can keep values reactive using `$derived` and reuse components to maintain state like sidebar scroll position.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "ce755304876086816db99654c866803322fa338dd6fbbd061b7c526ec11d0baa",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "claimOrdinal": 1,
+      "claim": "If your code in `onMount` or `onDestroy` needs to run again after navigation, use `afterNavigate` and `beforeNavigate` respectively.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "6a52e9e006a8075902047b579da3e7c5aa281f45800c684159d4dc353d67116d",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    },
+    {
+      "chunkId": "doc:sveltekit:7eecebe5e0d7481c:20",
+      "claimOrdinal": 2,
+      "claim": "To completely destroy and remount a component on navigation, wrap it in a `{#key page.url.pathname}` block.",
+      "deterministicStatuses": {
+        "technical": "PASS",
+        "numeric": "PASS",
+        "version": "PASS"
+      },
+      "judgeInputChecksum": "4d829cabc69f9fc8656d5da0a48fbae4b548770f34d7795bfd7f6759277a4e5d",
+      "verdict": "SUPPORTED",
+      "status": "JUDGED",
+      "unsupportedFragment": null
+    }
+  ],
+  "invariants": {
+    "judgeCannotOverrideDeterministicFailure": "VAL-09 owns the decision; this replay only records disagreement",
+    "spansFromModel": "never trusted, none requested"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "persistedSummaries": 0
+}

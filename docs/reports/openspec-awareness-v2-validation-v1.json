@@ -1,0 +1,20 @@
+{
+  "schema": "atlas.openspec-awareness-v2-validation.v1",
+  "status": "PROVEN_READ_ONLY_TESTS",
+  "rootTest": {
+    "command": "node tests/test-awareness-v2.mjs",
+    "passed": 12,
+    "total": 12
+  },
+  "bundleTests": {
+    "awareness": "12/12 PASS",
+    "adapter": "4/4 PASS",
+    "actionableAudit": "5/5 PASS"
+  },
+  "windowsPathHarnessFixed": true,
+  "directoryGraphAuthority": false,
+  "kmeansAuthority": "CHALLENGER_NAVIGATION_ONLY",
+  "runtimeMutation": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.graphify-current-source-membership-v1-reapply-receipt.v1",
+  "appliedAt": "2026-09-24T22:43:00.268Z",
+  "status": "CANONICAL_VIEW_REAPPLY_APPLY_PROVEN",
+  "sourceFile": "sveltekit-frontend/drizzle/manual/graphify_current_source_membership_v1.sql",
+  "sourceFileSha256": "b3bf929fe05fa68ae70e4736c5eb7a04f3a5f62ff8b411bb1280fa06adef7500",
+  "notApplied": "sveltekit-frontend/drizzle/manual/20260924_graphify_current_source_membership_v1_on_v2_DRAFT.sql (SUPERSEDED)",
+  "method": "single transaction: DROP VIEW IF EXISTS ... RESTRICT (0 dependents verified) + canonical file; CREATE OR REPLACE alone cannot add repository_id as column 1",
+  "before": {
+    "reads": "graphify_execution_files (legacy)",
+    "columns": "source_ref,workspace_id,...,active (no repository_id)",
+    "rows": 24139,
+    "active": 0,
+    "viewdefSha256": "d2bcf7362dc7cbaa2a7b0f12251b9bfccf7e9239e5ce65a7394c297757821b27"
+  },
+  "after": {
+    "reads": "graphify_execution_file_membership_v2",
+    "rows": 25545,
+    "active": 25542,
+    "latestCompletedExecution": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+    "viewdefSha256": "83ffb2b7c15cb25ebe7d3e48f043d6393e45836eb4b362f6e1fd120c60a0615d"
+  },
+  "canonicalQueryPreview": {
+    "rows": 25545,
+    "active": 25542,
+    "matches": true
+  },
+  "currentSemantics": "last seen in latest COMPLETED execution per workspace (not canonical_authority flag)",
+  "rollback": "BEGIN; DROP VIEW public.graphify_current_source_membership_v1 RESTRICT; CREATE VIEW public.graphify_current_source_membership_v1 AS <pre-apply-viewdef.sql>; COMMIT",
+  "separateFrom": "packet source-revision repair receipt"
+}

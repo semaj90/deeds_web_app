@@ -12,7 +12,12 @@
  */
 
 import { Command } from 'commander';
-import { pool } from '../lib/db.mjs';
+import pg from 'pg';
+
+// Matches the pattern used by sibling scripts (phase10-validation-smoke.mjs,
+// phase10-backfill-packet-type.mjs) — '../lib/db.mjs' never existed in this repo.
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
 const program = new Command();
 
@@ -37,10 +42,12 @@ async function regenerateToolEmbeddings() {
 
   try {
     // Fetch 6 canonical tools + others
+    // tool_registry's real column is `name`, not `tool_name` (confirmed live via \d
+    // tool_registry) — the original query would have failed on any real run, dry or apply.
     const toolsResult = await pool.query(`
       SELECT
         tool_id,
-        tool_name,
+        name AS tool_name,
         summary,
         tool_capabilities,
         tool_constraints,

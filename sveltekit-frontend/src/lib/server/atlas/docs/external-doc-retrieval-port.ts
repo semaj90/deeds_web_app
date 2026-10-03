@@ -1,4 +1,4 @@
-import type { ExternalDocRetrievalRuntimePort } from '@deeds/parent-atlas';
+import type { ExternalDocRetrievalFilterV1, ExternalDocRetrievalRuntimePort } from '@deeds/parent-atlas';
 import { ENV } from '../../env.server.js';
 import { embedSemantic768 } from './semantic-768-client.js';
 
@@ -13,6 +13,21 @@ function headers(): Record<string, string> {
 
 function url(path: string): string {
   return `${ENV.QDRANT_URL.replace(/\/$/, '')}${path}`;
+}
+
+export function buildExternalDocQdrantFilter(documentFilter: ExternalDocRetrievalFilterV1): Record<string, unknown> {
+  return {
+    must: [
+      { key: 'provider', match: { value: documentFilter.provider } },
+      { key: 'product', match: { value: documentFilter.product } },
+      { key: 'product_version', match: { value: documentFilter.product_version } },
+      documentFilter.architecture === null
+        ? { is_null: { key: 'architecture' } }
+        : { key: 'architecture', match: { value: documentFilter.architecture } },
+      { key: 'source_authority', match: { value: documentFilter.source_authority } },
+      { key: 'canonical_authority', match: { value: false } },
+    ],
+  };
 }
 
 async function query(body: unknown): Promise<string[]> {
@@ -39,32 +54,36 @@ export function createExternalDocRetrievalPort(): ExternalDocRetrievalRuntimePor
       const [vector] = await embedSemantic768([queryText]);
       return vector;
     },
-    async queryDense({ queryVector, k }) {
+    async queryDense({ queryVector, k, documentFilter }) {
       return query({
         query: queryVector,
         using: 'semantic_768',
         limit: k,
+        filter: buildExternalDocQdrantFilter(documentFilter),
         with_payload: true,
       });
     },
-    async queryBm25({ queryText, k }) {
+    async queryBm25({ queryText, k, documentFilter }) {
       return query({
         query: {
           text: queryText,
           model: 'qdrant/bm25',
         },
         using: 'lexical_bm25',
+        filter: buildExternalDocQdrantFilter(documentFilter),
         limit: k,
         with_payload: true,
       });
     },
-    async queryHybridRrf({ queryText, queryVector, k, prefetchK }) {
+    async queryHybridRrf({ queryText, queryVector, k, prefetchK, documentFilter }) {
+      const filter = buildExternalDocQdrantFilter(documentFilter);
       return query({
         prefetch: [
           {
             query: queryVector,
             using: 'semantic_768',
             limit: prefetchK,
+            filter,
           },
           {
             query: {
@@ -73,10 +92,12 @@ export function createExternalDocRetrievalPort(): ExternalDocRetrievalRuntimePor
             },
             using: 'lexical_bm25',
             limit: prefetchK,
+            filter,
           },
         ],
         query: { fusion: 'rrf' },
         limit: k,
+        filter,
         with_payload: true,
       });
     },

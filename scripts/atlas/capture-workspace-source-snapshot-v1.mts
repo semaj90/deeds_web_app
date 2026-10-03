@@ -3,13 +3,12 @@ import path from 'node:path';
 import { parseArgs } from 'node:util';
 // Keep the capture entrypoint bound to the maintained TypeScript implementation.
 // A stale JavaScript sibling must never silently become a second snapshot owner.
-import { observeSnapshot, sealSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
+import { captureStableSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' } } });
 if (!values['workspace-id']) throw new Error('--workspace-id must be supplied; no identity is inferred');
 const root = path.resolve(values.root ?? process.cwd());
-const first = observeSnapshot(root, values['workspace-id']);
-const report = sealSnapshot(first, observeSnapshot(root, values['workspace-id']));
+const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3 });
 const directory = path.join(root, 'docs/reports/workspace-source-snapshots');
 mkdirSync(directory, { recursive: true });
 const artifactPath = path.join(directory, `${report.snapshotRevision.slice(7)}.json`);

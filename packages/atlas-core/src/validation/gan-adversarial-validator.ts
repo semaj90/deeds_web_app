@@ -9,6 +9,8 @@
  * Each probe should FAIL with a specific error code.
  */
 
+import { validateSourceRefV1 } from './source-ref-validation-v1.js';
+
 export interface AdversarialProbe {
   probe_id: string;
   description: string;
@@ -182,7 +184,7 @@ export class GanAdversarialValidator {
     // Check for invalid source_ref format
     if (probe.violation_type === 'malformed_identity') {
       const sourceRef = data.source_ref as string;
-      if (!/^[a-z0-9\/_\-\.]+\.ts$|^[a-z0-9\/_\-\.]+\.tsx$/.test(sourceRef)) {
+      if (!validateSourceRefV1(sourceRef).ok) {
         return { error: 'ERR_INVALID_SOURCE_REF' };
       }
     }

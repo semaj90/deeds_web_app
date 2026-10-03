@@ -342,6 +342,7 @@ export default defineConfig({
     globals: true,
     // Increased timeout for async operations and property-based tests
     testTimeout: 30000,
+    hookTimeout: 30000, // route stubs cold-import the handler in beforeEach; default 10s hook limit surfaced as bare STACK_TRACE_ERROR under full-suite load
     // Allow tests with server-side code
     server: {
       deps: {

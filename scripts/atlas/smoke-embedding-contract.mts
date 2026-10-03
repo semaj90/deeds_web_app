@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Smoke Test: Embedding Contract Validation (768-dim canonical + 384-dim fallback)
+ * Smoke Test: Embedding Contract Validation (768-dim semantic_768 canonical)
  *
  * Validates that embeddings conform to the canonical contract:
  * 1. Ollama embeddings service responds
@@ -9,7 +9,7 @@
  * 4. Output is valid Float32Array
  * 5. L2 norm is valid (0.5 to 1.5, post-normalization)
  * 6. Embedding is deterministic (same input → same output)
- * 7. Graceful fallback for 384-dim (if available)
+ * 7. MRL 512/256/128 are separate normalized derived views, never fallbacks
  */
 
 import fetch from 'node-fetch';
@@ -102,6 +102,16 @@ function calculateL2Norm(embedding: number[]): number {
   return Math.sqrt(sum);
 }
 
+function mrlPrefixView(embedding: number[], dimensions: 512 | 256 | 128): number[] {
+  if (embedding.length !== 768 || !embedding.every(Number.isFinite)) {
+    throw new Error('MRL views require a finite canonical semantic_768 vector');
+  }
+  const prefix = embedding.slice(0, dimensions);
+  const norm = calculateL2Norm(prefix);
+  if (norm <= 1e-8) throw new Error(`semantic_mrl_${dimensions} prefix has zero norm`);
+  return prefix.map((value) => value / norm);
+}
+
 // ============================================================================
 // Main Smoke Test
 // ============================================================================
@@ -184,18 +194,19 @@ async function main() {
   });
 
   // ========================================================================
-  // Gate 6: 384-dim Fallback Support (Graceful)
+  // Gate 6: MRL prefixes are derived views, not canonical fallbacks
   // ========================================================================
 
-  await test(6, 'Graceful fallback for 384-dim truncation', async () => {
-    const truncated = embedding1.slice(0, 384);
-    const truncNorm = calculateL2Norm(truncated);
-
-    if (truncNorm < 0.3 || truncNorm > 2.0) {
-      return `⚠️ truncated 768→384 has norm ${truncNorm.toFixed(4)} (degraded but valid)`;
-    }
-
-    return `truncated 768→384 has norm ${truncNorm.toFixed(4)} (acceptable)`;
+  await test(6, 'MRL 512/256/128 views stay separate and normalized', async () => {
+    const views = ([512, 256, 128] as const).map((dimensions) => {
+      const vector = mrlPrefixView(embedding1, dimensions);
+      const norm = calculateL2Norm(vector);
+      if (vector.length !== dimensions || Math.abs(norm - 1) > 1e-5) {
+        throw new Error(`semantic_mrl_${dimensions} invalid shape/norm: ${vector.length}/${norm}`);
+      }
+      return `${dimensions}D norm=${norm.toFixed(4)}`;
+    });
+    return `${views.join(', ')}; derived from semantic_768, not canonical inputs`;
   });
 
   // ========================================================================
@@ -220,7 +231,7 @@ async function main() {
     console.log('='.repeat(70));
     console.log('\n✅ EMBEDDING CONTRACT VALIDATED');
     console.log(`   Model: ${MODEL} (768-dim canonical)`);
-    console.log(`   Fallback: 384-dim truncation available`);
+    console.log(`   Derived MRL views: semantic_mrl_512 / 256 / 128 (not fallbacks)`);
     console.log(`   Determinism: Verified`);
     process.exit(0);
   } else {

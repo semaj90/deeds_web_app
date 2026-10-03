@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.language-registry-contract-proof.v1",
+  "generatedAt": "2026-09-23T18:27:26Z",
+  "status": "CONTRACT_PROVEN_SOURCE_ADAPTERS_OPEN",
+  "implementation": {
+    "path": "packages/parent-atlas/src/core/language-registry-v1.ts",
+    "testPath": "packages/parent-atlas/test/language-registry-v1.test.mjs",
+    "exportPath": "packages/parent-atlas/src/index.ts",
+    "namespaces": ["CONTENT_LANGUAGE", "AST_PARSER_LANGUAGE", "PARSER_GRAMMAR_ID", "FILE_EXTENSION", "SIDECAR_LANGUAGE"],
+    "resolutionStates": ["RESOLVED", "UNMAPPED", "UNSUPPORTED", "AMBIGUOUS"],
+    "aliasPolicy": "Exact owner-evidenced bindings only; no inferred alias or canonical-language promotion",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "validation": {
+    "typescriptBuild": "PASS",
+    "focusedTests": { "passed": 4, "failed": 0 },
+    "coverage": [
+      "same spelling in distinct namespaces remains distinct",
+      "explicit binding resolves with evidence",
+      "known but unmapped label remains UNMAPPED",
+      "absent label remains UNSUPPORTED",
+      "conflicting bindings fail closed as AMBIGUOUS",
+      "binding labels must occur in supplied source vocabularies",
+      "registry and resolution output are stable under owner snapshot reordering"
+    ]
+  },
+  "sourceOwnerCensus": {
+    "liveParserLanguageColumn": "atlas_ast_nodes.parser_language",
+    "nodeTreeSitterProvider": "sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts",
+    "sidecarResolver": "python/miniforge_nlp_sidecar.py::_resolve_ast_language",
+    "scopeNote": "Census only; no vocabularies were imported into the registry and no runtime source-owner adapter is wired yet."
+  },
+  "nextGate": "LANGUAGE_REGISTRY_SOURCE_VOCABULARY_ADAPTERS_PROVEN"
+}

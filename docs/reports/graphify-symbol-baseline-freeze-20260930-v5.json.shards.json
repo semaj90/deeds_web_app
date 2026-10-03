@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.graphify-symbol-shards.v1",
+  "manifestChecksum": "sha256:b47984d5f16b35e99b542b346322bc634c0cbea9bc8f69d214b9339dfa08232e",
+  "sourceCount": 270,
+  "shardSize": 250,
+  "shards": [
+    {
+      "shardId": "GRAPHIFY-BASELINE-b47984d5f16b-0001",
+      "manifestChecksum": "sha256:b47984d5f16b35e99b542b346322bc634c0cbea9bc8f69d214b9339dfa08232e",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:9a27b9b725e00edebce8bbb4b1df9e04a537e82f0d632afb8626bbfeb0bd007d",
+      "offset": 0,
+      "maxFiles": 250,
+      "shardChecksum": "sha256:fd30b760da0824932d3a8ec1f00f1c5f68bc0c9c7f0be6520b8c10806ce38aae",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    },
+    {
+      "shardId": "GRAPHIFY-BASELINE-b47984d5f16b-0002",
+      "manifestChecksum": "sha256:b47984d5f16b35e99b542b346322bc634c0cbea9bc8f69d214b9339dfa08232e",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "extractorRevision": "sha256:9a27b9b725e00edebce8bbb4b1df9e04a537e82f0d632afb8626bbfeb0bd007d",
+      "offset": 250,
+      "maxFiles": 20,
+      "shardChecksum": "sha256:20a77d98d64324bc3f2875be11bc2a78dea8c515c537badfe8d9d2df7b50ac04",
+      "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+      "queueStatus": "PLANNED_NOT_ENQUEUED"
+    }
+  ]
+}

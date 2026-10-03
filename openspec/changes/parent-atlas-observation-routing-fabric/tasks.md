@@ -114,8 +114,8 @@ Tags are metadata/filter hints, not independent retrieval votes.
   not touch. Reconciling that table name collision (candidate_id/
   semantic_768 shape, if still wanted, needs a new non-colliding name) is
   still open, tracked by ORF-2R below, not resolved by this checkbox.
-- [ ] ORF-2R — Reconcile the exported `packages/parent-atlas` observation repository: it is currently an unused legacy writer targeting `candidate_id + workspace_revision` and a second `semantic_768` owner. Either adapt it to the packet-key exact-filter projection or explicitly split it into a separately named staging repository before enabling any caller.
-- [x] ORF-2R.1 — Legacy repository now fails closed unless callers explicitly opt into `LEGACY_CANDIDATE_VECTOR_V1`; no caller was enabled.
+- [ ] ORF-2R — Reconcile the exported `packages/parent-atlas` observation repository before enabling any caller. Current source targets the packet-key/feature-revision projection and rejects semantic search, but the feature-row `candidate_id` to `packet_key` binding is caller-supplied and not proven here. The older candidate-id/workspace-revision schema with `semantic_768` remains a distinct, unapplied shape and must not be treated as this repository's owner.
+- [x] ORF-2R.1 — Repository construction now requires explicit `PACKET_KEY_ORF_V1` opt-in. The adapter preserves opaque text workspace revisions and rejects blank explicit filters rather than converting them to `NULL` and silently widening a lookup. Its conflict-update now refreshes source-version, workspace, representation, and Tree-sitter metadata consistently with the canonical Svelte materializer. Mocked-pool tests prove exact text binding and metadata refresh; no caller or live database write was enabled. This does not close ORF-2R's candidate-to-packet identity reconciliation. The old manual SQL's `integer` workspace column conflicts with the Drizzle/runtime `text` contract and remains an unapplied migration discrepancy.
 - [x] ORF-2P — PostgreSQL 18 proof captured read-only in
   `docs/reports/orf-postgres-plan-receipt.json`: PostgreSQL 18.4, AIO worker
   settings recorded, and the packet-key feature-revision index was used in an
@@ -179,7 +179,7 @@ Tags are metadata/filter hints, not independent retrieval votes.
   checkbox.
 - [x] ORF-3C — `ExternalDocProjectionV1` target contract implemented for one programming-doc evidence family: semantic_512 lineage, selective indexed fields, flattened tags, cluster/community/PageRank payload hints.
 - [ ] ORF-3 — Qdrant collection/materializer implementation after migration dry-run proves the target is safe.
-- [ ] ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply.
+- [x] ORF-3A — External-doc 768→512 read-only migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply. **Dry-run receipt (2026-09-27):** 852/852 chunks had 768-dimensional nonzero vectors and required page/chunk/evidence revisions; 30 distinct page checksums and 790 distinct chunk checksums were bound into the exact identity manifest. Deterministic truncated-and-renormalized 512-D projection neighbor overlap was 0.93125/0.91875/0.925 at K=5/10/20 over 32 evenly sampled queries. This is only projection parity against the current 768 executor—not relevance, native 512 encoder provenance, or promotion evidence. No model calls or writes; `promotionEligible=false`.
 - [ ] ORF-3P — Qdrant payload-index benchmark: indexed selective fields vs unindexed/nested variants; record memory/storage cost and latency.
 - [x] ORF-4 — `ClusterFeatureProjectionV1` implemented: semantic_512/latent_64 lineage, KMeans/SOM/community revisions, probability/distance values, `evidenceAuthority=false`.
 - [x] ORF-4P — No test file existed for `cluster-feature-projection-v1.ts`
@@ -193,24 +193,21 @@ Tags are metadata/filter hints, not independent retrieval votes.
   cluster a row lands in (the actual "cannot become packet identity"
   claim); all-null KMeans/SOM/community fields (no clustering run yet)
   validate without error.
-- [x] ORF-5 — `RetrievalRouterFeatureRowV1` implemented as representation-explicit semantic_512 + optional latent_64 + structure/ontology/lexical/graph/cluster/temporal/evidence signals.
-- [ ] ORF-5P — Run router-row contract tests; freeze stable numeric flattening order for PyTorch/XGBoost input tensor.
-  **Scope decision (2026-08-24, operator-directed):** the router-row
-  contract tests already exist and pass (see `observation-routing-fabric.spec.ts`
-  test 2, run under ORF-1P — it builds a full `RetrievalRouterFeatureRowV1`
-  and asserts `semantic`/`latent` dimensions and `rowDigest` shape, but does
-  **not** yet freeze a numeric flattening order). The numeric
-  flatten-to-tensor step itself does not exist anywhere in this repo yet
-  (`retrieval-router-feature-row-v1.ts` has no `toTensor`/flatten function).
-  Operator direction: that flattening function belongs on the **Python/
-  PyTorch (aten) GPU side** (matching this repo's existing
-  `python/atlas_compute/*` executors and the GPU/CPU split established
-  elsewhere in `parent-atlas-neural-prefill-encoder`), not as new
-  TypeScript in `sveltekit-frontend`. Do not build a TS tensor-flattening
-  implementation for this. Remaining work: define the frozen field order as
-  a shared contract (e.g. an ordered list of `RetrievalRouterFeatureRowV1`
-  field paths) that both the TS row builder and the Python consumer agree
-  on, then implement the actual flatten in Python.
+- [x] ORF-5 — `RetrievalRouterFeatureRowV1` implemented as representation-explicit semantic_768 + optional latent_64 + structure/ontology/lexical/graph/cluster/temporal/evidence signals.
+- [x] ORF-5P — Freeze stable numeric flattening order and implement the pure CPU Python adapter for PyTorch/XGBoost challenger input. This is a layout contract only, not model training or promotion.
+  **Scope decision (2026-08-24, operator-directed):** flattening belongs on
+  the Python side, not as a TypeScript tensor implementation. The stable
+  order is now defined once in
+  `python/atlas_compute/retrieval_router_feature_order_v1.json`; the TS row
+  contract test verifies each path and shape against a real row built by the
+  production builder. `python/atlas_compute/router_feature_flatten.py` consumes
+  that same JSON and returns a fixed-width CPU tuple. Nullable numerics use
+  value-then-presence encoding; the optional latent vector is zero-filled with
+  a separate presence bit. Identity, revisions, categories, free text, and
+  digests are excluded from the model vector.
+  Validation (2026-09-27): isolated TypeScript contract suite 3/3 passed;
+  Python adapter suite 6/6 passed under Python 3.13. No GPU, database, cache,
+  training, or model-promotion path was run.
 - [x] ORF-6A — Protocol-neutral `.okf` MCP resource catalog implemented with stable `atlas://okf/...` URIs and intended cache policies.
 - [x] ORF-6B — MCP v1 registration adapter implemented using read-only resources; no 2026 cache-hint wire claim.
 - [x] ORF-6C — Wired `buildDefaultAtlasMcpSurface()` into
@@ -241,8 +238,8 @@ Tags are metadata/filter hints, not independent retrieval votes.
   existing tool), not separately re-verified with an out-of-bounds probe
   this pass. The underlying `docs/.okf/domains/*` content gap is a
   separate, real, still-open item — not fixed by this wiring.
-- [ ] ORF-6D — MCP 2026-07-28 / TypeScript SDK v2 migration proof: header routing, resource cache hints, list/result caching and JSON Schema 2020-12 tool schemas.
-- [ ] ORF-7 — Bounded MCP read tools for search/evidence/graph/hydrate. Existing receipt/time/output limits remain mandatory.
+- [x] ORF-6D — Isolated MCP 2026-07-28 / TypeScript SDK v2 compatibility proof: standard and parameter header routing, resource cache hints, client list/read caching, and JSON Schema 2020-12. Proof: `sveltekit-frontend/scripts/mcp/orf-6d-v2-compatibility-proof.mjs` passed against lockfile-resolved v2.1.0 packages using an in-process handler. This does not migrate the production runtime; direct `@modelcontextprotocol/sdk@1.22.0`, app dependencies, and datastore state were unchanged.
+- [ ] ORF-7 — Bounded MCP read tools for search/evidence/graph/hydrate. Existing receipt/time/output limits remain mandatory. **Bounded graph-path increments 2026-09-29:** `graph.shortest_path` and `graph.semantic_path_synthesis` now preserve their public input names while using bounded key lengths/max hops, Neo4j read-only access and timeout, bounded PostgreSQL read-only hydration with statement timeout/row cap, and capped stable output/error shapes. **Packet-search increments 2026-09-29:** `atlas.packet_search` rejects an empty filter set and trims/rejects whitespace-only filters; `atlas.packet_dense_search` requires a selective packet filter plus exactly one query form, caps filter/text/tag sizes, requires a finite 768-dimensional vector, and byte-caps successful output while preserving BigInt serialization as strings. **Coverage increment 2026-09-29:** `atlas.coverage` runs its aggregate/optional breakdown reads in one read-only transaction with a 2.5-second server statement timeout, 3-second per-query timeout, maximum 20 breakdown groups, and the shared response-byte cap. **PageRank pagination increment 2026-09-29:** `atlas.graph.pagerank` retains its 1–1000 result-limit contract, caps offset at 100,000, and byte-caps success/error output while continuing to use the existing registry authorization grant. Focused bounds tests pass 10/10; shared schema and MCP syntax/type-transpile checks pass; strict OpenSpec validation passes. No live MCP/database receipt was run. ORF-7 remains open for the remaining search/evidence/hydrate surface and full live proof.
 - [ ] ORF-8 — Ornith ContextManifest adapter consumes promoted ORF evidence only; ontology/schema resources are referenced by digest/URI rather than reprefilled wholesale.
 - [ ] ORF-9 — Exact-promotion gate combines source freshness + source span + Tree-sitter coordinate + compiler semantic evidence.
 - [ ] ORF-10 — Routing evaluation: compare static policy vs XGBoost/tiny PyTorch router on retrieval success, Recall@K, execution success, latency, VRAM/CPU work and regression rate.
@@ -365,19 +362,26 @@ A router chooses work. It does not create evidence truth.
 Written up on request, not implemented this session — no new code or live
 writes below this line.
 
-### 1. Re-run ORF-2P's PostgreSQL 18 AIO/bitmap proof against real data (highest value, lowest cost)
+### 1. ORF-2P populated-plan follow-up (read-only; rechecked 2026-09-29)
 
-`docs/reports/orf-postgres-plan-receipt.json` was captured when
-`atlas_observation_feature_rows` had **zero rows**; ORF-2P's own note says
-"Bitmap Heap Scan and populated-row selectivity remain pending after the
-feature materializer runs." The materializer has since run for real (ORF-2Q.2,
-this session): the table now has 1,808 rows with genuinely populated
-`ontology_classes`/`ast_observation_kinds`/`flattened_tags`. Re-running
-`node scripts/atlas/orf-postgres-plan-proof.mjs` now (read-only, same script,
-no code changes needed) should produce a real `Bitmap Heap Scan` plan node
-where the prior receipt only had `Index Scan` on an empty table — this is the
-single cheapest way to close out ORF-2P's remaining claim. Do this before
-anything else below; it's a rerun, not new work.
+The earlier receipt was captured with zero rows. A fresh PostgreSQL 18.4
+read-only recheck found 1,808 historical `atlas-ast-entity-prefill-v2` rows,
+but **zero** with `ontology_classes` populated; `ast_observation_kinds` is
+populated. The script's default `orf:1` / `DATABASE` / `DATABASE_WRITE`
+predicate again returned zero rows through the
+`atlas_observation_feature_rows_feature_revision_idx` Index Scan. An AST-only
+`VARIABLE_DECL` probe returned 50 rows through a Seq Scan. No Bitmap plan was
+observed. Receipt digest for the fresh default-predicate run:
+`f7c0baac5463ea4d95bb0e86a3c094e19e9bc2b0e52aec04fc3bacb229bb77d4`;
+the full coordinated evidence is in
+`docs/reports/routing-sidecar-native-critical-path-v1.json`.
+
+The prior claim that ORF-2Q.2 populated ontology fields was not supported by
+this current readback. Do not force a bitmap plan, create synthetic canonical
+rows, or change indexes to satisfy the old prediction. A populated-row plan
+comparison needs an actually admitted cohort and representative predicates;
+until then the bitmap/selectivity follow-up remains open and no database write
+or migration is authorized.
 
 ### 2. `docs/.okf/domains/*` content gap (blocks the 3 resources ORF-6C wired)
 

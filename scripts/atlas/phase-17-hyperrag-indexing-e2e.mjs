@@ -23,21 +23,24 @@ const asInt = (value, fallback) => {
 };
 const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex');
 
-// Historical 384-dim migration/e2e harness. It is retained for replay only;
-// the active Parent Atlas writer is semantic_768 via codebase_chunk_index.
+// Phase-17 HyperRAG indexing e2e harness, converted to the canonical semantic_768 lane
+// (embeddinggemma native 768-dim, atlas_packets.embedding). The active Parent Atlas writer is still
+// codebase_chunk_index; this harness is a second, explicit-opt-in path, so it is dry-run by default:
+//   - pass --apply to write, and --collection <768 collection> to choose the Qdrant target
+//     (no default: it must not silently push docs chunks into a canonical collection).
 const CONFIG = {
   input: path.resolve(REPO_ROOT, String(args.get('input') ?? 'docs')),
-  collection: String(args.get('collection') ?? process.env.QDRANT_COLLECTION ?? 'codebase_chunks_384_hybrid'),
+  collection: String(args.get('collection') ?? process.env.QDRANT_COLLECTION ?? ''),
   batchSize: asInt(args.get('batch-size') ?? process.env.BATCH_SIZE ?? 128, 128),
   concurrency: asInt(args.get('concurrency') ?? process.env.CONCURRENCY ?? 4, 4),
   resume: Boolean(args.get('resume')),
-  dryRun: Boolean(args.get('dry-run')),
+  dryRun: !args.get('apply') || Boolean(args.get('dry-run')),
   maxFiles: asInt(args.get('max-files') ?? 0, 0),
   databaseUrl: process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   qdrantUrl: String(process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/$/, ''),
   qdrantApiKey: process.env.QDRANT_API_KEY ?? '',
-  embedUrl: process.env.EMBED_URL ?? 'http://127.0.0.1:8081/v1/embeddings',
-  embedModel: process.env.EMBED_MODEL ?? 'embeddinggemma-384',
+  embedUrl: process.env.EMBED_URL ?? 'http://127.0.0.1:11434/v1/embeddings',
+  embedModel: process.env.EMBED_MODEL ?? 'embeddinggemma:latest',
   redisUrl: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
   neo4jUrl: String(process.env.NEO4J_URL ?? 'http://127.0.0.1:7474').replace(/\/$/, ''),
   neo4jUser: process.env.NEO4J_USER ?? 'neo4j',
@@ -45,7 +48,7 @@ const CONFIG = {
   rpcHealthUrl: process.env.HYPERRAG_RPC_HEALTH_URL ?? 'http://127.0.0.1:8094/health',
   checkpoint: path.resolve(REPO_ROOT, String(args.get('checkpoint') ?? 'docs/reports/phase-17-indexing-checkpoint.json')),
   report: path.resolve(REPO_ROOT, String(args.get('report') ?? 'docs/reports/phase-17-indexing-e2e-report.json')),
-  vectorDim: asInt(process.env.VECTOR_DIM ?? 384, 384),
+  vectorDim: asInt(process.env.VECTOR_DIM ?? 768, 768),
   contractVersion: process.env.ATLAS_CONTRACT_VERSION ?? 'phase17-v1',
 };
 
@@ -163,7 +166,7 @@ function buildPacket({ sourceRef, chunkIndex, content, embedding }) {
     embedding_version: '1',
     embedding_dimension: CONFIG.vectorDim,
     payload_contract_version: CONFIG.contractVersion,
-    content_embedding_384: embedding,
+    embedding_768: embedding,
     created_at: new Date().toISOString(),
   };
   const msgpack = encode(packet);
@@ -189,13 +192,13 @@ async function upsertPostgres(client, packet, msgpack) {
   await client.query('BEGIN');
   try {
     await client.query(`
-      INSERT INTO atlas_packets (packet_key,source_ref,feature_id,title_id,domain_class,content_hash,summary,content_embedding_384)
+      INSERT INTO atlas_packets (packet_key,source_ref,feature_id,title_id,domain_class,content_hash,summary,embedding)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
       ON CONFLICT (packet_key) DO UPDATE SET
         source_ref=EXCLUDED.source_ref, feature_id=EXCLUDED.feature_id, title_id=EXCLUDED.title_id,
         domain_class=EXCLUDED.domain_class, content_hash=EXCLUDED.content_hash,
-        summary=EXCLUDED.summary, content_embedding_384=EXCLUDED.content_embedding_384
-    `,[packet.packet_key,packet.source_ref,packet.feature_id,packet.title_id,packet.domain_class,packet.content_hash,packet.summary,JSON.stringify(packet.content_embedding_384)]);
+        summary=EXCLUDED.summary, embedding=EXCLUDED.embedding
+    `,[packet.packet_key,packet.source_ref,packet.feature_id,packet.title_id,packet.domain_class,packet.content_hash,packet.summary,JSON.stringify(packet.embedding_768)]);
     await client.query(`
       INSERT INTO atlas_rpc_packets (packet_key,source_ref,feature_id,title_id,domain_class,content_hash,payload_contract_version,msgpack)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
@@ -211,7 +214,7 @@ function qdrantHeaders() { return {'content-type':'application/json', ...(CONFIG
 async function qdrantUpsert(packet) {
   const id = crypto.createHash('sha256').update(packet.packet_key).digest().subarray(0,16).toString('hex');
   const response = await fetch(`${CONFIG.qdrantUrl}/collections/${encodeURIComponent(CONFIG.collection)}/points?wait=true`, {
-    method:'PUT', headers:qdrantHeaders(), body:JSON.stringify({ points:[{ id, vector:{ content:packet.content_embedding_384 }, payload:{
+    method:'PUT', headers:qdrantHeaders(), body:JSON.stringify({ points:[{ id, vector:{ content:packet.embedding_768 }, payload:{
       packet_key:packet.packet_key, source_ref:packet.source_ref, feature_id:packet.feature_id, title_id:packet.title_id,
       domain_class:packet.domain_class, domain_confidence:packet.domain_confidence, content_hash:packet.content_hash,
       payload_contract_version:packet.payload_contract_version, embedding_model:packet.embedding_model,
@@ -262,6 +265,12 @@ async function mapLimit(items, limit, mapper) {
   await Promise.all(Array.from({length:Math.max(1,limit)},worker));
 }
 async function main() {
+  if (!CONFIG.dryRun && !CONFIG.collection) {
+    throw new Error('--apply requires --collection <768-dim Qdrant collection with a "content" vector>; there is no default so canonical collections are never written implicitly');
+  }
+  if (CONFIG.vectorDim !== 768) {
+    throw new Error(`vectorDim must be 768 (semantic_768); got ${CONFIG.vectorDim}`);
+  }
   const client = new Client({connectionString:CONFIG.databaseUrl,application_name:'phase17-hyperrag-indexing'});
   const redis = new Redis(CONFIG.redisUrl,{maxRetriesPerRequest:1,connectTimeout:5000});
   const checkpoint = await loadCheckpoint();

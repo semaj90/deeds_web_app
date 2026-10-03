@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.emb-prov-01-embedding-provenance-receipt.v1",
+  "generatedAt": "2026-09-27T06:27:18.661Z",
+  "config": {
+    "provider": "ollama",
+    "baseUrl": "http://127.0.0.1:11434",
+    "baseUrlPort": 11434,
+    "expectedPortForProvider": 11434,
+    "configSelfConsistent": true,
+    "note": "provider/baseUrl agree on the expected port convention"
+  },
+  "strictLane": {
+    "strictBaseUrl": "http://127.0.0.1:8081",
+    "strictBaseUrlPort": 8081,
+    "strictEnabled": true,
+    "isDistinctFromGeneralBaseUrl": true,
+    "note": "Strict semantic_768 lane (embedSemantic768Canonical) uses this dedicated var, kept separate from EMBEDDING_BASE_URL so the two purposes never collide again (EMB-PROV-01 fix, 2026-09-27)."
+  },
+  "artifact": {
+    "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma-300m-f16.gguf",
+    "artifactExists": true,
+    "liveArtifactSha256": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
+    "recordedModelArtifactRevision": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
+    "recordedGgufSha256Var": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
+    "artifactChecksumMatchesRevision": true,
+    "artifactChecksumMatchesGgufVar": true
+  },
+  "crossExecutorParity": {
+    "probeText": "The quick brown fox jumps over the lazy dog.",
+    "llamaServer8081": {
+      "reachable": true,
+      "error": null
+    },
+    "ollama11434": {
+      "reachable": true,
+      "error": null
+    },
+    "parity": {
+      "dim": 768,
+      "llamaServerL2Norm": 1,
+      "ollamaL2Norm": 1,
+      "cosineSimilarity": 0.999988
+    },
+    "threshold": 0.999,
+    "executorsAgree": true
+  },
+  "status": "EMB_PROV_01_PROVEN"
+}

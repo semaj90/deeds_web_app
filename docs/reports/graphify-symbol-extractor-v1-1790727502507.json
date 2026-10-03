@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-30T00:18:22.506Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 5,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 5,
+  "sourceRevisionMismatchCount": 1,
+  "candidatesConsidered": 5,
+  "skippedUnsupported": 4,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "31e42ed8-36ab-4e1c-bf08-c6ea03ae6abd",
+      "sourceRef": ".claude/skills/drizzle-schema-review/SKILL.md",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615",
+      "fileKind": "markdown",
+      "outcome": "SOURCE_REVISION_MISMATCH",
+      "error": "EXPECTED_sha256:ace0002a04ae2ee4f43476c8d277202271e62f5f36a7bcedfe24b6f833fdf615_GOT_sha256:d59a18e766a86e3d3d5a3d6a544d335bb879b387ba6d393fbd2b11e24ef209a6"
+    }
+  ]
+}

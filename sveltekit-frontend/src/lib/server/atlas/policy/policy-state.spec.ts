@@ -34,4 +34,10 @@ describe('buildPolicyStateVector', () => {
     const state = buildPolicyStateTensor(input);
     expect(() => PolicyStateTensorSchema.parse(state)).not.toThrow();
   });
+
+  it('keeps SOM and topology coordinates out of policy features', () => {
+    const state = buildPolicyStateTensor(input);
+    expect(POLICY_FEATURES.some((feature) => /^(som|topology|geometry)[._]/i.test(feature))).toBe(false);
+    expect(() => PolicyStateTensorSchema.parse({ ...state, som_x: 7, som_y: 13 })).toThrow();
+  });
 });

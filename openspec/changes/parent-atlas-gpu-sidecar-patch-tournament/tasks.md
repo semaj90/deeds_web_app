@@ -124,6 +124,48 @@ Remaining before this is a *complete* record (not blocking, just not yet done):
   unresolved (GS1.45–1.47). Keep using synthetic revision-qualified fixtures until that's
   fixed.
 
+**Runtime split recheck (read-only, 2026-09-19):** the WSL2 Conda environment
+`atlas-rapids-cu13` is the proven PyTorch/cuVS/cuGraph lane (`torch 2.13.0+cu130`,
+CUDA 13.0, RTX 3060 Ti SM86, cuVS/cuGraph 26.06); `cuda.tile` and
+TensorRT-RTX are not installed there. The separately running Docker
+`atlas-gpu-8098` image is intentionally RAPIDS-only and has no PyTorch, so its
+PyTorch exact-scan route is unavailable even though CUDA/cuVS/cuGraph are
+available. Its Docker healthcheck was corrected to validate cupy/CUDA plus the
+RAPIDS libraries it actually owns. The two environments must not be conflated,
+and no package installation, rebuild, or runtime mutation was performed here.
+
+**GPU-24 combined-dispatcher review (read-only, 2026-09-29):** combine RAPIDS and
+cuTile at the admission/control-plane boundary, not by merging their Python
+environments or CUDA stacks. The current `GpuArbiterProfileV1` (`GPU-0`, max
+concurrency 1) is declarative; `gpu-job-queue.ts` is process-local; and the
+Redis-backed `inference/gpu-arbiter.ts` is not yet a safe shared dispatcher:
+lease acquisition and release use separate read/write operations without an
+atomic token-checked compare-and-set. The RAPIDS sidecar does not acquire that
+lease, and the cuTile lane has no resident service adapter. Therefore no current
+path proves mutual exclusion across the two runtimes. Keep GPU-24 open and do
+not call a local mutex or VRAM admission receipt cross-runtime arbitration.
+
+Required implementation gates before claiming a combined dispatcher:
+
+- [ ] GPU-24A choose one cross-process arbitration owner and failure policy;
+  do not assume Valkey/Redis is available in Engram-only mode.
+- [ ] GPU-24B implement atomic, owner-token-checked acquire/renew/release with
+  bounded expiry and stale-owner protection; prove competing processes cannot
+  both enter the same device critical section.
+- [ ] GPU-24C make both RAPIDS and cuTile executor entrypoints participate in
+  that same arbitration contract without merging their environments.
+- [ ] GPU-24D emit an operation-specific fallback receipt. CPU is a valid
+  numeric fallback; Qdrant is a semantic-search executor; Neo4j is a graph
+  executor. Never substitute one for another without operation compatibility.
+- [ ] GPU-24E run concurrent cross-runtime contention and failure-injection
+  tests; prove timeout/release behavior and that fallback preserves operation
+  semantics. Only then close GPU-24.
+
+The existing inference Redis lease is evidence of an inference coordination
+attempt, not proof for RAPIDS/cuTile dispatch. Its current read-then-write
+operations also require a separately reviewed hardening change before reuse.
+No runtime service, datastore, or GPU executor was changed by this review.
+
 **Index-type decision (recorded 2026-08-03, still in force — the CAGRA endpoint above does
 not override this until an operator explicitly says so)**: `brute_force` only, as an exact
 correctness oracle — never CAGRA (explicitly excluded, "do not promote CAGRA") or
@@ -275,6 +317,23 @@ Not yet exercised (beyond the accepted narrow seam, still gated for a future exp
 - [ ] **New bounded change needed**: `promote_recommendation`'s write path conflates two state vocabularies — recommendation status (`PROPOSED`/`APPROVED`) written into a table constrained by `semantic_lifecycle_events`'s lifecycle vocabulary (`ACTIVE`/`SUPERSEDED`/`RETRACTED`/`ARCHIVED`). Both `PROMOTE_RECOMMENDATION` and `RECOMMENDATION_SUPERSESSION` are individually `RUNTIME_SMOKE_PROVEN` via rolled-back transaction proofs, but the vocabulary conflict itself needs its own OpenSpec change — not folded into recommendation supersession or this GPU/tournament proposal.
 - [ ] RRF `includeProvenance` gating fixed in `rrf-fuse.ts` (`src/mcp/tools/repair_tools.ts:554`'s call site's intent to control provenance predates the fix and was previously silently ignored) — `tsgo` 263→261, zero regressions. Separately found, NOT fixed: `rrf-split.test.ts`'s "imports search runtime and rrf integration without infra side effects" test fails (measured 10,317ms against a <3000ms budget) — pre-existing, unrelated to this session's changes, real active regression needing dedicated investigation.
 - [ ] `graphify:daily` status: `GRAPHIFY_DAILY_STARTED: PARTIAL`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `GRAPH_SNAPSHOT_FRESH: PASS` (confirmed live 2026-08-03: `codebase-graph.json` refreshed to the current proof artifact). `DEEP_AUDIT: NOT_PROVEN` pending a full daily run.
+
+## Part E — simdjson chunking / streaming AUDIT HELPERS and tournament alignment (added 2026-09-20; docs + read-only helpers, no native build changes)
+
+Operator direction 2026-09-20: the simdjson documentation and helpers need an audit for chunking and streaming, aligned with the Patch Tournament (`SIMD-02` above defers a C simdjson On-Demand prototype at the receipt/JSONL boundary). This part adds only AUDIT work and test helpers; it does not start `SIMD-02`, does not edit `simd-bridge/cpp/binding.cc` (documented corruption history: never edit its Init/PcaProject region incrementally), and adds no new JSON parser owner. Status vocabulary: STATICALLY_REFERENCED, FIXTURE_PROVEN, RUNTIME_SMOKE_PROVEN, NOT_PROVEN; no performance claim is repeated until it is re-measured.
+
+Existing owners to reuse (verified by grep 2026-09-20): `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts` (`fastJsonParse`, `fastJsonValidate`, `fastJsonExtractNumbers`, `fastJsonExtractField`, `getSimdStats`, `acquireBuffer` / `releaseBuffer` / `withBuffer`, V8 fallback); `sveltekit-frontend/src/lib/server/atlas/indexing/simdjson-typed-evidence-bridge.ts` (`parseNdjsonTypedEvidence`, per-line sha256, wraps `@deeds/parent-atlas` `adaptSimdjsonTypedEvidence`); other importers: `ai/tool-call-parser.ts`, `utils/qdrant-parser.ts`, `vector/qdrant-manager.ts`, `ai/bifrost-cache-manager.ts`, `ollama.ts`, `atlas/pipeline/unified-context-pipeline-v1.ts`, `atlas/orchestration/atlas-execution-pipeline-v1.ts`. Docs that mention simdjson and must be reconciled with the code: `docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md`, `CANONICAL-PACKET-WIRING-BLUEPRINT.md`, `DAG-ACP-OPEN-MEMORY-WIRING.md`, `phase-3-gpu-graph-adaptive-architecture.md`, `PHASE-C-OPTION-B-ARCHITECTURE-DECISION.md`, `phase8-query-optimization-taxonomy.md`, plus the simdjson sections of the root `CLAUDE.md`.
+
+- [ ] SIMD-AUDIT-01 Doc-versus-code inventory: list every simdjson claim in the docs above and in `CLAUDE.md` (speedups, the 1 KB routing threshold, the LRU cache, Windows DLL fallback, extraction speedups) and classify each as CODE-CONFIRMED, MEASURED (receipt exists), UNMEASURED or STALE. Record as a table in a receipt; no claim is deleted, only labelled.
+- [ ] SIMD-AUDIT-02 Owner census under the runtime-ownership rules: classify `simdjson-bridge.ts` (candidate `CANONICAL_OWNER` for fast parse), `simdjson-typed-evidence-bridge.ts` (`ADAPTER` to typed evidence), and each importer above as consumer vs a second parser; use `scripts/atlas/audit-runtime-ownership.mjs`; flag any second JSON parser path as a peer owner.
+- [ ] SIMD-AUDIT-03 Chunk-boundary invariance helper (fixture, read-only): feed the same NDJSON through the existing bridge split at chunk sizes 1, 7, 64, 4096 and whole-buffer, including a multi-byte UTF-8 character split across a boundary, CRLF line endings, a missing final newline, blank lines, an oversize line and a truncated last record; the record list and per-line checksums must be IDENTICAL for every split and equal the V8 `JSON.parse` oracle; fail closed on any divergence. `parseNdjsonTypedEvidence` currently takes a whole string and splits on `\n`, so this proves the parse contract before any streaming variant exists.
+- [ ] SIMD-AUDIT-04 Engine parity fixture (simdjson bridge vs V8 oracle): duplicate keys, large integers beyond 2^53, float round-trip, invalid UTF-8, BOM, deeply nested input, empty document; document every difference; the V8 result is the reference. The V8 fallback must remain semantically identical to the native path or the difference must be recorded as a contract.
+- [ ] SIMD-AUDIT-05 Streaming line-framer DESIGN (design and fixture only; build only if 03 shows a real need): an incremental `NdjsonLineFramer` with a maximum line size, partial-line carry across chunks, UTF-8-safe boundary handling, a defined error for an over-cap line and backpressure semantics; it would frame lines and hand each line to the EXISTING `fastJsonParse`, never a second parser.
+- [ ] SIMD-AUDIT-06 Padding, capacity and buffer-pool audit (docs and code): the simdjson On-Demand API is documented to need a padded input buffer and a bounded document capacity, and `iterate_many` batches large NDJSON; verify each of these against the upstream simdjson documentation BEFORE citing them (they are NOT taken from memory here), then check that `acquireBuffer` / `withBuffer` buffers are padded, not shared across concurrent calls, and released on error paths.
+- [ ] SIMD-AUDIT-07 Tournament alignment: the Patch Tournament compares candidate receipts, so JSONL receipt parsing at the tournament boundary (the `SIMD-02` seam) must be chunk-invariant, checksum-stable and identical to the V8 oracle; add that as a determinism gate on tournament inputs (same bytes in, same records and checksums out, regardless of chunking or engine). Any speedup claim for the tournament path needs a measured, warm and cold benchmark on representative receipt sizes first.
+- [ ] SIMD-AUDIT-08 Wire-format rule alignment: bulk numeric arrays (embeddings, feature matrices) never go through JSON or NDJSON (Arrow IPC / raw mmap per the wire-format layering rule); confirm no simdjson consumer parses vectors, and reconcile the older Qdrant NDJSON-streaming guidance and `fastJsonExtractNumbers` use with that rule; NDJSON stays for descriptors, receipts and JSONL evidence.
+- [ ] SIMD-AUDIT-09 Docs sweep: update the six architecture docs and the `CLAUDE.md` simdjson sections with the audit result (which claims are proven, measured, unmeasured or stale) and add a short "chunking and streaming contract" note; historical text is labelled, not rewritten.
+- [ ] SIMD-AUDIT-10 Gate for `SIMD-02`: the C On-Demand prototype may start only after SIMD-AUDIT-03, 04 and 07 pass, so it is judged against a proven, chunk-invariant V8 oracle rather than assumed behavior.
 
 ## Explicitly deferred (do not start under this task list)
 

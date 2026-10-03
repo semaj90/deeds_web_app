@@ -1,5 +1,6 @@
 <!-- Enhanced AI Chat Test Component - Svelte 5 with bits-ui -->
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import type { Case as User } from '$lib/types';
 	import type { Document } from '$lib/types';
 	import { browser } from '$app/environment';
@@ -60,7 +61,7 @@ What would you like to explore today?`,
 						timestamp: new Date(),
 						metadata: {
 							provider: 'local',
-							model: 'gemma4-legal-enhanced'
+							model: SERVER_CHAT_MODEL
 						}
 					}
 				];
@@ -192,7 +193,7 @@ What would you like to explore today?`,
 				timestamp: new Date(),
 				metadata: {
 					provider: 'local',
-					model: 'gemma4-legal-enhanced',
+					model: SERVER_CHAT_MODEL,
 					gpu: 'RTX 3060 Ti'
 				}
 			};
@@ -276,7 +277,7 @@ What would you like to explore today?`,
 				timestamp: new Date(),
 				metadata: {
 					provider: 'local',
-					model: 'gemma4-legal-enhanced'
+					model: SERVER_CHAT_MODEL
 				}
 			}
 		];

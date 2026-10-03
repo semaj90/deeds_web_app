@@ -1,9 +1,9 @@
 {
   "schema": "atlas.graph-revision-owner.v1",
-  "generatedAt": "2026-09-04T17:45:20.252Z",
+  "generatedAt": "2026-09-14T16:31:06.816Z",
   "readOnly": true,
   "postgresWrites": false,
-  "expectedWorkspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+  "expectedWorkspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
   "presentTables": [
     "atlas_graph_snapshots_v2",
     "atlas_hyperedges",

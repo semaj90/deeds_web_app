@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T02:53:53Z",
+  "fromChange": "parent-atlas-versioned-doc-intelligence",
+  "toChange": "parent-atlas-adaptive-dag-fabric",
+  "pivotGate": "DOC-26_V2_IDENTITY_SELECTION_TO_DAG-FETCH-01",
+  "reason": "DOC-26 now has explicit opt-in V2 identity selection from strict manifest through chunking, with V1 compatibility preserved and focused Python proof. Its remaining acceptance requires delta-plan integration with canonical admission and prior-version readback; this is not proven by no-write fixtures. The adaptive DAG list has two open tasks, and DAG-FETCH-01 directly targets production fetch coalescing while preserving ACE card identity, a known wiring gap with existing fixture-level owners available for a bounded implementation pass.",
+  "fromChangeState": {
+    "completedTasks": 42,
+    "totalTasks": 48,
+    "openTasks": ["DOC-13", "DOC-14", "DOC-15", "DOC-17", "DOC-18", "DOC-26"],
+    "doc26": {
+      "status": "PARTIAL",
+      "v2ManifestToChunkerSelection": "PROVEN",
+      "pythonTestsPassed": 51,
+      "typescriptAdmissionPlannerTestsPassed": 17,
+      "deltaPlanAndPriorVersionReadback": "OPEN",
+      "report": "docs/reports/parent-atlas/doc-26-v2-pipeline-identity-selection-v1.json"
+    }
+  },
+  "toChangeState": {
+    "completedTasks": 11,
+    "totalTasks": 13,
+    "selectedGate": "DAG-FETCH-01",
+    "otherOpenGate": "NATS-EVENT-01",
+    "fetchCoalescing": "fixture-proven; production retrieval caller integration open",
+    "aceCardIdentity": "distinct cards with equivalent evidence must remain distinct"
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

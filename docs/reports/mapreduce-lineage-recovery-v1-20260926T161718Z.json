@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.mapreduce-lineage-recovery-receipt.v1",
+  "status": "MAPREDUCE_LINEAGE_RECOVERY_CONSERVED",
+  "generatedAt": "2026-09-26T16:17:18.874Z",
+  "canonicalAuthority": false,
+  "historicalArtifact": {
+    "enriched": ".tmp\\atlas\\mapreduce-primary-placeholder-enrichment-v1\\20260926T154258.271Z\\primary_metadata_corpus-enriched-00001.ndjson",
+    "enrichedSha256": "sha256:80f87826edafa6765abf55f3241c28dba07897c409e72039625efc7daa51786f",
+    "sourceArtifactSha256": "9ed6d8d3e28f6b0453d75f305b67586ef9dc70cfac05b97825f6763916a42664",
+    "records": 417,
+    "uniqueRecordOrdinals": 417,
+    "uniqueContentDigests": 412
+  },
+  "historicalIdentityFieldsPresent": {
+    "stableKey": 417,
+    "historicalFilePath": 417,
+    "contentHash": 417,
+    "derivedSourceRef": 417,
+    "derivedSourceRevision": 417,
+    "packetKey": 365,
+    "chunkIdentity": 127
+  },
+  "note": "Historical records are file-grained; sourceRef/sourceRevision were derived by content-digest binding, not carried as chunk coordinates.",
+  "destination": {
+    "ordinalMap": ".tmp\\atlas\\candidate-ordinal-bridged-v1\\20260926T074719Z\\candidate-ordinal-map-v1.json",
+    "rowCount": 6732,
+    "candidateSnapshotRevision": "sha256:a9777fc524edd0fc09b33c56ce4ab72c9742c94f90cb3673c735b1fe9e6a5768",
+    "ordinalMapChecksum": "ee56c81ab16ce6570232e8af8f2140e6e000eb6d73feb82f972b553265ba5d9f"
+  },
+  "conservation": {
+    "input": 417,
+    "output": 417,
+    "conserved": true,
+    "counts": {
+      "CURRENT_PACKET_NOT_FOUND": 15,
+      "CURRENT_PROVEN_LINEAGE_MISSING": 237,
+      "SOURCE_REVISION_CHANGED": 33,
+      "EXACT_PACKET_CURRENT_CHUNK_AMBIGUOUS": 127,
+      "DUPLICATE_HISTORICAL_RECORD": 5
+    }
+  },
+  "chunkLevel": {
+    "exactMatchChunks": 0,
+    "ambiguousRecordsCurrentChunkTotal": 1520,
+    "distinctCurrentOrdinalsAddressable": 1520
+  },
+  "semantics": "CURRENTLY_ADDRESSABLE_HISTORICAL_EVIDENCE only; historical values are not current canonical features.",
+  "detail": {
+    "path": ".tmp\\atlas\\mapreduce-lineage-recovery-v1\\20260926T161718Z\\recovery.ndjson",
+    "sha256": "sha256:42b8d4bdf1865292019583a936a3ef52d357e4c1fda446981a21a8c6916b2945",
+    "rows": 417
+  },
+  "producer": {
+    "scored": false,
+    "reEmbedded": false,
+    "placeholdersPromoted": false,
+    "cei23Touched": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.packets-workspace-binding-joinability.v1",
+  "generatedAt": "2026-09-18T02:18:30.337Z",
+  "mode": "READ_ONLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "joinability": {
+    "total_packets": 78226,
+    "joinable_to_bindings": 33052
+  },
+  "joinableToAdmittedRevision": {
+    "n": 16543
+  },
+  "writesPerformed": false
+}

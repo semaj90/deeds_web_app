@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T02:04:15.292Z",
+  "generatedAt": "2026-09-26T22:55:48.014Z",
   "status": "PASS_WITH_DRIFT",
   "redis": {
     "container": "legal-ai-valkey",
@@ -11,132 +11,36 @@
       "pattern": "bitfrost:summary:packet:v1:*",
       "ownership": "ACTIVE",
       "note": "ACE/Karpathy summary hot-cache. ~4,827 keys live at rewrite time.",
-      "count": 4826,
-      "sample": [
-        "bitfrost:summary:packet:v1:packet:071520fc354f",
-        "bitfrost:summary:packet:v1:packet:0575b5e4ae5c",
-        "bitfrost:summary:packet:v1:packet:07353c860b36",
-        "bitfrost:summary:packet:v1:packet:cf817dc6a6e9",
-        "bitfrost:summary:packet:v1:packet:29c2aa326d74"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bitfrost:summary:packet:v1:packet:071520fc354f",
-          "ttl": 599150,
-          "ok": true
-        },
-        {
-          "key": "bitfrost:summary:packet:v1:packet:0575b5e4ae5c",
-          "ttl": 599149,
-          "ok": true
-        },
-        {
-          "key": "bitfrost:summary:packet:v1:packet:07353c860b36",
-          "ttl": 599149,
-          "ok": true
-        },
-        {
-          "key": "bitfrost:summary:packet:v1:packet:cf817dc6a6e9",
-          "ttl": 599149,
-          "ok": true
-        },
-        {
-          "key": "bitfrost:summary:packet:v1:packet:29c2aa326d74",
-          "ttl": 599149,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
       "key": "gpu:som:packet:*",
       "pattern": "gpu:som:packet:*",
       "ownership": "ACTIVE",
       "note": "SOM BMU assignment per packet. ~5,000 keys live.",
-      "count": 5000,
-      "sample": [
-        "gpu:som:packet:1441",
-        "gpu:som:packet:128",
-        "gpu:som:packet:4841",
-        "gpu:som:packet:2016",
-        "gpu:som:packet:633"
-      ],
-      "ttlSamples": [
-        {
-          "key": "gpu:som:packet:1441",
-          "ttl": 599184,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:packet:128",
-          "ttl": 599184,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:packet:4841",
-          "ttl": 599184,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:packet:2016",
-          "ttl": 599184,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:packet:633",
-          "ttl": 599183,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
       "key": "gpu:som:cell:*",
       "pattern": "gpu:som:cell:*",
       "ownership": "ACTIVE",
       "note": "SOM grid cell membership index. ~296 keys live across 20 cells.",
-      "count": 296,
-      "sample": [
-        "gpu:som:cell:18:3",
-        "gpu:som:cell:2:18",
-        "gpu:som:cell:14:8",
-        "gpu:som:cell:1:8",
-        "gpu:som:cell:12:0"
-      ],
-      "ttlSamples": [
-        {
-          "key": "gpu:som:cell:18:3",
-          "ttl": 599182,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:cell:2:18",
-          "ttl": 599182,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:cell:14:8",
-          "ttl": 599182,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:cell:1:8",
-          "ttl": 599182,
-          "ok": true
-        },
-        {
-          "key": "gpu:som:cell:12:0",
-          "ttl": 599181,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
       "key": "gpu:autoencoder:latent_64:*",
@@ -155,40 +59,24 @@
       "pattern": "gpu:karpathy:scores",
       "ownership": "ACTIVE",
       "note": "PageRank/attention/authority blend hash. 1 key (hash with many fields), 24h TTL.",
-      "count": 1,
-      "sample": [
-        "gpu:karpathy:scores"
-      ],
-      "ttlSamples": [
-        {
-          "key": "gpu:karpathy:scores",
-          "ttl": 273019,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
       "key": "gpu:karpathy:summary",
       "pattern": "gpu:karpathy:summary",
       "ownership": "ACTIVE",
       "note": "Run metadata for the last karpathy:gpu pass. 1 key, 24h TTL.",
-      "count": 1,
-      "sample": [
-        "gpu:karpathy:summary"
-      ],
-      "ttlSamples": [
-        {
-          "key": "gpu:karpathy:summary",
-          "ttl": 273017,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
       "key": "gpu:karpathy:encoded",
@@ -207,32 +95,38 @@
       "pattern": "embed:v2:embeddinggemma:latest:*",
       "ownership": "ACTIVE",
       "note": "Embedding query cache, v2 key shape. Low steady-state count (cache-of-recent-queries, not bulk).",
-      "count": 4,
+      "count": 63,
       "sample": [
-        "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
-        "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
-        "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
-        "embed:v2:embeddinggemma:latest:edf32a02ab001aa2b7e13927d5f0d5a8862efa786a669265b80ac0b1f280a558"
+        "embed:v2:embeddinggemma:latest:652192e08087cb09829cd6490f557ce51d7707c048fc9d63118f3f3ee875669b",
+        "embed:v2:embeddinggemma:latest:7c5956df8db3078f1be169af1deb65774bab391e0aa091415cb2886b3bc5c338",
+        "embed:v2:embeddinggemma:latest:5d64f3c7f55c13bc4cb4405d3f480bfc17cdd969f0223e2f1ad81034f034edb6",
+        "embed:v2:embeddinggemma:latest:686f4228b98904b281f4ebfb562d1f0045ec8451956bb148afe1dd95656160fd",
+        "embed:v2:embeddinggemma:latest:0cccf4769c1f4da3ba1fbad5337129a083ba24bd0473b7aed5b3ae033a3793d8"
       ],
       "ttlSamples": [
         {
-          "key": "embed:v2:embeddinggemma:latest:ddc1ba0424a7319cd51df5572f2abb6b502cf4141789cf165c7552a4d406585a",
-          "ttl": 3045,
+          "key": "embed:v2:embeddinggemma:latest:652192e08087cb09829cd6490f557ce51d7707c048fc9d63118f3f3ee875669b",
+          "ttl": 425848,
           "ok": true
         },
         {
-          "key": "embed:v2:embeddinggemma:latest:6bd35c5d44ccb95707b7d54f7f530a05579dcda94994c1f55fc1e0fbe2e03eed",
-          "ttl": 273015,
+          "key": "embed:v2:embeddinggemma:latest:7c5956df8db3078f1be169af1deb65774bab391e0aa091415cb2886b3bc5c338",
+          "ttl": 425848,
           "ok": true
         },
         {
-          "key": "embed:v2:embeddinggemma:latest:8e6565b4d5aed79ca0dff3fad3b2ce706e3b152494a629e4e1a9fe4dcb7e3525",
-          "ttl": 9921,
+          "key": "embed:v2:embeddinggemma:latest:5d64f3c7f55c13bc4cb4405d3f480bfc17cdd969f0223e2f1ad81034f034edb6",
+          "ttl": 425848,
           "ok": true
         },
         {
-          "key": "embed:v2:embeddinggemma:latest:edf32a02ab001aa2b7e13927d5f0d5a8862efa786a669265b80ac0b1f280a558",
-          "ttl": 579333,
+          "key": "embed:v2:embeddinggemma:latest:686f4228b98904b281f4ebfb562d1f0045ec8451956bb148afe1dd95656160fd",
+          "ttl": 425848,
+          "ok": true
+        },
+        {
+          "key": "embed:v2:embeddinggemma:latest:0cccf4769c1f4da3ba1fbad5337129a083ba24bd0473b7aed5b3ae033a3793d8",
+          "ttl": 425847,
           "ok": true
         }
       ],
@@ -245,14 +139,38 @@
       "pattern": "embed:embeddinggemma:latest:*",
       "ownership": "LEGACY",
       "note": "Embedding query cache, v1 key shape (no embed:v2: prefix). Small residual count; embed:v2:* is the current shape.",
-      "count": 1,
+      "count": 23379,
       "sample": [
-        "embed:embeddinggemma:latest:edf32a02ab001aa2"
+        "embed:embeddinggemma:latest:4223fde248b8715cc172b4756ba5954b",
+        "embed:embeddinggemma:latest:a945db00112fb09e4e1873821cc6c2c8",
+        "embed:embeddinggemma:latest:d4fb0f7b5656e96b674edac31f44ff72",
+        "embed:embeddinggemma:latest:89859603cdbbcd3f074927ebb7b969c5",
+        "embed:embeddinggemma:latest:915373f28c5da4c4aab1ea6924eeb2f8"
       ],
       "ttlSamples": [
         {
-          "key": "embed:embeddinggemma:latest:edf32a02ab001aa2",
-          "ttl": 60932,
+          "key": "embed:embeddinggemma:latest:4223fde248b8715cc172b4756ba5954b",
+          "ttl": 27807,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:a945db00112fb09e4e1873821cc6c2c8",
+          "ttl": 27757,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:d4fb0f7b5656e96b674edac31f44ff72",
+          "ttl": 27676,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:89859603cdbbcd3f074927ebb7b969c5",
+          "ttl": 27812,
+          "ok": true
+        },
+        {
+          "key": "embed:embeddinggemma:latest:915373f28c5da4c4aab1ea6924eeb2f8",
+          "ttl": 27809,
           "ok": true
         }
       ],
@@ -265,20 +183,38 @@
       "pattern": "ace:*",
       "ownership": "ACTIVE",
       "note": "Small set of ACE cluster/probe/path keys (ace:cluster:members:*, ace:probe:*, ace:path:*). Not the ace:context:*/ace:summary:*/etc. family listed below -- those are aspirational.",
-      "count": 2,
+      "count": 36,
       "sample": [
-        "ace:path:cluster:1",
-        "ace:cluster:members:unclassified:community-26562"
+        "ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/cases/__tests__/cases-schemas.test.ts",
+        "ace:source_ref:f8955f0f",
+        "ace:source_ref:23627406",
+        "ace:source_ref:2a7ba9c5",
+        "ace:source_ref:0dbba660"
       ],
       "ttlSamples": [
         {
-          "key": "ace:path:cluster:1",
-          "ttl": 273013,
+          "key": "ace:chunk:hits:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/routes/api/cases/__tests__/cases-schemas.test.ts",
+          "ttl": -1,
           "ok": true
         },
         {
-          "key": "ace:cluster:members:unclassified:community-26562",
-          "ttl": 273012,
+          "key": "ace:source_ref:f8955f0f",
+          "ttl": 87178,
+          "ok": true
+        },
+        {
+          "key": "ace:source_ref:23627406",
+          "ttl": 87305,
+          "ok": true
+        },
+        {
+          "key": "ace:source_ref:2a7ba9c5",
+          "ttl": 87305,
+          "ok": true
+        },
+        {
+          "key": "ace:source_ref:0dbba660",
+          "ttl": 87178,
           "ok": true
         }
       ],
@@ -411,12 +347,32 @@
       "pattern": "ace:feature:*",
       "ownership": "ASPIRATIONAL",
       "note": "See ace:context:* note.",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 3,
+      "sample": [
+        "ace:feature:src.lib.server.cache-keys",
+        "ace:feature:src.lib.server.cache.atlas-reward-cache",
+        "ace:feature:src.lib.server.cache.redis-exact-match"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:feature:src.lib.server.cache-keys",
+          "ttl": 87174,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:src.lib.server.cache.atlas-reward-cache",
+          "ttl": 87182,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:src.lib.server.cache.redis-exact-match",
+          "ttl": 87301,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null,
-      "driftFlag": null
+      "driftFlag": "UNEXPECTED_POPULATED: was documented as ASPIRATIONAL with 0 live rows; now has 3. Verify whether a writer was added and update this script's classification."
     },
     {
       "key": "ace:query:*",
@@ -495,55 +451,43 @@
       "pattern": "bifrost:*",
       "ownership": "NAMING_DRIFT_CHECK",
       "note": "One-f spelling. Should stay at 0 -- if this ever shows real keys, something is writing to the wrong prefix (the real port-3040 Go Bifrost service does not use Redis key namespacing this way).",
-      "count": 46,
-      "sample": [
-        "bifrost:sem:packet:1703d9c005252a62",
-        "bifrost:sem:packet:packet:0004b466d863",
-        "bifrost:sem:feature:simd-bridge.LLMS",
-        "bifrost:sem:packet:packet:0009951ee430",
-        "bifrost:sem:packet:packet:000b1b923bf4"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bifrost:sem:packet:1703d9c005252a62",
-          "ttl": 81000,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0004b466d863",
-          "ttl": 81014,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:simd-bridge.LLMS",
-          "ttl": 81041,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0009951ee430",
-          "ttl": 81024,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:000b1b923bf4",
-          "ttl": 81029,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null,
-      "driftFlag": "UNEXPECTED_POPULATED: was documented as NAMING_DRIFT_CHECK with 0 live rows; now has 46. Verify whether a writer was added and update this script's classification."
+      "driftFlag": null
     }
   ],
   "driftFlags": [
+    {
+      "key": "bitfrost:summary:packet:v1:*",
+      "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
+    },
+    {
+      "key": "gpu:som:packet:*",
+      "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
+    },
+    {
+      "key": "gpu:som:cell:*",
+      "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
+    },
     {
       "key": "gpu:autoencoder:latent_64:*",
       "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
     },
     {
-      "key": "bifrost:*",
-      "message": "UNEXPECTED_POPULATED: was documented as NAMING_DRIFT_CHECK with 0 live rows; now has 46. Verify whether a writer was added and update this script's classification."
+      "key": "gpu:karpathy:scores",
+      "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
+    },
+    {
+      "key": "gpu:karpathy:summary",
+      "message": "UNEXPECTED_EMPTY: documented as ACTIVE (live writer) but found 0 rows. Check whether the writer stopped running or Redis was flushed."
+    },
+    {
+      "key": "ace:feature:*",
+      "message": "UNEXPECTED_POPULATED: was documented as ASPIRATIONAL with 0 live rows; now has 3. Verify whether a writer was added and update this script's classification."
     }
   ],
-  "nextSafeAction": "2 ownership-class drift flag(s) found -- see the \"Drift flags requiring attention\" section before trusting this audit's classification."
+  "nextSafeAction": "7 ownership-class drift flag(s) found -- see the \"Drift flags requiring attention\" section before trusting this audit's classification."
 }

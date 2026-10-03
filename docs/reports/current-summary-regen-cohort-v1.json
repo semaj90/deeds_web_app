@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.current-summary-regen-cohort.v1",
+  "gate": "CURRENT_SUMMARY_REGEN_FREEZE",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "generated": false,
+  "sourceShards": {
+    "dir": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260925T204039Z",
+    "rootSha256": "4c4b5e6d3f9d454a2bcb5bdf2152aa229e849d326e1978b23cc21c91861e8601"
+  },
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "identities": 24456,
+  "classification": {
+    "BLOCKED_PACKET_CREATION_FIRST": 7913,
+    "SUMMARY_PRESENT_PENDING_ADMISSION": 3295,
+    "REGEN_SUMMARY_AND_EMBEDDING": 12437,
+    "BLOCKED_REVISION_STAMP_FIRST": 392,
+    "BLOCKED_DIGEST_REFRESH_FIRST": 419
+  },
+  "frozen": {
+    "file": ".tmp/atlas/current-summary-regen-cohort-v1/cohort-20260925T212309Z.ndjson",
+    "rows": 15732,
+    "sha256": "92d6ec349c824b9552ef94b054e783606c9d99ab3b8a6375817d505953a10119",
+    "order": "pagerank desc then sourceRef (utility proxy; final priority belongs to the board scoring)"
+  },
+  "regenCohort": {
+    "rows": 12437,
+    "inputBytesStatus": {
+      "EXACT_ADMITTED_BYTES": 12436,
+      "DISK_HASH_MISMATCH": 1
+    },
+    "promptStrategy": {
+      "SINGLE_PROMPT": 12148,
+      "CHUNKED_DAG_REQUIRED": 289
+    },
+    "byFileKind": {
+      "md": 5761,
+      "ts": 2340,
+      "mjs": 2020,
+      "json": 1108,
+      "sql": 384,
+      "ps1": 241,
+      "py": 109,
+      "proto": 86,
+      "cjs": 83,
+      "js": 79,
+      "sh": 71,
+      "mts": 40
+    },
+    "astEligibility": {
+      "ELIGIBLE": 5525,
+      "NOT_ELIGIBLE": 6912
+    },
+    "withLegacyChunkHint": 0,
+    "withQuarantinedHint": 0,
+    "totalEstTokens": 86811075,
+    "largestEstTokens": 979518,
+    "diskVerified": {
+      "checked": 12437,
+      "mismatch": 1,
+      "missing": 0
+    }
+  },
+  "rules": [
+    "input for generation = exact admitted source bytes (disk hash equals membership hash); legacy chunk summaries are hints only",
+    "no summary text is admitted without CEI-05 claim eligibility + revision binding",
+    "CHUNKED_DAG_REQUIRED rows must go through the DAG prefill path, not a single prompt",
+    "blocked classes need stamping/refresh/packet-creation before entering the cohort"
+  ],
+  "consumers": [
+    "CEI-05 summary admission",
+    "CEI-06 semantic_768 regeneration",
+    "board task candidates (one per cohort row)"
+  ],
+  "generatedAt": "2026-09-25T21:23:09.143Z"
+}

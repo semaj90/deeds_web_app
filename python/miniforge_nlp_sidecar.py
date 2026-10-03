@@ -42,6 +42,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 try:
+    from atlas_nlp_classification_helper_v1 import ClassificationRequestV1, classify_request
+    CLASSIFICATION_HELPER_AVAILABLE = True
+except Exception:
+    ClassificationRequestV1 = None  # type: ignore[assignment]
+    classify_request = None  # type: ignore[assignment]
+    CLASSIFICATION_HELPER_AVAILABLE = False
+
+try:
     import uvicorn
 except ImportError as exc:  # pragma: no cover - launcher/runtime only
     raise RuntimeError("uvicorn is required to run the NLP sidecar") from exc
@@ -203,12 +211,18 @@ class AnalyzeRequest(BaseModel):
     extraction_mode: EXTRACTION_MODES = "full"
     document_id: Optional[str] = None
     source_ref: Optional[str] = None
+    source_revision: Optional[str] = Field(default=None, alias="sourceRevision")
+    workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision")
+    source_namespace: Optional[str] = Field(default=None, alias="sourceNamespace")
+    tree_node_id: Optional[str] = Field(default=None, alias="treeNodeId")
     packet_key: Optional[str] = None
     language: Optional[str] = None
     model_id: Optional[str] = None
     max_chars: int = Field(default=50_000, ge=1, le=200_000)
     passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]] = Field(default_factory=list)
     grounded_extraction_required: bool = False
+
+    model_config = {"populate_by_name": True}
 
 
 class AstChunkRequest(BaseModel):
@@ -326,6 +340,7 @@ class AnalysisPassResult(BaseModel):
     packet_key: Optional[str] = None
     source_ref: str
     source_revision: str
+    workspace_revision: Optional[str] = None
     family: Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded", "classify"]
     pass_name: str
     pass_revision: str
@@ -346,6 +361,7 @@ class AnalysisPassResult(BaseModel):
 class AstUnit(BaseModel):
     source_ref: str
     source_revision: str
+    packet_key: Optional[str] = None
     tree_node_id: str
     symbol_version_id: Optional[str] = None
     # tree_node_id/symbol_version_id are sidecar-local digests (digest(source_ref, symbol,
@@ -416,6 +432,16 @@ class HMMObservation(BaseModel):
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
+HMM_OBSERVATION_VOCABULARY_REVISION_V1 = "atlas.route-observation.v1"
+HMM_OBSERVATION_VOCABULARY_V1 = frozenset({
+    "STRUCTURAL_CHUNK_PRESENT",
+    "ENTITY_EVIDENCE_FOUND",
+    "IMPORT_RELATIONSHIP_FOUND",
+    "SEMANTIC_CARD_BUILT",
+    "REPAIR_AMBIGUOUS",
+})
+
+
 class Control5(BaseModel):
     lexical_confidence: Optional[float] = None
     semantic_confidence: Optional[float] = None
@@ -457,6 +483,8 @@ class ExperimentFeatureMatrix(BaseModel):
 
 
 class EventHypergraphPayload(BaseModel):
+    status: Literal["BUILT", "SKIPPED_LINEAGE"] = "BUILT"
+    warnings: list[str] = Field(default_factory=list)
     events: list[dict[str, Any]] = Field(default_factory=list)
     ontology_event_tuples: list[dict[str, Any]] = Field(default_factory=list)
     event_breadth_features: Optional[dict[str, Any]] = None
@@ -482,6 +510,7 @@ class AnalyzeResponse(BaseModel):
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix] = None
     event_hypergraph: Optional[EventHypergraphPayload] = None
     entity_graph_metrics: dict[str, Any] = Field(default_factory=dict)
+    classification_proposal: Optional[dict[str, Any]] = None
     processing_time_ms: int
 
 
@@ -539,9 +568,25 @@ MAX_TEXT_CHARS = int(os.getenv("NLP_SIDEcar_MAX_CHARS", "50000"))
 _spacy_nlp = None
 
 
+def _spacy_model_installed() -> bool:
+    """Report trained-model availability separately from the spaCy import."""
+    if not SPACY_AVAILABLE or spacy is None:
+        return False
+    try:
+        if bool(spacy.util.is_package(SPACY_MODEL)):  # type: ignore[union-attr]
+            return True
+    except Exception:
+        pass
+    try:
+        return Path(SPACY_MODEL).exists()
+    except Exception:
+        return False
+
+
 def _capabilities() -> dict[str, bool]:
     return {
         "spacy": SPACY_AVAILABLE,
+        "spacy_pos": SPACY_AVAILABLE and _spacy_model_installed(),
         "langextract": LANGEXTRACT_AVAILABLE,
         "tree_sitter": TREE_SITTER_AVAILABLE,
         "treesitter_chunker": TREESITTER_CHUNKER_AVAILABLE,
@@ -552,11 +597,16 @@ def _capabilities() -> dict[str, bool]:
         "cugraph": CUGRAPH_AVAILABLE,
         "cuvs": CUVS_AVAILABLE,
         "cupy": CUPY_AVAILABLE,
+        "classification_helper": CLASSIFICATION_HELPER_AVAILABLE,
     }
 
 
 def _capability_report() -> dict[str, Any]:
     capabilities = _capabilities()
+    language_pairs = sorted(_AST_LANGUAGE_EXTENSIONS.items())
+    language_revision = "sha256:" + hashlib.sha256(
+        json.dumps(language_pairs, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
     return {
         "service": "parent-atlas-compute-sidecar",
         "ast": {
@@ -564,11 +614,43 @@ def _capability_report() -> dict[str, Any]:
             "available": TREESITTER_CHUNKER_AVAILABLE,
             "xref": TREESITTER_CHUNKER_AVAILABLE,
             "repositoryProcessing": TREESITTER_CHUNKER_AVAILABLE,
+            "languageVocabularies": [
+                {
+                    "sourceOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "sourceRevision": language_revision,
+                    "namespace": "FILE_EXTENSION",
+                    "labels": [extension for extension, _ in language_pairs],
+                },
+                {
+                    "sourceOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "sourceRevision": language_revision,
+                    "namespace": "SIDECAR_LANGUAGE",
+                    "labels": sorted({language for _, language in language_pairs}),
+                },
+            ],
+            "languageBindings": [
+                {
+                    "fromNamespace": "FILE_EXTENSION",
+                    "fromLabel": extension,
+                    "toNamespace": "SIDECAR_LANGUAGE",
+                    "toLabel": language,
+                    "authorityOwner": "python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS",
+                    "authorityRevision": language_revision,
+                    "evidenceRefs": ["python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS"],
+                }
+                for extension, language in language_pairs
+            ],
         },
         "gpu": {"available": TORCH_AVAILABLE},
         "graph": {"networkx": NETWORKX_AVAILABLE, "cugraph": CUGRAPH_AVAILABLE, "nx_cugraph": NX_CUGRAPH_AVAILABLE},
         "vector": {"cuvs": CUVS_AVAILABLE, "cagra": CUVS_AVAILABLE},
         "capabilityDetails": {
+            "spacy_model": {
+                "package": SPACY_MODEL,
+                "installed": _spacy_model_installed(),
+                "loaded": _spacy_nlp is not None,
+                "pos_ready": bool(_spacy_nlp is not None and getattr(_spacy_nlp, "pipe_names", [])),
+            },
             "networkx": {
                 "installed": NETWORKX_AVAILABLE,
                 "active": NETWORKX_AVAILABLE,
@@ -761,6 +843,159 @@ def _safe_text(text: str, max_chars: int) -> str:
     return text[:max_chars] if len(text) > max_chars else text
 
 
+class PosTagRequest(BaseModel):
+    text: str
+
+
+class LinguisticTokenAssertion(BaseModel):
+    text: str
+    lemma: str
+    pos: str
+    tag: str
+    dependency: str
+    start_byte: int
+    end_byte: int
+
+
+class LinguisticTextSpan(BaseModel):
+    text: str
+    start_byte: int
+    end_byte: int
+
+
+class LinguisticDependencyEdge(BaseModel):
+    dependent_text: str
+    dependent_start_byte: int
+    dependent_end_byte: int
+    head_text: str
+    head_start_byte: int
+    head_end_byte: int
+    relation: str
+
+
+class PosTagResponse(BaseModel):
+    nouns: list[str]
+    proper_nouns: list[str]
+    verbs: list[str]
+    adjectives: list[str]
+    adverbs: list[str]
+    lemmas: list[str]
+    noun_phrases: list[str]
+    source: Literal["spacy", "unavailable"]
+    token_assertions: list[LinguisticTokenAssertion] = Field(default_factory=list)
+    noun_phrase_spans: list[LinguisticTextSpan] = Field(default_factory=list)
+    dependency_edges: list[LinguisticDependencyEdge] = Field(default_factory=list)
+    dependency_parser_available: bool = False
+    coordinate_basis: Literal["UTF8_BYTES"] = "UTF8_BYTES"
+
+
+def _utf8_byte_offset(text: str, character_offset: int) -> int:
+    return len(text[:character_offset].encode("utf-8"))
+
+
+def _spacy_pos_tags(text: str) -> PosTagResponse:
+    """Real noun/verb/adjective/adverb/lemma/noun-phrase extraction via spaCy's
+    POS tagger -- distinct from `_spacy_entities()` above (named-entity
+    recognition is a different task; this is part-of-speech tagging).
+
+    Added 2026-09-13: this capability was previously only attempted by a
+    Node-side script (scripts/atlas/extract-lexical-features.mjs) that spawned
+    a brand-new Python process per call, reloading the spaCy model every time
+    (~1-2s startup cost per row) -- and had never actually been run against
+    production data (extractor_version='spacy-nlp-v1' had zero rows live).
+    This reuses the SAME already-loaded `_lazy_spacy()` model this sidecar
+    keeps warm for `_spacy_entities()`, so a caller gets POS tags at the cost
+    of one HTTP round-trip, not a process spawn + model load.
+    """
+    nlp = _lazy_spacy()
+    if nlp is None:
+        return PosTagResponse(
+            nouns=[], proper_nouns=[], verbs=[], adjectives=[], adverbs=[],
+            lemmas=[], noun_phrases=[], source="unavailable",
+        )
+    doc = nlp(text)
+    # A package import (or the blank-English fallback used by _lazy_spacy)
+    # does not provide statistical POS annotations.  Do not label that result
+    # as spaCy output: an empty annotation set is an unavailable-model state,
+    # not a successful linguistic proof.
+    try:
+        has_pos_annotations = bool(doc.has_annotation("POS"))
+    except Exception:
+        has_pos_annotations = False
+    if not has_pos_annotations:
+        return PosTagResponse(
+            nouns=[], proper_nouns=[], verbs=[], adjectives=[], adverbs=[],
+            lemmas=[], noun_phrases=[], source="unavailable",
+        )
+    try:
+        dependency_parser_available = bool(doc.has_annotation("DEP"))
+    except Exception:
+        dependency_parser_available = False
+    token_assertions = []
+    for token in doc:
+        char_start = int(token.idx)
+        char_end = char_start + len(token.text)
+        token_assertions.append(LinguisticTokenAssertion(
+            text=token.text,
+            lemma=token.lemma_ or token.text,
+            pos=token.pos_ or "",
+            tag=token.tag_ or "",
+            dependency=token.dep_ or "",
+            start_byte=_utf8_byte_offset(text, char_start),
+            end_byte=_utf8_byte_offset(text, char_end),
+        ))
+    nouns = sorted({tok.text for tok in doc if tok.pos_ == "NOUN"})
+    proper_nouns = sorted({tok.text for tok in doc if tok.pos_ == "PROPN"})
+    verbs = sorted({tok.text for tok in doc if tok.pos_ == "VERB"})
+    adjectives = sorted({tok.text for tok in doc if tok.pos_ == "ADJ"})
+    adverbs = sorted({tok.text for tok in doc if tok.pos_ == "ADV"})
+    lemmas = sorted({tok.lemma_ for tok in doc if tok.pos_ in ("NOUN", "VERB", "ADJ")})
+    try:
+        chunks = list(doc.noun_chunks)
+        noun_phrases = sorted({chunk.text for chunk in chunks})
+        noun_phrase_spans = [LinguisticTextSpan(
+            text=chunk.text,
+            start_byte=_utf8_byte_offset(text, int(chunk.start_char)),
+            end_byte=_utf8_byte_offset(text, int(chunk.end_char)),
+        ) for chunk in chunks]
+    except Exception:
+        # noun_chunks requires a parser component; the blank("en") fallback in
+        # _lazy_spacy() has none -- degrade to empty rather than raising.
+        noun_phrases = []
+        noun_phrase_spans = []
+    dependency_edges = []
+    if dependency_parser_available:
+        for token in doc:
+            head = token.head
+            if (
+                head is token
+                or not token.dep_
+                or token.text.isspace()
+                or token.pos_ in {"PUNCT", "SPACE"}
+                or not any(character.isalnum() for character in token.text)
+            ):
+                continue
+            dependent_start = int(token.idx)
+            head_start = int(head.idx)
+            dependency_edges.append(LinguisticDependencyEdge(
+                dependent_text=token.text,
+                dependent_start_byte=_utf8_byte_offset(text, dependent_start),
+                dependent_end_byte=_utf8_byte_offset(text, dependent_start + len(token.text)),
+                head_text=head.text,
+                head_start_byte=_utf8_byte_offset(text, head_start),
+                head_end_byte=_utf8_byte_offset(text, head_start + len(head.text)),
+                relation=token.dep_,
+            ))
+    return PosTagResponse(
+        nouns=nouns, proper_nouns=proper_nouns, verbs=verbs, adjectives=adjectives,
+        adverbs=adverbs, lemmas=lemmas, noun_phrases=noun_phrases, source="spacy",
+        token_assertions=token_assertions,
+        noun_phrase_spans=noun_phrase_spans,
+        dependency_edges=dependency_edges,
+        dependency_parser_available=dependency_parser_available,
+    )
+
+
 def _regex_entities(text: str) -> list[Entity]:
     patterns = [
         ("DATE", r"\b\d{4}-\d{2}-\d{2}\b|\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}\b", 0.95),
@@ -791,6 +1026,81 @@ def _regex_entities(text: str) -> list[Entity]:
                 )
             )
     return sorted(results, key=lambda item: (item.start or 0, item.end or 0))
+
+
+def _linguistic_input(text: str, *, code_mode: bool) -> str:
+    """Keep comments/docstrings/query-like strings while masking code syntax.
+
+    The linguistic pass is not a source-symbol extractor. For code input,
+    preserve offsets but replace identifiers/operators/keywords with spaces so
+    spaCy and the fallback entity regex cannot treat source declarations as
+    linguistic evidence. Comments, quoted text, and template text remain
+    available as bounded natural-language input.
+    """
+    if not code_mode:
+        return text
+
+    source_chars = list(text)
+    chars = list(text)
+    state = "code"
+    quote = ""
+    index = 0
+    while index < len(chars):
+        current = source_chars[index]
+        next_char = source_chars[index + 1] if index + 1 < len(source_chars) else ""
+
+        if state == "code":
+            if current == "/" and next_char == "/":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
+                state = "line_comment"
+                index += 2
+                continue
+            if current == "/" and next_char == "*":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
+                state = "block_comment"
+                index += 2
+                continue
+            if current in {"'", '"', "`"}:
+                quote = current
+                state = "string"
+                index += 1
+                continue
+            if current not in {"\n", "\r", "\t"}:
+                # Keep the UTF-8 byte length invariant so spaCy offsets over
+                # the masked input still address the original source.
+                chars[index] = " " * len(current.encode("utf-8"))
+            index += 1
+            continue
+
+        if state == "line_comment":
+            if current in {"\n", "\r"}:
+                state = "code"
+            index += 1
+            continue
+
+        if state == "block_comment":
+            if current == "*" and next_char == "/":
+                chars[index] = " " * len(current.encode("utf-8"))
+                chars[index + 1] = " " * len(next_char.encode("utf-8"))
+                index += 2
+                state = "code"
+            else:
+                index += 1
+            continue
+
+        # Quoted strings are the bounded natural-language/query lane. Keep
+        # their contents and only leave the enclosing quote untouched.
+        if current == "\\":
+            index += 2
+            continue
+        if current == quote:
+            state = "code"
+            quote = ""
+        index += 1
+
+    return "".join(chars)
 
 
 def _spacy_entities(text: str) -> list[Entity]:
@@ -1068,7 +1378,20 @@ def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[in
     if end_line >= len(lines):
         end_index = len(text)
 
-    return start_index, max(start_index, end_index)
+    start_byte = len(text[:start_index].encode("utf-8"))
+    end_byte = len(text[:max(start_index, end_index)].encode("utf-8"))
+    return start_byte, max(start_byte, end_byte)
+
+
+def _slice_utf8_bytes(text: str, start_byte: int, end_byte: int) -> str:
+    """Slice source by authoritative UTF-8 byte offsets, rejecting invalid spans."""
+    source_bytes = text.encode("utf-8")
+    if start_byte < 0 or end_byte < start_byte or end_byte > len(source_bytes):
+        raise ValueError("UTF-8 byte span is outside the source buffer")
+    try:
+        return source_bytes[start_byte:end_byte].decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("UTF-8 byte span splits a code point") from exc
 
 
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
@@ -1117,7 +1440,10 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
 
                 snippet = _chunk_field(item, "text", "content", "snippet")
                 if snippet is None:
-                    snippet = text[start_byte:end_byte]
+                    try:
+                        snippet = _slice_utf8_bytes(text, start_byte, end_byte)
+                    except ValueError:
+                        continue
                 snippet = str(snippet).strip()
                 if not snippet:
                     continue
@@ -1156,7 +1482,10 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
         end = int(getattr(node, "end_byte", 0))
         if end <= start:
             continue
-        snippet = text[start:end].strip()
+        try:
+            snippet = _slice_utf8_bytes(text, start, end).strip()
+        except ValueError:
+            continue
         if not snippet:
             continue
         chunks.append(
@@ -1415,19 +1744,19 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
     chunker_revision = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unknown"
     structural_revision = f"{chunker}-boundary-v1"
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
 
     for idx, chunk in enumerate(chunks[:50]):
         symbol = chunk.symbol or f"chunk_{idx}"
         start = max(0, int(chunk.start))
         end = max(start, int(chunk.end))
-        lines_before = text[:start].splitlines()
-        line_start = len(lines_before) + 1
+        line_start = text.encode("utf-8")[:start].count(b"\n") + 1
         line_end = line_start + max(0, chunk.text.count("\n"))
         ast_units.append(
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
+                packet_key=req.packet_key,
                 tree_node_id=_digest_parts(source_ref, symbol, start, end, idx)[:24],
                 symbol_version_id=_digest_parts(source_ref, symbol, structural_revision)[:24],
                 language=language or "unknown",
@@ -1460,13 +1789,14 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
+                packet_key=req.packet_key,
                 tree_node_id=_digest_parts(source_ref, "fallback", language)[:24],
                 symbol_version_id=None,
                 language=language or "unknown",
                 node_kind="module",
                 qualified_symbol=None,
                 byte_start=0,
-                byte_end=len(text),
+                byte_end=len(text.encode("utf-8")),
                 line_start=1,
                 line_end=max(1, text.count("\n") + 1),
                 parent_symbol=None,
@@ -1501,10 +1831,15 @@ def _build_semantic_cards(
     lexical_facts = [feature.name for feature in features[:10]]
     linguistic_facts = [entity.text for entity in entities[:10]]
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
 
     for idx, unit in enumerate(ast_units[:20]):
-        excerpt = text[unit.byte_start : unit.byte_end].strip()[:5000] or unit.node_kind
+        try:
+            excerpt = _slice_utf8_bytes(text, unit.byte_start, unit.byte_end).strip()[:5000]
+        except ValueError:
+            # A malformed byte span cannot contribute source text to a derived card.
+            continue
+        excerpt = excerpt or unit.node_kind
         symbol = unit.qualified_symbol or unit.tree_node_id
         role = "structural-boundary" if unit.node_kind else "unknown"
         invariants = []
@@ -1549,24 +1884,24 @@ def _build_hmm_observations(
 ) -> list[HMMObservation]:
     observations: list[HMMObservation] = []
     source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    source_revision = req.source_revision or "unknown"
     now = datetime.utcnow().isoformat() + "Z"
 
     tokens: list[tuple[str, float, str]] = []
     if chunks:
-        tokens.append(("EXACT_SYMBOL_FOUND", 1.0, "structural"))
+        tokens.append(("STRUCTURAL_CHUNK_PRESENT", 1.0, "structural"))
     if entities:
-        tokens.append(("HIGH_SEMANTIC_MATCH", 0.8, "lexical"))
+        tokens.append(("ENTITY_EVIDENCE_FOUND", 0.8, "entity_extraction"))
     if any(rel.predicate == "imports" for rel in relationships):
-        tokens.append(("AST_CALL_EDGE_FOUND", 0.7, "structural"))
+        tokens.append(("IMPORT_RELATIONSHIP_FOUND", 0.7, "structural"))
     if semantic_cards:
-        tokens.append(("RERANK_CONFIDENT", 0.6, "semantic"))
-    if req.extraction_mode == "full":
-        tokens.append(("PATCH_SUCCESS", 0.4, "grounded"))
+        tokens.append(("SEMANTIC_CARD_BUILT", 0.6, "semantic"))
     if not tokens:
         tokens.append(("REPAIR_AMBIGUOUS", 0.2, "sequence"))
 
     for idx, (observation, weight, source_pass) in enumerate(tokens[:20]):
+        if observation not in HMM_OBSERVATION_VOCABULARY_V1:
+            raise ValueError(f"Observation is not in {HMM_OBSERVATION_VOCABULARY_REVISION_V1}: {observation}")
         observations.append(
             HMMObservation(
                 request_id=req.document_id or req.packet_key or _digest_parts(text)[:16],
@@ -1586,88 +1921,6 @@ def _build_hmm_observations(
     return observations
 
 
-def _build_control5(
-    pass_results: list[AnalysisPassResult],
-) -> Optional[Control5]:
-    def latest_value(family: str, *keys: str) -> Optional[float]:
-        for result in reversed(pass_results):
-            if result.family != family:
-                continue
-            for key in keys:
-                value = result.features.get(key)
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
-                    return float(value)
-        return None
-
-    control5 = Control5(
-        lexical_confidence=latest_value("lexical", "lexical_confidence", "bm25"),
-        semantic_confidence=latest_value("semantic", "semantic_confidence", "dense_cosine"),
-        structural_confidence=latest_value("structural", "structural_confidence", "ast_match"),
-        topological_confidence=latest_value("sequence", "topological_confidence", "hop_distance"),
-        execution_confidence=latest_value("sequence", "execution_confidence", "historical_execution_success"),
-    )
-    if any(value is not None for value in control5.model_dump().values()):
-        return control5
-    return None
-
-
-def _build_experiment_feature_matrix(
-    req: AnalyzeRequest,
-    pass_results: list[AnalysisPassResult],
-    control5: Optional[Control5],
-) -> ExperimentFeatureMatrix:
-    def latest_value(family: str, *keys: str) -> Optional[float]:
-        for result in reversed(pass_results):
-            if result.family != family:
-                continue
-            for key in keys:
-                value = result.features.get(key)
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
-                    return float(value)
-        return None
-
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
-    candidate_id = req.packet_key or req.document_id or source_ref
-    features = {}
-    for result in pass_results:
-        for key, value in result.features.items():
-            if isinstance(value, (int, float, bool)) or value is None:
-                features[f"{result.family}.{result.pass_name}.{key}"] = value
-
-    return ExperimentFeatureMatrix(
-        request_id=req.document_id or req.packet_key or _digest_parts(req.text)[:16],
-        candidate_id=candidate_id,
-        packet_key=req.packet_key,
-        source_ref=source_ref,
-        source_revision=source_revision,
-        feature_revision="nlp-feature-compiler-v1",
-        graph_revision=None,
-        representation_revision=req.model_id,
-        dense_cosine=latest_value("semantic", "dense_cosine", "semantic_confidence"),
-        bm25=latest_value("lexical", "bm25", "lexical_confidence"),
-        rrf=latest_value("rerank", "rrf", "reranker_score"),
-        ast_match=latest_value("structural", "ast_match", "structural_confidence"),
-        pagerank=latest_value("sequence", "pagerank"),
-        cheirank=latest_value("sequence", "cheirank"),
-        community_affinity=latest_value("sequence", "community_affinity"),
-        hop_distance=latest_value("sequence", "hop_distance"),
-        kmeans_distance=latest_value("semantic", "kmeans_distance"),
-        som_distance=latest_value("semantic", "som_distance"),
-        manifold_distance=latest_value("semantic", "manifold_distance"),
-        cross_encoder_score=latest_value("rerank", "cross_encoder_score"),
-        mixedbread_score=latest_value("rerank", "mixedbread_score"),
-        historical_execution_success=latest_value("sequence", "historical_execution_success"),
-        test_impact=latest_value("structural", "test_impact"),
-        reranker_score=latest_value("rerank", "reranker_score"),
-        control5=control5,
-        features=features,
-        pass_count=len(pass_results),
-        input_hash=_digest_parts(req.text, req.source_ref, source_revision, req.packet_key, req.model_id),
-        output_hash=_digest_parts(pass_results, control5),
-    )
-
-
 def _build_event_hypergraph(
     req: AnalyzeRequest,
     text: str,
@@ -1681,11 +1934,20 @@ def _build_event_hypergraph(
     control5: Optional[Control5],
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix],
 ) -> EventHypergraphPayload:
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
-    workspace_revision = req.model_id or req.document_id or "unknown"
+    # Event rows carry identity/revision columns, so they must not be filled
+    # from UI/request/model labels. Without the explicit lineage tuple, return
+    # a typed skip instead of fabricating a packet or workspace identity.
+    if not all((req.source_ref, req.source_revision, req.workspace_revision, req.packet_key)):
+        return EventHypergraphPayload(
+            status="SKIPPED_LINEAGE",
+            warnings=["SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED"],
+        )
+
+    source_ref = req.source_ref
+    source_revision = req.source_revision
+    workspace_revision = req.workspace_revision
     observed_at = datetime.utcnow().isoformat() + "Z"
-    packet_key = req.packet_key or req.document_id or source_ref
+    packet_key = req.packet_key
 
     events: list[dict[str, Any]] = []
 
@@ -1708,7 +1970,9 @@ def _build_event_hypergraph(
             "tree_node_id": metadata.get("tree_node_id"),
             "workspace_revision": workspace_revision,
             "source_revision": source_revision,
-            "representation_revision": req.model_id or "semantic-768-v1",
+            # A model label is not a vector representation revision. No
+            # representation is recorded until an embedding receipt exists.
+            "representation_revision": None,
             "producer_id": "miniforge-nlp-sidecar",
             "producer_revision": _package_version("langextract") or "sidecar-v1",
             "canonicalizer_revision": "event-canonicalizer-v1",
@@ -2127,8 +2391,17 @@ def _build_pass_results(
     if not requested and not req.grounded_extraction_required:
         return [], [], [], [], None, None
 
-    source_ref = req.source_ref or req.document_id or "unknown"
-    source_revision = req.model_id or "unknown"
+    # Pass results are revision-qualified evidence. Do not substitute a UI
+    # document label or sentinel when source authority was not supplied.
+    if (
+        not req.source_ref
+        or not req.source_revision
+        or req.source_revision.strip().lower() in {"unknown", "workspace:0"}
+    ):
+        return [], [], [], [], None, None
+
+    source_ref = req.source_ref
+    source_revision = req.source_revision
     now = datetime.utcnow().isoformat() + "Z"
     ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
     semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
@@ -2155,6 +2428,7 @@ def _build_pass_results(
                 packet_key=req.packet_key,
                 source_ref=source_ref,
                 source_revision=source_revision,
+                workspace_revision=req.workspace_revision,
                 family=family,  # type: ignore[arg-type]
                 pass_name=pass_name,
                 pass_revision=f"{pass_name}-v1",
@@ -2182,8 +2456,6 @@ def _build_pass_results(
             "cpu",
             {
                 "ast_units": len(ast_units),
-                "structural_confidence": 1.0 if ast_units else 0.2,
-                "ast_match": 1.0 if ast_units else 0.0,
             },
             {"ast_units": [unit.model_dump() for unit in ast_units]},
         )
@@ -2195,61 +2467,66 @@ def _build_pass_results(
             "regex",
             "v1",
             "cpu",
-            {
-                "lexical_confidence": 0.75 if concepts else 0.25,
-                "bm25": 0.6 if concepts else 0.15,
-            },
+            {"concept_count": len(concepts)},
             {"concepts": concepts[:50]},
         )
 
     if "linguistic" in requested:
-        linguistic_entities = _spacy_entities(text)
+        linguistic_text = _linguistic_input(text, code_mode=_is_code(req.source_type, text))
+        linguistic_entities = _spacy_entities(linguistic_text)
+        linguistic_pos = _spacy_pos_tags(linguistic_text)
         add_pass(
             "linguistic",
             "spacy_entities",
             "spacy" if SPACY_AVAILABLE else "regex",
             _package_version("spacy") or "unknown",
             "cpu",
+            {"entity_count": len(linguistic_entities)},
             {
-                "linguistic_confidence": 0.7 if linguistic_entities else 0.2,
+                "entities": [entity.model_dump() for entity in linguistic_entities],
+                "pos": linguistic_pos.model_dump(),
+                "input_scope": "comments_docstrings_strings_query_text" if _is_code(req.source_type, text) else "full_text",
+                "input_hash": hashlib.sha256(linguistic_text.encode("utf-8")).hexdigest(),
+                "coordinate_source": {
+                    "source_ref": source_ref,
+                    "source_revision": source_revision,
+                    "offset_basis": linguistic_pos.coordinate_basis,
+                    "source_byte_length": len(text.encode("utf-8")),
+                    "masked_input_byte_length": len(linguistic_text.encode("utf-8")),
+                },
             },
-            {"entities": [entity.model_dump() for entity in linguistic_entities]},
         )
 
     if "semantic" in requested:
         add_pass(
             "semantic",
             "semantic_card",
-            "embeddinggemma" if req.model_id else "local-card",
-            req.model_id or "semantic-768-v1",
+            "semantic-card-builder",
+            "semantic-card-v1",
             "cpu",
+            {},
             {
-                "semantic_confidence": 0.8 if semantic_cards else 0.3,
-                "dense_cosine": 0.8 if semantic_cards else 0.3,
-                "kmeans_distance": 0.4 if semantic_cards else 0.9,
-                "som_distance": 0.35 if semantic_cards else 0.9,
-                "manifold_distance": 0.32 if semantic_cards else 0.9,
+                "semantic_cards": [card.model_dump() for card in semantic_cards],
+                "embedding_status": "NOT_RUN",
             },
-            {"semantic_cards": [card.model_dump() for card in semantic_cards]},
+            warnings=["SEMANTIC_768_EMBEDDING_NOT_RUN"],
         )
 
     if "sequence" in requested:
         add_pass(
             "sequence",
             "hmm_observations",
-            "hmmlearn" if any(obs.observation for obs in observations) else "heuristic",
-            "v1",
+            "observation-builder",
+            HMM_OBSERVATION_VOCABULARY_REVISION_V1,
             "cpu",
             {
-                "topological_confidence": 0.5 if observations else 0.1,
-                "execution_confidence": 0.6 if observations else 0.1,
-                "historical_execution_success": 0.55 if observations else 0.0,
-                "hop_distance": 1.0 if observations else 0.0,
-                "pagerank": 0.0,
-                "cheirank": 0.0,
-                "community_affinity": 0.0,
+                "observation_count": float(len(observations)),
             },
-            {"observations": [obs.model_dump() for obs in observations]},
+            {
+                "vocabulary_revision": HMM_OBSERVATION_VOCABULARY_REVISION_V1,
+                "inference_status": "NOT_RUN",
+                "observations": [obs.model_dump() for obs in observations],
+            },
         )
 
     if "rerank" in requested:
@@ -2259,11 +2536,7 @@ def _build_pass_results(
             "sentence-transformers",
             "ms-marco-MiniLM-L6-v2",
             "cpu",
-            {
-                "cross_encoder_score": 0.0,
-                "mixedbread_score": 0.0,
-                "reranker_score": 0.0,
-            },
+            {},
             {"todo": "reranker backend stays in the canonical TS contract for this slice"},
             status="skipped",
             warnings=["reranker backend not invoked in default NLP pass compiler"],
@@ -2277,9 +2550,7 @@ def _build_pass_results(
             "langextract" if LANGEXTRACT_AVAILABLE else "unavailable",
             _package_version("langextract") or "unknown",
             "external",
-            {
-                "grounded_confidence": 0.6 if LANGEXTRACT_AVAILABLE else 0.0,
-            },
+            {},
             {"grounded_only": bool(LANGEXTRACT_AVAILABLE and req.grounded_extraction_required)},
             status=grounded_status,
             warnings=[] if LANGEXTRACT_AVAILABLE else ["LangExtract unavailable; grounded extraction skipped"],
@@ -2299,9 +2570,9 @@ def _build_pass_results(
             warnings=classify_warnings,
         )
 
-    control5 = _build_control5(pass_results)
-    matrix = _build_experiment_feature_matrix(req, pass_results, control5) if pass_results else None
-    return pass_results, ast_units, semantic_cards, observations, control5, matrix
+    # Matrix/control summaries have one implementation in the shared TS
+    # compiler. Python returns producer pass evidence only.
+    return pass_results, ast_units, semantic_cards, observations, None, None
 
 
 def _torch_summary(text: str) -> dict[str, Any]:
@@ -2442,6 +2713,28 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 
     entity_graph_metrics = _compute_entity_graph_metrics(relationships[:100])
 
+    classification_proposal: Optional[dict[str, Any]] = None
+    if CLASSIFICATION_HELPER_AVAILABLE and req.source_ref and req.source_revision:
+        try:
+            classification_proposal = classify_request(  # type: ignore[misc]
+                ClassificationRequestV1(
+                    text=text,
+                    sourceRef=req.source_ref,
+                    sourceRevision=req.source_revision,
+                    workspaceRevision=req.workspace_revision,
+                    packetKey=req.packet_key,
+                    sourceNamespace=req.source_namespace,
+                    treeNodeId=req.tree_node_id,
+                    language=language,
+                    title=req.document_id or "",
+                    modelCheckpoint=os.getenv("DOMAIN_CLASSIFIER_CHECKPOINT_PATH"),
+                )
+            )
+        except Exception as exc:
+            # The proposal lane is advisory. A malformed or unqualified source
+            # must not make the structural/linguistic analysis appear canonical.
+            metadata["classification_proposal_error"] = f"{type(exc).__name__}:{str(exc)[:180]}"
+
     return AnalyzeResponse(
         document_id=document_id,
         provider_revision=_provider_revision(),
@@ -2459,6 +2752,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         experiment_feature_matrix=experiment_feature_matrix,
         event_hypergraph=event_hypergraph,
         entity_graph_metrics=entity_graph_metrics,
+        classification_proposal=classification_proposal,
         processing_time_ms=int((time.perf_counter() - started) * 1000),
     )
 
@@ -2783,6 +3077,34 @@ def ast_chunk(req: AstChunkRequest) -> AstEvidenceResponse:
     return _ast_evidence(req)
 
 
+@app.post("/classify")
+def classify(req: ClassificationRequestV1) -> dict[str, Any]:
+    if not CLASSIFICATION_HELPER_AVAILABLE or classify_request is None:
+        raise HTTPException(503, "NLP_CLASSIFICATION_HELPER_UNAVAILABLE")
+    result = classify_request(req)
+    if req.run_model_challenger:
+        backend, features_map, artifacts, warnings = _classify_domain_pass(req.text)
+        result["trainedClassifier"] = {
+            "status": "SHADOW_ONLY" if backend != "unavailable" else "UNAVAILABLE",
+            "backend": backend,
+            "features": features_map,
+            "artifacts": artifacts,
+            "warnings": warnings,
+            "promotionAuthorized": False,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+    else:
+        result["trainedClassifier"] = {
+            "status": "NOT_REQUESTED",
+            "backend": None,
+            "promotionAuthorized": False,
+            "canonicalAuthority": False,
+            "writesPerformed": False,
+        }
+    return result
+
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     return _analyze(req)
@@ -2791,6 +3113,11 @@ def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 @app.post("/extract", response_model=ExtractResponse)
 def extract(req: AnalyzeRequest) -> ExtractResponse:
     return _extract(req)
+
+
+@app.post("/pos", response_model=PosTagResponse)
+def pos_tag(req: PosTagRequest) -> PosTagResponse:
+    return _spacy_pos_tags(_safe_text(req.text, MAX_TEXT_CHARS))
 
 
 @app.post("/extract/file")

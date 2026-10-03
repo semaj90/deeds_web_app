@@ -1,0 +1,77 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T22:10:48Z",
+  "runType": "PROGRAM_MAPPING_COLLISION_REVIEW",
+  "supersedes": "docs/reports/openspec-workboard-run-2026-09-25T2201Z.json",
+  "pivot": {
+    "from": "architecture overlay contract and current workboard snapshot",
+    "to": "change-level review of provisional program-domain mappings",
+    "reason": "The current program classified all open leaves provisionally; an audit found overlapping domain rules that were hidden by first-match classification. This report makes those candidates reviewable without selecting work or duplicating task rows."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEditedByThisRun": false,
+    "selectedTaskCount": 0,
+    "schedulerPermissionPolicy": "READY_NEVER_IMPLIES_SELECTED",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "implementation": {
+    "mappingReview": "Added a change-level review record containing all regex-matching program candidates, candidate corpora, affected open-task counts, mutation/gate-state distributions, dependency counts, and an explicit NOT_SELECTED state. It does not change the primary mapping or duplicate leaf tasks.",
+    "specAlignment": "The workboard-feature spec now requires ambiguous mappings to remain provisional and expose all candidates for review.",
+    "classificationSemantics": "Multiple candidate corpus domains are reported as a review signal, not asserted as a conflict; CROSS_CORPUS_CONTROL is a legitimate corpus classification."
+  },
+  "snapshot": {
+    "directory": ".tmp/codex-openspec-live-20260925T2150Z/reports",
+    "workboard": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-workboard-v1.json",
+    "controller": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-execution-controller-v1.json",
+    "programJson": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.json",
+    "programMarkdown": ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.md",
+    "workboardGeneratedAt": "2026-09-25T22:01:08Z",
+    "programGeneratedAt": "2026-09-25T22:10:44.365Z",
+    "changeCount": 88,
+    "totalTasks": 9548,
+    "openTasks": 3245,
+    "accountedOpenTasks": 3245,
+    "missingOrDuplicateAssignments": 0,
+    "selectedTasks": 0,
+    "openChangesInMappingReview": 73,
+    "multipleRuleMatches": 7,
+    "multipleCandidateCorpora": 3,
+    "allMappingsStillProvisional": true,
+    "declaredDependencyTasks": 3,
+    "openLeavesWithoutDeclaredDependencies": 3242,
+    "dependenciesInvented": 0,
+    "controllerTaskRows": 9548,
+    "controllerStaleOrMissingRows": 0
+  },
+  "validation": {
+    "programPlanAndControllerTests": "PASS 22/22",
+    "implementationProgramSyntax": "PASS",
+    "openspecStrict": "PASS parent-atlas-workboard-feature-utility-fabric",
+    "scopedDiffCheck": "PASS; line-ending normalization warnings only",
+    "mappingReviewReadback": "PASS; 73 rows, 7 multi-rule candidates, 3 multi-corpus candidate sets, all NOT_SELECTED"
+  },
+  "next": {
+    "schedulerSelection": "NONE",
+    "programReview": "Review the 7 overlapping-domain changes and 3 changes whose candidate rules span more than one corpus category; do not treat candidates as settled ownership.",
+    "dependencyCaveat": "3,242 open leaves still have no declared dependencies; no inferred edges were added."
+  },
+  "likely_cause": "A first-match regex classifier concealed overlapping candidate program domains, leaving program assignments provisional but making their ambiguity difficult to review.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.json",
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-achievable-implementation-program-v1.md",
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T2150Z/reports/openspec-execution-controller-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/openspec-program-plan-v1.mjs",
+    "scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+    "scripts/atlas/build-openspec-implementation-program-v1.mjs",
+    "openspec/changes/parent-atlas-workboard-feature-utility-fabric/specs/workboard-feature-vector/spec.md"
+  ],
+  "safe_next_command": "Review the generated change-level mapping candidates; keep every task NOT_SELECTED until a human selects a specific gate.",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/audit-openspec-execution-controller-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2210Z.json"
+}

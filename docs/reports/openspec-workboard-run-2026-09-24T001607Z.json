@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "runId": "openspec-workboard-run-2026-09-24T001607Z",
+  "startedAt": "2026-09-24T00:16:07Z",
+  "repository": "C:/Users/james/Videos/deeds-web-app",
+  "pivot": {
+    "from": "parent-atlas-deep-research-ingestion / DISCOVERY-04B",
+    "to": "parent-atlas-adaptive-dag-fabric / DAG-FETCH-01 fetch-plan coalescing",
+    "reason": "DISCOVERY-04B's existing canary converts the writer's commit to savepoint release, while the canonical handoff verifier asserts a committed admission; claiming live handoff proof would misstate transaction semantics. DAG-FETCH-01 is locally testable, directly targets the unresolved duplicate-fetch/evidence-identity behavior, and requires no datastore mutation."
+  },
+  "before": {
+    "deepResearchIngestion": {"complete": 6, "total": 7, "open": 1, "blockedTask": "DISCOVERY-04B"},
+    "adaptiveDagFabric": {"complete": 11, "total": 13, "open": 2},
+    "targetTask": "DAG-FETCH-01"
+  },
+  "scope": {
+    "mode": "READ_ONLY_CODE_AND_TEST_RECONCILIATION",
+    "databaseWrites": 0,
+    "cacheWrites": 0,
+    "graphWrites": 0,
+    "containerRebuilds": 0
+  },
+  "after": {
+    "adaptiveDagFabric": {"complete": 11, "total": 13, "open": 2},
+    "DAG_FETCH_fixtureProof": {"localCircuitTests": "PASS 4/4", "aceSelectionTests": "PASS 4/4", "productionCallersFound": 0},
+    "completedThisPivot": [],
+    "filesChangedByThisAgent": [],
+    "concurrentEditsPreserved": [
+      "sveltekit-frontend/src/lib/server/atlas/research/local-research-circuit-v1.ts",
+      "sveltekit-frontend/src/lib/server/atlas/research/local-research-circuit-v1.spec.ts",
+      "openspec/changes/parent-atlas-adaptive-dag-fabric/tasks.md"
+    ]
+  },
+  "remaining": [
+    "DAG-FETCH-01: locate or authorize a real production caller for this injected local circuit before claiming fetch-plan integration; currently only the fixture invokes it",
+    "NATS-EVENT-01: shadow stream remains separately unimplemented/deferred"
+  ],
+  "result": "FIXTURE_PROVEN_PRODUCTION_INTEGRATION_OPEN"
+}

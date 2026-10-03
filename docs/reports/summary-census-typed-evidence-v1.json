@@ -1,0 +1,98 @@
+{
+  "schema": "atlas.summary-census-typed-evidence-receipt.v1",
+  "status": "TYPED_EVIDENCE_PROVEN",
+  "canonicalAuthority": false,
+  "shardSet": ".tmp/atlas/legacy-summary-census-shards-v1/20260926T062323Z",
+  "rootChecksum": "sha256:835ca3f1df2abde36c553b7c5dfff0a7cfe2f7bf28a4731b14904253f03c4ca6",
+  "expectedRows": 40306,
+  "accepted": 40306,
+  "rejected": 0,
+  "rejectCodes": {},
+  "shardChecksumMismatch": 0,
+  "simdjsonUsedAllShards": true,
+  "byClass": {
+    "LEGACY_QUARANTINED": 10416,
+    "LEGACY_HINT_UNQUALIFIED": 28794,
+    "LEGACY_HINT_LINEAGE_BOUND": 425,
+    "LEGACY_CONTAMINATED": 671
+  },
+  "typedRootChecksum": "sha256:1fef5743afd024ea9c2be00f61233942fa40c309393b0b15ce2affbbb13e1cf2",
+  "perShard": [
+    {
+      "path": "census-shard-00001.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00002.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00003.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00004.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00005.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00006.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00007.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00008.ndjson",
+      "checksumOk": true,
+      "lines": 5000,
+      "accepted": 5000,
+      "rejected": 0,
+      "simdjsonUsed": true
+    },
+    {
+      "path": "census-shard-00009.ndjson",
+      "checksumOk": true,
+      "lines": 306,
+      "accepted": 306,
+      "rejected": 0,
+      "simdjsonUsed": true
+    }
+  ],
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "generatedAt": "2026-09-26T06:25:10.620Z"
+}

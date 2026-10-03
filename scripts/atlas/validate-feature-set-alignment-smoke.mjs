@@ -105,12 +105,12 @@ async function runSmokeTest() {
       FROM atlas_packets
     `);
 
-    // Lane 5: Embedding (content_embedding_384)
+    // Lane 5: Embedding (atlas_packets.embedding, semantic_768; legacy content_embedding_384 is not counted — DIM-01a)
     const embedding = await measureLane('Embedding', `
       SELECT
         COUNT(*) as total,
-        COUNT(CASE WHEN content_embedding_384 IS NOT NULL THEN 1 END) as count,
-        ROUND(100.0 * COUNT(CASE WHEN content_embedding_384 IS NOT NULL THEN 1 END) / COUNT(*), 2) as coverage_percent
+        COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) as count,
+        ROUND(100.0 * COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) / COUNT(*), 2) as coverage_percent
       FROM atlas_packets
     `);
 

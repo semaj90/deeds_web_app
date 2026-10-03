@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.workflow-run-receipt-audit.v1",
+  "status": "UNQUALIFIED_NO_WORKFLOW_ID",
+  "journal": "memory/runs/claude-code/2026-09-16.jsonl",
+  "openspecChange": "parent-atlas-agentic-run-receipt-binding",
+  "parsedLineCount": 1074,
+  "workflowCount": 0,
+  "innerEventsGrouped": 0,
+  "events": [],
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "notes": [
+    "One receipt is emitted per workflowId; inner agent/tool calls remain evidence.",
+    "Missing usage fields are omitted rather than synthesized.",
+    "No workflowId/workflow_id was present; no receipt was synthesized.",
+    "Dry run only; use --apply only after explicit authorization."
+  ]
+}

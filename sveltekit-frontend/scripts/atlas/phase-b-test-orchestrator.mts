@@ -113,7 +113,7 @@ async function logAnalysisPass(pool: Pool, packet: any, passKey: string, passTyp
         passType,
         'success',
         inputHash,
-        passKey === 'gemma4_summary_v1' ? 'gemma4-legal-iq4xs-direct.gguf' :
+        passKey === 'gemma4_summary_v1' ? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b') :
         passKey === 'embeddinggemma_summary_embed_v1' ? 'embeddinggemma:latest' : 'cache-push',
         JSON.stringify(output),
         JSON.stringify(scores),

@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.bounded-nlp-stage-run.v1",
+  "runId": "nlp-stage-1791003261014-61356",
+  "status": "IDEMPOTENT_EXISTING_STAGE_READBACK_PROVEN",
+  "readOnly": false,
+  "canonicalAuthority": false,
+  "writes": {
+    "analysisPassLedger": false,
+    "canonicalFeatureState": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false
+  },
+  "input": {
+    "suppliedPacketKey": "packet:b13af559f410",
+    "resolvedStoragePacketKey": "packet:b13af559f410",
+    "packetIdentityResolution": "DIRECT_STORAGE_ROW",
+    "sourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+    "sourceRevision": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+    "workspaceRevision": null,
+    "workspaceRevisionDisposition": "OMITTED_LEGACY_ZERO",
+    "sourceBytes": 6237,
+    "sourceChecksum": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+    "passSelection": [
+      "linguistic"
+    ]
+  },
+  "result": {
+    "inserted": false,
+    "rowId": "11146",
+    "passName": "spacy_entities",
+    "passRevision": "spacy_entities-v1",
+    "producerRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+    "inputHash": "d43057b9875b59da80581be0638fcc1b31f58f1aa1b8eb24e47addb0cd4993e0",
+    "outputHash": "d2eb3c0e2158849f343ef8a9444585cfaef61b0083ac838cdc9a764a96c030cb",
+    "stageInputChecksum": "a7a2658d0b53ecf47219f014fb47a0b1885b23d8a28ba064bd68792c3cfc15e8",
+    "stageOutputChecksum": "6a6c876d1feced882ba3c3166da2d07202e9fb79fb259b35277b178f8a0da47e"
+  },
+  "readback": {
+    "independentSelect": true,
+    "passed": true,
+    "rows": 1
+  },
+  "error": null
+}

@@ -1,0 +1,132 @@
+{
+  "schema": "atlas.symbol-identity-audit.v1",
+  "gate": "S01-09",
+  "generatedAt": "2026-09-21T23:48:25.060Z",
+  "result": "SYMBOL_IDENTITY_BLOCKED",
+  "blockers": [
+    "VERSION_HAS_QUALIFIED_SOURCE_REVISION:VIOLATED",
+    "REGISTRY_CREATED_FROM_QUALIFIED_REVISION:VIOLATED",
+    "STABLE_FILE_LINK:BLOCKED_NO_STABLE_FILE_OWNER",
+    "SYMBOL_ID_PATH_INDEPENDENT:BLOCKED_NO_EVIDENCE",
+    "UNCHANGED_AND_CHANGED_SYMBOL_ACROSS_REVISIONS:BLOCKED_NO_EVIDENCE",
+    "MOVE_AND_RENAME:BLOCKED_NO_EVIDENCE",
+    "TREE_NODE_OCCURRENCE_UNIQUE_TO_SYMBOL:VIOLATED"
+  ],
+  "audit": {
+    "registry": {
+      "symbols": 10504,
+      "createdFromRevisionShapes": {
+        "PLACEHOLDER": 10220,
+        "SHORT_OID": 90,
+        "QUALIFIED_SHA256": 194
+      },
+      "symbolsWithVersionRows": 479,
+      "activeSymbols": 10454,
+      "activeKeysEmbeddingAFilePath": 0,
+      "retiredKeysEmbeddingAFilePath": 50
+    },
+    "versions": {
+      "rows": 479,
+      "sourceRevisionShapes": {
+        "SHORT_OID": 85,
+        "QUALIFIED_SHA256": 194,
+        "PLACEHOLDER": 200
+      },
+      "workspaceRevisionShapes": {
+        "QUALIFIED_SHA256": 279,
+        "PLACEHOLDER": 200
+      },
+      "admissible": 0,
+      "notAdmissible": 479,
+      "revisionQualified": 194,
+      "withStableFileLink": 0,
+      "treeNodesSharedAcrossStableSymbols": 22
+    },
+    "predicates": {
+      "TREE_NODE_NOT_CANONICAL_SYMBOL_ID": {
+        "state": "PROVEN"
+      },
+      "VERSION_HAS_QUALIFIED_SOURCE_REVISION": {
+        "state": "VIOLATED",
+        "detail": "285 of 479 versions lack a sha256-qualified source/workspace revision (194 qualify); fully admissible incl. the stable-file link: 0"
+      },
+      "REGISTRY_CREATED_FROM_QUALIFIED_REVISION": {
+        "state": "VIOLATED"
+      },
+      "STABLE_FILE_LINK": {
+        "state": "BLOCKED_NO_STABLE_FILE_OWNER",
+        "detail": "S01-08: no stableFileId owner exists"
+      },
+      "SYMBOL_ID_PATH_INDEPENDENT": {
+        "state": "BLOCKED_NO_EVIDENCE",
+        "detail": "0 active keys embed a path; 50 retired legacy keys do. Active keys are opaque hashes, but whether the hash input includes the path is not established from the key format, so path independence is not proven"
+      },
+      "UNCHANGED_AND_CHANGED_SYMBOL_ACROSS_REVISIONS": {
+        "state": "BLOCKED_NO_EVIDENCE",
+        "detail": "0 symbols observed at 2+ source revisions"
+      },
+      "MOVE_AND_RENAME": {
+        "state": "BLOCKED_NO_EVIDENCE",
+        "detail": "move/rename aliases: 0; kinds present: {\"symbol_key\":194,\"qualified_name\":194}"
+      },
+      "TREE_NODE_OCCURRENCE_UNIQUE_TO_SYMBOL": {
+        "state": "VIOLATED",
+        "detail": "22 tree nodes are attached to more than one stable symbol"
+      }
+    },
+    "noFuzzyOrLatestSubstitutionInThisAudit": true
+  },
+  "chain": "stableFileId -> symbolId -> symbolVersionId -> treeNodeId",
+  "fileLevelGap": "S01-08 = STABLE_FILE_ID_OWNER_MISSING: the top of the chain has no owner; upstream_file_id is populated on 0 versions.",
+  "writers": {
+    "note": "static scan; liveness UNKNOWN",
+    "evidence": [
+      {
+        "file": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+        "exists": true,
+        "writesRegistry": true,
+        "writesVersions": false,
+        "writesAliases": false,
+        "mentionsWorkspacePlaceholder": false,
+        "classification": "UNKNOWN"
+      },
+      {
+        "file": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+        "exists": true,
+        "writesRegistry": false,
+        "writesVersions": true,
+        "writesAliases": false,
+        "mentionsWorkspacePlaceholder": false,
+        "classification": "UNKNOWN"
+      },
+      {
+        "file": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+        "exists": true,
+        "writesRegistry": true,
+        "writesVersions": false,
+        "writesAliases": false,
+        "mentionsWorkspacePlaceholder": false,
+        "classification": "UNKNOWN"
+      }
+    ]
+  },
+  "coverage": {
+    "registrySymbols": 10504,
+    "symbolsWithVersionRows": 479,
+    "admissibleVersions": 0
+  },
+  "safety": {
+    "databaseWrites": 0,
+    "registryWrites": 0,
+    "schemaChanges": 0,
+    "graphifyRun": false,
+    "readerCutover": false,
+    "inputIdentityBackfill": false,
+    "vectorWrites": 0,
+    "graphWrites": 0,
+    "cacheWrites": 0,
+    "newIdentityNamespaceCreated": false,
+    "transaction": "REPEATABLE READ READ ONLY, ROLLBACK"
+  },
+  "receiptChecksum": "sha256:204e0420ec95b7b7c5d557758661bb944cdf07e5f39b2f0ab54f91409213eaae"
+}

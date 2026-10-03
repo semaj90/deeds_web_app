@@ -2,7 +2,6 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/embedding/embed.js';
-import { persistCanonicalSemanticPacketEmbedding } from '$lib/server/embedding/semantic-packet-writer.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';
 
@@ -107,23 +106,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			console.warn(`Failed to cache embedding for ${resolvedPacketKey}:`, e);
 		}
 
-		// 4. Persist canonical lineage in Postgres only for real semantic embeddings.
-		// Deterministic fallback vectors stay cache-only and must not become
-		// authoritative semantic lineage.
+		// Canonical packet persistence is intentionally closed here. This route
+		// does not possess a server-owned admitted execution/source binding, so it
+		// must not call the nullable legacy writer or create current packet
+		// authority from an embedding request alone. The strict
+		// persistAdmittedSemanticPacketEmbedding() path remains the only eligible
+		// writer once an authoritative producer is wired. Embeddings may still be
+		// returned and cached; fallback vectors remain cache-only.
 		if (isRealSemanticEmbedding) {
-			try {
-				await persistCanonicalSemanticPacketEmbedding({
-					packetKey: resolvedPacketKey,
-					sourceRef: sourceRef || resolvedPacketKey,
-					treeNodeId: treeNodeId || null,
-					titleId: titleId || null,
-					sourcePath: sourceRef || resolvedPacketKey,
-					vector: embedding,
-				});
-			} catch (e) {
-				// Non-blocking: cache write succeeded even if Postgres fails
-				console.warn(`Failed to persist packet ${resolvedPacketKey}:`, e);
-			}
+			console.info(`Canonical packet persistence deferred: admitted lineage required for ${resolvedPacketKey}`);
 		}
 
 		return json({ embedding, cacheHit, duration });

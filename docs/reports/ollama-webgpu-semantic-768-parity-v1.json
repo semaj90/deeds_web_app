@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ollama-webgpu-semantic-768-parity.v1",
-  "generatedAt": "2026-08-29T05:55:24.575Z",
+  "generatedAt": "2026-09-15T20:09:06.783Z",
   "readOnly": true,
   "candidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
   "ordinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
@@ -96,6 +96,66 @@
       "maxAbsDelta": 0.6892932433999328,
       "ollamaDimensions": 768,
       "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 9,
+      "sourceRef": "docs/atlas/cluster-cards.json",
+      "renderedInputChecksum": "sha256:c2f1389631a29edf460b52dcd02fca79ae73728a0e264ccd651fe692847130ce",
+      "tokenCount": 512,
+      "ollamaCosineWebGpu": -0.059548649981670844,
+      "maxAbsDelta": 0.7158177818873597,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 10,
+      "sourceRef": "crates/atlas_packet_parser/build.rs",
+      "renderedInputChecksum": "sha256:4e248c2f940ccbc0d250ed779ea559144d311e2c4fba24d1a248d2c51630aaae",
+      "tokenCount": 31,
+      "ollamaCosineWebGpu": -0.038404851288568534,
+      "maxAbsDelta": 0.6836649087462463,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 11,
+      "sourceRef": "crates/turbovec-napi/package.json",
+      "renderedInputChecksum": "sha256:14e0f576bb909ccfa0b02b828813b9cb716ea33c9f5898e62eca59bfed7e456c",
+      "tokenCount": 259,
+      "ollamaCosineWebGpu": -0.04712373393130215,
+      "maxAbsDelta": 0.6895428156228272,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 12,
+      "sourceRef": "crates/atlas_packet_parser/wrapper.d.ts",
+      "renderedInputChecksum": "sha256:fa3a6ccd106222e888d8bfbd9fea8279a2a869b0e8a0a4585d23d82ea8817f0d",
+      "tokenCount": 108,
+      "ollamaCosineWebGpu": -0.025133956349492587,
+      "maxAbsDelta": 0.7159198946264649,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 13,
+      "sourceRef": "docs/atlas/native-gemm-deferral.md",
+      "renderedInputChecksum": "sha256:9c32dbed675c783cb93bcfe4f3cc6913cfae0bb62cbd0f360cab430d5c585fe2",
+      "tokenCount": 175,
+      "ollamaCosineWebGpu": 0.0740490709710753,
+      "maxAbsDelta": 0.5972119346237182,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
+    },
+    {
+      "candidateOrdinal": 14,
+      "sourceRef": "crates/turbovec-napi/build.rs",
+      "renderedInputChecksum": "sha256:4e248c2f940ccbc0d250ed779ea559144d311e2c4fba24d1a248d2c51630aaae",
+      "tokenCount": 31,
+      "ollamaCosineWebGpu": -0.038404851288568534,
+      "maxAbsDelta": 0.6836649087462463,
+      "ollamaDimensions": 768,
+      "webgpuDimensions": 768
     }
   ],
   "writes": {
@@ -103,8 +163,13 @@
     "qdrant": false,
     "valkey": false
   },
-  "status": "BLOCKED",
-  "errors": [
-    "WEBGPU_LOCAL_EXPORT_CONTEXT_LIMIT_512:628"
-  ]
+  "status": "PARITY_MEASURED_NOT_PROMOTED",
+  "errors": [],
+  "summary": {
+    "count": 15,
+    "minCosine": -0.07780500921840541,
+    "meanCosine": -0.030032535157062012,
+    "maxCosine": 0.0740490709710753,
+    "outputContract": "LAST_HIDDEN_STATE_MEAN_POOL_L2"
+  }
 }

@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.pgvector-coverage-plan.v1",
+  "generatedAt": "2026-09-29T17:30:44Z",
+  "status": "COVERAGE_PLAN_PROVEN_NO_ROWS_ADMISSIBLE",
+  "source": {
+    "table": "public.codebase_chunk_index",
+    "semanticColumn": "content_embedding",
+    "semanticRepresentation": "semantic_768",
+    "authorityTable": "public.atlas_workspace_source_bindings",
+    "authorityReceipt": "docs/reports/current-source-authority-cohort-v1.json",
+    "admissionReceipt": "docs/reports/workspace-revision-tournament-admission-v1.json",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "authorityReceiptStatus": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+    "admissionStatus": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED"
+  },
+  "measurement": {
+    "transaction": "REPEATABLE READ READ ONLY; ROLLBACK",
+    "writesPerformed": false,
+    "embeddingCalls": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "graphWrites": 0,
+    "rowsTotal": 274465,
+    "rowsMissingSemantic768": 219296,
+    "missingRowsWithExactAdmittedParentFileDigest": 169003,
+    "missingRowsWithoutExactAdmittedParentFileDigest": 50293,
+    "exactParentDigestRowsWithChunkSourceRevisionMatch": 0,
+    "exactParentDigestRowsWithWorkspaceRevisionMatch": 0,
+    "exactParentDigestRowsWithRepresentationRevision": 0,
+    "exactParentDigestRowsMarkedEmbeddingEligible": 0,
+    "provenRowsEligibleForBackfill": 0
+  },
+  "classification": {
+    "currentWorktreeFreshness": {
+      "status": "NOT_REMEASURED",
+      "lastObserved": "DRIFT_PRESENT",
+      "lastObservedAt": "2026-09-26T17:03:01Z",
+      "note": "The admitted snapshot proves historical source authority, not that the live worktree still matches it."
+    },
+    "generatedSource": {
+      "status": "UNPROVEN_NO_CANONICAL_FLAG_OR_POLICY",
+      "authoritativeFieldPresent": false,
+      "authoritativePolicyRevision": null
+    },
+    "nonAuthoritativePathHeuristicsForExactParentDigestRows": {
+      "generatedOrDependencyPath": 114,
+      "testOrFixturePath": 12648,
+      "otherPath": 156241,
+      "authoritative": false
+    },
+    "interpretation": "Exact parent-file digest agreement is not chunk-level source/workspace/representation provenance. Zero rows are admitted for embedding backfill."
+  },
+  "resourceGuard": {
+    "fullDryRunStatus": "REFUSED_INSUFFICIENT_RESOURCE_HEADROOM",
+    "freeDiskGiB": 5.34,
+    "freeMemoryGiB": 2.99,
+    "requiredFreeDiskGiB": 8,
+    "requiredFreeMemoryGiB": 4,
+    "writesPerformed": false
+  },
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "safeNextCommand": "After the resource guard passes, rerun npm run atlas:docs:pgvector-chunk-stream-dry-run to refresh the streaming receipt; do not backfill until chunk-level source, workspace, representation, and generated-source policy evidence is admitted."
+}

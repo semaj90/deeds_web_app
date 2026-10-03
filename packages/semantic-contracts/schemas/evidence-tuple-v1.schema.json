@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.deeds.legal/schemas/evidence-tuple/1.0.0",
+  "title": "Evidence Tuple v1",
+  "description": "Content-addressed tuple with an exact raw-evidence byte-span pointer. It is derived evidence, not canonical truth or an inference optimization. Consumers must additionally enforce byte_end > byte_start.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "event_id",
+    "subject",
+    "predicate",
+    "object",
+    "session_id",
+    "source_path",
+    "byte_start",
+    "byte_end",
+    "raw_sha256",
+    "severity"
+  ],
+  "properties": {
+    "schema": { "const": "atlas.evidence-tuple.v1" },
+    "event_id": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the canonical JSON representation of all envelope fields except event_id."
+    },
+    "subject": { "type": "string", "minLength": 1 },
+    "predicate": { "type": "string", "minLength": 1 },
+    "object": { "type": "string", "minLength": 1 },
+    "session_id": { "type": "string", "minLength": 1 },
+    "source_path": { "type": "string", "minLength": 1 },
+    "byte_start": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+    "byte_end": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+    "raw_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the exact UTF-8 source byte span [byte_start, byte_end)."
+    },
+    "severity": { "type": "string", "minLength": 1 }
+  }
+}

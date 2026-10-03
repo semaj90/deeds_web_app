@@ -1,5 +1,149 @@
 # Legal AI Platform — Claude Project Instructions
 
+## Current runtime and ACE/BitFrost status (2026-09-28; supersedes stale July status below)
+
+- **Current semantic storage contract (2026-09-27 correction):** the active PostgreSQL
+  `semantic_768` physical owner is `codebase_chunk_index.content_embedding_768` (`vector(768)`), per
+  the current repository instructions. `semantic-representation-v1.ts` and its receipts retain
+  their historical `content_embedding` (`halfvec(768)`) coordinate; new bindings use the additive
+  V2 contract. Physical presence in either column does not prove source, tokenizer, model, or
+  representation lineage. Do not rewrite historical receipts or treat the old readiness audit as
+  proof for the V2 owner.
+- **Native Windows CUDA/LibTorch startup build (2026-09-27):** the reviewed forced rebuild of
+  `tensorrt_bridge.node` completed configure, compile/link, addon-existence, and GPU-load probing
+  successfully on the existing RTX 3060 Ti / sm_86 lane using CUDA 13.0.48 and LibTorch
+  `2.9.0+cu130`. `scripts/startup/build-cuda-libtorch-on-startup.mjs` now reports the distinct
+  `CONFIGURE_OK`, `BUILD_OK`, `ADDON_EXISTS`, and `PROBE_EXIT_OK` stages, and its inline probe exits
+  explicitly after checking CUDA availability. This resolves the reported stale-invocation failure
+  for that existing lane; it is not a CUDA 13.4/TensorRT-RTX build, a 13.2.2 migration, or proof of
+  production inference. Keep those challenger/migration decisions separate and preserve the
+  working CUDA 13.0 + cu130 path.
+
+- **Synthesis/tool-use model:** Ornith 1.5 9B on llama-server `:8090`; resolve its active model
+  through the runtime model resolver. Ornith is not the semantic embedding writer. TRACE MCP has a
+  separate startup task (`:8788`); it is not part of `graphify:daily:chain`. The checked-in MCP
+  configs do not register a Docker MCP server. Do not expose generic `shell.run` or Docker control
+  to the model; keep operations typed and governed.
+- **Bifrost != BitFrost:** Bifrost is the inference/MCP gateway. BitFrost is the disposable
+  Valkey-backed residency/cache policy. A `gpu:karpathy:*` cache write or a healthy Bifrost service
+  is not proof that revision-qualified ACE packets were admitted to BitFrost.
+- **Daily Graphify and TRACE MCP are separate startup paths:**
+  `sveltekit-frontend/package.json` defines `graphify:daily:chain` as an apply sequence ending in
+  `scripts/atlas/graphify-daily-ace-packet-step-v1.mjs`. The root startup wrapper runs the
+  projection-admission gate before that apply chain; while admission is `NOT_SAFE_TO_PROJECT`, it
+  fails closed before the chain mutates projections. The final ACE step itself only repeats the
+  gate, performs a read-only eligible-packet count, and writes a local receipt; it does no
+  Postgres/Qdrant/Valkey packet writes and reports `PACKET_COMPOSITION_NOT_WIRED`. TRACE MCP starts
+  independently on its own task. A successful Graphify or TRACE startup is not an ACE packet/cache
+  promotion receipt.
+- **ACE incremental startup is manual, not folder-open automation:** the existing
+  `sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs` and
+  `config/startup-ace-policy.json` are real, but the orchestrator can run indexing/graph/cache
+  operations, spawn services, and prune stale PostgreSQL rows. Its `startup:ace:detached` alias is
+  now wired for an explicit operator-requested VS Code task; the task no longer runs automatically
+  on folder open or as a prerequisite of the Atlas smoke. The four previously reported silent
+  folder-open script failures are therefore resolved as three aliases plus this manual-only
+  reclassification—not by enabling a broad mutating startup chain.
+- **Hit-demand is implemented, but is not semantic/token-cache warming:** the
+  `ace:hit-demand` and `ace:hit-demand:dry` npm aliases point to the existing
+  `sveltekit-frontend/scripts/seed-hit-demand.mjs`; `context-for-file.ts::loadHitDemand()` consumes
+  its `{hits, hot_score, last_hit_at, avg_rerank}` values. The apply script aggregates recent
+  `chunk_hit_log` rows by normalized relative path and atomically replaces Redis
+  `ace:rank:demand` (one-hour TTL; a separate 24-hour high-water mark). The folder-open task can
+  therefore make a real Redis write. This is a coarse demand-ranking hint, not a tokenizer/model
+  token cache, revision-qualified ACE packet, BitFrost residency admission, or embedding trigger.
+  Its current path-keyed payload lacks the source/workspace/representation identity needed to claim
+  canonical warming. The old “missing command/implementation” notes below are historical; the
+  2026-09-28 follow-up records the alias fix and bounded live test.
+- **Existing packet, RPC, and prompt owners:** `packages/parent-atlas` provides
+  `buildAcePacketV3`; SvelteKit provides `AcePacketWriter.writeRevisionQualifiedV3ToBitfrost` and
+  revision-aware write helpers. The HyperRAG Packet RPC is also real: retrieval logic lives in
+  `src/lib/server/retrieval/hyperrag-packet-rpc.ts` and is exposed by
+  `src/routes/api/hyperrag/packet-rpc/+server.ts` (with additional routes). Separately, the live
+  OpenAI facade calls `assembleACEContext()` and `buildACEPromptCached()` before synthesis. Do not
+  conflate retrieval RPC packets, request-time prompt context, and persistent `AcePacketV3` cache
+  objects: the missing link is a proven admitted producer/caller that binds current
+  `ContextManifest` and packet/source/representation identity, derives the exact
+  `embedAllowedPacketKeys`, calls the BitFrost writer, and verifies readback. Do not create a second
+  packet schema, generic RPC registry, or cache owner to fill that gap.
+- **LangGraph/TRACE boundary:** TRACE MCP owns registered typed tool transport/execution; the
+  LangGraph bridge should only admit an already-executed result into bounded dispatcher state. The
+  current `src/mcp/langgraph-bridge.ts` is legacy Headroom code: it budgets serialized characters
+  rather than UTF-8 bytes, truncates arbitrary result/state JSON, can discard low-confidence state,
+  and has a last-resort summary fallback. `ensureSchema()` also creates a table at runtime. This is
+  not the settled V2 policy: keep identity, active DAG dependencies, required evidence refs, and
+  ContextManifest checksums pinned; prune only optional/disposable references; use artifact/receipt
+  refs for large outputs; fail closed if required state exceeds budget. Do not expose generic
+  `shell.run` or Docker control to Ornith; retain typed, operator-gated `ops.*` operations.
+- **Packet wire format and identity:** ACE packet JSON is a bounded descriptor/envelope, not a
+  container for 768-float vectors or bulk feature arrays. Preserve canonical `packet_key` and
+  source/revision identity; UUIDs are used only in their declared lifecycle roles and are not
+  interchangeable with packet keys, ordinals, Qdrant IDs, or checksums. Large numeric payloads use
+  qualified references and Arrow IPC or contiguous mmap/tensor artifacts. This is the existing wire
+  format rule, not a choice between “UUID JSON” and “all-mmap packets.”
+- **Admission remains closed:** the latest recorded
+  `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json` verdict is
+  `NOT_SAFE_TO_PROJECT`; only the ontology-cohort predicate is fully `PASS`. Revision qualification,
+  latent/graph/ordinal manifests, projection checksum alignment, BitFrost key derivability, and ACE
+  evidence grounding remain incomplete or partial. No ACE packet/cache promotion follows from the
+  receipt's existence. The fresh `gan-readonly-live-proof-v1-20260928T022800Z.json` confirms
+  61,718 packet rows read-only, 5 structural `source_ref` failures, and 1,520/1,520 qualified
+  chunks for the named cohort; semantic projection remains `NOT_EXERCISED`, so the overall
+  validation audit remains blocked on that separate lane.
+- **Separate cache path:** the 2026-09-27 startup follow-up proves the admitted Karpathy path wrote
+  `gpu:karpathy:scores` (190 Redis hash fields on its first run). This is a distinct cache family,
+  not `BITFROST-LIVE-WARM-01` proof. The latter remains blocked pending admitted packet identity
+  and a bounded write/readback/expiry canary. The last direct BitFrost cache census in the ledger is
+  dated 2026-09-27; do not present it as a live 2026-09-28 measurement.
+- **MCP configuration:** checked-in MCP configuration does not register a Docker MCP server.
+  Existing TRACE MCP tools and the HyperRAG HTTP Packet RPC are separate surfaces; configuration or
+  process presence alone does not prove a live handshake or authorize Docker/shell control.
+
+### Remaining implementation order
+
+1. `ACE-GATE-RECONCILE-01`: close the receipt-driven blocker table without weakening admission.
+   Keep Graphify apply, Karpathy score-cache enrichment, TRACE MCP startup, and ACE/BitFrost
+   warming as separate outcomes.
+2. `ACE-STARTUP-BOUNDARY-01`: document/test the distinction between the path-keyed
+   `ace:rank:demand` hint and revision-qualified semantic/context warming. The startup alias now
+   exists; the broad ACE incremental orchestrator is manual-only because it has side effects.
+3. `ACE-PRODUCER-TRACE-01`: trace request-time `ContextManifest` through `buildAcePacketV3`, prove
+   packet/source/representation identity, and derive the exact admitted packet-key set. The
+   HyperRAG Packet RPC is an existing retrieval interface, not persistent packet admission.
+4. `ACE-BITFROST-CALLER-01`: only after producer and admission proofs pass, call the existing writer
+   with identity/revision/checksum rejection, no-inline-vector, and one-vote-per-lane fixtures.
+5. `ACE-BITFROST-CANARY-01`: after explicit operator authorization, run one disposable
+   write/readback/TTL-expiry canary. Broader bucket warming and centroid warming require qualified
+   artifact/key derivation and atomic publication/readback.
+6. Connect sealed `LearningOutcomeV1` evidence to OaK judging and DSPy/GEPA in shadow mode only
+   after the TypeScript ContextManifest → Python DSPy guard → TypeScript response boundary is
+   enforced. GEPA optimizes the DSPy program; JEPA is a separate representation-learning idea, not
+   the same optimizer. Ornith remains synthesis/tool proposal, not embedding authority.
+7. Keep the optional breadth/acceleration plane behind qualified events and projections:
+   - HyperLogLog code and warmers exist, but remain approximate breadth telemetry; they never
+     establish identity or replace PostgreSQL counts. Audit the existing writer/read paths before
+     wiring a new event producer.
+   - `CentroidArtifactV1` and its checksum tests exist. Live revision-qualified centroid
+     publication/readback and useful coarse-routing recall are separate proof gates; do not warm a
+     broad bucket just because the artifact type exists.
+   - simdjson N-API parsing, Arrow IPC, and mmap artifact paths already exist. Reuse them for
+     bounded JSON/NDJSON ingestion and bulk numeric transport; do not put vectors in packet JSON or
+     confuse CPU parsing with GPU execution. cuTile stays a measured challenger behind established
+     cuBLASLt/LibTorch/cuVS baselines.
+   - Use existing bounded RLM/OaK DAG and HyperRAG retrieval owners for multi-hop expansion. Do not
+     add a second queue, packet RPC, or fusion owner until a code census proves a missing capability.
+   - Python OAKlib is an ontology adapter/candidate source; OaK is the reasoning/kernel boundary.
+     Neither mints canonical identity; PostgreSQL and the domain/ontology contracts retain that
+     authority.
+8. Evolve LangGraph Headroom separately to reference/revision-aware control state (UTF-8 byte
+   budgets, pinned required evidence, receipt/artifact refs, no arbitrary JSON truncation or
+   emergency summary, migration-owned schema). Keep execution in typed TRACE/OaK operators, not
+   the bridge.
+
+The detailed execution checklist is in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. Historical status banners and
+pipeline snapshots later in this file must not override this current-state note.
+
 > MCP/Atlas status note (2026-08-23, superseded 2026-09-08 by a name-level reconciliation, not just
 > a count refresh): TRACE MCP tool counts are runtime-derived and static-derived measurements of
 > two genuinely different populations — do not cite either as "the" tool count on its own, and do
@@ -224,11 +368,28 @@ archive-not-delete convention, then the column was removed. Do not reintroduce a
 do not cite `gpu:warden:cache:384d:*` Redis keys as live — they predate the drop.
 
 **Autoencoder latent lanes are a separate mechanism from MRL truncation** — a trained encoder
-projection, not a vector prefix — and currently only `latent_256` is real and populated
-(`codebase_chunk_index.latent_256` + Qdrant `codebase_chunks_latent256`, 1:1 with the 768 corpus).
-`latent_64` is schema-only (column exists, zero rows — the autoencoder producing it is untrained).
-`latent_128` does not exist anywhere in this repo (no column, no Qdrant collection) — treat any
-reference to it as a planned/future lane, not a built one, until it's actually verified live.
+projection, not a vector prefix. Corrected 2026-09-16 (via
+`parent-atlas-error-embedding-768-migration` task 7.1/7.2) — the "zero rows"/"does not exist" claims
+below were stale, verified live against Postgres and Qdrant directly, not assumed:
+
+- **`latent_256`**: real and populated — `codebase_chunk_index.latent_256` (55,169 rows) + Qdrant
+  `codebase_chunks_latent256`, 1:1 with the 768 corpus. Unchanged from the prior note.
+- **`latent_64`**: **no longer schema-only.** `codebase_chunk_index.latent_64` now has **1,703**
+  populated rows (verified live `count(latent_64)`, 2026-09-16) — the autoencoder producing it has
+  been run against at least this many rows, contradicting the old "untrained, zero rows" framing.
+  No Qdrant `codebase_chunks_latent64` collection exists yet (verified live via `GET /collections`)
+  — this lane is Postgres-only so far, not yet mirrored to Qdrant.
+- **`latent_128`**: **exists and is substantially populated**, not absent. `codebase_chunk_index`
+  has a real `latent_128` column (halfvec(128)) with **55,169** populated rows — a full match to
+  `latent_256`'s population, derived via a deterministic `SLICE_FIRST_N` + L2-renormalize of
+  `latent_256` (not a new training run, not MRL truncation of the raw 768d vector — see
+  `sveltekit-frontend/drizzle/manual/20260912_latent_128_columns.sql`'s own header comment for the
+  exact distinction). Its `atlas_representation_registry_v3` promotion (`CANDIDATE`→`VERIFIED`) was
+  explicitly, deliberately skipped by that migration's author — the column and data are real, the
+  registry bookkeeping is not. No Qdrant `codebase_chunks_latent128` collection exists yet (verified
+  live) — also Postgres-only so far. A parallel `error_embedding_latent_128` column exists too
+  (error-fixing lane, distinct from this content-embedding lane), currently populated only at
+  smoke-test scale (20 rows) — see that openspec change for the honest partial-completion detail.
 
 **PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
 - **Canonical storage**: Qdrant — **two 768-dim collections currently coexist**,
@@ -239,6 +400,29 @@ reference to it as a planned/future lane, not a built one, until it's actually v
   section 5 before picking one as "the" collection to query or write to.
 - **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 52,380 rows populated as of 2026-08-23)
 - **Retrieval path**: Qdrant ANN → Postgres join by source_ref → optional Neo4j topology expansion
+
+**Live re-verification (2026-09-27, `GET /collections/<name>` against the live Qdrant instance,
+via `docs/reports/qdrant-collection-roles-v1.json`'s regenerated census — this superseded a stale
+0-consumer bug in that same script, see `parent-atlas-qdrant-structural-payload-enrichment/tasks.md`
+`QDRANT-COLLECTION-ROLE-RECHECK-2026-09-12-R2`)**:
+
+| Collection | Live points | Named vectors | Note |
+|---|---|---|---|
+| `codebase_chunks_768` | **328,348** (was 105,762/109,776/40,568 at various earlier dates — real growth, not a typo; update again before citing an old figure) | `content`/`error`/`signature`, all 768-dim Cosine | `ACTIVE_SEMANTIC_PROJECTION` |
+| `codebase_chunks_768_v2` | 52,816 (was 52,380) | `content`/`error`/`signature`, all 768-dim Cosine | `COMPARISON_CHALLENGER`, still `NOT_PROMOTED` — the split below is still unresolved |
+| `codebase_chunks_512` | 53,380 (matches prior 53,379) | single unnamed vector | `SEMANTIC_EXPERIMENT` |
+| `codebase_chunks_256` | **does not exist** | — | confirms the note below is still accurate |
+| `codebase_chunks_128` | **does not exist** | — | confirms the note below is still accurate |
+| `codebase_chunks_latent256` | 55,169 (matches Postgres `latent_256` population exactly) | single unnamed vector | `LEARNED_LATENT_PROJECTION` |
+| `codebase_chunks_latent128` | **does not exist** | — | Postgres `latent_128` (55,169 rows) has no Qdrant mirror yet, per this file's own earlier note — still true |
+| `codebase_chunks_latent64` | **does not exist** | — | Postgres `latent_64` (1,703 rows) has no Qdrant mirror yet, per this file's own earlier note — still true |
+| `codebase_chunks_384` | 1 point | 384-dim | `LEGACY_SEMANTIC`, near-empty as documented |
+| `codebase_chunks_384_hybrid` | 10 points | 384-dim | `LEGACY_SEMANTIC`, near-empty as documented |
+
+Bottom line: the 768/512/latent-256 lanes are real and match (or exceed) what this file already
+claimed; the 256/128 MRL lanes and the latent-128/latent-64 Qdrant mirrors are still genuinely
+absent, not a doc gap — don't build them speculatively without a stated need, per
+`DEPENDENCY-CAPABILITY-GUARD-01`.
 
 **SECONDARY ROUTING LANE(S)**: 512d, 256d, 128d — all MRL-truncated prefixes of the same 768d
 embeddinggemma vector (optional, cost-optimized re-ranking). 384d is retired (see above) — do not
@@ -291,10 +475,15 @@ referenced elsewhere in this doc, since claims about them hadn't been verified a
 - **latent_256** (`codebase_chunk_index.latent_256` halfvec(256) + Qdrant `codebase_chunks_latent256`):
   real and fully live — 55,169 rows/points, a 1:1 match with the 768 corpus.
 - **latent_64** (`codebase_chunk_index.latent_64` vector(64) + would-be Qdrant `codebase_chunks_latent64`):
-  column exists but **zero rows populated**; the Qdrant collection doesn't exist. Schema-only,
-  matches this doc's own note elsewhere that the autoencoder producing it is untrained.
-- **latent_128**: no column, no Qdrant collection — does not exist anywhere in this repo. Any future
-  reference to a "latent128" lane is speculative/planned, not built — verify before citing it as real.
+  at the time of this 2026-08-30 check, zero rows populated, Qdrant collection absent, schema-only.
+  **Superseded 2026-09-16**: now has 1,703 populated rows (verified live) — the autoencoder has
+  since been run against real data; the Qdrant collection is still absent. See the corrected note
+  in this section's earlier "Autoencoder latent lanes" paragraph for current detail.
+- **latent_128**: at the time of this 2026-08-30 check, genuinely absent (no column, no Qdrant
+  collection). **Superseded 2026-09-16**: the column now exists (`halfvec(128)`) with 55,169
+  populated rows, added via `sveltekit-frontend/drizzle/manual/20260912_latent_128_columns.sql` —
+  this 2026-08-30 note's "does not exist anywhere in this repo" is no longer accurate. Qdrant
+  mirror still absent. See the corrected note earlier in this section for current detail.
 - **Dropped `codebase_chunk_index.content_embedding_384` (legacy vector(384))**: verified zero rows
   had 384-only data with no corresponding 768 vector (no data loss), archived all 52,380 populated
   rows to `deeds_labs/archive/2026-08-30/content_embedding_384_backup.csv` per this repo's
@@ -586,8 +775,10 @@ function validateWorkingDirectory(): void {
 ---
 
 ## Last Updated: July 28, 2026 (Cross-Directory Script Safety + Qdrant workspace_id Convention)
-## Status: All services UP ✅ | llama-server hforf.gguf :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
-## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
+## Historical status snapshot (July 2026 — superseded; do not use as current health evidence)
+The following service/pipeline claims were captured in July 2026 and are retained only as history.
+In particular, the “BitFrost 155K keys” and “155,162 keys” counts are not current measurements;
+see “Current runtime and ACE/BitFrost status” above and the dated BitFrost audit receipts.
 
 ---
 
@@ -1036,6 +1227,74 @@ plausible "the codebase probably already does this somewhere" smell):
 (PageRank/projection findings above), `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/`
 (reranker audit + ACP registration, tasks.md sections 6 and 11).
 
+### Correction: "Ewin Tang recommendation" — literal-name search is not proof of absence (Sep 15 2026)
+
+A same-day audit concluded "Ewin Tang's recommendation algorithm doesn't exist anywhere in this
+repo" from `rg -ni --hidden --no-ignore "ewin tang"` returning zero hits. **That conclusion was
+wrong, or at least premature** — a literal-name search proves the *name* isn't used, not that the
+*mechanism* was never built. Real, mechanism-named implementation was found once actually checked:
+`git log --all --oneline` for `python/atlas_compute/low_rank.py` and
+`**/sample-query-matrix-v1.ts` returns real commits — `feat(atlas): add low-rank and Tang-inspired
+comparison receipts`, `feat(atlas): add sample query matrix and length squared sampler`,
+`feat(atlas): prove semantic low-rank parity lineage`, `Repair SampleQueryMatrixV1 merge
+corruption` — plus a whole branch, `agent/ast-xgb-tang-alignment-20260822`. This machinery was
+real: `SampleQueryMatrixV1`, squared-L2/length-square sampling, explicitly gated
+`canonicalIdentityAuthority: false` / `retrievalVoteAdded: false` (challenger/shortlist only,
+never a retrieval vote or identity authority) — architecturally identical to this file's own
+existing governance pattern below.
+
+**CORRECTION, same day, a few hours later — the "two targeted `find`s came back empty" claim above
+was itself wrong.** Those `find`s were run scoped wrong (or against a stale snapshot) — a direct
+`Read`/`git ls-files`/`git log -- <path>` check on the real working tree shows **all three files
+exist right now, on `main`, tracked, non-empty, real**:
+
+```
+python/atlas_compute/low_rank.py                                                    267 lines
+sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.ts            58 lines
+sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.spec.ts       17 lines
+```
+
+**`TANG-LOW-RANK-OWNER-CENSUS-01` — COMPLETE, run for real (2026-09-15)**:
+
+| Field | Finding |
+|---|---|
+| `literalNameHits` | 0 in current tree (outside `.tmp/`/`deeds_labs/archive/` snapshots) — the person's name is still never used in code |
+| `mechanismHits` | 3 current files (above) + the git-log commit trail already cited |
+| `currentFiles` | present, tracked, non-empty, on `main` |
+| `historicalFiles` | same files, same content lineage — no divergence between historical and current |
+| `currentCallers` | **Real.** `recommendation-evidence-bundle-v1.ts:3` imports `SampleQueryMatrixV1Schema` and embeds it as a nullable `sample` field in `RecommendationEvidenceBundle`. `python/prove_atlas_compute.py:30` imports `compare_low_rank_recommendations` from `atlas_compute.low_rank` as a CLI proof-receipt generator (`--low-rank` flag). Neither is a retrieval hot path. |
+| `tests` | Real: `sample-query-matrix-v1.spec.ts` (2 passing-shaped assertions: length-squared probability computation, row-L2 degeneracy detection) |
+| `receipts` | `LowRankComparisonReceipt` / `CandidateShortlistReceipt` (Python, `schema: "atlas.low-rank-comparison-receipt.v1"` / `"atlas.candidate-shortlist-receipt.v1"`, both `canonical_authority: False`); `SamplingDecisionV1` (TS, `canonicalIdentityAuthority: false`, `retrievalVoteAdded: false`) |
+| `productionCaller` | No — challenger/evidence-bundle-only, explicitly gated non-canonical in both languages |
+| `canonicalAuthority` | `false` everywhere it appears — by design, not by omission |
+| `retrievalVoteAdded` | `false` everywhere it appears |
+
+**Verdict: this machinery is real, current, tested, and already correctly classified as
+`EXPERIMENT`/challenger evidence — not dead, not missing, not something to rebuild.** The Sep 15
+"empty find" note above was a false negative from a bad search, not a true absence. Treat this
+file's own §"Duplication Prevention" rule as satisfied for this capability going forward: do not
+build a second low-rank/length-squared-sampling module — this is the one, and it already declines
+canonical authority correctly.
+
+**Separate finding — a stale, more-advanced unmerged branch exists and should NOT be silently
+merged**: `origin/agent/sample-query-matrix-ewintang-20260822` (fetched and diffed against `main`,
+2026-09-15) is NOT an ancestor of `main` and diverges heavily overall (~311KB whole-repo diff, dated
+2026-08-22, predates roughly three weeks of unrelated main-branch churn) — merging it wholesale
+would be reckless and is explicitly NOT done here. But its versions of these 3 files are a real,
+more mature evolution: revision/checksum-qualified (`workspaceRevision`, `sourceMatrixRevision`,
+`sourceMatrixChecksum`), integrates with the real canonical `candidateOrdinalMapV1Schema`
+(`features/canonical-candidate-v1.ts`, confirmed present on `main`), and adds a
+`samplingEvaluationV1Schema` (measures length-squared vs. uniform vs. top-k-row-norm recall — an
+actual evaluation harness, `main` has no equivalent). It also **renames** several fields
+(`canonicalIdentityAuthority`→`identityAuthority`, `retrievalVoteAdded`→`retrievalVoteProduced`,
+adds `canonicalWritesAttempted`/`producerRevision`) and restructures `rows` — a breaking contract
+change relative to `main`'s current shape, which `recommendation-evidence-bundle-v1.ts` already
+depends on by the old names. **This is a real architecture decision (port the improved contract
+forward vs. leave the branch superseded), not a mechanical sync — flagged for the operator, not
+resolved unilaterally.** Cherry-picking just these 3 files' content (not merging the branch) is the
+bounded path if the operator wants the improved version; do not attempt it without confirming every
+other caller of the old field names first.
+
 ### One Canonical Runtime Owner Per Capability (governance layer, Aug 9 2026)
 
 The 6 rules above are the discipline an agent follows in the moment. This section is the
@@ -1111,6 +1370,34 @@ across a multi-phase proof sequence. **Lesson for future probes**: in WSL2, `whi
 `python3 -c "import X"` from a non-interactive shell is NOT evidence an environment is absent —
 invoke the target env's Python by its absolute path (`/home/james/miniforge3/envs/<env>/bin/python`)
 or explicitly `source /home/james/miniforge3/etc/profile.d/conda.sh && conda activate <env>` first.
+
+**Separate cuTile/SIMT challenger found (2026-09-14):** the earlier cuTile proof environment still
+exists at `/home/james/.venvs/atlas-cutile-cu132`; it is not a Miniforge environment and is not part
+of `atlas-rapids-cu13`. Direct WSL2 probing reports PyTorch `2.14.0+cu132`, CUDA `13.2`, cuTile
+`1.5.0`, Tile compiler `13.2.78`, and the RTX 3060 Ti (`sm_86`). The read-only vector-add and
+FP16 GEMM probes pass with finite output; the GEMM receipt reports zero absolute and relative
+delta against the PyTorch result. Use `/home/james/.venvs/atlas-cutile-cu132/bin/python` for
+cuTile/SIMT probes and `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` for RAPIDS/cuVS/
+cuGraph work. Do not merge the environments or add cuTile to Docker 8098 without a separate ABI,
+memory, and reproducibility decision. These are challenger proofs, not canonical representation or
+production decoder promotion.
+
+**Ampere 8 GiB memory alignment (verified 2026-09-14):** the RTX 3060 Ti is compute capability
+`8.6`. Keep the proven WSL2 RAPIDS environment (`/home/james/miniforge3/envs/atlas-rapids-cu13`)
+on the existing 26.06 stack and keep cuTile/SIMT in the separate
+`/home/james/.venvs/atlas-cutile-cu132` venv. Do not load cuDF/cuGraph/cuVS, cuTile, and a large
+decoder concurrently on this 8 GiB device. Start with bounded fixtures, FP16/BF16 where the
+operation has a parity receipt, FP32 accumulation for reductions, and matrix dimensions divisible
+by 8. Preserve explicit host/device ownership and release temporary tensors between stages.
+
+For RAPIDS, use RMM as the common allocator and set a deliberately capped pool only inside a
+measured worker; do not accept the library default of reserving half or all available VRAM when
+other CUDA consumers share the device. For PyTorch fragmentation, test
+`PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` per process and record allocated/reserved/free
+bytes before and after each fixture. These are operational tuning options, not identity or
+promotion evidence. NVIDIA documents cuTile Python support for Ampere in the CUDA 13.2 line,
+while RAPIDS documents RMM pool/async allocation and third-party allocator hooks; use those
+references when re-running the isolated challenger, without changing the canonical semantic lane.
 
 **`GPU-MINI-FABRIC-01`** (full roadmap in `openspec/changes/parent-atlas-gpu-mini-fabric-01/`) is a
 small, synthetic, frozen-fixture GPU proving ground built specifically so that no phase — exact vs
@@ -1369,6 +1656,225 @@ non-gating. **CUB-vs-CPU half is `DRY_RUN_PROVEN`** (see result above); cuTile h
 design.md, specs/, tasks.md — 25/26 tasks done, `openspec validate --strict` passes),
 `docs/reports/ace-radix-01-results.json` (the live benchmark result).
 
+### CUTILE-ACE-01 LEVEL 2 real result: both kernels exact-match their CPU oracles (2026-09-14)
+
+`CUTILE-ACE-01`'s LEVEL 3 fused cuTile challenger was gated behind LEVEL 1 (`ACE-RADIX-01`'s CUB
+oracle, already `DRY_RUN_PROVEN`) AND "LEVEL 2 simple custom CUDA glyph-score + residency-key-pack
+kernels," which had never been built. `parent-atlas-cutile-ace-level2` built and proved both:
+
+- **`GlyphScoreV1`** — a brand-new pure-integer scoring formula over `PacketGlyphV1` fields
+  (`pagerankQuantized×4 + recency×3 + residency×257×2 + lod×257×1 + popcount(featureBits)×50 +
+  popcount(flags)×50`), deliberately excluding `somCell` (never retrieval truth) and
+  `projectionOrdinal` (non-canonical GPU-local coordinate) as scoring inputs. No prior formula
+  existed anywhere in this repo for this — verified via `rg` before designing it. CPU oracle:
+  `scripts/atlas/ace-radix-01/glyph-score-v1.mjs` (8 unit tests, all passing, including a
+  hand-computed spot check and both field-exclusion isolation tests).
+- **`ResidencySortKeyV1` GPU packing** — not a new formula: computes the SAME
+  `(tier<<56)|(lod<<48)|(utilityBucket<<40)|(recencyBucket<<32)|projectionOrdinal` packing
+  `scripts/atlas/ace-radix-01/fixture-v1.mjs` already computes on CPU for `ACE-RADIX-01`'s
+  fixtures, just from raw glyph fields on GPU instead of pre-packed input.
+
+**Result: `DRY_RUN_PROVEN`** — both kernels (`native/cutile-ace-level2/glyph_kernels_bench.cu`)
+exactly matched their CPU oracles at all 3 tested fixture sizes (256, 1000, 4000), real runs on
+this host's RTX 3060 Ti, CUDA 13.0, sm_86: `docs/reports/cutile-ace-level2-results.json`. **LEVEL 1
++ LEVEL 2 are both now proven** (`cutile_ace_01_level3_unblocked: true` in that report), but LEVEL
+3 itself was NOT attempted — it still requires a CUDA 13.2+ host with a real cuTile programming API
+(`ACE-RADIX-01`'s own prior finding: this dev host's native Windows CUDA 13.0 toolkit only ships a
+compiler-intrinsic stub, `crt/cuda_tile.h`). "Unblocked" means the prerequisite proofs are done, not
+that LEVEL 3 has been run or would necessarily pass — do not cite this as LEVEL 3 being complete.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level2/`
+(proposal.md, design.md, specs/, tasks.md), `docs/reports/cutile-ace-level2-results.json`,
+`native/cutile-ace-level2/glyph_kernels_bench.cu`,
+`scripts/atlas/ace-radix-01/glyph-score-v1.mjs`.
+
+### CUTILE-ACE-01 LEVEL 3 real result: DRY_RUN_PROVEN via the Python cuda.tile API, after a genuine C++ toolchain dead end (2026-09-14, same day)
+
+LEVEL 3 (the fused cuTile challenger) WAS attempted this same day, in two stages, both worth
+knowing about — a real dead end, then a real pass.
+
+**Stage 1 — C++ `cuda_tile.h` attempt: `BLOCKED_TOOLCHAIN_VERSION_SKEW`, not attempted-and-passed.**
+WSL2's `atlas-rapids-cu13` conda env genuinely ships a real 4064-line `cuda::tiles` C++20 API
+(confirmed live, not a stub) — but that alone does not mean WSL2 can compile cuTile device code.
+The fused kernel (`native/cutile-ace-level3/glyph_fused_tile.cu`) compiles with **zero C++ frontend
+errors** after finding and fixing 6 real API-usage errors via actual compiler diagnostics
+(`__tile_global__` vs `__global__`, `cuda::tiles::bid()` vs `blockIdx`, no `popcount` builtin,
+tile-code cannot call plain `__device__`/`__host__` helper functions, `constexpr` vs `__device__
+__constant__`) — but device-code generation is blocked by a genuine cross-version toolchain skew:
+the only `tileiras` Tile-IR backend compiler anywhere on this WSL2 filesystem is CUDA 13.2 (from
+the separate `atlas-cutile-cu132` pip venv), while the header/frontend is CUDA 13.3. Root-caused
+past a simple CLI-flag mismatch (`-arch=sm_86` vs the correct `--gpu-name=sm_86`) all the way to
+the `.tilebc` intermediate bytecode itself: CUDA 13.3's `cicc` encodes the target architecture in a
+form ("86") that CUDA 13.2's `tileiras` rejects outright, even though `sm_86` is confirmed present
+in that `tileiras`' own embedded architecture table. Full trail:
+`docs/reports/cutile-ace-level3-attempt-v1.json`,
+`sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3/`.
+
+**Stage 2 — Python `cuda.tile` API: `DRY_RUN_PROVEN`.** Before attempting to install a
+matched-version `tileiras`, checked whether `atlas-cutile-cu132`'s venv already had a coherent
+alternative — it does: a real, documented Python package (`cuda_tile==1.5.0`, decorator-based
+`@ct.kernel`/`ct.launch` API, `help()`-documented unlike the C++ header). **Correction (same-day
+external review, applied precisely — this is a distinct programming model, not merely a different
+frontend to the same one)**: `cuda.tile` is the **CUDA Tile programming model**; LEVEL 2's
+`glyph_kernels_bench.cu` is the **SIMT programming model**. NVIDIA treats these as distinct
+execution spaces — Tile kernels expose block/tile-level parallelism and deliberately hide
+individual threads, and intra-kernel SIMT/Tile mixing is not the model (they can consume the same
+buffers and implement the same semantic contract across separate kernels, which is exactly what
+LEVEL 2 and LEVEL 3 do here). `ct.mma()`/`ct.mma_scaled()` are real Tile matrix operations, but
+their existence does not make a Tile kernel "SIMT-aware" — that framing was wrong and is retracted.
+What the evidence actually supports: the `atlas-cutile-cu132` venv has `cuda.tile==1.5.0` with a
+**matching TileIR backend available**, giving a coherent Python Tile toolchain with sm_86 runtime
+execution proven — not a claim about `nvcc` being the Python frontend's compiler (cuTile Python has
+its own Python→Tile compilation pipeline; `tileiras` can be supplied directly in that environment).
+A minimal elementwise-add smoke test passed first (`torch.allclose`, exact), then the real fused
+kernel (`native/cutile-ace-level3/glyph_fused_tile.py`) was ported and verified:
+
+- **Result: `DRY_RUN_PROVEN`** — exact match against the same CPU oracle at all 3 tested fixture
+  sizes (256, 1000, 4000), real execution on this host's RTX 3060 Ti (sm_86/Ampere), via PyTorch
+  2.14.0+cu132 tensors as device buffers. `docs/reports/cutile-ace-level3-results.json`.
+- 3 more real API errors found and fixed while porting: `ct.bid(0)` takes an explicit axis (not a
+  C++-style `uint3.x`); `ct.store(array, index, tile)`'s positional argument order differs from a
+  naive guess; and `ct.floordiv` on `uint32` tiles hits a genuine backend codegen limitation
+  (`rounding mode 'negative_inf' is not allowed with 'unsigned' flag`) — worked around by dividing
+  as signed `int32` then casting back to `uint64`; range-proven safe (not merely "non-negative") by
+  `CUTILE-ACE-BOUNDARY-01` below, since the real field width is `uint16` (max 65535), far below
+  `INT32_MAX`.
+- **This supersedes the C++ attempt for the LEVEL 3 *gate*, but does not retract or invalidate its
+  finding, and is not "the same implementation via a different language."** The
+  CUDA-13.3-header/CUDA-13.2-`tileiras` skew in the C++ path is real and still unfixed. The Python
+  Tile kernel is a distinct, independently-proven implementation of the same semantic contract.
+- **Not claimed**: any fusion *performance* benefit (fewer kernel launches, less memory traffic,
+  lower latency) versus LEVEL 2's two separate SIMT kernels — only fusion *correctness* was
+  measured (see `CUTILE-ACE-PERF-01` as a distinct, optional, not-yet-attempted follow-up below).
+  All 3 GPU-primitive levels (CUB oracle, SIMT, Tile) are now `DRY_RUN_PROVEN` for this
+  capability — the first time this proving-ground has completed its full LEVEL 1→2→3 ladder.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3/`
+(the blocked C++ attempt), `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-level3-python/`
+(the successful Python attempt), `docs/reports/cutile-ace-level3-attempt-v1.json`,
+`docs/reports/cutile-ace-level3-results.json`, `native/cutile-ace-level3/glyph_fused_tile.cu`,
+`native/cutile-ace-level3/glyph_fused_tile.py`.
+
+**CUTILE-ACE-BOUNDARY-01 follow-up (same day) — closed the one real gap in the above: the
+signed-division workaround's safety was asserted, not proven.** External review correctly flagged
+that `glyph_fused_tile.py`'s `ct.floordiv(ct.astype(pagerank_t, ct.int32), 257)` workaround (for a
+real `cuda.tile` backend limitation rejecting unsigned floor-division) was justified only by "all
+operands here are non-negative" — true but incomplete, since a non-negative `uint32` can still
+exceed `INT32_MAX` and wrap when cast to `int32`. Built an explicit 26-glyph boundary fixture
+(`scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs` — `pagerankQuantized`/`recency` swept through
+{0, 1, 256, 257, 258, 65535}, `featureBits`/`flags` bit-pattern extremes, `lod`/`residency`
+`uint8` bounds, `projectionOrdinal` `uint32` bounds, plus dedicated all-zero and all-max glyphs) and
+ran it through all 3 lanes — CPU oracle, LEVEL 2 CUDA C++, LEVEL 3 Python `cuda.tile` — **all exact
+match at every row**. The real field contract, established directly from `fixture-v1.mjs`'s own
+docstring and `PackedGlyphInputV1`'s `uint16_t` declaration: both fields are `uint16` (max 65535),
+roughly 32,767× smaller than `INT32_MAX` — the cast can never overflow for any value either field
+may legally hold. This also closes the separately-recorded "CUDA boundary-value tests not pursued"
+gap for LEVEL 2, which previously only had seeded-random coverage. Result:
+`docs/reports/cutile-ace-boundary-01-results.json`.
+
+**Frozen capability-ladder status for this glyph-scoring/residency-key-packing capability**
+(supersedes any earlier "LEVEL 3 not attempted" framing, and — per the same external review that
+caught the SIMT-aware/nvcc-frontend wording issues above — is named by **programming model**, not
+by implementation language, since the C++ attempt was never a peer LEVEL 3, only an alternate
+frontend to the same Tile level):
+
+```
+GPU-PRIMITIVE LEVEL LADDER (atlas-glyph-score-v1 / atlas-residency-key-pack-gpu)
+
+LEVEL 1 — ORACLE           CPU/CUB, semantic reference                          PROVEN
+LEVEL 2 — SIMT              CUDA C++, separate GlyphScore + ResidencySortKey     DRY_RUN_PROVEN
+                             kernels, boundary-value coverage included
+LEVEL 3 — TILE               Python cuda.tile, FUSED GlyphScore +                DRY_RUN_PROVEN
+                             ResidencySortKey kernel, boundary-value coverage
+                             included, signed-division workaround range-proven
+LEVEL 3 C++ IMPLEMENTATION  optional alternate frontend (cuda_tile.h)           PROVEN_BLOCKED
+                             (BLOCKED_TOOLCHAIN_VERSION_SKEW) — not required
+                             for LEVEL 3 semantic completion, deliberately not
+                             reopened; re-audit only if a CUDA-13.3-matched
+                             `tileiras` becomes available in this environment
+```
+
+Exact-match evidence for LEVEL 3: score parity and residency-key parity, N = 256/1000/4000 plus a
+26-row boundary fixture (all-zero glyph, all-max glyph, per-field extremes), sm_86 RTX 3060 Ti.
+
+**Not yet attempted, deliberately separate from the above (optional)**: `CUTILE-ACE-PERF-01` — a
+LEVEL 2 (two SIMT kernels) vs LEVEL 3 (one fused Tile kernel) performance comparison (kernel-only
+latency, end-to-end latency, launch count, H2D/D2H bytes, peak VRAM, throughput, warm vs cold). The
+ladder above proves semantic equivalence across CPU → SIMT → Tile with zero required performance
+outcome — a slower-but-correct LEVEL 3 result would still be a valid, useful result if this gate is
+ever run.
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-cutile-ace-boundary-01/`,
+`docs/reports/cutile-ace-boundary-01-results.json`,
+`scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs`.
+
+### BITFROST-L2-01 real result: v1 methodology was wrong (found via web research), v2 corrected but still inconclusive on this host, plus a real cudaMemGetInfo/nvidia-smi discrepancy (2026-09-14)
+
+`BITFROST-L2-01` (`parent-atlas-gpu-mini-fabric-01` section 10, gated on `AtlasAceResidencyV1`'s
+logical policy being proven — closed by `parent-atlas-bitfrost-sim-01`) benchmarked
+`cudaAccessPropertyPersisting` L2 set-aside for a HOT-tier buffer on this dev host's RTX 3060 Ti,
+Windows-native CUDA 13.0 toolkit (same environment `ACE-RADIX-01`'s CUB oracle used — kept
+separate from the WSL2 `atlas-rapids-cu13` RAPIDS environment, per this file's own "keep the three
+environments separate" rule).
+
+**v1 (superseded, methodology was wrong)**: measured a small persisting buffer in complete
+isolation — no competing memory traffic ever pressured it out of L2, so there was nothing for the
+persistence hint to protect against. `RESULT: DRY_RUN_PROVEN` across 3 runs, but lift was
+**consistently negative** (-4.95%, -3.44%, -1.29%). **Root cause found via web research (NVIDIA's
+own L2-cache-control docs + Lei Mao's independent "CUDA L2 Persistent Cache" benchmark, RTX 3090)**:
+a real benefit only shows up with a **two-buffer design** — the small persisting buffer is
+repeatedly re-accessed via modulo indexing WHILE a much larger "streaming" buffer is also touched
+every kernel launch, creating genuine L2 eviction pressure (Lei Mao's reference: 3MB persistent +
+3MB L2 set-aside + 1024MB streaming → ~20% speedup, 3.071ms→2.443ms, on an isolated GPU).
+
+**v2 (corrected methodology, real 7-run variance study)**: `native/bitfrost-l2-01/l2_persist_bench.cu`
+rewritten with a `streamingReadPersistKernel` implementing that two-buffer pattern. Since
+`cudaMemGetInfo` cannot be trusted on this host (see below), the streaming buffer size is computed
+by `scripts/atlas/bitfrost-l2-01/run-l2-persist-bench.mjs` from a REAL `nvidia-smi` reading (30% of
+free-minus-margin, floor 4 MiB, ceiling 64 MiB), not by the `.cu` binary's own `cudaMemGetInfo`
+call. Ran 7 times across this session under naturally fluctuating live contention (`nvidia-smi`
+free VRAM 138-399MiB, `llama-server.exe` running throughout, streaming buffers auto-sized 11-50MiB
+per run): lift = **+2.05%, +0.07%, -5.09%, +8.98%, -7.07%, +7.09%, -11.34%** — mean **-0.76%**, min
+**-11.34%**, max **+8.98%**, no correlation between sign/magnitude and streaming-buffer size.
+**Conclusion: no measurable net benefit or harm on this host, at this scale** — real GPU
+scheduling/contention noise (±5-11% swings) dominates whatever effect the mechanism might have at
+this scale; this is a genuine noise-dominated null result from 7 real samples, not an
+under-sampled fluke. This is a real, explained limitation: this shared 8GB card's live VRAM budget
+does not currently allow reproducing Lei Mao's 1024MiB streaming-buffer scale (the reference setup
+that showed a clean ~20% speedup on an isolated, dedicated GPU), so the eviction pressure these
+runs could safely generate is far smaller than what demonstrated the effect elsewhere. **Do not
+cite either v1 or v2 as "L2 persistence doesn't work"** — v1's negative result was a methodology
+artifact (nothing to measure); v2's null result is real but scale-limited by this host's
+contention, not a demonstration that the mechanism itself is ineffective.
+
+**Separate, more broadly-relevant finding — root-caused against primary Microsoft documentation
+(2026-09-14, not left as inference)**: `cudaMemGetInfo()` inside the CUDA process reported
+**~6.68GB free VRAM** in v1, while `nvidia-smi.exe` (queried immediately before/after, outside the
+CUDA process) reported only **~140-400MB free** — reproduced across all 10 runs so far (3 v1 + 7
+v2), not a one-off fluke. Two mechanisms found via web research, of different magnitude: (1) an
+NVIDIA-forum-confirmed CUDA-context-overhead effect (`cudaMemGetInfo` reports free memory AFTER
+context creation, `nvidia-smi`/`nvmlDeviceGetMemoryInfo` BEFORE) — real, but only tens-to-hundreds
+of MB, far too small to explain a ~6GB gap; (2) the actual primary mechanism, confirmed directly
+against **Microsoft's own WDDM 2.0 documentation** (`learn.microsoft.com/.../gpu-virtual-memory-in-
+wddm-2-0`, `IDXGIAdapter3::QueryVideoMemoryInfo`): WDDM assigns each process an OS-controlled
+**`Budget`** that the process "should target," and Microsoft's own docs state this budget
+"represents total available memory (dedicated + shared)" — i.e. it legitimately includes capacity
+the OS plans to make available via oversubscription/shared-system-memory paging, not a strict
+physically-free-right-now figure. `cudaMemGetInfo` on Windows derives its "free" figure from this
+WDDM `Budget` concept; `nvidia-smi` reports direct per-process physical VRAM usage. **This means
+any future CUDA work on this host that sizes allocations from `cudaMemGetInfo` alone is not
+getting a true safety guarantee** — it happened to be harmless in every run so far (no crash,
+`llama-server.exe` verified undisturbed every time), but a ~20x-optimistic free-memory figure could
+in principle let a much larger, unsafe allocation through. **Rule for future GPU work on this
+host**: when a real go/no-go VRAM decision matters, query `nvidia-smi` directly (outside the CUDA
+process, e.g. via a wrapper script) rather than trusting `cudaMemGetInfo` alone — see
+`scripts/atlas/bitfrost-l2-01/run-l2-persist-bench.mjs` for the pattern (computes the actual
+allocation size from `nvidia-smi`, records both figures side-by-side in the result JSON).
+
+**See**: `sveltekit-frontend/openspec/changes/archive/2026-09-14-parent-atlas-bitfrost-l2-01/`
+(proposal.md, design.md, specs/, tasks.md), `docs/reports/bitfrost-l2-01-results.json`,
+`native/bitfrost-l2-01/l2_persist_bench.cu`.
+
 ### DEPENDENCY-CAPABILITY-GUARD-01 — no install without a proven capability gap (2026-09-03)
 
 **Invariant: `NO_NEW_CAPABILITY_OWNER_WITHOUT_PROVEN_GAP`.** Never run `pip install`, `conda install`,
@@ -1427,6 +1933,189 @@ cuTile half (this dev host's CUDA 13.0 toolkit only ships a compiler-intrinsic s
 **See**: `docs/reports/runtime-capability-registry-v1.json` (the registry — `wsl::atlas-rapids-cu13`
 and `docker::atlas-gpu-8098` entries, per-capability owner map, the atlas-gpu-8098 over-install
 finding and its minimal-rebuild target, prohibited-duplicate-owner list).
+
+### CUDA 13.x multi-lane strategy: TensorRT-RTX 1.6 / CUDA 13.4 — DIRECTION ONLY, not started (2026-09-27)
+
+**Stated plan, nothing installed yet — verified live on this host**: only CUDA `v12.8`/`v13.0` exist
+under `NVIDIA GPU Computing Toolkit/CUDA/`, `CUDA_PATH` still points at `v13.0`, and no
+TensorRT-RTX installation was found anywhere on disk. The proven native lane (RTX 3060 Ti/sm_86,
+CUDA 13.0, LibTorch `2.9.0+cu130`, `tensorrt_bridge.node`) is untouched.
+
+**Rule**: TensorRT-RTX 1.6 (NVIDIA's separate CUDA-13.4-packaged SDK) must land as a **side-by-side
+challenger lane**, never an in-place replacement of the proven CUDA 13.0 lane — do not uninstall
+13.0, do not repoint the existing CMake preset's `CUDA_PATH`/`LIBTORCH_ROOT` at 13.4. LibTorch
+`cu130` and TensorRT-RTX's `cuda-13.4` package are separate binary/toolchain boundaries; TensorRT-RTX
+engines/runtime caches are version-sensitive (tied to GPU SKU, TensorRT-RTX version, CiG state,
+driver) and not forward-compatible across TensorRT-RTX runtime versions — a fresh runtime cache
+must be built per lane, never reused as proof the other configuration works. The 3060 Ti (Turing+)
+is architecturally fine for TensorRT-RTX; the GPU is not the blocker.
+
+**Planned layering** (mirrors this file's existing GPU LEVEL-ladder discipline — challenger proven
+independently before promotion, never silently replacing the working lane):
+
+```
+Native LibTorch lane (KEEP, unchanged)      TensorRT-RTX 1.6 lane (PROVE independently)
+  CUDA 13.0                                   CUDA 13.4
+  LibTorch cu130                              TensorRT-RTX 1.6 cuda-13.4 package
+  existing N-API addon / CMake preset         separate CMake preset + env selection
+                                               new engine/runtime cache
+```
+
+**Required gate before any promotion — `TRT-RTX-1.6-CUDA134-01`** (all must PASS, plus the existing
+CUDA 13.0 + LibTorch cu130 lane must still build and pass independently, unchanged):
+nvcc reports 13.4; RTX 3060 Ti sm_86 compile succeeds; TensorRT-RTX 1.6 DLL loads; a trivial engine
+build succeeds; inference succeeds; a *fresh* runtime cache succeeds (no reused cache as evidence);
+Node native bridge loads with no napi/CUDA DLL resolution conflicts; output parity vs. the current
+reference path; latency and VRAM measured.
+
+**Cross-stack correction (2026-09-27, same day) — CUDA 13.4 is NOT a universal target.** A follow-up
+operator brief proposed a fuller per-stack picture; the two most consequential claims were verified
+live via WebSearch before being recorded here (one of them needed a correction):
+
+| Stack | Verified current state | Target for this repo |
+|---|---|---|
+| **PyTorch/LibTorch** | Confirmed live: PyTorch is removing CUDA 13.0 from its nightly build matrix starting the week of 2026-09-28; **13.2 is becoming stable/default**, **13.4 stays prototype/nightly** (PyTorch 2.14 RFC promotes 13.2 to default PyPI). Confirmed live (2026-09-27) the actual C++ archive exists, not just the Python wheel — `download.pytorch.org/libtorch/cu132/` lists real `libtorch-win-shared-with-deps-{2.12.0,2.12.1,2.13.0,2.14.0}+cu132.zip` (plus a `2.12.0` debug variant). Also confirmed: `developer.nvidia.com/cuda-13-2-2-download-archive` (CUDA Toolkit 13.2 **Update 2**) is a real, Windows-supported download page — the specific patch that fixes the 12.8-13.2.1 compiler bug (see correction below). | Migrate the native LibTorch lane **13.0 → cu132 LibTorch zip + CUDA Toolkit 13.2.2 (Update 2)** — not 13.4, and not bare "13.2" (13.2.0/13.2.1 still carry the bug). **Two separate installs needed for this repo specifically**: the LibTorch zip alone bundles its own CUDA runtime libs (cudart/cublas/etc.) and would be sufficient for a pure-LibTorch consumer, but `simd-bridge/cpp/CMakeLists.txt` also calls `find_package(CUDAToolkit)` and compiles `.cu` files directly via `nvcc` for the `cuda_kernels` static lib — that needs an actual CUDA Toolkit 13.2.2 install on the host, `LIBTORCH_ROOT` and `CUDA_PATH` repointed together, same side-by-side discipline as the TensorRT-RTX lane. |
+| **RAPIDS/cuVS/cuGraph** | Confirmed live: RAPIDS 26.08 officially supports `cuda-version>=13.0,<=13.3` — **13.4 is out of range**, not yet supported. | Keep `atlas-rapids-cu13` (WSL2, per GPU-MINI-FABRIC-01 above) on 13.0-13.3; do **not** move it to 13.4. |
+| **cuTile** | **Checked against two primary sources (2026-09-27) and NOT confirmed — do not cite these claims.** CUDA Toolkit 13.4's own release notes list the "CUDA Tile" and "CUDA Tile IR" sections as **"None"** (no new features for 13.4). The official cuTile Python release-notes page (`docs.nvidia.com/cuda/cutile-python/release_notes.html`) lists only **version 1.0.0** (2025-12-02, "Initial release") — no 1.6 entry exists there. None of the specific features the brief cited (programmatic dependent launch, `ct.insert()`, unchecked memory access option, portable TileIR bytecode export, JAX interop, etc.) appear in either source. Treat "cuTile 1.6 adds CUDA-13.4 features" as unconfirmed/likely inaccurate until a real source is found — GPU-MINI-FABRIC-01 above's "stable on Ampere/sm_86 from CUDA 13.2" remains the only verified cuTile fact in this file. | No independent 13.4 justification currently stands for cuTile — the only confirmed reason for a 13.4 lane in this repo remains TensorRT-RTX. |
+| **TensorRT-RTX** | As established above — 1.6 adds CUDA 13.4 support, sm_86 in range. | The one lane that actually *needs* 13.4 right now. |
+
+**Correction to the brief's own claim**: it cited a PyTorch-disclosed compiler bug (nested thread
+divergence / incorrect reconvergence) as affecting "CUDA versions 12.8 through 13.0, fixed in
+13.2.2" — verified live via WebSearch against NVIDIA's own 13.2 Update 2 release notes: the bug's
+actual affected range is **12.8 through 13.2.1** (not just through 13.0), fixed in **13.2.2**. This
+matters because it means CUDA 13.2 alone (without the .2 update) still carries the bug — the
+correct migration target is specifically **13.2.2 or later**, not merely "13.2."
+
+**Revised lane layout** (supersedes the two-lane framing above — now three purposes, still all
+side-by-side, still nothing installed):
+
+```
+Windows native                          WSL2
+---------------                         ----
+CUDA 13.0 (current, KEEP for now —      atlas-rapids-cu13 (existing, per
+  known compiler bug 12.8-13.2.1;         GPU-MINI-FABRIC-01): CUDA 13.0-13.3,
+  LibTorch cu130 unaffected by that        RAPIDS 26.08, cuVS/cuGraph/cuML —
+  specific bug class per the brief,        do NOT move to 13.4
+  but still the eventual migration
+  source, not destination)
+                                         atlas-cutile-cu132 (existing, per
+CUDA 13.2.2+ (FUTURE migration            GPU-MINI-FABRIC-01): unchanged
+  target for LibTorch — confirmed
+  real artifacts exist: CUDA Toolkit    A future atlas-cutile-cu134 or
+  13.2.2 Update 2 installer (developer.  atlas-torch-cu132 WSL env is a
+  nvidia.com) + libtorch-win-shared-     DIRECTION only if Windows-native
+  with-deps-2.14.0+cu132.zip (download.  13.2.2/13.4 lanes prove insufficient
+  pytorch.org/libtorch/cu132/). BOTH     for a given experiment — not
+  installs needed for this repo (LibTorch
+  zip alone bundles its own CUDA
+  runtime, but tensorrt_bridge.node's
+  own nvcc/CUDAToolkit calls need the
+  Toolkit installed separately). Not yet
+  started; requires its own proof pass
+  before promotion, same discipline as
+  every other lane in this file.
+CUDA 13.4 (challenger — TensorRT-RTX      started here.
+  1.6 only; the cuTile-1.6-on-13.4
+  justification checked out negative,
+  see the table above — no cuTile
+  work belongs on this lane yet)
+```
+
+**Hard rule reaffirmed**: no stack in this repo moves to 13.4 as its canonical/production version
+right now. TensorRT-RTX is the only confirmed 13.4 consumer. LibTorch's real migration target is
+13.2.2+, not 13.4. RAPIDS stays on its already-current 13.0-13.3 range. Each of these is a
+separate, independently-gated proof lane per `DEPENDENCY-CAPABILITY-GUARD-01` above — do not
+collapse them into one "upgrade to 13.4" action.
+
+**Not done in this pass**: no CMake preset, env scaffolding, or install was created — operator
+explicitly deferred to a documentation-only step. CUDA 13.4 and TensorRT-RTX 1.6 installers are
+NVIDIA-site/license-gated downloads; a future session should not attempt to fetch/run them without
+the operator supplying the installer path first.
+
+**Reference docs fetched 2026-09-27**: `docs/.okf/tensorRTX7_26/` — overview, 1.6 release notes,
+Windows prerequisites, and SDK-zip Windows install steps, all mirrored from the live NVIDIA docs
+via `WebFetch` (see that folder's `README.md` for a fidelity caveat — one fetch produced a clearly
+wrong release date, flagged there, not treated as fact). Confirms: CUDA 13.4 support in 1.6,
+Ampere/sm_86 in the supported architecture range, WDDM-only on Windows, and the tightened
+runtime-cache compatibility rule already captured above.
+
+### LIBTORCH-DEPENDENCY-CENSUS-01 — real caller census (2026-09-27, read-only, source/caller only)
+
+**Purpose**: an operator brief proposed that LibTorch may be an `ARCHITECTURALLY_REPLACEABLE`
+convenience backend (a handful of tensor ops), not an irreplaceable architectural owner, and
+proposed a census gate (`rg 'torch::|#include <torch' simd-bridge/cpp` + per-function caller/
+replacement/blocker) before considering any removal. Ran that exact command and traced every
+result to its real TS-side production caller (not just the first bridge file), which the brief's
+own proposed command wouldn't distinguish on its own. **Parity tests, latency, and VRAM
+measurement were NOT run in this pass — this is source/caller mapping only**, per this file's
+Status Language discipline (`NOT_PROVEN` until measured).
+
+`rg 'torch::' simd-bridge/cpp` hits exactly 3 files: `pytorch_graph.cc` (10 exported ops),
+`pytorch_graph_fp16.cc` (3 fp16 variants), `libtorch_graph_impl.cpp` (6 ops + 2 diagnostics).
+`pytorch-graph.ts` and `libtorch-bridge.ts` are themselves thin N-API bridges (confirmed via their
+own docstrings), not production callers — excluded from the "real caller" column below; only
+callers of those bridges count.
+
+**CORRECTED same-day (2026-09-27) — the first pass's "5 zero-caller" claim was wrong, not a real
+finding.** That grep only matched `.fnName(` method-call style (`grep "\.${fn}("`), which misses
+(a) plain identifier calls after a destructured import (`clusterEmbeddings(args)`, no leading dot)
+and (b) direct `addon.fnName(...)` calls in repo-root `scripts/atlas/*.mjs`/`.mts` pipeline
+scripts, which live outside `sveltekit-frontend/src` and were never in scope for that grep's search
+root. A broader `Grep` (bare identifier, whole repo, `*.{ts,js,mjs,mts}`) found real, direct call
+sites for **all 5** — no dynamic/string-keyed dispatch needed to explain any of them, they were
+simply missed by too-narrow a search. Table below corrected accordingly.
+
+| Exported API | Op (LibTorch call) | Real production caller(s) | Possible replacement | Removal blocker |
+|---|---|---|---|---|
+| `pageRankGPU` | `torch::mm` power iteration | `/api/codebase-index/gpu-pipeline`, `master-feature-map.ts`, `route-feature-map.ts` | cuBLASLt SGEMM directly | Low — this GPU PageRank path is arguably already superseded by the canonical NetworkX/cuGraph pipeline (see "NetworkX vs. Neo4j" section above); may be a removal candidate outright, not just a replacement candidate |
+| `attentionScoreGPU` | `torch::mm` + softmax | `libtorch-reranker.ts` → `attention-head-ranker.ts`, `hyperrag-fusion-service.ts`; `karpathy-blend.ts` → 5 files incl. `/api/metrics/retrieval` | cuBLASLt GEMM + custom softmax kernel | Medium — `hyperrag-fusion-service.ts` looks live; Karpathy blend is separately marked LEGACY/REFERENCE ONLY elsewhere in this file (lower priority) |
+| `rewardScoreGPU` | cosine similarity (GRPO reward) | `gpu-pipeline.ts` (2 real routes) | cuBLASLt dot-product/GEMM | Low — GRPO/RL work is `Deferred` per multiple sections of this file |
+| `softmaxGPU` | numerically-stable softmax | `gpu-pipeline.ts` | trivial custom kernel or CPU (small n) | None found |
+| `topKIndicesGPU` | `torch::topk` | `gpu-pipeline.ts` | **CUB `DeviceRadixSort`/top-k** — already `DRY_RUN_PROVEN` in this repo (`ACE-RADIX-01`, see GPU-MINI-FABRIC-01 above) | None — this is the most concrete near-term replacement; the CUB oracle already exists and is proven |
+| `kmeansWithCentroids` | `torch::cdist` k-means | `som-clustering.ts` → 5 admin routes; `kmeans-cluster.ts` → `rg-atlas/run.ts` | RAPIDS cuML KMeans (`atlas-rapids-cu13` WSL2 env already exists) | Medium — cross-process boundary (WSL2 vs. native Windows Node), needs an RPC hop, not a drop-in swap |
+| `trainSOM` | `torch::cdist` SOM training | **Real**: `scripts/atlas/dir-pipeline.mjs:274`, `scripts/atlas/gemma4-semantic-embedding-cache.mts:204` (call itself buggy — see LibTorch-adjacent script-alignment note below), `scripts/atlas/gpu-full-pipeline.mjs:263` — direct `addon.trainSOM(...)` calls, repo-root pipeline scripts outside `sveltekit-frontend/src` | N/A yet — live, not a removal candidate | None currently — genuinely used by 3 pipeline scripts |
+| `autoencoderEncodeGPU`/`autoencoderDecodeGPU` | `tanh(mm)` | `autoencoder-bridge.ts` → `autoencoder-cuvs-bridge.ts`; `topology-projection.ts` → 2 API routes + `encode-768-to-64.ts` | cuBLASLt GEMM (it's one linear layer + tanh — trivially cheap to replace) | Low-technical, but this file's own "Why autoencoder is bypassed" note already flags the underlying weights as untrained/Xavier-random — any replacement needs numeric parity against that (already weak) baseline, not against a good result |
+| `pcaProjectGPU` | `torch::mm` | `autoencoder-bridge.ts`, `topology-projection.ts` | cuBLASLt GEMM (PCA projection is one matmul) | None found |
+| `graphSimilarity`/`graphSimilarityHalf`/`batchCosineSimilarity`(`_fp16`) | cosine similarity | `batch-rerank-orchestrator.ts` → `cuda-graph-caching-bridge.ts`; `prefilter.shadow.ts` → `discover-clusters.ts`, `encoded-cluster-prefilter.ts` | cuVS exact-KNN (already `PASS` in `SEMANTIC-EXACT-PARITY-01`, GPU-MINI-FABRIC-01 above) | Medium — same WSL2/native-process boundary as `kmeansWithCentroids` |
+| `clusterEmbeddings` | k-means (older API) | **Real**: `/api/codebase-index/cluster-assign/+server.ts` (live API route), `/api/codebase-index/cluster-detect/+server.ts`, `/api/codebase/analyze/+server.ts`, `scripts/atlas/phase-1b-gpu-kmeans-som.mjs` (this one's own `addon` is hardcoded `null` — deliberate CPU-only demo mode, not a real GPU call), `gpu-graph-analysis.ts`, `codebase-cluster-detection.ts` | N/A — live, backing production API routes | None — not a removal candidate |
+| `computeCaseEmbedding` | weighted embedding sum | **Real**: `/api/gpu/compute/+server.ts` (live API route), `sveltekit-frontend/scripts/atlas/prototype_feature_extract.mjs:23` | N/A — live, backing a production API route | None — not a removal candidate |
+| `attentionScoreGPU_fp16`/`rewardScoreGPU_fp16` | fp16 variants | **Real**: `scripts/atlas/karpathy-gpu-enrich.mjs:59` + its duplicate `scripts/karpathy-gpu-enrich.mjs:65` (the canonical Karpathy GPU Authority Blend pipeline, already documented elsewhere in this file), `sveltekit-frontend/scripts/run-hypergraph.ts:150`, `scripts/smoke/smoke-attention-score-gpu-boundary.mjs` | N/A — live, backing the canonical Karpathy blend | None — not a removal candidate |
+| `checkCudaAvailable`/`getCudaMemory` | device query | `batch-rerank-orchestrator.ts` | `cudaGetDeviceCount`/`cudaMemGetInfo` direct — LibTorch is overkill for a device query | None — trivially replaceable regardless of any other decision |
+
+**Bottom line (corrected)**: of 19 exported native APIs, **all 19 have real production callers** —
+zero are dead. All 5 that this file previously mislabeled "zero-caller" are real and no dynamic-
+dispatch mechanism was needed to explain any of them; the original claim was a search-tooling
+error (grep pattern too narrow), not evidence of dead code. Do not archive `trainSOM`,
+`clusterEmbeddings`, `computeCaseEmbedding`, or the fp16 variants on the basis of this census.
+Of the 19, most still map to a plausible non-LibTorch replacement this repo already has proven
+groundwork for (`ACE-RADIX-01`'s CUB oracle for top-k, `SEMANTIC-EXACT-PARITY-01`'s cuVS for
+cosine/KNN, `atlas-rapids-cu13` for k-means) rather than needing new research — but no parity/
+latency/VRAM proof was run, so **do not treat any single row above as cleared for migration**
+until that measurement exists, per this file's Status Language rule.
+
+**Separately found while verifying these callers (2026-09-27) — GPU addon path alignment, not
+census scope**: several of the calling scripts (`dir-pipeline.mjs`, `gpu-full-pipeline.mjs`,
+`gemma4-semantic-embedding-cache.mts`, `prototype_feature_extract.mjs`,
+`phase2b-lexical-extraction-kmeans.mjs`, `smoke-gpu-hardening.mjs`) hardcoded only the stale
+`simd-bridge/cpp/build/Release/tensorrt_bridge.node` path and would silently run against an old
+(pre-CUDA-rebuild) addon rather than the current `build-x64-cuda/Release` one. Fixed all 6 to check
+`build-x64-cuda/Release` first, matching the pattern `karpathy-gpu-enrich.mjs`/`run-hypergraph.ts`/
+`smoke-attention-score-gpu-boundary.mjs` already used correctly. Re-ran both smoke tests after the
+fix: `smoke-gpu-hardening.mjs` 3/3 pass (now against the correct Sept-27 CUDA build, not the stale
+June-2 one it was silently using before), `smoke-attention-score-gpu-boundary.mjs` 6 pass/1
+non-critical warning. Separately, `gemma4-semantic-embedding-cache.mts` was found to have two
+real pre-existing bugs beyond the addon path (a `require('crypto')`-vs-top-level-`await` module-
+type conflict, and a wrong Qdrant endpoint — `/points` instead of `/points/scroll`), both fixed;
+its 4 GPU call sites (`pageRankGPU`/`attentionScoreGPU`/`kmeansWithCentroids`/`trainSOM`) still
+pass arguments in the wrong shape (e.g. raw unflattened embeddings where a flat adjacency matrix
+or `Float32Array(n×dim)` is required) and have never produced valid output — this duplicates the
+already-correct, already-canonical `karpathy-gpu-enrich.mjs` pipeline. Recommend archiving
+`gemma4-semantic-embedding-cache.mts` (per this file's archive-not-delete convention) rather than
+repairing its call signatures, pending operator confirmation — not done in this pass.
+
+**Not done in this pass**: no code removed, no replacement implemented, no benchmark run. This is
+the corrected census plus the addon-path alignment fix — the brief's own proposed gate correctly
+separates "know the shape of the dependency" from "act on it."
 
 ---
 
@@ -1580,6 +2269,16 @@ Use only:
 
 **Never claim "production-ready" from dry-run evidence.**
 
+### Error handling in multi-step proof runs: record null, continue, never promote (2026-09-21)
+
+Parent Atlas workstation proofs (censuses, observation gates, preflights, audits) span many readers and steps. One failing step must not halt the whole run or be silently dropped:
+
+- **Record + continue**: a step that errors is written to the receipt as an explicit failure (`value: null` plus a `failures` reason such as `PROCESS_EXIT_FAILURE`, `MISSING_SHADOW_OBSERVATION`), and the run continues with the remaining steps.
+- **Never promote**: a null/failed step never counts toward `PROVEN`, `QUALIFIED`, `READY`, eligibility, or any pass criterion. The overall status stays `BLOCKED` until every required step passes. Null is "unknown", not "absent" and not "zero".
+- **Never coerce an identity/revision/authority fact to null and proceed**: a missing `sourceRevision`, `workspaceRevision`, `packet_key`, etc. is classified (`MISSING_REVISION`) and blocks; it is not defaulted, substituted, or treated as `depends=none`.
+- **Fix the cause in the harness, don't relax the gate**: when a failure is a census/harness defect (wrong argument, unrunnable loader), correct the harness and rerun, keeping the earlier receipt as history. Do not lower the criterion.
+- Reference implementation: `scripts/atlas/audit-graphify-authority-reader-shadow-census-v1.mts` (per-reader PASS/FAIL with reasons, 8/8 required).
+
 ---
 
 ## 🔧 NPX Execution Context & Module Alias Resolution
@@ -1663,10 +2362,12 @@ The ACP (Agent Control Plane) handles all memory, search, caching, and packet co
 5. Packet compaction (4,800 tokens instead of 18,800)
 6. Gemma4 synthesis (only now, with compact bundle; historical label for the live llama-server synthesis stage)
 
-**Memory Hierarchy** (like CPU caches):
-- Gemma4 ← L1 BitFrost Redis ← L2 Postgres JSONB ← L3 Qdrant ← L4 Neo4j ← L5 Filesystem ← L6 Internet
+**Current memory ownership (supersedes the historical cache hierarchy below):**
+- **Model KV prompt cache:** ephemeral reuse inside the active llama-server/model execution; not durable memory, canonical identity, or a source of truth.
+- **BitFrost/Valkey:** disposable hot residency and cache for revision/checksum-addressed evidence and context artifacts; never canonical identity or durable knowledge.
+- **PostgreSQL:** durable canonical packets, source/revision bindings, and semantic/evidence facts. Qdrant and Neo4j are rebuildable retrieval/graph projections; filesystem and Internet are source/evidence inputs, not additional memory tiers.
 
-**Workflows as Searchable Packets**: Capture every successful query as a workflow packet, embed it in Qdrant, and retrieve similar workflows instead of rebuilding from scratch.
+**Workflow retrieval note (derived projection only):** Searchable workflow packets may be projected to Qdrant from PostgreSQL-owned, revision-qualified records; Qdrant does not own durable workflow memory or canonical identity.
 
 **Key Win**: 75% token reduction, 80% latency reduction, Gemma4 focused on reasoning not search.
 
@@ -1991,7 +2692,7 @@ Embedding Dimensions Policy above; they were never deleted, just abandoned.)
 | `evidence_items` | Evidence chunks + metadata | Active |
 | `legal_documents` | Legal document embeddings | Active |
 | `legal_cases` | Case description embeddings | Active |
-| `codebase_chunks_768` | Dual-vector code search | Active (109,776 points) |
+| `codebase_chunks_768` | Dual-vector code search | Active (328,348 points as of 2026-09-27 — see the live re-verification table in the Embedding Dimensions Policy section above before citing an older figure) |
 | `chat_messages` | Chat context search | Active |
 | `embedding_cache` | Embedding lookup cache | Active |
 
@@ -2258,6 +2959,235 @@ docker exec deeds-redis-prod redis-cli config set maxmemory-policy allkeys-lru
 | `authority-chain.ts` | Langfuse embedding/search traces | +8 |
 | `rabbitmq-manager-fixed.ts` | Queue operation traces | +35 |
 | `BACKEND_INFRASTRUCTURE_AUDIT.md` | 17-gate service health checks | 500+ |
+
+### BitFrost warm buckets — measured state + target contract (2026-09-20)
+
+**Live Valkey is COLD, not the "155K keys" this file's status banner claims.** Measured 2026-09-20
+(`docker exec legal-ai-valkey valkey-cli -a redis`): `DBSIZE` 257; `bitfrost:*` 1 key, `gpu:*` 0,
+`centroid:*` 0, `bifrost:*` 0. Most keys are BullMQ/Langfuse queues, `embed:v2:*`, `ace:chunk:*`.
+`keyspace_hits` 9,951 vs `keyspace_misses` 263,532 (~3.6% hit rate). Treat the "BitFrost 155K keys"
+and `gpu:karpathy:*` claims elsewhere in this file as historical until re-warmed and re-measured.
+
+| Fact | Measured value | Implication |
+|---|---|---|
+| `maxmemory` / used | 2 GiB / 9.35 MiB | no memory pressure today |
+| `maxmemory-policy` | `noeviction` (NOT `volatile-lru`) | a full cache would reject writes, not evict; Session 203's "volatile-lru fix" is not what is live |
+| `ace:chunk:hits:*` TTL | `-1` (no expiry) | `volatile-lru` would never evict these — TTL-less keys are invisible to it |
+| `embed:v2:*` TTL | ~3-5 days remaining (7-day `TTL.EMBEDDING`) | only lane that already follows a 7-day TTL |
+| `TTL.CENTROID` / `BIFROST_INDEX` (`cache-keys.ts`) | 6 h | centroid buckets expire in 6 h, not 7 days |
+| SOM assignment (`atlas_packets.som_cell_x/y`) | 58,365 / 61,718 rows (94.6%); 400 distinct cells = full 20x20 | the 20x20 grid that warm buckets would key on is populated in Postgres |
+| Summaries (`codebase_chunk_index`) | 40,306 / 274,465 non-empty (14.7%) | older "39,151 total / 100%" figures are stale; total chunk count has grown ~7x |
+
+**Target contract (DIRECTION ONLY — nothing below is implemented; do not claim it is):**
+- Warm-bucket key = domain-taxonomy node + SOM cell (20x20) + `representation_revision`, built from
+  Postgres truth (`atlas_packets`, `codebase_chunk_index`) — never the other way around.
+- Warm buckets carry a 7-day TTL (raising `TTL.CENTROID`/`BIFROST_INDEX` from 6 h is a deliberate
+  change, not a default). LRU-before-eviction requires BOTH `maxmemory-policy volatile-lru` (or
+  `allkeys-lru`) AND a TTL on every warm key; changing the live policy from `noeviction` is an
+  operator-approved infra change (also needs `ace:chunk:hits:*` TTL-less keys decided first).
+- Bucket rank/progress is a measured ratio (warm buckets populated / 400 SOM cells, hit rate from
+  `INFO stats`), reported as counts per the Status Language rules — not a hand-set percentage.
+- Neural-prefill / decoder synthesis may read bucket hits only via the `PrefillReceiptV1` boundary
+  (`acePolicyRevision`, `bitfrostRevision`, `residencyPlanChecksum`); the cache is never identity.
+- Warm order: Postgres write first, Redis invalidate after, warm from Postgres (Canonical Truth Flow).
+
+**Status**: warm buckets = `NOT_PROVEN` (no bucket keys exist live).
+
+**Writer census (2026-09-20, read-only grep of `src/` + `scripts/`, static — no live-caller proof):**
+the key prefix is spelled two ways for the same packet cache, so writers and invalidators can
+disagree. `src/lib/server/ace/cache-keys.ts` (`bifrostPacketKey`, `bifrostFeatureKey`) carries a
+"use these ONLY" comment, but per `docs/reports/parent-atlas-bitfrost-invalidation-owner-v1.json`
+(BITFROST-INVALIDATION-OWNER-01, 2026-09-04) its `bifrost:packet:*` shape is **live-absent** — not
+the canonical shape. **Canonical (confirmed live shape): `cache-keys.ts` `bifrostKey.semantic.*` →
+`bifrost:sem:packet:{packet_key}`, `bifrost:sem:feature:{feature_id}`,
+`bitfrost:summary:packet:v1:{packet_key}`; canonical writer/invalidator =
+`src/lib/server/cache/atlas-reward-cache.ts` (`setPacketCache`, `invalidateBitfrostPacket`).** Treat
+every writer below that emits a non-`bifrost:sem:*` packet key as writing a dead-shape key until
+proven otherwise.
+
+| Logical key | `bifrost:` spelling (builder-owned) | `bitfrost:` spelling (ad-hoc) |
+|---|---|---|
+| packet | `ace/cache-keys.ts`, `cache-keys.ts`, `redis-cache-invalidate.ts`, `mcp-tool-implementations.ts`, `index-doc`, `batch-embeddings`, `predictions/promote`, `phase7-postgres-persistence.mts` | `packet-summary-pipeline.ts`, `packet-truth-flow.mts`, `phase8b`, `phase9`, `phase10*`, `batch-summarize-packets.mjs`, `graphify-incremental.mjs` |
+| trace / source | `bifrost:trace:*` (`redis-cache-invalidate.ts`, `mcp-tool-implementations.ts`) | `bitfrost:trace:*`, `bitfrost:source:*` (`packet-truth-flow.mts`, `phase8b`) |
+| centroid | `centroid:feature\|packet\|directory:*` (`ace/centroid-compression.ts`), `centroid:v1:*` (`tensor-similarity-cache.ts`) | `bitfrost:centroid:*` (`redis-packet-projection.ts` doc), `centroid:som:*` (`phase8a`), `centroid:cluster:*` (`phase8`) |
+| semantic / hot | `bifrost:sem:*` (`atlas-cache-envelope.ts`, `warm-bifrost-semantic-cache.mjs`) | `bitfrost:hot:*`, `bitfrost:som:*`, `bitfrost:summary:*` (`phase8-bitfrost-hot-buckets-bulk.mjs`, `phase8a`) |
+
+**Invalidation status (corrected 2026-09-20 after reading the 2026-09-04 receipt — an earlier
+draft of this section wrongly called `redis-cache-invalidate.ts` a live gap):**
+`dispatcher/redis-cache-invalidate.ts` already delegates to `invalidateBitfrostPacket()`
+(`APPLY_PROVEN` with disposable synthetic keys: seed → mutate → invalidate → readback, fail-open on
+Redis error, no namespace flush). **Remaining open gap is reachability, not spelling:** all 4
+delegating invalidators are unreachable from any live Postgres-mutation path (their RabbitMQ
+listener/worker have zero callers), and `setPacketCache`/`setFeatureCache` have no located external
+caller — the real writer of the live `bifrost:sem:packet:*` keys was not found in `src/`. Still-live
+stale/spelling risks: `packet-truth-flow.mts` and this file's Canonical Truth Flow section still say
+`bitfrost:packet:{key}` (dead shape); two `cache-keys.ts` files (764 and 126 lines) both define
+packet/feature keys; `cache/cache-invalidation.ts` uses a third unrelated shape
+(`semantic:bifrost:*`, flagged `COMPATIBILITY`, not audited).
+
+**CORRECTION (2026-09-20, same day): the packet/query identity conflation below was already FIXED
+on 2026-09-04 (`BIFROST-KEY-SEMANTICS-OWNER-01`) in the builder and the repo-root copy.** There are
+TWO copies of this warmer: repo-root `scripts/cache/warm-bifrost-semantic-cache.mjs` (commit
+`cef902bec6`, 2026-09-04) was migrated onto `bifrostKey.semantic.query()` (`bifrost:sem:query:{query_hash}`);
+the stale duplicate `sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` (`7111345b40`,
+2026-06-07) still writes `bifrost:sem:packet:{query_hash}` — that duplicate is the defect described
+next, classify it `COMPATIBILITY`/archive-candidate (do not delete). The description below was
+written from the stale copy.
+
+**Live-shape writer located (2026-09-20, static + live count; `CREATED`, not `APPLY_PROVEN`):**
+`sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` (stale copy; one commit, `7111345b40`, 2026-06-07) writes the `bifrost:sem:*` layout — `bifrost:sem:packet:{query_hash}`,
+`bifrost:sem:feature:{feature_id}`, `bifrost:sem:sourceRef:{sha256(ref)}`, `reward:zset`,
+`stale:zset`, all `setex` 24 h. Live Valkey holds **0** `bifrost:sem:*` keys today, consistent with
+a 24 h TTL lapsing with no re-warm. Findings that constrain any rewire:
+- **Identity mismatch:** it keys packets by `query_hash`; the canonical
+  `atlas-reward-cache.ts::invalidateBitfrostPacket()` deletes by `packet_key`. A packet warmed under
+  `query_hash` is not reachable by that invalidator — reconcile the key identity before wiring an
+  invalidation trigger to this writer.
+- **Input is small and old:** reads `memory/packets/semantic-cache-candidates.jsonl` (15.8 KB,
+  2026-06-08, DuckDB-join output) — not a fresh Postgres read, so it also violates "warm from
+  Postgres" until repointed.
+- **No caller:** no `package.json` script references it. `package.json` instead points at a
+  different script, `scripts/atlas/warm-bitfrost-semantic-cache.mjs` (`atlas:bitfrost-semantic-cache:warm[:apply]`),
+  whose 2026-09-11 receipt (`docs/reports/bitfrost-semantic-cache-warm.json`) is **dry-run only —
+  0 writes applied** — planning `bifrost:sem:*` (24 h), `ace:*` (1 h) and `atlas:centroid:*` (2 h) keys
+  from `atlas_higher_hop_index`. That table **now exists** (an older note in `sveltekit-frontend/CLAUDE.md`
+  saying it is missing is stale).
+- So two warmers target the same `bifrost:sem:*` namespace with different key identities; neither has
+  ever populated live Valkey in this audit's window. Classify the June script `COMPATIBILITY` and the
+  September script the candidate owner, pending a decision on `query_hash` vs `packet_key` identity.
+
+**September warmer dry-run (2026-09-20, `--limit=25`, `DRY_RUN_PROVEN`, 0 writes, 0 failures):**
+`scripts/atlas/warm-bitfrost-semantic-cache.mjs` already keys `bifrost:sem:packet:${packet_key}` and
+`bifrost:sem:feature:${feature_id}` (24 h) — i.e. the `packet_key` identity is already what it uses;
+the `query_hash` identity exists only in the June script. All 25 planned `packet_key`s resolve in
+`atlas_packets` (bare 16-hex is a real canonical key form there, alongside the `packet:<12hex>`
+form). Two limits found: (1) the key is built inline, not through the canonical builder
+(`cache-keys.ts` `bifrostKey.semantic.*`) — patch target; (2) its source ledger
+`atlas_higher_hop_index` (58,309 rows) has **`som_cluster` NULL on every row**, so this warmer
+cannot produce SOM-cell warm buckets; SOM assignments live in `atlas_packets.som_cell_x/y`.
+Any SOM/domain warm-bucket producer must read `atlas_packets`, not this ledger.
+
+**Cache identity roots (DECIDED 2026-09-20) + BCI-02..06 (`APPLY_PROVEN` for the code path on
+disposable synthetic keys; live warm population still 0):** packet cache root = `packet_key`;
+query/retrieval cache root = `query_hash` (`bifrost:sem:query:*`); feature = `feature_id`;
+centroid/routing = representation + cluster/SOM coordinate; prefill = `PrefillContentIdentity`
+checksum. These never substitute for one another. Landed (additive, v1 shapes unchanged) in
+`src/lib/server/cache-keys.ts`: `PacketSemanticCacheIdentityV2`, `packetSemanticIdentityDigestV2`
+(sha256 of `canonicalSha256V1`), `packetSemanticCacheKeyV2` → `bifrost:sem:packet:v2:{packet_key}:{digest}`,
+`packetSemanticIndexKeyV2` → `bifrost:sem:index:packet:{packet_key}` (Valkey SET reverse locator,
+disposable metadata only); and in `cache/atlas-reward-cache.ts`: `setPacketCacheV2` (SET+SADD+EXPIRE
+in one MULTI, index TTL 7 d) and `invalidateBitfrostPacket()` now `SMEMBERS`→`UNLINK` all v2 objects +
+the index (no SCAN/KEYS; still fail-open). The old "no revision segment in the key" rationale in
+`cache-keys.ts` assumed a warm live cache; the cache is empty, so v2 is additive, not an orphaning
+change. Proof: `atlas-reward-cache-v2.spec.ts` 10/10 (incl. `ATLAS_LIVE_VALKEY=1` live fixture: 2
+revisions seeded, invalidated by locator, unrelated packet survived, 0 leftover keys) +
+`tests/cache-keys.spec.ts` 15/15. **Census miss, corrected 2026-09-20:** a second revision-qualified cache identity already existed and
+is LIVE — `AceBitfrostCacheIdentityV1` (`src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts`,
+`atlas:bitfrost:v1:{cacheKind}:…:{sha256}` keys for `ACE_PACKET`/`ACE_CONTEXT`/`CENTROID`/`RESIDENCY`;
+callers `cache/ace-packet-cache.ts`, `cache/redis-cache-aggressive.ts`, `scripts/atlas/prove-bitfrost-centroid-replay-v1.mts`).
+My earlier writer census grepped key-prefix literals and missed builders that assemble keys from parts.
+Layering, not merge: `AceBitfrostCacheIdentityV1` = ACE artifact/centroid/residency identity (no
+per-packet reverse locator, cannot be invalidated by `packet_key`); `PacketSemanticCacheIdentityV2` =
+only the `bifrost:sem:packet:*` lane + reverse locator. Two revision-qualified identities now coexist —
+converge them under one owner before adding any third. Related residency contract:
+`docs/reports/bitfrost-residency-policy-v1.json` (HOT 30 d / WARM 7 d / COLD 1 d;
+`WIRED_POLICY_ADAPTER_PROVEN_TESTS_ONLY`, 35 tests, Valkey behavior NOT proven — so the 7-day WARM TTL
+is a policy value, not a live-proven setting). Remote branch `origin/agent/bitfrost-fanout-contract-20260920`
+(commit `93777aaf46`, `claude.md` only, +196 lines appended at the end, not merged) freezes the
+query-fanout/warm-bucket contract; verified it matches that policy file.
+**Not done / deferred:** no production caller writes v2 yet (BCI-10
+warm canary is gated); Postgres cache-receipt table `DEFERRED_PENDING_NEED_PROOF`; 7-day value TTL
+and LRU/LFU are deferred until writer → invalidation → readback → hit/miss telemetry exist.
+
+**Centroid / SOM re-measure for warm-bucket keys (2026-09-20, read-only; `PARTIAL_PROVEN`):**
+- `atlas_packets`: 58,365 / 61,718 rows have `som_cell_x/y` (94.6%), exactly **400 distinct non-null
+  cells** (20x20 fully occupied). **`som_revision` is NULL on all 58,365** — the warm-bucket identity
+  needs a `somRevision`, and none exists on the assignments, so SOM-cell bucket keys cannot be
+  revision-qualified yet (blocker: stamp a revision from the codebook run, do not invent one).
+- SOM codebook = `models/som/som_20x20_codebook.json` (400 rows, **`latent_dim` 64**, `native-cuda`,
+  50 iterations, 2026-07-28), not in Postgres (`som_adjacency_matrix` exists; no codebook table).
+  It lives in the 64-d autoencoder latent space, while `codebase_chunk_index.latent_64` has only 1,703
+  populated rows and this file already records the autoencoder weights as untrained — so SOM cell
+  quality is `NOT_PROVEN`; treat cells as a routing prefilter hint, never as identity or ranking.
+- `gpu_cluster_centroids`: 64 rows, **768-dim** float4[], `cluster_type='kmeans_js'`, all dated
+  2026-07-14 (older JS k-means, different space from the 64-d SOM codebook). `qdrant_centroid_clusters`
+  (202 rows) stores only `centroid_vector_hash`, no vectors. Two centroid sets in two different vector
+  spaces — do not mix them in one packed matrix. At 64x768 (or 400x64) float32 a brute-force
+  dot/cosine prefilter is a few hundred KB and needs no vector database.
+
+**`SOM_REVISION_PROVENANCE_01` (2026-09-20, read-only) — verdict: a `somRevision` CANNOT be honestly
+derived from what exists; do not stamp one.**
+- `models/som/som_assignments.json` (2026-07-28, same run as the codebook) is **per-chunk**, not
+  per-packet: 32,310 assignments keyed by `codebase_chunk_index.id` (300/300 sampled ids resolve
+  there), covering **388** cells. Zero of its ids match any `atlas_packets` id column
+  (`chunk_id`, `file_id`, `symbol_id`, `packet_id`).
+- Postgres `atlas_packets` carries packet-level SOM values that are **not derivable from that file**
+  (58,365 rows, 400 cells, keyed by `packet_key`) and are internally inconsistent: `som_cell_x/y`
+  vs `som_row/som_col` disagree on **58,200 of 58,365 rows (99.7%)**, and `som_row/som_col` covers
+  only 342 distinct cells vs 400 for `som_cell_x/y` — two coordinate conventions or two runs in one
+  table. `som_revision` is non-null on 1 row of the whole table (NULL on all 58,365 assigned rows).
+- **Consequence:** SOM-cell warm buckets and any `somRevision`-qualified key stay `BLOCKED` until a
+  fresh, versioned SOM run writes assignments and a content-addressed revision (checksum of the
+  codebook + input candidate snapshot) together, with one documented coordinate convention. Checksumming
+  the July codebook file alone would label assignments it did not produce — that would be an invented
+  revision. Until then use KMeans/domain-taxonomy buckets (no SOM axis) for warm-bucket identity.
+
+**`QUERY_FANOUT_BITFROST_READ_ONLY` receipt (2026-09-20, `PARTIAL_PROVEN`, workflow progress 70% =
+weighted completed stages, NOT model confidence; replay: `node scripts/atlas/prove-query-fanout-bitfrost-v1.mjs [--query=…]`,
+output `docs/reports/query-fanout-bitfrost-v1.json`, writes only that file):** one query through the
+chain — DONE: request identity, TRACE `domain.classify`, capability plan (177 TRACE tools; lexical/AST/
+semantic/taxonomy/graph/db lanes all have tools), semantic Top-K (Ollama `embeddinggemma` 768-d → Qdrant
+`codebase_chunks_768_v2` `content`: 10/10 hits carry `packet_key`), KMeans nearest centroid (brute force
+over 64 x 768-d `gpu_cluster_centroids`), live cache state. PARTIAL: `.okf` validation (3 domains / 6
+concepts / 1 language / 3 indexes loaded, but the classifier output named none of them). BLOCKED, with
+reasons in the receipt: SOM cell (`SOM_REVISION_PROVENANCE_01`), ACE cache identity (no frozen
+CandidateOrdinalMap/FeatureMatrix, so the 7 required revision fields cannot be honestly supplied),
+BitFrost bucket (`proposedBucket:null`). Cache lookup = `MISS_NO_IDENTITY`; live Valkey: `noeviction`,
+2 GiB, 0 `bifrost:sem:*` keys, 1 `bitfrost:*` key.
+**Two findings the receipt exposed:** (1) `domain.classify` (sklearn-lr, cpu, NB+LR) labelled a
+cache-invalidation query `ui` at ~0.55 probability — a weak, provisional classifier; do not let its label
+drive fanout or bucket choice without a confidence floor. (2) `codebase_chunks_768_v2` is live with 3
+named vectors (`content`/`error`/`signature`) and 52,816 points, not the "dense-only, 52,380" description
+in the Embedding Dimensions Policy above — that description is stale.
+
+**Schema tournament + next steps (2026-09-20, read-only; `node scripts/atlas/audit-schema-tournament-v1.mjs` → `docs/reports/schema-tournament-v1.json`; full detail in `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md`, `SCHEMA_TOURNAMENT_V1`):**
+**Do NOT create `*_v2` tables for the NLP/ontology fabric — the schema already exists and is empty.** Reuse:
+`atlas_ontology_linked_tuples` (token/POS/`evidence_span`/`producer_revision`), `atlas_taxonomy_assignment_candidates`
+(revision-qualified evidence lanes), `atlas_ontology_concepts`/`_relations`, `domain_taxonomy_v1` (versioned hierarchy),
+`registry_topology_projection`; `feature_ontology_tuples` (539,124 UNRESOLVED) stays the 14.3b resolution owner;
+`atlas_ontology_tuples`, `atlas_concepts`, `concept_records` (0 rows each) are duplicate/dead candidates (archive, never delete).
+Never `UPDATE atlas_packets.domain_class` to fix labels — use `replaced_by` rows + a normalizing VIEW. Feature matrices
+(Query / Candidate `[C,25]` / Token `[T,F]` / Topology) are Arrow/mmap artifacts + JSON receipts sharing one `CandidateOrdinalMap`
+checksum, not tables; a 4x6 matrix is a test fixture only. **Domain vocabularies:** three coexist (packet labels 39, code
+`CANONICAL_DOMAINS` 9, DB `atlas_domain_ontology` 13+4) — 65.9% of packet rows map cleanly onto the DB ontology; the owner
+decision is pending (recommended: `atlas_domain_ontology`, versioned via `domain_taxonomy_v1`). **Needs operator approval:**
+workspace snapshot admission (`AST-AUTH-01`), method-symbol convention (`Class.method` clears 106/161 deferred rows), 4 DDL items
+(`atlas_ast_nodes.ast_generation`, `atlas_symbol_versions` indexes on `source_revision`/`qualified_name`, topology revision columns,
+`atlas_ontology_linked_tuples` `source_revision`/`workspace_revision` + `label_kind` — its `evidence_span` is unconstrained jsonb, so a
+writer-side `GroundedExtractionV1` contract with mandatory `UTF8_PARSER_BUFFER_V1` spans is required first),
+4 bounded-canary populations, the domain owner. Five tuple-ish tables coexist (`feature_ontology_tuples` 539k owner,
+`ontology_domain_tuples` 61k, and empty `atlas_ontology_tuples`, `registry_ontology_tuples`, `atlas_ontology_linked_tuples`) — add no sixth. **Tranche order:** DOMAIN-VOCAB-01 → DOMAIN-CAL-02 → NLP-EXTRACT-03 → SYMBOL-LINK-04
+→ FEATURE-LINK-05 → PG18-PLAN-06 → SEMANTIC-07 (exact vs HNSW) → CLUSTER-08 (CPU KMeans oracle vs cuVS; SOM separate) → RANK-09
+→ TENSOR-10 → CONTEXT-11 → SYNTH-12; no deep RL / neural domain classifier before trustworthy labels + `.okf` reconciliation +
+revision-qualified feature production. The `:8095` NLP sidecar is an evidence EXECUTOR, never an identity owner. Governed
+implementation proven != canonical data authority proven (`node scripts/atlas/audit-ast-authority-gap-derivation-v1.mjs`).
+**Validation corpus (2026-09-20, `docs/reports/validation-corpus-inventory-v1.json`): ONE shared core, TWO adapters.** Core = source-text
+encoding, revision-qualified identity, `UTF8_PARSER_BUFFER_V1` spans, `GroundedExtractionV1`, `.okf`, `CandidateOrdinalMap`, receipts.
+WORKSTATION adapter (code/schemas/specs/configs) and LEGAL adapter (statutes/citations/opinions/evidence) differ in corpus + validators
+only; Ornith gets both, tagged `adapter: WORKSTATION | LEGAL | BOTH`, identity namespaces never merged. Measured gaps: only TS/JS has
+an AST lane (svelte/python/sql/shell/proto/go/cuda/wgsl none evidenced); 33 fixture files vs 2,407 specs; no negative corpus; **the legal
+adapter's live corpus is near-empty (evidence 806, cases 11, statutes/citations/precedents 0) and EVERY legal Qdrant collection has 0
+points — the "Qdrant Collections" table above listing them Active is stale.** Legal fixtures must be PII-safe synthetic or public-domain.
+`DOMAIN-CAL-02` draft = `docs/reports/domain-calibration-draft-v1.jsonl` (142 rows, all UNREVIEWED; only 49 revision-qualified).
+
+**Postgres registry check (2026-09-20):** no table is a cache-key/parameter registry.
+`atlas_vector_registry` (4,480 rows) = per-`source_ref` embedding lineage; `vector_index_registry`
+(4 rows) = stale 2026-07-21 `pending_build` seeds naming a 384-dim index (retired lane);
+`registry_topology_projection` = 0 rows, duplicates `atlas_packets.som_cell_x/y` +
+`gpu_cluster_centroids` (64 rows); `registry_projection_stats` view shows only `enrichment`
+populated. Classify the last two as `DEAD`/duplicate candidates — archive, do not delete. Do not add
+a Postgres key registry before the code-side builders are consolidated. PG18 AIO is on
+(`io_method=worker`, 3 workers) but benefits bitmap/seq scans, not btree key lookups.
 
 ---
 
@@ -2674,6 +3604,30 @@ T0a for the full bug writeup — this was one of three real bugs found while wir
 **Before writing new PG18 SQL that checks for NaN/Infinity**: grep for `isfinite(` (case-sensitive
 — `isFinite`/`Number.isFinite` in TypeScript are unrelated, real, and fine) before assuming the
 Postgres builtin still works.
+
+---
+
+## ParadeDB / pg_search + pgvector HNSW — live state (verified 2026-09-26)
+
+**Any older note in this repo saying "pg_search is not installed" is stale** (e.g. dated entries in
+`parent-atlas-neural-prefill-encoder/tasks.md`, `parent-atlas-workstation-todo.md`). Receipt:
+`PG-SEARCH-ENVIRONMENT-IDENTITY-01` in `openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md`.
+
+| Item | Live value |
+|---|---|
+| Server | container `legal-ai-postgres`, image `pgvector-pgsearch:pg18-local`, host port **5434**, PostgreSQL 18.4, `shared_preload_libraries=pg_search` |
+| Extensions | `pg_search` 0.25.1 (ParadeDB BM25), `vector` 0.8.3, `pg_trgm` 1.6 |
+| Size | `pg_search.so` 183 MB; BM25 index 91 MB |
+| BM25 index | `idx_codebase_chunk_pgsearch_bm25` on `codebase_chunk_index (id, content, relative_path)`, `USING bm25 ... WITH (key_field=id)` |
+| API | Both work on installed 0.25.1: `@@@` with `paradedb.score`, and the triple-pipe (any term) and triple-ampersand (all terms) operators with `pdb.score`. `USING paradedb` untested. Upstream has since published 0.25.9 and 0.25.10 packages for PostgreSQL 18; upgrade remains a separate, unmade decision. |
+| Native FTS | Built in (not an extension): GIN `idx_codebase_chunk_bm25_search` on `codebase_chunk_index.search_vector` (English tsvector, misleadingly named "bm25"). Declared owner path `search_code_lexical` reads `code_retrieval_chunks` (41,662 rows, `stable_key`), a different table and grain |
+| Canonical HNSW | `codebase_chunk_index_content_hnsw` on `content_embedding` halfvec(768), `halfvec_cosine_ops`, m=16, ef_construction=200. HNSW comes from pgvector, not ParadeDB. Measured recall@10 0.997 vs exact (100 in-corpus queries, ef_search 40/100/200), ~5-30 ms vs ~530-730 ms exact. Filtered/iterative-scan not yet proven |
+
+**Rules**
+- **Probe the right server first.** Host port 5432 is a separate Windows-native `postgres.exe` service; the app uses 5434. Before any extension/index probe record `inet_server_port()`, `data_directory`, `version()`; never let a probe without that fingerprint overwrite this table.
+- **Ownership:** native FTS = declared lexical owner; pg_search BM25 = installed, unpromoted challenger (no relevance labels, so no quality claim). `Bm25Lane` (`'bm25'` in `search-lanes.ts`) is actually pg_trgm `similarity`, not BM25; the string is a live routing key (`cognitive-router.ts`), so rename only with an alias.
+- No `CREATE`/`DROP`/`ALTER EXTENSION`, index rebuild, or pg_search upgrade without an explicit decision.
+- Postgres needs only SQL; TypeScript calls it via Drizzle `sql` templates. Keep extension DDL in SQL migrations.
 
 ---
 
@@ -4186,6 +5140,13 @@ See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete r
 
 **5-pillar smoke**: `npm run smoke:graphify` (read-only, <1s) — checks graph JSON + map.md + Redis fast cache + KAG notes + Qdrant `codebase_chunks_768` + ACE `FAST_AST_SCORE_CAP ≤ 0.07`. Flags: `--strict`, `--no-redis`, `--no-qdrant`.
 
+**Correction (2026-09-28)**: `smoke:graphify` and `graphify:full` (used in the table above) are
+confirmed **absent** from both `package.json` files — found by `npm run atlas:audit:startup-tasks`
+(new, see the Karpathy section's correction below) and spot-verified by direct `grep`, not just tool
+output. Only `smoke:graphify:symbols` exists under a similar name. Not investigated further in this
+pass (root-cause/rename target unknown) — treat every command in this Graphify table as unverified
+until re-checked against live `package.json`, not just this doc.
+
 **ACE priority order** (verified in `context-assembler.ts`): Qdrant semantic → ACP cross-feed → Redis KAG (cap 0.08) → Redis fast-AST (`FAST_AST_SCORE_CAP = 0.07` named constant) → SOM/hypergraph/PageRank.
 
 **Topo-byte Redis cache (May 5, 2026)**: Stage A0 in `fetchACPKnowledgeResults()` checks `ace:topo:{topoClass}:{queryHash}` (TTL 300s) before ANN. On cache hit, Qdrant is skipped entirely. `TopoPrefilterStats` flows to `ACEContext.retrievalTrace.topoPrefilter`. Implementation: `src/lib/server/cache/topo-candidate-cache.ts`.
@@ -4254,6 +5215,58 @@ Wired into the heavy lane of `scripts/startup/ace-incremental-startup.mjs` via `
 - 24h cooldown via `ace:startup:heavy_last_run`
 - Sequence: `graphify:authority → graphify:gds → graphify:cluster-summaries → graphify:bow-tiles → topology:validate → karpathy:gpu → audit:full-pipeline`
 - Allowlist also permits `karpathy:gpu:dirty` and `karpathy:gpu:dry` on every folder open (incremental lane)
+
+### Correction (2026-09-28): the Surface aliases were documentation, not reality — `karpathy:gpu` was completely broken; this Auto-fire policy subsection describes two files that do not exist
+
+**`karpathy:gpu` (bare) was non-functional since the moment its admission gate was added — verified
+live, not assumed.** Running it threw `Error: KARPATHY_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED`
+at `scripts/atlas/karpathy-gpu-enrich.mjs:623` every single time, because its apply mode hard-requires
+`ATLAS_WORKSPACE_REVISION` (`sha256:`-prefixed) and `ATLAS_SOURCE_COHORT_CHECKSUM` env vars, and a
+full repo-wide search found **zero code anywhere that ever set either one**. The "Surface" line
+above (`karpathy:gpu:dirty`, `karpathy:gpu:top200`, `karpathy:gpu:dry`) was aspirational when
+written — none of those three npm aliases existed in `sveltekit-frontend/package.json` until this
+correction; only bare `karpathy:gpu` existed, and it was broken.
+
+**Fixed 2026-09-28, live-verified, no fabrication**: `scripts/atlas/run-karpathy-gpu-admitted-v1.mjs`
+(new) resolves `ATLAS_WORKSPACE_REVISION` from the most recent COMPLETED `graphify_runs` row's real
+`workspace_revision` (fails closed with `NO_ADMITTED_WORKSPACE_REVISION` if none exists — never a
+timestamp or synthesized value), and `ATLAS_SOURCE_COHORT_CHECKSUM` from a sha256 of the exact real
+candidate set `karpathy-gpu-enrich.mjs` itself fetches for the run (via a new
+`--dry-run --dry-run-candidates` mode that emits a `KARPATHY_COHORT_JSON:` line for exactly this
+purpose), then re-invokes the real script with both supplied. **Live result**: `gpu:karpathy:scores`
+went **0 → 190 → 390** real Redis hash entries across two runs (verified via `HLEN`, not the
+script's own self-report), exit 0 both times. New, now-real npm aliases: `karpathy:gpu:dry` (the raw
+script's read-only mode), `karpathy:gpu:admitted` (the fix — this is what should be called from now
+on), `karpathy:gpu:dirty` and `karpathy:gpu:top200` (both routed through the admitted wrapper). All 3
+places in `.vscode/tasks.json` that called bare `karpathy:gpu` (including the `runOn: folderOpen`
+gated daily-startup task) now call `karpathy:gpu:admitted`. Full evidence trail:
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`,
+`STARTUP-BITFROST-WARM-DIAGNOSIS-01` and its follow-up entry.
+
+**The "Auto-fire policy" paragraph above this correction is STALE — `scripts/startup/
+ace-incremental-startup.mjs` and `config/startup-ace-policy.json` do not exist anywhere in this
+repo** (confirmed via direct `find`/`ls`, not a stale grep). The `.vscode/tasks.json` task whose
+`detail` field repeats this same description (`"🚀 Startup: ACE Incremental Refresh (detached,
+safe)"`) has a `command` of `npm run startup:ace:detached` — **also not a real npm script** in
+either `package.json` — so this task has silently done nothing on every folder-open since it was
+added. A sibling task, `"🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)"`, has the
+identical failure shape: its command `npm run ace:hit-demand` is also not a real script (the
+underlying `chunk_hit_log` Postgres table is real and has real consumers — `context-assembler.ts`,
+`mcp/server.ts` — but nothing seeds a Redis demand signal from it). **Do not treat either capability
+as live.** Both are recorded as open, unbuilt gates (not fixed in this correction — each needs its
+own build-vs-remove decision) in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. A new read-only check,
+`npm run atlas:audit:startup-tasks` (`scripts/atlas/audit-startup-task-npm-scripts-v1.mjs`), now
+exists specifically to catch this failure mode — any `.vscode/tasks.json` task whose `npm run X`
+doesn't resolve to a real script in either `package.json` (or the task's own declared cwd). Running
+it found the real scope is **4** silently-broken `runOn: folderOpen` tasks, not just these 2 — also
+`"🩺 Startup: Atlas Smoke Gate"` (`smoke:atlas`) and `"🧪 Startup: OpenCode Sidecars Smoke"`
+(`smoke:mcp:opencode-sidecars`), both likely non-functional since whichever of the 4 broke first,
+since they're chained via `dependsOn`. It also found 157 additional stale references on manual-only
+tasks (lower urgency — those fail loudly the moment someone runs them). None of the 161 were fixed
+in this pass; full detail in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`'s
+`STARTUP-BITFROST-WARM-DIAGNOSIS-01` follow-up entries.
 
 ### Verification
 
@@ -5065,3 +6078,81 @@ service, and never edit the repo's real `atlas_compute/__init__.py` to work
 around it. Separately, this specific base image is Debian PEP-668
 "externally managed" — plain `pip install` fails there without
 `--break-system-packages` (safe for a single-purpose container).
+
+## Binary bytes, SHA-256, and Parent Atlas revision lineage (2026-09-16)
+
+Keep binary representation, hashing, and lineage namespaces distinct:
+
+- A bit is 0/1. A byte is eight bits with an unsigned range of 0..255 (`0x00`..`0xff`). This is the domain for packed control bytes, feature bytes, and protocol buffers; it is not a revision or identity by itself.
+- SHA-256 hashes an arbitrary byte sequence and returns a 256-bit digest, equal to 32 bytes or 64 hexadecimal characters. Parent Atlas canonical text is `sha256:<64 lowercase hex characters>`.
+- Hash exact source bytes. Do not hash decoded UTF-16 text, normalized newlines, reserialized JSON, or a different encoding from the producer contract.
+- Whole-source and chunk hashes have different grains: `file_content_hash` is the whole source digest; `codebase_chunk_index.content_hash` is the chunk digest. Never compare those fields directly.
+- Keep `workspace_revision`, `source_revision`, `representation_revision`, and `feature_revision` as separate namespaces. A SHA-256-shaped value is not interchangeable merely because its format looks valid.
+- `packet_key` is a deterministic packet identity projection. It does not replace source digest, workspace revision, source revision, or CandidateOrdinal.
+- PostgreSQL owns canonical identity. Qdrant IDs, Redis/BitFrost keys, centroids, GPU buffers, topology coordinates, and cache descriptors remain derived projections.
+
+Canonical lineage:
+
+```text
+immutable snapshot
+  → Graphify execution_id
+  → source_ref + source_revision + exact source-byte digest
+  → packet_key + binding_checksum
+  → packet→chunk lineage
+  → representation_revision
+  → ACE/Qdrant/graph/GPU projections
+```
+
+Promotion and upsert rules:
+
+- An upsert is idempotent only when all canonical identity and digest fields match exactly.
+- A differing field is an identity collision, revision mismatch, or content mismatch; fail closed.
+- Never coerce a SHA-256 workspace revision into a legacy integer such as `0`.
+- Historical nullable rows remain observable but are not promotion-eligible.
+- Every promotion needs transaction readback, checksum evidence, and `writesPerformed` status.
+
+Standards references: NIST FIPS 180-4 defines SHA-256 message digests; Python documents bytes as integer sequences constrained to `0 <= x < 256`.
+
+## UUID version policy for Parent Atlas identity and indexes (2026-09-16)
+
+Use UUID versions by lifecycle role; never use a UUID format to replace canonical `packet_key`,
+`source_ref`, source digest, or revision identity.
+
+- **UUIDv4** (`crypto.randomUUID()`): random operational IDs for requests, traces, temporary
+  jobs, and ephemeral runs. It is not replay-stable packet or training-row identity.
+- **UUIDv5**: deterministic name-based identity from a frozen namespace and canonical name.
+  Parent Atlas uses the frozen `PACKET_AGGREGATE_NAMESPACE_V1` for derived packet-index matching
+  across legacy namespaces. It is a lookup key only and never authorizes an upsert.
+- **UUIDv7**: time-ordered IDs for newly generated durable events or batches when index locality
+  matters. It does not identify source bytes or reconcile historical packet namespaces.
+- **UUIDv8**: custom application-defined identity only after its bit layout, namespace, checksum,
+  and replay semantics are explicitly frozen. Do not introduce it for packet repair casually.
+
+For YAML/JQ/JSONL indexes, preserve the real field type: UUID fields as UUID, `packet_key` as
+text, and `sha256:<64 hex>` revisions/digests as text. A UUIDv5 match is admissible only after
+exact equality of `packet_key`, `source_ref`, `workspace_revision`, `source_revision`, and the
+whole-source digest. Same UUIDv5 key with different canonical fields is an identity collision.
+Manifests must record the UUID algorithm, frozen namespace, name input, and
+`canonicalIdentity: false` when the UUID is only an index key. PostgreSQL remains canonical;
+YAML/JQ, DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU IDs remain derived layers.
+
+RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
+
+### Classification gates everything downstream; matching is approximate, identity is exact (2026-09-20)
+
+**Operator direction:** classification must be finished under its OpenSpecs before file analysis, top-k, KMeans/KNN clustering, query fanout, document analysis, recommendations, the kanban task board, the feature matrix and the cache — all depend on it. Matching does not have to be exact; no ranker is 100%.
+
+**How to apply that without weakening the contracts:** classification, symbol matching and ranking are probabilistic lanes, judged by recall@k / precision / ECE on a reviewed set, with a caller-supplied confidence floor and fail-closed routing. Identity stays exact: `source_revision`, whole-source vs chunk digests, `UTF8_PARSER_BUFFER_V1` spans, `packet_key`, `CandidateOrdinalMap` and cache keys never become fuzzy or inferred.
+
+**Owners (do not add a second):** offline sklearn NB+LR trainer `python/train_domain_classifier.py`; read-only FastAPI seam `python/atlas_nlp_classification_helper_v1.py`; `:8095` sidecar `miniforge_nlp_sidecar_v2.py` (evidence executor only); TRACE `domain.classify` (provisional); ast-grep/Tree-sitter helpers under `scripts/atlas/lib/` (TS/JS only). No PyTorch logistic-regression trainer exists; one would be a challenger behind the sklearn baseline, only after a reviewed set exists. OpenSpec state (checked/open): search-classifier-sidecar 70/16, workstation-domain-classifier 115/26, query-routing-classifier 41/57, unified-symbol-ranking 17/0. Full detail and dependency order: `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md` (`CLASSIFICATION-GATE-01`).
+
+### Read-only OpenSpec audit parallelism and acceleration policy
+
+- The portfolio runner may use a bounded multi-process CPU stage pool only for independent readers of one frozen census. Its default concurrency is two and its hard cap is three; set `OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES=1` for serial replay. Do not increase concurrency without checking peak RSS and repeat-run stability.
+- Keep parser → independent census readers → dependent receipt binding/reconciliation/cards/workboard/final authority ordering explicit. Pooled stages require unique run-scoped outputs and identical run/census identity; any failure blocks downstream stages and final authority.
+- Do not add Redis/Valkey caching or GPU acceleration to Markdown/JSON parsing by default. Cache only measured, rebuildable intermediates, keyed by workspace revision, exact input checksums, parser/schema revision, and output checksum. A cache hit is never evidence or proof.
+- Reserve GPU executors for measured numerical kernels (e.g. qualified sparse graph ranking or dense feature matrices), with CPU-oracle parity and executor receipts. GPU is not a filesystem scanner or report-authority mechanism.
+
+**Domain review sheet + rules (2026-09-20):** `node scripts/atlas/build-domain-review-sheet-v1.mjs` builds an offline searchable review page `docs/reports/domain-review-sheet-v1.html` (blind mode, localStorage autosave, JSONL export the eval harness reads via `python python/atlas_domain_classifier_eval_v1.py --input <file>`). Labeling rules: judge primary responsibility from the path/file (the LLM evidence text is not truth); one of the 13 top-level `atlas_domain_ontology` groups; `AMBIGUOUS` / `NOT_A_DOMAIN` / `SKIP` are counted, never gold; second reviewer on >=10%. Trust floor 200 reviewed rows AND 30 per class; the 49 revision-qualified rows are far short (largest class 11; machine-learning, compiler, error-handling have 0), and closing that depends on CURRENT_SOURCE_AUTHORITY_PROVEN, not on labelling alone. Report Tier A (revision-qualified) and Tier B (unresolved-revision, evaluation only) separately.
+
+**Searching gitignored evidence (2026-09-20):** files over 10 MB cannot enter git (hook), so the AST/classification evidence lives under gitignored `.tmp/atlas/` and `*.jsonl`. `.rgignore` re-includes a selected set so a plain `rg` from the repo root finds them (draft/reviewed domain JSONL, AST candidates, canary-eligible rows, source-authority cohort, symbol nominations/resolution, knowledge snapshot). Test from the repo ROOT: searching inside an ignored directory bypasses ignore rules and gives a false pass. Searchable is not authoritative; regenerate before citing.

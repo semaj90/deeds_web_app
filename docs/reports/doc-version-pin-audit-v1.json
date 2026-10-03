@@ -1,0 +1,108 @@
+{
+  "schema": "atlas.doc-version-pin-audit.v1",
+  "generatedAt": "2026-09-23T21:52:04.860840+00:00",
+  "gate": "DOC_VERSION_PIN_AUDIT_01",
+  "items": [
+    {
+      "product": "bits-ui",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 5,
+      "local": {
+        "declaredRange": "^2.0.0",
+        "installed": "2.16.2",
+        "source": "node_modules/bits-ui"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    },
+    {
+      "product": "drizzle-kit",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 3,
+      "local": {
+        "declaredRange": "0.31.10",
+        "installed": "0.31.10",
+        "source": "node_modules/drizzle-kit"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    },
+    {
+      "product": "drizzle-orm",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 4,
+      "local": {
+        "declaredRange": "0.45.2",
+        "installed": "0.45.2",
+        "source": "node_modules/drizzle-orm"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    },
+    {
+      "product": "drizzle-orm",
+      "corpusQualification": "UNVERSIONED@2026-09-23",
+      "pages": 1,
+      "local": {
+        "declaredRange": "0.45.2",
+        "installed": "0.45.2",
+        "source": "node_modules/drizzle-orm"
+      },
+      "status": "UNVERSIONED"
+    },
+    {
+      "product": "pgvector",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 2,
+      "local": {
+        "declaredRange": null,
+        "installed": "0.8.3",
+        "source": "live pg_extension"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    },
+    {
+      "product": "postgresql",
+      "corpusQualification": "18",
+      "pages": 6,
+      "local": {
+        "declaredRange": null,
+        "installed": "18.4",
+        "source": "live server select version()"
+      },
+      "status": "MAJOR_MATCH"
+    },
+    {
+      "product": "svelte",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 4,
+      "local": {
+        "declaredRange": "^5.0.0",
+        "installed": "5.53.3",
+        "source": "node_modules/svelte"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    },
+    {
+      "product": "sveltekit",
+      "corpusQualification": "CURRENT_UPSTREAM@2026-09-23",
+      "pages": 5,
+      "local": {
+        "declaredRange": "^2.0.0",
+        "installed": "2.59.1",
+        "source": "node_modules/@sveltejs/kit"
+      },
+      "status": "UPSTREAM_UNPINNED"
+    }
+  ],
+  "statusCounts": {
+    "UPSTREAM_UNPINNED": 6,
+    "UNVERSIONED": 1,
+    "MAJOR_MATCH": 1
+  },
+  "result": "VERSION_PIN_GAPS",
+  "finding": "npm-product pages are CURRENT_UPSTREAM@date, so they cannot be claimed to describe the installed release; pinning them needs a version-addressed crawl (e.g. the docs site's tagged/versioned path or the package's own docs at the installed tag), not a relabel.",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  }
+}

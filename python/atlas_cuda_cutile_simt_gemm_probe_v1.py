@@ -6,34 +6,40 @@ import argparse
 import json
 import time
 
-import cuda.tile as ct
-import torch
+try:
+    import cuda.tile as ct
+    import torch
+    _IMPORT_ERROR: str | None = None
+except ModuleNotFoundError as exc:
+    ct = None
+    torch = None
+    _IMPORT_ERROR = f"{exc.name}: {exc}"
 
 
-ConstInt = ct.Constant[int]
+if ct is not None:
+    ConstInt = ct.Constant[int]
 
-
-@ct.kernel
-def matmul_kernel(a, b, out, tile_m: ConstInt, tile_n: ConstInt, tile_k: ConstInt):
-    row_tile = ct.bid(0)
-    col_tile = ct.bid(1)
-    tiles_k = ct.num_tiles(a, axis=1, shape=(tile_m, tile_k))
-    accumulator = ct.full((tile_m, tile_n), 0.0, dtype=ct.float32)
-    for k_tile in range(tiles_k):
-        left = ct.load(
-            a,
-            index=(row_tile, k_tile),
-            shape=(tile_m, tile_k),
-            padding_mode=ct.PaddingMode.ZERO,
-        )
-        right = ct.load(
-            b,
-            index=(k_tile, col_tile),
-            shape=(tile_k, tile_n),
-            padding_mode=ct.PaddingMode.ZERO,
-        )
-        accumulator = ct.mma(left, right, accumulator)
-    ct.store(out, index=(row_tile, col_tile), tile=ct.astype(accumulator, out.dtype))
+    @ct.kernel
+    def matmul_kernel(a, b, out, tile_m: ConstInt, tile_n: ConstInt, tile_k: ConstInt):
+        row_tile = ct.bid(0)
+        col_tile = ct.bid(1)
+        tiles_k = ct.num_tiles(a, axis=1, shape=(tile_m, tile_k))
+        accumulator = ct.full((tile_m, tile_n), 0.0, dtype=ct.float32)
+        for k_tile in range(tiles_k):
+            left = ct.load(
+                a,
+                index=(row_tile, k_tile),
+                shape=(tile_m, tile_k),
+                padding_mode=ct.PaddingMode.ZERO,
+            )
+            right = ct.load(
+                b,
+                index=(k_tile, col_tile),
+                shape=(tile_k, tile_n),
+                padding_mode=ct.PaddingMode.ZERO,
+            )
+            accumulator = ct.mma(left, right, accumulator)
+        ct.store(out, index=(row_tile, col_tile), tile=ct.astype(accumulator, out.dtype))
 
 
 def cutile_matmul(a: torch.Tensor, b: torch.Tensor, *, tile: int = 32) -> torch.Tensor:
@@ -52,8 +58,24 @@ def cutile_matmul(a: torch.Tensor, b: torch.Tensor, *, tile: int = 32) -> torch.
 
 
 def run(*, size: int, repeats: int) -> dict[str, object]:
+    if _IMPORT_ERROR is not None:
+        return {
+            "schema": "atlas.cuda-cutile-simt-gemm-probe.v1",
+            "status": "CUTILE_SIMT_UNAVAILABLE",
+            "availability": {"importError": _IMPORT_ERROR},
+            "fixture": {"shape": [size, size, size], "repeats": repeats},
+            "writes": False,
+            "canonicalAuthority": False,
+        }
     if not torch.cuda.is_available():
-        raise SystemExit("CUDA_UNAVAILABLE")
+        return {
+            "schema": "atlas.cuda-cutile-simt-gemm-probe.v1",
+            "status": "CUDA_UNAVAILABLE",
+            "availability": {"torch": torch.__version__, "torchCuda": torch.version.cuda},
+            "fixture": {"shape": [size, size, size], "repeats": repeats},
+            "writes": False,
+            "canonicalAuthority": False,
+        }
     torch.manual_seed(23)
     a = torch.randn((size, size), device="cuda", dtype=torch.float16)
     b = torch.randn((size, size), device="cuda", dtype=torch.float16)
@@ -132,10 +154,10 @@ def main() -> int:
     print(json.dumps({
         "schema": result["schema"],
         "status": result["status"],
-        "cutileWarmMeanMs": result["timing"]["cutileWarmMeanMs"],
-        "simtWarmMeanMs": result["timing"]["simtWarmMeanMs"],
-        "maxAbsoluteDelta": result["fixture"]["maxAbsoluteDelta"],
-        "maxRelativeDelta": result["fixture"]["maxRelativeDelta"],
+        "cutileWarmMeanMs": result.get("timing", {}).get("cutileWarmMeanMs"),
+        "simtWarmMeanMs": result.get("timing", {}).get("simtWarmMeanMs"),
+        "maxAbsoluteDelta": result.get("fixture", {}).get("maxAbsoluteDelta"),
+        "maxRelativeDelta": result.get("fixture", {}).get("maxRelativeDelta"),
         "output": args.output,
     }, sort_keys=True))
     return 0 if result["status"] == "CUTILE_SIMT_GEMM_FINITE_PARITY_PROVEN" else 1

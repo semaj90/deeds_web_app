@@ -12,7 +12,7 @@ const dbUrl = 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const pool = new pg.Pool({ connectionString: dbUrl });
 
 const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090/v1/chat/completions';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const BATCH_SIZE = 500;
 const MAX_BATCHES = parseInt(process.env.MAX_BATCHES || '100');
 

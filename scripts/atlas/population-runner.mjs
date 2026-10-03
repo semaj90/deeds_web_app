@@ -6,9 +6,9 @@
  * correct dependency order so you never have to drive scripts one by one.
  *
  * Stage order (dependency-driven):
- *   1. dense        — content_embedding_384 via embeddinggemma (embeds raw text → Postgres)
+ *   1. dense        — RETIRED legacy 384-D stage; canonical semantic_768 has a separately guarded owner
  *   2. sparse       — BM25 keyword index rebuild (needs text from stage 1 backfill)
- *   3. latent       — autoencoder 768→64 latent_64 (needs Qdrant embeddings from stage 1)
+ *   3. latent       — learned 768→256/128/64 projections (requires separately admitted semantic_768 inputs)
  *   4. som          — SOM 20×20 training (needs latent_64 index from stage 3)
  *   5. topology     — page_rank_score, community_id, kmeans_cluster authority columns
  *   6. validate     — graphify startup gate (7-service health check)
@@ -65,11 +65,12 @@ const STAGES = [
   {
     id: 1,
     name: 'dense',
-    description: 'content_embedding_384 backfill via embeddinggemma → Postgres + Qdrant',
+    status: 'RETIRED',
+    description: 'Retired 384-D writer. Canonical semantic_768 uses parent-atlas-semantic-768-backfill.mjs with its own authorization gate; this orchestrator does not invoke it.',
     type: 'node',
-    script: resolve(__dir, 'backfill-embedding-lane.mjs'),
-    extraArgs: (dry) => dry ? ['--dry-run', '--limit=100'] : ['--max-packets=10000', '--batch-size=32'],
-    cwd: SVELTE,
+    script: resolve(__dir, 'parent-atlas-semantic-768-backfill.mjs'),
+    extraArgs: () => [],
+    cwd: ROOT,
   },
   {
     id: 2,
@@ -83,7 +84,7 @@ const STAGES = [
   {
     id: 3,
     name: 'latent',
-    description: 'autoencoder 768→64 latent_64 backfill (requires Qdrant codebase_chunks_768 + AE weights)',
+    description: 'learned latent_256/latent_128/latent_64 projection backfill (requires qualified semantic_768 inputs + AE weights; not a replacement retrieval truth)',
     type: 'node',
     script: resolve(__dir, 'backfill-latent-vectors.mjs'),
     extraArgs: (dry) => dry ? ['--dry-run', '--limit=500'] : ['--apply'],
@@ -195,6 +196,13 @@ async function main() {
   for (const stage of selected) {
     const label = `Stage ${stage.id}: ${stage.name}`;
     log(`─── ${label} ─── ${stage.description}`);
+
+    if (stage.status === 'RETIRED') {
+      fail(`${label}: retired representation writer; use the separately governed semantic_768 workflow only after its prerequisites and authorization are satisfied`);
+      failed++;
+      if (!CONTINUE_FAIL) break;
+      continue;
+    }
 
     // Prerequisite check
     if (stage.prerequisiteCheck) {

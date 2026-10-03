@@ -1,0 +1,274 @@
+{
+  "schema": "atlas.retrieval-executor-compatibility-workboard.v1",
+  "generatedAt": "2026-09-18T16:29:43.997Z",
+  "mode": "READ_ONLY_CROSS_OPENSPEC_CENSUS",
+  "canonicalAuthority": false,
+  "promotionAllowed": false,
+  "writesPerformed": false,
+  "ownerRows": [
+    {
+      "owner": "parent-atlas-retrieval-lineage-dag-convergence",
+      "role": "canonical workspace/source/execution/packet lineage",
+      "state": "WIRED",
+      "promotion": "BLOCKED",
+      "evidence": [
+        "docs/reports/current-lineage-closure-v1.json",
+        "docs/reports/current-graphify-execution-owner-resolution-v1.json"
+      ],
+      "blocker": "EXECUTION_SOURCE_AUTHORITY",
+      "openspec": {
+        "name": "parent-atlas-retrieval-lineage-dag-convergence",
+        "completedTasks": 701,
+        "totalTasks": 926,
+        "lastModified": "2026-09-18T01:34:56.719Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-code-ingestion-pipeline",
+      "role": "Tree-sitter and ast-grep structural evidence",
+      "state": "PROVEN_FIXTURE_ONLY",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "docs/reports/structural-observations-v1.json"
+      ],
+      "blocker": "CURRENT_SOURCE_REVISION_ADMISSION",
+      "openspec": {
+        "name": "parent-atlas-code-ingestion-pipeline",
+        "completedTasks": 23,
+        "totalTasks": 35,
+        "lastModified": "2026-09-16T22:56:56.272Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "atlas-retrieval-reconciliation",
+      "role": "logical lane normalization and retrieval reconciliation",
+      "state": "PROVEN_CONTRACT",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "openspec/specs/atlas-retrieval-reconciliation/spec.md"
+      ],
+      "blocker": "CURRENT_PACKET_COHORT",
+      "openspec": null
+    },
+    {
+      "owner": "parent-atlas-semantic-768-canonical-contract",
+      "role": "canonical dense representation contract",
+      "state": "WIRED",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "docs/reports/semantic-768-canonical-readiness-v1.json"
+      ],
+      "blocker": "REVISION_QUALIFIED_VECTOR_COHORT",
+      "openspec": {
+        "name": "parent-atlas-semantic-768-canonical-contract",
+        "completedTasks": 43,
+        "totalTasks": 64,
+        "lastModified": "2026-09-14T16:25:07.820Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-candidate-feature-execution-fabric",
+      "role": "candidate ordinal and feature matrix execution",
+      "state": "PROVEN_FIXTURE_ONLY",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "docs/reports/candidate-feature-matrix-v1.json"
+      ],
+      "blocker": "CANDIDATE_ORDINAL_ELIGIBILITY",
+      "openspec": {
+        "name": "parent-atlas-candidate-feature-execution-fabric",
+        "completedTasks": 185,
+        "totalTasks": 274,
+        "lastModified": "2026-09-15T18:10:31.909Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-gpu-runtime-abi-alignment",
+      "role": "GPU executor capability and ABI proofs",
+      "state": "WIRED",
+      "promotion": "CHALLENGER_ONLY",
+      "evidence": [
+        "docs/reports/gpu-runtime-abi-alignment-v1.json"
+      ],
+      "blocker": "REFERENCE_PARITY_AND_RESIDENCY",
+      "openspec": {
+        "name": "parent-atlas-gpu-runtime-abi-alignment",
+        "completedTasks": 17,
+        "totalTasks": 22,
+        "lastModified": "2026-09-16T22:57:23.615Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-tensor-residency-integration",
+      "role": "GPU residency and cache ownership",
+      "state": "PROVEN_FIXTURE_ONLY",
+      "promotion": "CHALLENGER_ONLY",
+      "evidence": [
+        "docs/reports/gpu-residency-fixture-v1.json"
+      ],
+      "blocker": "LIVE_EXECUTOR_CAPABILITY",
+      "openspec": {
+        "name": "parent-atlas-tensor-residency-integration",
+        "completedTasks": 96,
+        "totalTasks": 151,
+        "lastModified": "2026-09-15T01:47:42.154Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-prefill-routing-residency-convergence",
+      "role": "routing, prefill DAG, and prompt/residency contracts",
+      "state": "PROVEN_FIXTURE_ONLY",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "docs/reports/prefill-dag-replay-v1.json"
+      ],
+      "blocker": "LIVE_PACKET_LINEAGE",
+      "openspec": {
+        "name": "parent-atlas-prefill-routing-residency-convergence",
+        "completedTasks": 47,
+        "totalTasks": 152,
+        "lastModified": "2026-09-18T01:39:09.236Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-memory-architecture-freeze",
+      "role": "model KV/recurrent state and memory boundary",
+      "state": "WIRED",
+      "promotion": "BLOCKED_BY_RESIDENCY_PROOF",
+      "evidence": [
+        "openspec/changes/parent-atlas-memory-architecture-freeze/tasks.md"
+      ],
+      "blocker": "MODEL_STATE_OWNERSHIP",
+      "openspec": {
+        "name": "parent-atlas-memory-architecture-freeze",
+        "completedTasks": 19,
+        "totalTasks": 31,
+        "lastModified": "2026-09-06T02:53:09.904Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "local-llm-offload-ownership",
+      "role": "llama-server and local model offload ownership",
+      "state": "WIRED",
+      "promotion": "PINNED_RUNTIME_REQUIRES_COMPATIBILITY_RECEIPT",
+      "evidence": [
+        "sveltekit-frontend/.env.example",
+        "opencode.json"
+      ],
+      "blocker": "8090_HEALTH_MODEL_PROPS_REPLAY",
+      "openspec": {
+        "name": "local-llm-offload-ownership",
+        "completedTasks": 37,
+        "totalTasks": 43,
+        "lastModified": "2026-09-14T01:40:57.973Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-retrieval-executor-compatibility-convergence",
+      "role": "analyze-this coordinator and cross-lane compatibility receipts",
+      "state": "WIRED",
+      "promotion": "BLOCKED_BY_LINEAGE",
+      "evidence": [
+        "docs/reports/analyze-this-adapters-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/analyze-this-coordinator.ts"
+      ],
+      "blocker": "CURRENT_SOURCE_AUTHORITY",
+      "openspec": {
+        "name": "parent-atlas-retrieval-executor-compatibility-convergence",
+        "completedTasks": 32,
+        "totalTasks": 46,
+        "lastModified": "2026-09-18T16:28:40.178Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-ace-bitfrost-cache-correctness",
+      "role": "revisioned ACE/BitFrost metadata cache boundary",
+      "state": "PROVEN_CONTRACT",
+      "promotion": "CHALLENGER_ONLY",
+      "evidence": [
+        "docs/reports/centroid-cache-families-v1.json",
+        "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts"
+      ],
+      "blocker": "LIVE_CANONICAL_LINEAGE",
+      "openspec": {
+        "name": "parent-atlas-ace-bitfrost-cache-correctness",
+        "completedTasks": 56,
+        "totalTasks": 88,
+        "lastModified": "2026-09-15T19:32:39.758Z",
+        "status": "in-progress"
+      }
+    },
+    {
+      "owner": "parent-atlas-graph-runtime-python-consolidation",
+      "role": "Python runtime, TurboVec, NetworkX/cuGraph challenger evidence",
+      "state": "PROVEN_RUNTIME_RECEIPT",
+      "promotion": "CHALLENGER_ONLY",
+      "evidence": [
+        "docs/reports/python-runtime-capability-v1.json",
+        "docs/reports/turbovec-runtime-v1.json"
+      ],
+      "blocker": "NO_CANONICAL_EXECUTOR_PROMOTION",
+      "openspec": {
+        "name": "parent-atlas-graph-runtime-python-consolidation",
+        "completedTasks": 5,
+        "totalTasks": 18,
+        "lastModified": "2026-09-05T06:30:58.761Z",
+        "status": "in-progress"
+      }
+    }
+  ],
+  "firstFailureBoundary": {
+    "status": "EXECUTION_SOURCE_AUTHORITY",
+    "executionOwner": "DUPLICATE_EQUIVALENT_EXECUTIONS",
+    "lifecycleOwner": "LIFECYCLE_OWNER_UNPROVEN",
+    "packetBridge": "PACKET_DIGEST_BRIDGE_BLOCKED",
+    "nextDecision": "EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION"
+  },
+  "completionModel": {
+    "WRITTEN": "artifact or type exists",
+    "WIRED": "connected to an owner or caller",
+    "PROVEN": "focused replay/receipt passes",
+    "PROMOTED": "canonical authority and independent readback admitted"
+  },
+  "policy": {
+    "noTaskAutoClose": true,
+    "noDdl": true,
+    "noPacketBackfill": true,
+    "noProjectionWrites": true,
+    "noCacheMutation": true,
+    "noModelUpgrade": true
+  },
+  "validationCommands": {
+    "strictOpenSpec": "npx openspec validate parent-atlas-retrieval-executor-compatibility-convergence --strict",
+    "focusedTests": [
+      "cd sveltekit-frontend; npx vitest run src/lib/server/ml/phase17-provider-admission.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/classification/xgboost-ranking-lineage-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/execution/executor-capability-receipt-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/gpu/gpu-residency-budget.test.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/gpu/residency-descriptor-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/gpu/kernel-challenger-classification-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/execution/tensorrt-rtx-compatibility-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/bifrost/client.compatibility.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/execution/llama-server-upgrade-receipt-v1.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/retrieval/analyze-this-coordinator.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/ace/feature-context-cache.spec.ts",
+      "cd sveltekit-frontend; npx vitest run src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.test.ts",
+      "node scripts/atlas/audit-python-runtime-v1.mjs",
+      "node scripts/atlas/audit-turbovec-runtime-v1.mjs"
+    ]
+  },
+  "nextGate": "EXPLICIT_GRAPHIFY_EXECUTION_OWNER_DECISION",
+  "safeNextCommand": "node scripts/atlas/plan-current-graphify-execution-owner-resolution-v1.mjs",
+  "smokeCommand": "npx openspec validate parent-atlas-retrieval-executor-compatibility-convergence --strict",
+  "reportPath": "docs/reports/retrieval-executor-compatibility-workboard-v1.json"
+}

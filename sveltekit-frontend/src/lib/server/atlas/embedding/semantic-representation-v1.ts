@@ -4,12 +4,14 @@ import { sha256HexSchema } from '../prefill/canonical-hash-v1.js';
 /**
  * SEM768-REPRESENTATION-CONTRACT-01
  *
- * Formalizes what a `codebase_chunk_index.content_embedding` row actually
- * proves, without creating a new table or migration. Per SEM768-STORAGE-OWNER-01
- * (docs/reports/sem768-storage-owner-01.json), that column is the confirmed
- * physical owner of the logical `semantic_768` representation (55,169/55,853
- * rows populated, HNSW m=16/ef_construction=200). This contract does not
- * change that storage — it names it precisely and separates two questions
+ * Historical V1 contract for rows stored in `codebase_chunk_index.content_embedding`.
+ * This schema is retained to read/verify existing V1 receipts; it is not the
+ * current physical-owner contract. The current owner is represented by
+ * SemanticRepresentationV2Schema in semantic-representation-v2.ts and uses
+ * `codebase_chunk_index.content_embedding_768`. Do not silently reinterpret a
+ * V1 receipt as V2 or rewrite historical receipts.
+ *
+ * This contract separates two questions
  * that are easy to conflate:
  *
  *   1. Where does the vector physically live? (chunkIndexId, storage.*)
@@ -117,12 +119,9 @@ export type InputDigestV1 = z.infer<typeof InputDigestV1Schema>;
 
 const optionalNonEmpty = z.string().min(1).optional();
 
-export const SemanticRepresentationV1Schema = z
-  .object({
-    schema: z.literal(SEMANTIC_REPRESENTATION_SCHEMA_V1),
-
-    // Physical storage coordinate. Always resolvable — every row selected
-    // from codebase_chunk_index has one. NOT a claim of canonical identity.
+/** Shared provenance fields; storage-specific schema/revision stay in each version. */
+export const SemanticRepresentationCoreV1Schema = z.object({
+    // Physical row coordinate. Always resolvable — every selected row has one.
     chunkIndexId: z.string().uuid(),
 
     // Canonical Atlas identity — populated ONLY when independently resolved
@@ -147,17 +146,19 @@ export const SemanticRepresentationV1Schema = z
 
     inputDigest: InputDigestV1Schema.optional(),
     vectorChecksum: sha256HexSchema.optional(),
-
-    storage: z
-      .object({
-        table: z.literal('codebase_chunk_index'),
-        column: z.literal('content_embedding'),
-        storageType: z.literal('halfvec(768)'),
-      })
-      .strict(),
-
     lineageStatus: SemanticLineageStatusV1Schema,
     canonicalAuthority: z.boolean(),
+  }).strict();
+
+export const SemanticRepresentationV1Schema = SemanticRepresentationCoreV1Schema
+  .extend({
+    schema: z.literal(SEMANTIC_REPRESENTATION_SCHEMA_V1),
+    // Historical V1 physical coordinate. Retained for existing receipts.
+    storage: z.object({
+      table: z.literal('codebase_chunk_index'),
+      column: z.literal('content_embedding'),
+      storageType: z.literal('halfvec(768)'),
+    }).strict(),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -206,6 +207,52 @@ export const SemanticRepresentationV1Schema = z
   });
 
 export type SemanticRepresentationV1 = z.infer<typeof SemanticRepresentationV1Schema>;
+
+/** Stage 4 admission receipt for one current semantic_768 cohort. */
+export const semanticCohortAdmissionV1Schema = z.object({
+  schema: z.literal('atlas.semantic-cohort-admission.v1'),
+  identity: z.object({
+    representation: z.literal('semantic_768'),
+    workspaceRevision: z.string().min(1),
+    sourceRevisionSetChecksum: sha256HexSchema,
+    representationRevision: z.string().min(1),
+    dimensions: z.literal(768),
+    modelRevision: z.string().min(1),
+  }).strict(),
+  candidateSetChecksum: sha256HexSchema,
+  ordinalMapChecksum: sha256HexSchema,
+  rowCount: z.number().int().nonnegative(),
+  payloadChecksum: sha256HexSchema.nullable(),
+  admissionStatus: z.enum(['ADMITTED', 'BLOCKED_LINEAGE', 'BLOCKED_REPRESENTATION', 'UNAVAILABLE']),
+  executor: z.enum(['POSTGRES_EXACT', 'QDRANT_HNSW', 'CUVS_BRUTE_FORCE', 'CUVS_CAGRA']).nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  blocker: z.string().min(1).nullable(),
+}).strict().superRefine((value, ctx) => {
+  if (value.admissionStatus === 'ADMITTED' && (!value.payloadChecksum || !value.executor || value.blocker !== null)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['admissionStatus'], message: 'ADMITTED semantic cohort requires payload checksum, executor, and no blocker.' });
+  }
+  if (value.admissionStatus === 'ADMITTED' && value.rowCount === 0) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rowCount'], message: 'ADMITTED semantic cohort must contain at least one qualified row.' });
+  }
+  if (value.admissionStatus !== 'ADMITTED' && value.blocker === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['blocker'], message: 'Blocked semantic cohort requires an explicit blocker.' });
+  }
+});
+
+export type SemanticCohortAdmissionV1 = z.infer<typeof semanticCohortAdmissionV1Schema>;
+
+/** Validate an explicitly supplied admission observation; never invents rows or revisions. */
+export function buildSemanticCohortAdmissionV1(
+  input: Omit<SemanticCohortAdmissionV1, 'schema' | 'canonicalAuthority' | 'writesPerformed'>,
+): SemanticCohortAdmissionV1 {
+  return semanticCohortAdmissionV1Schema.parse({
+    schema: 'atlas.semantic-cohort-admission.v1',
+    ...input,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+}
 
 export type SemanticRepresentationInputV1 = Omit<
   SemanticRepresentationV1,

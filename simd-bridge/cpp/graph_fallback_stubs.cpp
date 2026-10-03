@@ -4,6 +4,14 @@
 #include <cstdint>
 #include <cmath>
 #include <cstring>
+#include <algorithm>
+#include <vector>
+#include "native_execution_counters.h"
+
+static int recordStubInvocation() {
+  atlasNativeCounterRecord(AtlasExecutionCounter::stub_invocation);
+  return -99;
+}
 
 extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* output, int output_len) {
   if (!embeddings || !output) return -1;
@@ -27,6 +35,7 @@ extern "C" int graphSimilarity(const float* embeddings, int n, int dim, float* o
     }
   }
   free(norms);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -51,6 +60,34 @@ extern "C" int batchCosineSimilarity(const float* query, int dim, const float* c
     }
     scores[i] = dot / (qnorm * (sqrtf(cnorm) + 1e-12f));
   }
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
+  return 0;
+}
+
+extern "C" int batchCosineTopK(
+    const float* query, const float* corpus, int n, int dim, int k,
+    int32_t* indices, float* scores, int output_len, int* backend_out) {
+  if (!query || !corpus || !indices || !scores || !backend_out) return -1;
+  if (n <= 0 || dim <= 0 || k <= 0 || k > n || output_len < k) return -2;
+  for (int d = 0; d < dim; ++d) if (!std::isfinite(query[d])) return -2;
+  for (size_t i = 0; i < static_cast<size_t>(n) * static_cast<size_t>(dim); ++i)
+    if (!std::isfinite(corpus[i])) return -2;
+  float query_norm = 0.0f;
+  for (int d = 0; d < dim; ++d) query_norm += query[d] * query[d];
+  query_norm = sqrtf(query_norm) + 1e-12f;
+  std::vector<std::pair<float, int32_t>> ranked;
+  ranked.reserve(static_cast<size_t>(n));
+  for (int i = 0; i < n; ++i) {
+    const float* row = corpus + static_cast<size_t>(i) * dim;
+    float dot = 0.0f, norm = 0.0f;
+    for (int d = 0; d < dim; ++d) { dot += query[d] * row[d]; norm += row[d] * row[d]; }
+    ranked.emplace_back(dot / (query_norm * (sqrtf(norm) + 1e-12f)), static_cast<int32_t>(i));
+  }
+  std::partial_sort(ranked.begin(), ranked.begin() + k, ranked.end(),
+      [](const auto& a, const auto& b) { return a.first > b.first || (a.first == b.first && a.second < b.second); });
+  for (int i = 0; i < k; ++i) { scores[i] = ranked[i].first; indices[i] = ranked[i].second; }
+  *backend_out = 2;
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -68,6 +105,7 @@ extern "C" int computeCaseEmbedding(const float* weights, int n, const float* em
   }
   if (total_w == 0.0) total_w = 1.0;
   for (int d = 0; d < dim; ++d) output[d] = (float)(output[d] / total_w);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -128,6 +166,7 @@ extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k,
   free(centroids);
   free(counts);
   free(sums);
+  atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
 
@@ -142,15 +181,19 @@ extern "C" int getCudaMemory(int64_t* free_bytes, int64_t* total_bytes) {
 }
 
 // Additional CPU-side fallbacks for functions referenced elsewhere
-extern "C" int autoencoderEncodeGPU(const float*, int, float*, int) { return -99; }
-extern "C" int autoencoderDecodeGPU(const float*, int, float*, int) { return -99; }
-extern "C" int pcaProjectGPU(const float*, int, int, float*, int) { return -99; }
+extern "C" int autoencoderEncodeGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int autoencoderDecodeGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int pcaProjectGPU(const float*, int, int, float*, int) { return recordStubInvocation(); }
 
-// Stubs for GPU-named functions expected by bindings; these are no-ops in CPU fallback.
-extern "C" void pageRankGPU() {}
-extern "C" void attentionScoreGPU() {}
-extern "C" void rewardScoreGPU() {}
-extern "C" void softmaxGPU() {}
-extern "C" void topKIndicesGPU() {}
-extern "C" void kmeansWithCentroids() {}
-extern "C" void trainSOM() {}
+// ABI-compatible no-LibTorch stubs. Preserve the signatures declared by the
+// N-API boundary and fail explicitly instead of returning success through a
+// mismatched no-op symbol.
+extern "C" int pageRankGPU(const float*, int, float, int, float*, int) { return recordStubInvocation(); }
+extern "C" int attentionScoreGPU(const float*, int, const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int rewardScoreGPU(const float*, const float*, int, int, float*, int) { return recordStubInvocation(); }
+extern "C" int softmaxGPU(const float*, int, float*, int) { return recordStubInvocation(); }
+extern "C" int topKIndicesGPU(const float*, int, int, int*, int) { return recordStubInvocation(); }
+extern "C" int kmeansWithCentroids(const float*, int, int, int, int,
+                                    int*, int, float*, int, int*) { return recordStubInvocation(); }
+extern "C" int trainSOM(const float*, int, int, int, int, int,
+                         float, float, float, float, float*, int, int*, int) { return recordStubInvocation(); }

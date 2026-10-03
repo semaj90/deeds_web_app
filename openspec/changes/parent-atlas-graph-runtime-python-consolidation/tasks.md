@@ -76,20 +76,48 @@ zero-caller claim with a fresh grep (repo state moves).
         app + adds semantic512 routes on top) from the one actually deployed
         (`services/atlas-gpu-8098/app.py`); no name-collision risk, they're just two different
         FastAPI entrypoints and only one is wired into Docker today.
-- [ ] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 remaining
-      zero/near-zero caller files above (`atlas_subgraph_cugraph.py`,
-      `atlas_rapids_community_sidecar.py`, `atlas_compute/cugraph_ppr.py`,
-      `atlas_compute/graph_programs.py`) with classification + evidence (caller-trace result) per
-      file. Fresh grep already run for the first two (2026-08-31): both show only their own
+- [x] Add entries to `docs/architecture/runtime-ownership-registry.json` for the 4 files flagged
+      above (`atlas_subgraph_cugraph.py`, `atlas_rapids_community_sidecar.py`,
+      `atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) with classification +
+      evidence (caller-trace result) per file. **Correction (2026-09-23):
+      only 3 of these 4 are actually zero/near-zero-caller — `graph_programs.py` has a real,
+      currently-passing test exercising its API and should not be classified alongside the other
+      3.** Fresh grep already run for the first two (2026-08-31): both show only their own
       `__pycache__/*.pyc` as a "match" — confirmed zero real callers, DEAD.
-- [ ] Re-run the caller grep fresh at reclassification time for the remaining 2
-      (`atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) — not yet done this pass.
-- [ ] For `atlas_compute/graph_programs.py` specifically: check `parent-atlas-graph-runtime-enhancement`
-      GR10 (semantic best-first, TypeScript, not yet started) before finalizing DEAD — if GR10 work
-      begins and this file's heapq-based traversal turns out to be relevant prior art, surface it
-      there rather than silently deleting.
-- [ ] Update `runtime-ownership-baseline.json` if any of these are judged pre-existing tolerated debt
-      rather than new violations (they predate this proposal, so baseline is the right bucket).
+- [x] Re-run the caller grep fresh at reclassification time for the remaining 2
+      (`atlas_compute/cugraph_ppr.py`, `atlas_compute/graph_programs.py`) — done, and the two
+      files land in different classifications, not the same one:
+      - **`atlas_compute/cugraph_ppr.py`**: eagerly imported by `atlas_compute/__init__.py`
+        (line 11, re-exports `CuGraphPprParityReceipt`/`run_cugraph_ppr_parity`) — reachable as
+        an import-time side effect of any of the 45 real files that do
+        `from atlas_compute.<submodule> import ...` (any submodule import runs the package
+        `__init__.py` first). But grepped every one of those 45 callers plus the rest of
+        `python/`: **zero of them actually call `run_cugraph_ppr_parity()` or reference
+        `CuGraphPprParityReceipt`** outside the module's own definition. Import-reachable, not
+        functionally used anywhere — a real distinction from the two fully pycache-only-dead
+        files above, but not `PROVEN` either. Recommend `FIXTURE_ONLY`-or-`DEAD` per the
+        ownership vocabulary, not a third `DEAD` twin of the confirmed-dead pair.
+      - **`atlas_compute/graph_programs.py`**: same import-reachability as above, PLUS genuinely
+        called — `python/test_atlas_compute_graph_representation.py` imports and calls both
+        `deterministic_bfs()` and `condense_and_lexicographically_sort()`. Re-ran that test live:
+        `python -m pytest python/test_atlas_compute_graph_representation.py -q` → **4 passed**.
+        Not dead, not near-zero-caller — has a real, currently-passing test exercising its actual
+        API. It is registered separately as `FIXTURE_ONLY`; GR10 is a distinct TypeScript semantic
+        best-first feature, not this Python BFS/topological-order helper.
+      - `atlas_subgraph_cugraph.py` is registered `DEAD` (read-only CLI, no caller/deployment hit).
+      - `atlas_rapids_community_sidecar.py` is registered `EXPERIMENT` (standalone bounded API,
+        no deployment hit; its implementation helper remains used by a frozen-fixture challenger).
+      - `atlas_compute/cugraph_ppr.py` is registered `DEAD`: package-import reachable via the eager
+        barrel, but its function/receipt have no functional caller or test use.
+      Registry entries preserve the deployed TypeScript/Neo4j-GDS canonical owner and make no
+      deletion or runtime change.
+- [x] For `atlas_compute/graph_programs.py`, compare against
+      `parent-atlas-graph-runtime-enhancement` GR10 before classification. GR10 is explicitly
+      semantic best-first in TypeScript; the Python helper implements deterministic BFS and SCC/DAG
+      ordering. It remains useful as `FIXTURE_ONLY` reference code, not DEAD and not a GR10 owner.
+- [x] Update `runtime-ownership-baseline.json` for these four pre-existing, noncanonical artifacts
+      (`DEAD`, `EXPERIMENT`, or `FIXTURE_ONLY`) so the ownership audit treats them as documented
+      existing state rather than newly introduced ownership violations.
 
 ## T2 — `parent_atlas_pagerank_reference.py` — human decision
 
@@ -137,16 +165,17 @@ zero-caller claim with a fresh grep (repo state moves).
 
 ## T4 — Package scaffold
 
-- [ ] Create `python/atlas_graph_runtime/` with `identity.py` (promoted from
-      `atlas_compute/typed_graph_runtime.py`, contracts only, no behavior change) and a `README.md`
+- [x] Create `python/atlas_graph_runtime/` with `contracts.py` (the `TypedGraphEdge`,
+      `GraphExecutionReceipt`, and `GraphBackend` declarations extracted from
+      `atlas_compute/typed_graph_runtime.py`, with no algorithm moved) and a `README.md`
       stating the hard rule from `proposal.md`'s Design section.
-- [ ] Add empty `cugraph_executor.py`, `networkx_executor.py`, `cuvs_executor.py`, `cuml_executor.py`
+- [x] Add empty `cugraph_executor.py`, `networkx_executor.py`, `cuvs_executor.py`, `cuml_executor.py`
       placeholders — docstring only, pointing at this proposal + the future gate (GR7) that
       populates them. No implementation in this pass.
-- [ ] Do NOT move or modify `atlas_compute/typed_graph_runtime.py`'s existing test files
+- [x] Do NOT move or modify `atlas_compute/typed_graph_runtime.py`'s existing test files
       (`test_typed_graph_runtime.py`, `test_atlas_compute_graph_representation.py`) — update their
-      imports only if/when the promotion in this task actually moves the module; if kept as a
-      re-export shim instead, no test changes needed.
+      imports only if/when required. Tests remained in place and their existing import paths are
+      preserved by the compatibility module; this tranche did not edit either test file.
 
 ## T5 — Follow-up audit scope (tracked, not resolved here)
 
@@ -155,9 +184,14 @@ zero-caller claim with a fresh grep (repo state moves).
       app and layers semantic512 routes on top of the graph routes) from the one Docker actually
       runs (`services/atlas-gpu-8098/app.py`). No name collision — just two separate entrypoints,
       only one wired into `docker-compose.gpu.yml` today.
-- [ ] `scripts/atlas/run_louvain_challenger_v1.py` — "challenger" naming suggests an A/B algorithm
-      comparison; check it doesn't collide with the already-settled Louvain/Leiden ownership in
-      `parent-atlas-graph-analysis-contract` before it's touched by anything.
+- [x] `scripts/atlas/run_louvain_challenger_v1.py` — audited 2026-09-23 against the settled
+      Louvain/Leiden production ownership in `parent-atlas-graph-analysis-contract`. It is a
+      read-only frozen-fixture challenger, not a second production owner: it imports and calls
+      `python/atlas_rapids_community.py::run_cugraph_partition` with `algorithm="louvain"`,
+      emits a comparison receipt, and does not write canonical graph or retrieval state. The
+      production TypeScript/Neo4j-GDS owner remains separate and unchanged. Fresh caller search
+      found only the explicit live-graph-proof task references; no runtime registration or
+      canonical writer caller. No execution, graph write, or promotion was performed.
 
 ## Cross-references
 
@@ -172,16 +206,136 @@ zero-caller claim with a fresh grep (repo state moves).
 
 ## GPU expansion dependency crosswalk (2026-08-31)
 
+- [x] **GRAPH-RECEIPT-V2-CONTRACT-TEST (2026-09-26):** added an additive `GraphExecutionReceiptV2` beside the unchanged V1 contract. V1 field names/values are carried through; V2 requires an explicit executor revision and lowercase SHA-256 input/output checksums, and remains non-authoritative/no-write. The wrapper is not wired into execution. Focused compatibility/negative tests verify preservation and fail-closed provenance handling; this is contract-fixture proof only, not live graph execution or parity.
+- [x] **PAGERANK-BACKEND-ALIGNMENT-01 (2026-09-26):** added a pure NetworkX↔cuGraph comparison helper that requires proven V2 receipts, matching graph revision/input checksum/node and edge counts, explicit graph-ordinal-map checksum, exact ordinal-set equality, and output-checksum readback. It compares score deltas and deterministic top-k ordering with GraphOrdinal tie-break; fixture tests prove input-order independence and fail-closed identity mismatch. No GPU execution or live graph proof is claimed. Lane decision: cuGraph owns RAPIDS GPU PageRank; cuVS/CAGRA is a vector ANN challenger, not PageRank; DuckDB is offline receipt analytics; SIMT remains deferred pending a measured gap and parity proof.
+
 The tensor-residency expansion workboard tracks shared dependencies without
 moving graph ownership here. This graph runtime owns only the graph side:
 
-- [ ] **GPU-EXP-14** GraphProjectionArtifactV1 with explicit `GraphOrdinal`,
-  graph revision, vertex checksum, edge checksum, and ordinal-map checksum.
+- [x] **GPU-EXP-14** GraphProjectionArtifactV1 with explicit `GraphOrdinal`,
+  graph revision, vertex checksum, edge checksum, and ordinal-map checksum. **PROVEN at
+  noncanonical artifact-builder/fixture scope (2026-09-23):** the builder emits
+  `atlas.graph-projection-artifact.v1`, keeps `candidateOrdinalMapChecksum` separate from
+  `graphOrdinalMapChecksum`, and the Python executor validates the latter against the dense
+  `(graphOrdinal, graphNodeKey)` rows. Temporary Parquet write/readback fixture retains an
+  isolated vertex and verifies the cross-language TypeScript checksum golden. Focused graph
+  suite: 16/16 passed. No current-source artifact was rebuilt or promoted. Audit also found the
+  old checked-in artifact labeled the candidate-map checksum as `ordinalMapChecksum`; its value
+  (`86fee5…`) does not match the recomputed graph map (`4319a5…`), so that ambiguous legacy
+  manifest now fails closed.
 - [ ] **GPU-EXP-15** bounded multi-hop traversal with predecessor/path receipt;
   depth policy is 2 normally, 3 expanded, 4 hard maximum.
+  Implementation progress (2026-09-23): the 8098 BFS request now encodes DEFAULT=2,
+  EXPANDED=3, MAXIMUM=4, validates requests against the selected bound, reconstructs node-key
+  paths from predecessor ordinals, and emits a checksummed noncanonical path receipt bound to
+  graph revision, projection revision, and the explicit graph-ordinal-map checksum. Missing or
+  malformed bindings fail closed. Unit coverage exercises policy rejection, predecessor-chain
+  validation, receipt checksum revision sensitivity, and runtime response propagation (20 focused
+  Python tests passed on 2026-09-23).
+  **Still open:** live traversal against one admitted frozen graph; `/v1/graph/resident` currently
+  reports `resident:null`, and the available old artifact has the checksum ambiguity recorded
+  under GPU-EXP-14. No synthetic graph was loaded into the live GPU service.
+  **Read-only recheck (2026-09-26):** `GET http://127.0.0.1:8098/v1/graph/resident` reports
+  `capability.available=true` (`cugraph.pagerank`, backend 26.08.00) but `resident=null`; therefore
+  this still cannot produce a live traversal receipt. Existing `graph-ordinal-cpu-gpu-parity-v1`
+  is a six-node fixture, and `current-structural-graph-cpu-gpu-parity-v1` is a 23-node structural
+  proof; neither is the admitted frozen graph artifact required here.
 - [ ] **GPU-EXP-16** NetworkX oracle → cuGraph executor parity, including any
-  internal renumbering translation and deterministic replay.
+  internal renumbering translation and deterministic replay. **Partial fixture proof (2026-09-23):**
+  the BFS adapter is tested against NetworkX shortest paths with deliberately permuted executor
+  ordinals; translated node-key paths match and replayed path checksums are identical. This uses a
+  fake cuGraph result frame and proves adapter mapping/determinism only, not cuGraph computation or
+  live parity. Full task remains open pending replay on the same admitted frozen graph artifact.
+  **Read-only recheck (2026-09-26):** no resident graph is loaded on `:8098`, so live NetworkX ↔
+  cuGraph replay against one shared admitted artifact remains blocked. Do not substitute the fixture
+  receipts listed under GPU-EXP-15 or infer parity from backend capability availability.
+  The new `pagerank_parity.py` helper closes the comparator/receipt mechanics only; GPU-EXP-16
+  remains open until both executors run the same admitted frozen graph artifact.
 
 GPU cache, HNSW, QLoRA, and 4D coordinate tasks remain owned by their existing
 OpenSpecs. A graph result is derived evidence and cannot become CandidateOrdinal,
 canonical identity, or an additional retrieval vote.
+
+## First execution tranche checkpoint (2026-09-27)
+
+- [x] **GRAPH-CAPABILITY-CENSUS:** read-only environment census recorded in
+  `docs/reports/graph-ace-gpu-first-tranche-20260927.md`. NetworkX 3.6.1 is
+  callable and tested locally. Rechecked 2026-10-01: WSL2 Miniforge's existing
+  `atlas-rapids-cu13` interpreter at
+  `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` reports Python
+  3.14.6, PyTorch 2.13.0+cu130 with CUDA available, and cuGraph/cuVS 26.06.00.
+  The default WSL shell has no activated Conda environment, so GPU jobs must
+  select this pinned interpreter explicitly; do not create another environment.
+  Windows Python 3.13 has PyTorch 2.8.0+cu128/CUDA 12.8 and is a separate native
+  lane, not the WSL Graphify/RAPIDS runtime. The healthy NLP sidecar at :8095 is
+  a separate CPU-only Docker runtime (`torch`, `cugraph`, and `cuvs` unavailable);
+  keep NLP middleware there and dispatch GPU graph work only through its existing
+  RAPIDS owner. This was an environment/import check, not a GPU graph execution,
+  Graphify indexing run, or parity proof.
+  8098 reports cuGraph 26.08.00. The service reports capability available but
+  no resident graph. Neo4j HTTP reachability is not counted as a GDS algorithm
+  invocation. This is capability evidence, not live graph parity.
+- [x] **NETWORKX-ORACLE-SURFACE:** added thin PageRank/weighted-SSSP exports
+  that delegate to `atlas_compute.typed_graph_runtime`; focused tests passed
+  16/16. No new graph math or identity owner.
+- [ ] **GPU-FABRIC-AUDIT:** still open until a single frozen CandidateOrdinal
+  artifact is checked across cuVS, hypergraph, feature-pack, and residency
+  owners with matching snapshot/map checksums.
+- [ ] **GPU-DAG-CANARY:** blocked while 8098 has `resident:null` and the shared
+  artifact identity/H2D counters are not available. No graph was loaded.
+
+Report: `docs/reports/graph-ace-gpu-first-tranche-20260927.md`.
+
+## Query-conditioned PPR parity (2026-09-27)
+
+- [x] **PPR-ORDINAL-IDENTITY-01:** added a typed execution identity binding
+  graph revision, CandidateOrdinal snapshot/map, graph-ordinal map, graph
+  edges, normalized seed CandidateOrdinals/weights, alpha, epsilon, iteration
+  limit, and `dangling=PERSONALIZATION`. Added NetworkX and cuGraph thin calls
+  plus a receipt comparator for Pearson/Spearman, top-10/50/100 overlap, score
+  L1/L-infinity, rank displacement, mass conservation, and dangling score mass.
+  Unit/contract proof is complete; this does not imply live graph parity.
+- [x] **PPR-CUGRAPH-FIXTURE-01:** the RAPIDS 26.06.00 environment passed the
+  same five-ordinal directed fixture, including dangling and isolated vertices.
+  NetworkX↔cuGraph: Pearson 0.9999999999999996, Spearman 1.0, score L1
+  2.98e-8, L-infinity 9.28e-9, zero rank displacement, full top-10/50/100
+  overlap (all 5 available nodes), score sums 1.0/1.00000003, and dangling
+  mass delta 9.0e-9. Immutable receipt:
+  `docs/reports/ppr-fixture-canary-v1-20260927.json`. Synthetic fixture only;
+  it is not admitted-graph parity or a cache HIT proof.
+- [ ] **PPR-LIVE-GRAPH-01:** remains separate from the synthetic canary. It
+  requires one admitted frozen graph resident on 8098 plus the same graph/map
+  checksums at both executors.
+- [ ] **SIMT-PPR-01:** deferred unless measured cuGraph latency/memory shows a
+  material gap. cuVS/CAGRA remains vector-neighbor search, never PPR/PageRank.
+  DuckDB remains offline receipt analytics; Hilbert/real-valued score geometry
+  and Hamming/binary-projection geometry remain distinct artifacts. A Jacobian
+  is a local derivative map, not a generic second graph-ranking space.
+
+Global PageRank metric comparison also now exposes Pearson/Spearman, score
+L1/L-infinity and sums, top-10/50/100 overlap, rank displacement, and explicit
+dangling policy/mass. DuckDB remains an offline receipt analyzer, not an
+execution backend. No SIMT kernel is justified by the five-node canary.
+
+## Query-to-seed and worker execution gaps
+
+- [ ] **SEED-COMPILER-01:** compile the existing query-classification and
+  retrieval-lane outputs into one deterministic `QuerySeedSetV1` for the
+  existing PPR executor. Bind request/query checksum, workspace and graph
+  revisions, candidate snapshot and `CandidateOrdinalMapV1` checksums, exact
+  canonical IDs/ordinals, lane evidence references, normalized weights, and
+  seed checksum. Reject unresolved identities, stale revisions, duplicate
+  ordinals, and unqualified compact ordinals. Existing cartridge seed tiles
+  and `AtlasPageRankRequestV1` node-key inputs are not this compiler. Reuse the
+  current PPR and candidate-map owners; do not create another seed registry or
+  retrieval lane. Fixture/replay proof only until a current admitted graph is
+  available.
+- [ ] **PPR-WORKER-PARITY-01:** exercise the actual worker dispatch and its
+  selected executor against the same revision-qualified PPR fixtures as the
+  NetworkX/cuGraph contract. Include `0 -> 1` with node 1 dangling, all-dangling
+  nodes, and non-uniform personalization; assert finite non-negative scores,
+  unit mass, personalization-based dangling redistribution, exact ordinal
+  identity, and deterministic output. Record whether N-API or CPU emulation
+  ran; CPU fallback must not be reported as CUDA proof. Keep the legacy dense
+  `pageRankGPU` consumer out of this validation until its input and semantics
+  satisfy the sparse CSR contract.

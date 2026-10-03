@@ -3,7 +3,9 @@
  * "bm25" label for existing callers, but this delegates to
  * `postgres-fts.js`'s `searchCodeLexical()`, which is PostgreSQL native
  * tsvector/GIN full-text search (ts_rank/websearch_to_tsquery), not BM25.
- * pg_search is not installed in this repo. New callers should import
+ * pg_search 0.25.1 IS installed in the live DB (2026-09-26) with a BM25 index on
+ * codebase_chunk_index, but it is an unpromoted challenger and is not what this
+ * wrapper calls. New callers should import
  * `searchCodeLexical` from `$lib/server/search/postgres-fts.js` directly
  * and treat the lane as `postgres_tsvector_english`. See openspec/changes/
  * parent-atlas-neural-prefill-encoder/tasks.md's DBCTX-01/BM25 cleanup

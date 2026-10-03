@@ -14,7 +14,7 @@ import type { RequestHandler } from './$types.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { SERVER_EMBEDDING_MODEL, SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { VLM_MODELS } from '$lib/server/ollama.js';
 
 // ─── Response type ────────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 			ollamaReachable = true;
 			const body = (await r.json()) as { models?: Array<{ name: string }> };
 			const names = (body.models ?? []).map((m) => m.name.toLowerCase());
-			const chatModel = (VLM_MODELS.legal ?? 'gemma4-rotorquant:latest').toLowerCase();
+			const chatModel = (VLM_MODELS.legal ?? SERVER_CHAT_MODEL).toLowerCase();
 			const embedModel = SERVER_EMBEDDING_MODEL.toLowerCase();
 			chatModelReady = names.some((n) => n.startsWith(chatModel.split(':')[0]));
 			embedModelReady = names.some((n) => n.startsWith(embedModel.split(':')[0]));

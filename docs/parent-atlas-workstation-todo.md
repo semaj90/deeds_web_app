@@ -36,6 +36,34 @@ The bounded physical chunk proof must not be read as proof of stable namespace
 authority. Any write remains behind its owning proposal, human authorization,
 exact preimage validation, transaction, and readback receipt.
 
+### Implementation plan and current gate ranking (2026-09-15)
+
+The ranked implementation plan is recorded in
+`docs/reports/parent-atlas-workstation-implementation-plan-v1.json`. Its
+percentages are derived planning estimates, not completion authority. The
+workstation remains `authoritative=false` and `writesAllowed=false`.
+
+The blocking sequence is explicit:
+
+`stable snapshot readback → one Graphify execution owner → canonical packet
+digest → source/packet/chunk closure → symbol and graph ordinal identity →
+semantic_768 admission → domain/topic/entity observations → feature matrix /
+ACE → governed durable event readback → XGBoost corpus → GPU parity`.
+
+Current P0 facts are: the admitted workspace snapshot is proven; two equivalent
+Graphify executions remain unresolved as canonical owner; packet digest matches
+are zero; only 627 packet-lineage matches exist for 24,456 current bindings;
+current revision-qualified graph edges are zero; and the semantic corpus has
+5,730 duplicate canonical IDs with 109,746 missing source revisions. These are
+separate gates and must not be collapsed into one completion percentage.
+
+Domain, topic, entity, POS, concept, and ontology outputs remain evidence
+observations until they carry packet identity, source/workspace revisions,
+producer revision, and an evidence checksum. `.okf`, Pydantic, DuckDB/pandas,
+NetworkX, PyTorch, cuVS/cuTile, ACE, BitFrost, and model sidecars remain
+enrichment or execution layers; none can promote identity or authorize
+mutation.
+
 ### Tournament / temporal supersession reconciliation (2026-09-09)
 
 The repository has tournament and supersession machinery, but not one live
@@ -2183,3 +2211,18 @@ and `.md`.
 materialization into Neo4j/Postgres for these 32 approved candidates — remains open, gated behind
 whatever REL-01B's own preconditions turn out to require (this session has not designed or
 attempted that write).
+
+## TypeScript error-fixing replacement gate (2026-09-14)
+
+The legacy TypeScript/Svelte repair path is not a governed agentic repair owner. The read-only
+owner census in `docs/reports/typescript-error-fixer-owner-audit-v1.json` found seven
+mutation-capable legacy surfaces, including `scripts/batch-fix-ts-errors.mjs` and the numbered
+batch fixers, plus one structured `svelte-check --output machine` reader in
+`scripts/error-resolution/services/error-scanner.ts`. This audit did not run or assert an
+80,000-error count. The next implementation gate is
+`AGENTIC-TYPESCRIPT-ERROR-EVIDENCE-REPLACEMENT-01`: bounded machine-JSON capture, stable
+fingerprints, explicit revision fields when proven, and evidence-only TaskCandidate output.
+BeautifulSoup/web research, NLP enrichment, NetworkX, GPU/RTX, and BitFrost/ACE residency are
+separate downstream adapters; none may authorize a TypeScript edit or turn stale/crawled data
+into canonical error truth. Mutation remains behind `WorkflowActionEventV1`, exact preimage,
+approval, bounded execution, and independent validation.

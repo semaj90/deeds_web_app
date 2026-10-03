@@ -3,25 +3,41 @@
   "version": "1.0.0",
   "description": "Mastra workflows for Atlas durable operations: PageRank computation, clustering, registry alignment, and labeling",
   "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./workflows": "./dist/workflows/index.js",
     "./steps": "./dist/steps/index.js",
     "./executors": "./dist/executors/index.js",
-    "./models": "./dist/models/index.js"
+    "./models": "./dist/models/index.js",
+    "./prompt-plan-agent": "./dist/models/prompt-plan-agent.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "dev": "mastra dev",
+    "runtime:smoke": "node scripts/runtime-import-smoke.mjs",
     "test": "vitest",
     "lint": "eslint src",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@mastra/core": "^0.1.0",
+    "@ai-sdk/openai-compatible": "2.0.47",
+    "@langchain/core": "1.2.12",
+    "@langchain/langgraph": "1.4.18",
+    "@langchain/langgraph-checkpoint": "1.1.5",
+    "@langchain/langgraph-sdk": "1.12.0",
+    "@mastra/core": "1.71.0",
+    "@mastra/pg": "1.27.1",
+    "@mastra/redis": "1.4.6",
     "@deeds/atlas-core": "1.0.0",
+    "deepagents": "1.14.1",
+    "langchain": "1.5.12",
+    "langsmith": "0.9.0",
+    "ioredis": "^5.0.0",
     "zod": "^3.22.0",
     "pg": "^8.11.0",
     "redis": "^4.7.0",

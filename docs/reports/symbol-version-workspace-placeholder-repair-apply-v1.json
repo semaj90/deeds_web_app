@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.symbol-version-workspace-placeholder-repair.v1",
+  "generatedAt": "2026-09-27T23:15:12.948Z",
+  "status": "REPAIR_APPLIED",
+  "updatedRows": 77,
+  "targetRowCount": 77,
+  "fence": {
+    "before": 479,
+    "after": 479
+  }
+}

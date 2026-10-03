@@ -108,7 +108,7 @@ function buildSignal(event: {
 		eventType: 'recommendation.signal',
 		occurredAt: event.judgment.generatedAt,
 		traceId: event.traceId,
-		sourceRef: event.sourceRef ?? event.featureRow.packetKey ?? event.featureRow.candidateKey,
+		sourceRef: event.sourceRef ?? event.featureRow.packetKey ?? undefined,
 		payload: {
 			candidateId: event.featureRow.candidateKey,
 			targetType,

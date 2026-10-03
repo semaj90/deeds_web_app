@@ -19,7 +19,7 @@ import pg from 'pg';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,159 +47,101 @@ const pool = new Pool({
   database: 'legal_ai_db',
 });
 
-/**
- * Check if spaCy is available via Python
- */
+// Found live 2026-09-13: this script previously spawned a brand-new `python3` process per row
+// with an inline heredoc-style script, reloading spaCy's model from scratch every call (~1-2s
+// startup cost per row -- explains why extractor_version='spacy-nlp-v1' had zero rows live
+// despite the code existing since an earlier session: it never finished a real run at scale).
+// The live miniforge-nlp-sidecar (docker/miniforge-nlp-sidecar, port 8095) already keeps a spaCy
+// model warm in-process for its own /analyze endpoint's named-entity extraction -- reusing it via
+// one HTTP call per row is both correct (per this repo's Duplication Prevention rule: don't spin
+// up a second Python NLP process when a live one already exists) and dramatically cheaper (no
+// process spawn, no model reload).
+const NLP_SIDECAR_URL = process.env.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095';
+
 async function checkSpaCyAvailable() {
-  return new Promise((resolve) => {
-    const proc = spawn('python3', ['-c', 'import spacy; print(spacy.__version__)'], {
-      timeout: 5000,
-    });
-
-    let output = '';
-    proc.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    proc.on('close', (code) => {
-      if (code === 0) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-
-    proc.on('error', () => {
-      resolve(false);
-    });
-  });
+  try {
+    const res = await fetch(`${NLP_SIDECAR_URL}/health`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return false;
+    const body = await res.json();
+    return body?.capabilities?.spacy === true;
+  } catch {
+    return false;
+  }
 }
 
 /**
- * Extract lexical features using spaCy
+ * Extract lexical features via the live NLP sidecar's /pos endpoint (real spaCy POS tagging,
+ * not a per-call Python subprocess).
  */
 async function extractLexicalFeatures(text) {
-  return new Promise((resolve, reject) => {
-    if (!text || typeof text !== 'string' || text.trim().length === 0) {
-      resolve({
-        nouns: [],
-        properNouns: [],
-        verbs: [],
-        nounPhrases: [],
-        modifiers: [],
-        lemmas: [],
-      });
-      return;
+  const empty = { nouns: [], properNouns: [], verbs: [], nounPhrases: [], modifiers: [], lemmas: [], adjectives: [], adverbs: [] };
+  if (!text || typeof text !== 'string' || text.trim().length === 0) return empty;
+
+  // Truncate to 1000 chars to keep per-row latency bounded (matches this script's original limit).
+  const truncated = text.slice(0, 1000);
+
+  try {
+    const res = await fetch(`${NLP_SIDECAR_URL}/pos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: truncated }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+      if (VERBOSE) console.error(`  ❌ NLP sidecar /pos returned ${res.status}`);
+      return empty;
     }
+    const result = await res.json();
+    if (result.source === 'unavailable') return empty;
+    return {
+      nouns: result.nouns ?? [],
+      properNouns: result.proper_nouns ?? [],
+      verbs: result.verbs ?? [],
+      nounPhrases: result.noun_phrases ?? [],
+      // `modifiers` (adjectives+adverbs combined) keeps `keywords` unchanged for existing
+      // consumers; `adjectives`/`adverbs` are ALSO kept separately below -- found live
+      // 2026-09-13: the ACE packet envelope's `lexical_adverbs_ly` field (real, schema'd,
+      // msgpack-tagged, but never fed real data end-to-end) needs pure adverbs, not a combined
+      // adjective+adverb blob.
+      modifiers: [...(result.adjectives ?? []), ...(result.adverbs ?? [])],
+      lemmas: result.lemmas ?? [],
+      adjectives: result.adjectives ?? [],
+      adverbs: result.adverbs ?? [],
+    };
+  } catch (err) {
+    if (VERBOSE) console.error(`  ❌ NLP sidecar request failed: ${err.message}`);
+    return empty;
+  }
+}
 
-    // Truncate to 1000 chars to avoid overwhelming spaCy
-    const truncated = text.substring(0, 1000);
-
-    const pythonCode = `
-import spacy
-import json
-import sys
-
-try:
-    nlp = spacy.load('en_core_web_sm')
-    doc = nlp("""${truncated.replace(/"/g, '\\"').replace(/\n/g, ' ')}""")
-
-    nouns = [token.text for token in doc if token.pos_ == 'NOUN']
-    proper_nouns = [token.text for token in doc if token.pos_ == 'PROPN']
-    verbs = [token.text for token in doc if token.pos_ == 'VERB']
-    noun_phrases = [chunk.text for chunk in doc.noun_chunks]
-    modifiers = [token.text for token in doc if token.pos_ in ['ADJ', 'ADV']]
-    lemmas = [token.lemma_ for token in doc if token.pos_ in ['NOUN', 'VERB', 'ADJ']]
-
-    result = {
-        'nouns': list(set(nouns)),
-        'proper_nouns': list(set(proper_nouns)),
-        'verbs': list(set(verbs)),
-        'noun_phrases': list(set(noun_phrases)),
-        'modifiers': list(set(modifiers)),
-        'lemmas': list(set(lemmas))
+// Real named-entity extraction, added 2026-09-13. Found live: `atlas_packet_features.entities`
+// (19.4% populated, 11,990 rows) was NOT real entity data -- 100% of sampled values were
+// AST-symbol-shaped strings (`fn:`, `var:`, `export:`, `class:`, `method:` prefixes), written by
+// some earlier extraction pass into the wrong column. No real PERSON/ORG/DATE/MONEY/LAW
+// extraction had ever run. Reuses the sidecar's existing `/analyze` endpoint (already correctly
+// combines `_spacy_entities()` + `_regex_entities()` -- no new endpoint needed, matches the
+// Duplication Prevention rule) rather than the flat `fn:`/`var:` vocabulary that was there before.
+async function extractEntities(text) {
+  if (!text || typeof text !== 'string' || text.trim().length === 0) return [];
+  const truncated = text.slice(0, 1000);
+  try {
+    const res = await fetch(`${NLP_SIDECAR_URL}/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: truncated, source_type: 'plain_text' }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) {
+      if (VERBOSE) console.error(`  ❌ NLP sidecar /analyze returned ${res.status}`);
+      return [];
     }
-
-    print(json.dumps(result))
-except Exception as e:
-    print(json.dumps({'error': str(e)}))
-`;
-
-    const proc = spawn('python3', ['-c', pythonCode], {
-      timeout: 10000,
-      maxBuffer: 10 * 1024 * 1024,
-    });
-
-    let output = '';
-    let errorOutput = '';
-
-    proc.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    proc.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-    });
-
-    proc.on('close', (code) => {
-      if (code === 0 && output) {
-        try {
-          const result = JSON.parse(output);
-          if (result.error) {
-            resolve({
-              nouns: [],
-              properNouns: [],
-              verbs: [],
-              nounPhrases: [],
-              modifiers: [],
-              lemmas: [],
-            });
-          } else {
-            resolve({
-              nouns: result.nouns || [],
-              properNouns: result.proper_nouns || [],
-              verbs: result.verbs || [],
-              nounPhrases: result.noun_phrases || [],
-              modifiers: result.modifiers || [],
-              lemmas: result.lemmas || [],
-            });
-          }
-        } catch (e) {
-          if (VERBOSE) console.error(`  ❌ JSON parse error: ${e.message}`);
-          resolve({
-            nouns: [],
-            properNouns: [],
-            verbs: [],
-            nounPhrases: [],
-            modifiers: [],
-            lemmas: [],
-          });
-        }
-      } else {
-        if (VERBOSE && errorOutput) console.error(`  ❌ spaCy error: ${errorOutput}`);
-        resolve({
-          nouns: [],
-          properNouns: [],
-          verbs: [],
-          nounPhrases: [],
-          modifiers: [],
-          lemmas: [],
-        });
-      }
-    });
-
-    proc.on('error', (err) => {
-      if (VERBOSE) console.error(`  ❌ Process error: ${err.message}`);
-      resolve({
-        nouns: [],
-        properNouns: [],
-        verbs: [],
-        nounPhrases: [],
-        modifiers: [],
-        lemmas: [],
-      });
-    });
-  });
+    const result = await res.json();
+    const entities = Array.isArray(result.entities) ? result.entities : [];
+    return [...new Set(entities.map((e) => `${e.label}:${e.text}`.trim()).filter(Boolean))].slice(0, 128);
+  } catch (err) {
+    if (VERBOSE) console.error(`  ❌ Entity extraction failed: ${err.message}`);
+    return [];
+  }
 }
 
 /**
@@ -254,12 +196,21 @@ async function materializeLexicalFeatures(packets) {
   for (let i = 0; i < packets.length; i += batchSize) {
     const batch = packets.slice(i, i + batchSize);
 
-    for (const packet of batch) {
+    // Concurrent within each batch (bounded by batchSize) -- same I/O-bound-loop lesson as
+    // scripts/atlas/backfill-ast-symbols.mjs's earlier fix this session: an HTTP round-trip to
+    // the NLP sidecar per row, awaited sequentially, wastes most of the wall-clock time waiting,
+    // not computing. pg's Pool already supports concurrent queries safely.
+    const results = await Promise.allSettled(batch.map(async (packet) => {
       try {
-        const features = await extractLexicalFeatures(packet.summary);
+        const [features, entities] = await Promise.all([
+          extractLexicalFeatures(packet.summary),
+          extractEntities(packet.summary),
+        ]);
 
-        // Map spaCy output to the live schema
-        const contentHash = require('crypto')
+        // Map spaCy output to the live schema. Fixed 2026-09-13: this used `require('crypto')`
+        // inside an ESM (.mjs) module, which always throws `require is not defined` -- the real
+        // reason this script had never successfully written a row before this session.
+        const contentHash = crypto
           .createHash('sha256')
           .update(packet.summary || '')
           .digest('hex');
@@ -298,17 +249,41 @@ async function materializeLexicalFeatures(packets) {
             `nouns: ${features.nouns.length}, verbs: ${features.verbs.length}, phrases: ${features.nounPhrases.length}`,
             contentHash,
             'spacy-nlp-v1',
-            { spacy_extracted: true, nouns: features.nouns, verbs: features.verbs }
+            {
+              spacy_extracted: true,
+              nouns: features.nouns,
+              verbs: features.verbs,
+              adjectives: features.adjectives,
+              adverbs: features.adverbs,
+            }
           ]
         );
 
-        extracted++;
+        if (entities.length > 0) {
+          await pool.query(
+            `
+            INSERT INTO atlas_packet_features (packet_key, entities, updated_at)
+            VALUES ($1, $2::text[], NOW())
+            ON CONFLICT (packet_key) DO UPDATE SET
+              entities = EXCLUDED.entities,
+              updated_at = NOW()
+            WHERE atlas_packet_features.entities IS DISTINCT FROM EXCLUDED.entities
+            `,
+            [packet.packet_key, entities],
+          );
+        }
+
+        return true;
       } catch (err) {
         if (VERBOSE) {
           console.error(`   ❌ Error extracting ${packet.packet_key}: ${err.message}`);
         }
-        errors++;
+        return false;
       }
+    }));
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value) extracted++;
+      else errors++;
     }
 
     // Progress indicator
@@ -326,13 +301,20 @@ async function materializeLexicalFeatures(packets) {
 async function verifyLexicalMaterialization() {
   console.log('✅ Verifying lexical feature materialization...');
 
+  // Fixed 2026-09-13: this query referenced `nouns`/`verbs`/`noun_phrases` as top-level columns --
+  // feature_lexical_facts has no such columns (verified live via \d). The real spaCy-derived
+  // fields are folded into `keywords`/`identifiers` (see the INSERT below) plus a `nouns`/`verbs`
+  // breakout inside the `metadata` jsonb column. This function had never actually been run
+  // against a populated table before (extractor_version='spacy-nlp-v1' had zero rows), so the
+  // bug was never hit in practice.
   const res = await pool.query(`
     SELECT
       COUNT(*) as total,
-      COUNT(CASE WHEN nouns IS NOT NULL THEN 1 END) as with_nouns,
-      COUNT(CASE WHEN verbs IS NOT NULL THEN 1 END) as with_verbs,
-      COUNT(CASE WHEN noun_phrases IS NOT NULL THEN 1 END) as with_phrases
+      COUNT(CASE WHEN metadata->'nouns' IS NOT NULL THEN 1 END) as with_nouns,
+      COUNT(CASE WHEN metadata->'verbs' IS NOT NULL THEN 1 END) as with_verbs,
+      COUNT(CASE WHEN array_length(identifiers, 1) > 0 THEN 1 END) as with_phrases
     FROM feature_lexical_facts
+    WHERE extractor_version = 'spacy-nlp-v1'
   `);
 
   const stats = res.rows[0];

@@ -1,0 +1,159 @@
+{
+  "schema": "atlas.openspec-control-plane-owner-census.v1",
+  "gate": "OCP-00",
+  "generatedAt": "2026-09-22T01:00:00.000Z",
+  "status": "MATERIAL_FINDING_STOP_FOR_OPERATOR_REVIEW",
+  "headline": "Much of what the parent-atlas-openspec-control-plane proposal asks to build already exists, live, under a different name and location than the proposal assumed. The proposal's own premise ('Parent Atlas SSR admin UI: Not yet proven end-to-end') is corrected by this census: it exists and is live at /atlas/studio/openspec.",
+  "owners": [
+    {
+      "capability": "openspec-workboard-v1.json builder",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "scripts/atlas/build-openspec-workboard-v1.mjs",
+      "evidence": "docs/reports/openspec-workboard-v1.json, schema atlas.openspec.workboard.v1, source: openspec/changes/*/tasks.md, summary.totalTasks: 9393 (live-read this run)."
+    },
+    {
+      "capability": "workboard schema/types",
+      "classification": "MISSING",
+      "owner": null,
+      "evidence": "No typed TS contract exists for openspec-workboard-v1.json's own flat shape (schema, generatedAt, source, summary, ordering, indexing, lanes, workPackages, executionSteps, changes, taskInventory, nextTasks, actionableTasks, waitingTasks, supersededTasks, writes). A DIFFERENT, narrower typed contract (OpenSpecBoardSnapshotV1/OpenSpecBoardTaskV1 in openspec-board/types.ts) already exists but describes a DERIVED composite, not this file directly (see finding 1 below). OCP-01 is real work, scoped to the workboard's own shape."
+    },
+    {
+      "capability": "logicalTaskKey",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/contracts/task-attempt-receipt-v1.ts (TaskAttemptReceiptV1Schema.logicalTaskKey)",
+      "evidence": "Defined and live. Identity source is the board task's stableKey as emitted by the ACP tool openspec:workboard_recommend (ACPToolRegistry.ts:1566). A DIFFERENT, unrelated stableKey concept also exists in src/mcp/trace-mcp-server.ts for Neo4j graph nodes -- naming collision risk flagged, not the same identity, do not conflate."
+    },
+    {
+      "capability": "task execution classification",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "openspec-board/report-reader.ts (stateFromSource, OpenSpecExecutionState) for the composite board; openspec-workboard-v1.json's own executionState field for the flat board",
+      "evidence": "Two independently-real classifiers over two different board shapes (see finding 1). Do not build a third."
+    },
+    {
+      "capability": "dependency metadata / WFU parsing",
+      "classification": "UNKNOWN",
+      "owner": null,
+      "evidence": "Not directly inspected this census. openspec-workboard-v1.json has a 'laneDependencies' top-level field and per-task dependency fields (unverified shape). Check before building a dependency-graph projection."
+    },
+    {
+      "capability": "evidence receipts / closure mapper",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "TaskAttemptReceiptV1 (contracts/task-attempt-receipt-v1.ts) + receipt-store.ts (append-only JSONL, appendTaskAttemptReceipt/readLastTaskAttemptReceipts) + ACP tool openspec:record_attempt",
+      "evidence": "Live, advisory-only (canonicalAuthority: false, strict schema forbids extra fields), already implements 'a receipt never marks a task done -- COMPLETED requires a passing validation and no missing preconditions'. This already satisfies the control-plane proposal's OCP-13/14/16 completion-non-self-certification requirement. S01-13 (evidence-closure mapper) remains the separate canonical owner per its own gate; not duplicated here."
+    },
+    {
+      "capability": "current Parent Atlas admin routes/pages",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/routes/atlas/studio/openspec/ (+page.server.ts, +page.svelte, events/+server.ts)",
+      "evidence": "LIVE, auth-gated (requireUser -> redirect to /login), SSR load function reading readOpenSpecBoardSnapshot() + readOpenSpecAwarenessSnapshot() + readParentAtlasCapabilityCensus(), computing topic clusters and top-changes server-side. Explicitly declares persistence: {authority: 'docs/reports JSON receipts', postgresRole: 'optional read-model history only', writesPerformed: false} -- this IS the architecture invariant the new proposal describes, already implemented. The proposal's premise that this is 'not yet proven end-to-end' is INCORRECT as stated; it is live."
+    },
+    {
+      "capability": "existing admin navigation",
+      "classification": "UNKNOWN",
+      "owner": null,
+      "evidence": "Not checked whether /atlas/studio/openspec is linked from the main admin nav shell or only reachable by direct URL. Check before adding a second nav entry."
+    },
+    {
+      "capability": "existing Postgres Parent Atlas tables for OpenSpec",
+      "classification": "MISSING",
+      "owner": null,
+      "evidence": "Live query: zero tables matching 'openspec' in information_schema.tables. OCP-02/03 Postgres projection is genuinely new work, requires DDL authorization per this repo's Drizzle Safety Rule."
+    },
+    {
+      "capability": "current search/retrieval interfaces",
+      "classification": "REUSE_EXISTING_OWNER (for retrieval infra in general); MISSING (for OpenSpec-task-specific documents)",
+      "owner": "sveltekit-frontend/src/lib/server/retrieval/* (rrf-fuse.ts, search-runtime.ts, retrieve-candidates.ts, lane-contracts.ts) + adapters/bm42-sparse-retriever.ts + adapters/qdrant-bm42-retriever.ts",
+      "evidence": "General retrieval fusion/lane infrastructure exists and is extensive (57 files matched a broad BM42/retrieval grep). No OpenSpec-task-specific retrieval document or collection found. OCP-06 (retrieval document compiler) is real work but must plug into rrf-fuse.ts/search-runtime.ts as an additional document type, not a new fusion owner."
+    },
+    {
+      "capability": "BM42 owner",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts, retrieval/adapters/bm42-sparse-retriever.ts, retrieval/adapters/qdrant-bm42-retriever.ts"
+    },
+    {
+      "capability": "lexical exact / FTS / trigram owners",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/atlas/retrieval/postgres-lexical-scorer.ts (exact/FTS/trigram scoring, per this session's Duplication Prevention convention)"
+    },
+    {
+      "capability": "semantic_768 owner",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/vector/vector-contracts.ts, vector-index-registry.ts, embedding-contract-768.ts (per project CLAUDE.md's Embedding Dimensions Policy, not re-verified live this census)"
+    },
+    {
+      "capability": "Qdrant search/upsert helpers",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts, atlas/qdrant-collection-contracts.ts"
+    },
+    {
+      "capability": "ACE",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts (per project CLAUDE.md; not re-read this census)"
+    },
+    {
+      "capability": "BitFrost",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts, cache-keys.ts (bifrostKey.semantic.*, PacketSemanticCacheIdentityV2 per project CLAUDE.md's 2026-09-20 BitFrost section; not re-read this census)"
+    },
+    {
+      "capability": "Redis/Valkey clients",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "sveltekit-frontend/src/lib/server/redis.ts"
+    },
+    {
+      "capability": "ContextManifestV1",
+      "classification": "LEGACY_DUPLICATE_CANDIDATE",
+      "owner": "AT LEAST TWO candidates found, not yet reconciled: sveltekit-frontend/src/lib/server/atlas/context/ace-context-manifest-admission-v1.ts AND sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts (both have their own .spec.ts). Do not add a third. Reconcile which is canonical before OCP-12 integrates task packets into either."
+    },
+    {
+      "capability": "PromptPlanV1",
+      "classification": "LEGACY_DUPLICATE_CANDIDATE",
+      "owner": "AT LEAST TWO candidates found, not yet reconciled: sveltekit-frontend/src/lib/server/atlas/agentic-file-compiler/prompt-plan.ts AND sveltekit-frontend/src/lib/server/atlas/prefill/prompt-plan-v1.ts. Do not add a third."
+    },
+    {
+      "capability": "scheduler/job representation",
+      "classification": "REUSE_EXISTING_OWNER (partial)",
+      "owner": "openspec:workboard_recommend (ACP tool, admission/ready-set) + openspec:record_attempt (ACP tool, execution receipt) + TaskAttemptReceiptV1 (result/blockerClass/validationsPassed)",
+      "evidence": "Covers much of OCP-13/14's intent already (admission via workboard_recommend, receipt via record_attempt, non-self-certifying completion via the Zod superRefine rules). A formal OpenSpecExecutionRequestV1/JobLifecycle state machine was not found -- likely genuinely missing, but the receipt/admission halves should be extended, not replaced."
+    },
+    {
+      "capability": "execution receipt contracts",
+      "classification": "REUSE_EXISTING_OWNER",
+      "owner": "TaskAttemptReceiptV1Schema (contracts/task-attempt-receipt-v1.ts)"
+    },
+    {
+      "capability": "Go retrieval/service surfaces",
+      "classification": "UNKNOWN",
+      "owner": null,
+      "evidence": "Not inspected this census; project CLAUDE.md documents go-search-bridge.ts / go-retrieval-service (:8100) generally. Not checked for OpenSpec-task relevance."
+    }
+  ],
+  "findings": [
+    {
+      "id": "TWO_BOARD_SHAPES_ARE_LAYERED_NOT_COMPETING",
+      "severity": "material, resolved by inspection (not a true authority conflict)",
+      "detail": "docs/reports/openspec-workboard-v1.json (L0, 9393 tasks, built directly from tasks.md) and docs/reports/openspec-execution-controller-v1.json (L1, 9275 tasks, DERIVED -- its own 'source' field literally says 'docs/reports/openspec-workboard-v1.json', policy RECOMMENDATION_ONLY_NO_LEDGER_OR_RUNTIME_MUTATION) are NOT two competing authorities. The 118-task count gap is a FRESHNESS gap: the controller report is dated 2026-09-20, one day older than the current workboard (2026-09-21). openspec-board/report-reader.ts already has a freshness/staleness field (freshness.stale, 15-minute threshold) that exists precisely to surface this. The openspec-board composite snapshot (used by the live /atlas/studio/openspec page) is built from ~17 of these L1-derived reports (execution-controller, actionable-work, waiting-dependencies, deferred-discoveries, blocker-audit, directory-graph, file-kmeans, challenger-tournament, etc.), NOT read directly from openspec-workboard-v1.json. This is a legitimate, already-designed layered pipeline (workboard -> derived analysis reports -> composite reader -> SSR page), just under different names/locations than the new proposal assumed. Recommendation: regenerate the stale L1 reports (a scheduling/freshness task, not an architecture change) rather than building a parallel reader of openspec-workboard-v1.json."
+    },
+    {
+      "id": "SSR_ADMIN_PAGE_ALREADY_LIVE",
+      "severity": "corrects the proposal's stated premise",
+      "detail": "/atlas/studio/openspec is a real, auth-gated, SSR-rendering admin page today, with topic clustering, awareness snapshot, capability census, and an explicit no-writes-performed contract. OCP-03/04 should EXTEND this route and the openspec-board/* module, not create a new /admin/parent-atlas/openspec route or a parallel sveltekit-frontend/src/lib/server/atlas/openspec/ directory."
+    },
+    {
+      "id": "CONTEXT_MANIFEST_AND_PROMPT_PLAN_ALREADY_HAVE_UNRESOLVED_DUPLICATES",
+      "severity": "material, pre-existing debt unrelated to this change",
+      "detail": "Two ContextManifestV1-shaped files and two PromptPlanV1-shaped files already coexist unreconciled. OCP-09/12 must not add a third of either without first resolving which is canonical -- flagged per this repo's Duplication Prevention / One Canonical Runtime Owner rule, not resolved here (out of scope for a census)."
+    }
+  ],
+  "recommendation": "Do not create sveltekit-frontend/src/lib/server/atlas/openspec/ as a new directory, and do not build a second SSR route. OCP-01 (typed contract) should describe openspec-workboard-v1.json's actual flat shape directly (new, real gap) and separately note its relationship to the existing openspec-board composite (extend, do not replace). OCP-02/03 (Postgres projection, SSR wiring) should extend openspec-board/* and /atlas/studio/openspec rather than duplicate them. This is a significant enough correction to the proposal's premise that it should go back to the operator before any OCP-01 code is written, rather than auto-continuing.",
+  "acceptance": {
+    "canonicalWorkboardOwnerIdentified": true,
+    "noDuplicateWorkboardParserProposed": true,
+    "retrievalOwnersIdentified": true,
+    "aceBitfrostValkeyOwnerPathsIdentified": "partial (locations named from project CLAUDE.md, not re-verified live this census)",
+    "adminUiLocationIdentified": true,
+    "trueAuthorityConflictFound": false,
+    "materialPremiseCorrectionFound": true
+  },
+  "safety": { "databaseWrites": 0, "filesWrittenOutsideReceipt": 0, "graphifyRun": false }
+}

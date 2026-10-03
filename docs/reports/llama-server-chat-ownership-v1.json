@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.llama-server-chat-ownership.v1",
+  "generatedAt": "2026-09-20T04:52:37.200Z",
+  "owner": {
+    "kind": "CHAT_SYNTHESIS",
+    "service": "llama-server",
+    "endpoint": "http://127.0.0.1:8090",
+    "port": "8090",
+    "model": "ornith-1.5-9b",
+    "discoveredModels": [
+      "ornith-1.5-9b"
+    ]
+  },
+  "probes": {
+    "health": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 49,
+      "body": {
+        "status": "ok"
+      }
+    },
+    "models": {
+      "ok": true,
+      "status": 200,
+      "latencyMs": 4,
+      "body": {
+        "models": [
+          {
+            "name": "ornith-1.5-9b",
+            "model": "ornith-1.5-9b",
+            "modified_at": "",
+            "size": "",
+            "digest": "",
+            "type": "model",
+            "description": "",
+            "tags": [
+              ""
+            ],
+            "capabilities": [
+              "completion"
+            ],
+            "parameters": "",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "",
+              "families": [
+                ""
+              ],
+              "parameter_size": "",
+              "quantization_level": ""
+            }
+          }
+        ],
+        "object": "list",
+        "data": [
+          {
+            "id": "ornith-1.5-9b",
+            "aliases": [
+              "ornith-1.5-9b"
+            ],
+            "tags": [],
+            "object": "model",
+            "created": 1789879957,
+            "owned_by": "llamacpp",
+            "meta": {
+              "vocab_type": 2,
+              "n_vocab": 248320,
+              "n_ctx_train": 262144,
+              "n_embd": 4096,
+              "n_params": 8953803264,
+              "size": 5920720896
+            }
+          }
+        ]
+      }
+    }
+  },
+  "status": "LIVE_CHAT_OWNER_PROVEN",
+  "policy": {
+    "rawOllamaChatAllowed": false,
+    "rawOllamaGenerateAllowed": false,
+    "ollamaEmbeddingOwner": "http://127.0.0.1:11434",
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "evidence": {
+    "healthOk": true,
+    "modelsOk": true,
+    "expectedModel": "ornith-1.5-9b",
+    "modelMatch": true,
+    "readOnlyProbe": true
+  }
+}

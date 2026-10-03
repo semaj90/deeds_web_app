@@ -91,6 +91,7 @@ export function buildRepairFeaturePresenceEvidenceV1(input: {
     semanticMrl512QuerySimilarity: 'UNAVAILABLE',
     semanticMrl256QuerySimilarity: 'UNAVAILABLE',
     semanticMrl128QuerySimilarity: 'UNAVAILABLE',
+    legacySummaryCosineMax: 'UNAVAILABLE',
   };
 
   let latentReceiptChecksum: string | null = null;
@@ -136,6 +137,7 @@ export function buildRepairFeaturePresenceEvidenceV1(input: {
     featurePresence.latent256QuerySimilarity = state.latent_256_query_similarity;
     featurePresence.latent128QuerySimilarity = state.latent_128_query_similarity;
     featurePresence.latent64QuerySimilarity = state.latent_64_query_similarity;
+    featurePresence.legacySummaryCosineMax = state.legacy_summary_cosine_max;
     producerSetChecksum = set.producerSetChecksum;
   }
 

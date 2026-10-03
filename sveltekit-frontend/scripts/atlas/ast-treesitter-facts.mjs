@@ -2,11 +2,12 @@
 /**
  * AST Facts Lane — web-tree-sitter structural parser
  *
- * Role: structural sidecar — populates tree_node_id, ast_symbols, imports,
- * exports in codebase_chunk_index. Does NOT own packet identity or ranking.
+ * Role: structural sidecar — persists ast_symbols, imports, and exports in
+ * codebase_chunk_index. It computes a primary tree_node_id for diagnostics but
+ * does not persist that value. Does NOT own packet identity or ranking.
  *
  * Emits per-chunk facts:
- *   tree_node_id  — deterministic UUID: SHA-256(source_ref|language|kind|name|line)
+ *   tree_node_id  — deterministic diagnostic only; not persisted by this script
  *   ast_symbols   — JSONB [{kind, name, line_start, line_end, node_id}]
  *   imports[]     — module specifiers imported by this chunk's file
  *   exports[]     — export names declared in this chunk's file

@@ -1,0 +1,73 @@
+{
+  "schema": "atlas.ast-declaration-candidates-current.v1",
+  "readOnly": true,
+  "databaseWrites": false,
+  "canonicalAuthority": false,
+  "generatedAt": "2026-09-20T07:43:48.744Z",
+  "prefix": "sveltekit-frontend/src/",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "parser": {
+    "name": "ast-grep-napi",
+    "version": "0.44.0",
+    "grammarVersion": null
+  },
+  "offsetBasis": "UTF8_PARSER_BUFFER_V1",
+  "lineBasis": "ONE_BASED_STORAGE (napi is zero-based; +1 at storage)",
+  "sourceTextEncodingRevision": "SOURCE-TEXT-ENCODING-01",
+  "offsetSemantics": "UTF-8 byte offsets into the envelope parserBuffer (BOM stripped, normalized UTF-8), derived via Buffer.byteLength of the string prefix from napi UTF-16 indices; NOT raw-file offsets when bomBytes>0; every span verified against parserBuffer",
+  "bomProof": {
+    "candidates": 50,
+    "rawShiftedRoundTrip": 50,
+    "rawShiftedMismatch": 0,
+    "rawUnshiftedWouldBeWrong": 50,
+    "files": 4,
+    "status": "PASS"
+  },
+  "digestDivergedSources": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-gpu-residency-v1.ts",
+      "snapshotDigest": "25a979508c943986928ac76b8eb7166e64c054fd36f4619a1a72e734dbb83fbd",
+      "currentRawDigest": "a753fdd84e116cb78348a45024ab5faff1c22c7261648d697b6faaf37396a7d7",
+      "inKnow09DriftList": false,
+      "bytes": 17072,
+      "snapshotBytes": 15119,
+      "classification": "CHANGED_SINCE_ADMITTED_SNAPSHOT_NOT_IN_KNOW09_LIST"
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.spec.ts",
+      "snapshotDigest": "ee1225038946fdcca1116c034a8c7c7c4bdd9abd9ce948f1295679f4c7381779",
+      "currentRawDigest": "3ac3a35585ba5a64a04a7a44b703278f4310c5028a02c7c358641f807184acec",
+      "inKnow09DriftList": false,
+      "bytes": 6516,
+      "snapshotBytes": 4234,
+      "classification": "CHANGED_SINCE_ADMITTED_SNAPSHOT_NOT_IN_KNOW09_LIST"
+    }
+  ],
+  "output": ".tmp\\atlas\\ast-declaration-candidates-current-v1.jsonl",
+  "outputSha256": "2a217bf560488a5d698f6a7ba3e1f7584647918499f0c4c8280254d74864c1e8",
+  "stats": {
+    "sourcesInScope": 6092,
+    "unsupportedExt": 1367,
+    "driftSkipped": 196,
+    "fileMissing": 0,
+    "malformedEncoding": 0,
+    "bomFiles": 4,
+    "nonUtf8Sources": 0,
+    "digestDiverged": 2,
+    "parseError": 0,
+    "filesParsed": 4527,
+    "candidates": 24971,
+    "spanVerifyFailed": 0,
+    "nonAsciiFiles": 1819,
+    "byKind": {
+      "file": 3043,
+      "interface": 4448,
+      "class": 502,
+      "method": 3251,
+      "type": 3240,
+      "function": 10479,
+      "enum": 8
+    }
+  }
+}

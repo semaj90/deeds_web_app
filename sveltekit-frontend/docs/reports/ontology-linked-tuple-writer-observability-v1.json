@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.ontology-linked-tuple-writer-observability.v1",
+  "generatedAt": "2026-09-22T20:21:41.848Z",
+  "liveRowCount": 0,
+  "writerFunction": "persistOntologyLinkedTuples (src/lib/server/atlas/ontology-linked-tuple-postgres.ts)",
+  "registeredCallers": [
+    "src/lib/server/atlas/ontology-linked-tuple-postgres.ts",
+    "src/lib/server/atlas/taxonomy-topology-packet.ts"
+  ],
+  "registeredCallerCount": 2,
+  "callChainToMcpTool": "taxonomy-topology-packet.ts::buildTaxonomyTopologyPacket() -> registered tool in src/mcp/trace-mcp-server.ts (verified static import, 2026-09-22)",
+  "errorPathDoesLogOnException": true,
+  "errorPathBehavior": "A thrown exception IS logged via console.warn(DEGRADED_PERSISTENCE) before the .catch() fallback returns {written:0, errors:[...]} -- the failure is NOT silently swallowed at the code level, but no PERSISTENT receipt/log file capturing that warning was found by this census (console output is ephemeral unless separately captured).",
+  "runtimeInvocationReceiptsFound": [],
+  "classification": "INSUFFICIENT_TELEMETRY",
+  "classificationRationale": "The writer is real, wired, and its error path does log on exception -- but no persisted receipt, log file, or other durable evidence of any PAST invocation (successful or failed) was found by static search. This census does not itself invoke the writer, per the read-only mandate, so it cannot distinguish WRITER_NOT_OBSERVED (never called) from UPSTREAM_LINKED_TUPLES_EMPTY (called, but summary.linkedTuples was empty) from WRITE_FAILURE_OBSERVED (called, threw, only logged to now-lost console output) from WRITE_SUCCESS_WITH_ZERO_ROWS (called with an empty tuples array, \"succeeded\" trivially).",
+  "canonicalAuthority": false,
+  "writesPerformed": false
+}

@@ -63,6 +63,14 @@ export async function materializePacket(
     dryRun: config.dryRun ?? false,
   };
 
+  // PACKET-WRITER-QUARANTINE-01: this legacy ACP materializer does not accept
+  // the admitted execution/source binding or persist the canonical whole-source
+  // digest. Keep its inventory/dry-run path available, but prevent a future
+  // caller from accidentally reintroducing unqualified atlas_packets writes.
+  if (cfg.writePostgres && !cfg.dryRun) {
+    throw new Error('PACKET_MATERIALIZER_QUARANTINED_REVISION_QUALIFIED_WRITER_REQUIRED');
+  }
+
   const result: MaterializationResult = {
     packetKey: packet.packet_key,
     step1_postgres_read: { success: false },

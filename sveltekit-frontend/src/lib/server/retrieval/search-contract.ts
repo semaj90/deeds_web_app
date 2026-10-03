@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 export const SearchTierSchema = z.enum(['hot', 'warm', 'cold']);
@@ -237,10 +238,73 @@ export type SearchPage = z.infer<typeof SearchPageSchema>;
 export type SearchResultContract = z.infer<typeof SearchResultSchema>;
 export type RerankerResultContract = z.infer<typeof RerankerResultSchema>;
 
-export interface KeywordBundle {
-  exactKeywords: string[];
-  normalizedKeywords: string[];
-  expandedKeywords: string[];
+export const KeywordBundleV1Schema = z.object({
+  schema: z.literal('atlas.keyword-bundle.v1'),
+  exactKeywords: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  normalizedKeywords: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxNormalizedKeywords),
+  expandedKeywords: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExpandedKeywords)
+}).strict();
+
+export type KeywordBundleV1 = z.infer<typeof KeywordBundleV1Schema>;
+/** Compatibility alias for existing SearchRuntime callers. */
+export type KeywordBundle = KeywordBundleV1;
+
+export const QueryUnderstandingV1Schema = z.object({
+  schema: z.literal('atlas.query-understanding.v1'),
+  originalQuery: z.string().min(1).max(RETRIEVAL_LIMITS.maxQueryLength),
+  exactTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  identifierTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  pathTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  symbolTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  ftsTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  trigramTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  semanticText: z.string().min(1).max(RETRIEVAL_LIMITS.maxQueryLength),
+  negativeTerms: z.array(z.string().min(1)).max(RETRIEVAL_LIMITS.maxExactKeywords),
+  filters: SearchMetadataFilterSchema,
+  semanticRepresentation: z.literal('semantic_768'),
+  producerRevision: z.literal('atlas.query-understanding.v1')
+}).strict();
+
+export type QueryUnderstandingV1 = z.infer<typeof QueryUnderstandingV1Schema>;
+
+export const QueryPlanV1Schema = z.object({
+  schema: z.literal('atlas.query-plan.v1'),
+  query: z.string().min(1).max(RETRIEVAL_LIMITS.maxQueryLength),
+  queryUnderstanding: QueryUnderstandingV1Schema,
+  retrievalTier: SearchTierSchema,
+  lanes: z.array(SearchLaneSchema).min(1),
+  keywordBundle: KeywordBundleV1Schema,
+  filters: SearchMetadataFilterSchema,
+  topKPerLane: z.number().int().min(1).max(RETRIEVAL_LIMITS.maxTopKPerLane),
+  finalTopK: z.number().int().min(1).max(RETRIEVAL_LIMITS.maxFinalResults),
+  rerankTopK: z.number().int().min(1).max(RETRIEVAL_LIMITS.maxRerankCandidates),
+  pageSize: z.number().int().min(1).max(RETRIEVAL_LIMITS.maxFinalResults),
+  cursor: z.string().nullable(),
+  includeRelations: z.boolean(),
+  relationDepth: z.number().int().min(0).max(RETRIEVAL_LIMITS.maxRelationDepth),
+  includeDebugScores: z.boolean(),
+  workspaceRevision: z.string().min(1).nullable(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  promotionAuthorized: z.literal(false),
+  planChecksum: z.string().regex(/^[a-f0-9]{64}$/)
+}).strict();
+
+export type QueryPlanV1 = z.infer<typeof QueryPlanV1Schema>;
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => Buffer.compare(Buffer.from(a), Buffer.from(b)))
+      .map(([key, item]) => `${JSON.stringify(key)}:${canonicalJson(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function queryPlanChecksum(value: Omit<QueryPlanV1, 'planChecksum'>): string {
+  return createHash('sha256').update(canonicalJson(value), 'utf8').digest('hex');
 }
 
 function isIdentifierLike(value: string): boolean {
@@ -253,6 +317,10 @@ function isPathLike(value: string): boolean {
 
 function isDocLike(value: string): boolean {
   return /\b(doc|docs|documentation|guide|readme|design|architecture|proposal|summary|rfc|spec|decision|roadmap|tutorial|how to|why)\b/i.test(value);
+}
+
+function uniqueBounded(values: readonly string[], max: number): string[] {
+  return [...new Set(values.map((value) => value.trim()).filter(Boolean))].slice(0, max);
 }
 
 export function normalizeKeywordSurface(value: string): string {
@@ -293,7 +361,7 @@ export function buildKeywordBundle(input: {
   query: string;
   exactKeywords?: string[];
   expandedKeywords?: string[];
-}): KeywordBundle {
+}): KeywordBundleV1 {
   const queryTerms = tokenizeKeywordSurface(input.query).filter((term) => term.length > 2);
   const exactKeywords = [...new Set([
     ...(input.exactKeywords ?? []),
@@ -312,7 +380,51 @@ export function buildKeywordBundle(input: {
     ...queryTerms
   ].map((term) => normalizeKeywordSurface(term)).filter(Boolean))].slice(0, RETRIEVAL_LIMITS.maxExpandedKeywords);
 
-  return { exactKeywords, normalizedKeywords, expandedKeywords };
+  return KeywordBundleV1Schema.parse({
+    schema: 'atlas.keyword-bundle.v1',
+    exactKeywords,
+    normalizedKeywords,
+    expandedKeywords
+  });
+}
+
+/**
+ * Deterministic query decomposition for the hybrid fabric. It produces routing
+ * hints only; it does not call a model, mint identity, or generate an embedding.
+ */
+export function buildQueryUnderstandingV1(input: {
+  query: string;
+  filters?: SearchMetadataFilter;
+}): QueryUnderstandingV1 {
+  const originalQuery = input.query.trim();
+  if (!originalQuery) throw new Error('QUERY_UNDERSTANDING_QUERY_REQUIRED');
+  const exactTerms = uniqueBounded(tokenizeKeywordSurface(originalQuery), RETRIEVAL_LIMITS.maxExactKeywords);
+  const rawTerms = uniqueBounded(originalQuery.split(/\s+/), RETRIEVAL_LIMITS.maxExactKeywords);
+  const identifierTerms = uniqueBounded(rawTerms.filter((term) => isIdentifierLike(term)), RETRIEVAL_LIMITS.maxExactKeywords);
+  const pathTerms = uniqueBounded(rawTerms.filter((term) => isPathLike(term)), RETRIEVAL_LIMITS.maxExactKeywords);
+  const symbolTerms = uniqueBounded(
+    rawTerms.filter((term) => isIdentifierLike(term) || /^[A-Za-z][A-Za-z0-9]*$/.test(term)),
+    RETRIEVAL_LIMITS.maxExactKeywords
+  );
+  const bundle = buildKeywordBundle({ query: originalQuery });
+  const ftsTerms = uniqueBounded([...bundle.exactKeywords, ...bundle.normalizedKeywords], RETRIEVAL_LIMITS.maxExactKeywords);
+  const trigramTerms = uniqueBounded([...identifierTerms, ...pathTerms, ...rawTerms], RETRIEVAL_LIMITS.maxExactKeywords);
+
+  return QueryUnderstandingV1Schema.parse({
+    schema: 'atlas.query-understanding.v1',
+    originalQuery,
+    exactTerms,
+    identifierTerms,
+    pathTerms,
+    symbolTerms,
+    ftsTerms,
+    trigramTerms,
+    semanticText: normalizeKeywordSurface(originalQuery),
+    negativeTerms: [],
+    filters: SearchMetadataFilterSchema.parse(input.filters ?? {}),
+    semanticRepresentation: 'semantic_768',
+    producerRevision: 'atlas.query-understanding.v1'
+  });
 }
 
 export function inferRetrievalTier(input: {
@@ -382,4 +494,52 @@ export function normalizeRetrievalSearchRequest(
     exactKeywords: bundle.exactKeywords,
     expandedKeywords: bundle.expandedKeywords
   };
+}
+
+/**
+ * Freeze the existing normalized request into a deterministic, non-authoritative
+ * execution plan. This is a query contract only: it never admits source rows,
+ * creates CandidateOrdinal values, writes a cache, or promotes a projection.
+ */
+export function buildQueryPlanV1(input: {
+  request: RetrievalSearchRequest;
+  workspaceRevision?: string | null;
+}): QueryPlanV1 {
+  const request = RetrievalSearchRequestSchema.parse(input.request);
+  const bundle = buildKeywordBundle({
+    query: request.query,
+    exactKeywords: request.exactKeywords,
+    expandedKeywords: request.expandedKeywords
+  });
+  const queryUnderstanding = buildQueryUnderstandingV1({
+    query: request.query,
+    filters: request.filters
+  });
+  const base = {
+    schema: 'atlas.query-plan.v1' as const,
+    query: request.query,
+    queryUnderstanding,
+    retrievalTier: request.retrievalTier ?? inferRetrievalTier({
+      query: request.query,
+      exactKeywords: bundle.exactKeywords,
+      normalizedKeywords: bundle.normalizedKeywords,
+      expandedKeywords: bundle.expandedKeywords
+    }),
+    lanes: request.lanes,
+    keywordBundle: bundle,
+    filters: request.filters,
+    topKPerLane: request.topKPerLane,
+    finalTopK: request.finalTopK,
+    rerankTopK: request.rerankTopK,
+    pageSize: request.pageSize,
+    cursor: request.cursor ?? null,
+    includeRelations: request.includeRelations,
+    relationDepth: request.relationDepth,
+    includeDebugScores: request.includeDebugScores,
+    workspaceRevision: input.workspaceRevision ?? null,
+    canonicalAuthority: false as const,
+    writesPerformed: false as const,
+    promotionAuthorized: false as const
+  } satisfies Omit<QueryPlanV1, 'planChecksum'>;
+  return QueryPlanV1Schema.parse({ ...base, planChecksum: queryPlanChecksum(base) });
 }

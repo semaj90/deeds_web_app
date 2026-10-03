@@ -29,13 +29,27 @@ const AUDIT_SCRIPT = path.join(__dirname, 'audit-runtime-ownership.mjs');
 function evaluate(registry, baseline) {
   const violations = [];
   const knownExisting = [];
+  const notProven = [];
   function isTolerated(capability, item) {
     return baseline.tolerated.some((t) => t.capability === capability && t.item === item);
   }
   for (const [capabilityId, capability] of Object.entries(registry.capabilities ?? {})) {
-    const owner = capability.owner ?? capability.canonical_data_contract;
-    if (!owner) { violations.push({ class: 'MISSING_CANONICAL_OWNER', capabilityId }); continue; }
-    if (owner.unproven || owner.classification === 'UNKNOWN') continue;
+    const owners = Array.isArray(capability.owners)
+      ? capability.owners
+      : [capability.owner ?? capability.canonical_data_contract].filter(Boolean);
+    if (owners.length === 0) { violations.push({ class: 'MISSING_CANONICAL_OWNER', capabilityId }); continue; }
+    const canonicalOwners = owners.filter((owner) => owner.classification === 'CANONICAL_OWNER');
+    const optional = owners.filter((owner) => ['OPTIONAL_CHALLENGER', 'OPTIONAL_CHALLENGER_NOT_INSTALLED', 'OPTIONAL_CHALLENGER_NOT_WIRED'].includes(owner.classification));
+    const unresolved = owners.filter((owner) => owner.unproven || owner.classification === 'UNKNOWN');
+    if (optional.length) notProven.push({ capabilityId, optional: optional.length });
+    if (unresolved.length) notProven.push({ capabilityId, unresolved: unresolved.length });
+    if (!canonicalOwners.length && !optional.length && !unresolved.length) violations.push({ class: 'MISSING_CANONICAL_OWNER', capabilityId });
+    if (canonicalOwners.length > 1) {
+      const domains = canonicalOwners.map((owner) => owner.domain).filter(Boolean);
+      if (!(capability.note && domains.length === canonicalOwners.length && new Set(domains).size === domains.length)) {
+        violations.push({ class: 'MULTIPLE_CANONICAL_OWNERS', capabilityId });
+      }
+    }
     const allSecondary = [...(capability.backends ?? []), ...(capability.known_existing_duplication ?? [])];
     for (const entry of allSecondary) {
       if (entry.classification === 'CANONICAL_OWNER') {
@@ -47,7 +61,7 @@ function evaluate(registry, baseline) {
       }
     }
   }
-  return { violations, knownExisting };
+  return { violations, knownExisting, notProven };
 }
 
 let failures = 0;
@@ -59,6 +73,40 @@ function assertCase(name, actual, expected) {
     console.log(`  expected: ${JSON.stringify(expected)}`);
     console.log(`  actual:   ${JSON.stringify(actual)}`);
   }
+}
+
+// Case 5: domain-scoped canonical owners are valid when the registry documents
+// distinct ownership domains; this is not duplicate ownership.
+{
+  const registry = {
+    schema_version: 'atlas.runtime-ownership.v1',
+    capabilities: {
+      foo: {
+        note: 'Distinct domain-scoped owners',
+        owners: [
+          { domain: 'A', classification: 'CANONICAL_OWNER', path: 'a.ts' },
+          { domain: 'B', classification: 'CANONICAL_OWNER', path: 'b.ts' },
+        ],
+      },
+    },
+  };
+  const result = evaluate(registry, { tolerated: [] });
+  assertCase('domain-scoped canonical owners pass', result.violations.length, 0);
+}
+
+// Case 6: optional challenger lanes are deferred evidence, not canonical-owner conflicts.
+{
+  const registry = {
+    schema_version: 'atlas.runtime-ownership.v1',
+    capabilities: {
+      foo: {
+        owner: { classification: 'OPTIONAL_CHALLENGER_NOT_INSTALLED', path: 'wsl://challenger' },
+      },
+    },
+  };
+  const result = evaluate(registry, { tolerated: [] });
+  assertCase('deferred optional challenger does not fail', result.violations.length, 0);
+  assertCase('deferred optional challenger remains not proven', result.notProven.length, 1);
 }
 
 // Case 1: one owner + backends → no violations.

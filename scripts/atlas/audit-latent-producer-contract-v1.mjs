@@ -1,3 +1,13 @@
+/**
+ * TODO (stage-7 review, 2026-09-15): last run status was PRODUCER_CONTRACT_READY_FOR_REVIEW,
+ * nextGate INDEPENDENT_LATENT_CANARY_READBACK. This is the closest-to-unblocked stage found in
+ * this session's review -- the contract itself is ready, it just needs one independent canary
+ * readback run. Still correctly gated behind the admitted semantic_768 cohort quality (this
+ * repo's stage ordering: semantic_768 admission -> latent_256 -> latent_128/64), so do not run
+ * the canary readback until CURRENT-STRUCTURAL-LINEAGE-01's primary gate and the admitted
+ * cohort are further along -- but flagged here as the fastest win once that unblocks, not
+ * requiring new engineering work.
+ */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

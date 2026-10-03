@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.stable-file-schema-preflight.v1",
+  "gate": "S01-08H-PREFLIGHT",
+  "generatedAt": "2026-09-22T03:00:00.000Z",
+  "designOnly": true,
+  "databaseWrites": 0,
+  "correctionApplied": {
+    "problem": "The prior addendum's CHECK (source_revision = 'sha256:' || content_digest) proves only internal row consistency. It does NOT prove the revision corresponds to an admitted source/workspace authority -- PostgreSQL's own docs are explicit that CHECK constraints validate the current row only and cross-table truth needs FK/UNIQUE, not CHECK.",
+    "fix": "Split into two mechanisms, not one: (1) CHECK stays, proves internal digest consistency only. (2) NEW: repo_id text NOT NULL column added to atlas_stable_file_revision_binding, plus a composite FOREIGN KEY (repo_id, repository_relative_path, source_revision, workspace_revision) REFERENCES atlas_workspace_source_bindings (repo_id, canonical_source_ref, source_revision, workspace_revision) -- verified live this preflight: that exact 4-column UNIQUE constraint already exists on atlas_workspace_source_bindings (atlas_workspace_source_bindin_repo_id_canonical_source_ref__key), so the FK is directly buildable, not hypothetical. (3) The canonical writer (S01-08I, not yet built) remains the actual enforcement point in practice -- it must resolve a real admitted binding BEFORE insert (same pattern S01-10B's qualifySymbolVersionRevisionsV1 already uses); the FK is the database-level safety net behind that, not a replacement for it."
+  },
+  "checklist": [
+    { "item": 1, "requirement": "Four-table DDL exactly matches S01-08G + addendum", "status": "PASS", "note": "atlas_repository_identity, atlas_stable_file_identity, atlas_stable_file_revision_binding, atlas_stable_file_alias -- same 4, widened per this correction" },
+    { "item": 2, "requirement": "No fifth SourceRevision table introduced", "status": "PASS" },
+    { "item": 3, "requirement": "atlas_stable_file_revision_binding includes content_digest, byte_length", "status": "PASS" },
+    { "item": 4, "requirement": "Row-local constraints: content_digest lowercase sha256, source_revision = 'sha256:'||content_digest, byte_length >= 0", "status": "PASS" },
+    { "item": 5, "requirement": "StableFileIdentity.stable_file_id has NO DEFAULT", "status": "PASS", "note": "no DEFAULT gen_random_uuid() anywhere in the DDL -- the exact anti-pattern that made graphify_files.file_id a revision-record id, not logical identity" },
+    { "item": 6, "requirement": "Logical registry: created_from_source_ref/created_from_source_revision nullable", "status": "DEFERRED_TO_SEPARATE_MIGRATION", "note": "S01-10-schema's decision; not part of THIS DDL (S01-08H creates new tables only, does not ALTER atlas_symbol_registry) -- a separate, explicitly-authorized migration per S01-10-schema's own stop condition" },
+    { "item": 7, "requirement": "Revision-bearing entities: source_revision remains NOT NULL", "status": "PASS", "note": "atlas_stable_file_revision_binding.source_revision, atlas_symbol_versions.source_revision (unchanged) both NOT NULL" },
+    { "item": 8, "requirement": "No historical row mutation", "status": "PASS", "note": "4 CREATE TABLE statements only; 0 rows written" },
+    { "item": 9, "requirement": "No symbol predicate/guard changes bundled into DDL", "status": "PASS", "note": "S01-10B follow-up (logical registry admission semantics) and the final S01-09 rerun predicate change are recorded as REQUIRED FUTURE work, not implemented here" },
+    { "item": 10, "requirement": "No RepresentationSnapshot/vector/topology schema bundled in", "status": "PASS" },
+    { "item": 11, "requirement": "FK/UNIQUE plan explicitly proves admitted provenance", "status": "PASS_WITH_CORRECTION", "note": "the composite FK above; verified buildable against the live atlas_workspace_source_bindings unique constraint this preflight" },
+    { "item": 12, "requirement": "Down migration / rollback SQL generated", "status": "PASS", "note": "see rollbackSql" },
+    { "item": 13, "requirement": "Pre-apply catalog snapshot (pg_constraint / pg_indexes / information_schema.columns)", "status": "PASS", "note": "captured this preflight: 0/4 new table names exist; pg_constraint baseline on atlas_symbol_registry+atlas_symbol_versions+atlas_workspace_source_bindings = 55 constraints (unchanged by this DDL, since it creates new tables only)" },
+    { "item": 14, "requirement": "openspec validate --strict", "status": "PENDING", "note": "run at commit time for this gate" }
+  ],
+  "revisedDdlDelta": [
+    "atlas_stable_file_revision_binding gains: repo_id text NOT NULL",
+    "atlas_stable_file_revision_binding gains: FOREIGN KEY (repo_id, repository_relative_path, source_revision, workspace_revision) REFERENCES atlas_workspace_source_bindings (repo_id, canonical_source_ref, source_revision, workspace_revision)"
+  ],
+  "registryRevisionDecision": {
+    "decision": "Do NOT rename registry_revision in S01-08H or any bundled migration. Physical column name stays; its SEMANTIC MEANING is canonicalized in documentation and in the TypeScript repository adapter (not yet built) as producerRevision, not sourceRevision. A dedicated rename migration (registry_revision -> created_by_producer_revision) is explicitly deferred to a later, separately-authorized cleanup migration once callers are proven clean -- keeps S01-08H's blast radius to additive-only."
+  },
+  "hasRevisionBoundVersionDecision": {
+    "decision": "Do NOT persist a boolean flag on atlas_symbol_registry. Derive via EXISTS (SELECT 1 FROM atlas_symbol_versions v WHERE v.stable_symbol_id = r.stable_symbol_id) until profiling proves that query is actually expensive. A persisted flag creates a second transactionally-maintained invariant with no identity value today."
+  },
+  "s01_10B_followupContract_recordedNotImplemented": {
+    "logicalRegistryAdmission": {
+      "revisionAbsent": "VALID (logical skeleton)",
+      "revisionPresentAndQualified": "VALID (provenance recorded)",
+      "revisionPresentAndMalformed": "REJECT",
+      "revisionPresentAndFakePlaceholder": "REJECT"
+    },
+    "symbolVersionAdmission_unchanged": {
+      "revisionAbsent": "REJECT",
+      "revisionMalformed": "REJECT",
+      "revisionNotAdmitted": "REJECT"
+    },
+    "note": "This is a real, scoped contract change to admitLogicalSymbolRegistryV1 (sveltekit-frontend/.../symbol-revision-qualification-v1.ts) -- NOT implemented in this preflight or in S01-08H. Tracked as the 'S01-10B-followup' stage in the migration order below. qualifySymbolVersionRevisionsV1 (the atlas_symbol_versions guard) is explicitly UNCHANGED -- no weakening."
+  },
+  "finalS01_09_predicateChange_recordedNotImplemented": {
+    "decision": "REGISTRY_CREATED_FROM_QUALIFIED_REVISION should stop being an identity-admission gate in the final SymbolIdentityV1 rerun. Revision qualification should be required only on: atlas_symbol_versions, atlas_stable_file_revision_binding, and source authority (atlas_workspace_source_bindings) -- the structurally correct locations per the now-frozen G1 chain.",
+    "note": "Not implemented here -- this is the 'final S01-09' stage, after S01-08M wires upstream_file_id."
+  },
+  "rollbackSql": "DROP TABLE IF EXISTS atlas_stable_file_alias; DROP TABLE IF EXISTS atlas_stable_file_revision_binding; DROP TABLE IF EXISTS atlas_stable_file_identity; DROP TABLE IF EXISTS atlas_repository_identity;",
+  "migrationOrderFrozen": [
+    "S01-08H schema apply", "S01-08I canonical stable-file writer", "S01-08J bounded population preview",
+    "STOP -- explicit backfill authorization", "S01-08K population apply", "S01-08L lifecycle proof (tests A-F)",
+    "S01-08M atlas_symbol_versions.upstream_file_id -> stableFileId", "S01-10B-followup logical registry admission semantics",
+    "final S01-09 SymbolIdentityV1 rerun (drops REGISTRY_CREATED_FROM_QUALIFIED_REVISION as a gate)", "S01-11 PacketRevisionOwnerV1"
+  ],
+  "result": "S01_08H_PREFLIGHT_READY",
+  "authorizationRequired": true,
+  "authorizationNote": "This message explicitly did not authorize S01-08H. No DDL applied. Awaiting the exact typed token for this gate."
+}

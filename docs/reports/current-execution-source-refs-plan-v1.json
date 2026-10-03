@@ -1,0 +1,530 @@
+{
+  "schema": "atlas.current-execution-source-refs-plan.v1",
+  "mode": "APPLY",
+  "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "sourceSelectionChecksum": "sha256:886a2892922c6abb25582a3f24565d77cd902bd8d284745125a20d5edf707767",
+  "repositoryBridge": {
+    "executionRepository": "repo:root",
+    "sourceRegistryRepository": "deeds-web-app"
+  },
+  "counts": {
+    "executionMembers": 25542,
+    "rootMembers": 24456,
+    "unresolvedOtherRepositories": 1086,
+    "existingWholeFileRefs": 23367,
+    "contentOrIdentityMismatches": 0,
+    "candidateInserts": 1089
+  },
+  "candidateChecksum": "sha256:b7a5aa7b26ed14f735a23294fa7792a9d404ca1a93e312cdd51c3bb354d9add1",
+  "candidates": [
+    {
+      "sourceRefKey": ".clarity/ff1-plan.md",
+      "relativePath": ".clarity/ff1-plan.md",
+      "contentHash": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6"
+    },
+    {
+      "sourceRefKey": "claude.md",
+      "relativePath": "claude.md",
+      "contentHash": "89fdc51cde5f811cfa06f95db195baf957acd77408b763270e5f34023cd6d23f"
+    },
+    {
+      "sourceRefKey": ".claude/settings.json",
+      "relativePath": ".claude/settings.json",
+      "contentHash": "1d9fa661054d0cdc20813737bc62778628ac7119a4188b1af12abd1306feedd5"
+    },
+    {
+      "sourceRefKey": ".claude/settings.local.json",
+      "relativePath": ".claude/settings.local.json",
+      "contentHash": "32fed5fa33dd50cb46383382fb7ddd27ede23ccff49b4738df2d1ad0a9c11e2c"
+    },
+    {
+      "sourceRefKey": ".claude/skills/atlas-tools-mcp/SKILL.md",
+      "relativePath": ".claude/skills/atlas-tools-mcp/SKILL.md",
+      "contentHash": "671d6513d83a3cc915edd67cd8c85d5a8932a0a8bf7cab9d9b556cc13c2fbe11"
+    },
+    {
+      "sourceRefKey": "docker-compose.dev.yml",
+      "relativePath": "docker-compose.dev.yml",
+      "contentHash": "3e40854ff1ca5f8179646750145087906576224af0893a513c5dba758d4e1eff"
+    },
+    {
+      "sourceRefKey": "docker-compose.production.yml",
+      "relativePath": "docker-compose.production.yml",
+      "contentHash": "e11791b6572963de0f9eba97bd0925a24822060cfc4710043d6875d0196d9c08"
+    },
+    {
+      "sourceRefKey": "docker-compose.storage-guards.yml",
+      "relativePath": "docker-compose.storage-guards.yml",
+      "contentHash": "84fb28f82dd497fd7578086a2299d78dcebf497ce2cdb222e4ebb0f7774d5643"
+    },
+    {
+      "sourceRefKey": "docker-compose.test.yml",
+      "relativePath": "docker-compose.test.yml",
+      "contentHash": "382c5edb3a6c03545bcaaf9d570fe904efb6844b16a231f32a2dbf6d090749b1"
+    },
+    {
+      "sourceRefKey": "docker-compose.yml",
+      "relativePath": "docker-compose.yml",
+      "contentHash": "eb09df0a31f866713e29fcc18438710b3e68faace5f5b9009e5832bff011e1e8"
+    },
+    {
+      "sourceRefKey": "docker/docker-compose.gpu.yml",
+      "relativePath": "docker/docker-compose.gpu.yml",
+      "contentHash": "00d5433053549ba179d1726ede10b2f21fc781296d9b0c5ddf60e4820de55d65"
+    },
+    {
+      "sourceRefKey": "docker/docling-vlm/app_ornith.py",
+      "relativePath": "docker/docling-vlm/app_ornith.py",
+      "contentHash": "fd1473df6f8b122d7145dbb9e944fc2e9d333bd253ceb3b5f1c29e42a5b020a2"
+    },
+    {
+      "sourceRefKey": "docker/docling-vlm/app.py",
+      "relativePath": "docker/docling-vlm/app.py",
+      "contentHash": "5f912ce600e01d54bb47c6c3fef6e693e89cce8a9439f111bf91d5cdd2962466"
+    },
+    {
+      "sourceRefKey": "docker/docling-vlm/ornith_vlm_client.py",
+      "relativePath": "docker/docling-vlm/ornith_vlm_client.py",
+      "contentHash": "ec9b69fcae9651dae75868737eb03667966a9af98149166835dec08b93816fc9"
+    },
+    {
+      "sourceRefKey": "docs/architecture/oaklib-external-ontology-adapter-v1.md",
+      "relativePath": "docs/architecture/oaklib-external-ontology-adapter-v1.md",
+      "contentHash": "bb2cb9eea30517bb140a1d8a176f5d62f1f5ea321236c59172226134e313f4be"
+    },
+    {
+      "sourceRefKey": "docs/architecture/residency-scheduler-boundary-v1.md",
+      "relativePath": "docs/architecture/residency-scheduler-boundary-v1.md",
+      "contentHash": "00391cbc3639034de31ca67f867d21c82ae77498182490fd0f33c0eb03209324"
+    },
+    {
+      "sourceRefKey": "docs/architecture/rtx-visual-enhancement-boundary-v1.md",
+      "relativePath": "docs/architecture/rtx-visual-enhancement-boundary-v1.md",
+      "contentHash": "f99eb6fef3aa3e1d6333137d0c5664b4499ab363bc4349c3261acf62faaedd4b"
+    },
+    {
+      "sourceRefKey": "docs/archive/legacy-source-alias-fixture/file-reader.ts",
+      "relativePath": "docs/archive/legacy-source-alias-fixture/file-reader.ts",
+      "contentHash": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6"
+    },
+    {
+      "sourceRefKey": "docs/archive-manifest.json",
+      "relativePath": "docs/archive-manifest.json",
+      "contentHash": "6c84df7b9ba0d2a33bb6cb9065a0a0914048cdda8010170ecbdd61e4a389e755"
+    },
+    {
+      "sourceRefKey": "docs/graph/contract-error-map.json",
+      "relativePath": "docs/graph/contract-error-map.json",
+      "contentHash": "1d7978da08f4657eb41f4e1fc40f08964e95d65c842f2358c1ee054c6aa947a9"
+    },
+    {
+      "sourceRefKey": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "relativePath": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+      "contentHash": "b07d9637572f5fefd13dcfa2b2fe28b1c8ac295ef8356adae1c2eaf6c2ddfea6"
+    },
+    {
+      "sourceRefKey": "docs/.okf/IMPLEMENTATION_GUIDE.md",
+      "relativePath": "docs/.okf/IMPLEMENTATION_GUIDE.md",
+      "contentHash": "0b4fb46e25111551310fda3a336431e94fad75453980db90ab5679fd6aba81cd"
+    },
+    {
+      "sourceRefKey": "docs/.okf/registry.yaml",
+      "relativePath": "docs/.okf/registry.yaml",
+      "contentHash": "ef5a993eb7bfe7549b4fcea57e0fd32ba66c15301952cc075744c1c65887da91"
+    },
+    {
+      "sourceRefKey": "docs/.okf/schema.yaml",
+      "relativePath": "docs/.okf/schema.yaml",
+      "contentHash": "457513d7a00b426fb39f5a544c6e450f4157d54ddfcec1da9d6eec7ac21f194e"
+    },
+    {
+      "sourceRefKey": "docs/OPENSPEC-WORKBOARD.md",
+      "relativePath": "docs/OPENSPEC-WORKBOARD.md",
+      "contentHash": "b6c2eaa3f1f35d6a0506242846bdbad402503284bec0cce1697e77e9545c01ae"
+    },
+    {
+      "sourceRefKey": "docs/PARENT-ATLAS-CONTRACT-SUMMARY.md",
+      "relativePath": "docs/PARENT-ATLAS-CONTRACT-SUMMARY.md",
+      "contentHash": "664a4c27de2878ff4c36b3a4280469ff47209a747c321004a6fbbd9b6fddee10"
+    },
+    {
+      "sourceRefKey": "docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md",
+      "relativePath": "docs/PARENT-ATLAS-PACKET-IDENTITY-OS.md",
+      "contentHash": "ae49f5f216bdb2c010caaa4ea92f71ad66519e6e673ac02a5e58c56e524568ca"
+    },
+    {
+      "sourceRefKey": "docs/parent-atlas-workstation-todo.md",
+      "relativePath": "docs/parent-atlas-workstation-todo.md",
+      "contentHash": "74c2fd5167759053ed54211ad4c721026a43a896ca63a4a3b1010c0de2fb48f3"
+    },
+    {
+      "sourceRefKey": "docs/TRACE-MCP-TOOLS-AUDIT.json",
+      "relativePath": "docs/TRACE-MCP-TOOLS-AUDIT.json",
+      "contentHash": "bb74d01f7cd9d27bc09cd1a4e0c01d724ad15eb119d4dd7c2eb4c1f97922781a"
+    },
+    {
+      "sourceRefKey": "docs/vector-governance/pca-svd-representation-comparison-v1.json",
+      "relativePath": "docs/vector-governance/pca-svd-representation-comparison-v1.json",
+      "contentHash": "528ac329a95d913ed5a12744b360ed9841157e1791e28da68e8ca4930ad6105d"
+    },
+    {
+      "sourceRefKey": "examples/grpo-shadow-input.json",
+      "relativePath": "examples/grpo-shadow-input.json",
+      "contentHash": "c8cb013a90bd4cbdf40074d42c9552bf5a66ba62b955a31d1e2edbec8af57cbd"
+    },
+    {
+      "sourceRefKey": "examples/low-rank-input.json",
+      "relativePath": "examples/low-rank-input.json",
+      "contentHash": "667c190ef6be967d621cff9640837a2cd72a4b8a1b28c609b39fcaa920d876e6"
+    },
+    {
+      "sourceRefKey": "examples/residency-cagra-selector-v1.json",
+      "relativePath": "examples/residency-cagra-selector-v1.json",
+      "contentHash": "e33c98a8ea1dbbf37e9988efb503b81e82a5534550d533bd44ab9026f554d2fe"
+    },
+    {
+      "sourceRefKey": "karpathy-wiki/index.md",
+      "relativePath": "karpathy-wiki/index.md",
+      "contentHash": "90feee4217d900af0d1517f44427a167efdb2541dd319d3e4bdd50856aa5bb0c"
+    },
+    {
+      "sourceRefKey": "karpathy-wiki/log.md",
+      "relativePath": "karpathy-wiki/log.md",
+      "contentHash": "67bb33ffa8d9d133a02c6592d5a403eb09df6c68e9c094ae2356162b54ca2ced"
+    },
+    {
+      "sourceRefKey": "karpathy-wiki/project/atlas-retrieval-navigation.md",
+      "relativePath": "karpathy-wiki/project/atlas-retrieval-navigation.md",
+      "contentHash": "5df2153d7b93f6aa7f369e5535f2450449dee851b8375ca709899d846f002aa4"
+    },
+    {
+      "sourceRefKey": "karpathy-wiki/project/trace-kag-web-development-guide.md",
+      "relativePath": "karpathy-wiki/project/trace-kag-web-development-guide.md",
+      "contentHash": "2bcb845791a847cdbd1c6c4d9fe2684d748adc8e8f7804c815f6436ebc7d09f4"
+    },
+    {
+      "sourceRefKey": "llm/llm.md",
+      "relativePath": "llm/llm.md",
+      "contentHash": "81d731dc1aad3a6f9afe28e4f9bd8e7c95d2b063a351947f89475459863b367a"
+    },
+    {
+      "sourceRefKey": ".mcp.json",
+      "relativePath": ".mcp.json",
+      "contentHash": "9305941ce4ce8759a60d5e064b67d77787c9c35586d832a6121be441926e93d6"
+    },
+    {
+      "sourceRefKey": "memory/exports/lineage-chr97-validation.json",
+      "relativePath": "memory/exports/lineage-chr97-validation.json",
+      "contentHash": "0f1b39e044d61e418680f5d8d6c64e52ff51172ad0eff10615dd0c59a31add60"
+    },
+    {
+      "sourceRefKey": "memory/exports/lineage-chr97-validation.md",
+      "relativePath": "memory/exports/lineage-chr97-validation.md",
+      "contentHash": "15d35fc76119544187f94c1a4a5dd7139c578bd618b6430d5977024881f4b366"
+    },
+    {
+      "sourceRefKey": "memory/exports/lineage-validation.json",
+      "relativePath": "memory/exports/lineage-validation.json",
+      "contentHash": "9b6fa961b6bafbc8d400c08aee89928f6b6904b3ac54f49c3a45e4b683535f1c"
+    },
+    {
+      "sourceRefKey": "memory/exports/lineage-validation.md",
+      "relativePath": "memory/exports/lineage-validation.md",
+      "contentHash": "3c9c32c58e7ed59a0c29bb56144ec5c7f3f080e594e0028f82497b742f5402d0"
+    },
+    {
+      "sourceRefKey": "memory/packets/hyperrag-packets.manifest.json",
+      "relativePath": "memory/packets/hyperrag-packets.manifest.json",
+      "contentHash": "868d1469bba074b9eabf94310eafcb9c89cceae964d4cdc647c895562b6f3c30"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/atlas-rank-manifest.json",
+      "relativePath": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/atlas-rank-manifest.json",
+      "contentHash": "037b06e02a2dfb894c973d801c325f8c19775703701cafc0f17210f865546e8f"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/config.json",
+      "relativePath": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/config.json",
+      "contentHash": "2d125b9df6adbb73494caba42296bedc1abca091e41291a2edb79e77d7d92127"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/tokenizer_config.json",
+      "relativePath": "models/atlas-gemma-rank-v1-donor-b/standalone-init-bf16/tokenizer_config.json",
+      "contentHash": "01f2ff1c21ef2e722891380323edcaecd9c86a776aeb9b40148e2f35e3cee4d3"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1/standalone-init-bf16/atlas-rank-manifest.json",
+      "relativePath": "models/atlas-gemma-rank-v1/standalone-init-bf16/atlas-rank-manifest.json",
+      "contentHash": "138014a445ea8795e68731b270488ac62cb401df4d5fea9767c4c257f4b71b6f"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1/standalone-init-bf16/config.json",
+      "relativePath": "models/atlas-gemma-rank-v1/standalone-init-bf16/config.json",
+      "contentHash": "2d125b9df6adbb73494caba42296bedc1abca091e41291a2edb79e77d7d92127"
+    },
+    {
+      "sourceRefKey": "models/atlas-gemma-rank-v1/standalone-init-bf16/tokenizer_config.json",
+      "relativePath": "models/atlas-gemma-rank-v1/standalone-init-bf16/tokenizer_config.json",
+      "contentHash": "089594a3924fcfd4cb1c596a7906fbf476193519e5198f780912eed02b177e42"
+    },
+    {
+      "sourceRefKey": "models/model-manifest.json",
+      "relativePath": "models/model-manifest.json",
+      "contentHash": "3226233830fb3accacbd8a7e949f67b02c583b233b22564ec07fd733e1201078"
+    },
+    {
+      "sourceRefKey": "native/cutile-ace-level3/glyph_fused_tile.py",
+      "relativePath": "native/cutile-ace-level3/glyph_fused_tile.py",
+      "contentHash": "895f90b83a2465ae833b3ea8debea988009e066acfaeadc318cf02b36a693bfe"
+    },
+    {
+      "sourceRefKey": "next_steps/active/2026-09-12_parent-atlas-deep-audit-workstation-fit.md",
+      "relativePath": "next_steps/active/2026-09-12_parent-atlas-deep-audit-workstation-fit.md",
+      "contentHash": "615dda3f02853930fee9b2be1273a840dd2001336be500c99e5a2b8482f55533"
+    },
+    {
+      "sourceRefKey": "next_steps/active/2026-09-12_promotion-board-real-work.md",
+      "relativePath": "next_steps/active/2026-09-12_promotion-board-real-work.md",
+      "contentHash": "46755928dbe4a16697df90671735d70cf271afd63547c177fbd364463a865094"
+    },
+    {
+      "sourceRefKey": "next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md",
+      "relativePath": "next_steps/active/2026-09-14_gpu-mini-fabric-cutile-level3-and-tests.md",
+      "contentHash": "c82c5604d6846dcfa2217560e9c93d8590a67fdc4d91f7f03a2eba8541de5e26"
+    },
+    {
+      "sourceRefKey": ".opencode/agents/atlas-rlm-repair.md",
+      "relativePath": ".opencode/agents/atlas-rlm-repair.md",
+      "contentHash": "a798d24a5bba6fe5a61847f170136ac512f85455f0c9bff1368f3811817690e2"
+    },
+    {
+      "sourceRefKey": ".opencode/command/atlas-repair-stdio-proof.md",
+      "relativePath": ".opencode/command/atlas-repair-stdio-proof.md",
+      "contentHash": "a79270aee9c22341b044bb1d5285a78ebda6362d3f1a8696b8b642a5a45add9c"
+    },
+    {
+      "sourceRefKey": ".opencode/command/atlas-residency-proof.md",
+      "relativePath": ".opencode/command/atlas-residency-proof.md",
+      "contentHash": "e24d8740b5eb8410132c8da3a35afd5b2523480e2ff9711d25c72ed0eadefec4"
+    },
+    {
+      "sourceRefKey": "openspec/changes/atlas-feature-intelligence/agentic-workflow-next-steps.md",
+      "relativePath": "openspec/changes/atlas-feature-intelligence/agentic-workflow-next-steps.md",
+      "contentHash": "d4a4feaf5e5138884e88d587ddfedab49a425f8e300a1403f2b16c8ba54464d7"
+    },
+    {
+      "sourceRefKey": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "relativePath": "openspec/changes/atlas-feature-intelligence/tasks.md",
+      "contentHash": "215cff6a49be514b6e91911959f0cedaf43235108f925d559da56de6b8957299"
+    },
+    {
+      "sourceRefKey": "openspec/changes/codereview-inference-wiring-followup-aug22/tasks.md",
+      "relativePath": "openspec/changes/codereview-inference-wiring-followup-aug22/tasks.md",
+      "contentHash": "358fffb1d592a936100e87d1876d64d1ec5c83b982c6c8f97a970cb49bdffdcc"
+    },
+    {
+      "sourceRefKey": "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+      "relativePath": "openspec/changes/inference-wiring-deep-audit-aug22/tasks.md",
+      "contentHash": "0edff3ac6bd56c26dd62af2f43a8451f1b745572afcfd79cebddb591e104ee4a"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+      "contentHash": "5f7e0134c1ab83845eca79e4c6b26b28244f8ab349fc8f5fe931d33aa95effc1"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
+      "contentHash": "c0825c4dcf317118f37199006627dec8c5c0b20ea83c893bb35fefb3a2c850b9"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-agentic-file-compiler/tasks.md",
+      "contentHash": "746641452b17a6a5118bf264d417c7be9e0b4bee27929f4778009c2ad823a106"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/design.md",
+      "relativePath": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/design.md",
+      "contentHash": "c9f02c7f1e2521f4fa43c4c569f06a3d11f60cd7f2924d24eaf624e0e94e57bb"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/.openspec.yaml",
+      "relativePath": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/.openspec.yaml",
+      "contentHash": "0d815ffdda0fec4cf9c7b2346a209fdec1bcde4f92cfb10c2075e2e381fd16f8"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/proposal.md",
+      "contentHash": "f3710395072fc854fa70fb1bc6d94d82585caaebc9a9c5e55cda627b52a988d2"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/specs/analysis-pass-ornith-adapter/spec.md",
+      "relativePath": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/specs/analysis-pass-ornith-adapter/spec.md",
+      "contentHash": "7bf79d2b21fd6c6518370bbf05ac44ae27d751e8015590ed19e6222ff9c35f9e"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-analysis-pass-ornith-adapter/tasks.md",
+      "contentHash": "383ba754a8f4956086bd5f95989eee7d30ab4a4a819c9a80447a0cbeceeb18d3"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-best-fit-score-fabric/tasks.md",
+      "contentHash": "7a00511db93eded4425322ff5b019ce0a56e617505ba8a9a5bef123331ddff1c"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+      "contentHash": "80c796b6152bf77c963af4a51f3df367131b2284df7603b1c230e9f938890841"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-error-embedding-768-migration/design.md",
+      "relativePath": "openspec/changes/parent-atlas-error-embedding-768-migration/design.md",
+      "contentHash": "b5b7dfa011c936551b15154a755a66109e612ed669cf2357974908ca258fca05"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-error-embedding-768-migration/.openspec.yaml",
+      "relativePath": "openspec/changes/parent-atlas-error-embedding-768-migration/.openspec.yaml",
+      "contentHash": "2f19e85bc27192bfcfbe4fcfb49c1e49b7569f6d840f97966b535a07da28bc59"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-error-embedding-768-migration/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-error-embedding-768-migration/proposal.md",
+      "contentHash": "26fd3754efa36c5eacf998522763a1713bb5d2765e8a490b7291435cc4dcb93a"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-error-embedding-768-migration/specs/atlas-error-embedding-lane/spec.md",
+      "relativePath": "openspec/changes/parent-atlas-error-embedding-768-migration/specs/atlas-error-embedding-lane/spec.md",
+      "contentHash": "b20cb0ae96daae4e2540aa0fe1559820622b92959635ef01dbc684d927eb631c"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-error-embedding-768-migration/tasks.md",
+      "contentHash": "df6ca5c9cb8490d14de93b2050fbe450d9b639f07893bea8b55c0a5a7b0dc9ab"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/design.md",
+      "relativePath": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/design.md",
+      "contentHash": "2a0edd23d0a219f8d361574be04bd079d30ffd697315ad14e55465b03c7e87c9"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/.openspec.yaml",
+      "relativePath": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/.openspec.yaml",
+      "contentHash": "0d815ffdda0fec4cf9c7b2346a209fdec1bcde4f92cfb10c2075e2e381fd16f8"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/proposal.md",
+      "contentHash": "4af6c600174789ec0d4836fcdef3c29aca22dcb1240d72fe9e79160c924625bc"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-gpu-prellm-recommendation-v1/tasks.md",
+      "contentHash": "e5ee75582f4c67e2e2fc8d53120c06ea36c5139ac477737ab5e318afc90e0e79"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-gpu-runtime-abi-alignment/tasks.md",
+      "contentHash": "2ccfa20163cdff554f65a94fcb3529f1820cbc305d65f25f6c2971cb099362e3"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/tasks.md",
+      "contentHash": "cdba2e0b492fa3d50b6bbdbe1b2b9dc9164bc55c02e0ffc3995cbab6b3eabe2b"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md",
+      "contentHash": "00c397c3d77c2e3125c5a6c6da69a2955dd7f99ffa9b8389857f8b48eeb4f31d"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "contentHash": "82e43f413d0c907c25ece6348270c2d457b3f2fa0cb4fbe6ffc7ff50d8e6c38d"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md",
+      "contentHash": "0ba35f31f8cb87a8d9c09628addeaa4a0a49384584ad89cb3b7f0be1e8e179d2"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-graph-validation-fabric/tasks.md",
+      "contentHash": "14235469ca348df005348a7fccc8aaf635c0c60477dca32764a091e28ef4ed3c"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-grounded-knowledge-fabric/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-grounded-knowledge-fabric/proposal.md",
+      "contentHash": "55bd7eaabd0d5f5b8b005cdd3b2498df2dfe7a152882397d9ef647bd5016feb0"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-grounded-knowledge-fabric/spec.md",
+      "relativePath": "openspec/changes/parent-atlas-grounded-knowledge-fabric/spec.md",
+      "contentHash": "d11cfd2264bd487607c888201cdc17b6387d66db206bc52c597aae18d49a6d5f"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-grounded-knowledge-fabric/tasks.md",
+      "contentHash": "aba35531e701751eb2cbbedb1ff289ded8da6c2f9e59c2a02831065e7e64716f"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-kv-cache-adaptation-research/tasks.md",
+      "contentHash": "170e13a728d6e26b4721a59196ebb8d3181eb99b443cc4e6c96b01e064bebc0a"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-memory-architecture-freeze/proposal.md",
+      "contentHash": "85d9af4df1d8a798a1c0f7bac7752e0a6d0f4ebdbdb20ddc45f90f1cc34441b2"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+      "contentHash": "dab0672e8af335d5e8a3d66247bbe3241ca8e3d1cde8cec9f6fc150dddcd3318"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "contentHash": "b3ee697f4044f7b11a3b793ef01249ce9200a4596ac1d698611fc4569cdcf0ee"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
+      "contentHash": "0c2ce4eab04234933fdbde3399754054d0e0e737f33106553a62ce9d8253a9d7"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-ontology-kernel/tasks.md",
+      "contentHash": "255943ec161f94fb5ffb6b208afb16f87e673b182a0c49b313b71be7089b582f"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+      "contentHash": "c617cb941d6b12c07145165f9e83a8280799ec0077f87ef76e61ae2a005659c4"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-pca-svd-representation-baseline/proposal.md",
+      "relativePath": "openspec/changes/parent-atlas-pca-svd-representation-baseline/proposal.md",
+      "contentHash": "04d2b10b7e65562f6caa6653b9dc737409c18e2f4029b4b078562a42426fcab4"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-pca-svd-representation-baseline/specs/atlas-linear-projection-representation/spec.md",
+      "relativePath": "openspec/changes/parent-atlas-pca-svd-representation-baseline/specs/atlas-linear-projection-representation/spec.md",
+      "contentHash": "06813f37d37d8764d8a3b5c37a2694ffe898dc7bcad04d67cf39a9b3f3a95838"
+    },
+    {
+      "sourceRefKey": "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
+      "relativePath": "openspec/changes/parent-atlas-pca-svd-representation-baseline/tasks.md",
+      "contentHash": "a29a04fbb20e981ab9382c95f7839c4fe2eed90ac89ddcaead07b99ba1a7adad"
+    }
+  ],
+  "mismatches": [],
+  "committed": true,
+  "insertedCount": 1089,
+  "readbackCount": 1089,
+  "writesPerformed": true,
+  "safeToApply": false,
+  "status": "SOURCE_REFS_INSERT_AND_READBACK_PROVEN"
+}

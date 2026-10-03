@@ -7,6 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { pool } from '$lib/server/db/client.js';
+import { loadBindingProvenanceV1, provenanceForV1, qualifyPromotionNominationV1 } from '$lib/server/atlas/identity/symbol-revision-qualification-v1.js';
 import { extractAstFeatures } from '$lib/server/analysis/ast-grep-extractor.js';
 import { GraphifyStructuralMaterializer } from '$lib/server/atlas/indexing/graphify-structural-materializer.js';
 import { compileGraphifyStructuralIntelligence } from '$lib/server/atlas/indexing/graphify-structural-intelligence-adapter.js';
@@ -153,6 +154,8 @@ const report = {
   unsupported_files: 0,
   evidence_rows_written: 0,
   symbol_nominations: 0,
+  relation_graph_compiled: 0,
+  relation_graph_deferred: 0,
   canonical_symbol_resolutions: 0,
   symbols_created_or_versioned: 0,
   evidence_entity_facts_written: 0,
@@ -220,6 +223,8 @@ for (const absolutePath of files) {
     });
     if (!compiled.fabric) continue;
     report.symbol_nominations += compiled.fabric.symbol_nominations.length;
+    if (compiled.relationGraph?.status === 'COMPILED') report.relation_graph_compiled += 1;
+    else report.relation_graph_deferred += 1;
     if (!APPLY && NOMINATION_OUTPUT) {
       const runMetadata = runSourceMetadata.get(ref);
       for (const nomination of compiled.fabric.symbol_nominations) {
@@ -240,6 +245,7 @@ for (const absolutePath of files) {
       fabric_receipt: compiled.fabric.receipt,
       reference_facts: compiled.fabric.reference_facts,
       ast_grep_observations: compiled.fabric.ast_grep_observations,
+      relation_graph_checksum: compiled.relationGraph?.graph?.checksum ?? null,
     })}`;
     const evidenceId = `evidence:structural:${sha256([ref, sourceVersionAnchor, evidenceRevision]).slice(0, 40)}`;
 
@@ -253,6 +259,9 @@ for (const absolutePath of files) {
         canonical_promotion_allowed: compiled.receipt.canonicalPromotionMayBeAttempted,
         evidence_id: evidenceId,
         nominations: compiled.fabric.symbol_nominations.length,
+        relation_graph_status: compiled.relationGraph?.status ?? 'UNAVAILABLE',
+        relation_graph_reason: compiled.relationGraph?.reason ?? null,
+        relation_graph_checksum: compiled.relationGraph?.graph?.checksum ?? null,
       }));
       continue;
     }
@@ -278,6 +287,7 @@ for (const absolutePath of files) {
         source_version_anchor: structural.sourceVersionAnchor,
         source_revision_authority: structural.sourceRevisionAuthority,
         structural_receipt: compiled.fabric.receipt,
+        relation_graph_checksum: compiled.relationGraph?.graph?.checksum ?? null,
         reference_facts: compiled.fabric.reference_facts,
         ast_grep_observations: compiled.fabric.ast_grep_observations,
         diagnostics: compiled.receipt.diagnostics,
@@ -296,16 +306,24 @@ for (const absolutePath of files) {
         && ALLOW_CREATE_SYMBOLS
         && compiled.receipt.canonicalPromotionMayBeAttempted
       ) {
-        const promoted = await symbolRegistry.promoteNomination({
-          nomination,
-          registry_revision: REGISTRY_REVISION,
-          producer_revision: PRODUCER_REVISION,
-          allow_create: true,
-          evidence_refs: [evidenceId],
-        });
-        resolution = promoted.resolution;
-        await symbolRegistry.readback({ stable_symbol_id: promoted.resolution.stable_symbol_id!, producer_revision: PRODUCER_REVISION });
-        report.symbols_created_or_versioned += 1;
+        // S01-10B main-repo boundary guard: the package promoteNomination writes registry + aliases + version in one
+        // transaction with no revision validation, so an unqualified nomination must never reach it.
+        const provenanceMap = await loadBindingProvenanceV1(pool, [{ sourceRef: nomination.source_ref, sourceRevision: nomination.source_revision }]);
+        const revisionVerdict = qualifyPromotionNominationV1(nomination, REGISTRY_REVISION, provenanceForV1(provenanceMap, nomination.source_ref, nomination.source_revision));
+        if (!revisionVerdict.admitted) {
+          (report as Record<string, any>).symbols_rejected_unqualified_revision = ((report as Record<string, any>).symbols_rejected_unqualified_revision ?? 0) + 1;
+        } else {
+          const promoted = await symbolRegistry.promoteNomination({
+            nomination,
+            registry_revision: REGISTRY_REVISION,
+            producer_revision: PRODUCER_REVISION,
+            allow_create: true,
+            evidence_refs: [evidenceId],
+          });
+          resolution = promoted.resolution;
+          await symbolRegistry.readback({ stable_symbol_id: promoted.resolution.stable_symbol_id!, producer_revision: PRODUCER_REVISION });
+          report.symbols_created_or_versioned += 1;
+        }
       }
       resolutions.push(resolution);
       if (resolution.status === 'canonical') report.canonical_symbol_resolutions += 1;

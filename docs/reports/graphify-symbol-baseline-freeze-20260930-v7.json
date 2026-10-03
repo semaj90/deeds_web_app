@@ -1,0 +1,10 @@
+{
+  "schema": "atlas.graphify-symbol-batch-plan.v1",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "sourceSnapshotChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "producerRevision": "sha256:40eb7eeb696d569c6eadc3f405332eef63180617978af9aa350793213f4f9536",
+  "useLsp": false,
+  "rowCount": 0,
+  "rows": [],
+  "planChecksum": "sha256:09bc030c45497b2249b7b7d6a239f43145703db2c27f74c3780d750421c27094"
+}

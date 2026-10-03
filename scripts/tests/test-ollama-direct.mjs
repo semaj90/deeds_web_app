@@ -1,16 +1,16 @@
 /**
- * Test Ollama Direct (bypass Bifrost)
+ * Test llama-server Direct (bypass Bifrost; Ollama is embeddings-only)
  */
 
 async function testOllama() {
-	console.log('Testing Ollama directly at http://localhost:11434...\n');
+	console.log('Testing llama-server directly at http://127.0.0.1:8090...\n');
 
 	const start = Date.now();
-	const res = await fetch('http://localhost:11434/api/chat', {
+	const res = await fetch(`${process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'gemma4-rotorquant:latest',
+			model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
 			messages: [{ role: 'user', content: 'What is negligence? Answer in 10 words.' }],
 			stream: false,
 		}),
@@ -28,7 +28,7 @@ async function testOllama() {
 	}
 
 	const data = await res.json();
-	console.log('Response:', data.message?.content ?? 'NO CONTENT');
+	console.log('Response:', data.choices?.[0]?.message?.content ?? 'NO CONTENT');
 	console.log();
 	console.log('Full structure:', JSON.stringify(data, null, 2).slice(0, 800));
 }

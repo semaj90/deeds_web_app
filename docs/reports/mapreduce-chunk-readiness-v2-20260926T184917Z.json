@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.mapreduce-chunk-readiness-receipt.v2",
+  "generatedAt": "2026-09-26T18:49:17.388Z",
+  "status": "READINESS_REPLAY_PARTIAL",
+  "sourceManifest": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\manifest.json",
+  "sourceManifestChecksum": "sha256:e2db192da7cc34631adf9d30049b1fccb6868466acc1e86f509067d7eba20d13",
+  "sourceOverlay": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\packet-chunk-evidence.ndjson",
+  "sourceOverlayChecksum": "sha256:ff5ff53e58eb46dd4a2f79b61b8b6b9453b98696e7e80e1851367cfb35ad0a50",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "candidateCount": 127,
+  "chunkCount": 1520,
+  "measured": {
+    "inputConserved": true,
+    "packetStates": {
+      "PACKET_REVISION_QUALIFIED": 1520
+    },
+    "chunkStates": {
+      "CANONICAL_CHUNK_MISMATCH": 1406,
+      "CHUNK_REVISION_QUALIFIED": 114
+    },
+    "eligibilityStates": {
+      "CHUNK_REVISION_QUALIFIED": 114,
+      "PACKET_REVISION_QUALIFIED": 1406
+    },
+    "semantic768States": {
+      "AVAILABLE": 114,
+      "UNQUALIFIED": 1406
+    },
+    "summaryStates": {
+      "MISSING": 1520
+    },
+    "summarySemanticStates": {
+      "MISSING": 1338,
+      "UNBOUND": 182
+    },
+    "chunkSourceRevisionMirror": {
+      "null": 1520
+    },
+    "chunkWorkspaceRevisionMirror": {
+      "null": 1520
+    },
+    "exactSourceFileDigestRows": 1520,
+    "semanticRepresentationRevisionRows": 0,
+    "contentEmbedding768DiagnosticRows": 0
+  },
+  "artifacts": {
+    "rowDetails": ".tmp\\atlas\\mapreduce-chunk-readiness-v2\\20260926T184917Z\\readiness.ndjson",
+    "rowDetailsChecksum": "sha256:fba99aa90ea12bea83011095c0a94fdd08cccd1b7c7aea386436ab9c39f4bddd"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "receiptChecksum": "sha256:f390a923593a45af2a2ba61f4b2647595821629c64a449e536062081a1339ab6"
+}

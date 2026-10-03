@@ -223,8 +223,8 @@ async function buildWikiNotesPart(
 	errors: Record<string, string>,
 	limit: number
 ): Promise<WikiNote[] | null> {
-	// D16: `await using` auto-disconnects on scope exit (replaces try/finally)
-	await using redis = await getRedisFreshDisposable();
+	// `await using` is a SyntaxError on Node 22 (whole route 500s at load); try/finally is equivalent.
+	const redis = await getRedisFreshDisposable();
 	try {
 		const keys = await scanKeys(redis, 'wiki:note:*', limit);
 		if (keys.length === 0) return [];
@@ -261,6 +261,8 @@ async function buildWikiNotesPart(
 	} catch (err) {
 		errors.wikiNotes = (err as Error).message;
 		return null;
+	} finally {
+		await redis[Symbol.asyncDispose]();
 	}
 }
 
@@ -320,8 +322,8 @@ async function buildTileAtlasPart(
 async function buildCacheStatsPart(
 	errors: Record<string, string>
 ): Promise<Record<string, number> | null> {
-	// D16: `await using` auto-disconnects on scope exit
-	await using redis = await getRedisFreshDisposable();
+	// `await using` is a SyntaxError on Node 22 (whole route 500s at load); try/finally is equivalent.
+	const redis = await getRedisFreshDisposable();
 	try {
 		const patterns = [
 			'turbo:*',
@@ -344,6 +346,8 @@ async function buildCacheStatsPart(
 	} catch (err) {
 		errors.cacheStats = (err as Error).message;
 		return null;
+	} finally {
+		await redis[Symbol.asyncDispose]();
 	}
 }
 

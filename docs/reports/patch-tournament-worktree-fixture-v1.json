@@ -1,0 +1,430 @@
+{
+  "schema": "atlas.patch-tournament-worktree-fixture.v1",
+  "generatedAt": "2026-10-01T15:59:52.073Z",
+  "mode": "FIXTURE_ISOLATED_WORKTREE_EXECUTION",
+  "status": "FIXTURE_EXECUTION_PROVEN",
+  "proofLevel": "FIXTURE_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "canonicalWrites": false,
+  "autoApply": false,
+  "training": false,
+  "baseRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+  "candidateCount": 3,
+  "candidateExecution": [
+    {
+      "candidateId": "candidate-a",
+      "runId": "fixture-run-candidate-a",
+      "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+      "patchDigest": "sha256:2aedfe7c8f9fc1e46243b62c3d715de3373913a262ca452913a0e1209556ae9a",
+      "branchName": "fixture/candidate-a",
+      "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-a",
+      "patchSummary": "minimal syntax repair",
+      "compileError": "fixture-syntax-error",
+      "touchedFiles": [
+        "fixture.cjs"
+      ],
+      "staticChecks": [
+        {
+          "name": "node --check fixture.cjs",
+          "passed": true,
+          "command": "node --check fixture.cjs",
+          "evidenceRef": "fixture:candidate-a:static"
+        }
+      ],
+      "focusedTests": [
+        {
+          "name": "fixture-test.cjs",
+          "passed": true,
+          "command": "node fixture-test.cjs",
+          "evidenceRef": "fixture:candidate-a:focused"
+        }
+      ],
+      "evidenceRefs": [
+        "fixture:candidate-a:source-readback",
+        "fixture:candidate-a:static",
+        "fixture:candidate-a:focused"
+      ],
+      "riskSignals": [],
+      "readback": {
+        "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "baseRevisionMatch": true,
+        "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+        "changedFiles": [
+          "fixture.cjs"
+        ],
+        "changedFilesMatch": true
+      },
+      "diagnostics": {
+        "static": "",
+        "focused": ""
+      }
+    },
+    {
+      "candidateId": "candidate-b",
+      "runId": "fixture-run-candidate-b",
+      "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+      "patchDigest": "sha256:30ea1cf8c4fee2dac87f953193e1546da88cc7afd22815e1f5eb5ab5798229a8",
+      "branchName": "fixture/candidate-b",
+      "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-b",
+      "patchSummary": "broader syntax repair with extra file",
+      "compileError": "fixture-syntax-error",
+      "touchedFiles": [
+        "fixture.cjs",
+        "other.cjs"
+      ],
+      "staticChecks": [
+        {
+          "name": "node --check fixture.cjs",
+          "passed": true,
+          "command": "node --check fixture.cjs",
+          "evidenceRef": "fixture:candidate-b:static"
+        }
+      ],
+      "focusedTests": [
+        {
+          "name": "fixture-test.cjs",
+          "passed": true,
+          "command": "node fixture-test.cjs",
+          "evidenceRef": "fixture:candidate-b:focused"
+        }
+      ],
+      "evidenceRefs": [
+        "fixture:candidate-b:source-readback",
+        "fixture:candidate-b:static",
+        "fixture:candidate-b:focused"
+      ],
+      "riskSignals": [
+        "broader-scope"
+      ],
+      "readback": {
+        "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "baseRevisionMatch": true,
+        "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+        "changedFiles": [
+          "fixture.cjs"
+        ],
+        "changedFilesMatch": false
+      },
+      "diagnostics": {
+        "static": "",
+        "focused": ""
+      }
+    },
+    {
+      "candidateId": "candidate-c",
+      "runId": "fixture-run-candidate-c",
+      "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+      "patchDigest": "sha256:78c7a1b35dd04fdaf912990ab38c665a4071cc944a6289c4d353b87435b9ea9c",
+      "branchName": "fixture/candidate-c",
+      "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c",
+      "patchSummary": "non-repairing candidate",
+      "compileError": "fixture-syntax-error",
+      "touchedFiles": [
+        "fixture.cjs"
+      ],
+      "staticChecks": [
+        {
+          "name": "node --check fixture.cjs",
+          "passed": false,
+          "command": "node --check fixture.cjs",
+          "evidenceRef": "fixture:candidate-c:static"
+        }
+      ],
+      "focusedTests": [
+        {
+          "name": "fixture-test.cjs",
+          "passed": false,
+          "command": "node fixture-test.cjs",
+          "evidenceRef": "fixture:candidate-c:focused"
+        }
+      ],
+      "evidenceRefs": [
+        "fixture:candidate-c:source-readback",
+        "fixture:candidate-c:static"
+      ],
+      "riskSignals": [
+        "syntax-failure"
+      ],
+      "readback": {
+        "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "baseRevisionMatch": true,
+        "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+        "changedFiles": [],
+        "changedFilesMatch": false
+      },
+      "diagnostics": {
+        "static": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture.cjs:1\r\nmodule.exports = { value: };\r\n                          ^\r\n\r\nSyntaxError: Unexpected token '}'\r\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\r\n    at checkSyntax (node:internal/main/check_syntax:78:3)\r\n\r\nNode.js v22.23.3",
+        "focused": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture.cjs:1\r\nmodule.exports = { value: };\r\n                          ^\r\n\r\nSyntaxError: Unexpected token '}'\r\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\r\n    at Module._compile (node:internal/modules/cjs/loader:1755:20)\r\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\r\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\r\n    at Module.require (node:internal/modules/cjs/loader:1527:12)\r\n    at require (node:internal/modules/helpers:147:16)\r\n    at Object.<anonymous> (C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture-test.cjs:1:19)\r\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\r\n\r\nNode.js v22.23.3"
+      }
+    }
+  ],
+  "tournament": {
+    "tournamentId": "tournament:a9f82dc6e3c160748e147c4df389f54c313873492e3bd6ef37a92c43f0936284",
+    "objective": "bounded fixture compile-error tournament",
+    "workspaceId": "fixture-workspace",
+    "workspaceRevision": "fixture-unbound-workspace-revision",
+    "baseBranch": "main",
+    "compileError": "fixture-syntax-error",
+    "rankedCandidates": [
+      {
+        "candidateId": "candidate-a",
+        "runId": "fixture-run-candidate-a",
+        "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "patchDigest": "sha256:2aedfe7c8f9fc1e46243b62c3d715de3373913a262ca452913a0e1209556ae9a",
+        "branchName": "fixture/candidate-a",
+        "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-a",
+        "patchSummary": "minimal syntax repair",
+        "compileError": "fixture-syntax-error",
+        "touchedFiles": [
+          "fixture.cjs"
+        ],
+        "staticChecks": [
+          {
+            "name": "node --check fixture.cjs",
+            "passed": true,
+            "command": "node --check fixture.cjs",
+            "evidenceRef": "fixture:candidate-a:static"
+          }
+        ],
+        "focusedTests": [
+          {
+            "name": "fixture-test.cjs",
+            "passed": true,
+            "command": "node fixture-test.cjs",
+            "evidenceRef": "fixture:candidate-a:focused"
+          }
+        ],
+        "evidenceRefs": [
+          "fixture:candidate-a:source-readback",
+          "fixture:candidate-a:static",
+          "fixture:candidate-a:focused"
+        ],
+        "riskSignals": [],
+        "readback": {
+          "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "baseRevisionMatch": true,
+          "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+          "changedFiles": [
+            "fixture.cjs"
+          ],
+          "changedFilesMatch": true
+        },
+        "diagnostics": {
+          "static": "",
+          "focused": ""
+        },
+        "rank": 1,
+        "score": 91,
+        "reviewStatus": "review_first",
+        "rationale": "1/1 static checks passed; 1/1 focused tests passed; 3 evidence refs; isolated worktree provided"
+      },
+      {
+        "candidateId": "candidate-b",
+        "runId": "fixture-run-candidate-b",
+        "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "patchDigest": "sha256:30ea1cf8c4fee2dac87f953193e1546da88cc7afd22815e1f5eb5ab5798229a8",
+        "branchName": "fixture/candidate-b",
+        "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-b",
+        "patchSummary": "broader syntax repair with extra file",
+        "compileError": "fixture-syntax-error",
+        "touchedFiles": [
+          "fixture.cjs",
+          "other.cjs"
+        ],
+        "staticChecks": [
+          {
+            "name": "node --check fixture.cjs",
+            "passed": true,
+            "command": "node --check fixture.cjs",
+            "evidenceRef": "fixture:candidate-b:static"
+          }
+        ],
+        "focusedTests": [
+          {
+            "name": "fixture-test.cjs",
+            "passed": true,
+            "command": "node fixture-test.cjs",
+            "evidenceRef": "fixture:candidate-b:focused"
+          }
+        ],
+        "evidenceRefs": [
+          "fixture:candidate-b:source-readback",
+          "fixture:candidate-b:static",
+          "fixture:candidate-b:focused"
+        ],
+        "riskSignals": [
+          "broader-scope"
+        ],
+        "readback": {
+          "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "baseRevisionMatch": true,
+          "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+          "changedFiles": [
+            "fixture.cjs"
+          ],
+          "changedFilesMatch": false
+        },
+        "diagnostics": {
+          "static": "",
+          "focused": ""
+        },
+        "rank": 2,
+        "score": 83,
+        "reviewStatus": "review_first",
+        "rationale": "1/1 static checks passed; 1/1 focused tests passed; 3 evidence refs; isolated worktree provided; 1 risk signals"
+      },
+      {
+        "candidateId": "candidate-c",
+        "runId": "fixture-run-candidate-c",
+        "sourceRevision": "git:99140243454a3150a7461ed5a73ab9704d7dc5ac",
+        "patchDigest": "sha256:78c7a1b35dd04fdaf912990ab38c665a4071cc944a6289c4d353b87435b9ea9c",
+        "branchName": "fixture/candidate-c",
+        "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c",
+        "patchSummary": "non-repairing candidate",
+        "compileError": "fixture-syntax-error",
+        "touchedFiles": [
+          "fixture.cjs"
+        ],
+        "staticChecks": [
+          {
+            "name": "node --check fixture.cjs",
+            "passed": false,
+            "command": "node --check fixture.cjs",
+            "evidenceRef": "fixture:candidate-c:static"
+          }
+        ],
+        "focusedTests": [
+          {
+            "name": "fixture-test.cjs",
+            "passed": false,
+            "command": "node fixture-test.cjs",
+            "evidenceRef": "fixture:candidate-c:focused"
+          }
+        ],
+        "evidenceRefs": [
+          "fixture:candidate-c:source-readback",
+          "fixture:candidate-c:static"
+        ],
+        "riskSignals": [
+          "syntax-failure"
+        ],
+        "readback": {
+          "beforeRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "afterRevision": "99140243454a3150a7461ed5a73ab9704d7dc5ac",
+          "baseRevisionMatch": true,
+          "beforeSourceHash": "bd186eff37ea15f0f0fd14fff794fe5021bbafc845e1ca26a70aa7127d620e28",
+          "changedFiles": [],
+          "changedFilesMatch": false
+        },
+        "diagnostics": {
+          "static": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture.cjs:1\r\nmodule.exports = { value: };\r\n                          ^\r\n\r\nSyntaxError: Unexpected token '}'\r\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\r\n    at checkSyntax (node:internal/main/check_syntax:78:3)\r\n\r\nNode.js v22.23.3",
+          "focused": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture.cjs:1\r\nmodule.exports = { value: };\r\n                          ^\r\n\r\nSyntaxError: Unexpected token '}'\r\n    at wrapSafe (node:internal/modules/cjs/loader:1713:18)\r\n    at Module._compile (node:internal/modules/cjs/loader:1755:20)\r\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\r\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\r\n    at Module.require (node:internal/modules/cjs/loader:1527:12)\r\n    at require (node:internal/modules/helpers:147:16)\r\n    at Object.<anonymous> (C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c\\fixture-test.cjs:1:19)\r\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\r\n\r\nNode.js v22.23.3"
+        },
+        "rank": 3,
+        "score": 2,
+        "reviewStatus": "blocked",
+        "rationale": "0/1 static checks passed; 0/1 focused tests passed; 2 evidence refs; isolated worktree provided; 1 risk signals"
+      }
+    ],
+    "acePacket": {
+      "schemaVersion": "atlas.ace.patch-tournament.v1",
+      "packetId": "tournament:a9f82dc6e3c160748e147c4df389f54c313873492e3bd6ef37a92c43f0936284",
+      "objective": "bounded fixture compile-error tournament",
+      "workspaceRevision": "fixture-unbound-workspace-revision",
+      "compileErrorDigest": "sha256:c6d228b8d5169a647b062ac7686f8a2a41f3e58744905a1eb72f813ab85a7c33",
+      "reviewOrder": [
+        {
+          "candidateId": "candidate-a",
+          "rank": 1,
+          "score": 91,
+          "reviewStatus": "review_first",
+          "rationale": "1/1 static checks passed; 1/1 focused tests passed; 3 evidence refs; isolated worktree provided",
+          "patchSummary": "minimal syntax repair",
+          "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-a",
+          "branchName": "fixture/candidate-a",
+          "evidenceRefs": [
+            "fixture:candidate-a:source-readback",
+            "fixture:candidate-a:static",
+            "fixture:candidate-a:focused"
+          ]
+        },
+        {
+          "candidateId": "candidate-b",
+          "rank": 2,
+          "score": 83,
+          "reviewStatus": "review_first",
+          "rationale": "1/1 static checks passed; 1/1 focused tests passed; 3 evidence refs; isolated worktree provided; 1 risk signals",
+          "patchSummary": "broader syntax repair with extra file",
+          "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-b",
+          "branchName": "fixture/candidate-b",
+          "evidenceRefs": [
+            "fixture:candidate-b:source-readback",
+            "fixture:candidate-b:static",
+            "fixture:candidate-b:focused"
+          ]
+        },
+        {
+          "candidateId": "candidate-c",
+          "rank": 3,
+          "score": 2,
+          "reviewStatus": "blocked",
+          "rationale": "0/1 static checks passed; 0/1 focused tests passed; 2 evidence refs; isolated worktree provided; 1 risk signals",
+          "patchSummary": "non-repairing candidate",
+          "worktreePath": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-c",
+          "branchName": "fixture/candidate-c",
+          "evidenceRefs": [
+            "fixture:candidate-c:source-readback",
+            "fixture:candidate-c:static"
+          ]
+        }
+      ],
+      "constraints": [
+        "three candidates only",
+        "isolated worktrees required",
+        "static checks and focused tests before ranking",
+        "deterministic ranking only",
+        "no auto-apply",
+        "no training"
+      ]
+    },
+    "kanbanCard": {
+      "cardId": "tournament:a9f82dc6e3c160748e147c4df389f54c313873492e3bd6ef37a92c43f0936284",
+      "title": "Patch tournament: bounded fixture compile-error tournament",
+      "status": "ready_for_human_review",
+      "summary": "Top review candidate is candidate-a with score 91. minimal syntax repair",
+      "topCandidateId": "candidate-a",
+      "safeNextCommand": "review candidate-a in C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-a"
+    },
+    "noAutoApply": true,
+    "noTraining": true,
+    "safeNextCommand": "review candidate-a in C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q\\worktrees\\candidate-a"
+  },
+  "cleanup": {
+    "keepWorktrees": false,
+    "fixtureRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\patch-tournament-worktree-fixture-lkp20Q",
+    "cleanedUp": true
+  },
+  "nextGate": "ADMITTED_SOURCE_FRAME_AND_AUTHORIZED_LIVE_WORKTREE_EXECUTION",
+  "likely_cause": "The existing tournament planner had deterministic fixture replay but no isolated candidate worker seam.",
+  "evidence": [
+    "temporary Git repository",
+    "three isolated worktrees",
+    "source revision readback",
+    "static checks",
+    "focused test results",
+    "existing PatchTournament planner output"
+  ],
+  "patch_targets": [
+    "scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts",
+    "sveltekit-frontend/src/lib/server/agent/patch-tournament.ts"
+  ],
+  "safe_next_command": "npx tsx scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts",
+  "smoke_command": "npx tsx scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts && node -e \"const r=require('docs/reports/patch-tournament-worktree-fixture-v1.json'); if(r.candidateCount!==3 || !r.tournament.noAutoApply) process.exit(1)\"",
+  "report_path": "docs/reports/patch-tournament-worktree-fixture-v1.json"
+}

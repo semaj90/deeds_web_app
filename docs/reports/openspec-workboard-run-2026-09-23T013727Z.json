@@ -1,0 +1,105 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:37:27Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "PROTO_02B_REMAINING_ACTIVE_SIDECAR_OPERATION_AND_LIFECYCLE_RECONCILIATION",
+    "to": "PROTO_02B_BIFROST_IMAGE_SYNTHESIS_AND_RERANKER_OWNERSHIP_SLICE",
+    "reason": "Audit active Bifrost and image-synthesis containers plus actual app callers; separate the dormant CrossEncoder adapter from the live retrieval reranker."
+  },
+  "evidence": {
+    "liveHealth": {
+      "bifrost": {
+        "url": "http://127.0.0.1:3040/health",
+        "httpStatus": 200,
+        "status": "ok",
+        "dbPings": "ok",
+        "caller": "sveltekit-frontend/src/lib/server/bifrost/client.ts::streamBifrostChatCompletions",
+        "callerProtocol": "HTTP OpenAI-compatible /chat/completions",
+        "scope": "Health and configured code path proven; a model completion was not invoked."
+      },
+    "imageSynthesis": {
+        "url": "http://127.0.0.1:8092/health",
+        "httpStatus": 200,
+        "status": "healthy",
+        "device": "cpu",
+        "cuda": false,
+        "models": {
+          "wan_video": false,
+          "flux_keyframe": false,
+          "depth_anything_v2": false
+        },
+        "caller": "sveltekit-frontend/src/routes/api/evidence/upload/+server.ts::POST /depth",
+        "callerProtocol": "HTTP POST; optional Promise.allSettled branch",
+        "scope": "Health is live; depth inference was not invoked. Static implementation returns service-unavailable when its model pipeline is absent, and caller records that branch as a warning."
+      }
+    },
+    "messageBuses": {
+      "rabbitmq": {
+        "hostPorts": {
+          "amqp": {"port": 5673, "tcpReachable": true},
+          "management": {"port": 15673, "tcpReachable": true}
+        },
+        "callerExamples": [
+          "sveltekit-frontend/src/routes/api/worker/autotag/trigger/+server.ts",
+          "sveltekit-frontend/src/routes/api/synthesis/generate/+server.ts",
+          "sveltekit-frontend/src/routes/api/codebase/wiki/index/+server.ts"
+        ],
+        "classification": "live transport and application publisher paths located; no message was published"
+      },
+      "nats": {
+        "hostPorts": {
+          "client": {"port": 4222, "tcpReachable": true},
+          "monitoring": {"port": 8222, "tcpReachable": true}
+        },
+        "caller": "sveltekit-frontend/src/routes/api/indexing/queue/+server.ts",
+        "classification": "live transport and application caller path located; no message was published"
+      }
+    },
+    "rerankerOwnership": {
+      "legacyClient": "sveltekit-frontend/src/lib/server/reranker-client.ts",
+      "inRepoCallers": 0,
+      "defaultUrl": "http://127.0.0.1:8092",
+      "defaultTargetMismatch": "8092 is image-synthesis, not the CrossEncoder reranker; its health payload does not satisfy the declared reranker health fields.",
+      "documentedCrossEncoderPort": 8099,
+      "portConflict": "docker-compose.yml assigns host port 8099 to the optional TensorRT HTTP service when enabled.",
+      "currentRetrievalRerankerOwner": "sveltekit-frontend/src/lib/server/search/gpu-rerank.ts::rerankCandidates",
+      "liveCrossEncoderProbe": {
+        "url": "http://127.0.0.1:8099/health",
+        "result": "connection_refused"
+      },
+      "classification": "UNWIRED_LEGACY_ADAPTER; do not change the active retrieval path or repoint the adapter until service/port ownership is resolved."
+    },
+    "activeContainers": {
+      "legal-ai-bifrost": "healthy",
+      "legal-ai-image-synthesis": "healthy"
+    },
+    "canonicalWrites": false,
+    "promotionAuthorized": false
+  },
+  "validation": {
+    "liveCalls": "GET health and bounded TCP reachability only; no inference, queue publish, DB, cache, vector, graph, or source mutation",
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS for the touched OpenSpec file; full-worktree diff check reports unrelated generated/build artifact whitespace",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 38,
+    "open": 54,
+    "total": 92,
+    "delta": "No checkbox closed; PROTO-02B gained a bounded live-health and caller-ownership slice."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false,
+    "filesystem": true
+  },
+  "nextGate": "PROTO_02B_REMAINING_ACTIVE_SIDECAR_OPERATION_AND_LIFECYCLE_RECONCILIATION"
+}

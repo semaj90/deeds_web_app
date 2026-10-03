@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.unified-residency-provider-handoff.v1",
+  "status": "BOUNDED_PROVIDER_HANDOFF_PROVEN",
+  "environment": { "host": "WSL2 Ubuntu", "pythonEnvironment": "/home/james/.venvs/atlas-cutile-cu132", "device": "cpu-fixture-plus-existing-cuda-owner" },
+  "tests": { "passed": 16, "failed": 0, "command": "python -m unittest parent_atlas_tensor.test_unified_residency_provider parent_atlas_tensor.test_unified_residency_parity parent_atlas_tensor.test_unified_residency_vram parent_atlas_tensor.test_gpu_tile_cache parent_atlas_tensor.test_gpu_resident_executor" },
+  "provider": "UnifiedFeatureTileProvider",
+  "existingGpuOwner": "parent_atlas_tensor.gpu_tile_cache.GpuTileCache",
+  "descriptorToProvider": true,
+  "revisionLineageValidation": true,
+  "controlEnvelopeTransport": true,
+  "typedBufferTransport": true,
+  "stdioHandoff": true,
+  "float32OwnerCapability": true,
+  "unsupportedDtypeFailsClosed": true,
+  "shapeAndByteValidation": true,
+  "sanitizedReceipt": true,
+  "rawPointerExposed": false,
+  "writesPerformed": false,
+  "promotionEligible": false,
+  "openGates": ["realDescriptorTransport", "sameCorpusParity", "measuredVramPressure"]
+}

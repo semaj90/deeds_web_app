@@ -143,10 +143,14 @@ function l2norm(v: Float32Array): Float32Array {
 function cpuPageRank(adj: Float32Array, n: number, damping: number, iters: number): Float32Array {
 	// Build row-normalised column-stochastic P
 	const P = new Float32Array(n * n);
+	const dangling = new Uint8Array(n);
 	for (let i = 0; i < n; i++) {
 		let rowSum = 0;
 		for (let j = 0; j < n; j++) rowSum += adj[i * n + j];
-		if (rowSum < 1e-8) rowSum = 1;
+		if (rowSum < 1e-8) {
+			dangling[i] = 1;
+			rowSum = 1;
+		}
 		for (let j = 0; j < n; j++) P[j * n + i] = adj[i * n + j] / rowSum; // column-stochastic
 	}
 
@@ -154,7 +158,11 @@ function cpuPageRank(adj: Float32Array, n: number, damping: number, iters: numbe
 	const teleport = (1 - damping) / n;
 
 	for (let iter = 0; iter < iters; iter++) {
-		const next = new Float32Array(n).fill(teleport);
+		let danglingMass = 0;
+		for (let i = 0; i < n; i++) {
+			if (dangling[i]) danglingMass += r[i];
+		}
+		const next = new Float32Array(n).fill(teleport + (damping * danglingMass) / n);
 		for (let j = 0; j < n; j++) {
 			for (let i = 0; i < n; i++) next[j] += damping * P[j * n + i] * r[i];
 		}

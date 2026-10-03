@@ -9,6 +9,7 @@ import * as schema from './schema.js';
 import { ENV } from '../env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
 import { traceDB } from '../observability/langfuse.js';
+import { createReadOnlyQueryScope } from './read-only-query-scope.js';
 
 type LooseDb = {
   query: any;
@@ -97,8 +98,15 @@ pool.on('error', (err) => {
 
 // Enable pgvector iterative scanning for filtered HNSW queries (9x faster)
 pool.on('connect', (client) => {
-	client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
+  client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
 });
+
+const canonicalReadOnlyQueryScope = createReadOnlyQueryScope(pool);
+
+/** Run nested tracedQuery reads on one READ ONLY transaction with server-side statement_timeout. */
+export function withCanonicalReadOnlyQueryBudget<T>(statementTimeoutMs: number, operation: () => Promise<T>): Promise<T> {
+  return canonicalReadOnlyQueryScope.run(statementTimeoutMs, operation);
+}
 
 export const db = drizzle(pool, { schema: mergedSchema, cache }) as unknown as LooseDb;
 
@@ -128,10 +136,11 @@ export async function tracedQuery<T = any>(
 	queryText: string,
 	params?: any[]
 ): Promise<T> {
-	return traceDB(operation, { table: queryText.slice(0, 100) }, async () => {
-		const result = await pool.query(queryText, params);
-		return result as T;
-	});
+  return traceDB(operation, { table: queryText.slice(0, 100) }, async () => {
+    const queryClient = canonicalReadOnlyQueryScope.currentClient() ?? pool;
+    const result = await queryClient.query(queryText, params);
+    return result as T;
+  });
 }
 
 export async function closeConnections(): Promise<void> {

@@ -1,3 +1,4 @@
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { browser, dev } from '$app/environment';
 
 const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
@@ -9,20 +10,20 @@ const getServerEnv = () => {
       return {
         OLLAMA_URL: process.env.OLLAMA_URL ?? `http://${LOOPBACK_IP}:11434`,
         GEMMA4_LEGAL_MODEL:
-          process.env.GEMMA4_LEGAL_MODEL ?? process.env.GEMMA3_LEGAL_MODEL ?? 'gemma4-rotorquant:latest',
+          process.env.GEMMA4_LEGAL_MODEL ?? process.env.GEMMA3_LEGAL_MODEL ?? SERVER_CHAT_MODEL,
         EMBEDDING_MODEL: process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest',
       };
     } catch {
       return {
         OLLAMA_URL: `http://${LOOPBACK_IP}:11434`,
-        GEMMA4_LEGAL_MODEL: 'gemma4-rotorquant:latest',
+        GEMMA4_LEGAL_MODEL: SERVER_CHAT_MODEL,
         EMBEDDING_MODEL: 'embeddinggemma:latest',
       };
     }
   }
   return {
     OLLAMA_URL: `http://${LOOPBACK_IP}:11434`,
-    GEMMA4_LEGAL_MODEL: 'gemma4-rotorquant:latest',
+    GEMMA4_LEGAL_MODEL: SERVER_CHAT_MODEL,
     EMBEDDING_MODEL: 'embeddinggemma:latest',
   };
 };
@@ -65,7 +66,7 @@ export function getOllamaEndpoint(path: string = ''): string {
 }
 
 /**
- * Get the default chat model (gemma4-rotorquant:latest).
+ * Get the default chat model (Ornith 1.5, via SERVER_CHAT_MODEL).
  */
 export function getChatModel(): string {
   const env = getServerEnv();

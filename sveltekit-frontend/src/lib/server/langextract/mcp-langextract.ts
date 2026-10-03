@@ -80,6 +80,7 @@ const TOOLS = {
           documentType: args.documentType ?? 'case',
           extractEntities: args.extractEntities ?? true,
           extractStructure: args.extractStructure ?? true,
+          groundedExtractionRequired: true,
           language: args.language,
         });
         if (!result) {

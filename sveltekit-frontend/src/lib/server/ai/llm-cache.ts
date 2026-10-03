@@ -1,6 +1,6 @@
 /**
  * LLM Response Semantic Cache
- * Caches Ollama responses using vector similarity to reduce redundant API calls.
+ * Caches llama-server responses using vector similarity to reduce redundant API calls.
  *
  * Architecture:
  * - Query embedding (768-dim) stored in Qdrant llm_response_cache collection
@@ -11,10 +11,10 @@
 
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { getOllamaEmbeddingEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
 
-const OLLAMA_URL = getOllamaEndpoint();
+const OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 
 // Cache hit threshold — only return cached response if similarity >= 0.88
@@ -22,7 +22,7 @@ const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const CACHE_HIT_THRESHOLD = 0.88;
 
 // Model version — included in cache key so cache auto-invalidates when model changes
-// Bump this when deploying a new fine-tuned model (e.g. gemma4-rotorquant:latest → gemma4-rotorquant:latest)
+// Bump this when deploying a new llama-server chat model.
 const CACHE_MODEL_VERSION = 'v2';
 
 // Tiered TTL by query type (seconds)
@@ -91,7 +91,7 @@ export async function lookupCachedResponse(params: {
     query,
     queryEmbedding: providedEmbedding,
     context,
-    model = 'gemma4-rotorquant:latest',
+    model = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
   } = params;
 
   try {
@@ -103,7 +103,7 @@ export async function lookupCachedResponse(params: {
 
     const contextHash = generateContextHash(context);
     // Search for semantically similar cached queries
-    const searchRes = await qdrant.client.search(qdrant.collections.llm_cache, {
+    const searchRes = await qdrant.search(qdrant.collections.llm_cache, {
       vector: {
         name: 'query',
         vector: queryEmbedding,

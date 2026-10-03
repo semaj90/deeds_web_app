@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.agentic-file-compiler.validation-barrier-audit.v1",
+  "change": "parent-atlas-agentic-file-compiler",
+  "task": "AFC-17",
+  "contractStatus": "DUPLICATE_OBSERVATION_FAIL_CLOSED",
+  "focusedTests": {
+    "command": "npx vitest run --config vitest.lane-contracts.config.ts src/lib/server/atlas/agentic-file-compiler/validation-barrier.spec.ts",
+    "passed": 5,
+    "failed": 0
+  },
+  "structuredValueRuntime": {
+    "status": "READY",
+    "treeSitter": "0.25.1",
+    "treeSitterTypescript": "0.23.2",
+    "treesitterChunker": "4.0.0",
+    "python": "3.13.5",
+    "pyarrow": "21.0.0"
+  },
+  "nativeTypecheck": {
+    "status": "BLOCKED_PRE_EXISTING_REPOSITORY_ERRORS",
+    "command": "npm run typecheck:native -- --pretty false",
+    "errorCountAtLeast": 40
+  },
+  "liveRepositoryValidation": {
+    "status": "BLOCKED_PRE_EXISTING_REPOSITORY_ERRORS",
+    "note": "The live Tree-sitter/typecheck/test barrier remains open under the existing AFC-17 evidence; this contract change does not claim repository-wide validation."
+  },
+  "openSpecValidation": "PASSED",
+  "duplicateValidatorPolicy": "FAIL_CLOSED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false
+}

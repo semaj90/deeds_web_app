@@ -141,7 +141,7 @@ export const GET: RequestHandler = async () => {
         domains: ['lexical', 'search']
       },
       {
-        tool_id: 'gemma4.explain_code',
+        tool_id: 'ornith.explain_code',
         name: 'Code Explanation',
         domains: ['synthesis', 'explanation']
       }

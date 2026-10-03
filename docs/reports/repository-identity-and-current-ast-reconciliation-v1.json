@@ -1,0 +1,124 @@
+{
+  "schema": "atlas.repository-identity-and-current-ast-reconciliation.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "generatedAt": "2026-09-25T05:10:00Z",
+  "selectedGate": "REPOSITORY_IDENTITY_RECONCILIATION_01",
+  "schedulerNote": "Selection is recorded here and in the operator directive. The workboard generator only grants SELECTED to task-ledger rows named in an explicit selection file; this gate is not an OpenSpec task line, so no workboard field was changed. WFU tasks remain NOT_SELECTED.",
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "v2MembershipChecksum": "sha256:59b3f07ead8d796fbef31da5946b2bc0fd678fa6ab175d10df0d49361a16ff81",
+    "packetRepairRoot": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3"
+  },
+  "repositoryIdentity": {
+    "result": "REPOSITORY_IDENTITY_MAPPING_REQUIRED",
+    "owners": {
+      "canonicalRepositoryIdentity": "atlas_repository_identity (repository_id UUID PK; source_authority_repo_id UNIQUE; repository_kind ROOT|NESTED_GIT_REPOSITORY), minted by stable-file-identity-mint-v1.ts",
+      "canonicalSourceIdentity": "computeSourceIdentityKeyV1(repositoryId, canonicalSourceRef) = repositoryId + ':' + canonicalSourceRef, computed internally and never caller-supplied",
+      "sourceIdentityKeyBindsRepositoryAndSourceRef": true,
+      "graphifyMembershipRepositoryId": "Graphify-local namespace label ('Not a UUID' per stable-file-backfill-classifier-v1.ts), derived from the relative repository path by workspace-snapshot-capture-v1.mts",
+      "bridge": "BackfillClassificationContextV1.sourceAuthorityRepoIdForGraphifyRepo maps a Graphify label to source_authority_repo_id. The only admitted bridge is repo:root -> deeds-web-app (workspace bindings use repo_id deeds-web-app); every nested-repo label has none."
+    },
+    "population": {
+      "atlas_repository_identity": 0,
+      "atlas_stable_file_identity": 0,
+      "atlas_stable_file_revision_binding": 0,
+      "atlas_stable_file_alias": 0,
+      "finding": "The canonical owner exists in schema but is empty, so no membership label currently maps to a canonical repository_id."
+    },
+    "labelClassification": {
+      "repo:root": { "class": "EXECUTION_MEMBERSHIP_PARTITION", "bridge": "deeds-web-app (admitted by classifier contract; not proven by a populated atlas_repository_identity row)", "note": "repo:root == deeds-web-app is NOT assumed; it rests on the bridge contract and cardinality only" },
+      "repo:claude-mem": { "class": "UNRESOLVED" },
+      "repo:mcp-server-mcp": { "class": "UNRESOLVED" },
+      "repo:turbovec": { "class": "UNRESOLVED" },
+      "repo:sites/parent-atlas-gateboard": { "class": "UNRESOLVED" },
+      "repo:models/embeddinggemma_300m": { "class": "UNRESOLVED" },
+      "repo:granite-docling-258M": { "class": "UNRESOLVED" }
+    },
+    "packetKeyV2Implication": "PacketKeyV2 as implemented consumes the Graphify membership label. Under the existing owner it should consume the canonical repository identity (or the repository-qualified source identity) once atlas_repository_identity is populated and each label is mapped. The label is an execution partition, not authoritative input.",
+    "requiredMapping": "Populate atlas_repository_identity via the existing mint owner and record a label -> source_authority_repo_id -> repository_id mapping for each of the 7 labels (nested repositories need an admitted bridge first). No new repository identity is invented here."
+  },
+  "packetIdentityRegistry": {
+    "table": "atlas_packet_registry",
+    "result": "PACKET_IDENTITY_REGISTRY_NOT_CANONICAL",
+    "facts": {
+      "primaryKey": "packet_key (text), the physical packet key",
+      "rows": 61718,
+      "keysEqualAtlasPackets": 61718,
+      "inboundFks": 0,
+      "outboundFks": 0,
+      "carries": "source_ref, canonical_source_ref, file_path, feature_id, directory_path, tree_node_id, title_id, embedding/latent vectors, qdrant_point_id, turbovec_id, neo4j_node_id, ace/valkey cache keys, pagerank/karpathy scores, cache_state",
+      "lacks": "repository identity, packet kind/grain, revision fields, logical-vs-physical separation",
+      "canRepresentV2KeyWithoutPhysicalRow": "Technically yes (text PK, no FK), but it would be a projection/cache row, not an identity registry"
+    },
+    "reasoning": "It is a per-packet runtime/projection registry mirroring atlas_packets 1:1 and keyed by the same physical key. Making it the owner of canonical logical identity would mix OWNER with PROJECTION/CACHE columns. Reuse would need repository and kind columns and a redefinition of its key, which is a schema extension that changes its role.",
+    "decisionNeeded": "Whether the alias target should be (a) a new narrow packet-identity table, (b) an extension of atlas_packet_registry, or (c) built on the stable-file identity model. Operator direction says reuse if possible; the audit says it is not canonical as-is."
+  },
+  "historicalCohort": {
+    "denominator": 61718,
+    "classes": {
+      "CANONICAL_SOURCE_IDENTITY_PROVEN": 0,
+      "REPOSITORY_IDENTITY_UNRESOLVED": 17399,
+      "LEGACY_SOURCE_IDENTITY_UNPROVEN": 44256,
+      "PACKET_KIND_UNRESOLVED": 62,
+      "SOURCE_REF_CONTRACT_VIOLATION": 1,
+      "IDENTITY_CONFLICT": 0
+    },
+    "derivableCohortByLabel": { "repo:root": 16545, "repo:claude-mem": 759, "repo:turbovec": 86, "repo:granite-docling-258M": 10, "note": "sums to 17,400 including the 1 source_ref that violates the upstream contract" },
+    "rules": "No PacketKeyV2 is derived for rows without canonical repository/source evidence; no path-prefix, guessed repo:root, workspace name, or latest-execution fallback. Absence from membership is not evidence of a build artifact and is not asserted.",
+    "aliasMigrationDenominator": "the CANONICAL_SOURCE_IDENTITY_PROVEN cohort, currently 0 until repository mapping exists"
+  },
+  "currentAstProof": {
+    "result": "CURRENT_AST_EVIDENCE_MISSING",
+    "secondaryBlocker": "AST_REVISION_BINDING_REQUIRED",
+    "denominator": "24,456 repo:root source refs in this execution and workspace revision",
+    "classification": {
+      "AST_EVIDENCE_ABSENT": 24449,
+      "AST_REVISION_MISSING": 6,
+      "AST_STALE_OTHER_REVISION": 1,
+      "AST_REVISION_QUALIFIED": 0,
+      "AST_SOURCE_MISMATCH": "not classifiable: see pathBase",
+      "AST_WORKSPACE_MISMATCH": "not classifiable: workspace_id is populated on 206 of 11,273 rows"
+    },
+    "astTable": {
+      "name": "atlas_ast_nodes",
+      "rows": 11273,
+      "withSourceRevision": 98,
+      "distinctSourceRefKeys": 7771,
+      "keyShape": "<path>#file:<name>",
+      "pathBase": "11,227 of 11,273 rows match no current-scope ref; sampled keys are relative to sveltekit-frontend (src/lib/...) while membership refs are repository-root relative (sveltekit-frontend/src/lib/...). Path-prefix matching was not used to manufacture a join."
+    },
+    "measured": { "currentAstQualifiedRows": 0, "otherInputs": "48 in current-source-evidence-hydration-v1 (a different, non-scope-bound input)" },
+    "ownershipSeparation": "AST evidence != symbol identity != packet identity; tree_node_id, spans, and parser ordinals were not used as revision substitutes"
+  },
+  "currentSourceProof": {
+    "denominator": 24456,
+    "membershipRowsAllRepos": 25542,
+    "uniqueCanonicalSourceRefs": 24456,
+    "revisionQualifiedSourceRows": 24456,
+    "workspaceBindingMatches": 24456,
+    "revisionMismatches": 0,
+    "missingBindings": 0,
+    "repositoryScopeMismatchInScope": 0,
+    "outOfScopeOtherRepositories": 1086,
+    "evidence": "docs/reports/current-workspace-packet-chunk-join-v1.json"
+  },
+  "closureNumbers": { "packetCanonicalQualification": 16151, "packetChunkExactLineage": 577, "currentSourceQualification": 24456, "currentAstQualification": 0 },
+  "currentWorkspaceLineage": "NOT_PROVEN: CURRENT_AST_EVIDENCE_MISSING. The source and packet parts are proven; the AST part has no revision-bound evidence for this scope.",
+  "supersededArtifacts": [
+    "sveltekit-frontend/drizzle/manual/20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql and its ROLLBACK (drop the alias FK; superseded by the registry-backed direction; not applied)"
+  ],
+  "frozenAndUnchanged": [
+    "packet-key-v2.ts and packet-key-legacy-alias-v1.ts as CODE_ONLY proof",
+    "packet-admission-v1/16ff03a9... source-evidence manifest",
+    "packet-key-v2-admission-v1/6d8fc6e3... target manifest (provisional)"
+  ],
+  "nextGates": {
+    "PACKET_KEY_V2_FINAL_CONTRACT": "BLOCKED_BY_REPOSITORY_IDENTITY_MAPPING",
+    "ALIAS_COMPATIBILITY": "BLOCKED_BY_PACKET_IDENTITY_REGISTRY_DECISION",
+    "PACKET_ADMISSION": "AUTHORIZATION_REQUIRED (also blocked upstream)",
+    "GATE_2": "BLOCKED_BY_LINEAGE"
+  },
+  "noWrites": ["no datastore writes", "no DDL", "no Graphify run", "no workspace recapture"]
+}

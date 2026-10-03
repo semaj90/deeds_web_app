@@ -10,7 +10,7 @@ const sha256 = z.string().regex(/^[a-f0-9]{64}$/);
 const PromptPlanSegmentViewSchema = z.object({
   ordinal: z.number().int().nonnegative(),
   kind: z.enum(['SYSTEM', 'INSTRUCTION', 'EVIDENCE', 'TOOL_SCHEMA', 'USER_QUERY']),
-  packetKey: z.string().min(1).nullable(),
+  packetKey: z.string().min(1).nullable().optional(),
   evidenceRefs: z.array(z.string().min(1)),
   contentChecksum: sha256,
   tokenCount: z.number().int().nonnegative(),
@@ -61,6 +61,14 @@ export interface OrnithPromptPlanAdapterResultV1 {
   datastoreWrites: false;
   canonicalWrites: false;
   hiddenStatePersisted: false;
+}
+
+export interface PreparedOrnithPromptPlanV1 {
+  messages: Array<{ role: 'system' | 'user'; content: string }>;
+  requestId: string;
+  contextManifestChecksum: string;
+  promptPlanChecksum: string;
+  reservedOutputTokens: number;
 }
 
 interface ChatMessage {
@@ -124,6 +132,24 @@ export function computeOrnithPromptPlanChecksumV1(plan: OrnithPromptPlanViewV1):
     maxInputTokens: plan.maxInputTokens,
   };
   return createHash('sha256').update(canonicalEncodeV1(payload), 'utf8').digest('hex');
+}
+
+/**
+ * Validates an already-compiled PromptPlan and its exact content bytes, then
+ * returns messages for a runtime adapter. This does not resolve a model,
+ * retrieve candidates, or perform inference.
+ */
+export function prepareOrnithPromptPlanV1(
+  input: Pick<OrnithPromptPlanAdapterInputV1, 'promptPlan' | 'segmentContent'>,
+): PreparedOrnithPromptPlanV1 {
+  const { plan, messages } = validatePlanAndBuildMessages(input.promptPlan, input.segmentContent);
+  return {
+    messages,
+    requestId: plan.requestId,
+    contextManifestChecksum: plan.contextManifestChecksum,
+    promptPlanChecksum: plan.checksumSha256,
+    reservedOutputTokens: plan.reservedOutputTokens,
+  };
 }
 
 function validatePlanAndBuildMessages(

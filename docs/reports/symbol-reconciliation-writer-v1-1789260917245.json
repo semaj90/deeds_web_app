@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.symbol-reconciliation-writer-receipt.v1",
+  "generatedAt": "2026-09-13T00:55:16.845Z",
+  "targetWorkspaceRevision": "sha256:test-symbol-lane-smoke-fe249f1651c53b67",
+  "allowCreate": true,
+  "apply": true,
+  "gate": {
+    "status": "GROUNDED",
+    "workspaceRevision": "sha256:test-symbol-lane-smoke-fe249f1651c53b67",
+    "boundSourceRefCount": 3,
+    "symbolRowCount": 24
+  },
+  "action": "CANONICALIZATION_APPLIED",
+  "receipt": {
+    "schema": "atlas.gis-canonicalization-receipt.v1",
+    "source_ref": "multi",
+    "source_revision": "sha256:test-symbol-lane-smoke-fe249f1651c53b67",
+    "workspace_revision": "sha256:test-symbol-lane-smoke-fe249f1651c53b67",
+    "nomination_count": 24,
+    "canonical_symbol_count": 24,
+    "unresolved_symbol_count": 0,
+    "ambiguous_symbol_count": 0,
+    "symbol_version_count": 24,
+    "reference_fact_count": 0,
+    "canonical_reference_count": 0,
+    "degraded_reference_count": 0,
+    "unresolved_reference_count": 0,
+    "evidence_entity_fact_count": 24,
+    "canonical_identity_created": true,
+    "producer_revision": "symbol-reconciliation-writer-v1"
+  }
+}

@@ -4,7 +4,7 @@
  * LangChain agent with web crawling and evidence search capabilities
  */
 
-import { ChatOllama } from '@langchain/ollama';
+import { ChatOpenAI } from '@langchain/openai';
 import { AgentExecutor, createOpenAIFunctionsAgent } from 'langchain/agents';
 import { Tool } from '@langchain/core/tools';
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts';
@@ -87,15 +87,15 @@ class DocumentAnalysisTool extends Tool {
 
   async _call(documentText) {
     try {
-      // Call Ollama directly for document analysis
-      const response = await fetch('http://localhost:11434/api/generate', {
+      // Use the canonical llama-server/Ornith chat owner.
+      const response = await fetch(`${process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gemma3-legal:latest',
-          prompt: `Analyze this legal document and extract key information:
+          model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
+          messages: [{ role: 'user', content: `Analyze this legal document and extract key information:
 
 Document Text:
 ${documentText}
@@ -107,8 +107,10 @@ Please provide:
 4. Potential risks or concerns
 5. Recommendations
 
-Analysis:`,
-          stream: false
+Analysis:` }],
+          stream: false,
+          temperature: 0.1,
+          max_tokens: 2048,
         })
       });
 
@@ -117,7 +119,7 @@ Analysis:`,
       }
 
       const result = await response.json();
-      return result.response;
+      return result?.choices?.[0]?.message?.content ?? '';
     } catch (error) {
       return `Error analyzing document: ${error.message}`;
     }
@@ -146,10 +148,13 @@ class Gemma3LegalAgent {
 
   async initializeAgent() {
     try {
-      // Initialize Ollama chat model
-      const llm = new ChatOllama({
-        baseUrl: 'http://localhost:11434',
-        model: 'gemma3-legal:latest',
+      // Initialize the canonical llama-server/Ornith chat model.
+      const llm = new ChatOpenAI({
+        configuration: {
+          baseURL: `${process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'}/v1`,
+          apiKey: process.env.LLAMA_SERVER_API_KEY ?? 'local-no-key',
+        },
+        model: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
         temperature: 0.1,
         maxTokens: 2048
       });

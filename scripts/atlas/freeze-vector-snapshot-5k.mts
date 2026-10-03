@@ -3,7 +3,7 @@
  * Step 2: Freeze a 5,000-packet vector snapshot for indexing phases
  *
  * - Select 5,000 stratified packets (250 per domain class)
- * - Extract 384-dim embeddings (canonical dimension)
+ * - Freeze the canonical 768-dim semantic_768 lane when a qualified source is available
  * - Export to Parquet for GPU processing (K-means, SOM, indexing)
  * - Verify all embeddings are L2-normalized
  *
@@ -33,7 +33,7 @@ async function freezeVectorSnapshot(): Promise<void> {
   const outputIdx = args.indexOf('--output');
   const outputPath = outputIdx >= 0 ? args[outputIdx + 1] : null;
 
-  const snapshotPath = outputPath || path.join(SNAPSHOT_DIR, 'snapshot_5k_384dim.parquet');
+  const snapshotPath = outputPath || path.join(SNAPSHOT_DIR, 'snapshot_5k_semantic768.parquet');
 
   if (verbose) {
     console.log(`[Freeze 5K] Output: ${snapshotPath}`);

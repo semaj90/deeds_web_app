@@ -1,6 +1,6 @@
 # Agentic Error Fixing — Dimensional Model & Recovery Architecture
 
-**Status**: Design Phase (Sessions 104–107) | **Audience**: Implementation roadmap  
+**Status**: Design Phase (Sessions 104–107) | **Audience**: Implementation roadmap
 **Date**: July 5, 2026
 
 ---
@@ -73,22 +73,22 @@ Each packet's recovery fitness is scored across multiple dimensions:
 interface RecoveryPacketScore {
   // Semantic alignment (cosine similarity between error + packet)
   semantic_score: number;          // 0–1, higher = better match
-  
+
   // Topological proximity (3D distance in SOM/authority/community space)
   topological_distance: number;    // 0–1, lower = closer
-  
+
   // Authority rank (PageRank decile)
   authority_decile: number;        // 0–10, higher = more authoritative
-  
+
   // Community cohesion (packets in same Louvain community)
   community_cohesion: number;      // 0–1, higher = more connected
-  
+
   // Temporal recency (recovery packet used recently for same error)
   recency_score: number;           // 0–1, higher = more recent
-  
+
   // Policy score (RL learned preference)
   policy_score: number;            // 0–1, learned from outcomes
-  
+
   // Final blend
   final_score: number;             // 0.4·semantic + 0.2·topology + 0.15·authority + 0.1·community + 0.1·recency + 0.05·policy
 }
@@ -197,14 +197,14 @@ ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS (
   is_recovery_packet BOOLEAN DEFAULT false,        -- marked as recovery candidate
   recovery_error_classes TEXT[],                   -- ['ConnectivityError', 'TimeoutError', ...]
   recovery_domains TEXT[],                         -- ['auth', 'db', 'cache', ...]
-  
+
   -- Fitness metrics
   recovery_fit_score NUMERIC,                      -- 0–1, overall fitness
   recovery_authority_percentile NUMERIC,           -- 0–100, relative to other recovery candidates
   recovery_last_used_at TIMESTAMP,                 -- last time this packet fixed an error
   recovery_success_count INTEGER DEFAULT 0,        -- cumulative successful recoveries
   recovery_failure_count INTEGER DEFAULT 0,        -- cumulative failed attempts
-  
+
   -- RL policy
   recovery_policy_score NUMERIC DEFAULT 0.5,      -- learned preference, updated by policy
   recovery_policy_updated_at TIMESTAMP             -- when policy last changed
@@ -324,7 +324,7 @@ interface RecoveryOutcome {
   recovery_state: 'RESOLVED' | 'FAILED' | 'ESCALATED';
   error_resolved_at: Date;
   latency_ms: number;
-  
+
   // Reward computation
   reward = (
     state === 'RESOLVED' ? 1.0 : (
@@ -353,7 +353,7 @@ class RecoveryPolicyNet(nn.Module):
         self.fc1 = nn.Linear(32 + 1 + 1, 32)      # error + domain + authority + community
         self.fc2 = nn.Linear(32, 16)
         self.out = nn.Linear(16, 1)               # output: policy_score 0–1
-    
+
     def forward(self, error_class_id, domain_id, authority_pct, community_cohesion):
         e_emb = self.embed_error(error_class_id)
         d_emb = self.embed_domain(domain_id)
@@ -383,7 +383,7 @@ interface CanonicalRecoveryEnvelope extends CanonicalFeatureEnvelope {
   packet_key: string,
   feature_id: string,
   // ... (all other canonical fields)
-  
+
   // Recovery-specific fields
   is_recovery_packet: boolean,
   recovery_error_classes: string[],
@@ -448,11 +448,11 @@ Collect outcomes, backprop through policy net, update Postgres:
 
 ### Completion Order
 
-1. **tree_node_id backfill** (AST-grep extraction, 1–2 days)
+1. **tree_node_id backfill** (AST-grep extraction, )
 2. **concept_ids extraction** (LangExtract service, 2–4 hours)
 3. **SOM 20×20 training** (K-means + SOM, 1–2 hours GPU time)
 4. **Recovery annotation** (tag packets by domain, 30 min)
-5. **RL policy training** (collect 100+ outcomes, 1 week)
+5. **RL policy training** (collect 100+ outcomes, metric tensor, after eval gym, pytorch xgboost passes all gates, aten installed, reinforcement learning unsupervised find proper files needed to complete, cache, offload, after tournament openspec can test to see how far off we are recommendation: 1 week workflow testing ai training)
 
 ---
 

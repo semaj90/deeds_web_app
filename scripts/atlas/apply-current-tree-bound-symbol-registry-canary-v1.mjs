@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { loadSymbolRevisionQualificationV1 } from './lib/load-symbol-revision-qualification-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: path.resolve(root, 'sveltekit-frontend/.env') });
@@ -50,6 +51,8 @@ const report = {
   inputChecksum: digest(raw),
   selectedRowCount: rows.length,
   attempted: 0,
+  rejectedUnqualifiedRevision: 0,
+  rejections: [],
   inserted: 0,
   alreadyPresent: 0,
   readback: 0,
@@ -91,7 +94,16 @@ try {
   const lockResult = await pool.query('SELECT pg_try_advisory_xact_lock($1, $2) AS acquired', [lockKey1, lockKey2]);
   report.lockAcquired = lockResult.rows[0].acquired === true;
   if (!report.lockAcquired) throw new Error('SYMBOL_REGISTRY_CANARY_LOCK_NOT_ACQUIRED_CONCURRENT_RUN_IN_PROGRESS');
+  const q = await loadSymbolRevisionQualificationV1();
+  const provenanceMap = await q.loadBindingProvenanceV1(pool, rows.map((r) => ({ sourceRef: r.source_ref, sourceRevision: r.source_revision })));
   for (const row of rows) {
+    // S01-10B: LogicalSymbolRegistryAdmissionV1. A Git commit id is not a source revision; the canary previously wrote one here.
+    const verdict = q.admitLogicalSymbolRegistryV1({ sourceRef: row.source_ref, createdFromSourceRevision: row.source_revision, registryRevision: 'atlas-current-tree-bound-symbol-canary-v1', provenance: q.provenanceForV1(provenanceMap, row.source_ref, row.source_revision) });
+    if (!verdict.admitted) {
+      report.rejectedUnqualifiedRevision += 1;
+      if (report.rejections.length < 50) report.rejections.push({ symbolKey: row.symbol_key, reasons: verdict.reasons });
+      continue;
+    }
     report.attempted += 1;
     const result = await pool.query(
       `INSERT INTO public.atlas_symbol_registry

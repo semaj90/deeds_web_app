@@ -1,0 +1,139 @@
+{
+  "schema": "atlas.gpu-fabric-blocker-review.v1",
+  "capturedAt": "2026-09-29T04:55:02Z",
+  "status": "LOCAL_RUNTIME_RECONCILED_WITH_DOWNSTREAM_GATES_OPEN",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "servicesRestarted": false,
+  "gpu": {
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "driver": "580.88",
+    "computeCapability": "8.6"
+  },
+  "environments": {
+    "rapidsWsl": {
+      "runtime": "WSL2 Ubuntu Miniforge Conda",
+      "path": "/home/james/miniforge3/envs/atlas-rapids-cu13",
+      "python": "3.14.6",
+      "cudaToolkitPackages": "13.3",
+      "nvcc": "13.3.73",
+      "packages": {
+        "torch": "2.13.0",
+        "cudf": "26.6.1",
+        "cugraph": "26.6.0",
+        "cuml": "26.6.0",
+        "cuvs": "26.6.0",
+        "cupy": "14.1.1",
+        "numpy": "2.4.6",
+        "numba": "0.64.0"
+      },
+      "explicitManifestPackageCount": 270,
+      "explicitManifestSha256": "ccebabd6f00e467c71458bcbb90dbce05d71f6bef52960f691a81d0b87e8456c",
+      "httpServiceOwner": false
+    },
+    "cutileWsl": {
+      "runtime": "WSL2 Ubuntu Python virtualenv",
+      "path": "/home/james/.venvs/atlas-cutile-cu132",
+      "python": "3.14.6",
+      "cudaToolkitPackage": "13.2.1",
+      "tileCompilerPackages": "13.2.78",
+      "packages": {
+        "cuda-tile": "1.5.0",
+        "torch": "2.14.0+cu132",
+        "triton": "3.8.0",
+        "numpy": "2.5.3"
+      },
+      "pipFreezePackageCount": 59,
+      "pipFreezeSha256": "669019fc7d3f9a06774fc2b25a7a3738c6213db987044387967f4a623aba96ae",
+      "nvccInVirtualenv": false
+    },
+    "dockerExecutor": {
+      "container": "atlas-gpu-8098",
+      "image": "atlas-gpu-8098:26.08-cuda12-py3.13",
+      "imageId": "sha256:3126b1b13e1bd7351fb8a086b2a782d9136688f925efeafc568789cfb22eb214",
+      "imageCreatedAt": "2026-09-02T23:34:33.570467825Z",
+      "containerStartedAt": "2026-09-28T16:04:31.0138868Z",
+      "packages": {
+        "torch": null,
+        "cudf": "26.8.0",
+        "cugraph": "26.8.0",
+        "cuml": "26.8.0",
+        "cuvs": "26.8.0",
+        "cupy": "14.1.1"
+      },
+      "healthGet": {
+        "httpStatus": 200,
+        "ok": true,
+        "cudaAvailable": true,
+        "device": "NVIDIA GeForce RTX 3060 Ti",
+        "torchAvailable": false,
+        "writes": {
+          "postgres": false,
+          "qdrant": false,
+          "valkey": false
+        }
+      },
+      "graphCapabilitiesGet": {
+        "httpStatus": 200,
+        "available": true,
+        "backend": "cugraph.pagerank",
+        "backendVersion": "26.08.00"
+      },
+      "containerHealthcheckBeforeComposeChange": null,
+      "containerRestarted": false
+    }
+  },
+  "apiReconciliation": {
+    "openApiTitle": "Parent Atlas GPU Executor",
+    "openApiVersion": "1.0.0",
+    "oldSemanticKnnRoute": {
+      "path": "/v1/knn/exact",
+      "present": false
+    },
+    "currentCuVSArtifactRoute": {
+      "path": "/v1/tile-artifact/cuvs-exact-scan",
+      "present": true,
+      "requiresCurrentCohortQualification": true
+    },
+    "currentGraphRoutes": [
+      "/v1/graph/capabilities",
+      "/v1/graph/resident",
+      "/v1/graph/load",
+      "/v1/graph/pagerank",
+      "/v1/graph/bfs",
+      "/v1/graph/connected-components",
+      "/v1/graph/jaccard"
+    ],
+    "httpRequestsMade": [
+      "GET /health",
+      "GET /v1/graph/capabilities",
+      "GET /openapi.json"
+    ],
+    "mutationRoutesCalled": false
+  },
+  "existingReceiptChecksums": {
+    "docs/reports/cutile-ace-level2-results.json": "sha256:564b6ef8e3fc2a271d599665cf59103a9c049ca3cdad31c63f5e428b06bafa97",
+    "docs/reports/cutile-ace-level3-results.json": "sha256:7b692d498853b1961d1d025cfbc3d681d217ed1cef2c9ea0377606c71ee9b36d",
+    "docs/reports/semantic768-cuvs-exact-oracle-v1.json": "sha256:3bd5c59851b6f411bb9720e77460234226c5665115cea9ccad52e6c28c77f14c",
+    "docs/reports/unified-residency-cutile-simt-proof-v1.json": "sha256:ad5dd77c5b859bcc4fe762f83f2ade3200bf60c03de3574735842ad151d0b487",
+    "docs/reports/rapids-runtime-alignment-v1.json": "sha256:65a44fa409533723cb0fbfa63b1684903063e9a65f711e45914366c09485f91e"
+  },
+  "findings": [
+    "The RAPIDS Conda environment and cuTile virtualenv are distinct, independently revisioned runtimes; they are not interchangeable.",
+    "The current Docker RAPIDS executor intentionally omits PyTorch; torch absence is not a graph-executor defect and installing a second CUDA wheel stack is not indicated.",
+    "The live Docker executor currently sees the RTX 3060 Ti and its health and graph capability GETs pass, but the service has no Docker health status in the running container.",
+    "The current OpenAPI does not expose the historical /v1/knn/exact route. The available cuVS exact scan is an Arrow tile-artifact route, not proof of current semantic corpus admission.",
+    "The historical semantic768 exact-oracle receipt remains bounded fixture evidence and itself records candidate population freeze blocked, live current cohort ineligible, and CAGRA comparison not run.",
+    "CUDA 13.4 and TensorRT-RTX 1.6 were not installed or evaluated."
+  ],
+  "changesThisReview": [
+    "docker/docker-compose.gpu.yml: add a future container healthcheck requiring HTTP health and CUDA availability; validated compose configuration only, not applied to the running container."
+  ],
+  "openGates": [
+    "Apply the Compose healthcheck only during an authorized container recreation.",
+    "Refresh the exact-scan proof against the current tile-artifact API and a frozen, revision-qualified candidate cohort.",
+    "Run current-cohort cuVS exact and CAGRA comparison only after candidate freeze and route contract are proven.",
+    "Keep ACE producer identity and BitFrost cache writes blocked until ACE-PRODUCER-TRACE-01 and the admitted packet-key owner are proven.",
+    "CUDA 13.4/TensorRT-RTX 1.6 license-gated side-by-side evaluation remains deferred."
+  ]
+}

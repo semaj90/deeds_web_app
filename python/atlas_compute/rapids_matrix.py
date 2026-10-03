@@ -45,11 +45,20 @@ class RapidsKMeansReceipt:
     iterations: int
     inertia: float
     labels_checksum: str
+    input_checksum: str
     centroids_checksum: str
     canonical_authority: bool
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class RapidsKMeansArtifact:
+    """Derived KMeans receipt plus the exact centroid bytes it attests to."""
+
+    receipt: RapidsKMeansReceipt
+    centroids: np.ndarray
 
 
 def _checksum_array(value: np.ndarray) -> str:
@@ -83,7 +92,7 @@ def deterministic_farthest_first_ordinals(matrix: np.ndarray, n_clusters: int) -
     return selected
 
 
-def run_cuvs_kmeans(
+def _run_cuvs_kmeans(
     matrix: Sequence[Sequence[float]] | np.ndarray,
     *,
     n_clusters: int,
@@ -92,7 +101,7 @@ def run_cuvs_kmeans(
     tol: float = 1e-4,
     batch_samples: int = 0,
     batch_centroids: int = 0,
-) -> RapidsKMeansReceipt:
+) -> RapidsKMeansArtifact:
     """Run cuVS KMeans with deterministic array initialization."""
 
     import cupy as cp
@@ -126,8 +135,8 @@ def run_cuvs_kmeans(
     if not np.isfinite(float(inertia)) or not np.isfinite(float(predicted_inertia)):
         raise ValueError("cuVS KMeans returned non-finite inertia")
 
-    return RapidsKMeansReceipt(
-        schema="atlas.rapids-kmeans-receipt.v1",
+    receipt = RapidsKMeansReceipt(
+        schema="atlas.rapids-kmeans-receipt.v2",
         rows=int(source.shape[0]),
         dimensions=int(source.shape[1]),
         n_clusters=n_clusters,
@@ -137,8 +146,57 @@ def run_cuvs_kmeans(
         iterations=int(n_iter),
         inertia=float(inertia),
         labels_checksum=_checksum_array(labels_host),
+        input_checksum=_checksum_array(source),
         centroids_checksum=_checksum_array(centroids_host),
         canonical_authority=False,
+    )
+    centroids_host.setflags(write=False)
+    return RapidsKMeansArtifact(receipt=receipt, centroids=centroids_host)
+
+
+def run_cuvs_kmeans(
+    matrix: Sequence[Sequence[float]] | np.ndarray,
+    *,
+    n_clusters: int,
+    metric: str = "sqeuclidean",
+    max_iter: int = 300,
+    tol: float = 1e-4,
+    batch_samples: int = 0,
+    batch_centroids: int = 0,
+) -> RapidsKMeansReceipt:
+    """Run cuVS KMeans and return its receipt, preserving the original API."""
+
+    return _run_cuvs_kmeans(
+        matrix,
+        n_clusters=n_clusters,
+        metric=metric,
+        max_iter=max_iter,
+        tol=tol,
+        batch_samples=batch_samples,
+        batch_centroids=batch_centroids,
+    ).receipt
+
+
+def run_cuvs_kmeans_artifact(
+    matrix: Sequence[Sequence[float]] | np.ndarray,
+    *,
+    n_clusters: int,
+    metric: str = "sqeuclidean",
+    max_iter: int = 300,
+    tol: float = 1e-4,
+    batch_samples: int = 0,
+    batch_centroids: int = 0,
+) -> RapidsKMeansArtifact:
+    """Run cuVS KMeans and retain the checksum-bound centroid artifact."""
+
+    return _run_cuvs_kmeans(
+        matrix,
+        n_clusters=n_clusters,
+        metric=metric,
+        max_iter=max_iter,
+        tol=tol,
+        batch_samples=batch_samples,
+        batch_centroids=batch_centroids,
     )
 
 

@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { json } from '@sveltejs/kit';
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import { hashQuery } from '$lib/server/cache/ace-packet-cache.js';
@@ -11,7 +10,43 @@ import {
   persistTokenMapCartridge,
 } from '$lib/server/token-map/token-map-service.js';
 
-const execAsync = promisify(exec);
+const PACKET_BUILDER_TIMEOUT_MS = 60_000;
+
+function runPacketBuilder(scriptPath: string, query: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // Keep the query out of a shell command. This route is a transport adapter;
+    // it must not turn user input into executable shell syntax.
+    const child = spawn(process.execPath, [scriptPath, query], {
+      cwd: process.cwd(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+
+    let stderr = '';
+    child.stderr.setEncoding('utf8');
+    child.stderr.on('data', (chunk: string) => {
+      stderr += chunk;
+    });
+
+    const timeout = setTimeout(() => {
+      child.kill();
+      reject(new Error('ACE packet builder timed out'));
+    }, PACKET_BUILDER_TIMEOUT_MS);
+
+    child.once('error', (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+    child.once('close', (code) => {
+      clearTimeout(timeout);
+      if (code === 0) {
+        resolve();
+        return;
+      }
+      reject(new Error(`ACE packet builder exited with code ${code ?? 'unknown'}${stderr ? `: ${stderr.trim()}` : ''}`));
+    });
+  });
+}
 
 const postSchema = z.object({
   query: z.string().min(1),
@@ -44,18 +79,29 @@ export async function POST({ request, locals }) {
   const { query } = parsed.data;
 
   const scriptPath = path.join(process.cwd(), 'scripts', 'ace', 'build-packet.mjs');
-  await execAsync(`node ${scriptPath} "${query}"`);
+  try {
+    await runPacketBuilder(scriptPath, query);
+  } catch (error) {
+    console.warn(`[ace:packet] packet builder failed: ${(error as Error).message}`);
+    return json({ error: 'Packet generation failed', degraded: true }, { status: 502 });
+  }
 
   const queryHash = hashQuery(query).split(':').pop();
   const packetPath = path.join(process.cwd(), '.tmp', 'ace', `packet-${queryHash}.json`);
 
   if (fs.existsSync(packetPath)) {
-    const packet = JSON.parse(fs.readFileSync(packetPath, 'utf8'));
-    const queryHash = hashQuery(query).split(':').pop() ?? `query-${Date.now()}`;
+    let packet: Record<string, any>;
+    try {
+      packet = JSON.parse(fs.readFileSync(packetPath, 'utf8')) as Record<string, any>;
+    } catch (error) {
+      console.warn(`[ace:packet] packet read failed: ${(error as Error).message}`);
+      return json({ error: 'Packet generation failed', degraded: true }, { status: 502 });
+    }
+    const packetQueryHash = hashQuery(query).split(':').pop() ?? 'query';
     const tokenMapPayload = deriveTokenMapCartridgePayloadFromAcePacket(query, packet);
 
     if (tokenMapPayload) {
-      void persistTokenMapCartridge(queryHash, tokenMapPayload).catch((err) => {
+      void persistTokenMapCartridge(packetQueryHash, tokenMapPayload).catch((err) => {
         console.warn(`[ace:packet] token-map persistence failed: ${(err as Error).message}`);
       });
     }
@@ -67,7 +113,7 @@ export async function POST({ request, locals }) {
           sourceRefs: Array.isArray(packet.sourceRefs) ? packet.sourceRefs : [],
           rankedCards: Array.isArray(packet.rankedCards) ? packet.rankedCards : [],
           lokiData: null,
-          promptCacheKey: packet.promptCacheKey ?? `ace:prompt:${queryHash}`,
+          promptCacheKey: packet.promptCacheKey ?? `ace:prompt:${packetQueryHash}`,
           degraded: Boolean(packet.degraded),
         });
         packet.varianceRecovery = recovery.varianceRecovery;
@@ -81,7 +127,7 @@ export async function POST({ request, locals }) {
           clusterTagRecall: [],
           langextractEntities: [],
           semanticCacheHits: [],
-          acePacket: packet.promptCacheKey ?? `ace:prompt:${queryHash}`,
+          acePacket: packet.promptCacheKey ?? `ace:prompt:${packetQueryHash}`,
           nextSteps: ['run exact search', 'recall cluster tags', 'extract entities', 'build ACE packet'],
         };
         console.warn(`[ace:packet] Variance recovery normalization failed: ${(err as Error).message}`);

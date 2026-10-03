@@ -42,17 +42,20 @@
 
 ## Next session — pick up here
 
-- [ ] Ask the user (or infer from context) whether "graphify GPU indexed json packets" — now that
-      CHR97 is confirmed unrelated — means `graphify/frozen-graph-snapshot-v2.json` specifically
-      (this session's `GRAPH_SNAPSHOT_PARITY` artifact) or the broader `graphify:daily`/
-      `graphify:full` pipeline output (`docs/graph/codebase-graph.json` + Qdrant + Neo4j) for the
-      ACE/HyperRAG side only. Confirmed different downstream consumers use different graphify
-      outputs — don't assume they're the same thing.
-- [ ] Decide whether ACE's AST-blindness (context-assembler reads `codebase-graph.json`, which
-      has zero AST/tree-sitter derivation — see "AST extraction trace" above) is a gap worth
-      closing, i.e. should ACE's graph-intel path also consume `code_features`/
-      `feature_structural_facts` via `packet_key`. Get explicit approval before doing any wiring
-      work — this is a new capability, not a bugfix.
+- [x] Resolve the "graphify GPU indexed json packets" artifact distinction from current owners:
+      ACE's graph-intel reader consumes `docs/graph/codebase-graph.json`; its canonical retrieval
+      mirrors remain separate consumers. `graphify/frozen-graph-snapshot-v2.json` is the distinct
+      `GRAPH_SNAPSHOT_PARITY` artifact, not ACE's current runtime input. CHR97/cartridge consumes
+      case-scoped legal evidence and is unrelated to either Graphify path. No Graphify command was
+      run for this resolution (2026-09-24).
+- [x] Record the operator decision for AST-aware ACE context (2026-09-24): **yes, it is a
+      capability worth closing**, but AST evidence may enter ACE only through the existing
+      identity-qualified candidate/ordinal/feature admission path, not by injecting raw Graphify
+      JSON or bypassing SearchRuntime. Current composition remains a pure consumer of already
+      admitted candidates/features; `search-runtime-candidate-normalizer-v1.ts` still emits empty
+      `evidenceRefs` and `representationBindings`, so production wiring is NOT proven and must wait
+      for source/evidence lineage and a production route owner. This decision does not claim that
+      AST evidence is currently available to ACE or authorize a lineage bypass.
 - [x] **DONE (2026-09-05).** Registered all 6 components in
       `docs/architecture/runtime-ownership-registry.json`: `ace_packet_validator`,
       `ace_context_assembler` (carrying the AST-blindness `known_gap` note), `hyperrag_rpc_packet`,

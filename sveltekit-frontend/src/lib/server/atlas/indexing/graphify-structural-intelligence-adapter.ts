@@ -4,9 +4,12 @@ import {
   adaptAstGrepExtractedFeature,
   adaptAstGrepMatches,
   adaptGroundedLangExtract,
+  groundLangExtractUtf8SpansV1,
   adaptSidecarGroundedExtractions,
   buildGroundedDomainCandidates,
+  compileAstRelationGraphAdapterV1,
   type GroundedDomainCandidateV1,
+  type AstRelationGraphAdapterResultV1,
   compileStructuralExtractionFabric,
   type StructuralExtractionFabricResultV1,
 } from '@deeds/parent-atlas';
@@ -37,22 +40,42 @@ export type GraphifyStructuralIntelligenceReceipt = {
   referenceFactCount: number;
   astGrepObservationCount: number;
   langExtractObservationCount: number;
+  langExtractParserBufferPresent: boolean;
+  langExtractParserBufferChecksum: string | null;
+  langExtractParserBufferMatchesSource: boolean;
+  langExtractOffsetBasis: 'PYTHON_CODEPOINT';
+  langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1';
+  langExtractFallbackUsed: boolean;
+  langExtractFallbackReason: string | null;
+  langExtractUtf8SpanCount: number;
+  langExtractUtf8RejectionCount: number;
+  langExtractUtf8MismatchCount: number;
   groundedDomainCandidateCount: number;
   compatibilityNodeIdCount: number;
   compatibilityFileIdCount: number;
   compatibilityChunkIdCount: number;
   diagnostics: string[];
   canonicalIdentityCreated: false;
+  relationGraphStatus: AstRelationGraphAdapterResultV1['status'];
+  relationGraphReason: AstRelationGraphAdapterResultV1['reason'];
+  relationGraphChecksum: string | null;
+  relationGraphNodeCount: number;
+  relationGraphEdgeCount: number;
 };
 
 export type GraphifyStructuralIntelligenceResult = {
   fabric: StructuralExtractionFabricResultV1 | null;
+  relationGraph: AstRelationGraphAdapterResultV1 | null;
   groundedDomainCandidates: GroundedDomainCandidateV1[];
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
 
 function structuralStageChecksum(value: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
+}
+
+function bytesChecksum(value: Uint8Array): string {
+  return `sha256:${createHash('sha256').update(value).digest('hex')}`;
 }
 
 /** Pure bridge from the existing structural receipt to coordinator stage receipts. It does not
@@ -77,6 +100,8 @@ export function buildGraphifyStructuralStageReceiptsV1(input: {
   const extractOutput = structuralStageChecksum({
     receipt,
     fabricReceipt: fabric?.receipt ?? null,
+    relationGraphChecksum: input.result.relationGraph?.graph?.checksum ?? null,
+    relationGraphStatus: receipt.relationGraphStatus,
   });
   return {
     astParse: { inputChecksum: astInput, outputChecksum: astOutput },
@@ -96,6 +121,7 @@ function unique(values: readonly string[]): string[] {
  */
 export function compileGraphifyStructuralIntelligence(input: {
   source: string;
+  parserBuffer?: Uint8Array;
   workspaceRevision: string;
   materialization: StructuralMaterializationResult;
   astGrepFeatures?: ExtractedFeature[];
@@ -116,7 +142,8 @@ export function compileGraphifyStructuralIntelligence(input: {
   const { materialization } = input;
   if (!materialization.evidence) {
     return {
-      fabric: null,
+        fabric: null,
+      relationGraph: null,
       groundedDomainCandidates: [],
       receipt: {
         schema: 'atlas.graphify-structural-intelligence-receipt.v1',
@@ -136,12 +163,27 @@ export function compileGraphifyStructuralIntelligence(input: {
         referenceFactCount: 0,
         astGrepObservationCount: 0,
         langExtractObservationCount: 0,
+        langExtractParserBufferPresent: false,
+        langExtractParserBufferChecksum: null,
+        langExtractParserBufferMatchesSource: false,
+        langExtractOffsetBasis: 'PYTHON_CODEPOINT',
+        langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
+        langExtractFallbackUsed: false,
+        langExtractFallbackReason: null,
+        langExtractUtf8SpanCount: 0,
+        langExtractUtf8RejectionCount: 0,
+        langExtractUtf8MismatchCount: 0,
         groundedDomainCandidateCount: 0,
         compatibilityNodeIdCount: 0,
         compatibilityFileIdCount: 0,
         compatibilityChunkIdCount: 0,
         diagnostics: unique([...materialization.diagnostics, 'STRUCTURAL_FABRIC_SKIPPED_NO_EVIDENCE']),
         canonicalIdentityCreated: false,
+        relationGraphStatus: 'DEFERRED',
+        relationGraphReason: 'NO_STRUCTURAL_EVIDENCE',
+        relationGraphChecksum: null,
+        relationGraphNodeCount: 0,
+        relationGraphEdgeCount: 0,
       },
     };
   }
@@ -170,13 +212,47 @@ export function compileGraphifyStructuralIntelligence(input: {
   });
 
   const rawLangExtract = adaptSidecarGroundedExtractions(input.langExtractMetadata ?? {});
+  const parserBufferPresent = input.parserBuffer !== undefined;
+  const parserBuffer = input.parserBuffer ?? Buffer.from(input.source, 'utf8');
+  const utf8Grounding = groundLangExtractUtf8SpansV1({
+    source_ref: materialization.evidence.file_path,
+    source_revision: materialization.evidence.source_revision,
+    expected_source_revision: materialization.evidence.source_revision,
+    workspace_revision: input.workspaceRevision,
+    parser_buffer: parserBuffer,
+    offset_basis: 'PYTHON_CODEPOINT',
+    extractions: rawLangExtract,
+  });
+  // Spans are returned in input order with rejected entries omitted. Only
+  // exact byte-grounded spans may enter structural observations; the UTF-8
+  // receipt is an admission gate, not merely diagnostics.
+  const rejectedExtractionIndexes = new Set(utf8Grounding.rejections.map(({ index }) => index));
+  let spanIndex = 0;
+  const parserBufferText = new TextDecoder('utf-8', { fatal: true }).decode(parserBuffer);
+  const parserBufferMatchesSource = parserBufferText === input.source;
+  const byteVerifiedExtractions = rawLangExtract.flatMap((raw, index) => {
+    if (rejectedExtractionIndexes.has(index)) return [];
+    const span = utf8Grounding.spans[spanIndex++];
+    if (!parserBufferMatchesSource || span?.text_matches_extraction !== true) return [];
+    return [{
+      ...raw,
+      attributes: {
+        ...raw.attributes,
+        atlas_source_text_encoding_revision: span.source_text_encoding_revision,
+        atlas_utf8_start_byte: span.utf8_start_byte,
+        atlas_utf8_end_byte: span.utf8_end_byte,
+        atlas_slice_sha256: span.slice_sha256,
+        atlas_evidence_checksum: span.evidence_checksum,
+      },
+    }];
+  });
   const groundedLangExtract = adaptGroundedLangExtract({
     source_ref: materialization.evidence.file_path,
     source_revision: materialization.evidence.source_revision,
-    source_text: input.source,
+    source_text: parserBufferText,
     extractor_revision: input.revisions.langExtract,
     producer_revision: input.revisions.adapter,
-    extractions: rawLangExtract,
+    extractions: byteVerifiedExtractions,
   });
 
   const enriched = adaptAtlasAstEvidenceToStructuralInput({
@@ -194,6 +270,15 @@ export function compileGraphifyStructuralIntelligence(input: {
 
   const fabric = compileStructuralExtractionFabric(enriched.structural_input, {
     producer_revision: input.revisions.fabric,
+  });
+  const relationGraph = compileAstRelationGraphAdapterV1({
+    fabric,
+    sourceText: input.source,
+    sourceRevision: materialization.sourceRevisionAuthority === 'PROVEN'
+      ? materialization.sourceRevision
+      : null,
+    workspaceRevision: input.workspaceRevision,
+    graphProducerRevision: input.revisions.fabric,
   });
 
   const groundedDomainCandidates = input.groundedDomainMapping
@@ -216,14 +301,20 @@ export function compileGraphifyStructuralIntelligence(input: {
     && materialization.sourceRevisionAuthority === 'PROVEN'
     && materialization.sourceRevision !== null
     && strictNativeMode
+    && parserBufferPresent
+    && parserBufferMatchesSource
     && compatibilityCount === 0;
 
-  const langExtractDiagnostics = groundedLangExtract.receipt.rejected_ungrounded_count > 0
-    ? [`LANGEXTRACT_UNGROUNDED_REJECTED:${groundedLangExtract.receipt.rejected_ungrounded_count}`]
-    : [];
+  const utf8Diagnostics = [
+    ...(utf8Grounding.rejections.length > 0 ? [`LANGEXTRACT_UTF8_REJECTED:${utf8Grounding.rejections.length}`] : []),
+    ...(utf8Grounding.spans.some((span) => !span.text_matches_extraction)
+      ? [`LANGEXTRACT_UTF8_TEXT_MISMATCH:${utf8Grounding.spans.filter((span) => !span.text_matches_extraction).length}`]
+      : []),
+  ];
 
   return {
     fabric,
+    relationGraph,
     groundedDomainCandidates,
     receipt: {
       schema: 'atlas.graphify-structural-intelligence-receipt.v1',
@@ -243,6 +334,16 @@ export function compileGraphifyStructuralIntelligence(input: {
       referenceFactCount: fabric.receipt.reference_fact_count,
       astGrepObservationCount: fabric.receipt.ast_grep_observation_count,
       langExtractObservationCount: fabric.receipt.grounded_langextract_count,
+      langExtractParserBufferPresent: parserBufferPresent,
+      langExtractParserBufferChecksum: bytesChecksum(parserBuffer),
+      langExtractOffsetBasis: 'PYTHON_CODEPOINT',
+      langExtractSourceTextEncodingRevision: 'UTF8_PARSER_BUFFER_V1',
+      langExtractFallbackUsed: !parserBufferPresent,
+      langExtractFallbackReason: parserBufferPresent ? null : 'PARSER_BUFFER_DERIVED_FROM_SOURCE_TEXT',
+      langExtractParserBufferMatchesSource: parserBufferMatchesSource,
+      langExtractUtf8SpanCount: utf8Grounding.spans.length,
+      langExtractUtf8RejectionCount: utf8Grounding.rejections.length,
+      langExtractUtf8MismatchCount: utf8Grounding.spans.filter((span) => !span.text_matches_extraction).length,
       groundedDomainCandidateCount: groundedDomainCandidates.length,
       compatibilityNodeIdCount: enriched.receipt.compatibility_node_id_count,
       compatibilityFileIdCount: enriched.receipt.compatibility_file_id_count,
@@ -250,10 +351,17 @@ export function compileGraphifyStructuralIntelligence(input: {
       diagnostics: unique([
         ...materialization.diagnostics,
         ...enriched.receipt.diagnostics,
-        ...langExtractDiagnostics,
+        ...(!parserBufferMatchesSource ? ['LANGEXTRACT_PARSER_BUFFER_SOURCE_TEXT_MISMATCH'] : []),
+        ...utf8Diagnostics,
         ...fabric.receipt.diagnostics,
+        ...(relationGraph.reason ? [`AST_RELATION_GRAPH_DEFERRED:${relationGraph.reason}`] : []),
       ]),
       canonicalIdentityCreated: false,
+      relationGraphStatus: relationGraph.status,
+      relationGraphReason: relationGraph.reason,
+      relationGraphChecksum: relationGraph.graph?.checksum ?? null,
+      relationGraphNodeCount: relationGraph.graph?.nodes.length ?? 0,
+      relationGraphEdgeCount: relationGraph.graph?.edges.length ?? 0,
     },
   };
 }

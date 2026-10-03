@@ -58,6 +58,48 @@ export const QueryRouterDatasetRowV2Schema = z.object({
 }).strict();
 export type QueryRouterDatasetRowV2 = z.infer<typeof QueryRouterDatasetRowV2Schema>;
 
+export interface QueryRouterDatasetRevisionSetV1 {
+  queryRevision: readonly string[];
+  labelRevision: readonly string[];
+  datasetRevision: readonly string[];
+  tensorRevision: readonly string[];
+  splitRevision: readonly string[];
+  embeddingModelRevision: readonly string[];
+  embeddingPromptRevision: readonly string[];
+  representationRevision: readonly string[];
+}
+
+function sortedDistinct(values: readonly string[]): string[] {
+  return [...new Set(values)].sort();
+}
+
+/**
+ * Training artifacts may contain multiple query/label revisions, but they
+ * must never mix the embedding model, prompt, or representation contracts.
+ * This is a pure guard: it does not admit a corpus or write any artifact.
+ */
+export function assertUniformQueryRouterDatasetRevisionsV1(
+  inputRows: readonly QueryRouterDatasetRowV2[],
+): QueryRouterDatasetRevisionSetV1 {
+  if (inputRows.length === 0) throw new Error('QUERY_ROUTER_DATASET_EMPTY');
+  const revisionSets: QueryRouterDatasetRevisionSetV1 = {
+    queryRevision: sortedDistinct(inputRows.map((row) => row.queryRevision)),
+    labelRevision: sortedDistinct(inputRows.map((row) => row.labelRevision)),
+    datasetRevision: sortedDistinct(inputRows.map((row) => row.datasetRevision)),
+    tensorRevision: sortedDistinct(inputRows.map((row) => row.tensorRevision)),
+    splitRevision: sortedDistinct(inputRows.map((row) => row.splitRevision)),
+    embeddingModelRevision: sortedDistinct(inputRows.map((row) => row.embeddingModelRevision)),
+    embeddingPromptRevision: sortedDistinct(inputRows.map((row) => row.embeddingPromptRevision)),
+    representationRevision: sortedDistinct(inputRows.map((row) => row.representationRevision)),
+  };
+  const requiredUniform = ['datasetRevision', 'tensorRevision', 'splitRevision', 'embeddingModelRevision', 'embeddingPromptRevision', 'representationRevision'] as const;
+  for (const name of requiredUniform) {
+    const values = revisionSets[name];
+    if (values.length !== 1) throw new Error(`QUERY_ROUTER_DATASET_MIXED_${name.toUpperCase()}`);
+  }
+  return revisionSets;
+}
+
 function sha256(text: string): string {
   return createHash('sha256').update(text).digest('hex');
 }

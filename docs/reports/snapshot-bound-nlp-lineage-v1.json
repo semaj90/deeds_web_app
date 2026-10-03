@@ -1,0 +1,89 @@
+{
+  "schema": "atlas.snapshot-bound-nlp-lineage.v1",
+  "gate": "SNAPSHOT-BOUND-NLP-LINEAGE-PREFLIGHT-01",
+  "status": "SNAPSHOT_BOUND_NLP_PREFLIGHT_PROVEN",
+  "proofLevel": "BOUNDED_LIVE_PROVEN",
+  "sourceKind": "ADMITTED_WORKSPACE_SNAPSHOT",
+  "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "snapshotRevision": "sha256:06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36",
+  "materializedRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\workspace-source-snapshots\\06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36",
+  "membershipRows": 25291,
+  "sampledRows": 8,
+  "sampleLimit": 8,
+  "observations": [
+    {
+      "sourceRef": "claude-mem/docs/context/agent-sdk-v2-examples.ts",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:b923ba10ffd4f0366e9166e4450ae2ee4be581436651ff08f88d611cd30d6a14",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 19
+    },
+    {
+      "sourceRef": "claude-mem/install/public/installer.js",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:c9fec2fa62f65ea687c296d60aedfe8883d8159cd9b2a26a6231ca390ba0a806",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 0
+    },
+    {
+      "sourceRef": "claude-mem/openclaw/src/index.test.ts",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:bc02bf03194df63bc57bf3fc3ae16ccede78801b60c6e521699c185f18308710",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 327
+    },
+    {
+      "sourceRef": "claude-mem/openclaw/src/index.ts",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:a74a56575aa9398ae227ae50b4458d2ebdbf8b840cb5cbfab317641fbafe821a",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 230
+    },
+    {
+      "sourceRef": "claude-mem/openclaw/test-sse-consumer.js",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:5e77e90664a9a493c38fb670f88d9a1e428e2ef9538bee4aebc3fb5680a8bae6",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 22
+    },
+    {
+      "sourceRef": "claude-mem/plugin/scripts/bun-runner.js",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:151b36c6f2ce8a317f12158982e72e359c9777e193390d32fc1b7f6d53369274",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 42
+    },
+    {
+      "sourceRef": "claude-mem/plugin/scripts/statusline-counts.js",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:b5f2c0c6bcf18c7523d08b2645fb9a04400c92ead68984bacdbc595699948996",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 13
+    },
+    {
+      "sourceRef": "claude-mem/plugin/scripts/version-check.js",
+      "repositoryId": "repo:claude-mem",
+      "sourceRevision": "sha256:9c576a7c681ddda908737e5678715224596ad10f4f06d2e01039b8fecea91991",
+      "success": true,
+      "schema": "atlas.ast.evidence.v1",
+      "chunkCount": 17
+    }
+  ],
+  "violations": [],
+  "ownership": {
+    "sourceBytes": "materialized snapshot",
+    "astCstAndChunks": "LangExtract/Tree-sitter sidecar :8095",
+    "canonicalIdentity": "PostgreSQL graphify_execution_file_membership_v2",
+    "writesPerformed": false
+  },
+  "nextGate": "CURRENT-PACKET-CHUNK-LINEAGE-BRIDGE-RECONCILIATION",
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

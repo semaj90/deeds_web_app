@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T04:58:06Z",
+  "runType": "SELECTED_GATE_PIVOT",
+  "pivot": {
+    "from": "parent-atlas-workboard-feature-utility-fabric program/workboard modeling",
+    "to": "parent-atlas-retrieval-lineage-dag-convergence / CURRENT_WORKSPACE_LINEAGE",
+    "reason": "User selected current-scope AST/source lineage proof ahead of further PacketKeyV2 promotion."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEdited": false,
+    "selectedOpenSpec": "parent-atlas-retrieval-lineage-dag-convergence",
+    "selectedGate": "CURRENT_WORKSPACE_LINEAGE"
+  },
+  "frozenWork": {
+    "packetKeyV2": "FROZEN_NOT_PROMOTED",
+    "historicalEligibilityCensus": {
+      "status": "PROVEN_NOT_MIGRATION_POPULATION",
+      "derivable": 17399,
+      "legacy12HexStorageShape": 17301,
+      "acePrefixedStorageShape": 98,
+      "observedCanonicalCollisions": 0
+    },
+    "registerOrphanedChunksModified": false,
+    "ddlApplied": false,
+    "datastoreWrites": 0,
+    "graphifyRuns": 0
+  },
+  "nextProof": {
+    "requiredScopeBindings": [
+      "workspaceRevision",
+      "executionId",
+      "v2MembershipChecksum",
+      "packetRepairRoot"
+    ],
+    "astClassifications": [
+      "AST_REVISION_QUALIFIED",
+      "AST_REVISION_MISSING",
+      "AST_SOURCE_MISMATCH",
+      "AST_WORKSPACE_MISMATCH",
+      "AST_EVIDENCE_ABSENT",
+      "AST_STALE_OTHER_REVISION"
+    ]
+  },
+  "likely_cause": "The latest PacketKeyV2 work was ahead of unresolved current-scope AST lineage and packet registry ownership gates.",
+  "evidence": [
+    "User-provided PacketKeyV2 gate correction",
+    "docs/reports/current-workspace-lineage-scope-closure-v1.json",
+    "scripts/atlas/audit-current-workspace-lineage-scope-v1.mjs"
+  ],
+  "patch_targets": [
+    "docs/reports/openspec-workboard-run-2026-09-25T045806Z.json"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-current-workspace-lineage-scope-v1.mjs --workspace-revision <explicit-sha256> --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --repair-root-sha256 e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3",
+  "smoke_command": "node --check scripts/atlas/audit-current-workspace-lineage-scope-v1.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T045806Z.json"
+}

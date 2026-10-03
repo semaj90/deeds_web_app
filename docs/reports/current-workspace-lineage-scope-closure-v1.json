@@ -1,0 +1,300 @@
+{
+  "schema": "atlas.current-workspace-lineage-scope-closure.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "historicalReceiptsOverwritten": false,
+  "scope": {
+    "repositoryId": "repo:root",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "v2SourceMembership": {
+      "rows": 25542,
+      "checksum": "sha256:59b3f07ead8d796fbef31da5946b2bc0fd678fa6ab175d10df0d49361a16ff81",
+      "recipe": "sha256 of repository_id|source_ref|code_source_revision|content_hash lines ordered by repository_id, source_ref"
+    },
+    "appliedPacketRepair": {
+      "manifestRootSha256": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3",
+      "entryCount": 16151,
+      "accounting": {
+        "membershipTotal": 25542,
+        "inScope": 24456,
+        "outcomes": {
+          "MISSING_PACKET": 7352,
+          "LEGACY_LINEAGE_FIELDS_MISSING": 16151,
+          "ADMITTED_SNAPSHOT_BYTES_DIFFER_FROM_CURRENT_WORKTREE": 842,
+          "LEGACY_CONTENT_HASH_UNQUALIFIED": 93,
+          "SOURCE_BYTES_MISSING": 8,
+          "IDENTITY_COLLISION": 10,
+          "OUT_OF_SCOPE_REPOSITORY": 1086,
+          "WORKSPACE_SCOPE_MISMATCH": 0
+        },
+        "outcomeSum": 25542,
+        "fullyAccounted": true
+      },
+      "applyReceipt": {
+        "name": "apply-receipt-1790289515387-420.json",
+        "status": "SOURCE_AUTHORITY_APPLY_COMPLETE",
+        "committedPackets": 16151,
+        "appliedAt": "2026-09-24T22:38:35.387Z",
+        "inverseRootSha256": "bc247c0c2e16115f2f26bd1ebf832d71a59ec53b7a8bbb9a3daa0f361ddd4c91"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "name": "sourceCohort",
+      "path": "docs/reports/current-source-cohort-lineage-v1.json",
+      "sha256": "8bca03a4b18224b70040dca5b0efc37282bd1cf9a8d017bc8959322ebc3cdf26",
+      "modifiedAt": "2026-09-24T22:43:51.196Z",
+      "classification": "HISTORICAL_VALID_OTHER_SCOPE",
+      "reason": "Selects the current frame but its cohort rows are bound to other workspace revisions (currentWorkspaceMatched=0).",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+      ],
+      "declaredExecutionIds": [],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "executionOwner",
+      "path": "docs/reports/current-graphify-execution-owner-decision-v1.json",
+      "sha256": "ab0a40baa97fd453365245480da099bfa95f9daa9c6c18f0ea331a89da080673",
+      "modifiedAt": "2026-09-21T20:13:19.746Z",
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "reason": "Binds the exact scope; additional foreign scope identifiers appear only as listed candidates.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      ],
+      "declaredExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d"
+      ],
+      "generatedBeforeApply": true
+    },
+    {
+      "name": "packetChunkJoin",
+      "path": "docs/reports/current-workspace-packet-chunk-join-v1.json",
+      "sha256": "721492e1b00903127908c6dc2670c8d68edf3ccfde47f488b909cb132a56de1f",
+      "modifiedAt": "2026-09-25T04:24:34.531Z",
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "reason": "Binds the exact workspace revision and execution.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      ],
+      "declaredExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "packetWriter",
+      "path": "docs/reports/packet-writer-lineage-v1.json",
+      "sha256": "4ef55d46fd06b2d48c447dc3032a96b07c530e691b911734d80fabd716e20823",
+      "modifiedAt": "2026-09-24T22:43:11.576Z",
+      "classification": "UNRELATED",
+      "reason": "Carries no workspace-revision or execution binding; it cannot be compared to this scope and must not supply scope-bound counts.",
+      "declaredWorkspaceRevisions": [],
+      "declaredExecutionIds": [],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "packetRevisionOwner",
+      "path": "docs/reports/packet-revision-owner-v1.json",
+      "sha256": "4777851e8d88398e9bcaa4be4eafacb5ca97ce4ec70d3a070ad9789ba85399d3",
+      "modifiedAt": "2026-09-24T22:43:11.811Z",
+      "classification": "UNRELATED",
+      "reason": "Carries no workspace-revision or execution binding; it cannot be compared to this scope and must not supply scope-bound counts.",
+      "declaredWorkspaceRevisions": [],
+      "declaredExecutionIds": [],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "packetIdentityReconciliation",
+      "path": "docs/reports/current-packet-chunk-identity-reconciliation-v1.json",
+      "sha256": "355a9f97ee537121f306a751de0731ac9f31ebafe39976302f4b9558e540ea2c",
+      "modifiedAt": "2026-09-24T22:46:27.787Z",
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "reason": "Binds the exact workspace revision and execution.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      ],
+      "declaredExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "packetDigestBridge",
+      "path": "docs/reports/current-packet-digest-bridge-v1.json",
+      "sha256": "c3458719c21e7925f22f6d5cbe0ea07a9cdd1f1dab8eb72b5233efac6ab82878",
+      "modifiedAt": "2026-09-18T21:59:46.363Z",
+      "classification": "STALE",
+      "reason": "Same scope, but generated before the durable packet repair was applied; its packet-state counts describe the pre-repair rows.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+      ],
+      "declaredExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "generatedBeforeApply": true
+    },
+    {
+      "name": "sourceOwner",
+      "path": "docs/reports/current-source-owner-reconciliation-v1.json",
+      "sha256": "6dc1ab20d1d6808202a84762203d25affb943b77678ba6e83cbf45a263f329d6",
+      "modifiedAt": "2026-09-24T22:43:50.723Z",
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "reason": "Binds the exact scope; additional foreign scope identifiers appear only as listed candidates.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+        "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+        "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+        "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+        "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+        "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+        "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+        "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+        "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+        "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+        "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+        "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+        "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+        "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+        "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+        "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+        "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+        "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+        "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+        "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+        "sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc",
+        "sha256:a420b0f1271fee2307962312340c36c228937d4aa8b8bb1f1e43ed5d303dbe70",
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "sha256:db4d688bf34a4207ad9ba9cadf4dcc64b3b27d8809472bf51007d32bfa9e122c",
+        "sha256:3097d43973a39310034724c60036120e9877816ff6833259cd5b97277fe442e1",
+        "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+      ],
+      "declaredExecutionIds": [
+        "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "b337f94c-850b-44b5-99a7-ba6a6cfaeedf",
+        "3ded0ce6-cd8c-419f-96c9-49984824c956",
+        "24c421a1-28b1-431d-ac09-2793ed807ca6",
+        "c531a1b0-c932-482f-8a21-5d067f504a13",
+        "5013de19-7bed-4703-bd6b-1684b19e2aaf",
+        "cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc",
+        "14667026-459c-4a99-b3c2-c20b739a6e0d",
+        "255ca44b-947a-4a25-9e6c-a8890ea7555a",
+        "9524dd40-b9d4-4c13-9c7f-ccdbf0387af4",
+        "de58de64-0b29-4dea-b1bc-88949458793a",
+        "49681845-d45e-4e00-851a-31a28fb993ab",
+        "c418970d-b6d1-4258-a262-2ba3fb06f213",
+        "98c5f3a0-290c-4ae6-a76a-a48d565b91b7",
+        "945b3d60-784a-4669-a08a-82405bbb8133",
+        "956f03c2-d396-4e9e-9b68-69a8fb38cdb4",
+        "8c6891d3-27fe-4913-9f46-bd8f6cb129cf",
+        "de2b1e77-9849-4449-98ca-96a729491f2e",
+        "24b32bc1-beca-4451-ad97-d71e7abe1af4",
+        "747d0c3d-f9a6-4376-8314-387ecdef9923",
+        "8bd073a7-a8a9-43b7-b53a-778d33e3b524",
+        "24719bbd-3d33-4daf-bdec-f65277c6b149",
+        "ccb615ba-99da-4801-bcf7-0e8a63e7376a",
+        "45938370-7d17-4b25-a118-363997035e40",
+        "8894000e-d7cc-4298-8201-3f3ad6a0ce57",
+        "709e5232-879a-46a8-963d-71c45e2658f0",
+        "5b219159-d033-4d09-8174-6f602789e89b",
+        "680906bc-2bfd-48d5-b96e-5b9b4a4198d1",
+        "fe3dcfa6-da34-4a30-9281-e56d752f77ec",
+        "f9115616-7747-4879-a98f-fc0e189f71d8",
+        "6e64486f-c195-4b31-9b9e-7fe8f194523b",
+        "bfc5739f-554a-44c9-86f6-d239cb9b842a",
+        "5dc82676-d8a5-470e-a3b9-e06a98fb3de5"
+      ],
+      "generatedBeforeApply": false
+    },
+    {
+      "name": "sourceAuthorityRepairPlan",
+      "path": "docs/reports/current-source-authority-repair-plan-v1.json",
+      "sha256": "f069d56e6fe914d9f6158d8f31ac9fb3d6711b1aa495c08bb06497cebe6b2e17",
+      "modifiedAt": "2026-09-24T21:30:58.952Z",
+      "classification": "STALE",
+      "reason": "Same scope, but generated before the durable packet repair was applied; its packet-state counts describe the pre-repair rows.",
+      "declaredWorkspaceRevisions": [
+        "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "sha256:98914c394f4112963080857b5cbef21058cbe4cc9ac60ed4afffb05b808704ce"
+      ],
+      "declaredExecutionIds": [
+        "74d50c86-8194-45ea-8c3d-61aab737ef83"
+      ],
+      "generatedBeforeApply": true
+    },
+    {
+      "name": "sourceEvidence",
+      "path": "docs/reports/current-source-evidence-hydration-v1.json",
+      "sha256": "9dc4534eaa7f0fc7785557c02ac8900e6b3bf7d95869979542e5ee3876875f76",
+      "modifiedAt": "2026-09-24T22:43:59.229Z",
+      "classification": "UNRELATED",
+      "reason": "Carries no workspace-revision or execution binding; it cannot be compared to this scope and must not supply scope-bound counts.",
+      "declaredWorkspaceRevisions": [],
+      "declaredExecutionIds": [],
+      "generatedBeforeApply": false
+    }
+  ],
+  "funnelDiagnostics": [
+    {
+      "field": "workspaceSourceRows",
+      "value": 52,
+      "inputs": [
+        "sourceCohort"
+      ],
+      "usable": false,
+      "classification": "DERIVED_FROM_STALE_INPUT",
+      "note": "Sourced from an input that is not bound to the current scope (sourceCohort); not comparable to scope-bound counts."
+    },
+    {
+      "field": "astQualifiedRows",
+      "value": 48,
+      "inputs": [
+        "sourceEvidence"
+      ],
+      "usable": false,
+      "classification": "DERIVED_FROM_STALE_INPUT",
+      "note": "Sourced from an input that is not bound to the current scope (sourceEvidence); not comparable to scope-bound counts."
+    },
+    {
+      "field": "packetQualifiedRows",
+      "value": 16151,
+      "inputs": [
+        "packetChunkJoin"
+      ],
+      "usable": true,
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "note": null
+    },
+    {
+      "field": "packetChunkQualifiedRows",
+      "value": 577,
+      "inputs": [
+        "packetChunkJoin"
+      ],
+      "usable": true,
+      "classification": "CURRENT_MATCHING_SCOPE",
+      "note": null
+    }
+  ],
+  "measured": {
+    "packetQualifiedRows": 16151,
+    "packetChunkQualifiedRows": 577
+  },
+  "gate": {
+    "name": "CURRENT_WORKSPACE_LINEAGE",
+    "status": "REVISION_QUALIFIED_PACKET_LINEAGE_MEASURED",
+    "criterion": "measured revision-qualified packet lineage bound to the exact scope; no prescribed count",
+    "openScopeDiagnostics": [
+      "workspaceSourceRows",
+      "astQualifiedRows"
+    ]
+  },
+  "generatedAt": "2026-09-25T04:26:24.972Z"
+}

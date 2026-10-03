@@ -22,8 +22,9 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
+import { isMiniforgeNlpRunning } from './miniforge-nlp-health.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
@@ -71,6 +72,25 @@ const envFromFiles = loadRepoEnv(process.env);
 // ---------------------------------------------------------------------------
 const EMBEDDING_BACKENDS = ['ollama', 'llama_cpp_gguf', 'onnx_directml'];
 
+// ---------------------------------------------------------------------------
+// Local ONNX model probe — checked once at startup, cached.
+// The 291 MB model.onnx lives at repo-root/models/embeddinggemma_300m_onnx/
+// and is gitignored (.onnx in models/.gitignore). Tokenizer JSON is tracked.
+// We also check the historical static/ export path for older workstations.
+// ---------------------------------------------------------------------------
+let _localOnnxResult = undefined;
+
+function probeLocalOnnxModel() {
+  if (_localOnnxResult !== undefined) return _localOnnxResult;
+  const candidates = [
+    path.resolve(REPO_ROOT, 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    path.resolve(FRONTEND_ROOT, 'static', 'embeddinggemma_300m_onnx', 'model.onnx'),
+    path.resolve(FRONTEND_ROOT, 'static', 'models', 'embeddinggemma_300m_onnx', 'model.onnx'),
+  ];
+  _localOnnxResult = candidates.find((p) => existsSync(p)) ?? null;
+  return _localOnnxResult;
+}
+
 function resolveEmbeddingBackend(extra = {}) {
   const legacyOnnxFlag = String(
     extra.DEV_GPU_EMBED_SERVER ?? envFromFiles.DEV_GPU_EMBED_SERVER ?? process.env.DEV_GPU_EMBED_SERVER ?? '',
@@ -99,8 +119,26 @@ function resolveEmbeddingBackend(extra = {}) {
     return 'ollama';
   }
 
+  // Auto-promote 'ollama' → 'onnx_directml' on Windows when no explicit backend
+  // was requested and the local gitignored ONNX model is present.
+  // Explicit EMBEDDING_PROVIDER=ollama in .env suppresses auto-promotion.
+  if (
+    raw === 'ollama' &&
+    process.platform === 'win32' &&
+    !envFromFiles.EMBEDDING_PROVIDER &&
+    !process.env.EMBEDDING_PROVIDER
+  ) {
+    const onnxPath = probeLocalOnnxModel();
+    if (onnxPath) {
+      console.log(`[dev:gpu] 🔍 Found local ONNX model: ${onnxPath}`);
+      console.log('[dev:gpu]    Auto-selecting onnx_directml (DirectML → CPU → Ollama fallback). Set EMBEDDING_PROVIDER=ollama to suppress.');
+      return 'onnx_directml';
+    }
+  }
+
   return raw;
 }
+
 
 function mergedEnv(extra = {}) {
   const devGpuEnableMtp = String(
@@ -420,19 +458,6 @@ async function isLlamaServerRunning(port = 8090) {
   }
 }
 
-async function isMiniforgeNlpRunning(port = 8095) {
-  try {
-    const res = await fetch(`http://127.0.0.1:${port}/health`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    if (!res.ok) return false;
-    const data = await res.json().catch(() => null);
-    return data?.status === 'ok' && data?.model === 'miniforge-nlp-sidecar';
-  } catch {
-    return false;
-  }
-}
-
 async function isTcpPortOpen(port) {
   try {
     return await new Promise((resolve) => {
@@ -604,8 +629,11 @@ async function main() {
   let runtimeEmbeddingBackend = embeddingBackend;
   const wantEmbedServer = embeddingBackend === 'llama_cpp_gguf';
   if (embeddingBackend === 'onnx_directml') {
+    const onnxPath = probeLocalOnnxModel() ?? 'models/embeddinggemma_300m_onnx/model.onnx';
     console.log('[dev:gpu] ✅ Embedding backend: onnx_directml — in-process ONNX Runtime session, no separate port');
-    console.log('[dev:gpu]    Model: embeddinggemma (static/embeddinggemma_300m_onnx/model.onnx), execution provider: DirectML (falls back to CPU if unavailable)');
+    console.log(`[dev:gpu]    Model:    ${onnxPath}`);
+    console.log('[dev:gpu]    EP chain: DirectML (D3D12/GPU) → CPU (ONNX intra-op workers) → Ollama :11434 (network fallback)');
+    console.log(`[dev:gpu]    Threads:  intra-op=${Math.min(4, Math.max(1, (await import('node:os')).cpus().length))} (ONNX_CPU_INTRA_OP_THREADS to override)`);
   } else if (await isLlamaServerRunning(embedPort)) {
     console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — leaving it up`);
   } else if (wantEmbedServer) {
@@ -675,7 +703,7 @@ async function main() {
     console.log('[dev:gpu]   Execution provider: Ollama-managed (on-demand runner, unloads on idle)');
     console.log('[dev:gpu]                   Set EMBEDDING_BACKEND=llama_cpp_gguf to enable the dedicated :8081 server');
   }
-  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
+  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + treesitter-chunker + ast-grep; runtime=launcher-selected, Docker provenance-v2 by default)`);
 
   const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
   const vitePort = await findFreePort(desiredVitePort);

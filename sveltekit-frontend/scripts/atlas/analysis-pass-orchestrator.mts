@@ -160,7 +160,7 @@ function createGemma4SummaryRecord(
     status: 'success',
     input_hash: inputHash,
     prompt_hash: promptHash,
-    model_name: 'gemma4-legal-iq4xs-direct.gguf',
+    model_name: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
     temperature,
     max_tokens: maxTokens,
     output: {

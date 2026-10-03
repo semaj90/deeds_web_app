@@ -1,0 +1,18 @@
+{
+  "schema": "atlas.graph-snapshot-shard-manifest.v1",
+  "repositoryId": "repo:models/embeddinggemma_300m",
+  "repositoryKind": "SUBMODULE",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "sourceInventorySnapshotId": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "memberCount": 13,
+  "snapshotId": "5776e284-d222-43f4-b876-5cc72e9651a0",
+  "nodeCount": 0,
+  "edgeCount": 0,
+  "topologyHash": "57501e5c6808b3e14852a4ea21dc7873abf9409032a06f9b740c973e83f62cf7",
+  "materializerStatus": "MATERIALIZED",
+  "replayMatches": true,
+  "boundToAdmittedWorkspaceRevision": true,
+  "sealed": false,
+  "sealedAt": "2026-09-28T21:51:19.608Z"
+}

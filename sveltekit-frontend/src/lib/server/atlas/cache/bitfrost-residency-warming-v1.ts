@@ -22,7 +22,175 @@
  */
 
 import type Redis from 'ioredis';
+import {
+  admitCachedAcePacketV3,
+  aceCacheExpectationV3Schema,
+  verifyAcePacketV3,
+  type AceCacheExpectationV3,
+  type AcePacketV3,
+} from '@deeds/parent-atlas';
 import { bifrostKey } from '$lib/server/cache-keys.js';
+import {
+  AceBitfrostCacheIdentityV1Schema,
+  buildAceBitfrostCacheKeyV1,
+  type AceBitfrostCacheIdentityV1,
+} from './ace-bitfrost-cache-identity-v1.js';
+
+export type AcePacketV3BitfrostReadV1 =
+  | { status: 'HIT'; cacheKey: string; packet: AcePacketV3 }
+  | { status: 'MISS'; cacheKey: string; reason: string }
+  | { status: 'BLOCKED'; cacheKey: null; reason: string };
+
+export type AcePacketV3BitfrostWriteV1 =
+  | { status: 'WRITTEN'; cacheKey: string }
+  | { status: 'BLOCKED'; cacheKey: null; reason: string };
+
+function acePacketV3CacheExpectation(packet: AcePacketV3): AceCacheExpectationV3 {
+  return {
+    packet_key: packet.identity.packet_key,
+    source_ref: packet.identity.source_ref,
+    source_revision: packet.identity.source_revision,
+    workspace_revision: packet.identity.workspace_revision,
+    representation_id: packet.identity.representation_id,
+    representation_revision: packet.identity.representation_revision,
+    feature_revision: packet.identity.feature_revision,
+    graph_revision: packet.identity.graph_revision,
+    producer_revision: packet.identity.producer_revision,
+    packet_checksum: packet.integrity.packet_checksum,
+  };
+}
+
+function validateAcePacketV3CacheIdentity(
+  identityInput: AceBitfrostCacheIdentityV1,
+  packet: AcePacketV3,
+  embedAllowedPacketKeys: ReadonlySet<string>,
+): { identity: AceBitfrostCacheIdentityV1; cacheKey: string } | { reason: string } {
+  let identity: AceBitfrostCacheIdentityV1;
+  try {
+    identity = AceBitfrostCacheIdentityV1Schema.parse(identityInput);
+  } catch {
+    return { reason: 'CACHE_IDENTITY_INVALID' };
+  }
+
+  if (!embedAllowedPacketKeys.has(packet.identity.packet_key)) return { reason: 'PACKET_NOT_EMBED_ALLOWED' };
+  if (identity.cacheKind !== 'ACE_PACKET' || identity.artifactKind !== 'ace_packet_v3') return { reason: 'CACHE_KIND_MISMATCH' };
+  if (packet.source.status !== 'CURRENT' || packet.source.revision !== packet.identity.source_revision) return { reason: 'SOURCE_NOT_CURRENT' };
+  const embedding = packet.semantic.data.embedding;
+  if (embedding.status !== 'CURRENT' || embedding.revision !== packet.identity.representation_revision) return { reason: 'EMBEDDING_NOT_CURRENT' };
+  if (!embedding.data.input_digest || !embedding.data.embedding_digest || !embedding.data.vector_ref) return { reason: 'EMBEDDING_LINEAGE_INCOMPLETE' };
+
+  const comparisons: Array<[keyof AceBitfrostCacheIdentityV1, string | null]> = [
+    ['artifactChecksum', packet.integrity.packet_checksum],
+    ['workspaceRevision', packet.identity.workspace_revision],
+    ['sourceRevision', packet.identity.source_revision],
+    ['packetRevision', packet.identity.packet_revision],
+    ['representationId', packet.identity.representation_id],
+    ['representationRevision', packet.identity.representation_revision],
+    ['featureRevision', packet.identity.feature_revision],
+    ['graphRevision', packet.identity.graph_revision],
+    ['producerRevision', packet.identity.producer_revision],
+  ];
+  for (const [field, actual] of comparisons) {
+    if (actual === null || identity[field] !== actual) return { reason: `IDENTITY_MISMATCH:${field}` };
+  }
+
+  return { identity, cacheKey: buildAceBitfrostCacheKeyV1(identity) };
+}
+
+/** Read a v3 ACE packet only through the revision/checksum-aware cache identity owner. */
+export async function readAcePacketV3FromBitfrostV1(
+  redis: Pick<Redis, 'get'>,
+  input: {
+    cacheIdentity: AceBitfrostCacheIdentityV1;
+    expected: AceCacheExpectationV3;
+    embedAllowedPacketKeys: ReadonlySet<string>;
+  },
+): Promise<AcePacketV3BitfrostReadV1> {
+  let identity: AceBitfrostCacheIdentityV1;
+  let expected: AceCacheExpectationV3;
+  try {
+    identity = AceBitfrostCacheIdentityV1Schema.parse(input.cacheIdentity);
+    expected = aceCacheExpectationV3Schema.parse(input.expected);
+  } catch {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'CACHE_IDENTITY_INVALID' };
+  }
+  if (!expected.packet_checksum) return { status: 'BLOCKED', cacheKey: null, reason: 'EXPECTED_PACKET_CHECKSUM_REQUIRED' };
+  const cacheKey = buildAceBitfrostCacheKeyV1(identity);
+  if (!input.embedAllowedPacketKeys.has(expected.packet_key)) {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'PACKET_NOT_EMBED_ALLOWED' };
+  }
+  if (identity.cacheKind !== 'ACE_PACKET' || identity.artifactKind !== 'ace_packet_v3') {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'CACHE_KIND_MISMATCH' };
+  }
+  if (identity.artifactChecksum !== expected.packet_checksum) {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'EXPECTED_CHECKSUM_KEY_MISMATCH' };
+  }
+  for (const [field, expectedValue] of [
+    ['source_revision', expected.source_revision],
+    ['workspace_revision', expected.workspace_revision],
+    ['representation_id', expected.representation_id],
+    ['representation_revision', expected.representation_revision],
+    ['feature_revision', expected.feature_revision],
+    ['graph_revision', expected.graph_revision],
+    ['producer_revision', expected.producer_revision],
+  ] as const) {
+    if (expectedValue === undefined) continue;
+    const identityValue = ({
+      source_revision: identity.sourceRevision,
+      workspace_revision: identity.workspaceRevision,
+      representation_id: identity.representationId,
+      representation_revision: identity.representationRevision,
+      feature_revision: identity.featureRevision,
+      graph_revision: identity.graphRevision,
+      producer_revision: identity.producerRevision,
+    } as const)[field];
+    if (identityValue !== expectedValue) return { status: 'BLOCKED', cacheKey: null, reason: `IDENTITY_MISMATCH:${field}` };
+  }
+
+  let raw: string | null;
+  try {
+    raw = await redis.get(cacheKey);
+  } catch {
+    return { status: 'MISS', cacheKey, reason: 'CACHE_READ_FAILED' };
+  }
+  if (raw === null) return { status: 'MISS', cacheKey, reason: 'CACHE_EMPTY' };
+  const decision = admitCachedAcePacketV3(raw, expected);
+  if (decision.decision === 'MISS') return { status: 'MISS', cacheKey, reason: decision.reason };
+  const packetIdentity = validateAcePacketV3CacheIdentity(identity, decision.packet, input.embedAllowedPacketKeys);
+  if ('reason' in packetIdentity) return { status: 'MISS', cacheKey, reason: packetIdentity.reason };
+  return { status: 'HIT', cacheKey, packet: decision.packet };
+}
+
+/** Write a validated v3 packet to disposable BitFrost state; never writes canonical identity. */
+export async function writeAcePacketV3ToBitfrostV1(
+  redis: Pick<Redis, 'set'>,
+  input: {
+    packet: unknown;
+    cacheIdentity: AceBitfrostCacheIdentityV1;
+    embedAllowedPacketKeys: ReadonlySet<string>;
+    ttlSeconds?: number;
+  },
+): Promise<AcePacketV3BitfrostWriteV1> {
+  let packet: AcePacketV3;
+  try {
+    packet = verifyAcePacketV3(input.packet);
+  } catch {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'PACKET_INVALID' };
+  }
+  const checked = validateAcePacketV3CacheIdentity(input.cacheIdentity, packet, input.embedAllowedPacketKeys);
+  if ('reason' in checked) return { status: 'BLOCKED', cacheKey: null, reason: checked.reason };
+
+  const ttlSeconds = input.ttlSeconds ?? 3600;
+  if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 || ttlSeconds > 86_400) {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'TTL_OUT_OF_BOUNDS' };
+  }
+  try {
+    await redis.set(checked.cacheKey, JSON.stringify(packet), 'EX', ttlSeconds);
+    return { status: 'WRITTEN', cacheKey: checked.cacheKey };
+  } catch {
+    return { status: 'BLOCKED', cacheKey: null, reason: 'CACHE_WRITE_FAILED' };
+  }
+}
 
 // ── Residency score ───────────────────────────────────────────────────────
 

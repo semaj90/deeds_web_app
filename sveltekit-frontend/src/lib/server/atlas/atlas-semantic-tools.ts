@@ -113,12 +113,16 @@ const runtimeSchema = z
   .partial();
 
 const observationSchema = z.object({
-  lastTool: z.string().min(1).default('atlas.inspect_runtime'),
-  lastToolSucceeded: z.boolean().default(true),
+  // No receipt is a blocked observation, never a successful placeholder.
+  lastTool: z.string().min(1).default('none'),
+  lastToolSucceeded: z.boolean().default(false),
+  receiptId: z.string().min(1).optional(),
+  receiptChecksum: z.string().min(1).optional(),
   lastToolError: z.string().optional(),
-  retrievalConfidence: z.number().min(0).max(1).default(0.5),
+  // No receipt means no observed retrieval confidence.
+  retrievalConfidence: z.number().min(0).max(1).default(0),
   evidenceCount: z.number().int().nonnegative().default(0),
-  validationStatus: z.enum(['PASS', 'WARN', 'FAIL']).default('WARN'),
+  validationStatus: z.enum(['PASS', 'WARN', 'FAIL']).default('FAIL'),
   authFailure: z.boolean().default(false),
   revisionMismatch: z.boolean().default(false),
   tokenPressure: z.number().min(0).max(1).default(0),
@@ -154,17 +158,18 @@ const delegateInputSchema = z.object({
 export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
   {
     name: 'atlas.discover',
-    description: 'Inspect the current Atlas runtime, retrieval health, and allowed tool set for the current FSM state.',
+    description: 'Inspect retrieval health for an explicitly revision-qualified Atlas runtime.',
     inputSchema: {
       type: 'object',
       properties: {
         runtime: { type: 'object' },
       },
+      required: ['runtime'],
     },
   },
   {
     name: 'atlas.retrieve',
-    description: 'Run the retrieval wrapper against Go Retrieval gRPC first, then fall back to the canonical search runtime.',
+    description: 'Run retrieval with caller-owned workspace, packet, and revision identity.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -178,12 +183,12 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
         withGraphExpansion: { type: 'boolean', default: false },
         mock: { type: 'boolean', default: false },
       },
-      required: ['query'],
+      required: ['query', 'runtime'],
     },
   },
   {
     name: 'atlas.build_context',
-    description: 'Build a bounded context packet from retrieval results plus the current preamble/memory surface.',
+    description: 'Build a bounded context packet from explicitly revision-qualified retrieval input.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -196,18 +201,19 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
         runtime: { type: 'object' },
         includePreamble: { type: 'boolean', default: true },
       },
-      required: ['query'],
+      required: ['query', 'runtime'],
     },
   },
   {
     name: 'atlas.inspect_runtime',
-    description: 'Inspect the current runtime context, FSM policy, and retrieval health without mutating any state.',
+    description: 'Inspect an explicitly revision-qualified runtime and FSM policy without mutation.',
     inputSchema: {
       type: 'object',
       properties: {
         runtime: { type: 'object' },
         observation: { type: 'object' },
       },
+      required: ['runtime'],
     },
   },
   {
@@ -221,7 +227,7 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
         runtime: { type: 'object' },
         dryRun: { type: 'boolean', default: true },
       },
-      required: ['target'],
+      required: ['target', 'runtime'],
     },
   },
   {
@@ -233,7 +239,7 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
         runtime: { type: 'object' },
         observation: { type: 'object' },
       },
-      required: ['observation'],
+      required: ['observation', 'runtime'],
     },
   },
   {
@@ -246,25 +252,30 @@ export const ATLAS_SEMANTIC_TOOL_DEFINITIONS: AtlasSemanticToolDefinition[] = [
         reason: { type: 'string' },
         runtime: { type: 'object' },
       },
-      required: ['target'],
+      required: ['target', 'runtime'],
     },
   },
 ];
 
 function normalizeRuntimeContext(runtime?: AtlasSemanticRuntimeInput): AtlasRuntimeContext {
   const seed = runtimeSchema.parse(runtime ?? {});
+  if (!seed.workspaceId || !seed.workspaceRevision || !seed.packetKey || !seed.packetRevision) {
+    throw new Error('REVISION_QUALIFIED_RUNTIME_REQUIRED');
+  }
   return {
     ...createAtlasRuntimeContext({
       runId: seed.runId ?? randomUUID(),
       threadId: seed.threadId ?? 'atlas-thread',
       resourceId: seed.resourceId ?? 'atlas-resource',
-      workspaceId: seed.workspaceId ?? 'atlas-workspace',
-      packetKey: seed.packetKey ?? 'atlas:packet:runtime',
+      workspaceId: seed.workspaceId,
+      packetKey: seed.packetKey,
+      workspaceRevision: seed.workspaceRevision,
+      packetRevision: seed.packetRevision,
       initialState: seed.state ?? AtlasState.DISCOVER,
       tokenBudget: seed.tokenBudget?.maximumInput ?? 8192,
     }),
-    workspaceRevision: seed.workspaceRevision ?? new Date().toISOString(),
-    packetRevision: seed.packetRevision ?? new Date().toISOString(),
+    workspaceRevision: seed.workspaceRevision,
+    packetRevision: seed.packetRevision,
     confidence: seed.confidence ?? 0.5,
     tokenBudget: {
       maximumInput: seed.tokenBudget?.maximumInput ?? 8192,
@@ -300,10 +311,27 @@ function makeResult(
   };
 }
 
+function makeBlockedResult(
+  tool: AtlasSemanticToolName,
+  runtime: AtlasRuntimeContext,
+  reason: string,
+): AtlasSemanticToolResult {
+  return {
+    ok: false,
+    tool,
+    runtime,
+    state: AtlasState.RECOVER,
+    confidence: 0,
+    mock: false,
+    backend: 'fsm',
+    data: { error: reason, evidence: [], canonicalAuthority: false, writesPerformed: false },
+  };
+}
+
 async function inspectRuntime(runtime?: AtlasSemanticRuntimeInput, observation?: AtlasSemanticObservationInput) {
   const ctx = normalizeRuntimeContext(runtime);
   const obs = observationSchema.parse(observation ?? {});
-  const inference = estimateExecutionState(ctx.state, obs);
+  const inference = estimateExecutionState(ctx.state, obs, ctx);
   return makeResult('atlas.inspect_runtime', ctx, inference.state, inference.confidence, 'fsm', {
     allowedTools: inference.allowedTools,
     allowMutation: inference.allowMutation,
@@ -350,10 +378,14 @@ async function retrieve(input: AtlasSemanticRetrieveInput) {
     status: 'RUNTIME_PROOF_PENDING',
     loopState: 'RETRIEVE',
     loopTool: 'atlas.retrieve',
-    loopResult: 'PASS',
-    loopEvidenceCoverage: 0.5,
-    loopTokenPressure: 0.2,
+    loopResult: 'PENDING',
+    loopEvidenceCoverage: 0,
+    loopTokenPressure: 1 - runtime.tokenBudget.remainingInput / runtime.tokenBudget.maximumInput,
   });
+
+  if (params.mock && process.env.NODE_ENV !== 'test' && process.env.VITEST !== 'true') {
+    return makeBlockedResult('atlas.retrieve', runtime, 'MOCK_RETRIEVAL_TEST_ONLY');
+  }
 
   if (params.mock) {
     return makeResult('atlas.retrieve', runtime, AtlasState.RETRIEVE, runtime.confidence, 'mock', {
@@ -453,7 +485,7 @@ async function buildContext(input: AtlasSemanticBuildContextInput) {
 async function validateChange(input: AtlasSemanticValidateChangeInput) {
   const params = validateInputSchema.parse(input);
   const runtime = normalizeRuntimeContext(params.runtime);
-  const inference = estimateExecutionState(runtime.state, params.observation);
+  const inference = estimateExecutionState(runtime.state, params.observation, runtime);
 
   return makeResult('atlas.validate_change', runtime, inference.state, inference.confidence, 'fsm', {
     allowedTools: inference.allowedTools,

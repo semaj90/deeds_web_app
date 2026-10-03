@@ -16,6 +16,7 @@
  */
 
 #include "gpu_error_codes.h"
+#include "native_execution_counters.h"
 
 #include <torch/torch.h>
 #include <cstring>
@@ -61,6 +62,7 @@ extern "C" int attentionScoreGPU_fp16(
         auto output_f32 = weights.to(torch::kFloat32);
         auto cpu_w = output_f32.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_w.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -100,6 +102,7 @@ extern "C" int rewardScoreGPU_fp16(
         auto output_f32 = scores.to(torch::kFloat32);
         auto cpu_s = output_f32.to(torch::kCPU).contiguous();
         std::memcpy(out, cpu_s.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;
@@ -143,6 +146,7 @@ extern "C" int batchCosineSimilarity_fp16(
         auto output_f32 = sims.to(torch::kFloat32);
         auto cpu_s = output_f32.to(torch::kCPU).contiguous();
         std::memcpy(scores, cpu_s.data_ptr<float>(), n * sizeof(float));
+        atlasNativeCounterRecord(dev.is_cuda() ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
         return GPU_SUCCESS;
     } catch (const std::runtime_error& e) {
         if (std::string(e.what()).find("out of memory") != std::string::npos) return GPU_ERR_CUDA_OOM;

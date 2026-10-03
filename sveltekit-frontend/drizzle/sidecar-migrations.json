@@ -2,6 +2,61 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261001_openspec_task_identity_history_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_retrieval_v1.sql",
+      "status": "design_unapplied",
+      "reason": "EVF-09 retrieval companion: metadata indexes, task trigram search, and evidence-content FTS alongside the canonical semantic_768 HNSW lane. No rows are seeded or projected; requires ledger readback, embedding artifact receipt, and explicit authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v2.sql",
+      "status": "design_unapplied",
+      "reason": "Additive EVF-02 through EVF-06 companion: task predicates, assertion rows, supersession declarations, explicit task_evidence_binding read view, and fail-closed current-state proof derivation. No rows are seeded or applied.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
+      "file": "manual/20261001_openspec_evidence_fabric_v1.sql",
+      "status": "design_unapplied",
+      "reason": "Additive PostgreSQL 18 evidence registry and derived proof-state view for OpenSpec claims. No rows are seeded; application requires schema-owner review, read-only dry-run validation, and explicit operator authorization.",
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-openspec-evidence-fabric-v1.mjs --check-only"
+    },
+    {
+      "file": "manual/20260925_codebase_chunk_summary_text_v1.sql",
+      "status": "applied",
+      "reason": "Added nullable summary_text to codebase_chunk_index; the legacy summary column remains untouched because Drizzle maps it as signature. Applied transactionally on PostgreSQL 18.4 with zero rows populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 readback: summary_text is nullable text, no default, 0 populated rows."
+    },
+    {
+      "file": "manual/20260925_codebase_chunk_summary_provenance_v1.sql",
+      "status": "applied",
+      "reason": "Operator-selected additive nullable summary-provenance JSONB envelope on codebase_chunk_index. Applied transactionally to PostgreSQL 18.4; no summary rows or metadata values were populated.",
+      "appliedBy": "operator-requested-run",
+      "appliedAt": "2026-09-25",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL 18.4 information_schema and row-null census; summary_provenance is nullable JSONB and populated=0."
+    },
+    {
+      "file": "manual/20260916_workspace_event_head_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Additive append-only workspace event, participant, and head tables for incremental Graphify. Unapplied until migration-owner review, disposable readback canary, and explicit authorization.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-workspace-event-head-schema-v1.mjs"
+    },
+    {
       "file": "manual/20260909_router_feature_revision_indexes.sql",
       "status": "applied",
       "reason": "Aligns the active observation-feature owner with nullable text workspace revisions and adds bounded router lookup indexes. No row backfill or feature-matrix table is created.",
@@ -573,6 +628,15 @@
       "appliedAt": "2026-09-09",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT tgname FROM pg_trigger WHERE tgrelid='public.graphify_execution_file_membership_v2'::regclass AND NOT tgisinternal ORDER BY tgname;\""
+    },
+    {
+      "file": "manual/20260904_external_doc_intelligence_v1.sql",
+      "status": "applied",
+      "reason": "Canonical Postgres owner for external documentation pages/chunks (parent-atlas-versioned-doc-intelligence DOC-06/DOC-06b). Version-qualified identity (DocCoordinateV1), GIN tsvector + pgvector HNSW indexes expressed here because drizzle-kit cannot generate USING gin(...)/USING hnsw. No matching Drizzle TypeScript table definitions exist yet -- the app's read model (doc-intelligence-read-model.ts) queries these tables via an injected raw pg.Pool, not through Drizzle. Registered here (2026-09-27, EMB-PROV-01/docs-corpus follow-up) purely to close the audit gap this file exists to prevent -- no schema, data, or migration change made.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-09-04",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM atlas_external_doc_pages; SELECT count(*) FROM atlas_external_doc_chunks;\""
     }
   ]
 }

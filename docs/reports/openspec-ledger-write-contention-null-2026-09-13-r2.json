@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.openspec.ledger-write-contention-null.v1",
+  "generatedAt": "2026-09-13T00:00:00.000Z",
+  "result": null,
+  "writePerformed": false,
+  "target": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "attemptedUpdate": "OPENSPEC-PORTFOLIO-READINESS-RECHECK-2026-09-13-R2",
+  "reason": "Concurrent ledger edit detected; update intentionally not forced.",
+  "nextAction": "Retry after the concurrent edit is quiescent.",
+  "destructiveOperations": false
+}

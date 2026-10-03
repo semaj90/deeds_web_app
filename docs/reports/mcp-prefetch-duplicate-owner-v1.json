@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.mcp-prefetch-duplicate-owner.v1",
+  "generatedAt": "2026-09-21T02:07:57.913Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "toolName": "context.prefetch_feature_context",
+  "registrations": [
+    {
+      "file": "sveltekit-frontend/src/mcp/new_tools.ts",
+      "line": 123,
+      "registrationMode": "registerNewTools(server, ...) imported by trace-mcp-server",
+      "inputShape": [
+        "path?",
+        "query?",
+        "limit",
+        "activityLimit",
+        "includeCommunity",
+        "includeNotecards",
+        "includeAgentsMd"
+      ],
+      "implementation": "buildFeaturePrefetchContext + dispatcherMiddleware",
+      "classification": "CURRENT_SHARED_OWNER_CANDIDATE"
+    },
+    {
+      "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "line": 7791,
+      "registrationMode": "inline registerTool in the same server module",
+      "inputShape": [
+        "query",
+        "file_path?",
+        "top_k",
+        "include_kb",
+        "include_karpathy"
+      ],
+      "implementation": "inline TRACE/KAG + KB + Karpathy bridge",
+      "classification": "LEGACY_DUPLICATE_OWNER_CANDIDATE"
+    }
+  ],
+  "reachability": {
+    "traceServerImportsNewTools": true,
+    "traceServerCallsNewTools": true,
+    "sameRegistryRisk": true,
+    "duplicateNames": 1
+  },
+  "decision": {
+    "canonicalCandidate": "new_tools.ts",
+    "legacyCandidate": "trace-mcp-server.ts inline bridge",
+    "action": "CLASSIFIED_NO_CODE_CHANGE",
+    "rationale": [
+      "Both registrations are reachable from trace-mcp-server.ts.",
+      "The new_tools implementation uses the shared dispatcher and typed feature-prefetch helper.",
+      "The inline TRACE bridge has a different input contract and directly fans out to legacy services.",
+      "Removal or aliasing requires a separate compatibility/readback test and is not performed by this audit."
+    ]
+  },
+  "nextGate": "MCP_PREFETCH_OWNER_RECONCILED"
+}

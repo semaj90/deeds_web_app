@@ -1,0 +1,897 @@
+{
+  "schema": "atlas.bitfrost-runtime-writer-classification.v1",
+  "generatedAt": "2026-09-20T23:35:10.467Z",
+  "inputReport": "docs/reports/bitfrost-runtime-writer-review-v1.json",
+  "inputSemanticChecksum": "sha256:c85180f81b516c4ace2fc18b7d0f987c59ed3a8be2d08802bafd01bf3ec080cf",
+  "policy": {
+    "readOnly": true,
+    "advisoryOnly": true,
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false,
+    "noAutomaticRepointing": true
+  },
+  "summary": {
+    "files": 78,
+    "byClassification": {
+      "RESIDENCY_SPECIALIZED": 29,
+      "ROUTE_OR_ADAPTER": 11,
+      "TEST_OR_FIXTURE": 9,
+      "UNKNOWN_REVIEW": 29
+    }
+  },
+  "classifications": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/ace-packet-store.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/centroid-compression.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/code-intel-service.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/feature-context-cache.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/features/som-clustering.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/llm-context-cache.test.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": false,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/ontology-tuple-enricher.spec.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/phase-e-enrichment-bridge.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/rg-cluster-pivot.ts",
+      "occurrences": 3,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/self-prompt.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/som-packet-store.ts",
+      "occurrences": 8,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ace/stage-a0-routing.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/acp/ace-packet-swap.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "bitfrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/agent/tools/analyze-imports.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/ace-builder.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/ace-prompt-preflight.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/bifrost-cache-manager.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "bifrost:",
+        "bitfrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/code-intel-service.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/engram-memory.ts",
+      "occurrences": 11,
+      "prefixes": [
+        "ace:",
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/feature-builder.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/ai/feature-metadata.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/analytics/ldr-ace-bridge.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "bifrost:",
+        "bitfrost:"
+      ],
+      "activeCandidate": false,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/context-chunk-synthesizer.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/context-for-file.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/feature-context-matrix.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/graph/graph-feature-snapshot.spec.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/prompt-mapper.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/rg-search-matrix.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/rlm/bitfrost-policy.spec.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "bifrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/rlm/rlm-runtime.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache-keys.ts",
+      "occurrences": 5,
+      "prefixes": [
+        "ace:",
+        "bifrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/ace-context-pack-cache.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/packet-bitmap.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/redis-cache-aggressive.ts",
+      "occurrences": 12,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/rpc-cache.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/semantic-cache.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:",
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/cache/topo-candidate-cache.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:",
+        "bifrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "occurrences": 11,
+      "prefixes": [
+        "ace:",
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/intent-synthesis-reward.ts",
+      "occurrences": 5,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/ai/ace/telemetry-compressor.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/features/ai/cache/ace-context-cache-metrics.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/generation/feature-label-extractor.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/generation/packet-summary-pipeline.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:",
+        "bifrost:",
+        "bitfrost:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/graph/som-topology-pipeline.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/kb/wiki-logic.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/labels/normalize-labels.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/memory/claude-mem-ingest.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/queue/artifact-materialization-verification.spec.ts",
+      "occurrences": 3,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/bounded-resolution.spec.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/hypergraph-routing-service.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/subgraph-seed-neighborhood.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/rg-atlas/karpathy-blend.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/rg-atlas/kmeans-cluster.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/rg-atlas/run.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/search/engram-bigram.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/error-analysis/ExperienceRecorder.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/services/error-analysis/GRPOPolicy.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "UNKNOWN_REVIEW",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/tensor/tensor-analysis-cache.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "RESIDENCY_SPECIALIZED",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/token-map/token-map-service.test.ts",
+      "occurrences": 2,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": false,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/workers/identity-worker.spec.ts",
+      "occurrences": 3,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "TEST_OR_FIXTURE",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "occurrences": 3,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/admin/atlas/cache/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/admin/atlas/query/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+      "occurrences": 3,
+      "prefixes": [
+        "bitfrost:",
+        "gpu:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/cache/set/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/codebase-index/orchestrate/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/codebase/index/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/graph/som-topology/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "ace:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/hypergraph/lookup/+server.ts",
+      "occurrences": 1,
+      "prefixes": [
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    },
+    {
+      "file": "sveltekit-frontend/src/routes/api/semantic-contracts/predictions/promote/+server.ts",
+      "occurrences": 4,
+      "prefixes": [
+        "ace:",
+        "bifrost:",
+        "centroid:"
+      ],
+      "activeCandidate": true,
+      "classification": "ROUTE_OR_ADAPTER",
+      "authorityEffect": "NAVIGATION_ONLY",
+      "automaticRepointing": false
+    }
+  ],
+  "nextGate": "MANUAL_REVIEW_RUNTIME_CACHE_WRITER_CLASSIFICATIONS",
+  "semanticChecksum": "sha256:368c7f2cd8c16b95f30f262adc5badd801c7182724ca1df3237b2da96cd48b9a"
+}

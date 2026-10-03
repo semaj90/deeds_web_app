@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.domain-classifier-eval.v1",
+  "producerRevision": "atlas-domain-classifier-eval-v1",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "rowsConsidered": 142,
+  "goldRows": 0,
+  "revisionQualifiedOnly": false,
+  "warnings": [
+    "No row has a human reviewedGroup; accuracy is NOT computable. Weak-label agreement below is a diagnostic only."
+  ],
+  "status": "NO_GOLD_LABELS",
+  "weakLabelAgreementDiagnostic": {
+    "rows": 142,
+    "agreement": 0.15492957746478872,
+    "meaning": "NOT accuracy: the weak label shares lineage with the classifier under test."
+  },
+  "inputChecksum": "e5b4a91d236c33e593287225486db453e6f965e84e40bbbcb1b41e7ea6c6a1a4"
+}

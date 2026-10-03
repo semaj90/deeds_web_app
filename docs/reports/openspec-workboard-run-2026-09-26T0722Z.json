@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T07:22:03.474Z",
+  "status": "SNAPSHOT_ONLY",
+  "pivot": "Keep July summaries and vectors HINT-only; use exact CPU for the 29,219-row summary hint lane, defer TurboVec to scale or memory pressure, and do not add a summary-cosine SIMT/cuTile kernel. Prioritize exact source identity/revision joins before canonical promotion.",
+  "workboard": {
+    "snapshotPath": ".tmp/codex-openspec-live-20260926T0735Z/workboard-v1.json",
+    "programPath": ".tmp/codex-openspec-live-20260926T0735Z/implementation-program-v1.json",
+    "controllerPath": ".tmp/codex-openspec-live-20260926T0735Z/controller-output/openspec-execution-controller-v1.json",
+    "changeCount": 88,
+    "taskCount": 9569,
+    "openTaskCount": 3243,
+    "programCompletedTaskCount": 6326,
+    "accountedOpenTasks": 3243,
+    "duplicateAssignments": 0,
+    "missingAssignments": 0,
+    "selectedTasks": 0,
+    "inventedDependencies": 0,
+    "leavesWithoutDeclaredDependencies": 3240,
+    "programMappingReviewChangeCount": 73,
+    "ambiguousProgramMappingChangeCount": 7
+  },
+  "implemented": [
+    {
+      "path": "scripts/atlas/run-summary-census-fanout-v1.mjs",
+      "sha256": "sha256:0346e36efad7acb7c3006789d99c53e557b56af621711df8776e8ee1850a70a0",
+      "result": "Artifact-only concurrent shard fanout; validates sealed zero-write manifest, row schemas/trust states, shard digests, ordered root digest and ordinal continuity."
+    },
+    {
+      "path": ".tmp/atlas/summary-fanout-replay-v1/20260926T0725Z-100.json",
+      "sha256": "sha256:a130da518c0820d29de2436d84eab0d4e19eee7da0a354d85ababe9867e49661",
+      "result": "FANOUT_CONSERVED: 40,306/40,306 rows, 9/9 shards, 8 workers, zero rejects, ordered input root verified, ordinal continuity true."
+    }
+  ],
+  "fanoutProgressReceipts": [
+    { "path": ".tmp/atlas/summary-fanout-replay-v1/20260926T0722Z-0.json", "percent": 0, "rowsRead": 0, "expectedRows": 40306, "rejected": 0, "conservation": false },
+    { "path": ".tmp/atlas/summary-fanout-replay-v1/20260926T0722Z-50.json", "percent": 50, "rowsRead": 25000, "expectedRows": 40306, "rejected": 0, "conservation": false },
+    { "path": ".tmp/atlas/summary-fanout-replay-v1/20260926T0725Z-100.json", "percent": 100, "rowsRead": 40306, "expectedRows": 40306, "rejected": 0, "conservation": true }
+  ],
+  "lineageBlocker": {
+    "receiptPath": ".tmp/atlas/current-packet-chunk-lineage-bridge-v1/bridge-current-authority-20260926-r2.json",
+    "sha256": "sha256:86df9ce33ca6985004ec6ac7da076bb9788fd356209e9d8a8f348661e396cfb8",
+    "status": "CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_PARTIAL",
+    "selectedMembershipRows": 25542,
+    "repositories": 7,
+    "exactCurrentSourceBindingMembers": 0,
+    "exactProvenLineageMembers": 577,
+    "exactCurrentPacketChunkBridgeMembers": 0,
+    "classification": {
+      "CURRENT_SOURCE_BINDING_MISSING": 1086,
+      "CURRENT_SOURCE_BINDING_REPOSITORY_MISMATCH": 24456
+    },
+    "writesPerformed": false,
+    "interpretation": "No repository-name/path alias join was accepted as canonical identity; the mapping/admission owner is still unresolved."
+  },
+  "openNext": [
+    "Trace the authoritative namespace/binding owner for repo:root versus deeds-web-app, then rerun exact packet/chunk lineage bridge; do not mint a mapping or join by path/name/count.",
+    "SUMMARY-FANOUT-02: verified checkpoint/resume and transient-only retry proof.",
+    "SUMMARY-NLP-01: bounded filtered :8095 proposals with schema, digest, grounded-span and conservation checks.",
+    "Labeled retrieval evaluation and structural identity binding remain separate gates.",
+    "Canonical 12-row summary admission and 768-vector DB writes remain separately authorization-gated."
+  ],
+  "validation": {
+    "strictOpenSpecCandidateFeatureMatrix": "PASS",
+    "strictOpenSpecRetrievalLineageDagConvergence": "PASS",
+    "fanoutScriptSyntax": "PASS",
+    "persistentDatabaseProjectionQueueModelWrites": 0,
+    "containerRebuild": false
+  },
+  "notes": [
+    "The execution controller's proven count (6,328) is a readiness classification and differs by two from the program's ledger completion count (6,326); it is not treated as task completion authority.",
+    "The program remains advisory: 3,240 open leaves lack declared dependencies; none were invented and no tasks were selected."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "parent-atlas.analysis-pass-current-reconciliation-plan.v1",
+  "gate": "ANALYSIS-PASS-CURRENT-RECONCILIATION",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "ddlExecuted": false,
+  "decisionRequired": "Admit both legacy success and current succeeded status generations, or explicitly authorize a status migration before view replacement.",
+  "proposedViewPolicy": {
+    "statusPredicate": "status IN ('success', 'succeeded')",
+    "orderBy": "packet_key, source_revision, pass_type, pass_revision, input_hash, created_at DESC, id DESC",
+    "reason": "Preserve readable legacy history and current typed-writer rows while making duplicate selection deterministic."
+  },
+  "live": {
+    "statusCounts": [
+      {
+        "status": "succeeded",
+        "count": 27
+      },
+      {
+        "status": "success",
+        "count": 11076
+      }
+    ],
+    "deployedViewDefinition": " SELECT DISTINCT ON (packet_key, source_revision, pass_type, pass_revision, input_hash) id,\n    packet_key,\n    source_revision,\n    pass_type,\n    pass_revision,\n    input_hash,\n    status,\n    output,\n    scores,\n    provenance,\n    model_name,\n    prompt_hash,\n    temperature,\n    created_at,\n    updated_at\n   FROM analysis_pass_results\n  WHERE status = 'success'::text\n  ORDER BY packet_key, source_revision, pass_type, pass_revision, input_hash, created_at DESC;",
+    "legacySuccessRows": 11076,
+    "currentSucceededRows": 27
+  },
+  "status": "RECONCILIATION_PLAN_READY_OPERATOR_DECISION_REQUIRED"
+}

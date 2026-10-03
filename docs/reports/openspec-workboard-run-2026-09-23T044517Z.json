@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T04:45:17Z",
+  "objective": "Continue evidence-backed OpenSpec execution, preserve full task scope, defer container rebuilds until other safe work is exhausted.",
+  "pivot": {
+    "fromChange": "parent-atlas-adaptive-dag-fabric",
+    "fromProgress": "12/13",
+    "fromBlocker": "NATS-EVENT-01 requires operator scope authorization and a deployment/runtime owner; adding a second broker is not a local quick hit.",
+    "toChange": "parent-atlas-nlp-sidecar-feature-compiler",
+    "toTask": "SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-FULL-01 scope reconciliation",
+    "reason": "The remaining adaptive-DAG task is operator/runtime-gated. The sidecar ledger contained an apparent duplicate open task whose later completion proved only a 300-file sample, so the broader full-corpus requirement needed accurate separation rather than optimistic closure."
+  },
+  "selectedChange": {
+    "name": "parent-atlas-nlp-sidecar-feature-compiler",
+    "progressBefore": "83/142",
+    "progressAfter": "84/142",
+    "completedThisRun": [
+      "3.1 NLP linguistic input scoping: focused tests 4/4 and live /analyze verified the bounded comments/docstrings/query input scope; no source identity promotion was inferred."
+    ],
+    "reconciledThisRun": [
+      "Renamed the open sidecar-coverage item to SYMBOL-KIND-LIVE-SIDECAR-COVERAGE-FULL-01 and scoped it explicitly to the full current-source corpus.",
+      "Preserved the existing 300-file live sidecar result as bounded proof; did not claim it represents the full ~25k-source corpus.",
+      "Refreshed 3.2 status: en_core_web_sm is now installed/loaded, but observed POS labels are not reliable enough for promotion and dependency edges are absent from the response schema."
+    ],
+    "remainingSelectedLane": [
+      "Full-corpus live sidecar coverage requires a frozen, checksummed manifest and bounded diagnostics; not run in this tranche.",
+      "Docker dependency build reachability remains open because the auditor labels Python manifest scope using a directory heuristic, not Docker COPY/build-context reachability or transitive lock resolution."
+    ]
+  },
+  "evidence": {
+    "boundedSidecarReceipt": "sveltekit-frontend/docs/reports/symbol-kind-live-sidecar-coverage-v1.json",
+    "boundedSidecarProducer": "sveltekit-frontend/scripts/atlas/symbol-kind-live-sidecar-coverage-v1.mjs",
+    "dockerAuditReceipt": "docs/reports/docker-reproducibility-v1.json",
+    "dockerAuditProducer": "scripts/atlas/audit-docker-reproducibility-v1.mjs",
+    "dockerAuditScopeFinding": "pythonManifests.scopeEvidence=DIRECTORY_HEURISTIC_ONLY_BUILD_REACHABILITY_NOT_PROVEN; 53 Dockerfiles, 84 Python manifests, 7 directory-classified container-scoped manifests, 0 loose within that heuristic subset."
+  },
+  "validation": {
+    "boundedSidecarReceiptAssertions": "PASS: 300 requested/300 successful/0 failed; 8,832 chunks; 1,769 raw UNKNOWN, all classified as structural noise; 0 genuine unexplained; canonicalAuthority=false; writesPerformed=false.",
+    "nlpLinguisticScopeTests": "PASS: python/test_miniforge_nlp_sidecar_linguistic_scope.py, 4/4.",
+    "liveNlpProbe": "Health and /pos confirm model installed/loaded and non-empty output; fixture quality has errors (red tagged PROPN, token tagged ADJ), so 3.2 remains open. Live /analyze shows comments/docstrings linguistic input scope. No DB/cache/projection writes.",
+    "openspecStrict": "PASS: parent-atlas-nlp-sidecar-feature-compiler",
+    "scopedDiffCheck": "PASS",
+    "containerRebuild": "NOT RUN"
+  },
+  "promotion": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "mutations": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "rabbitmq": "none",
+    "containers": "none",
+    "filesystem": [
+      "Reconciled one OpenSpec task scope without checking it complete.",
+      "Added this timestamped workboard pivot receipt."
+    ]
+  },
+  "nextGate": "SELECT_NEXT_INDEPENDENT_ACTIONABLE_OPENSPEC_TASK; do not repeat blocked source-authority or operator-gated work"
+}

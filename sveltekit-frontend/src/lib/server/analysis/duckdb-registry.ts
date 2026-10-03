@@ -1,1 +1,1 @@
-export * from '../../../../packages/atlas-duckdb/src/index.js';
+export * from '../../../../../packages/atlas-duckdb/src/index.js';

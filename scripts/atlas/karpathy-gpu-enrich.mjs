@@ -82,6 +82,12 @@ const HIT_LOG_HOURS = parseInt(
   args.find(a => a.startsWith('--hours='))?.split('=')[1] ?? '24', 10) || 24;
 const limitIdx = args.indexOf('--limit');
 const LIMIT = limitIdx !== -1 ? parseInt(args[limitIdx + 1], 10) : 200;
+const WORKSPACE_REVISION = args.find(a => a.startsWith('--workspace-revision='))?.split('=')[1]
+  ?? process.env.ATLAS_WORKSPACE_REVISION
+  ?? null;
+const SOURCE_COHORT_CHECKSUM = args.find(a => a.startsWith('--source-cohort-checksum='))?.split('=')[1]
+  ?? process.env.ATLAS_SOURCE_COHORT_CHECKSUM
+  ?? null;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
@@ -197,6 +203,8 @@ const log_state = {
   dry: DRY,
   fp16: ENABLE_FP16 ? 'auto' : 'disabled(--fp32)',
   compareFp32: COMPARE_FP32,
+  workspaceRevision: WORKSPACE_REVISION,
+  sourceCohortChecksum: SOURCE_COHORT_CHECKSUM,
   candidates: 0,
   candidateSource: '',
   embedded: 0,
@@ -610,6 +618,15 @@ function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
 // ── Logic ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (!DRY) {
+    if (!/^sha256:[0-9a-f]{64}$/i.test(WORKSPACE_REVISION ?? '')) {
+      throw new Error('KARPATHY_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED');
+    }
+    if (!/^[0-9a-f]{64}$/i.test(SOURCE_COHORT_CHECKSUM ?? '')) {
+      throw new Error('KARPATHY_APPLY_SOURCE_COHORT_CHECKSUM_REQUIRED');
+    }
+  }
+
   // Self-test
   const variants = [
     'src/lib/server/db/connections.ts',
@@ -728,6 +745,14 @@ async function main() {
   console.log('');
 
   if (DRY_RUN_CANDIDATES) {
+    // Real, deterministic checksum of the exact candidate set this run fetched — never a
+    // fabricated value. A caller (e.g. run-karpathy-gpu-admitted-v1.mjs) parses this single
+    // machine-readable line to supply --source-cohort-checksum to a subsequent apply run of
+    // this same script, using the same --limit/--dirty/--source flags so the candidate fetch
+    // is reproducible between the two invocations.
+    const sortedKeys = candidates.map((c) => c.stableKey).sort();
+    const sourceCohortChecksum = createHash('sha256').update(JSON.stringify(sortedKeys)).digest('hex');
+    console.log(`KARPATHY_COHORT_JSON:${JSON.stringify({ sourceCohortChecksum, candidateCount: candidates.length, limit: LIMIT, mode: DIRTY_ONLY ? 'dirty' : 'topN' })}`);
     console.log('[karpathy] --dry-run-candidates: stopping before GPU pass.');
     return;
   }

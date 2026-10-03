@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -14,6 +15,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 PLAN = Path(os.environ.get("ATLAS_STRUCTURAL_EDGE_PLAN", ROOT / "docs" / "reports" / "current-structural-edge-artifact-plan-v1.json"))
 OUT = Path(os.environ.get("ATLAS_STRUCTURAL_GRAPH_ARTIFACT_OUT", ROOT / "sveltekit-frontend" / "docs" / "reports" / "current-structural-graph-artifact-v1"))
+sys.path.insert(0, str(ROOT / "python"))
+from atlas_graph_runtime.graph_projection_manifest import graph_ordinal_map_checksum_v1
 
 
 def digest(value: str) -> str:
@@ -62,17 +65,27 @@ def main() -> None:
     node_checksum = f"sha256:{digest(node_text)}"
     edge_checksum = f"sha256:{digest(edge_text)}"
     graph_revision = f"sha256:{digest('|'.join([plan['workspaceRevision'], node_checksum, edge_checksum]))}"
+    graph_ordinal_rows = [
+        {"graphOrdinal": row["gpu_node_id"], "graphNodeKey": row["graph_node_key"]}
+        for row in nodes
+    ]
+    graph_ordinal_checksum = graph_ordinal_map_checksum_v1(
+        graph_revision,
+        plan["workspaceRevision"],
+        graph_ordinal_rows,
+    )
 
     OUT.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(nodes).to_parquet(OUT / "nodes.parquet", index=False)
     pd.DataFrame(edges).to_parquet(OUT / "edges.parquet", index=False)
     (OUT / "nodes.json").write_text(json.dumps({"schema": "atlas.graph-node-table-v1", "rows": nodes}, indent=2) + "\n", encoding="utf-8")
     manifest = {
-        "schema": "atlas.current-structural-graph-artifact-v1",
+        "schema": "atlas.graph-projection-artifact.v1",
         "mode": "NON_PRODUCTION_DERIVED_ARTIFACT",
         "workspaceRevision": plan["workspaceRevision"],
         "candidateSnapshotRevision": plan.get("candidateSnapshotRevision"),
-        "ordinalMapChecksum": plan.get("ordinalMapChecksum"),
+        "candidateOrdinalMapChecksum": plan.get("ordinalMapChecksum"),
+        "graphOrdinalMapChecksum": graph_ordinal_checksum,
         "graphRevision": graph_revision,
         "projectionRevision": f"sha256:{digest('|'.join([graph_revision, 'projection-v1']))}",
         "producerRevision": "build-current-structural-graph-artifact-v1",

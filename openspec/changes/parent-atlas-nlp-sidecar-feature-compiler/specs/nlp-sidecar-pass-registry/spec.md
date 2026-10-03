@@ -36,8 +36,10 @@ callers already depend on.
   returning the existing `NlpAnalyzeResponse` shape unchanged
 
 ### Requirement: Linguistic passes run only over natural-language text
-The system SHALL run spaCy-backed linguistic analysis (POS tagging,
-lemmatization, dependency parsing, noun chunks, entity extraction) only over
+The system SHALL run the linguistic assertion lane (spaCy reference executor;
+admitted PyTorch POS challengers are allowed under the same contract) only over
+natural-language text, including POS tagging, lemmatization, dependency
+parsing, noun chunks, and entity extraction, only over
 comments, docstrings, error messages, README/spec text, and query text, and
 SHALL NOT run it over source code identifiers or tokens.
 

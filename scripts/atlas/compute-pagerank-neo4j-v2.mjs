@@ -8,17 +8,14 @@
  */
 
 import crypto from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import neo4j from 'neo4j-driver';
 import { parse as parseYaml } from 'yaml';
+import { validateFixtureEdges, writeFixtureEdgesBatched, writeFixtureNodesBatched } from './neo4j-fixture-batch-writes.mjs';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
-const frozenFixturePath = resolve(ROOT, 'graphify/frozen-graph-snapshot-v2.json');
-const defaultFixturePath = existsSync(frozenFixturePath)
-  ? frozenFixturePath
-  : resolve(ROOT, 'sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json');
+const defaultFixturePath = resolve(ROOT, 'sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json');
 const fixturePath = process.argv.includes('--fixture')
   ? resolve(process.argv[process.argv.indexOf('--fixture') + 1])
   : defaultFixturePath;
@@ -73,32 +70,9 @@ async function main() {
   let projectionCreated = false;
 
   try {
-    for (const node of nodes) {
-      await session.run(
-        `CREATE (:AtlasContextNode {
-          snapshot_id: $snapshotId,
-          fixture_run_id: $fixtureRunId,
-          node_key: $nodeKey,
-          node_type: $nodeType,
-          packet_key: $packetKey,
-          tree_node_id: $treeNodeId,
-          source_ref: $sourceRef
-        })`,
-        { snapshotId, fixtureRunId, nodeKey: node.nodeKey, nodeType: node.nodeType, packetKey: node.packetKey, treeNodeId: node.treeNodeId, sourceRef: node.sourceRef },
-      );
-    }
-
-    for (const edge of edges) {
-      if (!['CONTAINS', 'MATERIALIZES', 'IMPORTS', 'CALLS', 'REFERENCES', 'DEPENDS_ON', 'IMPLEMENTS', 'USES_CONCEPT', 'PARTICIPATES_IN'].includes(edge.edgeType)) {
-        throw new Error(`Unsupported fixture relationship type: ${edge.edgeType}`);
-      }
-      await session.run(
-        `MATCH (source:AtlasContextNode {snapshot_id: $snapshotId, fixture_run_id: $fixtureRunId, node_key: $sourceNodeKey})
-         MATCH (target:AtlasContextNode {snapshot_id: $snapshotId, fixture_run_id: $fixtureRunId, node_key: $targetNodeKey})
-         CREATE (source)-[:${edge.edgeType} {edge_key: $edgeKey, weight: $weight, confidence: $confidence}]->(target)`,
-        { snapshotId, fixtureRunId, sourceNodeKey: edge.sourceNodeKey, targetNodeKey: edge.targetNodeKey, edgeKey: edge.edgeKey, weight: edge.weight, confidence: edge.confidence },
-      );
-    }
+    validateFixtureEdges(edges);
+    await writeFixtureNodesBatched(session, nodes, { snapshotId, fixtureRunId });
+    await writeFixtureEdgesBatched(session, edges, { snapshotId, fixtureRunId });
 
     const nodeQuery = `MATCH (n:AtlasContextNode)
       WHERE n.snapshot_id = $snapshotId AND n.fixture_run_id = $fixtureRunId

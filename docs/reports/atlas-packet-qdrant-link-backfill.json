@@ -1,16 +1,16 @@
 {
-  "status": "WARN",
+  "status": "PASS",
   "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-09-08T19:02:45.306Z",
-  "packets_loaded": 55353,
+  "started_at": "2026-09-29T01:32:24.902Z",
+  "packets_loaded": 55233,
   "all_packets_loaded": 61718,
-  "already_linked_seen": 5000,
-  "no_postgres_join_seen": 0,
-  "qdrant_points_scanned": 5000,
-  "matches": 0,
-  "updated": 0,
-  "skipped_duplicate_packet": 0,
+  "already_linked_seen": 107865,
+  "no_postgres_join_seen": 52269,
+  "qdrant_points_scanned": 328348,
+  "matches": 16783,
+  "updated": 16783,
+  "skipped_duplicate_packet": 151431,
   "already_linked_samples": [
     {
       "pointId": 1,
@@ -63,11 +63,191 @@
       "sourceRef": "src/hooks.server.ts"
     }
   ],
-  "no_postgres_join_samples": [],
-  "unmatched_samples": [],
-  "matched_samples": [],
-  "errors": [
-    "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
+  "no_postgres_join_samples": [
+    {
+      "pointId": "000a3323-a67a-4ca9-a6fc-bed05d9513dc",
+      "qdrantPayloadKeys": [
+        "000a3323-a67a-4ca9-a6fc-bed05d9513dc",
+        "000a3323-a67a-4ca9-a6fc-bed05d9513dc",
+        "scripts/atlas/neo4j-gds-pagerank-fixed.mjs",
+        "scripts/atlas/neo4j-gds-pagerank-fixed.mjs"
+      ],
+      "relativePath": null,
+      "sourceRef": "scripts/atlas/neo4j-gds-pagerank-fixed.mjs"
+    },
+    {
+      "pointId": "000cdcf2-db09-4bb2-a2c0-b315b701dea9",
+      "qdrantPayloadKeys": [
+        "000cdcf2-db09-4bb2-a2c0-b315b701dea9",
+        "000cdcf2-db09-4bb2-a2c0-b315b701dea9",
+        "src/core/parameter-artifact-v1.spec.ts",
+        "src/core/parameter-artifact-v1.spec.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "packages/parent-atlas/src/core/parameter-artifact-v1.spec.ts"
+    },
+    {
+      "pointId": "00135cf1-8ed4-4d93-bc07-a4e0fd5537cd",
+      "qdrantPayloadKeys": [
+        "00135cf1-8ed4-4d93-bc07-a4e0fd5537cd",
+        "00135cf1-8ed4-4d93-bc07-a4e0fd5537cd",
+        "scripts/launchers/llama_server/README.md",
+        "scripts/launchers/llama_server/README.md"
+      ],
+      "relativePath": null,
+      "sourceRef": "scripts/launchers/llama_server/README.md"
+    },
+    {
+      "pointId": "0013b17e-f672-46ef-8e16-0673fc3c7ca1",
+      "qdrantPayloadKeys": [
+        "0013b17e-f672-46ef-8e16-0673fc3c7ca1",
+        "0013b17e-f672-46ef-8e16-0673fc3c7ca1",
+        "src/lib/server/atlas/features/manifold4-orientation-v1.ts",
+        "src/lib/server/atlas/features/manifold4-orientation-v1.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/features/manifold4-orientation-v1.ts"
+    },
+    {
+      "pointId": "001606c8-e0c4-49cb-a395-ca1cbbbee161",
+      "qdrantPayloadKeys": [
+        "001606c8-e0c4-49cb-a395-ca1cbbbee161",
+        "001606c8-e0c4-49cb-a395-ca1cbbbee161",
+        "drizzle/0111_phase111_evidence_ledgers.sql",
+        "drizzle/0111_phase111_evidence_ledgers.sql"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/drizzle/0111_phase111_evidence_ledgers.sql"
+    },
+    {
+      "pointId": "00180b67-7ba6-47ee-a075-e94db1792e6d",
+      "qdrantPayloadKeys": [
+        "00180b67-7ba6-47ee-a075-e94db1792e6d",
+        "00180b67-7ba6-47ee-a075-e94db1792e6d",
+        "src/core/lsp-semantic-observation.ts",
+        "src/core/lsp-semantic-observation.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "packages/parent-atlas/src/core/lsp-semantic-observation.ts"
+    },
+    {
+      "pointId": "001a95bb-d04f-471f-8a90-5e86bfd8368c",
+      "qdrantPayloadKeys": [
+        "001a95bb-d04f-471f-8a90-5e86bfd8368c",
+        "001a95bb-d04f-471f-8a90-5e86bfd8368c",
+        "src/lib/server/atlas/classification/structural-code-role-classifier-v1.ts",
+        "src/lib/server/atlas/classification/structural-code-role-classifier-v1.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/classification/structural-code-role-classifier-v1.ts"
+    },
+    {
+      "pointId": "001bb70b-8749-42ae-a1c7-c5216a667d8e",
+      "qdrantPayloadKeys": [
+        "001bb70b-8749-42ae-a1c7-c5216a667d8e",
+        "001bb70b-8749-42ae-a1c7-c5216a667d8e",
+        "src/lib/server/atlas/tensors/gpu-memory-observation-v1.spec.ts",
+        "src/lib/server/atlas/tensors/gpu-memory-observation-v1.spec.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/tensors/gpu-memory-observation-v1.spec.ts"
+    },
+    {
+      "pointId": "001da069-d92f-486a-b131-918b52aedb44",
+      "qdrantPayloadKeys": [
+        "001da069-d92f-486a-b131-918b52aedb44",
+        "001da069-d92f-486a-b131-918b52aedb44",
+        "src/lib/server/retrieval/go-retrieval-facade.ts",
+        "src/lib/server/retrieval/go-retrieval-facade.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-facade.ts"
+    },
+    {
+      "pointId": "001e4707-272e-475e-ae72-a2b0c31138c5",
+      "qdrantPayloadKeys": [
+        "001e4707-272e-475e-ae72-a2b0c31138c5",
+        "001e4707-272e-475e-ae72-a2b0c31138c5",
+        "src/lib/server/retrieval/repair-mrl-feature-producer-v1.ts",
+        "src/lib/server/retrieval/repair-mrl-feature-producer-v1.ts"
+      ],
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/repair-mrl-feature-producer-v1.ts"
+    }
   ],
-  "finished_at": "2026-09-08T19:03:17.603Z"
+  "unmatched_samples": [],
+  "matched_samples": [
+    {
+      "packetKey": "ace:packet:7c2c618045d0",
+      "sourceRef": "src/routes/(app)/demos/yorha/components/cases/CaseStats.svelte",
+      "pointId": 5006,
+      "joinKey": "ace:packet:7c2c618045d0",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:d58b42a5c209",
+      "sourceRef": "src/lib/types/sharedTypes.ts",
+      "pointId": 5012,
+      "joinKey": "ace:packet:d58b42a5c209",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:8866c9478344",
+      "sourceRef": "src/lib/server/db/AGENTS.md",
+      "pointId": 5018,
+      "joinKey": "ace:packet:8866c9478344",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:3ec24fbd8d63",
+      "sourceRef": "src/lib/server/retrieval/web-ingest.ts",
+      "pointId": 5026,
+      "joinKey": "ace:packet:3ec24fbd8d63",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:17a393039cf4",
+      "sourceRef": "src/lib/server/ai/linter-service.ts",
+      "pointId": 5029,
+      "joinKey": "src/lib/server/ai/linter-service.ts",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:8c5278996cf1",
+      "sourceRef": "src/lib/server/retrieval/citation-graph.ts",
+      "pointId": 5037,
+      "joinKey": "src/lib/server/retrieval/citation-graph.ts",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:356327d10270",
+      "sourceRef": "src/lib/webgpu/som-webgpu-cache.ts",
+      "pointId": 5039,
+      "joinKey": "ace:packet:356327d10270",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:fa756e93ee4b",
+      "sourceRef": "src/lib/components/evidence/EvidenceUploadResults.svelte",
+      "pointId": 5047,
+      "joinKey": "src/lib/components/evidence/EvidenceUploadResults.svelte",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:fed8b7be3c76",
+      "sourceRef": "src/lib/utils/buffer-conversion.ts",
+      "pointId": 5055,
+      "joinKey": "ace:packet:fed8b7be3c76",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:294df63fc670",
+      "sourceRef": "src/lib/server/ml/AGENTS.md",
+      "pointId": 5063,
+      "joinKey": "ace:packet:294df63fc670",
+      "vectorDim": 768
+    }
+  ],
+  "errors": [],
+  "finished_at": "2026-09-29T01:55:02.136Z"
 }

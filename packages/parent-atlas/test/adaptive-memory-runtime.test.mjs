@@ -2,12 +2,88 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  TRI_ENGRAM_V1,
+  triEngramV1Schema,
+  buildOrnithPrefixIdentityV1,
+  ornithPrefixIdentityV1Schema,
   testTimeMemoryObservationSchema,
   chooseAdaptiveMemoryDecision,
   lowBitRuntimePlanSchema,
 } from '../dist/core/adaptive-memory-runtime.js';
+import { adaptiveSemanticMemoryChecksum } from '../dist/core/adaptive-semantic-memory.js';
 
 const sha = 'b'.repeat(64);
+
+test('TriEngramV1 keeps canonical knowledge, derived projections, and ephemeral model state distinct', () => {
+  assert.equal(TRI_ENGRAM_V1.E1.owner, 'POSTGRES');
+  assert.equal(TRI_ENGRAM_V1.E1.canonicalAuthority, true);
+  assert.equal(TRI_ENGRAM_V1.E2.derived, true);
+  assert.equal(TRI_ENGRAM_V1.E2.canonicalAuthority, false);
+  assert.equal(TRI_ENGRAM_V1.E3.owner, 'LLAMA_SERVER');
+  assert.equal(TRI_ENGRAM_V1.E3.lifecycle, 'EPHEMERAL');
+  assert.equal(TRI_ENGRAM_V1.E3.canonicalAuthority, false);
+  assert.throws(() =>
+    triEngramV1Schema.parse({
+      ...TRI_ENGRAM_V1,
+      E3: { ...TRI_ENGRAM_V1.E3, canonicalAuthority: true },
+    })
+  );
+  assert.throws(() =>
+    triEngramV1Schema.parse({
+      ...TRI_ENGRAM_V1,
+      E3: { ...TRI_ENGRAM_V1.E3, lifecycle: 'PERSISTENT' },
+    })
+  );
+});
+
+test('Ornith prefix identity binds every prefix-defining revision without becoming authority', () => {
+  const material = {
+    modelRevision: 'ornith-r1',
+    chatTemplateRevision: 'template-r1',
+    toolSchemaRevision: 'tools-r1',
+    systemPromptRevision: 'prompt-r1',
+    contextManifestPrefixChecksum: sha,
+  };
+  const identity = buildOrnithPrefixIdentityV1(material);
+
+  assert.equal(identity.schema, 'atlas.ornith-prefix-identity.v1');
+  assert.equal(identity.prefixIdentityChecksum, adaptiveSemanticMemoryChecksum(material));
+  assert.equal(identity.canonicalAuthority, false);
+  assert.equal(
+    buildOrnithPrefixIdentityV1(material).prefixIdentityChecksum,
+    identity.prefixIdentityChecksum
+  );
+
+  for (const key of Object.keys(material)) {
+    const value =
+      key === 'contextManifestPrefixChecksum' ? 'c'.repeat(64) : `${material[key]}-changed`;
+    const changed = buildOrnithPrefixIdentityV1({ ...material, [key]: value });
+    assert.notEqual(
+      changed.prefixIdentityChecksum,
+      identity.prefixIdentityChecksum,
+      `${key} must change identity`
+    );
+  }
+});
+
+test('Ornith prefix identity rejects session telemetry and model recurrent state', () => {
+  const identity = buildOrnithPrefixIdentityV1({
+    modelRevision: 'ornith-r1',
+    chatTemplateRevision: 'template-r1',
+    toolSchemaRevision: 'tools-r1',
+    systemPromptRevision: 'prompt-r1',
+    contextManifestPrefixChecksum: sha,
+  });
+
+  assert.throws(() => ornithPrefixIdentityV1Schema.parse({ ...identity, sessionId: 'session:1' }));
+  assert.throws(() => ornithPrefixIdentityV1Schema.parse({ ...identity, cacheHit: true }));
+  assert.throws(() =>
+    ornithPrefixIdentityV1Schema.parse({ ...identity, recurrentState: 'opaque' })
+  );
+  assert.throws(() =>
+    ornithPrefixIdentityV1Schema.parse({ ...identity, canonicalAuthority: true })
+  );
+});
 
 test('high-surprise verified observation is only nominated for persistence', () => {
   const observation = testTimeMemoryObservationSchema.parse({

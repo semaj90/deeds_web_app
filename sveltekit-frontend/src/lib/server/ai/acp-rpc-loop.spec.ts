@@ -11,15 +11,16 @@ function toolCall(id: string, name: string, args: Record<string, unknown> = {}):
 }
 
 describe('executeToolCallsInParallel (parent-atlas-ace-bitfrost-cache-correctness T3, MCP tool-call parallelism)', () => {
-  it('runs tool calls concurrently, not serially: total time is close to the slowest call, not the sum', async () => {
+  it('runs known read-only mock tools concurrently, not serially', async () => {
     const delays = [40, 40, 40];
-    const calls = delays.map((_, index) => toolCall(`call-${index}`, `tool-${index}`));
+    const names = ['get_time', 'search_codebase', 'list_files'];
+    const calls = delays.map((_, index) => toolCall(`call-${index}`, names[index], { index }));
 
     const start = Date.now();
-    await executeToolCallsInParallel(calls, async (name) => {
-      const delay = delays[Number(name.split('-')[1])];
+    await executeToolCallsInParallel(calls, async (_name, args) => {
+      const delay = delays[Number(args.index)];
       await new Promise((resolve) => setTimeout(resolve, delay));
-      return JSON.stringify({ ok: true, name });
+      return JSON.stringify({ ok: true });
     });
     const elapsed = Date.now() - start;
 
@@ -31,13 +32,16 @@ describe('executeToolCallsInParallel (parent-atlas-ace-bitfrost-cache-correctnes
 
   it('returns results in the original tool_calls order even when the slowest call is first', async () => {
     const order: string[] = [];
-    const calls = [toolCall('call-a', 'slow'), toolCall('call-b', 'fast')];
+    const calls = [
+      toolCall('call-a', 'get_time', { speed: 'slow' }),
+      toolCall('call-b', 'list_files', { speed: 'fast' }),
+    ];
 
-    const results = await executeToolCallsInParallel(calls, async (name) => {
-      const delay = name === 'slow' ? 30 : 5;
+    const results = await executeToolCallsInParallel(calls, async (_name, args) => {
+      const delay = args.speed === 'slow' ? 30 : 5;
       await new Promise((resolve) => setTimeout(resolve, delay));
-      order.push(name); // records actual COMPLETION order
-      return JSON.stringify({ name });
+      order.push(String(args.speed)); // records actual COMPLETION order
+      return JSON.stringify({ speed: args.speed });
     });
 
     // Completion order is fast-then-slow (proves real concurrency happened)...

@@ -1,0 +1,2632 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "frozenManifestChecksum": "sha256:176b12b8da2dcb2138fe3f94b97ddfb7549efef3c1cff6dab5f2df4013bfb92a",
+  "shard": {
+    "shardId": "GRAPHIFY-BASELINE-176b12b8da2d-0001",
+    "manifestChecksum": "sha256:176b12b8da2dcb2138fe3f94b97ddfb7549efef3c1cff6dab5f2df4013bfb92a",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "extractorRevision": "sha256:36b6d85290c25edf1c569d305a67e32d89ca1e0595476041587bfdbd2d756bbc",
+    "offset": 0,
+    "maxFiles": 250,
+    "shardChecksum": "sha256:32a63e49fb102db6ece24ccb1d2625619c32a25cf60ad5ff9b85082d2091b629",
+    "mutationPolicy": "GRAPHIFY_STRUCTURAL_ONLY",
+    "queueStatus": "PLANNED_NOT_ENQUEUED"
+  },
+  "frozenMemberChecks": [
+    {
+      "fileId": "dbfbaba3-9ce8-4650-abb2-386bfbb9afa6",
+      "sourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+      "sourceRevision": "sha256:22254cd4d8386433faf42f4c447e559d248946d25f43bb8247f5d4bf8dacd8e2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "PROCESSED_WITH_SYMBOLS",
+      "readbackProven": true
+    },
+    {
+      "fileId": "42bc5d86-ba12-4817-b6fc-a81941568a2c",
+      "sourceRef": "sveltekit-frontend/src/app.d.ts",
+      "sourceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "PROCESSED_WITH_SYMBOLS",
+      "readbackProven": true
+    },
+    {
+      "fileId": "d42223ad-947b-457d-84eb-cb62b63585ec",
+      "sourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+      "sourceRevision": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "PROCESSED_WITH_SYMBOLS",
+      "readbackProven": true
+    },
+    {
+      "fileId": "fdbaaa71-0aa6-40e9-88e9-e332ebd79e5c",
+      "sourceRef": "sveltekit-frontend/src/custom-modules.d.ts",
+      "sourceRevision": "sha256:509d362578f5d6c2b8b9fe6bb4051edd87a394f34715d4b1593c67d269a6114f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": "WRITE_FAILED_ROLLED_BACK",
+      "readbackProven": false
+    },
+    {
+      "fileId": "3ae75645-28f2-4aa1-8d1f-38ad62a47eb8",
+      "sourceRef": "sveltekit-frontend/src/env.d.ts",
+      "sourceRevision": "sha256:e252a5d171ff186afba991315557ef87591c5da91730ceaa3dd9d06b9e0095fa",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7ba743b0-de06-495b-98c9-c00ea19e1aab",
+      "sourceRef": "sveltekit-frontend/src/global.d.ts",
+      "sourceRevision": "sha256:abb0cab28997a0a71eaeb0376d39948e608c81beec41727894154b8830b84cba",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1c3e18de-f327-455c-a666-0ffc6626b818",
+      "sourceRef": "sveltekit-frontend/src/hooks.client.ts",
+      "sourceRevision": "sha256:397c043fcf3cf132fd83a4ce6b5eef4251f324f613305ffa5b03c0ea4ed95e96",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cea5c13e-a00f-4c4d-b080-e5fc40ebb5b9",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/bounded-tool-caller.spec.ts",
+      "sourceRevision": "sha256:2e44e4aa203017022a64acce9e73df20d090d0e66c5f51003d1a8476fa8a0c98",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d0ed70f2-48cb-4694-8be3-6e58e664ca40",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/bounded-tool-caller.ts",
+      "sourceRevision": "sha256:3bc25fa29003ce6a138ec76a226f569fab784155a393fdde03b13b71c4a592b2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "67205fbf-58bf-4328-a3d1-6fe2463473ee",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/register-tools.ts",
+      "sourceRevision": "sha256:301d48d9aaa17e5decdec37a3f521d866f971516b7c20e43c06d09caec3bbba5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6e24068b-f2c9-40a6-9b1c-2690d2f2b004",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tool-diagnostic.ts",
+      "sourceRevision": "sha256:0da83276182d737d06938cc31a8016da910ed6c024867d5785e2b2f152e7feb6",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f7f13bd4-2122-4385-80a4-64eed309f9d9",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tool-gateway.ts",
+      "sourceRevision": "sha256:71b5787e73a75715b807faabe3981145c89a1e0d5a9c69177e2d62c8d76b36c7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "26be5a9c-3fd3-48ab-b5b9-ac7ffe73f34e",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tool-manifest.ts",
+      "sourceRevision": "sha256:040532006635b9bd073107f075d1805ff70b8d6c1d847ef6650b558bb45c43b2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f129eeb6-7f45-4b0a-93d5-3edf1ed54f4d",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tool-registry.ts",
+      "sourceRevision": "sha256:0ae3bda4fdb2e0eff3293b773363161607ccfaadee95445892a058424c556eab",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8e38d186-8e90-402b-8fd8-c5f121caf390",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/embedding-trainer.spec.ts",
+      "sourceRevision": "sha256:bb5d27651d379d634a3179f2a48d5815c2f66ddee1ab533bcb33d76672ccb00f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "aeee6a28-c99b-47cb-bdac-49bb8f430ef5",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/executor-tree-tool.spec.ts",
+      "sourceRevision": "sha256:e8d06152676afed6347bc157754c57de6a233e9b5f72e79c9710d776549e793a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e5c01a35-7348-4772-ba72-3cdbe7db800b",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/executor-tree-tool.ts",
+      "sourceRevision": "sha256:487ebcf62749777477e21689a8d9129fc6833b132661652f6b635aa0301d9d7e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e08c4d72-16b9-4d9c-8aaf-c497a1956aaf",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/label-generator.tool.spec.ts",
+      "sourceRevision": "sha256:e35905974f2a4aec268b362fa755b7240c74c0e58bb35b7a8f0b52513a676237",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f53f24a4-b8e9-46a3-8f9d-142cedebf6fd",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/label-generator.tool.ts",
+      "sourceRevision": "sha256:4be7609d5816eddb264933ab622077f95e0dae5b1666197b6ab5e02dfa71f07b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3fb152ae-1fa1-40df-8f7d-665ec0daf0b9",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/learning-trainer.tool.ts",
+      "sourceRevision": "sha256:1362f786c0edab14be08c40c124f5358a99a9dd9615d5615bca4bf65e9288a52",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "46254784-0025-40a7-a3c4-fd2791078f53",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/packet-search.tool.ts",
+      "sourceRevision": "sha256:550663994e127494dead9bae76764fabcefaaf10661b9e75994ec30319b596ef",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "73bb8123-afb5-40a7-869e-d707da07d8f0",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/startup-briefing.tool.ts",
+      "sourceRevision": "sha256:9ee0f9d06b12729946bbd8f8fc7dbc9368fff7535552c5e121a0395916d4816d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4db259bd-df76-4bdf-ae00-0212afa44d91",
+      "sourceRef": "sveltekit-frontend/src/lib/agent/tools/topology-status.tool.ts",
+      "sourceRevision": "sha256:a2ad1f3183f2108370c2be91277c243f78901638bd097d0b97e057a0a4860791",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cbf42c5b-3a1e-479c-9569-76e55d3f8a2a",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts",
+      "sourceRevision": "sha256:329b09391c54c085d8af70b2cdedb6f2ba29fb86b52ed0928a390d1d3166a365",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8967ac0e-c0be-4167-90a1-4a5b30b7ef04",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/citation-cache.ts",
+      "sourceRevision": "sha256:d34527f2dc0ebbe6b697568edb164cd7042435b10e895792fcb8126aa60391c2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6e16f089-6b84-4891-a4c4-8b8cd3436212",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/client-cache.ts",
+      "sourceRevision": "sha256:17116815d72cd667291f7584e5be1af3c96180f12abe91a4d10e622e52d6e4d2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "46e8f00a-4997-48a9-b228-457faf63d355",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/client-embed.ts",
+      "sourceRevision": "sha256:14e2f199f2ef3a122cd1c65e08ff9c9b99ccc3a8442d1c0f27e2c6bac4568851",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7826879a-4d78-4422-a85f-540e1bb7a345",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/client-llm-synthesis.ts",
+      "sourceRevision": "sha256:511a0802775a0033f960def27761be25f053178ceccd25c936811793e08a2d89",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bd7d00ae-fe8e-4652-9041-263544d9084d",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/client-quality.ts",
+      "sourceRevision": "sha256:d45605b4a460c55bebb5c8c723595856842d9e82dbebac8263cc89ea15dcfa57",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "20abb455-9f3f-422d-a13a-54c39b903a96",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/client-router.ts",
+      "sourceRevision": "sha256:1498984b5410f51247fbfd4a1e88cd77a71079278f95092d500c4a57e1b870af",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "90839d05-dc19-46ae-94e9-f2069256ed53",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/e2b/inference.ts",
+      "sourceRevision": "sha256:fbc6d35484348f2f84c65ecd9b4b3e42a6f6dc83710dadcba6467e6923e6221f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "140cf5f9-b782-458c-a4a4-96840677ab06",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/e2b/session.ts",
+      "sourceRevision": "sha256:75394ad2ce7f406d8096bce232648f8caf7d657a74728085f69e78ff9f3587b7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "338a967e-3bb5-47f5-beb2-a010d474a4c0",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/emotion-context.ts",
+      "sourceRevision": "sha256:310ed4d92bbcc3b63748534a470e9fa34995c9f3b4ea5181bead1a353c7f59ff",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3fe4f1b6-e13e-4af2-9adf-16e1317bb267",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/hypergraph.ts",
+      "sourceRevision": "sha256:4af7e6fe867cb3d9babc10beb776771d086ccac09e38c88d2e4139d4a00599a4",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ab671d86-192d-40c9-b135-1b938c2b2031",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/onnx/gemma4-e2b-session.ts",
+      "sourceRevision": "sha256:c9b9a3e3244a2c20ea5e728c79d4833d7bbe8426165758a3ccd42fb1921a463b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "19970d6a-ab2c-4e42-a967-c41f8c0ce52a",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/onnx/inference.ts",
+      "sourceRevision": "sha256:21c97914fcd5ce9575752f9e20eec3a407ca867cd35b48df79e8b6902b629c2f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bb7dd708-ac53-4ddf-98ad-d29654ccdabd",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/prompts.ts",
+      "sourceRevision": "sha256:2a2b188bd2a6bae010e33d568fccc8ad5f9ded3aa294b8d960c2fb68a00e767c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "899f9c82-b961-40c6-8e2a-4cf5d34d96c3",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/quant-config.ts",
+      "sourceRevision": "sha256:65b6b6dc514ecc80dc21cb0c33b02ad570468e2758ab4c230350088c7d4ca3bd",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "74be77be-c2f4-4d0e-9ef7-8b4e24ecb92a",
+      "sourceRef": "sveltekit-frontend/src/lib/ai/unified-generation.ts",
+      "sourceRevision": "sha256:9906d85c8da152ccdc9cb5a3e9f607d1ba1f1fda50ffe1f0ba75f14a23ff5325",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "052c202b-8122-44c5-9f6b-73240cafa612",
+      "sourceRef": "sveltekit-frontend/src/lib/ambient-events.d.ts",
+      "sourceRevision": "sha256:93e18aa42c5c89edf705f6396f9bbaac409abf31f47037123f03f504e822a73c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "eb0553cd-4bbc-49c1-a006-459df023ebda",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/__tests__/cache.test.ts",
+      "sourceRevision": "sha256:535cde901b7f1d28b451bd2f6e24a5890aa7124cdac32dd662fe044bc876f389",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "628ce798-4502-4e75-8385-95790d13d5ec",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/cache-invalidation.ts",
+      "sourceRevision": "sha256:8baf3d7958efe1a9dc5155e736372eed35fcc256e0bd9a3865ab433ccfe5a9fc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "62409b7c-3a87-4c45-9413-87594c54b2b4",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/cache-service.svelte.ts",
+      "sourceRevision": "sha256:5cba4cd607dd431422ae9142d2cc0cf13b66b85bc4e85cc4b22bca63aaf94061",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4e1b796e-6d92-4a6d-a9d8-f51dd29a0804",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/indexdb-cache.svelte.ts",
+      "sourceRevision": "sha256:551eaa7c4ee3f755261965802cef334a9bfd6922eab4d52b8b3d9c0d22e27b7c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f21e5bbf-81cc-4d42-b267-771a459eec43",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/loki-cache.svelte.ts",
+      "sourceRevision": "sha256:ab054df562f1cec96f24aab9f97ad92027aad1f6b1755d7551a410f670e64f57",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7caa5daa-5b17-49e3-97f9-142877dc9ccd",
+      "sourceRef": "sveltekit-frontend/src/lib/cache/offline-fetch.ts",
+      "sourceRevision": "sha256:08b0a896aae82d174f222c96f31d3a08678a27afa60f8b1d5c3e59956d3946c2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bda97f31-0ccc-47e6-9c72-a761d7f2289d",
+      "sourceRef": "sveltekit-frontend/src/lib/canvas/webgpu-shader-cache.ts",
+      "sourceRevision": "sha256:ad08f80394d07fa20b9860caceda96e3817528d574687379f6dff632dcb79b74",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d8e6abeb-ad18-46f5-a5f4-75bcb349c997",
+      "sourceRef": "sveltekit-frontend/src/lib/client-logging.ts",
+      "sourceRevision": "sha256:6d87c93fb704dcafdec6147946bf29ca3c542349ebac147b8cce5134274e9042",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "71642870-299a-4723-8c47-ed378a445685",
+      "sourceRef": "sveltekit-frontend/src/lib/client/atlas/visualization/lod-glyph-contract.ts",
+      "sourceRevision": "sha256:39390f747f35030884cae4e924bb9e0bb57918f9868d0db386ce75620f53d57b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "73016841-f38f-42da-8021-a8c4a230a822",
+      "sourceRef": "sveltekit-frontend/src/lib/client/batch-summarizer.ts",
+      "sourceRevision": "sha256:5cf7c2b883a70791b34702b22bf08987cd4ee98f57ee5b569dfafcac7b888f1a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "40b5403d-bde9-4355-a189-ec59b13d15ab",
+      "sourceRef": "sveltekit-frontend/src/lib/client/db/loki-client.ts",
+      "sourceRevision": "sha256:233dd023a2c45e4eab3160f73b4974d3ff52de562e790da611f1b88b9e597aab",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e104061c-4536-45fa-90aa-37f1d5bd036a",
+      "sourceRef": "sveltekit-frontend/src/lib/client/live-agent-visuals.svelte.ts",
+      "sourceRevision": "sha256:bb4477a3609cb401717831155736d3baefa72cac946714aeb6d8fab6583034ae",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "93803c90-769c-463d-bbdd-2ae2155201b0",
+      "sourceRef": "sveltekit-frontend/src/lib/client/phase18-offline-sync.ts",
+      "sourceRevision": "sha256:5a0ed92e4d390c1ceaa91dd63bf7eca560c866cc5e19098c1182dbe2f116989e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "aeff9cc8-3a7c-42a3-9365-052e5a829216",
+      "sourceRef": "sveltekit-frontend/src/lib/client/search-client.ts",
+      "sourceRevision": "sha256:18649e7ce32d350783dfc7df03ae8ec67593e809e2cc09a436c3bbe7ae44fddc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "9f19a5f0-c06d-4b02-9ef5-925d9de60cbd",
+      "sourceRef": "sveltekit-frontend/src/lib/client/search/ace-client.ts",
+      "sourceRevision": "sha256:fba9017d0b5488b9b7b14f3db3f2130703589bceed2f04d016dfab194b40566e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7ae21abd-7f4f-4207-9546-4bccfa466259",
+      "sourceRef": "sveltekit-frontend/src/lib/client/search/hyperrag-client.ts",
+      "sourceRevision": "sha256:380f63e114183e2b5bb11b0a44b04ad0f9879314418f17286705a0d771f7e325",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "89d7b388-d21b-47b3-a007-350b6e885bb6",
+      "sourceRef": "sveltekit-frontend/src/lib/client/streaming-handler.ts",
+      "sourceRevision": "sha256:7618a1502df7a1753d719f82c5afca0de7161b7888660eb5597bd06dc243c5ba",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f8d7d840-3092-46cf-905b-54b1bf7708d6",
+      "sourceRef": "sveltekit-frontend/src/lib/client/subscribeEmbedding.svelte.ts",
+      "sourceRevision": "sha256:2701122a8ff60ecaad63711539f59c0e86bc2d6c1af59acd87545cef7447c1ca",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d119a05d-ff00-4fdf-a686-08fd763961cf",
+      "sourceRef": "sveltekit-frontend/src/lib/client/sw-register.ts",
+      "sourceRevision": "sha256:b29f3d8ea00a303250d4de02876bfc40ca7a1439048e19e7aa756101adbd43eb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d2c2eeb3-40e0-4249-8bf4-604f92c8cdaa",
+      "sourceRef": "sveltekit-frontend/src/lib/client/timeline-client.ts",
+      "sourceRevision": "sha256:c636a1eae1398dbb1a79620e0c754437582639dfc4a89ee3d6eac54342ea3df7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ec33c378-cbbf-4b53-acd0-fc3f6241d4bf",
+      "sourceRef": "sveltekit-frontend/src/lib/client/workflow-event-stream.ts",
+      "sourceRevision": "sha256:ca38d5ad6fd1b8560503a6d9f9238a95a69916d4e204288faf31ae6be9e54647",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a468bbcb-df35-47e9-915a-ccdd2b8da473",
+      "sourceRef": "sveltekit-frontend/src/lib/collaboration/yjs-provider.ts",
+      "sourceRevision": "sha256:7f2aac107aee9d9fb1e80242751ed760ceee2e9d2298f8d8a9626dfa78ff012c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f066989f-6757-4e62-af0b-3e89cc72235c",
+      "sourceRef": "sveltekit-frontend/src/lib/command-center-manifest.ts",
+      "sourceRevision": "sha256:d50f38d173bdc024599c4c95bac70b3b1f675a17e318bbf7f1f6119f0311b256",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ca8ce010-f98a-4b49-b2f7-0b762346e594",
+      "sourceRef": "sveltekit-frontend/src/lib/components/agentic/__tests__/AgentChat.test.ts",
+      "sourceRevision": "sha256:911da0d9bea06fcf4ebe5688c1bfd9a1df3c2eebce25a67eaa94b8fa4c7cafa2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1cd61db0-affa-4e24-99e4-4e0aec84a93f",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ai/index.ts",
+      "sourceRevision": "sha256:a234f08d0202b3cff35f12639628a11a252950bfa19f01106e4a6373426f12cc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "828134eb-dfeb-4b5f-a05d-ba5dc26ad3ad",
+      "sourceRef": "sveltekit-frontend/src/lib/components/canvas/hybrid/types.ts",
+      "sourceRevision": "sha256:0207fd0572fce2f42eb363b6311b9654a2dfe2162b019c0803b40ea436220363",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "25cd9751-f952-44e6-bb3f-9899ec9c3389",
+      "sourceRef": "sveltekit-frontend/src/lib/components/cases/index.ts",
+      "sourceRevision": "sha256:f03a09d8f39ea74703ccb3f51ce45469e4e94dc127b0c209de26e327cb33b0db",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3159ad1f-4b75-49ca-b27d-663135c6c8ce",
+      "sourceRef": "sveltekit-frontend/src/lib/components/codebase/index.ts",
+      "sourceRevision": "sha256:3223607f8e3aadf486ee67af5ab15b3d826275fe186550f4d090cfb06484e008",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "822a6fc1-e752-4cc4-9bea-6b1408c041a5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/components-shims.d.ts",
+      "sourceRevision": "sha256:c18208cfebfb123f5dd5e883470e716d5015eaa42584eb85db6704e4c76e05f4",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a7318ab7-4a14-44ba-8f2b-73d3bb412630",
+      "sourceRef": "sveltekit-frontend/src/lib/components/dashboard/gamification-types.ts",
+      "sourceRevision": "sha256:ea07adfb6e9da632e82fd993632582379b94451b5b7790e28e46ed0f9dd4be5f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bc7cbf71-1aec-41e3-92dc-690254bffbd2",
+      "sourceRef": "sveltekit-frontend/src/lib/components/dashboard/index.ts",
+      "sourceRevision": "sha256:cf7910357db44c34702ac532d2cbdd92a9e07dbaa607547ae3f7168a28bc3fe0",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0b5b7f2e-5387-4e87-8f24-07aa1074953e",
+      "sourceRef": "sveltekit-frontend/src/lib/components/detective/index.ts",
+      "sourceRevision": "sha256:c10751801dc0c9f9b7520f0f9f87f94225eb32f64577f8f6173b0f3793a1829e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7e526943-b006-4b85-9730-84dbe0da0776",
+      "sourceRef": "sveltekit-frontend/src/lib/components/editor/index.ts",
+      "sourceRevision": "sha256:d78ec926dbd294875d7eca90bfe76941d5910969123ca81e765d5632d55c6d7a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ead757a6-e9af-4626-99c2-79b842972a3e",
+      "sourceRef": "sveltekit-frontend/src/lib/components/evidence/board-history.svelte.ts",
+      "sourceRevision": "sha256:30cca0941ecf9fbc4f1c446920e89ae3ab0840dd03fc2c78f76b0fd89b656fb5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6569fcfd-a06b-456b-8e66-74bd91da47f4",
+      "sourceRef": "sveltekit-frontend/src/lib/components/evidence/evidence-utils.ts",
+      "sourceRevision": "sha256:418948c3b8a7326829a3a138c826746b20d7604d4a8e18604ae172da2c59a883",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cbf4e147-c634-47a3-80f0-5d1221c175d4",
+      "sourceRef": "sveltekit-frontend/src/lib/components/glyphs/glyph-mapper.ts",
+      "sourceRevision": "sha256:9994001e7284eac64f8d740e2600131b0f9bb7fe2301b48f2333713b7e32c16d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "9486dcd3-9771-470f-b8bb-af8ebfd1c536",
+      "sourceRef": "sveltekit-frontend/src/lib/components/recommendations/index.ts",
+      "sourceRevision": "sha256:331443609e12af769f0ff6150be4c4419b7ce159af5f91c58b271bfb6ae0e0ba",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f8ad073a-4b52-41b9-952c-af216453c885",
+      "sourceRef": "sveltekit-frontend/src/lib/components/shells/index.ts",
+      "sourceRevision": "sha256:145c58dc05507728f45027cf7cc2db2e613fe5ff79319ca5cc50cdf3199848e9",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b4df20ad-f27f-4f2f-a5aa-989a9385567b",
+      "sourceRef": "sveltekit-frontend/src/lib/components/types.ts",
+      "sourceRevision": "sha256:ffcb62889b22a6d077d2e3a905d74151996ca0caacf7f7e68c19507412c635f8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f2120e29-1697-4955-b451-d0ef5ff33fbd",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/Card.js",
+      "sourceRevision": "sha256:239f70324dbdfebd8d2c003eb4bdebbdb7a137181229b9bb86a27695ccd2662d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4e50fe8a-6cb9-4e3d-9885-fe8b31d72e7f",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/Card/index.ts",
+      "sourceRevision": "sha256:e52db77c9a5c23113804174e4d69d20b47c4619d40075b7d4e0307b0fb8ebc13",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "868c6e2f-1c65-464a-8d4f-5bcb393590c8",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/alert-dialog/index.js",
+      "sourceRevision": "sha256:5a149c0d2197488b6fc174664d9bf47aa1758842ced32c6e1a58e5932e277443",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "aa38d624-0ae7-483b-b2a2-f2b128752d7b",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/alert-dialog/types.ts",
+      "sourceRevision": "sha256:6e1b7243ce829e073027592772fbc4c9cbdeeb46658a876a9e6dfa81e5bf5e29",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ece2317b-1f98-4e40-83b4-089c45d20bd1",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/avatar/index.ts",
+      "sourceRevision": "sha256:5000e8589fc62877a2805ae0cb5fab095b75469e3d75b390bb306649e9528c71",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0bad7027-ca0b-46c4-bd46-8969f6d4c7e0",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/badge/index.ts",
+      "sourceRevision": "sha256:e13dbc327d90e8e4220ad5576d8c974e8b226f239294d07869679f0204f26e6a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "10565f2b-8c81-421a-9a3d-5551741d1437",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/bits/compound.ts",
+      "sourceRevision": "sha256:78ac4177feccf2a35ce9017e10f22c195fef59798f2ba53755c058cbc63ad287",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5bed923f-88dd-43f8-a82e-72776137fbfa",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/bits/index.ts",
+      "sourceRevision": "sha256:d617f77abe1bfec9ddac0380e6756b58263bc033d1583201812dee33398137d0",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "19a6dc63-b891-4b32-ae61-33d361290b7a",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/button-variants.ts",
+      "sourceRevision": "sha256:72eeceb56d13e945cdc7f8610337937a9ad79449fca9359c8ba692024d68a679",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "32b5ae22-90fe-47ef-81ea-7241567fe4e8",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/button/index.ts",
+      "sourceRevision": "sha256:83e5967957e6f47a007bb85ccaada86fc8eda911c6ca60fdfd1498d78eef2324",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "09c0a441-c17e-4dc3-add4-87a56c022377",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/context-menu.js",
+      "sourceRevision": "sha256:ca42472386e8391d22c8744a636afc7b4126a1898cf3c321fe3aac52b3a0a16c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "37fbf51e-b7a7-4eab-8f33-88a6be730ec4",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/index.ts",
+      "sourceRevision": "sha256:02baf6a077b7e00d35366c9db06029fa9376fcefeb72b579fcafc35abbb2ac46",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "94fd6ca4-abf8-4090-98c4-5adfbde5f907",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/dialog/types.ts",
+      "sourceRevision": "sha256:11ca2954840fd959d012ec5ca55018abc19c8bc2bdaddcf9af76a35f9eb9320e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6c9ab576-f3ef-4995-a6a9-96877531b66f",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/enhanced/button-variants.ts",
+      "sourceRevision": "sha256:cbd06a61841645f0e6e26e2d650af6a55b887ba9b6b0e564b8cdf5fe9b890787",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "44886c27-ae66-41c0-9ed2-59d2c28a262c",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants-minimal.ts",
+      "sourceRevision": "sha256:db9c12655c93c50b039782ed09058259eca4dbd89bd7585b0de137b838d3006f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e5bca2bb-01d9-4a36-ae8c-82020b44cfc1",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/constants/gaming-constants.ts",
+      "sourceRevision": "sha256:6691b26315d59b1905c30ec1d6d5422f0b4d0d09bf28f80d0d22c65c4b00c98a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ed0bd91c-f0f9-4342-aa46-665368ace1f8",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/core/GamingEvolutionManager.ts",
+      "sourceRevision": "sha256:22cc62ba61dd6c2734105d058096c186cb1036e86b8c510843266f5ca58cc29a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5e823ace-036b-4c0d-9681-328f2ec8b01c",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/core/useGamingEvolution.js",
+      "sourceRevision": "sha256:b614d2855835d2f30a41561a8942f91285c852f287a5b8d76c61bb727288fa6f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b88ee596-fa97-43b1-b34d-832ae479e4a3",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/effects/audio-effects.ts",
+      "sourceRevision": "sha256:97886f2c28cd4db3789c532c0ec592616116cff87589a0034b4694588035d264",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "19114501-12a4-4eee-9a31-ef3357819b9b",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/effects/gradient-utils.ts",
+      "sourceRevision": "sha256:21fb78f744c4e3d0fdff7346d0a207533306059f9a4835685c6431a13545b3c9",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5fd25eed-0a05-433f-aee2-c117cc4457e4",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/effects/index.ts",
+      "sourceRevision": "sha256:d08d0990fa7dd336875f38ae951cb88ec10394479b9075c546dd3e0a622f331d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3059441f-ee64-4b83-be2e-a08f258f3e53",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/index.ts",
+      "sourceRevision": "sha256:59cf7c95077130927d95e4cc20359f589738e6cd0514d738feb05708405d62cf",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "019cb711-fe47-4192-b7dc-6425e6c1cd56",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/n64/N64ToastStore.svelte.ts",
+      "sourceRevision": "sha256:97ad6e55a93487be38644a46fd376bbdbe2db101c07d91670765e30b74789f87",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3c3da20d-208f-41d0-8358-4c3c917dc3d7",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/n64/index.ts",
+      "sourceRevision": "sha256:c0e362b71ed249323424c53505941fcc51a4a83ade2c7b8d7b6cba76bae51efb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b68b3b45-e23a-486b-bb2d-e215dfc65208",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/n64/tokens.ts",
+      "sourceRevision": "sha256:9f746a27cda0f76960690be478f82be53e9dc907d5d24a58dea5c60a7e426492",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1c26a34d-c236-45da-b409-d1fd93c1d278",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types-minimal.ts",
+      "sourceRevision": "sha256:6b9c99139b3d29d908b94d383c6ec70b6bd30b0995dc0787931815bdb4a87665",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b128b797-872f-4028-8421-e73f5b37864b",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/gaming/types/gaming-types.ts",
+      "sourceRevision": "sha256:09d3cfa4bde3c7f4ca27210a0950725e301734cf04482c21f83b6857e4393302",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b1069739-e4fd-4e3a-a77c-f4fd28ff95db",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/index.ts",
+      "sourceRevision": "sha256:9366154dc47d4423c08ae62c3e580dedb67c347bf48a974b78df0cb50c0bfa18",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a68e0d7d-7220-474e-a80c-1b1df2cf598b",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+      "sourceRevision": "sha256:202b22e3ba0020a38202db44fdbe5bea00c7d778cd84ec54e4fa74499f615392",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e2629b7e-f441-43df-8057-46d83b53b1d7",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/label/index.ts",
+      "sourceRevision": "sha256:d12dc02171b59f9ea18ae5c7cf0047f3deea8724c1bd97f9be82465643bfbebd",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ad3fcaed-a122-484c-bea7-bf8d6810e87c",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/modal/index.js",
+      "sourceRevision": "sha256:8925b63cb7d2381c4c80f847b874892344ae47ad2f536775a0d40bdc013fcadc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f8e49f90-d15f-4098-8bda-ba69b8bcee34",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/modular/types.ts",
+      "sourceRevision": "sha256:e2b3417d0996a932213dc281a76c8d5f3bef256c687e613157024c586c3c2e9e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "049b261d-fa65-433e-ac03-dceb44ad0795",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/progress/index.ts",
+      "sourceRevision": "sha256:10ef919a3c4b2bd83b3d80ee9d9de03ce7fc72907ea281b452bfe816d60a6893",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8f9c63a2-8ba4-431e-95e1-7371eca03619",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/scrollarea/index.js",
+      "sourceRevision": "sha256:890bcf62a25049543f78c828aace9c80180575031833b9e877bfd2ac238c7ab7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "936f26c8-7426-43cb-ab4e-24e84f6a07d0",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/select.ts",
+      "sourceRevision": "sha256:197b07836c360528bbeebe7307e6b5d16d2dd5b1eddd07328ce96200f2dea266",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0f9a2184-5ad6-4e2d-a2df-a4ded2400078",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/svelte5-index.ts",
+      "sourceRevision": "sha256:dab4bd77c094363bdaf097efa785701125e2d72bafb1eaf3fe1ac1345048498a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ea409662-8864-446c-bd00-7ee497af518f",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/table/index.ts",
+      "sourceRevision": "sha256:50f98abfe09c9f4def49b01e0d468fcacc2a94e694a860254e8f1dff272a5855",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "011ffda7-d4ca-449f-aa2d-d06bb1588dc1",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/tabs/index.ts",
+      "sourceRevision": "sha256:bcd330d49db0547eac5fdd2069742d098bb61328afea1871f28b2ef23cde8d22",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "9077f8f9-7edd-43f2-a9e4-8c888b144ac2",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/tabs/types.ts",
+      "sourceRevision": "sha256:4d8a65e1553424538e309cc94eda2e4437568b4ed3c2723892d05d403e2cb5b7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "fdcd8fad-4c30-4d21-be44-f6f68d39e79a",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/textarea.ts",
+      "sourceRevision": "sha256:3bc560fc5bf02fa0798fd2cee52305fac45cda4d7c18dc1958340d9eee89fbe9",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "af36d465-bf58-4363-9dc8-fe82a1d60aea",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/textarea/index.ts",
+      "sourceRevision": "sha256:5d83b9b2a8fff177d729b36eee2b7c0d3d7cb418ce0842beaf979d7f580cd640",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4531fe0c-cb5e-41d8-9ec6-c231e49dab74",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/tooltip.ts",
+      "sourceRevision": "sha256:604318f322f3623aa2f5df29e706ba6029b73cddcd8ca4f881b6820644fbd45a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "083691e0-d895-4007-a157-14a4ce1f9267",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/wrappers/bits/bits-overrides.ts",
+      "sourceRevision": "sha256:1557c4d168de6bad82980bb3a81004545854b6ab4057c6b97dff49bedab976d5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "218e22b5-6f76-4238-8265-87b9cc92161f",
+      "sourceRef": "sveltekit-frontend/src/lib/config/database.ts",
+      "sourceRevision": "sha256:7c8242984b47fa82e5cb7d8b5b1fda4826c7d9d7eca01310dcc58a1e1da47013",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e9ea1b3c-50e6-4a86-873c-db0c92bcc8d8",
+      "sourceRef": "sveltekit-frontend/src/lib/config/env.server.ts",
+      "sourceRevision": "sha256:372a77dbed6790f1263aa96c1c503ca48083697cf06d2d44da3f90a149513f02",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b01b0fe4-911d-4e9b-a625-f22a7812407f",
+      "sourceRef": "sveltekit-frontend/src/lib/config/pgvector-gpu-config.js",
+      "sourceRevision": "sha256:2c809b490bb902fa443e0bf892eb543048526bd7f667a4c01b3d5856acec7e44",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "39874c8c-ff71-41c5-8c8f-07b7e6a0db10",
+      "sourceRef": "sveltekit-frontend/src/lib/config/redis-config.ts",
+      "sourceRevision": "sha256:161f2000e4385a9c31647538964ee1a539527e1b49d09279c39905e9ee57b270",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ed16f2dd-e0eb-4229-9b21-8a32f87f14b2",
+      "sourceRef": "sveltekit-frontend/src/lib/config/retro-console-palettes.ts",
+      "sourceRevision": "sha256:bc10737ca96336517f6303239878cfc5bcb1f5144dfa89678939d017ee5bfeb1",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "625e98db-96ec-4192-b2f6-c6080699902b",
+      "sourceRef": "sveltekit-frontend/src/lib/config/themes.ts",
+      "sourceRevision": "sha256:f4e87b1da7ddf8d5737d9013b84937e8bf02e9489d7e0a94c9c63099ec990d7e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "da381e50-4e33-48b1-abb4-c41e819b660d",
+      "sourceRef": "sveltekit-frontend/src/lib/courtroom/courtroom-scene.svelte.ts",
+      "sourceRevision": "sha256:8c7d576cef71035a80039158c48328e41dbddbacf63c1ea843c65521559d9f2c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "2b4af6cd-bd8f-43b2-8319-074560d8e7a8",
+      "sourceRef": "sveltekit-frontend/src/lib/courtroom/courtroom-types.ts",
+      "sourceRevision": "sha256:95dc496d0411f6d3e2c0f987e13d673c153337f9161dc1ff9f91c5fe3012ef9a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0acabf94-dc98-47c7-99f5-06c66fbf057c",
+      "sourceRef": "sveltekit-frontend/src/lib/courtroom/crt-postprocess.ts",
+      "sourceRevision": "sha256:95826c5ec01678dd79a6c86c80582afeabb4e80e0ee7e56b096ce7c4e14c9fdc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4a9c8fe6-9e93-49e7-8bb1-f7652768482c",
+      "sourceRef": "sveltekit-frontend/src/lib/courtroom/timeline-engine.svelte.ts",
+      "sourceRevision": "sha256:2889e25723d7d1e1cdfdb1d300f1464134d7eb42163737c97aca61a0c3eeaaa2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7f9fd5f3-bce0-41ef-8db9-2d9f11c65da9",
+      "sourceRef": "sveltekit-frontend/src/lib/data/report-templates.ts",
+      "sourceRevision": "sha256:cf6c50800a3e4e722cb4d06a559229e8fb9596ce77b8df805d1680cad69a5f57",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0a7edbd0-1bff-4f64-bbb6-8323abf34f4f",
+      "sourceRef": "sveltekit-frontend/src/lib/data/route-groups-config.ts",
+      "sourceRevision": "sha256:3ad90779573e0ad614e54cca64f2e4c09a9f772ffbf32746b68ff559144fa647",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "852879b2-9e4c-4ab8-a136-0d92722e5275",
+      "sourceRef": "sveltekit-frontend/src/lib/data/types.ts",
+      "sourceRevision": "sha256:cc6cfadc625bc4e64ddcd35dae4040e0c842b0ac6a92ab71d3b6e11bcd75f7fd",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1e1c40cc-df73-4b9c-a99e-1b5d8e85e69a",
+      "sourceRef": "sveltekit-frontend/src/lib/db/client-db.ts",
+      "sourceRevision": "sha256:0a4c9a264a643b7b461eada29ae34cb0236f6a6ad22417e5fb1dc14720b97e0e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5a521934-8ba3-440d-b37c-7036fbc133a5",
+      "sourceRef": "sveltekit-frontend/src/lib/db/pool.ts",
+      "sourceRevision": "sha256:d1ca7b1c8ce1a3565977f34fceef0e4df2b8fb4434f9d9da8a40c2c320b23114",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a99bb505-5066-4853-b475-d2a723af3220",
+      "sourceRef": "sveltekit-frontend/src/lib/db/queries/route-health-archive.ts",
+      "sourceRevision": "sha256:c1919dec5f840826599dd34efeab07837023335b352ef14261e633084ea16dd4",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3e436dc3-52f7-4d30-ab0e-43185c18731c",
+      "sourceRef": "sveltekit-frontend/src/lib/db/queries/route-health-queries.ts",
+      "sourceRevision": "sha256:16c06a8f5e53618cf3f7b8fa45472206de87fb5575257259ae189381d74e21d8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0d1f4eaf-1000-4192-af81-3877f3440003",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema.ts",
+      "sourceRevision": "sha256:022fee542ea40df2b2ca568e944255b613ff4f87363f46caac5929d17197d102",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8a9e930d-d355-4861-9a8c-78c48427886b",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema/ace-web.ts",
+      "sourceRevision": "sha256:f2324628cf6b1a025e193729479820e6e25f6007fab1fc3869bfe37dca607820",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "c76e48ea-4cb0-421b-b9f8-370640798f36",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema/evidence.ts",
+      "sourceRevision": "sha256:9f72d350ae874a2c6b591efff01e8420f651346080936eadc7feed02053953a7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "94fdf2ac-56ab-461c-9f7f-4a6ccece5a74",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema/gpuInferenceDemo.ts",
+      "sourceRevision": "sha256:7abbf5496af6af38a8fdf06f5347b2eda66c2084891537e0092b57da0992e747",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ebda44ad-a06b-4692-add7-6fcacb7bf113",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema/route-health-tables.ts",
+      "sourceRevision": "sha256:3db8ad110528b54abfa635784b0ef69f7be27e9684439ac7c13cd1e0dde686ff",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "2ebdcf4d-6420-425b-b030-132d8afe4445",
+      "sourceRef": "sveltekit-frontend/src/lib/db/schema/yorha.ts",
+      "sourceRevision": "sha256:5e07a2524f46945facb50d9230e55ee907fe5530f50ce7eecc6c6cc10ef01193",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "04e38376-ef19-4a85-9a85-6a1ae8849024",
+      "sourceRef": "sveltekit-frontend/src/lib/db/vite-error-schema.ts",
+      "sourceRevision": "sha256:affce4559f9a5e5f9feb8e814e18f52c0e77c8a99073b08bf35ca09021771b2b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f942c60c-e945-4455-8f2f-e35fc6b1f4fd",
+      "sourceRef": "sveltekit-frontend/src/lib/env.server.ts",
+      "sourceRevision": "sha256:fbe13ad4b5207215c0c3e7b0b62db83de906d27bd7d06e381c7f7657ee4876ad",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "50d47c90-99a4-4e96-8eb6-42201582aaa0",
+      "sourceRef": "sveltekit-frontend/src/lib/env/index.ts",
+      "sourceRevision": "sha256:e2445a79d3ce962fb1b94243506230cfec0f0292b4f3706c7d486953bdecada3",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "22f56e6d-1ea4-43ac-a533-3b22a4a3a1e1",
+      "sourceRef": "sveltekit-frontend/src/lib/env/public.ts",
+      "sourceRevision": "sha256:c2bcdeaccaf4ebc680847959611834423c3fe2cf6f2a1c8b89d9b77d1297e0eb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "2e4a1f31-4877-4cb3-a31a-150c1e7e2a91",
+      "sourceRef": "sveltekit-frontend/src/lib/features/poi/services/poi.ts",
+      "sourceRevision": "sha256:280ca3e204c12fd2c7e6481fa2732e5037a78e5543925fdbd192fa86f7e6df43",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cb11c5cf-c0fd-4fde-b558-e8a0a4cfc222",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/chr97_agent_pb.d.ts",
+      "sourceRevision": "sha256:7332a54d06e1453b5102402e12fc07ffd499f31592362a37edcd5ac035567aa8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "2d1cc4e9-33f0-4a9b-b01e-5f61118ab2da",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/chr97_agent_pb.js",
+      "sourceRevision": "sha256:41e2dc8e9a6ef84fd2230362c29992f2389468b53929be85d6cb82a9e8d96aa5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "73ba5e5d-ab35-4001-84e0-c1f509323cf2",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/embedding_pb.d.ts",
+      "sourceRevision": "sha256:abb11c2d0d35146237241acc03fd8c45f573fbdb798f71d66e6f93666afde067",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0ad2bc85-46b9-48c5-b6f2-651f836da1c1",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/embedding_pb.js",
+      "sourceRevision": "sha256:50be652e3cfe83001fa1d861747fde66a2f7ad66143b7d63b0c082e5fbae9698",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "c7d321ea-3829-405e-9bfe-e92b6223f038",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/turbovec_cuda_pb.d.ts",
+      "sourceRevision": "sha256:df1aacd96d46bbdb251ff4f786196bd3004fa0fae75af3fb9256d62ffca2a81f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1d4215b8-1dc1-40a8-83d7-bc5d1ec7eccd",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/turbovec_cuda_pb.js",
+      "sourceRevision": "sha256:33fbe8bb43e7b054c17d19c94d5dc16eccbf0160cfeff4a8799e2c15e29ea211",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8a83fe64-d3e4-4506-b804-0a1de08cb6fe",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/vectors_pb.d.ts",
+      "sourceRevision": "sha256:fc9075ea8dc6882e080df03c6a19c100c021e231a9538edaba62e29edab6b0b9",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ceac61a6-ef38-455c-b767-7c37b9d25994",
+      "sourceRef": "sveltekit-frontend/src/lib/generated/proto/vectors_pb.js",
+      "sourceRevision": "sha256:ce4585939b635d39d0712811ff283c77891af3d1bd69080eb83ae22c0c057cc8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7cde868a-3154-4f77-89d1-9eb4eae46084",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/attention-scoring.ts",
+      "sourceRevision": "sha256:366387599820998299ff1a6bbb8716561b8c8788d9bc4892150b19d877058638",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b177ef07-1e6b-4fa8-b742-89d0b07fc7b7",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/autoencoder-compression.ts",
+      "sourceRevision": "sha256:93ab2d4e83f0f6512c67050e50457d3dedb7dd52d16658dc187cb332a895a76e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d38ecc3f-5132-4f11-aa00-cef260627b12",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/cuda-graph-rerank-hook.ts",
+      "sourceRevision": "sha256:e22c88088b98dde34a658b690f3598eaf88f8d10b4c61d4dd6c5e8acd5533c38",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f3d66d96-ba09-4d5c-88fa-b10e01b4df37",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gemma4-decomposition-planner.test.ts",
+      "sourceRevision": "sha256:d33a8ca9332181c7e065bbdb30fca18404c5c7df858133b4086e3339c0ad8e38",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1b8aa56a-6d6e-435a-9999-6c5af9e0766e",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gemma4-decomposition-planner.ts",
+      "sourceRevision": "sha256:6841fef7c5e71c8cf71e3848359188720765cb4b011e206bf434312c548ea496",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "542ab1df-d092-4ef2-9fc4-72765c722996",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gemma4-policy-orchestrator.ts",
+      "sourceRevision": "sha256:1d2e430d14af511d85d287616e4769198f7bac6e520d44f3b64e3d9d5fc4d536",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "09fd8010-bf21-4fca-ba2e-152a723e5185",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/global-gpu-manager.ts",
+      "sourceRevision": "sha256:0e8ad8659b45824f0dc44c6922524520cb0db8af30090b8e9dcefb9ad154db29",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d637ef20-c410-4c84-815c-251766a7f272",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gpu-compute-pipeline.ts",
+      "sourceRevision": "sha256:02fea269dabbf26d7930029e1d14158b7a288249da31d75a0fb520ad28fd66f0",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bc986a6b-c78c-4c81-9c7f-4d23bb809cf2",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gpu-embedding-bridge.ts",
+      "sourceRevision": "sha256:329e165c72b840b14c651f8591c7022d27a5f02f17abd4b2d57dade376c618a5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "dc7ef57a-2d58-4aa2-a8ae-67a0f831ed7f",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/gpu-search-reranker.ts",
+      "sourceRevision": "sha256:9fae1628f8887ea1969416bf9e47f45547e7f40a4557c066a829955ab9dc9393",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8083c26a-b4ce-4619-9098-3030d5845bcc",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/hybrid-gpu-context.ts",
+      "sourceRevision": "sha256:b345029cded4bba390f930be332fa4f34fda3eda56548c0ba705087a62859af7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5f16408f-acd3-4be8-8077-6232133649f4",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/index.ts",
+      "sourceRevision": "sha256:c9d635392575cfa555d029beadab881e7269a64efd7696149479c78280820d27",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "c249a360-346c-4bed-8a1e-4d94e2d43904",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/markdown-processor.ts",
+      "sourceRevision": "sha256:d7842a3a58dfb0279a654fce2ca05296f63618c250c9fbd6a0f34591e8592c0e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "000805b1-2a51-4ae2-bbb3-3954b92e9d3c",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/nes-glyph-webgpu.ts",
+      "sourceRevision": "sha256:d19cf9a1f321cfb9c5a9542697730a943d5b721171289439533ac0161a8a946d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bf170f91-4acf-4a41-adba-ecbebeb27121",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/nes-gpu-memory-bridge.ts",
+      "sourceRevision": "sha256:132d94e05083117209c483405610abb79329645c8d6d644d8ca9dad677a49dcb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e3995601-ff00-4e62-b644-9e4edaa34e70",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/nes-memory-architecture.ts",
+      "sourceRevision": "sha256:c09262f4d223070cf176bbde0ffe6f7bca2607e0600b6ac5518f4a6d5d5f00bf",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6e74af13-14db-4579-a45e-5b2102a52ec4",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/policy-reranker-bridge.ts",
+      "sourceRevision": "sha256:f745bea08aea980d74619f3fa747c1bfb38c70e06ac40600fa60f0b7743271c3",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a15fea00-4228-4b99-8f13-4e3f6032df8c",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/rune-to-legal-doc.ts",
+      "sourceRevision": "sha256:4ba539651b1ce99921c38bcc3f96d5aa379588069c60d919a23225b38310458f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "af235bdc-fa88-4413-8283-c970079d1e6c",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/runtime-optimizations.ts",
+      "sourceRevision": "sha256:08b2d677fdf8c0657b22546a35ea3c04299aafffe0c1571b352910e616f653fe",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "845255cb-f3a8-4575-8816-c5b210e62c7c",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/shader-registry.ts",
+      "sourceRevision": "sha256:9aad426258eeec2ec922a84091ce9bf4cdb7efe4fdc455197ad75eb101127628",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "afa3a444-8568-4e49-9f97-a3f23d8b774f",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/som-clustering-cuda.ts",
+      "sourceRevision": "sha256:4a4bbb3d7fdf6f04b05bace76c6006029facac1e6a18b2db6da51ed9642fc94b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4d9c71c2-ac13-4cce-ba3a-ea20a9debb73",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/som-clustering.ts",
+      "sourceRevision": "sha256:5d96b70dee97a65ec43281049f4898dffee6ab85ddae1cdbc5045466d94a0218",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3d43c49c-a1a9-4353-883e-8cc3c7b45c77",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/tensorrt-worker-pool.ts",
+      "sourceRevision": "sha256:744c185d2109667cc4cbced0686b6a93ed56ede0049713242c657c6571aa4c41",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e79137cd-762e-4bb3-88fa-a648c2791cd5",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/tensorrt-worker.js",
+      "sourceRevision": "sha256:e6849fa02067a58942a754908be28ff536264e7d1b42e89f80b3a9c6bf1497d5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "92418bed-9a66-4a00-83d5-04824afef3a0",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/webgpu-pagerank.ts",
+      "sourceRevision": "sha256:37de466bdf77890f8b0ee54f27217154582a3ce2576bff9ffe057872722658bb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "fba62041-53c6-4c65-9b2e-9a8425bf3059",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/webgpu-palace-compression.ts",
+      "sourceRevision": "sha256:eef028a4c7a389331e43f0ae0fe757d8230d4e8a216ba99f1499d5fdaf391547",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b4fc3353-f02f-4475-9e60-f8577b528c59",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/webgpu-palace-core.ts",
+      "sourceRevision": "sha256:c785c0589e11386f5a40993183687ee933709fee2b74ad36276363c83d3f89a8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b952de9b-ef0d-4544-b000-3c8e0d65d880",
+      "sourceRef": "sveltekit-frontend/src/lib/gpu/webgpu-palace-shaders.ts",
+      "sourceRevision": "sha256:9ec44c3e56549d76e9e148c2381a5e53f0c398f6fa7ba13874a94050a5b241ab",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "605f6177-c6ea-47ab-a5d5-b43cadeb2cc9",
+      "sourceRef": "sveltekit-frontend/src/lib/graph/graph.remote.ts",
+      "sourceRevision": "sha256:a9933c4ddcf6c30ecee1435c927a340996c434d0ac212931c6ace422201eb0a4",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "66c253eb-e92f-4626-8877-82d85d69e557",
+      "sourceRef": "sveltekit-frontend/src/lib/icons/yorha/index.ts",
+      "sourceRevision": "sha256:5b90fc730e58ca7417cd948a75ef23e8ff1c32f4317efc91f27f66311f9bf08c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d1e0bcec-baec-401c-90fb-3a9fbf69128d",
+      "sourceRef": "sveltekit-frontend/src/lib/index.ts",
+      "sourceRevision": "sha256:420d17c29e548e8a2f9ed6151bea52b94b080dce4249af272943307f5967cba7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d1fb5856-7c04-45ee-9636-82437cadc591",
+      "sourceRef": "sveltekit-frontend/src/lib/intent/regex-intent.ts",
+      "sourceRevision": "sha256:097f45aaa6bcdc2025355d971b8f36dba35e7793444802f649e6a686bca1a2af",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cf30231f-2da6-49c2-b6b8-caaab04e79ee",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/audio-upload-machine.ts",
+      "sourceRevision": "sha256:2ca563b44bbcdb66df8b52f541ba733a5606dac8c45fafa170bb947a8ed9cfc6",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5d4cd08f-c607-463d-b263-f37979463fca",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/auth-machine.ts",
+      "sourceRevision": "sha256:dbd213405a0881af2a103aee81d36d67d7bd3ac05cc7ee044789d72d2680d424",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b88a6bc3-27d6-41a9-849c-5ca1186b68fb",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/document-upload-machine.ts",
+      "sourceRevision": "sha256:654fa2e0be29a501187f71bcd9d28013e3c59c8e85c9e194f4791b370dc1ec2c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "351c1d47-f7ac-4df8-b0bb-dddd93706b56",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/evidence-analysis-machine.ts",
+      "sourceRevision": "sha256:f9a5352eef973020b1bfcaec10730a11d8be715ef8f04b15613bcde1507dad19",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a08da114-7f86-474a-989e-4d653ede3b02",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/evidence-processing-machine.ts",
+      "sourceRevision": "sha256:f2e3f3d8b6ff2106b79e743d46e8ac566510679f55d653c22c10703ee98248f0",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f18c3f2f-2f9a-4e6a-8534-a2f5766c5824",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/evidenceCustodyMachine.ts",
+      "sourceRevision": "sha256:e46f4b2b7fe389acc14409c14ea97e65f15c9d2c8863a2aa5db22ecd99a503ac",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "d994879a-5244-416a-882c-05521b096415",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/retrieval-machine.ts",
+      "sourceRevision": "sha256:679691fa9c8f9015c02fcff692be0a0b82996a41e75e97a01debd8ebbb43bb02",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "76a6776e-76ce-463b-af8d-b4339148342a",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/uploadMachine.ts",
+      "sourceRevision": "sha256:b24a575a9489ec725b0b842a9dc3aa6e4bc66bc85d2ac6bc209f8d7b82b01fbc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "56eaaeb1-7179-457c-b7e3-460512ed92d6",
+      "sourceRef": "sveltekit-frontend/src/lib/machines/userTypingStateMachine.ts",
+      "sourceRevision": "sha256:9e2a4d4ba21f359384d02f8fb12477a81862138e1f98dae645a7f7ed697e094f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b21fd9a0-0a42-46a7-81c3-95ac435fbfb3",
+      "sourceRef": "sveltekit-frontend/src/lib/mcp/langgraph-bridge.ts",
+      "sourceRevision": "sha256:3b31a78a30e6f84ac14b85b6b4a9246a490255c6577c6d029b9b97570e3517d8",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b471c16b-7770-455a-aa15-e6c43b781b61",
+      "sourceRef": "sveltekit-frontend/src/lib/mcp/memory-bridge.ts",
+      "sourceRevision": "sha256:35e232e7899b239674c0e6d747db69275b5532c0e9fa99a577a341286a2fc12f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "c28788f7-c3c7-49ff-aefb-f9d35740eaa0",
+      "sourceRef": "sveltekit-frontend/src/lib/messaging/rabbitmq-xstate-integration.ts",
+      "sourceRevision": "sha256:f37fb0d0631697f52bd2a0efab939e7d342853c305cced1c23af0c94b850bf99",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b55c9aa1-bc0f-4627-9500-501f26040318",
+      "sourceRef": "sveltekit-frontend/src/lib/models/ChatSession.svelte.ts",
+      "sourceRevision": "sha256:d801100e9fb3c279b8a6c76b28d97b315e24b6dec358612e25c6e5bcbe426a96",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e8bf7e74-4f0e-4b68-b337-05129f554144",
+      "sourceRef": "sveltekit-frontend/src/lib/phase72/routeGraphAdapter.ts",
+      "sourceRevision": "sha256:03b8135fe62d38d7984edbce6f09cb24bf1f607320aa41bdd66eba2cf196c795",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3ee54dbf-98a7-4a04-b093-384c69ba12c3",
+      "sourceRef": "sveltekit-frontend/src/lib/polyfills.ts",
+      "sourceRevision": "sha256:9dc08f5209d2da3c5d20645c28f3e136a272bcfc882522203b88eb9182e8b93e",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7de51247-0143-47b6-9d78-a1ccd5e9d4d5",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/contracts.ts",
+      "sourceRevision": "sha256:4b965ee85f8d25ce1638c65e4c1f4859e46442afc1c7ddc9683e7da1be318b73",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "1a30c9d6-d948-45be-8745-26ff4e7a181e",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/packet-lod-manifest.test.ts",
+      "sourceRevision": "sha256:2e9085a7d8f46b2bc7388ca896433fbf372c13bbcef631bc08e2d7f3a4e99018",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b2ec02df-225f-4258-84a4-158741a580b7",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/packet-lod-manifest.ts",
+      "sourceRevision": "sha256:835589c60c2c7aadd2299716a3b7a9f8b55c960ef942aadcdc4b74ecbc9aa5b7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "58a27ebe-150c-4db1-856d-caf56ed72ecc",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/runtime-cache-key.test.ts",
+      "sourceRevision": "sha256:7c9b7027595999e78e68af7eaf935b77d89551ec3113bb3fac31851b3ae6e193",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e0091771-85e7-4fe9-8db9-c01123713494",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/runtime-cache-key.ts",
+      "sourceRevision": "sha256:516274860a4d5c62dd745059e05cc4e48b60219e15c7e51c072b6b8f3552aec4",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "3e905fb6-d582-4977-8756-cf22fffe099e",
+      "sourceRef": "sveltekit-frontend/src/lib/runtime-cache/som-neighbor-lookup.ts",
+      "sourceRevision": "sha256:c9f28f6ae951fbbfa36ebfd04f382079ae292d7ef7da658d518a0ad50a14f7a3",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6c97c048-2990-4481-8d62-f7d0073045a1",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas.ts",
+      "sourceRevision": "sha256:8fd9d60ef0a56e7e327bc0fdc6ce5c5a18379e5d8759228de723d2e2d37eb450",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f807b558-f35b-46cb-96be-539e9eae50b3",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/auth.ts",
+      "sourceRevision": "sha256:0d704d69335d2af549d93e7a522d66fe3d0a96d7eb7d5212610e02673bbfb071",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "982ebe5e-d61c-4bcf-9821-bfc3df7694a8",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/board.ts",
+      "sourceRevision": "sha256:1215aa256cd1fca9705557f8bfc3c474392c2b4e7ad44abdd6ad8c9807213f07",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f7d52d9a-36c3-4b10-bc17-ee20c7cfcea8",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/evidence-upload.ts",
+      "sourceRevision": "sha256:f1ccaacdf60824174ad3df94b9d9a757faf9a9b0f5f1c0ced91dd2ecb63e3e04",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4433d497-94df-4314-8187-005a97cce6ce",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/evidence.ts",
+      "sourceRevision": "sha256:5a789b67183c56336e10380ca28b535fd6bbd10f92781860c795d1d6ae1db009",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e27b448e-35e9-4e05-8a3a-2cf3a0f7edb7",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/file-understanding.ts",
+      "sourceRevision": "sha256:04c3f7a431f4ffa44f4d49cccc7f8308023997b3f0340369590daca43332e4e7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f64c8c06-53d0-4542-b8de-f924aad91d7b",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/forms.ts",
+      "sourceRevision": "sha256:cf2bba43a4965988ec2eef2c98c67c6a9af94037e9a081dc170d8a18c7f5a6d5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "51b77062-87a6-47c9-b962-cc2d7b8dc1e1",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/packet-canonical.ts",
+      "sourceRevision": "sha256:3af9a99bc24d18d950ef6a27e0be60ae46fabc88c40303670c506479bebf2ddb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e1ecba43-2215-4aff-a4a3-8591f8cebf7e",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/phase18-envelope-schema.ts",
+      "sourceRevision": "sha256:3facd456b2ea1aa15183311baf9129dc7844cc075566c4aa2e04fb8e72d5486a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "2c776409-81c3-4aae-b6a6-d8751637ebcd",
+      "sourceRef": "sveltekit-frontend/src/lib/schemas/tree_node_identity_schema.ts",
+      "sourceRevision": "sha256:bb459ee5b1d9246aedef182047110bbd94010dffbc9042dede2fb77569fb696d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "8f7a9ed0-1465-4585-b196-1da9350c27c2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/DispatcherMiddleware.ts",
+      "sourceRevision": "sha256:d90449b85982eaa50c094fa4d6d9c621a3b3d3bd1a9aef985167196fc28867bb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e53a4f2e-5bf9-444b-b703-b2b6848ad00a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/DispatcherMiddlewareDependencies.ts",
+      "sourceRevision": "sha256:4b03e6ff2efdbdd784b652e9eb26ed3827802055ea3a09ccd812dff46dcf217d",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "93e268cd-0cf2-4bca-b25f-e9bca4b3bfc0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/__tests__/cache-smoke.test.ts",
+      "sourceRevision": "sha256:3d6bebee45d79a29f84e2b21b674739e3d67926814f71bc2d845bb5c5f090c10",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "00ab88bb-301b-46b7-9154-0caa9938b283",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace-ingest-progress.ts",
+      "sourceRevision": "sha256:e1a622ec27ce8e58d10d255102eef3afc1ea4bace895509e3dd4109d0980a059",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "0dbe3638-cdfa-4217-bd80-eafe0a449cac",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-assembler.ts",
+      "sourceRevision": "sha256:28c0211b785bfb0c4269e9091a11c8322ec2bbd745e1dd855ff6e04ef2062c6c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "68dcfb46-8924-44b8-9c35-26a803709050",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.spec.ts",
+      "sourceRevision": "sha256:6546593dc92b278c0955e19cdc3395dbef8aebf45f6c3a014180d333638d8491",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "6f11cbc9-73dd-418e-a327-4716ad60555d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-context-manifest.ts",
+      "sourceRevision": "sha256:66d8edd7c5d6819e92892c5ee177f78f922a3c7bdc3db2245af184620ec1073a",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "73380fd1-6db8-4383-9794-10f021d77bc2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-error-kag.ts",
+      "sourceRevision": "sha256:6b74ce38999c89985e84ccd0568ca9589a5ed2b67803a56687e2e1edaf1239f1",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "e5e343eb-bdbc-435a-9aee-8631b5592473",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-materializer.spec.ts",
+      "sourceRevision": "sha256:b18db5b035f348fda87c779d1a6422ec1ddc4565fcb3a111d8810a43516e45c3",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "73aacaf6-0ae1-4feb-a9c9-85c8ccb421a6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-packet-store.ts",
+      "sourceRevision": "sha256:1a440ac322e0b59a32358070d1bae493858aad183c44b45791ef08947c62ed0f",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "7d939cd5-9e09-4ec5-916f-8e34b971d4c0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-packet-validator.ts",
+      "sourceRevision": "sha256:b1d2e8631c225443012908173a68c230eb24de37e38cb0e72167668a610c5a7c",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "db8ddb80-0dca-471f-8fbc-f53d65a66c3e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-payload-selector.ts",
+      "sourceRevision": "sha256:cb853f6e46eb25982a2482630d276794c5d0b8e99ff142dbda1bf42b75f6b558",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ddb73f82-836a-44d9-b4c2-ea2601ab3495",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-query-packet.spec.ts",
+      "sourceRevision": "sha256:28799699c544639ebaebbddd5fee206b16d77cb2ec9882939814f49620da04d1",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "402d5ff3-3c02-4c2b-9a21-a28074481c5c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-query-packet.ts",
+      "sourceRevision": "sha256:0675921bdb49b002f08a4d384fb5a7ba0f1e02305dd3d24259ed1f6fc0c621d6",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "cc257d35-73e8-4726-9a18-8562fc68b3fa",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-retrieval-logger.ts",
+      "sourceRevision": "sha256:d50aee20431ae769fb406e11e87ae42bab12b7b763a0371da51560c331f3529b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4a883dd4-c6e5-4aaf-b04c-ddfc91e0623a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-routing.ts",
+      "sourceRevision": "sha256:e2d51c73340752a1ef8a85112520104e5fa3d41f6ae46df3a0858fba54da39be",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "c96476a1-5550-46b9-b028-a464e26c6e4e",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ace-wiki.ts",
+      "sourceRevision": "sha256:034827f5e28d980295955d3e6212fab5e4d5943c97bcc36f2870ad3f1c0f2cd7",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b1e40897-4b3d-4540-ac75-c0ea240027a1",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/adaptive-prefetch.ts",
+      "sourceRevision": "sha256:5cef63c99ae95cd1e1ebc59fd8d6cee5370a6577cf56ecae5140358aedb1f198",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "acf43b21-e6ef-4b84-a13c-7a31b69b5c19",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/agentic-repair-context-replay.spec.ts",
+      "sourceRevision": "sha256:8df153c0dc8ab161ae8bb31e8cf0cccfda38effe5c03b864416382656607eb57",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "4edb26e1-d851-4014-ac85-724598bad67a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/atlas-routing-matrix.ts",
+      "sourceRevision": "sha256:68eadb9e7e36f5912a19b332dce26be0dcdfb31475a12d6a6fee12ea982177c2",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "61d98638-52b0-414d-b0d3-6ec5fb4a1ff7",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/auto-tagger.ts",
+      "sourceRevision": "sha256:b0811f2e1d93d026cfda7500c103bb5f5bdf853209ccfe2a23c40405afabc565",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "5dad51fd-7516-41c2-aaa3-3d3e31d32800",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/cache/cache-key.ts",
+      "sourceRevision": "sha256:6912315e59c7b5f9fa4a26cc3794edf24a829879c18c7ce2cae81617f94cb7f0",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "9f4928dd-2e73-43cc-ac25-7fec71c2f1db",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/cache/revision-aware-cache.ts",
+      "sourceRevision": "sha256:8a42aa1100eee81ece6cb9ec0d70e65e4bfb2e7bd56991a2515c9eefa465f4dc",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "a0b768fe-d83a-4b04-a3ff-92efd30e5e62",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/canonical-packet-envelope.ts",
+      "sourceRevision": "sha256:b4abc109f620bf556115205d4920649cb363b20928f364482be61e89f9dac378",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "549c4aa7-a580-4155-b3d9-40cb0b0c9025",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/card-promotion-loader.ts",
+      "sourceRevision": "sha256:77e9dfef34fa1835e7dddbd3d162dcd0232643dcd0b1bfab9b957c6a7cb00feb",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "b6ea9e8d-5fa2-4fa2-a3c6-9e5a51a166fc",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/centroid-compression.ts",
+      "sourceRevision": "sha256:6bb47229ecb7e97ea30621384e19eabe809cb9588d36f1b9786beb7eb08c862b",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "bc9899d1-315e-4443-a6e0-640240b68bab",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/chat-memory.ts",
+      "sourceRevision": "sha256:f08b5c620f3020d07d69b8748f39d2784ed2b6a0a843d8a59d505483f68218be",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "ea745dd5-3ac7-4dd6-9d9b-c20faacfcf96",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/cluster-ace-packet.test.ts",
+      "sourceRevision": "sha256:db910d6c92d2913d6e98058f81d39cdd615f034f097df3a2bfc714eb314c2438",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    },
+    {
+      "fileId": "f0dc08e8-0bba-4210-b29c-64356440c945",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/cluster-ace-packet.ts",
+      "sourceRevision": "sha256:ff0812596339db8fce261c15f8083c9557beec31aeb557f9a0a1b2ac813a7ab5",
+      "fileKind": "ts_js",
+      "status": "PENDING_BYTE_CHECK",
+      "byteCheck": true,
+      "extractionOutcome": null,
+      "readbackProven": false
+    }
+  ],
+  "shardCompletionProven": false,
+  "status": "PARTIAL_FAILURE",
+  "fatalError": "OBSERVATION_READBACK_REJECTED:[\"symbols:CONFLICTING_EXPECTED_IDENTITY\",\"symbols:OBSERVATION_MISSING_OR_MISMATCH:3d882d9d720de69ce91d1b1cd600430bbdb901e2a2e45329fb97db9e8ae456d7\"]",
+  "availableBytes": 7248793600,
+  "maxFilesPerRun": 25,
+  "readbacks": [
+    {
+      "fileId": "dbfbaba3-9ce8-4650-abb2-386bfbb9afa6",
+      "sourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+      "sourceRevision": "sha256:22254cd4d8386433faf42f4c447e559d248946d25f43bb8247f5d4bf8dacd8e2",
+      "mode": "INDEPENDENT_POST_COMMIT_READ_ONLY",
+      "proven": true,
+      "rejects": [],
+      "codeSymbolCount": 3,
+      "astNodeCount": 0
+    },
+    {
+      "fileId": "42bc5d86-ba12-4817-b6fc-a81941568a2c",
+      "sourceRef": "sveltekit-frontend/src/app.d.ts",
+      "sourceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+      "mode": "INDEPENDENT_POST_COMMIT_READ_ONLY",
+      "proven": true,
+      "rejects": [],
+      "codeSymbolCount": 12,
+      "astNodeCount": 0
+    },
+    {
+      "fileId": "d42223ad-947b-457d-84eb-cb62b63585ec",
+      "sourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+      "sourceRevision": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+      "mode": "INDEPENDENT_POST_COMMIT_READ_ONLY",
+      "proven": true,
+      "rejects": [],
+      "codeSymbolCount": 5,
+      "astNodeCount": 0
+    }
+  ],
+  "generatedAt": "2026-09-30T15:37:54.740Z",
+  "apply": true,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "admissionMode": "CANONICAL_WORKSPACE_SOURCE_BINDING",
+  "workspaceRevisionCount": 1,
+  "graphifyWorkspaceRevisionMismatchCount": 250,
+  "sourceRevisionMismatchCount": 0,
+  "candidatePoolRows": 250,
+  "supportedCandidatePoolRows": 250,
+  "precheckRowsExamined": 250,
+  "precheckRevisionMismatchRows": 0,
+  "precheckMissingSourceRows": 0,
+  "precheckReadErrorRows": 0,
+  "sourceRevisionRejectSample": [],
+  "candidatesConsidered": 250,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "ts_js": 4
+  },
+  "filesProcessed": 3,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 23,
+  "totalSymbolsInserted": 20,
+  "datastoreWriteAttempted": true,
+  "plan": [
+    {
+      "fileId": "dbfbaba3-9ce8-4650-abb2-386bfbb9afa6",
+      "sourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:22254cd4d8386433faf42f4c447e559d248946d25f43bb8247f5d4bf8dacd8e2",
+      "sourceDigest": "sha256:22254cd4d8386433faf42f4c447e559d248946d25f43bb8247f5d4bf8dacd8e2",
+      "fileKind": "ts_js",
+      "outcome": "PROCESSED_WITH_SYMBOLS",
+      "symbolCount": 3
+    },
+    {
+      "fileId": "42bc5d86-ba12-4817-b6fc-a81941568a2c",
+      "sourceRef": "sveltekit-frontend/src/app.d.ts",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+      "sourceDigest": "sha256:856012f6fecb764bf528d9d0b37d9a7c33541ccd114444596e172c2d89fe1908",
+      "fileKind": "ts_js",
+      "outcome": "PROCESSED_WITH_SYMBOLS",
+      "symbolCount": 12
+    },
+    {
+      "fileId": "d42223ad-947b-457d-84eb-cb62b63585ec",
+      "sourceRef": "sveltekit-frontend/src/auth-store.svelte.ts",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+      "sourceDigest": "sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e",
+      "fileKind": "ts_js",
+      "outcome": "PROCESSED_WITH_SYMBOLS",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "fdbaaa71-0aa6-40e9-88e9-e332ebd79e5c",
+      "sourceRef": "sveltekit-frontend/src/custom-modules.d.ts",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "graphifyWorkspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "sourceRevision": "sha256:509d362578f5d6c2b8b9fe6bb4051edd87a394f34715d4b1593c67d269a6114f",
+      "sourceDigest": "sha256:509d362578f5d6c2b8b9fe6bb4051edd87a394f34715d4b1593c67d269a6114f",
+      "fileKind": "ts_js",
+      "outcome": "WRITE_FAILED_ROLLED_BACK",
+      "symbolCount": 3,
+      "error": "OBSERVATION_READBACK_REJECTED:[\"symbols:CONFLICTING_EXPECTED_IDENTITY\",\"symbols:OBSERVATION_MISSING_OR_MISMATCH:3d882d9d720de69ce91d1b1cd600430bbdb901e2a2e45329fb97db9e8ae456d7\"]"
+    }
+  ]
+}

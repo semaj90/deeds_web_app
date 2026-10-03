@@ -32,6 +32,37 @@
     "disable_content_logging": false,
     "log_retention_days": 7
   },
+  "mcp": {
+    "tool_manager_config": {
+      "disable_auto_tool_inject": true
+    },
+    "client_configs": [
+      {
+        "name": "trace",
+        "connection_type": "http",
+        "connection_string": "http://host.docker.internal:8788/mcp",
+        "is_code_mode_client": true,
+        "allow_on_all_virtual_keys": true,
+        "tools_to_execute": ["*"]
+      },
+      {
+        "name": "atlas_tools",
+        "connection_type": "http",
+        "connection_string": "http://host.docker.internal:8794/mcp",
+        "allow_on_all_virtual_keys": true,
+        "tools_to_execute": [
+          "classify_intent",
+          "build_agentic_rag_context",
+          "find_dependencies",
+          "find_feature",
+          "find_route",
+          "find_source_refs",
+          "trace_database",
+          "trace_tool_chain"
+        ]
+      }
+    ]
+  },
   "providers": {
     "ollama": {
       "keys": [

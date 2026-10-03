@@ -18,6 +18,15 @@ export namespace yorha {
             constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
 
             /**
+             * Creates new RetrievalService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): RetrievalService;
+
+            /**
              * Calls SearchEvidence.
              * @param request EvidenceSearchRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and EvidenceSearchResponse
@@ -116,6 +125,34 @@ export namespace yorha {
             public expandAstNeighbors(request: yorha.retrieval.IAstExpansionRequest): Promise<yorha.retrieval.AstExpansionResponse>;
 
             /**
+             * Calls GetSemanticAstPackets.
+             * @param request SemanticAstPacketRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and SemanticAstPacketResponse
+             */
+            public getSemanticAstPackets(request: yorha.retrieval.ISemanticAstPacketRequest, callback: yorha.retrieval.RetrievalService.GetSemanticAstPacketsCallback): void;
+
+            /**
+             * Calls GetSemanticAstPackets.
+             * @param request SemanticAstPacketRequest message or plain object
+             * @returns Promise
+             */
+            public getSemanticAstPackets(request: yorha.retrieval.ISemanticAstPacketRequest): Promise<yorha.retrieval.SemanticAstPacketResponse>;
+
+            /**
+             * Calls GetPacketRegistry.
+             * @param request PacketRegistryRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and PacketRegistryResponse
+             */
+            public getPacketRegistry(request: yorha.retrieval.IPacketRegistryRequest, callback: yorha.retrieval.RetrievalService.GetPacketRegistryCallback): void;
+
+            /**
+             * Calls GetPacketRegistry.
+             * @param request PacketRegistryRequest message or plain object
+             * @returns Promise
+             */
+            public getPacketRegistry(request: yorha.retrieval.IPacketRegistryRequest): Promise<yorha.retrieval.PacketRegistryResponse>;
+
+            /**
              * Calls GetTopologyContext.
              * @param request TopologyRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and TopologyResponse
@@ -210,6 +247,20 @@ export namespace yorha {
             type ExpandAstNeighborsCallback = (error: (Error|null), response?: yorha.retrieval.AstExpansionResponse) => void;
 
             /**
+             * Callback as used by {@link yorha.retrieval.RetrievalService#getSemanticAstPackets}.
+             * @param error Error, if any
+             * @param [response] SemanticAstPacketResponse
+             */
+            type GetSemanticAstPacketsCallback = (error: (Error|null), response?: yorha.retrieval.SemanticAstPacketResponse) => void;
+
+            /**
+             * Callback as used by {@link yorha.retrieval.RetrievalService#getPacketRegistry}.
+             * @param error Error, if any
+             * @param [response] PacketRegistryResponse
+             */
+            type GetPacketRegistryCallback = (error: (Error|null), response?: yorha.retrieval.PacketRegistryResponse) => void;
+
+            /**
              * Callback as used by {@link yorha.retrieval.RetrievalService#getTopologyContext}.
              * @param error Error, if any
              * @param [response] TopologyResponse
@@ -263,6 +314,9 @@ export namespace yorha {
 
             /** EvidenceSearchRequest includeDebug */
             includeDebug?: (boolean|null);
+
+            /** EvidenceSearchRequest atlasContext */
+            atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
         }
 
         /** Represents an EvidenceSearchRequest. */
@@ -304,6 +358,16 @@ export namespace yorha {
             /** EvidenceSearchRequest includeDebug. */
             public includeDebug: boolean;
 
+            /** EvidenceSearchRequest atlasContext. */
+            public atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /**
+             * Creates a new EvidenceSearchRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvidenceSearchRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IEvidenceSearchRequest): yorha.retrieval.EvidenceSearchRequest;
+
             /**
              * Encodes the specified EvidenceSearchRequest message. Does not implicitly {@link yorha.retrieval.EvidenceSearchRequest.verify|verify} messages.
              * @param message EvidenceSearchRequest message or plain object to encode
@@ -340,6 +404,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.EvidenceSearchRequest;
 
             /**
+             * Verifies an EvidenceSearchRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an EvidenceSearchRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns EvidenceSearchRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.EvidenceSearchRequest;
+
+            /**
+             * Creates a plain object from an EvidenceSearchRequest message. Also converts values to other types if specified.
+             * @param message EvidenceSearchRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.EvidenceSearchRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this EvidenceSearchRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for EvidenceSearchRequest
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -364,6 +456,9 @@ export namespace yorha {
 
             /** EvidenceSearchResponse debugJson */
             debugJson?: (string|null);
+
+            /** EvidenceSearchResponse receipt */
+            receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
         }
 
         /** Represents an EvidenceSearchResponse. */
@@ -389,6 +484,16 @@ export namespace yorha {
 
             /** EvidenceSearchResponse debugJson. */
             public debugJson: string;
+
+            /** EvidenceSearchResponse receipt. */
+            public receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+
+            /**
+             * Creates a new EvidenceSearchResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvidenceSearchResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IEvidenceSearchResponse): yorha.retrieval.EvidenceSearchResponse;
 
             /**
              * Encodes the specified EvidenceSearchResponse message. Does not implicitly {@link yorha.retrieval.EvidenceSearchResponse.verify|verify} messages.
@@ -424,6 +529,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.EvidenceSearchResponse;
+
+            /**
+             * Verifies an EvidenceSearchResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an EvidenceSearchResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns EvidenceSearchResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.EvidenceSearchResponse;
+
+            /**
+             * Creates a plain object from an EvidenceSearchResponse message. Also converts values to other types if specified.
+             * @param message EvidenceSearchResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.EvidenceSearchResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this EvidenceSearchResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for EvidenceSearchResponse
@@ -468,6 +601,13 @@ export namespace yorha {
             public event?: ("bundle"|"progress"|"error");
 
             /**
+             * Creates a new EvidenceBundleEvent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvidenceBundleEvent instance
+             */
+            public static create(properties?: yorha.retrieval.IEvidenceBundleEvent): yorha.retrieval.EvidenceBundleEvent;
+
+            /**
              * Encodes the specified EvidenceBundleEvent message. Does not implicitly {@link yorha.retrieval.EvidenceBundleEvent.verify|verify} messages.
              * @param message EvidenceBundleEvent message or plain object to encode
              * @param [writer] Writer to encode to
@@ -501,6 +641,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.EvidenceBundleEvent;
+
+            /**
+             * Verifies an EvidenceBundleEvent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an EvidenceBundleEvent message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns EvidenceBundleEvent
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.EvidenceBundleEvent;
+
+            /**
+             * Creates a plain object from an EvidenceBundleEvent message. Also converts values to other types if specified.
+             * @param message EvidenceBundleEvent
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.EvidenceBundleEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this EvidenceBundleEvent to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for EvidenceBundleEvent
@@ -560,6 +728,13 @@ export namespace yorha {
             public rerank?: (yorha.retrieval.IRerankExplain|null);
 
             /**
+             * Creates a new SearchResult instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchResult instance
+             */
+            public static create(properties?: yorha.retrieval.ISearchResult): yorha.retrieval.SearchResult;
+
+            /**
              * Encodes the specified SearchResult message. Does not implicitly {@link yorha.retrieval.SearchResult.verify|verify} messages.
              * @param message SearchResult message or plain object to encode
              * @param [writer] Writer to encode to
@@ -593,6 +768,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SearchResult;
+
+            /**
+             * Verifies a SearchResult message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SearchResult message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SearchResult
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SearchResult;
+
+            /**
+             * Creates a plain object from a SearchResult message. Also converts values to other types if specified.
+             * @param message SearchResult
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SearchResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SearchResult to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for SearchResult
@@ -658,6 +861,13 @@ export namespace yorha {
             public jurisdiction: string;
 
             /**
+             * Creates a new ChunkMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ChunkMetadata instance
+             */
+            public static create(properties?: yorha.retrieval.IChunkMetadata): yorha.retrieval.ChunkMetadata;
+
+            /**
              * Encodes the specified ChunkMetadata message. Does not implicitly {@link yorha.retrieval.ChunkMetadata.verify|verify} messages.
              * @param message ChunkMetadata message or plain object to encode
              * @param [writer] Writer to encode to
@@ -691,6 +901,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ChunkMetadata;
+
+            /**
+             * Verifies a ChunkMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ChunkMetadata message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ChunkMetadata
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ChunkMetadata;
+
+            /**
+             * Creates a plain object from a ChunkMetadata message. Also converts values to other types if specified.
+             * @param message ChunkMetadata
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ChunkMetadata, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ChunkMetadata to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ChunkMetadata
@@ -744,6 +982,13 @@ export namespace yorha {
             public finalScore: number;
 
             /**
+             * Creates a new RerankExplain instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RerankExplain instance
+             */
+            public static create(properties?: yorha.retrieval.IRerankExplain): yorha.retrieval.RerankExplain;
+
+            /**
              * Encodes the specified RerankExplain message. Does not implicitly {@link yorha.retrieval.RerankExplain.verify|verify} messages.
              * @param message RerankExplain message or plain object to encode
              * @param [writer] Writer to encode to
@@ -777,6 +1022,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RerankExplain;
+
+            /**
+             * Verifies a RerankExplain message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RerankExplain message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RerankExplain
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RerankExplain;
+
+            /**
+             * Creates a plain object from a RerankExplain message. Also converts values to other types if specified.
+             * @param message RerankExplain
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RerankExplain, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RerankExplain to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RerankExplain
@@ -842,6 +1115,13 @@ export namespace yorha {
             public documentContext?: (yorha.retrieval.IDocumentContext|null);
 
             /**
+             * Creates a new ContextBundle instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ContextBundle instance
+             */
+            public static create(properties?: yorha.retrieval.IContextBundle): yorha.retrieval.ContextBundle;
+
+            /**
              * Encodes the specified ContextBundle message. Does not implicitly {@link yorha.retrieval.ContextBundle.verify|verify} messages.
              * @param message ContextBundle message or plain object to encode
              * @param [writer] Writer to encode to
@@ -875,6 +1155,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ContextBundle;
+
+            /**
+             * Verifies a ContextBundle message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ContextBundle message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ContextBundle
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ContextBundle;
+
+            /**
+             * Creates a plain object from a ContextBundle message. Also converts values to other types if specified.
+             * @param message ContextBundle
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ContextBundle, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ContextBundle to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ContextBundle
@@ -940,6 +1248,13 @@ export namespace yorha {
             public aiReasoning: string;
 
             /**
+             * Creates a new GraphNeighbor instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GraphNeighbor instance
+             */
+            public static create(properties?: yorha.retrieval.IGraphNeighbor): yorha.retrieval.GraphNeighbor;
+
+            /**
              * Encodes the specified GraphNeighbor message. Does not implicitly {@link yorha.retrieval.GraphNeighbor.verify|verify} messages.
              * @param message GraphNeighbor message or plain object to encode
              * @param [writer] Writer to encode to
@@ -973,6 +1288,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.GraphNeighbor;
+
+            /**
+             * Verifies a GraphNeighbor message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a GraphNeighbor message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns GraphNeighbor
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.GraphNeighbor;
+
+            /**
+             * Creates a plain object from a GraphNeighbor message. Also converts values to other types if specified.
+             * @param message GraphNeighbor
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.GraphNeighbor, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this GraphNeighbor to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for GraphNeighbor
@@ -1038,6 +1381,13 @@ export namespace yorha {
             public keyEntitiesJson: string;
 
             /**
+             * Creates a new DocumentContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DocumentContext instance
+             */
+            public static create(properties?: yorha.retrieval.IDocumentContext): yorha.retrieval.DocumentContext;
+
+            /**
              * Encodes the specified DocumentContext message. Does not implicitly {@link yorha.retrieval.DocumentContext.verify|verify} messages.
              * @param message DocumentContext message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1071,6 +1421,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.DocumentContext;
+
+            /**
+             * Verifies a DocumentContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a DocumentContext message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns DocumentContext
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.DocumentContext;
+
+            /**
+             * Creates a plain object from a DocumentContext message. Also converts values to other types if specified.
+             * @param message DocumentContext
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.DocumentContext, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this DocumentContext to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for DocumentContext
@@ -1136,6 +1514,13 @@ export namespace yorha {
             public totalMs: number;
 
             /**
+             * Creates a new SearchTiming instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchTiming instance
+             */
+            public static create(properties?: yorha.retrieval.ISearchTiming): yorha.retrieval.SearchTiming;
+
+            /**
              * Encodes the specified SearchTiming message. Does not implicitly {@link yorha.retrieval.SearchTiming.verify|verify} messages.
              * @param message SearchTiming message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1171,6 +1556,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SearchTiming;
 
             /**
+             * Verifies a SearchTiming message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SearchTiming message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SearchTiming
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SearchTiming;
+
+            /**
+             * Creates a plain object from a SearchTiming message. Also converts values to other types if specified.
+             * @param message SearchTiming
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SearchTiming, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SearchTiming to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for SearchTiming
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -1204,6 +1617,15 @@ export namespace yorha {
 
             /** CodebaseSearchRequest includeDebug */
             includeDebug?: (boolean|null);
+
+            /** CodebaseSearchRequest packetKeys */
+            packetKeys?: (string[]|null);
+
+            /** CodebaseSearchRequest representationId */
+            representationId?: (string|null);
+
+            /** CodebaseSearchRequest atlasContext */
+            atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
         }
 
         /** Represents a CodebaseSearchRequest. */
@@ -1238,6 +1660,22 @@ export namespace yorha {
 
             /** CodebaseSearchRequest includeDebug. */
             public includeDebug: boolean;
+
+            /** CodebaseSearchRequest packetKeys. */
+            public packetKeys: string[];
+
+            /** CodebaseSearchRequest representationId. */
+            public representationId: string;
+
+            /** CodebaseSearchRequest atlasContext. */
+            public atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /**
+             * Creates a new CodebaseSearchRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CodebaseSearchRequest instance
+             */
+            public static create(properties?: yorha.retrieval.ICodebaseSearchRequest): yorha.retrieval.CodebaseSearchRequest;
 
             /**
              * Encodes the specified CodebaseSearchRequest message. Does not implicitly {@link yorha.retrieval.CodebaseSearchRequest.verify|verify} messages.
@@ -1275,6 +1713,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.CodebaseSearchRequest;
 
             /**
+             * Verifies a CodebaseSearchRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CodebaseSearchRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CodebaseSearchRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.CodebaseSearchRequest;
+
+            /**
+             * Creates a plain object from a CodebaseSearchRequest message. Also converts values to other types if specified.
+             * @param message CodebaseSearchRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.CodebaseSearchRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CodebaseSearchRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for CodebaseSearchRequest
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -1293,6 +1759,15 @@ export namespace yorha {
 
             /** CodebaseSearchResponse debugJson */
             debugJson?: (string|null);
+
+            /** CodebaseSearchResponse representationUsed */
+            representationUsed?: (string|null);
+
+            /** CodebaseSearchResponse representationFallbackReason */
+            representationFallbackReason?: (string|null);
+
+            /** CodebaseSearchResponse receipt */
+            receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
         }
 
         /** Represents a CodebaseSearchResponse. */
@@ -1312,6 +1787,22 @@ export namespace yorha {
 
             /** CodebaseSearchResponse debugJson. */
             public debugJson: string;
+
+            /** CodebaseSearchResponse representationUsed. */
+            public representationUsed: string;
+
+            /** CodebaseSearchResponse representationFallbackReason. */
+            public representationFallbackReason: string;
+
+            /** CodebaseSearchResponse receipt. */
+            public receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+
+            /**
+             * Creates a new CodebaseSearchResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CodebaseSearchResponse instance
+             */
+            public static create(properties?: yorha.retrieval.ICodebaseSearchResponse): yorha.retrieval.CodebaseSearchResponse;
 
             /**
              * Encodes the specified CodebaseSearchResponse message. Does not implicitly {@link yorha.retrieval.CodebaseSearchResponse.verify|verify} messages.
@@ -1347,6 +1838,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.CodebaseSearchResponse;
+
+            /**
+             * Verifies a CodebaseSearchResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CodebaseSearchResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CodebaseSearchResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.CodebaseSearchResponse;
+
+            /**
+             * Creates a plain object from a CodebaseSearchResponse message. Also converts values to other types if specified.
+             * @param message CodebaseSearchResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.CodebaseSearchResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CodebaseSearchResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for CodebaseSearchResponse
@@ -1391,6 +1910,13 @@ export namespace yorha {
             public event?: ("chunk"|"progress"|"error");
 
             /**
+             * Creates a new CodebaseChunkEvent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CodebaseChunkEvent instance
+             */
+            public static create(properties?: yorha.retrieval.ICodebaseChunkEvent): yorha.retrieval.CodebaseChunkEvent;
+
+            /**
              * Encodes the specified CodebaseChunkEvent message. Does not implicitly {@link yorha.retrieval.CodebaseChunkEvent.verify|verify} messages.
              * @param message CodebaseChunkEvent message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1424,6 +1950,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.CodebaseChunkEvent;
+
+            /**
+             * Verifies a CodebaseChunkEvent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CodebaseChunkEvent message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CodebaseChunkEvent
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.CodebaseChunkEvent;
+
+            /**
+             * Creates a plain object from a CodebaseChunkEvent message. Also converts values to other types if specified.
+             * @param message CodebaseChunkEvent
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.CodebaseChunkEvent, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CodebaseChunkEvent to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for CodebaseChunkEvent
@@ -1465,6 +2019,39 @@ export namespace yorha {
 
             /** CodebaseChunk endLine */
             endLine?: (number|null);
+
+            /** CodebaseChunk packetKey */
+            packetKey?: (string|null);
+
+            /** CodebaseChunk sourceRef */
+            sourceRef?: (string|null);
+
+            /** CodebaseChunk canonicalSourceRef */
+            canonicalSourceRef?: (string|null);
+
+            /** CodebaseChunk symbolVersionId */
+            symbolVersionId?: (string|null);
+
+            /** CodebaseChunk contentHash */
+            contentHash?: (string|null);
+
+            /** CodebaseChunk workspaceRevision */
+            workspaceRevision?: (string|null);
+
+            /** CodebaseChunk sourceRevision */
+            sourceRevision?: (string|null);
+
+            /** CodebaseChunk representationId */
+            representationId?: (string|null);
+
+            /** CodebaseChunk representationRevision */
+            representationRevision?: (string|null);
+
+            /** CodebaseChunk candidateId */
+            candidateId?: (string|null);
+
+            /** CodebaseChunk candidateOrdinal */
+            candidateOrdinal?: (number|Long|null);
         }
 
         /** Represents a CodebaseChunk. */
@@ -1506,6 +2093,46 @@ export namespace yorha {
             /** CodebaseChunk endLine. */
             public endLine: number;
 
+            /** CodebaseChunk packetKey. */
+            public packetKey: string;
+
+            /** CodebaseChunk sourceRef. */
+            public sourceRef: string;
+
+            /** CodebaseChunk canonicalSourceRef. */
+            public canonicalSourceRef: string;
+
+            /** CodebaseChunk symbolVersionId. */
+            public symbolVersionId: string;
+
+            /** CodebaseChunk contentHash. */
+            public contentHash: string;
+
+            /** CodebaseChunk workspaceRevision. */
+            public workspaceRevision: string;
+
+            /** CodebaseChunk sourceRevision. */
+            public sourceRevision: string;
+
+            /** CodebaseChunk representationId. */
+            public representationId: string;
+
+            /** CodebaseChunk representationRevision. */
+            public representationRevision: string;
+
+            /** CodebaseChunk candidateId. */
+            public candidateId: string;
+
+            /** CodebaseChunk candidateOrdinal. */
+            public candidateOrdinal: (number|Long);
+
+            /**
+             * Creates a new CodebaseChunk instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CodebaseChunk instance
+             */
+            public static create(properties?: yorha.retrieval.ICodebaseChunk): yorha.retrieval.CodebaseChunk;
+
             /**
              * Encodes the specified CodebaseChunk message. Does not implicitly {@link yorha.retrieval.CodebaseChunk.verify|verify} messages.
              * @param message CodebaseChunk message or plain object to encode
@@ -1540,6 +2167,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.CodebaseChunk;
+
+            /**
+             * Verifies a CodebaseChunk message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a CodebaseChunk message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns CodebaseChunk
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.CodebaseChunk;
+
+            /**
+             * Creates a plain object from a CodebaseChunk message. Also converts values to other types if specified.
+             * @param message CodebaseChunk
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.CodebaseChunk, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this CodebaseChunk to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for CodebaseChunk
@@ -1581,6 +2236,13 @@ export namespace yorha {
             public withinSameEvidenceOnly: boolean;
 
             /**
+             * Creates a new GraphHopPolicy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GraphHopPolicy instance
+             */
+            public static create(properties?: yorha.retrieval.IGraphHopPolicy): yorha.retrieval.GraphHopPolicy;
+
+            /**
              * Encodes the specified GraphHopPolicy message. Does not implicitly {@link yorha.retrieval.GraphHopPolicy.verify|verify} messages.
              * @param message GraphHopPolicy message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1614,6 +2276,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.GraphHopPolicy;
+
+            /**
+             * Verifies a GraphHopPolicy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a GraphHopPolicy message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns GraphHopPolicy
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.GraphHopPolicy;
+
+            /**
+             * Creates a plain object from a GraphHopPolicy message. Also converts values to other types if specified.
+             * @param message GraphHopPolicy
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.GraphHopPolicy, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this GraphHopPolicy to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for GraphHopPolicy
@@ -1661,6 +2351,13 @@ export namespace yorha {
             public allowPgvectorFallback: boolean;
 
             /**
+             * Creates a new PrefilterPolicy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PrefilterPolicy instance
+             */
+            public static create(properties?: yorha.retrieval.IPrefilterPolicy): yorha.retrieval.PrefilterPolicy;
+
+            /**
              * Encodes the specified PrefilterPolicy message. Does not implicitly {@link yorha.retrieval.PrefilterPolicy.verify|verify} messages.
              * @param message PrefilterPolicy message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1694,6 +2391,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.PrefilterPolicy;
+
+            /**
+             * Verifies a PrefilterPolicy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a PrefilterPolicy message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns PrefilterPolicy
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.PrefilterPolicy;
+
+            /**
+             * Creates a plain object from a PrefilterPolicy message. Also converts values to other types if specified.
+             * @param message PrefilterPolicy
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.PrefilterPolicy, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this PrefilterPolicy to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for PrefilterPolicy
@@ -1735,6 +2460,13 @@ export namespace yorha {
             public jurisdictionWeight: number;
 
             /**
+             * Creates a new RankPolicy instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RankPolicy instance
+             */
+            public static create(properties?: yorha.retrieval.IRankPolicy): yorha.retrieval.RankPolicy;
+
+            /**
              * Encodes the specified RankPolicy message. Does not implicitly {@link yorha.retrieval.RankPolicy.verify|verify} messages.
              * @param message RankPolicy message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1768,6 +2500,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RankPolicy;
+
+            /**
+             * Verifies a RankPolicy message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RankPolicy message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RankPolicy
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RankPolicy;
+
+            /**
+             * Creates a plain object from a RankPolicy message. Also converts values to other types if specified.
+             * @param message RankPolicy
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RankPolicy, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RankPolicy to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RankPolicy
@@ -1815,6 +2575,13 @@ export namespace yorha {
             public message: string;
 
             /**
+             * Creates a new RetrievalProgress instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetrievalProgress instance
+             */
+            public static create(properties?: yorha.retrieval.IRetrievalProgress): yorha.retrieval.RetrievalProgress;
+
+            /**
              * Encodes the specified RetrievalProgress message. Does not implicitly {@link yorha.retrieval.RetrievalProgress.verify|verify} messages.
              * @param message RetrievalProgress message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1848,6 +2615,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RetrievalProgress;
+
+            /**
+             * Verifies a RetrievalProgress message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RetrievalProgress message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RetrievalProgress
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RetrievalProgress;
+
+            /**
+             * Creates a plain object from a RetrievalProgress message. Also converts values to other types if specified.
+             * @param message RetrievalProgress
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RetrievalProgress, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RetrievalProgress to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RetrievalProgress
@@ -1889,6 +2684,13 @@ export namespace yorha {
             public detailsJson: string;
 
             /**
+             * Creates a new RetrievalError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetrievalError instance
+             */
+            public static create(properties?: yorha.retrieval.IRetrievalError): yorha.retrieval.RetrievalError;
+
+            /**
              * Encodes the specified RetrievalError message. Does not implicitly {@link yorha.retrieval.RetrievalError.verify|verify} messages.
              * @param message RetrievalError message or plain object to encode
              * @param [writer] Writer to encode to
@@ -1922,6 +2724,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RetrievalError;
+
+            /**
+             * Verifies a RetrievalError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RetrievalError message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RetrievalError
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RetrievalError;
+
+            /**
+             * Creates a plain object from a RetrievalError message. Also converts values to other types if specified.
+             * @param message RetrievalError
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RetrievalError, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RetrievalError to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RetrievalError
@@ -1999,6 +2829,13 @@ export namespace yorha {
             public metadata: { [k: string]: string };
 
             /**
+             * Creates a new RetrievalSourceMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetrievalSourceMetadata instance
+             */
+            public static create(properties?: yorha.retrieval.IRetrievalSourceMetadata): yorha.retrieval.RetrievalSourceMetadata;
+
+            /**
              * Encodes the specified RetrievalSourceMetadata message. Does not implicitly {@link yorha.retrieval.RetrievalSourceMetadata.verify|verify} messages.
              * @param message RetrievalSourceMetadata message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2032,6 +2869,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RetrievalSourceMetadata;
+
+            /**
+             * Verifies a RetrievalSourceMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RetrievalSourceMetadata message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RetrievalSourceMetadata
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RetrievalSourceMetadata;
+
+            /**
+             * Creates a plain object from a RetrievalSourceMetadata message. Also converts values to other types if specified.
+             * @param message RetrievalSourceMetadata
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RetrievalSourceMetadata, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RetrievalSourceMetadata to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RetrievalSourceMetadata
@@ -2079,6 +2944,13 @@ export namespace yorha {
             public rerankScore: number;
 
             /**
+             * Creates a new RetrievalScoreMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetrievalScoreMetadata instance
+             */
+            public static create(properties?: yorha.retrieval.IRetrievalScoreMetadata): yorha.retrieval.RetrievalScoreMetadata;
+
+            /**
              * Encodes the specified RetrievalScoreMetadata message. Does not implicitly {@link yorha.retrieval.RetrievalScoreMetadata.verify|verify} messages.
              * @param message RetrievalScoreMetadata message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2112,6 +2984,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RetrievalScoreMetadata;
+
+            /**
+             * Verifies a RetrievalScoreMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RetrievalScoreMetadata message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RetrievalScoreMetadata
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RetrievalScoreMetadata;
+
+            /**
+             * Creates a plain object from a RetrievalScoreMetadata message. Also converts values to other types if specified.
+             * @param message RetrievalScoreMetadata
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RetrievalScoreMetadata, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RetrievalScoreMetadata to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RetrievalScoreMetadata
@@ -2171,6 +3071,13 @@ export namespace yorha {
             public bmuCol: number;
 
             /**
+             * Creates a new RetrievalClusterMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RetrievalClusterMetadata instance
+             */
+            public static create(properties?: yorha.retrieval.IRetrievalClusterMetadata): yorha.retrieval.RetrievalClusterMetadata;
+
+            /**
              * Encodes the specified RetrievalClusterMetadata message. Does not implicitly {@link yorha.retrieval.RetrievalClusterMetadata.verify|verify} messages.
              * @param message RetrievalClusterMetadata message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2204,6 +3111,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.RetrievalClusterMetadata;
+
+            /**
+             * Verifies a RetrievalClusterMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RetrievalClusterMetadata message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RetrievalClusterMetadata
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.RetrievalClusterMetadata;
+
+            /**
+             * Creates a plain object from a RetrievalClusterMetadata message. Also converts values to other types if specified.
+             * @param message RetrievalClusterMetadata
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.RetrievalClusterMetadata, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RetrievalClusterMetadata to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for RetrievalClusterMetadata
@@ -2245,6 +3180,13 @@ export namespace yorha {
             public indexedAt: string;
 
             /**
+             * Creates a new TransportTimestamps instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TransportTimestamps instance
+             */
+            public static create(properties?: yorha.retrieval.ITransportTimestamps): yorha.retrieval.TransportTimestamps;
+
+            /**
              * Encodes the specified TransportTimestamps message. Does not implicitly {@link yorha.retrieval.TransportTimestamps.verify|verify} messages.
              * @param message TransportTimestamps message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2278,6 +3220,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.TransportTimestamps;
+
+            /**
+             * Verifies a TransportTimestamps message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a TransportTimestamps message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns TransportTimestamps
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.TransportTimestamps;
+
+            /**
+             * Creates a plain object from a TransportTimestamps message. Also converts values to other types if specified.
+             * @param message TransportTimestamps
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.TransportTimestamps, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this TransportTimestamps to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for TransportTimestamps
@@ -2367,6 +3337,13 @@ export namespace yorha {
             public updatedAfter: string;
 
             /**
+             * Creates a new SearchChunksRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchChunksRequest instance
+             */
+            public static create(properties?: yorha.retrieval.ISearchChunksRequest): yorha.retrieval.SearchChunksRequest;
+
+            /**
              * Encodes the specified SearchChunksRequest message. Does not implicitly {@link yorha.retrieval.SearchChunksRequest.verify|verify} messages.
              * @param message SearchChunksRequest message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2400,6 +3377,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SearchChunksRequest;
+
+            /**
+             * Verifies a SearchChunksRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SearchChunksRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SearchChunksRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SearchChunksRequest;
+
+            /**
+             * Creates a plain object from a SearchChunksRequest message. Also converts values to other types if specified.
+             * @param message SearchChunksRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SearchChunksRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SearchChunksRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for SearchChunksRequest
@@ -2507,6 +3512,13 @@ export namespace yorha {
             public filePath: string;
 
             /**
+             * Creates a new SearchChunkResult instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchChunkResult instance
+             */
+            public static create(properties?: yorha.retrieval.ISearchChunkResult): yorha.retrieval.SearchChunkResult;
+
+            /**
              * Encodes the specified SearchChunkResult message. Does not implicitly {@link yorha.retrieval.SearchChunkResult.verify|verify} messages.
              * @param message SearchChunkResult message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2542,6 +3554,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SearchChunkResult;
 
             /**
+             * Verifies a SearchChunkResult message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SearchChunkResult message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SearchChunkResult
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SearchChunkResult;
+
+            /**
+             * Creates a plain object from a SearchChunkResult message. Also converts values to other types if specified.
+             * @param message SearchChunkResult
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SearchChunkResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SearchChunkResult to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for SearchChunkResult
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -2573,6 +3613,13 @@ export namespace yorha {
 
             /** SearchChunksResponse totalMs. */
             public totalMs: number;
+
+            /**
+             * Creates a new SearchChunksResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchChunksResponse instance
+             */
+            public static create(properties?: yorha.retrieval.ISearchChunksResponse): yorha.retrieval.SearchChunksResponse;
 
             /**
              * Encodes the specified SearchChunksResponse message. Does not implicitly {@link yorha.retrieval.SearchChunksResponse.verify|verify} messages.
@@ -2610,6 +3657,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SearchChunksResponse;
 
             /**
+             * Verifies a SearchChunksResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SearchChunksResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SearchChunksResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SearchChunksResponse;
+
+            /**
+             * Creates a plain object from a SearchChunksResponse message. Also converts values to other types if specified.
+             * @param message SearchChunksResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SearchChunksResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SearchChunksResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for SearchChunksResponse
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -2641,6 +3716,13 @@ export namespace yorha {
 
             /** ClusterSummaryRequest clusterType. */
             public clusterType: string;
+
+            /**
+             * Creates a new ClusterSummaryRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ClusterSummaryRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IClusterSummaryRequest): yorha.retrieval.ClusterSummaryRequest;
 
             /**
              * Encodes the specified ClusterSummaryRequest message. Does not implicitly {@link yorha.retrieval.ClusterSummaryRequest.verify|verify} messages.
@@ -2676,6 +3758,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ClusterSummaryRequest;
+
+            /**
+             * Verifies a ClusterSummaryRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ClusterSummaryRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ClusterSummaryRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ClusterSummaryRequest;
+
+            /**
+             * Creates a plain object from a ClusterSummaryRequest message. Also converts values to other types if specified.
+             * @param message ClusterSummaryRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ClusterSummaryRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ClusterSummaryRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ClusterSummaryRequest
@@ -2729,6 +3839,13 @@ export namespace yorha {
             public metadata: { [k: string]: string };
 
             /**
+             * Creates a new ClusterSummaryResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ClusterSummaryResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IClusterSummaryResponse): yorha.retrieval.ClusterSummaryResponse;
+
+            /**
              * Encodes the specified ClusterSummaryResponse message. Does not implicitly {@link yorha.retrieval.ClusterSummaryResponse.verify|verify} messages.
              * @param message ClusterSummaryResponse message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2762,6 +3879,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ClusterSummaryResponse;
+
+            /**
+             * Verifies a ClusterSummaryResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ClusterSummaryResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ClusterSummaryResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ClusterSummaryResponse;
+
+            /**
+             * Creates a plain object from a ClusterSummaryResponse message. Also converts values to other types if specified.
+             * @param message ClusterSummaryResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ClusterSummaryResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ClusterSummaryResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ClusterSummaryResponse
@@ -2803,6 +3948,13 @@ export namespace yorha {
             public depth: number;
 
             /**
+             * Creates a new AstExpansionRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AstExpansionRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IAstExpansionRequest): yorha.retrieval.AstExpansionRequest;
+
+            /**
              * Encodes the specified AstExpansionRequest message. Does not implicitly {@link yorha.retrieval.AstExpansionRequest.verify|verify} messages.
              * @param message AstExpansionRequest message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2838,6 +3990,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.AstExpansionRequest;
 
             /**
+             * Verifies an AstExpansionRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AstExpansionRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AstExpansionRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.AstExpansionRequest;
+
+            /**
+             * Creates a plain object from an AstExpansionRequest message. Also converts values to other types if specified.
+             * @param message AstExpansionRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.AstExpansionRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AstExpansionRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for AstExpansionRequest
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -2869,6 +4049,13 @@ export namespace yorha {
 
             /** AstExpansionResponse edges. */
             public edges: yorha.retrieval.IAstEdge[];
+
+            /**
+             * Creates a new AstExpansionResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AstExpansionResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IAstExpansionResponse): yorha.retrieval.AstExpansionResponse;
 
             /**
              * Encodes the specified AstExpansionResponse message. Does not implicitly {@link yorha.retrieval.AstExpansionResponse.verify|verify} messages.
@@ -2904,6 +4091,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.AstExpansionResponse;
+
+            /**
+             * Verifies an AstExpansionResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AstExpansionResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AstExpansionResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.AstExpansionResponse;
+
+            /**
+             * Creates a plain object from an AstExpansionResponse message. Also converts values to other types if specified.
+             * @param message AstExpansionResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.AstExpansionResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AstExpansionResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for AstExpansionResponse
@@ -2951,6 +4166,13 @@ export namespace yorha {
             public filePath: string;
 
             /**
+             * Creates a new AstNode instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AstNode instance
+             */
+            public static create(properties?: yorha.retrieval.IAstNode): yorha.retrieval.AstNode;
+
+            /**
              * Encodes the specified AstNode message. Does not implicitly {@link yorha.retrieval.AstNode.verify|verify} messages.
              * @param message AstNode message or plain object to encode
              * @param [writer] Writer to encode to
@@ -2984,6 +4206,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.AstNode;
+
+            /**
+             * Verifies an AstNode message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AstNode message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AstNode
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.AstNode;
+
+            /**
+             * Creates a plain object from an AstNode message. Also converts values to other types if specified.
+             * @param message AstNode
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.AstNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AstNode to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for AstNode
@@ -3025,6 +4275,13 @@ export namespace yorha {
             public edgeType: string;
 
             /**
+             * Creates a new AstEdge instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AstEdge instance
+             */
+            public static create(properties?: yorha.retrieval.IAstEdge): yorha.retrieval.AstEdge;
+
+            /**
              * Encodes the specified AstEdge message. Does not implicitly {@link yorha.retrieval.AstEdge.verify|verify} messages.
              * @param message AstEdge message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3060,7 +4317,996 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.AstEdge;
 
             /**
+             * Verifies an AstEdge message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AstEdge message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AstEdge
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.AstEdge;
+
+            /**
+             * Creates a plain object from an AstEdge message. Also converts values to other types if specified.
+             * @param message AstEdge
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.AstEdge, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AstEdge to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for AstEdge
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a SemanticAstPacketRequest. */
+        interface ISemanticAstPacketRequest {
+
+            /** SemanticAstPacketRequest atlasContext */
+            atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /** SemanticAstPacketRequest sourceRef */
+            sourceRef?: (string|null);
+
+            /** SemanticAstPacketRequest packetKey */
+            packetKey?: (string|null);
+
+            /** SemanticAstPacketRequest limit */
+            limit?: (number|null);
+        }
+
+        /** Represents a SemanticAstPacketRequest. */
+        class SemanticAstPacketRequest implements ISemanticAstPacketRequest {
+
+            /**
+             * Constructs a new SemanticAstPacketRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.ISemanticAstPacketRequest);
+
+            /** SemanticAstPacketRequest atlasContext. */
+            public atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /** SemanticAstPacketRequest sourceRef. */
+            public sourceRef: string;
+
+            /** SemanticAstPacketRequest packetKey. */
+            public packetKey: string;
+
+            /** SemanticAstPacketRequest limit. */
+            public limit: number;
+
+            /**
+             * Creates a new SemanticAstPacketRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SemanticAstPacketRequest instance
+             */
+            public static create(properties?: yorha.retrieval.ISemanticAstPacketRequest): yorha.retrieval.SemanticAstPacketRequest;
+
+            /**
+             * Encodes the specified SemanticAstPacketRequest message. Does not implicitly {@link yorha.retrieval.SemanticAstPacketRequest.verify|verify} messages.
+             * @param message SemanticAstPacketRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.ISemanticAstPacketRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified SemanticAstPacketRequest message, length delimited. Does not implicitly {@link yorha.retrieval.SemanticAstPacketRequest.verify|verify} messages.
+             * @param message SemanticAstPacketRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.ISemanticAstPacketRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SemanticAstPacketRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SemanticAstPacketRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.SemanticAstPacketRequest;
+
+            /**
+             * Decodes a SemanticAstPacketRequest message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns SemanticAstPacketRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SemanticAstPacketRequest;
+
+            /**
+             * Verifies a SemanticAstPacketRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SemanticAstPacketRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SemanticAstPacketRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SemanticAstPacketRequest;
+
+            /**
+             * Creates a plain object from a SemanticAstPacketRequest message. Also converts values to other types if specified.
+             * @param message SemanticAstPacketRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SemanticAstPacketRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SemanticAstPacketRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for SemanticAstPacketRequest
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a SemanticAstPacketResponse. */
+        interface ISemanticAstPacketResponse {
+
+            /** SemanticAstPacketResponse packets */
+            packets?: (yorha.retrieval.ISemanticAstPacket[]|null);
+
+            /** SemanticAstPacketResponse receipt */
+            receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+        }
+
+        /** Represents a SemanticAstPacketResponse. */
+        class SemanticAstPacketResponse implements ISemanticAstPacketResponse {
+
+            /**
+             * Constructs a new SemanticAstPacketResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.ISemanticAstPacketResponse);
+
+            /** SemanticAstPacketResponse packets. */
+            public packets: yorha.retrieval.ISemanticAstPacket[];
+
+            /** SemanticAstPacketResponse receipt. */
+            public receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+
+            /**
+             * Creates a new SemanticAstPacketResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SemanticAstPacketResponse instance
+             */
+            public static create(properties?: yorha.retrieval.ISemanticAstPacketResponse): yorha.retrieval.SemanticAstPacketResponse;
+
+            /**
+             * Encodes the specified SemanticAstPacketResponse message. Does not implicitly {@link yorha.retrieval.SemanticAstPacketResponse.verify|verify} messages.
+             * @param message SemanticAstPacketResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.ISemanticAstPacketResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified SemanticAstPacketResponse message, length delimited. Does not implicitly {@link yorha.retrieval.SemanticAstPacketResponse.verify|verify} messages.
+             * @param message SemanticAstPacketResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.ISemanticAstPacketResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SemanticAstPacketResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SemanticAstPacketResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.SemanticAstPacketResponse;
+
+            /**
+             * Decodes a SemanticAstPacketResponse message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns SemanticAstPacketResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SemanticAstPacketResponse;
+
+            /**
+             * Verifies a SemanticAstPacketResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SemanticAstPacketResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SemanticAstPacketResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SemanticAstPacketResponse;
+
+            /**
+             * Creates a plain object from a SemanticAstPacketResponse message. Also converts values to other types if specified.
+             * @param message SemanticAstPacketResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SemanticAstPacketResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SemanticAstPacketResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for SemanticAstPacketResponse
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a SemanticAstPacket. */
+        interface ISemanticAstPacket {
+
+            /** SemanticAstPacket workspaceId */
+            workspaceId?: (string|null);
+
+            /** SemanticAstPacket workspaceRevision */
+            workspaceRevision?: (string|null);
+
+            /** SemanticAstPacket packetKey */
+            packetKey?: (string|null);
+
+            /** SemanticAstPacket packetRevision */
+            packetRevision?: (string|null);
+
+            /** SemanticAstPacket sourceRef */
+            sourceRef?: (string|null);
+
+            /** SemanticAstPacket sourceRevision */
+            sourceRevision?: (string|null);
+
+            /** SemanticAstPacket contentHash */
+            contentHash?: (string|null);
+
+            /** SemanticAstPacket chunkId */
+            chunkId?: (string|null);
+
+            /** SemanticAstPacket treeNodeId */
+            treeNodeId?: (string|null);
+
+            /** SemanticAstPacket nodeKind */
+            nodeKind?: (string|null);
+
+            /** SemanticAstPacket qualifiedSymbol */
+            qualifiedSymbol?: (string|null);
+
+            /** SemanticAstPacket parentTreeNodeId */
+            parentTreeNodeId?: (string|null);
+
+            /** SemanticAstPacket byteStart */
+            byteStart?: (number|Long|null);
+
+            /** SemanticAstPacket byteEnd */
+            byteEnd?: (number|Long|null);
+
+            /** SemanticAstPacket parserName */
+            parserName?: (string|null);
+
+            /** SemanticAstPacket parserRevision */
+            parserRevision?: (string|null);
+
+            /** SemanticAstPacket grammarRevision */
+            grammarRevision?: (string|null);
+
+            /** SemanticAstPacket astContentHash */
+            astContentHash?: (string|null);
+        }
+
+        /** Represents a SemanticAstPacket. */
+        class SemanticAstPacket implements ISemanticAstPacket {
+
+            /**
+             * Constructs a new SemanticAstPacket.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.ISemanticAstPacket);
+
+            /** SemanticAstPacket workspaceId. */
+            public workspaceId: string;
+
+            /** SemanticAstPacket workspaceRevision. */
+            public workspaceRevision: string;
+
+            /** SemanticAstPacket packetKey. */
+            public packetKey: string;
+
+            /** SemanticAstPacket packetRevision. */
+            public packetRevision: string;
+
+            /** SemanticAstPacket sourceRef. */
+            public sourceRef: string;
+
+            /** SemanticAstPacket sourceRevision. */
+            public sourceRevision: string;
+
+            /** SemanticAstPacket contentHash. */
+            public contentHash: string;
+
+            /** SemanticAstPacket chunkId. */
+            public chunkId: string;
+
+            /** SemanticAstPacket treeNodeId. */
+            public treeNodeId: string;
+
+            /** SemanticAstPacket nodeKind. */
+            public nodeKind: string;
+
+            /** SemanticAstPacket qualifiedSymbol. */
+            public qualifiedSymbol: string;
+
+            /** SemanticAstPacket parentTreeNodeId. */
+            public parentTreeNodeId: string;
+
+            /** SemanticAstPacket byteStart. */
+            public byteStart: (number|Long);
+
+            /** SemanticAstPacket byteEnd. */
+            public byteEnd: (number|Long);
+
+            /** SemanticAstPacket parserName. */
+            public parserName: string;
+
+            /** SemanticAstPacket parserRevision. */
+            public parserRevision: string;
+
+            /** SemanticAstPacket grammarRevision. */
+            public grammarRevision: string;
+
+            /** SemanticAstPacket astContentHash. */
+            public astContentHash: string;
+
+            /**
+             * Creates a new SemanticAstPacket instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SemanticAstPacket instance
+             */
+            public static create(properties?: yorha.retrieval.ISemanticAstPacket): yorha.retrieval.SemanticAstPacket;
+
+            /**
+             * Encodes the specified SemanticAstPacket message. Does not implicitly {@link yorha.retrieval.SemanticAstPacket.verify|verify} messages.
+             * @param message SemanticAstPacket message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.ISemanticAstPacket, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified SemanticAstPacket message, length delimited. Does not implicitly {@link yorha.retrieval.SemanticAstPacket.verify|verify} messages.
+             * @param message SemanticAstPacket message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.ISemanticAstPacket, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SemanticAstPacket message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SemanticAstPacket
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.SemanticAstPacket;
+
+            /**
+             * Decodes a SemanticAstPacket message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns SemanticAstPacket
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.SemanticAstPacket;
+
+            /**
+             * Verifies a SemanticAstPacket message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a SemanticAstPacket message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns SemanticAstPacket
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.SemanticAstPacket;
+
+            /**
+             * Creates a plain object from a SemanticAstPacket message. Also converts values to other types if specified.
+             * @param message SemanticAstPacket
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.SemanticAstPacket, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this SemanticAstPacket to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for SemanticAstPacket
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a PacketRegistryRequest. */
+        interface IPacketRegistryRequest {
+
+            /** PacketRegistryRequest atlasContext */
+            atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /** PacketRegistryRequest sourceRef */
+            sourceRef?: (string|null);
+
+            /** PacketRegistryRequest packetKey */
+            packetKey?: (string|null);
+
+            /** PacketRegistryRequest limit */
+            limit?: (number|null);
+        }
+
+        /** Represents a PacketRegistryRequest. */
+        class PacketRegistryRequest implements IPacketRegistryRequest {
+
+            /**
+             * Constructs a new PacketRegistryRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.IPacketRegistryRequest);
+
+            /** PacketRegistryRequest atlasContext. */
+            public atlasContext?: (yorha.shared.IAtlasRequestContextV2|null);
+
+            /** PacketRegistryRequest sourceRef. */
+            public sourceRef: string;
+
+            /** PacketRegistryRequest packetKey. */
+            public packetKey: string;
+
+            /** PacketRegistryRequest limit. */
+            public limit: number;
+
+            /**
+             * Creates a new PacketRegistryRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PacketRegistryRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IPacketRegistryRequest): yorha.retrieval.PacketRegistryRequest;
+
+            /**
+             * Encodes the specified PacketRegistryRequest message. Does not implicitly {@link yorha.retrieval.PacketRegistryRequest.verify|verify} messages.
+             * @param message PacketRegistryRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.IPacketRegistryRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified PacketRegistryRequest message, length delimited. Does not implicitly {@link yorha.retrieval.PacketRegistryRequest.verify|verify} messages.
+             * @param message PacketRegistryRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.IPacketRegistryRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PacketRegistryRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PacketRegistryRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.PacketRegistryRequest;
+
+            /**
+             * Decodes a PacketRegistryRequest message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns PacketRegistryRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.PacketRegistryRequest;
+
+            /**
+             * Verifies a PacketRegistryRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a PacketRegistryRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns PacketRegistryRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.PacketRegistryRequest;
+
+            /**
+             * Creates a plain object from a PacketRegistryRequest message. Also converts values to other types if specified.
+             * @param message PacketRegistryRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.PacketRegistryRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this PacketRegistryRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for PacketRegistryRequest
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a PacketRegistryResponse. */
+        interface IPacketRegistryResponse {
+
+            /** PacketRegistryResponse entries */
+            entries?: (yorha.retrieval.IPacketRegistryEntry[]|null);
+
+            /** PacketRegistryResponse receipt */
+            receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+        }
+
+        /** Represents a PacketRegistryResponse. */
+        class PacketRegistryResponse implements IPacketRegistryResponse {
+
+            /**
+             * Constructs a new PacketRegistryResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.IPacketRegistryResponse);
+
+            /** PacketRegistryResponse entries. */
+            public entries: yorha.retrieval.IPacketRegistryEntry[];
+
+            /** PacketRegistryResponse receipt. */
+            public receipt?: (yorha.shared.IAtlasToolReceiptV2|null);
+
+            /**
+             * Creates a new PacketRegistryResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PacketRegistryResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IPacketRegistryResponse): yorha.retrieval.PacketRegistryResponse;
+
+            /**
+             * Encodes the specified PacketRegistryResponse message. Does not implicitly {@link yorha.retrieval.PacketRegistryResponse.verify|verify} messages.
+             * @param message PacketRegistryResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.IPacketRegistryResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified PacketRegistryResponse message, length delimited. Does not implicitly {@link yorha.retrieval.PacketRegistryResponse.verify|verify} messages.
+             * @param message PacketRegistryResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.IPacketRegistryResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PacketRegistryResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PacketRegistryResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.PacketRegistryResponse;
+
+            /**
+             * Decodes a PacketRegistryResponse message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns PacketRegistryResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.PacketRegistryResponse;
+
+            /**
+             * Verifies a PacketRegistryResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a PacketRegistryResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns PacketRegistryResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.PacketRegistryResponse;
+
+            /**
+             * Creates a plain object from a PacketRegistryResponse message. Also converts values to other types if specified.
+             * @param message PacketRegistryResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.PacketRegistryResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this PacketRegistryResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for PacketRegistryResponse
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a PacketRegistryEntry. */
+        interface IPacketRegistryEntry {
+
+            /** PacketRegistryEntry schema */
+            schema?: (string|null);
+
+            /** PacketRegistryEntry workspaceId */
+            workspaceId?: (string|null);
+
+            /** PacketRegistryEntry workspaceRevision */
+            workspaceRevision?: (string|null);
+
+            /** PacketRegistryEntry packetKey */
+            packetKey?: (string|null);
+
+            /** PacketRegistryEntry packetRevision */
+            packetRevision?: (string|null);
+
+            /** PacketRegistryEntry sourceRef */
+            sourceRef?: (string|null);
+
+            /** PacketRegistryEntry sourceRevision */
+            sourceRevision?: (string|null);
+
+            /** PacketRegistryEntry contentHash */
+            contentHash?: (string|null);
+
+            /** PacketRegistryEntry lanes */
+            lanes?: (yorha.retrieval.IPacketRegistryLane[]|null);
+
+            /** PacketRegistryEntry registryRevision */
+            registryRevision?: (string|null);
+        }
+
+        /** Represents a PacketRegistryEntry. */
+        class PacketRegistryEntry implements IPacketRegistryEntry {
+
+            /**
+             * Constructs a new PacketRegistryEntry.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.IPacketRegistryEntry);
+
+            /** PacketRegistryEntry schema. */
+            public schema: string;
+
+            /** PacketRegistryEntry workspaceId. */
+            public workspaceId: string;
+
+            /** PacketRegistryEntry workspaceRevision. */
+            public workspaceRevision: string;
+
+            /** PacketRegistryEntry packetKey. */
+            public packetKey: string;
+
+            /** PacketRegistryEntry packetRevision. */
+            public packetRevision: string;
+
+            /** PacketRegistryEntry sourceRef. */
+            public sourceRef: string;
+
+            /** PacketRegistryEntry sourceRevision. */
+            public sourceRevision: string;
+
+            /** PacketRegistryEntry contentHash. */
+            public contentHash: string;
+
+            /** PacketRegistryEntry lanes. */
+            public lanes: yorha.retrieval.IPacketRegistryLane[];
+
+            /** PacketRegistryEntry registryRevision. */
+            public registryRevision: string;
+
+            /**
+             * Creates a new PacketRegistryEntry instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PacketRegistryEntry instance
+             */
+            public static create(properties?: yorha.retrieval.IPacketRegistryEntry): yorha.retrieval.PacketRegistryEntry;
+
+            /**
+             * Encodes the specified PacketRegistryEntry message. Does not implicitly {@link yorha.retrieval.PacketRegistryEntry.verify|verify} messages.
+             * @param message PacketRegistryEntry message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.IPacketRegistryEntry, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified PacketRegistryEntry message, length delimited. Does not implicitly {@link yorha.retrieval.PacketRegistryEntry.verify|verify} messages.
+             * @param message PacketRegistryEntry message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.IPacketRegistryEntry, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PacketRegistryEntry message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PacketRegistryEntry
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.PacketRegistryEntry;
+
+            /**
+             * Decodes a PacketRegistryEntry message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns PacketRegistryEntry
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.PacketRegistryEntry;
+
+            /**
+             * Verifies a PacketRegistryEntry message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a PacketRegistryEntry message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns PacketRegistryEntry
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.PacketRegistryEntry;
+
+            /**
+             * Creates a plain object from a PacketRegistryEntry message. Also converts values to other types if specified.
+             * @param message PacketRegistryEntry
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.PacketRegistryEntry, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this PacketRegistryEntry to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for PacketRegistryEntry
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of a PacketRegistryLane. */
+        interface IPacketRegistryLane {
+
+            /** PacketRegistryLane laneId */
+            laneId?: (string|null);
+
+            /** PacketRegistryLane kind */
+            kind?: (string|null);
+
+            /** PacketRegistryLane owner */
+            owner?: (string|null);
+
+            /** PacketRegistryLane status */
+            status?: (string|null);
+
+            /** PacketRegistryLane representationId */
+            representationId?: (string|null);
+
+            /** PacketRegistryLane representationRevision */
+            representationRevision?: (string|null);
+
+            /** PacketRegistryLane modelRevision */
+            modelRevision?: (string|null);
+
+            /** PacketRegistryLane collection */
+            collection?: (string|null);
+
+            /** PacketRegistryLane vectorName */
+            vectorName?: (string|null);
+
+            /** PacketRegistryLane tags */
+            tags?: (string[]|null);
+
+            /** PacketRegistryLane indexAlgorithm */
+            indexAlgorithm?: (string|null);
+
+            /** PacketRegistryLane indexRevision */
+            indexRevision?: (string|null);
+
+            /** PacketRegistryLane projectionChecksum */
+            projectionChecksum?: (string|null);
+
+            /** PacketRegistryLane writePolicy */
+            writePolicy?: (string|null);
+        }
+
+        /** Represents a PacketRegistryLane. */
+        class PacketRegistryLane implements IPacketRegistryLane {
+
+            /**
+             * Constructs a new PacketRegistryLane.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.retrieval.IPacketRegistryLane);
+
+            /** PacketRegistryLane laneId. */
+            public laneId: string;
+
+            /** PacketRegistryLane kind. */
+            public kind: string;
+
+            /** PacketRegistryLane owner. */
+            public owner: string;
+
+            /** PacketRegistryLane status. */
+            public status: string;
+
+            /** PacketRegistryLane representationId. */
+            public representationId: string;
+
+            /** PacketRegistryLane representationRevision. */
+            public representationRevision: string;
+
+            /** PacketRegistryLane modelRevision. */
+            public modelRevision: string;
+
+            /** PacketRegistryLane collection. */
+            public collection: string;
+
+            /** PacketRegistryLane vectorName. */
+            public vectorName: string;
+
+            /** PacketRegistryLane tags. */
+            public tags: string[];
+
+            /** PacketRegistryLane indexAlgorithm. */
+            public indexAlgorithm: string;
+
+            /** PacketRegistryLane indexRevision. */
+            public indexRevision: string;
+
+            /** PacketRegistryLane projectionChecksum. */
+            public projectionChecksum: string;
+
+            /** PacketRegistryLane writePolicy. */
+            public writePolicy: string;
+
+            /**
+             * Creates a new PacketRegistryLane instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PacketRegistryLane instance
+             */
+            public static create(properties?: yorha.retrieval.IPacketRegistryLane): yorha.retrieval.PacketRegistryLane;
+
+            /**
+             * Encodes the specified PacketRegistryLane message. Does not implicitly {@link yorha.retrieval.PacketRegistryLane.verify|verify} messages.
+             * @param message PacketRegistryLane message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.retrieval.IPacketRegistryLane, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified PacketRegistryLane message, length delimited. Does not implicitly {@link yorha.retrieval.PacketRegistryLane.verify|verify} messages.
+             * @param message PacketRegistryLane message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.retrieval.IPacketRegistryLane, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PacketRegistryLane message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PacketRegistryLane
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.retrieval.PacketRegistryLane;
+
+            /**
+             * Decodes a PacketRegistryLane message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns PacketRegistryLane
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.PacketRegistryLane;
+
+            /**
+             * Verifies a PacketRegistryLane message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a PacketRegistryLane message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns PacketRegistryLane
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.PacketRegistryLane;
+
+            /**
+             * Creates a plain object from a PacketRegistryLane message. Also converts values to other types if specified.
+             * @param message PacketRegistryLane
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.PacketRegistryLane, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this PacketRegistryLane to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for PacketRegistryLane
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
              */
@@ -3129,6 +5375,13 @@ export namespace yorha {
             public updatedAfter: string;
 
             /**
+             * Creates a new TopologyRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TopologyRequest instance
+             */
+            public static create(properties?: yorha.retrieval.ITopologyRequest): yorha.retrieval.TopologyRequest;
+
+            /**
              * Encodes the specified TopologyRequest message. Does not implicitly {@link yorha.retrieval.TopologyRequest.verify|verify} messages.
              * @param message TopologyRequest message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3162,6 +5415,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.TopologyRequest;
+
+            /**
+             * Verifies a TopologyRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a TopologyRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns TopologyRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.TopologyRequest;
+
+            /**
+             * Creates a plain object from a TopologyRequest message. Also converts values to other types if specified.
+             * @param message TopologyRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.TopologyRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this TopologyRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for TopologyRequest
@@ -3203,6 +5484,13 @@ export namespace yorha {
             public clusterMetadata?: (yorha.retrieval.IRetrievalClusterMetadata|null);
 
             /**
+             * Creates a new TopologyResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TopologyResponse instance
+             */
+            public static create(properties?: yorha.retrieval.ITopologyResponse): yorha.retrieval.TopologyResponse;
+
+            /**
              * Encodes the specified TopologyResponse message. Does not implicitly {@link yorha.retrieval.TopologyResponse.verify|verify} messages.
              * @param message TopologyResponse message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3236,6 +5524,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.TopologyResponse;
+
+            /**
+             * Verifies a TopologyResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a TopologyResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns TopologyResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.TopologyResponse;
+
+            /**
+             * Creates a plain object from a TopologyResponse message. Also converts values to other types if specified.
+             * @param message TopologyResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.TopologyResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this TopologyResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for TopologyResponse
@@ -3325,6 +5641,13 @@ export namespace yorha {
             public updatedAfter: string;
 
             /**
+             * Creates a new ResearchContextRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResearchContextRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IResearchContextRequest): yorha.retrieval.ResearchContextRequest;
+
+            /**
              * Encodes the specified ResearchContextRequest message. Does not implicitly {@link yorha.retrieval.ResearchContextRequest.verify|verify} messages.
              * @param message ResearchContextRequest message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3358,6 +5681,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ResearchContextRequest;
+
+            /**
+             * Verifies a ResearchContextRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ResearchContextRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ResearchContextRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ResearchContextRequest;
+
+            /**
+             * Creates a plain object from a ResearchContextRequest message. Also converts values to other types if specified.
+             * @param message ResearchContextRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ResearchContextRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ResearchContextRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ResearchContextRequest
@@ -3459,6 +5810,13 @@ export namespace yorha {
             public timestamps?: (yorha.retrieval.ITransportTimestamps|null);
 
             /**
+             * Creates a new ResearchContextChunk instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResearchContextChunk instance
+             */
+            public static create(properties?: yorha.retrieval.IResearchContextChunk): yorha.retrieval.ResearchContextChunk;
+
+            /**
              * Encodes the specified ResearchContextChunk message. Does not implicitly {@link yorha.retrieval.ResearchContextChunk.verify|verify} messages.
              * @param message ResearchContextChunk message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3494,6 +5852,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ResearchContextChunk;
 
             /**
+             * Verifies a ResearchContextChunk message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ResearchContextChunk message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ResearchContextChunk
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ResearchContextChunk;
+
+            /**
+             * Creates a plain object from a ResearchContextChunk message. Also converts values to other types if specified.
+             * @param message ResearchContextChunk
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ResearchContextChunk, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ResearchContextChunk to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for ResearchContextChunk
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -3525,6 +5911,13 @@ export namespace yorha {
 
             /** ResearchContextResponse totalMs. */
             public totalMs: number;
+
+            /**
+             * Creates a new ResearchContextResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResearchContextResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IResearchContextResponse): yorha.retrieval.ResearchContextResponse;
 
             /**
              * Encodes the specified ResearchContextResponse message. Does not implicitly {@link yorha.retrieval.ResearchContextResponse.verify|verify} messages.
@@ -3562,6 +5955,34 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.ResearchContextResponse;
 
             /**
+             * Verifies a ResearchContextResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a ResearchContextResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ResearchContextResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.ResearchContextResponse;
+
+            /**
+             * Creates a plain object from a ResearchContextResponse message. Also converts values to other types if specified.
+             * @param message ResearchContextResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.ResearchContextResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ResearchContextResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for ResearchContextResponse
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
@@ -3587,6 +6008,13 @@ export namespace yorha {
 
             /** HealthRequest service. */
             public service: string;
+
+            /**
+             * Creates a new HealthRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HealthRequest instance
+             */
+            public static create(properties?: yorha.retrieval.IHealthRequest): yorha.retrieval.HealthRequest;
 
             /**
              * Encodes the specified HealthRequest message. Does not implicitly {@link yorha.retrieval.HealthRequest.verify|verify} messages.
@@ -3622,6 +6050,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.HealthRequest;
+
+            /**
+             * Verifies a HealthRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a HealthRequest message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns HealthRequest
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.HealthRequest;
+
+            /**
+             * Creates a plain object from a HealthRequest message. Also converts values to other types if specified.
+             * @param message HealthRequest
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.HealthRequest, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this HealthRequest to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for HealthRequest
@@ -3681,6 +6137,13 @@ export namespace yorha {
             public timestamp: (number|Long);
 
             /**
+             * Creates a new HealthResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns HealthResponse instance
+             */
+            public static create(properties?: yorha.retrieval.IHealthResponse): yorha.retrieval.HealthResponse;
+
+            /**
              * Encodes the specified HealthResponse message. Does not implicitly {@link yorha.retrieval.HealthResponse.verify|verify} messages.
              * @param message HealthResponse message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3714,6 +6177,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.retrieval.HealthResponse;
+
+            /**
+             * Verifies a HealthResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a HealthResponse message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns HealthResponse
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.retrieval.HealthResponse;
+
+            /**
+             * Creates a plain object from a HealthResponse message. Also converts values to other types if specified.
+             * @param message HealthResponse
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.retrieval.HealthResponse, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this HealthResponse to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for HealthResponse
@@ -3789,6 +6280,13 @@ export namespace yorha {
             public embeddingDim: number;
 
             /**
+             * Creates a new RunIds instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RunIds instance
+             */
+            public static create(properties?: yorha.shared.IRunIds): yorha.shared.RunIds;
+
+            /**
              * Encodes the specified RunIds message. Does not implicitly {@link yorha.shared.RunIds.verify|verify} messages.
              * @param message RunIds message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3824,7 +6322,370 @@ export namespace yorha {
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.shared.RunIds;
 
             /**
+             * Verifies a RunIds message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a RunIds message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns RunIds
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.shared.RunIds;
+
+            /**
+             * Creates a plain object from a RunIds message. Also converts values to other types if specified.
+             * @param message RunIds
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.shared.RunIds, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this RunIds to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
              * Gets the default type url for RunIds
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of an AtlasRequestContextV2. */
+        interface IAtlasRequestContextV2 {
+
+            /** AtlasRequestContextV2 toolCallId */
+            toolCallId?: (string|null);
+
+            /** AtlasRequestContextV2 runId */
+            runId?: (string|null);
+
+            /** AtlasRequestContextV2 workspaceId */
+            workspaceId?: (string|null);
+
+            /** AtlasRequestContextV2 workspaceRevision */
+            workspaceRevision?: (string|null);
+
+            /** AtlasRequestContextV2 packetKey */
+            packetKey?: (string|null);
+
+            /** AtlasRequestContextV2 packetRevision */
+            packetRevision?: (string|null);
+        }
+
+        /** Represents an AtlasRequestContextV2. */
+        class AtlasRequestContextV2 implements IAtlasRequestContextV2 {
+
+            /**
+             * Constructs a new AtlasRequestContextV2.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.shared.IAtlasRequestContextV2);
+
+            /** AtlasRequestContextV2 toolCallId. */
+            public toolCallId: string;
+
+            /** AtlasRequestContextV2 runId. */
+            public runId: string;
+
+            /** AtlasRequestContextV2 workspaceId. */
+            public workspaceId: string;
+
+            /** AtlasRequestContextV2 workspaceRevision. */
+            public workspaceRevision: string;
+
+            /** AtlasRequestContextV2 packetKey. */
+            public packetKey: string;
+
+            /** AtlasRequestContextV2 packetRevision. */
+            public packetRevision: string;
+
+            /**
+             * Creates a new AtlasRequestContextV2 instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AtlasRequestContextV2 instance
+             */
+            public static create(properties?: yorha.shared.IAtlasRequestContextV2): yorha.shared.AtlasRequestContextV2;
+
+            /**
+             * Encodes the specified AtlasRequestContextV2 message. Does not implicitly {@link yorha.shared.AtlasRequestContextV2.verify|verify} messages.
+             * @param message AtlasRequestContextV2 message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.shared.IAtlasRequestContextV2, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified AtlasRequestContextV2 message, length delimited. Does not implicitly {@link yorha.shared.AtlasRequestContextV2.verify|verify} messages.
+             * @param message AtlasRequestContextV2 message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.shared.IAtlasRequestContextV2, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AtlasRequestContextV2 message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AtlasRequestContextV2
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.shared.AtlasRequestContextV2;
+
+            /**
+             * Decodes an AtlasRequestContextV2 message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns AtlasRequestContextV2
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.shared.AtlasRequestContextV2;
+
+            /**
+             * Verifies an AtlasRequestContextV2 message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AtlasRequestContextV2 message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AtlasRequestContextV2
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.shared.AtlasRequestContextV2;
+
+            /**
+             * Creates a plain object from an AtlasRequestContextV2 message. Also converts values to other types if specified.
+             * @param message AtlasRequestContextV2
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.shared.AtlasRequestContextV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AtlasRequestContextV2 to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for AtlasRequestContextV2
+             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+             * @returns The default type url
+             */
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        /** Properties of an AtlasToolReceiptV2. */
+        interface IAtlasToolReceiptV2 {
+
+            /** AtlasToolReceiptV2 schema */
+            schema?: (string|null);
+
+            /** AtlasToolReceiptV2 toolCallId */
+            toolCallId?: (string|null);
+
+            /** AtlasToolReceiptV2 toolName */
+            toolName?: (string|null);
+
+            /** AtlasToolReceiptV2 runId */
+            runId?: (string|null);
+
+            /** AtlasToolReceiptV2 workspaceId */
+            workspaceId?: (string|null);
+
+            /** AtlasToolReceiptV2 workspaceRevision */
+            workspaceRevision?: (string|null);
+
+            /** AtlasToolReceiptV2 packetKey */
+            packetKey?: (string|null);
+
+            /** AtlasToolReceiptV2 packetRevision */
+            packetRevision?: (string|null);
+
+            /** AtlasToolReceiptV2 succeeded */
+            succeeded?: (boolean|null);
+
+            /** AtlasToolReceiptV2 retrievalConfidence */
+            retrievalConfidence?: (number|null);
+
+            /** AtlasToolReceiptV2 evidenceCount */
+            evidenceCount?: (number|null);
+
+            /** AtlasToolReceiptV2 validationStatus */
+            validationStatus?: (string|null);
+
+            /** AtlasToolReceiptV2 outputChecksum */
+            outputChecksum?: (string|null);
+
+            /** AtlasToolReceiptV2 errorCode */
+            errorCode?: (string|null);
+
+            /** AtlasToolReceiptV2 canonicalAuthority */
+            canonicalAuthority?: (boolean|null);
+
+            /** AtlasToolReceiptV2 writesPerformed */
+            writesPerformed?: (boolean|null);
+
+            /** AtlasToolReceiptV2 receiptId */
+            receiptId?: (string|null);
+
+            /** AtlasToolReceiptV2 receiptChecksum */
+            receiptChecksum?: (string|null);
+        }
+
+        /** Represents an AtlasToolReceiptV2. */
+        class AtlasToolReceiptV2 implements IAtlasToolReceiptV2 {
+
+            /**
+             * Constructs a new AtlasToolReceiptV2.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: yorha.shared.IAtlasToolReceiptV2);
+
+            /** AtlasToolReceiptV2 schema. */
+            public schema: string;
+
+            /** AtlasToolReceiptV2 toolCallId. */
+            public toolCallId: string;
+
+            /** AtlasToolReceiptV2 toolName. */
+            public toolName: string;
+
+            /** AtlasToolReceiptV2 runId. */
+            public runId: string;
+
+            /** AtlasToolReceiptV2 workspaceId. */
+            public workspaceId: string;
+
+            /** AtlasToolReceiptV2 workspaceRevision. */
+            public workspaceRevision: string;
+
+            /** AtlasToolReceiptV2 packetKey. */
+            public packetKey: string;
+
+            /** AtlasToolReceiptV2 packetRevision. */
+            public packetRevision: string;
+
+            /** AtlasToolReceiptV2 succeeded. */
+            public succeeded: boolean;
+
+            /** AtlasToolReceiptV2 retrievalConfidence. */
+            public retrievalConfidence?: (number|null);
+
+            /** AtlasToolReceiptV2 evidenceCount. */
+            public evidenceCount: number;
+
+            /** AtlasToolReceiptV2 validationStatus. */
+            public validationStatus: string;
+
+            /** AtlasToolReceiptV2 outputChecksum. */
+            public outputChecksum?: (string|null);
+
+            /** AtlasToolReceiptV2 errorCode. */
+            public errorCode?: (string|null);
+
+            /** AtlasToolReceiptV2 canonicalAuthority. */
+            public canonicalAuthority: boolean;
+
+            /** AtlasToolReceiptV2 writesPerformed. */
+            public writesPerformed: boolean;
+
+            /** AtlasToolReceiptV2 receiptId. */
+            public receiptId: string;
+
+            /** AtlasToolReceiptV2 receiptChecksum. */
+            public receiptChecksum: string;
+
+            /** AtlasToolReceiptV2 _retrievalConfidence. */
+            public _retrievalConfidence?: "retrievalConfidence";
+
+            /** AtlasToolReceiptV2 _outputChecksum. */
+            public _outputChecksum?: "outputChecksum";
+
+            /** AtlasToolReceiptV2 _errorCode. */
+            public _errorCode?: "errorCode";
+
+            /**
+             * Creates a new AtlasToolReceiptV2 instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns AtlasToolReceiptV2 instance
+             */
+            public static create(properties?: yorha.shared.IAtlasToolReceiptV2): yorha.shared.AtlasToolReceiptV2;
+
+            /**
+             * Encodes the specified AtlasToolReceiptV2 message. Does not implicitly {@link yorha.shared.AtlasToolReceiptV2.verify|verify} messages.
+             * @param message AtlasToolReceiptV2 message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: yorha.shared.IAtlasToolReceiptV2, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified AtlasToolReceiptV2 message, length delimited. Does not implicitly {@link yorha.shared.AtlasToolReceiptV2.verify|verify} messages.
+             * @param message AtlasToolReceiptV2 message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: yorha.shared.IAtlasToolReceiptV2, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an AtlasToolReceiptV2 message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns AtlasToolReceiptV2
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): yorha.shared.AtlasToolReceiptV2;
+
+            /**
+             * Decodes an AtlasToolReceiptV2 message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns AtlasToolReceiptV2
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.shared.AtlasToolReceiptV2;
+
+            /**
+             * Verifies an AtlasToolReceiptV2 message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an AtlasToolReceiptV2 message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns AtlasToolReceiptV2
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.shared.AtlasToolReceiptV2;
+
+            /**
+             * Creates a plain object from an AtlasToolReceiptV2 message. Also converts values to other types if specified.
+             * @param message AtlasToolReceiptV2
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.shared.AtlasToolReceiptV2, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this AtlasToolReceiptV2 to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+
+            /**
+             * Gets the default type url for AtlasToolReceiptV2
              * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
              * @returns The default type url
              */
@@ -3881,6 +6742,13 @@ export namespace yorha {
             public createdAtUnix: (number|Long);
 
             /**
+             * Creates a new ArtifactRef instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ArtifactRef instance
+             */
+            public static create(properties?: yorha.shared.IArtifactRef): yorha.shared.ArtifactRef;
+
+            /**
              * Encodes the specified ArtifactRef message. Does not implicitly {@link yorha.shared.ArtifactRef.verify|verify} messages.
              * @param message ArtifactRef message or plain object to encode
              * @param [writer] Writer to encode to
@@ -3914,6 +6782,34 @@ export namespace yorha {
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
             public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): yorha.shared.ArtifactRef;
+
+            /**
+             * Verifies an ArtifactRef message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates an ArtifactRef message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns ArtifactRef
+             */
+            public static fromObject(object: { [k: string]: any }): yorha.shared.ArtifactRef;
+
+            /**
+             * Creates a plain object from an ArtifactRef message. Also converts values to other types if specified.
+             * @param message ArtifactRef
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: yorha.shared.ArtifactRef, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this ArtifactRef to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
 
             /**
              * Gets the default type url for ArtifactRef

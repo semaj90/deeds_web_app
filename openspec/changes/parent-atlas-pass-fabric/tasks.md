@@ -5,6 +5,14 @@
 Skip to PF4. Do not re-implement claimBatch/gate-fill/LISTEN-NOTIFY — they
 already work as specified and correctly.
 
+**Verification addendum (2026-09-27)**: `claimBatch` previously coerced a
+zero/invalid limit to `LIMIT 1`, despite the worker currently skipping zero
+free slots. It now returns an empty batch before querying for non-positive or
+non-finite capacity. The isolated mocked boundary suite passes 6/6, including
+four-row/one-query and invalid-capacity cases. This is application/fixture
+proof only; PostgreSQL locking, concurrent workers, and notification latency
+remain unproven and no live database was contacted.
+
 ## P0 UPDATE (2026-08-11, later same day): identity collision is worse than "disconnected" — it's a 3-WAY FORMAT SPLIT
 
 Earlier framing was "a resolver exists (`packet-key-builder.ts`) and a
@@ -150,11 +158,13 @@ not one:
    (stochastic_history/observed_event) when one already exists for that
    identity.
 
-**PF4C status**: `PASS_KEY_SEMANTICS_PROVEN = true` (now precisely
-characterized — it's execution-scoped, not logical-identity-scoped, and
-that's the root cause requiring the two-hash split above, not a bug to
-patch in place). `PASS_IDENTITY_PROVEN` remains `false` until the
-`passIdentityHash` field is added and threaded through eligibility queries.
+**PF4C status**: `PASS_KEY_SEMANTICS_PROVEN = true`: `pass_key` is the
+job/execution retry key; `pass_identity_hash` is a separate logical identity.
+The logical identity is now emitted only when the caller supplies a stable
+`inputHash`; an absent/blank input hash remains `NULL` instead of silently
+falling back to the job-scoped execution hash. `PASS_IDENTITY_PROVEN` applies
+only to explicitly qualified inputs; population and consumer coverage remain
+separate open gates.
 
 ## STEPS 2-3 APPLIED (2026-08-11, same day): executionSemantics wired
 
@@ -298,9 +308,9 @@ for (const jobType of JOB_TYPES) {
 ```
 
 **Acceptance**:
-- [ ] Single Postgres query claims all free slots
-- [ ] Test: 4 free → 4 jobs claimed (not 1)
-- [ ] Test: 0 free → 0 jobs claimed (no error)
+- [x] Single Postgres query claims all free slots (source + mocked boundary proof; no live PostgreSQL claim)
+- [x] Test: 4 free → 4 jobs claimed (not 1)
+- [x] Test: 0 free → 0 jobs claimed (no error; invalid capacity short-circuits before DB call)
 
 ---
 
@@ -311,9 +321,14 @@ for (const jobType of JOB_TYPES) {
 **Change**: Update gate tracking in executeJob callback.
 
 **Acceptance**:
-- [ ] embed_gate: 0/3 → 3 jobs dispatched in one pollOnce call
-- [ ] entity_gate: 0/2 → 2 jobs dispatched
-- [ ] forensics_gate: 0/4 → 4 jobs dispatched
+- [ ] embed_gate: 0/3 → 3 jobs dispatched in one pollOnce call. Still open:
+      the current `stageConfig` has no embedding job type, and this lane cannot
+      be added until semantic writer/provenance ownership is authorized.
+- [x] entity_gate: 0/2 → 2 jobs dispatched. `analysis-worker-wakeup.spec.ts`
+      runs the actual poll loop with mocked queue/gate boundaries and confirms
+      two entity jobs are admitted in one poll; job handlers are not invoked.
+- [x] forensics_gate: 0/4 → 4 jobs dispatched. The same fixture confirms four
+      forensics jobs are admitted in one poll; job handlers are not invoked.
 
 ---
 
@@ -346,7 +361,12 @@ setInterval(pollOnce, 30_000);
 
 **Acceptance**:
 - [ ] Job enqueued → worker wakes in <100ms
-- [ ] Fallback poll fires every 30s
+- [x] Fallback poll fires every 30s. `sveltekit-frontend/tests/lane-contracts/analysis-worker-wakeup.spec.ts`
+      starts the real worker with fake timers and verifies no second poll at
+      29,999 ms and a poll at 30,000 ms. Job claims and PostgreSQL listener
+      boundaries are mocked; this proves the timer contract, not live enqueue
+      latency or PostgreSQL delivery. PF3's live wake-latency criterion remains
+      open above.
 
 ---
 
@@ -484,20 +504,48 @@ type PassExecution = {
       shape for `summarization`; `embedding`/`cache_push` duplicate cause
       still unknown (47 groups, ~97 rows — low volume, check before assuming
       same pattern applies)
-- [ ] PF4C — prove `pass_key` semantics. Existing column already combines
-      `packet_key + pass_type + input_hash + prompt_hash + model_name +
-      temperature + max_tokens`. If `pass_key` was designed to *be* the full
-      producer-config identity, the durable logical key may be `packet_key +
-      source_revision + pass_key + input_hash` rather than introducing a
-      redundant `pass_type + pass_revision` pair. Check code history /
-      original design intent before freezing either shape.
-- [ ] PF4D — recover `source_revision`/`pass_revision` where evidence exists
-      (packet source ledger, producer provenance) for the 11,076 legacy rows
+      **Source trace refresh 2026-09-29:** `analysis-pass-orchestrator.mts`
+      is a legacy Gemma4-summary importer; the shared analysis worker calls
+      `recordAnalysisPassResult` with configured `passName` and nullable
+      lineage, but no current source literal for `embedding` or `cache_push`
+      was found in the scoped TypeScript callers. This cannot identify the
+      producer of the 27 unresolved embedding groups; the 10 cache-push groups
+      also remain untraced. No worker was run and no database was queried in
+      this source-only refresh, so PF4B stays open.
+- [x] PF4C — prove `pass_key` semantics from code/history: it is job-scoped
+      execution retry identity, not logical pass identity. Keep it unchanged;
+      use the separate logical identity only when a stable `inputHash` is
+      explicitly supplied, otherwise leave `passIdentityHash` NULL. Focused
+      cross-job tests prove execution keys differ while qualified logical
+      identities match; no DB writes or uniqueness changes are part of this
+      proof. `sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.identity.spec.ts`
+      now also pins deterministic-idempotent, stochastic-history, and
+      observed-event semantics; isolated contract tests pass 2/2. This does
+      not resolve PF4B's 47 embedding/cache_push duplicate groups or authorize
+      a migration/writer.
+- [x] PF4D — read-only recovery census completed 2026-09-27. No values were
+      backfilled: all 11,076 legacy rows have both revisions NULL; none has an
+      exact historical source-revision binding at or before its execution time,
+      and legacy producer provenance has no explicit source/pass revision.
+      Current packet revisions are not safe substitutes for historical values.
+      The recovery outcome is zero evidence-backed candidates; PF4E remains the
+      separate gate for explicitly representing unresolved legacy rows.
 - [ ] PF4E — mark unrecoverable rows explicitly `legacy-unresolved` (do not
       silently leave ambiguous NULLs — a typed status is queryable, a NULL
       that means "we don't know" vs NULL that means "not applicable" is not)
 - [ ] PF4F — wire the writer; new rows MUST populate both revision fields
-      (currently zero code paths write to this table at all)
+      (the shared `recordAnalysisPassResult` writer is called by
+      `sveltekit-frontend/src/lib/server/analysis/worker.ts`; its generic path
+      forwards nullable source/workspace/representation revisions, while a
+      specialized `code_feature_registry` branch builds a richer source-bound
+      input when a qualifying receipt exists. Live coverage remains sparse:
+      the 2026-09-27 read-only census found only 27/11,103 rows with both
+      source/pass revisions. A separate legacy importer,
+      `scripts/atlas/analysis-pass-orchestrator.mts`, is explicitly
+      `--apply`-gated and writes only `gemma4_summary_v1` rows with
+      `input_hash` and `prompt_hash` NULL and no source/pass revision columns.
+      Neither source explains the observed `embedding`/`cache_push` duplicate
+      groups. PF4F remains open: new eligible rows must carry both revisions.)
 - [ ] PF4G — prove duplicate-delivery idempotency on new writes
 - [ ] PF4H — add DB uniqueness **only at the logical-materialization
       boundary** (a view or projection selecting current-eligible-per-
@@ -582,14 +630,15 @@ prose:
   `currentBoundaryKind: "view_only"`, `rawRows: 11095` (11,076 → 11,095, +19 rows since this file
   was last dated — expected drift), `currentRows: 6903` (still matches this section's claim
   exactly), `uniqueConstraintPresent: false`.
-- **PF4C (identity/execution hash split) — core mechanism confirmed live**, contradicting this
-  line's own "undone" claim for at least the split itself: `analysis-pass-results.ts` still has
-  `passIdentityHash`, `resolveExecutionSemantics()`, and `KNOWN_PASS_EXECUTION_SEMANTICS`; the
-  `deterministic_idempotent` short-circuit-on-reuse path is still wired into
-  `recordAnalysisPassResult()`. Genuinely still open per this line: full `pass_key`
-  git-history/original-intent investigation, and the eligibility-query migration off `pass_key`
-  onto `passIdentityHash` for anything beyond the reuse check itself.
-- **PF4D (backfill legacy revisions) — confirmed still not done, and found to be a much smaller
+- **PF4C (identity/execution hash split) — source and fixture proof refreshed**:
+  `pass_key` remains the execution retry identity, while logical reuse queries
+  `passIdentityHash`. A stable caller-provided `inputHash` is required to emit
+  that logical hash; missing/blank input hashes now produce `NULL`, not a
+  job-scoped fallback. The idempotency fixture supplies the stable hash it
+  claims to exercise. Focused analysis-pass and lexical-adapter suites pass
+  15/15. This does not establish population coverage or authorize DB
+  uniqueness/materialization; those remain separate gates.
+- **PF4D historical checkpoint (2026-09-05; recovery/backfill was then unproven), and found to be a much smaller
   problem in practice than "wire the writer" suggests.** New diagnostic script
   `scripts/atlas/audit-pass-fabric-revision-population-v1.mts` (`npx tsx
   scripts/atlas/audit-pass-fabric-revision-population-v1.mts` from `sveltekit-frontend/`) queries
@@ -605,6 +654,13 @@ prose:
   be read as "the writer *can* populate both fields when the caller provides them, not that it does
   so in practice yet" — a narrower, more precise finding than either "zero code paths write" (the
   pre-2026-08-11 framing) or "wired" (which could be misread as "populated across the board").
+- **PF4D refresh (2026-09-27; read-only):** current population is 11,103 rows: 27 have both
+  revisions, zero have only one, and 11,076 legacy rows have neither. No legacy provenance row
+  carries an explicit source/pass revision. Although 1,304 legacy rows join to a packet with an
+  exact source-ref match, every such packet was updated after the pass execution; the current
+  revision is therefore not historical evidence. No exact workspace-source binding was observed
+  at or before pass execution. PF4D closes as **zero evidence-backed recovery candidates**; no
+  backfill or schema change was performed. PF4E remains open for explicit unresolved-state handling.
 - **PF4E (mark unrecoverable rows `legacy-unresolved`) — confirmed still not done.** `rg
   "legacy-unresolved|legacy_unresolved"` across `src/` returns zero matches.
 - **PF4G (duplicate-delivery idempotency on new writes) — not independently re-proven this pass**
@@ -1052,9 +1108,20 @@ async function executeToolBatch(
 - Error if deadlock
 
 **Acceptance**:
-- [ ] 3 independent read calls execute in parallel
-- [ ] Graph expansion waits for ANN seed
-- [ ] Test: 5 calls → batched as [3] then [2]
+- [x] 3 independent read calls execute in parallel
+- [x] Graph expansion waits for ANN seed
+- [x] Test: 5 calls → batched as [3] then [2]
+
+**Proof (2026-09-28; fixture/code only)**: `src/lib/server/executor/tool-batch.ts`
+is the shared bounded scheduler used by the existing ACP call path. Three
+explicitly known mock-read tools may overlap (cap 3); unclassified tools are
+serialized as writes. The scheduler validates dependencies/cycles, skips
+dependents after prerequisite failure, and preserves input result order.
+Focused tests passed 10/10 across the scheduler and ACP adapter; the full
+SvelteKit check passed with 0 errors and 291 existing warnings. The ACP
+dispatcher remains mock-only; this does not prove live MCP effect policy,
+resource-key serialization, or production tool execution. No datastore writes
+or model calls were made.
 
 ---
 
@@ -1065,8 +1132,19 @@ async function executeToolBatch(
 **Change**: Graph expansion only runs after dense_search results available.
 
 **Acceptance**:
-- [ ] Graph expansion depends_on: dense_search
-- [ ] Returns 1-2 hop neighbors + edges
+- [x] Graph expansion depends_on: dense_search
+- [x] Returns 1-2 hop neighbors + edges
+
+**Proof (2026-09-28; mocked Neo4j read boundary)**: `graph-retriever.ts`
+now returns the actual path depth, relationship types, and ordered edge
+endpoints returned by the bounded Neo4j query. Its test covers one- and
+two-hop results and rejects malformed paths; invalid depth/candidate limits
+fail closed before a session opens. SearchRuntime now selects only raw pre-fusion
+`dense_768` candidates with explicit canonical identity; the adapter passes
+that set to graph retrieval and skips graph expansion when the set is empty.
+Tests exclude lexical/noncanonical candidates and verify adapter wiring. The
+three focused suites passed 27/27. This is code/fixture proof only, not live
+SearchRuntime or Neo4j execution evidence.
 
 ---
 
@@ -1079,8 +1157,12 @@ async function executeToolBatch(
 **Note**: Real tricubic interpolation deferred (requires 3D lattice + 64-sample neighborhood).
 
 **Acceptance**:
-- [ ] Renamed in all callers
-- [ ] Governance: experimental implementation flagged, not canon
+- [x] Renamed in all callers to `cubicKernelNeighborhoodExperimental()`;
+      the scalar weight helper is `cubicKernelWeightExperimental()`.
+- [x] Governance: the CLI help, runtime label, and source comments identify
+      this as an experimental, noncanonical neighborhood only. The existing
+      `--tricube` flag and output behavior are preserved; real 3D lattice
+      interpolation remains deferred.
 
 ---
 
@@ -1223,3 +1305,60 @@ matches at production scale — that needs a run against the real frozen corpus 
 `docs/reports/graph-snapshot-parity/receipt.json`, plus proper ARI/NMI comparison for Louvain
 specifically (not raw community-count diffing, which this repo already knows is the wrong metric
 for community-detection parity).
+
+### BOUNDED-NLP-STAGED-OBSERVATIONS-01 — safe enrichment before projection
+
+- [ ] Freeze a bounded packet cohort through the existing source/packet resolver; require a real
+  `packetKey` and preserve absent `sourceRevision` / `workspaceRevision` as null rather than
+  deriving them from paths or current rows.
+- [ ] Select bounded domain/topic/entity/POS/concept extraction passes from existing producers;
+  outputs remain candidate observations and cannot write canonical feature, concept, entity,
+  relation, retrieval, or evidence state.
+- [x] Reconcile the existing `analysis_pass_results` status contract before persisting staged
+  observations. `succeeded` remains execution status; explicit opt-in `stageAsCandidateOnly` stores
+  `CANDIDATE_ONLY` in provenance without adding a DB status or migration. The writer resolves the
+  supplied packet key through the existing packet-row resolver, stores the resolved physical key
+  in the FK column, and records direct-versus-alias resolution in provenance without claiming
+  PacketKeyV2 logical identity. It fails closed on unresolved/mismatched identity, rejects
+  integration-event fanout, and rejects deterministic reuse without matching staged disposition.
+  Focused identity/writer suites pass 15/15; centroid manifest/card contract tests pass 12/12.
+  One bounded `spacy_entities` observation was staged for the exact existing packet row
+  `packet:b13af559f410` and independently read back as candidate-only. This is a one-row canary,
+  not proof of a bounded batch, full pass-family coverage, append-only behavior, or worker rollout.
+- [ ] Prove bounded batch limits, deterministic producer/input checksums where applicable,
+  append-only receipt behavior, and independent readback before enabling any worker or live pass.
+  **Canary evidence (2026-10-03):** one exact packet row was staged and independently read back;
+  a second execution reused row `11146` with identical input/output checksums and inserted no row.
+  Reports: `docs/reports/analysis-pass-staging/nlp-stage-1791002497054-53184.json` and
+  `docs/reports/analysis-pass-staging/nlp-stage-1791003261014-61356.json`. This does not prove
+  batch ceilings, concurrent duplicate delivery, or append-only behavior; those remain open.
+- [x] Add the pure `AnalysisPassAdmissionEnvelopeV1` classifier to the existing pass-results
+  owner. It keeps execution and admission orthogonal, never derives packet identity from
+  `evidenceId`/paths/current rows, preserves incomplete lineage as `OBSERVATION_ONLY`, and
+  never authorizes persistence or emits `ADMITTED`. It consumes the existing typed
+  `PacketKeyResolutionV2` output (including canonical/storage key and alias evidence), not a
+  boolean attestation. Focused unit tests cover exact lineage,
+  missing/unverified packet identity, missing revisions, failed execution, grounded evidence,
+  checksum tampering, and deterministic replay. This is not a DB state, migration, batch run,
+  or additional live pass write.
+- [x] Add pure `NlpStagingCohortV1` freeze/verify helpers to the same pass-results owner. The
+  contract permits only 8/16/32 members, requires exact resolver outputs and one shared
+  workspace revision, rejects duplicate logical source refs, labels null source revisions
+  `REVISION_PARTIAL`, and deterministically seals sorted members. Focused tests cover replay,
+  malformed size, workspace mismatch, duplicate source, unresolved identity, and tampering.
+  This only freezes a cohort artifact contract; no cohort was selected from PostgreSQL and no
+  NLP rows were appended. Keep the bounded live-cohort task open.
+
+**Contract progress (2026-10-03):** Added `buildStagedAnalysisPassObservationV1()` and
+`buildStagedAnalysisPassLedgerEntryV1()` to the existing `analysis_pass_results` schema owner, plus
+an explicit `stageAsCandidateOnly` option on its existing writer. Staged rows require a packet key
+resolved to an existing physical packet row through the existing resolver, producer/pass revisions,
+and successful execution; keep execution status separate from
+`admissionDisposition: CANDIDATE_ONLY`; retain absent source/workspace revisions as
+null; and bind ledger-input/output checksums while preserving any declared input hash separately.
+The opt-in writer stores the resolved physical packet reference and resolver lineage in row
+provenance, without claiming PacketKeyV2 logical identity; it rejects integration-event fanout,
+unresolved identity, or deduplication against an unstaged row. Focused fixture tests cover the
+contract and mocked writer only. No cohort
+was frozen, no pass was run/persisted, no live readback occurred, no database status/migration was
+added, and bounded producer selection/readback remain open.

@@ -5,15 +5,25 @@
  *
  * Structural projection rows are observations. They do not become graph edges
  * unless an explicit, revision-qualified edge producer supplies both endpoints.
+ *
+ * TODO (stage-5 review, 2026-09-15): last run status was
+ * CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION, nextGate
+ * REBUILD_GRAPH_PROJECTION_AGAINST_ADMITTED_EXECUTION. This is the SAME root cause as
+ * CURRENT-STRUCTURAL-LINEAGE-01's stale-snapshot finding this session (the admitted Graphify
+ * execution used as the projection source is itself stale/ambiguous -- two equivalent
+ * qualifying executions were found and never resolved, "Gate 0A" in the critical-path plan).
+ * Do not attempt to rebuild this projection until Gate 0A is resolved -- rebuilding against
+ * an ambiguous execution just produces a different stale artifact, not a fixed one.
  */
 
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
 const projectionPath = resolve(root, 'docs/reports/structural-projection-plan-v1.json');
 const relationshipPath = resolve(root, 'docs/reports/current-feature-ontology-graph-revision-v1.json');
+const authorityPath = resolve(root, 'docs/reports/current-graphify-snapshot-authority-v1.json');
 const reportPath = resolve(root, 'docs/reports/current-graph-artifact-readiness-v1.json');
 
 function readJson(path) {
@@ -26,6 +36,8 @@ function sha256(value) {
 
 const projection = readJson(projectionPath);
 const relationship = readJson(relationshipPath);
+const authority = readJson(authorityPath);
+const admittedWorkspaceRevision = authority.sourceSnapshot?.workspaceRevision ?? null;
 const rows = Array.isArray(projection.rows) ? projection.rows : [];
 const nodeKeys = [...new Set(rows.map((row) => row.graphNodeKey).filter(Boolean))].sort();
 const packetKeys = [...new Set(rows.map((row) => row.packetKey).filter(Boolean))].sort();
@@ -36,7 +48,11 @@ const explicitEdgeFields = ['edges', 'relations', 'targets', 'targetGraphNodeKey
 
 const workspaceRevision = projection.workspaceRevision ?? null;
 const relationshipWorkspaceRevision = relationship.workspaceRevision ?? null;
-const workspaceRevisionMatch = workspaceRevision !== null && workspaceRevision === relationshipWorkspaceRevision;
+const projectionMatchesAdmittedRevision = workspaceRevision !== null && workspaceRevision === admittedWorkspaceRevision;
+const relationshipMatchesAdmittedRevision = relationshipWorkspaceRevision !== null
+  && relationshipWorkspaceRevision === admittedWorkspaceRevision;
+const workspaceRevisionMatch = projectionMatchesAdmittedRevision && relationshipMatchesAdmittedRevision;
+const staleCurrentInput = admittedWorkspaceRevision !== null && !projectionMatchesAdmittedRevision;
 
 const observationDigest = sha256(rows.map((row) => [
   row.packetKey ?? '',
@@ -59,6 +75,8 @@ const report = {
     candidateSnapshotRevision: projection.candidateSnapshotRevision ?? null,
     ordinalMapChecksum: projection.ordinalMapChecksum ?? null,
     workspaceRevision,
+    admittedWorkspaceRevision,
+    projectionMatchesAdmittedRevision,
     selectedSourceCount: projection.selectedSourceCount ?? null,
     observedSourceCount: projection.observedSourceCount ?? sourceRefs.length,
     observationCount: rows.length,
@@ -73,6 +91,7 @@ const report = {
     relationshipGraphRevision: relationship.relationshipGraphRevision ?? null,
     kernelCount: relationship.kernelCount ?? null,
     workspaceRevisionMatch,
+    relationshipMatchesAdmittedRevision,
     reviewOnly: relationship.mode === 'READ_ONLY_DRY_RUN_DERIVATION',
   },
   edgeEvidence: {
@@ -84,15 +103,17 @@ const report = {
     callsImportsExportsAreNotEdges: true,
   },
   gate: {
-    currentObservationPlan: rows.length > 0 ? 'PROVEN_BOUNDED' : 'NOT_PROVEN',
-    currentNodeIdentityObservation: nodeKeys.length > 0 ? 'PROVEN_BOUNDED' : 'NOT_PROVEN',
+    currentObservationPlan: staleCurrentInput ? 'STALE_INPUT_REVISION' : (rows.length > 0 ? 'PROVEN_BOUNDED' : 'NOT_PROVEN'),
+    currentNodeIdentityObservation: staleCurrentInput ? 'STALE_INPUT_REVISION' : (nodeKeys.length > 0 ? 'PROVEN_BOUNDED' : 'NOT_PROVEN'),
     currentRevisionQualifiedEdgeArtifact: 'NOT_PROVEN',
     graphOrdinalMap: 'NOT_PROVEN_FOR_CURRENT_ARTIFACT',
     cpuGpuParity: 'PROVEN_FIXTURE_ONLY',
     historicalGraphReuseAllowed: false,
   },
-  status: 'CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER',
-  nextGate: 'CURRENT_REVISION_QUALIFIED_EDGE_MATERIALIZATION_READ_ONLY_PLAN',
+  status: staleCurrentInput ? 'CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_STALE_PROJECTION' : 'CURRENT_GRAPH_ARTIFACT_BLOCKED_ON_EDGE_PRODUCER',
+  nextGate: staleCurrentInput
+    ? 'REBUILD_GRAPH_PROJECTION_AGAINST_ADMITTED_EXECUTION'
+    : 'CURRENT_REVISION_QUALIFIED_EDGE_MATERIALIZATION_READ_ONLY_PLAN',
   writes: {
     postgres: false,
     qdrant: false,
@@ -104,7 +125,9 @@ const report = {
 };
 
 mkdirSync(dirname(reportPath), { recursive: true });
-writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const reportTempPath = `${reportPath}.${process.pid}.tmp`;
+writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+renameSync(reportTempPath, reportPath);
 console.log(JSON.stringify({
   status: report.status,
   observationCount: rows.length,

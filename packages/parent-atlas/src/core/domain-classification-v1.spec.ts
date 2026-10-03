@@ -48,6 +48,22 @@ describe('DomainClassificationV1', () => {
     ).toThrow('TRAINED_CLASSIFIER_FAMILY_REQUIRES_TRAINING_SNAPSHOT_REVISION');
   });
 
+  it('requires a model checksum for trained classifier families', () => {
+    expect(() =>
+      buildDomainClassificationV1({
+        canonicalId: 'packet:abc123',
+        sourceRevision: 'sha256:'.padEnd(71, '0'),
+        classifierFamily: 'NAIVE_BAYES',
+        classifierRevision: 'sklearn-multinomial-nb-v1',
+        trainingSnapshotRevision: 'training:2026-09-01',
+        probabilities: { auth: 0.6 },
+        predictedDomain: 'auth',
+        confidence: 0.6,
+        evidenceRefs: [],
+      }),
+    ).toThrow('TRAINED_CLASSIFIER_FAMILY_REQUIRES_MODEL_CHECKSUM');
+  });
+
   it('builds a valid NAIVE_BAYES classification with a training snapshot', () => {
     expect(() =>
       buildDomainClassificationV1({
@@ -56,6 +72,7 @@ describe('DomainClassificationV1', () => {
         classifierFamily: 'NAIVE_BAYES',
         classifierRevision: 'sklearn-multinomial-nb-v1',
         trainingSnapshotRevision: 'training:2026-09-01',
+        modelChecksum: `sha256:${'a'.repeat(64)}`,
         probabilities: { auth: 0.6, ui: 0.4 },
         predictedDomain: 'auth',
         confidence: 0.6,

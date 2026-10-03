@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-20T18:07:29.330Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 1,
+  "workspaceIdFilter": null,
+  "workspaceRevisionFilter": null,
+  "workspaceRevisionCount": 1,
+  "workspaceRevisionMismatchCount": 0,
+  "candidatesConsidered": 1,
+  "skippedUnsupported": 0,
+  "byFileKind": {
+    "markdown": 1
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 21,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "63b5b71d-3241-4b6b-97f8-f42375616000",
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+      "workspaceRevisionMatches": true,
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    }
+  ]
+}

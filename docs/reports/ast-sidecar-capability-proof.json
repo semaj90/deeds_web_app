@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.ast.sidecar.proof.v3",
-  "generatedAt": "2026-08-29T17:13:51.038Z",
+  "generatedAt": "2026-09-20T23:44:30.453Z",
   "endpoint": "http://127.0.0.1:8095",
   "status": "PROVEN",
   "structuralStatus": "PROVEN",
@@ -66,7 +66,7 @@
       "hierarchy": true
     },
     "grounding": {
-      "extractionCount": 2,
+      "extractionCount": 1,
       "nativeCharInterval": true,
       "alignmentStatusVisible": true,
       "error": null

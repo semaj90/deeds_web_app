@@ -1,0 +1,51 @@
+{
+  "schema": "atlas.unknown-resolution-set-receipt.v1",
+  "status": "UNKNOWN_RESOLUTION_SET_SEALED_ARTIFACT_ONLY",
+  "generatedAt": "2026-09-26T18:08:45.809Z",
+  "canonicalAuthority": false,
+  "supersedes": "unknown-resolution-draft-v2 (draft-unknown-resolution-v2.mts; withdrawn migration target)",
+  "storage": "artifact only — no database owner is created or modified; unknown_packets / unknown_resolution_ledger untouched",
+  "coordinates": {
+    "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+    "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+    "coordinateArtifactChecksum": "sha256:720e70357fcdade522a56f3486f43c506651b7ea72b7dd02ce733413e4977edf"
+  },
+  "inputs": {
+    "featureReceipt": "docs/reports/legacy-summary-hint-feature-v2-20260926T175630Z.json",
+    "overlayProof": "docs/reports/historical-evidence-overlay-proof-v2-20260926T175620Z.json",
+    "featureRows": "sha256:020502279d5390cdb06ab2e46a45932154d7c4dd3bbcc9db418d80caf9e3a73d",
+    "candidateMultiplicity": "sha256:720e70357fcdade522a56f3486f43c506651b7ea72b7dd02ce733413e4977edf",
+    "historicalEvidenceOverlaySet": "02c075d9e4bbb26f4573ce96e16845860e37f88c7a7447565f4b904688b94d3a"
+  },
+  "rowCount": 15973,
+  "byReason": {
+    "NO_PROVEN_CHUNK_LINEAGE": 15638,
+    "CHUNK_WITHOUT_QUALIFIED_SUMMARY": 335
+  },
+  "setChecksum": "8fbef234efaff8dd9f51248d92493d9b4b25d1335ce1b472e4339e095b71952a",
+  "producerRevision": "sha256:b78b40628b7b92df5da3ea29194fd89b793b919b9a413f311790cb427467d310",
+  "checks": {
+    "expectedCountsMatchFrozen": true,
+    "ordinalMapChecksumMatchesFrozen": true,
+    "totalMatchesFrozenRfMissingRows": true,
+    "resolverMatchesRoutingTable": true,
+    "rowsEqualUnavailable": true,
+    "reasonsPartitionAll": true,
+    "uniqueIds": true,
+    "byteIdenticalReplay": true,
+    "noValuesStored": true,
+    "packetIdentityRowsAbsent": true
+  },
+  "artifact": {
+    "path": ".tmp\\atlas\\unknown-resolution-set-v1\\20260926T180845Z\\unknown-resolution-set.json",
+    "sha256": "sha256:94282639ef43ab122377a815d95e1ec3d9ced924a75e9edfd7aca57d097c898a",
+    "bytes": 10980169
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

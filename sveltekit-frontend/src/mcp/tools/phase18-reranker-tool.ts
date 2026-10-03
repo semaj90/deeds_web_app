@@ -3,7 +3,6 @@ import {
   mcpToolInputSchema,
   phase18ResponseEnvelopeSchema,
   featureVectorSchema,
-  predictionResultSchema,
   envelopeMetadataSchema,
 } from '$lib/schemas/phase18-envelope-schema.js';
 import type {
@@ -107,7 +106,8 @@ export async function validatePhase18ToolInput(input: unknown): Promise<{
  * 2. Run inference on feature vectors
  * 3. Return ranked predictions with confidence scores
  *
- * For now: returns placeholder scores with deterministic ordering
+ * Current behavior: fail closed until an admitted model and revision-qualified
+ * feature bundle are available; no synthetic scores are returned.
  */
 export async function executePhase18Reranker(
   input: any,
@@ -169,36 +169,9 @@ export async function executePhase18Reranker(
     };
   }
 
-  // Generate placeholder predictions
-  // Production: load trained model and run inference
-  const results: PredictionResult[] = packetKeys.map((packetKey, index) => {
-    const featureVec = features[index].values;
-
-    // Placeholder scoring: average of features as a proxy for packet quality
-    const avgFeature = featureVec.reduce((a, b) => a + b, 0) / featureVec.length;
-    const score = Math.min(1.0, avgFeature + 0.1 * Math.random());
-
-    return {
-      packetKey,
-      rerankScore: score,
-      confidence: 0.8 + 0.2 * Math.random(),
-      reason: returnReasons
-        ? `Average feature value ${avgFeature.toFixed(3)}, adjusted for randomness`
-        : undefined,
-      modelVersion: '1.0-placeholder',
-      latencyMs: Math.floor(5 + Math.random() * 15)
-    };
-  });
-
-  // Sort by score descending and take topK
-  const sortedResults = results
-    .sort((a, b) => b.rerankScore - a.rerankScore)
-    .slice(0, topK);
-
-  // Compute summary statistics
-  const successCount = sortedResults.filter(r => r.rerankScore >= 0.5).length;
-  const errorCount = sortedResults.filter(r => r.rerankScore < 0.1).length;
-
+  // Do not return synthetic scores. This legacy MCP envelope has no admitted
+  // revision-qualified feature bundle or owned model identity. Callers must
+  // use the canonical executor once its sidecar admission gate is satisfied.
   return {
     metadata: {
       envelopeId,
@@ -211,19 +184,19 @@ export async function executePhase18Reranker(
       mode: 'inference'
     },
     requestId: requestId || randomUUID(),
-    success: true,
-    results: sortedResults,
-    summary: {
-      totalPackets: packetKeys.length,
-      successCount,
-      errorCount,
-      avgScore: sortedResults.length > 0
-        ? sortedResults.reduce((sum, r) => sum + r.rerankScore, 0) / sortedResults.length
-        : 0,
-      avgConfidence: sortedResults.length > 0
-        ? sortedResults.reduce((sum, r) => sum + r.confidence, 0) / sortedResults.length
-        : 0,
-      totalLatencyMs: sortedResults.reduce((sum, r) => sum + (r.latencyMs || 0), 0)
+    success: false,
+    results: [],
+    error: {
+      code: 'OWNED_RERANKER_NOT_ADMITTED',
+      message: 'Phase 18 scoring is unavailable until a revision-qualified owned model and feature bundle are admitted.',
+      details: {
+          canonicalOwner: 'canonical-rerank-executor',
+          legacyFeatureDimension: 13,
+          totalPackets: packetKeys.length,
+          requestedTopK: topK,
+        returnReasons,
+        writesPerformed: false,
+      },
     }
   };
 }

@@ -4,7 +4,8 @@
  * Lane 6: Topology Base Layer (5.56% → 50%+)
  *
  * Goal: Compute SOM grid assignments + PageRank scores
- * Prerequisites: content_embedding_384 must be populated (Lane 2)
+ * Prerequisite: atlas_packets.embedding is the 768-D physical vector surface.
+ * Presence is not a representation-provenance/admission receipt.
  * GPU Requirement: PyTorch for KMeans (10-50× speedup on RTX 3060 Ti)
  *
  * Usage:
@@ -40,21 +41,16 @@ async function checkPrerequisites() {
 
   // 1. Embedding coverage
   const embResult = await pool.query(
-    `SELECT COUNT(*) as total, COUNT(CASE WHEN content_embedding_384 IS NOT NULL THEN 1 END) as with_embed
+    `SELECT COUNT(*) as total, COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) as with_embed
      FROM atlas_packets`
   );
   const embCoverage = embResult.rows[0];
   const embPct = Math.round((embCoverage.with_embed / embCoverage.total) * 100);
 
-  console.log(`  Embedding coverage: ${embCoverage.with_embed}/${embCoverage.total} (${embPct}%)`);
+  console.log(`  768-D vector presence (not provenance admission): ${embCoverage.with_embed}/${embCoverage.total} (${embPct}%)`);
 
-  if (embPct < 50) {
-    console.log(`    ❌ BLOCKED: Embeddings must be ≥50% complete before topology. Run Lane 2 first.\n`);
-    return false;
-  }
-
-  console.log(`    ✅ READY (≥50%)\n`);
-  return true;
+  console.log('    ❌ BLOCKED: this legacy planner cannot prove per-vector representationRevision; physical vector coverage is diagnostic only.\n');
+  return false;
 }
 
 /**
@@ -97,7 +93,7 @@ async function backfillTopology() {
     // Recommendations
     console.log('⚠️  TOPOLOGY WORK REQUIRES GPU + NEURAL PROCESSING\n');
     console.log('Required steps (NOT YET IMPLEMENTED):\n');
-    console.log('  1. Load 384-dim embeddings into GPU memory (PyTorch/CUDA)');
+    console.log('  1. Require admitted, revision-qualified semantic_768 inputs before topology execution');
     console.log('  2. Compute KMeans clustering (K=25) with GPU acceleration');
     console.log('  3. Build SOM 20×20 grid from cluster centroids');
     console.log('  4. Assign som_row, som_col to each packet via BMU');

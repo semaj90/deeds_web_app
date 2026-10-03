@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.agentic-graph-topology-review.v1",
+  "reviewStatus": "CODE_AND_FIXTURE_REVIEWED",
+  "authorityStatus": "NOT_PRODUCTION_PROVEN",
+  "likely_cause": "The 4D topology lookup had a linear tile scan, while runtime fan-out and graph memory/authenticated smoke gates remain unwired or unproven.",
+  "evidence": [
+    "sveltekit-frontend/src/lib/server/atlas/topology/topology-tile-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/residency/multi-plane-execution.spec.ts",
+    "sveltekit-frontend/src/routes/api/codebase-index/graph/+server.ts",
+    "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+    "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md"
+  ],
+  "topology": {
+    "index": "revision-qualified in-memory Map keyed by four quantized coordinates; each key maps to tile buckets",
+    "queryComplexity": "bounded local coordinate probes plus matching tile members; radius 1 performs 81 Map lookups",
+    "probeLimit": 65536,
+    "canonicalAuthority": false,
+    "manifoldPca4": "strict ManifoldPca4V1 contract now binds its representation, basis provenance, input artifact, candidate and workspace revisions, coordinates, and output checksum; distinct from topologyCoordinate4V1",
+    "productionCallerFound": false,
+    "openOwnerTasks": ["TOPO-06", "TOPO-13a"]
+  },
+  "graphEndpoint": {
+    "implemented": [
+      "reject malformed or missing file_path payloads",
+      "bound maxFiles, maxPoints, response bytes, and per-file import content",
+      "apply directory scope and return non-200 typed failures"
+    ],
+    "focusedTests": "32 passed across graph endpoint and error-brain routes",
+    "remainingOpenSpecTasks": [
+      "bounded repeated-request memory smoke",
+      "Qdrant prefix-index proof or retain bounded server-side directory filter",
+      "live authenticated error-diagnosis request and populated-neighborhood readback"
+    ],
+    "qdrantPrefixIndex": "NOT_PROVEN; bounded server-side scope filtering remains the safe behavior"
+  },
+  "runtimeEnvironment": "WSL2 Miniforge RAPIDS/Torch and the CPU-focused NLP Docker sidecar were not re-probed or used in this review.",
+  "openSpec": {
+    "topologyOwner": "parent-atlas-topology-representation-admission",
+    "topologyTaskProgress": "8/26",
+    "graphApiOwner": "parent-atlas-graph-retrieval-proof",
+    "checkboxesChanged": false,
+    "masterTocUpdated": true
+  },
+  "validation": {
+    "topologyVitest": "13/13 passed",
+    "representationAndTopologyVitest": "15/15 passed",
+    "graphAndErrorBrainVitest": "32/32 passed",
+    "topologyOpenSpecStrict": "passed",
+    "graphApiOpenSpecStrict": "passed",
+    "targetedDiffCheck": "passed",
+    "fullPortfolioCensusRefreshed": false
+  },
+  "currentTruthNote": "The previously bound EVF run predates the added TOPO-13a task and topology index patch; its portfolio counts are not asserted as current in this report.",
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/atlas/topology/topology-tile-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/residency/multi-plane-execution.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/representations/representation-gradient-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/representations/representation-gradient-v1.spec.ts",
+    "openspec/changes/parent-atlas-topology-representation-admission/tasks.md",
+    "docs/MASTER-TOC.md"
+  ],
+  "safe_next_command": "npx openspec status --change parent-atlas-topology-representation-admission --json",
+  "smoke_command": "cd sveltekit-frontend && npx vitest run src/lib/server/atlas/residency/multi-plane-execution.spec.ts",
+  "report_path": "docs/reports/agentic-graph-topology-review-20261002.json"
+}

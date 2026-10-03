@@ -1,0 +1,151 @@
+{
+  "schema": "atlas.selected-membership-bridge.v1",
+  "gate": "CURRENT-MEMBERSHIP-BRIDGE-CENSUS-01",
+  "generatedAt": "2026-09-15T01:20:32.548Z",
+  "mode": "READ_ONLY",
+  "executionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+  "counts": {
+    "selectedMembershipRows": 25542,
+    "repositoryCount": 7,
+    "exactRepositoryPathSourceRefJoins": 0,
+    "canonicalSourceReferenceMissing": 25542,
+    "pathOnlySourceReferenceMatches": 32957,
+    "pathOnlyMatchesWithRepositoryMismatch": 32957,
+    "exactSourceRevisionJoins": 0,
+    "sourceIdentityLinkRows": 788,
+    "provenLineageSourceRows": 577
+  },
+  "diagnosticSamples": {
+    "membership": [
+      {
+        "repository_id": "repo:claude-mem",
+        "repository_relative_path": ".agent/rules/claude-mem-context.md",
+        "source_ref": "claude-mem/.agent/rules/claude-mem-context.md"
+      },
+      {
+        "repository_id": "repo:claude-mem",
+        "repository_relative_path": ".agents/plugins/marketplace.json",
+        "source_ref": "claude-mem/.agents/plugins/marketplace.json"
+      },
+      {
+        "repository_id": "repo:claude-mem",
+        "repository_relative_path": "bunfig.toml",
+        "source_ref": "claude-mem/bunfig.toml"
+      }
+    ],
+    "sourceRefs": [
+      {
+        "repo_id": "deeds-web-app",
+        "source_ref_key": "2-CONTEXT.md"
+      },
+      {
+        "repo_id": "deeds-web-app",
+        "source_ref_key": "724_agents.md"
+      },
+      {
+        "repo_id": "deeds-web-app",
+        "source_ref_key": "ACE-BITFROST-WORKER-INTEGRATION.md"
+      }
+    ],
+    "membershipRepositories": [
+      "repo:claude-mem",
+      "repo:granite-docling-258M",
+      "repo:mcp-server-mcp",
+      "repo:models/embeddinggemma_300m",
+      "repo:root",
+      "repo:sites/parent-atlas-gateboard",
+      "repo:turbovec"
+    ],
+    "sourceRefRepositories": [
+      "deeds-web-app"
+    ],
+    "pathOnlyRepositoryPairs": [
+      {
+        "membership_repository": "repo:root",
+        "source_repository": "deeds-web-app",
+        "path_matches": 23381
+      },
+      {
+        "membership_repository": "repo:sites/parent-atlas-gateboard",
+        "source_repository": "deeds-web-app",
+        "path_matches": 5
+      },
+      {
+        "membership_repository": "repo:claude-mem",
+        "source_repository": "deeds-web-app",
+        "path_matches": 3
+      },
+      {
+        "membership_repository": "repo:mcp-server-mcp",
+        "source_repository": "deeds-web-app",
+        "path_matches": 3
+      },
+      {
+        "membership_repository": "repo:granite-docling-258M",
+        "source_repository": "deeds-web-app",
+        "path_matches": 2
+      },
+      {
+        "membership_repository": "repo:models/embeddinggemma_300m",
+        "source_repository": "deeds-web-app",
+        "path_matches": 2
+      },
+      {
+        "membership_repository": "repo:turbovec",
+        "source_repository": "deeds-web-app",
+        "path_matches": 2
+      }
+    ],
+    "linkCoverageByRepository": [
+      {
+        "repository_id": "repo:claude-mem",
+        "selected": 763,
+        "linked": 0
+      },
+      {
+        "repository_id": "repo:granite-docling-258M",
+        "selected": 10,
+        "linked": 0
+      },
+      {
+        "repository_id": "repo:mcp-server-mcp",
+        "selected": 192,
+        "linked": 0
+      },
+      {
+        "repository_id": "repo:models/embeddinggemma_300m",
+        "selected": 13,
+        "linked": 0
+      },
+      {
+        "repository_id": "repo:root",
+        "selected": 24456,
+        "linked": 788
+      },
+      {
+        "repository_id": "repo:sites/parent-atlas-gateboard",
+        "selected": 22,
+        "linked": 0
+      },
+      {
+        "repository_id": "repo:turbovec",
+        "selected": 86,
+        "linked": 0
+      }
+    ]
+  },
+  "namespaceAuthority": {
+    "reportPath": "docs/reports/source-namespace-authority-v1.json",
+    "status": "SOURCE_NAMESPACE_AUTHORITY_PROVEN",
+    "aliasesApplied": []
+  },
+  "identityContract": "repository_id + repository_relative_path → source reference; source_ref + source_revision → proven packet/chunk lineage",
+  "nonAdmissionComparisons": [
+    "Qdrant point IDs",
+    "bare paths",
+    "whole-file hash to per-chunk content_hash"
+  ],
+  "status": "CURRENT_MEMBERSHIP_BRIDGE_INCOMPLETE",
+  "firstBlocker": "REPOSITORY_NAMESPACE_MISMATCH",
+  "writesPerformed": false
+}

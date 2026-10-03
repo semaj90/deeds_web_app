@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.afc-routing-contract-review.v1",
+  "reviewRevision": "afc-routing-contract-review:2026-09-27.1",
+  "scope": {
+    "queryRadixTouched": false,
+    "runtimeWired": false,
+    "datastoreWrites": false,
+    "cacheWrites": false,
+    "canonicalAuthority": false
+  },
+  "contracts": {
+    "v1": {
+      "registryStatic": true,
+      "runtimeCapabilitySeparate": true,
+      "capabilityHelperRevisionBound": true,
+      "triStateEligibility": true,
+      "routingSignalSeparated": false,
+      "logicalLaneSeparated": false,
+      "executorSeparated": false,
+      "notes": "Registry has executionSurface but no router signal, fusion lane, or executor identity."
+    },
+    "v2": {
+      "registryStatic": true,
+      "runtimeCapabilitySeparate": true,
+      "capabilityHelperRevisionBound": true,
+      "triStateEligibility": true,
+      "routingSignalSeparated": false,
+      "logicalLaneSeparated": true,
+      "executorSeparated": true,
+      "notes": "Raw v2 has lane and executor, but no router signal; its LEXICAL/STRUCTURAL/SEMANTIC/GRAPH/DOC lane enum is not SearchRuntime's fusion-lane type. Capability module also combines pure snapshot construction with live probing."
+    },
+    "v2Review": {
+      "registryStatic": true,
+      "runtimeCapabilitySeparate": true,
+      "capabilityHelperRevisionBound": true,
+      "triStateEligibility": true,
+      "routingSignalSeparated": true,
+      "logicalLaneSeparated": true,
+      "executorSeparated": true,
+      "notes": "Isolated review candidate explicitly separates routerSignal, logicalLane, and executor; router signals are validated against router-matrix.ts and logicalLane is typed from SearchRuntime. Fixture proof only; owner mappings are not promoted."
+    }
+  },
+  "fusionOwner": {
+    "owner": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+    "logicalRetrievalLanes": ["dense", "lexical", "exact", "ast", "schema", "rg", "bm42"],
+    "routerSignalOwner": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+    "oneVotePerLogicalLane": true,
+    "proofRefs": [
+      "sveltekit-frontend/src/lib/server/retrieval/__tests__/search-runtime-fusion.test.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/__tests__/rf6-live-replay-01.test.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/fusion-lane-dedupe.spec.ts"
+    ],
+    "scopeLimit": "Direct multi-executor fixture proves Qdrant and TurboVec collapse to one dense-lane contribution; it does not separately prove cuVS/CAGRA production mappings."
+  },
+  "invariants": {
+    "routerSignalDistinctFromLogicalLane": true,
+    "logicalLaneDistinctFromExecutor": true,
+    "oneVotePerLogicalLane": true,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "mappingFindings": {
+    "conceptualGraphAndDocsAreSearchRuntimeLanes": false,
+    "rgAndPostgresLexicalAreOneSearchRuntimeLane": false,
+    "notes": "SearchRuntime currently exposes graph/docs neither as fusion lane IDs nor an alias here; rg_keyword maps to rg, distinct from lexical. Do not encode the proposed conceptual lane list as if it were the current fusion owner."
+  },
+  "decision": "MANUAL",
+  "recommendation": "Use the isolated v2-review three-layer shape as the contract candidate, but keep promotion blocked until each helper has an owner-verified routerSignal, an explicit mapping to the existing SearchRuntime lane set (or a separately reviewed lane-owner change), and a real executor identity. Preserve one-vote-per-lane fusion."
+}
