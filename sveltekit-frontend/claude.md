@@ -169,6 +169,41 @@ const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
 
 ---
 
+## 🧭 Parent Atlas Helper / MCP Alignment (2026-10-03)
+
+Use the existing helper registry before adding tools:
+`src/lib/server/atlas/agentic-file-compiler/helper-registry-v2.ts`.
+
+Current read-only helper seed includes `rg-exact`, `ast-grep-structural`,
+`tree-sitter-chunk`, `semantic-768`, `graph-ppr`, `docs-corpus-search`,
+and LangExtract grounding. Runtime availability belongs in
+`helper-capability-snapshot-v2.ts`; helper registration alone is not proof that
+the helper is reachable or is a request-time owner.
+
+Hard rules:
+- One logical dense lane: `semantic_768`.
+- PostgreSQL pgvector exact, Qdrant, cuVS/CAGRA and TurboVec are executors or
+  challengers under that lane. They do not receive independent RRF votes merely
+  because execution differs.
+- SearXNG is external acquisition. Normalize and validate its results before
+  corpus admission; it is not a second canonical RAG or semantic-fusion lane.
+- TRACE MCP is the model-facing tool boundary. Diagnostic mounts such as
+  `postgres-readonly` and `qdrant-readonly` are operator/debug surfaces and
+  must not bypass SearchRuntime identity/fusion rules.
+- Structural helpers (rg, ast-grep, Tree-sitter, LSP) nominate evidence only.
+  They never mint canonical packet/task identity.
+- GPU/WSL executors are capability implementations, not authority. In
+  particular, KMeans/SOM/centroid executors do not grant task eligibility or
+  canonical identity.
+- If a helper has a live service dependency, record the interpreter/package
+  revision and a fresh capability probe. A static registry entry is not a live
+  receipt.
+
+Machine-readable alignment:
+`src/lib/server/atlas/agentic-file-compiler/mcp-helper-integration-v1.ts`.
+The associated spec fails closed if a semantic executor is accidentally given
+an independent fusion vote.
+
 ## 🔐 Data Persistence + Retrieval Contract (Session 89 Corrected)
 
 **Verified Architecture (June 28, 2026)**:
