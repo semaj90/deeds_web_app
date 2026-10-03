@@ -7,7 +7,18 @@ import { ATLAS_CANONICAL_SEMANTIC_DIMENSION } from '$lib/server/atlas/retrieval/
 
 const MIB = 1024 * 1024;
 
-export type GpuTelemetrySource = 'rapids-sidecar-cupy' | 'cuda-runtime' | 'nvml' | 'unavailable';
+export type GpuTelemetrySource = 'rapids-sidecar-cupy' | 'cuda-runtime' | 'nvml' | 'nvidia-smi' | 'unavailable';
+
+/**
+ * HEADROOM-V2-03 source grade. Only a reading taken OUTSIDE the CUDA process is admission-grade.
+ * `cudaMemGetInfo`-class sources (`cuda-runtime`, `rapids-sidecar-cupy`) follow the Windows WDDM Budget
+ * and overstated free VRAM ~20x on this host: they are diagnostic only and never sufficient on their own.
+ */
+const ADMISSION_GRADE_GPU_TELEMETRY_SOURCES: ReadonlySet<GpuTelemetrySource> = new Set(['nvml', 'nvidia-smi']);
+
+export function isAdmissionGradeGpuTelemetrySourceV1(source: GpuTelemetrySource): boolean {
+  return ADMISSION_GRADE_GPU_TELEMETRY_SOURCES.has(source);
+}
 
 export interface GpuMemoryTelemetryV1 {
   schema: 'atlas.gpu-memory-telemetry.v1';
@@ -208,12 +219,48 @@ export function mergeGpuResidencyPolicyV1(
   };
 }
 
+/**
+ * HEADROOM-V2-02: opt-in freshness for GPU telemetry. A reading older than `maxAgeMs`, dated in the
+ * future, or with an unparseable `capturedAt` is not usable for admission (treated like missing
+ * telemetry: fail over, never "last known good"). Callers that do not pass a freshness window keep the
+ * previous behaviour. Source-grade rules (cudaMemGetInfo-class vs NVML) are deliberately NOT applied
+ * here: the only live producer today is the CuPy sidecar (`rapids-sidecar-cupy`), so that would disable
+ * GPU admission outright and is an operator decision (see HEADROOM-V2-02 in the lanes tasks.md).
+ */
+export interface GpuTelemetryFreshnessV1 {
+  nowMs: number;
+  maxAgeMs: number;
+  /** When true, a non-admission-grade source (see `isAdmissionGradeGpuTelemetrySourceV1`) is rejected. */
+  requireAdmissionGradeSource?: boolean;
+}
+
+export function gpuTelemetryAgeStatusV1(
+  telemetry: GpuMemoryTelemetryV1,
+  freshness: GpuTelemetryFreshnessV1,
+): 'FRESH' | 'STALE' | 'INVALID_TIMESTAMP' {
+  const captured = Date.parse(telemetry.capturedAt);
+  if (Number.isNaN(captured)) return 'INVALID_TIMESTAMP';
+  const age = freshness.nowMs - captured;
+  return age >= 0 && age <= freshness.maxAgeMs ? 'FRESH' : 'STALE';
+}
+
 export function planGpuResidencyV1(
   telemetry: GpuMemoryTelemetryV1 | null,
   requestedCandidateCount: number,
   overrides: Parameters<typeof mergeGpuResidencyPolicyV1>[0] = {},
+  freshness?: GpuTelemetryFreshnessV1,
 ): GpuResidencyBudgetV1 {
   const policy = mergeGpuResidencyPolicyV1(overrides);
+  let telemetryRejection: 'STALE' | 'INVALID_TIMESTAMP' | 'UNTRUSTED_SOURCE' | null = null;
+  if (telemetry && freshness) {
+    const age = gpuTelemetryAgeStatusV1(telemetry, freshness);
+    if (age !== 'FRESH') telemetryRejection = age;
+    else if (freshness.requireAdmissionGradeSource && !isAdmissionGradeGpuTelemetrySourceV1(telemetry.source)) {
+      telemetryRejection = 'UNTRUSTED_SOURCE';
+    }
+  }
+  const rejectedSource = telemetry?.source;
+  if (telemetryRejection) telemetry = null;
   const requestedCandidateBucket = chooseCandidateBucket(requestedCandidateCount);
   const totalReservedBytes =
     policy.modelReservedBytes +
@@ -236,7 +283,12 @@ export function planGpuResidencyV1(
       maxCandidateBucket: null,
       executionTarget: 'qdrant',
       degraded: true,
-      reason: 'GPU telemetry unavailable; fail over before allocating CUDA work.',
+      reason:
+        telemetryRejection === null
+          ? 'GPU telemetry unavailable; fail over before allocating CUDA work.'
+          : telemetryRejection === 'UNTRUSTED_SOURCE'
+            ? `GPU telemetry source '${rejectedSource}' is diagnostic only, not admission-grade; fail over before allocating CUDA work.`
+            : `GPU telemetry ${telemetryRejection === 'STALE' ? 'stale' : 'has an invalid timestamp'}; fail over before allocating CUDA work.`,
     };
   }
 

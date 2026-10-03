@@ -572,5 +572,75 @@
     "sha256": "309b6bf2cfa30eb8168a2f1f85f18b10af33100778bee4f201b155b5743f91bd",
     "archived": "2026-09-27",
     "reason": "never worked since inception: two module/endpoint bugs fixed during testing (require(crypto) vs top-level await module-type conflict; wrong Qdrant endpoint /points instead of /points/scroll), but all 4 GPU call sites (pageRankGPU/attentionScoreGPU/kmeansWithCentroids/trainSOM) pass arguments in the wrong shape and have never produced valid output. Duplicates the already-correct, already-canonical karpathy-gpu-enrich.mjs Karpathy GPU Authority Blend pipeline. See CLAUDE.md LIBTORCH-DEPENDENCY-CENSUS-01 for the full investigation trail."
+  },
+  {
+    "path": "CLAUDE.md#gpu-compute-history",
+    "archivedTo": "docs/archive/claude-md-gpu-compute-history-2026-10-03.md",
+    "sha256": "bea82bf908ee11c129d19e6cfafcafb67e11b6c74d6a57a4ec48b549b25dd432",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: Tang census, GPU-MINI-FABRIC-01, CUTILE, BITFROST-L2-01, CUDA 13.x lanes, LibTorch census moved verbatim; consolidated into openspec parent-atlas-gpu-compute-lanes-consolidation/tasks.md"
+  },
+  {
+    "path": "CLAUDE.md#stale-status-bitfrost",
+    "archivedTo": "docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10-03.md",
+    "sha256": "79135a55b17446d8c06e5b605c1f6ba49a74f16fc22e087cfb066cff2dcc84cd",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: stale July status, Sessions 82-84, BitFrost warm-bucket audit moved verbatim; have-vs-need appended to parent-atlas-ace-bitfrost-cache-correctness/tasks.md"
+  },
+  {
+    "path": "CLAUDE.md#unified-audit-gate-system",
+    "archivedTo": "docs/archive/claude-md-audit-gates-2026-10-03.md",
+    "sha256": "699ee15a523834711d24b465ee169e488224a04dd7640b99e1d823f75c12f4cc",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: G1-G55 gate command tiers and G4/G5 route tables moved verbatim; pointer + decision tree + open findings list kept in CLAUDE.md"
+  },
+  {
+    "path": "CLAUDE.md#key-lessons",
+    "archivedTo": "docs/archive/claude-md-key-lessons-2026-10-03.md",
+    "sha256": "28f05831a6680f5afb05877bf6b5fb006f9e79d541b4cf3e216d4c631176d36e",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: Key Lessons moved verbatim; condensed rules list kept"
+  },
+  {
+    "path": "CLAUDE.md#embedding-dimensions-policy",
+    "archivedTo": "docs/archive/claude-md-embedding-dimensions-policy-2026-10-03.md",
+    "sha256": "b5870de3ded94f216f716b0879ecb5467d96826720d6bdad9bb943bdb57935e6",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: Embedding Dimensions Policy moved verbatim; condensed policy kept"
+  },
+  {
+    "path": "CLAUDE.md#duplication-prevention-lead-and-governance",
+    "archivedTo": "docs/archive/claude-md-duplication-prevention-2026-10-03.md",
+    "sha256": "a9435416e288a205b08b2671aee131d57c70241f6c013af9e45c4acc8a0eb392",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: Duplication Prevention incident lead and Runtime Owner governance moved verbatim; condensed rules kept; Tang and GPU standing-rules subsections untouched"
+  },
+  {
+    "path": "CLAUDE.md#legacy-reference-sections",
+    "archivedTo": "docs/archive/claude-md-legacy-reference-2026-10-03.md",
+    "sha256": "c6b7afbb448eaf3a8dfbb4a3c12f64f63c2805b45d7152aec239c0838724c478",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: GPU Acceleration Stack, Client-Backend Multi-Tier, Post-Audit Alignment, Redis L1/Bifrost L2, Karpathy blend, Reconstruction 3-Track and Migration history moved verbatim; condensed standing rules kept"
+  },
+  {
+    "path": "CLAUDE.md#status-and-governance-sections",
+    "archivedTo": "docs/archive/claude-md-status-and-governance-2026-10-03.md",
+    "sha256": "85e5fdb33d2923a50e4dc78fe1ef844f3c5197fdf99bda133bbea9221009fcfe",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: runtime/ACE status note, Agent Execution Integrity, Atlas Data Persistence, UUID policy (identity part), Parent Atlas identity alignment, Client Model Direction and Binary bytes/SHA-256 moved verbatim; condensed rules kept"
+  },
+  {
+    "path": "CLAUDE.md#ops-incident-sections",
+    "archivedTo": "docs/archive/claude-md-ops-incidents-2026-10-03.md",
+    "sha256": "ab47f1e39ec52dd030af0932f0316e776f92945e1cb9c32049aee4cc1506f65d",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: Phase 108D, Qdrant API Strategy, Cross-Directory Script Safety, workspace_id, Graphify validation gates, PG18 export performance, SeaweedFS, Gemma4 call rules, OpenCode config and Neural Decoder moved verbatim; condensed rules kept"
+  },
+  {
+    "path": "CLAUDE.md#small-reference-sections",
+    "archivedTo": "docs/archive/claude-md-small-refs-2026-10-03.md",
+    "sha256": "4fe5bfeeda424f2ad29bd3c15e5aa7e1e6c3bac5becbc566751708cd767fac3d",
+    "archived": "2026-10-03",
+    "reason": "CLAUDE.md size limit: TypeScript 7 lane, AGENTS.md spine and Backend Infrastructure Audit moved verbatim; condensed rules kept"
   }
 ]

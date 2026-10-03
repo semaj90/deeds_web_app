@@ -47,6 +47,10 @@ const RECIPES = {
   raw: (r) => r.content,
   title_none: (r) => `title: none | text: ${r.content}`,
   title_relative_path: (r) => `title: ${r.relative_path} | text: ${r.content}`,
+  // EMB-RECIPE-03: the documented writer (reembed-corpus-document-prefix-v1.mjs) trims content before prefixing.
+  raw_trimmed: (r) => r.content.trim(),
+  title_none_trimmed: (r) => `title: none | text: ${r.content.trim()}`,
+  title_relative_path_trimmed: (r) => `title: ${r.relative_path} | text: ${r.content.trim()}`,
 };
 const STRATA = {
   both_columns: 'content_embedding IS NOT NULL AND content_embedding_768 IS NOT NULL',
@@ -68,8 +72,13 @@ for (const [stratum, cond] of Object.entries(STRATA)) {
        FROM codebase_chunk_index WHERE ${cond} AND content IS NOT NULL AND length(content) > 40
       ORDER BY md5(id::text || 'census-v1') LIMIT $1`, [PER],
   )).rows;
-  const fresh = {};
-  for (const [name, fn] of Object.entries(RECIPES)) fresh[name] = await embedMany(rows.map(fn));
+  // Embed each distinct text once; a trimmed recipe whose text equals an earlier recipe's text for that row is not a separate candidate.
+  const texts = Object.fromEntries(Object.entries(RECIPES).map(([name, fn]) => [name, rows.map(fn)]));
+  const cache = new Map();
+  const distinct = [...new Set(Object.values(texts).flat())];
+  const vecs = await embedMany(distinct);
+  distinct.forEach((tx, i) => cache.set(tx, vecs[i]));
+  const fresh = Object.fromEntries(Object.entries(texts).map(([name, arr]) => [name, arr.map((tx) => cache.get(tx))]));
   const cols = { content_embedding: {}, content_embedding_768: {} };
   const byRoot = {}, byLen = {};
   const tally = (bucket, key, label) => { bucket[key] ??= {}; bucket[key][label] = (bucket[key][label] ?? 0) + 1; };
@@ -77,7 +86,9 @@ for (const [stratum, cond] of Object.entries(STRATA)) {
     for (const [col, txt] of [['content_embedding', row.ce], ['content_embedding_768', row.ce768]]) {
       if (!txt) continue;
       const v = JSON.parse(txt);
-      const scores = Object.fromEntries(Object.keys(RECIPES).map((n) => [n, cos(v, fresh[n][i])]));
+      const seen = new Set();
+      const names = Object.keys(RECIPES).filter((n) => { const tx = texts[n][i]; if (seen.has(tx)) return false; seen.add(tx); return true; });
+      const scores = Object.fromEntries(names.map((n) => [n, cos(v, fresh[n][i])]));
       const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
       const label = top[1] >= THRESHOLD ? top[0] : 'UNKNOWN';
       cols[col][label] = (cols[col][label] ?? 0) + 1;

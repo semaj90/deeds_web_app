@@ -13,6 +13,7 @@ import {
 } from '$lib/shared/schemas/protocol.js';
 import { eq, sql } from 'drizzle-orm';
 import { postgresErrorDetails } from '$lib/server/db/postgres-error-details.js';
+import { classifyPostgresError } from '$lib/server/db/readiness.js';
 
 export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry' | 'lexical_feature_registry';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
@@ -229,7 +230,8 @@ export async function claimBatch(
     if (
       err.code === 'ECONNREFUSED' ||
       err.message?.includes('57P03') ||
-      err.message?.includes('starting up')
+      err.message?.includes('starting up') ||
+      classifyPostgresError(err).state === 'starting'
     ) {
       throw err; // Let caller handle backoff
     }

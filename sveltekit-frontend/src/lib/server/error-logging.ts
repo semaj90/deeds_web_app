@@ -1,6 +1,7 @@
 import { db } from './db/client.js';
 import { errorLogs } from './db/schema-postgres.js';
 import { v4 as uuid } from 'uuid';
+import { classifyPostgresError, shouldCreateRepairTask } from './db/readiness.js';
 
 export type ErrorSeverity = 'CRITICAL' | 'ERROR' | 'WARNING' | 'INFO';
 export type ErrorCategory =
@@ -39,6 +40,14 @@ export interface LogErrorOptions {
  * Non-blocking: errors in logging do not propagate to caller
  */
 export async function logError(options: LogErrorOptions): Promise<void> {
+  // A Postgres startup/crash-recovery window (57P03) is transient: it is not a repair candidate.
+  if (options.category === 'database_error') {
+    const classification = classifyPostgresError(new Error(options.message));
+    if (!shouldCreateRepairTask(classification)) {
+      console.info(`[ERROR-LOGGING] Skipping error_logs row (database ${classification.state}: ${classification.reason})`);
+      return;
+    }
+  }
   try {
     const id = uuid();
     const now = new Date();

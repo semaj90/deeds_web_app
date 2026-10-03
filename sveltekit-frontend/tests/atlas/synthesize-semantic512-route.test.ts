@@ -20,8 +20,8 @@ const score = (packetKey: string, dim: number) => ({
 });
 
 vi.mock('$lib/server/auth-utils.js', () => ({ requireAdmin: m.requireAdmin }));
-vi.mock('$lib/server/atlas/gpu/atlas-rapids-memory-client.js', () => ({
-  createAtlasRapidsMemoryClient: () => ({ readTelemetry: async () => null }),
+vi.mock('$lib/server/atlas/gpu/nvidia-smi-memory-client.js', () => ({
+  createNvidiaSmiMemoryClient: () => ({ readTelemetry: async () => null }),
 }));
 vi.mock('$lib/server/atlas/gpu/gpu-residency-budget.js', () => ({
   planGpuResidencyV1: () => ({ executionTarget: 'gpu', maxCandidateBucket: 128 }),

@@ -5,7 +5,7 @@ import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
 import { loadMutationAwarenessV1 } from '$lib/server/atlas/graph/mutation-awareness.js';
 import { createAtlasRapidsPageRankClient, type AtlasPageRankReceiptV1, type AtlasPageRankResultV1 } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
-import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
+import { createNvidiaSmiMemoryClient } from '$lib/server/atlas/gpu/nvidia-smi-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 import { createAtlasRapidsSemantic512Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic512-client.js';
 import { scoreQdrantSemanticCandidatesV1 } from '$lib/server/atlas/retrieval/qdrant-semantic-scorer.js';
@@ -19,6 +19,7 @@ import {
 } from '$lib/server/atlas/graph/graph-runtime-contracts.js';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 
+const GPU_TELEMETRY_MAX_AGE_MS = 10_000;
 const DEFAULT_CANDIDATE_LIMIT = 128;
 const MAX_CANDIDATES = 512;
 const DEFAULT_TOKEN_BUDGET = 8_192;
@@ -86,9 +87,11 @@ export const POST: RequestHandler = async (event) => {
     const candidateLimit = boundedInt(body.candidateLimit, DEFAULT_CANDIDATE_LIMIT, 1, MAX_CANDIDATES);
     const tokenBudget = boundedInt(body.tokenBudget, DEFAULT_TOKEN_BUDGET, 256, MAX_TOKEN_BUDGET);
 
-    const rapids = createAtlasRapidsMemoryClient();
-    const gpuTelemetry = await rapids.readTelemetry();
-    const gpuBudget = planGpuResidencyV1(gpuTelemetry, candidateLimit);
+    // HEADROOM-V2-03: GPU admission relies ONLY on an out-of-process nvidia-smi reading. The CuPy sidecar's
+    // cudaMemGetInfo-class figure is diagnostic only and is not read here. Missing, failed or stale (>10 s)
+    // readings mean no GPU admission (fail over to Qdrant).
+    const gpuTelemetry = await createNvidiaSmiMemoryClient().readTelemetry();
+    const gpuBudget = planGpuResidencyV1(gpuTelemetry, candidateLimit, {}, { nowMs: Date.now(), maxAgeMs: GPU_TELEMETRY_MAX_AGE_MS, requireAdmissionGradeSource: true });
 
     const graph = await traverseGraphV1({
       schema: 'atlas.graph-traverse-request.v1',

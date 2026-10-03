@@ -36,6 +36,7 @@ import {
 import { ollamaBreaker } from '$lib/server/circuit-breaker.js';
 import { retry, retryPredicates } from '$lib/server/utils/retry.js';
 import { createHash } from 'crypto';
+import { formatEmbeddingGemmaInput, type EmbeddingGemmaInputMode } from '$lib/server/embedding/embedding-contract-768.js';
 
 // ── Re-exports (keep backward compatibility) ────────────────────────────────
 
@@ -256,6 +257,26 @@ export async function embedTexts(texts: string[]): Promise<number[][]> {
 	}
 
 	return results as number[][];
+}
+
+// ── Role-aware embedding (EMBED-CALLER-CONVERGENCE-01) ──────────────────────
+
+/**
+ * Embed text under an explicit EmbeddingGemma role. The contract owner
+ * (embedding-contract-768.ts) formats the prompt, so the L3/L4 cache keys (md5 of the
+ * exact text) differ automatically between roles and a prefixed vector can never be
+ * served for a raw request. Recipes per column (census 2026-10-03):
+ *   content_embedding     = 'document' with title = relative_path (content trimmed)
+ *   content_embedding_768 = raw -> plain embedText(text), no role
+ * Queries against a 'document' corpus use 'retrieval_query' / 'code_query'.
+ */
+export async function embedTextAs(mode: EmbeddingGemmaInputMode, text: string, title?: string): Promise<number[]> {
+	return embedText(formatEmbeddingGemmaInput(mode, text, title));
+}
+
+/** Batch variant of embedTextAs; `titles` (if given) aligns with `texts` by index. */
+export async function embedTextsAs(mode: EmbeddingGemmaInputMode, texts: string[], titles?: Array<string | undefined>): Promise<number[][]> {
+	return embedTexts(texts.map((text, i) => formatEmbeddingGemmaInput(mode, text, titles?.[i])));
 }
 
 // ── Utility ─────────────────────────────────────────────────────────────────
