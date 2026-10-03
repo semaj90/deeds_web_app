@@ -34,14 +34,20 @@ const admissionRepositoryCount = admission?.repositoryCount ?? derivation.reposi
 if (admitted) {
   if (admission.workspaceRevision !== derivation.workspaceRevisionCandidate) blockers.push('ADMISSION_DERIVATION_WORKSPACE_REVISION_MISMATCH');
   if (admission.snapshotRevision !== derivation.snapshotRevision) blockers.push('ADMISSION_DERIVATION_SNAPSHOT_MISMATCH');
-  if (admission.sourceCount !== derivation.sourceCount || admissionRepositoryCount !== derivation.repositoryCount) blockers.push('ADMISSION_DERIVATION_SCOPE_MISMATCH');
+  if (admission.snapshotSourceCount !== derivation.sourceCount) blockers.push('ADMISSION_DERIVATION_SNAPSHOT_SCOPE_MISMATCH');
+  if (admissionRepositoryCount !== derivation.repositoryCount) blockers.push('ADMISSION_DERIVATION_REPOSITORY_SCOPE_MISMATCH');
+  if (admission.sourceInventoryRevision !== plan.sourceInventoryRevision) blockers.push('ADMISSION_SOURCE_INVENTORY_REVISION_MISMATCH');
+  if (admission.sourceInventoryChecksum !== plan.sourceInventoryChecksum) blockers.push('ADMISSION_SOURCE_INVENTORY_CHECKSUM_MISMATCH');
+  if (admission.sourceSelectionChecksum !== plan.sourceSelectionChecksum) blockers.push('ADMISSION_SOURCE_SELECTION_CHECKSUM_MISMATCH');
+  if (admission.sourceCount !== plan.sourceCount) blockers.push('ADMISSION_SOURCE_SELECTION_COUNT_MISMATCH');
 } else {
-if (plan.authority !== false) blockers.push('PLAN_AUTHORITY_FLAG_NOT_FALSE');
-if (workspaceRevision !== null) blockers.push('PLAN_WORKSPACE_REVISION_MUST_REMAIN_NULL_UNTIL_ADMISSION');
-if (plan.admission?.canCallRecordSourceSelectionStage !== false) blockers.push('PLAN_MUST_NOT_CALL_COORDINATOR');
-if (plan.status !== 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED') blockers.push('SOURCE_SELECTION_PLAN_NOT_READY');
-if (plan.snapshotRevision !== derivation.snapshotRevision) blockers.push('PLAN_DERIVATION_SNAPSHOT_MISMATCH');
-if (planCandidate !== derivationCandidate) blockers.push('PLAN_DERIVATION_WORKSPACE_CANDIDATE_MISMATCH');
+  if (plan.authority !== false) blockers.push('PLAN_AUTHORITY_FLAG_NOT_FALSE');
+  if (workspaceRevision !== null) blockers.push('PLAN_WORKSPACE_REVISION_MUST_REMAIN_NULL_UNTIL_ADMISSION');
+  if (plan.admission?.canCallRecordSourceSelectionStage !== false) blockers.push('PLAN_MUST_NOT_CALL_COORDINATOR');
+  if (plan.status !== 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED') blockers.push('SOURCE_SELECTION_PLAN_NOT_READY');
+  if (plan.snapshotRevision !== derivation.snapshotRevision) blockers.push('PLAN_DERIVATION_SNAPSHOT_MISMATCH');
+  if (planCandidate !== derivationCandidate) blockers.push('PLAN_DERIVATION_WORKSPACE_CANDIDATE_MISMATCH');
+  if (typeof plan.sourceInventoryRevision !== 'string' || typeof plan.sourceInventoryChecksum !== 'string') blockers.push('PLAN_SOURCE_INVENTORY_PROVENANCE_MISSING');
 }
 if (derivation.status !== 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION') blockers.push('WORKSPACE_REVISION_DERIVATION_NOT_READY');
 const report = {
@@ -51,15 +57,46 @@ const report = {
   workspaceRevision: admitted && blockers.length === 0 ? admission.workspaceRevision : null,
   workspaceRevisionCandidate: admitted ? admission.workspaceRevision : plan.workspaceRevisionCandidate ?? plan.snapshotRevision ?? null,
   writesPerformed: false, datastoreWritesPerformed: false,
-  sourceSelectionPlan: { path: planPath, status: plan.status ?? null, snapshotRevision: plan.snapshotRevision ?? null, workspaceRevisionCandidate: planCandidate, sourceCount: plan.sourceCount ?? 0, sourceSelectionChecksum: plan.sourceSelectionChecksum ?? null },
-  admissionReceipt: admitted ? { path: ADMISSION, status: admission.status, workspaceRevision: admission.workspaceRevision, snapshotRevision: admission.snapshotRevision, sourceCount: admission.sourceCount, repositoryCount: admissionRepositoryCount, graphifyExecutionAuthorized: admission.graphifyExecutionAuthorized === true, projectionWritesAuthorized: admission.projectionWritesAuthorized === true } : null,
+  sourceSelectionPlan: {
+    path: planPath,
+    status: plan.status ?? null,
+    snapshotRevision: plan.snapshotRevision ?? null,
+    workspaceRevisionCandidate: planCandidate,
+    snapshotSourceCount: plan.snapshotSourceCount ?? null,
+    sourceCount: plan.sourceCount ?? 0,
+    sourceInventoryRevision: plan.sourceInventoryRevision ?? null,
+    sourceInventoryChecksum: plan.sourceInventoryChecksum ?? null,
+    sourceSelectionChecksum: plan.sourceSelectionChecksum ?? null,
+  },
+  admissionReceipt: admitted ? {
+    path: ADMISSION,
+    status: admission.status,
+    workspaceRevision: admission.workspaceRevision,
+    snapshotRevision: admission.snapshotRevision,
+    snapshotSourceCount: admission.snapshotSourceCount,
+    sourceCount: admission.sourceCount,
+    repositoryCount: admissionRepositoryCount,
+    sourceInventoryRevision: admission.sourceInventoryRevision,
+    sourceInventoryChecksum: admission.sourceInventoryChecksum,
+    sourceSelectionChecksum: admission.sourceSelectionChecksum,
+    graphifyExecutionAuthorized: admission.graphifyExecutionAuthorized === true,
+    projectionWritesAuthorized: admission.projectionWritesAuthorized === true,
+  } : null,
   workspaceRevisionDerivation: { path: DERIVATION, status: derivation.status ?? null, snapshotRevision: derivation.snapshotRevision ?? null, workspaceRevisionCandidate: derivationCandidate, sourceCount: derivation.sourceCount ?? 0, repositoryCount: derivation.repositoryCount ?? 0 },
   tournamentContract: contract,
-  compatibility: { planRevisionNull: workspaceRevision === null, tournamentCanAcceptPlan: admitted && blockers.length === 0, reason: admitted && blockers.length === 0 ? 'Current admission receipt binds the tournament workspace revision; Graphify execution remains separately gated.' : 'Existing tournament request schema requires a non-null workspaceRevision; null is preserved until source-authority admission.' },
-  blockers, firstBlockingInvariant: 'TOURNAMENT_REQUIRES_BOUND_WORKSPACE_REVISION',
+  compatibility: {
+    planRevisionNull: workspaceRevision === null,
+    tournamentCanAcceptPlan: admitted && blockers.length === 0,
+    reason: admitted && blockers.length === 0
+      ? 'Current admission receipt binds workspace, snapshot, source-inventory, and canonical source-selection provenance; Graphify execution remains separately gated.'
+      : 'Existing tournament request schema requires a non-null admitted workspaceRevision and a checksum-bound canonical source selection.',
+  },
+  blockers,
+  firstBlockingInvariant: blockers[0] ?? null,
   nextGate: admitted && blockers.length === 0 ? 'AUTHORIZE-GRAPHIFY-POST-PHASE16-TERMINAL-RUN-01' : 'WORKSPACE-REVISION-TOURNAMENT-SOURCE-AUTHORITY-01',
   safeNextCommand: 'npm run atlas:graphify:source-selection:plan',
 };
 await mkdir(dirname(REPORT), { recursive: true });
 await writeFile(REPORT, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: report.authority, workspaceRevision: report.workspaceRevision, tournamentCanAcceptPlan: report.compatibility.tournamentCanAcceptPlan, firstBlockingInvariant: blockers.length ? report.firstBlockingInvariant : null, reportPath: REPORT }, null, 2));
+console.log(JSON.stringify({ schema: report.schema, status: report.status, proofLevel: report.proofLevel, authority: report.authority, workspaceRevision: report.workspaceRevision, sourceInventoryChecksum: report.sourceSelectionPlan.sourceInventoryChecksum, sourceSelectionChecksum: report.sourceSelectionPlan.sourceSelectionChecksum, tournamentCanAcceptPlan: report.compatibility.tournamentCanAcceptPlan, firstBlockingInvariant: report.firstBlockingInvariant, reportPath: REPORT }, null, 2));
+if (blockers.length) process.exitCode = 3;

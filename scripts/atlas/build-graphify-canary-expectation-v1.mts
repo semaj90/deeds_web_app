@@ -19,10 +19,15 @@ if (admission.graphifyExecutionAuthorized !== false) {
 if (admission.projectionWritesAuthorized !== false) {
   throw new Error('GRAPHIFY_CANARY_EXPECTATION_REQUIRES_PROJECTION_WRITES_TO_REMAIN_UNAUTHORIZED');
 }
+if (typeof admission.sourceInventoryRevision !== 'string' || typeof admission.sourceInventoryChecksum !== 'string') {
+  throw new Error('GRAPHIFY_CANARY_EXPECTATION_REQUIRES_SOURCE_INVENTORY_PROVENANCE');
+}
 
 const expectation = buildGraphifyCanaryExpectationV1({
   workspaceRevision: String(admission.workspaceRevision ?? ''),
   snapshotRevision: String(admission.snapshotRevision ?? ''),
+  sourceInventoryRevision: String(admission.sourceInventoryRevision),
+  sourceInventoryChecksum: String(admission.sourceInventoryChecksum),
   sourceSelectionChecksum: String(admission.sourceSelectionChecksum ?? ''),
   sourceCount: Number(admission.sourceCount ?? 0),
 });
@@ -44,6 +49,8 @@ console.log(JSON.stringify({
   schema: report.schema,
   workspaceRevision: report.workspaceRevision,
   snapshotRevision: report.snapshotRevision,
+  sourceInventoryChecksum: report.sourceInventoryChecksum,
+  sourceSelectionChecksum: report.sourceSelectionChecksum,
   sourceCount: report.sourceCount,
   identityChecksum: report.identityChecksum,
   graphifyExecutionAuthorized: report.graphifyExecutionAuthorized,
