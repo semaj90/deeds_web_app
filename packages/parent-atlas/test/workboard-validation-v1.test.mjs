@@ -79,6 +79,28 @@ test('missing required validator makes receipt incomplete and emits TODO candida
   assert.equal(todos[0].mutationAuthorized, false);
 });
 
+test('required NOT_REQUIRED is incomplete rather than proven', () => {
+  const receipt = buildFeatureValidationReceiptV1(plan, [
+    { kind: 'PLAYWRIGHT', status: 'PASS', evidenceRefs: ['pw.json'] },
+    { kind: 'SCREENSHOT', status: 'NOT_REQUIRED', evidenceRefs: [] },
+    { kind: 'DB_READBACK', status: 'PASS', evidenceRefs: ['pg18.json'] },
+  ]);
+
+  assert.equal(receipt.status, 'INCOMPLETE');
+  assert.deepEqual(receipt.missingRequiredValidators, ['SCREENSHOT']);
+});
+
+test('duplicate validator observations fail closed', () => {
+  assert.throws(
+    () =>
+      buildFeatureValidationReceiptV1(plan, [
+        { kind: 'PLAYWRIGHT', status: 'PASS', evidenceRefs: ['pw-1.json'] },
+        { kind: 'PLAYWRIGHT', status: 'PASS', evidenceRefs: ['pw-2.json'] },
+      ]),
+    /Duplicate validation observation/
+  );
+});
+
 test('required validation failure dominates missing state', () => {
   const receipt = buildFeatureValidationReceiptV1(plan, [
     {
@@ -107,7 +129,7 @@ test('GEPA artifact stays shadow-only and checksummed', () => {
   const policy = buildGepaShadowPolicyV1({
     policyId: 'repair-policy-gepa-candidate-001',
     basePolicyRevision: 'repair-policy-v3',
-    optimizerApiRevision: 'dspy.GEPA@3.1.2',
+    optimizerApiRevision: 'dspy.GEPA@official-api-docs',
     trainingCorpusRevision: 'repair-outcomes@fixture-v1',
     metricRevision: 'repair-tournament-metric-v1',
     toolRegistryRevision: 'mcp-tool-registry-v5',
