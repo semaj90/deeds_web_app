@@ -76,22 +76,54 @@ function read(relative) {
   } catch { return ''; }
 }
 
+function exactMutationForTarget(source, target) {
+  if (target.surface === 'atlas_packets.embedding') {
+    return /\b(?:INSERT\s+INTO|UPDATE)\s+(?:public\.)?atlas_packets\b/i.test(source)
+      && /\bembedding\b\s*=/i.test(source);
+  }
+  if (target.surface === 'codebase_chunk_index.content_embedding_768') {
+    return /\b(?:INSERT\s+INTO|UPDATE)\s+(?:public\.)?codebase_chunk_index\b/i.test(source)
+      && /\bcontent_embedding_768\b/i.test(source);
+  }
+  return /\b(?:INSERT\s+INTO|UPDATE)\s+(?:public\.)?codebase_chunk_index\b/i.test(source)
+    && /\bcontent_embedding\b(?!_768)\s*=/i.test(source);
+}
+
 function classify(relative, source, target) {
   if (relative.endsWith('audit-semantic-768-writer-ownership-v1.mjs')) return null;
   if (/\.(?:test|spec)\.(?:mjs|mts|ts|sql)$/i.test(relative)) return null;
   const applies = target.patterns.some((pattern) => pattern.test(source));
   if (!applies) return null;
-  const mutation = /\b(?:INSERT\s+INTO|UPDATE)\s+(?:public\.)?(?:codebase_chunk_index|atlas_packets)\b/i.test(source)
-    && (target.surface === 'atlas_packets.embedding'
-      ? /\bembedding\s*=/i.test(source)
-      : new RegExp(target.surface.split('.')[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*=', 'i').test(source)
-        || new RegExp('INSERT INTO[\\s\\S]{0,1200}' + target.surface.split('.')[1], 'i').test(source));
+
+  const mutation = exactMutationForTarget(source, target);
   const revisionQualified = /source_revision|sourceRevision/i.test(source)
     && /workspace_revision|workspaceRevision/i.test(source);
-  const guarded = /WHERE[\s\S]{0,800}(source_revision|sourceRevision)[\s\S]{0,800}(workspace_revision|workspaceRevision)/i.test(source);
-  const dryRun = /dry[-_ ]?run|read[-_ ]only/i.test(source);
+  const guarded = /WHERE[\s\S]{0,2400}(source_revision|sourceRevision)[\s\S]{0,2400}(workspace_revision|workspaceRevision)/i.test(source)
+    || /EXISTS\s*\([\s\S]{0,2400}(source_revision|sourceRevision)[\s\S]{0,2400}(workspace_revision|workspaceRevision)/i.test(source);
+  const canonicalLineageQualified = /atlas_packet_chunk_lineage/i.test(source)
+    && /canonical_chunk_id|canonicalChunkId/i.test(source)
+    && /packet_key|packetKey/i.test(source)
+    && /revision_status\s*=\s*['"]PROVEN['"]/i.test(source);
+  const independentReadback = /readback/i.test(source)
+    && /vector_dims\s*\(|dimensions/i.test(source)
+    && /embedding_version|representationRevision/i.test(source);
+  const dryRun = /dry[-_ ]?run|read[-_ ]only|DRY_RUN/i.test(source);
   const entrypoint = /package\.json$|startup|route|worker|daemon|index-stream/i.test(relative);
-  return { path: relative, surface: target.surface, role: target.role, kind: mutation ? 'MUTATION_WRITER' : 'READER_OR_DIAGNOSTIC', revisionQualified, guarded, dryRun, productionReachableCandidate: entrypoint };
+  const explicitApply = /--apply|\bAPPLY\b|ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL|EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED/i.test(source);
+
+  return {
+    path: relative,
+    surface: target.surface,
+    role: target.role,
+    kind: mutation ? 'MUTATION_WRITER' : 'READER_OR_DIAGNOSTIC',
+    revisionQualified,
+    guarded,
+    canonicalLineageQualified,
+    independentReadback,
+    explicitApply,
+    dryRun,
+    productionReachableCandidate: entrypoint,
+  };
 }
 
 async function liveCensus() {
@@ -213,6 +245,8 @@ async function main() {
     },
     writers,
     mutationWriters,
+    physicalOwnerMutationWriters,
+    fullyQualifiedPhysicalWriters,
     operatorEntrypoints: [
       { command: 'npm run atlas:graphify:embedding:daily:apply', target: 'codebase_chunk_index.content_embedding', status: 'HISTORICAL_SURFACE_REQUIRES_OWNER_REVIEW' },
     ],
@@ -235,6 +269,15 @@ async function main() {
     writesPerformed: false,
   };
   fs.mkdirSync(path.dirname(REPORT_PATH), { recursive: true });
+  fs.writeFileSync(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  console.log(JSON.stringify({
+    reportPath: REPORT_PATH,
+    verdict: report.verdict,
+    writerCount: writers.length,
+    physicalOwnerMutationWriterCount: physicalOwnerMutationWriters.length,
+    fullyQualifiedPhysicalWriterCount: fullyQualifiedPhysicalWriters.length,
+    live,
+  }, null, 2));
   const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;
   fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   fs.renameSync(reportTempPath, REPORT_PATH);
