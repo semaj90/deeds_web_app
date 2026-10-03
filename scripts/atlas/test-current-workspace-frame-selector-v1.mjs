@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { resolveCurrentWorkspaceFrameV1 } from './lib/current-workspace-frame-selector-v1.mjs';
+
+function fixture(files = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-frame-selector-'));
+  fs.mkdirSync(path.join(root, 'docs/reports'), { recursive: true });
+  for (const [relative, value] of Object.entries(files)) {
+    const target = path.join(root, relative);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  }
+  return root;
+}
+
+const admitted = (revision, snapshotRevision = 'sha256:snap') => ({
+  status: 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED',
+  authority: true,
+  workspaceRevision: revision,
+  snapshotRevision,
+});
+const derived = (revision, snapshotRevision = 'sha256:snap') => ({
+  status: 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION',
+  workspaceRevisionCandidate: revision,
+  snapshotRevision,
+});
+const plan = (revision, snapshotRevision = 'sha256:snap') => ({
+  status: 'SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED',
+  workspaceRevisionCandidate: revision,
+  snapshotRevision,
+});
+
+test('admission beats a newer derived candidate', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted'),
+    'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json': derived('sha256:derived'),
+    'docs/reports/graphify-source-selection-plan-v1.json': plan('sha256:derived'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:admitted');
+  assert.equal(result.selectedSource, 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT');
+});
+
+test('conflicting authoritative receipts fail closed', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
+    'docs/reports/current-graphify-snapshot-authority-v1.json': {
+      status: 'CURRENT_SNAPSHOT_PROVEN',
+      sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
+    },
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_BLOCKED');
+  assert.ok(result.blockers.includes('CURRENT_REVISION_SELECTOR_CONFLICT'));
+});
+
+test('explicit CLI revision resolves an authority conflict without mutating receipts', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
+    'docs/reports/current-graphify-snapshot-authority-v1.json': {
+      status: 'CURRENT_SNAPSHOT_PROVEN',
+      sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
+    },
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: ['--workspace-revision', 'sha256:operator'], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:operator');
+  assert.equal(result.selectedSource, 'CLI_WORKSPACE_REVISION');
+  assert.equal(result.explicitOverride, true);
+});
+
+test('derived candidate is fallback only when no authority receipt exists', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json': derived('sha256:derived'),
+    'docs/reports/graphify-source-selection-plan-v1.json': plan('sha256:derived'),
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:derived');
+  assert.equal(result.selectedSource, 'CURRENT_SEALED_SNAPSHOT_DERIVATION_FALLBACK');
+  assert.equal(result.selectedAuthority, false);
+});
