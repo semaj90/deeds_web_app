@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.cei24-snapshot-conflict-replay.v1",
+  "generatedAt": "2026-09-26T17:05:00Z",
+  "status": "PACKET_KEY_SNAPSHOT_REPRODUCED_PARTIAL_HINT_CROSSWALK_REPRODUCED",
+  "canonicalAuthority": false,
+  "identityDecision": {
+    "packetCandidateCanonicalId": "packet_key",
+    "packetIdRole": "physical PostgreSQL row locator/evidence reference only",
+    "ownerEvidence": [
+      "packages/atlas-core/src/identity/canonical-identity-v1.ts",
+      "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+      "scripts/atlas/materialize-lineage-qualified-candidate-map-v1.mts",
+      "scripts/atlas/materialize-cei24-candidate-ordinal-map-v1.mts"
+    ],
+    "ordinalMapOwner": "sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts::materializeCandidateOrdinalMap",
+    "featureSnapshotOwner": "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-snapshot-v1.ts::materializeCandidateFeatureSnapshot"
+  },
+  "snapshotComparison": {
+    "packetKeySnapshot": {
+      "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+      "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+      "rows": 16151,
+      "rerunReceipt": "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T170421.895Z.json",
+      "mapArtifact": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T170421.895Z/candidate-ordinal-map-v1.json",
+      "reproduced": true,
+      "candidateFeatureSnapshotRows": 16151,
+      "candidateFeatureSnapshotChecksum": "21ee6b69c9b26a5bd23164041423999737cddee931ddaa7a11aac2ad7eac47c0"
+    },
+    "packetIdSnapshot": {
+      "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+      "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+      "rows": 16151,
+      "historicalReceipt": "docs/reports/cei24-snapshot-owner-reconciliation-v1-20260926T164448Z.json",
+      "disposition": "SUPERSEDED_IDENTITY_POLICY; retain as historical evidence; do not consume its CandidateOrdinals"
+    },
+    "relationship": "same packet/source/revision/workspace candidate universe with incompatible canonicalId ordering; packet_id snapshot is not a separately admitted universe"
+  },
+  "hintCrosswalkReplay": {
+    "receipt": "docs/reports/cei24-packet-chunk-summary-hint-crosswalk-v1-20260926T170429Z.json",
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "qualityApprovedHints": 330,
+    "exactChunkHintRows": 322,
+    "unmatchedHints": 8,
+    "candidateValuesAfterMaxAggregation": 178,
+    "candidatesWithNoHint": 15973,
+    "conservation": "330 input rows = 322 exact + 8 current candidate not found; no unclassified or dropped rows",
+    "partialPolicy": "PARTIAL_EXACT_ONLY_V1; only exact matches may contribute; unmatched hints remain excluded/unavailable",
+    "authorityWorkspaceRevision": "exact source-binding revision",
+    "packetWorkspaceMirrorMismatches": 16151,
+    "mirrorInterpretation": "legacy packet workspace_revision mirror is non-authoritative; source/workspace tuple comes from exact atlas_workspace_source_bindings join",
+    "receiptStatusCaveat": "The crosswalk script emits LEGACY_SUMMARY_FEATURE_BLOCKED_SNAPSHOT_ALIGNMENT because 8 hints are unmatched under its all-input status rule. Under the separately recorded PARTIAL_EXACT_ONLY_V1 policy, the 322 exact rows and 178 candidate aggregates are eligible for the noncanonical sparse feature proof; no identity rule is weakened."
+  },
+  "packetIdToMatrixRowCrosswalk": {
+    "basis": "atlas_packets.packet_id retained as row-locator evidence; packet_key selects candidate identity and joins the CEI matrix row",
+    "rows": 16151,
+    "uniquePacketKeys": 16151,
+    "matrixReport": "docs/reports/candidate-feature-matrix-draft-v1-20260926T150456Z.json",
+    "status": "reproduced by the CEI-24 owner materializer; matrix ordering remains an explicit crosswalk and is not CandidateOrdinal identity"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

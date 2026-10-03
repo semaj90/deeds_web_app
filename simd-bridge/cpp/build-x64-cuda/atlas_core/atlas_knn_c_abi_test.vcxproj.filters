@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\native\atlas_core\tests\atlas_knn_c_abi_test.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\native\atlas_core\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{AD146CAA-83B6-3CF2-B492-B95251231A45}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

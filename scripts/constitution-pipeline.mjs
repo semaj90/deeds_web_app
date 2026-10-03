@@ -10,6 +10,7 @@
  *   node ../scripts/constitution-pipeline.mjs
  */
 
+import { llamaChat } from './atlas/lib/llama-inference.mjs';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -81,20 +82,9 @@ function parseDocTags(raw, pageNumber = 1) {
 // ── Service Helpers ────────────────────────────────────────────────────────
 
 async function ollamaGenerate(model, prompt, images) {
-	const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			model,
-			prompt,
-			images,
-			stream: false,
-			options: { temperature: 0, num_predict: 8192 },
-		}),
-		signal: AbortSignal.timeout(120_000),
-	});
-	if (!res.ok) throw new Error(`Ollama generate error ${res.status}: ${await res.text()}`);
-	return (await res.json()).response ?? '';
+	// llama-server (Ornith 1.5 + mmproj) via the shared helper; Ollama is embeddings-only.
+	const parts = images && images.length ? [{ type: 'text', text: prompt }, ...images.map((b64) => ({ type: 'image_url', image_url: { url: 'data:image/png;base64,' + b64 } }))] : null;
+	return (await llamaChat(parts ? [{ role: 'user', content: parts }] : prompt, { temperature: 0, maxTokens: 8192, timeoutMs: 120_000 })) ?? '';
 }
 
 async function ollamaEmbed(texts) {

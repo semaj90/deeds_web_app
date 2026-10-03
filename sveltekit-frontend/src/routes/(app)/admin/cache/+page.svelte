@@ -62,11 +62,16 @@
 		totalSizeMB: number;
 		redisConnected: boolean;
 		nesMemory: {
-			totalDocuments: number;
-			allocatedBanks: number;
-			bankSizeBytes: number;
-			totalMemoryBytes: number;
-			utilizationPercent: number;
+			// /api/cartridge/stats returns a different nesMemory shape (totalRAM/usedRAM/documentCount/...);
+			// every field is optional so the template can degrade instead of throwing (was: crash on .toFixed).
+			totalDocuments?: number;
+			allocatedBanks?: number;
+			bankSizeBytes?: number;
+			totalMemoryBytes?: number;
+			utilizationPercent?: number;
+			documentCount?: number;
+			totalRAM?: number;
+			usedRAM?: number;
 		};
 		error?: string;
 	}
@@ -620,22 +625,22 @@
 
 						<div class="metric-card">
 							<div class="metric-label">Total Cache Size</div>
-							<div class="metric-value">{cartridgeStats.totalSizeMB.toFixed(2)} MB</div>
+							<div class="metric-value">{(cartridgeStats.totalSizeMB ?? (cartridgeStats.totalSizeBytes ?? 0) / 1048576).toFixed(2)} MB</div>
 							<div class="metric-meta">{formatBytes(cartridgeStats.totalSizeBytes)}</div>
 						</div>
 
 						<div class="metric-card">
 							<div class="metric-label">NES Documents</div>
-							<div class="metric-value">{cartridgeStats.nesMemory.totalDocuments}</div>
-							<div class="metric-meta">{cartridgeStats.nesMemory.allocatedBanks} banks allocated</div>
+							<div class="metric-value">{cartridgeStats.nesMemory?.totalDocuments ?? cartridgeStats.nesMemory?.documentCount ?? 0}</div>
+							<div class="metric-meta">{cartridgeStats.nesMemory?.allocatedBanks ?? 0} banks allocated</div>
 						</div>
 
 						<div class="metric-card">
 							<div class="metric-label">NES Memory</div>
-							<div class="metric-value">{formatBytes(cartridgeStats.nesMemory.totalMemoryBytes)}</div>
+							<div class="metric-value">{formatBytes(cartridgeStats.nesMemory?.totalMemoryBytes ?? 0)}</div>
 							<div class="metric-meta">
-								{cartridgeStats.nesMemory.utilizationPercent.toFixed(1)}% utilization
-								({formatBytes(cartridgeStats.nesMemory.bankSizeBytes)} / bank)
+								{(cartridgeStats.nesMemory?.utilizationPercent ?? (cartridgeStats.nesMemory?.totalRAM ? ((cartridgeStats.nesMemory.usedRAM ?? 0) / cartridgeStats.nesMemory.totalRAM) * 100 : 0)).toFixed(1)}% utilization
+								({formatBytes(cartridgeStats.nesMemory?.bankSizeBytes ?? 0)} / bank)
 							</div>
 						</div>
 

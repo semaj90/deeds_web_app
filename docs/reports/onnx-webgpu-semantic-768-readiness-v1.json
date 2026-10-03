@@ -1,11 +1,16 @@
 {
   "schema": "atlas.onnx-webgpu-semantic-768-readiness.v1",
-  "generatedAt": "2026-08-29T06:22:39.188Z",
+  "generatedAt": "2026-09-17T21:35:55.809Z",
   "readOnly": true,
+  "writesPerformed": false,
   "requestedProvider": "webgpu",
+  "actualProvider": "webgpu",
+  "fallbackAllowed": false,
   "cpuFallbackAllowed": false,
+  "executor": "onnx_webgpu",
   "representationId": "semantic_768",
   "dimensions": 768,
+  "maxInputTokens": 512,
   "modelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\static\\embeddinggemma_300m_onnx\\model.onnx",
   "modelChecksum": "sha256:e416365eaf7224cd490c508ea3b42f10855332dd8317015d2344577f73788772",
   "tokenizerChecksum": "sha256:6852f8d561078cc0cebe70ca03c5bfdd0d60a45f9d2e0e1e4cc05b68e9ec329e",
@@ -13,13 +18,36 @@
     "advertisedMaxInputTokens": 2048,
     "localExportMaxInputTokens": 512,
     "slidingWindowTokens": 512,
-    "status": "LOCAL_EXPORT_LIMITED"
+    "status": "LOCAL_EXPORT_FIXED_512"
   },
+  "capacityEvidence": {
+    "testedTokenCounts": [
+      512,
+      628,
+      1024,
+      2048,
+      2049
+    ],
+    "acceptedTokenCounts": [
+      512
+    ],
+    "rejectedTokenCounts": [
+      628,
+      1024,
+      2048,
+      2049
+    ],
+    "status": "LOCAL_EXPORT_FIXED_512"
+  },
+  "promotionEligibility": "BOUNDED_CHALLENGER_ONLY",
+  "canonicalPrimaryEligible": false,
+  "canonicalAuthority": false,
+  "canonicalPrimaryBlocker": "LOCAL_EXPORT_CAPACITY_BELOW_2048",
   "semanticEquivalence": {
     "status": "NOT_PROVEN",
     "reason": "LOCAL_EXPORT_SEQUENCE_OR_OUTPUT_CONTRACT_REQUIRES_SEPARATE_PARITY_PROOF"
   },
-  "runtimePackageDir": "C:\\Users\\james\\Videos\\deeds-web-app\\services\\embedding-onnx-webgpu\\node_modules\\onnxruntime-node",
+  "runtimePackageDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\node_modules\\onnxruntime-node",
   "runtime": {
     "package": "onnxruntime-node",
     "version": "1.29.0",
@@ -101,6 +129,6 @@
       "tokenCount": 13
     }
   ],
-  "status": "WEBGPU_RUNTIME_AND_TOKEN_STATE_INFERENCE_PROVEN",
+  "status": "WEBGPU_512_CHALLENGER_PROVEN",
   "errors": []
 }

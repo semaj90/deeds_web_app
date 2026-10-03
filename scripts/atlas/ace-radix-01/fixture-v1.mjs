@@ -58,6 +58,27 @@ function randInt(next, maxInclusive) {
 }
 
 /**
+ * Packs a single PacketGlyphV1-shaped glyph into its ResidencySortKeyV1
+ * 64-bit sort key. Extracted (2026-09-14, CUTILE-ACE-BOUNDARY-01) from what
+ * was previously inline-only logic in generateAceRadix01FixtureV1()'s loop,
+ * so a second, hand-built boundary-value fixture (boundary-fixture-v1.mjs)
+ * can reuse the SAME formula instead of re-deriving it -- this refactor is
+ * behavior-preserving (generateAceRadix01FixtureV1()'s own output is
+ * unchanged; verified via fixture-v1.test.mjs's regeneration-parity check).
+ * @param {{ projectionOrdinal: number, lod: number, residency: number, pagerankQuantized: number, recency: number }} glyph
+ * @returns {bigint}
+ */
+export function packGlyphKeyV1(glyph) {
+  const { projectionOrdinal, lod, residency, pagerankQuantized, recency } = glyph;
+  const tier = BigInt(residency);
+  const lodField = BigInt(lod);
+  const utilityBucket = BigInt(Math.floor(pagerankQuantized / 257));
+  const recencyBucket = BigInt(Math.floor(recency / 257));
+  const ordinal = BigInt(projectionOrdinal);
+  return (tier << 56n) | (lodField << 48n) | (utilityBucket << 40n) | (recencyBucket << 32n) | ordinal;
+}
+
+/**
  * @param {number} n
  * @returns {{ glyphs: Array<Record<string, number>>, packedKeys: bigint[] }}
  */
@@ -76,7 +97,7 @@ export function generateAceRadix01FixtureV1(n) {
     const somCell = randInt(next, 65535);
     const flags = randInt(next, 65535);
 
-    glyphs.push({
+    const glyph = {
       projectionOrdinal,
       featureBits,
       lod,
@@ -85,17 +106,9 @@ export function generateAceRadix01FixtureV1(n) {
       recency,
       somCell,
       flags,
-    });
-
-    const tier = BigInt(residency);
-    const lodField = BigInt(lod);
-    const utilityBucket = BigInt(Math.floor(pagerankQuantized / 257));
-    const recencyBucket = BigInt(Math.floor(recency / 257));
-    const ordinal = BigInt(projectionOrdinal);
-
-    const packedKey =
-      (tier << 56n) | (lodField << 48n) | (utilityBucket << 40n) | (recencyBucket << 32n) | ordinal;
-    packedKeys.push(packedKey);
+    };
+    glyphs.push(glyph);
+    packedKeys.push(packGlyphKeyV1(glyph));
   }
 
   return { glyphs, packedKeys };

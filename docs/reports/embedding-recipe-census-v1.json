@@ -1,0 +1,272 @@
+{
+  "schema": "atlas.embedding-recipe-census.v1",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY",
+  "perStratum": 100,
+  "threshold": 0.995,
+  "strata": {
+    "both_columns": {
+      "populationRows": 739,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest:eg-task-prefix-v1": 78,
+        "embeddinggemma:latest": 22
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "title_relative_path": 55,
+          "UNKNOWN": 24,
+          "raw": 21
+        },
+        "content_embedding_768": {
+          "UNKNOWN": 100
+        }
+      },
+      "byContentLength": {
+        "content_embedding|300-799": {
+          "title_relative_path": 33,
+          "UNKNOWN": 19,
+          "raw": 3
+        },
+        "content_embedding_768|300-799": {
+          "UNKNOWN": 55
+        },
+        "content_embedding|800-1499": {
+          "raw": 15,
+          "title_relative_path": 8,
+          "UNKNOWN": 1
+        },
+        "content_embedding_768|800-1499": {
+          "UNKNOWN": 24
+        },
+        "content_embedding|>=1500": {
+          "UNKNOWN": 3,
+          "title_relative_path": 1
+        },
+        "content_embedding_768|>=1500": {
+          "UNKNOWN": 4
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 13,
+          "raw": 3,
+          "UNKNOWN": 1
+        },
+        "content_embedding_768|<300": {
+          "UNKNOWN": 17
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "title_relative_path": 35,
+          "UNKNOWN": 13
+        },
+        "content_embedding_768|src/lib": {
+          "UNKNOWN": 48
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path": 15,
+          "UNKNOWN": 10
+        },
+        "content_embedding_768|src/routes": {
+          "UNKNOWN": 25
+        },
+        "content_embedding|sveltekit-frontend/docs": {
+          "raw": 21
+        },
+        "content_embedding_768|sveltekit-frontend/docs": {
+          "UNKNOWN": 21
+        },
+        "content_embedding|scripts/agent": {
+          "title_relative_path": 3
+        },
+        "content_embedding_768|scripts/agent": {
+          "UNKNOWN": 3
+        }
+      }
+    },
+    "content_embedding_only": {
+      "populationRows": 54430,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest": 6,
+        "embeddinggemma:latest:eg-task-prefix-v1": 94
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "raw": 6,
+          "title_relative_path": 58,
+          "UNKNOWN": 36
+        },
+        "content_embedding_768": {}
+      },
+      "byContentLength": {
+        "content_embedding|800-1499": {
+          "raw": 4,
+          "title_relative_path": 28,
+          "UNKNOWN": 1
+        },
+        "content_embedding|300-799": {
+          "UNKNOWN": 31,
+          "title_relative_path": 23
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 7,
+          "UNKNOWN": 3
+        },
+        "content_embedding|>=1500": {
+          "raw": 2,
+          "UNKNOWN": 1
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "UNKNOWN": 25,
+          "title_relative_path": 17
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path": 12,
+          "UNKNOWN": 10
+        },
+        "content_embedding|simd-bridge/cpp": {
+          "title_relative_path": 5
+        },
+        "content_embedding|sveltekit-frontend/docs": {
+          "raw": 5
+        },
+        "content_embedding|scripts/api-cleanup": {
+          "title_relative_path": 3
+        },
+        "content_embedding|docs/architecture": {
+          "title_relative_path": 3
+        },
+        "content_embedding|packages/atlas-core": {
+          "title_relative_path": 3
+        },
+        "content_embedding|services/go-codeintel-service": {
+          "UNKNOWN": 1,
+          "title_relative_path": 1
+        }
+      }
+    },
+    "content_embedding_768_only": {
+      "populationRows": 219259,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest": 100
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {},
+        "content_embedding_768": {
+          "raw": 100
+        }
+      },
+      "byContentLength": {
+        "content_embedding_768|800-1499": {
+          "raw": 86
+        },
+        "content_embedding_768|>=1500": {
+          "raw": 7
+        },
+        "content_embedding_768|300-799": {
+          "raw": 4
+        },
+        "content_embedding_768|<300": {
+          "raw": 3
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding_768|sveltekit-frontend/memory": {
+          "raw": 29
+        },
+        "content_embedding_768|sveltekit-frontend/src": {
+          "raw": 28
+        },
+        "content_embedding_768|scripts/atlas": {
+          "raw": 9
+        },
+        "content_embedding_768|sveltekit-frontend/scripts": {
+          "raw": 6
+        },
+        "content_embedding_768|sveltekit-frontend/docs": {
+          "raw": 5
+        },
+        "content_embedding_768|sveltekit-frontend/tests": {
+          "raw": 3
+        },
+        "content_embedding_768|scripts/api-cleanup": {
+          "raw": 3
+        },
+        "content_embedding_768|sveltekit-frontend/docs_readme": {
+          "raw": 3
+        }
+      }
+    },
+    "tagged_eg_task_prefix_v1": {
+      "populationRows": 52364,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest:eg-task-prefix-v1": 100
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "title_relative_path": 63,
+          "UNKNOWN": 37
+        },
+        "content_embedding_768": {
+          "UNKNOWN": 2
+        }
+      },
+      "byContentLength": {
+        "content_embedding|800-1499": {
+          "title_relative_path": 29,
+          "UNKNOWN": 1
+        },
+        "content_embedding|300-799": {
+          "UNKNOWN": 32,
+          "title_relative_path": 27
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 7,
+          "UNKNOWN": 3
+        },
+        "content_embedding_768|300-799": {
+          "UNKNOWN": 2
+        },
+        "content_embedding|>=1500": {
+          "UNKNOWN": 1
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "UNKNOWN": 26,
+          "title_relative_path": 19
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path": 13,
+          "UNKNOWN": 10
+        },
+        "content_embedding|simd-bridge/cpp": {
+          "title_relative_path": 5
+        },
+        "content_embedding|scripts/api-cleanup": {
+          "title_relative_path": 3
+        },
+        "content_embedding|docs/architecture": {
+          "title_relative_path": 3
+        },
+        "content_embedding|packages/atlas-core": {
+          "title_relative_path": 3
+        },
+        "content_embedding_768|src/lib": {
+          "UNKNOWN": 2
+        },
+        "content_embedding|services/go-codeintel-service": {
+          "UNKNOWN": 1,
+          "title_relative_path": 1
+        }
+      }
+    }
+  },
+  "databaseWrites": false,
+  "outcome": "RECIPE_CENSUS_PROVEN_UNKNOWN_ROWS_PRESERVED"
+}

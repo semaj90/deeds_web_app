@@ -117,6 +117,7 @@ export const AlgorithmIdSchema = z.enum([
   'HILBERT_2D_SORT',
   'QUATERNION_ABS_DOT',
   'JACOBIAN_JVP',
+  'JACOBIAN_VJP',
   'NARY_INCIDENCE_FANOUT',
   'PCA_SVD_PROJECTION',
   'AUTOENCODER_PROJECTION',
@@ -260,8 +261,8 @@ export const AlgorithmExecutionManifestV1Schema = z.object({
   if (value.geometry.kind === 'HILBERT_2D_LOCALITY_ORDER' && value.algorithm.algorithmId !== 'HILBERT_2D_SORT') {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['algorithm', 'algorithmId'], message: 'Hilbert geometry must identify HILBERT_2D_SORT' });
   }
-  if (value.geometry.kind === 'JACOBIAN_SENSITIVITY' && value.algorithm.algorithmId !== 'JACOBIAN_JVP') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['algorithm', 'algorithmId'], message: 'Jacobian diagnostics must identify JACOBIAN_JVP' });
+  if (value.geometry.kind === 'JACOBIAN_SENSITIVITY' && !['JACOBIAN_JVP', 'JACOBIAN_VJP'].includes(value.algorithm.algorithmId)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['algorithm', 'algorithmId'], message: 'Jacobian diagnostics must identify JACOBIAN_JVP or JACOBIAN_VJP' });
   }
   if (value.algorithm.algorithmId === 'MODEL_MOE_ROUTING' && value.model.routerKind !== 'MODEL_MOE') {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['model', 'routerKind'], message: 'MODEL_MOE_ROUTING requires model-declared MoE topology' });

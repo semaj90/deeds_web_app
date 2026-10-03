@@ -1,0 +1,304 @@
+{
+  "schema": "atlas.enriched-index-smoke-validation.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "shardManifest": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260925T204039Z\\manifest.json",
+  "shardRootSha256": "4c4b5e6d3f9d454a2bcb5bdf2152aa229e849d326e1978b23cc21c91861e8601",
+  "status": "SMOKE_FAIL",
+  "checksRun": 41,
+  "checksFailed": 1,
+  "failures": [
+    {
+      "name": "embedding: no single vector shared by >1% of rows (placeholder detector)",
+      "pass": false,
+      "detail": "{\"largest_identical_group\":12400,\"rows_in_duplicate_groups\":12400,\"embedding_eligible_false\":15694}"
+    }
+  ],
+  "checks": [
+    {
+      "name": "shard sha256 enriched-index-00001.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "shard record count enriched-index-00001.ndjson",
+      "pass": true,
+      "detail": "5000/5000"
+    },
+    {
+      "name": "shard sha256 enriched-index-00002.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "shard record count enriched-index-00002.ndjson",
+      "pass": true,
+      "detail": "5000/5000"
+    },
+    {
+      "name": "shard sha256 enriched-index-00003.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "shard record count enriched-index-00003.ndjson",
+      "pass": true,
+      "detail": "5000/5000"
+    },
+    {
+      "name": "shard sha256 enriched-index-00004.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "shard record count enriched-index-00004.ndjson",
+      "pass": true,
+      "detail": "5000/5000"
+    },
+    {
+      "name": "shard sha256 enriched-index-00005.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "shard record count enriched-index-00005.ndjson",
+      "pass": true,
+      "detail": "4456/4456"
+    },
+    {
+      "name": "manifest root sha256",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "total records equals manifest",
+      "pass": true,
+      "detail": "24456"
+    },
+    {
+      "name": "unique sourceRef",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "schema tag on every record",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "lineageState in vocabulary",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "qualified rows carry packetKey + revision",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "packetKey unique among packet-bearing rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no summary text copied",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "embedding never marked identity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "unresolved/legacy rows have no packetKey",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "summary.revisionQualified only when qualified",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "non-eligible AST rows are NOT_APPLICABLE",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "hash-conflict rows never counted qualified",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix file sha256 numeric.f32le",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix file sha256 numeric_mask.u8",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix file sha256 semantic768.f32le",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix file sha256 semantic768_mask.u8",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix file sha256 candidate-ordinal-map.ndjson",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix numeric size = N*K*4",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix semantic size = N*768*4",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix candidates equals qualified rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix never claims canonical while blockers remain",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "matrix: observed embeddings unit-norm, masked rows zero",
+      "pass": true,
+      "detail": "0"
+    },
+    {
+      "name": "embedding: all present ones are 768-dim",
+      "pass": true,
+      "detail": "{\"wrong_dim\":0}"
+    },
+    {
+      "name": "embedding: no zero-norm vectors",
+      "pass": true,
+      "detail": "{\"zero_norm\":0}"
+    },
+    {
+      "name": "embedding: no NaN norms",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "qualified row count matches packet rows",
+      "pass": true,
+      "detail": "15732/15732"
+    },
+    {
+      "name": "embedding: no single vector shared by >1% of rows (placeholder detector)",
+      "pass": false,
+      "detail": "{\"largest_identical_group\":12400,\"rows_in_duplicate_groups\":12400,\"embedding_eligible_false\":15694}"
+    },
+    {
+      "name": "gate vs ground truth: no real embedding is blocked by the pre-embedding gate (qualified cohort)",
+      "pass": true,
+      "detail": "{\"real_but_blocked\":0,\"allowed_but_placeholder\":1,\"allowed\":3295,\"placeholder_with_summary\":1}"
+    },
+    {
+      "name": "gate: embed-allowed packets do not already hold the shared placeholder (at most 1 tolerated)",
+      "pass": true,
+      "detail": "{\"real_but_blocked\":0,\"allowed_but_placeholder\":1,\"allowed\":3295,\"placeholder_with_summary\":1}"
+    },
+    {
+      "name": "astState joined on every record",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "embeddingSanity": {
+    "rows": 15732,
+    "with_embedding": 15694,
+    "wrong_dim": 0,
+    "zero_norm": 0,
+    "non_unit_norm": 0,
+    "nan_norm": 0,
+    "distinct_vectors": 3295,
+    "with_embedding_version": 13962,
+    "distinct_embedding_versions": 1
+  },
+  "duplicateEmbeddings": {
+    "largest_identical_group": 12400,
+    "rows_in_duplicate_groups": 12400,
+    "embedding_eligible_false": 15694
+  },
+  "representationState": {
+    "non_legacy_representation_revision": 0,
+    "som_revision_present": 0,
+    "embedding_digest_present": 0
+  },
+  "matrixCohort": {
+    "qualifiedRows": 15732,
+    "blockedFromCanonicalMatrix": [
+      "REPRESENTATION_REVISION_UNSTAMPED",
+      "PLACEHOLDER_EMBEDDING_SHARED"
+    ]
+  },
+  "blockers": [
+    {
+      "id": "REPRESENTATION_REVISION_UNSTAMPED",
+      "severity": "BLOCKS_CANONICAL_MATRIX",
+      "evidence": "representation_revision is legacy 0 on every qualified packet",
+      "fixNeeds": "DB write: stamp a content-addressed representation_revision per embedding version; operator approval required"
+    },
+    {
+      "id": "SOM_REVISION_ABSENT",
+      "severity": "BLOCKS_SOM_KEYED_BUCKETS",
+      "evidence": "som_revision null on all qualified packets; SOM cells not revision-bound",
+      "fixNeeds": "fresh versioned SOM run writing assignments + revision together (no invented revision)"
+    },
+    {
+      "id": "EMBEDDING_DIGEST_ABSENT",
+      "severity": "BLOCKS_EMBEDDING_REPLAY_PROOF",
+      "evidence": "embedding_digest null on all qualified packets",
+      "fixNeeds": "DB write: compute and store digests (derived from stored vectors)"
+    },
+    {
+      "id": "PLACEHOLDER_EMBEDDING_SHARED",
+      "severity": "BLOCKS_CANONICAL_MATRIX",
+      "evidence": "12400 packets share identical vectors (largest group 12400); 15694 have embedding_eligible=false. Real embeddings ~= 3294+ (summarized packets only)",
+      "fixNeeds": "treat shared-vector rows as embedding-absent (mask) in the matrix; real embeddings require summaries first (writes to generate)"
+    },
+    {
+      "id": "EMBEDDING_VERSION_MISSING_ON_SOME",
+      "severity": "MASK_REQUIRED",
+      "evidence": "1732 embeddings have no embedding_version",
+      "fixNeeds": "mask in matrix or backfill version from a proven producer"
+    },
+    {
+      "id": "PACKET_DIGEST_STALE",
+      "severity": "EXCLUDED_FROM_MATRIX",
+      "evidence": "419 packets: revision matches disk, packet.sha256 stale (writer current-packet-digest-bridge-v1)",
+      "fixNeeds": "digest refresh + summary/embedding re-derivation (writes)"
+    },
+    {
+      "id": "PACKET_REVISION_MISSING",
+      "severity": "EXCLUDED_FROM_MATRIX",
+      "evidence": "392 packets without source_revision",
+      "fixNeeds": "revision stamping from proven admission (writes)"
+    },
+    {
+      "id": "NO_CANONICAL_PACKET",
+      "severity": "COVERAGE_GAP",
+      "evidence": "5193 legacy-chunk-only + 2720 unresolved identities",
+      "fixNeeds": "packet creation under the canonical truth flow (writes)"
+    }
+  ],
+  "canonicalMatrixReady": false,
+  "generatedAt": "2026-09-25T21:38:27.979Z"
+}

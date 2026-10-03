@@ -17,6 +17,10 @@ services:
     container_name: atlas-gpu-8098
     environment:
       ATLAS_GPU_8098_PORT: "8098"
+      # Compatibility mode preserves existing read-only probes until they
+      # include a Parent Atlas shared residency lease. Set to "1" only after
+      # all executor callers are receipt-bound.
+      ATLAS_GPU_REQUIRE_SHARED_RESIDENCY_LEASE: "0"
       ATLAS_GPU_ARTIFACT_ROOT: /mnt/c/Users/james/Videos/deeds-web-app
       ATLAS_GRAPH_ARTIFACT_ROOT: /mnt/c/Users/james/Videos/deeds-web-app/sveltekit-frontend/docs/reports
       CUDA_VISIBLE_DEVICES: "0"
@@ -25,6 +29,12 @@ services:
       - ..:/mnt/c/Users/james/Videos/deeds-web-app:ro
     ports:
       - "8098:8098"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request,sys; d=json.load(urllib.request.urlopen('http://127.0.0.1:8098/health', timeout=3)); sys.exit(0 if d.get('ok') is True and d.get('cudaAvailable') is True else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         reservations:
@@ -114,6 +124,8 @@ services:
   # ========================================================================
   # Legal AI GPU Service (Main Application)
   # ========================================================================
+  # LEGACY CUDA 12.6 compatibility service. Keep available for the older
+  # legal-ai-gpu workflow; it is not the current TensorRT-RTX/cuTile lane.
   legal-ai-gpu:
     build:
       context: .

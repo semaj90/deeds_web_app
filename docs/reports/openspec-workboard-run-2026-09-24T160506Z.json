@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T16:05:06Z",
+  "head": "e909640269",
+  "pivot": {
+    "fromChange": "parent-atlas-versioned-doc-intelligence",
+    "fromProgress": "42/48 complete; DOC-13, DOC-14, DOC-15, DOC-17, DOC-18, DOC-26 remain open",
+    "toChange": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+    "task": "LOD-01 read-only memory census",
+    "reason": "The remaining versioned-document gates require missing live owners/projections or separately authorized persistence; LOD-01 is a concrete read-only task with a live TurboVec sidecar to measure."
+  },
+  "lod01": {
+    "result": "LOD_01_LIVE_CENSUS_PARTIAL",
+    "measurementWindowUtc": {
+      "start": "2026-09-24T16:01:00Z",
+      "end": "2026-09-24T16:04:00Z"
+    },
+    "mode": "READ_ONLY_HOST_PROCESS_SERVICE_METRICS_AND_POSTGRES_AGGREGATES",
+    "canonicalPostgres": {
+      "relation": "public.codebase_chunk_index",
+      "field": "content_embedding_768",
+      "rowsWithVector": 219998,
+      "dimensionMin": 768,
+      "dimensionMax": 768,
+      "float32PayloadBytes": 675833856,
+      "storedVectorBytes": 676713848,
+      "method": "read-only aggregate query; no vector values or row text returned"
+    },
+    "turbovecPythonSidecar": {
+      "endpoint": "http://127.0.0.1:8791/health",
+      "health": "ok",
+      "reportedIndexed": 327820,
+      "dimension": 64,
+      "bits": 4,
+      "collection": "codebase_chunks_768",
+      "hostPid": 47792,
+      "workingSetBytes": 1359872,
+      "privateBytes": 762609664,
+      "virtualBytes": 5294862336,
+      "interpretation": "process memory is measured, but its resident/committed bytes cannot be attributed solely to the compressed vector index or used to prove absence of FP32 duplicates"
+    },
+    "turbovecNodeBridge": {
+      "hostPid": 2940,
+      "workingSetBytes": 5791744,
+      "privateBytes": 708337664,
+      "virtualBytes": 58919497728,
+      "loadedNativeModules": ["tensorrt_bridge.node"],
+      "turbovecRustNapiLoadedInBridge": false,
+      "interpretation": "bridge RSS is not a TurboVec Rust-N-API measurement; no TurboVec native module was observed in this bridge"
+    },
+    "qdrant": {
+      "collection": "codebase_chunks_768",
+      "points": 328348,
+      "contentVectors": 327858,
+      "indexedVectorsAllNames": 328386,
+      "dockerContainerMemory": "545.1MiB",
+      "metrics": {
+        "memoryActiveBytes": 1191157760,
+        "memoryAllocatedBytes": 1164240432,
+        "memoryMetadataBytes": 52584448,
+        "memoryResidentMappedPagesBytes": 1247641600,
+        "memoryRetainedBytes": 872251392
+      },
+      "interpretation": "application metrics and Docker cgroup memory are separate measurement scopes; the mapped-page resident metric exceeds cgroup usage and is not substituted for process RSS"
+    },
+    "valkey": {
+      "dockerContainerMemory": "37.76MiB",
+      "serverInfoMemory": null,
+      "serverInfoStatus": "NOAUTH; no credential was read or exposed"
+    },
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 3060 Ti",
+      "totalBytes": 8589934592,
+      "usedBytes": 7969177600,
+      "freeBytes": 445644800,
+      "perProcessAttribution": "UNAVAILABLE_PERMISSION"
+    },
+    "arrowMmap": {
+      "virtualBytes": null,
+      "residentBytes": null,
+      "status": "NO_CURRENT_SEMANTIC_SNAPSHOT_OR_ARROW_MMAP_ARTIFACT_FOUND",
+      "candidateArtifacts": [
+        {"name": "vector-snapshot-5k-768.ndjson", "bytes": 82896350, "lastModifiedUtc": "2026-08-25T22:38:42Z"},
+        {"name": "vector-snapshot-5k-768.parquet", "bytes": 4571777, "lastModifiedUtc": "2026-08-23T11:11:39Z"},
+        {"name": "atlas-vector-snapshot-5k-768.duckdb", "bytes": 49557504, "lastModifiedUtc": "2026-08-25T22:38:21Z"}
+      ],
+      "note": "These are older NDJSON/Parquet/DuckDB candidate artifacts, not a current SemanticSnapshotV1 or an Arrow/mmap residency measurement."
+    },
+    "ordinalMap": {
+      "bytes": null,
+      "databaseRelation": "ABSENT",
+      "publicOrdinalMapTables": []
+    },
+    "cohortConsistency": {
+      "postgresCanonicalVectorRows": 219998,
+      "qdrantContentVectors": 327858,
+      "pythonSidecarIndexed": 327820,
+      "status": "MISMATCHED_COHORTS_NOT_PROMOTION_SAFE"
+    },
+    "gates": {
+      "LOD01": "PARTIAL_MEASUREMENTS_ONLY",
+      "LOD_MEMORY_COMPRESSION_PROVEN": "NOT_PROVEN",
+      "LOD_PROCESS_WORKING_SET_PROVEN": "NOT_PROVEN",
+      "fourGbTargetClaim": false
+    }
+  },
+  "sideEffects": {
+    "postgres": "read-only aggregate/schema queries only; transactions rolled back",
+    "qdrant": "HTTP GET metrics/collection readback only",
+    "valkey": "INFO attempt rejected with NOAUTH; no write",
+    "filesystem": "one timestamped evidence report created",
+    "containerRebuilds": 0,
+    "graphifyRuns": 0
+  },
+  "nextBlocker": "A current, frozen SemanticSnapshotV1 with a matching ordinal map and TurboVec index is absent; Valkey internal INFO and GPU process attribution are unavailable in the current permissions. Keep LOD-01 open and do not infer a 4 GB working-set claim."
+}

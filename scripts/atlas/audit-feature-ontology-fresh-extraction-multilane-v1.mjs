@@ -82,10 +82,19 @@ const report = {
     langextract: { adapter: 'langextract-grounded-v1', sources: 0, groundedCandidates: 0, status: 'NOT_PROVEN' },
   },
   merge: { rawCandidates: extraction.candidates?.length ?? 0, uniqueCandidates: candidates.length, structuralEvidenceCoLocated: candidates.filter((row) => row.structuralEvidenceCoLocated).length, crossLaneAgreement: 0, crossLaneDisagreement: 0, identityConflicts: 0 },
+  extractionStatus: extraction.status ?? null,
+  extractionCounts: extraction.counts ?? null,
+  extractionFailures: extraction.failures ?? [],
   candidates, relationshipGraphRevision: null, rel01bAllowed: false,
   status: candidates.length > 0 && sources.length === 6 ? 'MULTILANE_REVIEW_CANDIDATES_READY' : 'MULTILANE_EXTRACTION_INCOMPLETE',
   nextGate: 'REL_01A8_INDEPENDENT_SOURCE_SPAN_REVISION_VALIDATION',
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+const temporaryReport = `${reportPath}.${process.pid}.${Date.now()}.tmp`;
+try {
+  fs.writeFileSync(temporaryReport, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(temporaryReport, reportPath);
+} finally {
+  try { fs.unlinkSync(temporaryReport); } catch {}
+}
 console.log(JSON.stringify({ status: report.status, sourceCount: report.sourceCount, rawCandidates: report.merge.rawCandidates, uniqueCandidates: report.merge.uniqueCandidates, crossLaneAgreement: report.merge.crossLaneAgreement, groundedSources: report.lanes.pythonEnrichment.groundedSources, reportPath: 'docs/reports/feature-ontology-fresh-extraction-multilane-v1.json' }, null, 2));

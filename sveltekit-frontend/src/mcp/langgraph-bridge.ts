@@ -48,7 +48,7 @@ export const HeadroomConfigSchema = z.object({
 export type HeadroomConfig = z.infer<typeof HeadroomConfigSchema>;
 
 /**
- * LangGraph Bridge: manages state + tool invocation within Headroom constraints
+ * LangGraph Headroom adapter: admits executed tool results into bounded dispatcher state.
  */
 export class LangGraphBridge {
   private config: HeadroomConfig;
@@ -68,34 +68,30 @@ export class LangGraphBridge {
   }
 
   /**
-   * Process a tool call through the dispatcher state machine
-   * with Netflix Headroom overflow protection
+   * Apply an already-executed tool result to dispatcher state.
+   * Tool execution belongs to the registered handler/governed executor, never this adapter.
    */
-  async invokeTool(
-    toolName: string,
-    toolInput: Record<string, unknown>,
-    currentState: DispatcherState
-  ): Promise<{ result: unknown; updatedState: DispatcherState }> {
-    // Apply headroom constraints to current state
-    const headroomed = this.applyHeadroom(currentState);
-
-    // Simulate dispatcher invocation (in real implementation, calls LangGraph runtime)
+  async applyToolResult(input: {
+    state: DispatcherState;
+    toolCall: { toolName: string; toolCallId: string };
+    resultEnvelope: unknown;
+  }): Promise<{ result: unknown; updatedState: DispatcherState }> {
+    const { state, toolCall, resultEnvelope } = input;
+    const headroomed = this.applyHeadroom(state);
     const newState: DispatcherState = {
       ...headroomed,
-      current_tool: toolName,
-      current_input: toolInput,
-      action: 'tool_call',
+      current_tool: toolCall.toolName,
+      action: 'complete',
     };
 
-    // Record state transition (optional: for audit trail)
+    // Keep a bounded state transition only; the executor owns the result payload.
     this.stateHistory.push(newState);
 
-    // Apply headroom to tool result size
-    let result: unknown = toolInput;
-    if (typeof toolInput === 'string' && toolInput.length > this.config.maxToolResultChars) {
-      result = toolInput.slice(0, this.config.maxToolResultChars) + '\n[... truncated ...]';
-    } else if (typeof toolInput === 'object' && toolInput !== null) {
-      const asRecord = toolInput as Record<string, unknown>;
+    let result: unknown = resultEnvelope;
+    if (typeof resultEnvelope === 'string' && resultEnvelope.length > this.config.maxToolResultChars) {
+      result = resultEnvelope.slice(0, this.config.maxToolResultChars) + '\n[... truncated ...]';
+    } else if (typeof resultEnvelope === 'object' && resultEnvelope !== null) {
+      const asRecord = resultEnvelope as Record<string, unknown>;
       if (Array.isArray(asRecord.content)) {
         // MCP tool-result shape (`{ content: [{ type: 'text', text }] }`). Truncate the
         // text block(s) in place instead of slicing the serialized JSON string below —
@@ -105,7 +101,7 @@ export class LangGraphBridge {
         // client-side instead of returning a truncated-but-valid result.
         const serializedFull = JSON.stringify(asRecord);
         if (serializedFull.length <= this.config.maxToolResultChars) {
-          result = toolInput;
+          result = resultEnvelope;
         } else {
           const blocks = asRecord.content as Array<Record<string, unknown>>;
           const budgetPerBlock = Math.max(200, Math.floor(this.config.maxToolResultChars / Math.max(1, blocks.length)));

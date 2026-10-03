@@ -15,4 +15,22 @@ describe('ACE Card Selection V2', () => {
     expect(result.selected).toHaveLength(0);
     expect(result.rejected[0]?.reason).toBe('WORKSPACE_REVISION_MISMATCH');
   });
+
+  it('preserves distinct cards even when their evidence fetch identity is equivalent', () => {
+    const first = AceCardV2Schema.parse({ ...base, cardId: 'card:first', evidenceRefs: ['e2', 'e1'] });
+    const duplicate = AceCardV2Schema.parse({ ...base, cardId: 'card:duplicate', evidenceRefs: ['e1', 'e2'] });
+    const result = selectAceCardsV2({ cards: [duplicate, first], query: 'redis cache', workspaceRevision: 'sha256:workspace', candidateSnapshotRevision: 'candidate:v1', ordinalMapChecksum: 'sha256:ordinal', maxCards: 4, tokenBudget: 20 });
+
+    expect(result.selected.map((card) => card.cardId)).toEqual(['card:duplicate', 'card:first']);
+    expect(result.rejected).toEqual([]);
+  });
+
+  it('keeps evidence from different source revisions or evidence sets distinct', () => {
+    const samePathNewRevision = AceCardV2Schema.parse({ ...base, cardId: 'card:revision', sourceRevision: 'sha256:source-r2' });
+    const differentEvidence = AceCardV2Schema.parse({ ...base, cardId: 'card:evidence', evidenceRefs: ['e3'] });
+    const result = selectAceCardsV2({ cards: [base, samePathNewRevision, differentEvidence], query: 'redis cache', workspaceRevision: 'sha256:workspace', candidateSnapshotRevision: 'candidate:v1', ordinalMapChecksum: 'sha256:ordinal', maxCards: 4, tokenBudget: 20 });
+
+    expect(result.selected.map((card) => card.cardId)).toHaveLength(3);
+    expect(result.rejected).toEqual([]);
+  });
 });

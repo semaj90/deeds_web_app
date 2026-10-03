@@ -45,9 +45,13 @@ vi.mock('./promote-results-outbox.js', () => ({
   recordPromotionIntent: mockRecordPromotionIntent,
 }));
 
-vi.mock('../atlas/policy/policy-training.js', () => ({
-  appendSearchRuntimeTrainingRow: mockAppendSearchRuntimeTrainingRow,
-}));
+vi.mock('../atlas/policy/policy-training.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../atlas/policy/policy-training.js')>();
+  return {
+    ...actual,
+    appendSearchRuntimeTrainingRow: mockAppendSearchRuntimeTrainingRow,
+  };
+});
 
 vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
   readKagHypergraphNeighborsV1: mockReadKagHypergraphNeighborsV1,
@@ -204,6 +208,7 @@ describe('search runtime bridge', () => {
       { includeVectorLanes: true }
     );
     expect(mockRerankCanonicalFeatureEnvelopes).toHaveBeenCalledTimes(1);
+    expect(mockAppendSearchRuntimeTrainingRow).not.toHaveBeenCalled();
     expect(mockRerankCanonicalFeatureEnvelopes.mock.calls[0]?.[2]).toEqual(
       expect.objectContaining({
         rerankTier: 'deep',

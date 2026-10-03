@@ -1,0 +1,190 @@
+{
+  "schema": "atlas.openspec-evidence-embedding-plan.v1",
+  "mode": "READ_ONLY_INPUT_MANIFEST",
+  "status": "MODEL_ARTIFACT_UNPROVEN",
+  "source": {
+    "cards": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/evidence-cards-v1.json",
+    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004",
+    "cardsChecksum": "sha256:6b445fefbd670e339a2b1d033ac0619acca4cd8b5b3a94817824feee620019aa"
+  },
+  "representation": {
+    "names": [
+      "TASK_CLAIM_768",
+      "EVIDENCE_CARD_768",
+      "PREDICATE_768",
+      "BLOCKER_768",
+      "SUMMARY_768"
+    ],
+    "canonicalName": "semantic_768",
+    "dimension": 768,
+    "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+  },
+  "model": {
+    "modelId": null,
+    "modelArtifactRevision": null,
+    "modelReceiptRequired": true
+  },
+  "counts": {
+    "cards": 11060,
+    "plannedInputs": 55300,
+    "rowsByRepresentation": {
+      "TASK_CLAIM_768": 11060,
+      "EVIDENCE_CARD_768": 11060,
+      "PREDICATE_768": 11060,
+      "BLOCKER_768": 11060,
+      "SUMMARY_768": 11060
+    }
+  },
+  "sampleInputs": [
+    {
+      "representation": "TASK_CLAIM_768",
+      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "EVIDENCE_CARD_768",
+      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "PREDICATE_768",
+      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "BLOCKER_768",
+      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "SUMMARY_768",
+      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "TASK_CLAIM_768",
+      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "EVIDENCE_CARD_768",
+      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "PREDICATE_768",
+      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "BLOCKER_768",
+      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "SUMMARY_768",
+      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "TASK_CLAIM_768",
+      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "EVIDENCE_CARD_768",
+      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "PREDICATE_768",
+      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "BLOCKER_768",
+      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "SUMMARY_768",
+      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "TASK_CLAIM_768",
+      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "EVIDENCE_CARD_768",
+      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "PREDICATE_768",
+      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "BLOCKER_768",
+      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "SUMMARY_768",
+      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "TASK_CLAIM_768",
+      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "EVIDENCE_CARD_768",
+      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "PREDICATE_768",
+      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "BLOCKER_768",
+      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    },
+    {
+      "representation": "SUMMARY_768",
+      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
+      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    }
+  ],
+  "policy": {
+    "canonicalDenseOwner": "PostgreSQL after authorized ledger admission",
+    "vectorWrites": false,
+    "qdrantWrites": false,
+    "cuvsWrites": false,
+    "turbovecWrites": false,
+    "exactInputIdentityRequired": true,
+    "legacy384Allowed": false,
+    "proofStateCreatedByEmbedding": false
+  },
+  "writesPerformed": false,
+  "likely_cause": "Embedding work must bind to immutable EvidenceCard inputs and an exact model artifact before any vector is treated as canonical or projected.",
+  "evidence": [
+    "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/evidence-cards-v1.json",
+    "semantic_768",
+    "EvidenceCard checksum list"
+  ],
+  "patch_targets": [
+    "scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-embedding-plan-v1.json",
+  "generatedAt": "2026-10-02T04:47:36.782Z",
+  "checksum": "sha256:bc497e7f6fe0093e0bd1770b5745af0f810df372a81fde967dee5f0a55e507e7"
+}

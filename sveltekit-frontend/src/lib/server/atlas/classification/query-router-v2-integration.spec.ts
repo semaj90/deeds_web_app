@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { projectQueryFeaturesV1 } from './query-feature-projection-v1.js';
 import { buildRetrievalRouterTensorV2, RETRIEVAL_ROUTER_TENSOR_MANIFEST_V2 } from './retrieval-router-tensor-manifest-v2.js';
-import { compileQueryRouterDatasetRowV2, deterministicQueryRouterSplitV1 } from './query-router-dataset-v2.js';
+import { assertUniformQueryRouterDatasetRevisionsV1, compileQueryRouterDatasetRowV2, deterministicQueryRouterSplitV1 } from './query-router-dataset-v2.js';
 import { compileRetrievalExecutorPlanV2, DEFAULT_RETRIEVAL_EXECUTOR_CAPABILITIES_V2 } from './retrieval-executor-policy-v2.js';
 import { QueryClassificationV2Schema } from './query-classification-v2.js';
 
@@ -51,6 +51,29 @@ describe('Parent Atlas query router v2 integration contracts', () => {
     expect(second.rowDigest).toBe(first.rowDigest);
     expect(first.featureTensor234).toHaveLength(234);
     expect(first.representationId).toBe('classification_mrl_128');
+  });
+
+  it('rejects mixed model, prompt, or representation revisions before training export', () => {
+    const source = {
+      queryId: 'query:router-revision-1',
+      query: 'inspect router revision',
+      queryRevision: 'query-set.v1',
+      labelRevision: 'labels.v1',
+      embeddingModelId: 'google/embeddinggemma-300m' as const,
+      embeddingModelRevision: 'embeddinggemma-rev-1',
+      embeddingPromptRevision: 'embeddinggemma.task-prompts.google-v1',
+      representationRevision: 'classification-mrl.v1',
+      classification768: [1, ...zero(767)], ontologyMask32: zero(32),
+      operationFlags16: zero(16), runtimeResource16: zero(16), graphToolStructure16: zero(16),
+      domainLabel: 'retrieval' as const, operationLabel: 'find' as const,
+      retrievalNeeds: [1, 0, 0, 0, 0, 0, 0, 0], budgetTargets: [1, 0, 0], evidenceRefs: [],
+    };
+    const first = compileQueryRouterDatasetRowV2(source);
+    const second = { ...first, embeddingPromptRevision: 'embeddinggemma.task-prompts.other-v1' };
+    expect(() => assertUniformQueryRouterDatasetRevisionsV1([first, second])).toThrow(
+      'QUERY_ROUTER_DATASET_MIXED_EMBEDDINGPROMPTREVISION',
+    );
+    expect(assertUniformQueryRouterDatasetRevisionsV1([first]).representationRevision).toEqual(['classification-mrl.v1']);
   });
 
   it('does not select configured-but-unproven semantic executors', () => {

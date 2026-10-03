@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.afc-owner-manual-mapping-01-partial.v1",
+  "createdAt": "2026-09-27T02:55:00.000Z",
+  "scope": "Third bounded slice: tree-sitter-chunk, lsp-definition, lsp-references, semantic-768, graph-ppr.",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "runtimeCallsPerformed": false,
+  "findings": [
+    {
+      "helperId": "tree-sitter-chunk",
+      "previousStatus": "UNIT_PROVEN_NOT_LIVE",
+      "revisedStatus": "LIVE_VIA_OFFLINE_PIPELINE",
+      "finding": "10 real (non-test) files use tree-sitter/tree-sitter-typescript, including src/lib/server/atlas/indexing/graphify-structural-batch-v1.ts and graphify-structural-materializer.ts -- real, wired Graphify offline indexing pipeline modules (imported by canonical-lifecycle-reconciler-v1.ts, graphify-structural-lifecycle-v1.ts), not test-only. No +server.ts route calls tree-sitter-chunk directly, but this pipeline is a real, scheduled offline job (Graphify), and its output plausibly IS the upstream producer of the tree_node_id/metadata/output_meta Postgres columns that retrieve-candidates.ts reads live for the 'ast'/'exact' fusion lanes (slice 2 finding). This connects three previously-separate findings: tree-sitter-chunk (offline structural extraction) -> Graphify batch materialization -> Postgres columns -> retrieve-candidates.ts live query -> 'ast'/'exact' lanes.",
+      "caveat": "The specific column-population link (does graphify-structural-batch-v1.ts write tree_node_id, specifically) was NOT traced end-to-end in this slice -- flagged as plausible/likely based on naming and pipeline shape, not proven by reading the actual INSERT/UPDATE statement. That would be the next concrete step, not done here given session scope."
+    },
+    {
+      "helperId": "lsp-definition",
+      "previousStatus": "CONTRACT_ONLY",
+      "revisedStatus": "CONTRACT_ONLY",
+      "finding": "Unchanged, confirmed with stronger evidence: grep found the contract file (lsp-semantic-observation.ts) referenced only by the registry itself and by summary-claim-validation-v1.ts, which contains an explicit comment: 'NOT reused, deliberately... is SOURCE-FILE grain' -- i.e. a real author explicitly decided NOT to wire this contract into that other module. No live LSP client/process found anywhere. Status stands."
+    },
+    {
+      "helperId": "lsp-references",
+      "previousStatus": "CONTRACT_ONLY",
+      "revisedStatus": "CONTRACT_ONLY",
+      "finding": "Same evidence as lsp-definition (shared contract file, shared absence of a live client). Status stands."
+    },
+    {
+      "helperId": "semantic-768",
+      "previousStatus": "BLOCKED",
+      "revisedStatus": "BLOCKED",
+      "finding": "Confirmed: zero references to embedSemantic768Canonical or a 'semantic' scoreSource/lane literal in search-runtime.ts. The strict semantic_768 embedding executor (EMB-PROV-01, proven live this session) produces vectors, but SearchRuntime's own fusion path does not call it directly -- status unchanged, evidence strengthened (a real, targeted negative grep, not just absence-of-earlier-mention)."
+    },
+    {
+      "helperId": "graph-ppr",
+      "previousStatus": "BLOCKED",
+      "revisedStatus": "BLOCKED",
+      "finding": "Confirmed: cugraph_ppr.py / graph_ppr / 'graph_dependency' only appear in router-matrix.ts (as a SignalType name) and the registry itself -- no live dispatcher file found anywhere in src/lib/server. Status unchanged, evidence strengthened."
+    }
+  ],
+  "notDone": "The column-population link for tree-sitter-chunk (does graphify-structural-batch-v1.ts actually write tree_node_id?) was not traced. No registry promoted, no code wired.",
+  "sessionTotal": "10 of 12 entries now have at least one round of direct-code-verification evidence beyond the original audit (rg-exact, langextract-grounding, ast-grep-structural, ts-morph-symbol, tree-sitter-chunk, lsp-definition, lsp-references, semantic-768, graph-ppr, plus the original 3 LIVE entries unchanged: postgres-fts, postgres-trigram, docs-corpus-search)."
+}

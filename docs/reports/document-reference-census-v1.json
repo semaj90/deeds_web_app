@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.document-reference-census.v1",
+  "status": "NO_SUPERSESSION_TARGETS",
+  "targetCount": 0,
+  "searchedIdentifierCount": 0,
+  "targets": [],
+  "searchScope": "ripgrep exact strings over non-ignored repository text files; generated reports, graph snapshots, build outputs, dependencies, and .tmp excluded",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionAuthorized": false,
+  "inputs": {
+    "registrySha256": "94425e02750440625c1f22db6964f3618c3f1d5386a2f1d4a7e5a22c68f516ac"
+  }
+}

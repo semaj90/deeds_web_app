@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { buildCanonicalPacketHashV1, canonicalSha256V1 } from './canonical-hash-v1.js';
 import { buildOrdinalRegistryV1 } from './ordinal-registry-v1.js';
 import { buildPromptPlanV1 } from './prompt-plan-v1.js';
+import { buildPrefillDagExecutionReceiptV1, buildPrefillDerivedFeatureReceiptV1 } from './prefill-contracts-v1.js';
 import {
   buildPrefillArtifactIdentityV1,
   buildContextPrefixIdentityFromPrefillContentV1,
   buildPrefillContentIdentityV1,
+  buildPrefillDecodePhaseReceiptV1,
   buildPrefillReceiptV1,
 } from './prefill-contracts-v1.js';
 import { buildContextPrefixIdentityV1, buildContextPrefixReuseObservationV1 } from './context-prefix-identity-v1.js';
@@ -77,6 +79,25 @@ describe('OrdinalRegistryV1', () => {
 });
 
 describe('compiled prefill identity', () => {
+  it('records prefill and decode as separate model-owned ephemeral phases', () => {
+    const base = {
+      requestId: 'request:phase-1',
+      contentIdentityChecksum: 'a'.repeat(64),
+      modelRevision: 'model:v1',
+      outputChecksum: 'b'.repeat(64),
+      stateOwnership: 'MODEL_EPHEMERAL' as const,
+      canonicalAuthority: false as const,
+      writesPerformed: false as const,
+      producerRevision: 'producer:v1',
+    };
+    const prefill = buildPrefillDecodePhaseReceiptV1({ ...base, phase: 'PREFILL' });
+    const decode = buildPrefillDecodePhaseReceiptV1({ ...base, phase: 'DECODE', outputChecksum: 'c'.repeat(64) });
+    expect(prefill.phase).toBe('PREFILL');
+    expect(decode.phase).toBe('DECODE');
+    expect(prefill.contentIdentityChecksum).toBe(decode.contentIdentityChecksum);
+    expect(prefill).not.toHaveProperty('kv');
+    expect(decode).not.toHaveProperty('recurrentState');
+  });
   it('separates logical content identity from physical KV artifact identity', () => {
     const manifest = H('manifest');
     const plan = buildPromptPlanV1({
@@ -296,5 +317,30 @@ describe('compiled prefill identity', () => {
         { ordinal: 0, kind: 'SYSTEM', packetKey: null, evidenceRefs: [], contentChecksum: H('system-invalid-budget'), tokenCount: 1 },
       ],
     })).toThrow(/exceeds contextLimitTokens/);
+  });
+
+  it('binds derived features to input/output checksums without granting authority', () => {
+    const receipt = buildPrefillDerivedFeatureReceiptV1({
+      requestId: 'req-derived-1', dagNodeId: 'node:pca', inputChecksum: H('input'), outputChecksum: H('output'),
+      featureKind: 'PCA', featureRevision: 'pca:v1', sourceRevision: 'source:v1', representationRevision: 'semantic_768:v1',
+      dimensions: [15, 128], canonicalAuthority: false, writesPerformed: false, producerRevision: 'fixture:pca:v1',
+    });
+    expect(receipt.checksumSha256).toHaveLength(64);
+    expect(receipt.canonicalAuthority).toBe(false);
+  });
+
+  it('rejects duplicate nodes and produces a deterministic DAG receipt', () => {
+    const base = {
+      requestId: 'req-dag-receipt-1', pipelineChecksum: H('pipeline'),
+      nodes: [
+        { dagNodeId: 'node:query', inputChecksum: H('in-a'), outputChecksum: H('out-a'), nodeRevision: 'node:v1' },
+        { dagNodeId: 'node:plan', inputChecksum: H('out-a'), outputChecksum: H('out-b'), nodeRevision: 'node:v1' },
+      ],
+      status: 'PLANNED' as const, canonicalAuthority: false as const, writesPerformed: false as const, producerRevision: 'dag:v1',
+    };
+    const first = buildPrefillDagExecutionReceiptV1(base);
+    const second = buildPrefillDagExecutionReceiptV1(base);
+    expect(first.checksumSha256).toBe(second.checksumSha256);
+    expect(() => buildPrefillDagExecutionReceiptV1({ ...base, nodes: [...base.nodes, base.nodes[0]] })).toThrow('PREFILL_DAG_RECEIPT_DUPLICATE_NODE');
   });
 });

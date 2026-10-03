@@ -1,0 +1,286 @@
+{
+  "schema": "atlas.routing-sidecar-native-critical-path.v1",
+  "asOf": "2026-09-29",
+  "scope": [
+    "parent-atlas-nlp-sidecar-feature-compiler",
+    "parent-atlas-observation-routing-fabric",
+    "parent-atlas-policy-routing-integration",
+    "parent-atlas-pass-fabric",
+    "parent-atlas-native-acceleration-cabi",
+    "parent-atlas-onnx-webgpu-embedding-promotion"
+  ],
+  "censusMethod": {
+    "source": "Current tasks.md files in the working tree",
+    "counts": "Literal Markdown checkboxes; includes checklist subtasks and historical/open gate checkboxes, so counts are not controller eligibility or executable-work counts.",
+    "checked": 235,
+    "unchecked": 116,
+    "total": 351,
+    "openSpecInstructionCrossCheck": {
+      "method": "npx openspec instructions apply --change <name> --json",
+      "purpose": "Classify actionable OpenSpec tasks; not substituted for the literal checkbox census.",
+      "nlpSidecar": {
+        "instructionTasks": { "checked": 99, "unchecked": 44, "total": 143 },
+        "literalCheckboxes": { "checked": 100, "unchecked": 49, "total": 149 },
+        "note": "The instruction parser omits six checklist lines present in tasks.md (one checked and five unchecked); retain both views and do not treat either as a progress percentage for the other."
+      },
+      "otherFiveBoardsMatchLiteralCheckboxCounts": true
+    },
+    "taskFilesModifiedByThisReport": false
+  },
+  "workboards": [
+    {
+      "change": "parent-atlas-nlp-sidecar-feature-compiler",
+      "tasksPath": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+      "checked": 100,
+      "unchecked": 49,
+      "actionableInstructionTasks": { "checked": 99, "unchecked": 44, "total": 143 },
+      "ownerClass": "runtime-and-lineage-foundation",
+      "criticalOpenItems": [
+        "0.4 semantic_768 generation owner reconciliation remains unresolved; strict embedding adapter presence does not establish a canonical writer or caller.",
+        "Candidate/source identity and current source/workspace revision admission remain upstream constraints on semantic materialization and AST persistence.",
+        "RAPIDS health evidence records torchAvailable=false; import/health signals do not prove /analyze, fixture execution, or GPU execution.",
+        "Sidecar health/capabilities and executable /analyze or astChunk fixture proofs are separate evidence. Historical fixture receipts exist, but an import-only fixtureVerified=false capability field is not contradicted or overwritten by them.",
+        "PyTorch POS, HMM routes, GPU ABI ownership, and broad image reproducibility remain separate tasks rather than prerequisites to the already-proven CPU/reference sidecar behaviors."
+      ],
+      "dependencyRole": "Upstream identity, source revision, and semantic representation authority for ORF, pass execution, and native/WebGPU challengers."
+    },
+    {
+      "change": "parent-atlas-observation-routing-fabric",
+      "tasksPath": "openspec/changes/parent-atlas-observation-routing-fabric/tasks.md",
+      "checked": 19,
+      "unchecked": 7,
+      "actionableInstructionTasks": { "checked": 19, "unchecked": 7, "total": 26 },
+      "ownerClass": "observation-persistence-and-read-surface",
+      "criticalOpenItems": [
+        "ORF-2R candidate_id-to-packet_key binding is caller-supplied and not proven; do not enable a caller on that assumption.",
+        "ORF-3 materialization is explicitly downstream of a safe migration dry-run; no migration/apply occurred in this census.",
+        "ORF-7 is partially hardened but remains open across remaining search/evidence/hydrate tools and live MCP proof.",
+        "ORF-8/9/10 remain downstream of promoted evidence, exact source/span/compiler lineage, and routing evaluation."
+      ],
+      "dependencyRole": "Consumes admitted feature/source identities; cannot repair missing upstream identity by coercion."
+    },
+    {
+      "change": "parent-atlas-policy-routing-integration",
+      "tasksPath": "openspec/changes/parent-atlas-policy-routing-integration/tasks.md",
+      "checked": 36,
+      "unchecked": 4,
+      "actionableInstructionTasks": { "checked": 36, "unchecked": 4, "total": 40 },
+      "ownerClass": "policy-runtime-and-reward-evaluation",
+      "criticalOpenItems": [
+        "The recorded :8091 runtime identifies as langgraph-synthesis and does not expose the expected /hmm/viterbi route; /hmm/adapt is not inference.",
+        "The error/query-to-OKF-to-HMM-to-bounded-tools path is not end-to-end proven.",
+        "PPO remains blocked on a stable replayable reward environment.",
+        "QLoRA/checkpoint and action-mask constraints remain explicit promotion gates."
+      ],
+      "dependencyRole": "Policy state and execution decision owner; current component tests do not prove the live HMM/runtime chain."
+    },
+    {
+      "change": "parent-atlas-pass-fabric",
+      "tasksPath": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
+      "checked": 30,
+      "unchecked": 26,
+      "actionableInstructionTasks": { "checked": 30, "unchecked": 26, "total": 56 },
+      "ownerClass": "pass-definition-execution-history-and-worker",
+      "criticalOpenItems": [
+        "The design distinguishes logical pass identity from execution/retry identity: passIdentityHash is lineage-qualified logical identity; pass_key is execution-level retry identity.",
+        "Execution semantics differ by pass (deterministic_idempotent, stochastic_history, observed_event); legacy/current rows and consumers still need population/coverage proof.",
+        "embed_gate has no proven stageConfig embedding job dispatch; do not equate pass eligibility with a qualified canonical embedding writer.",
+        "LISTEN/NOTIFY wake latency is a live PostgreSQL proof and may require write/enqueue activity; no such live mutation was attempted.",
+        "Several unchecked database uniqueness/schema/apply items are explicitly gated and are not safe to infer as ready from source implementation alone."
+      ],
+      "dependencyRole": "Owns pass scheduling and execution receipts, not semantic representation authority or canonical source identity."
+    },
+    {
+      "change": "parent-atlas-native-acceleration-cabi",
+      "tasksPath": "openspec/changes/parent-atlas-native-acceleration-cabi/tasks.md",
+      "checked": 39,
+      "unchecked": 24,
+      "actionableInstructionTasks": { "checked": 39, "unchecked": 24, "total": 63 },
+      "ownerClass": "native-executor-and-identity-join",
+      "criticalOpenItems": [
+        "P0.2 canonical candidate identity join and P0.4 hydrated route proof remain blocked by the current exact identity/source evidence; fixture contracts do not establish live identity rows.",
+        "P2.3 CPU PageRank and NetworkX parity are proven on the shared fixture, but Neo4j GDS parity remains open.",
+        "P2.5 N-API adapter refactor, CUDA graph capture, CAGRA exact oracle/benchmark, protobuf/gRPC service, and projection jobs remain distinct implementation/performance gates.",
+        "Native, LibTorch, CUDA, cuVS, cuGraph and WebGPU are executor/challenger identities; none becomes semantic authority merely by compiling or returning a vector."
+      ],
+      "dependencyRole": "Compute/executor layer; outputs require canonical identity, representation, and execution receipts before fusion or projection."
+    },
+    {
+      "change": "parent-atlas-onnx-webgpu-embedding-promotion",
+      "tasksPath": "openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion/tasks.md",
+      "checked": 11,
+      "unchecked": 6,
+      "actionableInstructionTasks": { "checked": 11, "unchecked": 6, "total": 17 },
+      "ownerClass": "embedding-challenger-parity-and-promotion",
+      "criticalOpenItems": [
+        "ONNX WebGPU runtime execution and 768-dimensional output have receipts, but provider parity remains PARITY_OBSERVED_UNADMITTED (recorded cosine about 0.98945, max absolute delta about 0.02043).",
+        "The local artifact is classified LOCAL_EXPORT_FIXED_512 / bounded challenger only; do not infer 2048-token capacity from dynamic shape metadata.",
+        "Ollama remains canonical semantic_768 owner; the recorded 15-row Ollama/WebGPU comparison is non-equivalent and not promotion evidence.",
+        "Post-receipt runtime teardown failure and browser IndexedDB lifecycle are separate open gates; no provider traffic switch is authorized by this census."
+      ],
+      "dependencyRole": "Challenger under the existing semantic lane; cannot replace the canonical encoder without admitted parity and promotion receipts."
+    }
+  ],
+  "preservedBoundaries": {
+    "classification": "Query/source classification is evidence, not ontology identity or execution authority.",
+    "taxonomy": "Classifier vocabulary, persisted ontology identity, and taxonomy topology remain separate owners.",
+    "keywordExpansion": "Keyword/radix expansion is planning evidence; QUERY-RADIX was not changed or promoted.",
+    "helperEligibility": "Eligibility/capability state is distinct from helper registry declarations and runtime execution.",
+    "retrievalPlan": "A plan is not proof that its selected executor ran.",
+    "routerSignal": "Router signal is not executor identity or fusion lane.",
+    "executor": "CPU/native/WebGPU/GPU backends are execution identities and challengers, not canonical semantic authority.",
+    "fusionLane": "Multiple executors for one lane must normalize before fusion; no extra vote is created by executor count.",
+    "healthVsAnalyze": "Service health/import/capability checks do not substitute for /analyze, astChunk, or fixed-fixture execution receipts.",
+    "logicalPassVsExecution": "passIdentityHash is logical lineage identity; pass_key remains execution/retry identity."
+  },
+  "crossChangeCriticalPath": [
+    "Admit current source/workspace identity and exact candidate-to-packet binding.",
+    "Resolve the canonical semantic writer and immutable representation/content-input provenance.",
+    "Only then qualify observation/pass rows and dispatch embedding work.",
+    "Keep native/WebGPU results shadow/challenger until same-artifact parity and exact identity readback pass.",
+    "Perform schema, migration, persistence, or traffic promotion only through separately authorized gates."
+  ],
+  "readyBoundedGates": [
+    {
+      "gate": "ORF-7-REMAINING-SEARCH-EVIDENCE-HYDRATE-AUDIT-01",
+      "status": "READY_SOURCE_ONLY_REMAINDER_AUDIT",
+      "scope": "Continue the source-only ORF-7 inventory over remaining search/evidence/hydrate registrations, label each read-only versus mutating/external/model-dependent, identify input/output/deadline bounds and fixture coverage, then select another bounded code-only increment only where the real owner is clear. No live service, database, cache, model, or persistence mutation call.",
+      "latestIncrement": "graph.expand_neighborhood now converts failure of its direct read-only Neo4j fallback into the existing byte-capped stable response shape with empty nodes/edges/sourceRefs/graphPaths/neighbors, confidence=0, bounded error text, center, and maxHops. turbovec.rank_chunks now has capped query/sourceRefs/score-map schemas and shared byte-capped output; its deterministic score formula, result limit, and non-fusion role are unchanged. engram.chat_memory_recent now bounds userId/sourceRefs, uses the existing canonical READ ONLY transaction with 2.5-second statement_timeout, retains its row limits, and byte-caps success/error output. hypergraph.search, hypergraph.get_edge, hypergraph.expand_members, and knowledge.get_minified_map now use a 5-second upstream deadline, 256-KiB streamed JSON cap, and shared 128-KiB MCP output cap. knowledge.get_minified_map also uses the canonical READ ONLY query budget for its bounded Postgres read. clusters.get_members now trims and bounds clusterKey and limit, executes through the canonical READ ONLY transaction with a 2.5-second statement timeout, and applies the shared 128-KiB output cap. codebase.rg_search now validates bounded query/glob/context inputs, invokes rg with execFile argument arrays rather than a shell string, applies a 10-second timeout and 128-KiB maxBuffer, and clips UTF-8 output at a codepoint boundary. search.postgres_fts now bounds query/class/result count, executes through the canonical READ ONLY query-budget wrapper with a 2.5-second statement timeout, and caps success/error output at 128 KiB; search.hybrid remains model-backed and was not changed or invoked. trace.explain_retrieval now validates a 512-character query, scans at most ten pages/500 keys, selects at most twenty sorted and deduplicated keys for bounded reads, checks stored value length and fetches at most 64 KiB per value, applies a 2.5-second per-command timeout and an 8-second total deadline, and returns through the shared 128-KiB output cap. kb.search_notecards now caps query length/results and MCP output; the shared JSONL reader rejects corpora above 64 MiB/30,000 cards, rows above 256 KiB, and rank files above 4 MiB. Current local corpus read-only audit: 46,734,560 bytes, 21,289 valid rows, max row 6,780 bytes, zero malformed rows. No Redis, database, model, or live MCP call was executed by this work.",
+      "evidence": "Pure fixtures cover graph failure-shape stability/error truncation, TurboVec input boundaries, recent-memory filter limits, upstream JSON declared-length/streaming/malformed-response bounds, minified-map request limits, hypergraph search query/filter/result bounds, shell-free ripgrep argument construction plus UTF-8 byte truncation, bounded Postgres FTS query parameters/timeout policy, bounded trace-query/key-selection/matching contracts, and notecard corpus/query/output bounds. The current local notecard JSONL was streamed and parsed read-only: 46,734,560 bytes, 21,289 valid rows, max row 6,780 bytes, zero malformed lines. Prior bounds cover graph paths, packet search/dense search, coverage, PageRank pagination, feature-document reads/plans, compact-context/source-ref/suggest/explain/get_chunk and trace-search inputs. ORF-7 still lists remaining search/evidence/hydrate surface and separate live protocol proof.",
+      "whyReady": "Source-only inventory and one bounded search patch are complete; remaining handlers still need owner and side-effect classification before selecting another implementation. No handler is promoted and live protocol proof stays open."
+    },
+    {
+      "gate": "NATIVE-P2.5-EXPORT-SURFACE-INVENTORY-01",
+      "status": "AUDIT_COMPLETE_NO_ADDITIONAL_C_ABI_MATCH_PROVEN",
+      "scope": "Compare current simd-bridge N-API exports, atlas_core C ABI operations, and existing tests/build targets. Produce a per-export matrix of migrated, legacy-only, unsupported, and fixture-covered behavior; nominate at most one stateless CPU operation for the next isolated adapter slice. No production build replacement, GPU claim, database access, or runtime traffic switch.",
+      "evidence": "Source registration census found 41 N-API exports in simd-bridge/cpp/binding.cc, with only atlasPageRank delegated to the new native/atlas_core/napi callback; the atlas_core N-API adapter exposes only that one operation. The remaining 40 registrations stay on the legacy binding wrappers. The C ABI has PageRank and similarity-graph implementation surfaces plus a deliberately unavailable exact-KNN backend; no other legacy N-API operation is an equivalent C ABI implementation that can be mechanically delegated without defining new semantics. PageRank adapter fixture exists, but broad migration, addon regression, packaging, and GPU runtime proof remain open.",
+      "whyReady": "The export inventory is complete and read-only. The next adapter operation is not ready to select safely: choosing among the legacy operations would require a new semantic/API contract, so retain the isolated PageRank slice and do not promote or rewrite the remaining exports."
+    }
+  ],
+  "dependencyStops": [
+    {
+      "gate": "ORF-7-REMAINING-EXECUTOR-SURFACES",
+      "status": "PARTIAL_READ_BOUNDS_PROVEN_LIVE_PROTOCOL_NOT_RUN",
+      "evidence": [
+        "atlas.prefilter sends an embedding request to Ollama and then POSTs to TurboVec; this turn made no model/service call.",
+        "ace.compact_search embeds and searches, and its default useCache=true path writes a Redis cache entry; this turn made no model/cache call.",
+        "atlas.populate_feature_documents writes feature docs and a manifest, seeds a packet, and defaults startResearchIfMissing=true; this turn did not invoke it.",
+        "The read-only feature-document status/plan/evidence-tuple contracts are now locally bounded and fixture-tested, but no live MCP protocol or database call was made."
+      ],
+      "safeNext": "Continue static/fixture review of read-only tools. Keep model, cache-write, filesystem-write, and persistent-store paths outside this gate; a live read-only MCP proof must use an explicit read-only handler and bounded target.",
+      "writesPerformed": false,
+      "modelCallsPerformed": false,
+      "liveMcpOrDatabaseCalls": false,
+      "taskLedgerEdited": false
+    },
+    {
+      "gate": "P0.3-TYPED-HYDRATION-COUNTERS",
+      "status": "BLOCKED_ON_P0.2_CANONICAL_IDENTITY_JOIN",
+      "evidence": [
+        "hydrate-candidates.ts currently selects and matches codebase_chunk_index rows; the documented atlas_packets/symbol-tree canonical identity join is absent.",
+        "The current proof.canonicalJoinedCount increments only after the compatibility FeatureEnvelopeSchema succeeds, so it conflates row resolution with envelope construction.",
+        "The compatibility FeatureEnvelopeSchema permits missing stable identity fields; enforcing the staged discriminated identity contract would change hydration acceptance before P0.4 route-regression proof."
+      ],
+      "safeNext": "Implement or prove the P0.2 canonical join first; then define row-match, identity-resolution, and strict-envelope counters at their actual stage boundaries. Keep the legacy output path unchanged until P0.4 parity is proven.",
+      "writesPerformed": false,
+      "modelCallsPerformed": false,
+      "taskLedgerEdited": false
+    }
+  ],
+  "runEvidence": {
+    "nativeP25ExportInventory": {
+      "legacyNapiRegistrations": 41,
+      "atlasCoreDelegatedExports": ["atlasPageRank"],
+      "legacyOnlyRegistrations": 40,
+      "exactKnnBackend": "UNAVAILABLE_STUB",
+      "additionalStatelessCAbiEquivalentReady": false,
+      "inventorySourceRefs": [
+        "simd-bridge/cpp/binding.cc:1582-1629",
+        "native/atlas_core/napi/atlas_core_napi.cpp:244-256",
+        "native/atlas_core/include/atlas_core.h:227-293",
+        "native/atlas_core/tests/atlas_core_c_abi_test.c",
+        "native/atlas_core/tests/atlas_knn_c_abi_test.c"
+      ],
+      "writesPerformed": false,
+      "gpuExecutionClaimed": false
+    },
+    "currentOpenSpecInstructionProgress": {
+      "method": "npx openspec instructions apply --change <name> --json",
+      "total": { "checked": 234, "remaining": 111, "tasks": 345 },
+      "note": "NLP sidecar parser progress is 99/143 while literal Markdown checkbox census is 100/149; the parser omits six checklist lines in that ledger. The five other boards agree with literal counts.",
+      "queriedAt": "2026-09-29"
+    },
+    "openspecStrictValidation": {
+      "changes": 6,
+      "result": "PASS",
+      "names": [
+        "parent-atlas-nlp-sidecar-feature-compiler",
+        "parent-atlas-observation-routing-fabric",
+        "parent-atlas-policy-routing-integration",
+        "parent-atlas-pass-fabric",
+        "parent-atlas-native-acceleration-cabi",
+        "parent-atlas-onnx-webgpu-embedding-promotion"
+      ]
+    },
+  "focusedMcpBoundsTests": "PASS 29/29 read-tool-bound contract tests and 3/3 notecard corpus-bound fixtures; prior feature-document filesystem-bound fixtures passed 3/3 in the preceding focused run (35 total across those focused runs)",
+  "orf7GraphNeighborhoodFailureShape": "PASS: Neo4j fallback errors map to a deterministic bounded response; pure fixture only, no Neo4j/PostgreSQL/MCP/model call",
+  "orf7TurboVecRankBounds": "PASS: query/ref/map limits validated and ranking response uses the shared 128-KiB cap; formula unchanged; no service/store/model call",
+  "orf7EngramReadBounds": "PASS: user/source-ref filters bounded, traced query executed only inside existing READ ONLY transaction scope, output cap applied; test fixtures only, no database query invoked",
+    "repoWideSvelteCheck": "STOPPED by operator safety after the process reached about 5.7 GB working set and continued consuming CPU; no completion/result claimed",
+    "readToolBoundsTypeCheck": "PASS: standalone strict tsc on read-tool-bounds.ts and its spec with explicit node types",
+    "traceMcpServerTypeSyntaxCheck": "PASS: esbuild TypeScript transpile of trace-mcp-server.ts",
+    "neo4jPageRankClientSyntaxCheck": "PASS",
+    "onnxReceiptConsistencyRead": "PASS; three existing receipts parsed and cross-checked; no model/runtime invocation",
+    "passFabricIdentityTests": "PASS 19/19 from the SvelteKit package root; pure identity/adaptor tests plus mocked duplicate-delivery DB chain; no live database query or write",
+    "nativeCoreNapiPageRankAdapter": "PASS: integrated CPU-fallback tensorrt_bridge.node rebuilt from current sources and N-API fixture passed; in addition to directed CSR/validation cases, two concurrent jobs are admitted, the third is rejected at the bounded queue, copied inputs remain valid after caller mutation, and the queue accepts new work after drain. Backend is cpu_reference; execution_observed=false. No GPU execution or parity claim.",
+    "nativeCoreNapiRuntimeProofScope": "Fixture only; does not close P2.5 full export migration, packaging, or GPU runtime proof.",
+    "orf7HypergraphReadBounds": "PASS: hypergraph.get_edge and hypergraph.expand_members use a 5-second upstream timeout, bounded streaming JSON read, and shared output cap; fixture-only, no live MCP or database call.",
+    "orf7KnowledgeMinifiedMapBounds": "PASS: request schema bounds directory/edge/agent counts; internal hypergraph request has a 5-second timeout and 256-KiB streamed response cap; Postgres lookup uses the canonical read-only transaction and 2.5-second statement timeout; MCP response uses the shared output cap. Fixture/static proof only; no live MCP or database call.",
+    "orf7HypergraphSearchBounds": "PASS: query, edge-type list/items, and result count are schema-bounded; internal read has a 5-second caller timeout, 256-KiB streamed JSON input cap, and shared output cap. Fixture/static proof only; no live MCP or database call.",
+    "orf7ClusterMembersBounds": "PASS: clusterKey and result limit are schema-bounded; Postgres read executes inside canonical READ ONLY transaction with 2.5-second statement timeout; response uses shared 128-KiB cap. Unit/static proof only; no live database call.",
+    "orf7CodebaseRgSearchBounds": "PASS: schema constrains query/glob/context, shell execution was replaced by execFile with an argument vector, process timeout is 10 seconds, maxBuffer is 128 KiB, and output clipping preserves UTF-8 codepoint boundaries. Fixture/type/transpile proof only; rg itself was not invoked by this validation.",
+    "orf7PostgresFtsBounds": "PASS: query/topology-filter/result bounds are fixture-tested; execution uses the canonical READ ONLY query-budget wrapper with a 2.5-second statement timeout; success and error payloads are capped at 128 KiB. No database query was invoked.",
+    "orf7TraceExplainRetrievalBounds": "PASS: query is limited to 512 trimmed characters; Redis access scans at most ten pages/500 keys and selects at most twenty sorted/deduplicated keys, with a 2.5-second per-command timeout plus an 8-second total deadline, STRLEN preflight plus GETRANGE capped at 64 KiB, and the shared 128-KiB output cap. Pure fixture only; no Redis/live MCP call.",
+    "orf7NotecardSearchBounds": "PASS: query <=512 characters, MCP result limit <=20, shared reader max corpus 64 MiB/30,000 cards/256-KiB row, rank file <=4 MiB, fields/output byte-capped. Pure fixtures 3/3; current local corpus read-only audit is within all bounds with 21,289 valid rows and no malformed JSONL. No live MCP call.",
+    "codebaseToolsTargetedTypeCheck": "NOT_CLEAN: isolated tsc on codebase_tools.ts is blocked by the existing direct-Zod versus MCP SDK schema typing mismatch (also present at the untouched AWK registration), optional DispatcherMiddleware typing, and unrelated memory-bridge nullable rowCount diagnostics. The shared bounds module/spec strict typecheck and MCP transpile pass; no repo-wide check is claimed.",
+    "nlpUtf8GroundingAdapter": "Current source already wires groundLangExtractUtf8SpansV1 into graphify-structural-intelligence-adapter and admits only exact byte-grounded spans. Reverification: adapter suite 7/7 and direct UTF-8 suite 11/11. No new wiring patch was needed; source authority/canonical promotion remain open.",
+    "liveMcpOrDatabaseCalls": false,
+    "modelCalls": false,
+    "migrationsOrDatastoreWrites": false,
+    "queryRadixChanged": false,
+    "taskLedgersChangedByThisReport": false,
+    "workspaceWideDiffCheck": "NOT_CLEAN: pre-existing trailing whitespace is reported in simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml; it is outside this report and was not edited here."
+  },
+  "likely_cause": "The six boards describe adjacent layers but several task checkboxes conflate contracts, source/fixture proof, live runtime proof, canonical lineage, and promotion; dependency order must be based on those proof owners rather than checkbox adjacency.",
+  "evidence": [
+    "Current literal checkbox census from the six scoped tasks.md files: 235 checked, 116 unchecked.",
+    "NLP sidecar task 0.4 and source/identity notes leave the canonical semantic writer and fully qualified candidate population unresolved.",
+    "ORF-2R explicitly says candidate_id-to-packet_key binding is caller-supplied and unproven; ORF-3 is migration-gated.",
+    "Policy task note records that :8091 lacks /hmm/viterbi and that adaptation is not inference.",
+    "Pass-fabric design and task notes distinguish passIdentityHash from pass_key and deterministic from stochastic execution semantics.",
+    "Current pass-fabric focused tests prove execution keys differ across jobs while logical identity stays equal for stable input; absent stable input yields null logical identity; deterministic duplicate delivery reuses a mocked receipt without insert; lexical adapter replay preserves logical identity across jobs and invalidates on workspace revision.",
+    "Native C ABI task notes report CPU/NetworkX PageRank parity but leave Neo4j GDS and live identity join proofs open.",
+    "ONNX readiness and CPU/WebGPU receipts share model/tokenizer checksums, prove explicit CPU/WebGPU providers and same-input checksum evidence, but retain PARITY_OBSERVED_UNADMITTED and the 512-token capacity ceiling.",
+    "The separate 15-row Ollama/WebGPU receipt remains non-equivalent/non-promoted and uses mutable model alias embeddinggemma:latest; its cohort result is not conflated with the same-input CPU/WebGPU fixture."
+  ],
+  "patch_targets": [
+    "native/atlas_core/napi/CMakeLists.txt",
+    "native/atlas_core/napi/atlas_core_napi.cpp",
+    "native/atlas_core/napi/test-atlas-core-napi.cjs",
+    "simd-bridge/cpp/CMakeLists.txt",
+    "simd-bridge/cpp/binding.cc",
+    "sveltekit-frontend/src/mcp/new_tools.ts",
+    "sveltekit-frontend/src/mcp/read-tool-bounds.ts",
+    "sveltekit-frontend/src/mcp/read-tool-bounds.spec.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "sveltekit-frontend/src/mcp/codebase_tools.ts",
+    "sveltekit-frontend/src/lib/server/atlas/feature-document-evidence.ts",
+    "sveltekit-frontend/src/lib/server/atlas/feature-document-evidence.bounds.spec.ts",
+    "sveltekit-frontend/src/lib/server/atlas/feature-doc-ingestion.ts",
+    "sveltekit-frontend/src/lib/server/atlas/feature-doc-enrichment.ts",
+    "docs/reports/routing-sidecar-native-critical-path-v1.json"
+  ],
+  "safe_next_command": "rg -n \"registerTool|server\\.tool|atlas\\.(packet|feature|graph|coverage)|kb\\.trace_search|codebase\\.rg_search\" sveltekit-frontend/src/mcp",
+  "smoke_command": "cd sveltekit-frontend && npx vitest run src/mcp/read-tool-bounds.spec.ts src/lib/server/atlas/feature-document-evidence.bounds.spec.ts --pool=threads --poolOptions.threads.singleThread",
+  "report_path": "docs/reports/routing-sidecar-native-critical-path-v1.json"
+}

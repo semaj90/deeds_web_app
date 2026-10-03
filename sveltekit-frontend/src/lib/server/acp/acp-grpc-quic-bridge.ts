@@ -262,25 +262,36 @@ export interface A2AAgentDescriptor {
   altSvcHeader?: string; // For QUIC alt-svc negotiation
 }
 
+const A2A_PEER_TOOL_ALLOWLIST = new Set(['identity:recover']);
+const A2A_PEER_METHOD_ALLOWLIST: Record<string, ReadonlySet<string>> = {
+  retrieval: new Set(['Search', 'RRFFuse', 'Rerank']),
+};
+
 export function buildA2AAgentDescriptor(
   agentId: string,
   toolRegistry: ACPToolRegistry,
   serviceRegistry: Partial<ACPServiceRegistry>
 ): A2AAgentDescriptor {
-  const allTools = toolRegistry.listTools();
+  // Peer discovery is default-deny. Internal ACP tools remain registered, but
+  // metadata must not advertise generic execution or mirror/write-capable tools.
+  const peerTools = toolRegistry.listTools().filter((tool) => A2A_PEER_TOOL_ALLOWLIST.has(tool.id));
   const servicePorts: A2AServicePort[] = [];
 
-  // Extract unique service ports from registered tools
-  for (const tool of allTools) {
+  // Advertise only explicitly approved methods for services referenced by an
+  // allowlisted peer tool. Unknown services/methods are never inferred safe.
+  for (const tool of peerTools) {
     const serviceKey = tool.serviceId as keyof typeof serviceRegistry;
     const service = serviceRegistry[serviceKey];
+    const approvedMethods = A2A_PEER_METHOD_ALLOWLIST[tool.serviceId];
+    const methods = service?.methods.filter((method) => approvedMethods?.has(method)) ?? [];
+    if (methods.length === 0) continue;
     if (service && !servicePorts.find((p) => p.id === tool.serviceId)) {
       servicePorts.push({
         id: tool.serviceId,
         protocol: 'grpc',
         protoFile: service.protoName,
         serviceName: service.serviceName,
-        methods: service.methods,
+        methods,
         port: service.grpcPort,
         host: '127.0.0.1',
         quicEnabled: true,
@@ -294,12 +305,21 @@ export function buildA2AAgentDescriptor(
     name: 'Deeds Legal AI',
     version: '1.0.0',
     description: 'Unified legal AI assistant with gRPC/QUIC proto boundaries',
-    capabilities: ['retrieval', 'synthesis', 'tool-calling', 'graph-traversal'],
-    tools: allTools.map((t) => t.id),
+    capabilities: peerTools.length > 0 ? ['retrieval'] : [],
+    tools: peerTools.filter((tool) => servicePorts.some((port) => port.id === tool.serviceId)).map((tool) => tool.id),
     servicePorts,
     quicEnabled: true,
     altSvcHeader: 'h3=":443"; h2=":443"; http/1.1',
   };
+}
+
+/** Returns only tool records named by the already-filtered peer descriptor. */
+export function listA2APeerTools(
+  toolRegistry: ACPToolRegistry,
+  descriptor: Pick<A2AAgentDescriptor, 'tools'>,
+): ACPToolRegistryEntry[] {
+  const allowed = new Set(descriptor.tools);
+  return toolRegistry.listTools().filter((tool) => allowed.has(tool.id));
 }
 
 // ─────────────────────────────────────────────────────────────────────

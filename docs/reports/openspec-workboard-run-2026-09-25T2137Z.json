@@ -1,0 +1,109 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T21:37:06Z",
+  "runType": "FULL_OPEN_TASK_PROGRAM_REFRESH_AND_CONTROLLER_PATH_FIX",
+  "supersedes": "docs/reports/openspec-workboard-run-2026-09-25T2127Z.json",
+  "pivot": {
+    "from": "large-corpus enrichment and lineage-bound summary proposal review",
+    "to": "current OpenSpec task inventory, dependency-aware program hierarchy, and execution-controller snapshot parity",
+    "reason": "User requested continuing through the OpenSpec task inventory and wiring the implementation program; container rebuilds remain deferred until the end."
+  },
+  "repository": {
+    "workingTreeWasDirty": true,
+    "taskLedgersEditedByThisRun": false,
+    "selectedTaskCount": 0,
+    "schedulerPermissionPolicy": "READY_NEVER_IMPLIES_SELECTED",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "implementation": {
+    "controllerInput": "Added ATLAS_OPENSPEC_WORKBOARD_PATH, independent of ATLAS_OPENSPEC_REPORTS_DIR; default input remains docs/reports/openspec-workboard-v1.json so the atomic runner keeps its prior behavior.",
+    "controllerReportSource": "Now records the actual workboard input path.",
+    "workboardControllerOverride": "build-openspec-workboard-v1.mjs accepts --controller-file=<path> for isolated, matched hierarchy builds.",
+    "workboardSource": "The generated snapshot hashes all 90 task files; all hashes still match the current files at this receipt."
+  },
+  "snapshot": {
+    "directory": ".tmp/codex-openspec-live-20260925T213527Z/reports",
+    "workboard": ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-workboard-v1.json",
+    "controller": ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-execution-controller-v1.json",
+    "programJson": ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-achievable-implementation-program-v1.json",
+    "programMarkdown": ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-achievable-implementation-program-v1.md",
+    "changeCount": 88,
+    "taskFilesHashed": 90,
+    "totalTasks": 9528,
+    "completedTasks": 6298,
+    "openTasks": 3230,
+    "controllerTaskRows": 9528,
+    "controllerStaleOrMissingRows": 0,
+    "controllerStableKeyParity": true,
+    "openTaskAssignments": {
+      "accountedExactlyOnce": true,
+      "missing": 0,
+      "duplicates": 0,
+      "schedulerSelected": 0
+    }
+  },
+  "programPlan": {
+    "milestones": 7,
+    "programs": 25,
+    "gates": 105,
+    "workPackages": 805,
+    "workPackagesUnderThreeTasks": 429,
+    "reviewQueueLeaves": 0,
+    "allOpenMappings": "PROVISIONAL",
+    "openGateStates": {
+      "READY": 2180,
+      "AUTHORIZATION_REQUIRED": 224,
+      "BLOCKED_BY_LINEAGE": 252,
+      "BLOCKED_BY_RUNTIME": 28,
+      "OWNER_DECISION_REQUIRED": 2,
+      "WAITING_FOR_DEPENDENCY": 440,
+      "DEFERRED": 52,
+      "SUPERSEDED": 50,
+      "REVIEW_REQUIRED": 2
+    },
+    "mutationClasses": {
+      "READ_ONLY": 359,
+      "CODE_ONLY": 1549,
+      "LOCAL_ARTIFACT": 349,
+      "DB_WRITE": 267,
+      "DDL": 150,
+      "CACHE_WRITE": 152,
+      "PROJECTION_WRITE": 246,
+      "GRAPHIFY_RUN": 158
+    },
+    "declaredLeafDependencies": 3,
+    "openLeavesWithoutDeclaredDependencies": 3227,
+    "dependenciesInvented": 0,
+    "note": "All open leaves are placed once, but the plan is not fully adjudicated: program mappings remain heuristic/provisional; dependency metadata is sparse; package count exceeds the rough 250-400 target because owner/mutation/readiness boundaries were preserved rather than merged. No priority or percentage auto-selects work."
+  },
+  "validation": {
+    "controllerPathTest": "PASS 1/1",
+    "programPlanTests": "PASS 18/18",
+    "openspecStrict": "PASS parent-atlas-workboard-feature-utility-fabric",
+    "controllerSyntax": "PASS",
+    "workboardSyntax": "PASS",
+    "scopedDiffCheck": "PASS"
+  },
+  "next": {
+    "selectedCriticalPath": "SOURCE_LINEAGE → PACKET_KEY_OWNER → PACKET_ADMISSION → PACKET_CHUNK_LINEAGE → GATE_2",
+    "currentScopeNote": "PACKET_AUDIT_SEMANTICS is already recorded proven in the source-authority ledger. The admission gap remains blocked on the packet-key logical identity owner/recipe; do not mint keys from source_ref alone or bypass that decision.",
+    "programPlanCaveat": "The 2,180 READY tasks are eligible classifications only, not selected authorization. Start with one explicitly governed work package and keep lineage/auth/owner decisions as hard stops."
+  },
+  "likely_cause": "The workboard builder and controller had no explicit shared snapshot-path contract; once corrected, the current full inventory can be reconciled without touching shared generated reports.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925T213527Z/reports/openspec-achievable-implementation-program-v1.json",
+    "scripts/atlas/audit-openspec-execution-controller-v1.test.mjs"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-execution-controller-v1.mjs",
+    "scripts/atlas/audit-openspec-execution-controller-v1.test.mjs",
+    "scripts/atlas/build-openspec-workboard-v1.mjs"
+  ],
+  "safe_next_command": "Use the current timestamped program plan to select one bounded critical-path work package; do not infer selection from READY.",
+  "smoke_command": "node --test scripts/atlas/audit-openspec-execution-controller-v1.test.mjs scripts/atlas/lib/openspec-program-plan-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2137Z.json"
+}

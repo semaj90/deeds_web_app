@@ -1,0 +1,102 @@
+{
+  "schema": "atlas.pr-89-90-91-98-selective-adoption.v1",
+  "generatedAt": "2026-09-20",
+  "phase": "PR-RECON-03",
+  "baseRef": "origin/main",
+  "workingBranch": "integrate/pr-clean-batch-20260920",
+  "policy": {
+    "wholeMergePerformed": false,
+    "mainWorktreeTouched": false,
+    "canonicalWrites": false,
+    "promotionAuthorized": false
+  },
+  "adopted": [
+    {
+      "pr": 89,
+      "classification": "SELECTIVE_ADOPTION_CANDIDATE",
+      "owner": "promotion critical-owner reconciliation",
+      "currentFile": "scripts/atlas/reconcile-promotion-critical-owners-v2.mjs",
+      "rationale": "Read-only ownership reconciliation with no authority promotion; present in the clean integration branch."
+    },
+    {
+      "pr": 90,
+      "classification": "SELECTIVE_ADOPTION_CANDIDATE",
+      "owner": "Valkey authority event fabric",
+      "currentFiles": [
+        "sveltekit-frontend/src/lib/server/queue/valkey-event-stream.ts",
+        "sveltekit-frontend/src/lib/server/queue/valkey-event-stream.spec.ts",
+        "scripts/atlas/prove-valkey-authority-event-fabric.mts"
+      ],
+      "rationale": "Transport and receipt contracts remain subordinate to PostgreSQL authority; cache identity owners are not replaced."
+    },
+    {
+      "pr": 91,
+      "classification": "SELECTIVE_ADOPTION_CANDIDATE",
+      "owner": "Graphify symbol projection",
+      "currentFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-preflight-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts"
+      ],
+      "rationale": "Projection contracts are useful while writes and authority remain disabled pending source admission."
+    },
+    {
+      "pr": 98,
+      "classification": "PARTIALLY_SUPERSEDED",
+      "owner": "packet digest bridge",
+      "currentFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-digest-bridge-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/current-packet-digest-readback-v1.ts"
+      ],
+      "rationale": "Pure contracts/tests are retained only where current; the older planner is superseded by the current .mjs planner/producer."
+    }
+  ],
+  "superseded": [
+    {
+      "pr": 98,
+      "files": [
+        "scripts/atlas/plan-current-packet-digest-bridge-v1.mts"
+      ],
+      "replacement": "scripts/atlas/plan-current-packet-digest-bridge-v1.mjs and its current producer"
+    }
+  ],
+  "testsOnly": [
+    {
+      "pr": 89,
+      "result": "prior focused read-only audit recorded; rerun requires installed dependencies"
+    },
+    {
+      "pr": 90,
+      "result": "prior focused event-fabric specs recorded 9/9"
+    },
+    {
+      "pr": 91,
+      "result": "prior projection/preflight/writer specs recorded 21/21 after schema compatibility rebase"
+    },
+    {
+      "pr": 98,
+      "result": "prior pure digest specs recorded 13/13"
+    }
+  ],
+  "blocked": [
+    {
+      "key": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+      "reason": "Projection and digest contracts cannot become canonical until the current source frame is admitted."
+    },
+    {
+      "key": "PR_CLEAN_BATCH_LOCAL_REPLAY",
+      "reason": "The isolated worktree does not have the repository's installed pg dependency; focused runtime replay is deferred."
+    }
+  ],
+  "validation": {
+    "nodeSyntaxForNewSalvageAudits": "PASS",
+    "salvageReportJson": "PASS",
+    "openSpecStrict": "PASS for parent-atlas-retrieval-lineage-dag-convergence",
+    "databaseWrites": false,
+    "valkeyWrites": false,
+    "qdrantWrites": false,
+    "graphifyRefresh": false,
+    "migrationsApplied": false
+  }
+}
+

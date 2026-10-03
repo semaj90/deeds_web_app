@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T03:46:39Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "selection": {
+    "pivotChain": [
+      {
+        "from": "parent-atlas-graph-runtime-python-consolidation",
+        "stateAtEntry": { "checked": 13, "open": 5, "total": 18 },
+        "to": "parent-atlas-tensor-residency-integration",
+        "stateAtExit": { "checked": 97, "open": 54, "total": 151 },
+        "reason": "Crosswalked shared GPU-EXP-14/15 task status into the dependent tensor-residency workboard without creating a second graph artifact owner."
+      },
+      {
+        "from": "parent-atlas-tensor-residency-integration",
+        "stateAtExit": { "checked": 97, "open": 54, "total": 151 },
+        "to": "parent-atlas-graph-runtime-python-consolidation",
+        "stateAtExit": { "checked": 14, "open": 4, "total": 18 },
+        "reason": "Returned to the graph-runtime owner to continue GPU-EXP-15/16 implementation and retain its proof gates."
+      }
+    ]
+  },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "neo4jWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false,
+    "liveGraphLoad": false
+  },
+  "result": {
+    "change": "parent-atlas-graph-runtime-python-consolidation",
+    "taskProgress": { "checked": 14, "open": 4, "total": 18, "deltaCheckedThisRun": 1 },
+    "linkedChangeProgress": {
+      "change": "parent-atlas-tensor-residency-integration",
+      "checked": 97,
+      "open": 54,
+      "total": 151,
+      "deltaCheckedThisRun": 1
+    },
+    "gpuExp14": {
+      "status": "PROVEN_NONCANONICAL_ARTIFACT_BUILDER_FIXTURE",
+      "contract": "atlas.graph-projection-artifact.v1",
+      "checksumFields": ["candidateOrdinalMapChecksum", "graphOrdinalMapChecksum"],
+      "fixtureCoverage": ["dense_graph_ordinals", "isolated_vertex_retained", "parquet_readback", "typescript_checksum_golden"],
+      "oldManifestFinding": "Existing artifact's ordinalMapChecksum was a candidate map checksum (86fee5...) and did not match recomputed graph ordinal map checksum (4319a5...). Known ambiguous legacy manifest now fails closed.",
+      "canonicalAuthority": false,
+      "liveArtifactRebuilt": false
+    },
+    "gpuExp15": {
+      "implementation": "BFS request modes DEFAULT=2, EXPANDED=3, MAXIMUM=4; bounded predecessor-chain path reconstruction and checksummed noncanonical receipt.",
+      "proof": "unit and adapter fixture only",
+      "liveFrozenGraphRun": false,
+      "remainingBlocker": "8098 has resident:null and 392 MiB free of 8192 MiB, below its 768 MiB graph-load floor; no graph was loaded."
+    },
+    "gpuExp16": {
+      "status": "OPEN",
+      "existingEvidenceReviewed": [
+        "docs/reports/ontology-linked-tuple-cugraph-algorithm-parity-v1.json",
+        "docs/reports/current-structural-graph-cpu-gpu-parity-v1.json",
+        "docs/reports/graph-ordinal-cpu-gpu-replay-v1.json"
+      ],
+      "reasonOpen": "Existing receipts are bounded/older and do not establish fresh deterministic replay on the newly aligned GraphProjectionArtifactV1. Live parity was not rerun because the active GPU had insufficient free memory."
+    },
+    "operatorTasksRemaining": [
+      "T2 keep-or-archive decision for parent_atlas_pagerank_reference.py",
+      "Record that human decision in the ownership registry"
+    ],
+    "validation": {
+      "pythonFocusedTests": "24 passed",
+      "pythonSyntax": "PASS",
+      "graphRuntimeOpenSpecStrict": "PASS",
+      "tensorResidencyOpenSpecStrict": "PASS",
+      "gitDiffCheck": "PASS for scoped files; repository-wide check reports pre-existing trailing whitespace in unrelated simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml",
+      "containerRebuild": "DEFERRED"
+    },
+    "liveState": {
+      "gpuSidecar": "healthy, CUDA available, cuGraph 26.08.00, resident:null",
+      "gpuMemoryFreeMiB": 392,
+      "gpuMemoryTotalMiB": 8192,
+      "minimumGraphLoadMiB": 768
+    },
+    "filesystemChanges": [
+      "python/atlas_graph_runtime/graph_projection_manifest.py",
+      "python/atlas_graph_runtime/__init__.py",
+      "python/atlas_rapids_graph_runtime.py",
+      "scripts/atlas/build-current-structural-graph-artifact-v1.py",
+      "python/tests/test_graph_projection_manifest.py",
+      "python/tests/test_graph_projection_artifact_builder.py",
+      "python/tests/test_atlas_rapids_graph_runtime.py",
+      "openspec/changes/parent-atlas-graph-runtime-python-consolidation/tasks.md",
+      "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md"
+    ],
+    "externalStateWrites": { "postgres": false, "qdrant": false, "valkey": false, "neo4j": false, "graphify": false }
+  }
+}

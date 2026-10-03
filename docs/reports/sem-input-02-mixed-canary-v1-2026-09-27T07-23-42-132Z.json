@@ -1,0 +1,154 @@
+{
+  "schema": "atlas.sem-input-02-mixed-canary-receipt.v1",
+  "generatedAt": "2026-09-27T07:23:42.132Z",
+  "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+  "embeddingExecutor": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma"
+  },
+  "sampleSize": 8,
+  "provenCount": 8,
+  "policyDistribution": {
+    "semantic-input-compiler-v1:markdown-first-heading-section": 1,
+    "semantic-input-compiler-v1:ts-js-top-level-declarations": 2,
+    "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar": 5
+  },
+  "results": [
+    {
+      "candidateOrdinal": 0,
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:markdown-first-heading-section",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "HEADING"
+      ],
+      "originalBytes": 20907,
+      "renderedBytes": 39,
+      "selectionRatio": 0.002,
+      "tokenCount": 8,
+      "renderedTextChecksum": "sha256:2a4a7292ae1ae6630f487160c804fba8189fc2ba536ec1fd4f8742536c1d0660",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 51,
+      "sourceRef": "packages/parent-atlas-core/src/policy-orchestrator.ts",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:ts-js-top-level-declarations",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "DECLARATION"
+      ],
+      "originalBytes": 12986,
+      "renderedBytes": 9621,
+      "selectionRatio": 0.741,
+      "tokenCount": 2919,
+      "renderedTextChecksum": "sha256:591da41249e36c8b36c9e54e8a6d13607c356a2a5f5ffe9df17135be04de1417",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 4,
+      "sourceRef": "scripts/agent/dag-reducer.mjs",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:ts-js-top-level-declarations",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "DECLARATION"
+      ],
+      "originalBytes": 3725,
+      "renderedBytes": 2266,
+      "selectionRatio": 0.608,
+      "tokenCount": 719,
+      "renderedTextChecksum": "sha256:e5fc18f16d7029ac943103c5865f963990ddbe79beada6ed9d5be5d9bbc10b1f",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 46,
+      "sourceRef": "docs/atlas/package-boundary-registry.json",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "WHOLE_FILE_FALLBACK"
+      ],
+      "originalBytes": 911,
+      "renderedBytes": 911,
+      "selectionRatio": 1,
+      "tokenCount": 302,
+      "renderedTextChecksum": "sha256:8dbbb7d8db03b5a99c52259eddb1061ef05bec7c73722df468d25e3d163bcba7",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 108,
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/TagInput.svelte",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "WHOLE_FILE_FALLBACK"
+      ],
+      "originalBytes": 3269,
+      "renderedBytes": 3269,
+      "selectionRatio": 1,
+      "tokenCount": 1439,
+      "renderedTextChecksum": "sha256:07abe17cec98c523f1aa93a51b6e338ce88f073a87de27c610742765bdb0665a",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 1,
+      "sourceRef": "scripts/agent/schema-agent-tracking.sql",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "WHOLE_FILE_FALLBACK"
+      ],
+      "originalBytes": 2252,
+      "renderedBytes": 2252,
+      "selectionRatio": 1,
+      "tokenCount": 669,
+      "renderedTextChecksum": "sha256:25557b5b05ee2485877f9c80d2c1a658caa94b2fc7b61746dea065bfea03832d",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 242,
+      "sourceRef": "scripts/unsloth-training/generate_detective_mode_enhanced.py",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "WHOLE_FILE_FALLBACK"
+      ],
+      "originalBytes": 17136,
+      "renderedBytes": 17136,
+      "selectionRatio": 1,
+      "tokenCount": 4594,
+      "renderedTextChecksum": "sha256:188434037fcd25240174704c349471c6fdf7212ee6c65cbd6c3dfe7e110286a7",
+      "vectorDim": 768
+    },
+    {
+      "candidateOrdinal": 522,
+      "sourceRef": "simd-bridge/cpp/build-x64-fallback/CMakeFiles/CMakeConfigureLog.yaml",
+      "status": "SEM_INPUT_COMPILED_AND_EMBEDDED",
+      "selectionPolicyRevision": "semantic-input-compiler-v1:whole-file-fallback-unsupported-grammar",
+      "segmentCount": 1,
+      "segmentKinds": [
+        "WHOLE_FILE_FALLBACK"
+      ],
+      "originalBytes": 25199,
+      "renderedBytes": 25199,
+      "selectionRatio": 1,
+      "tokenCount": 9145,
+      "renderedTextChecksum": "sha256:52b97f9d8f885f8fcc35d1c6dbfefc0496ce3e487bdd57bbcce3974af8de7313",
+      "vectorDim": 768
+    }
+  ],
+  "authority": {
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "status": "SEM_INPUT_02_CANARY_PROVEN"
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseHyperRelationV1 } from '../graph/hyper-relation-v1.js';
-import { retrieveHypergraphContextV1 } from './hypergraph-retrieval-v1.js';
+import { buildHypergraphFusionEvidenceV1, retrieveHypergraphContextV1 } from './hypergraph-retrieval-v1.js';
 
 function relation(input: {
 	relationId: string;
@@ -29,6 +29,19 @@ const budget = {
 };
 
 describe('retrieveHypergraphContextV1', () => {
+	it('projects n-ary evidence to existing candidates without pairwise expansion', () => {
+		const result = retrieveHypergraphContextV1({
+			workspaceRevision: 'workspace:r1', sourceRevision: 'source:r1', queryRevision: 'query:r1', mode: 'hybrid',
+			seeds: [{ canonicalId: 'A', score: 1, source: 'human', evidenceRef: 'seed:A' }],
+			relations: [relation({ relationId: 'R1', relationType: 'USES', participants: [
+				{ canonicalId: 'A', role: 'actor', ordinal: 0 }, { canonicalId: 'B', role: 'target', ordinal: 1 }, { canonicalId: 'C', role: 'context', ordinal: 2 },
+			] })], budget,
+		});
+		const evidence = buildHypergraphFusionEvidenceV1(result, ['A', 'B', 'missing']);
+		expect(evidence.map((item) => item.candidateId)).toEqual(['A', 'B']);
+		expect(evidence[0].entityCount).toBe(3);
+		expect(evidence[0].projectionHash).toBe(result.projectionHash);
+	});
 	it('preserves a ternary relation instead of inventing pairwise facts', () => {
 		const result = retrieveHypergraphContextV1({
 			workspaceRevision: 'workspace:r1',

@@ -19,11 +19,7 @@ import crypto from 'crypto';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
-import {
-  WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
-  buildRipgrepExcludeArgs,
-  exclusionPolicyChecksum,
-} from './lib/whole-codebase-source-exclusions.mjs';
+import { buildRipgrepExcludeArgs, exclusionPolicyChecksum, WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION } from './lib/whole-codebase-source-exclusions.mjs';
 
 const { Pool } = pg;
 
@@ -35,6 +31,19 @@ Object.assign(process.env, ENV);
 const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
 const verbose = args.includes('--verbose');
+
+// This historical writer has no admitted workspace/source revision or exact
+// source-byte digest contract. Keep its inventory useful, but quarantine its
+// mutation path until it is replaced by the canonical packet writer.
+if (!dryRun) {
+  console.error(JSON.stringify({
+    status: 'PACKET_WRITER_QUARANTINED',
+    reason: 'REVISION_QUALIFIED_CANONICAL_PACKET_WRITER_REQUIRED',
+    writesPerformed: false,
+    safeToApply: false,
+  }));
+  process.exit(2);
+}
 
 function sha256(str) {
   return crypto.createHash('sha256').update(str).digest('hex');
@@ -189,8 +198,8 @@ async function upsertPackets(pool, packets) {
 async function generateReports(packets, result) {
   const jsonReport = {
     generated_at: new Date().toISOString(),
-    source_exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
-    source_exclusion_policy_checksum: exclusionPolicyChecksum(),
+    exclusion_policy_revision: WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION,
+    exclusion_policy_checksum: exclusionPolicyChecksum(),
     summary: {
       total_packets: packets.length,
       upserted: result.success,

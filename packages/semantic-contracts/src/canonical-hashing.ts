@@ -13,12 +13,20 @@ import crypto from 'crypto';
  * Guarantees: same JSON value → same hash (round-trip safe via canonical JSON)
  */
 export function canonicalHashJSON(value: unknown): string {
-  const canonical = JSON.stringify(
-    JSON.parse(JSON.stringify(value)),
-    Object.keys(JSON.parse(JSON.stringify(value)) as Record<string, unknown>).sort(),
-    0
-  );
+  const canonical = JSON.stringify(sortJsonObjectKeys(JSON.parse(JSON.stringify(value))));
   return crypto.createHash('sha256').update(canonical, 'utf8').digest('hex');
+}
+
+function sortJsonObjectKeys(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortJsonObjectKeys);
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    return Object.fromEntries(
+      Object.keys(record).sort()
+        .map((key) => [key, sortJsonObjectKeys(record[key])]),
+    );
+  }
+  return value;
 }
 
 /**

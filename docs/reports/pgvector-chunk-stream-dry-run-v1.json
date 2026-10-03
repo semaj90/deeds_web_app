@@ -1,0 +1,50 @@
+{
+  "schema": "atlas.pgvector-chunk-stream-dry-run.v1",
+  "generatedAt": "2026-09-21T01:43:59.214Z",
+  "startedAt": "2026-09-21T01:43:58.729Z",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "writesPerformed": false,
+  "postgresWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false,
+  "graphWrites": false,
+  "stream": {
+    "source": "public.codebase_chunk_index",
+    "semanticRepresentation": "semantic_768",
+    "vectorColumn": "content_embedding",
+    "vectorTransport": "not-read/not-JSON",
+    "pagination": "id > cursor ORDER BY id ASC LIMIT pageSize",
+    "pageSize": 50,
+    "maxPages": 1,
+    "resumableCursor": null,
+    "requestedWorkspaceRevision": null,
+    "backpressure": "bounded-pages; no downstream writer attached"
+  },
+  "eligibility": {
+    "predicate": "source_ref + content_hash + source_revision + workspace_revision + representation_revision; revisions exclude 0/workspace:0",
+    "rawRowsLive": 274465,
+    "sourceRefRows": 272073,
+    "contentHashRows": 274428,
+    "qualifiedSourceRevisionRows": 0,
+    "qualifiedWorkspaceRevisionRows": 0,
+    "representationRevisionRows": 0,
+    "qualifiedRowsLive": 0,
+    "qualifiedRowsSampled": 0,
+    "sampledRowsWithEmbedding": 0,
+    "liveQualifiedRowsWithEmbedding": 0,
+    "currentSourceAuthorityProven": false
+  },
+  "checkpoint": {
+    "schemaVersion": "atlas.pgvector.chunk-stream-checkpoint.v1",
+    "cursorField": "id",
+    "lastDurableCursor": null,
+    "pagesCompleted": 0,
+    "rowsCompleted": 0,
+    "persistedTo": "report-only; no checkpoint store write"
+  },
+  "pages": [],
+  "nextGate": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+  "status": "PGVECTOR_STREAM_BLOCKED_NO_ELIGIBLE_ROWS"
+}

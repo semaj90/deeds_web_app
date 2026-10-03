@@ -16,6 +16,7 @@ function event(overrides = {}) {
   return {
     schema: 'atlas.workflow-action.v1',
     workflowId: 'wf:sv4-proof',
+    runId: 'run:sv4-proof',
     workflowRevision: 7,
     sequence: 12,
     actionId: 'action:validate',

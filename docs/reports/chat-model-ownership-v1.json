@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.chat-model-ownership.v1",
+  "status": "OWNER_PROVEN_WITH_LEGACY_REVIEW",
+  "activeChatOwner": {
+    "provider": "llama-server",
+    "endpoint": "http://127.0.0.1:8090/v1",
+    "modelId": "ornith-1.5-9b",
+    "healthStatus": 200
+  },
+  "ollamaEmbeddingOwner": {
+    "provider": "ollama",
+    "endpoint": "http://127.0.0.1:11434",
+    "role": "EMBEDDINGGEMMA_ONLY"
+  },
+  "legacyChatNames": 1268,
+  "directOllamaChatCallsites": [],
+  "embeddingOllamaReferences": 1277,
+  "activeLlamaReferences": 445,
+  "compatibilityReceipt": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\llama-server-8090-compatibility-v1.json",
+  "modelChecksum": "sha256:a9a8d6d859b540502f57c53ef78a4a608df818061b180022a32b9af46698d5c6",
+  "policy": {
+    "ollamaChatAllowed": false,
+    "llamaServerChatAllowed": true,
+    "legacyNamesAreAuthority": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

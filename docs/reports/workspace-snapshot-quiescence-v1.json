@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.workspace-snapshot-quiescence-report.v1",
+  "status": "BOUNDED_RETRY_HARDENING_PROVEN",
+  "changedFiles": [
+    "scripts/atlas/lib/workspace-snapshot-capture-v1.mts",
+    "scripts/atlas/capture-workspace-source-snapshot-v1.mts",
+    "scripts/atlas/workspace-snapshot-capture-v1.test.mts"
+  ],
+  "behavior": {
+    "maxAttempts": 3,
+    "transientDriftRetried": true,
+    "observationsMerged": false,
+    "continuousDriftBlocked": true,
+    "authorityInferred": false,
+    "writesPerformed": false
+  },
+  "focusedTests": {
+    "command": "npx tsx --test scripts/atlas/workspace-snapshot-capture-v1.test.mts",
+    "passed": 1,
+    "failed": 0
+  },
+  "liveReadback": {
+    "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
+    "snapshotRevision": "sha256:f22cc64278dbd5ccc197c62c2ee5b2ac3345dbdcf24d7eb4ac5c367b0b62ccf9",
+    "captureAttempts": 1,
+    "transientDriftObserved": false,
+    "violations": 0,
+    "sourceCount": 25668,
+    "repositoryCount": 7,
+    "canonicalAuthority": false,
+    "datastoreWritesPerformed": false
+  },
+  "remainingBlockers": [
+    "duplicate equivalent Graphify execution owner",
+    "source-to-packet-to-chunk digest closure",
+    "current semantic cohort and live ACE admission"
+  ],
+  "canonicalAuthority": false,
+  "datastoreWritesPerformed": false
+}

@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.parallel-shard-smoke.v1",
+  "dir": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\current-enriched-index-summary-metadata-v1\\20260925T211940Z",
+  "shards": 5,
+  "concurrency": 8,
+  "status": "PASS",
+  "passed": 5,
+  "failed": 0,
+  "totals": {
+    "rows": 24456,
+    "badJson": 0,
+    "missingRequired": 0,
+    "duplicateKeysWithinShard": 0,
+    "summaries": 0,
+    "summariesClean": 0
+  },
+  "elapsedMs": 258,
+  "perShard": [
+    {
+      "file": "enriched-index-00001.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "enriched-index-00002.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "enriched-index-00003.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "enriched-index-00004.ndjson",
+      "rows": 5000,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    },
+    {
+      "file": "enriched-index-00005.ndjson",
+      "rows": 4456,
+      "badJson": 0,
+      "missingRequired": 0,
+      "duplicateKeys": 0,
+      "summaries": 0,
+      "summariesClean": 0,
+      "ok": true,
+      "reason": null
+    }
+  ],
+  "databaseWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0
+}

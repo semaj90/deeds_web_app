@@ -798,7 +798,7 @@ export class HyperRagFusionService {
         query,
         mode,
         intent: profile,
-        model: ENV.GEMMA4_MODEL,
+        model: getReasoningModelId('legal'),
         metadata: {
           routing: budgeted.routingExplanation,
           fallbackCount: budgeted.routingExplanation?.fallbacks.length || 0,
@@ -872,7 +872,7 @@ INSTRUCTIONS:
           { role: 'system', content: 'You are an expert legal retrieval synthesizer.' },
           { role: 'user', content: prompt },
         ],
-        ENV.GEMMA4_MODEL ?? reasoningModel,
+        reasoningModel,
         { temperature: 0.1, maxTokens: 384 }
       );
 

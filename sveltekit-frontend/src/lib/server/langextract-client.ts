@@ -292,8 +292,11 @@ export async function extractDocument(
     extractEntities?: boolean;
     extractStructure?: boolean;
     language?: string;
+    groundedExtractionRequired?: boolean;
   }
 ): Promise<LangExtractResponse | null> {
+  if (options?.groundedExtractionRequired !== true) return null;
+
   if (ENV.LANGEXTRACT_NATIVE === 'true') {
     try {
       const { extractDocumentNative } = await import('$lib/server/langextract/native.js');
@@ -366,8 +369,10 @@ export async function extractDocument(
  */
 export async function extractFile(
   file: File | Blob,
-  options?: { documentType?: string; extractEntities?: boolean }
+  options?: { documentType?: string; extractEntities?: boolean; groundedExtractionRequired?: boolean }
 ): Promise<LangExtractResponse | null> {
+  if (options?.groundedExtractionRequired !== true) return null;
+
   if (!ENV.LANGEXTRACT_ENABLED) return null;
 
   const healthy = await checkHealth();

@@ -16,12 +16,13 @@
  *
  * Usage:
  *   node packet-rpc-4d-manifold.mjs --query "auth sessions" --batch 500
- *   node packet-rpc-4d-manifold.mjs --tricube --coords "10,10,2,0.5"
+ *   node packet-rpc-4d-manifold.mjs --tricube --coords "10,10,2,0.5" (experimental, noncanonical)
  *   node packet-rpc-4d-manifold.mjs --log-axes (full 4D trace)
  */
 
 import fetch from 'node-fetch';
 import fs from 'fs';
+import { llamaChat } from '../../../scripts/atlas/lib/llama-inference.mjs';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const NEO4J_URL = process.env.NEO4J_URL || 'http://localhost:7474';
@@ -37,8 +38,8 @@ class Manifold4D {
     this.w = w; // authority/PageRank (0-1)
   }
 
-  // Tricubic interpolation kernel (smooth neighborhood search)
-  tricubic(dist) {
+  // Scalar cubic weight only; this is not tricubic lattice interpolation.
+  cubicKernelWeightExperimental(dist) {
     const d = Math.abs(dist);
     if (d < 1) return (2/3) - d*d + 0.5*d*d*d;
     if (d < 2) return (4/6) - 2*d + d*d - (1/6)*d*d*d;
@@ -259,17 +260,7 @@ Provide:
 4. Next hops`;
 
     try {
-      const genRes = await fetch(`${OLLAMA_URL}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          prompt,
-          stream: false,
-        }),
-      });
-
-      const { response } = await genRes.json();
+      const response = await llamaChat(prompt, { maxTokens: 512 }); // llama-server (Ornith 1.5); Ollama is embeddings-only
 
       results.push({
         batch: batchNum,
@@ -291,9 +282,10 @@ Provide:
   return results;
 }
 
-// 4D Tricubic search (neighborhood query)
-function tricubicSearch(packets, centerCoords, radius = 0.3) {
-  console.log(`\n[TRICUBE] Tricubic neighborhood search`);
+// Experimental Manhattan-radius neighborhood with a scalar cubic weight.
+// This is not tricubic interpolation and is not a canonical retrieval path.
+function cubicKernelNeighborhoodExperimental(packets, centerCoords, radius = 0.3) {
+  console.log(`\n[EXPERIMENTAL] Cubic-kernel neighborhood (noncanonical)`);
   console.log(`  Center: (${centerCoords.x.toFixed(2)}, ${centerCoords.y.toFixed(2)}, ${centerCoords.z.toFixed(2)}, ${centerCoords.w.toFixed(2)})`);
   console.log(`  Radius: ${radius}`);
 
@@ -303,18 +295,18 @@ function tricubicSearch(packets, centerCoords, radius = 0.3) {
     const dist = packet.manifold.distanceManhattan(centerCoords);
 
     if (dist <= radius) {
-      const weight = new Manifold4D().tricubic(dist);
+      const weight = new Manifold4D().cubicKernelWeightExperimental(dist);
       neighbors.push({
         packet: packet,
         distance: dist,
-        tricubic_weight: weight,
+        experimental_cubic_kernel_weight: weight,
       });
     }
   }
 
   neighbors.sort((a, b) => a.distance - b.distance);
 
-  console.log(`  ✓ Found ${neighbors.length} neighbors in tricubic kernel`);
+  console.log(`  ✓ Found ${neighbors.length} neighbors in experimental cubic kernel`);
   console.log(`    Distances: ${neighbors.slice(0, 5).map(n => n.distance.toFixed(3)).join(', ')}`);
 
   return neighbors;
@@ -364,7 +356,7 @@ async function main() {
   console.log(`   Query: "${queryArg}"`);
   console.log(`   Batch size: ${batchSizeArg}`);
   console.log(`   Log axes: ${logAxes}`);
-  console.log(`   Tricube search: ${tricubeArg}\n`);
+  console.log(`   Experimental cubic-kernel neighborhood: ${tricubeArg} (noncanonical)\n`);
 
   try {
     // Phase 1: Retrieve (X axis)
@@ -382,10 +374,10 @@ async function main() {
     // Phase 5: Synthesize (Gemma4 tool calls)
     const synthesisResults = await synthesizeWithGemma4(packets, batchSizeArg);
 
-    // Optional: Tricubic search
+    // Optional experimental neighborhood only; never a canonical retrieval vote.
     if (tricubeArg) {
       const center = new Manifold4D(0.7, 0.6, 0.5, 0.4);
-      const neighbors = tricubicSearch(packets, center, 0.5);
+      const neighbors = cubicKernelNeighborhoodExperimental(packets, center, 0.5);
     }
 
     // Log full trace if requested

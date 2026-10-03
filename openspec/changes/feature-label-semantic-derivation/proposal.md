@@ -76,12 +76,15 @@ i.e. `feature_id`/`feature_label` (one) : `title_id` (one or more) : source file
 the *derived* label for OpenSpec draft titles once available, while continuing to carry
 `title_id`/`packet_key` for lineage — never the raw basename.
 
-## Separate, already-flagged concern (not this proposal's scope)
+## Separate naming concern — historical snapshot reconciled 2026-09-24
 
-The previous session's change to `graphify:daily:dry` (making it run `graphify:materialize:apply`
-+ phase8 steps 1–3 for real) made that script name misleading — `:dry` now performs canonical
-writes. That naming/safety fix is tracked separately; do not conflate it with this proposal.
-See `tasks.md` Phase 0 for the one-line follow-up if/when it's picked up.
+An earlier snapshot reported that `graphify:daily:dry` invoked canonical apply paths. A fresh,
+read-only inspection of the current `sveltekit-frontend/package.json` definitions found that this
+is no longer true: materialization has no `--apply`, cold processing receives `--dry-run`, phase8
+fanout receives `--dry-run` without `--apply-through`, and Qdrant feature-map sync receives
+`--dry-run`. The command was not executed. It may still emit local progress/report artifacts, so
+this reconciliation establishes absence of the previously alleged canonical apply paths, not
+filesystem-pure behavior. See the dated evidence in `tasks.md` Phase 0.
 
 ## Files this proposal will touch (Phase 2+, not yet edited)
 

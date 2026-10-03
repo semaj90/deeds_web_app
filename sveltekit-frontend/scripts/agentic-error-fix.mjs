@@ -242,7 +242,7 @@ async function main() {
   // ── Agent call ─────────────────────────────────────────────────────────────
   const generation = trace?.generation({
     name: 'agent-call',
-    model: 'gemma4-rotorquant:latest',
+    model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
     input: { prompt: prompt.slice(0, 2000) },
     metadata: { agentUrl, preferredBackend, errorHash, memoryHitUsed: !!memoryHit },
   });

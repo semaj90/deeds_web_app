@@ -52,7 +52,7 @@ const COUCH_URL         = process.env.COUCH_URL         ?? 'http://127.0.0.1:598
 const TURBOVEC_SIDECAR  = process.env.TURBOVEC_SIDECAR  ?? 'http://127.0.0.1:8792';
 const BITFROST_URL      = process.env.BITFROST_URL      ?? process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090';
 const EMBED_MODEL       = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? 'gemma4-rotorquant:latest';
+const BITFROST_MODEL     = process.env.BITFROST_MODEL    ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const AUTHORITY_SNAPSHOT_PATH = process.env.AUTHORITY_SNAPSHOT_PATH
   ?? path.join(ROOT, 'logs', 'authority', 'latest.json');
 

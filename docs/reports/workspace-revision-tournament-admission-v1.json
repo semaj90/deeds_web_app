@@ -1,16 +1,16 @@
 {
   "schema": "atlas.workspace-revision-tournament-admission.v1",
-  "generatedAt": "2026-09-11T14:38:21.664Z",
+  "generatedAt": "2026-09-15T01:04:38.272Z",
   "mode": "EXPLICIT_BOUNDED_ADMISSION_RECEIPT",
   "status": "WORKSPACE_REVISION_TOURNAMENT_ADMITTED",
   "proofLevel": "BOUNDED_LIVE_PROVEN",
   "authority": true,
-  "workspaceRevision": "sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881",
-  "snapshotRevision": "sha256:48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8",
-  "sourceCount": 25291,
-  "sourceSelectionChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
-  "snapshotMembershipChecksum": "sha256:52244f10f2087277bcff0e73c01ba0e790d82a7064ac7b1825301f974ff1c795",
-  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\48e1dbb326a4e249dc550cf1df06da8ec82ca4a837dd93eca114e4bafb2747e8.json",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "sourceCount": 25542,
+  "sourceSelectionChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "snapshotMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
+  "manifestPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-source-snapshots\\6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
   "approval": {
     "confirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
     "scope": "TOURNAMENT_SOURCE_AUTHORITY_ONLY"
@@ -21,6 +21,6 @@
   "training": false,
   "writesPerformed": false,
   "datastoreWritesPerformed": false,
-  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-source-authority-v1.json",
+  "preflightPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\workspace-revision-tournament-source-authority-recheck-v4.json",
   "nextGate": "GRAPHIFY-BOUNDED-TOURNAMENT-CANARY-01"
 }

@@ -17,7 +17,9 @@ const paths = {
   astGrep: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'analysis', 'ast-grep-extractor.ts'),
   proof: path.join(root, 'scripts', 'atlas', 'prove-ast-sidecar.mjs'),
   integrationProof: path.join(root, 'scripts', 'atlas', 'prove-structural-intelligence-integration.mjs'),
+  integrationReceipt: path.join(root, 'docs', 'reports', 'structural-intelligence-integration-proof.json'),
   dockerfile: path.join(root, 'docker', 'miniforge-nlp-sidecar', 'Dockerfile'),
+  oakWrapper: path.join(root, 'python', 'miniforge_nlp_sidecar_oak.py'),
   launcher: path.join(root, 'scripts', 'launch-miniforge-nlp-sidecar.ps1'),
 };
 
@@ -43,7 +45,7 @@ for (const [name, file] of Object.entries(paths)) {
   check(`${name.toUpperCase()}_EXISTS`, await exists(file), path.relative(root, file), 'presence');
 }
 
-const [sidecarV2, helper, client, normalizer, materializer, graphifyFabric, astGrep, proof, integrationProof, dockerfile, launcher] = await Promise.all([
+const [sidecarV2, helper, client, normalizer, materializer, graphifyFabric, astGrep, proof, integrationProof, integrationReceipt, dockerfile, oakWrapper, launcher] = await Promise.all([
   read(paths.sidecarV2),
   read(paths.helper),
   read(paths.client),
@@ -53,9 +55,18 @@ const [sidecarV2, helper, client, normalizer, materializer, graphifyFabric, astG
   read(paths.astGrep),
   read(paths.proof),
   read(paths.integrationProof),
+  read(paths.integrationReceipt),
   read(paths.dockerfile),
+  read(paths.oakWrapper),
   read(paths.launcher),
 ]);
+
+let liveIntegrationReceipt = null;
+try {
+  liveIntegrationReceipt = JSON.parse(integrationReceipt);
+} catch {
+  liveIntegrationReceipt = null;
+}
 
 check('HELPER_NORMALIZES_CHUNKER_IDS', helper.includes('normalize_treesitter_chunker_chunk'), 'native node_id/file_id/symbol_id/chunk_id helper exists');
 check('HELPER_NORMALIZES_LANGEXTRACT_GROUNDING', helper.includes('normalize_langextract_extraction'), 'char_interval/alignment_status helper exists');
@@ -142,7 +153,13 @@ check(
   'provenance-v2 /analyze exposes native LangExtract grounding metadata',
   'live',
 );
-check('DOCKER_LAUNCHES_PROVENANCE_V2', dockerfile.includes('miniforge_nlp_sidecar_v2.py'), 'Docker 8095 entrypoint selects provenance-v2 facade', 'live');
+check(
+  'DOCKER_LAUNCHES_PROVENANCE_V2',
+  (dockerfile.includes('miniforge_nlp_sidecar_v2.py')
+    || (dockerfile.includes('miniforge_nlp_sidecar_oak.py') && oakWrapper.includes('from miniforge_nlp_sidecar_v2 import app'))),
+  'Docker 8095 entrypoint selects provenance-v2 directly or through the OAK wrapper',
+  'live',
+);
 check(
   'LOCAL_LAUNCHER_DEFAULTS_TO_PROVENANCE_V2',
   launcher.includes("'miniforge_nlp_sidecar_v2.py'") && launcher.includes('UseLegacySidecar'),
@@ -153,18 +170,25 @@ check(
 const presencePass = checks.filter((item) => item.category === 'presence').every((item) => item.ok);
 const scaffoldPass = checks.filter((item) => item.category === 'scaffold').every((item) => item.ok);
 const liveWired = checks.filter((item) => item.category === 'live').every((item) => item.ok);
+const liveProofProven = liveIntegrationReceipt?.status === 'PROVEN_WITH_LIVE_8095'
+  && liveIntegrationReceipt.steps?.some((step) => step.id === 'LIVE_8095_PROVENANCE_PROOF' && step.status === 'PASS');
 
 const receipt = {
   schema: 'atlas.structural-provenance-wiring-audit.v4',
-  status: presencePass && scaffoldPass && liveWired
-    ? 'WIRED_UNPROVEN_RUNTIME'
+  status: presencePass && scaffoldPass && liveWired && liveProofProven
+    ? 'PROVEN_LIVE_RUNTIME_NONCANONICAL'
+    : presencePass && scaffoldPass && liveWired
+      ? 'WIRED_UNPROVEN_RUNTIME'
     : presencePass && scaffoldPass
       ? 'SCAFFOLDED_LIVE_WIRING_PENDING'
       : 'INCOMPLETE',
   presence_ready: presencePass,
   scaffold_ready: scaffoldPass,
   live_sidecar_wired: liveWired,
-  runtime_proven: false,
+  runtime_proven: Boolean(liveProofProven),
+  live_integration_receipt: liveIntegrationReceipt
+    ? 'docs/reports/structural-intelligence-integration-proof.json'
+    : null,
   red_gates: checks.filter((item) => !item.ok).map((item) => item.id),
   next_runtime_gate: 'Run scripts/atlas/prove-structural-intelligence-integration.mjs; set ATLAS_PROVE_LIVE_SIDECAR=1 to include the live 8095 proof.',
   checks,

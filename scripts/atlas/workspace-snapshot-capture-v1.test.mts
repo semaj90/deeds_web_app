@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { observeSnapshot, sealSnapshot, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mjs';
+import { captureStableSnapshot, observeSnapshot, sealSnapshot, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mjs';
 
 test('dirty nested bytes alter snapshot identity; replay stays stable; drift blocks capture', () => {
   const root = mkdtempSync(path.join(tmpdir(), 'atlas-snapshot-proof-'));
@@ -16,6 +16,9 @@ test('dirty nested bytes alter snapshot identity; replay stays stable; drift blo
     git('-c', 'user.name=Snapshot Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'fixture');
   }
   init(root); const child = path.join(root, 'nested'); init(child);
+  const stable = captureStableSnapshot(root, 'fixture-workspace', { maxAttempts: 2 });
+  assert.equal(stable.captureAttempts, 1);
+  assert.equal(stable.transientDriftObserved, false);
   const first = observeSnapshot(root, 'fixture-workspace');
   assert.equal(first.repositories.length, 2);
   assert.equal(first.sources.length, 2);

@@ -35,6 +35,7 @@ import path from 'node:path';
 import { execFile, execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import { parseQualifiedKarpathyScore, hasQualifiedTraceEnvelope } from './lib/qualified-karpathy-evidence-v1.mjs';
 
 dotenv.config({ path: './sveltekit-frontend/.env' });
 
@@ -89,16 +90,23 @@ function queryHash(text) {
 // ── Karpathy blend scoring formula ────────────────────────────────────────────
 // finalScore = 0.45·cosine + 0.20·pagerank + 0.15·topology + 0.10·hotness + 0.10·freshness
 // +0.15 bonus if rgPathHit (implementation query) or graphCommunityHit (architecture query)
-function blendScore({ cosine, pagerank = 0, topology = 0, hotness = 0, freshness = 0.5, rgBonus = false, graphBonus = false }) {
-  let base = 0.45 * cosine + 0.20 * pagerank + 0.15 * topology + 0.10 * hotness + 0.10 * freshness;
+function blendScore({ cosine, pagerank = null, topology = null, hotness = null, freshness = null, rgBonus = false, graphBonus = false }) {
+  let base = 0.45 * cosine;
+  if (Number.isFinite(pagerank)) base += 0.20 * pagerank;
+  if (Number.isFinite(topology)) base += 0.15 * topology;
+  if (Number.isFinite(hotness)) base += 0.10 * hotness;
+  if (Number.isFinite(freshness)) base += 0.10 * freshness;
   if (rgBonus)    base += 0.15;
   if (graphBonus) base += 0.15;
   return Math.min(base, 1.0);
 }
 
+
 // ── 4D topology score from payload metadata ───────────────────────────────────
 function topologyScore(payload) {
-  if (!payload) return 0;
+  if (!payload) return null;
+  const graphRevision = payload.graph_revision ?? payload.graphRevision;
+  if (!graphRevision) return null;
   const text   = (payload.text ?? payload.content ?? '');
   const tags   = (payload.tags ?? []);
   const x      = 0;           // cosine handled separately
@@ -343,7 +351,7 @@ async function main() {
         console.log(`  chunks     : ${hit.chunks?.length}`);
         console.log(`  karpathyRev: ${hit.karpathyRev}`);
       }
-      if (hit.confidence >= FAST_CONFIDENCE_GATE) {
+      if (hit.confidence >= FAST_CONFIDENCE_GATE && hasQualifiedTraceEnvelope(hit)) {
         hit.latencyMs = Math.round(performance.now() - t0);
         hit.cacheHit  = true;
         if (JSON_OUT) {
@@ -353,6 +361,9 @@ async function main() {
         }
         await redis.quit().catch(() => {});
         return;
+      }
+      if (!hasQualifiedTraceEnvelope(hit) && !JSON_OUT) {
+        console.log('  (cache envelope lacks revision-qualified evidence — bypassing fast path)');
       }
       if (!JSON_OUT) console.log(`  (confidence below ${FAST_CONFIDENCE_GATE} — escalating to hybrid)`);
     }
@@ -391,8 +402,12 @@ async function main() {
     const prRaw = await redis.hgetall('gpu:karpathy:scores').catch(() => null);
     if (prRaw) karpathyMap = prRaw;
     const summary = await redis.hgetall('gpu:karpathy:summary').catch(() => null);
-    if (summary?.rev) karpathyRev = summary.rev;
-    else if (summary?.run_at) karpathyRev = summary.run_at.slice(0, 10);
+    // `rev`/`run_at` from legacy summaries are diagnostic labels, not lineage.
+    // Do not promote a timestamp or unqualified revision into the trace result.
+    const summaryRevision = summary?.workspaceRevision;
+    if (/^sha256:[0-9a-f]{64}$/i.test(String(summaryRevision ?? ''))) {
+      karpathyRev = summaryRevision;
+    }
   }
 
   // ── Stage 4: Score codebase hits with full blend formula ─────────────────
@@ -405,15 +420,16 @@ async function main() {
     }
     const sourceRef = (r.payload?.source_path ?? r.payload?.file_path ?? r.payload?.chunk_id ?? String(r.id));
     const prRaw     = karpathyMap[sourceRef] ?? karpathyMap[sourceRef.replace(/\\/g, '/')];
-    const pr        = prRaw ? parseFloat(JSON.parse(prRaw).blend ?? JSON.parse(prRaw)) : 0;
+    const karpathy  = parseQualifiedKarpathyScore(prRaw);
+    const pr        = karpathy?.score ?? 0;
     const topo      = topologyScore(r.payload);
-    const hotness   = r.payload?.hot_cluster ? 1.0 : 0.0;
+    const hotness   = r.payload?.hot_cluster && (r.payload?.graph_revision ?? r.payload?.graphRevision) ? 1.0 : null;
     const blend     = blendScore({
       cosine:    r.score,
       pagerank:  pr,
       topology:  topo,
       hotness,
-      freshness: 0.5,
+      freshness: null,
       rgBonus:   isImplQuery,
       graphBonus: isArchQuery,
     });
@@ -422,7 +438,7 @@ async function main() {
       source_ref: sourceRef,
       text:       ((r.payload?.text ?? r.payload?.content ?? '') + '').slice(0, 200),
       score:      parseFloat(blend.toFixed(4)),
-      signals:    { cosine: parseFloat(r.score.toFixed(3)), pagerank: parseFloat(pr.toFixed(3)), topology: parseFloat(topo.toFixed(3)), hotness },
+      signals:    { cosine: parseFloat(r.score.toFixed(3)), pagerank: karpathy ? parseFloat(pr.toFixed(3)) : null, topology: Number.isFinite(topo) ? parseFloat(topo.toFixed(3)) : null, hotness, karpathyQualified: Boolean(karpathy) },
       collection: PRIMARY_COLLECTION,
     };
   }).sort((a, b) => b.score - a.score);
@@ -456,14 +472,15 @@ async function main() {
     const fusedScored = fused.slice(0, 8).map(({ rrf, hits, payload, baseScore }) => {
       const sourceRef = (payload?.source_path ?? payload?.file_path ?? payload?.chunk_id ?? 'unknown');
       const prRaw     = karpathyMap[sourceRef] ?? karpathyMap[sourceRef.replace(/\\/g, '/')];
-      const pr        = prRaw ? parseFloat(JSON.parse(prRaw).blend ?? JSON.parse(prRaw)) : 0;
+      const karpathy  = parseQualifiedKarpathyScore(prRaw);
+      const pr        = karpathy?.score ?? 0;
       const topo      = topologyScore(payload);
       const blend     = blendScore({
         cosine:     baseScore ?? 0,
         pagerank:   pr,
         topology:   topo,
-        hotness:    payload?.hot_cluster ? 1.0 : 0.0,
-        freshness:  0.5,
+        hotness:    payload?.hot_cluster && (payload?.graph_revision ?? payload?.graphRevision) ? 1.0 : null,
+        freshness:  null,
         rgBonus:    isImplQuery,
         graphBonus: isArchQuery,
       });
@@ -472,7 +489,7 @@ async function main() {
         source_ref: sourceRef,
         text:       ((payload?.text ?? payload?.content ?? '') + '').slice(0, 200),
         score:      parseFloat(blend.toFixed(4)),
-        signals:    { cosine: parseFloat((baseScore ?? 0).toFixed(3)), pagerank: parseFloat(pr.toFixed(3)), topology: parseFloat(topo.toFixed(3)), rrf: parseFloat(rrf.toFixed(4)), hits },
+        signals:    { cosine: parseFloat((baseScore ?? 0).toFixed(3)), pagerank: karpathy ? parseFloat(pr.toFixed(3)) : null, topology: Number.isFinite(topo) ? parseFloat(topo.toFixed(3)) : null, rrf: parseFloat(rrf.toFixed(4)), hits, karpathyQualified: Boolean(karpathy) },
         collection: PRIMARY_COLLECTION,
       };
     }).sort((a, b) => b.score - a.score);

@@ -1,41 +1,125 @@
 {
   "schema": "atlas.doc-23-ast-grep-repair-planner-proof.v1",
   "gate": "DOC-23",
-  "status": "DOC_23_AST_GREP_REPAIR_FIXTURE_PROVEN",
+  "status": "DOC_23_AST_GREP_LIVE_FIXTURE_PREVIEW_PROVEN",
+  "proofMode": "SYNTHETIC_FIXTURE_ONLY",
+  "repositoryRevision": "032757da2859e2d5e8a5e22a6964a9fecd3bf272",
+  "worktreeDirty": true,
+  "astGrepVersion": "ast-grep 0.45.3",
   "structuralMatch": {
     "ruleId": "replace-legacy-value",
     "language": "typescript",
-    "startByte": 14,
-    "endByte": 22,
+    "startByte": 22,
+    "endByte": 30,
     "matchedText": "oldValue",
-    "evidenceRef": "ast-grep:replace-legacy-value:1"
+    "evidenceRef": "ast-grep:replace-legacy-value:33ffb10a1a0833d0",
+    "wholeNodeRange": {
+      "start": 0,
+      "end": 32
+    },
+    "metavariableRange": {
+      "start": 21,
+      "end": 31
+    }
   },
+  "diffPreviewChecksum": "sha256:ea96f63e1734278a314cfff6d87d38bbd3463dab01b2b654c4b426857d5e08cf",
   "proposal": {
     "schema": "atlas.patch-proposal.v1",
     "sourceRef": "src/example.ts",
-    "baseSourceRevision": "sha256:e2e846d0811ba3ca2ff75fcc41f163648e3e136dc4bc32c073b9e10543c77c61",
+    "baseSourceRevision": "sha256:3adaa8790114d5ab0c840315146872d8d8956ff3b244ffddb1136d44b3f509bb",
     "matches": [
       {
         "ruleId": "replace-legacy-value",
         "language": "typescript",
-        "startByte": 14,
-        "endByte": 22,
+        "startByte": 22,
+        "endByte": 30,
         "matchedText": "oldValue",
-        "evidenceRef": "ast-grep:replace-legacy-value:1"
+        "evidenceRef": "ast-grep:replace-legacy-value:33ffb10a1a0833d0",
+        "wholeNodeRange": {
+          "start": 0,
+          "end": 32
+        },
+        "metavariableRange": {
+          "start": 21,
+          "end": 31
+        }
       }
     ],
-    "replacementText": "newValue",
+    "replacementText": "export const value = \"newValue\";",
     "evidenceRefs": [
-      "ast-grep:replace-legacy-value:1"
+      "ast-grep:replace-legacy-value:33ffb10a1a0833d0"
     ],
     "canonicalAuthority": false,
     "mutationAuthorized": false
   },
-  "checks": {
-    "exactUtf8Match": true,
-    "sourceRevisionBound": true,
-    "mutationAuthorized": false
+  "checks": [
+    {
+      "name": "ast-grep-structural-search",
+      "argv": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\node_modules\\@ast-grep\\cli\\ast-grep.exe",
+        "run",
+        "--pattern",
+        "export const value = $A",
+        "--lang",
+        "ts",
+        "--json",
+        "C:\\Users\\james\\AppData\\Local\\Temp\\atlas-doc23-astgrep-CQw4JI\\example.ts"
+      ],
+      "status": "PASS",
+      "exitCode": 0,
+      "stdoutChecksum": "sha256:462fdd853bb77b74bff84f7d9f10ead9c7b5f640e06b40d65473c3b58780e51c",
+      "stderrChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "exact-metavariable-byte-span",
+      "status": "PASS",
+      "exitCode": 0,
+      "matchCount": 1
+    },
+    {
+      "name": "ast-grep-rewrite-diff-preview",
+      "argv": [
+        "C:\\Users\\james\\Videos\\deeds-web-app\\node_modules\\@ast-grep\\cli\\ast-grep.exe",
+        "run",
+        "--pattern",
+        "export const value = $A",
+        "--rewrite",
+        "export const value = \"newValue\";",
+        "--lang",
+        "ts",
+        "C:\\Users\\james\\AppData\\Local\\Temp\\atlas-doc23-astgrep-CQw4JI\\example.ts"
+      ],
+      "status": "PASS",
+      "exitCode": 0,
+      "stdoutChecksum": "sha256:ea96f63e1734278a314cfff6d87d38bbd3463dab01b2b654c4b426857d5e08cf",
+      "stderrChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diff-preview-contains-before-and-after",
+      "status": "PASS",
+      "exitCode": 0,
+      "previewChecksum": "sha256:ea96f63e1734278a314cfff6d87d38bbd3463dab01b2b654c4b426857d5e08cf"
+    },
+    {
+      "name": "ast-grep-did-not-write-fixture",
+      "status": "PASS",
+      "exitCode": 0
+    },
+    {
+      "name": "doc24-proposal-byte-and-digest-parity",
+      "status": "PASS",
+      "exitCode": 0
+    }
+  ],
+  "isolatedWorkspace": {
+    "created": true,
+    "cleanedAfterRun": true,
+    "persistentSourceModified": false
   },
   "writesPerformed": false,
-  "nextGate": "DOC_24_PATCH_PROPOSAL_AND_VALIDATION_RECEIPT"
+  "ephemeralWritesPerformed": true,
+  "persistentWritesPerformed": false,
+  "canonicalAuthority": false,
+  "mutationAuthorized": false,
+  "nextGate": "DOC_24_TARGET_SOURCE_REVIEW_AND_EXPLICIT_MUTATION_AUTHORIZATION"
 }

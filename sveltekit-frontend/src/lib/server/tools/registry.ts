@@ -9,6 +9,7 @@
  */
 
 import { z } from 'zod';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 // ============================================================================
 // Generated Types from JSON Schemas
@@ -53,7 +54,7 @@ export const LangExtractBatchRequestSchema = z.object({
     relations: z.array(z.enum(['imports', 'extends', 'depends_on', 'deprecated_by', 'introduced_in', 'exports', 'implements']))
   }),
   options: z.object({
-	model: z.string().default('gemma4-rotorquant:latest'),
+	model: z.string().default(SERVER_CHAT_MODEL),
     temperature: z.number().min(0).max(2).default(0.1),
     timeout_ms: z.number().min(1000).max(300000).default(30000)
   }).optional()
@@ -76,7 +77,7 @@ export const ClusterTagRequestSchema = z.object({
   }).optional(),
   tag_config: z.object({
 	generate_summaries: z.boolean().default(true),
-    model: z.string().default('gemma4-rotorquant:latest'),
+    model: z.string().default(SERVER_CHAT_MODEL),
     update_qdrant: z.boolean().default(true)
   }).optional()
 });

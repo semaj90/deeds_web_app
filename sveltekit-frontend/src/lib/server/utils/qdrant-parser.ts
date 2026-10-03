@@ -9,7 +9,7 @@ import { fastJsonParse, isSimdJsonAvailable } from '../gpu/simdjson-bridge.js';
 export interface QdrantParserTrace {
   parser: 'simdjson' | 'json.parse';
   responseBytes: number;
-  qdrantOperation: 'search' | 'scroll' | 'upsert' | 'collection' | 'unknown';
+  qdrantOperation: 'query' | 'search' | 'scroll' | 'upsert' | 'collection' | 'unknown';
 }
 
 export async function parseQdrantJsonResponse<T = any>(

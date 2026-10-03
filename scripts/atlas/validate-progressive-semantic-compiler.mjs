@@ -135,7 +135,7 @@ async function main() {
       { key: 'domain_class', kind: 'text', candidates: ['domain_class', 'domainClass'] },
       { key: 'summary', kind: 'text', candidates: ['summary'] },
       { key: 'qdrant_point_id', kind: 'text', candidates: ['qdrant_point_id', 'qdrantPointId'] },
-      { key: 'embedding', kind: 'value', candidates: ['embedding', 'content_embedding_384'] },
+      { key: 'embedding', kind: 'value', candidates: ['embedding'] }, // 768 only; legacy content_embedding_384 must not count as embedded (DIM-01a)
       { key: 'latent_64', kind: 'value', candidates: ['latent_64', 'latent64'] },
       { key: 'som_20x20', kind: 'value', candidates: ['som_row', 'som_col'] },
     ]);

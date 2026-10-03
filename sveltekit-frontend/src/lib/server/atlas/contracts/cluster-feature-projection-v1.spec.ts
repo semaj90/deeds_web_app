@@ -78,4 +78,11 @@ describe('ORF-4: ClusterFeatureProjectionV1', () => {
     expect(projection.evidenceAuthority).toBe(false);
     expect(projection.kmeans.clusterId).toBeNull();
   });
+
+  it('keeps a null receipt distinct from missing packet/source identity', () => {
+    const projection = buildClusterFeatureProjectionV1({ ...BASE_INPUT, sourceVersionReceiptId: null });
+    expect(projection.sourceVersionReceiptId).toBeNull();
+    expect(() => buildClusterFeatureProjectionV1({ ...BASE_INPUT, packetKey: '' })).toThrow();
+    expect(() => buildClusterFeatureProjectionV1({ ...BASE_INPUT, sourceRef: '' })).toThrow();
+  });
 });

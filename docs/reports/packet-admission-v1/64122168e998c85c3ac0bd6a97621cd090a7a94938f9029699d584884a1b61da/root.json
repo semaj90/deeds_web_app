@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.packet-admission-manifest.v1",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "packetKeyRecipe": "UNDECIDED_PACKET_ADMISSION_OWNER_DECISION_REQUIRED",
+  "writesAuthorized": false,
+  "entryCount": 7259,
+  "shards": [
+    {
+      "name": "shard-0000.json",
+      "sha256": "131d2e70698aaeac291849ce3fe0fa2717eef6c9669d3ddeacd17a24f2b150ec",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0001.json",
+      "sha256": "f63953eaac4fc0fd7ed9fbc03f0bcdd7c6728c09d14b774d5c81e8103c37b78d",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0002.json",
+      "sha256": "f97a80c052340f2c51d40e23073102246dbe68553a0b0144b6a32c6513a774e7",
+      "entryCount": 2000
+    },
+    {
+      "name": "shard-0003.json",
+      "sha256": "17e062dc030e2a4e5a6dfa217a50718b8001b75fa5e4b71bbb3570ebabbba1cf",
+      "entryCount": 1259
+    }
+  ],
+  "accounting": {
+    "classes": {
+      "ADMISSION_READY": 7259,
+      "WORKSPACE_BINDING_MISSING": 0,
+      "REVISION_MISMATCH": 0,
+      "SOURCE_BYTES_CHANGED": 990,
+      "IDENTITY_COLLISION": 0,
+      "PACKET_NOW_EXISTS": 0,
+      "OUT_OF_SCOPE": 1086
+    },
+    "priorGapSize": 0
+  }
+}

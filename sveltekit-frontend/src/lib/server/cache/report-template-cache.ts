@@ -8,6 +8,7 @@
  * - Template rendering results (15 minutes TTL)
  */
 
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { ensureRedis, redisPool } from '$lib/server/redis.js';
 import { REPORT_TEMPLATES, getTemplate, type ReportTemplate } from '$lib/data/report-templates.js';
 import type { Redis } from 'ioredis';
@@ -154,7 +155,7 @@ export async function cacheAIContent(
 	templateType: string,
 	caseId: string,
 	content: string,
-	model: string = 'gemma4-rotorquant:latest',
+	model: string = SERVER_CHAT_MODEL,
 	tokenCount?: number
 ): Promise<void> {
 	const redis = redisPool.getConnection();

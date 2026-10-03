@@ -1,0 +1,29 @@
+{
+  "schema": "atlas.wfu-studio-progress-native.v1",
+  "generatedAt": "2026-09-23T19:54:56Z",
+  "gate": "WFU-12_NATIVE_PROGRESS_SEMANTICS",
+  "result": "NATIVE_PROGRESS_LABEL_AND_BOUNDS_PROVEN",
+  "path": "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte",
+  "contract": {
+    "element": "HTML progress",
+    "value": "derived from proven task count and clamped to [0,100]",
+    "max": 100,
+    "label": "associated label element via for/id",
+    "motion": "basic static CSS treatment; no Anime.js introduced",
+    "meaning": "workflow/ledger completion, not model confidence"
+  },
+  "validation": {
+    "svelteServerCompile": "PASS; zero compiler warnings; native element, associated label, and max/value contract asserted",
+    "openspecStrict": "PASS: parent-atlas-workboard-feature-utility-fabric",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "writes": {
+    "database": 0,
+    "valkey": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "graphify": 0,
+    "containerRebuilds": 0
+  }
+}

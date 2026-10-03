@@ -288,7 +288,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
   }
 
   // Fall back to direct llama-server
-  const result = await ollamaInference(request, start);
+  const result = await llamaServerInference(request, start);
   console.info(
     `[inference-router] backend=llama-server latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`
   );
@@ -649,11 +649,10 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
  *
  * Cascade:
  *   1. HF Transformers server (:8085) — legal fine-tuned NF4, if running
- *   2. llama-server native multimodal — gemma4:e4b-it-q4_K_M with /v1/chat/completions image_url parts
- *      (Stock E4B has identical SigLIP vision tower — frozen during GRPO training)
+ *   2. llama-server native multimodal — the loaded local model with /v1/chat/completions image_url parts
  *
- * For text-only requests that reach this function, only try HF server (Ollama
- * text-only is handled by the main cascade's ollamaInference fallback).
+ * For text-only requests that reach this function, only try the HF server.
+ * Text chat is owned by llama-server :8090; Ollama :11434 is not a chat owner.
  */
 async function tryVlmServer(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	// ── Attempt 1: HF Transformers VLM server on :8085 ──
@@ -662,7 +661,7 @@ async function tryVlmServer(request: InferenceRequest, startTime: number): Promi
 
 	// ── Attempt 2: llama-server native multimodal (only for image requests) ──
 	if (request.imageBase64) {
-		return tryOllamaVlm(request, startTime);
+		return tryLlamaServerVlm(request, startTime);
 	}
 
 	return null;
@@ -730,7 +729,7 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
 }
 
 /**
- * Ollama native VLM fallback — uses gemma4:e4b-it-q4_K_M with /api/chat images field.
+ * llama-server native VLM fallback using the loaded model and OpenAI-compatible API.
  * Same SigLIP vision tower as the legal fine-tune (frozen during GRPO training).
  *
  * VRAM swap: If the first attempt fails (likely VRAM full from llama-server),
@@ -739,9 +738,10 @@ async function tryHfVlmServer(request: InferenceRequest, startTime: number): Pro
  * NOTE: With TurboQuant --mmproj, this path is rarely needed. It's a fallback for
  * when TurboQuant is running WITHOUT --mmproj or is down entirely.
  */
-async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+
+async function tryLlamaServerVlm(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	// First attempt — works when VRAM is available (llama-server not running)
-	const result = await _ollamaVlmCall(request, startTime);
+	const result = await _llamaServerVlmCall(request, startTime);
 	if (result) return result;
 
 	// VRAM swap: Use vlm-lifecycle to safely switch to VISION mode
@@ -753,7 +753,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
   }
 
 	try {
-		return await _ollamaVlmCall(request, startTime);
+		return await _llamaServerVlmCall(request, startTime);
 	} finally {
 		// We don't auto-switch back to TEXT here to allow subsequent vision requests
     // to benefit from the loaded model. The system remains in VISION mode until
@@ -762,7 +762,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 }
 
 /** Raw llama-server VLM call — no VRAM swap logic */
-async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
+async function _llamaServerVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
 	const model = await getActiveLocalVlmModel().catch(() => LOCAL_VLM_MODEL);
 
 	try {
@@ -866,7 +866,7 @@ async function tryLiteRT(request: InferenceRequest, startTime: number): Promise<
 	}
 }
 
-async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
+async function llamaServerInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
 		const { resolvedModel: model } = await resolveLoadedLlamaModel(
 			LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), request.model ?? null);
 	const prompt = request.systemPrompt

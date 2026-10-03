@@ -1,0 +1,76 @@
+{
+  "schema": "atlas.ace-producer-trace.v1",
+  "generatedAt": "2026-09-29T04:37:42Z",
+  "change": "parent-atlas-ace-rlm-bitfrost-integration",
+  "task": "ACE-PRODUCER-TRACE-01",
+  "status": "BLOCKED_NOT_PROVEN",
+  "mode": "READ_ONLY_SOURCE_TRACE",
+  "writesPerformed": false,
+  "liveRequestPath": {
+    "status": "WIRED_LEGACY_ONLY",
+    "path": [
+      "sveltekit-frontend/src/lib/server/ace/query-router.ts:465",
+      "sveltekit-frontend/src/lib/server/ace/query-router.ts:568",
+      "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts:1610",
+      "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts:1880"
+    ],
+    "finding": "The live assembler maps ranked retrieval cards into legacy ACE context and attaches the legacy ContextManifest. The mapped card carries source_ref/snippet/score/feature_id, not a V3 packet with proven packet/source/workspace/representation lineage."
+  },
+  "v3Contract": {
+    "status": "CREATED_CONTRACT_ONLY",
+    "owner": "packages/parent-atlas/src/core/ace-packet-v3.ts:214",
+    "checks": [
+      "packet/source/revision fields are schema-validated and cross-checked against the canonical envelope",
+      "CURRENT embedding requires input_digest, embedding_digest, vector_ref, and representation_revision",
+      "packet body is sealed with a deterministic checksum"
+    ],
+    "productionCallerFound": false
+  },
+  "contextManifestBridge": {
+    "status": "CREATED_TESTED_NOT_PRODUCTION_WIRED",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/context/ace-packet-v3-context-manifest-bridge-v1.ts:57",
+    "checks": [
+      "admitted feature snapshot and selected ordinal membership",
+      "packet key, source ref, source revision, and workspace revision match",
+      "CURRENT-only representation/graph revision aggregation",
+      "selected packet-set and manifest checksums"
+    ],
+    "writesPerformed": false,
+    "productionCallerFound": false
+  },
+  "bitfrostWriter": {
+    "status": "CREATED_TESTED_NOT_PRODUCTION_WIRED",
+    "owner": "sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.ts:165",
+    "guard": "Validates the V3 packet, source and embedding currentness, representation/cache identity fields, checksum, TTL, and caller-provided embedAllowedPacketKeys before Redis SET.",
+    "allowedKeyOwner": null,
+    "productionCallerFound": false,
+    "invoked": false
+  },
+  "allowedKeyDerivation": {
+    "status": "NOT_PROVEN",
+    "finding": "The daily ACE packet step runs a read-only embed_allowed count and writes a local receipt; it does not emit an admitted packet-key set or compose/write V3 packets.",
+    "evidence": "scripts/atlas/graphify-daily-ace-packet-step-v1.mjs:50-57"
+  },
+  "localCompositionArtifact": {
+    "path": "docs/reports/ace-packets-v3-composition-v1.json",
+    "mode": "LOCAL_ARTIFACTS_ONLY",
+    "composed": 15732,
+    "currentSemanticOrTopology": 0,
+    "residencyPending": 15732,
+    "reason": "The report says representation_revision is unavailable, embeddings cannot be CURRENT, summaries lack admitted input digests, and topology is only HINT. This is offline composition evidence, not a production ContextManifest producer."
+  },
+  "contractTests": {
+    "command": "node --test packages/parent-atlas/test/ace-packet-v3.test.mjs; npx vitest run src/lib/server/atlas/context/ace-packet-v3-context-manifest-bridge-v1.spec.ts src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts --reporter=dot",
+    "result": "PASS",
+    "tests": 46,
+    "scope": "isolated packet, bridge, and BitFrost guard fixtures only; no production wiring or live cache proof"
+  },
+  "acceptance": {
+    "packetSourceIdentityEndToEnd": false,
+    "representationIdentityEndToEnd": false,
+    "allowedKeySetDerivedFromAdmittedOwner": false,
+    "aceProducerTracePassed": false,
+    "bitfrostCallerMayProceed": false
+  },
+  "next": "Establish one production source owner that resolves admitted canonical candidates and exact current source/workspace revisions, obtains representation revision from its approved owner, and derives allowed keys as canonical admitted packet keys intersected with independent embed policy. Then connect that owner to the existing V3 builder and bridge; do not use Qdrant IDs or embed_allowed alone as canonical authority."
+}

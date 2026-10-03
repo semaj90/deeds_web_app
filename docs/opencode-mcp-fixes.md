@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the fixes applied to resolve OpenCode Gemma4 integration issues:
+This document describes the fixes applied to resolve OpenCode Ornith 1.5 llama-server 8090 integration issues:
 
 1. **OpenCode transport configuration** — Fixed MCP HTTP server detection
 2. **Memory persistence** — Added Engram PostgreSQL bridge with BM25/HNSW indexing
@@ -21,7 +21,7 @@ This document describes the fixes applied to resolve OpenCode Gemma4 integration
 - Added `"headers"` for proper MIME type negotiation
 - Added `"timeout": 30000` (30s) for tool timeouts
 - Added `"tools"` allowlist/blocklist for access control
-- Added `"tools": true` and `"reasoning": false` to model config for Gemma4
+- Added `"tools": true` and `"reasoning": false` to model config for Ornith 1.5 llama-server 8090
 
 **Result:** OpenCode now successfully connects to TRACE MCP server at http://127.0.0.1:8788
 
@@ -34,21 +34,21 @@ This document describes the fixes applied to resolve OpenCode Gemma4 integration
 **Features:**
 - PostgreSQL table: `agent_observations` (stores tool invocations)
 - BM25 text search index (inverse keyword search on `bm25_tags` + `output_summary`)
-- HNSW vector index (384-dim semantic similarity on `hnsw_embedding`)
+- HNSW vector index (768-dim semantic similarity on `hnsw_embedding`)
 - Automatic schema creation with GIN indexes
 
 **Schema:**
 ```sql
 CREATE TABLE agent_observations (
   observation_id UUID PRIMARY KEY,
-  agent_name VARCHAR(255),         -- "gemma4-opencode"
+  agent_name VARCHAR(255),         -- " Ornith 1.5 llama-server 8090"
   tool_name VARCHAR(255),          -- "trace.kag_search"
   input_hash VARCHAR(64),          -- SHA256 of input (deduplication)
   output_summary TEXT,             -- First 2KB of result
   decision_context JSONB,          -- Tool-specific metadata
   confidence REAL,                 -- [0, 1] tool success rate
   bm25_tags TEXT[],                -- ["trace", "kag_search"]
-  hnsw_embedding vector(384),      -- Optional: 384-dim semantic vector
+  hnsw_embedding vector(768),      -- Optional: 768-dim semantic vector
   created_at TIMESTAMP
 );
 
@@ -62,7 +62,7 @@ CREATE INDEX idx_hnsw ON agent_observations
 **Usage in TRACE MCP:**
 ```typescript
 await engramBridge.recordObservation({
-  agent_name: 'gemma4-opencode',
+  agent_name: 'mastra/langchain. .okf deep agents?',
   tool_name: 'trace.kag_search',
   input_hash: EngramMemoryBridge.hashInput(args),
   output_summary: result.slice(0, 500),
@@ -79,7 +79,7 @@ const similar = await engramBridge.searchMemoryByBM25(['auth', 'database']);
 
 ## Fix 3: LangGraph Bridge (src/mcp/langgraph-bridge.ts)
 
-**Purpose:** Netflix Headroom state management for dispatcher memory constraints.
+**Purpose:** pokemon lut hashmaps patrcia lut? Netflix Headroom state management for dispatcher memory constraints.
 
 **Features:**
 - Max state size: 32KB (soft limit)
@@ -113,7 +113,7 @@ const { result, updatedState } = await bridge.invokeTool(
 
 ## Fix 4: Shell Tool Wrapper (shell.run in trace-mcp-server.ts)
 
-**Purpose:** Safe bash execution for Gemma4 agentic workflows.
+**Purpose:** Safe bash execution for Ornith 1.5 llama-server 8090 agentic error fixing?
 
 **Schema:**
 ```
@@ -132,7 +132,7 @@ Output:
 
 **Example:**
 ```bash
-# Gemma4 invokes via OpenCode
+# Ornith 1.5 llama-server 8090 invokes via OpenCode
 shell.run --command="npm run test:diagnostics:unit" --timeout_ms=30000
 
 # Response
@@ -208,7 +208,7 @@ curl -s http://127.0.0.1:8788/mcp/tools/list | jq '.tools | length'
 
 **4. Tool invocation + telemetry:**
 ```bash
-# Via OpenCode: Gemma4 invokes trace.kag_search
+# Via OpenCode: Ornith 1.5 llama-server 8090 invokes trace.kag_search
 # Then verify recording:
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
   "SELECT tool_name, confidence, output_summary FROM agent_observations LIMIT 1;"
@@ -222,7 +222,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ OpenCode (Claude Desktop)                                  │
-│  - Gemma4 inference (:8090/v1/chat/completions)           │
+│  - Ornith 1.5 llama-server 8090 inference (:8090/v1/chat/completions)           │
 │  - Tool calls via MCP                                     │
 └──────────────────────┬──────────────────────────────────────┘
                        │ HTTP Streamable Transport
@@ -265,7 +265,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
 3. **Build semantic search UI (future):**
    - Query agent memory by BM25 tags (past decisions)
    - Query by HNSW embedding (similar reasoning patterns)
-   - Display decision audit trail for each Gemma4 response
+   - Display decision audit trail for each Ornith 1.5 llama-server 8090 response
 
 ---
 

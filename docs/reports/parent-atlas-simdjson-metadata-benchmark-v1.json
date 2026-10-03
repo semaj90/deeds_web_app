@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-09-23T19:17:20.329Z",
+  "nativeAddon": true,
+  "iters": 200,
+  "mode": "METADATA_JSON_OR_JSONL_READ_ONLY_BENCHMARK",
+  "inputs": [
+    {
+      "path": "docs/reports/semantic-contracts/semantic-contract-conflicts.ndjson",
+      "bytes": 108331,
+      "records": 331,
+      "sha256": "a895b372488801eda175b0f82fb30f6951ec2fce56e7def52b797f73d5d7b09f",
+      "nativeDirectParity": "PASS",
+      "fastPathNativeCalls": 0,
+      "fastPathV8Bypasses": 331,
+      "medianV8Ms": 0.0006555000000000177,
+      "medianFastPathMs": 0.000660999999999774,
+      "medianSpeedup": 0.9952191235062697
+    },
+    {
+      "path": "docs/reports/a2a-direct-invocation-authorization-v1.json",
+      "bytes": 27496,
+      "records": 1,
+      "sha256": "b66475da9fb9d5a3a2856bbf5c5df41fc4a8eb8fa27371cfe277e50dcd0d34e4",
+      "nativeDirectParity": "PASS",
+      "fastPathNativeCalls": 1,
+      "fastPathV8Bypasses": 0,
+      "medianV8Ms": 0.04460599999999999,
+      "medianFastPathMs": 0.09952850000000012,
+      "medianSpeedup": 0.4481731363378323
+    }
+  ],
+  "semanticSchemaOwnerChanged": false,
+  "semanticSchemaValidation": "NOT_REPLACED_OR_BYPASSED; benchmark measures parser parity only",
+  "nativeParity": "PASS",
+  "rows": [
+    {
+      "path": "docs/reports/semantic-contracts/semantic-contract-conflicts.ndjson",
+      "bytes": 108331,
+      "records": 331,
+      "sha256": "a895b372488801eda175b0f82fb30f6951ec2fce56e7def52b797f73d5d7b09f",
+      "nativeDirectParity": "PASS",
+      "fastPathNativeCalls": 0,
+      "fastPathV8Bypasses": 331,
+      "medianV8Ms": 0.0006555000000000177,
+      "medianFastPathMs": 0.000660999999999774,
+      "medianSpeedup": 0.9952191235062697
+    },
+    {
+      "path": "docs/reports/a2a-direct-invocation-authorization-v1.json",
+      "bytes": 27496,
+      "records": 1,
+      "sha256": "b66475da9fb9d5a3a2856bbf5c5df41fc4a8eb8fa27371cfe277e50dcd0d34e4",
+      "nativeDirectParity": "PASS",
+      "fastPathNativeCalls": 1,
+      "fastPathV8Bypasses": 0,
+      "medianV8Ms": 0.04460599999999999,
+      "medianFastPathMs": 0.09952850000000012,
+      "medianSpeedup": 0.4481731363378323
+    }
+  ],
+  "note": "simdjson uses CPU SIMD (AVX2/SSE4.2), not GPU/CUDA"
+}

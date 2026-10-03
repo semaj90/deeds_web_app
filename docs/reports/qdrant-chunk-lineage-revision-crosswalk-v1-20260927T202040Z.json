@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.qdrant-chunk-lineage-revision-crosswalk.v1",
+  "generatedAt": "2026-09-27T20:20:40Z",
+  "mode": "LIVE_POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "scope": {
+    "qdrantCollection": "codebase_chunks_768",
+    "sourceTables": ["atlas_chunk_packet_identity_links", "codebase_chunk_index", "atlas_packet_chunk_lineage", "atlas_workspace_source_bindings"]
+  },
+  "observations": {
+    "qdrantIdentityLinkRows": 105762,
+    "distinctLinkedChunkRows": 52381,
+    "linksResolvingToChunkIndexRow": 53380,
+    "linksJoiningProvenPacketChunkLineage": 6312,
+    "distinctChunksWithProvenLineage": 6312,
+    "lineageRowsWithSourceRevision": 6312,
+    "identityLinkRowsWithSourceRevision": 0,
+    "provenLineageRowsJoiningWorkspaceSourceBindings": 11246,
+    "distinctWorkspaceRevisionsAmongThoseJoins": 2,
+    "chunkContentHashEqualToWorkspaceFileDigest": 0
+  },
+  "interpretation": {
+    "sourceRevisionEvidence": "A bounded historical subset has PROVEN atlas_packet_chunk_lineage source revisions and exact source-ref/source-revision matches to workspace bindings.",
+    "semanticRepresentationRevisionProven": false,
+    "vectorGenerationTimeBound": false,
+    "vectorByteParityProven": false,
+    "historicalVectorsMayBeRetroactivelyStamped": false,
+    "qdrantProjectionIsCanonical": false
+  },
+  "limitations": [
+    "The join proves stored source-lineage relationships for 6,312 linked chunk rows, not that the Qdrant vector was generated from that source revision.",
+    "Workspace binding join spans two workspace revisions for this subset.",
+    "No chunk content_hash equals the workspace source content_digest in the joined subset.",
+    "No representation revision or exact vector-byte digest was joined.",
+    "No datastore/cache writes, vector reads, or inference calls were performed."
+  ],
+  "safeguards": {"postgresWrites": 0, "qdrantWrites": 0, "valkeyWrites": 0, "inferenceCalls": 0, "vectorsFetched": false}
+}

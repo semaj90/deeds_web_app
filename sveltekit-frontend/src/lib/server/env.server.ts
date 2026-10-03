@@ -161,6 +161,16 @@ export const ENV = Object.freeze({
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL,
   EMBED_MODEL_PATH: privateEnv.EMBED_MODEL_PATH,
   EMBEDDING_BASE_URL: privateEnv.EMBEDDING_BASE_URL,
+  // EMB-PROV-01 (2026-09-27): dedicated URL for the strict semantic_768 lane
+  // (embedSemantic768Canonical, llama-server /v1/embeddings executor). Kept
+  // separate from EMBEDDING_BASE_URL, which rg-atlas/embed.ts's P0 fingerprint
+  // guard pairs with EMBEDDING_PROVIDER for its OWN self-consistency check —
+  // sharing one var name between those two purposes previously made the P0
+  // guard's provider/URL pairing self-contradictory whenever the strict lane's
+  // URL was pointed at :8081 (llama-server) while EMBEDDING_PROVIDER stayed
+  // 'ollama' (correct, for the unrelated /api/embed auto-DirectML-suppression
+  // use in embedding-provider-v1.ts). See docs/reports/emb-prov-01-embedding-provenance-receipt.json.
+  EMBEDDING_STRICT_BASE_URL: privateEnv.EMBEDDING_STRICT_BASE_URL,
   // EMBED-PROVIDER-CONVERGENCE-01: compatibility input only, consumed
   // exclusively by resolveEmbeddingProviderV1() (embedding-provider-v1.ts).
   // No other module should read this directly.

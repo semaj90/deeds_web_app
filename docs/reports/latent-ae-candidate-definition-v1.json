@@ -1,0 +1,150 @@
+{
+  "schema": "atlas.latent-ae-candidate-definition.v1",
+  "status": "DEFINITION_AND_SHAPE_PROVEN_NOT_TRAINED",
+  "observedDate": "2026-09-30",
+  "architecture": {
+    "input": {
+      "representationId": "semantic_768",
+      "dimensions": 768,
+      "expectedModelFamily": "EmbeddingGemma",
+      "canonicalColumn": "codebase_chunk_index.content_embedding_768"
+    },
+    "encoder": [768, 512, 256, 128],
+    "publishedCandidateOutputs": {
+      "latent_256": { "dimensions": 256, "kind": "learned_intermediate" },
+      "latent_128": { "dimensions": 128, "kind": "learned_bottleneck" },
+      "latent_64": {
+        "dimensions": 64,
+        "kind": "normalized_prefix_of_latent_128",
+        "learnedLayer": false
+      }
+    },
+    "topology4d": {
+      "dimensions": 4,
+      "kind": "separate_revisioned_projection",
+      "input": "latent_256",
+      "producedByAutoencoder": false
+    },
+    "historical384Architecture": "768->384->256; incompatible and not selected"
+  },
+  "runtimeEvidence": {
+    "windowsPython": {
+      "version": "3.13",
+      "torch": "2.8.0+cu128",
+      "torchCudaBuild": "12.8",
+      "cudaAvailable": true,
+      "device": "RTX 3060 Ti"
+    },
+    "wslPython": {
+      "environment": "atlas-rapids-cu13",
+      "torch": "2.13.0+cu130",
+      "torchCudaBuild": "13.0",
+      "cudaAvailable": true,
+      "packagesPresent": ["cudf", "cugraph", "cuml", "cuvs"]
+    },
+    "syntheticGpuShapeSmoke": {
+      "status": "PASS",
+      "inputShape": [2, 768],
+      "outputShapes": [[2, 256], [2, 128], [2, 64]],
+      "outputsFinite": true,
+      "trainingPerformed": false
+    },
+    "focusedTests": "py -3.13 -m pytest -q python/test_latent_autoencoder.py: 11 passed"
+  },
+  "snapshotSizing": {
+    "admittedRows": 16151,
+    "dimensions": 768,
+    "rawFloat32Bytes": 49615872,
+    "rawFloat32MiB": 47.3,
+    "rawFloat16MiB": 23.7,
+    "currentCanonicalColumnObservedRows": 219998,
+    "currentColumnRawFloat32Bytes": 675833856,
+    "currentColumnRawFloat32MiB": 644.5,
+    "currentColumnRawFloat32GiB": 0.629,
+    "note": "These are raw dense-vector matrix sizes only. A frozen admitted 16,151-row snapshot is about 47.3 MiB FP32 (23.7 MiB FP16); reading all 219,998 currently populated canonical-column rows is about 644.5 MiB FP32. Neither requires copying a 22-GB database. Do not snapshot/train until writer and row provenance are proven; database/index overhead is separate."
+  },
+  "latentProjectionSizing": {
+    "dimensionsPerPoint": 448,
+    "qdrantFloat32BytesPerPoint": 1792,
+    "postgresBytesPerPoint": 1024,
+    "admittedRows": 16151,
+    "admittedQdrantRawVectorBytes": 28942592,
+    "admittedQdrantRawVectorMiB": 27.6,
+    "admittedPostgresRawVectorBytes": 16538624,
+    "admittedPostgresRawVectorMiB": 15.77,
+    "currentPopulatedRows": 219998,
+    "currentPopulatedQdrantRawVectorBytes": 394236416,
+    "currentPopulatedQdrantRawVectorMiB": 375.96,
+    "currentPopulatedPostgresRawVectorBytes": 225277952,
+    "currentPopulatedPostgresRawVectorMiB": 214.82,
+    "note": "Raw vector payloads only; excludes point payload metadata, Qdrant indexes/segments, Postgres row/index overhead, and backups. Candidate cohort still must be revision-qualified. Do not duplicate source text or summaries into payloads."
+  },
+  "entrypoints": {
+    "npmAeTrain": "sveltekit-frontend/package.json -> py -3.13 ../python/train_latent_autoencoder.py; guarded candidate PyTorch trainer, still blocked before database access until canonical semantic input lineage is proven",
+    "candidateTrainer": "python/train_latent_autoencoder.py; direct execution now exits 78 before imports, database access, training, or output writes while TRAINING_AUTHORITY_PROVEN is false",
+    "candidateDryRun": "npm run ae:train:dry; invokes python/train_latent_autoencoder.py --plan-only and prints the 768-512-256-128 architecture/provenance gate with no database access or artifact writes",
+    "legacyTrainer": "scripts/atlas/train-autoencoder-768-64.mjs; compatibility shim now reports the current candidate on dry-run and blocks the historical Qdrant/Redis implementation before service access",
+    "legacyQueueEntrypoint": "sveltekit-frontend/scripts/atlas/queue-autoencoder-training.mjs; separate historical queue path, not the approved candidate trainer"
+  },
+  "postgresDrizzleAlignment": {
+    "canonicalInput": { "column": "codebase_chunk_index.content_embedding_768", "postgresType": "vector(768)", "drizzleOwners": ["sveltekit-frontend/src/lib/server/db/schema-postgres.ts", "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts"] },
+    "liveReadOnlySchemaObservation": {
+      "auditReport": "docs/reports/latent-representation-identity-audit-2026-09-30.json",
+      "content_embedding_768": "vector(768)",
+      "content_embedding": "halfvec(768), historical/unresolved",
+      "latent_256": "halfvec(256)",
+      "latent_128": "halfvec(128)",
+      "latent_64": "vector(64)",
+      "schemaMigrationRequiredForTheseDeclaredColumns": false
+    },
+    "derivedStorage": {
+      "latent_256": { "postgresType": "halfvec(256)", "drizzleType": "halfvec(256)", "candidateMeaning": "learned intermediate" },
+      "latent_128": { "postgresType": "halfvec(128)", "drizzleType": "halfvec(128)", "candidateMeaning": "learned bottleneck; historical column values may be legacy slice-derived" },
+      "latent_64": { "postgresType": "vector(64)", "drizzleType": "vector(64)", "candidateMeaning": "normalized prefix of candidate latent_128; historical values are not relabeled" }
+    },
+    "schemaChange": "NO_NEW_DATABASE_MIGRATION_AUTHORED_OR_APPLIED; existing physical declarations are mapped in Drizzle",
+    "sourceModelWriter": "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts was corrected to map historical content_embedding as halfvec(768) and declare the latent vector columns consistently"
+  },
+  "qdrantProjection": {
+    "serverImageDeclared": "qdrant/qdrant:v1.19.0",
+    "liveServerVersion": "1.19.0 (read-only GET / verified 2026-09-30)",
+    "currentLegacyCollection": { "name": "codebase_chunks_latent256", "vectorDimensions": 256, "candidateCompatible": false },
+    "candidateVectorLayout": { "kind": "named_dense_vectors", "vectors": { "latent_256": 256, "latent_128": 128, "latent_64": 64 }, "collectionRevision": "NOT_SELECTED" },
+    "candidatePointSerializer": "python/provision_qdrant_latent256.py::build_candidate_point; validates complete identity/provenance payload, exact dimensions, finite values, and unit norms; fixture-tested only",
+    "upsertContract": {
+      "pointShape": "{id: projection_uuid, vector: all_three_named_vectors, payload: complete_payload_v2}",
+      "updateSemantics": "FULL_POINT_REPLACEMENT; never omit an existing named vector or required payload field",
+      "targetCollection": "NEW_VERSIONED_COLLECTION_REQUIRED; do not reuse legacy single-vector collection",
+      "readbackRequired": ["projection_id", "canonical_id", "all_vector_dimensions", "all_vector_digests", "payload_checksum"]
+    },
+    "requiredPayloadFields": ["canonical_id", "packet_key", "chunk_row_id", "projection_id", "source_ref", "source_revision", "workspace_revision", "source_digest", "semantic_input_digest", "semantic_model_revision", "tokenizer_revision", "tokenizer_revision_status", "architecture_revision", "producer_revision", "training_receipt_digest", "training_input_snapshot_checksum", "representation_revisions", "representation_definitions", "vector_dimensions", "vector_digests", "checkpoint_digest", "projection_revision", "payload_checksum", "canonical_authority"],
+    "payloadSchema": "atlas.latent-qdrant-point-payload.v2; complete identity/provenance metadata plus per-named-vector and stable payload digests; large source/context text and duplicate vectors excluded; unversioned RFF/KMeans/topology tags excluded",
+    "payloadValuePolicy": "identity and provenance metadata only; no vectors or large context blobs duplicated into payload",
+    "upsertStatus": "BLOCKED; no training input provenance, candidate checkpoint, Postgres candidate-row readback, or admitted projection revision. Do not reuse the legacy 256-only collection or create a new collection until the collection revision and consumers are approved.",
+    "expectedOrder": "canonical admitted Postgres inputs -> candidate output materialization/readback -> Qdrant batch upsert -> Qdrant identity/vector/payload readback"
+  },
+  "semanticWriterAudit": {
+    "report": "docs/reports/semantic-768-writer-ownership-v1.json",
+    "verdict": "OWNER_NOT_PROVEN",
+    "patternMatchedSourcePaths": 15,
+    "canonicalTarget": "codebase_chunk_index.content_embedding_768",
+    "populatedRows": 219998,
+    "rowsWithSourceRevision": 0,
+    "rowsWithWorkspaceRevision": 0,
+    "rowsWithRepresentationRevision": 0,
+    "rowsWithLineageProducerRevision": 0,
+    "rowsWithImmutableModelRevision": 0,
+    "rowsWithTokenizerRevision": 0,
+    "embeddingModelLabels": ["embeddinggemma:latest", "embeddinggemma:latest:eg-task-prefix-v1"],
+    "interpretation": "Model labels and dimensions do not prove immutable per-row writer/input lineage; the training gate must remain closed."
+  },
+  "safety": {
+    "trainingPerformed": false,
+    "checkpointWritten": false,
+    "databaseCacheOrProjectionWrites": false,
+    "semanticWriterProvenance": "OPEN",
+    "directPythonTrainingGuard": "BLOCKED_BEFORE_DATABASE_READ",
+    "promotion": "NOT_PERFORMED"
+  },
+  "rffClarification": "scripts/atlas/backfill-graphify-rff-embeddings-768.mjs embeds Graphify error/signature text with EmbeddingGemma into separate error_embedding/signature_embedding columns; it is not a Random Fourier transform or an autoencoder stage. Its apply path can write PostgreSQL and was not run."
+}

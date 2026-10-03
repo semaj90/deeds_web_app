@@ -1,0 +1,43 @@
+{
+  "schema": "atlas.val-08.oak-typed-assertion-adapter.v1",
+  "gate": "VAL-08",
+  "status": "FIXTURE_PROVEN_LIVE_RELATION_COHORT_EMPTY",
+  "owner": "python/atlas_oak_kernel.py::oak_check_typed_assertion",
+  "route": "POST /oak/assertion/check",
+  "contract": {
+    "input": ["subject concept ID", "allowlisted predicate", "object concept ID", "evidenceRef"],
+    "match": "Exact subject/predicate/object lookup with LIMIT 2",
+    "outcomes": ["MATCHED", "NOT_FOUND", "AMBIGUOUS"],
+    "strictInput": true,
+    "unsupportedAdapter": "FAIL_CLOSED_503",
+    "sourceSpanVerification": "NOT_PERFORMED",
+    "ordinaryProseJudgment": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  },
+  "liveReadback": {
+    "database": "legal_ai_db",
+    "table": "public.atlas_ontology_relations",
+    "transaction": "READ_ONLY",
+    "rowCount": 0,
+    "predicateRows": 0,
+    "columns": ["relation_id", "subject_concept_id", "predicate", "object_concept_id", "evidence", "confidence", "extractor_version", "created_at"],
+    "sourceRevisionOrSpanColumns": 0,
+    "positiveLiveMatch": "NOT_AVAILABLE_ZERO_ROWS"
+  },
+  "focusedTests": {
+    "command": "python -m pytest test_atlas_oak_kernel.py -q",
+    "passed": 15,
+    "failed": 0
+  },
+  "openSpecStrict": "PASS",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "source": 0,
+    "containerRebuilds": 0
+  },
+  "decision": "The bounded kernel evaluator is fixture-proven. The route is not live in the existing sidecar image, and the live relation table has no rows; no production positive result or source-evidence verification is claimed."
+}

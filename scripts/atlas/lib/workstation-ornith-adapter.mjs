@@ -24,10 +24,10 @@ export async function discoverOrnithModel(endpoint, { timeoutMs = 5000 } = {}) {
   const body = await response.json();
   const modelIds = Array.isArray(body?.data) ? body.data.map((item) => String(item?.id ?? '')).filter(Boolean) : [];
   if (modelIds.length === 0) throw new Error('NO_LOADED_MODEL');
-  const allowed = modelIds.filter((id) => ORNITH_ALLOWLIST_PATTERN.test(id));
+  const allowed = (body.data ?? []).filter((item) => ORNITH_ALLOWLIST_PATTERN.test(String(item?.id ?? '')));
   if (allowed.length === 0) throw new Error(`ORNITH_MODEL_NOT_LOADED:${modelIds.join(',')}`);
-  if (allowed.length > 1) throw new Error(`AMBIGUOUS_ORNITH_MODELS:${allowed.join(',')}`);
-  return { modelIds, loadedModel: allowed[0] };
+  if (allowed.length > 1) throw new Error(`AMBIGUOUS_ORNITH_MODELS:${allowed.map((item) => item.id).join(',')}`);
+  return { modelIds, loadedModel: String(allowed[0].id), loadedModelDetails: allowed[0] };
 }
 
 /**
@@ -38,8 +38,16 @@ export async function discoverOrnithModel(endpoint, { timeoutMs = 5000 } = {}) {
  * not a cross-run determinism guarantee (model/runtime output need not be
  * bit-identical across executions even for a fixed prompt).
  */
-export async function streamChatCompletion(endpoint, model, messages, { maxTokens = 32, temperature = 0, timeoutMs = 90_000 } = {}) {
-  const requestBody = { model, messages, max_tokens: maxTokens, temperature, stream: true };
+export async function streamChatCompletion(endpoint, model, messages, {
+  maxTokens = 32, temperature = 0, topP, seed, presencePenalty, frequencyPenalty, timeoutMs = 90_000,
+} = {}) {
+  const requestBody = {
+    model, messages, max_tokens: maxTokens, temperature, stream: true,
+    ...(topP === undefined ? {} : { top_p: topP }),
+    ...(seed === undefined ? {} : { seed }),
+    ...(presencePenalty === undefined ? {} : { presence_penalty: presencePenalty }),
+    ...(frequencyPenalty === undefined ? {} : { frequency_penalty: frequencyPenalty }),
+  };
   const requestChecksum = sha256(JSON.stringify(requestBody));
   const response = await fetch(`${endpoint}/v1/chat/completions`, {
     method: 'POST',
@@ -53,6 +61,7 @@ export async function streamChatCompletion(endpoint, model, messages, { maxToken
   let buf = '';
   let assembled = '';
   let finishReason = null;
+  let usage = null;
   let rawEventBytes = '';
   for await (const chunk of response.body) {
     const decoded = decoder.decode(chunk, { stream: true });
@@ -69,6 +78,7 @@ export async function streamChatCompletion(endpoint, model, messages, { maxToken
         const parsed = JSON.parse(payload);
         assembled += parsed.choices?.[0]?.delta?.content ?? '';
         finishReason = parsed.choices?.[0]?.finish_reason ?? finishReason;
+        usage = parsed.usage ?? usage;
       } catch {
         // skip malformed SSE line
       }
@@ -78,6 +88,7 @@ export async function streamChatCompletion(endpoint, model, messages, { maxToken
   return {
     assembled,
     finishReason,
+    usage,
     streamed: true,
     requestChecksum,
     responseChecksum: sha256(rawEventBytes),

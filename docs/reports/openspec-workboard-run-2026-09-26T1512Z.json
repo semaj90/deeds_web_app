@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T15:12:19Z",
+  "pivotFrom": "CURRENT-PACKET-CHUNK-LINEAGE-RESIDUAL-DIAGNOSTIC-01",
+  "pivotTo": "DAILY-GRAPHIFY-INDEXED-DATA-MULTICORE-01",
+  "change": "parent-atlas-retrieval-lineage-dag-convergence",
+  "status": "IMPLEMENTATION_SCOPE_BLOCKED_ON_DATA_AND_STAGE_SELECTION",
+  "progress": {
+    "openSpecTasksComplete": 787,
+    "openSpecTasksTotal": 1037,
+    "remaining": 250
+  },
+  "evidence": {
+    "featureMatrixChange": "parent-atlas-repair-candidate-feature-matrix",
+    "requalifiedPacketMatrixRows": 16151,
+    "staleCompatibilityShaRows": 419,
+    "canonical": false,
+    "summaryHintFeaturePendingQueryVectorRows": 330,
+    "summaryHintFeatureUnavailableRows": 6402,
+    "queryVectorRequirement": "revision-qualified semantic_768 query vector not present in frozen artifacts",
+    "phase8Fanout": "scripts/startup/run-atlas-phase8-fanout.mjs",
+    "phase8Execution": "11 dependency-ordered subprocess stages; sequential execution retained",
+    "graphifyDailyChain": "sveltekit-frontend/package.json graphify:daily:chain is apply-capable",
+    "productionGraphifyExecuted": false,
+    "databaseWrites": 0,
+    "projectionWrites": 0,
+    "cacheWrites": 0,
+    "rabbitmqPublishes": 0
+  },
+  "remaining": [
+    "identify which placeholder family should be populated from indexed fields; absent or unqualified semantic vectors must remain masked",
+    "select a CPU-heavy, shard-independent Graphify stage before adding bounded multicore execution; do not parallelize dependency-ordered fanout steps",
+    "keep the 330-row query-bound cosine feature blocked until an exact revision-qualified semantic_768 query vector is supplied"
+  ]
+}

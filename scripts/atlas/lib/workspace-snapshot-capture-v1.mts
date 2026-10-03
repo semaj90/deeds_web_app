@@ -112,9 +112,53 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
     canonicalAuthority: false, datastoreWritesPerformed: false };
 }
 
+/**
+ * Capture a stable read-only frame with bounded quiescence retries. A retry
+ * only replaces the observation being compared; it never merges two frames or
+ * suppresses a real violation. Exhausting attempts preserves the blocked
+ * receipt, so this helper cannot turn a live worktree into authority.
+ */
+export function captureStableSnapshot(
+  root: string,
+  workspaceId: string,
+  options: { maxAttempts?: number } = {},
+) {
+  const maxAttempts = Number.isInteger(options.maxAttempts) && (options.maxAttempts ?? 0) > 0
+    ? options.maxAttempts!
+    : 3;
+  let first = observeSnapshot(root, workspaceId);
+  let transientDriftObserved = false;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const second = observeSnapshot(root, workspaceId);
+    const report = sealSnapshot(first, second);
+    const drifted = report.violations.includes('WORKSPACE_CHANGED_BETWEEN_SCANS');
+    if (!drifted || attempt === maxAttempts) {
+      // Include capture metadata in the sealed checksum. Previously these
+      // fields were appended after sealSnapshot() computed snapshotRevision,
+      // making every stable capture fail readback with a false
+      // MANIFEST_CHECKSUM_MISMATCH.
+      const withCaptureMetadata = { ...report, captureAttempts: attempt, transientDriftObserved };
+      const {
+        schema,
+        snapshotRevision,
+        workspaceRevision,
+        status,
+        canonicalAuthority,
+        datastoreWritesPerformed,
+        ...checksumBody
+      } = withCaptureMetadata;
+      return { ...withCaptureMetadata, snapshotRevision: hash(checksumBody) };
+    }
+    transientDriftObserved = true;
+    first = second;
+  }
+  throw new Error('SNAPSHOT_CAPTURE_RETRY_EXHAUSTED');
+}
+
 export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string }) {
   const { schema, snapshotRevision, workspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
   const violations: string[] = [];
+  const violationDetails: Array<{ sourceRef: string; code: string }> = [];
   if (schema !== 'atlas.workspace-source-snapshot-capture.v1' || hash(body) !== snapshotRevision) violations.push('MANIFEST_CHECKSUM_MISMATCH');
   if (workspaceRevision !== null || canonicalAuthority !== false || datastoreWritesPerformed !== false) violations.push('UNEXPECTED_AUTHORITY_CLAIM');
   if (status !== 'CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK' || body.violations.length) violations.push('CAPTURE_NOT_VERIFIED');
@@ -144,10 +188,29 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
       const digest = createHash('sha256').update(bytes).digest('hex');
       if (digest !== source.contentDigest || source.sourceRevision !== `sha256:${digest}` || bytes.length !== source.byteLength) throw new Error('SOURCE_BYTES_CHANGED');
       exactMatches++;
-    } catch { violations.push(`SOURCE_READBACK_FAILED:${source.sourceRef}`); }
+    } catch (error) {
+      // Preserve the stable aggregate violation string for existing callers,
+      // but expose the actionable reason so audits can distinguish a missing
+      // file from changed bytes or an unsafe path.
+      const message = error instanceof Error ? error.message : String(error);
+      const code = message === 'SOURCE_BYTES_CHANGED'
+        ? 'SOURCE_BYTES_CHANGED'
+        : message === 'UNSAFE_PATH'
+          ? 'UNSAFE_PATH'
+          : !existsSync(file)
+            ? 'SOURCE_FILE_MISSING'
+            : 'SOURCE_READBACK_ERROR';
+      violations.push(`SOURCE_READBACK_FAILED:${source.sourceRef}`);
+      violationDetails.push({ sourceRef: source.sourceRef, code });
+    }
   }
+  const violationCounts = violationDetails.reduce<Record<string, number>>((counts, detail) => {
+    counts[detail.code] = (counts[detail.code] ?? 0) + 1;
+    return counts;
+  }, {});
   return { status: violations.length ? 'SNAPSHOT_READBACK_BLOCKED' : 'SNAPSHOT_BYTES_READBACK_PROVEN',
     snapshotRevision, sourceCount: body.sources.length, exactMatches, violations,
+    violationDetails, violationCounts,
     canonicalAuthority: false, datastoreWritesPerformed: false,
     scope: 'Recorded sources only; this does not assert current full-workspace membership or Graphify admission' };
 }

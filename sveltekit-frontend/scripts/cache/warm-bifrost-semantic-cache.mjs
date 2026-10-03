@@ -15,6 +15,17 @@
  *   node scripts/cache/warm-bifrost-semantic-cache.mjs
  *   node scripts/cache/warm-bifrost-semantic-cache.mjs --dry-run
  *   node scripts/cache/warm-bifrost-semantic-cache.mjs --min-reward 0.7
+ *
+ * STALE DUPLICATE (2026-06-07) — do not use for new work. The repo-root copy,
+ * `scripts/cache/warm-bifrost-semantic-cache.mjs`, was migrated onto the correct
+ * `bifrost:sem:query:{query_hash}` prefix (BIFROST-KEY-SEMANTICS-OWNER-01 Stage 2,
+ * 2026-09-04); THIS copy still writes the dead `bifrost:sem:packet:{query_hash}` shape
+ * (line 8 above), which collides with `atlas-reward-cache.ts`'s unrelated canonical-
+ * packetKey identity under the same prefix. There is also a third, unrelated script,
+ * `scripts/atlas/warm-bitfrost-semantic-cache.mjs`, keyed on packetKey identity from
+ * Postgres directly (not this DuckDB/JSONL source) — do not conflate any of the three.
+ * Classify this file `COMPATIBILITY`/archive-candidate per root CLAUDE.md's runtime-
+ * ownership vocabulary; prefer the repo-root copy for any new invocation.
  */
 
 import { createReadStream } from 'node:fs';

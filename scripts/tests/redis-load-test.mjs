@@ -90,7 +90,7 @@ async function sendRequest() {
 			},
 			body: JSON.stringify({
 				message: query,
-				model: 'gemma4-rotorquant:latest-fast',  // Optimized 7.5B legal model (10× faster than baseline)
+				model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),  // Optimized 7.5B legal model (10× faster than baseline)
 				temperature: 0.3,
 			}),
 			signal: AbortSignal.timeout(20000),  // 20s timeout (legal model)

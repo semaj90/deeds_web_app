@@ -149,6 +149,93 @@ export const WorkflowActionEventSchema = z.object({
 }).strict();
 export type WorkflowActionEventV1 = z.infer<typeof WorkflowActionEventSchema>;
 
+// ── WORKFLOW-ACTION-SCHEMA-OWNER-01: canonical adapter ─────────────────────────
+//
+// This local WorkflowActionEventV1 stays the compiler-lifecycle-facing type (runId,
+// executor, revisions, inputRefs/outputRefs, errorRef, embedded checksum). It no longer
+// independently claims the 'atlas.workflow-action.v1' schema identity as its own contract --
+// that identity is owned by `workflowActionEventSchema` in
+// `@deeds/parent-atlas/core/workflow-action-event`. These two functions are the explicit
+// adapter boundary, per design.md Decision 2.
+import type { WorkflowActionEventV1 as CanonicalWorkflowActionEventV1 } from '@deeds/parent-atlas/core/workflow-action-event';
+
+type CompilerBridgeFields = {
+	executor?: WorkflowActionEventV1['executor'];
+	inputRefs?: string[];
+	outputRefs?: string[];
+	errorRef?: string | null;
+	checksum?: string;
+};
+
+// The package contract intentionally owns the narrower runtime kind set. The
+// compiler adapter also carries its legacy lifecycle kinds during migration;
+// those fields are bridge data and are never parsed as canonical persistence.
+type CanonicalCompilerBridgeEvent = Omit<CanonicalWorkflowActionEventV1, 'kind'> &
+	CompilerBridgeFields & { kind: WorkflowActionEventV1['kind'] };
+
+export function toCanonicalWorkflowActionEvent(local: WorkflowActionEventV1): CanonicalCompilerBridgeEvent {
+	return {
+		schema: 'atlas.workflow-action.v1',
+		workflowId: local.workflowId,
+		workflowRevision: local.workflowRevision,
+		sequence: local.sequence,
+		actionId: local.actionId,
+		parentActionId: local.parentActionId ?? undefined,
+		dagNodeId: local.dagNodeId,
+		attempt: local.attempt,
+		lane: local.lane,
+		transport: local.transport ?? undefined,
+		kind: local.kind,
+		resourceRefs: [],
+		evidenceRefs: local.evidenceRefs,
+		artifactRefs: [],
+		metadata: {},
+		producerRevision: local.producerRevision,
+		runId: local.runId,
+		revisions: local.revisions,
+		executor: local.executor ?? undefined,
+		inputRefs: local.inputRefs,
+		outputRefs: local.outputRefs,
+		errorRef: local.errorRef ?? undefined,
+		checksum: local.checksum,
+	};
+}
+
+export function fromCanonicalWorkflowActionEvent(
+	canonical: CanonicalCompilerBridgeEvent,
+	extras: { runId: string; revisions: WorkflowActionEventV1['revisions']; emittedAt: string; checksum: string },
+): WorkflowActionEventV1 {
+	const bridge = canonical as CanonicalCompilerBridgeEvent;
+	if (!WorkflowActionEventSchema.shape.kind.options.includes(bridge.kind as never)) {
+		throw new Error(
+		`WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_COMPILER_SHAPE: '${bridge.kind}' has no equivalent in this local WorkflowActionEventSchema's kind enum`,
+		);
+	}
+	return WorkflowActionEventSchema.parse({
+		schema: ATLAS_WORKFLOW_ACTION_SCHEMA,
+		workflowId: bridge.workflowId,
+		workflowRevision: bridge.workflowRevision,
+		runId: bridge.runId ?? extras.runId,
+		sequence: bridge.sequence,
+		actionId: bridge.actionId,
+		parentActionId: bridge.parentActionId ?? null,
+		dagNodeId: bridge.dagNodeId,
+		attempt: bridge.attempt,
+		lane: bridge.lane,
+		transport: bridge.transport ?? null,
+		executor: bridge.executor ?? null,
+		kind: bridge.kind,
+		revisions: bridge.revisions ?? extras.revisions,
+		inputRefs: bridge.inputRefs ?? [],
+		outputRefs: bridge.outputRefs ?? [],
+		evidenceRefs: bridge.evidenceRefs,
+		errorRef: bridge.errorRef ?? null,
+		emittedAt: extras.emittedAt,
+		producerRevision: bridge.producerRevision,
+		checksum: bridge.checksum ?? extras.checksum,
+	});
+}
+
 export const FileMutationPlanSchema = z.object({
 	schema: z.literal(ATLAS_FILE_MUTATION_PLAN_SCHEMA),
 	mutationId: z.string().min(1),

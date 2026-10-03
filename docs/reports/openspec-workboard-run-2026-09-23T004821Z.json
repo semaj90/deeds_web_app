@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T00:48:21Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "TURBOVEC_NAPI_ADAPTER_EXPORT_COMPATIBILITY_AUDIT",
+    "to": "PROTO_02B_FLEET_TRANSPORT_CALLER_INVENTORY",
+    "reason": "TurboVec's HTTP/gRPC/N-API/Python paths are now classified with direct proof. The adjacent fleet audit found three live Go services with distinct health states and unprobed gRPC methods; continue by inventorying remaining sidecar owners rather than assuming all published gRPC ports are ready."
+  },
+  "evidence": {
+    "transportMatrix": "docs/reports/parent-atlas-transport-owner-matrix-v1.json",
+    "turbovecHttpGrpcHealth": "PASS on both transports; same indexed corpus shape",
+    "turbovecNapiExports": "PASS 5/5; SvelteKit search adapter incompatible and fails closed",
+    "goHttpHealth": {
+      "retrieval": "READY_FULL",
+      "search": "DEGRADED; qdrantConnected=false",
+      "embedding": "HEALTHY; model loaded on CPU"
+    },
+    "goGrpcPorts": "Published for retrieval 50053, search 50055, embedding 50051; method-level health not probed",
+    "canonicalWrites": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "jsonParse": "PASS",
+    "diffCheck": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 31,
+    "open": 61,
+    "total": 92,
+    "delta": "two evidence-backed contract/classification tasks completed; fleet audit remains open"
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "runtimeRemoval": false
+  },
+  "nextGate": "PROTO_02B_COMPLETE_ACTIVE_SIDECAR_OWNER_AND_CALLER_MATRIX"
+}

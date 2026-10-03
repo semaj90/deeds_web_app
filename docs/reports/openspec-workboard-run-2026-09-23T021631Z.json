@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T02:16:31Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "9.6 API/SSR coverage completed with 8/8 focused tests",
+    "to": "5.8 prevent documentation archive tooling from moving OpenSpec-owned changes",
+    "reason": "The existing archive gate enforces generic supersession rules but does not explicitly forbid OpenSpec paths; a bounded fail-closed guard and regression test can encode the documented ownership boundary without adding an apply operation."
+  },
+  "stateAtSelection": { "checked": 39, "open": 25, "total": 64 },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "archiveApply": false,
+    "canonicalPromotion": false
+  },
+  "completed": ["5.8 explicit OpenSpec archive-lifecycle exclusion in the documentation archive gate"],
+  "evidence": {
+    "regressionTests": "7/7 PASS",
+    "syntax": "node --check on changed .mjs owner and test PASS",
+    "deterministicReplay": "PASS; two consecutive builds byte-identical",
+    "registryChecksum": "555bdc742a025ea353ce83be60548d2c5ef1250205e5f6a48d180972a70eeae1",
+    "masterTocChecksum": "45fba3d0e606461bc0f28035dce892a2aa76c0c7bd823e5f0837ac9ad8099702",
+    "openSpecStrict": "PASS",
+    "governanceValidator": { "status": "BLOCKED", "failures": 0, "closureBlockers": ["UNCHECKED_TASKS:3305"], "archiveEligible": 0, "writes": { "documents": 0, "archives": 0, "registry": 0 } },
+    "archiveApplyAdded": false
+  },
+  "openSpecProgress": { "change": "parent-atlas-document-governance-master-index", "checked": 40, "open": 24, "total": 64, "delta": "1 fail-closed archive ownership guard proven with tests" },
+  "mutations": { "database": false, "qdrant": false, "valkey": false, "neo4j": false, "graphify": false, "containers": false, "archives": false, "filesystem": true },
+  "status": "COMPLETE",
+  "nextGate": "DOCUMENT_GOVERNANCE_5_5_CONTRADICTION_VALIDATION"
+}

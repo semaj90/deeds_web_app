@@ -1,5 +1,10 @@
-import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import {
+  GRAPH_EXPAND_NEO4J_TIMEOUT_MS,
+  graphAnalysisNeighborhoodInputSchema,
+  graphShortestPathInputSchema,
+  serializeBoundedReadResult,
+} from '../read-tool-bounds.js';
 
 async function getNeo4j() {
   const neo4j = await import('neo4j-driver');
@@ -10,21 +15,16 @@ async function getNeo4j() {
       ENV.NEO4J_PASSWORD
     )
   );
-  return driver;
+  return { driver, readAccessMode: neo4j.default.session.READ };
 }
 
 export const graphExpandNeighborhoodTool = {
   name: 'graph.expand_neighborhood',
   description: 'Expand a file node\'s import/export neighborhood in the Neo4j codebase graph. Returns adjacent nodes with their cluster, authority score, and SOM position. Use after topology_search to deepen a promising hit.',
-  parameters: z.object({
-    path: z.string().describe('File path (e.g. src/lib/server/ace/context-assembler.ts)'),
-    hops: z.number().int().min(1).max(3).default(2).optional().describe('Graph traversal depth'),
-    direction: z.enum(['both', 'imports', 'importedBy']).default('both').optional(),
-    limit: z.number().int().min(1).max(100).default(30).optional(),
-  }),
+  parameters: graphAnalysisNeighborhoodInputSchema.describe('Bounded, read-only graph neighborhood lookup.'),
   execute: async (args: { path: string; hops?: number; direction?: string; limit?: number }) => {
-    const driver = await getNeo4j();
-    const session = driver.session();
+    const { driver, readAccessMode } = await getNeo4j();
+    const session = driver.session({ defaultAccessMode: readAccessMode });
     try {
       const hops = args.hops ?? 2;
       const limit = args.limit ?? 30;
@@ -42,7 +42,8 @@ export const graphExpandNeighborhoodTool = {
                 neighbor.somBmuCol AS somCol,
                 neighbor.topoByte AS topoByte
          LIMIT $limit`,
-        { path: args.path, limit }
+        { path: args.path, limit },
+        { timeout: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
       );
       const nodes = records.map(r => ({
         path: r.get('path'),
@@ -53,7 +54,7 @@ export const graphExpandNeighborhoodTool = {
         somCol: r.get('somCol'),
         topoByte: r.get('topoByte'),
       }));
-      return JSON.stringify({ path: args.path, hops, totalNeighbors: nodes.length, nodes });
+      return serializeBoundedReadResult({ path: args.path, hops, totalNeighbors: nodes.length, nodes });
     } finally {
       await session.close();
       await driver.close();
@@ -64,25 +65,22 @@ export const graphExpandNeighborhoodTool = {
 export const graphShortestPathTool = {
   name: 'graph.shortest_path',
   description: 'Find the shortest import path between two files in the Neo4j codebase graph. Useful for understanding dependency chains and coupling.',
-  parameters: z.object({
-    from: z.string().describe('Source file path'),
-    to: z.string().describe('Target file path'),
-    maxHops: z.number().int().min(1).max(10).default(6).optional(),
-  }),
+  parameters: graphShortestPathInputSchema.describe('Bounded, read-only shortest import path lookup.'),
   execute: async (args: { from: string; to: string; maxHops?: number }) => {
-    const driver = await getNeo4j();
-    const session = driver.session();
+    const { driver, readAccessMode } = await getNeo4j();
+    const session = driver.session({ defaultAccessMode: readAccessMode });
     try {
       const maxHops = args.maxHops ?? 6;
       const { records } = await session.run(
         `MATCH (a:CodebaseFile {filePath: $from}), (b:CodebaseFile {filePath: $to}),
                p = shortestPath((a)-[:IMPORTS*..${maxHops}]->(b))
          RETURN [n IN nodes(p) | n.filePath] AS path, length(p) AS hops`,
-        { from: args.from, to: args.to }
+        { from: args.from, to: args.to },
+        { timeout: GRAPH_EXPAND_NEO4J_TIMEOUT_MS },
       );
-      if (!records.length) return JSON.stringify({ found: false, from: args.from, to: args.to });
+      if (!records.length) return serializeBoundedReadResult({ found: false, from: args.from, to: args.to });
       const rec = records[0];
-      return JSON.stringify({
+      return serializeBoundedReadResult({
         found: true,
         from: args.from,
         to: args.to,

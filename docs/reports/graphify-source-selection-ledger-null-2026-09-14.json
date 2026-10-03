@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.graphify-source-selection-ledger-null.v1",
+  "status": "NULL_LEDGER_WRITE_BLOCKED",
+  "value": null,
+  "attempts": 3,
+  "reason": "The retrieval-lineage tasks ledger changed concurrently and its append anchor was unavailable; the read-only planner result is preserved separately.",
+  "plannerResult": {
+    "status": "SOURCE_SELECTION_PLAN_BLOCKED",
+    "sourceCount": 25365,
+    "authority": false,
+    "writesPerformed": false,
+    "reportPath": "docs/reports/graphify-source-selection-plan-v1.json"
+  },
+  "nextGate": "GRAPHIFY-SNAPSHOT-ADMISSION-RECONCILIATION-01",
+  "writesPerformed": false,
+  "datastoreWritesPerformed": false
+}

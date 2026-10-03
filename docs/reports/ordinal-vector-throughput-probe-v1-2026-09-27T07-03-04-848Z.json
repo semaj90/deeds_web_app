@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.ordinal-vector-throughput-probe.v1",
+  "generatedAt": "2026-09-27T07:03:04.847Z",
+  "embeddingExecutor": {
+    "url": "http://127.0.0.1:8081",
+    "model": "embeddinggemma"
+  },
+  "corpus": {
+    "totalRows": 16151,
+    "sampledRows": 30,
+    "stride": 538
+  },
+  "sequential": {
+    "wallMs": 10733,
+    "perRequestAvgMs": 358,
+    "p50Ms": 70,
+    "p90Ms": 542,
+    "maxMs": 5095,
+    "failures": 0,
+    "projectedFullCorpusMinutes": 96.3
+  },
+  "concurrent": {
+    "concurrency": 4,
+    "wallMs": 3517,
+    "perRequestWallAvgMs": 117,
+    "p50Ms": 123,
+    "p90Ms": 2583,
+    "maxMs": 2745,
+    "failures": 0,
+    "speedupVsSequential": 3.05,
+    "projectedFullCorpusMinutes": 31.6
+  },
+  "fileByteLengthStats": {
+    "minBytes": 403,
+    "maxBytes": 22218,
+    "avgBytes": 4637
+  },
+  "authority": {
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  },
+  "status": "THROUGHPUT_PROBE_CLEAN"
+}

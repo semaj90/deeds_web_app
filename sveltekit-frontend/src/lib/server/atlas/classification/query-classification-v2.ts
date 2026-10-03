@@ -67,6 +67,9 @@ export const QueryClassificationV2Schema = z.object({
   entropy: z.number().finite().min(0),
   abstained: z.boolean(),
   evidenceRefs: z.array(z.string().min(1)).default([]),
+  // Learned classification is routing evidence only; it never becomes
+  // source/packet authority or a retrieval vote.
+  evidenceAuthority: z.literal(false).default(false),
   canonicalWritesAllowed: z.literal(false),
   retrievalVoteAdded: z.literal(false),
 }).strict();

@@ -112,7 +112,7 @@ export function buildRouteHeadDagV1(
 	const canonicalIds = canonicalIdsForOrdinals(admission.candidateOrdinals, context.canonicalIdsByOrdinal);
 	if (!Array.isArray(canonicalIds)) return canonicalIds;
 	const executor = ROUTE_HEAD_EXECUTOR_V1[admission.action];
-	const node = {
+	const node: ContextToolDagV1['nodes'][number] = {
 		nodeId: `route-head:${admission.action.toLowerCase()}:${admission.decisionChecksum.slice(0, 16)}`,
 		kind: executor.kind,
 		dependsOn: [],
@@ -122,7 +122,7 @@ export function buildRouteHeadDagV1(
 		requiresExactPromotion: false,
 		requiresValidation: false,
 		maxAttempts: 1,
-	} as const;
+	};
 	const dag = validateContextToolDag({
 		schema: 'atlas.context-tool-dag.v1',
 		workflowId: context.workflowId,

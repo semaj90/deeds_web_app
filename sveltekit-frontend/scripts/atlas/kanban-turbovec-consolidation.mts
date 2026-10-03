@@ -21,6 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { buildEmbedBodies, extractEmbeddings } from './lib/embed-request-contract.mjs';
 import { fastJsonParse, getSimdStats } from '../../src/lib/server/gpu/simdjson-bridge.ts';
 import { graphSimilaritySafe, isCudaAvailable } from '../../src/lib/server/gpu/libtorch-bridge.ts';
 
@@ -261,35 +262,66 @@ async function postJson(url, body, timeoutMs) {
   return res.json();
 }
 
+// Which backend actually produced each vector; a run with fallback vectors is degraded and must
+// not be cited as semantic-embedding evidence.
+const semanticEmbedding = { requestedBackend: 'ollama', ollama: 0, sveltekit: 0, deterministicFallback: 0 };
+// Ollama answers HTTP 400 "Post http://127.0.0.1:<port>/tokenize ... refused" when its runner is
+// transiently gone; that (and network/timeout errors) is retried, ordinary contract errors are not.
+const TRANSIENT_EMBED_ERROR = /tokenize|dial tcp|actively refused|ECONNREFUSED|ECONNRESET|fetch failed|timeout|aborted| 5\d\d:/i;
+// The SvelteKit route is rate-limited to 60 req/min, so it cannot absorb a large batch.
+const SVELTEKIT_FALLBACK_MAX_TEXTS = 50;
+
+function fallbackBatch(texts) {
+  semanticEmbedding.deterministicFallback += texts.length;
+  return texts.map((text) => fallbackVector(text));
+}
+
 async function embedBatch(texts) {
   if (!texts.length) return [];
-  if (embeddingServiceUnavailable) {
-    return texts.map((text) => fallbackVector(text));
-  }
+  if (embeddingServiceUnavailable) return fallbackBatch(texts);
 
-  const body = { model: EMBED_MODEL, input: texts };
+  // Each endpoint has its own request/response shape (see lib/embed-request-contract.mjs).
   const candidates = [
-    `${OLLAMA_URL}/api/embed`,
-    `${SVELTEKIT_URL}/api/embed`,
+    { kind: 'ollama', url: `${OLLAMA_URL}/api/embed` },
+    { kind: 'sveltekit', url: `${SVELTEKIT_URL}/api/embed` },
   ];
 
-  for (const url of candidates) {
+  for (const { kind, url } of candidates) {
+    if (kind === 'sveltekit' && texts.length > SVELTEKIT_FALLBACK_MAX_TEXTS) {
+      console.warn(`[embed] skipping sveltekit fallback for ${texts.length} texts (rate limit 60/min)`);
+      continue;
+    }
     try {
-      const data = await postJson(url, body, 6000);
-      if (Array.isArray(data?.embeddings) && data.embeddings.length === texts.length) {
-        return data.embeddings;
+      const responses: unknown[] = [];
+      for (const body of buildEmbedBodies(kind, texts, EMBED_MODEL)) {
+        // Ollama gets bounded batches (cold model load possible); SvelteKit gets one short call per text.
+        // Ollama intermittently answers 400 "dial tcp ...:<port>/tokenize" on an input that succeeds on
+        // retry (runner-side fault, reproduced 2026-09-24), so retry an Ollama chunk before giving up.
+        const attempts = kind === 'ollama' ? 3 : 1;
+        for (let attempt = 1; ; attempt++) {
+          try {
+            responses.push(await postJson(url, body, kind === 'ollama' ? 60000 : 6000));
+            break;
+          } catch (error) {
+            if (attempt >= attempts || !TRANSIENT_EMBED_ERROR.test(String((error as Error)?.message ?? error))) throw error;
+            await new Promise((resolve) => setTimeout(resolve, 500 * attempt));
+          }
+        }
       }
-      if (Array.isArray(data?.embedding) && texts.length === 1) {
-        return [data.embedding];
+      const vectors = extractEmbeddings(kind, responses, texts.length);
+      if (vectors) {
+        semanticEmbedding[kind] += vectors.length;
+        return vectors;
       }
-    } catch {
-      // try next endpoint
+      console.warn(`[embed] ${kind} returned no usable vectors for ${texts.length} texts; trying next endpoint`);
+    } catch (error) {
+      console.warn(`[embed] ${kind} failed: ${String((error as Error)?.message ?? error).slice(0, 300)}`);
     }
   }
 
   embeddingServiceUnavailable = true;
-  // Last resort: single-text embedding fallback, one call per item.
-  return texts.map((text) => fallbackVector(text));
+  // Last resort: deterministic pseudo-vectors (degraded, counted in semanticEmbedding).
+  return fallbackBatch(texts);
 }
 
 async function turbovecPrefilter(vector) {
@@ -653,6 +685,7 @@ async function main() {
       uniqueRecordCount: deduped.length,
       scopedRecordCount: scopedRecords.length,
       embeddedCount: vectors.filter(Boolean).length,
+      semanticEmbedding: { ...semanticEmbedding, degraded: semanticEmbedding.deterministicFallback > 0 },
       groupCount: groups.length,
       consolidationCandidateGroups: groups.filter((group) => group.recordCount > 1).length,
       highOverlapGroups: groups.filter((group) => group.recordCount > 4 && group.openCount > 1).length,
@@ -680,6 +713,7 @@ async function main() {
   console.log(`Board updated: ${APPLY ? 'yes' : 'no'}`);
   console.log(`Groups: ${report.summary.groupCount}`);
   console.log(`Embedded records: ${report.summary.embeddedCount}/${report.summary.scopedRecordCount}`);
+  console.log(`Embedding backends: ${JSON.stringify(report.summary.semanticEmbedding)}`);
 }
 
 main()

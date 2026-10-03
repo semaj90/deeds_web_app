@@ -6,7 +6,11 @@
  * - Retrieval/context: SearchRuntime in readOnly mode (Postgres + Qdrant + graph lanes).
  * - Query embeddings: canonical semantic_768 EmbeddingGemma executor (:8081).
  * - Synthesis/planning: Ornith 1.5 via llama-server (:8090), resolved from /v1/models.
- * - Repair memory: append-only analysis_pass_results through the existing pass-fabric writer.
+ * - Repair memory: append-only analysis_pass_results through the existing pass-fabric writer, plus
+ *   a canonical WorkflowActionEventV1 (atlas.workflow-action.v1) persisted through the existing
+ *   writeCanonicalWorkflowActionAtomically() writer -- 'completed' only when analysis_pass_results
+ *   actually persisted (its row id becomes receiptId); 'failed' always, with errorCode derived from
+ *   the real thrown-error message. See scripts/phase79-canonical-workflow-action-event.mts.
  * - Source mutation: this script, gated by --apply + ATLAS_AUTHORIZE_PHASE79_REPAIR=1.
  *
  * Deliberately NOT owners:
@@ -31,6 +35,11 @@ import path from 'node:path';
 import postgres from 'postgres';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
+import {
+  buildPhase79CanonicalWorkflowActionEvent,
+  PHASE79_SYSTEM_TENANT_ID,
+  PHASE79_WORKFLOW_NAME,
+} from './phase79-canonical-workflow-action-event.mts';
 
 const execFile = promisify(execFileCallback);
 const __filename = fileURLToPath(import.meta.url);
@@ -960,6 +969,71 @@ async function persistRepairEpisode(input: {
   return { persisted: true, rowId: result.row.id };
 }
 
+async function emitCanonicalWorkflowActionEvent(input: {
+  sessionId: string;
+  suggestion: Suggestion;
+  sourceRef: string;
+  status: 'succeeded' | 'failed';
+  failureReason: string | null;
+  ledgerResult: { persisted: boolean; reason?: string; rowId?: number | string };
+  proposalChecksum: string;
+  context: RetrievalContext;
+  startedAt: string;
+  completedAt: string;
+}): Promise<{ emitted: boolean; reason?: string; runId?: string; actionId?: string; duplicate?: boolean }> {
+  const built = buildPhase79CanonicalWorkflowActionEvent({
+    sessionId: input.sessionId,
+    suggestionId: input.suggestion.id,
+    clusterId: input.suggestion.cluster_id,
+    sourceRef: input.sourceRef,
+    status: input.status,
+    failureReason: input.failureReason,
+    ledgerPersisted: input.ledgerResult.persisted,
+    ledgerRowId: input.ledgerResult.rowId ?? null,
+    proposalChecksum: input.proposalChecksum,
+    packets: input.context.packets.map((packet) => ({ packetKey: packet.packetKey })),
+    producerRevision: PHASE79_PASS_REVISION,
+    startedAt: input.startedAt,
+    completedAt: input.completedAt,
+  });
+
+  if (built.skipped) {
+    return { emitted: false, reason: built.reason };
+  }
+
+  try {
+    const { writeCanonicalWorkflowActionAtomically } = await import(
+      '$lib/server/agent/action-writer.js'
+    );
+    const result = await writeCanonicalWorkflowActionAtomically({
+      event: built.event,
+      workflowName: PHASE79_WORKFLOW_NAME,
+      workflowVersion: PHASE79_PASS_REVISION,
+      tenantId: PHASE79_SYSTEM_TENANT_ID,
+      initiatedBy: 'phase79-agentic-repair',
+      inputPacket: {
+        suggestionId: input.suggestion.id,
+        sourceRef: input.sourceRef,
+        kind: built.event.kind,
+      },
+      actionType: `atlas.workflow.${built.event.kind}`,
+      permissionScope: ['phase79:repair-attempt'],
+      idempotencyKey: built.idempotencyKey,
+    });
+    return {
+      emitted: true,
+      runId: result.runId,
+      actionId: result.actionId,
+      duplicate: result.duplicate,
+    };
+  } catch (error) {
+    return {
+      emitted: false,
+      reason: `CANONICAL_EVENT_WRITE_FAILED:${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
 async function writeAttemptReceipt(receipt: Record<string, unknown>): Promise<string> {
   const safeId = String(receipt.suggestionId ?? randomUUID()).replace(/[^a-zA-Z0-9_-]/g, '_');
   const receiptPath = path.join(LOGS_DIR, `attempt-${safeId}-${Date.now()}.json`);
@@ -1145,12 +1219,31 @@ async function processOneSuggestion(
     };
   }
 
+  const canonicalEventResult = await emitCanonicalWorkflowActionEvent({
+    sessionId,
+    suggestion,
+    sourceRef,
+    status: applied ? 'succeeded' : 'failed',
+    failureReason,
+    ledgerResult,
+    proposalChecksum,
+    context,
+    startedAt,
+    completedAt,
+  });
+  console.log(
+    canonicalEventResult.emitted
+      ? `canonicalWorkflowActionEvent=EMITTED runId=${canonicalEventResult.runId} actionId=${canonicalEventResult.actionId} duplicate=${canonicalEventResult.duplicate}`
+      : `canonicalWorkflowActionEvent=SKIPPED reason=${canonicalEventResult.reason}`
+  );
+
   const finalReceiptPath = await writeAttemptReceipt({
     schema: 'atlas.phase79.repair-apply-receipt.v2',
     sessionId,
     suggestionId: suggestion.id,
     sourceRef,
     proposalChecksum,
+    canonicalEventResult,
     sourceRevisionBefore,
     sourceRevisionAfter: applied ? sourceRevisionAfter : null,
     applied,
@@ -1232,7 +1325,7 @@ async function runAgent(): Promise<void> {
     retrievalPolicy:
       'createProductionSearchRuntime({ readOnly: true }); no direct Qdrant/Valkey/Neo4j mutation',
     persistencePolicy:
-      'successful/failed authorized repair episodes use existing analysis_pass_results only when canonical packet identity is proven',
+      'successful/failed authorized repair episodes use existing analysis_pass_results only when canonical packet identity is proven; a canonical WorkflowActionEventV1 (atlas.workflow-action.v1) is additionally emitted via writeCanonicalWorkflowActionAtomically -- completed kind only when a receiptId (the analysis_pass_results row id) is available, failed kind always',
     sourceMutationAuthorized: APPLY && APPLY_AUTHORIZED,
     highRiskAuthorized: ALLOW_HIGH_RISK && HIGH_RISK_AUTHORIZED,
   };

@@ -112,7 +112,7 @@ async function indexTools() {
       output_schema: { neighbors: 'array<Packet>', paths: 'array<Path>', distances: 'integer[]' }
     },
     {
-      tool_id: 'gemma4.explain_code',
+      tool_id: 'ornith.explain_code',
       name: 'Gemma4 Code Explanation',
       description: 'LLM synthesis of code structure, intent, and constraints',
       capabilities: ['code summarization', 'constraint extraction', 'dependency mapping'],

@@ -48,9 +48,9 @@ async function main() {
           (canonical_source_ref IS NOT NULL) as gate_1_source_ref_trusted,
           (identity_confidence > 0.8) as gate_2_ace_cache_hit,
           (title_id IS NOT NULL) as gate_3_kag_neighbor_available,
-          (embedding IS NOT NULL OR content_embedding_384 IS NOT NULL) as gate_4_dag_edge_exists,
+          (embedding IS NOT NULL) as gate_4_dag_edge_exists,
           (summary IS NOT NULL AND LENGTH(COALESCE(summary, '')) > 10) as gate_5_summary_exists,
-          (content_embedding_384 IS NOT NULL) as gate_6_embedding_exists,
+          (embedding IS NOT NULL) as gate_6_embedding_exists,
           (updated_at >= NOW() - INTERVAL '24 hours') as gate_7_all_mirrors_synced
         FROM atlas_packets
         WHERE packet_key IS NOT NULL

@@ -28,11 +28,21 @@ function categoricalValue(row: ObservationFeatureRowV1, featureId: string): stri
 export type ObservationFeatureRepository = ReturnType<typeof createObservationFeatureRepository>;
 
 export type ObservationFeatureRepositoryOptions = {
-  schema?: 'PACKET_KEY_ORF_V1';
+  schema: 'PACKET_KEY_ORF_V1';
 };
 
-export function createObservationFeatureRepository(pool: Pool, options: ObservationFeatureRepositoryOptions = {}) {
-  void options;
+function validateWorkspaceRevision(value: string | undefined): string | null {
+  if (value === undefined) return null;
+  if (value.trim().length === 0) {
+    throw new Error('OBSERVATION_FEATURE_WORKSPACE_REVISION_REQUIRED');
+  }
+  return value;
+}
+
+export function createObservationFeatureRepository(pool: Pool, options: ObservationFeatureRepositoryOptions) {
+  if (options?.schema !== 'PACKET_KEY_ORF_V1') {
+    throw new Error('OBSERVATION_FEATURE_REPOSITORY_SCHEMA_OPT_IN_REQUIRED');
+  }
   return {
     async upsertFeatureRow(input: {
       row: ObservationFeatureRowV1;
@@ -45,6 +55,7 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
       producerRevision?: string;
     }): Promise<ObservationFeatureRowV1> {
       const row = observationFeatureRowSchema.parse(input.row);
+      validateWorkspaceRevision(row.workspace_revision);
       const featureRowChecksum = observationFeatureChecksum(row);
       const kmeansRaw = categoricalValue(row, 'cluster.kmeans');
       const kmeans = kmeansRaw === null ? null : Number(kmeansRaw);
@@ -66,6 +77,11 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
         )
         ON CONFLICT (packet_key, feature_revision) DO UPDATE SET
           source_ref = EXCLUDED.source_ref,
+          source_version_receipt_id = EXCLUDED.source_version_receipt_id,
+          workspace_revision = EXCLUDED.workspace_revision,
+          representation_id = EXCLUDED.representation_id,
+          representation_revision = EXCLUDED.representation_revision,
+          tree_node_id = EXCLUDED.tree_node_id,
           ontology_classes = EXCLUDED.ontology_classes,
           ast_observation_kinds = EXCLUDED.ast_observation_kinds,
           langextract_classes = EXCLUDED.langextract_classes,
@@ -86,7 +102,7 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
         input.featureRevision,
         row.source_ref,
         input.sourceVersionReceiptId ?? null,
-        Number.isInteger(Number(row.workspace_revision)) ? Number(row.workspace_revision) : null,
+        row.workspace_revision,
         input.representationId ?? null,
         input.representationRevision ?? null,
         input.treeNodeId ?? null,
@@ -120,14 +136,12 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
       limit?: number;
     }): Promise<Array<{ packet_key: string; feature_revision: string; source_ref: string }>> {
       const limit = Math.max(1, Math.min(input.limit ?? 200, 5000));
-      const workspaceRevision = input.workspaceRevision && /^\d+$/.test(input.workspaceRevision)
-        ? Number(input.workspaceRevision)
-        : null;
+      const workspaceRevision = validateWorkspaceRevision(input.workspaceRevision);
       const result = await pool.query<{ packet_key: string; feature_revision: string; source_ref: string }>(`
         SELECT packet_key, feature_revision, source_ref
         FROM atlas_observation_feature_rows
         WHERE feature_revision = $1
-          AND ($2::integer IS NULL OR workspace_revision = $2)
+          AND ($2::text IS NULL OR workspace_revision = $2)
           AND (cardinality($3::text[]) = 0 OR ontology_classes @> $3::text[])
           AND (cardinality($4::text[]) = 0 OR ast_observation_kinds @> $4::text[])
           AND (cardinality($5::text[]) = 0 OR langextract_classes @> $5::text[])

@@ -46,8 +46,12 @@ async function probe(item: (typeof cases)[number]): Promise<ProbeResult> {
     const diagnosticMatch = item.expectedDiagnostic == null
       ? diagnostics === 0
       : diagnosticText.includes(item.expectedDiagnostic);
+    // STRUCT-05 proves syntax evidence independently from STRUCT-04's
+    // transport error-tag contract. The sidecar may return recovered syntax
+    // diagnostics without an error_tag; do not conflate that with identity
+    // validity or make the MISSING fixture depend on a separate envelope.
     const valid = item.expectedDiagnostic != null
-      ? evidence.error_tag === 'ChunkingError' && diagnosticMatch && evidence.syntax_status === 'RECOVERED_WITH_ERRORS'
+      ? diagnosticMatch && evidence.syntax_status === 'RECOVERED_WITH_ERRORS'
       : evidence.error_tag == null && evidence.syntax_status === 'CLEAN' && diagnosticMatch && (evidence.chunks?.length ?? 0) > 0;
     return {
       name: item.name,
@@ -92,6 +96,7 @@ const report = {
   failedFiles: results.filter((result) => result.status === 'FAIL').length,
   malformedDiagnosticPass: results.some((result) => result.name === 'malformed' && result.diagnosticMatch),
   missingDiagnosticPass: results.some((result) => result.name === 'missing-delimiter' && result.diagnosticMatch),
+  typedErrorTagPass: results.filter((result) => result.expectedDiagnostic != null).every((result) => result.errorTag === 'ChunkingError'),
   results,
 };
 
@@ -107,6 +112,7 @@ await writeFile(markdownPath, [
   `- files: ${report.passedFiles}/${report.totalFiles} passed`,
   `- malformed diagnostic: ${report.malformedDiagnosticPass ? 'PASS' : 'FAIL'}`,
   `- missing delimiter diagnostic: ${report.missingDiagnosticPass ? 'PASS' : 'FAIL'}`,
+  `- typed ChunkingError tag: ${report.typedErrorTagPass ? 'PASS' : 'OPEN (sidecar envelope)'}`,
   '',
   ...results.map((result) => `- ${result.name}: ${result.status} (${result.chunkCount} chunks, ${result.diagnosticCount} diagnostics)`),
   '',

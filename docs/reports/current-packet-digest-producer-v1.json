@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.current-packet-digest-producer.v1",
+  "generatedAt": "2026-09-28T19:15:05.921Z",
+  "executionId": "e48f17f6-171b-4e35-af52-02076ca376ce",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "limit": 25,
+  "mode": "READ_ONLY_PLAN",
+  "counts": {},
+  "manifest": null,
+  "admission": null,
+  "observations": [],
+  "mutation": {
+    "attempted": false,
+    "inserted": 0,
+    "updated": 0,
+    "readback": "NOT_RUN",
+    "rolledBack": false
+  },
+  "writesPerformed": false,
+  "promotion": "BLOCKED_UNTIL_READBACK_AND_PACKET_CHUNK_LINEAGE_GATE"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "parent-atlas.agentic-logic-census.v1",
+  "status": "LOCAL_ATLAS_LOGIC_FOUND_PAPERCLIP_RUNTIME_NOT_FOUND",
+  "mainRepository": "C:/Users/james/Videos/deeds-web-app",
+  "surfaces": {
+    "mastraPackage": "packages/atlas-orchestrator",
+    "mastraAndWorkflowScripts": ["scripts/atlas/daily-graphify-concrete-dag.mjs", "scripts/atlas/phase1-file-understanding-mastra.mjs", "scripts/atlas/unified-registry-repair-loop.mts", "scripts/atlas/agentic-recommendation-workflow.mjs"],
+    "workstationAndRepairOwner": ["packages/atlas-core/src/workstation-orchestrator.ts", "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts", "sveltekit-frontend/scripts/agents/repair-registry.ts", "sveltekit-frontend/scripts/agents/repair-loop.ts"],
+    "claimRetryLeaseLogic": ["scripts/agentic/claim-task.mjs", "scripts/agentic/release-task-claim.mjs", "packages/atlas-core/src/queue/topology.ts", "packages/parent-atlas-client/src/http/client.ts", "packages/parent-atlas-client/src/mcp/client.ts"],
+    "opencodeBoundary": [".opencode/opencode.jsonc", ".opencode/agents/atlas-rlm-repair.md", ".opencode/command/atlas-repair-stdio-proof.md"],
+    "paperclipRuntime": []
+  },
+  "ownership": {"workstationAndRepair": "@deeds/atlas-core", "workflowOrchestration": "@deeds/atlas-orchestrator", "contracts": "@deeds/atlas-contracts", "paperclip": "external_adapter_concept_only"},
+  "writesPerformed": false,
+  "canonicalAuthority": false
+}

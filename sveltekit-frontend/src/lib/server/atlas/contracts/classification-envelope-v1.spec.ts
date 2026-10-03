@@ -8,6 +8,45 @@ import {
 } from './classification-envelope-v1.js';
 
 describe('Classification envelope alignment', () => {
+  it('preserves absent provenance versions as null instead of inventing unknown versions', () => {
+    const classification = buildClassificationEnvelopeV1({
+      identity: {
+        packetKey: 'packet:provenance-null',
+        sourceRef: 'src/provenance-null.ts',
+        contentHash: 'sha256:content',
+        workspaceRevision: 'workspace:1',
+        featureId: 'feature:provenance-null',
+        featureLabel: 'Provenance null fixture',
+        titleId: null,
+      },
+      signals: {
+        laneStatus: 'REFERENCE_ONLY',
+        evidenceState: 'GATED',
+        knowledgeResolution: 'UNCLASSIFIED',
+        partOfSpeech: null,
+      },
+      validation: {
+        layer: 'validation',
+        packetKey: 'packet:provenance-null',
+        sourceRef: 'src/provenance-null.ts',
+        contentHash: 'sha256:content',
+        workspaceRevision: 'workspace:1',
+        validatedBy: 'test',
+        phase: 'test',
+        canPromotion: null,
+        isValid: false,
+        outcome: null,
+        ledgerPath: null,
+        recordedAt: null,
+      },
+    });
+
+    expect(classification.provenance.packetSchemaVersion).toBeNull();
+    expect(classification.provenance.featureSchemaVersion).toBeNull();
+    expect(classification.provenance.validationSchemaVersion).toBeNull();
+    expect(classification.provenance.ledgerSchemaVersion).toBeNull();
+  });
+
   it('keeps packet, feature row, validation, and ledger identity aligned for structural tree nodes', () => {
     const now = '2026-07-28T00:00:00.000Z';
 

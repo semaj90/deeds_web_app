@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.library-docs-source-manifest.v1",
+  "revision": "atlas-library-docs-source-manifest-v1-2026-09-30",
+  "canonicalAuthority": false,
+  "acquisitionStatus": "PLANNED_NOT_FETCHED_IN_THIS_MANIFEST",
+  "packageInventoryBasis": [
+    "root package-lock.json",
+    "sveltekit-frontend/package-lock.json",
+    "python/*requirements*.txt",
+    "python/pyproject.toml",
+    "services/*/go.mod",
+    "go-retrieval-classifier/go.mod",
+    "Cargo.toml and crate manifests",
+    "service-specific Docker requirements"
+  ],
+  "rules": {
+    "officialSourcesOnly": true,
+    "versionBounded": true,
+    "immutableRunOutput": true,
+    "overwriteExistingCorpus": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "mcpWriteTools": 0
+  },
+  "sources": [
+    { "id": "postgresql-pgvector", "languages": ["sql", "c"], "priority": "P0", "urls": ["https://www.postgresql.org/docs/current/", "https://github.com/pgvector/pgvector"] },
+    { "id": "drizzle", "languages": ["typescript"], "priority": "P0", "urls": ["https://orm.drizzle.team/docs/overview", "https://orm.drizzle.team/docs/migrations", "https://orm.drizzle.team/docs/sql-schema-declaration"] },
+    { "id": "zod", "languages": ["typescript"], "priority": "P0", "urls": ["https://zod.dev/"] },
+    { "id": "qdrant", "languages": ["typescript", "python", "go"], "priority": "P0", "urls": ["https://qdrant.tech/documentation/concepts/points/", "https://qdrant.tech/documentation/manage-data/vectors/", "https://qdrant.tech/documentation/search/text-search/hybrid-search/"] },
+    { "id": "redis-valkey", "languages": ["typescript", "python", "go"], "priority": "P0", "urls": ["https://redis.io/docs/latest/", "https://valkey.io/topics/"] },
+    { "id": "mcp", "languages": ["typescript"], "priority": "P0", "urls": ["https://modelcontextprotocol.io/specification/"] },
+    { "id": "svelte-typescript", "languages": ["typescript"], "priority": "P1", "urls": ["https://svelte.dev/docs/kit", "https://svelte.dev/docs/svelte", "https://www.typescriptlang.org/docs/"] },
+    { "id": "langchain-langgraph-typescript", "languages": ["typescript"], "priority": "P1", "urls": ["https://docs.langchain.com/_llms/agent-development-lifecycle/build/type-script.md", "https://docs.langchain.com/oss/javascript/langchain/overview.md", "https://docs.langchain.com/oss/javascript/langgraph/overview.md"] },
+    { "id": "langchain-langgraph-python", "languages": ["python"], "priority": "P1", "urls": ["https://docs.langchain.com/oss/python/langgraph/llms.txt", "https://docs.langchain.com/oss/python/langchain/overview.md"] },
+    { "id": "openwiki-agent-docs", "languages": ["mixed"], "priority": "P1", "urls": ["https://docs.langchain.com/oss/openwiki/overview.md", "https://docs.langchain.com/oss/openwiki/code-mode.md", "https://docs.langchain.com/oss/openwiki/integrations.md"] },
+    { "id": "tree-sitter", "languages": ["typescript", "c"], "priority": "P1", "urls": ["https://tree-sitter.github.io/tree-sitter/"] },
+    { "id": "ast-grep", "languages": ["typescript", "rust"], "priority": "P1", "urls": ["https://ast-grep.github.io/guide/"] },
+    { "id": "fastapi-pydantic", "languages": ["python"], "priority": "P1", "urls": ["https://fastapi.tiangolo.com/tutorial/", "https://docs.pydantic.dev/latest/"] },
+    { "id": "go-grpc-protobuf-pgx", "languages": ["go"], "priority": "P1", "urls": ["https://grpc.io/docs/languages/go/", "https://protobuf.dev/reference/go/go-generated/", "https://pkg.go.dev/github.com/jackc/pgx/v5"] },
+    { "id": "networkx-python", "languages": ["python"], "priority": "P1", "urls": ["https://networkx.org/documentation/stable/"] },
+    { "id": "rapids-cugraph", "languages": ["python", "cpp", "cuda"], "priority": "P1", "urls": ["https://docs.rapids.ai/api/cugraph/stable/", "https://docs.rapids.ai/api/cugraph/stable/api_docs/", "https://docs.rapids.ai/api/cugraph/stable/graph_support/cugraph_cpp/"] },
+    { "id": "rapids-cuvs", "languages": ["python", "cpp", "cuda"], "priority": "P1", "urls": ["https://docs.rapids.ai/api/cuvs/stable/", "https://docs.rapids.ai/api/cuvs/stable/integrations/"] },
+    { "id": "cuda-cublas", "languages": ["cpp", "cuda"], "priority": "P1", "urls": ["https://docs.nvidia.com/cuda/cublas/index.html"] },
+    { "id": "onnx-runtime", "languages": ["typescript", "cpp"], "priority": "P2", "urls": ["https://onnxruntime.ai/docs/"] },
+    { "id": "pytorch-numpy-pyarrow", "languages": ["python", "cpp"], "priority": "P2", "urls": ["https://pytorch.org/docs/stable/", "https://numpy.org/doc/stable/", "https://arrow.apache.org/docs/python/"] },
+    { "id": "oaklib", "languages": ["python"], "priority": "P2", "urls": ["https://oaklib.readthedocs.io/en/latest/"] },
+    { "id": "rust-workspace", "languages": ["rust"], "priority": "P2", "urls": ["https://doc.rust-lang.org/book/", "https://napi.rs/", "https://docs.rs/tokio/latest/tokio/", "https://docs.rs/rayon/latest/rayon/", "https://serde.rs/"] },
+    { "id": "simdjson-cpp", "languages": ["cpp"], "priority": "P2", "urls": ["https://simdjson.org/", "https://github.com/simdjson/simdjson"] },
+    { "id": "beautifulsoup-firecrawl", "languages": ["python", "http"], "priority": "P2", "urls": ["https://www.crummy.com/software/BeautifulSoup/bs4/doc/", "https://docs.firecrawl.dev/"] }
+  ]
+}

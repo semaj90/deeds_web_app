@@ -1,5 +1,11 @@
-# Legal AI Evidence Processing System — PyTorch CUDA Runtime
-# RTX 3060 Ti (Ampere sm_86) Optimized — CUDA 12.6 / cuDNN 9
+# Legal AI Evidence Processing System — LEGACY PyTorch CUDA Runtime
+# RTX 3060 Ti (Ampere sm_86) compatibility lane — CUDA 12.6 / cuDNN 9
+#
+# This image remains available for the older legal-ai-gpu workflow. It is not
+# the current RTX alignment, not a TensorRT-RTX image, and not the cuTile/SIMT
+# reference lane. Use the pinned CUDA 13.2 PyTorch images for current SM86
+# neural/cuTile proofs; keep TensorRT-RTX in a separate CUDA 13.4 capability
+# lane until its official package and runtime receipts are proven.
 #
 # Build:
 #   docker build -f docker/Dockerfile.cuda -t legal-ai-gpu .

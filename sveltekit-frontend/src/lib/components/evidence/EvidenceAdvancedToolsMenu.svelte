@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 	import { invalidateAll } from '$app/navigation';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import DetectiveEvidenceMap from '$lib/components/yorha/DetectiveEvidenceMap.svelte';
@@ -122,7 +123,7 @@
 									verificationResults={{ aiAnalysisScore: 0.94, tamperedIndicators: [] }}
 									originalHash={firstEvidence?.id ?? ''}
 									currentHash={firstEvidence?.id ?? ''}
-									aiAnalysis={{ riskLevel: 'low', confidence: 0.96, models: ['gemma4-legal'] }}
+									aiAnalysis={{ riskLevel: 'low', confidence: 0.96, models: [SERVER_CHAT_MODEL] }}
 									showDetails={true}
 								/>
 							{:else if section.id === 'relationships'}

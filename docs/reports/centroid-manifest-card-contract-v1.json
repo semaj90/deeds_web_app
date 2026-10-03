@@ -1,0 +1,49 @@
+{
+  "schema": "atlas.implementation-report.v1",
+  "reportId": "centroid-manifest-card-contract-v1",
+  "observedDate": "2026-10-02",
+  "workspaceRevision": "4f8fcc467a253972154601859ec39f082cbc9af6",
+  "status": "CONTRACT_PROVEN",
+  "ownerChange": "parent-atlas-ace-rlm-bitfrost-integration",
+  "reusedOwners": [
+    "sveltekit-frontend/src/lib/server/atlas/cache/centroid-artifact-v1.ts",
+    "parent-atlas-pass-fabric: analysis_pass_results"
+  ],
+  "implementedContracts": [
+    "CentroidManifestV1",
+    "CentroidCardV1",
+    "verifyCentroidCardAgainstManifestV1"
+  ],
+  "proof": {
+    "centroidArtifactTests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "targetedTypeScript": "PASS",
+    "strictOpenSpecValidation": {
+      "parent-atlas-ace-rlm-bitfrost-integration": "PASS",
+      "parent-atlas-pass-fabric": "PASS"
+    },
+    "diffWhitespaceCheck": "PASS"
+  },
+  "mutations": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "gpuPromotion": 0,
+    "existingTaskCheckboxesChanged": 0,
+    "newlyRecordedImplementationTasksChecked": 2
+  },
+  "notProven": [
+    "No admitted live candidate snapshot or centroid artifact readback",
+    "No Valkey centroid publication, warming, or residency promotion",
+    "No bounded NLP pass persisted; analysis_pass_results staging status semantics remain unresolved",
+    "No SIMDJSON benchmark; no parsing workload was profiled in this slice",
+    "Full svelte-check was interrupted after high memory use; targeted TypeScript check passed"
+  ],
+  "nextGates": [
+    "Bind centroid manifest/card to exact admitted candidate snapshot and artifact readback",
+    "Define staging semantics under parent-atlas-pass-fabric before any NLP result persistence",
+    "Benchmark SIMDJSON only against a measured large JSON/NDJSON workload with output parity"
+  ]
+}

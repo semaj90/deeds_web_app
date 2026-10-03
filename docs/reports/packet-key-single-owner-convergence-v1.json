@@ -1,0 +1,241 @@
+{
+  "schema": "atlas.packet-key-single-owner-convergence.v1",
+  "gate": "PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01",
+  "generatedAt": "2026-09-22T00:00:00Z",
+  "mode": "READ_ONLY",
+  "scopeNote": "Follow-up to manual-migration-reconciliation MMR1.8 (packet-writer-source-revision-authority-v1.json) and canonical-identity-v1-spec-reconciliation.json. Answers whether packet_key has a single owner, independent of the two operator decisions (S01-08K apply token, PACKET-WRITER-PRODUCTION-OWNER-01).",
+  "liveCensus": {
+    "table": "atlas_packets",
+    "queriedAt": "2026-09-22",
+    "totalRows": 61718,
+    "schemes": [
+      {
+        "scheme": "DOMINANT_SOURCE_REF_HASH",
+        "pattern": "^packet:[0-9a-f]{12}$",
+        "formula": "'packet:' + sha256(source_ref).slice(0, 12)",
+        "rowCount": 58362,
+        "percentage": 94.56,
+        "sourceRevisionPopulated": 0
+      },
+      {
+        "scheme": "ACE_PREFIX_VARIANT",
+        "pattern": "^ace:packet:[0-9a-f]{12}$",
+        "formula": "same sha256(source_ref).slice(0,12) hash as DOMINANT_SOURCE_REF_HASH, wrong historical prefix",
+        "rowCount": 3294,
+        "percentage": 5.34,
+        "sourceRevisionPopulated": 0,
+        "note": "100% covered by atlas_packet_identity_aliases (3294 alias rows, alias_key = this row's packet_key, canonical_packet_key = the packet:<hash> equivalent). Not a live conflict; fully resolved via the alias table."
+      },
+      {
+        "scheme": "RPC_PROTO_16HEX",
+        "pattern": "^[0-9a-f]{16}$",
+        "formula": "sha256('rpc:' + service + '.' + method).slice(0, 16)",
+        "rowCount": 61,
+        "percentage": 0.099,
+        "note": "Distinct identity domain (source_kind='rpc_method', source_ref='proto:Service.Method'). Not a competing derivation for codebase-file packets -- a separate sub-scheme for RPC/tool packets, produced by scripts/atlas/packetize-proto-rpc-tools.mjs::packetKeyFor()."
+      },
+      {
+        "scheme": "OTHER_UNRECOGNIZED",
+        "rowCount": 1,
+        "example": "sha256:4ff58c17ae76b8b115e4cd94",
+        "sourceRef": "cluster:summary:0",
+        "sourceKind": "cluster-summary",
+        "note": "Single legacy row, non-file cluster-summary packet. Not investigated further (out of proportion to its weight); flagged, not resolved."
+      },
+      {
+        "scheme": "COMPUTE_PACKET_KEY_V1_HEX64_NODESCOPED",
+        "pattern": "^[0-9a-f]{64}$",
+        "liveRows": 0,
+        "note": "packet-key-builder.ts::computePacketKey(source_ref, tree_node_id, title_id). Zero live rows despite being imported by 8+ production TS files (see producers[])."
+      },
+      {
+        "scheme": "COMPUTE_PACKET_KEY_V1_WORKSPACE_SCOPED",
+        "pattern": "^pkt:",
+        "liveRows": 0,
+        "note": "compute-packet-key.ts::computePacketKey({workspaceId, sourceRef, semanticAnchor}). Zero live rows, zero production callers (only its own containment spec)."
+      }
+    ],
+    "duplicateKeys": "not separately re-queried this pass -- MMR1.8's liveReadback already established atlas_packets.packet_key uniqueness assumptions; no new duplicate-key finding surfaced by this census"
+  },
+  "producers": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "export": "persistAdmittedSemanticPacketEmbedding",
+      "classification": "CANONICAL_WRITER",
+      "formula": "uses admission.packetKey verbatim (opaque -- caller-supplied via SemanticPacketWriteAdmissionV1); does not compute a key itself",
+      "runtimeCallers": "0 confirmed live production callers as of MMR1.8 (2026-09-21 gate) -- mechanism proven, unwired",
+      "tablesWritten": [
+        "atlas_packets"
+      ],
+      "stableFileIdInput": false,
+      "sourceRefInput": true,
+      "canonicalAuthorityClaim": "yes, per MMR1.8 gate"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+      "export": "persistCanonicalSemanticPacketEmbedding / resolvePersistedPacketKey",
+      "classification": "LEGACY_WRITER",
+      "formula": "if callerPacketKey supplied -> resolveCanonicalPacketKey(callerPacketKey) (dominant-scheme-or-alias only, throws on hex64/pkt: candidates). If NOT supplied AND sourceRef+treeNodeId+titleId all present -> falls back to packet-key-builder.ts hex64 formula and WOULD write it. No live caller currently supplies the no-packetKey + full-triple combination (all current callers supply a resolvable packetKey), so this hex64 fallback branch is reachable in code but not exercised in current production traffic -- not independently re-verified this pass per caller, carried forward from the module's own header comment.",
+      "tablesWritten": [
+        "atlas_packets"
+      ],
+      "canonicalAuthorityClaim": "no -- historical-compatible path per its own docstring"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts",
+      "export": "resolveCanonicalPacketKey / resolvePacketKeyForWrite",
+      "classification": "COMPATIBILITY_WRITER",
+      "role": "Not a key producer -- the write-gate/resolution authority. Resolves any candidate to (a) an exact atlas_packets.packet_key match, (b) an atlas_packet_identity_aliases lookup, or (c) throws PacketIdentityUnresolvedError. Explicitly and unconditionally rejects hex64 and pkt: candidates as StructuralScopedAddressExperimentError before even attempting resolution -- i.e. production code has ALREADY decided, at the resolver layer, that those two schemes are not canonical packet identity, independent of any decision recorded in this report.",
+      "builtIn": "Session 200 (P0-3, PACKET_IDENTITY_ALIAS_AND_WRITER_CONVERGENCE)"
+    },
+    {
+      "path": "scripts/atlas/upsert-whole-codebase-atlas-packets.mjs",
+      "function": "inline (sha256() helper + packet_key template literal, line 76)",
+      "classification": "MIGRATION_BACKFILL",
+      "formula": "'packet:' + sha256(source_ref).slice(0, 12)",
+      "insertStatement": "INSERT INTO atlas_packets (...) ON CONFLICT (packet_key) DO NOTHING",
+      "explicitBehavior": "'Preserve existing packet_key when source_ref already exists' (own header comment) -- confirms the live lifecycle contract: identity is a pure function of source_ref, with no revision/content input.",
+      "note": "Not registered in package.json as a scheduled/live npm script; referenced extensively across graphify/source-authority receipts and openspec changes as the primary bulk producer of current-corpus packet rows. Classified MIGRATION_BACKFILL per the pre-existing MMR1.8 bulk-script taxonomy (consistent, not re-derived), even though it accounts for the overwhelming majority (99.9%) of live rows once its ace:packet: alias-equivalent cohort is included."
+    },
+    {
+      "path": "scripts/atlas/register-orphaned-chunks.mjs",
+      "classification": "LEGACY_WRITER (bug, since fixed)",
+      "formula": "same sha256(source_ref).slice(0,12) hash, wrote with an erroneous 'ace:' prefix",
+      "rowsProduced": 3294,
+      "note": "Fully compatibility-covered via atlas_packet_identity_aliases (built in Session 200). Not re-verified this pass whether the bug itself is still present in the live script file -- out of scope (read-only, no packet writes)."
+    },
+    {
+      "path": "scripts/atlas/packetize-proto-rpc-tools.mjs",
+      "function": "packetKeyFor(service, method)",
+      "classification": "CANONICAL_OWNER_CANDIDATE (distinct sub-domain)",
+      "formula": "sha256('rpc:' + service + '.' + method).slice(0, 16)",
+      "rowsProduced": 61,
+      "note": "Not a competing packet_key derivation for the same identity domain -- covers a structurally distinct class of packets (RPC/proto tool descriptors, source_kind='rpc_method'), never overlapping with source_ref-keyed codebase-file packets."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-builder.ts",
+      "export": "computePacketKey(source_ref, tree_node_id, title_id)",
+      "classification": "CANONICAL_OWNER_CANDIDATE (self-declared, NOT_YET_PROVEN)",
+      "formula": "sha256(source_ref + '|' + (tree_node_id ?? '') + '|' + (title_id ?? '')).digest('hex') -- raw 64-hex, no prefix",
+      "liveRows": 0,
+      "runtimeCallers": [
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts",
+        "sveltekit-frontend/src/lib/server/analysis/source-pos-concept-packet.ts",
+        "sveltekit-frontend/src/lib/server/analysis/code-feature-registry-enqueue.ts",
+        "sveltekit-frontend/src/lib/server/tasks/semantic-packets.ts",
+        "sveltekit-frontend/src/lib/server/dispatch/mcp-tool-implementations.ts",
+        "sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.ts",
+        "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts (comparison/mismatch-guard only, per resolvePersistedPacketKey)",
+        "sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts"
+      ],
+      "stableFileIdInput": false,
+      "sourceRefInput": true,
+      "renameControl": "does NOT survive rename (source_ref is a direct hash input)",
+      "revisionControl": "does not accept a revision/content input -- structurally the same revision-invariance as the dominant scheme, but at a finer (per-AST-node) grain via tree_node_id + title_id",
+      "canonicalAuthorityClaim": "declared 'FINAL_PACKET_IDENTITY_V2 -- NOT_YET_PROVEN' in its own header; explicit instruction not to silently promote it",
+      "promotionStatus": "NOT PROMOTED -- resolver layer (packet-identity-resolver.ts) actively rejects its output as non-canonical (StructuralScopedAddressExperimentError). Its 8 importers use it, but every live write path either never reaches its output or is gated by the resolver before persistence."
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/identity/compute-packet-key.ts",
+      "export": "computePacketKey({workspaceId, sourceRef, semanticAnchor})",
+      "classification": "DEAD_ORPHAN",
+      "formula": "'pkt:' + workspaceId + ':' + sha256('pkt:v1:' + workspaceId + ':' + normalizedSourceRef + ':' + semanticAnchor).slice(0,32)",
+      "liveRows": 0,
+      "runtimeCallers": "none found outside its own compute-packet-key-containment.spec.ts",
+      "note": "Own file header already says 'Canonical logical packet identity should use packet-key-builder.ts instead; this helper is only for compatibility / scoped-address flows' -- self-demoted, not a live candidate."
+    }
+  ],
+  "aliasOwner": {
+    "table": "atlas_packet_identity_aliases",
+    "rowCount": 3294,
+    "coverage": "100% of the ACE_PREFIX_VARIANT cohort (3294/3294)",
+    "meaning": "Historical bug-compatibility only (register-orphaned-chunks.mjs's wrong-prefix write), NOT a rename/lifecycle-continuity mechanism -- confirmed by packet-identity-resolver.ts's own header: 'Historical PK migration (P0-6) is deliberately deferred'.",
+    "renameContinuity": false
+  },
+  "lifecycleContract": {
+    "status": "UNDEFINED_AS_WRITTEN_SPEC / INFERRED_FROM_WRITER_BEHAVIOR",
+    "inferredGrain": "FILE_LIFECYCLE_PACKET, keyed on source_ref (path) alone -- NOT on stableFileId, NOT on sourceRevision/contentHash, NOT on symbolVersionId or treeNodeId",
+    "evidence": "upsert-whole-codebase-atlas-packets.mjs's own comment: 'Preserve existing packet_key when source_ref already exists' -- i.e. the writer's actual behavior IS the only documented contract; no separate spec doc states this.",
+    "sameLogicalPacketTest": {
+      "sameStableFileId_sameSourceRef_R1_to_R2": "packet_key STAYS THE SAME (formula has no revision/content input) -- consistent with a revision-invariant file-identity model.",
+      "sameContent_sameStableFileId_sourceRefA_to_B_rename": "packet_key CHANGES (source_ref is the sole hash input) -- packet_key CANNOT detect that A and B are the same logical file that moved. This is the real gap: stableFileId (UUIDv7, already frozen per S01-08 series) is the correct answer to 'is this the same file', but packet_key is not wired to it."
+    }
+  },
+  "renameControl": "NOT survived by the dominant live scheme, hex64 candidate, or RPC sub-scheme (all hash source_ref/service+method directly). Survived only via the historical alias table, and only for the single already-fixed ace:packet: prefix bug -- not a general rename mechanism.",
+  "revisionControl": "NOT an input to any live or candidate scheme found. sourceRevision is tracked as a separate atlas_packets column (independently proven admission-chain per MMR1.8), never folded into packet_key.",
+  "futureOwner": {
+    "status": "NO_PROVEN_CANDIDATE",
+    "path": null,
+    "export": null,
+    "formula": null,
+    "rationale": "Neither non-live candidate (hex64 node-scoped, pkt: workspace-scoped) has a promotion decision, live rows, or a resolved grain question (file-scoped vs node-scoped packet identity is explicitly flagged as an open product question in packet-key-builder.ts's own header, unresolved by this gate)."
+  },
+  "legacySchemes": [
+    {
+      "scheme": "ACE_PREFIX_VARIANT",
+      "status": "LIVE_DATA_CONVERGED via alias table, 3294/3294 rows"
+    },
+    {
+      "scheme": "COMPUTE_PACKET_KEY_V1_HEX64_NODESCOPED",
+      "status": "NEVER_LIVE -- zero rows, actively rejected by the resolver"
+    },
+    {
+      "scheme": "COMPUTE_PACKET_KEY_V1_WORKSPACE_SCOPED",
+      "status": "NEVER_LIVE -- zero rows, zero production callers, self-demoted in its own docstring"
+    },
+    {
+      "scheme": "RPC_PROTO_16HEX",
+      "status": "LIVE, but a distinct identity sub-domain, not a packet_key conflict"
+    }
+  ],
+  "ambiguousRows": {
+    "count": 1,
+    "description": "The single OTHER_UNRECOGNIZED 'sha256:...' cluster-summary row -- not investigated to a producing script this pass."
+  },
+  "migration": {
+    "required": false,
+    "designOnly": false,
+    "rationale": "Live data already has a single de facto owner (dominant source_ref-hash scheme, with the only competing live cohort fully alias-covered). No live migration is required to reach single ownership of the DATA. What remains open is a lifecycle-contract decision (should packet_key survive rename / become revision-qualified / converge on stableFileId), which is a design question, not a migration -- and per the pasted task instructions this report performs design analysis only where migration IS required; since migration is not required, no migration design is produced."
+  },
+  "result": "PACKET_KEY_LIFECYCLE_CONTRACT_UNDEFINED",
+  "resultRationale": "Live packet_key ownership is empirically single (99.9% of atlas_packets rows resolve to one formula-family, with the resolver actively rejecting both non-live candidate schemes) -- so this is NOT an active OWNER_CONFLICT at the data layer, and NOT a MIGRATION_REQUIRED or COMPATIBILITY_LAYER_REQUIRED case (the one compatibility layer needed, the alias table, already exists and is fully applied). The genuine open gap is that no written contract states what packet_key is supposed to mean over a file's lifecycle -- specifically whether it must survive rename, whether it should be revision-qualified, or whether it should ultimately be derived from stableFileId (the already-frozen UUIDv7 file-lifecycle identity) rather than from source_ref directly. That undefined contract is exactly what blocks deciding whether packet-key-builder.ts's hex64/node-scoped candidate is the right future owner, the wrong one, or irrelevant. Distinct from and independent of both open operator decisions (S01-08K apply token; PACKET-WRITER-PRODUCTION-OWNER-01 caller choice).",
+  "tests": {
+    "added": [
+      "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-dominant-scheme.spec.ts (7 tests, new)"
+    ],
+    "reused": [
+      "sveltekit-frontend/src/lib/server/atlas/identity/compute-packet-key-containment.spec.ts (2 tests, pre-existing)"
+    ],
+    "coverage": [
+      "formula determinism",
+      "rename behavior (non-survival)",
+      "revision-change behavior (no revision input, single-arg formula)",
+      "scheme classification (dominant vs hex64 vs pkt: mutual distinctness)",
+      "no projection/cluster/CandidateOrdinal input (arity check)",
+      "legacy-prefix detection (ace:packet: hash-equivalence to packet:)"
+    ],
+    "result": "9/9 PASS",
+    "runCommand": "npx vitest run src/lib/server/atlas/identity/packet-key-dominant-scheme.spec.ts src/lib/server/atlas/identity/compute-packet-key-containment.spec.ts"
+  },
+  "openSpecValidation": {
+    "parent-atlas-retrieval-lineage-dag-convergence": "PASS -- Change is valid",
+    "manual-migration-reconciliation": "PASS -- Change is valid"
+  },
+  "gitDiffCheck": "run after write, before commit -- see commit message for result",
+  "commit": "PENDING -- local only, not pushed",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "scopeLimits": [
+    "No packet_key rewritten, no aliases inserted, no packet writers changed.",
+    "S01-08K NOT applied, NOT started.",
+    "CANONICAL-IDENTITY-CANARY-01 / SOURCE-PACKET-IDENTITY-CANARY-01 NOT started.",
+    "No Graphify run, no Postgres/Qdrant/Valkey/Neo4j mutation.",
+    "The single OTHER_UNRECOGNIZED row and the register-orphaned-chunks.mjs bug's current live-script status were flagged but not further investigated (out of proportion to scope).",
+    "This gate does not resolve PACKET-WRITER-PRODUCTION-OWNER-01 (separate, already-tracked operator decision in manual-migration-reconciliation/tasks.md)."
+  ]
+}

@@ -118,13 +118,13 @@ interface GraphEdge {
 async function getASTSubgraph(
 	filePath: string,
 	origin: URL,
+	requestFetch: typeof fetch,
 ): Promise<{ nodes: GraphNode[]; edges: GraphEdge[]; neighborFiles: string[] }> {
 	try {
 		// Reuse the cached graph API
-		const res = await fetch(new URL('/api/codebase-index/graph?maxFiles=300', origin), {
-      headers: { cookie: '' }, // Internal call, auth bypassed below
-      signal: AbortSignal.timeout(15_000),
-    });
+		const res = await requestFetch(new URL('/api/codebase-index/graph?maxFiles=300', origin), {
+			signal: AbortSignal.timeout(15_000),
+		});
 
 		if (!res.ok) return { nodes: [], edges: [], neighborFiles: [] };
 
@@ -616,7 +616,7 @@ ${errorContext || 'No past error matches'}`;
 
 // ── Handler ──────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ request, locals, url }) => {
+export const POST: RequestHandler = async ({ request, locals, url, fetch }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const parsed = diagnosisSchema.safeParse(await request.json().catch(() => ({})));
@@ -643,7 +643,7 @@ export const POST: RequestHandler = async ({ request, locals, url }) => {
 		let subgraphSummary = '';
 
 		if (filePath) {
-			subgraph = await getASTSubgraph(filePath, url);
+			subgraph = await getASTSubgraph(filePath, url, fetch);
 			if (subgraph.nodes.length > 0) {
 				subgraphSummary = subgraph.nodes
 					.map((n) => `${n.filePath} (${n.type}, complexity: ${n.complexity ?? 0})`)

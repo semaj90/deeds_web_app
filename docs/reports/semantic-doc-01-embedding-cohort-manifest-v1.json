@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.semantic-doc-embedding-cohort-manifest.v1",
+  "generatedAt": "2026-09-23T21:28:28.461Z",
+  "gate": "SEMANTIC-DOC-PROVENANCE-01",
+  "representationRevision": "semantic_768:embeddinggemma-300m-q8_0:gguf-4a2f0fe92d93:doc-prompt-v1:cohort-354fdd73836dd7be",
+  "representation": "semantic_768",
+  "model": "embeddinggemma-300m (Q8_0 GGUF executor)",
+  "dimension": 768,
+  "normalization": "L2 unit norm (mean pooling)",
+  "executor": "llama-server EmbeddingGemma :8081 (NOT Ollama)",
+  "ggufSha256": "4a2f0fe92d9326ed8cc69e543f997d748d806a2c534d48974350afa5a292d4bf",
+  "referenceSafetensorsSha256": "cbf5a78393b6a033e0b8a63a57549964f7ed5c6fbeb4ba0694214f36123f2fd2",
+  "promptContract": "embeddinggemma-document-prompt-v1: \"title: {title} | text: {text}\"",
+  "promptContractChecksum": "52c2dc0add2f62831676f6b51c891be49562de2abeec23cb0e915fe251971f6e",
+  "sourceCorpusChecksum": "105445a61a4b6c3f103271e33c32fef16aad585992d0d47d7ced6e2cf33cfcfd",
+  "chunkCount": 852,
+  "cohortChecksum": "354fdd73836dd7be9f61ab27950f140f961dcc50ea41f6ffd4b6b87cb05b29cb",
+  "liveStats": {
+    "total": 852,
+    "embedded": 852,
+    "dim768": 852,
+    "minNorm": 0.9999999419280503,
+    "maxNorm": 1.0000000563781755
+  },
+  "parityEvidence": {
+    "receipt": "docs/reports/semantic-doc-01-embedding-parity-v1.json",
+    "meanCosine": 0.999616579868423,
+    "minCosine": 0.9993596379859873,
+    "top1Agreement": 1
+  },
+  "populationReceipt": "docs/reports/semantic-doc-01-embedding-population-v1.json",
+  "qdrantProjectionRule": "a Qdrant payload/vector may claim this cohort only if it carries this representationRevision and the recomputed cohortChecksum equals the frozen one (--verify); a future re-embedding gets a NEW representationRevision",
+  "rowLocalProvenance": false,
+  "note": "atlas_external_doc_chunks has no per-row embedding provenance columns; provenance is frozen at cohort level here. Adding row-local columns would be a separate DDL decision.",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

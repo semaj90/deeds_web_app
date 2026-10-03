@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.ontology-kernel-critical-path.v1",
+  "generatedAt": "2026-09-27T03:14:46.8798960-07:00",
+  "scope": {
+    "change": "parent-atlas-ontology-kernel",
+    "completedTasks": 221,
+    "totalTasks": 313,
+    "uncheckedTasks": 92,
+    "method": "Dependency-focused review of current unchecked sections; not an item-by-item audit of all 92 tasks",
+    "writesPerformed": false,
+    "databaseAccessed": false,
+    "graphifyApplied": false,
+    "taskLedgerEdited": false
+  },
+  "ownerBoundaries": {
+    "classifierVocabulary": { "owner": "sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts", "meaning": "runtime classifier labels and normalization" },
+    "persistedDomainIdentity": { "owner": "atlas_domain_ontology.group_id", "meaning": "persisted domain ontology identity" },
+    "generalConceptIdentity": { "owner": "atlas_ontology_concepts", "meaning": "broader concept registry; not a classifier label table" },
+    "topology": { "owners": ["taxonomy_nodes", "taxonomy_edges"], "meaning": "traversal/topology read model; not identity authority" },
+    "versionedAliasAdapter": { "owner": "domain_taxonomy_v1", "status": "UNPOPULATED_NOT_AUTHORIZED" },
+    "legacyPacketValue": { "owner": "atlas_packets.domain_class", "meaning": "HISTORICAL_MIXED_OBSERVATION", "canonicalAuthority": false }
+  },
+  "criticalPath": [
+    {
+      "order": 0,
+      "gate": "DOMAIN-OWNER-02/03/04",
+      "state": "PROVEN",
+      "action": "Retain the frozen split of classifier labels, domain identity, general concepts, topology, version/alias bridge, and legacy packet observations.",
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:4845-4861", "docs/architecture/domain-registry-contract-v1.md:10-58", "docs/reports/domain-vocab-proposal-v1.json"],
+      "exitCondition": "All future tasks refer to the correct owner; no table is silently promoted to universal registry."
+    },
+    {
+      "order": 1,
+      "gate": "DOMAIN-OWNER-05",
+      "state": "READY_TO_IMPLEMENT",
+      "action": "Build a pure read-side normalizer over the frozen vocabulary census. Preserve raw label/evidence; classify exact, alias, subtype, non-domain, ambiguous, or quarantined; unresolved stays unmapped.",
+      "dependencies": ["DOMAIN-OWNER-02/03/04"],
+      "prohibited": ["UPDATE atlas_packets.domain_class", "populate domain_taxonomy_v1", "mint ontology IDs", "infer ui→frontend or ml→machine-learning without explicit mapping evidence"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:4862-4865", "docs/architecture/domain-registry-contract-v1.md:48-58"],
+      "exitCondition": "Deterministic report checksum plus fail-closed fixture for unresolved and mixed legacy values."
+    },
+    {
+      "order": 2,
+      "gate": "DOMAIN-OWNER-06",
+      "state": "READY_TO_IMPLEMENT_AFTER_05",
+      "action": "Fixture/disposable proof of explicit mappings and rejection cases; keep production adapter unpopulated.",
+      "dependencies": ["DOMAIN-OWNER-05"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:4866-4869"],
+      "exitCondition": "Same input yields same mapping checksum; unknown, ambiguous, revisionless, and wrong-owner values reject without writes."
+    },
+    {
+      "order": 3,
+      "gate": "CURRENT-SOURCE-AND-NAMESPACE-BINDING",
+      "state": "BLOCKED",
+      "action": "Reconcile the selected terminal workspace snapshot, source namespace, packet/source binding, content hash, and source revision before concept admission.",
+      "dependencies": ["DOMAIN-OWNER-06", "current terminal snapshot-bound execution"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:4838-4843", "openspec/changes/parent-atlas-ontology-kernel/tasks.md:2073-2113", "openspec/changes/parent-atlas-ontology-kernel/tasks.md:2844-2857"],
+      "exitCondition": "One current snapshot-bound receipt binds source namespace, sourceRef, source/content revision, and workspace revision; missing namespace or source binding remains a hard reject."
+    },
+    {
+      "order": 4,
+      "gate": "CONCEPT-01",
+      "state": "READY_TO_IMPLEMENT",
+      "action": "Refresh the raw-label inventory across packet labels, trace selections, Valkey indexes, and Neo4j Concept nodes in a single read-only evidence frame; existing packet/trace inventory is only partial for this gate.",
+      "dependencies": [],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2220-2272"],
+      "exitCondition": "Counts, normalized aliases, ambiguous/unmapped values, and evidence-source revisions are reconciled without merging or deleting concepts. This census does not admit concepts."
+    },
+    {
+      "order": 5,
+      "gate": "CONCEPT-02",
+      "state": "BLOCKED",
+      "action": "Resolve normalized values only against explicitly declared ontology classes and the correct identity owner; never use a classifier label or topology node as a concept ID.",
+      "dependencies": ["CONCEPT-01", "CURRENT-SOURCE-AND-NAMESPACE-BINDING", "explicit ontology/mapping revisions"],
+      "historicalEvidence": "Prior preview recorded 18 explicit mapping matches, 0 ambiguous, 19,427 unmapped; prior task census described atlas_ontology_concepts as empty. The task ledger also records 3,352 classifier rows with only 148 revision-qualified Graphify joins, zero declared source namespaces, and a 52/52 source-revision match cohort with 0/52 current-workspace revision matches. These are historical receipts, not current live counts.",
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2273-2292", "docs/reports/concept-vocabulary-authority-01.json"],
+      "exitCondition": "Every admitted mapping identifies source vocabulary, target owner/ID, mapping revision, ontology revision, exact evidence, and source lineage; unresolved stays rejected."
+    },
+    {
+      "order": 6,
+      "gate": "CONCEPT-03",
+      "state": "BLOCKED_ON_CURRENT_LINEAGE",
+      "action": "Re-run the grounded tuple admission fixture with exact sourceRef/span, source and workspace revisions, mapping/ontology revisions, evidence refs, and tuple checksum.",
+      "dependencies": ["CONCEPT-02", "CURRENT-SOURCE-AND-NAMESPACE-BINDING"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2380-2405", "python/parent_atlas_ontology/domain_tuple_bridge.py", "python/test_domain_tuple_bridge.py"],
+      "exitCondition": "Deterministic fixture passes twice; no registry, graph, or cache write."
+    },
+    {
+      "order": 7,
+      "gate": "CONCEPT-04",
+      "state": "OPERATOR_DECISION",
+      "action": "Only after the grounded fixture and owner mapping pass, decide whether to authorize the existing canonical concepts/relations migration and a bounded seed; the ledger says the global Drizzle migration baseline is unresolved.",
+      "dependencies": ["CONCEPT-03", "explicit migration/DDL authorization", "migration baseline review"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2540-2544"],
+      "exitCondition": "If declined, keep proposals local/unadmitted. If approved later, use existing canonical tables with transactional write plus independent readback; no new taxonomy table."
+    },
+    {
+      "order": 8,
+      "gate": "CONCEPT-05/06/07",
+      "state": "BLOCKED_ON_CANONICAL_READBACK",
+      "action": "Project only admitted PostgreSQL concepts to Neo4j; then create one revisioned shared graph artifact and derive bounded topology/geometry features as non-canonical projections.",
+      "dependencies": ["CONCEPT-04", "canonical readback parity", "ProjectionNodeKeyV1 and ordinal-map identity"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2545-2559", "openspec/changes/parent-atlas-ontology-kernel/tasks.md:2583-2587"],
+      "exitCondition": "Projection counts/checksums and ordinal map read back against canonical concepts; graph/geometry adds no identity or retrieval vote."
+    },
+    {
+      "order": 9,
+      "gate": "CONCEPT-08/09/10/12",
+      "state": "DEFERRED_UNTIL_DATA_GATES",
+      "action": "Build a source-split revisioned classifier snapshot, establish XGBoost baseline, consider PyTorch only as a challenger, then perform deterministic read-only replay.",
+      "dependencies": ["CONCEPT-05/06/07", "admitted source-qualified labels", "frozen model/data revisions"],
+      "evidence": ["openspec/changes/parent-atlas-ontology-kernel/tasks.md:2560-2587"],
+      "exitCondition": "Two replays have equal source/mapping/ontology/projection/feature/prediction checksums; no model output changes canonical ontology."
+    }
+  ],
+  "parallelButNotCritical": [
+    { "gate": "OAK fanout 3.5/4.6/6.1", "state": "BLOCKED_OR_OPERATOR_DECISION", "reason": "Requires a real revision-qualified tuple producer/admission authority; the fanout DDL is draft-only and explicitly gated." },
+    { "gate": "External Firecrawl/.okf evidence ingestion", "state": "SEPARATE_EVIDENCE_ACQUISITION_PATH", "reason": "Must bind capture identity/content hash/evidence revision; it cannot bypass canonical concept admission." },
+    { "gate": "OAK construction benchmarks / GEPA / reinforcement learning", "state": "DEFERRED_RESEARCH", "reason": "Do not precede ontology ownership, grounded source lineage, and deterministic baseline."
+    }
+  ],
+  "quickImplementationHops": [
+    { "hop": 1, "title": "Run pure DomainClassNormalizerV1 fixtures and the independent same-frame raw-label inventory", "change": "parent-atlas-ontology-kernel", "tasks": ["DOMAIN-OWNER-05/06", "CONCEPT-01"], "writes": false },
+    { "hop": 2, "title": "Refresh current snapshot/source-namespace binding receipt", "change": "parent-atlas-ontology-kernel", "tasks": ["current binding recheck"], "writes": false },
+    { "hop": 3, "title": "Resolve only explicitly declared owner/mapping identities against the refreshed inventory", "change": "parent-atlas-ontology-kernel", "tasks": ["CONCEPT-02"], "writes": false },
+    { "hop": 4, "title": "Grounded tuple fixture replay", "change": "parent-atlas-ontology-kernel", "tasks": ["CONCEPT-03"], "writes": false },
+    { "hop": 5, "title": "Canonical registry seed decision", "change": "parent-atlas-ontology-kernel", "tasks": ["CONCEPT-04"], "writes": "REQUIRES_EXPLICIT_OPERATOR_AUTHORIZATION" },
+    { "hop": 6, "title": "Projection/readback, shared graph, then model baseline", "change": "parent-atlas-ontology-kernel", "tasks": ["CONCEPT-05 through CONCEPT-12"], "writes": "SEPARATE_GATED_PROJECTIONS_ONLY_AFTER_CANONICAL_READBACK" }
+  ],
+  "validation": {
+    "openspecValidateStrict": "PASS",
+    "sourceHash": "sha256:fe5c505fdf4048918baf0309404010f22494eee808f617ba351afd585d5eec4e",
+    "ownershipContractHash": "sha256:9501b495792339c0f73f88d433cb7595abb9416de5b3feebe3825a1d4a6f707a",
+    "limitations": ["No live database re-query was performed; prior row counts cited in the task ledger are labeled historical.", "This report prioritizes the ontology/concept admission critical path and does not classify all 92 unchecked tasks individually."]
+  }
+}

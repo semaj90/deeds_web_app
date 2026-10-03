@@ -103,8 +103,9 @@ async function buildEvidencePacket(
 	workspaceRevision: string | null,
 	runGraphRevision: string | null,
 ) {
-	const packetKey = candidate.packet_keys[0] ?? `kanban:${candidate.task_id}`;
-	const sourceRef = candidate.source_ref ?? `kanban:${candidate.task_id}`;
+	const sourceRef = candidate.source_ref?.trim() ?? null;
+	const packetKey = candidate.packet_keys[0]?.trim() ?? null;
+	if (!sourceRef) return null;
 	const pos = inferPartOfSpeech(candidate.task_label, candidate.script);
 	const text = [
 		candidate.task_label,
@@ -128,8 +129,10 @@ async function buildEvidencePacket(
 		featureLabel: candidate.task_label ?? candidate.task_id,
 		text,
 		isCode: candidate.kind === 'graphify_evidence' || candidate.files.length > 0,
-		treeNodeId: candidate.tree_node_id ?? null,
-		titleId: candidate.title_id ?? null,
+		// Only an existing packet key may carry structural identity into this packet.
+		// Do not let the source packet helper mint one from task metadata.
+		treeNodeId: packetKey ? candidate.tree_node_id ?? null : null,
+		titleId: packetKey ? candidate.title_id ?? null : null,
 		representationRevision: featureRevision,
 		producerId: 'daily-graphify-board-recommendations',
 		producerRevision: boardGenerated,
@@ -190,7 +193,9 @@ function buildFeatureRow(
 		tokenCost,
 		latencyMs: 0,
 		evidenceCoverage,
-		freshnessScore: 1,
+		// No revision-qualified freshness observation is available at board-build time.
+		// Keep it unavailable instead of treating the current run timestamp as freshness.
+		freshnessScore: null,
 		featureRevision,
 		graphRevision: candidate.graph_revision ?? runGraphRevision,
 		eventRevision,
@@ -205,7 +210,7 @@ export async function buildDailyGraphifyBoardRecommendations(
 	const policyRevision = context.policyRevision ?? 'daily-graphify-board-policy-v1';
 	const featureRevision = context.featureRevision ?? 'daily-graphify-board-feature-v1';
 	const traceId = context.traceId ?? board.generated;
-	const sourceRef = context.sourceRef ?? board.collection;
+	const sourceRef = context.sourceRef;
 	const eventRevision = context.sourceRevision ?? board.generated;
 	const generatedAt = context.generatedAt ?? board.generated;
 
@@ -231,8 +236,13 @@ export async function buildDailyGraphifyBoardRecommendations(
 			buildEvidencePacket(candidate, board.generated, featureRevision, eventRevision, workspaceRevision, runGraphRevision),
 		),
 	);
-	const featureRows = candidates.map((candidate, index) => {
-		const evidencePacket = evidencePackets[index]?.packet;
+	const admittedCandidates = candidates.filter((_, index) => evidencePackets[index] !== null);
+	const admittedPackets = evidencePackets.filter(
+		(packet): packet is NonNullable<typeof packet> => packet !== null,
+	);
+	if (admittedCandidates.length === 0) return [];
+	const featureRows = admittedCandidates.map((candidate, index) => {
+		const evidencePacket = admittedPackets[index]?.packet;
 		if (!evidencePacket) {
 			throw new Error(`Missing evidence packet for Graphify candidate ${candidate.task_id}`);
 		}
@@ -275,9 +285,9 @@ export async function buildDailyGraphifyBoardRecommendations(
 				task_id: candidate.task_id,
 				dedup_key: candidate.dedup_key,
 			},
-			domainClassification: evidencePackets[index]?.packet.domainClassification,
-			posTaggerOutput: evidencePackets[index]?.packet.posTaggerOutput,
-			featureMatrixSetup: evidencePackets[index]?.packet.featureMatrixSetup,
+			domainClassification: admittedPackets[index]?.packet.domainClassification,
+			posTaggerOutput: admittedPackets[index]?.packet.posTaggerOutput,
+			featureMatrixSetup: admittedPackets[index]?.packet.featureMatrixSetup,
 			featureRow: result.featureRow,
 			policyResult: result,
 			kanbanCardId: `kanban:${candidate.task_id}`,

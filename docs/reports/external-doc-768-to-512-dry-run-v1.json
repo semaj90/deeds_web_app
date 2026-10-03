@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.external-doc-768-to-512-dry-run.v1",
+  "generatedAt": "2026-09-27",
+  "status": "READ_ONLY_PROJECTION_COMPARISON",
+  "source": {
+    "tables": [
+      "public.atlas_external_doc_chunks",
+      "public.atlas_external_doc_pages"
+    ],
+    "transaction": "READ ONLY; ROLLBACK",
+    "modelCalls": 0,
+    "writesPerformed": false
+  },
+  "cohort": {
+    "chunkCount": 852,
+    "queryCount": 32,
+    "sourceDimension": 768,
+    "projectedDimension": 512,
+    "sourceVectorChecksum": "sha256:ab830fa324ace3590497973cedadda83f9820daddb57ce2cc70ff3bffd423ba3",
+    "projectedVectorChecksum": "sha256:a81a177889df94a771e582c5b4d4c10925b2bbf34596979c535cfbfd48f2076b",
+    "identityChecksum": "sha256:9748960e9548c9878f1f7b58b78e59437d09f438e6ac3d80517143350e928beb",
+    "projectedIdentityChecksum": "sha256:9748960e9548c9878f1f7b58b78e59437d09f438e6ac3d80517143350e928beb",
+    "exactIdentityParity": true,
+    "pageChecksumCount": 30,
+    "chunkChecksumCount": 790,
+    "invalidOrZeroVectors": 0,
+    "missingIdentityOrChecksumFields": 0
+  },
+  "projection": {
+    "method": "truncate first 512 dimensions, then L2 normalize",
+    "native512EncoderProvenance": false,
+    "recallAt5": 0.93125,
+    "recallAt10": 0.91875,
+    "recallAt20": 0.925,
+    "comparison": "sampled exact cosine neighbor overlap against the current 768-D vectors; 32 evenly spaced query chunks; excludes self",
+    "relevanceJudged": false
+  },
+  "applied": false,
+  "promotionEligible": false,
+  "limitations": [
+    "This is a mathematical projection challenger, not proof that an EmbeddingGemma native 512-dimensional representation is available or revision-qualified.",
+    "Neighbor overlap measures projection parity, not relevance or application quality.",
+    "Exact identity parity preserves chunk/page IDs, page content hashes, chunk checksums, and evidence revisions; it does not resolve canonical semantic writer ownership."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.agentic-error-fixing.v1",
+  "inputChecksum": "sha256:583694d9587409efacf684e8ab17195395aa401b14e3d491b689c087e7e9a69e",
+  "candidates": [
+    {
+      "fingerprint": "sha256:bbb99173869814b3",
+      "errorCode": "TS2307",
+      "kind": "TYPECHECK_OR_SCHEMA",
+      "file": "src/lib/server/atlas/example.ts",
+      "owner": "SvelteKit server owner",
+      "proposedAction": "Inspect the smallest owning contract and run a scoped typecheck.",
+      "status": "PROPOSED",
+      "mutationAllowed": false
+    }
+  ],
+  "validation": null,
+  "modelResolution": {
+    "status": "PROVEN_RUNTIME",
+    "configuredModel": "ornith-1.5-9b",
+    "runtimeModelId": "ornith-1.5-9b",
+    "endpoint": "http://127.0.0.1:8090",
+    "resolutionSource": "LLAMA_V1_MODELS"
+  },
+  "generatedAt": "2026-09-15T23:37:12.787Z",
+  "status": "PLAN_READY",
+  "mode": "READ_ONLY_PROPOSAL",
+  "mutationAllowed": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "validationDetails": null,
+  "deterministicPlanChecksum": "sha256:18a75c051b30b8e87ed708303555068417704802017dd7d9b78e8ab4fb0e65b5",
+  "candidateCount": 1,
+  "nextGate": "OPERATOR_REVIEW_THEN_SCOPED_VALIDATION"
+}

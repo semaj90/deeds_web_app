@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.val-06a.judge-input-admission-hardening.v1",
+  "generatedAt": "2026-09-24T02:08:19Z",
+  "gate": "VAL-06A",
+  "status": "CONTRACT_AND_PYTHON_ADAPTER_HARDENING_TESTED_NOT_COMMITTED",
+  "owner": "sveltekit-frontend/src/lib/server/atlas/docs/summary-judge-input-v1.ts",
+  "changes": {
+    "canonicalChunkTextChecksum": "required; recomputed from exact UTF-8 text using canonicalSha256V1 in TypeScript and its Python parity verifier",
+    "chunkIdentity": "builder verifies returned chunk_id and evidence_revision match the sealed validation artifact",
+    "deterministicPrerequisites": {
+      "technical": "NOT_RUN rejected",
+      "numeric": "NOT_RUN rejected",
+      "version": "NOT_RUN rejected",
+      "sourceSpan": "must be VERIFIED, REJECTED, or NO_CLAIMED_SPAN"
+    },
+    "promptVisibleMetadata": "existing strict allowlist retained",
+    "chunkBound": "32 KiB UTF-8; reject without truncation"
+  },
+  "verification": {
+    "focusedVitest": "PASS",
+    "focusedTests": 6,
+    "focusedPythonTests": "PASS",
+    "pythonTests": 70,
+    "val07PythonAdapterParity": "updated strict shape, exact chunk-text checksum, and completed deterministic-state validation",
+    "targetedTypeScript": "PASS (standalone strict tsc with explicit node/vitest types)",
+    "projectSvelteCheck": "NOT_COMPLETED; svelte-check produced no diagnostics after initial scan and was interrupted after extended no-output run",
+    "openSpecStrict": "PASS",
+    "scopedDiffCheck": "PASS_WITH_CRLF_NORMALIZATION_WARNINGS"
+  },
+  "sideEffects": {
+    "modelCalls": 0,
+    "oakCalls": 0,
+    "retrievalCalls": 0,
+    "databaseWrites": 0,
+    "persistentWrites": 0,
+    "containerRebuilds": 0
+  },
+  "nextGate": "VAL10B_FROZEN_COHORT_WRITER_ADMISSION",
+  "limitations": [
+    "VAL-06A does not prove the caller obtained the supplied row from PostgreSQL; the readback owner remains responsible for that proof.",
+    "Summary persistence writer still generates fresh summaries and does not consume sealed VAL-10 claim-resolution evidence.",
+    "49-claim and 51-claim replay receipts are distinct cohorts; no canonical apply cohort is selected."
+  ]
+}

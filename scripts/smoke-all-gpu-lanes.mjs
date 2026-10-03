@@ -443,7 +443,7 @@ if (!LANE_FILTER || LANE_FILTER === 'vlm') {
         });
 
         // Use the first available model id from Stage 2, fall back to a known alias
-        const smokeModelId = modelId ?? 'gemma4-legal-iq4xs-direct.gguf';
+        const smokeModelId = modelId ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
         const result = await generateText({
           model: provider(smokeModelId),

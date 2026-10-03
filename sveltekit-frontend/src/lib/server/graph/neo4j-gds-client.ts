@@ -280,7 +280,13 @@ export async function getTopPageRankClient(
   scoreProperty = 'pageRankScore',
 ): Promise<AuthorityNodeClient[]> {
   const driver = getNeo4jDriver();
-  const session = driver.session();
+  if (nodeType && !/^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(nodeType)) {
+    throw new Error('INVALID_PAGERANK_NODE_LABEL');
+  }
+  if (!/^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(scoreProperty)) {
+    throw new Error('INVALID_PAGERANK_SCORE_PROPERTY');
+  }
+  const session = driver.session({ defaultAccessMode: neo4j.session.READ });
 
   try {
     const label = nodeType ? `:${nodeType}` : '';
@@ -297,6 +303,7 @@ export async function getTopPageRankClient(
       LIMIT $limit
     `,
       toNeo4jParams({ limit }),
+      { timeout: 5_000 },
     );
 
     return result.records.map((r) => ({

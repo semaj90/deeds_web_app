@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.openspec-evidence-ledger-import-plan.v1",
+  "mode": "READ_ONLY_DRY_RUN",
+  "status": "BLOCKED_IMPORT_PLAN",
+  "source": {
+    "census": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
+    "graph": "docs/reports/openspec-dependency-graph-v1.json",
+    "binding": "docs/reports/openspec-receipt-binding-v1.json",
+    "predicates": "docs/reports/openspec-task-evidence-bindings-v1.json",
+    "cards": "docs/reports/openspec-evidence-cards-v1.json",
+    "migration": "docs/reports/openspec-evidence-migration-dry-run-v1.json"
+  },
+  "workspaceRevisions": {
+    "census": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004",
+    "graph": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004",
+    "binding": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+    "predicates": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+    "cards": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+    "migration": null
+  },
+  "checks": {
+    "inputsPresent": true,
+    "migrationDesignValidated": true,
+    "workspaceRevisionParity": false,
+    "graphIdentityMatchesCensus": true,
+    "predicateIdentityMatchesCensus": false,
+    "cardIdentityMatchesCensus": false,
+    "noHeuristicProofAdmission": true,
+    "noProjectionRowsPlanned": true
+  },
+  "missingInputs": [],
+  "plannedRows": {
+    "openspec_changes": 117,
+    "openspec_tasks": 11060,
+    "openspec_dependencies": 63,
+    "evidence_receipts": 1046,
+    "task_evidence": 4,
+    "openspec_evidence_chunks": 0,
+    "openspec_task_predicate": 14019,
+    "evidence_assertion": 61,
+    "openspec_supersession": 0
+  },
+  "admission": {
+    "exactProofEligibleReceiptBindings": 3,
+    "heuristicBindingsAdmitted": 0,
+    "projectionsAdmitted": 0,
+    "canonicalProofStateWrites": 0,
+    "checkboxMutations": 0,
+    "supersessionCandidatesAdmitted": 0,
+    "supersessionCandidatesObserved": 208
+  },
+  "authority": {
+    "canonical": "PostgreSQL 18 after authorized apply and independent readback",
+    "current": "Repository census and design-only dry-run; PostgreSQL not established",
+    "taskClaims": "tasks.md",
+    "proofState": "Derived from revision-qualified receipts and assertions"
+  },
+  "writesPerformed": false,
+  "likely_cause": "The evidence ledger needs a bounded row plan and revision-parity check before any canonical import is authorized.",
+  "evidence": [
+    "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
+    "docs/reports/openspec-dependency-graph-v1.json",
+    "docs/reports/openspec-receipt-binding-v1.json",
+    "docs/reports/openspec-task-evidence-bindings-v1.json",
+    "docs/reports/openspec-evidence-cards-v1.json",
+    "docs/reports/openspec-evidence-migration-dry-run-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-ledger-import-plan-v1.json",
+  "generatedAt": "2026-10-02T04:47:35.197Z",
+  "checksum": "sha256:79094ca362726d08ca7ad89b96db94f63676c080516eb3d3c4b5267aaabae5bd"
+}

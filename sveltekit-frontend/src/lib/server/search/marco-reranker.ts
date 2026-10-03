@@ -6,6 +6,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { resolveRerankEndpoint } from './rerank-endpoint.js';
 
 export interface RerankPair {
 	query: string;
@@ -22,10 +23,15 @@ export interface RerankScore {
  */
 export async function rerankWithMarco(query: string, candidates: string[]): Promise<number[]> {
 	if (candidates.length === 0) return [];
+	const endpoint = resolveRerankEndpoint(ENV);
+	if (!endpoint) {
+		console.warn('[marco-reranker] Reranker endpoint unavailable');
+		return new Array(candidates.length).fill(0);
+	}
 
 	try {
 		// Implementation assuming a local inference API (e.g. TEI or custom Go bridge)
-		const response = await fetch(`${ENV.RERANK_URL}/rerank`, {
+		const response = await fetch(`${endpoint}/rerank`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.external-doc-chunk-evidence-identity.v1",
+  "generatedAt": "2026-09-23T17:39:06.746774+00:00",
+  "gate": "EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01",
+  "headAtGeneration": "44ea883525dd771753eefcd46abb5e1ac9836ea6",
+  "pageIdentity": {
+    "owner": "python/atlas_doc_coordinate.py DocCoordinateV1 (page/version); built natively by atlas_okf_docs_pipeline.build_page_coordinate from manifest fields",
+    "formula": "DocCoordinateV1.evidence_revision = sha256(stable-json{provider,product,product_version,url,section_anchor,content_hash}); constructed ONCE per page and carried unchanged into every chunk",
+    "contentHashBasis": "sha256 of _normalize_ws(page text) - the same normalized text the chunk byte spans address (23 of 30 stored pages differ from that text because chunk_document re-normalizes code indentation; follow-up gate EXTERNAL_DOC_CHUNK_TEXT_INDENTATION_FIDELITY)",
+    "nativePipelineConstruction": true,
+    "nativeChunksWithoutDocCoordinate": 0,
+    "versionQualificationRule": "exact versions only for EXACT_VERSION/MAJOR_VERSION manifest sources; live pages are CURRENT_UPSTREAM@<capture date>; issue pages UNVERSIONED@<capture date>"
+  },
+  "chunkIdentity": {
+    "owner": "python/atlas_doc_coordinate.py ExternalDocChunkEvidenceV1 / chunk_evidence_revision; TS mirror sveltekit-frontend/src/lib/server/atlas/docs/external-doc-intelligence-contracts-v1.ts chunkEvidenceRevisionV1",
+    "formula": "sha256:canonicalSha256V1{schema:\"atlas.external-doc-chunk-evidence.v1\", pageEvidenceRevision, ordinal, startByte, endByte, chunkChecksum} (ATLAS_CANONICAL_V1; Python port asserts key/format parity; golden value asserted in both languages; not truncated)",
+    "excludedFromIdentity": [
+      "headingPath",
+      "sectionAnchor",
+      "parserRevision",
+      "chunkerRevision",
+      "fetcher",
+      "retrievedAt",
+      "model identity",
+      "LangExtract revision",
+      "embedding revision"
+    ]
+  },
+  "corpus": {
+    "pageCount": 30,
+    "chunkCount": 847,
+    "manifestRevision": "okf-pinned-docs-r3",
+    "countNote": "count is measured, not hard-coded; unchanged at 847 after the identity repair (chunking itself was not modified)"
+  },
+  "before": {
+    "note": "old chunk coordinate = page coordinate with section_anchor rewritten to the heading path and content_hash rebound; chunks sharing a heading shared one revision",
+    "duplicateChunkEvidenceRevisionGroups": 78,
+    "duplicateChunkEvidenceRevisionRows": 358,
+    "earlierSmokeReported": {
+      "chunks": 847,
+      "duplicateExtraRowsTotalMinusDistinct": 280
+    }
+  },
+  "after": {
+    "uniquePageEvidenceRevisionCount": 30,
+    "duplicatePageEvidenceRevisionGroups": 0,
+    "uniqueChunkEvidenceRevisionCount": 847,
+    "duplicateChunkEvidenceRevisionGroups": 0,
+    "duplicateChunkEvidenceRevisionRows": 0
+  },
+  "invariants": [
+    "A same page + same heading + multiple chunks -> unique chunkEvidenceRevision per span (python + fixture)",
+    "B deterministic replay -> identical revisions (python)",
+    "C identical chunk text at different byte locations -> different revisions (python)",
+    "D changed chunk bytes / E changed start/end byte / F changed page revision -> different revisions (python parametrized + TS)",
+    "G different product version -> different page revision and disjoint child chunk revisions (python)",
+    "H UTF-8 / non-ASCII spans replay identically and slice exact bytes (python + committed cross-language fixture)",
+    "chunkId is unchanged and never equal to chunkEvidenceRevision",
+    "a page evidence revision is never sent as a chunk evidence revision (TS validator blocker)",
+    "Python golden revision equals TypeScript canonicalSha256V1 result"
+  ],
+  "doc06aMapping": {
+    "page.evidenceRevision": "DocCoordinateV1.evidence_revision",
+    "page.contentHash": "DocCoordinateV1.content_hash (sha256 of the normalized text the spans address)",
+    "chunks[].evidenceRevision": "ExternalDocChunkEvidenceV1.chunkEvidenceRevision (never the page revision)",
+    "chunks[].startByte/endByte/chunkChecksum": "preserved exactly from chunk_document",
+    "writerCalled": false,
+    "handoffResult": "EXTERNAL_DOC_ADMISSION_HANDOFF_READY"
+  },
+  "chunkIdAudit": {
+    "changed": false,
+    "futureGate": "EXTERNAL_DOC_CHUNK_ID_COLLISION_AUDIT (chunk_id embeds a 16-hex truncated document checksum)"
+  },
+  "cacheIdentityReadiness": {
+    "chunkEvidenceRevisionUniqueAndEligible": true,
+    "conceptualKey": "doc-analysis:{chunkEvidenceRevision}:{analysisType}:{producerRevision}:{modelRevision}:{promptRevision}",
+    "warming": "ACE/BitFrost/Valkey per-chunk derived-analysis warming stays BLOCKED until canonical chunks are admitted; no cache was written"
+  },
+  "analysisOwnerAudit": {
+    "analysis_pass_results": "packet_key/source_ref/feature_id keyed, no chunk evidence revision, model revision or output checksum column - not reusable",
+    "atlas_summary_layers": "packet_key keyed and upserted (updated_at), not append-only - not reusable",
+    "externalDocEnrichmentOwner": "none exists (only atlas_external_doc_pages/chunks)",
+    "disposition": "EXTERNAL_DOC_ANALYSIS_OWNER_REQUIRED",
+    "preferredContract": "ExternalDocAnalysisV1 (external-doc-intelligence-contracts-v1.ts); conceptual owner atlas_external_doc_analyses; not created or applied"
+  },
+  "summarySqlDisposition": "DRAFT_SUPERSEDED_PENDING_ANALYSIS_OWNER (header added; file retained, unapplied)",
+  "result": "EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

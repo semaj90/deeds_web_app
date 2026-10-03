@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:10:40Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-transport-memory-boundaries",
+  "selection": {
+    "from": "CC_03_CODE_CHUNK_EXPERIMENTAL_ONLY_CLASSIFICATION",
+    "to": "CC_01_CODE_CHUNK_FIELD_LEVEL_CONTRACT_AUDIT",
+    "reason": "With replacement rejected and runtime integration still unproven, reconcile the reference field set against existing local structural owners before considering a benchmark or adapter."
+  },
+  "evidence": {
+    "mappingReport": "docs/reports/structural-chunk-reference-mapping-v1.json",
+    "result": "Scope/entities/imports/spans map to existing schemas; signature and batch error coverage are partial; sibling/context text are absent and remain derived representation-only inputs.",
+    "runtimeOutput": "NOT_TESTED; package not installed",
+    "canonicalWrites": false
+  },
+  "validation": {
+    "openSpecStrict": "PASS",
+    "diffCheck": "PASS",
+    "jsonParse": "PASS"
+  },
+  "openSpecProgress": {
+    "checked": 37,
+    "open": 55,
+    "total": 92,
+    "delta": "CC-01 static field audit completed with explicit coverage gaps; CC-02 benchmark, CC-04 integration, and CC-05 batch proof remain open."
+  },
+  "mutations": {
+    "database": false,
+    "qdrant": false,
+    "valkey": false,
+    "neo4j": false,
+    "graphify": false,
+    "containers": false
+  },
+  "nextGate": "CC_02_FIXED_CORPUS_CONTEXT_METADATA_BENCHMARK"
+}

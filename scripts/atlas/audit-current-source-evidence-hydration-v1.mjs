@@ -174,7 +174,9 @@ report.reportChecksum = crypto.createHash('sha256').update(JSON.stringify(report
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });
 let actualReportPath = reportPath;
 try {
-  fs.writeFileSync(actualReportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const reportTempPath = `${reportPath}.${process.pid}.tmp`;
+  fs.writeFileSync(reportTempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  fs.renameSync(reportTempPath, actualReportPath);
 } catch (error) {
   // Preserve a fresh read-only result when another Windows process temporarily
   // holds the stable report path. Never leave the audit result unrecorded.

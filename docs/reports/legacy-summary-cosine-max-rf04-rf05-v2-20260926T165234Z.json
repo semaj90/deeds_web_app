@@ -1,0 +1,115 @@
+{
+  "schema": "atlas.legacy-summary-cosine-max-rf04-rf05-receipt.v2",
+  "status": "RF04_CONFORMED_ADMISSION_RF05_PRESENCE_REPLAYED_ARTIFACT_ONLY",
+  "generatedAt": "2026-09-26T16:52:34.727Z",
+  "featureName": "legacy_summary_cosine_max",
+  "canonicalAuthority": false,
+  "retrievalVote": false,
+  "rankingPromotion": false,
+  "mutationAuthority": false,
+  "input": {
+    "featureReceipt": "docs\\reports\\legacy-summary-hint-feature-v2-20260926T162937Z.json",
+    "featureChecksum": "2495aa47227c2247ee173f9a474211825aa3ee0ab09f9257acac26640eb01525",
+    "producerRevision": "sha256:4c942f64237f448dde3e375eb5a2b638aa8e9bf4e5c066d618f6d2c59e571c8e",
+    "queryEmbeddingDigest": "sha256:7e3c1be35252de5b191d3aa2361f7573ecf582d1db5441ec192d315b0f94a8f6"
+  },
+  "coordinates": {
+    "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+    "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e",
+    "rows": 16151
+  },
+  "contractChange": {
+    "registryAppended": "legacy_summary_cosine_max",
+    "appendedAtEnd": true,
+    "overlayFeatureCount": 25,
+    "derivation": "LEGACY_SUMMARY_HINT_MAX_COSINE",
+    "representationId": "semantic_768",
+    "sourceRepresentationId": "semantic_768",
+    "artifactState": "PARTIAL",
+    "runtimeModelRevision": "UNRESOLVED_RUNTIME_MODEL_REVISION"
+  },
+  "rf04": {
+    "producerSetChecksum": "sha256:fdb418cd2b41b7f5617ca9eb31c283487b80908f0f1cc4fcf65e8101bc7ae28c",
+    "artifactChecksum": "sha256:8a2b72838231f8f3165b2339e4ab9e357d906258fa4c8f93751b1723f9f3d701",
+    "bundleChecksum": "sha256:e1e9b0112175bab6673b0f2996f977ac92029b2b32a9084da9a45a5706febff2",
+    "matrixManifestChecksum": "sha256:6b3703b8874b2f63c6151b77bed9174b591c542439addcfb416dc33201d33751",
+    "baseMatrixManifestChecksum": "sha256:05f26d0eb126587d203e7eeb8dd7e0617a75235e446f6820abfc36e18c70c9c3",
+    "baseMatrixNote": "explicit empty base plane; no base-plane producer exists for this snapshot",
+    "coverage": {
+      "state": "PARTIAL",
+      "presentRows": 178,
+      "missingRows": 15973
+    }
+  },
+  "rf05": {
+    "presenceChecksum": "sha256:2015164c8d2c22184bb2cdbafdb8a8b074d5cccc4e2a7c259f79508d644ebe9a",
+    "featurePresence": {
+      "latent256": "UNAVAILABLE",
+      "latent128": "UNAVAILABLE",
+      "latent64": "UNAVAILABLE",
+      "latent256QuerySimilarity": "UNAVAILABLE",
+      "latent128QuerySimilarity": "UNAVAILABLE",
+      "latent64QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl512QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl256QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl128QuerySimilarity": "UNAVAILABLE",
+      "legacySummaryCosineMax": "PARTIAL"
+    },
+    "baselineFeaturePresence": {
+      "latent256": "UNAVAILABLE",
+      "latent128": "UNAVAILABLE",
+      "latent64": "UNAVAILABLE",
+      "latent256QuerySimilarity": "UNAVAILABLE",
+      "latent128QuerySimilarity": "UNAVAILABLE",
+      "latent64QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl512QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl256QuerySimilarity": "UNAVAILABLE",
+      "semanticMrl128QuerySimilarity": "UNAVAILABLE",
+      "legacySummaryCosineMax": "UNAVAILABLE"
+    }
+  },
+  "checks": {
+    "featureStatePartial": true,
+    "derived178": true,
+    "unavailable15973": true,
+    "totalStates16151": true,
+    "otherOverlayFeaturesUnchangedUnavailable": true,
+    "basePlaneStillEmpty": true,
+    "derivedValuesEqualRawCosine": true,
+    "unavailableRowsMasked": true,
+    "presencePartialForFeature": true,
+    "noOtherPresenceKeyChanged": true,
+    "presenceReplayIdentical": true
+  },
+  "tamper": {
+    "tamperedArtifactValueRejectedByBundle": true,
+    "wrongSnapshotRejectedByBundle": true,
+    "wrongOrdinalChecksumRejectedByPresence": true
+  },
+  "artifacts": {
+    "producerArtifact": {
+      "path": ".tmp\\atlas\\legacy-summary-cosine-max-rf04-v2\\20260926T165234Z\\producer-artifact.json",
+      "sha256": "sha256:b7fffeea6d607eda7c81cb22ce2351f1a3fb383c05c6b54825e835855b8a6fa6"
+    },
+    "producerSet": {
+      "path": ".tmp\\atlas\\legacy-summary-cosine-max-rf04-v2\\20260926T165234Z\\producer-set.json",
+      "sha256": "sha256:d0d75c52a5d186692d35982bc0e69898f5d18488ee25c4f1242352b19dc719c1"
+    },
+    "presenceEvidence": {
+      "path": ".tmp\\atlas\\legacy-summary-cosine-max-rf04-v2\\20260926T165234Z\\presence-evidence.json",
+      "sha256": "sha256:07d2793d8bc9971fde61d41f3df859f06a4e28de351eebc0d797cdc840ef6780"
+    }
+  },
+  "notMeasured": [
+    "relevance lift (0 graded labels)",
+    "MMR",
+    "ACE ContextManifest live replay"
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  }
+}

@@ -58,6 +58,21 @@ class ByteSafeSpanTests(unittest.TestCase):
             decoded = normalized_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8")
             self.assertEqual(decoded, chunk.text, f"ordinal={chunk.ordinal}")
 
+    def test_blank_lines_after_heading_do_not_shift_byte_span(self) -> None:
+        text = "# Context\n\n**Context engineering** uses exact byte spans after heading whitespace is trimmed.\n"
+        chunks = chunk_document(
+            source_id="heading-blank-line", source_revision="sha256:" + "1" * 64,
+            source_url="https://example.test/context", title="Context", text=text,
+            maximum_chars=2800, overlap_chars=240,
+        )
+        normalized_bytes = _normalize_ws(text).encode("utf-8")
+        for chunk in chunks:
+            self.assertEqual(
+                normalized_bytes[chunk.start_byte:chunk.end_byte].decode("utf-8"),
+                chunk.text,
+                f"ordinal={chunk.ordinal}",
+            )
+
     def test_byte_offset_diverges_from_char_offset_when_multibyte_present(self) -> None:
         """Proves start_byte is actually doing different work than start_char,
         not silently equal to it -- a chunk starting after CJK/emoji content

@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.qdrant-pid-backfill-exact.v1",
+  "mode": "apply",
+  "collection": "codebase_chunks_768",
+  "vectorDim": 768,
+  "packetsMissingPointId": 55267,
+  "packetsWithAnyExactPoint": 697,
+  "uniqueEligible": 120,
+  "ambiguousSkipped": 577,
+  "preImage": "docs\\reports\\qdrant-pid-backfill-preimage-2026-09-28.json",
+  "updated": 120,
+  "readbackInTransaction": 120,
+  "committed": true
+}

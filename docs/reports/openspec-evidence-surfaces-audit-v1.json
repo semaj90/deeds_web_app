@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.openspec-evidence-surfaces-audit.v1",
+  "milestone": "EVF-14_AND_EVF-15",
+  "status": "SURFACES_PRESENT_LIVE_HANDSHAKE_UNPROVEN",
+  "mode": "READ_ONLY_SOURCE_SURFACE_AUDIT",
+  "files": [
+    {
+      "path": "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.server.ts",
+      "present": true,
+      "patterns": {
+        "evidenceHealthReader": true,
+        "boardReader": true
+      },
+      "checksum": "sha256:f3b42af357754a54ef80bd62ee3b52f8010c64f21eca19e6841e751476140f5d"
+    },
+    {
+      "path": "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte",
+      "present": true,
+      "patterns": {
+        "evidencePanel": true,
+        "workboardParity": true,
+        "promotionStatus": true
+      },
+      "checksum": "sha256:7e37a2e767d083db776e48b24d9e533ef3096f126dd6845d4293d584f50a6997"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/openspec-evidence-tools.ts",
+      "present": true,
+      "patterns": {
+        "census": true,
+        "task": true,
+        "frontier": true,
+        "card": true,
+        "receipt": true,
+        "contradictions": true,
+        "dependencies": true,
+        "search": true,
+        "context": true,
+        "noWrites": true
+      },
+      "checksum": "sha256:5ef33383b7ce7550f480935a5c814ce904f2412d1aaad0f92a9bed45c933be6f"
+    },
+    {
+      "path": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+      "present": true,
+      "patterns": {
+        "registration": true
+      },
+      "checksum": "sha256:2f1eb0a0e011b26227e0d00121fa91b4fcb7b411f1352f9a4bb1b4c9cdee5db9"
+    }
+  ],
+  "gates": {
+    "studioSurfacePresent": true,
+    "mcpToolSurfacePresent": true,
+    "mcpRegistrationPresent": true,
+    "handshakePerformed": false,
+    "healthVerified": false,
+    "writesPerformed": false
+  },
+  "invariants": [
+    "Source registration and UI wiring do not establish a live MCP handshake or service health receipt.",
+    "MCP responses remain bounded and read-only until the runtime gate is independently verified.",
+    "PostgreSQL, receipt, and projection authorities remain outside the UI/MCP surface."
+  ],
+  "likely_cause": "Studio and MCP surfaces can be source-wired before their live handshake and health receipts exist.",
+  "evidence": [
+    "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.server.ts",
+    "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte",
+    "sveltekit-frontend/src/mcp/openspec-evidence-tools.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
+    "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.server.ts",
+    "sveltekit-frontend/src/routes/atlas/studio/openspec/+page.svelte",
+    "sveltekit-frontend/src/mcp/openspec-evidence-tools.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-surfaces-audit-v1.json",
+  "generatedAt": "2026-10-02T04:47:37.960Z",
+  "checksum": "sha256:5dbb90d27c471b6ed965c929f4ca0a549c2ce0ef9ac2d1fd6580e3fa22c7bcb8"
+}

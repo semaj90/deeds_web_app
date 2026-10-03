@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.pkt-lineage-09-historical-promotion.v1",
+  "task": "PKT-LINEAGE-09-HISTORICAL-PROMOTION-01-APPLY",
+  "generatedAt": "2026-09-28T18:51:27.029Z",
+  "writesToNonLineageStores": {
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "prewrite": {
+    "uniqueConstraintPresent": true,
+    "chunkOrdinalNullable": true,
+    "existingCanonicalRowCount": 8266,
+    "existingCanonicalIdenticalToProposal": 0,
+    "conflictingRows": 0,
+    "existingRowsNotInFreshProposal": 8266
+  },
+  "mode": "APPLY",
+  "proposalPath": ".tmp\\atlas\\pkt-lineage-current-multi-chunk-frozen-proposal-v1.json",
+  "packetsProcessed": 13010,
+  "rowsBefore": 8266,
+  "rowsInserted": 116847,
+  "rowsAlreadyIdentical": 0,
+  "rowsAfter": 125113,
+  "rollbacks": 0,
+  "conflicts": 0,
+  "duplicatePairs": 0,
+  "syntheticIds": 0,
+  "rollbackDetails": [],
+  "verdict": "HISTORICAL_LINEAGE_PROMOTION_PROVEN"
+}

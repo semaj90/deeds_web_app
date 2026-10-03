@@ -97,10 +97,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <CudaCompile>
-      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
+      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
       <Defines>%(Defines);ONNX_NAMESPACE=onnx_c2;SOM_HAVE_CUDA=1;CMAKE_INTDIR="Debug"</Defines>
       <AdditionalOptions>%(AdditionalOptions) -lineinfo -gencode arch=compute_86,code=sm_86 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --Werror cross-execution-space-call --no-host-device-move-forward --expt-relaxed-constexpr --expt-extended-lambda -std=c++17 --generate-code=arch=compute_86,code=[compute_86,sm_86] -Xcompiler="-Zi -Ob0"</AdditionalOptions>
       <CodeGeneration></CodeGeneration>
@@ -115,7 +115,7 @@
       <UseHostInclude>false</UseHostInclude>
     </CudaCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -150,10 +150,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <CudaCompile>
-      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
+      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
       <Defines>%(Defines);ONNX_NAMESPACE=onnx_c2;NDEBUG;SOM_HAVE_CUDA=1;CMAKE_INTDIR="Release"</Defines>
       <AdditionalOptions>%(AdditionalOptions) -lineinfo -gencode arch=compute_86,code=sm_86 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --Werror cross-execution-space-call --no-host-device-move-forward --expt-relaxed-constexpr --expt-extended-lambda -std=c++17 --generate-code=arch=compute_86,code=[compute_86,sm_86] -Xcompiler=-Ob2</AdditionalOptions>
       <CodeGeneration></CodeGeneration>
@@ -167,7 +167,7 @@
       <UseHostInclude>false</UseHostInclude>
     </CudaCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -202,10 +202,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <CudaCompile>
-      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
+      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
       <Defines>%(Defines);ONNX_NAMESPACE=onnx_c2;NDEBUG;SOM_HAVE_CUDA=1;CMAKE_INTDIR="MinSizeRel"</Defines>
       <AdditionalOptions>%(AdditionalOptions) -lineinfo -gencode arch=compute_86,code=sm_86 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --Werror cross-execution-space-call --no-host-device-move-forward --expt-relaxed-constexpr --expt-extended-lambda -std=c++17 --generate-code=arch=compute_86,code=[compute_86,sm_86] -Xcompiler=-Ob1</AdditionalOptions>
       <CodeGeneration></CodeGeneration>
@@ -219,7 +219,7 @@
       <UseHostInclude>false</UseHostInclude>
     </CudaCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -254,10 +254,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <CudaCompile>
-      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
+      <Include>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(Include)</Include>
       <Defines>%(Defines);ONNX_NAMESPACE=onnx_c2;NDEBUG;SOM_HAVE_CUDA=1;CMAKE_INTDIR="RelWithDebInfo"</Defines>
       <AdditionalOptions>%(AdditionalOptions) -lineinfo -gencode arch=compute_86,code=sm_86 -Xcudafe --diag_suppress=cc_clobber_ignored,--diag_suppress=field_without_dll_interface,--diag_suppress=base_class_has_different_dll_interface,--diag_suppress=dll_interface_conflict_none_assumed,--diag_suppress=dll_interface_conflict_dllexport_assumed,--diag_suppress=bad_friend_decl --Werror cross-execution-space-call --no-host-device-move-forward --expt-relaxed-constexpr --expt-extended-lambda -std=c++17 --generate-code=arch=compute_86,code=[compute_86,sm_86] -Xcompiler="-Zi -Ob1"</AdditionalOptions>
       <CodeGeneration></CodeGeneration>
@@ -271,7 +271,7 @@
       <UseHostInclude>false</UseHostInclude>
     </CudaCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -347,6 +347,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <CudaCompile Include="..\som_cache.cu" />
     <CudaCompile Include="..\lstm_gpu.cu" />
     <CudaCompile Include="..\cuda_graph_bridge.cu" />
+    <CudaCompile Include="..\native_runtime_info.cu" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

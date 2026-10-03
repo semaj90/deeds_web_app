@@ -30,7 +30,10 @@ export const GET: RequestHandler = async ({ locals }) => {
    // replacing the previous `let client = null; ... finally { if (client) client.quit() }`
    // pattern. The dispose hook swallows quit errors so already-closed
    // clients don't double-throw.
-   await using client = attachDispose(getValkeyClient().duplicate({ lazyConnect: true }));
+   // NOTE: `await using` is not parseable on Node 22 (needs Node 24 / lowering), which made this
+   // whole route 500 with a SyntaxError at module load; explicit try/finally is equivalent.
+   const client = attachDispose(getValkeyClient().duplicate({ lazyConnect: true }));
+   try {
 
    // Ping using the short-lived client
    if (client && typeof client.ping === 'function') {
@@ -50,6 +53,9 @@ export const GET: RequestHandler = async ({ locals }) => {
      host: ENV.REDIS_HOST,
      timestamp,
    });
+   } finally {
+     await client[Symbol.asyncDispose]();
+   }
  } catch (error: unknown) {
  const msg = extractMessage(error);
  console.warn('[Redis Health] Redis unavailable: ', msg);

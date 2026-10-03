@@ -1,13 +1,24 @@
 {
-  "generated": "2026-09-09T01:26:50.904Z",
-  "mode": "apply",
-  "traces_loaded": 1100,
+  "generated": "2026-09-14T20:58:42.619Z",
+  "mode": "dry-run",
+  "traces_loaded": 1000,
+  "synthetic_traces_excluded": 1000,
+  "eligible_traces": 0,
   "total_rows": 0,
   "positive_rows": 0,
   "zero_label_rows": 0,
   "distinct_features": 0,
   "completeness_pct": 0,
   "karpathy_scores_loaded": 0,
+  "packet_reference_join": {
+    "trace_feature_labels": 0,
+    "exact_feature_labels_matched": 0,
+    "unmatched_feature_labels": 0,
+    "packet_key_inference_performed": false,
+    "bridge_supplied": false,
+    "bridge_path": null,
+    "bridge_entries": 0
+  },
   "gates": [
     {
       "name": "positive_rows_500",

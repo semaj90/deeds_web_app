@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast.failure-isolation.v1",
-  "generatedAt": "2026-08-20T19:43:30.164Z",
+  "generatedAt": "2026-09-22T21:20:10.632Z",
   "sidecarUrl": "http://127.0.0.1:8095",
   "sourceRevision": "ast-failure-isolation-v1",
   "status": "PROVEN",
@@ -9,6 +9,7 @@
   "failedFiles": 0,
   "malformedDiagnosticPass": true,
   "missingDiagnosticPass": true,
+  "typedErrorTagPass": false,
   "results": [
     {
       "name": "valid-a",
@@ -25,10 +26,10 @@
       "name": "malformed",
       "filePath": "src/malformed.ts",
       "status": "PASS",
-      "errorTag": "ChunkingError",
+      "errorTag": null,
       "syntaxStatus": "RECOVERED_WITH_ERRORS",
-      "chunkCount": 1,
-      "diagnosticCount": 1,
+      "chunkCount": 0,
+      "diagnosticCount": 2,
       "expectedDiagnostic": "ERROR",
       "diagnosticMatch": true
     },
@@ -36,7 +37,7 @@
       "name": "missing-delimiter",
       "filePath": "src/missing-delimiter.ts",
       "status": "PASS",
-      "errorTag": "ChunkingError",
+      "errorTag": null,
       "syntaxStatus": "RECOVERED_WITH_ERRORS",
       "chunkCount": 2,
       "diagnosticCount": 1,

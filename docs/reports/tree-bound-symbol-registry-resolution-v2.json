@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.tree-bound-symbol-registry-resolution-proof.v2",
+  "gate": "GRAPH-RESOLVE-06B.3",
+  "status": "READ_ONLY_PROVEN",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "inputPlanPath": ".tmp/atlas/current-tree-bound-symbol-registry-input-v1.ndjson",
+  "inputPlanChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2",
+  "inputRowCount": 461,
+  "promotableInputCount": 0,
+  "nonPromotableInputCount": 461,
+  "resolutionPath": ".tmp/atlas/current-structural-symbol-resolution-v1.ndjson",
+  "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
+  "outputPath": ".tmp/atlas/tree-bound-symbol-registry-resolution-v2.ndjson",
+  "counts": {
+    "treeBoundInput": 461,
+    "exactCanonicalKey": 0,
+    "exactMetadataRevision": 0,
+    "registryMissing": 461,
+    "registryAmbiguous": 0,
+    "symbolVersionBound": 0,
+    "symbolVersionMissing": 0,
+    "symbolVersionAmbiguous": 0,
+    "sourceRevisionMismatch": 0,
+    "fuzzyMatches": 0
+  },
+  "registryRowsRead": 10454,
+  "symbolVersionRowsRead": 479,
+  "lookupPolicy": [
+    "exact canonical_key",
+    "exact source_ref/source_revision/byte span/declaration hash for symbol version",
+    "no fuzzy or name-only lookup"
+  ],
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "promotionAuthorized": false,
+  "readOnly": true,
+  "nextGate": "REGISTRY_NAMESPACE_RECONCILIATION_REQUIRED"
+}

@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.candidate-feature-matrix-draft.v1",
+  "canonical": false,
+  "notCanonicalBecause": [
+    "representation_revision is legacy 0 on every packet",
+    "som_revision absent",
+    "embedding_digest absent"
+  ],
+  "sourceShards": {
+    "dir": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260925T204039Z",
+    "rootSha256": "4c4b5e6d3f9d454a2bcb5bdf2152aa229e849d326e1978b23cc21c91861e8601"
+  },
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidates": 15732,
+  "ordinalMapChecksum": "c646301b2115d9bb52f7702805204ecd307bfad0d20421b76c158b2b46f85326",
+  "ordering": "sourceRef ascending; ordinal = row index",
+  "numeric": {
+    "shape": [
+      15732,
+      6
+    ],
+    "dtype": "float32-le",
+    "columns": [
+      "log1p_pagerank",
+      "concept_cardinality_log1p",
+      "summary_present",
+      "keyword_present",
+      "k_core_log1p",
+      "latent64_present"
+    ],
+    "maskFile": "numeric_mask.u8",
+    "missingValueWrittenAs": 0,
+    "observedFraction": {
+      "log1p_pagerank": 1,
+      "concept_cardinality_log1p": 0.992,
+      "summary_present": 1,
+      "keyword_present": 1,
+      "k_core_log1p": 0.1735,
+      "latent64_present": 1
+    }
+  },
+  "semantic768": {
+    "shape": [
+      15732,
+      768
+    ],
+    "dtype": "float32-le",
+    "l2Normalized": true,
+    "maskFile": "semantic768_mask.u8",
+    "realEmbeddings": 3294,
+    "maskedPlaceholderOrAbsent": 12438,
+    "badNormSkipped": 0,
+    "placeholderRule": "vector shared by >1% of embedded qualified rows is treated as absent"
+  },
+  "excludedFeatures": [
+    "ast_score",
+    "reward_prior",
+    "community_confidence",
+    "representation_revision"
+  ],
+  "projectionsAreMetadataOnly": [
+    "domainClass",
+    "clusterId",
+    "communityId",
+    "somCell"
+  ],
+  "files": {
+    "numeric.f32le": {
+      "bytes": 377568,
+      "sha256": "3c781bded3e896bc236bada476b315d17958840cd1204ef73ad67b0784a4dcef"
+    },
+    "numeric_mask.u8": {
+      "bytes": 94392,
+      "sha256": "3eb3156541366742fff33b9343b617f1565ccf96f46746b663cd5bdbfd5b63c2"
+    },
+    "semantic768.f32le": {
+      "bytes": 48328704,
+      "sha256": "f41331c238325a0ad4c313f5ccc7369483c6bc934b9af77badf76f08c9f5f1dc"
+    },
+    "semantic768_mask.u8": {
+      "bytes": 15732,
+      "sha256": "fff0add299e41a9aeee514fb2ffeabc9d05a767502d96d5a54c9214eee4e6be4"
+    },
+    "candidate-ordinal-map.ndjson": {
+      "bytes": 3850651,
+      "sha256": "b69085b0b4c1122c9ab4d5003578b28d01e218bcf34714265d5509e8d5e3001c"
+    }
+  },
+  "generatedAt": "2026-09-25T20:41:24.901Z",
+  "outDir": ".tmp\\atlas\\candidate-feature-matrix-v1\\20260925T204124Z"
+}

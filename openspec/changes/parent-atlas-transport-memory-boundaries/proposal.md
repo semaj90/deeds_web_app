@@ -2,7 +2,7 @@
 
 ## Status
 
-Classification and ownership backlog only. No runtime transport, memory, vector, or agent protocol changes are authorized by this OpenSpec.
+Classification and ownership backlog. No runtime transport execution, memory, vector, or agent protocol migration is authorized. The sole runtime exception is a fail-closed A2A peer-discovery allowlist required by A2A-03; it may reduce advertised tools/methods but cannot grant execution, mutation, or canonical authority.
 
 ## Purpose
 

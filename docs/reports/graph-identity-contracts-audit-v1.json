@@ -1,0 +1,164 @@
+{
+  "schema": "atlas.graph-identity-contracts-audit.v1",
+  "generatedAt": "2026-10-01T16:38:12.539Z",
+  "status": "DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN",
+  "proofLevel": "STATIC_SOURCE_PROVEN",
+  "authority": false,
+  "writesPerformed": false,
+  "canonicalWrites": false,
+  "contracts": [
+    {
+      "id": "parse_node_id",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type ParseNodeId",
+      "role": "AST parse occurrence",
+      "revisionBound": true,
+      "forbidden": [
+        "symbol_id",
+        "symbol_version_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "IDENTITY_CONTRACT_DEFINITION"
+    },
+    {
+      "id": "symbol_id",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type SymbolId",
+      "role": "logical symbol identity",
+      "revisionBound": false,
+      "forbidden": [
+        "symbol_version_id",
+        "parse_node_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "IDENTITY_CONTRACT_DEFINITION"
+    },
+    {
+      "id": "symbol_version_id",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type SymbolVersionId",
+      "role": "revision-qualified symbol occurrence",
+      "revisionBound": true,
+      "forbidden": [
+        "symbol_id",
+        "parse_node_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "IDENTITY_CONTRACT_DEFINITION"
+    },
+    {
+      "id": "chunk_id",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type ChunkId",
+      "role": "retrieval chunk identity",
+      "revisionBound": true,
+      "forbidden": [
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "IDENTITY_CONTRACT_DEFINITION"
+    },
+    {
+      "id": "packet_key",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type PacketKey",
+      "role": "canonical packet join identity",
+      "revisionBound": false,
+      "forbidden": [
+        "qdrant_point_id",
+        "graph_node_key"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "IDENTITY_CONTRACT_DEFINITION"
+    },
+    {
+      "id": "concept_id",
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+      "marker": "type ConceptId",
+      "role": "ontology concept reference",
+      "revisionBound": false,
+      "forbidden": [
+        "packet_key",
+        "symbol_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:696d582daeef619c3186b13b87119942a612ee296a2be40db32ee0d25d03a122",
+      "authority": "ONTOLOGY_REFERENCE_UNVERIFIED"
+    },
+    {
+      "id": "graph_node_key",
+      "source": "packages/parent-atlas/src/core/graph-node-key-v1.ts",
+      "marker": "graphNodeKeyV1Schema",
+      "role": "derived graph projection address",
+      "revisionBound": false,
+      "forbidden": [
+        "packet_key",
+        "symbol_id",
+        "symbol_version_id",
+        "parse_node_id"
+      ],
+      "exists": true,
+      "markerFound": true,
+      "sourceChecksum": "sha256:76d642e39a0f1d211e18916ad83e97b01d4e5524321988a7c742d9a32e851603",
+      "authority": "PROJECTION_ONLY"
+    }
+  ],
+  "support": [
+    {
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:4a362fa091602fca67e0541cc8b1a2efba24f2acf441c14e98489c940a409934"
+    },
+    {
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/symbol-revision-qualification-v1.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:22f169b0d95bfa8774258db9a54f02f72c4150e0d1078353b8bb087e6f28c0e1"
+    },
+    {
+      "source": "sveltekit-frontend/src/lib/server/atlas/identity/symbol-identity-audit-v1.ts",
+      "exists": true,
+      "sourceChecksum": "sha256:425f741d6669bc7e2ef0fab2c21a46e622c9f55f76f6f3d366f8b5438a8d94fb"
+    }
+  ],
+  "invariants": [
+    "parse_node_id is an AST occurrence and is not symbol_id or symbol_version_id.",
+    "symbol_version_id is revision-bound and is not symbol_id.",
+    "packet_key is a join identity and is never manufactured from a projection address.",
+    "graph_node_key is a derived projection address and never substitutes for canonical identity.",
+    "This audit proves definitions only; live population and cross-revision continuity remain separate gates."
+  ],
+  "likely_cause": "Identity definitions existed across several Atlas seams, but the OpenSpec task lacked one current source audit and stable task identity.",
+  "evidence": [
+    "source marker audit",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts",
+    "packages/parent-atlas/src/core/graph-node-key-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/symbol-revision-qualification-v1.ts",
+    "sveltekit-frontend/src/lib/server/atlas/identity/symbol-identity-audit-v1.ts"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-graph-identity-contracts-v1.mjs",
+    "sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-graph-identity-contracts-v1.mjs",
+  "smoke_command": "node scripts/atlas/audit-graph-identity-contracts-v1.mjs && node -e \"const r=require('docs/reports/graph-identity-contracts-audit-v1.json'); if(r.status!=='DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN') process.exit(1)\"",
+  "report_path": "docs/reports/graph-identity-contracts-audit-v1.json",
+  "checksum": "sha256:b3f08e9e0331c5c8ca042584d1a0b050fece1d956bf130e4b82d8bd74bbbc04f"
+}

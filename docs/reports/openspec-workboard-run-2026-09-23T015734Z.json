@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T01:57:34Z",
+  "readOnly": false,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "change": "parent-atlas-document-governance-master-index",
+  "selection": {
+    "from": "8.1 read-only governance summary endpoint",
+    "to": "8.3 typed governance summary page-data contract",
+    "reason": "The API now has a tested stable summary shape; the adjacent SSR/UI contract still duplicates a narrower type and does not runtime-validate the API payload before passing it to the page."
+  },
+  "stateAtSelection": {
+    "checked": 36,
+    "open": 28,
+    "total": 64,
+    "nextTask": "8.3"
+  },
+  "guardrails": {
+    "databaseWrites": false,
+    "qdrantWrites": false,
+    "valkeyWrites": false,
+    "graphifyRefresh": false,
+    "containerRebuild": false,
+    "canonicalPromotion": false
+  },
+  "status": "PARTIAL",
+  "result": {
+    "contractSchemaTypecheck": "PASS",
+    "focusedSummaryRouteTests": "PASS (6/6)",
+    "fullSvelteCheck": "STOPPED_FOR_RESOURCE_SAFETY at approximately 5.6 GiB working set; no diagnostics emitted",
+    "task8_3CheckboxClosed": false,
+    "progressAfterAttempt": { "checked": 36, "open": 28, "total": 64 },
+    "reason": "The shared schema is proven, but the full Svelte page integration typecheck was not completed; task 8.3 remains open pending a safe targeted page check."
+  },
+  "nextGate": "DOCUMENT_GOVERNANCE_9_8_DETERMINISTIC_VALIDATION_REPLAY"
+}

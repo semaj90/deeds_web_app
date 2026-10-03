@@ -1,0 +1,39 @@
+{
+  "schema": "atlas.unified-residency-stdio-handoff.v1",
+  "status": "HOST_TO_WSL_PROVIDER_HANDOFF_PROVEN",
+  "producer": "Node host frame encoder",
+  "staging": {
+    "engine": "DuckDB",
+    "mode": "in-memory read-only SELECT",
+    "rows": 2,
+    "writesPerformed": false
+  },
+  "consumer": "parent_atlas_tensor.unified_residency_stdio",
+  "transport": {
+    "control": "length-prefixed UTF-8 JSON descriptor",
+    "numeric": "length-prefixed little-endian Float32 bytes",
+    "descriptorBytes": 574,
+    "numericBytes": 32
+  },
+  "lineage": {
+    "workspaceRevision": "workspace:stdio-host-fixture-v1",
+    "sourceRevision": "source:stdio-host-fixture-v1",
+    "representationRevision": "representation:feature-tile-v1",
+    "featureRevision": "feature:stdio-host-fixture-v1"
+  },
+  "receipt": {
+    "state": "RESIDENT",
+    "residencyKey": "atlas:residency:stdio:host-fixture",
+    "byteLength": 32,
+    "device": "cuda",
+    "rawPointerExposed": false,
+    "writesPerformed": false
+  },
+  "frameChecksum": "21856eb0091bc58beae35f4d4915b9864b1de688559818ac7e9621bd76d106f5",
+  "processExitCode": 0,
+  "stderr": "",
+  "parseError": null,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "promotionEligible": false
+}

@@ -1,77 +1,117 @@
-#!/usr/bin/env node
-/**
- * Record one canonical WorkflowActionEventV1 against an OpenSpec change.
- * Default is dry-run; --apply is required before touching openspec/.
- */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, relative, resolve } from 'node:path';
 
-const args = new Map();
-for (let i = 2; i < process.argv.length; i += 1) {
-  const value = process.argv[i];
-  if (value === '--apply' || value === '--dry-run') args.set(value, true);
-  else if (value.startsWith('--')) args.set(value, process.argv[++i]);
+const argv = process.argv.slice(2);
+const has = (flag) => argv.includes(flag);
+const valueOf = (flag) => {
+  const index = argv.indexOf(flag);
+  return index === -1 ? null : argv[index + 1] ?? null;
+};
+
+const repoRoot = resolve(valueOf('--repo-root') ?? process.cwd());
+const eventFile = valueOf('--event-file');
+const eventJson = valueOf('--event-json');
+const dryRun = has('--dry-run') || !has('--apply');
+
+if ((!eventFile && !eventJson) || (eventFile && eventJson)) {
+  throw new Error('Provide exactly one of --event-file <path> or --event-json <json>');
 }
 
-const change = String(args.get('--openspec-change') ?? '').trim();
-const inputPath = String(args.get('--input') ?? '').trim();
-const apply = args.has('--apply');
-if (!change || !inputPath) {
-  console.error('Usage: node scripts/atlas/record-agentic-run-receipt.mjs --openspec-change <change> --input <event.json> [--apply]');
-  process.exit(1);
-}
-
-const event = JSON.parse(readFileSync(inputPath, 'utf8'));
-const errors = [];
-if (event.schema !== 'atlas.workflow-action.v1') errors.push('SCHEMA_MISMATCH');
-if (event.kind !== 'completed') errors.push('EVENT_NOT_COMPLETED');
-if (!event.workflowId || !event.actionId || !Number.isInteger(event.sequence)) errors.push('EVENT_IDENTITY_MISSING');
-if (!event.openspecChange) errors.push('OPENSPEC_BINDING_MISSING');
-if (event.openspecChange && event.openspecChange !== change) errors.push('OPENSPEC_BINDING_MISMATCH');
-if (event.progress?.etaMs !== undefined && (!Number.isFinite(event.progress.etaMs) || event.progress.etaMs < 0)) errors.push('INVALID_ETA');
-if (errors.length) {
-  console.error(`RECEIPT_REJECTED ${errors.join(',')}`);
-  process.exit(2);
-}
-
-const changeDir = join(process.cwd(), 'openspec', 'changes', change);
-const tasksPath = join(changeDir, 'tasks.md');
-const receiptsPath = join(changeDir, 'receipts.jsonl');
-if (!existsSync(tasksPath)) {
-  console.error(`OPENSPEC_TASKS_MISSING ${tasksPath}`);
-  process.exit(2);
-}
-
-const eventKey = `${event.workflowId}:${event.actionId}:${event.sequence}`;
-const existing = existsSync(receiptsPath)
-  ? readFileSync(receiptsPath, 'utf8').split(/\r?\n/).filter(Boolean).map((line) => {
-      try { return JSON.parse(line); } catch { return null; }
-    })
-  : [];
-if (existing.some((item) => item && `${item.workflowId}:${item.actionId}:${item.sequence}` === eventKey)) {
-  console.log(`RECEIPT_NOOP ${eventKey}`);
-  process.exit(0);
-}
-
-const receiptLine = JSON.stringify(event);
-const progress = event.progress?.fraction ?? (
-  event.progress?.completedUnits != null && event.progress?.totalUnits > 0
-    ? event.progress.completedUnits / event.progress.totalUnits
-    : event.state === 'succeeded' ? 1 : null
+const eventInput = JSON.parse(eventFile ? await readFile(resolve(repoRoot, eventFile), 'utf8') : eventJson);
+const { tsImport } = await import('tsx/esm/api');
+const { workflowActionEventSchema } = await tsImport(
+  '../../packages/parent-atlas/src/core/workflow-action-event.ts',
+  import.meta.url,
 );
-const eta = event.progress?.etaMs == null ? 'unavailable' : `${event.progress.etaMs}ms`;
-const bullet = `- ${event.emittedAt ?? new Date().toISOString()} — workflow \`${event.workflowId}\`, action \`${event.actionId}\`, sequence ${event.sequence}; progress=${progress == null ? 'unavailable' : `${Math.round(progress * 100)}%`}; ETA=${eta}; event=${eventKey}`;
-const tasksText = readFileSync(tasksPath, 'utf8');
-const section = tasksText.includes('## Run Receipts')
-  ? `${tasksText.trimEnd()}\n${bullet}\n`
-  : `${tasksText.trimEnd()}\n\n## Run Receipts\n\n${bullet}\n`;
+const parsedEvent = workflowActionEventSchema.safeParse(eventInput);
+if (!parsedEvent.success) {
+  const issues = parsedEvent.error.issues.map((issue) => `${issue.path.join('.') || '<root>'}: ${issue.message}`);
+  throw new Error(`RUN_RECEIPT_INVALID: canonical WorkflowActionEventV1: ${issues.join('; ')}`);
+}
+const event = parsedEvent.data;
+const openspecChange = event.metadata.openspecChange;
+if (event.kind !== 'completed') throw new Error('RUN_RECEIPT_INVALID: kind must be completed');
+if (typeof openspecChange !== 'string' || !/^[-a-zA-Z0-9_]+$/.test(openspecChange)) {
+  throw new Error('RUN_RECEIPT_INVALID: openspecChange must be a safe change name');
+}
 
-console.log(`RECEIPT_READY ${eventKey} apply=${apply}`);
-if (!apply || args.has('--dry-run')) {
-  console.log(`would append ${receiptsPath}`);
-  console.log(`would update ${tasksPath}`);
+const changesRoot = resolve(repoRoot, 'openspec/changes');
+const changeRoot = resolve(changesRoot, openspecChange);
+const relativeChange = relative(changesRoot, changeRoot);
+if (relativeChange.startsWith('..') || relativeChange.includes(':')) {
+  throw new Error('RUN_RECEIPT_INVALID: change path escapes openspec/changes');
+}
+
+const tasksPath = resolve(changeRoot, 'tasks.md');
+const receiptsPath = resolve(changeRoot, 'receipts.jsonl');
+if (!existsSync(tasksPath)) throw new Error(`RUN_RECEIPT_INVALID: missing ${tasksPath}`);
+
+const identity = `${event.workflowId}\u0000${event.workflowRevision}\u0000${event.actionId}\u0000${event.sequence}`;
+const existingText = existsSync(receiptsPath) ? await readFile(receiptsPath, 'utf8') : '';
+const existingEvents = existingText
+  .split(/\r?\n/)
+  .filter(Boolean)
+  .map((line, index) => {
+    try {
+      return { event: JSON.parse(line), index };
+    } catch {
+      throw new Error(`RUN_RECEIPT_INVALID: malformed receipts.jsonl line ${index + 1}`);
+    }
+  });
+const duplicate = existingEvents.find(({ event: candidate }) =>
+  `${candidate.workflowId}\u0000${candidate.workflowRevision}\u0000${candidate.actionId}\u0000${candidate.sequence}` === identity
+);
+
+if (duplicate) {
+  const same = JSON.stringify(duplicate.event) === JSON.stringify(event);
+  if (!same) throw new Error('RUN_RECEIPT_CONFLICT: identity already exists with different payload');
+  console.log(JSON.stringify({
+    schema: 'atlas.agentic-run-receipt-record.v1',
+    status: 'NO_OP_ALREADY_RECORDED',
+    dryRun,
+    identity: { workflowId: event.workflowId, workflowRevision: event.workflowRevision, actionId: event.actionId, sequence: event.sequence },
+    writesPerformed: false,
+  }, null, 2));
   process.exit(0);
 }
-writeFileSync(receiptsPath, `${existsSync(receiptsPath) ? readFileSync(receiptsPath, 'utf8').trimEnd() + '\n' : ''}${receiptLine}\n`, 'utf8');
-writeFileSync(tasksPath, section, 'utf8');
-console.log(`RECEIPT_RECORDED ${eventKey}`);
+
+const tasksText = await readFile(tasksPath, 'utf8');
+const operation = typeof event.metadata.operation === 'string' ? event.metadata.operation : 'completed';
+const state = typeof event.metadata.state === 'string' ? event.metadata.state : 'succeeded';
+const bullet = `- ${event.workflowId}@r${event.workflowRevision}/${event.actionId}#${event.sequence}: ${operation} (state=${state})`;
+let nextTasksText = tasksText;
+const heading = /^## Run Receipts\s*$/m;
+if (heading.test(tasksText)) {
+  const match = heading.exec(tasksText);
+  const afterHeading = (match?.index ?? 0) + (match?.[0].length ?? 0);
+  const nextHeading = /^##\s+/m.exec(tasksText.slice(afterHeading));
+  const insertAt = nextHeading ? afterHeading + nextHeading.index : tasksText.length;
+  const prefix = tasksText.slice(0, insertAt).replace(/\s*$/, '\n');
+  const suffix = tasksText.slice(insertAt).replace(/^\s*/, '\n');
+  nextTasksText = `${prefix}${bullet}${suffix}`;
+} else {
+  nextTasksText = `${tasksText.replace(/\s*$/, '\n\n')}## Run Receipts\n${bullet}\n`;
+}
+
+const nextReceiptsText = `${existingText}${existingText && !existingText.endsWith('\n') ? '\n' : ''}${JSON.stringify(event)}\n`;
+const result = {
+  schema: 'atlas.agentic-run-receipt-record.v1',
+  status: dryRun ? 'DRY_RUN_WOULD_RECORD' : 'RECORDED',
+  dryRun,
+  identity: { workflowId: event.workflowId, workflowRevision: event.workflowRevision, actionId: event.actionId, sequence: event.sequence },
+  targets: {
+    tasksPath,
+    receiptsPath,
+    tasksChanged: nextTasksText !== tasksText,
+    receiptsChanged: nextReceiptsText !== existingText,
+  },
+  writesPerformed: !dryRun,
+};
+
+if (!dryRun) {
+  await mkdir(dirname(receiptsPath), { recursive: true });
+  await writeFile(tasksPath, nextTasksText, 'utf8');
+  await writeFile(receiptsPath, nextReceiptsText, 'utf8');
+}
+console.log(JSON.stringify(result, null, 2));

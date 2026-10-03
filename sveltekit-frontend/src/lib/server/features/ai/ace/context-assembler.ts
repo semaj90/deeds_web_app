@@ -134,7 +134,8 @@ import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
 import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
-import { aceTopkKey } from '../../../ace/cache-keys.js';
+import { aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { persistRevisionedAceTopRetrievalCache } from '$lib/server/cache/ace-top-retrieval-cache.js';
 import {
   normalizeTelemetrySourceRefs,
   resolveTelemetryPacketFallbacks,
@@ -1535,14 +1536,10 @@ export async function assembleACEContext(opts: {
   corpusHash?: string;
   ragBundleHash?: string;
   graphSnapshotHash?: string;
-  /** Optional caller-owned retrieval identity forwarded to QueryRouter. */
-  workspaceRevision?: string;
-  candidateSnapshotRevision?: string;
-  ordinalMapChecksum?: string;
-  representationRevision?: string;
-  retrievalPolicyRevision?: string;
-  contextPolicyRevision?: string;
-  graphRevision?: string | null;
+  /** Only a server-validated handoff may enable strict retrieval cache v3. */
+  retrievalCacheIdentityV3?: BifrostRetrievalCacheIdentityV3;
+  /** Optional complete identity from the admitted SearchRuntime manifest. */
+  retrievalCacheIdentity?: RetrievalCacheIdentityV1;
   /**
    * nes-arch path-first preflight (LLMS.md spec). When provided, the
    * assembler does a sub-5ms Redis lookup for the nearest LLMS.md
@@ -1592,13 +1589,8 @@ export async function assembleACEContext(opts: {
       if (!routeResult) {
         routeResult = await routeQuery({
           query: opts.query,
-          workspaceRevision: opts.workspaceRevision,
-          candidateSnapshotRevision: opts.candidateSnapshotRevision,
-          ordinalMapChecksum: opts.ordinalMapChecksum,
-          representationRevision: opts.representationRevision,
-          retrievalPolicyRevision: opts.retrievalPolicyRevision,
-          contextPolicyRevision: opts.contextPolicyRevision,
-          graphRevision: opts.graphRevision,
+          retrievalCacheIdentityV3: opts.retrievalCacheIdentityV3,
+          disableRetrievalCache: !opts.retrievalCacheIdentityV3,
         });
       }
       const packet = routeResult.packet;
@@ -2308,7 +2300,7 @@ export async function assembleACEContext(opts: {
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
         fetchGlossaryMatches(query),
-        fetchRAGChunks(query, opts.sectionTypes, caseId),
+        fetchRAGChunks(query, opts.sectionTypes, caseId, opts.retrievalCacheIdentity),
         caseId ? fetchKAGNeighbors(caseId) : Promise.resolve([]),
         conversationId ? fetchChatHistory(conversationId) : Promise.resolve([]),
         opts.enableWebSearch ? webSearch(query, 3).catch(() => null) : Promise.resolve(null),
@@ -2365,6 +2357,7 @@ export async function assembleACEContext(opts: {
                     ),
                     topK: 8,
                     skipVectorLane: true,
+                    retrievalCacheIdentity: opts.retrievalCacheIdentity,
                   })
                 )
               )
@@ -5541,7 +5534,8 @@ async function getQueryEmbedding(query: string): Promise<number[] | null> {
         modelArtifactRevision,
         tokenizerRevision,
         inputPolicyRevision,
-        baseUrl: ENV.EMBEDDING_BASE_URL,
+        // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
+        baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
         timeoutMs: 5_000,
       });
       return result.embedding;
@@ -5831,7 +5825,8 @@ async function fetchResearchSummaryChunks(
 async function fetchRAGChunks(
   query: string,
   sectionTypes?: string[],
-  caseId?: string
+  caseId?: string,
+  retrievalCacheIdentity?: RetrievalCacheIdentityV1
 ): Promise<{ ragChunks: RAGChunk[]; kbChunks: RAGChunk[]; caseChunks: RAGChunk[] }> {
   const embedding = await traceEmbedding(query, 'embeddinggemma:latest', () =>
     getQueryEmbedding(query)
@@ -6099,6 +6094,28 @@ async function fetchRAGChunks(
     redis.setex(topkKey, 600, JSON.stringify(topkPayload)).catch(() => {});
   } catch {
     /* non-fatal — ACE cache lane will miss on this query, Qdrant is the fallback */
+  }
+
+  // CACHE-RETRIEVAL-IDENTITY-03: also write under the revision-qualified key so
+  // runAceCacheLane()'s revisioned read path (multi-lane-retrieval.ts) can hit
+  // this warm entry instead of always falling back to the unrevisioned aceTopkKey
+  // above. Previously this writer only ever wrote the legacy key, so a caller
+  // supplying retrievalCacheIdentity could never observe a hit here even after a
+  // fresh write for the identical query. topN=8 matches this file's own
+  // multiLaneSearch({ topK: 8, ... }) call a few lines above in assembleACEContext
+  // -- admission requires an exact topN match, so this must stay in sync with it.
+  if (retrievalCacheIdentity) {
+    try {
+      const revisionedResults = kbChunks.slice(0, 8).map((c) => ({
+        id: c.source,
+        sourceRef: c.source,
+        snippet: c.content.slice(0, 200),
+        score: c.score,
+      }));
+      void persistRevisionedAceTopRetrievalCache(retrievalCacheIdentity, revisionedResults, 8);
+    } catch {
+      /* non-fatal — revisioned ACE cache lane will miss on this query */
+    }
   }
 
   // Re-attach transient embeddings dropped by intermediate rerank passes.

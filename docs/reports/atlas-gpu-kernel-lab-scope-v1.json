@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.gpu-kernel-lab-scope.v1",
+  "generatedAt": "2026-09-11",
+  "scope": {
+    "owner": "WSL2 atlas-cutile-cu132",
+    "purpose": "isolated cuTile/TileIR/PTXAS and CUDA SIMT challenger work",
+    "decoderImageMutation": false,
+    "rapidsImageMutation": false,
+    "canonicalWrites": false
+  },
+  "localDockerInventory": {
+    "cudaDevelKernelLabImage": false,
+    "activeRapidsImage": "atlas-gpu-8098:26.08-cuda12-py3.13",
+    "activeDecoderImage": "atlas-neural-decoder:torch2.13.0-cu132",
+    "unrelatedLegacyImagesPresent": [
+      "atlas-gpu-8098:repro-v1",
+      "atlas-gpu-8098:repro-v2",
+      "atlas-neural-decoder:torch2.8.0-cu128"
+    ]
+  },
+  "wslProof": {
+    "environment": "atlas-cutile-cu132",
+    "torch": "2.14.0+cu132",
+    "cuda": "13.2",
+    "cuTile": "1.5.0",
+    "gpu": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": [8, 6],
+    "simtReceipt": "docs/reports/atlas-cuda-simt-live-20260911.json",
+    "cuTileReceipt": "docs/reports/atlas-cuda-cutile-simt-gemm-live-20260911.json"
+  },
+  "status": "KERNEL_LAB_SCOPE_DEFINED_DOCKER_DEVEL_IMAGE_NOT_AVAILABLE",
+  "nextGate": "ADMIT_SEPARATE_DEVEL_IMAGE_AFTER_DISK_AND_DIGEST_REVIEW"
+}

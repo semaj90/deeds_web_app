@@ -7,7 +7,7 @@
  */
 
 import { openDB, type IDBPDatabase } from 'idb';
-import Loki from 'lokijs';
+import Loki, { type Collection } from 'lokijs';
 
 export interface BoardLayout {
 	caseId: string;

@@ -57,6 +57,18 @@ const TOP_N = (() => {
   const idx = args.indexOf('--top');
   return idx !== -1 ? parseInt(args[idx + 1], 10) : null;
 })();
+const argValue = (name) => {
+  const inline = args.find((arg) => arg.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1).trim();
+  const idx = args.indexOf(name);
+  return idx !== -1 && args[idx + 1] && !args[idx + 1].startsWith('--')
+    ? args[idx + 1].trim()
+    : null;
+};
+const ADMITTED_WORKSPACE_REVISION =
+  argValue('--workspace-revision') ?? process.env.ATLAS_WORKSPACE_REVISION ?? null;
+const SOURCE_COHORT_CHECKSUM =
+  argValue('--source-cohort-checksum') ?? process.env.ATLAS_SOURCE_COHORT_CHECKSUM ?? null;
 
 if (!REDIS_URL) {
   console.error('[hotness] REDIS_URL not set — skipping');
@@ -393,6 +405,15 @@ function computeHotness(f) {
 
 async function main() {
   const startTs = Date.now();
+
+  if (!DRY_RUN) {
+    if (!/^sha256:[0-9a-f]{64}$/i.test(String(ADMITTED_WORKSPACE_REVISION ?? ''))) {
+      throw new Error('HOTNESS_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED');
+    }
+    if (!/^[0-9a-f]{64}$/i.test(String(SOURCE_COHORT_CHECKSUM ?? ''))) {
+      throw new Error('HOTNESS_APPLY_SOURCE_COHORT_CHECKSUM_REQUIRED');
+    }
+  }
 
   // --- Redis connection (ioredis cold-start pattern) ---
   const redisOptions = {

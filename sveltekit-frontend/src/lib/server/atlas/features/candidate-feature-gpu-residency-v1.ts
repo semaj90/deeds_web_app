@@ -1,6 +1,13 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
+import {
+  admitGpuExecutionLeaseV1,
+  type GpuExecutionLeaseV1,
+  type GpuResidencyBudgetV1,
+  type GpuResidencyExecutorV1,
+} from '../gpu/gpu-residency-budget.js';
+
 import { artifactAddressSchema, type ArtifactAddressV1 } from '../../queue/artifact-work-item-v1.js';
 import { CANDIDATE_SCALAR_FEATURES } from './candidate-feature-columnar-v1.js';
 import {
@@ -141,6 +148,11 @@ export const candidateFeatureGpuResidencyLeaseV1Schema = z.object({
 });
 export type CandidateFeatureGpuResidencyLeaseV1 = z.infer<typeof candidateFeatureGpuResidencyLeaseV1Schema>;
 
+function observedGpuBytes(observation: CandidateFeatureGpuResidencyObservationV1): number {
+  const bytesByDtype = { f32: 4, u8: 1, i32: 4 } as const;
+  return observation.buffers.reduce((total, buffer) => total + buffer.shape.reduce((size, dimension) => size * dimension, 1) * bytesByDtype[buffer.dtype], 0);
+}
+
 export const candidateFeatureGpuReleaseReceiptV1Schema = z.object({
   schema: z.literal(CANDIDATE_FEATURE_GPU_RELEASE_SCHEMA),
   leaseId: z.string().min(1),
@@ -274,6 +286,39 @@ export function buildCandidateFeatureGpuResidencyLease(input: {
     ...body,
     leaseChecksum: sha256(canonicalJson(body)),
   });
+}
+
+/**
+ * Candidate-feature executor seam. The existing artifact lease remains the
+ * feature-lane contract; this wrapper adds the shared budget owner's decision
+ * before a caller is allowed to treat the observed buffers as admissible.
+ * It does not allocate, persist, or promote anything.
+ */
+export function buildCandidateFeatureGpuResidencyLeaseWithSharedBudget(input: {
+  pack: unknown;
+  observation: unknown;
+  leaseEpoch?: number;
+  producerRevision: string;
+  budget: GpuResidencyBudgetV1;
+  budgetRevision: string;
+  executor?: GpuResidencyExecutorV1;
+  activeReservedBytes?: number;
+}): { candidateLease: CandidateFeatureGpuResidencyLeaseV1; sharedLease: GpuExecutionLeaseV1; canonicalAuthority: false; writesPerformed: false } {
+  const observation = candidateFeatureGpuResidencyObservationSchema.parse(input.observation);
+  const candidateLease = buildCandidateFeatureGpuResidencyLease(input);
+  const sharedLease = admitGpuExecutionLeaseV1({
+    budget: input.budget,
+    budgetRevision: input.budgetRevision,
+    leaseId: observation.leaseId,
+    leaseEpoch: input.leaseEpoch ?? 1,
+    executor: input.executor ?? 'pytorch_cuda',
+    requestedBytes: observedGpuBytes(observation),
+    activeReservedBytes: input.activeReservedBytes,
+  });
+  if (sharedLease.admission !== 'ALLOW') {
+    throw new Error(`GPU_EXECUTOR_RESIDENCY_ADMISSION_${sharedLease.admission}`);
+  }
+  return { candidateLease, sharedLease, canonicalAuthority: false, writesPerformed: false };
 }
 
 export function verifyGpuResidentArtifactLease(input: {

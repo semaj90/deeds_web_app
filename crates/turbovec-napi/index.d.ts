@@ -41,3 +41,14 @@ export declare function packQdrantPayloads(nodesPath: string, edgesPath: string)
  * Builds a TurboQuantIndex with dim float32 vectors at `bits` precision.
  */
 export declare function turbovecSmoke(dim: number, bits: number): string
+/**
+ * Exact cosine top-k (oracle). `vectors` is n*dim, `queries` is nq*dim, row-major. Rows are L2-normalised
+ * here so callers may pass unnormalised data. Returns nq*k row indices then nq*k scores (as two arrays).
+ */
+export interface TopKResult {
+  indices: Array<number>
+  scores: Array<number>
+}
+export declare function hintExactCosineTopk(vectors: Float32Array, queries: Float32Array, dim: number, k: number): TopKResult
+/** Quantized turbovec top-k (challenger). Same layout and return shape as the exact oracle. */
+export declare function hintTurbovecTopk(vectors: Float32Array, queries: Float32Array, dim: number, bits: number, k: number): TopKResult

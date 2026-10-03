@@ -151,6 +151,7 @@ vi.mock('$lib/server/queue/rabbitmq-manager-fixed.js', () => ({
 const mockApiResponses = {
 	success: vi.fn((data: unknown) => Response.json(data)),
 	badRequest: vi.fn((msg: string) => Response.json({ error: msg }, { status: 400 })),
+	unauthorized: vi.fn((msg = 'Unauthorized') => Response.json({ error: msg }, { status: 401 })),
 	serviceUnavailable: vi.fn((msg: string) => Response.json({ error: msg }, { status: 503 })),
 };
 vi.mock('$lib/server/api/response-helper.js', () => ({
@@ -720,12 +721,15 @@ describe('/api/embed (POST)', () => {
 	it('returns 401 when unauthenticated', async () => {
 		const res = await POST({ request: mkRequest({ text: 'hello' }), locals: anonLocals });
 		expect(res.status).toBe(401);
+		expect(await res.json()).not.toHaveProperty('embedding');
 	});
 
 	it('returns 400 for missing text', async () => {
 		const res = await POST({ request: mkRequest({}), locals: authedLocals });
 		// apiResponses.badRequest is mocked
 		expect(mockApiResponses.badRequest).toHaveBeenCalled();
+		expect(res.status).toBe(400);
+		expect(await res.json()).not.toHaveProperty('embedding');
 	});
 
 	it('returns embeddinggemma embedding by default', async () => {
@@ -739,19 +743,14 @@ describe('/api/embed (POST)', () => {
 		expect(data.model).toBe('embeddinggemma:latest');
 	});
 
-	it('returns nomic embedding when requested', async () => {
-		mockOllamaFetch.mockResolvedValueOnce({
-			ok: true,
-			json: async () => ({ embedding: Array.from({ length: 768 }, () => 0.1) }),
-		});
-
+	it('rejects unsupported model labels without returning an embedding', async () => {
 		const res = await POST({
 			request: mkRequest({ text: 'Legal query', model: 'nomic' }),
 			locals: authedLocals,
 		});
 		const data = await res.json();
-		expect(res.status).toBe(200);
-		expect(data.model).toBe('nomic-embed-text:latest');
+		expect(res.status).toBe(400);
+		expect(data).not.toHaveProperty('embedding');
 	});
 
 	it('returns mock embedding with custom dimensions', async () => {
@@ -784,11 +783,12 @@ describe('/api/embed (POST)', () => {
 			resetTime: Date.now() + 30000,
 		});
 
-		await POST({
+		const res = await POST({
 			request: mkRequest({ text: 'test text' }),
 			locals: authedLocals,
 		});
-		expect(mockApiResponses.serviceUnavailable).toHaveBeenCalled();
+		expect(res.status).toBe(429);
+		expect(await res.json()).not.toHaveProperty('embedding');
 	});
 });
 

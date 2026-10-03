@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.summary-candidate-cohort.v1",
+  "control": true,
+  "purpose": "NEGATIVE_CONTROL: must be refused by the writer; NOT part of the authoritative cohort",
+  "source": "../docs/reports/external-doc-summary-faithfulness-v1.json",
+  "unsupportedTokens": [
+    "low-selectivity"
+  ],
+  "chunkCohortChecksum": "fd2b2bd03016b305adddccf5f621708157318bead82b589eb55c6687f43b4a8a",
+  "candidateCohortChecksum": "5713db798d682742ada1431989e1463837988dd1fea1115410e2c34127e09f5e",
+  "pairs": [
+    {
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a"
+    }
+  ],
+  "modelCalls": 0,
+  "candidates": [
+    {
+      "schema": "atlas.summary-candidate.v1",
+      "chunkId": "doc:pgvector:fe883c75f323441d:22",
+      "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+      "identityVersion": "external-doc-chunk-id:v1",
+      "producerId": "atlas-summary-negative-control",
+      "producerRevision": "negative-control:historical-unsupported-summary",
+      "modelId": "ornith-1.5-9b",
+      "modelRevision": "ornith-1.5-9b@hforf.gguf@b8757-a29e4c0b7",
+      "promptRevision": "negative-control:not-generated",
+      "inputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+      "summaryText": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause. It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can cover multiple columns. For low-selectivity filters, exact indexes work well, but approximate indexes like HNSW may perform better, with filtering applied after the index scan. To handle cases where few rows match, you can enable iterative index scans by setting `hnsw.iterative_scan = strict_order`. For filtering by a few distinct values, partial indexing is suggested, while partitioning is recommended when filtering by many different values.",
+      "outputChecksum": "d9da4b7230b5399c45ae2b4cde7bfe5e32eec3618a879a0eff5fcea0b4e5da1b",
+      "generationMetadata": {
+        "backend": "llama-server",
+        "baseUrl": "http://127.0.0.1:8090",
+        "temperature": 0.2,
+        "seed": 1729,
+        "maxTokens": 300,
+        "finishReason": "stop",
+        "completionTokens": 96,
+        "productName": "pgvector",
+        "versionLabel": "CURRENT_UPSTREAM@2026-09-23"
+      },
+      "canonicalAuthority": false,
+      "candidateId": "sc:d8682b7baa1bd3865d0c5d3cde8e200287d24c69a04a94c5775a1f3d07c8da86"
+    }
+  ]
+}

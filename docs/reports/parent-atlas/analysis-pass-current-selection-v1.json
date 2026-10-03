@@ -31,13 +31,13 @@
     },
     {
       "status": "succeeded",
-      "n": 19,
+      "n": 27,
       "earliest": "2026-08-11T04:18:05.579Z",
-      "latest": "2026-08-25T17:33:09.590Z"
+      "latest": "2026-09-06T07:18:28.565Z"
     }
   ],
   "liveViewCoversRowCount": 11076,
-  "totalRowCount": 11095,
+  "totalRowCount": 11103,
   "scenarioSingleUnsupersededPass": {
     "found": true,
     "identity": {
@@ -78,5 +78,5 @@
   "identityGroupsWithTiedTimestamps": 0,
   "tiebreakRisk": "STRUCTURALLY_UNENFORCED_BUT_NO_CURRENT_TIES",
   "reason": "Live deployed analysis_pass_current view does not match drizzle/manual/analysis_pass_current.sql on disk. Live status filter: 'success'. File status filter: 'succeeded'. Live has id-tiebreak: false. File has id-tiebreak: true. This is a separately-tracked finding, not silently patched by this proof script.",
-  "reportChecksum": "sha256:642420d1b529bdf291dea7a0464422d7b983c9e6536b589abcf7839b2ff97bcd"
+  "reportChecksum": "sha256:61146ee72a7934543594abcf99912bd7820410000dc39be325169efd2815ba3e"
 }

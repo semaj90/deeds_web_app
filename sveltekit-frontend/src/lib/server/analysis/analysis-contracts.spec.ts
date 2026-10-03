@@ -15,6 +15,7 @@ import {
   HMMObservationSchema,
   ExperimentFeatureMatrixSchema,
   compileEventHypergraphBundle,
+  HypergraphLineageUnavailableError,
   compileExperimentFeatureMatrix,
 } from './nlp-feature-compiler.js';
 import { createModelAnalysisSidecarClient } from './model-analysis-sidecar.js';
@@ -485,6 +486,97 @@ describe('analysis contracts', () => {
     expect(eventBundle.recommendationPolicyResults[0]?.receipt.payload.decisionId).toBe(
       eventBundle.recommendationPolicyResults[0]?.decisionId,
     );
+  });
+
+  it('AST-UNIT-NORMALIZE-01: AstUnitSchema defaults packetKey to null and pins canonicalAuthority to false', () => {
+    const bare = AstUnitSchema.parse({
+      sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+      sourceRevision: 'source-v1',
+      treeNodeId: 'node-1',
+      language: 'ts',
+      nodeKind: 'function',
+      byteStart: 0,
+      byteEnd: 10,
+      lineStart: 1,
+      lineEnd: 2,
+      parserEngine: 'tree-sitter',
+      parserRevision: '1.0.0',
+      grammarRevision: '1.0.0',
+      chunker: 'treesitter-chunker',
+      chunkerRevision: '1.0.0',
+      structuralRevision: 'structural-v1',
+      contentHash: 'content-1',
+    });
+    expect(bare.packetKey).toBeNull();
+    expect(bare.canonicalAuthority).toBe(false);
+
+    const withPacketKey = AstUnitSchema.parse({
+      sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+      sourceRevision: 'source-v1',
+      packetKey: 'packet:1',
+      treeNodeId: 'node-1',
+      language: 'ts',
+      nodeKind: 'function',
+      byteStart: 0,
+      byteEnd: 10,
+      lineStart: 1,
+      lineEnd: 2,
+      parserEngine: 'tree-sitter',
+      parserRevision: '1.0.0',
+      grammarRevision: '1.0.0',
+      chunker: 'treesitter-chunker',
+      chunkerRevision: '1.0.0',
+      structuralRevision: 'structural-v1',
+      contentHash: 'content-1',
+    });
+    expect(withPacketKey.packetKey).toBe('packet:1');
+
+    // canonicalAuthority is a fixed literal, never settable to true — attempting so must fail closed.
+    expect(() =>
+      AstUnitSchema.parse({
+        sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+        sourceRevision: 'source-v1',
+        treeNodeId: 'node-1',
+        language: 'ts',
+        nodeKind: 'function',
+        byteStart: 0,
+        byteEnd: 10,
+        lineStart: 1,
+        lineEnd: 2,
+        parserEngine: 'tree-sitter',
+        parserRevision: '1.0.0',
+        grammarRevision: '1.0.0',
+        chunker: 'treesitter-chunker',
+        chunkerRevision: '1.0.0',
+        structuralRevision: 'structural-v1',
+        contentHash: 'content-1',
+        canonicalAuthority: true,
+      }),
+    ).toThrow();
+  });
+
+  it('fails closed instead of promoting requestId to packet identity', () => {
+    expect(() =>
+      compileEventHypergraphBundle({
+        requestId: 'req:missing-packet',
+        sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+        sourceRevision: 'source-v1',
+        workspaceRevision: 'workspace-v1',
+        passResults: [],
+      }),
+    ).toThrow(HypergraphLineageUnavailableError);
+  });
+
+  it('fails closed instead of promoting sourceRevision to workspace identity', () => {
+    expect(() =>
+      compileEventHypergraphBundle({
+        requestId: 'req:missing-workspace',
+        packetKey: 'packet:1',
+        sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+        sourceRevision: 'source-v1',
+        passResults: [],
+      }),
+    ).toThrow(HypergraphLineageUnavailableError);
   });
 
   it('falls back to the local model path when the sidecar is unavailable', async () => {

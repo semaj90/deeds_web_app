@@ -68,7 +68,7 @@ describe('daily graphify board recommendations', () => {
 		const first = await buildDailyGraphifyBoardRecommendations(board);
 		const second = await buildDailyGraphifyBoardRecommendations(board);
 
-		expect(first).toHaveLength(2);
+		expect(first).toHaveLength(1);
 		expect(first[0]?.taskId).toBe('graphify-daily-refresh');
 		expect(first[0]?.retrievalMode).toBe('sparse');
 		expect(first[0]?.domainClassification.primary_label).toBeTruthy();

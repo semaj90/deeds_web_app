@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.tree-node-occurrence-forward-correction.v1",
+  "gate": "S01-09D",
+  "generatedAt": "2026-09-22T02:20:00.000Z",
+  "producerOwner": "scripts/atlas/run-ast-entity-prefill-yaml.mjs (extract()/visit() -- the earliest live producer emitting ast-entities.jsonl rows)",
+  "contractOwner": "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts (TreeNodeOccurrenceV1, deriveTreeNodeOccurrenceId, validateTreeNodeOccurrenceV1, validateTreeNodeOccurrencePopulationV1) + scripts/atlas/lib/tree-node-occurrence-v1.mjs (byte-identical plain-node mirror for the hot-path producer, algorithm cross-verified against the bounded replay)",
+  "identityTuple": "{ sourceRef, sourceRevision, nodeType, startByte, endByte, astPath? } -> sha256:<hex> -- proven sufficient (0 collisions, 362/362 distinct) without needing astPath",
+  "legacyFieldCompatibility": {
+    "tree_node_id": "field name PRESERVED, but its VALUE is now the declaration-scoped occurrenceId (not the packet's file-scoped value) -- no downstream caller rename required",
+    "tree_node_occurrence_id": "new explicit field added, identical value to tree_node_id, for future callers that want the unambiguous name",
+    "packet_tree_node_id": "new field preserving the ORIGINAL packet-level value, for provenance/debugging only -- never used as occurrence identity",
+    "callerCensus": "nominate-ast-symbols-dry-run.mjs (reads candidate.tree_node_id, no format assumption -- verified compatible); enrich-ast-entity-prefill-identity.mjs (does its own independent atlas_packets SELECT, does not consume ast-entities.jsonl's tree_node_id at all -- unaffected, verified)"
+  },
+  "tests": { "specFile": "sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.spec.ts", "fixtures": ["A_two_functions_same_file", "B_function_and_class", "C_overloads_distinct_spans", "D_same_declaration_reparse_deterministic", "E_changed_source_revision", "F_file_scoped_legacy_input_rejected"], "passed": "8/8" },
+  "currentReplay": {
+    "before": { "sharedGroups": 22, "currentlyReproducible": 13, "historicalOnly": 9 },
+    "method": "bounded, read-only, code-local re-run of the patched run-ast-entity-prefill-yaml.mjs against exactly the 13 currently-reproducible files (new --source-ref= filter added, read-only, no DB write) -- NOT a full repo regeneration, NOT Graphify",
+    "filesReplayed": 13,
+    "entityCandidates": 362,
+    "afterForwardReplay": {
+      "reproducibleSharedDistinctDeclarationGroups": 0,
+      "collisions": 0,
+      "rejectedLegacyInputs": "n/a -- no legacy/file-scoped id was produced by the fixed producer to reject; validateTreeNodeOccurrencePopulationV1 confirms 0 violations across all 362 rows",
+      "distinctOccurrenceIdsPerFile": "matches declaration-row count exactly, per file, for all 13 files (verified: 36/36, 23/23, 15/15, 39/39, 31/31, 12/12, 8/8, 48/48, 36/36, 13/13, 36/36, 23/23, 42/42)"
+    }
+  },
+  "classification": {
+    "LIVE_FORWARD_FIXED": "13/22 groups -- confirmed still reproducible before this fix (present in the live nominations artifact), now proven 0 collisions on regeneration",
+    "HISTORICAL_BAD_OCCURRENCE": "9/22 groups -- not present in the live nominations artifact; historical-only, not reproducible by the current pipeline before or after this fix",
+    "HISTORICAL_NOT_REPRODUCIBLE": "same 9 groups -- explicitly not re-attempted or rewritten"
+  },
+  "historicalRowsChanged": 0,
+  "downstreamChecksumImpact": {
+    "note": "The 198 historical atlas_symbol_versions rows carrying the old file-scoped upstream_node_id are untouched by this gate. Any FUTURE regeneration of the full nominations artifact (not run here) would produce DIFFERENT upstream_node_id values for the 13 live-reproducible files than what those 198 historical rows currently hold -- this is a projection-refresh consequence, reported here and NOT performed automatically.",
+    "refreshRequired": true,
+    "refreshPerformed": false
+  },
+  "safety": {
+    "databaseWrites": 0,
+    "graphifyRun": false,
+    "stableFileIdCreated": false,
+    "upstreamFileIdChanged": false,
+    "symbolRevisionRepair": false,
+    "registryRowsChanged": false,
+    "sourceUnavailableRowsTouched": 0
+  },
+  "result": "TREE_NODE_OCCURRENCE_FORWARD_CORRECTION_PROVEN"
+}

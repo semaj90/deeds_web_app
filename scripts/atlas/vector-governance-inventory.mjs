@@ -3,7 +3,7 @@
  * Vector Governance Inventory
  *
  * Catalog all vectors in the system by dimension, model, storage tier, and authority status.
- * Build the foundation for 768→384 governance decisions.
+ * Inventory canonical semantic_768 separately from legacy and derived projections.
  */
 
 import fs from 'fs';
@@ -130,16 +130,19 @@ async function generateVectorGovernanceReport(inventory) {
     memory_analysis: {},
     governance_recommendations: [],
     current_policy: {
-      canonical_dimension: 384,
+      canonical_dimension: 768,
       native_model: 'embeddinggemma:latest',
-      legacy_dimensions: [768],
-      derived_dimensions: [64]
+      canonical_representation: 'semantic_768',
+      mrl_projection_dimensions: [512, 256, 128],
+      legacy_dimensions: [384],
+      derived_latent_dimensions: [256, 128, 64]
     },
     proof_status: {
       stage_3_semantic_extraction: 'MOCK_FIXTURE_ONLY',
-      native_384_embedding: 'NOT_YET_PROVEN',
-      legacy_768_classification: 'NOT_YET_PROVEN',
-      ae_768_to_384_training: 'NOT_YET_EVALUATED'
+      embeddinggemma_native_768: 'REQUIRES_CURRENT_PROVENANCE_RECEIPT',
+      mrl_projection_quality: 'SEPARATE_EVALUATION_REQUIRED',
+      legacy_384_classification: 'LEGACY_ONLY',
+      latent_projection_quality: 'SEPARATE_EVALUATION_REQUIRED'
     }
   };
 
@@ -154,8 +157,8 @@ async function generateVectorGovernanceReport(inventory) {
 
     report.memory_analysis['768-dim-fp32'] = mem_768_fp32;
     report.memory_analysis['768-dim-fp16'] = mem_768_fp16;
-    report.memory_analysis['384-dim-fp32'] = mem_384_fp32;
-    report.memory_analysis['384-dim-fp16'] = mem_384_fp16;
+    report.memory_analysis['legacy-384-comparison-fp32'] = mem_384_fp32;
+    report.memory_analysis['legacy-384-comparison-fp16'] = mem_384_fp16;
 
     const savings_fp32 = mem_768_fp32.total_mib - mem_384_fp32.total_mib;
     const savings_fp16 = mem_768_fp16.total_mib - mem_384_fp16.total_mib;
@@ -163,7 +166,7 @@ async function generateVectorGovernanceReport(inventory) {
     console.log(`  768-dim (${count_768} vectors):`);
     console.log(`    fp32: ${mem_768_fp32.total_mib} MiB`);
     console.log(`    fp16: ${mem_768_fp16.total_mib} MiB`);
-    console.log(`  384-dim (same count):`);
+    console.log(`  Legacy 384-D storage comparison (same count; not canonical):`);
     console.log(`    fp32: ${mem_384_fp32.total_mib} MiB (saves ${savings_fp32.toFixed(1)} MiB)`);
     console.log(`    fp16: ${mem_384_fp16.total_mib} MiB (saves ${savings_fp16.toFixed(1)} MiB)`);
   }
@@ -172,33 +175,33 @@ async function generateVectorGovernanceReport(inventory) {
   report.governance_recommendations = [
     {
       priority: 'CRITICAL',
-      item: 'Classify all 768-dim vectors as LEGACY or FIXTURE_ONLY',
-      rationale: 'Stage 3 mock vectors do not represent semantic embeddings; deterministic hashing only',
-      action: 'Add authority_status field to all vector records'
+      item: 'Qualify canonical semantic_768 vectors by immutable representation provenance',
+      rationale: 'Physical dimension alone does not prove model, tokenizer, input policy, or source revision',
+      action: 'Require the current representation receipt before semantic admission or projection'
     },
     {
       priority: 'CRITICAL',
-      item: 'Prove native 384-dim EmbeddingGemma embedding path',
-      rationale: 'Cannot use 768→384 transformation until native path is verified',
-      action: 'Run embeddinggemma:latest on representative sample; compare cosine similarity to ground truth'
+      item: 'Keep MRL and latent projections distinct from canonical semantic_768',
+      rationale: '512/256/128 MRL and 256/128/64 latent vectors have separate representation identities',
+      action: 'Record source representation, projection revision, target dimension, and evaluation receipt'
     },
     {
       priority: 'HIGH',
-      item: 'Establish PCA 768→384 baseline',
-      rationale: 'Before training autoencoder, establish simple dimensionality reduction baseline',
-      action: 'Compute PCA on legacy 768-dim vectors; measure reconstruction error and retrieval recall'
+      item: 'Evaluate optional dimension-reduced challengers against semantic_768',
+      rationale: 'Reduced vectors are executor/projection candidates, not replacements for canonical identity',
+      action: 'Compare retrieval recall and latency on the same revision-qualified held-out cohort'
     },
     {
       priority: 'HIGH',
-      item: 'Implement vector transformation metadata contract',
-      rationale: 'Every 384-dim vector must declare its source (native, PCA, AE) and validation status',
-      action: 'Add VectorRepresentation schema with sourceDimension, targetDimension, representationType, transformationId'
+      item: 'Retain 384-D artifacts as legacy-only evidence',
+      rationale: 'A legacy dimension must not be mistaken for canonical semantic_768 or a qualified MRL slice',
+      action: 'Keep separate collection/column and explicit migration lifecycle; do not backfill authority from current model state'
     },
     {
       priority: 'MEDIUM',
       item: 'Establish hot/warm/cold storage tier policy',
-      rationale: 'Do not retain both 768 and 384 in hot path unless measured use case requires it',
-      action: 'Archive legacy 768-dim vectors after successful 384 promotion; retain manifest for rollback'
+      rationale: 'Keep canonical 768-D source vectors and only measured, revision-qualified projections in hot tiers',
+      action: 'Archive legacy artifacts with manifest and rollback metadata; never delete canonical source vectors'
     },
     {
       priority: 'MEDIUM',
@@ -239,9 +242,10 @@ async function execute() {
 
   console.log('\n[Vector Inventory] Proof Status:');
   console.log(`  Stage 3 Semantic Extraction: ${report.proof_status.stage_3_semantic_extraction}`);
-  console.log(`  Native 384 Embedding: ${report.proof_status.native_384_embedding}`);
-  console.log(`  Legacy 768 Classification: ${report.proof_status.legacy_768_classification}`);
-  console.log(`  AE 768→384 Training: ${report.proof_status.ae_768_to_384_training}`);
+  console.log(`  EmbeddingGemma native 768: ${report.proof_status.embeddinggemma_native_768}`);
+  console.log(`  MRL projection quality: ${report.proof_status.mrl_projection_quality}`);
+  console.log(`  Latent projection quality: ${report.proof_status.latent_projection_quality}`);
+  console.log(`  Legacy 384 policy: ${report.proof_status.legacy_384_classification}`);
 
   console.log('\n═══════════════════════════════════════════════════════════');
   console.log('✓ VECTOR GOVERNANCE INVENTORY COMPLETE');

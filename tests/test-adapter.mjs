@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+const root=path.resolve(import.meta.dirname,'..');
+const dir=fs.mkdtempSync(path.join(os.tmpdir(),'atlas-board-'));
+fs.copyFileSync(path.join(root,'tests/adapter-fixture.json'),path.join(dir,'openspec-actionable-work-v1.json'));
+const out=path.join(dir,'out.json');
+execFileSync(process.execPath,[path.join(root,'scripts/atlas/adapt-openspec-controller-to-ranker-v2.mjs'),dir,out],{stdio:'inherit'});
+const result=JSON.parse(fs.readFileSync(out,'utf8'));
+if(result.tasks.length!==3) throw new Error('expected 3 tasks');
+const t1=result.tasks.find(x=>x.id==='T1');
+const t2=result.tasks.find(x=>x.id==='T2');
+if(!t1.readOnly) throw new Error('audit task should be read-only');
+if(t2.readOnly) throw new Error('writer task should be mutating');
+if(t1.goalRank!==10||t2.goalRank!==40) throw new Error('priority mapping failed');
+console.log('adapter tests: 4/4 PASS');

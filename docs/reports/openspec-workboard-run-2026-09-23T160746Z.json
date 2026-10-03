@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-23T16:07:46Z",
+  "objective": "Continue evidence-backed OpenSpec execution; preserve authority gates and defer container rebuilds until safe local work is exhausted.",
+  "pivot": {
+    "fromChange": "parent-atlas-nlp-sidecar-feature-compiler",
+    "fromProgress": "84/142",
+    "fromOpenTask": "spaCy live linguistic quality and the separate PyTorch POS challenger remain unproven; container rebuild is deferred.",
+    "toChange": "inference-wiring-deep-audit-aug22",
+    "toTask": "5.11 bounded read-only live inference facade replay",
+    "reason": "A live model POST had been deferred because the full OpenAI facade reaches cache, Engram, reward-event, and durable synthesis-metric writers. The inference change had two duplicate open checkboxes for the same gate, so a narrow internal no-persistence mode could close both without rebuilding containers or writing stores."
+  },
+  "selectedChange": {
+    "name": "inference-wiring-deep-audit-aug22",
+    "progressBefore": "53/55",
+    "progressAfter": "55/55",
+    "completedThisRun": [
+      "Added an internal immutable all-false replay policy to runChatCompletion; it branches before scenario/cache/retrieval/tool/Engram/metrics/persistence paths and uses the shared runtime model resolver.",
+      "Bypassed both read and write sides of the legacy SSE cache when the internal replay policy is supplied.",
+      "Normalized configured llama-server API base URLs ending in /v1 after the initial configured URL returned 404 from an appended /v1/models path.",
+      "Ran one bounded live completion; reported, resolved, outbound and response model IDs matched ornith-1.5-9b."
+    ],
+    "reconciledThisRun": [
+      "Closed both duplicate OpenSpec live-replay entries against the same receipt; normal facade side effects and production synthesis readiness remain explicitly outside the proof.",
+      "The earlier report of 15 mocked tests was stale; the current complete facade suite now passes 17/17, including the new no-write and stream-cache-bypass tests."
+    ],
+    "nextOpenSpecProgress": {
+      "name": "parent-atlas-nlp-sidecar-feature-compiler",
+      "progress": "84/142",
+      "remaining": 58
+    }
+  },
+  "evidence": {
+    "liveReplayReceipt": "docs/reports/inference-facade-read-only-live-replay-v1.json",
+    "liveLoadedModel": "GET http://127.0.0.1:8090/v1/models -> ornith-1.5-9b (llamacpp)",
+    "configuredUrlFinding": "The first test preflight returned HTTP 404 because the effective configured base included /v1 while runtime-contract appended /v1/models; the shared base normalizer fixed this, and the subsequent live replay passed.",
+    "sourcePath": "sveltekit-frontend/src/lib/server/ai/openai-facade.ts::runChatCompletion",
+    "runtimeResolver": "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts::resolveLlamaInferenceTarget"
+  },
+  "validation": {
+    "openaiFacadeSuite": "PASS: 17/17 tests, including replay negative-writer assertions and SSE cache bypass.",
+    "replayFocusedTests": "PASS: 2/2 targeted replay tests.",
+    "runtimeBaseUrlTests": "PASS: 4/4 normalization cases.",
+    "liveReplayTest": "PASS: 1/1; HTTP 200, non-streaming, finish_reason=stop, 17 prompt / 2 completion tokens.",
+    "openspecStrict": "PASS: inference-wiring-deep-audit-aug22; 55/55 task entries checked.",
+    "scopedDiffCheck": "PASS for touched tracked files. Repository-wide git diff --check reports unrelated trailing whitespace in simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml and unrelated concurrent edits.",
+    "svelteCheck": "NOT PROVEN: broad svelte-check reached approximately 4.57 GB working set and was stopped to avoid exhausting workstation memory."
+  },
+  "promotion": {
+    "canonicalAuthority": false,
+    "promotionAuthorized": false,
+    "writesPerformed": false
+  },
+  "mutations": {
+    "postgres": "none; live replay branch cannot reach Postgres writers",
+    "qdrant": "none",
+    "valkey": "none; facade and SSE cache writers bypassed",
+    "neo4j": "none",
+    "graphify": "none",
+    "containers": "none; no rebuild or restart",
+    "filesystem": [
+      "Added bounded internal replay mode and stream-cache bypass.",
+      "Normalized shared llama-server base URL and added four focused cases.",
+      "Added gated live replay test, generated its metadata-only receipt, and reconciled the two OpenSpec task entries.",
+      "Added this timestamped workboard pivot receipt."
+    ]
+  },
+  "result": "INFERENCE_FACADE_READ_ONLY_LIVE_REPLAY_PROVEN",
+  "nextGate": "Continue the existing Parent Atlas workboard; next safe local task is the sidecar linguistic response contract/test tranche, without rebuilding its container."
+}

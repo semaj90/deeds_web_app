@@ -1,63 +1,104 @@
 {
   "schema": "atlas.candidate-ordinal-corpus-receipt.v1",
-  "generatedAt": "2026-08-27T03:47:32.953Z",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "packetRowsForRevision": 16151,
+  "packetRowsForAdmittedRootCohort": 16151,
+  "sourceScope": "ADMITTED_REPO_ROOT",
+  "sourceManifestRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "rootSourceCount": 24456,
+  "rootSourceMembershipChecksum": "sha256:3de8249bce644bc6c1c5b4901bbf4b9ea8e7523ba9ea2ddd99752b356f4e93c1",
+  "lineageQualifiedRowCount": 14564,
+  "lineageRequired": true,
+  "rejectionCensusScope": {
+    "candidateDenominator": "atlas_packets rows at admitted workspaceRevision with exact repo:root sourceRef/sourceRevision membership",
+    "missing_packet": "repo:root snapshot sources with no atlas_packets row at any workspace revision; diagnostic only, outside the candidate-row denominator",
+    "excluded_legacy_identity": "historical same-revision ordinal rows whose canonicalId differs from packetKey; legacy ID values are not reused",
+    "missing_lineage": "admitted repo:root packet rows without an exact PROVEN packet-to-chunk bridge"
+  },
+  "rejectionCensus": {
+    "excluded_legacy_identity": 116,
+    "missing_packet": 7913,
+    "missing_source_revision": 0,
+    "workspace_revision_mismatch": 0,
+    "duplicate_canonical_id": 0,
+    "duplicate_ordinal": 0,
+    "foreign_repository": 0,
+    "source_revision_mismatch": 0,
+    "source_snapshot_revision_mismatch": 0,
+    "missing_lineage": 1587,
+    "lineage_unqualified_other": 0
+  },
+  "legacyIdentityHandling": {
+    "historicalArtifactMatched": true,
+    "historicalLegacyIdentityRows": 116,
+    "historicalLegacyIdentityValuesCarriedForward": 0,
+    "legacyPacketKeysRebuiltFromCanonicalRows": 116,
+    "identitySource": "atlas_packets.packet_key",
+    "legacyIdentityAuthority": false
+  },
+  "fullAdmittedRootCoverage": false,
+  "canonicalOrderingPolicy": "CANONICAL_ID_ASCENDING",
+  "generatedAt": "2026-09-29T01:00:01.842Z",
   "dryRun": false,
   "shuffleTest": false,
-  "rowCount": 4951,
-  "candidateSnapshotRevision": "corpus-snapshot:workspace-active-v1:v1",
-  "ordinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+  "localArtifactOnly": false,
+  "datastoreWrites": 0,
+  "canonicalAuthority": false,
+  "rowCount": 14564,
+  "candidateSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "ordinalMapChecksum": "77634f4763f67af6658ba9b4017db2d1c2b8ce150903e5ce09fb31ec752e91fd",
   "sampleFirst5": [
     {
       "ordinal": 0,
-      "id": "00a1065c-9748-4ccd-97f8-04370464bdd6",
-      "sourceRef": "proto:RetrievalService.StreamEvidence"
+      "id": "ace:packet:0051e908c9be",
+      "sourceRef": "docs/architecture/phase8-query-optimization-taxonomy.md"
     },
     {
       "ordinal": 1,
-      "id": "047e8f8d-73b1-408a-95e2-ab66610ac5fe",
-      "sourceRef": "proto:EmbeddingService.Health"
+      "id": "ace:packet:014b1c91aa72",
+      "sourceRef": "scripts/agent/schema-agent-tracking.sql"
     },
     {
       "ordinal": 2,
-      "id": "06cf846d-a475-4155-9d45-4b16e2eb7f5a",
-      "sourceRef": "proto:ChatAssistantService.GetHistory"
+      "id": "ace:packet:02dae66923a3",
+      "sourceRef": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md"
     },
     {
       "ordinal": 3,
-      "id": "0796e064-a042-443e-aa88-8862d151ddbf",
-      "sourceRef": "proto:RetrievalService.ExpandAstNeighbors"
+      "id": "ace:packet:04518e5714ed",
+      "sourceRef": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md"
     },
     {
       "ordinal": 4,
-      "id": "0a9ecb2d-6992-458e-b8a9-042f2f8ff691",
-      "sourceRef": "proto:LibrarySearchService.GetDocumentToc"
+      "id": "ace:packet:04abe0bfe254",
+      "sourceRef": "scripts/agent/dag-reducer.mjs"
     }
   ],
   "sampleLast5": [
     {
-      "ordinal": 4946,
-      "id": "packet:ffa00673e2d0",
-      "sourceRef": "src/lib/server/ace/ngram-retrieval.ts"
+      "ordinal": 14559,
+      "id": "packet:ffedadbac458",
+      "sourceRef": "src/lib/server/error-brain/transport/llms.md"
     },
     {
-      "ordinal": 4947,
-      "id": "packet:ffae6c1c9446",
-      "sourceRef": "src/routes/(app)/code-intel/wiki/+page.server.ts"
+      "ordinal": 14560,
+      "id": "packet:fff5f0215270",
+      "sourceRef": "src/lib/server/db/schema/atlas-memory-address-registry.ts"
     },
     {
-      "ordinal": 4948,
-      "id": "packet:ffb32e42e4d9",
-      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14t20-51-26-276z/ai/context/+server.ts"
+      "ordinal": 14561,
+      "id": "packet:fff6c38c6870",
+      "sourceRef": "scripts/bench-constraint-check.cjs"
     },
     {
-      "ordinal": 4949,
-      "id": "packet:ffb570772442",
-      "sourceRef": "src/lib/server/db/migrations/meta/_journal.json"
+      "ordinal": 14562,
+      "id": "packet:fff85fb4d2bd",
+      "sourceRef": "docs/obsidian-vault/files/scripts__graphify-obsidian-vault.md"
     },
     {
-      "ordinal": 4950,
-      "id": "packet:ffca48d56b54",
-      "sourceRef": "src/lib/components/legal-ai/collectiondetail.svelte"
+      "ordinal": 14563,
+      "id": "packet:fff912ab069a",
+      "sourceRef": "src/lib/server/features/evidence/video/transcript-service.ts"
     }
   ]
 }

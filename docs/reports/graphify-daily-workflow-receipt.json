@@ -1,42 +1,42 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "56ad719c-ac2c-4d04-b6b2-844c86d64443",
-  "repositoryRevision": "b2a60ab978f4b69c8f37565156c4cc0c492c5f7b",
-  "generatedAt": "2026-09-10T22:41:07.540Z",
+  "runId": "bf06be9a-388e-474c-89a4-b847acb5f974",
+  "repositoryRevision": "88ae5c7d56c59d724962d5654eea7dcc775ace62",
+  "generatedAt": "2026-09-30T20:08:47.161Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 25271,
-      "totalBytes": 470826774,
-      "currentRevision": "b2a60ab978f4b69c8f37565156c4cc0c492c5f7b",
-      "priorRevision": "b2a60ab978f4b69c8f37565156c4cc0c492c5f7b"
+      "totalFiles": 25542,
+      "totalBytes": 473214249,
+      "currentRevision": "88ae5c7d56c59d724962d5654eea7dcc775ace62",
+      "priorRevision": "88ae5c7d56c59d724962d5654eea7dcc775ace62"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 25271,
-      "codeFiles": 14795,
-      "documentationFiles": 8068,
-      "configFiles": 1857,
-      "otherFiles": 551,
+      "totalFiles": 25542,
+      "codeFiles": 14987,
+      "documentationFiles": 8134,
+      "configFiles": 1869,
+      "otherFiles": 552,
       "topExtensions": [
         {
           "extension": ".md",
-          "count": 8068
+          "count": 8134
         },
         {
           "extension": ".ts",
-          "count": 7987
+          "count": 8062
         },
         {
           "extension": ".mjs",
-          "count": 3738
+          "count": 3817
         },
         {
           "extension": ".json",
-          "count": 1724
+          "count": 1727
         },
         {
           "extension": ".svelte",
@@ -44,19 +44,19 @@
         },
         {
           "extension": ".sql",
-          "count": 651
+          "count": 656
         },
         {
           "extension": ".py",
-          "count": 590
+          "count": 614
         },
         {
           "extension": ".mts",
-          "count": 531
+          "count": 539
         },
         {
           "extension": ".ps1",
-          "count": 300
+          "count": 301
         },
         {
           "extension": ".js",
@@ -74,16 +74,16 @@
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 25271,
-      "filesWithStructure": 11991,
-      "factCount": 127626,
-      "functionCount": 47933,
-      "classCount": 1883,
-      "interfaceCount": 1585,
-      "methodCount": 6414,
-      "importCount": 36015,
-      "constCount": 7503,
-      "arrowCount": 26293,
+      "filesProcessed": 25542,
+      "filesWithStructure": 12143,
+      "factCount": 129011,
+      "functionCount": 48401,
+      "classCount": 1884,
+      "interfaceCount": 1583,
+      "methodCount": 6421,
+      "importCount": 36489,
+      "constCount": 7576,
+      "arrowCount": 26657,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -216,16 +216,6 @@
           "source": "ast-grep"
         },
         {
-          "filePath": "$lib/utils/file-reader.ts",
-          "sourceRef": "$lib/utils/file-reader.ts",
-          "kind": "function",
-          "name": "function",
-          "lineStart": 5,
-          "lineEnd": 5,
-          "stableId": "e2c4cc5b45f7fa359c3aad639238bfc1f9f19c121d467e49e2ae5c816802a548",
-          "source": "ast-grep"
-        },
-        {
           "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
           "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
           "kind": "import",
@@ -284,42 +274,52 @@
           "lineEnd": 39,
           "stableId": "78a8065e2fbb0a2bd776886b708de27ab410d0b1e5684b15253c09785a40a3c9",
           "source": "ast-grep"
+        },
+        {
+          "filePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+          "kind": "function",
+          "name": "normalizeDemandUtility",
+          "lineStart": 44,
+          "lineEnd": 44,
+          "stableId": "16ad97dfa457739afccc642c783691d8c79448a6554ee142ee790e84ddabcd44",
+          "source": "ast-grep"
         }
       ]
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 127150,
+      "uniqueIds": 128535,
       "duplicateIds": 476,
-      "reusedIds": 127150,
+      "reusedIds": 128535,
       "supersededIds": 476
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 25271,
-      "entries": 25271,
-      "totalTokens": 40874832,
-      "totalUniqueTokens": 8394451,
+      "filesProcessed": 25542,
+      "entries": 25542,
+      "totalTokens": 41137549,
+      "totalUniqueTokens": 8478000,
       "topGlobalTerms": [
         {
           "term": "count",
-          "weight": 675481
+          "weight": 675718
         },
         {
           "term": "tag",
-          "weight": 623164
+          "weight": 623188
         },
         {
           "term": "routes",
-          "weight": 596681
+          "weight": 596700
         },
         {
           "term": "api",
-          "weight": 500831
+          "weight": 500915
         },
         {
           "term": "filepath",
-          "weight": 488427
+          "weight": 488463
         },
         {
           "term": "topoclass",
@@ -327,43 +327,43 @@
         },
         {
           "term": "id",
-          "weight": 451323
+          "weight": 451902
         },
         {
           "term": "unclassified",
-          "weight": 428064
+          "weight": 428073
         },
         {
           "term": "pagerank",
-          "weight": 393378
+          "weight": 393456
         },
         {
           "term": "graphauthorityscore",
-          "weight": 387960
+          "weight": 387964
         },
         {
           "term": "communityid",
-          "weight": 376485
+          "weight": 376497
         },
         {
           "term": "gpu",
-          "weight": 353812
+          "weight": 354335
         },
         {
           "term": "community",
-          "weight": 338541
+          "weight": 338571
         },
         {
           "term": "app",
-          "weight": 311785
+          "weight": 311851
         },
         {
           "term": "cluster",
-          "weight": 309529
+          "weight": 309647
         },
         {
           "term": "components",
-          "weight": 250763
+          "weight": 250776
         },
         {
           "term": "clusterkey",
@@ -375,11 +375,11 @@
         },
         {
           "term": "kind",
-          "weight": 229389
+          "weight": 229599
         },
         {
           "term": "server.ts",
-          "weight": 211427
+          "weight": 211462
         }
       ],
       "samples": [
@@ -518,6 +518,142 @@
             }
           ],
           "hash": "87fc37c742a2265c6cd13e4b7cd5f475680dca40641839e071ea97717de2c349"
+        },
+        {
+          "filePath": ".clarity/ff1-plan.md",
+          "tokenCount": 250,
+          "uniqueTokenCount": 146,
+          "topTerms": [
+            {
+              "term": "to",
+              "weight": 9
+            },
+            {
+              "term": "check",
+              "weight": 8
+            },
+            {
+              "term": "oom",
+              "weight": 8
+            },
+            {
+              "term": "svelte",
+              "weight": 8
+            },
+            {
+              "term": "ff1",
+              "weight": 6
+            },
+            {
+              "term": "svelte-check",
+              "weight": 6
+            },
+            {
+              "term": ".clarity",
+              "weight": 5
+            },
+            {
+              "term": "allowlist",
+              "weight": 5
+            },
+            {
+              "term": "tier",
+              "weight": 5
+            },
+            {
+              "term": "error",
+              "weight": 4
+            },
+            {
+              "term": "is",
+              "weight": 4
+            },
+            {
+              "term": "of",
+              "weight": 4
+            },
+            {
+              "term": "oom-safe",
+              "weight": 4
+            },
+            {
+              "term": "safe",
+              "weight": 4
+            },
+            {
+              "term": "tsgo",
+              "weight": 4
+            },
+            {
+              "term": "1.",
+              "weight": 3
+            },
+            {
+              "term": "2.",
+              "weight": 3
+            },
+            {
+              "term": "3.",
+              "weight": 3
+            },
+            {
+              "term": "fast",
+              "weight": 3
+            },
+            {
+              "term": "full",
+              "weight": 3
+            },
+            {
+              "term": "locations",
+              "weight": 3
+            },
+            {
+              "term": "phase",
+              "weight": 3
+            },
+            {
+              "term": "report",
+              "weight": 3
+            },
+            {
+              "term": "run",
+              "weight": 3
+            },
+            {
+              "term": "subset",
+              "weight": 3
+            },
+            {
+              "term": "an",
+              "weight": 2
+            },
+            {
+              "term": "authoritative",
+              "weight": 2
+            },
+            {
+              "term": "baseline",
+              "weight": 2
+            },
+            {
+              "term": "baseline.",
+              "weight": 2
+            },
+            {
+              "term": "compare",
+              "weight": 2
+            },
+            {
+              "term": "current",
+              "weight": 2
+            },
+            {
+              "term": "errors",
+              "weight": 2
+            }
+          ],
+          "hash": "625c90a88cad26f13068301773b5116be66a7154f77369b30a5a52ad99ef5309"
         },
         {
           "filePath": ".claude/AGENT_CONSTITUTION.md",
@@ -1806,142 +1942,6 @@
             }
           ],
           "hash": "627b51b151de669a3c25ef15d29ae03acdbfe79381041f627c34854eb00fe6c1"
-        },
-        {
-          "filePath": ".claude/commands/deep-audit.md",
-          "tokenCount": 1447,
-          "uniqueTokenCount": 705,
-          "topTerms": [
-            {
-              "term": "audit",
-              "weight": 34
-            },
-            {
-              "term": "run",
-              "weight": 22
-            },
-            {
-              "term": "fix",
-              "weight": 19
-            },
-            {
-              "term": "d9",
-              "weight": 16
-            },
-            {
-              "term": "gate",
-              "weight": 15
-            },
-            {
-              "term": "deep",
-              "weight": 14
-            },
-            {
-              "term": "to",
-              "weight": 14
-            },
-            {
-              "term": "in",
-              "weight": 13
-            },
-            {
-              "term": "ace",
-              "weight": 12
-            },
-            {
-              "term": "gates",
-              "weight": 12
-            },
-            {
-              "term": "npm",
-              "weight": 12
-            },
-            {
-              "term": "all",
-              "weight": 10
-            },
-            {
-              "term": "codebase",
-              "weight": 10
-            },
-            {
-              "term": "graph",
-              "weight": 10
-            },
-            {
-              "term": "orphan",
-              "weight": 9
-            },
-            {
-              "term": "report",
-              "weight": 9
-            },
-            {
-              "term": "route",
-              "weight": 9
-            },
-            {
-              "term": "...",
-              "weight": 8
-            },
-            {
-              "term": "api",
-              "weight": 8
-            },
-            {
-              "term": "fanin",
-              "weight": 8
-            },
-            {
-              "term": "index",
-              "weight": 8
-            },
-            {
-              "term": "is",
-              "weight": 8
-            },
-            {
-              "term": "keep",
-              "weight": 8
-            },
-            {
-              "term": "mode",
-              "weight": 8
-            },
-            {
-              "term": "vs",
-              "weight": 8
-            },
-            {
-              "term": "/deep-audit",
-              "weight": 7
-            },
-            {
-              "term": "if",
-              "weight": 7
-            },
-            {
-              "term": "only",
-              "weight": 7
-            },
-            {
-              "term": "output",
-              "weight": 7
-            },
-            {
-              "term": "re",
-              "weight": 7
-            },
-            {
-              "term": "routes",
-              "weight": 7
-            },
-            {
-              "term": "som",
-              "weight": 7
-            }
-          ],
-          "hash": "c45cb77ca6eddcd812aab80271918aa8249c9c085d983aae069bea114dcf3b0c"
         }
       ]
     },
@@ -2064,21 +2064,6 @@
           "status": "EMBEDDED"
         },
         {
-          "filePath": "$lib/utils/file-reader.ts",
-          "sourceRef": "$lib/utils/file-reader.ts",
-          "contentHash": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
-          "representationName": "semantic_768",
-          "dimension": 768,
-          "model": "deterministic-hash-embedder",
-          "source": "deterministic",
-          "embeddingHash": "bc3cd517a42742b999f96c06469c61859b3202f729c130ac221ce2714e7cb492",
-          "labels": [],
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "status": "EMBEDDED"
-        },
-        {
           "filePath": "ace-pipeline-audit.mjs",
           "sourceRef": "ace-pipeline-audit.mjs",
           "contentHash": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
@@ -2152,15 +2137,34 @@
           "ontology": "utility",
           "tier": "test",
           "status": "EMBEDDED"
+        },
+        {
+          "filePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+          "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+          "contentHash": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+          "representationName": "semantic_768",
+          "dimension": 768,
+          "model": "deterministic-hash-embedder",
+          "source": "deterministic",
+          "embeddingHash": "dd763d6a7b10968121142cc41cbd91498d854508e0f06e2e9d3d0e00ebb7203e",
+          "labels": [
+            "vectors",
+            "server-side",
+            "library"
+          ],
+          "domain": "retrieval",
+          "ontology": "utility",
+          "tier": "middleware",
+          "status": "EMBEDDED"
         }
       ]
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 291267,
-      "containsEdges": 127626,
-      "importEdges": 36015,
-      "declaresEdges": 127626,
+      "entries": 294511,
+      "containsEdges": 129011,
+      "importEdges": 36489,
+      "declaresEdges": 129011,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2366,36 +2370,36 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 25271,
+      "filesProcessed": 25542,
       "domainCounts": {
-        "test": 801,
-        "feature": 2445,
-        "config": 926,
-        "graph": 766,
+        "test": 822,
+        "feature": 2469,
+        "config": 956,
+        "graph": 785,
         "api": 3508,
         "ai": 180,
-        "ui": 7488,
-        "gpu": 1202,
-        "auth": 1309,
-        "retrieval": 3648,
-        "indexer": 1464,
-        "cache": 1482,
-        "vector": 52
+        "ui": 7538,
+        "gpu": 1233,
+        "auth": 1315,
+        "retrieval": 3707,
+        "indexer": 1474,
+        "cache": 1501,
+        "vector": 54
       },
       "ontologyCounts": {
-        "utility": 17738,
-        "model": 3595,
-        "adapter": 1153,
-        "handler": 358,
-        "bridge": 79,
-        "manager": 985,
+        "utility": 17929,
+        "model": 3634,
+        "adapter": 1174,
+        "handler": 362,
+        "bridge": 80,
+        "manager": 999,
         "client": 33,
-        "service": 1330
+        "service": 1331
       },
       "tierCounts": {
-        "test": 2739,
-        "feature": 19732,
-        "middleware": 2523,
+        "test": 2780,
+        "feature": 19935,
+        "middleware": 2550,
         "core": 277
       },
       "sampleLabels": [
@@ -2407,6 +2411,13 @@
           "labels": [
             "testing"
           ]
+        },
+        {
+          "filePath": ".clarity/ff1-plan.md",
+          "domain": "feature",
+          "ontology": "utility",
+          "tier": "feature",
+          "labels": []
         },
         {
           "filePath": ".claude/AGENT_CONSTITUTION.md",
@@ -2482,13 +2493,6 @@
           "ontology": "utility",
           "tier": "feature",
           "labels": []
-        },
-        {
-          "filePath": ".claude/commands/deep-audit.md",
-          "domain": "feature",
-          "ontology": "utility",
-          "tier": "feature",
-          "labels": []
         }
       ]
     },
@@ -2500,19 +2504,19 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 25271,
+      "postgresCanonicalRecords": 25542,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 291267,
-      "redisProjectionRecords": 25271,
+      "neo4jProjectionRecords": 294511,
+      "redisProjectionRecords": 25542,
       "representationName": "semantic_768",
       "denseVectorName": "content",
-      "collectionName": "codebase_chunks_768_v2"
+      "collectionName": "codebase_chunks_768"
     },
     "validation": {
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 862,
+      "duplicateFileHashes": 868,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2539,7 +2543,7 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 25271,
+      "reusedFiles": 25542,
       "invalidatedFiles": 0,
       "reusedRatio": 1
     }
@@ -2568,7 +2572,7 @@
     "path": "docs/reports/workspace-source-binding-observation.json",
     "workspaceRevision": "sha256:927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
     "sourceManifestDigest": "927ed41118a45a4b88fdaf15229f8e94358a375bd5b3ea19421ea42d2fa5bad3",
-    "sourceCount": 25271,
+    "sourceCount": 25542,
     "boundSources": 25361,
     "skippedSources": 107
   },

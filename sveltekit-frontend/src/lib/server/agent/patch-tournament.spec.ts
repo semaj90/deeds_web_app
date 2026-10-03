@@ -16,6 +16,9 @@ const candidate = (
   overrides: Partial<Parameters<typeof buildPatchTournamentPlan>[0]['candidates'][number]> = {},
 ) => ({
   candidateId,
+  runId: `run-${candidateId}`,
+  sourceRevision: 'sha256:source-revision-1',
+  patchDigest: `sha256:${'a'.repeat(64)}`,
   branchName: `codex/${candidateId}`,
   worktreePath: `C:/Users/james/Videos/deeds-web-app.worktrees/${candidateId}`,
   patchSummary: `${candidateId} patch summary`,
@@ -68,6 +71,11 @@ describe('patch-tournament', () => {
     expect(plan.acePacket.reviewOrder[0].patchSummary).toContain('alpha patch summary');
     expect(plan.kanbanCard.topCandidateId).toBe('alpha');
     expect(plan.kanbanCard.safeNextCommand).toContain('alpha');
+    expect(atlasToolRegistry['atlas.patch.tournament'].inputSchema.safeParse({
+      ...baseRequest,
+      candidates: [candidate('alpha'), candidate('beta'), candidate('gamma')],
+    }).success).toBe(true);
+    expect(atlasToolRegistry['atlas.patch.tournament'].outputSchema.safeParse(plan).success).toBe(true);
   });
 
   it('requires exactly three candidates at the registry boundary', () => {
@@ -78,6 +86,33 @@ describe('patch-tournament', () => {
     });
 
     expect(parsed.success).toBe(false);
+  });
+
+  it('requires candidate identity and rejects a compile-error mismatch', () => {
+    expect(() => buildPatchTournamentPlan({
+      ...baseRequest,
+      candidates: [
+        candidate('alpha'),
+        candidate('beta', { compileError: 'different error' }),
+        candidate('gamma'),
+      ],
+    })).toThrow('PATCH_TOURNAMENT_COMPILE_ERROR_MISMATCH');
+
+    expect(() => buildPatchTournamentPlan({
+      ...baseRequest,
+      candidates: [candidate('alpha', { patchDigest: '' }), candidate('beta'), candidate('gamma')],
+    })).toThrow('PATCH_TOURNAMENT_CANDIDATE_IDENTITY_INCOMPLETE');
+  });
+
+  it('derives a stable tournament identity from candidate revisions and patch digests', () => {
+    const request = {
+      ...baseRequest,
+      candidates: [candidate('beta'), candidate('alpha'), candidate('gamma')],
+    } as const;
+    const first = buildPatchTournamentPlan(request);
+    const second = buildPatchTournamentPlan({ ...request, candidates: [request.candidates[2], request.candidates[0], request.candidates[1]] });
+    expect(first.tournamentId).toBe(second.tournamentId);
+    expect(first.acePacket.compileErrorDigest).toMatch(/^sha256:[a-f0-9]{64}$/);
   });
 
   it('registers the patch tournament as read-only proposal work', () => {

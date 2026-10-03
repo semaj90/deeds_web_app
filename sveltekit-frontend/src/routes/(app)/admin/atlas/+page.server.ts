@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { documentGovernanceSummaryV1Schema } from '$lib/types/document-governance-summary-v1.js';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.user) throw redirect(303, '/login?redirect=/admin/atlas');
@@ -15,8 +16,32 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		.catch(() => null);
 
 	const documentGovernancePromise = fetch('/api/admin/atlas/document-governance')
+		.then(async (r) => {
+			if (!r.ok) return null;
+			const parsed = documentGovernanceSummaryV1Schema.safeParse(await r.json());
+			return parsed.success ? parsed.data : null;
+		})
+		.catch(() => null);
+
+	// Documentation Corpus panel: read-only snapshot + optional GET search (?docq=), rendered server-side (works without JS).
+	const docsQuery = (url.searchParams.get('docq') ?? '').trim().slice(0, 300);
+	const docsProduct = (url.searchParams.get('docprod') ?? '').trim().slice(0, 100);
+	const docsVersion = (url.searchParams.get('docver') ?? '').trim().slice(0, 100);
+	const localDocsQuery = (url.searchParams.get('localDocq') ?? '').trim().slice(0, 120);
+	const localDocsOffsetRaw = Number(url.searchParams.get('localDocOffset') ?? 0);
+	const localDocsOffset = Number.isSafeInteger(localDocsOffsetRaw) && localDocsOffsetRaw >= 0 ? Math.min(localDocsOffsetRaw, 100_000) : 0;
+	const localDocsManifestChecksum = url.searchParams.get('manifestChecksum') ?? '';
+	const docsCorpusPromise = fetch('/api/admin/atlas/docs-corpus')
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
+	const localDocsSnapshotPromise = fetch(`/api/admin/atlas/docs-corpus/local-snapshot?q=${encodeURIComponent(localDocsQuery)}&offset=${localDocsOffset}${localDocsManifestChecksum ? `&manifestChecksum=${encodeURIComponent(localDocsManifestChecksum)}` : ''}`)
+		.then(async (r) => (r.ok ? await r.json() : null))
+		.catch(() => null);
+	const docsSearchPromise = docsQuery.length >= 2
+		? fetch(`/api/admin/atlas/docs-corpus/search?q=${encodeURIComponent(docsQuery)}${docsProduct ? `&product=${encodeURIComponent(docsProduct)}` : ''}${docsVersion ? `&productVersion=${encodeURIComponent(docsVersion)}` : ''}`)
+				.then(async (r) => (r.ok ? await r.json() : null))
+				.catch(() => null)
+		: Promise.resolve(null);
 
 	const cacheStatsPromise = locals.user.role === 'admin'
 		? fetch('/api/admin/cache-stats')
@@ -24,11 +49,14 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 			.catch(() => null)
 		: Promise.resolve(null);
 
-	const [health, runtimeRegistry, documentGovernance, cacheStats] = await Promise.all([
+	const [health, runtimeRegistry, documentGovernance, cacheStats, docsCorpus, docsSearch, localDocsSnapshot] = await Promise.all([
 		healthPromise,
 		runtimeRegistryPromise,
 		documentGovernancePromise,
-		cacheStatsPromise
+		cacheStatsPromise,
+		docsCorpusPromise,
+		docsSearchPromise,
+		localDocsSnapshotPromise
 	]);
 
 	const workflowTaskId = url.searchParams.get('taskId');
@@ -53,6 +81,14 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		runtimeRegistry,
 		documentGovernance,
 		cacheStats,
+		docsCorpus,
+		docsSearch,
+		localDocsSnapshot,
+		docsQuery,
+		localDocsQuery,
+		localDocsOffset,
+		docsProduct,
+		docsVersion,
 		workflowStatus: workflowStatus?.status ?? null,
 		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
 		hforfModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? ENV.HFORF_MODEL_PATH ?? 'models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',

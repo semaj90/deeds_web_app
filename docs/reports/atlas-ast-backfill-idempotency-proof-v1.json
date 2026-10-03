@@ -1,15 +1,16 @@
 {
   "schema": "atlas.ast-backfill-idempotency-proof.v1",
-  "generatedAt": "2026-08-25T23:24:16.482Z",
+  "generatedAt": "2026-09-27T06:10:03.227Z",
   "readOnly": true,
   "databaseWrites": false,
   "applyBlocked": true,
-  "applyBlockedReason": "AST-ID-06 has 4 unresolved operator decisions (path/case/method-scope/vendored-tree) — see parent-atlas-neural-prefill-encoder/tasks.md",
+  "applyBlockedReason": "AST-ID-06 decisions frozen for dry-run only (2026-09-20); apply needs AST_BF_11..16 all passing plus explicit operator canary approval",
+  "candidatesInput": "docs\\reports\\graphify-ast-declaration-candidates-active-v3.jsonl",
   "steps": {
     "AST_BF_01_select_candidates": {
       "requestedLimit": 1000,
       "selected": 1000,
-      "source": "docs\\reports\\graphify-ast-declaration-candidates-v2.jsonl"
+      "source": "docs\\reports\\graphify-ast-declaration-candidates-active-v3.jsonl"
     },
     "AST_BF_02_construct_rows": {
       "total": 1000,
@@ -100,14 +101,119 @@
       "netNewIfApplied": 1000,
       "databaseWrites": 0
     },
+    "AST_BF_11_PATH_POLICY": {
+      "policy": "ACTIVE_APP_RELATIVE_V1",
+      "candidatesInput": 39033,
+      "admittedRows": 14633,
+      "violations": {
+        "absolute": 0,
+        "parentEscape": 0,
+        "workspacePrefix": 0,
+        "notSrcRelative": 0
+      },
+      "rawPathPreservedAsProvenance": true,
+      "status": "PASS"
+    },
+    "AST_BF_12_COLLISION": {
+      "groups": 14539,
+      "originCollisions": 0,
+      "caseCollisions": 0,
+      "sameKeyDifferentSpan": 57,
+      "treeNodeIdCollisions": 0,
+      "ambiguousRowsExcluded": 0,
+      "exclusionRule": "AMBIGUOUS_SAME_KEY (recommended default, awaiting explicit operator confirmation)",
+      "status": "PASS",
+      "note": "sameKeyDifferentSpan (overloads/redeclarations) is informational; rows sharing a tree_node_id are excluded from any apply set."
+    },
+    "AST_BF_13_SCOPE": {
+      "admitted": 14633,
+      "unsupportedKindExcluded": 2,
+      "rejectedByReason": {
+        "OUTSIDE_ACTIVE_APP_SRC": 24398
+      },
+      "foreignAbsolutePathCohortInTable": "NOT_EVALUATED_IN_SCRIPT (script reads files only; live atlas_ast_nodes has 3,498 treesitter-chunker absolute-path rows to quarantine via superseded_by — DB-side plan)",
+      "deletion": "FORBIDDEN",
+      "status": "PASS"
+    },
+    "AST_BF_14_PARENT_PLAN": {
+      "method": 2592,
+      "methodsWithPlannedParent": 0,
+      "deferredNoEnclosingClass": 2592,
+      "productionBoundNullParents": 0,
+      "phaseAFileRows": 0,
+      "phaseBTopLevelUnderFile": 0,
+      "phaseCMethodsUnderClass": 0,
+      "convention": "file(ROOT) -> declaration(parent=file) -> method(parent=class); matches existing atlas_ast_nodes (2,153/2,153 ids reproduce)",
+      "status": "PASS_WITH_DEFERRED",
+      "note": "Deferred methods are excluded from any apply set (never written with a NULL parent)."
+    },
+    "AST_BF_15_LINEAGE": {
+      "status": "FAIL",
+      "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "parserVersion": "0.45.3",
+      "counts": {
+        "rows": 0,
+        "notInSnapshot": 0,
+        "driftExcluded": 0,
+        "fileMissing": 0,
+        "digestDiverged": 0,
+        "spanDisagrees": 0,
+        "stampable": 0,
+        "rawRevisionCoerced": 14633
+      },
+      "stampableRowsWithCompleteLineage": 0,
+      "stampableFraction": 0,
+      "note": "Only stampable rows (in admitted snapshot, not drifted, file bytes hash to snapshot digest, span contains symbol) may enter a canary; the rest are excluded, never stamped."
+    },
+    "AST_BF_16_REPLAY": {
+      "pass1Checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass2Checksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "status": "PASS"
+    },
+    "AST_BF_17_NET_NEW": {
+      "existingRows": 11273,
+      "eligibleBeforeOverlap": 0,
+      "alreadyPresentByTreeNodeId": 0,
+      "structuralKeyConflictExcluded": 0,
+      "netNew": 0,
+      "status": "PASS",
+      "eligibleHandoff": {
+        "path": ".tmp\\atlas\\ast-canary-eligible-v1.jsonl",
+        "rows": 0,
+        "lineBasis": "1-based (napi 0-based + 1)"
+      }
+    },
+    "AST_BF_18C_STRUCTURAL_CONFLICT_CLASSIFICATION": {
+      "conflicts": 0,
+      "byClass": {},
+      "byExistingParser": {},
+      "byCandidateKind": {},
+      "samples": {},
+      "supersessionProposalsAllowed": 0,
+      "rule": "Only STALE_OLD_IDENTITY with strong revision evidence may ever feed a supersession proposal; newer generator alone is not evidence. None qualify unless a class other than *_UNPROVEN_* appears with revision proof.",
+      "status": "CLASSIFIED_NO_WRITES",
+      "handoff": {
+        "path": ".tmp\\atlas\\ast-conflicts-v1.jsonl"
+      }
+    },
     "AST_BF_10_apply_gate": {
-      "status": "BLOCKED",
-      "reason": "AST-ID-06 has 4 unresolved operator decisions (path/case/method-scope/vendored-tree) — see parent-atlas-neural-prefill-encoder/tasks.md",
-      "unblockConditions": [
-        "AST-ID-06 path-relativity decision",
-        "AST-ID-06 case-normalization policy",
-        "AST-ID-06 method/chunk-extraction-scope policy",
-        "AST-ID-06 vendored/legacy-tree exclusion policy"
+      "status": "DECISIONS_FROZEN_FOR_DRY_RUN",
+      "applyAllowed": false,
+      "canaryEligibleRows": 0,
+      "gates": {
+        "AST_BF_11_PATH_POLICY": "PASS",
+        "AST_BF_12_COLLISION": "PASS",
+        "AST_BF_13_SCOPE": "PASS",
+        "AST_BF_14_PARENT_PLAN": "PASS_WITH_DEFERRED",
+        "AST_BF_15_LINEAGE": "FAIL",
+        "AST_BF_16_REPLAY": "PASS"
+      },
+      "allDryRunGatesPass": false,
+      "remainingBeforeCanary": [
+        "explicit operator approval of a bounded canary apply",
+        "canary limited to AST_BF_15 stampable rows",
+        "post-write readback of tree_node_id/source_revision/workspace_id"
       ]
     }
   },

@@ -56,3 +56,52 @@ dispatch directly to Qdrant, Postgres, Neo4j, or Valkey.
 - **AND** the producer emits only the snapshot/admission result
 - **AND** writesPerformed is false unless a separately authorized cache write
   is explicitly requested
+
+### Requirement: Request-scoped candidates remain bound to the sealed parent map
+
+A request-scoped retrieval selection MUST bind to the checksum, row count,
+producer revision, workspace revision, and candidate-snapshot revision of the
+validated parent `CandidateOrdinalMapV1`. Every selected candidate MUST retain
+its original parent `candidateOrdinal` and exact canonical ID, packet key,
+source reference, source revision, and workspace revision. Selection order,
+retrieval rank, executor IDs, and local array positions MUST NOT allocate or
+rewrite a canonical ordinal.
+
+#### Scenario: Top-K selection retains parent identity and coordinates
+- **GIVEN** a validated parent `CandidateOrdinalMapV1`
+- **AND** SearchRuntime returns revision-qualified selected identities with
+  their already-admitted parent ordinals
+- **WHEN** the server constructs the request-scoped selection receipt
+- **THEN** the receipt binds the exact parent map checksum and producer metadata
+- **AND** each selected row preserves its original parent ordinal
+- **AND** the receipt is deterministic, non-canonical, and write-free
+
+#### Scenario: Selected features bind to the admitted full feature snapshot
+- **GIVEN** a verified request selection and a complete full-cohort
+  `CandidateFeatureSnapshotV1` bound to the same parent ordinal map
+- **WHEN** the server resolves feature rows for the selected candidates
+- **THEN** it verifies the full snapshot checksum and exact selected-row
+  identity/revisions before returning the subset
+- **AND** the selected subset preserves sparse parent ordinals and binds the
+  parent map, feature snapshot, and selection checksums
+- **AND** the full snapshot row count is not redefined as the request top-K
+  count
+- **AND** the result is non-canonical and write-free
+
+#### Scenario: Selection cannot substitute or remap a candidate
+- **GIVEN** a selected candidate has an unknown ordinal or mismatched canonical
+  ID, packet key, source reference, source revision, or workspace revision
+- **OR** the receipt is replayed against a different parent map
+- **WHEN** the selection is built or independently verified
+- **THEN** it is rejected before ACE snapshot or ContextManifest construction
+- **AND** no ordinal is inferred from rank or request-local array position
+
+#### Scenario: Legacy ACE stream cannot accept client cache authority
+- **GIVEN** the live stream route still assembles a legacy packet rather than
+  an admitted `AcePacketV3`/`ContextManifest`
+- **WHEN** a client supplies an `aceCacheIdentity` in its request body
+- **THEN** request validation rejects that body before cache access
+- **AND** the route does not perform a revisioned BitFrost read or write from
+  caller-provided identity
+- **AND** revisioned cache access remains unavailable until a server-owned
+  admitted ACE handoff is wired

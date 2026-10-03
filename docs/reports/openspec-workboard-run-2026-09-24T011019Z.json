@@ -1,0 +1,21 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "timestamp": "2026-09-24T01:10:19Z",
+  "reason": "parent-atlas-agentic-completion remains 9/11 because AGENT-09 needs admitted-source isolated candidate execution and AGENT-10 needs policy acceptance plus durable write/readback. ACE/HyperRAG/CHR97 audit remains 5/7; both open tasks explicitly require operator scope decisions before wiring, and the domains are correctly separate.",
+  "sourceChanges": [
+    {"name": "parent-atlas-agentic-completion", "completed": 9, "total": 11},
+    {"name": "ace-hyperrag-chr97-graphify-audit", "completed": 5, "total": 7}
+  ],
+  "nextChange": {
+    "name": "parent-atlas-gpu-runtime-abi-alignment",
+    "reason": "Five tasks remain; inspect whether any are CPU/local contract proofs independent of unavailable CUDA/GPU runtime."
+  },
+  "mutationBoundary": {
+    "postgres": "none",
+    "qdrant": "none",
+    "valkey": "none",
+    "neo4j": "none",
+    "graphify": "none",
+    "containerRebuilds": "none"
+  }
+}

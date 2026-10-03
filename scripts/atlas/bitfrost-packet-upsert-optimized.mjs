@@ -69,12 +69,14 @@ async function initRedis() {
 }
 
 /**
- * Compute directory hash for tier-3 grouping
- * E.g., "src/lib/server" → "dir:5f9c4ab0"
+ * Build the existing coarse directory group key for tier-3 grouping.
+ * This is a truncated path prefix, not a hash; e.g. "src/lib/server"
+ * currently maps to "dir:src:lib:". Do not use it as identity.
  */
 function getDirectoryHash(dirPath) {
   if (!dirPath) return 'dir:unclassified';
-  // Simple hash: first 8 chars of base32(crc32(dirPath))
+  // Preserve the existing key format: first three slash-delimited segments,
+  // joined with colons and truncated to eight characters.
   const parts = dirPath.split('/').slice(0, 3); // Keep first 3 levels
   return `dir:${parts.join(':').substring(0, 8).replace(/\//g, ':')}`;
 }

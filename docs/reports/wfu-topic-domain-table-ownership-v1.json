@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.wfu-topic-domain-table-ownership.v1",
+  "generatedAt": "2026-09-23T18:15:58Z",
+  "status": "READ_ONLY_ROLE_CLASSIFICATION_COMPLETE",
+  "classificationSource": "docs/architecture/runtime-ownership-registry.json#capabilities.domain_classification.persistence_surfaces",
+  "livePostgres": {
+    "database": "legal_ai_db",
+    "readOnlyTransaction": true,
+    "tableCountsExact": true,
+    "tables": {
+      "atlas_domain_ontology": { "rows": 17, "classification": "CANONICAL_OWNER", "role": "domain ontology node identities", "activeReaders": ["sveltekit-frontend/src/lib/server/atlas/ontology-resolution-boundary-postgres.ts", "sveltekit-frontend/src/routes/api/admin/atlas/ontology-resolution/+server.ts"] },
+      "atlas_ontology_concepts": { "rows": 0, "classification": "CANONICAL_OWNER", "role": "OAK concept identity/label registry", "activeReaders": ["python/atlas_oak_kernel.py"], "incomingForeignKeys": 2 },
+      "taxonomy_nodes": { "rows": 5527, "classification": "BACKEND", "role": "taxonomy topology read model", "activeReaders": ["sveltekit-frontend/src/lib/server/atlas/taxonomy-topology-packet.ts", "sveltekit-frontend/src/lib/server/atlas/taxonomy-retrieval-filter-v1.ts", "sveltekit-frontend/src/mcp/trace-mcp-server.ts"] },
+      "taxonomy_edges": { "rows": 62802, "classification": "BACKEND", "role": "taxonomy relationship/topology surface", "activeReaders": ["scripts/atlas/populate-hyperedges-from-taxonomy-edges-v1.mts"] },
+      "domain_taxonomy_v1": { "rows": 0, "classification": "ADAPTER", "role": "empty versioned/deprecation alias schema candidate", "blocker": "domain_class owner decision remains open" },
+      "atlas_taxonomy_assignment_candidates": { "rows": 0, "classification": "ADAPTER", "role": "revision/evidence-bearing review candidates", "owner": "sveltekit-frontend/src/lib/server/atlas/kag-taxonomy-candidate-postgres.ts" },
+      "document_topics": { "rows": 0, "classification": "BACKEND", "role": "derived clustering/topic assignment projection", "writer": "sveltekit-frontend/src/lib/server/ml/topic-clustering-worker.ts", "readers": ["sveltekit-frontend/src/routes/api/cases/analytics/+server.ts", "sveltekit-frontend/src/routes/api/recommendations/[userId]/+server.ts", "sveltekit-frontend/src/routes/api/ml/cluster-status/+server.ts"] },
+      "feature_domain_facts": { "rows": 123376, "classification": "BACKEND", "role": "derived evidence-bearing domain facts", "activeReader": "sveltekit-frontend/src/lib/server/agents/regen/loaders/features.ts", "writerScript": "scripts/atlas/phase-107-backfill-joins.mts", "additionalReadConsumer": "scripts/atlas/materialize-registry-structural-lexical-domain.mts" },
+      "feature_domain": { "rows": 61659, "classification": "DEAD", "role": "legacy packet-domain materialization", "evidence": "No active application read/write owner found in scoped source search; retained data is not deleted." },
+      "ontology_domain_tuples": { "rows": 61659, "classification": "DEAD", "role": "legacy domain tuple materialization", "evidence": "No active application read/write owner found in scoped source search; retained data is not deleted." },
+      "atlas_concepts": { "rows": 0, "classification": "DEAD", "role": "duplicate concept registry candidate", "evidence": "Zero rows and zero incoming FK dependents; existing schema tournament flags as dead/duplicate candidate." },
+      "warden_hmm_topics": { "rows": 0, "classification": "DEAD", "role": "unpopulated HMM topic projection", "evidence": "Schema/relation only; no live producer or consumer found." }
+    }
+  },
+  "decisions": {
+    "domainClassOwner": "OPEN_OPERATOR_DECISION; classifier owner remains domain-taxonomy.ts, domain ontology identities remain atlas_domain_ontology; do not reconcile by rewriting labels",
+    "domainTaxonomyPopulation": "NOT_AUTHORIZED",
+    "legacyDataDeletion": "NOT_AUTHORIZED",
+    "canonicalAuthorityPromotion": false
+  },
+  "writes": { "postgres": 0, "valkey": 0, "qdrant": 0, "neo4j": 0, "graphify": 0, "filesystem": "registry/report/OpenSpec evidence only" }
+}

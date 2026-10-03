@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.library-docs-package-lock-snapshot.v1",
+  "repository": {
+    "repoDir": "sveltekit-frontend",
+    "packageName": "yorha-legal-ai-frontend",
+    "packageVersion": "1.0.0",
+    "packageJsonSha256": "baca0fadc8323a7e679b7a7b7e427e88cdf933285bc550cde628493a4c55cd22",
+    "packageLockSha256": "cabd5efa80bc621dfc44ad944eb14b8ebf27773c412cfad26917feef5139419e",
+    "lockfileVersion": 3
+  },
+  "asOfUTC": "2026-09-30",
+  "packages": [
+    {
+      "sourceId": "sveltekit",
+      "product": "sveltekit",
+      "packageName": "@sveltejs/kit",
+      "declaredDirectly": true,
+      "declaredRange": "^2.0.0",
+      "resolvedVersionAtLockRoot": "2.59.1",
+      "allLockResolvedVersions": [
+        "2.59.1"
+      ],
+      "lockEntries": [
+        {
+          "lockPath": "node_modules/@sveltejs/kit",
+          "version": "2.59.1"
+        }
+      ],
+      "status": "LOCK_RESOLVED",
+      "docsVersionQualification": "CURRENT_UPSTREAM",
+      "docsVersion": null,
+      "asOfUTC": "2026-09-30"
+    },
+    {
+      "sourceId": "svelte5-runes",
+      "product": "svelte",
+      "packageName": "svelte",
+      "declaredDirectly": true,
+      "declaredRange": "^5.0.0",
+      "resolvedVersionAtLockRoot": "5.53.3",
+      "allLockResolvedVersions": [
+        "5.53.3",
+        "4.2.20"
+      ],
+      "lockEntries": [
+        {
+          "lockPath": "node_modules/svelte",
+          "version": "5.53.3"
+        },
+        {
+          "lockPath": "node_modules/svelte-language-server/node_modules/svelte",
+          "version": "4.2.20"
+        }
+      ],
+      "status": "LOCK_RESOLVED_MULTIPLE_INSTANCES",
+      "docsVersionQualification": "CURRENT_UPSTREAM",
+      "docsVersion": null,
+      "asOfUTC": "2026-09-30"
+    },
+    {
+      "sourceId": "bits-ui",
+      "product": "bits-ui",
+      "packageName": "bits-ui",
+      "declaredDirectly": true,
+      "declaredRange": "^2.0.0",
+      "resolvedVersionAtLockRoot": "2.16.2",
+      "allLockResolvedVersions": [
+        "2.16.2"
+      ],
+      "lockEntries": [
+        {
+          "lockPath": "node_modules/bits-ui",
+          "version": "2.16.2"
+        }
+      ],
+      "status": "LOCK_RESOLVED",
+      "docsVersionQualification": "CURRENT_UPSTREAM",
+      "docsVersion": null,
+      "asOfUTC": "2026-09-30"
+    },
+    {
+      "sourceId": "drizzle-orm",
+      "product": "drizzle-orm",
+      "packageName": "drizzle-orm",
+      "declaredDirectly": true,
+      "declaredRange": "0.45.2",
+      "resolvedVersionAtLockRoot": "0.45.2",
+      "allLockResolvedVersions": [
+        "0.45.2"
+      ],
+      "lockEntries": [
+        {
+          "lockPath": "node_modules/drizzle-orm",
+          "version": "0.45.2"
+        }
+      ],
+      "status": "LOCK_RESOLVED",
+      "docsVersionQualification": "CURRENT_UPSTREAM",
+      "docsVersion": null,
+      "asOfUTC": "2026-09-30"
+    },
+    {
+      "sourceId": "drizzle-kit",
+      "product": "drizzle-kit",
+      "packageName": "drizzle-kit",
+      "declaredDirectly": true,
+      "declaredRange": "0.31.10",
+      "resolvedVersionAtLockRoot": "0.31.10",
+      "allLockResolvedVersions": [
+        "0.31.10"
+      ],
+      "lockEntries": [
+        {
+          "lockPath": "node_modules/drizzle-kit",
+          "version": "0.31.10"
+        }
+      ],
+      "status": "LOCK_RESOLVED",
+      "docsVersionQualification": "CURRENT_UPSTREAM",
+      "docsVersion": null,
+      "asOfUTC": "2026-09-30"
+    }
+  ],
+  "packageSnapshotSha256": "235fdda3ee54ec4906fd361f15d4ad9aac04d647661789bbe3a08f86e7774f7e",
+  "canonicalAuthority": false
+}

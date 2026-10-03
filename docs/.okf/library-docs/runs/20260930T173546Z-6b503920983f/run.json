@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.library-docs-capture-run.v1",
+  "runId": "20260930T173546Z-6b503920983f",
+  "generatedAt": "2026-09-30T17:35:46.760Z",
+  "asOfUTC": "2026-09-30",
+  "repoDir": "sveltekit-frontend",
+  "sourceManifest": "docs/.okf/dev/pinned-docs.manifest.json",
+  "sourceManifestSha256": "eeeb8d8cb80ce61029a7ccc23af7fd0b70e6289c84d31ccba5456e4012dda2b7",
+  "coordinatesSha256": "f82c8b5158fba8100a1abe1775e0d0f56fa9a4ec7bd31f26c39b1653a0ff4985",
+  "packageSnapshot": "package-lock-snapshot.json",
+  "packageSnapshotSha256": "c2f7edafbed55f472f69da2a327a64a1b1b8282f328c93c5c4e15aca7555db89",
+  "pageCountPlanned": 30,
+  "sources": [
+    {
+      "sourceId": "sveltekit",
+      "sourceRevision": "sveltekit-2-2026-09-23",
+      "pageCount": 5
+    },
+    {
+      "sourceId": "svelte5-runes",
+      "sourceRevision": "svelte5-runes-5-2026-09-23",
+      "pageCount": 4
+    },
+    {
+      "sourceId": "bits-ui",
+      "sourceRevision": "bits-ui-2-2026-09-23",
+      "pageCount": 5
+    },
+    {
+      "sourceId": "drizzle-orm",
+      "sourceRevision": "drizzle-orm-0.45-2026-09-23",
+      "pageCount": 5
+    },
+    {
+      "sourceId": "postgresql-18",
+      "sourceRevision": "postgresql-18-18-2026-09-23",
+      "pageCount": 6
+    },
+    {
+      "sourceId": "pgvector",
+      "sourceRevision": "pgvector-0.8-2026-09-23",
+      "pageCount": 2
+    },
+    {
+      "sourceId": "drizzle-kit",
+      "sourceRevision": "drizzle-kit-0.31-2026-09-23",
+      "pageCount": 3
+    }
+  ],
+  "writes": {
+    "networkFetch": false,
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "canonicalAuthority": false,
+  "status": "PREPARED_NOT_FETCHED"
+}

@@ -3,16 +3,60 @@
 ## GS1.9 - Inventory identity fields
 
 - [x] Inventory identity fields across `atlas_tree_nodes`, `atlas_packets`, `graphify_files`, `graphify_symbols`, `graphify_edges`, and the topology tables.
-- [ ] Record which fields are stable keys, which are version-bound occurrences, and which are derived projections.
-- [ ] Verify the live join semantics for packet-to-tree and packet-to-symbol links.
-- [ ] Validation commands:
-  - `node scripts/atlas/audit-tree-nodes.mjs --verbose`
-  - `node scripts/atlas/backfill-tree-nodes.mjs --dry-run --limit=100`
-  - `node scripts/atlas/phase1-tree-node-derivation.mjs --dry-run --limit=5000`
+- [x] Record which fields are stable keys, which are version-bound occurrences, and which are derived projections.
+      From `\d atlas_tree_nodes` (269,972 rows live):
+      - **Stable keys**: `node_id` (PK, uuid), `packet_key` (text, references `atlas_packets`,
+        indexed), `source_ref`/`file_path` (source identity).
+      - **Version-bound occurrences**: `lineage_version` (`'tree-nodes-v1'` default — a schema
+        generation marker, not per-row data), `feature_id`/`feature_label` (labels attached at
+        derivation time, not re-verified per revision).
+      - **Derived projections (pointers into mirrors, not identity)**: `qdrant_point_id`,
+        `neo4j_node_id`, `glyph_record_id`, `community_id`, `som_cluster`/`som_x`/`som_y` —
+        clustering/topology results written after the fact, never joined-on as identity.
+      - `root_id`/`parent_id`/`tree_depth`/`page_index_path` are structural tree-shape fields,
+        not identity in either sense.
+- [x] Verify the live join semantics for packet-to-tree and packet-to-symbol links.
+      Packet-to-tree: live, via `packet_key`/`feature_id`, but **partial** — re-ran
+      `node scripts/atlas/audit-tree-nodes.mjs --verbose`: 269,972 rows, 0 duplicate `node_id`s,
+      0 orphans, but only **61,659/269,972 (23%) linked** to a `feature_id` — the audit gate's
+      own `linkage` check reports `pass:false`. Packet-to-symbol: **no direct join exists at
+      all** — `atlas_tree_nodes` has no `symbol_id`/`symbol_version_id` column, confirming this
+      file's own GS1.10 finding ("No live `symbol_version_id` or `parse_node_id` contract was
+      found") from the schema side, not just the package-scan side.
+- [x] Validation commands:
+  - `node scripts/atlas/audit-tree-nodes.mjs --verbose` → **GATE FAIL** (linkage 23%, otherwise
+    clean: 0 duplicate node_ids, 0 orphans, max depth 2).
+  - `node scripts/atlas/backfill-tree-nodes.mjs --dry-run --limit=100` → 100/100 files, 0 docs
+    created, 100 reused, 0 chunks created, 100 reused, 0 packet links updated; no changes
+    committed (dry-run confirmed via its own report, `docs/reports/tree-nodes-backfill.json`).
+  - `node scripts/atlas/phase1-tree-node-derivation.mjs --dry-run --limit=5000` → 59 packets with
+    NULL `tree_node_id` found (far below the 5000 limit — most packets already have one derived);
+    all 59 resolved via stage-1 `feature_id` heuristic (100%), stage-2 AST and stage-3 TurboVec
+    confidence lanes saw 0 — not exercised by this cohort. Dry-run only, `--apply` not run.
 
 ## GS1.10 - Separate identity contracts
 
-- [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
+- [ ] **GS1-10-IDENTITY-CONTRACTS-01** Define separate contracts for `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
+- [ ] GS1.10 STATIC RECONCILIATION (2026-09-24, read-only; no schema/data/code change, parent boxes deliberately NOT ticked).
+  Vocabulary/types: `PROVEN_EXISTING_IMPLEMENTATION` — `sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts`
+  defines branded types + interfaces for all seven (the "no live `parse_node_id`/`symbol_version_id` contract" text below is stale
+  on *definition*, still true on *population*). Cross-reference, do not duplicate: `CANONICAL-IDENTITY-V1` (lineage-dag-convergence,
+  `SPEC_DRAFT`; `packages/atlas-core/src/identity/canonical-identity-v1.ts`).
+  | id | owner / role | revision | authority vs projection | forbidden substitution |
+  |---|---|---|---|---|
+  | `parse_node_id` | `graph-identity-contracts.ts` (`tree-node-occurrence-v1.ts` = occurrence id, sha256 of sourceRef+sourceRevision+nodeType+bytes) — AST occurrence | yes | structural evidence | != `symbol_id`, != `symbol_version_id` |
+  | `symbol_id` | `graph-identity-contracts.ts`, `symbol-identity-audit-v1.ts` — logical symbol | no | logical authority | != revision-qualified occurrence |
+  | `symbol_version_id` | same + `symbol-revision-qualification-v1.ts` — symbol at a source revision | yes | authority | != `symbol_id` |
+  | `chunk_id` | `graph-identity-contracts.ts`, `canonicalChunkId` in CANONICAL-IDENTITY-V1 — retrieval chunk | yes (chunkerRevision) | mirror identity | never inferred from `packet_key` or a projection address |
+  | `packet_key` | `packet-identity-resolver.ts`, `PacketIdentityRefV1` (lifecycle explicitly UNDEFINED per PACKET-KEY-SINGLE-OWNER-CONVERGENCE-01) | not in type | join identity | never manufactured from a Qdrant id; not a `stableFileId` |
+  | `concept_id` | ontology tables (`atlas_ontology_concepts` per the schema tournament; `concept_records` from drizzle 0032 is a 0-row duplicate candidate) — UNVERIFIED which column is the key | no (intentional? NOT decided) | ontology identity, referenced only | not a graph/source identity |
+  | `graph_node_key` | `packages/parent-atlas/src/core/graph-node-key-v1.ts` (`^(symbol|packet|chunk|occurrence):.+$`), consumed by `graph-ordinal-map-v1.ts` | optional | PROJECTION address | never substitutes for `packet_key`, `chunk_id`, `symbol_id`, `symbol_version_id`, `parse_node_id` |
+  Findings: (a) `GraphNodeKind` in `graph-identity-contracts.ts` lists CONCEPT/DOCUMENT/PROCESS/PACKAGE/TEST/EXTERNAL_DOC but the
+  `graphNodeKeyV1Schema` regex only admits symbol|packet|chunk|occurrence prefixes — the two disagree; (b) `tree_node_id` = projection/
+  occurrence compatibility field, never canonical symbol identity; Qdrant point id / `qdrant_id` = projection address, != `packet_key`.
+  STILL OPEN (unchanged): live population (`atlas_tree_nodes` has no `symbol_id`/`symbol_version_id`; Neo4j/Qdrant writers still emit
+  `tree_node_id`; 23% tree-node to `feature_id` linkage), `concept_id` key owner + revisionless decision, allowed-join rules as code.
+  Status: ownership/join semantics `PARTIAL / PROOF_ONLY`; live population `BLOCKED_BY_LINEAGE`.
 - [ ] Keep `tree_node_id` as a provisional structural field until the separate contracts are proven live.
 - [ ] Do not relax `atlas_graph_nodes_v2_tree_node_unique` until the split identity model is implemented and tested.
 - [ ] Current evidence:
@@ -1819,3 +1863,14 @@ Still not touched: the stale legacy `CodebaseFile`-only node set (3,667 nodes, s
 run) this route never touches either way. Multi-hop analysis on the current, live `CodebaseFile`
 population is now genuinely usable through the tools checked; building further on top of it is
 unblocked.
+
+## GRAPH-API-BOUNDS-01 — codebase graph endpoint admission and bounded responses (2026-10-01)
+
+- [x] Validate Qdrant payloads before path operations; skip malformed or missing `file_path` values.
+- [x] Honor `maxFiles`, bounded point limits, and `dir` scope; page with bounded payload fields and response bytes.
+- [x] Return a stable graph response envelope and non-200 status for upstream/parse failures; cover with focused route tests.
+- [x] Verify current browser callers' `maxFiles`/`dir` expectations against the revised response contract; the admin view sends both fields and handles typed error codes.
+- [ ] Run a controlled repeated-request memory smoke against a representative, explicitly bounded dataset.
+- [ ] Evaluate Qdrant-side directory filtering availability; retain bounded server-side filtering unless a safe indexed prefix contract is proven.
+- [x] Reuse SvelteKit's request-scoped fetch for the internal `error-brain/diagnose` graph call so same-origin authorization is forwarded without bypassing the graph route guard.
+- [ ] Run a live authenticated error-diagnosis request and verify its bounded graph neighborhood is populated.

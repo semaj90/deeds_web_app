@@ -1,0 +1,15 @@
+{
+  "schema": "atlas.semantic-768-shadow-receipt-contract.v1",
+  "status": "SHADOW_RECEIPT_CONTRACT_READY_LIVE_EXECUTION_PENDING",
+  "change": "parent-atlas-retrieval-logic-convergence",
+  "task": "RETRIEVAL-TEXT-02",
+  "implementation": "sveltekit-frontend/src/lib/server/retrieval/semantic-768-shadow-receipt-v1.ts",
+  "tests": "sveltekit-frontend/src/lib/server/retrieval/semantic-768-shadow-receipt-v1.spec.ts",
+  "representation": "semantic_768",
+  "modelOwner": "EmbeddingGemma",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "liveExecutionReceipt": false,
+  "nextGate": "EMBEDDINGGEMMA_SHADOW_EXECUTION_BOUND_TO_RETRIEVAL_TEXT_V1"
+}

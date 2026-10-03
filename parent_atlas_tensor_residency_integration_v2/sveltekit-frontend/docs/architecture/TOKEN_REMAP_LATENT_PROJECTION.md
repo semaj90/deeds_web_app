@@ -1,6 +1,6 @@
 # Token Remap + Latent Projection
 
-Model-facing token ids remain owned by the model tokenizer. Atlas creates a parallel `TokenFeatureMap` carrying byte span, engram key, AST/ontology/domain IDs, entropy/surprisal, feature ID, and packet key.
+Model-facing token ids remain owned by the model tokenizer. Atlas creates a parallel matrix `TokenFeatureMap` carrying byte span, engram key, AST/ontology/domain IDs, entropy/surprisal, feature ID, and packet key.
 
 Discrete token/engram IDs are not interpolated. Numeric derived representations may be projected or quantized.
 

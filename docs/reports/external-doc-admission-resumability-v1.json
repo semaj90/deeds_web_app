@@ -1,0 +1,264 @@
+{
+  "schema": "atlas.external-doc-admission-resumability.v1",
+  "generatedAt": "2026-09-23T20:30:35.394Z",
+  "readOnly": true,
+  "expected": {
+    "pageCount": 30,
+    "chunkCount": 852
+  },
+  "liveBefore": {
+    "pages": 30,
+    "chunks": 852,
+    "unexpectedPageRows": 0,
+    "duplicatePageRows": 0,
+    "unexpectedChunkRows": 0,
+    "duplicateChunkRows": 0
+  },
+  "classification": {
+    "alreadyAdmittedExact": 30,
+    "missing": 0,
+    "conflict": 0
+  },
+  "pages": [
+    {
+      "url": "https://svelte.dev/docs/kit/form-actions",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/kit/hooks",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/kit/load",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/kit/page-options",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/kit/state-management",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/svelte/$derived",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/svelte/$effect",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/svelte/$props",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://svelte.dev/docs/svelte/$state",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://bits-ui.com/docs/child-snippet",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://bits-ui.com/docs/components/dialog",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://bits-ui.com/docs/getting-started",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://bits-ui.com/docs/migration-guide",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://bits-ui.com/docs/state-management",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://github.com/drizzle-team/drizzle-orm/issues/5792",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/column-types",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/extensions",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/indexes-constraints",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/functions-uuid.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/indexes-bitmap-scans.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/release-18.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/runtime-config-resource.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/using-explain.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://www.postgresql.org/docs/18/view-pg-aios.html",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://github.com/pgvector/pgvector/blob/master/CHANGELOG.md",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://github.com/pgvector/pgvector",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    },
+    {
+      "url": "https://orm.drizzle.team/docs/kit-overview",
+      "classification": "ALREADY_ADMITTED_EXACT",
+      "reasons": []
+    }
+  ],
+  "writerCalls": 0,
+  "currentFullCorpusReplay": true,
+  "partialFixture": {
+    "result": "PROVEN_BY_FOCUSED_TEST",
+    "expectedPages": [
+      "A",
+      "B",
+      "C"
+    ],
+    "initial": [
+      "A:ALREADY_ADMITTED_EXACT",
+      "B:ALREADY_ADMITTED_EXACT",
+      "C:MISSING"
+    ],
+    "writerEligible": [
+      "C"
+    ],
+    "writerCalls": 1,
+    "test": "external-doc-admission-plan-v1.spec.ts"
+  },
+  "crashResumeFixture": {
+    "result": "PROVEN_BY_FOCUSED_TEST",
+    "firstRunCommitted": [
+      "A",
+      "B"
+    ],
+    "crashBefore": "C",
+    "resumedSkipped": [
+      "A",
+      "B"
+    ],
+    "resumedAdmitted": [
+      "C"
+    ],
+    "test": "external-doc-admission-plan-v1.spec.ts"
+  },
+  "conflictFixtures": [
+    {
+      "case": "wrong page evidence revision",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "missing child chunk",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "extra child chunk",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "wrong child checksum",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "wrong child span",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "wrong child text",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "chunk ID collision on another page",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    },
+    {
+      "case": "duplicate page candidate",
+      "result": "CONFLICT_WRITER_CALLS_ZERO",
+      "test": "external-doc-admission-plan-v1.spec.ts"
+    }
+  ],
+  "supersession": {
+    "supported": false,
+    "followup": "EXTERNAL_DOC_CORPUS_SUPERSESSION_01"
+  },
+  "result": "EXTERNAL_DOC_ADMISSION_RESUMABILITY_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

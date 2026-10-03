@@ -1,0 +1,16 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T02:25:53.710Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 1,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 0,
+  "skippedUnsupported": 0,
+  "byFileKind": {},
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 0,
+  "totalSymbolsInserted": null,
+  "plan": []
+}

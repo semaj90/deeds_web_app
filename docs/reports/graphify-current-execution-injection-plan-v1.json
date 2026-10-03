@@ -3,8 +3,8 @@
   "status": "READY_FOR_EXPLICIT_AUTHORIZATION",
   "executionOwner": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts",
   "lifecycleInput": "docs/reports/graphify-lifecycle-entrypoint-v1.json",
-  "workspaceRevision": "sha256:f476b4a6aac2afcafe0f82c7b0e48d52951ccbce73fca52b9706b1f1fbfabefb",
-  "bindingCount": 24101,
+  "workspaceRevision": "sha256:1c7fed613ecccb4cd1bb92640e23da841354141d089f4d4749ff59b6a2c5ca78",
+  "bindingCount": 24181,
   "workspaceNamespaceStatus": "WORKSPACE_SOURCE_NAMESPACE_PROVEN",
   "requiredInputs": {
     "workspaceRevision": true,
@@ -30,5 +30,5 @@
     "A future bounded apply must use one dedicated PostgreSQL connection and a fresh execution_id.",
     "The full current-workspace source set is not an authorization request; scope must be explicitly chosen and bounded separately."
   ],
-  "planChecksum": "sha256:86c633c41889091a91cd37a0b977926d226bbeb16b186e78dec8775c8d14fa5b"
+  "planChecksum": "sha256:7d38fb705f210fd91cc85b7f8b44914cafcd45a150b3f88248b0861b7b4e5630"
 }

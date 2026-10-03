@@ -623,6 +623,7 @@ func main() {
 	mux.HandleFunc("/ready", httpReadyHandler(srv))
 	mux.HandleFunc("/stats", httpStatsHandler(srv))
 	mux.HandleFunc("/embed", httpEmbedHandler(srv))
+	mux.HandleFunc("/embed/v2", httpStrictEmbedHandlerV2(srv))
 	httpServer := &http.Server{Addr: ":" + cfg.HTTPPort, Handler: mux}
 
 	// Start servers

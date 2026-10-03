@@ -97,6 +97,7 @@ export const candidateFeatureGpuPackV1Schema = z.object({
   featureSnapshotChecksum: checksum,
   workspaceRevision: revision,
   featureRevision: revision,
+  sourceRevisions: z.array(revision),
   columnarChecksum: checksum,
   logicalRows: z.number().int().nonnegative(),
   physicalRows: z.number().int().nonnegative(),
@@ -134,6 +135,9 @@ export const candidateFeatureGpuPackV1Schema = z.object({
   }
   if (value.paddingRows !== physical - value.logicalRows || physical < value.logicalRows) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['paddingRows'], message: 'FEATURE_GPU_PACK_PADDING_SHAPE_MISMATCH' });
+  }
+  if (value.sourceRevisions.length !== value.logicalRows) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sourceRevisions'], message: 'FEATURE_GPU_PACK_SOURCE_REVISION_LENGTH_MISMATCH' });
   }
   if (value.logicalRows > 0 && physical % value.rowAlignment !== 0) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['physicalRows'], message: 'FEATURE_GPU_PACK_ALIGNMENT_MISMATCH' });
@@ -250,6 +254,7 @@ export function materializeCandidateFeatureGpuPack(input: {
     physicalRows,
     rowAlignment,
     featureNames: CANDIDATE_SCALAR_FEATURES,
+    sourceRevisions: columnar.sourceRevisions,
     featureValuesChecksum,
     featurePresenceChecksum,
     validMaskChecksum,
@@ -265,6 +270,7 @@ export function materializeCandidateFeatureGpuPack(input: {
     featureSnapshotChecksum: columnar.featureSnapshotChecksum,
     workspaceRevision: columnar.workspaceRevision,
     featureRevision: columnar.featureRevision,
+    sourceRevisions: [...columnar.sourceRevisions],
     columnarChecksum: columnar.columnarChecksum,
     logicalRows: columnar.rowCount,
     physicalRows,

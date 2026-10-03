@@ -1,0 +1,570 @@
+{
+  "schema": "atlas.summary-candidate-evaluation.v1",
+  "cohort": {
+    "candidateCohortChecksum": "5713db798d682742ada1431989e1463837988dd1fea1115410e2c34127e09f5e",
+    "chunkCohortChecksum": "fd2b2bd03016b305adddccf5f621708157318bead82b589eb55c6687f43b4a8a"
+  },
+  "judge": {
+    "modelId": "ornith-1.5-9b",
+    "modelRevision": "ornith-1.5-9b:hforf.gguf",
+    "promptRevision": "summary-claim-judge-prompt:val-07-v1",
+    "backend": "llama-server (NOT Ollama)"
+  },
+  "spineRevision": "d3184d91e3ad67a1b21d0d54ca1734f60800a65435cad28197a88cb9e72f6cd0",
+  "counts": {
+    "candidates": 1,
+    "claims": 5,
+    "eligible": 0,
+    "ineligible": 1,
+    "claimDecisions": {
+      "ADMIT": 4,
+      "REJECT": 1
+    }
+  },
+  "entries": [
+    {
+      "candidateId": "sc:d8682b7baa1bd3865d0c5d3cde8e200287d24c69a04a94c5775a1f3d07c8da86",
+      "claimSet": {
+        "schema": "atlas.summary-claim-set.v1",
+        "candidateId": "sc:d8682b7baa1bd3865d0c5d3cde8e200287d24c69a04a94c5775a1f3d07c8da86",
+        "extractorRevision": "claims-of:sentence-regex-v1",
+        "claimList": [
+          {
+            "claimOrdinal": 0,
+            "claimText": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause.",
+            "claimChecksum": "f62f1ff1cfeef00ea797f65c37855686dcb13d2e1232985fdf07768cb5fc79f3"
+          },
+          {
+            "claimOrdinal": 1,
+            "claimText": "It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can cover multiple columns.",
+            "claimChecksum": "3fdeab111632b87024b296cf29421fe2b71512f22980b56367312de9472b6ed5"
+          },
+          {
+            "claimOrdinal": 2,
+            "claimText": "For low-selectivity filters, exact indexes work well, but approximate indexes like HNSW may perform better, with filtering applied after the index scan.",
+            "claimChecksum": "620257a51058d0a9431a08461531e885761a1825f05b9744a7bcd14358c0fde4"
+          },
+          {
+            "claimOrdinal": 3,
+            "claimText": "To handle cases where few rows match, you can enable iterative index scans by setting `hnsw.iterative_scan = strict_order`.",
+            "claimChecksum": "a5526c72ba7708b41804075e3a980e6819632d6b0602600ef1bb6dcd7323b46a"
+          },
+          {
+            "claimOrdinal": 4,
+            "claimText": "For filtering by a few distinct values, partial indexing is suggested, while partitioning is recommended when filtering by many different values.",
+            "claimChecksum": "1845d0f74c07050d3d129efb70c30d9cff0a70a66d23a9e6ab12447a0989920d"
+          }
+        ],
+        "claimSetChecksum": "d1bcb9b36cab7ad8f4f57a7e5c90a4faece26e78b140ac0a8330f003baf0f494"
+      },
+      "validations": [
+        {
+          "schema": "atlas.summary-claim-validation.v1",
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "analysisId": null,
+          "summaryInputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+          "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+          "claimOrdinal": 0,
+          "claimText": "This chunk explains how to index nearest neighbor queries that include a `WHERE` clause.",
+          "technical": {
+            "status": "PASS",
+            "sourceTokens": [
+              "B-tree",
+              "CURRENT_UPSTREAM",
+              "Open-source",
+              "SP-GiST",
+              "WHERE",
+              "category_id",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan",
+              "location_id",
+              "strict_order",
+              "vector_l2_ops"
+            ],
+            "claimTokens": [
+              "WHERE"
+            ],
+            "missingTechnicalTokens": [
+              "CURRENT_UPSTREAM",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan"
+            ],
+            "unexpectedTechnicalTokens": []
+          },
+          "numeric": {
+            "status": "PASS",
+            "sourceValues": [
+              "123",
+              "3",
+              "1",
+              "2",
+              "5",
+              "10%",
+              "40",
+              "4",
+              "2026",
+              "09",
+              "23"
+            ],
+            "claimValues": [],
+            "unsupportedValues": []
+          },
+          "version": {
+            "status": "PASS",
+            "sourceVersions": [],
+            "claimVersions": [],
+            "unsupportedVersions": []
+          },
+          "sourceSpan": {
+            "status": "NO_CLAIMED_SPAN",
+            "spans": []
+          },
+          "semantic": {
+            "status": "JUDGED",
+            "verdict": "SUPPORTED",
+            "citedSpans": [],
+            "unsupportedFragment": null,
+            "judgeModelId": "ornith-1.5-9b",
+            "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+            "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+            "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+          },
+          "ontology": {
+            "status": "NOT_RUN",
+            "kernelRevision": null,
+            "assertions": []
+          },
+          "result": {
+            "decision": "ADMIT",
+            "escalationRevision": "summary-claim-resolution:val-09-v1"
+          },
+          "resolutionLayer": "COMPOSITE",
+          "validatorRevision": "summary-claim-validator:val-10-candidate-v1",
+          "canonicalAuthority": false,
+          "claimChecksum": "f62f1ff1cfeef00ea797f65c37855686dcb13d2e1232985fdf07768cb5fc79f3",
+          "validationId": "scv:706aacd45859b7e54f789e6ee032e7b235306149a847f2ac11261f9d74578895",
+          "validationChecksum": "b91fa1d9b4befbbd898c3fcbaa9671dc341720f5dad3ca9e513ccb5adad29268"
+        },
+        {
+          "schema": "atlas.summary-claim-validation.v1",
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "analysisId": null,
+          "summaryInputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+          "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+          "claimOrdinal": 1,
+          "claimText": "It recommends creating an index on the filter column, noting that Postgres supports B-tree, hash, GiST, SP-GiST, GIN, and BRIN index types, and that multicolumn indexes can cover multiple columns.",
+          "technical": {
+            "status": "PASS",
+            "sourceTokens": [
+              "B-tree",
+              "CURRENT_UPSTREAM",
+              "Open-source",
+              "SP-GiST",
+              "WHERE",
+              "category_id",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan",
+              "location_id",
+              "strict_order",
+              "vector_l2_ops"
+            ],
+            "claimTokens": [
+              "B-tree",
+              "SP-GiST"
+            ],
+            "missingTechnicalTokens": [
+              "CURRENT_UPSTREAM",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan"
+            ],
+            "unexpectedTechnicalTokens": []
+          },
+          "numeric": {
+            "status": "PASS",
+            "sourceValues": [
+              "123",
+              "3",
+              "1",
+              "2",
+              "5",
+              "10%",
+              "40",
+              "4",
+              "2026",
+              "09",
+              "23"
+            ],
+            "claimValues": [],
+            "unsupportedValues": []
+          },
+          "version": {
+            "status": "PASS",
+            "sourceVersions": [],
+            "claimVersions": [],
+            "unsupportedVersions": []
+          },
+          "sourceSpan": {
+            "status": "NO_CLAIMED_SPAN",
+            "spans": []
+          },
+          "semantic": {
+            "status": "JUDGED",
+            "verdict": "SUPPORTED",
+            "citedSpans": [],
+            "unsupportedFragment": null,
+            "judgeModelId": "ornith-1.5-9b",
+            "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+            "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+            "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+          },
+          "ontology": {
+            "status": "NOT_RUN",
+            "kernelRevision": null,
+            "assertions": []
+          },
+          "result": {
+            "decision": "ADMIT",
+            "escalationRevision": "summary-claim-resolution:val-09-v1"
+          },
+          "resolutionLayer": "COMPOSITE",
+          "validatorRevision": "summary-claim-validator:val-10-candidate-v1",
+          "canonicalAuthority": false,
+          "claimChecksum": "3fdeab111632b87024b296cf29421fe2b71512f22980b56367312de9472b6ed5",
+          "validationId": "scv:d1e14bd29abee33d247ccbd7b94bf19e8f3a5dbeff25d68d471d8d4b1f15a5d3",
+          "validationChecksum": "cf89571b321abd5bd91eb5c5c3975704808ebc4b95079d8e67b53f890363b176"
+        },
+        {
+          "schema": "atlas.summary-claim-validation.v1",
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "analysisId": null,
+          "summaryInputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+          "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+          "claimOrdinal": 2,
+          "claimText": "For low-selectivity filters, exact indexes work well, but approximate indexes like HNSW may perform better, with filtering applied after the index scan.",
+          "technical": {
+            "status": "FAIL",
+            "sourceTokens": [
+              "B-tree",
+              "CURRENT_UPSTREAM",
+              "Open-source",
+              "SP-GiST",
+              "WHERE",
+              "category_id",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan",
+              "location_id",
+              "strict_order",
+              "vector_l2_ops"
+            ],
+            "claimTokens": [
+              "low-selectivity"
+            ],
+            "missingTechnicalTokens": [
+              "CURRENT_UPSTREAM",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan"
+            ],
+            "unexpectedTechnicalTokens": [
+              "low-selectivity"
+            ]
+          },
+          "numeric": {
+            "status": "PASS",
+            "sourceValues": [
+              "123",
+              "3",
+              "1",
+              "2",
+              "5",
+              "10%",
+              "40",
+              "4",
+              "2026",
+              "09",
+              "23"
+            ],
+            "claimValues": [],
+            "unsupportedValues": []
+          },
+          "version": {
+            "status": "PASS",
+            "sourceVersions": [],
+            "claimVersions": [],
+            "unsupportedVersions": []
+          },
+          "sourceSpan": {
+            "status": "NO_CLAIMED_SPAN",
+            "spans": []
+          },
+          "semantic": {
+            "status": "JUDGED",
+            "verdict": "UNSUPPORTED_CLAIM",
+            "citedSpans": [],
+            "unsupportedFragment": "low-selectivity",
+            "judgeModelId": "ornith-1.5-9b",
+            "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+            "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+            "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+          },
+          "ontology": {
+            "status": "NOT_RUN",
+            "kernelRevision": null,
+            "assertions": []
+          },
+          "result": {
+            "decision": "REJECT",
+            "escalationRevision": "summary-claim-resolution:val-09-v1"
+          },
+          "resolutionLayer": "TECHNICAL",
+          "validatorRevision": "summary-claim-validator:val-10-candidate-v1",
+          "canonicalAuthority": false,
+          "claimChecksum": "620257a51058d0a9431a08461531e885761a1825f05b9744a7bcd14358c0fde4",
+          "validationId": "scv:d9a29faae1ff2656e811ecb4a04e5c501191978a0df3b3525ca103998545dd2b",
+          "validationChecksum": "3fee99313184fd99e442726319e9ec035f8ba97a90e7e972b1096030ed908d60"
+        },
+        {
+          "schema": "atlas.summary-claim-validation.v1",
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "analysisId": null,
+          "summaryInputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+          "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+          "claimOrdinal": 3,
+          "claimText": "To handle cases where few rows match, you can enable iterative index scans by setting `hnsw.iterative_scan = strict_order`.",
+          "technical": {
+            "status": "PASS",
+            "sourceTokens": [
+              "B-tree",
+              "CURRENT_UPSTREAM",
+              "Open-source",
+              "SP-GiST",
+              "WHERE",
+              "category_id",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan",
+              "location_id",
+              "strict_order",
+              "vector_l2_ops"
+            ],
+            "claimTokens": [
+              "hnsw.iterative_scan = strict_order"
+            ],
+            "missingTechnicalTokens": [
+              "CURRENT_UPSTREAM",
+              "hnsw.ef_search"
+            ],
+            "unexpectedTechnicalTokens": []
+          },
+          "numeric": {
+            "status": "PASS",
+            "sourceValues": [
+              "123",
+              "3",
+              "1",
+              "2",
+              "5",
+              "10%",
+              "40",
+              "4",
+              "2026",
+              "09",
+              "23"
+            ],
+            "claimValues": [],
+            "unsupportedValues": []
+          },
+          "version": {
+            "status": "PASS",
+            "sourceVersions": [],
+            "claimVersions": [],
+            "unsupportedVersions": []
+          },
+          "sourceSpan": {
+            "status": "NO_CLAIMED_SPAN",
+            "spans": []
+          },
+          "semantic": {
+            "status": "JUDGED",
+            "verdict": "SUPPORTED",
+            "citedSpans": [],
+            "unsupportedFragment": null,
+            "judgeModelId": "ornith-1.5-9b",
+            "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+            "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+            "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+          },
+          "ontology": {
+            "status": "NOT_RUN",
+            "kernelRevision": null,
+            "assertions": []
+          },
+          "result": {
+            "decision": "ADMIT",
+            "escalationRevision": "summary-claim-resolution:val-09-v1"
+          },
+          "resolutionLayer": "COMPOSITE",
+          "validatorRevision": "summary-claim-validator:val-10-candidate-v1",
+          "canonicalAuthority": false,
+          "claimChecksum": "a5526c72ba7708b41804075e3a980e6819632d6b0602600ef1bb6dcd7323b46a",
+          "validationId": "scv:1d08610ed5d1bc739935f5c93f107dd76002f6d632a79d7dc25de70e7c5f6fec",
+          "validationChecksum": "f0be9c6df3665bafbde6d98698b212fc3e70871cfb3ccee6f9855cc8d48d0c7a"
+        },
+        {
+          "schema": "atlas.summary-claim-validation.v1",
+          "chunkId": "doc:pgvector:fe883c75f323441d:22",
+          "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+          "analysisId": null,
+          "summaryInputChecksum": "9f105a088a1812f0ef5e9f370cb6bf467f9da681c86cf77424c49e058f7a39fe",
+          "summaryOutputChecksum": "c886bc3b72168a6fdb61d6fe31b4a3bcbbcb0ce046f1cf4089919551c759adc3",
+          "claimOrdinal": 4,
+          "claimText": "For filtering by a few distinct values, partial indexing is suggested, while partitioning is recommended when filtering by many different values.",
+          "technical": {
+            "status": "PASS",
+            "sourceTokens": [
+              "B-tree",
+              "CURRENT_UPSTREAM",
+              "Open-source",
+              "SP-GiST",
+              "WHERE",
+              "category_id",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan",
+              "location_id",
+              "strict_order",
+              "vector_l2_ops"
+            ],
+            "claimTokens": [],
+            "missingTechnicalTokens": [
+              "CURRENT_UPSTREAM",
+              "hnsw.ef_search",
+              "hnsw.iterative_scan"
+            ],
+            "unexpectedTechnicalTokens": []
+          },
+          "numeric": {
+            "status": "PASS",
+            "sourceValues": [
+              "123",
+              "3",
+              "1",
+              "2",
+              "5",
+              "10%",
+              "40",
+              "4",
+              "2026",
+              "09",
+              "23"
+            ],
+            "claimValues": [],
+            "unsupportedValues": []
+          },
+          "version": {
+            "status": "PASS",
+            "sourceVersions": [],
+            "claimVersions": [],
+            "unsupportedVersions": []
+          },
+          "sourceSpan": {
+            "status": "NO_CLAIMED_SPAN",
+            "spans": []
+          },
+          "semantic": {
+            "status": "JUDGED",
+            "verdict": "SUPPORTED",
+            "citedSpans": [],
+            "unsupportedFragment": null,
+            "judgeModelId": "ornith-1.5-9b",
+            "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+            "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+            "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE"
+          },
+          "ontology": {
+            "status": "NOT_RUN",
+            "kernelRevision": null,
+            "assertions": []
+          },
+          "result": {
+            "decision": "ADMIT",
+            "escalationRevision": "summary-claim-resolution:val-09-v1"
+          },
+          "resolutionLayer": "COMPOSITE",
+          "validatorRevision": "summary-claim-validator:val-10-candidate-v1",
+          "canonicalAuthority": false,
+          "claimChecksum": "1845d0f74c07050d3d129efb70c30d9cff0a70a66d23a9e6ab12447a0989920d",
+          "validationId": "scv:7daaaa635c3dd41ca93e7ca93f0121d7954e71981dac096e788357fc7c21ef33",
+          "validationChecksum": "a168c3243a21c4592beb30d36e8c2b8e39ce4bafdfd2eb1259221bc39452203e"
+        }
+      ],
+      "eligibility": {
+        "schema": "atlas.summary-eligibility.v1",
+        "candidateId": "sc:d8682b7baa1bd3865d0c5d3cde8e200287d24c69a04a94c5775a1f3d07c8da86",
+        "claimSetChecksum": "d1bcb9b36cab7ad8f4f57a7e5c90a4faece26e78b140ac0a8330f003baf0f494",
+        "validationContractRevision": "summary-claim-validator:val-10-candidate-v1",
+        "spineRevision": "d3184d91e3ad67a1b21d0d54ca1734f60800a65435cad28197a88cb9e72f6cd0",
+        "judgePromptRevision": "summary-claim-judge-prompt:val-07-v1",
+        "judgeModelRevision": "ornith-1.5-9b:hforf.gguf",
+        "resolverPolicyRevision": "summary-claim-resolution:val-09-v1",
+        "resolutions": [
+          {
+            "claimOrdinal": 0,
+            "claimChecksum": "f62f1ff1cfeef00ea797f65c37855686dcb13d2e1232985fdf07768cb5fc79f3",
+            "validationId": "scv:706aacd45859b7e54f789e6ee032e7b235306149a847f2ac11261f9d74578895",
+            "validationChecksum": "b91fa1d9b4befbbd898c3fcbaa9671dc341720f5dad3ca9e513ccb5adad29268",
+            "judgeInputChecksum": "50d51b7639da7b672499519ff02efd8e67fdc002b77b38107f6b78b0b9b7f342",
+            "decision": "ADMIT",
+            "resolutionLayer": "COMPOSITE"
+          },
+          {
+            "claimOrdinal": 1,
+            "claimChecksum": "3fdeab111632b87024b296cf29421fe2b71512f22980b56367312de9472b6ed5",
+            "validationId": "scv:d1e14bd29abee33d247ccbd7b94bf19e8f3a5dbeff25d68d471d8d4b1f15a5d3",
+            "validationChecksum": "cf89571b321abd5bd91eb5c5c3975704808ebc4b95079d8e67b53f890363b176",
+            "judgeInputChecksum": "cf404e15d3c70ce8c25c82427bcb72b736c520184eba7745c586fc4035819059",
+            "decision": "ADMIT",
+            "resolutionLayer": "COMPOSITE"
+          },
+          {
+            "claimOrdinal": 2,
+            "claimChecksum": "620257a51058d0a9431a08461531e885761a1825f05b9744a7bcd14358c0fde4",
+            "validationId": "scv:d9a29faae1ff2656e811ecb4a04e5c501191978a0df3b3525ca103998545dd2b",
+            "validationChecksum": "3fee99313184fd99e442726319e9ec035f8ba97a90e7e972b1096030ed908d60",
+            "judgeInputChecksum": "94537e2d003565a27136c6c7a2c6df8b2500ef105d96a877e3920f0a0a966302",
+            "decision": "REJECT",
+            "resolutionLayer": "TECHNICAL"
+          },
+          {
+            "claimOrdinal": 3,
+            "claimChecksum": "a5526c72ba7708b41804075e3a980e6819632d6b0602600ef1bb6dcd7323b46a",
+            "validationId": "scv:1d08610ed5d1bc739935f5c93f107dd76002f6d632a79d7dc25de70e7c5f6fec",
+            "validationChecksum": "f0be9c6df3665bafbde6d98698b212fc3e70871cfb3ccee6f9855cc8d48d0c7a",
+            "judgeInputChecksum": "179d608dd35fe8aaa81aba769ce0b09d2cebb49c592fb34fb8bfd6ba9f11c6ef",
+            "decision": "ADMIT",
+            "resolutionLayer": "COMPOSITE"
+          },
+          {
+            "claimOrdinal": 4,
+            "claimChecksum": "1845d0f74c07050d3d129efb70c30d9cff0a70a66d23a9e6ab12447a0989920d",
+            "validationId": "scv:7daaaa635c3dd41ca93e7ca93f0121d7954e71981dac096e788357fc7c21ef33",
+            "validationChecksum": "a168c3243a21c4592beb30d36e8c2b8e39ce4bafdfd2eb1259221bc39452203e",
+            "judgeInputChecksum": "b89c28796b40af454a7cc271407379ed2cd8ac63c1f4a3b0c6d63ce60bfa94c7",
+            "decision": "ADMIT",
+            "resolutionLayer": "COMPOSITE"
+          }
+        ],
+        "eligible": false,
+        "eligibilityChecksum": "4b8964cbeb78b23a274b450cc1e9d6643877441b4712f970e8b880d6948e1376"
+      }
+    }
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

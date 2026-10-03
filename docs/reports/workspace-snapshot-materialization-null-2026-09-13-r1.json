@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.workspace-source-materialization.v1",
+  "result": null,
+  "status": "SNAPSHOT_SOURCE_CHANGED_BEFORE_MATERIALIZATION",
+  "snapshotRevision": "sha256:e88bfd888b86298c8a2cc450806afbe9dfc4cb03ac4e570c4ff928cfab8e4971",
+  "failedSource": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+  "materializedRoot": ".tmp/workspace-source-snapshots/e88bfd888b86298c8a2cc450806afbe9dfc4cb03ac4e570c4ff928cfab8e4971",
+  "partialSentinel": ".tmp/workspace-source-snapshots/e88bfd888b86298c8a2cc450806afbe9dfc4cb03ac4e570c4ff928cfab8e4971.partial",
+  "cleanupPerformed": false,
+  "writesPerformed": false,
+  "nextSafeAction": "Do not remove or reuse the partial tree automatically; stabilize the worktree, review the exact sentinel, then capture/materialize a fresh snapshot."
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.summary-candidate-frozen-replay.v1",
+  "gate": "VAL10_FROZEN_COHORT_DETERMINISTIC_REPLAY",
+  "candidateCohortChecksum": "63e83c53bde93be1c9f759dcee00d002d510b6ea0b2d1c9a1b189a0825e93691",
+  "candidates": 19,
+  "claims": 46,
+  "modelCalls": 0,
+  "identical": true,
+  "mismatches": [],
+  "spineRevisionFrozen": "d3184d91e3ad67a1b21d0d54ca1734f60800a65435cad28197a88cb9e72f6cd0",
+  "spineRevisionNow": "d3184d91e3ad67a1b21d0d54ca1734f60800a65435cad28197a88cb9e72f6cd0",
+  "counts": {
+    "candidates": 19,
+    "claims": 46,
+    "eligible": 19,
+    "ineligible": 0,
+    "claimDecisions": {
+      "ADMIT": 46
+    }
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

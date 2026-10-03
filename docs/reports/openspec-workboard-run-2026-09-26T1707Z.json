@@ -1,0 +1,100 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-26T17:07:30Z",
+  "status": "PIVOT_RECORDED_SNAPSHOT_CONFLICT_RECONCILED_LARGE_CORPUS_JOIN_BLOCKED",
+  "fromChange": "parent-atlas-repair-candidate-feature-matrix",
+  "toChange": "parent-atlas-candidate-feature-execution-fabric",
+  "pivotReason": "The RF-04 HINT feature coordinate must use the repository PACKET identity owner (packet_key), while the large-corpus enrichment lane remains blocked on exact source/path identity joins. Keep these workstreams separate and do not promote HINT or MapReduce artifacts into canonical evidence.",
+  "workboard": {
+    "snapshot": "docs/reports/openspec-workboard-pivot-20260926T1707Z.json",
+    "markdown": "docs/reports/openspec-workboard-pivot-20260926T1707Z.md",
+    "changes": 88,
+    "tasks": 9630,
+    "open": 3253,
+    "builderStatus": "OPENSPEC_WORKBOARD_BUILT"
+  },
+  "executionController": {
+    "state": "WAITING",
+    "totalTasks": 9630,
+    "proven": 6379,
+    "actionable": 2181,
+    "waiting": 964,
+    "deferred": 106,
+    "writesPerformed": false,
+    "controllerPrimaryReportsRefreshed": [
+      "openspec-execution-controller-v1.json",
+      "openspec-actionable-work-v1.json",
+      "openspec-waiting-dependencies-v1.json",
+      "openspec-deferred-discoveries-v1.json",
+      "openspec-dependency-cycles-v1.json",
+      "openspec-agent-error-receipts-v1.json",
+      "openspec-blocker-audit-v1.json"
+    ],
+    "blockerGroups": {
+      "DECLARED_TASK_DEPENDENCY": 576,
+      "CANONICAL_AUTHORIZATION": 221,
+      "PACKET_MATERIALIZATION": 18,
+      "CURRENT_SOURCE_AUTHORITY": 111,
+      "CANDIDATE_POPULATION_FREEZE": 38
+    },
+    "stagingReports": "docs/reports/staging/openspec-pivot-20260926T1705Z/"
+  },
+  "workAttempted": [
+    {
+      "gate": "CEI-24-SNAPSHOT-CONFLICT-REPLAY-01",
+      "result": "packet_key snapshot reproduced; packet_id coordinate superseded for this packet candidate feature proof",
+      "candidateRows": 16151,
+      "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+      "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+      "hintRows": 330,
+      "exactChunkHints": 322,
+      "unmatchedHints": 8,
+      "maxAggregatedCandidateValues": 178,
+      "unavailableCandidates": 15973,
+      "receipt": "docs/reports/cei24-snapshot-conflict-replay-v1-20260926T1705Z.json"
+    },
+    {
+      "gate": "LARGE-CORPUS exact current binding replay",
+      "result": "admitted source cohort proven, but file/path join to the MapReduce input remains unresolved",
+      "authorityAudit": "docs/reports/current-source-authority-cohort-v1.802a09590280.json",
+      "authorityStatus": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+      "admittedSources": 25542,
+      "exactRootBindings": 24456,
+      "nestedBindingsAbsent": 1086,
+      "mapReduceRowsWithExactIndexedPath": 0,
+      "crosswalk": "docs/reports/mapreduce-primary-postgres-crosswalk-v1-20260926T170724Z.json"
+    }
+  ],
+  "validation": {
+    "parent-atlas-repair-candidate-feature-matrix": "STRICT_VALID",
+    "parent-atlas-candidate-feature-execution-fabric": "STRICT_VALID"
+  },
+  "boundaries": {
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "neo4jWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0,
+    "summaryEmbeddingOrCosineRecomputed": false
+  },
+  "nextOpenTask": "LARGE_CORPUS_CANONICAL_JOIN_01: identify an existing admitted exact identity join for the 5,000 metadata rows; do not normalize paths or reuse content hashes alone.",
+  "likely_cause": "The competing CEI-24 artifacts ordered the same packet universe by different identifiers, while the large MapReduce corpus carries path/hash metadata without the exact admitted source identity keys needed for canonical joining.",
+  "evidence": [
+    "docs/reports/cei24-candidate-snapshot-convergence-v1-20260926T170421.895Z.json",
+    "docs/reports/cei24-packet-chunk-summary-hint-crosswalk-v1-20260926T170429Z.json",
+    "docs/reports/cei24-snapshot-conflict-replay-v1-20260926T1705Z.json",
+    "docs/reports/current-source-authority-cohort-v1.802a09590280.json",
+    "docs/reports/mapreduce-primary-postgres-crosswalk-v1-20260926T170724Z.json"
+  ],
+  "patch_targets": [
+    "openspec/changes/parent-atlas-repair-candidate-feature-matrix/tasks.md",
+    "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
+    "scripts/atlas/validate-large-corpus-enrichment-shards-v1.mjs",
+    "scripts/atlas/audit-large-corpus-shards-postgres-reconciliation-v1.mjs"
+  ],
+  "safe_next_command": "npx tsx scripts/atlas/materialize-cei24-candidate-ordinal-map-v1.mts",
+  "smoke_command": "npx openspec validate parent-atlas-repair-candidate-feature-matrix --strict; npx openspec validate parent-atlas-candidate-feature-execution-fabric --strict",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-26T1707Z.json"
+}

@@ -33,6 +33,12 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 
+# Keep the diagnostic/training CLI usable on Windows PowerShell as well as UTF-8 shells.
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 ROOT = Path(__file__).resolve().parent.parent.parent
 
 sys.path.insert(0, str(ROOT / 'python'))
@@ -424,6 +430,10 @@ def main():
     rows = load_csv(CSV_PATH)
 
     if args.dry_run:
+        if not rows:
+            print('ERROR: training dataset contains 0 rows; refusing to validate or train an empty model input')
+            print('Run the revision-qualified feature export after its lineage/label gates pass.')
+            sys.exit(1)
         X, y, groups = build_arrays(rows)
         print(f'Feature matrix: {X.shape[0]:,} × {X.shape[1]} | label range [{y.min():.3f}, {y.max():.3f}]')
         print(f'Positive labels (>0): {(y > 0).sum():,} ({100*(y>0).mean():.1f}%)')

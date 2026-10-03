@@ -1,0 +1,272 @@
+{
+  "schema": "atlas.feature-matrix-column-coverage.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "shardManifest": ".tmp\\atlas\\current-enriched-index-shards-v1\\20260925T202948Z\\manifest.json",
+  "shardRootSha256": "36838a25e26633e337af7d676a14dfda824258ab4e0c6b3f0782ff5f4e8281ba",
+  "qualifiedRowsInput": 15732,
+  "packetRowsMatched": 15732,
+  "distinctPacketKeys": 15732,
+  "columnCoverage": {
+    "semantic_embedding_present": {
+      "count": 15694,
+      "fraction": 0.9976
+    },
+    "latent_64_present": {
+      "count": 3013,
+      "fraction": 0.1915
+    },
+    "som_cell": {
+      "count": 15606,
+      "fraction": 0.992
+    },
+    "som_revision_present": {
+      "count": 0,
+      "fraction": 0
+    },
+    "kmeans_cluster": {
+      "count": 15694,
+      "fraction": 0.9976
+    },
+    "community_id": {
+      "count": 15694,
+      "fraction": 0.9976
+    },
+    "community_confidence": {
+      "count": 15606,
+      "fraction": 0.992
+    },
+    "pagerank": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "betweenness": {
+      "count": 0,
+      "fraction": 0
+    },
+    "eigenvector": {
+      "count": 0,
+      "fraction": 0
+    },
+    "k_core": {
+      "count": 2729,
+      "fraction": 0.1735
+    },
+    "authority_score": {
+      "count": 4758,
+      "fraction": 0.3024
+    },
+    "domain_class": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "primary_domain": {
+      "count": 0,
+      "fraction": 0
+    },
+    "domain_confidence": {
+      "count": 554,
+      "fraction": 0.0352
+    },
+    "concept_ids_nonempty": {
+      "count": 15606,
+      "fraction": 0.992
+    },
+    "extracted_entities_nonempty": {
+      "count": 0,
+      "fraction": 0
+    },
+    "keywords_nonempty": {
+      "count": 3475,
+      "fraction": 0.2209
+    },
+    "ast_score": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "reward_prior": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "summary_nonempty": {
+      "count": 3295,
+      "fraction": 0.2094
+    },
+    "representation_revision_present": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "embedding_digest_present": {
+      "count": 0,
+      "fraction": 0
+    },
+    "embedding_version_present": {
+      "count": 13962,
+      "fraction": 0.8875
+    },
+    "lineage_binding_checksum_present": {
+      "count": 15732,
+      "fraction": 1
+    },
+    "qdrant_point_id_present": {
+      "count": 3143,
+      "fraction": 0.1998
+    }
+  },
+  "embeddingDimensions": [
+    {
+      "dim": 768,
+      "n": 15694
+    }
+  ],
+  "representationVersions": [
+    {
+      "embedding_version": "5b807996620f68bdc0e1defd6de4ee9d1bc56d90bc72f7994bf00080b36cdb74",
+      "representation_revision": "0",
+      "source_representation_id": "(null)",
+      "n": 13962
+    },
+    {
+      "embedding_version": "(null)",
+      "representation_revision": "0",
+      "source_representation_id": "(null)",
+      "n": 1770
+    }
+  ],
+  "candidateTiers": {
+    "dense_ge_0_95": [
+      "semantic_embedding_present",
+      "som_cell",
+      "kmeans_cluster",
+      "community_id",
+      "community_confidence",
+      "pagerank",
+      "domain_class",
+      "concept_ids_nonempty",
+      "ast_score",
+      "reward_prior",
+      "representation_revision_present",
+      "lineage_binding_checksum_present"
+    ],
+    "partial_0_05_to_0_95": [
+      "latent_64_present",
+      "k_core",
+      "authority_score",
+      "keywords_nonempty",
+      "summary_nonempty",
+      "embedding_version_present",
+      "qdrant_point_id_present"
+    ],
+    "sparse_lt_0_05": [
+      "som_revision_present",
+      "betweenness",
+      "eigenvector",
+      "primary_domain",
+      "domain_confidence",
+      "extracted_entities_nonempty",
+      "embedding_digest_present"
+    ]
+  },
+  "rules": [
+    "coverage != quality",
+    "cluster/SOM/community are projections, never identity",
+    "a column below 0.95 needs an explicit missing-value mask, not imputation"
+  ],
+  "generatedAt": "2026-09-25T20:33:54.992Z",
+  "informationContent": {
+    "method": "count(distinct) per column over the qualified rows (read-only)",
+    "ast_score": {
+      "distinct": 2,
+      "range": [
+        0,
+        0.85
+      ],
+      "verdict": "near-constant flag, not a usable feature"
+    },
+    "reward_prior": {
+      "distinct": 2,
+      "range": [
+        0,
+        0.3
+      ],
+      "verdict": "near-constant flag, not a usable feature"
+    },
+    "community_confidence": {
+      "distinct": 2,
+      "range": [
+        0.7,
+        0.95
+      ],
+      "verdict": "two-level tag, not a usable feature"
+    },
+    "representation_revision": {
+      "distinct": 1,
+      "value": 0,
+      "verdict": "legacy integer 0 everywhere: present but NOT a qualified representation revision"
+    },
+    "pagerank": {
+      "distinct": 434,
+      "verdict": "usable, heavy-tailed (max 10.1)"
+    },
+    "kmeans": {
+      "distinct": 106,
+      "verdict": "projection metadata"
+    },
+    "som_cell": {
+      "distinctX": 20,
+      "verdict": "projection metadata; som_revision absent so not revision-bound"
+    },
+    "community_id": {
+      "distinct": 4321,
+      "verdict": "projection metadata"
+    },
+    "concept_cardinality": {
+      "distinct": 13,
+      "range": [
+        1,
+        116
+      ],
+      "verdict": "usable count feature"
+    }
+  },
+  "firstMatrixRecommendation": {
+    "numeric": [
+      "pagerank (log1p)",
+      "concept_cardinality",
+      "summary_present (mask)",
+      "keywords_present (mask)"
+    ],
+    "vector": [
+      "semantic_768 from packet.embedding ONLY where summary present (3,295); mask the shared placeholder vector"
+    ],
+    "categoricalProjections": [
+      "domain_class",
+      "kmeans_cluster",
+      "community_id",
+      "som_cell"
+    ],
+    "excluded": [
+      "ast_score",
+      "reward_prior",
+      "community_confidence",
+      "representation_revision"
+    ],
+    "blockers": [
+      "no qualified representation_revision (all 0)",
+      "som_revision absent",
+      "embedding_digest absent"
+    ]
+  },
+  "correction": {
+    "supersedes": "columnCoverage.semantic_embedding_present (0.9976)",
+    "finding": "12,399 of 15,694 qualified packets with an embedding share ONE identical vector (no summary); only 3,295 distinct vectors exist, matching the 3,295 summarized packets",
+    "effectiveEmbeddingCoverage": {
+      "real": 3295,
+      "placeholder": 12399,
+      "absent": 38,
+      "fractionReal": 0.2094
+    },
+    "detectedBy": "smoke-validate-enriched-index-v1.mjs",
+    "note": "presence != usable; embedding_eligible is false on all 15,694 so it does not separate them"
+  }
+}

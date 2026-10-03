@@ -158,12 +158,12 @@ async function main() {
   if (!reports.gpu) {
     blockers.push({ source: 'gpu', detail: 'G18: gpu-bridge-probe.json missing' });
   } else {
-    const liveCount = Number(reports.gpu.live_count ?? 0);
+    const backendProvenCount = Number(reports.gpu.backend_proven_count ?? 0);
     if (reports.gpu.cuda_available !== true) {
       blockers.push({ source: 'gpu', detail: 'G18: CUDA not confirmed by checkCudaAvailable()' });
     }
-    if (liveCount < 10) {
-      blockers.push({ source: 'gpu', detail: `G18: only ${liveCount} live GPU bridge functions detected; need >= 10` });
+    if (backendProvenCount < 10) {
+      blockers.push({ source: 'gpu', detail: `G18: only ${backendProvenCount} backend-proven bridge functions detected; need >= 10` });
     }
   }
 
@@ -222,7 +222,9 @@ async function main() {
       '',
       '## Reports',
       '',
-      `- GPU live count: ${reports.gpu?.live_count ?? 'missing'}`,
+      `- GPU backend-proven count: ${reports.gpu?.backend_proven_count ?? 0}`,
+      `- GPU shape-valid count: ${reports.gpu?.shape_valid_count ?? 'missing'}`,
+      `- Legacy unqualified GPU live_count: ${reports.gpu?.live_count ?? 'missing'}`,
       `- Postgres version: ${reports.pgSchema?.postgres_version ?? 'missing'}`,
       `- parent_atlas_documents: ${reports.pgSchema?.gates?.parent_atlas_documents_exists ? 'present' : 'missing'}`,
       `- alias_id on task_semantic_packets: ${reports.pgSchema?.gates?.alias_id_verified ? 'present' : 'missing'}`,

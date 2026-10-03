@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-agentic-completion:AGENT-09:fixture-worktree-v1",
+  "evidenceType": "EXECUTION",
+  "changeId": "parent-atlas-agentic-completion",
+  "taskId": "AGENT-09",
+  "claim": "The existing PatchTournament planner has a bounded three-candidate isolated-worktree fixture worker with source readback, static checks, focused tests, deterministic ranking, ACE output, and no automatic apply.",
+  "gitCommit": "68dedecf145ad63d9cd2aa0bad5b4dbd347f952e",
+  "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
+  "sourceRevision": "sha256:60e09a4fd1ecd4c26c8da18d49109bcbf9e4aa102f90d5b19652243de1a671e1",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-agentic-completion/tasks.md",
+      "lineStart": 14,
+      "lineEnd": 15,
+      "sourceRevision": "sha256:15ea6edca7f91a1db1e6e3d3dcfdfcc86ce1a9f8e230343c31049dcc7a1fa888"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/run-patch-tournament-worktree-fixture-v1.mts",
+  "command": "npm run atlas:tournament:worktree:fixture",
+  "inputs": [
+    {
+      "kind": "fixture_execution",
+      "uri": "docs/reports/patch-tournament-worktree-fixture-v1.json",
+      "checksum": "sha256:e6fedff14bd2f8f190a51d5de4e4e4c72d2c67fdc11d4897f4cbbb6d09a1e767"
+    }
+  ],
+  "observedAt": "2026-10-01T15:59:52.073Z",
+  "expectedAssertions": [
+    {
+      "id": "isolated-worktrees",
+      "expected": "three candidate worktrees execute from one base revision"
+    },
+    {
+      "id": "source-readback",
+      "expected": "each candidate reads back the unchanged base revision before and after its uncommitted patch"
+    },
+    {
+      "id": "candidate-checks",
+      "expected": "static and focused checks are recorded for all candidates"
+    },
+    {
+      "id": "live-admission",
+      "expected": "an admitted live source frame and separately authorized live execution are available"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "isolated-worktrees",
+      "actual": "3 temporary Git worktrees executed",
+      "passed": true
+    },
+    {
+      "id": "source-readback",
+      "actual": "all fixture candidates retained the base revision during patch execution",
+      "passed": true
+    },
+    {
+      "id": "candidate-checks",
+      "actual": "two candidates passed static/focused checks and one candidate was blocked",
+      "passed": true
+    },
+    {
+      "id": "live-admission",
+      "actual": "fixture-only execution; live source admission and authorization remain unavailable",
+      "passed": false
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "ace_and_kanban_projection",
+      "uri": "docs/reports/patch-tournament-worktree-fixture-v1.json",
+      "checksum": "sha256:e6fedff14bd2f8f190a51d5de4e4e4c72d2c67fdc11d4897f4cbbb6d09a1e767"
+    }
+  ],
+  "verifier": "scripts/atlas/audit-openspec-evidence-fabric-v1.mjs",
+  "readbackRequired": true,
+  "readbackPerformed": true,
+  "readbackCommand": "node -e \"const r=require('docs/reports/patch-tournament-worktree-fixture-v1.json'); if(r.candidateCount!==3 || !r.tournament.noAutoApply) process.exit(1)\"",
+  "verdict": "PARTIAL",
+  "checksum": "sha256:7c0060507125b7d3f670ea0fe6099a214721c77c12c724b42f84e59697dc5019"
+}

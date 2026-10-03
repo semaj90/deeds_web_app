@@ -1,0 +1,848 @@
+{
+  "schema": "atlas.summary-hint-nlp-quality-review.v1",
+  "status": "EXPANSION_BLOCKED_QUALITY_GAPS_FOUND",
+  "generatedAt": "2026-09-26T07:59:41.553Z",
+  "input": {
+    "proposalPath": ".tmp/atlas/summary-nlp-hint-v1/20260926T0735Z/proposals.ndjson",
+    "proposalSha256": "sha256:27553299c947bab560109f00694b69062129159c0cef69eea815d834c7b1ace7",
+    "censusRootChecksum": "sha256:a12d6d33250cdb681231f93edcfed5e2551359676ec3b869994f23a19bde59f9",
+    "censusPath": ".tmp/atlas/summary-search-census-v1/20260926T062750Z"
+  },
+  "counts": {
+    "proposals": 32,
+    "inputRowsReconciled": 32,
+    "censusDetectorPreviouslyClean": 32,
+    "sharedDetectorClean": 28,
+    "sharedDetectorBlocked": 4,
+    "promptOrReasoningResidue": 4,
+    "exactSpanEntities": 38,
+    "duplicateSpanEntities": 0,
+    "genericOrMislabelledEntities": 20,
+    "lowInformationEntities": 9,
+    "sourceRefMissing": 31,
+    "lineageBound": 1,
+    "unqualifiedHint": 31,
+    "emptyEntityLists": 6
+  },
+  "aggregateDisposition": {
+    "accepted": 0,
+    "rejectedGenericOrMislabelled": 20,
+    "rejectedLowInformation": 9,
+    "manualReviewRequired": 9,
+    "proposalAdmission": "NONE; NLP fields remain suggestions"
+  },
+  "findings": [
+    {
+      "ordinal": 30832,
+      "chunkRowId": "c237677b-2f07-4938-916f-2f44472fef6e",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0004033129bca63a45859245b77a4394b239ad875f6d4b51d36989c1316d797f",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "CSS",
+          "label": "ORG",
+          "span": [
+            5,
+            8
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "ok, warn",
+          "label": "ORG",
+          "span": [
+            238,
+            246
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 38221,
+      "chunkRowId": "f31c3017-a84c-4cea-b483-ec6d22366c29",
+      "sourceRef": "docs/guides/proof_depth_track_checklist.md",
+      "trustState": "LEGACY_HINT_LINEAGE_BOUND",
+      "summaryDigest": "sha256:0006f20e0cdccce7b85516c4124a16dd1a475f65363a92edb06393f6bd34ba60",
+      "residue": [
+        "TURN_CONTROL_MARKER"
+      ],
+      "entityReviews": [
+        {
+          "text": "ANN",
+          "label": "ORG",
+          "span": [
+            88,
+            91
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        },
+        {
+          "text": "IndexedDB",
+          "label": "NORP",
+          "span": [
+            228,
+            237
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 25516,
+      "chunkRowId": "9fe144df-3d4f-4ffa-bd4d-f587df1a07d0",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0008e901247e6d70dd86fe18359c76756b0f04c87a126cfbf55bcbbdef62de49",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "May 4th to May 9th, 2026",
+          "label": "DATE",
+          "span": [
+            234,
+            258
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 37372,
+      "chunkRowId": "ede1478c-14ee-471a-9ee1-20ae88165880",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:000dcc5c4190802f618df155f0d01559a4f75eb6381663dfd0a4331dffadeddc",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "function to",
+          "label": "CODE_SYMBOL",
+          "span": [
+            166,
+            177
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 39026,
+      "chunkRowId": "f810e3bc-bf3c-4fab-8bbd-603aff473074",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0012e9324342796465a5abc114587e2b9c46d3edccf255edc8d0d05cd7d08ef9",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "Redis",
+          "label": "PERSON",
+          "span": [
+            129,
+            134
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 20180,
+      "chunkRowId": "7cd9f423-60ae-4931-8874-10a1b42246f9",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:001337f8e541b38b0e04bc786e006ffee65a9bb2200ad32c4fc16020af3166eb",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "function implements",
+          "label": "CODE_SYMBOL",
+          "span": [
+            5,
+            24
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 28212,
+      "chunkRowId": "b12fd680-af07-4239-89cc-6cfba4c9c045",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0019cecab01d34a01f26d6c8814ec43a86e3ab5328cb4672f464d17d7198ee7e",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "TypeScript",
+          "label": "ORG",
+          "span": [
+            26,
+            36
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 38949,
+      "chunkRowId": "f7927df3-d83a-460e-8a0b-7e799178bb89",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:001af27536fc396be896550bad0eb7c6e24b6376a5402cec64e0b4234f93c20b",
+      "residue": [],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 37690,
+      "chunkRowId": "efc43ccc-8be7-4781-9941-b7c56c916d48",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:001c8052d4b3a50abc5caadf6989214137aca2c3180b7d8e7682da28c03095ac",
+      "residue": [],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 38808,
+      "chunkRowId": "f6a6e666-0d8d-4adb-9f4d-099cb539ef41",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:001da94d995aa5a32d362282a0cc60b866ae988ebe1396ae67f750bfaf208ab5",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "JavaScript",
+          "label": "ORG",
+          "span": [
+            5,
+            15
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "Promise.all",
+          "label": "ORG",
+          "span": [
+            213,
+            224
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 30248,
+      "chunkRowId": "be2cc499-20aa-404f-bd13-128715141e57",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:001e9e55cd6813ba2241398807cf4d5c2943045498abb84809ee431368145553",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "the Language Model",
+          "label": "PERSON",
+          "span": [
+            87,
+            105
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 19989,
+      "chunkRowId": "7bcad3d8-a076-434c-a1fa-5e9557cfc146",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002026b8442a4b7721ba3481d53ebf4a0f640843ad75f1a2baffd9a4baee542b",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "function call",
+          "label": "CODE_SYMBOL",
+          "span": [
+            277,
+            290
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 20702,
+      "chunkRowId": "806d60f3-eac7-4e16-b86d-02afe56aa98c",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:00205011b904dd6c2c655d60fd0a6ea7ddb5192a7ffe1818faee0657e1b16a84",
+      "residue": [],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 13524,
+      "chunkRowId": "50faca89-6358-4ac0-a9e8-4d07d91776b8",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002796552e4dd731711d2f32974e196b542c0a7416a08c9c460c114f71babe2a",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "1",
+          "label": "CARDINAL",
+          "span": [
+            0,
+            1
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        },
+        {
+          "text": "4",
+          "label": "CARDINAL",
+          "span": [
+            91,
+            92
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 25892,
+      "chunkRowId": "a21830fe-ddc3-48ec-bb7f-f126bebd6458",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002b8adf2618b179713d57e535aa7f371be0475fa3445a3b01f04f094b676dee",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "function exports",
+          "label": "CODE_SYMBOL",
+          "span": [
+            5,
+            21
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "function to",
+          "label": "CODE_SYMBOL",
+          "span": [
+            71,
+            82
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 35582,
+      "chunkRowId": "e18a946f-6bb3-450a-b72e-462d3c03ba07",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002b8db2f6b64fef929ff3f626f88aa1f39f1e58dcab83b4a70e50371edbe78e",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "API",
+          "label": "ORG",
+          "span": [
+            201,
+            204
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 2050,
+      "chunkRowId": "09382878-ff3f-48b6-9618-7c8a49aa387a",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002be14cea6f0a5975b0c803bc8b629f0b2160cf92f5a9169491723c45fac59f",
+      "residue": [
+        "TURN_CONTROL_MARKER"
+      ],
+      "entityReviews": [
+        {
+          "text": "8090",
+          "label": "DATE",
+          "span": [
+            124,
+            128
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 19375,
+      "chunkRowId": "77fef46e-cd4d-4846-b5d3-59d8445151ca",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:002ca6f066c602947a8725c2e2022555218b7413385d9fcf59ee0a670da1cbf7",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "TurboQuant",
+          "label": "ORG",
+          "span": [
+            53,
+            63
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 31441,
+      "chunkRowId": "c6317676-d92a-4097-b029-875ddc5ddc20",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0031142fde62fd998254b669f940468a56ce876c094b16b8f511528bcb144f66",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "JavaScript",
+          "label": "ORG",
+          "span": [
+            5,
+            15
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 32022,
+      "chunkRowId": "c9e4b6cb-b71b-4585-a142-7dc7b5e3610e",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0033d402d34d091f2b88a753851027ce40c447c9c09c196c02d5d9d947d65771",
+      "residue": [],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 24722,
+      "chunkRowId": "9a936db2-8848-4eec-bc0c-515f8eb0012d",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:00352ca847c6bd305df1307430e1f010608e0962e65f6b17718cbbbef07988ba",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "KAG",
+          "label": "ORG",
+          "span": [
+            144,
+            147
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 23986,
+      "chunkRowId": "96274196-b3ec-46ab-bbfe-815e70a49b29",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0037f8b631c3719238e77e8bca4b292e4d4aaa1467435be8935f5ef687478b78",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "API",
+          "label": "ORG",
+          "span": [
+            26,
+            29
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "first",
+          "label": "ORDINAL",
+          "span": [
+            43,
+            48
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        },
+        {
+          "text": "ETag",
+          "label": "ORG",
+          "span": [
+            74,
+            78
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        },
+        {
+          "text": "JSON",
+          "label": "PERSON",
+          "span": [
+            211,
+            215
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 37839,
+      "chunkRowId": "f09aac69-4102-4587-99e4-bac779d5be05",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:003c7b0dbc5bbf97337dbdea976ca689dd56923b0f4a18b2507658fab8afee6f",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "three",
+          "label": "CARDINAL",
+          "span": [
+            148,
+            153
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 24253,
+      "chunkRowId": "97b824d6-1f4a-4bd2-ab6d-322037c44d2c",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:00405023cbcca2f239b1c06935d621930c49b89a43583734660c147f68d5c0cd",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "LegalSection",
+          "label": "ORG",
+          "span": [
+            239,
+            251
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 3702,
+      "chunkRowId": "1106f332-4b5c-439c-85aa-ea3268bb18c1",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:004159824ec0b14ded0ee6cd4f360f334aef37af7c1957f94445543d31d7cc2b",
+      "residue": [
+        "PROMPT_OR_REASONING_RESIDUE"
+      ],
+      "entityReviews": [
+        {
+          "text": "CodebaseAuditReport",
+          "label": "PRODUCT",
+          "span": [
+            48,
+            67
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        },
+        {
+          "text": "1",
+          "label": "CARDINAL",
+          "span": [
+            221,
+            222
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        },
+        {
+          "text": "TypeScript",
+          "label": "ORG",
+          "span": [
+            255,
+            265
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 20312,
+      "chunkRowId": "7d9c5156-27a4-4d8f-864b-58bb02e9741c",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:00443be3d78d78d202a95ed9b2d1b9c7882999c2f37c6628b22cd952c0980a85",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "500",
+          "label": "CARDINAL",
+          "span": [
+            448,
+            451
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 2269,
+      "chunkRowId": "0a48a1e5-1392-4f16-9ede-ae73578ab24f",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:00526f363240b2967c77617071017871c99fbd8e67b89943c1facd11d4771aba",
+      "residue": [
+        "PROMPT_OR_REASONING_RESIDUE"
+      ],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 20698,
+      "chunkRowId": "8067bf7d-b0e9-42c0-8a78-c9ca4e6d11b7",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:005941fa85a5dee2c7d6d3b9e7d599b0fc016139893615a7adb4936139c7b8e3",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "May 4th to May 6th, 2026",
+          "label": "DATE",
+          "span": [
+            273,
+            297
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_LOW_INFORMATION"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 22386,
+      "chunkRowId": "8b68d984-7d43-476e-80a1-18ec29ed97c9",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:005aa553be9e1c927990ee837f1137828c0076713c53f9bc695975c9db404d95",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "Vitest",
+          "label": "GPE",
+          "span": [
+            28,
+            34
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "Redis",
+          "label": "ORG",
+          "span": [
+            175,
+            180
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 30122,
+      "chunkRowId": "bd4af07f-96ef-46ce-bd4b-2047ddc0535e",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:005b047738be2abeac263f38e627a8a2d800064e15c4048c4b2cbacd7cff794c",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "SHA-256",
+          "label": "PRODUCT",
+          "span": [
+            237,
+            244
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REVIEW_FALSE_ENTITY_OR_USEFUL"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 22171,
+      "chunkRowId": "8a0c63d6-3861-468d-8395-c9518b990336",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:006058f6bc1c2766c63592fb9a814749280d90727dd39ed31772a1789e58b29b",
+      "residue": [],
+      "entityReviews": [],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    },
+    {
+      "ordinal": 32592,
+      "chunkRowId": "cda26655-4cfe-4ae9-b4b9-3c0502eeea06",
+      "sourceRef": null,
+      "trustState": "LEGACY_HINT_UNQUALIFIED",
+      "summaryDigest": "sha256:0067d8d7a308e41540efcb7ba67228abc83a851465fef3068b15fae906fdf11a",
+      "residue": [],
+      "entityReviews": [
+        {
+          "text": "CSS",
+          "label": "ORG",
+          "span": [
+            5,
+            8
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        },
+        {
+          "text": "UI",
+          "label": "ORG",
+          "span": [
+            51,
+            53
+          ],
+          "exactSpan": true,
+          "duplicateSpan": false,
+          "disposition": "REJECT_GENERIC_OR_MISLABELLED"
+        }
+      ],
+      "admission": "HINT_ONLY_NOT_ADMITTED",
+      "acceptedForCanonicalEnrichment": false
+    }
+  ],
+  "boundaries": {
+    "canonicalAuthority": false,
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "llmCalls": 0
+  }
+}

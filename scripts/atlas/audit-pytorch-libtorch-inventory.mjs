@@ -14,12 +14,36 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../../');
 const SAVE = process.argv.includes('--save');
 const DETAILED = process.argv.includes('--detailed');
+
+function rgFiles(globs, pattern) {
+  const args = [
+    '-l',
+    ...globs.flatMap((glob) => ['--glob', glob]),
+    '--glob', '!node_modules/**',
+    '--glob', '!.git/**',
+    '-e', pattern,
+    '.',
+  ];
+  let output;
+  try {
+    output = execFileSync('rg', args, { cwd: ROOT, encoding: 'utf8', windowsHide: true });
+  } catch (error) {
+    // ripgrep status 1 means a valid search with no matches, not an audit error.
+    if (error?.status === 1) return [];
+    throw error;
+  }
+  return output
+    .split(/\r?\n/)
+    .map((file) => file.trim())
+    .filter(Boolean)
+    .map((file) => file.replace(/^\.\\/, '').replaceAll('\\', '/'));
+}
 
 // Categories of PyTorch/LibTorch files
 const INVENTORY_PATTERNS = {
@@ -117,13 +141,9 @@ async function findPyTorchFiles() {
   // Find TypeScript/JavaScript files with PyTorch references
   let tsFiles = [];
   try {
-    const output = execSync(`rg --files --type ts --type js -g "!node_modules/**" -g "!.git/**" "pytorch|libtorch|torch|autoencoder"`, {
-      cwd: ROOT,
-      encoding: 'utf-8',
-    });
-    tsFiles = output.split('\n').filter(Boolean);
+    tsFiles = rgFiles(['*.ts', '*.tsx', '*.js', '*.mjs', '*.mts'], 'pytorch|libtorch|torch|autoencoder');
   } catch (e) {
-    console.log('No TypeScript/JavaScript PyTorch files found (or rg not in PATH)');
+    console.log(`TypeScript/JavaScript search unavailable: ${e.message}`);
   }
 
   console.log(`Found ${tsFiles.length} TS/JS files with PyTorch references.`);
@@ -145,13 +165,9 @@ async function findPyTorchFiles() {
   // Find Python files with torch references
   let pyFiles = [];
   try {
-    const output = execSync(`rg --files --type py -g "!node_modules/**" -g "!.git/**" "pytorch|torch"`, {
-      cwd: ROOT,
-      encoding: 'utf-8',
-    });
-    pyFiles = output.split('\n').filter(Boolean);
+    pyFiles = rgFiles(['*.py'], 'pytorch|torch');
   } catch (e) {
-    console.log('No Python PyTorch files found.');
+    console.log(`Python search unavailable: ${e.message}`);
   }
 
   console.log(`Found ${pyFiles.length} Python files with torch references.`);
@@ -163,13 +179,9 @@ async function findPyTorchFiles() {
   // Find C++ files
   let cppFiles = [];
   try {
-    const output = execSync(`rg --files --type cpp -g "!node_modules/**" -g "!.git/**" "libtorch"`, {
-      cwd: ROOT,
-      encoding: 'utf-8',
-    });
-    cppFiles = output.split('\n').filter(Boolean);
+    cppFiles = rgFiles(['*.cc', '*.cpp', '*.cxx', '*.h', '*.hpp'], 'libtorch|torch::');
   } catch (e) {
-    console.log('No C++ LibTorch files found.');
+    console.log(`C++ search unavailable: ${e.message}`);
   }
 
   console.log(`Found ${cppFiles.length} C++ files with PyTorch references.`);
@@ -219,13 +231,9 @@ async function findPyTorchFiles() {
   // Find native bindings
   let bindingFiles = [];
   try {
-    const output = execSync(`rg --files -g "!node_modules/**" -g "!.git/**" "\\.node$|tensorrt_bridge"`, {
-      cwd: ROOT,
-      encoding: 'utf-8',
-    });
-    bindingFiles = output.split('\n').filter(Boolean);
+    bindingFiles = rgFiles(['*.node'], '\\.(node)$|tensorrt_bridge');
   } catch (e) {
-    console.log('Native binding search completed.');
+    errors.push({ stage: 'native_binding_search', error: e.message });
   }
 
   console.log(`Found ${bindingFiles.length} native binding files.`);

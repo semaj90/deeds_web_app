@@ -98,3 +98,114 @@ def build_doc_coordinate(
         section_anchor=section_anchor,
         content_hash=content_hash,
     )
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# ExternalDocChunkEvidenceV1 -- CHUNK-grain evidence identity (EXTERNAL_DOC_CHUNK_EVIDENCE_IDENTITY_01).
+#
+# DocCoordinateV1 above is PAGE/VERSION identity and is carried UNCHANGED into every child chunk. A chunk's own
+# identity is its exact UTF-8 span + bytes under that page revision, hashed with the repository's canonical encoder
+# (a faithful port of sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.ts canonicalEncodeV1, so the
+# TypeScript admission adapter recomputes the identical value). headingPath / sectionAnchor / parser / chunker /
+# model revisions are deliberately NOT part of the identity: they are provenance/metadata.
+
+import re
+import struct
+import unicodedata
+from typing import Any
+
+EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA = "atlas.external-doc-chunk-evidence.v1"
+_SIMPLE_KEY = re.compile(r"^[a-z][A-Za-z0-9]*$")
+
+
+def external_doc_chunk_id_v2(*, source_id: str, chunk_evidence_revision: str) -> str:
+    """Return a version-scoped chunk identity without changing the legacy V1 chunk-id scheme.
+
+    V1 IDs are based on source id + document checksum + ordinal and therefore collide when
+    identical bytes are admitted under two product versions. V2 binds the exact chunk evidence
+    revision, which already includes the page/version revision, ordinal, UTF-8 span and chunk
+    checksum. Callers must not switch an existing corpus to V2 implicitly; admission integration
+    must explicitly select this contract and preserve existing V1 rows.
+    """
+    if not isinstance(source_id, str) or not source_id.strip():
+        raise ValueError("DOC_CHUNK_ID_V2_SOURCE_ID_REQUIRED")
+    if not isinstance(chunk_evidence_revision, str) or not re.fullmatch(r"sha256:[a-f0-9]{64}", chunk_evidence_revision):
+        raise ValueError("DOC_CHUNK_ID_V2_EVIDENCE_REVISION_INVALID")
+    digest = canonical_sha256_v1({
+        "schema": "atlas.external-doc-chunk-identity.v2",
+        "sourceId": source_id,
+        "chunkEvidenceRevision": chunk_evidence_revision,
+    })
+    return f"doc:v2:{digest}"
+
+
+def _length_prefixed(value: str) -> str:
+    normalized = unicodedata.normalize("NFC", value)
+    return f"{len(normalized.encode('utf-8'))}:{normalized}"
+
+
+def canonical_encode_v1(value: Any) -> str:
+    """Port of canonicalEncodeV1 (ATLAS_CANONICAL_V1). Object keys must be plain lowerCamel ASCII so codepoint order
+    equals the TypeScript ``localeCompare('en')`` order; anything else is rejected rather than risk a silent mismatch."""
+    if value is None:
+        return "n;"
+    if isinstance(value, bool):
+        return "b1;" if value else "b0;"
+    if isinstance(value, str):
+        return f"s{_length_prefixed(value)};"
+    if isinstance(value, (int, float)):
+        number = float(value)
+        if number != number or number in (float("inf"), float("-inf")):
+            raise TypeError("canonical encoding rejects NaN and Infinity")
+        return f"f{struct.pack('>d', 0.0 if number == 0 else number).hex()};"
+    if isinstance(value, (list, tuple)):
+        return f"a{len(value)}[{''.join(canonical_encode_v1(item) for item in value)}]"
+    if isinstance(value, dict):
+        for key in value:
+            if not isinstance(key, str) or not _SIMPLE_KEY.match(key):
+                raise TypeError(f"canonical object key not supported by the Python port: {key!r}")
+        keys = sorted(value)
+        return f"o{len(keys)}{{{''.join(f'k{_length_prefixed(key)};{canonical_encode_v1(value[key])}' for key in keys)}}}"
+    raise TypeError(f"canonical encoding does not support {type(value).__name__}")
+
+
+def canonical_sha256_v1(value: Any) -> str:
+    return sha256(canonical_encode_v1(value).encode("utf-8")).hexdigest()
+
+
+def chunk_evidence_revision(*, page_evidence_revision: str, ordinal: int, start_byte: int, end_byte: int, chunk_checksum: str) -> str:
+    """``sha256:<64 hex>`` (never truncated) over the chunk's identity inputs. Distinct spans/bytes/page revisions
+    always differ; deterministic replay is identical; heading metadata and producer revisions do not participate."""
+    if not page_evidence_revision:
+        raise ValueError("CHUNK_EVIDENCE_REQUIRES_PAGE_EVIDENCE_REVISION")
+    if end_byte <= start_byte or start_byte < 0:
+        raise ValueError("CHUNK_EVIDENCE_INVALID_BYTE_SPAN")
+    digest = canonical_sha256_v1({
+        "schema": EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA,
+        "pageEvidenceRevision": page_evidence_revision,
+        "ordinal": ordinal,
+        "startByte": start_byte,
+        "endByte": end_byte,
+        "chunkChecksum": chunk_checksum,
+    })
+    return f"sha256:{digest}"
+
+
+class ExternalDocChunkEvidenceV1(BaseModel):
+    """Chunk-grain evidence identity. ``chunk_evidence_revision`` is derived, never supplied."""
+
+    schema_: str = Field(default=EXTERNAL_DOC_CHUNK_EVIDENCE_SCHEMA, alias="schema")
+    page_evidence_revision: str = Field(..., min_length=8)
+    ordinal: int = Field(..., ge=0)
+    start_byte: int = Field(..., ge=0)
+    end_byte: int = Field(..., gt=0)
+    chunk_checksum: str = Field(..., pattern=r"^[a-f0-9]{64}$")
+
+    model_config = {"populate_by_name": True, "frozen": True}
+
+    @property
+    def chunk_evidence_revision(self) -> str:
+        return chunk_evidence_revision(
+            page_evidence_revision=self.page_evidence_revision, ordinal=self.ordinal,
+            start_byte=self.start_byte, end_byte=self.end_byte, chunk_checksum=self.chunk_checksum,
+        )

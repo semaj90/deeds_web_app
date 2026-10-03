@@ -1,0 +1,159 @@
+{
+  "schema": "atlas.wfu-04-ast-grep-tree-node-resolution.v1",
+  "generatedAt": "2026-09-23T19:28:52.229Z",
+  "task": "WFU-04_AST_GREP_TREE_NODE_RESOLUTION",
+  "resolverOwner": "packages/parent-atlas/src/core/ast-grep-tree-node-resolution-v1.ts (resolveAstGrepObservationTreeNodeV1; legacy resolveAstGrepTreeNodeIdsV1 is a wrapper over the same core)",
+  "observationContract": "AstGrepObservationV1 (structural-symbol.ts); live inputs are the ast-grep nomination stream (no persisted AstGrepObservationV1 rows exist), mapped source_ref/source_revision/byte_start/byte_end/upstream_node_id",
+  "astOwner": "atlas_ast_nodes / frozen revision-qualified AST snapshot (.tmp/atlas/current-source-ast-snapshot-v1.ndjson, schema atlas.revision-qualified-ast-node.v1)",
+  "sourceRefNormalization": "canonicalAstSourceRefV1 = the AST bridge convention (backslash->slash, drop leading \"sveltekit-frontend/\"); no case folding; root-identity loss surfaces as AMBIGUOUS, never silently chosen",
+  "sourceRevisionRule": "exact equality after the only accepted equivalence (sha256:<hex> == <hex>); missing/sentinel/non-64-hex revision => LINEAGE_MISMATCH; never equated with workspace/parser/graph/producer revisions",
+  "resolutionRules": [
+    "1 source_ref (normalized) then 2 source_revision exact",
+    "3 upstream_node_id (claim): must exist for ref+revision AND its span must contain the observation; failure never falls through",
+    "4 exact span: exactly one node => RESOLVED (EXACT_SPAN); >1 => AMBIGUOUS",
+    "5 unique containing node (frozen rule, admitted): exactly one containing node => RESOLVED (UNIQUE_CONTAINING_NODE); >1 => AMBIGUOUS; no best-overlap, no name/symbol matching, no confidence",
+    "6 zero => UNRESOLVED"
+  ],
+  "fixtures": {
+    "file": "packages/parent-atlas/test/ast-grep-observation-tree-node-resolution-v1.test.mjs",
+    "positive": [
+      "upstream id",
+      "exact span",
+      "unique containing",
+      "non-ASCII UTF-8 bytes",
+      "deterministic replay"
+    ],
+    "negative": [
+      "missing/wrong/sentinel revision",
+      "same span other source",
+      "same name other file",
+      "two containing nodes",
+      "two same-span nodes",
+      "duplicate upstream id",
+      "failed upstream id no fallthrough",
+      "no candidate",
+      "overlap only",
+      "stale-revision candidate"
+    ]
+  },
+  "liveCensus": {
+    "candidateSet": {
+      "name": "frozen AST snapshot",
+      "nodes": 565,
+      "distinctSourceRefs": 6,
+      "graphifyVsSourceRevisionSplit": 0
+    },
+    "primary": {
+      "observations": 461,
+      "withUpstreamNodeId": 461,
+      "resolvedByUpstreamNodeId": 0,
+      "resolvedByExactSpan": 0,
+      "resolvedByUniqueContainment": 0,
+      "unresolved": 461,
+      "ambiguous": 0,
+      "lineageMismatch": 0,
+      "reasons": {
+        "NO_CANDIDATES_FOR_SOURCE_REF": 461
+      }
+    },
+    "spanOnlySensitivity": {
+      "note": "NOT a resolution result: same census with the upstream_node_id claim ignored, to show how much depends on that claim",
+      "observations": 461,
+      "withUpstreamNodeId": 461,
+      "resolvedByUpstreamNodeId": 0,
+      "resolvedByExactSpan": 0,
+      "resolvedByUniqueContainment": 0,
+      "unresolved": 461,
+      "ambiguous": 0,
+      "lineageMismatch": 0,
+      "reasons": {
+        "NO_CANDIDATES_FOR_SOURCE_REF": 461
+      }
+    },
+    "snapshotSelfReplayControl": {
+      "note": "CONTROL, NOT EVIDENCE: each frozen-snapshot node replayed as an observation; shows resolver behavior on real candidate geometry (nested/duplicate spans stay AMBIGUOUS, never first-wins)",
+      "spanOnly": {
+        "observations": 565,
+        "withUpstreamNodeId": 0,
+        "resolvedByUpstreamNodeId": 0,
+        "resolvedByExactSpan": 565,
+        "resolvedByUniqueContainment": 0,
+        "unresolved": 0,
+        "ambiguous": 0,
+        "lineageMismatch": 0,
+        "reasons": {
+          "RESOLVED": 565
+        }
+      },
+      "withUpstreamNodeId": {
+        "observations": 565,
+        "withUpstreamNodeId": 565,
+        "resolvedByUpstreamNodeId": 565,
+        "resolvedByExactSpan": 0,
+        "resolvedByUniqueContainment": 0,
+        "unresolved": 0,
+        "ambiguous": 0,
+        "lineageMismatch": 0,
+        "reasons": {
+          "RESOLVED": 565
+        }
+      }
+    },
+    "observationVsCandidateFileOverlap": {
+      "note": "why the primary census is 0: the observation stream and the frozen AST snapshot cover disjoint files",
+      "observationSourceRefs": 20,
+      "snapshotSourceRefs": 6,
+      "intersection": 0
+    },
+    "liveAtlasAstNodes": {
+      "note": "read-only; only rows with source_revision AND byte span can be candidates",
+      "totals": {
+        "total": 11273,
+        "with_revision": 98,
+        "with_span": 210,
+        "qualified": 98
+      },
+      "candidates": 98,
+      "census": {
+        "observations": 461,
+        "withUpstreamNodeId": 461,
+        "resolvedByUpstreamNodeId": 0,
+        "resolvedByExactSpan": 0,
+        "resolvedByUniqueContainment": 0,
+        "unresolved": 461,
+        "ambiguous": 0,
+        "lineageMismatch": 0,
+        "reasons": {
+          "NO_CANDIDATES_FOR_SOURCE_REF": 461
+        }
+      }
+    }
+  },
+  "callableProjectionComparison": {
+    "note": "corroboration only, for RESOLVED outputs of the primary census; callable_search never resolved anything",
+    "callableRows": 285,
+    "resolvedChecked": 0,
+    "PROJECTION_AGREES": 0,
+    "PROJECTION_MISSING": 0,
+    "PROJECTION_STALE": 0,
+    "PROJECTION_CONFLICT": 0
+  },
+  "canonicalAuthority": {
+    "changed": false
+  },
+  "notEstablished": [
+    "CURRENT_SOURCE_AUTHORITY_PROVEN",
+    "canonical AST promotion",
+    "symbol-version admission",
+    "callable-search completeness",
+    "Graphify freshness"
+  ],
+  "result": "WFU_04_EXACT_AST_RESOLUTION_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

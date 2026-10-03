@@ -1,6 +1,6 @@
 {
   "schema": "atlas.pipeline-router-matrix-surfaces.v1",
-  "generatedAt": "2026-09-10T20:06:23.818Z",
+  "generatedAt": "2026-09-20T23:50:02.722Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "authority": false,
@@ -16,7 +16,7 @@
       "featureMatrixData": "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts",
       "canonicalRouterLiveConsumerCount": 2,
       "compatibilityVocabularyLiveConsumerCount": 0,
-      "featureMatrixLiveConsumerCount": 9
+      "featureMatrixLiveConsumerCount": 11
     }
   },
   "staticSurfaces": [
@@ -159,12 +159,14 @@
         "sveltekit-frontend/src/lib/server/atlas/retrieval/qas-neural-execution-bridge.ts",
         "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-adapter.ts",
         "sveltekit-frontend/src/lib/server/atlas/retrieval/search-runtime-qas-feature-resolver.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/candidate-feature-matrix-adapter-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/chunk-retrieval-profile-v1.ts",
         "sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.spec.ts",
         "sveltekit-frontend/src/lib/server/retrieval/repair-candidate-feature-matrix-v1.ts",
         "sveltekit-frontend/src/lib/server/retrieval/repair-feature-producer-v1.spec.ts",
         "sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.spec.ts"
       ],
-      "liveConsumerCount": 9
+      "liveConsumerCount": 11
     }
   ],
   "postgres": {
@@ -313,7 +315,10 @@
           "projection_dimension",
           "encoder_revision",
           "som_revision",
-          "source_revision"
+          "source_revision",
+          "workspace_revision_key",
+          "lineage_binding_checksum",
+          "lineage_producer_revision"
         ],
         "columnTypes": {
           "packet_id": "text",
@@ -456,7 +461,10 @@
           "projection_dimension": "integer",
           "encoder_revision": "text",
           "som_revision": "text",
-          "source_revision": "text"
+          "source_revision": "text",
+          "workspace_revision_key": "text",
+          "lineage_binding_checksum": "text",
+          "lineage_producer_revision": "text"
         },
         "missingRequiredColumns": []
       },
@@ -647,7 +655,25 @@
           "reconstruction_error",
           "routing_tier",
           "latent_256",
-          "latent_256_checkpoint_revision"
+          "latent_256_checkpoint_revision",
+          "error_embedding_latent_256",
+          "error_embedding_latent_256_checkpoint_revision",
+          "error_embedding_latent_64",
+          "error_embedding_latent64_model",
+          "error_embedding_latent_valid",
+          "error_embedding_latent_validated_at",
+          "latent_128",
+          "error_embedding_latent_128",
+          "file_content_hash",
+          "content_hash_scope",
+          "content_hash_algorithm",
+          "content_hash_length",
+          "content_hash_version",
+          "workspace_revision",
+          "source_revision",
+          "representation_revision",
+          "lineage_binding_checksum",
+          "lineage_producer_revision"
         ],
         "columnTypes": {
           "id": "uuid",
@@ -732,7 +758,25 @@
           "reconstruction_error": "real",
           "routing_tier": "character varying",
           "latent_256": "USER-DEFINED",
-          "latent_256_checkpoint_revision": "character varying"
+          "latent_256_checkpoint_revision": "character varying",
+          "error_embedding_latent_256": "USER-DEFINED",
+          "error_embedding_latent_256_checkpoint_revision": "character varying",
+          "error_embedding_latent_64": "USER-DEFINED",
+          "error_embedding_latent64_model": "text",
+          "error_embedding_latent_valid": "boolean",
+          "error_embedding_latent_validated_at": "timestamp with time zone",
+          "latent_128": "USER-DEFINED",
+          "error_embedding_latent_128": "USER-DEFINED",
+          "file_content_hash": "text",
+          "content_hash_scope": "text",
+          "content_hash_algorithm": "text",
+          "content_hash_length": "integer",
+          "content_hash_version": "integer",
+          "workspace_revision": "text",
+          "source_revision": "text",
+          "representation_revision": "text",
+          "lineage_binding_checksum": "text",
+          "lineage_producer_revision": "text"
         },
         "missingRequiredColumns": []
       },
@@ -1040,13 +1084,43 @@
       },
       {
         "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_ast_symbols_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_ast_symbols_gin ON public.atlas_packet_features USING gin (ast_symbols)"
+      },
+      {
+        "tablename": "atlas_packet_features",
         "indexname": "idx_atlas_packet_features_concepts_gin",
         "indexdef": "CREATE INDEX idx_atlas_packet_features_concepts_gin ON public.atlas_packet_features USING gin (used_concepts)"
       },
       {
         "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_entities_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_entities_gin ON public.atlas_packet_features USING gin (entities)"
+      },
+      {
+        "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_exports_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_exports_gin ON public.atlas_packet_features USING gin (exports)"
+      },
+      {
+        "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_imports_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_imports_gin ON public.atlas_packet_features USING gin (imports)"
+      },
+      {
+        "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_lexical_features_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_lexical_features_gin ON public.atlas_packet_features USING gin (lexical_features)"
+      },
+      {
+        "tablename": "atlas_packet_features",
         "indexname": "idx_atlas_packet_features_packet_key",
         "indexdef": "CREATE INDEX idx_atlas_packet_features_packet_key ON public.atlas_packet_features USING btree (packet_key)"
+      },
+      {
+        "tablename": "atlas_packet_features",
+        "indexname": "idx_atlas_packet_features_tree_node_ids_gin",
+        "indexdef": "CREATE INDEX idx_atlas_packet_features_tree_node_ids_gin ON public.atlas_packet_features USING gin (tree_node_ids)"
       },
       {
         "tablename": "atlas_packets",
@@ -1252,6 +1326,11 @@
         "tablename": "atlas_packets",
         "indexname": "idx_atlas_packets_ledger_type_idx",
         "indexdef": "CREATE INDEX idx_atlas_packets_ledger_type_idx ON public.atlas_packets USING btree (ledger_type)"
+      },
+      {
+        "tablename": "atlas_packets",
+        "indexname": "idx_atlas_packets_lineage_binding_checksum",
+        "indexdef": "CREATE INDEX idx_atlas_packets_lineage_binding_checksum ON public.atlas_packets USING btree (lineage_binding_checksum) WHERE (lineage_binding_checksum IS NOT NULL)"
       },
       {
         "tablename": "atlas_packets",
@@ -1475,6 +1554,11 @@
       },
       {
         "tablename": "atlas_packets",
+        "indexname": "idx_atlas_packets_workspace_revision_key_source",
+        "indexdef": "CREATE INDEX idx_atlas_packets_workspace_revision_key_source ON public.atlas_packets USING btree (workspace_revision_key, source_ref) WHERE ((workspace_revision_key IS NOT NULL) AND (source_ref IS NOT NULL))"
+      },
+      {
+        "tablename": "atlas_packets",
         "indexname": "idx_latent_64_not_null",
         "indexdef": "CREATE INDEX idx_latent_64_not_null ON public.atlas_packets USING hash (packet_id) WHERE (latent_64 IS NOT NULL)"
       },
@@ -1655,8 +1739,43 @@
       },
       {
         "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent64_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent64_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_64 vector_cosine_ops) WHERE (error_embedding_latent_64 IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_128_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_128 halfvec_cosine_ops) WHERE (error_embedding_latent_128 IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_checkpoint_revisi ON public.codebase_chunk_index USING btree (error_embedding_latent_256_checkpoint_revision) WHERE (error_embedding_latent_256_checkpoint_revision IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_256_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_256_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding_latent_256 halfvec_cosine_ops) WHERE (error_embedding_latent_256 IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_error_embedding_latent_valid",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_error_embedding_latent_valid ON public.codebase_chunk_index USING btree (error_embedding_latent_valid)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
         "indexname": "idx_codebase_chunk_index_error_embedding_hnsw",
-        "indexdef": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding vector_cosine_ops) WITH (m='16', ef_construction='64')"
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_error_embedding_hnsw ON public.codebase_chunk_index USING hnsw (error_embedding halfvec_cosine_ops) WITH (m='16', ef_construction='64')"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_file_content_hash",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_file_content_hash ON public.codebase_chunk_index USING btree (source_ref, file_content_hash) WHERE (file_content_hash IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_lineage_checksum",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_lineage_checksum ON public.codebase_chunk_index USING btree (lineage_binding_checksum) WHERE (lineage_binding_checksum IS NOT NULL)"
       },
       {
         "tablename": "codebase_chunk_index",
@@ -1675,8 +1794,28 @@
       },
       {
         "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_representation_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_representation_revision ON public.codebase_chunk_index USING btree (representation_revision) WHERE (representation_revision IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_source_revision",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_source_revision ON public.codebase_chunk_index USING btree (source_revision) WHERE (source_revision IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_index_workspace_source_lineage",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_index_workspace_source_lineage ON public.codebase_chunk_index USING btree (workspace_revision, source_ref) WHERE ((workspace_revision IS NOT NULL) AND (source_ref IS NOT NULL))"
+      },
+      {
+        "tablename": "codebase_chunk_index",
         "indexname": "idx_codebase_chunk_latent64_hnsw",
         "indexdef": "CREATE INDEX idx_codebase_chunk_latent64_hnsw ON public.codebase_chunk_index USING hnsw (latent_64 vector_cosine_ops) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "tablename": "codebase_chunk_index",
+        "indexname": "idx_codebase_chunk_latent_128_hnsw",
+        "indexdef": "CREATE INDEX idx_codebase_chunk_latent_128_hnsw ON public.codebase_chunk_index USING hnsw (latent_128 halfvec_cosine_ops) WHERE (latent_128 IS NOT NULL)"
       },
       {
         "tablename": "codebase_chunk_index",

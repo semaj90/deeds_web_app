@@ -1,0 +1,237 @@
+{
+  "schema": "atlas.symbol-revision-forward-qualification-receipt.v2",
+  "generatedAt": "2026-09-22T00:18:32.479Z",
+  "result": "SYMBOL_REVISION_FORWARD_QUALIFICATION_PROVEN",
+  "blockedReason": null,
+  "evidenceClass": "STATIC_REACHABILITY_SCAN_PLUS_FIXTURES (not a live writer run)",
+  "historicalBaseline": {
+    "registryWorkspacePlaceholders": 10220,
+    "registryGitRevisionRows": 90,
+    "versionWorkspacePlaceholders": 200,
+    "versionGitRevisionRows": 85,
+    "qualifiedVersions": 194,
+    "source": "docs/reports/symbol-identity-v1.json + symbol-producer-ownership-v1.json (S01-09/S01-10, unchanged)"
+  },
+  "schemaConstraint": {
+    "registryRevisionNullable": false,
+    "registrySkeletonWithoutRevisionRepresentable": false,
+    "unqualifiedRegistryAdmissionPolicy": "FAIL_CLOSED",
+    "laterGate": "S01-10-schema (is atlas_symbol_registry a logical registry or partly a revision-bearing observation table)"
+  },
+  "writers": {
+    "discovered": 7,
+    "canonical": 5,
+    "guarded": 5,
+    "nonAuthority": 1,
+    "unknown": 0,
+    "packageBypass": 0
+  },
+  "matrix": [
+    {
+      "writer": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+      "canonicalAuthority": true,
+      "runtimeRole": "MUTATION_OWNER",
+      "mutationOwner": "self (registry+aliases+versions, one transaction, COMMIT)",
+      "guardLocation": "none at owner; enforced at every main-repo caller",
+      "guarded": false,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    },
+    {
+      "writer": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "canonicalAuthority": true,
+      "runtimeRole": "CANONICAL_CANARY_WRITER",
+      "mutationOwner": "self (raw SQL registry)",
+      "guardLocation": "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+      "guarded": true,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    },
+    {
+      "writer": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "canonicalAuthority": true,
+      "runtimeRole": "CANONICAL_LIVE_WRITER",
+      "mutationOwner": "self (raw SQL versions)",
+      "guardLocation": "scripts/atlas/materialize-ast-symbol-versions.mjs",
+      "guarded": true,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    },
+    {
+      "writer": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "canonicalAuthority": true,
+      "runtimeRole": "CANONICAL_LIVE_WRITER",
+      "mutationOwner": "self (raw SQL registry)",
+      "guardLocation": "scripts/atlas/promote-ast-symbols-to-registry.mjs",
+      "guarded": true,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    },
+    {
+      "writer": "scripts/atlas/prove-feature-intelligence-database.mjs",
+      "canonicalAuthority": false,
+      "runtimeRole": "PROOF_ONLY_WRITER",
+      "mutationOwner": "self (fixture rows)",
+      "guardLocation": null,
+      "guarded": false,
+      "provablyUnreachable": true,
+      "bypassPossible": false
+    },
+    {
+      "writer": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+      "canonicalAuthority": true,
+      "runtimeRole": "CANONICAL_LIVE_WRITER",
+      "mutationOwner": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+      "guardLocation": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+      "guarded": true,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    },
+    {
+      "writer": "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
+      "canonicalAuthority": true,
+      "runtimeRole": "CANONICAL_LIVE_WRITER",
+      "mutationOwner": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+      "guardLocation": "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
+      "guarded": true,
+      "provablyUnreachable": false,
+      "bypassPossible": false
+    }
+  ],
+  "aliasWriters": {
+    "finding": "atlas_symbol_aliases is inserted only by the package mutation owner, co-transactionally with registry and version rows and carrying nomination.source_revision; it is guarded by the same caller-boundary gate. No independent alias writer found in tracked or untracked source.",
+    "classification": "CANONICAL_REVISION_WRITER (via package owner), not an independent NON_REVISION_AUTHORITY_WRITER",
+    "origin388Rows": "not attributable to a run by static analysis"
+  },
+  "packageCallerAudit": {
+    "owner": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+    "callers": [
+      {
+        "writer": "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+        "guarded": true
+      },
+      {
+        "writer": "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
+        "guarded": true
+      }
+    ],
+    "sourcePatched": false,
+    "distPatched": false,
+    "note": "package source intentionally NOT patched (main-repo-first); move the invariant into the package only after the main-repo behavior is proven and all package callers audited"
+  },
+  "findings": [
+    "symbol-reconciliation-writer-v1.mts sets nomination.source_revision = the WORKSPACE revision (and its built-in default revision differs from the admitted S01-07 one); no per-source binding matches that value, so under the contract every promotion nomination it builds is rejected until it binds per-source revisions. Dry-run is unaffected.",
+    "prove-feature-intelligence-database.mjs inserts `proof://database` / `proof-src-r1` fixture rows but has no COMMIT and always ROLLBACKs; classified PROOF_ONLY_WRITER, provably non-persisting by static evidence.",
+    "prove-vitest-evidence.mjs and prove-live-schema-introspection.mjs call promoteNomination on the test-case and schema-object registries, not the symbol registry; not symbol writers."
+  ],
+  "fixtures": {
+    "rejected": [
+      {
+        "name": "historical workspace:0 version",
+        "expect": "WORKSPACE_REVISION_PLACEHOLDER",
+        "admitted": false,
+        "reasons": [
+          "WORKSPACE_REVISION_PLACEHOLDER"
+        ],
+        "ok": true
+      },
+      {
+        "name": "historical Git commit version",
+        "expect": "SOURCE_REVISION_GIT_COMMIT",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_GIT_COMMIT"
+        ],
+        "ok": true
+      },
+      {
+        "name": "sha256:<40hex>",
+        "expect": "SOURCE_REVISION_LEGACY_40HEX",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_LEGACY_40HEX"
+        ],
+        "ok": true
+      },
+      {
+        "name": "sha256:<63hex>",
+        "expect": "SOURCE_REVISION_INVALID",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_INVALID"
+        ],
+        "ok": true
+      },
+      {
+        "name": "valid-looking sha256, no provenance",
+        "expect": "REVISION_PROVENANCE_MISSING",
+        "admitted": false,
+        "reasons": [
+          "REVISION_PROVENANCE_MISSING"
+        ],
+        "ok": true
+      },
+      {
+        "name": "registry skeleton, no revision",
+        "expect": "REGISTRY_SCHEMA_REQUIRES_PLACEHOLDER",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_MISSING",
+          "REGISTRY_SCHEMA_REQUIRES_PLACEHOLDER"
+        ],
+        "ok": true
+      },
+      {
+        "name": "registry workspace:0",
+        "expect": "SOURCE_REVISION_INVALID",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_INVALID"
+        ],
+        "ok": true
+      },
+      {
+        "name": "registry Git commit",
+        "expect": "SOURCE_REVISION_GIT_COMMIT",
+        "admitted": false,
+        "reasons": [
+          "SOURCE_REVISION_GIT_COMMIT"
+        ],
+        "ok": true
+      }
+    ],
+    "accepted": [
+      {
+        "name": "clean version",
+        "admitted": true,
+        "ok": true
+      },
+      {
+        "name": "clean registry",
+        "admitted": true,
+        "ok": true
+      }
+    ]
+  },
+  "proof": {
+    "sharedQualificationContractUsed": true,
+    "canonicalWriterCoverageComplete": true,
+    "workspacePlaceholderRejected": true,
+    "gitCommitRevisionRejected": true,
+    "malformedShaRejected": true,
+    "provenanceRequired": true,
+    "registrySkeletonFailsClosed": true,
+    "qualifiedInputStillAccepted": true,
+    "rejectionIsNonMutating": true
+  },
+  "safety": {
+    "databaseWrites": 0,
+    "historicalRowsChanged": 0,
+    "registryRowsUpdated": 0,
+    "versionRowsUpdated": 0,
+    "graphifyRun": false,
+    "stableFileIdCreated": false,
+    "upstreamFileIdChanged": false,
+    "readerCutover": false
+  }
+}

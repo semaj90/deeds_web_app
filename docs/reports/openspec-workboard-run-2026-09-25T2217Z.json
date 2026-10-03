@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-25T22:17:42Z",
+  "runType": "FRESH_PROGRAM_METADATA_AND_ASSIGNMENT_AUDIT",
+  "supersedes": "docs/reports/openspec-workboard-run-2026-09-25T2215Z.json",
+  "pivot": {
+    "from": "fresh current-ledger census",
+    "to": "full-snapshot metadata, package-boundary, and review-queue audit",
+    "reason": "The previous run established fresh source hashes; this pass checks every task row and assigned open leaf against the hierarchy contract."
+  },
+  "repository": {
+    "taskLedgersEditedByThisRun": false,
+    "selectedTaskCount": 0,
+    "schedulerPermissionPolicy": "READY_NEVER_IMPLIES_SELECTED",
+    "datastoreWrites": 0,
+    "graphifyRuns": 0,
+    "containerRebuilds": 0
+  },
+  "snapshot": {
+    "directory": ".tmp/codex-openspec-live-20260925T2213Z/reports",
+    "workboard": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-workboard-v1.json",
+    "controller": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-execution-controller-v1.json",
+    "program": ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.json",
+    "totalTasks": 9555,
+    "openTasks": 3246,
+    "completedTasks": 6309,
+    "sourceFilesHashed": 90,
+    "sourceHashMismatchesAtAudit": 0,
+    "controllerRows": 9555,
+    "controllerStaleOrMissingRows": 0
+  },
+  "audit": {
+    "requiredMetadataFields": [
+      "gateState", "schedulerPermission", "mutationClass", "proofLevel", "owner", "primaryProgramId",
+      "secondaryProgramIds", "dependsOn", "unlocks", "milestoneId", "waveId", "changeGateId",
+      "workPackageId", "declaredDependencies", "inheritedDependencies", "effectiveDependencies"
+    ],
+    "taskRowsMissingRequiredFields": 0,
+    "openTaskAssignments": { "expected": 3246, "accountedExactlyOnce": 3246, "missing": 0, "duplicates": 0, "foreign": 0 },
+    "packageBoundaryViolations": 0,
+    "selectedTasks": 0,
+    "workPackages": 814,
+    "programMappingReview": { "openChanges": 73, "multiRuleCandidates": 7, "multipleCandidateCorpora": 3, "allProvisional": true },
+    "dependencies": { "declaredOpenTaskCount": 3, "openTasksWithoutDeclaredDependencies": 3243, "invented": 0 }
+  },
+  "interpretation": {
+    "status": "STRUCTURAL_METADATA_AND_ACCOUNTING_PROVEN_FOR_THIS_SNAPSHOT",
+    "notProven": [
+      "canonical correctness of heuristic program mappings",
+      "task dependency completeness",
+      "execution readiness or scheduler selection",
+      "runtime or datastore completion of any OpenSpec task"
+    ]
+  },
+  "validation": {
+    "metadataAndAssignmentAudit": "PASS across all 9,555 task rows and 3,246 open leaves",
+    "programPlanAndControllerTests": "PASS 22/22",
+    "openspecStrict": "PASS parent-atlas-workboard-feature-utility-fabric",
+    "sourceHashParity": "PASS 90/90 at audit time"
+  },
+  "likely_cause": "The current inventory has complete scheduler metadata and exact task accounting, but sparse declared dependencies and provisional rule-based program mappings still limit execution-plan confidence.",
+  "evidence": [
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-workboard-v1.json",
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-execution-controller-v1.json",
+    ".tmp/codex-openspec-live-20260925T2213Z/reports/openspec-achievable-implementation-program-v1.json"
+  ],
+  "patch_targets": [],
+  "safe_next_command": "Review the seven multi-rule change mappings; do not infer selection or dependency edges.",
+  "smoke_command": "node --test scripts/atlas/lib/openspec-program-plan-v1.test.mjs scripts/atlas/audit-openspec-execution-controller-v1.test.mjs",
+  "report_path": "docs/reports/openspec-workboard-run-2026-09-25T2217Z.json"
+}

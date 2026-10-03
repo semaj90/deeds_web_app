@@ -1,0 +1,94 @@
+{
+  "schema": "atlas.doc-26.v2-pipeline-identity-selection.v1",
+  "generatedAt": "2026-09-24T04:26:13Z",
+  "gate": "DOC-26",
+  "status": "DOC_26_V2_IDENTITY_SELECTION_PROVEN_INTEGRATION_PARTIAL",
+  "owner": {
+    "manifestBoundary": "python/atlas_doc_manifest.py::SourceConfigV1",
+    "pipeline": "python/atlas_okf_docs_pipeline.py::compile_chunks",
+    "chunker": "python/atlas_external_docs.py::chunk_document",
+    "identityPrimitive": "python/atlas_doc_coordinate.py::external_doc_chunk_id_v2"
+  },
+  "contract": {
+    "manifestField": "chunk_identity_version",
+    "default": "V1",
+    "v2Requires": [
+      "provider",
+      "product",
+      "product_version",
+      "EXACT_VERSION or MAJOR_VERSION qualification",
+      "revision-qualified page coordinate"
+    ],
+    "v1IdsChanged": false,
+    "unsupportedVersionsFailClosed": true,
+    "v2WithoutCoordinateFailsClosed": true
+  },
+  "proof": {
+    "manifestToPipelineSelection": true,
+    "chunkIdentityVersionReachedChunker": true,
+    "v2CoordinateGuardAtChunker": true,
+    "admissionEnvelopeBuilderUsesManifestSelection": true,
+    "sameBytesAcrossProductVersions": {
+      "v1ChunkIdsRemainEqual": true,
+      "v2ChunkIdsDiffer": true
+    },
+    "v2IdDerivedFrom": "source_id + chunk_evidence_revision",
+    "manifestVersionSelectionTested": true,
+    "priorVersionFakeStateFixture": {
+      "retainedOlderVersionRowPresent": true,
+      "productionLookupPredicateModeled": true,
+      "expectedNewVersionClassification": "MISSING",
+      "selectOnly": true,
+      "liveDatabaseReadback": false
+    },
+    "typescriptHandoffAcceptsVersionedChunkIds": true,
+    "tests": {
+      "command": "python -m pytest test_atlas_doc_admission_envelope_identity_v2.py test_atlas_doc_chunk_identity_v2_pipeline.py test_atlas_doc_chunk_evidence.py test_atlas_doc_manifest.py test_atlas_okf_docs_pipeline.py -q",
+      "passed": 52,
+      "failed": 0
+    },
+    "typescriptReadOnlyTests": {
+      "command": "npm exec vitest -- run src/lib/server/atlas/docs/external-doc-versioned-recrawl-v2.spec.ts src/lib/server/atlas/docs/external-doc-admission-plan-v1.spec.ts",
+      "passed": 18,
+      "failed": 0
+    },
+    "frontendTypeCheck": {
+      "command": "npm run check",
+      "status": "WORKSPACE_ERRORS_UNRELATED",
+      "errors": 32,
+      "warnings": 291,
+      "filesWithDiagnostics": 117,
+      "diagnosticsInDoc26TouchedFiles": 0
+    },
+    "pythonSyntax": "PASS",
+    "openspecStrict": "PASS",
+    "scopedDiffCheck": "PASS"
+  },
+  "liveReadOnlyBaseline": {
+    "database": "legal_ai_db",
+    "transactionMode": "READ ONLY",
+    "postgresWrites": 0,
+    "containerRebuilds": 0,
+    "pgvectorCurrentUpstreamPages": 2,
+    "pgvectorCurrentUpstreamChunks": 151,
+    "postgresqlProductVersion18Pages": 6,
+    "productsWithMultipleExplicitVersionLabels": 0,
+    "priorPinnedVersionCanaryAvailable": false,
+    "limitation": "Live corpus contains no product with two explicit version labels to use as a prior-version preservation canary; the pgvector rows are CURRENT_UPSTREAM and the PostgreSQL rows are version label 18 only."
+  },
+  "notProven": [
+    "incremental delta-plan production and crawler selection",
+    "handoff to the existing canonical external-doc admission owner",
+    "read-only proof that prior product-version rows remain unchanged",
+    "new-version admission or persistence"
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "filesystemCorpusArtifacts": 0,
+    "containerRebuilds": 0
+  },
+  "nextGate": "DOC_26_BOUNDED_DELTA_PLAN_AND_PRIOR_VERSION_READBACK"
+}

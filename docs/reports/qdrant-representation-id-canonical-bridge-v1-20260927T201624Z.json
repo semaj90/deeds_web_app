@@ -1,0 +1,143 @@
+{
+  "schema": "atlas.qdrant-representation-id-canonical-bridge-audit.v1",
+  "generatedAt": "2026-09-27T20:16:51.015Z",
+  "mode": "FULL_QDRANT_PAYLOAD_SCROLL_PLUS_POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "qdrant": {
+    "url": "http://127.0.0.1:6333",
+    "collection": "codebase_chunks_768",
+    "before": {
+      "status": "green",
+      "pointsCount": 328348
+    },
+    "after": {
+      "status": "green",
+      "pointsCount": 328348
+    },
+    "pages": 329,
+    "vectorsFetched": false
+  },
+  "totals": {
+    "points": 328348,
+    "representationIdPresent": 324981,
+    "representationIdValidUuid": 1000,
+    "canonicalChunkRowUnique": 1000,
+    "canonicalChunkRowMissing": 327348,
+    "canonicalChunkRowAmbiguous": 0,
+    "exactSourceRef": 866,
+    "exactContentHash": 74,
+    "exactSourceRefAndHash": 63,
+    "allSourceWorkspaceRepresentationRevisionsPresent": 0,
+    "strictlyRevisionQualified": 0,
+    "identityLinkPresent": 105762,
+    "identityLinkChunkUuidEqualsRepresentationId": 1001,
+    "identityLinkSourceRevisionPresent": 0
+  },
+  "sampleFailures": [
+    {
+      "pointId": "1",
+      "representationId": "1550075d-9042-4953-bc75-90b50a9a8c5c",
+      "sourceRefMatches": false,
+      "contentHashMatches": true,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "2",
+      "representationId": "f0c422e6-9b5a-423e-a07f-555e94bcd16d",
+      "sourceRefMatches": false,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "3",
+      "representationId": "6215cce4-9ca4-4658-8570-8d880b12162c",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "4",
+      "representationId": "6b72f3c5-f565-4abf-a58a-faae1e245126",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "5",
+      "representationId": "768abae8-d432-46aa-a6f0-9cd065ac169b",
+      "sourceRefMatches": false,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "6",
+      "representationId": "b7990f28-6554-4869-8500-bd3fbbe5a6c0",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "7",
+      "representationId": "8bd831f5-603d-4dea-878b-6dc6756afb63",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "8",
+      "representationId": "68d52a80-3085-481f-bb74-474d3ce7b120",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "9",
+      "representationId": "5f1c229e-037a-41fa-8bbd-823bcf607f35",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "10",
+      "representationId": "c415d9f3-e1b1-42b3-9586-e21e8bbe6170",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "11",
+      "representationId": "59763f20-7b8c-4b26-9e98-ff93c5c1aa3e",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    },
+    {
+      "pointId": "12",
+      "representationId": "5e9ae087-ce00-4d25-a77f-94d34ef74856",
+      "sourceRefMatches": true,
+      "contentHashMatches": false,
+      "allRequiredRevisionsPresent": false
+    }
+  ],
+  "interpretation": {
+    "representationIdMeaning": "MIXED_FIELD: only 1,000 Qdrant points carry a UUID-shaped value that joins codebase_chunk_index.id; a spot check at point 1002 returned the literal semantic_768. Never treat this field as a uniformly typed chunk-row ID or as a semantic representation revision.",
+    "representationIdNonUuidPresent": 323981,
+    "representationIdMissing": 3367,
+    "uuidJoinRowsAreCanonicalOnlyAfterPostgresReadback": true,
+    "identityLinkTableSourceRevisionRows": 0,
+    "qdrantProjectionIsCanonical": false,
+    "semanticAdmission": false
+  },
+  "limitations": [
+    "Qdrant scrolling is not a transactionally pinned snapshot; before/after counts are recorded.",
+    "The current identity-link table may be a stale audit snapshot; its rows corroborate locator equality only and do not confer revision authority.",
+    "Strict representation provenance requires immutable source, workspace, and semantic representation revisions plus vector-byte verification.",
+    "No vector payloads, inference, or datastore/cache writes were performed."
+  ],
+  "safeguards": {
+    "postgresWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "inferenceCalls": 0,
+    "vectorsFetched": false
+  }
+}

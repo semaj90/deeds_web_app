@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import type { OpenSpecTaskSelection, ReconciliationStatus } from './openspec-controller.js';
 
 export type HmmErrorClass =
   | 'meta_hygiene'
@@ -22,6 +23,12 @@ export interface WorkflowLoopInput {
   modelRevision?: string;
   sourceRefs?: string[];
   metadata?: Record<string, unknown>;
+  taskKey?: string;
+  completionEnvelopeRevision?: string;
+  threadId?: string;
+  controllerReportChecksum?: string;
+  selection?: OpenSpecTaskSelection;
+  planOnly?: boolean;
 }
 
 export interface WorkflowClassification {
@@ -119,6 +126,7 @@ export interface WorkflowLoopResult {
     targetPath?: string;
     workspaceRevision?: string;
     modelRevision?: string;
+    threadId?: string;
     sourceRefs: string[];
   };
   scaffold: ScaffoldDraft;
@@ -129,6 +137,19 @@ export interface WorkflowLoopResult {
   repair: WorkflowRepairResult;
   smoke: WorkflowSmokeResult;
   logged: boolean;
+  openspec?: {
+    selection: OpenSpecTaskSelection;
+    reconciliationStatus?: ReconciliationStatus;
+    failureFingerprint?: string;
+  };
+  gan: {
+    created: boolean;
+    wired: boolean;
+    proven: boolean;
+    done: boolean;
+    proofRefs: string[];
+    promotionAuthorized: false;
+  };
 }
 
 export interface WorkflowLoopDeps {
@@ -381,7 +402,12 @@ async function defaultLog(
       toonHash: (entry.metadata.toonHash as string) ?? entry.runId,
       mcpCalls: (entry.metadata.mcpCalls as any[]) ?? [],
       cacheHits: (entry.metadata.cacheHits as any) ?? 0,
-      bifrostModel: (entry.metadata.bifrostModel as string) ?? 'gemma4-rotorquant:latest',
+      // Error-agent synthesis is owned by the active llama-server model. Do
+      // not stamp legacy Gemma4/Bifrost model names into receipts when the
+      // workstation is serving Ornith.
+      bifrostModel: (entry.metadata.bifrostModel as string)
+        ?? process.env.LLAMA_SERVER_MODEL
+        ?? 'ornith-1.5-9b',
       output: (entry.metadata.output as string) ?? String(entry.metadata.repairSummary ?? ''),
       error: entry.passed ? undefined : (entry.metadata.error || new Error(`Workflow smoke check failed for ${entry.hmmErrorClass}`)),
     });
@@ -412,7 +438,7 @@ export async function runWorkflowLoop(
   const verdict = computeVerdict(classification, receipt, smoke);
   const policyUpdate = computePolicyUpdate(scaffold, verdict, input);
 
-  const log = deps.log ?? defaultLog;
+  const log = deps.log ?? (input.planOnly ? async () => undefined : defaultLog);
   await log({
     runId,
     query: input.query,
@@ -439,6 +465,14 @@ export async function runWorkflowLoop(
     timestamp: now().toISOString(),
   }, receipt, verdict, policyUpdate);
 
+  const logged = !input.planOnly;
+  const proofRefs = [...new Set([
+    ...(input.selection ? [`controller:${input.selection.controllerReportChecksum}`, `task:${input.selection.taskKey}`] : []),
+    ...receipt.outputs.evidenceRefs,
+    smoke.command,
+  ])];
+  const proven = smoke.passed && Object.values(receipt.verifier).every(Boolean);
+
   const result: WorkflowLoopResult = {
     runId,
     status: smoke.passed ? 'repaired' : 'needs_review',
@@ -451,6 +485,7 @@ export async function runWorkflowLoop(
       targetPath: input.targetPath,
       workspaceRevision: input.workspaceRevision,
       modelRevision: input.modelRevision,
+      threadId: input.threadId,
       sourceRefs: sanitizePacketRefs(input),
     },
     scaffold,
@@ -460,10 +495,20 @@ export async function runWorkflowLoop(
     classification,
     repair,
     smoke,
-    logged: true,
+    logged,
+    gan: {
+      created: true,
+      wired: Boolean(input.selection),
+      proven,
+      done: false,
+      proofRefs,
+      promotionAuthorized: false,
+    },
   };
 
   // Record agent trace for Phase 3F learning pipeline (fire-and-forget)
+  if (input.planOnly) return result;
+
   void (async () => {
     try {
       const { recordAgentTrace } = await import('../../observability/agent-trace-recorder.js');

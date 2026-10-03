@@ -1,0 +1,1334 @@
+{
+  "schema": "atlas.mcp-current-code-reconciliation.v1",
+  "gate": "SEARCH-REINTEGRATION-05",
+  "generatedAt": "2026-09-19T16:47:16.118Z",
+  "mode": "READ_ONLY",
+  "sources": {
+    "currentMcpDirectory": "sveltekit-frontend/src/mcp",
+    "searchInventory": "docs/reports/search-tool-inventory-v1.json",
+    "liveTraceReceipt": "docs/reports/trace-disabled-search-tools-v1.json",
+    "historicalOntology": "docs/reports/mcp-tool-ontology.json"
+  },
+  "currentCode": {
+    "registeredToolDeclarations": 164,
+    "uniqueToolNames": 163,
+    "duplicateNames": [
+      {
+        "name": "context.prefetch_feature_context",
+        "count": 2,
+        "scope": "CROSS_SERVER_OR_BUNDLE_DUPLICATE",
+        "declarations": [
+          {
+            "name": "context.prefetch_feature_context",
+            "file": "sveltekit-frontend/src/mcp/new_tools.ts",
+            "offset": 16251
+          },
+          {
+            "name": "context.prefetch_feature_context",
+            "file": "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+            "offset": 249057
+          }
+        ]
+      }
+    ]
+  },
+  "searchSurface": {
+    "auditedTools": 9,
+    "handlerListMismatches": [
+      {
+        "name": "kb.trace_search",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "NOT_IN_CURRENT_RECEIPT_SCOPE"
+      },
+      {
+        "name": "trace.kag_search",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "NOT_IN_CURRENT_RECEIPT_SCOPE"
+      },
+      {
+        "name": "codebase.rg_search",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "codebase.awk_analyze",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "research.web_search",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "research.synthesize",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "research.deep_analyze",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "trace.bifrost_dispatch",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      },
+      {
+        "name": "kb.rg_atlas_search",
+        "sourceRegistrationPresent": true,
+        "liveListPresent": false,
+        "status": "OPTIONAL_OR_DISABLED"
+      }
+    ],
+    "optionalOrDisabled": [
+      "codebase.rg_search",
+      "codebase.awk_analyze",
+      "research.web_search",
+      "research.synthesize",
+      "research.deep_analyze",
+      "trace.bifrost_dispatch",
+      "kb.rg_atlas_search"
+    ],
+    "outsideCurrentReceiptScope": [
+      "kb.trace_search",
+      "trace.kag_search"
+    ]
+  },
+  "ontology": {
+    "historicalToolRows": 173,
+    "historicalUnknownCount": 63,
+    "currentCodeUnknownCount": 51,
+    "historicalOrExternalCount": 21,
+    "rows": [
+      {
+        "name": "kb.organize_messy_text",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.extract_citations",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.trace_search",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": true,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.query",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.wiki_note_lookup",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.archive_synthesis",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.prefetch_feature_context",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.compact_context",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.source_refs",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.suggest_files",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.explain_trace",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.get_chunk",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ui.analyze_view",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.execute_graphify",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "skills.list",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "skills.run_mission",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "legal.get_transcript",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.find_precedents",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.search_recordings",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.cross_examine",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.score_case",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.similar_cases",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.batch_ingest",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.build_timeline",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.cross_reference_evidence",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.issue_spotter",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.find_similar_opinions",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.transcribe_video",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.write_obsidian_note",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.mock_trial",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "legal.check_services",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "engram.ace_packet_inject",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas_get_active_context",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "engram.chat_memory_store",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "engram.redis_health",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.embedding_keywords",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.embedding_cluster_tags",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.embedding_neighbors",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.embedding_all_tags",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.hydration_status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.recompute_manifold_plan",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "db.schema_overview",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "db.table_inspect",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "library.registry_lookup",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "library.registry_search",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "library.registry_fetch_tier",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "library.registry_rescan",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ldr_research",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "phase109a_archive_signal",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "phase109a_supersede_signal",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "phase109a_supersede_recommendation",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "phase109a_promote_recommendation",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "phase109a_query_signal_history",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "phase109a_validate_state_transition",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": false,
+        "currentSearchInventory": false,
+        "status": "HISTORICAL_OR_EXTERNAL"
+      },
+      {
+        "name": "file.read_window",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "wiki.status",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "wiki.search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "wiki.refresh_directory",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "wiki.explain_page",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.expand_neighborhood",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "turbovec.rank_chunks",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "engram.chat_memory_recent",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.shortest_path",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.semantic_path_synthesis",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.community_for_node",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.pagerank_top",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.search_near",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.same_som_cluster",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.search_som_neighborhood",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.hybrid_search",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "graph.materialize_pathway",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.search_pathways",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.search_summary_tree",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.search_notecards",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kb.explain_context_pack",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace.system_health",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "search.rerank",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "hypergraph.semantic_path_synthesis",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.search_4d",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "clusters.get_members",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace.explain_retrieval",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace_dynamic_context",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "search.postgres_fts",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "search.hybrid",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace.kag_search",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": true,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace.graphrag_search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "search.go_hybrid",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.build_kv_packet",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.get_compressed_card",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.explain_compression",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.refresh_task_toc",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "search.dev_context",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.record_agent_run",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.ingest_memory_directory",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.ingest_error",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.recall_similar_fix",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.multi_lane_search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.web_search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.feature_lookup",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "kag.panel_context",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.trust_audit",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "taxonomy.children",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "taxonomy.path",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.peers_via_relations",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.coverage_chain",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "clusters.get_summary_lenses",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "clusters.som_cell_lookup",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "clusters.kmeans_members",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "trace.validate_ace_hit",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.propose_patch",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.run_targeted_test",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.record_fix_attempt",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.run_quality_gate",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "hypergraph.search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "hypergraph.get_edge",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "hypergraph.explain_activation",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "hypergraph.expand_members",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "knowledge.get_minified_map",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "tools.batch_call",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "codebase.context_for_file",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.context_for_file",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.peers_for_dir",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.coverage",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.shares_tags",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "LLMS.md.binding_chain",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.update_LLMS.md",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.search_tools",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.inspect_tool_contract",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.validate_tool_call",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.audit_tool_result",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.verify_write",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.validate_claims",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.fixer_semantic_recall",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.fixer_pattern_store",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "evidence.search_by_image",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "evidence.image_feedback",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "evidence.link_image_graph",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "image.search_by_text",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "image.caption",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "image.enrich_tags",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.gpu_attention",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.gpu_pagerank",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.gpu_topk",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ops.gpu_pipeline_stats",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "runtime.simdjson_status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "runtime.sse_probe",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "runtime.quic_status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.prefilter",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "ace.compact_search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.packet_search",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.coverage",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.graph.pagerank",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.workstation_status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.feature_document_status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.populate_feature_documents",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.feature_document_ingestion_plan",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.feature_document_enrichment_plan",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.materialize_feature_evidence_tuples",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.pos_concept_tagging",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "atlas.build_taxonomy_topology_packet",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "karpathy.attention_rank_files",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "karpathy.som_topology_stats",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "topology.language_distribution",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "research.playbook_lookup_by_language",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.build_ace_packet",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "context.build_indexed_source_packet",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "service_workers.status",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "service_workers.result",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "miniforge.health",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "miniforge.analyze",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "domain.classify",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "miniforge.extract",
+        "ontologyClassification": "ONTOLOGY_UNKNOWN",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      },
+      {
+        "name": "shell.run",
+        "ontologyClassification": "ONTOLOGY_CLASSIFIED",
+        "currentCodeRegistration": true,
+        "currentSearchInventory": false,
+        "status": "CURRENT_CODE"
+      }
+    ]
+  },
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false
+  },
+  "status": "CURRENT_CODE_RECONCILED_HISTORICAL_MISMATCHES_CLASSIFIED",
+  "nextGate": "SEARCH-REINTEGRATION-06_NON_AUTHORIZING_AUDIT_SEMANTICS"
+}

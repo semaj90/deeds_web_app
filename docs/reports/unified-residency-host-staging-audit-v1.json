@@ -1,0 +1,44 @@
+{
+  "schema": "atlas.unified-residency-host-staging-audit.v1",
+  "status": "DUCKDB_TO_WSL_RESIDENCY_HANDOFF_PROVEN",
+  "node": {
+    "packageDeclared": true,
+    "package": "duckdb@1.4.4",
+    "nativeBindingAvailable": true,
+    "smoke": "in-memory SELECT through @atlas/duckdb wrapper produced a 2x4 feature tile",
+    "repair": "npm rebuild duckdb"
+  },
+  "python": {
+    "rapids": {
+      "environment": "/home/james/miniforge3/envs/atlas-rapids-cu13",
+      "duckdbImportable": false,
+      "pandasImportable": true,
+      "pyarrowImportable": true
+    },
+    "cutile": {
+      "environment": "/home/james/.venvs/atlas-cutile-cu132",
+      "duckdbImportable": false,
+      "pandasImportable": false,
+      "pyarrowImportable": false
+    },
+    "repositoryShadowingCheck": "performed outside repository root"
+  },
+  "proof": {
+    "wrapper": "@atlas/duckdb",
+    "queryMode": "read-only in-memory SELECT",
+    "rows": 2,
+    "numericBytes": 32,
+    "providerState": "RESIDENT",
+    "providerDevice": "cuda",
+    "rawPointerExposed": false,
+    "writesPerformed": false
+  },
+  "architecture": {
+    "duckdbRole": "optional host analytical staging",
+    "pandasRole": "RAPIDS-side analysis/export only",
+    "cutileNumericTransport": "typed buffers",
+    "canonicalAuthority": "PostgreSQL",
+    "writesPerformed": false
+  },
+  "nextGate": "UNIFIED-RESIDENCY-HOST-STAGING-01"
+}

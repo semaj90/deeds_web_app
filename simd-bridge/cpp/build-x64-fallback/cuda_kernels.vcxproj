@@ -78,7 +78,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -98,10 +98,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;NO_CUDA=1;SOM_HAVE_CUDA=0;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -114,7 +114,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -135,10 +135,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NO_CUDA=1;SOM_HAVE_CUDA=0;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -172,10 +172,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NO_CUDA=1;SOM_HAVE_CUDA=0;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -188,7 +188,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -208,10 +208,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;NO_CUDA=1;SOM_HAVE_CUDA=0;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.17.1\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\james\AppData\Local\node-gyp\Cache\22.23.3\include\node;C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\..\..\sveltekit-frontend\node_modules\node-addon-api;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -293,6 +293,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\cuda_graph_bridge.cu">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\native_runtime_info.cu">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">CompileAsCpp</CompileAs>

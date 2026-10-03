@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "startedAt": "2026-09-24T15:42:42Z",
+  "change": "parent-atlas-versioned-doc-intelligence",
+  "fromTask": "DOC-15",
+  "pivotTo": "DOC-13_SOURCE_REVISION_AUTHORITY_SUBGATE",
+  "reason": "DOC-15 filter-contract wiring was advanced, but production SearchRuntime integration and the live Qdrant projection remain unavailable. Continued to the next open task in the same OpenSpec change and addressed its exact target-code-revision authority gap.",
+  "progressBefore": { "complete": 42, "total": 48, "remaining": 6 },
+  "doc15": {
+    "status": "CODE_CONTRACT_ADVANCED_LIVE_AND_PRODUCTION_INTEGRATION_OPEN",
+    "evidence": "docs/reports/parent-atlas/doc-15-same-query-fanout-v1.json",
+    "unresolved": [
+      "The external-doc adapter is not yet a branch of production SearchRuntime/hybridSearch.",
+      "Live hybrid Qdrant collection is missing and source projection is empty; no live same-query replay is possible."
+    ],
+    "writes": 0
+  },
+  "doc13": {
+    "subgate": "EXTRACTION_TO_CODE_SOURCE_REVISION_AUTHORITY",
+    "status": "PROVEN_FOR_SEALED_SOURCE_COHORT",
+    "evidence": "docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json",
+    "proof": {
+      "sourceAuthorityReceipt": "CURRENT_SOURCE_AUTHORITY_PROVEN",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "symbolVersionsRead": 200,
+      "exactSymbolName": "classifyPacketTask",
+      "targetRevisionWasModelSupplied": false,
+      "targetRevisionDerivedFrom": "unique exact-name symbol version with exact source_ref/source_revision/workspace_revision/content_digest binding",
+      "digestMatchesRevision": true,
+      "ambiguousName": "AMBIGUOUS",
+      "unboundCodeRevision": "UNRESOLVED / TARGET_CODE_SOURCE_REVISION_UNBOUND",
+      "staleCodeRevision": "STALE_CODE_SOURCE",
+      "currentWorkingTreeEqualityClaimed": false
+    },
+    "limitation": "The source-authority receipt is for a sealed 2026-09-21 cohort and records 1,814 working-tree drift rows. This proves revision authority within that admitted cohort, not equality to the current worktree.",
+    "taskCheckbox": "remains open: downstream index admission and broader acceptance gates remain unresolved",
+    "writes": 0
+  },
+  "filesChangedByThisRun": [
+    "scripts/atlas/prove-doc-symbol-mutual-index-live-v1.mjs",
+    "docs/reports/parent-atlas/doc-13-symbol-mutual-index-live-v1.json",
+    "docs/reports/openspec-workboard-run-2026-09-24T154242Z.json"
+  ],
+  "openSpecLedgerEdited": false,
+  "postgresWrites": 0,
+  "qdrantWrites": 0,
+  "valkeyWrites": 0,
+  "neo4jWrites": 0,
+  "containerRebuilds": 0,
+  "commit": null,
+  "push": false
+}

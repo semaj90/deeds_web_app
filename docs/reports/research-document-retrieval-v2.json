@@ -1,0 +1,136 @@
+{
+  "schema": "atlas.research-document-retrieval.v2",
+  "generatedAt": "2026-09-21T03:26:38.660Z",
+  "mode": "READ_ONLY_BOUNDED_FIXTURE",
+  "owners": {
+    "webSearch": "docker/langgraph-synthesis/app.py",
+    "typedContracts": "docker/langgraph-synthesis/research_contracts.py",
+    "htmlNormalizationAndChunking": "python/atlas_external_docs.py",
+    "postgresFts": "scripts/atlas/prove-postgres-fts-replay-v1.mjs",
+    "pgvector": "scripts/atlas/replay-pgvector-semantic-768-exact-hnsw-v1.mjs",
+    "dagParameters": "scripts/atlas/audit-dag-parameter-scope-v1.mjs",
+    "astGrep": "scripts/atlas/audit-ast-grep-outline-symbol-population-v1.mjs"
+  },
+  "checks": {
+    "requiredFiles": {
+      "count": 8,
+      "missing": []
+    },
+    "javascriptSyntax": {
+      "checked": 5,
+      "failures": []
+    },
+    "pythonContractAndDocumentFixture": {
+      "status": "PASS",
+      "output": {
+        "title": "Atlas Docs",
+        "links": 0,
+        "chunks": 1,
+        "chunkIds": [
+          "doc:fixture:atlas-docs:cdcff5f97db50287:0"
+        ],
+        "byteSpansValid": true,
+        "webSearchContract": "PASS",
+        "pydanticContracts": "PASS"
+      }
+    },
+    "webSearchOwnerSource": {
+      "validatedHelperPresent": true,
+      "pydanticValidationPresent": true,
+      "boundedLimitPresent": true
+    },
+    "containerWebSearch": {
+      "status": "PASS",
+      "typedV2ContractMounted": true,
+      "output": "[]",
+      "image": "legal-ai-langgraph"
+    },
+    "mcpParameterContracts": {
+      "standaloneLdr": {
+        "startResearch": true,
+        "pollStatus": true,
+        "searchHistory": true,
+        "quickSummary": true
+      },
+      "streamableTrace": {
+        "ldrResearch": true
+      },
+      "exactUsage": {
+        "standaloneStart": {
+          "query": "string length 3..2000",
+          "max_iterations": "integer 1..10",
+          "search_engines": "string[]"
+        },
+        "standalonePoll": {
+          "taskId": "non-empty string"
+        },
+        "standaloneHistory": {
+          "query": "string length 3..500",
+          "limit": "integer 1..50"
+        },
+        "standaloneSummary": {
+          "query": "string length 3..1000",
+          "max_results": "integer 1..20"
+        },
+        "traceResearch": {
+          "query": "non-empty string",
+          "maxResults": "integer 1..50",
+          "maxDocs": "integer 1..20",
+          "temperature": "number 0..1"
+        }
+      }
+    },
+    "ldrMcpHealth": {
+      "status": "PASS",
+      "toolCount": 4,
+      "toolNames": [
+        "ldr.start_research",
+        "ldr.poll_status",
+        "ldr.search_history",
+        "ldr.quick_summary"
+      ]
+    },
+    "existingReadOnlyReports": {
+      "fts": {
+        "present": true,
+        "status": "POSTGRES_FTS_BLOCKED_SOURCE_REVISION",
+        "reportPath": "docs/reports/postgres-fts-replay-v1.json"
+      },
+      "pgvector": {
+        "present": true,
+        "status": "PGVECTOR_REPLAY_BLOCKED_SOURCE_REVISION",
+        "reportPath": "docs/reports/postgres-pgvector-exact-hnsw-replay-v1.json"
+      },
+      "dagScope": {
+        "present": true,
+        "status": "PER_OPERATOR_ARGUMENT_SCOPE_SUPPORTED",
+        "reportPath": "docs/reports/dag-parameter-scope-v1.json"
+      },
+      "dagConsumers": {
+        "present": true,
+        "status": "ADAPTER_RESOLUTION_PROVEN_LEGACY_COMPATIBILITY_OPEN",
+        "reportPath": "docs/reports/dag-parameter-executor-consumers-v1.json"
+      }
+    }
+  },
+  "boundaries": {
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "remoteFetchPerformed": false,
+    "vectorBackfillPerformed": false,
+    "cacheWarmPerformed": false,
+    "graphifyRefreshPerformed": false,
+    "semanticLane": "one logical semantic_768 lane; executors remain interchangeable",
+    "vectorContract": "pgvector exact oracle; HNSW challenger; revision-qualified eligibility required",
+    "plannerContract": "PostgreSQL AIO/BitmapAnd are planner observations, not application identity",
+    "astGrepContract": "bounded documentation structure evidence only; not canonical identity"
+  },
+  "status": "RESEARCH_DOCUMENT_RETRIEVAL_V2_FIXTURE_AND_RUNTIME_SMOKE_PROVEN",
+  "blockers": [
+    "External document persistence and pgvector streaming require a separately admitted, revision-qualified cohort.",
+    "Existing FTS/pgvector live reports may remain blocked by missing revision-qualified rows.",
+    "This fixture does not prove remote provider availability, production latency, or canonical promotion."
+  ],
+  "receiptChecksum": "sha256:b3f2956365011c1a5a87a61cf1c95c1ae89d91ce2d469a8c8075dc1305286a34"
+}

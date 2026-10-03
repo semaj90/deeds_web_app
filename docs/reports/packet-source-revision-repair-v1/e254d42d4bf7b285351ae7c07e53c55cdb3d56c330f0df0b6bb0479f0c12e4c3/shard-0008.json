@@ -1,0 +1,2877 @@
+{
+  "schema": "atlas.packet-source-revision-repair-shard.v2",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "ordinal": 8,
+  "entries": [
+    {
+      "packetKey": "packet:fd8ae6feff8f",
+      "sourceRef": "karpathy-wiki/project/trace-kag-web-development-guide.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2bcb845791a847cdbd1c6c4d9fe2684d748adc8e8f7804c815f6436ebc7d09f4",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "85347e1b49cd6eb17365363544115d24562b51cffab9923918438cae3e996561",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2bcb845791a847cdbd1c6c4d9fe2684d748adc8e8f7804c815f6436ebc7d09f4",
+      "membershipContentDigest": "2bcb845791a847cdbd1c6c4d9fe2684d748adc8e8f7804c815f6436ebc7d09f4",
+      "bindingChecksum": "85347e1b49cd6eb17365363544115d24562b51cffab9923918438cae3e996561"
+    },
+    {
+      "packetKey": "packet:fd8dca68e1ec",
+      "sourceRef": "scripts/promotion/run-promotion-queue.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:833791ddcd4a69fba162197d1335278a98c26b043a7a1b2263374fe9f95ffcee",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "d8dac0a6585f3cf9ad512ffe41eeaac90637fcef08606f97b5edf15f7236c138",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "833791ddcd4a69fba162197d1335278a98c26b043a7a1b2263374fe9f95ffcee",
+      "membershipContentDigest": "833791ddcd4a69fba162197d1335278a98c26b043a7a1b2263374fe9f95ffcee",
+      "bindingChecksum": "d8dac0a6585f3cf9ad512ffe41eeaac90637fcef08606f97b5edf15f7236c138"
+    },
+    {
+      "packetKey": "packet:fd933b09da52",
+      "sourceRef": "sveltekit-frontend/drizzle/manual/20260316_poi_crimes_column.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6f3553cb0836b41c7f74ca8ebc878864e890bd4dcd298ae5724ac02b856421b3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "2d1dbeba03974cb5ae1ee23c15d73a0396035eabf81cd0ce068d7e80ad9dfbea",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6f3553cb0836b41c7f74ca8ebc878864e890bd4dcd298ae5724ac02b856421b3",
+      "membershipContentDigest": "6f3553cb0836b41c7f74ca8ebc878864e890bd4dcd298ae5724ac02b856421b3",
+      "bindingChecksum": "2d1dbeba03974cb5ae1ee23c15d73a0396035eabf81cd0ce068d7e80ad9dfbea"
+    },
+    {
+      "packetKey": "packet:fd9476954149",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__evidence__boardminimap.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:29089f70be10a557986839583bc1293bf94b54a18d80088d55a111828be6095f",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "51894c83901adf2a24e30d683aca3282e9283263c13e6d4b40714ae476e86e95",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "29089f70be10a557986839583bc1293bf94b54a18d80088d55a111828be6095f",
+      "membershipContentDigest": "29089f70be10a557986839583bc1293bf94b54a18d80088d55a111828be6095f",
+      "bindingChecksum": "51894c83901adf2a24e30d683aca3282e9283263c13e6d4b40714ae476e86e95"
+    },
+    {
+      "packetKey": "packet:fd94e852d15b",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes___app___admin__phase89___page.server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ccc50c0eeb311fa7d45f16c0539656342d16f6815e4a699ec367fcf91a6df9eb",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "0459ebb2cb66736d4f5f2c4ac5ba86f4e7e9c95bf787a9ed3ed269d881ec48f2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ccc50c0eeb311fa7d45f16c0539656342d16f6815e4a699ec367fcf91a6df9eb",
+      "membershipContentDigest": "ccc50c0eeb311fa7d45f16c0539656342d16f6815e4a699ec367fcf91a6df9eb",
+      "bindingChecksum": "0459ebb2cb66736d4f5f2c4ac5ba86f4e7e9c95bf787a9ed3ed269d881ec48f2"
+    },
+    {
+      "packetKey": "packet:fd95243d0341",
+      "sourceRef": "sveltekit-frontend/src/lib/server/legal/constitution-fetcher.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3112d54bf8432276eaa7a58e8e9776f9763924495ecad3bc882dd5101d80b6c3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "1a84f51516ed720c37a123a356787bbbf5b3346a24d49ac16fb86567f19ae2ba",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3112d54bf8432276eaa7a58e8e9776f9763924495ecad3bc882dd5101d80b6c3",
+      "membershipContentDigest": "3112d54bf8432276eaa7a58e8e9776f9763924495ecad3bc882dd5101d80b6c3",
+      "bindingChecksum": "1a84f51516ed720c37a123a356787bbbf5b3346a24d49ac16fb86567f19ae2ba"
+    },
+    {
+      "packetKey": "packet:fd97591cc82a",
+      "sourceRef": "QUICKREF-PHASE-D.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:bcd932366d0faa017487b94b8fc1f6643b9fb1d7b872187985c13f547b4a30fe",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "eddb99f1cac55a4e45631a0c17d2ec375a619a53b47df883f6c0edfba783e2a7",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "bcd932366d0faa017487b94b8fc1f6643b9fb1d7b872187985c13f547b4a30fe",
+      "membershipContentDigest": "bcd932366d0faa017487b94b8fc1f6643b9fb1d7b872187985c13f547b4a30fe",
+      "bindingChecksum": "eddb99f1cac55a4e45631a0c17d2ec375a619a53b47df883f6c0edfba783e2a7"
+    },
+    {
+      "packetKey": "packet:fd983360f570",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T16-08-31/relationship_map.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:90c25c56e09ce54ac034135d0a200135693b3443556b229e0b97a1eec4529aa2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "dec65b9cdab9167c7d8de1ebac39375eb4979d63bc0dd55d139e1362d9f5e8e9",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "90c25c56e09ce54ac034135d0a200135693b3443556b229e0b97a1eec4529aa2",
+      "membershipContentDigest": "90c25c56e09ce54ac034135d0a200135693b3443556b229e0b97a1eec4529aa2",
+      "bindingChecksum": "dec65b9cdab9167c7d8de1ebac39375eb4979d63bc0dd55d139e1362d9f5e8e9"
+    },
+    {
+      "packetKey": "packet:fd99e1b5dd41",
+      "sourceRef": "sveltekit-frontend/tests/karpathy-persistence.spec.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:845ff294feb0d7eb7fe356e643aa2dcf4aa7d7d4a19d8880cb6b260267638035",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "12f8aab6a4b1840aae65c1b62d3b6af691adc6ab72ca28d069b0cfe82cfbef36",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "845ff294feb0d7eb7fe356e643aa2dcf4aa7d7d4a19d8880cb6b260267638035",
+      "membershipContentDigest": "845ff294feb0d7eb7fe356e643aa2dcf4aa7d7d4a19d8880cb6b260267638035",
+      "bindingChecksum": "12f8aab6a4b1840aae65c1b62d3b6af691adc6ab72ca28d069b0cfe82cfbef36"
+    },
+    {
+      "packetKey": "packet:fda2957b5e9d",
+      "sourceRef": "next_steps/completed/2026-04-06_whisper-multilingual-gpu-roadmap.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:58f77cc8348a299a6ac98d1278e7d6f995dc4398c7e54fd191eb5c52d95fd2a7",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "c701243f4d9bf0fa299941ae58f86c0f97f5e54dd051ceaa0a41b84573e581b0",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "58f77cc8348a299a6ac98d1278e7d6f995dc4398c7e54fd191eb5c52d95fd2a7",
+      "membershipContentDigest": "58f77cc8348a299a6ac98d1278e7d6f995dc4398c7e54fd191eb5c52d95fd2a7",
+      "bindingChecksum": "c701243f4d9bf0fa299941ae58f86c0f97f5e54dd051ceaa0a41b84573e581b0"
+    },
+    {
+      "packetKey": "packet:fda5aadff309",
+      "sourceRef": "sveltekit-frontend/scripts/RankErrors.ps1",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:7c0dd5212bd16c33280063c226be3816881466efedb7547afcfc03d666f01a44",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "69bc89ac28e6a09207a4b867956f978b2314a95e4c0933bbd37a859b2094b2f6",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "7c0dd5212bd16c33280063c226be3816881466efedb7547afcfc03d666f01a44",
+      "membershipContentDigest": "7c0dd5212bd16c33280063c226be3816881466efedb7547afcfc03d666f01a44",
+      "bindingChecksum": "69bc89ac28e6a09207a4b867956f978b2314a95e4c0933bbd37a859b2094b2f6"
+    },
+    {
+      "packetKey": "packet:fda87e4136d9",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__types__ui-components.d.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6ec94cf7982f027e1ed021acc8d31d753a544ef82cb607c7fd93fecc76318f1c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "f6519bbda09cb8e35837289bb1a8174712f3587b3c0a6e277820a28ae4f0e619",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6ec94cf7982f027e1ed021acc8d31d753a544ef82cb607c7fd93fecc76318f1c",
+      "membershipContentDigest": "6ec94cf7982f027e1ed021acc8d31d753a544ef82cb607c7fd93fecc76318f1c",
+      "bindingChecksum": "f6519bbda09cb8e35837289bb1a8174712f3587b3c0a6e277820a28ae4f0e619"
+    },
+    {
+      "packetKey": "packet:fdaea7bdc0a8",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/cases/__id/notes/__noteId.test.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6fbfdfa0ecc6de086c4a9a194cd900d34084e287172243a75ba51ee57461258b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "bc7b3a1205c97e8f92589f3f2d7d7af915b9b3b8b601d080e619641c6d9b8638",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6fbfdfa0ecc6de086c4a9a194cd900d34084e287172243a75ba51ee57461258b",
+      "membershipContentDigest": "6fbfdfa0ecc6de086c4a9a194cd900d34084e287172243a75ba51ee57461258b",
+      "bindingChecksum": "bc7b3a1205c97e8f92589f3f2d7d7af915b9b3b8b601d080e619641c6d9b8638"
+    },
+    {
+      "packetKey": "packet:fdaf05220939",
+      "sourceRef": "scripts/write-export.js",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c5b1098e2b160ab401293e3dae3542e8b410ec1f98f8e636846b6af62042f0e5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "1c139abe1ccb1ece6f99be87eb1d39848e8b8ebfb889a3e77e52a587ecbc2257",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c5b1098e2b160ab401293e3dae3542e8b410ec1f98f8e636846b6af62042f0e5",
+      "membershipContentDigest": "c5b1098e2b160ab401293e3dae3542e8b410ec1f98f8e636846b6af62042f0e5",
+      "bindingChecksum": "1c139abe1ccb1ece6f99be87eb1d39848e8b8ebfb889a3e77e52a587ecbc2257"
+    },
+    {
+      "packetKey": "packet:fdb667aa83b7",
+      "sourceRef": "sveltekit-frontend/scripts/smoke/smoke-hyperrag.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:adfdd26878159f3dbd9e4e853e9de8cd88700f6a8251853213d203cf1237a90a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ad4e800c065653c0c0ac7c217563085f02429509f8da17f97d3bb8adadf8fafb",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "adfdd26878159f3dbd9e4e853e9de8cd88700f6a8251853213d203cf1237a90a",
+      "membershipContentDigest": "adfdd26878159f3dbd9e4e853e9de8cd88700f6a8251853213d203cf1237a90a",
+      "bindingChecksum": "ad4e800c065653c0c0ac7c217563085f02429509f8da17f97d3bb8adadf8fafb"
+    },
+    {
+      "packetKey": "packet:fdb7562da474",
+      "sourceRef": "scripts/reports/cache-hit-protocol-report.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:06f278b6d47d92016af2c0333c39f37daf799848e91743ac5e0e5c8f2127bc24",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "679b485f8185afd6a53e869a75e7ac4556438fd461b6c20a61ada50e87b36a1c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "06f278b6d47d92016af2c0333c39f37daf799848e91743ac5e0e5c8f2127bc24",
+      "membershipContentDigest": "06f278b6d47d92016af2c0333c39f37daf799848e91743ac5e0e5c8f2127bc24",
+      "bindingChecksum": "679b485f8185afd6a53e869a75e7ac4556438fd461b6c20a61ada50e87b36a1c"
+    },
+    {
+      "packetKey": "packet:fdb81cee9885",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ai/AIRecommendation.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ed6eb676b6ba606179c666cde3558902f482e21d4559d0c780d9bf7ad513855d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ea10fd6e991bf423d468fd65d5ad1fa1440d59666feb21f561213e8b30b19fc5",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ed6eb676b6ba606179c666cde3558902f482e21d4559d0c780d9bf7ad513855d",
+      "membershipContentDigest": "ed6eb676b6ba606179c666cde3558902f482e21d4559d0c780d9bf7ad513855d",
+      "bindingChecksum": "ea10fd6e991bf423d468fd65d5ad1fa1440d59666feb21f561213e8b30b19fc5"
+    },
+    {
+      "packetKey": "packet:fdbd4d0a3e62",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___citations___server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:7b07126ad60becfc4eaef34477bc0f95de6fb8caeeef676917cbeec992179bc5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fa2f43fba7cc8ce64ff95ee8a4d31ab7fd26c0ec4f02f22ef3a13376a2e99250",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "7b07126ad60becfc4eaef34477bc0f95de6fb8caeeef676917cbeec992179bc5",
+      "membershipContentDigest": "7b07126ad60becfc4eaef34477bc0f95de6fb8caeeef676917cbeec992179bc5",
+      "bindingChecksum": "fa2f43fba7cc8ce64ff95ee8a4d31ab7fd26c0ec4f02f22ef3a13376a2e99250"
+    },
+    {
+      "packetKey": "packet:fdbe245492c9",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/glyph/generate.test.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:cfb0a11f4d1b981f7a40f1e47481650df22f292e6e9f99fc142c7a5616e13120",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "003b5c5456e86d0857096c484d6a4634cbeb4727b5f7f0756993633f81c4eba2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "cfb0a11f4d1b981f7a40f1e47481650df22f292e6e9f99fc142c7a5616e13120",
+      "membershipContentDigest": "cfb0a11f4d1b981f7a40f1e47481650df22f292e6e9f99fc142c7a5616e13120",
+      "bindingChecksum": "003b5c5456e86d0857096c484d6a4634cbeb4727b5f7f0756993633f81c4eba2"
+    },
+    {
+      "packetKey": "packet:fdd5495bf483",
+      "sourceRef": "sveltekit-frontend/src/lib/components/yorha/_simulations/SystemStatus.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5f048a06dfb78b66533298925db8302ebf31b4dd09b19012f692e7e0c931c91b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "a2b3bb6d05fd214374f4c8ca6aa59182a61c079d7ca86aaa970632a7e99022b8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5f048a06dfb78b66533298925db8302ebf31b4dd09b19012f692e7e0c931c91b",
+      "membershipContentDigest": "5f048a06dfb78b66533298925db8302ebf31b4dd09b19012f692e7e0c931c91b",
+      "bindingChecksum": "a2b3bb6d05fd214374f4c8ca6aa59182a61c079d7ca86aaa970632a7e99022b8"
+    },
+    {
+      "packetKey": "packet:fdd6dbf8f946",
+      "sourceRef": "next_steps/active/2026-06-10_atlas-runner-deployment-OLD.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:b358fadccd135c3376beda71bd5e0128cf7ab620823a7ad9d04ac0328d8366cb",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b5406e25979d8b5ace91e7d2818f456bffcdcf5eb51406ac305437518339951b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "b358fadccd135c3376beda71bd5e0128cf7ab620823a7ad9d04ac0328d8366cb",
+      "membershipContentDigest": "b358fadccd135c3376beda71bd5e0128cf7ab620823a7ad9d04ac0328d8366cb",
+      "bindingChecksum": "b5406e25979d8b5ace91e7d2818f456bffcdcf5eb51406ac305437518339951b"
+    },
+    {
+      "packetKey": "packet:fde1643c0ee5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/select/SelectItem.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6283f484ef4e393679eb322a558514c8e62925983d8c4557f525f3156c4a7ce2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "513d2b15bd86ac19744c43ba24fe831769db7b10bdb7e6eb8f29abf0ce072008",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6283f484ef4e393679eb322a558514c8e62925983d8c4557f525f3156c4a7ce2",
+      "membershipContentDigest": "6283f484ef4e393679eb322a558514c8e62925983d8c4557f525f3156c4a7ce2",
+      "bindingChecksum": "513d2b15bd86ac19744c43ba24fe831769db7b10bdb7e6eb8f29abf0ce072008"
+    },
+    {
+      "packetKey": "packet:fde811371a1b",
+      "sourceRef": "sveltekit-frontend/scripts/smoke/verify-workflow.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ebf055de6f0bf35390616d4e4cd8b45e23e5ecc7fc784b9a1ce2f24b46d7c1b3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "47224f75cad8c5ba9fc2c095bb1ae4359772d60e7075164dc0525b9826dcde03",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ebf055de6f0bf35390616d4e4cd8b45e23e5ecc7fc784b9a1ce2f24b46d7c1b3",
+      "membershipContentDigest": "ebf055de6f0bf35390616d4e4cd8b45e23e5ecc7fc784b9a1ce2f24b46d7c1b3",
+      "bindingChecksum": "47224f75cad8c5ba9fc2c095bb1ae4359772d60e7075164dc0525b9826dcde03"
+    },
+    {
+      "packetKey": "packet:fde9ec234a82",
+      "sourceRef": "sveltekit-frontend/src/lib/components/evidence/EvidenceList.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:8ad7a423025c10524d4bbee7237efcfe2f4e2e30faeb12ca124855fea3049eac",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e6986f3578767d2feab201d7d48ecae2ac039ebd704e8ee62bed729cf0a1e393",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "8ad7a423025c10524d4bbee7237efcfe2f4e2e30faeb12ca124855fea3049eac",
+      "membershipContentDigest": "8ad7a423025c10524d4bbee7237efcfe2f4e2e30faeb12ca124855fea3049eac",
+      "bindingChecksum": "e6986f3578767d2feab201d7d48ecae2ac039ebd704e8ee62bed729cf0a1e393"
+    },
+    {
+      "packetKey": "packet:fdeb4484127f",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__ai__openai-types.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:9163e1ee2501d19f637054773495fa9dbfaf6956e133ee04a355cb04d3a1ce3c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fd0863cdeca01a1ab84232ef414419534b716e5069ef97f3ed34c149cfca999b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "9163e1ee2501d19f637054773495fa9dbfaf6956e133ee04a355cb04d3a1ce3c",
+      "membershipContentDigest": "9163e1ee2501d19f637054773495fa9dbfaf6956e133ee04a355cb04d3a1ce3c",
+      "bindingChecksum": "fd0863cdeca01a1ab84232ef414419534b716e5069ef97f3ed34c149cfca999b"
+    },
+    {
+      "packetKey": "packet:fdf3f16f9c6a",
+      "sourceRef": "scripts/atlas/audit-recommendation-merge.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:02a79d272a71e9da88e24aaaef538c2694d9047905031407fe44272e3b67f00b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "442964eb661c0fd6ebc9628146fddc0ebf7fdb0f5693682b11cac69d61a69945",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "02a79d272a71e9da88e24aaaef538c2694d9047905031407fe44272e3b67f00b",
+      "membershipContentDigest": "02a79d272a71e9da88e24aaaef538c2694d9047905031407fe44272e3b67f00b",
+      "bindingChecksum": "442964eb661c0fd6ebc9628146fddc0ebf7fdb0f5693682b11cac69d61a69945"
+    },
+    {
+      "packetKey": "packet:fdf8be87b0a6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/evidence/services/forensics.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3e6c8644af3c72f645d186c2a0df64bf17a9448f322058819d42f3c4413b8699",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b8a14fdc49c9c5ca7bd54a630d90045ef1b465a9ac294fe1bd30f78850c68757",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3e6c8644af3c72f645d186c2a0df64bf17a9448f322058819d42f3c4413b8699",
+      "membershipContentDigest": "3e6c8644af3c72f645d186c2a0df64bf17a9448f322058819d42f3c4413b8699",
+      "bindingChecksum": "b8a14fdc49c9c5ca7bd54a630d90045ef1b465a9ac294fe1bd30f78850c68757"
+    },
+    {
+      "packetKey": "packet:fdfbe4536ede",
+      "sourceRef": "sveltekit-frontend/src/lib/utils/sensitive-info-detector.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:a2959054ac223006779462ba50c7393689df0099dde0b01ee89a73aeb2d59eef",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "9d5b39cb8faf4d619d023d74fd25c5976ddfae5f22accbdfa1ce03d448ba8074",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "a2959054ac223006779462ba50c7393689df0099dde0b01ee89a73aeb2d59eef",
+      "membershipContentDigest": "a2959054ac223006779462ba50c7393689df0099dde0b01ee89a73aeb2d59eef",
+      "bindingChecksum": "9d5b39cb8faf4d619d023d74fd25c5976ddfae5f22accbdfa1ce03d448ba8074"
+    },
+    {
+      "packetKey": "packet:fe06535d22e3",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__research__lane4-feedback.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c3c3b3d97651bc0baf33366367982fbe7d39d270c6c149dba9f017cb71470120",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "85733ab27fde6a98f62a66aa7c01d15323e80d01c183847dd3825e11d4e41cdd",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c3c3b3d97651bc0baf33366367982fbe7d39d270c6c149dba9f017cb71470120",
+      "membershipContentDigest": "c3c3b3d97651bc0baf33366367982fbe7d39d270c6c149dba9f017cb71470120",
+      "bindingChecksum": "85733ab27fde6a98f62a66aa7c01d15323e80d01c183847dd3825e11d4e41cdd"
+    },
+    {
+      "packetKey": "packet:fe06b92678eb",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__fictional-cases.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:452f14052d21b50183b04071555adcaf6511bde56069fd959f3cd5dbd67529b3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7fb76b5567c7d3165faac6e62d6da673be3fc3173d2b07455ea21ad533f44f4a",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "452f14052d21b50183b04071555adcaf6511bde56069fd959f3cd5dbd67529b3",
+      "membershipContentDigest": "452f14052d21b50183b04071555adcaf6511bde56069fd959f3cd5dbd67529b3",
+      "bindingChecksum": "7fb76b5567c7d3165faac6e62d6da673be3fc3173d2b07455ea21ad533f44f4a"
+    },
+    {
+      "packetKey": "packet:fe070c129f7d",
+      "sourceRef": "sveltekit-frontend/drizzle/manual/0053_agent_memory_refactor_many_to_many.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ca25b5b3441da7b97a082994d06c9ba0e626afc345ee1e47f22749a67d75b8e7",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e4c11f961b356dfb05451ddd26cbf8aeee64391460829b536986925c0cc2cdf1",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ca25b5b3441da7b97a082994d06c9ba0e626afc345ee1e47f22749a67d75b8e7",
+      "membershipContentDigest": "ca25b5b3441da7b97a082994d06c9ba0e626afc345ee1e47f22749a67d75b8e7",
+      "bindingChecksum": "e4c11f961b356dfb05451ddd26cbf8aeee64391460829b536986925c0cc2cdf1"
+    },
+    {
+      "packetKey": "packet:fe0765706c96",
+      "sourceRef": "scripts/tests/kag-ingest-notebook-contract.test.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ccae3dec2c14213662ccfb1f9e8a06d11d6d314e5b456314b0aa7bc9da44d83c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7c83fc78b23515b3f1876141995927d4965aa63c3ee0061d7192a0fdff82dfd8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ccae3dec2c14213662ccfb1f9e8a06d11d6d314e5b456314b0aa7bc9da44d83c",
+      "membershipContentDigest": "ccae3dec2c14213662ccfb1f9e8a06d11d6d314e5b456314b0aa7bc9da44d83c",
+      "bindingChecksum": "7c83fc78b23515b3f1876141995927d4965aa63c3ee0061d7192a0fdff82dfd8"
+    },
+    {
+      "packetKey": "packet:fe0992f00aaf",
+      "sourceRef": "sveltekit-frontend/src/routes/api/pipeline/run/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:9552c543133c4c7fc8707ee4668dbc8cfc4ea5451b80582a283a668b38cd4ecc",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "284944f851d888586ac30ec27bf3e61b2c51b868fde36f8ac383e445bdfb8327",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "9552c543133c4c7fc8707ee4668dbc8cfc4ea5451b80582a283a668b38cd4ecc",
+      "membershipContentDigest": "9552c543133c4c7fc8707ee4668dbc8cfc4ea5451b80582a283a668b38cd4ecc",
+      "bindingChecksum": "284944f851d888586ac30ec27bf3e61b2c51b868fde36f8ac383e445bdfb8327"
+    },
+    {
+      "packetKey": "packet:fe12ad03b9d3",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__engagement__heartbeat___server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:7b7d6fe14745f3050f86d388062fe9396e40fab751a3e3cbf694b5eaf017c623",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "283f85d9a1420f35f368c263bb3c4924f9e26d77998488eacffc18433c2f9c78",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "7b7d6fe14745f3050f86d388062fe9396e40fab751a3e3cbf694b5eaf017c623",
+      "membershipContentDigest": "7b7d6fe14745f3050f86d388062fe9396e40fab751a3e3cbf694b5eaf017c623",
+      "bindingChecksum": "283f85d9a1420f35f368c263bb3c4924f9e26d77998488eacffc18433c2f9c78"
+    },
+    {
+      "packetKey": "packet:fe1639958e6c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/admin-chat.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:40bafd7f4621eae1111f32f34b4973545bfac4bd4cdb52b9b34a3afdcc78074c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "eff5c0bcaab69e26963d306fdd40b15c25c0041329d10a758425530567237918",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "40bafd7f4621eae1111f32f34b4973545bfac4bd4cdb52b9b34a3afdcc78074c",
+      "membershipContentDigest": "40bafd7f4621eae1111f32f34b4973545bfac4bd4cdb52b9b34a3afdcc78074c",
+      "bindingChecksum": "eff5c0bcaab69e26963d306fdd40b15c25c0041329d10a758425530567237918"
+    },
+    {
+      "packetKey": "packet:fe1e0ec4e229",
+      "sourceRef": "next_steps/completed/PHASE0_CONFIG_AUDIT.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6b7f33aa0bd3391939ff4cc96015b148bb2d35b0117b726356f57a544c00cfd5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "398afb8fed67cec7e5c0128fe388d95d6a93f8427212e2635016d645e75d3566",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6b7f33aa0bd3391939ff4cc96015b148bb2d35b0117b726356f57a544c00cfd5",
+      "membershipContentDigest": "6b7f33aa0bd3391939ff4cc96015b148bb2d35b0117b726356f57a544c00cfd5",
+      "bindingChecksum": "398afb8fed67cec7e5c0128fe388d95d6a93f8427212e2635016d645e75d3566"
+    },
+    {
+      "packetKey": "packet:fe1e526b7856",
+      "sourceRef": "scripts/atlas/ingester/gemma4-error-fixer.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:f875ddb33db673d21484fb7644801a66c6c69508aeec16878dce2fd7e9a796fb",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "28a99c7c1b0193dfd7b9dff69824e1300a233da91ffa2399d5a2e3dd0401d34f",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "f875ddb33db673d21484fb7644801a66c6c69508aeec16878dce2fd7e9a796fb",
+      "membershipContentDigest": "f875ddb33db673d21484fb7644801a66c6c69508aeec16878dce2fd7e9a796fb",
+      "bindingChecksum": "28a99c7c1b0193dfd7b9dff69824e1300a233da91ffa2399d5a2e3dd0401d34f"
+    },
+    {
+      "packetKey": "packet:fe231613d881",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__ai__legaldocumentsummarizer.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c54688a3d6927d322eea5cd7eb9a4ba748826c1f752c96b9ee69301029e216ff",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "72bc642b432bb38970797a580b65fcb06a3986a91fb2bb9faeae737603ed9e1c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c54688a3d6927d322eea5cd7eb9a4ba748826c1f752c96b9ee69301029e216ff",
+      "membershipContentDigest": "c54688a3d6927d322eea5cd7eb9a4ba748826c1f752c96b9ee69301029e216ff",
+      "bindingChecksum": "72bc642b432bb38970797a580b65fcb06a3986a91fb2bb9faeae737603ed9e1c"
+    },
+    {
+      "packetKey": "packet:fe23f99cc64c",
+      "sourceRef": "scripts/atlas/shared-label-registry.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:9a32a3c45fe07ea87386b695be144bba37a8c7e6dd25010ba3965465b53c699e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "567cd691c7281ac99c6c86d76d97d62a5c3363255f27b16e78bd2fb082aa064c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "9a32a3c45fe07ea87386b695be144bba37a8c7e6dd25010ba3965465b53c699e",
+      "membershipContentDigest": "9a32a3c45fe07ea87386b695be144bba37a8c7e6dd25010ba3965465b53c699e",
+      "bindingChecksum": "567cd691c7281ac99c6c86d76d97d62a5c3363255f27b16e78bd2fb082aa064c"
+    },
+    {
+      "packetKey": "packet:fe27eb11d264",
+      "sourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/gemma-embedding.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2d7ddae568c658073ff9cae9e4bec8baeaf5c79a40043cc15011f55057ee554e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ad73be723fc965d5fed415a16c7c0a69eff78634a44a9669ee6161f9ef7b10a3",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2d7ddae568c658073ff9cae9e4bec8baeaf5c79a40043cc15011f55057ee554e",
+      "membershipContentDigest": "2d7ddae568c658073ff9cae9e4bec8baeaf5c79a40043cc15011f55057ee554e",
+      "bindingChecksum": "ad73be723fc965d5fed415a16c7c0a69eff78634a44a9669ee6161f9ef7b10a3"
+    },
+    {
+      "packetKey": "packet:fe29becec4f0",
+      "sourceRef": "scripts/test-phase8-loop.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:92f52e76cff743c1d5cd4dfd1202520e1d1acc63ebe47101ecef9d6bfadd144b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b98a638b360f51767765f2f8aa32174d52b9ac587762e899bdb4aebf1303f455",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "92f52e76cff743c1d5cd4dfd1202520e1d1acc63ebe47101ecef9d6bfadd144b",
+      "membershipContentDigest": "92f52e76cff743c1d5cd4dfd1202520e1d1acc63ebe47101ecef9d6bfadd144b",
+      "bindingChecksum": "b98a638b360f51767765f2f8aa32174d52b9ac587762e899bdb4aebf1303f455"
+    },
+    {
+      "packetKey": "packet:fe354a5f2614",
+      "sourceRef": "scripts/legal_calibration_data.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5310b8b01464365f6bb5fb7fb808c97c99f682adf455ef67186625dd72dcbaf6",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "af8db4864281c09aada7fc76d751a0311d4c07766edbf6b185f91c1977c4d53e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5310b8b01464365f6bb5fb7fb808c97c99f682adf455ef67186625dd72dcbaf6",
+      "membershipContentDigest": "5310b8b01464365f6bb5fb7fb808c97c99f682adf455ef67186625dd72dcbaf6",
+      "bindingChecksum": "af8db4864281c09aada7fc76d751a0311d4c07766edbf6b185f91c1977c4d53e"
+    },
+    {
+      "packetKey": "packet:fe382e031a84",
+      "sourceRef": "ecosystem.prod.config.cjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:8ca014de1dcd354c496cb0b134c2b19cc0fadf70eed2db955d8d0667abf19301",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "933048fd1dd0d874614966f968aee2bd624c87ecc7a3d878af78ccc3e7423f4c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "8ca014de1dcd354c496cb0b134c2b19cc0fadf70eed2db955d8d0667abf19301",
+      "membershipContentDigest": "8ca014de1dcd354c496cb0b134c2b19cc0fadf70eed2db955d8d0667abf19301",
+      "bindingChecksum": "933048fd1dd0d874614966f968aee2bd624c87ecc7a3d878af78ccc3e7423f4c"
+    },
+    {
+      "packetKey": "packet:fe3a1bfa0c8f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/meta/0000_snapshot.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:beca4ceced6abdbeb9d196fbcec1762013d3dcccda513d2878929ef8e4178166",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "f87eb17269f1f8c476427be8bd141ad29471bb4b613b839056b4fc2c790193bd",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "beca4ceced6abdbeb9d196fbcec1762013d3dcccda513d2878929ef8e4178166",
+      "membershipContentDigest": "beca4ceced6abdbeb9d196fbcec1762013d3dcccda513d2878929ef8e4178166",
+      "bindingChecksum": "f87eb17269f1f8c476427be8bd141ad29471bb4b613b839056b4fc2c790193bd"
+    },
+    {
+      "packetKey": "packet:fe3a38801752",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/neo4j-rerank.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:1bd594ee6c826c96addf5dd4ce4b372614a923159c086e7411d336d9c39d620e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4d6af37dc839ce353df0bbd68ab5a65e755e204d13bf49ca85f078261bc5903e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "1bd594ee6c826c96addf5dd4ce4b372614a923159c086e7411d336d9c39d620e",
+      "membershipContentDigest": "1bd594ee6c826c96addf5dd4ce4b372614a923159c086e7411d336d9c39d620e",
+      "bindingChecksum": "4d6af37dc839ce353df0bbd68ab5a65e755e204d13bf49ca85f078261bc5903e"
+    },
+    {
+      "packetKey": "packet:fe3fa11182dd",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/.venv-py313-backup__lib__site-packages__googleapiclient__discovery_cache__documents__discoveryengine.v1.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:022cb8f95a19a6b54555e59449591d7b630651e936377c95bee7e5c97b2bd411",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "627ffc3ca7f776572711729f1b652e335ca3a7bfb2bc43a872801d1630a4e919",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "022cb8f95a19a6b54555e59449591d7b630651e936377c95bee7e5c97b2bd411",
+      "membershipContentDigest": "022cb8f95a19a6b54555e59449591d7b630651e936377c95bee7e5c97b2bd411",
+      "bindingChecksum": "627ffc3ca7f776572711729f1b652e335ca3a7bfb2bc43a872801d1630a4e919"
+    },
+    {
+      "packetKey": "packet:fe45763a8f05",
+      "sourceRef": "sveltekit-frontend/drizzle/migrations/20251207_route_error_patches.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:b439e523d8a025c140bc7982aac6e406265abbfee33520dba2477a64bd90321e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4ea71cdf84389a304d8cf743c647dd92ae39e57f4575539f3bb4d1ee5bbf877d",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "b439e523d8a025c140bc7982aac6e406265abbfee33520dba2477a64bd90321e",
+      "membershipContentDigest": "b439e523d8a025c140bc7982aac6e406265abbfee33520dba2477a64bd90321e",
+      "bindingChecksum": "4ea71cdf84389a304d8cf743c647dd92ae39e57f4575539f3bb4d1ee5bbf877d"
+    },
+    {
+      "packetKey": "packet:fe494b8a6a0c",
+      "sourceRef": "scripts/atlas/phase-1b-som-backfill-heuristic.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c17c1ff835d31ca4000d49e834f72e087cbf1796a96bbf08f99e5fe03c5835ae",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "c58b87146795ad919b2b8ca151751247a069a7864342cfbefc039e19fe3a9ab2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c17c1ff835d31ca4000d49e834f72e087cbf1796a96bbf08f99e5fe03c5835ae",
+      "membershipContentDigest": "c17c1ff835d31ca4000d49e834f72e087cbf1796a96bbf08f99e5fe03c5835ae",
+      "bindingChecksum": "c58b87146795ad919b2b8ca151751247a069a7864342cfbefc039e19fe3a9ab2"
+    },
+    {
+      "packetKey": "packet:fe4ea3393c21",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__phase97-authenticated-streaming.spec.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:fe631b1b4d8d07f92c71dfa840a9258fe14e66236d65a081bad7704f0fec5033",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7510452d78fc7e5fdf4ea7fbbb4bfa70cea89834e3f2cb5482cb44ae4b966c0e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "fe631b1b4d8d07f92c71dfa840a9258fe14e66236d65a081bad7704f0fec5033",
+      "membershipContentDigest": "fe631b1b4d8d07f92c71dfa840a9258fe14e66236d65a081bad7704f0fec5033",
+      "bindingChecksum": "7510452d78fc7e5fdf4ea7fbbb4bfa70cea89834e3f2cb5482cb44ae4b966c0e"
+    },
+    {
+      "packetKey": "packet:fe52190e4462",
+      "sourceRef": "sveltekit-frontend/scripts/lang-extract.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ba9f1a7d9fbcefd1a54518b120a0232643dd6973830a2d7a8604eee0145f275a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "1c741f9252c14513c748be2e62f03c95907a5abf60eb1a0292dd8bf8447017d8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ba9f1a7d9fbcefd1a54518b120a0232643dd6973830a2d7a8604eee0145f275a",
+      "membershipContentDigest": "ba9f1a7d9fbcefd1a54518b120a0232643dd6973830a2d7a8604eee0145f275a",
+      "bindingChecksum": "1c741f9252c14513c748be2e62f03c95907a5abf60eb1a0292dd8bf8447017d8"
+    },
+    {
+      "packetKey": "packet:fe533979902e",
+      "sourceRef": "sveltekit-frontend/tests/e2e/route-forensic/evidence-list.diagnostic.spec.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:4015752e5d75d396d7c40a028e9222c48ecda167689a3c6ccdd28f3383f9ab72",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "373beb8485b9067888f670efbf79a57b52e7e1b2f432f5a5511fa771ce1af39b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "4015752e5d75d396d7c40a028e9222c48ecda167689a3c6ccdd28f3383f9ab72",
+      "membershipContentDigest": "4015752e5d75d396d7c40a028e9222c48ecda167689a3c6ccdd28f3383f9ab72",
+      "bindingChecksum": "373beb8485b9067888f670efbf79a57b52e7e1b2f432f5a5511fa771ce1af39b"
+    },
+    {
+      "packetKey": "packet:fe541ebda445",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/queue/dispatch-stats.test.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:25e5de8caa2bd8c8d31022007a7281cad1d58bc889a22a461f3e304823a1ce6c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4ddc8cc4a13323806e54f48188078426757087b125b7dbd05ceaf9a6fc2d0e9f",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "25e5de8caa2bd8c8d31022007a7281cad1d58bc889a22a461f3e304823a1ce6c",
+      "membershipContentDigest": "25e5de8caa2bd8c8d31022007a7281cad1d58bc889a22a461f3e304823a1ce6c",
+      "bindingChecksum": "4ddc8cc4a13323806e54f48188078426757087b125b7dbd05ceaf9a6fc2d0e9f"
+    },
+    {
+      "packetKey": "packet:fe546ebb4c63",
+      "sourceRef": "sveltekit-frontend/drizzle/archived/0011_chief_goliath.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6af8fa59b5e9a14895b205115cf653202e390060a325c34dcdc26eddcf9ac203",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "27610735ac2d924abb05bf4d9f47fdacf77e1196a29325b0160d2ad1645a8742",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6af8fa59b5e9a14895b205115cf653202e390060a325c34dcdc26eddcf9ac203",
+      "membershipContentDigest": "6af8fa59b5e9a14895b205115cf653202e390060a325c34dcdc26eddcf9ac203",
+      "bindingChecksum": "27610735ac2d924abb05bf4d9f47fdacf77e1196a29325b0160d2ad1645a8742"
+    },
+    {
+      "packetKey": "packet:fe5aac959776",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/sveltekit-frontend/src/routes/api/ace/stage-5-policy.test.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3c66ab5cf74260982e20157b7b22d0913c5edfc0fa7ffd2b31ec037dc34603c8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "cb6b6e34e4efe3142d96be2ad96d4568000a8d2d50001e8e2ca52b731390d627",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3c66ab5cf74260982e20157b7b22d0913c5edfc0fa7ffd2b31ec037dc34603c8",
+      "membershipContentDigest": "3c66ab5cf74260982e20157b7b22d0913c5edfc0fa7ffd2b31ec037dc34603c8",
+      "bindingChecksum": "cb6b6e34e4efe3142d96be2ad96d4568000a8d2d50001e8e2ca52b731390d627"
+    },
+    {
+      "packetKey": "packet:fe603b57bd0e",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__webgpu__wire-telemetry.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:dc119238e215591eb44832e66679d311f378b7cc75ed30017e2c2100ba786256",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "68e648d7c300fb3a9b40ffb25f4760263214f941891a6ee8c2ddf70fa9701310",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "dc119238e215591eb44832e66679d311f378b7cc75ed30017e2c2100ba786256",
+      "membershipContentDigest": "dc119238e215591eb44832e66679d311f378b7cc75ed30017e2c2100ba786256",
+      "bindingChecksum": "68e648d7c300fb3a9b40ffb25f4760263214f941891a6ee8c2ddf70fa9701310"
+    },
+    {
+      "packetKey": "packet:fe6bc7e4291f",
+      "sourceRef": "scripts/atlas/smoke-memory-address-registry.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:14c905434098d904716999c85adadc346d5e86256627610944e08a44e944a068",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b36ce7e15bd2a76e35643ea5ece67bb3d1c4c09f6925adeb5d34f3c69d627919",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "14c905434098d904716999c85adadc346d5e86256627610944e08a44e944a068",
+      "membershipContentDigest": "14c905434098d904716999c85adadc346d5e86256627610944e08a44e944a068",
+      "bindingChecksum": "b36ce7e15bd2a76e35643ea5ece67bb3d1c4c09f6925adeb5d34f3c69d627919"
+    },
+    {
+      "packetKey": "packet:fe728fd12142",
+      "sourceRef": "docs/PHASE-4B-TASK-2-NEO4J-READY.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d10b6d1fdcae588d0ac3891cf91bdf95ec4e963279d54a4d847fd5eb23622b45",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6850f80691e13728a65f42726ab8b11164578b2fc576dcec2083571af3508a7a",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d10b6d1fdcae588d0ac3891cf91bdf95ec4e963279d54a4d847fd5eb23622b45",
+      "membershipContentDigest": "d10b6d1fdcae588d0ac3891cf91bdf95ec4e963279d54a4d847fd5eb23622b45",
+      "bindingChecksum": "6850f80691e13728a65f42726ab8b11164578b2fc576dcec2083571af3508a7a"
+    },
+    {
+      "packetKey": "packet:fe72fab10020",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__auth__me.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d698fd86dd9ab9e92d000ee12d1ad15db128eedd5ad50147d3018cd3fd9c63df",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "9b6e42001dbbb3411810ceba4a30b5fa86c0e199a381ff67a2697c542476e794",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d698fd86dd9ab9e92d000ee12d1ad15db128eedd5ad50147d3018cd3fd9c63df",
+      "membershipContentDigest": "d698fd86dd9ab9e92d000ee12d1ad15db128eedd5ad50147d3018cd3fd9c63df",
+      "bindingChecksum": "9b6e42001dbbb3411810ceba4a30b5fa86c0e199a381ff67a2697c542476e794"
+    },
+    {
+      "packetKey": "packet:fe7c1bef6288",
+      "sourceRef": "sveltekit-frontend/src/routes/api/chat/memory/search/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:253fe5ba0b0316f77dff3719d2c14a51c7dae360df1276f9e9f1a943b942de98",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "f4e5b50dba6e22d237f3afcf304514929e017464504d53e926d0734f5b6f33a1",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "253fe5ba0b0316f77dff3719d2c14a51c7dae360df1276f9e9f1a943b942de98",
+      "membershipContentDigest": "253fe5ba0b0316f77dff3719d2c14a51c7dae360df1276f9e9f1a943b942de98",
+      "bindingChecksum": "f4e5b50dba6e22d237f3afcf304514929e017464504d53e926d0734f5b6f33a1"
+    },
+    {
+      "packetKey": "packet:fe7e439ab9b2",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__codeintel__clusters___id____server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2ae59dc7dcda81ba9df8b7b72f05e6c1d2bcd223085a6e7de823f8b5f986ad4d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "2a7125fcc77cf2342ced4f5910b859652ae29e53dd6e6ef9ce6a9f2b82d35fd9",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2ae59dc7dcda81ba9df8b7b72f05e6c1d2bcd223085a6e7de823f8b5f986ad4d",
+      "membershipContentDigest": "2ae59dc7dcda81ba9df8b7b72f05e6c1d2bcd223085a6e7de823f8b5f986ad4d",
+      "bindingChecksum": "2a7125fcc77cf2342ced4f5910b859652ae29e53dd6e6ef9ce6a9f2b82d35fd9"
+    },
+    {
+      "packetKey": "packet:fe80b0adc226",
+      "sourceRef": "sveltekit-frontend/docs/design/video_phase1.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:182bf06f9c1125487903847f137df9b184e32efb1bf6fea03cb44ce4036ce1fd",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "524b7848856952b8432ae6c99ac66de0d0682a4963a930d57e181a214a15ffc8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "182bf06f9c1125487903847f137df9b184e32efb1bf6fea03cb44ce4036ce1fd",
+      "membershipContentDigest": "182bf06f9c1125487903847f137df9b184e32efb1bf6fea03cb44ce4036ce1fd",
+      "bindingChecksum": "524b7848856952b8432ae6c99ac66de0d0682a4963a930d57e181a214a15ffc8"
+    },
+    {
+      "packetKey": "packet:fe8f71ee7524",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__llm__ollama-client.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6550729b56f29bbb46db41af3c3874eb000216342b0d52158d9a8c2f1e0c1df6",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b86f392062269f6cc879b8da813a6287f8780a33fb8d1461f16463d9e7469df8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6550729b56f29bbb46db41af3c3874eb000216342b0d52158d9a8c2f1e0c1df6",
+      "membershipContentDigest": "6550729b56f29bbb46db41af3c3874eb000216342b0d52158d9a8c2f1e0c1df6",
+      "bindingChecksum": "b86f392062269f6cc879b8da813a6287f8780a33fb8d1461f16463d9e7469df8"
+    },
+    {
+      "packetKey": "packet:fe9e34bc43aa",
+      "sourceRef": "scripts/atlas/replay-agentic-recommendations.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:cbcbaab2ac64e5f0f2f5d0b80677211b56882759cfdf7fb57c1a53534689e19f",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ac03c4c7ff920d5e90f699f53a85bb03787d0cc90eab0fc3201d7c9271c2e22f",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "cbcbaab2ac64e5f0f2f5d0b80677211b56882759cfdf7fb57c1a53534689e19f",
+      "membershipContentDigest": "cbcbaab2ac64e5f0f2f5d0b80677211b56882759cfdf7fb57c1a53534689e19f",
+      "bindingChecksum": "ac03c4c7ff920d5e90f699f53a85bb03787d0cc90eab0fc3201d7c9271c2e22f"
+    },
+    {
+      "packetKey": "packet:fe9e6c68faf0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/multi-lane-retrieval.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "d61f02d8c7711b3891f23e366470138d48bb853b5b86269d3efbc1a66e4cbffe",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
+      "membershipContentDigest": "91cffbc7b171fbe21ba6b57ec7948cf1ecb88bc5b964255998f62e39b8e7206c",
+      "bindingChecksum": "d61f02d8c7711b3891f23e366470138d48bb853b5b86269d3efbc1a66e4cbffe"
+    },
+    {
+      "packetKey": "packet:fea0302abcb9",
+      "sourceRef": "docs/open-lanes/neo4j-gds-gemma4-orchestration.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d6845a7c19d348fb7ab7b9e24ef3ccf95eddc9fd5196c1d0d216fb7356951dfc",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "a6629933c5caecadd255a3dfb706f8f9f65d56b2cc6c9d8dc6c7b0f48364705b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d6845a7c19d348fb7ab7b9e24ef3ccf95eddc9fd5196c1d0d216fb7356951dfc",
+      "membershipContentDigest": "d6845a7c19d348fb7ab7b9e24ef3ccf95eddc9fd5196c1d0d216fb7356951dfc",
+      "bindingChecksum": "a6629933c5caecadd255a3dfb706f8f9f65d56b2cc6c9d8dc6c7b0f48364705b"
+    },
+    {
+      "packetKey": "packet:fea1c3f3b2de",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/nes-elements/+page.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ea15f698a1f7c1f7fa2e64bdd3e6640d969940ceb21d3460e618de2c69ebefff",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "947c78067828e9606caa955cc2ee2df33df88141c8575c6862a2eea44d944d2a",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ea15f698a1f7c1f7fa2e64bdd3e6640d969940ceb21d3460e618de2c69ebefff",
+      "membershipContentDigest": "ea15f698a1f7c1f7fa2e64bdd3e6640d969940ceb21d3460e618de2c69ebefff",
+      "bindingChecksum": "947c78067828e9606caa955cc2ee2df33df88141c8575c6862a2eea44d944d2a"
+    },
+    {
+      "packetKey": "packet:fea315e53129",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__overview.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d40772858bf815396e915b8357a80c6ab1b8ef9f769f9dac83721cf824c2589b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4658f29fe198e43e6c6ec452ce54cd855539bade1d611886d3095596f00cf93c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d40772858bf815396e915b8357a80c6ab1b8ef9f769f9dac83721cf824c2589b",
+      "membershipContentDigest": "d40772858bf815396e915b8357a80c6ab1b8ef9f769f9dac83721cf824c2589b",
+      "bindingChecksum": "4658f29fe198e43e6c6ec452ce54cd855539bade1d611886d3095596f00cf93c"
+    },
+    {
+      "packetKey": "packet:feaa24284b33",
+      "sourceRef": "scripts/_check_glossary.cjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2e4ee33eaee05e7c0e2693f064fd293411e4402f01d1be5477b541a879deb2d8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "28b7058150a5650ee73fba42ed8879d7c0b9fbd62bdd32d83f84a0540eec6f91",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2e4ee33eaee05e7c0e2693f064fd293411e4402f01d1be5477b541a879deb2d8",
+      "membershipContentDigest": "2e4ee33eaee05e7c0e2693f064fd293411e4402f01d1be5477b541a879deb2d8",
+      "bindingChecksum": "28b7058150a5650ee73fba42ed8879d7c0b9fbd62bdd32d83f84a0540eec6f91"
+    },
+    {
+      "packetKey": "packet:feafbbdfd51f",
+      "sourceRef": "sveltekit-frontend/tests/routes/auto/api/cache/LLMS.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:49a17896e47b718fa4c92be316e1789bb61515428113aa837b1ea0b5ea0112de",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "da10caa261ca60e21d15422da9aef76b16b5b417ca087bead1fffa1a05888184",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "49a17896e47b718fa4c92be316e1789bb61515428113aa837b1ea0b5ea0112de",
+      "membershipContentDigest": "49a17896e47b718fa4c92be316e1789bb61515428113aa837b1ea0b5ea0112de",
+      "bindingChecksum": "da10caa261ca60e21d15422da9aef76b16b5b417ca087bead1fffa1a05888184"
+    },
+    {
+      "packetKey": "packet:feb1b0d48760",
+      "sourceRef": "sveltekit-frontend/src/lib/types/index.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d5a8de1d62ef033d562e28aa22f289ebbba202fd73babcfcfe29bdc9400a94e4",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "dbe71ad1d8d61be9697c26a84120fee9386e07ac42368411cce3534a71c860e2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d5a8de1d62ef033d562e28aa22f289ebbba202fd73babcfcfe29bdc9400a94e4",
+      "membershipContentDigest": "d5a8de1d62ef033d562e28aa22f289ebbba202fd73babcfcfe29bdc9400a94e4",
+      "bindingChecksum": "dbe71ad1d8d61be9697c26a84120fee9386e07ac42368411cce3534a71c860e2"
+    },
+    {
+      "packetKey": "packet:feb3a7b60d71",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T15-55-50/ace_hit_relationships.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:489a865083cecdcf29b9d5193b4ade9a32cd099d7de0165b825203c90056f1c3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "01a3248d4eb301b37b07adf1169bf3147421cd98d03ef0618f469a90e689f505",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "489a865083cecdcf29b9d5193b4ade9a32cd099d7de0165b825203c90056f1c3",
+      "membershipContentDigest": "489a865083cecdcf29b9d5193b4ade9a32cd099d7de0165b825203c90056f1c3",
+      "bindingChecksum": "01a3248d4eb301b37b07adf1169bf3147421cd98d03ef0618f469a90e689f505"
+    },
+    {
+      "packetKey": "packet:febb46701a2a",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/analytics/LLMS.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:1da6026b86f627d4f702e1975c4c8b9c599fd054b79c76625438c0e70fa2e587",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "f7bbfc719acfaa482ff3def615244b14607f6144d81c43d93a06dfd4d2e8def8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "1da6026b86f627d4f702e1975c4c8b9c599fd054b79c76625438c0e70fa2e587",
+      "membershipContentDigest": "1da6026b86f627d4f702e1975c4c8b9c599fd054b79c76625438c0e70fa2e587",
+      "bindingChecksum": "f7bbfc719acfaa482ff3def615244b14607f6144d81c43d93a06dfd4d2e8def8"
+    },
+    {
+      "packetKey": "packet:febb54f5b47d",
+      "sourceRef": "docs/profile-cards/data/next_steps_active_SCHEMA_MANIFEST.json.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3f5de7ab9e208481361dfdaa95653c0cfe3ad4ce9cb46b1657b173491e125ecc",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "941ef67c14338e4ce2389a36e26542601459393ba90b89f7d97e14f23aecbee0",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3f5de7ab9e208481361dfdaa95653c0cfe3ad4ce9cb46b1657b173491e125ecc",
+      "membershipContentDigest": "3f5de7ab9e208481361dfdaa95653c0cfe3ad4ce9cb46b1657b173491e125ecc",
+      "bindingChecksum": "941ef67c14338e4ce2389a36e26542601459393ba90b89f7d97e14f23aecbee0"
+    },
+    {
+      "packetKey": "packet:febc43c78dbe",
+      "sourceRef": "sveltekit-frontend/tests/performance-snapshot.spec.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:7f6a9a7c4ef4007622297755292f48ef6aebf2d6266f8d550989569fa9500291",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e8996d9f291bec27b74b87fa7cb8304bc72e0dceead44e95208274e7fbae75b1",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "7f6a9a7c4ef4007622297755292f48ef6aebf2d6266f8d550989569fa9500291",
+      "membershipContentDigest": "7f6a9a7c4ef4007622297755292f48ef6aebf2d6266f8d550989569fa9500291",
+      "bindingChecksum": "e8996d9f291bec27b74b87fa7cb8304bc72e0dceead44e95208274e7fbae75b1"
+    },
+    {
+      "packetKey": "packet:febc6345dfd3",
+      "sourceRef": "sveltekit-frontend/src/routes/api/pgai/analyze/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2e1791657691c9fd00d0ebc9c4fbaae0ecb5217e28009e907d9e10bade3a140a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "0a3e6d86cec05f08444043fb5a30b92b6bb695c14ddcbf51c01d7860a306380b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2e1791657691c9fd00d0ebc9c4fbaae0ecb5217e28009e907d9e10bade3a140a",
+      "membershipContentDigest": "2e1791657691c9fd00d0ebc9c4fbaae0ecb5217e28009e907d9e10bade3a140a",
+      "bindingChecksum": "0a3e6d86cec05f08444043fb5a30b92b6bb695c14ddcbf51c01d7860a306380b"
+    },
+    {
+      "packetKey": "packet:fec08b29d31d",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__servicenetworking.v1.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5623217879f15b60c1750e8ba409ce6b81b9e9c656fd2e512ea2affcad66d727",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "08b2301eea04900f6c4f368ada76d6e3e82ee9d60eca3124be7f819b1e749e23",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5623217879f15b60c1750e8ba409ce6b81b9e9c656fd2e512ea2affcad66d727",
+      "membershipContentDigest": "5623217879f15b60c1750e8ba409ce6b81b9e9c656fd2e512ea2affcad66d727",
+      "bindingChecksum": "08b2301eea04900f6c4f368ada76d6e3e82ee9d60eca3124be7f819b1e749e23"
+    },
+    {
+      "packetKey": "packet:feca30d5a01d",
+      "sourceRef": "scripts/atlas/agentic-toolgan-dedupe.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:cc38d88b4ef411f71ecb3621af321dd202ab1fd2ac5558e15463c30938e9f975",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "c6500f7915554aa6d94e26c83bde742b5437d3aebd1b61bd4ead423d4616dc20",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "cc38d88b4ef411f71ecb3621af321dd202ab1fd2ac5558e15463c30938e9f975",
+      "membershipContentDigest": "cc38d88b4ef411f71ecb3621af321dd202ab1fd2ac5558e15463c30938e9f975",
+      "bindingChecksum": "c6500f7915554aa6d94e26c83bde742b5437d3aebd1b61bd4ead423d4616dc20"
+    },
+    {
+      "packetKey": "packet:fece0fae9284",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__ai__cross-exam.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d25da76ccee4f3d8a56da1466082bd0462e96c49d90d818012fa8f858a40c5af",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "2876446d1cee5356dac286bd674f2cf4281b3700bfe96994d83a93c19bbf0851",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d25da76ccee4f3d8a56da1466082bd0462e96c49d90d818012fa8f858a40c5af",
+      "membershipContentDigest": "d25da76ccee4f3d8a56da1466082bd0462e96c49d90d818012fa8f858a40c5af",
+      "bindingChecksum": "2876446d1cee5356dac286bd674f2cf4281b3700bfe96994d83a93c19bbf0851"
+    },
+    {
+      "packetKey": "packet:fece2d81d759",
+      "sourceRef": "sveltekit-frontend/uploads/transcriptions/transcription-aa107402-1955-4df2-92b8-81df6bfcad1e.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:85c3322453e66c954cfe1c718a02b01935fead975958c8a95b6879bc3cc4a426",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "2d5c1d9f7a7bb014ee83ab2a3fb5dd0a9366f54464f0ef9e8c33ed7b4d51702e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "85c3322453e66c954cfe1c718a02b01935fead975958c8a95b6879bc3cc4a426",
+      "membershipContentDigest": "85c3322453e66c954cfe1c718a02b01935fead975958c8a95b6879bc3cc4a426",
+      "bindingChecksum": "2d5c1d9f7a7bb014ee83ab2a3fb5dd0a9366f54464f0ef9e8c33ed7b4d51702e"
+    },
+    {
+      "packetKey": "packet:fed59033a31b",
+      "sourceRef": "sveltekit-frontend/src/routes/api/health/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:8586afb9a28f99ad8c27eca0d6819bf547db790e1ea355cd8caf959811ced8d6",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b4cab783d9dd878fbd705b2afa77914d862dfc421db3b5b5181847cbfd5f9c58",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "8586afb9a28f99ad8c27eca0d6819bf547db790e1ea355cd8caf959811ced8d6",
+      "membershipContentDigest": "8586afb9a28f99ad8c27eca0d6819bf547db790e1ea355cd8caf959811ced8d6",
+      "bindingChecksum": "b4cab783d9dd878fbd705b2afa77914d862dfc421db3b5b5181847cbfd5f9c58"
+    },
+    {
+      "packetKey": "packet:fed70197ef38",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/.venv__lib__site-packages__googleapiclient__discovery_cache__documents__videointelligence.v1p2beta1.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:54bf4509c6257f7c83f72ef94bdb82fc17ece8b621309f276faf64f4c0c9d8da",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "15979285744ce758ac5734fb9f5136ec139dc12330bae72dc75cfd11c36180ac",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "54bf4509c6257f7c83f72ef94bdb82fc17ece8b621309f276faf64f4c0c9d8da",
+      "membershipContentDigest": "54bf4509c6257f7c83f72ef94bdb82fc17ece8b621309f276faf64f4c0c9d8da",
+      "bindingChecksum": "15979285744ce758ac5734fb9f5136ec139dc12330bae72dc75cfd11c36180ac"
+    },
+    {
+      "packetKey": "packet:fedb00b73432",
+      "sourceRef": "scripts/run-integration-tests.sh",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c0b3215659be706e09d2ecd59c2b292d6670ad1702ff139be78700b607ee6dd5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "8f30334f7b281c9b83457a2a7f81cecc368ac4c8533cb8a56bd325e4ea494c31",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c0b3215659be706e09d2ecd59c2b292d6670ad1702ff139be78700b607ee6dd5",
+      "membershipContentDigest": "c0b3215659be706e09d2ecd59c2b292d6670ad1702ff139be78700b607ee6dd5",
+      "bindingChecksum": "8f30334f7b281c9b83457a2a7f81cecc368ac4c8533cb8a56bd325e4ea494c31"
+    },
+    {
+      "packetKey": "packet:fee27a1f19a0",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__code-intel__topology___server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c1b454bbf5401de5a3cad3a775e9aeb006eade373c5c270041a0a5f114fab1a0",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "2613c1667970530c0883f9e5412a8240c9f2a8096bd8643feb78934a149cb812",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c1b454bbf5401de5a3cad3a775e9aeb006eade373c5c270041a0a5f114fab1a0",
+      "membershipContentDigest": "c1b454bbf5401de5a3cad3a775e9aeb006eade373c5c270041a0a5f114fab1a0",
+      "bindingChecksum": "2613c1667970530c0883f9e5412a8240c9f2a8096bd8643feb78934a149cb812"
+    },
+    {
+      "packetKey": "packet:feedba81d83e",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/theory-board/+page.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:dc8ca2eadc444bf69c944057671d4654264f018211821f84264cc6f5905acaf5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ea7fcd40a7d1ab01b4b5bf317151d2c07472c4d8fd949dd153bf0aba834124bd",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "dc8ca2eadc444bf69c944057671d4654264f018211821f84264cc6f5905acaf5",
+      "membershipContentDigest": "dc8ca2eadc444bf69c944057671d4654264f018211821f84264cc6f5905acaf5",
+      "bindingChecksum": "ea7fcd40a7d1ab01b4b5bf317151d2c07472c4d8fd949dd153bf0aba834124bd"
+    },
+    {
+      "packetKey": "packet:feef1839b5c1",
+      "sourceRef": ".github/agents/trace-audit.agent.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "456cc6e98e625845f9dc1e9a32d4a419872ae094243c69813821d2cc01d0ba03",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+      "membershipContentDigest": "d1104cd948899b7aee8d9815fd0cda5e2856ee06c44be9eabd366955dba7e669",
+      "bindingChecksum": "456cc6e98e625845f9dc1e9a32d4a419872ae094243c69813821d2cc01d0ba03"
+    },
+    {
+      "packetKey": "packet:fef14f64dde0",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/phase89/+page.server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d1bb53ea24fabc7b93b443566fe76d09320b8ca72009b21b09b6da45985abcda",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e231f2bc9a7a393d3d2133798560d3a1eebea0940684f0feb020786e21f537be",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d1bb53ea24fabc7b93b443566fe76d09320b8ca72009b21b09b6da45985abcda",
+      "membershipContentDigest": "d1bb53ea24fabc7b93b443566fe76d09320b8ca72009b21b09b6da45985abcda",
+      "bindingChecksum": "e231f2bc9a7a393d3d2133798560d3a1eebea0940684f0feb020786e21f537be"
+    },
+    {
+      "packetKey": "packet:fefa4a48b361",
+      "sourceRef": "sveltekit-frontend/src/lib/components/legal/ContractAnalyzer.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:9c0dac05a7e4c13a24881b255512a13f8ba1150170348a7ecbadda6855438f24",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "067fe0e7b4ecb1d9c020c11232d8bb4ca27961662dae81dd2cdeb87030ad1435",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "9c0dac05a7e4c13a24881b255512a13f8ba1150170348a7ecbadda6855438f24",
+      "membershipContentDigest": "9c0dac05a7e4c13a24881b255512a13f8ba1150170348a7ecbadda6855438f24",
+      "bindingChecksum": "067fe0e7b4ecb1d9c020c11232d8bb4ca27961662dae81dd2cdeb87030ad1435"
+    },
+    {
+      "packetKey": "packet:ff05615734e3",
+      "sourceRef": "sveltekit-frontend/scripts/atlas/atlas-cartridge-seed.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:beb6be7a635926c5cda3a1c5d1d8b01af175806e39b32f93765d5853a25e2531",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "40cfa02753298fc9d6fa7a8576ee624eb72d5e27549dda00f090188a80b809c9",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "beb6be7a635926c5cda3a1c5d1d8b01af175806e39b32f93765d5853a25e2531",
+      "membershipContentDigest": "beb6be7a635926c5cda3a1c5d1d8b01af175806e39b32f93765d5853a25e2531",
+      "bindingChecksum": "40cfa02753298fc9d6fa7a8576ee624eb72d5e27549dda00f090188a80b809c9"
+    },
+    {
+      "packetKey": "packet:ff074c5a3881",
+      "sourceRef": "drizzle/manual/20260317_library_hash_unique.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:bdc43c5267299d5d0c8dcc5c15cb415afa6ecc479f17c6c033ee7987da2a1b25",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "16befb0526bf686cc5efa54be01f7f1947b07df365acd2dae8cf32975a1f7320",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "bdc43c5267299d5d0c8dcc5c15cb415afa6ecc479f17c6c033ee7987da2a1b25",
+      "membershipContentDigest": "bdc43c5267299d5d0c8dcc5c15cb415afa6ecc479f17c6c033ee7987da2a1b25",
+      "bindingChecksum": "16befb0526bf686cc5efa54be01f7f1947b07df365acd2dae8cf32975a1f7320"
+    },
+    {
+      "packetKey": "packet:ff075dc7e630",
+      "sourceRef": "scripts/git/commit_and_push.sh",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:1f78d0c3e9a13c2585892f4252f188e2ff58b0a0009e6cee7164c9c96576bb4e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "008e9aaafc8fca99693b0c586bc416274806577edb4d3996fb3e94fbe832b960",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "1f78d0c3e9a13c2585892f4252f188e2ff58b0a0009e6cee7164c9c96576bb4e",
+      "membershipContentDigest": "1f78d0c3e9a13c2585892f4252f188e2ff58b0a0009e6cee7164c9c96576bb4e",
+      "bindingChecksum": "008e9aaafc8fca99693b0c586bc416274806577edb4d3996fb3e94fbe832b960"
+    },
+    {
+      "packetKey": "packet:ff0bccadcc9f",
+      "sourceRef": "docs/ENV-SERVICE-DEPENDENCIES-DIAGNOSTIC.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ed5a439ca407d17c3c415e618f27e878a99a4ba9c64a6effc65bbe2756254028",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fecb07f6fb0d30dc99053187e3ac393bb2fd944ce5566a0cead3f0f83c3e4b1e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ed5a439ca407d17c3c415e618f27e878a99a4ba9c64a6effc65bbe2756254028",
+      "membershipContentDigest": "ed5a439ca407d17c3c415e618f27e878a99a4ba9c64a6effc65bbe2756254028",
+      "bindingChecksum": "fecb07f6fb0d30dc99053187e3ac393bb2fd944ce5566a0cead3f0f83c3e4b1e"
+    },
+    {
+      "packetKey": "packet:ff11359e37f9",
+      "sourceRef": "proto/archived/qlora_service.proto",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3b178326184f348ccb95ad7ce6267cda2cfd4d7ec36c60ab55b30d68f3b8f8a9",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e3d7d4e2d98bc7fb84000fc116036162d586f43d09c188148114b4427fcb296a",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3b178326184f348ccb95ad7ce6267cda2cfd4d7ec36c60ab55b30d68f3b8f8a9",
+      "membershipContentDigest": "3b178326184f348ccb95ad7ce6267cda2cfd4d7ec36c60ab55b30d68f3b8f8a9",
+      "bindingChecksum": "e3d7d4e2d98bc7fb84000fc116036162d586f43d09c188148114b4427fcb296a"
+    },
+    {
+      "packetKey": "packet:ff12888181fc",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__codeintel-fix-recommender.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:0b926f4619b57d1b8f0e4105828cf99c31537ad92214fcfb5f1194398d7a349f",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "616d17f1e28d34fa921716afc60a426d95f070895540191ab7783995be4f1950",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "0b926f4619b57d1b8f0e4105828cf99c31537ad92214fcfb5f1194398d7a349f",
+      "membershipContentDigest": "0b926f4619b57d1b8f0e4105828cf99c31537ad92214fcfb5f1194398d7a349f",
+      "bindingChecksum": "616d17f1e28d34fa921716afc60a426d95f070895540191ab7783995be4f1950"
+    },
+    {
+      "packetKey": "packet:ff1370e02fe0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/error-brain/transport/factory.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:46d4e701c225593f0f3c043a9c040d940ddbe041077b136bdc3b07b6f7ffa84c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "374c1b4bb617d2cb893f9ca065e14ddca81f6fe2a1856ae2a4cb084f56f5058e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "46d4e701c225593f0f3c043a9c040d940ddbe041077b136bdc3b07b6f7ffa84c",
+      "membershipContentDigest": "46d4e701c225593f0f3c043a9c040d940ddbe041077b136bdc3b07b6f7ffa84c",
+      "bindingChecksum": "374c1b4bb617d2cb893f9ca065e14ddca81f6fe2a1856ae2a4cb084f56f5058e"
+    },
+    {
+      "packetKey": "packet:ff17ae6cbca9",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T03-28-08/ace_hit_relationships.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:dfdc1ca16e7bc826f3a6bd907e2ec63867066257ef4d4cb3b81a48d97b3a4c8a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "f3c09633d416fe047b4b75c25fbadfa52fb497b996348cf2c20305918d0fe912",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "dfdc1ca16e7bc826f3a6bd907e2ec63867066257ef4d4cb3b81a48d97b3a4c8a",
+      "membershipContentDigest": "dfdc1ca16e7bc826f3a6bd907e2ec63867066257ef4d4cb3b81a48d97b3a4c8a",
+      "bindingChecksum": "f3c09633d416fe047b4b75c25fbadfa52fb497b996348cf2c20305918d0fe912"
+    },
+    {
+      "packetKey": "packet:ff1c39f97b21",
+      "sourceRef": "sveltekit-frontend/scripts/smoke/smoke-upload.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:bbaa4660b731e6b6daf8f94191129a1f09b05818e0bb116c7c7495685128a05d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "14b9dc1976641cb05a09b3222159f8f04b2f289bb8efde197de0c81e5fd3ecf4",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "bbaa4660b731e6b6daf8f94191129a1f09b05818e0bb116c7c7495685128a05d",
+      "membershipContentDigest": "bbaa4660b731e6b6daf8f94191129a1f09b05818e0bb116c7c7495685128a05d",
+      "bindingChecksum": "14b9dc1976641cb05a09b3222159f8f04b2f289bb8efde197de0c81e5fd3ecf4"
+    },
+    {
+      "packetKey": "packet:ff1db664452b",
+      "sourceRef": "system_blueprint.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:42229db328a4fd9c2b321a04b32df0e4355b3445d0666223363d124b8c54310b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ba27671d3135b62e283f61fb60c2c8e26629de681841656f3f5e02cecc479381",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "42229db328a4fd9c2b321a04b32df0e4355b3445d0666223363d124b8c54310b",
+      "membershipContentDigest": "42229db328a4fd9c2b321a04b32df0e4355b3445d0666223363d124b8c54310b",
+      "bindingChecksum": "ba27671d3135b62e283f61fb60c2c8e26629de681841656f3f5e02cecc479381"
+    },
+    {
+      "packetKey": "packet:ff20147d4bd3",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/cases/new/+page.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6e4da8a4f5f8a6b80fd011cc985153e3c3330f6630eaa7749a75bc79944d0c5b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "04af8554589fc28a06cd429738a4ddc5c7d3a341b9874091f7eeea84d9f41f27",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6e4da8a4f5f8a6b80fd011cc985153e3c3330f6630eaa7749a75bc79944d0c5b",
+      "membershipContentDigest": "6e4da8a4f5f8a6b80fd011cc985153e3c3330f6630eaa7749a75bc79944d0c5b",
+      "bindingChecksum": "04af8554589fc28a06cd429738a4ddc5c7d3a341b9874091f7eeea84d9f41f27"
+    },
+    {
+      "packetKey": "packet:ff20adedb99d",
+      "sourceRef": "sveltekit-frontend/scripts/tests/smoke-vault-walker.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:97261b7f28fd928925733e3929cf5360a5dd1e01a1730379ac37f213714777e8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "c1ff8084e87b5d990faf074defecca521f16f732b203ca7781f89a7c080939a9",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "97261b7f28fd928925733e3929cf5360a5dd1e01a1730379ac37f213714777e8",
+      "membershipContentDigest": "97261b7f28fd928925733e3929cf5360a5dd1e01a1730379ac37f213714777e8",
+      "bindingChecksum": "c1ff8084e87b5d990faf074defecca521f16f732b203ca7781f89a7c080939a9"
+    },
+    {
+      "packetKey": "packet:ff271cb71081",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__cache__loki-cache.svelte.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:12d8d45e7e2c9a81c0a94297171be7290ca2dd00e121acbacc59080e2402e9fb",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "b2a48a3182f55a098ef7312c0a4c9a98b305561c3e7cf356cc2ee4794504e831",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "12d8d45e7e2c9a81c0a94297171be7290ca2dd00e121acbacc59080e2402e9fb",
+      "membershipContentDigest": "12d8d45e7e2c9a81c0a94297171be7290ca2dd00e121acbacc59080e2402e9fb",
+      "bindingChecksum": "b2a48a3182f55a098ef7312c0a4c9a98b305561c3e7cf356cc2ee4794504e831"
+    },
+    {
+      "packetKey": "packet:ff27d64e625e",
+      "sourceRef": "sveltekit-frontend/src/routes/api/statutes/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:4e42a31285b76a353f9f6b97540c634681522a8f770c0459fb661310591ff569",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "130265972af1a19b5d517ff2e9d48dcfc7fe8e6b47eb0b8a24d15c66d5873980",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "4e42a31285b76a353f9f6b97540c634681522a8f770c0459fb661310591ff569",
+      "membershipContentDigest": "4e42a31285b76a353f9f6b97540c634681522a8f770c0459fb661310591ff569",
+      "bindingChecksum": "130265972af1a19b5d517ff2e9d48dcfc7fe8e6b47eb0b8a24d15c66d5873980"
+    },
+    {
+      "packetKey": "packet:ff2e4b20a693",
+      "sourceRef": "sveltekit-frontend/docs/reports/feature-labelling-parent-atlas-report.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:192ea05056fc23db8d1f41043a863a8c04515ad08aa9c6ab361f1a251725bdb5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "9644fa399f36848db482bcfbcece5ea42683809cdc267c5f7c6f0c2ed7832224",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "192ea05056fc23db8d1f41043a863a8c04515ad08aa9c6ab361f1a251725bdb5",
+      "membershipContentDigest": "192ea05056fc23db8d1f41043a863a8c04515ad08aa9c6ab361f1a251725bdb5",
+      "bindingChecksum": "9644fa399f36848db482bcfbcece5ea42683809cdc267c5f7c6f0c2ed7832224"
+    },
+    {
+      "packetKey": "packet:ff372e14ea30",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/Skeleton.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d53ee826223297386cdf8738b75175561b6aea03e139a90753450a1bd65df640",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fb9db84f59dee5168a3b524bedb6aab59386f0d7312307aed0817e730652685f",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d53ee826223297386cdf8738b75175561b6aea03e139a90753450a1bd65df640",
+      "membershipContentDigest": "d53ee826223297386cdf8738b75175561b6aea03e139a90753450a1bd65df640",
+      "bindingChecksum": "fb9db84f59dee5168a3b524bedb6aab59386f0d7312307aed0817e730652685f"
+    },
+    {
+      "packetKey": "packet:ff3d3f6fb25d",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Clusters/cluster-97.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:89b6453a933275b2b96681d92201ef4439814a8e72dd4198feb4c01ccdc579ce",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "dec2c581bef2689c4b7fc1415eb2c575c428e71c8fbcbffff6531dc59d313dda",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "89b6453a933275b2b96681d92201ef4439814a8e72dd4198feb4c01ccdc579ce",
+      "membershipContentDigest": "89b6453a933275b2b96681d92201ef4439814a8e72dd4198feb4c01ccdc579ce",
+      "bindingChecksum": "dec2c581bef2689c4b7fc1415eb2c575c428e71c8fbcbffff6531dc59d313dda"
+    },
+    {
+      "packetKey": "packet:ff429b0dc482",
+      "sourceRef": "sveltekit-frontend/src/lib/server/admin/recommendation-engine.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:ec2e869133ec90cc3113b07c8f4c6c50a7d52cbc211f6b35cc743c812924f0c2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e3f3ffb03d614e358ff4c10f9ccf491c95e7255d1b9c973c7cce729b5ef345a6",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "ec2e869133ec90cc3113b07c8f4c6c50a7d52cbc211f6b35cc743c812924f0c2",
+      "membershipContentDigest": "ec2e869133ec90cc3113b07c8f4c6c50a7d52cbc211f6b35cc743c812924f0c2",
+      "bindingChecksum": "e3f3ffb03d614e358ff4c10f9ccf491c95e7255d1b9c973c7cce729b5ef345a6"
+    },
+    {
+      "packetKey": "packet:ff52d2ee5f78",
+      "sourceRef": "sveltekit-frontend/src/routes/api/codebase-index/directory-summaries/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7dc18baf3023e53dcee1157dbba1f7eaf859daf1c8cb4d2d0a0e36d5d7d2c4cf",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+      "membershipContentDigest": "fd9097504f4e3b7155336f65cc1d19ec593bb5224702d63390a41801f0b823a8",
+      "bindingChecksum": "7dc18baf3023e53dcee1157dbba1f7eaf859daf1c8cb4d2d0a0e36d5d7d2c4cf"
+    },
+    {
+      "packetKey": "packet:ff59f3807c4c",
+      "sourceRef": "sveltekit-frontend/src/routes/api/phase89/clusters/+server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:463692cd522c145356deff5239fc66c306162b7d13daa0f43b2fc040965479ff",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "cdb58eca82fee6c1af3633034315cc8ebe92cb7e92eeea31b2635198ce4bcbaf",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "463692cd522c145356deff5239fc66c306162b7d13daa0f43b2fc040965479ff",
+      "membershipContentDigest": "463692cd522c145356deff5239fc66c306162b7d13daa0f43b2fc040965479ff",
+      "bindingChecksum": "cdb58eca82fee6c1af3633034315cc8ebe92cb7e92eeea31b2635198ce4bcbaf"
+    },
+    {
+      "packetKey": "packet:ff6359281b41",
+      "sourceRef": "scripts/atlas/prewarm-compact-cache.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:b7ca563685b0531deb257e128c71d9180a8b3abb7bbbc08396329e78369c7a9b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4d8e30f7013cbcbc11b967a59121c0cdfbf30c931bbee5c109ccd040d3637a43",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "b7ca563685b0531deb257e128c71d9180a8b3abb7bbbc08396329e78369c7a9b",
+      "membershipContentDigest": "b7ca563685b0531deb257e128c71d9180a8b3abb7bbbc08396329e78369c7a9b",
+      "bindingChecksum": "4d8e30f7013cbcbc11b967a59121c0cdfbf30c931bbee5c109ccd040d3637a43"
+    },
+    {
+      "packetKey": "packet:ff67362690f1",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T16-11-51/graph_nodes.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:1089dd93578441b62b21245bbcccae07c3d1647ceeac994778bc23d1ac0b608d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "c931da4bdce516fb3b58a6fa6cb45108ea40a79faee7d8baa9a58aa052cf5b36",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "1089dd93578441b62b21245bbcccae07c3d1647ceeac994778bc23d1ac0b608d",
+      "membershipContentDigest": "1089dd93578441b62b21245bbcccae07c3d1647ceeac994778bc23d1ac0b608d",
+      "bindingChecksum": "c931da4bdce516fb3b58a6fa6cb45108ea40a79faee7d8baa9a58aa052cf5b36"
+    },
+    {
+      "packetKey": "packet:ff6736dac2cc",
+      "sourceRef": "sveltekit-frontend/scripts/knowledge/redis-write-preview.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:b884ce15dfee03264201b9ba1f4a23d803d54780a74216b00fa5c25f886c8e56",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "51b3d991a599b6710f396ce5f521ce9665fdd3ed5f158ae4eb0caf35dbe07c6d",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "b884ce15dfee03264201b9ba1f4a23d803d54780a74216b00fa5c25f886c8e56",
+      "membershipContentDigest": "b884ce15dfee03264201b9ba1f4a23d803d54780a74216b00fa5c25f886c8e56",
+      "bindingChecksum": "51b3d991a599b6710f396ce5f521ce9665fdd3ed5f158ae4eb0caf35dbe07c6d"
+    },
+    {
+      "packetKey": "packet:ff68ce2783fe",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T02-59-42/llm_synthesis_mapping.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5d90318986d4522ddb086fa7eb80268294085607985ec9aebc10522ee9bc8701",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7dd508da70ab153e31b5daccfe3deb48e337d4f22d7ae571552fd7c7c58e1f20",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5d90318986d4522ddb086fa7eb80268294085607985ec9aebc10522ee9bc8701",
+      "membershipContentDigest": "5d90318986d4522ddb086fa7eb80268294085607985ec9aebc10522ee9bc8701",
+      "bindingChecksum": "7dd508da70ab153e31b5daccfe3deb48e337d4f22d7ae571552fd7c7c58e1f20"
+    },
+    {
+      "packetKey": "packet:ff69adaae277",
+      "sourceRef": "sveltekit-frontend/src/lib/components/dashboard/EvidenceAnalysisDashboard.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:931269e17ab8892d7b8ec922544c360d403407bb560783b0797c281dcedb162c",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "8c41274a18df3ea425af41edb75d25bc006665c7185aff7dd5ecf2fab7f719c1",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "931269e17ab8892d7b8ec922544c360d403407bb560783b0797c281dcedb162c",
+      "membershipContentDigest": "931269e17ab8892d7b8ec922544c360d403407bb560783b0797c281dcedb162c",
+      "bindingChecksum": "8c41274a18df3ea425af41edb75d25bc006665c7185aff7dd5ecf2fab7f719c1"
+    },
+    {
+      "packetKey": "packet:ff6b6363af5e",
+      "sourceRef": "sveltekit-frontend/scripts/neo4j-graph-enrich.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:38c306cf0364db36344f56e7a0bd1da2a877814f0268d1655094231c8082e5d2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "4c2368c3a111b61a3e468ff4290c8e076aaa18d22f094ff2f9a4ddeb61361447",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "38c306cf0364db36344f56e7a0bd1da2a877814f0268d1655094231c8082e5d2",
+      "membershipContentDigest": "38c306cf0364db36344f56e7a0bd1da2a877814f0268d1655094231c8082e5d2",
+      "bindingChecksum": "4c2368c3a111b61a3e468ff4290c8e076aaa18d22f094ff2f9a4ddeb61361447"
+    },
+    {
+      "packetKey": "packet:ff6ce2c9794c",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/ui-components/+page.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:569e4a80c8453c7dfada8cf541c68d8b8b08e086897c7fbb291b8e09d46c2776",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "1c34429e2ac9c703719a8e2872f1d27627607091036d0856f9cbffa60555474c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "569e4a80c8453c7dfada8cf541c68d8b8b08e086897c7fbb291b8e09d46c2776",
+      "membershipContentDigest": "569e4a80c8453c7dfada8cf541c68d8b8b08e086897c7fbb291b8e09d46c2776",
+      "bindingChecksum": "1c34429e2ac9c703719a8e2872f1d27627607091036d0856f9cbffa60555474c"
+    },
+    {
+      "packetKey": "packet:ff6fb66639ed",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__caseselector.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2a9fb2ae94244f1257b5182e965ee5487097395b97eabeca4c90c60e0a587da4",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "09c526bbb23864a542dca5eda6585b1408fb3fb4d143c6d89f0c9607632227dc",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2a9fb2ae94244f1257b5182e965ee5487097395b97eabeca4c90c60e0a587da4",
+      "membershipContentDigest": "2a9fb2ae94244f1257b5182e965ee5487097395b97eabeca4c90c60e0a587da4",
+      "bindingChecksum": "09c526bbb23864a542dca5eda6585b1408fb3fb4d143c6d89f0c9607632227dc"
+    },
+    {
+      "packetKey": "packet:ff73dd06b946",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__scripts__check-user.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:05162d6fb9639447776d0a7f87d85f27cfae500b1a1e8f5ee25267449d94665d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ee4e82cf517a103d14ba2a82c01922d8debba4f54723fdd0de7b83e6fcbe7716",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "05162d6fb9639447776d0a7f87d85f27cfae500b1a1e8f5ee25267449d94665d",
+      "membershipContentDigest": "05162d6fb9639447776d0a7f87d85f27cfae500b1a1e8f5ee25267449d94665d",
+      "bindingChecksum": "ee4e82cf517a103d14ba2a82c01922d8debba4f54723fdd0de7b83e6fcbe7716"
+    },
+    {
+      "packetKey": "packet:ff77fd5b7f6f",
+      "sourceRef": "sveltekit-frontend/drizzle/manual/20260602_superseded_score_candidate.sql",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:cbb6d9de415558b465f17807eba20b72c92fcd454236cb0f861e0f40d6625086",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "eebd6ad119133379167928fa2540bf2505c78a12bbf61f36e0eb7753778863e2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "cbb6d9de415558b465f17807eba20b72c92fcd454236cb0f861e0f40d6625086",
+      "membershipContentDigest": "cbb6d9de415558b465f17807eba20b72c92fcd454236cb0f861e0f40d6625086",
+      "bindingChecksum": "eebd6ad119133379167928fa2540bf2505c78a12bbf61f36e0eb7753778863e2"
+    },
+    {
+      "packetKey": "packet:ff83d1579fe9",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ui/input/index.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:202b22e3ba0020a38202db44fdbe5bea00c7d778cd84ec54e4fa74499f615392",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "70e1c5613e86ef0f57ce97f6727109b1108c87021cd65cc98d45e8887c39f861",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "202b22e3ba0020a38202db44fdbe5bea00c7d778cd84ec54e4fa74499f615392",
+      "membershipContentDigest": "202b22e3ba0020a38202db44fdbe5bea00c7d778cd84ec54e4fa74499f615392",
+      "bindingChecksum": "70e1c5613e86ef0f57ce97f6727109b1108c87021cd65cc98d45e8887c39f861"
+    },
+    {
+      "packetKey": "packet:ff8e45a74f1b",
+      "sourceRef": "scripts/ai-os/query-progress.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:8e8a637b8f38b32eb93d283bc180faacf7408c8894e7082242afbf517f9e251f",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "58402cfe103e4c10267a93862498152760290659ceb7d903e34665531c1cbe1d",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "8e8a637b8f38b32eb93d283bc180faacf7408c8894e7082242afbf517f9e251f",
+      "membershipContentDigest": "8e8a637b8f38b32eb93d283bc180faacf7408c8894e7082242afbf517f9e251f",
+      "bindingChecksum": "58402cfe103e4c10267a93862498152760290659ceb7d903e34665531c1cbe1d"
+    },
+    {
+      "packetKey": "packet:ff9395776dfd",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__vector-search___server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:40fd190d36ea392ec35d531c5bfbbc62f66078ed4a4e9f1ade1784f37220b93a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7f98f9e23a5c6f0e558e20b9c8df640d1fb4e21c08f8f30b72901c66198c2487",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "40fd190d36ea392ec35d531c5bfbbc62f66078ed4a4e9f1ade1784f37220b93a",
+      "membershipContentDigest": "40fd190d36ea392ec35d531c5bfbbc62f66078ed4a4e9f1ade1784f37220b93a",
+      "bindingChecksum": "7f98f9e23a5c6f0e558e20b9c8df640d1fb4e21c08f8f30b72901c66198c2487"
+    },
+    {
+      "packetKey": "packet:ff93d75b7e42",
+      "sourceRef": "docs/atlas/atlas-ci.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:50ee4c6193e633e825864c3d198bc9b736b7a9ee94afc5f36ac69f6ad012def2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "35d9ecdf14d7c73fa4ab56a27d3fa8c9db8ab926705a9b3c8fad2512b3d71a15",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "50ee4c6193e633e825864c3d198bc9b736b7a9ee94afc5f36ac69f6ad012def2",
+      "membershipContentDigest": "50ee4c6193e633e825864c3d198bc9b736b7a9ee94afc5f36ac69f6ad012def2",
+      "bindingChecksum": "35d9ecdf14d7c73fa4ab56a27d3fa8c9db8ab926705a9b3c8fad2512b3d71a15"
+    },
+    {
+      "packetKey": "packet:ff945bf0d48d",
+      "sourceRef": "simd-bridge/cpp/libtorch_stubs.cc",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:3060ea149905b9ac17d62848335630ef5190f28f7881b6cdfb7e7c435f736dd2",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e87a26c8611bc92d8fe5be48641580b50c3a734440b43f3c9bc400320d024715",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "3060ea149905b9ac17d62848335630ef5190f28f7881b6cdfb7e7c435f736dd2",
+      "membershipContentDigest": "3060ea149905b9ac17d62848335630ef5190f28f7881b6cdfb7e7c435f736dd2",
+      "bindingChecksum": "e87a26c8611bc92d8fe5be48641580b50c3a734440b43f3c9bc400320d024715"
+    },
+    {
+      "packetKey": "packet:ff951c280465",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__utils__cn.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2be3aecd6a3ab03241d113a97c109c7d108bf914276de6171cb779eb665b9ca5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6ef9bd83663a6d78f1fe9724961c4e3554d648323607aabad2b58b54d17d3380",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2be3aecd6a3ab03241d113a97c109c7d108bf914276de6171cb779eb665b9ca5",
+      "membershipContentDigest": "2be3aecd6a3ab03241d113a97c109c7d108bf914276de6171cb779eb665b9ca5",
+      "bindingChecksum": "6ef9bd83663a6d78f1fe9724961c4e3554d648323607aabad2b58b54d17d3380"
+    },
+    {
+      "packetKey": "packet:ff9b27ed3689",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/sveltekit-frontend__drizzle__meta__0001_snapshot.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:104fa774602de8420351e4427bcd2283d70b93445b6061dfcd79490a628a135d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "80cc2686254d95b0b8850d0aa94d8e8221122b9816c5cbdb9ae15ee916140f17",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "104fa774602de8420351e4427bcd2283d70b93445b6061dfcd79490a628a135d",
+      "membershipContentDigest": "104fa774602de8420351e4427bcd2283d70b93445b6061dfcd79490a628a135d",
+      "bindingChecksum": "80cc2686254d95b0b8850d0aa94d8e8221122b9816c5cbdb9ae15ee916140f17"
+    },
+    {
+      "packetKey": "packet:ff9c94d583ff",
+      "sourceRef": "sveltekit-frontend/scripts/cards/master-feature-cards.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:94aa76f8caf2a5827793f99caf674a56f46085c51ff71f05a56bce1c2b61d913",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "478f25134aa1ad4216791f27de40e476aae41aa12bb3431863d0b6ec13e665ac",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "94aa76f8caf2a5827793f99caf674a56f46085c51ff71f05a56bce1c2b61d913",
+      "membershipContentDigest": "94aa76f8caf2a5827793f99caf674a56f46085c51ff71f05a56bce1c2b61d913",
+      "bindingChecksum": "478f25134aa1ad4216791f27de40e476aae41aa12bb3431863d0b6ec13e665ac"
+    },
+    {
+      "packetKey": "packet:ff9cd61c7f57",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/ai-dashboard/+page.server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5b2b8785545223fdf63fc08a3332b1c173633fc9790a42d97e0ad67aa5872f3e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "ba6d8abcbd78180e89b91658a8f565d7a0bfa207934995669c9f3ebd2783e138",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5b2b8785545223fdf63fc08a3332b1c173633fc9790a42d97e0ad67aa5872f3e",
+      "membershipContentDigest": "5b2b8785545223fdf63fc08a3332b1c173633fc9790a42d97e0ad67aa5872f3e",
+      "bindingChecksum": "ba6d8abcbd78180e89b91658a8f565d7a0bfa207934995669c9f3ebd2783e138"
+    },
+    {
+      "packetKey": "packet:ffa00673e2d0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/ngram-retrieval.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "113ff92bc4ea514f8ac12800890d3df1dddb2eba2ae3ee3550fc295be8126f68",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
+      "membershipContentDigest": "5704d5e9edcec962a64c8897fa793f3040d8295b97e01fc0f64d51fc85140d56",
+      "bindingChecksum": "113ff92bc4ea514f8ac12800890d3df1dddb2eba2ae3ee3550fc295be8126f68"
+    },
+    {
+      "packetKey": "packet:ffa10fb23442",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__hypergraph__hypergraph-types.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d84eb335f7e8f396a7b38a4ba9a459a912e3a9e5b0228a6831da5fae08fded54",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fc80109335318030e05f7c20ad8695a9c2940cbe6a610b3e85383adcb0eb288e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d84eb335f7e8f396a7b38a4ba9a459a912e3a9e5b0228a6831da5fae08fded54",
+      "membershipContentDigest": "d84eb335f7e8f396a7b38a4ba9a459a912e3a9e5b0228a6831da5fae08fded54",
+      "bindingChecksum": "fc80109335318030e05f7c20ad8695a9c2940cbe6a610b3e85383adcb0eb288e"
+    },
+    {
+      "packetKey": "packet:ffa31a545420",
+      "sourceRef": "sveltekit-frontend/memory/features/feature-trace-multi-server-mcp.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:810402d61af460e02edbe75cce7437bd3d9c5deb8d463ec28bfe8b274503032b",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "616bf8862c3cd9f497965855480623a683f283ed745599256289440db8c584ac",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "810402d61af460e02edbe75cce7437bd3d9c5deb8d463ec28bfe8b274503032b",
+      "membershipContentDigest": "810402d61af460e02edbe75cce7437bd3d9c5deb8d463ec28bfe8b274503032b",
+      "bindingChecksum": "616bf8862c3cd9f497965855480623a683f283ed745599256289440db8c584ac"
+    },
+    {
+      "packetKey": "packet:ffa4edeea897",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__graph__bagofwordstexturepanel.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:12cf43aa4a914049197df96fab958b4283fcf974ee22035b341f49214fb81b38",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6843fc483f20740621f317b45b34e5c3a79e6e0d926a66679eec2c20a10aaa39",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "12cf43aa4a914049197df96fab958b4283fcf974ee22035b341f49214fb81b38",
+      "membershipContentDigest": "12cf43aa4a914049197df96fab958b4283fcf974ee22035b341f49214fb81b38",
+      "bindingChecksum": "6843fc483f20740621f317b45b34e5c3a79e6e0d926a66679eec2c20a10aaa39"
+    },
+    {
+      "packetKey": "packet:ffa6f53a03d0",
+      "sourceRef": "sveltekit-frontend/drizzle/introspected/relations.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:e0b19cab7538d486c4b1113e33ea6b6551a6b8257b486df5d72ededf7f9b3d35",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "00ad5589aa9f7866a69a75e9b7f772a542a82c199def8d211f7bf5b69f3bf16b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "e0b19cab7538d486c4b1113e33ea6b6551a6b8257b486df5d72ededf7f9b3d35",
+      "membershipContentDigest": "e0b19cab7538d486c4b1113e33ea6b6551a6b8257b486df5d72ededf7f9b3d35",
+      "bindingChecksum": "00ad5589aa9f7866a69a75e9b7f772a542a82c199def8d211f7bf5b69f3bf16b"
+    },
+    {
+      "packetKey": "packet:ffad5805e3bf",
+      "sourceRef": "scripts/tests/run-replay-breadth-50.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:56495fe7f9add543443768f399ce7c0cce540cdba4cc13e317a7e838c2e0016a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7b660566cfb75f88221efe50cd11d6926672b426004c9feb2d4027b30a2f6435",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "56495fe7f9add543443768f399ce7c0cce540cdba4cc13e317a7e838c2e0016a",
+      "membershipContentDigest": "56495fe7f9add543443768f399ce7c0cce540cdba4cc13e317a7e838c2e0016a",
+      "bindingChecksum": "7b660566cfb75f88221efe50cd11d6926672b426004c9feb2d4027b30a2f6435"
+    },
+    {
+      "packetKey": "packet:ffae6c1c9446",
+      "sourceRef": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/+page.server.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6a4948438119adabb5f5949985323623ca216203e9f02feea0b6822d65c0cc38",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "e9f116dc432ba3be9227971f1b845e2e503526235a931dc01dbe05f8ef3a13a3",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6a4948438119adabb5f5949985323623ca216203e9f02feea0b6822d65c0cc38",
+      "membershipContentDigest": "6a4948438119adabb5f5949985323623ca216203e9f02feea0b6822d65c0cc38",
+      "bindingChecksum": "e9f116dc432ba3be9227971f1b845e2e503526235a931dc01dbe05f8ef3a13a3"
+    },
+    {
+      "packetKey": "packet:ffb570772442",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/migrations/meta/_journal.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:6f4a641e4feaf714d591f773e79f41245d91847f32c23d5bb8bf6083c26fb51d",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "86d68d0a7d9943c1720f7a3d0ad8b6baa047869943c9c914d8c91e4c8c0ff801",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "6f4a641e4feaf714d591f773e79f41245d91847f32c23d5bb8bf6083c26fb51d",
+      "membershipContentDigest": "6f4a641e4feaf714d591f773e79f41245d91847f32c23d5bb8bf6083c26fb51d",
+      "bindingChecksum": "86d68d0a7d9943c1720f7a3d0ad8b6baa047869943c9c914d8c91e4c8c0ff801"
+    },
+    {
+      "packetKey": "packet:ffc180d40402",
+      "sourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/redis-orchestrator.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c47df24b714a87390066cc6e6a14f70ee3ba86668786600c6ba078f13e0277c5",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "294f620d9dd6fcf6abc4721cce0a85e1265e80080cb274a0039100c04978d4fb",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c47df24b714a87390066cc6e6a14f70ee3ba86668786600c6ba078f13e0277c5",
+      "membershipContentDigest": "c47df24b714a87390066cc6e6a14f70ee3ba86668786600c6ba078f13e0277c5",
+      "bindingChecksum": "294f620d9dd6fcf6abc4721cce0a85e1265e80080cb274a0039100c04978d4fb"
+    },
+    {
+      "packetKey": "packet:ffca48d56b54",
+      "sourceRef": "sveltekit-frontend/src/lib/components/legal-ai/CollectionDetail.svelte",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2b4e72d879ed6093d14af1c31e68a4549f4dde92db585f2dc74283c0940b4bcd",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "5a5ceb6f9bb12520c4c547a58f20d13f99e658b63863f9e6d7a06884f6c3f18b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2b4e72d879ed6093d14af1c31e68a4549f4dde92db585f2dc74283c0940b4bcd",
+      "membershipContentDigest": "2b4e72d879ed6093d14af1c31e68a4549f4dde92db585f2dc74283c0940b4bcd",
+      "bindingChecksum": "5a5ceb6f9bb12520c4c547a58f20d13f99e658b63863f9e6d7a06884f6c3f18b"
+    },
+    {
+      "packetKey": "packet:ffca5b6a9bc7",
+      "sourceRef": "scripts/atlas/activate-xgboost-stage4.sh",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:62302335093a58b1e47045ca3ef0fc8e0c3dc61d937c72262024bd493ff722ec",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7b4cb29940a1e2147b0aa2958ec75add64ad1a838e1361655ba12506e276694c",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "62302335093a58b1e47045ca3ef0fc8e0c3dc61d937c72262024bd493ff722ec",
+      "membershipContentDigest": "62302335093a58b1e47045ca3ef0fc8e0c3dc61d937c72262024bd493ff722ec",
+      "bindingChecksum": "7b4cb29940a1e2147b0aa2958ec75add64ad1a838e1361655ba12506e276694c"
+    },
+    {
+      "packetKey": "packet:ffd3bc6ea685",
+      "sourceRef": "sveltekit-frontend/static/evidence-processor-sw.js",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:d37e3e99997843828efd5ca33bd5c61718c9109f49c4bcf83c64f6a165e6a2d8",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "98dce0646a57754b4e3dde903d37f82d8bdb1f317ef52819021fdd540dd230d2",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "d37e3e99997843828efd5ca33bd5c61718c9109f49c4bcf83c64f6a165e6a2d8",
+      "membershipContentDigest": "d37e3e99997843828efd5ca33bd5c61718c9109f49c4bcf83c64f6a165e6a2d8",
+      "bindingChecksum": "98dce0646a57754b4e3dde903d37f82d8bdb1f317ef52819021fdd540dd230d2"
+    },
+    {
+      "packetKey": "packet:ffd84cfe54e2",
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/cases/seed-simple.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:a7b40c161c43caea717fee4405bf1ba290919a3bbac5cc4884a64963368b46cd",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "8e26125068610966c349483f02ac50e231d3e2bc43e7951a5fa6b0ec2f8b128b",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "a7b40c161c43caea717fee4405bf1ba290919a3bbac5cc4884a64963368b46cd",
+      "membershipContentDigest": "a7b40c161c43caea717fee4405bf1ba290919a3bbac5cc4884a64963368b46cd",
+      "bindingChecksum": "8e26125068610966c349483f02ac50e231d3e2bc43e7951a5fa6b0ec2f8b128b"
+    },
+    {
+      "packetKey": "packet:ffe00f45c399",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__config__redis-config.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c7afa8d2b8b1b6c2546208043dc177f824a55c869db0a6b4b9087c69c209c765",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "1ca75241e6115a53eb23edcee84bb56973d6d0ff7cb68e47430912e786c8aaef",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c7afa8d2b8b1b6c2546208043dc177f824a55c869db0a6b4b9087c69c209c765",
+      "membershipContentDigest": "c7afa8d2b8b1b6c2546208043dc177f824a55c869db0a6b4b9087c69c209c765",
+      "bindingChecksum": "1ca75241e6115a53eb23edcee84bb56973d6d0ff7cb68e47430912e786c8aaef"
+    },
+    {
+      "packetKey": "packet:ffe07a711f05",
+      "sourceRef": "sveltekit-frontend/scripts/phase104-backups/src/lib/services/api-orchestrator.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:bc7db5630f608469bd972f5a08f9912e86665a352c0f8b590684e7b404fb5377",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "0b77146969bb545242dcca0d563c2b3bcab84c3b8b3037e5d6211c05066e9f40",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "bc7db5630f608469bd972f5a08f9912e86665a352c0f8b590684e7b404fb5377",
+      "membershipContentDigest": "bc7db5630f608469bd972f5a08f9912e86665a352c0f8b590684e7b404fb5377",
+      "bindingChecksum": "0b77146969bb545242dcca0d563c2b3bcab84c3b8b3037e5d6211c05066e9f40"
+    },
+    {
+      "packetKey": "packet:ffe3a0b1867c",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__graph__som-topology___server.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:45fa4a304d470894afc6d5eed0cbafa58b9ac3f06dc95fe12537a9284e46f6d1",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6d9dc7419566b05c0048c63094fa8696173a30bf21481ce33dd8ba3e181a915e",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "45fa4a304d470894afc6d5eed0cbafa58b9ac3f06dc95fe12537a9284e46f6d1",
+      "membershipContentDigest": "45fa4a304d470894afc6d5eed0cbafa58b9ac3f06dc95fe12537a9284e46f6d1",
+      "bindingChecksum": "6d9dc7419566b05c0048c63094fa8696173a30bf21481ce33dd8ba3e181a915e"
+    },
+    {
+      "packetKey": "packet:ffe66ae6124b",
+      "sourceRef": "scripts/atlas/audit-supernode-pressure.mjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:f73d8d6b20bc89bea4c3a7354bb2830466179dd27736d886f73bc224822e66b9",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "a3ef9dd78d1552fa1b7156d0c3e5e93ff3734dbde2bc285cf8246d592ccc835d",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "f73d8d6b20bc89bea4c3a7354bb2830466179dd27736d886f73bc224822e66b9",
+      "membershipContentDigest": "f73d8d6b20bc89bea4c3a7354bb2830466179dd27736d886f73bc224822e66b9",
+      "bindingChecksum": "a3ef9dd78d1552fa1b7156d0c3e5e93ff3734dbde2bc285cf8246d592ccc835d"
+    },
+    {
+      "packetKey": "packet:ffe72277e0e7",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__reports__preview____id.test.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:e58005b2f124f93bd010018737ed8cf6d105ccc73767d984fc41fcbcbe5209df",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "23dca694751c03ead8d24a64f61ca0d4c9382a87c75e484f53bc842a822510da",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "e58005b2f124f93bd010018737ed8cf6d105ccc73767d984fc41fcbcbe5209df",
+      "membershipContentDigest": "e58005b2f124f93bd010018737ed8cf6d105ccc73767d984fc41fcbcbe5209df",
+      "bindingChecksum": "23dca694751c03ead8d24a64f61ca0d4c9382a87c75e484f53bc842a822510da"
+    },
+    {
+      "packetKey": "packet:ffec8dc7a46c",
+      "sourceRef": "sveltekit-frontend/memory/runs/2026-05-07T03-08-46/graph_edges.json",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c40d0ba754d4b507bba22f56b3aea3504a3fd17b81679466e4e4b52b8677be77",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6e35bbfa4968cbf5c82cf71a194eeb498fb8836c824cff3ef0023360ab00dde8",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c40d0ba754d4b507bba22f56b3aea3504a3fd17b81679466e4e4b52b8677be77",
+      "membershipContentDigest": "c40d0ba754d4b507bba22f56b3aea3504a3fd17b81679466e4e4b52b8677be77",
+      "bindingChecksum": "6e35bbfa4968cbf5c82cf71a194eeb498fb8836c824cff3ef0023360ab00dde8"
+    },
+    {
+      "packetKey": "packet:ffedadbac458",
+      "sourceRef": "sveltekit-frontend/src/lib/server/error-brain/transport/LLMS.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:2ac713cf18ff166441eeeb5cc6a86e92379e35b58c48198e581e77cda639ac45",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "26ad8a3f2b9ed9e995b477ec0b2de3236fcc8757c0fb2118edbc0acc94c73a06",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "2ac713cf18ff166441eeeb5cc6a86e92379e35b58c48198e581e77cda639ac45",
+      "membershipContentDigest": "2ac713cf18ff166441eeeb5cc6a86e92379e35b58c48198e581e77cda639ac45",
+      "bindingChecksum": "26ad8a3f2b9ed9e995b477ec0b2de3236fcc8757c0fb2118edbc0acc94c73a06"
+    },
+    {
+      "packetKey": "packet:fff07c616089",
+      "sourceRef": "src/lib/server/utils/contract-normalizer.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:f015362c721e035d142a76bb2a7e81c253268baee5391529c9ff696a4fd9d195",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6e2f0294f42d54bf2a30065b0f0fec85847a134f7167dccb6fe29562324bb6a4",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "f015362c721e035d142a76bb2a7e81c253268baee5391529c9ff696a4fd9d195",
+      "membershipContentDigest": "f015362c721e035d142a76bb2a7e81c253268baee5391529c9ff696a4fd9d195",
+      "bindingChecksum": "6e2f0294f42d54bf2a30065b0f0fec85847a134f7167dccb6fe29562324bb6a4"
+    },
+    {
+      "packetKey": "packet:fff5f0215270",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-memory-address-registry.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:c129bb50d4b954ae0447da61cac0b98806b4c1c39d9bbf7808e755bb63ede07e",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "7e1cf9f3217cde2a3fba780ba8dc9349bc4f817e354ede0847b47ae6c71cdb38",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "c129bb50d4b954ae0447da61cac0b98806b4c1c39d9bbf7808e755bb63ede07e",
+      "membershipContentDigest": "c129bb50d4b954ae0447da61cac0b98806b4c1c39d9bbf7808e755bb63ede07e",
+      "bindingChecksum": "7e1cf9f3217cde2a3fba780ba8dc9349bc4f817e354ede0847b47ae6c71cdb38"
+    },
+    {
+      "packetKey": "packet:fff6c38c6870",
+      "sourceRef": "sveltekit-frontend/scripts/bench-constraint-check.cjs",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:5105226dd0b1b2ade33e7de245044cd633e920b17f395b529c481867770ab78a",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6943b498ab522dbfe54b891c79f6f834e000fec47581b37cda7a531e2fbd2369",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "5105226dd0b1b2ade33e7de245044cd633e920b17f395b529c481867770ab78a",
+      "membershipContentDigest": "5105226dd0b1b2ade33e7de245044cd633e920b17f395b529c481867770ab78a",
+      "bindingChecksum": "6943b498ab522dbfe54b891c79f6f834e000fec47581b37cda7a531e2fbd2369"
+    },
+    {
+      "packetKey": "packet:fff85fb4d2bd",
+      "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__graphify-obsidian-vault.md",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:9356bb12bb2a13269170805d32054c4648dea58847262a24cfff716900770ee3",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "fa7a19380a1be83755ace714e795ff57ecda136b64f2dbd54f3fd1ab6e6c7e94",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "9356bb12bb2a13269170805d32054c4648dea58847262a24cfff716900770ee3",
+      "membershipContentDigest": "9356bb12bb2a13269170805d32054c4648dea58847262a24cfff716900770ee3",
+      "bindingChecksum": "fa7a19380a1be83755ace714e795ff57ecda136b64f2dbd54f3fd1ab6e6c7e94"
+    },
+    {
+      "packetKey": "packet:fff912ab069a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/evidence/video/transcript-service.ts",
+      "before": {
+        "sourceRevision": null,
+        "contentHash": null,
+        "workspaceRevisionKey": null,
+        "lineageBindingChecksum": null
+      },
+      "proposed": {
+        "sourceRevision": "sha256:0c57f8d570b8491b468217344a2508c6d7d78cb83da40d1cccb7d12140729203",
+        "workspaceRevisionKey": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "lineageBindingChecksum": "6523436d8830db118d5e1d1a03b01676563d365efa9af8cc2e91a764f38a6f11",
+        "lineageProducerRevision": "current-packet-digest-bridge-v1"
+      },
+      "byteDigest": "0c57f8d570b8491b468217344a2508c6d7d78cb83da40d1cccb7d12140729203",
+      "membershipContentDigest": "0c57f8d570b8491b468217344a2508c6d7d78cb83da40d1cccb7d12140729203",
+      "bindingChecksum": "6523436d8830db118d5e1d1a03b01676563d365efa9af8cc2e91a764f38a6f11"
+    }
+  ]
+}

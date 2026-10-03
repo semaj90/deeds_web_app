@@ -446,10 +446,9 @@ global OaK convergence. Until one of those is proven:
   the two identities are no longer entangled. `tsc --noEmit` confirms no new errors introduced.
   Full result: `docs/reports/parent-atlas-bitfrost-key-semantics-owner-v1-stage2.json`.
 
-  **Found and flagged, not fixed (pre-existing, unrelated)**: `query-router.ts` imports
-  `bifrostRetrievalCacheKeyV2` from `cache-keys.js`, which has never been exported there —
-  confirmed via `git show HEAD:...cache-keys.ts` (zero matches before this session's edits). This
-  predates this gate entirely; out of scope to fix here.
+  **Follow-up resolved**: `query-router.ts` now imports `bifrostRetrievalCacheKeyV2` from the
+  existing ACE cache-key owner (`ace/cache-keys.ts`) while retaining `bifrostKey` from the
+  general cache-key module. No duplicate key constructor was added.
 
   **Not done**: the full `invalidateRedisCache`-shaped-function sweep and `bifrost:sem:sourceRef:*`
   read-side audit flagged in Stage 1 remain open.
@@ -1408,6 +1407,10 @@ open exactly as items 1/2/4 above describe.
   predates the source change.
 - [ ] Implement `GO-LEXICAL-SCORER-CENSUS-01` before labeling any Go result `BM25`; prove term
   statistics, document frequency, document-length normalization, and frozen corpus statistics.
+  Static source census (`scripts/atlas/audit-go-lexical-scorer-census-v1.mjs`, read-only
+  2026-09-19) confirms the Go route is PostgreSQL `PG_TS_RANK_CD`, not Okapi BM25, and
+  records `trueBm25=false`; the corpus-statistics and deployed-binary readback gates remain
+  open. Report: `docs/reports/go-lexical-scorer-census-v1.json`.
 - [x] Read-only source-authority audit confirms acquisition owns raw-byte `contentDigest` and
   `storageUri` in `atlas_source_revisions`, while `codebase_chunk_index.content_hash` is a derived
   per-chunk hash and `atlas_packets` has no proven source-revision link to acquisition.
@@ -2702,6 +2705,26 @@ canonical chunk-owner rows); (4) only then return to DOC-13/14 once that lane se
 - [x] Added a read-only migration safety audit; it checks additive SQL and reports whether the
   new columns are already present without applying the migration.
 
+### CANONICAL-OWNER-REVISION-AXES-RECHECK-2026-09-14
+
+- [x] Re-ran the canonical-owner revision migration safety audit against the
+  live database.
+- [x] Confirmed the proposed SQL is additive-only and the revision columns are
+  not yet applied: `additiveOnly=true`, `migrationApplied=false`.
+- [x] Confirmed `promotionAllowed=false`; the audit performed no migration,
+  backfill, schema, packet, vector, graph, or cache write.
+- [ ] Review and authorize the nullable revision migration only after current
+  Graphify execution, source-content lineage, and packet/concept currentness
+  are proven in the authoritative frame.
+
+Status: `ADDITIVE_MIGRATION_SAFE_NOT_APPLIED_CURRENTNESS_BLOCKED`;
+writesPerformed=false.
+
+Evidence: `docs/reports/canonical-owner-revision-migration-safety-v1.json`;
+`scripts/atlas/audit-canonical-owner-revision-migration-safety-v1.mjs`.
+
+Next gate: `CURRENT_GRAPHIFY_LINEAGE_BEFORE_REVISION_MIGRATION`.
+
 ### CANONICAL-OWNER-ROW-ADAPTERS-01 — fail-closed row adapters implemented 2026-09-07
 
 - [x] Added packet and concept row adapters that require the dedicated source-content or
@@ -3188,6 +3211,23 @@ Evidence: `docs/reports/task-semantic-packet-production-target-v1.json`.
 
 This is an additive plan only. No table, column, index, row, projection, or cache was changed.
 
+### TASK-SEMANTIC-PACKET-WRITER-MATRIX-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only writer/schema matrix against the live
+      `public.task_semantic_packets` table. The current schema has `39` columns;
+      `5` writer surfaces are schema-compatible, `3` legacy writers are blocked
+      by obsolete columns, and `1` path is intent-only.
+- [x] Corrected the earlier stale statement that there were zero compatible
+      writers. The guarded MCP/API production paths are compatible with the
+      current schema; this audit does not authorize any migration or write.
+- [ ] Keep legacy writers disabled and do not add the seven obsolete columns
+      (`community_id`, `som_cluster`, `som_col`, `som_row`, `task_status`,
+      `task_title`, `task_type`) without a newly admitted consumer.
+
+Evidence: `docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
+Status: `LIVE_WRITER_SCHEMA_MATRIX_RECONCILED`; authority=false;
+writesPerformed=false. First blocker: `CURRENT_PACKET_CHUNK_LINEAGE_UNPROVEN`.
+
 ### TASK-SEMANTIC-QDRANT-IDENTITY-01 — semantic_768 input guard 2026-09-08
 
 - [x] Added `assertCanonicalSemantic768Vector()` to the active task-packet lifecycle.
@@ -3354,13 +3394,69 @@ large hot state exists.
 
 ### CENTROID-DURABLE-ARTIFACT-01 — design gate (2026-09-08)
 
-- [ ] Define durable `CentroidArtifactV1` with workspace/representation/clustering revisions,
-  dimensions, vector checksum, member-set checksum, and artifact reference.
-- [ ] Treat Valkey centroid loss as `CACHE_MISS`, not `CENTROID_LOST`; rebuild from the durable
-  artifact or sealed semantic population.
+- [x] Define durable `CentroidArtifactV1` with workspace/representation/clustering revisions,
+  dimensions, vector checksum, member-set checksum, and artifact reference. Landed as
+  `sveltekit-frontend/src/lib/server/atlas/cache/centroid-artifact-v1.ts` (+ `.spec.ts`, 7
+  tests passing): `buildCentroidArtifactV1()` computes an order-sensitive vector checksum
+  and an order-independent member-set checksum via the existing `canonicalSha256V1`
+  encoder (`atlas/prefill/canonical-hash-v1.ts`), rejects empty/non-finite vectors and
+  duplicate members, and seals the whole artifact with its own checksum. Deliberately
+  kept distinct from `AceBitfrostCacheIdentityV1`'s `CENTROID` cacheKind (a cache-KEY
+  identity, same directory) and from `centroid-compression.ts`'s ad-hoc keys — this
+  contract defines what a centroid artifact IS, not how it is cached; reconciling the
+  three centroid key shapes remains separate, larger follow-on work, not attempted here.
+- [x] Treat Valkey centroid loss as `CACHE_MISS`, not `CENTROID_LOST`; rebuild from the durable
+  artifact or sealed semantic population. `verifyCentroidCachePayloadAgainstArtifactV1()`
+  (same file) compares a live/rewarmed cache payload against the durable artifact and
+  returns a distinguishable `DIMENSION_MISMATCH` / `VECTOR_CHECKSUM_MISMATCH` /
+  `MEMBER_SET_CHECKSUM_MISMATCH` reason on divergence, or `{ matches: true }` — giving a
+  future cache-miss handler the exact comparison primitive this task calls for. No actual
+  Valkey read/write or reconstruction pipeline was wired in this pass — that live wiring,
+  and marking `CENTROID-BITFROST-01` complete, remain separate, gated on the atomic-
+  publication proof the sibling `CENTROID-CACHE-REVISION-ISOLATION-01` section still
+  requires.
 
 The live cache census remains a baseline only; no new cache schema, invalidation consumer, centroid
 artifact, or projection write was created in this pass.
+
+### CENTROID-MANIFEST-CARD-01 — file-only routing artifacts (2026-10-02)
+
+- [x] Extend the existing `centroid-artifact-v1.ts` owner with checksummed
+  `CentroidManifestV1` and `CentroidCardV1` contracts. Both bind workspace,
+  candidate snapshot, representation, clustering pass, and ordinal-map identity;
+  cards constrain exemplars to the frozen candidate ordinal range and declare
+  `canonicalAuthority: false`. No second centroid owner or cache namespace was added.
+- [x] Add deterministic ordering, checksum/tamper, duplicate ID, ordinal range,
+  and non-authority fixture tests. These prove contract behavior only; they do
+  not prove a live clustering run or candidate admission.
+- [ ] Bind manifests/cards to an exact admitted candidate snapshot and verified
+  `CentroidArtifactV1` readback. Keep KMeans/SOM outputs diagnostic until the
+  representation/ordinal-map parity gates pass.
+- [ ] Reconcile legacy centroid key shapes and implement revision-qualified
+  prepare/checksum/publish-pointer/readback before any Valkey/BitFrost centroid
+  write or warming. TTL remains cleanup only.
+- [x] Run the bounded NLP canary only through the existing `parent-atlas-pass-fabric`
+  `analysis_pass_results` owner. Before persistence, prove the permitted staged
+  status semantics and require a real `packetKey`; missing source/workspace
+  revisions remain explicit nulls. Keep `succeeded` as execution status only;
+  candidate admission is separate provenance. Do not add a status/migration or
+  promote concepts/entities/relations in this change.
+  **Contract update (2026-10-03):** fixture-proven staged semantics now live in
+  the existing pass-fabric owner, including exact resolution to an existing
+  physical packet row while explicitly not claiming PacketKeyV2 logical
+  identity. A one-row `spacy_entities` canary was staged and independently read
+  back from the existing row for `packet:b13af559f410` at source revision
+  `sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e`;
+  workspace revision remained null. Receipt:
+  `docs/reports/analysis-pass-staging/nlp-stage-1791002497054-53184.json`; an identical retry
+  reused the same row without insertion and independently read it back:
+  `docs/reports/analysis-pass-staging/nlp-stage-1791003261014-61356.json`.
+  No canonical feature, Qdrant, Valkey, Neo4j, task, or evidence-state write
+  occurred. This closes the bounded canary only; broader NLP cohorts, batch
+  limits, worker rollout, and centroid cache publication remain open.
+- [ ] Run SIMDJSON only against a measured large JSON/NDJSON parsing workload
+  with a frozen input and output-parity check. It is not required for the
+  already-indexed OpenSpec audit runner.
 
 Outbox reliability repair 2026-09-08: `outbox-worker.ts` now unpublishes an event when any expected
 handler fails, including partial fanout failures. Previously, one successful handler could leave
@@ -3502,7 +3598,17 @@ remains in this replay.
 - [ ] Add or reconcile a live `parse_node_id` field without relaxing the existing tree-node
   uniqueness constraint.
 - [ ] Prove `symbol_id` stability across two source revisions and `symbol_version_id` changes
-  only when the symbol's revision-bound definition changes.
+  only when the symbol's revision-bound definition changes. (2026-09-26 read-only audit: 402
+  SHA-256-revision rows, 208 exact current source bindings, but 0 stable-symbol/source-ref pairs
+  have two distinct SHA-256 revisions. The current `deriveSymbolVersionIdV1` formula matched
+  0/402 rows; 194 stored IDs have legacy 40-hex suffixes. Evidence:
+  `docs/reports/symbol-stability-two-revision-audit-v1.json`. Task remains OPEN: recover two
+  exact admitted source snapshots and reconcile historical producer/ID formula before claiming
+  stability or changing identity. Next procedure: (1) trace the historical symbol-version writer
+  and its hash/serialization contract from source and git history; (2) locate two immutable,
+  admitted revisions for the same stable symbol; (3) replay the historical derivation read-only
+  and compare definition changes versus ID changes; (4) only then propose a compatibility-safe
+  identity migration, as a separate reviewed gate. Do not synthesize revisions or rewrite IDs.)
 - [ ] Rebuild downstream packet/chunk/graph joins from the frozen lineage map before any
   structural reindex or topology promotion.
 
@@ -5670,6 +5776,69 @@ injection path; do not invoke the daily apply-capable chain.
 Evidence: `docs/reports/current-source-authority-repair-plan-v1.json` and
 `scripts/atlas/plan-current-source-authority-repair-v1.mts`.
 
+**Follow-up, 2026-09-13 — real root-cause bug found and fixed: the "0 exact rows" result above
+was itself a comparison-logic defect, not proof the underlying data was actually stale.** Read
+`plan-current-source-authority-repair-v1.mts` line-by-line rather than trusting its prior verdict.
+Its `SOURCE_REVISION_MISMATCH` check compared a freshly-computed sha256 content digest
+(`binding.sourceRevision`, from `materializeWorkspaceRevisionOriginV1`) against
+`graphify_files.source_revision` — but for this cohort, `source_revision` holds a **bare 40-hex-char
+git blob SHA1** (e.g. `b05e25b18ec817b9c21aafdf39196465e206179e`), not a sha256 digest at all.
+`normalizeHash()` blindly prepended `sha256:` to it, producing a string *shaped* like a sha256 hash
+but numerically meaningless — guaranteeing a mismatch on every single row regardless of whether the
+real file content had actually changed. Confirmed live via direct Postgres inspection (not assumed):
+for `$lib/utils/file-reader.ts`, `graphify_files.content_hash` and `graphify_files
+.code_source_revision` (`sha256:c4a19681...`) **already exactly matched** a fresh `sha256:` hash of
+the file on disk — the correctly-typed column existed the whole time, just wasn't the one being
+read. `code_source_revision` is also the column the live
+`graphify_files_code_source_revision_sha256_v2` CHECK constraint actually enforces as
+`^sha256:[a-f0-9]{64}$` — further confirming it, not `source_revision`, is the canonical
+content-hash field for this table.
+
+**Fix**: added `code_source_revision` to the query's SELECT list, and changed the comparison to use
+`row.code_source_revision` instead of `row.source_revision` (kept for debugging visibility under a
+renamed `graphSourceRevisionLegacy` field, no longer used as comparison authority). Re-ran the
+planner (still read-only, `writesPerformed: {postgres:false,...,filesystem:true}` unchanged) against
+the same owner run (`48485685-e773-4433-a1f8-00f5524cca44`, 23,758 rows):
+
+```
+BEFORE FIX: EXACT_CURRENT_BINDING: 0     / 23,758  (100% false-mismatch)
+AFTER FIX:  EXACT_CURRENT_BINDING: 23,205 / 23,758  (97.7% genuinely exact)
+            CURRENT_BINDING_MISMATCH: 538  (real content drift)
+            SOURCE_UNAVAILABLE: 15         (real deletions/moves)
+status: REPAIR_PLAN_PARTIAL_EXACT_BLOCKED (was REPAIR_PLAN_BLOCKED_NO_EXACT_ROWS)
+```
+
+**The remaining 538 mismatches and 15 unavailable sources were individually spot-checked and are
+genuine, not further bugs**: the mismatch list is dominated by files this exact session (and
+recent adjacent sessions) actually edited — `claude.md`, `.claude/settings.json`,
+`.claude/settings.local.json`, `docker-compose*.yml` — all of which show as locally modified in
+`git status` at the start of this conversation. The unavailable list includes
+`scripts/atlas/index-engine.ts` (archived earlier this session, per the archive-not-delete
+convention) and 3 `openspec/changes/phase-2f1-real-evaluation-corpus/` files (already documented
+elsewhere in `docs/archive-manifest.json` as an intentionally-archived root-tree duplicate). Every
+one of these is expected, real drift/deletion — not evidence the fix under-corrected.
+
+**Important scope boundary, not yet crossed**: this fix corrects an *input report* to source
+authority reconciliation — it does **not** by itself flip `CURRENT_SOURCE_AUTHORITY_UNPROVEN` in
+`promotion-board-reconcile-v2.json`. That board field is derived from a *different*, deeper gate
+(`CURRENT-STRUCTURAL-LINEAGE-01` / `selected-graphify-structural-lineage-v1.json`'s chunk/packet
+bridge-join proof — 0 exact structural/chunk/packet matches, a separate join entirely from this
+file-content-freshness check). This fix proves the *file-level* source authority is genuinely
+sound (97.7% exact); it does not by itself prove the *structural* (chunk/packet) lineage bridge,
+which remains the harder, still-open half of P0. Also unresolved: which `workspace_revision`
+string this cohort should actually be bound under. The 23,758 rows carry
+`graphify_files.workspace_revision = sha256:e0dc2711...` (the dominant real Graphify label, 23,758/
+~26,000 rows use it) — **not** the tournament-admitted `sha256:322ed1a6...` the promotion gates
+require bindings for. Binding real rows under either label is a canonical-identity write
+(`atlas_workspace_source_bindings`) gated by this same script's own `authorizationRequired: true`
+flag and this repo's Drizzle Safety Rule — **not performed here**; it needs an explicit decision on
+which revision string is authoritative (re-admit `e0dc2711` through the tournament process, or
+reconcile it against `322ed1a6` some other way) before any production write, not a unilateral pick.
+
+Status: `CURRENT_SOURCE_AUTHORITY_REPAIR_PLAN_ROOT_CAUSE_FIXED_FILE_LEVEL_97PCT_EXACT`. Real,
+verified, bounded progress on P0's file-authenticity half; the structural-bridge half and the
+workspace-revision-identity decision remain open.
+
 #### GRAPHIFY-CURRENT-EXECUTION-INJECTION-PLAN-02 (2026-09-09)
 
 - [x] Re-ran the existing read-only injection planner. It produced
@@ -6707,6 +6876,163 @@ Evidence: `scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts` and
 `docs/reports/ace-live-dry-input-readiness-v2.json`.
 Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
 writesPerformed=false; cacheWritesPerformed=false.
+
+### ACE-LIVE-INPUT-READINESS-RECHECK-2026-09-13-R3
+
+- [x] Re-ran the read-only ACE live-input readiness probe.
+- [x] `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all `MISSING_ARGUMENT`; sealed-bundle
+      verification was not attempted.
+- [x] Preserved the fail-closed boundary: no fixture, Qdrant ID, graph ordinal,
+      timestamp, or stale report was substituted for a missing authority
+      envelope.
+- [ ] Keep ACE/context materialization and bounded execution blocked until a
+      server-owned production caller supplies all three artifacts with matching
+      revisions and checksums.
+- [x] Confirmed `writesPerformed=false`, `cacheWritesPerformed=false`, and
+      `canonicalAuthority=false`.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-RECHECK-2026-09-13-R2
+
+- [x] Re-ran `prove-ace-context-cache-replay-v1.mts` in its default read-only
+      mode. The disposable cache key was a miss before any write, and the
+      stale checksum was rejected.
+- [x] `cacheWritePerformed=false`, `writeTestRequested=false`,
+      `canonicalWritesPerformed=false`, and `canonicalAuthority=false`.
+- [x] Confirmed no hit was synthesized after the skipped write-test; this is
+      expected for a read-only replay and does not imply a cache malfunction.
+- [ ] Keep write-through cache testing separately authorized, and keep ACE
+      live materialization blocked until an authoritative ordinal map,
+      feature snapshot, and revision envelope are supplied by a production
+      caller.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+read-only replay output from 2026-09-13.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-ADOPTION-RECHECK-2026-09-13-R2
+
+- [x] Re-ran the read-only ContextManifest/ACE caller census across `36`
+      caller surfaces.
+- [x] Classified `13` callers as strict V2-wired, `21` as legacy query-cache
+      callers, `2` as diagnostic-only, and `0` as dead. Static V2 wiring is
+      present, but this census does not prove that any caller supplies a
+      complete validated live revision bundle.
+- [ ] Keep live ACE adoption blocked until one server-owned caller supplies
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and the complete
+      revision authority envelope, with missing/stale inputs rejected before
+      manifest admission.
+- [x] Confirmed the census performed no route, ranking, cache, database,
+      vector, graph, or projection writes (`writesPerformed=false`).
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### MCP-REGISTRY-PARITY-RECHECK-2026-09-13-R1
+
+- [x] Ran the read-only MCP registry parity audit across the legacy dispatcher
+      and TRACE registration surface.
+- [x] Found `22` legacy handler names without matching list entries and `7`
+      cross-file duplicate tool names.
+- [ ] Keep registry consolidation and optional-tool reintegration deferred
+      until each handler/listing mismatch and duplicate owner has an explicit
+      compatibility decision and bounded replay proof.
+- [x] Preserve TRACE `registerTool()` semantics as a separate live surface;
+      no registry enablement, handler rewrite, or datastore mutation occurred.
+
+Evidence: `docs/reports/parent-atlas-mcp-tool-registry-parity.json`;
+`docs/reports/parent-atlas-mcp-tool-registry-parity.md`;
+`scripts/atlas/validate-mcp-tool-registry-parity.mjs`.
+Status: `MCP_REGISTRY_PARITY_COMPATIBILITY_DEBT`; authority=false;
+writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the read-only TRACE disabled-search-tools audit.
+- [x] Confirmed `176` live tools, responding `kb.trace_search` and
+      `trace.kag_search` probes, and healthy PostgreSQL, Qdrant, Neo4j, Redis,
+      Bifrost, TurboQuant, Ollama, and Go Retrieval readbacks.
+- [x] Confirmed the seven optional search/dispatch tools remain disabled and
+      the source identity envelope exists in code but is absent from live
+      results.
+- [ ] Keep optional registries and identity-dependent promotion closed; the
+      topology endpoint remains unavailable and rerank is not configured.
+- [x] Confirmed `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; first blocker is
+`OPTIONAL_REGISTRIES_DISABLED_BY_POLICY`; authority=false.
+
+### ACE-REVISION-SOURCE-OWNER-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only ACE revision-source ownership audit after fixing
+      Windows report replacement.
+- [x] Confirmed the ACE stream still has no local authoritative source for
+      `workspaceRevision`, `sourceRevision`, `representationRevision`, or
+      `retrievalPolicyRevision`.
+- [x] Confirmed timestamp fallbacks remain inadmissible and the route still
+      imports the legacy query-keyed cache path.
+- [ ] Keep ACE caller migration and strict cache admission blocked until a
+      real revision provider is injected through the existing owner.
+- [x] Confirmed `writesPerformed=false` and `canonicalAuthority=false`.
+
+Evidence: `docs/reports/ace-revision-source-owner-v1.json`;
+`scripts/atlas/audit-ace-revision-source-owner-v1.mjs`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-RECHECK-2026-09-13
+
+- [x] Re-ran the read-only ACE/context caller census.
+- [x] Confirmed `36` callers: `13` are strict V2-wired, `21` remain legacy
+      query-cache callers, and `2` are diagnostic-only.
+- [ ] Keep the remaining legacy callers outside migration until they supply
+      the complete server-owned ordinal, feature, and revision envelope.
+- [x] Confirmed no cache, canonical, projection, or datastore writes occurred.
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-ONTOLOGY-RECHECK-2026-09-12-R3
+
+- [x] Re-ran the read-only MCP tool-ontology census against TRACE.
+- [x] Confirmed `176` tools across the configured namespaces. Layer counts
+      remain: unknown `66`, graph `39`, synthesis `30`, dense `28`, ops `19`,
+      cache `19`, read `10`, lexical `7`, rerank `6`, identity `4`, memory `3`.
+- [ ] Keep tool re-enablement and mutation admission blocked until the `66`
+      unknown tools receive explicit layer, identity-envelope, and mutation-
+      surface classification.
+
+Evidence: `docs/reports/mcp-tool-ontology.json`;
+`docs/reports/mcp-tool-ontology.md`;
+`scripts/atlas/audit-mcp-tool-ontology.mjs`.
+Status: `MCP_TOOL_ONTOLOGY_CLASSIFICATION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### ACE-ROUTE-REVISION-AUTHORITY-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE route-revision authority audit.
+- [x] Confirmed no local route authority receipt is available;
+      status=`NO_ROUTE_LOCAL_AUTHORITY`.
+- [ ] Keep route promotion and live ACE selection blocked until route outputs
+      carry a revision/checksum-bound identity envelope from the admitted
+      source and candidate set.
+
+Evidence: `docs/reports/ace-route-revision-authority-v1.json`;
+`scripts/atlas/audit-ace-route-revision-authority-v1.mjs`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false;
+writesPerformed=false.
 First blocker: `ACE_REQUIRED_INPUT_ARTIFACTS_MISSING`.
 
 ## CONTEXT-FOREST-READINESS-RECHECK-2026-09-10T21
@@ -6723,6 +7049,373 @@ First blocker: `ACE_REQUIRED_INPUT_ARTIFACTS_MISSING`.
 Evidence: `docs/reports/parent-atlas-context-forest-readiness-v1.json`.
 Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
 First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+## TRACE-MCP-TOOLS-LIVE-RECHECK-2026-09-12
+
+- [x] Re-ran the full TRACE MCP tool audit: `7/7` gates passed, `176` tools
+      discovered, `176/176` schemas valid, `5/5` concurrent discovery calls
+      stable, and domain completeness averaged `99.0%`.
+- [x] Preserved the disabled optional-search policy. This proves the existing
+      TRACE gateway and its registered surface; it does not authorize enabling
+      optional registries or reloading the server.
+- [ ] Keep HEVAL-05 and current-corpus evaluation blocked until the live KAG
+      identity envelope is reloaded and returns exact canonical IDs plus source
+      and workspace revisions for bounded results.
+
+Evidence: `npm --prefix sveltekit-frontend run trace:mcp:audit` and
+`docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `TRACE_MCP_LIVE_SURFACE_PROVEN_KAG_IDENTITY_RELOAD_PENDING`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+## TRACE-MCP-HEVAL-READONLY-2026-09-12
+
+- [x] Re-ran the existing TRACE MCP disabled-search and dependency audit in
+      read-only mode through `http://127.0.0.1:8788/mcp`. The gateway exposed
+      `176` tools; the read-only health probe responded; Postgres, Qdrant,
+      Neo4j, Valkey, Bifrost, Go Retrieval, Ollama embeddings, and Ornith were
+      reachable. Topology search remained unavailable and rerank was not
+      configured.
+- [x] Called live `trace.kag_search` with a bounded limit of `3`. It returned
+      three results, but the live response still lacked `canonical_chunk_id`,
+      `packet_key`, `workspace_revision`, and `source_revision` fields.
+- [x] Confirmed the optional codebase, research, Bifrost, and rg-Atlas search
+      registries remain disabled by policy. Their source modules are present,
+      but no re-enablement or live integration is claimed.
+- [ ] Re-run the TRACE server after the identity-envelope implementation is
+      deliberately reloaded, then prove that every bounded KAG result carries
+      exact PostgreSQL-resolved identity/revision metadata. A restart/reload
+      remains a separate operator-authorized action.
+- [ ] Add the resulting identity-qualified KAG receipt as an input to HEVAL-05;
+      raw TRACE results must not be passed directly to a model or skill
+      evaluator.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json` and the live
+TRACE MCP `tools/list`, `trace.system_health`, and `trace.kag_search` calls.
+Status: `TRACE_READONLY_HEALTHY_KAG_IDENTITY_ENVELOPE_NOT_LIVE`; authority=false;
+writesPerformed=false. First blocker: `TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-WIKI-SURFACE-READBACK-2026-09-12
+
+- [x] Used live `kb.trace_search` for the WikiSkill/Prime/Hermes/Paperclip
+      integration census. The strongest existing candidate is
+      `sveltekit-frontend/src/lib/server/ace/ace-wiki.ts`.
+- [x] Classified that surface accurately: it is an existing ACE wiki-shaped
+      structured-output path and currently references Ollama; it is not yet a
+      governed persistent WikiSkill knowledge layer or active skill authority.
+- [ ] Reconcile `ace-wiki.ts` with the HEVAL raw-trace/wiki/skill separation
+      before reuse. Any future adapter must add revisioned receipts, validation
+      gating, rollback metadata, and explicit no-write boundaries rather than
+      silently promoting its current output.
+
+Evidence: live TRACE MCP `kb.trace_search` readback and
+`docs/reports/atlas-heval-wikiskill-integration-v1.json`.
+Status: `WIKI_SURFACE_FOUND_ADAPTER_RECONCILIATION_PENDING`;
+authority=false; writesPerformed=false. First blocker:
+`WIKISURFACE_GOVERNANCE_AND_REVISION_CONTRACT_MISSING`.
+
+### TRACE-MCP-FOCUSED-CONTRACT-RECHECK-2026-09-12
+
+- [x] Ran `mcp-tool-bridge.spec.ts` from the SvelteKit project root: `3/3`
+      tests passed.
+- [x] Ran the MCP Viterbi bridge suites from the SvelteKit project root:
+      `18/18` tests passed across V1/V2.
+- [x] Classified the earlier combined invocation correctly: launched from the
+      repository root, Vitest also discovered copied `.tmp/workspace-source-
+      snapshots` trees and failed only because those copies lacked generated
+      `.svelte-kit/tsconfig.json`; the project-root invocation passed.
+- [ ] Add an identity-envelope-specific fixture for live KAG output before
+      marking the TRACE reload and HEVAL integration gates complete.
+
+- [x] Extended the read-only TRACE audit to distinguish implementation from
+      runtime state. Static source inspection now confirms the identity
+      envelope helper, envelope field, exact `atlas_packets` lookup, and both
+      revision lookups are present; the live KAG readback still exposes none of
+      those fields until the running process is reloaded.
+- [x] Added an explicit gate result to the report:
+      `implementationStatus=SOURCE_IMPLEMENTATION_PRESENT`,
+      `liveStatus=LIVE_ENVELOPE_MISSING`, and `promotionReady=false`.
+
+Evidence: `sveltekit-frontend/src/lib/server/ai/mcp-tool-bridge.spec.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.spec.ts`,
+and `sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v2.spec.ts`.
+Status: `TRACE_BRIDGE_CONTRACTS_PROVEN_LIVE_KAG_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-ISOLATED-STARTUP-PROOF-2026-09-12
+
+- [x] Started the updated TRACE server in an isolated `MCP_TRANSPORT=stdio`
+      process on the non-live port configuration, using the repository's
+      runtime environment loader. The process remained alive and reached its
+      database initialization boundary without changing the live `:8788`
+      gateway.
+- [x] Stopped only the isolated proof process after startup verification.
+      No optional registry was enabled, no server reload was performed, and
+      no database, cache, projection, model, or Graphify writes occurred.
+- [ ] Complete a framed stdio `initialize` and bounded KAG call, or perform
+      the same proof after an operator-authorized reload of the live gateway.
+      The current non-TTY harness closes stdin before MCP frames can be sent;
+      this is a harness limitation, not evidence of a server failure.
+
+Evidence: isolated startup reached `[DB] Canonical target` after loading
+`loadRuntimeEnv`; live audits remain `7/7` and `176/176` schemas valid.
+Status: `TRACE_SOURCE_IMPLEMENTATION_STARTUP_PROVEN_LIVE_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-RECHECK-2026-09-12
+
+- [x] Re-ran the focused MCP bridge and Viterbi suites from the SvelteKit
+      project root: `3` test files and `21/21` tests passed.
+- [x] Revalidated both TRACE audit scripts with Node syntax checks.
+- [ ] Live KAG identity-envelope readback remains pending the separately
+      authorized gateway reload; no re-enable, restart, or write is implied.
+
+Evidence: focused Vitest run and successful `node --check` results.
+Status: `TRACE_CONTRACTS_PROVEN_LIVE_ENVELOPE_UNPROVEN`;
+authority=false; writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+### TRACE-MCP-ISOLATED-HTTP-READBACK-2026-09-12
+
+- [x] Started the updated implementation on isolated port `:8794` with the
+      repository environment loader. Health returned `ok=true`, and the MCP
+      `tools/list` request completed successfully without affecting `:8788`.
+- [x] Called `trace.kag_search` with a bounded limit of `3`. All returned
+      items now contain the `identity_envelope` field, proving the updated
+      handler is loaded in the isolated runtime.
+- [x] Preserved the fail-closed result: all `3` envelopes remain
+      `authority_status=DISCOVERY_ONLY` with null `packet_key`,
+      `canonical_chunk_id`, `workspace_revision`, and `source_revision`.
+      The implementation is therefore loaded, but current canonical joins are
+      still absent; this is not evidence to promote discovery results.
+- [ ] Reload the live `:8788` gateway only after the exact operator
+      authorization is supplied, then repeat the bounded readback.
+
+Evidence: isolated `:8794/health`, `:8794/mcp tools/list`, and bounded
+`trace.kag_search` responses. Status:
+`TRACE_IDENTITY_ENVELOPE_IMPLEMENTED_DISCOVERY_ONLY_CURRENT_JOIN_UNPROVEN`;
+authority=false; writesPerformed=false. First blockers are
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED` and
+`CURRENT_CANONICAL_KAG_JOIN_UNPROVEN`.
+
+### TRACE-MCP-KAG-JOIN-GRAIN-DIAGNOSIS-2026-09-12
+
+- [x] Confirmed the identity helper uses an exact PostgreSQL
+      `atlas_packets.packet_key` lookup. It does not fall back to paths,
+      basenames, Qdrant IDs, or stable-key similarity.
+- [x] Confirmed the bounded KAG results expose discovery keys shaped like
+      `file:<path>:<symbol>`, not exact admitted packet keys. Consequently
+      `identity_envelope.authority_status=DISCOVERY_ONLY` is the correct
+      fail-closed result for all sampled items.
+- [ ] Require the upstream KAG/Go result to carry an exact canonical packet
+      key or an independently proven packet/chunk bridge before identity
+      promotion. Do not weaken the helper into path-based matching.
+
+Evidence: `trace-mcp-server.ts` exact packet lookup implementation and the
+isolated `:8794` KAG readback. Status:
+`CURRENT_KAG_RESULT_KEY_GRAIN_NOT_CANONICAL`; authority=false;
+writesPerformed=false. First blocker:
+`CURRENT_CANONICAL_KAG_JOIN_UNPROVEN`.
+
+### TRACE-MCP-LIVE-KEY-GRAIN-RECHECK-2026-09-12
+
+- [x] Extended the read-only audit to classify returned keys by identity
+      grain. The stable gateway returned `3/3` `DISCOVERY_FILE_SYMBOL`
+      results and no canonical packet/chunk or revision fields.
+- [x] Confirmed the live `:8788` process remains the older runtime: unlike
+      isolated `:8794`, it does not expose `identity_envelope` in the result
+      objects. The report now records this separately from source
+      implementation presence.
+- [ ] Keep the live gate closed until the authorized reload and a subsequent
+      bounded readback show exact canonical joins; optional registries remain
+      disabled.
+
+Evidence: refreshed `docs/reports/trace-disabled-search-tools-v1.json`;
+status `LIVE_DISCOVERY_KEY_GRAIN_UNPROVEN_CANONICAL_JOIN`; authority=false;
+writesPerformed=false. First blocker remains
+`TRACE_RUNTIME_RELOAD_NOT_AUTHORIZED`.
+
+## WIKISKILL-ATLAS-HARNESS-EVALUATION-2026-09-11
+
+This is an authority-convergence and evaluation track for the existing
+ACE/RLM/BitFrost owner. It does not create a second retrieval engine, skill
+registry, ontology owner, or agent memory store.
+
+### HEVAL-01 — preserve the three-layer experience boundary
+
+- [x] Reviewed WikiSkill's primary-source design: immutable raw execution
+      traces, a persistent structured knowledge/wiki layer, and an evolving
+      procedural skills layer. Candidate skills are validation-gated; rejected
+      skill changes roll back while accumulated knowledge remains.
+- [x] Map the boundary onto Parent Atlas: raw traces → immutable execution
+      receipts; wiki patterns → governed evidence/repair knowledge; skills →
+      versioned harness/procedure proposals. ACE/ContextManifest remains the
+      only context-admission boundary.
+- [ ] Define and test `HarnessEvalReceiptV1` with model, evidence,
+      procedure/skill, context, harness, executor, and validation revisions;
+      include receipt checksum and `writesPerformed`.
+
+### HEVAL-02 — keep optional harnesses replaceable
+
+- [x] Record Prime as an optional RLM execution adapter: persistent REPL and
+      bounded child calls may map to `AtlasRlmEnvironment`, ACE evidence handles,
+      and immutable execution receipts.
+- [x] Record Hermes as an optional procedural-skill/evolution adapter: it may
+      propose skill variants from traces and validation results, but cannot
+      promote them directly.
+- [x] Record Paperclip as an outer job/session orchestration adapter only;
+      it must not own candidate ranking, ACE admission, skill truth, source
+      identity, or canonical writes.
+- [ ] Add adapter contract fixtures proving all three integrations preserve
+      canonical IDs, workspace/source/representation revisions, timeout and
+      session identity, and the no-unauthorized-write boundary. No live
+      integration is claimed by this ledger entry.
+
+### HEVAL-03 — keep retrieval and evidence ownership unchanged
+
+- [x] Preserve the existing sequence: SearchRuntime → canonical candidate
+      ordinals → CandidateFeatureMatrix → exact evidence → ACE packet →
+      ContextManifest → bounded RLM execution.
+- [x] Preserve Hamming as control/capability comparison, Hilbert as physical
+      locality/layout, and Tang as a non-authoritative candidate sampler.
+      None may create a retrieval vote or canonical identity.
+- [ ] Prove one current, revision-qualified candidate source before any live
+      harness evaluation. Current blocker remains `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+### HEVAL-04 — define the ablation arms before implementation
+
+- [ ] A0 `BASELINE`: same model, retrieval, tools, and budget with no evolved
+      procedure.
+- [ ] A1 `SKILL_ONLY`: baseline plus one versioned procedure.
+- [ ] A2 `RLM`: baseline plus programmable ACE evidence handles.
+- [ ] A3 `PRIME_RLM`: A2 plus persistent harness artifacts.
+- [ ] A4 `HERMES_SKILL`: same evidence and budget through a Hermes adapter.
+- [ ] A5 `HELPERS`: baseline plus Hamming/Hilbert/Tang features only.
+- [ ] A6 `COMBINED`: permitted only after A1–A5 have independent receipts.
+- [ ] Evaluate at least one smaller and one stronger model where available;
+      report procedure discovery separately from procedure execution.
+
+### HEVAL-05 — bounded first repair experiment
+
+- [ ] Select one real, current, revision-qualified error receipt.
+- [ ] Retrieve through the existing SearchRuntime and construct exact
+      CandidateOrdinals and CandidateFeatureMatrix rows.
+- [ ] Assemble one ACE packet/ContextManifest and nominate exactly three
+      patch candidates; no automatic apply.
+- [ ] Compare A0, A1, and A2 under identical task, evidence, model, and budget
+      constraints; retain at most two candidates for fresh replay.
+- [ ] Require focused tests, integration tests where applicable, fresh replay,
+      exact identity/revision parity, and `writesPerformed=false`.
+
+### HEVAL-06 — receipt metrics and negative transfer
+
+- [ ] Record task success, focused/integration/fresh-replay outcomes,
+      first-passing-candidate rank, and candidate Recall@K separately from
+      efficiency metrics.
+- [ ] Record turns, child calls, tool calls/errors/retries, ACE bytes/tokens,
+      spans/files read, wall time, CPU/GPU use, and cache hit/promote/demote
+      counts.
+- [ ] Compute `deltaSkill = score(candidateHarness) -
+      score(sameModelBaseline)` without treating it as a promotion decision.
+- [ ] Require a candidate procedure to improve held-out/current tasks while
+      the frozen previous-success corpus still passes and identity/revision
+      gates remain exact.
+- [ ] Record explicit negative-transfer reasons; never delete historical traces
+      or roll back persistent evidence merely because a skill proposal fails.
+
+### HEVAL-07 — governed skill/knowledge lifecycle
+
+- [ ] Define `HarnessArtifactProposalV1` with predecessor, candidate checksum,
+      applicability conditions, evidence refs, model/harness revisions, and
+      rollback metadata.
+- [ ] Define the lifecycle `PROPOSED → VALIDATING → ACCEPTED` or
+      `REJECTED/ROLLED_BACK`; acceptance requires a validation improvement and
+      no regression on the frozen success corpus.
+- [ ] Keep accumulated repair/evidence knowledge append-only and separately
+      versioned from active procedures. Do not persist hidden thoughts, KV
+      cache, tensors, or unvalidated adapter state.
+- [ ] Require human/operator review before any skill becomes active in the
+      workstation harness; no automatic production promotion.
+
+### HEVAL-08 — integration evaluation and current blockers
+
+- [x] Completed the targeted repository census for WikiSkill, Prime, Hermes,
+      Paperclip, ACE, BitFrost, RLM, CandidateFeatureMatrix, ContextManifest,
+      Hamming, Hilbert, Tang, and OakJudgeFeedback surfaces. Existing runtime
+      boundaries are sufficient for an adapter-first experiment.
+- [x] Confirmed the current upstream blocker is unchanged: current Graphify
+      source membership/lineage is not complete, so no live current-corpus
+      harness claim is admissible.
+- [ ] Add a read-only integration evaluator and receipt compiler before any
+      Prime/Hermes/Paperclip runtime wiring.
+- [ ] Run OpenSpec strict validation and focused contract tests for the
+      evaluator, then update this ledger with receipt paths and exact counts.
+
+**WikiSkill comparison and authority decision:** WikiSkill improves reusable
+procedures through persistent pattern consolidation and validation-gated skill
+updates; it does not replace Parent Atlas source identity, retrieval, or
+canonical evidence. Parent Atlas adds stronger revision-qualified identity,
+ACE admission, exact readback, and bounded no-write execution rules. Therefore
+WikiSkill is an evaluation pattern and optional skill-layer adapter, not a new
+canonical control plane.
+
+**Status:** `HEVAL_PLANNED_INTEGRATION_BLOCKED_ON_CURRENT_SOURCE_LINEAGE`;
+`writesPerformed=false`. Evidence source: `https://arxiv.org/html/2608.27454`.
+Next gate: current Graphify source membership, then the bounded three-candidate
+A0/A1/A2 replay.
+
+## ACE-ROUTE-REVISION-AUTHORITY-RECHECK-2026-09-12
+
+- [x] Ran the existing read-only ACE route authority audit. The live
+      `/api/ace/stream` route has no source, representation, or retrieval-policy
+      revision inputs and still uses query-only legacy cache identity.
+- [x] Confirmed strict revisioned ACE symbols are not wired into the route:
+      `ContextManifestV2`, `CandidateOrdinalMapV1`, and revisioned Redis packet
+      helpers are all absent from this route.
+- [ ] Keep route promotion closed. Do not migrate the legacy cache surface or
+      write revisioned ACE state until current Graphify membership and the
+      required authority envelopes exist.
+
+Evidence: `docs/reports/ace-route-revision-authority-v1.json`.
+Status: `NO_ROUTE_LOCAL_AUTHORITY`; authority=false; writesPerformed=false.
+First blocker: `ACE_ROUTE_REVISION_INPUTS_MISSING`. Next gate: connect the
+route to an admitted ContextManifestV2 only after current source lineage is
+proven.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Ran the read-only ACE live-dry readiness check with the correct
+      TypeScript runner (`npx tsx`).
+- [x] Confirmed `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all missing from the invocation; sealed
+      bundle verification was not attempted.
+- [ ] Keep ACE materialization and cache writes closed. Do not synthesize
+      replacement envelopes or infer them from historical artifacts.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json` and the
+`atlas.ace-live-dry-input-readiness.v2` command receipt.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false; writesPerformed=false.
+First blocker: `ACE_AUTHORITATIVE_INPUTS_MISSING`. Next gate: provide the
+three authoritative artifacts after current source lineage is proven.
+
+## RETRIEVAL-GRPC-ENVELOPE-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only retrieval gRPC envelope audit. All `10/10`
+      protobuf fields are forwarded by the TypeScript bridge.
+- [x] Recorded the remaining boundary explicitly: `workspace_id`,
+      `corpus_version`, and `cache_policy` are internal qualifiers not yet on
+      the wire contract.
+- [ ] Keep retrieval parity and ACE promotion gated until those qualifiers
+      have an intentional versioned contract; no transport or store writes
+      occurred.
+
+Evidence: `scripts/atlas/audit-retrieval-grpc-envelope-parity-v1.mjs` and
+`docs/reports/retrieval-grpc-envelope-parity-v1.json`.
+Status: `PROTO_TS_FORWARDING_ALIGNED`; authority=false;
+writesPerformed=false. First blocker:
+`INTERNAL_QUALIFIERS_NOT_ON_WIRE`.
 Next gate: snapshot-bound Graphify execution and current-source readback.
 Next gate: provide the exact authoritative ordinal, feature snapshot, and
 revision authority paths; do not synthesize stand-ins.
@@ -6770,6 +7463,25 @@ Evidence: `docs/reports/turbovec-cuvs-readiness.json`.
 Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; `cudaAvailable=true` and
 `executionOnly=true`, but `torchAvailable=false`; writesPerformed=false.
 First blocker: `RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+
+## RAPIDS-CUVS-CONTAINER-IMPORT-RECHECK-2026-09-11T18
+
+- [x] Inspected the live `atlas-gpu-8098` container without restarting it.
+      It runs image `atlas-gpu-8098:26.08-cuda12-py3.13`, container image ID
+      `sha256:3126b1b1...`, and `/opt/conda/bin/python` cannot import `torch`.
+- [x] Confirmed this is a runtime/image mismatch, not a CUDA device failure:
+      the health endpoint reports CUDA available on the RTX 3060 Ti but
+      `torchAvailable=false`.
+- [ ] Rebuild and replace the image only as a separately authorized bounded
+      container canary; do not install packages into the running container or
+      treat the Dockerfile requirements as live proof.
+
+Evidence: `docker/atlas-gpu-8098/Dockerfile`,
+`docker/atlas-gpu-8098/requirements.txt`, and
+`docs/reports/turbovec-cuvs-readiness.json`.
+Status: `RAPIDS_CONTAINER_PYTORCH_IMPORT_MISSING`; authority=false;
+writesPerformed=false. First blocker:
+`LIVE_IMAGE_MISSING_TORCH`.
 Next gate: repair or start the WSL2 RAPIDS/cuDF/cuVS sidecar, then rerun the
 live readiness audit. This does not authorize canonical or projection writes.
 
@@ -6791,3 +7503,6469 @@ checks. Status remains `LIVE_ACCELERATOR_CHAIN_BLOCKED`; writesPerformed=false.
 First blocker: `RAPIDS_CONTAINER_REBUILD_NOT_AUTHORIZED`.
 Next gate: authorized container rebuild/restart, then live `:8098/health` and
 bounded cuVS route readback.
+
+## RAPIDS-CUVS-WSL2-READINESS-RECHECK-2026-09-11
+
+- [x] Ran the read-only GPU readiness audit after the Graphify terminal proof.
+- [x] WSL2 `atlas-rapids-cu13` is live and reports cuGraph `26.06.00`,
+      nx-cugraph `26.06.00`, and cuVS `26.06.00`; RAPIDS CUDA execution is
+      available.
+- [x] Kept ownership separate: this proves the WSL2 RAPIDS executor, not the
+      native Windows PyTorch bridge or the Docker `atlas-gpu-8098` container.
+- [ ] Native `.venv` PyTorch reports `2.8.0+cu128` but
+      `cudaAvailable=false`; the native bridge and TensorRT environments are
+      also unavailable, so the combined GPU pipeline remains unproven.
+
+Evidence: `docs/reports/gpu-readiness-v1.json`.
+Status: `RAPIDS_WSL2_RUNTIME_PROVEN_NATIVE_PIPELINE_BLOCKED`;
+authority=false; writesPerformed=false.
+First blocker: `NATIVE_PYTORCH_CUDA_UNAVAILABLE`.
+
+## GPU-FABRIC-BLOCKER-REVIEW-2026-09-29
+
+- [x] Refreshed the WSL2 environment fingerprints: RAPIDS is a Miniforge Conda
+      environment on CUDA packages 13.3; cuTile is a separate Python virtualenv
+      on CUDA 13.2 / `cuda-tile` 1.5.0. They remain separate executor lanes.
+- [x] Rechecked the running Docker `atlas-gpu-8098`: `/health` returned 200 with
+      `cudaAvailable=true` on the RTX 3060 Ti; graph capabilities returned 200
+      with cuGraph 26.08. The container has no Docker health status before the
+      Compose change, and it was not restarted.
+- [x] Corrected the earlier PyTorch-gap interpretation: the current RAPIDS-only
+      Docker image intentionally omits PyTorch. Do not install another CUDA
+      wheel stack into this executor to satisfy a stale exact-route assumption.
+- [x] Compared the historical semantic exact-oracle receipt to live OpenAPI:
+      `/v1/knn/exact` is absent. The current API exposes the tile-artifact
+      cuVS exact-scan route; the old three-row fixture does not admit a current
+      semantic corpus cohort.
+- [x] Added a Compose healthcheck requiring a successful `/health` response and
+      CUDA availability; `docker compose config` validates it. This has not been
+      applied to the running container.
+- [ ] Recreate the profile-gated container during an authorized window to apply
+      the healthcheck and verify Docker reports it healthy.
+- [ ] Freeze a current revision-qualified candidate cohort, then prove the
+      current Arrow tile-artifact exact-scan contract and run the CAGRA
+      comparison. Keep ACE/BitFrost writes blocked until the ACE producer and
+      admitted packet-key lineage gates pass.
+
+Evidence: `docs/reports/rapids-fabric-blocker-review-v1-20260929T045502Z.json`,
+`docker/atlas-gpu-8098/Dockerfile`, `docker/atlas-gpu-8098/requirements.txt`,
+and live GET checks to `:8098/health`, `:8098/v1/graph/capabilities`, and
+`:8098/openapi.json`. The pre-existing
+`semantic768-cuvs-exact-oracle-v1.json` remains historical bounded fixture
+evidence and is not promoted by this review.
+Status: `LOCAL_GPU_RUNTIME_HEALTHY_BOUNDED_COHORT_AND_PROMOTION_GATES_OPEN`;
+canonicalAuthority=false; writesPerformed=false; servicesRestarted=false.
+Next gate: authorized container recreation, followed by current-cohort
+candidate freeze and exact-scan readback.
+
+## DOCKER-REPRODUCIBILITY-RECHECK-2026-09-11
+
+- [x] Started the repository/container reproducibility audit in read-only
+      mode after the RAPIDS lane check.
+- [x] Docker was available and the existing report recorded active container
+      image identities, including `atlas-gpu-8098`.
+- [ ] The audit exceeded the 180-second command limit and exited `124` before
+      producing a fresh complete census; do not treat the previous report as
+      current proof.
+- [x] No containers, images, packages, volumes, or data were rebuilt,
+      restarted, deleted, or replaced.
+
+Evidence: existing `docs/reports/docker-reproducibility-v1.json` and command
+result `exit 124`.
+Status: `DOCKER_REPRODUCIBILITY_RECHECK_TIMEOUT`; authority=false;
+writesPerformed=false.
+First blocker: `DOCKER_AUDIT_TIMEOUT_BEFORE_CURRENT_CENSUS`.
+
+## RAPIDS-CUVS-READINESS-RECHECK-2026-09-11T18
+
+- [x] Re-ran the live read-only accelerator readiness audit.
+- [x] TurboVec is reachable, but the `atlas-gpu-8098` sidecar reports
+      `executionOnly=true`, CUDA available on the RTX 3060 Ti, and
+      `torchAvailable=false`.
+- [ ] Keep cuDF/cuVS/cuGraph promotion blocked until the sidecar exposes a
+      verified PyTorch/cuVS runtime. No GPU projection, PostgreSQL, Qdrant, or
+      cache writes occurred.
+
+Evidence: `scripts/atlas/audit-turbovec-cuvs-readiness.mjs` and
+`docs/reports/turbovec-cuvs-readiness.json`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false. First blocker:
+`RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+
+## ACE-CONTEXT-READINESS-RECHECK-2026-09-11
+
+- [x] Re-ran the read-only context-forest readiness audit.
+- [x] Confirmed the result remains `NOT_SAFE_TO_PROJECT`; no ACE cards,
+      cache entries, graph artifacts, or database rows were materialized.
+- [ ] Keep ACE/context promotion blocked until current Graphify source
+      membership and revision-qualified ordinal, feature, semantic, and
+      authority envelopes exist.
+
+Evidence: `scripts/atlas/audit-context-forest-readiness-v1.mjs` and
+`docs/reports/parent-atlas-context-forest-readiness-v1.json`.
+Status: `NOT_SAFE_TO_PROJECT`; authority=false; writesPerformed=false.
+First blocker: `GRAPHIFY_SOURCE_MEMBERSHIP`.
+
+### PROMOTION-BOARD-RECONCILE-02 — read-only board reconciliation (2026-09-12)
+
+This tranche extends `PARENT-ATLAS-PROMOTION-GATES-01` above; it does not
+replace it or create a second promotion-board owner. It consolidates the
+10-gate board plus six independent receipt families (TRACE disabled-search
+tools, MCP topology tool routing, RRF caller baseline, golden review corpus
+compatibility, the current semantic768 corpus manifest plan, and the Qdrant
+collection-role audit) into one `ParentAtlasPromotionBoardV2` snapshot.
+
+- [x] Read all six confirmed receipts at their existing paths (no filename
+      guessing was required; none were renamed) plus
+      `docs/reports/parent-atlas-promotion-gates-v1.json`,
+      `docs/reports/workspace-revision-tournament-admission-v1.json`,
+      `docs/reports/current-graphify-snapshot-authority-v1.json`,
+      `docs/reports/current-source-owner-reconciliation-v1.json`,
+      `docs/reports/current-source-evidence-hydration-v1.json`,
+      `docs/reports/qdrant-collection-roles-v1.json`,
+      `docs/reports/lineage-qdrant-semantic-canary-v1.json`,
+      `docs/reports/semantic-768-writer-ownership-v1.json`,
+      `docs/reports/current-graph-artifact-readiness-v1.json`,
+      `docs/reports/domain-classifier-lineage-v1.json`,
+      `docs/reports/golden-relevance-review-queue-validation-v1.json`, and
+      `docs/reports/ace-live-dry-input-readiness-v2.json`. No competing
+      "current" receipt was found for any of the required families —
+      `currentReceiptAmbiguous=false`.
+- [x] Added `scripts/atlas/audit-promotion-board-reconcile-v2.mjs` (read-only;
+      only `fs.readFileSync`/`fs.writeFileSync` on `docs/reports/*`, no
+      network/service/database calls) producing
+      `docs/reports/promotion-board-reconcile-v2.json` (authoritative) and
+      `docs/reports/promotion-board-reconcile-v2.md` (concise view).
+- [x] Confirmed `codebase_chunks_768` (109,776 pts, `DECLARED_PROJECTION_OWNER`)
+      and `codebase_chunks_768_v2` (52,816 pts, `COMPARISON_CHALLENGER`,
+      `NOT_PROMOTED`) both genuinely coexist per
+      `docs/reports/qdrant-collection-roles-v1.json`; they were NOT merged or
+      treated as duplicates by this tranche.
+- [x] Board result: `sourceAuthority=PARTIAL` (workspace admitted + terminal
+      execution proven-for-revision, but `CURRENT-STRUCTURAL-LINEAGE-01`
+      still `BLOCKED_BY_PREVIOUS_GATE`), `semanticCorpus=BLOCKED`
+      (`CURRENT_CORPUS_SELECTION_UNRESOLVED`), `retrievalFusion=BLOCKED`
+      (90/93 RRF-referencing call sites `UNMAPPED`, 2
+      `EXECUTOR_AS_LANE` violations), `judgmentCorpus=BLOCKED`
+      (0/1 manifests compatible — the one found manifest is 384-dim, not
+      768-dim), `topology=OPTIONAL_CAPABILITY_NOT_DEPLOYED` (contract/fixture
+      proven, no live endpoint; port 8101 confirmed owned by the Go index
+      worker via static source inspection, not started or stopped by this
+      audit), `trace=PROVEN` (TRACE-MCP-CORE-SEARCH-01: tools/list healthy at
+      176 tools, `trace.kag_search` responds, optional registries disabled;
+      the live identity-envelope reload remains a separate, already-tracked
+      gate under the `TRACE-MCP-*-2026-09-12` entries above and does not
+      block TRACE's own core-search status), `rerank=UNCONFIGURED`.
+- [x] All six `safeTo*` promotion booleans derive to `false` per the section
+      11 formulas (never loosened). `GRAPHIFY_PROMOTION=DO_NOT_RETRY`.
+- [x] Confirmed all 9 read-only invariants (`writesPerformed`,
+      `graphifyApplyInvoked`, `topologyStarted`, `rerankConfigured`,
+      `judgmentsImported`, `rrfRuntimeChanged`, `qdrantModified`,
+      `postgresModified`, `dockerCleanupPerformed`) are `false` — the script
+      makes zero network, database, Qdrant, or Docker calls, only file reads
+      under `docs/reports/` and two file writes to new report paths.
+- [x] Ran `openspec validate --strict parent-atlas-ace-rlm-bitfrost-integration`:
+      PASS (see below).
+- [x] `SEMANTIC-CORPUS-ADMISSION-01` — **measured 2026-09-12**, verdict
+      `SEMANTIC_CORPUS_ADMISSION_BLOCKED`. Built `scripts/atlas/audit-semantic-corpus-admission-v1.mjs`
+      (read-only: scrolls all points in both 768 collections, reads
+      `workspace_id`/`workspace_revision`/`source_revision`/`representation_revision`/canonical-id
+      payload fields, joins Postgres `atlas_workspace_source_bindings` for the admitted revision).
+      Real measured values against `codebase_chunks_768` (109,776 points, matches live
+      `pointsCount` exactly):
+      - `canonicalIdCount`: 10,995 (out of 109,776 points — canonical identity is resolved via
+        `canonical_source_ref`/`canonical_id`/`packet_key` fallback chain, not a single consistent
+        field; breakdown: 105,745 via `canonical_source_ref`, 3,455 via `packet_key`, 576 via
+        `canonical_id`).
+      - `duplicateCanonicalIds`: 5,730.
+      - `missingSourceRevision`: 109,746 / 109,776 (99.97%).
+      - `mixedWorkspaceRevision`: 30 (109,746 points have no `workspace_revision` field at all,
+        tracked separately from the 30 that have one but it's invalid/doesn't match the admitted
+        revision).
+      - `mixedRepresentationRevision`: 16 distinct values found (expected exactly 1).
+      - **Root-cause finding, more fundamental than corpus reconciliation alone**:
+        `atlas_workspace_source_bindings` has **zero rows** for the admitted workspace revision
+        `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf` — its only 111
+        rows are all under a *different* revision (`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`).
+        Source-revision admission cannot be measured against Postgres truth at all right now; this
+        is a source-authority gap (shared with `CURRENT-STRUCTURAL-LINEAGE-01`), not a Qdrant-only
+        problem.
+      - `codebase_chunks_768_v2` (challenger, reported separately per this repo's hard rule — never
+        summed with or merged into the owner's counts) recorded for visibility in the same receipt.
+      - Confirmed live via direct Qdrant payload sampling before writing the script: **the only
+        compliant writer of `workspace_id`/`workspace_revision`** is `qdrant-sync-worker.ts` via
+        `buildQdrantSyncPayload()`; at least 6 other scripts write to `codebase_chunks_768` without
+        it (already flagged `LEGACY_BACKFILL_OR_WORKER`/`promotionBlocked: true` by
+        `scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs`) and account for the bulk of the gap.
+      - Wired (additive, backward-compatible, verified zero regression): an optional
+        `workspaceRevision` filter parameter on `buildCodebaseQdrantFilter()`
+        (`sveltekit-frontend/src/lib/server/search/qdrant-search.ts`) and
+        `CodebaseAnnSearchOptions`, threaded to its one real call site
+        (`QdrantSearchBackend.search()`). Deliberately **not** defaulted anywhere — doing so today
+        would silently drop ~99.97% of the corpus from search results given the measured gap above.
+        `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts` and the 5 other retrieval files
+        originally suspected as callers were checked directly and found to not call into this
+        filter chain at all — no changes needed there.
+      - Report: `docs/reports/semantic-corpus-admission-v1.json`. Test:
+        `sveltekit-frontend/tests/qdrant-search-policy.spec.ts` (also found and fixed: this file
+        existed but was never in `vitest.config.ts`'s `include` list, so it silently never ran and
+        its assertions had drifted stale relative to `buildCodebaseQdrantFilter`'s real output —
+        fixed both the missing `include` entry and the stale assertions; 5/5 tests pass).
+      - Deferred, not executed: patching `workspace_revision`/`source_revision` onto the
+        legacy-written points via `setPayload` is a live-data mutation requiring separate, explicit
+        operator sign-off (same discipline as this repo's Drizzle Safety Rule) — tracked as the new
+        `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` gate below, not built or run.
+      - Cross-references `QDRANT-V2-IDENTITY-LINEAGE-01` and
+      `LEIDEN-EXACT-PROJECTION-IDENTITY-01` in `PARENT-ATLAS-PROMOTION-GATES-01`
+      above — does not duplicate that gate's evidence chain.
+- [ ] `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` — **dry-run computed 2026-09-12,
+      verdict `BLOCKED_ON_UNGROUNDED_REVISION`, still not executed.** Built
+      `scripts/atlas/dryrun-qdrant-legacy-payload-backfill-v1.mjs`
+      (zero `setPayload`/`upsert`/`delete` calls anywhere in the file) to
+      compute exactly what patching `workspace_revision`/`source_revision`
+      onto the ~109,746 legacy-written points in `codebase_chunks_768` would
+      write, before any live mutation. Result: 109,746/109,776 points would
+      be patched with `workspace_revision=sha256:322ed1a6...` (the admitted
+      revision), all canonical IDs resolve cleanly (0 unresolvable). **But
+      that admitted revision has 0 rows in `atlas_workspace_source_bindings`
+      for `repo_id=deeds-web-app`** — the only revision with any Postgres
+      bindings at all is a *different* one
+      (`sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`,
+      111 rows). Executing the patch as computed would write a
+      `workspace_revision` value with zero Postgres-side justification — not
+      a stale-but-honest backfill, false provenance. **Do not execute this
+      gate** until either (a) Graphify runs end-to-end and produces real
+      source bindings for the admitted revision (P0 in
+      `next_steps/active/2026-09-12_promotion-board-real-work.md`), or (b) a
+      different, actually-bound revision is chosen and re-justified as the
+      assignment target. Evidence:
+      `docs/reports/semantic-corpus-admission-v1.json`,
+      `docs/reports/qdrant-legacy-payload-backfill-dryrun-v1.json`.
+      **Cross-reference (2026-09-12, parallel session on a sibling change)**:
+      `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md` independently
+      audited the same `codebase_chunks_768` corpus from a different angle (packet-key fan-out
+      classification rather than canonical-ID/workspace-revision admission census) and reached the
+      same conclusion via different evidence — verified real, not taken on faith
+      (`docs/reports/current-graphify-run-owner-v1.json`: `GRAPHIFY_RUN_OWNER_BLOCKED`, zero writes;
+      `docs/reports/current-packet-qdrant-bridge-v1.json`: `PACKET_QDRANT_BRIDGE_MISSING`, zero
+      writes). Their classification of the 109,776 legacy points: 4,351 multi-point packet groups,
+      only 15 valid revisioned fan-outs, 2,630 exact-duplicate projection groups, 1,616
+      conflicting-source groups, 5,701 revision-unproven groups. Their own explicit conclusion
+      matches this gate's `BLOCKED_ON_UNGROUNDED_REVISION` stance exactly: "do not reconcile the
+      109,776 / 52,816 / 55,169 corpora by writing anything until that payload can be constructed
+      entirely from admitted immutable lineage." Two independent audits, same corpus, same refusal
+      to write — do not treat this as two separate blockers to resolve differently; they are the
+      same blocker.
+      **Read-only recheck (2026-10-02):** the newer source cohort at
+      `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+      now has 24,456 exact Graphify-membership/source-binding rows; this does not
+      establish a crosswalk for legacy Qdrant points. The topology eligibility
+      replay admits 15 PostgreSQL `semantic_768` ordinals from 127,926 candidates,
+      while 31,891 Qdrant points yield zero exact canonical/revision matches.
+      A directly inspected legacy point has a prefixed `source_ref` and null
+      `canonical_id`, `source_revision`, and `workspace_revision`. The backfill
+      remains blocked: do not infer the crosswalk from path or packet key and do
+      not call `setPayload`/`upsert`. Receipt:
+      `docs/reports/atlas-topology-pg-qdrant-eligibility-20261002-r3.json`.
+- [x] `GOLDEN-REVIEW-CORPUS-02` — **measured 2026-09-12**, verdict
+      `GOLDEN_REVIEW_CORPUS_BLOCKED`. The prior compatibility receipt
+      (`docs/reports/golden-review-corpus-compatibility-v1.json`) was itself
+      stale/thin — its one manifest has literal placeholder values
+      (`query_set_hash: "sha256:query-set-hash"`, `judgment_set_hash:
+      "pending"`) and predates a real, more advanced pipeline this repo
+      already built: 60 real queries registered under domain
+      `golden_review_pending` in `evaluation_queries`, with bound query IDs
+      (`docs/reports/golden-review-query-registration-receipt-v1.json`,
+      cross-checked live and confirmed all 60 present, correct domain — 0
+      drift). Built `scripts/atlas/audit-golden-review-corpus-v2.mjs`
+      (read-only) to measure judgment coverage for real instead of trusting
+      the stale receipt:
+      - **Zero judgments exist for any of the 60 registered queries** —
+        `evaluation_relevance` (properly FK'd to `evaluation_queries.id`): 0
+        rows. `evaluation_relevance_corrected` (also FK'd): 0 rows.
+        `evaluation_judgments` (17,536 rows total) uses a structurally
+        disconnected 12-char-hash `query_id` with **no foreign key to
+        `evaluation_queries` at all** — it cannot be joined to these 60
+        queries by construction, not just by missing data.
+      - **No human-graded judgment exists anywhere in this database, for any
+        query, in any domain** — database-wide, `evaluation_relevance_corrected`
+        is 100% `judgment_source='derived'` (33,216 rows, zero `'human'`);
+        `evaluation_judgments` is `pending` (5,246) or `gemma4`-graded
+        (12,290), zero `'human'`. This means a compatible golden corpus
+        cannot be assembled by relabeling/re-wiring existing data — it
+        requires new human review work, not a data-plumbing fix.
+      - **All existing judgment rows are bound to the wrong corpus generation**:
+        every `evaluation_relevance_corrected` row carries
+        `corpus_version='2026-07-12-main-4ade5cfa'` — the same git-commit
+        label as the stale 384-dim placeholder manifest, not the currently
+        admitted workspace revision
+        (`sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`).
+        No row anywhere carries a `sha256:`-prefixed workspace/representation
+        revision binding.
+      - Report: `docs/reports/golden-review-corpus-v2.json`. No writes
+        performed (script is read-only; 3 blockers recorded:
+        `GOLDEN_REVIEW_ZERO_JUDGMENTS`,
+        `NO_HUMAN_GRADED_JUDGMENT_EXISTS_ANYWHERE`,
+        `GOLDEN_REVIEW_CORPUS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION`).
+      - **This gate cannot be closed by further auditing** — the remaining
+        work is literally a human sitting down and grading query/candidate
+        relevance pairs for the 60 registered queries against the current
+        768-dim corpus. Flagging this explicitly rather than implying more
+        automation will resolve it.
+      Cross-references
+      `RETRIEVAL-JUDGMENT-SET-01` in `PARENT-ATLAS-PROMOTION-GATES-01`.
+- [x] `RRF-CALLER-CLASSIFICATION-02` — **classified 2026-09-12**, verdict
+      `RRF_CALLER_CLASSIFICATION_BLOCKED`. Built
+      `scripts/atlas/classify-rrf-callers-v1.mjs` (read-only; does not modify
+      `combineViaRRF` or rewrite any caller) to classify all 93 callers from
+      `docs/reports/rrf-caller-baseline-v1.json` into the 8 categories.
+      **All 93 accounted for, 0 unclassified** (self-consistency check: every
+      `callerId` in the baseline matched a recorded classification):
+      - `LEGACY_COMPATIBILITY`: 41 — confirms this repo's own Duplication
+        Prevention finding: at least 10 distinctly-named, independent
+        fusion/scoring modules (`rrf-fusion.ts`, `rrf-integration.ts`,
+        `hyperrag-fusion-service.ts`, `multi-vector-orchestrator.ts`,
+        `retrieval-fusion-rrf.ts`, `rrf-lane-ranker.ts`, `rrf-multi-vector.ts`,
+        `compute-rrf-score.ts`, `feature-envelope.ts`,
+        `unified-orchestrator.ts`) still call real, independent RRF logic —
+        none delegate to `SearchRuntime`.
+      - `FEATURE_ONLY`: 34 — type/constant definitions, internal lines inside
+        `combineViaRRF`'s and `rrf-fuse.ts`'s own function bodies (not calls
+        to something else), and real production API-route/MCP-tool features
+        that call the shared `rrf-fuse.ts` utility (a genuinely
+        widely-reused, real production module, distinct from
+        `combineViaRRF`).
+      - `TEST_ONLY`: 13 — inline `testN`-pattern fixture blocks plus 3 files
+        whose names are themselves test/proof conventions
+        (`rrf-integration-tests.ts`, `rrf-local-testing.ts`, `rrf-proof.ts`).
+      - `CANONICAL_SEARCHRUNTIME_CALLER`: 2 — `search-runtime.ts`'s own
+        `fuseSearchRuntimeCandidates` definition and call site (the declared
+        `canonicalFusionOwner`).
+      - `EXECUTOR_AS_LANE_VIOLATION`: 2 — reused the baseline's own prior
+        `REJECTED_EXECUTOR_AS_LANE` finding rather than re-deriving it
+        (`unified-orchestrator.ts:564,610` — TurboVec, an executor, voted as
+        an independent RRF lane).
+      - `UNMAPPED`: 1 — `service.ts:455` (`weighted = rrf * laneConfig.weight`)
+        — genuinely insufficient evidence from the excerpt alone; left
+        honestly unclassified rather than guessed.
+      - **Real finding, distinct from the classification itself**:
+        `combineViaRRF` (the function this task explicitly says not to
+        modify) is defined in `rrf-combiner.ts:100`, a DIFFERENT file from
+        `search-runtime.ts` (the declared canonical owner) — and has real
+        production callers (`rrf-integration.ts:985`, `rrf-proof.ts:66`,
+        `unified-orchestrator.ts:610`) that are themselves separate from
+        `SearchRuntime`'s own `fuseSearchRuntimeCandidates`. Two genuinely
+        different canonical-shaped primitives currently coexist.
+      - Per this task's own instruction, **not** every `LEGACY_COMPATIBILITY`
+        caller is being proposed for migration — that determination is out
+        of scope for a classification pass.
+      Report: `docs/reports/rrf-caller-classification-v1.json`. No writes
+      performed; `combineViaRRF` untouched; no caller rewritten.
+      Cross-references
+      `RRF-CURRENT-PRODUCTION-REPLAY-01` in `PARENT-ATLAS-PROMOTION-GATES-01`.
+      **Deepened 2026-09-12 (run independently of the Graphify blocker, since this decision doesn't
+      depend on it)**: investigating the `LEGACY_COMPATIBILITY` bucket to produce a concrete
+      recommendation (not just "needs a decision") found the sprawl is worse than "two canonical-
+      shaped primitives" — **at least 5 independently-exported RRF fusion functions exist**:
+      `fuseSearchRuntimeCandidates` (declared canonical), `combineViaRRF` (`rrf-combiner.ts`),
+      `combineRRFLanes` (`rrf-combiner-utils.ts` — a third, previously-uncited combiner module),
+      `computeRrfComponent`/`rrfMergeMultipleLanes`/`rrfMergeDenseQdrant` (`retrieval-fusion-rrf.ts`),
+      and `computeRRFScore`/`fuseRetrievalLanes` (`rrf-fusion.ts`) — each with its own `k`-constant
+      and formula code, confirmed via direct import-list inspection, not re-exports of one shared
+      implementation. Same failure class as CLAUDE.md's already-documented 5-implementation
+      PageRank sprawl. Given the real scope, this is now tracked as its own OpenSpec change —
+      `openspec/changes/parent-atlas-rrf-fusion-consolidation/` (proposal + tasks + spec, validates
+      clean) — rather than a quick note here, since a proper per-primitive
+      caller/liveness/numerical-equivalence audit (mirroring the PageRank dedup effort) is a
+      real, multi-file investigation in its own right, not a one-line classification fix.
+- [x] `TOPOLOGY-EXECUTOR-NEED-01` — **answered 2026-09-12: NO.** Read-only
+      code inspection (no port allocated, no service started, port 8101
+      remains owned by the Go index worker):
+      - `grep`-confirmed zero references to the topology executor
+        (`topology_search`/`topologySearchExecutor`) anywhere in the
+        production retrieval path (`src/lib/server/retrieval/`,
+        `src/lib/server/atlas/`) — it exists only at the MCP agent-tool layer
+        (`src/mcp/tools/topology-search.tool.ts` and its registrations in
+        `server.ts`/`server-fastmcp.ts`/`trace-mcp-server.ts`), never as a
+        dependency of the actual candidate retrieval pipeline.
+      - The tool's own docstring already self-documents this:
+        `"The topology executor is not part of the core stack and must be
+        independently deployed... Optional topology executor unavailable...
+        Keep this registry disabled until a dedicated executor and readback
+        receipt exist."` It fails clean (a JSON error, no crash, no silent
+        fallback-to-wrong-data) when unavailable — confirmed by direct
+        source read, not just health-check absence.
+      - The specific features this executor would provide
+        (`topo_class`, `som_cluster`, `graphAuthorityScore`) are **already
+        materialized directly in live Qdrant payloads** today (confirmed via
+        direct payload sampling earlier this session, e.g.
+        `"graphAuthorityScore": 0.35, "som_cluster": 0, "cluster_key":
+        "unclassified:community-26562"` on real `codebase_chunks_768`
+        points) — i.e. the "existing topology feature materialization"
+        escape clause in this gate's own question is already satisfied.
+      - **Verdict: `OPTIONAL_CAPABILITY_NOT_DEPLOYED`, confirmed correct.**
+        No current admitted workload requires a live topology executor.
+        `safeToEnableTopology` stays `false` but this is not a promotion
+        blocker per this repo's own rule that
+        `DEDICATED_TOPOLOGY_EXECUTOR_MISSING` must be severity `OPTIONAL`.
+- [x] `CURRENT-STRUCTURAL-LINEAGE-01` re-run (P0, 2026-09-12) — re-ran
+      `scripts/atlas/audit-selected-graphify-structural-lineage-v1.mjs`
+      (read-only) as the next step off the promotion board queue. Fresh
+      evidence, real and new: `status: CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`,
+      `firstBlocker: CURRENT_PACKET_CHUNK_LINEAGE_BRIDGE_INCOMPLETE`. Of
+      25,291 selected Graphify membership rows (7 repositories),
+      `bridgeRowsMissing: 24,714` (97.7%) have no `atlas_packet_chunk_lineage`
+      bridge row joining them to `codebase_chunk_index`/`atlas_packets` —
+      only 577 `lineageBridgeMatches`. Zero exact structural/chunk/packet
+      matches by any admissible join key (`exactChunkMatches`,
+      `exactPacketMatches`, `exactStructuralMatches` all 0); the identity
+      contract explicitly prohibits path-only/basename-only/array-order-only/
+      qdrant-point-id-only/historical-binding-fallback joins, so these zeros
+      are a correct refusal to fabricate a match, not a script defect.
+      **Unresolved discrepancy found, not chased further this session**: this
+      script's selected execution (`cbcd35c6-b26c-4d1a-a08b-9aa16a1afbcc`,
+      `status: COMPLETED`) is bound to the exact same admitted workspace
+      revision (`sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`)
+      that Gate 1 (`CURRENT-SOURCE-TERMINAL-EXECUTION-01`) separately reports
+      as having zero qualifying/terminal executions for
+      (`NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`). "Selected" (this
+      script's admission source, `docs/reports/promotion-gate-receipt-currentness-v1.json`)
+      and "terminal" (Gate 1's stricter criterion) are evidently not the same
+      concept, but exactly how they differ was not investigated here — flagged
+      for whoever picks up Gate 1/`CURRENT-STRUCTURAL-LINEAGE-01` next, not
+      silently treated as consistent. Report:
+      `docs/reports/selected-graphify-structural-lineage-v1.json`. No writes
+      performed (script is read-only by its own docstring and design).
+
+Report: `docs/reports/promotion-board-reconcile-v2.json` (authoritative) and
+`docs/reports/promotion-board-reconcile-v2.md` (concise).
+Status: `PROMOTION_BOARD_RECONCILE_02_COMPLETE`; mode=`READ_ONLY`;
+writesPerformed (production state)=`false`. First blockers remain
+`CURRENT_SOURCE_AUTHORITY_UNPROVEN` (SOURCE) and
+`CURRENT_CORPUS_SELECTION_UNRESOLVED` (SEMANTIC_CORPUS).
+Next gate: `CURRENT-STRUCTURAL-LINEAGE-01` (shared with
+`PARENT-ATLAS-PROMOTION-GATES-01`), then `SEMANTIC-CORPUS-ADMISSION-01`.
+
+**Re-verified 2026-09-13 (fresh session, per operator request) — found a real, unreconciled
+discrepancy in the board's own `retrievalFusion` field, not chased further this pass.** The
+authoritative `docs/reports/promotion-board-reconcile-v2.json` computes
+`retrievalFusion.executorAsLaneViolations: 0` and `promotion.safeToMigrateRrfCallers: true`, sourced
+from the simpler 4-category `rrf-caller-classification-v1.json` (`FEATURE_ONLY`/
+`LEGACY_COMPATIBILITY`/`TEST_ONLY`/`CANONICAL_SEARCHRUNTIME_CALLER`, no `EXECUTOR_AS_LANE_VIOLATION`
+category at all). But this same `RRF-CALLER-CLASSIFICATION-02` entry's own narrative above describes
+a *deeper*, later pass (`scripts/atlas/classify-rrf-callers-v1.mjs`, the full 8-category taxonomy)
+that found **2 real `EXECUTOR_AS_LANE_VIOLATION` callers** (`unified-orchestrator.ts:564,610` —
+TurboVec, an executor, voted as an independent RRF lane) and 1 genuinely `UNMAPPED` caller
+(`service.ts:455`). Per the board's own promotion formula, `executorAsLaneViolations > 0` should
+force `safeToMigrateRrfCallers = false`, not `true` — the board's cached value was computed from the
+older, coarser receipt and was never re-run against the deeper classification. **Do not trust
+`safeToMigrateRrfCallers: true` in the current JSON report as-is** until the board is regenerated
+against the 8-category classification. Not fixed here (context-bounded); flagged for the next
+`PROMOTION-BOARD-RECONCILE` re-run (already P4 in `nextGateQueue`).
+
+**Re-verified again, 2026-09-13 (later same day) — this discrepancy no longer holds; the flag
+above describes a state that has itself since been superseded, not a live bug.** Read the current,
+on-disk `scripts/atlas/classify-rrf-callers-v1.mjs` directly rather than trusting the narrative
+above: the 3 callers previously described as `EXECUTOR_AS_LANE_VIOLATION`×2 +
+`UNMAPPED`×1 (`unified-orchestrator.ts:564,610`, `service.ts:455`) are now each classified
+`LEGACY_COMPATIBILITY` in the script's `CLASSIFICATION` map, each with an explicit rationale from a
+closer read of the actual code: `unified-orchestrator.ts:564` — "TurboVec is retained as executor
+metadata inside the module's dense semantic convergence map; the implementation keeps one
+strongest dense contribution per candidate"; `:610` — "`combineRRFLanes` receives
+`buildRrfLaneMap` output, where Qdrant and TurboVec have already converged into the single
+`dense_vector` logical lane before fusion"; `service.ts:455` — "this is the legacy `service.ts`
+`rrfFusion` implementation over the revisioned search-lane registry; it is not the declared
+SearchRuntime owner and is not a new executor lane." In other words: a further, more careful
+investigation (already reflected in the live script, not performed fresh here) concluded TurboVec
+does **not** actually vote as an independent RRF lane — it converges into a single dense-vector
+lane *before* `combineRRFLanes` runs — so this is not the `EXECUTOR_AS_LANE_VIOLATION` pattern the
+prior note described. **Live-reconfirmed, not assumed from reading the script alone**: re-ran
+`node scripts/atlas/classify-rrf-callers-v1.mjs` (read-only, confirmed by its own docstring — does
+not modify `combineViaRRF` or any caller) — regenerated `rrf-caller-classification-v1.json`
+byte-for-byte matching what was already on disk (`FEATURE_ONLY: 34, LEGACY_COMPATIBILITY: 44,
+TEST_ONLY: 13, CANONICAL_SEARCHRUNTIME_CALLER: 2`, 93/93 classified, 0 unmapped, 0
+`EXECUTOR_AS_LANE_VIOLATION`, `status: RRF_CALLER_CLASSIFICATION_READY`); then re-ran
+`node scripts/atlas/audit-promotion-board-reconcile-v2.mjs` (also read-only —
+`writesPerformed: false`, `graphifyApplyInvoked: false`, `qdrantModified: false`,
+`postgresModified: false` all confirmed in its own completion receipt) — regenerated
+`promotion-board-reconcile-v2.json`/`.md` with a fresh checksum but the same substantive values:
+`board.retrievalFusion.executorAsLaneViolations: 0`, `board.promotion.safeToMigrateRrfCallers:
+true`. **Conclusion: the board's cached `true` was already correct against the current
+classification data — there was no stale-vs-fresh mismatch to fix.** The prior note's "8-category
+taxonomy found 2 violations + 1 unmapped" claim was itself describing an intermediate state of the
+classification that has since been corrected in place; that correction was not tracked at the time
+it happened (no git history for either file — both are untracked in this repo, so there's no diff
+to point to), which is why the prior note's re-verification pass couldn't see it and (correctly,
+given what it could observe) flagged a mismatch. Nothing left to do here; do not re-flag this as an
+open discrepancy without first reading the current classification script's rationale for those 3
+specific callers.
+
+**One real bug found and fixed while re-verifying, distinct from the false-alarm above**:
+`audit-promotion-board-reconcile-v2.mjs`'s own `nextGateQueue` array (the "Section 16 next-priority
+queue" the board report renders) had a **hardcoded** P3 note string — `'Blocked: 90/93 callers
+UNMAPPED, 2 EXECUTOR_AS_LANE violations.'` — that directly contradicted this exact same script's own
+freshly-computed `board.retrievalFusion` in the very same run (0 unmapped, 0 violations,
+`status: RRF_CALLER_CLASSIFICATION_READY`). This is the real, narrow root cause of why the false
+alarm above looked plausible: the script's own report was internally self-contradictory (one
+computed field said READY, a sibling hardcoded field said BLOCKED with stale counts), not a data
+problem in either underlying receipt. Fixed by deriving the P3 note from the already-computed
+`retrievalFusion` object instead of a literal string, so it can't silently drift out of sync with
+the fields it describes again. Re-ran the (confirmed read-only, `writesPerformed: false`) script
+afterward — P3's note now reads `"Not blocking: RRF_CALLER_CLASSIFICATION_READY (93/93 classified,
+0 EXECUTOR_AS_LANE violations). Migration itself is a separate, not-yet-made decision."`, consistent
+with `board.retrievalFusion`/`board.promotion` in the same report.
+
+Status of this thread: **CLOSED, no open discrepancy remains.** `safeToMigrateRrfCallers: true` is
+correct given current classification data; the fixed `nextGateQueue` bug means the board's own
+narrative no longer contradicts itself. The separate, larger `LEGACY_COMPATIBILITY` sprawl
+(5 independently-exported RRF fusion functions) remains tracked in its own change,
+`openspec/changes/parent-atlas-rrf-fusion-consolidation/`, and is a distinct decision from whether
+migration is currently *safe* (it is) versus whether it has been *done* (it has not).
+
+### `CURRENT-SOURCE-TERMINAL-EXECUTION-01` — real Graphify run attempted 2026-09-12, still `BLOCKED`
+
+- **This is the first real (non-audit) `npm run graphify:daily` execution attempt this session**,
+  per P0 in `next_steps/active/2026-09-12_promotion-board-real-work.md`. It did not complete —
+  reached Graphify's own internal canonical-projection admission gate
+  (`scripts/atlas/require-canonical-projection-admission-v1.mjs`) and correctly refused to promote.
+- Two unrelated retention/environment blockers were cleared first (archived, not deleted, per this
+  repo's convention — see `docs/archive-manifest.json` entries dated 2026-09-12): (1) a crashed
+  partial multi-repo snapshot (`.partial-12564`, confirmed leftover from an old,
+  already-superseded version of `materialize-workspace-source-snapshot-v1.mts` that used
+  PID-suffixed staging — the live script was already rewritten to a single fixed `.partial` stage
+  specifically to prevent this), and (2) two historical complete snapshots exceeding the retention
+  cap (`MAX_MATERIALIZED_SNAPSHOTS=2`). A third, transient Windows file-lock error on
+  `docs/reports/graphify-daily-workflow-receipt.json` self-resolved on retry (not a code bug).
+- With those cleared, the pipeline ran genuinely further than any prior attempt: repository
+  provenance dry-run (`atlas:phase109b:workflow:dry`) came back fully `PROVEN` for snapshot/
+  inventory/structural/validation/incremental (25,291 sources, 127,797 structural facts,
+  0 missing/malformed hashes, 862 duplicate file hashes). It then ran the canonical-projection
+  fabric audit **transactionally read-only** (log-confirmed `transaction opened READ ONLY` →
+  `transaction rolled back — confirmed zero production mutations`) against 11 promotion
+  predicates. **Result: `NOT_SAFE_TO_PROJECT`, 10/11 predicates below PASS**:
+
+  | Predicate | Verdict | Key finding |
+  |---|---|---|
+  | IDENTITY_ALIGNED | PARTIAL_PROVEN | 325/1000 sampled packets missing `qdrant_point_id` |
+  | REVISION_QUALIFIED | NOT_PROVEN | No live `atlas_packets.workspace_revision` column exists |
+  | SYMBOLS_RESOLVED | NOT_PROVEN | `graphify_symbols` table exists but has 0 rows (schema built, never populated) |
+  | SEMANTIC_OWNER_PROVEN | PARTIAL_PROVEN | `codebase_chunk_index.content_embedding` is the active candidate; ownership not independently proven end-to-end |
+  | LATENT_FAMILY_PROVEN | NOT_PROVEN | No `atlas_representation_records` ledger; `latent_64` (only populated lane) unproven as single-input non-cascaded family |
+  | GRAPH_MANIFEST_SEALED | ABSENT | No sealed node/edge manifest; NetworkX/cuGraph/Neo4j each build their own graph independently |
+  | ONTOLOGY_COHORT_NONEMPTY | **PASS** | 63,084 rows across ontology/hyperedge tables — the one passing predicate |
+  | ORDINAL_MAP_SEALED | ABSENT | `CandidateOrdinal` remains a design intent (CLAUDE.md), not a table-backed sealed artifact |
+  | PROJECTIONS_CHECKSUM_ALIGNED | NOT_PROVEN | Depends on the two absent predicates above |
+  | BITFROST_KEYS_DERIVABLE | NOT_PROVEN | Cache keys exist; no proven derivable domain+cluster+topology+symbol scheme |
+  | ACE_EVIDENCE_GROUNDED | NOT_PROVEN | `ace_context_sources` exists, 0 rows |
+
+  Evidence: `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-12.json` / `.md`.
+- **This is not a bug or a failed attempt — it is the pipeline correctly self-blocking.** "Running
+  Graphify" does not, by itself, resolve the promotion board; the underlying architecture gaps
+  (no `workspace_revision` column, empty symbol table, no representation/graph/ordinal manifests)
+  are real, pre-existing debt this run surfaced but cannot fix by re-running. Picking which of the
+  9 failing predicates to build out first is a human prioritization decision, not made here.
+- Status: `NOT_SAFE_TO_PROJECT` (unchanged from before this run in substance, but now backed by a
+  live, dated, transactional 11-predicate audit instead of the prior `NO_TERMINAL_EXECUTION_FOR_CURRENT_WORKSPACE`
+  framing alone). `writesPerformed=false` for the entire attempt.
+
+**Follow-up, 2026-09-13 — the GRAPHIFY-DAILY-COORDINATOR-01 bounded canary was run for real, for
+the first time, per explicit operator instruction ("run the graphify coordinator again for P0").**
+Found the actual driver script is
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` (distinct from, and
+more capable than, the earlier `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`, which
+only drives 3 of 10 ledger stages) — it drives OPEN → SOURCE_SELECTION → INVENTORY → AST_PARSE →
+STRUCTURAL_EXTRACT using the real, live, healthy 8095 NLP-sidecar AST service
+(`create8095AstProvider`, verified live via `GET :8095/health` → tree-sitter/ast-grep/langextract
+all `true`), then calls `completeExecution({status:'COMPLETED'})`. Its own module docstring is
+explicit that **SEMANTIC_ENRICH/GRAPH_BUILD/PROJECT/VALIDATE have no safe coordinator owner bound
+yet and must not be called from production code paths until a specific owner audit closes** — so
+even a fully successful run of this script cannot reach all 10 ledger stages today; 5/10 is this
+script's own designed ceiling (`canonicalPromotionMayBeAttempted: false` is baked into its report).
+
+Per this script's own required discipline (`canaryRequiredBeforeBroadRun: true` in
+`docs/reports/graphify-execution-ledger-coordinator-plan-v1.json`), ran the **bounded canary**
+(`--limit=3`, not `--full`) rather than the 24,205-source full run, which needs a separate,
+larger-scope authorization (`AUTHORIZE_GRAPHIFY_FULL_WORKSPACE_SOURCE_SELECTION_V1`) not given
+here. Also corrected a false blocker along the way: the prior audit's
+`workspaceForeignRowExists: false` finding was checking the legacy `graphify_runs` table (which
+has zero rows for this workspace_revision, unrelated to the newer ledger) — `workspace_id
+625743d2-092b-4fa8-abe0-9dc094920c80` genuinely **exists** in `public.workspaces` (confirmed via
+direct `SELECT count(*)`), so that was never a real blocker for this coordinator path.
+
+**Real, live result** (`docs/reports/graphify-daily-coordinator-canary-v1.json`):
+`status: PROVEN_COMMITTED_BOUNDED_CANARY`, new execution `5013de19-7bed-4703-bd6b-1684b19e2aaf`,
+`workspace_revision: sha256:322ed1a6...` (the admitted revision), 5/5 attempted stages COMPLETED,
+`writesPerformed: true`, verified directly against Postgres (not just trusted from the script's own
+report): `graphify_executions` row COMPLETED, 5 `graphify_execution_stages` rows COMPLETED, 3
+`graphify_execution_file_membership_v2` rows.
+
+**Honest caveat, not glossed over**: the canary's first 3 root-repo sources happened to be
+`.claude/AGENT_CONSTITUTION.md`, `.claude/AGENT_RECOMMENDATIONS.md`,
+`.claude/ATLAS-ENGINEERING-PROMPT.md` — all Markdown, not code — and the script only runs
+AST_PARSE/STRUCTURAL_EXTRACT against the *first* selected source. Its own report shows
+`structuralProviderStatus: "RECOVERED_WITH_ERRORS"`, `structuralProvenanceStatus: "NO_EVIDENCE"`
+for that file. This canary run genuinely proves the **ledger mechanism** end-to-end (open →
+select → inventory → parse → extract → complete, real DB rows, real 8095 service call), but does
+**not** demonstrate meaningful structural extraction on real source code, and 3 sources out of
+24,205 root sources is nowhere near P0-scale coverage. Selecting real `.ts`/`.tsx` files for the
+canary would require either passing `--limit` against a differently-ordered source list or a
+script change to filter by extension — not attempted here.
+
+**What this does and does not resolve for P0**: this proves the coordinator ledger itself is real
+and callable against the admitted revision (a genuine, new capability this session), but does
+**not** resolve `CURRENT-SOURCE-TERMINAL-EXECUTION-01`'s `NOT_SAFE_TO_PROJECT` verdict above — none
+of the 11 canonical-projection predicates depend on `graphify_executions`/`graphify_execution_stages`,
+and the full-scale run (24,205 sources) plus the still-unbound SEMANTIC_ENRICH/GRAPH_BUILD/PROJECT/
+VALIDATE stage owners remain separately unresolved. Status:
+`GRAPHIFY_COORDINATOR_LEDGER_MECHANISM_PROVEN_BOUNDED_CANARY_ONLY`. Next real step, if pursued: a
+canary targeting real code files (not `.claude/*.md`), then a decision on `--full` mode.
+
+**Follow-up, 2026-09-13 — `--full` mode blocked, correctly, before anyone ran it.** External review
+correctly identified a real, serious gap in `graphify-daily-coordinator-canary-v1.mts`: `--full`
+changes `SOURCE_SELECTION`/`INVENTORY` membership to the entire snapshot (24,205 `repo:root`
+sources), but `AST_PARSE`/`STRUCTURAL_EXTRACT` unconditionally test only ONE source
+(`structuralBinding = bindings.find(...) ?? bindings[0]`) — unchanged by `--full`. A `--full` run
+would therefore mark `status: COMPLETED` on a 24,205-source membership after structurally proving
+exactly 1 of them — a large, real membership count wearing a misleadingly-total-looking
+`COMPLETED` label. **Added a hard throw at the top of the script**:
+`GRAPHIFY_COORDINATOR_CANARY_FULL_MODE_BLOCKED` fires immediately whenever `--full` is passed,
+before any DB connection or lock is acquired. Verified the file still parses correctly
+(`esbuild.transformSync`) after the edit. **`--full` stays blocked until structural materialization
+is made to iterate every selected source**, not just the first.
+
+**Next gate, tracked, not built**: `GRAPHIFY-STRUCTURAL-CODE-CANARY-02` — patch the bounded canary
+to accept `--source-ref=<path>` (validated against the sealed snapshot's `repo:root` sources, never
+an arbitrary filesystem path) so the structural sample is an explicit, deterministic, real code
+file instead of "whatever alphabetically sorts first" (which is how the first canary landed on
+`.claude/AGENT_CONSTITUTION.md` and got `NO_EVIDENCE`). Acceptance mirrors the `.ts`-targeted canary
+already proven this session (`selectedSourceCount: 1`, `structurallyProcessedSourceCount: 1`,
+`structuralProviderStatus: PROVEN`/`NATIVE_READY`, `symbol nominations > 0`, zero canonical/Qdrant/
+graph writes) but as a first-class script flag rather than the `ATLAS_GRAPHIFY_CANARY_SOURCE_REFS`
+env-var override added ad hoc earlier this session. Precise status of the already-run canaries,
+for the record (not to be confused with "full Graphify" — corrected framing, external review):
+
+```
+GRAPHIFY COORDINATOR CANARY (both runs, 2026-09-13)
+  ledger stages attempted     5/10 (OPEN, SOURCE_SELECTION, INVENTORY, AST_PARSE, STRUCTURAL_EXTRACT)
+  structural sources tested   1 per run, regardless of membership count (3 both times)
+  canonical authority         false
+PROVEN:   execution identity, snapshot membership (bounded), source-revision readback (bounded),
+          stage-ledger transitions, AST-service invocation (8095), structural extraction on a
+          real .ts file (second run only)
+NOT PROVEN: multi-source structural processing, semantic enrichment, graph build, projection,
+          validation, the complete production pipeline
+```
+
+**Follow-up, same session, minutes later — re-ran targeting real `.ts` files, real structural
+success this time.** Added a small additive override to
+`graphify-daily-coordinator-canary-v1.mts` (`ATLAS_GRAPHIFY_CANARY_SOURCE_REFS`, comma-separated
+explicit sourceRef list, first entry becomes the structural sample) since the default
+`rootSources.slice(0, N)` is plain alphabetical order and the repo's first ~560 root sources are
+all non-code (`.claude/*.md`). Ran against 3 real `.ts` files
+(`ace-vector-selection-slice/src/lib/server/ace/{ranking/packet-feature-matrix,vector/ace-packet-vector,vector/turbovec-interpolation}.ts`)
+: new execution `c531a1b0-c932-482f-8a21-5d067f504a13`, `structuralProviderStatus: "PROVEN"`,
+`structuralProvenanceStatus: "NATIVE_READY"` (vs. the prior canary's `RECOVERED_WITH_ERRORS`/
+`NO_EVIDENCE` on a Markdown file) — the 8095 structural service genuinely parses real TS source
+through this ledger path. Still 5/10 stages, still `canonicalPromotionMayBeAttempted: false`, still
+does not resolve `NOT_SAFE_TO_PROJECT` above.
+
+### `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01` (new, 2026-09-12) — three uncoordinated registries found, not reconciled
+
+- **Investigating `SYMBOLS_RESOLVED` (empty `graphify_symbols`) as a candidate "complete one lane"
+  target surfaced a bigger, systemic finding**, matching the exact "N competing owners, zero
+  reconciled" pattern root `CLAUDE.md`'s Duplication Prevention section already documents for
+  PageRank (5 implementations) and rerankers (14 files) — this is a new instance of the same class
+  of problem, not a new class.
+- Read-only census (`scripts/atlas/audit-symbol-representation-table-census-v1.mjs`,
+  `scripts/atlas/audit-atlas-symbol-registry-freshness-v1.mjs`, both new, zero writes) found:
+
+  | Table | Exists | Rows | Role |
+  |---|---|---|---|
+  | `graphify_symbols` | yes | 0 | What `SYMBOLS_RESOLVED` (this audit's predicate) actually checks |
+  | `atlas_symbol_registry` | yes | 10,310 | A *different*, live, populated symbol registry the gate never reads |
+  | `atlas_symbol_versions` | yes | 285 | Sibling AST-derived symbol-version data |
+  | `atlas_representations` (`drizzle/0152_atlas_representations_registry.sql`) | **no** | — | Pending/unapplied 10-table registry from the `latent_128` promotion work (see `parent-atlas-error-embedding-768-migration` task 5.1, still open) |
+  | `atlas_representation_records` | **no** | — | What `LATENT_FAMILY_PROVEN` (this audit's predicate) actually checks — a *third*, differently-named concept |
+
+- **Why this is not a quick "just point the gate at the populated table" fix**: `atlas_symbol_versions`'
+  populated rows carry `workspace_revision: sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9`
+  — **not** the currently-admitted revision (`sha256:322ed1a6...`) — and its `registry_revision`
+  labels (`promotion:ast-nominations:v1`, `atlas-current-tree-bound-symbol-canary-v1`) read as
+  staging/canary runs, not a declared-production dataset. Treating this as satisfying
+  `SYMBOLS_RESOLVED` would repeat the exact ungrounded-revision mistake `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`'s
+  dry-run already caught and refused to execute past (see that gate's entry above) — the same
+  revision, `sha256:55edaaad...`, is the one with the 111 real `atlas_workspace_source_bindings`
+  rows found there too, which is suggestive but not itself sufficient grounds to promote this data
+  without an explicit decision.
+- **Correction (2026-09-12, run independently of the Graphify blocker): the original framing above
+  conflated two separate decisions.** Symbol identity (`SYMBOLS_RESOLVED`) and representation/
+  embedding lineage (`LATENT_FAMILY_PROVEN`) are different capabilities with different candidate
+  tables — treating them as one decision was itself imprecise. Splitting them:
+
+  **Symbol identity — concrete recommendation, not yet approved**: adopt `graphify_symbols` +
+  `graphify_edges` as canonical, not `atlas_symbol_registry`/`atlas_symbol_versions`. Reasoning:
+  `graphify_symbols` FK's directly to `graphify_files` (26,014 rows, already live and populated,
+  itself carrying real `source_revision`/`workspace_revision` columns per the schema census) — so
+  once Graphify produces a real terminal execution, a symbol writer has a natural, already-revision-
+  qualified anchor to attach to. `atlas_symbol_registry`/`atlas_symbol_versions` has no such FK
+  anchor, uses loose text identifiers, and its populated data is already revision-unbound to the
+  current admission (see above) — it's real evidence but the wrong schema shape to build on.
+  Recommend treating it as a `COMPATIBILITY`/historical data source that can inform a backfill once
+  `graphify_symbols` has a real writer, not as the destination itself. Still needs: (1) the actual
+  writer (none exists yet for either table), (2) resolving whether `atlas_symbol_registry` data can
+  be reused as training/reference input for that writer or should be left as-is and superseded.
+
+  **Representation/embedding lineage — concrete recommendation, not yet approved**: adopt the
+  pending `atlas_representations` migration (`drizzle/0152_atlas_representations_registry.sql`),
+  not a fresh `atlas_representation_records` table. Reasoning: 0152 is a genuinely complete design
+  (10 tables covering providers, lane selections, provider fallbacks, migrations, Qdrant collection
+  mappings, compatibility evaluations, validation results, plus an immutability trigger on
+  production-verified rows) that already exists, reviewed, and unapplied — `atlas_representation_records`
+  is only a bare name the fabric-audit script checks for; nothing was ever designed for it. Once
+  0152 is applied (Drizzle Safety Rule sign-off required) and real rows exist,
+  `audit-canonical-projection-fabric.mjs`'s `LATENT_FAMILY_PROVEN` check should be updated to look
+  for `atlas_representations` instead of the never-designed `atlas_representation_records` name.
+
+  Both recommendations feed `openspec/changes/parent-atlas-qdrant-structural-payload-enrichment`'s
+  task 1.4 (same underlying persist-vs-on-demand choice for AST/structural evidence) — that task
+  should now reference the symbol-identity recommendation specifically, not a generic "pick one."
+- **Decision approved 2026-09-12 (explicit operator direction: "pick the registry").** Both
+  recommendations above are now the approved direction:
+  1. **Symbol identity**: `graphify_symbols` + `graphify_edges` are canonical. `atlas_symbol_registry`/
+     `atlas_symbol_versions` are `COMPATIBILITY` — real evidence that may inform a future backfill,
+     not a destination.
+  2. **Representation/embedding lineage**: the pending `atlas_representations` migration
+     (`drizzle/0152_atlas_representations_registry.sql`) is canonical. `atlas_representation_records`
+     is retired as a concept — nothing was ever built for that name; the fabric-audit script's
+     `LATENT_FAMILY_PROVEN` check should be updated to look for `atlas_representations` once applied.
+  - **This decision does NOT itself apply the 0152 migration, build any writer, or update the
+    fabric-audit script** — those remain separate implementation steps, and applying 0152 is still
+    its own Drizzle Safety Rule sign-off gate (schema migration), not satisfied by this approval
+    alone. What's approved here is the *direction*, unblocking `parent-atlas-qdrant-structural-
+    payload-enrichment` task 1.4 and `parent-atlas-pca-svd-representation-baseline` task 3.1 to
+    target a named, decided registry instead of an open question.
+  - **Applied 2026-09-12 (explicit operator instruction: "apply the 0152 migration").**
+    `drizzle/0152_atlas_representations_registry.sql` executed live via
+    `docker exec -i legal-ai-postgres psql` — clean `BEGIN`...`COMMIT`, 8 tables created
+    (`atlas_representations`, `atlas_representation_providers`,
+    `atlas_representation_lane_selections`, `atlas_representation_provider_fallbacks`,
+    `atlas_retrieval_lane_fallbacks`, `atlas_representation_migrations`,
+    `atlas_qdrant_collection_mappings`, `atlas_representation_compatibility_evaluations`,
+    `atlas_representation_validation_results`), the immutability trigger installed, and the 5 seed
+    rows inserted (`semantic_768`, `semantic_512`, `semantic_384`, `topology_128`, `latent_64`, all
+    `lifecycle_status: CANDIDATE` / `verification_status: UNVERIFIED` — verified live via direct
+    `SELECT`, not assumed from the apply log alone). No pre-existing table was touched (all
+    `CREATE TABLE IF NOT EXISTS`) and no destructive statement was in the file (confirmed via a
+    `DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM` grep before applying).
+  - **Not yet done, separate from this migration apply**: `pca_svd_64/128/256` are not yet
+    registered as rows (they weren't part of 0152's original 5-row seed list and would need a new
+    `INSERT` with `dimension_method: 'LINEAR_PROJECTION'` — the first real use of that enum value);
+    `latent_128`/`latent_256` (already real and populated in `codebase_chunk_index`, per this
+    session's earlier work) are also not yet registered here; no writer/backfill code was changed;
+    the fabric-audit script's `LATENT_FAMILY_PROVEN` check still looks for the non-existent
+    `atlas_representation_records` name, not the now-real `atlas_representations` — that script
+    update is still a separate, not-yet-done step.
+  - Status: `REGISTRY_RECONCILIATION_REPRESENTATION_HALF_APPLIED`. Symbol-identity half
+    (`graphify_symbols`/`graphify_edges` adoption) remains direction-approved but not yet acted on —
+    no writer exists for it yet, unlike the representation half which now has a live schema.
+
+### **FINAL ARCHITECTURE DECISION 2026-09-12 — supersedes the symbol-identity half above**
+
+**Operator direction, explicit and reasoned, overriding this document's earlier
+`graphify_symbols`-as-canonical recommendation**: symbol identity is owned by
+**`atlas_symbol_registry` + `atlas_symbol_versions`**, not `graphify_symbols`. Rationale given and
+verified against this repo's own code, not just asserted: `atlas_symbol_registry`'s own migration
+(`20260818_atlas_symbol_registry_v1.sql`) already calls itself the canonical cross-revision symbol
+registry, explicitly separating stable logical identity from upstream Tree-sitter/chunker IDs;
+`atlas_symbol_versions` carries the revision-bound source/workspace identity, upstream node/
+symbol/chunk IDs, declaration hash, span, parent route, and producer revision (schema already
+matches `structural-symbol.ts`'s `SymbolVersionV1` contract). `symbol-registry-repository.ts`
+already resolves exact canonical keys from these tables in production code.
+
+**Frozen ownership matrix** (canonical vs. producer/index/executor — never conflate the columns):
+
+| Surface | Role |
+|---|---|
+| `atlas_symbol_registry` | **CANONICAL** logical symbol identity |
+| `atlas_symbol_versions` | **CANONICAL** revision-qualified symbol instance |
+| `atlas_symbol_aliases` | rename/move/upstream-ID reconciliation |
+| `atlas_structural_reference_resolutions` | canonical/degraded structural reference resolution |
+| `graphify_symbols` | **PRODUCER** / revision-scoped structural extraction, NOT canonical identity |
+| Tree-sitter CST | structural evidence (substrate) |
+| `ast-grep` | structural search/rule extractor — operates over Tree-sitter's real CST, not a simplified AST (its own docs distinguish the two; CST preserves concrete syntax like operators) |
+| `atlas_representations` | **CANONICAL** representation-contract registry (applied above) — NOT a symbol registry, a separate concern |
+| pgvector | exact semantic representation store/oracle |
+| Qdrant / cuVS / CAGRA | derived ANN executors |
+| PostgreSQL FTS / `pg_trgm` | lexical indexes |
+| `rg` | live exact lexical executor |
+| NLP / keywords | derived features |
+| simdjson | ingestion/parser accelerator (CPU SIMD, not GPU — per this repo's existing hard rule) |
+| Postgres 18 AIO / bitmap scans | execution optimization only, never an identity layer |
+
+**Corrected pipeline** (source → identity, not identity → source):
+```
+source bytes → Tree-sitter CST → ast-grep/structural extractors → graphify_symbols
+  (structural facts, revision-scoped evidence) → symbol reconciliation →
+  atlas_symbol_registry (stable_symbol_id) + atlas_symbol_versions (symbol_version_id, bridges
+  durable identity to one source revision)
+```
+A CST node's `node_id`/`byte_start`/`byte_end`/`node_type`/`ast_path` is revision-scoped evidence,
+never durable identity. `graphify_symbols.symbol_id` is a **stable-symbol candidate** whose
+cross-revision continuity still requires proof — consistent with this repo's own graph-retrieval
+design language and the earlier `SYMBOLS_RESOLVED` audit finding that the table alone is
+insufficient to prove that predicate.
+
+**Lexical layer design** (do not put lexical identity into the symbol registry):
+- B-tree: `stable_symbol_id`, `canonical_key`, `source_ref`, `source_revision`,
+  `workspace_revision`, `symbol_version_id`
+- GIN/tsvector: lexical text, names, signatures, keywords/concepts
+- `pg_trgm`: fuzzy identifier/name lookup
+- `rg`: exact live workspace scan
+
+**Critical caveat, explicitly preserved from the operator's own instruction, not glossed over**:
+**this architecture pick does not make the existing data current.** `evidenceStatus` for
+`atlas_symbol_versions` remains `BLOCKED` until it is regenerated/reconciled against the currently
+admitted workspace revision (`sha256:322ed1a6...`) — the existing 10,310/285 rows are real but
+bound to a *different*, non-admitted revision (`sha256:55edaaad...`), per this same section's
+earlier finding. **Selecting the canonical owner is an architecture decision; it does not
+retroactively fix the ungrounded-revision problem** that separately blocks
+`QDRANT-LEGACY-PAYLOAD-BACKFILL-01` and `WORKSPACE-REVISION-COLUMN-01` — that still needs
+Graphify to produce real, admitted-revision-bound bindings (P0), unchanged by this decision.
+
+Status: `SYMBOL_IDENTITY_OWNER_DECIDED_ATLAS_SYMBOL_REGISTRY` — architecture only. No code, schema,
+or data changed by this decision itself. `graphify_symbols`/`graphify_edges` remain live, populated
+(`graphify_files`: 26,014 rows) producer tables, feeding the now-decided canonical registry rather
+than replacing it. Next real step (not started): build the reconciliation writer from
+`graphify_symbols`/`atlas_symbol_versions` into a workspace-revision-bound canonical state, and
+update `audit-canonical-projection-fabric.mjs`'s `SYMBOLS_RESOLVED` check to read
+`atlas_symbol_registry`/`atlas_symbol_versions` instead of the now-demoted `graphify_symbols`.
+
+### `SYMBOL-RECONCILIATION-WRITER-01` (new, 2026-09-12) — tracked, not started, pick up fresh
+
+- **Checked before building anything (Duplication Prevention): the reconciliation writer's pieces
+  already exist, but nothing wires them together.** `packages/parent-atlas/src/core/
+  gis-canonicalization.ts::canonicalizeStructuralEvidence()` (nomination → resolution →
+  canonical form) and `packages/parent-atlas/src/core/symbol-registry-repository.ts::
+  createSymbolRegistryRepository()` (the real Postgres writer — `INSERT INTO
+  atlas_symbol_registry/atlas_symbol_aliases/atlas_symbol_versions`) both have **zero callers
+  anywhere in the repo**, confirmed via grep. The type contracts they both use
+  (`structuralSymbolNominationSchema`/`symbolResolutionSchema`/`symbolVersionSchema` in
+  `structural-symbol.ts`) are real and shared. This is an unwired scaffold, not a missing
+  capability — build on it, do not duplicate or discard it.
+- **What "build the reconciliation writer" means concretely, not started**: a script that (1)
+  reads `graphify_symbols` (or Tree-sitter/ast-grep output directly) scoped to the currently
+  admitted workspace revision, (2) calls `canonicalizeStructuralEvidence()` to produce
+  nominations/resolutions, (3) drives `createSymbolRegistryRepository()` to write
+  revision-bound rows into `atlas_symbol_registry`/`atlas_symbol_versions`.
+- **Must not repeat the ungrounded-revision mistake already caught twice this session**: any new
+  write must be bound to the real admitted revision (`sha256:322ed1a6...`) once Graphify actually
+  produces bindings for it (P0, still not done) — writing against the existing stale
+  `sha256:55edaaad...`-bound data would just add more ungrounded rows to the same problem.
+- **Also not started, same task family**: updating `audit-canonical-projection-fabric.mjs`'s
+  `SYMBOLS_RESOLVED` predicate to read `atlas_symbol_registry`/`atlas_symbol_versions` instead of
+  `graphify_symbols`, per the architecture decision above.
+- Status: `TRACKED_NOT_STARTED`. Explicitly deferred to a fresh session per operator instruction
+  ("pick it up fresh next time") rather than started under this session's context budget.
+
+**Built 2026-09-12 (this session, fresh pickup) — `scripts/atlas/symbol-reconciliation-writer-v1.mts`,
+gate proven live, zero writes performed.** Wires `canonicalizeStructuralEvidence()` and
+`createSymbolRegistryRepository()` together for real: reads `graphify_symbols` joined to
+`graphify_files.source_ref`, scoped to source_refs bound to a target `workspace_revision` via
+`atlas_workspace_source_bindings` (column is `canonical_source_ref`, not `source_ref` — a real
+typo caught and fixed during the first live run), builds `StructuralSymbolNominationV1` records,
+and drives them through resolution/promotion. **Hard fail-closed gate, exercised live twice, both
+correctly refuse to write anything**:
+- `--workspace-revision sha256:322ed1a6...` (the admitted revision) → `BLOCKED_ON_UNGROUNDED_REVISION`
+  (`atlas_workspace_source_bindings` has 0 rows for it — unchanged since this gate was first found).
+- `--workspace-revision sha256:55edaaad...` (the only bound revision, 111 source_refs) →
+  `BLOCKED_ON_EMPTY_SYMBOL_SOURCE` (`graphify_symbols` has 0 rows repo-wide, confirmed live —
+  there is no structural evidence to canonicalize yet, for any revision).
+Default mode is dry-run/resolve-only; `--allow-create` + `--apply` are required together to permit
+new canonical-symbol promotion (never exercised live — no revision currently clears the gate).
+The `GROUNDED` code path (nomination-building + `canonicalizeStructuralEvidence()` invocation) is
+proven by code review and by the two gate-rejection runs reaching it correctly, not by a live
+successful write — that remains true until (a) Graphify produces real bindings for the admitted
+revision (P0), and (b) something populates `graphify_symbols` (currently empty regardless of
+revision — a second, independent blocker from the revision-grounding one, discovered while wiring
+this). Receipts: `docs/reports/symbol-reconciliation-writer-v1-*.json` (both runs saved).
+Status: `WIRED_GATE_PROVEN_WRITE_PATH_UNEXERCISED`. Next real trigger: re-run this same script,
+unchanged, once `graphify_symbols` has rows for a source_ref bound to the admitted revision —
+do not build a second reconciliation writer when that day comes.
+
+**Follow-through, 2026-09-13, same day — the extraction lane was built and the `GROUNDED` path
+was proven live for the first time.** Full plan approved and executed (`whimsical-floating-hickey`
+plan): built `scripts/atlas/graphify-symbol-extractor-v1.mts`, the "canonical Graphify extractor"
+`graphify_symbols`'s own migration comment called for but that nothing had ever built. Extends the
+real, pre-existing `scripts/graphify/lib/ts-ast-extractor.mjs` (TypeScript Compiler API walker,
+`extractSymbolsFromSource()` now exported and reusable, unit-tested — 4/4 pass) rather than
+reimplementing it, and adds BOM-aware (UTF-8/UTF-8-BOM/UTF-16LE/UTF-16BE) file reading plus
+extractors for `.json` (key-path structure) and `.md` (ATX heading nesting) via
+`scripts/atlas/lib/{encoding,json-symbol-extractor,markdown-symbol-extractor}.mjs`. `.txt` files
+get zero symbols (valid, not a failure). Also added `scripts/atlas/lib/lsp-client.mjs`, a real
+minimal JSON-RPC client that spawns `typescript-language-server`'s actual `cli.mjs` entry point
+directly (not its `.cmd` shim — that shim's own child process outlived a timeout kill during
+testing, a real bug found and fixed by spawning the resolved Node entry point instead) for a
+`--use-lsp` opt-in alternate TS/JS extraction path, proven live against both a small fixture and a
+real 26KB repo file (`~1.3s`, correct hierarchical symbol nesting). `--use-lsp` stays opt-in, not
+default, since spawning a language-server process per file is measured to be far slower over a
+large batch than the in-process Compiler API walk — consistent with the intended design.
+
+**Real bugs found and fixed while building this, not glossed over**:
+1. `symbol-reconciliation-writer-v1.mts`'s nomination-builder was mapping `declaration_hash` from
+   `graphify_symbols.source_text_hash` (a deliberately-truncated 12-char hash) instead of the full
+   64-char `ast_fingerprint` column — the `structuralSymbolNominationSchema` `declaration_hash`
+   field requires a full sha256, so every promotion attempt failed a Zod validation until this was
+   corrected. Found via the first real end-to-end smoke run, not by inspection.
+2. The `lsp-client.mjs`'s original design spawned the npm `.cmd` shim with `shell:true`; on
+   Windows, a plain `child.kill()` on timeout only kills the `cmd.exe` wrapper, not the real
+   language-server process underneath it, leaving orphaned processes running detached. Fixed by
+   resolving and spawning the package's actual `lib/cli.mjs` entry point via `node` directly
+   (`process.execPath`), which removes the shell layer entirely and makes `kill('SIGKILL')`
+   reliable. (A separate false alarm during the same investigation: `npx tsx -e "..."` silently
+   produces zero output whenever the inline script contains an `import` statement in this
+   environment — this looked like an LSP hang for a while but was actually a broken ad hoc test
+   harness; the real `.mjs` file tests were unaffected and correctly proved the client works.)
+
+**Live results (real writes, not projected)**:
+- `graphify_symbols`: 0 rows -> 37,179+ rows across markdown/json/ts_js kinds (heading/module/
+  field/function/import/interface/type_alias), via multiple real `--apply` batches against real
+  `graphify_files` rows. Zero orphaned `graphify_symbols` rows for `UNPROCESSED` files even after
+  one batch was killed mid-run — the per-file transaction boundary held.
+- **`scripts/atlas/smoke-graphify-symbol-lane-v1.mjs`** (new, wired as `npm run
+  smoke:graphify:symbols`): end-to-end synthetic-revision proof, `status: PASS`. Creates its own
+  `sha256:test-symbol-lane-smoke-*` workspace revision + `atlas_workspace_source_bindings` rows
+  against 3 real, on-disk, `atlas_source_refs`-registered files (never touches the real admitted
+  revision), runs the extractor, then runs `symbol-reconciliation-writer-v1.mts --allow-create
+  --apply` for the **first live exercise of its `GROUNDED` branch** — previously proven only by
+  code review. Result: `gateStatus: "GROUNDED"`, `canonicalSymbolCount: 24`, re-run idempotent
+  (24 -> 24, no duplicates), synthetic rows fully cleaned up (`0` remaining after the run).
+  Re-verified afterward: the real admitted revision (`sha256:322ed1a6...`) still correctly returns
+  `BLOCKED_ON_UNGROUNDED_REVISION` — none of this leaked into or altered the real P0 blocker.
+- `scripts/atlas/audit-canonical-projection-fabric.mjs`'s `SYMBOLS_RESOLVED` predicate extended
+  (additively — old fields kept) to also report `atlas_symbol_registry`/`atlas_symbol_versions`
+  row counts alongside the `graphify_symbols` count, with a new `EXTRACTED_NOT_RECONCILED` verdict
+  tier between `NOT_PROVEN` and `PARTIAL_PROVEN`. Re-ran live: correctly reports
+  `graphify_symbols_row_count: 35811`, `atlas_symbol_registry_row_count: 10310` (the latter is
+  **pre-existing stale data from before this session**, unrelated to the new extraction — the
+  gate's own note now explains this explicitly rather than implying reconciliation coverage that
+  doesn't exist).
+- `scripts/atlas/index-engine.ts` (the dead, broken, falsely-"Phase 110"-attributed scaffold from
+  earlier this session) archived to `deeds_labs/archive/2026-09-13/index-engine.ts.broken`,
+  `docs/archive-manifest.json` entry added.
+
+**Scope boundary respected**: this work never wrote to `atlas_workspace_source_bindings` for the
+real admitted revision, never attempted to fix P0 (Graphify's own coordinator run completing for
+`sha256:322ed1a6...`), and the real admitted-revision gate is re-confirmed still `BLOCKED` after
+all of the above. P0 remains a separate, unresolved, tracked blocker.
+
+Status: `EXTRACTION_LANE_LIVE_RECONCILIATION_GROUNDED_PATH_PROVEN_SYNTHETIC_ONLY`. Real production
+promotion (the admitted revision actually reaching `GROUNDED`) still requires P0.
+
+**Follow-up, 2026-09-13 — `SOURCE-TEXT-ENCODING-01` built (design-corrected per external review),
+not yet re-verified with a live run.** The first extractor version wrote Markdown headings and
+JSON key paths into `graphify_symbols` as fake "symbols" (`kind: 'heading'/'field'/'module'`) --
+a real design mistake, since that table is explicitly for deterministic CODE symbols. Fixed:
+- `scripts/atlas/lib/source-text-envelope.mjs` — `SourceTextEnvelopeV1` fail-closed BOM decoder
+  (UTF-8/UTF-8-BOM/UTF-16LE/UTF-16BE; UTF-16 without a BOM is never guessed) plus a `SOURCE_KINDS`
+  extension→`documentKind` routing table. Unit-tested: 11/11 pass
+  (`source-text-envelope.test.mjs` — ASCII txt, BOM md, multibyte JSON, UTF-16LE/BE with BOM,
+  emoji surrogate pairs + CRLF, malformed-UTF-8 rejection, odd-byte-no-BOM handling,
+  mid-codepoint offset rejection).
+- `scripts/atlas/lib/atlas-ast-nodes-writer.mjs` (new, additive) — writes non-code structure
+  (JSON key paths, Markdown headings) into the **existing, real** `atlas_ast_nodes` table
+  (already had a canonical writer, `sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs`,
+  found via grep before building anything new — reused its exact `tree_node_id` hash convention
+  rather than inventing a second one, but did not reuse the script itself since it sources from
+  `codebase_chunk_index` with a code-only `KIND_MAP`, not a live per-file walk).
+- `scripts/atlas/lib/markdown-symbol-extractor.mjs` extended with `extractMarkdownFences()` --
+  Markdown's own embedded fenced code (when the fence language is in the new
+  `MARKDOWN_FENCE_LANGUAGE_TO_EXT` allowlist) now recurses into the real TS/JS extractor and
+  gains genuine `graphify_symbols` identity, carrying explicit provenance
+  (`parentDocument`/`parentSection`/fence byte spans) in its `metadata` column -- the heading
+  structure itself never becomes a code symbol.
+- `scripts/atlas/graphify-symbol-extractor-v1.mts` rewired: `code` → `graphify_symbols` (unchanged
+  behavior), `json`/`markdown` structure → `atlas_ast_nodes` (new), Markdown embedded code →
+  `graphify_symbols` with provenance (new), `plaintext` → still zero structural extraction
+  (unchanged, reserved for future lexical/NLP enrichment). Type-checks clean.
+- **Cleanup performed on already-written data**: the first version's incorrect writes
+  (25,732 `heading` + 7,912 `field` + 3,370 `module` rows = 37,014 rows) were deleted from
+  `graphify_symbols`, and their 1,414 source files reset to `parse_status = 'UNPROCESSED'` so the
+  corrected extractor naturally repopulates them into `atlas_ast_nodes` on the next run. Verified
+  after cleanup: only genuine code kinds remain (`function` 73, `import` 62, `interface` 31,
+  `type_alias` 23 = 189 rows).
+- **Not yet done**: a live re-run proving the corrected routing end-to-end (json/markdown →
+  `atlas_ast_nodes` rows actually land; a real Markdown file with a real `ts`/`js` fence produces
+  a real embedded `graphify_symbols` row with provenance). Flagged, not silently assumed working
+  from unit tests + a clean type-check alone.
+Status: `SOURCE_TEXT_ENCODING_01_BUILT_LIVE_REVERIFICATION_PENDING`.
+
+**Follow-up, 2026-09-13 (same day) — live re-verification run, one real bug found and fixed.**
+Ran `graphify-symbol-extractor-v1.mts --apply` against real, already-`UNPROCESSED`
+`graphify_files` rows (workspace `625743d2-092b-4fa8-abe0-9dc094920c80`), not synthetic fixtures:
+- `.claude/settings.local.json` → 6 `module`-kind rows in `atlas_ast_nodes` (this file's shape has
+  no depth-2 leaf keys, only object containers — 0 `field` rows is correct for this input, not a
+  gap; JSON leaf-key routing itself was separately confirmed via the extractor's own dry-run plan
+  output showing `field` in its emitted symbol set).
+- `.claude/skills/codebase-indexing-agentic-error-fixing.md` (77 total headings across the 3 files
+  tested) → real `heading`-kind rows in `atlas_ast_nodes`. Its and a second `.md` file's fences were
+  all `bash`/`json`/plain — correctly produced zero embedded `graphify_symbols` rows (no ts/js
+  fence existed to recurse into, not a bug).
+- `ACE-BITFROST-WORKER-INTEGRATION.md` (has real ` ```typescript ` fences) → **real embedded-code
+  proof**: `graphify_symbols` gained rows like `type_alias:CanonicalAcePacketEnvelope` and
+  `function:packetSeedCandidatesFromRrf` with `metadata` carrying exactly the designed provenance
+  shape (`parentDocument`, `parentSection`, `fenceStartByte`/`fenceEndByte`,
+  `embeddedStartByte`/`embeddedEndByte`, `extractor_source: "markdown-embedded-fence"`).
+- **Real bug found on first `--apply` attempt (not a synthetic-test artifact)**: `atlas_ast_nodes`
+  has a live `chk_atlas_ast_nodes_kind` CHECK constraint (added
+  `drizzle/manual/20260716b_atlas_ast_nodes_alter.sql`, code-only allowlist: file/module/class/
+  interface/type/function/method/constructor/parameter/route/schema/test/call_site/import/export)
+  that rejected both `heading` and `field` — the two new document-structure kinds this lane
+  introduces. First live write attempt errored out mid-batch (`23514`, `chk_atlas_ast_nodes_kind`)
+  partway through a multi-file run; the JSON files that had already committed in earlier per-file
+  transactions were unaffected, but the run halted before reaching later files. Fixed with a new
+  additive migration, `drizzle/manual/20260913_atlas_ast_nodes_document_structure_kinds.sql`
+  (drops and re-adds the same constraint with `heading`/`field` added to the allowlist — no rows
+  altered, no other values removed), applied live via `docker exec ... psql`. Confirmed this is the
+  correct, minimal fix rather than remapping the new kinds onto an existing code-kind name (which
+  would have made document-structure rows indistinguishable from real code AST rows in the same
+  table).
+- **Idempotency re-confirmed live** (not just via the earlier synthetic smoke test): reset
+  `ACE-BITFROST-WORKER-INTEGRATION.md`'s `parse_status` back to `UNPROCESSED` and re-ran `--apply` —
+  `atlas_ast_nodes` count (25) and `graphify_symbols` count (5) for that file were byte-identical
+  before and after the second run, despite the receipt reporting `totalSymbolsInserted: 8` (that
+  field reflects attempted `INSERT ... ON CONFLICT` rows, not net-new rows — the `ON CONFLICT DO
+  NOTHING`/`DO UPDATE` clauses correctly prevented duplication).
+- **Scope boundary re-confirmed**: re-ran `symbol-reconciliation-writer-v1.mts` with no args
+  afterward — still returns `BLOCKED_ON_UNGROUNDED_REVISION` for the real admitted revision
+  (`sha256:322ed1a6...`, 0 bound source refs), proving none of today's writes touched or altered
+  the P0 blocker.
+- **Closed a separate, previously-flagged loose end**: `scripts/atlas/lib/encoding.mjs` had been
+  archived to `deeds_labs/archive/2026-09-13/encoding.mjs.superseded` in the same session that
+  built `source-text-envelope.mjs`, but its `docs/archive-manifest.json` entry was missed at the
+  time — added now (sha256 `2f10d237ec3a96c39b93ec2f971cf909e3552d62d5b380d53e0e2db82d521c18`,
+  matches the on-disk file).
+
+Status: `SOURCE_TEXT_ENCODING_01_LIVE_REVERIFICATION_PROVEN`. All three routing destinations
+(code→`graphify_symbols`, document-structure→`atlas_ast_nodes`, embedded-fence-code→
+`graphify_symbols` with provenance) confirmed against real repo files, not synthetic fixtures.
+Remaining open items (unchanged from before): `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`'s
+`--source-ref` flag (not built), the RRF-classification discrepancy on
+`PROMOTION-BOARD-RECONCILE-02` (not resolved), and P0 itself (out of scope, still blocked).
+
+**Follow-up, 2026-09-13 (same day) — `GRAPHIFY-STRUCTURAL-CODE-CANARY-02` built, live-proven.**
+`sveltekit-frontend/scripts/atlas/graphify-daily-coordinator-canary-v1.mts` now accepts a
+first-class, repeatable `--source-ref=<path>` CLI flag (replaces the ad hoc
+`ATLAS_GRAPHIFY_CANARY_SOURCE_REFS` env-var override — no longer read anywhere in the file):
+- Every `--source-ref` value is looked up against `rootSources` (the sealed snapshot's real
+  `repo:root` sources, loaded from the admitted workspace-revision's snapshot file) by exact
+  string match — never opened from disk or otherwise treated as a filesystem path until that
+  lookup succeeds. Not found → throws
+  `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_FOUND_IN_SEALED_SNAPSHOT:<ref>`.
+- Each resolved source's extension is checked against a code-source allowlist (`.ts .tsx .mts .cts
+  .js .jsx .mjs .cjs`) since structural materialization is TypeScript-compiler-based. A non-code
+  match (e.g. `.md`) → throws `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_A_CODE_SOURCE:<ref>`.
+- `--source-ref` + `--full` together throws `GRAPHIFY_COORDINATOR_CANARY_SOURCE_REF_NOT_VALID_WITH_FULL`
+  (currently unreachable in practice since `--full` itself throws first, but kept for when that
+  block is eventually lifted).
+- Report `gate`/`status` now read `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`/`PROVEN_STRUCTURAL_CODE_CANARY`
+  when `--source-ref` drives the run (vs. `GRAPHIFY-DAILY-COORDINATOR-01`/`PROVEN_COMMITTED_BOUNDED_CANARY`
+  for the default numeric-`--limit` path), and a new `requestedSourceRefs` field names every
+  explicitly-requested ref so a multi-ref invocation can't be misread as proving structural
+  extraction on more than the one (`structuralSourceRef`, always singular) that actually got it —
+  the same honesty gap `--full` had at 24k scale, made visible instead of silently reintroduced at
+  smaller scale.
+- Updated the now-stale `--full`-blocked error text (previously said "not yet built" about this
+  exact gate).
+
+**Live-proven, not just type-checked**: ran the real canary end-to-end against
+`ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts` (the same real
+`.ts` file the earlier env-var-driven canary used) via
+`--source-ref=ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts`.
+Real execution `b337f94c-850b-44b5-99a7-ba6a6cfaeedf`: `fileCount: 1`, `completedStageCount: 5`,
+`structuralProviderStatus: "PROVEN"`, `structuralProvenanceStatus: "NATIVE_READY"`,
+`requestedSourceRefs: ["ace-vector-selection-slice/.../packet-feature-matrix.ts"]`. Also verified
+all three guard rails live, not just by code inspection: a `.md` ref throws
+`SOURCE_REF_NOT_A_CODE_SOURCE`; a path-traversal-shaped ref (`../../../etc/passwd.ts`) throws
+`SOURCE_REF_NOT_FOUND_IN_SEALED_SNAPSHOT` (the sealed-snapshot lookup itself is what defeats path
+traversal — it's a string-equality check against known sourceRefs, never a filesystem read); and
+`--full --source-ref=x.ts` together still hits the pre-existing `--full`-blocked throw first.
+
+**Real bug found and fixed mid-verification**: the report-file write (`writeFile` from
+`node:fs/promises`) intermittently threw a bare `UNKNOWN: unknown error` on this exact path on
+Windows, reproducible across repeat runs, even though all DB-side work (execution open, all 5
+stage transitions, `completeExecution`) had already succeeded — confirmed live via a direct
+Postgres readback of the completed-but-report-less execution (`24c421a1-28b1-431d-ac09-2793ed807ca6`,
+`fileCount: 1`, `completed_stages: 5`) before touching any code, so the fix wasn't guessed at.
+A synchronous write (`writeFileSync` from `node:fs`) to the identical path succeeded immediately
+in a direct test, so swapped the report write to `writeFileSync` — same output shape and location,
+async-vs-sync only. Re-ran afterward and the report file wrote cleanly on the first attempt.
+
+Status: `GRAPHIFY_STRUCTURAL_CODE_CANARY_02_BUILT_AND_LIVE_PROVEN`. Scope note: this closes the
+"explicit, deterministic code-source targeting" gap only — it does not make `--full` safe to lift
+(structural materialization still only ever tests one source per run, by design, regardless of
+how many `--source-ref` values are passed), and does not touch P0.
+
+**Checked 2026-09-12 (same session): does anything populate `graphify_symbols`? No.** Grepped the
+whole repo for `graphify_symbols`/`graphifySymbols` (raw SQL and Drizzle schema references alike).
+Exactly one candidate writer exists anywhere: `scripts/atlas/index-engine.ts`
+(`runIndexEngine()` → `processSymbols()` → `tx.insert(graphifySymbols)...`). It is **broken and
+zero-caller, not a dormant working writer**:
+- Fails `tsc --noEmit` outright — `error TS1002: Unterminated string literal` at its own line 14
+  (a `$lib/server/db/schema/graphify.js` import missing its closing quote/semicolon), cascading
+  into 20+ further parse errors. It cannot run.
+- Contains duplicated import lines (6-7 repeated verbatim at 11-12) and literal `<task_progress>`
+  / `>>>>` markers pasted directly into the function body (lines 53-74) — this reads as leaked
+  agent-tool output accidentally committed into source, not a real implementation draft.
+- Zero callers anywhere in the repo (`runIndexEngine`/`index-engine` match only the file's own
+  name).
+This means the empty-`graphify_symbols` blocker found by `SYMBOL-RECONCILIATION-WRITER-01`'s gate
+is not "no one has gotten to it yet" — the one attempt that exists never worked and was never
+wired in. Left in place, not archived, pending an explicit decision (fix this file into a real
+Stage 1-2 indexer, or archive it as broken and route symbol extraction through
+`packages/parent-atlas`'s existing `treesitter-chunker`/`ast-grep` adapters instead, per this
+file's own "Audit `packages/*` Before Moving Anything" hard rule in CLAUDE.md — that packages-side
+adapter path was not evaluated here as a `graphify_symbols` writer candidate, only the raw-grep
+surface was).
+
+### `WORKSPACE-REVISION-COLUMN-01` (new, 2026-09-12) — **corrected same day**: column exists, is dead, not absent
+
+- **Correction to this gate's own earlier entry above, verified live, not assumed**: the original
+  fabric-audit's "no live `atlas_packets.workspace_revision` column exists" claim is imprecise.
+  Direct `information_schema.columns` + row inspection
+  (`scripts/atlas/audit-atlas-packets-revision-columns-v1.mjs`, read-only) found the column DOES
+  exist — as `integer`, and **100% of 61,718 rows are `0`** (a dead default, never meaningfully
+  written). Same story for `atlas_packets.representation_revision` (integer, 100% zero).
+  `atlas_packets.source_revision` (text) exists but is **0/61,718 populated** (all NULL) — genuinely
+  empty, unlike the other two. None of the three can satisfy `buildQdrantSyncPayload()`'s contract,
+  which requires a `sha256:[a-f0-9]{64}`-format string (per `requireContentRevision()` in
+  `qdrant-sync-payload.ts`) — the live `integer` columns are the same class of legacy numeric
+  epoch that file's own doc comment already warns can't satisfy canonical lineage
+  (`workspace_cache_revision`, not `workspace_revision`).
+- **Checked whether the real value could be derived by joining to `atlas_workspace_source_bindings`
+  instead of migrating the column type — it can't, not because of a join-key problem, but because
+  the binding data itself barely exists**: only 111/61,718 packets (0.18%) join at all
+  (`wsb.canonical_source_ref = ap.source_ref`, `repo_id='deeds-web-app'`), and **0 of those 111**
+  are bound to the currently-admitted revision (`sha256:322ed1a6...`) — all 111 sit under the
+  *other* revision (`sha256:55edaaad...`), same one flagged in `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`
+  and `SYMBOL-REPRESENTATION-REGISTRY-RECONCILIATION-01` above. This is the third independent
+  confirmation this session that the real root blocker is upstream of any writer-contract or
+  schema patch: there is almost no grounded workspace-source binding data to populate anything
+  with, admitted-revision or otherwise. Script:
+  `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs` (read-only).
+- **Design implication (not started, needs sign-off)**: fixing this column is not "backfill from
+  existing bindings" — that data doesn't exist yet in useful quantity. The dependency order is:
+  (1) Graphify must run end-to-end and produce real `atlas_workspace_source_bindings` rows bound to
+  the admitted revision (P0, same blocker as everywhere else); only then does (2) either altering
+  `atlas_packets.workspace_revision`'s type or adding a new correctly-typed column, populated from
+  those real bindings, become meaningful. Migrating the column's type today, before (1), would just
+  produce a correctly-typed column that's still empty.
+- Status: `TRACKED_NOT_STARTED`, corrected finding. Blocks: `REVISION_QUALIFIED`.
+
+### `QDRANT-WRITER-CONTRACT-PATCH-01` (new, 2026-09-12) — design only, sequenced behind the above
+
+- **This was the specific thing asked for this turn: "design the writer-contract patch."** The
+  writer contract itself (`buildQdrantSyncPayload()` in
+  `sveltekit-frontend/src/lib/server/retrieval/qdrant-sync-payload.ts`) is **already correct** — it
+  hard-fails (throws) without a valid `packetKey`/`sourceRef`/`featureId`/`workspaceId`, a
+  `sha256:`-format `workspace_revision` and `source_revision`, a positive `representation_revision`,
+  and the canonical `representation_id`. Nothing about this file needs patching.
+- **The actual defect, per `scripts/atlas/audit-emb3a-qdrant-writer-lineage.mjs` (re-run
+  2026-09-12, read-only)**: of 9 known writer surfaces touching `codebase_chunks_768`, only
+  `qdrant-sync-worker.ts` delegates to the compliant builder
+  (`status: LINEAGE_COMPLETE_VIA_SHARED_BUILDER`). **6 legacy scripts bypass it entirely** and are
+  each flagged `promotionBlocked: true` / `REVISION_FIELDS_MISSING`:
+  `backfill-packets-to-qdrant.mjs`, `backfill-packets-to-qdrant-ollama.mjs`,
+  `qdrant-upsert-worker.mjs`, `backfill-qdrant-payloads-from-postgres.mjs`,
+  `backfill-qdrant-payload-upsert.mjs`, and one more in the full report
+  (`docs/reports/emb3a-qdrant-writer-lineage-audit.json`).
+- **Spot-checked one legacy writer's actual query**
+  (`scripts/atlas/backfill-qdrant-payloads-from-postgres.mjs:44-58`): its `SELECT` joins
+  `codebase_chunk_index` to `atlas_packets` on `cci.relative_path = ap.source_ref` and only
+  selects `packet_key, source_ref, feature_id, domain_class, title_id, som_row, som_col,
+  community_id` — it never even attempts to select `workspace_revision`/`source_revision`/
+  `representation_revision`, not because they're unavailable in its query shape, but because the
+  script predates those fields being expected at all.
+- **The fix is real but cannot be usefully applied yet — same root dependency as
+  `WORKSPACE-REVISION-COLUMN-01` above**: widening these 6 scripts' queries and routing their
+  payload construction through `buildQdrantSyncPayload()` would immediately hard-fail every row
+  (by design — that's the contract working correctly) until real, admitted-revision-bound
+  `workspace_revision`/`source_revision` values exist upstream to select. Patching the 6 legacy
+  writers ahead of that would either (a) fail closed on every row, achieving nothing, or (b) tempt
+  someone into loosening the compliant builder's hard-fail checks to let ungrounded data through —
+  exactly the false-provenance mistake `QDRANT-LEGACY-PAYLOAD-BACKFILL-01`'s dry-run already
+  refused to commit.
+- **Recommended sequencing, not started**:
+  1. Run Graphify for real (P0) → produces real `atlas_workspace_source_bindings` rows bound to
+     the admitted revision.
+  2. Resolve `WORKSPACE-REVISION-COLUMN-01` (schema decision + migration, sign-off required).
+  3. Rewrite the 6 legacy writers to select the now-real revision columns and delegate to
+     `buildQdrantSyncPayload()` instead of hand-building payloads — or, simpler, retire them
+     entirely and run one full incremental pass through the already-compliant
+     `qdrant-sync-worker.ts` path instead of maintaining 6 parallel writers long-term.
+  4. Only then does `QDRANT-LEGACY-PAYLOAD-BACKFILL-01` (or a rebuild) become executable without
+     writing false provenance.
+- Status: `DESIGNED_NOT_STARTED`. Zero code changes made to any of the 6 legacy scripts or to
+  `qdrant-sync-payload.ts` — this is a design/sequencing record only. Evidence:
+  `docs/reports/emb3a-qdrant-writer-lineage-audit.json`,
+  `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs` output (inline above,
+  not written to a separate report file).
+
+### `GRAPH-ORDINAL-MANIFEST-01` (new, 2026-09-12) — tracked, not started
+
+- Closes `GRAPH_MANIFEST_SEALED` and `ORDINAL_MAP_SEALED`, both `ABSENT` (no table exists at all,
+  not just unpopulated). Two decisions bundled here because `PROJECTIONS_CHECKSUM_ALIGNED` depends
+  on both simultaneously:
+  1. Which graph engine's output becomes the sealed `GraphProjectionManifestV1` — NetworkX, cuGraph,
+     or Neo4j each currently build their own graph independently (per root `CLAUDE.md`'s
+     NetworkX↔cuGraph parity-pipeline correction) with no single agreed node/edge manifest.
+  2. Build a real `CandidateOrdinal` sealed-map table — currently a design intent in `CLAUDE.md`'s
+     "Parent atlas current identity and retrieval alignment" section, never a table-backed artifact.
+- Not yet designed: table shape, writer, or which engine wins — genuine architecture decisions, not
+  made here.
+- Status: `TRACKED_NOT_STARTED`. Blocks: `GRAPH_MANIFEST_SEALED`, `ORDINAL_MAP_SEALED`,
+  `PROJECTIONS_CHECKSUM_ALIGNED`.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Ran the read-only V2 readiness compiler through the repository TypeScript
+      loader after correcting the `.mts` invocation.
+- [x] The compiler fail-closed with all three authoritative inputs missing:
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1`. Cross-contract verification was not
+      attempted because no artifact arguments were supplied.
+- [x] Confirmed `writesPerformed=false`, `cacheWritesPerformed=false`, and
+      `canonicalAuthority=false`.
+- [ ] Do not synthesize or seed replacement artifacts. ACE/context admission
+      remains downstream of current source lineage, graph/feature sealing, and
+      revision-authority receipts.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false. First blocker:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## BITFROST-TRACKING-CAPABILITY-RECHECK-2026-09-12
+
+- [x] Proved the Valkey connection-tracking capability and configured prefix
+      discovery in read-only mode.
+- [x] Confirmed `DATA_MUTATION_PERFORMED=false`.
+- [ ] Prove live invalidation delivery, stale-entry rejection, and replay
+      behavior with revision/checksum-addressed fixtures; connection tracking
+      alone does not prove cache correctness or ACE admission.
+
+Evidence: `docs/reports/bitfrost-valkey-tracking-proof.json` and
+`docs/reports/bitfrost-valkey-tracking-proof.md`.
+Status: `PROVEN_CONNECTION_CAPABILITY`; authority=false;
+writesPerformed=false. ACE remains blocked on
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## BITFROST-SEMANTIC-CACHE-RECHECK-2026-09-12
+
+- [x] Ran the semantic BitFrost/Valkey audit in read-only mode.
+- [x] Confirmed the cache service is reachable and `28` cache families are
+      classified.
+- [x] Recorded three documented-live families with zero current rows:
+      `gpu:autoencoder:latent_64:*`, `gpu:karpathy:scores`, and
+      `gpu:karpathy:summary`.
+- [x] Classified the result as `PASS_WITH_DRIFT`; empty families are not
+      interpreted as proof of a flush, failure, or authority loss.
+- [ ] Prove revision/checksum-addressed ACE hit, miss, stale rejection, and
+      invalidation behavior before warming or writing any cache family.
+
+Evidence: `docs/reports/bitfrost-semantic-cache-audit.json` and
+`docs/reports/bitfrost-semantic-cache-audit.md`.
+Status: `PASS_WITH_DRIFT`; cache authority=false; no cache mutation was
+performed. First blocker remains:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## MCP-SURFACE-LIVE-RECHECK-2026-09-12
+
+- [x] Completed the live read-only MCP surface discovery for both local
+      `atlas-tools` and external TRACE.
+- [x] Confirmed `atlas-tools` is reachable over stdio with `10` tools and
+      TRACE is reachable over streamable HTTP with `176` tools; both surfaces
+      expose revisioned schema fingerprints and are not canonical authorities.
+- [x] Preserved the mutation boundary: `atlas-tools.record_outcome` is a
+      declared ledger/Neo4j mutation surface, while discovery itself performed
+      no tool call that writes state.
+- [x] Confirmed the result is protocol/surface reachability evidence, not
+      current-corpus lineage, ACE admission, or production retrieval proof.
+- [ ] Add the remaining timeout and mutation-surface probes before enabling
+      any optional MCP history or write path.
+
+Evidence: `docs/reports/mcp-tool-surface-live-v1.json` and
+`scripts/atlas/discover-mcp-tools-live-v1.mts`.
+Status: `MCP_SURFACES_REACHABLE_DISCOVERY_ONLY`; authority=false;
+writesPerformed=false. First blocker remains:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## GPU-ACE-ORNITH-READINESS-RECHECK-2026-09-12
+
+- [x] Read-only cross-lane receipt proves the bounded GPU/ACE/Ornith chain:
+      tile readback, GPU ordinal roundtrip, feature replay, context replay,
+      synthesis replay, claim validation, and read-only DAG checks all pass.
+- [x] Mutation remains blocked as designed. The receipt does not claim full
+      corpus CandidateOrdinal expansion or graph-revision ownership for the
+      128/768 scale.
+- [ ] Keep ACE promotion blocked until authoritative ordinal, feature, and
+      revision envelopes exist and explicit mutation authorization is supplied.
+
+Evidence: `docs/reports/parent-atlas-gpu-ace-ornith-readiness-v1.json`;
+`scripts/atlas/audit-parent-atlas-gpu-ace-ornith-readiness-v1.mjs`.
+Status: `GPU_ACE_ORNITH_READONLY_CHAIN_PROVEN`; authority=false;
+writesPerformed=false. First blocker:
+`FULL_CORPUS_CANDIDATE_ORDINAL_AND_GRAPH_REVISION_OWNERSHIP_MISSING`.
+
+## TEMPORAL-SCHEMA-SURFACES-RECHECK-2026-09-12
+
+- [x] Read-only temporal schema audit found all `6/6` expected tables and no
+      missing required columns. Database error: none.
+- [x] The schema accepts nullable workspace revisions where historical rows
+      require them; this is schema presence proof, not artifact-current-owner
+      or supersession proof.
+- [ ] Keep temporal action-history and artifact-supersession admission open
+      until ordered revision frames and predecessor/replacement evidence exist.
+      No tables, events, owners, or supersession records were mutated.
+
+Evidence: `docs/reports/temporal-schema-surfaces-v1.json`;
+`scripts/atlas/audit-temporal-schema-surfaces-v1.mjs`.
+Status: `SCHEMA_SURFACES_PRESENT_SUPERSESSION_PROOF_OPEN`;
+authority=false; writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_CHAIN_UNPROVEN`.
+
+## TEMPORAL-CURRENT-OWNER-RECHECK-2026-09-12
+
+- [x] Read-only current-owner projection audit found no temporal events or
+      projected entities: `0` events, `0` entities, `0` active owners, and
+      `0` superseded/terminal artifacts.
+- [x] No ambiguous active owners or revision-bound/unbound rows were observed;
+      the result is an empty projection, not proof of a valid current owner.
+- [ ] Keep artifact supersession and current-owner admission blocked until two
+      ordered immutable frames and explicit predecessor/replacement evidence
+      exist. No events, owners, or projections were written.
+
+Evidence: `docs/reports/temporal-current-owner-projection-v1.json`;
+`scripts/atlas/audit-temporal-current-owner-projection-v1.mjs`.
+Status: `CURRENT_OWNER_NOT_PROVEN_NO_EVENTS`; authority=false;
+writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_EVENTS_MISSING`.
+
+## TEMPORAL-LOGICAL-IDENTITY-RECHECK-2026-09-12
+
+- [x] Read-only logical-identity audit found one observed frame containing
+      `61,718` logical packet identities. Every identity has exactly one
+      observed version in this frame; no multi-version identity or
+      supersession relationship was inferred.
+- [x] The audit keeps `packet_key` as the proposed logical identity and
+      treats source/workspace revisions as version coordinates. It does not
+      synthesize revision-bearing identity or promote a timestamp to
+      supersession evidence.
+- [x] Receipt checksum: `d31b1613b9b6cd9f269caf161304c65871fb6c4610ec8d2c56e9c44799690cb0`.
+      Writes: `false`.
+- [ ] Artifact supersession remains unproven until at least two ordered,
+      immutable frames contain explicit predecessor/replacement evidence.
+
+Evidence: `docs/reports/temporal-logical-identity-v1.json`;
+`scripts/atlas/audit-temporal-logical-identity-v1.mjs`.
+Status: `SINGLE_FRAME_NO_SUPERSESSION_POSSIBLE`; authority=false;
+writesPerformed=false. First blocker:
+`ARTIFACT_SUPERSESSION_EVENTS_MISSING`.
+
+## ACE-LIVE-DRY-INPUT-RECHECK-2026-09-12
+
+- [x] Read-only ACE input readiness check ran through the correct TypeScript
+      entrypoint and found all three authoritative inputs missing:
+      `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1`.
+- [x] Cross-contract verification was not attempted because the required
+      inputs were absent. Candidate-source authority remained false.
+- [ ] Keep ACE packet/cache materialization blocked; do not synthesize these
+      envelopes from fixture, Qdrant, graph ordinal, or stale aggregate data.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false. First blocker:
+`CANDIDATE_ORDINAL_FEATURE_AND_REVISION_ARTIFACTS_MISSING`.
+
+## TRACE-DISABLED-SEARCH-TOOLS-REINTEGRATION-RECHECK-2026-09-12
+
+- [x] Read-only audit confirmed the optional codebase, research, Bifrost, and
+      `rg_atlas` registries remain disabled by policy; seven search/dispatch
+      tools are not exposed as live tools.
+- [x] TRACE MCP remains reachable: `176` tools discovered, the read-only
+      search probe responded, and the static identity-envelope implementation
+      contains packet, source-revision, and workspace-revision lookup paths.
+- [x] Dependency readback is healthy for required MCP, Bifrost, synthesis,
+      Qdrant, Neo4j, PostgreSQL, and Redis services. The optional topology
+      endpoint is unavailable and does not authorize registry re-enablement.
+- [ ] Keep optional registries disabled until operator review, dependency
+      health, schema/identity regression tests, and bounded live readback are
+      separately proven for each family. No MCP mutation or datastore write
+      occurred.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`docs/reports/mcp-tool-surface-live-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; authority=false;
+writesPerformed=false. First blocker: `OPTIONAL_REGISTRIES_DISABLED_BY_POLICY`.
+
+## REPAIR-CANDIDATE-FEATURE-MATRIX-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only repair-candidate feature-matrix proof.
+- [x] The bounded matrix contains `15` candidates, preserves the `25`-feature
+      base plane, and exposes a `24`-feature repair overlay (`49` total).
+      The overlay is currently empty and replay is identical.
+- [ ] Keep repair-candidate execution and ACE admission blocked until
+      authoritative candidate/revision envelopes are supplied.
+
+Evidence: `docs/reports/current-repair-candidate-feature-matrix-v1.json`.
+Status: `REPAIR_CANDIDATE_FEATURE_MATRIX_CONTRACT_PROVEN`; authority=false;
+writesPerformed=false.
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only TRACE MCP disabled-search-tools audit.
+- [x] Confirmed the gateway and required dependencies respond; `176` live
+      tools are discovered and the read-only TRACE probe responds.
+- [x] Confirmed the seven optional codebase/research/Bifrost/rg-Atlas tools
+      remain disabled by policy.
+- [ ] Keep re-enablement closed until dependency health, identity-envelope
+      schemas, regression tests, and bounded live readback are proven.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; identity envelope live status is
+`LIVE_ENVELOPE_MISSING`; writesPerformed=false.
+
+### ACE-PROMPT-CACHE-CALLER-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE prompt-cache caller census.
+- [x] Confirmed `2` callers, with `0` strict V2 handoffs and `2` legacy or
+      uncertified callers.
+- [ ] Keep cache prefill handoff blocked until every caller emits the
+      revision/checksum-bound V2 context contract; no cache writes occurred.
+
+Evidence: `docs/reports/ace-prompt-cache-caller-audit-v1.json`;
+`scripts/atlas/audit-ace-prompt-cache-callers-v1.mjs`.
+Status: `CACHE_PREFILL_CALLER_HANDOFF_BLOCKED`; authority=false;
+writesPerformed=false.
+
+### MCP-COMPATIBILITY-CALLER-CENSUS-RECHECK-2026-09-12
+
+- [x] Completed the read-only compatibility census across `840` files.
+- [x] Recorded `18,077` MCP compatibility/caller references against registry
+      revision `sha256:f9b028031d84e8922dc3a02fc0dc19bb5d474c5695f58306054679b47b6f142e`.
+- [ ] Keep protocol/caller compatibility separate from live handshake,
+      executor capability, and mutation authorization; this census alone does
+      not prove any caller is safe to enable.
+- [x] No MCP tool was enabled, no server state was mutated, and no canonical
+      or projection datastore was written.
+
+Evidence: `docs/reports/mcp-compatibility-callers-v1.json`;
+`scripts/atlas/audit-mcp-compatibility-callers-v1.mjs`.
+Status: `MCP_COMPATIBILITY_CENSUS_PROVEN_LIVE_HANDOFF_OPEN`; authority=false;
+writesPerformed=false.
+### ATLAS-PACKETS-WORKSPACE-BINDING-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only packet/workspace-binding joinability check.
+- [x] Confirmed `61,718` packet rows, `111` joinable to workspace bindings,
+      and `0` joinable to the admitted workspace revision.
+- [ ] Keep packet revision admission and ACE/context promotion blocked until
+      packet rows are joined through the exact current workspace/source frame.
+
+Evidence: command output from `scripts/atlas/audit-atlas-packets-workspace-binding-joinability-v1.mjs`.
+Status: `PACKET_WORKSPACE_BINDING_ADMITTED_REVISION_EMPTY`;
+authority=false; writesPerformed=false.
+
+### ORNITH-VLM-OWNER-RECHECK-2026-09-12
+
+- [x] Re-ran the read-only VLM owner audit.
+- [x] Confirmed Ornith 1.5 VLM via llama.cpp `:8090/v1`, Docling's OpenAI
+      multimodal client, the official mmproj launcher profile, and no Ollama
+      VLM fallback in active paths.
+- [x] Confirmed the normal `dev:gpu` vision mode remains an explicit switch;
+      Ollama remains embedding fallback only.
+
+Evidence: `docs/reports/ornith-vlm-owner-audit-v1.json`.
+Status: `ORNITH_VLM_OWNER_STATICALLY_PROVEN`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-ONTOLOGY-RECHECK-2026-09-12
+
+- [x] Refreshed the read-only MCP tool ontology census: `176` tools across
+      the configured namespaces.
+- [x] Confirmed layer classification remains incomplete for `66` tools and
+      the registry exposes explicit read-write surfaces for Engram, database,
+      and graph operations.
+- [ ] Require per-tool mutation-surface, identity-envelope, and authority
+      classification before any optional registry or tool is re-enabled.
+
+Evidence: `docs/reports/mcp-tool-ontology.json`;
+`docs/reports/mcp-tool-ontology.md`.
+Status: `MCP_TOOL_ONTOLOGY_CLASSIFICATION_PARTIAL`; authority=false;
+writesPerformed=false.
+
+### ACE-PACKET-CACHE-REPLAY-RECHECK-2026-09-12-R2
+
+- [x] Ran the bounded ACE packet-cache replay.
+- [x] Confirmed miss-before-write, hit-after-write, and stale-lineage miss
+      behavior; replay status is `ACE_PACKET_CACHE_REPLAY_PROVEN`.
+- [x] Confirmed canonical authority remained false and no canonical store was
+      written.
+- [ ] Correct the replay gate's mutation declaration before treating it as a
+      read-only proof: the receipt reports `cacheWritePerformed=true`. Future
+      audits must use an explicit no-write mode or clearly classify this as a
+      cache mutation test.
+
+Evidence: command output from
+`scripts/atlas/prove-ace-packet-cache-replay-v1.mts`.
+Status: `ACE_PACKET_CACHE_REPLAY_PROVEN_WITH_CACHE_WRITE`;
+canonicalAuthority=false; canonicalWritesPerformed=false;
+cacheWritePerformed=true.
+
+### ACE-PACKET-CACHE-READ-ONLY-GUARD-2026-09-12
+
+- [x] Changed the ACE replay harness to default to read-only audit mode.
+- [x] Confirmed the default run reports `cacheWritePerformed=false`,
+      `canonicalWritesPerformed=false`, and preserves stale-lineage misses.
+- [x] Isolated the write-through replay behind the explicit `--write-test`
+      flag so a normal audit cannot mutate Valkey/Redis.
+- [ ] Keep write-test execution outside routine portfolio audits and require
+      separate authorization before using it.
+
+Evidence: `scripts/atlas/prove-ace-packet-cache-replay-v1.mts`;
+read-only command output from the default replay.
+Status: `ACE_PACKET_CACHE_READ_ONLY_AUDITED`; authority=false;
+cacheWritePerformed=false; writesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-GUARD-2026-09-12
+
+- [x] Changed the ACE context-cache replay harness to default to read-only
+      mode.
+- [x] Confirmed the default run preserves miss and stale-check behavior while
+      reporting `cacheWritePerformed=false`.
+- [x] Isolated write-through replay behind the explicit `--write-test` flag.
+- [ ] Keep write-test execution outside routine portfolio audits and require
+      separate authorization before using it.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+default replay output.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+cacheWritePerformed=false; writesPerformed=false.
+
+### ACE-CONTEXT-CACHE-READ-ONLY-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the ContextManifest/ACE cache replay without `--write-test`.
+- [x] Confirmed the disposable key was a miss before any write, the stale
+      manifest checksum was rejected, and no cache hit was synthesized.
+- [x] Confirmed `cacheWritePerformed=false`, `canonicalWritesPerformed=false`,
+      and `canonicalAuthority=false`.
+- [ ] Keep write-through replay opt-in and separately authorized; this proof
+      does not establish live ACE caller adoption or current-corpus lineage.
+
+Evidence: `scripts/atlas/prove-ace-context-cache-replay-v1.mts`;
+default read-only replay output.
+Status: `ACE_CONTEXT_CACHE_READ_ONLY_AUDITED`; authority=false;
+writesPerformed=false.
+
+### ACE-CONTEXT-CALLER-ADOPTION-RECHECK-2026-09-13-R1
+
+- [x] Ran the read-only ACE ContextManifest caller census across `36` caller
+      surfaces.
+- [x] Classified `13` surfaces as strict V2-wired, `21` as legacy
+      query-cache callers, and `2` as diagnostic-only; no dead callers were
+      found.
+- [ ] Keep live adoption open: the census does not identify a caller with a
+      validated server-owned revision bundle. The next gate is
+      `SELECT_CALLER_WITH_VALIDATED_REVISION_BUNDLE`.
+- [x] Confirmed `writesPerformed=false`; no cache, canonical, ranking, or
+      projection state was changed.
+
+Evidence: `docs/reports/ace-context-live-caller-adoption-v1.json`;
+`scripts/atlas/audit-ace-context-live-callers-v1.mjs`.
+Status: `ACE_CONTEXT_CALLER_ADOPTION_PARTIAL`; static V2 wiring is present,
+production revision-bundle adoption remains open.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only TRACE MCP disabled-search-tools audit.
+- [x] Confirmed `176` live tools, a responding read-only probe, and healthy
+      required MCP, Bifrost, synthesis, Qdrant, Neo4j, PostgreSQL, and Redis
+      dependencies.
+- [x] Confirmed the seven optional search/dispatch tools remain disabled and
+      the source identity envelope is implemented but absent from the live
+      result.
+- [ ] Keep optional registries and identity-dependent promotion closed; the
+      optional topology endpoint remains unavailable and no live envelope is
+      emitted.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED`; identityEnvelopeLiveStatus=
+`LIVE_ENVELOPE_MISSING`; authority=false; writesPerformed=false.
+
+### TRACE-IDENTITY-ENVELOPE-RECHECK-2026-09-14
+
+- [x] Re-ran `scripts/atlas/audit-trace-disabled-search-tools-v1.mjs` in
+      read-only mode. The endpoint remains healthy, the seven optional search
+      tools remain disabled, and `kb.trace_search` responds.
+- [x] Corrected the current status interpretation: the audit reports
+      `staticIdentityEnvelope.implementationPresent=false`,
+      `envelopeFieldPresent=false`, `sourceRevisionLookupPresent=false`, and
+      `workspaceRevisionLookupPresent=false`. Exact packet lookup exists, but
+      that is not a revision-qualified identity envelope.
+- [ ] Add the live TRACE request-envelope implementation only after the
+      server-owned revision bundle exists; keep optional tools and promotion
+      closed until bounded disabled-tool replay proves delivery.
+
+Status: `DISABLED_SEARCH_TOOLS_AUDITED_IDENTITY_IMPLEMENTATION_MISSING`;
+`authority=false`; `writesPerformed=false`.
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`.
+
+### ACE-LIVE-INPUT-READINESS-RECHECK-2026-09-12-R2
+
+- [x] Re-ran the read-only ACE live-input readiness check.
+- [x] Confirmed `CandidateOrdinalMapV1`, `CandidateFeatureSnapshotV1`, and
+      `RevisionAuthorityEnvelopeV1` are all missing as explicit arguments.
+- [x] Confirmed cross-contract verification was not attempted and datastore
+      and cache writes remained false.
+- [ ] Keep ACE/context materialization and bounded execution blocked until
+      these three authoritative envelopes are supplied; do not synthesize
+      replacements from fixtures, Qdrant IDs, graph ordinals, or stale data.
+
+Evidence: `docs/reports/ace-live-dry-input-readiness-v2.json`;
+`scripts/atlas/audit-ace-live-dry-input-readiness-v2.mts`.
+Status: `ACE_LIVE_DRY_INPUT_BLOCKED`; authority=false;
+writesPerformed=false; cacheWritesPerformed=false.
+
+### `CURRENT-STRUCTURAL-LINEAGE-01` — real coverage characterized 2026-09-13, genuine data gap confirmed (not a logic bug)
+
+**Context**: following the `CURRENT-SOURCE-AUTHORITY-REPAIR-PLAN-02` fix above (file-content
+authority now proven 97.7% exact for owner run `48485685-e773-4433-a1f8-00f5524cca44`, 23,758
+sources), checked whether the SAME kind of comparison-logic bug explained
+`CURRENT-STRUCTURAL-LINEAGE-01`'s persistent `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN` /
+`lineageBridgeMatches: 0` result. It does not — this one is a genuine, large data gap.
+
+**Why the selected execution shows 0/3 bridge matches (not a bug)**: `audit-selected-graphify-
+structural-lineage-v1.mjs` reconciles against `promotion-gate-receipt-currentness-v1.json`'s
+`admittedExecutionId` — which resolves to `c531a1b0-c932-482f-8a21-5d067f504a13`, one of THIS
+session's own bounded structural canaries (built for `GRAPHIFY-STRUCTURAL-CODE-CANARY-02`/
+`GRAPHIFY-DAILY-COORDINATOR-01`, 1-3 files, never intended to populate
+`atlas_packet_chunk_lineage`). It is correctly selected as "the" execution because it is the
+**only** `graphify_executions` row ever bound to the admitted workspace revision
+(`sha256:322ed1a6...`) — `atlas_workspace_source_bindings` has 0 rows for that revision, so no
+real full-scale Graphify run has ever completed against it. 0/3 bridge matches is the honest,
+correct answer for that selection, not a defect.
+
+**Characterized the real gap directly (read-only SQL, no writes)**: rather than re-select a
+different execution (the owner run `48485685-...` predates `graphify_execution_file_membership_v2`
+and has 0 rows there, so the script's execution-scoped query path can't be pointed at it directly),
+queried `atlas_packet_chunk_lineage`/`atlas_packets` directly against the owner run's 23,758
+sources:
+
+```sql
+owner_run_sources (distinct)     23,758
+with_any_lineage_row              7,421 rows (multi-member inflated; not per-source)
+with_revision_matched_lineage     6,781 rows (source_revision agrees)
+distinct_packets_resolved           627  ← real, distinct source files with a proven bridge
+```
+
+**Conclusion: only ~627/23,758 (≈2.6%) of the current owner run's real files have a genuine,
+revision-matched, packet-resolved structural lineage bridge.** This is a real, large,
+un-glossed-over data gap — not a comparison bug, not something a quick fix closes. Closing it
+requires either (a) running real Graphify chunk-extraction/packet-materialization across the
+remaining ~23,000 files (a large, resource-intensive, long-running operation touching
+Postgres/Qdrant at production scale), or (b) accepting partial coverage and re-scoping what
+"structurally proven" means for promotion purposes. **Neither decision was made here** — per this
+file's own repeated caution against running full Graphify indexing "merely because the map is
+stale," and because a full materialization run is exactly the kind of large, hard-to-reverse,
+resource-intensive action this repo's rules require explicit operator authorization for, not a
+unilateral continuation of "iterate on P0."
+
+Status: `CURRENT_STRUCTURAL_LINEAGE_01_GAP_CHARACTERIZED_NOT_CLOSED`. Real number now known
+(627/23,758 ≈ 2.6%) where before it was an opaque "0 matches, unclear why." Closing this gap is a
+scale-of-materialization decision for the operator, not a bug fix — flagged as the concrete next
+decision point for P0, not attempted unilaterally.
+
+**Session summary for this P0 iteration**: two real, verified bugs found and fixed
+(`plan-current-source-authority-repair-v1.mts`'s wrong-column comparison;
+`audit-promotion-board-reconcile-v2.mjs`'s stale hardcoded `nextGateQueue` note), one real data gap
+newly characterized with hard numbers (structural lineage bridge, 2.6% real coverage). P0 itself
+(`atlas_workspace_source_bindings` has 0 rows for the admitted revision, and only 2.6% of the real
+owner run's files have a structural lineage bridge) remains open and is now better understood, not
+resolved — full resolution requires an operator decision on whether to authorize a large-scale
+Graphify materialization run, or to re-admit/reconcile the owner run's `sha256:e0dc2711...`
+revision label against the tournament-admitted `sha256:322ed1a6...` some other way.
+
+### TURBOVEC-CUVS-READINESS-RECHECK-2026-09-13-R1
+
+- [x] Re-ran the TurboVec/cuVS readiness auditor in explicit `--dry-run` mode
+      after changing report persistence to atomic replacement for Windows.
+- [x] The report completed safely with status `LIVE_ACCELERATOR_CHAIN_BLOCKED`
+      and blocker `LIVE_PROBE_SKIPPED_DRY_RUN`; both TurboVec and cuVS remain
+      `NOT_PROVEN` because live probes were intentionally skipped.
+- [ ] Keep live accelerator admission separate from dry-run safety. Do not
+      infer endpoint health, CUDA availability, PyTorch/cuVS capability, or
+      projection authority from this dry-run receipt.
+- [x] Confirmed `canonicalAuthority=false` and `writesPerformed=false`.
+
+Evidence: `docs/reports/turbovec-cuvs-readiness.json`;
+`scripts/atlas/audit-turbovec-cuvs-readiness.mjs`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false.
+
+### TURBOVEC-CUVS-LIVE-READINESS-RECHECK-2026-09-13-R2
+
+- [x] Ran the live read-only TurboVec/cuVS health probe. TurboVec is
+      reachable and ready at `8791` with `109,248` indexed items, `64`
+      dimensions, and 4-bit configuration; it remains a derived executor.
+- [x] The 8098 RAPIDS sidecar is reachable with CUDA available on an
+      `NVIDIA GeForce RTX 3060 Ti`, but reports `torchAvailable=false` and
+      `ready_for_use=false`. The live blocker is
+      `RAPIDS_CUDA_TORCH_EXECUTION_NOT_PROVEN`.
+- [ ] Keep cuVS/CUDA execution and GPU ordinal parity blocked until the 8098
+      runtime exposes the required PyTorch/cuVS capability and the exact
+      roundtrip proof passes. Do not add PyTorch to the RAPIDS image or rebuild
+      it from this health result alone.
+- [x] Confirmed both services remain execution-only/derived and the probe
+      performed no PostgreSQL, Qdrant, Valkey, model, or projection writes.
+
+Evidence: `docs/reports/turbovec-cuvs-readiness.json`;
+`scripts/atlas/audit-turbovec-cuvs-readiness.mjs`.
+Status: `LIVE_ACCELERATOR_CHAIN_BLOCKED`; authority=false;
+writesPerformed=false.
+
+**Session handoff note (2026-09-13, ahead of an expected rate-limit reset ~20:00) — pick up here
+next session, do not re-derive from scratch:**
+
+Waiting on an explicit operator decision before any further P0 write action (asked, not yet
+answered as of this note):
+1. Authorize a large-scale real Graphify structural materialization run (chunk-extraction +
+   packet-write) across the ~23,000 owner-run files still missing an `atlas_packet_chunk_lineage`
+   bridge row (currently 627/23,758 ≈ 2.6% coverage) — a long-running, resource-intensive,
+   production-Postgres/Qdrant-touching operation, **not** to be started unilaterally; OR
+2. Work the workspace-revision identity reconciliation instead (owner run's real data is labeled
+   `sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb`; the tournament-
+   admitted revision is `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`;
+   `atlas_workspace_source_bindings` has 0 rows for the admitted one).
+
+Nothing else is mid-edit or half-applied: both script fixes this session
+(`plan-current-source-authority-repair-v1.mts`, `audit-promotion-board-reconcile-v2.mjs`) are
+complete, live-verified, and committed to this file's record above. No pending writes, no open
+transactions, no uncommitted schema changes. `npx openspec validate --strict
+parent-atlas-ace-rlm-bitfrost-integration` passes clean as of this note.
+
+### SOURCE-TEXT-ENCODING-01-RECHECK-2026-09-13
+
+- [x] Ran `node --test scripts/atlas/lib/source-text-envelope.test.mjs`.
+- [x] All `11/11` tests pass for UTF-8, UTF-8-BOM, UTF-16LE/BE BOM,
+      malformed UTF-8 rejection, JSON decoding, CRLF normalization, emoji
+      surrogate pairs, and byte-boundary validation.
+- [x] The source envelope remains fail-closed: BOM-less UTF-16 is not guessed,
+      malformed input is rejected, and canonical coordinates remain UTF-8
+      byte offsets while LSP conversion remains UTF-16 transport metadata.
+- [ ] Live extractor readback is still open. The extractor currently blocks
+      before `--help` returns in this environment, so no live source scan was
+      attempted and no `graphify_symbols` write is authorized by this proof.
+- [x] No database, graph, vector, cache, model, or projection writes occurred.
+
+Evidence: `scripts/atlas/lib/source-text-envelope.mjs`;
+`scripts/atlas/lib/source-text-envelope.test.mjs`.
+Status: `SOURCE_TEXT_ENCODING_PROVEN_BOUNDED`; live extractor readback open;
+authority=false; writesPerformed=false.
+
+### SOURCE-TEXT-EXTRACTOR-CLI-REACHABILITY-RECHECK-2026-09-13
+
+- [x] Added an early `--help` / `-h` path to
+      `scripts/atlas/graphify-symbol-extractor-v1.mts` so documentation and
+      argument discovery do not require a PostgreSQL connection.
+- [x] Verified the help path returns successfully through `npx tsx` and
+      lists the bounded, source-targeting, LSP, and explicit-apply options.
+- [x] This is a CLI reachability fix only; it does not alter extraction,
+      identity reconciliation, parse status, or apply behavior.
+- [ ] Live read-only extractor execution remains open and must use an exact
+      admitted source selection before any scan. `--apply` remains an explicit
+      mutation path and is not authorized by this change.
+- [x] No database, graph, vector, cache, model, or projection writes occurred.
+
+Evidence: `scripts/atlas/graphify-symbol-extractor-v1.mts`;
+`scripts/atlas/lib/source-text-envelope.test.mjs` (11/11).
+Status: `EXTRACTOR_CLI_REACHABLE`; live source readback and current-lineage
+admission remain open; authority=false; writesPerformed=false.
+
+### SOURCE-TEXT-EXTRACTOR-DRY-RUN-RECHECK-2026-09-13
+
+- [x] Ran the extractor in default dry-run mode with `--limit 1`.
+- [x] One live `graphify_files` candidate was read as Markdown and produced
+      `9` structural observations; no parse failure occurred.
+- [x] `apply=false`, `filesProcessed=0`, and `totalSymbolsInserted=null`
+      confirm this was planning/readback only; no parse status or symbol rows
+      were changed.
+- [x] An exact source-targeted dry-run also completed successfully but found
+      `0` matching rows, so source targeting is not evidence that the named
+      path belongs to the current database cohort.
+- [ ] Keep live symbol materialization and current-source authority blocked
+      until the selected source reference, workspace revision, and execution
+      membership are proven as one admitted frame.
+
+Evidence: `docs/reports/graphify-symbol-extractor-v1-1789266360564.json`;
+`scripts/atlas/graphify-symbol-extractor-v1.mts`.
+Status: `EXTRACTOR_READONLY_DRY_RUN_PROVEN`; current-source lineage and apply
+authorization remain open; authority=false; writesPerformed=false.
+
+### MCP-TOOL-SURFACE-RECHECK-2026-09-13-R1
+
+- [x] Ran the existing read-only static MCP tool-surface audit with JSON
+      output. It found `179` registrations, `177` unique names, and `2`
+      gated registrations.
+- [x] Two cross-file name collisions remain: `trace.kag_search` is registered
+      by `dispatcher-tool-integration.ts` and `trace-mcp-server.ts`;
+      `context.prefetch_feature_context` is registered by `new_tools.ts` and
+      `trace-mcp-server.ts`.
+- [ ] Keep both collisions open for owner review. Do not resolve them by
+      deleting or enabling a registration; first compare live reachability,
+      schemas, transport, and compatibility aliases against the current TRACE
+      `tools/list` receipt.
+- [x] Existing handler-alias groups were reported for review, but shared
+      `createToolWithDispatcher` does not alone prove duplicate semantics.
+- [x] Confirmed the audit is static/read-only and performed no MCP, database,
+      cache, model, graph, or projection writes.
+
+Evidence: `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs`;
+read-only JSON audit output from `node scripts/audit-mcp-tool-surface.mjs
+--json`.
+Status: `MCP_STATIC_SURFACE_COLLISIONS_OPEN`; authority=false;
+writesPerformed=false.
+
+### MCP-TOOL-SURFACE-COMMENT-FILTER-RECHECK-2026-09-13-R1
+
+- [x] Corrected `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs` to
+      remove block and line comments before registration matching while
+      preserving source newlines for diagnostics.
+- [x] Re-ran the static audit: registrations decreased from `179` to `178`,
+      and the documented-only `trace.kag_search` false positive disappeared.
+- [x] One real cross-file collision remains:
+      `context.prefetch_feature_context` is registered by both
+      `src/mcp/new_tools.ts` and `src/mcp/trace-mcp-server.ts`.
+- [ ] Keep the remaining collision open until the two schemas, handlers,
+      transport owners, and live `tools/list` exposure are compared. Do not
+      delete, rename, or enable either registration from this static result.
+- [x] Confirmed no MCP server, database, cache, model, graph, or projection
+      write occurred.
+
+Evidence: `sveltekit-frontend/scripts/audit-mcp-tool-surface.mjs`;
+read-only JSON audit output after comment filtering.
+Status: `MCP_STATIC_AUDIT_FALSE_POSITIVE_REMOVED_ONE_REAL_COLLISION_OPEN`;
+authority=false; writesPerformed=false.
+
+### MCP-TOOL-SURFACE-TRANSPORT-OWNER-RECHECK-2026-09-13-R1
+
+- [x] Confirmed `trace-mcp-server.ts` creates the `trace-mcp-server` MCP
+      instance, registers `new_tools.ts` through `registerNewTools(...)`, and
+      serves that single registry over TRACE HTTP or stdio transport.
+- [x] Confirmed `server-fastmcp.ts` creates a separate FastMCP instance named
+      `deeds-codebase-intel`, starts its own stdio transport, and does not call
+      `registerNewTools(...)`. Its `trace.kag_search` is therefore not a
+      same-process duplicate of the filtered collision.
+- [x] Reclassified `context.prefetch_feature_context` as a cross-server
+      namespace overlap: the `new_tools.ts` registration is in the TRACE
+      server's shared registry, while the second registration in
+      `trace-mcp-server.ts` is the richer direct TRACE bridge. This is a
+      client-configuration/ownership review item, not proof of two handlers
+      executing in one MCP instance.
+- [x] Compared the registrations: `new_tools.ts` accepts optional `path` or
+      `query`, `limit`, activity, community, notecard, and AGENTS.md controls
+      and delegates to `buildFeaturePrefetchContext`; the direct TRACE
+      registration requires `query` and uses `file_path`, `top_k`, KB, and
+      Karpathy controls for a different richer response path. The schemas are
+      not wire-compatible aliases and must not be silently merged.
+- [ ] Compare the two prefetch schemas and response contracts against the
+      current live TRACE `tools/list` receipt, then choose one compatibility
+      policy for clients that configure both servers. Do not delete, rename,
+      enable, or merge either registration in this read-only gate.
+
+Evidence: `sveltekit-frontend/src/mcp/trace-mcp-server.ts` (server creation,
+`registerNewTools(...)`, and direct prefetch registration);
+`sveltekit-frontend/src/mcp/new_tools.ts` (`registerNewTools` prefetch
+registration); `sveltekit-frontend/src/mcp/server-fastmcp.ts` (separate
+`FastMCP` instance and stdio start).
+Status: `CROSS_SERVER_NAMESPACE_OVERLAP_CONFIRMED_SCHEMA_COMPARISON_OPEN`;
+authority=false; writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-RECHECK-2026-09-13-R3
+
+- [x] Re-ran the read-only disabled-search-tools audit with optional
+      registries still disabled by policy.
+- [x] Confirmed `7` disabled tools across codebase, research, Bifrost, and
+      `rg-atlas` families; live TRACE exposes `176` tools.
+- [x] Read-only `kb.trace_search`, `trace.kag_search`, and
+      `trace.system_health` probes responded. Required MCP, Bifrost,
+      synthesis, Qdrant, Neo4j, PostgreSQL, Redis, and Go Retrieval checks
+      were healthy; optional topology endpoint was unavailable.
+- [x] Static implementation contains packet, source-revision, and
+      workspace-revision envelope lookups, but the live read-only result still
+      lacks that identity envelope. Promotion remains false.
+- [ ] Keep optional registries disabled until operator review, dependency
+      health, schema/identity regression tests, bounded live readback, and a
+      live identity-envelope proof all pass. This receipt does not authorize
+      enabling, merging, or renaming tools.
+- [x] Confirmed `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SEARCH_TOOLS_AUDITED_IDENTITY_ENVELOPE_LIVE_OPEN`;
+authority=false; writesPerformed=false.
+
+### TRACE-DISABLED-SEARCH-TOOLS-SCHEMA-RECHECK-2026-09-13-R1
+
+- [x] Extended the existing read-only auditor with per-tool live schema
+      presence, schema keys, and deterministic schema fingerprints.
+- [x] Confirmed all `7` disabled search/dispatch tools are absent from the
+      live `tools/list` response, so no live schema can yet be compared for
+      re-enablement.
+- [ ] Preserve the re-integration gate: once a tool is explicitly enabled,
+      capture its live input schema and compare it to the source contract,
+      then run identity-envelope, timeout, mutation-surface, and bounded
+      readback tests before admission.
+- [x] Confirmed the audit remains read-only and `writesPerformed=false`.
+
+Evidence: `docs/reports/trace-disabled-search-tools-v1.json`;
+`scripts/atlas/audit-trace-disabled-search-tools-v1.mjs`.
+Status: `DISABLED_SCHEMA_FINGERPRINT_AUDIT_READY_TO_COMPARE_ON_REENABLE`;
+authority=false; writesPerformed=false.
+
+### Workspace-revision identity reconciliation — read-only content-level comparison (2026-09-13, continued)
+
+**Question investigated**: are `sha256:322ed1a6...` (tournament-admitted, sealed 2026-09-11,
+25,291 sources / 24,205 `repo:root`) and `sha256:e0dc2711...` (the label actually attached to
+23,758 real `graphify_files` rows, the dominant live Graphify cohort) two genuinely different
+codebase states, or the same underlying lineage labeled by two different revision-computation
+methodologies at two close points in time? Purely read-only: loaded the admitted snapshot's own
+manifest file directly and joined it against live `graphify_files` rows in Postgres by `source_ref`,
+comparing `content_hash` values. No writes, no schema changes, no identity decisions made.
+
+```
+admitted repo:root sources:          24,205
+e0dc2711 owner-run distinct refs:     23,758
+present in both:                      23,745
+content_hash EXACT match:             23,369  (98.4%)
+content_hash mismatch:                   376  (1.6%)
+```
+
+**The 376 mismatches are not evidence of a different lineage** — spot-checked and every one is a
+file known to be actively, repeatedly edited across sessions in this exact time window:
+`.claude/settings.json`, `.claude/settings.local.json`, `.mcp.json`, `claude.md`,
+`TRACE-MCP-AUDIT-COMPLETE.md`. These are precisely the files this file's own "Follow-up" sections
+elsewhere already document as edited today. Normal ~2-day drift between a sealed snapshot
+(2026-09-11) and a live, actively-edited cohort, not corruption or a different repository state.
+
+**Conclusion (evidence only, no decision made)**: `322ed1a6` and `e0dc2711` describe the *same*
+underlying codebase lineage at two close points in time — 98.4% file-identical — not two
+incompatible histories. This meaningfully lowers the risk of the "re-admit/reconcile e0dc2711"
+path flagged in the previous follow-up above, compared to treating it as an unrelated or
+unvalidated revision label. **Still not acted on**: no `atlas_workspace_source_bindings` write, no
+re-admission, no revision-identity decision made here — this is additional evidence for whoever
+makes that call next, not the call itself.
+
+Status: `WORKSPACE_REVISION_IDENTITY_CONTENT_OVERLAP_CHARACTERIZED_98PCT4`. Read-only, no
+production state changed. Script: ad hoc, not committed (scratch comparison under job tmp dir);
+the query pattern (`workspace-source-snapshots/<hash>.json` sources filtered to `repo:root`, joined
+by `source_ref` against `graphify_files.content_hash` for a target `workspace_revision`) is simple
+enough to be reproduced directly if this needs re-verifying later.
+
+### P0 breakthrough — real workspace-source bindings written for the admitted revision, GROUNDED gate reached for the first time (2026-09-13, continued)
+
+**Following operator direction ("c" = proceed with the workspace-revision identity reconciliation)**,
+built and ran `scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs`
+(new, dry-run-default/`--apply`-gated, matching this repo's writer-safety convention). It binds
+`atlas_workspace_source_bindings` rows for the tournament-admitted revision
+(`sha256:322ed1a6...`) using ONLY content-hash-exact matches against the live `e0dc2711` owner
+run — never a fabricated or approximate identity.
+
+**Real, unexpected finding discovered mid-build**: `atlas_source_refs` (the table
+`atlas_workspace_source_bindings.canonical_source_ref` has an FK against) is a
+**symbol/fragment-level registry**, not a file-level one — 22,487 of its 22,604 rows for this repo
+are `path#symbol` compound keys; only **117** are bare, whole-file-level entries (some existing
+rows use a `#file` fragment convention, e.g. `+page.ts#file`, confirming file-level entries are a
+recognized but barely-populated pattern here). This is very likely the same root cause behind
+`CURRENT-STRUCTURAL-LINEAGE-01`'s 2.6% bridge coverage finding above — both gates ultimately
+depend on a source-identity registry that was populated at the symbol/chunk level, not the raw-file
+level, for the vast majority of the codebase.
+
+**Applied (real, live, verified)**:
+```
+admitted repo:root sources:        24,205
+  notInGraph (no live Graphify row):   460
+  contentMismatch (edited since):      376
+  notInRegistry (no atlas_source_refs entry): 23,252  ← the real bottleneck found above
+  candidateBindings:                    117
+INSERTED: 117 / READBACK: 117 — BINDINGS_INSERT_AND_READBACK_PROVEN
+```
+Verified live in Postgres: `atlas_workspace_source_bindings` now has **117 real rows** for
+`sha256:322ed1a6...` — this table had **zero** rows for the admitted revision for the entire
+duration of this multi-session effort until this write.
+
+**Immediate downstream effect, live-verified**: re-ran `symbol-reconciliation-writer-v1.mts`
+(no synthetic revision override — the real admitted revision, default invocation) —
+**`gate.status: "GROUNDED"`** for the first time ever against the real admitted revision
+(previously always `BLOCKED_ON_UNGROUNDED_REVISION`). `boundSourceRefCount: 117`,
+`symbolRowCount: 24`. Ran `--apply`: `action: "CANONICALIZATION_APPLIED"`,
+`canonical_identity_created: false` (the 24 nominations resolved against already-existing
+canonical symbols rather than minting new ones — a legitimate, correct outcome, not a bug).
+
+**Separate loose end found and cleaned up while verifying**: discovered 49 leftover rows in both
+`atlas_symbol_registry` and `atlas_symbol_versions` from an earlier session's
+`smoke-graphify-symbol-lane-v1.mjs` run that did NOT fully clean up as its own design intended
+(namespaced `sha256:test-symbol-lane-smoke-*`, fake file paths — never collided with real
+production symbol resolution, but was clutter in a production table). Deleted both sets (49 + 49)
+in a single transaction, verified 0 remaining afterward. Not related to the P0 write above; found
+incidentally while checking `created_at` timestamps to confirm the real apply's provenance.
+
+**Effect on the promotion board (re-ran `audit-promotion-board-reconcile-v2.mjs`, read-only,
+`writesPerformed: false`)**: `board.sourceAuthority.currentWorkspaceOwnerProven` flipped
+**`false` → `true`** — real, measurable, verifiable progress, not cosmetic. `safeToProject` remains
+`false` because `sourceMembershipProven` (the deeper structural chunk/packet bridge,
+`CURRENT-STRUCTURAL-LINEAGE-01`) is unaffected by this write — that gate still reconciles against
+the tiny 1-3-file canary execution, not this 117-row binding set, and its own real gap (2.6%
+coverage on the full owner run, characterized in the follow-up above) is untouched by this step.
+
+**What this does and does not mean**: this is real, non-synthetic, verified forward progress on
+P0's file-authority half — the admitted revision is no longer completely ungrounded, for the first
+time. It does **not** mean P0 is closed. The two harder remaining pieces are unchanged from
+before: (1) scaling `atlas_source_refs`/structural-lineage coverage from ~0.5%/2.6% to something
+materially higher (a real, large indexing task, not a bug fix), and (2) the semantic/judgment
+corpus gates, which require actual human relevance-grading work, not automation.
+
+Status: `ADMITTED_REVISION_PARTIALLY_GROUNDED_117_BINDINGS_LIVE_PROVEN`. Scripts:
+`scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs` (new).
+
+### `atlas_source_refs` populated at scale — 117 → 23,369 real bindings, 194 real canonical symbols (2026-09-13, continued)
+
+**Following operator direction ("populate atlas_source_refs with whole-file entries at scale")**,
+built `scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs` (new, dry-run
+default/`--apply`-gated). Reused the exact, already-established writer convention from
+`apply-current-source-registry-reconciliation-v1.mjs` (read directly before writing anything, per
+Duplication Prevention) rather than inventing a new key shape: `source_ref_key === relativePath`
+(bare path, no `#file` suffix — an earlier, unrelated, differently-shaped legacy entry had briefly
+suggested a `#file` convention; the real canonical writer proved that wrong), `source_type='code'`,
+`symbol_kind` left NULL, `content_hash` bare 64-hex sha256. Scope: only the same content-exact-match
+candidate pool already computed by the binding-apply script (never unrelated or unverified data).
+
+```
+BEFORE: atlas_source_refs file-level rows:        117
+Dry-run candidateInserts:                       23,252
+APPLIED: inserted 23,252 / readback 23,252 — FILE_LEVEL_SOURCE_REFS_INSERT_AND_READBACK_PROVEN
+AFTER:  atlas_source_refs total: 45,856 (22,487 symbol-level UNCHANGED + 23,369 file-level)
+```
+
+Verified the 22,487 pre-existing symbol/fragment-level rows were untouched (purely additive) by
+direct count before/after.
+
+**Immediate cascading effect, re-ran the binding-apply script**: `notInRegistry` dropped from
+23,252 → 0. Applied: **23,369 total real bindings now exist** for the admitted revision (up from
+117 minutes earlier, up from 0 for the entire session before that). Verified live in Postgres.
+
+**Re-ran `symbol-reconciliation-writer-v1.mts` against the real admitted revision**:
+`boundSourceRefCount: 23,369`, `symbolRowCount: 194` (up from 24 — more of the real
+`graphify_symbols` rows now tie to a bound sourceRef). First dry-run without `--allow-create`
+correctly resolved 0/194 to canonical (all newly-nominated, no pre-existing canonical match to
+reuse) — a legitimate, conservative outcome, not a bug. Re-ran with `--allow-create --apply`:
+**`canonical_symbol_count: 194`, `symbol_version_count: 194`, `canonical_identity_created: true`,
+`unresolved_symbol_count: 0`**. Verified live: `atlas_symbol_versions` now has 194 real rows for
+the admitted revision, joined back to real canonical symbol names/kinds from real source files
+(including `deeds_labs/archive/scaffolds/2026-08-12-parent-atlas-event-merkle-identity-pack/
+src/daily/parent-atlas-daily-compiler.ts` and `temp_poc_amqp_test/poc_amqp_diagnostics.mjs` — real,
+existing files, not fabricated).
+
+**Minor, non-blocking imprecision noticed, not fixed (flagged)**: a handful of `import type {...}`
+statement lines were classified `symbol_kind: 'function'` by the existing `ts-ast-extractor.mjs`
+walk rather than `'import'` — a pre-existing extractor classification looseness, out of scope for
+this step, does not affect the gate's correctness (still a real, non-fabricated symbol), just a
+future precision improvement.
+
+**Board-level effect (re-ran `audit-promotion-board-reconcile-v2.mjs`, read-only)**:
+`board.sourceAuthority.currentWorkspaceOwnerProven` remains `true` (already flipped by the prior
+117-row step). `sourceMembershipProven` remains `false` — this specific board field is derived from
+`CURRENT-STRUCTURAL-LINEAGE-01`'s OWN reconciliation, which still points at the tiny canary
+execution (`b337f94c-...`, 1 file), not this new 23,369-row binding set — today's work grounds the
+*source identity* layer, not the *structural chunk/packet bridge* layer characterized earlier
+(2.6% coverage). Those remain two genuinely different gates; closing this one does not
+automatically close that one.
+
+**What changed, stated precisely**: the admitted workspace revision went from having literally
+zero real source-identity grounding to having 23,369 real, content-verified source bindings and
+194 real canonical code symbols — a first-of-its-kind result for this revision across this whole
+multi-session effort. What remains open, unchanged: the structural chunk/packet lineage bridge
+(needs either large-scale materialization across the full owner run or a re-scoped definition of
+"proven"), and the semantic/judgment corpus gates (need real human relevance grading).
+
+Status: `ADMITTED_REVISION_SOURCE_IDENTITY_FULLY_GROUNDED_23369_BINDINGS_194_CANONICAL_SYMBOLS`.
+Scripts: `scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs` (new).
+- [x] ACE-GROUNDING-FAILCLOSED-01 expose one shared, pure ACE evidence-block
+  builder and require an explicit `ADMITTED` status before either prompt packet
+  or ACE-card evidence reaches bounded synthesis. `REJECTED`, null, and legacy
+  contexts without a status now return empty evidence blocks. Regression proof:
+  `scripts/atlas/agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs`.
+
+### TRACE representation-capability follow-up — source fixes verified, live replay still open (2026-09-14)
+
+The two downstream TRACE failures from the stale-runtime recheck are now separated
+from the source implementation status. The Qdrant path has a read-only
+`DenseRepresentationCapabilityV1` contract and `QdrantManager.getDenseRepresentationCapability()`;
+named collections resolve their configured vector name (for example `summary` on
+`summary_lenses_768`) instead of assuming the global `content` name. The capability
+checksum is verified before use and every result carries `writesPerformed=false`.
+The optional Engram 512-dimensional path now checks `information_schema` and returns
+typed `REPRESENTATION_UNAVAILABLE` when `hnsw_embedding_512` is absent; it does not
+issue query-path DDL, fabricate a truncated vector, or silently fall back.
+
+- [x] **TRACE-DENSE-CAPABILITY-DISCOVERY-01** source contract and Qdrant named-vector
+  resolution are implemented and focused-proven.
+- [x] **ENGRAM-OPTIONAL-REPRESENTATION-01** absent `hnsw_embedding_512` is represented
+  as a typed unavailable result with zero writes.
+- [x] Focused regression suite: `dense-representation-capability-v1.spec.ts`,
+  `qdrant-manager-named-vector.spec.ts`, and `engram-representation-result.spec.ts`;
+  **6/6 tests passed**.
+- [ ] **TRACE-ISOLATED-LIVE-PROOF-01** rerun a fresh isolated TRACE process and prove
+  the corrected Qdrant schema discovery and Engram optional-column behavior through
+  the actual HTTP/MCP path. The stable `:8788` process must not be restarted by this
+  audit; the prior readback was served by stale compiled code.
+- [ ] **TRACE-CUVS-SEMANTIC-768-ORACLE-01** build/read a revision-qualified
+  `semantic_768` snapshot and prove cuVS brute-force exact results against the same
+  PostgreSQL/pgvector cohort. Existing tiny-fixture cuVS evidence is not current-corpus
+  proof.
+- [ ] **TRACE-CUVS-CAGRA-01** measure CAGRA only as a challenger against that exact
+  cuVS oracle; retain it as quarantined until same-corpus recall, filter, revision,
+  and VRAM receipts pass.
+- [ ] **TRACE-SEMANTIC-EXECUTOR-SELECTION-01** prove Qdrant, pgvector, cuVS exact,
+  and CAGRA are executors of one `semantic_768` lane and do not create extra fusion
+  votes. No executor may become identity or cache authority.
+- [ ] **TRACE-GPU-POSTRANK-01** prove post-retrieval SIMT/cuTile feature parity on
+  the same candidate ordinal map; JSON remains control metadata only, not the numeric
+  GPU path.
+
+Current status: `SOURCE_FIXES_FOCUSED_PROVEN_LIVE_TRACE_RELOAD_AND_CUVS_PARITY_OPEN`;
+authority=false; `writesPerformed=false`. Do not enable optional TRACE registries,
+create `hnsw_embedding_512`, alter Qdrant schemas, backfill vectors, or promote cuVS/
+CAGRA from these source-level tests. Evidence: `sveltekit-frontend/src/lib/server/vector/
+dense-representation-capability-v1.ts`, `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts`,
+`sveltekit-frontend/src/mcp/memory-bridge.ts`, and the three focused test files above.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+## BitFrost warm preflight reconciliation — 2026-09-26
+
+- [x] `BITFROST-WARM-PREFLIGHT-01`: extended the existing legacy warm script's
+  read-only preflight to report an eligibility funnel (total rows, source ref,
+  feature id, source revision, workspace revision, and fully qualified rows).
+  The old `--apply` path is now fail-closed: its `bifrost:warm:v1:*` / `ace:*`
+  keys do not bind a CandidateOrdinal snapshot or ordinal-map checksum, so it
+  cannot write those legacy entries. The script still emits the plan/report.
+- [x] Live dry-run against `atlas_packets`: 61,718 total rows; 61,717 with a
+  source ref, 61,717 with a feature id, 16,151 with an admissible source
+  revision, and **0** with an admissible row-local workspace revision. This
+  initial pass planned 0 keys. Do not substitute workspace revisions from a
+  different relation without an exact owner-proven join.
+- [x] `BITFROST-WARM-SOURCE-BINDING-PREFLIGHT-01`: added an opt-in,
+  read-only join to `atlas_workspace_source_bindings`, requiring the explicit
+  admitted root mapping `repo:root -> deeds-web-app`, exact
+  `canonical_source_ref` + `source_revision`, and caller-supplied
+  `--workspace-revision=sha256:...`. For the explicitly selected current
+  revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+  the whole-ledger funnel found 2,475 exact feature-bearing packet bindings
+  among 61,718 packets; the join produced 2,475 unique packet keys and no
+  ambiguous matches. A limit-25 dry-run planned 25 packet, 25 feature, and 75
+  ACE/centroid-family keys. This is plan evidence only: the emitted legacy key
+  format still lacks CandidateOrdinal snapshot/map and admitted ACE packet
+  checksums, so the `--apply` path remains disabled. No workspace revision is
+  inferred when the explicit argument is absent.
+- [x] Fail-closed and regression verification: explicit-revision `--apply`
+  exited nonzero with `REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED`,
+  `writesPerformed=false`, and 0 applied writes. Existing BitFrost residency /
+  ACE cache identity suites passed 27/27; strict OpenSpec validation and scoped
+  `git diff --check` passed. The test pass validates the existing packet/cache
+  contract, not a live cache-warm caller.
+  The refreshed BitFrost audit reports 7 drift flags (six documented-active
+  families empty; three keys under the aspirational `ace:feature:*` family).
+  No Valkey writes were performed. MCP tools for Atlas/BitFrost are not exposed
+  in the current execution session; local MCP configuration is not proof of a
+  callable tool.
+- [ ] `BITFROST-LIVE-WARM-01`: remains open until a server-owned current
+  `ContextManifestV2`/ACE packet source supplies revision- and checksum-bound
+  entries, then one bounded disposable warm/readback/expiry canary passes.
+  Do not use the legacy generic warm script for live writes.
+
+Evidence: `scripts/atlas/warm-bitfrost-semantic-cache.mjs`,
+`docs/reports/bitfrost-semantic-cache-warm.json`, and
+`docs/reports/bitfrost-semantic-cache-audit.json`.
+
+### ACE-FSO-03 / Context handoff first-tranche checkpoint (2026-09-27)
+
+- [ ] **ACE-FSO-03-LIVE-WIRING:** exact reader and read-only runner remain
+  code-only until a valid immutable feature/representation/workspace revision
+  and current pinned CandidateOrdinal map are supplied. The prior receipt
+  `docs/reports/ace-fso-03-live-receipt-v1-20260927T000240Z.json` is retained
+  but non-admissible: it used `repr:unset`, and its missing count omitted nine
+  rejected candidates. The runner now rejects unresolved revision sentinels
+  before DB access and asserts accepted+rejected conservation.
+- [x] **CONTEXT-HANDOFF-FIXTURE-01:** existing ContextManifestV2→PromptPlanV1
+  and ACE prompt bridge fixture suites pass 9/9. This does not establish a live
+  CandidateOrdinal→ContextManifest caller or invoke a model.
+- [ ] **CONTEXT-HANDOFF-CANARY:** live evidence-bound CandidateOrdinal output
+  has not been supplied; keep model calls and cache writes disabled.
+
+Report: `docs/reports/graph-ace-gpu-first-tranche-20260927.md`.
+
+### Bifrost Atlas Tools bridge startup and tool-schema audit — 2026-09-27
+
+- [x] Added an idempotent atlas-tools stdio-to-HTTP bridge startup hook to
+  `sveltekit-frontend/scripts/start-trace-stack.ps1`. It accepts only the expected
+  bridge health identity, refuses to take over an occupied port, records the
+  process in the existing startup receipt, and redirects logs to `logs/sidecars/`.
+  The listener uses `:8794`; `:8792` is already assigned to TurboVec MCP.
+  PowerShell syntax validation passed. A separate bridge instance on `:8794`
+  passed health and JSON-RPC `tools/list` (10 tools). The older `:8792` instance
+  remains running until Bifrost is verified against `:8794`; do not mistake it
+  for TurboVec. The full launcher was not run because it starts other services.
+- [x] **BIFROST-MCP-CATALOG-RECONCILIATION-01:** live `/api/mcp/clients` reports
+  two healthy clients: TRACE has 177 tools and `is_code_mode_client=true`; the
+  Atlas bridge has 10 tools, with `tools_to_execute` allowlisting eight. The
+  Bifrost public `/mcp` surface lists those eight Atlas tools plus four generic
+  code-mode helpers (12 total). Thus the earlier “185 tools” was 177 internal
+  TRACE tools + eight allowlisted Atlas tools, not 185 prompt-visible schemas;
+  raw client registries total 187 (177 + 10). Bifrost intentionally hides the
+  TRACE catalog behind code mode rather than exposing 177 individual schemas.
+- [x] **MCP-TOOL-SCHEMA-COST-DIAGNOSIS-01:** on the frozen query
+  “Find LangGraph documentation and build grounded context for a RAG answer,”
+  the app selector requested eight names; six exactly match TRACE. The other
+  two (`codebase.rg_search`, `kb.search_cards`) are absent from TRACE's current
+  177-tool catalog. llama-server tokenization measured 30,922 tokens for the
+  full TRACE tool-schema list and 976 for the six matching schemas (96.8% lower
+  in this direct-TRACE comparison only). The actual Bifrost `/mcp` surface is
+  12 schemas / 2,112 tokens, of which its four code-mode helpers are 1,458
+  tokens. Do not present the selector delta as observed Bifrost savings: the
+  selector is not applied at the Bifrost boundary and two requested names do
+  not resolve.
+- [ ] **BIFROST-ATLAS-ENDPOINT-CUTOVER-01:** the saved `docker/bifrost/config.json`
+  now targets `:8794`, and that bridge answers health plus `tools/list` (10).
+  Bifrost was started before this endpoint edit. Read-only host socket census
+  shows an established connection on `:8792` and none on `:8794`, consistent
+  with the active Atlas client still using the pre-migration endpoint. Keep the
+  old bridge alive until an operator-approved Bifrost reload/restart proves the
+  client reconnects to `:8794`; then restore `:8792` for its assigned TurboVec
+  MCP task. Bifrost logs also show repeated Atlas client disconnect/reconnect
+  cycles at roughly 50-second intervals; determine whether that is expected
+  transport behavior or bridge session instability during the cutover.
+  Re-checked read-only 2026-09-27: neither `:8792` nor `:8794` answers
+  `GET /health` right now (curl exit 7, connection refused, on both); the
+  Bifrost service itself is up (`:3040/health` → `{"status":"ok"}`). This is
+  NOT a verification-only task as previously assumed — closing it requires an
+  operator-approved Bifrost reload/restart, which was not performed here. No
+  restart attempted; no checkbox flipped.
+- [ ] **MCP-TOOL-SELECTOR-ALIGNMENT-01:** decide whether the existing app
+  selector should target TRACE's exact registered names or remain outside the
+  Bifrost code-mode surface. Do not claim all eight selected tools are available
+  from TRACE until the two absent names are resolved by their existing owners.
+
+Evidence: read-only `http://127.0.0.1:3040/api/mcp/clients`, Bifrost `/mcp`
+`tools/list`, TRACE `:8788/mcp` `tools/list`, and tokenizer endpoint `:8090`.
+Bridge health/tool-list proofs passed on `:8792` and `:8794`. Saved config and
+startup target `:8794`; no Bifrost restart or cache warm was performed.
+No Bifrost restart, cache warm, or datastore mutation was performed.
+
+### ACE packet token-size canary — 2026-09-27
+
+- [x] Measured one real record from the checksum-verified
+  `atlas.ace-packets-v3-manifest.v1` artifact at
+  `.tmp/atlas/ace-packets-v3/20260925T220337Z/`. The selected record is the
+  first record in shard `ace-packets-v3-00001.ndjson`; the shard SHA-256 matches
+  the manifest (`0158ab66…5b66b9`). Its serialized JSON is 2,604 bytes, with
+  row SHA-256 `b9fc26f2…dbe1e29` and packet checksum
+  `sha256:778a603b…e95db76`.
+- [x] Read-only llama-server `:8090/tokenize` results, repeated three times:
+  the fixed one-line query (“Find LangGraph documentation and build grounded
+  context for a RAG answer.”) is 14 tokens; the ACE packet JSON is 1,080 tokens;
+  query + packet envelope is 1,100 tokens. All three repetitions matched.
+- [x] Live Bifrost `/api/config` reports
+  `mcp_disable_auto_tool_inject=true`; the saved config also has
+  `disable_auto_tool_inject=true`. This confirms the default tool-injection
+  control, but this tokenizer-only call bypassed Bifrost and does not measure
+  Bifrost request construction.
+- [ ] Cache reuse/prefill latency with this packet remains unmeasured. No
+  `/v1/chat/completions` call was made because that would exercise inference and
+  may populate runtime caches. No KV-cache or packet state was persisted.
+- Limitation: the sampled packet has CURRENT source identity but its summary
+  text is absent and representation, feature, and graph revisions are null.
+  The 1,100-token count is therefore a real composed-packet structural-cost
+  measurement, not proof of a fully revision-admitted ContextManifest/CHR97
+  payload or ACE packet savings.
+- [x] Compared existing lossless serialization choices on that same packet:
+  pretty JSON = 3,460 bytes / 1,488 tokens; compact JSON = 2,604 bytes /
+  1,080 tokens; MessagePack = 2,217 bytes and deep-equal after decode. Compact
+  JSON saves 856 bytes and 408 tokens versus pretty JSON. MessagePack saves
+  another 387 storage bytes (14.9%) versus compact JSON, but its Base64 and hex
+  text forms cost 2,235 and 4,369 tokens respectively. Therefore binary helps
+  storage/transport only when decoded before model input; it is not a prompt
+  compression format by itself. No new codec or packet schema was introduced.
+- MessagePack binary SHA-256 for this exact serialization:
+  `d49c1568d5de0e9ebffc07ecad5bec0a0ada5e29139d95e6b690db77931d0465`.
+  This is a bounded tokenizer/codec comparison, not a production ACE/CHR97
+  ContextManifest or cache-prefill proof.
+
+## STARTUP-BITFROST-WARM-DIAGNOSIS-01 (2026-09-27): why the workspace-open startup chain isn't warming BitFrost/Karpathy caches — two real, distinct causes found, neither is "the task didn't run"
+
+Operator asked why the daily-graphify startup chain didn't warm BitFrost/token/KV caches on
+folder open. Investigated live rather than guessed. Two real, separate root causes found —
+**neither is a startup-scheduling bug; both are pre-existing, correctly fail-closed gates that
+simply have no wired path to satisfaction yet**:
+
+**1. `karpathy:gpu` (the `gpu:karpathy:*` Redis warm step) always throws in its only npm form.**
+`.vscode/tasks.json`'s `"🌅 Startup: Daily Graphify Apply + Karpathy GPU (gated, 24h)"` task
+(`runOn: folderOpen`) calls plain `npm run karpathy:gpu` after `graphify:daily`. Ran it directly
+this session, live: `Error: KARPATHY_APPLY_ADMITTED_WORKSPACE_REVISION_REQUIRED` at
+`scripts/atlas/karpathy-gpu-enrich.mjs:623` — apply mode (the npm script's only mode; there is no
+`karpathy:gpu:dry` alias in `sveltekit-frontend/package.json`) hard-requires
+`ATLAS_WORKSPACE_REVISION` (a `sha256:` string) and `ATLAS_SOURCE_COHORT_CHECKSUM` env vars.
+**Searched the entire repo (`.mjs`/`.ts`/`.json`, excluding `node_modules`) for anywhere that sets
+either variable: zero matches outside the one file that reads them.** No wrapper script, no npm
+alias, no CI config, nothing computes or supplies an "admitted" workspace revision to this gate —
+it has had no possible caller since it was added. This is not a startup-timing issue: `npm run
+graphify:validate` passed clean (all critical services up, Postgres/Qdrant/Redis/embedding/LLM all
+healthy) immediately before this was tested, and the exact same PowerShell logic the VS Code task
+runs was replayed manually and reaches the `npm run karpathy:gpu` call correctly — it always throws
+at that point, startup or not.
+
+**2. The BitFrost semantic-cache warmer's `--apply` mode is intentionally, permanently blocked** —
+confirmed by reading its own header comment (`scripts/atlas/warm-bitfrost-semantic-cache.mjs`,
+not the different `scripts/cache/warm-bifrost-semantic-cache.mjs`): *"THIS script's `--apply` is
+permanently hard-blocked (`REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED`) until a revision-bound ACE
+packet identity/ordinal-map source exists"* — i.e. exactly `BITFROST-LIVE-WARM-01` above, still
+`NOT STARTED`. This is correct, deliberate design, not a bug — recorded here only to connect it to
+finding #1, since both mean the same underlying prerequisite (an admitted/revision-bound source) is
+missing, just gating two different scripts.
+
+**Live cache state confirmed cold** (2026-09-27, `docker exec legal-ai-valkey valkey-cli`): `DBSIZE`
+286, `gpu:karpathy:*` 0 keys, `bifrost:sem:*` 1 key, `bitfrost:*` 1 key — consistent with both gates
+above never having successfully applied.
+
+**3. Separately, unconfirmed**: the gated task's own log/stamp files
+(`logs/task-output/graphify-daily-apply-latest.log`, `.graphify-daily-apply-last-run`) do not exist
+at all today, which would also happen if the task's Postgres-readiness loop (180s timeout) expired
+before Docker/Postgres was up at whatever moment the folder was actually opened, or if VS Code
+never fired the `runOn: folderOpen` trigger for this specific task at all today. **Could not verify
+this from outside a live VS Code session** — flagged as unresolved, not asserted, per this repo's
+own evidence discipline (do not claim a cause without proof). Whichever of these did or didn't
+happen is moot for the actual warming outcome: even a perfect run would still die at the
+`karpathy:gpu` step per finding #1.
+
+**Not fixed this pass, deliberately**: did not fabricate a workspace revision or bypass either
+gate to force a warm write — both gates exist specifically to prevent writing Redis entries that
+aren't bound to a real, current, checksum-verified source, and inventing an "admitted" value to
+satisfy them would be exactly the kind of synthesized-revision shortcut this repo's evidence rules
+forbid. The real fix is either (a) build the missing admission/revision source both gates are
+waiting on (`BITFROST-LIVE-WARM-01`'s own stated prerequisite), or (b) a deliberate, reviewed
+decision on what a startup-time admitted workspace revision should mean and where it comes from —
+neither is a small change and neither was requested explicitly this session.
+
+## STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP: karpathy:gpu fixed for real, live-verified (2026-09-27, same day)
+
+Operator asked to fix what's fixable. Finding #1 above (karpathy:gpu's apply path had zero wired
+callers for its two required admission env vars) was a genuine plumbing gap, not an intentional
+block like finding #2 (`BITFROST-LIVE-WARM-01`) — so it was fixed, using only real, live data:
+
+- **`scripts/atlas/karpathy-gpu-enrich.mjs`** — minimal, additive patch: in `--dry-run
+  --dry-run-candidates` mode, after fetching the real candidate set, now emits one machine-readable
+  line — `KARPATHY_COHORT_JSON:{"sourceCohortChecksum":"<sha256 of sorted real stableKeys>",
+  "candidateCount":N,"limit":L,"mode":"topN|dirty"}` — before returning. No existing behavior changed
+  for any other flag combination.
+- **`scripts/atlas/run-karpathy-gpu-admitted-v1.mjs`** (new) — a thin wrapper that supplies both
+  required admission values from real data, never fabricated: (1) `ATLAS_WORKSPACE_REVISION` <- the
+  most recent COMPLETED `graphify_runs` row's real `sha256:`-prefixed `workspace_revision` (same
+  semantics as `resolveCurrentGraphifyWorkspaceRevision()` in
+  `sveltekit-frontend/src/lib/server/atlas/board/graphify-current-workspace-revision.ts`, replicated
+  in plain SQL since this is a workspace-root script); fails closed with `NO_ADMITTED_WORKSPACE_REVISION`
+  if no such row exists, never falls back to a timestamp or synthesized value. (2)
+  `ATLAS_SOURCE_COHORT_CHECKSUM` <- runs the target script's own `--dry-run --dry-run-candidates`
+  mode first to get the real candidate-set checksum above, then re-invokes the target script with the
+  identical passthrough args (same `--limit`/`--dirty`) so the real apply run's candidate fetch
+  reproduces the same cohort.
+- **New npm aliases** (`sveltekit-frontend/package.json`): `karpathy:gpu:dry` (the raw script's
+  read-only dry mode), `karpathy:gpu:admitted` (the fixed, real entrypoint), `karpathy:gpu:dirty` and
+  `karpathy:gpu:top200` (both routed through the admitted wrapper). Three of these four names were
+  already referenced in CLAUDE.md's "Karpathy GPU Authority Blend" section as if they existed —
+  they did not; that section was documentation drift, now made real.
+- **`.vscode/tasks.json`** — all 3 places that called bare `npm run karpathy:gpu` (the always-throwing
+  form) now call `npm run karpathy:gpu:admitted`: the gated `runOn: folderOpen` startup task, the
+  manual "Retrieval Plane: Karpathy GPU Rank Refresh" task, and the manual "🧠 Karpathy GPU: Top-50
+  Authority Blend" task. Verified the edited file is still structurally intact (a naive verification
+  script's own bug — treating `vscode://schemas/tasks` as a `//`-comment — produced a false parse
+  error; confirmed via exact substring match and `git diff --stat` showing only the intended 4-line
+  change, not a corruption).
+
+**Live-verified end to end, twice, not just claimed**: ran `node scripts/atlas/run-karpathy-gpu-admitted-v1.mjs`
+directly. Resolved real `workspaceRevision=sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+(`graphify_runs.run_id=01a8d8fc-2507-4f39-868e-039039237b98`, a real COMPLETED row from 2026-09-15)
+and a real `sourceCohortChecksum` from 200 actual PageRank-top candidates. First run: `gpu:karpathy:scores`
+went from **0 -> 190** live Redis hash fields (verified via `HLEN`, not the script's own self-report).
+Second run (idempotent re-verification): `total_scores_in_redis: 390` per its own summary, real
+`next_steps/active/karpathy-gpu-recommendations.md` report written. Exit code 0 both times.
+
+**Deliberately NOT touched**: `BITFROST-LIVE-WARM-01` (finding #2 above) remains correctly blocked —
+its prerequisite (a revision-bound ACE packet identity/ordinal-map source) genuinely does not exist,
+and forcing that gate open would mean fabricating identity, which is a different and much larger
+category of change than the plumbing gap this follow-up closed. Not attempted.
+
+## ACE / BitFrost current-state reconciliation and implementation plan (2026-09-28)
+
+Read-only source review confirms the following boundary:
+
+- `graphify:daily:chain` is an apply sequence and its final
+  `graphify-daily-ace-packet-step-v1.mjs` is currently a fail-closed admission check, read-only
+  eligible-packet census, and local receipt writer. It does not compose packets or write to
+  Postgres, Qdrant, or Valkey.
+- The packet builder (`buildAcePacketV3`) and explicit cache writer
+  (`AcePacketWriter.writeRevisionQualifiedV3ToBitfrost`) already exist. The missing runtime link is
+  a live, admitted producer/caller with a revision-bound ContextManifest/packet identity and exact
+  allowed-packet set—not another packet schema or a second writer.
+- `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json` remains
+  `NOT_SAFE_TO_PROJECT`; its current evidence is insufficient for packet/cache promotion. Keep
+  `BITFROST-LIVE-WARM-01` open. The separate admitted Karpathy cache write is not ACE BitFrost warm
+  proof.
+- `.vscode/tasks.json` contains a folder-open `ace:hit-demand` invocation, but no corresponding
+  `ace:hit-demand` npm script or implementation was found in the searched SvelteKit scripts. The
+  `chunk_hit_log` table/readers do not establish an aggregation writer.
+- TRACE MCP startup is a separate task from daily Graphify. No Docker MCP registration was found in
+  the checked-in MCP configuration; do not add generic shell/Docker control to Ornith.
+
+### Ordered gates
+
+- [x] `ACE-GATE-RECONCILE-01` (reconciled against the 2026-09-28 21:53Z receipt below): use the latest canonical projection receipt to resolve actual
+  identity, revision, manifest, projection, and evidence-grounding blockers; do not weaken the
+  admission gate or synthesize revisions.
+- [ ] `ACE-PRODUCER-TRACE-01`: trace the current ContextManifest/ACE producer through
+  `buildAcePacketV3`, proving packet/source/representation identity and allowed-key derivation.
+- [ ] `ACE-BITFROST-CALLER-01`: only after the prior gates pass, connect that producer to the
+  existing `AcePacketWriter.writeRevisionQualifiedV3ToBitfrost`; preserve disposable-cache-only
+  semantics and keep bulk vectors outside packet JSON.
+- [ ] `ACE-BITFROST-CANARY-01`: after explicit operator authorization, perform one bounded
+  disposable write/readback/TTL-expiry canary with checksum and source-revision verification.
+- [ ] `ACE-HIT-DEMAND-OWNER-01`: establish the intended owner and contract for the dangling
+  `ace:hit-demand` startup hook; either implement a bounded revision-qualified aggregation through
+  the existing cache owner or retire the hook after review. No unqualified Redis write.
+- [ ] `ACE-STARTUP-BOUNDARY-01`: document and test the separation between TRACE MCP startup,
+  Graphify apply, Karpathy score-cache enrichment, and ACE/BitFrost packet warming; ensure startup
+  success/stamps cannot imply a blocked ACE warm succeeded.
+
+**Recommended next action:** close `ACE-GATE-RECONCILE-01` with a small read-only blocker table from
+the 2026-09-28 receipt. Do not run the daily apply chain or any cache warmer as part of that audit.
+
+### ACE-GATE-RECONCILE-01 — blocker table from a live `graphify:daily` run (2026-09-28)
+
+`npm run graphify:daily` bound the admitted snapshot (25,542 sources, provenance dry-run 97.8% reuse,
+`canonicalWriteAttempted:false`), then **failed closed** at `require-canonical-projection-admission-v1.mjs`
+with `GRAPHIFY_PROMOTION_ADMISSION_BLOCKED:NOT_SAFE_TO_PROJECT` (exit 1). This is the designed
+behavior, not a regression: the apply chain never started, nothing was mutated. Verdicts are
+identical to the 2026-09-26 receipt (no predicate moved). Receipt:
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json`.
+
+| # | Predicate | Verdict | Root cause | Fix class | Blocked on |
+|---|---|---|---|---|---|
+| 1 | `REVISION_QUALIFIED` | PARTIAL (corrected 2026-09-28 from NOT_PROVEN) | Columns/indexes already exist (`workspace_revision_key`, `source_revision`); audit was reading `atlas_ast_nodes`. 16,151/61,718 packets carry the admitted revision via `current-packet-digest-bridge-v1`; the other 45,567 are outside snapshot membership or await the packet-admission owner decision (7,350 gap, recipe `UNDECIDED`). **No DDL needed; do not synthesize revisions.** | Owner decision on packet admission |
+| 2 | `GRAPH_MANIFEST_SEALED` | PRESENT (corrected 2026-09-28 from ABSENT) | `graph-snapshot-parity/manifest.json` exists and NetworkX+cuGraph consume it; not workspace-revision-bound, Neo4j does not consume it, table-hash recipe unverifiable against raw parquet bytes; NetworkX/cuGraph/Neo4j each build their own graph | new contract | operator approval (schema) |
+| 3 | `ORDINAL_MAP_SEALED` | PARTIAL_PROVEN (updated 2026-09-28 after the single-chunk apply) | The artifact-based map now contains 1,358/16,151 current-revision packets with exact packet→chunk lineage; checksum `97e691c5…`. 14,744 packets have no lineage and 49 have only stale-revision lineage. Do not add a second owner or relax the source-revision join. | multi-chunk membership/source-revision proof; no projection promotion yet |
+| 4 | `LATENT_FAMILY_PROVEN` | NOT_PROVEN | audit checks nonexistent `atlas_representation_records`; real registry `atlas_representations` has 5 rows, all `UNVERIFIED`, `artifact_digest='unknown'`, no input-digest ledger; no producer/encoder/input-digest ledger tying latent lanes | new ledger | #1 |
+| 5 | `PROJECTIONS_CHECKSUM_ALIGNED` | NOT_PROVEN | derived: needs #2 + #4 checksums | derived | #2, #4 |
+| 6 | `IDENTITY_ALIGNED` | PARTIAL | 325/1000 sampled packets lack `qdrant_point_id`; 0 duplicate `packet_key` | Postgres write (backfill) | explicit write authorization; do not synthesize IDs |
+| 7 | `SEMANTIC_OWNER_PROVEN` | PARTIAL | `content_embedding` is candidate owner; writer, revision-qualified read path, Qdrant readback unproven | proof | none (read-only proof possible) |
+| 8 | `SYMBOLS_RESOLVED` | PARTIAL | `atlas_symbol_registry` reconciliation `BLOCKED_ON_UNGROUNDED_REVISION` | proof | #1 |
+| 9 | `BITFROST_KEYS_DERIVABLE` | NOT_PROVEN | 0 sample keys; no derivable domain+cluster+topology+symbol key scheme | design + proof | #1, #5 |
+| 10 | `ACE_EVIDENCE_GROUNDED` | NOT_PROVEN | `ace_context_sources` has **0 rows**; the audit also never checks card-level span/symbol grounding (harness gap) | harness + producer | `ACE-PRODUCER-TRACE-01` |
+| — | `ONTOLOGY_COHORT_NONEMPTY` | PASS | 63,084 rows | — | — |
+
+**Fix-first order (dependency-driven):** (1) revision column/binding, since #4, #5, #8, #9 all hang
+off it; (2) `CandidateOrdinalMap` + graph manifest seal; (3) representation ledger; (4) then
+checksum alignment, BitFrost key derivation, ACE grounding. #7 and the ACE-grounding harness check
+(#10) need no schema change and can run now. Nothing here is closed: `ACE-GATE-RECONCILE-01` stays
+open until the receipt verdict changes; do not weaken the gate or synthesize revisions.
+
+**Qdrant point-ID backfill (row 6), applied 2026-09-28:** `scripts/atlas/backfill-packet-qdrant-pid-exact-v1.mjs`
+(rehearsal-by-default, pre-image `docs/reports/qdrant-pid-backfill-preimage-2026-09-28.json`, receipt
+`docs/reports/qdrant-pid-backfill-exact-v1.json`). Exact join only: `payload.packet_key` = `packet_key` and
+exactly one point. Result: 120 rows written and read back (55,267 → 55,147 packets missing a point ID);
+verdict unchanged (`PARTIAL_PROVEN`). Reasons the number is small, not a bug:
+- Only 697 of 55,267 missing packets have *any* `codebase_chunks_768` point carrying their `packet_key`;
+  577 have several chunk points (packet vs chunk grain), so no packet-level ID is defined. Left null.
+- The older `backfill-atlas-packet-qdrant-links.mjs` joins on source_ref path variants and takes the first
+  chunk; **do not `--apply` it** (same granularity trap as `LEIDEN-QDRANT-IDENTITY-JOIN-01`).
+- **New finding:** 222,011 of 328,348 points in `codebase_chunks_768` carry a `packet_key` that does not
+  exist in `atlas_packets` (orphaned Qdrant payloads, a listed hard-fail condition). Not touched; needs its
+  own classification (stale generation vs packet-admission gap of 7,350) before any cleanup.
+- Open decision: whether packet-level `qdrant_point_id` should exist at all for multi-chunk packets, or the
+  identity link should live at packet→chunk lineage (`atlas_packet_chunk_lineage`).
+
+### Definitions and decisions (2026-09-28) — the remaining gate contracts
+
+Each contract reuses an existing owner; none adds a table just to satisfy an existence check.
+
+| Contract | Owner (reuse) | Definition of SEALED | Status / next step |
+|---|---|---|---|
+| `GraphProjectionManifestV1` | `sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json` (producer `export-graph-snapshot-parity-parquet.mts`) | `graphRevision`, node/edge counts, table hashes whose recipe is documented and re-verifiable; bound to the admitted `workspaceRevision`; consumed by NetworkX, cuGraph **and** the Neo4j mirror | `PRESENT`. Gaps: rebuild against the admitted snapshot (current one derives from the Aug-8 frozen graph), document the hash recipe, add a verifier |
+| `CandidateOrdinalMapV1` | `materialize-candidate-ordinal-corpus-v1.mts` → `candidate-ordinal-corpus-receipt-v1.json` | `sha256:` admitted snapshot revision, ordinals only for rows proven through `atlas_packet_chunk_lineage` (7,421 rows), checksum over the ordered ids | `PARTIAL_PROVEN` (2026-09-28). Lineage join was already present; the real bug was filtering on legacy integer `workspace_revision` (always 0) instead of `workspace_revision_key`, so it could never match a sha256 revision. Fixed, added guarded `--authorize-current-cohort` apply (admitted revision+snapshot only), regenerated: **261 → 513 lineage-PROVEN rows of 16,151 revision-bound packets** after a second fix (join on raw `source_ref`; lineage stores the `sveltekit-frontend/…` spelling that `canonical_source_ref` strips), checksum `c22d80b0…`. Old 4,951-row corpus recoverable from git. **Coverage breakdown (read-only, 2026-09-28):** 15,589 revision-bound packets have no lineage row at all (producers ran for only 627 packets total); 49 have lineage but a different `source_revision` (bytes changed since — correctly excluded); 513 qualify. The lever is running the packet→chunk lineage producer for the remaining packets, not relaxing the filter. Prior gap text: only 261 revision-bound packets have `PROVEN` `atlas_packet_chunk_lineage` rows with matching `source_revision` (table has 7,421 rows); raise coverage by proving lineage, never by relaxing the filter |
+| Representation ledger | `atlas_representations` (5 rows) | verified row + real artifact digest + per-row producer/encoder/input-digest record, so latent lanes share one derivation | `PARTIAL_PROVEN` (2026-09-28, was `NOT_PROVEN`) — see reconciliation below, which closes the digest question a concurrent session's `canonical-projection-readonly-reconciliation-v1.json` left open (PyTorch unavailable in its interpreter) |
+| Packet ↔ Qdrant link | Postgres `atlas_packet_chunk_lineage` | **Decision:** `atlas_packets.qdrant_point_id` is set only when exactly one point carries the `packet_key` (the 120 rows just written); multi-chunk packets (577) link through packet→chunk lineage, never a guessed packet-level ID | Decided; audit `IDENTITY_ALIGNED` should later measure lineage coverage for multi-chunk packets instead of demanding a point ID |
+| Packet admission | `current-packet-digest-bridge-v1` (16,151 bound) | 7,350 sources have no packet; the packet-key recipe is `UNDECIDED` | **Open, operator decision** — cannot be defined by inference without minting identity |
+
+Wired: `audit-canonical-projection-fabric.mjs` reads these owners (revision columns, graph manifest,
+ordinal receipt, `atlas_representations`) instead of nonexistent tables. Its 2026-09-28 17:56Z snapshot
+predates the separate single-chunk apply: at that point the ordinal predicate was still NOT_PROVEN at
+513 rows. The later apply regenerated the map to 1,358 rows (PARTIAL_PROVEN); the global projection
+verdict remains NOT_SAFE_TO_PROJECT because graph-manifest and representation gates remain open. The
+older audit did not perform the regeneration. No representation digest was written and no graph rebuild
+was performed by that audit.
+
+**Lineage coverage investigation (read-only, 2026-09-28; pre-apply 513-row ordinal baseline):**
+
+| Pre-apply class of the 15,589 revision-bound packets with no `atlas_packet_chunk_lineage` row | Packets | Chunks | Path |
+|---|---|---|---|
+| single-chunk file | 845 | 845 | unambiguous membership (`EXACT_SINGLE_MEMBER`); all 845 were later frozen and applied |
+| multi-chunk file | 13,158 | 119,713 | needs an owner rule for file-level packet ↔ chunk membership (`EXACT_MULTI_MEMBER`) |
+| no chunks in `codebase_chunk_index` | 1,586 | 0 | needs chunking first |
+
+- The earlier 841/13,046/1,702 aggregate is superseded by this fresh direct-path grouping; no
+  row-key list was saved with the earlier result, so the exact historical four-row delta cannot
+  be assigned. The current 845-row proposal exactly matches the fresh single-chunk cohort.
+- One packet per `source_ref` (0 duplicates among revision-bound packets), so packets are file-level.
+- **Multi-chunk lineage not written.** The 13,158 remaining files map to 119,713 chunk rows.
+  Fresh read-only checks prove whole-file digest parity for all 119,713 after removing only the
+  literal `sha256:` prefix, with 0 mismatches; however, `codebase_chunk_index.source_revision`
+  is NULL on all 119,713. Graphify has exact file/revision/namespace bindings for 13,011 packets;
+  the other 147 each have Graphify file rows, but none match the packet's source revision (even
+  after the same `sha256:` normalization). Digest parity does not itself prove that a file packet
+  should include every chunk. Lineage rows need
+  `canonical_chunk_id` (existing convention `fullrepo:<source_ref>:<n>`) and
+  `source_namespace` (`workspace:<uuid>`), which must come from the freeze→apply pipeline
+  (`freeze-pkt-lineage-09-proposal-v1.mjs` → `apply-pkt-lineage-09-historical-promotion-v1.mjs`; the apply script
+  forbids `source_ref` fanout and consumes only a frozen proposal). Deriving them ad hoc would mint identity.
+- **Next (bounded):** obtain/record the owner decision for multi-chunk packet membership before
+  preparing or applying the 13,158-file cohort; run chunking for the 1,586 files without chunks.
+  The applied single-chunk slice raised ordinal coverage 513 → 1,358.
+
+**Single-chunk lineage slice — frozen, rehearsed, and applied (2026-09-28):**
+`scripts/atlas/freeze-pkt-lineage-current-single-chunk-v1.mjs` (read-only) → 845 rows
+(`docs/reports/pkt-lineage-current-single-chunk-frozen-proposal-v1.json`, checksum `sha256:f4b0911e…`), 0 skipped. Every row has
+three-way whole-source digest parity (packet `source_revision` = chunk `file_content_hash` = `graphify_files.code_source_revision`),
+identity read verbatim from existing columns (`chunk_id`, chunk row id, `graphify_files.workspace_id`), producer
+`PKT-LINEAGE-CURRENT-SINGLE-CHUNK-01:v1`. (The file row is selected by digest parity, not by `graphify_files.workspace_revision`,
+which is Graphify's own namespace `e0dc…`, not the tournament-admitted `e24bb…`.) The apply script gained `--proposal=` and
+`--rehearse`: rehearsal wrote 845 rows in per-packet transactions, exact readback 0 rollbacks/conflicts/duplicates/synthetic IDs,
+rolled back (table still 7,421). Receipt: `…-rehearsal-receipt.json`. Separate apply receipt `…-apply-receipt.json` confirms **APPLIED 2026-09-28** (per-packet transactions, exact readback): lineage rows 7,421 → 8,266, 0 rollbacks/conflicts/duplicates/synthetic IDs;
+ordinal corpus regenerated → **1,358/16,151** (checksum `97e691c5…`), `ORDINAL_MAP_SEALED` still `PARTIAL_PROVEN`, overall still `NOT_SAFE_TO_PROJECT`.
+Original expectation: ordinal-map coverage 513 → 1,358 (matched). Multi-chunk (13,158 packets / 119,713 chunks) untouched pending the membership-rule decision; the existing
+09 freeze already encodes "all chunks with `relative_path` = `source_ref`" as `EXACT_MULTI_MEMBER`.
+
+**Read-only projection/lineage reconciliation (2026-09-28):** after the separate single-chunk
+apply, the current ordinal receipt and repeatable-read query agree on 1,358/16,151 exact
+packet→chunk candidates: 14,744 have no packet-key lineage row and 49 have only older
+source-revision lineage (688 membership rows; physical row and canonical chunk ID exist, but
+the revision mismatch correctly excludes them). The remaining multi-chunk cohort has 119,713
+whole-file digest matches, but still needs a membership owner decision; 147 files have Graphify
+rows whose source revisions do not match. The report distinguishes the autoencoder state-dictionary checksum from the
+checkpoint file SHA-256 and records that the graph manifest is not bound to the admitted
+workspace revision. This audit made no writes; the separate 845-row lineage apply is recorded
+above. Report:
+`docs/reports/canonical-projection-readonly-reconciliation-v1.json`.
+
+**Multi-chunk lineage slice — frozen and rehearsed, NOT applied (2026-09-28):** `freeze-pkt-lineage-current-single-chunk-v1.mjs --multi`
+(convention: every chunk with `relative_path` = `source_ref` is a member, `EXACT_MULTI_MEMBER`; whole packet skipped if any chunk fails
+digest parity). Proposal `.tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json` (90 MB, gitignored — repo hook rejects >10 MB),
+**116,847 rows / 13,010 packets**, checksum `sha256:e477356d…`, 0 digest mismatches. Skipped whole: 147 packets with no provable namespace,
+1 packet (`openai-facade.ts`) where 26 canonical `chunk_id`s each map to **two distinct chunk rows** in `codebase_chunk_index`.
+**Caught by rehearsal, not by the plan:** the first rehearsal inserted 116,873 of 116,899 proposed rows because `ON CONFLICT DO NOTHING`
+silently kept an arbitrary row of each duplicate pair; the readback (which compares canonical-id sets) would have passed anyway.
+Fixed by a fail-closed `duplicate_canonical_chunk_id` rule. Corrected rehearsal: 13,010 packets, 116,847 inserted = proposed, 0 identical/
+rollbacks/conflicts/duplicates/synthetic IDs, rolled back (table still 8,266). **APPLIED 2026-09-28** (per-packet transactions, exact readback): lineage rows 8,266 → 125,113, 0 rollbacks/conflicts/duplicates/synthetic IDs;
+ordinal corpus regenerated → **14,368/16,151 (89%)** (checksum `9c275253…`), `ORDINAL_MAP_SEALED` still `PARTIAL_PROVEN`, overall still `NOT_SAFE_TO_PROJECT`.
+Open data-quality finding: duplicate `chunk_id` values across distinct `codebase_chunk_index` rows for `openai-facade.ts` need their own investigation.
+Remaining lineage gap: 1,702 packets with no chunks (need chunking) + 147 no-namespace + 1 duplicate-ID packet = 1,783 of 16,151.
+
+**Representation digest reconciliation, CLOSED not a real mismatch (2026-09-28):** the "checkpoint file hashes to `ac5c069d…`
+but `ae_meta.json` claims `d6e9395e…`" gap was never drift — two legitimate, different recipes over the identical checkpoint.
+`ac5c069d…` is `sha256sum` over the saved `.pt` file bytes (pickle/zip container). `d6e9395e…` is
+`atlas_compute.latent_autoencoder.state_dict_checksum()` — sha256 over sorted `(tensor_name, tensor_bytes)` pairs from
+`model.state_dict()`, computed in-memory at training time, which is what `ae_meta.json` and `codebase_chunk_index.
+latent_256_checkpoint_revision` (55,169 rows) both actually use. A concurrent session's read-only reconciliation
+(`docs/reports/canonical-projection-readonly-reconciliation-v1.json`) correctly identified the two recipes but could not
+recompute `state_dict_checksum` live (no PyTorch in its interpreter) and left the question open. Resolved here by loading the
+real checkpoint in the WSL2 `atlas-rapids-cu13` PyTorch env and recomputing the same recipe live: **exact match to
+`d6e9395e…`**. Registered on the `latent_64` row (`atlas_representations`, rehearsed in a transaction + read back + rolled
+back, then applied): `upstream_model_id='nested-semantic-autoencoder'`, `upstream_revision`/`artifact_digest=d6e9395e…`,
+`verification_status='STATIC_VERIFIED'`.
+**Audit bug found and fixed alongside**: `atlas_representations` was never in the audit's `candidateTables` list, so
+`existing.has()` was always false and this predicate could never see real registry data regardless of DB state; and
+`repVerified` checked for a literal `'VERIFIED'` string that the column's own CHECK constraint doesn't allow (real values
+are `STATIC_VERIFIED`/`SAMPLE_VERIFIED`/`PRODUCTION_VERIFIED`/etc.). Both fixed. `LATENT_FAMILY_PROVEN` → `PARTIAL_PROVEN`.
+**Not closed**: no per-row producer/encoder/*input*-digest ledger exists (which source snapshot produced this checkpoint),
+and no `latent_256`/`latent_128` rows exist in the registry despite being the same encoder family (prefix-derived from
+`latent_64`'s bottleneck) — open, needs an owner decision on whether they're separate rows or one row with multiple outputs.
+
+**latent_256/latent_128 registry rows, closed (2026-09-28):** confirmed live before registering anything — `codebase_chunk_index.latent64_model`
+= `d6e9395e…` on all 1,703 populated `latent_64` rows (same checkpoint as `latent_256`'s 55,169-row `latent_256_checkpoint_revision`, so
+the earlier `latent_64` digest registration was correct, not a mismatch). `latent_128` is architecturally different, confirmed via
+`drizzle/manual/20260912_latent_128_columns.sql`'s own header: a deterministic `SLICE_FIRST_N`+L2-renormalize of `latent_256`, not a
+second encoder pass and not MRL truncation of raw `semantic_768`. Rehearsed (transaction + readback + rollback), then applied:
+inserted `latent_256` (`dimension_method='AUTOENCODER'`, direct bottleneck) and `latent_128` (`dimension_method='SLICE_FIRST_N'`,
+derived from `latent_256`), both `artifact_digest=d6e9395e…`, `verification_status='STATIC_VERIFIED'`; corrected `latent_64`'s own
+`dimension_method` from `UNKNOWN` to `SLICE_FIRST_N` (it is `PREFIX_OF_LATENT_128`, not a direct output either) in the same transaction.
+Registry: 5 → 7 rows, 3 verified with real digests. `dimension_method` allowed values are `NATIVE|MRL_TRUNCATE|LINEAR_PROJECTION|
+AUTOENCODER|CUSTOM_MODEL_HEAD|SLICE_FIRST_N|UNKNOWN` (schema constraint) — the audit's earlier `PREFIX_RENORM` guess was invalid and
+caught at rehearsal, not guessed past. `LATENT_FAMILY_PROVEN` stays `PARTIAL_PROVEN`: still no per-row *input*-digest (which
+semantic_768 snapshot trained this checkpoint) and `lifecycle_status` stays `CANDIDATE` — no promotion vote taken here.
+
+**SYMBOLS_RESOLVED reconciliation gate, corrected from stale (2026-09-28):** the audit's note claimed the gate "stays
+`BLOCKED_ON_UNGROUNDED_REVISION` for the admitted workspace revision regardless" — checked live, that was already false:
+`atlas_workspace_source_bindings` has 24,456 rows for the admitted revision (populated independently of this thread's
+`atlas_packets` lineage work). Ran `symbol-reconciliation-writer-v1.mts --dry-run` then `--apply` (no `--allow-create`,
+so promotion-eligible only, no new identity minted): gate status `GROUNDED`, all 194 `graphify_symbols` nominations resolve
+against the existing `atlas_symbol_registry` (10,504 rows) with 0 unresolved / 0 ambiguous / 0 revision-rejected.
+`canonical_identity_created: false` — no writes needed since nothing was unresolved; registry unchanged (10,504/479 before
+and after, confirmed). Added a live `reconciliation_gate` field to the audit's `SYMBOLS_RESOLVED` predicate (same query the
+writer uses) so this doesn't go stale again. `graphify_symbols` itself remains tiny (194 rows) relative to the workspace —
+that's the real remaining limiter, not the reconciliation gate.
+
+**GRAPH_MANIFEST_SEALED rebuild scoping, blocked on a real design decision (2026-09-28):** checked cost before running
+anything — `export-graph-snapshot-v2.mts` -> `materializeCanonicalGraphSnapshotFromPostgres()` is a bounded Postgres-read +
+in-memory build + JSON write (reads `atlas_packets` + `atlas_tree_nodes`, no AST re-extraction), cheap, NOT the multi-hour
+rebuild first assumed. But `PACKET_SELECT_SQL` filters `WHERE workspace_id = $1`, and `atlas_packets.workspace_id` is a
+**top-level directory name** (`docs` 54,142 rows, `sveltekit-frontend` 3,060, `scripts` 562, …) — a completely different
+axis from `workspace_revision_key` (the sha256 tournament-admitted revision this whole thread's work is bound to). One
+exporter run cannot produce a manifest scoped to the admitted revision as currently written.
+**Two real paths, neither picked**: (1) run the exporter once per `workspace_id` and merge — no merge/union convention
+exists for `GraphProjectionManifestV1`; (2) change `PACKET_SELECT_SQL`'s filter to `workspace_revision_key = $1` — a real
+edit to `graph-snapshot-postgres.ts`, a shared materializer other callers may use (not checked). Neither is a quick script
+run; both are scoped code/design changes. **Not done pending an owner decision.**
+
+**Packet-key recipe decided and applied — 7,259 new atlas_packets rows (2026-09-28):** operator decision: reuse
+CURRENT_LIVE_IDENTITY (`packet:` + `sha256(source_ref).slice(0,12)`), confirmed empirically against 5 random live rows
+before use, not `packet-key-builder.ts`'s node-scoped 64-hex scheme or `build-packet-key-v2-admission-manifest-v1.mts`'s
+UUIDv5 scheme (both real, both different, neither touched). Reused the existing read-only admission pipeline rather than
+hand-rolling classification: `produce-current-packet-digest-bridge-v1.mjs --census` (correct `--execution-id` was
+`74d50c86-…`, from `selected-graphify-execution-owner-v1.json` — an earlier attempt with the wrong execution id silently
+produced 0 entries) froze a fresh 7,259-row `ADMISSION_READY` manifest (990 `SOURCE_BYTES_CHANGED`, 1,086 `OUT_OF_SCOPE`,
+correctly excluded) at `docs/reports/packet-admission-v1/64122168…/`.
+New script `scripts/atlas/admit-packets-current-live-identity-v1.mjs`: verifies every shard's `sha256Of()` checksum against
+`root.json` (reused the real checksum function from `packet-source-revision-repair-v1.mjs`, not reimplemented), verifies
+each entry's `source_revision` format/equality/digest-match, computes `packet_key`, checks for collisions both within the
+batch and against the *entire* live `atlas_packets` table before any write. Rehearsed at `--limit=100` (clean), then full
+7,259 (clean, 0 intra-batch collisions, 0 live-table collisions, exact readback, rolled back), then applied: `atlas_packets`
+61,718 → **68,977** rows (exact arithmetic match), committed, exact readback.
+Only identity/revision columns populated (`packet_key`, `source_ref`, `canonical_source_ref`, `source_revision`,
+`workspace_revision_key`, `lineage_binding_checksum`, `content_hash`, `lineage_producer_revision`); everything else left at
+schema default — these are minimal admitted packets, not enriched ones (no embeddings, no summary, no chunk lineage yet).
+**Re-ran the canonical projection fabric audit after applying**: `SEMANTIC_OWNER_PROVEN` shows `NOT_PROVEN` in this run —
+**confirmed this is an unrelated concurrent-session edit to that predicate's logic** (now unconditionally returns
+`writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED'`), not caused by this packet-admission apply. All other predicates unchanged.
+Overall verdict still `NOT_SAFE_TO_PROJECT`. Next: these 7,259 packets are unpacketed-no-more but still need lineage,
+embeddings, and symbol/ontology enrichment before they help any predicate further — that's the natural follow-up, not done
+here.
+
+**CORRECTION 2026-09-28, same day: the 7,259-row admission apply above used the WRONG identity scheme and was rolled
+back.** External review caught what my own research missed: `docs/reports/packet-key-owner-decision-v1.json` (dated
+2026-09-24, four days before this session, verified by reading the file directly, not trusting the review's summary of
+it) already records a settled, implemented, tested owner decision for exactly this 7,350-source admission gap —
+`PacketKeyV2 = packet:UUIDv5(PACKET_AGGREGATE_NAMESPACE_V1, "packet:v2" NUL repository_scope NUL canonical_source_ref NUL
+packet_kind)`, with real code (`packet-key-v2.ts`, `packet-key-legacy-alias-v1.ts`, 12/12 + 9/9 tests), a frozen admission
+manifest for these same sources at a *different* root (`6d8fc6e3…`, `uniquePacketKeysV2: 7350`), and an explicit statement
+that "new admissions use the new key" — the legacy `packet:<12hex>` scheme I used is documented in that same file as the
+*existing* dominant writer being superseded, not the target for new rows.
+**My error**: I offered "reuse the recipe from 5 sampled existing rows" as an option without first searching for an
+existing owner-decision artifact — exactly the audit-before-you-build failure this repo's Duplication Prevention rule
+exists to catch. The operator's "same recipe as existing packets" answer was reasonable given the option as framed; the
+framing itself was under-researched.
+**Remediation, verified before and after**: checked all FK-linked child tables for any reference to the 7,259 newly-minted
+packet_keys — zero downstream references anywhere (confirmed live query, not assumed). Rehearsed the delete (transaction +
+readback + rollback: 7,259→0 for that producer tag, 61,718 total, matched), then applied: `atlas_packets` 68,977 → **61,718**,
+exact match to the pre-mistake count. Re-ran the fabric audit: identical to the last-known-good state, no residual effect
+on any predicate. `scripts/atlas/admit-packets-current-live-identity-v1.mjs` is left in place (source-controlled evidence
+of the mistake) but must not be run again with `--apply`.
+**Correct path forward, NOT done here** (also gated on operator authorization the decision file itself withholds):
+`openBeforeAdmission` lists (1) authorize + apply the alias-kind DDL (`20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql`),
+then the 17,399 alias rows, (2) authorize the 7,350-row V2 admission apply against manifest root `6d8fc6e3…` via the
+already-built `register-orphaned-chunks.mjs --packet-key-v2-manifest-root=...` path, (3) confirm repository-scope
+authority for `graphify_execution_file_membership_v2.repository_id` (status `VERIFY`, not settled), (4) decide the legacy
+`register-orphaned-chunks.mjs` non-V2 path. None of these four are mine to push through unilaterally either — the decision
+file explicitly withholds `writesAuthorized` pending exactly this authorization.
+
+**GRAPH_MANIFEST_SEALED query fix, applied (2026-09-28), plus a git-stash near-miss and one pre-existing bug found:**
+Confirmed `materializeCanonicalGraphSnapshotFromPostgres` has exactly one real caller
+(`export-graph-snapshot-v2.mts`) before touching the shared query -- safe to edit directly. Fixed
+`PACKET_SELECT_SQL` in `graph-snapshot-postgres.ts`: `WHERE workspace_id = $1` -> `WHERE
+workspace_revision_key = $1`; renamed `PostgresGraphSnapshotInput.workspaceId` -> `workspaceRevision`
+(`Omit<...,'workspaceId'>` added so the field isn't double-required); the loader now maps
+`workspaceRevision` onto the downstream `GraphSnapshotMaterializerInput.workspaceId` field (left
+unrenamed there -- 6 use sites in the wider materializer/manifest/proof contract, out of scope to
+rename). Updated the 4 spec fixture call sites and the CLI script's `--workspace-id` -> `--workspace-revision`.
+**Near-miss, corrected**: a scoped `git stash` (to isolate a tsc diagnostic check) swept up all 57
+files of concurrent uncommitted work across this repo (~2M lines), not just this file -- caught
+before any loss, restored via `git stash apply` + verified every stashed diff reappeared (only 3
+unrelated submodule-pointer entries differed), then dropped the stash. Nothing lost. Lesson: never
+`git stash` (even briefly) in a working tree with this much concurrent multi-session state; use
+`git diff -- <path>` / a worktree copy instead.
+**Pre-existing bug found, NOT fixed here (separate scope)**: `graph-snapshot-postgres.spec.ts`'s
+"materializes an immutable snapshot" test drops both tree nodes from `graphSnapshotNodes` (1 node
+instead of 3). Root cause, confirmed via direct read of `graph-snapshot-materializer.ts` (clean,
+no concurrent edits -- this is committed, current logic): `classifyCanonicalGraphEligibility()`
+requires `metadata.source === 'atlas_packets'` for packet-hierarchy tree-node types, but the test
+fixture's tree-node `metadata` (`{ lane: 'root' }` / `{ lane: 'page' }`) has no `source` field --
+fixture is stale against an already-committed eligibility gate. This was previously masked by the
+ZodError this session's fix resolved (the test never ran far enough to hit it). Flagged, not
+touched -- fixing the eligibility gate or the fixture is a real product decision (which is wrong?)
+outside this thread's scope.
+**Re-ran the fabric audit**: `GRAPH_MANIFEST_SEALED` unchanged (`PRESENT`) -- expected, since the audit
+still reads the OLD `graph-snapshot-parity/manifest.json` artifact (Aug-8 frozen snapshot). The fix
+enables regenerating that artifact against the admitted revision, but it hasn't been regenerated yet.
+**Blocked on a known, documented execution-context issue, not a code bug**: running
+`export-graph-snapshot-v2.mts` directly via `tsx`/`node` fails with `ERR_MODULE_NOT_FOUND` on the
+`.js`-suffixed `$lib/...` import -- this is exactly the "NPX Execution Context & Module Alias
+Resolution" failure mode CLAUDE.md already documents (plain `tsx` doesn't inherit SvelteKit's Vite
+alias config). No existing npm script alias runs this exporter from the correct context. Needs
+either a `vite-node`-based invocation or a new package.json script wired the same way other
+SvelteKit-context scripts in this repo are -- real setup work, not attempted in this pass given
+context budget. This is the concrete next step: get one real export run against the admitted
+revision, producing a manifest with `workspaceRevision` bound correctly, then re-audit.
+
+**GRAPH-SNAPSHOT-SCOPE-V2-01, applied (2026-09-28) -- `workspace_revision_key` alone was still
+insufficient scope; a repository + execution partition was missing.** An external review correctly
+identified that `atlas_packets.workspace_id` (1,196 near-meaningless directory-path values, already
+abandoned by the prior fix above) was the wrong axis for a second reason beyond revision identity:
+even after scoping to `workspace_revision_key`, a snapshot still spans every repository in the
+admitted revision undifferentiated (16,151 packets at the current admitted revision,
+`sha256:e24bb97187...`). Every load-bearing factual claim in the review was verified live against
+the DB before acting on it (per this session's own "verify pasted claims before trusting them" rule
+-- see the packet-key mistake above for why):
+- `graphify_execution_file_membership_v2` genuinely exists with `execution_id`, `repository_id`,
+  `workspace_revision`, `source_ref`, `code_source_revision`, `content_hash`, `repository_relative_path`,
+  `byte_length`, `observed_at` (9 columns, confirmed via `information_schema.columns`).
+- Its `repository_id` (text) is a small, real, distinct-from-`atlas_packets.repository_id` (uuid,
+  unrelated column) partition: exactly 7 values live -- `repo:root` (339,119 rows), `repo:claude-mem`,
+  `repo:mcp-server-mcp`, `repo:turbovec`, `repo:sites/parent-atlas-gateboard`,
+  `repo:models/embeddinggemma_300m`, `repo:granite-docling-258M`.
+- Its existing index already leads with `(workspace_revision, repository_id, repository_relative_path)`
+  -- confirmed via `pg_indexes`; no new index was added, per the review's own advice to check
+  `EXPLAIN (ANALYZE, BUFFERS)` against the existing index before adding one.
+- **Found live, not in the review**: a real fan-out bug the naive join would have hit. Two distinct
+  `execution_id`s (`0dba1c0d-2cf7-4f35-a61b-c77956f60d3d` and `74d50c86-8194-45ea-8c3d-61aab737ef83`,
+  the latter the same owner-preflight execution_id used earlier this session for the packet census)
+  each independently contributed 24,456 membership rows for `repo:root` at the current admitted
+  revision -- a join on `(workspace_revision, repository_id)` alone returns 32,302 raw matches
+  collapsing to only 16,151 distinct `packet_key`s. This is why `executionId` is a required field on
+  `PostgresGraphSnapshotInput`, not an optional narrowing -- without it, correctness would silently
+  depend on `SELECT DISTINCT` papering over an unscoped join rather than an honest "one execution,
+  one snapshot" identity.
+
+Applied: `PostgresGraphSnapshotInput` gained required `executionId`/`repositoryId` fields (doc
+comments cite the live numbers above so a future reader doesn't have to re-derive them).
+`PACKET_SELECT_SQL` now joins `atlas_packets p` against `graphify_execution_file_membership_v2 m`
+on `(m.source_ref = p.source_ref AND m.code_source_revision = p.source_revision)`, filtered by
+`p.workspace_revision_key = $1 AND m.workspace_revision = $1 AND m.execution_id = $2 AND
+m.repository_id = $3`, with `SELECT DISTINCT` as a belt-and-suspenders guard (not a substitute for
+the `execution_id` filter). `export-graph-snapshot-v2.mts` gained required `--execution-id` /
+`--repository-id` CLI args and its status-log output field renamed `workspace_id` ->
+`workspace_revision` (matching the earlier fix's naming) plus new `execution_id`/`repository_id`
+fields. `graph-snapshot-postgres.spec.ts`'s 3 test call sites updated with
+`executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83'` / `repositoryId: 'repo:root'`. Re-ran the
+suite: 2/3 pass, same pre-existing `classifyCanonicalGraphEligibility` fixture-staleness failure
+documented directly above (unrelated to this change, not re-caused by it -- the mock intercepts by
+SQL substring, not exact params, so this edit's compatibility with the existing mock harness was
+directly confirmed, not assumed). `PostgresGraphSnapshotInput` has zero other consumers repo-wide
+(grep-confirmed) -- bounded blast radius, matching the review's own scoping note.
+
+**Not yet resolved by this change, deliberately out of scope**: the review's proposed
+`GRAPH-SNAPSHOT-MERGE-V1-01` (deterministic cross-repository shard merge, dedup by canonical graph
+identity not by repository position) is a separate follow-up, not attempted here -- this change only
+makes one repository's shard scope correctly; multi-repository merge is untouched.
+`graphify_execution_file_membership_v2.repository_id`'s authority status is still recorded as
+`VERIFY, not settled` a few paragraphs above (the `PacketKeyV2` `openBeforeAdmission` list) --
+this fix consumes that column as a scoping key without waiting on that separate authorization
+question, since scoping a read-only export query is a materially lower-consequence action than the
+identity-minting admission apply that question gates. Still blocked on the same execution-context
+issue as the paragraph above: no real export has been run yet against the admitted revision with
+the corrected scope -- that remains the concrete next step.
+
+**Real export run succeeded (2026-09-28) -- the "blocked on module-resolution" framing above was
+wrong; it was an invocation mistake, not a code blocker.** Ran
+`npx tsx ../scripts/atlas/export-graph-snapshot-v2.mts` (note: `npx tsx`, not plain `node` --
+this repo's own "NPX Execution Context & Module Alias Resolution" rule's Context B, from
+`sveltekit-frontend/`) against `repo:root` with the corrected `GRAPH-SNAPSHOT-SCOPE-V2-01` scope
+(`workspace-revision=sha256:e24bb97187...`, `execution-id=74d50c86-8194-45ea-8c3d-61aab737ef83`,
+`repository-id=repo:root`, `source-inventory-snapshot-id=sha256:6288726b7362...` -- the real
+snapshot revision from `docs/reports/graphify-workspace-snapshot-binding-v1.json`, not a placeholder).
+**Result: real success**, not a failure -- `48,339` nodes, `32,226` edges, exit 0, real topology
+hash (`f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178`). The earlier
+`ERR_MODULE_NOT_FOUND` this session hit was from invoking via plain `node`, not `npx tsx` -- the
+`.mts` extension needs `tsx`'s loader regardless of alias resolution; once that's right, the
+relative import chain (this script imports `graph-snapshot-postgres.ts` by relative path, and its
+only `$lib/...` references are `import type` -- erased at compile time) resolves fine with no
+SvelteKit-context workaround needed. Output moved to session scratchpad (147MB, not gitignored at
+the ad hoc repo-root path it was first written to -- moved rather than left there to avoid an
+accidental commit).
+
+**But re-running the fabric audit afterward confirmed `GRAPH_MANIFEST_SEALED` is unchanged
+(`PRESENT`) -- and found a second, independent gap: this predicate cannot reach `PASS` as currently
+coded, regardless of what artifact exists.** Read `audit-canonical-projection-fabric.mjs`'s
+predicate 6 directly (not inferred): it reads a fixed path,
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json` -- a different, older,
+NetworkX/cuGraph-parity artifact, unrelated to the exporter this fix touches, and never updated to
+read the new per-repository-scoped export's output. Worse: `bound_to_admitted_workspace_revision:
+false` and `neo4j_consumes_manifest: false` are **hardcoded literal `false` values** in the script
+(lines ~339-340 as of this read), never actually computed from the manifest's own contents --
+and the `verdict` field is only ever assigned `graphManifest ? 'PRESENT' : 'ABSENT'` (line 341) --
+**there is no code path in this predicate that can ever produce `PASS`.** This is a genuine,
+separate gap from data readiness: even a perfect manifest, correctly bound to the admitted
+revision and consumed by all three engines, would still report `PRESENT`, not `PASS`, under the
+current code.
+
+**Open design question, not resolved here (deliberately -- needs a real decision, not a silent
+audit-script rewrite under a bare "continue")**: what does "sealed" mean now that
+`GRAPH-SNAPSHOT-SCOPE-V2-01` scopes exports per-repository rather than producing one workspace-wide
+manifest? Two shapes are possible and this thread does not pick one:
+1. **Per-repository seal**: each of the 7 real repositories (`repo:root`,
+   `repo:claude-mem`, `repo:mcp-server-mcp`, `repo:turbovec`,
+   `repo:sites/parent-atlas-gateboard`, `repo:models/embeddinggemma_300m`,
+   `repo:granite-docling-258M`) gets its own sealed shard manifest, and the predicate passes when
+   all 7 (or all repositories with nonzero membership at the admitted revision) are sealed.
+2. **Merged seal**: `GRAPH-SNAPSHOT-MERGE-V1-01` (the review's own proposed follow-up, itself not
+   attempted here) produces one deterministic cross-repository merge first, and the predicate seals
+   against that single merged manifest -- closer to the original single-manifest shape the audit
+   script already expects, but requires building the merge step first (dedup by canonical graph
+   identity, not repository position, per the review's own note).
+Neither is implemented. The audit script's `PASS`-impossibility bug (hardcoded `false` fields, no
+`PASS` in the verdict enum) needs fixing regardless of which shape is chosen -- that part is a
+pure bug fix, not a design call -- but doing so before the shape decision would mean guessing at
+what "bound to admitted workspace revision" and "sealed" should check for a scope that didn't exist
+when this predicate was written. Flagged for explicit operator direction before either is touched.
+
+**Operator selected "per-repository seal" -- implemented, run for real, audit re-run (2026-09-28).**
+Built `scripts/atlas/seal-graph-snapshot-shards-v1.mts`: reads the two existing owner-decision
+artifacts (`docs/reports/selected-graphify-execution-owner-v1.json` --
+`canonicalAuthority: true`, `docs/reports/graphify-workspace-snapshot-binding-v1.json` --
+`workspaceAuthorityAdmitted: true`, cross-checked to agree with each other, fails closed if not)
+rather than hardcoding the admitted revision/execution -- per this session's own "grep for an
+existing owner-decision before minting anything" rule. Queries the real, live repository set from
+`graphify_execution_file_membership_v2` (7 repositories at the admitted revision + selected
+execution -- same set found earlier), materializes one shard per repository via the already-fixed
+`materializeCanonicalGraphSnapshotFromPostgres`, writes each to
+`sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/<slug>/manifest.json` plus a top-level
+`seal-index.json` -- does NOT touch or overwrite the older NetworkX/cuGraph parity `manifest.json`
+artifact (separate schema, separate consumers, deliberately left alone).
+
+**Real finding, caught before it could inflate the gate: an empty-but-non-erroring shard is not the
+same as "nothing to seal."** First run marked all 7 shards `sealed: true` even though 6 had zero
+nodes/edges -- traced (not assumed) to real data: `atlas_packets` rows DO exist for those repos'
+`source_ref`s, but with `source_revision`/`workspace_revision_key` both NULL (legacy,
+never revision-qualified rows) -- confirmed via direct query, not a join bug in the new scoped SQL.
+Left as `sealed: true`, this would have silently reported the gate as more complete than reality --
+exactly the "evidence laundering" pattern this repo's own AGENT EXECUTION INTEGRITY rules exist to
+catch. Fixed: `sealed` now also requires `nodeCount > 0`. Re-ran: **honest result -- `allShardsSealed:
+false`, only `repo:root` (48,339 nodes / 32,226 edges) genuinely sealed; `repo:claude-mem`,
+`repo:granite-docling-258M`, `repo:mcp-server-mcp`, `repo:models/embeddinggemma_300m`,
+`repo:sites/parent-atlas-gateboard`, `repo:turbovec` all correctly `sealed: false`** (real
+membership rows, zero revision-qualified packets -- a genuine, separate data-completeness gap, not
+part of this fix's scope to close).
+
+Updated `audit-canonical-projection-fabric.mjs`'s `GRAPH_MANIFEST_SEALED` predicate to read the new
+seal index (in addition to, not instead of, the legacy manifest -- both reported, prefixed
+`legacy_*` vs `seal_index_*`/plain), independently re-derive the live repository set (does not just
+trust the seal index's own self-report -- guards against staleness), and added a genuine `PASS`
+branch the prior code structurally could not reach (verdict was capped at `PRESENT`/`ABSENT`
+regardless of any condition). **Re-ran the full audit: `GRAPH_MANIFEST_SEALED` moved `PRESENT ->
+PARTIAL_PROVEN`** -- `bound_to_admitted_workspace_revision: true` (correct, live-verified),
+`seal_index_covers_live_repositories: false` (correct -- 1/7), all 7 `live_repository_ids`
+correctly enumerated from a live query. This is real, honest progress -- the predicate is no longer
+structurally incapable of reaching `PASS`, and its current `PARTIAL_PROVEN` state accurately
+reflects that only 1 of 7 real repositories has revision-qualified packet content to seal. Overall
+gate verdict remains `NOT_SAFE_TO_PROJECT` (10/11 predicates still below `PASS`) -- this closes one
+concrete, previously-impossible-to-close predicate gap without overclaiming readiness for the other
+6 repositories' missing packet admission, which remains open, separate work.
+
+**Not done here, explicitly out of scope**: revision-qualifying packets for the 6 empty
+repositories (a packet-admission gap, not a graph-snapshot-export gap -- likely intersects with the
+already-open `PacketKeyV2` admission question, but not confirmed); Neo4j consumption of either
+manifest (still zero, still a separate, honestly-reported gap in the predicate's own fields).
+
+**`GRAPH-SNAPSHOT-MERGE-V1-01`, designed and built (2026-09-28, operator-selected direction).**
+Built `scripts/atlas/merge-graph-snapshot-shards-v1.mts`. Design decisions, recorded in the script's
+own header comment (not just here, so code and doc can't drift):
+1. **Shard bulk data is never persisted to disk.** A single-repository export already produced a
+   147MB JSON file (`repo:root` alone) -- tracking that would violate this repo's pre-commit
+   >10MB file-size gate. Shard manifests stay summary-only; the merge script RE-MATERIALIZES each
+   sealed shard's full node/edge set live from Postgres using the exact
+   `(workspaceRevision, executionId, repositoryId, sourceInventorySnapshotId)` recorded in that
+   shard's own `manifest.json` -- cross-checked against `seal-index.json` field-by-field, fails
+   closed (`SHARD_MANIFEST_SEAL_INDEX_MISMATCH`) on any drift rather than trusting a possibly-stale
+   index entry.
+2. **Dedup identity is `nodeKey`/`edgeKey`, not repository position** -- per the external review
+   this follows. These keys are already globally-unique-by-construction under the current
+   packet-key scheme (`packet:<packetKey>`, `tree:<uuid>`), so a real cross-repo duplicate isn't
+   expected today, but the merge handles it correctly regardless: two shards claiming the same key
+   with IDENTICAL content (compared with `snapshotId` excluded, reusing the same field-exclusion
+   `topologyHash()` itself already applies) are deduped, contributing repositories recorded; two
+   shards claiming the same key with DIFFERENT content are a `NODE_IDENTITY_CONFLICT`/
+   `EDGE_IDENTITY_CONFLICT` -- both conflicting copies are excluded from the merged set (fail
+   closed on the specific entity, not an arbitrary pick-a-winner), reported in a `conflicts` array,
+   and the merge still completes for everything non-conflicting rather than aborting outright
+   (this is diagnostic read-only work, not an admission-critical write).
+3. Only `sealed: true` shards are merged; unsealed repositories go into `excludedRepositories` with
+   an explicit reason, never silently dropped.
+4. The merged manifest gets a fresh `snapshotId`; every included node/edge has its `snapshotId`
+   rewritten to that value (content otherwise untouched).
+5. `topologyHash` is computed via the EXISTING exported `topologyHash()` from `graph-snapshot.ts`
+   -- not reimplemented -- which already sorts by key and excludes `snapshotId`, so reuse gives a
+   deterministic, ordering-independent digest for free (Duplication Prevention: grepped for and
+   found this before writing a new hash routine).
+
+**Ran for real, correctness self-check passed**: with only 1 of 7 shards currently sealed
+(`repo:root`), the merge is a true test of the identity-function edge case -- and it behaved
+exactly as it should: `mergedFromRepositories: ["repo:root"]`, `excludedRepositoryCount: 6`,
+`nodeCount: 48339`, `edgeCount: 32226`, `conflictCount: 0`, and **`topologyHash` exactly matches**
+the single-repo export's own hash from earlier this session
+(`f6407b3ac00733131fb25a5f9dc6359223ad238e31be960cb9e4c69bec2ac178`) -- confirming the merge
+algorithm is a correct no-op when there is exactly one input, not just that it ran without an
+uncaught exception. Output: `sveltekit-frontend/docs/reports/graph-snapshot-parity/shards/merged-manifest.json`
+(`atlas.graph-snapshot-merged-manifest.v1`). Does not overwrite any per-repository shard manifest,
+`seal-index.json`, or the legacy NetworkX/cuGraph parity manifest.
+
+**Not done here, explicitly out of scope**: wiring `GRAPH_MANIFEST_SEALED`'s `PASS` computation to
+optionally accept the merged manifest as an alternative to full per-repository coverage (the
+predicate's current `PASS` path, implemented above, is unaffected by this addition and remains the
+one actually driving the audit's verdict); a real multi-shard conflict test (only possible once a
+second repository has genuine revision-qualified content, per the still-open packet-admission gap
+above) -- today's run cannot exercise the conflict-detection path with real data, only prove the
+zero-conflict/single-shard case.
+
+**Read-only root-cause investigation, why the 6 non-`repo:root` shards have zero revision-qualified
+packets (2026-09-28) -- traced to an exact line of code, then reframed by a fact that changes
+whether this is even a bug.** Found the precise mechanism, not just a data observation:
+`scripts/atlas/produce-current-packet-digest-bridge-v1.mjs` line 224 -- the script that qualifies
+`atlas_packets.source_revision`/`workspace_revision_key` -- has `AND m.repository_id = 'repo:root'`
+**hardcoded** in its source query against `graphify_execution_file_membership_v2`. It has never
+processed, and structurally cannot process, any other repository. Checked one layer upstream:
+`atlas_workspace_source_bindings` (the table this producer reads `source_revision` from) is ALSO
+100% `repo:root`-path-prefixed -- 0 rows for any of the other 6 repos' path prefixes -- so this
+isn't a single hardcoded filter away from being fixed; the scope limitation runs through at least
+two pipeline stages (source-binding reconciliation, then packet-digest production).
+
+**Reframing finding, more important than the mechanism itself**: all 6 non-`repo:root` repositories
+are git **submodules pointing at external third-party projects**, confirmed via `.gitmodules` --
+`claude-mem` (github.com/thedotmack/claude-mem, an external tool), `granite-docling-258M` and
+`models/embeddinggemma_300m` (HuggingFace model weight repos, not source code this project
+authored), `mcp-server-mcp` (github.com/sveltejs/mcp, SvelteKit's own upstream MCP server),
+`turbovec` (github.com/RyanCodrai/turbovec, an external library), `sites/parent-atlas-gateboard`
+(a separate external site repo on a different git host entirely). **This means the "gap" may not
+be a bug at all** -- it may be a correct, if undocumented, design boundary: packet admission
+(canonical `packet_key`/`source_revision` identity) scoped to this project's own authored source
+(`repo:root`), while the submodules are graphified into `graphify_execution_file_membership_v2`
+for cross-reference/navigation context only, deliberately never packet-admitted as if they were
+this project's own canonical source. Searched for an existing decision record on this specific
+question (per this session's own "grep for an owner-decision before minting anything" rule,
+applied here to *not* minting a fix) and found none -- this appears to be a genuinely undecided,
+undocumented boundary, not a settled call either way.
+
+**Not resolved here, deliberately**: whether submodule content should ever be packet-admitted is a
+real product/scope decision (does "this workstation's canonical identity" include vendored
+third-party code, or only originated code?), not something to infer from the absence of a decision
+record. No code changed for this thread -- investigation only, per the scope this thread was
+explicitly picked under. If the operator decides submodules SHOULD be packet-admitted, the concrete
+next steps are now known precisely: (1) extend `atlas_workspace_source_bindings`'s source-binding
+reconciliation to cover the other 6 repositories, (2) remove or parameterize the
+`repository_id = 'repo:root'` hardcode in `produce-current-packet-digest-bridge-v1.mjs` line 224,
+(3) re-run the per-repository sealer and merge -- both already built and already correctly handle
+an arbitrary repository set, no changes needed to either for this to flow through automatically.
+If the operator decides submodules should NOT be packet-admitted, the honest fix is smaller: relabel
+`GRAPH_MANIFEST_SEALED`'s `excludedRepositories` reason from the generic
+`SHARD_NOT_SEALED_ZERO_QUALIFIED_CONTENT_OR_REPLAY_MISMATCH` to something that distinguishes
+"deliberately out of packet-admission scope" from "genuinely incomplete," so a future reader (human
+or agent) doesn't mistake this specific, intentional boundary for an open gap needing work.
+
+**Operator decided: keep `repo:root`-only (2026-09-28). Implemented the smaller fix -- and
+`GRAPH_MANIFEST_SEALED` reached real `PASS` as a direct, honest consequence.** Built
+`scripts/atlas/lib/gitmodules-registry.mjs` (shared, not duplicated across the 3 consumers):
+`readSubmodulePaths()` parses `.gitmodules`, `classifyRepositoryId()` maps a `repository_id` to
+`FIRST_PARTY` (the literal `"root"` -- never a submodule path), `SUBMODULE` (a recognized
+`.gitmodules` path), or `UNKNOWN` (fail-closed default, treated the same as `FIRST_PARTY` so a
+future unrecognized repository is never silently exempted from the admission bar).
+
+Wired into all three scripts: `seal-graph-snapshot-shards-v1.mts` now tags each shard with
+`repositoryKind` and computes `allInScopeShardsSealed` (submodules excluded) alongside the
+unchanged, still-honest `allShardsSealed` (submodules included -- kept, not replaced, so the raw
+fact stays visible); `merge-graph-snapshot-shards-v1.mts`'s `excludedRepositories` now reports
+`SUBMODULE_OUT_OF_PACKET_ADMISSION_SCOPE_BY_DESIGN` vs. the original generic reason;
+`audit-canonical-projection-fabric.mjs`'s `GRAPH_MANIFEST_SEALED` predicate independently
+re-classifies the live repository set at audit time (does not just trust the sealer's stored
+`repositoryKind` label) and computes `seal_index_covers_live_repositories` against only the
+in-scope subset.
+
+**Re-ran the full pipeline for real** (sealer -> merge -> audit, live Postgres + live
+`.gitmodules`, not simulated): `repo:root` correctly classified `FIRST_PARTY`, all 6 others
+correctly classified `SUBMODULE`, `allInScopeShardsSealed: true`. Re-ran the fabric audit:
+**`GRAPH_MANIFEST_SEALED` verdict is now `PASS`** -- overall gate moved from 10/11 predicates
+below PASS to **9/11**. Every supporting field checked, not just the verdict string:
+`live_in_scope_repository_ids: ["repo:root"]` (correct), `submodule_repositories_excluded_by_design`
+lists all 6 explicitly (correct, transparent -- not hidden), `bound_to_admitted_workspace_revision:
+true`, `seal_index_covers_live_repositories: true`. The `note` field states plainly that this PASS
+does not certify Neo4j consumption of any graph manifest (still zero, still separately tracked) --
+a real, honest PASS with its own boundary stated in the same breath, not an inflated one.
+
+**Session running total for the graph-manifest thread**: `GRAPH-SNAPSHOT-SCOPE-V2-01` (exporter
+scoping fix + a real 2x fan-out bug caught) -> per-repository seal (built, then corrected after
+catching an empty-shard-marked-sealed bug) -> `GRAPH_MANIFEST_SEALED` predicate rewrite (fixed a
+structural PASS-impossibility bug) -> `GRAPH-SNAPSHOT-MERGE-V1-01` (built, self-consistency proven)
+-> submodule root-cause investigation (found the exact hardcoded-scope line, then the more important
+submodule reframing) -> operator decision -> submodule classification wired through all 3 scripts
+-> **`GRAPH_MANIFEST_SEALED` reaches real `PASS`**. Two real bugs caught and fixed before they could
+inflate the gate along the way (the fan-out join bug, the empty-shard-sealed bug) -- both caught by
+this thread's own rehearsal/verification discipline, not by luck.
+
+## SEMANTIC-OWNER-REGRESSION-01 -- read-only investigation, real regression found and fixed (2026-09-28)
+
+Per an operator-directed sequencing decision (investigate `SEMANTIC_OWNER_PROVEN` first, then the
+6-repository packet-admission gap, `GRAPH-SNAPSHOT-MERGE-V1-01` deferred): read-only investigation
+into why this predicate reports `NOT_PROVEN`. Did not modify any semantic writer, embedding,
+Postgres row, Qdrant collection, or representation record for this thread -- audit-script-only fix,
+per the explicit constraint given.
+
+**Reconstructed exactly what changed, not just what the current code says.** `git log --all
+--oneline -- scripts/atlas/audit-canonical-projection-fabric.mjs` shows only 3 commits ever touched
+this file (`a7e262ccf0`, `865a7c3f57`, `3d255c9b06`); none of them contain the code currently on
+disk for this predicate's `verdict` field -- meaning the live working tree has an **uncommitted**
+edit beyond the last commit, consistent with this repo's documented pattern of concurrent sessions
+leaving uncommitted state. `git diff HEAD` isolates the exact change:
+
+```
+- verdict: active768Present.length === 1 ? 'PARTIAL_PROVEN' : 'NOT_PROVEN',   (last COMMITTED)
++ verdict: 'NOT_PROVEN',                                                      (current, before this fix)
+```
+
+The same diff also shows real, legitimate additions alongside this regression in the same
+uncommitted hunk: a new `HISTORICAL_OR_UNRESOLVED_768_SURFACES` list, a renamed/clarified
+`canonical768ContractTargetPresent` variable, and a new `writerOwnerStatus` field -- this was not a
+wholesale bad edit, it looks like an in-progress refinement that flattened the verdict computation
+either by mistake or as an intentional pending-further-work placeholder that was never revisited.
+
+**Classification: A (AUDIT_REGRESSION).** Verified live, before concluding this, that the
+underlying data/owner situation has NOT regressed: `codebase_chunk_index.content_embedding_768` is
+present in the live vector-column census right now (`information_schema.columns`, 71 real vector
+columns enumerated, this one among them) -- the exact same signal the last-committed ternary used
+to compute `PARTIAL_PROVEN`. Not B (evidence-stale -- there's no receipt/artifact involved, this
+predicate reads live schema directly), not C (owner drift -- no second writer claims authority),
+not D (real provenance failure -- the target column genuinely exists), not E (representation
+mismatch -- the predicate is inspecting exactly `content_embedding_768`, the canonical target, not
+a legacy/384/512 surface). Purely a verdict-computation bug.
+
+**Fixed, minimally, matching the last-committed intent rather than the current in-progress
+refinement's incomplete state**: restored `verdict: canonical768ContractTargetPresent.length === 1
+? 'PARTIAL_PROVEN' : 'NOT_PROVEN'` -- the last COMMITTED ceiling (`PARTIAL_PROVEN`, not the even
+earlier `PASS`-capable version from `a7e262ccf0`, which commit `865a7c3f57` deliberately tightened
+first -- that intentional tightening is preserved, only the later uncommitted flattening is undone).
+Left `writerOwnerStatus: 'UNRESOLVED_NOT_PROMOTED'` as an unconditional literal -- this one IS
+correct as invariant across both branches, since the predicate's own `note` field already explains
+column presence alone never proves a unique writer, in either branch.
+
+**Re-ran the read-only audit for real**: `SEMANTIC_OWNER_PROVEN` moved `NOT_PROVEN -> PARTIAL_PROVEN`.
+Overall gate stays at 9/11 predicates below PASS (unchanged count -- this predicate was already
+counted as below-PASS before the fix and still is after; the fix restores an honest intermediate
+state, it does not and should not inflate the gate). Terminal state for this tranche, per the
+directed plan: `SEMANTIC_OWNER_PROVEN` -> explained (AUDIT_REGRESSION) and honestly restored, not
+"confirmed genuinely blocked" -- the underlying semantic-768 column ownership question itself
+remains open (writer uniqueness, revision-qualified reads, and per-row provenance are all still
+unproven, exactly as the predicate's own `note` already said before this fix and still says after
+it) -- only the audit's own measurement of that question was broken, and only that was fixed.
+
+## PACKET-ADMISSION-GAP-01 -- read-only classification, 6 repositories (2026-09-28)
+
+Per the same directed sequencing, second thread. Read-only: no `PacketKeyV2` minting, no revision
+backfill, no writes of any kind -- classification only, per the explicit constraint given.
+
+**Per-repository classification** (live query, `atlas_packets LEFT JOIN`ed against
+`graphify_execution_file_membership_v2` on `source_ref`, for the 6 non-`repo:root` repositories at
+the admitted revision + selected execution):
+
+| Repository | Membership rows | Matched packets | Revision-qualified | Legacy (null revision/hash) | No packet at all |
+|---|---|---|---|---|---|
+| `repo:claude-mem` | 763 | 759 | 0 | 759 | 4 |
+| `repo:turbovec` | 86 | 86 | 0 | 86 | 0 |
+| `repo:granite-docling-258M` | 10 | 10 | 0 | 10 | 0 |
+| `repo:mcp-server-mcp` | 192 | 0 | 0 | 0 | 192 |
+| `repo:sites/parent-atlas-gateboard` | 22 | 0 | 0 | 0 | 22 |
+| `repo:models/embeddinggemma_300m` | 13 | 0 | 0 | 0 | 13 |
+
+**Two genuinely distinct sub-populations, not one uniform gap**:
+1. **`claude-mem`/`turbovec`/`granite-docling-258M` -- `LEGACY_PACKET_NEEDS_REGEN`.** Spot-checked 5
+   sample packets directly: `content_hash`, `sha256`, `source_revision`, `workspace_revision_key`
+   are ALL null -- these are bare identity-only rows (`packet_key` + `source_ref`, nothing else),
+   not "missing revision but otherwise fine." The membership table already has everything a
+   producer would need to regenerate them (`content_hash`, `code_source_revision`, both populated,
+   `sha256:`-prefixed) -- this is exactly the same `LEGACY_LINEAGE_FIELDS_MISSING` case
+   `produce-current-packet-digest-bridge-v1.mjs` already handles for `repo:root`, just never
+   pointed at these repos (same hardcoded-filter root cause as before). `claude-mem` additionally
+   has 4 source_refs with no packet at all -- a small `NO_PACKET` subset within an otherwise
+   `LEGACY_PACKET_NEEDS_REGEN` repository, not a uniform state even within one repo.
+2. **`mcp-server-mcp`/`sites/parent-atlas-gateboard`/`models/embeddinggemma_300m` --
+   `NO_PACKET`, 100%.** Zero `atlas_packets` rows exist for any of these source_refs, matched or
+   not. These would need actual new `packet_key` minting (an INSERT, not an UPDATE) -- a
+   higher-consequence action in the same category as the already-explicitly-gated `PacketKeyV2`
+   admission question, not a simple backfill.
+
+**`ALREADY_BINDABLE`: zero, everywhere.** No source_ref in any of the 6 repositories currently has
+a revision-qualified packet matching the admitted inventory exactly. **`IDENTITY_UNRESOLVED`: zero
+found** -- every membership row's `source_ref` either matches exactly one `atlas_packets` row or
+zero; no ambiguous/multiple-match cases were found in this scan.
+
+**Per the operator's own stated rule ("Only `ALREADY_BINDABLE` should be eligible for a bounded
+producer run without an additional identity decision") -- there is nothing safe to auto-fix here
+without a further identity decision.** Confirms investigation-only was the correct scope and the
+correct stopping point for this thread; no backfill or minting was attempted, matching the explicit
+constraint given. `GRAPH-SNAPSHOT-MERGE-V1-01` remains deferred, unchanged, per the same directive
+-- 1 valid shard plus 6 unsealed-by-design (submodule) shards would add no admission value right
+now, and nothing in this investigation changes that.
+
+**Terminal state for this tranche**: `SEMANTIC_OWNER_PROVEN` -> explained (real `AUDIT_REGRESSION`,
+fixed) and honestly restored to `PARTIAL_PROVEN`. `GRAPH_MANIFEST_SEALED` -> unchanged at real
+`PASS` (submodule-scoped, from the prior thread). `PACKET_ADMISSION_GAP` -> classified by
+repository and sub-population, not backfilled. `GRAPH-SNAPSHOT-MERGE-V1-01` -> still deferred.
+Overall gate: `NOT_SAFE_TO_PROJECT`, 9/11 predicates below PASS (unchanged count from before this
+tranche -- this tranche restored honesty on one predicate and produced a clean classification on
+another; it did not and should not have moved the overall verdict).
+
+## ORDINAL-SCOPE-RECONCILE-01 -- read-only census, no regeneration (2026-09-28)
+
+Per operator direction: reconcile `ORDINAL_MAP_SEALED`'s denominator against the now-settled
+`repo:root`-only admission scope, rather than judging the existing ordinal artifact against a
+broader/obsolete universe. Explicit constraints honored: exact canonical/revision joins only, no
+identity inference, no packet minting, no Postgres/Qdrant writes, no touching the 6 excluded
+submodule populations, and `materialize-candidate-ordinal-corpus-v1.mts` was NOT modified or run --
+census only, read-only against the live `atlas_packets` table and the existing corpus artifact on
+disk (`docs/reports/candidate-ordinal-corpus-v1.json`, 14,368 rows).
+
+**Real, per-row census** (every candidate corpus row carries its own `workspaceRevision`/
+`sourceRevision`/`candidateSnapshotRevision`, not just corpus-level metadata -- verified before
+assuming otherwise):
+
+| Field | Value |
+|---|---|
+| `admittedRootCandidates` (live: `atlas_packets` at admitted revision, `source_revision IS NOT NULL`) | **16,151** |
+| `ordinalRows` (corpus `candidates.length`) | **14,368** |
+| `exactIdentityMatches` (corpus `canonicalId` = live `packet_key`) | **14,252** |
+| `revisionMatches` (of the matched rows, per-row `sourceRevision` also matches live) | **14,252** (100% of matches -- zero revision drift among matched rows) |
+| `missingOrdinal` (admitted candidates absent from the corpus entirely) | **1,899** |
+| `duplicateCanonicalId` / `duplicateOrdinal` | **0 / 0** |
+| `foreignRepositoryRows` (corpus rows whose `sourceRef` is a submodule path) | **0** |
+| corpus-level `workspaceRevision`/`candidateSnapshotRevision` mismatches (per-row vs. corpus header) | **0** |
+| Orphaned corpus rows (present in corpus, match NO currently-admitted packet at all) | **116** |
+
+**The 116 orphaned rows are not a revision-staleness issue -- they are a different identity scheme
+entirely**, found by inspection before assuming "stale" per the requested taxonomy: 14,252 of
+14,368 corpus rows use the dominant `packet:<12-hex>` scheme; the other exactly **116** use
+`packet_<24-hex>` or `packet_<n>_<epoch-ms>` (underscore-separated, two different sub-shapes seen
+in a spot sample) -- neither format matches `atlas_packets.packet_key` under any currently-admitted
+row. This 116 count is the SAME 116 rows as the orphaned set (100% correlation, verified) -- i.e.
+every orphaned row is explained by identity-scheme mismatch, not by a real packet that simply
+changed revision.
+
+**Classification per the requested taxonomy**:
+- **`ORDINAL_MAP_SEALED` = `PARTIAL_PROVEN`** (not `PASS`, not `STALE`, not `NOT_PROVEN`): a valid,
+  revision-exact subset genuinely exists (14,252/16,151 = 88.2% of the admitted `repo:root`
+  population, zero revision drift within that subset) -- but admitted candidates are missing
+  (1,899, real coverage gap, requires regeneration to close) AND the corpus carries 116 rows tied
+  to an identity scheme that isn't the current one (requires exclusion/reconciliation, not
+  regeneration, once the scheme's origin is understood).
+- **Root cause is NOT an obsolete all-repository denominator** -- `foreignRepositoryRows: 0` rules
+  that out cleanly; the prior `PARTIAL_PROVEN` state was not caused by counting non-root rows in
+  the denominator. It is genuinely **both** missing coverage AND a legacy-identity-scheme
+  contamination, exactly the "could be partly both" case the operator's own plan anticipated.
+
+**Not done here, deliberately**: `materialize-candidate-ordinal-corpus-v1.mts` was not touched.
+`ORDINAL_MAP_SEALED`'s audit-script predicate (which likely has the same class of
+denominator/staleness blind spot the two prior predicate fixes this session found) was not
+inspected or modified in this pass -- flagged as the natural next check, not done under this
+census's explicit read-only-only scope. The 116-row identity-scheme origin (which producer wrote
+`packet_<24-hex>` / `packet_<n>_<epoch-ms>` rows into this corpus, and when) was not traced further
+-- next step if this thread continues, still read-only.
+
+## ORDINAL-LINEAGE-02 -- correction to the prior census, real producer bug found and fixed, NOT applied (2026-09-28)
+
+Following the operator's own next step ("repair existing producer only if genuine coverage/lineage
+is missing"), traced the 116 "orphaned" rows from `ORDINAL-SCOPE-RECONCILE-01` above to their
+actual cause -- **and found that census entry was itself wrong.** Recording the correction plainly
+rather than leaving the earlier wrong classification standing.
+
+**Correction**: the 116 rows are NOT orphaned, NOT a different-identity-scheme population lacking a
+current binding, and NOT evidence of missing lineage. Joining on the corpus's `packetKey` field
+(instead of `canonicalId`, which is what the prior census used, matching the requested taxonomy's
+own field name) shows **all 116 are genuine, currently-admitted, revision-exact packets** --
+116/116 match live `atlas_packets.packet_key`, 0 not found, 0 revision mismatch, verified live
+before writing this down.
+
+**Real root cause: a one-line producer bug**, not a coverage gap. `materialize-candidate-ordinal-corpus-v1.mts`
+line 162 set `canonicalId = row.packet_id` -- `packet_id` is a real, separate `atlas_packets`
+column, NOT an alias for `packet_key`. Verified live: 3,413 rows repo-wide have
+`packet_id IS DISTINCT FROM packet_key`; for the 116 that also happen to be in this corpus's
+admitted-and-lineage-qualified population, `packet_id` held an unrelated legacy scheme
+(`packet_<n>_<epoch-ms>` for 78 rows whose `packet_key` carries the separate, already-known
+`ace:packet:` prefix variant; `packet_<24-hex>` for the other 38, whose `packet_key` is otherwise
+normal `packet:<12-hex>`). For the other 14,252 rows, `packet_id` happened to equal `packet_key` by
+coincidence, which is exactly why this went unnoticed -- the bug only ever manifested for the
+minority where the two columns diverge.
+
+**Fixed**: `canonicalId = row.packet_key` (matching what every other producer/consumer in this repo
+already treats as canonical), with an added defensive runtime guard
+(`CANDIDATE_ROW_WITHOUT_PACKET_KEY`) matching this repo's "reject rather than fabricate identity"
+convention, since the upstream `validRows` filter's non-null guarantee isn't visible to the type
+checker through the intervening `.filter()` call.
+
+**Rehearsed via `--dry-run`, twice, identical results both times** (no writes, per the script's own
+existing gate -- `--authorize-current-cohort` was never passed): row count unchanged at **14,368**
+(correct and expected -- this fix changes a field's *value*, not which rows qualify), new
+deterministic `ordinalMapChecksum` `9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`
+(the old checksum, `9c2752534f56bf9a3e2390dda1f49ed5ede9064fa1eeaff780e21f6a18b8291e`, necessarily
+differs since 116 rows' `canonicalId` values changed).
+
+**Deliberately NOT applied.** The script's existing authorization gate
+(`ORDINAL_CORPUS_APPLY_REQUIRES_AUTHORIZED_CURRENT_COHORT`, requiring `--authorize-current-cohort`
+plus an exact match against `workspace-revision-tournament-admission-v1.json`) was left untriggered
+-- this fix stays at the rehearsed-not-applied stage, matching the operator's own step separation
+(`ORDINAL-LINEAGE-02`: repair the producer vs. `ORDINAL-SEAL-03`: deterministic regeneration +
+digest + readback, a distinct later step). The corrected code exists and is proven correct by
+rehearsal; the live `docs/reports/candidate-ordinal-corpus-v1.json` artifact on disk still carries
+the old, buggy `canonicalId` values for those 116 rows until an explicit apply is authorized.
+
+**Real remaining gap, unchanged by this fix**: the 1,899 missing-candidate count from
+`ORDINAL-SCOPE-RECONCILE-01` stands -- this fix corrects an identity-field bug in already-included
+rows, it does not add coverage. `ORDINAL_MAP_SEALED` should still be reported `PARTIAL_PROVEN` for
+that reason (88.2% coverage, 1,899 genuinely missing), not because of the 116 -- that count is now
+understood to be a pure bookkeeping defect with zero effect on real coverage, once the corrected
+corpus is actually applied.
+
+## ORDINAL-LINEAGE-03 / ORDINAL-REGEN-03 -- root-scope materializer and isolated corrected artifact (2026-09-28)
+
+Updated the existing ordinal materializer so `repo:root` membership in the currently admitted
+workspace snapshot is the source-cohort authority. Before querying packets, the script now verifies
+the admission status/revisions, confines the manifest path to the sealed snapshot directory, and
+recomputes the snapshot, source-membership, and source-content checksums. A packet enters the root
+cohort only when its **raw** `source_ref` and exact `source_revision` occur together in a manifest
+source whose `repositoryId` is `repo:root`; canonicalized aliases cannot widen membership. Apply
+still requires the existing explicit `--authorize-current-cohort` gate.
+
+The map itself remains strict `CandidateOrdinalMapV1`; scope and lineage diagnostics are recorded
+in the companion receipt rather than appended as unknown map fields. This was caught during local
+artifact readback because the map schema is `.strict()`.
+
+**Read-only live rehearsal + local artifact readback**:
+
+- The sealed snapshot has 24,456 `repo:root` sources. The live read-only materializer query returned
+  16,151 workspace-revision rows, all 16,151 matched the exact admitted root source path/revision
+  set, and 14,368 had the required PROVEN packet→chunk lineage. A follow-up read-only lineage
+  breakdown classified the remaining 1,783 as 1,734 with no lineage row and 49 with a source-
+  revision mismatch; no row was promoted or repaired.
+- A finer read-only cross-tab reconciled all 16,151 rows without treating absence as permission to
+  synthesize lineage:
+  - 14,368 `PROVEN` rows have chunk rows and an exact current Graphify namespace.
+  - Of the 1,734 rows with no lineage row, 1,586 have no chunk rows, 147 have chunk rows but no
+    exact Graphify namespace, and 1 has a duplicate canonical chunk ID.
+  - Of the 49 source-revision mismatches, 46 have chunk rows and an exact current Graphify
+    namespace; 3 have no exact current Graphify namespace.
+  These cohorts require distinct follow-ups: chunk production for the 1,586, namespace/source
+  authority for the 150 rows lacking an exact namespace, duplicate-ID resolution for the single
+  ambiguous row, and revision-qualified re-proposal for the 46 stale bindings. No apply path was
+  run; the counts are diagnostic and do not authorize repairs.
+- Existing proposal tooling is narrower than the unresolved cohort: `freeze-pkt-lineage-current-
+  single-chunk-v1.mjs` only proposes packets with no existing lineage and requires exact
+  `source_ref`/`relative_path` plus source/chunk/Graphify digest parity (single-chunk by default;
+  `--multi` is explicit). Therefore it cannot repair the 49 stale existing rows, and cannot create
+  chunks or authorize a namespace for the other cohorts. The separate apply tool consumes a frozen
+  proposal and writes lineage; it was not run. Any future stale-row proposal must explicitly model
+  replacement/revision semantics rather than rely on the no-existing-lineage proposal path.
+- Shuffled deterministic rehearsal returned 14,368 candidates and checksum
+  `9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`.
+- Corrected map and receipt were written only under
+  `.tmp/atlas/candidate-ordinal-corpus-v2/ordinal-root-20260928-v2/`; strict schema parse,
+  `assertCandidateOrdinalMapIntegrityV1`, receipt/map count and checksum parity, root-scope binding,
+  and zero-datastore-write flags all passed.
+- The existing `docs/reports/candidate-ordinal-corpus-v1.json` and receipt were not overwritten.
+
+**Still open**: 1,783 of the 16,151 admitted root-cohort packet rows lack proven lineage and were
+not assigned ordinals. This is a 14,368/16,151 partial artifact, not `ORDINAL_MAP_SEALED`; the
+full-cohort readback and the audit predicate's reachable `PASS` branch remain separate gates.
+
+**Convergence note (2026-09-28, cross-session).** This section landed concurrently with
+`ORDINAL-AUDIT-VERIFY-01`/`ORDINAL-LEGACY-ID-TRACE-01` immediately above (same day, independent
+work) -- both threads reached the **identical checksum**
+(`9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`) and the identical corrected
+count (**1,783**, not the earlier-reported 1,899 -- confirms that correction was right: the extra
+116 were rows present all along under a mismatched `canonicalId`, not genuinely missing). This
+section's finer breakdown (1,734 no-lineage-row + 49 source-revision-mismatch) refines, and is
+consistent with, the `canonical_id_packet_key_mismatch`/`missing_ordinal` fields now computed live
+by the fixed `ORDINAL_MAP_SEALED` audit predicate (see immediately above): `admitted_root_candidate_count:
+16151`, `exact_identity_matches: 14368` (100% of corpus rows, by `packetKey`), `missing_ordinal:
+1783`, `canonical_id_packet_key_mismatch: 116`, `duplicate_canonical_id: 0`, `duplicate_ordinal: 0`,
+`foreign_repository_rows: 0`. Re-ran the full fabric audit with the fixed predicate:
+`ORDINAL_MAP_SEALED` verdict is `PARTIAL_PROVEN` (unchanged string, now genuinely computed with
+real per-row checks and a reachable `PASS` branch -- previously the predicate could never reach
+`PASS` under any input, the same class of bug already fixed twice this session for
+`GRAPH_MANIFEST_SEALED` and `SEMANTIC_OWNER_PROVEN`). Overall gate unchanged: `NOT_SAFE_TO_PROJECT`,
+9/11 predicates below PASS.
+
+**`ORDINAL-LEGACY-ID-TRACE-01`, brief (context-budget-limited): the 116 mismatched `canonicalId`
+values trace to `atlas_packets.packet_id`** -- a real, separate column (verified live:
+`information_schema.columns` shows both `packet_id` and `packet_key` as distinct `text` columns;
+3,413 rows repo-wide have them diverge). The mismatched IDs embed real epoch-millisecond
+timestamps (e.g. `packet_10_1784513267148` decodes to `2026-07-20T02:07:47.148Z`) -- consistent
+with an earlier, pre-`packet_key`-convention bulk admission pass, not a currently-canonical scheme
+and not a fallback/candidate ID minted by the ordinal materializer itself. Per the operator's own
+rule ("116 legacy rows != regeneration candidates... should be explained and excluded, not
+translated... unless an authoritative identity mapping is discovered"): no translation is needed
+here at all -- `packetKey` already IS the authoritative mapping for these 116 rows (verified 116/116
+exact live match), so the correct handling is simply to stop reading `canonicalId` as identity and
+read `packetKey` instead, which the producer fix already does. The exact prior script that first
+wrote `atlas_packets.packet_id` was not tracked down further given context budget -- a genuinely
+open, low-priority trace if ever needed, not blocking anything above.
+
+**Not done, still deferred per explicit instruction**: full regeneration/apply of the canonical
+`docs/reports/candidate-ordinal-corpus-v1.json` (both this session's fix and the concurrent
+session's isolated `.tmp/` artifact remain unapplied, pending `--authorize-current-cohort` and
+resolution of the 1,783 genuinely-unqualified rows); no work was done on or borrowed from the
+concurrent native/NLP/ORF portfolio, per the explicit instruction to keep those streams isolated.
+
+**1,783-row gap classification, read-only (2026-09-28), confirms and explains the concurrent
+session's 1,734/49 split**: for each of the 1,783 admitted-but-unqualified packets, checked whether
+any `atlas_packet_chunk_lineage` row exists at all for `(packet_key, source_ref)`, versus whether
+one exists but disqualifies on revision/status/chunk grounds.
+- **1,734 -- `MISSING_LINEAGE_BRIDGE`**: zero `atlas_packet_chunk_lineage` rows exist for that
+  `(packet_key, source_ref)` pair, period. Never linked to any chunk.
+- **49 -- `STALE_LINEAGE`**: a real lineage row DOES exist -- `revision_status='PROVEN'`, a real
+  non-null `chunk_row_id` -- so it is not disqualified by status or missing-chunk. Sample-verified
+  (5/5) the actual disqualifying field: the lineage row's own `source_revision` differs from the
+  packet's CURRENT `source_revision`. The source file's content changed after the lineage bridge
+  was last computed for it -- the bridge is stale relative to the currently admitted revision, not
+  absent.
+
+**Both are gaps in `atlas_packet_chunk_lineage` itself, not in `materialize-candidate-ordinal-corpus-v1.mts`**,
+which already correctly requires an exact-revision `PROVEN` lineage row as designed -- this is not
+a materializer bug, and not something the ordinal producer can close on its own. Closing this 1,783
+gap needs either populating the 1,734 missing bridge rows or refreshing the 49 stale ones in
+`atlas_packet_chunk_lineage` -- a write-adjacent operation on a different table, matching this
+session's earlier lineage-freeze work (`apply-pkt-lineage-09-historical-promotion-v1.mjs`), not
+something to start without explicit authorization. **Not attempted here** -- read-only
+classification only, per the investigate-first direction. This is the concrete next gate if the
+operator wants ordinal coverage to reach 16,151/16,151: a lineage-bridge backfill/refresh pass,
+scoped to these exact 1,783 `(packet_key, source_ref)` pairs, run and rehearsed with the same
+discipline as every other write this session (transaction + readback before any real commit).
+
+**Stale note:** `ACE-HIT-DEMAND-OWNER-01` above still says no `ace:hit-demand` script exists; the
+alias was added on 2026-09-28 (see `STARTUP-BITFROST-WARM-DIAGNOSIS-01` follow-ups) and the task
+should be re-scoped to the path-demand-hint contract (`ACE-STARTUP-BOUNDARY-01`).
+
+## STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 2: built the audit tool, found the real scope is bigger than 2 broken tasks (2026-09-28)
+
+Landed `scripts/atlas/audit-startup-task-npm-scripts-v1.mjs` (`npm run atlas:audit:startup-tasks`) —
+a read-only check that a `.vscode/tasks.json` task's `npm run <script>` actually resolves to a real
+script in the relevant `package.json` (root, `sveltekit-frontend`, or the task's own declared
+`options.cwd`). Motivated directly by finding `ace:hit-demand` and `startup:ace:detached` broken by
+hand; running the finished tool found **the real scope is 4 silently-broken `runOn: folderOpen`
+tasks, not 2**, plus 157 additional stale references on manual-only tasks (lower urgency — those
+fail loudly the moment a person runs them, so they announce themselves without a special tool).
+
+**4 confirmed silent, automatic failures (all `runOn: folderOpen`, all spot-verified by hand against
+the real `package.json`, not just tool output)**:
+
+| Task | Missing script | Note |
+|---|---|---|
+| `🚀 Startup: ACE Incremental Refresh (detached, safe)` | `startup:ace:detached` | Already known this session — `scripts/startup/ace-incremental-startup.mjs` and `config/startup-ace-policy.json` also don't exist. |
+| `🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)` | `ace:hit-demand` | Already known this session — `chunk_hit_log` table is real, seeding step was never built. |
+| `🩺 Startup: Atlas Smoke Gate (16 probes, detached)` | `smoke:atlas` | **New finding.** A differently-named `smoke:atlas-tools` exists — plausible rename drift, not investigated further. |
+| `🧪 Startup: OpenCode Sidecars Smoke (detached)` | `smoke:mcp:opencode-sidecars` | **New finding.** No similarly-named script found. |
+
+Both new findings (`smoke:atlas`, `smoke:mcp:opencode-sidecars`) are themselves gated behind other
+now-broken tasks via `dependsOn` chains (Atlas Smoke Gate → depends on the already-broken ACE
+Incremental Refresh; Seed Hit-Demand → depends on Atlas Smoke Gate) — meaning this whole `dependsOn`
+chain of 4 tasks has likely been non-functional together since whichever one broke first.
+
+**One false positive caught and fixed before trusting the tool**: the first version of the audit
+script only checked 2 fixed `package.json` paths and flagged `"Extension: Compile on Startup"` →
+`compile` as dangling — that task's `options.cwd` is `vscode-extension`, which has its own
+`package.json` with a real `compile` script. Fixed by making the audit cwd-aware (checks a task's
+declared `options.cwd` package.json too, not just the two baseline ones); re-ran, false positive
+gone, the 4 real findings above unchanged.
+
+**157 manual-only dangling references also found** — not investigated individually (that's a much
+larger, separate cleanup effort), but spot-checked 3 for tool correctness: `dev:grpc`, `check:tsgo`
+(real script is `typecheck:native`), and `smoke:graphify` (bare — this exact name is cited as live
+in root CLAUDE.md's "Graphify/Karpathy Stack" section, `5-pillar smoke`, but doesn't exist; only
+`smoke:graphify:symbols` does) all confirmed genuinely absent, not tool bugs. **This means root
+CLAUDE.md itself has at least one more stale command reference beyond what this session's earlier
+corrections already fixed** — flagged here, not corrected in this pass (out of scope; would need
+its own investigation into what `smoke:graphify` was renamed to, if anything).
+
+**Not done in this pass**: no attempt to fix any of the 161 dangling references, silent or manual —
+this follow-up's scope was building and proving the detection tool, per the approved plan. The tool
+itself is real, tested (`node --check` clean, verified end-to-end through the npm alias, one false
+positive caught and fixed), and exits 1 only on silent/automatic findings (manual-only findings are
+reported but don't fail the gate, since they're self-announcing). Fixing the 4 silent findings (and
+triaging the 157 manual ones) is future work — each needs its own build-vs-remove-vs-rename decision,
+not a blind bulk fix.
+
+## STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 3: 2 of 4 silent failures fixed for real (2026-09-28)
+
+**Correction to two of this session's own earlier claims, found while fixing these** — both wrong,
+both from too-narrow searches, not from actually-missing code:
+
+1. **"HyperRAG Packet RPC registry doesn't exist" was wrong.** A real, live, 634-line endpoint —
+   `sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts` — fuses Qdrant + Postgres FTS
+   + Neo4j, returns immutable provenance tuples with confidence scores, has a working smoke test
+   (`scripts/atlas/smoke-hyperrag-packet-rpc.mjs`, aliased `smoke:hyperrag-packet-rpc` /
+   `smoke:trace:full`). The earlier claim came from grepping file *contents* for specific patterns
+   (`PacketRpc`, `RpcRegistry`) and never checking whether a file literally named
+   `*hyperrag-packet-rpc*` existed. It did.
+2. **`ace:hit-demand`'s "missing implementation" framing was wrong** — only the npm *alias* was
+   missing; the real, complete, idempotent producer script already existed at
+   `sveltekit-frontend/scripts/seed-hit-demand.mjs`, and its real *consumer* already existed too
+   (`context-for-file.ts`'s `loadHitDemand()`, reading the exact `{hits, hot_score, avg_rerank,
+   last_hit_at}` shape the seeder writes). Both sides of this feature were built; only the npm
+   script name connecting the task to the seeder was never added.
+
+**Fixed for real, live-verified, this session**:
+- `npm run ace:hit-demand` (+ `ace:hit-demand:dry`) added, pointing at the pre-existing
+  `scripts/seed-hit-demand.mjs`. Live-tested: dry-run correctly reports "no hits in last 24h" against
+  real (empty-in-window) `chunk_hit_log` data; a real `--hours=4000 --force` apply run against the
+  table's actual historical rows (32 rows, dated 2026-04-20) wrote a real `ace:rank:demand` Redis
+  hash — verified via direct `HGETALL`/`GET`/`TTL`, not the script's own output — matching the exact
+  shape its real consumer expects.
+- `npm run smoke:atlas` added, pointing at a pre-existing, previously-unaliased script,
+  `scripts/smoke-atlas-context.mjs`, whose own docstring literally says "Regression smoke for the
+  atlas → context_for_file → hypergraph search lane" — the same chain the broken task's `detail`
+  field described. Live-tested: 15/17 real probes pass (1 warn: no prompt cards, atlas peers sparse;
+  1 real fail: `provenance.sources` empty — a genuine, pre-existing, unrelated finding, not
+  introduced by this wiring), exit 0.
+
+**Audit re-run confirms progress**: `npm run atlas:audit:startup-tasks` silent-folderOpen count
+4 → 2. Remaining 2: `startup:ace:detached` (the larger two-lane incremental/heavy orchestrator —
+its script + policy file genuinely do not exist, unlike the two just fixed) and
+`smoke:mcp:opencode-sidecars` (not investigated this pass — time-boxed per context budget; same
+"check for an unaliased existing script before assuming it's unbuilt" approach should be tried
+first, given this session's 2-for-2 track record of that being the actual answer).
+
+**Lesson applied going forward**: before recording anything as "missing implementation," check for
+an existing-but-unaliased script by name/docstring, not just by npm-script-name absence — this
+session got that wrong twice in a row before correcting the pattern.
+
+## STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 4: 3 of 4 silent failures now fixed; last one confirmed genuinely unbuilt (2026-09-28)
+
+Same "check for an existing-but-unaliased script before assuming it's unbuilt" approach, applied to
+the last remaining `smoke:mcp:opencode-sidecars` finding — worked a third time in a row.
+`scripts/smoke-opencode-mcp-sidecars.mjs` already existed (word order swapped vs. the task's
+expected `smoke:mcp:opencode-sidecars` name), docstring confirms it's the right script ("Regression
+guard for the OpenCode MCP sidecars," checks turbovec/engram-embed/langextract transports, tolerates
+DOWN sidecars). Added the missing alias, ran it live: real per-sidecar status
+(`turbovec: TRANSPORT_ERROR — 404`, `engram-embed: OK`, `turbovec-sidecar: SKIPPED — disabled in
+opencode.json`), exit 0 as designed.
+
+**`npm run atlas:audit:startup-tasks` silent-folderOpen count: 4 → 1.** Only
+`startup:ace:detached` remains, and — unlike the other 3 — checked and confirmed this one really is
+unbuilt, not just unaliased: no `*ace*incremental*` or `*ace*detach*` script exists anywhere under
+`scripts/`. This matches the original finding that its backing files
+(`scripts/startup/ace-incremental-startup.mjs`, `config/startup-ace-policy.json`) genuinely don't
+exist. Per the operator-approved plan, this one is left as an explicit build-vs-remove decision, not
+attempted here — it's a real two-lane orchestrator (incremental git-diff-triggered refresh + a
+GPU-gated heavy lane), meaningfully more scope than the three alias fixes above.
+
+### STARTUP-BITFROST-WARM-DIAGNOSIS-01 — FOLLOW-UP 5: stale final-failure claim corrected; manual wiring only (2026-09-28)
+
+The preceding follow-up is stale: a path-scoped recheck found the orchestrator and policy at
+`sveltekit-frontend/scripts/startup/ace-incremental-startup.mjs` and
+`sveltekit-frontend/config/startup-ace-policy.json`. The missing item was the npm alias, not the
+implementation. Added `startup:ace:detached` to `sveltekit-frontend/package.json`, but did **not**
+enable it on folder open: the script can run indexing/graph/cache steps, spawn services, and execute
+a PostgreSQL pruning step. The VS Code task is now user-requested/manual, visible in the task UI,
+and no longer a prerequisite for the folder-open Atlas smoke. This resolves the remaining silent
+folder-open command failure without enabling automatic mutations.
+
+The earlier `ace:hit-demand`, `smoke:atlas`, and `smoke:mcp:opencode-sidecars` aliases are present.
+No startup orchestrator, smoke, MCP sidecar, database, cache, or model command was executed as part
+of this correction. Validation is limited to static task/package alignment and is captured in the
+receipt below.
+
+**Validation receipt (2026-09-28):** `node scripts/atlas/audit-startup-task-npm-scripts-v1.mjs`
+reports `silentFolderOpenDanglingCount=0` and `manualOnlyDanglingCount=156` across 638 tasks / 212
+`npm run` references. The manual-only count includes historical and intentionally user-invoked
+commands; it is not a claim that all 156 are actionable defects. `npx openspec validate
+parent-atlas-ace-rlm-bitfrost-integration --strict`, package JSON parsing, and scoped `git diff
+--check` pass. The audit itself is static; no startup chain or external service was invoked.
+
+**Session total for this diagnosis thread**: `karpathy:gpu` (fixed via new admission wrapper),
+`ace:hit-demand`, `smoke:atlas`, `smoke:mcp:opencode-sidecars` (all fixed via missing-alias wiring
+to pre-existing scripts) — 4 real fixes, all live-verified. `startup:ace:detached` — correctly left
+open pending an operator decision. Two of this session's own earlier claims corrected along the way
+(HyperRAG Packet RPC exists; ace:hit-demand needed an alias, not new code).
+
+### ACE-GATE-RECONCILE-01 — current receipt reconciliation (2026-09-28)
+
+Reconciled the historical blocker table above against the regenerated
+`docs/reports/atlas-canonical-projection-fabric-audit-2026-09-28.json`
+(`generated_at=2026-09-28T21:53:04.683Z`). The older table remains historical evidence and is
+superseded for current status by this receipt:
+
+| Predicate | Current verdict |
+|---|---|
+| `IDENTITY_ALIGNED` | `PARTIAL_PROVEN` |
+| `REVISION_QUALIFIED` | `PARTIAL_PROVEN` |
+| `SYMBOLS_RESOLVED` | `PARTIAL_PROVEN` |
+| `SEMANTIC_OWNER_PROVEN` | `NOT_PROVEN` |
+| `LATENT_FAMILY_PROVEN` | `PARTIAL_PROVEN` |
+| `GRAPH_MANIFEST_SEALED` | `PASS` |
+| `ONTOLOGY_COHORT_NONEMPTY` | `PASS` |
+| `ORDINAL_MAP_SEALED` | `PARTIAL_PROVEN` |
+| `PROJECTIONS_CHECKSUM_ALIGNED` | `NOT_PROVEN` |
+| `BITFROST_KEYS_DERIVABLE` | `NOT_PROVEN` |
+| `ACE_EVIDENCE_GROUNDED` | `NOT_PROVEN` |
+
+The overall receipt remains `NOT_SAFE_TO_PROJECT`: nine of eleven predicates are below `PASS`.
+The graph-manifest pass is limited to the operator-approved `repo:root` admission scope and does
+not establish Neo4j manifest consumption. The ordinal map is 14,368/16,151; semantic writer
+ownership is unresolved; and the ACE evidence audit found `ace_context_sources` empty. No
+projection/cache apply was authorized or run. `ACE-GATE-RECONCILE-01` is complete as a status
+reconciliation only; it closes none of the remaining admission predicates.
+
+### ACE-PRODUCER-TRACE-01 — read-only ownership trace (2026-09-28)
+
+The contracts exist, but the live producer chain is not proven. `buildAcePacketV3()` validates and
+seals a packet checksum. The ContextManifest bridge checks an admitted feature snapshot, ordinal,
+packet key, source ref/revision, workspace revision, and current-only representation/graph
+revisions, then emits a no-write receipt. The BitFrost writer separately requires an injected
+`embedAllowedPacketKeys` set and exact packet/cache identity matches before its explicit TTL write.
+That set is supplied by the caller; no admitted packet-key-set producer was found. The shared
+`ENRICHMENT_READINESS_CTE_V1` does define a read-only `embed_allowed` predicate, but the daily ACE
+step only counts matching rows and explicitly leaves composition unwired; it does not emit the
+packet-key set or establish the broader current-revision admission needed here. A static caller
+search found no application caller for the V3 bridge or cache writer (cache-writer calls found were
+focused tests); packet composers/canaries exist as scripts and do not prove a live request path.
+
+Disposition: `ACE-PRODUCER-TRACE-01` remains open. We cannot prove a current ContextManifest/ACE
+producer through `buildAcePacketV3`, nor source the allowed-key set from an admitted owner. Do not
+wire `ACE-BITFROST-CALLER-01` or run its canary until that producer/caller and key-derivation owner
+are established. This trace was static/read-only; no Redis, database, projection, or model operation
+was performed.
+
+### ACE-PRODUCER-TRACE-01 — current source recheck (2026-09-29)
+
+The read-only recheck confirms the earlier disposition: **BLOCKED_NOT_PROVEN**. The production
+`query-router.ts` path emits legacy ranked cards (`source_ref`, snippet, score, feature label), and
+`context-assembler.ts` maps those into legacy ACE context before attaching its legacy ContextManifest.
+No production caller connects that path to `buildAcePacketV3()` or
+`bridgeAcePacketsToContextManifestV1()`. The V3 builder and bridge have the needed fail-closed
+identity/checksum rules, but remain contract/composer/test surfaces rather than a live producer.
+
+The existing BitFrost writer also has identity/revision/checksum rejection, but it requires the caller
+to supply `embedAllowedPacketKeys`; no admitted packet-key-set owner is wired. The daily ACE step
+only counts `embed_allowed` rows and records a receipt. The local V3 composition report has 15,732
+packets, zero CURRENT semantic/topology sections, and 15,732 PENDING residency sections because
+representation provenance and other current evidence are unavailable. It does not close the live
+producer gate.
+
+Receipt: `docs/reports/ace-producer-trace-01-v2-20260929T043742Z.json`. No task checkbox was
+promoted. Do not start `ACE-BITFROST-CALLER-01` or its explicitly authorized write/readback canary
+until the production source owner and admitted allowed-key derivation are proven.
+The isolated V3 packet suite passed 13/13, and the bridge plus BitFrost guard suites passed 33/33;
+these are contract fixtures only and do not change the production-wiring disposition.
+
+### ORDINAL-LINEAGE-02 — audit verification and legacy identity trace (2026-09-28)
+
+`ORDINAL-AUDIT-VERIFY-01` is complete as a read-only predicate audit. The audit now verifies the
+sealed repo:root snapshot and its checksum, admitted denominator, per-row workspace and snapshot
+revision, exact source/canonical packet identity, source revision, uniqueness, contiguous ordinal
+slots, orphan/foreign rows, and a recomputed map checksum. It writes to an isolated `.tmp` report
+directory when `ATLAS_AUDIT_REPORT_DIR` is supplied, preserving the historical same-day report.
+The corrected result matches the established truth set: 16,151 admitted root candidates; 14,368
+current ordinal rows; 14,252 exact identity-and-revision matches; 1,899 missing admitted rows;
+116 `canonicalId`/`packetKey` mismatches; zero duplicate IDs/ordinals and zero foreign-repository
+rows. The 116 are excluded legacy identity contamination. `ORDINAL_MAP_SEALED` remains
+`PARTIAL_PROVEN`; the overall projection gate remains `NOT_SAFE_TO_PROJECT`.
+
+`ORDINAL-LEGACY-ID-TRACE-01` traced both underscore-style ID families to
+`scripts/atlas/register-orphaned-chunks.mjs`. Its ordinary apply path creates temporary
+`packet_<index>_<epoch-ms>` packet IDs; the capture-lineage path creates `packet_<24-hex>` packet
+IDs. The census places 78 timestamp-style IDs on 2026-07-20 and 38 hash-style IDs on 2026-09-03.
+All differ from their canonical `packet_key`; the timestamp family has 78 alias records pointing
+to current keys, but none of the legacy IDs is itself an alias key, and the hash family has no
+alias records. These are storage/temporary IDs, not canonical identity. The previous ordinal
+materializer admitted them by taking `packet_id` as `canonicalId`; the current materializer uses
+the canonical row's `packet_key` and carries forward zero historical legacy ID values.
+
+The existing materializer was updated additively to retain explicit rejection diagnostics and to
+materialize only exact, revision-qualified repo:root lineage. Two shuffled, read-only dry runs
+produced byte-identical 14,368-row maps (artifact SHA-256
+`b4aed0bced606e6cfbbe76bcdc2446a10ef7cba26769f91de7b09da871c11cc7`; ordinal checksum
+`9197c2d8611a5be96ce76982358ddcd926789ffe32b3a6a248dec8027e6eba9b`). Schema parsing and
+integrity/readback checks passed; datastore writes were zero. This is a deterministic partial
+rebuild, not the required 16,151-row sealed artifact, and the official historical artifact was
+not overwritten.
+
+The remaining 1,783 admitted candidates are not eligible for ordinal materialization yet:
+1,734 have no qualifying lineage bridge and 49 have only stale source-revision lineage. The
+materializer's rejection census also distinguishes `excluded_legacy_identity`, `missing_packet`,
+`missing_source_revision`, `workspace_revision_mismatch`, `duplicate_canonical_id`,
+`duplicate_ordinal`, and `foreign_repository`; `missing_packet` is explicitly a root-snapshot
+diagnostic outside the packet-candidate denominator. Do not append missing rows to the historical
+map or repair the lineage here. Resolve the missing/stale bridges under their own authorized
+lineage owner, then regenerate the complete map from the admitted canonical cohort and prove two-run
+determinism before changing `ORDINAL_MAP_SEALED` to `PASS`.
+
+### ORDINAL-LINEAGE-02 — correction: lineage-refresh apply was already committed; stop custom writer (2026-09-28)
+
+Correction to the preceding read-only disposition: preserved artifact
+`docs/reports/pkt-lineage-refresh-01-apply-v1.json` records `APPLY_COMMITTED` at
+`2026-09-28T23:47:08.724Z`, `writesPerformed=true`. This commit predates this correction pass; no
+apply was initiated in this pass. The receipt reports 2,814 lineage-row inserts, including 147
+previously missing packet groups, plus 49 stale packet groups refreshed; table row count changed
+from 125,113 to 127,927. Do not describe the lineage operation as “not applied.” The matching
+rehearsal receipt is retained and reports rollback only.
+
+The prior apply's acceptance check was insufficient for the now-required three-way revision
+invariant: it accepted packet↔chunk parity while omitting the admitted-workspace Graphify revision
+check. A bounded `BEGIN READ ONLY` readback of the exact producer-tagged rows found 196 admitted
+root packet keys / 3,502 lineage rows. All 196 packet groups have current `PROVEN` lineage and
+packet↔chunk digest parity; zero have a `graphify_files` row at the admitted workspace revision.
+Across historical Graphify rows, 46 packet groups have at least one matching digest, 150 have no
+matching digest, and 63 have multiple distinct Graphify revision values. Therefore the historical
+matches are not a safe substitute for an admitted-workspace Graphify binding. No corrective write,
+rollback, or further lineage refresh was performed.
+
+The preserved read-only reevaluation remains: 1,783 targets classified as 1,586
+`NO_PHYSICAL_CHUNK`, 1 `DUPLICATE_CANONICAL_CHUNK_ID`, and 196
+`GRAPHIFY_REV_MISMATCH`; zero are repairable under the existing three-way parity rule. The 196 are
+not permission to relax that rule. The post-commit live readback confirms that the lineage rows
+were written but does not establish the missing Graphify authority. The remaining 1,587 require
+separate chunk coverage/identity work; ordinal sealing remains blocked.
+
+`scripts/atlas/rehearse-pkt-lineage-refresh-01-v1.mjs` is now a retired diagnostic stub. Its custom
+target mutation planning and SQL write path were removed; invoking it performs no DB access and
+exits with a retirement notice. Historical rehearsal/apply receipts are preserved. The existing
+`freeze-pkt-lineage-current-single-chunk-v1.mjs` remains the canonical read-only freeze owner for
+its documented scope, but its current query selects only packets with no lineage row and is not
+itself an exact 1,783-row reevaluator. Do not run it as if it covered stale rows or the full
+repo:root target set.
+
+At the time of this correction, the next gate was `GRAPHIFY-FILE-REV-OWNER-TRACE-01`; it was
+subsequently completed as a read-only static ownership trace (see the section below). The current
+next gate is `GRAPHIFY-FILE-REV-REEVAL-01`: freeze the exact 196 source refs and compare their
+packet revision, chunk digest, Graphify revision/workspace/run evidence, and admitted snapshot.
+No refresh/rehearsal should be defined until that exact comparison is complete. Any future refresh
+must go through the existing Graphify owner, followed by the existing lineage freeze owner. This
+correction records an already-committed write and a read-only readback; it authorizes no additional
+database mutation.
+
+### GRAPHIFY-FILE-REV-OWNER-TRACE-01 — read-only owner trace (2026-09-28)
+
+The declared `graphify_files` source-revision persistence owner is
+`sveltekit-frontend/src/lib/server/atlas/indexing/graphify-source-inventory-writer-v2.ts`
+(`writeGraphifySourceInventoryV2` / `writeGraphifySourceInventoryInTransactionV2`). It does not
+invent revisions: it accepts validated `WorkspaceRevisionRecordV1` and
+`WorkspaceSourceBindingV1` inputs, writes `binding.sourceRevision` to
+`graphify_files.code_source_revision`, binds the content digest and byte length, records
+`workspace_revision` and run IDs, then independently reads back the row and checks exact revision,
+content digest, and byte length. Its upsert identity is `(workspace_id, source_ref,
+code_source_revision)`; a new code revision is a new versioned row, while same-revision updates
+require content digest and byte-length parity.
+
+The source identity owner is `deriveCodeSourceRevisionV1` in
+`identity/code-source-revision-v1.ts`: SHA-256 over exact UTF-8 bytes, formatted
+`sha256:<hex>`. `workspace-revision-origin-runtime-v1.ts` reads file bytes, verifies UTF-8
+round-trip, and creates source bindings; the workspace revision is a separate SHA-256 manifest
+digest. `graphify_files` rows carry workspace revision and Graphify run IDs, but not an
+`execution_id`. The separate `graphify_execution_file_membership_v2` relation carries execution
+identity and is not interchangeable with a `graphify_files` row.
+
+Static call-path audit found a standalone file-inventory caller and a full-corpus caller for the
+writer. The declared `graphify:daily:chain` package command does not include
+`graphify-daily-lifecycle-file-inventory-v1.mjs` or call `writeGraphifySourceInventoryV2`; the
+coordinator's `graphify_execution_file_membership_v2` writes are not `graphify_files` writes. Thus
+`graphify_files.code_source_revision` has a real writer owner, but refreshing it is not proven to
+be part of the current daily chain. No Graphify command or writer was run in this trace.
+
+The existing `freeze-pkt-lineage-current-single-chunk-v1.mjs` remains strict three-way parity, but
+its selection only includes packets with no lineage row and does not accept the frozen 1,783 exact
+target set; it cannot reevaluate the already-written 196 stale-Graphify cases as-is. The preserved
+`PKT-LINEAGE-REEVAL-01` classification is therefore retained as diagnostic evidence, not upgraded
+to a new lineage owner. Current read-only readback after the pre-existing apply confirms the 196
+producer-tagged packet groups have packet↔chunk parity but no `graphify_files` row at the admitted
+workspace revision. Because the writing helper derives new rows from supplied current workspace
+bindings, a broad daily rerun would not establish or restore the older admitted snapshot revision.
+
+Disposition: `GRAPHIFY-FILE-REV-OWNER-TRACE-01` is closed for static code ownership and algorithm;
+live admitted-snapshot refreshability remains unresolved. Next, freeze the exact 196 source refs and
+compare packet revision, chunk digest, all Graphify revision/workspace/run evidence, and the
+admitted snapshot before proposing any Graphify refresh. Only the existing Graphify writer may
+perform such a refresh, with an exact matching admitted record/binding set and independent
+readback. This trace authorized no database mutation.
+
+**Target-manifest gap:** the preserved apply receipt records aggregate counts and an
+`unexpectedOtherSample`, but does not include the exact 196 affected packet keys/source refs or a
+target-manifest checksum. That sample is not the affected set. `GRAPHIFY-FILE-REV-REEVAL-01` must
+freeze its exact target keys from independently verified database/write evidence (196 packet keys,
+3,502 lineage rows) before hashing files; do not infer targets from the sample or timestamps.
+
+**Read-only query attempt (2026-09-28):** the live catalog confirms indexes on lineage `id`,
+`(packet_key, canonical_chunk_id)`, `canonical_chunk_id`, `packet_key`, `revision_status`, and
+`source_ref`; there is no index on `created_at` or `lineage_producer_revision`. A bounded recent-row
+aggregation intended only to discover a producer tag hit its 15-second statement timeout and was
+canceled. It returned no target manifest and performed no writes. Keep `GRAPHIFY-FILE-REV-REEVAL-01`
+open until exact packet keys are recovered from a preserved preimage or an indexed, independently
+verified target selector; do not retry the timestamp scan or widen it.
+
+### AUDIT-SYMBOL-01 -- SYMBOLS_RESOLVED unreachable-PASS bug fixed; two facts separated (2026-09-29)
+
+`SYMBOLS_RESOLVED`'s verdict ternary (`atlasSymbolRegistryRowCount > 0 ? 'PARTIAL_PROVEN' : ...`)
+had no `PASS` branch at all and never consulted the `reconciliation_gate` object it computed --
+the same unreachable-verdict bug class already found and fixed 3x earlier this session
+(`GRAPH_MANIFEST_SEALED`, `SEMANTIC_OWNER_PROVEN`, `ORDINAL_MAP_SEALED`). Per external review, the
+fix does NOT collapse "did nominated symbols resolve" and "is coverage sufficient" into one flip
+to `PASS` -- those are separated as two distinct facts in the predicate output:
+
+- `nomination_resolution`: read from the most recent `symbol-reconciliation-writer-v1-*.json`
+  receipt whose `targetWorkspaceRevision` matches the CURRENT admitted revision (never a stale
+  or mismatched-revision receipt). Live result: `194/194` nominations resolved, `0` unresolved,
+  `0` ambiguous -- genuinely clean.
+- `coverage`: `symbolsForBoundRefs / boundSourceRefCount` from the existing live
+  `reconciliation_gate` query. Live result: `194/24,456` bound source refs (`0.8%`) have any
+  extracted `graphify_symbols` row at all.
+
+`PASS` requires both `nomination_resolution.clean === true` AND `coverage.full_coverage === true`.
+Live verdict correctly stays `PARTIAL_PROVEN` -- resolution is clean, coverage is the real,
+honest remaining gap (owner: `scripts/atlas/graphify-symbol-extractor-v1.mts`, extraction
+coverage, not reconciliation). This is a verifier-honesty fix, not a coverage backfill.
+
+**Same-pass, unrelated to symbols but requested as a "quick win":** ran the existing
+`backfill-atlas-packet-qdrant-links.mjs` (dry-run then `--apply`, reused rather than duplicated
+per this repo's Duplication Prevention rule) -- `16,783/16,783` real matches written to
+`atlas_packets.qdrant_point_id`/`qdrant_collection`/`qdrant_vector_dim`. This closed
+`IDENTITY_ALIGNED` to real `PASS` (was `289/1000` missing in sample, now `0/1000`).
+`REVISION_QUALIFIED` also now reads `PASS` live -- that predicate's admitted-cohort scope
+correction (denominator = admitted repo:root cohort 16,151, not the table-wide 61,718) was
+already committed in an earlier pass this session; reaching `PASS` here is live data catching
+up to already-committed code, not a new change.
+
+**Overall fabric audit: 9/11 predicates below PASS -> 7/11 below PASS.** Remaining below PASS:
+`SYMBOLS_RESOLVED`, `SEMANTIC_OWNER_PROVEN`, `LATENT_FAMILY_PROVEN`, `ORDINAL_MAP_SEALED`,
+`PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, `ACE_EVIDENCE_GROUNDED`. None of these
+are schema/storage-model gaps -- per external review, they are producer/provenance problems
+(missing unique-writer proof, missing promotion decisions, missing tables, missing key-derivation
+schemes) not fixable by adding fields to any packet contract. Full per-predicate gap table
+recorded in this session's chat; not duplicated here in full to avoid drift from the live
+regenerated report at `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+
+Committed `95cd026434` on `handoff/summary-enrichment-lineage-20260925` (pushed). `GRAPHIFY-BINDING-01`
+read-only trace is now complete: all 24,456 admitted root execution-member rows exactly match
+`atlas_workspace_source_bindings` on source ref, workspace/source revision, normalized content
+digest, and byte length; root ordinals are unique/contiguous. However, zero `graphify_files` rows
+are bound to the admitted workspace revision or identify the native snapshot run. The current
+`writeGraphifySourceInventoryV2` per-file input requires Git-backed workspace metadata; the
+sealed-snapshot binder only binds run-level metadata. Therefore the next implementation must be
+an additive snapshot-backed input path inside the existing Graphify writer, with an exact bounded
+target manifest and readback. Do not derive admitted source bytes from the current worktree, infer
+Git OIDs, or create a second writer. No DB writes were made by this census.
+
+The fresh fabric audit is 4 `PASS`, 4 `PARTIAL_PROVEN`, 3 `NOT_PROVEN` (seven below `PASS`). The
+audit script's `ACE_EVIDENCE_GROUNDED` note was also corrected: it now distinguishes a zero-row
+`ace_context_sources` table from a populated table whose individual evidence still needs grounding.
+This is a reporting correction only; it does not change the predicate verdict or authorize ACE,
+Graphify, cache, projection, or schema writes.
+
+Follow-up read-only ACE store reconciliation found `ace_context_cache=2` (both legacy
+`feature_map_store` entries), `ace_context_packets=0`, `ace_context_sources=0`, and no
+`public.llm_context_cache`, although Drizzle declares that relation and
+`ace-context-pack-cache.ts::persistAceContextPackAuditRow()` targets it. The two existing cached
+JSON objects contain no source/workspace revision, source-ref list, or ContextManifest checksum,
+so they do not satisfy `ACE_EVIDENCE_GROUNDED`. The pointer writer also previously classified any
+fulfilled Postgres promise as a successful write even when this function returned `null`;
+`classifyAceContextPackPointerSource()` now requires a non-null persisted key before reporting
+Postgres. Focused fixtures cover Postgres success, Redis fallback, and local fallback. This
+improves telemetry only; no cache, DB, or schema writes were made and the admission gate remains
+blocked. Before adding a migration or redirecting the writer, reconcile the intended Postgres
+cache/audit owner with the existing `ace_context_cache` contract.
+
+Fresh full fabric audit after the note correction: `docs/reports/graphify_928-audit-live-ace-store-fix/`
+(`2026-09-29T03:27:56.162Z`) returned 4 `PASS`, 4 `PARTIAL_PROVEN`, 3 `NOT_PROVEN`, overall
+`NOT_SAFE_TO_PROJECT`; `ace_context_sources.row_count=0` and the note now correctly states that.
+No graph projection or canonical write was attempted. The same seven below-PASS predicates
+remain; the ACE persistence telemetry fix does not alter gate status.
+
+### ACE-PRODUCER-TRACE-01 — first real (non-fixture) exercise of the packet→ContextManifest bridge (2026-09-29)
+
+Found before writing anything new: `bridgeAcePacketsToContextManifestV1()`
+(`sveltekit-frontend/src/lib/server/atlas/context/ace-packet-v3-context-manifest-bridge-v1.ts`) is a
+real, complete, well-tested pure function — the exact join this task asks for (selected candidate
+ordinals → verified `AcePacketV3` evidence → `ContextManifest` admission receipt, with strict
+packet_key/source_ref/source_revision/workspace_revision equality checks and a mixed-revision
+guard) — but it had **zero callers anywhere in the repo outside its own `.spec.ts`** (checked via
+grep across `sveltekit-frontend/src` and all of `scripts/atlas`, `*.mjs`/`*.mts`). It had never been
+run against real data.
+
+Also found already real and already run: `scripts/atlas/compose-ace-packets-v3.mjs` composed
+15,732 real `AcePacketV3` packets on 2026-09-29 from the current admitted workspace revision
+(`sha256:e24bb971...`, matrix `.tmp/atlas/candidate-feature-matrix-v1/20260926T174833Z`, 0 verify
+failures, 0 cache-admission misses) — but nothing downstream ever consumed them either.
+
+Built `scripts/atlas/prove-ace-producer-trace-01-v1.mjs` (read-only, no DB/Valkey/Qdrant/Neo4j
+writes) to close that gap for real: it reads a real bounded cohort of `REVISION_QUALIFIED` rows
+from the actual admitted ordinal map, locates each row's actual composed packet in the actual
+composer output (not a fixture), independently re-verifies each packet via `verifyAcePacketV3`
+(not trusting the composer's own self-check), materializes a fresh real
+`CandidateOrdinalMapV1`/`CandidateFeatureSnapshotV1` over just that cohort via the existing
+`materializeCandidateOrdinalMap`/`materializeCandidateFeatureSnapshot` owners (no new schema, no
+second materializer), then calls `bridgeAcePacketsToContextManifestV1()` for the first time ever
+against real packets instead of hand-built fixtures.
+
+**Result: `ACE_PRODUCER_CHAIN_REAL_TRACE_PROVEN`** at both N=5 and N=200 (`docs/reports/ace-producer-trace-01-v1.json`,
+latest run N=200). Every step passed: real ordinal-map read (16,151 rows, 15,732 revision-qualified),
+real packet located for 100% of the selected cohort, independent packet verification, fresh
+snapshot materialization, and a successful bridge call producing a real
+`contextManifestIdentityChecksum`. `representationRevision`/`graphRevision` both correctly stayed
+`null` in the receipt — the composed packets' semantic/topology sections are `HINT`, never
+`CURRENT` (per `compose-ace-packets-v3.mjs`'s own `whyNotCurrent` list: no real
+`representation_revision`, no SOM revision, contaminated summaries), and the bridge's
+non-promotion guard correctly refused to fabricate a `CURRENT` revision from `HINT` evidence.
+
+**What this proves and what it does not**: this proves the identity-join contract (packet ↔
+candidate row ↔ ContextManifest admission) is real, wired, and correct for a live cohort — not
+just fixture-shaped. It does **not** prove semantic/topology readiness (those stay `HINT`/`PENDING`
+until `SEMANTIC_OWNER_PROVEN` and a real SOM revision exist — separate, already-tracked gaps), and
+it performs no BitFrost write — `ACE-BITFROST-CALLER-01`/`ACE-BITFROST-CANARY-01` remain the next,
+separately-gated steps per this file's existing implementation order and per root `CLAUDE.md`'s
+"Remaining implementation order" §3-5.
+
+**Reconciliation with the concurrent "ACE-PRODUCER-TRACE-01 — current source recheck" entry
+above (same date):** that recheck's `BLOCKED_NOT_PROVEN` verdict answers a stricter, distinct
+question — whether the *live retrieval path* (`query-router.ts` → `context-assembler.ts`) calls
+`buildAcePacketV3()`/the bridge in production. It does not, and this run does not change that:
+zero production request-serving code was touched here, and this receipt does not promote any task
+checkbox. What this run adds is narrower: proof that the bridge *contract itself* is correct when
+exercised against real (not fixture) packets and a real admitted cohort, not just its own unit
+tests. Both dispositions stand side by side: mechanism-correct-on-real-data (this entry) AND
+not-yet-wired-into-production-retrieval (the recheck above). Do not cite this entry as closing
+`ACE-PRODUCER-TRACE-01` — the recheck's `BLOCKED_NOT_PROVEN` remains the governing status.
+
+### Session handoff (2026-09-29) — Docker GPU fixes, ae:train alias fix, kmeans/bitsandbytes census
+
+Real, live-verified fixes made this session, separate from the ACE-PRODUCER-TRACE-01 work above:
+
+1. **`image-synthesis` (`docker/image-synthesis/`, `docker-compose.yml`) — two real bugs found
+   and fixed, both verified live**:
+   - `docker-compose.yml`'s `LLM_MODEL: ${LLM_MODEL:-gemma4-legal:latest}` shadowed
+     `app.py`'s already-correct `ornith-1.5-9b` default (chat/synthesis is sent to llama-server
+     `:8090`; Ollama is embeddings-only there). Fixed default to `ornith-1.5-9b`; live-verified on
+     the recreated container.
+   - `image-synthesis` had **no `deploy.resources.reservations.devices` block at all** (unlike
+     `atlas-gpu-8098`, which has one) — Docker never passed the RTX 3060 Ti through, and the
+     service silently ran on CPU (`device=cpu` in its own startup log; not a crash). Added the
+     same `devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]` block. Live-verified:
+     startup log now shows `device=cuda`; `nvidia-smi` inside the container sees the GPU;
+     `torch.cuda.is_available()=True`; `bitsandbytes 0.49.2` loads its CUDA backend cleanly.
+   - Committed: `9554f275f7`.
+2. **Ruled out, not fixed, because nothing was broken**: Unsloth (not an actual dependency
+   anywhere in this repo — one string literal naming a HuggingFace checkpoint in an unrelated
+   Gemma-rank script), and the FLUX NF4/INT8 quantization code path itself (already Ampere-safe —
+   `int8_weight_only()`/`int4_weight_only()` via torchao, bitsandbytes NF4; never touches an
+   NVFP4/MXFP4/SM100-only path). No kmeans clustering error was ever located — no log, no receipt,
+   no failed run turned up despite checking; if one exists, it needs to be pointed to directly.
+3. **`rapidsai/base:26.08-cuda12-py3.13-amd64` Docker image removed** — 0 containers referenced
+   it (leftover base-image tag from building `atlas-gpu-8098`), freed ~6.24GB unique layers;
+   `atlas-gpu-8098`'s own running container and `/health` were unaffected (verified before/after).
+4. **`ae:train`/`ae:train:dry` npm aliases were broken (never worked)** — `atlas:p6:ae:train:queue`
+   resolves from `sveltekit-frontend` to the absent repo-root target
+   `scripts/atlas/queue-autoencoder-training.mjs`. A same-named 715-byte file exists under
+   `sveltekit-frontend/scripts/atlas/`, but it is a logging stub and is not the file that npm's
+   `../scripts/atlas/...` path executes. `atlas:phase16:ae:dry` called `npm run ae:train:dry`,
+   which also did not exist at the time. Same failure class as this file's earlier
+   `karpathy:gpu`/`ace:hit-demand`/`smoke:atlas` findings. Fixed by
+   adding real `ae:train`/`ae:train:dry` scripts pointing at the actual existing trainer,
+   `scripts/atlas/train-autoencoder-768-64.mjs` (which already supports `--dry-run`). Live-verified:
+   `npm run ae:train:dry` now runs for real and fails on an honest, specific missing prerequisite
+   (`docs/reports/ae-train-manifest.json`, generated by `scripts/atlas/ae-train-manifest.mjs`) —
+   not a "command not found" error. **Not fixed, flagged as a bigger gap**:
+   The `ae:train`/`ae:train:dry` aliases now exist and target the real trainer. Queue aliases
+   remain unresolved: `atlas:p6:ae:train:queue`, `atlas:p5:kmeans:queue`, and
+   `atlas:p5:som:queue:20x20` point at absent repo-root queue executors. This looks like an
+   entire "Phase 5/6 GPU job queueing" lane (presumably RabbitMQ or a worker pool) that was
+   scaffolded in `package.json` but never implemented. Do not fabricate stub queue scripts for
+   this without knowing the intended queue/worker architecture.
+5. **Real `KMEANS-ORACLE-01` gap confirmed, not yet built**: `scripts/atlas/cuml-kmeans-clustering.py`
+   exists but only ever runs cuML KMeans *or* sklearn KMeans as a fallback (try/except on import),
+   never both on the same input for a parity comparison. A genuine sklearn-CPU-oracle-vs-cuML
+   parity receipt (the pattern this repo already uses elsewhere, e.g. `SEMANTIC-EXACT-PARITY-01`)
+   does not exist for KMeans. Also found: 8 separate kmeans-related scripts under `scripts/atlas/`
+   (`cuml-kmeans-clustering.py`, `graphrag-kmeans-communities.mjs`, `kmeans-multi-k-experiment.mjs`,
+   `persist-kmeans-centroids.mjs`, `phase-1b-gpu-kmeans-som.mjs`,
+   `phase-2a-ast-grep-lexical-kmeans-topology.mjs`, `phase2b-lexical-extraction-kmeans.mjs`,
+   `train-turbovec-kmeans.mjs`) — flagged as a possible Duplication-Prevention audit candidate
+   (same shape as this file's earlier "5 competing PageRank implementations" finding), not audited
+   in this pass.
+6. **Confirmed NOT the same subsystem**: `docs/parent-atlas-workstation-todo.md` (dated
+   2026-09-05, self-described as superseded by the v2 workboard) has zero mentions of
+   bitsandbytes/FP4/kmeans/Unsloth anywhere — it tracks Parent Atlas identity/lineage/
+   CandidateOrdinal/8095/8098 gates, an unrelated subsystem to `image-synthesity`. Do not merge
+   findings from one into the other.
+
+**Next, if picked up**: `GPU-LEASE-01` (single heavy-owner lease for the 8GB RTX 3060 Ti across
+`image-synthesis`/RAPIDS KMeans/CAGRA/cuGraph — VRAM was seen at 7823/8192MiB in an earlier
+session, which is a much more plausible failure mode for a future GPU error than anything checked
+in this pass), then `KMEANS-ORACLE-01` (build the actual sklearn-vs-cuML parity receipt), then
+decide the queue-script gap (item 4) with the operator before building anything.
+
+### Graphify/Karpathy startup outcome reporting (2026-09-29)
+
+The folder-open task intentionally runs admitted Karpathy Redis enrichment independently after
+`graphify:daily` returns. A blocked Graphify admission therefore does not imply a Graphify apply,
+even when Karpathy succeeds. Corrected the task label, detail, and output so the result is
+explicit: `STARTUP CYCLE PARTIAL` when Graphify is blocked and Karpathy succeeds; only
+`STARTUP CYCLE COMPLETE` means both succeeded. Preserved the existing 24-hour marker path because
+its current marker is fresh; it throttles the combined cycle after Karpathy success, so a blocked
+Graphify retry waits for that cooldown. This update is
+reporting/scheduling clarity only; it does not change either runner, loosen admission, or rerun
+Graphify/Karpathy. Validation: startup-task audit parsed 639 tasks/213 npm references and found
+zero dangling folder-open references (156 previously catalogued manual-only findings remain);
+PowerShell parser accepted the edited command; strict OpenSpec validation and scoped `git diff
+--check` passed. The startup task itself was not executed.
+
+### ACE packet-field vs projection-admission blocker reconciliation (2026-09-29)
+
+Reconciled the pasted older blocker list against the current fabric report and the actual V3 schema.
+The older `IDENTITY_ALIGNED` 289/1,000 and table-wide `REVISION_QUALIFIED` 16,151/61,718 figures
+are stale for the current audit. Current evidence is 4/11 predicates `PASS`, 7/11 below `PASS`:
+`SYMBOLS_RESOLVED`, `SEMANTIC_OWNER_PROVEN`, `LATENT_FAMILY_PROVEN`, `ORDINAL_MAP_SEALED`,
+`PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED`.
+`IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`, and
+`ONTOLOGY_COHORT_NONEMPTY` are `PASS`.
+
+The proposed ACE packet fields are mostly already present; do not add duplicates to chase the gate:
+- `source_revision`: required `identity.source_revision`, cross-checked against the base envelope and
+  the selected CandidateFeatureSnapshot row.
+- `file_path`: canonical locator is `source_ref`; adding a second path identity is not required.
+- `summary`: `semantic.data.summary` already carries text, input digest, model revision, and section
+  status. It remains `HINT`/`PENDING` when summary provenance is not qualified.
+- token budget: request-specific and already supplied to the ContextManifest bridge; do not make it
+  durable packet identity. Exact token counts belong to a tokenizer-qualified request/prompt plan.
+- features: feature identity/revision is separate from consumer layout ordering. Remap by stable
+  feature ID through an explicit layout adapter; do not add a universal ordinal to ACE packets.
+- representation, graph, and centroid references: represented in identity/topology sections with
+  explicit `CURRENT`/`HINT`/`STALE`/`PENDING` status; centroid refs bind representation revision
+  and artifact checksum. A `semantic_768` label with null representation revision is not a current
+  embedding claim.
+
+**Actual ACE gaps:** the 200-packet real-artifact bridge receipt at
+`docs/reports/ace-producer-trace-01-v1.json` proves packet/candidate/ContextManifest identity
+joining, but records `representationRevision=null`, `graphRevision=null`, `canonicalAuthority=false`,
+and `writesPerformed=false`. Static caller search finds the V3 builder only in package composition,
+audit/canary scripts, and the structural composer; the ContextManifest bridge is called only by its
+proof script outside tests; `AcePacketWriter.writeRevisionQualifiedV3ToBitfrost` has no production
+caller. `embedAllowedPacketKeys` therefore still has no server-owned, admitted producer.
+
+The live `ace_context_sources` table exists but has 0 rows. Its legacy shape is
+`id/retrieval_run_id/source_kind/stable_key/file_path/directory_path/score/reason/metadata/created_at`;
+it has no typed packet key, source revision, byte-span, ContextManifest checksum, or representation
+revision columns. Repository search found no current INSERT writer or tracked migration owner for
+this table. The fabric audit currently counts rows only and labels any non-empty table
+`PARTIAL_PROVEN`; that is not a sufficient grounding proof and must not be “fixed” by inserting
+unqualified rows. Grounding needs a revision-qualified production producer plus independent source
+span/readback verification (or an explicitly reviewed correction to the audit's evidence owner).
+
+**Independent ordinal blocker remains upstream:** current admitted cohort is 16,151; ordinal map is
+14,564; missing 1,587 consists of 1,586 distinct missing physical chunk paths plus one duplicate
+canonical chunk ID. Within the 1,586 missing paths, 1,570 have an exact Graphify code-source
+revision, while 16 do not; current file bytes match packet revision for 15 of those 16. The
+`.vscode/tasks.json` mismatch is pre-existing user work and was left untouched. Neither this gap nor
+the other six below-PASS predicates is fixed by adding fields to `AcePacketV3`.
+
+**Disposition / order:** keep `ACE-PRODUCER-TRACE-01` open despite the real-data contract receipt;
+it still requires a production retrieval caller and admitted key-set derivation. First establish a
+revision-qualified chunk/source owner and resolve the ordinal rejection buckets; independently close
+symbol, semantic-writer, latent-input, and cross-projection checksum ownership. Then wire the existing
+ACE bridge from the real retrieval/feature owners, prove grounded ContextManifest source spans and
+readback, and only afterward consider the existing BitFrost writer/canary. No packet schema,
+database, Redis/Valkey, Qdrant, or graph changes were made in this reconciliation.
+
+### GRAPHIFY-SYMBOL-COVERAGE-REEVAL-01 — live admission recheck (2026-09-29)
+
+Reran `scripts/atlas/audit-canonical-projection-fabric.mjs` with a separate report directory so the
+already-modified daily report was not overwritten. The fresh SELECT-only receipt is
+`docs/reports/atlas-canonical-projection-fabric-audit-followup-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+The verdict remains `NOT_SAFE_TO_PROJECT`, with 4/11 predicates `PASS`. For
+`SYMBOLS_RESOLVED`, the admitted repo root has 24,456 source bindings, of which 21,584 are supported
+by the current extractor. Only 62 are `PROCESSED`; 20,363 exact-revision rows remain
+`UNPROCESSED`; 1,159 supported refs lack an exact `graphify_files.code_source_revision` row; parse
+failures and duplicate exact rows are both zero. The 194/194 symbol nominations still resolve
+cleanly. This is a genuine coverage gap, not a per-file “must emit a code symbol” requirement.
+
+The writer trace found two separate owners: `graphify-source-inventory-writer-v2.ts` persists
+`graphify_files` inventory from caller-supplied, already-materialized source bindings and enforces
+content-digest/byte-length parity; `graphify-daily-coordinator-v1.ts` records execution membership
+and explicitly does not write `graphify_files`. Do not treat the lifecycle coordinator or the
+symbol extractor as authority to synthesize missing inventory rows. The exact-revision extractor
+can only process existing `UNPROCESSED` inventory rows joined to the admitted source binding.
+
+Hardened the extractor's explicit `--apply` failure path: missing/parse-failed rows now revalidate
+the exact admitted binding, lock the matching `(file_id, source_ref, code_source_revision)` row,
+and perform a guarded update. This removes the prior file-id-only update path. The successful
+extraction path retains its own revision and source-byte rechecks. The 50-row run was dry-run only:
+50 candidates, 47 extractor-supported, 1,152 planned structural records, zero revision mismatch,
+and zero database writes. No `--apply` was run.
+
+Validation: Node syntax check, TypeScript syntax check, strict OpenSpec validation, scoped diff
+check, and the exact-revision dry-run passed. `SYMBOLS_RESOLVED` remains `PARTIAL_PROVEN`; the
+1,159 missing inventory rows and 20,363 unprocessed rows remain open. No projection apply, source
+inventory write, database/cache/vector write, or model call occurred.
+
+#### Correction — bounded exact-revision extraction was subsequently applied
+
+The preceding paragraph recorded the state before the guarded apply and is superseded for current
+status by this correction. The existing extractor owner was then run with explicit `--apply`, exact
+admitted workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+and bounded batches. The first 50-candidate apply processed 47 supported files (1,148 rows
+inserted); a subsequent 200-candidate apply processed 159 files (2,349 rows inserted; 3
+source-revision mismatches rejected without writes); a 1,000-candidate apply processed 950 files
+(28,193 rows inserted; 8 source-revision mismatches rejected without writes). All three completed
+with zero per-file failures. The extractor's per-file transactions rechecked source bytes and exact
+revision bindings; unsupported files were skipped. No source-inventory, embedding, Qdrant,
+Valkey/Redis, Neo4j, projection, or model operation was part of these applies.
+
+Independent read-only audit after the batches:
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch1000-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+`SYMBOLS_RESOLVED` coverage advanced from 62 to 1,218 processed of 21,584 supported refs; exact
+revision rows with symbols advanced to 1,075 across 253 source refs. There are still 19,207
+supported exact-revision refs unprocessed and 1,159 supported refs without an exact
+`graphify_files.code_source_revision` row. Parse failures and duplicate exact inventory rows remain
+zero. The overall admission gate remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS (7 below PASS); the
+ordinal census is unchanged at 14,564/16,151 with 1,587 missing. This is partial extraction
+coverage, not a closed predicate. Receipts: `graphify-symbol-extractor-v1-1790705467358.json`,
+`graphify-symbol-extractor-v1-1790705631365.json`, and
+`graphify-symbol-extractor-v1-1790705838069.json`.
+
+#### Chunk-gap owner recheck
+
+The existing read-only freeze owner was re-run in its documented `--multi` mode. It found one
+candidate packet with 52 physical chunk rows, but the packet was rejected as
+`duplicate_canonical_chunk_id`; zero memberships were proposed. Thus this run did not recover any
+of the 1,586 `NO_PHYSICAL_CHUNK` sources and did not authorize a lineage write. The existing
+`materialize-packet-markdown-chunks.mjs` is not a substitute: it destructively clears and rebuilds
+the unrelated `packet_markdown_chunks` table from `nes_chrom_packets`, not `codebase_chunk_index`.
+The existing `GraphifySourceInventoryWriterV2` likewise persists already-materialized source
+bindings, and its coordinator does not supply missing source rows. Keep the chunk gap blocked until
+the canonical chunk producer and its admitted-source caller are identified; do not use the broad
+full-repository indexer or the generic Markdown packet chunker as a repair path. The multi-freeze
+receipt is `.tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json` (local diagnostic,
+no canonical or projection writes).
+
+#### AST index-key bound and resumed extraction
+
+A later 1,000-candidate extraction attempt exposed PostgreSQL error `54000` from the existing
+`atlas_ast_nodes` unique B-tree index: a very long `qualified_symbol` produced a 3,640-byte index
+tuple, over PostgreSQL's approximately one-third-page limit. The per-file transaction rolled back
+the failing file; earlier successful files remained committed. Fixed the existing
+`atlas-ast-nodes-writer.mjs` rather than changing schema ownership: `qualified_symbol` is now bounded
+only as an index/display value when its UTF-8 size exceeds 512 bytes, using a prefix plus SHA-256
+marker; the full value still feeds `tree_node_id`, `structural_key`, and `normalized_node_hash`.
+Three focused tests pass, including Unicode byte bounding and proof that full structural identity
+remains unchanged.
+
+After this fix, a bounded 1,000-candidate apply completed: 686 files processed, 1 parse failure, 130
+source-revision mismatches left unprocessed, 183 unsupported files skipped, and 231,329 structural
+rows inserted. Fresh SELECT-only audit:
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-repaired-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+Live totals are now 2,276/21,584 supported exact-revision sources processed, 18,145 unprocessed,
+4 parse-failed, 1,159 with no exact Graphify inventory row, and zero duplicate exact inventory
+rows. One new JSON failure is confirmed to be source syntax, not the AST index issue:
+`packages/atlas-duckdb/src/redis-centroid-config.json` contains unquoted arithmetic
+(`1 + 1 + 2 + 5 + 5`) and therefore is not valid JSON. The three earlier malformed JSON documents
+remain individually recorded in `graphify_files.parse_error`; no source file was modified to make
+the extraction gate look better.
+
+The 11-predicate gate remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS. Ordinals remain 14,564/16,151 with
+1,587 missing. The long-name writer fix and partial extraction progress do not close ordinal,
+semantic-owner, latent-input, projection-checksum, BitFrost derivation, or ACE grounding gates.
+
+One further 1,000-candidate batch completed after the repaired batch: 494 processed, 0 failed,
+247 source-revision mismatches rejected, 259 unsupported, and 5,504 rows inserted. Independent
+read-only audit at
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-next-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`
+now reads 2,770/21,584 supported exact-revision sources processed, 17,651 unprocessed, 4
+parse-failed, and 1,159 missing exact Graphify inventory rows. Still 4/11 PASS; all other predicate
+verdicts are unchanged. Batch receipt: `graphify-symbol-extractor-v1-1790707295663.json`.
+
+A subsequent bounded batch processed 199 files (2,760 rows inserted), failed 0, rejected 252
+source-revision mismatches, and skipped 549 unsupported files. Its read-only admission receipt is
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-third-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`:
+2,969/21,584 processed, 17,452 unprocessed, 4 parse-failed, 1,159 missing exact inventory rows;
+overall still 4/11 PASS. Batch receipt: `graphify-symbol-extractor-v1-1790707453150.json`.
+
+The next 1,000-candidate apply made 177 additional per-file commits, then stalled without an active
+PostgreSQL query or measurable CPU/file-I/O progress. After interrupting only that invocation, a
+fresh read-only audit showed 3,146 processed, 17,275 unprocessed, 4 parse-failed, and 1,159 missing
+inventory rows; because the process did not reach its receipt writer, there is no batch receipt.
+The stall was traced to the next candidate, `scripts/atlas/audit-qdrant-noise.mjs`: its block comment
+contained a literal `*/` in a path example, prematurely ending the comment. `node --check` confirmed
+the source was syntactically invalid. Corrected only the comment to use `<suffix>` notation; syntax
+now passes. The exact-source dry-run then correctly rejected it as `SOURCE_REVISION_MISMATCH`
+because the admitted binding still names the old bytes. It was not applied or marked processed;
+rebind/admission must precede extraction of this changed file. Diagnostic receipt:
+`graphify-symbol-extractor-v1-1790708458935.json`.
+
+After that source correction, a 1,000-candidate dry-run completed (273 source-revision mismatches,
+557 unsupported, 170 eligible, 1,423 planned observations). The explicit guarded apply processed
+those 170 files with zero failures and 1,423 rows inserted. Fresh
+read-only admission receipt:
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-after-hang-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+It reads 3,316/21,584 processed, 17,105 unprocessed, 4 parse-failed, 1,159 without exact
+`graphify_files` source-revision rows, and still 4/11 overall PASS. Apply receipt:
+`graphify-symbol-extractor-v1-1790708551256.json`.
+
+The following dry-run/apply pair completed without failures. Dry-run receipt
+`graphify-symbol-extractor-v1-1790708639085.json` classified 160 eligible files in its 1,000-candidate
+window; the guarded apply receipt `graphify-symbol-extractor-v1-1790708653080.json` processed those
+160 files and inserted 1,485 symbol rows. Its other candidates remained rejected/skipped by exact
+source-revision mismatch or unsupported-kind policy. Fresh independent audit:
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-fourth-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+It reports 3,476/21,584 supported admitted sources processed, 16,945 unprocessed, 4 parse-failed,
+and 1,159 without an exact Graphify source-revision row. The overall projection gate remains
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS; ordinal coverage is still 14,564/16,151 with 1,587 missing.
+No projection apply, ordinal regeneration, semantic materialization, or cache write was performed.
+
+A subsequent 1,000-candidate dry-run/apply pair used the same admitted workspace revision. The dry-run
+receipt `graphify-symbol-extractor-v1-1790708839006.json` found 147 eligible files; the guarded apply
+receipt `graphify-symbol-extractor-v1-1790708869765.json` processed all 147 with zero failures and
+inserted 1,255 symbol rows. It rejected 283 exact source-revision mismatches and skipped 570
+unsupported candidates. Independent read-only admission audit:
+`docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-fifth-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+Current `SYMBOLS_RESOLVED` state is 3,623/21,584 supported sources processed, 16,798 unprocessed,
+4 parse-failed, 1,159 lacking an exact Graphify revision row, and zero duplicate exact Graphify
+source refs. Ordinal coverage remains 14,564/16,151 with 1,587 missing; overall admission remains
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS. The audit ran in a READ ONLY transaction and rolled back; no
+projection, ordinal, semantic, or cache writes occurred.
+
+#### Current blocker reconciliation (2026-09-29)
+
+Fresh read-only audit and detailed reconciliation are recorded in
+`docs/reports/atlas-canonical-projection-fabric-deep-audit-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`
+and `docs/reports/graphify-projection-blocker-deep-audit-20260929.md`. Current predicate count is
+11 (not the older pasted “9 blockers” summary): `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`,
+`GRAPH_MANIFEST_SEALED`, and `ONTOLOGY_COHORT_NONEMPTY` PASS; the other seven remain below PASS.
+This corrects stale claims in the older handoff: identity currently has zero missing Qdrant point
+IDs in the 1,000-row sample, and the 45,567 table-wide legacy packet rows are not the admitted
+repo:root denominator. The 194/194 nomination resolution does not close symbol population coverage;
+current extraction is 3,623/21,584 (16.8%). `AcePacketV3` already carries the required durable
+identity, revision, digest, vector-ref, and centroid-ref fields; the missing ACE proof is its
+production canonical-source caller and grounded source readback (`ace_context_sources` currently has
+zero rows), not additional packet fields. QLoRA, domain classification, HLL breadth, centroids,
+Neo4j/Qdrant/NetworkX, and NLP fanout are not substitutes for the seven current gate proofs.
+
+Guard provenance was checked with `git blame`: the daily admission call was added to
+`scripts/startup/run-graphify-daily-startup.mjs` on 2026-09-10 (`6752fdb64e`). Therefore the task
+worked before because the stronger fail-closed promotion guard had not yet been inserted; the
+present `GRAPHIFY_PROMOTION_ADMISSION_BLOCKED:NOT_SAFE_TO_PROJECT` is expected protection, not a
+Graphify task regression. This audit and reconciliation did not bypass the guard or write to
+PostgreSQL, Qdrant, Redis/Valkey, Neo4j, or a model.
+
+#### ORDINAL-QUERY-PLAN-01 / post-batch follow-up (2026-09-29)
+
+The existing guarded symbol extractor processed another 141 exact-revision files. Its receipt
+reported 1,174 symbol/AST rows, later reconciled to 1,172 persisted rows (1,112 symbols + 60 AST);
+receipt `docs/reports/graphify-symbol-extractor-v1-1790709740924.json`. The independent follow-up
+audit `docs/reports/atlas-canonical-projection-fabric-post-symbol-batch-sixth-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`
+now reports 3,764/21,584 supported admitted refs (17.4%), 16,657 unprocessed, 1,159 without an exact
+Graphify source-revision row, four parse failures, and zero duplicate exact rows. Overall remains
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS.
+
+The current ordinal materializer dry-run timed out with PostgreSQL `57014` at its existing 60-second
+statement timeout; the artifact was not applied or regenerated. Fresh statistics had already been
+collected. The measured bounded 100-row plan completed in ~39.5 ms but showed repeated per-packet
+bitmap intersections across separate `packet_key` and `source_ref` indexes and chunk primary-key
+lookups. The full-cohort estimated plan contains four correlated lineage subplans. No composite
+lineage index currently leads with packet/source/revision keys. This is evidence of an access-path /
+query-shape performance problem, not evidence that ordinal semantics are wrong. Do not raise the
+timeout or add an index from intuition. First time the existing admission, lineage, and physical-chunk
+stages separately; prove whether the `codebase_chunk_index` joins can be removed (there is no FK on
+`chunk_row_id` today); then propose an additive migration only if a measured plan comparison supports
+it. Retain the existing Drizzle migration owner; no `drizzle-kit push`.
+
+The exact-execution read-only bridge receipt is `.tmp/atlas/graphify-chunk-bridge-deep-audit-20260929.json`:
+25,542 memberships across seven repositories; 24,456 exact current source bindings; 14,628 exact
+proven packet/chunk bridges; 9,827 `repo:root` lineage-missing source refs, of which 5,503 have
+physical chunk rows and 4,324 have none; one source ref is proven at another revision. These are
+execution/source-binding totals, not the 16,151-packet ordinal denominator. Keep the existing frozen
+ordinal gap classification authoritative until an exact packet-key join reconciles the two sets.
+
+Only the guarded symbol extractor wrote Graphify symbol rows in this follow-up. Audit/plan probes were
+read-only; there were no ordinal artifact, Qdrant, Valkey/BitFrost, cache, or model writes/calls.
+Detailed findings are in `docs/reports/graphify-projection-blocker-deep-audit-20260929.md`.
+
+#### ORDINAL-QUERY-PLAN-01 — measured query-shape fix (2026-09-29)
+
+The existing materializer now computes `lineage_proven`, `lineage_present`, and
+`lineage_revision_mismatch` in one lateral aggregate rather than four correlated `EXISTS` probes.
+It retains the join to `codebase_chunk_index`: `atlas_packet_chunk_lineage.chunk_row_id` is NOT NULL,
+but the live schema has no FK proving the referenced physical row exists. A live parity query over a
+deterministic 1,000-packet sample found zero differences between the old and new lineage predicates.
+
+The full dry-run with `--shuffle` completed within the unchanged 60-second timeout and confirmed:
+16,151 admitted root packets; 14,564 lineage-qualified; 1,587 missing exact lineage; zero duplicate,
+legacy, foreign-repository, or revision-drift identities; matching normal/reversed-order checksums;
+and the same checksum across two independent dry-run processes. Local-only artifacts:
+`.tmp/atlas/candidate-ordinal-corpus-v2/rewrite-dryrun-20260929/`;
+`.tmp/atlas/candidate-ordinal-corpus-v2/rewrite-dryrun-20260929-run2/`;
+`ordinalMapChecksum=77634f4763f67af6658ba9b4017db2d1c2b8ce150903e5ce09fb31ec752e91fd`.
+This is not canonical regeneration or an ordinal seal. The independent post-rewrite audit remains
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS, as expected. Receipt:
+`docs/reports/atlas-canonical-projection-fabric-post-ordinal-query-rewrite-20260929/atlas-canonical-projection-fabric-audit-2026-09-29.json`.
+
+No migration or index was added: the measured rewrite cleared the timeout without schema mutation.
+Next: freeze and classify the exact 1,587 excluded packet/source rows using the existing chunk and
+lineage owners, then repair only eligible rows through those owners. Keep `ORDINAL_MAP_SEALED`
+PARTIAL until complete current-revision lineage, canonical regeneration, and independent readback.
+
+#### SYMBOL-EXTRACTOR-CANARY-READBACK-01 / PARSER-PROVENANCE-GUARD-01 (2026-09-29)
+
+Before any further extractor apply, reconciled the latest saved apply receipt
+`docs/reports/graphify-symbol-extractor-v1-1790709740924.json` against PostgreSQL by exact
+`file_id + source_ref + source_revision`. Its 141 processed files all read back as `PROCESSED`;
+all 141 still match the receipt's code source revision, the exact admitted workspace/source binding,
+and current on-disk SHA-256. The receipt reports 1,174 `totalSymbolsInserted` and zero failed files,
+but independent readback finds 1,112 `graphify_symbols` plus 60 `atlas_ast_nodes` = 1,172 persisted
+rows. The two-row difference is localized to `scripts/atlas/ingester/tasker-gemma4-writer.mjs`:
+the extractor emits 13 observations but two repeated qualified identities (`main.scanForText` and
+`main.pickTitle`) collapse under the existing `(file_id, stable_symbol_key)` uniqueness contract.
+This is not a missing processed file or revision mismatch. The old receipt remains immutable; its
+counter included two conflict-upsert returns and must not be described as a unique insert count.
+The 60 AST nodes have explicit parser versions (`json-symbol-extractor-v1` /
+`markdown-symbol-extractor-v1`); the live AST schema requires `parser_version NOT NULL`. Legacy
+`graphify_files.parser_version` is not used as AST producer truth.
+
+For future receipts, the extractor now uses `ON CONFLICT DO NOTHING`, reads the existing stable
+symbol ID to preserve parent linking, and increments `totalSymbolsInserted` only on an actual
+insert. No apply was rerun against the already-processed cohort.
+
+The separately reported parser-version failure has no matching saved failure receipt/candidate list
+in the extractor reports. Its exact target set is therefore still unreconciled; do not claim batch
+rollback or retry unidentified rows. The extractor already passes explicit extractor-owned versions
+for JSON/Markdown AST nodes. The shared AST writer now fails early with `PARSER_VERSION_REQUIRED`
+when that provenance is absent or blank, rather than passing NULL to SQL. Focused writer tests pass
+5/5. This local boundary fix does not establish that any unreceipted prior invocation left no writes.
+
+The exact 1,587-row ordinal rejection sidecar was compared read-only with the current canonical
+workspace bindings and `graphify_files`: all 1,587 have exactly one admitted workspace/source
+binding. Scoped to the 1,586 sources with no physical chunks, 1,570 have exact
+`code_source_revision` matches and 16 do not. The separately quarantined source with duplicated
+physical chunks has an exact Graphify revision, so the aggregate across all 1,587 targets is 1,571
+exact / 16 mismatched. This reconciles the earlier 1,570/16 count; the denominators differ. Of the
+16 mismatches, 15 packet revisions match current on-disk bytes and `.vscode/tasks.json` does not.
+Multiple historical Graphify rows exist for some sources, so the count is distinct target tuples,
+not raw Graphify rows. These remain eligibility observations, not write authorization.
+
+Chunk-owner trace did not find an existing bounded chunk-only owner for this manifest. The full-repo
+indexer also embeds, writes Qdrant, and warms Redis; the index-stream route mirrors Qdrant and has
+additional projection effects; `add-source-ref-chunks.mjs` only adds/backfills source-ref schema
+metadata. None was invoked. No chunk, lineage, ordinal artifact, Qdrant, Redis/Valkey, or model writes
+were performed in this follow-up. Next: classify the 16 mismatched source revisions and identify an
+existing eligible materializer that can be invoked without unrelated fanout; otherwise keep this
+repair blocked instead of creating a second chunk authority.
+
+#### SEMANTIC-WRITER-BOUNDARY-02 / ACE-GROUNDING-AUDIT-OWNER-02 (2026-09-29)
+
+Removed two projection-to-canonical semantic write paths without selecting a replacement owner:
+the existing `index-stream` PostgreSQL mirror no longer accepts Qdrant's `content` vector, and the
+existing broad `index-full-repo-for-search.mjs` writer now persists chunk metadata only while its
+embedding remains a Qdrant projection. It still performs its existing Qdrant/centroid work when an
+operator explicitly runs apply; it was not run. The static ownership report therefore classifies
+both as projection executors, not PostgreSQL `content_embedding_768` writers. Its writer-owner
+verdict remains `OWNER_NOT_PROVEN`; the guarded 15-row lineage-qualified backfill candidate is not
+promoted as the general owner, and other historical embedding surfaces remain unresolved.
+
+Corrected `ACE_EVIDENCE_GROUNDED` so `ace_context_sources` row count is diagnostic only and can
+never yield `PARTIAL_PROVEN`. The audit now requires evidence owned by the canonical live retrieval
+→ AcePacketV3 → ContextManifest path; that production receipt does not yet exist, so the predicate
+remains `NOT_PROVEN` regardless of legacy row count. No table, migration, packet field, or alternate
+grounding ledger was introduced.
+
+Validation: semantic-boundary plus AST-writer tests pass 10/10; focused Node syntax and scoped diff
+checks pass; strict OpenSpec validation passes. The static writer census reports 15 mutation-capable
+paths overall and keeps `OWNER_NOT_PROVEN` (live census skipped). Frontend `npm run check` completed
+with 0 errors and 291 warnings across 100 files. A fresh read-only canonical fabric audit failed at
+connection setup with `Connection terminated unexpectedly`; no new live receipt was produced. The
+saved canonical fabric receipt predates these source-only changes and must not be presented as a
+post-patch live audit. No database, Qdrant, Redis/Valkey, or model writes/calls were performed.
+The repository-wide `git diff --check` still reports trailing whitespace in pre-existing generated
+`simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml`; the scoped diff check for this
+tranche passes, and that generated build artifact was left untouched.
+
+#### ACE-PRODUCTION-CALLER-TRACE-02 (2026-09-29)
+
+Read-only caller tracing confirms the remaining ACE blocker is production wiring, not packet schema.
+The live `/api/ace/stream` route launches `scripts/ace/build-packet.mjs`; the legacy builder may
+emit `doc:local_cache` as a degraded fallback and returns the older `sourceRefs`/`rankedCards`
+packet. The route sends that legacy object to synthesis and may persist it through its separately
+admitted cache path. No request was invoked for this trace.
+
+`createSearchRuntimeAceProductionSourceAdapterV1` has no production caller. Its resolver validates
+an already-provided candidate set, ordinal map, and feature rows; it does not fetch/prove the
+canonical admitted source set. `resolveCanonicalPacketKey` and `resolvePacketKeyResolutionV2` resolve
+packet storage keys/aliases, not the exact source/workspace revision of a selected retrieval result.
+`buildAcePacketV3` has no application-route caller. Contract/fixture evidence therefore remains
+bounded and does not promote `ACE-PRODUCER-TRACE-01`.
+
+The separate `/api/tools/search` path builds an intent/tool-routing packet and passes empty
+`selectedEvidenceIds`, `sourceRefs`, and `evidenceIds`; it is not a grounded source packet. The
+opt-in `searchWithAceManifest` method has no production route caller and expects the caller to supply
+revisioned features, so it is not a canonical admitted-source fetcher either.
+
+Additional live path found: `/api/search/hyperrag` calls `SearchRuntime.search` and, when synthesis
+is requested, passes up to five packet source refs/summaries to `bifrostChat`. It does not call the
+ACE manifest method, `buildAcePacketV3`, or ContextManifest bridge; its workspace revision is
+request-supplied. Classify this as retrieval-assisted synthesis, not proof of `ACE_EVIDENCE_GROUNDED`.
+It needs canonical admitted revision resolution and ContextManifest grounding before it can serve as
+the V3 production path. No endpoint was invoked.
+
+Follow-up reachability check: Windows completes a raw TCP connect to the published `127.0.0.1:5434`
+port, but the PostgreSQL protocol still resets immediately (`Connection terminated unexpectedly`)
+for both the canonical audit and a bounded 2.5-second read-only `pg` query. The Docker Desktop
+forwarder log still targets container IP `172.18.0.10`, while live inspection reports
+`172.18.0.21`. Do not treat a successful TCP handshake as restored PostgreSQL access. No service
+restart was performed; the live audit remains pending operator approval to refresh the forwarding
+state.
+
+The installed Docker Desktop executable is `4.50.0.209931` (Engine/CLI `28.5.1`). Official Docker
+release notes list `4.93.0` and report that `4.92.0` fixed published ports remaining unreachable
+after a host-port conflict. This is relevant but not yet proven to match the current stale-IP
+forwarding defect. No update or restart was performed; treat Docker Desktop update/restart as an
+operator-approved remediation candidate, then verify actual PostgreSQL protocol access before
+rerunning the canonical admission audit.
+
+Next implementation must bind existing retrieval to the canonical admitted source owner, fail closed
+on missing exact packet/source/workspace revision evidence, call the V3 composer and ContextManifest
+bridge, and emit independent grounding/readback evidence. The audit predicate must consume that
+production receipt. Keep `ace_context_sources` diagnostic only; no new packet fields, table, or
+grounding owner is justified. No database/cache/model/projection writes or route requests occurred.
+
+### QAS/ContextManifest seam review (2026-09-29)
+
+Inspected `searchWithAceManifest`, the QAS sync/async feature-source joins, the existing ACE resolver,
+feature-snapshot producer, and packet-to-ContextManifest bridge. These are reusable composition and
+validation stages, not a canonical source owner: callers supply the workspace/representation and
+policy revisions, candidate ordinal map, feature rows, lane masks, and source callbacks. The resolver
+validates the supplied identities/revisions against one another but does not fetch the admitted
+workspace cohort or prove PostgreSQL admission provenance. Producer/bridge receipts remain
+`canonicalAuthority: false` and `writesPerformed: false`.
+
+Do not wire `/api/search/hyperrag` by promoting its request-supplied workspace revision or optional
+retrieval metadata. The missing dependency is a production read owner that binds actual retrieval
+candidate packet keys to exact canonical admitted packet/source/workspace revisions and existing
+ordinal/feature evidence. After that owner exists, reuse the current composition stages and fail
+closed on unbound candidates. No new ACE schema, table, or cache contract is warranted. No endpoint
+was called and no database/cache/model/projection writes occurred.
+
+#### GRAPHIFY-ADMISSION-REMEDIATION-REVIEW-01 (2026-09-29)
+
+Mapped each below-PASS predicate to its missing proof and existing owner in
+`docs/reports/graphify-projection-blocker-deep-audit-20260929.md`. Confirmed the 4/11 state is not a
+request for more AcePacketV3 fields: semantic ownership, latent input binding, chunk/ordinal coverage,
+projection checksums, BitFrost admitted-key production, and live ACE grounding are separate evidence
+gates. The report includes a predicate-by-predicate repair sequence and primary documentation for
+PostgreSQL plan diagnosis, pgvector exact/approximate tradeoffs, Drizzle migrations, and Valkey HLL's
+approximate cardinality boundary.
+
+The existing admission wrapper's committed source documents that it was added because the audit
+historically returned success even for `NOT_SAFE_TO_PROJECT`; it now throws unless the report says
+`SAFE_TO_PROJECT`. Thus `graphify:daily` may have applied before enforcement, but its present failure
+is the intended fail-closed behavior. The saved report is still 4/11 PASS and is not a fresh live audit.
+No database, projection, cache, model, or route writes/calls were performed.
+
+Validation for this documentation/contract-review tranche: 23 focused Node tests passed (AST writer,
+semantic write boundary, AcePacketV3); 15 focused Vitest tests passed (ContextManifest bridge, QAS
+feature join, ACE production-source adapter); strict OpenSpec validation passed. These establish the
+existing contract behavior only; they do not prove any live production caller or data predicate.
+
+Static inspection of the evaluator also found that only `SYMBOLS_RESOLVED` and
+`ORDINAL_MAP_SEALED` have reachable `PASS` branches among the seven currently below-PASS predicates.
+`SEMANTIC_OWNER_PROVEN`, `LATENT_FAMILY_PROVEN`, `PROJECTIONS_CHECKSUM_ALIGNED`,
+`BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED` currently cap at `PARTIAL_PROVEN` or
+`NOT_PROVEN` (or are hardcoded `NOT_PROVEN`). Add an audit-owner follow-up: wire each existing
+owner's current-revision evidence into its predicate and test a valid PASS fixture plus stale/missing
+rejection. This is separate from proving the live data and must not be “fixed” by optimistic counts
+or a parallel registry. Consequently, `SAFE_TO_PROJECT` is not reachable in the current evaluator
+even after only the ordinal coverage gap is repaired.
+
+#### GRAPHIFY-POST-APPLY-REFRESH-01 (2026-09-30)
+
+Reran the canonical projection audit read-only after a bounded exact-revision symbol-extraction
+canary. Current receipt is
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/live-refresh/atlas-canonical-projection-fabric-audit-2026-09-30.json`:
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS. Identity, revision, graph-manifest, and nonempty-ontology
+predicates pass; seven others remain below PASS. The stale handoff's `289/1000` and table-wide
+61,718 denominator are not current evidence; use the live admitted `repo:root` cohort and this
+receipt.
+
+The existing source-binding owner has 24,456/24,456 exact execution-root bindings (read-only; zero
+candidate inserts). Fixed the existing symbol extractor's admitted-cohort selection so it filters
+supported source kinds and checks on-disk bytes against exact `source_revision` before applying the
+bounded limit. A dry-run examined 292 candidates, skipped 287 revision mismatches, and found five
+eligible exact-byte files. Existing per-file guarded apply processed those five files, inserted 43
+structural observations, and reported zero failures; receipt:
+`docs/reports/graphify-symbol-extractor-v1-1790727992920.json`. Post-apply audit moved processed
+symbol coverage 3,764→3,769 and unprocessed 16,657→16,652. This is partial progress only. No packet,
+embedding, Qdrant, cache, or projection writes occurred.
+
+YaRN/Qwen long-context configuration remains a runtime-execution experiment, independent of ACE,
+BitFrost, source authority, and projection admission; do not use it as gate evidence or add it to
+AcePacketV3. A successful server start is not a long-context quality proof.
+
+Validation: focused selector/write-boundary tests 8/8 PASS; strict OpenSpec validation PASS. The
+broad stable-script check exits nonzero on existing unrelated TypeScript diagnostics; it is not a
+passing gate. Continue by resolving exact-revision extraction coverage and chunk/ordinal coverage,
+then wire current owner receipts into the five predicates that presently lack reachable PASS
+branches. Keep the admission guard fail-closed.
+
+#### GRAPHIFY-POST-APPLY-REFRESH-02 (2026-09-30)
+
+Continued with a second bounded five-file dry-run/apply using the same canonical workspace revision
+and exact source-byte check. The plan rejected 287 stale rows before selecting five current-byte
+files; the existing writer inserted 30 structural observations with zero file failures. Receipt:
+`docs/reports/graphify-symbol-extractor-v1-1790728303452.json`. Fresh read-only admission receipt:
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/live-refresh-after-symbol-canary-2/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+It remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS. Symbol extraction is 3,774/21,584, with 16,647
+unprocessed; ordinal coverage remains 14,564/16,151 with 1,587 missing. Total across the two
+bounded batches is 10 files and 73 inserted structural observations, zero file failures. No ordinal,
+projection, Qdrant, cache, packet, or embedding writes occurred. The YaRN runtime track remains
+independent and does not change any admission result.
+
+#### GRAPHIFY-EXACT-IDENTITY-BLOCKER-AUDIT-01 (2026-09-30)
+
+Corrected `IDENTITY_ALIGNED` to assess nonempty/unique canonical `packet_key` values across the
+exact admitted repo:root revision cohort; the prior 1,000-row `latent_64` sample could not establish
+cohort coverage, and missing `qdrant_point_id` is a projection-pointer diagnostic, not canonical
+identity. Latest read-only receipt:
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/live-identity-cohort-audit-v2/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+It confirms 16,151 exact packet keys, zero missing/duplicate keys, identity PASS, and 1,634 missing
+Qdrant projection pointers. A read-only exact join found only 7 missing-pointer packets with a
+single source/revision-bound Qdrant target; 136 had multiple targets, so no pointer backfill was
+performed.
+
+Current gate is still `NOT_SAFE_TO_PROJECT`, 4/11 PASS. Seven open predicates and owner-specific
+repair evidence are documented in
+`docs/reports/graphify-projection-blocker-deep-audit-20260929.md`. Key findings: symbol extraction
+is partial (3,774/21,584); semantic writer ownership is unresolved; latent input-snapshot binding is
+absent; ordinal coverage is 14,564/16,151; projection checksum alignment has no current cross-owner
+receipt and no reachable PASS branch; BitFrost lacks an admitted-key production caller/readback;
+ACE production retrieval still uses legacy composition and does not call the existing V3 builder +
+ContextManifest bridge. The earlier 289/1000 and table-wide 61,718 framing is stale for the current
+admitted cohort.
+
+The daily wrapper fails because the admission guard now checks the audit receipt and throws unless
+all predicates are `PASS`; historically the audit could exit zero while its report was
+`NOT_SAFE_TO_PROJECT`. This is intended fail-closed behavior. AcePacketV3 already has durable
+provenance fields; do not add file_path/token/feature/centroid fields to try to close unrelated owner
+proofs. QLoRA, domain routing, graph fanout, and YaRN are separate lanes. No Qdrant pointer writes or
+cache/projection writes were made.
+
+#### SEMANTIC-LATENT-PROVENANCE-CALC-01 (2026-09-29, read-only)
+
+Reconciled the latent training input against its frozen artifacts and current PostgreSQL state.
+`docs/reports/latent-autoencoder-training-receipt-v3-full01.json` records 55,169 input rows,
+ordered identity checksum `f3a0c51dcb3202a55c5df18f6a245e66d65978b79d536569705269e692819668`,
+matrix checksum `bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0`, and the
+latent checkpoint digest. The saved v4 ordinal map and FP32 matrix are present; their matrix
+checksum matches the receipt. A fresh read-only PostgreSQL export of the current
+`content_embedding` cohort reproduced the same 55,169 ordered IDs and exact matrix checksum.
+All IDs match the saved map; 434 `source_ref` values were NULL in the frozen map but are now
+populated. Thus the historical latent training rows/vectors are exactly recoverable, while the
+old per-row source-reference metadata is not identical to today's values. The receipt retains only
+train/validation source counts and split checksums, not each row's split assignment; because those
+434 source refs have since changed, the exact historical train-versus-validation membership cannot
+be independently reconstructed from the current database/map alone.
+
+This does **not** prove canonical `semantic_768` lineage: the training/export owner reads the
+historical `codebase_chunk_index.content_embedding` halfvec column, not the declared
+`content_embedding_768` canonical target. Its frozen row map has only ordinal, row ID, and
+sourceRef—no source/workspace revision or per-row model/tokenizer/input/vector digest. The
+checkpoint/training receipt is strong cohort-level artifact evidence, not a promoted
+representation receipt; lifecycle remains `CANDIDATE`.
+
+The fresh live semantic census found 219,998 populated `content_embedding_768` rows. Across those
+rows, `content_hash` and the mutable `embedding_model` label are populated, but `source_revision`,
+`workspace_revision`, `representation_revision`, and `lineage_producer_revision` are populated on
+0 rows. `embedding_version` is populated on only 759 rows. The strengthened live census found
+219,422 rows with the exact `embeddinggemma:latest` alias, 576 carrying the `:eg-task-prefix-v1`
+suffix, and 759 with an embedding_version. Provenance is also absent from the nested JSONB surfaces: for every populated
+canonical vector, `metadata`, `output_meta`, and `summary_provenance` have zero source/workspace/
+representation/producer revisions, model revisions, tokenizer revisions, input digests, or vector
+digests. `output_meta` exists on every row but is empty in the deterministic sample. The populated
+`content_hash` has not been proven to hash the exact text passed to the embed endpoint. The only
+non-internal trigger is the search-vector maintenance trigger. Source tracing found the guarded
+15-row lineage backfill as a bounded
+`content_embedding_768` writer; the index-stream route writes summary/auxiliary vectors and
+metadata, while full-repo indexing writes Qdrant vectors/metadata, not this canonical vector
+column. Therefore the unique general writer and per-row provenance remain unresolved; do not
+re-embed or promote from these counts.
+
+No PostgreSQL, Qdrant, Valkey, checkpoint, or model writes/calls were made. The live checks used
+read-only PostgreSQL transactions; checksum comparison was computed in memory. Next: identify the
+historical ingestion/import owner(s) behind the populated canonical column and determine whether
+their source receipts survive. Separately, keep latent provenance as cohort-recoverable but
+canonical-lineage-unproven, then require the existing evaluation/promotion owner before changing
+`CANDIDATE`.
+
+#### SEMANTIC-LATENT-ARTIFACT-READBACK-02 (2026-09-30, read-only)
+
+Revalidated the frozen v4 ordinal map, matrix, snapshot manifest, and full01 trainer receipt without
+database/model/cache writes. The map has 55,169 unique IDs and contiguous ordinals; its raw-file
+SHA-256 matches the snapshot manifest, the ordered-ID checksum matches the trainer receipt, and the
+169,479,168-byte FP32 matrix digest matches both manifest and receipt. The map records 2,789 null
+`sourceRef` values; the trainer deterministically substitutes `__no_source_ref__:<id>` before its
+source-grouped split. The receipt has split counts/checksums but omits per-row split membership and
+NumPy version, so exact train/validation assignment has not been independently replayed. This proves
+the historical training input cohort/matrix more strongly, but that cohort was read from historical
+`codebase_chunk_index.content_embedding`, not canonical `content_embedding_768`; the recorded
+`embeddinggemma:latest` producer is a mutable alias, with no tokenizer/model digest or admitted
+source/workspace revision binding. `LATENT_FAMILY_PROVEN` remains `PARTIAL_PROVEN`; lifecycle stays
+`CANDIDATE`. The stronger historical receipt does not close `SEMANTIC_OWNER_PROVEN`.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-03 (2026-09-30)
+
+Continued the existing guarded symbol extractor only on admitted, exact-revision source refs.
+Two bounded batches (50 files, then 500 files) passed dry-run checks for canonical workspace
+binding and on-disk bytes equal to the admitted `source_revision`; no broad indexer, embeddings,
+Qdrant, Valkey, packet, ordinal, or projection path was invoked. The 50-file apply processed all
+50 with zero failures and inserted 335 structural observations. Its independent read-only
+readback found all 50 exact file/source/revision identities in `PROCESSED` state and 335 symbol
+rows. The 500-file apply processed all 500 with zero failures and inserted 4,289 observations
+(4,188 symbol rows plus 101 Markdown AST rows); independent readback reconciled all expected
+files, revisions, statuses, and AST rows.
+
+Focused selector/write-boundary tests passed 8/8. A fresh post-apply read-only fabric audit is
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/live-after-symbol-500/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+It reports 4,324/21,584 supported admitted source refs processed (20.0%), 16,097 unprocessed,
+1,159 without an exact Graphify source-revision row, zero duplicate exact rows, and 2,309 exact
+revision refs with 16,489 symbol rows. The overall verdict remains `NOT_SAFE_TO_PROJECT`, 4/11
+PASS; the other six below-PASS owner/provenance gates and ordinal 14,564/16,151 coverage remain
+unchanged. This bounded extraction advances only `SYMBOLS_RESOLVED`; it does not establish
+semantic writer lineage, latent input provenance/promotion, full ordinal coverage, projection
+checksum alignment, BitFrost key derivation, or ACE production grounding. Keep the daily
+projection guard fail-closed.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-04 (2026-09-30)
+
+Ran the next 500-file dry-run and guarded apply at the same admitted workspace revision. The dry-run
+selected 500 `WOULD_EXTRACT` candidates with zero source-revision mismatches in the selected
+cohort; 348 stale bytes were rejected during the earlier bounded precheck and did not consume
+the selected limit. Apply processed 500/500 with zero failures and reported 3,535 inserted
+observations. An independent read-only PostgreSQL readback verified 500/500 exact file/source/
+revision identities in `PROCESSED` state, zero identity/revision mismatches, and reconciled
+3,319 `graphify_symbols` rows plus 216 `atlas_ast_nodes` rows to the 3,535 insert receipt.
+
+Fresh read-only fabric audit:
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/live-after-symbol-1000/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+Symbol coverage is now 4,824/21,584 (22.4%), with 15,597 unprocessed, 1,159 lacking an exact
+Graphify source-revision row, and zero duplicate exact rows. The gate remains `NOT_SAFE_TO_PROJECT`
+at 4/11 PASS. `ORDINAL_MAP_SEALED` remains 14,564/16,151 with 1,587 unresolved; semantic writer
+lineage, latent input binding/promotion, projection checksum receipt, BitFrost admitted-key
+derivation, and production ACE grounding remain open. No broad indexing or embedding/Qdrant/cache/
+packet/ordinal/projection writes were performed. Projection admission remains fail-closed.
+
+#### AE-TRAINING-ENTRYPOINT-TRUTH-01 (2026-09-30)
+
+Corrected the training entrypoint truth after tracing all three paths. `scripts/atlas/train-autoencoder-768-64.mts`
+was a simulation that printed fabricated metrics and `GATE 2 PASS`; it now fails closed with
+`AE_TRAINING_BLOCKED`. The production-facing `ae:train`/`ae:train:dry` aliases now point to that
+fail-closed diagnostic. The actual JavaScript trainer remains available only as `ae:legacy:train*`:
+it fetches vectors from Qdrant, writes weights to Redis, and persists `sae_latent` rows to
+`feature_records`, so it is not the canonical latent-family trainer. The AE queue alias now points
+to its real frontend stub, which fails with `AE_QUEUE_NOT_IMPLEMENTED` rather than claiming a job
+was queued.
+
+The actual PyTorch checkpoint trainer, `python/train_latent_autoencoder.py`, reads
+`codebase_chunk_index.content_embedding`, not canonical `content_embedding_768`. Its future
+training receipts now identify that source column and label its authority as unproven; no training
+was run. Updated the nested-AE README and metadata to distinguish historical backfill/benchmark
+evidence from canonical lineage/promotion. The current model remains 768→384→256, with
+`latent_128`/`latent_64` derived from the learned `latent_256`; `semantic_mrl_512` and topology
+coordinates are separate representations/features, not additional AE layers. A new
+768→512→256→128/topology architecture requires a separately revisioned design and a canonical,
+proven input cohort; it was not trained or promoted here.
+
+No database, Qdrant, Redis/Valkey, checkpoint, projection, or model writes/calls occurred. This
+entrypoint correction does not change the live projection audit: `NOT_SAFE_TO_PROJECT`, 4/11 PASS.
+
+#### AE-ARCHITECTURE-REVISION-02 (2026-09-30)
+
+Updated the candidate PyTorch architecture to the explicitly requested encoder ladder
+`768 → 512 → 256 → 128`. `latent_256` is now the learned intermediate stage, `latent_128` the
+learned bottleneck, and `latent_64` a normalized prefix of `latent_128`; the 4D topology projection
+is explicitly separate and is not emitted by this autoencoder. The training reader now selects
+`codebase_chunk_index.content_embedding_768` and checks rank, dimension, and finiteness. The new
+receipt records architecture revision and EmbeddingGemma as an expected-but-unattested family;
+model/tokenizer revision fields remain null and writer/per-row provenance remains unproven. New
+output defaults use candidate-specific filenames to avoid overwriting the historical checkpoint
+and receipt. The old `768 → 384 → 256` checkpoint remains historical and is not shape-compatible.
+
+No training was run and no checkpoint/database/cache/projection/model artifact was written. The
+`ae:train` alias remains fail-closed until canonical EmbeddingGemma input provenance is proven.
+Runtime tests could not execute because the available Windows Python lacks NumPy/PyTorch and
+pytest; Python syntax compilation and scoped diff checks passed. Projection admission is unchanged
+at `NOT_SAFE_TO_PROJECT`, 4/11 PASS.
+
+#### GRAPHIFY-BLOCKER-REFRESH-AND-AE-TRUTH-03 (2026-09-30)
+
+The latest isolated live fabric audit is
+`docs/reports/graphify-projection-blocker-deep-audit-20260929/goal-refresh-20260930/live-after-symbol-142-20260930T0211Z/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+It remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS. The admitted denominator is the exact 16,151-row
+repo:root cohort; `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`, and
+`ONTOLOGY_COHORT_NONEMPTY` pass. The seven below-PASS predicates and current blockers are:
+
+- `SYMBOLS_RESOLVED`: 4,966/21,584 supported admitted refs processed (23.0%); 15,455 remain
+  unprocessed, 1,159 lack an exact Graphify source-revision row, and four are parse failures.
+- `SEMANTIC_OWNER_PROVEN`: `content_embedding_768` exists, but unique writer, row-level source/model/
+  tokenizer/representation provenance, and readback remain unproven.
+- `LATENT_FAMILY_PROVEN`: the historical v3 checkpoint and its 55,169 bindings are verified, but
+  its exact canonical semantic_768 training-input cohort is not; it remains CANDIDATE.
+- `ORDINAL_MAP_SEALED`: 14,564/16,151; 1,587 unresolved (1,586 without physical chunks, one
+  duplicate canonical chunk identity).
+- `PROJECTIONS_CHECKSUM_ALIGNED`: no current receipt binds the same admitted cohort, ordinal map,
+  representation inputs, and projection readbacks.
+- `BITFROST_KEYS_DERIVABLE`: no live admitted-key producer plus identity-bound cache write/readback.
+- `ACE_EVIDENCE_GROUNDED`: no proven production retrieval → admitted resolver → AcePacketV3 →
+  ContextManifest receipt/readback. This is not an AcePacketV3 field-count deficiency.
+
+Symbol extraction advanced through the existing guarded owner on two exact-reference batches
+(50 + 42 files). All 92 source refs matched their canonical workspace binding and on-disk
+source_revision; apply processed 92/92 with zero file failures. Independent read-only readback
+verified 92/92 exact file/revision rows. It found 589 graphify symbol rows and 264 AST rows; the
+two apply receipts' 853 inserted observations reconcile to those rows. One source has 12 planned
+symbols but 11 stable identities because the file declares two top-level `main` functions with the
+same `(file, kind, qualified_name)` identity. This collision is retained as a diagnostic, not
+silently counted as a unique symbol. The post-apply audit moved processed coverage from 4,874 to
+4,966; the overall admission verdict did not change.
+
+The next ordered 50-row dry-run exposed eight `scripts/memory/graphify/gds/*.json` files that would
+expand to 104,650 AST nodes. None of those eight was applied; classify generated-artifact eligibility
+before attempting them. The other 42 bounded refs from that slice were processed separately and
+verified, so the large JSON expansion did not block unrelated exact-source extraction.
+
+`graphify:daily` is not failing because its old daily map implementation suddenly stopped working.
+Commit `865a7c3f57` introduced `require-canonical-projection-admission-v1.mjs` because the audit
+historically exited zero even when its report said `NOT_SAFE_TO_PROJECT`; the wrapper now blocks
+the apply-capable chain unless the report is `SAFE_TO_PROJECT`. A prior successful task completion
+therefore did not prove the projection-admission predicates were satisfied. Keep this guard
+fail-closed.
+
+The former v3 checkpoint remains historical `768→384→256`; the current candidate code is
+`768→512→256→128`, with `latent_64` derived from `latent_128` and 4D topology owned separately.
+No candidate training/checkpoint was run. `ae:train` remains a fail-closed placeholder; the Python
+candidate reader uses `content_embedding_768`, but EmbeddingGemma model/tokenizer and row provenance
+are not attested. The 384 checkpoint metadata remains factual historical evidence and is not a
+training target or a live canonical lane.
+
+Writes in this tranche were limited to exact-revision Graphify symbol/AST observations and processed
+status for those 92 files. No semantic vectors, ordinal map, Qdrant, Redis/Valkey, BitFrost, ACE,
+projection, or model/checkpoint writes occurred. PostgreSQL 18's constraint guidance supports
+expressing row/relationship invariants with unique/FK constraints, but schema migration cannot
+retroactively establish producer/model/tokenizer provenance; do not add a migration as a shortcut.
+
+#### AE-ENTRYPOINT-AND-SEMANTIC-WRITER-RECONCILIATION-01 (2026-09-30)
+
+Answered which trainer is actually selected and closed the accidental legacy training route without
+running training. This current-state correction supersedes the earlier `AE-TRAINING-ENTRYPOINT-TRUTH-01`
+and `AE-ARCHITECTURE-REVISION-02` wording that described the Python reader as using
+`content_embedding` and the candidate architecture as 768→384→256; those statements predate the
+candidate-reader/architecture edit. `sveltekit-frontend/package.json` maps `ae:train` and `ae:train:dry` to
+`scripts/atlas/train-autoencoder-768-64.mts`; that file is a fail-closed placeholder and exits 78,
+so neither alias trained anything. The real current candidate is
+`python/train_latent_autoencoder.py` + `python/atlas_compute/latent_autoencoder.py`: EmbeddingGemma
+output input width 768, encoder stages 512 -> 256 -> learned 128, `latent_64` derived from the
+128-D output, and topology4d explicitly owned by a separate projection. Its reader selects
+`content_embedding_768`, but model/tokenizer revisions and per-row canonical input lineage remain
+unproven; it was not launched.
+
+The separate `ae:legacy:train` alias previously launched
+`scripts/atlas/train-autoencoder-768-64.mjs`, an older 768 -> 256 -> 64 Qdrant/Redis trainer with
+Redis weight/feature writes. It is not the historical PyTorch 768 -> 384 -> 256 checkpoint either.
+That old alias is now fail-closed before any service connection or training; its `--dry-run`
+diagnostic remains available. The actual `768 -> 384 -> 256` architecture belongs to the historical
+v3 checkpoint and historical `content_embedding` cohort. Preserve that metadata as historical
+evidence only; do not load it as the new candidate. `semantic_mrl_512` is a distinct native-MRL
+representation, not an autoencoder layer. The 384 hidden width is not the EmbeddingGemma input
+dimension and does not indicate that MiniLM is the current embedding owner. EmbeddingGemma is the
+canonical dense embedding target; any MiniLM reranker replacement is a separate consumer decision.
+
+The refreshed read-only semantic writer census is
+`docs/reports/semantic-768-writer-ownership-v1.json`: 219,998 populated
+`content_embedding_768` vectors, all with basic content hash/model/dimension/normalization fields,
+but zero with source/workspace/representation/producer revisions or encoder, input, tokenizer,
+model, metadata, or vector digests. Model labels are 219,422 `embeddinggemma:latest` and 576
+`embeddinggemma:latest:eg-task-prefix-v1`; these mutable labels do not prove immutable model or
+tokenizer identity. The audit finds 15 writer candidates and returns `OWNER_NOT_PROVEN`.
+
+Found a particularly important naming/target discrepancy: `atlas:graphify:embedding:daily:apply`
+invokes `scripts/atlas/backfill-graphify-file-embeddings-768.mjs`, whose `semantic_768` label and
+768 dimension notwithstanding, its SQL targets legacy `codebase_chunk_index.content_embedding`
+(`halfvec(768)`), not canonical `content_embedding_768` (`vector(768)`). This route therefore cannot
+close `SEMANTIC_OWNER_PROVEN` for the canonical column. Do not retarget it or bulk-re-embed until
+the unique writer, exact EmbeddingGemma artifact/tokenizer/execution binding, admitted input
+revisions, and canonical readback contract are resolved.
+
+Validation: syntax-check the retired runner and exercise `ae:legacy:train` to confirm it exits 78
+before connecting; inspect the existing `ae:train` blocked behavior. No training, checkpoint,
+database, embedding, Qdrant, cache, projection, ACE, or BitFrost writes were performed by this
+reconciliation. No Drizzle migration is indicated: the mismatch is an existing script-to-column
+ownership mismatch and absent historical provenance, not a missing schema field.
+
+#### AE-QDRANT-PGVECTOR-ALIGNMENT-02 (2026-09-29)
+
+Reconciled the retired latent writer with the candidate architecture without training or projecting
+data. `scripts/atlas/train-autoencoder-768-64.mjs` is now an inert compatibility shim: `--dry-run`
+prints the current `768 -> 512 -> 256 -> 128` candidate and its storage/projection gates; other
+invocations exit 78 before service access. The old embedded Qdrant/Redis trainer body is unreachable.
+The separate `python/provision_qdrant_latent256.py` now reports the candidate projection contract
+and rejects `--apply` before database or Qdrant access. Its pure `build_candidate_point` serializer
+now validates all three named vectors, exact dimensions, finiteness/unit norms, canonical packet
+identity, source/workspace revisions, digests, model/tokenizer/checkpoint revisions, and a
+non-canonical authority flag. Its historical `codebase_chunks_latent256` collection (single 256-D
+vector) is not silently reused for the new output family; candidate collection revision is still
+unselected.
+
+Drizzle declarations are aligned to the existing PostgreSQL types: canonical
+`content_embedding_768 vector(768)`; historical `content_embedding halfvec(768)`; latent storage
+`latent_256 halfvec(256)`, `latent_128 halfvec(128)`, and `latent_64 vector(64)`. Existing latent
+column declarations do not qualify old values as outputs of the new architecture, and no migration
+was created or applied. Candidate `latent_128` is learned; candidate `latent_64` is its normalized
+prefix. 4D topology remains a separate revisioned projection from `latent_256`.
+
+The repo's GPU compose file pins Qdrant v1.19.0, but the live server version was not checked. A
+candidate upsert remains blocked until canonical semantic writer/model/tokenizer and per-row source
+lineage, candidate checkpoint/input snapshot, PostgreSQL candidate-row readback, and a versioned
+Qdrant vector-layout/consumer contract are proven. The future payload contract requires canonical
+projection ID plus `packet_key`, `source_ref`, source/workspace revisions, source and semantic-input
+digests, model/tokenizer and representation revisions, checkpoint digest, projection revision, and
+`canonical_authority: false`; vectors are not duplicated into payload JSON.
+
+Validation: candidate npm dry-run passed; retired-runner Node tests 2/2 passed; focused Python tests
+9/9 passed, including proof that legacy Qdrant `--apply` exits 78 before connecting and fixture
+checks for complete named-vector payload validation; Python compile,
+Node syntax, report JSON parse, and scoped whitespace checks passed. No training, checkpoint,
+PostgreSQL, Qdrant, Redis/Valkey, or projection writes occurred. The refreshed admission audit stays
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS; symbol coverage is 5,008/21,584. `SEMANTIC_OWNER_PROVEN`,
+`LATENT_FAMILY_PROVEN`, `ORDINAL_MAP_SEALED`, `PROJECTIONS_CHECKSUM_ALIGNED`,
+`BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED` remain open.
+
+#### AE-CANDIDATE-ENTRYPOINT-AND-PAYLOAD-03 (2026-09-30)
+
+Corrected the active `ae:train` and `ae:train:dry` npm aliases: both previously pointed to a
+missing `train-autoencoder-768-64.mts`; they now target the actual Python candidate trainer under
+the installed Python 3.13 CUDA environment. Added `--plan-only`, which emits the exact candidate
+architecture and blocked-provenance status without importing Torch, connecting to PostgreSQL,
+training, or writing an artifact. Runtime check found Python 3.13 Torch `2.8.0+cu128`, CUDA
+available, CUDA runtime 12.8; the focused candidate model tests pass in that interpreter, so a
+missing Torch installation is not the present blocker. The actual training gate remains closed
+because `content_embedding_768` writer/input provenance is not proven.
+
+The refreshed writer census found 15 static source-path matches (not 15 proven active writers)
+and returns `OWNER_NOT_PROVEN`. Of 219,998 populated canonical-contract vectors, the live row
+census found 0 with source revision, workspace revision, representation revision, lineage producer
+revision, immutable model revision, or tokenizer revision. The stored model labels are mutable
+`embeddinggemma:latest` and `embeddinggemma:latest:eg-task-prefix-v1`; these cannot identify the
+exact model artifact/runtime call. Existing writer candidates all remain unpromoted; no writer was
+executed. This is the direct blocker to training and latent provenance.
+
+Expanded the pure candidate Qdrant point payload contract to v2: physical chunk UUID and separate
+projection UUID; canonical packet/source/workspace identity; source and semantic-input digests;
+semantic model/tokenizer identity with explicit tokenizer attestation status; architecture and
+producer revisions; checkpoint, training-receipt, and input-snapshot digests; all three named
+representation definitions/revisions/dimensions; and deterministic per-vector digests. The
+payload also includes a stable checksum. Removed the unreachable historical single-vector network
+writer so this module has no Postgres/Qdrant client dependencies or latent write path. The
+historical collection is still incompatible; no Qdrant collection was created and no upsert was
+attempted. Do not put unproven RFF/KMeans/topology tags into this payload: those
+remain separately revisioned projections/features, and 4D topology is not an autoencoder output.
+
+The refreshed read-only Postgres schema inventory now proves the physical types match both
+Drizzle declarations: canonical `content_embedding_768 vector(768)`, historical/unresolved
+`content_embedding halfvec(768)`, `latent_256 halfvec(256)`, `latent_128 halfvec(128)`, and
+`latent_64 vector(64)`. The stale representation-identity auditor had labeled the historical
+`content_embedding` surface as canonical and `content_embedding_768` as legacy; corrected its
+classification to the current Parent Atlas contract and added `format_type(atttypid, atttypmod)`
+to the read-only schema report so dimensions are actually checked. No Drizzle migration or data
+write was needed. A separate read-only `GET /` verified live Qdrant `1.19.0`; the candidate
+collection remains uncreated and unselected.
+
+The refreshed live projection audit at `2026-09-30T03:38:49Z` remains `NOT_SAFE_TO_PROJECT`,
+4/11 PASS: symbol coverage 5,008/21,584; semantic writer PARTIAL; latent lineage/promotion
+PARTIAL; ordinal map PARTIAL at 14,564/16,151; checksum alignment, BitFrost key derivation, and
+ACE grounding NOT_PROVEN. PostgreSQL audit used a READ ONLY transaction and rolled back. Focused
+Python model/projection tests pass 11/11; the repo's larger task ledger still contains dated,
+contradictory historical evidence and must not be read as the current admission receipt.
+
+Raw vector-storage estimate only: the 16,151-row admitted cohort is about 27.6 MiB for three
+Qdrant FP32 vectors (256+128+64) and 15.8 MiB for Postgres halfvec(256)+halfvec(128)+vector(64).
+Even the current 219,998-row embedding population would imply about 376 MiB raw Qdrant latent
+vectors and 215 MiB raw Postgres latent vectors, before indexes/metadata. This is not a 22-GB
+vector snapshot; full source text/summary duplication is excluded from payload.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-05 (2026-09-30)
+
+After confirming the live admitted workspace binding and exact on-disk source digests, applied the
+existing guarded Graphify extractor to only five explicitly named TypeScript/JavaScript refs under
+workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`:
+`smoke-searxng.mjs`, `smoke-task-payload.mjs`, `smoke-tool-schema.mjs`, `smoke-validate.js`, and
+`smoke-validation-test.mjs`. The dry-run showed all five exact source bindings, zero byte-digest
+mismatches, and 24 deterministic code symbols. The bounded apply committed all five per-file
+transactions and inserted 24 symbols. An independent `BEGIN TRANSACTION READ ONLY` query then
+read back all five exact source refs at their bound source revisions as `PROCESSED`, with symbol
+counts 1, 3, 5, 5, and 10; it rolled back successfully.
+
+The canonical projection audit was immediately refreshed at `2026-09-30T03:50:40Z`: still
+`NOT_SAFE_TO_PROJECT`, 4/11 PASS. Symbol coverage moved from 5,008 to 5,013 of 21,584 supported
+admitted refs; 15,408 remain unprocessed, 1,159 have no exact Graphify revision row, and four
+remain parse-failed. Ordinal coverage is unchanged at 14,564/16,151 (1,587 missing). This is a
+verified bounded increment, not closure of `SYMBOLS_RESOLVED`; no semantic embeddings, latent
+training, Qdrant, Redis/Valkey, or projection writes were performed. Focused candidate-selection
+and AST-writer tests pass 8/8.
+
+Follow-up batch at `2026-09-30T03:51Z`: the same dry-run-first procedure selected and applied the
+36 remaining TypeScript/JavaScript refs from the frozen exact-revision dry-run (299 symbols); an
+independent read-only query read back all 41 refs across both batches as `PROCESSED`, exact-bound,
+with 323 total symbols and no non-processed rows. The refreshed audit at `2026-09-30T03:52:21Z`
+reports 5,049/21,584 processed (23.39%), 15,372 unprocessed, 1,159 missing exact Graphify rows,
+and four parse failures. Overall remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS; ordinal remains
+14,564/16,151 with 1,587 missing. These 41 source-local outcomes are real progress but do not
+establish full `SYMBOLS_RESOLVED` coverage.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-06 (2026-09-30)
+
+A read-only source census encountered an earlier 25-ref code cohort whose current disk digests did
+not match the admitted source revisions (25/25 rejected); none were applied. Scanning ahead found
+24 exact byte-matched code refs. The guarded extractor applied only those 24 (161 symbols), and an
+independent read-only query verified 24/24 exact revision rows as `PROCESSED` with 161 symbols.
+One candidate from the initial 25-ref census had already left `UNPROCESSED` before selection and
+was therefore not included. The fresh canonical audit at `2026-09-30T03:55:33Z` reports
+`SYMBOLS_RESOLVED` 5,073/21,584 (23.50%), 15,348 unprocessed, 1,159 without an exact Graphify
+revision row, and four parse failures. The overall gate remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS;
+`ORDINAL_MAP_SEALED` remains 14,564/16,151 with 1,587 missing. The mismatch cohort confirms that
+path equality is insufficient; keep byte/revision checks fail-closed.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-07 (2026-09-30)
+
+Selected another 25 code refs only after a read-only scan verified their current file-byte digests
+equal the exact admitted source revisions. The extractor dry-run confirmed all 25 and planned 203
+symbols; bounded apply processed all 25, and independent read-only readback verified all 25 exact
+revision rows as `PROCESSED` with 203 symbols. The refreshed audit at `2026-09-30T03:59:37Z`
+reports 5,098/21,584 processed (23.62%), 15,323 unprocessed, 1,159 without an exact Graphify
+revision row, and four parse failures. `NOT_SAFE_TO_PROJECT` remains 4/11 PASS; ordinal remains
+14,564/16,151 with 1,587 missing. Across the three batches in this continuation, 90 exact refs
+were independently read back with 687 symbols; this remains a partial symbol-coverage increment.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-08 (2026-09-30)
+
+Continued with 25 additional exact code refs. All 25 matched the admitted workspace/source
+revisions and on-disk byte digests in dry-run, producing 136 symbols. The existing per-file guarded
+writer applied those exact refs; independent read-only readback verified 25/25 as `PROCESSED` with
+136 symbols. The latest live audit at `2026-09-30T04:03:34Z` reports `SYMBOLS_RESOLVED`
+5,123/21,584 (23.74%), 15,298 unprocessed, 1,159 without an exact Graphify row, and four
+parse-failed refs. Overall remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS; ordinal remains
+14,564/16,151 with 1,587 missing. This tranche wrote Graphify symbol observations only; no
+embeddings, latent outputs, Qdrant, Redis/Valkey, projections, ACE, or BitFrost were written.
+
+#### AE-CANDIDATE-PROJECTION-CONTRACT-04 (2026-09-30)
+
+Made the candidate AE-to-storage contract explicit without opening training or projection writes.
+The model remains `semantic_768` (EmbeddingGemma target) → 512 → learned `latent_256` → learned
+`latent_128`; `latent_64` is an L2-normalized prefix of `latent_128`, while `topology4d` remains a
+separate revisioned projection from `latent_256`. The plan now defines a new, uncreated Qdrant
+1.19.0 candidate collection with named cosine vectors `{latent_256:256, latent_128:128,
+latent_64:64}` and an explicit full-point upsert/readback contract. The payload revision v3
+explicitly binds the input representation, dimension, and canonical pgvector source column. A pure
+REST request builder emits `PUT /collections/codebase_chunks_latent_family_v2/points?wait=true`,
+rejects duplicate projection IDs, and performs no network I/O. It does not reuse the legacy
+single-vector collection or put RFF/KMeans/topology features into payload.
+
+The same plan records the existing Drizzle/PostgreSQL declarations: canonical
+`content_embedding_768 vector(768)` input; derived storage `latent_256 halfvec(256)`,
+`latent_128 halfvec(128)`, and `latent_64 vector(64)`. No migration is needed for these already
+aligned types. Candidate point serialization remains pure and complete, but actual upsert remains
+disabled until semantic writer/input lineage, checkpoint/readback, stable projection-ID ownership,
+and collection preflight are proven. Qdrant documents that re-upserting an ID overwrites that point,
+so every eventual call must include all three named vectors and the complete revisioned payload and
+then verify the point by ID.
+
+Validation: focused AE suite 12/12 passed, including architecture, payload checksum, Qdrant vector
+layout, and Drizzle/pgvector contract checks. No training, checkpoint, PostgreSQL, Qdrant, Redis/
+Valkey, projection, ACE, or BitFrost writes were performed. Overall admission remains at its latest
+saved 4/11 PASS, `NOT_SAFE_TO_PROJECT`; this contract clarification does not promote any predicate.
+
+#### AE-QDRANT-PGVECTOR-CONTRACT-HARDEN-05 (2026-09-30)
+
+Hardened the pure candidate Qdrant serializer so it verifies the asserted `latent_64` relationship,
+not only its width and unit norm: it must equal the L2-normalized first 64 coordinates of the
+candidate learned `latent_128`. SHA-256 provenance fields now require exactly 64 lowercase hex
+characters after the `sha256:` prefix. Expanded the static Drizzle contract test to verify both
+`schema/search-analytics.ts` and `schema-postgres.ts` declare canonical `vector(768)` and the
+candidate storage dimensions (`halfvec(256)`, `halfvec(128)`, `vector(64)`).
+
+The candidate remains `768 -> 512 -> learned latent_256 -> learned latent_128`; `latent_64` is a
+normalized prefix of `latent_128`; topology4d remains separate. Qdrant 1.19's REST request remains
+a full-point upsert containing all three named vectors and the complete revisioned payload, with
+`wait=true`; no executable client or live write is enabled. No database migration is required for
+the already-aligned pgvector declarations. Training and projection remain blocked on canonical
+EmbeddingGemma/input lineage, checkpoint/readback, stable projection-ID ownership, and collection
+preflight.
+
+Validation: candidate AE tests pass 13/13; Python compile and `ae:train:dry` pass; strict OpenSpec
+validation passes. No training, checkpoint, PostgreSQL, Qdrant, Redis/Valkey, or projection writes
+were performed. Repository-wide `git diff --check` still reports pre-existing trailing whitespace
+inside `simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml`; scoped checks for the AE
+files are clean.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-09 (2026-09-30)
+
+Applied 12 additional TypeScript/JavaScript source refs through the existing guarded extractor,
+after an exact-ref dry-run confirmed the admitted workspace revision, zero source-revision mismatches,
+zero missing source files, and 81 planned symbols. One file had a valid zero-symbol result; the
+other 11 produced 81 symbol rows. Independent read-only database readback verified all 12 exact
+source-revision rows as `PROCESSED`, with 81 total symbol rows and no missing or non-processed rows.
+The latest canonical audit at `2026-09-30T04:34:32Z` reports `SYMBOLS_RESOLVED` 5,160/21,584
+(23.91%), 15,261 unprocessed, 1,159 without an exact Graphify source-revision row, and four parse
+failures. Overall remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS; `ORDINAL_MAP_SEALED` remains
+14,564/16,151 with 1,587 unresolved. No semantic embeddings, latent outputs, Qdrant, Redis/Valkey,
+projections, ACE, or BitFrost were written. The dry-run's generated Graphify GDS JSON files were
+excluded from apply; only the bounded code cohort was applied.
+
+#### GRAPHIFY-EXACT-SYMBOL-COHORT-APPLY-10 (2026-09-30)
+
+Applied 25 further TypeScript/JavaScript refs from a 150-candidate dry-run, after a second exact-ref
+dry-run confirmed all 25 against the admitted workspace revision and current source digests (zero
+revision mismatch, missing source, or read error); the plan contained 108 symbols. The existing
+guarded writer processed 25/25 with zero failures. Independent read-only readback confirmed 25/25
+exact-revision rows `PROCESSED`, 108 symbol rows, and no missing or non-processed rows. The refreshed
+canonical audit at `2026-09-30T04:36:53Z` reports `SYMBOLS_RESOLVED` 5,185/21,584 (24.02%),
+15,236 unprocessed, 1,159 without an exact Graphify revision row, and four parse failures. Overall
+remains `NOT_SAFE_TO_PROJECT`, 4/11 PASS; ordinal remains 14,564/16,151 with 1,587 unresolved.
+The dry-run's generated GDS JSON observations were not applied. This batch wrote symbol observations
+only; no embedding, latent, Qdrant, Redis/Valkey, projection, ACE, or BitFrost writes occurred.
+
+#### GRAPHIFY-FROZEN-BASELINE-01 (2026-09-30)
+
+Continued the user-authorized exact-byte structural backlog, using the existing extractor/writers
+rather than a parallel indexing owner. Details and commands:
+`docs/reports/graphify-symbol-baseline-execution-20260930.md`.
+
+- [x] GRAPHIFY-BASELINE-MANIFEST-01: freeze all 14,531 eligible source UUID/ref/revision tuples,
+  bound to existing canonical workspace admission, current bytes and checksummed producer inputs.
+  Producer-bound v1–v5 manifests preserve identical ordered members; explicit read-only rebinding
+  followed parser corrections, never silently changed the admitted cohort.
+- [x] GRAPHIFY-BASELINE-SHARD-01: 59 deterministic shards (250 files, final 31), code/frontend
+  source priority, fixed shard checksums, strict range/membership validation; descriptors remain
+  PLANNED_NOT_ENQUEUED.
+- [x] GRAPHIFY-SHARD-EXECUTOR-01: existing per-file guarded owner, exact source rehash/identity
+  locks, bounded consecutive shards, observation/resource/disk limits, independent post-commit
+  read-only observation readback and readback-only resume. No count-only completion assertion.
+- [x] Correct existing module ancestry, Unicode/raw-byte/CRLF/fenced-code spans and JSON locations;
+  use installed compiler JSON AST, not approximate text search. Preserve old observation evidence.
+- [x] Reconcile the CPU-stalled worker and partial commits through exact live readback. Only that
+  verified worker PID was stopped; no service restart. Receipts/manifests retained.
+- [x] Visit every member under current producer in a zero-write 59-shard sweep; create derived
+  gap ledger with exact identities, revisions, mismatches and receipt checksums. Baseline seal false.
+- [ ] GRAPHIFY-BASELINE-SEAL-01: resolve the 1,336 current-producer gaps before seal/promotion.
+- [ ] GRAPHIFY-OBSERVATION-RECONCILE-01: 443 stored readback mismatches (12 code / 431 JSON),
+  preserve/archive old observations and refresh only through existing revision-qualified owner.
+- [ ] GRAPHIFY-LOCAL-IDENTITY-01: 589 duplicate expected observation identities (225 code /
+  364 Markdown); define owner-qualified overload/repeated-heading identities, no dedup shortcut.
+- [ ] GRAPHIFY-GENERATED-RESOURCE-01: 297 bounded-workload deferrals; 27 already PROCESSED but
+  unverified, 270 still UNPROCESSED. No truncation or denominator exclusion to force PASS.
+- [ ] GRAPHIFY-EXACT-FAILURE-RETRY-01: seven exact failed members; classify strict JSON/JSONC,
+  invalid escape/banner and parser-location cases; no blanket status reset or guessed revision.
+- [ ] GRAPHIFY-KANBAN-BRIDGE-01: reuse existing task owner only after claim fencing / receipt
+  verification are proven. No taskboard sync/apply or automatic enqueue was run.
+- [ ] GRAPHIFY-INCREMENTAL-01: admitted source-revision delta scheduling through existing owners;
+  missing legacy incremental alias is not evidence of an implemented incremental worker.
+
+Fresh audit `2026-09-30T16:24:42.629Z`: SYMBOLS_RESOLVED remains PARTIAL_PROVEN, status coverage
+18,850/21,584 (87.33%), versus prior 5,185 (24.02%); 1,564 UNPROCESSED, 1,159 missing exact
+Graphify revision rows, 11 PARSE_FAILED. Independent exact manifest census: 13,665 PROCESSED
+(4,127 frontend/src), 859 UNPROCESSED, seven PARSE_FAILED. Stronger current-producer sweep:
+13,195 verified, 1,336 unresolved, 34/59 shards completely verified. These measurements must
+not be conflated. Four older parse failures, 705 byte-drift refs and 1,159 inventory gaps remain
+outside the frozen repair scope. Overall admission 4/11 PASS; ordinal unchanged 14,564/16,151.
+
+Evidence: `graphify-symbol-baseline-20260930-v5.json`,
+`graphify-symbol-baseline-run-1790785686707.json`, and
+`graphify-symbol-baseline-report-1790785706923/{summary,gaps}.json` under docs/reports.
+The final sweep/report tool made zero canonical writes; the apply wrote structural observations
+and existing Graphify status only. No embedding/model/training, chunk/lineage/ordinal, Qdrant,
+Redis/Valkey/Neo4j, ACE/BitFrost, DDL/migration, disk cleanup or service restart.
+Validation: 42/42 focused tests, standalone extractor typecheck, report syntax check, strict OpenSpec
+validation and scoped tracked/new-file whitespace checks all passed. No broader gate marked complete.
+
+#### DOMAIN-CLASSIFICATION-AGENTIC-RETRIEVAL-ALIGNMENT-01 (2026-09-30)
+
+Added `docs/.okf/architecture/domain-classification-and-agentic-retrieval-v1.md` and registered it
+as a non-authoritative navigation reference in `docs/.okf/registry.yaml`. It separates source
+domain labels from query intent, feature IDs, ontology relationships, representations, clusters,
+execution lanes, retrieval fusion, and MCP authorization. The requested ten-class vocabulary is a
+proposal only; the existing `parent-atlas-domain-taxonomy-v1` and `QueryClassificationV2` owners
+were not changed. The note aligns the proposed `semantic_768 -> 512 -> 256 -> 128` AE chain,
+derived `latent_64`, separate `topology_4d`, PCA/SVD/RFF, QLoRA, attention/quantization terminology,
+Qdrant projection rules, and bounded MCP retrieval with the existing owners and open provenance
+gates. It also records why ontology-linked tuples are typed evidence edges rather than a linked list.
+
+Verified the existing LangChain fetch artifact with `scripts/atlas/verify-langchain-doc-corpus-v1.mjs`:
+86/87 discovered pages fetched; current chunk receipt records 1,548 chunks, 79 in-scope pages, and
+7 redirect-scope rejects. Used the existing checksum-verifying `readLocalChunkSnapshotPageV1()`
+viewer for a read-only `tool calling` query: status `LOCAL_UNADMITTED`, 31 substring matches, 5
+returned. This is artifact-level local retrieval only, not an MCP production caller, canonical
+external-doc admission, Qdrant projection, or Valkey cache population. No crawl, model call,
+database/cache/vector write, or MCP tool invocation occurred.
+
+Reviewed the reported Graphify readback SQL error. A quoted CTE alias `"fileKind"` referenced as
+unquoted `fileKind` folds to `filekind` in PostgreSQL; snake_case aliases avoid this. No checked-in
+query owner was found, so no SQL file was changed and the readback failure is not evidence of data
+damage.
+
+Remaining implementation work: versioned runtime taxonomy compatibility decision; canonical
+semantic and source lineage; reviewed external-doc admission/readback; an explicitly registered,
+bounded read-only MCP docs search tool; and independent projection/ACE/BitFrost gate receipts.
+No admission predicate was promoted and no Qdrant/Valkey/ACE state was written.
+
+#### LIBRARY-DOCS-AND-POST-TOURNAMENT-HARDENING-01 (2026-09-30)
+
+Added a preliminary, lockfile/manifest-backed top-library priority list at
+`docs/.okf/dev/library-docs-prioritization-v1.md` and an official documentation source list at
+`docs/.okf/dev/library-docs-manifest-v1.json`; registered both through the existing OKF navigation
+registry. The list covers TypeScript/JavaScript, Python, Go, Rust and C++, prioritizing canonical
+data/retrieval/tool boundaries before optional runtimes. It deliberately distinguishes dependency
+declaration, lock resolution, environment installation, runtime loading and production callers.
+The manifest is noncanonical and explicitly `PLANNED_NOT_FETCHED_IN_THIS_MANIFEST`; this pass did
+not crawl, overwrite the existing docs corpus, call Firecrawl, or write any database/vector/cache.
+
+Important initial consolidation signals from checked-in locks/requirements: root vs frontend
+resolve different Svelte/SvelteKit, Drizzle/pg, LangChain/LangGraph versions; Python sidecars pin
+different FastAPI/Pydantic/Torch/NumPy sets; the Python Qdrant client is older than the JS/Go client
+and server target; Go services have gRPC/protobuf and pgx version skew. These are audit candidates,
+not automatic upgrade/merge decisions. The lock inventory does not prove all packages are installed
+or loaded in a running environment.
+
+End-to-end work queue:
+
+- [x] LIBDOC-01 Create a preliminary top-library list across repository language ecosystems.
+- [x] LIBDOC-02 Record official documentation entrypoints and exact manifest/lock sources to audit.
+- [ ] LIBDOC-03 Complete a read-only dependency inventory: direct/transitive, lock-resolved,
+  installed per named environment, runtime-loaded, production-called, license/EOL/security status.
+- [ ] LIBDOC-04 Reconcile the list with the existing OpenWiki/OKF and LangChain acquisition owners;
+  add an explicit repository-directory/package-manifest+lock resolver to the existing source-manifest
+  flow; pin official URL/version scope, usage rights, UTC as-of date, honest version qualification,
+  fetch method and output to a new immutable run. Unversioned docs must not be relabeled as the
+  installed package version.
+- [ ] LIBDOC-05 Fetch bounded official docs by priority (P0 then P1 then P2), record Firecrawl vs
+  BeautifulSoup/direct-Markdown provenance, bind the receipt to the selected repo manifest/lock
+  checksums and date, and preserve failures/redirects without overwriting prior corpora.
+- [ ] LIBDOC-06 Build deterministic page/chunk manifests and a local searchable index; validate
+  counts, canonical URLs, source/version/content digests, duplicates and citation spans.
+- [ ] LIBDOC-07 Prove an existing-owner read-only MCP docs-search path with bounded Zod input/output,
+  citation/evidence refs, stable pagination and no raw-hit direct injection or write authority.
+- [ ] LIBDOC-08 Build the production-hardening matrix from actual call sites: duplicate libraries,
+  version skew, ABI/protocol compatibility, security support, image/disk cost and migration risk.
+- [ ] LIBDOC-09 Resolve the tournament dependency gate: complete and read back `GS1.41` in
+  `parent-atlas-graph-retrieval-proof` and its explicitly dependent `AGENT-09` in
+  `parent-atlas-agentic-completion`, or record the operator-approved replacement owner. These
+  trackers are currently open; library supersession/consolidation is blocked until their accepted
+  tournament receipts exist.
+- [ ] LIBDOC-10 After LIBDOC-09 only, run bounded supersession passes: generate enhanced artifacts
+  beside old ones with provenance, compatibility/migration notes and consumer list; update callers
+  only after focused validation/readback; mark old artifacts superseded and archive them. Never
+  delete the original or combine unrelated dependency upgrades into one pass.
+- [ ] LIBDOC-11 Run language-specific checks, cross-service contract/parity smoke tests, dependency
+  and license/security audits, and rollback/readback; close only the exact libraries whose owners
+  and consumers are proven.
+
+External docs discoverability is now defined, not populated in a new run. The existing LangChain
+artifact remains a separate local, noncanonical snapshot. No production dependency, generated
+source, lockfile, service, or runtime was changed in this tranche.
+
+Pipeline-owner reconciliation (2026-09-30): the requested BeautifulSoup/Firecrawl and PostgreSQL
+path already exists; do not create a parallel crawler, docs table, or index owner. The existing
+`python/atlas_okf_docs_pipeline.py` uses the bounded/version-aware source manifest and the
+`atlas_external_docs.py` Firecrawl-v2/BeautifulSoup adapters. Canonical persistence is the existing
+SvelteKit `admitExternalDocPage` owner, orchestrated by the versioned-recrawl-v2 runner; local
+captures remain noncanonical until that explicit admission path and readback.
+
+Read-only live reconciliation passed on 2026-09-30: PostgreSQL 18.4 (`server_version_num=180004`);
+`atlas_external_doc_pages`/`atlas_external_doc_chunks` are PRESENT (30 pages / 852 chunks); the
+chunk vector is `vector(768)` with type parity; generated FTS is available; all 16 table indexes
+were read back, including GIN search/filter indexes and `aedc_embedding_hnsw` with
+`vector_cosine_ops`. The manual external-doc DDL is already registered as applied. Runtime Drizzle
+declarations exist at `src/lib/server/db/schema/external-doc-intelligence.ts` and are re-exported
+from the configured `src/lib/server/db/schema.ts`; these are declarations for the existing
+manually-owned tables, not a request to generate duplicate DDL. No new Drizzle migration is
+indicated by this audit. Receipts: `docs/reports/postgresql18-runtime-readiness-v1.json` and
+`docs/reports/external-doc-studio-readiness-v1.current.json` (the latter is a read-only catalog
+audit apart from writing its local report).
+
+The remaining library-docs gap is version selection, not fetch mechanics or Postgres indexing. The
+current source list has official URL candidates but does not yet resolve selected packages from an
+explicit `--repo-dir` / package manifest and lockfile, nor bind the installed/resolved package
+version to a version-addressed docs URL or an honest `CURRENT_UPSTREAM@YYYY-MM-DD` snapshot label.
+Before fetching, add that resolver to the existing source-manifest flow; record repository root,
+package manifest/lock checksums, selected package/version, UTC as-of date, docs-version
+qualification, and the immutable run id. Never label an unversioned current docs page with the
+installed package version. Preserve per-page Firecrawl-vs-BeautifulSoup provenance and failures.
+Then run the existing local capture/chunk path, validate it, and only after review use the existing
+versioned admission planner/writer and canonical readback. Do not use Drizzle `push` or ad-hoc DDL.
+
+API-doc catalog and inventory helper tranche (2026-09-30): added
+`docs/.okf/dev/library-api-doc-catalog-v1.json` with official publisher entrypoints and separately
+identified Python/C++ API surfaces for cuDF/libcudf, cuGraph/libcugraph, cuVS, cuML/libcuml, RAFT,
+and RMM, plus the core Node/Python/Go/Rust/database/retrieval dependencies. Registered the catalog
+in the existing OKF navigation registry. Added a read-only npm manifest/lock census and an explicit
+Python interpreter package probe. This is an inventory/report helper, not an AST or semantic
+indexing owner; Graphify/8095 remains the structural owner and the existing semantic writer remains
+the only candidate embedding owner. Runtime-loaded, production-called, license, security, and
+non-npm lock-resolution facts remain unproven until their dedicated probes run. No package was
+installed/upgraded and no canonical store was written.
+
+Read-only inventory execution (2026-09-30): active-repository scan found 63 package manifests,
+508 unique declared npm package names, and 1,000 declarations; 739 declaration instances have a
+package manifest physically discoverable under the nearest repository `node_modules`. Lock
+resolution classified 519 declarations as single-version npm-lock resolved, 122 as multiple
+versions, 255 as pnpm-lock present but not yet parsed, and 104 as unresolved under the current
+lock/parser scope. 487 unique npm names do not yet map to a curated catalog source. The first
+unfiltered census also found ignored `.tmp` and `deeds_labs` archive copies; the helper now excludes
+those ignored trees and the final report reflects the active repo only. An explicitly selected
+Windows Python 3.13.5 interpreter reported 533 installed distributions; this says nothing about
+the separate WSL2/sidecar environments. Runtime loading, production callers, licenses, security,
+and support/EOL remain unprobed. Reports:
+`docs/reports/library-api-doc-inventory-v1-20260930T175725Z.{json,md}` and
+`docs/reports/python-package-inventory-windows-python313-20260930T175756Z.json`.
+
+Next bounded tasks:
+- [ ] LIBDOC-INVENTORY-01 Run the census and classify every declared npm dependency against the
+  catalog; identify documentation gaps without inventing URLs.
+- [ ] LIBDOC-PYTHON-ENV-01 Run the package probe separately for each named Python environment and
+  keep environment-specific inventories distinct.
+- [ ] LIBDOC-API-VALIDATE-01 Check catalog URLs, publisher/license rules, version selectors, and
+  fetch adapter support before any additional crawl.
+- [ ] ATLAS-INDEX-SUBHELPERS-01 Add only report/planning helpers that bind to the frozen Graphify
+  manifest and existing AST/symbol/semantic owners; no alternate extractor, vector writer, or
+  unbounded full-corpus rescan.
+
+## ORNITH-LONGCTX-RUNTIME-GATES-01 — later runtime phases (2026-09-30)
+
+Planning clarification: YaRN is a llama.cpp/Ornith execution policy, not an ACE, retrieval,
+canonical-memory, or projection-admission feature. Q4_K_M describes model-weight quantization;
+KV-cache type and any TurboQuant/RotorQuant implementation are separate runtime dimensions. A
+server accepting a larger `--ctx-size` or starting with YaRN enabled proves configuration only,
+not useful context extension. Do not change the active `:8090` service or its default profile as
+part of these gates. Use a separately launched, explicitly bounded challenger for runtime tests.
+
+Later-gate order:
+
+- [ ] LCTX-01 MODEL-AND-BUILD-IDENTITY: record the exact local GGUF path, SHA-256, model metadata
+  and declared native context, tokenizer identity, llama.cpp executable/build revision, CUDA
+  backend, and effective launch arguments. Resolve the actual model from `/v1/models`; do not
+  equate the friendly `Ornith-1.5-9B` label with a public model/config revision without evidence.
+- [ ] LCTX-02 RUNTIME-CAPABILITY: verify the selected executable's own help/metadata and a
+  non-production challenger startup for context size, YaRN mode/scale/original context, flash
+  attention, KV K/V types, GPU layer count, and parallel slots. Reject unsupported or silently
+  ignored settings; preserve startup logs and effective runtime metadata.
+- [ ] LCTX-03 NATIVE-BASELINE: benchmark the unchanged native-RoPE profile at bounded 64K and
+  128K first, then at the model's evidenced native ceiling only if workstation memory permits.
+  Record exact prompt acceptance, output correctness, VRAM/RAM peak, prefill/TTFT, prompt and
+  generation throughput. Keep one inference owner on the 8-GB GPU.
+- [ ] LCTX-04 EXECUTION-POLICY-CONTRACT: define the runtime-owned, request-scoped choice between
+  native and YaRN profiles, selected only when the requested token budget needs it. Keep this
+  policy outside AcePacketV3 and canonical memory; do not enable static YaRN for short requests
+  absent measured justification.
+- [ ] LCTX-05 PREFIX-IDENTITY: review the existing prompt-prefix/cache identity owner and bind the
+  effective context-execution profile/revision (RoPE policy, scale, original context and relevant
+  runtime/model identity) alongside ordered prompt/evidence checksums. Prove a native prefix and
+  YaRN prefix cannot collide. Do not use semantic similarity to authorize KV reuse and do not
+  persist hidden thoughts, tensors, or KV state into Redis/Valkey.
+- [ ] LCTX-06 TOKEN-ACCEPTANCE: generate deterministic, checksummed corpora and verify the server
+  actually tokenizes/accepts the full prompt with no silent truncation. Test bounded lengths within
+  native context before any beyond-native case; include 320K/400K/512K only after LCTX-01/02/03
+  pass and only with a matching extension policy. Record requested and server-reported token counts.
+- [ ] LCTX-07 NEEDLE-AND-SHORT-REGRESSION: run deterministic exact-answer needles at early, middle,
+  and late positions over native and extension lengths; compare identical short-context prompts
+  under native and YaRN settings. Record exact/partial/missed/hallucinated results and fail any
+  unexplained truncation or unacceptable short-context regression. Promotion thresholds must be
+  fixed in the benchmark plan before the run, not selected after seeing results.
+- [ ] LCTX-08 ATLAS-EVIDENCE-QUALITY: evaluate frozen, revision-qualified Parent Atlas evidence
+  assembled through the existing retrieval/ACE/ContextManifest owners. Score exact source identity,
+  source revision, answer correctness, and invented-evidence count at controlled context positions.
+  This tests synthesis quality only; it cannot repair or satisfy a canonical admission predicate.
+- [ ] LCTX-09 RESOURCE-AND-CACHE-REPLAY: measure VRAM, host RAM, prefill/decode latency, and
+  repeatability for the chosen profile. Separately measure exact-prefix reuse only through the
+  current runtime/cache owner and exact prefix identity; distinguish llama-server ephemeral reuse
+  from durable BitFrost/Valkey cache behavior. No durable cache write without its existing gate.
+- [ ] LCTX-10 PROFILE-RECEIPT-AND-ROLLBACK: emit a versioned, immutable benchmark receipt binding
+  model/GGUF/tokenizer/build, effective context settings, prompt corpus checksums, test outcomes,
+  resource metrics, and cache identity revision. Promote only the profile meeting predeclared
+  correctness/resource thresholds; keep native as rollback/default. YaRN 4x or approximately 1M
+  context is a later research-only gate after 2x evidence, never inferred from startup success.
+- [ ] LCTX-11 OWNER-AND-DOCS-RECONCILIATION: attach the exact official llama.cpp and model-family
+  documentation revisions used for flags/architecture to the existing library-doc capture owner;
+  distinguish upstream support from local runtime proof. Do not treat Q4_K_M as evidence of KV
+  quantization, native FP4, or long-context quality.
+
+These tasks do not change the current Graphify admission count, ACE/BitFrost production status,
+semantic writer, retrieval ranking, or canonical corpus. They authorize no model downloads, service
+restart, database/cache/projection writes, or model training by themselves.
+
+## AST-domain propagation through existing ACE owners (2026-09-30)
+
+- [ ] PACKET-ENVELOPE-DOMAIN-04: extend the existing
+      `buildCanonicalAcePacketEnvelope()` contract—not a new packet schema—to accept the admitted
+      `domain`, `domain_class`, `ast_domain_confidence`, AST evidence reference, and provider
+      revision. Keep canonical `domain` distinct from derived `domain_class`; validate confidence
+      bounds and provenance. Preserve packet/source/revision identity exactly, and represent
+      conflicting domain evidence without silently rewriting canonical domain.
+- [ ] PACKET-ASSEMBLER-REVISION-06: harden the existing Redis fast path in
+      `parent-atlas-packet-assembler.ts` to validate requested admitted packet/source/workspace,
+      graph, and representation revisions before returning a cached packet. Reject or refresh
+      incompatible cache entries; `source_ref` equality alone is insufficient.
+- [ ] PACKET-ASSEMBLER-SCORE-07: remove or explicitly label the assembler's synthetic `1.0`/`0.5`
+      ranked-card scores and repeated first-feature assignment. Use actual retrieval/fusion evidence
+      when present; otherwise mark the values as structural/default metadata that cannot be used as
+      relevance evidence or a ranking vote.
+- [ ] PACKET-ASSEMBLER-CACHE-08: stop writing `cache_hit: 'redis'` for newly assembled packets.
+      Represent cache status (`hit`/`miss`/`refreshed`) separately from assembly source
+      (`nes-card`/`postgres`/`retrieval`) in the existing compatible packet contract; add round-trip
+      tests and an explicit compatibility path for persisted values.
+- [ ] ACE-MATERIALIZER-DOMAIN-09: extend the existing read/join step in `ace-materializer.ts` to
+      resolve exactly one admitted AST-domain feature for the packet's source/workspace revisions,
+      then pass its domain annotation, confidence, evidence reference, and provider revision through
+      `buildCanonicalAcePacketEnvelope()`. Keep PostgreSQL the authority and this materializer the
+      projection owner; AST producers must not write Qdrant or Redis/BitFrost directly.
+- [ ] DOMAIN-PROJECTION-READBACK-10: add a dry-run/readback proof from the canonical PostgreSQL
+      packet and admitted AST feature through the envelope to Qdrant payload and BitFrost value.
+      Compare packet identity, source/workspace revisions, domain evidence, and checksums; report
+      missing/stale/ambiguous inputs as typed omissions. No projection/cache apply is implied.
+- [ ] DOMAIN-E2E-RECEIPT-11: create a deterministic receipt spanning AST observation → admitted
+      feature → classifier vector → canonical packet envelope → existing assembler/materializer →
+      projection readback. Verify checksums and zero identity mutation; distinguish fixture proof
+      from live production proof and leave `ACE_EVIDENCE_GROUNDED` open until the live path is
+      independently demonstrated.
+
+## Projection-admission live refresh and next repair order (2026-09-30T20:25Z)
+
+Latest read-only audit: `NOT_SAFE_TO_PROJECT`, 4/11 PASS. The admitted denominator is the exact
+16,151-row `repo:root` packet/source-revision cohort; do not use the historical 61,718-row table total
+or old 289/1,000 sample as the denominator. Current passes: `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`,
+`GRAPH_MANIFEST_SEALED`, and `ONTOLOGY_COHORT_NONEMPTY`. Full evidence is in
+`docs/reports/graphify-projection-blocker-deep-audit-20260929.md` and the isolated read-only artifact
+`.tmp/projection-audit-refresh-20260930/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+
+The seven remaining gates are owner/provenance proofs, not missing `AcePacketV3` fields:
+
+- [ ] `SYMBOLS_RESOLVED`: current audit is 18,850/21,584 processed (87.33%), with 1,564
+      unprocessed, 1,159 lacking exact Graphify revision rows, and 11 parse failures. Continue
+      reconciliation of the frozen 14,531-source baseline using its existing extractor and
+      independent exact-revision readback; do not equate `PROCESSED` status with a verified outcome.
+- [ ] `SEMANTIC_OWNER_PROVEN`: trace all existing writers of `content_embedding_768`, identify one
+      canonical writer, and prove exact source/workspace revision, immutable model/tokenizer and
+      representation revisions, input/vector digests, and readback. No re-embedding until this is
+      established.
+- [ ] `LATENT_FAMILY_PROVEN`: recover or create a manifest only from the proven canonical semantic
+      input snapshot; bind training/config/checkpoint/output lineage. Keep lifecycle `CANDIDATE` until
+      a separate quality evaluation and promotion decision.
+- [ ] `ORDINAL_MAP_SEALED`: current map is 14,564/16,151; 1,587 are missing. Fresh read-only
+      comparison found 1,586 source refs without an exact physical-chunk match and one source with
+      52 physical chunk rows containing 26 duplicated chunk IDs. Of the missing set, 1,571 have
+      exact Graphify `code_source_revision` (1,044 processed, 523 unprocessed, four parse-failed),
+      while 16 have stale/null Graphify revision evidence; all 1,587 paths currently exist, with
+      1,583 byte matches and four byte drifts. Freeze and revalidate this manifest before repair.
+      Find/prove a bounded existing chunk+lineage owner with no embedding/Qdrant/cache fanout; if
+      absent, add bounded behavior to the existing canonical chunk owner. Quarantine the duplicate
+      identity for its owner—never deduplicate or synthesize ordinals in the materializer.
+- [ ] `PROJECTIONS_CHECKSUM_ALIGNED`: identify the existing receipt/projection owner and bind the
+      sealed admitted cohort, ordinal-map checksum, representation inputs, projection revisions, and
+      independent destination readbacks. Do not create a parallel registry/table solely for this
+      gate; use Drizzle generate+migrate only if a settled existing owner requires durable schema.
+- [ ] `BITFROST_KEYS_DERIVABLE`: prove an admitted ACE key producer/caller and deterministic key
+      derivation, then identity-bound write/readback under the existing cache owner. Keep apply/warm
+      blocked until ACE admission and readback are proven.
+- [ ] `ACE_EVIDENCE_GROUNDED`: connect production retrieval through the canonical admitted resolver,
+      existing `AcePacketV3` builder, and `ContextManifest`, then prove exact evidence/revision
+      grounding with independent readback. `ace_context_sources` is legacy diagnostic data, not the
+      grounding authority; do not add packet fields or a competing ledger to compensate.
+
+No full `graphify:daily` retry will drain symbol or chunk backlogs: the daily wrapper correctly
+fails closed at admission before those downstream projections. No writes, reindex, projection,
+cache warming, schema migration, or service restart were performed for this refresh.
+
+### Producer-path correction from continuation audit (2026-09-30)
+
+- [ ] Do not act on the pasted `289/1,000` Qdrant-ID or `16,151/61,718` revision claims: latest
+      exact admitted-cohort proof remains `IDENTITY_ALIGNED` and `REVISION_QUALIFIED` at 16,151/16,151.
+      Qdrant point-ID absence is a projection diagnostic, not a canonical identity failure.
+- [ ] Do not add packet fields as a substitute for producers: `source_revision` and summary/input
+      provenance already exist in V3; `file_path` is not canonical identity; token budgets remain
+      request-scoped in `ContextManifest`/`PromptPlan`; centroids/domain/QLoRA are derived lanes.
+- [ ] `ORDINAL_MAP_SEALED`: reject `index-full-repo-for-search.mjs` as a repair owner. It combines
+      mutable-tag embedding, Qdrant upserts, Postgres chunk metadata and optional Redis centroid
+      warming, but does not persist admitted workspace/source revision plus packet-chunk lineage.
+      Build/extend only the existing canonical chunk owner with frozen-manifest selection, source
+      digest/revision revalidation, chunk-only bounded writes, lineage readback, and no semantic or
+      cache fanout. First locate/confirm that owner and its canonical identity contract; quarantine
+      the duplicate-ID source for the identity owner.
+- [ ] `ACE_EVIDENCE_GROUNDED`: `searchWithAceManifest()` is an opt-in composition that requires
+      caller-owned qualified feature sources; `/api/ace/stream` still uses the legacy packet builder.
+      Wire the existing production source owner through SearchRuntime → V3 → ContextManifest, then
+      produce a live receipt/readback. Do not retrofit `ace_context_sources` as another authority.
+- [ ] `PROJECTIONS_CHECKSUM_ALIGNED`: reuse an existing projection/receipt owner for cohort,
+      ordinal, representation-input and destination-readback checksums. Qdrant's named-vector
+      `update_vectors` can update selected vectors while retaining unspecified ones; choose update
+      versus full point upsert based on the actual point/schema operation and verify readback. No
+      migration unless the settled receipt owner requires it; if required, use reviewed Drizzle
+      generate+migrate, not schema push.
+
+Official references reviewed: [Qdrant point/vector updates](https://qdrant.tech/documentation/concepts/points/),
+[Drizzle migrations](https://orm.drizzle.team/docs/migrations), and [pgvector](https://github.com/pgvector/pgvector).
+Fresh audit artifact: `.tmp/projection-audit-refresh-20260930-continuation/atlas-canonical-projection-fabric-audit-2026-09-30.json`
+(`2026-09-30T20:35:57.204Z`, `NOT_SAFE_TO_PROJECT`, 4/11 PASS).
+
+#### Canonical chunk-owner census follow-up (2026-09-30)
+
+- [ ] `ORDINAL_MAP_SEALED` owner selection remains BLOCKED: the scoped census found no existing
+      bounded producer that creates missing canonical physical chunks and exact admitted
+      packet-to-chunk membership. `index-full-repo-for-search.mjs` and codebase index-stream /
+      batch-upsert are broad or Qdrant-to-Postgres mirror paths without admission lineage;
+      `apply-codebase-chunk-lineage-backfill-v1.mjs` updates only existing rows; the ordinal
+      materializer consumes existing proven lineage. Review the source-acquisition/chunk-boundary/
+      canonical-ID owner before implementing a bounded create path. Keep apply blocked and the
+      duplicate canonical-ID source quarantined; do not add a parallel writer or modify a mirror.
+
+- [x] Re-reviewed candidate existing producers (2026-09-30): `scripts/atlas/index-full-repo-for-search.mjs`
+      is definitively ineligible: it derives `fullrepo:<path>:<array-index>` chunk IDs, uses the
+      derived Qdrant UUID as `packet_key`, skips rows already present by Qdrant ID, and its apply
+      path couples mutable-alias embedding, Qdrant upsert, PostgreSQL metadata, and optional Redis
+      centroid warming. It does not bind the current admitted packet/source/workspace revisions or
+      insert `atlas_packet_chunk_lineage`. `ingest-tree-nodes.mjs` and `backfill-tree-nodes.mjs`
+      create PageIndex document/chunk nodes from existing packet rows; those are tree projections,
+      not `codebase_chunk_index` physical chunk producers. The lineage backfill changes metadata on
+      existing physical rows only. Thus no safe existing physical-chunk creator has been identified;
+      the next review target is the original admitted source-acquisition/chunk-boundary owner and its
+      canonical chunk-ID contract. No apply path was run and no datastore/cache/projection was written.
+
+Acceptance: contract/unit tests cover revision rejection, domain conflicts, confidence validation,
+cache compatibility, real-vs-placeholder ranking metadata, and projection payload parity. Any
+database migration must be justified by the settled existing schema owner and use the repository's
+Drizzle migration workflow; these tasks do not authorize live writes or a new table/materializer.
+
+### Current goal refresh (2026-09-30T20:47Z)
+
+- [x] Re-ran the canonical projection audit in a PostgreSQL read-only transaction. Current result is
+      `NOT_SAFE_TO_PROJECT`, 4/11 PASS; the admitted `repo:root` source/packet cohort is 16,151 and
+      both `IDENTITY_ALIGNED` and `REVISION_QUALIFIED` pass 16,151/16,151. Old `289/1,000` and
+      `16,151/61,718` statements are stale and must not drive repairs.
+- [x] Recomputed the ordinal artifact in dry-run/local-artifact-only mode against the currently
+      admitted workspace and snapshot. Result remains 14,564/16,151; all 1,587 rejected entries are
+      `MISSING_LINEAGE`. A live read-only census confirmed 1,586 have no physical chunks and one
+      source has 52 chunk rows/26 distinct IDs. All 1,587 remain exact current workspace/source
+      bindings; 1,571 have exact Graphify revision rows (1,044 processed, 523 unprocessed, 4 failed),
+      and 16 lack those rows. On-disk source digest census: 1,583 match, 4 drift.
+- [ ] Fix `SYMBOLS_RESOLVED` through exact source/revision reconciliation and the existing extractor;
+      do not count processed status as verified coverage. Resolve identity conflicts, JSON resource
+      deferrals, readback mismatches, and parser failures through their actual owners.
+- [ ] Fix `ORDINAL_MAP_SEALED` by identifying/settling the existing canonical source/chunk/identity
+      owner before any write. The broad indexer, Qdrant mirror, and lineage-only backfill are not
+      eligible chunk creators. Revalidate bytes; quarantine four drifted sources and the duplicate
+      chunk-ID case; only then perform bounded owner writes and independent lineage readback.
+- [ ] Fix `SEMANTIC_OWNER_PROVEN` before new embedding: converge to one canonical
+      `content_embedding_768` writer and prove immutable model/tokenizer/representation identity,
+      exact source input digest, vector digest, and readback.
+- [ ] Fix `LATENT_FAMILY_PROVEN` from that sealed canonical semantic input manifest; bind the
+      existing `768→512→256→128` family and `latent_64` derived prefix to training/config/checkpoint
+      receipts. Keep `CANDIDATE` until quality evaluation and separate promotion approval.
+- [ ] Fix `PROJECTIONS_CHECKSUM_ALIGNED` through the existing projection/receipt owner, binding one
+      admitted cohort + ordinal checksum + representation revisions to destination readbacks; do not
+      create a parallel table merely because current registry columns do not store this run receipt.
+- [ ] Fix `ACE_EVIDENCE_GROUNDED` by wiring production retrieval through the existing canonical
+      resolver → `AcePacketV3` → `ContextManifest` route, then verify exact source/revision/span
+      grounding. Existing packet fields are sufficient; do not add identity aliases or use the
+      legacy `ace_context_sources` table as V3 proof.
+- [ ] Fix `BITFROST_KEYS_DERIVABLE` only after admitted ACE grounding: wire deterministic key
+      derivation from canonical identity and revisions/checksums, then execute an authorized bounded
+      cache write/readback. A key fixture or TTL cannot prove authority.
+- [x] Re-froze the current exact-byte, supported, still-UNPROCESSED symbol cohort and ran all four
+      frozen shards in dry-run mode (2026-09-30T21:02Z). The immutable local manifest contains
+      859 files (`sha256:3fc237efff9efb237f08332407a9a4e63ca2a6bc560661245f98a9deffda0d6a`);
+      candidate census examined 4,308 rows, skipped 2,744 unsupported kinds, and found 1,564
+      supported unprocessed rows: 859 exact-byte matches plus 705 current-byte mismatches. All 859
+      frozen members were visited, but there were zero safe `WOULD_EXTRACT` candidates: 589 are
+      `IDENTITY_CONFLICT_DEFERRED` (225 code / 364 Markdown) and 270 generated JSON files are
+      `RESOURCE_LIMIT_DEFERRED`. `datastoreWriteAttempted=false`, `apply=false`; the shard/readback
+      seal is false. This confirms the frozen-shard mechanism works, while execution cannot safely
+      drain this population until the existing identity owner resolves duplicate local identities
+      and the bounded JSON workload policy is implemented. Do not weaken unique keys, deduplicate
+      conflicting spans, or apply this plan as-is. Plan/shards: `.tmp/atlas/graphify-symbol-baseline/`;
+      receipts: `docs/reports/graphify-symbol-extractor-v1-1790802112611.json`,
+      `...-1790802113408.json`, `...-1790802117379.json`, `...-1790802119628.json`, and
+      `docs/reports/graphify-symbol-baseline-run-1790802119633.json`.
+- [x] Recorded primary-source guidance in the deep-audit report: PostgreSQL read-only
+      transactions/constraints, Qdrant named-vector update and wait/readback semantics, Valkey TTL
+      semantics, and EmbeddingGemma MRL widths. These clarify implementation mechanics but do not
+      substitute for local producer/readback evidence.
+
+Fresh audit: `.tmp/projection-audit-goal-refresh-20260930T/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+Ordinal dry-run diagnostics: `.tmp/atlas/candidate-ordinal-corpus-v2/goal-refresh-20260930T2047/`.
+Detailed blocker analysis and source links: `docs/reports/graphify-projection-blocker-deep-audit-20260929.md`.
+
+### Live admission recheck (2026-09-30)
+
+- [x] Re-ran `node scripts/atlas/audit-canonical-projection-fabric.mjs` against PostgreSQL in a
+  READ ONLY transaction; it rolled back and emitted a fresh report. Verdict remains
+  `NOT_SAFE_TO_PROJECT`, **4/11 PASS**: `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`,
+  `GRAPH_MANIFEST_SEALED`, and `ONTOLOGY_COHORT_NONEMPTY` pass.
+- [x] Reconfirmed the denominator: 16,151 exact-revision admitted `repo:root` packets, not 61,718
+  historical table rows. Ordinals are 14,564/16,151 with 1,587 missing; duplicate, orphan, and
+  revision-mismatch counts in the current ordinal artifact are zero.
+- [x] Corrected a tempting false repair: 1,634 missing `qdrant_point_id` values are explicitly
+  projection diagnostics, not canonical identity defects. Do not backfill point IDs to satisfy
+  `IDENTITY_ALIGNED` or `ORDINAL_MAP_SEALED`.
+- [x] Current unresolved gates remain separate producer/readback proofs: symbol extraction coverage
+  (18,850/21,584 processed, 1,159 exact Graphify revision gaps, 11 parse failures); unique semantic
+  writer and per-row provenance; latent input-cohort lineage plus evaluation/promotion; ordinal
+  physical-chunk coverage; projection checksum/readback; admitted BitFrost key producer/readback;
+  production retrieval → `AcePacketV3` → `ContextManifest` grounding/readback. Extra packet fields do
+  not establish those owners or receipts.
+- [ ] Continue `GRAPHIFY-LOCAL-IDENTITY-01` and `GRAPHIFY-GENERATED-RESOURCE-01`; then re-freeze
+  exact-revision symbol candidates and require existing-writer readback before changing admission.
+- [ ] Continue tracing the canonical physical-chunk creator/ID owner for the 1,586 missing rows and
+  duplicate case; do not use broad indexers, projection IDs, or synthetic ordinals.
+
+Primary references reviewed for implementation mechanics: [PostgreSQL 18 constraints](https://www.postgresql.org/docs/18/ddl-constraints.html)
+requires producer keys to honor declared uniqueness; [Qdrant point operations](https://qdrant.tech/documentation/concepts/points/)
+and [payload operations](https://qdrant.tech/documentation/concepts/payload/) distinguish point upsert
+from narrow updates; [Drizzle migrate](https://orm.drizzle.team/docs/drizzle-kit-migrate) documents
+the migration flow if a proven schema owner later requires DDL. None of these references justifies
+a schema migration or projection write for the current gaps.
+
+### Physical chunk producer ownership trace (2026-09-30)
+
+- [x] Searched direct SQL and Drizzle insert paths for `codebase_chunk_index`. Three live-looking
+  writers were found and classified; none is eligible for the frozen ordinal repair cohort:
+  - `scripts/atlas/index-full-repo-for-search.mjs::upsertPostgresMetadata` is a broad filesystem
+    indexer. It writes metadata keyed by Qdrant ID; its point ID is also used as `packet_key`, and
+    it cannot establish admitted workspace/source revision or canonical packet/chunk membership.
+  - `sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts::mirrorToPostgres`
+    scrolls existing Qdrant points and mirrors payload fields. It has no source/workspace revision
+    admission check and is a projection mirror, not the physical chunk boundary owner.
+  - `sveltekit-frontend/src/routes/api/codebase/auto-research/+server.ts` inserts generated wiki
+    summaries; this is not a source-file chunk producer.
+- [x] Verified the two known SQL/Drizzle mirrors do not create a safe substitute merely because they
+  can insert rows. No direct source-to-canonical-chunk producer accepting an admitted frozen
+  manifest was found in the searched application/scripts/services/packages paths.
+- [x] Checked live PostgreSQL triggers, functions, and rewrite rules in a READ ONLY transaction:
+  the sole `codebase_chunk_index` trigger computes `search_vector`; `refresh_codebase_chunk_stats`
+  only inserts/deletes rows in the separate stats table; no rewrite rule or DB function was found
+  that creates source chunks or lineage. This closes the database-side-owner search for the live
+  schema inspected, not external scheduled jobs or other databases.
+- [x] Traced the Graphify daily wrapper's optional full-repo embedding lane: it invokes
+  `index-full-repo-for-search.mjs --dry-run` only when explicitly opted in, before the admission
+  gate; the comment explicitly separates this from the mutating chain. This explains how broad
+  search/Graphify artifacts can appear to work while not proving the current canonical chunk,
+  ordinal, or projection-admission contract.
+- [ ] `CANONICAL-CHUNK-PRODUCER-OWNER-01`: locate the original canonical source/chunk boundary
+  producer or explicitly designate the existing canonical indexing owner; require exact admitted
+  source/workspace revisions, original source bytes, stable source spans/chunk boundaries, and
+  canonical chunk IDs before enabling bounded repair.
+- [ ] Only after that owner and contract are proven, materialize the exact eligible missing-chunk
+  cohort with revision revalidation, no embedding/Qdrant/Redis fanout, and independent lineage
+  readback; then regenerate and seal ordinals.
+
+### CandidateOrdinal versus chunk-lineage reconciliation (2026-09-30)
+
+- [x] Cross-checked the existing CEI-24 packet-grain `CandidateOrdinalMapV1` against the live
+  admitted cohort in a READ ONLY PostgreSQL transaction. The separate CEI-24 map has 16,151 rows;
+  all 16,151 live exact-root packets match by packet key, source ref, source revision, and workspace
+  revision. Zod schema + `assertCandidateOrdinalMapIntegrityV1` pass; its map-file SHA-256 and
+  ordinal checksum match its receipt. It intentionally contains zero chunk identities and declares
+  `identityAuthority=false`.
+- [ ] `ORDINAL-MAP-OWNER-CONVERGENCE-01`: resolve the producer/audit mismatch before labeling
+  1,587 as an ordinal defect. The audit currently consumes the lineage-filtered
+  `candidate-ordinal-corpus-v1.json` (14,564 rows), while the canonical packet-grain map contract
+  has a separate 16,151-row map and an explicitly pending packet→chunk crosswalk. Refresh that map
+  against the current admitted snapshot/receipt and decide whether `ORDINAL_MAP_SEALED` is packet
+  coordinate completeness; keep physical chunk coverage independently blocking projection parity.
+  Do not point the audit at the historical `.tmp` map or relax snapshot binding without the fresh
+  receipt and a focused test.
+- [x] Replayed the existing ordinal-corpus producer with `--dry-run` against the admitted
+  workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+  and admitted candidate snapshot `sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b`.
+  It read 16,151 admitted `repo:root` packet rows and emitted 14,564 lineage-qualified rows; the
+  ordinal checksum exactly matches the current audit (`77634f4763f67af6658ba9b4017db2d1c2b8ce150903e5ce09fb31ec752e91fd`).
+  All 1,587 exclusions classify as `MISSING_LINEAGE` in this producer's diagnostic; this run does
+  not independently distinguish absent physical chunks from the separately documented duplicate
+  chunk-ID contradiction. Local-only map, receipt, and diagnostics are under
+  `.tmp/atlas/candidate-ordinal-corpus-v2/diagnostic-20260930/`; no canonical report was replaced,
+  and the producer reports zero datastore writes. This confirms reproducibility, not sealing.
+- [x] Traced likely existing chunk/lineage writers without invoking them. The route
+  `sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts` writes embeddings and
+  cluster fields to `codebase_chunk_index` and emits Qdrant upserts; `scripts/atlas/index-full-repo-for-search.mjs`
+  writes PostgreSQL metadata, embeddings, Qdrant points, and optional Redis centroid state. Neither
+  is a safe chunk-only repair entry point for this frozen gap. `scripts/atlas/register-orphaned-chunks.mjs`
+  captures packet/lineage membership for already-existing orphan chunks and can also insert packet
+  rows; it does not create the missing physical chunks for already-admitted packets. No writer was
+  run. The 1,586-row repair therefore remains blocked pending a source-revision-aware chunk owner
+  with unrelated embedding/Qdrant/cache fanout disabled by contract.
+- [x] Added a focused `CandidateOrdinalMapV1` owner regression proving that
+  `candidateSnapshotRevision` is distinct from `workspaceRevision`, while the map integrity
+  assertion still requires every candidate to bind to the map snapshot. This is a contract test
+  only; it does not refresh a live map, alter the admission evaluator, or close the convergence
+  task above.
+- [x] Re-ran the canonical projection fabric audit in a PostgreSQL READ ONLY transaction on
+  2026-09-30. It remains `NOT_SAFE_TO_PROJECT` with 4/11 PASS; all seven target predicates remain
+  below PASS. The audit wrote only its local JSON/Markdown reports and rolled back the read-only
+  transaction. The convergence task remains open pending a refreshed current packet-map receipt
+  and explicit physical-chunk crosswalk evidence.
+- [x] Reconciled the older pasted blocker summary against the fresh audit: `IDENTITY_ALIGNED` and
+  `REVISION_QUALIFIED` pass on the exact 16,151-packet admitted `repo:root` cohort; missing Qdrant
+  point IDs are projection diagnostics, and the historical table-wide denominator is not the gate
+  cohort. Added a predicate-by-predicate repair path and primary documentation notes to the deep
+  audit report. No ACE field additions or datastore writes were used as substitutes for producer,
+  lineage, projection-readback, or grounded-context evidence.
+- [x] Froze the current exact-byte/exact-workspace-revision symbol backlog using the existing
+  extractor plan owner and dry-ran all four fixed shards. Manifest checksum
+  `sha256:3fc237efff9efb237f08332407a9a4e63ca2a6bc560661245f98a9deffda0d6a`; 859 members were
+  visited, with zero datastore writes and zero readback promotions. Outcomes: 589
+  `IDENTITY_CONFLICT_DEFERRED`, 270 `RESOURCE_LIMIT_DEFERRED`. A concrete TypeScript case
+  (`sveltekit-frontend/src/global.d.ts`) has repeated ambient module/export declarations that map
+  to one current stable key but distinct source spans. This is an extractor identity/evidence-shape
+  issue requiring contract review, not permission to drop occurrences or broaden apply.
+- [x] Updated the existing symbol/AST observation planner to preserve repeated source occurrences
+  with deterministic, span-derived occurrence identities: unique observations keep their prior
+  keys; repeated code declarations receive deterministic occurrence keys; repeated AST nodes keep
+  distinct qualified names. Added focused regression tests. This changes observation identity only;
+  it does not change canonical packet/source identity or add a schema/table.
+- [x] Re-froze under the updated extractor revision and dry-ran all four shards. Manifest
+  `docs/reports/graphify-symbol-baseline-freeze-20260930-v3.json`, checksum
+  `sha256:a4a95001c242c527b027feab3bca730b3032cef0a915b0281c5476b3623530b9`, contains 859 exact-
+  byte members. Outcome census: 589 `WOULD_EXTRACT`, 270 `RESOURCE_LIMIT_DEFERRED`, zero
+  `IDENTITY_CONFLICT_DEFERRED`, zero files committed, zero independently verified members, and
+  no datastore writes. Aggregate receipt:
+  `docs/reports/graphify-symbol-baseline-run-1790805565777.json`. The 589 are now eligible for a
+  separately authorized bounded apply/readback; they are not yet counted as processed coverage.
+- [ ] Define a complete, bounded JSON structural extraction strategy or an explicit terminal
+  resource-limited outcome accepted by the `SYMBOLS_RESOLVED` coverage contract for the remaining
+  270 members. Do not truncate observations or count a deferred row as processed.
+- [x] Applied only the 589 eligible exact-byte members from the refreshed v4 plan through the
+  existing four-shard bounded apply path. The first attempt stopped and rolled back the first
+  file because readback exposed a mismatch between planned occurrence keys and insert keys; the
+  writer was corrected to consume the exact keys used by its readback plan, then v4 was frozen and
+  dry-run again before apply. Final independent read-only replay verified all 589 committed files
+  (261 `PROCESSED_WITH_SYMBOLS`, 328 `PROCESSED_STRUCTURE_ONLY`); zero file failures. The 270 JSON
+  resource-limited rows were not applied. No embedding, Qdrant, Redis/Valkey, Neo4j, or model writes.
+- [x] Refreshed the canonical projection audit in a PostgreSQL READ ONLY transaction after the
+  bounded apply. `SYMBOLS_RESOLVED` advanced to 19,439/21,584 (90.06%): 975 remain unprocessed,
+  1,159 lack exact Graphify source-revision rows, and 11 are parse failures. Overall admission is
+  still `NOT_SAFE_TO_PROJECT`, 4/11 PASS; all six other below-PASS predicates remain separate.
+- [x] Measured the 270 deferred JSON files against the extractor's actual depth-2 key census:
+  2,249–67,988 structural keys/file (median 18,579; 210 exceed 10,000). This confirms the 2,000
+  observation cap is substantive; simply raising/removing it would create an unbounded write
+  expansion. Keep this set deferred pending a bounded JSON-shape contract (or a truthful terminal
+  outcome supported by the admission predicate), not truncation or a false processed status.
+- [x] Re-ran the existing semantic-writer ownership census after the symbol apply. It remains
+  `OWNER_NOT_PROVEN`. Live `content_embedding_768` has 219,998 populated vectors, but all 219,998
+  lack `source_revision`, `workspace_revision`, `representation_revision`, and
+  `lineage_producer_revision`; metadata/output-meta/summary-provenance contain zero of the required
+  source/model/tokenizer/input/vector/producer revision fields. Every row uses mutable model label
+  `embeddinggemma:latest` or its task-prefix variant. The scan found 15 candidate mutator paths
+  spanning multiple historical/secondary surfaces; the one statically matching the canonical
+  column is a separately authorized 15-row canary, not a proven production owner. The current
+  Graphify backfill writes the historical `content_embedding` halfvec surface, not the canonical
+  `content_embedding_768` vector surface. No embedding or database writes were made by this census.
+- [ ] Converge the canonical semantic writer only after its exact admitted source/chunk join,
+  immutable EmbeddingGemma model and tokenizer revisions, input/vector digests, and PostgreSQL
+  readback are carried by the same producer transaction/receipt. Do not re-embed or retrofit the
+  219,998 historical rows until recoverability and promotion policy are proven.
+
+### Why the previous daily run appeared successful; current repair order (2026-09-30)
+
+- [x] Verified history: commit `865a7c3f5761093319a2da96524086c2dde53c29` (2026-09-09)
+  introduced the admission wrapper because the audit could report `NOT_SAFE_TO_PROJECT` while the
+  daily process still exited successfully. The wrapper now runs the read-only audit and refuses to
+  start the apply-capable chain unless the receipt is `SAFE_TO_PROJECT`. A prior green exit or a
+  successful ACE/Graphify feature path therefore proves execution, not the present 11-predicate
+  admission contract.
+- [x] Froze a fresh exact-workspace/exact-byte symbol plan, without applying it:
+  `docs/reports/graphify-symbol-baseline-freeze-20260930-v5.json`, checksum
+  `sha256:b47984d5f16b35e99b542b346322bc634c0cbea9bc8f69d214b9339dfa08232e`. Of 975 unprocessed
+  supported candidates, 705 fail the current source-byte/revision check; the remaining 270 are all
+  JSON and remain deferred by the bounded structural extractor. Thus this plan has zero presently
+  eligible rows to apply. Do not process the 705 under stale Graphify revisions or raise the JSON
+  cap without an explicit bounded shape/outcome contract.
+- [x] Replayed both shards of the v5 plan with the same extractor revision. All 270 exact-byte JSON
+  candidates returned `RESOURCE_LIMIT_DEFERRED`; `filesCommittedThisRun=0`,
+  `independentlyVerifiedMembers=0`, `datastoreWriteAttempted=false`, and
+  `projectionAdmissionPromoted=false`. Receipt:
+  `docs/reports/graphify-symbol-baseline-run-1790806838692.json`. This confirms the frozen plan has
+  no safe apply rows under the current extraction contract.
+- [ ] Keep the repair tracks separate and ordered by authority dependencies:
+  (1) settle JSON resource-terminal semantics and the 1,159 missing exact Graphify revision rows;
+  (2) identify/implement a canonical chunk owner for the 1,586 absent physical chunks and quarantine
+  the duplicate chunk-ID contradiction; (3) converge the single `content_embedding_768` writer and
+  immutable EmbeddingGemma/model-tokenizer/input/output lineage; (4) only then bind the latent
+  training-input cohort and keep promotion a separate evaluation vote; (5) bind projection checksums
+  and independent readbacks to the sealed cohort; (6) wire live retrieval through the admitted
+  resolver → existing `AcePacketV3` → `ContextManifest` path and prove grounded readback; (7) enable
+  BitFrost identity-bound key write/readback only after admitted ACE grounding. No added ACE field,
+  QLoRA/NLP/ontology enrichment, centroid, or graph fanout substitutes for these proofs.
+- [x] Reviewed primary documentation relevant to the implementation constraints:
+  PostgreSQL 18 documents enforcement of read-only transactions; Ollama's official API describes
+  model tags and exposes model digests from `/api/ps`/`/api/tags`; Qdrant documents targeted named-
+  vector updates separately from point upsert; Drizzle documents the generate→migrate workflow.
+  These inform receipts and projection update mechanics, not Parent Atlas authority or predicate
+  semantics.
+- [x] Re-ran the canonical fabric audit after the dry-run-only work in a PostgreSQL READ ONLY
+  transaction (`2026-09-30T22:21:16Z`). It remains `NOT_SAFE_TO_PROJECT`, with four PASS
+  (`IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`,
+  `ONTOLOGY_COHORT_NONEMPTY`) and seven below PASS: symbols 19,439/21,584; semantic writer and
+  latent family partial; ordinal 14,564/16,151; projection checksum, BitFrost derivation, and ACE
+  grounding not proven. Transaction rolled back; no canonical or projection writes.
+- [x] Re-tested a proposed increase of the frozen JSON observation ceiling using the same exact
+  270-file manifest. All 270 parsed completely under a measured 70,000-observation ceiling, but
+  that would create **5,799,947 AST rows** (5,333,064 in shard 1; 466,883 in shard 2), median
+  18,579/file and maximum 67,988/file. The largest sources are generated Graphify GDS snapshots,
+  run snapshots, and vector row maps—not code. Reverted the exploratory ceiling; no data writes
+  occurred. A global cap increase is rejected as a safe fix: first define whether generated JSON
+  artifacts belong in the supported source denominator and an indexed JSON-shape contract that
+  does not mistake every array record/index for a source capability.
+- [x] Added a focused extractor regression proving complete output below a caller-supplied bound
+  (2,500 keys with a 3,000 observation limit) while retaining fail-closed over-limit behavior.
+  `node --test scripts/atlas/lib/json-symbol-extractor-location.test.mjs` passed 4/4. The extractor
+  remains at the existing 2,000 observations/file in frozen mode; this test alone does not make
+  the 270-file population eligible or change admission.
+- [x] Refroze the exact-workspace/exact-byte JSON set against the current producer checksum as
+  `docs/reports/graphify-symbol-baseline-freeze-20260930-v6.json` (270 members, 2 shards; checksum
+  `sha256:6e73ab6127e9e214e1f4fa04c66221404f44675fb07eb3dd05911699ac294938`) and replayed both
+  shards dry-run. 270/270 produced a complete `WOULD_EXTRACT` plan with 5,799,947 observations;
+  zero writes, zero committed files, zero independently verified members, no promotion. This is
+  a sizing/eligibility receipt only, not authorization to materialize millions of generated-data
+  nodes.
+- [x] Re-ran `audit-semantic-768-writer-ownership-v1.mjs` against live PostgreSQL. It reports
+  `OWNER_NOT_PROVEN`, 15 candidate writer paths. `content_embedding_768` contains 219,998 rows;
+  all lack row-level source/workspace/representation/producer revisions and nested input/model/
+  tokenizer/vector digests. `embedding_model` is mutable `embeddinggemma:latest` (219,422 rows)
+  or its task-prefix variant (576). The canonical-column candidate is a bounded 15-row backfill,
+  not an established general production owner; the Graphify daily writer targets historical
+  `content_embedding` halfvec. No embedding or datastore writes were made.
+- [x] Refreshed the fabric audit again after the dry-run and writer census. Current result remains
+  `NOT_SAFE_TO_PROJECT`: 4/11 PASS and 7 below PASS. `SYMBOLS_RESOLVED` remains 19,439/21,584;
+  `ORDINAL_MAP_SEALED` 14,564/16,151; semantic and latent are partial; checksum alignment,
+  BitFrost derivation, and ACE grounding are not proven. Audit transaction was READ ONLY and rolled
+  back.
+- [x] Define and validate JSON source eligibility/shape semantics before any apply. The existing
+  extractor now uses `atlas.json-source-shape-policy.v1`: generated artifacts are excluded by the
+  shared candidate-selection policy; authored JSON objects are bounded to 4 MiB and 2,000
+  depth-limited object-key observations; arrays are opaque values; scalar/root-array JSON is a
+  valid zero-observation outcome; over-limit and malformed inputs remain explicit deferrals/errors;
+  exact parser spans are preserved. Read-only v6 manifest audit: 270 unique rows, 270 excluded,
+  zero unexpected inclusions. Focused policy/location tests pass 7/7; OpenSpec strict validation
+  passes. No extraction apply or datastore/projection/model writes were performed. This closes the
+  JSON-shape contract only; it does not seal the symbol baseline or change projection admission.
+- [x] Define `AstMiniRecordV1` as a bounded adapter over the existing revision-qualified AST
+  observations (source/workspace/source revisions, producer revision, node kind, byte span,
+  parent/occurrence locator, and selected declaration/import/call/export/type flags). Add schema and
+  span/revision validation; do not persist the full parser tree or create a second AST authority.
+  Implemented as a pure adapter over an existing row; exact revisions/digest and span are required,
+  treeNodeId remains a locator, and canonicalAuthority is always false. Focused tests pass 3/3.
+- [ ] Define and build deterministic `AstRelationGraphV1` edges from admitted mini-records plus
+  existing revision-qualified import/call/reference evidence. Do not call the code-knowledge graph
+  a DAG: call/reference cycles are valid; reserve DAG validation for the separate prefill/tool
+  control plan. Specify edge vocabulary, duplicate/ambiguous-reference outcomes, stable ordering,
+  and checksum; unresolved/stale references cannot become admitted edges. Reuse existing graph
+  snapshot/relationship owners; NetworkX remains an oracle/sampling tool, not graph authority.
+  Pure builder and bounded structural-fabric adapter are implemented and fixture-proven.
+  `compileGraphifyStructuralIntelligence` now exposes the derived graph and folds its checksum into
+  the existing structural stage receipt; the native structural materializer and daily coordinator
+  canary invoke that compiler. Proven canonical source-revision authority, exact source-byte SHA,
+  workspace checksum, native node locator, and chunk-span digest are required; legacy revisions and compatibility IDs defer without graph
+  edges. Package tests pass 9/9 and the Graphify adapter tests pass 8/8. Durable snapshot/replay
+  evidence and a production consumer remain open, so this task is not complete. No graph store or
+  projection writes made.
+- [ ] Define `LabelFeatureV1` and noncanonical `LabelProposalV1` adapters over existing AST keyword
+  features, source-role/domain evidence, and revision-qualified NLP observations. Reuse the current
+  domain vocabulary/classifier envelope; require evidence refs and producer/taxonomy revisions.
+  Rule/sklearn/PyTorch/LLM outputs remain proposals until the existing ontology resolver admits
+  them. Do not train a PyTorch labeler without a frozen, reviewed labeled set and evaluation gate.
+  Added pure package schemas/builders with deterministic checksums, active-taxonomy input, strict
+  source/workspace/taxonomy matching, and proposal-only output; package fixture tests pass 4/4.
+  Production adaptation remains open: the existing `PacketAstKeywordFeatures`/grounded-domain rows
+  do not themselves carry the exact admitted source/workspace binding in the shape needed here, so
+  no revision may be inferred and no parallel persistence owner is introduced.
+- [ ] Add deterministic POS/NLP evidence as an optional text-enrichment lane for comments,
+  docstrings, Markdown, and natural-language identifiers only. Preserve source spans and provider
+  revision; do not treat POS output as AST structure, identity, or ontology promotion. Added the
+  pure `PosTextEvidenceV1` adapter for the existing `:8095` spaCy linguistic response; fixture tests
+  prove exact UTF-8 byte grounding and immutable provider/source/workspace binding. Production caller,
+  source-region ownership, and persisted-evidence readback remain open; no POS evidence was persisted.
+- [ ] Specify bulk artifact and compute adapters separately: JSONL for bounded records/receipts;
+  Arrow/Parquet/mmap for dense feature matrices; simdjson only for JSON transport parsing. KMeans,
+  graph sampling, radix ordering, and top-k alignment must consume sealed canonical ordinals plus
+  ordinal-map checksum and emit derived snapshots; they must not define identity or add retrieval
+  votes. Add CPU fixture parity before any GPU executor wiring. Native simdjson was exercised via
+  the production TypeScript bridge on a >1 KiB 1,500-record payload (`nativeParses=1`, fallback=0);
+  the standalone N-API health probe now parses and validates the native return value rather than
+  merely checking that the function exists. This proves the local parser path, not corpus-wide
+  adoption or a performance win; PERF0 and compute adapters remain open. A focused independent CPU
+  top-K oracle now verifies the existing scatter-sort-compact challenger’s stable ordinal tie-break
+  and retained snapshot/columnar checksums. This fixture parity is not a GPU proof and does not close
+  the broader artifact, KMeans, graph-sampling, or radix work.
+- [x] Add a streaming JSONL record reader as a transport helper: byte-framed LF/CRLF parsing,
+  bounded line size and batch count, fatal malformed/invalid-UTF8/non-object handling, per-batch
+  line range and checksum. Focused tests cover chunk-split UTF-8, CRLF, bounds, malformed rows, and
+  blank lines. Wired it into the existing `daily-graphify-directory-stream.mjs` manifest reader;
+  that command still emits only a planned graph JSONL and explicitly does not execute its AST,
+  chunk, embedding, or RAPIDS jobs. The helper does not classify, write PostgreSQL, call
+  EmbeddingGemma, or update Qdrant/TurboVec; those remain separate owner integrations.
+- [ ] Continue the independent blockers in dependency order: (1) classify the 1,159 missing exact
+  Graphify revision rows and 705 byte mismatches; (2) identify a canonical physical-chunk producer
+  for the 1,586 missing rows and resolve the single duplicate identity through its owner; (3)
+  converge semantic writer and immutable EmbeddingGemma/tokenizer/input/output lineage; (4) bind
+  latent training inputs and keep promotion as a separate evaluation vote; (5) bind projection
+  checksums to independent readbacks; (6) wire live retrieval through canonical resolver → existing
+  `AcePacketV3` → `ContextManifest`; (7) only then prove BitFrost key derivation and write/readback.
+  No packet-field expansion, broad indexer, re-embedding, cache writes, or projection apply closes
+  these gates by itself.
+- [x] Reclassified the 270-file exact-byte JSON backlog using the frozen manifest and path census:
+  152 historical `memory/runs` JSON files, 83 Graphify GDS snapshots, 26 Drizzle metadata
+  snapshots, three other `memory` artifacts, two phase-110 ground-truth fixtures, one phase-72
+  graph export, one vector row-map artifact, one prior-stage snapshot, and one generated
+  unreachable-classification artifact. All are generated/test artifacts, not authored symbol
+  sources. Added the shared, versioned exclusion policy to symbol candidate selection and the
+  `SYMBOLS_RESOLVED` denominator; they remain in the admitted workspace and their own producers
+  remain responsible for any other projections.
+- [x] Added regression coverage for every excluded artifact class plus non-excluded authored
+  `package.json` and documentation JSON. Replayed the v6 manifest against the policy: 270/270
+  excluded, zero unexpected inclusions. The current v8 frozen plan is
+  `docs/reports/graphify-symbol-baseline-freeze-20260930-v8.json`, checksum
+  `sha256:bc98193c7a19de8b4d2ed7ba54fc598457373e678167931abdfb59a688b5a5bf`: zero apply
+  candidates; the remaining 704 supported unprocessed rows all failed exact on-disk byte
+  revalidation and remain unapplied.
+- [x] Re-ran the fabric audit in a READ ONLY transaction (`2026-09-30T22:33:45.688Z`). Scope is
+  now explicit: 834 generated/test artifacts are outside symbol-extraction coverage; supported
+  admitted sources are 20,750, with 18,881 processed (90.99%), 704 unprocessed, 1,155 missing an
+  exact Graphify revision row, 10 parse failures, and no duplicate exact rows. `SYMBOLS_RESOLVED`
+  remains `PARTIAL_PROVEN`; overall stays `NOT_SAFE_TO_PROJECT`, 4/11 PASS. This scope correction
+  removes generated-data overcounting but does not convert revision drift or missing producer rows
+  into success.
+- [x] Validated the shared scope policy and JSON extraction behavior: 9 focused tests passed,
+  OpenSpec strict validation passed, and the audit’s SQL regex executed successfully in the live
+  read-only transaction. No database, cache, Qdrant, Neo4j, or model writes occurred.
+- [x] Ran the existing source bridge reconciliation with the admitted execution
+  `74d50c86-8194-45ea-8c3d-61aab737ef83`. Read-only receipt confirms all 24,456 admitted root
+  snapshot rows have exact execution membership and Postgres source-binding matches, but there are
+  zero `graphify_files` rows whose `workspace_revision` is the admitted revision. This is distinct
+  from the extractor's 19,595 exact `code_source_revision` matches: their source bytes can match
+  while the Graphify inventory run is not bound to the admitted workspace revision.
+- [x] Called the existing `materializeWorkspaceRevisionOriginV1` in-memory only (no DB or file
+  writes) to test whether the repository still matches the admitted snapshot. Current dirty tree
+  resolves to 26,309 source bindings. The first diagnostic digest was
+  `sha256:a11d674fc241427bbc53bc0bb5198e27ee12ea7dbdc5141279cf1ba3533509f9`; after the task/report
+  edits in this turn, a repeat remained at 26,309 but produced
+  `sha256:b075f3fa0645ce4ab959662a0b6eb7745c5698e8ed9bc068dbad4401954cbd91`. This confirms the
+  digest itself changes as tracked files change; neither diagnostic is an admitted revision. The
+  old admitted snapshot is 24,456 sources at
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`. Do not run
+  `graphify-daily-lifecycle-file-inventory-v1.mjs` against that old admission: it has no dry-run
+  mode and would write an inventory for a dirty-tree revision. Resolve through a deliberate new
+  source snapshot/admission, then inventory and extract against that exact stable revision; never
+  relabel old rows or infer revisions.
+- [x] Captured a fresh, stable, non-authoritative workspace source snapshot after confirming the
+  existing capture → derive → explicit-preflight chain. Snapshot
+  `sha256:8a22069c7db9c5e89c6630b26a8ef67981793098faf4859a4a11e42201bff715` contains 27,395
+  sources across seven repositories and has zero capture violations. Byte readback and revision
+  derivation produced candidate
+  `sha256:582d7f7350152a53982598aa0934b58e116b589f5d890b32fd3fe3aeee677105`; preflight reports
+  `CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION`. This is not authority: no admission
+  confirmation was supplied, `workspaceRevision` remains null, and Graphify execution and
+  projection writes remain unauthorized. The snapshot was produced before this task-log update,
+  so recapture/re-derive/preflight after this edit before any admission decision. Reports are local
+  ignored artifacts; no database, cache, projection, model, or inventory writes occurred.
+- [ ] After task/source changes are quiescent, recapture and byte-validate the exact intended
+  workspace snapshot; derive and review the candidate, source count, membership/content checksums,
+  nested repository revisions, dirty-state scope, and exclusions. Only a separately explicit
+  human admission decision may invoke the tournament admission command. This is a gate only for
+  work that must bind Graphify inventory/extraction to that workspace revision; it is **not** a
+  global blocker for the remaining tasks in this OpenSpec, other OpenSpecs, or independent NLP
+  sidecar/classifier work. Admission alone does not authorize Graphify execution, extraction, or
+  projection writes; those require their own bounded gates and readbacks.
+
+### Follow-up audit correction — packet-grain ordinal seal (2026-09-30)
+
+- [x] Corrected `ORDINAL_MAP_SEALED` to consume the existing CEI-24 packet-grain map and owner
+  receipt rather than treating the separate lineage-filtered corpus as the candidate ordinal map.
+  Refreshed the audit at `2026-09-30T23:11:15.788Z` in a PostgreSQL READ ONLY transaction:
+  packet-grain map 16,151/16,151; exact identity and source/workspace revision matches 16,151/16,151;
+  zero missing ordinals, duplicate canonical IDs, duplicate packet keys, duplicate ordinals, or
+  orphan rows. `ORDINAL_MAP_SEALED` now PASS. Physical packet→chunk crosswalk remains a separate
+  pending concern and is not claimed complete by this predicate.
+- [x] Recomputed the overall gate state: `NOT_SAFE_TO_PROJECT`, **5/11 PASS**. `SYMBOLS_RESOLVED`,
+  `SEMANTIC_OWNER_PROVEN`, and `LATENT_FAMILY_PROVEN` remain partial;
+  `PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED` remain not
+  proven. The audit wrote local JSON/Markdown reports and rolled back its read-only transaction;
+  no production table, cache, Qdrant, model, or projection writes occurred.
+- [x] Corrected the semantic-writer census so it groups mutation candidates by exact physical
+  column. The previous hardcoded `UNRESOLVED_WRITER_SPLIT` compared two producers of legacy
+  `content_embedding`; neither is a writer of canonical `content_embedding_768`. The static scan
+  finds one canonical-target candidate (`apply-lineage-qualified-semantic-768-backfill-v1.mjs`),
+  but that is only a frozen 15-row canary and does not satisfy general ownership or full-cohort
+  provenance/readback. The daily alias still writes the legacy halfvec column. Live census remains
+  219,998 canonical vectors with zero row-level source/workspace/representation/producer revisions
+  and zero nested model/tokenizer/input/vector digests. Verdict correctly remains
+  `OWNER_NOT_PROVEN`; no semantic vectors were rewritten.
+
+### Current gate refresh and blocker semantics (2026-09-30)
+
+- [x] Re-ran `node scripts/atlas/audit-canonical-projection-fabric.mjs` against live PostgreSQL
+  in a READ ONLY transaction. Current result is `NOT_SAFE_TO_PROJECT`, **5/11 PASS** (supersedes
+  the pasted 4/11 report and all older ordinal/identity denominators). Passing gates are
+  `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`,
+  `ONTOLOGY_COHORT_NONEMPTY`, and packet-grain `ORDINAL_MAP_SEALED` (16,151/16,151).
+- [x] Recorded exact remaining evidence: `SYMBOLS_RESOLVED` is 18,881/20,750 supported sources
+  processed (704 unprocessed, 1,155 without an exact Graphify revision row, 10 parse failures);
+  `SEMANTIC_OWNER_PROVEN` has 219,998 populated canonical vectors but no row-level source/workspace/
+  representation/producer revisions or nested model/tokenizer/input/vector digests;
+  `LATENT_FAMILY_PROVEN` has verified checkpoint/output bindings but no canonical semantic input
+  cohort digest or promotion decision; `PROJECTIONS_CHECKSUM_ALIGNED` has no cross-owner receipt;
+  `ACE_EVIDENCE_GROUNDED` has no live retrieval→admitted resolver→AcePacketV3→ContextManifest
+  grounded readback; `BITFROST_KEYS_DERIVABLE` has no admitted production key owner and
+  identity-bound live write/readback.
+- [x] Corrected the causal explanation for previously working adjacent features: Graphify,
+  retrieval, classifier/NLP, Neo4j/NetworkX, Qdrant, ACE packet assembly, and BitFrost contracts
+  may be operational, but their existing receipts do not establish these specific promotion
+  predicates. Daily Graphify now fails closed at the stricter projection-admission boundary.
+  Adding `source_revision`, `file_path`, summaries, token counts, feature remaps, centroid tags,
+  QLoRA metadata, or graph fan-out to a packet cannot substitute for the missing producer lineage,
+  frozen input checksums, and independent destination readback.
+- [x] Reconciled primary documentation with the proof requirements: PostgreSQL supports an explicit
+  read-only transaction for safe audit; Ollama exposes model digest through `/api/ps` separately
+  from embedding generation, so a mutable alias plus separate lookup is not atomic per-call model
+  provenance; Qdrant documents that upsert updates/replaces a point while `update_vectors` preserves
+  unspecified named vectors. Future projection changes must use the existing complete point owner
+  or a field-scoped update with full identity/readback proof.
+- [ ] Fix the actual producer gaps in dependency order; do not mark a gate PASS from schema fields,
+  contract tests, classifier health, vector counts, or historical receipts alone:
+  (1) continue exact-revision symbol reconciliation only after a new workspace revision is
+  explicitly admitted—the current frozen v8 plan has zero safe apply candidates because the 704
+  rows drift from the admitted bytes and 1,155 lack exact Graphify revision rows;
+  (2) establish one general `content_embedding_768` writer with immutable model/tokenizer identity,
+  exact input/source/revision digests, and independent bounded readback;
+  (3) bind the existing latent checkpoint to that frozen semantic input cohort and separately
+  record evaluation/promotion; (4) have existing projection owners emit/replay a same-cohort
+  alignment receipt; (5) wire the existing live SearchRuntime source resolver through AcePacketV3
+  and ContextManifest and prove grounded readback; (6) only then prove admitted BitFrost key
+  derivation and a reversible identity/checksum-bound canary.
+- [ ] Keep physical packet→chunk crosswalk repair separate from the packet-grain ordinal gate;
+  keep NLP/QLoRA/classification/graph fan-out out of the promotion prerequisites unless an
+  authoritative predicate contract explicitly depends on their revision-bound evidence.
+- [x] Reconfirmed the audit transaction rolled back with zero production writes. Only local audit
+  reports and this OpenSpec ledger were written; no embeddings, checkpoint, Qdrant, Neo4j, or cache
+  mutations were performed.
+- [x] Reconciled existing receipts against the live owner boundary rather than calling all prior
+  ACE work absent: `ace-producer-trace-01-v1.json` proves a real-artifact, read-only 200-candidate
+  V3 producer trace, but `searchWithAceManifest()` has no caller in `/api/ace/stream`; that route
+  still invokes the legacy `scripts/ace/build-packet.mjs`. The older full-16,151 ACE feature-source
+  receipt maps 0 exact candidates (16,142 missing, 9 rejected), so neither artifact proves live
+  V3 grounding. Existing projection evidence is also mismatched in scope/state: the current-source
+  projection alignment is 52 rows against a 16,629-row manifest (2026-09-18); latent receipts are
+  fixture-only; the graph→Qdrant receipt is DRY_RUN with zero inputs/upserts; feature readiness is
+  `NOT_READY` and tied to an older snapshot/ordinal checksum. These are useful component proofs,
+  not the current 16,151-row cross-projection/readback receipt. No parallel receipt table is
+  justified by this census.
+- [x] Traced the ACE bridge one boundary further: `SearchRuntimeAceProductionSourceAdapterV1` is
+  intentionally only an injected-owner wrapper, and `SearchRuntimeAceResolverV1` consumes an
+  already admitted ordinal map plus already produced feature rows; neither queries the canonical
+  packet/source owner. `SearchRuntimeQasFeatureSources` is likewise an injected projection/context
+  interface, not a production provider. The route has no call to `searchWithAceManifest()` and no
+  production source-owner implementation was found by scoped call-site search. This makes the
+  missing deliverable specific: implement/bind an owner that starts from actual SearchRuntime
+  candidates, independently resolves each exact `packet_key`/`source_ref`/source/workspace
+  revision against the admitted Postgres owner, obtains exact revision-bound feature rows, then
+  invokes the existing resolver and ContextManifest builder; reject any partial or ambiguous set.
+  Do not reuse packet metadata alone as the independent canonical readback.
+
+### Follow-up: semantic-writer census coverage correction (2026-09-30)
+
+- [x] Refreshed `node scripts/atlas/audit-canonical-projection-fabric.mjs` at
+  `2026-09-30T23:44:28.906Z` in a PostgreSQL READ ONLY transaction. Current result remains
+  `NOT_SAFE_TO_PROJECT`, **5/11 PASS**. `ORDINAL_MAP_SEALED` is PASS for the packet-grain
+  16,151/16,151 map; the physical packet→chunk crosswalk remains explicitly separate. The six
+  below-PASS predicates and exact current census are recorded in
+  `docs/reports/atlas-canonical-projection-fabric-audit-2026-09-30.json`.
+- [x] Expanded `audit-semantic-768-writer-ownership-v1.mjs` to scan the first-party Python,
+  service, worker, native, infrastructure, SQL/migration, and nested SvelteKit script roots that
+  the earlier Node/Svelte-only scan omitted; the report now records `scannedRoots`. `node --check`
+  and static-only audit passed. This corrected census found **two** static mutation candidates for
+  `codebase_chunk_index.content_embedding_768`, so the prior “one candidate” finding was incomplete.
+- [x] Traced the newly found
+  `sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs`: package aliases expose
+  `atlas:embed:full-corpus:apply`; its apply path embeds every nonempty row with a null vector using
+  mutable `embeddinggemma:latest`, then updates by row ID plus `content_embedding_768 IS NULL`.
+  It does not bind the write to admitted source/workspace revisions or record immutable model /
+  tokenizer / input / vector digests. The separate 15-row lineage backfill is also only a canary,
+  not a general owner. Do not run either apply path or claim `SEMANTIC_OWNER_PROVEN` from these
+  scripts as-is.
+- [ ] Select one canonical semantic producer and converge/retire the unqualified full-corpus apply
+  path only after the replacement consumes a frozen exact-revision input manifest, records immutable
+  model/tokenizer and per-row digests, and performs independent bounded PostgreSQL readback. Then
+  re-run the expanded owner census and full fabric audit. No training, embedding, database, Qdrant,
+  cache, or projection writes were performed in this follow-up.
+
+### Fresh admission and NLP-sidecar verification (2026-10-01)
+
+- [x] Re-ran `node scripts/atlas/audit-canonical-projection-fabric.mjs` against the live database in
+  a READ ONLY transaction. The report at
+  `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-01.json` is
+  `NOT_SAFE_TO_PROJECT`, **5/11 PASS**. Passing predicates are `IDENTITY_ALIGNED`,
+  `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`, `ONTOLOGY_COHORT_NONEMPTY`, and packet-grain
+  `ORDINAL_MAP_SEALED` (16,151/16,151). This supersedes the pasted 4/11 status and historical
+  1,587-row ordinal gap. The physical packet→chunk crosswalk remains separate.
+- [x] Current remaining evidence: `SYMBOLS_RESOLVED` 18,881/20,750 supported refs processed
+  (704 unprocessed, 1,155 without an exact Graphify revision row, 10 parse failures);
+  `SEMANTIC_OWNER_PROVEN` lacks a unique general writer plus per-row source/workspace/model/
+  tokenizer/representation/input/vector lineage and independent readback; `LATENT_FAMILY_PROVEN`
+  lacks the exact canonical semantic input cohort and promotion decision; projection alignment has
+  no same-cohort cross-owner checksum/readback receipt; ACE has no live SearchRuntime→admitted
+  resolver→AcePacketV3→ContextManifest grounded readback; BitFrost has no admitted production key
+  producer and identity/checksum-bound write/readback.
+- [x] Audited evaluator truth conditions in `scripts/atlas/audit-canonical-projection-fabric.mjs`.
+  `SEMANTIC_OWNER_PROVEN` currently has a deliberate `PARTIAL_PROVEN` ceiling,
+  `PROJECTIONS_CHECKSUM_ALIGNED` and `ACE_EVIDENCE_GROUNDED` currently return hardcoded
+  `NOT_PROVEN`, and BitFrost key presence only yields `PARTIAL_PROVEN`. Keep the gate fail-closed,
+  but add an evaluator follow-up: consume verifiable receipts from existing producer owners and
+  include PASS/negative fixtures. Do not make these predicates pass from added packet fields, table
+  existence, legacy `ace_context_sources`, or cache-key counts.
+- [x] Live-tested `http://127.0.0.1:8095/analyze` read-only. The mounted
+  `models/domain-classifier/checkpoint.joblib` exists; a fixture request carrying fixture-only
+  source/workspace revisions returned `backend=sklearn-lr` on CPU and model revision
+  `domain-classifier-nblr-v1-1788454983`. A request without source revision returned no pass result,
+  as required by the sidecar's evidence gate. The separate `classification_proposal` came from the
+  deterministic helper; its model challenger reported `loaded=false`. SvelteKit MCP
+  `domain.classify` and ACP `nlp:classify_domain` omit `sourceRevision`, so those callers currently
+  cannot reach the revision-qualified sklearn result. This is an adjacent classifier wiring issue,
+  not one of the 11 projection-admission predicates and not a reason to delay unrelated OpenSpec
+  work.
+- [ ] CLASSIFIER-SOURCE-REVISION-01 — exact admitted source-binding propagation is partially
+  implemented (2026-09-30): ACP `nlp:classify_domain` and TRACE MCP `domain.classify` now require
+  `sourceRef` + `workspaceRevision`, resolve exactly one existing
+  `atlas_workspace_source_bindings` row, verify `source_revision == sha256:content_digest`, and
+  pass the admitted revisions to `:8095/analyze`. The learned taxonomy bridge uses the same
+  resolver when both identities are supplied; absent/ambiguous bindings remain deterministic-only.
+  Unit proof covers resolver scope, digest parity, and binding-checksum guards. Remaining: verify
+  the running sidecar accepts this request shape, trace production callers so they can provide the
+  admitted workspace revision, and inspect the separate `atlas.classify_domain` Phase-109 tool
+  before deciding whether it belongs to this learned-classifier contract. No live classification
+  request or database write was made. This work is adjacent to, not a blocker for, projection
+  admission.
+- [x] Reviewed primary-source guidance: Ollama exposes model digests through `/api/ps` separately
+  from embedding generation, so per-call provenance must bind a pinned model identity rather than
+  infer it from a mutable alias; PostgreSQL unique constraints can enforce tuple uniqueness where
+  an existing owner requires it; PostgreSQL `REPEATABLE READ` can give the Postgres-side cohort
+  scan one stable MVCC snapshot (it does not make Postgres, Qdrant, and Valkey one distributed
+  transaction); Qdrant distinguishes point upsert, which replaces a point's unspecified vectors,
+  from field-scoped vector updates; Valkey `SET` conditional options and `GET` support an explicit
+  post-write canary/readback, but only after an admitted ACE identity/key owner exists.
+  See [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md),
+  [PostgreSQL 18 constraints](https://www.postgresql.org/docs/18/ddl-constraints.html), and
+  [PostgreSQL 18 concurrency control](https://www.postgresql.org/docs/18/mvcc.html),
+  [Qdrant points](https://qdrant.tech/documentation/concepts/points/),
+  [Valkey SET](https://valkey.io/commands/set/), and [Valkey GET](https://valkey.io/commands/get/).
+  These docs inform implementation mechanics; they do not prove this repo's producer lineage.
+  No packet-field expansion, schema migration, or parallel registry is justified by these sources
+  alone.
+- [x] Fail-closed the unqualified full-corpus `sveltekit-frontend/scripts/atlas/` semantic writer:
+  `--apply` now stops before embedding/database work even when the legacy authorization flag is set;
+  `--dry-run` remains available. This prevents writes that cannot bind each vector to admitted
+  source/workspace revisions, immutable model/tokenizer identity, input/output digests, and
+  independent readback. This is containment, not `SEMANTIC_OWNER_PROVEN`; the 15-row canary is
+  still not a general promoted writer.
+- [x] Re-audited the 15-row canary writer itself. Its `/api/embed` request defaults to mutable
+  `embeddinggemma:latest`; its reported `modelRevision` is synthesized from row `content_hash`
+  values rather than read from the model runtime; it does not persist/read back tokenizer, input,
+  and vector digests; and it upserts a Qdrant point with only the `content` vector plus a partial
+  payload. Added an unconditional preflight block before map, database, embedding, or Qdrant access.
+  `node --check` passed; with the legacy authorization flag set, the script exited 1 with
+  `SEMANTIC_768_APPLY_BLOCKED:CANONICAL_WRITER_PROVENANCE_INCOMPLETE`. This is containment only.
+- [x] Traced the existing Go embedding service's additive `/embed/v2` path before designing a
+  replacement. It already validates caller-supplied input checksums, resolves an Ollama model digest,
+  checks resident model identity before and after inference, emits vector/input/representation
+  checksums, and has focused tests (`go test ./...` passed in `services/go-embedding-service`). It
+  is still not the canonical PostgreSQL writer: tokenizer identity is configured rather than
+  runtime-attested, receipt says `atomicPerCallModelBinding=false`, its cache write is a projection,
+  and no admitted source/workspace identity or PostgreSQL write/readback is performed there. Reuse
+  this endpoint as the inference executor candidate; do not recreate the embedding provenance
+  protocol or promote it as the writer without closing those gaps.
+- [x] Refreshed the live fabric audit again on 2026-10-01: **5/11 PASS**, same six below-PASS
+  predicates as the current section. `ORDINAL_MAP_SEALED` still passes at 16,151/16,151; its
+  physical packet→chunk crosswalk remains a separate pending projection. The stale 1,587 ordinal
+  deficit and 289/1,000 Qdrant-ID sample are not current blockers.
+- [x] Re-traced the ACE production seam. `SearchRuntime` → QAS → `searchWithAceManifest()` exists
+  as an opt-in, read-only adapter, but it requires caller-supplied revisioned feature sources and
+  policy/snapshot revisions; no live route supplies those inputs. `/api/ace/stream` still invokes
+  the legacy `scripts/ace/build-packet.mjs` path. Therefore the missing work is production owner
+  wiring plus grounded readback, not V3 packet-field expansion. No route request or cache write was
+  made during this trace.
+- [x] Ran the focused adapter contract test with the package's actual runner:
+  `npx vitest run src/lib/server/atlas/retrieval/search-runtime-adapter-qas.spec.ts` passed 2/2.
+  This verifies the opt-in adapter fixture only; it does not prove a live route caller or grounded
+  production receipt.
+- [x] Closed an identity-equality gap in `SearchRuntimeAceResolverV1`: runtime candidate records
+  must now match their ordinal-map rows across canonical ID, packet key, source ref, exact source
+  revision, and workspace revision. Added a stale-source-revision regression; focused resolver and
+  production-source-adapter suites passed 8/8. This strengthens the injected-owner contract only;
+  it does not supply the missing live canonical source owner or promote ACE grounding.
+- [ ] Replace the blocked canary implementation with a producer that binds a pinned immutable model
+  and tokenizer identity to each exact admitted input, persists or emits a row-complete lineage
+  receipt, independently verifies PostgreSQL vector readback, and updates Qdrant without replacing
+  unspecified named vectors/payload. Only then may the bounded canary be explicitly re-enabled;
+  this does not authorize full-corpus apply or prove a unique general owner by itself.
+- [ ] Continue by closing producer/readback evidence in dependency order; do not turn current audit
+  counts into authority to bulk-write. Keep classifier caller repair separately scoped. No database,
+  embedding/model, Qdrant, Neo4j, or cache writes occurred in this verification.
+
+### Follow-up owner census (2026-10-01)
+
+- [x] Re-ran the semantic-writer census in static-only mode to a separate report path. It found two
+  candidate writers targeting `codebase_chunk_index.content_embedding_768`: the broad
+  `sveltekit-frontend/scripts/atlas/backfill-codebase-chunk-embeddings.mjs` and the guarded,
+  cohort-specific `scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs`. Neither is
+  a proven general canonical owner. Historical `content_embedding` and `atlas_packets.embedding`
+  writers remain separate surfaces; the Qdrant mirror does not establish canonical authority.
+  Report: `docs/reports/goal-refresh-20261001/semantic-writer-static.json`.
+- [x] Rechecked the PostgreSQL runtime after Docker recovered. The container is healthy and an
+  in-container `BEGIN TRANSACTION READ ONLY` probe succeeds, but Windows `psql` and the Node audit
+  still receive `server closed the connection unexpectedly` through the published `127.0.0.1:5434`
+  port. No services were restarted and no database or projection writes were attempted. The saved
+  2026-10-01 fabric audit remains the latest full audit; do not call it a fresh live result.
+- [x] Used the in-container read-only SQL path to refresh two owner measurements without claiming a
+  full audit. For the admitted workspace revision, symbol counts are 19,439/21,584 processed,
+  975 exact-revision rows still unprocessed, 1,159 missing exact Graphify rows, and 11 parse
+  failures. The live 768-D column has 219,998 vectors; all 219,998 lack scalar source/workspace/
+  representation/producer revision, model-revision, tokenizer, input-digest, and vector-digest
+  lineage. 219,239 carry the mutable label `embeddinggemma:latest`. Details and read-only scope are
+  in `docs/reports/goal-refresh-20261001/live-container-readonly-census.json`.
+- [ ] Restore the Windows-to-container PostgreSQL protocol path, refresh the full fabric audit into
+  a unique report directory, then continue owner-level repairs. Until then, do not apply symbol,
+  semantic, latent, projection, ACE, or BitFrost changes that require current live readback.
+- [x] Reconciled the symbol-count discrepancy with a live, read-only rerun using the exact shared
+  `GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1` policy. Current counts match the saved fabric audit:
+  20,750 supported (24,456 bound; 834 generated exclusions), 19,595 exact Graphify rows, 18,881
+  processed, 704 unprocessed, 1,155 missing exact Graphify revisions, and 10 parse failures. The
+  earlier 21,584/975/11 census omitted the shared generated-artifact exclusion and is superseded;
+  271 of its extra unprocessed rows were excluded generated artifacts. A read-only byte census
+  found all 704 remaining exact-revision unprocessed files differ from the admitted bytes (0 exact
+  matches, missing files, invalid identities, or read errors), so none is safe to extract under the
+  old revision. The correction is in
+  `docs/reports/goal-refresh-20261001/live-container-readonly-census.json`. No extraction or
+  datastore/projection/model writes occurred.
+- [ ] GRAPHIFY-SEALED-SNAPSHOT-INVENTORY-OWNER-01: keep the 916 byte-matching missing-inventory
+  refs as candidates only. Corrected owner trace: `bindSealedSnapshotWorkspaceRevisionV1` can bind
+  the admitted revision and source-selection checksum/count to `graphify_runs`, but does not insert
+  `graphify_files`; the located bounded inventory writer still requires Git-shaped
+  `WorkspaceRevisionRecordV1`/`WorkspaceSourceBindingV1` inputs and has no production caller. The
+  previous `4cf21f7a...` feasibility result therefore does not prove the admitted sealed snapshot
+  is incompatible—it exercised the Git-shaped derivation, whereas the admitted multi-repo snapshot
+  has no Git blob IDs. Before any inventory apply, resolve an existing source-identity owner that
+  can provide the exact admitted bindings or implement a narrowly scoped adapter under that owner;
+  preserve both checksum meanings (execution `SOURCE_SELECTION` artifact checksum versus admission
+  sorted-identity-key checksum), independently verify all selected identities/digests, then dry-run
+  and read back. No writes were made; the 916 refs remain unauthorized.
+
+- [x] Extended the read-only owner trace against the actual admitted snapshot artifact
+  `sha256:6288726b...`: the existing pure
+  `adaptSealedSnapshotSourcesToRepositoryQualifiedMembershipV2()` accepted all 25,542 unique
+  source identities; each source revision exactly matched its content digest; and its sorted
+  membership checksum matched both the snapshot and admission (`sha256:dccaf9f6...`). The snapshot
+  spans seven repositories and has no Git blob OIDs. This proves the coordinator's execution-
+  membership adapter in memory only. It does **not** populate `graphify_files`, produce the
+  `WorkspaceRevisionRecordV1` required by `writeGraphifySourceInventoryV2()`, or authorize
+  Graphify execution. The separate `graphify-daily-lifecycle-file-inventory-v1.mjs` wrapper
+  materializes the current single-repository worktree and writes through that Git-shaped owner;
+  it is not a valid substitute for the admitted multi-repository snapshot and was not run. The
+  existing tournament admission still has `graphifyExecutionAuthorized=false` and
+  `projectionWritesAuthorized=false`. Keep this task open until a snapshot-compatible
+  `graphify_files` owner and explicit execution authorization are both established; no database,
+  projection, cache, or model writes were made.
+
+### Phase 10B–16 roadmap reconciliation (2026-10-01)
+
+- [x] Replaced the stale Phase 10B–16 roadmap with the current Parent Atlas ownership model and
+  runtime naming: Ornith-1.5-9B through llama-server `:8090`; Gemma4 retained only as historical
+  lineage/compatibility where applicable. A read-only `/v1/models` probe returned
+  `ornith-1.5-9b` during this review.
+- [x] Reconciled the roadmap's streaming claims with the existing helpers: bounded JSONL reader
+  and daily directory stream are transport/planning stages, not semantic chunking, extraction,
+  embedding, or production indexing. Kept source-role policy and canonical chunk-owner/readback
+  proof as explicit open work.
+- [x] Corrected stale service-port assumptions, Qdrant authority language, legacy ACE packet
+  framing, and the stale ordinal blocker. Latest complete saved fabric audit remains 5/11 PASS;
+  the later PostgreSQL refresh attempt failed before producing a new result.
+- [ ] Reconcile the admitted multi-repository frozen source set with the existing inventory and
+  chunk owners. Produce a read-only, source-revision-guarded plan with reason-coded outcomes;
+  distinguish planned stream stages from executed stages and obtain explicit authorization before
+  canonical writes.
+- [ ] Prove the existing semantic writer as the sole canonical `semantic_768` owner, including
+  immutable model/tokenizer/runtime identity, input/vector digests, conditional writes, and
+  independent readback. Keep latent training blocked until its exact semantic input manifest is
+  frozen and evaluated.
+- [ ] Close symbol extraction/readback only for exact admitted revisions; preserve drift,
+  identity conflicts, resource deferrals, and parse failures as distinct terminal outcomes.
+- [ ] Produce projection-alignment evidence over one admitted cohort and ordinal checksum using
+  existing owners; do not add a competing registry/table solely to satisfy the gate.
+- [ ] Wire the live SearchRuntime route through the admitted resolver → AcePacketV3 →
+  ContextManifest and prove bounded grounded readback. Keep BitFrost writes after that proof and
+  require an explicitly authorized reversible canary.
+- [ ] Validate each Phase 10B–16 exit criterion with owner receipts and tests; do not mark a phase
+  complete from a service handshake, plan artifact, fixture, or model proposal alone.
+- [x] Recorded the requested blocker refresh against the saved 2026-10-01 fabric report and
+  attempted the read-only live audit. The audit could not acquire a PostgreSQL connection
+  (`Connection terminated unexpectedly`), so **5/11 PASS at 2026-10-01T00:25:29.690Z remains the
+  latest complete result**; this failed attempt is not a new gate verdict. Current blockers are
+  `SYMBOLS_RESOLVED` (18,881/20,750, with exact-byte drift/missing inventory/parser cases),
+  `SEMANTIC_OWNER_PROVEN` (canonical vector rows lack required producer/input/model/tokenizer
+  lineage), `LATENT_FAMILY_PROVEN` (checkpoint proven, canonical training-input cohort and
+  promotion not), `PROJECTIONS_CHECKSUM_ALIGNED` (no cross-projection cohort/ordinal/readback
+  receipt), `ACE_EVIDENCE_GROUNDED` (no proven live admitted-resolver → V3 → ContextManifest
+  grounded readback), and `BITFROST_KEYS_DERIVABLE` (no admitted key producer plus bound
+  write/readback). The older 4/11 and 1,587 ordinal-gap summary is superseded: packet-grain
+  ordinals now pass 16,151/16,151; the physical chunk crosswalk is separate. Primary references
+  reviewed: [pgvector](https://github.com/pgvector/pgvector) distinguishes exact search from
+  approximate HNSW/IVFFlat; [Qdrant point operations](https://qdrant.tech/documentation/concepts/points/)
+  document overwrite-on-upsert and targeted vector updates; [EmbeddingGemma model card](https://ai.google.dev/gemma/docs/embeddinggemma/model_card)
+  confirms 768/512/256/128 output widths, but none of these component docs substitutes for
+  Parent Atlas producer lineage and independent readback. No projections or stores were changed.
+- [x] Deepened the database transport diagnosis read-only: container PostgreSQL reports
+  `listen_addresses='*'`, port 5432, and a matching `host all all all md5` rule; in-container
+  `pg_isready` passes. Windows IPv4/IPv6 and WSL clients can establish TCP to the published port
+  (and WSL can establish TCP to the container IP), but PostgreSQL protocol sessions close/time out
+  before authentication and do not appear in `pg_stat_activity`. Docker Desktop documents that
+  published traffic is forwarded by its backend process; this localizes the failure to the
+  host/VM forwarding path but does not prove a specific root cause. Do not restart or remap the
+  database based on this evidence alone.
+- [x] Confirmed the sealed workspace revision is admitted as source authority (`25,542` sources,
+  snapshot `sha256:6288726b...`, revision `sha256:e24bb971...`) while both
+  `graphifyExecutionAuthorized` and `projectionWritesAuthorized` are explicitly `false`. This is
+  a separate apply authorization boundary: even after implementing a matching sealed-snapshot
+  inventory adapter, do not run it against canonical tables until the authorization owner grants
+  that capability. Preserve the current fail-closed gate.
+- [x] Classified the 1,155 current missing-exact-Graphify refs by inventory state and admitted-byte
+  digest: 529 have no Graphify row and still match; 387 have only a different-revision row and still
+  match; 80 no-row and 152 different-revision rows have drifted; 7 no-row sources are missing.
+  The 916 byte-matching rows are candidates, not write authorization. Traced the existing bounded
+  owner to `graphify-source-inventory-writer-v2.ts::writeGraphifySourceInventoryInTransactionV2`;
+  it requires a complete `WorkspaceRevisionRecordV1`/binding manifest and no production caller was
+  found. The saved feasibility receipt recomputes `4cf21f7a...`, not admitted `e24bb971...`; the
+  database contains only 24,456 root bindings with zero `git_blob_oid`, while the sealed snapshot
+  has 25,542 sources across seven repositories. Do not call the writer until the exact admitted
+  record/manifest is reconciled through its identity owner. The report also records the Windows
+  direct-container-IP probe as unreachable; no service restart, extractor apply, or datastore write
+  occurred.
+
+### Gate-blocker continuation: attachment reconciliation (2026-10-01)
+
+- [x] Read the supplied `graphify:daily` handoff and reconcile its 4/11/partial-ordinal claims to
+  the latest complete saved fabric audit. The saved audit is **5/11 PASS**; the five passing gates
+  include packet-grain `ORDINAL_MAP_SEALED` at 16,151/16,151. Its physical chunk crosswalk is
+  explicitly separate. Do not use the stale 1,587 count as the current ordinal gate failure.
+- [x] Attempted a fresh read-only full audit. Host-side PostgreSQL protocol terminated before the
+  script produced a report. In-container `pg_isready` and read-only `psql SELECT 1` succeed, while
+  host-side `SELECT 1` still terminates. The saved 5/11 report remains authoritative until a full
+  refresh succeeds; no service was restarted.
+- [x] Recorded the six current saved-report blockers in
+  `docs/reports/graphify-projection-blocker-deep-audit-20260929.md`: incomplete exact-revision
+  symbol coverage; unresolved canonical semantic writer/per-row lineage; latent training-input
+  lineage plus separate promotion; missing same-cohort projection receipt; no live
+  retrieval→admitted resolver→AcePacketV3→ContextManifest proof; and no admitted BitFrost key
+  producer/readback.
+- [x] Researched primary executor documentation and recorded its scope: pgvector exact-vs-ANN
+  behavior, Qdrant point overwrite versus targeted vector update, and llama.cpp chat/stream API.
+  These explain executor semantics; none supplies Parent Atlas source, model, cohort, or grounding
+  provenance.
+- [x] After explicit operator approval, restart Docker Desktop and restore the host-to-PostgreSQL
+  protocol path. The configured `legal_admin` connection through `127.0.0.1:5434` succeeded and
+  the existing read-only fabric audit completed/rolled back; no database, Compose, or Docker
+  configuration/data writes were made. The underlying forwarding failure trigger remains
+  unproven.
+- [ ] Continue owner-specific repairs only against the exact admitted revision and existing owners.
+  Do not weaken `graphify:daily` admission, use the legacy `ace_context_sources` table as V3 proof,
+  add redundant packet fields as a substitute for production wiring, or warm BitFrost before ACE
+  grounding is independently read back.
+- [x] Inspected the predicate implementation after the failed live refresh. The current
+  `PROJECTIONS_CHECKSUM_ALIGNED` and `ACE_EVIDENCE_GROUNDED` branches are hardcoded to
+  `NOT_PROVEN`; no existing receipt is consumed. Recorded this as an evaluator integration gap,
+  separate from the current missing producer/readback evidence. The local-source-cohort alignment
+  artifact is not a substitute for same-admitted-cohort projection or production ACE receipts.
+- [x] Retested PostgreSQL connectivity read-only from Windows via both the published port
+  (`127.0.0.1:5434`) and the inspected container IP (`172.18.0.12:5432`); both host protocol paths
+  fail, while in-container `psql SELECT 1` succeeds. No restart, port remap, or datastore write was
+  attempted.
+- [x] Reconciled the private-IP probe against current Docker Desktop documentation: direct Windows
+  routing to a Linux container IP is not supported/expected, so it is not evidence of a second
+  failure. The published mapping is present and listeners are `com.docker.backend.exe` plus
+  `wslrelay.exe`; container-local `pg_isready` and `psql SELECT 1` succeed. The forwarding-path
+  protocol failure remains unexplained; no firewall changes or service restart were attempted.
+- [ ] Determine the exact trigger of the published-port protocol close. The operator-approved
+  Docker Desktop restart restored access, but did not establish root cause. The installed Desktop
+  executable remains `4.50.0.209931` (not 4.92.0); no firewall changes, port remap, or database
+  recreation were performed.
+- [x] Reconciled the effective DB identity without exposing its password: `loadAtlasEnv()` loads
+  `.env`/`.env.local`, and the resulting URL uses the live `legal_admin` role. The old
+  `legal_admin:123456` literal was only the fabric audit's fallback. Removed that fallback; the audit
+  now throws `ATLAS_FABRIC_AUDIT_DATABASE_URL_REQUIRED` if no operator URL is configured.
+- [x] Attributed the `role "root" does not exist` messages to my own earlier bare in-container
+  `pg_isready` probes (no `-U`; Docker exec runs as root). These probes did not write data, but they
+  were avoidable and are not to be repeated. The running container healthcheck uses explicit
+  `legal_admin`/database arguments. No compose edit or service restart was made.
+- [x] Compared the live container's Compose labels/healthcheck with the separate GPU compose file.
+  The running container belongs to root `docker-compose.yml` and checks `legal_admin`; the
+  standalone `docker/docker-compose.gpu.yml` declares a conflicting `postgres` role/password and
+  healthcheck. This is a plausible source of `role "postgres" does not exist` only if that alternate
+  definition was invoked; do not assume it owns the running container or start it against the
+  shared DB volume before reconciling ownership.
+- [ ] Reconcile or retire the standalone GPU compose PostgreSQL definition so all supported launch
+  paths use the configured canonical DB identity; validate rendered Compose config before any
+  container recreation, and do not recreate services as part of this audit.
+- [ ] After the existing projection and production ACE owners emit their receipts, wire the fabric
+  evaluator to validate those exact receipts and their cohort/ordinal/source bindings. Keep both
+  predicates fail-closed when evidence is absent, malformed, stale, or does not match the admitted
+  cohort. Do not add a parallel registry/table solely for evaluator input.
+- [ ] **ACE query-scope join (2026-10-01 follow-up):** before wiring the live route, reconcile the
+  `SearchRuntimeAceResolverV1` full-cohort cardinality contract with request-scoped retrieval. It
+  currently requires `candidates.length === ordinalMap.rowCount`, one feature row
+  for every map row, and runtime identity for every map candidate. The retrieval-row snapshot
+  materializer independently requires the same full row count. This is not yet a valid bridge from
+  top-K SearchRuntime hits to ACE context. The QAS path can build a query-scoped ordinal map, but
+  its caller-supplied `candidateSnapshotRevision` is not itself proof that the selected identities
+  came from the sealed global ordinal map. The QAS adapter also rejects candidates without
+  `stableSymbolId`, exact `sourceRevision`/`workspaceRevision`, and a supplied feature context; its
+  snapshot builder assigns request-local ordinals and does not carry a parent-map checksum. Static
+  caller search found only the adapter definition and fixture test, not a live route caller. Define
+  and test one owner-bound selection contract that keeps the parent map checksum and original
+  ordinals (or explicitly binds a selection-map checksum to that parent); do not relax equality
+  guards, use retrieval rank as an ordinal, or infer a source revision. Then wire the route and
+  require exact selected-row identity/revision readback.
+
+### ACE selected-candidate contract implementation (2026-10-01)
+
+- [x] Added `SearchRuntimeSelectedCandidateSetV1` as a read-only adapter contract over an existing,
+  integrity-checked `CandidateOrdinalMapV1`. It binds the parent map checksum, row count, producer,
+  workspace and candidate-snapshot revisions, query digest, request ID, and retrieval-policy
+  revision. Selected rows preserve original parent ordinals and must exactly match canonical ID,
+  packet key, source reference, and SHA-256 source/workspace revisions. The contract never assigns
+  local ordinals and declares no identity authority or writes.
+- [x] Added focused tests for original-ordinal preservation, deterministic evidence normalization,
+  tamper detection, parent-map mismatch, duplicate/empty selection rejection, and identity/revision
+  substitution. Focused Vitest result: 4/4 passed; `npx tsgo --noEmit --pretty false`, strict
+  OpenSpec validation, and scoped `git diff --check` also passed.
+- [ ] Integrate the selection receipt with the request-scoped feature snapshot/ACE bridge and live
+  route. Define how sparse parent ordinals enter the selected feature snapshot without masquerading
+  as a complete dense map; then independently read back exact selected identity/revision and prove
+  ContextManifest grounding. The production caller remains absent and `ACE_EVIDENCE_GROUNDED`
+  remains open.
+
+### PostgreSQL published-port transport research (2026-10-01)
+
+Official Docker Desktop networking documentation confirms Windows host connections to Linux
+containers traverse the Desktop backend; direct Windows routing to a container-private IP is not
+the expected diagnostic path. Docker Desktop 4.92.0 release notes (2026-09-21) also document a fix
+for published ports that remain unreachable after a host port was momentarily busy. This is a
+plausible lead for the observed host protocol close, not a machine-specific diagnosis. Do not
+upgrade/restart Docker or recreate the database container during this audit; capture current
+diagnostics and obtain an operator-approved maintenance window if a controlled runtime upgrade is
+needed. Sources: [Docker Desktop networking](https://docs.docker.com/desktop/features/networking/networking-how-tos/)
+and [Docker Desktop release notes](https://docs.docker.com/desktop/release-notes/).
+
+### PostgreSQL published-port recovery and refreshed fabric audit (2026-10-01)
+
+- [x] Following explicit operator authorization, restarted Docker Desktop. The CLI restart stopped
+  the backend without relaunching it; `docker desktop start --detach` plus launching the installed
+  Desktop executable restored the engine. Docker Desktop reports `running`; the PostgreSQL
+  container is healthy and its published mapping remains host `5434` → container `5432`.
+- [x] Verified with explicit database identity only: container-local
+  `pg_isready -U legal_admin -d legal_ai_db` reports accepting connections; a host-side configured
+  Node connection through `127.0.0.1:5434` authenticated as `legal_admin` to `legal_ai_db`.
+  No credentials were printed.
+- [x] Reran `node scripts/atlas/audit-canonical-projection-fabric.mjs`. The audit completed its
+  read-only transaction and rollback, refreshed the 2026-10-01 JSON/Markdown report pair, and
+  returned `NOT_SAFE_TO_PROJECT`, 5/11 PASS. Passing gates are identity alignment, revision
+  qualification, Graphify manifest sealing, nonempty ontology cohort, and packet-grain ordinal
+  sealing (16,151/16,151). Six remain below PASS: symbols, semantic writer, latent lineage/promotion,
+  projection checksum alignment, ACE grounding, and BitFrost derivation. Physical chunk crosswalk
+  remains a separate concern and does not downgrade the packet-grain ordinal gate.
+- [x] Confirmed the installed Desktop executable is still `4.50.0.209931`; the cited 4.92.0
+  release-note fix is a plausible lead only, not the verified cause of this incident. The restart
+  changed runtime state only; no database content, credentials, Compose files, or Docker settings
+  were changed. Earlier `root`/`postgres` role errors and the literal `:'pattern'` SQL syntax error
+  remain separate probe/configuration mistakes, not findings from this successful audit.
+- [ ] Identify the persistent cause of the host-forwarding failure if it recurs. Do not claim the
+  4.92.0 fix applies to this machine unless Desktop is actually updated and the behavior is
+  reproduced/verified.
+
+### ACE selected-feature slice and producer API research (2026-10-01)
+
+- [x] Added `buildSearchRuntimeSelectedFeatureRowsV1` and its verifier beside the existing
+  SearchRuntime selection contract. It validates the full `CandidateFeatureSnapshotV1` checksum
+  and parent map binding, then joins only selected rows by their original parent ordinal and exact
+  packet/source/revision identity. The full snapshot denominator remains unchanged; the selected
+  feature slice is non-canonical and write-free.
+- [x] Added a spec scenario and focused regressions for sparse ordinal preservation, altered
+  snapshot checksum, changed parent map, and receipt re-verification. Focused Vitest passed 6/6;
+  `npx tsgo --noEmit --pretty false`, strict OpenSpec validation, and scoped `git diff --check`
+  passed.
+- [ ] Continue the separate live-wiring task: no route currently consumes this selection/slice
+  contract, fetches the exact selected `AcePacketV3` rows from the admitted owner, or independently
+  reads back the resulting `ContextManifest`. This helper does not promote
+  `ACE_EVIDENCE_GROUNDED` and does not authorize cache writes.
+- [x] Reviewed primary API documentation against the semantic/projection gaps. Ollama's embed
+  response identifies the requested model and returns embeddings, while loaded-model digest is
+  available from a separate `/api/ps` response; therefore those endpoints alone do not prove
+  atomic per-call model digest/tokenizer identity. Qdrant documents that upsert replaces an
+  existing point (unspecified named vectors are nulled), while update-vectors preserves other
+  vectors; this informs safe projection mechanics but does not establish Parent Atlas cohort
+  lineage. pgvector documents exact search as a perfect-recall baseline and ANN as an approximate
+  executor; this helps parity testing but does not supply producer/readback receipts. Sources:
+  [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md),
+  [Qdrant points](https://qdrant.tech/documentation/concepts/points/),
+  [pgvector](https://github.com/pgvector/pgvector).
+
+### ACE stream cache-identity trust boundary (2026-10-01)
+
+- [x] Removed `aceCacheIdentity` from the `/api/ace/stream` client request
+  contract. The route now admits no revisioned cache identity from request JSON
+  and explicitly blocks revisioned BitFrost access while it still builds the
+  legacy packet. This closes client-controlled identity reaching cache GET/SET;
+  it does not wire ACE V3 or prove `ACE_EVIDENCE_GROUNDED`.
+- [x] Added a strict query-only request schema and tests confirming that a
+  caller-supplied `aceCacheIdentity` is rejected. The existing cache-admission
+  tests plus new route-contract tests passed 5/5; TypeScript check and strict
+  OpenSpec validation passed.
+- [ ] Wire an actual server-owned SearchRuntime → admitted resolver →
+  `AcePacketV3` → `ContextManifest` handoff before enabling revisioned cache
+  reads or writes. Verify exact source/workspace revisions and selected evidence
+  independently; keep legacy packets uncached in the revisioned namespace.
+
+### Live audit reconciliation and blocker ownership (2026-10-01)
+
+- [x] Reconciled the current live fabric report at
+  `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-01.md`. The
+  verdict is `NOT_SAFE_TO_PROJECT`: **5/11 PASS, six below PASS**. The CLI
+  summary says “6/11 predicates below PASS”; that is not “6/11 PASS.” Passing
+  predicates are `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`,
+  `GRAPH_MANIFEST_SEALED`, `ONTOLOGY_COHORT_NONEMPTY`, and packet-grain
+  `ORDINAL_MAP_SEALED` (16,151/16,151). The earlier 4/11 and 14,564/16,151
+  ordinal statements are historical and must not be repeated as current state.
+- [x] Confirmed the remaining six are distinct producer/proof gaps, not missing
+  convenience fields on one ACE packet:
+  `SYMBOLS_RESOLVED` is 18,881/20,750 (91.0%; 704 unprocessed, 1,155 missing
+  exact Graphify revision rows, 10 parse failures);
+  `SEMANTIC_OWNER_PROVEN` lacks one unique writer and per-row exact input/model/
+  tokenizer/representation/vector lineage plus independent readback;
+  `LATENT_FAMILY_PROVEN` lacks a canonical semantic training-input cohort and
+  promotion decision (keep `CANDIDATE`);
+  `PROJECTIONS_CHECKSUM_ALIGNED` lacks a receipt from existing projection
+  owners binding the same cohort/map/inputs/outputs/readbacks;
+  `ACE_EVIDENCE_GROUNDED` lacks a live selected-candidate → admitted resolver →
+  `AcePacketV3` → `ContextManifest` path with grounded readback; and
+  `BITFROST_KEYS_DERIVABLE` lacks that admitted identity path plus live key
+  derivation/write/readback. Adding `source_revision`, `file_path`, summary,
+  token budget, feature remapping, centroid, or classifier fields alone cannot
+  satisfy these producer/readback conditions. Token budgets are request-scoped;
+  Postgres remains identity authority and caches/projections remain derived.
+- [x] Separated Graphify source populations using
+  `docs/reports/goal-refresh-20261001/live-container-readonly-census.json`:
+  916 of 1,155 missing exact inventory rows have bytes matching the admitted
+  source digest and are feasibility candidates only; 232 are drifted and 7 are
+  missing/unreadable. The current Git-shaped inventory writer cannot be fed
+  fabricated commit/blob metadata from a sealed multi-repository snapshot; the
+  sealed-snapshot run binder only binds `graphify_runs` metadata and does not
+  create `graphify_files`. Continue by defining/testing a pure snapshot-to-
+  inventory plan against the existing inventory owner, then require exact
+  identity/revision/content readback before any separately authorized apply.
+  Do not run the broad indexer or reinterpret byte matches as write authority.
+- [x] Removed the embedded `legal_admin:123456` fallback from
+  `scripts/atlas/graphify-daily-snapshot-native-open-v1.mts`; the gated runner
+  now fails before connecting unless `DATABASE_URL` is explicitly configured.
+  A no-URL invocation was verified to exit with
+  `GRAPHIFY_SNAPSHOT_NATIVE_OPEN_DATABASE_URL_REQUIRED`; `npx tsgo --noEmit
+  --pretty false` and strict OpenSpec validation passed. This corrects script
+  configuration safety only; it does not repair the source inventory adapter
+  or authorize the runner to open a Graphify execution.
+- [x] Verified external mechanics relevant to repair sequencing: Ollama's
+  `/api/embed` response returns embeddings for a named model while `/api/ps`
+  exposes the loaded artifact digest separately, so those calls do not by
+  themselves establish atomic per-call artifact/tokenizer provenance;
+  pgvector exact search is a perfect-recall reference while HNSW/IVFFlat are
+  approximate executors. These references guide implementation but are not
+  Parent Atlas lineage proof:
+  [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md),
+  [pgvector](https://github.com/pgvector/pgvector/blob/master/README.md).
+- [ ] Keep the implementation order evidence-driven: close the sealed-snapshot
+  Graphify inventory adapter/readback and exact symbol outcomes; prove the sole
+  `semantic_768` owner before latent training; then emit a same-cohort projection
+  receipt; wire the existing selected-candidate contract into the live ACE
+  route; and prove BitFrost only after that route is grounded. Never make the
+  admission predicate green by lowering thresholds, adding parallel schemas, or
+  promoting historical vectors/checkpoints.
+
+### Live refresh and sealed-snapshot inventory plan (2026-10-01)
+
+- [x] Refreshed the live read-only fabric audit after PostgreSQL transport was
+  restored. It completed and rolled back its `READ ONLY` transaction; the new
+  report at `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-01.json`
+  is still `NOT_SAFE_TO_PROJECT`, with **5/11 PASS** and six below PASS.
+  `ORDINAL_MAP_SEALED` is now **PASS, 16,151/16,151**; 1,634 missing Qdrant
+  point IDs are projection diagnostics, not identity failure. Current remaining
+  gates are symbol coverage, semantic writer lineage, latent input lineage and
+  promotion, cross-projection receipts, live ACE grounding, and BitFrost
+  derivation. No database/projection/cache/model writes occurred.
+- [x] Added the pure
+  `buildSealedSnapshotGraphifyInventoryPlanV1()` adapter beside the existing
+  Graphify inventory owner. It validates exact frozen source identity, source
+  and workspace revisions, digest, byte length, and terminal missing-inventory
+  state. It maps the exact source digest to `code_source_revision` and
+  `content_hash`, explicitly leaves Git-only `source_revision` null, and emits
+  `legacyGitWriterCompatible=false`, `executionAuthorized=false`, and
+  `writesPerformed=false`. It is a plan contract, not an insert/readback owner;
+  the 916 census matches remain candidates only.
+- [x] Added regressions for byte-digest/length mismatch, workspace/source
+  revision mismatch, identity absent from the frozen manifest, duplicate
+  identities, and the invariant that the plan never invents Git provenance.
+  Focused Graphify writer/coordinator and selected-candidate tests passed
+  29/29 before this plan change; the updated writer and selected-candidate tests
+  then passed 23/23, including the four new plan cases.
+- [x] Added a pure readback comparator for the existing `graphify_files` row
+  shape. It checks exact workspace/run IDs, source reference, null legacy Git
+  revision, `code_source_revision`, `content_hash`, byte length, workspace
+  revision, authority marker, first/last-seen run IDs, and missing/duplicate/
+  unexpected rows. The comparator reports structural match only; the caller
+  must still prove an independent post-write query and authorized run.
+- [ ] Bind this pure plan to the exact admitted snapshot artifact and a
+  snapshot-compatible `graphify_files` writer under the existing owner, with
+  conditional insert semantics and independent readback. The live bound run is
+  already `COMPLETED`, and the current V2 writer requires Git-shaped
+  `WorkspaceRevisionRecordV1`; do not attach new inventory to that completed
+  run, invent Git metadata, or apply the 916 candidates without a new authorized
+  run/admission.
+- [ ] Continue ACE-LIVE wiring only through the existing SearchRuntime
+  `readOnly:true` path. The sparse selected-candidate/feature-row contract is
+  fixture-proven and preserves original ordinals, but `/api/ace/stream` still
+  has no production caller for it, no admitted selected-row source owner, and
+  no independent `AcePacketV3` → `ContextManifest` route readback. Keep
+  revisioned cache access disabled until that proof exists.
+- [x] Reviewed primary documentation for execution mechanics: pgvector exact
+  search is the recall oracle and HNSW/IVFFlat are approximate executors;
+  Qdrant upsert overwrites an existing point, while targeted vector updates are
+  available; Ollama returns embeddings from `/api/embed` while loaded-model
+  digest is exposed separately by `/api/ps`, so those calls alone do not bind
+  immutable model/tokenizer identity atomically per embedding request. These
+  references inform safe repair mechanics but do not prove Parent Atlas
+  provenance: [pgvector](https://github.com/pgvector/pgvector/blob/master/README.md),
+  [Qdrant points](https://qdrant.tech/documentation/concepts/points/),
+  [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md).

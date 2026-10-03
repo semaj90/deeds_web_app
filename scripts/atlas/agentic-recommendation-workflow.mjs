@@ -550,6 +550,21 @@ async function l5Rerank(query, evidence) {
   }
 }
 
+export function buildAceEvidenceBlocks(aceContext) {
+  if (!aceContext || aceContext.status !== 'ADMITTED') {
+    return { acePacket: '', aceCards: '' };
+  }
+
+  const acePacket = typeof aceContext.promptPacket === 'string' && aceContext.promptPacket.length > 0
+    ? `ACE packet:\n${aceContext.promptPacket}\n`
+    : '';
+  const aceCards = Array.isArray(aceContext.cards) && aceContext.cards.length > 0
+    ? `ACE cards:\n${aceContext.cards.slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`).join('\n')}\n`
+    : '';
+
+  return { acePacket, aceCards };
+}
+
 // ── L6: Gemma4 synthesis (bounded) ───────────────────────────────────────────
 
 async function l6Synthesis(query, identity, ranked, memory, aceContext = null) {
@@ -558,12 +573,7 @@ async function l6Synthesis(query, identity, ranked, memory, aceContext = null) {
     .filter(Boolean)
     .join('\n\n');
 
-  const acePacket = aceContext?.promptPacket
-    ? `ACE packet:\n${aceContext.promptPacket}\n`
-    : '';
-  const aceCards = Array.isArray(aceContext?.cards) && aceContext.cards.length > 0
-    ? `ACE cards:\n${aceContext.cards.slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`).join('\n')}\n`
-    : '';
+  const { acePacket, aceCards } = buildAceEvidenceBlocks(aceContext);
 
   const priorFix = memory.prior_fix
     ? `Prior solution: ${memory.prior_fix.solution ?? 'see Engram record'}`

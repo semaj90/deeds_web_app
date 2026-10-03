@@ -19,7 +19,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env' });
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 // Top-10 legal preambles for KV cache warming
 // These are used by Phase 7 summarization workers

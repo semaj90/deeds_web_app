@@ -128,8 +128,19 @@ function extractLexicalFeatures(astSymbols, featureLabel, metadataKeywords, tags
 async function clusterWithGpu(vectors, k) {
   return new Promise((resolve, reject) => {
     try {
-      // Load the N-API addon
-      const addon = require(path.join(repoRoot, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
+      // Load the N-API addon — build-x64-cuda (CUDA/LibTorch build) checked first
+      let addon = null;
+      for (const candidate of [
+        path.join(repoRoot, 'simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+        path.join(repoRoot, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+      ]) {
+        try { addon = require(candidate); break; } catch { /* try next */ }
+      }
+      if (!addon) {
+        console.warn('⚠️  tensorrt_bridge addon not found in any known build directory, falling back to CPU clustering');
+        resolve(null);
+        return;
+      }
 
       if (!addon.clusterEmbeddings) {
         console.warn('⚠️  tensorrt_bridge addon not available, falling back to CPU clustering');
@@ -356,11 +367,18 @@ async function main() {
         for (const update of batch) {
           try {
             // Upsert: INSERT or UPDATE
+            // Fixed 2026-09-13: this had NO clobber guard at all -- would unconditionally
+            // overwrite lexical_features on every run, including rows another of the 3 other
+            // live writers of this column already populated (see
+            // openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md, "lexical_features
+            // audited" + ownership-decision entries). Additive-only until/unless this script is
+            // formally promoted to sole canonical owner with a real migration.
             const result = await client.query(`
               INSERT INTO atlas_packet_features (packet_key, lexical_features, updated_at)
               VALUES ($1, $2, NOW())
               ON CONFLICT (packet_key) DO UPDATE
               SET lexical_features = EXCLUDED.lexical_features, updated_at = NOW()
+              WHERE COALESCE(array_length(atlas_packet_features.lexical_features, 1), 0) = 0
             `, [update.packet_key, update.lexical_features]);
 
             if (result.command === 'INSERT') {

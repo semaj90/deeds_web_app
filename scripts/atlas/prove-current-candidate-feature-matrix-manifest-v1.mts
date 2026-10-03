@@ -1,3 +1,12 @@
+/**
+ * TODO (stage-8 review, 2026-09-15): last run status was GRAPH_FEATURE_MATRIX_REPLAY_PROVEN,
+ * nextGate GPU_33_CANDIDATE_ORDINAL_GPU_ABI. Correctly reads the lineage-qualified 15-row
+ * canary (`.tmp/atlas/lineage-qualified-candidate-map-v1.json`), not the broader unqualified
+ * corpus flagged in materialize-candidate-ordinal-corpus-v1.mts -- this script's scope is
+ * already right. Scale-out is blocked on the same upstream chain as stage 3
+ * (CURRENT-STRUCTURAL-LINEAGE-01 primary gate + Gate 0A graph-owner resolution), not on this
+ * script's own logic.
+ */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { buildCandidateFeatureMatrix } from '../../sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.js';

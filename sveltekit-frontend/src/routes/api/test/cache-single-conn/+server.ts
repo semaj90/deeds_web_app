@@ -4,6 +4,7 @@
  * Test Redis cache using SINGLE connection (not pool) to isolate pooling issues.
  */
 
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { json } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
@@ -30,7 +31,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Generate cache key
     const cacheKey = generateCacheKey({
-      model: 'gemma4-rotorquant:latest',
+      model: SERVER_CHAT_MODEL,
       messages: [{ role: 'user', content: query }],
       temperature: 0.3,
       maxTokens: 200,
@@ -43,7 +44,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const testResponse = {
       content:
         'Hearsay is an out-of-court statement offered to prove the truth of the matter asserted.',
-      model: 'gemma4-rotorquant:latest',
+      model: SERVER_CHAT_MODEL,
       backend: 'test',
       cachedAt: new Date().toISOString(),
     };

@@ -124,6 +124,7 @@ describe('workflow-loop core', () => {
         selectedCards: expect.arrayContaining([expect.objectContaining({ id: 'card-1' })]),
         toonHash: 'run-test-default-log',
         cacheHits: 2,
+        bifrostModel: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
         output: 'patched validation via default log flow',
       })
     );
@@ -205,6 +206,7 @@ describe('workflow-loop LangGraph adapter', () => {
       expect.objectContaining({
         query: 'resolve ssr safety issue',
         toonHash: 'run-graph-default-log',
+        bifrostModel: process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
         output: 'guarded browser globals via graph',
       })
     );

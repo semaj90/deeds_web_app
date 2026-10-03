@@ -273,7 +273,7 @@ export async function runPacketSummaryWithQA(input: {
       glyphClusterId: undefined,
       confidence: 0.85,
       tokensUsed: 150,
-      model: 'gemma4-rotorquant:latest',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
     });
   } catch (err) {
     console.error('Failed to record QA-passed summary:', err);

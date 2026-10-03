@@ -1,3 +1,4 @@
+# @atlas-disposition ARCHIVED_LEGACY: malformed mixed-language artifact; no current package/runtime references.
 import os
 
 files_to_fix = {

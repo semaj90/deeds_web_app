@@ -92,8 +92,6 @@ export function buildSearchRuntimeFeatureBundleV1(
   };
   const bundleLogicalChecksum = serverFeatureBundleChecksumV1(serverFeatureBundleLogicalIdentityV1({
     ...partial,
-    bundleLogicalChecksum: '0'.repeat(64),
-    bundleEnvelopeChecksum: '0'.repeat(64),
   }));
   const bundleEnvelopeChecksum = serverFeatureBundleChecksumV1({
     schema: 'atlas.server-feature-bundle.envelope.v1',

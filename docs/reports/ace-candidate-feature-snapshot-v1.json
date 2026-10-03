@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.ace-candidate-feature-snapshot-receipt.v1",
+  "status": "ACE_CANDIDATE_FEATURE_SNAPSHOT_READY",
+  "mode": "READ_ONLY_FROZEN_ARTIFACT_COMPOSITION",
+  "sourceArtifacts": {
+    "baseCandidateSnapshotRevision": "lineage-qualified-canary:sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc:v1:15",
+    "baseOrdinalMapChecksum": "86fee5d38619d3065d8710942068f26fb5b0d3c09992b1b523083ae0a593d297",
+    "goldenReplayChecksum": "d1db484f15dfd70cc59ab33802d19fa883ed3abd5993c78683d252c46af98d2c",
+    "graphRevision": "sha256:e0807b80454a71995bb87c42f62a3b966b501ce56e6a6b106e6e2237ab81d3ab",
+    "graphFeatureRevision": "graph-pagerank:cugraph-v1:alpha-0.85:tol-1e-6:maxIter-100"
+  },
+  "derived": {
+    "candidateSnapshotRevision": "ace-golden-feature-snapshot:v1:c735ceac89bd0b02e0e040a9ededcd7e1222006a7e6ad531060212b1097d3cd4",
+    "ordinalMapChecksum": "0f652cc5d1dbe6ca362145c600ad22759b9a9a8bc5f86ff42a78115025d24c6f",
+    "snapshotChecksum": "b38f8a025302ca3e87dfa2806550ecfd014cd2a9de1f5be0f0a6555809198337",
+    "featureRevision": "sha256:c735ceac89bd0b02e0e040a9ededcd7e1222006a7e6ad531060212b1097d3cd4",
+    "candidateCount": 15,
+    "semanticFeatureRows": 15,
+    "graphFeatureRows": 7,
+    "graphAbsentRows": 8,
+    "ordinalsPreserved": true,
+    "canonicalOwnerChanged": false,
+    "identityAuthority": false
+  },
+  "semantics": {
+    "evidenceRevisionHashOwner": "canonicalSha256V1 / ATLAS_CANONICAL_V1",
+    "semanticScoreOwner": "parent-atlas-golden-retrieval-v1 exact semantic_768 score",
+    "graphAuthorityOwner": "current-graph-feature-gather-v1 pagerankMax -> authority_norm precedent",
+    "graphRevisionAppliesToCandidateUniverse": true,
+    "missingGraphFeaturePolicy": "NULL_WITHOUT_ZERO_SUBSTITUTION",
+    "rankingPromotion": false
+  },
+  "writesPerformed": false,
+  "databaseWritesPerformed": false,
+  "qdrantWritesPerformed": false,
+  "graphWritesPerformed": false,
+  "cacheWritesPerformed": false,
+  "canonicalAuthority": false,
+  "outputMap": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\ace-golden-candidate-map-v1.json",
+  "outputSnapshot": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\atlas\\ace-candidate-feature-snapshot-v1.json",
+  "nextGate": "REVISION_AUTHORITY_ENVELOPE_MATERIALIZATION_THEN_ACE_LIVE_DRY_INPUT_READINESS"
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T04:35:22Z",
+  "fromChange": "parent-atlas-versioned-doc-intelligence",
+  "toChange": "parent-atlas-rrf-fusion-consolidation",
+  "fromTask": "DOC-18 / DOC-26",
+  "toTask": "3.1",
+  "pivotGate": "DOC_CENTROID_OWNER_AND_DOC26_LIVE_ADMISSION_TO_RRF_HUMAN_DECISION",
+  "reason": "DOC-18's legacy SOM apply owner is mismatched (384D codebase vectors plus packet/Redis writes), while DOC-26 still needs integrated live version admission/readback. The nearly complete deep-research-ingestion change's only open task also requires a separately authorized canonical admission write. Pivoted to inspect RRF consolidation's remaining task; it is explicitly a human sign-off and therefore not safe to implement autonomously.",
+  "fromTaskState": {
+    "parent-atlas-versioned-doc-intelligence": {
+      "status": "IN_PROGRESS",
+      "openTasks": ["DOC-13", "DOC-14", "DOC-15", "DOC-17", "DOC-18", "DOC-26"],
+      "doc18Finding": "Existing legacy SOM runner consumes 384-dimensional codebase vectors and its apply path mutates atlas_packets and Redis; it is not a valid owner for 768-dimensional external-doc routing.",
+      "doc26Finding": "V2 identity reaches manifest-driven Python chunking and the admission handoff; production delta-only selection and integrated prior-version live readback remain open."
+    },
+    "parent-atlas-deep-research-ingestion": {
+      "status": "BLOCKED_ON_EXPLICIT_ADMISSION_AUTHORIZATION",
+      "openTask": "DISCOVERY-04B",
+      "evidence": "Task requires a real bounded DOC-06A admission write; no authorization was provided or used."
+    }
+  },
+  "toTaskState": {
+    "change": "parent-atlas-rrf-fusion-consolidation",
+    "selectedTask": "3.1",
+    "status": "OPERATOR_DECISION_REQUIRED",
+    "evidence": "Task explicitly calls for human sign-off to migrate callers, designate BACKEND/ADAPTER, or retire a noncanonical primitive."
+  },
+  "constraints": {
+    "containerRebuildsUntilEnd": true,
+    "canonicalWrites": false,
+    "datastoreWrites": false,
+    "preserveConcurrentWorkingTreeEdits": true,
+    "noCommitOrPush": true
+  }
+}

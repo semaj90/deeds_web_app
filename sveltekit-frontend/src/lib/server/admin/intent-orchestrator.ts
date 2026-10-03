@@ -1,4 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export type UserIntent =
   | 'code_search' // Finding files/symbols in the codebase
@@ -85,7 +86,7 @@ export class IntentOrchestrator {
   }
 
   /**
-   * Classify user query into a known intent category using Gemma 3.
+   * Classify user query using the active Ornith model through llama-server :8090.
    */
   static async classify(query: string, history: any[] = []): Promise<ExecutionPlan> {
     const historyText = this.summarizeHistory(history, 4);
@@ -111,9 +112,9 @@ RESPONSE FORMAT (JSON only):
     `.trim();
 
     try {
-      // Use Gemma3:270m for sub-200ms latency classification
+      // Bifrost routes chat through llama-server :8090; Ollama remains embeddings-only.
       const text =
-        (await bifrostChat([{ role: 'user', content: prompt }], 'gemma3:270m', {
+        (await bifrostChat([{ role: 'user', content: prompt }], LLM_MODEL_ID, {
           temperature: 0.1,
         })) || '{}';
       const match = text.match(/\{[\s\S]*\}/);

@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.current-workspace-ast-lineage.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "graphifyRun": false,
+  "scope": {
+    "repositoryId": "repo:root",
+    "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "v2MembershipChecksum": "sha256:59b3f07ead8d796fbef31da5946b2bc0fd678fa6ab175d10df0d49361a16ff81",
+    "packetRepairRoot": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3"
+  },
+  "identityJoin": {
+    "candidateKey": "exact normalized repository_relative_path to atlas_ast_nodes.relative_path",
+    "rootTransform": "strip the one leading sveltekit-frontend/ segment from the membership repository-relative path",
+    "canonicalQualificationAlsoRequires": [
+      "workspace_id exact match",
+      "source_revision exact match",
+      "source_content_hash equals membership content_hash"
+    ],
+    "fuzzyOrPrefixMatchUsed": false,
+    "sourceRefAloneUsed": false
+  },
+  "denominators": {
+    "currentSourcePopulation": 24456,
+    "astObservedPopulation": 2076,
+    "revisionQualifiedAstPopulation": 10,
+    "missingAstEvidence": 22380,
+    "staleOrWrongRevisionAstEvidence": 3,
+    "observedSourcesMissingWorkspaceBinding": 2058,
+    "observedSourcesMissingAstRevision": 2063,
+    "allSourcesClassifiedExactlyOnce": true,
+    "classifiedSources": 24456
+  },
+  "classifications": {
+    "AST_EVIDENCE_ABSENT": 22380,
+    "AST_REVISION_MISSING": 5,
+    "AST_REVISION_QUALIFIED": 10,
+    "AST_STALE_OTHER_REVISION": 3,
+    "AST_WORKSPACE_BINDING_MISSING": 2058,
+    "AST_SOURCE_MISMATCH": 0,
+    "AST_WORKSPACE_MISMATCH": 0
+  },
+  "gate": {
+    "name": "CURRENT_WORKSPACE_LINEAGE",
+    "status": "BLOCKED",
+    "blocker": "CURRENT_AST_EVIDENCE_INCOMPLETE_OR_UNBOUND"
+  },
+  "generatedAt": "2026-09-25T19:40:02.082Z",
+  "reportSha256": "ec3be1f9260332d6c5d5f8611d682158f3e46de2aa9966b7d2a36aeb732af1d5"
+}

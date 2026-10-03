@@ -811,6 +811,63 @@ Next gate: current source lineage and representation-owner reconciliation.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
 
+### SEMANTIC-CORPUS-ADMISSION-REVISION-SOURCE-FIX-2026-09-13
+
+- [x] Removed the stale hard-coded workspace revision from the read-only
+      semantic admission auditor.
+- [x] The auditor now requires and validates the authoritative
+      `workspace-revision-tournament-admission-v1.json` receipt before querying
+      Qdrant or PostgreSQL.
+- [x] Re-ran against admitted revision `sha256:3e677c29319a4a60bc60803be4186ba108dce906945af593a3a6f5cf43d11881`.
+- [x] Current result remains blocked: `109,776` owner candidates,
+      `5,730` duplicate canonical IDs, `109,746` missing source revisions,
+      `30` mixed workspace revisions, and no admitted source bindings.
+- [ ] Reconcile the legacy projection against the exact current
+      source/packet/chunk cohort before changing eligibility or payloads.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED_CURRENT_RECEIPT_BOUND`;
+authority=false; writesPerformed=false. This correction changes only audit
+currentness and does not authorize vector, Qdrant, GPU, latent, or database
+writes.
+
+Evidence: `scripts/atlas/audit-semantic-corpus-admission-v1.mjs`;
+`docs/reports/workspace-revision-tournament-admission-v1.json`;
+`docs/reports/semantic-corpus-admission-v1.json`.
+
+### SEMANTIC-CORPUS-ADMISSION-RECHECK-2026-09-14
+
+- [x] Reran the read-only semantic corpus admission audit.
+- [x] Confirmed `109776` legacy candidates but only `10995` canonical IDs;
+  `5730` duplicate canonical IDs remain.
+- [x] Confirmed `109746` candidates lack source revision, with `30` mixed
+  workspace revisions and `16` mixed representation revisions.
+- [ ] Reconcile the legacy projection against the sealed current
+  source/packet/chunk cohort; do not repair duplicate IDs or synthesize
+  revisions.
+
+Status: `SEMANTIC_CORPUS_ADMISSION_BLOCKED`; `admittedRevisionHasAnyBindings=true`.
+Evidence: `docs/reports/semantic-corpus-admission-v1.json`.
+No vector, Qdrant, GPU, latent, or database writes occurred.
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-14
+
+- [x] Reran the live read-only writer census; `18` writer/reference surfaces
+  remain discoverable.
+- [x] Fixed the Windows report-write race by replacing the stable report via
+  a per-process temporary file and atomic rename; `node --check` and the live
+  rerun both passed.
+- [x] Confirmed the three relevant populations remain split:
+  `atlas_packets.embedding` `61659/61718`, halfvec `content_embedding`
+  `55169/55853`, and vector `content_embedding_768` `1386/55853`.
+- [ ] Reconcile one source/revision-qualified representation owner against the
+  admitted packet/chunk cohort before changing eligibility or filling vectors.
+
+Status: `OWNER_NOT_PROVEN`; `writesPerformed=false`.
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+The report-write fix changes audit reliability only; it does not change writer
+ownership or authorize vector/projection mutation.
+
 ### SEMANTIC-768-ACTIVE-CONTRACT-DIAGNOSTIC — 2026-09-11
 
 - [x] Confirmed the active logical contract: `semantic_768`, native 768D,
@@ -855,9 +912,11 @@ Next gate: snapshot-bound Graphify membership and current source lineage.
       with `halfvec(768)` storage.
 - [x] Regenerated the read-only bundle: `52,364` eligible rows,
       `semantic_768`, EmbeddingGemma, dimension `768`.
-- [ ] Keep FP16 storage as the current physical owner only; do not declare
-      it permanently preferred over full `vector(768)` until precision/recall
-      and index-size evidence exists.
+- [x] Superseded by `SEM768-CURRENT-OWNER-CONTRACT-02`: the current instructed
+      physical owner is `content_embedding_768` (`vector(768)`). Historical
+      FP16 measurements remain valid for their old cohort, but no longer decide
+      storage ownership. Precision/recall and index-size comparisons may inform
+      performance, not override the current owner contract.
 
 Evidence: `scripts/atlas/sem768-corpus-bundle-01.mts` and
 `docs/reports/sem768-corpus-bundle-01.json`.
@@ -1090,3 +1149,141 @@ and the live EmbeddingGemma output, then resolve canonical writer ownership.
       performed.
 
 Evidence: `docs/reports/semantic-768-writer-ownership-v1.json`.
+
+### SEMANTIC-768-TRUNCATION-AND-384-CENSUS — 2026-09-19 (read-only)
+
+**Truncation contract.** EmbeddingGemma MRL truncations are 768 (canonical), 512, 256, 128 only.
+384 is not a valid size. Derived lanes are produced only from an indexed, validated 768 source.
+
+| Lane | Location (live) | Rows/points | Note |
+|---|---|---|---|
+| 768 canonical | PG `codebase_chunk_index.content_embedding` halfvec(768) + HNSW m16/ef200 | 55,169 | Qdrant `codebase_chunks_768` = 328,348 pts (docs said 109,776; unexplained growth) |
+| 512 | Qdrant `codebase_chunks_512` only | 53,380 | no PG column |
+| 256 / 128 | PG `latent_256`/`latent_128` halfvec + HNSW | 55,169 | autoencoder/slice-derived, NOT MRL of 768 |
+| MRL 512/256/128 error lanes | Qdrant `error_embedding_mrl_*` | 20 each | smoke scale |
+
+**384 census (retired lane, data still present).**
+`atlas_packets.content_embedding_384` 58,109/61,718 rows, written 2026-07-21..09-08 by
+`scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs` (model alias `embeddinggemma-384` on :8081,
+`VECTOR_DIM=384`; alias meaning unverified). `packet_vector_bundles.content_vector` 4,047/15,652,
+first-384-dims slice of 768 (`populate-packet-vector-bundles.mjs`), renormalization unverified.
+`codebase_chunk_index.summary_embedding_384` 10/274,465. All other 384 columns hold 0 rows.
+`atlas_packets.embedding` (768) is populated on 61,659 rows but stores no model name
+(`embedding_version` is a hash / NULL), so EmbeddingGemma provenance is not provable from the table.
+
+- [x] Freeze the writer set with a guard test:
+      `sveltekit-frontend/src/lib/server/atlas/embedding-384-writers.guard.spec.ts` (5 known writers).
+- [x] `hnsw.iterative_scan=relaxed_order` already set on the app pool (`db/client.ts:100`);
+      `adminPool` and standalone scripts do not set it.
+- [ ] Prove `atlas_packets.embedding` was produced by EmbeddingGemma (writer read or sample re-embed).
+- [ ] Decide per writer: migrate or archive `phase-17`, `populate-packet-vector-bundles`,
+      `rebuild-gemma4-summaries-384`, `restore-qdrant-384-from-postgres`, `backfill-content-embedding-384`.
+- [ ] Archive (with manifest) the 0-row 384 columns; decide the 58,109-row column separately.
+
+No column, index, embedding, or Qdrant write was performed. Do not overwrite `atlas_packets.embedding`
+from any retargeted 384 writer.
+
+### LEGACY-384-SCRIPT-ALIGNMENT-01 (2026-09-27; code-only guards)
+
+- Corrected the active SOM loader to require finite 768-D vectors without
+  inferring semantic_768 identity from dimension, and made its
+  mutating mode require `--allow-unqualified-experimental-write`; it still does
+  not prove per-vector representation provenance, so no canonical projection
+  claim is made.
+- Corrected topology and bitmap scripts to stop counting the retired
+  `content_embedding_384` column as semantic-vector presence. The topology
+  planner labels 768-D presence as physical-only and now fails closed because
+  it cannot prove per-vector representation revisions.
+- Reclassified the old summary 384 writer as legacy-only and blocked `--apply`
+  unless `--allow-legacy-384-write` is explicit. It remains outside the
+  canonical 768 lane; no data was generated or written.
+- Updated the P4/schema audit wording to identify semantic_768 as the canonical
+  retrieval lane and 384 as legacy/experimental only.
+- Corrected remaining active dimension defaults: Qdrant verification now uses
+  the collection's explicit dimension (or requires `QDRANT_EXPECTED_DIM` for
+  ambiguous names) instead of assuming 384; the TurboVec audit's empty-input
+  fallback is 768. Updated the old vector-governance report to name 768 as
+  canonical while keeping MRL (512/256/128), latent (256/128/64), and legacy
+  384 artifacts as distinct, non-canonical representation classes. Training
+  readiness no longer treats the historically mislabeled `embedding384_cosine`
+  metric as a 768-D baseline.
+- Verification: `embedding-384-writers.guard.spec.ts` passes 3/3;
+  JEPA input gate tests accept finite 768-D vectors, reject 64/128/256/384/512-D
+  vectors, and verify duplicate identity handling. `node --check` passes for
+  all touched scripts; strict OpenSpec validation
+  passes. Both guarded `--apply` invocations exit 2 before connecting to
+  PostgreSQL, Qdrant, or Valkey. No inference or datastore/cache write was run.
+- [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+### SEMANTIC-768-OWNER-RECHECK-2026-09-27 (read-only, bounded)
+
+Re-ran the same read-only writer census (`atlas:semantic-768:writer-ownership`)
+this file's own `SEMANTIC-768-OWNER-01`/`CORE-LANE-RECHECK-2026-09-10` entries
+recorded, since the last run is dated 2026-09-14 (13 days stale) and this
+session already found unrelated Qdrant collections grew substantially in
+that window (`codebase_chunks_768`: 105,762 → 328,348 points, see
+`parent-atlas-qdrant-structural-payload-enrichment/tasks.md`).
+
+- [x] Re-ran `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs` against
+      the live PostgreSQL instance. Confirmed real drift since 2026-09-14, not
+      a stale-report artifact:
+
+| Surface | 2026-09-14 | 2026-09-27 (live) |
+|---|---|---|
+| `atlas_packets.embedding` populated | 61,659/61,718 | 61,659/61,718 (unchanged) |
+| `codebase_chunk_index.content_embedding` populated | 55,169/55,853 | 55,169/274,465 (row count grew, populated count identical) |
+| `codebase_chunk_index.content_embedding_768` populated | 1,386/55,853 | **219,998/274,465** — real backfill happened |
+
+- [x] Confirmed the verdict logic itself did not silently change: still
+      `OWNER_NOT_PROVEN`, still `19` writer surfaces, still
+      `UNRESOLVED_WRITER_SPLIT` between `activeCandidate:
+      codebase_chunk_index.content_embedding` (the still-current pick),
+      `historicalDominantProducer: reembed-corpus-document-prefix-v1.mjs`,
+      and `operatorReachableCandidate: backfill-graphify-file-embeddings-768.mjs`
+      — same three-way split as before, not resolved by the backfill.
+- [ ] **New concrete risk this recheck surfaces**: `content_embedding_768` going
+      from near-empty (1,386 rows, easy to ignore) to 80% populated (219,998
+      rows) materially raises the cost of leaving `OWNER_NOT_PROVEN` open —
+      it is no longer a thin, low-consequence duplicate surface. Whoever picks
+      up the owner-reconciliation gate next should treat this column as a
+      live, substantial candidate, not a historical leftover.
+
+No write performed (script is read-only by its own contract, verified before
+running: `readOnly: true`, `writesPerformed: false`). This recheck does not
+resolve `AMBIGUOUS_SEMANTIC_768_OWNER` — that remains an explicit operator
+decision per this file's own existing guard tasks above, not something to
+resolve unilaterally here.
+
+Evidence: `docs/reports/semantic-768-writer-ownership-v1.json` (regenerated).
+
+### SEM768-CURRENT-OWNER-CONTRACT-02 (2026-09-27; additive code contract)
+
+- [x] Added `SemanticRepresentationV2` as an additive physical-storage binding
+      for the current contract owner, `codebase_chunk_index.content_embedding_768`
+      (`vector(768)`). Historical V1 schema/builders/receipts remain unchanged
+      semantically and continue to identify `content_embedding` (`halfvec(768)`).
+- [x] Kept physical storage ownership separate from row qualification:
+      V2 defaults to non-authoritative when source/chunk/revision/input/vector
+      provenance is absent and rejects `canonicalAuthority=true` without the
+      required lineage.
+- [x] Validation: V1 + V2 focused suites pass (15/15); targeted TypeScript
+      compilation passes; strict OpenSpec validation passes; scoped whitespace
+      check passes. Full SvelteKit `npm run check` was stopped after memory grew
+      past 3 GB without diagnostics; it is not reported as passed.
+- [x] Ran the current-owner read-only census against the existing sealed
+      127-candidate / 1,520-chunk snapshot. Receipt:
+      `docs/reports/mapreduce-chunk-readiness-v3-20260928T012835Z.json`.
+      Current-source byte rehash matched 1,520/1,520 rows; exact packet/chunk
+      lineage qualified 1,520/1,520; current `content_embedding_768` was
+      physically missing on 1,520/1,520; historical `content_embedding` was
+      present on 1,520/1,520; summaries were missing on 1,520/1,520. No row
+      had complete immutable model/tokenizer/input/vector digest binding.
+      Canonical authority=false; datastore/cache/projection writes=0.
+- [ ] Resolve writer ownership and execution/tokenizer provenance before any
+      materialization or projection. No database, cache, model, or projection
+      writes are authorized by this contract change.
+
+The current-owner correction follows the repository's active instructions. It
+supersedes older task-history statements that called `content_embedding` the
+current pick; those dated measurements and V1 receipts remain historical
+evidence, not rewritten facts.

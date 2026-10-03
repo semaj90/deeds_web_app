@@ -4,9 +4,9 @@
  * DOC-26 — read-only incremental version-recrawl decision proof.
  *
  * This fixture deliberately does not call a crawler or write a datastore. It
- * proves the identity rule used by the existing acquisition owner: bytes (and
- * an explicit product/version identity) decide reuse; timestamps and cache
- * validators are supporting metadata only.
+ * proves only a proposed recrawl decision rule. It is not wired to the Python
+ * crawler or the PostgreSQL admission owner and must not be treated as live
+ * incremental-recrawl proof.
  */
 
 import { createHash } from 'node:crypto';
@@ -65,7 +65,8 @@ const results = cases.map((test) => {
     pass: outcome.decision === test.expected,
     reason: outcome.reason,
     timestampOnlyDifference: test.name === 'same-bytes-new-timestamp',
-    priorRowsPreserved: outcome.decision === 'REPROCESS_NEW_VERSION',
+    priorRowsPreserved: false,
+    persistenceProof: 'NOT_EXERCISED_BY_FIXTURE',
   };
 });
 
@@ -80,7 +81,12 @@ const report = {
   status: results.every((result) => result.pass) && malformedMetadata.decision === 'REPROCESS_CHANGED_BYTES'
     ? 'DOC_26_INCREMENTAL_RECRAWL_FIXTURE_PROVEN'
     : 'DOC_26_INCREMENTAL_RECRAWL_FIXTURE_FAILED',
-  owner: 'sveltekit-frontend/src/lib/server/atlas/acquisition/conditional-fetch.ts',
+  decisionOwner: null,
+  relatedOwners: [
+    'python/atlas_okf_docs_pipeline.py',
+    'sveltekit-frontend/src/lib/server/atlas/docs/external-doc-admission.ts',
+  ],
+  integrationStatus: 'FIXTURE_ONLY_NOT_WIRED',
   identityRule: 'content bytes and explicit productVersion determine reuse; timestamps and validators do not create identity',
   cases: results,
   incompleteMetadata: {
@@ -88,6 +94,17 @@ const report = {
     expected: 'REPROCESS_CHANGED_BYTES',
     pass: malformedMetadata.decision === 'REPROCESS_CHANGED_BYTES',
     note: 'Missing identity metadata must not silently reuse or overwrite a prior revision.',
+  },
+  identityCompatibility: {
+    currentChunkIdShape: 'doc:{source_id}:{document_checksum[0:16]}:{ordinal}',
+    productVersionChangesPageEvidenceRevision: true,
+    productVersionChangesChunkEvidenceRevision: true,
+    productVersionChangesChunkId: false,
+    databaseChunkIdIsGloballyUnique: true,
+    result: 'DOC_26_BLOCKED_CHUNK_IDENTITY_COLLISION',
+    proof: 'python/test_atlas_doc_chunk_evidence.py::test_different_product_version_changes_page_and_child_chunk_evidence',
+    nextGate: 'DOC_CHUNK_IDENTITY_V2_OR_COMPATIBILITY_CONTRACT_REVIEW',
+    note: 'Do not change canonical chunk IDs in this fixture; a second version with identical bytes collides under the current global chunk_id uniqueness constraint.',
   },
   writesPerformed: false,
   crawlerCalled: false,

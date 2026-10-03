@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.summary-semantic-judge-live-proof.v1",
+  "gate": "VAL-07",
+  "contractOwner": "sveltekit-frontend",
+  "contractPath": "src/lib/server/atlas/docs/summary-judge-input-v1.ts",
+  "adapterPath": "python/atlas_summary_claim_judge_v1.py::judge_claim_v1",
+  "mode": "ONE_BOUNDED_FIXTURE_CLAIM_NO_PERSISTENCE",
+  "input": {
+    "fixture": "sveltekit-frontend/src/lib/server/atlas/docs/__fixtures__/summary-judge-input-v1.fixture.json",
+    "chunkId": "doc:pgvector:fe883c75f323441d:22",
+    "chunkEvidenceRevision": "sha256:b4ac81deeb1a9e4d3cb6c3e4c4f047dd744739a4a7b0cd573f7ff3dba0ab195a",
+    "judgeInputChecksum": "76cee8a4d93cd4e829abf6127444f85ac187ce493044d4ec2a050717bb89399e",
+    "claimChecksum": "37d03a909baafc881df33bab010c2f0948e176f536bb6d8606c0460c43ebadcd",
+    "promptRevision": "summary-judge-prompt:val-06-v1"
+  },
+  "model": {
+    "reportedModelId": "ornith-1.5-9b",
+    "listedModelIds": ["ornith-1.5-9b"],
+    "outboundModelId": "ornith-1.5-9b",
+    "resolvedModelRevision": "ornith-1.5-9b:hforf.gguf",
+    "revisionBasis": "llama-server /props model_path basename",
+    "immutableWeightDigest": "NOT_READ"
+  },
+  "observed": {
+    "status": "JUDGED",
+    "verdict": "SUPPORTED",
+    "requestId": "chatcmpl-pT6hO9GW3MvOWDeSxIrb7KtSbzy337AX",
+    "finishReason": "stop",
+    "usage": {
+      "completion_tokens": 13,
+      "prompt_tokens": 318,
+      "total_tokens": 331,
+      "prompt_tokens_details": {"cached_tokens": 0}
+    },
+    "independenceClass": "SAME_MODEL_SEMANTIC_JUDGE",
+    "citedSpans": 0
+  },
+  "scope": {
+    "oneCanonicalChunk": true,
+    "oneClaim": true,
+    "retrievalCalls": 0,
+    "webCalls": 0,
+    "oakCalls": 0,
+    "durableWrites": 0,
+    "summaryPersistence": false,
+    "finalDecisionComputed": false
+  },
+  "limitations": [
+    "Loaded model ID was resolver-confirmed; immutable model-weight digest was not read.",
+    "Judge is same-model evidence, not independent ground truth.",
+    "Any cited source span remains unverified; this fixture emitted none."
+  ],
+  "result": "VAL_07_BOUNDED_SAME_MODEL_JUDGE_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "filesystemCorpus": 0
+  }
+}

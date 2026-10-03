@@ -1,0 +1,12 @@
+{
+  "schema": "atlas.workspace-revision-tournament-admission.v1",
+  "result": null,
+  "status": "EXPLICIT_CONFIRMATION_REQUIRED",
+  "requiredConfirmation": "AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1",
+  "requestedWorkspaceRevision": "sha256:7c842167b802575d545e5dacf337005f351af1193ac93d8e91dd6d05fcb37303",
+  "snapshotRevision": "sha256:2c835984bad96dc7275161d74ebc56ea941536836fab151636427c317b3b2320",
+  "authorityChanged": false,
+  "graphifyExecutionAuthorized": false,
+  "writesPerformed": false,
+  "nextSafeAction": "Do not pass confirmation automatically; review the candidate and explicitly authorize admission only if intended."
+}

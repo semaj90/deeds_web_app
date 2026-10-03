@@ -1,4 +1,5 @@
 import { createRequire } from 'node:module';
+import { createHash } from 'node:crypto';
 
 import type {
   AtlasStructuralEvidence,
@@ -13,7 +14,20 @@ import type {
 
 const require = createRequire(import.meta.url);
 
-export type NodeTreeSitterProviderLanguage = 'typescript' | 'tsx' | 'javascript' | 'jsx';
+/** Runtime vocabulary for this provider, reused by diagnostics and registry adapters. */
+export const NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1 = Object.freeze(['typescript', 'tsx', 'javascript', 'jsx'] as const);
+export type NodeTreeSitterProviderLanguage = typeof NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1[number];
+
+export function nodeTreeSitterProviderLanguageVocabularyV1() {
+  const labels = [...NODE_TREE_SITTER_PROVIDER_LANGUAGES_V1];
+  const sourceRevision = `sha256:${createHash('sha256').update(JSON.stringify(labels)).digest('hex')}`;
+  return {
+    sourceOwner: 'sveltekit-frontend/src/lib/server/atlas/indexing/node-tree-sitter-ast-provider.ts',
+    sourceRevision,
+    namespace: 'PARSER_GRAMMAR_ID' as const,
+    labels,
+  };
+}
 
 type PositionLike = { row: number; column: number };
 type SyntaxNodeLike = {

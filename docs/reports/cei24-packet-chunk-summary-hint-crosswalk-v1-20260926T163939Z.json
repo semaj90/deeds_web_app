@@ -1,0 +1,84 @@
+{
+  "schema": "atlas.cei24-packet-chunk-summary-hint-crosswalk-receipt.v1",
+  "status": "LEGACY_SUMMARY_FEATURE_BLOCKED_SNAPSHOT_ALIGNMENT",
+  "generatedAt": "2026-09-26T16:39:42.049Z",
+  "mode": "REPEATABLE_READ_READ_ONLY_PLUS_LOCAL_ARTIFACT",
+  "inputs": {
+    "candidateMap": ".tmp/atlas/cei24-candidate-ordinal-map-v1/20260926T163711.224Z/candidate-ordinal-map-v1.json",
+    "candidateSnapshotRevision": "sha256:687871b76918f27213c45d72d7200aff82351343cec5577037d75c2c7631e28d",
+    "ordinalMapChecksum": "d0ccf96093ecf7ec9575271159038524367c62f3aba3ff6a32bad668f9e25ea3",
+    "candidateMapSha256": {
+      "sha256": "sha256:89459af4d3d763f49c45265c642ae3bcdfd9d9b4972d83fc8e753b73658008a1",
+      "bytes": 20576723
+    },
+    "hintCrosswalk": ".tmp/atlas/legacy-summary-hint-ordinal-join-v1/20260926T080239Z/hint-candidate-ordinal.ndjson",
+    "hintCrosswalkSha256": "sha256:94e9b09b4439b1a1f5a7861864a6a9549140fd6be2255895ac55e7766a227510",
+    "vectorIndexSha256": "sha256:88f6b88708dce0814a639c5fe37b335b8544f84b5134c6a069b722cd40e7ab86",
+    "vectorBytesSha256": "sha256:1c32d021ed5bca49a100f0cc9ee53063c8280f33a7ad0625e9cacbfa05b8f362",
+    "census": ".tmp/atlas/legacy-summary-census-v1/census-20260926T080031Z.ndjson",
+    "censusSha256": "sha256:66ffbe64d95a039e89ccf235aa04593a2f4c6af5ef351388dea1e846279cc5c2",
+    "lineageOwner": "public.atlas_packet_chunk_lineage + public.codebase_chunk_index",
+    "sourceBindingOwner": "public.atlas_workspace_source_bindings (repo_id=deeds-web-app)",
+    "transactionReadOnly": "on"
+  },
+  "counts": {
+    "candidates": 16151,
+    "packetMissing": 0,
+    "packetIdentityExact": 16151,
+    "packetWorkspaceMirrorMismatches": 16151,
+    "bindingExact": 16151,
+    "provenChunkMemberships": 6651,
+    "chunkRowExact": 6651,
+    "candidatesWithZeroProvenChunks": 15638,
+    "candidatesWithOneProvenChunk": 0,
+    "candidatesWithMultipleProvenChunks": 513,
+    "maxProvenChunksPerCandidate": 50,
+    "hints": 330,
+    "outcomes": {
+      "EXACT_CURRENT_CANDIDATE_MATCH": 322,
+      "CURRENT_CANDIDATE_NOT_FOUND": 8
+    },
+    "candidatesWith0Hints": 15973,
+    "candidatesWith1Hint": 120,
+    "candidatesWithMultipleHints": 58,
+    "maxHintsPerCandidate": 12,
+    "matchedHintRows": 322,
+    "unmatchedHintRows": 8
+  },
+  "conservation": {
+    "hintsIn": 330,
+    "rowsOut": 330,
+    "unclassified": 0,
+    "pass": true
+  },
+  "output": {
+    "hintCrosswalk": {
+      "path": ".tmp/atlas/cei24-packet-chunk-hint-crosswalk-v1/20260926T163939Z/crosswalk.ndjson",
+      "rows": 330,
+      "sha256": "sha256:05be91eefb03cff9609b4261a05a534a01ba19e16e5c4ad1d88b0f7f25e1bc13"
+    },
+    "candidateMultiplicity": {
+      "path": ".tmp/atlas/cei24-packet-chunk-hint-crosswalk-v1/20260926T163939Z/candidate-multiplicity.ndjson",
+      "rows": 16151,
+      "sha256": "sha256:f3caf39e231e53767f0360daf7c8a3ea125ed96ebccebc5bd3c16364d8ed6f86"
+    },
+    "candidateChunkEvidenceOverlay": {
+      "path": ".tmp/atlas/cei24-packet-chunk-hint-crosswalk-v1/20260926T163939Z/candidate-chunk-evidence-overlay.ndjson",
+      "rows": 16151,
+      "sha256": "sha256:39a43ed9163714ac13db9ea077f47c2cf3978c57eac665b96f19e959bbcd3fbd"
+    }
+  },
+  "boundaries": {
+    "packetIdentityIsNotChunkIdentity": true,
+    "chunkMultiplicityPreserved": true,
+    "cosineComputed": false,
+    "queryEmbeddingCreated": false,
+    "featureProducerAdmitted": false,
+    "canonicalAuthority": false,
+    "databaseWrites": 0,
+    "qdrantWrites": 0,
+    "valkeyWrites": 0,
+    "rabbitmqPublishes": 0,
+    "graphifyRuns": 0
+  }
+}

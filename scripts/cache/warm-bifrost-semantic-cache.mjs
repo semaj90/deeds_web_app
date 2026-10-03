@@ -22,6 +22,16 @@
  *
  * Usage:
  *   node scripts/cache/warm-bifrost-semantic-cache.mjs [--dry-run] [--limit N]
+ *
+ * Two other, unrelated scripts share a near-identical name — do not conflate:
+ *  - `sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` — a STALE
+ *    duplicate of THIS file (predates the Stage 2 fix above); still writes the dead
+ *    `bifrost:sem:packet:{query_hash}` shape. Do not use it for new work.
+ *  - `scripts/atlas/warm-bitfrost-semantic-cache.mjs` — reads Postgres
+ *    `atlas_higher_hop_index` directly (not this DuckDB/JSONL source) and writes
+ *    `bifrost:sem:packet:{packet_key}` keyed on canonical packetKey identity, a
+ *    different identity axis from this script's query-hash keying. Its `--apply` is
+ *    permanently hard-blocked pending revision-bound ACE packet identity.
  */
 
 import fs from 'node:fs';

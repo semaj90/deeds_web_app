@@ -16,7 +16,7 @@
  *   - stdout summary (human-readable)
  *
  * Exit codes:
- *   0  addon loaded + at least 1 GPU function returns OK
+ *   0  addon loaded + probe completed (not a GPU liveness claim)
  *   1  addon loaded but every function returned the NO_LIBTORCH stub (-99)
  *   2  addon failed to load (DLL missing, wrong arch, etc.)
  */
@@ -25,25 +25,13 @@ import { existsSync, writeFileSync, mkdirSync, readFileSync, statSync } from 'fs
 import { createRequire } from 'module';
 import path from 'path';
 import { createHash } from 'crypto';
+import { bridgeCandidatePaths } from '../sveltekit-frontend/src/lib/server/gpu/native-addon-paths.mjs';
+import { buildNativeProbeEvidenceClaims, classifyNativeAddonProbe, OUTCOME } from './atlas/native-addon-probe-classification.mjs';
 
 const require = createRequire(import.meta.url);
 
-// Multi-fallback addon resolver (matches libtorch-bridge.ts logic)
 function resolveAddonPath() {
-  const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
-  const paths = [
-    envOverride,
-    path.resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-    path.resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
-    path.resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
-    path.resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
-    'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node'
-  ].filter(Boolean);
-
-  for (const p of paths) {
-    if (existsSync(p)) return p;
-  }
-  return null;
+	return bridgeCandidatePaths().find(existsSync) ?? null;
 }
 
 function getAddonMetadata(addonPath) {
@@ -71,12 +59,15 @@ const probe = {
   addon_loaded: false,
   load_error: null,
   exports: [],
+  backend_info: null,
   functions: {},
   cuda_available: null,
   cuda_memory_mb: null,
   stub_count: 0,
-  live_count: 0,
+  shape_valid_count: 0,
+  backend_proven_count: 0,
   missing_export_count: 0,
+  outcome_counts: Object.fromEntries(Object.values(OUTCOME).map((outcome) => [outcome, 0])),
   summary: '',
 };
 
@@ -84,7 +75,7 @@ console.log('🔍 GPU Bridge Probe');
 console.log('   Addon: ' + ADDON_PATH);
 console.log();
 
-if (!existsSync(ADDON_PATH)) {
+if (!ADDON_PATH || !existsSync(ADDON_PATH)) {
   probe.load_error = 'tensorrt_bridge.node not found — run `cd simd-bridge/cpp && bash build.sh` (or build.bat on Windows)';
   console.error('  ✗ ' + probe.load_error);
   writeFileSync(OUT_FILE, JSON.stringify(probe, null, 2));
@@ -96,6 +87,7 @@ try {
   addon = require(ADDON_PATH);
   probe.addon_loaded = true;
   probe.exports = Object.keys(addon).sort();
+  probe.backend_info = typeof addon.getBackendInfo === 'function' ? addon.getBackendInfo() : null;
   console.log(`  ✓ Addon loaded (${probe.exports.length} exports)`);
 } catch (err) {
   probe.load_error = err.message;
@@ -177,18 +169,28 @@ const PROBES = [
     name: 'batchCosineSimilarity',
     // Native signature: (query, dim, corpus, n, scores OUT, scoresLen) → rc
     run: () => {
-      const scores = new Float32Array(4);
-      const rc = addon.batchCosineSimilarity?.(randVec(64), 64, randVec(4 * 64), 4, scores, 4);
-      return { rc, scores };
+      const query = new Float32Array([1, 2, -1]);
+      const corpus = new Float32Array([2, 0, 1, 0, 1, 1, -1, -2, 1, 1, 2, -1]);
+      const stableScores = new Float32Array(4);
+      const rc = addon.batchCosineSimilarity?.(query, 3, corpus, 4, stableScores, 4);
+      const expected = [
+        1 / (Math.sqrt(6) * Math.sqrt(5) + 1e-12),
+        1 / (Math.sqrt(6) * Math.sqrt(2) + 1e-12),
+        -6 / (Math.sqrt(6) * Math.sqrt(6) + 1e-12),
+        6 / (Math.sqrt(6) * Math.sqrt(6) + 1e-12),
+      ];
+      return { rc, scores: stableScores, expected };
     },
     isLive: (r) => r && r.rc === 0 && isFinite32(r.scores),
   },
   {
     name: 'autoencoderEncode',
     // Signature: (input, n, inputDim, W, b, hiddenDim) → Float32Array of length (n * hiddenDim)
-    // Needs a real W/b — skipping here (covered by smoke-all-gpu-lanes.mjs lane 3)
-    run: () => 'covered-by-smoke',
-    isLive: (r) => r === 'covered-by-smoke',
+    // Needs fitted weights. Keep the startup probe from invoking it with synthetic weights.
+    externalProof: true,
+    evidenceRef: 'smoke-all-gpu-lanes.mjs:lane-3',
+    run: () => null,
+    isLive: () => false,
   },
   {
     name: 'trainSOM',
@@ -233,60 +235,41 @@ const PROBES = [
   {
     name: 'graphSimilarity',
     // Signature: (embeddings, n, dim) → Float32Array of length (n*n)
-    run: () => addon.graphSimilarity?.(randVec(6 * 32), 6, 32),
-    isLive: (r) => r instanceof Float32Array && r.length === 36,
+    run: () => addon.graphSimilarity?.(new Float32Array([1, 0, 0, 1, 1, 1]), 3, 2),
+    isLive: (r) => r instanceof Float32Array && r.length === 9,
   },
 ];
-
-// Classification outcomes per P1.1 spec (CORRECTED Session 196)
-// CRITICAL: Shape validity does NOT prove GPU execution.
-// Until P1.3 (counters) and P1.4 (parity) are available, all results are NOT_PROVEN or SHAPE_VALID at best.
-const OUTCOME = Object.freeze({
-  MISSING_EXPORT: 'MISSING_EXPORT',
-  NO_LIBTORCH_STUB: 'NO_LIBTORCH_STUB',
-  NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
-  CALL_FAILED: 'CALL_FAILED',
-  SKIPPED_EXTERNAL_PROOF: 'SKIPPED_EXTERNAL_PROOF',
-  SHAPE_VALID: 'SHAPE_VALID',
-  NOT_PROVEN: 'NOT_PROVEN',
-});
-
-function classifyOutcome(exported, result, error, shapeValid, externalProof) {
-  // MISSING_EXPORT: function not in addon.exports
-  if (!exported) return OUTCOME.MISSING_EXPORT;
-
-  // Covered by smoke tests (not verified inline)
-  if (externalProof) return OUTCOME.SKIPPED_EXTERNAL_PROOF;
-
-  // Call failed with error
-  if (error) return OUTCOME.CALL_FAILED;
-
-  // Extract return code if result is numeric or has .rc property
-  const returnCode = (typeof result === 'number') ? result : (typeof result === 'object' && Number.isInteger(result?.rc)) ? result.rc : null;
-
-  // Stub invocation: returns -99 (NO_LIBTORCH stub)
-  if (returnCode === -99) return OUTCOME.NO_LIBTORCH_STUB;
-
-  // Error codes: 38, 95 reserved for NOT_IMPLEMENTED
-  if (returnCode === 38 || returnCode === 95) return OUTCOME.NOT_IMPLEMENTED;
-
-  // Shape validity only — does NOT prove backend (CPU or GPU)
-  // Multiple implementations can return identical shapes.
-  // Promotion to backend classification (CUDA_LIVE, LIBTORCH_CPU, etc.) requires P1.3+ counters.
-  if (shapeValid) return OUTCOME.SHAPE_VALID;
-
-  // No shape validity, no proof of execution
-  return OUTCOME.NOT_PROVEN;
-}
 
 for (const p of PROBES) {
   let outcome, classification;
   try {
-    const r = p.run();
-    const shapeValid = p.isLive(r);
     const exported = addon[p.name] !== undefined;
-    const externalProof = r === 'covered-by-smoke';
-    classification = classifyOutcome(exported, r, null, shapeValid, externalProof);
+    const externalProof = p.externalProof === true;
+    addon.resetExecutionCounters?.();
+    const r = externalProof ? null : p.run();
+    const shapeValid = !externalProof && p.isLive(r);
+    const counters = addon.getExecutionCounters?.() ?? null;
+    let parity = null;
+    if (p.name === 'batchCosineSimilarity' && r?.expected) {
+      const maxAbsError = Math.max(...r.expected.map((value, index) => Math.abs(r.scores[index] - value)));
+      parity = maxAbsError <= 2e-5 ? 'MATCH' : 'MISMATCH';
+    } else if (p.name === 'graphSimilarity' && r instanceof Float32Array) {
+      const v = [[1, 0], [0, 1], [1, 1]];
+      const expected = v.flatMap((a) => v.map((b) => {
+        const dot = a[0] * b[0] + a[1] * b[1];
+        return dot / (Math.hypot(...a) * Math.hypot(...b) + 1e-12);
+      }));
+      const maxAbsError = Math.max(...expected.map((value, index) => Math.abs(r[index] - value)));
+      parity = maxAbsError <= 2e-5 ? 'MATCH' : 'MISMATCH';
+    }
+    const backend = probe.backend_info?.per_export_backend?.[p.name]?.backend;
+    const backendEvidence = {
+      cudaExecutionCount: counters?.cuda_execution ?? 0,
+      cpuFallbackCount: counters?.cpu_fallback ?? 0,
+      libtorchCpuCount: backend === 'cpu_fallback' ? counters?.cpu_fallback ?? 0 : 0,
+      backendInfoValid: Boolean(backend),
+    };
+    classification = classifyNativeAddonProbe({ exported, result: r, error: null, shapeValid, externalProof, backendEvidence, parity });
 
     let raw;
     if (r instanceof Float32Array || r instanceof Int32Array) {
@@ -296,13 +279,42 @@ for (const p of PROBES) {
     } else {
       raw = String(r);
     }
-    outcome = { ok: shapeValid, classification, raw };
-    if (shapeValid && classification !== 'SKIPPED_EXTERNAL_PROOF') probe.live_count++;
-    else if (r === -99) probe.stub_count++;
-    console.log(`  ${shapeValid && classification !== 'SKIPPED_EXTERNAL_PROOF' ? '✓' : '~'} ${p.name.padEnd(24)} → [${classification}] ${raw}`);
+    outcome = {
+      ok: shapeValid && parity !== 'MISMATCH',
+      classification,
+      ...buildNativeProbeEvidenceClaims({
+        binaryPresent: Boolean(ADDON_PATH && existsSync(ADDON_PATH)),
+        implementationLinked: null,
+        symbolLoaded: exported,
+        executionCounters: counters,
+        branchAttempted: !externalProof,
+      }),
+      evidenceRef: externalProof ? p.evidenceRef ?? null : null,
+      backend,
+      executionCounters: counters,
+      parity,
+      raw,
+    };
+    probe.outcome_counts[classification]++;
+    if (classification === OUTCOME.SHAPE_VALID) probe.shape_valid_count++;
+    if (classification === OUTCOME.CUDA_LIVE || classification === OUTCOME.LIBTORCH_CPU) probe.backend_proven_count++;
+    if (classification === OUTCOME.MISSING_EXPORT) probe.missing_export_count++;
+    if (classification === OUTCOME.NO_LIBTORCH_STUB) probe.stub_count++;
+    console.log(`  ${classification === OUTCOME.CUDA_LIVE || classification === OUTCOME.LIBTORCH_CPU ? '✓' : '~'} ${p.name.padEnd(24)} → [${classification}] ${raw}`);
   } catch (e) {
-    classification = classifyOutcome(addon[p.name] !== undefined, null, e, false, false);
-    outcome = { ok: false, classification, error: e.message.slice(0, 80) };
+    const exported = addon[p.name] !== undefined;
+    classification = classifyNativeAddonProbe({ exported, result: null, error: e, shapeValid: false });
+    outcome = {
+      ok: false,
+      classification,
+      ...buildNativeProbeEvidenceClaims({
+        binaryPresent: Boolean(ADDON_PATH && existsSync(ADDON_PATH)),
+        implementationLinked: null,
+        symbolLoaded: exported,
+      }),
+      error: e.message.slice(0, 80),
+    };
+    probe.outcome_counts[classification]++;
     console.log(`  ✗ ${p.name.padEnd(24)} → [${classification}] ${e.message.slice(0, 60)}`);
   }
   probe.functions[p.name] = outcome;
@@ -323,11 +335,12 @@ if (probe.functions.checkCudaAvailable?.ok) {
 }
 
 const total = PROBES.length;
-probe.summary = `${probe.live_count}/${total} live, ${probe.stub_count}/${total} stub, cuda=${probe.cuda_available}`;
+probe.summary = `${probe.backend_proven_count}/${total} backend-proven, ${probe.shape_valid_count}/${total} shape-valid, ${probe.stub_count}/${total} stub, cuda=${probe.cuda_available}`;
 
 console.log();
 console.log('═══════════════════════════════════════════════════════════════');
-console.log(`Live functions:    ${probe.live_count}/${total}`);
+console.log(`Backend proven:    ${probe.backend_proven_count}/${total}`);
+console.log(`Shape valid only:  ${probe.shape_valid_count}/${total}`);
 console.log(`Stub functions:    ${probe.stub_count}/${total}`);
 console.log(`CUDA available:    ${probe.cuda_available}`);
 if (probe.cuda_memory_mb) console.log(`Free VRAM:         ${probe.cuda_memory_mb} MB`);
@@ -344,7 +357,8 @@ writeFileSync(
     `addon_path: ${probe.addon_path}`,
     `addon_loaded: ${probe.addon_loaded}`,
     `cuda_available: ${probe.cuda_available}`,
-    `live_count: ${probe.live_count}`,
+    `backend_proven_count: ${probe.backend_proven_count}`,
+    `shape_valid_count: ${probe.shape_valid_count}`,
     `stub_count: ${probe.stub_count}`,
     `summary: ${probe.summary}`,
     probe.load_error ? `load_error: ${probe.load_error}` : null,
@@ -353,7 +367,7 @@ writeFileSync(
 console.log(`Task log written: ${LOG_FILE}`);
 
 // Exit code
-if (probe.live_count === 0 && probe.stub_count === total) {
+if (probe.backend_proven_count === 0 && probe.stub_count === total) {
   console.warn('\n⚠️  All functions returned NO_LIBTORCH stubs (-99). Bridge built without LibTorch.');
   process.exit(1);
 }

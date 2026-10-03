@@ -23,8 +23,10 @@ CLICKHOUSE_HOST = os.getenv("CLICKHOUSE_HOST", "clickhouse")
 CLICKHOUSE_PORT = int(os.getenv("CLICKHOUSE_PORT", "8123"))
 CLICKHOUSE_USER = os.getenv("CLICKHOUSE_USER", "default")
 CLICKHOUSE_PASSWORD = os.getenv("CLICKHOUSE_PASSWORD", "clickhouse_password")
+# Ollama is embeddings-only. Tagging (chat) goes to llama-server (Ornith 1.5).
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://host.docker.internal:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4-legal:latest")
+LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", "http://host.docker.internal:8090/v1").rstrip("/")
+OLLAMA_MODEL = os.getenv("LLAMA_SERVER_MODEL", "ornith-1.5-9b")  # name kept for existing references
 SYNC_INTERVAL = int(os.getenv("SYNC_INTERVAL", "60"))  # seconds
 
 class ClickHouseMirror:
@@ -51,7 +53,7 @@ class ClickHouseMirror:
         logger.info("✅ Connected to Postgres and ClickHouse")
 
     async def auto_tag_with_ollama(self, text: str, context: str = "legal") -> List[str]:
-        """Auto-tag text using Ollama gemma4-legal model"""
+        """Auto-tag text using llama-server (Ornith 1.5)"""
         try:
             prompt = f"""Extract 3-5 relevant tags from this {context} text.
 Return ONLY the tags as a comma-separated list, no explanation.
@@ -61,18 +63,20 @@ Text: {text[:500]}
 Tags:"""
 
             response = await self.ollama_client.post(
-                f"{OLLAMA_URL}/api/generate",
+                f"{LLAMA_SERVER_URL}/chat/completions",
                 json={
                     "model": OLLAMA_MODEL,
-                    "prompt": prompt,
+                    "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
-                    "options": {"temperature": 0.3, "num_predict": 50}
+                    "temperature": 0.3,
+                    "max_tokens": 50
                 }
             )
 
             if response.status_code == 200:
                 result = response.json()
-                tags_text = result.get("response", "").strip()
+                msg = result["choices"][0]["message"]
+                tags_text = (msg.get("content") or msg.get("reasoning_content") or "").strip()
                 tags = [tag.strip() for tag in tags_text.split(",") if tag.strip()]
                 return tags[:5]  # Max 5 tags
             else:

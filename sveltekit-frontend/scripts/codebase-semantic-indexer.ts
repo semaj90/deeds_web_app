@@ -23,6 +23,7 @@ import { join, relative, extname, basename } from 'path';
 import { createHash } from 'crypto';
 import { config as loadEnv } from 'dotenv';
 import { resolve } from 'path';
+import { llamaChat } from '../../scripts/atlas/lib/llama-inference.mjs';
 
 // Load env
 for (const dir of [process.cwd(), resolve(process.cwd(), '..')]) {
@@ -38,7 +39,7 @@ const OLLAMA_URL = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const REDIS_URL = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const EMBEDDING_MODEL = process.env.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-const TAG_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
+const TAG_MODEL = process.env.OLLAMA_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const COLLECTION = 'codebase_chunks_768';
 const VECTOR_DIM = 768;
 
@@ -460,23 +461,8 @@ ${fileContent.slice(0, 3000)}
 Return ONLY valid JSON, no explanation.`;
 
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: TAG_MODEL,
-        prompt,
-        stream: false,
-        options: { temperature: 0.1, num_predict: 300 },
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!res.ok) {
-      return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };
-    }
-
-    const data = await res.json();
-    const text = data.response?.trim() ?? '';
+    // Chat/generation goes to llama-server (Ornith 1.5); Ollama is embeddings-only.
+    const text = (await llamaChat(prompt, { maxTokens: 300, temperature: 0.1, timeoutMs: 30000 }))?.trim() ?? '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return { tags: [], purpose: '', domain: 'utility', complexity: 'medium' };

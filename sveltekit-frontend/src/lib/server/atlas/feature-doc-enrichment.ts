@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { tracedQuery } from '$lib/server/db/client.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 import { CLASSIFIER_VERSION } from '$lib/server/enrichment/domain-classifier.js';
-import { buildIndexedSourcePacket } from '$lib/server/ace/indexed-source-packet.js';
 import {
   OntologyLinkedTupleV1Schema,
   buildOntologyLinkedTuplesFromFeatureRow,
@@ -18,6 +17,8 @@ import { selectFeatureScopedRows } from './feature-scope-query.js';
 import {
   FeatureDocumentManifestSchema,
   getFeatureDocumentEvidence,
+  readFeatureDocumentManifestFile,
+  type FeatureDocumentReadBounds,
   type FeatureDocumentEvidence,
 } from './feature-document-evidence.js';
 
@@ -315,20 +316,23 @@ function deriveNextCommands(featureId: string, evidenceState: z.infer<typeof Fea
 }
 
 export async function buildFeatureDocumentEnrichmentPlan(
-  featureIdInput: string
+  featureIdInput: string,
+  readBounds: FeatureDocumentReadBounds = {},
 ): Promise<BuildFeatureDocEnrichmentPlanResult> {
   const featureId = String(featureIdInput ?? '').trim();
   if (!featureId) {
     throw new Error('featureId is required');
   }
 
-  const evidence = await getFeatureDocumentEvidence(featureId);
+  const evidence = await getFeatureDocumentEvidence(featureId, readBounds);
   if (!evidence.manifestPath) {
     throw new Error(`Feature manifest missing for ${featureId}`);
   }
 
-  const manifestRaw = fs.readFileSync(evidence.manifestPath, 'utf8');
-  const manifest = FeatureDocumentManifestSchema.parse(JSON.parse(manifestRaw));
+  const { raw: manifestRaw, manifest } = readFeatureDocumentManifestFile(
+    evidence.manifestPath,
+    readBounds.maxManifestBytes,
+  );
   const manifestOkf = manifest.okf ?? null;
   const manifestContentHash = sha256Hex(manifestRaw);
   const evidenceState = toEvidenceState(evidence);
@@ -526,22 +530,21 @@ async function loadLibraryDocumentMap(sourceRefs: string[]) {
 
 export async function materializeFeatureEvidenceTuples(
   featureIdInput: string,
-  options?: { maxTuples?: number }
+  options?: { maxTuples?: number; readBounds?: FeatureDocumentReadBounds }
 ): Promise<MaterializeFeatureEvidenceTuplesResult> {
-  const { evidence, plan } = await buildFeatureDocumentEnrichmentPlan(featureIdInput);
+  const { evidence, plan } = await buildFeatureDocumentEnrichmentPlan(featureIdInput, options?.readBounds);
   const manifestOkf = loadManifestOkf(evidence.manifestPath);
-  const maxTuples = Math.min(64, Math.max(1, options?.maxTuples ?? 16));
+  const requestedMaxTuples = options?.maxTuples ?? 16;
+  const maxTuples = Number.isFinite(requestedMaxTuples)
+    ? Math.min(16, Math.max(1, Math.trunc(requestedMaxTuples)))
+    : 16;
   const packetRows = await loadAtlasPacketRows(plan.featureId, maxTuples);
   const packetKeys = packetRows
     .map((row) => String(row.packet_key ?? '').trim())
     .filter(Boolean);
   const { ontologyMap, lexicalMap, structuralMap } = await loadFactMaps(packetKeys);
-  const sourceCandidates = plan.sourceCandidates.filter((candidate) => candidate.accepted);
   const documentIdMap = await loadLibraryDocumentMap(
-    uniqueStable([
-      ...packetRows.map((row) => String(row.source_ref ?? '').trim()).filter(Boolean),
-      ...sourceCandidates.map((candidate) => candidate.sourceRef),
-    ])
+    uniqueStable(packetRows.map((row) => String(row.source_ref ?? '').trim()).filter(Boolean))
   );
 
   const tuples = packetRows.map((row) => {
@@ -725,98 +728,6 @@ export async function materializeFeatureEvidenceTuples(
       },
     });
   });
-
-  if (tuples.length < maxTuples) {
-    for (const candidate of sourceCandidates) {
-      if (tuples.length >= maxTuples) break;
-      if (candidate.sourceType !== 'local_file' && candidate.sourceType !== 'api_schema' && candidate.sourceType !== 'code_source') {
-        continue;
-      }
-      if (tuples.some((tuple) => tuple.sourceRef === candidate.sourceRef)) continue;
-
-      const packet = await buildIndexedSourcePacket({
-        sourceRef: candidate.sourceRef,
-        featureId: plan.featureId,
-      }).catch(() => null);
-
-      tuples.push(
-        FeatureEvidenceTupleSchema.parse({
-          tupleId: sha256Hex(
-            [
-              'feature-evidence-tuple.v1',
-              plan.featureId,
-              candidate.sourceRef,
-              packet?.packet.packet_id ?? '',
-            ].join('\0')
-          ),
-          schemaVersion: 'feature-evidence-tuple.v1',
-          featureId: plan.featureId,
-          sourceRef: candidate.sourceRef,
-          packetKey: packet?.packet.packet_id ?? undefined,
-          treeNodeId: undefined,
-          documentId: documentIdMap.get(candidate.sourceRef) ?? undefined,
-          qdrantPointId: undefined,
-          domainClass: manifestOkf?.domainClassification.primaryDomain || undefined,
-          ontologyIds: manifestOkf?.semanticOntology.ontologyIds ?? [],
-          conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
-          astSymbols: [],
-          lexicalFeatures: manifestOkf?.keywordCorpus.keywords ?? [],
-          ontologyLinkedTuples: buildOntologyLinkedTuplesFromFeatureRow({
-            featureRow: {
-              identity: {
-                packet_key: packet?.packet.packet_id ?? '',
-                source_ref: candidate.sourceRef,
-                file_path: candidate.localPath ?? candidate.sourceRef,
-                function_symbol: null,
-                feature_id: plan.featureId,
-                title_id: null,
-                tree_node_id: undefined,
-              },
-              lexical: {
-                method: 'bm25' as const,
-                term_count: manifestOkf?.keywordCorpus.keywords.length ?? 0,
-                top_terms: uniqueStable(manifestOkf?.keywordCorpus.keywords ?? [])
-                  .slice(0, 20)
-                  .map((term, index): [string, number] => [term, Math.max(0.01, 1 - index * 0.03)]),
-                part_of_speech: null,
-                computed_at: new Date().toISOString(),
-              },
-              domain_class: manifestOkf?.domainClassification.primaryDomain || null,
-              secondary_domains: manifestOkf?.domainClassification.secondaryDomains ?? [],
-              ontology_ids: manifestOkf?.semanticOntology.ontologyIds ?? [],
-              concept_ids: manifestOkf?.semanticOntology.conceptIds ?? [],
-              evidence_state: plan.evidenceState,
-            },
-            packetKey: packet?.packet.packet_id ?? '',
-            sourceRef: candidate.sourceRef,
-            featureLabel: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
-            sourceTables: uniqueStable([
-              documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
-              'ace_packet_runtime',
-              manifestOkf ? 'feature_document_manifest.okf' : '',
-            ].filter(Boolean)).slice(0, 12),
-            labelerVersion: plan.classifierPlan.classifierVersion ?? null,
-            taggerVersion: null,
-            ontologyVersion: null,
-            nlpVersion: manifestOkf?.nlp.langextractVersion ?? null,
-          }),
-          entities: [],
-          evidenceState: plan.evidenceState,
-          provenance: {
-            sourceTables: uniqueStable([
-              documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
-              'ace_packet_runtime',
-              manifestOkf ? 'feature_document_manifest.okf' : '',
-            ].filter(Boolean)).slice(0, 12),
-            classifierVersion: plan.classifierPlan.classifierVersion ?? null,
-            lexicalExtractorVersion: null,
-            structuralParserVersion: null,
-            ontologyExtractorVersion: null,
-          },
-        })
-      );
-    }
-  }
 
   return { evidence, plan, tuples };
 }

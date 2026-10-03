@@ -1,0 +1,181 @@
+{
+  "schema": "atlas.ast-source-parity-worktree.v1",
+  "generatedAt": "2026-09-20T18:50:40.112Z",
+  "input": {
+    "sourceParityReceipt": "docs/reports/ast-source-parity-disposition-v1.json",
+    "sourceSnapshot": ".tmp/knowledge-source-snapshot-live-v1.json",
+    "mismatchCount": 653,
+    "mismatchReferenceChecksum": "cd8396526a549240de3de74d9afdbf590dd721056c210986e1dd13ca629f21df",
+    "gitModifiedCount": 88,
+    "gitStagedCount": 0,
+    "gitUntrackedCount": 150,
+    "gitDeletedCount": 0
+  },
+  "byDisposition": {
+    "NOT_VISIBLE_IN_GIT_STATUS": 635,
+    "WORKTREE_MODIFIED": 18
+  },
+  "samples": {
+    "NOT_VISIBLE_IN_GIT_STATUS": [
+      {
+        "sourceRef": ".okf/index.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "codex.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker-compose.yml",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/clickhouse-mirror/clickhouse-mirror.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/docker-compose.gpu.yml",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/docling-vlm/app.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/image-synthesis/app.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docker/langgraph-synthesis/app.py",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/.okf/schema.yaml",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/OPENSPEC-WORKBOARD.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/architecture/runtime-ownership-baseline.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/architecture/runtime-ownership-registry.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/graph/contract-error-map.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/parent-atlas-workstation-todo.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "docs/vector-governance/pca-svd-representation-comparison-v1.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "memory/exports/mcp-health-probe.json",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/local-llm-offload-ownership/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/manual-migration-reconciliation/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
+        "disposition": "NOT_VISIBLE_IN_GIT_STATUS"
+      }
+    ],
+    "WORKTREE_MODIFIED": [
+      {
+        "sourceRef": "claude.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "package.json",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/src/core/workflow-action-adapters.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "packages/parent-atlas/test/workflow-action-adapters.test.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "python/miniforge_nlp_sidecar.py",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-current-source-cohort-lineage-v1.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "scripts/atlas/audit-structural-provenance-wiring.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "scripts/atlas/graphify-symbol-extractor-v1.mts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "scripts/atlas/lib/atlas-ast-nodes-writer.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "simd-bridge/cpp/build-x64-cuda/CMakeFiles/CMakeConfigureLog.yaml",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/scripts/atlas/populate-atlas-ast-nodes.mjs",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.spec.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/cache-keys.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/cache/atlas-reward-cache.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      },
+      {
+        "sourceRef": "sveltekit-frontend/src/lib/server/db/schema/atlas-ast-nodes.ts",
+        "disposition": "WORKTREE_MODIFIED"
+      }
+    ]
+  },
+  "status": "MISMATCH_COHORT_INCOMPLETE",
+  "authority": "DIAGNOSTIC_ONLY",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "fa6008ccce8598fcb3a46362b5ee720b6d918c682d73fc9560fd0e4335e80055"
+}

@@ -163,7 +163,7 @@ function inferDim(rows) {
     const emb = getEmbedding(row);
     if (Array.isArray(emb) && emb.length > 0) return emb.length;
   }
-  return DIM ?? 384;
+  return DIM ?? 768;
 }
 
 function loadRows() {

@@ -57,6 +57,8 @@ export const domainClassificationV1Schema = z.object({
   /** Deterministic RULES executor has no training corpus -- omit. NAIVE_BAYES/LOGISTIC_REGRESSION
    * are trained models and must declare which snapshot they were fit on. */
   trainingSnapshotRevision: revision.optional(),
+  /** Learned classifier artifact identity. RULES has no model artifact and omits this. */
+  modelChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/i).optional(),
 
   probabilities: z.record(z.string(), z.number().min(0).max(1)),
   predictedDomain: z.string().min(1).nullable(),
@@ -70,8 +72,14 @@ export const domainClassificationV1Schema = z.object({
   if (isTrained && value.trainingSnapshotRevision === undefined) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['trainingSnapshotRevision'], message: 'TRAINED_CLASSIFIER_FAMILY_REQUIRES_TRAINING_SNAPSHOT_REVISION' });
   }
+  if (isTrained && value.modelChecksum === undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['modelChecksum'], message: 'TRAINED_CLASSIFIER_FAMILY_REQUIRES_MODEL_CHECKSUM' });
+  }
   if (!isTrained && value.trainingSnapshotRevision !== undefined) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['trainingSnapshotRevision'], message: 'RULES_FAMILY_HAS_NO_TRAINING_SNAPSHOT' });
+  }
+  if (!isTrained && value.modelChecksum !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['modelChecksum'], message: 'RULES_FAMILY_HAS_NO_MODEL_CHECKSUM' });
   }
   if (value.predictedDomain !== null && !(value.predictedDomain in value.probabilities)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['predictedDomain'], message: 'PREDICTED_DOMAIN_MUST_APPEAR_IN_PROBABILITIES_MAP' });

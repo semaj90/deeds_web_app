@@ -50,10 +50,12 @@ from .qdrant_scoped_ann import (
     evaluate_qdrant_scoped_ann,
 )
 from .rapids_matrix import (
+    RapidsKMeansArtifact,
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
     deterministic_farthest_first_ordinals,
     run_cuvs_kmeans,
+    run_cuvs_kmeans_artifact,
     run_cuvs_pca,
 )
 from .representation_compare import RepresentationComparisonReceipt, compare_representations

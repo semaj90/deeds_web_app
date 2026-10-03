@@ -1,0 +1,96 @@
+{
+  "schema": "atlas.execution-pipeline-report.v1",
+  "status": "CONTRACT_PROVEN_READ_ONLY",
+  "implementation": "sveltekit-frontend/src/lib/server/atlas/orchestration/atlas-execution-pipeline-v1.ts",
+  "focusedTests": { "passed": 7, "failed": 0 },
+  "stageContractTests": { "passed": 10, "failed": 0 },
+  "packetSummaryChecksumReadback": "PROVEN_IN_MEMORY",
+  "openspecValidation": "PASS_STRICT_TARGETED_RUN",
+  "fullTypecheck": "FAILED_UNRELATED_PREEXISTING_ERRORS",
+  "contractBindingsWired": true,
+  "graphifyExecutionOwnerResolution": {
+    "status": "DUPLICATE_EQUIVALENT_EXECUTIONS",
+    "candidateCount": 2,
+    "distinctEvidenceSignatures": 1,
+    "canonicalExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "canonicalAuthorityReadback": true,
+    "duplicateExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+    "safeToApply": false,
+    "writesPerformed": false
+  },
+  "canonicalOwnersReused": {
+    "candidateOrdinal": "sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts",
+    "semanticRepresentation": "sveltekit-frontend/src/lib/server/atlas/embedding/semantic-representation-v1.ts",
+    "structuralGraph": "sveltekit-frontend/src/lib/server/atlas/graph/structural-graph-snapshot-v1.ts",
+    "aceBitfrost": "sveltekit-frontend/src/lib/server/atlas/cache/ace-bitfrost-cache-identity-v1.ts"
+  },
+  "liveReadOnlyLineageAudit": {
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "status": "PACKET_DIGEST_BRIDGE_MISSING",
+    "bindingSources": 24456,
+    "exactPacketDigestMatches": 0,
+    "legacyDigestMatches": 3230,
+    "missingPacketRows": 7902,
+    "packetDigestMismatches": 20,
+    "lineageLinkedSources": 627,
+    "writesPerformed": false
+  },
+  "packetDigestCanaryLadder": [
+    { "limit": 1, "readyInsert": 1, "legacyLineageMissing": 0, "legacyContentHashUnqualified": 0, "sourceDigestMismatch": 0, "writesPerformed": false },
+    { "limit": 5, "readyInsert": 3, "legacyLineageMissing": 2, "legacyContentHashUnqualified": 0, "sourceDigestMismatch": 0, "writesPerformed": false },
+    { "limit": 52, "readyInsert": 38, "legacyLineageMissing": 14, "legacyContentHashUnqualified": 0, "sourceDigestMismatch": 0, "writesPerformed": false },
+    { "limit": 500, "readyInsert": 241, "legacyLineageMissing": 235, "legacyContentHashUnqualified": 22, "sourceDigestMismatch": 2, "writesPerformed": false }
+  ],
+  "freshSnapshotPreflight": {
+    "snapshotRevision": "sha256:c1d650f7fa67b2e881d9d15fb3389c91ac83131593743bdea2d9a7d7663a3c73",
+    "workspaceRevisionCandidate": "sha256:aff603af68664e1b42b57fec4efaad26bad4182e1d1267e48d9edfb8d5d00922",
+    "sourceCount": 25667,
+    "repositoryCount": 7,
+    "violations": 0,
+    "status": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
+    "authority": false,
+    "writesPerformed": false
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "proofGates": {
+    "sameInputSameChecksum": true,
+    "workspaceRevisionBindsChecksum": true,
+    "executorIsNotIdentityOwner": true,
+    "stageDagAcyclic": true,
+    "semanticLaneOneVote": true,
+    "checksumChainValidation": true,
+    "classifierIdentityBoundary": true,
+    "ordinalMapSharedByGraphAndRetrieval": true,
+    "fastApiParameterParity": "CONTRACT_AND_FOCUSED_TEST_PROVEN",
+    "stage03OrdinalAdmission": "BLOCKED_WITHOUT_CURRENT_COHORT",
+    "stage04SemanticAdmission": "CONTRACT_ONLY",
+    "stage05GraphManifest": "CONTRACT_ONLY",
+    "stage06StructuralFeatures": "CONTRACT_ONLY",
+    "stage07DerivedLatents": "CONTRACT_ONLY",
+    "stage08CandidateFeatureMatrix": "CONTRACT_ONLY",
+    "stage09AceBitfrostResidency": "CONTRACT_ONLY",
+    "simdSimtParity": "NOT_RUN",
+    "liveMcpReadback": "NOT_RUN"
+  },
+  "remainingLiveGates": [
+    "current packet and chunk admission",
+    "live classifier producer/readback",
+    "live retrieval executor readback",
+    "GPU parity"
+  ],
+  "scaffoldBlockers": {
+    "PA_STAGE_03": "CURRENT_SOURCE_CHUNK_COHORT_UNAVAILABLE",
+    "PA_STAGE_04": "SEMANTIC_COHORT_LINEAGE_NOT_PROVEN",
+    "PA_STAGE_05": "REVISION_QUALIFIED_GRAPH_EDGES_NOT_PROVEN",
+    "PA_STAGE_06": "NETWORKX_CUGRAPH_PARITY_NOT_RUN",
+    "PA_STAGE_07": "SEMANTIC_768_INPUT_ADMISSION_BLOCKED",
+    "PA_STAGE_08": "CURRENT_CANDIDATE_FEATURE_MATRIX_NOT_ADMITTED",
+    "PA_STAGE_09": "ACE_LIVE_REVISION_QUALIFIED_ADMISSION_NOT_PROVEN"
+    ,"PA_STAGE_10": "CURRENT_PACKET_COHORT_NOT_ADMITTED"
+    ,"PA_STAGE_11": "SEALED_REVISION_QUALIFIED_GRAPH_NOT_PROVEN"
+    ,"PA_STAGE_12": "POSTGRES_CANONICAL_READBACK_REQUIRED"
+    ,"PA_STAGE_13": "NES_CHROM97_CANARY_BLOCKED_LINEAGE"
+  }
+}

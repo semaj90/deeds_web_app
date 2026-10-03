@@ -225,6 +225,37 @@ contracts:
       - index.md
       - summary.json
       - canonical_api_recommendations
+  - name: domain-classification-agentic-retrieval-alignment-v1
+    owner: docs/.okf/architecture/domain-classification-and-agentic-retrieval-v1.md
+    role: non-authoritative alignment note for domain taxonomy, ontology evidence, representations, docs retrieval, and MCP boundaries
+    notes:
+      - design_alignment_only
+      - no_runtime_taxonomy_migration
+      - no_canonical_identity_authority
+      - langchain_local_snapshot_is_unadmitted
+  - name: langchain-typescript-local-corpus-v1
+    owner: docs/.okf/topics/langchain/corpus-typescript.json
+    role: artifact-only official TypeScript/OpenWiki docs source scope for local retrieval
+    notes:
+      - local_snapshot_only
+      - canonical_authority_false
+      - no_dense_projection_or_datastore_writes
+  - name: library-docs-prioritization-v1
+    owner: docs/.okf/dev/library-docs-prioritization-v1.md
+    role: preliminary lockfile-based library documentation priority and post-tournament consolidation plan
+    notes:
+      - manifest_census_not_installed_runtime_proof
+      - official_docs_manifest: docs/.okf/dev/library-docs-manifest-v1.json
+      - acquisition_not_yet_run
+      - supersession_waits_for_tournament_receipts
+  - name: library-api-doc-catalog-v1
+    owner: docs/.okf/dev/library-api-doc-catalog-v1.json
+    role: curated official API documentation source catalog, including separate RAPIDS Python and C++ surfaces
+    notes:
+      - noncanonical_docs_input
+      - installed_package_inventory_required
+      - version_qualification_is_explicit
+      - no_datastore_write_authority
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.

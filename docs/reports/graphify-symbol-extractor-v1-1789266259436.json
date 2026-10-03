@@ -1,0 +1,349 @@
+{
+  "schema": "atlas.graphify-symbol-extractor-receipt.v1",
+  "generatedAt": "2026-09-13T02:24:19.435Z",
+  "apply": false,
+  "useLsp": false,
+  "limit": 50,
+  "workspaceIdFilter": null,
+  "candidatesConsidered": 50,
+  "skippedUnsupported": 3,
+  "byFileKind": {
+    "markdown": 44,
+    "json": 3
+  },
+  "filesProcessed": 0,
+  "filesFailed": 0,
+  "totalSymbolsExtracted": 1138,
+  "totalSymbolsInserted": null,
+  "plan": [
+    {
+      "fileId": "c5d4d836-2518-4f42-9b4d-db836563d5be",
+      "sourceRef": "2-CONTEXT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "abf840d1-8fd6-4fe5-b132-7697d2ec43c3",
+      "sourceRef": "724_agents.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "66c86f5e-ae7c-410a-bef4-9019edd6b45c",
+      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 35
+    },
+    {
+      "fileId": "63b5b71d-3241-4b6b-97f8-f42375616000",
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "318c8a87-891d-4db5-a80b-73063bbdb4ce",
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "03ea7fe2-88ea-4810-998e-d9f655ac1fff",
+      "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 43
+    },
+    {
+      "fileId": "2e7e2488-cf3c-4932-adb1-ab3ce0cdaf87",
+      "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 6
+    },
+    {
+      "fileId": "8ab4bf65-8ef5-4155-b8f7-e366d172ee91",
+      "sourceRef": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "ff84449a-a746-4980-aad3-e2cf01e2adc1",
+      "sourceRef": "AGENTS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "4d2f34a4-aedd-46ef-a336-2fac15d2f3ec",
+      "sourceRef": "AGENTS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "9e50d65a-c44c-438a-981a-077c753ae949",
+      "sourceRef": "AGENTS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 21
+    },
+    {
+      "fileId": "3223f298-6545-43dc-bc09-c24da926f694",
+      "sourceRef": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 38
+    },
+    {
+      "fileId": "7fe068d0-8d48-4f77-8a32-d084f75c80ab",
+      "sourceRef": "ARCHITECTURE-AUDIT-REFACTOR-COMPLETE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 49
+    },
+    {
+      "fileId": "062d357b-67ba-41f5-89c5-1dc6a15cf19e",
+      "sourceRef": "ARCHITECTURE_CHECKPOINT_2026_06_11.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "5f040b19-55fa-4061-a6a9-365b0a58119f",
+      "sourceRef": "ARCHITECTURE-EVOLUTION-PHASES-8-10.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 24
+    },
+    {
+      "fileId": "1276fae3-151e-4830-8f50-0f8ce22f67e6",
+      "sourceRef": "ARCHITECTURE_SPEC.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 45
+    },
+    {
+      "fileId": "48f544e7-bac4-47a5-b13d-9cf46e7a7d45",
+      "sourceRef": "atlas.config.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 41
+    },
+    {
+      "fileId": "3d2ad0fa-419d-48a5-9f21-821912b71139",
+      "sourceRef": "ATLAS-FREEZE-DECISION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 16
+    },
+    {
+      "fileId": "ff522edf-b949-4bd5-b9d3-6f14b6f74350",
+      "sourceRef": "ATLAS-INFRASTRUCTURE-STATE-2026-07-08.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 15
+    },
+    {
+      "fileId": "c241e8a2-e9a0-446f-9a9e-900876a2a8d8",
+      "sourceRef": "ATLAS-LANES-DEPENDENCY-GRAPH.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "40b7f219-6764-4015-b96a-8a94df5e6c54",
+      "sourceRef": "ATLAS_READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "15835efd-9a03-4f1c-bcd6-5da6ad46d3db",
+      "sourceRef": "ATLAS-STABLE-BASELINES.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 20
+    },
+    {
+      "fileId": "17abf337-6a4b-484d-a373-5c2801f50f64",
+      "sourceRef": "ATLAS-STATUS-RECONCILIATION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 26
+    },
+    {
+      "fileId": "2514c066-3ff6-4826-bb14-d7e000c79492",
+      "sourceRef": "AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 61
+    },
+    {
+      "fileId": "5f23db87-6618-45c8-bae1-2424cd3da75a",
+      "sourceRef": "audit/public-route-allowlist.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 7
+    },
+    {
+      "fileId": "fad4431d-a641-4968-9ca4-506c915598fb",
+      "sourceRef": "BATCH-GPU-ACCELERATION-ANALYSIS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "1ebc7e81-634a-40ec-96d2-6775f58c57f7",
+      "sourceRef": "BATCH-SUMMARIZATION-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 37
+    },
+    {
+      "fileId": "7fb6ac72-a5ea-4df0-acb9-ecb4162ef1de",
+      "sourceRef": "BATCH-SUMMARIZATION-READY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 30
+    },
+    {
+      "fileId": "fed17659-50ed-493b-8316-dbd512cfe67b",
+      "sourceRef": "big-tools-request.json",
+      "fileKind": "json",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 5
+    },
+    {
+      "fileId": "1d8df371-bce9-42cb-953a-cc43c3c361e1",
+      "sourceRef": "CARD-1-QUICK-START.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 14
+    },
+    {
+      "fileId": "d3015758-fe46-4be1-80cb-7b7c1add8988",
+      "sourceRef": "CHUNK-BACKFILL-EXECUTION-PLAN.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 44
+    },
+    {
+      "fileId": "52e640c7-53fe-4751-8ced-5a1293f4c2d9",
+      "sourceRef": "CHUNK-BACKFILL-EXECUTION-SUMMARY.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "d1f10537-53d8-4a7b-b199-2fe7fae41aa2",
+      "sourceRef": "CHUNK-BACKFILL-QUICK-REFERENCE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 33
+    },
+    {
+      "fileId": "0281ce0b-c74a-4d88-ab42-970fcbd2f5eb",
+      "sourceRef": "CLASSIFIER-SIDECAR-INDEX.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 34
+    },
+    {
+      "fileId": "1249bb2a-0414-4399-b18d-b45857232eb0",
+      "sourceRef": ".claude/AGENT_CONSTITUTION.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 1
+    },
+    {
+      "fileId": "53bb701f-7898-4f9d-968b-347cd7cf977f",
+      "sourceRef": ".claude/AGENT_RECOMMENDATIONS.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 4
+    },
+    {
+      "fileId": "97475ea1-dd8e-442e-a096-4eb44b036b26",
+      "sourceRef": ".claude/agents/drizzle-inspector.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "43719c20-9b0f-4e0a-b233-e50d125e22d6",
+      "sourceRef": ".claude/agents/obsidian-cartographer.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 10
+    },
+    {
+      "fileId": "ce23ff8c-eabd-4690-9930-87ac3185de73",
+      "sourceRef": ".claude/agents/sveltekit-route-auditor.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 11
+    },
+    {
+      "fileId": "bf994ee8-14ad-4c5a-a2a5-1ad690569618",
+      "sourceRef": ".claude/agents/topology-medic.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 9
+    },
+    {
+      "fileId": "1d7869e1-16fe-4ddf-b9ba-b066ad934215",
+      "sourceRef": ".claude/ATLAS-ENGINEERING-PROMPT.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 57
+    },
+    {
+      "fileId": "5f705c2b-722a-4a79-bbf9-be304c1dfc27",
+      "sourceRef": ".claude/CLAUDE.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 2
+    },
+    {
+      "fileId": "9a1825c5-3625-4e12-96d0-d4998150d4eb",
+      "sourceRef": ".claude/commands/audit-components.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 28
+    },
+    {
+      "fileId": "1214f4df-f276-478d-95bb-14f8ee0a21df",
+      "sourceRef": ".claude/commands/audit-duplication.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 8
+    },
+    {
+      "fileId": "1de73577-bae4-4120-847c-4e420005c617",
+      "sourceRef": ".claude/commands/deep-audit.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 23
+    },
+    {
+      "fileId": "307c2af4-0101-44c5-99da-9155abf8a3dc",
+      "sourceRef": ".claude/commands/graphify.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 40
+    },
+    {
+      "fileId": "e688d0bb-1f37-4e3d-ab6a-6668e2ed0eef",
+      "sourceRef": ".claude/commands/nes-arch.md",
+      "fileKind": "markdown",
+      "outcome": "WOULD_EXTRACT",
+      "symbolCount": 13
+    }
+  ]
+}

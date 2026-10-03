@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.native-addon-contract-audit.v1",
+  "generatedAt": "2026-09-27",
+  "scope": "One explicit out-of-tree Windows CUDA/LibTorch addon; contract/capability audit, not production deployment proof.",
+  "addon": {
+    "path": "C:/Users/james/AppData/Local/Temp/parent-atlas-native-p13-counters-cuda-20260927/Release/tensorrt_bridge.node",
+    "sha256": "eba9b1c7c98177c63b833b106a766596d95b3627ae6baac8d2b96b4d045147ca",
+    "mtimeUtc": "2026-09-27T21:28:44.4829467Z",
+    "buildCommit": "7801d6d85a1c",
+    "buildDirty": true,
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "computeCapability": "8.6",
+    "cudaRuntime": 13000,
+    "cublasAvailable": true
+  },
+  "exportCount": 39,
+  "backendCounts": {
+    "libtorch_cuda": 14,
+    "cuda_kernel": 9,
+    "cpu_fallback": 14,
+    "unavailable": 2
+  },
+  "exportsByBackend": {
+    "libtorch_cuda": [
+      "attentionScoreGPU", "attentionScoreGPU_fp16", "autoencoderDecode", "autoencoderEncode",
+      "batchCosineSimilarity", "batchCosineSimilarity_fp16", "kmeansWithCentroids", "pageRankGPU",
+      "pcaProject", "rewardScoreGPU", "rewardScoreGPU_fp16", "softmaxGPU", "topKIndicesGPU", "trainSOM"
+    ],
+    "cuda_kernel": [
+      "captureGraph", "cudaGraphCount", "dotProduct", "lstmAdd", "relu", "replayGraph",
+      "replayGraphOnStream", "scale", "somCache"
+    ],
+    "cpu_fallback": [
+      "checkCudaAvailable", "clusterEmbeddings", "computeCaseEmbedding", "getBackendInfo", "getCudaMemory",
+      "getExecutionCounters", "graphSimilarity", "graphSimilarityHalf", "poolStats", "resetExecutionCounters",
+      "simdJsonBackend", "simdJsonExtractNumbers", "simdJsonParse", "simdJsonValidate"
+    ],
+    "unavailable": ["bridgeSIMD", "cuvsCompressEmbedding"]
+  },
+  "boundedExecutionEvidence": {
+    "batchCosineSimilarity": {
+      "classification": "CUDA_LIVE",
+      "parity": "MATCH",
+      "cudaExecutionCounter": 1,
+      "cpuFallbackCounter": 0
+    },
+    "graphSimilarity": { "classification": "CPU_FALLBACK", "parity": "MATCH" },
+    "getCudaMemory": { "returnCode": 0, "freeMiB": 5855, "totalMiB": 8191 }
+  },
+  "authority": {
+    "canonicalIdentity": false,
+    "semanticRepresentationPromotion": false,
+    "applicationOrProductionLiveness": false
+  },
+  "sideEffects": { "databaseWrites": 0, "projectionWrites": 0, "cacheWrites": 0, "modelCalls": 0 }
+}

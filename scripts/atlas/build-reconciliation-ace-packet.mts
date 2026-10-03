@@ -1,9 +1,8 @@
 #!/usr/bin/env tsx
 
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createClient } from 'redis';
 
@@ -15,11 +14,6 @@ const RECONCILIATION_REPORT_PATH = join(REPO_ROOT, 'reports', 'semantic-contract
 
 const REDIS_URL = process.env.VALKEY_URL ?? process.env.REDIS_URL ?? 'redis://:redis@127.0.0.1:6379';
 const TTL_SECONDS = Number(process.env.ACE_PACKET_TTL_SECONDS ?? '1800');
-const WORKSPACE_REVISION = (
-  process.env.WORKSPACE_REVISION
-  ?? execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim()
-);
-const WORKSPACE_ID = process.env.WORKSPACE_ID ?? 'deeds-web-app';
 
 type LaneStatus =
   | 'ABSENT'
@@ -215,6 +209,23 @@ function buildSignalSummary(lanes: LaneAuditEntry[]): ReconciliationAcePacketV1[
 }
 
 async function main(): Promise<void> {
+  const args = process.argv.slice(2);
+  const value = (flag: string, envName: string): string | null => {
+    const index = args.indexOf(flag);
+    return index >= 0 && args[index + 1] ? args[index + 1].trim() : process.env[envName]?.trim() || null;
+  };
+  const workspaceRevision = value('--workspace-revision', 'WORKSPACE_REVISION');
+  const workspaceId = value('--workspace-id', 'WORKSPACE_ID');
+  const runId = value('--run-id', 'ACE_RUN_ID');
+  const acePacketId = value('--ace-packet-id', 'ACE_PACKET_ID');
+  const apply = args.includes('--apply');
+  if (!workspaceRevision) throw new Error('WORKSPACE_REVISION_REQUIRED');
+  if (!workspaceId) throw new Error('WORKSPACE_ID_REQUIRED');
+  if (!runId) throw new Error('ACE_RUN_ID_REQUIRED');
+  if (!acePacketId) throw new Error('ACE_PACKET_ID_REQUIRED');
+  if (apply && process.env.ATLAS_ALLOW_RECONCILIATION_ACE_CACHE_WRITE !== '1') {
+    throw new Error('RECONCILIATION_ACE_CACHE_WRITE_EXPLICIT_GUARD_REQUIRED');
+  }
   if (!Number.isFinite(TTL_SECONDS) || TTL_SECONDS < 60) {
     throw new Error('ACE_PACKET_TTL_SECONDS must be a number >= 60');
   }
@@ -225,9 +236,7 @@ async function main(): Promise<void> {
   const report = loadJson<ReconciliationReport>(reconciliationRaw);
   const laneAudits = Object.values(report.lane_audits ?? {}) as LaneAuditEntry[];
   const createdAt = new Date().toISOString();
-  const runId = `run_${randomUUID()}`;
-  const acePacketId = `ace_${randomUUID()}`;
-  const packetKey = `reconciliation:${WORKSPACE_REVISION.slice(0, 12)}`;
+  const packetKey = `reconciliation:${workspaceRevision.slice(0, 12)}`;
   const redisKey = `ace:packet:${packetKey}`;
   const redisAliasKey = `bifrost:packet:${packetKey}`;
 
@@ -236,8 +245,8 @@ async function main(): Promise<void> {
     packetKind: 'ace.reconciliation.context',
     acePacketId,
     runId,
-    workspaceId: WORKSPACE_ID,
-    workspaceRevision: WORKSPACE_REVISION,
+    workspaceId,
+    workspaceRevision,
     objective: 'Resume reconciliation from bounded evidence without rereading the full audit.',
     createdAt,
     expiresInSeconds: TTL_SECONDS,
@@ -306,35 +315,34 @@ async function main(): Promise<void> {
   await mkdir(REPORT_DIR, { recursive: true });
   await writeFile(join(REPORT_DIR, 'reconciliation-ace-packet.json'), JSON.stringify(packet, null, 2));
 
-  const redis = createClient({ url: REDIS_URL });
-  redis.on('error', () => {});
-  await redis.connect();
-
-  try {
-    const serialized = JSON.stringify(packet);
-    await redis.set(redisKey, serialized, { EX: TTL_SECONDS });
-    await redis.set(redisAliasKey, serialized, { EX: TTL_SECONDS });
-    await redis.set('ace:packet:latest:reconciliation', redisKey, { EX: TTL_SECONDS });
-    await redis.set('bifrost:packet:latest:reconciliation', redisKey, { EX: TTL_SECONDS });
-
-    console.log(
-      JSON.stringify({
-        ok: true,
-        packetKey,
-        redisKey,
-        redisAliasKey,
-        acePacketId,
-        runId,
-        workspaceRevision: WORKSPACE_REVISION,
-        ttlSeconds: TTL_SECONDS,
-        selectedEntityCount: packet.selectedEntities.length,
-        violationCount: packet.violations.length,
-        sourceRefs: packet.sourceRefs,
-      }, null, 2),
-    );
-  } finally {
-    await redis.quit();
+  if (apply) {
+    const redis = createClient({ url: REDIS_URL });
+    redis.on('error', () => {});
+    await redis.connect();
+    try {
+      const serialized = JSON.stringify(packet);
+      await redis.set(redisKey, serialized, { EX: TTL_SECONDS });
+      await redis.set(redisAliasKey, serialized, { EX: TTL_SECONDS });
+    } finally {
+      await redis.quit();
+    }
   }
+
+  console.log(JSON.stringify({
+    ok: true,
+    mode: apply ? 'APPLY_REVISION_ADDRESSED' : 'READ_ONLY',
+    writesPerformed: apply,
+    packetKey,
+    redisKey,
+    redisAliasKey,
+    acePacketId,
+    runId,
+    workspaceRevision,
+    ttlSeconds: TTL_SECONDS,
+    selectedEntityCount: packet.selectedEntities.length,
+    violationCount: packet.violations.length,
+    sourceRefs: packet.sourceRefs,
+  }, null, 2));
 }
 
 main().catch((error) => {

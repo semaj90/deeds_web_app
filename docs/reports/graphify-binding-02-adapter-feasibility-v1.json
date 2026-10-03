@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.graphify-binding-02-adapter-feasibility.v1",
+  "task": "GRAPHIFY-BINDING-02",
+  "generatedAt": "2026-09-29T03:34:35.628Z",
+  "mode": "READ_ONLY_FEASIBILITY_PROBE",
+  "writesPerformed": false,
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "snapshotSourceCount": 25542,
+  "errors": [],
+  "entriesMapped": 25542,
+  "recordBuilt": true,
+  "recomputedWorkspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+  "recomputedMatchesAdmitted": false,
+  "bindingsBuilt": true,
+  "bindingsCount": 25542,
+  "sampleEntries": [
+    {
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "contentDigest": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteLength": 4781,
+      "gitBlobOid": null
+    },
+    {
+      "sourceRef": ".clarity/ff1-plan.md",
+      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "byteLength": 1722,
+      "gitBlobOid": null
+    }
+  ],
+  "sampleBindings": [
+    {
+      "schema": "atlas.workspace-source-binding.v1",
+      "workspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+      "sourceRef": "__tests__/data-hashing.spec.ts",
+      "sourceRevision": "sha256:da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "contentDigest": "da7c6ceeb3c983e9e49ae0cc8e5cdb761ada6264f8c40d78296fac48b502c3ba",
+      "byteLength": 4781,
+      "gitObjectFormat": "sha1",
+      "baseCommitOid": "cb122d7415a9a3ed570b759495888bf0a8c71413",
+      "gitBlobOid": null,
+      "trackedAtBaseCommit": false,
+      "dirtyRelativeToBaseCommit": true,
+      "sourceManifestOrdinal": 0,
+      "readOnlyObservation": true,
+      "canonicalAuthority": false,
+      "producerRevision": "GRAPHIFY-BINDING-02:v1",
+      "checksum": "cfac9d2c73b080a26b1df3c5ea871a70b69285bbc597b4d377176b4b02328045"
+    },
+    {
+      "schema": "atlas.workspace-source-binding.v1",
+      "workspaceRevision": "sha256:4cf21f7afbabe0f4b8ea4dd66c5789b533b964199675650650cb227d52ddbfed",
+      "sourceRef": ".clarity/ff1-plan.md",
+      "sourceRevision": "sha256:a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "contentDigest": "a7ff32004a057b55fe1847c9becded73811e70307c3ec2e521b525d7289db8d6",
+      "byteLength": 1722,
+      "gitObjectFormat": "sha1",
+      "baseCommitOid": "cb122d7415a9a3ed570b759495888bf0a8c71413",
+      "gitBlobOid": null,
+      "trackedAtBaseCommit": false,
+      "dirtyRelativeToBaseCommit": true,
+      "sourceManifestOrdinal": 1,
+      "readOnlyObservation": true,
+      "canonicalAuthority": false,
+      "producerRevision": "GRAPHIFY-BINDING-02:v1",
+      "checksum": "cf2bca2eca4092f00e5a73b89a5dab20cd5387b6731c64685a03bc0456c53a70"
+    }
+  ],
+  "verdict": "DIGEST_MISMATCH_INVESTIGATE_BEFORE_PROCEEDING"
+}

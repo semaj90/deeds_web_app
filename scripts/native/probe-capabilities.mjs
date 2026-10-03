@@ -109,9 +109,10 @@ if (simdAddon && typeof simdAddon.simdJsonParse === 'function') {
     const jsonStr = JSON.stringify(testObj);
 
     const simdResult = simdAddon.simdJsonParse(jsonStr);
+    const simdValue = typeof simdResult === 'string' ? JSON.parse(simdResult) : simdResult;
     const nativeResult = JSON.parse(jsonStr);
 
-    if (JSON.stringify(simdResult) === JSON.stringify(nativeResult)) {
+    if (JSON.stringify(simdValue) === JSON.stringify(nativeResult)) {
       console.log('  ✓ SIMD JSON parsing validated');
       simdWorking = true;
       if (verbose) {
@@ -132,25 +133,26 @@ if (simdAddon && typeof simdAddon.simdJsonParse === 'function') {
 if (cudaAddon) {
   try {
     // Test 1: Check CUDA memory (non-destructive probe)
-    if (typeof cudaAddon.isCudaAvailable === 'function') {
-      const cudaAvailable = cudaAddon.isCudaAvailable();
+    if (typeof cudaAddon.checkCudaAvailable === 'function') {
+      const cudaAvailable = Boolean(cudaAddon.checkCudaAvailable());
       console.log(`  ✓ CUDA availability probe: ${cudaAvailable ? 'AVAILABLE' : 'NOT AVAILABLE'}`);
       cudaWorking = cudaAvailable;
     }
 
     // Test 2: Try a simple tensor operation
-    if (typeof cudaAddon.libtorchCosineSimilarity === 'function') {
+    if (typeof cudaAddon.batchCosineSimilarity === 'function') {
       const vec1 = new Float32Array([1.0, 0.0, 0.0]);
       const vec2 = new Float32Array([1.0, 0.0, 0.0]);
-      const similarity = cudaAddon.libtorchCosineSimilarity(vec1, vec2);
+      const scores = new Float32Array(1);
+      const resultCode = cudaAddon.batchCosineSimilarity(vec1, 3, vec2, 1, scores, 1);
 
-      if (similarity !== undefined && similarity !== null && Number.isFinite(similarity)) {
-        console.log(`  ✓ LibTorch cosine similarity validated (result: ${similarity.toFixed(4)})`);
+      if (resultCode === 0 && Number.isFinite(scores[0])) {
+        console.log(`  ✓ LibTorch cosine similarity validated (result: ${scores[0].toFixed(4)})`);
         cudaWorking = true;
         if (verbose) {
           console.log(`    Query vector: [1.0, 0.0, 0.0]`);
           console.log(`    Candidate vector: [1.0, 0.0, 0.0]`);
-          console.log(`    Similarity: ${similarity}`);
+          console.log(`    Similarity: ${scores[0]}`);
         }
       } else {
         console.warn('  ⚠️  LibTorch cosine similarity returned invalid value');

@@ -83,7 +83,7 @@ async function readCanonicalPacketState(
 	packetKey: string,
 ): Promise<CanonicalPacketStateV1> {
 	const result = await client.query(
-		`SELECT source_ref, source_revision, workspace_revision, embedding_digest
+		`SELECT source_ref, source_revision, workspace_revision, content_hash
 		 FROM atlas_packets WHERE packet_key = $1 LIMIT 1`,
 		[packetKey],
 	);
@@ -104,7 +104,10 @@ async function readCanonicalPacketState(
 		sourceRef: row.source_ref,
 		sourceRevision: row.source_revision,
 		workspaceRevision: row.workspace_revision !== null ? String(row.workspace_revision) : null,
-		contentDigest: row.embedding_digest,
+		// content_hash is the packet/source content identity. embedding_digest
+		// belongs to the vector representation and must not decide source
+		// idempotency or packet-digest admission.
+		contentDigest: row.content_hash,
 	};
 }
 
@@ -149,6 +152,19 @@ export async function executePacketWriteTransaction(
 			);
 		}
 	} else if (decision.decision === 'INSERT_NEW') {
+		if (request.workspaceRevision === null || request.workspaceRevision === undefined) {
+			throw new Error('WORKSPACE_REVISION_REQUIRED_FOR_PACKET_INSERT');
+		}
+		// The live scaffold still targets the legacy integer workspace_revision
+		// column. Never truncate or coerce an admitted checksum revision into 0;
+		// reject until the storage owner is revision-compatible.
+		if (!/^\d+$/.test(request.workspaceRevision)) {
+			throw new Error('WORKSPACE_REVISION_STORAGE_INCOMPATIBLE');
+		}
+		const legacyWorkspaceRevision = Number(request.workspaceRevision);
+		if (!Number.isSafeInteger(legacyWorkspaceRevision)) {
+			throw new Error('WORKSPACE_REVISION_STORAGE_INCOMPATIBLE');
+		}
 		// Minimal identity-bearing INSERT. This is deliberately narrower than
 		// semantic-packet-writer.ts's real INSERT (no embedding/topology/vectors/
 		// representation columns) -- extracting that full column set into a
@@ -157,11 +173,11 @@ export async function executePacketWriteTransaction(
 		// transaction/outbox/receipt mechanics for INSERT_NEW; it does not yet
 		// replace semantic-packet-writer.ts's own INSERT.
 		const insertResult = await client.query(
-			`INSERT INTO atlas_packets (packet_key, packet_id, source_ref, source_revision, workspace_revision)
-			 VALUES ($1, $1, $2, $3, 0)
+			`INSERT INTO atlas_packets (packet_key, packet_id, source_ref, source_revision, workspace_revision, content_hash)
+			 VALUES ($1, $1, $2, $3, $4, $5)
 			 ON CONFLICT (packet_key) DO NOTHING
 			 RETURNING packet_key`,
-			[request.packetKey, request.sourceRef, request.sourceRevision],
+			[request.packetKey, request.sourceRef, request.sourceRevision, legacyWorkspaceRevision, request.contentDigest],
 		);
 		mutationApplied = insertResult.rows.length === 1;
 		if (!mutationApplied) {
@@ -188,11 +204,13 @@ export async function executePacketWriteTransaction(
 			aggregateType: 'atlas_packets',
 			aggregateId: uuidv5(request.packetKey, PACKET_AGGREGATE_NAMESPACE_V1),
 			aggregateKey: request.packetKey,
-			workspaceRevision: request.workspaceRevision ?? 'unknown',
-			sourceRevision: request.sourceRevision ?? 'unknown',
-			graphRevision: 'unknown',
-			representationRevision: 'unknown',
-			featureRevision: 'unknown',
+			// Nullable means unobserved here; never turn missing lineage into a
+			// populated sentinel that downstream readers could mistake for proof.
+			workspaceRevision: request.workspaceRevision ?? null,
+			sourceRevision: request.sourceRevision ?? null,
+			graphRevision: null,
+			representationRevision: null,
+			featureRevision: null,
 			changedPacketKeys: [request.packetKey],
 			projections: ['SEMANTIC'],
 		};

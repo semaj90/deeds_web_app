@@ -15,7 +15,7 @@ async function test() {
     body: JSON.stringify({
       query,
       runs: 1,
-      model: 'gemma4-rotorquant:latest-fast',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       // bifrostChat will try L1 Redis → fail → try Bifrost L2 → timeout → ERROR
       // We need to bypass bifrostChat and use direct Ollama
     })
@@ -33,7 +33,7 @@ async function test() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       message: query,
-      model: 'gemma4-rotorquant:latest-fast',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       temperature: 0.3
     })
   }).then(r => r.json());
@@ -48,7 +48,7 @@ async function test() {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       message: query,
-      model: 'gemma4-rotorquant:latest-fast',
+      model: (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b'),
       temperature: 0.3
     })
   }).then(r => r.json());

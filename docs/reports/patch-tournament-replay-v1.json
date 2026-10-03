@@ -1,6 +1,6 @@
 {
   "schema": "atlas.patch-tournament-replay.v1",
-  "generatedAt": "2026-09-09T23:37:27.213Z",
+  "generatedAt": "2026-09-20T04:58:09.382Z",
   "mode": "READ_ONLY_FIXTURE_REPLAY",
   "status": "TOURNAMENT_REPLAY_PROVEN_FIXTURE_ONLY",
   "proofLevel": "FIXTURE_PROVEN",
@@ -11,8 +11,8 @@
   "autoApply": false,
   "training": false,
   "candidateCount": 3,
-  "firstChecksum": "sha256:3250dadfdcbe11c85f5d3c26c8afb3bc51a61d9e2dc54b86ecfef2f10526c22e",
-  "secondChecksum": "sha256:3250dadfdcbe11c85f5d3c26c8afb3bc51a61d9e2dc54b86ecfef2f10526c22e",
+  "firstChecksum": "sha256:641815c332f2461e70f5cb66e3cee3c264fe1ad8a2cf8097e2c4e0c3c2fec469",
+  "secondChecksum": "sha256:641815c332f2461e70f5cb66e3cee3c264fe1ad8a2cf8097e2c4e0c3c2fec469",
   "rankedCandidateIds": [
     "candidate-a",
     "candidate-b",

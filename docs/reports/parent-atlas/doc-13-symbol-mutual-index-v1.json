@@ -7,22 +7,25 @@
     "staleRejected": true,
     "ambiguousRejected": true,
     "unmappedRejected": true,
+    "missingCodeRevisionRejected": true,
+    "distinctRevisionDomainsPreserved": true,
     "result": {
       "status": "MATCHED",
-      "reason": "EXACT_NAME_AND_SOURCE_REVISION",
+      "reason": "EXACT_NAME_AND_TARGET_CODE_SOURCE_REVISION",
       "matches": [
         {
           "stableSymbolId": "symbol:graph.from_cudf_edgelist",
           "symbolVersionId": "symbol-version:graph.from_cudf_edgelist:1",
           "sourceRef": "src/graph.py",
-          "sourceRevision": "sha256:doc-fixture-revision"
+          "documentationSourceRevision": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "codeSourceRevision": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
         }
       ]
     }
   },
   "identityOwner": "existing stableSymbolId/symbolVersionId registry",
-  "matchingPolicy": "exact symbol name plus exact sourceRevision; no fuzzy identity",
+  "matchingPolicy": "exact symbol name plus explicit target code sourceRevision; documentation evidence sourceRevision remains separate; no fuzzy identity",
   "writesPerformed": false,
   "canonicalAuthority": false,
-  "reportChecksum": "6eb8859902b0547dedae09de9f8de12d0b77c22b5139ff5f2e5c0e4f77ffa3b5"
+  "reportChecksum": "9477cf5f16483ff0500d542e264fe264de3f67282c2d0f5052db5981a166a7d1"
 }

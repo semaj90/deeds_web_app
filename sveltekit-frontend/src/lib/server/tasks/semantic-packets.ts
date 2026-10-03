@@ -27,7 +27,8 @@ import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.
 
 const TASK_COLLECTION_NAME = qdrantManager.collections.codebase_chunks;
 const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || TASK_COLLECTION_NAME;
-const TASK_PACKET_MODEL = process.env.GEMMA4_MODEL || 'gemma4-rotorquant:latest';
+// Task-summary chat is served by llama-server :8090. Ollama :11434 is embeddings-only.
+const TASK_PACKET_MODEL = process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
 const TASK_PACKET_SEMANTIC_PATH = ['kanban', 'task_summary', 'agent_pickup'];
 const TASK_PACKET_CACHE_PREFIX = 'task:semantic-packet';
 const TASK_PACKET_CACHE_TTL_SECONDS = 60 * 60 * 24;

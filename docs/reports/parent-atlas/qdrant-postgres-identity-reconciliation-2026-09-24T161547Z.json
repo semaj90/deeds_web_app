@@ -1,0 +1,141 @@
+{
+  "schema": "atlas.qdrant-postgres-identity-reconciliation.v1",
+  "generatedAt": "2026-09-24T16:30:26.363Z",
+  "mode": "READ_ONLY_FULL_COLLECTION_SCROLL_AND_REPEATABLE_READ_POSTGRES",
+  "status": "QDRANT_PG_IDENTITY_RECONCILIATION_MEASURED",
+  "collection": "codebase_chunks_768",
+  "collectionCountBefore": 328348,
+  "collectionCountAfter": 328348,
+  "pointsScanned": 328348,
+  "duplicatePointIds": 0,
+  "exactQdrantIdParity": {
+    "qdrantPointsWithPostgresQdrantId": 222529,
+    "qdrantPointsWithoutPostgresQdrantId": 105819,
+    "postgresQdrantIdsPresentInQdrant": 222529,
+    "postgresQdrantIdsMissingFromQdrant": 51936
+  },
+  "postgresSnapshot": {
+    "codebaseChunkRows": 274465,
+    "codebaseChunkRowsWithQdrantId": 274465,
+    "distinctQdrantIds": 274465,
+    "codebaseChunkDistinctChunkIds": 273701,
+    "codebaseChunkRowsWithScopedHash": 90509,
+    "codebaseChunkRowsWithSourceRevision": 0,
+    "codebaseChunkRowsWithWorkspaceRevision": 0,
+    "codebaseChunkRowsWithRepresentationRevision": 0,
+    "atlasPacketRows": 61718,
+    "atlasPacketKeys": 61718,
+    "atlasPacketRowsWithQdrantPointId": 6451,
+    "aliasRows": 3294,
+    "representationIdCanonicalColumnPresent": false
+  },
+  "classification": {
+    "mutuallyExclusive": true,
+    "counts": {
+      "CURRENT_CANONICAL": 0,
+      "STALE_REVISION": 0,
+      "DUPLICATE_CURRENT": 0,
+      "DUPLICATE_STALE": 0,
+      "LEGACY_ALIAS_RESOLVABLE": 0,
+      "PLACEHOLDER_BACKFILL": 1,
+      "ORPHAN": 59,
+      "UNRESOLVED": 328288
+    },
+    "total": 328348,
+    "interpretation": "Zero CURRENT/STALE/duplicate-current/duplicate-stale means zero rows met the required revision/hash proof; it does not prove that stale or duplicate rows are absent. Identity-only matches without complete comparable revision evidence are UNRESOLVED."
+  },
+  "resolvedBy": {
+    "qdrantId": 222529,
+    "chunkId": 16897,
+    "atlasPacketKeyMatched": 88863,
+    "packetKeyToUniqueCodebaseChunk": 0,
+    "packetKeyWithAmbiguousChunk": 0,
+    "sourceRevisionAndHash": 0,
+    "sourceHash": 0,
+    "declaredAlias": 0,
+    "prefixAlias": 0,
+    "representationIdObserved": 324981
+  },
+  "qdrantIdSourceRef": {
+    "matchedPointIds": 222529,
+    "exactSourceRef": 220115,
+    "pathEquivalent": 2412,
+    "mismatchOrMissing": 2
+  },
+  "qdrantPayloadCoverage": {
+    "sourceRevision": 30,
+    "workspaceRevision": 30,
+    "representationId": 324981,
+    "representationRevision": 219251,
+    "contentHashScope": 0,
+    "contentHashAlgorithm": 0,
+    "contentHash": 325550,
+    "chunkId": 243281,
+    "packetKey": 328348
+  },
+  "qdrantPayloadShape": {
+    "contentHashLengthCounts": {
+      "16": 79777,
+      "64": 245773
+    },
+    "packetKeyPrefixes": {
+      "packet": 38567,
+      "acePacket": 67770,
+      "other": 222011,
+      "missing": 0
+    },
+    "sourceRevisionPresence": {
+      "missing": 328318,
+      "present": 30
+    }
+  },
+  "identityResolutionAttempts": {
+    "PACKET_KEY_ONLY": 87968,
+    "CHUNK_ID": 16897,
+    "AMBIGUOUS_CHUNK_ID": 895,
+    "QDRANT_ID": 222529,
+    "NONE": 59
+  },
+  "packetKeyAliasAudit": {
+    "declaredAliasRows": 3294,
+    "aliasKinds": {
+      "PREFIX_DIVERGENCE_ACE_PACKET": 3294
+    },
+    "declaredAliasTargetsPresentInAtlasPackets": 3294,
+    "qdrantPayloadAliasMatches": 0,
+    "qdrantPrefixAliasMatches": 0,
+    "atlasPacketKeyForms": {
+      "packet": 58362,
+      "acePacket": 3294,
+      "other": 62
+    },
+    "suffixesPresentUnderBothPrefixes": 0
+  },
+  "safeguards": {
+    "staleRequiresSameLogicalIdentityAndSameHashScopeAndAlgorithm": true,
+    "qdrantIdEqualityAloneDoesNotMeanCurrent": true,
+    "aliasesResolvedOnlyByDeclaredAliasOrExactPacketPrefixCounterpart": true,
+    "representationIdAloneIsNotCanonicalIdentity": true,
+    "noRandomIdsCreated": true,
+    "noRegistryRowsWritten": true,
+    "noPointPayloadOrVectorChanged": true
+  },
+  "writeEffects": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "unresolvedReason": "Rows without matching source revision plus comparable hash scope/algorithm are not promoted to current or stale; ambiguous and identity-only matches remain unresolved.",
+  "runStartedAt": "2026-09-24T16:30:02.997Z",
+  "postgresColumnsObserved": {
+    "codebaseQdrantId": true,
+    "codebaseChunkId": true,
+    "codebaseHashScope": true,
+    "codebaseHashAlgorithm": true,
+    "codebaseSourceRevision": true,
+    "codebaseWorkspaceRevision": true,
+    "codebaseRepresentationRevision": true,
+    "packetAliasTable": true
+  }
+}

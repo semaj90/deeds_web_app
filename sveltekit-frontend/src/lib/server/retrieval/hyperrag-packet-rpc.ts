@@ -145,6 +145,23 @@ type NesPacketRow = {
   payload: Record<string, unknown> | null;
 };
 
+/**
+ * Resolve only caller/database-owned packet identity. Transport IDs, source
+ * paths, Qdrant point IDs, and array positions are projections and cannot be
+ * promoted to packet identity at this boundary.
+ */
+export function resolveCanonicalHyperRagPacketIdentity(row: Record<string, unknown>): {
+  packetKey: string;
+  sourceRef: string;
+} | null {
+  const packetKey = cleanText(row.packet_key ?? row.packetKey ?? row.canonical_packet_key ?? row.canonicalPacketKey);
+  const sourceRef = cleanText(
+    row.source_ref ?? row.sourceRef ?? row.canonical_source_ref ?? row.canonicalSourceRef,
+  );
+  if (!packetKey || !sourceRef) return null;
+  return { packetKey, sourceRef };
+}
+
 let packetRpcPool: pg.Pool | null = null;
 
 function getPacketRpcPool(): pg.Pool {
@@ -402,13 +419,14 @@ function buildHyperRagPacketFromAtlasRow(
   rank: number,
   query: string,
 ): HyperRagPacketRpcPacket {
-  const sourceRef =
-    cleanText(row.source_ref) ||
-    cleanText(row.source_path) ||
-    cleanText(row.file_path) ||
-    cleanText(row.source_ref_key) ||
-    cleanText(row.packet_key) ||
-    `hyperrag:${rank}`;
+  const identity = resolveCanonicalHyperRagPacketIdentity({
+    packet_key: row.packet_key,
+    source_ref: row.source_ref,
+  });
+  if (!identity) {
+    throw new Error('HYPERRAG_CANONICAL_PACKET_IDENTITY_UNAVAILABLE');
+  }
+  const { packetKey, sourceRef } = identity;
   const featureId = canonicalFeatureId(
     row.feature_id,
     row.payload?.feature_id,
@@ -433,7 +451,7 @@ function buildHyperRagPacketFromAtlasRow(
 
   return {
     packet_id: row.packet_id,
-    packet_key: cleanText(row.packet_key) || sourceRef,
+    packet_key: packetKey,
     packet_ulid: row.packet_ulid,
     packet_type: 'chrom97',
     source_ref: sourceRef,
@@ -931,11 +949,13 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
 
   if (input.useExactMatchCache !== false) {
     const exactPackets = [...new Map(
-      (await loadAtlasPacketsForExactQuery(canonicalQuery)).map((row) => [
-        cleanText(row.packet_key) || cleanText(row.source_ref) || cleanText(row.packet_id) || cleanText(row.qdrant_point_id),
-        row,
-      ])
-    ).values()].filter((row) => Boolean(cleanText(row.packet_key) || cleanText(row.source_ref)));
+      (await loadAtlasPacketsForExactQuery(canonicalQuery))
+        .map((row) => [cleanText(row.packet_key), row] as const)
+        .filter(([packetKey]) => Boolean(packetKey)),
+    ).values()].filter((row) => Boolean(resolveCanonicalHyperRagPacketIdentity({
+      packet_key: row.packet_key,
+      source_ref: row.source_ref,
+    })));
 
     if (exactPackets.length > 0) {
       const packets = exactPackets
@@ -978,8 +998,9 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
 
   const canonicalPackets: HyperRagPacketRpcPacket[] = runtimeResult.packets.map((packet, index) => {
     const row = packet as Record<string, unknown>;
-    const packetKey = String(row.packet_key ?? row.packetKey ?? row.id ?? row.source_ref ?? `hyperrag:${index}`);
-    const sourceRef = String(row.source_ref ?? row.sourceRef ?? row.file_path ?? row.path ?? '');
+    const identity = resolveCanonicalHyperRagPacketIdentity(row);
+    if (!identity) return null;
+    const { packetKey, sourceRef } = identity;
     const titleId = (row.title_id ?? row.titleId ?? null) as string | null;
     const featureId = (row.feature_id ?? row.featureId ?? null) as string | null;
     const qdrantPointId = (row.qdrant_point_id ?? row.qdrantPointId ?? null) as string | null;
@@ -993,8 +1014,8 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       packet_key: packetKey,
       packet_ulid: (row.packet_ulid ?? row.packetUlid ?? null) as string | null,
       packet_type: 'chrom97',
-      source_ref: sourceRef || packetKey,
-      canonical_source_ref: sourceRef || packetKey,
+      source_ref: sourceRef,
+      canonical_source_ref: sourceRef,
       title_id: titleId,
       feature_id: featureId,
       feature_label: domainClass,
@@ -1021,7 +1042,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       verification_command: (row.verification_command ?? row.verify_command ?? null) as string | null,
       rank: index + 1,
     };
-  });
+  }).filter((packet): packet is HyperRagPacketRpcPacket => packet !== null);
 
   const trace = {
     retrieval_strategy: 'fusion' as const,

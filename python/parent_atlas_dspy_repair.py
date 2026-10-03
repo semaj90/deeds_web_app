@@ -11,6 +11,9 @@ validate the metric and data contracts without forcing GPU/LLM dependencies.
 
 from __future__ import annotations
 
+import hashlib
+import json
+import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
@@ -32,6 +35,244 @@ class RepairMetricObservationV1:
     false_edit_rate: float
     latency_budget_score: float
     cache_reuse_rate: float
+    # Set only from deterministic validator/operator receipts, never model text.
+    hard_gate_failures: tuple[str, ...] = ()
+
+
+def build_semantic_768_gepa_example_v1(input: Mapping[str, Any]) -> dict[str, Any]:
+    """Validate a metadata-only semantic retrieval example for GEPA.
+
+    This adapter deliberately accepts a vector checksum, never vector bytes. It
+    validates lineage and evaluation metadata but does not assert that a source
+    trace is canonical or admitted; callers must provide those upstream proofs.
+    """
+
+    def require_object(value: Any, label: str, expected: set[str]) -> dict[str, Any]:
+        if not isinstance(value, Mapping) or set(value) != expected:
+            raise ValueError(f"{label} must contain exactly {sorted(expected)}")
+        return dict(value)
+
+    def require_text(value: Any, label: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{label} must be a non-empty string")
+        if value.strip().lower() in {"unknown", "latest", "unset", "null"}:
+            raise ValueError(f"{label} must not use an unresolved placeholder")
+        return value.strip()
+
+    def require_sha256(value: Any, label: str) -> str:
+        text = require_text(value, label)
+        if not text.startswith("sha256:") or len(text) != 71:
+            raise ValueError(f"{label} must be sha256:<64 lowercase hex>")
+        if any(char not in "0123456789abcdef" for char in text[7:]):
+            raise ValueError(f"{label} must be sha256:<64 lowercase hex>")
+        return text
+
+    row = require_object(
+        input,
+        "input",
+        {"schema", "queryChecksum", "identity", "semanticRepresentation", "routing", "outcome", "evidenceRefs"},
+    )
+    if row["schema"] != "atlas.gepa-semantic-768-example.v1":
+        raise ValueError("schema must be atlas.gepa-semantic-768-example.v1")
+
+    identity = require_object(
+        row["identity"],
+        "identity",
+        {"sourceRef", "sourceRevision", "workspaceRevision", "contentHash", "packetKey", "canonicalId"},
+    )
+    identity = {
+        "sourceRef": require_text(identity["sourceRef"], "identity.sourceRef"),
+        "sourceRevision": require_sha256(identity["sourceRevision"], "identity.sourceRevision"),
+        "workspaceRevision": require_sha256(identity["workspaceRevision"], "identity.workspaceRevision"),
+        "contentHash": require_sha256(identity["contentHash"], "identity.contentHash"),
+        "packetKey": require_text(identity["packetKey"], "identity.packetKey"),
+        "canonicalId": require_text(identity["canonicalId"], "identity.canonicalId"),
+    }
+
+    semantic = require_object(
+        row["semanticRepresentation"],
+        "semanticRepresentation",
+        {"kind", "dimensions", "representationRevision", "modelRevision", "vectorChecksum"},
+    )
+    if semantic["kind"] != "semantic_768" or semantic["dimensions"] != 768:
+        raise ValueError("semanticRepresentation must be semantic_768 with 768 dimensions")
+    semantic = {
+        "kind": "semantic_768",
+        "dimensions": 768,
+        "representationRevision": require_text(
+            semantic["representationRevision"], "semanticRepresentation.representationRevision"
+        ),
+        "modelRevision": require_text(semantic["modelRevision"], "semanticRepresentation.modelRevision"),
+        "vectorChecksum": require_sha256(semantic["vectorChecksum"], "semanticRepresentation.vectorChecksum"),
+    }
+
+    routing = require_object(row["routing"], "routing", {"logicalLane", "executor"})
+    routing = {
+        "logicalLane": require_text(routing["logicalLane"], "routing.logicalLane"),
+        "executor": require_text(routing["executor"], "routing.executor"),
+    }
+    if routing["logicalLane"] == routing["executor"]:
+        raise ValueError("routing.executor must remain distinct from routing.logicalLane")
+
+    outcome = require_object(
+        row["outcome"],
+        "outcome",
+        {"recallAt10", "mrr", "validationPassed", "latencyMs"},
+    )
+    metrics: dict[str, float] = {}
+    for name in ("recallAt10", "mrr"):
+        value = outcome[name]
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+            or not 0 <= value <= 1
+        ):
+            raise ValueError(f"outcome.{name} must be finite and between 0 and 1")
+        metrics[name] = float(value)
+    latency = outcome["latencyMs"]
+    if isinstance(latency, bool) or not isinstance(latency, (int, float)) or not math.isfinite(latency) or latency < 0:
+        raise ValueError("outcome.latencyMs must be finite and non-negative")
+    if not isinstance(outcome["validationPassed"], bool):
+        raise ValueError("outcome.validationPassed must be boolean")
+
+    refs = row["evidenceRefs"]
+    if not isinstance(refs, list) or not refs:
+        raise ValueError("evidenceRefs must be a non-empty list")
+    evidence_refs = sorted({require_text(ref, "evidenceRefs[]") for ref in refs})
+    if identity["sourceRef"] not in evidence_refs:
+        raise ValueError("evidenceRefs must include identity.sourceRef")
+
+    normalized: dict[str, Any] = {
+        "schema": "atlas.gepa-semantic-768-example.v1",
+        "queryChecksum": require_sha256(row["queryChecksum"], "queryChecksum"),
+        "identity": identity,
+        "semanticRepresentation": semantic,
+        "routing": routing,
+        "outcome": {
+            **metrics,
+            "validationPassed": outcome["validationPassed"],
+            "latencyMs": float(latency),
+        },
+        "evidenceRefs": evidence_refs,
+    }
+    identity_bytes = json.dumps(
+        {
+            "sourceRef": identity["sourceRef"],
+            "sourceRevision": identity["sourceRevision"],
+            "contentHash": identity["contentHash"],
+            "representationRevision": semantic["representationRevision"],
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    normalized["evidenceIdentityChecksum"] = "sha256:" + hashlib.sha256(identity_bytes).hexdigest()
+    return normalized
+
+
+def validate_dspy_repair_output_v1(
+    output: Mapping[str, Any],
+    *,
+    context_manifest_checksum: str,
+    allowed_evidence_refs: Sequence[str],
+    allowed_target_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Fail closed unless structured DSPy output cites only supplied manifest IDs.
+
+    This is a boundary validator, not a ContextManifest parser or evidence
+    owner. The TypeScript caller must derive the checksum and allowlists from
+    the exact admitted manifest and invoke this before accepting a proposal.
+    Free-text fields remain proposals; they do not authorize source access or
+    edits without a separate deterministic validator.
+    """
+    expected_fields = {
+        "schema",
+        "contextManifestChecksum",
+        "diagnosis",
+        "targetCandidates",
+        "patchPlan",
+        "validationPlan",
+        "evidenceRefs",
+    }
+    if not isinstance(output, Mapping) or set(output) != expected_fields:
+        raise ValueError(f"repair output must contain exactly {sorted(expected_fields)}")
+    if output["schema"] != "atlas.dspy-repair-output.v1":
+        raise ValueError("schema must be atlas.dspy-repair-output.v1")
+
+    def require_text(value: Any, label: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"{label} must be a non-empty string")
+        return value.strip()
+
+    def require_sha256(value: Any, label: str) -> str:
+        text = require_text(value, label)
+        if (
+            len(text) != 71
+            or not text.startswith("sha256:")
+            or any(char not in "0123456789abcdef" for char in text[7:])
+        ):
+            raise ValueError(f"{label} must be sha256:<64 lowercase hex>")
+        return text
+
+    actual_manifest_checksum = require_sha256(
+        output["contextManifestChecksum"], "contextManifestChecksum"
+    )
+    expected_manifest_checksum = require_sha256(
+        context_manifest_checksum, "expected context_manifest_checksum"
+    )
+    if actual_manifest_checksum != expected_manifest_checksum:
+        raise ValueError("CONTEXT_MANIFEST_CHECKSUM_MISMATCH")
+
+    def require_allowlist(values: Sequence[str], label: str) -> set[str]:
+        if isinstance(values, (str, bytes)) or not isinstance(values, Sequence) or not values:
+            raise ValueError(f"{label} must be a non-empty sequence")
+        normalized = [require_text(value, f"{label}[]") for value in values]
+        if len(normalized) != len(set(normalized)):
+            raise ValueError(f"{label} contains duplicate identifiers")
+        return set(normalized)
+
+    allowed_refs = require_allowlist(allowed_evidence_refs, "allowed_evidence_refs")
+    allowed_targets = require_allowlist(allowed_target_ids, "allowed_target_ids")
+
+    def require_unique_refs(
+        value: Any,
+        label: str,
+        allowed: set[str],
+        error_code: str,
+        *,
+        sort: bool,
+    ) -> list[str]:
+        if not isinstance(value, list) or not value:
+            raise ValueError(f"{label} must be a non-empty list")
+        refs = [require_text(item, f"{label}[]") for item in value]
+        if len(refs) != len(set(refs)):
+            raise ValueError(f"{label} contains duplicate identifiers")
+        unknown = sorted(set(refs) - allowed)
+        if unknown:
+            raise ValueError(f"{error_code}: {unknown}")
+        return sorted(refs) if sort else refs
+
+    return {
+        "schema": "atlas.dspy-repair-output.v1",
+        "contextManifestChecksum": actual_manifest_checksum,
+        "diagnosis": require_text(output["diagnosis"], "diagnosis"),
+        "targetCandidates": require_unique_refs(
+            output["targetCandidates"],
+            "targetCandidates",
+            allowed_targets,
+            "UNAUTHORIZED_TARGET_ID",
+            sort=False,
+        ),
+        "patchPlan": require_text(output["patchPlan"], "patchPlan"),
+        "validationPlan": require_text(output["validationPlan"], "validationPlan"),
+        "evidenceRefs": require_unique_refs(
+            output["evidenceRefs"],
+            "evidenceRefs",
+            allowed_refs,
+            "UNAUTHORIZED_EVIDENCE_REF",
+            sort=True,
+        ),
+    }
 
 
 def _p(value: float) -> float:
@@ -42,7 +283,27 @@ def _p(value: float) -> float:
 
 
 def atlas_repair_score_v1(observation: RepairMetricObservationV1) -> tuple[float, str]:
-    """Return a normalized 0..1 score plus textual feedback for GEPA."""
+    """Return receipt-derived score/feedback; hard safety failures always score zero."""
+    allowed_hard_failures = {
+        "FABRICATED_EVIDENCE",
+        "PERMISSION_VIOLATION",
+        "UNSAFE_MUTATION",
+    }
+    unknown_failures = sorted(set(observation.hard_gate_failures) - allowed_hard_failures)
+    if unknown_failures:
+        raise ValueError(f"unknown hard gate failure codes: {unknown_failures}")
+
+    hard_failures = list(observation.hard_gate_failures)
+    if not observation.targeted_tests_passed:
+        hard_failures.append("TARGETED_TEST_FAILURE")
+    if not observation.typecheck_passed:
+        hard_failures.append("TYPECHECK_FAILURE")
+    if not observation.regression_free:
+        hard_failures.append("REGRESSION")
+    hard_failures = sorted(set(hard_failures))
+    if hard_failures:
+        return 0.0, "Hard gate failure(s): " + ", ".join(hard_failures)
+
     score = (
         0.15 * _p(observation.retrieval_recall_at_5)
         + 0.15 * _p(observation.localization_recall_at_5)
@@ -57,12 +318,6 @@ def atlas_repair_score_v1(observation: RepairMetricObservationV1) -> tuple[float
     )
 
     failures: list[str] = []
-    if not observation.targeted_tests_passed:
-        failures.append("targeted tests failed")
-    if not observation.typecheck_passed:
-        failures.append("typecheck failed")
-    if not observation.regression_free:
-        failures.append("regression detected")
     if observation.exact_evidence_coverage < 0.8:
         failures.append("exact evidence coverage below 0.8")
     if observation.localization_recall_at_5 < 0.8:

@@ -23,6 +23,7 @@ export interface RetrievalCacheIdentityV1 {
 	candidateSnapshotRevision: string;
 	ordinalMapChecksum: string;
 	representationRevision: string;
+	featureRevision: string;
 	retrievalPolicyRevision: string;
 	contextPolicyRevision: string;
 	graphRevision?: string | null;
@@ -37,6 +38,7 @@ export const aceTopkRevisionedKeyV1 = (identity: RetrievalCacheIdentityV1): stri
 		candidateSnapshotRevision: identity.candidateSnapshotRevision,
 		ordinalMapChecksum: identity.ordinalMapChecksum,
 		representationRevision: identity.representationRevision,
+		featureRevision: identity.featureRevision,
 		retrievalPolicyRevision: identity.retrievalPolicyRevision,
 		contextPolicyRevision: identity.contextPolicyRevision,
 		graphRevision: identity.graphRevision ?? null,
@@ -110,6 +112,72 @@ export const bifrostRetrievalCacheKeyV2 = (identity: {
 	});
 	const digest = createHash('sha256').update(canonical).digest('hex');
 	return `bifrost:retrieval:v2:${digest}`;
+};
+
+/** Strict server-authoritative identity for retrieval cache v3.
+ * Keep v2 unchanged: it is a legacy compatibility namespace, not a fallback
+ * for a v3 lookup.
+ */
+export interface BifrostRetrievalCacheIdentityV3 {
+	queryHash: string;
+	workspaceRevision: string;
+	candidateSnapshotRevision: string;
+	ordinalMapChecksum: string;
+	representationRevision: string;
+	featureRevision: string;
+	retrievalPolicyRevision: string;
+	contextPolicyRevision: string;
+	graphRevision: string | null;
+	modelRevision: string;
+	dimension: number;
+}
+
+export const bifrostRetrievalCacheKeyV3 = (identity: BifrostRetrievalCacheIdentityV3): string => {
+	const required = [
+		identity.queryHash,
+		identity.workspaceRevision,
+		identity.candidateSnapshotRevision,
+		identity.ordinalMapChecksum,
+		identity.representationRevision,
+		identity.featureRevision,
+		identity.retrievalPolicyRevision,
+		identity.contextPolicyRevision,
+		identity.modelRevision,
+	];
+	if (required.some((value) => typeof value !== 'string' || value.trim().length === 0)) {
+		throw new Error('BIFROST_RETRIEVAL_V3_IDENTITY_INCOMPLETE');
+	}
+	if (!Number.isInteger(identity.dimension) || identity.dimension < 1) {
+		throw new Error('BIFROST_RETRIEVAL_V3_DIMENSION_INVALID');
+	}
+	const canonical = JSON.stringify({
+		queryHash: identity.queryHash,
+		workspaceRevision: identity.workspaceRevision,
+		candidateSnapshotRevision: identity.candidateSnapshotRevision,
+		ordinalMapChecksum: identity.ordinalMapChecksum,
+		representationRevision: identity.representationRevision,
+		featureRevision: identity.featureRevision,
+		retrievalPolicyRevision: identity.retrievalPolicyRevision,
+		contextPolicyRevision: identity.contextPolicyRevision,
+		graphRevision: identity.graphRevision,
+		modelRevision: identity.modelRevision,
+		dimension: identity.dimension,
+	});
+	const digest = createHash('sha256').update(canonical).digest('hex');
+	return `bifrost:retrieval:v3:${digest}`;
+};
+
+/** No identity preserves the legacy unrevisioned behavior. A supplied but
+ * mismatched strict identity disables cache access; it never falls back to v2.
+ */
+export const bifrostRetrievalCacheLookupKey = (
+	queryHash: string,
+	identity?: BifrostRetrievalCacheIdentityV3,
+	disableLegacyFallback = false,
+): string | null => {
+	if (!identity) return disableLegacyFallback ? null : `bitfrost:retrieval:${queryHash}`;
+	if (identity.queryHash !== queryHash) return null;
+	return bifrostRetrievalCacheKeyV3(identity);
 };
 
 export const bifrostEligibilityKey = (

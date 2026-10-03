@@ -1,4 +1,9 @@
-import { runChatCompletion } from '$lib/server/ai/openai-facade.js';
+import {
+  runChatCompletion,
+  type RevisionedExactAnswerCacheOptionsV1,
+  type InferenceReplayPolicyV1,
+  type InferenceReplayResultV1,
+} from '$lib/server/ai/openai-facade.js';
 import type { OpenAIChatCompletionRequest } from '$lib/server/ai/openai-types.js';
 import {
   getCachedStreamResponse,
@@ -12,6 +17,21 @@ export interface StreamCacheOptions {
   maxTokens?: number;
   chunkSize?: number;
   chunkDelayMs?: number;
+}
+
+export interface StreamProviderOptions {
+  userId?: string;
+  useMcp?: boolean;
+  /**
+   * Strict caller-owned handoff. When present, the facade owns the exact
+   * revisioned completion cache; the legacy message-only stream cache is
+   * deliberately bypassed.
+   */
+  revisionedExactAnswerCache?: RevisionedExactAnswerCacheOptionsV1;
+  /** Internal-only; bypasses both read and write sides of the stream cache. */
+  replayPolicy?: InferenceReplayPolicyV1;
+  /** Metadata-only replay observer; never receives prompt or response text. */
+  onReplayResult?: (result: Omit<InferenceReplayResultV1, 'response'>) => void;
 }
 
 export interface OpenAISseChunk {
@@ -62,7 +82,7 @@ export async function* streamFromCachedCompletion(
 
 export async function* streamFromProviderAndCache(
   req: OpenAIChatCompletionRequest,
-  opts: { userId?: string; useMcp?: boolean } = {},
+  opts: StreamProviderOptions = {},
   options: StreamCacheOptions = {}
 ): AsyncGenerator<{ content: string; done: boolean; cached?: boolean }> {
   const normalizedMessages = req.messages.map((message) => ({
@@ -78,18 +98,29 @@ export async function* streamFromProviderAndCache(
     chunkDelayMs: options.chunkDelayMs,
   };
 
-  const cached = await getCachedStreamResponse(normalizedMessages, cacheOptions);
-  if (cached !== null) {
-    for await (const chunk of streamCachedResponse(cached, cacheOptions)) {
-      yield { content: chunk.content, done: chunk.done, cached: true };
+  // A strict V2 handoff must never be shadowed by the legacy message-only
+  // cache. runChatCompletion computes the rendered-request and generation
+  // signatures and performs the revision-qualified exact-answer lookup.
+  if (!opts.revisionedExactAnswerCache && !opts.replayPolicy) {
+    const cached = await getCachedStreamResponse(normalizedMessages, cacheOptions);
+    if (cached !== null) {
+      for await (const chunk of streamCachedResponse(cached, cacheOptions)) {
+        yield { content: chunk.content, done: chunk.done, cached: true };
+      }
+      return;
     }
-    return;
   }
 
   const response = await runChatCompletion(req, opts);
   const content = response.choices?.[0]?.message?.content ?? '';
 
-  await storeCachedStreamResponse(normalizedMessages, content, cacheOptions);
+  // Strict V2 completions are owned by the revision-qualified exact-answer
+  // cache inside runChatCompletion. Do not also write the legacy
+  // message-only stream cache: that would create an unqualified alias that
+  // can be reused after the admitted source or model identity changes.
+  if (!opts.revisionedExactAnswerCache && !opts.replayPolicy) {
+    await storeCachedStreamResponse(normalizedMessages, content, cacheOptions);
+  }
 
   const chunkSize = options.chunkSize ?? 5;
   const chunkDelayMs = options.chunkDelayMs ?? 0;

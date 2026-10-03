@@ -1,0 +1,17 @@
+{
+  "schema": "parent-atlas.doc-13-live-ambiguity-census.v1",
+  "generatedAt": "2026-09-23T21:14:00Z",
+  "gate": "DOC-13",
+  "readOnly": true,
+  "canonicalAuthority": false,
+  "query": "WITH names AS (SELECT v.symbol_version_id, v.source_revision, x.kind, x.name FROM public.atlas_symbol_registry r JOIN public.atlas_symbol_versions v ON v.stable_symbol_id=r.stable_symbol_id CROSS JOIN LATERAL (VALUES ('qualified',r.canonical_qualified_name),('bare',r.canonical_name),('key',r.canonical_key)) x(kind,name) WHERE r.status='active' AND v.source_revision ~ '^sha256:[0-9a-f]{64}$' AND v.workspace_revision ~ '^sha256:[0-9a-f]{64}$' AND NULLIF(btrim(x.name),'') IS NOT NULL), groups AS (SELECT kind,name,source_revision,count(DISTINCT symbol_version_id) n FROM names GROUP BY kind,name,source_revision) SELECT kind,count(*) FILTER(WHERE n>1),coalesce(max(n),0),count(*) FROM groups GROUP BY kind ORDER BY kind",
+  "liveResults": {
+    "qualifiedName": { "ambiguousNameRevisionGroups": 20, "maxSymbolVersionsInGroup": 4, "totalNameRevisionGroups": 372 },
+    "bareName": { "ambiguousNameRevisionGroups": 20, "maxSymbolVersionsInGroup": 4, "totalNameRevisionGroups": 372 },
+    "canonicalKey": { "ambiguousNameRevisionGroups": 0, "maxSymbolVersionsInGroup": 1, "totalNameRevisionGroups": 402 }
+  },
+  "interpretation": "Broader live ambiguity exists beyond the previously exercised four-candidate group. This is a census, not proof that all 20 groups were individually passed through the resolver. Preserve fail-closed AMBIGUOUS behavior.",
+  "resolverReplay": "Existing bounded four-candidate ambiguity fixture remains the only individually replayed group.",
+  "writesPerformed": false,
+  "nextGate": "DOC_13_BROAD_AMBIGUITY_RESOLVER_REPLAY"
+}

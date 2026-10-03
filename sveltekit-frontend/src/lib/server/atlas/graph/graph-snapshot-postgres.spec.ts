@@ -122,7 +122,9 @@ describe('canonical graph snapshot postgres loader', () => {
     const pool = makePool();
     const loaded = await loadCanonicalGraphSnapshotInputFromPostgres(pool, {
       snapshotId,
-      workspaceId: 'workspace:parent-atlas',
+      workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc',
+      executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83',
+      repositoryId: 'repo:root',
       sourceInventorySnapshotId: 'inventory:2026-07-23T12:00:00Z',
       identityContractVersion: 'identity-contract-v1',
       parserContractVersion: 'tree-sitter-typescript-v1',
@@ -137,7 +139,9 @@ describe('canonical graph snapshot postgres loader', () => {
 
     const materialized = await materializeCanonicalGraphSnapshotFromPostgres(pool, {
       snapshotId,
-      workspaceId: 'workspace:parent-atlas',
+      workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc',
+      executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83',
+      repositoryId: 'repo:root',
       sourceInventorySnapshotId: 'inventory:2026-07-23T12:00:00Z',
       identityContractVersion: 'identity-contract-v1',
       parserContractVersion: 'tree-sitter-typescript-v1',
@@ -172,7 +176,9 @@ describe('canonical graph snapshot postgres loader', () => {
 
     const loaded = await loadCanonicalGraphSnapshotInputFromPostgres(pool, {
       snapshotId,
-      workspaceId: 'workspace:parent-atlas',
+      workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc',
+      executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83',
+      repositoryId: 'repo:root',
       sourceInventorySnapshotId: 'inventory:2026-07-23T12:00:00Z',
       identityContractVersion: 'identity-contract-v1',
       parserContractVersion: 'tree-sitter-typescript-v1',
@@ -203,7 +209,9 @@ describe('canonical graph snapshot postgres loader', () => {
 
     await expect(loadCanonicalGraphSnapshotInputFromPostgres(pool, {
       snapshotId,
-      workspaceId: 'workspace:parent-atlas',
+      workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc',
+      executionId: '74d50c86-8194-45ea-8c3d-61aab737ef83',
+      repositoryId: 'repo:root',
       sourceInventorySnapshotId: 'inventory:2026-07-23T12:00:00Z',
       identityContractVersion: 'identity-contract-v1',
       parserContractVersion: 'tree-sitter-typescript-v1',

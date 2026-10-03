@@ -1,0 +1,66 @@
+{
+  "schema": "atlas.legacy-summary-census.v1",
+  "gate": "LEGACY-SUMMARY-01",
+  "mode": "READ_ONLY",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "repositoryId": "deeds-web-app",
+  "tally": {
+    "totalLegacy": 40306,
+    "cleanDetector": 39247,
+    "quarantined": 10416,
+    "cleanAndQuarantined": 10309,
+    "cleanNotQuarantined": 28938,
+    "cleanNotQuarantinedLineageBound": 330,
+    "cleanNotQuarantinedUnqualified": 28608,
+    "contaminatedNotQuarantined": 952,
+    "byClass": {
+      "LEGACY_QUARANTINED": 10416,
+      "LEGACY_HINT_UNQUALIFIED": 28608,
+      "LEGACY_HINT_LINEAGE_BOUND": 330,
+      "LEGACY_CONTAMINATED": 952
+    },
+    "contaminationReasons": {
+      "CONTROL_TOKEN_LEAK": 230,
+      "PROMPT_SCAFFOLD_LEAK": 357,
+      "REASONING_LEAK": 127,
+      "PLACEHOLDER_PATTERN": 342,
+      "TOO_SHORT": 4
+    },
+    "models": {
+      "null": 28194,
+      "gemma4-legal-iq4xs": 590,
+      "gemma4-legal-iq4xs-direct.gguf": 154
+    }
+  },
+  "conservation": {
+    "classified": 40306,
+    "total": 40306,
+    "pass": true
+  },
+  "shardPath": ".tmp/atlas/legacy-summary-census-v1/census-20260926T080031Z.ndjson",
+  "shardSha256": "sha256:66ffbe64d95a039e89ccf235aa04593a2f4c6af5ef351388dea1e846279cc5c2",
+  "readOnlyGuard": {
+    "populations": {
+      "st": {
+        "before": 0,
+        "after": 0,
+        "unchanged": true
+      },
+      "se": {
+        "before": 1160,
+        "after": 1160,
+        "unchanged": true
+      },
+      "chunks": {
+        "before": 274465,
+        "after": 274465,
+        "unchanged": true
+      }
+    },
+    "pass": true,
+    "databaseWrites": 0,
+    "modelCalls": 0
+  },
+  "semantics": "quarantine overrides detector; none is CURRENT; summary digest is exact bytes; lineage-bound != describes current source",
+  "generatedAt": "2026-09-26T08:00:45.349Z"
+}

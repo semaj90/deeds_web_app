@@ -1,0 +1,221 @@
+{
+  "schema": "atlas.file-content-hash-parity-proof.v1",
+  "generatedAt": "2026-09-15T15:24:11.596Z",
+  "mode": "READ_ONLY",
+  "gate": "parent-atlas-chunk-index-whole-file-hash task 4.1",
+  "admittedExecutionId": "14667026-459c-4a99-b3c2-c20b739a6e0d",
+  "admittedWorkspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+  "sampleSize": 20,
+  "counts": {
+    "exactMatches": 19,
+    "mismatches": 0,
+    "readFailures": 1
+  },
+  "status": "PARITY_PROOF_MISMATCH_FOUND",
+  "rows": [
+    {
+      "sourceRef": "$lib/utils/file-reader.ts",
+      "relativePath": "$lib/utils/file-reader.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "c4a196813c7d8f4ea0e22645135cc5c8df9a36a547a494ebad502c060d7550f6",
+      "liveComputedHash": null,
+      "byteLength": null,
+      "readError": "ENOENT: no such file or directory, open 'C:\\Users\\james\\Videos\\deeds-web-app\\$lib\\utils\\file-reader.ts'",
+      "exactMatch": false
+    },
+    {
+      "sourceRef": "2-CONTEXT.md",
+      "relativePath": "2-CONTEXT.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "cb1332629b3c4a4fdfe657ef0deb73ff0ba98ebda13c5035601728aa806a22c0",
+      "liveComputedHash": "cb1332629b3c4a4fdfe657ef0deb73ff0ba98ebda13c5035601728aa806a22c0",
+      "byteLength": 3848,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "724_agents.md",
+      "relativePath": "724_agents.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "12f1094952ee8e746851ad0cab8ba554b72efbe780180d0c213f8f4f2d391db3",
+      "liveComputedHash": "12f1094952ee8e746851ad0cab8ba554b72efbe780180d0c213f8f4f2d391db3",
+      "byteLength": 1957,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ACE-BITFROST-WORKER-INTEGRATION.md",
+      "relativePath": "ACE-BITFROST-WORKER-INTEGRATION.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "e7f11e4963bb6375162861013792c58cbb8362a6e4977d253c3d4a7dbd64fe46",
+      "liveComputedHash": "e7f11e4963bb6375162861013792c58cbb8362a6e4977d253c3d4a7dbd64fe46",
+      "byteLength": 14657,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "relativePath": "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "9a75bd39d28fc8637aa7157b4d82d080c753c89e2a839d6ac580b84fb62084bb",
+      "liveComputedHash": "9a75bd39d28fc8637aa7157b4d82d080c753c89e2a839d6ac580b84fb62084bb",
+      "byteLength": 8615,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-pipeline-audit.mjs",
+      "relativePath": "ace-pipeline-audit.mjs",
+      "workspaceRevisionMatches": true,
+      "storedHash": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
+      "liveComputedHash": "5cc3b8a9898183caf6737e76db62e752825c61b4a9cf6787da790753f8b29aae",
+      "byteLength": 7691,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ACE-QUICK-REFERENCE.md",
+      "relativePath": "ACE-QUICK-REFERENCE.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+      "liveComputedHash": "e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09",
+      "byteLength": 9117,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "relativePath": "ACE-SUMMARY-LATENCY-IMPACT.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12",
+      "liveComputedHash": "0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12",
+      "byteLength": 10542,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "relativePath": "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "c2e5915a56d0e6796e225287c273ce2f966081144fb7df01752b22bb0ebb8dd5",
+      "liveComputedHash": "c2e5915a56d0e6796e225287c273ce2f966081144fb7df01752b22bb0ebb8dd5",
+      "byteLength": 13526,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "relativePath": "ace-vector-selection-slice/INTEGRATION-NOTES.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "c576c133480c8176ef653133f6d31b754a08cb6a1394638e8b39880c1e8fda45",
+      "liveComputedHash": "c576c133480c8176ef653133f6d31b754a08cb6a1394638e8b39880c1e8fda45",
+      "byteLength": 1866,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.test.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
+      "liveComputedHash": "c0fc88df8ae64ca10552f7ed9c7fe092b628d54094e9bb94b030c7099d4fe206",
+      "byteLength": 1819,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/ranking/packet-feature-matrix.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
+      "liveComputedHash": "baf50b8d924093f5c49093bd0e80510fad09c4375c62d64940050c7b557d9a8b",
+      "byteLength": 3392,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.test.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
+      "liveComputedHash": "6a53014b0921708bef346d5ddf8e95e8a63625d65aa14fdcf7f2ddb0eecfb0b2",
+      "byteLength": 1163,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/vector/ace-packet-vector.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+      "liveComputedHash": "740cb7b9c3a76f3476121788b7c5e131c473eda0904352ca90de50be37d4e45a",
+      "byteLength": 2523,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.test.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "ecbd66496dd1beb37da66089bcebdc7eeb8b0f3e309b1e85a1f3b005baa1aab4",
+      "liveComputedHash": "ecbd66496dd1beb37da66089bcebdc7eeb8b0f3e309b1e85a1f3b005baa1aab4",
+      "byteLength": 1369,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+      "relativePath": "ace-vector-selection-slice/src/lib/server/ace/vector/turbovec-interpolation.ts",
+      "workspaceRevisionMatches": true,
+      "storedHash": "d7d78f61fc3996466f11830354b0037ae3a2b5c88edefe1a62efc76a3dcf95a7",
+      "liveComputedHash": "d7d78f61fc3996466f11830354b0037ae3a2b5c88edefe1a62efc76a3dcf95a7",
+      "byteLength": 3289,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+      "relativePath": "AGENTIC-WORKFLOW-PLAN-SUMMARY.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "bf305a991489525ac3e1c2c18fef782e3a238d98429a1eeb23ac0aa8a61c284f",
+      "liveComputedHash": "bf305a991489525ac3e1c2c18fef782e3a238d98429a1eeb23ac0aa8a61c284f",
+      "byteLength": 9517,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "AGENTS.md",
+      "relativePath": "AGENTS.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "548e69a882b09bd9bc2c9af11ff0e0792d80f27d2ccdd2bceb841e971f5da0fb",
+      "liveComputedHash": "548e69a882b09bd9bc2c9af11ff0e0792d80f27d2ccdd2bceb841e971f5da0fb",
+      "byteLength": 15388,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "apply-parent-atlas-policy-bundle.ps1",
+      "relativePath": "apply-parent-atlas-policy-bundle.ps1",
+      "workspaceRevisionMatches": true,
+      "storedHash": "3ab9b3e509c4b94678fe985a05d8f6780f8d365fe2f63871469f009b49eaa9fd",
+      "liveComputedHash": "3ab9b3e509c4b94678fe985a05d8f6780f8d365fe2f63871469f009b49eaa9fd",
+      "byteLength": 1034,
+      "readError": null,
+      "exactMatch": true
+    },
+    {
+      "sourceRef": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+      "relativePath": "ARCHITECTURAL-CORRECTION-PHASE-102.md",
+      "workspaceRevisionMatches": true,
+      "storedHash": "122b926002d15fff0193ee07ec3e4da7f8f3c4cd986cdcab1c90e59db822c783",
+      "liveComputedHash": "122b926002d15fff0193ee07ec3e4da7f8f3c4cd986cdcab1c90e59db822c783",
+      "byteLength": 10213,
+      "readError": null,
+      "exactMatch": true
+    }
+  ],
+  "error": null,
+  "writesPerformed": false,
+  "postgresWrites": false,
+  "reportChecksum": "ac6f8345f312b128ba203ca518aede89f1c24eeba6702197ba145c19dc413e60"
+}

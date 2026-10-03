@@ -148,6 +148,7 @@ export const a2aProjectionReceiptSchema = z.object({
   workflow_revision: z.number().int().nonnegative(),
   action_id: id,
   sequence: z.number().int().nonnegative(),
+  atlas_task_id: id,
   task_id: id,
   context_id: id,
   protocol_release: z.literal(A2A_RELEASE_VERSION),
@@ -215,6 +216,7 @@ function artifactForAtlasRef(event: WorkflowActionEventV1, artifactRef: string):
  */
 export function workflowEventToA2aWire(input: {
   event: z.input<typeof workflowActionEventSchema>;
+  taskAttempt: { taskId: string; runId: string; executionReceiptId: string | null };
   task_id: string;
   context_id: string;
   timestamp?: string;
@@ -225,6 +227,15 @@ export function workflowEventToA2aWire(input: {
   receipt: A2aProjectionReceiptV1;
 } {
   const event = workflowActionEventSchema.parse(input.event);
+  const taskAttempt = z.object({
+    taskId: id,
+    runId: id,
+    executionReceiptId: id.nullable(),
+  }).strict().parse(input.taskAttempt);
+  if (taskAttempt.runId !== event.runId) throw new Error('A2A_TASK_ATTEMPT_RUN_MISMATCH');
+  if (taskAttempt.executionReceiptId !== (event.receiptId ?? null)) {
+    throw new Error('A2A_TASK_ATTEMPT_RECEIPT_MISMATCH');
+  }
   const status = a2aTaskStatusSchema.parse({
     state: stateForWorkflowEvent(event),
     timestamp: input.timestamp,
@@ -236,6 +247,8 @@ export function workflowEventToA2aWire(input: {
     status,
     ...(artifacts.length > 0 ? { artifacts } : {}),
     metadata: {
+      atlasTaskId: taskAttempt.taskId,
+      atlasRunId: taskAttempt.runId,
       atlasWorkflowId: event.workflowId,
       atlasWorkflowRevision: event.workflowRevision,
       atlasActionId: event.actionId,
@@ -282,6 +295,7 @@ export function workflowEventToA2aWire(input: {
     workflow_revision: event.workflowRevision,
     action_id: event.actionId,
     sequence: event.sequence,
+    atlas_task_id: taskAttempt.taskId,
     task_id: input.task_id,
     context_id: input.context_id,
     protocol_release: A2A_RELEASE_VERSION,

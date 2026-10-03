@@ -100,11 +100,30 @@ convention) once the two salvage items above are copied out — do not archive t
 
 ## T3 — Phase 3 gate (semantic_768 trust, before any RFF work)
 
-- [ ] Confirm (not assume) `parent-atlas-semantic-768-canonical-contract`'s outstanding drift item
+- [x] Confirm (not assume) `parent-atlas-semantic-768-canonical-contract`'s outstanding drift item
       is closed: EmbeddingGemma raw output == 768, Qdrant `semantic_768` collection dim == 768, no
-      384-dim runtime dependence in the active retrieval path.
+      384-dim runtime dependence in the active retrieval path. All 3 confirmed live, 2026-09-22:
+      `curl :11434/api/embed` with `embeddinggemma:latest` → raw output dim 768. `curl
+      :6333/collections/codebase_chunks_768_v2` → all 3 named vectors (`content`/`error`/
+      `signature`) are size 768. 384-dim dependence: read `resolve-embedding-lane.ts` and
+      `embedding-service.ts` directly rather than trusting the grep-hit count (19 files match the
+      literal string `384`, mostly retirement/guard code) — every live code path that can see a
+      384-dim signal (explicit `embedding_lane` field, `vector_name`, `collection` name, or raw
+      `dimension`) returns `lane: null, reason: LEGACY_DIMENSION_EXPLICIT_ONLY` and
+      `embedQueryForLane('dense_384', ...)` throws `EMBEDDING_LANE_RETIRED` immediately. These are
+      fail-closed guards against 384, not runtime dependence on it.
 - [ ] Confirm L1/L2 (in-process + Bifrost) precomputed-vector caches are validated for dimension,
-      not just a cold Ollama health probe.
+      not just a cold Ollama health probe. **Checked, and the real finding is more basic than the
+      question assumed: neither cache is implemented at all.** `embedding-service.ts`'s
+      `getL1Cache()`/`setL1Cache()`/`getL2Cache()` (the functions `embedQueryForLane`'s dense_768
+      non-strict path reads/writes through) are stub placeholders — every Redis/Bifrost call
+      inside them is commented out, and each function unconditionally `return null` /
+      no-ops. `embedQueryForLane` is genuinely live (12 real callers incl. `trace-mcp-server.ts`,
+      `unified-orchestrator.ts`, `semantic-768.ts`), so every production call through this path is
+      a cold Ollama fetch today regardless of the `cached`/`cache_level` fields the result type
+      advertises. There is no dimension-validation gap to close on the cache read path — there is
+      no cache read path yet. Leaving this open (not closing it) since the task as written asks to
+      confirm validation exists, and the honest answer is it doesn't exist to validate.
 - [ ] Do not proceed to T7 (RFF) until this task is checked off with live evidence, not assumption.
 
 ## T4 — Phase 4 / RF6 (RRF ownership — coordinate with `parent-atlas-retrieval-fusion-reachability`)
@@ -160,9 +179,11 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       directly against the live DB (`docker exec -i legal-ai-postgres psql ... < 0099_*.sql`) —
       completed cleanly, every object already exists so it's a safe no-op (`NOTICE: relation ...
       already exists, skipping` for every statement, zero errors).
-- [ ] No other SQL in the repo currently uses `isfinite()` on a numeric column (confirmed via the
-      same grep) — this is a two-file problem, not a systemic one. No broader sweep needed unless
-      new SQL is written copying the old pattern.
+- [x] Repository-wide SQL compatibility sweep completed for PostgreSQL 18. The orphaned root
+      `src/lib/server/graph/pagerank-promotion-gate.ts` mirror was still emitting `isfinite(...)`;
+      it now uses the same explicit NaN/Infinity comparison as the frontend owner. Remaining
+      `isfinite` matches are application-language numeric checks or historical documentation,
+      not PostgreSQL SQL. No database writes occurred.
 
 ## T6 — Phase 6 (staged FeatureRow)
 
@@ -294,7 +315,10 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       (`docs/reports/proto-registry-audit.json`, 2026-07-04: 13 proto files, 12 services, 61 RPC
       methods, 61 rows written to Postgres + Qdrant + Redis each). The report's `- [ ]` on these
       three lines is wrong; only the two retrieval-wiring checkboxes below are genuinely open.
-- [ ] Verify what currently populates `RouterObservation.availableTools` before replacing it.
+- [x] Verify what currently populates `RouterObservation.availableTools` before replacing it. Evidence:
+  `scripts/atlas/audit-router-observation-tool-owner-v1.mjs` and
+  `docs/reports/router-observation-tool-owner-v1.json` confirm the Phase 1 route owns it through
+  the static `MOCK_TOOL_REGISTRY`; no MCP/Qdrant/Neo4j discovery replacement was made.
 - [ ] Wire a Qdrant top-K query over the 61 packetized RPC-method manifests
       (`domain_class=mcp_agents`) ranked by embedding similarity to the current query, as the new
       `availableTools` source — this is the "Gemma4 gets top-K tools, not flat 300+" goal the
@@ -320,14 +344,17 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
       types + tests), `cartridge/glyph-tile-engine.ts` + `glyph-mappers.ts`, `engram-bigram.ts` /
       `engram-memory.ts` (confirmed compiled into the production build), and a fully-generated
       `docs/okf/parent-atlas/` bundle with a real `gaps/` directory.
-- [ ] File a correction against `parent-atlas-okf-knowledge-layers` — its README says
+- [x] File a correction against `parent-atlas-okf-knowledge-layers` — its README says
       `PARENT_ATLAS_KNOWLEDGE_GAP_AUDIT_V1` is "design/audit only, not yet implemented," but
       `docs/okf/parent-atlas/index.md` already exists with `status: PARTIAL_PROVEN` and 9 real gap
-      writeups. One of the two documents is stale; reconcile in that change, not here.
-- [ ] Before designing any new 4D-manifold, hypergraph, token-remap, glyph-cache, or Engram
+      writeups. One of the two documents is stale; reconcile in that change, not here. Evidence:
+      `docs/reports/agentic-repair-okf-reconciliation-v1.json`; the README now records partial
+      materialization while leaving runtime validation and promotion incomplete.
+- [x] Before designing any new 4D-manifold, hypergraph, token-remap, glyph-cache, or Engram
       mechanism anywhere in this change (especially Phase 15's HMM work, which already touches
       `manifold4` via `quaternion-manifold.ts::hmmAxisMultiplier()`), read the files listed above
-      first — do not duplicate them.
+      first — do not duplicate them. Evidence: `docs/reports/agentic-repair-owner-census-v1.json`;
+      existing owners were inventoried read-only and no new mechanism was introduced.
 - [x] Confirmed still genuinely absent, no correction needed: Kafka CDC (zero `kafka` hits in
       `sveltekit-frontend/src/`), softcap/Ewin-Tang ℓ2-sampling (zero hits), and
       "isoquant"/"quanterion" as distinct concepts (likely conflation with the real, documented
@@ -345,18 +372,20 @@ JS) found exactly 4 hits repo-wide: this change's own docs, one unrelated Python
 - [x] Confirmed the brief's "next 10 actions" list matches this document's Phase 1/2/4/6/10/11/12/14
       ordering for items 1–9. Item 10 (OpenWiki/module-crawler work) is genuinely out of scope for
       this change — flagged for `parent-atlas-okf-knowledge-layers` or a new sibling instead.
-- [ ] New graph-traversal sub-scope surfaced by the brief, not previously itemized here: Louvain/
+- [x] New graph-traversal sub-scope surfaced by the brief, not previously itemized here: Louvain/
       Leiden community detection, canonical community-taxonomy records, taxonomy-aware BFS,
       personalized PageRank, weighted-Dijkstra baseline, semantic best-first search. All belong
       under Phase 2/3's existing scope (graph traversal + structural features) — do not design
       these until `parent-atlas-graph-retrieval-proof`'s identity split unblocks Phase 2/3 (same
       blocker already recorded for the rest of that phase).
-- [ ] Quaternion/similarity-learning-before-Qdrant, TurboQuant-after-frozen-embedding sequencing
+- [x] Quaternion/similarity-learning-before-Qdrant, TurboQuant-after-frozen-embedding sequencing
       note captured in proposal.md — cross-check against `parent-atlas-semantic-768-canonical-
       contract` before any future embedding-specialization work, don't quantize a moving target.
-- [ ] Check whether `kag record_agent_run` (from the brief) and Phase 14's
+- [x] Check whether `kag record_agent_run` (from the brief) and Phase 14's
       `record-repair-episode.mts` (once the bundle exists) should be unified into one tool instead
-      of two overlapping learning-flywheel entry points.
+      of two overlapping learning-flywheel entry points. Evidence:
+      `docs/reports/agentic-repair-run-recording-ownership-v1.json`; only
+      `kag.record_agent_run` exists in this checkout, so no second writer is introduced.
 - [ ] **G4 (fresh Graphify revision)** — promoted from a proposal.md note to an actual task since
       it's been independently flagged three times this session: the brief's gate checklist twice,
       and this session's own `[Graph stale]` hook warnings showing `codebase-graph.json` at

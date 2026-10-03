@@ -455,8 +455,13 @@
     },
     {
       "label": "🌲 XGBoost Reranker Sidecar :8765 (detached)",
-      "type": "shell",
-      "command": "pwsh -NoProfile -Command \"$p = Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue; if ($p) { Write-Host '⚡ XGBoost reranker already listening on :8765'; exit 0 }; if (-not (Test-Path 'models/xgboost-reranker.ubj')) { Write-Host '⚠️ models/xgboost-reranker.ubj missing — run: npm run atlas:xgboost:train'; exit 0 }; New-Item -ItemType Directory -Force -Path logs/sidecars | Out-Null; Start-Process python -ArgumentList 'scripts/atlas/serve-xgboost-reranker.py' -WorkingDirectory '${workspaceFolder}' -WindowStyle Hidden -Environment @{PYTHONIOENCODING='utf-8'} -RedirectStandardOutput 'logs/sidecars/xgboost-reranker.out.log' -RedirectStandardError 'logs/sidecars/xgboost-reranker.err.log'; Start-Sleep 3; $h = Invoke-RestMethod http://127.0.0.1:8765/health -ErrorAction SilentlyContinue; if ($h.model_loaded) { Write-Host \\\"⚡ XGBoost reranker :8765 started (model_type=$($h.model_type))\\\" } else { Write-Host '⚠️ XGBoost reranker did not respond — see logs/sidecars/xgboost-reranker.err.log' }\"",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        "scripts/atlas/start-xgboost-reranker-sidecar-v1.ps1"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -472,7 +477,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Idempotent detached start: serves models/xgboost-reranker.ubj (NDCG@10 = 0.9731) on :8765. Cascade Stage 4 flips rerank_source from 'gemma4' to 'xgboost' once /health returns model_loaded=true."
+      "detail": "Idempotent detached start: serves models/xgboost-reranker.ubj on :8765. Missing model is an optional skip; occupied port must pass /health with model_loaded=true; attempted startup that fails readiness exits non-zero."
     },
     {
       "label": "Dev Server",
@@ -1206,7 +1211,7 @@
     {
       "label": "Retrieval Plane: Karpathy GPU Rank Refresh",
       "type": "shell",
-      "command": "npm run karpathy:gpu",
+      "command": "npm run karpathy:gpu:admitted",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2010,7 +2015,8 @@
     {
       "label": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "type": "shell",
-      "command": "node scripts/startup/run-graphify-daily-startup.mjs",
+      "command": "npm run graphify:daily:dry",
+      "detail": "CEI-20: was the frontend maintenance wrapper (sveltekit-frontend/scripts/startup/run-graphify-daily-startup.mjs). Now the canonical graphify:daily family in READ-ONLY dry-run mode; production apply is a deliberate manual npm run graphify:daily (root wrapper: admission then apply chain).",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
@@ -2041,6 +2047,30 @@
         "reveal": "silent",
         "focus": false,
         "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false
+      }
+    },
+    {
+      "label": "🌅 Startup: Daily Graphify Gate + Karpathy GPU (gated, 24h cycle)",
+      "type": "shell",
+      "command": "$root = (Get-Location).Path; $stamp = Join-Path $root 'logs/task-output/.graphify-daily-apply-last-run'; $cooldownSec = 86400; $log = Join-Path $root 'logs/task-output/graphify-daily-apply-latest.log'; if ((Test-Path $stamp) -and ((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalSeconds -lt $cooldownSec) { Write-Host ('Graphify/Karpathy startup cycle skipped - last cycle ' + [int]((Get-Date) - (Get-Item $stamp).LastWriteTime).TotalHours + ' h ago') } else { New-Item -Path (Join-Path $root 'logs/task-output') -ItemType Directory -Force | Out-Null; $pgUp = $false; for ($i = 0; $i -lt 36; $i++) { docker exec legal-ai-postgres pg_isready -U legal_admin -d legal_ai_db 2>$null | Out-Null; if ($LASTEXITCODE -eq 0) { $pgUp = $true; break }; Start-Sleep -Seconds 5 }; if (-not $pgUp) { Write-Host 'Graphify/Karpathy startup cycle SKIPPED - Postgres not ready after 180s (will retry next open; no stamp written)' } else { Push-Location sveltekit-frontend; npm run graphify:validate 2>&1 | Tee-Object $log | Select-Object -Last 8; $gate = $LASTEXITCODE; if ($gate -ne 0) { Write-Host 'Graphify/Karpathy startup cycle SKIPPED - graphify:validate failed (critical service down; no stamp written)' } else { npm run graphify:daily 2>&1 | Tee-Object -Append $log | Select-Object -Last 12; $d = $LASTEXITCODE; if ($d -ne 0) { Write-Host ('GRAPHIFY BLOCKED (exit ' + $d + '; admission is NOT_SAFE_TO_PROJECT); no Graphify projection was applied; continuing with independent Karpathy Redis enrichment') } else { Write-Host 'GRAPHIFY APPLY PASS' }; npm run karpathy:gpu:admitted 2>&1 | Tee-Object -Append $log | Select-Object -Last 8; $k = $LASTEXITCODE; if ($k -eq 0) { Set-Content $stamp (Get-Date -Format o); if ($d -eq 0) { Write-Host 'STARTUP CYCLE COMPLETE: Graphify apply PASS; Karpathy enrichment PASS; 24h cycle cooldown recorded' } else { Write-Host ('STARTUP CYCLE PARTIAL: Graphify BLOCKED (exit ' + $d + '); Karpathy enrichment PASS; 24h cycle cooldown recorded; Graphify is not complete') } } else { Write-Host ('KARPATHY ENRICHMENT FAILED (exit ' + $k + ') - see ' + $log + '; no cycle stamp written') } }; Pop-Location } }",
+      "detail": "Folder-open cycle, operator-approved. Wait for Postgres, then graphify:validate. graphify:daily checks canonical projection admission and fails closed before apply unless SAFE_TO_PROJECT. The independent karpathy:gpu:admitted Redis enrichment still runs after Graphify's result. Output reports each outcome separately; the cycle stamp is written only after Karpathy succeeds and suppresses this combined cycle for 24h, even if Graphify was blocked. PARTIAL is not Graphify success. The separate dry-run task remains the read-only default.",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+        "instanceLimit": 1
+      },
+      "isBackground": true,
+      "dependsOn": "🩺 Startup: Service Health Check",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "dedicated",
         "showReuseMessage": false,
         "clear": false
       }
@@ -2180,28 +2210,26 @@
       "detail": "Preview agents:pipeline output — write:dry → enrich:dry → ingest:dry. No file IO, no Redis writes, no Postgres writes."
     },
     {
-      "label": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
+      "label": "🛠️ Manual: ACE Incremental Refresh (operator-requested)",
       "type": "shell",
       "command": "npm run startup:ace:detached",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "runOptions": {
-        "runOn": "folderOpen",
+        "runOn": "userRequest",
         "instanceLimit": 1
       },
-      "isBackground": true,
-      "dependsOn": "🗺️ Startup: Auto-Map Codebase (graphify:daily)",
       "problemMatcher": [],
       "presentation": {
-        "echo": false,
-        "reveal": "never",
+        "echo": true,
+        "reveal": "always",
         "focus": false,
         "panel": "dedicated",
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "Detached fork of scripts/startup/ace-incremental-startup.mjs. Two lanes: (1) INCREMENTAL — git diff vs ace:startup:last_sha → agents:pipeline:dry → agents:pipeline:safe → topology:validate → graph:synthesize, lock-protected via Redis lock:startup:ace-refresh. (2) HEAVY — only fires when TurboQuant :8090 OR Ollama :11434 is healthy AND last heavy run was >24h ago, runs graphify:authority/gds/cluster-summaries/bow-tiles. Policy denylist in config/startup-ace-policy.json refuses destructive commands. Logs to logs/task-output/pipeline-test/startup-latest.json."
+      "detail": "Manual only: invokes scripts/startup/ace-incremental-startup.mjs under config/startup-ace-policy.json. This orchestrator can write Redis/Postgres state, run indexing/graph/cache steps, spawn services, and attempt a GPU-gated heavy lane. Review its plan/log first; it is intentionally not a folder-open dependency."
     },
     {
       "label": "🚀 ACE Startup: Manual Refresh (force, foreground)",
@@ -2225,7 +2253,7 @@
     {
       "label": "🧠 Karpathy GPU: Top-50 Authority Blend",
       "type": "shell",
-      "command": "npm run karpathy:gpu",
+      "command": "npm run karpathy:gpu:admitted",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
@@ -2348,7 +2376,6 @@
         "instanceLimit": 1
       },
       "isBackground": true,
-      "dependsOn": "🚀 Startup: ACE Incremental Refresh (detached, safe)",
       "problemMatcher": [],
       "presentation": {
         "echo": false,
@@ -2358,7 +2385,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs after ACE incremental refresh has primed the caches. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green when the full chain runs; skipped when the dev server is down."
+      "detail": "16-probe regression gate over the atlas → context_for_file → hypergraph search → /api/ace/recommendations chain. Runs independently of the manual ACE incremental refresh. 30-min cooldown via logs/task-output/.atlas-smoke-last-run stamp. Catches schema drift, dual-DB confusion, empty hypergraph_edges, and stale Redis caches in one shot — green when the full chain runs; skipped when the dev server is down."
     },
     {
       "label": "🔥 Startup: Seed Hit-Demand (chunk_hit_log → Redis, detached)",
@@ -10793,6 +10820,22 @@
       "problemMatcher": []
     },
     {
+      "label": "🌉 BitFrost: Semantic Cache Warm Report (read-only, no writes)",
+      "type": "shell",
+      "command": "npm run atlas:bitfrost-semantic-cache:warm",
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "group": "test",
+      "detail": "Manual-only, NOT runOn:folderOpen. Writes docs/reports/bitfrost-semantic-cache-warm.{json,md} showing what WOULD warm for llama-server synthesis cache hits, given current atlas_higher_hop_index rows. Performs ZERO Redis writes -- scripts/atlas/warm-bitfrost-semantic-cache.mjs's --apply path is permanently hard-blocked in source (REVISION_BOUND_ACE_PACKET_IDENTITY_REQUIRED) until the ACE packet residency owner / ContextManifest admission chain (ACE-PRODUCER-TRACE-01 -> ACE-BITFROST-CALLER-01 -> ACE-BITFROST-CANARY-01, see openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md) exists. This task is visibility only, not real warming -- do not add --apply to this command until that chain is built. The live, already-self-warming cache for llama-server chat responses is the separate Bifrost L1 Redis exact-match + L2 semantic cache (bifrostChat(), :3040) -- it needs no warm step.",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🔗 Graphify: Deep Import Graph (cycles + orphans + hotspots)",
       "type": "shell",
       "command": "npm run graphify:deep",
@@ -11797,15 +11840,15 @@
       "detail": "Phase 85 P5: Dry-run feature label extraction from 18,046 atlas_packets. Verifies 100% canonical feature_id + feature_label coverage. Zero writes, safe to run on startup."
     },
     {
-      "label": "🚀 Phase 85 P6: Summary Generation (Startup Dry-Run)",
+      "label": "🚀 Phase 85 P6: Summary Generation (Manual Dry-Run)",
       "type": "shell",
-      "command": "npm run atlas:p6:rebuild:summaries:dry -- --limit=25",
+      "command": "npm run atlas:p6:rebuild:summaries:768:dry -- --limit=25",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend"
       },
       "isBackground": true,
       "runOptions": {
-        "runOn": "folderOpen"
+        "runOn": "default"
       },
       "problemMatcher": [],
       "presentation": {
@@ -11927,6 +11970,28 @@
         "clear": false
       },
       "detail": "Phase B: Asynchronous EmbeddingGemma worker. Consumes summaries from RabbitMQ atlas.enrichment.embedding queue, computes 768-dim embeddings via Ollama, logs analysis_pass_results, updates atlas_summary_layers. Runs continuously. Stop with Ctrl+C."
+    },
+    {
+      "label": "🧠 OpenCode: Atlas Residency Proof (read-only)",
+      "type": "shell",
+      "command": "opencode run --command atlas-residency-proof --agent ornith-atlas-kernel --format json",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": false,
+      "runOptions": {
+        "runOn": "userRequest"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "detail": "Runs the existing OpenCode agent against the bounded unified-residency proof. The command is read-only and does not use --auto; no migration, datastore, projection, cleanup, or GPU-state mutation is authorized."
     }
   ]
 }

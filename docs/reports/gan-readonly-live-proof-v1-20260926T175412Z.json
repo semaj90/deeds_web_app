@@ -1,0 +1,302 @@
+{
+  "schema": "atlas.gan-readonly-live-proof.v1",
+  "generatedAt": "2026-09-26T17:54:12.960Z",
+  "proofMode": true,
+  "dryRun": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "writes": {
+    "postgres": 0,
+    "redis": 0,
+    "nats": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "status": "GAN_LIVE_READ_ONLY_PROVEN",
+  "proofLevel": "LIVE_READ_ONLY",
+  "note": "Proves the real validator ran on every real row inside one READ ONLY snapshot. It does not prove the rows are valid; findings below are reported, not fixed.",
+  "transaction": {
+    "isolation": "REPEATABLE READ",
+    "readOnly": true,
+    "rolledBack": true,
+    "writeAttemptRefused": true,
+    "refusalSqlState": "25006"
+  },
+  "injected": {
+    "dbInjected": true,
+    "dbReadSucceeded": true,
+    "redisInjected": false,
+    "natsInjected": false,
+    "orchestratorReadPathUsed": false,
+    "why": "orchestrator.readPacketsFromPostgres prefilters the audited fields to NOT NULL, selects columns absent from the live table, and swallows errors into []"
+  },
+  "proof": {
+    "rowsRead": 61718,
+    "packetsValidated": 61718,
+    "postgresWrites": 0,
+    "redisWrites": 0,
+    "natsPublishes": 0
+  },
+  "consistency": {
+    "validatorProcessedEqualsRowsRead": true,
+    "rowsReadEqualsSqlTotal": true,
+    "hardPlusPassedEqualsRead": true,
+    "sqlExpectedMissingPacketKeyEqualsValidator": true,
+    "sqlExpectedInvalidSourceRefEqualsValidator": true,
+    "sqlExpectedMissingFeatureIdEqualsValidator": true
+  },
+  "census": {
+    "total": 61718,
+    "missing_packet_key": 0,
+    "missing_source_ref": 1,
+    "missing_feature_id": 0,
+    "source_ref_fails_validator_regex": 56724,
+    "null_workspace_revision_key": 45567,
+    "null_source_revision": 45567,
+    "missing_summary": 54832,
+    "null_embedding": 59,
+    "distinct_packet_keys": 61718,
+    "packet_id_differs_from_packet_key": 3413,
+    "expected_invalid_source_ref": 56724,
+    "expected_missing_feature_id": 0,
+    "expected_missing_packet_key": 0,
+    "packetKeyFormats": [
+      {
+        "format": "packet:<12hex>",
+        "n": 58362
+      },
+      {
+        "format": "ace:packet:*",
+        "n": 3294
+      },
+      {
+        "format": "bare 16hex",
+        "n": 61
+      },
+      {
+        "format": "other",
+        "n": 1
+      }
+    ],
+    "validatorSourceRefRejectionsByExtension": [
+      {
+        "ext": "json",
+        "n": 14041
+      },
+      {
+        "ext": "md",
+        "n": 10138
+      },
+      {
+        "ext": "(none)",
+        "n": 5823
+      },
+      {
+        "ext": "ts",
+        "n": 3575
+      },
+      {
+        "ext": "svelte",
+        "n": 2667
+      },
+      {
+        "ext": "py",
+        "n": 2516
+      },
+      {
+        "ext": "mjs",
+        "n": 2407
+      },
+      {
+        "ext": "png",
+        "n": 1487
+      },
+      {
+        "ext": "timestamp",
+        "n": 942
+      },
+      {
+        "ext": "jsonl",
+        "n": 909
+      },
+      {
+        "ext": "txt",
+        "n": 846
+      },
+      {
+        "ext": "d",
+        "n": 821
+      }
+    ]
+  },
+  "validator": {
+    "hardFailures": 56724,
+    "passed": 4994,
+    "hardByReason": {
+      "invalid_source_ref": 56724
+    },
+    "hardByProbe": {
+      "ADV002": 56724
+    },
+    "softWarnings": {
+      "missing_summary": 3628
+    },
+    "hardSamples": [
+      {
+        "packet_key": "packet:bb3563cefb17",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/GPU-ACCELERATION-IMPLEMENTATION.md"
+      },
+      {
+        "packet_key": "packet:8a91eee31142",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/artifacts/security-top-10-auth-remediation.md"
+      },
+      {
+        "packet_key": "packet:7183a9b81576",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/artifacts/phase_1_5_multi_domain_schema.sql"
+      },
+      {
+        "packet_key": "packet:46fa994e589f",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/K-MEANS-VS-KNN-DISTINCTION.md"
+      },
+      {
+        "packet_key": "packet:c2559414628d",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/GRAPHIFY-READINESS-ENDPOINTS.md"
+      },
+      {
+        "packet_key": "packet:6e767090dd08",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/graph/gph-proj-rtx-integration.md"
+      },
+      {
+        "packet_key": "packet:7068cf292309",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/FOUR-LANE-SEMANTIC-INDEXING-ALIGNMENT.md"
+      },
+      {
+        "packet_key": "packet:a0c07fee4e29",
+        "reason": "invalid_source_ref",
+        "source_ref": "sveltekit-frontend/docs/features/feature_trace-mcp.md"
+      }
+    ]
+  },
+  "schemaDrift": {
+    "orchestratorAssumedColumns": [
+      "packet_key",
+      "source_ref",
+      "feature_id",
+      "summary",
+      "title",
+      "embedding",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "missingLive": [
+      "title",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "consequence": "GanAuditOrchestrator step 1 selects title/ganValidated and step 3 updates ganValidated/ganValidationError/ganWarnings; against this table those statements error, and step 1 returns [] on error"
+  },
+  "adversarialReceipt": {
+    "path": "docs\\reports\\gan-adversarial-proof-v1-20260926T175156Z.json",
+    "sha256": "sha256:4b215984524e94ca3977fbdfd1e5bda653316a58f6e3035d3dc62cadcd974276",
+    "status": "ADVERSARIAL_FIXTURES_PROVEN",
+    "totals": {
+      "probes": 16,
+      "passed": 16,
+      "historical": 6,
+      "modern": 10,
+      "withControl": 15,
+      "withoutControl": [
+        "ADV016"
+      ]
+    },
+    "selfTests": {
+      "acceptedMaliciousInputDetected": true,
+      "wrongRejectionCodeDetected": true,
+      "rejectedBenignControlDetected": true,
+      "thrownErrorDetected": true,
+      "healthyProbeStillPasses": true
+    },
+    "knownGapCount": 7
+  },
+  "summary": {
+    "rowsRead": 61718,
+    "hardFailures": 56724,
+    "passed": 4994,
+    "hardByReason": {
+      "invalid_source_ref": 56724
+    },
+    "softTop": [
+      [
+        "missing_summary",
+        3628
+      ]
+    ],
+    "missingLiveColumns": [
+      "title",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "keyFormats": [
+      "packet:<12hex>=58362",
+      "ace:packet:*=3294",
+      "bare 16hex=61",
+      "other=1"
+    ],
+    "consistency": {
+      "validatorProcessedEqualsRowsRead": true,
+      "rowsReadEqualsSqlTotal": true,
+      "hardPlusPassedEqualsRead": true,
+      "sqlExpectedMissingPacketKeyEqualsValidator": true,
+      "sqlExpectedInvalidSourceRefEqualsValidator": true,
+      "sqlExpectedMissingFeatureIdEqualsValidator": true
+    }
+  },
+  "lanes": {
+    "authority": {
+      "status": "LIVE_READ_ONLY",
+      "measuredHere": true,
+      "findings": {
+        "hardFailures": 56724,
+        "missingIdentityFields": 1,
+        "duplicatePacketKeys": 0,
+        "nullWorkspaceRevisionKey": 45567,
+        "nullSourceRevision": 45567
+      }
+    },
+    "structuralLineage": {
+      "status": "BLOCKED",
+      "measuredHere": false,
+      "reason": "CHUNK_REVISION_QUALIFICATION_MISSING",
+      "evidence": "recorded finding (0 of 1,520 indexed chunk rows have an exact current source+workspace revision match; packet-level bridging proven); not re-measured by this runner"
+    },
+    "semanticProjection": {
+      "status": "NOT_EXERCISED",
+      "measuredHere": false,
+      "reason": "no Qdrant/embedding parity check in this runner"
+    },
+    "runtimeSideEffects": {
+      "status": "LIVE_READ_ONLY",
+      "measuredHere": true,
+      "findings": {
+        "writeAttemptRefused": true,
+        "postgresWrites": 0,
+        "redisWrites": 0,
+        "natsPublishes": 0
+      }
+    }
+  },
+  "masterStatus": "BLOCKED",
+  "masterReason": "structuralLineage lane BLOCKED and semanticProjection not exercised; an all-lane PROVEN result is not available"
+}

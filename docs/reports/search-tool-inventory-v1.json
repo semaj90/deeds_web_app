@@ -1,0 +1,360 @@
+{
+  "schema": "atlas.search-tool-inventory.v1",
+  "gate": "SEARCH-REINTEGRATION-01",
+  "generatedAt": "2026-09-19T16:40:16.104Z",
+  "mode": "READ_ONLY",
+  "status": "INVENTORY_PROVEN_READ_ONLY",
+  "summary": {
+    "totalTools": 9,
+    "registryMapped": 9,
+    "handlerMapped": 9,
+    "contractMapped": 9,
+    "callerInventoried": 9,
+    "ontologyObserved": 3,
+    "liveExposed": 9
+  },
+  "dispositionAudit": {
+    "allowed": [
+      "RESTORE",
+      "ADAPTER_ONLY",
+      "SUPERSEDED",
+      "KEEP_DISABLED",
+      "REMOVE_AFTER_CALLER_ZERO"
+    ],
+    "everyToolClassified": true,
+    "counts": {
+      "RESTORE": 0,
+      "ADAPTER_ONLY": 8,
+      "SUPERSEDED": 0,
+      "KEEP_DISABLED": 1,
+      "REMOVE_AFTER_CALLER_ZERO": 0
+    },
+    "noRestoreClaimed": true
+  },
+  "tools": [
+    {
+      "name": "kb.trace_search",
+      "family": "trace-core",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/new_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/new_tools.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts"
+      ],
+      "runtimeOwner": "TRACE MCP retrieval boundary; canonical join-back required",
+      "inputContract": "query:string, limit:1..20, intent?:string[]",
+      "outputContract": "bounded retrieval hits; raw output is not model context",
+      "identityRequirement": "sourceRef/sourceRevision/workspaceRevision/packetKey when packet-backed",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Canonical join-back and current source-revision authority remain unproven.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/lib/server/atlas/contracts/trace-mcp-tool-census-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/policy/policy-training.spec.ts",
+        "sveltekit-frontend/src/lib/server/auth/tool-authorization.ts",
+        "sveltekit-frontend/src/lib/server/router/viterbi-router.test.ts",
+        "sveltekit-frontend/src/mcp/new_tools.ts",
+        "sveltekit-frontend/src/mcp/server.ts",
+        "sveltekit-frontend/src/routes/api/agent/execute/+server.ts",
+        "sveltekit-frontend/src/routes/api/agent/route/+server.ts"
+      ],
+      "callerCount": 8,
+      "ontologyRegistrationFiles": [
+        "sveltekit-frontend/src/lib/server/auth/tool-authorization.ts"
+      ],
+      "ontologyRegistrationObserved": true,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "trace.kag_search",
+      "family": "trace-core",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "runtimeOwner": "TRACE MCP; Go Retrieval first, SvelteKit/PostgreSQL fallback",
+      "inputContract": "query:string, limit:1..50, topo_class?:string",
+      "outputContract": "bounded KAG retrieval envelope with identity metadata required for promotion",
+      "identityRequirement": "sourceRef/sourceRevision/workspaceRevision/packetKey when packet-backed",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Retrieval boundary is usable for bounded reads but current lineage promotion is blocked.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/lib/server/ace/ace-query-packet.spec.ts",
+        "sveltekit-frontend/src/lib/server/ace/adaptive-prefetch.ts",
+        "sveltekit-frontend/src/lib/server/ace/cache-keys.ts",
+        "sveltekit-frontend/src/lib/server/ace/hmm-wiki-logger.ts",
+        "sveltekit-frontend/src/lib/server/ace/tool-response-summarizer.ts",
+        "sveltekit-frontend/src/lib/server/ai/ace-schema-validator.ts",
+        "sveltekit-frontend/src/lib/server/ai/context-compression.ts",
+        "sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts",
+        "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-bridge.spec.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-bridge.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "sveltekit-frontend/src/lib/server/ai/tool-call-parser.spec.ts",
+        "sveltekit-frontend/src/lib/server/ai/tool-selection.ts",
+        "sveltekit-frontend/src/lib/server/ai/toon.ts",
+        "sveltekit-frontend/src/lib/server/atlas/pos-concept-tagging-lane.spec.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ai/kv-context-controller.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.spec.ts",
+        "sveltekit-frontend/src/lib/server/mcp/client.ts",
+        "sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts",
+        "sveltekit-frontend/src/lib/server/opencode/dispatch-router.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.spec.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.deprecated-filter.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/summary-card-retrieval.test.ts",
+        "sveltekit-frontend/src/lib/server/wiki/wiki-gap-analyzer.ts",
+        "sveltekit-frontend/src/mcp/dispatcher-middleware.ts",
+        "sveltekit-frontend/src/mcp/dispatcher-tool-integration.ts",
+        "sveltekit-frontend/src/mcp/ldr-research-tools.ts",
+        "sveltekit-frontend/src/mcp/new_tools.ts",
+        "sveltekit-frontend/src/mcp/server-fastmcp.ts",
+        "sveltekit-frontend/src/mcp/tools/trace-kag.tool.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/atlas/audit/+server.ts",
+        "sveltekit-frontend/src/routes/api/atlas/concept-tagging/server.route.test.ts",
+        "sveltekit-frontend/src/routes/api/tools/search/+server.ts"
+      ],
+      "callerCount": 39,
+      "ontologyRegistrationFiles": [
+        "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts",
+        "sveltekit-frontend/src/lib/server/ai/tool-selection.ts",
+        "sveltekit-frontend/src/lib/server/mcp/tool-ranker.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.spec.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.ts"
+      ],
+      "ontologyRegistrationObserved": true,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "codebase.rg_search",
+      "family": "codebase",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/codebase_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/codebase_tools.ts"
+      ],
+      "runtimeOwner": "SvelteKit MCP codebase tools via dispatcher middleware",
+      "inputContract": "query:string, include?:string, contextLines?:number",
+      "outputContract": "bounded diagnostic text; WORKTREE_DIAGNOSTIC unless admitted",
+      "identityRequirement": "sourceRef/sourceRevision required before canonical promotion",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Useful for dirty-worktree diagnostics; cannot establish canonical source authority.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts",
+        "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "sveltekit-frontend/src/lib/server/ai/tool-selection.ts",
+        "sveltekit-frontend/src/lib/server/atlas/temporal/temporal-recommendation-outcome-dag.integration.spec.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.spec.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.ts",
+        "sveltekit-frontend/src/mcp/codebase_tools.ts",
+        "sveltekit-frontend/src/routes/api/agent/route/+server.ts"
+      ],
+      "callerCount": 9,
+      "ontologyRegistrationFiles": [
+        "sveltekit-frontend/src/lib/server/ai/llama-tool-definitions.ts",
+        "sveltekit-frontend/src/lib/server/ai/tool-selection.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.spec.ts",
+        "sveltekit-frontend/src/lib/server/opencode/intent-router.ts"
+      ],
+      "ontologyRegistrationObserved": true,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "codebase.awk_analyze",
+      "family": "codebase",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/codebase_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/codebase_tools.ts"
+      ],
+      "runtimeOwner": "SvelteKit MCP codebase tools via dispatcher middleware",
+      "inputContract": "filePath:string, pattern:string, logic:string",
+      "outputContract": "bounded diagnostic text; no canonical writes",
+      "identityRequirement": "sourceRef/sourceRevision required before canonical promotion",
+      "disposition": "KEEP_DISABLED",
+      "dispositionReason": "Arbitrary AWK execution is not an admitted retrieval path.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/codebase_tools.ts"
+      ],
+      "callerCount": 1,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "research.web_search",
+      "family": "research",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts"
+      ],
+      "runtimeOwner": "SvelteKit MCP research adapter",
+      "inputContract": "query:string, engines?:string, limit?:number",
+      "outputContract": "provider/results text; external evidence, not canonical source authority",
+      "identityRequirement": "external evidence refs; no packet identity implied",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "External research evidence remains downstream and non-canonical.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "callerCount": 1,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "research.synthesize",
+      "family": "research",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/lib/server/ai/llama-server-model-resolver.ts"
+      ],
+      "runtimeOwner": "llama-server :8090; active model resolved at runtime",
+      "inputContract": "query:string, case_id?:uuid, temperature?:number, max_tokens?:number, skip_cache?:boolean",
+      "outputContract": "answer/usage metadata; synthesis is downstream of canonical ACE context",
+      "identityRequirement": "ContextManifest/PromptPlan identity required; no raw search injection",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Synthesis is downstream of canonicalized ACE context and llama-server ownership.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "callerCount": 1,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "research.deep_analyze",
+      "family": "research",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "runtimeOwner": "SvelteKit MCP research adapter and llama-server synthesis boundary",
+      "inputContract": "topic:string, depth?:'standard'|'exhaustive'",
+      "outputContract": "bounded multi-query research summary; no canonical writes",
+      "identityRequirement": "evidence refs required for any downstream claim",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Multi-query orchestration is not a source or retrieval authority.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/research_tools.ts"
+      ],
+      "callerCount": 1,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "trace.bifrost_dispatch",
+      "family": "bifrost",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/bifrost_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/bifrost_tools.ts"
+      ],
+      "runtimeOwner": "Bifrost routing adapter; Ollama embedding-only, llama-server chat-only",
+      "inputContract": "tier:'EMBED'|'RERANK'|'GENERATE_FAST'|'GENERATE_LONG', payload:record",
+      "outputContract": "provider response; executor receipt required before promotion",
+      "identityRequirement": "representation/executor/model revision and checksums required",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "Bifrost routes providers but does not own canonical identity or executor promotion.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/bifrost_tools.ts"
+      ],
+      "callerCount": 1,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    },
+    {
+      "name": "kb.rg_atlas_search",
+      "family": "rg-atlas",
+      "registryPaths": [
+        "sveltekit-frontend/src/mcp/rg_atlas_tools.ts"
+      ],
+      "handlerPaths": [
+        "sveltekit-frontend/src/mcp/rg_atlas_tools.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/run.ts"
+      ],
+      "runtimeOwner": "RG-Atlas adapter via runRgSearchAtlas",
+      "inputContract": "rgSearchAtlasOptionsSchema",
+      "outputContract": "runId/topHits/diagnostics; navigation or retrieval projection only",
+      "identityRequirement": "sourceRef/sourceRevision/workspaceRevision required for canonical promotion",
+      "disposition": "ADAPTER_ONLY",
+      "dispositionReason": "RG-Atlas is a bounded adapter/projection and cannot promote lineage.",
+      "registryEntryPresent": true,
+      "liveListExposure": true,
+      "callerFiles": [
+        "sveltekit-frontend/src/mcp/dispatcher-tool-integration.spec.ts",
+        "sveltekit-frontend/src/mcp/rg_atlas_tools.ts",
+        "sveltekit-frontend/src/mcp/server.ts"
+      ],
+      "callerCount": 3,
+      "ontologyRegistrationFiles": [],
+      "ontologyRegistrationObserved": false,
+      "canonicalAuthority": false,
+      "runtimeEnablementChanged": false,
+      "writesPerformed": false
+    }
+  ],
+  "authority": {
+    "runtimeEnablementChanged": false,
+    "canonicalAuthorityChanged": false,
+    "writesPerformed": false,
+    "promotionAuthorized": false,
+    "note": "Inventory and caller evidence do not enable, disable, or promote any search surface."
+  },
+  "nextGate": "SEARCH-REINTEGRATION-03_REINTEGRATION_PRECONDITIONS",
+  "evidenceChecksum": "sha256:6aecd69e86ed7da14d96a44e61ebb42fc99615d610c05efc0fbe92d82108c4a5"
+}

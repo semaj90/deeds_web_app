@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.openspec-workboard-run.v1",
+  "generatedAt": "2026-09-24T16:30:30Z",
+  "head": "e909640269",
+  "pivots": [
+    {
+      "from": "parent-atlas-versioned-doc-intelligence",
+      "progress": "42/48 complete; DOC-13, DOC-14, DOC-15, DOC-17, DOC-18, DOC-26 remain open",
+      "to": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "task": "LOD-01 read-only memory census",
+      "outcome": "partial evidence measured; task remains open because there is no current frozen SemanticSnapshotV1/ordinal map and several owner-specific memory metrics are unavailable",
+      "priorRunReport": "docs/reports/openspec-workboard-run-2026-09-24T160506Z.json"
+    },
+    {
+      "from": "parent-atlas-retrieval-lod-algorithm-taxonomy",
+      "progress": "52/104 complete; LOD-01 remains open",
+      "to": "parent-atlas-search-classifier-sidecar",
+      "task": "Resolve canonical packet-to-Qdrant identity and current source lineage",
+      "outcome": "full read-only Qdrant/Postgres scan completed; identity resolution is broad, but current/stale lineage cannot be proven from the live payload/schema",
+      "reason": "LOD census showed canonical Postgres, Qdrant, and TurboVec populations differ; exact point-ID parity is the upstream evidence needed before any snapshot or classifier promotion."
+    }
+  ],
+  "openSpecProgress": {
+    "parent-atlas-versioned-doc-intelligence": { "complete": 42, "total": 48, "remaining": 6 },
+    "parent-atlas-retrieval-lod-algorithm-taxonomy": { "complete": 52, "total": 104, "remaining": 52 },
+    "parent-atlas-search-classifier-sidecar": { "complete": 70, "total": 86, "remaining": 16 }
+  },
+  "qdrantPostgresIdentity": {
+    "receipt": "docs/reports/parent-atlas/qdrant-postgres-identity-reconciliation-2026-09-24T161547Z.json",
+    "status": "QDRANT_PG_IDENTITY_RECONCILIATION_MEASURED",
+    "collection": "codebase_chunks_768",
+    "pointsScanned": 328348,
+    "postgresCodebaseRows": 274465,
+    "postgresQdrantIdsUnique": 274465,
+    "exactQdrantIdMatches": 222529,
+    "qdrantPointsWithoutExactPostgresQdrantId": 105819,
+    "postgresQdrantIdsMissingFromQdrant": 51936,
+    "exactSourceRefMatchesAmongPointIdMatches": 220115,
+    "pathEquivalentSourceRefs": 2412,
+    "sourceRefMismatchOrMissing": 2,
+    "secondaryIdentity": {
+      "uniqueChunkIdMatches": 16897,
+      "ambiguousChunkIdMatches": 895,
+      "atlasPacketKeyMatches": 88863,
+      "packetKeysThatUniquelyResolveToCodebaseChunk": 0,
+      "sourceRevisionAndComparableHashMatches": 0,
+      "sourceAndComparableHashMatches": 0
+    },
+    "currentStaleAndProjectionClassification": {
+      "CURRENT_CANONICAL": 0,
+      "STALE_REVISION": 0,
+      "DUPLICATE_CURRENT": 0,
+      "DUPLICATE_STALE": 0,
+      "LEGACY_ALIAS_RESOLVABLE": 0,
+      "PLACEHOLDER_BACKFILL": 1,
+      "ORPHAN": 59,
+      "UNRESOLVED": 328288,
+      "importantQualification": "Zero current/stale/duplicate counts mean no point met the proof criteria; they do not prove such rows are absent. Most identity-only matches remain unresolved."
+    },
+    "hashAndRevisionEvidence": {
+      "qdrantPointsWithContentHash": 325550,
+      "qdrantHashLengths": { "16": 79777, "64": 245773 },
+      "qdrantContentHashScopeFields": 0,
+      "qdrantContentHashAlgorithmFields": 0,
+      "qdrantSourceRevisionFields": 30,
+      "postgresRowsWithSourceRevision": 0,
+      "postgresRowsWithWorkspaceRevision": 0,
+      "postgresRowsWithRepresentationRevision": 0,
+      "note": "Hash length alone is not scope/algorithm parity; stale classification was correctly withheld."
+    },
+    "packetKeyAlias": {
+      "declaredAliases": 3294,
+      "declaredAliasTargetsPresent": 3294,
+      "qdrantPointsMatchingDeclaredOrPrefixAlias": 0,
+      "atlasPacketSuffixesPresentUnderBothPrefixes": 0
+    },
+    "representation": {
+      "qdrantRepresentationIds": 324981,
+      "canonicalPostgresRepresentationIdColumn": false,
+      "useAsIdentity": false
+    },
+    "result": "Projection rows cannot be certified current or stale from existing payload provenance. Do not create random IDs, registry rows, or backfill/delete projection data."
+  },
+  "lod01Result": {
+    "status": "LOD_01_LIVE_CENSUS_PARTIAL",
+    "canonicalPostgresContentEmbedding768Rows": 219998,
+    "canonicalFloat32PayloadBytes": 675833856,
+    "turbovecSidecar": "327820 vectors; 64 dimensions; 4-bit; process working set and committed bytes are separately reported in the prior run receipt",
+    "fourGbTargetClaim": false,
+    "reason": "Canonical vectors, Qdrant points, and TurboVec index are not the same frozen cohort; ordinal map and Arrow/mmap resident measurements remain unavailable."
+  },
+  "validation": {
+    "reconciliationScriptSyntax": "PASS",
+    "fullReadOnlyQdrantScroll": "PASS; 328348 points; no vector payload fetched",
+    "postgresTransaction": "REPEATABLE READ READ ONLY; rolled back",
+    "openspecStrict": {
+      "parent-atlas-search-classifier-sidecar": "PASS",
+      "parent-atlas-retrieval-lod-algorithm-taxonomy": "PASS",
+      "parent-atlas-versioned-doc-intelligence": "PASS"
+    },
+    "scopedDiffCheck": "PASS"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "containerRebuilds": 0,
+    "graphifyRuns": 0,
+    "filesystem": "timestamped census and workboard receipts only"
+  },
+  "taskLedgerEdits": 0,
+  "commits": 0,
+  "pushes": 0,
+  "nextBlocker": "Source/workspace/representation lineage and comparable content-hash scope/algorithm must be populated and read back for a frozen cohort before current/stale projection status can be proven."
+}

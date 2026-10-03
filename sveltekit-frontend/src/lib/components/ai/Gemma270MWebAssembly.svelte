@@ -1,4 +1,4 @@
-<!-- VLM Image Analysis — Client ONNX embedding + Server YOLO + gemma4-legal VLM -->
+<!-- VLM Image Analysis — Client ONNX embedding + Server YOLO + Ornith 1.5 VLM -->
 <script lang="ts">
 	// Client-side AI imports (real infrastructure)
 	import { embedText, isEmbeddingModelReady } from '$lib/ai/client-embed.js';
@@ -233,7 +233,7 @@
 				} catch { /* YOLO service may be offline */ }
 			}
 
-			// Stage 4: VLM description via gemma4-legal (server-side Ollama)
+			// Stage 4: VLM description via Ornith 1.5 (llama-server :8090 + mmproj)
 			if (enableVlm && uploadedEvidenceId) {
 				analysisStep = 'vlm';
 				const startTime = performance.now();
@@ -296,7 +296,7 @@
 		{ id: 'embedding', label: 'Client Embed', desc: 'ONNX 768d', icon: 'cpu' },
 		{ id: 'uploading', label: 'MinIO Upload', desc: 'SHA-256 hash', icon: 'upload' },
 		{ id: 'yolo', label: 'YOLO', desc: 'Object detect', icon: 'scan' },
-		{ id: 'vlm', label: 'VLM', desc: 'gemma4-legal', icon: 'brain' },
+		{ id: 'vlm', label: 'VLM', desc: 'Ornith 1.5', icon: 'brain' },
 		{ id: 'entities', label: 'Entities', desc: 'LLM + regex', icon: 'file-text' }
 	] as const;
 
@@ -332,7 +332,7 @@
 		<div class="model-item">
 			<span class="i-lucide-brain w-3 h-3 inline-block"></span>
 			<span class="model-label">VLM:</span>
-			<span class="status-ok">gemma4-legal:latest</span>
+			<span class="status-ok">ornith-1.5-9b</span>
 		</div>
 		<div class="model-item">
 			<span class="i-lucide-scan w-3 h-3 inline-block"></span>

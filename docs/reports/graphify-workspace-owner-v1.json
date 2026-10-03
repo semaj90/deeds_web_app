@@ -1,6 +1,6 @@
 {
   "schema": "atlas.graphify-workspace-owner-v1",
-  "generatedAt": "2026-09-09T01:17:54.955Z",
+  "generatedAt": "2026-09-17T18:21:37.539Z",
   "readOnly": true,
   "canonicalWrites": false,
   "candidateOwner": "public.workspaces.id",
@@ -558,7 +558,7 @@
   ],
   "counts": {
     "workspaces": 1,
-    "graphify_runs": 19,
+    "graphify_runs": 20,
     "graphify_files": 26014
   },
   "conclusion": "Graphify run workspace identity is referentially bound to public.workspaces."

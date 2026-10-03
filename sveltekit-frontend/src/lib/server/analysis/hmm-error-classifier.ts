@@ -1,11 +1,37 @@
 /**
- * HMM Error Classifier
+ * HMM-style Error Classifier (STATUS: heuristic classifier, NOT a repair
+ * authority, NOT a recovery-packet selector -- verified 2026-09-14 against a
+ * broader agentic-repair architecture review; corrected here, not left
+ * silently mislabeled).
  *
- * Classifies error observation sequences into hidden error states.
- * CPU-only — no GPU, no LLM, no retrieval ranking.
+ * Naming correction: despite the function name `viterbiDecode` and the STATUS
+ * this file previously claimed ("Viterbi decode"), the forward pass below has
+ * NO transition matrix and NO backpointer -- it repeatedly multiplies each
+ * state's running score by that state's emission weight for the next
+ * observation (`scores[state] = scores[state] * emitWeight`), with no
+ * cross-state transition term at all. That is a naive per-state evidence
+ * accumulator, not a Viterbi decoder over a hidden state sequence (real
+ * Viterbi requires `scores[state] = max over prevState(scores[prevState] *
+ * transitionProb[prevState][state]) * emitWeight`). Useful as a classifier
+ * over observation evidence; not a sequence decoder. Kept the name
+ * `viterbiDecode` for now to avoid a wider rename across callers -- do not
+ * take the name as evidence the algorithm is actually Viterbi.
+ *
+ * Schema-misuse correction: `writeClusterClassification()` below writes
+ * `classification.suggestedAction` (a classifier LABEL, e.g. "retry" /
+ * "quarantine") into `error_cluster_groups.recovery_packet_key`, a column
+ * whose name and only other writer/reader convention
+ * (`src/lib/server/acp/ace-packet-swap.ts`) treat as an actual packet-key
+ * IDENTITY reference. As of this correction, `ace-packet-swap.ts` does NOT
+ * actually read this column live (its own comment: "In practice this would
+ * query error_cluster_groups for recovery_packet_key" -- it currently uses a
+ * self-test fallback instead), so this has not yet corrupted a live read
+ * path -- but do not add a live reader of `recovery_packet_key` that expects
+ * a real packet key until this column is either split (a separate label
+ * column) or this writer is corrected, whichever an operator decides.
  *
  * Flow:
- *   error_signal_stream rows → normalize observations → Viterbi decode
+ *   error_signal_stream rows → normalize observations → heuristic decode
  *   → emit ErrorState + confidence + suggestedAction
  *   → caller writes result to error_cluster_groups / error_suggestion_states
  *
@@ -13,6 +39,8 @@
  * - HMM classifies sequences only — it does NOT do retrieval ranking
  * - Always join on (error_class, model_name) pair — never error_class alone
  * - packet_key is immutable — classifier selects existing packets, never mutates
+ * - NOT repair authority: a passing classification here must never be treated
+ *   as authorization to select or swap a recovery packet on its own.
  */
 
 import { db } from '$lib/server/db/client.js';
@@ -253,6 +281,13 @@ export async function classifyErrorCluster(
 
 // ── Cluster group persistence ─────────────────────────────────────────────────
 
+/**
+ * NOTE (schema misuse, see file header): `classification.suggestedAction` is a
+ * classifier LABEL string (e.g. "retry"), written here into
+ * `recovery_packet_key` -- a column named and elsewhere treated as a real
+ * packet-key identity. Do not read this column expecting a valid packet key
+ * without first checking the file header's correction note.
+ */
 export async function writeClusterClassification(
   errorClass: string,
   modelName: string,

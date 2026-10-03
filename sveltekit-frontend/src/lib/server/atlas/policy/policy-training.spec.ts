@@ -186,6 +186,35 @@ describe('policy training export', () => {
     expect(row.finalOutcome).toBe('success');
   });
 
+  it.each([
+    ['workspaceRevision', 'unknown'],
+    ['sourceRevision', 'unset'],
+    ['representationRevision', 'repr:unset'],
+  ] as const)('rejects unqualified %s before a training row can be persisted', async (field, value) => {
+    const datasetDir = fs.mkdtempSync(path.join(os.tmpdir(), 'policy-training-unqualified-'));
+    const filePath = path.join(datasetDir, 'rows.jsonl');
+    const revisions = { ...makeRevision(), [field]: value };
+    const input = {
+      trace: makeTrace(),
+      policyState: makePolicyState(),
+      decision: makeDecision(),
+      revisions,
+      labelProvenance: {
+        source: 'AUDIT' as const,
+        sourceRevision: 'audit:1',
+        sourceRefs: ['audit-ledger:1'],
+      },
+    };
+
+    try {
+      expect(() => buildRouteTraceTrainingRow(input)).toThrow(/non-placeholder workspace, source, and representation revisions/);
+      await expect(appendRouteTraceTrainingRow(input, { filePath })).rejects.toThrow(/non-placeholder workspace, source, and representation revisions/);
+      expect(fs.existsSync(filePath)).toBe(false);
+    } finally {
+      fs.rmSync(datasetDir, { recursive: true, force: true });
+    }
+  });
+
   it('loads replay rows and skips malformed lines', async () => {
     const datasetDir = fs.mkdtempSync(path.join(os.tmpdir(), 'policy-training-load-'));
     try {
@@ -201,7 +230,11 @@ describe('policy training export', () => {
           sourceRefs: ['audit-ledger:1'],
         },
       });
-      fs.writeFileSync(filePath, `${JSON.stringify(row)}\nnot-json\n`, 'utf8');
+      const unqualifiedRow = {
+        ...row,
+        revisions: { ...row.revisions, workspaceRevision: 'unknown' },
+      };
+      fs.writeFileSync(filePath, `${JSON.stringify(row)}\n${JSON.stringify(unqualifiedRow)}\nnot-json\n`, 'utf8');
 
       const loaded = await loadRouteTraceTrainingRows({ datasetDir });
       expect(loaded).toHaveLength(1);

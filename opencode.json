@@ -41,14 +41,17 @@
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000
     },
     "atlas-task-kernel": {
       "type": "local",
       "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-task-kernel-mcp.mjs"],
-      "enabled": false,
-      "timeout": 30000
+      "enabled": true,
+      "timeout": 60000
     }
+  },
+  "experimental": {
+    "mcp_timeout": 60000
   },
   "small_model": "llama-server/ornith-1.5-9b",
   "agent": {

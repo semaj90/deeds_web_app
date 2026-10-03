@@ -35,7 +35,7 @@ const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? 'neo4j123';
 const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://localhost:8090';
-const LLAMA_MODEL = process.env.LLAMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+const LLAMA_MODEL = process.env.LLAMA_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 const COUCHDB_CLEAN_URL = COUCHDB_URL.replace(/\/$/, '');
 const couchdbUser = process.env.COUCHDB_USER ?? 'admin';
@@ -199,7 +199,7 @@ async function main() {
     console.log('=== Batch DirectoryNote Generation ===');
     console.log(`[cfg] dryRun=${DRY_RUN}`);
     console.log(`[cfg] llmServer=${process.env.LLAMA_SERVER_URL ?? 'http://localhost:8090'}`);
-    console.log(`[cfg] model=${process.env.LLAMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf'}`);
+    console.log(`[cfg] model=${process.env.LLAMA_MODEL ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b')}`);
 
     console.log('\n[neo4j] Fetching codebase files...');
     let dirMap;
@@ -250,7 +250,7 @@ async function main() {
         return;
     }
 
-    console.log(`\n[llm] Generating summaries via llama-server :8090 (${process.env.LLAMA_MODEL || 'gemma4-legal-iq4xs-direct.gguf'})...`);
+    console.log(`\n[llm] Generating summaries via llama-server :8090 (${process.env.LLAMA_MODEL || (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b')})...`);
     const summaryStartTime = Date.now();
 
     for (const dir of missingDirs) {

@@ -25,6 +25,11 @@ import {
   buildLlamaPromptCacheOptionsV1,
   recordLlamaPromptCacheTelemetry,
 } from './context-prompt-streamer.js';
+import { executeToolBatch } from '../executor/tool-batch.js';
+
+// Only these names have read-only mock implementations in executeMcpTool.
+// Every other tool is serialized as a write until a real effect policy exists.
+const ACP_READ_ONLY_TOOL_NAMES = new Set(['get_time', 'search_codebase', 'list_files']);
 
 export interface AcpRpcLoopConfig {
   llamaBaseUrl: string;
@@ -98,21 +103,24 @@ export async function executeToolCallsInParallel(
   toolCalls: ToolCall[],
   executor: (name: string, args: Record<string, any>) => Promise<string>
 ): Promise<Array<{ role: 'tool'; tool_call_id: string; content: string }>> {
-  return Promise.all(
-    toolCalls.map(async (toolCall) => {
-      try {
-        const args = JSON.parse(toolCall.function.arguments);
-        const result = await executor(toolCall.function.name, args);
-        return { role: 'tool' as const, tool_call_id: toolCall.id, content: result };
-      } catch (err) {
-        return {
-          role: 'tool' as const,
-          tool_call_id: toolCall.id,
-          content: JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
-        };
-      }
-    })
+  const results = await executeToolBatch(
+    toolCalls.map((toolCall) => ({
+      id: toolCall.id,
+      tool: toolCall.function.name,
+      input: toolCall.function.arguments,
+      effect: ACP_READ_ONLY_TOOL_NAMES.has(toolCall.function.name) ? 'read' as const : 'write' as const,
+    })),
+    async (call) => executor(call.tool, JSON.parse(call.input)),
+    { maxParallel: 3, timeoutMs: 30_000 },
   );
+
+  return results.map((result) => ({
+    role: 'tool' as const,
+    tool_call_id: result.id,
+    content: result.status === 'succeeded'
+      ? result.output
+      : JSON.stringify({ error: result.error }),
+  }));
 }
 
 /**

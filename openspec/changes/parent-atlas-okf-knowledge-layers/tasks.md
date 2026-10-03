@@ -73,6 +73,13 @@ Duplication Prevention rule ("record what you found, even when you don't fix it"
 
 - [ ] Validate existing `.okf/` files against OKF v0.2 (provenance, trust, lifecycle fields present and well-formed).
 
+  **Current audit (read-only)**: `npm run atlas:docs:okf:v02` now records the
+  missing profile fields and manifest drift in
+  `docs/reports/okf-v02-bundle-audit-v1.json`; 25 files were scanned, 0 meet
+  the profile yet, and no metadata repair was attempted. The task remains
+  open until the profile is deliberately populated or the bundle is
+  dispositioned by its owner.
+
   **Partial finding (2026-08-24, read-only, no validator built yet)**: checked
   what actually exists before writing a validator. `.okf/manifest.yaml`
   declares itself `version: 2` and registers 5 domain schemas under
@@ -203,7 +210,13 @@ type TelemetryBreadth = {
 
 ## Slice 3 — Mock/stub candidate detection
 
-- [ ] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\.random.*(mock|stub|simulate|placeholder|demo)`.
+- [x] Static pass: `rg` for `TODO|NOT_IMPLEMENTED|throw new Error.*not implemented|Math\.random.*(mock|stub|simulate|placeholder|demo)`.
+  **Completed 2026-09-24 (read-only, full pattern incl. the `Math.random` clause, `sveltekit-frontend/src`):**
+  `.ts` 151 hits / 80 files; `.svelte` 16 hits / 15 files; the `Math.random.*(mock|stub|simulate|placeholder|demo)`
+  clause alone matches 0 lines in `.ts`/`.svelte` (synthetic `Math.random` use is not labeled that way, so this term
+  finds nothing — the AST classification below, which flags 1,068 `UNLABELED_SYNTHETIC_PRODUCTION_REVIEW` hits, is the
+  better detector). Note: that classification report scanned `.ts`/`.js` under `sveltekit-frontend/src` +
+  `scripts/atlas` only; the 16 `.svelte` hits are not yet classified.
 
   **Partial, 2026-08-24**: ran the first three terms (not yet the
   `Math.random.*(mock|stub|...)` clause) against
@@ -222,22 +235,42 @@ type TelemetryBreadth = {
   budget. Left honestly incomplete rather than producing a shallow or
   guessed classification. The raw hit list above is real, reusable input
   for whoever runs this to completion next.
-- [ ] AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).
+- [x] AST-context classification per hit: test fixture (acceptable) / demo-flag-gated mock (acceptable, labeled) / unlabeled synthetic production response (flag) / throwing stub (flag) / unreferenced stub (flag).
+  Evidence: `docs/reports/okf-ast-context-classification-v1.json` and `.md`; the read-only TypeScript syntax-context audit records 2,439 findings across 7,202 source files, with disposition counts and per-hit AST ancestry. It remains advisory and does not authorize mutation.
 - [ ] LLM used only to summarize post-static+runtime findings — never as sole verdict source.
-- [ ] Output: one JSON + Markdown report.
+- [x] Output: one JSON + Markdown report. (2026-09-24: `docs/reports/okf-ast-context-classification-v1.json` + `.md`
+  exist, committed in `8523b7a003`; policy `writesPerformed:false`, `canonicalAuthority:false`. The LLM-summary item above
+  remains open.)
 
 ## Slice 4 — atlas_work_items design + fixture
 
-- [ ] Draft `atlas_work_items` + `atlas_work_item_evidence` Drizzle schema (design only — do not apply/migrate yet).
-- [ ] Repository-only fixture (in-memory or local test DB) proving the shape round-trips: insert one gap-backed work item + one evidence row, read back.
+- [x] Draft `atlas_work_items` + `atlas_work_item_evidence` Drizzle schema (design only — do not apply/migrate yet).
+  Evidence: `docs/architecture/atlas-work-items-design-v1.md`; the proposed
+  shape remains design-only and does not enter the live Drizzle schema.
+- [x] Repository-only fixture (in-memory or local test DB) proving the shape round-trips: insert one gap-backed work item + one evidence row, read back.
+  Evidence: `scripts/atlas/prove-okf-work-item-fixture-v1.mjs` and
+  `docs/reports/okf-work-item-fixture-v1.json`; foreign-key, revision,
+  deterministic-serialization, and shape checks pass with in-memory-only
+  persistence.
 - [ ] Do NOT apply this migration against the live database in this slice.
 
 ## Slice 5 — Kanban issues + recommendations + OpenWiki review page
 
-- [ ] From slices 1–3's findings, generate one Kanban issue per evidence-backed gap (using the slice-4 fixture, not live Postgres, until the migration is separately approved).
-- [ ] One recommendation per issue, each citing required evidence + prohibited changes + acceptance gates.
+- [x] From slices 1–3's findings, generate one Kanban issue per evidence-backed gap (using the slice-4 fixture, not live Postgres, until the migration is separately approved).
+  Evidence: `scripts/atlas/build-okf-gap-recommendations-v1.mjs` derives six
+  review-only issues from `.okf/concepts`; it creates no live Kanban task.
+- [x] One recommendation per issue, each citing required evidence + prohibited changes + acceptance gates.
+  Evidence: `docs/reports/okf-gap-recommendations-v1.json` contains six
+  evidence-linked recommendations with explicit acceptance gates and
+  prohibited mutations; operator review remains required.
 - [ ] Install OpenWiki; configure its generated-wiki output directory separate from `docs/okf/parent-atlas/` (hand-authored/canonical).
 - [ ] OpenWiki synthesizes exactly one review page summarizing this audit — verify it does not scan `.env`, secrets, model binaries, raw Qdrant vectors, or unbounded logs.
+
+  **Boundary proof available (read-only)**: `scripts/atlas/audit-openwiki-review-input-boundary-v1.mjs`
+  produces `docs/reports/openwiki-review-input-boundary-v1.json` with 31
+  eligible inputs, an isolated generated output directory, and explicit
+  exclusions for secrets, model/vector artifacts, and logs. OpenWiki was not
+  installed or invoked, so synthesis remains open.
 
 ## Slice 6 — Cross-domain OKF schema boundary (planning/audit only)
 
@@ -261,11 +294,16 @@ any library, database feature, model, or accelerator into a canonical owner.
   `featureRevision`, `subjectRef`, `ontologyRefs`, `value`, `coverage`, and
   provenance. Reuse the existing feature-matrix owner; do not create a second
   semantic envelope or identity schema.
-- [ ] **OKF-06.4 Document/file derivation graph** Specify how a document,
+- [x] **OKF-06.4 Document/file derivation graph** Specify how a document,
   packet, source file, symbol, related file, feature row, and ontology tuple
   connect through evidence references. Derived relationships must be
   replayable from canonical Postgres/Graphify records and must not be inferred
   solely from a cluster label or embedding similarity.
+  Evidence: `OkfDocumentFileDerivationGraphV1Schema` in
+  `sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts`,
+  focused contract tests, and the revision/endpoints/evidence invariants in
+  `okf-cross-domain-v1.spec.ts`. The envelope remains noncanonical and
+  write-disabled.
 
   **Spot-check (2026-08-24, read-only)**: verified OKF-06.1/06.2/06.3's `[x]`
   marks are backed by real code, not just checked off in this file —
@@ -273,10 +311,6 @@ any library, database feature, model, or accelerator into a canonical owner.
   (`sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts:22`)
   has exactly the fields OKF-06.1 specifies (`subjectRef`, `domainId`,
   `taxonomyRevision`, `producerId`, confirmed by grep against the live file).
-  Confirmed OKF-06.4 by contrast has **no** corresponding envelope anywhere:
-  searched `sveltekit-frontend/src/lib/server/atlas/contracts/` for
-  `DocumentDerivationGraph`/`DerivationGraphV1`/similar — zero matches. The
-  `[ ]` here is accurate, not stale.
 - [x] **OKF-06.5 Runtime ownership matrix** Classify LangChain, Deep Agents,
   LangGraph, OpenWiki, PyTorch, PostgreSQL AIO, bitmap/table indexes, pgvector,
   Qdrant, Neo4j, Valkey, and the agentic Kanban board as
@@ -296,18 +330,30 @@ any library, database feature, model, or accelerator into a canonical owner.
   and acceptance gates. Recommended work may create or update a Kanban task,
   but it may not mutate canonical graph, packet, ontology, vector, or cache
   truth without an independently approved apply path.
-- [ ] **OKF-06.7 Storage/index boundary** Record PostgreSQL/pgvector as
+- [x] **OKF-06.7 Storage/index boundary** Record PostgreSQL/pgvector as
   canonical or durable derived storage only where an existing owner proves it;
   record bitmap/table indexes as query accelerators with explainable filter
   parity; record PyTorch/AIO as compute/I/O capabilities, not schema owners.
-- [ ] **OKF-06.8 Agent/document boundary** Treat LangChain/Deep Agents as
+  Evidence: `docs/reports/okf-storage-agent-boundaries-v1.json` records
+  PostgreSQL identity ownership, pgvector exact/challenger roles, and GIN/
+  bitmap/AIO as execution details. Runtime FTS and filtered-vector parity
+  remain explicitly open.
+- [x] **OKF-06.8 Agent/document boundary** Treat LangChain/Deep Agents as
   optional orchestration, OpenWiki as a generated review surface, and the
   Kanban agent as a recommendation/execution coordinator. None may write
   canonical truth directly; all durable changes require promotion receipts.
-- [ ] **OKF-06.9 Schema proof** Validate representative document, file, feature,
+  Evidence: `docs/reports/okf-storage-agent-boundaries-v1.json` and the
+  existing LangGraph/OpenWiki ownership receipts; all mutation flags remain
+  false.
+- [x] **OKF-06.9 Schema proof** Validate representative document, file, feature,
   tuple, cluster, and recommendation fixtures with stable IDs, revision
   changes, missing-evidence statuses, and supersession behavior. Produce one
   JSON/Markdown receipt with `CREATED`, `WIRED`, `PROVEN`, and `DONE` states.
+  Evidence: `scripts/atlas/prove-okf-schema-boundaries-v1.mts` and
+  `docs/reports/okf-schema-boundaries-v1.json` prove five schema fixtures,
+  deterministic replay, revision changes, missing-evidence rejection, and
+  supersession. The receipt has `promotionAuthorized=false` and
+  `writesPerformed=false`.
 
 ### Current classification for this slice
 
@@ -371,3 +417,10 @@ any library, database feature, model, or accelerator into a canonical owner.
 - Direct OpenWiki ingestion of secrets, raw vectors, or unbounded repository logs.
 - Treating PostgreSQL AIO, bitmap indexes, pgvector, or PyTorch as new canonical
   schema owners.
+
+## 2026-09-27 — Portable OKF / registry owner audit
+
+- [x] Read-only inventory against the live PostgreSQL 18.4 `legal_ai_db` confirmed several distinct existing owners: `atlas_schema_registry` (schema metadata), `atlas_domain_ontology` (17 domain-ontology group rows), `atlas_packet_registry` (packet-oriented registry), `atlas_ontology_concepts` (empty concept identity schema), `domain_taxonomy_v1` (empty version/alias adapter), and `taxonomy_nodes` / `taxonomy_edges` (populated topology read model). Application domain classification is separately owned by `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` (`CANONICAL_DOMAINS`). This does **not** establish one universal registry or authorize merging/populating these tables.
+- [x] Keep OKF as portable Markdown + YAML authoring/interchange, validated against existing local schemas and checksums. It may nominate documented use-cases, keywords, language/domain labels, and routing metadata; it cannot mint canonical packet/symbol IDs, ordinals, revisions, or promote classifier output.
+- [ ] Before adding a PostgreSQL registry table or admin editor, close the existing domain-class owner decision and map each OKF field to exactly one admitted owner. Prefer a read-only registry projection/API over a new table if the existing owner is sufficient. No DDL, row writes, OpenWiki integration install, or wiki initialization occurred in this audit.
+- [ ] If later approved, expose the reviewed registry through the existing Admin Unified Indexing Studio as a read-only inspector first. A Pokédex-like display is an ordinal/hex UI metaphor only; do not copy Pokémon source/assets or use display numbers as identity.

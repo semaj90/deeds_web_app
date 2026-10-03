@@ -10,6 +10,7 @@ RUN python -m pip install --no-cache-dir \
     -r /tmp/atlas-gpu-8098-requirements.txt
 
 COPY services/atlas-gpu-8098/app.py /app/services/atlas-gpu-8098/app.py
+COPY services/atlas-gpu-8098/shared_residency.py /app/services/atlas-gpu-8098/shared_residency.py
 COPY python/atlas_rapids_graph_runtime.py /app/python/atlas_rapids_graph_runtime.py
 
 RUN mkdir -p /app/services/atlas-gpu-8098 /app/python \
@@ -18,6 +19,9 @@ RUN mkdir -p /app/services/atlas-gpu-8098 /app/python \
 USER rapids
 EXPOSE 8098
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD python -c "import torch; assert torch.cuda.is_available(); import cudf, cuvs, cugraph"
+# This image is intentionally RAPIDS-only; PyTorch belongs to the separate
+# neural-decoder/WSL2 lane. Health must therefore validate the libraries this
+# sidecar actually owns rather than requiring an absent torch installation.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD python -c "import cupy; assert cupy.cuda.runtime.getDeviceCount() > 0; import cudf, cuvs, cugraph"
 
 CMD ["python", "/app/services/atlas-gpu-8098/app.py"]

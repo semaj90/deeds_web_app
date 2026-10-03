@@ -1,0 +1,91 @@
+{
+  "schema": "atlas.openspec-evidence-migration-dry-run.v1",
+  "generatedAt": "2026-10-02T04:47:32.436Z",
+  "status": "DESIGN_VALIDATED_UNAPPLIED",
+  "mode": "READ_ONLY_STATIC_SQL_DRY_RUN",
+  "migrations": [
+    {
+      "path": "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql",
+      "checksum": "sha256:df9101e336c33e7433183ededdff10380b77c34e76085b679ca1b60dbe651387",
+      "bytes": 6221
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql",
+      "checksum": "sha256:d1177e60bea362dc1e9a942c452d2a0a705eb30d0ae9217f0d081817b63f377c",
+      "bytes": 4857
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_retrieval_v1.sql",
+      "checksum": "sha256:6648cf8d28dad19575a7d5d33a8d45a9fc21439f5bbeb68ffba1abf2f84eaf84",
+      "bytes": 872
+    },
+    {
+      "path": "sveltekit-frontend/drizzle/manual/20261001_openspec_task_identity_history_v1.sql",
+      "checksum": "sha256:086ecb579d741fb2a0c24d494a6c80145819b0d2daead9634e91e3208d3d37d7",
+      "bytes": 5870
+    }
+  ],
+  "relations": {
+    "openspec_changes": true,
+    "openspec_tasks": true,
+    "openspec_dependencies": true,
+    "evidence_receipts": true,
+    "task_evidence": true,
+    "openspec_evidence_chunks": true,
+    "openspec_task_predicate": true,
+    "evidence_assertion": true,
+    "task_evidence_binding": true,
+    "openspec_supersession": true,
+    "openspec_task_current": true,
+    "openspec_task_current_v2": true,
+    "openspec_task_revisions": true,
+    "openspec_task_aliases": true
+  },
+  "sidecars": {
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql": true,
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql": true,
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_retrieval_v1.sql": true,
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_task_identity_history_v1.sql": true
+  },
+  "checks": {
+    "allRequiredRelationsPresent": true,
+    "canonicalVector768": true,
+    "hnswCosineIndex": true,
+    "retrievalMetadataIndexes": true,
+    "trigramAndFtsIndexes": true,
+    "noMutationStatements": true,
+    "allSidecarsDesignUnapplied": true,
+    "proofStateDerivedInView": true,
+    "readbackReceiptRequired": true,
+    "stableCanonicalTaskKey": true,
+    "internalSurrogateIdentity": true,
+    "surrogatePrimaryKeyInFreshLedger": true,
+    "immutableRevisionHistory": true,
+    "aliasPreservation": true,
+    "receiptsBoundToTaskRevision": true,
+    "lifecycleSeparatedFromProof": true
+  },
+  "canonicalAuthority": "PostgreSQL 18 after authorized apply and independent readback; not established by this dry-run",
+  "sideEffects": {
+    "sqlApplied": false,
+    "databaseMutated": false,
+    "rowsSeeded": false
+  },
+  "likely_cause": "The EVF schema must be reviewed as additive design before any live ledger or proof-state mutation is authorized.",
+  "evidence": [
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_retrieval_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_task_identity_history_v1.sql",
+    "sveltekit-frontend/drizzle/sidecar-migrations.json"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_fabric_v2.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_evidence_retrieval_v1.sql",
+    "sveltekit-frontend/drizzle/manual/20261001_openspec_task_identity_history_v1.sql"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence-migration-dry-run-v1.json"
+}

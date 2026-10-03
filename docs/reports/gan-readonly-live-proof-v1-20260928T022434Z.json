@@ -1,0 +1,334 @@
+{
+  "schema": "atlas.gan-readonly-live-proof.v2",
+  "generatedAt": "2026-09-28T02:24:34.220Z",
+  "proofMode": true,
+  "dryRun": true,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "writes": {
+    "postgres": 0,
+    "redis": 0,
+    "nats": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "status": "LIVE_READ_ONLY_PROVEN",
+  "proofLevel": "LIVE_READ_ONLY",
+  "note": "execution proves the harness ran correctly on real rows. validator states whether the RULE is trustworthy. SQL-vs-JS agreement is parity, not correctness. Remaining hard failures are corpus findings only because the rule is now structural and evidence-derived.",
+  "execution": {
+    "status": "PROVEN",
+    "databaseConnected": true,
+    "transactionReadOnly": true,
+    "rolledBack": true,
+    "writeAttemptRefused": true,
+    "refusalSqlState": "25006",
+    "selectedRows": 61718,
+    "validatedRows": 61718,
+    "postgresWrites": 0,
+    "redisWrites": 0,
+    "natsPublishes": 0,
+    "qdrantWrites": 0,
+    "consistency": {
+      "validatorProcessedEqualsRowsRead": true,
+      "hardPlusPassedEqualsRead": true,
+      "sqlMissingPacketKeyEqualsValidator": true,
+      "sqlInvalidSourceRefEqualsValidator": true,
+      "crossTabSumsToRowsWithPacketKey": true
+    },
+    "validatorOwner": "packages/atlas-core/src/validation/packet-adversarial-validator-v2.ts (validatePacketForAtlasV2 -> validateSourceRefV1)",
+    "orchestratorReadPathUsed": false
+  },
+  "validator": {
+    "status": "POLICY_DERIVED_FROM_INVENTORY_AND_FIXTURES",
+    "sourceRefPolicy": "SourceRefValidationV1 (structural; no extension allowlist; no normalization)",
+    "evidence": {
+      "sourceRefInventory": {
+        "path": "docs\\reports\\source-ref-inventory-v1-20260926T180602Z.json",
+        "sha256": "sha256:06eaf2146d9c2aa1ed389347213d6f7d173ccc1fa4ec657e0b1aded2792c7086"
+      },
+      "adversarialReceipt": {
+        "path": "docs\\reports\\gan-adversarial-proof-v1-20260926T224957Z.json",
+        "sha256": "sha256:a6a85980cdf55660f087822f447f36410dade3211ffb21c0fa1c10638c49b55d",
+        "status": "ADVERSARIAL_FIXTURES_PROVEN",
+        "probes": 16,
+        "passed": 16,
+        "selfTests": {
+          "acceptedMaliciousInputDetected": true,
+          "wrongRejectionCodeDetected": true,
+          "rejectedBenignControlDetected": true,
+          "thrownErrorDetected": true,
+          "healthyProbeStillPasses": true
+        }
+      }
+    },
+    "parityNotCorrectness": "sqlInvalidSourceRefEqualsValidator shows two implementations agree; it does not show the rule is right"
+  },
+  "supersedes": {
+    "receipts": [
+      "docs/reports/gan-readonly-live-proof-v1-20260926T175412Z.json",
+      "docs/reports/gan-readonly-live-proof-v1-20260926T175520Z.json"
+    ],
+    "reclassification": {
+      "execution": "PROVEN (unchanged)",
+      "validatorVerdict": "BLOCKED_POLICY_DRIFT (legacy lowercase .ts/.tsx source_ref rule; 56,724 hard failures were rule drift, not corpus corruption)"
+    }
+  },
+  "census": {
+    "total": 61718,
+    "missing_packet_key": 0,
+    "sql_invalid_source_ref": 5,
+    "feature_blank_with_source_ref": 0,
+    "null_workspace_revision_key": 45567,
+    "null_source_revision": 45567,
+    "missing_summary": 54832,
+    "null_embedding": 59,
+    "distinct_packet_keys": 61718,
+    "packet_id_differs_from_packet_key": 3413,
+    "packetKeyFormats": [
+      {
+        "format": "packet:<12hex>",
+        "n": 58362
+      },
+      {
+        "format": "ace:packet:*",
+        "n": 3294
+      },
+      {
+        "format": "bare 16hex",
+        "n": 61
+      },
+      {
+        "format": "other",
+        "n": 1
+      }
+    ]
+  },
+  "oldVsNewSourceRef": {
+    "legacyRuleRejectedRows": 56724,
+    "legacyRuleRejectedRowsRecomputedHere": 56724,
+    "newRuleRejectedRows": 5,
+    "crossTab": {
+      "bothRejected": 5,
+      "legacyRejectedNewAccepted": 56719,
+      "legacyAcceptedNewRejected": 0,
+      "bothAccepted": 4994
+    },
+    "legacyAcceptedNewRejectedSamples": [],
+    "reading": "legacyRejectedNewAccepted = rows the legacy rule falsely rejected; legacyAcceptedNewRejected = rows the legacy rule accepted but the structural rule rejects"
+  },
+  "validatorResult": {
+    "hardFailures": 5,
+    "passed": 61713,
+    "hardByCode": {
+      "ERR_INVALID_SOURCE_REF": 5
+    },
+    "softWarnings": {
+      "missing_summary": 54828,
+      "missing_embedding": 59
+    },
+    "hardSamples": [
+      {
+        "packet_key": "ace:packet:e3b0c44298fc",
+        "code": "ERR_INVALID_SOURCE_REF",
+        "source_ref": ""
+      },
+      {
+        "packet_key": "packet:99e624275901",
+        "code": "ERR_INVALID_SOURCE_REF",
+        "source_ref": "nul"
+      },
+      {
+        "packet_key": "packet:b1c8ef9a1a6b",
+        "code": "ERR_INVALID_SOURCE_REF",
+        "source_ref": "utputFormat"
+      },
+      {
+        "packet_key": "packet:6b86b273ff34",
+        "code": "ERR_INVALID_SOURCE_REF",
+        "source_ref": "1"
+      },
+      {
+        "packet_key": "packet:9cb07eae5501",
+        "code": "ERR_INVALID_SOURCE_REF",
+        "source_ref": "--since 2h"
+      }
+    ]
+  },
+  "schemaDrift": {
+    "classification": "GAN-LEGACY-SCHEMA-DRIFT-01",
+    "orchestratorAssumedColumns": [
+      "packet_key",
+      "source_ref",
+      "feature_id",
+      "summary",
+      "title",
+      "embedding",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "missingLive": [
+      "title",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "action": "do not recreate the columns automatically; do not run the legacy mutation path; this proof uses receipt artifacts instead",
+    "consequence": "legacy orchestrator step 1 selects title/ganValidated and step 3 updates ganValidated/ganValidationError/ganWarnings; against this table those statements error and step 1 swallows the error into []"
+  },
+  "summary": {
+    "rowsRead": 61718,
+    "hardFailures": 5,
+    "passed": 61713,
+    "hardByCode": {
+      "ERR_INVALID_SOURCE_REF": 5
+    },
+    "legacyRejected": 56724,
+    "newRejected": 5,
+    "cross": {
+      "bothRejected": 5,
+      "legacyRejectedNewAccepted": 56719,
+      "legacyAcceptedNewRejected": 0,
+      "bothAccepted": 4994
+    },
+    "softTop": [
+      [
+        "missing_summary",
+        54828
+      ],
+      [
+        "missing_embedding",
+        59
+      ]
+    ],
+    "missingLiveColumns": [
+      "title",
+      "ganvalidated",
+      "ganvalidationerror",
+      "ganwarnings"
+    ],
+    "consistency": {
+      "validatorProcessedEqualsRowsRead": true,
+      "hardPlusPassedEqualsRead": true,
+      "sqlMissingPacketKeyEqualsValidator": true,
+      "sqlInvalidSourceRefEqualsValidator": true,
+      "crossTabSumsToRowsWithPacketKey": true
+    }
+  },
+  "lanes": {
+    "authority": {
+      "status": "LIVE_READ_ONLY",
+      "measuredHere": true,
+      "findings": {
+        "hardFailures": 5,
+        "duplicatePacketKeys": 0,
+        "nullWorkspaceRevisionKey": 45567,
+        "nullSourceRevision": 45567,
+        "packetIdDiffersFromPacketKey": 3413
+      }
+    },
+    "structuralLineage": {
+      "status": "PROVEN",
+      "measuredHere": false,
+      "evidenceReceipt": {
+        "path": "docs\\reports\\mapreduce-chunk-readiness-v3-20260928T012835Z.json",
+        "sha256": "sha256:0faad26a774c940faa07c1324c7e143e5dc11a302c0e7c6def90f428f6f8d048"
+      },
+      "receiptVersion": "v3",
+      "candidateCount": 127,
+      "chunkCount": 1520,
+      "counts": {
+        "CHUNK_REVISION_QUALIFIED": 1520
+      },
+      "sourceBindingQualifiedRows": 1520,
+      "semantic768": {
+        "MISSING": 1520
+      },
+      "semantic768Quality": {
+        "MISSING": 1520
+      },
+      "semanticRepresentationBinding": {
+        "UNQUALIFIED_OR_INCOMPLETE": 1520
+      },
+      "summary": {
+        "MISSING": 1520
+      },
+      "summarySemantic": {
+        "MISSING": 1338,
+        "UNBOUND": 182
+      },
+      "reason": null
+    },
+    "semanticProjection": {
+      "status": "NOT_EXERCISED",
+      "measuredHere": false,
+      "reason": "no Qdrant/embedding parity check in this runner"
+    },
+    "runtimeSideEffects": {
+      "status": "LIVE_READ_ONLY",
+      "measuredHere": true,
+      "findings": {
+        "writeAttemptRefused": true,
+        "postgresWrites": 0,
+        "redisWrites": 0,
+        "natsPublishes": 0
+      }
+    }
+  },
+  "validationAudit": {
+    "schema": "atlas.validation-audit.v2",
+    "status": "BLOCKED_SEMANTIC_PROJECTION_NOT_EXERCISED",
+    "lanes": {
+      "authority": {
+        "status": "LIVE_READ_ONLY"
+      },
+      "structuralLineage": {
+        "status": "PROVEN",
+        "measuredHere": false,
+        "evidenceReceipt": {
+          "path": "docs\\reports\\mapreduce-chunk-readiness-v3-20260928T012835Z.json",
+          "sha256": "sha256:0faad26a774c940faa07c1324c7e143e5dc11a302c0e7c6def90f428f6f8d048"
+        },
+        "receiptVersion": "v3",
+        "candidateCount": 127,
+        "chunkCount": 1520,
+        "counts": {
+          "CHUNK_REVISION_QUALIFIED": 1520
+        },
+        "sourceBindingQualifiedRows": 1520,
+        "semantic768": {
+          "MISSING": 1520
+        },
+        "semantic768Quality": {
+          "MISSING": 1520
+        },
+        "semanticRepresentationBinding": {
+          "UNQUALIFIED_OR_INCOMPLETE": 1520
+        },
+        "summary": {
+          "MISSING": 1520
+        },
+        "summarySemantic": {
+          "MISSING": 1338,
+          "UNBOUND": 182
+        },
+        "reason": null
+      },
+      "semanticProjection": {
+        "status": "NOT_EXERCISED"
+      },
+      "runtimeSideEffects": {
+        "status": "LIVE_READ_ONLY"
+      }
+    },
+    "adversarial": {
+      "total": 16,
+      "passed": 16,
+      "receipt": "docs\\reports\\gan-adversarial-proof-v1-20260926T224957Z.json"
+    },
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

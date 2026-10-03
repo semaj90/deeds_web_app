@@ -1,6 +1,6 @@
 {
   "schema": "atlas.canonical-owner-schema-reconciliation.v1",
-  "generatedAt": "2026-09-07T22:50:28.686Z",
+  "generatedAt": "2026-09-17T18:10:22.462Z",
   "mode": "READ_ONLY_SCHEMA_AUDIT",
   "writes": {
     "postgres": false,
@@ -153,7 +153,11 @@
         "projection_representation_id",
         "projection_dimension",
         "encoder_revision",
-        "som_revision"
+        "som_revision",
+        "source_revision",
+        "workspace_revision_key",
+        "lineage_binding_checksum",
+        "lineage_producer_revision"
       ],
       "requiredColumns": [
         "packet_key",
@@ -161,10 +165,8 @@
         "source_revision",
         "workspace_revision"
       ],
-      "missing": [
-        "source_revision"
-      ],
-      "complete": false
+      "missing": [],
+      "complete": true
     },
     {
       "table": "atlas_symbol_versions",
@@ -230,7 +232,7 @@
       "complete": false
     }
   ],
-  "packetOwnerReady": false,
+  "packetOwnerReady": true,
   "symbolOwnerReady": true,
   "conceptOwnerReady": false,
   "liveOwnerRegistryReady": false,

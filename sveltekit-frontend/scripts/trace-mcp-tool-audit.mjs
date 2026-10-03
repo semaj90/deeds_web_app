@@ -3,11 +3,12 @@
 /**
  * Trace MCP Tool Audit + Concurrency Test
  *
- * Validates all 124 MCP tools for:
+ * Validates the TRACE MCP tool surface for:
  * 1. PROVENANCE — tool declares input schema + response contract
- * 2. BREADTH — semantic intelligence coverage across 20 domains
+ * 2. BREADTH — semantic intelligence coverage across functional domains
  * 3. CONCURRENCY — tools handle parallel invocations without corruption
  * 4. IDEMPOTENCY — repeated calls with same params return same result
+ * 5. SAFETY — generic shell execution is not exposed as an MCP tool
  *
  * Exit: 0 = all gates pass, 1 = critical failure, 2 = degraded (partial pass)
  */
@@ -18,6 +19,7 @@ import { createHash } from 'crypto';
 const MCP_URL = process.env.TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
 const HEALTH_URL = process.env.TRACE_MCP_HEALTH || 'http://127.0.0.1:8788/health';
 const TIMEOUT = 5000;
+const FORBIDDEN_TOOL_NAMES = new Set(['shell.run']);
 
 // Tool categorization by semantic intelligence domain
 const DOMAINS = {
@@ -80,7 +82,6 @@ const DOMAINS = {
   'skills': [
     'skills.list', 'skills.run_mission'
   ],
-  'shell': ['shell.run'],
   'runtime': [
     'runtime.sse_probe', 'runtime.simdjson_status', 'runtime.quic_status'
   ],
@@ -115,7 +116,6 @@ const TEST_INPUTS = {
   'operations-inference': { operation: 'test' },
   'search-ranking': { candidates: [], query: 'test' },
   'skills': {},
-  'shell': { command: 'echo test' },
   'runtime': {},
   'evidence-imaging': { query: 'test' },
   'tracing-diagnostics': { query: 'test' },
@@ -229,12 +229,15 @@ async function gateToolDiscovery() {
   }
 
   const toolCount = tools.length;
-  const expected = 124;
+  const expected = 123;
   const coverage = Math.min(100, (toolCount / expected) * 100);
+  const forbidden = tools.map((tool) => tool.name).filter((name) => FORBIDDEN_TOOL_NAMES.has(name));
 
   return {
-    pass: toolCount >= 110, // Allow some variance
-    details: `${toolCount} tools discovered (expected ${expected}, ${coverage.toFixed(1)}% coverage)`,
+    pass: toolCount >= 110 && forbidden.length === 0, // Allow count variance, never unsafe tool exposure
+    details: `${toolCount} tools discovered (expected ${expected}, ${coverage.toFixed(1)}% coverage); ` +
+      (forbidden.length === 0 ? 'no forbidden tools exposed' : `forbidden tools exposed: ${forbidden.join(', ')}`),
+    forbiddenTools: forbidden,
     toolCount
   };
 }

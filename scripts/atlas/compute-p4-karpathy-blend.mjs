@@ -15,6 +15,10 @@ import Redis from 'ioredis';
 const isVerbose = process.argv.includes('--verbose');
 const isDryRun = process.argv.includes('--dry-run');
 
+if (!isDryRun) {
+  throw new Error('P4_KARPATHY_APPLY_BLOCKED_UNREVISIONED_TARGET');
+}
+
 const log = (msg, data = '') => {
   if (isVerbose || msg.includes('ERROR') || msg.includes('PASS') || msg.includes('✅')) {
     console.log(`[P4-Karpathy] ${msg}`, data || '');
@@ -65,6 +69,13 @@ async function computeKarpathyBlend() {
       log(`✅ Loaded ${Object.keys(attScores).length} attention scores`);
     } catch (e) {
       log(`⚠️ Could not load attention scores: ${e.message}`);
+    }
+
+    if (Object.keys(prScores).length < 400) {
+      throw new Error('P4_KARPATHY_PAGERANK_INPUTS_INCOMPLETE');
+    }
+    if (Object.keys(attScores).length < 400) {
+      throw new Error('P4_KARPATHY_ATTENTION_INPUTS_INCOMPLETE');
     }
 
     // Phase 4.3: Compute frequency (packet count per SOM cell)
@@ -127,8 +138,8 @@ async function computeKarpathyBlend() {
 
     const blendScores = {};
     for (let i = 0; i < 400; i++) {
-      const pr = prScores[i] || 0.15; // Default PageRank (baseline)
-      const att = attScores[i] || 0.05;
+      const pr = prScores[i];
+      const att = attScores[i];
       const freq = freqScores[i] || 0;
       const prov = provScores[i] || 0;
 
@@ -168,8 +179,8 @@ async function computeKarpathyBlend() {
       `);
 
       for (let i = 0; i < 400; i++) {
-        const pr = prScores[i] || 0.15;
-        const att = attScores[i] || 0.05;
+        const pr = prScores[i];
+        const att = attScores[i];
         const freq = freqScores[i] || 0;
         const prov = provScores[i] || 0;
         const blend = blendScores[i];

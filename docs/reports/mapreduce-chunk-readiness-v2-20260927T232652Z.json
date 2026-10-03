@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.mapreduce-chunk-readiness-receipt.v2",
+  "generatedAt": "2026-09-27T23:26:52.779Z",
+  "status": "READINESS_REPLAY_COMPLETE",
+  "sourceManifest": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\manifest.json",
+  "sourceManifestChecksum": "sha256:e2db192da7cc34631adf9d30049b1fccb6868466acc1e86f509067d7eba20d13",
+  "sourceOverlay": ".tmp\\atlas\\mapreduce-packet-chunk-evidence-overlay-v1\\20260926T181939Z\\packet-chunk-evidence.ndjson",
+  "sourceOverlayChecksum": "sha256:ff5ff53e58eb46dd4a2f79b61b8b6b9453b98696e7e80e1851367cfb35ad0a50",
+  "candidateSnapshotRevision": "sha256:09bfbf6125ddc67f194edd6170f6d9c87a14d001f877eef1ec269600b2424388",
+  "ordinalMapChecksum": "90c237c8d8afd41d176540e2a5a3430ae86b626b7de94e08b49255e7b7fd4bf9",
+  "candidateCount": 127,
+  "chunkCount": 1520,
+  "measured": {
+    "inputConserved": true,
+    "packetStates": {
+      "PACKET_REVISION_QUALIFIED": 1520
+    },
+    "chunkStates": {
+      "CHUNK_REVISION_QUALIFIED": 1520
+    },
+    "eligibilityStates": {
+      "CHUNK_REVISION_QUALIFIED": 1520
+    },
+    "semantic768States": {
+      "AVAILABLE": 1520
+    },
+    "summaryStates": {
+      "MISSING": 1520
+    },
+    "summarySemanticStates": {
+      "MISSING": 1338,
+      "UNBOUND": 182
+    },
+    "chunkSourceRevisionMirror": {
+      "null": 1520
+    },
+    "chunkWorkspaceRevisionMirror": {
+      "null": 1520
+    },
+    "exactSourceFileDigestRows": 1520,
+    "semanticRepresentationRevisionRows": 0,
+    "contentEmbedding768DiagnosticRows": 0,
+    "canonicalChunkMismatchDiagnosis": {
+      "sameFileDifferentChunkOrdinal": 0,
+      "otherCanonicalIdMismatch": 0,
+      "chunkOrdinalDeltaCounts": {}
+    }
+  },
+  "artifacts": {
+    "rowDetails": ".tmp\\atlas\\mapreduce-chunk-readiness-v2\\20260927T232652Z\\readiness.ndjson",
+    "rowDetailsChecksum": "sha256:52b22399cb5ae6af479e32b31164d93d6f6229e0830892657ff4e73937caf52a"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "neo4j": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "receiptChecksum": "sha256:54918a10bd7bdc09c5b1cb6dd0e3fca5d50d14b41473a4aebdff6c38f198886a"
+}

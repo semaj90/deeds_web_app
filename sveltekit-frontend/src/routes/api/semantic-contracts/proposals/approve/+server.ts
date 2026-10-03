@@ -102,7 +102,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // 5. Attempt Neo4j sync (non-blocking if Neo4j unavailable)
     try {
       // Dynamic import to handle case where Neo4j driver not configured
-      const neo4jModule = await import('$lib/server/graph/neo4j-driver').catch(() => null);
+      const neo4jModule = await import('$lib/server/neo4j-driver.js').catch(() => null);
       if (neo4jModule?.getNeo4jDriver) {
         const driver = neo4jModule.getNeo4jDriver();
         await driver.session().run(

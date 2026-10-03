@@ -39,7 +39,7 @@ try {
 
 // Config
 const LLAMA_SERVER_URL = process.env.LLAMA_URL || 'http://127.0.0.1:8090';
-const LLAMA_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
+const LLAMA_MODEL = (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 
 const DB_HOST = process.env.DATABASE_HOST || '127.0.0.1';
 const DB_PORT = parseInt(process.env.DATABASE_PORT || '5434');

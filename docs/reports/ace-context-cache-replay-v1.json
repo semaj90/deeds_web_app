@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.ace-context-cache-replay.v1",
+  "generatedAt": "2026-09-15T18:17:26.066Z",
+  "mode": "DISPOSABLE_FIXTURE",
+  "status": "ACE_CONTEXT_CACHE_REPLAY_PROVEN",
+  "missBeforeWrite": true,
+  "hitAfterWrite": true,
+  "staleChecksumMiss": true,
+  "cacheWritePerformed": true,
+  "canonicalWritesPerformed": false,
+  "canonicalAuthority": false,
+  "cleanupAttempted": true,
+  "reportPath": "docs/reports/ace-context-cache-replay-v1.json"
+}

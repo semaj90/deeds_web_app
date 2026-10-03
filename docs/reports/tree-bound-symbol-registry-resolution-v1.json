@@ -6,19 +6,19 @@
   "nominationsPath": ".tmp/atlas/current-graphify-symbol-nominations-v1.jsonl",
   "outputPath": ".tmp/atlas/tree-bound-symbol-registry-resolution-v1.ndjson",
   "counts": {
-    "treeBoundInput": 353,
-    "exactCanonicalKey": 90,
+    "treeBoundInput": 461,
+    "exactCanonicalKey": 0,
     "exactMetadataRevision": 0,
-    "registryMissing": 263,
+    "registryMissing": 461,
     "registryAmbiguous": 0,
-    "symbolVersionBound": 85,
-    "symbolVersionMissing": 5,
+    "symbolVersionBound": 0,
+    "symbolVersionMissing": 0,
     "symbolVersionAmbiguous": 0,
     "sourceRevisionMismatch": 0,
     "fuzzyMatches": 0
   },
-  "registryRowsRead": 10260,
-  "symbolVersionRowsRead": 285,
+  "registryRowsRead": 10454,
+  "symbolVersionRowsRead": 479,
   "lookupPolicy": [
     "exact canonical_key",
     "exact source_ref/source_revision/byte span/declaration hash for symbol version",
@@ -27,5 +27,5 @@
   "canonicalWrites": 0,
   "databaseWrites": 0,
   "readOnly": true,
-  "nextGate": "GRAPH-RESOLVE-06B.4_LIVE_PRODUCER_REPLAY"
+  "nextGate": "REGISTRY_NAMESPACE_RECONCILIATION_REQUIRED"
 }

@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.legacy-summary-cei23-alignment-receipt.v1",
+  "status": "LEGACY_SUMMARY_FEATURE_BLOCKED_SNAPSHOT_ALIGNMENT",
+  "generatedAt": "2026-09-26T15:51:59.231Z",
+  "inputs": {
+    "candidateMatrixReport": "docs/reports/candidate-feature-matrix-draft-v1-20260926T150456Z.json",
+    "candidateMatrixDescriptor": ".tmp/atlas/candidate-feature-matrix-v1/20260926T150456Z/descriptor.json",
+    "candidateMapRows": 16151,
+    "candidateMapFileSha256": "sha256:dcdbec415e4e131a4595f8118bb21da217bf0edc42e3509fdfb1191f9a2d59b2",
+    "ordinalMapChecksum": "61f8cf1aa5d5b72968bf02e8bc771a72c8ad99cf80a54bfcd8937fd2b3b232b6",
+    "candidateSnapshotRevision": null,
+    "candidateSnapshotRevisionStatus": "NOT_EXPORTED_BY_CEI23_MATRIX_OWNER",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "legacyHintCrosswalk": ".tmp/atlas/legacy-summary-hint-ordinal-join-v1/20260926T080239Z/hint-candidate-ordinal.ndjson",
+    "legacyHintRows": 330,
+    "hintCrosswalkSha256": "sha256:94e9b09b4439b1a1f5a7861864a6a9549140fd6be2255895ac55e7766a227510",
+    "qualityCensus": ".tmp/atlas/legacy-summary-census-v1/census-20260926T080031Z.ndjson",
+    "qualityCensusSha256": "sha256:66ffbe64d95a039e89ccf235aa04593a2f4c6af5ef351388dea1e846279cc5c2",
+    "vectorIndexSha256": "sha256:88f6b88708dce0814a639c5fe37b335b8544f84b5134c6a069b722cd40e7ab86",
+    "vectorBytesSha256": "sha256:1c32d021ed5bca49a100f0cc9ee53063c8280f33a7ad0625e9cacbfa05b8f362",
+    "vectorDimensions": 768
+  },
+  "candidateCoordinates": {
+    "packetKeySourceRefSourceRevisionWorkspaceRevisionExactMatches": 0,
+    "candidateRowsCarryChunkRowId": 0,
+    "candidateRowsCarryCanonicalChunkId": 0,
+    "candidateRowsCarrySummaryDigest": 0,
+    "allRowsHaveChunkIdentity": false,
+    "allRowsHaveSummaryDigest": false
+  },
+  "counts": {
+    "EXACT_CURRENT_CANDIDATE_MATCH": 0,
+    "CURRENT_CANDIDATE_NOT_FOUND": 8,
+    "SOURCE_REVISION_MISMATCH": 0,
+    "WORKSPACE_REVISION_MISMATCH": 0,
+    "CHUNK_IDENTITY_MISMATCH": 322,
+    "SUMMARY_DIGEST_MISMATCH": 0,
+    "DUPLICATE_OR_AMBIGUOUS_MATCH": 0
+  },
+  "conservation": {
+    "inputRows": 330,
+    "outputRows": 330,
+    "unclassified": 0,
+    "conserved": true
+  },
+  "detail": {
+    "path": ".tmp/atlas/legacy-summary-cei23-alignment-v1/20260926T155159.229Z/alignment.ndjson",
+    "rows": 330,
+    "sha256": "sha256:4c4680a3484c912ce48e49e4a995e8892ae306076fc6b378a3fd1b024c25acbb"
+  },
+  "producer": {
+    "feature": "legacy_summary_cosine",
+    "started": false,
+    "queryVectorCreated": false,
+    "cosineComputed": false,
+    "rf04Admitted": false,
+    "rf05Replayed": false
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "reasons": [
+    "CEI23_CANDIDATE_MAP_IS_PACKET_SOURCE_LEVEL_AND_OMITS_CHUNK_IDENTITY_AND_SUMMARY_DIGEST",
+    "CANDIDATE_SNAPSHOT_REVISION_NOT_EXPORTED"
+  ]
+}

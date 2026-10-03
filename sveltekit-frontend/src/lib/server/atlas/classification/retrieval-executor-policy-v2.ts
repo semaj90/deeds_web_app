@@ -13,11 +13,13 @@ export type SemanticRepresentationAuthorityV2 = z.infer<typeof SemanticRepresent
 
 export const RetrievalExecutorIdV2Schema = z.enum([
   'postgres_fts',
+  'pg_search_bm25',
   'qdrant_bm25',
   'qdrant_minicoil',
   'qdrant_splade',
   'qdrant_hnsw',
   'pgvector_exact',
+  'pgvector_hnsw',
   'cuvs_bruteforce',
   'cuvs_cagra',
   'cuvs_vamana_build',
@@ -46,11 +48,13 @@ export type RetrievalExecutorCapabilityV2 = z.infer<typeof RetrievalExecutorCapa
 
 export const DEFAULT_RETRIEVAL_EXECUTOR_CAPABILITIES_V2: readonly RetrievalExecutorCapabilityV2[] = [
   { id:'postgres_fts', status:'PROVEN_AVAILABLE', logicalLane:'lexical', mode:'query-and-build', supportedRepresentations:[], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'PostgreSQL FTS baseline; algorithm provenance remains POSTGRES_FTS_TS_RANK[_CD], not BM25.' },
+  { id:'pg_search_bm25', status:'CONFIGURED_UNPROVEN', logicalLane:'lexical', mode:'query-and-build', supportedRepresentations:[], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'ParadeDB pg_search 0.25.1 BM25 on codebase_chunk_index (live, proven by postgres-search-capabilities-v1 receipt); shadow challenger to postgres_fts on the same chunk-grain corpus. Unpromoted: no relevance labels. Shares the lexical logical lane vote; never a second vote.' },
   { id:'qdrant_bm25', status:'CONFIGURED_UNPROVEN', logicalLane:'sparse', mode:'query-and-build', supportedRepresentations:[], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'Qdrant sparse BM25; requires IDF-enabled sparse vector configuration and proof.' },
   { id:'qdrant_minicoil', status:'CONFIGURED_UNPROVEN', logicalLane:'sparse', mode:'query-and-build', supportedRepresentations:[], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'Exact-term contextual sparse challenger; IDF modifier required.' },
   { id:'qdrant_splade', status:'CONFIGURED_UNPROVEN', logicalLane:'sparse', mode:'query-and-build', supportedRepresentations:[], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'Sparse vocabulary-expansion challenger for lexical mismatch.' },
   { id:'qdrant_hnsw', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'query-and-build', supportedRepresentations:['semantic_768','semantic_mrl_512','semantic_mrl_256','semantic_mrl_128','semantic_512'], exact:false, approximate:true, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'Persistent semantic ANN. Active representation must match the admitted corpus contract.' },
   { id:'pgvector_exact', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'query', supportedRepresentations:['semantic_768','semantic_mrl_512','semantic_mrl_256','semantic_mrl_128','semantic_512'], exact:true, approximate:false, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'Bounded relational exact reference when a representation-qualified column/snapshot is proven.' },
+  { id:'pgvector_hnsw', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'query', supportedRepresentations:['semantic_768'], exact:false, approximate:true, gpu:false, persistentIndex:true, onDiskCapable:true, evidenceAuthority:false, notes:'PostgreSQL pgvector HNSW on codebase_chunk_index.content_embedding halfvec(768) (m=16, ef_construction=200). Measured recall@10 0.997 vs exact on 100 in-corpus queries; filtered/iterative-scan and revision-qualified cohort binding not yet proven. One semantic lane vote; executor swap must not add a vote.' },
   { id:'cuvs_bruteforce', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'query', supportedRepresentations:['semantic_768','semantic_mrl_512','semantic_mrl_256','semantic_mrl_128','semantic_512'], exact:true, approximate:false, gpu:true, persistentIndex:false, onDiskCapable:false, evidenceAuthority:false, notes:'GPU exact oracle over the same admitted representation snapshot.' },
   { id:'cuvs_cagra', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'query-and-build', supportedRepresentations:['semantic_768','semantic_mrl_512','semantic_mrl_256','semantic_mrl_128','semantic_512'], exact:false, approximate:true, gpu:true, persistentIndex:false, onDiskCapable:false, evidenceAuthority:false, notes:'GPU graph ANN challenger; one semantic lane contribution only.' },
   { id:'cuvs_vamana_build', status:'CONFIGURED_UNPROVEN', logicalLane:'semantic', mode:'build', supportedRepresentations:['semantic_768','semantic_mrl_512','semantic_mrl_256','semantic_mrl_128','semantic_512'], exact:false, approximate:true, gpu:true, persistentIndex:false, onDiskCapable:false, evidenceAuthority:false, notes:'GPU Vamana index construction/serialization capability; not treated as a query executor until search support is separately proven.' },

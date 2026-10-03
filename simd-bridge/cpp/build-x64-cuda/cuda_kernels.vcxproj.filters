@@ -10,6 +10,9 @@
     <CudaCompile Include="..\cuda_graph_bridge.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\native_runtime_info.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\CMakeLists.txt" />

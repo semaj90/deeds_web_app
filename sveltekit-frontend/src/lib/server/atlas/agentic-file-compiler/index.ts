@@ -14,6 +14,7 @@ export * from './mastra-snapshot-bridge.js';
 export * from './search-runtime-policy.js';
 export * from './file-mutation-guard.js';
 export * from './workflow-action-event-adapter.js';
+export * from './workflow-action-event-writer.js';
 export * from './validation-barrier.js';
 export * from './invalidation-plan.js';
 export * from './model-route-map.js';

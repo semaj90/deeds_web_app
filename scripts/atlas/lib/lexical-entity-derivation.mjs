@@ -26,9 +26,18 @@ const STOPWORD_TOKENS = new Set([
   'type', 'interface', 'return', 'async', 'await',
 ]);
 
+// All `kind:name` prefixes this repo's ast_symbols extractors emit (backfill-ast-symbols.mjs's
+// declarationKinds map + the import/export cases). Found live 2026-09-13: this function only ever
+// special-cased `import:`, so any OTHER prefix (`fn:`, `var:`, `export:`, `class:`, `method:`,
+// `interface:`, `type:`, `enum:`) survived tokenization glued to the first word (`fn:determine`,
+// not `fn` + `determine`) -- the actual root cause of `used_concepts` containing AST-symbol-noise
+// look-alike strings, not a wrong-column bug like `entities` had.
+const KNOWN_PREFIXES = ['import:', 'export:', 'fn:', 'var:', 'class:', 'method:', 'interface:', 'type:', 'enum:'];
+
 /** Splits `camelCase` / `PascalCase` / `snake_case` / `kebab-case` into lowercase word tokens. */
 export function tokenizeIdentifier(identifier) {
-  const withoutPrefix = identifier.startsWith('import:') ? identifier.slice('import:'.length) : identifier;
+  const matchedPrefix = KNOWN_PREFIXES.find((prefix) => identifier.startsWith(prefix));
+  const withoutPrefix = matchedPrefix ? identifier.slice(matchedPrefix.length) : identifier;
   const withSpaces = withoutPrefix
     .replace(/[/_.\-]+/g, ' ')
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -48,7 +57,21 @@ export function deriveEntityLexicalFeatures(astSymbols) {
   const symbols = Array.isArray(astSymbols) ? astSymbols.filter((s) => typeof s === 'string' && s.length > 0) : [];
 
   // "entities": the actual named code entities, excluding raw import-path pseudo-symbols.
-  const entities = [...new Set(symbols.filter((s) => !s.startsWith('import:')))].sort();
+  // Fixed 2026-09-13 (same session as the used_concepts prefix-contamination fix): this used to
+  // keep the full `kind:name` string verbatim (`fn:determineRequestType`), which is what made
+  // sampled `atlas_packet_features.entities` rows look identical in shape to `ast_symbols` --
+  // real signal (which symbol is this), but redundant with the column that already stores it.
+  // Stripping the prefix here (name only, NOT word-tokenized like usedConcepts -- an entity is
+  // one identifier, not a bag of words) makes this column carry distinct value from ast_symbols.
+  const entities = [...new Set(
+    symbols
+      .filter((s) => !s.startsWith('import:'))
+      .map((s) => {
+        const matched = KNOWN_PREFIXES.find((prefix) => prefix !== 'import:' && s.startsWith(prefix));
+        return matched ? s.slice(matched.length) : s;
+      })
+      .filter((s) => s.length > 0),
+  )].sort();
 
   // "lexicalFeatures": raw terms preserved (NE-07) plus their tokenized word forms.
   const lexicalFeatureSet = new Set();

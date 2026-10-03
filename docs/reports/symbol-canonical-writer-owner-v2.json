@@ -1,0 +1,59 @@
+{
+  "schema": "atlas.symbol-canonical-writer-owner.v1",
+  "gate": "SYMBOL-WRITER-OWNER-01",
+  "generatedAt": "2026-09-22T20:57:15.818Z",
+  "scopeDisclosure": "Bounded by session context budget: git grep across sveltekit-frontend/{src,scripts}, packages, python, drizzle/manual -- NOT a full transitive call-graph trace of every possible caller. Two concrete callers found and inspected directly; not re-verified beyond those two.",
+  "directWritersFound": [
+    "packages/parent-atlas/src/core/symbol-registry-repository.ts"
+  ],
+  "owner": {
+    "path": "packages/parent-atlas/src/core/symbol-registry-repository.ts",
+    "export": "createSymbolRegistryRepository",
+    "tablesWritten": [
+      "atlas_symbol_registry",
+      "atlas_symbol_aliases",
+      "atlas_symbol_versions"
+    ],
+    "stableSymbolIdDerivation": "sha256(language.toLowerCase(), kind, symbol_key) -- deterministic, no path-only/latest/fuzzy input",
+    "symbolVersionIdDerivation": "sha256(stable_symbol_id, source_revision, upstream_node_id, declaration_hash) -- explicitly revision-qualified, never workspace-revision-substituted",
+    "schemaCompatibility": "EXACT_MATCH -- INSERT column lists verified byte-for-byte against live atlas_symbol_registry and atlas_symbol_versions, including propagated upstream_file_id.",
+    "safetyGate": "promoteNomination() throws SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE unless allow_create=true is explicitly passed -- writes are not accidental.",
+    "identityRelianceOnForbiddenInputs": "NONE -- no latest/HEAD/path-only/workspace:0/fuzzy-name identity found in stableSymbolId or symbolVersionId derivation.",
+    "upstreamFileIdentityConsumption": "UPSTREAM_FILE_ID_PROPAGATED_STABLE_FILE_ADMISSION_OPEN",
+    "upstreamFileIdentityConsumptionNote": "upstream_file_id is now carried from the canonical structural chunk schema through nominations into atlas_symbol_versions; the value is not yet proven to be an S01-08K stableFileId because S01-08K has not been applied.",
+    "callers": [
+      "packages/parent-atlas/package.json",
+      "packages/parent-atlas/src/index.ts",
+      "sveltekit-frontend/scripts/atlas/native-structural-materializer.mts",
+      "sveltekit-frontend/scripts/atlas/prove-revision-owner.mts",
+      "sveltekit-frontend/scripts/atlas/symbol-canonical-writer-owner-census-v1.mjs",
+      "sveltekit-frontend/src/lib/server/atlas/indexing/symbol-canonical-writer-owner-v1.spec.ts"
+    ],
+    "callersWiredToNpmScript": [],
+    "runtimeReachable": "MANUAL_SCRIPT_INVOCATION_ONLY",
+    "classification": "CANONICAL_RUNTIME_OWNER"
+  },
+  "schemaIncompatibleWriters": [
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-writer-v1.ts",
+      "reason": "Writes stable_symbol_key/symbol_kind columns; live atlas_symbol_registry schema has stable_symbol_id, not stable_symbol_key. Targets a different/legacy table shape, not this owner.",
+      "classification": "SCHEMA_INCOMPATIBLE_OR_DIFFERENT_TABLE"
+    }
+  ],
+  "conflicts": [],
+  "upstreamFileIdentity": {
+    "status": "UPSTREAM_FILE_ID_PROPAGATED_STABLE_FILE_ADMISSION_OPEN",
+    "note": "The canonical path now preserves upstream_file_id, but S01-08K stable-file admission remains unapplied and therefore stable-file identity is not promoted."
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphifyRuns": 0
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "result": "SYMBOL_CANONICAL_WRITER_LINEAGE_BLOCKED",
+  "nextBlocker": "S01-08K_STABLE_FILE_IDENTITY_NOT_APPLIED -- upstream_file_id propagation is proven, stable-file admission is not"
+}

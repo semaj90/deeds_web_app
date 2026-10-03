@@ -2,6 +2,14 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { ResourceEnvelopeV1Schema, ResolutionRevisionSetSchema } from '$lib/server/retrieval/bounded-resolution.js';
 
+// Compatibility export: the feature-vector implementation remains owned by
+// query-routing-features-v1.ts; dataset consumers historically import it from
+// this aggregate contracts module.
+export {
+  QueryRoutingFeatureVectorV1Schema,
+  type QueryRoutingFeatureVectorV1,
+} from './query-routing-features-v1.js';
+
 export const RouterDomainSchema = z.enum([
   'CODE_SEARCH', 'AST_ANALYSIS', 'GRAPH_ANALYSIS', 'DATABASE', 'GPU',
   'BUILD_ERROR', 'TEST_FAILURE', 'UI', 'LEGAL', 'AGENT_CONTROL', 'UNKNOWN',

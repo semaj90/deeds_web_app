@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.packet-source-revision-rollback-manifest.v1",
+  "checksumRecipe": "sorted-key-json-sha256-v1",
+  "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "inverseOf": "e254d42d4bf7b285351ae7c07e53c55cdb3d56c330f0df0b6bb0479f0c12e4c3",
+  "targetTable": "atlas_packets",
+  "targetColumns": [
+    "source_revision",
+    "workspace_revision_key",
+    "lineage_binding_checksum",
+    "lineage_producer_revision"
+  ],
+  "entryCount": 5,
+  "shards": [
+    {
+      "name": "shard-0000.json",
+      "sha256": "a1acbea7a7eabc35dd690d1bd90021e348c587035cb68a34f0ca80bf9f98df64",
+      "entryCount": 5
+    }
+  ]
+}

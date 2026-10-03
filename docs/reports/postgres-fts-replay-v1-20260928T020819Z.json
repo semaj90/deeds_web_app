@@ -1,0 +1,11 @@
+{
+  "schema": "atlas.postgres-fts-replay.v1",
+  "generatedAt": "2026-09-28T02:08:31.002Z",
+  "mode": "READ_ONLY",
+  "queryText": "Graphify retrieval",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "status": "POSTGRES_FTS_REPLAY_ERROR",
+  "error": "canceling statement due to statement timeout",
+  "receiptChecksum": "sha256:b1c1b5d1d2c634a5e4d815b8b34270b6c03d499ca0d6aa18be439df481ac9592"
+}

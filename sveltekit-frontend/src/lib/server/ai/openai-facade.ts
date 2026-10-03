@@ -56,7 +56,7 @@ import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { LLM_MODEL_ID, resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { isVlmOrMmprojRequestModel } from '$lib/server/ai/request-classifiers.js';
 import { shouldUseDraftModel } from '$lib/server/ai/draft-model-policy.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
@@ -120,6 +120,128 @@ export interface RunChatCompletionOptionsV1 {
   useMcp?: boolean;
   /** Optional strict V2 cache handoff from a revision-qualified SearchRuntime caller. */
   revisionedExactAnswerCache?: RevisionedExactAnswerCacheOptionsV1;
+  /** Internal-only bounded replay mode. Never populated from an HTTP request body. */
+  replayPolicy?: InferenceReplayPolicyV1;
+  /** Test/replay instrumentation only; receives metadata and never prompt/response text. */
+  onReplayResult?: (result: Omit<InferenceReplayResultV1, 'response'>) => void;
+}
+
+export interface InferenceReplayPolicyV1 {
+  schema: 'atlas.inference-replay-policy.v1';
+  cacheReadAllowed: false;
+  cacheWriteAllowed: false;
+  userMemoryWriteAllowed: false;
+  conversationWriteAllowed: false;
+  postgresWriteAllowed: false;
+  valkeyWriteAllowed: false;
+  qdrantWriteAllowed: false;
+  neo4jWriteAllowed: false;
+  graphifyRunAllowed: false;
+  retrievalAllowed: false;
+  toolExecutionAllowed: false;
+  durableMetricsWriteAllowed: false;
+}
+
+export const INFERENCE_READ_ONLY_REPLAY_POLICY_V1: InferenceReplayPolicyV1 = Object.freeze({
+  schema: 'atlas.inference-replay-policy.v1',
+  cacheReadAllowed: false,
+  cacheWriteAllowed: false,
+  userMemoryWriteAllowed: false,
+  conversationWriteAllowed: false,
+  postgresWriteAllowed: false,
+  valkeyWriteAllowed: false,
+  qdrantWriteAllowed: false,
+  neo4jWriteAllowed: false,
+  graphifyRunAllowed: false,
+  retrievalAllowed: false,
+  toolExecutionAllowed: false,
+  durableMetricsWriteAllowed: false,
+});
+
+export interface InferenceReplayResultV1 {
+  requestId: string;
+  reportedModelId: string;
+  resolvedModelId: string;
+  outboundModelId: string;
+  responseStatus: number;
+  streaming: false;
+  finishReason: string | null;
+  promptTokens: number | null;
+  completionTokens: number | null;
+  response: OpenAIChatCompletionResponse;
+}
+
+/**
+ * A bounded live transport probe through the existing facade owner. It skips
+ * retrieval, caches, tool execution, user memory, and all durable telemetry.
+ * The only outbound call is a tiny non-streaming llama-server completion.
+ */
+async function runReadOnlyInferenceReplayV1(
+  req: OpenAIChatCompletionRequest,
+): Promise<InferenceReplayResultV1> {
+  const userMessages = req.messages.filter((message) => message.role === 'user');
+  const unsafeMessage = req.messages.some((message) => !['system', 'user'].includes(message.role));
+  const userText = userMessages[0]?.content ?? '';
+  const systemText = req.messages.find((message) => message.role === 'system')?.content ?? '';
+  if (
+    userMessages.length !== 1 || unsafeMessage || typeof userText !== 'string' ||
+    userText.length === 0 || userText.length > 512 || systemText.length > 128 ||
+    (req.tools?.length ?? 0) > 0 || req.case_id || req.file_path || req.use_mcp
+  ) {
+    throw new Error('Read-only inference replay requires one bounded user message and no tools, retrieval, or case/file context');
+  }
+
+  const requestId = `inference-replay-${crypto.randomUUID()}`;
+  const target = await resolveLlamaInferenceTarget();
+  const startedAt = Date.now();
+  const response = await fetch(`${target.baseUrl.replace(/\/$/, '')}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-request-id': requestId },
+    body: JSON.stringify({
+      model: target.model,
+      messages: [
+        ...(systemText ? [{ role: 'system', content: systemText }] : []),
+        { role: 'user', content: userText },
+      ],
+      max_tokens: Math.min(req.max_tokens ?? 16, 16),
+      temperature: Math.min(req.temperature ?? 0, 0.2),
+      stream: false,
+      cache_prompt: false,
+    }),
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) {
+    throw new Error(`Read-only inference replay failed: llama-server HTTP ${response.status}`);
+  }
+
+  const body = await response.json() as {
+    model?: unknown;
+    choices?: Array<{ message?: { content?: unknown }; finish_reason?: unknown }>;
+    usage?: { prompt_tokens?: unknown; completion_tokens?: unknown };
+  };
+  const content = body.choices?.[0]?.message?.content;
+  if (typeof content !== 'string') throw new Error('Read-only inference replay returned no assistant text');
+  const normalizedResponse = wrapResponse({
+    content,
+    model: target.model,
+    durationMs: Date.now() - startedAt,
+    ace: { used: false, chunks: 0, agentsMd: false, codeLlmHit: false, cacheHit: 'none', inputTokens: 0 },
+    backend: 'llama-server-read-only-replay',
+    selectedLane: 'bifrost',
+  });
+
+  return {
+    requestId,
+    reportedModelId: target.model,
+    resolvedModelId: target.model,
+    outboundModelId: target.model,
+    responseStatus: response.status,
+    streaming: false,
+    finishReason: typeof body.choices?.[0]?.finish_reason === 'string' ? body.choices[0].finish_reason : null,
+    promptTokens: typeof body.usage?.prompt_tokens === 'number' ? body.usage.prompt_tokens : null,
+    completionTokens: typeof body.usage?.completion_tokens === 'number' ? body.usage.completion_tokens : null,
+    response: normalizedResponse,
+  };
 }
 
 /**
@@ -756,6 +878,34 @@ export async function runChatCompletion(
 
   if (!query) {
     throw new Error('No user query found in messages — last message must be role:user');
+  }
+
+  if (opts.replayPolicy) {
+    const policy = opts.replayPolicy;
+    if (
+      policy.schema !== INFERENCE_READ_ONLY_REPLAY_POLICY_V1.schema ||
+      policy.cacheReadAllowed !== false || policy.cacheWriteAllowed !== false || policy.userMemoryWriteAllowed !== false ||
+      policy.conversationWriteAllowed !== false || policy.postgresWriteAllowed !== false ||
+      policy.valkeyWriteAllowed !== false || policy.qdrantWriteAllowed !== false ||
+      policy.neo4jWriteAllowed !== false || policy.graphifyRunAllowed !== false ||
+      policy.retrievalAllowed !== false || policy.toolExecutionAllowed !== false ||
+      policy.durableMetricsWriteAllowed !== false
+    ) {
+      throw new Error('Unsupported inference replay policy');
+    }
+    const replay = await runReadOnlyInferenceReplayV1(req);
+    opts.onReplayResult?.({
+      requestId: replay.requestId,
+      reportedModelId: replay.reportedModelId,
+      resolvedModelId: replay.resolvedModelId,
+      outboundModelId: replay.outboundModelId,
+      responseStatus: replay.responseStatus,
+      streaming: replay.streaming,
+      finishReason: replay.finishReason,
+      promptTokens: replay.promptTokens,
+      completionTokens: replay.completionTokens,
+    });
+    return replay.response;
   }
 
   // Tiered Scenario Cache (Tier 1 Redis, Tier 2 Qdrant + Postgres hydration)

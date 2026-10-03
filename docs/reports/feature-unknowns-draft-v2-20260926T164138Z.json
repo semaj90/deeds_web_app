@@ -1,0 +1,57 @@
+{
+  "schema": "atlas.feature-unknowns-draft-receipt.v2",
+  "status": "DRAFT_ARTIFACT_ONLY_NOT_APPLIED",
+  "generatedAt": "2026-09-26T16:41:38.631Z",
+  "target": "public.atlas_feature_unknowns (PROPOSED; table does not exist)",
+  "migration": {
+    "path": "sveltekit-frontend\\drizzle\\manual\\20260926_atlas_feature_unknowns_PROPOSED.sql",
+    "sha256": "sha256:ed07c7f73c292dc184b8b07d749cdc72663150ebcadfaf73ea028e613e011a9f",
+    "applied": false
+  },
+  "inputs": {
+    "featureReceipt": "docs\\reports\\legacy-summary-hint-feature-v2-20260926T162937Z.json",
+    "featureRows": {
+      "path": ".tmp\\atlas\\legacy-summary-hint-feature-v2\\20260926T162937Z\\feature-rows.ndjson",
+      "sha256": "sha256:580e400717445d239d9ba9b8beeb58689cab9dba31c759c931269654ad2dd94f",
+      "bytes": 16044096
+    },
+    "cei24Overlay": {
+      "path": ".tmp\\atlas\\cei24-candidate-chunk-overlay-v1\\20260926T161153Z\\candidate-chunk-evidence-overlay.ndjson",
+      "sha256": "sha256:f8c72d13f6f5eaf3e18f59d8800abb19e3141e846f7a0ecd827ac67faef39608",
+      "bytes": 12824829
+    }
+  },
+  "coordinates": {
+    "candidateSnapshotRevision": "sha256:603ec7df0c335cbd7feecc9f7041d9e09605e2008a37d7f7998d1c475aa4be81",
+    "ordinalMapChecksum": "6ae3cbcc4c4e6eff3ff6f516cdc1216db59b94a6b83c382e6cddc028f9418a0e"
+  },
+  "draftRows": 15973,
+  "byReason": {
+    "NO_PROVEN_CHUNK_LINEAGE": 15638,
+    "CHUNK_WITHOUT_QUALIFIED_SUMMARY": 335
+  },
+  "checks": {
+    "matchesUnavailableCount": true,
+    "uniqueSurrogateKeys": true,
+    "uniqueNaturalKeys": true,
+    "reasonsPartitionAll": true,
+    "noValuesStored": true,
+    "deterministic": true
+  },
+  "uuidNamespace": "ac6c930e-5dda-52cc-85a8-a2dfcf324b31",
+  "producerRevision": "sha256:efd1c4ee35b552482df5b3deea1fb8ebe9365f4c66e97b47b2b01d8e295c98a1",
+  "artifact": {
+    "path": ".tmp\\atlas\\feature-unknowns-draft-v2\\20260926T164138Z\\atlas_feature_unknowns.draft.ndjson",
+    "sha256": "sha256:bc83018f7932a8a2492b6f2ee7ade495fa885d197e923e837568a80c3f9ab7a4",
+    "rows": 15973
+  },
+  "packetLevelSummaryPresentAmongDrafts": 3622,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0,
+    "graphify": 0
+  },
+  "semantics": "Worklist of missing feature values. Not identity, not a value store; distinct from unknown_packets (packet-identity lifecycle)."
+}

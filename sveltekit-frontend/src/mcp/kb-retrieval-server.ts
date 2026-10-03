@@ -14,8 +14,11 @@ import { join } from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
+import { z as mcpZ } from 'zod/v3';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '../lib/server/kb/search-logic.js';
 import { ENV } from '../lib/server/env.server.js';
+import { findRepoRoot } from '../lib/server/atlas/docs/doc-intelligence-read-model.js';
+import { readLocalChunkSnapshotPageV1 } from '../lib/server/atlas/docs/local-chunk-snapshot-v1.js';
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -67,6 +70,43 @@ server.tool(
     } catch (err: any) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: err.message }) }], isError: true };
     }
+  }
+);
+
+server.tool(
+  'docs.search_langchain_local_snapshot',
+  {
+    query: mcpZ
+      .string()
+      .trim()
+      .min(1)
+      .max(120)
+      .describe('Substring query against the pinned local LangChain docs snapshot'),
+    language: mcpZ
+      .string()
+      .trim()
+      .min(1)
+      .max(32)
+      .optional()
+      .describe('Optional programming language filter, such as python or typescript'),
+    limit: mcpZ.number().int().min(1).max(20).default(5),
+    offset: mcpZ.number().int().min(0).max(100_000).default(0),
+    manifestChecksum: mcpZ
+      .string()
+      .regex(/^sha256:[a-f0-9]{64}$/)
+      .optional()
+      .describe('Required to continue pagination against the same pinned manifest'),
+  },
+  async ({ query, language, limit, offset, manifestChecksum }) => {
+    const page = readLocalChunkSnapshotPageV1({
+      root: findRepoRoot(),
+      query,
+      language,
+      limit,
+      offset,
+      expectedManifestChecksum: manifestChecksum,
+    });
+    return { content: [{ type: 'text' as const, text: JSON.stringify(page, null, 2) }] };
   }
 );
 

@@ -18,6 +18,8 @@ export const REPAIR_FEATURE_DERIVATIONS = [
   'GRAPH_DERIVED',
   'STRUCTURAL_DERIVED',
   'TOPOLOGY_DERIVED',
+  'LEGACY_SUMMARY_HINT_MAX_COSINE',
+  'LEGACY_SUMMARY_HINT_MAX_COSINE',
   'OTHER_DERIVED',
 ] as const;
 
@@ -181,6 +183,21 @@ function validateDerivationMetadata(input: {
     if (!input.representationRevision?.trim() || !input.sourceRepresentationRevision?.trim()) {
       throw new Error(`REPAIR_FEATURE_ARTIFACT_LATENT_REVISION_REQUIRED:${input.featureName}`);
     }
+  }
+  if (input.featureName === 'legacy_summary_cosine_max') {
+    // Historical summary HINT evidence aggregated by MAX chunk cosine. Both the HINT vectors and the query
+    // are raw semantic_768 embeddings; the derivation is explicit rather than hidden behind OTHER_DERIVED.
+    if (input.derivation !== 'LEGACY_SUMMARY_HINT_MAX_COSINE') {
+      throw new Error(`REPAIR_FEATURE_ARTIFACT_LEGACY_SUMMARY_DERIVATION_INVALID:${input.featureName}`);
+    }
+    if (input.representationId !== 'semantic_768' || input.sourceRepresentationId !== 'semantic_768') {
+      throw new Error(`REPAIR_FEATURE_ARTIFACT_LEGACY_SUMMARY_REPRESENTATION_INVALID:${input.featureName}`);
+    }
+    if (!input.representationRevision?.trim() || !input.sourceRepresentationRevision?.trim()) {
+      throw new Error(`REPAIR_FEATURE_ARTIFACT_LEGACY_SUMMARY_REVISION_REQUIRED:${input.featureName}`);
+    }
+  } else if (input.derivation === 'LEGACY_SUMMARY_HINT_MAX_COSINE') {
+    throw new Error(`REPAIR_FEATURE_ARTIFACT_LEGACY_SUMMARY_DERIVATION_WRONG_FEATURE:${input.featureName}`);
   }
 }
 

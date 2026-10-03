@@ -1,0 +1,30 @@
+{
+  "schema": "atlas.compact-query-router-tensor-projection-proof.v1",
+  "generatedAt": "2026-09-18T00:35:43.620Z",
+  "status": "ROUTER_TENSOR_PROJECTION_PARITY_PROVEN",
+  "source": {
+    "revision": "atlas.retrieval-router-tensor.v2",
+    "width": 234,
+    "checksum": "sha256:76b1705481db4399cc4edf8e8d3347dd0d92bc21fc3103222eb55fda03a016e7"
+  },
+  "output": {
+    "width": 154,
+    "checksum": "sha256:dc145bf6640808b4a68c2f803d890a1a07ccacbeea15eea1417869674a8399af",
+    "classificationMrl128Parity": true,
+    "deterministicQueryFeatures26Parity": true
+  },
+  "sections": {
+    "classificationMrl128": {
+      "sourceOffset": 0,
+      "width": 128
+    },
+    "deterministicQueryFeatures26": {
+      "sourceOffset": 160,
+      "width": 26
+    }
+  },
+  "evidenceAuthority": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "nextGate": "ROUTE-MISSINGNESS-01"
+}

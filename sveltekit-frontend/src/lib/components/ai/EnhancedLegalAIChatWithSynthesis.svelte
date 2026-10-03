@@ -3,6 +3,7 @@
   Combines all advanced services: input synthesis: LegalBERT analysis: RAG pipeline, and streaming
 -->
 <script lang="ts">
+	import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
   import { onMount, tick } from 'svelte';
   import { browser } from '$app/environment';
   import { fade, fly } from 'svelte/transition';
@@ -400,7 +401,7 @@ Response:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: SERVER_CHAT_MODEL,
           prompt: enhancedPrompt,
           stream: true,
           options: {
@@ -461,7 +462,7 @@ Response:`;
           metadata: { documentsProcessed: context.documentIds?.length || 0 }
         },
         metadata: {
-          model: 'gemma4-legal',
+          model: SERVER_CHAT_MODEL,
           streaming: true,
           userRole,
           caseId,
@@ -597,7 +598,7 @@ Response:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal',
+        model: SERVER_CHAT_MODEL,
         messages: [{ role: 'user', content: enhancedPrompt }],
         stream: false,
         options: {
@@ -635,7 +636,7 @@ Response:`;
         metadata: { documentsProcessed: context.documentIds?.length || 0 }
       },
       metadata: {
-        model: 'gemma4-legal',
+        model: SERVER_CHAT_MODEL,
         userRole,
         caseId,
         enabledFeatures: {
@@ -703,7 +704,7 @@ Response:`;
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: SERVER_CHAT_MODEL,
           prompt: `Perform a comprehensive legal analysis of the following text. Extract and analyze:
 
 1. Legal entities (parties, courts, statutes, cases)
@@ -745,7 +746,7 @@ Provide a structured analysis:`,
 ${analysis.response}
 
 **System Status:** ✅ All services operational
-**Model:** gemma4-legal
+**Model:** ornith-1.5-9b
 **Processing Complete**`);
     } catch (error: any) {
       await addSystemMessage(`❌ Analysis failed: ${error.message}`);
@@ -763,7 +764,7 @@ ${analysis.response}
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: SERVER_CHAT_MODEL,
           prompt: `Research legal topic: "${topic}" for ${userRole}
 
 Provide comprehensive analysis with:
@@ -797,7 +798,7 @@ Topic: ${topic}`,
 **Research Quality:** ${Math.round(confidenceScore)}%
 **Keyword Relevance:** ${keywordMatches} matches found
 **Response Length:** ${responseLength} characters
-**Model:** gemma4-legal
+**Model:** ornith-1.5-9b
 
 **Research Findings:**
 ${research.response}
@@ -864,7 +865,7 @@ ${relatedReports.length > 0 ? `**Database Stats:**
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-legal',
+          model: SERVER_CHAT_MODEL,
           prompt,
           stream: true,
           options: {

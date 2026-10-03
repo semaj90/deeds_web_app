@@ -1,0 +1,36 @@
+{
+  "schema": "atlas.symbol-revision-repair-apply-admission.v1",
+  "generatedAt": "2026-09-22T00:34:44.490Z",
+  "arithmetic": {
+    "versionsTotal": 479,
+    "alreadyQualified": 194,
+    "exactRepair": 208,
+    "blocked": 77,
+    "arithmeticHolds": true
+  },
+  "checksums": {
+    "previewChecksum": "sha256:babdfe0d2c96d5dd39bc39c25bd3135d0a2cdeacb25549541f53c47be06937c1",
+    "previewChecksumMatch": true,
+    "sealedCohortChecksum": "sha256:52d4a054e04e1904a49c0eff19dbab1bcc446e63aec8ca2dcde01f4960319abe",
+    "cohortChecksumMatch": true,
+    "manifestChecksum": "sha256:54df391c065b1e721cd8c201781f3024839ae00c30885b8ab4ae15dea8c4b7dc",
+    "manifestChecksumMatch": true
+  },
+  "manifestRows": 208,
+  "admission": {
+    "staleRows": 0,
+    "missingRows": 0,
+    "ambiguousRows": 0,
+    "invalidProposalRows": 0,
+    "duplicateTargetRows": 0,
+    "noStableFileIdInvolved": true,
+    "allRowsOk": true
+  },
+  "failingRowSample": [],
+  "safety": {
+    "databaseWrites": 0,
+    "historicalRowsChanged": 0,
+    "readerCutover": false
+  },
+  "result": "S01_10_REPAIR_APPLY_READY"
+}

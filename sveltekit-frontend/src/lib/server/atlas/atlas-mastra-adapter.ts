@@ -5,16 +5,15 @@
 
 import { z } from 'zod';
 
-// @mastra/core is NOT installed in this repo (confirmed via package.json audit,
-// 2026-08-01/02 — no `mastra` or `@mastra/core` dependency exists). The
-// unconditional `import { createTool } from '@mastra/core'` this file used to
-// have crashed at module-load time on every request to /api/atlas/mastra-agent
-// with "Failed to resolve entry for package @mastra/core" (reproduced live).
-// This local shim preserves the exact call shape (id/description/inputSchema/
-// outputSchema/execute) so the 7 tool definitions below still type-check and
-// export real, callable objects — it does NOT provide Mastra's actual agent
-// runtime (tool selection, step orchestration, model loop). If/when the real
-// @mastra/core package is installed, delete this shim and restore the import.
+// The frontend deliberately keeps this local tool seam until a real Mastra
+// runtime is proven compatible with the PostgreSQL/Drizzle ownership model.
+// The isolated @deeds/atlas-orchestrator workspace declares @mastra/core, but
+// the currently resolved 0.1.x runtime eagerly imports @prisma-app/client.
+// Adding Prisma here would create an unauthorized second persistence owner.
+// This shim preserves the call shape (id/description/inputSchema/outputSchema/
+// execute) so the seven tool definitions remain callable, while making no
+// claim that Mastra's agent loop, workflow runtime, or snapshot persistence is
+// live. AFC-14/AFC-15 must remain open until a compatible runtime is proven.
 interface LocalToolShim<TInput, TOutput> {
   id: string;
   description: string;
@@ -24,6 +23,22 @@ interface LocalToolShim<TInput, TOutput> {
 }
 function createTool<TInput, TOutput>(config: LocalToolShim<TInput, TOutput>): LocalToolShim<TInput, TOutput> {
   return config;
+}
+
+/**
+ * A typed fail-closed signal for adapter seams that have no live owner yet.
+ * Callers must treat this as unavailable evidence, never as an empty success.
+ */
+export class AtlasAdapterUnavailableError extends Error {
+  readonly code: string;
+  readonly writesPerformed = false;
+  readonly canonicalAuthority = false;
+
+  constructor(code: string) {
+    super(code);
+    this.name = 'AtlasAdapterUnavailableError';
+    this.code = code;
+  }
 }
 import {
   AtlasRuntimeContext,
@@ -70,10 +85,14 @@ export const atlasRetrieveTool = createTool({
     if (runtime) {
       if (!isTransitionAllowed(runtime.state, AtlasState.RETRIEVE, {
         lastTool: 'init',
-        lastToolSucceeded: true,
-        retrievalConfidence: 0.7,
+        // This guard has no prior tool receipt. Do not manufacture one just
+        // to satisfy the FSM; retrieval must remain blocked until discovery
+        // supplies actual evidence.
+        lastToolSucceeded: false,
+        lastToolError: 'PRIOR_TOOL_RECEIPT_REQUIRED',
+        retrievalConfidence: 0,
         evidenceCount: 0,
-        validationStatus: 'PASS',
+        validationStatus: 'WARN',
         authFailure: false,
         revisionMismatch: false,
         tokenPressure: 0.5,
@@ -83,23 +102,7 @@ export const atlasRetrieveTool = createTool({
       }
     }
 
-    // TODO: Call Go Retrieval gRPC or HTTP endpoint
-    // For now, return stub response
-    return {
-      packets: [
-        {
-          packetKey: 'atlas:packet:example:001',
-          sourceRef: 'src/lib/server/atlas/atlas-runtime-context.ts',
-          contentHash: 'abc123def456',
-          denseScore: 0.95,
-          sparseScore: 0.82,
-          graphScore: 0.88,
-          retrievalId: 'retrieval:2026-07-29:001',
-        },
-      ],
-      confidence: 0.9,
-      evidenceCount: 1,
-    };
+    throw new AtlasAdapterUnavailableError('ATLAS_RETRIEVAL_ADAPTER_UNAVAILABLE');
   },
 });
 
@@ -115,13 +118,18 @@ export const atlasValidateChangeTool = createTool({
     valid: z.boolean(),
     status: z.enum(['PASS', 'WARN', 'FAIL']),
     errors: z.array(z.string()),
+    available: z.boolean(),
+    canonicalAuthority: z.boolean(),
+    writesPerformed: z.boolean(),
   }),
   execute: async (input, context) => {
-    // TODO: Call Postgres validation, schema enforcement
     return {
-      valid: true,
-      status: 'PASS',
-      errors: [],
+      valid: false,
+      status: 'FAIL',
+      errors: ['ATLAS_VALIDATION_ADAPTER_UNAVAILABLE'],
+      available: false,
+      canonicalAuthority: false,
+      writesPerformed: false,
     };
   },
 });
@@ -145,11 +153,10 @@ export const atlasApplyChangeTool = createTool({
       throw new Error('Mutation not allowed in current context');
     }
 
-    // TODO: Call Postgres write, invalidate Redis, emit RabbitMQ event
     return {
-      success: true,
-      rowsAffected: 1,
-      newRevision: new Date().toISOString(),
+      success: false,
+      rowsAffected: 0,
+      newRevision: '',
     };
   },
 });
@@ -170,15 +177,7 @@ export const atlasBuildContextTool = createTool({
   }),
   }),
   execute: async (input, context) => {
-    // TODO: Call ACE context assembler, token counter
-    return {
-      contextPacket: {
-        prompt: 'Analyze the retrieved evidence...',
-        evidence: [],
-        metadata: {},
-        tokenCount: 0,
-      },
-    };
+    throw new AtlasAdapterUnavailableError('ATLAS_CONTEXT_ADAPTER_UNAVAILABLE_ACE_OWNER_REQUIRED');
   },
 });
 
@@ -189,6 +188,7 @@ export const atlasDiscoverTool = createTool({
     query: z.string().describe('Path, symbol, or identifier'),
   }),
   outputSchema: z.object({
+    status: z.enum(['UNAVAILABLE', 'FOUND']),
     packets: z.array(
       z.object({
         packetKey: z.string(),
@@ -196,11 +196,17 @@ export const atlasDiscoverTool = createTool({
         confidence: z.number(),
       })
     ),
+    reason: z.string().optional(),
+    canonicalAuthority: z.boolean(),
+    writesPerformed: z.boolean(),
   }),
   execute: async (input, context) => {
-    // TODO: Resolve identity from Postgres, Neo4j topology
     return {
+      status: 'UNAVAILABLE',
       packets: [],
+      reason: 'ATLAS_DISCOVER_UNAVAILABLE_CANONICAL_RESOLUTION_REQUIRED',
+      canonicalAuthority: false,
+      writesPerformed: false,
     };
   },
 });
@@ -213,11 +219,21 @@ export const atlasInspectRuntimeTool = createTool({
   }),
   outputSchema: z.object({
     runtime: z.record(z.string(), z.unknown()),
+    registryLanes: z.array(z.record(z.string(), z.unknown())).optional(),
+    writesPerformed: z.literal(false),
   }),
   execute: async (input, context) => {
     const runtime = (context as any).atlasRuntime as AtlasRuntimeContext | undefined;
+    const detail = (input as any)?.detail ?? 'summary';
+    let registryLanes: Record<string, unknown>[] | undefined;
+    if (detail === 'full') {
+      const { buildPacketRegistryLaneDescriptorsV1 } = await import('./contracts/rpc-packet-registry-lanes-v1.js');
+      registryLanes = buildPacketRegistryLaneDescriptorsV1() as unknown as Record<string, unknown>[];
+    }
     return {
-      runtime: runtime || {},
+      runtime: (runtime || {}) as Record<string, unknown>,
+      registryLanes,
+      writesPerformed: false as const,
     };
   },
 });
@@ -233,12 +249,17 @@ export const atlasDelegateTool = createTool({
   outputSchema: z.object({
     result: z.string(),
     status: z.enum(['success', 'failed', 'pending']),
+    available: z.boolean(),
+    reason: z.string().optional(),
+    writesPerformed: z.boolean(),
   }),
   execute: async (input, context) => {
-    // TODO: Wire A2A / ACP / OpenCode delegation
     return {
       result: '',
-      status: 'pending',
+      status: 'failed',
+      available: false,
+      reason: 'ATLAS_DELEGATE_UNAVAILABLE_GOVERNED_OWNER_REQUIRED',
+      writesPerformed: false,
     };
   },
 });
@@ -253,13 +274,25 @@ export async function createAtlasRequestContext(init: {
   resourceId: string;
   workspaceId: string;
   packetKey: string;
+  workspaceRevision: string;
+  packetRevision: string;
 }) {
+  if (!init.workspaceRevision.trim()) {
+    throw new Error('ADMITTED_WORKSPACE_REVISION_REQUIRED');
+  }
+
+  if (!init.packetRevision.trim()) {
+    throw new Error('PACKET_REVISION_REQUIRED');
+  }
+
   const runtime = createAtlasRuntimeContext({
     runId: init.runId,
     threadId: init.threadId,
     resourceId: init.resourceId,
     workspaceId: init.workspaceId,
     packetKey: init.packetKey,
+    workspaceRevision: init.workspaceRevision,
+    packetRevision: init.packetRevision,
     initialState: AtlasState.DISCOVER,
     tokenBudget: 8192,
   });

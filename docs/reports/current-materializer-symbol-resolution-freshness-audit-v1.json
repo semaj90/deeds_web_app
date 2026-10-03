@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.current-materializer-symbol-resolution-freshness-audit.v1",
+  "status": "HISTORICAL_ADAPTER_SUPERSEDED_FOR_CURRENT_COHORT",
+  "currentPlan": {
+    "path": "docs/reports/current-tree-bound-symbol-registry-input-v1.json",
+    "entryCount": 461,
+    "planChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "promotionAuthorized": false
+  },
+  "currentResolution": {
+    "path": "docs/reports/tree-bound-symbol-registry-resolution-v2.json",
+    "inputRowCount": 461,
+    "inputPlanChecksum": "sha256:011a7d0b66f80f451b20ad7d8af1fd8e53f19c44b1c61b2c2b74b7f5bb88a3e2",
+    "exactCanonicalKey": 0,
+    "symbolVersionBound": 0,
+    "promotionAuthorized": false
+  },
+  "historicalAdapter": {
+    "path": "docs/reports/current-materializer-symbol-resolution-adapter-v1.json",
+    "inputCount": 440,
+    "treeBound": 353,
+    "canonical": 90,
+    "outputChecksum": "sha256:b076aff7a890bcbfb4b6ad9728082b108c0f7b9e9ded2aa82bfc552ac2483dcf",
+    "inputPlanChecksum": null,
+    "workspaceRevision": null
+  },
+  "registryKeyPrefixes": [
+    {
+      "prefix": "symbol-key",
+      "count": 10260
+    },
+    {
+      "prefix": "upstream-symbol",
+      "count": 194
+    }
+  ],
+  "checks": {
+    "currentPlanExists": true,
+    "currentPlanChecksumPresent": true,
+    "currentResolutionMatchesPlan": true,
+    "adapterIsCurrentCohort": false,
+    "adapterCarriesCurrentWorkspaceRevision": false,
+    "adapterPromotionClosed": false
+  },
+  "staleReasons": [
+    "ADAPTER_INPUT_COHORT_NOT_CURRENT_461_ROW_PLAN",
+    "ADAPTER_RECEIPT_MISSING_WORKSPACE_REVISION_BINDING"
+  ],
+  "canonicalAuthority": false,
+  "canonicalWrites": 0,
+  "databaseWrites": 0,
+  "readOnly": true,
+  "nextGate": "REGENERATE_CURRENT_SYMBOL_INPUT_FROM_ADMITTED_WORKSPACE_OWNER"
+}

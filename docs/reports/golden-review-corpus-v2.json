@@ -1,0 +1,79 @@
+{
+  "schema": "atlas.golden-review-corpus.v2",
+  "generatedAt": "2026-09-12T19:12:14.008Z",
+  "mode": "READ_ONLY_AUDIT",
+  "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+  "registeredQueryCount": 60,
+  "registeredQueryDomain": "golden_review_pending",
+  "querySetChecksum": "sha256:bc72ed247b9b531d6d7e89aa2e4cba69e804c7cf3cdbe0c5f926dd9c31e0f8df",
+  "blockers": [
+    {
+      "code": "GOLDEN_REVIEW_ZERO_JUDGMENTS",
+      "lane": "JUDGMENT",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/golden-review-corpus-v2.json"
+      ],
+      "explanation": "All 60 registered golden_review_pending queries have zero rows in evaluation_relevance and evaluation_relevance_corrected -- no relevance judgment exists for any of them (evaluation_judgments cannot be checked, see note above; database-wide it is 100% 'pending'/'gemma4', never 'human')."
+    },
+    {
+      "code": "NO_HUMAN_GRADED_JUDGMENT_EXISTS_ANYWHERE",
+      "lane": "JUDGMENT",
+      "severity": "CRITICAL",
+      "receiptRefs": [
+        "docs/reports/golden-review-corpus-v2.json"
+      ],
+      "explanation": "Database-wide, zero rows in evaluation_relevance_corrected have judgment_source='human' (all 33,216 are 'derived') and zero rows in evaluation_judgments have graded_by='human' (12,290 are 'gemma4', 5,246 'pending'). No compatible golden judgment corpus can be assembled from existing data by relabeling -- new human review work is required, not a data-wiring fix."
+    },
+    {
+      "code": "GOLDEN_REVIEW_CORPUS_NOT_BOUND_TO_ADMITTED_WORKSPACE_REVISION",
+      "lane": "JUDGMENT",
+      "severity": "PROMOTION_BLOCKING",
+      "receiptRefs": [
+        "docs/reports/golden-review-corpus-v2.json"
+      ],
+      "explanation": "All existing evaluation_relevance_corrected rows carry corpus_version='2026-07-12-main-4ade5cfa' (a git-commit label, matching the STALE 384-dim placeholder manifest in golden-review-corpus-compatibility-v1.json) -- none carry the admitted workspace revision sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf or any sha256:-prefixed revision at all. No embeddingModelRevision/representationRevision binding exists on this table either."
+    }
+  ],
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "postgresModified": false
+  },
+  "registrationReceiptCrossCheck": {
+    "missingFromDb": 0,
+    "wrongDomainCount": 0,
+    "allBoundCorrectly": true
+  },
+  "judgmentsForRegisteredQueries": {
+    "evaluation_relevance": 0,
+    "evaluation_relevance_corrected": 0,
+    "evaluation_relevance_corrected_corpus_versions": [],
+    "evaluation_relevance_corrected_judgment_sources": [],
+    "evaluation_judgments_note": "evaluation_judgments uses a 12-char hash query_id with no foreign key to evaluation_queries.id -- structurally cannot be joined to these 60 registered UUIDs, checked database-wide instead (see databaseWideJudgmentContext)."
+  },
+  "databaseWideJudgmentContext": {
+    "evaluation_relevance_corrected_by_source_and_corpus": [
+      {
+        "judgment_source": "derived",
+        "corpus_version": "2026-07-12-main-4ade5cfa",
+        "count": 33216
+      }
+    ],
+    "evaluation_judgments_by_graded_by": [
+      {
+        "graded_by": "pending",
+        "count": 5246
+      },
+      {
+        "graded_by": "gemma4",
+        "count": 12290
+      }
+    ],
+    "anyHumanGradedJudgmentExistsAnywhere": false,
+    "anyJudgmentBoundToAdmittedWorkspaceRevision": false
+  },
+  "status": "GOLDEN_REVIEW_CORPUS_BLOCKED",
+  "compatibleManifestCount": 0,
+  "importEnabled": false,
+  "nextRequiredStep": "Human-review at least the 60 registered golden_review_pending query/candidate pairs and record judgments bound to the admitted workspace revision, embedding model revision, and representation revision -- this is new grading work, not achievable by re-wiring existing derived/gemma4 judgments."
+}

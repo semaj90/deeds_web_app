@@ -1,0 +1,65 @@
+{
+  "schema": "atlas.phase79-canonical-workflow-action-wiring-results.v1",
+  "test": "PHASE79-CANONICAL-WORKFLOW-ACTION-WIRING-01",
+  "read_only": false,
+  "canonical_production_data_touched": false,
+  "canonical_production_data_mutated": false,
+  "writesPerformed": false,
+  "summary": "Wired sveltekit-frontend/scripts/phase79-agentic-repair.mts to construct and persist a canonical WorkflowActionEventV1 (atlas.workflow-action.v1) for every authorized repair attempt's terminal outcome, closing the explicit follow-up recorded by workflow-action-schema-owner-01. Construction logic is a new pure module (no side effects); persistence reuses the existing writeCanonicalWorkflowActionAtomically() writer. No new persistence path, no change to Phase 79's mutation/apply/rollback logic.",
+  "perFileDisposition": [
+    {
+      "file": "sveltekit-frontend/scripts/phase79-canonical-workflow-action-event.mts",
+      "disposition": "CREATED",
+      "changed": true,
+      "note": "Pure builder, no top-level side effects, no DB connection required. Exports buildPhase79CanonicalWorkflowActionEvent()."
+    },
+    {
+      "file": "sveltekit-frontend/scripts/phase79-agentic-repair.mts",
+      "disposition": "ADAPTER_CALL_SITE",
+      "changed": true,
+      "note": "Added emitCanonicalWorkflowActionEvent() (calls the pure builder then writeCanonicalWorkflowActionAtomically()), called from processOneSuggestion() after ledgerResult is computed. Updated header docstring and sessionReceipt.persistencePolicy to describe the new emission honestly. No change to --apply/--dry-run gating, risk-level gating, or file-mutation/rollback logic."
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+      "disposition": "REUSED_UNCHANGED",
+      "changed": false,
+      "note": "writeCanonicalWorkflowActionAtomically() and CanonicalActionRequestV1 already existed (built/tested earlier this session for workflow-action-schema-owner-01's collision-detection work) and were reused as-is -- no new persistence path invented."
+    },
+    {
+      "file": "sveltekit-frontend/scripts/phase79-canonical-workflow-action-event.test.mts",
+      "disposition": "CREATED_TEST",
+      "changed": true,
+      "note": "5 tests covering completed-with-receipt, succeeded-without-persisted-ledger (honest skip), failed-with-real-errorCode, failed-with-null-failureReason fallback, and idempotency-key distinctness."
+    }
+  ],
+  "identityMappingDecisions": {
+    "workflowId": "phase79-repair:${suggestion.id} -- each repair attempt is its own workflow instance",
+    "workflowRevision": "0 -- no revision concept exists",
+    "sequence": "0 -- exactly one action per workflow instance",
+    "actionId": "fresh randomUUID() -- required by prepareCanonicalActionWriteV1's UUID enforcement (agent_run_actions.action_id is a uuid column)",
+    "runId": "fresh randomUUID() -- same UUID constraint (agent_runs.run_id); distinct from Phase 79's own human-readable sessionId, preserved in metadata.sessionId instead",
+    "dagNodeId": "constant 'phase79.repair-attempt' -- names the one operation-class Phase 79 always executes; not a real DAG node",
+    "attempt": "1 -- no retry loop within processOneSuggestion()",
+    "lane": "'tool' -- best fit among WORKFLOW_ACTION_LANES, matches recordAnalysisPassResult()'s own passType: 'tool_execution'",
+    "kind": "'completed' or 'failed', mapped directly from Phase 79's existing status field",
+    "producerRevision": "PHASE79_PASS_REVISION ('phase79-agentic-repair.v2'), reused verbatim",
+    "tenantId": "documented nil-UUID sentinel 00000000-0000-0000-0000-000000000000 -- no real multi-tenant concept exists for Phase 79; no prior production caller in this repo had established a system-tenant convention (only test fixtures use a non-UUID placeholder, which would fail against the real Postgres uuid column)"
+  },
+  "receiptIdAndErrorCodeHandling": {
+    "completedRequiresReceiptId": "Only constructed when analysis_pass_results actually persisted (ledgerResult.persisted === true); receiptId = String(rowId). If not persisted, the builder returns { skipped: true, reason: 'NO_RECEIPT_ID_AVAILABLE_LEDGER_NOT_PERSISTED' } rather than fabricating a receiptId. This is a disclosed real gap: some successful repairs will not get a canonical event until REPAIR-MUTATION-OWNER-BINDING-01 supplies a real governed-mutation receipt.",
+    "failedRequiresErrorCode": "Derived from the real thrown-error message's leading colon-delimited token (e.g. 'VERIFICATION_NOT_IMPROVED:before=3/1:after=3/1' -> 'VERIFICATION_NOT_IMPROVED'). Falls back to 'UNKNOWN_FAILURE' only when failureReason is null."
+  },
+  "testResults": {
+    "phase79-canonical-workflow-action-event.test.mts": "5/5 pass (ran fresh via `npx tsx --test`)",
+    "tsgo --noEmit (repo-wide)": "0 errors attributable to either touched file; 74 pre-existing errors in unrelated files (nodejs-whisper missing types, QdrantClient.search typing mismatches, GoRetrievalSearchHit.source typo) confirmed unchanged by this work"
+  },
+  "notAttempted": [
+    "No live end-to-end run of phase79-agentic-repair.mts --apply against a real Postgres instance with real pending error_suggestions rows and a running Ornith/llama-server -- that is AGENTIC-REPAIR-CANARY-01's scope, explicitly out of scope here. The actual writeCanonicalWorkflowActionAtomically() DB write was therefore never executed live in this change; only its inputs (the constructed WorkflowActionEventV1) were proven schema-valid.",
+    "No consumer (Kanban projection, A2A listener, LangGraph checkpoint/resume) reads these events back yet."
+  ],
+  "openQuestionsCarriedForward": [
+    "Whether Phase 78, Kanban, or A2A should adopt the same PHASE79_SYSTEM_TENANT_ID nil-UUID convention, or a real shared system-tenant identity should be minted once multiple callers exist.",
+    "Whether REPAIR-MUTATION-OWNER-BINDING-01 should eventually supply a real governed-mutation receipt Phase 79 could use as receiptId for successful repairs whose analysis_pass_results write did not persist, closing the disclosed gap above."
+  ],
+  "RESULT": "DRY_RUN_PROVEN"
+}

@@ -179,6 +179,11 @@ export async function claimBatch(
   jobType: string;
   result: PersistedEnvelope;
 }>> {
+  const batchLimit = Math.floor(limit);
+  if (!Number.isFinite(limit) || batchLimit <= 0) {
+    return [];
+  }
+
   if (analysisJobsTableMissing) {
     return [];
   }
@@ -192,7 +197,7 @@ export async function claimBatch(
         FROM analysis_jobs
         WHERE status = 'queued' ${typeFilter}
         ORDER BY created_at ASC
-        LIMIT ${Math.max(1, Math.floor(limit))}
+        LIMIT ${batchLimit}
         FOR UPDATE SKIP LOCKED
       )
       UPDATE analysis_jobs AS j

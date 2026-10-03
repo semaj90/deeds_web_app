@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.astg-01-capability-receipt.v1",
+  "generatedAt": "2026-09-27T06:14:35.034Z",
+  "canonicalVersion": "0.45.3",
+  "components": {
+    "napi": {
+      "version": "0.45.3",
+      "source": "sveltekit-frontend/node_modules/@ast-grep/napi/package.json"
+    },
+    "localCli": {
+      "version": "0.45.3",
+      "source": "sveltekit-frontend/node_modules/@ast-grep/cli/package.json"
+    },
+    "globalAstGrepBinary": {
+      "version": "0.45.3",
+      "ok": true,
+      "raw": "ast-grep 0.45.3",
+      "note": "PATH-resolved, shell:true — matches real production spawnSync call in ast-grep-symbol-extraction.mjs"
+    },
+    "globalSgBinary": {
+      "version": "0.45.3",
+      "ok": true,
+      "raw": "ast-grep 0.45.3",
+      "note": "deprecated alias of ast-grep upstream; developer convenience only, not a runtime dependency"
+    }
+  },
+  "napiSmoke": {
+    "ok": true,
+    "matchCount": 1,
+    "names": [
+      "foo"
+    ]
+  },
+  "versionsConverged": true,
+  "status": "ASTG_01_02_03_PROVEN",
+  "rule": "ASTG-01/02: project @ast-grep/cli, @ast-grep/napi, and the PATH-resolved global ast-grep binary must all match. ASTG-03: global `sg` is developer-only (deprecated upstream alias of ast-grep), never assumed as a runtime dependency by any script. Re-run this receipt after any npm install (local or -g) that touches ast-grep."
+}

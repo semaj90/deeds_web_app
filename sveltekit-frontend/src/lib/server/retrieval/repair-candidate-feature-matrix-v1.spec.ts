@@ -192,4 +192,96 @@ describe('buildRepairCandidateFeatureMatrixV1', () => {
       ],
     })).toThrow('REPAIR_OVERLAY_VALUE_NON_FINITE:postgres_fts_score:0');
   });
+
+  describe('CFM-PRESENCE-NULLABILITY-01', () => {
+    // Required identity fields must reject undefined, null, '', and whitespace-only alike —
+    // a bare `!value` falsy check rejects '' but not '   ', letting a blank-but-truthy string
+    // masquerade as qualified provenance.
+    it.each([undefined, null, '', '   '])(
+      'rejects packetKey = %p as REPAIR_PACKET_KEY_INVALID_OR_DUPLICATE',
+      (blank) => {
+        const { baseMatrix, identities } = fixture();
+        const broken = [{ ...identities[0]!, packetKey: blank as unknown as string }, identities[1]!];
+        expect(() => buildRepairCandidateFeatureMatrixV1({
+          baseMatrix,
+          baseMatrixManifestChecksum: SHA_A,
+          candidateSnapshotRevision: SHA_B,
+          ordinalMapChecksum: SHA_C,
+          producerRevision: 'test',
+          identities: broken,
+          overlayFeatureStates: states(),
+        })).toThrow('REPAIR_PACKET_KEY_INVALID_OR_DUPLICATE:0');
+      },
+    );
+
+    it.each([undefined, null, '', '   '])(
+      'rejects sourceRef = %p as REPAIR_SOURCE_REF_REQUIRED',
+      (blank) => {
+        const { baseMatrix, identities } = fixture();
+        const broken = [{ ...identities[0]!, sourceRef: blank as unknown as string }, identities[1]!];
+        expect(() => buildRepairCandidateFeatureMatrixV1({
+          baseMatrix,
+          baseMatrixManifestChecksum: SHA_A,
+          candidateSnapshotRevision: SHA_B,
+          ordinalMapChecksum: SHA_C,
+          producerRevision: 'test',
+          identities: broken,
+          overlayFeatureStates: states(),
+        })).toThrow('REPAIR_SOURCE_REF_REQUIRED:0');
+      },
+    );
+
+    // Optional revision fields legitimately allow null/undefined ("not supplied"), but a
+    // supplied blank/whitespace-only value is never a real revision token and must fail closed.
+    it.each(['', '   '])(
+      'rejects a supplied blank sourceRevision = %p as REPAIR_SOURCE_REVISION_BLANK',
+      (blank) => {
+        const { baseMatrix, identities } = fixture();
+        const broken = [{ ...identities[0]!, sourceRevision: blank }, identities[1]!];
+        expect(() => buildRepairCandidateFeatureMatrixV1({
+          baseMatrix,
+          baseMatrixManifestChecksum: SHA_A,
+          candidateSnapshotRevision: SHA_B,
+          ordinalMapChecksum: SHA_C,
+          producerRevision: 'test',
+          identities: broken,
+          overlayFeatureStates: states(),
+        })).toThrow('REPAIR_SOURCE_REVISION_BLANK:0');
+      },
+    );
+
+    it.each(['', '   '])(
+      'rejects a supplied blank representationRevision = %p as REPAIR_REPRESENTATION_REVISION_BLANK',
+      (blank) => {
+        const { baseMatrix, identities } = fixture();
+        const broken = [{ ...identities[0]!, representationRevision: blank }, identities[1]!];
+        expect(() => buildRepairCandidateFeatureMatrixV1({
+          baseMatrix,
+          baseMatrixManifestChecksum: SHA_A,
+          candidateSnapshotRevision: SHA_B,
+          ordinalMapChecksum: SHA_C,
+          producerRevision: 'test',
+          identities: broken,
+          overlayFeatureStates: states(),
+        })).toThrow('REPAIR_REPRESENTATION_REVISION_BLANK:0');
+      },
+    );
+
+    it.each([null, undefined] as const)(
+      'accepts workspaceRevision = %p as legitimately not-supplied',
+      (notSupplied) => {
+        const { baseMatrix, identities } = fixture();
+        const ok = [{ ...identities[0]!, workspaceRevision: notSupplied }, identities[1]!];
+        expect(() => buildRepairCandidateFeatureMatrixV1({
+          baseMatrix,
+          baseMatrixManifestChecksum: SHA_A,
+          candidateSnapshotRevision: SHA_B,
+          ordinalMapChecksum: SHA_C,
+          producerRevision: 'test',
+          identities: ok,
+          overlayFeatureStates: states(),
+        })).not.toThrow();
+      },
+    );
+  });
 });

@@ -1,0 +1,42 @@
+{
+  "schema": "atlas.contract-parity-receipt.v1",
+  "contract": "atlas.unknown-resolution.v1",
+  "status": "ZOD_PYDANTIC_PARITY_PROVEN",
+  "schemaChecksum": "sha256:4aba5523cdee1bc7b986e111864fb7843b15726705b9d028ca263cf67964e39d",
+  "producerRevision": "sha256:a38a9670fc04c9bf806a15a8d236250f632fd587b75ab399be5ddfa4be976a46",
+  "fixtures": 21,
+  "zodAccepts": 3,
+  "verdictMismatches": [],
+  "fieldDiff": {
+    "onlyZod": [],
+    "onlyPydantic": []
+  },
+  "enumDiff": {
+    "subjectKind": {
+      "onlyZod": [],
+      "onlyPydantic": []
+    },
+    "status": {
+      "onlyZod": [],
+      "onlyPydantic": []
+    },
+    "resolverKind": {
+      "onlyZod": [],
+      "onlyPydantic": []
+    }
+  },
+  "requiredFieldCount": 14,
+  "additionalPropertiesClosed": true,
+  "realSetRows": {
+    "checked": 15973,
+    "rejected": 0
+  },
+  "crossFieldRulesNote": "superRefine rules are not in JSON Schema; covered by fixtures with Zod-recorded verdicts",
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "rabbitmq": 0
+  }
+}

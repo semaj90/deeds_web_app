@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     if (goResults) {
       const results = goResults.results.map((hit) => ({
         chunk_id: String(hit.chunk_id ?? hit.chunkId ?? hit.id ?? ''),
-        source: String(hit.source ?? hit.source_type ?? hit.sourceType ?? 'web_page'),
+        source: String(hit.sourceId ?? hit.source_type ?? hit.sourceType ?? 'web_page'),
         url: String(hit.source_url ?? hit.sourceUrl ?? ''),
         title: String(hit.title ?? hit.source_title ?? hit.sourceTitle ?? ''),
         body: String(hit.content ?? hit.text ?? hit.snippet ?? ''),

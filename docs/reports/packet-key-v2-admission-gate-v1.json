@@ -1,0 +1,52 @@
+{
+  "schema": "atlas.packet-key-v2-admission-gate.v1",
+  "mode": "READ_ONLY",
+  "writesPerformed": false,
+  "generatedAt": "2026-09-25T04:46:57.870Z",
+  "gate": "PACKET_KEY_ALIAS_DDL_APPLY_AUTHORIZATION_REQUIRED",
+  "nextGate": "ALIAS_DDL_AUTHORIZATION_THEN_ADMISSION_APPLY_AUTHORIZATION",
+  "manifest": {
+    "path": "docs/reports/packet-key-v2-admission-v1/6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a/root.json",
+    "rootSha256": "6d8fc6e36d36d9de3c70868671a47b37dde3dfd07319bb2a99c628a901069f6a",
+    "entryCount": 7350,
+    "accounting": {
+      "sourceEntries": 7350,
+      "accountedEntries": 7350,
+      "classes": {
+        "ADMISSION_READY": 7350,
+        "PACKET_NOW_EXISTS_VIA_V2": 0,
+        "PACKET_NOW_EXISTS_VIA_LEGACY_ALIAS": 0,
+        "PACKET_KEY_CANONICAL_COLLISION": 0,
+        "IDENTITY_CONFLICT": 0
+      },
+      "rejections": 0,
+      "uniquePacketKeysV2": 7350
+    }
+  },
+  "aliasInfrastructure": {
+    "primaryKey": [
+      "PRIMARY KEY (alias_key)"
+    ],
+    "foreignKeys": [
+      "FOREIGN KEY (canonical_packet_key) REFERENCES atlas_packets(packet_key)"
+    ],
+    "oneLegacyKeyToAtMostOneCanonical": true,
+    "canonicalMustBeExistingAtlasPacketsRow": true,
+    "atlasPacketsTotal": 61718,
+    "atlasPacketsWithV2Key": 0,
+    "finding": "The live alias table cannot yet express legacy -> V2 (its FK requires the canonical key to be a stored atlas_packets row). The alias-kind DDL (PACKET_KEY_V1_STORAGE_TO_V2, kind-aware guard triggers, partial unique index) is prepared but NOT applied and needs authorization."
+  },
+  "aliasModel": {
+    "kind": "PACKET_KEY_V1_STORAGE_TO_V2",
+    "ddl": "sveltekit-frontend/drizzle/manual/20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql",
+    "rollback": "sveltekit-frontend/drizzle/manual/20260925_atlas_packet_identity_alias_v1_storage_to_v2_ROLLBACK.sql",
+    "ddlApplied": false,
+    "atlasPacketsV2ColumnAdded": false,
+    "legacyPopulationCensus": "docs/reports/packet-key-v2-legacy-population-census-v1.json"
+  },
+  "fixedContracts": {
+    "dynamicMintFromSourceRef": false,
+    "legacyKeyCanonical": false
+  },
+  "rejections": []
+}

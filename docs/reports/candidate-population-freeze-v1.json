@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.candidate-population-freeze.v1",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "candidateSnapshotRevision": null,
+  "candidateOrdinalMapChecksum": "9669b018f17de4e85315ab882fa6c6088c94b96aa6feea434174b97a9c41a3a3",
+  "representationId": "semantic_768",
+  "representationRevision": null,
+  "tensorChecksum": null,
+  "rowIdentityChecksum": null,
+  "rowCount": 4951,
+  "sourceAuthorityReceipt": "docs/reports/current-lineage-closure-v1.json",
+  "blockers": [
+    "CURRENT_LINEAGE_HAS_ZERO_ELIGIBLE_CANDIDATES",
+    "WORKSPACE_COHORT_NOT_ALIGNED",
+    "SOURCE_PRODUCER_AUTHORITY_UNPROVEN",
+    "ORDINAL_ADMISSION_DOWNSTREAM_DISABLED",
+    "SEMANTIC_SNAPSHOT_STATUS_BLOCKED_CURRENT_LINEAGE"
+  ],
+  "status": "CANDIDATE_POPULATION_FREEZE_BLOCKED",
+  "downstreamAllowed": false,
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseWrites": false,
+  "qdrantWrites": false,
+  "valkeyWrites": false,
+  "freezeChecksum": "sha256:6ab27528b87a08674eac5fa16443093d74f6206158960997705c1b2f117bdd8d",
+  "nextGate": "CURRENT_LINEAGE_ADMISSION",
+  "receipts": {
+    "lineage": "docs/reports/current-lineage-closure-v1.json",
+    "ordinalAdmission": "docs/reports/candidate-ordinal-admission-v1.json",
+    "semanticSnapshot": "docs/reports/current-semantic-candidate-snapshot-v1.json"
+  }
+}
