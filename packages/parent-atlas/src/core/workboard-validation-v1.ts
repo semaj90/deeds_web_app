@@ -168,12 +168,20 @@ export function buildFeatureValidationReceiptV1(
     FeatureValidationObservationV1Schema.parse(observation)
   );
 
+  const seenKinds = new Set<ValidatorKind>();
+  for (const observation of normalized) {
+    if (seenKinds.has(observation.kind)) {
+      throw new Error(`Duplicate validation observation for ${observation.kind}`);
+    }
+    seenKinds.add(observation.kind);
+  }
+
   const byKind = new Map(normalized.map((observation) => [observation.kind, observation]));
   const missingRequiredValidators = plan.requirements
     .filter((requirement) => requirement.required)
     .filter((requirement) => {
       const observed = byKind.get(requirement.kind);
-      return !observed || observed.status === 'MISSING';
+      return !observed || observed.status === 'MISSING' || observed.status === 'NOT_REQUIRED';
     })
     .map((requirement) => requirement.kind);
 
