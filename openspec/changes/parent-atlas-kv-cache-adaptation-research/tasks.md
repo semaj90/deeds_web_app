@@ -678,3 +678,28 @@ order. This is the harder, multi-week-shaped gate (the ordinal-drift proof
 from earlier this session — 3,270/3,294 mismatches — lives here). Recommend
 scoping it as its own focused pass rather than continuing in this same
 session given accumulated context.
+
+
+## ISOQUANT-SYNTH-01 / ORNITH-YARN-PROBE-01 — bounded experimental proof (2026-09-30)
+
+- [x] ISOQUANT-SYNTH-01 Add a standalone synthetic rotate -> quantize -> dequantize -> inverse-rotate
+  reconstruction harness at `scripts/atlas/prove-isoquant-synthetic-reconstruction-v1.mjs`.
+  It covers dimensions 128/256/512, 2/3/4-bit scalar baselines, and deterministic 4D quaternion
+  fast/full rotations. It emits only a timestamped JSON report and does not touch llama-server,
+  Postgres, Qdrant, Valkey, Neo4j, or any canonical Atlas writer.
+- [ ] ISOQUANT-REAL-KV-02 Stage 2 remains OPEN. The synthetic harness is explicitly not sufficient:
+  capture a fixed sample of REAL K/V tensors from a supported model/runtime, run the same
+  round-trip metrics, and compare against fp16/q8_0 plus any supported cache backend.
+  Do not mark IsoQuant runtime support, quality parity, or VRAM/latency benefit as proven before this.
+- [x] ORNITH-YARN-PROBE-01 Add `scripts/atlas/prove-ornith-yarn-runtime-v1.mjs`, a read-only
+  `:8090` probe that records model identity, exposed context size when available, and a bounded
+  deterministic completion. It intentionally reports `provesYaRNAlgorithmActive: false` because
+  `/props` is not a stable proof of the exact launcher CLI flags across llama.cpp builds.
+- [ ] ORNITH-YARN-LAUNCH-02 Bind any future claim of active YaRN to an exact launcher/process receipt:
+  llama.cpp build revision, model checksum, full command line, `--rope-scaling yarn`,
+  `--yarn-orig-ctx`, scale/factor fields, configured context, and rollback profile. Keep the
+  current :8090 production profile unchanged until that receipt and a quality/latency comparison exist.
+
+**Boundary:** these tasks are research proofs only. They do not create a new KV-cache owner, do not
+serialize Ornith recurrent/SSM state into ACE/BitFrost/Valkey, and do not alter ContextManifest,
+canonical evidence, or the existing `KvCompressionBackend` promotion gates.
