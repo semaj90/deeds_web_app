@@ -5,11 +5,12 @@
 //
 //   node scripts/atlas/rank-open-tasks-v1.mjs [--in ledger.json] [--limit 10] [--offset 0]
 //        [--ordering-checksum sha256:..] [--include-waiting] [--include-write-gated]
-//        [--diversify-by-change] [--max-age-hours N] [--json]
+//        [--diversify-by-change] [--max-age-hours N] [--cohort file | --cohort-from-corpus task-cards.json] [--json]
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { bindCohortToLedgerV1, buildTaskCardCohortV1, locatorKey } from './lib/task-card-cohort-v1.mjs';
 
 export const RANK_SCHEMA = 'atlas.open-task-ranking.v1';
 const SAFE_MUTATION = new Set(['CODE_ONLY', 'READ_ONLY']);
@@ -53,6 +54,17 @@ export function rankOpenTasks(ledger, readLines, options = {}) {
   const funnel = { inventory: inventory.length };
   let pool = inventory.filter((t) => t.executionState === 'ACTIONABLE' || (includeWaiting && t.executionState === 'WAITING_ON_DEPENDENCY'));
   funnel.open = pool.length;
+  // WB-TASKCARD-OWNER-01: when a frozen task-card cohort is supplied, LIFECYCLE admission comes from
+  // it and the ranker does not redefine it. Execution gating (gate / controller / mutation class)
+  // stays here because task cards do not carry those Workboard attributes.
+  let cohortBinding = null;
+  if (options.cohort) {
+    cohortBinding = bindCohortToLedgerV1(options.cohort, ledger);
+    const before = pool.length;
+    pool = pool.filter((t) => cohortBinding.locatorKeys.has(locatorKey(t.source, t.line)));
+    funnel.cohortAdmitted = pool.length;
+    funnel.cohortExcluded = before - pool.length;
+  }
   pool = pool.filter((t) => t.gateState === 'READY' && (t.controllerState === 'ACTIONABLE' || (includeWaiting && t.executionState === 'WAITING_ON_DEPENDENCY')));
   funnel.gateReady = pool.length;
   if (!includeWriteGated) pool = pool.filter((t) => SAFE_MUTATION.has(t.mutationClass));
@@ -108,6 +120,10 @@ export function rankOpenTasks(ledger, readLines, options = {}) {
     workboardRevision: sha256(`${ledger.generatedAt ?? ''}|${inventory.length}|${JSON.stringify(ledger.sourceFileHashes ?? {})}`),
     ledgerGeneratedAt: ledger.generatedAt ?? null,
     options: { includeWaiting, includeWriteGated, diversifyByChange },
+    eligibilitySource: cohortBinding ? 'FROZEN_TASK_CARD_COHORT' : 'RAW_WORKBOARD_INVENTORY',
+    cohort: cohortBinding
+      ? { checksum: cohortBinding.cohortChecksum, workspaceRevision: cohortBinding.cohortWorkspaceRevision, staleFiles: cohortBinding.staleFiles, missingFiles: cohortBinding.missingFiles }
+      : null,
     orderingChecksum: sha256(ranked.map((r) => r.stableKey).join('\n')),
     funnel,
     ranked,
@@ -139,6 +155,8 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
     if (k === '--in') a.in = argv[++i];
+    else if (k === '--cohort') a.cohortFile = argv[++i];
+    else if (k === '--cohort-from-corpus') a.cohortFromCorpus = argv[++i];
     else if (k === '--limit') a.limit = Number(argv[++i]);
     else if (k === '--offset') a.offset = Number(argv[++i]);
     else if (k === '--ordering-checksum') a.orderingChecksum = argv[++i];
@@ -169,6 +187,13 @@ function main() {
       return null;
     }
   };
+  // A frozen cohort file is the contract; --cohort-from-corpus builds it with the reference exporter
+  // (CURRENT cards in lifecycle state OPEN) for convenience and parity checks.
+  if (args.cohortFile) args.cohort = JSON.parse(readFileSync(resolve(args.cohortFile), 'utf8'));
+  else if (args.cohortFromCorpus) {
+    const corpus = JSON.parse(readFileSync(resolve(args.cohortFromCorpus), 'utf8'));
+    args.cohort = buildTaskCardCohortV1(corpus);
+  }
   const result = rankOpenTasks(ledger, readLines, args);
   const page = pageRanking(result, args);
   if (args.json) {
