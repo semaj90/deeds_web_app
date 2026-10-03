@@ -1,6 +1,6 @@
 {
   "schema": "atlas.emb-prov-01-embedding-provenance-receipt.v1",
-  "generatedAt": "2026-09-27T06:27:18.661Z",
+  "generatedAt": "2026-10-03T22:34:29.809Z",
   "config": {
     "provider": "ollama",
     "baseUrl": "http://127.0.0.1:11434",
@@ -23,7 +23,20 @@
     "recordedModelArtifactRevision": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
     "recordedGgufSha256Var": "bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7",
     "artifactChecksumMatchesRevision": true,
-    "artifactChecksumMatchesGgufVar": true
+    "artifactChecksumMatchesGgufVar": true,
+    "artifactBytes": 621867360
+  },
+  "provenanceFields": {
+    "tokenizerRevision": "embedded-in-artifact:sha256:BC843658E96D2E9CC7C3402332B158F0CC4F73E61B23CEF9A41ACEE1C0D372B7:vocab_type=1:n_vocab=262144",
+    "tokenizerSha256": "1299c11d7cf632ef3b4e11937501358ada021bbdf7c47638d13c0ee982f2e79c",
+    "inputPolicyRevision": "semantic-input-v1",
+    "serverModelAlias": "embeddinggemma"
+  },
+  "runtimeLoadedArtifact": {
+    "reachable": true,
+    "loadedModelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\embeddinggemma-300m-f16.gguf",
+    "loadedMatchesArtifact": true,
+    "note": "compared by file name; the checksum above is of the configured path"
   },
   "crossExecutorParity": {
     "probeText": "The quick brown fox jumps over the lazy dog.",
