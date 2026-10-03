@@ -27,6 +27,13 @@ Audit and safety:
 
 If a feature exists in another lane, carry the logic forward only if it maps cleanly to this stack and does not break canonical feature IDs, labels, or storage ownership.
 
+## OpenSpec audit execution
+
+- `scripts/atlas/run-openspec-evidence-fabric-v1.mjs` uses a bounded CPU stage pool only for independent readers of the same frozen census. The default is at most two concurrent stages; the hard cap is three. Set `OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES=1` to force serial execution or `2`/`3` only when memory headroom is adequate.
+- The parser must finish before pooled readers start; receipt binding, reconciliation, cards, workboard projections, final authority, and dependent stages stay serialized in dependency order. Each concurrent stage must have a distinct run-scoped output path and the same `runId`/census checksum.
+- Do not add Redis/Valkey caching or GPU work to Markdown/JSON census parsing by default. Consider caching only after profiling demonstrates material repeat cost; cache keys must include workspace revision, exact input checksums, parser/schema revision, and deterministic output checksum. Cache hits are rebuildable intermediates, never proof or canonical state.
+- GPU is for measured numerical kernels (for example qualified CSR PageRank or dense feature-matrix operations), not filesystem scanning, Markdown parsing, JSON serialization, or report authority decisions. Preserve CPU-oracle parity and executor receipts before using GPU output.
+
 Recent Parent Atlas findings:
 - `packet_id` stays the canonical UUID identity.
 - `packet_ulid` is now the sortable workflow/order field for packet lineage.

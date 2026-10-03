@@ -8,7 +8,9 @@ const CENSUS_PATH = process.env.OPENSPEC_CENSUS_PATH
   ? path.resolve(ROOT, process.env.OPENSPEC_CENSUS_PATH)
   : path.join(ROOT, 'docs', 'reports', 'openspec-evidence-portfolio-census-v2.json');
 const CENSUS_REF = path.relative(ROOT, CENSUS_PATH).replaceAll('\\', '/');
-const OUTPUT_PATH = path.join(ROOT, 'docs', 'reports', 'openspec-dependency-graph-v1.json');
+const OUTPUT_PATH = process.env.OPENSPEC_DEPENDENCY_GRAPH_OUTPUT
+  ? path.resolve(ROOT, process.env.OPENSPEC_DEPENDENCY_GRAPH_OUTPUT)
+  : path.join(ROOT, 'docs', 'reports', 'openspec-dependency-graph-v1.json');
 
 function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;

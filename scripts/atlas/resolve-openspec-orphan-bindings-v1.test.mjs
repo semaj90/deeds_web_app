@@ -454,3 +454,33 @@ test('binds a gate alias only when the explicit change contains one admitted mat
   assert.equal(report.bindings[0].bindingDisposition, 'MISSING_REVISION');
   assert.equal(report.bindings[0].proofEligible, false);
 });
+
+test('keeps unscoped declared-ID collisions ambiguous across authority scopes', () => {
+  const tasks = ['openspec://root', 'openspec://frontend'].map((authorityScope, index) => ({
+    taskRef: `${index === 0 ? 'openspec' : 'sveltekit-frontend/openspec'}/changes/demo/tasks.md#L${index + 1}`,
+    tasksPath: `${index === 0 ? 'openspec' : 'sveltekit-frontend/openspec'}/changes/demo/tasks.md`,
+    authorityScope,
+    changeId: 'demo',
+    taskId: 'TASK-1',
+    sourceLine: index + 1,
+    taskHash: `sha256:source-${index}`,
+    taskText: 'Capture the same declared task identifier.',
+    taskIdentity: { normalizedClaimHash: `sha256:claim-${index}` },
+  }));
+  const receipt = {
+    uri: 'docs/reports/demo-identity-collision.json',
+    scopeDisposition: 'OPENSPEC_SCOPED',
+    fields: { taskIds: ['TASK-1'], changeIds: ['demo'] },
+  };
+  const report = resolveOpenSpecOrphanBindingsV1({
+    schema: 'atlas.openspec-evidence-portfolio-census.v2',
+    source: { workspaceRevision: 'sha256:workspace' },
+    tasks,
+    historicalReceiptCandidates: [receipt],
+    evidenceReceipts: [],
+  }, { mappings: [] }, { receipts: [] });
+
+  assert.equal(report.bindings[0].strategy, 'DECLARED_ID_CHANGE');
+  assert.equal(report.bindings[0].bindingDisposition, 'AMBIGUOUS');
+  assert.equal(report.bindings[0].matchedTaskCount, 2);
+});

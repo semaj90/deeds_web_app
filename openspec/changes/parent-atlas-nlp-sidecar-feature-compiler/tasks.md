@@ -508,6 +508,18 @@ tree-lineage work is closed.
 
 - **LANGEXTRACT-ORNITH-CLASSIFIER-FANOUT-01 refresh (2026-09-20, read-only):** `scripts/atlas/audit-langextract-ornith-classifier-fanout-v1.mjs` reaches the sidecar boundary but fails closed with `SOURCE_REVISION_UNKNOWN` and `NO_GROUNDED_ENTITY_FIXTURE`; status `BOUNDARY_REACHABLE_LINEAGE_BLOCKED`, proof level `PARTIAL_PROVEN`. This confirms service wiring is not sufficient for grounded extraction or ontology admission. No source, database, vector, cache, or Graphify writes occurred. Report: `docs/reports/langextract-ornith-classifier-fanout-v1.json`.
 - **LANGEXTRACT-ORNITH-CLASSIFIER-FANOUT-01 bounded fixture proof (2026-09-21, read-only):** the same existing audit now uses a deterministic synthetic/public fixture with `source_revision=sha256:<fixture-text>`, explicit workspace revision, and grounded entity text. Live `/v1/models`, sidecar health, `/analyze`, classifier, grounded pass, and OAK health all passed: `BOUNDARY_FANOUT_PROVEN`, `BOUNDED_LIVE_PROVEN`, blockers `[]`. This proves the bounded transport/grounding/fanout contract only; it does not admit ontology rows, source authority, or canonical promotion. Report: `docs/reports/langextract-ornith-classifier-fanout-v1.json`; `canonicalAuthority=false`, `writesPerformed=false`.
+- [ ] **LANGEXTRACT-CONCURRENCY-01:** establish and test a service-wide bounded
+  admission/queue policy for concurrent LangExtract requests on the existing
+  CPU sidecar. The current `LANGEXTRACT_MAX_WORKERS=1` bounds workers inside a
+  single extraction; it does not prove a bound across simultaneous requests.
+  Exercise the existing `/analyze` and grounded extraction paths with a
+  deterministic blocking stub; assert maximum active extractions, bounded
+  queued work, overload response, timeout/cancellation behavior, and no
+  cross-request result mixing. Keep per-request chunk workers, HTTP request
+  concurrency, and llama-server capacity as separate measured limits. Do not
+  increase worker counts or claim throughput without a load receipt. This is
+  CPU-side extraction only; Ornith synthesis at `:8090` and EmbeddingGemma
+  `semantic_768` remain separate owners.
 - **LANGEXTRACT-CALLER-GATE-01 partial (2026-09-21):** the shared SvelteKit `langextract-client.ts` now fails closed unless callers explicitly pass `groundedExtractionRequired: true` for both text and file extraction. The two live callers (`mcp-langextract.ts` and Whisper transcription) pass the flag explicitly. A focused Vitest guard proves neither path reaches `fetch` without authorization. Python sidecar analysis already gates `_grounded_extractions()` on `grounded_extraction_required`. Direct MCP tool handlers and native heuristic extraction remain separate explicit/compatibility surfaces and require a follow-up caller census before 10.1 can be closed. No writes or canonical promotion.
 - **LANGEXTRACT-CALLER-GATE-01 PROVEN (2026-09-21, static + focused test):** the four direct MCP handlers (`langextract:legal`, `langextract:evidence`, `langextract:file`, `langextract:custom`) now require `grounded_extraction_required=true` in both their advertised schemas and handler guards before any `/extract` or `/extract/file` request. The shared client and Python analysis path enforce the same boundary. Native regex extraction remains explicitly classified as compatibility-only and is not presented as official LangExtract grounding. Focused client guard test passed 1/1; no network call occurs without authorization. **Task 10.1 is now evidence-complete for the official LangExtract paths.**
 

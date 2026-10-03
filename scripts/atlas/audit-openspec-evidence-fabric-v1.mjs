@@ -556,9 +556,16 @@ function receiptCandidates(root) {
   return [...new Set([...directories.flatMap(listFiles), ...runScopedReceipts])].filter((file) => {
     if (path.extname(file).toLowerCase() !== '.json') return false;
     const sourceRef = relative(root, file);
-    if (sourceRef.startsWith('docs/reports/openspec-evidence/') && !/receipt.*\.json$/i.test(path.basename(file))) return false;
+    if (sourceRef.startsWith('docs/reports/openspec-evidence/')) {
+      const fileName = path.basename(file);
+      if (!/receipt.*\.json$/i.test(fileName) || isDerivedRunScopedReceiptReport(fileName)) return false;
+    }
     return !isDerivedEvidenceReport(path.basename(file));
   });
+}
+
+function isDerivedRunScopedReceiptReport(fileName) {
+  return /^(?:receipt-typing|receipt-binding|receipt-binding-audit)-v1\.json$/i.test(fileName);
 }
 
 function isDerivedEvidenceReport(fileName) {

@@ -399,6 +399,7 @@ Integration of the compact ordinal / codebook framing as a deterministic project
   - PCA/SVD records `basisRevision`, `trainingCohortRevision`, `meanDigest`, `componentsDigest`.
   - MLP records `modelRevision`, `trainingCohortRevision`, `featureSchemaRevision`, optimizer receipt.
   - Discrete cluster ordinals (`clusterOrdinal = 317` under KMeans-512) act as approximate locality buckets for hot-set pre-filtering, NOT semantic truth.
+- [x] 8.6A Superseded the historical scalar authority ordering: semantic MRL, autoencoder latents, linear projections, cluster assignments, and topology coordinates use distinct family classes; matching dimensions do not imply equivalence. The runtime no longer exports a total-order comparator. `EvidenceDepth` and residency remain owned by their separate contracts. Focused representation and compact-codebook tests cover the separation; this does not admit any projection for production retrieval.
 
 ### 8.7 Ephemeral Model State Boundary (`HiddenStateCacheKeyV1`)
 - [x] 8.7 Enforced hard isolation for transformer hidden states and activations:

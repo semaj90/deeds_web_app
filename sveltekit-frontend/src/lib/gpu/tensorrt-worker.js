@@ -176,20 +176,23 @@ function emulateGpuOperation(task) {
 				const pr = new Float32Array(n);
 				pr.fill(1 / n);
 				const damping_factor = damping || 0.85;
+				const outDegree = new Uint32Array(n);
+				for (let source = 0; source < n; source++) {
+					for (let target = 0; target < n; target++) {
+						if (flatEmbeddings[source * n + target] > 0) outDegree[source]++;
+					}
+				}
 
 				for (let iter = 0; iter < (iters || 10); iter++) {
-					const new_pr = new Float32Array(n);
+					let danglingMass = 0;
+					for (let source = 0; source < n; source++) {
+						if (outDegree[source] === 0) danglingMass += pr[source];
+					}
+					const new_pr = new Float32Array(n).fill((1 - damping_factor) / n + (damping_factor * danglingMass) / n);
 					for (let i = 0; i < n; i++) {
-						new_pr[i] = (1 - damping_factor) / n;
-						for (let j = 0; j < n; j++) {
-							if (flatEmbeddings[j * n + i] > 0) {
-								let out_degree = 0;
-								for (let k = 0; k < n; k++) {
-									if (flatEmbeddings[j * n + k] > 0) out_degree++;
-								}
-								if (out_degree > 0) {
-									new_pr[i] += damping_factor * (pr[j] / out_degree);
-								}
+						for (let source = 0; source < n; source++) {
+							if (outDegree[source] > 0 && flatEmbeddings[source * n + i] > 0) {
+								new_pr[i] += damping_factor * (pr[source] / outDegree[source]);
 							}
 						}
 					}

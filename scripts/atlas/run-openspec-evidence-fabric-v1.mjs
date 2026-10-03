@@ -1,8 +1,13 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
+import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
+import { runBoundedStagePool } from './lib/openspec-stage-pool-v1.mjs';
+
+const execFileAsync = promisify(execFile);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const REPORTS = path.join(ROOT, 'docs', 'reports');
@@ -10,12 +15,15 @@ const OUTPUT_PATH = process.env.OPENSPEC_EVIDENCE_PIPELINE_OUTPUT
   ? path.resolve(ROOT, process.env.OPENSPEC_EVIDENCE_PIPELINE_OUTPUT)
   : path.join(REPORTS, 'openspec-evidence-pipeline-v1.json');
 
-const STAGES = [
-  ['EVF-01_PARSER', 'audit-openspec-evidence-fabric-v1.mjs'],
+const CENSUS_STAGES = [
   ['EVF-02_GRAPH', 'build-openspec-dependency-graph-v1.mjs'],
   ['EVF-02_IDENTITY_RECONCILIATION', 'propose-openspec-task-identity-reconciliation-v1.mjs'],
   ['EVF-03A_IDENTITY_RECOVERY', 'recover-openspec-task-identities-v1.mjs'],
   ['EVF-03B_RECEIPT_TYPING', 'classify-openspec-receipts-v1.mjs'],
+];
+
+const STAGES = [
+  ['EVF-01_PARSER', 'audit-openspec-evidence-fabric-v1.mjs'],
   ['EVF-03C_ORPHAN_BINDING', 'resolve-openspec-orphan-bindings-v1.mjs'],
   ['EVF-03C_COMPACT_SUMMARY', 'compile-openspec-evidence-summary-v1.mjs'],
   ['EVF-03_RECEIPT_BINDING', 'audit-openspec-receipt-binding-v1.mjs'],
@@ -92,38 +100,54 @@ function latestCensusPath(runDirectory) {
   return candidate;
 }
 
-function runStage(stage, script, env) {
+async function runStage(stage, script, env) {
   const startedAt = new Date().toISOString();
-  const result = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'atlas', script)], {
-    cwd: ROOT,
-    env,
-    encoding: 'utf8',
-    maxBuffer: 16 * 1024 * 1024,
-    windowsHide: true,
-  });
+  let result;
+  let cause = null;
+  try {
+    result = await execFileAsync(process.execPath, [path.join(ROOT, 'scripts', 'atlas', script)], {
+      cwd: ROOT,
+      env,
+      encoding: 'utf8',
+      maxBuffer: 16 * 1024 * 1024,
+      windowsHide: true,
+    });
+  } catch (error) {
+    cause = error;
+    result = { stdout: error.stdout ?? '', stderr: error.stderr ?? '' };
+  }
   const stdout = String(result.stdout ?? '');
   const stderr = String(result.stderr ?? '');
+  const exitCode = cause ? (Number.isInteger(cause.code) ? cause.code : null) : 0;
   const record = {
     stage,
     script: relative(path.join(ROOT, 'scripts', 'atlas', script)),
     startedAt,
     completedAt: new Date().toISOString(),
-    exitCode: result.status ?? null,
-    signal: result.signal ?? null,
+    exitCode,
+    signal: cause?.signal ?? null,
     outputTail: stdout.slice(-2000),
     errorTail: stderr.slice(-2000),
   };
   process.stdout.write(`${JSON.stringify({ stage, exitCode: record.exitCode })}\n`);
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    const error = new Error(`${stage}_FAILED:${record.exitCode ?? record.signal ?? 'unknown'}`);
+  if (cause || exitCode !== 0) {
+    const error = new Error(`${stage}_FAILED:${record.exitCode ?? record.signal ?? cause?.message ?? 'unknown'}`);
     error.record = record;
     throw error;
   }
   return record;
 }
 
-function main() {
+function stageConcurrency() {
+  const available = typeof os.availableParallelism === 'function' ? os.availableParallelism() : os.cpus().length;
+  const defaultValue = Math.min(2, Math.max(1, available - 1));
+  const configured = Number(process.env.OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES ?? defaultValue);
+  if (!Number.isInteger(configured) || configured < 1) throw new Error('INVALID_OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES');
+  return Math.min(3, configured);
+}
+
+async function main() {
+  const maxConcurrentStages = stageConcurrency();
   const runToken = `${new Date().toISOString().replace(/\D/g, '').slice(0, 17)}-${process.pid}`;
   const censusRunDirectory = path.join(ROOT, 'docs', 'reports', 'openspec-evidence', `pipeline-${runToken}`);
   const beforeTaskLedgers = taskLedgerSnapshot();
@@ -134,11 +158,14 @@ function main() {
     OPENSPEC_EVIDENCE_RUN_ID: `pipeline-${runToken}`,
     OPENSPEC_IDENTITY_RECOVERY_OUTPUT: relative(path.join(censusRunDirectory, 'identity-recovery-v1.json')),
     OPENSPEC_IDENTITY_RECOVERY_PATH: relative(path.join(censusRunDirectory, 'identity-recovery-v1.json')),
+    OPENSPEC_IDENTITY_RECONCILIATION_OUTPUT: relative(path.join(censusRunDirectory, 'identity-reconciliation-v1.json')),
+    OPENSPEC_DEPENDENCY_GRAPH_OUTPUT: relative(path.join(censusRunDirectory, 'dependency-graph-v1.json')),
     OPENSPEC_RECEIPT_TYPES_OUTPUT: relative(path.join(censusRunDirectory, 'receipt-typing-v1.json')),
     OPENSPEC_RECEIPT_TYPES_PATH: relative(path.join(censusRunDirectory, 'receipt-typing-v1.json')),
     OPENSPEC_ORPHAN_BINDINGS_OUTPUT: relative(path.join(censusRunDirectory, 'receipt-binding-v1.json')),
     OPENSPEC_ORPHAN_BINDINGS_PATH: relative(path.join(censusRunDirectory, 'receipt-binding-v1.json')),
     OPENSPEC_EVIDENCE_SUMMARY_OUTPUT: relative(path.join(censusRunDirectory, 'compact-summary-v1.json')),
+    OPENSPEC_LANGEXTRACT_OUTPUT: relative(path.join(censusRunDirectory, 'langextract-proposals-v1.json')),
     OPENSPEC_PREDICATE_RESOLUTION_OUTPUT: relative(path.join(censusRunDirectory, 'predicate-resolution-v1.json')),
     OPENSPEC_PREDICATE_RESOLUTION_PATH: relative(path.join(censusRunDirectory, 'predicate-resolution-v1.json')),
     OPENSPEC_EVIDENCE_BINDINGS_PATH: relative(path.join(censusRunDirectory, 'predicate-resolution-v1.json')),
@@ -160,16 +187,16 @@ function main() {
   let failure = null;
   let diagnosticFailure = null;
   try {
-    stages.push(runStage('EVF-00_GS1_10_CURRENT_RECEIPT', 'record-tree-node-identity-formula-receipt-v1.mjs', {
+    stages.push(await runStage('EVF-00_GS1_10_CURRENT_RECEIPT', 'record-tree-node-identity-formula-receipt-v1.mjs', {
       ...environment,
       OPENSPEC_TREE_NODE_RECEIPT_RUN_DIR: relative(censusRunDirectory),
     }));
   } catch (error) {
     failure = { message: error.message, record: error.record ?? null };
   }
-  for (const [stage, script] of failure ? [] : STAGES) {
+  for (const [stage, script] of failure ? [] : STAGES.slice(0, 1)) {
     try {
-      const record = runStage(stage, script, {
+      const record = await runStage(stage, script, {
         ...environment,
         ...(censusPath ? { OPENSPEC_CENSUS_PATH: relative(censusPath) } : {}),
       });
@@ -180,10 +207,38 @@ function main() {
       break;
     }
   }
+  if (!failure && censusPath) {
+    const results = await runBoundedStagePool(CENSUS_STAGES, maxConcurrentStages, async ([stage, script]) => {
+      try {
+        const record = await runStage(stage, script, {
+          ...environment,
+          OPENSPEC_CENSUS_PATH: relative(censusPath),
+        });
+        return { record };
+      } catch (error) {
+        return { record: error.record ?? null, error };
+      }
+    });
+    for (const result of results) {
+      if (result.record) stages.push(result.record);
+      if (result.error && !failure) failure = { message: result.error.message, record: result.record };
+    }
+  }
+  for (const [stage, script] of failure ? [] : STAGES.slice(1)) {
+    try {
+      stages.push(await runStage(stage, script, {
+        ...environment,
+        ...(censusPath ? { OPENSPEC_CENSUS_PATH: relative(censusPath) } : {}),
+      }));
+    } catch (error) {
+      failure = { message: error.message, record: error.record ?? null };
+      break;
+    }
+  }
   let authority = null;
   if (!failure) {
     try {
-      const authorityRecord = runStage('EVF-RUN_FINAL_AUTHORITY', 'compile-openspec-evidence-run-manifest-v1.mjs', {
+      const authorityRecord = await runStage('EVF-RUN_FINAL_AUTHORITY', 'compile-openspec-evidence-run-manifest-v1.mjs', {
         ...environment,
         ...(censusPath ? { OPENSPEC_CENSUS_PATH: relative(censusPath) } : {}),
         OPENSPEC_RECONCILIATION_PATH: relative(path.join(censusRunDirectory, 'reconciliation-v1.json')),
@@ -203,9 +258,10 @@ function main() {
   }
   if (!failure && authority) {
     try {
-      stages.push(runStage('HEALTH_DIAGNOSTIC', 'compile-openspec-evidence-health-v1.mjs', {
+      stages.push(await runStage('HEALTH_DIAGNOSTIC', 'compile-openspec-evidence-health-v1.mjs', {
         ...environment,
         OPENSPEC_EVIDENCE_MANIFEST_PATH: relative(path.join(censusRunDirectory, 'run-manifest-v1.json')),
+        OPENSPEC_EVIDENCE_HEALTH_OUTPUT: relative(path.join(censusRunDirectory, 'health-diagnostic-v1.json')),
       }));
     } catch (error) {
       diagnosticFailure = { message: error.message, record: error.record ?? null };
@@ -226,6 +282,14 @@ function main() {
         : null,
     },
     stages,
+    execution: {
+      stagePool: 'BOUNDED_INDEPENDENT_CENSUS_READERS',
+      maxConcurrentStages,
+      parallelStages: CENSUS_STAGES.map(([stage]) => stage),
+      remainingStages: 'SERIAL_DEPENDENCY_ORDER',
+      cache: 'DISABLED',
+      gpu: 'NOT_APPLICABLE_TO_MARKDOWN_AND_JSON_CENSUS',
+    },
     authority: authority ? {
       manifest: relative(path.join(censusRunDirectory, 'run-manifest-v1.json')),
       finalSummary: authority.finalSummary,
@@ -255,4 +319,7 @@ function main() {
   if (report.status !== 'PIPELINE_COMPLETED_READ_ONLY') process.exitCode = 1;
 }
 
-main();
+main().catch((error) => {
+  process.stderr.write(`${JSON.stringify({ status: 'PIPELINE_FAILED', error: error.message })}\n`);
+  process.exitCode = 1;
+});

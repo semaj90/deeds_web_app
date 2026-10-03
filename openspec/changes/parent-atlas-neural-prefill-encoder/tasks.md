@@ -44,6 +44,21 @@ no training required, no checkpoint). These are two different representations th
 share a dimension — never conflate a `semantic_mrl_128` value with a learned `latent_128` value.
 A `semantic_768` vs. `semantic_mrl_128` vs. learned `latent_128` vs. learned `latent_64` recall
 comparison was requested this session and has not yet been built.
+
+### Lineage reconciliation — 2026-10-02
+
+The active producer implementation in `python/atlas_compute/latent_autoencoder.py`
+learns `latent_256`, then learns `latent_128` through its encoder stage; it
+derives `latent_64` as the normalized 64-coordinate prefix of `latent_128`.
+This supersedes the preceding text that described `latent_128` as a normalized
+prefix of `latent_256`. The existing TypeScript artifact family and fixtures
+were aligned to the producer chain in the topology representation-admission
+owner. This is a contract/code alignment only: existing database rows and
+historical receipts remain diagnostic until exact producer and source lineage
+are independently read back. The `semantic_mrl_*` IDs remain separate semantic
+representations owned by the vector manifest; do not rename stored `latent_*`
+IDs or infer equivalence from matching dimensions.
+
 - [x] Kept RRF ownership in SearchRuntime. Qdrant-native RRF is permitted only
   for benchmark/parity comparison and does not create a second fusion owner.
 - [x] Kept topology admission outside the semantic retrieval -> ContextManifest

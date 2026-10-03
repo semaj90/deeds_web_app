@@ -103,7 +103,7 @@ function taskIdentityMap(identityReport) {
 
 function buildIndexes(tasks, identityReport) {
   const mappings = taskIdentityMap(identityReport);
-  const indexes = Object.fromEntries(['taskRef', 'canonicalTaskKey', 'taskId', 'declared', 'migration', 'legacy', 'source', 'gate', 'claimHash', 'change', 'allChange'].map((key) => [key, new Map()]));
+  const indexes = Object.fromEntries(['taskRef', 'canonicalTaskKey', 'taskId', 'declared', 'declaredByChangeTask', 'declaredByTaskId', 'migration', 'legacy', 'legacyByAlias', 'source', 'gate', 'claimHash', 'claimHashByChange', 'change', 'allChange'].map((key) => [key, new Map()]));
   for (const task of tasks) {
     const mapping = mappings.get(task.taskRef) ?? {};
     if (task.changeId) add(indexes.allChange, task.changeId, task);
@@ -111,17 +111,28 @@ function buildIndexes(tasks, identityReport) {
     add(indexes.taskRef, task.canonicalTaskRef, task);
     if (task.taskId) add(indexes.taskId, task.taskId, task);
     add(indexes.canonicalTaskKey, mapping.canonicalTaskKey, task);
-    if (task.taskId) add(indexes.declared, `${task.authorityScope}\0${task.changeId}\0${task.taskId}`, task);
+    if (task.taskId) {
+      add(indexes.declared, `${task.authorityScope}\0${task.changeId}\0${task.taskId}`, task);
+      add(indexes.declaredByChangeTask, `${task.changeId}\0${task.taskId}`, task);
+      add(indexes.declaredByTaskId, task.taskId, task);
+    }
     if (mapping.migrationKey) add(indexes.migration, `${task.authorityScope}\0${mapping.migrationKey}`, task);
-    for (const candidate of mapping.legacyCandidates ?? []) add(indexes.legacy, `${task.authorityScope}\0${candidate.value.toUpperCase()}`, task);
+    for (const candidate of mapping.legacyCandidates ?? []) {
+      const alias = candidate.value.toUpperCase();
+      add(indexes.legacy, `${task.authorityScope}\0${alias}`, task);
+      add(indexes.legacyByAlias, alias, task);
+    }
     add(indexes.source, task.taskRef, task);
     if (task.changeId && Number.isInteger(task.sourceLine)) {
-      add(indexes.legacy, `${task.authorityScope}\0${`${task.changeId}:${task.sourceLine}`.toUpperCase()}`, task);
+      const alias = `${task.changeId}:${task.sourceLine}`.toUpperCase();
+      add(indexes.legacy, `${task.authorityScope}\0${alias}`, task);
+      add(indexes.legacyByAlias, alias, task);
     }
     for (const token of String(task.taskText).match(/\b(?:[A-Z]{2,}[A-Z0-9]*(?:[-_.][A-Z0-9]+)+|\d+(?:\.\d+)+[a-z]?)\b/g) ?? []) {
       if (/(?:GATE|PREDICATE|REQ|REQUIREMENT|PHASE)/i.test(token)) add(indexes.gate, `${task.authorityScope}\0${token.toUpperCase()}`, task);
     }
     add(indexes.claimHash, `${task.authorityScope}\0${task.changeId}\0${task.taskIdentity?.normalizedClaimHash}`, task);
+    add(indexes.claimHashByChange, `${task.changeId}\0${task.taskIdentity?.normalizedClaimHash}`, task);
     add(indexes.change, task.changeId, task);
   }
   return { indexes, mappings };
@@ -185,11 +196,11 @@ function explicitArtifactCandidates(fields, indexes) {
   for (const key of fields.canonicalTaskKeys) candidates.push(...matchesFor(indexes, 'canonicalTaskKey', [key]));
   for (const changeId of fields.changeIds) {
     for (const taskId of fields.taskIds) {
-      for (const [key, rows] of indexes.declared.entries()) if (key.endsWith(`\0${changeId}\0${taskId}`)) candidates.push(...rows);
+      candidates.push(...(indexes.declaredByChangeTask.get(`${changeId}\0${taskId}`) ?? []));
     }
   }
   if (!candidates.length && fields.taskIds.length === 1 && fields.changeIds.length === 0) {
-    for (const [key, rows] of indexes.declared.entries()) if (key.endsWith(`\0${fields.taskIds[0]}`)) candidates.push(...rows);
+    candidates.push(...(indexes.declaredByTaskId.get(fields.taskIds[0]) ?? []));
   }
   return unique(candidates);
 }
@@ -256,7 +267,9 @@ function resolveOne(receipt, indexes, mappings, census, sourceArtifactRoot) {
     ['EXACT_TASK_REF', matchesFor(indexes, 'taskRef', [...fields.taskRefs, ...canonicalTaskRefs])],
     ['CANONICAL_TASK_KEY', matchesFor(indexes, 'canonicalTaskKey', fields.canonicalTaskKeys)],
     ['DECLARED_ID_CHANGE', unique(fields.changeIds.flatMap((changeId) => fields.taskIds.flatMap((taskId) => {
-      const candidates = authority ? [indexes.declared.get(`${authority}\0${changeId}\0${taskId}`)] : [...indexes.declared.entries()].filter(([key]) => key.endsWith(`\0${changeId}\0${taskId}`)).map(([, rows]) => rows);
+      const candidates = authority
+        ? [indexes.declared.get(`${authority}\0${changeId}\0${taskId}`)]
+        : [indexes.declaredByChangeTask.get(`${changeId}\0${taskId}`)];
       return candidates.flat().filter(Boolean);
     })))],
     ['EXPLICIT_TASK_ID', matchesFor(indexes, 'taskId', fields.taskIds.filter((taskId) => !taskId.includes(':')))],
@@ -267,7 +280,7 @@ function resolveOne(receipt, indexes, mappings, census, sourceArtifactRoot) {
       .flatMap((taskId) => {
         const normalized = taskId.toUpperCase();
         if (authority) return indexes.legacy.get(scoped(normalized)) ?? [];
-        return [...indexes.legacy.entries()].filter(([key]) => key.endsWith(`\0${normalized}`)).flatMap(([, rows]) => rows);
+        return indexes.legacyByAlias.get(normalized) ?? [];
     }))])],
     ['EXACT_GATE_ID_CHANGE', unique(fields.changeIds.flatMap((changeId) => fields.gateIds.flatMap((gateId) => {
       const gateKey = `${gateId.toUpperCase()}`;
@@ -402,8 +415,9 @@ function resolveOne(receipt, indexes, mappings, census, sourceArtifactRoot) {
     ...matchesFor(indexes, 'gate', fields.gateIds.map((gateId) => scoped(gateId.toUpperCase()))),
     ...unique(fields.claims.flatMap((claim) => fields.changeIds.flatMap((changeId) => {
       const hash = claimHash(claim);
-      const keys = authority ? [`${authority}\0${changeId}\0${hash}`] : [...indexes.claimHash.keys()].filter((key) => key.endsWith(`\0${changeId}\0${hash}`));
-      return keys.flatMap((key) => indexes.claimHash.get(key) ?? []);
+      return authority
+        ? indexes.claimHash.get(`${authority}\0${changeId}\0${hash}`) ?? []
+        : indexes.claimHashByChange.get(`${changeId}\0${hash}`) ?? [];
     }))),
   ]);
   const unsupportedIdentityCandidate = fields.migrationKeys.length > 0 || fields.gateIds.length > 0 || fields.claims.length > 0;

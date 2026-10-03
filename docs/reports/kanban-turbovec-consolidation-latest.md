@@ -1,6 +1,6 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-10-01T22:33:37.503Z
+Generated: 2026-10-02T21:59:01.291Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
@@ -12,9 +12,6 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:39**: 6 records, 6 open, clusters=39, 56, 70, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate. | Wire into API routes (`/api/cases`, `/api/evidence/upload`) — deferred
-- **lib:cluster:none**: 5 records, 5 open, clusters=none, families=lib
-  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › data
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:82**: 5 records, 5 open, clusters=82, 99, 113, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Add Playwright test fixtures for auth + DB seeding | Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation. | Archive duplicate JSON-RPC 2.0 shim logic after the canonical handler is confirmed
@@ -30,6 +27,9 @@ simdjson parses: 3957402 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:64**: 5 records, 5 open, clusters=64, 81, 95, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`.
+- **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
+  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
+  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:28**: 4 records, 4 open, clusters=28, 45, 59, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats | Install Unsloth + PyTorch (`uv pip install unsloth --torch-backend=auto`) | Keep CPU fallback paths available for dev and rollback | todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md

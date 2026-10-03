@@ -1058,6 +1058,12 @@ limit, unrelated to retired 384-D embeddings. The existing NLP sidecar owns POS 
 NB/LR classifier inference. `atlas_nlp_classification_helper_v1.py` also exposes a bounded
 rule-based proposal seam; do not confuse that seam with the checkpoint-backed classifier.
 
+Runtime boundary verified 2026-10-02: the healthy `legal-ai-langgraph` container has LangGraph
+installed and PyTorch absent. This matches `docker/langgraph-synthesis/Dockerfile`'s CPU-only
+orchestration contract; it is not evidence that PyTorch was removed from the separate classifier,
+ATen, or GPU executor lanes. Keep those owners and add PyTorch to this image only if a specifically
+owned tensor executor is approved, rather than coupling model dependencies to orchestration.
+
 - [ ] NLP-INTERIM-CLASSIFIER-01: bind the existing FastAPI NLP classifier outputs to exact
       source/workspace, classifier/checkpoint, feature, and label revisions; prove bounded
       readback and declared backend before using its domain/operation observations in routing.

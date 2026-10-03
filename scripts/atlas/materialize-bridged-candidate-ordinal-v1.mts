@@ -166,7 +166,9 @@ try {
 
 if (rawRows.length === 0) throw new Error('EXACT_PACKET_CHUNK_COHORT_EMPTY');
 const sourceRefs = new Set(rawRows.map((row) => row.source_ref));
-if (sourceRefs.size !== 577) throw new Error(`EXACT_BRIDGE_SOURCE_COUNT_MISMATCH:${sourceRefs.size}`);
+if (sourceRefs.size > sourceCounts.mappedBindingRows) {
+  throw new Error(`BRIDGE_SOURCE_COUNT_EXCEEDS_EXACT_BINDINGS:${sourceRefs.size}:${sourceCounts.mappedBindingRows}`);
+}
 const uniqueChunks = new Set(rawRows.map((row) => row.canonical_chunk_id));
 if (uniqueChunks.size !== rawRows.length) throw new Error('CANONICAL_CHUNK_ID_NOT_UNIQUE_IN_EXACT_COHORT');
 

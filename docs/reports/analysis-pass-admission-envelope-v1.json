@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.analysis-pass-admission-implementation-report.v1",
+  "status": "CONTRACT_PROVEN",
+  "scope": "pure non-persistent pass admission and frozen NLP cohort contracts",
+  "canonicalAuthority": false,
+  "persistenceAuthorized": false,
+  "databaseWritesPerformed": false,
+  "cacheWritesPerformed": false,
+  "gpuWorkPerformed": false,
+  "implementation": {
+    "owner": "sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.ts",
+    "classifier": "classifyAnalysisPassAdmissionV1",
+    "verifier": "verifyAnalysisPassAdmissionEnvelopeV1",
+    "cohortBuilder": "buildNlpStagingCohortV1",
+    "cohortVerifier": "verifyNlpStagingCohortV1",
+    "identityRule": "Only explicit packetKey plus a matching existing PacketKeyResolutionV2 result qualifies; evidenceId, source paths, and current rows are never fallback identity sources.",
+    "incompleteLineage": "OBSERVATION_ONLY",
+    "failedExecution": "REJECTED",
+    "completeEvidence": "ELIGIBLE_FOR_REVIEW only; ADMITTED is never emitted"
+  },
+  "validation": {
+    "focusedVitest": {
+      "filesPassed": 3,
+      "testsPassed": 44,
+      "testsFailed": 0
+    },
+    "openSpecStrict": "PASS",
+    "gitDiffCheck": "PASS",
+    "fullTypeCheck": "NOT_RUN"
+  },
+  "auditNote": "The follow-up --check-only census is DIAGNOSTIC_ONLY_NOT_PROMOTABLE and produced no final-summary artifacts; its raw counters are not treated as current interpreted EVF authority.",
+  "deferred": [
+    "8-16 packet staged cohort and independent database readback",
+    "canonical feature/entity/concept admission",
+    "Qdrant identity reconciliation",
+    "Valkey centroid publication or BitFrost warming",
+    "GPU topology/latent promotion",
+    "SIMDJSON adoption without a measured parsing bottleneck"
+  ],
+  "patchTargets": [
+    "sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.ts",
+    "sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.identity.spec.ts",
+    "openspec/changes/parent-atlas-pass-fabric/specs/pass-fabric/spec.md",
+    "openspec/changes/parent-atlas-pass-fabric/tasks.md"
+  ]
+}

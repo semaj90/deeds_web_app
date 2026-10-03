@@ -21,8 +21,26 @@ import {
 	gpuPageRank,
 	type GPUTask
 } from '$lib/gpu/tensorrt-worker-pool.js';
+import { pageRankGPU as pageRankDense } from '$lib/server/gpu/pytorch-graph.js';
 
 describe('TensorRT Worker Pool Integration', () => {
+	describe('dense PageRank dangling-mass handling', () => {
+		it('redistributes dangling rank and preserves unit mass', () => {
+			const result = pageRankDense(new Float32Array([0, 1, 0, 0]), 2, 0.85, 200);
+			const scores = Array.from(result.scores);
+
+			expect(scores.reduce((sum, score) => sum + score, 0)).toBeCloseTo(1, 5);
+			expect(scores[0]).toBeCloseTo(0.350877, 4);
+			expect(scores[1]).toBeCloseTo(0.649123, 4);
+		});
+
+		it('keeps an all-dangling graph at the uniform distribution', () => {
+			const result = pageRankDense(new Float32Array(4), 2, 0.85, 20);
+
+			expect(Array.from(result.scores)).toEqual([0.5, 0.5]);
+		});
+	});
+
 	beforeAll(async () => {
 		// Lazy-init: first call to getWorkerPool() creates threads
 		getWorkerPool();
@@ -275,9 +293,9 @@ describe('TensorRT Worker Pool Integration', () => {
 				expect(rank).toBeGreaterThan(0);
 			}
 
-			// Sum of ranks should be close to n (dampening property)
+			// PageRank scores form a probability distribution.
 			const sum = Array.from(ranks).reduce((a, b) => a + b, 0);
-			expect(sum).toBeCloseTo(n, 0); // Allow ±1
+			expect(sum).toBeCloseTo(1, 5);
 		});
 
 		it('respects damping factor and iterations', async () => {

@@ -25,11 +25,7 @@ import {
   buildAtlasFeatureCardV1,
   AtlasFeatureCardV1Schema,
 } from '../features/atlas-feature-card-v1.js';
-import {
-  AUTHORITY_RANKS,
-  compareAuthority,
-  isHigherAuthority,
-} from '../representations/representation-gradient-v1.js';
+import { RepresentationFamilyV1Schema } from '../representations/representation-gradient-v1.js';
 import {
   buildHiddenStateCacheKeyV1,
   assertEphemeralStorageOnly,
@@ -172,12 +168,12 @@ describe('Section 8 — Compact Codebook, Registry Ordinal Maps & Virtual Memory
     });
   });
 
-  describe('8.6 Representation Hierarchy & Gradient', () => {
-    it('enforces authority order from canonical down to discrete clusters', () => {
-      expect(compareAuthority('CANONICAL_SEMANTIC_768', 'PCA_SVD_DETERMINISTIC_128')).toBeLessThan(0);
-      expect(isHigherAuthority('CANONICAL_SEMANTIC_768', 'MLP_LEARNED_64')).toBe(true);
-      expect(isHigherAuthority('PCA_SVD_DETERMINISTIC_128', 'DISCRETE_CLUSTER_512')).toBe(true);
-      expect(AUTHORITY_RANKS.DISCRETE_CLUSTER_512).toBe(3);
+  describe('8.6 Independent representation families', () => {
+    it('classifies representation kinds without imposing one total dimensional rank', () => {
+      expect(RepresentationFamilyV1Schema.parse('SEMANTIC_EMBEDDING')).toBe('SEMANTIC_EMBEDDING');
+      expect(RepresentationFamilyV1Schema.parse('AUTOENCODER_LATENT')).toBe('AUTOENCODER_LATENT');
+      expect(RepresentationFamilyV1Schema.parse('CLUSTER_ASSIGNMENT')).toBe('CLUSTER_ASSIGNMENT');
+      expect(RepresentationFamilyV1Schema.parse('TOPOLOGY_COORDINATE')).toBe('TOPOLOGY_COORDINATE');
     });
   });
 

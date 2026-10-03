@@ -34,15 +34,50 @@ construction decision it references is a separate, still-open, unrelated small d
   alongside Tree-sitter/ast-grep — never a replacement, and never a second canonical identity
   authority (parser/LSP observation is evidence, not identity, per this repo's existing Parent
   Atlas Frozen Identity Contract).
-- Record that SocratiCode (if evaluated at all) is a challenger/UX benchmark only — never installed
-  as a second canonical index, symbol authority, retrieval fusion owner, or packet owner.
+- Record that SocratiCode (if evaluated at all) is a challenger/UX benchmark only — never a
+  persistent second index, symbol authority, retrieval fusion owner, or packet owner.
+- Add a staged, isolated comparison of the distinct Graft projects—TrailHQ
+  (`trailhq/Graft`, npm `@nanonets/graft`) for structural working-tree context,
+  and `amaar-mc/graft` (npm `graftmap`) for file-dependency personalized
+  PageRank—plus Understand Anything. Record the canonical upstream and any
+  evaluated fork separately: the current candidate reference is
+  `jaccas/understand-anything`, reported as a fork of
+  `Egonex-AI/Understand-Anything`; historical `razor-ai/understand-anything`
+  and `Lum1104/Understand-Anything` references must be resolved to exact
+  ancestry and commit before treating them as the same source. Also evaluate
+  SocratiCode (`giancarloerra/SocratiCode`) and CodeGraph
+  (`andysom25/codegraph`) against the existing Graphify/8095 and Parent Atlas
+  code-intelligence path. Candidate installs belong in a disposable evaluation
+  worktree/container with pinned revisions; they must not rewrite shared agent
+  configuration, index production data, or acquire canonical ownership.
+- Treat Graft, Understand Anything, SocratiCode, and CodeGraph as alternative
+  challenger executors, not four components to deploy together. Select at most
+  one bounded capability after a frozen-query benchmark. Adapt admitted
+  observations through existing Atlas identity/revision resolution and the
+  existing TRACE or `atlas-tools` MCP owner; do not create another canonical
+  graph, vector store, MCP server, or ContextManifest compiler.
+- Evaluate Understand Anything's Karpathy-style knowledge-base view as a
+  documentation/navigation projection only. Source-linked `.okf` and existing
+  document-governance owners remain authoritative; generated relationships and
+  summaries are proposals until grounded and admitted.
+- Keep orchestration and memory boundaries explicit: Mastra may orchestrate an
+  existing bounded workflow if its live runtime is available; HMM/policy owns
+  state/action recommendation, not workflow execution. BitFrost may cache only
+  admitted revision/checksum-addressed ACE artifacts after the existing
+  ContextManifest/readback gate.
 - Record session-state handoff notes so a fresh session can resume without re-deriving context.
 
 ## Non-Goals
 
 - Does NOT implement any of the five gates in this change — each requires its own bounded
   read-first audit before any code is written, per this repo's Duplication Prevention rule.
-- Does NOT install Clang/libclang/clangd, SocratiCode, or any new parser/graph-DB/embedding model.
+- Does NOT install candidate tools into the application/runtime environment or
+  enable production indexing. A temporary, pinned, isolated install is allowed
+  only for the comparison gates below, after license, telemetry, network,
+  platform, data-scope, and generated-file behavior are recorded.
+- Does NOT add all candidate tools to agent/MCP configuration or make any
+  candidate a canonical graph, identity, embedding, RRF, evidence, or memory
+  owner.
 - Does NOT resolve the pending `pageRankGPU` graph-construction decision from the same session —
   that is a separate, smaller, already-flagged-to-the-operator decision.
 - Does NOT re-litigate or duplicate `parent-atlas-unified-symbol-ranking` (already closed/archived

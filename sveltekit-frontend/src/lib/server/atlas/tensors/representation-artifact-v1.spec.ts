@@ -165,14 +165,47 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
     );
   });
 
-  it('accepts a latent_64 artifact declaring latent_256 as its input (prefix-derived view)', () => {
+  it('accepts a latent_64 artifact declaring latent_128 as its input (prefix-derived view)', () => {
+    const latent64 = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: 'latent_128',
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(latent64)).not.toThrow();
+  });
+
+  it('rejects a latent_64 artifact that skips its latent_128 parent', () => {
     const latent64 = RepresentationArtifactV1Schema.parse({
       ...artifact,
       representationId: 'latent_64',
       dimensions: 64,
       inputRepresentationId: 'latent_256',
     });
-    expect(() => assertPromotionReadyRepresentationArtifact(latent64)).not.toThrow();
+    expect(() => assertPromotionReadyRepresentationArtifact(latent64)).toThrow(
+      'LATENT_INPUT_REPRESENTATION_MISMATCH'
+    );
+  });
+
+  it('rejects same-dimension semantic MRL artifacts from the AE latent family gate', () => {
+    const semanticMrl256 = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationId: 'semantic_mrl_256',
+      dimensions: 256,
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(semanticMrl256)).toThrow(
+      'REPRESENTATION_NOT_IN_NESTED_LATENT_FAMILY'
+    );
+  });
+
+  it('rejects AE family members labeled with another representation family', () => {
+    const misclassified = RepresentationArtifactV1Schema.parse({
+      ...artifact,
+      representationFamily: 'semantic-mrl',
+    });
+    expect(() => assertPromotionReadyRepresentationArtifact(misclassified)).toThrow(
+      'REPRESENTATION_FAMILY_ID_MISMATCH'
+    );
   });
 
   it('rejects a latent_128 artifact whose dimensions do not match the frozen family (128)', () => {
@@ -193,64 +226,107 @@ describe('LATENT256-REPRESENTATION-CONTRACT-02: nested latent family', () => {
     expect(NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_256.physical).toBe(true);
   });
 
-  it('accepts family members that share one root modelChecksum/modelRevision/parametersDigest/transformPolicyRevision', () => {
+  it('freezes latent_64 as a normalized prefix of latent_128, not latent_256 or semantic MRL', () => {
+    expect(NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_64).toMatchObject({
+      dimensions: 64,
+      origin: 'DERIVED',
+      parentRepresentationId: 'latent_128',
+      inputRepresentationId: 'latent_128',
+      transform: 'NESTED_PREFIX_L2_RENORMALIZE',
+    });
+  });
+
+  it('accepts the explicit latent_256 -> latent_128 -> latent_64 parent chain', () => {
     const latent256 = sealArtifact();
+    const latent128 = sealArtifact({
+      representationId: 'latent_128',
+      dimensions: 128,
+      inputRepresentationId: latent256.representationId,
+      inputRepresentationRevision: latent256.representationRevision,
+      inputDigest: latent256.outputDigest,
+      inputPopulationChecksum: latent256.outputPopulationChecksum,
+    });
     const latent64 = sealArtifact({
       representationId: 'latent_64',
       dimensions: 64,
+      inputRepresentationId: latent128.representationId,
+      inputRepresentationRevision: latent128.representationRevision,
+      inputDigest: latent128.outputDigest,
+      inputPopulationChecksum: latent128.outputPopulationChecksum,
+    });
+    expect(() => assertRepresentationFamilyRevisionBinding([latent256, latent128, latent64])).not.toThrow();
+  });
+
+  it('rejects a latent_64 artifact bound to a different latent_128 checkpoint than it claims', () => {
+    const latent256 = sealArtifact();
+    const latent128 = sealArtifact({
+      representationId: 'latent_128',
+      dimensions: 128,
       inputRepresentationId: latent256.representationId,
       inputRepresentationRevision: latent256.representationRevision,
       inputDigest: latent256.outputDigest,
       inputPopulationChecksum: latent256.outputPopulationChecksum,
     });
-    expect(() => assertRepresentationFamilyRevisionBinding([latent256, latent64])).not.toThrow();
-  });
-
-  it('rejects a latent_64 artifact silently derived from a different latent_256 checkpoint than it claims (the exact bug this gate closes)', () => {
-    const latent256 = sealArtifact();
     const latent64WrongChecksum = sealArtifact({
       representationId: 'latent_64',
       dimensions: 64,
-      inputRepresentationId: latent256.representationId,
-      inputRepresentationRevision: latent256.representationRevision,
-      inputDigest: latent256.outputDigest,
-      inputPopulationChecksum: latent256.outputPopulationChecksum,
+      inputRepresentationId: latent128.representationId,
+      inputRepresentationRevision: latent128.representationRevision,
+      inputDigest: latent128.outputDigest,
+      inputPopulationChecksum: latent128.outputPopulationChecksum,
       modelChecksum: 'b'.repeat(64),
     });
     expect(() =>
-      assertRepresentationFamilyRevisionBinding([latent256, latent64WrongChecksum])
+      assertRepresentationFamilyRevisionBinding([latent256, latent128, latent64WrongChecksum])
     ).toThrow('REPRESENTATION_FAMILY_REVISION_MISMATCH');
   });
 
   it('rejects a child artifact bound to a stale parent revision or output checksum', () => {
     const latent256 = sealArtifact();
-    const staleChild = sealArtifact({
-      representationId: 'latent_64',
-      dimensions: 64,
+    const latent128 = sealArtifact({
+      representationId: 'latent_128',
+      dimensions: 128,
       inputRepresentationId: latent256.representationId,
-      inputRepresentationRevision: 'latent:stale-parent',
+      inputRepresentationRevision: latent256.representationRevision,
       inputDigest: latent256.outputDigest,
       inputPopulationChecksum: latent256.outputPopulationChecksum,
     });
-    expect(() => assertRepresentationFamilyRevisionBinding([latent256, staleChild])).toThrow(
+    const staleChild = sealArtifact({
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: latent128.representationId,
+      inputRepresentationRevision: 'latent:stale-parent',
+      inputDigest: latent128.outputDigest,
+      inputPopulationChecksum: latent128.outputPopulationChecksum,
+    });
+    expect(() => assertRepresentationFamilyRevisionBinding([latent256, latent128, staleChild])).toThrow(
       'REPRESENTATION_PARENT_REVISION_MISMATCH'
     );
   });
 
   it('rejects a family member whose descriptor changed after sealing', () => {
     const latent256 = sealArtifact();
-    const latent64 = sealArtifact({
-      representationId: 'latent_64',
-      dimensions: 64,
+    const latent128 = sealArtifact({
+      representationId: 'latent_128',
+      dimensions: 128,
       inputRepresentationId: latent256.representationId,
       inputRepresentationRevision: latent256.representationRevision,
       inputDigest: latent256.outputDigest,
       inputPopulationChecksum: latent256.outputPopulationChecksum,
     });
+    const latent64 = sealArtifact({
+      representationId: 'latent_64',
+      dimensions: 64,
+      inputRepresentationId: latent128.representationId,
+      inputRepresentationRevision: latent128.representationRevision,
+      inputDigest: latent128.outputDigest,
+      inputPopulationChecksum: latent128.outputPopulationChecksum,
+    });
 
     expect(() =>
       assertRepresentationFamilyRevisionBinding([
         latent256,
+        latent128,
         { ...latent64, outputDigest: 'sha256:tampered' },
       ])
     ).toThrow('REPRESENTATION_ARTIFACT_DIGEST_MISMATCH');
@@ -272,22 +348,22 @@ describe('LATENT-REPRESENTATION-SEMANTICS-03: origin/materialization axes', () =
     expect(m.parentRepresentationId).toBeNull();
   });
 
-  it('latent_128 is DERIVED + VIRTUAL, a true transform of the latent_256 parent', () => {
+  it('latent_128 is LEARNED + VIRTUAL from the latent_256 encoder stage', () => {
     const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_128;
-    expect(m.origin).toBe('DERIVED');
+    expect(m.origin).toBe('LEARNED');
     expect(m.materialization).toBe('VIRTUAL');
     expect(m.parentRepresentationId).toBe('latent_256');
-    expect(m.transform).toBe('NESTED_PREFIX_L2_RENORMALIZE');
+    expect(m.inputRepresentationId).toBe('latent_256');
     expect(m.coProducedWith).toBeNull();
   });
 
-  it('latent_64 is DERIVED + PERSISTED from latent_256 via prefix+L2-renormalize', () => {
+  it('latent_64 is DERIVED + PERSISTED from latent_128 via prefix+L2-renormalize', () => {
     const m = NESTED_LATENT_REPRESENTATION_FAMILY_V1.members.latent_64;
     expect(m.origin).toBe('DERIVED');
     expect(m.materialization).toBe('PERSISTED');
-    expect(m.parentRepresentationId).toBe('latent_256');
+    expect(m.parentRepresentationId).toBe('latent_128');
     expect(m.coProducedWith).toBeNull();
-    expect(m.inputRepresentationId).toBe('latent_256');
+    expect(m.inputRepresentationId).toBe('latent_128');
     expect(m.transform).toBe('NESTED_PREFIX_L2_RENORMALIZE');
   });
 });

@@ -316,3 +316,26 @@ Global PageRank metric comparison also now exposes Pearson/Spearman, score
 L1/L-infinity and sums, top-10/50/100 overlap, rank displacement, and explicit
 dangling policy/mass. DuckDB remains an offline receipt analyzer, not an
 execution backend. No SIMT kernel is justified by the five-node canary.
+
+## Query-to-seed and worker execution gaps
+
+- [ ] **SEED-COMPILER-01:** compile the existing query-classification and
+  retrieval-lane outputs into one deterministic `QuerySeedSetV1` for the
+  existing PPR executor. Bind request/query checksum, workspace and graph
+  revisions, candidate snapshot and `CandidateOrdinalMapV1` checksums, exact
+  canonical IDs/ordinals, lane evidence references, normalized weights, and
+  seed checksum. Reject unresolved identities, stale revisions, duplicate
+  ordinals, and unqualified compact ordinals. Existing cartridge seed tiles
+  and `AtlasPageRankRequestV1` node-key inputs are not this compiler. Reuse the
+  current PPR and candidate-map owners; do not create another seed registry or
+  retrieval lane. Fixture/replay proof only until a current admitted graph is
+  available.
+- [ ] **PPR-WORKER-PARITY-01:** exercise the actual worker dispatch and its
+  selected executor against the same revision-qualified PPR fixtures as the
+  NetworkX/cuGraph contract. Include `0 -> 1` with node 1 dangling, all-dangling
+  nodes, and non-uniform personalization; assert finite non-negative scores,
+  unit mass, personalization-based dangling redistribution, exact ordinal
+  identity, and deterministic output. Record whether N-API or CPU emulation
+  ran; CPU fallback must not be reported as CUDA proof. Keep the legacy dense
+  `pageRankGPU` consumer out of this validation until its input and semantics
+  satisfy the sparse CSR contract.

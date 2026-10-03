@@ -33,7 +33,11 @@ def test_embeddinggemma_input_and_requested_encoder_ladder():
     assert latent256.shape == (8, 256)
     assert latent128.shape == (8, 128)
     assert latent64.shape == (8, 64)
+    assert latent256.dtype == torch.float32
+    assert latent128.dtype == torch.float32
+    assert latent64.dtype == torch.float32
     assert torch.allclose(latent64, expected64, atol=1e-6)
+    assert torch.equal(latent64, expected64)
     assert not torch.allclose(latent128, torch.nn.functional.normalize(latent256[:, :128], p=2, dim=-1))
 
 

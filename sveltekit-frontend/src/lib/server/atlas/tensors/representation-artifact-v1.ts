@@ -143,26 +143,9 @@ export function assertRepresentationArtifactDigestV1(
   return artifact;
 }
 
-// LATENT256-REPRESENTATION-CONTRACT-02 (parent-atlas-retrieval-lineage-dag-convergence):
-// frozen description of the live NestedSemanticAutoencoder family. Corrects two real gaps found
-// live, not assumed:
-//   1. This file previously hardcoded a single 'ae_latent_64' / 'semantic_768' special case,
-//      which (a) didn't match the naming this file's own test fixtures already use
-//      (bare 'latent_256'/'latent_128'/'latent_64', matching the live Postgres column names —
-//      never an 'ae_'-prefixed variant anywhere in production), and (b) unconditionally rejected
-//      ANY inputRepresentationId other than 'semantic_768' for EVERY representationId, which
-//      would incorrectly reject a legitimate latent_128 artifact declaring latent_256 as its
-//      input (the actual derived-view relationship this family is supposed to support).
-//   2. Physical persistence and mathematical origin are separate axes. The producer contract
-//      defines latent_128 and latent_64 as prefix/L2-renormalized views of latent_256; either
-//      view may be persisted for a residency tier. A persisted latent_64 row therefore does
-//      not become independently learned merely because it has a database column or index.
-//      Derived views require the parent representation revision and transform policy in their
-//      manifest binding.
-// LATENT-REPRESENTATION-SEMANTICS-03 (parent-atlas-retrieval-lineage-dag-convergence, 2026-09-03):
-// `physical` (above) conflated two independent axes into one boolean, which cannot express
-// The live producer and training receipt define both lower-width outputs as prefix + L2-normalize
-// views of latent_256. Physical persistence remains a separate materialization axis.
+// This registry preserves the live representation IDs. The producer learns the
+// 256- and 128-dimensional stages; the 64-dimensional output is a normalized
+// prefix of latent_128. Persistence and mathematical origin remain separate.
 export const NESTED_LATENT_REPRESENTATION_FAMILY_V1 = {
   familyId: 'nested-semantic-autoencoder',
   members: {
@@ -178,21 +161,20 @@ export const NESTED_LATENT_REPRESENTATION_FAMILY_V1 = {
     latent_128: {
       dimensions: 128,
       physical: false,
-      origin: 'DERIVED' as const,
+      origin: 'LEARNED' as const,
       materialization: 'VIRTUAL' as const,
       parentRepresentationId: 'latent_256' as string | null,
       coProducedWith: null as string | null,
       inputRepresentationId: 'latent_256',
-      transform: 'NESTED_PREFIX_L2_RENORMALIZE' as const,
     },
     latent_64: {
       dimensions: 64,
       physical: true,
       origin: 'DERIVED' as const,
       materialization: 'PERSISTED' as const,
-      parentRepresentationId: 'latent_256' as string | null,
+      parentRepresentationId: 'latent_128' as string | null,
       coProducedWith: null as string | null,
-      inputRepresentationId: 'latent_256',
+      inputRepresentationId: 'latent_128',
       transform: 'NESTED_PREFIX_L2_RENORMALIZE' as const,
     },
   },
@@ -208,16 +190,16 @@ export function assertPromotionReadyRepresentationArtifact(
     NESTED_LATENT_REPRESENTATION_FAMILY_V1.members[
       artifact.representationId as NestedLatentRepresentationId
     ];
-  if (member) {
-    if (artifact.dimensions !== member.dimensions) {
-      throw new Error(`${artifact.representationId.toUpperCase()}_DIMENSION_MISMATCH`);
-    }
-    if (artifact.inputRepresentationId !== member.inputRepresentationId) {
-      throw new Error('LATENT_INPUT_REPRESENTATION_MISMATCH');
-    }
-  } else if (artifact.inputRepresentationId !== 'semantic_768') {
-    // Unrecognized representationId (not a member of this frozen family) — fall back to the
-    // original, stricter default rather than silently accepting an unknown shape.
+  if (!member) {
+    throw new Error('REPRESENTATION_NOT_IN_NESTED_LATENT_FAMILY');
+  }
+  if (artifact.representationFamily !== NESTED_LATENT_REPRESENTATION_FAMILY_V1.familyId) {
+    throw new Error('REPRESENTATION_FAMILY_ID_MISMATCH');
+  }
+  if (artifact.dimensions !== member.dimensions) {
+    throw new Error(`${artifact.representationId.toUpperCase()}_DIMENSION_MISMATCH`);
+  }
+  if (artifact.inputRepresentationId !== member.inputRepresentationId) {
     throw new Error('LATENT_INPUT_REPRESENTATION_MISMATCH');
   }
   if (artifact.canonicalAuthority !== false) {

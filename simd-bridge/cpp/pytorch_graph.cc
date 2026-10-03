@@ -49,8 +49,9 @@ extern "C" int pageRankGPU(
 
         // Build row-normalised column-stochastic transition matrix P
         auto A = torch::from_blob(const_cast<float*>(adj), {n, n}, opts).to(dev);
-        auto row_sum = A.sum(/*dim=*/1, /*keepdim=*/true).clamp_min(1e-8f);
-        auto P = (A / row_sum).t();  // P[j,i] = probability of walking i→j
+        auto row_sum = A.sum(/*dim=*/1, /*keepdim=*/true);
+        auto dangling_mask = (row_sum < 1e-8f).to(torch::kFloat32);
+        auto P = (A / row_sum.clamp_min(1e-8f)).t();  // P[j,i] = probability of walking i→j
 
         // Uniform initial rank
         auto r = torch::full({n, 1}, 1.0f / n,
@@ -59,7 +60,8 @@ extern "C" int pageRankGPU(
                                     torch::TensorOptions().dtype(torch::kFloat32).device(dev));
 
         for (int i = 0; i < iters; ++i) {
-            r = damping * torch::mm(P, r) + teleport;
+            auto dangling_mass = torch::sum(r * dangling_mask);
+            r = damping * (torch::mm(P, r) + dangling_mass / n) + teleport;
         }
 
         auto cpu_r = r.squeeze().to(torch::kCPU).contiguous();

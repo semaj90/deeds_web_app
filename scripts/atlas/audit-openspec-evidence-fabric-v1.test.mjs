@@ -294,6 +294,9 @@ test('does not re-ingest derived EVF reports as historical receipt candidates', 
   fs.mkdirSync(evidenceRun, { recursive: true });
   fs.writeFileSync(path.join(evidenceRun, 'census-v1.json'), JSON.stringify({ schema: 'atlas.openspec-evidence-portfolio-census.v2' }));
   fs.writeFileSync(path.join(evidenceRun, 'tree-node-identity-formula-receipt-v1.json'), JSON.stringify({ schema: 'legacy.receipt.v1', taskId: 'OLD-2' }));
+  fs.writeFileSync(path.join(evidenceRun, 'receipt-typing-v1.json'), JSON.stringify({ schema: 'atlas.openspec-receipt-typing.v1', taskId: 'OLD-3' }));
+  fs.writeFileSync(path.join(evidenceRun, 'receipt-binding-v1.json'), JSON.stringify({ schema: 'atlas.openspec-orphan-binding-resolution.v1', taskId: 'OLD-4' }));
+  fs.writeFileSync(path.join(evidenceRun, 'receipt-binding-audit-v1.json'), JSON.stringify({ schema: 'atlas.openspec-receipt-binding-audit.v1', taskId: 'OLD-5' }));
   const report = buildPortfolioCensus(root);
   assert.equal(report.summary.receipts_total, 2);
   assert.equal(report.summary.untypedReceiptCandidateCount, 2);

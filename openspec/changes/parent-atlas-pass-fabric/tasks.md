@@ -1305,3 +1305,60 @@ matches at production scale — that needs a run against the real frozen corpus 
 `docs/reports/graph-snapshot-parity/receipt.json`, plus proper ARI/NMI comparison for Louvain
 specifically (not raw community-count diffing, which this repo already knows is the wrong metric
 for community-detection parity).
+
+### BOUNDED-NLP-STAGED-OBSERVATIONS-01 — safe enrichment before projection
+
+- [ ] Freeze a bounded packet cohort through the existing source/packet resolver; require a real
+  `packetKey` and preserve absent `sourceRevision` / `workspaceRevision` as null rather than
+  deriving them from paths or current rows.
+- [ ] Select bounded domain/topic/entity/POS/concept extraction passes from existing producers;
+  outputs remain candidate observations and cannot write canonical feature, concept, entity,
+  relation, retrieval, or evidence state.
+- [x] Reconcile the existing `analysis_pass_results` status contract before persisting staged
+  observations. `succeeded` remains execution status; explicit opt-in `stageAsCandidateOnly` stores
+  `CANDIDATE_ONLY` in provenance without adding a DB status or migration. The writer resolves the
+  supplied packet key through the existing packet-row resolver, stores the resolved physical key
+  in the FK column, and records direct-versus-alias resolution in provenance without claiming
+  PacketKeyV2 logical identity. It fails closed on unresolved/mismatched identity, rejects
+  integration-event fanout, and rejects deterministic reuse without matching staged disposition.
+  Focused identity/writer suites pass 15/15; centroid manifest/card contract tests pass 12/12.
+  One bounded `spacy_entities` observation was staged for the exact existing packet row
+  `packet:b13af559f410` and independently read back as candidate-only. This is a one-row canary,
+  not proof of a bounded batch, full pass-family coverage, append-only behavior, or worker rollout.
+- [ ] Prove bounded batch limits, deterministic producer/input checksums where applicable,
+  append-only receipt behavior, and independent readback before enabling any worker or live pass.
+  **Canary evidence (2026-10-03):** one exact packet row was staged and independently read back;
+  a second execution reused row `11146` with identical input/output checksums and inserted no row.
+  Reports: `docs/reports/analysis-pass-staging/nlp-stage-1791002497054-53184.json` and
+  `docs/reports/analysis-pass-staging/nlp-stage-1791003261014-61356.json`. This does not prove
+  batch ceilings, concurrent duplicate delivery, or append-only behavior; those remain open.
+- [x] Add the pure `AnalysisPassAdmissionEnvelopeV1` classifier to the existing pass-results
+  owner. It keeps execution and admission orthogonal, never derives packet identity from
+  `evidenceId`/paths/current rows, preserves incomplete lineage as `OBSERVATION_ONLY`, and
+  never authorizes persistence or emits `ADMITTED`. It consumes the existing typed
+  `PacketKeyResolutionV2` output (including canonical/storage key and alias evidence), not a
+  boolean attestation. Focused unit tests cover exact lineage,
+  missing/unverified packet identity, missing revisions, failed execution, grounded evidence,
+  checksum tampering, and deterministic replay. This is not a DB state, migration, batch run,
+  or additional live pass write.
+- [x] Add pure `NlpStagingCohortV1` freeze/verify helpers to the same pass-results owner. The
+  contract permits only 8/16/32 members, requires exact resolver outputs and one shared
+  workspace revision, rejects duplicate logical source refs, labels null source revisions
+  `REVISION_PARTIAL`, and deterministically seals sorted members. Focused tests cover replay,
+  malformed size, workspace mismatch, duplicate source, unresolved identity, and tampering.
+  This only freezes a cohort artifact contract; no cohort was selected from PostgreSQL and no
+  NLP rows were appended. Keep the bounded live-cohort task open.
+
+**Contract progress (2026-10-03):** Added `buildStagedAnalysisPassObservationV1()` and
+`buildStagedAnalysisPassLedgerEntryV1()` to the existing `analysis_pass_results` schema owner, plus
+an explicit `stageAsCandidateOnly` option on its existing writer. Staged rows require a packet key
+resolved to an existing physical packet row through the existing resolver, producer/pass revisions,
+and successful execution; keep execution status separate from
+`admissionDisposition: CANDIDATE_ONLY`; retain absent source/workspace revisions as
+null; and bind ledger-input/output checksums while preserving any declared input hash separately.
+The opt-in writer stores the resolved physical packet reference and resolver lineage in row
+provenance, without claiming PacketKeyV2 logical identity; it rejects integration-event fanout,
+unresolved identity, or deduplication against an unstaged row. Focused fixture tests cover the
+contract and mocked writer only. No cohort
+was frozen, no pass was run/persisted, no live readback occurred, no database status/migration was
+added, and bounded producer selection/readback remain open.

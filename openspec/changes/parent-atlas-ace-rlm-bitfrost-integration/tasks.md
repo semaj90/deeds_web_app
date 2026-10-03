@@ -3419,6 +3419,45 @@ large hot state exists.
 The live cache census remains a baseline only; no new cache schema, invalidation consumer, centroid
 artifact, or projection write was created in this pass.
 
+### CENTROID-MANIFEST-CARD-01 — file-only routing artifacts (2026-10-02)
+
+- [x] Extend the existing `centroid-artifact-v1.ts` owner with checksummed
+  `CentroidManifestV1` and `CentroidCardV1` contracts. Both bind workspace,
+  candidate snapshot, representation, clustering pass, and ordinal-map identity;
+  cards constrain exemplars to the frozen candidate ordinal range and declare
+  `canonicalAuthority: false`. No second centroid owner or cache namespace was added.
+- [x] Add deterministic ordering, checksum/tamper, duplicate ID, ordinal range,
+  and non-authority fixture tests. These prove contract behavior only; they do
+  not prove a live clustering run or candidate admission.
+- [ ] Bind manifests/cards to an exact admitted candidate snapshot and verified
+  `CentroidArtifactV1` readback. Keep KMeans/SOM outputs diagnostic until the
+  representation/ordinal-map parity gates pass.
+- [ ] Reconcile legacy centroid key shapes and implement revision-qualified
+  prepare/checksum/publish-pointer/readback before any Valkey/BitFrost centroid
+  write or warming. TTL remains cleanup only.
+- [x] Run the bounded NLP canary only through the existing `parent-atlas-pass-fabric`
+  `analysis_pass_results` owner. Before persistence, prove the permitted staged
+  status semantics and require a real `packetKey`; missing source/workspace
+  revisions remain explicit nulls. Keep `succeeded` as execution status only;
+  candidate admission is separate provenance. Do not add a status/migration or
+  promote concepts/entities/relations in this change.
+  **Contract update (2026-10-03):** fixture-proven staged semantics now live in
+  the existing pass-fabric owner, including exact resolution to an existing
+  physical packet row while explicitly not claiming PacketKeyV2 logical
+  identity. A one-row `spacy_entities` canary was staged and independently read
+  back from the existing row for `packet:b13af559f410` at source revision
+  `sha256:de612e194d44ecdb6128c73543a70d53e75568f5b95cf9981e0edf4d38227a9e`;
+  workspace revision remained null. Receipt:
+  `docs/reports/analysis-pass-staging/nlp-stage-1791002497054-53184.json`; an identical retry
+  reused the same row without insertion and independently read it back:
+  `docs/reports/analysis-pass-staging/nlp-stage-1791003261014-61356.json`.
+  No canonical feature, Qdrant, Valkey, Neo4j, task, or evidence-state write
+  occurred. This closes the bounded canary only; broader NLP cohorts, batch
+  limits, worker rollout, and centroid cache publication remain open.
+- [ ] Run SIMDJSON only against a measured large JSON/NDJSON parsing workload
+  with a frozen input and output-parity check. It is not required for the
+  already-indexed OpenSpec audit runner.
+
 Outbox reliability repair 2026-09-08: `outbox-worker.ts` now unpublishes an event when any expected
 handler fails, including partial fanout failures. Previously, one successful handler could leave
 `published_at` set while another failed projection was never retried. No outbox cycle was run.
@@ -7717,6 +7756,17 @@ collection-role audit) into one `ParentAtlasPromotionBoardV2` snapshot.
       entirely from admitted immutable lineage." Two independent audits, same corpus, same refusal
       to write — do not treat this as two separate blockers to resolve differently; they are the
       same blocker.
+      **Read-only recheck (2026-10-02):** the newer source cohort at
+      `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+      now has 24,456 exact Graphify-membership/source-binding rows; this does not
+      establish a crosswalk for legacy Qdrant points. The topology eligibility
+      replay admits 15 PostgreSQL `semantic_768` ordinals from 127,926 candidates,
+      while 31,891 Qdrant points yield zero exact canonical/revision matches.
+      A directly inspected legacy point has a prefixed `source_ref` and null
+      `canonical_id`, `source_revision`, and `workspace_revision`. The backfill
+      remains blocked: do not infer the crosswalk from path or packet key and do
+      not call `setPayload`/`upsert`. Receipt:
+      `docs/reports/atlas-topology-pg-qdrant-eligibility-20261002-r3.json`.
 - [x] `GOLDEN-REVIEW-CORPUS-02` — **measured 2026-09-12**, verdict
       `GOLDEN_REVIEW_CORPUS_BLOCKED`. The prior compatibility receipt
       (`docs/reports/golden-review-corpus-compatibility-v1.json`) was itself
