@@ -1101,4 +1101,7 @@ docs/reports/workspace-source-snapshots/
 # >10 MB generated reports cannot enter git (pre-commit hook; CLAUDE.md large-file rule). They stay on disk, gitignored, and are searchable via .rgignore re-includes. Never deleted.
 docs/reports/openspec-directory-graph-v1.json
 docs/reports/openspec-file-labels-v1.json
+docs/reports/openspec-evidence/pipeline-20261003*/
+docs/reports/openspec-evidence/pipeline-attempt-20261003T*/
+docs/reports/openspec-evidence/pipeline-current-worktree-20261003*.json
 docs/reports/staging/
