@@ -20,6 +20,7 @@ import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { buildRipgrepExcludeArgs, exclusionPolicyChecksum, WHOLE_CODEBASE_SOURCE_EXCLUSION_POLICY_REVISION } from './lib/whole-codebase-source-exclusions.mjs';
+import { assertLegacyPacketKeySourceRefMatch, legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
 
 const { Pool } = pg;
 
@@ -77,7 +78,7 @@ async function extractWholeCodebasePackets() {
 
     for (const file of fileList) {
       const source_ref = file.replace(/\\/g, '/');
-      const packet_key = `packet:${sha256(source_ref).slice(0, 12)}`;
+      const packet_key = legacyPacketKeyFromSourceRef(source_ref);
       const feature_id = determineFeatureId(source_ref);
       const feature_label = path.basename(source_ref);
 
@@ -148,12 +149,26 @@ async function upsertPackets(pool, packets) {
     try {
       // Check if source_ref already exists
       const checkRes = await pool.query(
-        'SELECT packet_key FROM atlas_packets WHERE source_ref = $1',
+        'SELECT packet_key, source_ref FROM atlas_packets WHERE source_ref = $1',
         [packet.source_ref]
       );
 
       if (checkRes.rows.length > 0) {
         // Preserve existing packet_key
+        skipped += 1;
+        continue;
+      }
+
+      const collisionRes = await pool.query(
+        'SELECT source_ref FROM atlas_packets WHERE packet_key = $1',
+        [packet.packet_key]
+      );
+      if (collisionRes.rows.length > 0) {
+        assertLegacyPacketKeySourceRefMatch({
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          existingSourceRef: collisionRes.rows[0].source_ref,
+        });
         skipped += 1;
         continue;
       }
@@ -164,7 +179,7 @@ async function upsertPackets(pool, packets) {
           packet_id, artifact_id, packet_key, source_ref, file_path, feature_id, feature_label,
           group_id, packet_universe, metadata, created_at, updated_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12)
-        ON CONFLICT (packet_key) DO NOTHING`,
+        `,
         [
           packet.packet_id,
           packet.artifact_id,

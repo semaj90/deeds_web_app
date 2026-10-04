@@ -57,6 +57,7 @@ export const blockHash = (block) => sha256(block.map((l) => l.replace(/\s+$/, ''
  */
 export const normalizeTaskTitle = (text) => stripWfuComment(text).replace(/[*`_]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
 export const stableTitleHash = (change, text) => sha256(`${change}\u0000${normalizeTaskTitle(text)}`).slice(7, 23);
+export const requiresSupersessionReview = (text) => /superseded|historical|obsolete|retired|compatibility-only/i.test(text);
 
 export function parseWfu(blockText) {
   const m = withoutCodeSpans(blockText).match(WFU_COMMENT);

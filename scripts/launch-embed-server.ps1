@@ -167,6 +167,10 @@ $ctxLen     = if ($env:EMBED_CTX)        { $env:EMBED_CTX }        else { '2048'
 $batchSize  = if ($env:EMBED_BATCH_SIZE) { $env:EMBED_BATCH_SIZE } else { $ctxLen }
 $ubatchSize = if ($env:EMBED_UBATCH_SIZE){ $env:EMBED_UBATCH_SIZE} else { $ctxLen }
 $threads    = [System.Environment]::ProcessorCount.ToString()
+# The model receipt (EMB-PROV-01) records serverModelAlias=embeddinggemma. Without --alias llama-server reports the GGUF
+# file name, so the runtime readback cannot match the requested model id. Identity is still decided by the loaded
+# path + sha256, never by this alias.
+$alias      = if ($env:EMBED_ALIAS) { $env:EMBED_ALIAS } else { 'embeddinggemma' }
 
 # -- Fail-closed invariant (EMBED-SERVER-PHYSICAL-BATCH-01) -------------------
 # Refuses to launch with a config that would silently cap admitted input length
@@ -211,6 +215,7 @@ $args = @(
   '--host',         '127.0.0.1',
   '--port',         $port,
   '-ngl',           $ngl,
+  '--alias',        $alias,
   '--embedding',
   '--pooling',      'mean',
   '-c',             $ctxLen,

@@ -2,10 +2,10 @@
 
 > Historical status note (2026-08-23): The MCP dispatcher TODO below is retained as historical provenance from the June 26, 2026 snapshot. Current MCP/Atlas wiring evidence is tracked in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md; this document original results are preserved.
 
-**Date**: June 26, 2026  
-**Status**: ✅ **FIXED**  
-**Blocker**: Layer 4 (Qdrant) returning empty searches due to zero-vector embeddings  
-**Impact**: Enables real vector search on codebase packets in Qdrant  
+**Date**: June 26, 2026
+**Status**: ✅ **FIXED**
+**Blocker**: Layer 4 (Qdrant) returning empty searches due to zero-vector embeddings
+**Impact**: Enables real vector search on codebase packets in Qdrant
 
 ---
 
@@ -97,7 +97,7 @@ Query: "auth session validation"
 ### Scenario 2: Codebase Query (Cached)
 ```
 Same query 5 minutes later
-→ Embed query via L3 Redis cache (5ms hit) 
+→ Embed query via L3 Redis cache (5ms hit)
 → Go Search Service Qdrant search
 → Results returned instantly with no inference ✅
 ```
@@ -115,8 +115,8 @@ ACE packet written to Qdrant via materializePacket()
 
 ## Qdrant Collection Contract
 
-**Collection**: `codebase_chunks_768`  
-**Vector field**: `embedding` (768-dim, cosine distance)  
+**Collection**: `codebase_chunks_768`
+**Vector field**: `embedding` (768-dim, cosine distance)
 **Payload schema** (from Layer 3 fallback implementation):
 
 ```json
@@ -139,8 +139,8 @@ All fields are now populated with real content + real embeddings.
 
 ## Integration Impact
 
-**Before**: Qdrant collection had dummy vectors → retrieval scored everything as ~equal → search useless  
-**After**: Qdrant collection has real 768-dim embeddings → cosine similarity is meaningful → top-K retrieval works  
+**Before**: Qdrant collection had dummy vectors → retrieval scored everything as ~equal → search useless
+**After**: Qdrant collection has real 768-dim embeddings → cosine similarity is meaningful → top-K retrieval works
 
 **Layers affected**:
 - ✅ **Layer 3** (Go Search Service) — fallback to codebase_chunks_768 now useful
@@ -177,7 +177,7 @@ curl -X POST http://localhost:8096/search \
 # Dry-run to verify embedding generation works
 node -e "
 const { materializePacket } = require('./dist/lib/server/ace/ace-materializer.js');
-await materializePacket({ 
+await materializePacket({
   packetKey: 'ace:packet:auth:001',
   dryRun: true  // Don't write to Qdrant
 });
@@ -211,11 +211,11 @@ docker exec legal-ai-valkey redis-cli -a redis --no-auth-warning GET "embed:embe
 
 ## Critical Path Impact
 
-**Pipeline Completion Before**: 57% (Layer 4 blocker preventing retrieval)  
+**Pipeline Completion Before**: 57% (Layer 4 blocker preventing retrieval)
 **Pipeline Completion After**: **60-65%** (Layer 4 now operational, retrieval works)
 
 **Remaining blockers** (from ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md):
-1. ✅ FIXED: **Layer 4 (Qdrant Materialization)** 
+1. ✅ FIXED: **Layer 4 (Qdrant Materialization)**
 2. ⏳ TODO: **Layer 5 (Synthesis Function)** — `synthesize()` not implemented
 3. ⏳ TODO: **Layer 1 (MCP Dispatcher)** — `/atlas.packet.*` not wired
 4. ✅ FIXED: **Layer 3 (Search Service Collection)** — codebase fallback added (Session 83)
@@ -239,8 +239,8 @@ docker exec legal-ai-valkey redis-cli -a redis --no-auth-warning GET "embed:embe
 
 ---
 
-**Status**: ✅ **BLOCKER 1 RESOLVED**  
-**Ready for**: Layer 5 (Synthesis) work  
-**Test Command**: See "Verification" section above  
-**Unblocks**: Real semantic search on codebase packets  
+**Status**: ✅ **BLOCKER 1 RESOLVED**
+**Ready for**: Layer 5 (Synthesis) work
+**Test Command**: See "Verification" section above
+**Unblocks**: Real semantic search on codebase packets
 

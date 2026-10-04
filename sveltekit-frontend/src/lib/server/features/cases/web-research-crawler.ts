@@ -24,6 +24,7 @@
 import { webSearch } from '$lib/server/retrieval/web-search.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ const GRAPH_REBUILD_EVERY = 100;             // trigger rebuild every N new embe
 const WEB_SUM_KEY         = (h: string) => `web:research:sum:${h}`;
 const WEB_IDX_KEY         = (pl: string) => `web:research:idx:${pl}`;
 const BUILT_AT_KEY        = 'web:research:built_at';
-const MODEL               = 'gemma4-rotorquant:latest';
+const MODEL               = BIFROST_CHAT_MODEL;
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

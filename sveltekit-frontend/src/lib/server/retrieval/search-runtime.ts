@@ -1104,13 +1104,35 @@ export class SearchRuntime {
   private async lookupHypergraphNeighbors(
     packets: FeatureEnvelope[],
   ): Promise<Array<{ canonicalId: string; hyperedgeIds: string[] }> | undefined> {
-    const canonicalIds = packets
-      .map((p) => p.packet_key ?? p.source_ref)
-      .filter((v): v is string => Boolean(v));
-    if (canonicalIds.length === 0) return undefined;
+    const workspaceRevisions = new Set(packets.map((packet) => packet.workspace_revision?.trim()).filter(Boolean));
+    const graphRevisions = new Set(packets.map((packet) => packet.graph_revision?.trim()).filter(Boolean));
+    if (
+      packets.some((packet) => !packet.workspace_revision?.trim() || !packet.graph_revision?.trim()) ||
+      workspaceRevisions.size !== 1 ||
+      graphRevisions.size !== 1
+    ) return undefined;
+
+    const packetKeys = [...new Set(packets.map((packet) => packet.packet_key?.trim()).filter((key): key is string => Boolean(key)))];
+    if (packetKeys.length === 0) return undefined;
     try {
-      const { readKagHypergraphNeighborsV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
-      const receipt = await readKagHypergraphNeighborsV1(canonicalIds);
+      const { resolvePacketKeyResolutionV2 } = await import('../atlas/identity/packet-identity-resolver.js');
+      const resolutions = await Promise.all(packetKeys.map(async (packetKey) => {
+        try {
+          const resolution = await resolvePacketKeyResolutionV2(packetKey);
+          return resolution.storagePacketKey === packetKey ? resolution : null;
+        } catch {
+          return null;
+        }
+      }));
+      const canonicalIds = [...new Set(resolutions
+        .map((resolution) => resolution?.canonicalPacketKey)
+        .filter((key): key is string => Boolean(key)))];
+      if (canonicalIds.length === 0) return undefined;
+      const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      const receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, {
+        workspaceRevision: [...workspaceRevisions][0]!,
+        graphRevision: [...graphRevisions][0]!,
+      });
       return receipt.neighbors.length > 0 ? receipt.neighbors : undefined;
     } catch (error) {
       console.warn('[search-runtime] hypergraph neighbor lookup failed (non-blocking):', error);

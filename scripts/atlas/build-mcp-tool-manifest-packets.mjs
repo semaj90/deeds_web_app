@@ -30,6 +30,11 @@ import { createHash }  from 'node:crypto';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  assertEmbeddingApiConfiguredForApplyV1,
+  requestEmbeddingV1,
+  resolveEmbeddingApiBaseUrlV1,
+} from './lib/embedding-api-client-v1.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT   = join(__dir, '../..');
@@ -46,8 +51,7 @@ const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
 const NEO4J_URL    = process.env.NEO4J_URL    || 'http://localhost:7474';
 const NEO4J_USER   = process.env.NEO4J_USER   || 'neo4j';
 const NEO4J_PASS   = process.env.NEO4J_PASS   || 'neo4j123';
-const _ollamaRaw = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
+const EMBEDDING_API_BASE_URL = resolveEmbeddingApiBaseUrlV1();
 const COLLECTION   = 'codebase_chunks_768';
 
 // ── Domain ontology map ────────────────────────────────────────────────────────
@@ -408,23 +412,14 @@ async function discoverFromMcpFiles() {
   return tools;
 }
 
-// ── Canonical embedding via EmbeddingGemma only ──
-
-const EMBED_MODEL = process.env.EMBEDDINGGEMMA_MODEL ?? process.env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest';
+// ── Canonical embedding API; preserve the existing unprompted corpus recipe ──
 
 async function embed(text) {
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBED_MODEL, prompt: text }),
-      signal: AbortSignal.timeout(15_000),
-    });
-    if (!res.ok) return null;
-    const d = await res.json();
-    if (Array.isArray(d.embedding) && d.embedding.length === 768 && d.embedding.every(Number.isFinite)) return d.embedding;
-  } catch { /* canonical embedding unavailable */ }
-  return null;
+  return requestEmbeddingV1({
+    baseUrl: EMBEDDING_API_BASE_URL,
+    text,
+    mode: 'unprompted_legacy',
+  });
 }
 
 // ── Neo4j helper ───────────────────────────────────────────────────────────────
@@ -632,6 +627,12 @@ async function main() {
     return;
   }
 
+  assertEmbeddingApiConfiguredForApplyV1({
+    apply: APPLY,
+    noQdrant: NO_QDRANT,
+    baseUrl: EMBEDDING_API_BASE_URL,
+  });
+
   // ── 4. Postgres insert ────────────────────────────────────────────────────
   console.log(`\nInserting into atlas_packets…`);
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 3 });
@@ -692,8 +693,8 @@ async function main() {
         const points = [];
         for (const p of batch) {
           const text   = [p.payload.tool_name, p.payload.description, ...p.payload.ontology].join(' ');
-          const vector = await embed(text);
-          if (!vector || vector.length !== 768) continue;
+          const embedded = await embed(text);
+          const vector = embedded.embedding;
 
           // Stable numeric ID from packet_key hash
           const numId = parseInt(p.packet_key.slice(0, 8), 16);
@@ -711,6 +712,7 @@ async function main() {
               ontology:         p.payload.ontology,
               transport:        p.payload.transport,
               atlas_enriched:   true,
+              embedding_input_recipe: embedded.inputRecipe,
               canonicalSourceRef: p.source_ref,
               file_path:        p.payload.file,
             },

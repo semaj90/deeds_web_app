@@ -1,0 +1,74 @@
+{
+  "schema": "atlas.openspec-artifact-census.v1",
+  "generatedAt": "2026-10-03T18:00:59.072Z",
+  "workspaceRevision": "9b15098c243234751cb57a5977be78aa35840e9a",
+  "sourceWorkboard": {
+    "schema": "atlas.openspec.workboard.v1",
+    "generatedAt": "2026-10-03T18:00:58.308Z",
+    "source": null,
+    "taskPopulationChecksum": "sha256:ca48e3740b4c76c6598d6eb5cbc40f24548e36fc221ec7ab914695b72e62e2b3",
+    "sourceTaskFileCount": 94,
+    "checksumValidation": "MATCHED_CURRENT_TASK_FILES",
+    "controllerEvidenceGeneratedAt": "2026-09-26T17:08:37.551Z",
+    "controllerEvidenceFreshness": "STALE"
+  },
+  "tasks": {
+    "current": 2694,
+    "waiting": 813,
+    "checked": 6890,
+    "superseded": 0,
+    "supersessionReviewCandidates": 56,
+    "reviewRequired": 1752,
+    "staleOrMissingControllerEvidence": 5073,
+    "total": 10455
+  },
+  "taskCountNotes": {
+    "current": "Existing Workboard actionable count; advisory, not task authority.",
+    "checked": "Checkbox claims only; not proof of completion.",
+    "superseded": "Zero confirmed in this census; heuristic matches remain review candidates.",
+    "reviewRequired": "Count of rows labeled REVIEW_REQUIRED by the Workboard projection; may overlap other counts."
+  },
+  "reports": {
+    "hot": 0,
+    "warm": 0,
+    "coldCandidate": 0,
+    "reviewRequired": 1258,
+    "filesInventoriedByMetadata": 1258,
+    "eligibility": "UNASSESSED_RETAIN_LOCAL",
+    "classificationRequirements": [
+      "current references",
+      "replay requirement",
+      "sensitivity",
+      "canonical/source status",
+      "reviewed supersession"
+    ]
+  },
+  "bytes": {
+    "local": 14352144428,
+    "archiveCandidate": 0,
+    "measurement": "Filesystem metadata only; report contents were not read."
+  },
+  "retrieval": {
+    "defaults": [
+      "CURRENT",
+      "WAITING",
+      "REVIEW_REQUIRED"
+    ],
+    "historyOnly": [
+      "SUPERSEDED",
+      "HISTORICAL"
+    ],
+    "enabled": false
+  },
+  "writesPerformed": false,
+  "outputArtifactWritten": true,
+  "mutationFlags": {
+    "taskLedgerWrites": false,
+    "archiveWrites": false,
+    "cacheWrites": false,
+    "redisWrites": false,
+    "qdrantWrites": false,
+    "postgresWrites": false,
+    "seaweedfsWrites": false
+  }
+}

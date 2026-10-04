@@ -18,7 +18,8 @@ import fetch from 'node-fetch';
 import pg from 'pg';
 import amqplib from 'amqplib';
 
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const SVELTEKIT_URL = process.env.SVELTEKIT_URL || 'http://127.0.0.1:5173';
 const RABBIT_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';

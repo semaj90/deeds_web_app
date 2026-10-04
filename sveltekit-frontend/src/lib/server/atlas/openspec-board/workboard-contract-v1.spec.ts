@@ -7,6 +7,7 @@ import {
   projectTask,
   OpenSpecWorkboardContractError,
   OpenSpecImplementationProgramV1Schema,
+  OpenSpecWorkboardTaskV1Schema,
   OpenSpecWorkboardV1Schema,
 } from './workboard-contract-v1';
 
@@ -30,7 +31,7 @@ describe('OpenSpecWorkboardContractV1 against the live canonical artifact', () =
     expect(tasks.length).toBe(workboard.summary.totalTasks);
     expect(tasks.filter((t) => t.executionState === 'DONE').length).toBe(workboard.summary.completedTasks);
     expect(tasks.filter((t) => t.state === 'OPEN').length).toBe(workboard.summary.openTasks);
-    expect(tasks.filter((t) => t.executionState === 'ACTIONABLE').length).toBe(workboard.summary.actionableTasks);
+    expect(tasks.filter((t) => t.executionState === 'ACTIONABLE' && t.supersessionReviewState !== 'REVIEW_REQUIRED').length).toBe(workboard.summary.actionableTasks);
     expect(tasks.filter((t) => t.executionState === 'WAITING_ON_DEPENDENCY').length).toBe(workboard.summary.waitingTasks);
     expect(tasks.filter((t) => t.executionState === 'SUPERSEDED_OR_HISTORICAL').length).toBe(workboard.summary.supersededTasks);
   });
@@ -56,6 +57,40 @@ describe('OpenSpecWorkboardContractV1 against the live canonical artifact', () =
       expect(typeof t.taskKey).toBe('string');
       expect(typeof t.text).toBe('string');
     }
+  });
+
+  it('projection keeps text-only supersession candidates visible for review but non-actionable', async () => {
+    const task = OpenSpecWorkboardTaskV1Schema.parse({
+      taskKey: 'sample-change:1',
+      change: 'sample-change',
+      source: 'openspec/changes/sample-change/tasks.md',
+      line: 1,
+      text: 'Old path candidate',
+      state: 'OPEN',
+      kind: 'WORK_ITEM',
+      executionState: 'ACTIONABLE',
+      declaredSourceRef: null,
+      declaredSourceRevision: null,
+      priority: 50,
+      lastUpdatedAt: '2026-10-03T00:00:00.000Z',
+      timestampMethod: 'FILESYSTEM_MTIME',
+      blockHash: 'sha256:block',
+      stableKey: 'sample-change#stable',
+      logicalTaskKey: null,
+      taskIdentity: {
+        logicalTaskKey: null,
+        taskRevision: 'sha256:block',
+        sourceLine: 1,
+        migrationKey: 'sample-change#stable',
+        basis: 'MIGRATION_TITLE_HASH',
+      },
+      eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' },
+      supersessionReviewState: 'REVIEW_REQUIRED',
+    });
+    const projected = projectTask(task);
+    expect(projected.supersessionReviewState).toBe('REVIEW_REQUIRED');
+    expect(projected.actionable).toBe(false);
+    expect(projected.superseded).toBe(false);
   });
 
   it('validates the implementation program and accounts for each open leaf exactly once', async () => {

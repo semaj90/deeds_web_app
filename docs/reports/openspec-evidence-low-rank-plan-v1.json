@@ -36,8 +36,8 @@
   },
   "counts": {
     "taskCards": 11024,
-    "graphNodes": 11060,
-    "graphEdges": 63,
+    "graphNodes": 11112,
+    "graphEdges": 65,
     "latentRowsPlanned": 11024
   },
   "projection": {
@@ -68,6 +68,6 @@
   "safe_next_command": "node scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-low-rank-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-low-rank-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:37.856Z",
-  "checksum": "sha256:dad652592dd7691822c82355d088b54107eafcf1ce9fab51c768eb78da841b9f"
+  "generatedAt": "2026-10-03T05:00:19.967Z",
+  "checksum": "sha256:7b49049301cfedb575f716bb2c8215c900664fd45bf982d91d0396da6662c545"
 }

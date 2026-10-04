@@ -23,6 +23,7 @@ import type { SearchFilter, SearchLane } from './types.js';
 import type { SearchTier } from './search-contract.js';
 import { inferRetrievalTier } from './search-contract.js';
 import { embedQueryForLane, type QueryVectorBundle } from './embedding-service.js';
+import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 import {
   resolveSemanticLane,
   assertSemantic768,
@@ -255,21 +256,15 @@ function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | un
 async function generateEmbedding(query: string, config: RetrievalConfig): Promise<number[]> {
   const startTime = Date.now();
   try {
-    const res = await fetch(`http://${config.ollama.host}:${config.ollama.port}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'embeddinggemma:latest',
-        prompt: query
-      })
+    // EMBED-CALLER-CONVERGENCE-01: recipe stays the caller's explicit raw query (unprompted_legacy,
+    // unchanged); the provider and host/port stay pinned to this config, so the backend is
+    // unchanged. Transport shape, the 30 s timeout, and vector validation are now shared.
+    const result = await executeProviderEmbeddingV1({
+      text: query,
+      mode: 'unprompted_legacy',
+      provider: { provider: 'ollama', baseUrl: `http://${config.ollama.host}:${config.ollama.port}`, modelId: 'embeddinggemma:latest' }
     });
-
-    if (!res.ok) throw new Error(`Ollama embedding failed: ${res.status}`);
-    const data = await res.json() as { embedding: number[] };
-    if (!data.embedding || data.embedding.length !== 768) {
-      throw new Error(`Expected 768-dim embedding, got ${data.embedding?.length || 0}`);
-    }
-    return data.embedding;
+    return result.embedding;
   } catch (err) {
     console.error('Embedding stage failed:', err);
     throw err;

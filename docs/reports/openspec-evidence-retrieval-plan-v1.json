@@ -5,7 +5,7 @@
   "source": {
     "embeddingPlan": "docs/reports/openspec-evidence-embedding-plan-v1.json",
     "migrationDryRun": "docs/reports/openspec-evidence-migration-dry-run-v1.json",
-    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004"
+    "workspaceRevision": "sha256:e3244087483abe147ccd21eeb3101cf47dd8db01fcc6b4a064031705ac2a903e"
   },
   "canonicalLane": {
     "representation": "semantic_768",
@@ -51,6 +51,6 @@
   "safe_next_command": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-retrieval-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-retrieval-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:36.911Z",
-  "checksum": "sha256:d4d92f214ae817e63bb3b15b2832b6de92602187df41ef5c07fb111b83a7d67a"
+  "generatedAt": "2026-10-03T05:00:18.986Z",
+  "checksum": "sha256:3fb74da16677338c0fb2090cd5a3aee377728ea550171cbce47c41d9c0e57bfe"
 }

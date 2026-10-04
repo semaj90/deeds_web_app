@@ -29,6 +29,7 @@ import {
   sanitizeGemma4Summary,
 } from './lib/gemma4-summary-sanitizer.mjs';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -113,7 +114,7 @@ function summaryTextFor(row) {
 function derivePacketKey(row) {
   const sourceRef = canonicalSourceRef(row.relative_path ?? row.source_ref ?? row.sourceRef ?? '');
   if (!sourceRef) return '';
-  return `packet:${stableHash(sourceRef).slice(0, 12)}`;
+  return legacyPacketKeyFromSourceRef(sourceRef);
 }
 
 function deriveTitleId(row, packetRow) {

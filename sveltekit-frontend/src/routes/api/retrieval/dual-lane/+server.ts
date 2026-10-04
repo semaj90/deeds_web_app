@@ -14,6 +14,7 @@ import { db } from '$lib/server/db/client';
 import { env } from '$env/dynamic/private';
 import { ENV } from '$lib/server/env.server.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
+import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 
 interface QdrantResponse {
   result?: {
@@ -55,27 +56,23 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 
   try {
-    // Step 1: Embed query (using Ollama embeddinggemma)
-    const embedResponse = await fetch(`${env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL || 'http://127.0.0.1:11434'}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'embeddinggemma:latest',
-        prompt: q,
-      }),
-      signal: AbortSignal.timeout(30_000),
+    // Step 1: preserve the existing raw query recipe while centralizing its contract.
+    const embeddingResult = await executeEmbeddingInputV1({
+      text: q,
+      mode: 'unprompted_legacy',
+      executor: async (prompt) => {
+        const embedResponse = await fetch(`${env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model: 'embeddinggemma:latest', prompt }),
+          signal: AbortSignal.timeout(30_000),
+        });
+        if (!embedResponse.ok) throw new Error(`EMBEDDING_HTTP_${embedResponse.status}`);
+        const embedData = await embedResponse.json() as { embedding?: unknown };
+        return embedData.embedding;
+      },
     });
-
-    if (!embedResponse.ok) {
-      return error(503, 'Embedding service unavailable');
-    }
-
-    const embedData = (await embedResponse.json()) as { embedding?: number[] };
-    if (!embedData.embedding) {
-      return error(500, 'No embedding generated');
-    }
-
-    const embedding = embedData.embedding;
+    const embedding = embeddingResult.embedding;
 
     // Fail-closed: codebase_chunks_768 stores 768-dim named vectors ("content",
     // "semantic"). A truncated 384-dim vector must never be sent here — it would

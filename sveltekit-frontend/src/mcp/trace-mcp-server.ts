@@ -175,6 +175,11 @@ import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-p
 import { runPacketDenseSearch } from '../lib/server/retrieval/packet-dense-search.js';
 import type { QdrantPointsQueryFn } from '../lib/server/retrieval/packet-dense-rerank.js';
 import { embedQueryForLane } from '../lib/server/retrieval/embedding-service.js';
+import { EMBEDDINGGEMMA_PROMPT_REVISION_V1 } from '../lib/server/atlas/embedding/embeddinggemma-task-representation-v1.js';
+import {
+  PROMPT_REVISION_UNPROMPTED,
+  SEMANTIC_REPRESENTATION_ID,
+} from '../lib/server/embedding/embedding-contract-768.js';
 import { buildAcePacketFromSource } from '../lib/server/ace/source-to-packet.js';
 import { buildIndexedSourcePacket } from '../lib/server/ace/indexed-source-packet.js';
 import { populateFeatureDocuments } from '../lib/server/atlas/feature-doc-population.js';
@@ -678,6 +683,11 @@ registerNativeAccelerationTools(server, async () => {
 // search.hybrid + topology.search_near + search.dev_context all embed the same
 // query independently — single embeddinggemma call costs 3-7s, cache hit is <5ms.
 const EMBED_CACHE_TTL = 3600;
+type McpEmbeddingModeV1 = 'unprompted_legacy' | 'retrieval_query';
+const MCP_EMBEDDING_PROMPT_REVISION: Readonly<Record<McpEmbeddingModeV1, string>> = {
+  unprompted_legacy: PROMPT_REVISION_UNPROMPTED,
+  retrieval_query: EMBEDDINGGEMMA_PROMPT_REVISION_V1,
+};
 
 let _embedRedis: import('ioredis').default | null = null;
 let _embedRedisConnecting: Promise<import('ioredis').default> | null = null;
@@ -729,17 +739,22 @@ function makeRedis(options: { commandTimeoutMs?: number } = {}) {
 }
 
 async function getOrComputeEmbedding(
-  query: string
+  query: string,
+  mode: McpEmbeddingModeV1,
 ): Promise<{ embedding: number[]; cached: boolean }> {
   const safeQuery = query.slice(0, 4000);
-  const key = `embed:mcp:${createHash('md5').update(safeQuery).digest('hex')}`;
+  const promptRevision = MCP_EMBEDDING_PROMPT_REVISION[mode];
+  const keyDigest = createHash('sha256')
+    .update(`${SEMANTIC_REPRESENTATION_ID}\0${mode}\0${promptRevision}\0${safeQuery}`)
+    .digest('hex');
+  const key = `embed:mcp:v2:${mode}:${keyDigest}`;
   try {
     const r = await getEmbedRedis();
     const hit = await r.get(key).catch(() => null);
     if (hit) {
       try {
         const parsed = JSON.parse(hit) as number[];
-        if (Array.isArray(parsed) && parsed.length === 768) {
+        if (Array.isArray(parsed) && parsed.length === 768 && parsed.every(Number.isFinite)) {
           return { embedding: parsed, cached: true };
         }
       } catch {
@@ -748,21 +763,21 @@ async function getOrComputeEmbedding(
     }
     let embedding: number[] = [];
     try {
-      const res = await sveltePost('/api/embed', { text: safeQuery });
-      embedding = ((res as { embedding?: number[] }).embedding ?? []) as number[];
-    } catch {
-      // Fallback to direct Ollama
-      try {
-        const res = await fetch(`${OLLAMA_BASE}/api/embeddings`, {
-          method: 'POST',
-          body: JSON.stringify({ model: OLLAMA_EMBED_MODEL, prompt: safeQuery }),
-          signal: AbortSignal.timeout(10_000),
-        });
-        const data = (await res.json()) as { embedding?: number[] };
-        embedding = data.embedding ?? [];
-      } catch (err) {
-        console.error('Embedding fallback failed:', err);
+      const res = await sveltePost('/api/embed', { text: safeQuery, taskMode: mode });
+      const result = res as {
+        embedding?: unknown;
+        inputRecipe?: { mode?: string; promptRevision?: string };
+      };
+      const inputRecipe = result.inputRecipe;
+      if (!inputRecipe || inputRecipe.mode !== mode || inputRecipe.promptRevision !== promptRevision) {
+        throw new Error('MCP_EMBEDDING_RECIPE_RECEIPT_MISMATCH');
       }
+      if (!Array.isArray(result.embedding) || result.embedding.length !== 768 || !result.embedding.every(Number.isFinite)) {
+        throw new Error('MCP_EMBEDDING_VECTOR_INVALID');
+      }
+      embedding = result.embedding as number[];
+    } catch {
+      console.error('Canonical embedding API unavailable; direct executor fallback is disabled.');
     }
 
     if (embedding.length === 768) {
@@ -2320,7 +2335,7 @@ server.registerTool(
         limit: limit * 2,
         jsonFilter,
       });
-      const embedPromise = getOrComputeEmbedding(query);
+      const embedPromise = getOrComputeEmbedding(query, 'unprompted_legacy');
       const semanticPromise = embedPromise.then(({ embedding, cached }) => {
         if (embedding.length !== 768)
           return { ok: false, cached, data: [] as Array<Record<string, unknown>> };
@@ -2420,7 +2435,7 @@ server.registerTool(
   },
   async ({ startKey, endKey, summary, pathSteps, citationSpans, pagerankScore }) => {
     try {
-      const { embedding } = await getOrComputeEmbedding(summary);
+      const { embedding } = await getOrComputeEmbedding(summary, 'unprompted_legacy');
       if (embedding.length === 0)
         return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
 
@@ -2499,7 +2514,7 @@ server.registerTool(
   },
   async ({ query, limit }) => {
     try {
-      const { embedding } = await getOrComputeEmbedding(query);
+      const { embedding } = await getOrComputeEmbedding(query, 'unprompted_legacy');
       if (embedding.length === 0)
         return { content: [{ type: 'text', text: 'Embedding failed' }], isError: true };
 
@@ -2576,7 +2591,7 @@ server.registerTool(
     const QDRANT = QDRANT_URL;
     try {
       // Embed query once for both Qdrant tiers.
-      const embedRes = await getOrComputeEmbedding(query);
+      const embedRes = await getOrComputeEmbedding(query, 'unprompted_legacy');
       const vec = embedRes.embedding;
 
       // --- L1: per-chunk lens summaries (Qdrant summary_lenses_768) ---
@@ -3342,7 +3357,7 @@ server.registerTool(
         topo_class ?? null,
       ]);
 
-      const embedPromise = getOrComputeEmbedding(query);
+      const embedPromise = getOrComputeEmbedding(query, 'unprompted_legacy');
 
       const qdrantPromise = embedPromise.then(({ embedding }) => {
         if (!embedding.length) return { results: [] };
@@ -3525,7 +3540,7 @@ server.registerTool(
         sparseTopK,
         topo_class ?? null,
       ]);
-      const embedPromise = getOrComputeEmbedding(query);
+      const embedPromise = getOrComputeEmbedding(query, 'unprompted_legacy');
       const qdrantPromise = embedPromise.then(({ embedding }) => {
         if (!embedding.length) return { results: [] };
         return fetch(`${SVELTEKIT}/api/code-intel/search`, {
@@ -4050,7 +4065,7 @@ server.registerTool(
     try {
       // Precompute embedding once (Redis-cached) so the SvelteKit endpoint
       // skips its own embed call when this is a repeat query.
-      const { embedding } = await getOrComputeEmbedding(query);
+      const { embedding } = await getOrComputeEmbedding(query, 'unprompted_legacy');
 
       const body: Record<string, unknown> = { query, limit, mode: 'dev_context' };
       if (filePath) body.filePath = filePath;
@@ -7945,14 +7960,8 @@ server.registerTool(
 
     // ── Lane 2: Qdrant semantic search via SvelteKit embed + search ───────────
     try {
-      const embedRes = await fetch(`${SK_URL}/api/embed`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: opts.query }),
-        signal: AbortSignal.timeout(6000),
-      });
-      if (embedRes.ok) {
-        const { embedding } = (await embedRes.json()) as { embedding: number[] };
+      const { embedding } = await getOrComputeEmbedding(opts.query, 'unprompted_legacy');
+      if (embedding.length === 768) {
         const qdRes = await fetch(`${QDRANT_URL}/collections/codebase_chunks_768/points/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -8367,21 +8376,14 @@ server.registerTool(
     }),
   },
   async ({ query, collection, limit, score_threshold, case_id, tags }) => {
-    const SK_URL = SVELTEKIT;
     const QDRANT_LCL = QDRANT_URL;
 
-    // Step 1: embed via /api/embed (Redis L1 + Bifrost L2 cached)
+    // Step 1: use the shared MCP embedding cache and recipe adapter.
     let vector: number[];
     try {
-      const er = await fetch(`${SK_URL}/api/embed`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: query, model: 'embeddinggemma:latest' }),
-        signal: AbortSignal.timeout(10_000),
-      });
-      const ed = (await er.json()) as { embedding?: number[]; error?: string };
-      if (!ed.embedding?.length) throw new Error(ed.error ?? 'empty embedding');
-      vector = ed.embedding;
+      const result = await getOrComputeEmbedding(query, 'unprompted_legacy');
+      if (result.embedding.length !== 768) throw new Error('empty or invalid embedding');
+      vector = result.embedding;
     } catch (e) {
       return {
         content: [
@@ -9151,15 +9153,7 @@ server.registerTool(
   },
   async ({ query, topClusters }) => {
     try {
-      // Embed the query via Ollama embeddinggemma
-      const embRes = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),
-        signal: AbortSignal.timeout(5000),
-      });
-      if (!embRes.ok) throw new Error(`embed failed: ${embRes.status}`);
-      const { embedding } = await embRes.json() as { embedding: number[] };
+      const { embedding } = await getOrComputeEmbedding(query, 'unprompted_legacy');
       if (!embedding || embedding.length !== 768) throw new Error('embedding dim mismatch');
 
       // Call TurboVec sidecar
@@ -9274,7 +9268,7 @@ server.registerTool(
       [query, safeLimit * 3, null],
     ).catch(() => ({ rows: [] as Record<string, unknown>[] }));
 
-    const embedPromise = getOrComputeEmbedding(query);
+    const embedPromise = getOrComputeEmbedding(query, 'unprompted_legacy');
 
     const qdrantPromise = embedPromise.then(({ embedding }) => {
       if (!embedding.length) return { results: [] as Record<string, unknown>[] };

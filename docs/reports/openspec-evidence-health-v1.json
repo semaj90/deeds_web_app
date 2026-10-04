@@ -4,56 +4,56 @@
   "status": "FINAL_RUN_AUTHORITY_VERIFIED_READ_ONLY",
   "promotionEligible": false,
   "source": {
-    "census": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
-    "manifest": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/run-manifest-v1.json",
-    "finalSummary": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/final-summary-v1.json",
-    "runId": "pipeline-20261002044610126-60936",
-    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004",
-    "generatedAt": "2026-10-02T04:46:26.434Z",
+    "census": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/census-v1.json",
+    "manifest": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/run-manifest-v1.json",
+    "finalSummary": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/final-summary-v1.json",
+    "runId": "pipeline-20261003044903838-24208",
+    "workspaceRevision": "sha256:683165a3af86c42237d02a6357d72aea462756629bb0ecf18c3344782a672f7a",
+    "generatedAt": "2026-10-03T04:49:23.258Z",
     "canonicalAuthority": "scripts/atlas/compile-openspec-evidence-run-manifest-v1.mjs"
   },
   "claims": {
-    "changes": 117,
-    "activeChanges": 107,
+    "changes": 118,
+    "activeChanges": 108,
     "archivedChanges": 10,
-    "tasks": 11060,
-    "checked": 7313,
-    "unchecked": 3747,
+    "tasks": 11122,
+    "checked": 7344,
+    "unchecked": 3778,
     "checkedWithEvidence": 0,
-    "checkedWithoutEvidence": 7313,
+    "checkedWithoutEvidence": 7344,
     "uncheckedButProven": 1
   },
   "identity": {
-    "taskIdMissing": 6993,
+    "taskIdMissing": 7020,
     "duplicateTaskIds": 507,
-    "explicitTaskIds": 4067,
-    "derivedTaskIds": 6959,
+    "explicitTaskIds": 4102,
+    "derivedTaskIds": 6986,
     "ambiguousTaskIdentities": 0,
     "recoveredLegacyIds": 312,
     "identityCollisions": 0,
     "collisionClasses": {}
   },
   "receipts": {
-    "total": 1073,
-    "bound": 2,
-    "orphan": 61,
+    "total": 1092,
+    "bound": 1,
+    "orphan": 62,
     "ambiguous": 5,
-    "staleOrMissingRevision": 14,
+    "staleOrMissingRevision": 41,
     "checksumFailures": 0,
-    "typed": 883,
-    "candidateTyped": 190,
+    "typed": 898,
+    "candidateTyped": 194,
     "recoveredLegacyBindings": 0,
     "orphanResolutionMissingTask": 9,
     "bindingReasons": {
       "CANDIDATE_IDENTITY_NOT_ADMITTED_FOR_BINDING": 39,
       "CHANGE_ONLY_REFERENCE_HAS_MULTIPLE_ADMITTED_TASKS": 5,
-      "DETERMINISTIC_MATCH": 16,
+      "DETERMINISTIC_MATCH": 42,
       "EXPLICIT_TASK_TOKEN_INVALID": 8,
       "FILENAME_ONLY_CANDIDATE": 2,
-      "MULTIPLE_TASK_IDENTITIES_IN_PORTFOLIO_ARTIFACT": 54,
-      "NO_SUPPORTED_IDENTITY_HINTS": 52,
-      "OUTSIDE_OPENSPEC_EVIDENCE_SCOPE": 548,
-      "SOURCE_REF_NOT_TASK_IDENTITY": 348,
+      "MULTIPLE_TASK_IDENTITIES_IN_PORTFOLIO_ARTIFACT": 40,
+      "NO_SUPPORTED_IDENTITY_HINTS": 53,
+      "OUTSIDE_OPENSPEC_EVIDENCE_SCOPE": 549,
+      "SOURCE_REF_NOT_TASK_IDENTITY": 353,
       "UNMATCHED_LEGACY_ALIAS": 1
     },
     "unknownReceiptTypes": 0
@@ -61,22 +61,22 @@
   "proof": {
     "states": {
       "BLOCKED": 60,
-      "CLAIM_ONLY": 10958,
+      "CLAIM_ONLY": 11020,
       "PROVEN": 1,
       "STALE": 41
     },
     "contradictionTasks": 0,
     "blockedTasks": 60,
     "heuristicPromotionCount": 0,
-    "predicateCount": 14071
+    "predicateCount": 14138
   },
   "graph": {
-    "nodes": 11060,
-    "edges": 63,
+    "nodes": 11112,
+    "edges": 65,
     "unresolvedEdges": 86,
     "cycles": 0,
     "aliasGroups": 20439,
-    "supersessionCandidates": 208
+    "supersessionCandidates": 210
   },
   "workboard": {
     "status": "WORKBOARD_PARITY_NOT_PROVEN",
@@ -105,37 +105,37 @@
       "id": "EVF-03A_IDENTITY_RECOVERY",
       "status": "TASK_IDENTITY_COVERAGE_PASS",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/identity-recovery-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/identity-recovery-v1.json"
     },
     {
       "id": "EVF-03B_RECEIPT_TYPING",
       "status": "RECEIPT_TYPES_PARTIAL",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/receipt-typing-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/receipt-typing-v1.json"
     },
     {
       "id": "EVF-03C_ORPHAN_BINDING",
       "status": "ORPHAN_BINDING_COVERAGE_NOT_PROVEN",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/receipt-binding-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/receipt-binding-v1.json"
     },
     {
       "id": "EVF-03C_COMPACT_SUMMARY",
       "status": "PIPELINE_COMPLETED_READ_ONLY",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/final-summary-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/final-summary-v1.json"
     },
     {
       "id": "EVF-03_RECEIPT_BINDING",
       "status": "ORPHAN_BINDING_COVERAGE_NOT_PROVEN",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/receipt-binding-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/receipt-binding-v1.json"
     },
     {
       "id": "EVF-04_PREDICATE_RESOLUTION",
       "status": "REPORT_PRESENT",
       "writesPerformed": false,
-      "report": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/predicate-resolution-v1.json"
+      "report": "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/predicate-resolution-v1.json"
     },
     {
       "id": "EVF-06_POSTGRES_LEDGER",
@@ -226,7 +226,7 @@
   },
   "likely_cause": "Evidence health must be displayed from a bounded projection because the authoritative census contains the full task corpus and is too large for request-time UI reads.",
   "evidence": [
-    "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/census-v1.json",
+    "docs/reports/openspec-evidence/pipeline-20261003044903838-24208/census-v1.json",
     "docs/reports/openspec-task-evidence-bindings-v1.json",
     "docs/reports/openspec-evidence-summary-v1.json"
   ],
@@ -236,6 +236,6 @@
   "safe_next_command": "node scripts/atlas/compile-openspec-evidence-health-v1.mjs",
   "smoke_command": "node --check scripts/atlas/compile-openspec-evidence-health-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-health-v1.json",
-  "generatedAt": "2026-10-02T04:47:45.775Z",
-  "checksum": "sha256:f761664bf5e4e7452af5a8a9fcb6d68cc25a24d83b658af60e45773123f9a26a"
+  "generatedAt": "2026-10-03T04:49:55.757Z",
+  "checksum": "sha256:54023ec490a0c890406c642d77693a0c702e106c81c8333238f02d24b7efd054"
 }

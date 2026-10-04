@@ -11,6 +11,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import { pool } from '$lib/server/db/client';
@@ -178,16 +179,19 @@ async function fetchClusterChunks(clusterId: number): Promise<QdrantPoint[]> {
 
 async function embedSummary(summary: string): Promise<number[] | null> {
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: summary }),
-      signal: AbortSignal.timeout(30_000),
+    const embeddingFetch: typeof fetch = (input, init) => ollamaFetch(String(input), init);
+    const { embedding } = await executeProviderEmbeddingV1({
+      text: summary,
+      mode: 'unprompted_legacy',
+      provider: {
+        provider: 'ollama',
+        baseUrl: ENV.OLLAMA_BASE_URL,
+        modelId: 'embeddinggemma:latest',
+      },
+      timeoutMs: 30_000,
+      fetchImpl: embeddingFetch,
     });
-
-    if (!res.ok) return null;
-    const data = (await res.json()) as { embedding?: number[]; embeddings?: number[][] };
-    return data.embedding ?? data.embeddings?.[0] ?? null;
+    return embedding;
   } catch {
     return null;
   }

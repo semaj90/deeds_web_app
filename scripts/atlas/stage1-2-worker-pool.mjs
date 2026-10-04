@@ -39,7 +39,8 @@ const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.
 
 const pool = new pg.Pool({ connectionString: DB_URL });
 
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const BIFROST_URL = process.env.BIFROST_URL || 'http://127.0.0.1:3040';
 
 // ── Helper Functions ──────────────────────────────────────────────────────────
@@ -58,7 +59,7 @@ async function callGemma4(prompt, intent) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }

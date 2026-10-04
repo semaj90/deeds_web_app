@@ -31,6 +31,7 @@ import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.
 import { Client, Pool } from 'pg';
 import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pass-results.js';
 import type { ExtractedFeature } from './ast-langextract-bridge.js';
+import { classifyPostgresError } from '$lib/server/db/readiness.js';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -513,6 +514,7 @@ async function pollOnce(): Promise<void> {
 		}
 	} catch (err: any) {
 		consecutiveDbErrors++;
+		const readiness = classifyPostgresError(err);
 
 		// Exponential backoff: 2s, 4s, 8s, 16s, 32s (max)
 		const backoffMs = Math.min(2000 * Math.pow(2, consecutiveDbErrors - 1), 32000);
@@ -520,9 +522,9 @@ async function pollOnce(): Promise<void> {
 		// Only log once per minute to avoid spam
 		const now = Date.now();
 		if (now - lastDbErrorLog > DB_ERROR_LOG_INTERVAL) {
-			if (err.code === 'ECONNREFUSED') {
+			if (readiness.reason === 'CONNECTION_REFUSED') {
 				console.warn(`[Worker] DB unavailable (ECONNREFUSED), backing off ${backoffMs}ms`);
-			} else if (err.message?.includes('57P03') || err.message?.includes('starting up')) {
+			} else if (readiness.state === 'starting') {
 				console.warn(`[Worker] DB still starting up, backing off ${backoffMs}ms`);
 			} else {
 				console.error(`[Worker] Poll error:`, err.message);

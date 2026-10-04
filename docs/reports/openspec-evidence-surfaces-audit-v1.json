@@ -79,6 +79,6 @@
   "safe_next_command": "node scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
   "smoke_command": "node --check scripts/atlas/audit-openspec-evidence-surfaces-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-surfaces-audit-v1.json",
-  "generatedAt": "2026-10-02T04:47:37.960Z",
+  "generatedAt": "2026-10-03T05:00:20.063Z",
   "checksum": "sha256:5dbb90d27c471b6ed965c929f4ca0a549c2ce0ef9ac2d1fd6580e3fa22c7bcb8"
 }

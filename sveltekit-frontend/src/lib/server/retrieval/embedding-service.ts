@@ -15,6 +15,8 @@
  */
 
 import { assertSemantic768 } from '../embedding/embedding-contract-768.js';
+import { executeEmbeddingInputV1 } from '../embedding/embedding-execution-adapter-v1.js';
+import { createProviderEmbeddingExecutorV1 } from '../embedding/embedding-provider-executor-v1.js';
 import { embedSemantic768Canonical } from '../embedding/canonical-embed.js';
 
 import { ENV } from '../env.server.js';
@@ -346,35 +348,45 @@ async function embedViaOllama(
   requireExact768 = false,
 ): Promise<EmbeddingResult> {
   const url = `${config.ollama_url}/api/embeddings`;
+  const requestEmbedding = async (prompt: string): Promise<number[]> => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: modelOverride, prompt }),
+      signal: AbortSignal.timeout(config.timeout_ms),
+    });
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: modelOverride,
-      prompt: query,
-    }),
-    signal: AbortSignal.timeout(config.timeout_ms),
-  });
+    if (!res.ok) {
+      throw new Error(`Ollama embedding failed: ${res.status}`);
+    }
 
-  if (!res.ok) {
-    throw new Error(`Ollama embedding failed: ${res.status}`);
-  }
+    const json = (await res.json()) as { embedding?: number[] };
+    const embedding = json.embedding ?? [];
+    if (!Array.isArray(embedding) || embedding.length === 0) {
+      throw new Error('Ollama returned empty embedding');
+    }
+    return embedding;
+  };
 
-  const json = (await res.json()) as { embedding?: number[] };
-  const embedding = json.embedding ?? [];
-
-  if (!Array.isArray(embedding) || embedding.length === 0) {
-    throw new Error('Ollama returned empty embedding');
-  }
-
-  // Fail closed BEFORE truncateVector can zero-pad a short vector into a
-  // dimensionally-valid-looking-but-corrupted 768-dim result. Must run on the
-  // raw model output, not the post-truncateVector output (which is always
-  // exactly `dim` long by construction, so checking after would never fire).
-  if (requireExact768) {
-    assertSemantic768(embedding);
-  }
+  const embedding = requireExact768
+    ? (await executeEmbeddingInputV1({
+        text: query,
+        mode: 'unprompted_legacy',
+        executor: async (formattedText) => {
+          const requestSemantic768Embedding = createProviderEmbeddingExecutorV1({
+            provider: {
+              provider: 'ollama',
+              baseUrl: config.ollama_url,
+              modelId: modelOverride,
+            },
+            timeoutMs: config.timeout_ms,
+          });
+          const rawEmbedding = await requestSemantic768Embedding(formattedText) as number[];
+          assertSemantic768(rawEmbedding);
+          return rawEmbedding;
+        },
+      })).embedding
+    : await requestEmbedding(query);
 
   const vec = truncateVector(new Float32Array(embedding), dim);
 

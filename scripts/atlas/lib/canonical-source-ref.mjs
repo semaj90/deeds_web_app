@@ -32,6 +32,48 @@ export function sourceRefHash(value) {
   return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 12);
 }
 
+export function legacyPacketKeyFromSourceRef(value) {
+  const sourceRef = String(value ?? '');
+  if (!sourceRef) return '';
+  return `packet:${crypto.createHash('sha256').update(sourceRef, 'utf8').digest('hex').slice(0, 12)}`;
+}
+
+export function assertLegacyPacketKeySourceRefMatch({ packetKey, sourceRef, existingSourceRef }) {
+  const candidateSourceRef = String(sourceRef ?? '');
+  const storedSourceRef = String(existingSourceRef ?? '');
+  if (!candidateSourceRef || !storedSourceRef || packetKey !== legacyPacketKeyFromSourceRef(candidateSourceRef)) {
+    throw new Error('LEGACY_PACKET_KEY_COLLISION_CHECK_INPUT_INVALID');
+  }
+  if (candidateSourceRef !== storedSourceRef) throw new Error('LEGACY_PACKET_KEY_TRUNCATION_COLLISION');
+  return true;
+}
+
+export function assertLegacyPacketKeyCorpusV1(entries) {
+  for (const entry of entries ?? []) {
+    const sourceRef = String(entry?.sourceRef ?? '');
+    const packetKey = String(entry?.packetKey ?? '');
+    if (!sourceRef || packetKey !== legacyPacketKeyFromSourceRef(sourceRef)) {
+      throw new Error('LEGACY_PACKET_KEY_CORPUS_ENTRY_INVALID');
+    }
+  }
+  return assertPacketKeySourceRefPairsUniqueV1(entries);
+}
+
+export function assertPacketKeySourceRefPairsUniqueV1(entries) {
+  const sourceRefByPacketKey = new Map();
+  for (const entry of entries ?? []) {
+    const sourceRef = String(entry?.sourceRef ?? '');
+    const packetKey = String(entry?.packetKey ?? '');
+    if (!sourceRef || !packetKey) throw new Error('PACKET_KEY_SOURCE_REF_PAIR_INVALID');
+    const existingSourceRef = sourceRefByPacketKey.get(packetKey);
+    if (existingSourceRef !== undefined && existingSourceRef !== sourceRef) {
+      throw new Error('LEGACY_PACKET_KEY_TRUNCATION_COLLISION');
+    }
+    sourceRefByPacketKey.set(packetKey, sourceRef);
+  }
+  return true;
+}
+
 export function isGeneratedPath(value) {
   const normalized = String(value ?? '')
     .replace(/\\/g, '/')

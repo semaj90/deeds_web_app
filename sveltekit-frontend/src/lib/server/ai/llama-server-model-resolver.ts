@@ -19,6 +19,15 @@
  *   opaque identifier; use it verbatim in requests and logs.
  */
 
+/**
+ * Normalize OpenAI API URLs to the origin/base expected by the `/v1/*` owners.
+ * Pure (no ENV access, no import-time requirements) so any reader can use it;
+ * re-exported from llm/runtime-contract.ts, which stays the configuration owner.
+ */
+export function normalizeLlamaServerBaseUrlV1(value: string): string {
+  return value.trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
+}
+
 export type ResolvedModelSource = 'configured-match' | 'llama-server-loaded';
 
 export interface ResolvedInferenceModel {

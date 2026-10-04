@@ -13,7 +13,7 @@
  *   1. Find all source_ref in codebase_chunk_index that DON'T have atlas_packets rows
  *   2. Extract directory_path and feature_id from source_ref pattern
  *   3. Generate stable packet_key (sha256 hash)
- *   4. INSERT into atlas_packets (ON CONFLICT DO NOTHING for idempotency)
+ *   4. classify insertion candidates only; this planner performs no INSERT
  *   5. Report counts and write JSON audit
  *
  * Usage:
@@ -71,6 +71,7 @@ import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveBoundedPacketSourceRevisionV1, resolvePacketSourceRevisionV1 } from './lib/packet-source-revision-admission-v1.mjs';
 import { assertApplyAuthorized, classifyV2AdmissionLiveState, loadPacketKeyV2AdmissionManifest } from './lib/packet-key-v2-admission-v1.mjs';
+import { assertLegacyPacketKeyCorpusV1, legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -246,7 +247,7 @@ function extractFeatureId(sourceRef) {
  * with the live atlas_packets row family already in the database.
  */
 function generatePacketKey(sourceRef) {
-  return 'packet:' + createHash('sha256').update(sourceRef).digest('hex').slice(0, 12);
+  return legacyPacketKeyFromSourceRef(sourceRef);
 }
 
 /**
@@ -482,6 +483,10 @@ async function main() {
         updated_at: new Date(),
       };
     });
+    assertLegacyPacketKeyCorpusV1(toRegister.map(registration => ({
+      packetKey: registration.packet_key,
+      sourceRef: registration.source_ref,
+    })));
 
     // Re-materialize and compare the live workspace immediately before any
     // lineage-bearing INSERT. A receipt that was valid for an earlier tree is
@@ -665,6 +670,7 @@ async function main() {
       // and its exact admitted source-revision memberships commit together.
       let registered = 0;
       let skipped = 0;
+      let failed = 0;
       for (const registration of toRegister) {
         const candidates = lineageBySourceRef.get(registration.source_ref) ?? [];
         const namespace = candidates.find(row => row.workspace_id);
@@ -680,8 +686,7 @@ async function main() {
           await client.query('BEGIN');
           const packetResult = await client.query(
             `INSERT INTO atlas_packets (packet_id, packet_key, source_ref, source_revision, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())
-             ON CONFLICT (packet_key) DO NOTHING`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now(), now())`,
             [`packet_${createHash('sha256').update(registration.packet_key).digest('hex').slice(0, 24)}`, registration.packet_key, registration.source_ref, admittedSourceRevisionByRef.get(registration.source_ref), registration.directory_path, registration.feature_id, registration.domain_class, registration.source_kind],
           );
           registered += packetResult.rowCount ?? 0;
@@ -717,7 +722,7 @@ async function main() {
           await client.query('COMMIT');
         } catch (err) {
           await client.query('ROLLBACK');
-          skipped += 1;
+          failed += 1;
           console.error(`Source failed and was rolled back (${registration.source_ref}): ${err.message}`);
         } finally {
           client.release();
@@ -731,7 +736,8 @@ async function main() {
         orphaned_found: toRegister.length,
         registered,
         skipped,
-        status: 'registration_lineage_capture_complete',
+        failed,
+        status: failed === 0 ? 'registration_lineage_capture_complete' : 'registration_lineage_capture_partial_failure',
       });
       return;
     }
@@ -740,6 +746,7 @@ async function main() {
     console.log('\nApplying registration...');
     let registered = 0;
     let skipped = 0;
+    let failed = 0;
 
     for (let i = 0; i < toRegister.length; i += DB_BATCH) {
       const batch = toRegister.slice(i, i + DB_BATCH);
@@ -763,7 +770,6 @@ async function main() {
       const insertSql = `
         INSERT INTO atlas_packets (packet_id, packet_key, source_ref, directory_path, feature_id, domain_class, source_kind, created_at, updated_at)
         VALUES ${valueRows.join(',')}
-        ON CONFLICT (packet_key) DO NOTHING
       `;
 
       try {
@@ -771,7 +777,7 @@ async function main() {
         registered += res.rowCount ?? 0;
       } catch (err) {
         console.error(`Batch failed: ${err.message}`);
-        skipped += batch.length;
+        failed += batch.length;
       }
 
       if ((i + batch.length) % 2000 === 0 || i + batch.length >= toRegister.length) {
@@ -799,8 +805,9 @@ async function main() {
       orphaned_found: toRegister.length,
       registered: registered,
       skipped: skipped,
+      failed: failed,
       total_chunk_packets: totalChunkPackets,
-      status: 'registration_complete'
+      status: failed === 0 ? 'registration_complete' : 'registration_partial_failure'
     });
 
     console.log('\n✨ Next: run classify-domain-ontology.mjs to assign domain_class');

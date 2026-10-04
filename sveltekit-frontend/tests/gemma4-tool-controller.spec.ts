@@ -11,6 +11,13 @@ vi.mock('$lib/server/trace/trace-collector.js', () => ({
   recordAgentAction: mocks.recordAction,
 }));
 
+// Hermetic: dispatchToolCall tries the live TRACE MCP server (:8788) before the in-process
+// fallback. Force "unavailable" so results come only from the mocked TOOL_DISPATCH below,
+// regardless of whether a real server is running on the machine.
+vi.mock('$lib/server/ai/mcp-tool-bridge.js', () => ({
+  callTraceMcpTool: vi.fn(async () => ({ error: 'mcp unavailable in unit test' })),
+}));
+
 vi.mock('$lib/server/ai/preflight.js', () => ({
   preflight: vi.fn(async () => ({
     prevent: false,
@@ -103,10 +110,33 @@ describe('gemma4-tool-controller', () => {
       callModel,
     });
 
-    // Dedup stops the loop on the first repeated tool call, so only two model calls are needed.
-    expect(callModel).toHaveBeenCalledTimes(2);
-    expect(result.toolRounds).toBeLessThanOrEqual(2);
+    // Each round uses distinct arguments, so the dedup guard does not fire: 3 loop rounds
+    // (MAX_TOOL_ROUNDS) + 1 forced final prose call = 4 model calls.
+    expect(callModel).toHaveBeenCalledTimes(4);
+    expect(result.toolRounds).toBe(3);
     expect(result.mcpPort).toBe(8788);
+  });
+
+  it('exposes runOrnithToolLoop and keeps runGemma4ToolLoop as a compatibility alias', async () => {
+    const mod = await import('$lib/server/ai/gemma4-tool-controller.js');
+    expect(typeof mod.runOrnithToolLoop).toBe('function');
+    expect(mod.runGemma4ToolLoop).toBe(mod.runOrnithToolLoop);
+  });
+
+  it('records tool timeline events under the ornith-agent pipeline label', async () => {
+    const { runOrnithToolLoop } = await import('$lib/server/ai/gemma4-tool-controller.js');
+    const callModel = vi.fn()
+      .mockResolvedValueOnce({
+        content: '',
+        tool_calls: [{ function: { name: 'trace.kag_search', arguments: { query: 'label check' } } }],
+      })
+      .mockResolvedValueOnce({ content: 'done' });
+    mocks.dispatchFn.mockResolvedValue({ tool: 'trace.kag_search', success: true, data: [] });
+
+    await runOrnithToolLoop({ messages: [{ role: 'user', content: 'q' }], sessionId: 's1', callModel });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(mocks.dbInsertValues).toHaveBeenCalledWith(expect.objectContaining({ pipeline: 'ornith-agent' }));
   });
 
   it('stops on repeated identical tool call (dedup guard)', async () => {

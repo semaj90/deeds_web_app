@@ -100,6 +100,48 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
  */
 export const SERVER_CHAT_MODEL = 'ornith-1.5-9b';
 
+/**
+ * Chat model id as the Bifrost gateway (:3040) lists it: provider-prefixed. The bare
+ * SERVER_CHAT_MODEL is correct only for direct llama-server (:8090) calls.
+ * Probed 2026-10-03: GET :3040/v1/models -> openai/ornith-1.5-9b.
+ */
+export const BIFROST_CHAT_MODEL = `openai/${SERVER_CHAT_MODEL}`;
+
+/** Transports the ordinary Ornith text lane can be addressed through. */
+export type OrnithTransportTargetV1 = 'LLAMA_SERVER' | 'BIFROST_OPENAI';
+
+/**
+ * Role identity != transport identity: the canonical model id is the same for every
+ * transport, the string sent on the wire is not. Callers must use this instead of
+ * patching an `openai/` prefix locally. Unknown targets fail closed.
+ */
+export function resolveOrnithRequestModelV1(
+  target: OrnithTransportTargetV1,
+  canonicalModelId: string = SERVER_CHAT_MODEL
+): {
+  target: OrnithTransportTargetV1;
+  canonicalModelId: string;
+  requestModelId: string;
+} {
+  const normalizedModelId = canonicalModelId.trim();
+  if (!normalizedModelId || normalizedModelId.includes('/')) {
+    throw new Error('INVALID_CANONICAL_ORNITH_MODEL_ID');
+  }
+  switch (target) {
+    case 'LLAMA_SERVER':
+      return { target, canonicalModelId: normalizedModelId, requestModelId: normalizedModelId };
+    case 'BIFROST_OPENAI':
+      return {
+        target,
+        canonicalModelId: normalizedModelId,
+        requestModelId:
+          normalizedModelId === SERVER_CHAT_MODEL ? BIFROST_CHAT_MODEL : `openai/${normalizedModelId}`,
+      };
+    default:
+      throw new Error(`UNKNOWN_ORNITH_TRANSPORT_TARGET: ${String(target)}`);
+  }
+}
+
 	/** Legacy Gemma4 compatibility identifier; not the active chat owner. */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 

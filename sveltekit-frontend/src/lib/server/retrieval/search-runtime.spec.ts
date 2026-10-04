@@ -54,7 +54,19 @@ vi.mock('../atlas/policy/policy-training.js', async (importOriginal) => {
 });
 
 vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
-  readKagHypergraphNeighborsV1: mockReadKagHypergraphNeighborsV1,
+  readKagHypergraphNeighborsStrictV1: mockReadKagHypergraphNeighborsV1,
+}));
+
+vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
+  resolvePacketKeyResolutionV2: async (key: string) => {
+    const identities: Record<string, string> = {
+      'packet-1': 'packet:00000000-0000-5000-8000-000000000001',
+      'packet-2': 'packet:00000000-0000-5000-8000-000000000002',
+    };
+    const canonicalPacketKey = identities[key];
+    if (!canonicalPacketKey) throw new Error('unresolved');
+    return { canonicalPacketKey, storagePacketKey: key, resolutionSource: 'LEGACY_ALIAS', aliasEvidenceVersion: 'PACKET_KEY_V1_STORAGE_TO_V2@1' };
+  },
 }));
 
 import { createSearchRuntime } from './search-runtime.js';
@@ -310,6 +322,8 @@ describe('search runtime bridge', () => {
           chunk_id: 'chunk-qdrant',
           packet_key: 'packet-1',
           source_ref: 'src/lib/example.ts',
+          workspace_revision: 'workspace:r1',
+          graph_revision: 'graph:r1',
           relative_path: 'src/lib/example.ts',
           summary: 'qdrant summary',
           content: 'qdrant content',
@@ -339,7 +353,7 @@ describe('search runtime bridge', () => {
       requestedCanonicalIds: 1,
       matchedTuples: 1,
       matchedHyperedges: 1,
-      neighbors: [{ canonicalId: 'packet-1', hyperedgeIds: ['hyperedge:abc123'] }],
+      neighbors: [{ canonicalId: 'packet:00000000-0000-5000-8000-000000000001', hyperedgeIds: ['hyperedge:abc123'] }],
     });
 
     const runtime = createSearchRuntime({ userId: 'user-1' });
@@ -354,10 +368,30 @@ describe('search runtime bridge', () => {
     expect(result.metadata.candidatesReranked).toBe(1);
 
     // The new evidence is attached to provenance only.
-    expect(mockReadKagHypergraphNeighborsV1).toHaveBeenCalledWith(['packet-1']);
+    expect(mockReadKagHypergraphNeighborsV1).toHaveBeenCalledWith(['packet:00000000-0000-5000-8000-000000000001'], {
+      workspaceRevision: 'workspace:r1',
+      graphRevision: 'graph:r1',
+    });
     expect(result.provenance.hypergraphNeighbors).toEqual([
-      { canonicalId: 'packet-1', hyperedgeIds: ['hyperedge:abc123'] },
+      { canonicalId: 'packet:00000000-0000-5000-8000-000000000001', hyperedgeIds: ['hyperedge:abc123'] },
     ]);
+
+    mockReadKagHypergraphNeighborsV1.mockClear();
+    mockRerankCanonicalFeatureEnvelopes.mockResolvedValueOnce({
+      results: [{
+        chunk_id: 'chunk-qdrant',
+        packet_key: 'packet-1',
+        source_ref: 'src/lib/example.ts',
+        relative_path: 'src/lib/example.ts',
+        summary: 'qdrant summary',
+        content: 'qdrant content',
+        retrieved_rank: 1,
+      }],
+      provenance: { cacheStatus: 'miss', cacheKey: 'rerank:v1:test', modelVersion: 'none', rendererVersion: 'search-runtime-v1', authScope: 'public', topK: 2, maxLength: 4096, crossEncoderAttempted: false, crossEncoderUsed: false, fallbackUsed: false, latencyMs: 0 },
+    });
+    const unqualifiedResult = await runtime.search({ text: 'unqualified graph packet', topK: 2 });
+    expect(mockReadKagHypergraphNeighborsV1).not.toHaveBeenCalled();
+    expect(unqualifiedResult.provenance.hypergraphNeighbors).toBeUndefined();
   });
 
   it('accepts hostile query strings as data and preserves the search contract', async () => {

@@ -9,22 +9,25 @@
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { blockHash, parseWfu, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
+import { blockHash, parseWfu, requiresSupersessionReview, resolveDeclarations, sectionSlug, sha256, stripWfuComment, summarizeDeclared, taskBlock } from './lib/wfu-metadata.mjs';
 import { buildArchitectureOverlay, buildProgramGates, buildProgramHierarchy, buildProgramWorkPackages, buildSelectedChainOverlay, classifyArchitectureProgram, classifyGateState, classifyProgramTask, computeCompletionTracking, isValidSchedulerSelection, mutationClass, PROGRAM_MILESTONES, PROGRAM_WAVES, schedulerPermission } from './lib/openspec-program-plan-v1.mjs';
 
 // Repo root is owned by this script's location, not by process.cwd() (running from scripts/atlas wrote to a nonexistent scripts/atlas/docs path).
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const changesRoot = join(root, 'openspec', 'changes');
+const taskSnapshotMode = process.argv.includes('--task-snapshot-stdout');
+const positionalArgs = process.argv.slice(2).filter((argument) => argument !== '--task-snapshot-stdout');
 // Optional output overrides allow isolated audits to build a fresh snapshot
 // without replacing the shared projection while another session edits it.
-const reportPath = process.argv[2]
-  ? resolve(root, process.argv[2])
+const reportPath = taskSnapshotMode ? null : positionalArgs[0]
+  ? resolve(root, positionalArgs[0])
   : join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
-const markdownPath = process.argv[3]
-  ? resolve(root, process.argv[3])
+const markdownPath = taskSnapshotMode ? null : positionalArgs[1]
+  ? resolve(root, positionalArgs[1])
   : join(root, 'docs', 'OPENSPEC-WORKBOARD.md');
 // The prior artifact at the output path is the baseline for completion tracking (read before it is overwritten).
 const previousWorkboard = (() => {
+  if (taskSnapshotMode) return null;
   if (!existsSync(reportPath)) return null;
   try {
     const parsed = JSON.parse(readFileSync(reportPath, 'utf8'));
@@ -60,7 +63,6 @@ const classifyExecutionState = (text, state, kind) => {
   if (state === 'DONE') return 'DONE';
   if (kind === 'INVARIANT') return 'INVARIANT';
   const value = text.toLowerCase();
-  if (/superseded|historical|obsolete|retired|compatibility-only/.test(value)) return 'SUPERSEDED_OR_HISTORICAL';
   if (/promotion-0[12]|promote|freeze the shared candidate population|run som 20x20|only after|ann-03|current source authority|source authority.*not proven|candidate ordinal.*admission|qdrant.*identity.*promotion|current qdrant|exact packet\/chunk identity|candidateordinalmap\/semantic_768\/graph|graph-resolve-06b|graph-06d|registry reconciliation|lsp\/compiler producer|canonical admission|terminal graphify|partial_proven|empty-plan|blocked|not authorized|^do not |requires .* authorization|remains open|pending|unproven|^keep |cannot .* until|safe.?to.?apply\s*[=:]\s*false|before further lifecycle repair|live readback.*pending|readback.*pending/.test(value)) return 'WAITING_ON_DEPENDENCY';
   return 'ACTIONABLE';
 };
@@ -125,6 +127,7 @@ for (const file of taskFiles) {
       state: done ? 'DONE' : 'OPEN',
       kind: classifyKind(text),
       executionState: classifyExecutionState(text, done ? 'DONE' : 'OPEN', classifyKind(text)),
+      supersessionReviewState: !done && requiresSupersessionReview(text) ? 'REVIEW_REQUIRED' : null,
       lane: classifyLane(`${change} ${text}`),
       declaredSourceRef: extractDeclared(text, ['source_ref', 'sourceRef']),
       declaredSourceRevision: extractDeclared(text, ['source_revision', 'sourceRevision']),
@@ -190,9 +193,10 @@ if (schedulerSelection) {
   if (unknownKeys.length) throw new Error(`UNKNOWN_STABLE_SELECTION_KEY: ${unknownKeys.join(',')}`);
 }
 const completedTasks = tasks.length - openTasks.length;
-const actionableTasks = openTasks.filter((task) => task.executionState === 'ACTIONABLE');
+const actionableTasks = openTasks.filter((task) => task.executionState === 'ACTIONABLE' && task.supersessionReviewState !== 'REVIEW_REQUIRED');
 const waitingTasks = openTasks.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY');
 const supersededTasks = openTasks.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL');
+const reviewRequiredTasks = openTasks.filter((task) => task.supersessionReviewState === 'REVIEW_REQUIRED');
 const byPriority = [...actionableTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const openByPriority = [...openTasks].sort((a, b) => a.priority - b.priority || b.lastUpdatedAt.localeCompare(a.lastUpdatedAt) || a.change.localeCompare(b.change) || a.line - b.line);
 const frontierTasks = [...byPriority.reduce((frontier, task) => {
@@ -264,9 +268,10 @@ const changes = [...new Set(tasks.map((task) => task.change))].sort().map((chang
   const rows = tasks.filter((task) => task.change === change);
   const done = rows.filter((task) => task.state === 'DONE').length;
   const openRows = rows.filter((task) => task.state === 'OPEN');
-  const actionable = openRows.filter((task) => task.executionState === 'ACTIONABLE').length;
+  const actionable = openRows.filter((task) => task.executionState === 'ACTIONABLE' && task.supersessionReviewState !== 'REVIEW_REQUIRED').length;
   const waiting = openRows.filter((task) => task.executionState === 'WAITING_ON_DEPENDENCY').length;
   const superseded = openRows.filter((task) => task.executionState === 'SUPERSEDED_OR_HISTORICAL').length;
+  const reviewRequired = openRows.filter((task) => task.supersessionReviewState === 'REVIEW_REQUIRED').length;
   const executionState = openRows.length === 0
     ? 'COMPLETE'
     : actionable > 0 && waiting > 0
@@ -286,6 +291,7 @@ const changes = [...new Set(tasks.map((task) => task.change))].sort().map((chang
     actionable,
     waiting,
     superseded,
+    reviewRequired,
     executionState,
   };
 });
@@ -517,7 +523,7 @@ const result = {
   hierarchyContractVersion: 'v2',
   generatedAt,
   source: 'openspec/changes/*/tasks.md',
-  summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
+  summary: { completedTasks, openTasks: openTasks.length, actionableTasks: actionableTasks.length, waitingTasks: waitingTasks.length, supersededTasks: supersededTasks.length, reviewRequiredTasks: reviewRequiredTasks.length, totalTasks: tasks.length, progressFraction: tasks.length ? completedTasks / tasks.length : null, progressBar: progressBar(tasks.length ? completedTasks / tasks.length : null), eta: { status: 'UNKNOWN', method: 'NO_RECEIPT_LINKED_THROUGHPUT' } },
   schedulerPolicy: {
     rule: 'READY_NEVER_IMPLIES_SELECTED; COMPLETION_PERCENTAGE_NEVER_IMPLIES_PRIORITY; ONLY_EXPLICIT_SELECTION_FILE_GRANTS_SELECTION_PERMISSION',
     selectionSource: selectionFile ? pathOf(selectionFile) : null,
@@ -587,6 +593,7 @@ const result = {
   actionableTasks: byPriority.slice(0, 200),
   waitingTasks: waitingTasks.slice(0, 200),
   supersededTasks: supersededTasks.slice(0, 200),
+  reviewRequiredTasks: reviewRequiredTasks.slice(0, 200),
   writes: { taskLedgers: 0, sourceDocuments: 0 },
 };
 
@@ -600,7 +607,7 @@ const markdown = [
   '- The nested wire-agentic-workflows-e2e-test ledger is reference-only. WorkflowActionEventV1 and WorkflowExecutionCoordinatesV1 retain run/backend boundaries.',
   '- Planning reconciliation does not prove runtime convergence, authorize cache/datastore writes, or advance current source/cohort admission.', '',
   `Overall progress: ${result.summary.progressBar} ${completedTasks}/${tasks.length} tasks`,
-  `Execution states: ${actionableTasks.length} actionable; ${waitingTasks.length} waiting on dependencies; ${supersededTasks.length} superseded/historical; ${invariants.length} invariants.`,
+  `Execution states: ${actionableTasks.length} actionable; ${waitingTasks.length} waiting on dependencies; ${supersededTasks.length} receipt-confirmed superseded/historical; ${reviewRequiredTasks.length} supersession-review candidates; ${invariants.length} invariants.`,
   `Scheduler permission: ${result.schedulerPolicy.selectedTaskCount} explicitly selected; READY/actionable rows are not selected automatically.`,
   `Change states: ${changeExecutionSummary.complete} complete; ${changeExecutionSummary.advanceable} advanceable; ${changeExecutionSummary.mixed} mixed actionable/waiting; ${changeExecutionSummary.waitingOrHistorical} waiting/historical; ${changeExecutionSummary.reviewRequired} review required.`,
   'ETA: UNKNOWN — no receipt-linked throughput supports a defensible estimate.', '',
@@ -654,7 +661,42 @@ const markdown = [
   ...changes.map((change) => `- [${change.change}](openspec/changes/${change.change}/) ${change.progressBar} ${change.completed}/${change.total} complete; ${change.open} open`), '',
 ].join('\n');
 
-writeFileSync(reportPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
-writeFileSync(markdownPath, `${markdown}\n`, 'utf8');
-console.log(`OPENSPEC_WORKBOARD_BUILT changes=${changes.length} tasks=${tasks.length} open=${openTasks.length}`);
-console.log(`report=${reportPath}`);
+if (taskSnapshotMode) {
+  const snapshot = {
+    schema: 'atlas.openspec.workboard-task-snapshot.v1',
+    generatedAt,
+    summary: result.summary,
+    controllerEvidence: result.controllerEvidence,
+    sourceFileHashes,
+    tasks: tasks.map((task) => ({
+      taskKey: task.taskKey,
+      change: task.change,
+      source: task.source,
+      line: task.line,
+      text: task.text.slice(0, 640),
+      claimTruncated: task.text.length > 640,
+      state: task.state,
+      executionState: task.executionState,
+      lane: task.lane,
+      blockHash: task.blockHash,
+      stableKey: task.stableKey,
+      logicalTaskKey: task.logicalTaskKey,
+      taskIdentity: task.taskIdentity,
+      declared: task.declared ?? null,
+      dependsOnTaskIds: task.dependsOnTaskIds ?? null,
+      readSet: task.readSet ?? null,
+      writeSet: task.writeSet ?? null,
+      unblocksGateCount: task.unblocksGateCount ?? null,
+      controllerState: task.controllerState,
+      gateState: task.gateState,
+      schedulerPermission: task.schedulerPermission,
+      program: task.program,
+    })),
+  };
+  process.stdout.write(JSON.stringify(snapshot));
+} else {
+  writeFileSync(reportPath, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+  writeFileSync(markdownPath, `${markdown}\n`, 'utf8');
+  console.log(`OPENSPEC_WORKBOARD_BUILT changes=${changes.length} tasks=${tasks.length} open=${openTasks.length}`);
+  console.log(`report=${reportPath}`);
+}

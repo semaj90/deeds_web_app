@@ -16,6 +16,7 @@ import {
 } from '$lib/server/runtime-profile.js';
 import type { RequestHandler } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { HEALTHY_DATABASE, classifyPostgresError, type DatabaseReadinessClassification } from '$lib/server/db/readiness.js';
 
 const PROBE_TIMEOUT = 3000;
 
@@ -31,9 +32,22 @@ type ServiceState = {
 	state: RuntimeRequirementState;
 	ok: boolean;
 	latencyMs: number;
-	error?: string;
+		error?: string;
+	/** Postgres only: STARTING (crash recovery) is distinct from UNAVAILABLE. */
+	readiness?: { state: DatabaseReadinessClassification['state']; reason: string; retryable: boolean };
 	rationale: string;
 };
+
+const DB_PROBE_TIMEOUT: DatabaseReadinessClassification = { state: 'unavailable', reason: 'TIMEOUT', sqlstate: null, retryable: true };
+
+async function probePostgres(): Promise<DatabaseReadinessClassification> {
+	try {
+		await db.execute(sql`SELECT 1`);
+		return HEALTHY_DATABASE;
+	} catch (error) {
+		return classifyPostgresError(error);
+	}
+}
 
 async function probeNeo4j(): Promise<boolean> {
 	const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
@@ -70,8 +84,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 		return response.ok;
 	};
 
-	const [dbOk, redisOk, ollamaOk, qdrantOk, neo4jOk, engramOk] = await Promise.all([
-		safe(db.execute(sql`SELECT 1`).then(() => true), false),
+	const [dbReadiness, redisOk, ollamaOk, qdrantOk, neo4jOk, engramOk] = await Promise.all([
+		safe(probePostgres(), DB_PROBE_TIMEOUT),
 		redisRequirement === 'disabled' ? Promise.resolve(true) : safe(redis.ping().then(() => true), false),
 		safe(
 			ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(PROBE_TIMEOUT) })
@@ -90,12 +104,14 @@ export const GET: RequestHandler = async ({ locals }) => {
 		engramRequirement === 'disabled' ? Promise.resolve(true) : safe(probeEngramEmbed(), false),
 	]);
 
+		const dbOk = dbReadiness.state === 'healthy';
 	const serviceStates: Record<string, ServiceState> = {
 		postgres: {
 			required: runtimeProfile.services.postgres.state === 'required',
 			state: runtimeProfile.services.postgres.state,
 			ok: runtimeProfile.services.postgres.state === 'disabled' ? true : dbOk,
-			latencyMs: runtimeProfile.services.postgres.state === 'disabled' ? 0 : dbOk ? 1 : PROBE_TIMEOUT,
+						latencyMs: runtimeProfile.services.postgres.state === 'disabled' ? 0 : dbOk ? 1 : PROBE_TIMEOUT,
+			readiness: { state: dbReadiness.state, reason: dbReadiness.reason, retryable: dbReadiness.retryable },
 			rationale: runtimeProfile.services.postgres.rationale,
 		},
 		redis: {
@@ -160,6 +176,10 @@ export const GET: RequestHandler = async ({ locals }) => {
 			services: serviceStates,
 			time: new Date().toISOString(),
 		},
-		{ status: ready ? 200 : 503 },
+				{
+			status: ready ? 200 : 503,
+			// STARTING is expected and self-resolving: tell probes to retry rather than alarm.
+			headers: !ready && dbReadiness.state === 'starting' ? { 'Retry-After': '5' } : undefined,
+		},
 	);
 };

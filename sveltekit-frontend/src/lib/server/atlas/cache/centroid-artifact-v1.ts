@@ -272,3 +272,41 @@ export function verifyCentroidCachePayloadAgainstArtifactV1(
 	if (memberSetChecksum !== artifact.memberSetChecksum) return { matches: false, reason: 'MEMBER_SET_CHECKSUM_MISMATCH' };
 	return { matches: true };
 }
+
+// ── HASHCENT-02: verifiable clustering parameters (binds seed / k / executor into parametersChecksum) ──
+
+export const CENTROID_CLUSTERING_PARAMETERS_SCHEMA_V1 = 'atlas.centroid-clustering-parameters.v1' as const;
+
+/**
+ * The manifest's `parametersChecksum` is opaque on its own. This is the parameter object whose canonical
+ * hash it must equal, so `k`, `seed` and the executor (e.g. cuVS KMeans vs the CPU oracle) are bound and
+ * verifiable without changing the strict manifest schema (which would alter existing manifest checksums).
+ */
+export const CentroidClusteringParametersV1Schema = z.object({
+	schema: z.literal(CENTROID_CLUSTERING_PARAMETERS_SCHEMA_V1),
+	/** Executor identity + version, e.g. `cuvs-kmeans:26.06` or `sklearn-minibatch-kmeans:<ver>`. */
+	executorRevision: z.string().min(1),
+	k: z.number().int().positive(),
+	seed: z.number().int().nonnegative(),
+	metric: z.enum(['cosine', 'l2']),
+	init: z.string().min(1),
+	maxIterations: z.number().int().positive(),
+}).strict();
+export type CentroidClusteringParametersV1 = z.infer<typeof CentroidClusteringParametersV1Schema>;
+
+export function centroidClusteringParametersChecksumV1(parameters: CentroidClusteringParametersV1): string {
+	return canonicalSha256V1(CentroidClusteringParametersV1Schema.parse(parameters));
+}
+
+/** True only when the manifest's `parametersChecksum` is the hash of exactly these parameters and `k` matches the centroid count. */
+export function verifyCentroidManifestParametersV1(
+	manifest: CentroidManifestV1,
+	parameters: CentroidClusteringParametersV1,
+): { matches: true } | { matches: false; reason: 'PARAMETERS_CHECKSUM_MISMATCH' | 'K_CENTROID_COUNT_MISMATCH' } {
+	const parsed = CentroidClusteringParametersV1Schema.parse(parameters);
+	if (centroidClusteringParametersChecksumV1(parsed) !== manifest.parametersChecksum) {
+		return { matches: false, reason: 'PARAMETERS_CHECKSUM_MISMATCH' };
+	}
+	if (parsed.k !== manifest.centroids.length) return { matches: false, reason: 'K_CENTROID_COUNT_MISMATCH' };
+	return { matches: true };
+}

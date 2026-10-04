@@ -908,3 +908,20 @@ current plan, namespace compatibility, and exact readback are separately approve
 Acceptance: schema/key tests exercise collisions, source and revision changes, independent
 projection revision changes, legacy cache records, and fail-closed misses. No live Valkey mutation
 or cache warming is authorized by these gates.
+
+## Consolidated from CLAUDE.md — 2026-10-03 (have vs need)
+
+Verbatim source: `docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10-03.md`. Status words per CLAUDE.md Status Language; nothing below is production-promoted.
+
+**Have**: `PacketSemanticCacheIdentityV2` + `setPacketCacheV2` + locator-based `invalidateBitfrostPacket()` (APPLY_PROVEN on disposable synthetic keys; `atlas-reward-cache-v2.spec.ts` 10/10, `cache-keys.spec.ts` 15/15); `AceBitfrostCacheIdentityV1` live for ACE packet/context/centroid/residency; residency policy `docs/reports/bitfrost-residency-policy-v1.json` (HOT 30d/WARM 7d/COLD 1d, tests-only); query-fanout receipt PARTIAL_PROVEN (Postgres/Qdrant/KMeans/cache-state done; SOM, ACE identity, bucket BLOCKED).
+
+**Need**:
+- [ ] Converge `PacketSemanticCacheIdentityV2` and `AceBitfrostCacheIdentityV1` under one owner before any third identity.
+- [ ] Wire invalidators to a live Postgres-mutation path (RabbitMQ listener/worker currently has zero callers); locate the real writer of live `bifrost:sem:packet:*` keys.
+- [ ] BCI-10 warm canary (one disposable write/readback/TTL expiry) — operator authorization required; no production v2 caller yet.
+- [ ] Repoint `scripts/atlas/warm-bitfrost-semantic-cache.mjs` to read `atlas_packets` (Postgres truth) and build keys via the canonical builder; mark `sveltekit-frontend/scripts/cache/warm-bifrost-semantic-cache.mjs` COMPATIBILITY (archive, not delete).
+- [ ] SOM revision: fresh versioned SOM run writing assignments + content-addressed revision + one coordinate convention; until then KMeans/domain-taxonomy buckets only.
+- [ ] Operator decisions: `maxmemory-policy` (noeviction → volatile-lru), TTL for `ace:chunk:hits:*` (currently none), `TTL.CENTROID` 6h → 7d.
+- [ ] Fix `bitfrost:packet:{key}` dead-shape strings in `packet-truth-flow.mts` and spelling drift across phase8*/9/10* writers.
+- [ ] Domain vocabulary owner decision (`atlas_domain_ontology` recommended) → DOMAIN-VOCAB-01 … SYNTH-12 tranche tracked in `parent-atlas-nlp-sidecar-feature-compiler/tasks.md`.
+- [ ] Operator-gated DDL (4 items): `atlas_ast_nodes.ast_generation`, `atlas_symbol_versions` indexes, topology revision columns, `atlas_ontology_linked_tuples` revision columns + `GroundedExtractionV1` writer contract.

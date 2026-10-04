@@ -27,7 +27,8 @@ export const RuntimeIdentityV1Schema = z.object({
   gpuUuid: z.string().min(1).nullable(), deviceName: z.string().min(1).nullable(),
   driverVersion: z.string().min(1).nullable(), cudaRuntime: z.string().min(1).nullable(),
   pythonEnv: z.string().min(1).nullable(), backendRevision: z.string().min(1),
-  telemetrySource: z.enum(['nvml', 'nvidia_smi', 'cuda_runtime', 'mixed', 'none']),
+  telemetrySource: z.enum(['nvml', 'nvidia-smi', 'nvidia_smi', 'cuda_runtime', 'mixed', 'none'])
+    .transform((source) => source === 'nvidia_smi' ? 'nvidia-smi' : source),
 }).strict();
 export type RuntimeIdentityV1 = z.infer<typeof RuntimeIdentityV1Schema>;
 

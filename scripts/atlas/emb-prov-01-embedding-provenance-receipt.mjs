@@ -23,7 +23,7 @@
  *
  * Usage: node scripts/atlas/emb-prov-01-embedding-provenance-receipt.mjs
  */
-import { readFileSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, statSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -121,6 +121,25 @@ const ollamaResult = await tryEmbed('http://127.0.0.1:11434/api/embed', {
   input: PROBE_TEXT,
 });
 
+// --- 3b. Runtime-loaded artifact (EMB-PROV-REFRESH-01) --------------------------
+// llama-server /props reports the GGUF path it actually loaded; compare it to the file we hashed
+// so the receipt ties "what is serving on :8081" to "which bytes were checksummed".
+const normPath = (p) => String(p ?? '').replace(/\\/g, '/').toLowerCase();
+let runtime = { reachable: false, loadedModelPath: null, loadedMatchesArtifact: null, note: 'props endpoint unavailable' };
+try {
+  const res = await fetch('http://127.0.0.1:8081/props', { signal: AbortSignal.timeout(5_000) });
+  if (res.ok) {
+    const props = await res.json();
+    const loaded = props.model_path ?? props.default_generation_settings?.model ?? null;
+    runtime = {
+      reachable: true,
+      loadedModelPath: loaded,
+      loadedMatchesArtifact: loaded && modelPath ? normPath(loaded).endsWith(normPath(path.basename(modelPath))) : null,
+      note: loaded ? 'compared by file name; the checksum above is of the configured path' : 'server did not report a model path',
+    };
+  }
+} catch { /* leave defaults */ }
+
 const llamaVec = llamaServerResult.ok ? llamaServerResult.body?.data?.[0]?.embedding : null;
 const ollamaVec = ollamaResult.ok ? ollamaResult.body?.embeddings?.[0] : null;
 
@@ -164,7 +183,15 @@ const receipt = {
     recordedGgufSha256Var: recordedGgufSha || null,
     artifactChecksumMatchesRevision,
     artifactChecksumMatchesGgufVar,
+    artifactBytes: artifactExists ? statSync(modelPath).size : null,
   },
+  provenanceFields: {
+    tokenizerRevision: effective.EMBEDDING_TOKENIZER_REVISION ?? null,
+    tokenizerSha256: effective.EMBEDDING_TOKENIZER_SHA256 ?? null,
+    inputPolicyRevision: effective.EMBEDDING_INPUT_POLICY_REVISION ?? null,
+    serverModelAlias: effective.EMBEDDING_SERVER_MODEL ?? null,
+  },
+  runtimeLoadedArtifact: runtime,
   crossExecutorParity: {
     probeText: PROBE_TEXT,
     llamaServer8081: { reachable: llamaServerResult.ok, error: llamaServerResult.ok ? null : llamaServerResult.error },
@@ -174,12 +201,20 @@ const receipt = {
     executorsAgree,
   },
   status:
-    configSelfConsistent && artifactChecksumMatchesRevision && executorsAgree
+    configSelfConsistent && artifactChecksumMatchesRevision && executorsAgree && runtime.loadedMatchesArtifact !== false
       ? 'EMB_PROV_01_PROVEN'
       : 'EMB_PROV_01_DRIFT_DETECTED',
 };
 
-const outPath = path.join(REPO_ROOT, 'docs', 'reports', 'emb-prov-01-embedding-provenance-receipt.json');
+// A non-proven run must never overwrite the committed proven receipt: it goes to .tmp instead.
+// EMB_PROV_RECEIPT_OUT overrides both.
+const canonicalOut = path.join(REPO_ROOT, 'docs', 'reports', 'emb-prov-01-embedding-provenance-receipt.json');
+const failedOut = path.join(REPO_ROOT, '.tmp', 'atlas', 'emb-prov-01-last-unproven.json');
+const outPath = process.env.EMB_PROV_RECEIPT_OUT
+  ? path.resolve(REPO_ROOT, process.env.EMB_PROV_RECEIPT_OUT)
+  : receipt.status === 'EMB_PROV_01_PROVEN' ? canonicalOut : failedOut;
+mkdirSync(path.dirname(outPath), { recursive: true });
 writeFileSync(outPath, JSON.stringify(receipt, null, 2) + '\n');
+console.error(`receipt written: ${outPath}`);
 console.log(JSON.stringify(receipt, null, 2));
 if (receipt.status !== 'EMB_PROV_01_PROVEN') process.exitCode = 1;

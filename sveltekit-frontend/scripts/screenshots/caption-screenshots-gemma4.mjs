@@ -2,16 +2,17 @@
 /**
  * caption-screenshots-gemma4.mjs
  *
- * Run Gemma4 VLM (with mmproj vision tower) over already-indexed screenshots
- * to generate captions. UPDATEs screenshot_artifacts.caption +
+ * Run the vision-capable llama-server (Ornith 1.5 + official mmproj, profile
+ * `ornith-1.5-vlm`) over already-indexed screenshots to generate captions. UPDATEs screenshot_artifacts.caption +
  * caption_embedding (768-dim via embeddinggemma).
  *
- * Endpoint: Ollama /api/generate with images: [<base64>]. Uses the
- * gemma4-rotorquant:latest tag which has the vision tower attached.
+ * Endpoint: llama-server POST /v1/chat/completions with an image_url part. Requires
+ * GET :8090/props -> modalities.vision=true (start with `-StartupProfile ornith-1.5-vlm`, or
+ * DEV_GPU_VISION=true for dev:gpu). Ollama is NOT used for captioning (embeddings only).
  *
  * Stack:
- *   - Ollama @ OLLAMA_URL (default http://127.0.0.1:11434)
- *   - gemma4-rotorquant:latest         (VLM, ~5.3GB)
+ *   - llama-server @ LLAMA_SERVER_URL / TURBOQUANT_URL (default http://127.0.0.1:8090)
+ *   - Ollama @ OLLAMA_URL (default http://127.0.0.1:11434) for the caption embedding only
  *   - embeddinggemma:latest           (768-dim caption embedding)
  *   - sharp                           (compress full image to ~512px JPEG before send,
  *                                      cheaper for VLM inference)
@@ -47,7 +48,7 @@ const LIMIT     = parseInt(
 ) || 10;
 
 const OLLAMA_URL     = process.env.OLLAMA_BASE_URL ?? process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
-const TURBOQUANT_URL = process.env.TURBOQUANT_URL  ?? 'http://127.0.0.1:8090';
+const TURBOQUANT_URL = String(process.env.LLAMA_SERVER_URL ?? process.env.TURBOQUANT_URL ?? 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const VLM_MODEL      = process.env.VLM_MODEL   ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
 const EMBED_MODEL    = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
 const DB_URL         = process.env.DATABASE_URL;
@@ -201,24 +202,6 @@ async function captionWithTurboQuant(imageB64) {
   } catch { return null; }
 }
 
-async function captionWithOllama(imageB64) {
-  const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model:   VLM_MODEL,
-      prompt:  PROMPT,
-      images:  [imageB64],
-      stream:  false,
-      options: { temperature: 0.2, num_predict: 220 },
-    }),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) throw new Error(`Ollama VLM ${res.status}: ${await res.text().catch(() => '')}`);
-  const j = await res.json();
-  return (j.response ?? '').trim();
-}
-
 /**
  * Strip leaked chain-of-thought scaffolding that gemma4-rotorquant:latest sometimes
  * emits despite the "no reasoning, no numbered list" prompt directive. The
@@ -255,10 +238,8 @@ async function captionWithGemma4(imageB64) {
     const cleaned = stripChainOfThought(tqRaw);
     if (cleaned) return { caption: cleaned, source: 'turboquant' };
   }
-  // Tier 2: Ollama (reloads weights or competes; works but slower under pressure)
-  const olRaw = await captionWithOllama(imageB64);
-  const cleaned = stripChainOfThought(olRaw);
-  return { caption: cleaned, source: cleaned ? 'ollama-fallback' : 'empty' };
+  // No Ollama tier: Ollama cannot serve the Ornith model and chat/vision belongs to llama-server.
+  return { caption: '', source: 'empty' };
 }
 
 async function embedCaption(text) {
@@ -284,18 +265,16 @@ try {
     process.exit(1);
   }
 
-  // Verify VLM is reachable
+  // Verify the vision-capable llama-server is reachable and actually has the projector loaded.
   try {
-    const tags = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
-    const j = await tags.json();
-    const has = (j.models ?? []).some(m => m.name === VLM_MODEL);
-    if (!has) {
-      console.warn(`   ⚠ ${VLM_MODEL} not in Ollama models list — caption calls may fail`);
+    const props = await (await fetch(`${TURBOQUANT_URL}/props`, { signal: AbortSignal.timeout(3000) })).json();
+    if (props?.modalities?.vision) {
+      console.log(`   ✓ ${props.model_alias ?? VLM_MODEL} serving with vision on ${TURBOQUANT_URL}`);
     } else {
-      console.log(`   ✓ ${VLM_MODEL} available`);
+      console.warn(`   ⚠ ${TURBOQUANT_URL} reports modalities.vision=false — captions will be empty. Start it with -StartupProfile ornith-1.5-vlm (or DEV_GPU_VISION=true for dev:gpu).`);
     }
   } catch (e) {
-    console.warn(`   ⚠ Ollama unreachable: ${e.message}`);
+    console.warn(`   ⚠ llama-server unreachable at ${TURBOQUANT_URL}: ${e.message}`);
   }
 
   const where = FORCE ? 'TRUE' : 'caption IS NULL';
@@ -331,10 +310,6 @@ try {
         failed++;
         continue;
       }
-      if (captionSource === 'ollama-fallback') {
-        console.log(`   ↩ TurboQuant empty for ${imgPath} — used Ollama fallback`);
-      }
-
       let captionEmbedding = null;
       if (!NO_EMBED) {
         captionEmbedding = await embedCaption(caption).catch(() => null);

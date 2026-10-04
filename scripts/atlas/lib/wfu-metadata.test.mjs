@@ -2,7 +2,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  parseWfu, stripWfuComment, taskBlock, blockHash, resolveDeclarations, summarizeDeclared, withoutCodeSpans, compareDependencyShadow
+  parseWfu, stripWfuComment, taskBlock, blockHash, resolveDeclarations, summarizeDeclared, withoutCodeSpans, compareDependencyShadow,
+  requiresSupersessionReview
 } from './wfu-metadata.mjs';
 
 const row = (change, line, state, text) => {
@@ -43,6 +44,11 @@ test('invalid est and unknown keys warn instead of throwing', () => {
 
 test('stripWfuComment removes the comment from task text', () => {
   assert.equal(stripWfuComment('**A-1 title** body <!-- wfu: est=5 -->'), '**A-1 title** body');
+});
+
+test('supersession language is only a review signal, not replacement evidence', () => {
+  assert.equal(requiresSupersessionReview('This task is superseded by another path'), true);
+  assert.equal(requiresSupersessionReview('Implement the current path'), false);
 });
 
 test('taskBlock follows indented continuation and stops at the next sibling', () => {

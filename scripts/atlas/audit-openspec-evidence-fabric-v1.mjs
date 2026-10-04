@@ -861,6 +861,10 @@ function sourceManifest(root) {
     .sort((left, right) => left.source.localeCompare(right.source));
 }
 
+export function computeOpenSpecWorkspaceRevisionV1(root = DEFAULT_ROOT) {
+  return sha256(canonicalJson(sourceManifest(root)));
+}
+
 function readJsonIfPresent(file) {
   try {
     return JSON.parse(readText(file));
@@ -1006,6 +1010,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
       taskSpanMatched,
       claim: receipt?.claim ?? null,
       actualAssertions: receipt?.actualAssertions ?? [],
+      ...(receipt?.outputs?.length ? { outputs: receipt.outputs } : {}),
       proofEligible: Boolean(binding.proofEligible && workspaceCurrent && sourceCurrent && receipt?.verdict),
     };
   });

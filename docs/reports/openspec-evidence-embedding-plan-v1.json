@@ -3,9 +3,9 @@
   "mode": "READ_ONLY_INPUT_MANIFEST",
   "status": "MODEL_ARTIFACT_UNPROVEN",
   "source": {
-    "cards": "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/evidence-cards-v1.json",
-    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004",
-    "cardsChecksum": "sha256:6b445fefbd670e339a2b1d033ac0619acca4cd8b5b3a94817824feee620019aa"
+    "cards": "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/evidence-cards-v1.json",
+    "workspaceRevision": "sha256:e3244087483abe147ccd21eeb3101cf47dd8db01fcc6b4a064031705ac2a903e",
+    "cardsChecksum": "sha256:4f409617cdf387c21e9d31774cce0bff09ecfd3b98ee5d395c06627fa5dd5f7e"
   },
   "representation": {
     "names": [
@@ -17,7 +17,7 @@
     ],
     "canonicalName": "semantic_768",
     "dimension": 768,
-    "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+    "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
   },
   "model": {
     "modelId": null,
@@ -25,141 +25,141 @@
     "modelReceiptRequired": true
   },
   "counts": {
-    "cards": 11060,
-    "plannedInputs": 55300,
+    "cards": 11122,
+    "plannedInputs": 55610,
     "rowsByRepresentation": {
-      "TASK_CLAIM_768": 11060,
-      "EVIDENCE_CARD_768": 11060,
-      "PREDICATE_768": 11060,
-      "BLOCKER_768": 11060,
-      "SUMMARY_768": 11060
+      "TASK_CLAIM_768": 11122,
+      "EVIDENCE_CARD_768": 11122,
+      "PREDICATE_768": 11122,
+      "BLOCKER_768": 11122,
+      "SUMMARY_768": 11122
     }
   },
   "sampleInputs": [
     {
       "representation": "TASK_CLAIM_768",
-      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:641ff43ff27f18fe38539374199adbbf98bcf25048ec6ec080bf1c3dd3291059",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "EVIDENCE_CARD_768",
-      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:641ff43ff27f18fe38539374199adbbf98bcf25048ec6ec080bf1c3dd3291059",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "PREDICATE_768",
-      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:641ff43ff27f18fe38539374199adbbf98bcf25048ec6ec080bf1c3dd3291059",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "BLOCKER_768",
-      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:641ff43ff27f18fe38539374199adbbf98bcf25048ec6ec080bf1c3dd3291059",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "SUMMARY_768",
-      "cardChecksum": "sha256:2f30989004041c365d209ff08742644f3cabe6f98f48fd515cba1b5647bd951f",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:641ff43ff27f18fe38539374199adbbf98bcf25048ec6ec080bf1c3dd3291059",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "TASK_CLAIM_768",
-      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:dd60f061d0fedca9da48e0a15b7f756d212e68e5039af9b163ec2a3edb565dce",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "EVIDENCE_CARD_768",
-      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:dd60f061d0fedca9da48e0a15b7f756d212e68e5039af9b163ec2a3edb565dce",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "PREDICATE_768",
-      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:dd60f061d0fedca9da48e0a15b7f756d212e68e5039af9b163ec2a3edb565dce",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "BLOCKER_768",
-      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:dd60f061d0fedca9da48e0a15b7f756d212e68e5039af9b163ec2a3edb565dce",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "SUMMARY_768",
-      "cardChecksum": "sha256:d0868c96589c3d1fcb238f768632af439ca6c24cac73c03dd121051c3e510eca",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:dd60f061d0fedca9da48e0a15b7f756d212e68e5039af9b163ec2a3edb565dce",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "TASK_CLAIM_768",
-      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:47e76e7128fae477e87e5a4e71ef37ab53cd61c9f3fcfab9e20eea5bdf2bea5c",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "EVIDENCE_CARD_768",
-      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:47e76e7128fae477e87e5a4e71ef37ab53cd61c9f3fcfab9e20eea5bdf2bea5c",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "PREDICATE_768",
-      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:47e76e7128fae477e87e5a4e71ef37ab53cd61c9f3fcfab9e20eea5bdf2bea5c",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "BLOCKER_768",
-      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:47e76e7128fae477e87e5a4e71ef37ab53cd61c9f3fcfab9e20eea5bdf2bea5c",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "SUMMARY_768",
-      "cardChecksum": "sha256:c94ceee824b24565c8a270d07ccabbdd72c6e1b2f404a415b7e86462c156b56e",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:47e76e7128fae477e87e5a4e71ef37ab53cd61c9f3fcfab9e20eea5bdf2bea5c",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "TASK_CLAIM_768",
-      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:68628f29e3ab00ca36a8c40d271497095c4d266156c27b32efd2934f0087730a",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "EVIDENCE_CARD_768",
-      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:68628f29e3ab00ca36a8c40d271497095c4d266156c27b32efd2934f0087730a",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "PREDICATE_768",
-      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:68628f29e3ab00ca36a8c40d271497095c4d266156c27b32efd2934f0087730a",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "BLOCKER_768",
-      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:68628f29e3ab00ca36a8c40d271497095c4d266156c27b32efd2934f0087730a",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "SUMMARY_768",
-      "cardChecksum": "sha256:fe233a5868052a6c75f9140ee1adcc5ce66a6d400db4366507e1951090f06367",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:68628f29e3ab00ca36a8c40d271497095c4d266156c27b32efd2934f0087730a",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "TASK_CLAIM_768",
-      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:997b3c71c7212b89ed6e2bdff3280fc283cc68adb8267b77fc2a2d679fb551bc",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "EVIDENCE_CARD_768",
-      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:997b3c71c7212b89ed6e2bdff3280fc283cc68adb8267b77fc2a2d679fb551bc",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "PREDICATE_768",
-      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:997b3c71c7212b89ed6e2bdff3280fc283cc68adb8267b77fc2a2d679fb551bc",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "BLOCKER_768",
-      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:997b3c71c7212b89ed6e2bdff3280fc283cc68adb8267b77fc2a2d679fb551bc",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     },
     {
       "representation": "SUMMARY_768",
-      "cardChecksum": "sha256:caba1372668dddd2c5b61d5c4f1aa9fc6c6043ab489ef899cb2e8d58e14ab5fb",
-      "inputRevision": "sha256:04c2b2dfd0d66f8564a9aac78b1f6e24a3fcbf5f244379168bf04c70e4946d80"
+      "cardChecksum": "sha256:997b3c71c7212b89ed6e2bdff3280fc283cc68adb8267b77fc2a2d679fb551bc",
+      "inputRevision": "sha256:3dff40924b4f8a8674ac6d9eb2655454b4841daf87e210a349ae62d5c48a3579"
     }
   ],
   "policy": {
@@ -175,7 +175,7 @@
   "writesPerformed": false,
   "likely_cause": "Embedding work must bind to immutable EvidenceCard inputs and an exact model artifact before any vector is treated as canonical or projected.",
   "evidence": [
-    "docs/reports/openspec-evidence/pipeline-20261002044610126-60936/evidence-cards-v1.json",
+    "docs/reports/openspec-evidence/pipeline-20261003045919683-49160/evidence-cards-v1.json",
     "semantic_768",
     "EvidenceCard checksum list"
   ],
@@ -185,6 +185,6 @@
   "safe_next_command": "node scripts/atlas/plan-openspec-evidence-ledger-import-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-embeddings-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-embedding-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:36.782Z",
-  "checksum": "sha256:bc497e7f6fe0093e0bd1770b5745af0f810df372a81fde967dee5f0a55e507e7"
+  "generatedAt": "2026-10-03T05:00:18.907Z",
+  "checksum": "sha256:839d3c2daa98a52ad9b4a902f7a730f0e8a8002b892f860eb09ae98e3186a961"
 }

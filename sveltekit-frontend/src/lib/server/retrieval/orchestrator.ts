@@ -41,6 +41,7 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -49,7 +50,6 @@ export type { ContextDoc };
 
 const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 // Ollama is retained here only for the EmbeddingGemma embedding lane.
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const RAG_MAX_CHUNKS = 12;
 const CORRECTIVE_RAG_THRESHOLD = 0.5;
 
@@ -130,20 +130,8 @@ async function embedQuery(query: string): Promise<number[] | null> {
 	if (cached) return cached;
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				model: EMBEDDING_MODEL,
-				prompt: query,
-				keep_alive: '24h',
-			}),
-			signal: AbortSignal.timeout(8000),
-		});
-		if (!res.ok) return null;
-		const data = (await res.json()) as { embedding?: number[] };
-		const vec = data.embedding;
-		if (!Array.isArray(vec) || vec.length !== 768) return null;
+		const vec = await generateEmbedding(query, { taskMode: 'unprompted_legacy' });
+		if (!vec) return null;
 		setCachedEmbedding(query, EMBEDDING_MODEL, vec).catch(() => {});
 		return vec;
 	} catch {

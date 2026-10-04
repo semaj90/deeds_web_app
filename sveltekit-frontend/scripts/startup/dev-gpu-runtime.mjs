@@ -140,6 +140,18 @@ function resolveEmbeddingBackend(extra = {}) {
 }
 
 
+/**
+ * Opt-in vision lane for dev:gpu (DEV_GPU_VISION=true): launches the 'ornith-1.5-vlm'
+ * profile (official mmproj, manifest id ORNITH_VISION_PRODUCTION) WITHOUT -TextOnly and
+ * keeps the projector on the CPU (LLAMA_ARG_MMPROJ_OFFLOAD=0) so it adds no VRAM on an
+ * 8 GiB card. Default is unchanged: text-only 'ornith-1.5'.
+ */
+function isDevGpuVisionEnabled(extra = {}) {
+  return String(
+    extra.DEV_GPU_VISION ?? envFromFiles.DEV_GPU_VISION ?? process.env.DEV_GPU_VISION ?? 'false',
+  ).toLowerCase() === 'true';
+}
+
 function mergedEnv(extra = {}) {
   const devGpuEnableMtp = String(
     extra.DEV_GPU_ENABLE_MTP ?? envFromFiles.DEV_GPU_ENABLE_MTP ?? process.env.DEV_GPU_ENABLE_MTP ?? 'false',
@@ -186,6 +198,10 @@ function mergedEnv(extra = {}) {
     EMBED_MAX_BATCH: envFromFiles.EMBED_MAX_BATCH ?? '64',
     MINIFORGE_SIDECAR_URL: envFromFiles.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
     DEV_GPU_LLM_BACKEND: devGpuLlmBackend,
+    // Only set when the vision lane is requested; an explicit value in .env or the shell wins.
+    LLAMA_ARG_MMPROJ_OFFLOAD: isDevGpuVisionEnabled(extra)
+      ? (envFromFiles.LLAMA_ARG_MMPROJ_OFFLOAD ?? process.env.LLAMA_ARG_MMPROJ_OFFLOAD ?? '0')
+      : undefined,
     LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? `http://127.0.0.1:${synthPort}/v1`,
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
     // Ornith 1.5 (alias "ornith-1.5-9b", launch-turboquant.ps1 profile
@@ -582,7 +598,11 @@ async function main() {
       // model resolution. Override via TURBO_STARTUP_PROFILE env var if a
       // different profile (e.g. "ornith" for the legacy model, once restored)
       // is intentionally wanted for a dev:gpu run.
-      const startupProfile = process.env.TURBO_STARTUP_PROFILE || 'ornith-1.5';
+      const wantVision = isDevGpuVisionEnabled();
+      const startupProfile = process.env.TURBO_STARTUP_PROFILE || (wantVision ? 'ornith-1.5-vlm' : 'ornith-1.5');
+      if (wantVision) {
+        console.log('[dev:gpu] DEV_GPU_VISION=true: vision profile, projector on CPU (LLAMA_ARG_MMPROJ_OFFLOAD=' + (launcherEnv.LLAMA_ARG_MMPROJ_OFFLOAD ?? '0') + '); ~0.9 GB extra system RAM, no extra VRAM.');
+      }
       await runChecked('pwsh', [
         '-NoProfile',
         '-ExecutionPolicy',
@@ -592,7 +612,7 @@ async function main() {
         '-StartupProfile',
         startupProfile,
         '-Detached',
-        '-TextOnly',
+        ...(wantVision ? [] : ['-TextOnly']),
       ], { cwd: REPO_ROOT, env: launcherEnv });
 
       // Bounded verification gate — confirms the TARGET model is actually
@@ -601,7 +621,7 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'gemma4-legal', 'gemma4-thinking': 'gemma4-legal-thinking' };
+      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'gemma4-legal', 'gemma4-thinking': 'gemma4-legal-thinking' };
       const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? profileAliasMap[startupProfile] ?? 'ornith-1.5-9b';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
@@ -612,6 +632,21 @@ async function main() {
       }
 
       console.log(`[dev:gpu] ✅ TurboQuant llama-server (${verification.runningAlias}) verified active on :8090 (attempt ${verification.attempt})`);
+
+      if (wantVision) {
+        // The launcher may reuse an already-running text-only server that matches model/ctx, so
+        // confirm the projector really loaded instead of trusting the profile name.
+        try {
+          const props = await (await fetch(`http://127.0.0.1:${synthPort}/props`, { signal: AbortSignal.timeout(5000) })).json();
+          if (props?.modalities?.vision) {
+            console.log('[dev:gpu] ✅ Vision enabled on :8090 (modalities.vision=true)');
+          } else {
+            console.warn('[dev:gpu] ⚠️  DEV_GPU_VISION=true but :8090 reports modalities.vision=false (a text-only server was likely reused). Stop the :8090 llama-server process and rerun dev:gpu, or use scripts/launch-turboquant.ps1 -StartupProfile ornith-1.5-vlm.');
+          }
+        } catch (error) {
+          console.warn(`[dev:gpu] ⚠️  Could not read :8090 /props to confirm vision: ${error.message}`);
+        }
+      }
     }
   }
 

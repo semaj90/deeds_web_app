@@ -2,7 +2,7 @@
 
 Purpose
 -------
-Ensure every feature produced into the Atlas has a discoverable producer, canonical Redis key, storage location, and consumer. This prevents guessing key schemas and avoids schema drift when assembling knowledge.
+Ensure every feature produced into the Atlas has a discoverable producer, canonical Redis-valkey centroids? key, storage location, and consumer. This prevents guessing key schemas and avoids schema drift when assembling knowledge.
 
 Search heuristics (run from repo root)
 ------------------------------------
@@ -65,7 +65,7 @@ Notes
 -----
 - Every consumer and producer must declare which subset of the above they read/write.
 - Adapter implementations should tolerate empty arrays/objects but reject missing keys.
-- Put an audit header `atlas_schema_version` in Redis JSON blobs to enable safe upgrades.
+- Put an audit header `atlas_schema_version` in Redis-valkey centroids? JSON blobs to enable safe upgrades.
 
 Manifest schema (richer)
 ------------------------

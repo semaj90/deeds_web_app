@@ -1,6 +1,8 @@
 import { createHash } from 'node:crypto';
 import {
   SEMANTIC_DIMENSION,
+  formatEmbeddingGemmaTaskInputV1,
+  type EmbeddingGemmaTaskModeV1,
 } from '../../embedding/embedding-contract-768.js';
 
 export const EMBEDDINGGEMMA_MODEL_ID = 'google/embeddinggemma-300m' as const;
@@ -9,26 +11,9 @@ export const EMBEDDINGGEMMA_NATIVE_DIMENSION = SEMANTIC_DIMENSION;
 export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [128, 256, 512, 768] as const;
 export type EmbeddingGemmaMrlDimension = (typeof EMBEDDINGGEMMA_MRL_DIMENSIONS)[number];
 
-export type EmbeddingGemmaTaskModeV1 =
-  | 'retrieval_query'
-  | 'retrieval_document'
-  | 'code_retrieval_query'
-  | 'classification'
-  | 'clustering'
-  | 'sentence_similarity'
-  | 'summarization';
+export type { EmbeddingGemmaTaskModeV1 } from '../../embedding/embedding-contract-768.js';
 
 export const EMBEDDINGGEMMA_PROMPT_REVISION_V1 = 'embeddinggemma.task-prompts.google-v1' as const;
-
-export const EMBEDDINGGEMMA_TASK_PREFIX_V1: Readonly<Record<EmbeddingGemmaTaskModeV1, string>> = {
-  retrieval_query: 'task: search result | query: ',
-  retrieval_document: 'title: none | text: ',
-  code_retrieval_query: 'task: code retrieval | query: ',
-  classification: 'task: classification | query: ',
-  clustering: 'task: clustering | query: ',
-  sentence_similarity: 'task: sentence similarity | query: ',
-  summarization: 'task: summarization | query: ',
-};
 
 export interface EmbeddingGemmaFormattedInputV1 {
   schema: 'atlas.embeddinggemma-formatted-input.v1';
@@ -36,6 +21,7 @@ export interface EmbeddingGemmaFormattedInputV1 {
   promptRevision: typeof EMBEDDINGGEMMA_PROMPT_REVISION_V1;
   formattedText: string;
   sourceTextDigest: string;
+  formattedTextChecksum: string;
 }
 
 function sha256(text: string): string {
@@ -50,13 +36,11 @@ export function formatEmbeddingGemmaInputV1(input: {
   const text = input.text.trim();
   if (!text) throw new Error('EMBEDDINGGEMMA_SOURCE_TEXT_REQUIRED');
 
-  let formattedText: string;
-  if (input.mode === 'retrieval_document') {
-    const title = input.title?.trim() || 'none';
-    formattedText = `title: ${title} | text: ${text}`;
-  } else {
-    formattedText = `${EMBEDDINGGEMMA_TASK_PREFIX_V1[input.mode]}${text}`;
-  }
+  const formattedText = formatEmbeddingGemmaTaskInputV1({
+    mode: input.mode,
+    content: text,
+    title: input.title,
+  });
 
   return {
     schema: 'atlas.embeddinggemma-formatted-input.v1',
@@ -64,6 +48,7 @@ export function formatEmbeddingGemmaInputV1(input: {
     promptRevision: EMBEDDINGGEMMA_PROMPT_REVISION_V1,
     formattedText,
     sourceTextDigest: sha256(text),
+    formattedTextChecksum: sha256(formattedText),
   };
 }
 

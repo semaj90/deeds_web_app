@@ -41,6 +41,6 @@
   "safe_next_command": "node scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-synthesis-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-synthesis-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:37.415Z",
+  "generatedAt": "2026-10-03T05:00:19.508Z",
   "checksum": "sha256:9cf03d3fbe0ce5b5c082857d749f1b3812b4e6aa059a0f0abb89f0498116d82e"
 }

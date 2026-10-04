@@ -1,7 +1,15 @@
 /**
- * Gemma4 MCP Tool-Call Controller — Step 5 (TRACE/Karpathy plan).
+ * Ornith 1.5 MCP Tool-Call Controller — Step 5 (TRACE/Karpathy plan).
  *
- * Routes Gemma4 tool calls through trace-mcp-server.ts (:8788) for
+ * Formerly the Gemma4 tool controller. The file name and the `runGemma4ToolLoop`
+ * export are kept ONLY for import compatibility (api/agent/execute,
+ * dev-context-planner, tests/gemma4-tool-controller.spec.ts, scripts); new code
+ * uses `runOrnithToolLoop`. This module is model-agnostic: the caller injects
+ * `callModel`, and the chat/synthesis model is whatever llama-server `:8090`
+ * currently serves (Ornith 1.5 9B, text/tool lane only) — resolve it through
+ * `llama-server-model-resolver.ts`, never hardcode a model id here.
+ *
+ * Routes Ornith tool calls through trace-mcp-server.ts (:8788) for
  * read-only graph/search/context operations. Falls back to in-process
  * dispatch when the standalone server is unavailable.
  *
@@ -117,7 +125,7 @@ export interface ToolLoopOutput {
   priorAnswerKey?:     string;      // set if a prior-answer HCA card was injected
   priorAnswerCard?:    HCACard;
   mcpPort:             number;
-  // Step 5B — populated when devContextMeta is supplied to runGemma4ToolLoop
+  // Step 5B — populated when devContextMeta is supplied to runOrnithToolLoop
   selectedStableKeys?: string[];
   selectedFiles?:      string[];
   contextHitCount?:    number;
@@ -204,7 +212,7 @@ async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>):
  *
  * Tools are dimension-agnostic: they can accept results from either 768-dim
  * (canonical) or 512-dim (MRL candidate) retrieval lanes and produce normalized
- * results suitable for downstream consumption by Gemma4 or reranking.
+ * results suitable for downstream consumption by Ornith or reranking.
  *
  * Returns { result, fromServer }:
  *   - fromServer=true: result came from :8788 HTTP JSON-RPC
@@ -302,7 +310,7 @@ async function recordToolTimelineEvent(input: {
     sessionId: input.sessionId ?? '',
     userId: input.userId ? Number(input.userId) : null,
     eventType: 'tool_call',
-    pipeline: 'gemma4-agent',
+    pipeline: 'ornith-agent',
     payload: {
       executionId,
       round: input.round,
@@ -340,7 +348,7 @@ export interface ToolLoopMessage {
  *   1. Input messages (typically from ACE context assembler)
  *   2. Optional dev context summary injection (before last user message)
  *   3. Optional prior-answer HCA card injection (compressed to 128 tokens)
- *   4. Gemma4 receives augmented messages and generates tool_calls (if needed)
+ *   4. Ornith receives augmented messages and generates tool_calls (if needed)
  *   5. Each tool call dispatched to :8788 (or in-process fallback)
  *   6. Results fed back to model in next round (max 3 rounds)
  *
@@ -365,20 +373,20 @@ export interface RunToolLoopInput {
 }
 
 /**
- * Main Gemma4 tool-call loop executor.
+ * Main Ornith 1.5 tool-call loop executor.
  *
  * Canonical flow:
  *   1. ACE context assembler provides initial messages (potentially from 768-dim or 512-dim retrieval)
  *   2. Dev context summary injected (if provided, Step 5B)
  *   3. Prior answer HCA card injected (if provided, compressed to 128 tokens)
- *   4. Gemma4 called up to MAX_TOOL_ROUNDS times (default 3)
+ *   4. Ornith called up to MAX_TOOL_ROUNDS times (default 3)
  *   5. Each tool call validated, dispatched to :8788 (or fallback), result fed back
  *   6. Loop stops on: stuck tool (2+ errors or dedup), exhausted rounds, or prose answer
  *   7. Final answer + tool usage metadata returned
  *
  * Vector dimension context is transparent: tools normalize results from both lanes.
  */
-export async function runGemma4ToolLoop(input: RunToolLoopInput): Promise<ToolLoopOutput> {
+export async function runOrnithToolLoop(input: RunToolLoopInput): Promise<ToolLoopOutput> {
   const {
     priorAnswerText,
     priorAnswerKey,
@@ -543,3 +551,6 @@ export async function runGemma4ToolLoop(input: RunToolLoopInput): Promise<ToolLo
     stablePrefixHash:    devContextMeta?.stablePrefixHash,
   };
 }
+
+/** @deprecated Use runOrnithToolLoop. Kept for import compatibility (tests, scripts). */
+export const runGemma4ToolLoop = runOrnithToolLoop;

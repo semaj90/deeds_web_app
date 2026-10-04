@@ -2,8 +2,8 @@
 
 > Historical status note (2026-08-23): The Layer 1 :8788 registration findings below describe the June 26, 2026 snapshot. Current TRACE registration and runtime gates are documented in docs/reports/mcp-atlas-markdown-audit-2026-08-23.md; the original findings are preserved unchanged.
 
-**Date**: June 26, 2026  
-**Scope**: End-to-end packet lookup (IDE) → synthesis (answer)  
+**Date**: June 26, 2026
+**Scope**: End-to-end packet lookup (IDE) → synthesis (answer)
 **Overall Completion**: **57%** (5 layers: 35% + 60% + 85% + 75% + 40% + 45% = 57% avg)
 
 ---
@@ -40,12 +40,12 @@
 **Status**: 🟡 **PARTIAL** (60%)
 
 ### What's Working
-- ✅ `ace-packet-reader.ts`: Reads from Postgres + Redis (LIVE)
+- ✅ `ace-packet-reader.ts`: Reads from Postgres + Redis-valkey centroids (LIVE)
   - Handles cache miss gracefully
   - Returns null on missing packets
   - Metadata fallback logic working
 
-- ✅ `ace-packet-writer.ts`: Writes to Postgres + Redis + .tmp audit (LIVE)
+- ✅ `ace-packet-writer.ts`: Writes to Postgres + Redis-valkey centroids + .tmp audit (LIVE)
   - Upsert-safe for concurrent writes
   - Forensic audit trail captured
   - Per-store error isolation
@@ -152,7 +152,7 @@
 **Status**: 🟡 **PARTIAL** (40%)
 
 ### What's Working
-- ✅ Gemma4 server expected at :8090 (TurboQuant)
+- ✅ ornith 1.5 server expected at :8090 (TurboQuant)
 - ✅ HTTP fetch skeleton wired
 - ✅ Context-assembler.ts imports canonical types
 - ✅ Logging framework for synthesis events
@@ -229,38 +229,38 @@
 ## Critical Path Blockers (Priority Order)
 
 ### 🔴 **BLOCKER 1: Qdrant Materialization (Layer 4)**
-**File**: `src/lib/server/ace/ace-materializer.ts` line 135-147  
-**Issue**: Dummy vectors prevent any meaningful search  
-**Fix**: Replace `new Array(768).fill(0)` with real embeddings from Ollama  
-**Est. Time**: 1-2 hours  
+**File**: `src/lib/server/ace/ace-materializer.ts` line 135-147
+**Issue**: Dummy vectors prevent any meaningful search
+**Fix**: Replace `new Array(768).fill(0)` with real embeddings from Ollama
+**Est. Time**: 1-2 hours
 **Impact**: Without this, Layers 3-6 all fail silently
 
 ### 🔴 **BLOCKER 2: Synthesis Function (Layer 5)**
-**File**: `src/routes/api/chat/stream/+server.ts` line ~150  
-**Issue**: `synthesize(query, context)` not implemented  
-**Fix**: Wire Gemma4 HTTP client, stream response  
-**Est. Time**: 2-3 hours  
+**File**: `src/routes/api/chat/stream/+server.ts` line ~150
+**Issue**: `synthesize(query, context)` not implemented
+**Fix**: Wire Gemma4 HTTP client, stream response
+**Est. Time**: 2-3 hours
 **Impact**: No LLM output, answer is empty
 
 ### 🔴 **BLOCKER 3: MCP JSON-RPC Dispatcher (Layer 1)**
-**File**: `src/mcp/server.ts`  
-**Issue**: No `/atlas.packet.*` commands routed  
-**Fix**: Add tool handlers, wire to JSON-RPC transport  
-**Est. Time**: 2-3 hours  
+**File**: `src/mcp/server.ts`
+**Issue**: No `/atlas.packet.*` commands routed
+**Fix**: Add tool handlers, wire to JSON-RPC transport
+**Est. Time**: 2-3 hours
 **Impact**: IDE cannot invoke retrieval
 
 ### 🟡 **BLOCKER 4: Search Service Collection Adapter (Layer 3)**
-**File**: `go-microservice/cmd/search-service/main.go`  
-**Issue**: Hardcoded to `legal_documents`, no codebase fallback  
-**Fix**: Add collection detection, fallback to `codebase_chunks_768`  
-**Est. Time**: 1-2 hours  
+**File**: `go-microservice/cmd/search-service/main.go`
+**Issue**: Hardcoded to `legal_documents`, no codebase fallback
+**Fix**: Add collection detection, fallback to `codebase_chunks_768`
+**Est. Time**: 1-2 hours
 **Impact**: Codebase queries return empty
 
 ### 🟡 **BLOCKER 5: Answer Assembly RAG Endpoint (Layer 6)**
-**File**: Need new `src/routes/api/rag/answer/+server.ts`  
-**Issue**: No dedicated answer endpoint  
-**Fix**: Create endpoint that chains retrieval → synthesis → formatting  
-**Est. Time**: 2-3 hours  
+**File**: Need new `src/routes/api/rag/answer/+server.ts`
+**Issue**: No dedicated answer endpoint
+**Fix**: Create endpoint that chains retrieval → synthesis → formatting
+**Est. Time**: 2-3 hours
 **Impact**: Users have no clear way to get answers
 
 ---
@@ -306,7 +306,7 @@ PIPELINE TOTAL:           57%  [█████░________________]  ETA: 10-15 
 - [ ] IDE query `/atlas.packet.search { query: "auth" }` returns 10 results via JSON-RPC
 - [ ] `POST /api/rag/answer { query: "How does auth work?" }` returns LLM-synthesized answer with citations
 - [ ] Qdrant search returns non-zero similarity scores (real vectors, not dummy)
-- [ ] Gemma4 synthesis produces coherent responses (not empty/malformed)
+- [ ] ornith 1.5 llama-server 8090 synthesis produces coherent responses (not empty/malformed)
 - [ ] Go Search Service auto-detects both `legal_documents` and `codebase_chunks_768`
 - [ ] Chat stream SSE delivers token-by-token LLM output
 - [ ] Citation formatting includes source file/line references
@@ -343,8 +343,8 @@ PIPELINE TOTAL:           57%  [█████░________________]  ETA: 10-15 
 4. **The gap is NOT architectural** — all the right protocols/services exist
 5. **The gap IS implementation** — critical functions are stubbed or use dummy data
 
-**Most impactful fix**: Qdrant materialization (if Qdrant is empty, all retrieval fails)  
-**Second most impactful**: Synthesis function (if not implemented, no answers)  
+**Most impactful fix**: Qdrant materialization (if Qdrant is empty, all retrieval fails)
+**Second most impactful**: Synthesis function (if not implemented, no answers)
 **Third most impactful**: MCP dispatcher (if not wired, IDE cannot call anything)
 
 ---

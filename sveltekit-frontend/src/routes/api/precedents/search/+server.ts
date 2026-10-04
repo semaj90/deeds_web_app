@@ -17,6 +17,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -44,15 +45,23 @@ interface PrecedentSearchResult {
 
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),
-			signal: AbortSignal.timeout(8000)
+		const result = await executeEmbeddingInputV1({
+			text: query,
+			mode: 'unprompted_legacy',
+			executor: async (prompt) => {
+				const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt }),
+					signal: AbortSignal.timeout(8000)
+				});
+				if (!res.ok) throw new Error(`EMBEDDING_HTTP_${res.status}`);
+				const data = await res.json() as { embedding?: unknown };
+				if (!Array.isArray(data.embedding)) throw new Error('EMBEDDING_RESPONSE_INVALID');
+				return data.embedding;
+			},
 		});
-		if (!res.ok) return null;
-		const data = await res.json();
-		return Array.isArray(data.embedding) ? data.embedding : null;
+		return result.embedding;
 	} catch {
 		return null;
 	}

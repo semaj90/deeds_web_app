@@ -118,7 +118,10 @@ if (-not $ollamaRunning) {
 Write-Host "`n==> Waiting for health..." -ForegroundColor Cyan
 
 # Required
-Wait-Health 'postgres'  { pg_isready -h 127.0.0.1 -p 5432 -U legal_admin 2>&1 | Out-Null; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
+# Probe the APP database (Docker legal-ai-postgres on host port 5434), not the native Windows
+# postgres service on 5432. pg_isready exit 1 = server rejecting connections (STARTING / crash
+# recovery): print 'S' and keep waiting; 2 = no response; 3 = bad params. Override with POSTGRES_HOST_PORT.
+Wait-Health 'postgres'  { $pgPort = if ($env:POSTGRES_HOST_PORT) { $env:POSTGRES_HOST_PORT } else { '5434' }; pg_isready -h 127.0.0.1 -p $pgPort -U legal_admin 2>&1 | Out-Null; if ($LASTEXITCODE -eq 1) { Write-Host -NoNewline 'S' }; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
 Wait-Health 'redis'     { docker exec legal-ai-valkey redis-cli ping 2>&1 | Select-String 'PONG' | Out-Null; if ($LASTEXITCODE -ne 0) { throw } } -Required $true
 Wait-Health 'qdrant'    { Invoke-HttpCheck 'http://localhost:6333/collections' } -Required $true
 Wait-Health 'ollama'    { Invoke-HttpCheck 'http://localhost:11434/api/tags' } -Required $true -MaxSeconds 180

@@ -146,4 +146,14 @@ describe('Parent Atlas neural routing lineage', () => {
     expect(receipt.status).toBe('REJECT');
     expect(receipt.reasonCodes).toContain('INSUFFICIENT_VRAM_HEADROOM');
   });
+
+  it('normalizes the legacy nvidia_smi telemetry source at the runtime identity boundary', () => {
+    const runtime = buildRuntimeIdentity({
+      hostOs: 'Windows', executionOs: 'Linux/WSL2', wslDistro: 'Ubuntu',
+      gpuUuid: 'GPU-1', deviceName: 'RTX', driverVersion: 'x', cudaRuntime: '13.3',
+      pythonEnv: 'atlas-rapids-cu13', backendRevision: 'rev-1', telemetrySource: 'nvidia_smi',
+    });
+
+    expect(runtime.telemetrySource).toBe('nvidia-smi');
+  });
 });

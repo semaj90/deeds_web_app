@@ -6,7 +6,7 @@
   "source": {
     "reconciliation": "docs/reports/openspec-workboard-evidence-reconciliation-v1.json",
     "evidenceHealth": "docs/reports/openspec-evidence-health-v1.json",
-    "workspaceRevision": "sha256:0a73a8b82f2a3cb2cebb29ffbd628a11e64e3386f4741616e2c04f1f75e4d004"
+    "workspaceRevision": "sha256:683165a3af86c42237d02a6357d72aea462756629bb0ecf18c3344782a672f7a"
   },
   "gates": {
     "workboardParity": false,
@@ -48,6 +48,6 @@
   "safe_next_command": "node scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
   "smoke_command": "node --check scripts/atlas/preflight-openspec-controlled-task-mutation-v1.mjs",
   "report_path": "docs/reports/openspec-controlled-task-mutation-preflight-v1.json",
-  "generatedAt": "2026-10-02T04:47:40.446Z",
-  "checksum": "sha256:bc155849f6ccff6d310800277d418210c71acd1458d42b4009e0c97dbdbea86f"
+  "generatedAt": "2026-10-03T05:00:22.797Z",
+  "checksum": "sha256:66466cd38962f2c0d2d52937949d5c681ccf2eb31bfa592aac892dc72bd832ac"
 }

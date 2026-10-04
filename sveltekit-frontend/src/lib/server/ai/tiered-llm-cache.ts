@@ -34,6 +34,7 @@ import {
 } from '$lib/server/ai/llm-cache.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 export interface TieredCacheOptions {
   model?: string;
@@ -70,7 +71,7 @@ export async function tieredLLMQuery(
   const startTime = performance.now();
 
   const {
-    model = 'gemma4-rotorquant:latest-fast',  // Use optimized model (10.7× faster)
+    model = SERVER_CHAT_MODEL,  // direct llama-server id; L3 re-resolves the loaded model
     temperature = 0.7,
     maxTokens = 2048,
     context = 'default',

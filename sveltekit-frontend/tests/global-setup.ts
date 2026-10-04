@@ -17,11 +17,39 @@ import {
   TEST_IDS_FILE,
 } from './fixtures/test-cases.js';
 import { PORTS, env } from './helpers/env-ports.js';
+import { HEALTHY_DATABASE, classifyPostgresError, type DatabaseReadinessClassification } from '../src/lib/server/db/readiness.js';
 
 const BASE_URL = PORTS.APP_BASE;
-const DB_URL =
-  process.env.DATABASE_URL ||
-  `postgresql://legal_admin:123456@127.0.0.1:${PORTS.PG_PORT}/legal_ai_db`;
+// No credential literals in source: DATABASE_URL resolves from process.env > .env.local > .env
+// (env-ports helper). If none is set, DB cleanup is skipped with a warning.
+const DB_URL = process.env.DATABASE_URL || env('DATABASE_URL', '');
+const DB_READY_TIMEOUT_MS = Number(env('PLAYWRIGHT_DB_READY_TIMEOUT_MS', '90000'));
+
+/**
+ * Wait for PostgreSQL to accept queries. Distinguishes STARTING (crash recovery /
+ * SQLSTATE 57P03: keep waiting) from UNAVAILABLE (retry briefly; non-retryable
+ * auth/config failures stop immediately). Never throws; returns the last classification.
+ */
+async function waitForDatabaseReady(connectionString: string): Promise<DatabaseReadinessClassification> {
+  const deadline = Date.now() + DB_READY_TIMEOUT_MS;
+  let last = classifyPostgresError(new Error('database readiness not attempted'));
+  while (Date.now() < deadline) {
+    const probe = new pg.Client({ connectionString, connectionTimeoutMillis: 3000 });
+    try {
+      await probe.connect();
+      await probe.query('SELECT 1');
+      await probe.end().catch(() => {});
+      return HEALTHY_DATABASE;
+    } catch (err) {
+      await probe.end().catch(() => {});
+      last = classifyPostgresError(err);
+      if (!last.retryable) return last;
+      console.log(`   ⏳  DB ${last.state} (${last.reason}); retrying …`);
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    }
+  }
+  return last;
+}
 
 export default async function globalSetup() {
   if (process.env.PLAYWRIGHT_SKIP_GLOBAL_SETUP === 'true') {
@@ -32,8 +60,12 @@ export default async function globalSetup() {
   console.log('\n🌱  [global-setup] Cleaning up stale test cases …');
 
   // Hard-delete any leftover [PW-TEST] cases from previous runs
-  const pool = new pg.Pool({ connectionString: DB_URL });
+  const readiness = DB_URL ? await waitForDatabaseReady(DB_URL) : null;
+  const pool = new pg.Pool({ connectionString: DB_URL || undefined });
   try {
+    if (!readiness || readiness.state !== 'healthy') {
+      throw new Error(`database ${readiness?.state ?? 'not configured'} (${readiness?.reason ?? 'NO_DATABASE_URL'})`);
+    }
     const result = await pool.query(`DELETE FROM cases WHERE title LIKE $1 RETURNING title`, [
       `${TEST_CASE_PREFIX}%`,
     ]);

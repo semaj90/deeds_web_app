@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   GpuAdmissionReceiptV1Schema,
   RuntimeIdentityV1Schema,
@@ -15,7 +16,7 @@ export interface GpuTelemetrySample {
   activeComputeProcesses?: number | null;
 }
 
-export function buildRuntimeIdentity(input: Omit<RuntimeIdentityV1, 'schemaVersion'>): RuntimeIdentityV1 {
+export function buildRuntimeIdentity(input: Omit<z.input<typeof RuntimeIdentityV1Schema>, 'schemaVersion'>): RuntimeIdentityV1 {
   return RuntimeIdentityV1Schema.parse({ schemaVersion: 'atlas.runtime-identity.v1', ...input });
 }
 

@@ -68,7 +68,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
-import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
+import { resolveOrnithRequestModelV1, TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import crypto from 'node:crypto';
@@ -1008,7 +1008,9 @@ export async function bifrostChat(
     // Preserve the existing gateway fallback when the local server is down;
     // direct callers still fail closed rather than inventing a model identity.
   }
-  const bifrostModel = effectiveModel.includes('/') ? effectiveModel : `openai/${loadedLlamaModel}`;
+  const bifrostModel = effectiveModel.includes('/')
+    ? effectiveModel
+    : resolveOrnithRequestModelV1('BIFROST_OPENAI', loadedLlamaModel).requestModelId;
   // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
   // Without it, every request bypasses the cache entirely (Bifrost docs).
   // 'legal-ai-global' creates a shared namespace: semantically similar questions
@@ -1241,7 +1243,7 @@ export async function bifrostChat(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL_ID, // this server only ever has ROTORQUANT_MODEL_PATH loaded
+        model: resolveOrnithRequestModelV1('LLAMA_SERVER', LLM_MODEL_ID).requestModelId,
         messages: messagesForInference,
         stream: false,
         ...(options?.tools ? { tools: options.tools } : {}),

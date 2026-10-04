@@ -29,6 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 import pg from 'pg';
+import { classifyPostgresError } from '../../src/lib/server/db/readiness.js';
 import {
   classifyError,
   loadRepairSkill,
@@ -234,6 +235,13 @@ async function runRepairLoop(): Promise<void> {
   let skipped  = 0;
 
   for (const event of events) {
+    const databaseReadiness = classifyPostgresError(event.error);
+    if (databaseReadiness.state === 'starting') {
+      log(`Skipping transient PostgreSQL startup event (${databaseReadiness.reason})`);
+      skipped++;
+      continue;
+    }
+
     log(`\n─── Error: ${event.error.slice(0, 120)}`);
     log(`    source_ref: ${event.source_ref}`);
 

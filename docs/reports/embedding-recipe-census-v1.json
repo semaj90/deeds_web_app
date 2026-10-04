@@ -14,9 +14,10 @@
       },
       "recipeHistogramByColumn": {
         "content_embedding": {
-          "title_relative_path": 55,
-          "UNKNOWN": 24,
-          "raw": 21
+          "title_relative_path": 24,
+          "title_relative_path_trimmed": 52,
+          "raw": 21,
+          "UNKNOWN": 3
         },
         "content_embedding_768": {
           "UNKNOWN": 100
@@ -24,8 +25,8 @@
       },
       "byContentLength": {
         "content_embedding|300-799": {
-          "title_relative_path": 33,
-          "UNKNOWN": 19,
+          "title_relative_path": 7,
+          "title_relative_path_trimmed": 45,
           "raw": 3
         },
         "content_embedding_768|300-799": {
@@ -33,8 +34,8 @@
         },
         "content_embedding|800-1499": {
           "raw": 15,
-          "title_relative_path": 8,
-          "UNKNOWN": 1
+          "title_relative_path_trimmed": 5,
+          "title_relative_path": 4
         },
         "content_embedding_768|800-1499": {
           "UNKNOWN": 24
@@ -47,9 +48,9 @@
           "UNKNOWN": 4
         },
         "content_embedding|<300": {
-          "title_relative_path": 13,
+          "title_relative_path": 12,
           "raw": 3,
-          "UNKNOWN": 1
+          "title_relative_path_trimmed": 2
         },
         "content_embedding_768|<300": {
           "UNKNOWN": 17
@@ -57,15 +58,17 @@
       },
       "topSourceRoots": {
         "content_embedding|src/lib": {
-          "title_relative_path": 35,
-          "UNKNOWN": 13
+          "title_relative_path": 19,
+          "title_relative_path_trimmed": 27,
+          "UNKNOWN": 2
         },
         "content_embedding_768|src/lib": {
           "UNKNOWN": 48
         },
         "content_embedding|src/routes": {
-          "title_relative_path": 15,
-          "UNKNOWN": 10
+          "title_relative_path_trimmed": 22,
+          "UNKNOWN": 1,
+          "title_relative_path": 2
         },
         "content_embedding_768|src/routes": {
           "UNKNOWN": 25
@@ -94,24 +97,25 @@
       "recipeHistogramByColumn": {
         "content_embedding": {
           "raw": 6,
-          "title_relative_path": 58,
-          "UNKNOWN": 36
+          "title_relative_path_trimmed": 66,
+          "title_relative_path": 27,
+          "UNKNOWN": 1
         },
         "content_embedding_768": {}
       },
       "byContentLength": {
         "content_embedding|800-1499": {
           "raw": 4,
-          "title_relative_path": 28,
-          "UNKNOWN": 1
+          "title_relative_path_trimmed": 12,
+          "title_relative_path": 17
         },
         "content_embedding|300-799": {
-          "UNKNOWN": 31,
-          "title_relative_path": 23
+          "title_relative_path_trimmed": 49,
+          "title_relative_path": 5
         },
         "content_embedding|<300": {
-          "title_relative_path": 7,
-          "UNKNOWN": 3
+          "title_relative_path": 5,
+          "title_relative_path_trimmed": 5
         },
         "content_embedding|>=1500": {
           "raw": 2,
@@ -120,31 +124,34 @@
       },
       "topSourceRoots": {
         "content_embedding|src/lib": {
-          "UNKNOWN": 25,
-          "title_relative_path": 17
+          "title_relative_path_trimmed": 32,
+          "title_relative_path": 9,
+          "UNKNOWN": 1
         },
         "content_embedding|src/routes": {
-          "title_relative_path": 12,
-          "UNKNOWN": 10
+          "title_relative_path_trimmed": 21,
+          "title_relative_path": 1
         },
         "content_embedding|simd-bridge/cpp": {
-          "title_relative_path": 5
+          "title_relative_path_trimmed": 3,
+          "title_relative_path": 2
         },
         "content_embedding|sveltekit-frontend/docs": {
           "raw": 5
         },
         "content_embedding|scripts/api-cleanup": {
-          "title_relative_path": 3
+          "title_relative_path_trimmed": 2,
+          "title_relative_path": 1
         },
         "content_embedding|docs/architecture": {
           "title_relative_path": 3
         },
         "content_embedding|packages/atlas-core": {
-          "title_relative_path": 3
+          "title_relative_path": 2,
+          "title_relative_path_trimmed": 1
         },
         "content_embedding|services/go-codeintel-service": {
-          "UNKNOWN": 1,
-          "title_relative_path": 1
+          "title_relative_path_trimmed": 2
         }
       }
     },
@@ -209,8 +216,9 @@
       },
       "recipeHistogramByColumn": {
         "content_embedding": {
-          "title_relative_path": 63,
-          "UNKNOWN": 37
+          "title_relative_path_trimmed": 70,
+          "title_relative_path": 29,
+          "UNKNOWN": 1
         },
         "content_embedding_768": {
           "UNKNOWN": 2
@@ -218,16 +226,16 @@
       },
       "byContentLength": {
         "content_embedding|800-1499": {
-          "title_relative_path": 29,
-          "UNKNOWN": 1
+          "title_relative_path_trimmed": 12,
+          "title_relative_path": 18
         },
         "content_embedding|300-799": {
-          "UNKNOWN": 32,
-          "title_relative_path": 27
+          "title_relative_path_trimmed": 53,
+          "title_relative_path": 6
         },
         "content_embedding|<300": {
-          "title_relative_path": 7,
-          "UNKNOWN": 3
+          "title_relative_path": 5,
+          "title_relative_path_trimmed": 5
         },
         "content_embedding_768|300-799": {
           "UNKNOWN": 2
@@ -238,31 +246,34 @@
       },
       "topSourceRoots": {
         "content_embedding|src/lib": {
-          "UNKNOWN": 26,
-          "title_relative_path": 19
+          "title_relative_path_trimmed": 34,
+          "title_relative_path": 10,
+          "UNKNOWN": 1
         },
         "content_embedding|src/routes": {
-          "title_relative_path": 13,
-          "UNKNOWN": 10
+          "title_relative_path_trimmed": 22,
+          "title_relative_path": 1
         },
         "content_embedding|simd-bridge/cpp": {
-          "title_relative_path": 5
+          "title_relative_path_trimmed": 3,
+          "title_relative_path": 2
         },
         "content_embedding|scripts/api-cleanup": {
-          "title_relative_path": 3
+          "title_relative_path_trimmed": 2,
+          "title_relative_path": 1
         },
         "content_embedding|docs/architecture": {
           "title_relative_path": 3
         },
         "content_embedding|packages/atlas-core": {
-          "title_relative_path": 3
+          "title_relative_path": 2,
+          "title_relative_path_trimmed": 1
         },
         "content_embedding_768|src/lib": {
           "UNKNOWN": 2
         },
         "content_embedding|services/go-codeintel-service": {
-          "UNKNOWN": 1,
-          "title_relative_path": 1
+          "title_relative_path_trimmed": 2
         }
       }
     }

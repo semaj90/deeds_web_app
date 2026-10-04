@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { getNamedVectorName } from '$lib/server/config/vector-config.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 
 interface KAGHit {
   path: string | null;
@@ -13,15 +14,8 @@ interface KAGHit {
 }
 
 async function embedQuery(text: string): Promise<number[]> {
-  const base = ENV.OLLAMA_BASE_URL;
-  const res = await fetch(`${base}/api/embeddings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest', prompt: text }),
-    signal: AbortSignal.timeout(12_000),
-  });
-  if (!res.ok) throw new Error(`Embed failed: ${res.status}`);
-  const { embedding } = await res.json() as { embedding: number[] };
+  const embedding = await generateEmbedding(text, { taskMode: 'unprompted_legacy' });
+  if (!embedding) throw new Error('EMBEDDING_UNAVAILABLE');
   return embedding;
 }
 

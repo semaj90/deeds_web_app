@@ -21,19 +21,10 @@ const OLLAMA_HINT = /11434|OLLAMA|ollama/i;
 const EMBEDDING_LIFECYCLE = /embeddinggemma|OLLAMA_EMBED|keep_alive\s*:\s*0/i;
 
 // Known offenders (found 2026-09-19). Shrinks as batches are converted.
+// 2026-10-04: 8 entries were already llama-server callers (stale) and were pruned. batch_repair_chat.py was archived 2026-10-04.
+// The Svelte chat component was moved to /api/ai/chat 2026-10-04.
+// caption-screenshots-gemma4.mjs moved to the vision-capable llama-server 2026-10-04. The list is now empty; keep the ratchet.
 const KNOWN_OLLAMA_CHAT_CALLERS: string[] = [
-	'scripts/batch_repair_chat.py',
-	'scripts/gemma3-legal-agent.mjs',
-	'scripts/tests/test-ollama-direct.mjs',
-	'sveltekit-frontend/scripts/generate-timeline-synthesis.mjs',
-	'sveltekit-frontend/scripts/graphify-svg-architecture.mjs',
-	'sveltekit-frontend/scripts/mcp/test-direct-ollama.mjs',
-	'sveltekit-frontend/scripts/screenshots/caption-screenshots-gemma4.mjs',
-	'sveltekit-frontend/scripts/startup/run-service-health-check.mjs',
-	'sveltekit-frontend/scripts/test-ollama-docling.js',
-	'sveltekit-frontend/scripts/test-ollama-inference.js',
-	'sveltekit-frontend/scripts/tests/fix-cluster4.mjs',
-	'sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte',
 ];
 
 function findCallers(): string[] {

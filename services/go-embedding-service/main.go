@@ -331,22 +331,35 @@ func (s *embeddingServer) StreamEmbeddings(stream pb.EmbeddingService_StreamEmbe
 }
 
 func (s *embeddingServer) Health(ctx context.Context, req *pb.HealthRequest) (*pb.HealthResponse, error) {
-	// Check Ollama
-	ollamaOk := false
-	httpReq, _ := http.NewRequestWithContext(ctx, "GET", s.cfg.OllamaURL+"/api/tags", nil)
+	ollamaURL := strings.TrimRight(s.cfg.OllamaURL, "/")
+	ollamaReachable := false
+	httpReq, _ := http.NewRequestWithContext(ctx, "GET", ollamaURL+"/api/tags", nil)
 	if resp, err := httpClient.Do(httpReq); err == nil {
-		ollamaOk = resp.StatusCode == 200
+		ollamaReachable = resp.StatusCode == http.StatusOK
 		resp.Body.Close()
 	}
 
+	modelLoaded := false
+	if ollamaReachable {
+		var running ollamaPsV2
+		if err := strictJSONGetV2(ctx, ollamaURL+"/api/ps", &running); err == nil {
+			for _, model := range running.Models {
+				if model.Name == s.cfg.EmbedModel || model.Model == s.cfg.EmbedModel {
+					modelLoaded = true
+					break
+				}
+			}
+		}
+	}
+
 	status := "healthy"
-	if !ollamaOk {
+	if !ollamaReachable {
 		status = "unhealthy"
 	}
 
 	return &pb.HealthResponse{
 		Status:      status,
-		ModelLoaded: fmt.Sprintf("%v", ollamaOk),
+		ModelLoaded: fmt.Sprintf("%v", modelLoaded),
 		Device:      "cpu", // Ollama handles GPU internally
 		Timestamp:   time.Now().Unix(),
 	}, nil

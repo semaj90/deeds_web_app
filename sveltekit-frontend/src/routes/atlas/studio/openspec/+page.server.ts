@@ -5,6 +5,7 @@ import { readOpenSpecBoardSnapshot } from '$lib/server/atlas/openspec-board/repo
 import { readOpenSpecAwarenessSnapshot } from '$lib/server/atlas/openspec-board/awareness';
 import { readParentAtlasCapabilityCensus } from '$lib/server/atlas/openspec-board/capability-census';
 import { readOpenSpecEvidenceHealthSnapshot } from '$lib/server/atlas/openspec-board/evidence-health';
+import { readEvidenceReadinessChipsV1 } from '$lib/server/atlas/openspec-board/evidence-readiness';
 
 function requireUser(locals: App.Locals) {
   if (!locals.user) throw redirect(303, '/login');
@@ -15,11 +16,12 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
   requireUser(locals);
   depends('atlas:openspec-board');
 
-  const [board, awareness, capabilityCensus, evidenceHealth] = await Promise.all([
+  const [board, awareness, capabilityCensus, evidenceHealth, evidenceReadiness] = await Promise.all([
     readOpenSpecBoardSnapshot(),
     readOpenSpecAwarenessSnapshot(),
     readParentAtlasCapabilityCensus(),
-    readOpenSpecEvidenceHealthSnapshot()
+    readOpenSpecEvidenceHealthSnapshot(),
+    readEvidenceReadinessChipsV1()
   ]);
   const clusters = buildTopicClusters(board.tasks);
 
@@ -40,6 +42,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
     awareness,
     capabilityCensus,
     evidenceHealth,
+    evidenceReadiness,
     clusters,
     topChanges,
     referencedFileCount: fileRefs.size,

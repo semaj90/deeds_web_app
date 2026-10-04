@@ -1,7 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
+import { buildPacketIncidenceLineageV1 } from '../lineage/packet-incidence-lineage-v1.js';
 
 const queryMock = vi.fn();
 vi.mock('$lib/server/db/client.js', () => ({ pool: { query: (...args: unknown[]) => queryMock(...args) } }));
+vi.mock('../identity/packet-identity-resolver.js', () => ({
+  resolvePacketKeyResolutionV2: async (key: string) => {
+    const identities: Record<string, string> = {
+      'packet:0123456789ab': 'packet:00000000-0000-5000-8000-000000000001',
+      'packet:abcdef012345': 'packet:00000000-0000-5000-8000-000000000002',
+    };
+    const canonicalPacketKey = identities[key];
+    if (!canonicalPacketKey) throw new Error('unresolved');
+    return { canonicalPacketKey, storagePacketKey: key, resolutionSource: 'LEGACY_ALIAS', aliasEvidenceVersion: 'PACKET_KEY_V1_STORAGE_TO_V2@1' };
+  },
+}));
 
 function tupleRow(overrides: Record<string, unknown> = {}) {
   return {
@@ -48,6 +60,59 @@ function hyperedgeMemberRows(overrides: Record<string, unknown> = {}) {
     { ...base, member_id: 'packet:a', member_role: 'actor', ordinal: 0, ...overrides },
     { ...base, member_id: 'packet:b', member_role: 'target', ordinal: 1, ...overrides },
   ];
+}
+
+function packetIncidenceRows(overrides: Record<string, unknown> = {}) {
+  const packet = {
+    packetKey: 'packet:0123456789ab',
+    canonicalId: 'packet:00000000-0000-5000-8000-000000000001',
+    sourceRevision: 'source-a-r1',
+  };
+  const neighbor = {
+    packetKey: 'packet:abcdef012345',
+    canonicalId: 'packet:00000000-0000-5000-8000-000000000002',
+    sourceRevision: 'source-b-r1',
+  };
+  const lineage = buildPacketIncidenceLineageV1({
+    ...packet,
+    neighborPacketKey: neighbor.packetKey,
+    neighborCanonicalId: neighbor.canonicalId,
+    neighborSourceRevision: neighbor.sourceRevision,
+    edgeType: 'IMPORTS',
+    workspaceRevision: 'ws-1',
+    graphRevision: 'graph-1',
+    producerId: 'graphify-packet-incidence-projection-v1',
+    producerRevision: 'graphify-packet-incidence-projection-v1@1',
+    evidenceRefs: ['source-span:src/a.ts:1-2', 'graph-edge:reference-1'],
+  });
+  const row = {
+    lineage_checksum: lineage.lineageChecksum,
+    input_checksum: lineage.inputChecksum,
+    packet_key: lineage.packetKey,
+    canonical_id: lineage.canonicalId,
+    source_revision: lineage.sourceRevision,
+    neighbor_packet_key: lineage.neighborPacketKey,
+    neighbor_canonical_id: lineage.neighborCanonicalId,
+    neighbor_source_revision: lineage.neighborSourceRevision,
+    edge_type: lineage.edgeType,
+    workspace_revision: lineage.workspaceRevision,
+    graph_revision: lineage.graphRevision,
+    producer_id: lineage.producerId,
+    producer_revision: lineage.producerRevision,
+    evidence_refs: lineage.evidenceRefs,
+    lineage,
+  };
+  return {
+    lineage,
+    row: { ...row, ...overrides },
+  };
+}
+
+function endpointRows() {
+  return { rows: [
+    { packet_key: 'packet:0123456789ab', source_ref: 'src/a.ts', source_revision: 'source-a-r1' },
+    { packet_key: 'packet:abcdef012345', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+  ] };
 }
 
 describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
@@ -107,7 +172,7 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     queryMock.mockRejectedValue(new Error('connection refused'));
 
     const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
-    await expect(readKagHypergraphNeighborsStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' })).rejects.toThrow('connection refused');
+    await expect(readKagHypergraphNeighborsStrictV1(['packet:00000000-0000-5000-8000-000000000001'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' })).rejects.toThrow('connection refused');
   });
 
   it('strict seam requires and binds both traversal revisions', async () => {
@@ -115,15 +180,14 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     queryMock.mockResolvedValue({ rows: [] });
 
     const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
-    await readKagHypergraphNeighborsStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
-    const hyperedgeCall = queryMock.mock.calls.find(([sql]) => String(sql).includes('atlas_hyperedges'));
-    expect(hyperedgeCall?.[0]).toContain('h.workspace_revision = $2');
-    expect(hyperedgeCall?.[0]).toContain('h.graph_revision = $3');
-    expect(hyperedgeCall?.[1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
+    await readKagHypergraphNeighborsStrictV1(['packet:00000000-0000-5000-8000-000000000001'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
+    const incidenceCall = queryMock.mock.calls.find(([sql]) => String(sql).includes('atlas_packet_incidence'));
+    expect(incidenceCall?.[0]).toContain('workspace_revision = $2');
+    expect(incidenceCall?.[0]).toContain('graph_revision = $3');
+    expect(incidenceCall?.[0]).toContain('LIMIT $4');
+    expect(incidenceCall?.[1]).toEqual([['packet:00000000-0000-5000-8000-000000000001'], 'ws-1', 'graph-1', 4097]);
     const tupleCall = queryMock.mock.calls.find(([sql]) => String(sql).includes('atlas_ontology_linked_tuples'));
-    expect(tupleCall?.[0]).toContain("provenance->>'workspaceRevision' = $2");
-    expect(tupleCall?.[0]).toContain("provenance->>'graphRevision' = $3");
-    expect(tupleCall?.[1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
+    expect(tupleCall).toBeUndefined();
   });
 
   it('strict seam rejects an incomplete traversal snapshot before querying', async () => {
@@ -140,7 +204,56 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     const { readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
     const result = await readKagHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' });
     expect(result[0].participants.map((participant) => participant.role)).toEqual(['actor', 'target']);
-    expect(queryMock.mock.calls[0][1]).toEqual([['packet:a'], 'ws-1', 'graph-1']);
+    expect(queryMock.mock.calls[0][1]).toEqual([['packet:a'], 'ws-1', 'graph-1', 4097]);
+    expect(String(queryMock.mock.calls[0][0])).toContain('LIMIT $4');
+  });
+
+  it('strict traversal expands only a checksum-verified directed packet incidence row', async () => {
+    queryMock.mockClear();
+    const fixture = packetIncidenceRows();
+    queryMock.mockImplementation((sql: string) => Promise.resolve(sql.includes('atlas_packet_incidence') ? { rows: [fixture.row] } : endpointRows()));
+    const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    const result = await readKagHypergraphNeighborsStrictV1(
+      [fixture.lineage.canonicalId],
+      { workspaceRevision: 'ws-1', graphRevision: 'graph-1' },
+    );
+
+    expect(result.matchedTuples).toBe(0);
+    expect(result.matchedHyperedges).toBe(1);
+    expect(result.neighbors).toEqual([{
+      canonicalId: fixture.lineage.canonicalId,
+      hyperedgeIds: [`packet-incidence:${fixture.lineage.lineageChecksum}`],
+      neighborCanonicalIds: [fixture.lineage.neighborCanonicalId],
+      neighborStoragePacketKeys: [fixture.lineage.neighborPacketKey],
+    }]);
+  });
+
+  it('strict traversal rejects bad incidence checksums and legacy request identities', async () => {
+    queryMock.mockClear();
+    const fixture = packetIncidenceRows();
+    queryMock.mockImplementation((sql: string) => Promise.resolve(sql.includes('atlas_packet_incidence') ? { rows: [{
+      ...fixture.row,
+      lineage: { ...fixture.lineage, graphRevision: 'tampered' },
+    }] } : endpointRows()));
+    const { readKagHypergraphNeighborsStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readKagHypergraphNeighborsStrictV1(
+      [fixture.lineage.canonicalId],
+      { workspaceRevision: 'ws-1', graphRevision: 'graph-1' },
+    )).rejects.toThrow();
+    await expect(readKagHypergraphNeighborsStrictV1(['packet:0123456789ab'], {
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+    })).rejects.toThrow('KAG_CANONICAL_PACKET_KEY_V2_REQUIRED');
+  });
+
+  it('fails closed when the bounded hyperedge-member read exceeds its result-row cap', async () => {
+    queryMock.mockClear();
+    const { MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1, readKagHyperedgesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    const row = hyperedgeMemberRows()[0];
+    queryMock.mockResolvedValue({ rows: Array.from({ length: MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 + 1 }, () => row) });
+
+    await expect(readKagHyperedgesStrictV1(['packet:a'], { workspaceRevision: 'ws-1', graphRevision: 'graph-1' }))
+      .rejects.toThrow('KAG_HYPEREDGE_MEMBER_ROW_LIMIT_EXCEEDED');
+    expect(queryMock.mock.calls[0][1][3]).toBe(MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 + 1);
   });
 
   it('dedupes and caps the requested canonicalIds before querying', async () => {

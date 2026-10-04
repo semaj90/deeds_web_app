@@ -30,6 +30,9 @@ const STAGES = [
   ['EVF-04_PREDICATE_RESOLUTION', 'resolve-openspec-predicates-v1.mjs'],
   ['EVF-03D_CENSUS_RECONCILIATION', 'reconcile-openspec-census-revisions-v1.mjs'],
   ['EVF-05_CARD_COMPILATION', 'compile-openspec-evidence-cards-v1.mjs'],
+  // Read-only incremental dirty-set (OPENSPEC-DAILY-ANALYSIS-01A): compares this run's cards to the
+  // .tmp baseline snapshot. It never writes the baseline; that is a separate explicit command.
+  ['EVF-05B_DIRTY_SET', 'openspec-dirty-set-v1.mjs'],
   ['EVF-05_FEATURE_PACKET_COMPILATION', 'compile-openspec-feature-packets-v1.mjs'],
   ['EVF-03C_GS1_10_GOLDEN_SPECIMEN', 'prove-openspec-golden-task-v1.mjs'],
   ['EVF-06_MIGRATION_AUDIT', 'audit-openspec-evidence-migration-v1.mjs'],
@@ -100,6 +103,82 @@ function latestCensusPath(runDirectory) {
   return candidate;
 }
 
+const PHASE_FIELDS = ['inputRevision', 'outputRevision', 'inputCount', 'outputCount', 'dirtyCount', 'skippedUnchangedCount', 'writesPerformed'];
+
+/**
+ * A stage may print one JSON document carrying `phaseReceipt`; its counters are merged into the
+ * stage record (OPENSPEC-DAILY-ANALYSIS-01A). Stages that print nothing structured are unchanged.
+ */
+export function phaseFromStdout(stdout) {
+  try {
+    const phase = JSON.parse(stdout)?.phaseReceipt;
+    if (!phase || typeof phase !== 'object') return {};
+    return { phase: Object.fromEntries(PHASE_FIELDS.filter((field) => field in phase).map((field) => [field, phase[field]])) };
+  } catch {
+    return {};
+  }
+}
+
+export function parseRunnerArgs(argv) {
+  if (argv.length === 0) return { mode: 'FULL' };
+  if (argv[0] !== '--incremental' || argv[1] !== '--dry-run') {
+    throw new Error('USAGE: run-openspec-evidence-fabric-v1.mjs [--incremental --dry-run [--cards file] [--baseline file]]');
+  }
+
+  const options = { mode: 'INCREMENTAL_DRY_RUN', cards: null, baseline: null };
+  for (let index = 2; index < argv.length; index += 1) {
+    const flag = argv[index];
+    if (flag !== '--cards' && flag !== '--baseline') throw new Error(`UNSUPPORTED_INCREMENTAL_DRY_RUN_ARGUMENT:${flag}`);
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE:${flag}`);
+    options[flag === '--cards' ? 'cards' : 'baseline'] = value;
+    index += 1;
+  }
+  return options;
+}
+
+function assertReadOnlyDirtySetReceipt(receipt) {
+  const phase = receipt?.phaseReceipt;
+  const writes = receipt?.writes;
+  if (receipt?.schema !== 'atlas.openspec-dirty-set-receipt.v1' || receipt.writesPerformed !== false) {
+    throw new Error('INCREMENTAL_DRY_RUN_RECEIPT_NOT_READ_ONLY');
+  }
+  if (phase?.phase !== 'EVF-05B_DIRTY_SET' || phase.writesPerformed !== false
+    || !('inputRevision' in phase) || !('outputRevision' in phase)
+    || !Number.isInteger(phase.dirtyCount) || !Number.isInteger(phase.skippedUnchangedCount)) {
+    throw new Error('INCREMENTAL_DRY_RUN_PHASE_RECEIPT_INVALID');
+  }
+  if (writes?.receipt !== null || writes?.snapshot !== null
+    || writes?.postgres !== 0 || writes?.qdrant !== 0 || writes?.valkey !== 0 || writes?.tasksMd !== 0) {
+    throw new Error('INCREMENTAL_DRY_RUN_WRITE_REPORTED');
+  }
+}
+
+async function runIncrementalDryRun(options) {
+  const script = path.join(ROOT, 'scripts', 'atlas', 'openspec-dirty-set-v1.mjs');
+  const args = [];
+  if (options.cards) args.push('--cards', path.resolve(ROOT, options.cards));
+  if (options.baseline) args.push('--baseline', path.resolve(ROOT, options.baseline));
+  const { stdout } = await execFileAsync(process.execPath, [script, ...args], {
+    cwd: ROOT,
+    env: { ...process.env, OPENSPEC_DIRTY_SET_OUTPUT: '' },
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+    windowsHide: true,
+  });
+  const dirtySetReceipt = JSON.parse(stdout);
+  assertReadOnlyDirtySetReceipt(dirtySetReceipt);
+  process.stdout.write(`${JSON.stringify({
+    schema: 'atlas.openspec-incremental-dry-run.v1',
+    status: 'DRY_RUN_COMPLETED',
+    mode: options.mode,
+    phaseReceipt: dirtySetReceipt.phaseReceipt,
+    dirtySetReceipt,
+    writesPerformed: false,
+    writes: { reports: 0, baseline: 0, postgres: 0, qdrant: 0, valkey: 0, tasksMd: 0 },
+  }, null, 2)}\n`);
+}
+
 async function runStage(stage, script, env) {
   const startedAt = new Date().toISOString();
   let result;
@@ -119,13 +198,17 @@ async function runStage(stage, script, env) {
   const stdout = String(result.stdout ?? '');
   const stderr = String(result.stderr ?? '');
   const exitCode = cause ? (Number.isInteger(cause.code) ? cause.code : null) : 0;
+  const completedAt = new Date().toISOString();
   const record = {
     stage,
     script: relative(path.join(ROOT, 'scripts', 'atlas', script)),
     startedAt,
-    completedAt: new Date().toISOString(),
+    completedAt,
+    durationMs: Date.parse(completedAt) - Date.parse(startedAt),
+    status: cause || exitCode !== 0 ? 'FAILED' : 'OK',
     exitCode,
     signal: cause?.signal ?? null,
+    ...phaseFromStdout(stdout),
     outputTail: stdout.slice(-2000),
     errorTail: stderr.slice(-2000),
   };
@@ -147,6 +230,11 @@ function stageConcurrency() {
 }
 
 async function main() {
+  const options = parseRunnerArgs(process.argv.slice(2));
+  if (options.mode === 'INCREMENTAL_DRY_RUN') {
+    await runIncrementalDryRun(options);
+    return;
+  }
   const maxConcurrentStages = stageConcurrency();
   const runToken = `${new Date().toISOString().replace(/\D/g, '').slice(0, 17)}-${process.pid}`;
   const censusRunDirectory = path.join(ROOT, 'docs', 'reports', 'openspec-evidence', `pipeline-${runToken}`);
@@ -171,6 +259,7 @@ async function main() {
     OPENSPEC_EVIDENCE_BINDINGS_PATH: relative(path.join(censusRunDirectory, 'predicate-resolution-v1.json')),
     OPENSPEC_EVIDENCE_CARDS_PATH: relative(path.join(censusRunDirectory, 'evidence-cards-v1.json')),
     OPENSPEC_EVIDENCE_CARDS_OUTPUT: relative(path.join(censusRunDirectory, 'evidence-cards-v1.json')),
+    OPENSPEC_DIRTY_SET_OUTPUT: relative(path.join(censusRunDirectory, 'dirty-set-v1.json')),
     OPENSPEC_EVIDENCE_WORKBOARD_OUTPUT: relative(path.join(censusRunDirectory, 'workboard-projection-v1.json')),
     OPENSPEC_WORKBOARD_RECONCILIATION_OUTPUT: relative(path.join(censusRunDirectory, 'workboard-reconciliation-v1.json')),
     OPENSPEC_GOLDEN_OUTPUT: relative(path.join(censusRunDirectory, 'golden-task-v1.json')),
@@ -319,7 +408,9 @@ async function main() {
   if (report.status !== 'PIPELINE_COMPLETED_READ_ONLY') process.exitCode = 1;
 }
 
-main().catch((error) => {
-  process.stderr.write(`${JSON.stringify({ status: 'PIPELINE_FAILED', error: error.message })}\n`);
-  process.exitCode = 1;
-});
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    process.stderr.write(`${JSON.stringify({ status: 'PIPELINE_FAILED', error: error.message })}\n`);
+    process.exitCode = 1;
+  });
+}

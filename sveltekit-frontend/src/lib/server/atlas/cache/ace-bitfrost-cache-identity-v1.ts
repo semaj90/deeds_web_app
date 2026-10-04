@@ -115,3 +115,61 @@ export function buildAceContextManifestCacheKeyV1(manifest: ContextManifestV2): 
     parsed.identityChecksum,
   ].join(':');
 }
+
+// ── HASHCENT-01: namespaced hash -> centroid lookup (descriptor + key only; no Valkey write) ──
+
+/**
+ * Hash namespaces are disjoint on purpose: a task block hash, a report SHA-256, a packet digest and a
+ * normalized SearXNG-content hash may never be substituted for one another, and none of them is an
+ * identity (`packet_key` / `stableKey` stay the identity keys). A hash is a lookup key only.
+ */
+export const CENTROID_HASH_NAMESPACES_V1 = [
+  'TASK_BLOCK_HASH',
+  'REPORT_SHA256',
+  'PACKET_DIGEST',
+  'SEARXNG_CONTENT_HASH',
+] as const;
+export type CentroidHashNamespaceV1 = (typeof CENTROID_HASH_NAMESPACES_V1)[number];
+
+/** `sha256:<64 lowercase hex>`; rejects packet keys, stable keys, UUIDs and bare hex. */
+const sha256Text = z.string().regex(/^sha256:[0-9a-f]{64}$/, 'lookupHash must be sha256:<64 lowercase hex>');
+
+/** Tiny Valkey value: descriptors only. No vectors, no source content, no identity generation. */
+export const CacheDescriptorV1Schema = z
+  .object({
+    namespace: z.enum(CENTROID_HASH_NAMESPACES_V1),
+    lookupHash: sha256Text,
+    centroidId: z.string().min(1),
+    representationRevision: revision,
+    artifactChecksum: revision,
+  })
+  .strict();
+export type CacheDescriptorV1 = z.infer<typeof CacheDescriptorV1Schema>;
+
+/**
+ * Key for a hash -> centroid locator. The answer (`centroidId`) is deliberately NOT part of the key;
+ * the representation revision and centroid-artifact checksum ARE, so a re-clustered or re-embedded
+ * corpus can never be served an older locator.
+ */
+export function buildCentroidLookupKeyV1(
+  input: Pick<CacheDescriptorV1, 'namespace' | 'lookupHash' | 'representationRevision' | 'artifactChecksum'>,
+): string {
+  const parsed = CacheDescriptorV1Schema.pick({
+    namespace: true,
+    lookupHash: true,
+    representationRevision: true,
+    artifactChecksum: true,
+  }).parse(input);
+  return [
+    'atlas',
+    'bitfrost',
+    'v1',
+    'centroid_lookup',
+    parsed.namespace.toLowerCase(),
+    parsed.representationRevision,
+    parsed.artifactChecksum,
+    parsed.lookupHash,
+  ]
+    .map((part) => encodeURIComponent(part))
+    .join(':');
+}
