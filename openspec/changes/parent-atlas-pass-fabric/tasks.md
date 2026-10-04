@@ -512,6 +512,52 @@ type PassExecution = {
       producer of the 27 unresolved embedding groups; the 10 cache-push groups
       also remain untraced. No worker was run and no database was queried in
       this source-only refresh, so PF4B stays open.
+- [ ] PF4B-QUEUE-04 — consumer patch + terminal classification (2026-10-04).
+      **Legacy classification (frozen, evidence-bounded):** the 9 divergent
+      groups / 21 rows are `DIVERGENT_OUTPUT_METADATA_PROVEN` (two stored
+      output variants per group, differing only in `embedding_norm`) with
+      `VECTOR_DIVERGENCE`, `RETRY` and `LEGITIMATE_REEXECUTION` all UNPROVEN;
+      execution identity is `LEGACY_EXECUTION_IDENTITY_UNRECOVERABLE` unless an
+      external broker log later proves attempt identity. The 3 groups that
+      repeat a variant are `REPEATED_OUTPUT_METADATA` only (a matching
+      `embedding_norm` does not make them retries). No dedupe, no uniqueness
+      constraint.
+      **Identity split (no new type; PF4C already owns the logical half):**
+      logical = existing `passIdentityHash` (packet_key + source_revision +
+      pass_name + pass_revision + input_hash); execution = that + `execution_id`
+      + broker message identity. The execution half has no recorded home yet.
+      **Code (commit after d42287db21, `phase-b-queue-consumer-embedding{,-batch}.mts`):**
+      writers (raw INSERT, constant `pass_key` `embeddinggemma_summary_embed_v1`)
+      now persist `provenance.broker` (messageId, deliveryTag, redelivered,
+      routingKey, consumerTag), `input_hash` = sha256 of the summary, and
+      `output.representation_id=semantic_768` + `model_tag` (artifact revision
+      null: `:latest` is not an immutable revision). A failed ledger write now
+      requeues instead of acking. Still NULL: `source_revision`,
+      `pass_revision`, `pass_identity_hash` (messages do not carry them; not
+      invented), so `PF4B-QUEUE-02` stays open. NOT run against the DB: the
+      INSERT's `$12` mapping is read-checked only; a persistent DB failure now
+      requeues indefinitely (needs a retry cap or DLQ).
+- [ ] PF4B-QUEUE-05 — bounded redelivery / DLQ for the embedding consumers
+      (2026-10-04). `sveltekit-frontend/src/lib/server/queue/embedding-consumer-retry-policy-v1.ts`
+      (+ spec 8/8) owns the pure policy; both `phase-b-queue-consumer-embedding{,-batch}.mts`
+      call `processDeliveryV1`. Failure (embedding null, ledger write false,
+      summary update false, thrown error, unparseable body) -> `nack(requeue)`
+      up to `EMBED_CONSUMER_MAX_ATTEMPTS` (default 3), then publish the original
+      body + headers to the companion queue `atlas.enrichment.embedding.dlq`
+      (confirm channel) and ack the original; if the DLQ publish fails the
+      message is requeued, never dropped. A classic queue cannot gain a DLX
+      without PRECONDITION_FAILED, hence the explicit companion queue. The DLQ
+      path writes no `analysis_pass_results` row. Identities kept separate:
+      broker identity = broker `messageId` else a content digest (never a
+      timestamp); logical input key = packet_key + input_hash + `semantic_768`;
+      execution id = consumer run + delivery tag + attempt (all three persisted
+      under `provenance.execution`). Summary-update failures now count as
+      failures (they were silently acked before). KNOWN LIMITS: the attempt
+      counter is in-process, so a consumer restart resets it; a retry after a
+      failed summary update can add a second ledger row for the same logical
+      input (distinguishable by execution id, but still a PF4B-style duplicate
+      until an idempotent upsert on logical identity exists); nothing was run
+      against RabbitMQ or Postgres, only the pure policy tests.
 - [x] PF4C — prove `pass_key` semantics from code/history: it is job-scoped
       execution retry identity, not logical pass identity. Keep it unchanged;
       use the separate logical identity only when a stable `inputHash` is
