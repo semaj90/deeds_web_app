@@ -107,6 +107,29 @@ export const SERVER_CHAT_MODEL = 'ornith-1.5-9b';
  */
 export const BIFROST_CHAT_MODEL = `openai/${SERVER_CHAT_MODEL}`;
 
+/** Transports the ordinary Ornith text lane can be addressed through. */
+export type OrnithTransportTargetV1 = 'LLAMA_SERVER' | 'BIFROST_OPENAI';
+
+/**
+ * Role identity != transport identity: the canonical model id is the same for every
+ * transport, the string sent on the wire is not. Callers must use this instead of
+ * patching an `openai/` prefix locally. Unknown targets fail closed.
+ */
+export function resolveOrnithRequestModelV1(target: OrnithTransportTargetV1): {
+  target: OrnithTransportTargetV1;
+  canonicalModelId: string;
+  requestModelId: string;
+} {
+  switch (target) {
+    case 'LLAMA_SERVER':
+      return { target, canonicalModelId: SERVER_CHAT_MODEL, requestModelId: SERVER_CHAT_MODEL };
+    case 'BIFROST_OPENAI':
+      return { target, canonicalModelId: SERVER_CHAT_MODEL, requestModelId: BIFROST_CHAT_MODEL };
+    default:
+      throw new Error(`UNKNOWN_ORNITH_TRANSPORT_TARGET: ${String(target)}`);
+  }
+}
+
 	/** Legacy Gemma4 compatibility identifier; not the active chat owner. */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
