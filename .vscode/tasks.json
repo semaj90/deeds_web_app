@@ -3676,6 +3676,70 @@
       "detail": "Verify TurboQuant server is ready on :8090"
     },
     {
+      "label": "⚡ TurboQuant: Status (:8090 process, vision, VRAM)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$p = Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\" | Where-Object { $_.CommandLine -match '--port 8090( |$)' }; if (-not $p) { Write-Host ':8090 llama-server: NOT RUNNING' } else { $p | ForEach-Object { Write-Host ('PID ' + $_.ProcessId + ' started ' + $_.CreationDate + ' mmproj=' + [bool]($_.CommandLine -match '--mmproj')) }; try { $r = Invoke-RestMethod http://127.0.0.1:8090/props -TimeoutSec 4; Write-Host ('alias=' + $r.model_alias + ' vision=' + $r.modalities.vision + ' n_ctx=' + $r.default_generation_settings.n_ctx) } catch { Write-Host ('/props unavailable: ' + $_.Exception.Message) } }; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader"
+      ],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Read-only: is llama-server running on :8090, does it have vision, and how much VRAM is free"
+    },
+    {
+      "label": "⚡ TurboQuant: Stop (unload Ornith on :8090)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$p = Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\" | Where-Object { $_.CommandLine -match '--port 8090( |$)' }; if (-not $p) { Write-Host 'No llama-server on :8090 - nothing to stop' } else { $p | ForEach-Object { Write-Host ('Stopping PID ' + $_.ProcessId + ' (port 8090) gracefully; the Ollama runner and other llama-server processes are not touched'); Stop-Process -Id $_.ProcessId }; Start-Sleep -Seconds 4; if (Get-Process -Id ($p | Select-Object -First 1).ProcessId -ErrorAction SilentlyContinue) { Write-Host 'Still running after graceful stop - not forcing. Re-run Status or stop it manually.' } else { Write-Host 'Stopped.' } }; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Graceful stop of ONLY the :8090 llama-server by PID (frees ~6.4 GiB for cuVS KMeans or other GPU jobs). Anything calling :8090 fails until it is started again. Never use taskkill /IM llama-server.exe: Ollama's embedding runner shares the image name."
+    },
+    {
+      "label": "⚡ TurboQuant: Start (vision, CPU projector, :8090)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/launch-turboquant.ps1",
+        "-Detached",
+        "-StartupProfile",
+        "ornith-1.5-vlm"
+      ],
+      "options": {
+        "env": {
+          "LLAMA_ARG_MMPROJ_OFFLOAD": "0"
+        }
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "ornith-1.5-vlm profile with the mmproj kept on the CPU (LLAMA_ARG_MMPROJ_OFFLOAD=0): no extra VRAM. Run Status afterwards and expect vision=True."
+    },
+    {
       "label": "⚡ TurboQuant: Test Inference (hearsay query)",
       "type": "shell",
       "command": "curl -s -X POST http://localhost:8090/v1/chat/completions -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-rotorquant:latest\\\",\\\"messages\\\":[{\\\"role\\\":\\\"user\\\",\\\"content\\\":\\\"What is hearsay evidence? Answer in 2 sentences.\\\"}],\\\"max_tokens\\\":120,\\\"temperature\\\":0.3}\" | python -m json.tool",
