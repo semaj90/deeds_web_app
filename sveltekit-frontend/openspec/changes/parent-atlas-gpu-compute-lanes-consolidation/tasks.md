@@ -1308,6 +1308,61 @@ Failing specs not mine (unchanged): `langgraph-client.spec`, `tool-shim-temporal
 - **Multiplicity:** 13,698 of 28,974 edges (47%) carry more than one position. One logical edge with many occurrences maps onto `planGraphifyEdgeReplayV1`'s one-edge/many-evidence-entries model, so each position should become its own evidence entry.
 - A reference-site span would be start point + the target name's length in the same unit (dotted names such as `path.join` cover the whole text). NOT built: needs (1) the schema decision above (additive `occurrence_positions` in `packages/parent-atlas`), (2) a byte-column variant of the converter, (3) a decision on which edges lacking positions (28% of raw edges) fall back to `containing_node_span`.
 
+### GSP-5.4 concrete paper DDL (2026-10-04, reviewable draft; NOTHING written or applied; supersedes the column list in the earlier HOLD NOTICE where they differ)
+- **Gate status:** the earlier condition for drafting ("at least one real file yields admitted edges") is now met in the harness (2,276 admitted edges over the whole `atlas` tree, deterministic across processes). The other gates (rollback plan, Drizzle review, explicit operator apply approval) are NOT met; this entry does not authorize any DB write.
+- **Baseline is the applied `drizzle/manual/20260903_graphify_symbols_edges_additive_v1.sql`** (`graphify_edges`: `edge_id`, `workspace_id`, `subject_symbol_id`, `predicate`, `object_symbol_id`, `unresolved_target`, `evidence_kind`, `evidence_span jsonb NOT NULL`, `confidence`, `source_revision`; indexes on subject and `source_revision` only). The LIVE table, its row count and whether any legacy rows exist were NOT probed in this pass; a read-only `\d graphify_edges` and `count(*)` are required before review.
+- **Corrections to the earlier note, with reasons:** (1) NO `evidence_checksum` on the parent: evidence is deliberately outside edge identity and can grow, so a NOT NULL parent checksum would go stale or force mutation; evidence is a child set with a per-entry hash. (2) NO supersession columns now: a newer admitted `graph_revision` yields a different `edge_key`, so revision scoping already supersedes; add an explicit tombstone state only if a real need appears. (3) The new columns are NULLABLE with a CHECK that makes an admitted row (edge_key set) complete, so legacy rows are never relabelled as admitted.
+- **Parent evidence columns:** the existing `evidence_kind`, `evidence_span`, `confidence` are NOT NULL on `graphify_edges`. Decision for review: mirror the primary (lowest-sorted) evidence entry into them at insert and treat the child table as the full set; the alternative (relax them to nullable) changes an applied contract.
+- **Evidence content:** `reference_site` entries need the `occurrence_positions` decisions recorded above (additive package schema key, a byte-column converter); until then evidence is `containing_node_span` only.
+- **Insert path:** one transaction: `INSERT INTO graphify_edges ... ON CONFLICT (edge_key) WHERE edge_key IS NOT NULL DO NOTHING RETURNING edge_id` (look the id up on conflict), then `INSERT INTO graphify_edge_evidence ... ON CONFLICT (edge_id, evidence_entry_hash) DO NOTHING`. Replaying the same fact adds evidence, never a second edge. Persist through the existing `graphify-symbol-writer-v1.ts`, not a new writer (GSP-5.5).
+- **Rollback / pre-image (additive, so rollback is cheap):** before apply capture `SELECT count(*), count(edge_key) FROM graphify_edges` and a `pg_dump -t graphify_edges -t graphify_symbols`; canary rows are tagged by `execution_id` and removable with one `DELETE ... WHERE execution_id = <canary>` (evidence cascades); full rollback = `DROP TABLE graphify_edge_evidence`, drop the new indexes and constraint, `ALTER TABLE graphify_edges DROP COLUMN` the eight new columns (no legacy data touched).
+- **Drizzle Safety Rule findings:** (a) `drizzle.config.ts` `tablesFilter` contains NO `graphify_*` pattern (0 matches) and `graphify_edges`/`graphify_symbols` are not declared in `src/lib/server/db`, so a `drizzle-kit generate/push` could try to DROP them; add `'!graphify_*'` (or declare them) BEFORE any related migration work, as its own reviewed change. (b) This is a manual sidecar migration (needs a `sidecar-migrations.json` entry with `appliedBy`/`appliedAt` after approval; not in the journal). (c) Do not run `drizzle-kit push`.
+- **Still open for review:** the parent-mirror vs relaxed-NOT-NULL choice; whether `execution_id` should be a typed FK to the graphify execution ledger (`graphify_executions`) instead of text; the unnominated-source rule (about half of non-import facts are dropped before any of this); and the `WORKSPACE-REVISION-KEY-MIGRATION-01` gate.
+
+```sql
+-- GSP-5.4 PAPER DESIGN. NOT a migration: do not save under drizzle/ or drizzle/manual/ until reviewed and approved.
+-- Additive only; every new column is NULLABLE so existing rows stay observable but non-admitted (no backfill, no invented revisions).
+ALTER TABLE public.graphify_edges
+  ADD COLUMN IF NOT EXISTS edge_key               text,   -- 'sha256:' || 64 hex, from planGraphifyEdgeReplayV1 (graphify-edge-replay-identity-v1.ts)
+  ADD COLUMN IF NOT EXISTS workspace_revision_key text,
+  ADD COLUMN IF NOT EXISTS graph_revision         text,
+  ADD COLUMN IF NOT EXISTS producer_id            text,
+  ADD COLUMN IF NOT EXISTS producer_revision      text,
+  ADD COLUMN IF NOT EXISTS execution_id           text,   -- reference to the graphify execution ledger; metadata, never the arbiter
+  ADD COLUMN IF NOT EXISTS target_source_revision text,
+  ADD COLUMN IF NOT EXISTS observed_at            timestamptz DEFAULT now();  -- metadata only
+
+-- The arbiter. Partial, so legacy rows (edge_key IS NULL) never collide.
+CREATE UNIQUE INDEX IF NOT EXISTS graphify_edges_edge_key_uq_v2
+  ON public.graphify_edges (edge_key) WHERE edge_key IS NOT NULL;
+
+-- An admitted row is complete or it is not admitted at all.
+ALTER TABLE public.graphify_edges ADD CONSTRAINT graphify_edges_admitted_complete_v2 CHECK (
+  edge_key IS NULL OR (
+    edge_key ~ '^sha256:[0-9a-f]{64}$'
+    AND workspace_revision_key IS NOT NULL AND graph_revision IS NOT NULL
+    AND producer_id IS NOT NULL AND producer_revision IS NOT NULL
+    AND target_source_revision ~ '^sha256:[0-9a-f]{64}$' AND source_revision ~ '^sha256:[0-9a-f]{64}$'
+    AND object_symbol_id IS NOT NULL AND unresolved_target IS NULL)) NOT VALID;  -- VALIDATE after review; legacy rows have edge_key NULL so it passes
+
+-- Selectors and reverse traversal (only subject is indexed today).
+CREATE INDEX IF NOT EXISTS graphify_edges_snapshot_v2 ON public.graphify_edges (workspace_revision_key, graph_revision) WHERE edge_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS graphify_edges_object_symbol_v2 ON public.graphify_edges (object_symbol_id) WHERE object_symbol_id IS NOT NULL;
+
+-- Evidence is OUT of edge identity and grows (47% of edges have several occurrences), so it is a child set, not a parent column.
+CREATE TABLE IF NOT EXISTS public.graphify_edge_evidence (
+  evidence_id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  edge_id              uuid NOT NULL REFERENCES public.graphify_edges(edge_id) ON DELETE CASCADE,
+  evidence_entry_hash  text NOT NULL,                    -- sha256 of the canonical entry (evidenceEntryOfV1)
+  evidence_kind        text NOT NULL,                    -- 'reference_site' | 'containing_node_span' | ...
+  start_byte bigint NOT NULL, end_byte bigint NOT NULL,  -- UTF-8 byte offsets into the exact source revision
+  start_row integer NOT NULL, end_row integer NOT NULL,  -- 0-based
+  confidence real NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
+  evidence_refs jsonb NOT NULL DEFAULT '[]'::jsonb,
+  CONSTRAINT graphify_edge_evidence_span_v2 CHECK (end_byte >= start_byte AND end_row >= start_row),
+  CONSTRAINT graphify_edge_evidence_entry_uq_v2 UNIQUE (edge_id, evidence_entry_hash));
+```
+
 ### Repo hygiene recorded with this commit
 Committed with the 10 MB per-file limit respected. Left out on purpose: 220 files over 10 MB (mostly 95 MB `docs/reports/openspec-evidence*/census-v1.json`), 120 per-run snapshot files under `docs/reports/openspec-evidence/pipeline-*` (164 MB, regenerable), nested untracked directories (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`) and `simd-bridge/cpp/build-x64-cuda/*` build output. Three tracked files still contain a hard-coded DB DSN with a dev password in a fallback (`scripts/atlas/build-mcp-tool-manifest-packets.mjs`, `scripts/atlas/register-orphaned-chunks.mjs`, `sveltekit-frontend/src/lib/server/analysis/worker.ts`): pre-existing in HEAD, not introduced now; move to env-only in a hardening pass (credentials belong in `.env.local`).
 
