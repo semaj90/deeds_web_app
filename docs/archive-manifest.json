@@ -642,5 +642,12 @@
     "sha256": "4fe5bfeeda424f2ad29bd3c15e5aa7e1e6c3bac5becbc566751708cd767fac3d",
     "archived": "2026-10-03",
     "reason": "CLAUDE.md size limit: TypeScript 7 lane, AGENTS.md spine and Backend Infrastructure Audit moved verbatim; condensed rules kept"
+  },
+  {
+    "path": "scripts/batch_repair_chat.py",
+    "archive_path": "docs/archive/2026-10-04/batch_repair_chat.py.bak",
+    "sha256": "483bb3020926105104345947d4d22afa0a9b365b3f960ac7ed3ce7e7a1175ef2",
+    "archived": "2026-10-04T00:00:00Z",
+    "reason": "Misfiled: SvelteKit server-action TypeScript (streams from Ollama /api/generate, publishes SSE deltas to Redis) saved under a .py name, so it cannot run as Python and had no code callers (only generated source-inventory reports mention it). Archived, not deleted; recovery: git mv back or cp from archive_path (sha256 above). Removes one raw Ollama chat caller from the frozen guard list."
   }
 ]

@@ -21,10 +21,9 @@ const OLLAMA_HINT = /11434|OLLAMA|ollama/i;
 const EMBEDDING_LIFECYCLE = /embeddinggemma|OLLAMA_EMBED|keep_alive\s*:\s*0/i;
 
 // Known offenders (found 2026-09-19). Shrinks as batches are converted.
-// 2026-10-04: 8 entries were already llama-server callers (stale) and were pruned. Remaining: batch_repair_chat.py
-// (TypeScript saved under a .py name), caption-screenshots-gemma4.mjs (vision -> VLM lane) and the Svelte chat component.
+// 2026-10-04: 8 entries were already llama-server callers (stale) and were pruned. batch_repair_chat.py was archived 2026-10-04.
+// Remaining: caption-screenshots-gemma4.mjs (vision -> VLM lane) and the Svelte chat component.
 const KNOWN_OLLAMA_CHAT_CALLERS: string[] = [
-	'scripts/batch_repair_chat.py',
 	'sveltekit-frontend/scripts/screenshots/caption-screenshots-gemma4.mjs',
 	'sveltekit-frontend/src/lib/components/ai/EnhancedLegalAIChatWithSynthesis.svelte',
 ];
