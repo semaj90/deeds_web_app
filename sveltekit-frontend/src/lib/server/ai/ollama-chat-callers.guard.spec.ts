@@ -23,9 +23,8 @@ const EMBEDDING_LIFECYCLE = /embeddinggemma|OLLAMA_EMBED|keep_alive\s*:\s*0/i;
 // Known offenders (found 2026-09-19). Shrinks as batches are converted.
 // 2026-10-04: 8 entries were already llama-server callers (stale) and were pruned. batch_repair_chat.py was archived 2026-10-04.
 // The Svelte chat component was moved to /api/ai/chat 2026-10-04.
-// Remaining: caption-screenshots-gemma4.mjs (vision -> VLM lane; no vision model is loaded, see the lane-consolidation tasks.md).
+// caption-screenshots-gemma4.mjs moved to the vision-capable llama-server 2026-10-04. The list is now empty; keep the ratchet.
 const KNOWN_OLLAMA_CHAT_CALLERS: string[] = [
-	'sveltekit-frontend/scripts/screenshots/caption-screenshots-gemma4.mjs',
 ];
 
 function findCallers(): string[] {
