@@ -19,7 +19,7 @@
  */
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
-import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { SERVER_CHAT_MODEL, SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
@@ -711,7 +711,7 @@ export async function loadCodebaseContext(query: string): Promise<{
     import('$lib/server/retrieval/ace-retrieval-logger').then(({ logAceRun }) => {
         logAceRun({
             query,
-            model: 'gemma4-rotorquant:latest',
+            model: SERVER_CHAT_MODEL,
             mode: 'multi-vector-rerank',
             metadata: {
                 recallMs: recall.recallMs,

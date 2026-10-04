@@ -24,6 +24,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { TTL } from '$lib/server/cache-keys.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 export interface SomCellSummary {
   x: number;
@@ -127,7 +128,7 @@ Focus on structural patterns and data-flow, not individual files.`;
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model:       'gemma4-rotorquant:latest',
+            model:       SERVER_CHAT_MODEL,
             messages:    [{ role: 'user', content: prompt }],
             temperature: 0.2,
             max_tokens:  180,
