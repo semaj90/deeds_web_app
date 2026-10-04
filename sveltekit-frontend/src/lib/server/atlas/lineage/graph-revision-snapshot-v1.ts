@@ -4,8 +4,16 @@
  * Rule: `workspaceRevisionKey` and `graphRevision` must originate from ONE immutable snapshot receipt, never from the
  * current HEAD and a separate graph read. Pure and DB-free: it reads nothing and writes nothing, and it mints no
  * identity. Anything short of full proof is a named non-admission; there is no partial promotion.
+ *
+ * OWNERSHIP (audited 2026-10-04, do not re-define here): workspace/source revision identity is owned by
+ * `identity/workspace-source-binding-v1.ts` (WorkspaceRevisionRecordV1), `identity/revision-authority-envelope-v1.ts`,
+ * `indexing/graphify-revision-authority-v2.ts` (git commit is provenance only) and the coverage receipt by
+ * `graph/graph-snapshot-source-revision-binding-v1.ts`. This module owns ONLY the graph-revision pairing and the edge
+ * admission verdict; use `buildGraphRevisionSnapshotFromOwnersV1` so the key and coverage are derived from those owners.
  */
 import { createHash } from 'node:crypto';
+import type { WorkspaceRevisionRecordV1 } from '../identity/workspace-source-binding-v1.js';
+import type { GraphSnapshotSourceBindingReceiptV1 } from '../graph/graph-snapshot-source-revision-binding-v1.js';
 
 export const GRAPH_REVISION_SNAPSHOT_SCHEMA_V1 = 'atlas.graph-revision-snapshot.v1' as const;
 
@@ -49,6 +57,30 @@ export function buildGraphRevisionSnapshotV1(input: GraphRevisionSnapshotInputV1
     throw new Error('GRAPH_SNAPSHOT_INVALID: sourceRevisionCoverage');
   }
   return { schema: GRAPH_REVISION_SNAPSHOT_SCHEMA_V1, ...input, snapshotChecksum: checksumOf(input) };
+}
+
+/**
+ * Derive a snapshot from the existing revision owners instead of re-stating their fields. The workspace key is the
+ * owner's `workspaceRevision`; coverage comes from the graph-source binding receipt; the two must name the same
+ * workspace or the call throws (one snapshot, never two reads).
+ */
+export function buildGraphRevisionSnapshotFromOwnersV1(input: {
+  workspaceRecord: Pick<WorkspaceRevisionRecordV1, 'workspaceRevision'>;
+  bindingReceipt: Pick<GraphSnapshotSourceBindingReceiptV1, 'workspaceRevision' | 'boundNodeCount' | 'sourceBackedNodeCount'>;
+  graphRevision: string;
+  producerId: string;
+  producerRevision: string;
+}): GraphRevisionSnapshotV1 {
+  if (input.bindingReceipt.workspaceRevision !== input.workspaceRecord.workspaceRevision) {
+    throw new Error('GRAPH_SNAPSHOT_INVALID: binding receipt and workspace record name different workspace revisions');
+  }
+  return buildGraphRevisionSnapshotV1({
+    workspaceRevisionKey: input.workspaceRecord.workspaceRevision,
+    graphRevision: input.graphRevision,
+    producerId: input.producerId,
+    producerRevision: input.producerRevision,
+    sourceRevisionCoverage: { qualified: input.bindingReceipt.boundNodeCount, total: input.bindingReceipt.sourceBackedNodeCount },
+  });
 }
 
 export function verifyGraphRevisionSnapshotV1(s: GraphRevisionSnapshotV1): boolean {

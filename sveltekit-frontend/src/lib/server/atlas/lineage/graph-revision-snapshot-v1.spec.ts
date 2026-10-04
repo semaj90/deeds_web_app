@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
-  buildGraphRevisionSnapshotV1, classifyEdgeCandidateV1, summarizeEdgeReadbackV1, verifyGraphRevisionSnapshotV1,
+  buildGraphRevisionSnapshotFromOwnersV1, buildGraphRevisionSnapshotV1, classifyEdgeCandidateV1, summarizeEdgeReadbackV1, verifyGraphRevisionSnapshotV1,
   type GraphEdgeCandidateV1, type GraphEndpointCandidateV1,
 } from './graph-revision-snapshot-v1.js';
 
@@ -32,6 +32,25 @@ describe('GraphRevisionSnapshotV1', () => {
     expect(() => buildGraphRevisionSnapshotV1({ ...ok, workspaceRevisionKey: 'HEAD' })).toThrow(/workspaceRevisionKey/);
     expect(() => buildGraphRevisionSnapshotV1({ ...ok, graphRevision: ' ' })).toThrow(/graphRevision/);
     expect(() => buildGraphRevisionSnapshotV1({ ...ok, sourceRevisionCoverage: { qualified: 3, total: 2 } })).toThrow(/sourceRevisionCoverage/);
+  });
+});
+
+describe('derivation from the existing revision owners', () => {
+  const ws = 'sha256:' + 'e'.repeat(64);
+  const receipt = { workspaceRevision: ws, boundNodeCount: 15925, sourceBackedNodeCount: 16151 };
+
+  it('takes the key and coverage from the owners and adds only the graph pairing', () => {
+    const s = buildGraphRevisionSnapshotFromOwnersV1({ workspaceRecord: { workspaceRevision: ws }, bindingReceipt: receipt, graphRevision: 'g1', producerId: 'graphify', producerRevision: 'p1' });
+    expect(s.workspaceRevisionKey).toBe(ws);
+    expect(s.sourceRevisionCoverage).toEqual({ qualified: 15925, total: 16151 });
+    expect(verifyGraphRevisionSnapshotV1(s)).toBe(true);
+  });
+
+  it('refuses a receipt and record that name different workspaces', () => {
+    expect(() => buildGraphRevisionSnapshotFromOwnersV1({
+      workspaceRecord: { workspaceRevision: ws }, bindingReceipt: { ...receipt, workspaceRevision: 'sha256:' + 'f'.repeat(64) },
+      graphRevision: 'g1', producerId: 'graphify', producerRevision: 'p1',
+    })).toThrow(/different workspace revisions/);
   });
 });
 
