@@ -26,7 +26,8 @@ const { Pool } = pg;
 
 // Config
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const QUEUE_NAME = 'phase7.summarization';
 const DLQ_NAME = `${QUEUE_NAME}.dlq`;
 const PREFETCH = 2; // Allow 2 messages at a time per worker

@@ -58,7 +58,8 @@ const LIMIT = parseInt(process.env.CHUNK_LIMIT || '0');
 
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REDIS_URL = process.env.REDIS_URL || 'redis://:redis@127.0.0.1:6379';
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 const BIFROST_URL = process.env.BIFROST_URL || 'http://127.0.0.1:3040';
 

@@ -29,7 +29,8 @@ const { Pool } = pkg;
 // CONFIG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 

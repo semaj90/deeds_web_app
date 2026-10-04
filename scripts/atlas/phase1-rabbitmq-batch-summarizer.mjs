@@ -35,7 +35,8 @@ const amqp = require('amqplib');
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const QUEUE = 'codebase.index';
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE || '500');
 const LIMIT = parseInt(process.env.CHUNK_LIMIT || '0');

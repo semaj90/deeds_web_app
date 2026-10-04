@@ -22,7 +22,8 @@ const DB_USER = process.env.DATABASE_USER || 'legal_admin';
 const DB_PASSWORD = process.env.DATABASE_PASSWORD || '123456';
 const DB_NAME = process.env.DATABASE_NAME || 'legal_ai_db';
 
-const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
+// Neutral name first (NAME-ENV-01B); legacy GEMMA4_URL kept as fallback. Base URL: strip a trailing /v1 because call sites append /v1/....
+const GEMMA4_URL = (process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const GEMMA4_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 
 // Args
