@@ -119,7 +119,7 @@ VS Code tasks (Terminal > Run Task; defined in `.vscode/tasks.json`; lifecycle i
 | Step | Task | Effect |
 |---|---|---|
 | observe | `TurboQuant: Status (:8090 process, vision, VRAM)` | read-only, safe anytime |
-| turn it down | `GPU: Prepare cuVS KMeans (frees VRAM, does NOT run KMeans)` or `Free GPU VRAM (unload Ollama + stop :8090)` | `ollama stop` each model, graceful stop of ONLY the llama-server with `--port 8090`, prints running/loaded/used/free, exit 1 if `:8090` survives or free < `KMEANS_MIN_FREE_MIB` (default 4096, a placeholder) |
+| turn it down | `GPU: Prepare cuVS KMeans (frees VRAM, does NOT run KMeans)` or `Free GPU VRAM (unload Ollama + stop :8090)` | `ollama stop` each model, graceful stop of ONLY the llama-server with `--port 8090`, prints running/loaded/used/free, exit 1 if `:8090` survives or free < `KMEANS_MIN_FREE_MIB` (default 1536 = measured `CUVS_KMEANS_MEDIUM` minimum free, up to ~55k rows) |
 | run the job | WSL interpreter `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python` | e.g. `python/atlas_compute/cluster_softmax.py::run_cuvs_soft_kmeans` |
 | bring it back | `TurboQuant: Start (vision, CPU projector, :8090)` then Status | expect `vision=True`; never leave `:8090` down silently |
 
