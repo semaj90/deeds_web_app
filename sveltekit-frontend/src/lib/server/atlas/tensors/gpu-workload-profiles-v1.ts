@@ -59,11 +59,11 @@ export const GPU_WORKLOAD_PROFILES_V1: Readonly<Record<GpuWorkloadIdV1, GpuWorkl
   },
   CUVS_KMEANS_CORPUS: {
     id: 'CUVS_KMEANS_CORPUS',
-    description: 'cuVS KMeans over the whole corpus (~219k rows)',
-    measuredNeedMiB: null,
-    minimumFreeMiB: null,
-    evidence: 'MEASURE_FIRST',
-    evidenceNote: 'Raw fp32 matrix is 642 MiB at 219k rows; fit/predict buffers not measured at this scale (a 3-point extrapolation from 5k/20k/55k suggests ~1.5 GiB, an estimate only).',
+    description: 'cuVS KMeans over the whole corpus (219,998 x 768 rows)',
+    measuredNeedMiB: 1536,
+    minimumFreeMiB: 3072,
+    evidence: 'MEASURED',
+    evidenceNote: '2026-10-04 real semantic_768, all 219,998 rows (content_embedding_768, ORDER BY id), K=64, 27 iterations, 110 s: peak 2,516 MiB total, about 1,419 MiB above the lowest sample (1,097), rounded up to 1536. Growth by rows: +252 (5k), +391 (20k), +591 (55k), +1,419 (220k). The WSL host was under memory pressure during the run (pinned host memory could not be allocated, synchronous transfer used); that affects wall time, not the VRAM figure.',
   },
   CUVS_CAGRA_64K: {
     id: 'CUVS_CAGRA_64K',

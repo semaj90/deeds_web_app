@@ -27,7 +27,7 @@ describe('gpu workload profiles route through decideGpuMemoryAdmissionV1', () =>
   });
 
   it('an unmeasured workload is DEFERred with no guessed number and the owner is not consulted', () => {
-    for (const id of ['CUVS_KMEANS_CORPUS', 'CUVS_CAGRA_64K', 'CUGRAPH_PAGERANK'] as GpuWorkloadIdV1[]) {
+    for (const id of ['CUVS_CAGRA_64K', 'CUGRAPH_PAGERANK'] as GpuWorkloadIdV1[]) {
       const r = admitGpuWorkloadV1(id, free(6978, false));
       expect(r.decision).toBe('DEFER');
       expect(r.admission).toBeNull();
@@ -43,6 +43,16 @@ describe('gpu workload profiles route through decideGpuMemoryAdmissionV1', () =>
     expect(medium.measuredNeedMiB!).toBeGreaterThan(small.measuredNeedMiB!);
     expect(admitGpuWorkloadV1('CUVS_KMEANS_MEDIUM', free(6403, false)).decision).toBe('ADMIT');
     expect(admitGpuWorkloadV1('CUVS_KMEANS_MEDIUM', free(207, true)).decision).not.toBe('ADMIT');
+  });
+
+  it('the whole-corpus profile is measured above the medium profile and needs the Ornith server stopped', () => {
+    const medium = GPU_WORKLOAD_PROFILES_V1.CUVS_KMEANS_MEDIUM;
+    const corpus = GPU_WORKLOAD_PROFILES_V1.CUVS_KMEANS_CORPUS;
+    expect(corpus.evidence).toBe('MEASURED');
+    expect(corpus.measuredNeedMiB!).toBeGreaterThan(medium.measuredNeedMiB!);
+    expect([corpus.measuredNeedMiB, corpus.minimumFreeMiB]).toEqual([1536, 3072]);
+    expect(admitGpuWorkloadV1('CUVS_KMEANS_CORPUS', free(6799, false)).decision).toBe('ADMIT');
+    expect(admitGpuWorkloadV1('CUVS_KMEANS_CORPUS', free(207, true)).decision).not.toBe('ADMIT');
   });
 
   it('BITFROST_L2 uses the existing-ledger figures (need 1024, minimum free 2048)', () => {
