@@ -71,7 +71,8 @@
           "value": "",
           "weight": 1.0,
           "models": [
-            "*"
+            "embeddinggemma:latest",
+            "nomic-embed-text:latest"
           ],
           "ollama_key_config": {
             "url": "http://host.docker.internal:11434"

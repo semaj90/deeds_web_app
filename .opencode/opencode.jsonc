@@ -31,15 +31,8 @@
             "maxTokens": 4096,
           },
         },
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096,
-          },
-        },
+        // The historical gemma4-legal-iq4xs-direct.gguf entry was removed 2026-10-04: it is not served on :8090 and a
+        // single-model llama-server would answer it with Ornith under a Gemma label. Recoverable from git history.
       },
     },
   },
