@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildAgenticRagContext, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
+import { buildAgenticRagContext, buildAgenticRagContextLive, buildLiveAtlasContext, callTraceTool, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
 
 const ROOT = 'C:/Users/james/Videos/deeds-web-app';
 
@@ -204,4 +204,152 @@ test('an expired packet is flagged in contextSource and warnings, a fresh one is
 test('a missing source revision is surfaced as a warning', () => {
   const result = withPacketCwd((p) => { delete p.sourceRevision; delete p.source_revision; if (p.sourceArtifact && typeof p.sourceArtifact === 'object') delete p.sourceArtifact.sourceRevision; }, () => buildAgenticRagContext({ query: 'x' }));
   assert.ok(result.warnings.includes('MISSING_SOURCE_REVISION'));
+});
+
+// ── live, query-specific context ──────────────────────────────────────────────────────────────────
+function fakeTrace(script) {
+  const calls = [];
+  const trace = async (name, args) => {
+    calls.push({ name, args });
+    const handler = script[name];
+    if (!handler) throw Object.assign(new Error('no handler'), { code: 'TRACE_TOOL_ERROR' });
+    return handler(args);
+  };
+  trace.calls = calls;
+  return trace;
+}
+const hit = (id, p, score, content = 'snippet text') => ({ id, path: p, score, content, lenses: [] });
+const packet = (key, ref, sha) => ({ packet_key: key, source_ref: ref, feature_id: 'f', sha256: sha ?? null });
+
+test('live cards are query-specific, deduplicated per file, ordered by score and bound to packet identity', async () => {
+  const trace = fakeTrace({
+    'atlas.query': () => [hit('c1', 'src/a.ts', 0.4, 'a one'), hit('c2', 'sveltekit-frontend/src/b.ts', 0.9, 'b best'), hit('c3', 'src/a.ts', 0.7, 'a better')],
+    'atlas.packet_search': ({ source_ref }) => ({ packets: source_ref === 'src/a.ts' ? [packet('packet:aaa', 'src/a.ts')] : [packet('packet:b1', 'src/b.ts'), packet('ace:packet:b2', 'sveltekit-frontend/src/b.ts')] }),
+  });
+  const result = await buildLiveAtlasContext({ query: 'who owns persistence', maxCards: 10 }, { trace });
+  assert.equal(result.querySpecific, true);
+  assert.equal(result.candidateSetBasis, 'LIVE_TRACE_RANKED_SEARCH');
+  assert.equal(result.contextSource.kind, 'TRACE_MCP_LIVE');
+  assert.deepEqual(result.cards.map((c) => c.sourceRef), ['src/b.ts', 'src/a.ts']); // best score first, one card per file
+  const [b, a] = result.cards;
+  assert.equal(a.score, 0.7);
+  assert.equal(a.summary, 'a better');
+  assert.deepEqual(a.chunkIds, ['c1', 'c3']);
+  assert.equal(a.identityBound, true);
+  assert.equal(a.packetKey, 'packet:aaa');
+  assert.equal(b.identityBound, false);
+  assert.equal(b.identityConflict, true); // two packets for one file is a conflict, never silently picked
+  assert.equal(b.packetKey, null);
+  assert.deepEqual([...b.packetKeys].sort(), ['ace:packet:b2', 'packet:b1']);
+  assert.ok(b.rejectionReasons.includes('IDENTITY_CONFLICT'));
+  assert.ok(result.cards.every((c) => c.proofUsable === false && c.rejectionReasons.includes('MISSING_SOURCE_REVISION')));
+  assert.equal(result.admissionStatus, 'UNADMITTED_RETRIEVAL_CANDIDATES');
+  assert.equal(result.retrievalAdmission.proofUsable, false);
+  assert.ok(result.warnings.includes('SOME_CARDS_IDENTITY_UNBOUND'));
+  assert.match(result.promptPacket, /packet: packet:aaa/);
+  assert.match(result.promptPacket, /packet: unbound/);
+});
+
+test('different queries produce different candidate sets (the 01B failure no longer reproduces)', async () => {
+  const trace = fakeTrace({
+    'atlas.query': ({ query }) => (/hearsay/.test(query) ? [hit('l1', 'src/evidence-rules.ts', 0.8)] : [hit('g1', 'src/graphify-writer.ts', 0.8)]),
+    'atlas.packet_search': () => ({ packets: [] }),
+  });
+  const legal = await buildLiveAtlasContext({ query: 'hearsay admissibility' }, { trace });
+  const code = await buildLiveAtlasContext({ query: 'graphify persistence owner' }, { trace });
+  assert.notDeepEqual(legal.cards.map((c) => c.sourceRef), code.cards.map((c) => c.sourceRef));
+});
+
+test('a failed identity lookup leaves that card unbound but keeps it; a missing packet is IDENTITY_UNBOUND', async () => {
+  const trace = fakeTrace({
+    'atlas.query': () => [hit('c1', 'src/a.ts', 0.5), hit('c2', 'src/b.ts', 0.4)],
+    'atlas.packet_search': ({ source_ref }) => {
+      if (source_ref === 'src/a.ts') throw Object.assign(new Error('timeout'), { code: 'TRACE_TIMEOUT' });
+      return { packets: [] };
+    },
+  });
+  const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
+  assert.equal(result.totalCards, 2);
+  const a = result.cards.find((c) => c.sourceRef === 'src/a.ts');
+  assert.equal(a.identityLookupError, 'TRACE_TIMEOUT');
+  assert.ok(a.rejectionReasons.includes('IDENTITY_UNBOUND'));
+  assert.equal(result.contextSource.identityBoundCount, 0);
+});
+
+test('a packet with a sha256 is the only thing that removes MISSING_SOURCE_REVISION, and proofUsable still stays false', async () => {
+  const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [packet('packet:aaa', 'src/a.ts', 'abc123')] }) });
+  const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
+  assert.ok(!result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
+  assert.equal(result.cards[0].proofUsable, false);
+});
+
+test('no hits is a successful live answer with a warning, a domain filter is reported as not applied', async () => {
+  const trace = fakeTrace({ 'atlas.query': () => [], 'atlas.packet_search': () => ({ packets: [] }) });
+  const result = await buildLiveAtlasContext({ query: 'nothing matches', domainFilter: 'legal' }, { trace });
+  assert.equal(result.ok, true);
+  assert.equal(result.totalCards, 0);
+  assert.equal(result.querySpecific, true);
+  assert.ok(result.warnings.includes('LIVE_QUERY_NO_HITS'));
+  assert.ok(result.warnings.includes('DOMAIN_FILTER_NOT_APPLIED'));
+  assert.equal(trace.calls.filter((c) => c.name === 'atlas.packet_search').length, 0);
+});
+
+test('the payload budget truncates cards and says so', async () => {
+  const many = Array.from({ length: 20 }, (_, i) => hit(`c${i}`, `src/file-${i}.ts`, 1 - i / 100, 'x'.repeat(400)));
+  const trace = fakeTrace({ 'atlas.query': () => many, 'atlas.packet_search': () => ({ packets: [] }) });
+  const result = await buildLiveAtlasContext({ query: 'q', maxPayloadBytes: 4096 }, { trace });
+  assert.equal(result.payloadTruncated, true);
+  assert.ok(result.payloadBytes <= 4096);
+  assert.ok(result.totalCards < 20);
+});
+
+function fakeFetch(responses) {
+  const queue = [...responses];
+  const fn = async () => {
+    fn.calls += 1;
+    const next = queue.shift();
+    if (next instanceof Error) throw next;
+    return { ok: next.ok ?? true, status: next.status ?? 200, text: async () => next.text };
+  };
+  fn.calls = 0;
+  return fn;
+}
+const sse = (payload) => `event: message\ndata: ${JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(payload) }] }, jsonrpc: '2.0', id: 1 })}\n\n`;
+const fast = { retryDelayMs: 0, timeoutMs: 1000 };
+
+test('callTraceTool parses SSE framing and retries once after an empty cold-start response', async () => {
+  const fetchImpl = fakeFetch([{ text: '' }, { text: sse([{ id: 1 }]) }]);
+  const result = await callTraceTool('atlas.query', { query: 'q' }, { fetchImpl, ...fast });
+  assert.deepEqual(result, [{ id: 1 }]);
+  assert.equal(fetchImpl.calls, 2);
+});
+
+test('callTraceTool reports typed failures instead of returning empty data', async () => {
+  await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([{ text: '' }, { text: '' }]), ...fast }), { code: 'TRACE_EMPTY_RESPONSE' });
+  await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([{ ok: false, status: 503, text: 'x' }, { ok: false, status: 503, text: 'x' }]), ...fast }), { code: 'TRACE_HTTP_503' });
+  await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([{ text: sse({ ok: false, error: 'canceling statement due to statement timeout' }) }, { text: sse({ ok: false, error: 'x' }) }]), ...fast }), { code: 'TRACE_TOOL_ERROR' });
+  await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([new Error('connect ECONNREFUSED'), new Error('connect ECONNREFUSED')]), ...fast }), { code: 'TRACE_UNREACHABLE' });
+  await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([{ text: 'not json at all' }, { text: 'not json at all' }]), ...fast }), (error) => Boolean(error.code));
+});
+
+test('when live search fails the answer falls back to the labelled static packet and names the failure', async () => {
+  const failing = async () => { throw Object.assign(new Error('boom'), { code: 'TRACE_EMPTY_RESPONSE' }); };
+  const result = await withPacketCwd(() => {}, () => buildAgenticRagContextLive({ query: 'q', maxCards: 3 }, { trace: failing }));
+  assert.equal(result.querySpecific, false);
+  assert.equal(result.contextSource.kind, 'STATIC_PACKET_FILE');
+  assert.deepEqual(result.liveRetrieval, { attempted: true, failure: 'TRACE_EMPTY_RESPONSE', message: 'boom' });
+  assert.ok(result.warnings.includes('LIVE_RETRIEVAL_UNAVAILABLE'));
+  assert.ok(result.warnings.includes('NO_QUERY_SPECIFIC_RETRIEVAL'));
+});
+
+test('disableLive forces the static packet without calling TRACE, and a live success has no fallback marker', async () => {
+  let called = 0;
+  const trace = async (name) => { called += 1; return name === 'atlas.query' ? [hit('c1', 'src/a.ts', 0.5)] : { packets: [] }; };
+  const disabled = await withPacketCwd(() => {}, () => buildAgenticRagContextLive({ query: 'q' }, { trace, disableLive: true }));
+  assert.equal(called, 0);
+  assert.equal(disabled.liveRetrieval.failure, 'LIVE_DISABLED');
+  const live = await buildAgenticRagContextLive({ query: 'q' }, { trace });
+  assert.equal(live.querySpecific, true);
+  assert.equal(live.liveRetrieval, undefined);
+  assert.ok(!live.warnings.includes('LIVE_RETRIEVAL_UNAVAILABLE'));
 });

@@ -37,7 +37,8 @@ test('every declared property is forwarded to the internal tool unless explicitl
 
 test('descriptions do not claim retrieval or a research circuit the tools do not perform', () => {
   const byName = Object.fromEntries(TOOLS.map((t) => [t.name, t.description]));
-  assert.match(byName.atlas_context, /not query-specific retrieval/i);
+  assert.match(byName.atlas_context, /unadmitted/i);
+  assert.match(byName.atlas_context, /querySpecific:false/);
   assert.match(byName.atlas_research, /maxRounds is not applied/i);
   assert.doesNotMatch(byName.atlas_research, /bounded, read-only research circuit/i);
 });

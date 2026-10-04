@@ -834,6 +834,230 @@ export function buildAgenticRagContext({
   };
 }
 
+// ── Live, query-specific context (KERNEL-PATCH-03) ────────────────────────────────────────────────
+// `atlas_context` ranks live through TRACE `atlas.query` (a ranked chunk search whose result set varies with the
+// query, unlike the static packet) and binds each hit's path to packet identity through `atlas.packet_search`.
+// Candidates are NOT admitted evidence: no source revision is available, so proofUsable stays false.
+// Any TRACE failure falls back to the labelled static packet. ATLAS_CONTEXT_LIVE=0 forces the static packet.
+const TRACE_MCP_URL = process.env.ATLAS_TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
+const LIVE_CONTEXT_DISABLED = /^(0|false|no)$/i.test(process.env.ATLAS_CONTEXT_LIVE ?? '');
+const LIVE_HIT_CAP = 20;
+const LIVE_BIND_CONCURRENCY = 5;
+
+function typedError(code, message) {
+  return Object.assign(new Error(message ?? code), { code });
+}
+
+export async function callTraceTool(
+  name,
+  args,
+  { fetchImpl = globalThis.fetch, url = TRACE_MCP_URL, timeoutMs = 12000, retries = 1, retryDelayMs = 250 } = {}
+) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetchImpl(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } }),
+      });
+      const text = await response.text();
+      if (!response.ok) throw typedError(`TRACE_HTTP_${response.status}`);
+      // An empty event stream is how TRACE reports an internal timeout (observed: exactly ~5 s, often on a cold call).
+      if (!text.trim()) throw typedError('TRACE_EMPTY_RESPONSE');
+      const framed = text.match(/data:\s*(\{.*\})/s);
+      const message = JSON.parse(framed ? framed[1] : text);
+      if (message.error) throw typedError('TRACE_RPC_ERROR', message.error.message);
+      const body = message.result?.content?.[0]?.text ?? '';
+      if (message.result?.isError) throw typedError('TRACE_TOOL_ERROR', body.slice(0, 200));
+      let parsed;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        throw typedError('TRACE_UNPARSEABLE', body.slice(0, 120));
+      }
+      if (parsed && parsed.ok === false) throw typedError('TRACE_TOOL_ERROR', String(parsed.error ?? '').slice(0, 200));
+      return parsed;
+    } catch (error) {
+      lastError = error.code ? error : typedError(error.name === 'AbortError' ? 'TRACE_TIMEOUT' : 'TRACE_UNREACHABLE', error.message);
+    } finally {
+      clearTimeout(timer);
+    }
+    if (attempt < retries) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+  }
+  throw lastError;
+}
+
+async function mapWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (next < items.length) {
+        const index = next;
+        next += 1;
+        results[index] = await worker(items[index], index);
+      }
+    })
+  );
+  return results;
+}
+
+export async function buildLiveAtlasContext(
+  { query, maxCards = 20, domainFilter, maxPayloadBytes = 24576 },
+  { trace = (name, args) => callTraceTool(name, args) } = {}
+) {
+  const queryText = String(query ?? '').slice(0, 512);
+  const cap = Math.max(1, Math.min(LIVE_HIT_CAP, Number(maxCards) || LIVE_HIT_CAP));
+  const payloadBudget = Math.max(4096, Math.min(65536, Number(maxPayloadBytes) || 24576));
+  const raw = await trace('atlas.query', { query: queryText, limit: cap });
+  const hits = Array.isArray(raw) ? raw : (raw?.results ?? raw?.hits ?? []);
+
+  // One card per file: best score, best snippet, every chunk id kept.
+  const byFile = new Map();
+  for (const hit of hits) {
+    const display = workspaceRelativeDisplay(hit?.path);
+    const canonical = canonicalWorkspaceRef(hit?.path);
+    if (!canonical) continue;
+    const entry = byFile.get(canonical);
+    const score = Number.isFinite(Number(hit.score)) ? Number(hit.score) : 0;
+    if (!entry) {
+      byFile.set(canonical, { canonical, display, score, snippet: String(hit.content ?? ''), chunkIds: hit.id ? [hit.id] : [] });
+    } else {
+      if (hit.id) entry.chunkIds.push(hit.id);
+      if (score > entry.score) Object.assign(entry, { score, snippet: String(hit.content ?? '') });
+    }
+  }
+  const files = [...byFile.values()].sort((a, b) => b.score - a.score || a.canonical.localeCompare(b.canonical));
+
+  // Identity binding is best-effort per file: a lookup failure leaves that card unbound, it never fails the answer.
+  const bindings = await mapWithConcurrency(files, LIVE_BIND_CONCURRENCY, async (file) => {
+    try {
+      const found = await trace('atlas.packet_search', { source_ref: file.display, limit: 5 });
+      const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === file.canonical);
+      return { packets, error: null };
+    } catch (error) {
+      return { packets: [], error: error.code ?? 'BIND_FAILED' };
+    }
+  });
+
+  let cards = files.map((file, index) => {
+    const { packets, error } = bindings[index];
+    const packetKeys = [...new Set(packets.map((p) => p.packet_key).filter(Boolean))];
+    const identityBound = packetKeys.length === 1;
+    const identityConflict = packetKeys.length > 1;
+    const sourceRevisionKnown = packets.some((p) => p.sha256);
+    const rejectionReasons = [
+      'NON_CANONICAL',
+      ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
+      ...(identityBound ? [] : [identityConflict ? 'IDENTITY_CONFLICT' : 'IDENTITY_UNBOUND']),
+    ];
+    return {
+      title: file.display.slice(0, 240),
+      summary: file.snippet.replace(/\s+/g, ' ').trim().slice(0, 300),
+      sourceRef: file.display.slice(0, 512),
+      domain: null,
+      score: file.score,
+      kind: 'rankedChunk',
+      order: index + 1,
+      chunkIds: file.chunkIds.slice(0, 5),
+      packetKey: identityBound ? packetKeys[0] : null,
+      packetKeys,
+      featureId: packets[0]?.feature_id ?? null,
+      identityBound,
+      identityConflict,
+      identityLookupError: error,
+      retrievalUsable: true,
+      proofUsable: false,
+      rejectionReasons,
+    };
+  });
+
+  let payloadTruncated = queryText !== String(query ?? '');
+  let sourceRefs = [];
+  let promptPacket = '';
+  let payloadBytes = 0;
+  do {
+    sourceRefs = [...new Set(cards.map((c) => c.sourceRef).filter(Boolean))];
+    promptPacket = [
+      `[ACE CONTEXT — ${cards.length} live ranked cards, query: "${queryText}"]`,
+      ...cards.slice(0, 10).map(
+        (c, i) =>
+          `${i + 1}. ${c.title} (score: ${c.score.toFixed(3)})` +
+          (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
+          `\n   sourceRef: ${c.sourceRef}` +
+          (c.packetKey ? ` packet: ${c.packetKey}` : ' packet: unbound')
+      ),
+    ].join('\n');
+    payloadBytes = Buffer.byteLength(JSON.stringify({ query: queryText, cards, sourceRefs, promptPacket }), 'utf8');
+    if (payloadBytes <= payloadBudget || cards.length === 0) break;
+    cards.pop();
+    payloadTruncated = true;
+  } while (cards.length > 0);
+
+  const reasons = [...new Set(cards.flatMap((c) => c.rejectionReasons))];
+  const unbound = cards.filter((c) => !c.identityBound).length;
+  return {
+    ok: true,
+    query: queryText,
+    totalCards: cards.length,
+    signalSummary: { pagerank: null, summary: `Live ranked search: ${hits.length} chunk hits over ${files.length} files`, lexical: [], centroid: null, reranker: null },
+    packetAge: null,
+    revisionStatus: 'MISSING_SOURCE_REVISION',
+    freshnessStatus: 'LIVE_QUERY',
+    querySpecific: true,
+    candidateSetBasis: 'LIVE_TRACE_RANKED_SEARCH',
+    contextSource: {
+      kind: 'TRACE_MCP_LIVE',
+      rankingTool: 'atlas.query',
+      identityTool: 'atlas.packet_search',
+      hitCount: hits.length,
+      fileCount: files.length,
+      identityBoundCount: cards.length - unbound,
+    },
+    warnings: [
+      'UNADMITTED_RETRIEVAL_CANDIDATES',
+      'MISSING_SOURCE_REVISION',
+      ...(cards.length === 0 ? ['LIVE_QUERY_NO_HITS'] : []),
+      ...(unbound > 0 ? ['SOME_CARDS_IDENTITY_UNBOUND'] : []),
+      ...(domainFilter ? ['DOMAIN_FILTER_NOT_APPLIED'] : []),
+    ],
+    admissionStatus: 'UNADMITTED_RETRIEVAL_CANDIDATES',
+    retrievalAdmission: { retrievalUsable: true, proofUsable: false, rejectionReasons: reasons },
+    retrievalRouting: {
+      domain: null,
+      markers: [],
+      allowedDomains: [],
+      candidatesBeforeFilter: hits.length,
+      candidatesAfterFilter: cards.length,
+      filterAppliedBeforeRanking: false,
+    },
+    cards,
+    sourceRefs,
+    promptPacket,
+    payloadTruncated,
+    maxPayloadBytes: payloadBudget,
+    payloadBytes,
+    safeNextCommand: null,
+  };
+}
+
+export async function buildAgenticRagContextLive(args, deps = {}) {
+  const asFallback = (liveRetrieval) => {
+    const fallback = buildAgenticRagContext(args);
+    return { ...fallback, liveRetrieval, warnings: [...(fallback.warnings ?? []), 'LIVE_RETRIEVAL_UNAVAILABLE'] };
+  };
+  if (LIVE_CONTEXT_DISABLED || deps.disableLive) return asFallback({ attempted: false, failure: 'LIVE_DISABLED' });
+  try {
+    return await buildLiveAtlasContext(args, deps);
+  } catch (error) {
+    return asFallback({ attempted: true, failure: error.code ?? 'LIVE_FAILED', message: String(error.message ?? '').slice(0, 200) });
+  }
+}
+
 function buildRecommendation({
   intent,
   domain,
@@ -1286,7 +1510,7 @@ async function dispatch(method, params, id) {
     try {
       let result;
       if (name === 'classify_intent') result = classifyIntent(args);
-      else if (name === 'build_agentic_rag_context') result = buildAgenticRagContext(args);
+      else if (name === 'build_agentic_rag_context') result = await buildAgenticRagContextLive(args);
       else if (name === 'build_recommendation') result = buildRecommendation(args);
       else if (name === 'record_outcome') result = await recordOutcome(args);
       else if (name === 'find_dependencies') result = await findDependencies(args);
