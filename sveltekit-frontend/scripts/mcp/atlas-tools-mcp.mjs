@@ -949,7 +949,10 @@ export async function buildLiveAtlasContext(
     const packetKeys = [...new Set(packets.map((p) => p.packet_key).filter(Boolean))];
     const identityBound = packetKeys.length === 1;
     const identityConflict = packetKeys.length > 1;
-    const sourceRevisionKnown = packets.some((p) => p.sha256);
+    const sourceRevisionKnown = packets.some((p) =>
+      typeof (p.source_revision ?? p.sourceRevision) === 'string' &&
+      (p.source_revision ?? p.sourceRevision).trim().length > 0,
+    );
     const rejectionReasons = [
       'NON_CANONICAL',
       ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
@@ -1002,6 +1005,8 @@ export async function buildLiveAtlasContext(
   const unbound = cards.filter((c) => !c.identityBound).length;
   return {
     ok: true,
+    canonicalAuthority: false,
+    writesPerformed: false,
     query: queryText,
     totalCards: cards.length,
     signalSummary: { pagerank: null, summary: `Live ranked search: ${hits.length} chunk hits over ${files.length} files`, lexical: [], centroid: null, reranker: null },

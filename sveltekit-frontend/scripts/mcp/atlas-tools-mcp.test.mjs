@@ -174,11 +174,18 @@ function withPacketCwd(mutate, run) {
   fs.writeFileSync(path.join(dir, '.opencode', 'ace-packet.json'), JSON.stringify(packet));
   const previous = process.cwd();
   process.chdir(dir);
+  let result;
   try {
-    return run();
-  } finally {
+    result = run();
+  } catch (error) {
     process.chdir(previous);
+    throw error;
   }
+  if (result && typeof result.then === 'function') {
+    return result.finally(() => process.chdir(previous));
+  }
+  process.chdir(previous);
+  return result;
 }
 
 test('atlas_context states that its candidate set is a fixed packet, not query-specific retrieval', () => {
@@ -276,8 +283,18 @@ test('a failed identity lookup leaves that card unbound but keeps it; a missing 
   assert.equal(result.contextSource.identityBoundCount, 0);
 });
 
-test('a packet with a sha256 is the only thing that removes MISSING_SOURCE_REVISION, and proofUsable still stays false', async () => {
+test('a packet content checksum does not satisfy source revision, and proofUsable stays false', async () => {
   const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [packet('packet:aaa', 'src/a.ts', 'abc123')] }) });
+  const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
+  assert.ok(result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
+  assert.equal(result.cards[0].proofUsable, false);
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
+});
+
+test('only an explicit source revision field removes MISSING_SOURCE_REVISION', async () => {
+  const sourcePacket = { ...packet('packet:aaa', 'src/a.ts', 'abc123'), source_revision: 'sha256:source-v1' };
+  const trace = fakeTrace({ 'atlas.query': () => [hit('c1', 'src/a.ts', 0.5)], 'atlas.packet_search': () => ({ packets: [sourcePacket] }) });
   const result = await buildLiveAtlasContext({ query: 'q' }, { trace });
   assert.ok(!result.cards[0].rejectionReasons.includes('MISSING_SOURCE_REVISION'));
   assert.equal(result.cards[0].proofUsable, false);
