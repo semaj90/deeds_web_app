@@ -790,6 +790,25 @@ export function buildAgenticRagContext({
       : 'unknown',
     revisionStatus,
     freshnessStatus,
+    // The cards come from ONE static reconciliation packet on disk, rescored against the query text; the
+    // candidate set is not retrieved per query (KERNEL-REAL-01B). Say so in the result itself.
+    querySpecific: false,
+    candidateSetBasis: 'FIXED_PACKET_CARDS',
+    contextSource: {
+      kind: 'STATIC_PACKET_FILE',
+      packetKind: packet.packetKind ?? null,
+      packetId: packet.acePacketId ?? null,
+      packetPath: path.relative(root, packetPath).replace(/\\/g, '/'),
+      createdAt: packetCreatedAt,
+      expiresInSeconds: Number.isFinite(packetExpiresInSeconds) ? packetExpiresInSeconds : null,
+      expired: packetExpired,
+      workspaceRevision: packetWorkspaceRevision,
+    },
+    warnings: [
+      'NO_QUERY_SPECIFIC_RETRIEVAL',
+      ...(packetExpired ? ['PACKET_EXPIRED'] : []),
+      ...(packetSourceRevision ? [] : ['MISSING_SOURCE_REVISION']),
+    ],
     admissionStatus: packetAdmissionStatus,
     retrievalAdmission,
     retrievalRouting: {

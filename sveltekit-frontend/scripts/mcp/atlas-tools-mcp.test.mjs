@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { buildAgenticRagContext, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
 
 const ROOT = 'C:/Users/james/Videos/deeds-web-app';
 
@@ -159,4 +162,46 @@ test('a symbol name is reported as TARGET_NOT_A_PATH, not as a missing file', as
   assert.equal(result.lookup.failure, 'TARGET_NOT_A_PATH');
   const missing = await findDependencies({ target: 'src/not-there.ts' }, { driver: fakeDriver([[], []]) });
   assert.equal(missing.lookup.failure, 'PROJECTION_MISSING_FILE');
+});
+
+const REAL_PACKET = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../../../reports/semantic-contracts/reconciliation-ace-packet.json');
+
+function withPacketCwd(mutate, run) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-ctx-'));
+  const packet = JSON.parse(fs.readFileSync(REAL_PACKET, 'utf8'));
+  mutate(packet);
+  fs.mkdirSync(path.join(dir, '.opencode'));
+  fs.writeFileSync(path.join(dir, '.opencode', 'ace-packet.json'), JSON.stringify(packet));
+  const previous = process.cwd();
+  process.chdir(dir);
+  try {
+    return run();
+  } finally {
+    process.chdir(previous);
+  }
+}
+
+test('atlas_context states that its candidate set is a fixed packet, not query-specific retrieval', () => {
+  const result = withPacketCwd(() => {}, () => buildAgenticRagContext({ query: 'anything at all', maxCards: 5 }));
+  assert.equal(result.ok, true);
+  assert.equal(result.querySpecific, false);
+  assert.equal(result.candidateSetBasis, 'FIXED_PACKET_CARDS');
+  assert.equal(result.contextSource.kind, 'STATIC_PACKET_FILE');
+  assert.equal(result.contextSource.packetPath, '.opencode/ace-packet.json');
+  assert.ok(result.warnings.includes('NO_QUERY_SPECIFIC_RETRIEVAL'));
+});
+
+test('an expired packet is flagged in contextSource and warnings, a fresh one is not', () => {
+  const expired = withPacketCwd((p) => { p.createdAt = '2020-01-01T00:00:00.000Z'; p.expiresInSeconds = 60; }, () => buildAgenticRagContext({ query: 'x' }));
+  assert.equal(expired.contextSource.expired, true);
+  assert.ok(expired.warnings.includes('PACKET_EXPIRED'));
+  const fresh = withPacketCwd((p) => { p.createdAt = new Date().toISOString(); p.expiresInSeconds = 3600; }, () => buildAgenticRagContext({ query: 'x' }));
+  assert.equal(fresh.contextSource.expired, false);
+  assert.ok(!fresh.warnings.includes('PACKET_EXPIRED'));
+  assert.equal(fresh.querySpecific, false, 'a fresh packet is still not query-specific');
+});
+
+test('a missing source revision is surfaced as a warning', () => {
+  const result = withPacketCwd((p) => { delete p.sourceRevision; delete p.source_revision; if (p.sourceArtifact && typeof p.sourceArtifact === 'object') delete p.sourceArtifact.sourceRevision; }, () => buildAgenticRagContext({ query: 'x' }));
+  assert.ok(result.warnings.includes('MISSING_SOURCE_REVISION'));
 });

@@ -17,12 +17,12 @@ const SERVER_INFO = { name: 'atlas-task-kernel', version: '1.0.0' };
 const INTERNAL_CALL_TIMEOUT_MS = 55_000;
 
 const TOOLS = [
-  { name: 'atlas_context', description: 'Build a bounded canonicalized Atlas context packet. Cache and retrieval implementations remain internal.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 50 }, domainFilter: { type: 'string' } }, required: ['query'], additionalProperties: false } },
+  { name: 'atlas_context', description: 'Return the current Atlas reconciliation context packet rescored against the query. Not query-specific retrieval; non-canonical diagnostics (see querySpecific and warnings).', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 50 }, domainFilter: { type: 'string' } }, required: ['query'], additionalProperties: false } },
   { name: 'atlas_inspect', description: 'Inspect canonical source references relevant to a bounded query.', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], additionalProperties: false } },
   { name: 'atlas_expand', description: 'Expand read-only structural dependencies for one target.', inputSchema: { type: 'object', properties: { target: { type: 'string' } }, required: ['target'], additionalProperties: false } },
   { name: 'atlas_verify', description: 'Classify a task and return a safe evidence-gathering direction without editing or executing work.', inputSchema: { type: 'object', properties: { prompt: { type: 'string' }, context: { type: 'string' } }, required: ['prompt'], additionalProperties: false } },
   { name: 'atlas_validate_plan', description: 'Validate a proposed plan; it cannot authorize execution.', inputSchema: { type: 'object', properties: { intent: { type: 'string' }, domain: { type: 'string' }, errorSummary: { type: 'string' }, evidenceLines: { type: 'array', items: { type: 'string' } }, patchTargets: { type: 'array', items: { type: 'string' } }, proposedFix: { type: 'string' } }, required: ['intent', 'domain', 'errorSummary', 'evidenceLines', 'patchTargets'], additionalProperties: false } },
-  { name: 'atlas_research', description: 'Run one bounded, read-only research circuit through Atlas context selection. It never exposes arbitrary Python or storage operations.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 32 }, maxRounds: { type: 'number', minimum: 1, maximum: 3 } }, required: ['query'], additionalProperties: false } },
+  { name: 'atlas_research', description: 'Run one round of atlas_context selection, read-only. maxRounds is not applied here; multi-round research is the separate ldr-research server.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 32 }, maxRounds: { type: 'number', minimum: 1, maximum: 3 } }, required: ['query'], additionalProperties: false } },
 ];
 
 const IMPLEMENTATIONS = {
@@ -108,6 +108,9 @@ async function dispatch(method, params) {
       schema: 'atlas.local-research-mcp-result.v1',
       query: params?.arguments?.query,
       maxRounds: params?.arguments?.maxRounds ?? 3,
+      // maxRounds is echoed for compatibility but never applied: exactly one atlas_context round runs.
+      maxRoundsApplied: false,
+      roundsExecuted: 1,
       maxCards: params?.arguments?.maxCards ?? 32,
       backend: 'atlas-task-kernel',
       ldrToolServer: 'ldr-research',
