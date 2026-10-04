@@ -46,7 +46,7 @@ export const GPU_WORKLOAD_PROFILES_V1: Readonly<Record<GpuWorkloadIdV1, GpuWorkl
     measuredNeedMiB: 512,
     minimumFreeMiB: 1024,
     evidence: 'MEASURED',
-    evidenceNote: '2026-10-04 synthetic runs: +~200 MiB at 5,000 x 768 (K=32) and +~330 MiB at 20,000 x 768 (K=64) over a ~1.3 GiB desktop baseline, rounded up to 512. Real semantic_768 (5,000 rows, K=64, 19 iterations): +252 MiB over the run's own minimum (peak 1,745 MiB total), consistent with 512; 20k+ real rows not yet measured.',
+    evidenceNote: '2026-10-04 synthetic runs: +~200 MiB at 5,000 x 768 (K=32) and +~330 MiB at 20,000 x 768 (K=64) over a ~1.3 GiB desktop baseline, rounded up to 512. Real semantic_768 (5,000 rows, K=64, 19 iterations): +252 MiB over the run's own minimum (peak 1,745 MiB total), consistent with 512; 20,000 real rows (K=64, 29 iterations): +391 MiB (peak 1,968 MiB total), still inside 512. 55k+ real rows not measured.',
   },
   CUVS_KMEANS_CORPUS: {
     id: 'CUVS_KMEANS_CORPUS',
