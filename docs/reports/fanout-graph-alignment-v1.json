@@ -1,0 +1,4866 @@
+{
+ "schema": "atlas.fanout-graph-alignment.v1",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "gpuExecuted": false,
+ "sourceAudit": {
+  "path": "/mnt/c/Users/james/AppData/Local/Temp/fanout-capability-audit-v1.json",
+  "schema": "atlas.fanout-capability-audit.v1",
+  "sha256": "sha256:f1b7f8419c69d82a5028277e82c9aebd978f3e00e35d2fad2f723b10995306b3",
+  "capabilities": 29
+ },
+ "networkxVersion": "3.6.1",
+ "caveats": [
+  "A1 weights come from matchedFiles, which the source audit truncates (max 40 per capability against referenceFileCount); weights are biased samples of co-location, not lineage.",
+  "A2 edges are the declared stage order, a plan topology; PageRank over it measures that topology, not observed dependence.",
+  "B accelerator edges are proposals; no GPU kernel ran here and no lane is proven by this receipt.",
+  "NetworkX and the repo reference agreeing on a graph proves arithmetic parity only, not that the graph is meaningful."
+ ],
+ "colocationMatchedFilesExcludedAsTestOrDocumentation": 420,
+ "stageOrder": [
+  "CLASSIFICATION",
+  "ROUTING",
+  "FEATURE_EXTRACTION",
+  "EXPANSION",
+  "PROMOTION",
+  "CACHE"
+ ],
+ "stageOrderBasis": "operator plan: classify -> route -> seeds -> expand -> promote -> ACE/cache (illustrative, not observed)",
+ "stageMembership": {
+  "CLASSIFICATION": [
+   "domain_classifier",
+   "query_shape",
+   "retrieval_intent",
+   "task_intent"
+  ],
+  "ROUTING": [
+   "centroid",
+   "cuvs",
+   "kmeans",
+   "mcp"
+  ],
+  "FEATURE_EXTRACTION": [
+   "ast_grep",
+   "entity",
+   "lexical_exact",
+   "lexical_fts",
+   "lexical_trigram",
+   "pca",
+   "pos",
+   "semantic_768",
+   "simdjson",
+   "svd",
+   "umap"
+  ],
+  "EXPANSION": [
+   "cugraph",
+   "graphify",
+   "ontology",
+   "packet_incidence",
+   "searxng"
+  ],
+  "PROMOTION": [
+   "ace_packet",
+   "context_manifest"
+  ],
+  "CACHE": [
+   "bifrost",
+   "bitfrost",
+   "redis_valkey"
+  ]
+ },
+ "unstagedCapabilities": [],
+ "graphs": {
+  "A1_colocation": {
+   "analysis": {
+    "nodeCount": 29,
+    "edgeCount": 454,
+    "isDag": false,
+    "weaklyConnectedComponents": 4,
+    "pagerankMaxAbsDelta_networkx_vs_reference": 1.2278789096598075e-12,
+    "pagerankTop5Overlap": 5,
+    "pagerankKendallTau": 1.0,
+    "pagerankTop5_networkx": [
+     [
+      "cugraph",
+      0.062075
+     ],
+     [
+      "ast_grep",
+      0.056998
+     ],
+     [
+      "lexical_trigram",
+      0.055829
+     ],
+     [
+      "pca",
+      0.055511
+     ],
+     [
+      "domain_classifier",
+      0.053855
+     ]
+    ],
+    "pagerankTop5_reference": [
+     [
+      "cugraph",
+      0.062075
+     ],
+     [
+      "ast_grep",
+      0.056998
+     ],
+     [
+      "lexical_trigram",
+      0.055829
+     ],
+     [
+      "pca",
+      0.055511
+     ],
+     [
+      "domain_classifier",
+      0.053855
+     ]
+    ]
+   },
+   "checksum": "sha256:86560de0a30bbc14b31b3f718fe73319d29d44172d591a54da1d49213e9ab875"
+  },
+  "A2_declared_stage_dag": {
+   "analysis": {
+    "nodeCount": 29,
+    "edgeCount": 131,
+    "isDag": true,
+    "weaklyConnectedComponents": 1,
+    "pagerankMaxAbsDelta_networkx_vs_reference": 1.2201073484874314e-12,
+    "pagerankTop5Overlap": 5,
+    "pagerankKendallTau": 1.0,
+    "pagerankTop5_networkx": [
+     [
+      "ace_packet",
+      0.10889
+     ],
+     [
+      "context_manifest",
+      0.10889
+     ],
+     [
+      "bifrost",
+      0.073324
+     ],
+     [
+      "bitfrost",
+      0.073324
+     ],
+     [
+      "redis_valkey",
+      0.073324
+     ]
+    ],
+    "pagerankTop5_reference": [
+     [
+      "ace_packet",
+      0.10889
+     ],
+     [
+      "context_manifest",
+      0.10889
+     ],
+     [
+      "bifrost",
+      0.073324
+     ],
+     [
+      "bitfrost",
+      0.073324
+     ],
+     [
+      "redis_valkey",
+      0.073324
+     ]
+    ]
+   },
+   "checksum": "sha256:7cc94202e3d92595c96f5d80ee764b046ef7f6187e2b2b48c0c37184ffecc76c"
+  },
+  "B_accelerator_alignment": {
+   "analysis": {
+    "nodeCount": 35,
+    "edgeCount": 148,
+    "isDag": true,
+    "weaklyConnectedComponents": 1,
+    "pagerankMaxAbsDelta_networkx_vs_reference": 1.0220366220003996e-12,
+    "pagerankTop5Overlap": 5,
+    "pagerankKendallTau": 1.0,
+    "pagerankTop5_networkx": [
+     [
+      "ace_packet",
+      0.074546
+     ],
+     [
+      "context_manifest",
+      0.074546
+     ],
+     [
+      "lane:CUGRAPH",
+      0.057289
+     ],
+     [
+      "lane:SIMT_CUB_CUTILE",
+      0.047777
+     ],
+     [
+      "lane:SIMDJSON_CPU_SIMD",
+      0.046861
+     ]
+    ],
+    "pagerankTop5_reference": [
+     [
+      "ace_packet",
+      0.074546
+     ],
+     [
+      "context_manifest",
+      0.074546
+     ],
+     [
+      "lane:CUGRAPH",
+      0.057289
+     ],
+     [
+      "lane:SIMT_CUB_CUTILE",
+      0.047777
+     ],
+     [
+      "lane:SIMDJSON_CPU_SIMD",
+      0.046861
+     ]
+    ]
+   },
+   "checksum": "sha256:6d8781f935f536a93ee29041cd0c5fc986dc83195516915bd12cc69321fc66dd",
+   "copiedFrom": "A2_declared_stage_dag"
+  }
+ },
+ "accelerator": {
+  "lanes": {
+   "CUVS": "cuVS ANN and KMeans executor (WSL atlas-rapids-cu13)",
+   "CUGRAPH": "cuGraph PageRank/BFS (parity oracle: NetworkX)",
+   "RTX_CUBLASLT_LIBTORCH": "cuBLASLt / LibTorch dense scoring via tensorrt_bridge.node",
+   "RAPIDS_CUML_CUDF": "RAPIDS cuML/cuDF tabular and decomposition",
+   "SIMDJSON_CPU_SIMD": "simdjson AVX2/SSE4.2 CPU SIMD JSON parsing (not GPU)",
+   "SIMT_CUB_CUTILE": "SIMT CUB radix / cuTile residency key kernels"
+  },
+  "knownStateQuotedFromRepoDocs": {
+   "CUVS": "CAGRA recall measured on semantic_768; run_cuvs_soft_kmeans fails on cuvs 26.6 until pairwise_distance is wrapped with cp.asarray",
+   "CUGRAPH": "NetworkX<->cuGraph PageRank+Louvain parity PASS on the 162,234-node snapshot (docs/reports/graph-snapshot-parity/receipt.json)",
+   "RTX_CUBLASLT_LIBTORCH": "tensorrt_bridge.node cu130 loads on RTX 3060 Ti sm_86; no parity/latency/VRAM proof exists for removal (LIBTORCH-PARITY-01)",
+   "RAPIDS_CUML_CUDF": "no owner confirmed by this script; every edge to it is an unverified proposal",
+   "SIMDJSON_CPU_SIMD": "native addon with V8 fallback; payloads under 1 KB bypass native",
+   "SIMT_CUB_CUTILE": "ladder L2 and L3 cuTile DRY_RUN_PROVEN, CUB half DRY_RUN_PROVEN; nothing production-promoted"
+  },
+  "alignment": [
+   {
+    "capability": "semantic_768",
+    "lane": "CUVS",
+    "basis": "cuVS = ANN",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "semantic_768",
+    "lane": "RTX_CUBLASLT_LIBTORCH",
+    "basis": "cuBLASLt = dense scoring",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "cuvs",
+    "lane": "CUVS",
+    "basis": "cuVS = ANN",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "kmeans",
+    "lane": "CUVS",
+    "basis": "KMeans executor is cuVS (run_cuvs_soft_kmeans)",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "centroid",
+    "lane": "CUVS",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "pca",
+    "lane": "RAPIDS_CUML_CUDF",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "svd",
+    "lane": "RAPIDS_CUML_CUDF",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "umap",
+    "lane": "RAPIDS_CUML_CUDF",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "graphify",
+    "lane": "CUGRAPH",
+    "basis": "cuGraph = PageRank/BFS",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "packet_incidence",
+    "lane": "CUGRAPH",
+    "basis": "cuGraph = PageRank/BFS",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "ontology",
+    "lane": "CUGRAPH",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "cugraph",
+    "lane": "CUGRAPH",
+    "basis": "cuGraph = PageRank/BFS",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "simdjson",
+    "lane": "SIMDJSON_CPU_SIMD",
+    "basis": "simdjson is CPU SIMD, not GPU",
+    "status": "RULE_BACKED_PROPOSAL"
+   },
+   {
+    "capability": "ace_packet",
+    "lane": "SIMDJSON_CPU_SIMD",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "context_manifest",
+    "lane": "SIMDJSON_CPU_SIMD",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "mcp",
+    "lane": "SIMDJSON_CPU_SIMD",
+    "basis": null,
+    "status": "UNVERIFIED_PROPOSAL"
+   },
+   {
+    "capability": "bitfrost",
+    "lane": "SIMT_CUB_CUTILE",
+    "basis": "CUB radix is a backend under ACE/BitFrost residency",
+    "status": "RULE_BACKED_PROPOSAL"
+   }
+  ],
+  "cpuOnlyOrUnaligned": [
+   "ast_grep",
+   "bifrost",
+   "domain_classifier",
+   "entity",
+   "lexical_exact",
+   "lexical_fts",
+   "lexical_trigram",
+   "pos",
+   "query_shape",
+   "redis_valkey",
+   "retrieval_intent",
+   "searxng",
+   "task_intent"
+  ],
+  "alignmentCapabilitiesNotInAudit": [],
+  "ruleBackedCount": 9,
+  "unverifiedCount": 8
+ },
+ "graphExports": {
+  "A1_edges": [
+   {
+    "src": "ace_packet",
+    "dst": "ast_grep",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "ace_packet",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bifrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "ace_packet",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bitfrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "ace_packet",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "centroid",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "ace_packet",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "context_manifest",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "ace_packet",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "cugraph",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "ace_packet",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "ace_packet",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "domain_classifier",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "ace_packet",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "graphify",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "ace_packet",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "kmeans",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "ace_packet",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "lexical_fts",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "ace_packet",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "lexical_trigram",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "ace_packet",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "ontology",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "ace_packet",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "pca",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "ace_packet",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "searxng",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "ace_packet",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "simdjson",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "ace_packet",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "svd",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "ace_packet",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "ast_grep",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "ast_grep",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "context_manifest",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "ast_grep",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "cugraph",
+    "weight": 16.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "ast_grep",
+    "weight": 16.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "cuvs",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "ast_grep",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "domain_classifier",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "ast_grep",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "graphify",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "ast_grep",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "kmeans",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "ast_grep",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "lexical_fts",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "ast_grep",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "lexical_trigram",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "ast_grep",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "ontology",
+    "weight": 11.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "ast_grep",
+    "weight": 11.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "pca",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "ast_grep",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "pos",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "ast_grep",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "ast_grep",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "semantic_768",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "ast_grep",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "simdjson",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "ast_grep",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "svd",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "ast_grep",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "bitfrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "bifrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "centroid",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "cugraph",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "domain_classifier",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "bifrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "graphify",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "kmeans",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "bifrost",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "lexical_fts",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "bifrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "lexical_trigram",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "bifrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "ontology",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "pca",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "redis_valkey",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "bifrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bifrost",
+    "dst": "simdjson",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "bifrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "centroid",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "context_manifest",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bitfrost",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "cugraph",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "domain_classifier",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "kmeans",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "bitfrost",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "lexical_trigram",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "ontology",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "bitfrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "pca",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "redis_valkey",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "bitfrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "searxng",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "bitfrost",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "bitfrost",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "cugraph",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "centroid",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "domain_classifier",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "graphify",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "centroid",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "kmeans",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "centroid",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_fts",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "centroid",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "redis_valkey",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "centroid",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "centroid",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "centroid",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "cugraph",
+    "weight": 13.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "context_manifest",
+    "weight": 13.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "cuvs",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "context_manifest",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "domain_classifier",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "context_manifest",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "graphify",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "context_manifest",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "kmeans",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "context_manifest",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "lexical_fts",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "context_manifest",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "lexical_trigram",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "context_manifest",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "ontology",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "context_manifest",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "pca",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "context_manifest",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "context_manifest",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "searxng",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "context_manifest",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "simdjson",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "context_manifest",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "svd",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "context_manifest",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "cuvs",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "cugraph",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "domain_classifier",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "cugraph",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "graphify",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "cugraph",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "kmeans",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "cugraph",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "lexical_fts",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "cugraph",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "lexical_trigram",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "cugraph",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "ontology",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "cugraph",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "pca",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "cugraph",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "cugraph",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "cugraph",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "simdjson",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "cugraph",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cugraph",
+    "dst": "svd",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "cugraph",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "domain_classifier",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "graphify",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "cuvs",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "kmeans",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "cuvs",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_fts",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "ontology",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "cuvs",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "simdjson",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "cuvs",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "cuvs",
+    "dst": "svd",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "cuvs",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "domain_classifier",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "kmeans",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "domain_classifier",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "lexical_fts",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "domain_classifier",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "lexical_trigram",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "domain_classifier",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "ontology",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "domain_classifier",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "pca",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "domain_classifier",
+    "weight": 9.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "pos",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "domain_classifier",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "query_shape",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "domain_classifier",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "searxng",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "domain_classifier",
+    "weight": 7.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "domain_classifier",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "simdjson",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "domain_classifier",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "svd",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "domain_classifier",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "umap",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "domain_classifier",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "kmeans",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "graphify",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "ontology",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "graphify",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "redis_valkey",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "graphify",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "graphify",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "simdjson",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "graphify",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "graphify",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_trigram",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "kmeans",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "ontology",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "kmeans",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pca",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "kmeans",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pos",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "kmeans",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "kmeans",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "simdjson",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "kmeans",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "kmeans",
+    "dst": "svd",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "kmeans",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "lexical_trigram",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "lexical_fts",
+    "weight": 12.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "ontology",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "lexical_fts",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "pca",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "lexical_fts",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "lexical_fts",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "query_shape",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "lexical_fts",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "redis_valkey",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "lexical_fts",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "searxng",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "lexical_fts",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "semantic_768",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "lexical_fts",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "simdjson",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "lexical_fts",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "svd",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "lexical_fts",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "umap",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "lexical_fts",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "ontology",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "lexical_trigram",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "pca",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "lexical_trigram",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "lexical_trigram",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "query_shape",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "lexical_trigram",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "searxng",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "lexical_trigram",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "lexical_trigram",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "simdjson",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "lexical_trigram",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "svd",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "lexical_trigram",
+    "weight": 8.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "pca",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "ontology",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "ontology",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "ontology",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "simdjson",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "ontology",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "ontology",
+    "dst": "svd",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "ontology",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "pos",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "packet_incidence",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "query_shape",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "packet_incidence",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "packet_incidence",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "task_intent",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "packet_incidence",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "pos",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "pca",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "query_shape",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "pca",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "searxng",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "pca",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "simdjson",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "pca",
+    "weight": 10.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "svd",
+    "weight": 18.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "pca",
+    "weight": 18.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pca",
+    "dst": "umap",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "pca",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "query_shape",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "pos",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "searxng",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "pos",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "simdjson",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "pos",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "svd",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "pos",
+    "weight": 4.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "task_intent",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "pos",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "pos",
+    "dst": "umap",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "pos",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "query_shape",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "svd",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "query_shape",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "task_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "query_shape",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "query_shape",
+    "dst": "umap",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "query_shape",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "redis_valkey",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "redis_valkey",
+    "dst": "semantic_768",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "redis_valkey",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "task_intent",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "retrieval_intent",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "retrieval_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "semantic_768",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "simdjson",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "searxng",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "svd",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "searxng",
+    "weight": 5.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "task_intent",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "searxng",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "searxng",
+    "dst": "umap",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "searxng",
+    "weight": 3.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "svd",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "simdjson",
+    "weight": 6.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "simdjson",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "task_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "svd",
+    "dst": "umap",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "svd",
+    "weight": 2.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "task_intent",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   },
+   {
+    "src": "umap",
+    "dst": "task_intent",
+    "weight": 1.0,
+    "edgeKind": "COLOCATION"
+   }
+  ],
+  "A2_edges": [
+   {
+    "src": "domain_classifier",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cugraph",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cugraph",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "graphify",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "graphify",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ontology",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ontology",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "searxng",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "searxng",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   }
+  ],
+  "B_nodes": [
+   "ace_packet",
+   "ast_grep",
+   "bifrost",
+   "bitfrost",
+   "centroid",
+   "context_manifest",
+   "cugraph",
+   "cuvs",
+   "domain_classifier",
+   "entity",
+   "graphify",
+   "kmeans",
+   "lexical_exact",
+   "lexical_fts",
+   "lexical_trigram",
+   "mcp",
+   "ontology",
+   "packet_incidence",
+   "pca",
+   "pos",
+   "query_shape",
+   "redis_valkey",
+   "retrieval_intent",
+   "searxng",
+   "semantic_768",
+   "simdjson",
+   "svd",
+   "task_intent",
+   "umap",
+   "lane:CUGRAPH",
+   "lane:CUVS",
+   "lane:RAPIDS_CUML_CUDF",
+   "lane:RTX_CUBLASLT_LIBTORCH",
+   "lane:SIMDJSON_CPU_SIMD",
+   "lane:SIMT_CUB_CUTILE"
+  ],
+  "B_edges": [
+   {
+    "src": "domain_classifier",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "domain_classifier",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "query_shape",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "retrieval_intent",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "centroid",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "cuvs",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "kmeans",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "task_intent",
+    "dst": "mcp",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "centroid",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cuvs",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "kmeans",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "ast_grep",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "entity",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_exact",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_fts",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "lexical_trigram",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "pca",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "pos",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "semantic_768",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "simdjson",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "svd",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "mcp",
+    "dst": "umap",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ast_grep",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "entity",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_exact",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_fts",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "lexical_trigram",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pca",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "pos",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "simdjson",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "svd",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "cugraph",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "graphify",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "ontology",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "packet_incidence",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "umap",
+    "dst": "searxng",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cugraph",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "cugraph",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "graphify",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "graphify",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ontology",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ontology",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "searxng",
+    "dst": "ace_packet",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "searxng",
+    "dst": "context_manifest",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bifrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "bitfrost",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "redis_valkey",
+    "weight": 1.0,
+    "edgeKind": "DECLARED_STAGE_ORDER"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "lane:CUVS",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "semantic_768",
+    "dst": "lane:RTX_CUBLASLT_LIBTORCH",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "cuvs",
+    "dst": "lane:CUVS",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "kmeans",
+    "dst": "lane:CUVS",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "centroid",
+    "dst": "lane:CUVS",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "pca",
+    "dst": "lane:RAPIDS_CUML_CUDF",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "svd",
+    "dst": "lane:RAPIDS_CUML_CUDF",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "umap",
+    "dst": "lane:RAPIDS_CUML_CUDF",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "graphify",
+    "dst": "lane:CUGRAPH",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "packet_incidence",
+    "dst": "lane:CUGRAPH",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "ontology",
+    "dst": "lane:CUGRAPH",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "cugraph",
+    "dst": "lane:CUGRAPH",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "simdjson",
+    "dst": "lane:SIMDJSON_CPU_SIMD",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "ace_packet",
+    "dst": "lane:SIMDJSON_CPU_SIMD",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "context_manifest",
+    "dst": "lane:SIMDJSON_CPU_SIMD",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "mcp",
+    "dst": "lane:SIMDJSON_CPU_SIMD",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   },
+   {
+    "src": "bitfrost",
+    "dst": "lane:SIMT_CUB_CUTILE",
+    "weight": 1.0,
+    "edgeKind": "PROPOSED_ACCELERATOR_ALIGNMENT"
+   }
+  ]
+ },
+ "variadicProbeSummary": {
+  "probeRevision": "AST_GREP_VARIADIC_ARGS_V2",
+  "patterns": {
+   "routeQuery": "routeQuery($$$ARGS)",
+   "buildRetrievalPlan": "buildRetrievalPlan($$$ARGS)",
+   "selectMcpToolSubset": "selectMcpToolSubset($$$ARGS)",
+   "requestAcquisition": "requestAcquisition($$$ARGS)"
+  },
+  "results": {
+   "routeQuery": {
+    "total": 3,
+    "nonTest": [
+     "sveltekit-frontend/src/routes/api/sse/chat/+server.ts:1322",
+     "sveltekit-frontend/src/routes/api/ace/route/+server.ts:30",
+     "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts:1590"
+    ]
+   },
+   "buildRetrievalPlan": {
+    "total": 4,
+    "nonTest": [
+     "sveltekit-frontend/src/routes/api/search/hyperrag/+server.ts:102"
+    ]
+   },
+   "selectMcpToolSubset": {
+    "total": 1,
+    "nonTest": [
+     "sveltekit-frontend/src/mcp/server.ts:2093"
+    ]
+   },
+   "requestAcquisition": {
+    "total": 2,
+    "nonTest": [
+     "sveltekit-frontend/scripts/atlas/smoke-acquisition-mvp.mts:22",
+     "sveltekit-frontend/scripts/atlas/smoke-acquisition-mvp.mts:40"
+    ]
+   }
+  }
+ },
+ "receiptChecksum": "sha256:1fc35d04435eeacb478bb7e121c3caf9274ff71dec758da5fb34fdc5c97e3dd9"
+}
