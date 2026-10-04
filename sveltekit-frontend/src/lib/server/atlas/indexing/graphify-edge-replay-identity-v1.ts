@@ -4,21 +4,30 @@
  * Pure and DB-free. It does not write, does not own a table, and does not replace the surrogate `edge_id`; it derives the
  * SEMANTIC key a future unique arbiter would be built on, and classifies candidates that must stay outside the admitted
  * edge set. Layers (do not blur): graphify_edges = structural fact owner; PacketIncidenceLineageV1 = derived lineage
- * contract; HyperRAG = reader. Excluded from the key: edge_id, timestamps, confidence, evidenceRefs order, insertion order.
+ * contract; HyperRAG = reader.
+ *
+ * Edge identity != evidence identity. The key covers WHAT is asserted (endpoints, predicate, revisions, producer).
+ * Evidence (kind, span, confidence, refs) is carried separately and hashed into `evidenceChecksum`, so the same fact seen
+ * at several call sites is ONE logical edge with several evidence entries. Excluded from the key: edge_id, timestamps,
+ * confidence, evidence, insertion order.
  */
 import { createHash } from 'node:crypto';
 import type { GraphifyEdgeProjectionCandidateV1 } from './graphify-symbol-projection-v1.js';
 
-export const GRAPHIFY_EDGE_REPLAY_KEY_SCHEMA_V1 = 'atlas.graphify-edge-replay-key.v1' as const;
+export const GRAPHIFY_EDGE_REPLAY_KEY_SCHEMA_V1 = 'atlas.graphify-edge-replay-key.v2' as const;
 
 export type GraphifyEdgeAdmissionV1 =
   | 'ADMITTED'
   | 'UNRESOLVED_SOURCE'
   | 'UNRESOLVED_TARGET'
   | 'SOURCE_REVISION_UNBOUND'
-  | 'TARGET_REVISION_UNBOUND';
+  | 'TARGET_REVISION_UNBOUND'
+  | 'WORKSPACE_REVISION_MISMATCH'
+  | 'EVIDENCE_UNBOUND';
 
 export interface GraphifyEdgeReplayContextV1 {
+  /** The admitted workspace snapshot key (GraphRevisionSnapshotV1.workspaceRevisionKey); candidates must carry the same. */
+  workspaceRevisionKey: string;
   /** The one immutable graph snapshot these candidates belong to (GraphRevisionSnapshotV1.graphRevision). */
   graphRevision: string;
   producerRevision: string;
@@ -42,12 +51,32 @@ function canonicalJson(value: unknown): string {
   return JSON.stringify(value) ?? 'null';
 }
 
+export interface GraphifyEdgeEvidenceEntryV1 {
+  evidenceKind: string;
+  evidenceSpan: GraphifyEdgeProjectionCandidateV1['evidenceSpan'];
+  confidence: number;
+  evidenceRefs: string[];
+}
+
+export function evidenceEntryOfV1(edge: GraphifyEdgeProjectionCandidateV1): GraphifyEdgeEvidenceEntryV1 {
+  return {
+    evidenceKind: edge.evidenceKind,
+    evidenceSpan: edge.evidenceSpan,
+    confidence: edge.confidence,
+    evidenceRefs: [...new Set(edge.evidenceRefs)].sort(),
+  };
+}
+
+/** Checksum of an evidence SET: order- and duplicate-independent. */
+export function evidenceChecksumV1(entries: readonly GraphifyEdgeEvidenceEntryV1[]): string {
+  const unique = new Map(entries.map((e) => [canonicalJson(e), e]));
+  return `sha256:${sha256(canonicalJson([...unique.keys()].sort()))}`;
+}
+
 export interface GraphifyEdgeReplayVerdictV1 {
   admission: GraphifyEdgeAdmissionV1;
-  /** Present only when ADMITTED: `sha256:<hex>` over the canonical semantic tuple. */
+  /** Present only when ADMITTED: `sha256:<hex>` over the canonical semantic tuple (no evidence). */
   edgeKey: string | null;
-  /** Present only when ADMITTED: checksum of the non-key payload (confidence, evidence refs) for drift detection. */
-  payloadChecksum: string | null;
   targetSourceRevision: string | null;
 }
 
@@ -57,78 +86,106 @@ export function deriveGraphifyEdgeReplayVerdictV1(
   ctx: GraphifyEdgeReplayContextV1,
 ): GraphifyEdgeReplayVerdictV1 {
   const reject = (admission: GraphifyEdgeAdmissionV1, targetSourceRevision: string | null = null): GraphifyEdgeReplayVerdictV1 => ({
-    admission, edgeKey: null, payloadChecksum: null, targetSourceRevision,
+    admission, edgeKey: null, targetSourceRevision,
   });
-  if (!nonEmpty(ctx.graphRevision) || !nonEmpty(ctx.producerRevision)) throw new Error('GRAPHIFY_EDGE_REPLAY_CONTEXT_INVALID');
+  if (!nonEmpty(ctx.workspaceRevisionKey) || !nonEmpty(ctx.graphRevision) || !nonEmpty(ctx.producerRevision)) {
+    throw new Error('GRAPHIFY_EDGE_REPLAY_CONTEXT_INVALID');
+  }
   if (!nonEmpty(edge.subjectStableSymbolKey)) return reject('UNRESOLVED_SOURCE');
   if (!SHA256_REVISION.test(edge.sourceRevision)) return reject('SOURCE_REVISION_UNBOUND');
   const object = edge.objectStableSymbolKey?.trim() ? edge.objectStableSymbolKey : null;
   if (!object) return reject('UNRESOLVED_TARGET');
   const targetRevision = ctx.targetSourceRevisionOf?.(object) ?? null;
   if (!targetRevision || !SHA256_REVISION.test(targetRevision)) return reject('TARGET_REVISION_UNBOUND');
+  if (edge.workspaceRevision !== ctx.workspaceRevisionKey) return reject('WORKSPACE_REVISION_MISMATCH', targetRevision);
+  if (!edge.evidenceRefs.some(nonEmpty) && !(edge.evidenceSpan.endByte > edge.evidenceSpan.startByte)) return reject('EVIDENCE_UNBOUND', targetRevision);
 
   const tuple = {
     schema: GRAPHIFY_EDGE_REPLAY_KEY_SCHEMA_V1,
-    workspaceRevision: edge.workspaceRevision,
+    workspaceRevisionKey: ctx.workspaceRevisionKey,
     graphRevision: ctx.graphRevision,
     subject: edge.subjectStableSymbolKey,
     predicate: edge.predicate,
     object,
     sourceRevision: edge.sourceRevision,
     targetSourceRevision: targetRevision,
-    evidenceKind: edge.evidenceKind,
-    evidenceSpan: edge.evidenceSpan,
     producerRevision: ctx.producerRevision,
   };
-  return {
-    admission: 'ADMITTED',
-    edgeKey: `sha256:${sha256(canonicalJson(tuple))}`,
-    payloadChecksum: `sha256:${sha256(canonicalJson({ confidence: edge.confidence, evidenceRefs: [...new Set(edge.evidenceRefs)].sort() }))}`,
-    targetSourceRevision: targetRevision,
-  };
+  return { admission: 'ADMITTED', edgeKey: `sha256:${sha256(canonicalJson(tuple))}`, targetSourceRevision: targetRevision };
+}
+
+export interface GraphifyAdmittedEdgeV1 {
+  edgeKey: string;
+  subject: string;
+  predicate: string;
+  object: string;
+  sourceRevision: string;
+  targetSourceRevision: string;
+  /** Sorted, de-duplicated evidence entries for this logical edge (several call sites = one edge, many entries). */
+  evidence: GraphifyEdgeEvidenceEntryV1[];
+  evidenceChecksum: string;
 }
 
 export interface GraphifyEdgeReplayPlanV1 {
-  admitted: { edge: GraphifyEdgeProjectionCandidateV1; edgeKey: string; payloadChecksum: string; targetSourceRevision: string }[];
+  admitted: GraphifyAdmittedEdgeV1[];
   rejected: { edge: GraphifyEdgeProjectionCandidateV1; admission: Exclude<GraphifyEdgeAdmissionV1, 'ADMITTED'> }[];
-  /** Same edgeKey with a different payloadChecksum: a replay would silently change a fact, so it is surfaced, never merged. */
-  conflicts: { edgeKey: string; payloadChecksums: string[] }[];
-  counts: Record<GraphifyEdgeAdmissionV1, number> & { total: number; duplicatesCollapsed: number };
-  /** Order-independent: sha256 over the sorted admitted edge keys and their payload checksums. */
+  /**
+   * EDGE_KEY_COLLISION: the same key claims two different semantic tuples (a hash collision or a key-derivation bug).
+   * Never merged, never admitted.
+   */
+  collisions: { edgeKey: string }[];
+  counts: Record<GraphifyEdgeAdmissionV1, number> & { total: number; mergedEvidenceEntries: number; collisions: number };
+  /** Order-independent: sha256 over the sorted admitted edge keys and their evidence checksums. */
   planChecksum: string;
 }
 
-/** Plan a batch deterministically: input order never changes the admitted set, the conflicts or the planChecksum. */
+/** Plan a batch deterministically: input order never changes the admitted set, the evidence sets or the planChecksum. */
 export function planGraphifyEdgeReplayV1(
   edges: readonly GraphifyEdgeProjectionCandidateV1[],
   ctx: GraphifyEdgeReplayContextV1,
 ): GraphifyEdgeReplayPlanV1 {
-  const counts = { ADMITTED: 0, UNRESOLVED_SOURCE: 0, UNRESOLVED_TARGET: 0, SOURCE_REVISION_UNBOUND: 0, TARGET_REVISION_UNBOUND: 0, total: edges.length, duplicatesCollapsed: 0 };
-  const byKey = new Map<string, GraphifyEdgeReplayPlanV1['admitted'][number]>();
-  const payloadsByKey = new Map<string, Set<string>>();
+  const counts = {
+    ADMITTED: 0, UNRESOLVED_SOURCE: 0, UNRESOLVED_TARGET: 0, SOURCE_REVISION_UNBOUND: 0, TARGET_REVISION_UNBOUND: 0,
+    WORKSPACE_REVISION_MISMATCH: 0, EVIDENCE_UNBOUND: 0, total: edges.length, mergedEvidenceEntries: 0, collisions: 0,
+  };
+  const groups = new Map<string, { tuple: string; base: Omit<GraphifyAdmittedEdgeV1, 'evidence' | 'evidenceChecksum' | 'edgeKey'>; evidence: Map<string, GraphifyEdgeEvidenceEntryV1> }>();
+  const collided = new Set<string>();
   const rejected: GraphifyEdgeReplayPlanV1['rejected'] = [];
   for (const edge of edges) {
     const v = deriveGraphifyEdgeReplayVerdictV1(edge, ctx);
     counts[v.admission] += 1;
     if (v.admission !== 'ADMITTED') {
-      rejected.push({ edge, admission: v.admission });
+      rejected.push({ edge, admission: v.admission as Exclude<GraphifyEdgeAdmissionV1, 'ADMITTED'> });
       continue;
     }
-    const set = payloadsByKey.get(v.edgeKey!) ?? new Set<string>();
-    set.add(v.payloadChecksum!);
-    payloadsByKey.set(v.edgeKey!, set);
-    if (byKey.has(v.edgeKey!)) counts.duplicatesCollapsed += 1;
-    else byKey.set(v.edgeKey!, { edge, edgeKey: v.edgeKey!, payloadChecksum: v.payloadChecksum!, targetSourceRevision: v.targetSourceRevision! });
+    const tuple = canonicalJson([edge.subjectStableSymbolKey, edge.predicate, edge.objectStableSymbolKey, edge.sourceRevision, v.targetSourceRevision]);
+    const entry = evidenceEntryOfV1(edge);
+    const entryKey = canonicalJson(entry);
+    const existing = groups.get(v.edgeKey!);
+    if (!existing) {
+      groups.set(v.edgeKey!, {
+        tuple,
+        base: { subject: edge.subjectStableSymbolKey, predicate: edge.predicate, object: edge.objectStableSymbolKey!, sourceRevision: edge.sourceRevision, targetSourceRevision: v.targetSourceRevision! },
+        evidence: new Map([[entryKey, entry]]),
+      });
+    } else if (existing.tuple !== tuple) {
+      collided.add(v.edgeKey!);
+    } else if (existing.evidence.has(entryKey)) {
+      counts.mergedEvidenceEntries += 1;
+    } else {
+      existing.evidence.set(entryKey, entry);
+      counts.mergedEvidenceEntries += 1;
+    }
   }
-  const conflicts = [...payloadsByKey.entries()]
-    .filter(([, set]) => set.size > 1)
-    .map(([edgeKey, set]) => ({ edgeKey, payloadChecksums: [...set].sort() }))
+  counts.collisions = collided.size;
+  const admitted: GraphifyAdmittedEdgeV1[] = [...groups.entries()]
+    .filter(([key]) => !collided.has(key))
+    .map(([edgeKey, g]) => {
+      const evidence = [...g.evidence.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, e]) => e);
+      return { edgeKey, ...g.base, evidence, evidenceChecksum: evidenceChecksumV1(evidence) };
+    })
     .sort((a, b) => a.edgeKey.localeCompare(b.edgeKey));
-  const conflicted = new Set(conflicts.map((c) => c.edgeKey));
-  const admitted = [...byKey.values()].filter((a) => !conflicted.has(a.edgeKey)).sort((a, b) => a.edgeKey.localeCompare(b.edgeKey));
-  const planChecksum = `sha256:${sha256(canonicalJson({
-    admitted: admitted.map((a) => [a.edgeKey, a.payloadChecksum]),
-    conflicts,
-  }))}`;
-  return { admitted, rejected, conflicts, counts, planChecksum };
+  const collisions = [...collided].sort().map((edgeKey) => ({ edgeKey }));
+  const planChecksum = `sha256:${sha256(canonicalJson({ admitted: admitted.map((a) => [a.edgeKey, a.evidenceChecksum]), collisions }))}`;
+  return { admitted, rejected, collisions, counts, planChecksum };
 }
