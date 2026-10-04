@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// RANK-OPEN-TASKS-01: deterministic, read-only ranking of open Workboard tasks.
-// Advisory only: the score is a transparent heuristic, never proof, priority authority or a
-// task-state change. Reads the ledger and current tasks.md files; writes nothing.
+// RANK-OPEN-TASKS-01: deterministic, read-only advisory task ranking.
+// --retrieval-result ranks exactly the selector output; raw-ledger mode is legacy compatibility.
 //
-//   node scripts/atlas/rank-open-tasks-v1.mjs [--in ledger.json] [--limit 10] [--offset 0]
+//   node scripts/atlas/rank-open-tasks-v1.mjs --retrieval-result selected.json [--limit 10] [--offset 0]
+//   node scripts/atlas/rank-open-tasks-v1.mjs [--in ledger.json] [--limit 10] [--offset 0] [legacy]
 //        [--ordering-checksum sha256:..] [--include-waiting] [--include-write-gated]
 //        [--diversify-by-change] [--max-age-hours N] [--cohort file | --cohort-from-corpus task-cards.json] [--json]
 import { createHash } from 'node:crypto';
@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { bindCohortToLedgerV1, buildTaskCardCohortV1, locatorKey } from './lib/task-card-cohort-v1.mjs';
 
 export const RANK_SCHEMA = 'atlas.open-task-ranking.v1';
+export const TASK_CARD_RANK_SCHEMA = 'atlas.openspec-task-card-ranking.v1';
 const SAFE_MUTATION = new Set(['CODE_ONLY', 'READ_ONLY']);
 const THEMES = {
   nlp: /\bnlp\b|langextract|taxonom|ontolog|classif/i,
@@ -26,6 +27,52 @@ const THEMES = {
 const UNCHECKED = /^\s*[-*]\s*\[ \]/;
 
 const sha256 = (text) => `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
+const taskCardCandidateChecksum = (cards) => sha256(JSON.stringify(cards));
+
+/** Preserve the selector set; until revision-bound features exist, use only stable identity ordering. */
+export function rankSelectedOpenSpecTaskCardsV1(retrievalResult) {
+  if (retrievalResult?.schema !== 'atlas.openspec-task-retrieval-result.v1') throw new Error('TASK_CARD_RETRIEVAL_SCHEMA_UNSUPPORTED');
+  if (typeof retrievalResult.workspaceHead !== 'string' || !retrievalResult.workspaceHead
+    || typeof retrievalResult.taskPopulationRevision !== 'string' || !retrievalResult.taskPopulationRevision
+    || !Array.isArray(retrievalResult.cards)) throw new Error('TASK_CARD_RETRIEVAL_BINDING_MISSING');
+  if (retrievalResult.returnedCount !== retrievalResult.cards.length) throw new Error('TASK_CARD_RETRIEVAL_COUNT_MISMATCH');
+  const candidateChecksum = taskCardCandidateChecksum(retrievalResult.cards);
+  if (retrievalResult.candidateChecksum !== candidateChecksum) throw new Error('TASK_CARD_CANDIDATE_CHECKSUM_MISMATCH');
+
+  const ranked = retrievalResult.cards.map((card) => {
+    if (!card || typeof card.stableKey !== 'string' || !card.stableKey || typeof card.taskRevision !== 'string' || !card.taskRevision) {
+      throw new Error('TASK_CARD_RANK_IDENTITY_MISSING');
+    }
+    return { card, stableKey: card.stableKey, taskRevision: card.taskRevision };
+  });
+  ranked.sort((left, right) => left.stableKey.localeCompare(right.stableKey)
+    || left.taskRevision.localeCompare(right.taskRevision)
+    || JSON.stringify(left.card).localeCompare(JSON.stringify(right.card)));
+  const ordered = ranked.map((item, index) => ({
+    rank: index + 1,
+    stableKey: item.stableKey,
+    taskRevision: item.taskRevision,
+    score: {},
+    taskCard: item.card,
+    selected: false,
+    canonicalAuthority: false,
+  }));
+  return {
+    schema: TASK_CARD_RANK_SCHEMA,
+    inputSchema: retrievalResult.schema,
+    workspaceHead: retrievalResult.workspaceHead,
+    taskPopulationRevision: retrievalResult.taskPopulationRevision,
+    candidateChecksum,
+    rankingMode: 'NEUTRAL_IDENTITY_ORDER',
+    rankingFeatureBlocker: 'NO_REVISION_BOUND_TASKCARD_RANK_FEATURES',
+    candidateCount: retrievalResult.cards.length,
+    orderingChecksum: sha256(ordered.map((item) => `${item.stableKey}\0${item.taskRevision}`).join('\n')),
+    ranked: ordered,
+    canonicalAuthority: false,
+    selected: false,
+    writesPerformed: false,
+  };
+}
 
 /** Re-resolve the task's current line: the recorded line if it still matches, else a unique text match. */
 export function resolveCurrentLine(task, lines) {
@@ -44,11 +91,8 @@ export function resolveCurrentLine(task, lines) {
   return hits.length === 1 ? { line: hits[0], moved: true } : null;
 }
 
-/**
- * Pure ranking. `readLines(sourcePath)` returns the current lines of a tasks.md or null.
- * Returns { ranked, rejected, funnel, orderingChecksum, workboardRevision }.
- */
-export function rankOpenTasks(ledger, readLines, options = {}) {
+/** Legacy raw-ledger compatibility ranker. Prefer rankSelectedOpenSpecTaskCardsV1 for selected cards. */
+export function rankOpenTasksLegacyV1(ledger, readLines, options = {}) {
   const { includeWaiting = false, includeWriteGated = false, diversifyByChange = false } = options;
   const inventory = Array.isArray(ledger.taskInventory) ? ledger.taskInventory : [];
   const funnel = { inventory: inventory.length };
@@ -133,6 +177,9 @@ export function rankOpenTasks(ledger, readLines, options = {}) {
   };
 }
 
+/** @deprecated Legacy raw-ledger compatibility alias; new task-card flows must use the selector result API. */
+export const rankOpenTasks = rankOpenTasksLegacyV1;
+
 /** Page without drift: offset is valid only against the ordering it was issued for. */
 export function pageRanking(result, { offset = 0, limit = 10, orderingChecksum } = {}) {
   if (orderingChecksum && orderingChecksum !== result.orderingChecksum) {
@@ -155,6 +202,7 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const k = argv[i];
     if (k === '--in') a.in = argv[++i];
+    else if (k === '--retrieval-result') a.retrievalResultFile = argv[++i];
     else if (k === '--cohort') a.cohortFile = argv[++i];
     else if (k === '--cohort-from-corpus') a.cohortFromCorpus = argv[++i];
     else if (k === '--limit') a.limit = Number(argv[++i]);
@@ -174,6 +222,20 @@ function parseArgs(argv) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
+  if (args.retrievalResultFile) {
+    const retrievalResult = JSON.parse(readFileSync(resolve(args.retrievalResultFile), 'utf8'));
+    const result = rankSelectedOpenSpecTaskCardsV1(retrievalResult);
+    const page = pageRanking(result, args);
+    if (args.json) {
+      console.log(JSON.stringify({ ...result, ranked: undefined, page }, null, 2));
+      return;
+    }
+    console.error(`WARNING: advisory task-card ranker; ${result.candidateCount} selector candidates, no selection or writes.`);
+    console.log(`candidates ${result.candidateCount} ordering ${result.orderingChecksum.slice(0, 20)}`);
+    for (const item of page.items) console.log(`#${item.rank} ${item.stableKey}@${item.taskRevision}\n    ${String(item.taskCard.claim ?? '').replace(/\s+/g, ' ').slice(0, 230)}`);
+    console.log(`showing ${page.items.length} of ${page.total}; next offset ${page.nextOffset ?? 'none'}`);
+    return;
+  }
   const ledger = JSON.parse(readFileSync(resolve(args.in), 'utf8'));
   const ageHours = ledger.generatedAt ? (Date.now() - Date.parse(ledger.generatedAt)) / 3_600_000 : Infinity;
   if (args.maxAgeHours !== null && !(ageHours <= args.maxAgeHours)) {
@@ -194,13 +256,13 @@ function main() {
     const corpus = JSON.parse(readFileSync(resolve(args.cohortFromCorpus), 'utf8'));
     args.cohort = buildTaskCardCohortV1(corpus);
   }
-  const result = rankOpenTasks(ledger, readLines, args);
+  const result = rankOpenTasksLegacyV1(ledger, readLines, args);
   const page = pageRanking(result, args);
   if (args.json) {
     console.log(JSON.stringify({ ...result, ranked: undefined, rejected: result.rejected.length, page }, null, 2));
     return;
   }
-  console.error(`WARNING: advisory heuristic; ledger generated ${result.ledgerGeneratedAt} (${Number.isFinite(ageHours) ? ageHours.toFixed(0) : '?'} h old).`);
+  console.error(`WARNING: LEGACY raw-ledger compatibility ranker; advisory only. Ledger generated ${result.ledgerGeneratedAt} (${Number.isFinite(ageHours) ? ageHours.toFixed(0) : '?'} h old).`);
   console.log(`funnel ${JSON.stringify(result.funnel)} rejected ${result.rejected.length} ordering ${result.orderingChecksum.slice(0, 20)}`);
   for (const r of page.items) {
     console.log(`#${r.rank} P${r.score.priority} [${r.score.themes.join(',') || '-'}] ${r.changeId}:${r.line}${r.lineMoved ? ' (moved)' : ''} ${r.mutationClass}\n    ${r.text}`);

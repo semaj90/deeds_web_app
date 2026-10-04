@@ -119,6 +119,66 @@ export function phaseFromStdout(stdout) {
   }
 }
 
+export function parseRunnerArgs(argv) {
+  if (argv.length === 0) return { mode: 'FULL' };
+  if (argv[0] !== '--incremental' || argv[1] !== '--dry-run') {
+    throw new Error('USAGE: run-openspec-evidence-fabric-v1.mjs [--incremental --dry-run [--cards file] [--baseline file]]');
+  }
+
+  const options = { mode: 'INCREMENTAL_DRY_RUN', cards: null, baseline: null };
+  for (let index = 2; index < argv.length; index += 1) {
+    const flag = argv[index];
+    if (flag !== '--cards' && flag !== '--baseline') throw new Error(`UNSUPPORTED_INCREMENTAL_DRY_RUN_ARGUMENT:${flag}`);
+    const value = argv[index + 1];
+    if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE:${flag}`);
+    options[flag === '--cards' ? 'cards' : 'baseline'] = value;
+    index += 1;
+  }
+  return options;
+}
+
+function assertReadOnlyDirtySetReceipt(receipt) {
+  const phase = receipt?.phaseReceipt;
+  const writes = receipt?.writes;
+  if (receipt?.schema !== 'atlas.openspec-dirty-set-receipt.v1' || receipt.writesPerformed !== false) {
+    throw new Error('INCREMENTAL_DRY_RUN_RECEIPT_NOT_READ_ONLY');
+  }
+  if (phase?.phase !== 'EVF-05B_DIRTY_SET' || phase.writesPerformed !== false
+    || !('inputRevision' in phase) || !('outputRevision' in phase)
+    || !Number.isInteger(phase.dirtyCount) || !Number.isInteger(phase.skippedUnchangedCount)) {
+    throw new Error('INCREMENTAL_DRY_RUN_PHASE_RECEIPT_INVALID');
+  }
+  if (writes?.receipt !== null || writes?.snapshot !== null
+    || writes?.postgres !== 0 || writes?.qdrant !== 0 || writes?.valkey !== 0 || writes?.tasksMd !== 0) {
+    throw new Error('INCREMENTAL_DRY_RUN_WRITE_REPORTED');
+  }
+}
+
+async function runIncrementalDryRun(options) {
+  const script = path.join(ROOT, 'scripts', 'atlas', 'openspec-dirty-set-v1.mjs');
+  const args = [];
+  if (options.cards) args.push('--cards', path.resolve(ROOT, options.cards));
+  if (options.baseline) args.push('--baseline', path.resolve(ROOT, options.baseline));
+  const { stdout } = await execFileAsync(process.execPath, [script, ...args], {
+    cwd: ROOT,
+    env: { ...process.env, OPENSPEC_DIRTY_SET_OUTPUT: '' },
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+    windowsHide: true,
+  });
+  const dirtySetReceipt = JSON.parse(stdout);
+  assertReadOnlyDirtySetReceipt(dirtySetReceipt);
+  process.stdout.write(`${JSON.stringify({
+    schema: 'atlas.openspec-incremental-dry-run.v1',
+    status: 'DRY_RUN_COMPLETED',
+    mode: options.mode,
+    phaseReceipt: dirtySetReceipt.phaseReceipt,
+    dirtySetReceipt,
+    writesPerformed: false,
+    writes: { reports: 0, baseline: 0, postgres: 0, qdrant: 0, valkey: 0, tasksMd: 0 },
+  }, null, 2)}\n`);
+}
+
 async function runStage(stage, script, env) {
   const startedAt = new Date().toISOString();
   let result;
@@ -170,6 +230,11 @@ function stageConcurrency() {
 }
 
 async function main() {
+  const options = parseRunnerArgs(process.argv.slice(2));
+  if (options.mode === 'INCREMENTAL_DRY_RUN') {
+    await runIncrementalDryRun(options);
+    return;
+  }
   const maxConcurrentStages = stageConcurrency();
   const runToken = `${new Date().toISOString().replace(/\D/g, '').slice(0, 17)}-${process.pid}`;
   const censusRunDirectory = path.join(ROOT, 'docs', 'reports', 'openspec-evidence', `pipeline-${runToken}`);

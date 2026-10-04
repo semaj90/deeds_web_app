@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-evidence-migration-dry-run.v1",
-  "generatedAt": "2026-10-02T04:47:32.436Z",
+  "generatedAt": "2026-10-03T05:00:16.138Z",
   "status": "DESIGN_VALIDATED_UNAPPLIED",
   "mode": "READ_ONLY_STATIC_SQL_DRY_RUN",
   "migrations": [

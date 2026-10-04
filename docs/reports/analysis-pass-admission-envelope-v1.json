@@ -21,7 +21,7 @@
   "validation": {
     "focusedVitest": {
       "filesPassed": 3,
-      "testsPassed": 44,
+      "testsPassed": 45,
       "testsFailed": 0
     },
     "openSpecStrict": "PASS",

@@ -38,7 +38,7 @@ Concrete lane map
 - Qdrant is the semantic lookup mirror.
 - Postgres remains the canonical identity and provenance store.
 - `embeddinggemma` is the canonical embedding family, and `512` is the canonical embedding lane.
-- `384` is only a compact projection / routing lane when an explicit projection exists.
+- `embeddinggemma 768 mrl 512 256 128 latent256 latent128 latent64 needs updating from legacy stale 384` is only a compact projection / routing lane when an explicit projection exists.
 
 Caveman architecture (compiler pipeline)
 -------------------------------------------------

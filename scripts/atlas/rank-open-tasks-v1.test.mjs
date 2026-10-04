@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { pageRanking, rankOpenTasks, resolveCurrentLine } from './rank-open-tasks-v1.mjs';
+import { pageRanking, rankOpenTasks, rankOpenTasksLegacyV1, rankSelectedOpenSpecTaskCardsV1, resolveCurrentLine } from './rank-open-tasks-v1.mjs';
+import { selectOpenSpecTaskCardsV1 } from './lib/openspec-report-manifest-v1.mjs';
 
 const task = (over) => ({
   taskKey: `c:${over.line}`, stableKey: `sk-${over.n}`, change: 'c1', source: 'c1/tasks.md', line: over.line,
@@ -83,4 +84,56 @@ test('result is advisory and performs no writes', () => {
   const r = rankOpenTasks(ledger([]), read);
   assert.equal(r.advisory, true);
   assert.equal(r.writesPerformed, false);
+});
+
+test('task-card ranker preserves the selector candidate set and revision binding', () => {
+  const cards = [
+    { stableKey: 'zeta', taskRevision: 'rev-z', changeId: 'other', claim: 'plain work', retrievalState: 'CURRENT' },
+    { stableKey: 'alpha', taskRevision: 'rev-a', changeId: 'graph', claim: 'PageRank graph work', retrievalState: 'REVIEW_REQUIRED' },
+    { stableKey: 'waiting', taskRevision: 'rev-w', changeId: 'wait', claim: 'plain waiting', retrievalState: 'WAITING' },
+    { stableKey: 'history', taskRevision: 'rev-h', changeId: 'old', claim: 'plain history', retrievalState: 'HISTORICAL' },
+  ];
+  const retrievalResult = selectOpenSpecTaskCardsV1({
+    corpus: {
+      schema: 'atlas.openspec-task-triage-corpus.v1',
+      workspaceHead: 'head-1',
+      taskPopulationRevision: 'sha256:task-population-1',
+      retrievalPolicy: { defaultStates: ['CURRENT', 'WAITING', 'REVIEW_REQUIRED'], historyOnlyStates: ['HISTORICAL'] },
+      taskCardCorpus: { cards },
+    },
+  });
+  const ranked = rankSelectedOpenSpecTaskCardsV1(retrievalResult);
+  assert.deepEqual(ranked.ranked.map((item) => item.taskCard).sort((a, b) => a.stableKey.localeCompare(b.stableKey)),
+    retrievalResult.cards.slice().sort((a, b) => a.stableKey.localeCompare(b.stableKey)));
+  assert.equal(ranked.ranked.length, retrievalResult.returnedCount);
+  assert.equal(ranked.candidateChecksum, retrievalResult.candidateChecksum);
+  assert.equal(ranked.workspaceHead, retrievalResult.workspaceHead);
+  assert.equal(ranked.taskPopulationRevision, retrievalResult.taskPopulationRevision);
+  assert.equal(ranked.ranked[0].stableKey, 'alpha');
+  assert.equal(ranked.rankingMode, 'NEUTRAL_IDENTITY_ORDER');
+  assert.equal(ranked.rankingFeatureBlocker, 'NO_REVISION_BOUND_TASKCARD_RANK_FEATURES');
+  assert.ok(ranked.ranked.every((item) => Object.keys(item.score).length === 0));
+  assert.ok(ranked.ranked.every((item) => item.selected === false && item.canonicalAuthority === false));
+  assert.equal(ranked.selected, false);
+  assert.equal(ranked.canonicalAuthority, false);
+  assert.equal(ranked.writesPerformed, false);
+});
+
+test('task-card ranking rejects altered selector candidates and keeps legacy raw-ledger API explicit', () => {
+  const retrievalResult = selectOpenSpecTaskCardsV1({
+    corpus: {
+      schema: 'atlas.openspec-task-triage-corpus.v1',
+      workspaceHead: 'head-1',
+      taskPopulationRevision: 'sha256:task-population-1',
+      retrievalPolicy: { defaultStates: ['CURRENT'], historyOnlyStates: [] },
+      taskCardCorpus: { cards: [{ stableKey: 'one', taskRevision: 'rev-1', retrievalState: 'CURRENT', claim: 'plain' }] },
+    },
+  });
+  assert.throws(() => rankSelectedOpenSpecTaskCardsV1({ ...retrievalResult, cards: [] }), /TASK_CARD_RETRIEVAL_COUNT_MISMATCH/);
+  assert.throws(() => rankSelectedOpenSpecTaskCardsV1({
+    ...retrievalResult,
+    cards: [{ ...retrievalResult.cards[0], claim: 'tampered' }],
+  }), /TASK_CARD_CANDIDATE_CHECKSUM_MISMATCH/);
+  assert.equal(rankOpenTasks, rankOpenTasksLegacyV1);
+  assert.equal(rankOpenTasksLegacyV1(ledger([]), read).eligibilitySource, 'RAW_WORKBOARD_INVENTORY');
 });

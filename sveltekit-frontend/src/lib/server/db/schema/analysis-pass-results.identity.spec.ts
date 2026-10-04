@@ -305,6 +305,7 @@ describe('NLP staging cohort contract', () => {
 				sourceRef: `src/domain-${index}/file.ts`,
 				sourceRevision: index === 3 ? null : `sha256:source-${index}`,
 				workspaceRevision: 'sha256:workspace-cohort',
+				domainClass: index % 2 === 0 ? 'code' : 'documentation',
 				packetIdentityResolution: {
 					canonicalPacketKey: packetKey,
 					storagePacketKey: packetKey,
@@ -354,6 +355,12 @@ describe('NLP staging cohort contract', () => {
 		candidates[1] = { ...candidates[1], sourceRef: candidates[0].sourceRef };
 		expect(() => buildNlpStagingCohortV1({ ...cohortInput, candidates }))
 			.toThrow('NLP_STAGING_COHORT_DUPLICATE_LOGICAL_SOURCE');
+	});
+
+	it('rejects a cohort without mixed domain classes', () => {
+		const candidates = cohortInput.candidates.map((candidate) => ({ ...candidate, domainClass: 'code' }));
+		expect(() => buildNlpStagingCohortV1({ ...cohortInput, candidates }))
+			.toThrow('NLP_STAGING_COHORT_DOMAIN_DIVERSITY_REQUIRED');
 	});
 
 	it('rejects unresolved or mismatched packet identities', () => {

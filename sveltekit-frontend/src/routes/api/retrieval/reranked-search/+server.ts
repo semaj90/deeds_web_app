@@ -19,6 +19,7 @@ import { extractBM25Scores, extractQueryTerms, type BM25ScoreMap } from '$lib/se
 import { rerankerBlend, type QdrantResult, type RerankerCandidate } from '$lib/server/retrieval/reranker-blend';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
+import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 import fetch from 'node-fetch';
 
 const SearchRequestSchema = z.object({
@@ -49,31 +50,25 @@ interface SearchResponse {
 }
 
 /**
- * Embed query via Ollama
+ * Embed query using the existing unprompted recipe behind the shared contract.
  */
 async function embedQuery(query: string): Promise<number[]> {
   try {
-    const response = await fetch(`${ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434'}/api/embed`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: 'embeddinggemma',
-        input: query,
-        // Note: NOT requesting dimensions - Ollama returns native 768-dim for embeddinggemma
-        // Qdrant collection codebase_chunks_768 expects 768-dim vectors
-      }),
+    const result = await executeEmbeddingInputV1({
+      text: query,
+      mode: 'unprompted_legacy',
+      executor: async (prompt) => {
+        const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ model: 'embeddinggemma', input: prompt }),
+        });
+        if (!response.ok) throw new Error(`EMBEDDING_HTTP_${response.status}`);
+        const data = await response.json() as { embeddings?: unknown };
+        return Array.isArray(data.embeddings) ? data.embeddings[0] : undefined;
+      },
     });
-
-    if (!response.ok) {
-      throw new Error(`Embedding failed: ${response.status}`);
-    }
-
-    const result = (await response.json()) as { embeddings?: number[][] };
-    const embeddings = result.embeddings?.[0];
-    if (!Array.isArray(embeddings) || embeddings.length !== 768) {
-      throw new Error(`Invalid embedding dimension: expected 768, got ${embeddings?.length ?? 0}`);
-    }
-    return embeddings;
+    return result.embedding;
   } catch (err) {
     console.error('Embedding query failed:', err);
     return [];

@@ -30,6 +30,13 @@ describe('EmbeddingGemma task representation V1', () => {
     expect(encodeClassificationInput('debug qdrant').formattedText).toBe('task: classification | query: debug qdrant');
   });
 
+  it('binds source and formatted-input digests to the selected task prompt', () => {
+    const formatted = encodeRetrievalQuery(' find writer ');
+    expect(formatted.sourceTextDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(formatted.formattedTextChecksum).toMatch(/^[a-f0-9]{64}$/);
+    expect(formatted.formattedTextChecksum).not.toBe(formatted.sourceTextDigest);
+  });
+
   it('keeps task identity separate from dimension', () => {
     expect(embeddingGemmaTaskRepresentationIdV1('classification', 768)).toBe('classification_768');
     expect(embeddingGemmaTaskRepresentationIdV1('classification', 128)).toBe('classification_mrl_128');

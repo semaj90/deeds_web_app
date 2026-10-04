@@ -5,6 +5,7 @@
  * Excluded from identity: DB row ids, timestamps, Qdrant/Neo4j ids, insertion order, executor ids.
  */
 import { createHash } from 'node:crypto';
+import { z } from 'zod';
 
 export const PACKET_INCIDENCE_LINEAGE_SCHEMA_V1 = 'atlas.packet-incidence-lineage.v1' as const;
 
@@ -28,6 +29,27 @@ export interface PacketIncidenceLineageV1 extends PacketIncidenceIdentityV1 {
   inputChecksum: string;
   lineageChecksum: string;
 }
+
+const nonEmptyString = z.string().trim().min(1);
+const lineageDigest = z.string().regex(/^sha256:[0-9a-f]{64}$/i);
+
+export const PacketIncidenceLineageV1Schema = z.object({
+  schema: z.literal(PACKET_INCIDENCE_LINEAGE_SCHEMA_V1),
+  packetKey: nonEmptyString,
+  canonicalId: nonEmptyString,
+  sourceRevision: nonEmptyString,
+  neighborPacketKey: nonEmptyString,
+  neighborCanonicalId: nonEmptyString,
+  neighborSourceRevision: nonEmptyString,
+  edgeType: nonEmptyString,
+  workspaceRevision: nonEmptyString,
+  graphRevision: nonEmptyString,
+  producerId: nonEmptyString,
+  producerRevision: nonEmptyString,
+  evidenceRefs: z.array(nonEmptyString).min(1),
+  inputChecksum: lineageDigest,
+  lineageChecksum: lineageDigest,
+}).strict();
 
 export type PacketIncidenceProofV1 =
   | 'PACKET_A_RESOLVES'

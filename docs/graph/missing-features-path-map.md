@@ -53,7 +53,7 @@ flowchart LR
 - `sourceRef` = canonical source identity for traversals
 - `feature_id` = stable feature lane / registry identity
 - `alias_id` = cross-store alias for task / packet / profile reconciliation
-- `parent_atlas_card_id` = offline synthesis / card-level atlas identity
+- `parent_atlas_card_id` = offline synthesis using these or ornith 1.5? llama-server 8090? / card-level atlas identity
 - cluster aliases to treat as equivalent when reconciling Qdrant payloads:
   - `cluster_id`
   - `cluster_key`

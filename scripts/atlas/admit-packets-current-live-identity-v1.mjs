@@ -27,10 +27,10 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 import { sha256Of, CHECKSUM_RECIPE } from './lib/packet-source-revision-repair-v1.mjs';
+import { legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const limitArg = process.argv.find((a) => a.startsWith('--limit='));
@@ -62,11 +62,9 @@ for (const e of entries) {
 }
 
 // CURRENT_LIVE_IDENTITY recipe, confirmed live 2026-09-28.
-const computeLivePacketKey = (sourceRef) => `packet:${crypto.createHash('sha256').update(sourceRef).digest('hex').slice(0, 12)}`;
-
 const minted = entries.slice(0, Number.isFinite(LIMIT) ? LIMIT : entries.length).map((e) => ({
   ...e,
-  packetKey: computeLivePacketKey(e.sourceRef),
+  packetKey: legacyPacketKeyFromSourceRef(e.sourceRef),
 }));
 
 // Collision check: within the minted set itself.
@@ -110,7 +108,6 @@ try {
           workspace_revision_key, lineage_binding_checksum, content_hash,
           lineage_producer_revision, source_kind, workspace_revision, representation_revision)
        VALUES ($1,$1,$2,$2,$3,$4,$5,$6,$7,'repo_index',0,0)
-       ON CONFLICT (packet_key) DO NOTHING
        RETURNING packet_key`,
       [m.packetKey, m.sourceRef, m.sourceRevision, m.workspaceRevision, m.bindingChecksum, m.contentDigest, 'admit-packets-current-live-identity-v1'],
     );

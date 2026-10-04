@@ -67,7 +67,8 @@ export const HardwareProfileV1Schema = z.object({
 	compute_capability_major: z.number().int().nonnegative(),
 	compute_capability_minor: z.number().int().nonnegative(),
 	vram_total_bytes: z.number().int().positive(),
-	vram_source: z.enum(['cuda_runtime', 'nvml', 'nvidia_smi', 'bridge', 'unknown']),
+	vram_source: z.enum(['cuda_runtime', 'nvml', 'nvidia-smi', 'nvidia_smi', 'bridge', 'unknown'])
+		.transform((source) => source === 'nvidia_smi' ? 'nvidia-smi' : source),
 	driver_version: z.string().min(1).nullable().optional(),
 	cuda_runtime_version: z.string().min(1).nullable().optional(),
 	libtorch_version: z.string().min(1).nullable().optional(),

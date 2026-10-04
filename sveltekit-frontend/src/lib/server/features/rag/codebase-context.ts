@@ -25,6 +25,7 @@ import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
+import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 import {
   getCachedEmbedding,
   getCachedSearchResults,
@@ -271,20 +272,21 @@ async function embedQuery(text: string): Promise<number[]> {
     return cached;
   }
 
-  const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt, keep_alive: '24h' }),
-    signal: AbortSignal.timeout(15_000),
+  const embeddingFetch: typeof fetch = (input, init) => ollamaFetch(String(input), init);
+  const { embedding } = await executeProviderEmbeddingV1({
+    text: prompt,
+    mode: 'unprompted_legacy',
+    provider: {
+      provider: 'ollama',
+      baseUrl: ENV.OLLAMA_BASE_URL,
+      modelId: SERVER_EMBEDDING_MODEL,
+    },
+    timeoutMs: 15_000,
+    keepAlive: '24h',
+    fetchImpl: embeddingFetch,
   });
-
-  if (!res.ok) throw new Error(`Embedding failed: ${res.status}`);
-  const data = await res.json();
-  if (!isValidEmbedding(data.embedding)) {
-    throw new Error('Embedding response returned an invalid vector');
-  }
-  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, data.embedding).catch(() => {});
-  return data.embedding;
+  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding).catch(() => {});
+  return embedding;
 }
 
 async function searchQdrant(

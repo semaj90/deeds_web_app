@@ -1,0 +1,71 @@
+{
+  "schema": "atlas.report-artifact-manifest-corpus.v1",
+  "generatedAt": "2026-10-04T03:16:31.265Z",
+  "workspaceHead": "6f3eb416bf7ced4fe97688f0e9a6877d0b1f86f6",
+  "workspaceRevision": null,
+  "previousAudit": {
+    "generatedAt": null,
+    "auditHead": null,
+    "reusePolicy": "Reuse SHA-256 only when both size and modifiedAt exactly match the prior audited entry; this is a cache hit, not fresh checksum proof."
+  },
+  "summary": {
+    "artifactCount": 1,
+    "metadataOnlyFiles": 0,
+    "freshlyHashedBytes": 3775,
+    "cachedChecksumCount": 0,
+    "freshChecksumCount": 1,
+    "checksumReviewRequiredCount": 0,
+    "associatedTaskCount": 0,
+    "coldCandidateCount": 0,
+    "verifiedColdCopies": 1,
+    "archiveWrites": true,
+    "localSourcesRetained": true
+  },
+  "policy": {
+    "archiveNeedsCurrentReferencesReplaySensitivityCanonicalStatusAndReviewedSupersession": true,
+    "sizeAloneDoesNotQualify": true,
+    "canonicalAuthority": false,
+    "mutationAuthorized": false
+  },
+  "artifacts": [
+    {
+      "schema": "atlas.report-artifact-manifest.v1",
+      "artifactId": "docs/reports/playwright-config-roles-v1-20261003.md",
+      "sha256": "sha256:f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8",
+      "checksumState": "FRESH_SHA256",
+      "producer": null,
+      "producerRevision": null,
+      "sizeBytes": 3775,
+      "mediaType": "text/markdown",
+      "createdAt": null,
+      "modifiedAt": "2026-10-03T19:48:39.199Z",
+      "associatedTaskKeys": [],
+      "taskAssociationState": "NOT_JOINED",
+      "storageClass": "COLD_SEAWEEDFS",
+      "localDisposition": "RETAIN_LOCAL",
+      "replayRequired": null,
+      "replayReviewState": "UNASSESSED",
+      "sensitivityClass": "UNASSESSED",
+      "seaweedRef": "seaweedfs://atlas-archive/openspec-cold-canary/f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8/playwright-config-roles-v1-20261003.md",
+      "archiveCopyState": "COPY_READBACK_VERIFIED",
+      "archiveEligible": false
+    }
+  ],
+  "writesPerformed": true,
+  "canary": {
+    "gate": "COLD-MANIFEST-01",
+    "sourcePath": "docs/reports/playwright-config-roles-v1-20261003.md",
+    "sourceSha256": "sha256:f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8",
+    "sourceBytes": 3775,
+    "bucket": "atlas-archive",
+    "objectKey": "openspec-cold-canary/f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8/playwright-config-roles-v1-20261003.md",
+    "uploadEtag": "\"5d1b5937698b30ceb75b618aa4ac5f26\"",
+    "readbackSha256": "sha256:f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8",
+    "readbackBytes": 3775,
+    "utf8RoundTrip": true,
+    "workspaceHead": "6f3eb416bf7ced4fe97688f0e9a6877d0b1f86f6",
+    "sourceRetained": true,
+    "objectDeletionPerformed": false,
+    "canonicalAuthority": false
+  }
+}

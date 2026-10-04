@@ -18,7 +18,7 @@ The system MUST represent a successfully executed NLP pass as a candidate-only o
 
 #### Scenario: A bounded NLP cohort is frozen before execution
 - **WHEN** `buildNlpStagingCohortV1` receives a proposed cohort
-- **THEN** it accepts only sizes 8, 16, or 32, requires one exact workspace revision, resolved PacketKeyV2 identities, non-duplicate source references, and an explicit selection-policy revision.
+- **THEN** it accepts only sizes 8, 16, or 32, requires one exact workspace revision, resolved PacketKeyV2 identities, non-duplicate source references, at least two existing domain-class labels, and an explicit selection-policy revision.
 - **AND** it preserves missing source revisions as null with `REVISION_PARTIAL`, sorts packet references deterministically, and seals the cohort checksum.
 - **AND** freezing the contract performs no database, cache, projection, or GPU writes and does not execute NLP.
 

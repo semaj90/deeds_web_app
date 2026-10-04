@@ -9,7 +9,8 @@ import * as dotenv from 'dotenv';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env') });
 dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: true });
-const REPORT = resolve(ROOT, 'docs/reports/graph-revision-owner-v1.json');
+const reportArgument = process.argv.slice(2).find((argument) => argument.startsWith('--output='));
+const REPORT = resolve(ROOT, reportArgument?.slice('--output='.length) || 'docs/reports/graph-revision-owner-v1.json');
 const pool = new pg.Pool({
   host: process.env.DB_HOST || process.env.PGHOST || '127.0.0.1',
   port: Number(process.env.DB_PORT || process.env.PGPORT || 5434),

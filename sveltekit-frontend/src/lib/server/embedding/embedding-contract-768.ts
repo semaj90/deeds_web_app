@@ -64,7 +64,42 @@ export const EMBEDDINGGEMMA_MRL_DIMENSIONS = [768, 512, 256, 128] as const;
 export const PROMPT_REVISION_TASK_PREFIX_V1 = 'eg-task-prefix-v1' as const;
 export const PROMPT_REVISION_UNPROMPTED = 'unprompted-v0' as const;
 
+export const EMBEDDINGGEMMA_TASK_MODES_V1 = [
+  'retrieval_query',
+  'retrieval_document',
+  'code_retrieval_query',
+  'classification',
+  'clustering',
+  'sentence_similarity',
+  'summarization',
+] as const;
+
+export type EmbeddingGemmaTaskModeV1 = (typeof EMBEDDINGGEMMA_TASK_MODES_V1)[number] | 'code_query_legacy';
+
 export type EmbeddingGemmaInputMode = 'retrieval_query' | 'code_query' | 'document';
+
+const taskPrefixesV1: Readonly<Record<Exclude<EmbeddingGemmaTaskModeV1, 'retrieval_document'>, string>> = {
+  retrieval_query: 'task: search result | query: ',
+  code_retrieval_query: 'task: code retrieval | query: ',
+  code_query_legacy: 'task: code retrieval query | query: ',
+  classification: 'task: classification | query: ',
+  clustering: 'task: clustering | query: ',
+  sentence_similarity: 'task: sentence similarity | query: ',
+  summarization: 'task: summarization | query: ',
+};
+
+export function formatEmbeddingGemmaTaskInputV1(input: {
+  mode: EmbeddingGemmaTaskModeV1;
+  content: string;
+  title?: string | null;
+}): string {
+  const content = input.content.trim();
+  if (!content) throw new Error('EMBEDDINGGEMMA_EMPTY_INPUT');
+  if (input.mode === 'retrieval_document') {
+    return `title: ${input.title?.trim() || 'none'} | text: ${content}`;
+  }
+  return `${taskPrefixesV1[input.mode]}${content}`;
+}
 
 /**
  * Canonical EmbeddingGemma prompt owner. Callers must not hand-build prompt
@@ -75,18 +110,13 @@ export function formatEmbeddingGemmaInput(
   content: string,
   title?: string,
 ): string {
-  const normalizedContent = content.trim();
-  if (!normalizedContent) {
-    throw new Error('EMBEDDINGGEMMA_EMPTY_INPUT');
-  }
-
   switch (mode) {
     case 'retrieval_query':
-      return `task: search result | query: ${normalizedContent}`;
+      return formatEmbeddingGemmaTaskInputV1({ mode, content });
     case 'code_query':
-      return `task: code retrieval query | query: ${normalizedContent}`;
+      return formatEmbeddingGemmaTaskInputV1({ mode: 'code_query_legacy', content });
     case 'document':
-      return `title: ${title?.trim() || 'none'} | text: ${normalizedContent}`;
+      return formatEmbeddingGemmaTaskInputV1({ mode: 'retrieval_document', content, title });
   }
 }
 

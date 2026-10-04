@@ -157,6 +157,7 @@ test('scheduler selection manifest requires a nonempty, unique exact task-key li
 test('waiting and historical states remain non-ready', () => {
   assert.equal(classifyGateState(task('x', 'needs source', { executionState: 'WAITING_ON_DEPENDENCY' })), 'WAITING_FOR_DEPENDENCY');
   assert.equal(classifyGateState(task('x', 'obsolete', { executionState: 'SUPERSEDED_OR_HISTORICAL' })), 'SUPERSEDED');
+  assert.equal(classifyGateState(task('x', 'old path candidate', { executionState: 'ACTIONABLE', controllerState: 'ACTIONABLE', supersessionReviewState: 'REVIEW_REQUIRED' })), 'REVIEW_REQUIRED');
 });
 
 test('current controller evidence separates proof-only, authority waits, and stale receipts', () => {

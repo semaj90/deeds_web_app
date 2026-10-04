@@ -665,6 +665,7 @@ export function isValidSchedulerSelection(selection) {
 
 export function classifyGateState(task) {
   if (task.state === 'DONE' || task.executionState === 'DONE') return 'COMPLETE';
+  if (task.supersessionReviewState === 'REVIEW_REQUIRED') return 'REVIEW_REQUIRED';
   if (task.controllerState === 'PROVEN') return 'PROOF_ONLY';
   if (task.controllerState === 'DEFERRED') return 'DEFERRED';
   if (task.controllerState === 'STALE_CONTROLLER_RECEIPT') return 'REVIEW_REQUIRED';

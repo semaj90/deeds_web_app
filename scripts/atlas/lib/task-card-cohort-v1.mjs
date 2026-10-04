@@ -8,6 +8,7 @@
 // should emit this shape or adopt this exporter. It adds no selection rules of its own: the caller
 // states which `retrievalState`s and card `state`s are admitted, and both are recorded in the cohort.
 import { createHash } from 'node:crypto';
+import { selectOpenSpecTaskCardsV1 } from './openspec-report-manifest-v1.mjs';
 
 export const COHORT_SCHEMA = 'atlas.task-card-cohort.v1';
 const sha256 = (text) => `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`;
@@ -27,10 +28,24 @@ export function buildTaskCardCohortV1(taskCardCorpus, { retrievalStates = ['CURR
   const cards = taskCardCorpus?.cards;
   const source = taskCardCorpus?.source;
   if (!Array.isArray(cards) || !source?.taskFileHashes) throw new Error('COHORT_CORPUS_INVALID');
-  const retrieval = new Set(retrievalStates);
-  const lifecycle = new Set(states);
-  const locators = cards
-    .filter((card) => retrieval.has(card.retrievalState) && lifecycle.has(card.state))
+  if (!source.workspaceHead || !source.workspaceRevision || !source.sourcePopulationChecksum) {
+    throw new Error('COHORT_REVISION_BINDING_MISSING');
+  }
+  const retrieval = [...new Set(retrievalStates)].sort();
+  const lifecycle = [...new Set(states)].sort();
+  const selected = selectOpenSpecTaskCardsV1({
+    corpus: {
+      schema: 'atlas.openspec-task-triage-corpus.v1',
+      workspaceHead: source.workspaceHead,
+      taskPopulationRevision: source.sourcePopulationChecksum,
+      retrievalPolicy: { defaultStates: retrieval, historyOnlyStates: [] },
+      taskCardCorpus,
+    },
+    cardStates: lifecycle,
+    limit: Math.min(Math.max(cards.length, 1), 10_000),
+  });
+  if (selected.returnedCount !== selected.eligibleCount) throw new Error('COHORT_SELECTION_TRUNCATED');
+  const locators = selected.cards
     .map((card) => ({ stableKey: card.stableKey, sourcePath: card.sourcePath, sourceLine: card.sourceLine, taskRevision: card.taskRevision }))
     .sort((a, b) => a.sourcePath.localeCompare(b.sourcePath) || a.sourceLine - b.sourceLine || a.stableKey.localeCompare(b.stableKey));
   const unsigned = {
@@ -40,7 +55,7 @@ export function buildTaskCardCohortV1(taskCardCorpus, { retrievalStates = ['CURR
     workspaceRevision: source.workspaceRevision ?? null,
     sourcePopulationChecksum: source.sourcePopulationChecksum ?? null,
     taskFileHashes: source.taskFileHashes,
-    selection: { retrievalStates: [...retrieval].sort(), states: [...lifecycle].sort() },
+    selection: { retrievalStates: retrieval, states: lifecycle },
     count: locators.length,
     locators,
     canonicalAuthority: false,

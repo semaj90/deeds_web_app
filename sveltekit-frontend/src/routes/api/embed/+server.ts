@@ -12,6 +12,11 @@ import { ENV } from '$lib/server/env.server.js';
 import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 import { classifyEmbeddingError } from '$lib/server/embedding/embedding-backend-resolution.js';
 import { resolveEmbeddingProviderV1, checkVectorShapeV1 } from '$lib/server/embedding/embedding-provider-v1.js';
+import { EMBEDDINGGEMMA_TASK_MODES_V1 } from '$lib/server/embedding/embedding-contract-768.js';
+import {
+	executeEmbeddingInputV1,
+	type EmbeddingInputModeV1,
+} from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 // EMBED-PROVIDER-CONVERGENCE-01: single resolver, not an independent
@@ -21,7 +26,16 @@ const EMBEDDING_PROVIDER_V1 = resolveEmbeddingProviderV1();
 const embedRequestSchema = z.object({
 	text: z.string().min(1, 'Text is required').max(50000),
 	model: z.enum(['embeddinggemma', 'mock']).optional().default('embeddinggemma'),
+	taskMode: z.enum([...EMBEDDINGGEMMA_TASK_MODES_V1, 'unprompted_legacy']).optional(),
+	title: z.string().max(500).nullable().optional(),
 	dimensions: z.number().int().min(1).max(4096).optional()
+}).superRefine((value, context) => {
+	if (value.model === 'mock' && value.taskMode) {
+		context.addIssue({ code: 'custom', path: ['taskMode'], message: 'Recipe modes require the EmbeddingGemma model' });
+	}
+	if (value.taskMode && value.dimensions !== undefined && value.dimensions !== 768) {
+		context.addIssue({ code: 'custom', path: ['dimensions'], message: 'Recipe-qualified embeddings require native 768 dimensions' });
+	}
 });
 
 type EmbedRequest = z.infer<typeof embedRequestSchema>;
@@ -31,6 +45,12 @@ interface EmbedResponse {
 	model: string;
 	dimensions: number;
 	tokens?: number;
+	inputRecipe?: {
+		mode: EmbeddingInputModeV1;
+		promptRevision: string;
+		sourceTextDigest: string;
+		formattedInputChecksum: string;
+	};
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -53,7 +73,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		if (!parsed.success) {
 			return apiResponses.badRequest('Invalid embedding request');
 		}
-		const { text, model, dimensions } = parsed.data;
+		const { text, model, dimensions, taskMode, title } = parsed.data;
 
 		// Acquire GPU lease for embedding generation (non-blocking)
 		if (model !== 'mock') {
@@ -86,20 +106,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				// against a known-good reference — not the tokenizer mechanism.
 				// Falls back to the standard embedText() cascade
 				// (ONNX Tier-0 -> llama_cpp_gguf Tier-1 -> gRPC -> Ollama) on null.
-				let embedding: number[] | null = null;
-				if (EMBEDDING_PROVIDER_V1.provider === 'onnx_directml') {
-					embedding = await runOnnxDirectMLEmbedding(text);
-				}
-				if (!embedding) {
-					embedding = await embedText(text);
-				}
+				const execution = await executeEmbeddingInputV1({
+					text,
+					mode: taskMode,
+					title,
+					executor: async (embeddingInput) => {
+						if (EMBEDDING_PROVIDER_V1.provider === 'onnx_directml') {
+							const onnxEmbedding = await runOnnxDirectMLEmbedding(embeddingInput);
+						if (onnxEmbedding) return onnxEmbedding;
+						}
+						return embedText(embeddingInput);
+					},
+				});
+				const embedding = execution.embedding;
 				// Fail-closed: reject wrong dimension, non-finite values, or a
 				// zero/degenerate norm rather than returning it as success.
 				const shapeCheck = checkVectorShapeV1(embedding);
 				if (!shapeCheck.ok) {
 					throw new Error(`EMBED_RECEIPT_SHAPE_INVALID:${shapeCheck.failures.join(',')}`);
 				}
-				result = { embedding, model: 'embeddinggemma:latest', dimensions: embedding.length };
+				result = {
+					embedding,
+					model: 'embeddinggemma:latest',
+					dimensions: embedding.length,
+					...(taskMode && {
+						inputRecipe: execution.inputRecipe,
+					}),
+				};
 				break;
 			}
 			case 'mock': {
@@ -159,6 +192,7 @@ export const GET: RequestHandler = async () => {
 			message: 'Embedding API endpoint',
 			methods: ['POST'],
 			models: ['embeddinggemma', 'mock'],
+			taskModes: [...EMBEDDINGGEMMA_TASK_MODES_V1, 'unprompted_legacy'],
 			maxTextLength: 50000,
 			ollamaUrl: OLLAMA_URL,
 			embeddingBackend: EMBEDDING_PROVIDER_V1,

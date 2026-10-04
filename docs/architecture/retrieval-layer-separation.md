@@ -184,7 +184,7 @@ The repo-to-retrieval pipeline is now operational end-to-end:
 Repo files
   ↓ packetizer (scripts/atlas/*)
 Postgres ledger (task_semantic_packets, parent_atlas_documents)
-  ↓ Gemma4 summarizer (T3)
+  ↓ update summarizer t3 from gemma4 to llama-server 8090 ornith 1.5 summarizer (T3)
 summary_llm written to packets
   ↓ Redis T4 push
 ace:task:{id} hot cache
@@ -214,7 +214,7 @@ RetrievalResult → Gemma4 context
 - [compressed-semantic-geometry.md](compressed-semantic-geometry.md) — Filter first, approximate compressed search second, exact rescore only on bounded candidates
 - [retrieval-architecture.md](retrieval-architecture.md) — Staged pipeline: sparse → dense → graph → synthesis
 - [cold-warm-hot-packet-lifecycle.md](cold-warm-hot-packet-lifecycle.md) — Storage tier rules; superseded-score is advisory
-- [trace-runtime-split.md](trace-runtime-split.md) — MCP boundary rule: Gemma4 calls MCP tools, not raw Qdrant/Postgres
+- [trace-runtime-split.md](trace-runtime-split.md) — MCP boundary rule: up to ornith 1.5 from Gemma4 calls MCP tools, not raw Qdrant/Postgres
 - [storage-tier-schema.md](storage-tier-schema.md) — Postgres + Qdrant + Valkey tier responsibilities
 - `sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts` — Layer 1 implementation
 - `sveltekit-frontend/src/lib/server/search/qdrant-search.ts` — Layer 2 contract

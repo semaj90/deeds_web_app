@@ -15,7 +15,7 @@ export interface AuthoritativeGpuObservationV1 {
 	computeCapabilityMajor: number;
 	computeCapabilityMinor: number;
 	totalVramBytes: number;
-	source: 'cuda_runtime' | 'nvml' | 'nvidia_smi';
+	source: 'cuda_runtime' | 'nvml' | 'nvidia-smi' | 'nvidia_smi';
 	driverVersion?: string | null;
 	cudaRuntimeVersion?: string | null;
 	libtorchVersion?: string | null;

@@ -16,11 +16,11 @@
     "contextBytes": 2
   },
   "cards": [],
-  "queryPlanRevision": "sha256:f334eea11d76628d1e285a1e1a7717f996f32e258985c0fdd4b7c2873ed90a4c",
+  "queryPlanRevision": "sha256:d33f817a7bcd434251ef56337d25597226d207ee4c1b903b2df05bc88de99dcf",
   "manifestChecksumInputs": {
     "cardChecksums": [],
     "workspaceRevision": "sha256:b45a8aca0bd7b71560429a1fc40c093ede0fd29a4c5d34370b8015e68ee6bf7b",
-    "queryPlanRevision": "sha256:f334eea11d76628d1e285a1e1a7717f996f32e258985c0fdd4b7c2873ed90a4c"
+    "queryPlanRevision": "sha256:d33f817a7bcd434251ef56337d25597226d207ee4c1b903b2df05bc88de99dcf"
   },
   "policy": {
     "rawDocumentsInjected": false,
@@ -45,6 +45,6 @@
   "safe_next_command": "node scripts/atlas/audit-openspec-evidence-hybrid-rrf-v1.mjs",
   "smoke_command": "node --check scripts/atlas/compile-openspec-evidence-context-manifest-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-context-manifest-v1.json",
-  "generatedAt": "2026-10-02T04:47:37.315Z",
-  "checksum": "sha256:54c64660b2fe7fc785bdb67291abab00690dfa4233b780b47b52a0b3430e8f08"
+  "generatedAt": "2026-10-03T05:00:19.413Z",
+  "checksum": "sha256:897e088b0a9eb47348f53d8c43d41b6e8d6f16b5f9081037cbe724c28c6a5e91"
 }

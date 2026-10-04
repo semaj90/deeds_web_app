@@ -4,6 +4,7 @@ import {
   digestEmbeddingGemmaMrl,
   EMBEDDINGGEMMA_MRL_DIMENSIONS,
   formatEmbeddingGemmaInput,
+  formatEmbeddingGemmaTaskInputV1,
   truncateEmbeddingGemmaMrl,
 } from './embedding-contract-768.js';
 
@@ -45,6 +46,21 @@ describe('EmbeddingGemma MRL contract', () => {
     );
     expect(() => formatEmbeddingGemmaInput('document', '   ')).toThrow(
       'EMBEDDINGGEMMA_EMPTY_INPUT',
+    );
+  });
+
+  it('centralizes task-representation prefixes without changing existing recipes', () => {
+    expect(formatEmbeddingGemmaTaskInputV1({ mode: 'retrieval_query', content: 'find writer' })).toBe(
+      formatEmbeddingGemmaInput('retrieval_query', 'find writer'),
+    );
+    expect(formatEmbeddingGemmaTaskInputV1({ mode: 'code_retrieval_query', content: 'find writer' })).toBe(
+      'task: code retrieval | query: find writer',
+    );
+    expect(formatEmbeddingGemmaTaskInputV1({ mode: 'code_query_legacy', content: 'find writer' })).toBe(
+      'task: code retrieval query | query: find writer',
+    );
+    expect(formatEmbeddingGemmaTaskInputV1({ mode: 'retrieval_document', content: 'body', title: 'file.ts' })).toBe(
+      formatEmbeddingGemmaInput('document', 'body', 'file.ts'),
     );
   });
 

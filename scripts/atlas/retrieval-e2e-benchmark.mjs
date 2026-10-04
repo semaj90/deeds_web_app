@@ -41,7 +41,7 @@ const config = {
 };
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
-const GEMMA4_URL = process.env.LLAMA_URL || 'http://127.0.0.1:8090';
+const GEMMA4_URL = process.env.LLAMA_URL || process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
 // Valkey / Redis connection (password-protected)
 const VALKEY_URL = process.env.REDIS_URL || 'redis://:redis@127.0.0.1:6379';

@@ -62,6 +62,6 @@
   "safe_next_command": "node scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-projection-parity-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:38.044Z",
+  "generatedAt": "2026-10-03T05:00:20.141Z",
   "checksum": "sha256:573e8d9c77dfbe0f7699aa54fc9e5cd5898d519271ae7e0cd4cb7ae3e2e334a0"
 }

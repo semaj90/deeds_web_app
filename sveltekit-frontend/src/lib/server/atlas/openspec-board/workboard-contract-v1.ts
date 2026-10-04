@@ -82,6 +82,15 @@ export const OpenSpecWorkboardTaskV1Schema = z
       waveTitle: z.string().nullable(),
       classification: z.enum(['TASK_TEXT_RULE', 'CHANGE_FALLBACK_REVIEW', 'UNCLASSIFIED_REVIEW_REQUIRED']),
       matchedRule: z.string().nullable(),
+      architecture: z.object({
+        programId: z.string().nullable(),
+        programName: z.string().nullable(),
+        milestoneId: z.string().regex(/^M[0-6]$/).nullable(),
+        lane: z.string().nullable(),
+        corpus: z.string().nullable(),
+        classification: z.string(),
+        matchedRule: z.string().nullable(),
+      }).strict(),
       milestone: z.string().regex(/^M[0-6]$/).nullable(),
       gate: z.string().min(1),
       gateId: z.string().regex(/^GATE-WAVE-(0[0-9]|10)$/).nullable(),
@@ -166,9 +175,14 @@ const programWaveV1Schema = z.object({
 const programWorkPackageV1Schema = z.object({
   id: z.string().min(1),
   wave: z.number().int().min(0).max(10).nullable(),
+  waveIds: z.array(z.number().int().min(0).max(10)),
   milestone: z.string().regex(/^M[0-6]$/).nullable(),
+  milestoneId: z.string().regex(/^M[0-6]$/).nullable(),
   gateId: z.string().regex(/^GATE-WAVE-(0[0-9]|10)$/).nullable(),
+  changeGateId: z.string().min(1),
   gate: z.string().min(1),
+  gateState: gateStateSchema,
+  mutationClass: mutationClassSchema,
   owner: z.string().min(1),
   ownerScope: z.literal('OPENSPEC_CHANGE_ONLY_NOT_CANONICAL_RUNTIME_OWNER'),
   canonicalOwner: z.null(),
@@ -178,7 +192,6 @@ const programWorkPackageV1Schema = z.object({
   dependsOnWaveIds: z.array(z.number().int().min(0).max(10)),
   dependsOn: z.array(z.string()).optional(),
   programId: z.string().min(1).nullable().optional(),
-  changeGateId: z.string().min(1).optional(),
   mappingStatus: mappingStatusSchema.optional(),
   prerequisiteGateIds: z.array(z.string()).optional(),
   primaryLane: z.string().nullable().optional(),
@@ -188,8 +201,7 @@ const programWorkPackageV1Schema = z.object({
   state: z.enum(['PLANNED_NOT_SELECTED', 'REVIEW_REQUIRED']),
 }).strict().superRefine((workPackage, ctx) => {
   if (workPackage.taskCount !== workPackage.taskKeys.length) ctx.addIssue({ code: 'custom', message: 'work-package taskCount must match taskKeys' });
-  if (workPackage.wave === null && workPackage.milestone !== null) ctx.addIssue({ code: 'custom', message: 'unclassified work package cannot claim a milestone' });
-  if (workPackage.wave === null && workPackage.state !== 'REVIEW_REQUIRED') ctx.addIssue({ code: 'custom', message: 'unclassified work package must remain review-only' });
+  if (workPackage.wave === null && workPackage.gateId !== null) ctx.addIssue({ code: 'custom', message: 'work package without a scheduling wave cannot claim a wave gate' });
 });
 
 const programGateV1Schema = z.object({
@@ -539,6 +551,7 @@ export interface OpenSpecTaskProjectionV1 {
   text: string;
   state: string;
   executionState: string;
+  supersessionReviewState: string | null;
   priority: number;
   actionable: boolean;
   waiting: boolean;
@@ -565,8 +578,9 @@ export function projectTask(task: OpenSpecWorkboardTaskV1): OpenSpecTaskProjecti
     text: task.text,
     state: task.state,
     executionState: task.executionState,
+    supersessionReviewState: typeof task.supersessionReviewState === 'string' ? task.supersessionReviewState : null,
     priority: task.priority,
-    actionable: task.executionState === 'ACTIONABLE',
+    actionable: task.executionState === 'ACTIONABLE' && task.supersessionReviewState !== 'REVIEW_REQUIRED',
     waiting: task.executionState === 'WAITING_ON_DEPENDENCY',
     superseded: task.executionState === 'SUPERSEDED_OR_HISTORICAL',
     lane: task.lane ?? null,

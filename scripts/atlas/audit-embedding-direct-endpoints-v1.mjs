@@ -1,13 +1,17 @@
 #!/usr/bin/env node
-// EMBED-CALLER-CONVERGENCE-01 (bounded gate), step 1 + guard: classify every production source
-// file that references a direct embedding endpoint, using the real import graph to separate live
-// callers from dormant ones. Read-only.
+// EMBED-CALLER-CONVERGENCE-01 (bounded gate): classify every production source file that references
+// a direct embedding endpoint, using the real import graph and the local call structure to separate
+// callers from wrappers, transport owners, non-callers and dormant code. Read-only.
 //
 //   node scripts/atlas/audit-embedding-direct-endpoints-v1.mjs [--out file] [--check] [--write-baseline]
 //
-// --check          fail (exit 1) when a file with a direct endpoint is neither in the tolerated
-//                  baseline nor a declared transport owner (a NEW bypass).
-// --write-baseline write the current LIVE direct-endpoint set as tolerated debt (explicit only).
+// --check          fail (exit 1) when a production file gains a direct embedding CALL that is neither
+//                  a declared transport owner nor in the tolerated baseline.
+// --write-baseline write the current guarded set as tolerated debt (explicit only).
+//
+// Classes: LIVE_DIRECT_CALLER, LIVE_WRAPPER, TRANSPORT_OWNER, ROUTE_REACHABLE_NONCALLER,
+//   FIXTURE, TEST, DIAGNOSTIC, LEGACY, DORMANT, DEAD. TEST/fixture files remain outside the
+//   production census; LEGACY/DEAD require explicit evidence, since import-graph absence proves neither.
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,6 +29,7 @@ export const TRANSPORT_OWNERS = new Set([
   'lib/server/embedding/embedding-execution-adapter-v1.ts',
   'lib/server/embedding/embedding-query-route-adapter-v1.ts',
   'lib/server/embedding/embedding-provider-v1.ts',
+  'lib/server/embedding/embedding-provider-executor-v1.ts',
   'lib/server/embedding/embedding-backend-resolution.ts',
   'lib/server/embedding/embedding-contract.ts',
   'lib/server/embedding/embedding-contract-768.ts',
@@ -35,9 +40,15 @@ export const TRANSPORT_OWNERS = new Set([
   'lib/server/env.server.ts'
 ]);
 export const DIAGNOSTIC_PATH = /(^|\/)(health|semantic-health)(\/|\.|$)|system-configuration/;
+export const FIXTURE_PATH = /(^|\/)(__mocks__|mocks?|stubs?|fixtures?|examples?|demos?)(\/|$)/;
+// Classes the ratchet guards. A non-caller, a facade-only route, a fixture or a diagnostic cannot bypass.
+export const GUARDED_CLASSES = new Set(['LIVE_DIRECT_CALLER', 'LIVE_WRAPPER']);
 
 const ENTRY = /(^|\/)(\+(server|page\.server|layout\.server|page|layout)\.(ts|js|svelte)|hooks\.(server|client)\.[tj]s|service-worker\.[tj]s)$|^mcp\/(server|trace-mcp-server)\.ts$/;
+const ROUTE_HANDLER = /(^|\/)\+(server|page\.server|layout\.server)\.(ts|js)$/;
 const WORKER_ROOT = /^lib\/server\/workers\//;
+// Includes repo fetch wrappers such as `ollamaFetch(` / `safeFetch(` (any identifier ending in Fetch).
+const CALL_SITE = /\b(axios|got|request|post|ky|undici)\s*\(|\b[A-Za-z_$]*[Ff]etch\s*\(|\.(post|request|fetch)\s*\(|new\s+Request\s*\(/;
 
 /** A line is a DIRECT endpoint reference unless it is a bare relative call to the app's own route. */
 export function classifyLine(line) {
@@ -48,6 +59,48 @@ export function classifyLine(line) {
   if (/\/v1\/embeddings/.test(t)) return 'V1_EMBEDDINGS';
   if (/fetch\(\s*[`'"]\/api\/embed/.test(t) || /^[`'"]\/api\/embed[`'"]/.test(t)) return 'INTERNAL_ROUTE';
   return 'DIRECT_API_EMBED';
+}
+
+/**
+ * Is the endpoint string at `index` used in a request, or only mentioned (a constant, a URL
+ * builder, a log or doc string)? A call-shaped token within 6 lines before or 3 after counts.
+ */
+export function isCallSite(lines, index) {
+  const from = Math.max(0, index - 6);
+  const to = Math.min(lines.length - 1, index + 3);
+  for (let i = from; i <= to; i += 1) if (CALL_SITE.test(lines[i])) return true;
+  // The endpoint is stored in a variable (`const EMBED_URL = ...`, `endpoint = '/api/embeddings'`)
+  // and requested elsewhere in the file: follow that one hop.
+  const assigned = /(?:^|\s)(?:const|let|var)?\s*([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*[`'"{]/.exec(lines[index]);
+  if (assigned) {
+    const name = assigned[1];
+    const use = new RegExp(`\\b${name.replace(/\$/g, '\\$')}\\b`);
+    for (let i = 0; i < lines.length; i += 1) if (i !== index && use.test(lines[i]) && CALL_SITE.test(lines[i])) return true;
+  }
+  return false;
+}
+
+const FN_DECL = [
+  /^\s*(export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)/,
+  /^\s*(export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?(?:\(|function|[A-Za-z_$][\w$]*\s*=>)/,
+  /^\s{2,}(?:public\s+|private\s+|protected\s+|static\s+)*(?:async\s+)?([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*(?::[^{;]+)?\{\s*$/
+];
+
+/** Nearest preceding function-like declaration, with whether it is exported. Heuristic. */
+export function enclosingFunction(lines, index) {
+  for (let i = index; i >= 0; i -= 1) {
+    for (let k = 0; k < FN_DECL.length; k += 1) {
+      const m = FN_DECL[k].exec(lines[i]);
+      if (!m) continue;
+      if (k === 2) {
+        const name = m[1];
+        if (/^(if|for|while|switch|catch|function|return)$/.test(name)) continue;
+        return { name, exported: false, kind: 'method' };
+      }
+      return { name: m[2], exported: Boolean(m[1]), kind: 'function' };
+    }
+  }
+  return null;
 }
 
 export function walk(dir, out = []) {
@@ -98,13 +151,24 @@ export function reachableFrom(roots, edges) {
   return seen;
 }
 
-export function classifyFile({ file, kinds, reachableFromRoutes, reachableFromWorkers }) {
+/** A wrapper owns a transport call inside an exported embedding-ish function other modules import. */
+const WRAPPER_NAME = /embed|vector|encode/i;
+
+export function classifyFile({ file, hits, reachableFromRoutes, reachableFromWorkers, manualClassification = null }) {
   if (TRANSPORT_OWNERS.has(file)) return 'TRANSPORT_OWNER';
   if (DIAGNOSTIC_PATH.test(file)) return 'DIAGNOSTIC';
-  if (kinds.every((k) => k === 'INTERNAL_ROUTE')) return 'INTERNAL_ROUTE_ONLY';
-  if (reachableFromRoutes) return 'LIVE_CONSUMER';
-  if (reachableFromWorkers) return 'LIVE_CONSUMER_VIA_WORKER';
-  return 'UNREACHABLE_DORMANT_CANDIDATE';
+  if (FIXTURE_PATH.test(file)) return 'FIXTURE';
+  if (TEST_FILE.test(file)) return 'TEST';
+  if (manualClassification === 'LEGACY' || manualClassification === 'DEAD') return manualClassification;
+  if (hits.every((h) => h.kind === 'INTERNAL_ROUTE')) return 'LIVE_WRAPPER';
+  const direct = hits.filter((h) => h.kind !== 'INTERNAL_ROUTE');
+  const calls = direct.filter((h) => h.isCall);
+  const live = reachableFromRoutes || reachableFromWorkers;
+  if (!calls.length) return live ? 'ROUTE_REACHABLE_NONCALLER' : 'DORMANT';
+  if (!live) return 'DORMANT';
+  if (ROUTE_HANDLER.test(file)) return 'LIVE_DIRECT_CALLER';
+  if (calls.some((h) => h.enclosing?.exported && WRAPPER_NAME.test(h.enclosing.name))) return 'LIVE_WRAPPER';
+  return 'LIVE_DIRECT_CALLER';
 }
 
 export function runCensus() {
@@ -118,18 +182,23 @@ export function runCensus() {
   const fromWorkers = reachableFrom(workerRoots, edges);
   const rows = [];
   for (const file of files) {
+    const lines = read(file).split(/\r?\n/);
     const hits = [];
-    read(file).split(/\r?\n/).forEach((line, i) => {
+    lines.forEach((line, i) => {
       const kind = classifyLine(line);
-      if (kind) hits.push({ line: i + 1, kind });
+      if (!kind) return;
+      hits.push({ line: i + 1, kind, isCall: isCallSite(lines, i), enclosing: enclosingFunction(lines, i) });
     });
     if (!hits.length) continue;
-    const kinds = [...new Set(hits.map((h) => h.kind))];
     rows.push({
-      file, kinds, hitCount: hits.length,
+      file,
+      kinds: [...new Set(hits.map((h) => h.kind))],
+      hitCount: hits.length,
+      callCount: hits.filter((h) => h.isCall && h.kind !== 'INTERNAL_ROUTE').length,
+      enclosing: [...new Set(hits.filter((h) => h.enclosing).map((h) => `${h.enclosing.exported ? 'export ' : ''}${h.enclosing.name}`))].slice(0, 4),
       reachableFromRoutes: fromRoutes.has(file),
       reachableFromWorkers: fromWorkers.has(file),
-      classification: classifyFile({ file, kinds, reachableFromRoutes: fromRoutes.has(file), reachableFromWorkers: fromWorkers.has(file) })
+      classification: classifyFile({ file, hits, reachableFromRoutes: fromRoutes.has(file), reachableFromWorkers: fromWorkers.has(file) })
     });
   }
   rows.sort((a, b) => a.file.localeCompare(b.file));
@@ -138,12 +207,14 @@ export function runCensus() {
   return { scannedFiles: files.length, routeRoots: routeRoots.length, workerRoots: workerRoots.length, summary, rows };
 }
 
-/** The gate: tolerated baseline of live direct-endpoint files; a new one fails. */
+/** The ratchet: new live direct callers/wrappers fail. Facade-only /api/embed clients and dormant
+ *  code are visible in the census but do not count as endpoint bypasses. */
 export function evaluateGuard(rows, baseline) {
   const tolerated = new Set(baseline?.tolerated ?? []);
-  const live = rows.filter((r) => ['LIVE_CONSUMER', 'LIVE_CONSUMER_VIA_WORKER', 'UNREACHABLE_DORMANT_CANDIDATE'].includes(r.classification));
-  const newBypasses = live.filter((r) => !tolerated.has(r.file)).map((r) => r.file);
-  const resolvedSinceBaseline = [...tolerated].filter((f) => !live.some((r) => r.file === f));
+  const guarded = rows.filter((r) => GUARDED_CLASSES.has(r.classification)
+    && !(r.classification === 'LIVE_WRAPPER' && r.kinds?.every((kind) => kind === 'INTERNAL_ROUTE')));
+  const newBypasses = guarded.filter((r) => !tolerated.has(r.file)).map((r) => r.file);
+  const resolvedSinceBaseline = [...tolerated].filter((f) => !guarded.some((r) => r.file === f));
   return { pass: newBypasses.length === 0, newBypasses, resolvedSinceBaseline };
 }
 
@@ -154,14 +225,15 @@ function main() {
   const baseline = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, 'utf8')) : null;
   const guard = evaluateGuard(census.rows, baseline);
   if (argv.includes('--write-baseline')) {
-    const live = census.rows.filter((r) => ['LIVE_CONSUMER', 'LIVE_CONSUMER_VIA_WORKER', 'UNREACHABLE_DORMANT_CANDIDATE'].includes(r.classification)).map((r) => r.file);
+    const tolerated = census.rows.filter((r) => GUARDED_CLASSES.has(r.classification)
+      && !(r.classification === 'LIVE_WRAPPER' && r.kinds?.every((kind) => kind === 'INTERNAL_ROUTE'))).map((r) => r.file);
     mkdirSync(dirname(BASELINE_PATH), { recursive: true });
-    writeFileSync(BASELINE_PATH, `${JSON.stringify({ schema: 'atlas.embedding-direct-endpoint-baseline.v1', purpose: 'Tolerated debt: production source files that reference a direct embedding endpoint outside the declared transport owners. A file NOT listed here that gains such a reference fails the guard. Shrinking this list is the migration; growing it needs a recorded reason.', tolerated: live }, null, 2)}\n`, 'utf8');
+    writeFileSync(BASELINE_PATH, `${JSON.stringify({ schema: 'atlas.embedding-direct-endpoint-baseline.v2', purpose: 'Tolerated debt: route/worker-reachable production files that directly call an embedding endpoint or wrap such a call, excluding calls to the application /api/embed facade. A new caller/wrapper file fails the guard. Non-callers, facade-only routes, fixtures, diagnostics and dormant code are not guarded. Shrinking this list is the migration; growing it needs a recorded reason.', tolerated }, null, 2)}\n`, 'utf8');
   }
   if (outIdx >= 0) {
     const out = resolve(argv[outIdx + 1]);
     mkdirSync(dirname(out), { recursive: true });
-    writeFileSync(out, `${JSON.stringify({ schema: 'atlas.embedding-direct-endpoint-census.v1', ...census, guard, writesPerformed: false }, null, 2)}\n`, 'utf8');
+    writeFileSync(out, `${JSON.stringify({ schema: 'atlas.embedding-direct-endpoint-census.v2', ...census, guard, writesPerformed: false }, null, 2)}\n`, 'utf8');
   }
   console.log(JSON.stringify({ scannedFiles: census.scannedFiles, routeRoots: census.routeRoots, workerRoots: census.workerRoots, summary: census.summary, baselinePresent: Boolean(baseline), guard: { pass: guard.pass, newBypasses: guard.newBypasses.slice(0, 20), newBypassCount: guard.newBypasses.length, resolvedSinceBaseline: guard.resolvedSinceBaseline.length } }, null, 2));
   if (argv.includes('--check') && !guard.pass) process.exitCode = 1;

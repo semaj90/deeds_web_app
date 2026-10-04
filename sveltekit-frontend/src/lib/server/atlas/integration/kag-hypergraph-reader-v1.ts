@@ -2,6 +2,12 @@ import { pool } from '$lib/server/db/client.js';
 import { buildKagMutualIndexV1 } from './kag-mutual-index-v1.js';
 import type { HyperedgeV1, HyperedgeParticipantV1 } from '../../graph/hyperedge-contract.js';
 import type { OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v1.js';
+import { PACKET_KEY_V2_PATTERN } from '../identity/packet-key-v2.js';
+import {
+  PacketIncidenceLineageV1Schema,
+  type PacketIncidenceLineageV1,
+} from '../lineage/packet-incidence-lineage-v1.js';
+import { verifyPacketIncidenceLineagesAgainstPostgresV1 } from '../lineage/packet-incidence-postgres-readback-v1.js';
 
 /**
  * KAG "next steps" item 1 (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration).
@@ -19,6 +25,7 @@ import type { OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v
  */
 
 const MAX_CANONICAL_IDS = 256;
+export const MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 = 4096;
 
 export interface KagTraversalSnapshotV1 {
   workspaceRevision: string;
@@ -28,6 +35,8 @@ export interface KagTraversalSnapshotV1 {
 export interface KagHypergraphNeighborV1 {
   canonicalId: string;
   hyperedgeIds: string[];
+  neighborCanonicalIds?: string[];
+  neighborStoragePacketKeys?: string[];
 }
 
 export interface KagHypergraphNeighborsReceiptV1 {
@@ -80,7 +89,10 @@ interface HyperedgeMemberRow {
   producer_revision: string;
   evidence_refs: string[];
   checksum: string;
+  packet_key: string | null;
+  properties: unknown;
   member_id: string;
+  member_type: string;
   member_role: string;
   ordinal: number | null;
 }
@@ -156,14 +168,16 @@ export async function readKagHypergraphNeighborsV1(
     if (options.strict && (!snapshot?.workspaceRevision?.trim() || !snapshot?.graphRevision?.trim())) {
       throw new Error('KAG_TRAVERSAL_SNAPSHOT_REQUIRED');
     }
+    if (options.strict && uniqueIds.some((id) => !PACKET_KEY_V2_PATTERN.test(id))) {
+      throw new Error('KAG_CANONICAL_PACKET_KEY_V2_REQUIRED');
+    }
+    if (options.strict) return await readExactPacketIncidenceV1(uniqueIds, snapshot!);
     const hyperedgeRevisionFilter = snapshot
       ? `\n            AND h.workspace_revision = $2\n            AND h.graph_revision = $3`
       : '';
-    const hyperedgeParams = snapshot ? [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision] : [uniqueIds];
-    // Ontology tuples currently carry provenance in JSONB rather than typed
-    // workspace/graph columns. A strict traversal must therefore require the
-    // producer to have recorded both revisions; an unqualified tuple is
-    // unavailable, never implicitly current.
+    const hyperedgeParams = snapshot
+      ? [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision]
+      : [uniqueIds];
     const tupleRevisionFilter = snapshot
       ? `\n            AND provenance->>'workspaceRevision' = $2\n            AND provenance->>'graphRevision' = $3`
       : '';
@@ -183,9 +197,9 @@ export async function readKagHypergraphNeighborsV1(
       ),
       pool.query<HyperedgeMemberRow>(
         `
-          SELECT h.hyperedge_id, h.contract_hyperedge_id, h.relation_type, h.workspace_revision,
-                 h.source_revision, h.graph_revision, h.producer_revision, h.evidence_refs,
-                 h.checksum, m.member_id, m.member_role, m.ordinal
+          SELECT h.hyperedge_id, h.contract_hyperedge_id, h.relation_type, h.packet_key,
+                 h.workspace_revision, h.source_revision, h.graph_revision, h.producer_revision,
+                 h.evidence_refs, h.checksum, h.properties, m.member_id, m.member_type, m.member_role, m.ordinal
           FROM atlas_hyperedges h
           JOIN atlas_hyperedge_members m ON m.hyperedge_id = h.hyperedge_id
           WHERE h.contract_hyperedge_id IS NOT NULL
@@ -231,6 +245,92 @@ export async function readKagHypergraphNeighborsV1(
   }
 }
 
+interface StoredPacketIncidenceRowV1 {
+  lineage_checksum: string;
+  input_checksum: string;
+  packet_key: string;
+  canonical_id: string;
+  source_revision: string;
+  neighbor_packet_key: string;
+  neighbor_canonical_id: string;
+  neighbor_source_revision: string;
+  edge_type: string;
+  workspace_revision: string;
+  graph_revision: string;
+  producer_id: string;
+  producer_revision: string;
+  evidence_refs: string[];
+  lineage: unknown;
+}
+
+async function readExactPacketIncidenceV1(
+  canonicalIds: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
+): Promise<KagHypergraphNeighborsReceiptV1> {
+  const result = await pool.query<StoredPacketIncidenceRowV1>(
+    `SELECT lineage_checksum, input_checksum, packet_key, canonical_id, source_revision,
+            neighbor_packet_key, neighbor_canonical_id, neighbor_source_revision, edge_type,
+            workspace_revision, graph_revision, producer_id, producer_revision, evidence_refs, lineage
+       FROM atlas_packet_incidence
+      WHERE canonical_id = ANY($1::text[])
+        AND workspace_revision = $2
+        AND graph_revision = $3
+      ORDER BY lineage_checksum
+      LIMIT $4`,
+    [canonicalIds, snapshot.workspaceRevision, snapshot.graphRevision, MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 + 1],
+  );
+  if (result.rows.length > MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1) {
+    throw new Error('KAG_PACKET_INCIDENCE_ROW_LIMIT_EXCEEDED');
+  }
+  const lineages = result.rows.map(parseStoredPacketIncidenceRowV1);
+  await verifyPacketIncidenceLineagesAgainstPostgresV1(lineages, snapshot);
+  const neighborsByPacket = new Map<string, { hyperedgeIds: Set<string>; canonicalIds: Set<string>; storageKeys: Set<string> }>();
+  for (const lineage of lineages) {
+    const current = neighborsByPacket.get(lineage.canonicalId) ?? {
+      hyperedgeIds: new Set<string>(), canonicalIds: new Set<string>(), storageKeys: new Set<string>(),
+    };
+    current.hyperedgeIds.add(`packet-incidence:${lineage.lineageChecksum}`);
+    current.canonicalIds.add(lineage.neighborCanonicalId);
+    current.storageKeys.add(lineage.neighborPacketKey);
+    neighborsByPacket.set(lineage.canonicalId, current);
+  }
+  return {
+    requestedCanonicalIds: canonicalIds.length,
+    matchedTuples: 0,
+    matchedHyperedges: lineages.length,
+    neighbors: [...neighborsByPacket.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([canonicalId, value]) => ({
+      canonicalId,
+      hyperedgeIds: [...value.hyperedgeIds].sort(),
+      neighborCanonicalIds: [...value.canonicalIds].sort(),
+      neighborStoragePacketKeys: [...value.storageKeys].sort(),
+    })),
+  };
+}
+
+function parseStoredPacketIncidenceRowV1(row: StoredPacketIncidenceRowV1): PacketIncidenceLineageV1 {
+  const value = typeof row.lineage === 'string' ? JSON.parse(row.lineage) : row.lineage;
+  const lineage = PacketIncidenceLineageV1Schema.parse(value);
+  if (
+    lineage.lineageChecksum !== row.lineage_checksum
+    || lineage.inputChecksum !== row.input_checksum
+    || lineage.packetKey !== row.packet_key
+    || lineage.canonicalId !== row.canonical_id
+    || lineage.sourceRevision !== row.source_revision
+    || lineage.neighborPacketKey !== row.neighbor_packet_key
+    || lineage.neighborCanonicalId !== row.neighbor_canonical_id
+    || lineage.neighborSourceRevision !== row.neighbor_source_revision
+    || lineage.edgeType !== row.edge_type
+    || lineage.workspaceRevision !== row.workspace_revision
+    || lineage.graphRevision !== row.graph_revision
+    || lineage.producerId !== row.producer_id
+    || lineage.producerRevision !== row.producer_revision
+    || JSON.stringify([...lineage.evidenceRefs].sort()) !== JSON.stringify([...(row.evidence_refs ?? [])].sort())
+  ) {
+    throw new Error(`PACKET_INCIDENCE_READBACK_COLUMN_MISMATCH:${row.lineage_checksum}`);
+  }
+  return lineage;
+}
+
 /** Strict read-only seam for governed DAG execution. Existing callers keep
  * the historical fail-open wrapper above; this boundary preserves typed DB
  * failures for receipts instead of converting them into empty success. */
@@ -266,9 +366,14 @@ export async function readKagHyperedgesStrictV1(
         AND h.hyperedge_id IN (
           SELECT DISTINCT hyperedge_id FROM atlas_hyperedge_members WHERE member_id = ANY($1::text[])
         )
+      ORDER BY h.contract_hyperedge_id, m.ordinal NULLS LAST, m.member_id
+      LIMIT $4
     `,
-    [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision],
+    [uniqueIds, snapshot.workspaceRevision, snapshot.graphRevision, MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 + 1],
   );
+  if (result.rows.length > MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1) {
+    throw new Error('KAG_HYPEREDGE_MEMBER_ROW_LIMIT_EXCEEDED');
+  }
   const grouped = new Map<string, HyperedgeMemberRow[]>();
   for (const row of result.rows) grouped.set(row.contract_hyperedge_id, [...(grouped.get(row.contract_hyperedge_id) ?? []), row]);
   return [...grouped.entries()]

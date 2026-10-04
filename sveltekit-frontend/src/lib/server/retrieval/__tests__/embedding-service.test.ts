@@ -30,6 +30,7 @@ describe('embedQueryForLane — fail-closed dimension guard (dense_768)', () => 
     const result = await embedQueryForLane('test query', 'dense_768');
     expect(result.vector.length).toBe(768);
     expect(result.dimension).toBe(768);
+    expect(JSON.parse(String(fetchSpy.mock.calls[0]?.[1]?.body)).prompt).toBe('test query');
   });
 
   it('throws SEMANTIC_768_DIMENSION_MISMATCH instead of silently zero-padding a short vector', async () => {

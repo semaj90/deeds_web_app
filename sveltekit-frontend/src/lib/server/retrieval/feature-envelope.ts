@@ -215,6 +215,7 @@ export const FeatureEnvelopeSchema = z.object({
   tree_node_id: z.string().optional().describe('Canonical topology node identity if already assigned'),
   qdrant_point_id: z.string().nullable().optional().describe('Canonical dense retrieval point identity if already assigned (null when the chunk has no Qdrant mirror)'),
   workspace_revision: z.string().nullable().optional().describe('Workspace revision attached by the authority join (null until a writer populates it)'),
+  graph_revision: z.string().nullable().optional().describe('Graph snapshot revision attached by the authority join (null until a writer populates it)'),
   source_revision: z.string().nullable().optional().describe('Source revision attached by the authority join (null until a writer populates it)'),
   representation_id: z.string().nullable().optional().describe('Representation identity attached by the authority join (null until a writer populates it)'),
   representation_revision: z.number().int().nullable().optional().describe('Representation revision attached by the authority join (null until a writer populates it)'),

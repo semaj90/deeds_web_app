@@ -35,6 +35,24 @@ describe('hardware-specialization-v1 contracts', () => {
 		expect(profile.capabilities.bf16).toBe(true);
 	});
 
+	it('normalizes the legacy nvidia_smi source when materializing a hardware profile', () => {
+		const profile = HardwareProfileV1Schema.parse({
+			schema_version: 'atlas.hardware-profile.v1',
+			profile_id: 'gpu:rtx3060ti:sm86',
+			device_name: 'NVIDIA GeForce RTX 3060 Ti',
+			architecture: 'sm_86',
+			compute_capability_major: 8,
+			compute_capability_minor: 6,
+			vram_total_bytes: 8 * 1024 * 1024 * 1024,
+			vram_source: 'nvidia_smi',
+			capabilities: { fp16: true, bf16: true, tf32: true, int8: true, fp8: false, fp4: false },
+			observed_at: '2026-08-15T00:00:00.000Z',
+			producer_revision: 'test',
+		});
+
+		expect(profile.vram_source).toBe('nvidia-smi');
+	});
+
 	it('rejects an architecture label that disagrees with compute capability', () => {
 		expect(() => HardwareProfileV1Schema.parse({
 			schema_version: 'atlas.hardware-profile.v1',

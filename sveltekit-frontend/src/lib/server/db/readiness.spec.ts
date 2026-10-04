@@ -59,6 +59,7 @@ describe('shouldCreateRepairTask', () => {
     expect(shouldCreateRepairTask(HEALTHY_DATABASE)).toBe(false);
     expect(shouldCreateRepairTask(classifyPgIsReadyExit(1))).toBe(false);
     expect(shouldCreateRepairTask(classifyPostgresError(Object.assign(new Error('x'), { code: '57P03' })))).toBe(false);
+    expect(shouldCreateRepairTask(classifyPostgresError('the database system is starting up'))).toBe(false);
     expect(shouldCreateRepairTask(classifyPostgresError(Object.assign(new Error('x'), { code: 'ECONNREFUSED' })))).toBe(false);
   });
 

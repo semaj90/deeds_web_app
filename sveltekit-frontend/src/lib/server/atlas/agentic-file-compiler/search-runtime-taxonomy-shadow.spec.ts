@@ -12,7 +12,7 @@ vi.mock('../../retrieval/hydrate-candidates.js', () => ({ hydrateCandidatesWithP
 vi.mock('../../retrieval/canonical-rerank-executor.js', () => ({ rerankCanonicalFeatureEnvelopes: mockRerankCanonicalFeatureEnvelopes }));
 vi.mock('../../retrieval/promote-results-outbox.js', () => ({ recordPromotionIntent: mockRecordPromotionIntent }));
 vi.mock('../policy/policy-training.js', () => ({ appendSearchRuntimeTrainingRow: mockAppendSearchRuntimeTrainingRow }));
-vi.mock('../integration/kag-hypergraph-reader-v1.js', () => ({ readKagHypergraphNeighborsV1: mockReadKagHypergraphNeighborsV1 }));
+vi.mock('../integration/kag-hypergraph-reader-v1.js', () => ({ readKagHypergraphNeighborsStrictV1: mockReadKagHypergraphNeighborsV1 }));
 
 import { createSearchRuntime } from '../../retrieval/search-runtime.js';
 import { classifyAtlasQuery } from './query-classifier.js';

@@ -1343,7 +1343,8 @@ for community-detection parity).
   or additional live pass write.
 - [x] Add pure `NlpStagingCohortV1` freeze/verify helpers to the same pass-results owner. The
   contract permits only 8/16/32 members, requires exact resolver outputs and one shared
-  workspace revision, rejects duplicate logical source refs, labels null source revisions
+  workspace revision, rejects duplicate logical source refs, requires mixed caller-provided
+  existing domain-class labels, labels null source revisions
   `REVISION_PARTIAL`, and deterministically seals sorted members. Focused tests cover replay,
   malformed size, workspace mismatch, duplicate source, unresolved identity, and tampering.
   This only freezes a cohort artifact contract; no cohort was selected from PostgreSQL and no

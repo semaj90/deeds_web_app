@@ -294,6 +294,7 @@ export interface NlpStagingCohortPacketRefV1 {
 	sourceRef: string;
 	sourceRevision: string | null;
 	revisionState: NlpCohortRevisionStateV1;
+	domainClass: string;
 }
 
 export interface NlpStagingCohortV1 {
@@ -310,6 +311,7 @@ export interface NlpStagingCohortCandidateV1 {
 	sourceRef: string | null;
 	sourceRevision: string | null;
 	workspaceRevision: string;
+	domainClass: string;
 	packetIdentityResolution: PacketKeyResolutionV2;
 }
 
@@ -339,11 +341,13 @@ export function buildNlpStagingCohortV1(input: BuildNlpStagingCohortInputV1): Nl
 
 	const seenPacketKeys = new Set<string>();
 	const seenSources = new Set<string>();
+	const seenDomains = new Set<string>();
 	const packetRefs = input.candidates.map((candidate): NlpStagingCohortPacketRefV1 => {
 		const suppliedPacketKey = candidate.packetKey.trim();
 		const sourceRef = candidate.sourceRef ? normalizeCohortSourceRef(candidate.sourceRef) : '';
 		const sourceRevision = candidate.sourceRevision?.trim() || null;
 		const memberWorkspaceRevision = candidate.workspaceRevision.trim();
+		const domainClass = candidate.domainClass.trim();
 		const resolution = candidate.packetIdentityResolution;
 		const resolutionMatches = Boolean(
 			resolution
@@ -360,6 +364,7 @@ export function buildNlpStagingCohortV1(input: BuildNlpStagingCohortInputV1): Nl
 			throw new Error('NLP_STAGING_COHORT_WORKSPACE_REVISION_MISMATCH');
 		}
 		if (!sourceRef) throw new Error('NLP_STAGING_COHORT_SOURCE_REF_REQUIRED');
+		if (!domainClass) throw new Error('NLP_STAGING_COHORT_DOMAIN_CLASS_REQUIRED');
 		if (seenPacketKeys.has(resolution.canonicalPacketKey)) {
 			throw new Error('NLP_STAGING_COHORT_DUPLICATE_PACKET_IDENTITY');
 		}
@@ -367,14 +372,17 @@ export function buildNlpStagingCohortV1(input: BuildNlpStagingCohortInputV1): Nl
 		if (seenSources.has(sourceKey)) throw new Error('NLP_STAGING_COHORT_DUPLICATE_LOGICAL_SOURCE');
 		seenPacketKeys.add(resolution.canonicalPacketKey);
 		seenSources.add(sourceKey);
+		seenDomains.add(domainClass);
 		return {
 			packetKey: resolution.canonicalPacketKey,
 			storagePacketKey: resolution.storagePacketKey,
 			sourceRef,
 			sourceRevision,
 			revisionState: sourceRevision ? 'REVISION_QUALIFIED' : 'REVISION_PARTIAL',
+			domainClass,
 		};
 	}).sort((left, right) => left.packetKey.localeCompare(right.packetKey));
+	if (seenDomains.size < 2) throw new Error('NLP_STAGING_COHORT_DOMAIN_DIVERSITY_REQUIRED');
 
 	const unsigned = {
 		schema: 'atlas.nlp-staging-cohort.v1' as const,
@@ -392,10 +400,13 @@ export function verifyNlpStagingCohortV1(cohort: NlpStagingCohortV1): boolean {
 		|| !NLPCOHORT_ALLOWED_SIZES.has(cohort.packetRefs.length)) return false;
 	const packetKeys = cohort.packetRefs.map((ref) => ref.packetKey);
 	const sourceRefs = cohort.packetRefs.map((ref) => normalizeCohortSourceRef(ref.sourceRef));
-	if (new Set(packetKeys).size !== packetKeys.length || new Set(sourceRefs).size !== sourceRefs.length) return false;
+	const domainClasses = cohort.packetRefs.map((ref) => ref.domainClass.trim());
+	if (new Set(packetKeys).size !== packetKeys.length || new Set(sourceRefs).size !== sourceRefs.length
+		|| new Set(domainClasses).size < 2) return false;
 	if (cohort.packetRefs.some((ref) => !PACKET_KEY_V2_PATTERN.test(ref.packetKey)
 		|| !ref.storagePacketKey.trim()
 		|| !ref.sourceRef.trim()
+		|| !ref.domainClass.trim()
 		|| (ref.sourceRevision === null ? ref.revisionState !== 'REVISION_PARTIAL' : ref.revisionState !== 'REVISION_QUALIFIED'))) return false;
 	return cohortChecksum === sha256Hex(stableStringify(unsigned));
 }

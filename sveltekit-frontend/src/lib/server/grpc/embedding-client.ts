@@ -14,6 +14,12 @@ import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
+import {
+  prepareEmbeddingInputV1,
+  validateEmbeddingBatchV1,
+  type EmbeddingInputModeV1,
+  type EmbeddingInputRecipeV1,
+} from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -40,6 +46,8 @@ export interface EmbeddingOptions {
   preferSequentialHttp?: boolean;
   skipCacheRead?: boolean;
   skipCacheWrite?: boolean;
+  taskMode?: EmbeddingInputModeV1;
+  title?: string | null;
 }
 
 // `onnx-local` remains a legacy receipt/cache label only. This canonical
@@ -64,6 +72,7 @@ export interface EmbeddingResult {
   totalMs: number;
   cacheHit?: boolean;
   attempts?: EmbeddingAttempt[];
+  inputRecipes?: EmbeddingInputRecipeV1[];
 }
 
 export interface EmbeddingTransportHealth {
@@ -763,7 +772,8 @@ export async function generateEmbeddingsWithTags(
   // Back-fill tags into cache entries for all texts (non-blocking)
   if (qdrantTags.length && !options.skipCacheWrite) {
     for (let i = 0; i < texts.length; i++) {
-      setCachedEmbedding(texts[i], result.vectors[i], result.source, qdrantTags).catch(() => {});
+      const cacheText = prepareEmbeddingInputV1({ text: texts[i], mode: options.taskMode, title: options.title }).formattedText;
+      setCachedEmbedding(cacheText, result.vectors[i], result.source, qdrantTags).catch(() => {});
     }
   }
   return { result, qdrantTags };
@@ -784,10 +794,16 @@ export async function generateEmbeddings(
 ): Promise<EmbeddingResult> {
   const start = performance.now();
   const attempts: EmbeddingAttempt[] = [];
+  const preparedInputs = texts.map((text) => prepareEmbeddingInputV1({
+    text,
+    mode: options.taskMode,
+    title: options.title,
+  }));
+  const cacheTexts = preparedInputs.map((prepared) => prepared.formattedText);
 
   const cachedEntries = options.skipCacheRead
     ? texts.map(() => null)
-    : await Promise.all(texts.map(getCachedEmbeddingEntry));
+    : await Promise.all(cacheTexts.map(getCachedEmbeddingEntry));
 
   // Check cache for each text
   const cachedResults = cachedEntries.map((entry) => entry?.vector ?? null);
@@ -795,14 +811,16 @@ export async function generateEmbeddings(
 
   // All cached — return immediately
   if (uncachedIndices.length === 0) {
+    const validatedCachedResults = validateEmbeddingBatchV1(cachedResults, texts.length);
     const cachedSource = cachedEntries[0]?.source ?? 'http-ollama';
     return {
-      vectors: cachedResults as number[][],
+      vectors: validatedCachedResults,
       model: SERVER_EMBEDDING_MODEL,
       dimension: cachedResults[0]?.length ?? 768,
       source: cachedSource,
       totalMs: Math.round(performance.now() - start),
       cacheHit: true,
+      inputRecipes: preparedInputs.map((prepared) => prepared.inputRecipe),
       attempts: [
         {
           transport: cachedSource,
@@ -814,7 +832,7 @@ export async function generateEmbeddings(
   }
 
   // Generate only uncached embeddings
-  const uncachedTexts = uncachedIndices.map((i) => texts[i]);
+  const uncachedTexts = uncachedIndices.map((i) => cacheTexts[i]);
   let newVectors: number[][] | null = null;
   let source: EmbeddingResult['source'] = 'http-ollama';
   let model = SERVER_EMBEDDING_MODEL;
@@ -930,15 +948,18 @@ export async function generateEmbeddings(
     throw new EmbeddingGenerationError('All embedding tiers failed', attempts);
   }
 
+  newVectors = validateEmbeddingBatchV1(newVectors, uncachedIndices.length);
+
   // Merge cached + new, and cache new results
   const vectors = [...cachedResults] as number[][];
   for (let j = 0; j < uncachedIndices.length; j++) {
     const idx = uncachedIndices[j];
     vectors[idx] = newVectors[j];
   }
+  const validatedVectors = validateEmbeddingBatchV1(vectors, texts.length);
 
   // Validate dimension contract (768-dim canonical for embeddinggemma)
-  const dimension = vectors[0]?.length ?? 768;
+  const dimension = validatedVectors[0]?.length ?? 768;
   if (dimension !== 768) {
     console.warn(
       `[embedding-client] WARNING: Received ${dimension}-dim embedding from ${source}, expected 768-dim. ` +
@@ -948,17 +969,18 @@ export async function generateEmbeddings(
 
   // Fire-and-forget cache writes for new embeddings
   for (let j = 0; !options.skipCacheWrite && j < uncachedIndices.length; j++) {
-    setCachedEmbedding(texts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
+    setCachedEmbedding(cacheTexts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
   }
 
   return {
-    vectors,
+    vectors: validatedVectors,
     model,
     dimension,
     source,
     totalMs: Math.round(performance.now() - start),
     cacheHit: false,
     attempts,
+    inputRecipes: preparedInputs.map((prepared) => prepared.inputRecipe),
   };
 }
 
@@ -977,10 +999,13 @@ export async function generateSingleEmbedding(
  * Single-text nullable embedding — drop-in replacement for embeddings-simple.generateEmbedding().
  * Returns null on empty input or failure, compatible with null-check call sites.
  */
-export async function generateEmbedding(text: string): Promise<number[] | null> {
+export async function generateEmbedding(
+  text: string,
+  options: EmbeddingOptions = {},
+): Promise<number[] | null> {
   if (!text?.trim()) return null;
   try {
-    const result = await generateEmbeddings([text]);
+    const result = await generateEmbeddings([text], options);
     return result.vectors[0] ?? null;
   } catch {
     return null;

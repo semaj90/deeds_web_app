@@ -71,6 +71,6 @@
   "safe_next_command": "node scripts/atlas/plan-openspec-evidence-projection-parity-v1.mjs",
   "smoke_command": "node --check scripts/atlas/plan-openspec-evidence-gpu-acceleration-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-gpu-acceleration-plan-v1.json",
-  "generatedAt": "2026-10-02T04:47:38.133Z",
+  "generatedAt": "2026-10-03T05:00:20.212Z",
   "checksum": "sha256:d9107aa5248dbce6ce8aa59112730b327ed8cdd276d197108863536589a15b9d"
 }

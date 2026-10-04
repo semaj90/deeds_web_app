@@ -12,6 +12,7 @@ import {
   parseTasksMarkdown,
   resolveReceiptBindings,
   resolveDependencyCandidate,
+  verifyEvidenceReceiptV1,
 } from './audit-openspec-evidence-fabric-v1.mjs';
 import { buildEvidenceReceiptV1 } from './audit-openspec-evidence-fabric-v1.mjs';
 import { compileOpenSpecFeaturePacketsV1 } from './compile-openspec-feature-packets-v1.mjs';
@@ -46,6 +47,12 @@ test('requires complete uniquely identified assertions before a PROVEN receipt c
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ expectedAssertions: [], actualAssertions: [] })), /proven requires assertions/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'other', passed: true }] })), /assertion identity mismatch/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'assert-1', passed: false }] })), /unsatisfied assertion/);
+});
+
+test('verifies receipt checksum before report-output association', () => {
+  const receipt = buildEvidenceReceiptV1(receiptInput({ outputs: [{ uri: 'docs/reports/report.json', checksum: 'sha256:output' }] }));
+  assert.deepEqual(verifyEvidenceReceiptV1(receipt), receipt);
+  assert.throws(() => verifyEvidenceReceiptV1({ ...receipt, outputs: [] }), /checksum mismatch/);
 });
 
 test('parses stable and missing task IDs without treating checkboxes as proof', () => {

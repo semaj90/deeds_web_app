@@ -1,6 +1,6 @@
 # Phase C Completion & Phase D Unblocked
 
-**Date**: June 14, 2026  
+**Date**: June 14, 2026
 **Status**: ✅ **PHASE C COMPLETE** — Phase D Higher-Hop Enrichment **UNBLOCKED**
 
 ---
@@ -79,7 +79,7 @@ The reported "0/50 Qdrant/Postgres payload agreement" was caused by:
 
 ### Critical Decision: MVP Acceptable
 
-**Rationale**: 
+**Rationale**:
 - Postgres is 100% canonical-complete (can drive all Phase D enrichments)
 - Qdrant canonical-matched cohort (48.8%) can be safely enriched
 - Legacy/orphaned points will remain untouched and non-blocking
@@ -111,11 +111,11 @@ Wire deferred fields into feature cards:
 {
   "feature_id": "auth_sessions",
   "packet_count": 42,
-  
+
   // Phase C (present)
   "karpathy_score": 0.512,
   "authority_score": 0.680,
-  
+
   // Phase D (new)
   "somCluster": 5,
   "glyphRecord": { /* GlyphRecord mapper output */ },
@@ -130,7 +130,7 @@ Wire deferred fields into feature cards:
 1. **SOM topology** — Populate somCluster from metadata.som_cluster
 2. **GlyphRecord mapping** — Wire unified semantic glyph metadata
 3. **Qdrant snapshots** — Capture point metadata as qdrantHit
-4. **Redis cache keys** — Derive redisHotKey from cache path
+4. **Redis-valkey centroids cache keys** — Derive redisHotKey from cache path
 5. **Neo4j alignment** — Link to Neo4j node IDs
 
 ---
@@ -150,7 +150,7 @@ Wire deferred fields into feature cards:
 ```bash
 # Verify Postgres canonical coverage
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
-  SELECT 
+  SELECT
     COUNT(*) as total,
     COUNT(CASE WHEN feature_id IS NOT NULL AND source_ref IS NOT NULL AND packet_key IS NOT NULL THEN 1 END) as canonical_complete
   FROM atlas_packets;"

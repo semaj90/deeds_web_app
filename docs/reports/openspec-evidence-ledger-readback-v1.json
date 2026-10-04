@@ -1,6 +1,6 @@
 {
   "schema": "atlas.openspec-evidence-ledger-readback.v1",
-  "generatedAt": "2026-10-02T04:47:33.451Z",
+  "generatedAt": "2026-10-03T05:00:16.320Z",
   "mode": "READ_ONLY",
   "status": "UNPROVEN_NO_LIVE_DATABASE",
   "dryRun": {
@@ -68,5 +68,5 @@
   "safe_next_command": "node scripts/atlas/audit-openspec-evidence-migration-v1.mjs",
   "smoke_command": "node scripts/atlas/audit-openspec-evidence-ledger-readback-v1.mjs",
   "report_path": "docs/reports/openspec-evidence-ledger-readback-v1.json",
-  "checksum": "sha256:a48dbd60da414952b03f2bcb68312533b09856740a1680a0f16d727ba3371e2c"
+  "checksum": "sha256:fd0ab8e32686c27126382c354479c065372de842f47ec2c8dc22b38a2506a1f1"
 }
