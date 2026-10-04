@@ -156,3 +156,28 @@ export function resolveReferenceTargetV1(input: {
   if (keys.length > 1) return none('EXPORT_AMBIGUOUS', binding, spec.sourceRef);
   return { status: 'RESOLVED_SYMBOL', targetSourceRef: spec.sourceRef, targetSymbolKey: keys[0], binding };
 }
+
+/**
+ * True when a symbol nomination's `parent_route` proves a directly exported top-level declaration. The chunker's
+ * nominations never set `exported`, so the route is the only syntax evidence: `[export_statement, <declaration>]`, or
+ * `[export_statement, lexical_declaration, variable_declarator]` for `export const x = ...`. A helper nested inside an
+ * exported function (`[export_statement, function_declaration, variable_declarator]`) is NOT exported. Re-exports
+ * (`export { a as b }`) and default exports are not recognised here and stay unresolved.
+ */
+export function isTopLevelExportRouteV1(parentRoute: readonly string[] | null | undefined): boolean {
+  const r = parentRoute ?? [];
+  if (r[0] !== 'export_statement') return false;
+  return r.length === 2 || (r.length === 3 && r[1] === 'lexical_declaration' && r[2] === 'variable_declarator');
+}
+
+/** Build `exportsBySourceRef` entries for one file from its symbol nominations (name -> symbol keys under that name). */
+export function buildExportsForSourceV1(
+  nominations: readonly { name: string; symbol_key: string; parent_route?: readonly string[] | null }[],
+): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const n of nominations) {
+    if (!isTopLevelExportRouteV1(n.parent_route)) continue;
+    out.set(n.name, [...(out.get(n.name) ?? []), n.symbol_key]);
+  }
+  return out;
+}
