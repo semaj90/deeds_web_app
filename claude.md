@@ -41,7 +41,7 @@ model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fi
 requests — a real bug, not just stale docs) and `scripts/validate-graphify-startup.mjs` (hardcoded
 model-name gate was rejecting Ornith as "wrong model"). **`SERVER_VLM_MODEL` was deliberately NOT
 changed** — the separate VLM server on `:8085` (FastAPI + HF Transformers) is untouched by this
-switch and still reports `"vlm_model":"gemma4:e4b"` live; do not conflate the two lanes.
+switch and reported `"vlm_model":"gemma4:e4b"` on 2026-09-03; do not conflate the two lanes. **Re-probed 2026-10-04:** `GET :8085/health` = `degraded`, `vlm_model:"ornith-1.5-9b"`, `vlm_url` -> `:8090`, `vlm_vision:"false"`, `vlm_ocr:false` — no vision model is currently serving (see the lane-consolidation `tasks.md`).
 `scripts/launch-turboquant.ps1` already has a first-class `ornith-1.5` profile (not stale), but its
 doc comment still calls `gemma4-direct` the default profile — minor, not fixed yet.
 
