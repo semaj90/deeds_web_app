@@ -1529,3 +1529,85 @@ Direction (operator paste): run Granite Docling 258M as a separate DOCUMENT-CONV
 - **Correction to the earlier entry:** the app-side lookup filtered `cache_key = 'global'` (hard-coded) while `bifrostChat` sent the gateway `x-bf-cache-key` = `options.cacheKey ?? 'legal-ai-global'` plus optional entity tags. They were DIFFERENT namespaces, so the app-side reader never read the namespace a caller declared; it read the plugin's default key. The exposure was real but narrower and odder than "everything shares `global`".
 - **`BifrostSemanticCachePlugin` contents (metadata fields only, 18 points, no response text read):** `cache_key` `global` 9 (7 model `ornith-1.5-9b`, 2 model `openai/ornith-1.5-9b`), `legal-ai-global` 3 (2 `hforf.gguf`, 1 `ornith-1.5-9b`), `agent-tool-loop:openai-facade` 3 (`hforf.gguf`), and 3 `smoke-test-*` keys. The `global` points prove the plugin writes under its `default_cache_key` when a request carries no key, so the in-code comment that a missing key bypasses the cache is stale. Entries carrying the retired model name `hforf.gguf` are stale relative to the served model and none of the 18 carries domain, intent or revision fields.
 - **Status handoff:** at 15:02 `ollama.ts` held an uncommitted edit by another session deleting the app-side Qdrant lookup (about 195 deletions, marking `cacheKey`/`entityTags` `@deprecated`: "Semantic cache admission is disabled until server-owned context is available"), alongside new untracked `cache/bifrost-l2-admission-v1.ts` and its spec (a pure admission contract: scope by CODE or LEGAL, model, embedding recipe, domain, intent, revision, answer artifact proven). This session's audit missed that module earlier; do not duplicate it. Not yet covered by that work, as far as this session checked: the gateway plugin path. Without a bypass header the plugin still reuses under its default key `global`, so disabling only the app-side reader does not stop gateway reuse. Verify against `docker/bifrost/config.json` (`semantic_cache`, `default_cache_key: global`) and send an explicit bypass (the repo notes `x-bf-cache-type: none`, unverified for this Bifrost version) or disable the plugin until admission is wired.
+
+## 20. KAG DAG tables: add / alter / migrate / index definition (2026-10-04, PAPER ONLY; nothing written or applied)
+Scope: `kag_dag_runs`, `kag_dag_nodes`, `kag_dag_edges` (runner: `features/ai/ace/kag-dag-runner.ts`, re-exported by `ace/kag-dag-runner.ts`; Drizzle declarations in `db/schema/kag-dag.ts`). Requested by the operator while the KAG DAG was producing errors. This entry defines the schema changes; it does NOT explain those errors (see "What was and was not reproduced").
+### Verified baseline (read-only, live database `legal-ai-postgres`)
+- All three tables exist and hold **0 rows**, so no DAG run has ever persisted here.
+- The Drizzle declarations in `db/schema/kag-dag.ts` match the live columns exactly, so a column-name mismatch is NOT the cause of the errors. Minor drift only: Drizzle declares `kag_dag_edges.run_id` nullable while live it is NOT NULL (it is part of the primary key).
+- Live indexes: `kag_dag_runs` has ONLY its primary key (no index on `query_hash`, `status` or `created_at`); `kag_dag_nodes` has the primary key, `UNIQUE (run_id, node_key)`, and single-column indexes on `run_id` (redundant with the unique), `node_type` and the boolean `cache_hit` (a poor index); `kag_dag_edges` has only the composite primary key `(run_id, from_node_key, to_node_key)`. FKs: nodes and edges reference `kag_dag_runs(id)` with `ON DELETE CASCADE`; edges do NOT reference nodes.
+- Gaps against the repo's identity rules: no `workspace_revision_key`, `graph_revision`, `packet_key` link, `ContextManifest` checksum, producer or execution identity on a run; `kag_dag_nodes.run_id` is NULLABLE although it is the parent key (so `UNIQUE (run_id, node_key)` does not constrain NULL-run rows); node outputs are inline `jsonb` with no size, token or reference columns.
+### Runner behaviour that constrains the DDL (read from the code)
+- Run status written: `running`, `success`, `failed`. Node status written: `running`, `success`, `error`. A separate step-result type is `completed | skipped | failed`. The vocabularies disagree, so tighten CHECKs only after code picks one.
+- **Edges are inserted BEFORE nodes** (plan time vs execution time), each inside a bare `try { ... } catch { /* ignore duplicates */ }` that swallows EVERY error, not only duplicates. A real failure (a future FK violation, a bad value) would be hidden. A plain edge->node foreign key would therefore break the runner and the break would be silent; the paper DDL uses a DEFERRABLE FK and requires one transaction per run, plus changing the catch to ignore only unique violations (SQLSTATE 23505).
+- `query_hash` is `sha256(query).slice(0, 16)` (64 bits, collision-prone); the runner never selects by it. Keep it; add a full `query_sha256` instead of changing its meaning.
+### Paper DDL (additive; not a migration file)
+```sql
+-- KAG-DAG-DDL-01 PAPER DESIGN. NOT a migration: do not save under drizzle/ or drizzle/manual/ until reviewed and approved.
+-- Baseline = the LIVE tables (verified read-only 2026-10-04: kag_dag_runs, kag_dag_nodes, kag_dag_edges, all 0 rows).
+-- Every ADD is nullable/defaulted and idempotent; ALTERs are guarded so they cannot fail on or rewrite existing data.
+
+-- ===== ADD: run-level identity and routing (join by packet_key + revisions; never feature_id alone) =====
+ALTER TABLE public.kag_dag_runs
+  ADD COLUMN IF NOT EXISTS query_sha256              text,  -- full 'sha256:'+64 hex; query_hash stays as the legacy 16-hex truncation
+  ADD COLUMN IF NOT EXISTS workspace_revision_key    text,
+  ADD COLUMN IF NOT EXISTS graph_revision            text,
+  ADD COLUMN IF NOT EXISTS context_manifest_checksum text,
+  ADD COLUMN IF NOT EXISTS ace_packet_key            text,  -- packet_key of the AcePacketV3 this run consumed/produced
+  ADD COLUMN IF NOT EXISTS domain                    text,  -- canonical registry NAME, not a numeric code
+  ADD COLUMN IF NOT EXISTS routing_registry_revision text,  -- routing-registry-v1 revision the intent/domain names came from
+  ADD COLUMN IF NOT EXISTS producer_id               text,
+  ADD COLUMN IF NOT EXISTS producer_revision         text,
+  ADD COLUMN IF NOT EXISTS execution_id              text;
+
+-- ===== ADD: node-level order, attempts, size and token accounting (feeds TOKEN-BUDGET-01) =====
+ALTER TABLE public.kag_dag_nodes
+  ADD COLUMN IF NOT EXISTS seq             integer,                 -- topological position within the run
+  ADD COLUMN IF NOT EXISTS attempt         integer NOT NULL DEFAULT 1,
+  ADD COLUMN IF NOT EXISTS lane            text,                    -- canonical lane name
+  ADD COLUMN IF NOT EXISTS executor        text,
+  ADD COLUMN IF NOT EXISTS input_tokens    integer,
+  ADD COLUMN IF NOT EXISTS output_tokens   integer,
+  ADD COLUMN IF NOT EXISTS output_bytes    integer,
+  ADD COLUMN IF NOT EXISTS output_ref      text,                    -- large outputs by reference, not inline jsonb
+  ADD COLUMN IF NOT EXISTS output_checksum text,
+  ADD COLUMN IF NOT EXISTS error_code      text;
+
+-- ===== ALTER (guarded) =====
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM public.kag_dag_nodes WHERE run_id IS NULL) THEN
+    RAISE EXCEPTION 'KAG_DAG_NODES_RUN_ID_HAS_NULLS';   -- never coerce; classify and block
+  END IF;
+END $$;
+ALTER TABLE public.kag_dag_nodes ALTER COLUMN run_id SET NOT NULL;   -- the UNIQUE (run_id, node_key) is meaningless while run_id can be NULL
+
+-- Status vocabularies as the runner writes them today (NOT VALID, then VALIDATE after review). Note the run/node mismatch:
+-- runs use running|success|failed, nodes use running|success|error. Pick one vocabulary in code before tightening further.
+ALTER TABLE public.kag_dag_runs  ADD CONSTRAINT kag_dag_runs_status_chk_v2  CHECK (status IN ('running','success','failed')) NOT VALID;
+ALTER TABLE public.kag_dag_nodes ADD CONSTRAINT kag_dag_nodes_status_chk_v2 CHECK (status IN ('running','success','error','skipped')) NOT VALID;
+
+-- Edge endpoints must be real nodes of the same run. DEFERRABLE because the runner inserts edges (plan time) BEFORE nodes
+-- (execution time); a plain FK would make those inserts fail. Requires the run's inserts to share one transaction.
+ALTER TABLE public.kag_dag_edges ADD CONSTRAINT kag_dag_edges_from_node_fk_v2
+  FOREIGN KEY (run_id, from_node_key) REFERENCES public.kag_dag_nodes (run_id, node_key) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED NOT VALID;
+ALTER TABLE public.kag_dag_edges ADD CONSTRAINT kag_dag_edges_to_node_fk_v2
+  FOREIGN KEY (run_id, to_node_key)   REFERENCES public.kag_dag_nodes (run_id, node_key) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED NOT VALID;
+
+-- ===== INDEX (only what a real query needs; nothing is dropped) =====
+CREATE INDEX IF NOT EXISTS kag_dag_runs_query_hash_idx_v2   ON public.kag_dag_runs (query_hash);
+CREATE INDEX IF NOT EXISTS kag_dag_runs_status_created_v2   ON public.kag_dag_runs (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS kag_dag_runs_snapshot_v2         ON public.kag_dag_runs (workspace_revision_key, graph_revision) WHERE workspace_revision_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS kag_dag_runs_packet_key_v2       ON public.kag_dag_runs (ace_packet_key) WHERE ace_packet_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS kag_dag_nodes_run_seq_v2         ON public.kag_dag_nodes (run_id, seq);
+CREATE INDEX IF NOT EXISTS kag_dag_nodes_type_status_v2     ON public.kag_dag_nodes (node_type, status);
+CREATE INDEX IF NOT EXISTS kag_dag_edges_to_node_v2         ON public.kag_dag_edges (run_id, to_node_key);   -- reverse traversal; the PK already covers (run_id, from_node_key)
+```
+
+### Migration plan
+- **Backfill: none needed on this database** (0 rows in all three tables). Elsewhere the new columns stay NULL and are not invented (no revisions fabricated); the `NOT NULL` on `run_id` is guarded by a `RAISE EXCEPTION` pre-check instead of coercion; CHECK and FK constraints are added `NOT VALID` and validated after review.
+- **Vehicle:** a manual sidecar migration `drizzle/manual/<date>_kag_dag_v2.sql` plus a `sidecar-migrations.json` entry (`appliedBy`, `appliedAt`) after approval, and a same-change update to `db/schema/kag-dag.ts` so Drizzle does not drift. Never `drizzle-kit push`. These tables ARE declared in Drizzle (unlike `graphify_*`), so `generate` will see them: inspect the generated SQL before journaling.
+- **Rollback:** the changes are additive; roll back with `DROP INDEX IF EXISTS` for each `_v2` index, `ALTER TABLE ... DROP CONSTRAINT` for each `_v2` constraint, and `ALTER TABLE ... DROP COLUMN IF EXISTS` for the added columns (no historical data exists to lose on this database). `run_id SET NOT NULL` is reversed with `DROP NOT NULL`.
+- **Code changes required alongside (not part of the DDL):** (a) wrap one run's inserts in a transaction; (b) narrow the edge `catch` to unique violations only and log everything else; (c) unify the run/node status vocabulary; (d) populate the new identity and token columns; (e) update the Drizzle declaration. Redundant `kag_dag_nodes_run_idx` and the `cache_hit` index are candidates to drop later; per the archive rule nothing is dropped here.
+### What was and was not reproduced
+- `ace/kag-dag-runner.test.ts` passes (1 test, a re-export check); it does not exercise the runner. The runner's own spec `features/ai/ace/kag-dag-runner.spec.ts` passes 6/6 against a MOCKED database (it covers topological ordering and a deliberate fail-open case; the "connection refused" printed to stderr is that simulated failure, not a real one). It also confirms by design that `persistKagDagRunFromSteps` is fail-open and non-blocking: a database error inside it is caught and logged as `persistKagDagRunFromSteps failed (non-blocking)` and the caller continues, so a persistence failure leaves the tables EMPTY with no visible error. Together with the 0 rows found live, that makes a silent persistence failure the leading explanation to check first: search the application log for that exact message. The operator's actual error text has NOT been seen; the likely sources identified from the code are the swallowed edge-insert errors above and callers that never persist (0 rows). Please supply the error message or the failing route so the cause can be confirmed before any change.
+- **TOKEN-BUDGET-01 (audit scope updated per the operator):** measure the KAG DAG per node rather than only per tool: tokens in/out per node (`input_tokens`, `output_tokens`, `output_bytes` above), tool-schema tokens per MCP surface (6 `atlas-task-kernel` tools vs the TRACE set), and ACE packet/card size, using the llama-server tokenizer (`/tokenize`). Not started.
