@@ -2,6 +2,7 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
+const DRY_RUN = process.argv.includes('--dry-run');
 const reportPath = path.join(root, 'docs', 'reports', 'okf-runtime-ownership.json');
 const markdownPath = path.join(root, 'docs', 'reports', 'okf-runtime-ownership.md');
 const roots = ['scripts', 'sveltekit-frontend/src', 'packages', 'services', 'docker'];
@@ -28,6 +29,13 @@ const candidates = [
   { id: 'langgraph', label: 'LangGraph', role: 'OPTIONAL_INTEGRATION', anchors: [], pattern: /langgraph/i },
   { id: 'openwiki', label: 'OpenWiki', role: 'OPTIONAL_INTEGRATION', anchors: [], pattern: /openwiki/i },
   { id: 'gpu-feature-adapters', label: 'GPU feature/tensor adapters', role: 'PROJECTION_OWNER', anchors: ['sveltekit-frontend/src/lib/server/atlas/tensors'], pattern: /feature.?matrix|tensor|cuda|cuvs|cagra/i },
+  { id: 'searxng', label: 'SearXNG external-evidence lane', role: 'OPTIONAL_INTEGRATION', anchors: [], pattern: /searxng/i },
+  { id: 'go-retrieval', label: 'Go retrieval service bridge', role: 'RUNTIME_EXECUTOR', anchors: ['sveltekit-frontend/src/lib/server/retrieval/go-search-bridge.ts'], pattern: /go-search-bridge|go-retrieval|:8100/i },
+  { id: 'turbovec', label: 'TurboVec CPU compact challenger', role: 'PROJECTION_OWNER', anchors: ['sveltekit-frontend/src/lib/server/retrieval/turbovec-rerank.ts', 'sveltekit-frontend/src/lib/server/retrieval/turbovec-prefilter.ts'], pattern: /turbovec/i },
+  { id: 'hyperrag-packet-rpc', label: 'HyperRAG Packet RPC', role: 'RUNTIME_EXECUTOR', anchors: ['sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts'], pattern: /hyperrag.?packet.?rpc|packet-rpc/i },
+  { id: 'ace-packet', label: 'ACE JSON packet (AcePacketV3)', role: 'CANONICAL_OWNER', anchors: [], pattern: /AcePacketV3|buildAcePacketV3|AcePacketWriter/i },
+  { id: 'context-manifest', label: 'ContextManifest', role: 'CANONICAL_OWNER', anchors: [], pattern: /ContextManifest/i },
+  { id: 'bitfrost', label: 'BitFrost residency cache', role: 'CACHE', anchors: [], pattern: /bitfrost:|BitFrost/i },
 ];
 
 async function collect(directory, output = []) {
@@ -101,6 +109,10 @@ const markdown = [
   'This is a static, read-only ownership inventory. It does not install packages, call endpoints, write canonical data, or promote ownership.',
 ].join('\n') + '\n';
 
+if (DRY_RUN) {
+  console.log(JSON.stringify({ status: report.status, filesScanned: report.filesScanned, gaps: report.gaps, results: results.map(({ id, classification, status, anchorEvidence, importedOrUsedFiles }) => ({ id, classification, status, anchors: anchorEvidence.length, used: importedOrUsedFiles.length })) }, null, 2));
+  process.exit(0);
+}
 await mkdir(path.dirname(reportPath), { recursive: true });
 await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 await writeFile(markdownPath, markdown, 'utf8');
