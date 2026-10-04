@@ -60,6 +60,20 @@ def resolve_prediction_batch_size(value: int) -> int:
     return DEFAULT_PREDICTION_BATCH_SIZE if value == 0 else value
 
 
+def _as_cupy_array(value: Any, cp: Any) -> Any:
+    """cuVS executor COMPATIBILITY adapter, private to this module (not a general representation converter).
+
+    Return a CuPy array for a cuVS/pylibraft result. Do not reuse it outside the cuVS call boundary:
+    it is not a data owner and carries no identity, revision or normalization semantics.
+
+    cuVS 26.6 ``pairwise_distance`` returns a pylibraft ``device_ndarray``, which has no arithmetic
+    operators (``euclidean * euclidean`` raised ``TypeError``). CuPy arrays pass through unchanged;
+    anything exposing ``__cuda_array_interface__`` is wrapped without a host copy.
+    """
+
+    return value if isinstance(value, cp.ndarray) else cp.asarray(value)
+
+
 def run_cuvs_soft_kmeans(
     matrix: Sequence[Sequence[float]] | np.ndarray,
     *,
@@ -136,7 +150,7 @@ def run_cuvs_soft_kmeans(
         end = min(source.shape[0], start + prediction_batch_size)
         batch_gpu = cp.asarray(source[start:end], dtype=cp.float32)
         labels, _ = kmeans.predict(params, batch_gpu, centroids)
-        euclidean = pairwise_distance(batch_gpu, centroids, metric="euclidean")
+        euclidean = _as_cupy_array(pairwise_distance(batch_gpu, centroids, metric="euclidean"), cp)
         distances_host = cp.asnumpy(euclidean * euclidean).astype(np.float32, copy=False)
         labels_parts.append(cp.asnumpy(labels).reshape(-1).astype(np.int64, copy=False))
 
