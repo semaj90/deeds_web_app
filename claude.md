@@ -33,8 +33,8 @@ Gemma4 — verified directly via `GET :8090/props`: `"model_alias":"ornith-1.5-9
 `"modalities":{"vision":false,"audio":false}` (text/tool-calling only; no vision projector is
 loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` is required for that. As of 2026-10-04
 `models/mmproj-Ornith-1.5-9B-BF16.gguf` EXISTS on disk but is not loaded (`/props` still shows vision false;
-the loaded weights are `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`, alias `ornith-1.5-9b`; whether this
-projector matches those weights is unverified). Requests send the alias, never a GGUF filename.) The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
+the loaded weights are `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`, alias `ornith-1.5-9b`; `models/model-manifest.json`
+pairs it with those weights as `ORNITH_VISION_PRODUCTION`, launcher profile `ornith-1.5-vlm`, sha256-verified; not run on this host). Requests send the alias, never a GGUF filename.) The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
 immediately below this one is FROZEN from Aug 4 and documents the old Gemma4/hforf setup — treat
 its *process* (chat-template wiring, `--skip-chat-parsing` ban) as still valid, but its specific
 model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fixed this session:
