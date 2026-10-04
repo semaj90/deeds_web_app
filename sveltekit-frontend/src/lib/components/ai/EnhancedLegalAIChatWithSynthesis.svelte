@@ -10,7 +10,6 @@
   import Button from '$lib/components/ui/Button.svelte';
   import TypewriterResponse from './TypewriterResponse.svelte';
   import Icon from '$lib/components/ui/Icon.svelte';
-  import { getOllamaBaseUrl } from '$lib/utils/ollama';
 
   // Props
   interface Props {
@@ -397,49 +396,19 @@ Please provide a comprehensive legal analysis including:
 Response:`;
 
     try {
-      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
+      // Chat goes through the server route (llama-server/Ornith); the browser never calls a model host.
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: SERVER_CHAT_MODEL,
-          prompt: enhancedPrompt,
-          stream: true,
-          options: {
-            temperature: 0.4,
-            num_ctx: 4096,
-            top_p: 0.9
-          }
-        }),
+        body: JSON.stringify({ prompt: enhancedPrompt, temperature: 0.4 }),
       });
 
       if (!response.ok) {
         throw new Error(`AI service error: ${response.status} ${response.statusText}`);
       }
 
-      let fullResponse = '';
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n').filter((line: string) => line.trim());
-
-          for (const line of lines) {
-            try {
-              const data = JSON.parse(line);
-              if (data.response) {
-                fullResponse += data.response;
-              }
-            } catch {
-              // Skip invalid JSON lines
-            }
-          }
-        }
-      }
+      const chatResult = await response.json();
+      const fullResponse: string = chatResult.response || '';
 
       const processingTime = Date.now() - startTime;
 
@@ -597,16 +566,7 @@ Response:`;
     const response = await fetch('/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: SERVER_CHAT_MODEL,
-        messages: [{ role: 'user', content: enhancedPrompt }],
-        stream: false,
-        options: {
-          temperature: 0.4,
-          num_ctx: 4096,
-          top_p: 0.9
-        }
-      }),
+      body: JSON.stringify({ prompt: enhancedPrompt, temperature: 0.4 }),
     });
 
     if (!response.ok) {
@@ -700,11 +660,10 @@ Response:`;
     isProcessing = true;
 
     try {
-      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: SERVER_CHAT_MODEL,
           prompt: `Perform a comprehensive legal analysis of the following text. Extract and analyze:
 
 1. Legal entities (parties, courts, statutes, cases)
@@ -716,11 +675,7 @@ Response:`;
 Text to analyze: "${text}"
 
 Provide a structured analysis:`,
-          stream: false,
-          options: {
-            temperature: 0.2,
-            num_ctx: 4096
-          }
+          temperature: 0.2
         })
       });
 
@@ -760,11 +715,10 @@ ${analysis.response}
     isProcessing = true;
 
     try {
-      const response = await fetch(`${getOllamaBaseUrl()}/api/generate`, {
+      const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: SERVER_CHAT_MODEL,
           prompt: `Research legal topic: "${topic}" for ${userRole}
 
 Provide comprehensive analysis with:
@@ -775,11 +729,7 @@ Provide comprehensive analysis with:
 5. Recommendations
 
 Topic: ${topic}`,
-          stream: false,
-          options: {
-            temperature: 0.3,
-            num_ctx: 2048
-          }
+          temperature: 0.3
         })
       });
 
