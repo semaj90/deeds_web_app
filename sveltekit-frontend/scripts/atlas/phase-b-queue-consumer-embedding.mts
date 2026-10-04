@@ -12,6 +12,7 @@
 import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp, { Channel, Connection, Message } from 'amqplib';
 import { Pool } from 'pg';
+import { createHash } from 'node:crypto';
 
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
@@ -84,10 +85,11 @@ async function callEmbeddingGemma(summary: string): Promise<number[] | null> {
 async function logAnalysisPass(
   pool: Pool,
   packet: SummaryMessage,
-  embedding: number[]
-): Promise<void> {
+  embedding: number[],
+  msg?: Message
+): Promise<boolean> {
   if (DRY_RUN) {
-    return;
+    return true;
   }
 
   try {
@@ -96,13 +98,13 @@ async function logAnalysisPass(
       INSERT INTO analysis_pass_results (
         pass_key, packet_key, source_ref, feature_id,
         pass_type, status,
-        model_name,
+        model_name, input_hash,
         output, scores, index_push, provenance,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4,
         $5, $6,
-        $7,
+        $7, $12,
         $8, $9, $10, $11,
         NOW(), NOW()
       )
@@ -117,6 +119,9 @@ async function logAnalysisPass(
         EMBEDDING_MODEL,
         JSON.stringify({
           embedding_dim: EMBEDDING_DIM,
+          representation_id: 'semantic_768',
+          model_tag: EMBEDDING_MODEL,
+          model_artifact_revision: null,
           embedding_norm: Math.sqrt(embedding.reduce((a, b) => a + b * b, 0)),
         }),
         JSON.stringify({ magnitude: Math.sqrt(embedding.reduce((a, b) => a + b * b, 0)) }),
@@ -128,17 +133,28 @@ async function logAnalysisPass(
         }),
         JSON.stringify({
           source: 'queue_consumer_embedding',
+          // Legacy synthetic correlation value; NOT a broker or attempt identity (PF4B-QUEUE-01).
           queue_message_id: `${packet.packet_key}:${Date.now()}`,
+          broker: {
+            message_id: msg?.properties?.messageId ?? null,
+            delivery_tag: msg?.fields?.deliveryTag ?? null,
+            redelivered: msg?.fields?.redelivered ?? null,
+            routing_key: msg?.fields?.routingKey ?? null,
+            consumer_tag: msg?.fields?.consumerTag ?? null,
+          },
           identity: {
             identity_mutated: false,
             join_key: 'packet_key',
             fallback_join: `${packet.source_ref}:${packet.feature_id}`,
           },
         }),
+        `sha256:${createHash('sha256').update(packet.summary, 'utf8').digest('hex')}`,
       ]
     );
+    return true;
   } catch (err) {
     console.error(`  ✗ Failed to log pass: ${err}`);
+    return false;
   }
 }
 
@@ -196,7 +212,11 @@ async function processMessage(
     }
 
     // Log analysis pass
-    await logAnalysisPass(pgPool, packet, embedding);
+    if (!(await logAnalysisPass(pgPool, packet, embedding, msg))) {
+      console.log(`  ⚠️  Ledger write failed; not acking`);
+      channel.nack(msg, false, true); // requeue: never ack without a ledger row
+      return;
+    }
 
     // Update summary layer
     await updateSummaryLayerEmbedding(pgPool, packet, embedding);
