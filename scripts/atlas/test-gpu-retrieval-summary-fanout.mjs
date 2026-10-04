@@ -24,7 +24,8 @@ const env = loadRepoEnv();
 const INPUT = path.resolve(REPO_ROOT, String(argv.get('input') ?? '.tmp/gpu-retrieval-summary-envelopes.ndjson'));
 const LIMIT = Number(argv.get('limit') ?? 6);
 const LANGEXTRACT_URL = String(argv.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095').replace(/\/+$/, '');
-const GEMMA4_URL = String(argv.get('gemma4-url') ?? env.GEMMA4_URL ?? env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/+$/, '');
+// CLI flag first, then the neutral name, then the legacy name (NAME-ENV-01B; previously GEMMA4_URL won over LLAMA_SERVER_URL).
+const GEMMA4_URL = String(argv.get('gemma4-url') ?? env.LLAMA_SERVER_URL ?? env.GEMMA4_URL ?? 'http://127.0.0.1:8090').trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 const OUT_ACE = path.resolve(REPO_ROOT, String(argv.get('ace-out') ?? '.tmp/ace-envelope-from-gpu-retrieval.ndjson'));
 const OUT_SEEDS = path.resolve(REPO_ROOT, String(argv.get('seeds-out') ?? '.tmp/kmeans-som-feature-seeds.ndjson'));
 const OUT_JSON = path.resolve(REPO_ROOT, String(argv.get('report') ?? 'docs/reports/gpu-retrieval-summary-fanout-proof.json'));

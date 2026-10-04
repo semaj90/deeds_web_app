@@ -45,10 +45,12 @@ const REDIS_PASS = process.env.REDIS_PASSWORD || 'redis';
 // Gate 2 Fix: Unified endpoint configuration (avoid port mismatch)
 // Stage 1 (summaries): llama-server at 8090 (Gemma4)
 // Stage 2 (embeddings): Ollama at 11434 (embeddinggemma)
-const GEMMA4_URL =
-  process.env.GEMMA4_URL ??
+// Neutral name first (NAME-ENV-01B); base URL has any trailing /v1 stripped because the call site appends /v1/....
+const GEMMA4_URL = String(
   process.env.LLAMA_SERVER_URL ??
-  'http://127.0.0.1:8090';
+  process.env.GEMMA4_URL ??
+  'http://127.0.0.1:8090'
+).trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
 
 const _ollamaRaw = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
