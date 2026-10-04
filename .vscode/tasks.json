@@ -3740,6 +3740,40 @@
       "detail": "ornith-1.5-vlm profile with the mmproj kept on the CPU (LLAMA_ARG_MMPROJ_OFFLOAD=0): no extra VRAM. Run Status afterwards and expect vision=True."
     },
     {
+      "label": "🤖 Ollama: Unload all models (free VRAM)",
+      "type": "process",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "$names = @(ollama ps | Select-Object -Skip 1 | ForEach-Object { ($_ -split '\\s+')[0] } | Where-Object { $_ }); if ($names.Count -eq 0) { Write-Host 'No Ollama models loaded' } else { $names | ForEach-Object { Write-Host ('Unloading ' + $_); ollama stop $_ } }; Start-Sleep -Seconds 2; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader"
+      ],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Runs `ollama stop` for every model `ollama ps` lists (embeddinggemma reloads on the next embedding request). Does not touch llama-server on :8090."
+    },
+    {
+      "label": "🧹 Free GPU VRAM (unload Ollama + stop :8090)",
+      "dependsOn": [
+        "🤖 Ollama: Unload all models (free VRAM)",
+        "⚡ TurboQuant: Stop (unload Ornith on :8090)"
+      ],
+      "dependsOrder": "sequence",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": false
+      },
+      "problemMatcher": [],
+      "detail": "Frees the most VRAM: unloads Ollama models, then gracefully stops ONLY the :8090 llama-server. Anything calling :8090 fails until you run the Start task again. Use before cuVS KMeans."
+    },
+    {
       "label": "⚡ TurboQuant: Test Inference (hearsay query)",
       "type": "shell",
       "command": "curl -s -X POST http://localhost:8090/v1/chat/completions -H \"Content-Type: application/json\" -d \"{\\\"model\\\":\\\"gemma4-rotorquant:latest\\\",\\\"messages\\\":[{\\\"role\\\":\\\"user\\\",\\\"content\\\":\\\"What is hearsay evidence? Answer in 2 sentences.\\\"}],\\\"max_tokens\\\":120,\\\"temperature\\\":0.3}\" | python -m json.tool",
