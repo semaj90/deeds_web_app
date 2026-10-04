@@ -23,6 +23,7 @@ import {
   buildSceneIntentUserPrompt,
 } from './scene-intent-prompt.js';
 import { bifrostChat } from '$lib/server/ollama.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 export interface SceneIntentExtractInput {
   narrative:     string;
@@ -130,7 +131,7 @@ export async function extractSceneIntent(
   input: SceneIntentExtractInput,
 ): Promise<SceneIntentExtractResult> {
   const startedAt = Date.now();
-  const model = input.model ?? 'gemma4-rotorquant:latest';
+  const model = input.model ?? BIFROST_CHAT_MODEL;
 
   const messages = [
     { role: 'system' as const, content: `${SCENE_INTENT_SYSTEM_PROMPT}\n\n${SCENE_INTENT_SHAPE_HINT}` },

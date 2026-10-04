@@ -65,6 +65,7 @@ import { YOLOService }               from '$lib/server/yolo.js';
 import { analyzeEvidenceImage }      from '$lib/server/analysis/vlm-evidence-analyzer.js';
 import { langGraphSynthesize }       from '$lib/server/ai/langgraph-client.js';
 import { classifyPath }              from '$lib/server/tensor/topology-byte-mapper.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ const HG_IDX_TTL      = 4 * 60 * 60;
 const MAX_ROWS        = 4_000;        // cap DB fetch
 const SOM_GRID_W           = 12;   // research SOM grid (smaller than codebase 44×44)
 const SOM_GRID_H           = 12;
-const MODEL                = 'gemma4-rotorquant:latest';
+const MODEL                = BIFROST_CHAT_MODEL;
 const SUMMARIZE_BATCH_SIZE = 5;    // parallel hyperedge summarization batch width
 
 // Grade thresholds

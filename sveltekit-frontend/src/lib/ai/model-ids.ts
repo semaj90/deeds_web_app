@@ -100,6 +100,13 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
  */
 export const SERVER_CHAT_MODEL = 'ornith-1.5-9b';
 
+/**
+ * Chat model id as the Bifrost gateway (:3040) lists it: provider-prefixed. The bare
+ * SERVER_CHAT_MODEL is correct only for direct llama-server (:8090) calls.
+ * Probed 2026-10-03: GET :3040/v1/models -> openai/ornith-1.5-9b.
+ */
+export const BIFROST_CHAT_MODEL = `openai/${SERVER_CHAT_MODEL}`;
+
 	/** Legacy Gemma4 compatibility identifier; not the active chat owner. */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
