@@ -4,6 +4,7 @@ import { gatherAdminContext } from '$lib/server/admin/ai-chat-context.js';
 import { OperatorRouter } from '$lib/server/kag/operator-router.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { resolveOrnithRequestModelV1 } from '$lib/ai/model-ids.js';
 
 import { z } from 'zod';
 
@@ -85,7 +86,7 @@ Do NOT attempt to mutate data or generate code for production use.
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LLM_MODEL_ID,
+        model: resolveOrnithRequestModelV1('BIFROST_OPENAI', LLM_MODEL_ID).requestModelId,
         messages: [{ role: 'user', content: prompt }],
         stream: false
       })

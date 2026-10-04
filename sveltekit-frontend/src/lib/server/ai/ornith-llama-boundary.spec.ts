@@ -59,6 +59,24 @@ describe('Ornith request model id per transport', () => {
     expect(resolveOrnithRequestModelV1('BIFROST_OPENAI').canonicalModelId).toBe(SERVER_CHAT_MODEL);
   });
 
+  it('resolves configured model IDs without recreating transport prefixes at call sites', () => {
+    expect(resolveOrnithRequestModelV1('LLAMA_SERVER', 'ornith-1.5-9b')).toEqual({
+      target: 'LLAMA_SERVER',
+      canonicalModelId: 'ornith-1.5-9b',
+      requestModelId: 'ornith-1.5-9b',
+    });
+    expect(resolveOrnithRequestModelV1('BIFROST_OPENAI', 'ornith-1.5-9b')).toEqual({
+      target: 'BIFROST_OPENAI',
+      canonicalModelId: 'ornith-1.5-9b',
+      requestModelId: 'openai/ornith-1.5-9b',
+    });
+  });
+
+  it('rejects provider-qualified values as canonical model identity', () => {
+    expect(() => resolveOrnithRequestModelV1('BIFROST_OPENAI', 'openai/ornith-1.5-9b'))
+      .toThrow(/INVALID_CANONICAL_ORNITH_MODEL_ID/);
+  });
+
   it('unknown transport targets fail closed', () => {
     expect(() => resolveOrnithRequestModelV1('OLLAMA' as never)).toThrow(/UNKNOWN_ORNITH_TRANSPORT_TARGET/);
   });

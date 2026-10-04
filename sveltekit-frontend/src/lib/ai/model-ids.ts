@@ -115,16 +115,28 @@ export type OrnithTransportTargetV1 = 'LLAMA_SERVER' | 'BIFROST_OPENAI';
  * transport, the string sent on the wire is not. Callers must use this instead of
  * patching an `openai/` prefix locally. Unknown targets fail closed.
  */
-export function resolveOrnithRequestModelV1(target: OrnithTransportTargetV1): {
+export function resolveOrnithRequestModelV1(
+  target: OrnithTransportTargetV1,
+  canonicalModelId: string = SERVER_CHAT_MODEL
+): {
   target: OrnithTransportTargetV1;
   canonicalModelId: string;
   requestModelId: string;
 } {
+  const normalizedModelId = canonicalModelId.trim();
+  if (!normalizedModelId || normalizedModelId.includes('/')) {
+    throw new Error('INVALID_CANONICAL_ORNITH_MODEL_ID');
+  }
   switch (target) {
     case 'LLAMA_SERVER':
-      return { target, canonicalModelId: SERVER_CHAT_MODEL, requestModelId: SERVER_CHAT_MODEL };
+      return { target, canonicalModelId: normalizedModelId, requestModelId: normalizedModelId };
     case 'BIFROST_OPENAI':
-      return { target, canonicalModelId: SERVER_CHAT_MODEL, requestModelId: BIFROST_CHAT_MODEL };
+      return {
+        target,
+        canonicalModelId: normalizedModelId,
+        requestModelId:
+          normalizedModelId === SERVER_CHAT_MODEL ? BIFROST_CHAT_MODEL : `openai/${normalizedModelId}`,
+      };
     default:
       throw new Error(`UNKNOWN_ORNITH_TRANSPORT_TARGET: ${String(target)}`);
   }
