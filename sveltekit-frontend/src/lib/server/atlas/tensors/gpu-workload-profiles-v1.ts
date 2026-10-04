@@ -21,6 +21,7 @@ export const MIB = 1024 * 1024;
 
 export type GpuWorkloadIdV1 =
   | 'CUVS_KMEANS_SMALL'
+  | 'CUVS_KMEANS_MEDIUM'
   | 'CUVS_KMEANS_CORPUS'
   | 'CUVS_CAGRA_64K'
   | 'CUGRAPH_PAGERANK'
@@ -46,15 +47,23 @@ export const GPU_WORKLOAD_PROFILES_V1: Readonly<Record<GpuWorkloadIdV1, GpuWorkl
     measuredNeedMiB: 512,
     minimumFreeMiB: 1024,
     evidence: 'MEASURED',
-    evidenceNote: '2026-10-04 synthetic runs: +~200 MiB at 5,000 x 768 (K=32) and +~330 MiB at 20,000 x 768 (K=64) over a ~1.3 GiB desktop baseline, rounded up to 512. Real semantic_768 (5,000 rows, K=64, 19 iterations): +252 MiB over the run's own minimum (peak 1,745 MiB total), consistent with 512; 20,000 real rows (K=64, 29 iterations): +391 MiB (peak 1,968 MiB total), still inside 512. 55k+ real rows not measured.',
+    evidenceNote: '2026-10-04 synthetic runs: +~200 MiB at 5,000 x 768 (K=32) and +~330 MiB at 20,000 x 768 (K=64) over a ~1.3 GiB desktop baseline, rounded up to 512. Real semantic_768 (5,000 rows, K=64, 19 iterations): +252 MiB over the run minimum (peak 1,745 MiB total), consistent with 512; 20,000 real rows (K=64, 29 iterations): +391 MiB (peak 1,968 MiB total), still inside 512. 55k+ real rows not measured.',
+  },
+  CUVS_KMEANS_MEDIUM: {
+    id: 'CUVS_KMEANS_MEDIUM',
+    description: 'cuVS KMeans at ~55k x 768 rows (the content_embedding column size)',
+    measuredNeedMiB: 768,
+    minimumFreeMiB: 1536,
+    evidence: 'MEASURED',
+    evidenceNote: '2026-10-04 real semantic_768, 55,000 rows, K=64, 33 iterations: +591 MiB over the run minimum (peak 2,182 MiB total), rounded up to 768. Growth was sub-linear: +252 (5k), +391 (20k), +591 (55k).',
   },
   CUVS_KMEANS_CORPUS: {
     id: 'CUVS_KMEANS_CORPUS',
-    description: 'cuVS KMeans over tens of thousands to the whole corpus (55k-219k rows)',
+    description: 'cuVS KMeans over the whole corpus (~219k rows)',
     measuredNeedMiB: null,
     minimumFreeMiB: null,
     evidence: 'MEASURE_FIRST',
-    evidenceNote: 'Raw fp32 matrix alone is 162 MiB (55k) to 642 MiB (219k); fit/predict buffers not measured at this scale.',
+    evidenceNote: 'Raw fp32 matrix is 642 MiB at 219k rows; fit/predict buffers not measured at this scale (a 3-point extrapolation from 5k/20k/55k suggests ~1.5 GiB, an estimate only).',
   },
   CUVS_CAGRA_64K: {
     id: 'CUVS_CAGRA_64K',

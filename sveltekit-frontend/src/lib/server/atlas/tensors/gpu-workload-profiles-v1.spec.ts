@@ -36,6 +36,15 @@ describe('gpu workload profiles route through decideGpuMemoryAdmissionV1', () =>
     }
   });
 
+  it('the 55k profile is measured above the small profile and is not admitted beside the Ornith server', () => {
+    const small = GPU_WORKLOAD_PROFILES_V1.CUVS_KMEANS_SMALL;
+    const medium = GPU_WORKLOAD_PROFILES_V1.CUVS_KMEANS_MEDIUM;
+    expect(medium.evidence).toBe('MEASURED');
+    expect(medium.measuredNeedMiB!).toBeGreaterThan(small.measuredNeedMiB!);
+    expect(admitGpuWorkloadV1('CUVS_KMEANS_MEDIUM', free(6403, false)).decision).toBe('ADMIT');
+    expect(admitGpuWorkloadV1('CUVS_KMEANS_MEDIUM', free(207, true)).decision).not.toBe('ADMIT');
+  });
+
   it('BITFROST_L2 uses the existing-ledger figures (need 1024, minimum free 2048)', () => {
     const profile = GPU_WORKLOAD_PROFILES_V1.BITFROST_L2;
     expect([profile.measuredNeedMiB, profile.minimumFreeMiB, profile.evidence]).toEqual([1024, 2048, 'EXISTING_LEDGER']);
