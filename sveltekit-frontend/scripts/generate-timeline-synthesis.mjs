@@ -8,7 +8,7 @@
  *   3. pgvector semantic search on research_summaries (manifold4 cosine distance)
  *   4. Quaternion-manifold rerank: standardise → HMM bias → dot-product score
  *   5. KAG context: Redis wiki:note:dir:* for active directories
- *   6. Gemma4 streaming synthesis (Ollama /api/generate stream)
+ *   6. Streaming synthesis (llama-server /v1/chat/completions SSE)
  *   7. Output: docs/agent_timeline_synthesis.md + Redis agent:synthesis:latest (6h TTL)
  *
  * Usage:
@@ -42,6 +42,7 @@ const QUERY_ARG   = (() => {
 const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://127.0.0.1:6379';
 const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
 const OLLAMA_URL  = process.env.OLLAMA_URL  ?? 'http://127.0.0.1:11434';
+const LLAMA_SERVER_URL = (process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/v1\/?$/, '');
 const DB_URL      = process.env.DATABASE_URL ?? '';
 const EMBED_MODEL = process.env.EMBED_MODEL ?? 'embeddinggemma:latest';
 const LLM_MODEL   = process.env.LLM_MODEL   ?? (process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b');
@@ -200,35 +201,47 @@ function defaultQuery(timelineMd) {
     : 'codebase fix timeline analysis agent recommendations';
 }
 
-// ── Gemma4 streaming synthesis ────────────────────────────────────────────────
+// ── llama-server streaming synthesis (/v1/chat/completions, SSE) ─────────────
+// Chat/synthesis belongs to llama-server (Ornith); Ollama is embeddings-only.
+// stream:true is required: a thinking model with stream:false can spend max_tokens
+// on reasoning_content and return empty content.
 async function synthesize(prompt, onChunk) {
+  let full = '';
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+    const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: LLM_MODEL,
-        prompt,
+        messages: [{ role: 'user', content: prompt }],
         stream: true,
-        options: { temperature: 0.3, num_predict: 1200, stop: ['</analysis>'] },
+        temperature: 0.3,
+        max_tokens: 1200,
+        stop: ['</analysis>'],
       }),
       signal: AbortSignal.timeout(300_000),
     });
-    if (!res.ok) throw new Error(`Ollama ${res.status}`);
+    if (!res.ok) throw new Error(`llama-server ${res.status}`);
     const reader = res.body.getReader();
     const dec    = new TextDecoder();
-    let full     = '';
+    let buffer   = '';
     let streaming = true;
     while (streaming) {
       const { done, value } = await reader.read();
       if (done) { streaming = false; break; }
-      const lines = dec.decode(value, { stream: true }).split('\n').filter(Boolean);
-      for (const line of lines) {
+      buffer += dec.decode(value, { stream: true });
+      const lines = buffer.split(/\r?\n/);
+      buffer = lines.pop() ?? '';
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line.startsWith('data:')) continue;
+        const payload = line.slice(5).trim();
+        if (payload === '[DONE]') { streaming = false; break; }
         try {
-          const j = JSON.parse(line);
-          if (j.response) {
-            full += j.response;
-            onChunk(j.response);
+          const piece = JSON.parse(payload).choices?.[0]?.delta?.content;
+          if (piece) {
+            full += piece;
+            onChunk(piece);
           }
         } catch { /* partial JSON */ }
       }

@@ -25,7 +25,6 @@ const KNOWN_OLLAMA_CHAT_CALLERS: string[] = [
 	'scripts/batch_repair_chat.py',
 	'scripts/gemma3-legal-agent.mjs',
 	'scripts/tests/test-ollama-direct.mjs',
-	'sveltekit-frontend/scripts/generate-timeline-synthesis.mjs',
 	'sveltekit-frontend/scripts/graphify-svg-architecture.mjs',
 	'sveltekit-frontend/scripts/mcp/test-direct-ollama.mjs',
 	'sveltekit-frontend/scripts/screenshots/caption-screenshots-gemma4.mjs',
