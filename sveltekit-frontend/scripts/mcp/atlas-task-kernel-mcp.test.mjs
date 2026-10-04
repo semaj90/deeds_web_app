@@ -43,6 +43,15 @@ test('descriptions do not claim retrieval or a research circuit the tools do not
   assert.doesNotMatch(byName.atlas_research, /bounded, read-only research circuit/i);
 });
 
+test('atlas_inspect advertises identity resolution, not source content, and accepts refs', () => {
+  const inspect = TOOLS.find((t) => t.name === 'atlas_inspect');
+  assert.match(inspect.description, /packet identity/i);
+  assert.match(inspect.description, /not source content/i);
+  assert.ok(Object.keys(inspect.inputSchema.properties).includes('refs'));
+  assert.equal(inspect.inputSchema.properties.refs.maxItems, 10);
+  assert.ok(!inspect.inputSchema.required || inspect.inputSchema.required.length === 0, 'refs-only calls must be valid');
+});
+
 test('the research envelope never presents maxRounds as applied', () => {
   assert.match(source, /maxRoundsApplied:\s*false/);
   assert.match(source, /roundsExecuted:\s*1/);

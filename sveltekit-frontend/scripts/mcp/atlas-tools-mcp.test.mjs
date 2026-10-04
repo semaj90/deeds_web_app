@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildAgenticRagContext, buildAgenticRagContextLive, buildLiveAtlasContext, callTraceTool, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
+import { classifyInspectRef, findSourceRefs, buildAgenticRagContext, buildAgenticRagContextLive, buildLiveAtlasContext, callTraceTool, buildCodebaseFileLookupKeys, collapseDependencyRows, findDependencies } from './atlas-tools-mcp.mjs';
 
 const ROOT = 'C:/Users/james/Videos/deeds-web-app';
 
@@ -369,4 +369,112 @@ test('disableLive forces the static packet without calling TRACE, and a live suc
   assert.equal(live.querySpecific, true);
   assert.equal(live.liveRetrieval, undefined);
   assert.ok(!live.warnings.includes('LIVE_RETRIEVAL_UNAVAILABLE'));
+});
+
+// ── inspect: packet identity ──────────────────────────────────────────────────────────────────────
+const inspectPacket = (key, ref, extra = {}) => ({ packet_key: key, source_ref: ref, feature_id: 'f.x', feature_label: 'F X', summary: '  a   summary  ', sha256: null, ...extra });
+function fakeNeo4j(rowsByQuery) {
+  const runs = [];
+  return {
+    runs,
+    session: () => ({
+      run: async (_cypher, params) => { runs.push(params); return { records: (rowsByQuery[params.query] ?? []).map((name) => ({ get: () => name })) }; },
+      close: async () => {},
+    }),
+  };
+}
+
+test('classifyInspectRef separates paths, packet keys, names and empties', () => {
+  assert.equal(classifyInspectRef('src/hooks.server.ts'), 'PATH');
+  assert.equal(classifyInspectRef('C:\\x\\y.ts'), 'PATH');
+  assert.equal(classifyInspectRef('README.md'), 'PATH');
+  assert.equal(classifyInspectRef('packet:649b6f79c506'), 'PACKET_KEY');
+  assert.equal(classifyInspectRef('ace:packet:b5aa13ce0a61'), 'PACKET_KEY');
+  assert.equal(classifyInspectRef('graphify'), 'NAME');
+  assert.equal(classifyInspectRef('retry dead letter'), 'NAME');
+  assert.equal(classifyInspectRef('   '), 'EMPTY');
+});
+
+test('a path resolves to exactly one packet and is identity-bound but revision-unqualified', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts')] }) });
+  const result = await findSourceRefs({ query: 'sveltekit-frontend/src/a.ts' }, { trace });
+  assert.equal(trace.calls[0].args.source_ref, 'src/a.ts'); // the canonical workspace-relative form is what is searched
+  const [item] = result.inspected;
+  assert.equal(item.status, 'IDENTITY_BOUND');
+  assert.deepEqual(item.packetKeys, ['packet:aaa']);
+  assert.equal(item.packets[0].summary, 'a summary'); // whitespace collapsed
+  assert.equal(result.provenance.authority, 'atlas_packets_via_trace');
+  assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
+  assert.equal(result.provenance.graphRevision, null);
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.writesPerformed, false);
+});
+
+test('only an explicit source revision on every packet qualifies the result', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { source_revision: 'sha256:rev1' })] }) });
+  const result = await findSourceRefs({ refs: ['src/a.ts'] }, { trace });
+  assert.equal(result.provenance.status, 'IDENTITY_BOUND_REVISION_QUALIFIED');
+  const withChecksumOnly = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:aaa', 'src/a.ts', { sha256: 'abc' })] }) });
+  const second = await findSourceRefs({ refs: ['src/a.ts'] }, { trace: withChecksumOnly });
+  assert.equal(second.provenance.status, 'IDENTITY_BOUND_REVISION_UNQUALIFIED');
+});
+
+test('two packets for one file is a conflict that is reported, never resolved by picking one', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:649b', 'sveltekit-frontend/src/hooks.server.ts'), inspectPacket('ace:packet:b5aa', 'src/hooks.server.ts')] }) });
+  const result = await findSourceRefs({ query: 'src/hooks.server.ts' }, { trace });
+  assert.equal(result.inspected[0].status, 'IDENTITY_CONFLICT');
+  assert.deepEqual([...result.inspected[0].packetKeys].sort(), ['ace:packet:b5aa', 'packet:649b']);
+  assert.equal(result.provenance.status, 'UNRESOLVED');
+});
+
+test('packets for other files returned by a fuzzy search are filtered out; none left means NO_PACKET', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': () => ({ packets: [inspectPacket('packet:zzz', 'src/other.ts')] }) });
+  const result = await findSourceRefs({ query: 'src/a.ts' }, { trace });
+  assert.equal(result.inspected[0].status, 'NO_PACKET');
+  assert.deepEqual(result.inspected[0].packets, []);
+});
+
+test('one failed lookup does not fail the others, and the failure is named', async () => {
+  const trace = fakeTrace({
+    'atlas.packet_search': ({ source_ref }) => {
+      if (source_ref === 'src/bad.ts') throw Object.assign(new Error('x'), { code: 'TRACE_EMPTY_RESPONSE' });
+      return { packets: [inspectPacket('packet:ok', source_ref)] };
+    },
+  });
+  const result = await findSourceRefs({ refs: ['src/ok.ts', 'src/bad.ts'] }, { trace });
+  const byRef = Object.fromEntries(result.inspected.map((i) => [i.ref, i]));
+  assert.equal(byRef['src/ok.ts'].status, 'IDENTITY_BOUND');
+  assert.equal(byRef['src/bad.ts'].status, 'LOOKUP_FAILED');
+  assert.equal(byRef['src/bad.ts'].failure, 'TRACE_EMPTY_RESPONSE');
+  assert.equal(result.provenance.status, 'UNRESOLVED');
+});
+
+test('refs and query are deduplicated and capped at ten with the overflow reported', async () => {
+  const trace = fakeTrace({ 'atlas.packet_search': ({ source_ref }) => ({ packets: [inspectPacket(`packet:${source_ref}`, source_ref)] }) });
+  const refs = Array.from({ length: 12 }, (_, i) => `src/f${i}.ts`);
+  const result = await findSourceRefs({ query: 'src/f0.ts', refs }, { trace });
+  assert.equal(result.inspected.length, 10);
+  assert.equal(result.lookup.truncatedInputs, 2);
+  assert.equal(trace.calls.length, 10);
+});
+
+test('a plain name uses the legacy Neo4j SourceRef name search and never calls TRACE', async () => {
+  const trace = fakeTrace({});
+  const driver = fakeNeo4j({ graphify: ['graphify_edges', 'graphify_symbols'] });
+  const result = await findSourceRefs({ query: 'graphify' }, { trace, driver });
+  assert.equal(trace.calls.length, 0);
+  assert.deepEqual(result.sourceRefs, ['graphify_edges', 'graphify_symbols']);
+  assert.equal(result.inspected[0].status, 'NAME_MATCHED');
+  assert.equal(result.provenance.authority, 'neo4j_projection');
+  assert.equal(result.provenance.status, 'UNRESOLVED');
+});
+
+test('a packet key is reported as unsupported instead of guessed, and empty input is rejected', async () => {
+  const trace = fakeTrace({});
+  const result = await findSourceRefs({ refs: ['packet:649b6f79c506'] }, { trace });
+  assert.equal(result.inspected[0].status, 'UNSUPPORTED_REF_KIND');
+  assert.equal(result.inspected[0].failure, 'PACKET_KEY_LOOKUP_NOT_AVAILABLE');
+  assert.equal(trace.calls.length, 0);
+  const empty = await findSourceRefs({}, { trace });
+  assert.equal(empty.lookup.failure, 'EMPTY_INSPECT_INPUT');
 });

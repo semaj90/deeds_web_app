@@ -277,13 +277,15 @@ const TOOLS = [
   },
   {
     name: 'find_source_refs',
-    description: 'Query SourceRef or CodebaseFile nodes in the knowledge graph.',
+    description:
+      'Resolve file paths to Atlas packet identity (packet key, feature, revision when known); plain names search SourceRef names in the knowledge graph.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Name pattern or file path substring.' },
+        query: { type: 'string', description: 'A file path, or a name pattern for SourceRef names.' },
+        refs: { type: 'array', maxItems: 10, items: { type: 'string', maxLength: 1024 }, description: 'File paths to resolve (any form).' },
       },
-      required: ['query'],
+      required: [],
       additionalProperties: false,
     },
   },
@@ -1442,21 +1444,112 @@ async function traceToolChain({ tool }) {
   }
 }
 
-async function findSourceRefs({ query }) {
+// ── Inspect: resolve inputs to packet identity (KERNEL-PATCH-04) ──────────────────────────────────
+// Path-like inputs resolve through TRACE `atlas.packet_search` (the canonical `atlas_packets` identity); plain
+// names keep the legacy Neo4j SourceRef name search. Identity only: this never returns source content, and a
+// packet-key lookup is reported as unsupported rather than guessed (`atlas.packet_search` has no key parameter).
+const INSPECT_REF_CAP = 10;
+
+export function classifyInspectRef(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return 'EMPTY';
+  if (/^(?:ace:)?packet:[0-9a-f]{6,}$/i.test(text)) return 'PACKET_KEY';
+  if (/[\\/]/.test(text) || /\.[A-Za-z0-9]{1,8}$/.test(text)) return 'PATH';
+  return 'NAME';
+}
+
+function packetIdentityView(packet) {
+  return {
+    packetKey: packet.packet_key ?? null,
+    sourceRef: packet.source_ref ?? null,
+    featureId: packet.feature_id ?? null,
+    featureLabel: packet.feature_label ?? null,
+    conceptIds: Array.isArray(packet.concept_ids) ? packet.concept_ids.slice(0, 16) : null,
+    summary: typeof packet.summary === 'string' ? packet.summary.replace(/\s+/g, ' ').trim().slice(0, 300) : null,
+    sha256: packet.sha256 ?? null,
+    sourceRevision: packet.source_revision ?? packet.sourceRevision ?? null,
+    byteStart: packet.byte_start ?? null,
+    byteEnd: packet.byte_end ?? null,
+    identityLane: packet.identity_lane ?? null,
+  };
+}
+
+export async function findSourceRefs({ query, refs } = {}, { trace = (name, args) => callTraceTool(name, args), driver } = {}) {
   if (MOCK_MODE) return mockGraphResult('find_source_refs', { query });
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-  try {
-    const res = await session.run(
-      `MATCH (s:SourceRef) WHERE s.name CONTAINS $query
-       RETURN s.name as name`,
-      { query }
-    );
-    const refs = res.records.map((r) => r.get('name'));
-    return { query, sourceRefs: refs, ...diagnosticProvenance('find_source_refs', query) };
-  } finally {
-    await session.close();
+  const requested = [
+    ...new Set(
+      [...(Array.isArray(refs) ? refs : []), ...(query ? [query] : [])].map((value) => String(value).trim()).filter(Boolean)
+    ),
+  ];
+  const inputs = requested.slice(0, INSPECT_REF_CAP);
+  const truncatedInputs = requested.length - inputs.length;
+  const base = { query: query ?? null, refs: Array.isArray(refs) ? refs : [], canonicalAuthority: false, writesPerformed: false };
+  if (inputs.length === 0) {
+    return {
+      ...base,
+      sourceRefs: [],
+      inspected: [],
+      lookup: { requested: 0, truncatedInputs: 0, failure: 'EMPTY_INSPECT_INPUT' },
+      provenance: { tool: 'find_source_refs', authority: 'none', graphRevision: null, evidenceRefs: [], status: 'UNRESOLVED', subject: null },
+    };
   }
+
+  const inspected = await mapWithConcurrency(inputs, 5, async (input) => {
+    const kind = classifyInspectRef(input);
+    if (kind === 'PACKET_KEY') {
+      return { ref: input, kind, status: 'UNSUPPORTED_REF_KIND', packets: [], packetKeys: [], failure: 'PACKET_KEY_LOOKUP_NOT_AVAILABLE' };
+    }
+    if (kind === 'NAME') return { ref: input, kind, status: 'NAME_SEARCH', packets: [], packetKeys: [], failure: null };
+    const canonical = canonicalWorkspaceRef(input);
+    try {
+      const found = await trace('atlas.packet_search', { source_ref: workspaceRelativeDisplay(input), limit: 5 });
+      const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === canonical).map(packetIdentityView);
+      const packetKeys = [...new Set(packets.map((p) => p.packetKey).filter(Boolean))];
+      const status = packets.length === 0 ? 'NO_PACKET' : packetKeys.length === 1 ? 'IDENTITY_BOUND' : 'IDENTITY_CONFLICT';
+      return { ref: input, kind, canonical, status, packets, packetKeys, failure: null };
+    } catch (error) {
+      return { ref: input, kind, canonical, status: 'LOOKUP_FAILED', packets: [], packetKeys: [], failure: error.code ?? 'LOOKUP_FAILED' };
+    }
+  });
+
+  const names = inspected.filter((item) => item.kind === 'NAME');
+  const sourceRefs = [];
+  let nameFailure = null;
+  if (names.length > 0) {
+    const session = (driver ?? getNeo4jDriver()).session();
+    try {
+      for (const item of names) {
+        const res = await session.run(`MATCH (s:SourceRef) WHERE s.name CONTAINS $query RETURN s.name as name`, { query: item.ref });
+        const matches = res.records.map((r) => r.get('name'));
+        item.status = matches.length > 0 ? 'NAME_MATCHED' : 'NAME_NO_MATCH';
+        item.matchCount = matches.length;
+        sourceRefs.push(...matches);
+      }
+    } catch (error) {
+      nameFailure = 'NEO4J_LOOKUP_FAILED';
+      for (const item of names) item.status = 'LOOKUP_FAILED';
+    } finally {
+      await session.close();
+    }
+  }
+
+  const pathItems = inspected.filter((item) => item.kind === 'PATH');
+  const allBound = pathItems.length > 0 && pathItems.every((item) => item.status === 'IDENTITY_BOUND');
+  const allRevisioned = allBound && pathItems.every((item) => item.packets.every((p) => typeof p.sourceRevision === 'string' && p.sourceRevision.trim()));
+  return {
+    ...base,
+    sourceRefs: [...new Set(sourceRefs)],
+    inspected,
+    lookup: { requested: inputs.length, truncatedInputs, nameFailure },
+    provenance: {
+      tool: 'find_source_refs',
+      authority: pathItems.length > 0 ? 'atlas_packets_via_trace' : 'neo4j_projection',
+      graphRevision: null,
+      evidenceRefs: [],
+      status: allRevisioned ? 'IDENTITY_BOUND_REVISION_QUALIFIED' : allBound ? 'IDENTITY_BOUND_REVISION_UNQUALIFIED' : 'UNRESOLVED',
+      subject: inputs.join(', ').slice(0, 200),
+    },
+  };
 }
 
 async function findFeature({ feature }) {
