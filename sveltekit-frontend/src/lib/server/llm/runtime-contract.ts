@@ -16,12 +16,10 @@
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
-import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { resolveLoadedLlamaModel, normalizeLlamaServerBaseUrlV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 
-/** Normalize OpenAI API URLs to the origin/base expected by the `/v1/*` owners below. */
-export function normalizeLlamaServerBaseUrlV1(value: string): string {
-  return value.trim().replace(/\/+$/, '').replace(/\/v1$/i, '');
-}
+/** Re-exported: the pure function lives in the import-safe resolver so readers can use it without this module's import-time requirements. */
+export { normalizeLlamaServerBaseUrlV1 } from '$lib/server/ai/llama-server-model-resolver.js';
 
 export const LLM_BASE_URL = normalizeLlamaServerBaseUrlV1(
   ENV.LLAMA_SERVER_URL ??
