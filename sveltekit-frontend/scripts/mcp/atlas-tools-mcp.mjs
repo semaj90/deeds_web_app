@@ -22,8 +22,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import neo4j from 'neo4j-driver';
+import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
 
-const log = (...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
+const log =(...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
 
 let neo4jDriver = null;
 function getNeo4jDriver() {
@@ -1003,22 +1004,146 @@ function diagnosticProvenance(tool, subject) {
   };
 }
 
-async function findDependencies({ target }) {
+// CodebaseFile nodes live in two key families (see KERNEL-REAL-01A in the lane-consolidation tasks.md):
+// `path` (indexed, workspace-relative, carries IMPORTS) and `filePath` (absolute or
+// `sveltekit-frontend/`-prefixed, carries CALLS). One canonical workspace-relative key is resolved
+// to the stored form of each family; the normalizer is the shared scripts/atlas/lib one.
+const WORKSPACE_ABS_ROOT = path
+  .resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+  .replace(/\\/g, '/');
+const DEPENDENCY_ROW_CAP = 500;
+
+// The shared normalizer strips a drive letter and a leading `deeds-web-app/` or `sveltekit-frontend/`
+// but not an absolute `Users/<name>/.../deeds-web-app/` prefix, so that prefix is stripped here first.
+// `display` keeps the file's own case (the indexed `path` property is case-preserved);
+// `canonical` is the shared normalizer's lowercase workspace-relative form.
+function workspaceRelativeDisplay(raw) {
+  return String(raw ?? '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^file:\/+/i, '')
+    .replace(/^[A-Za-z]:\/+/, '')
+    .replace(/[?#].*$/, '')
+    .replace(/^\.\/+/, '')
+    .replace(/^(?:.*?\/)?deeds-web-app\//i, '')
+    .replace(/^sveltekit-frontend\//i, '')
+    .replace(/\/+/g, '/')
+    .replace(/^\/+/, '');
+}
+
+export function canonicalWorkspaceRef(raw) {
+  return normalizeSourceRef(workspaceRelativeDisplay(raw));
+}
+
+export function buildCodebaseFileLookupKeys(target, workspaceAbsRoot = WORKSPACE_ABS_ROOT) {
+  const display = workspaceRelativeDisplay(target);
+  const canonical = normalizeSourceRef(display);
+  if (!canonical) return null;
+  const absPrefix = `${workspaceAbsRoot}/sveltekit-frontend/`;
+  return {
+    canonical,
+    pathKeys: [...new Set([display, canonical])],
+    filePathKeys: [...new Set([`sveltekit-frontend/${display}`, `${absPrefix}${display}`])],
+    lowerFilePathKeys: [`sveltekit-frontend/${canonical}`, `${absPrefix}${canonical}`.toLowerCase()],
+  };
+}
+
+export function collapseDependencyRows(rows) {
+  const seen = new Map();
+  for (const row of rows) {
+    if (!row.type) continue; // OPTIONAL MATCH with no outgoing edge
+    const depRaw = row.depPath ?? row.depFilePath ?? row.depSourceRef ?? null;
+    const depCanonical = depRaw ? canonicalWorkspaceRef(depRaw) : null;
+    const key = `${row.type}|${depCanonical ?? row.depName ?? ''}|${row.depKind ?? ''}`;
+    const entry = seen.get(key);
+    if (entry) {
+      entry.viaFlaggedDuplicate = entry.viaFlaggedDuplicate && Boolean(row.flagged);
+      continue;
+    }
+    seen.set(key, {
+      dep: depRaw,
+      depCanonical,
+      depKind: row.depKind ?? null,
+      depName: row.depName ?? null,
+      type: row.type,
+      viaFlaggedDuplicate: Boolean(row.flagged),
+    });
+  }
+  return [...seen.values()];
+}
+
+const DEPENDENCY_RETURN = `OPTIONAL MATCH (f)-[r:IMPORTS|CALLS]->(dep)
+       RETURN f.path AS nodePath, f.filePath AS nodeFilePath, f.dataQualityFlag AS flagged,
+              type(r) AS type, dep.path AS depPath, dep.filePath AS depFilePath,
+              dep.sourceRef AS depSourceRef, labels(dep)[0] AS depKind, dep.name AS depName
+       LIMIT ${DEPENDENCY_ROW_CAP + 1}`;
+
+export async function findDependencies({ target }, { driver } = {}) {
   if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
-  const normalizedTarget = target.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-  try {
-    const res = await session.run(
-      `MATCH (f:CodebaseFile { filePath: $normalizedTarget })-[r:IMPORTS|CALLS]->(dep)
-       RETURN dep.filePath as dep, type(r) as type`,
-      { normalizedTarget }
-    );
-    const deps = res.records.map((r) => ({ dep: r.get('dep'), type: r.get('type') }));
+  const keys = buildCodebaseFileLookupKeys(target);
+  if (!keys) {
     return {
-      target: normalizedTarget,
-      dependencies: deps,
-      ...diagnosticProvenance('find_dependencies', normalizedTarget),
+      target: String(target ?? ''),
+      dependencies: [],
+      lookup: { failure: 'EMPTY_TARGET' },
+      ...diagnosticProvenance('find_dependencies', String(target ?? '')),
+    };
+  }
+  const session = (driver ?? getNeo4jDriver()).session();
+  try {
+    // Phase A: exact keys (the `path` property is indexed). Phase B: case-insensitive scan, run when phase A
+    // found nothing OR reached only one of the two node families (a case difference would otherwise hide the
+    // other family's edges). Phase B's rows are a superset of phase A's, so they replace them.
+    let phase = 'A';
+    let res = await session.run(
+      `MATCH (f:CodebaseFile)
+       WHERE f.path IN $pathKeys OR f.filePath IN $filePathKeys
+       ${DEPENDENCY_RETURN}`,
+      { pathKeys: keys.pathKeys, filePathKeys: keys.filePathKeys }
+    );
+    let rows = res.records.map((r) => r.toObject());
+    const familiesSeen = new Set(rows.map((row) => (row.nodePath != null ? 'path' : 'filePath')));
+    if (familiesSeen.size < 2) {
+      phase = 'B';
+      res = await session.run(
+        `MATCH (f:CodebaseFile)
+         WHERE toLower(f.path) = $canonical OR toLower(f.filePath) IN $lowerFilePathKeys
+         ${DEPENDENCY_RETURN}`,
+        { canonical: keys.canonical, lowerFilePathKeys: keys.lowerFilePathKeys }
+      );
+      const phaseBRows = res.records.map((r) => r.toObject());
+      if (phaseBRows.length >= rows.length) rows = phaseBRows;
+    }
+    const truncated = rows.length > DEPENDENCY_ROW_CAP;
+    if (truncated) rows = rows.slice(0, DEPENDENCY_ROW_CAP);
+    const nodes = new Map();
+    for (const row of rows) {
+      const family = row.nodePath != null ? 'path' : 'filePath';
+      nodes.set(`${family}|${row.nodePath ?? row.nodeFilePath}`, { family, key: row.nodePath ?? row.nodeFilePath, flagged: Boolean(row.flagged) });
+    }
+    const dependencies = collapseDependencyRows(rows);
+    return {
+      target: keys.canonical,
+      dependencies,
+      lookup: {
+        canonical: keys.canonical,
+        phase,
+        nodesMatched: [...nodes.values()],
+        // TARGET_NOT_A_PATH: no node and the input has neither a slash nor an extension (for example a symbol name;
+        // this tool is file-keyed). PROJECTION_MISSING_FILE: no node under any known key form.
+        // NO_OUTGOING_EDGES: node(s) found, none outgoing.
+        failure:
+          nodes.size === 0
+            ? /[/.]/.test(keys.canonical)
+              ? 'PROJECTION_MISSING_FILE'
+              : 'TARGET_NOT_A_PATH'
+            : dependencies.length === 0
+              ? 'NO_OUTGOING_EDGES'
+              : null,
+        truncated,
+        rowCap: DEPENDENCY_ROW_CAP,
+      },
+      ...diagnosticProvenance('find_dependencies', keys.canonical),
     };
   } finally {
     await session.close();
