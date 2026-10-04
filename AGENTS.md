@@ -104,6 +104,7 @@ Startup does NOT require Redis/Qdrant/Neo4j. Engram MCP at `:8792` is the only r
 - UnoCSS is the styling baseline; do not assume default Tailwind classes exist.
 - `drizzle/meta/` must contain only JSON snapshot/journal files — no `.md` or `.txt`.
 - Sidecar migrations in `drizzle/` that are not in `_journal.json` must be listed in `drizzle/sidecar-migrations.json`.
+- WSL2/miniforge/conda/cuVS/RAPIDS GPU work: the 8 GiB card cannot hold the Ornith vision server on `:8090` too. Free it first with the VS Code task `GPU: Prepare cuVS KMeans` (graceful, only `--port 8090`; ask the operator and check `/slots` is idle), run the job with `/home/james/miniforge3/envs/atlas-rapids-cu13/bin/python`, then run `TurboQuant: Start (vision, CPU projector, :8090)`. Details: `codex.md` and `CLAUDE.md`. Never `taskkill /IM llama-server.exe`.
 
 ## Parent Atlas verified retrieval and analysis fabric (2026-08-29)
 
