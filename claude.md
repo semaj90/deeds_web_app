@@ -31,8 +31,10 @@ correct on architecture/roles unless noted otherwise).
 `:8090` currently serves `ornith-1.5-9b` (`models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`), not
 Gemma4 — verified directly via `GET :8090/props`: `"model_alias":"ornith-1.5-9b"`,
 `"modalities":{"vision":false,"audio":false}` (text/tool-calling only; no vision projector is
-loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` would be required for that, and none exists in
-the model directory as of this check). The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
+loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` is required for that. As of 2026-10-04
+`models/mmproj-Ornith-1.5-9B-BF16.gguf` EXISTS on disk but is not loaded (`/props` still shows vision false;
+the loaded weights are `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`, alias `ornith-1.5-9b`; whether this
+projector matches those weights is unverified). Requests send the alias, never a GGUF filename.) The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
 immediately below this one is FROZEN from Aug 4 and documents the old Gemma4/hforf setup — treat
 its *process* (chat-template wiring, `--skip-chat-parsing` ban) as still valid, but its specific
 model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fixed this session:

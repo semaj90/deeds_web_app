@@ -46,7 +46,7 @@ const TURBOVEC_GRPC_URL = String(args.get('turbovec-grpc') ?? env.TURBOVEC_SIDEC
 const GO_RETRIEVAL_URL = String(args.get('go-retrieval-url') ?? env.GO_RETRIEVAL_HTTP_URL ?? env.RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100').replace(/\/+$/, '');
 const LANGEXTRACT_URL = String(args.get('langextract-url') ?? env.LANGEXTRACT_URL ?? 'http://127.0.0.1:8095').replace(/\/+$/, '');
 const GEMMA4_URL = String(args.get('gemma4-url') ?? env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1').replace(/\/+$/, '');
-const GEMMA4_MODEL = String(args.get('gemma4-model') ?? env.LOCAL_GEMMA_MODEL ?? env.LANGEXTRACT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf');
+const GEMMA4_MODEL = String(args.get('gemma4-model') ?? env.LOCAL_GEMMA_MODEL ?? env.LANGEXTRACT_MODEL ?? env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b');
 
 function lane(status, detail = {}) {
   return { status, ...detail };

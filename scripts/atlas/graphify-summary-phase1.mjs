@@ -105,7 +105,7 @@ async function callGemma4(prompt, intent) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: prompt }

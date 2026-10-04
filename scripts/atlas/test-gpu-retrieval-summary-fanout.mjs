@@ -233,7 +233,7 @@ async function langExtract(snippets) {
 
   async function gemma4InlineExtraction(reason) {
     const data = await postJson(`${GEMMA4_URL}/v1/chat/completions`, {
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
       messages: [
         {
           role: 'system',
@@ -378,7 +378,7 @@ async function gemma4Summary(aceEnvelope) {
   ];
   try {
     const data = await postJson(`${GEMMA4_URL}/v1/chat/completions`, {
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
       messages,
       temperature: 0.1,
       max_tokens: 420,

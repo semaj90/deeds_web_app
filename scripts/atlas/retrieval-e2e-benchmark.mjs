@@ -416,7 +416,7 @@ async function stage6_llmGeneration(query, context) {
     const prompt = `Context:\n${context}\n\nQuestion: ${query}\n\nProvide a concise answer (1-2 sentences):`;
 
     const response = await postJson(`${GEMMA4_URL}/v1/chat/completions`, {
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 256,
       temperature: 0.3,
