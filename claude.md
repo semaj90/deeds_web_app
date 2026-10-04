@@ -32,7 +32,7 @@ correct on architecture/roles unless noted otherwise).
 Gemma4 — verified directly via `GET :8090/props`: `"model_alias":"ornith-1.5-9b"`,
 `"modalities":{"vision":false,"audio":false}` (text/tool-calling only; no vision projector is
 loaded — a separate `mmproj-Ornith-1.5-9B-*.gguf` is required for that. As of 2026-10-04
-`models/mmproj-Ornith-1.5-9B-BF16.gguf` EXISTS on disk but is not loaded (`/props` still shows vision false;
+`models/mmproj-Ornith-1.5-9B-BF16.gguf` EXISTS and is now loaded via the `ornith-1.5-vlm` profile (earlier `/props` showed vision false;
 the loaded weights are `models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`, alias `ornith-1.5-9b`; `models/model-manifest.json`
 pairs it with those weights as `ORNITH_VISION_PRODUCTION`, launcher profile `ornith-1.5-vlm`, sha256-verified; not run on this host). Requests send the alias, never a GGUF filename.) The "❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT" section
 immediately below this one is FROZEN from Aug 4 and documents the old Gemma4/hforf setup — treat
@@ -43,7 +43,7 @@ model identity (`gemma4-legal-iq4xs-direct.gguf`) as historical, not current. Fi
 requests — a real bug, not just stale docs) and `scripts/validate-graphify-startup.mjs` (hardcoded
 model-name gate was rejecting Ornith as "wrong model"). **`SERVER_VLM_MODEL` was deliberately NOT
 changed** — the separate VLM server on `:8085` (FastAPI + HF Transformers) is untouched by this
-switch and reported `"vlm_model":"gemma4:e4b"` on 2026-09-03; do not conflate the two lanes. **Re-probed 2026-10-04:** `GET :8085/health` = `degraded`, `vlm_model:"ornith-1.5-9b"`, `vlm_url` -> `:8090`, `vlm_vision:"false"`, `vlm_ocr:false` — no vision model is currently serving (see the lane-consolidation `tasks.md`).
+switch and reported `"vlm_model":"gemma4:e4b"` on 2026-09-03; do not conflate the two lanes. **Re-probed 2026-10-04:** `:8085/health` was `degraded` (`vlm_vision:"false"`, `vlm_ocr:false`) while `:8090` ran text-only. After relaunching `:8090` with `-StartupProfile ornith-1.5-vlm` and `LLAMA_ARG_MMPROJ_OFFLOAD=0` (projector on CPU), `/props` shows `modalities.vision:true`, a real image request returned "Red", and `:8085/health` is `healthy` with `vlm_ocr:true`, `vlm_vision:"true"` (VLM lane = the same Ornith server, not a Gemma4 model). GPU is then ~7.8 of 8.2 GiB used; see the lane-consolidation `tasks.md`.
 `scripts/launch-turboquant.ps1` already has a first-class `ornith-1.5` profile (not stale), but its
 doc comment still calls `gemma4-direct` the default profile — minor, not fixed yet.
 
