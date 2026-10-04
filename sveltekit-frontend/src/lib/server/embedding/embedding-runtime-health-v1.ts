@@ -167,3 +167,87 @@ export async function probeOllamaEmbeddingRuntimeV1(options: {
     observedAt,
   };
 }
+
+/** The fields of `atlas.emb-prov-01-embedding-provenance-receipt.v1` that the binding reads. */
+export interface EmbeddingModelReceiptV1 {
+  schema: string;
+  generatedAt: string;
+  status: string;
+  artifact: {
+    liveArtifactSha256: string;
+    recordedModelArtifactRevision: string;
+    artifactChecksumMatchesRevision: boolean;
+  };
+  runtimeLoadedArtifact?: { loadedMatchesArtifact?: boolean };
+  crossExecutorParity?: { executorsAgree?: boolean; parity?: { dim?: number } };
+  provenanceFields?: { serverModelAlias?: string };
+}
+
+export interface ReceiptBindingV1 {
+  /** The probe with dimension / artifact revision filled in only when the receipt truly covers this runtime. */
+  probe: EmbeddingRuntimeProbeV1;
+  bound: boolean;
+  reasons: string[];
+}
+
+const RECEIPT_SCHEMA_V1 = 'atlas.emb-prov-01-embedding-provenance-receipt.v1';
+const RECEIPT_PROVEN = 'EMB_PROV_01_PROVEN';
+
+const stripSha = (value: string): string => value.trim().toLowerCase().replace(/^sha256[:-]/, '');
+
+/**
+ * Bind a runtime probe to the committed model receipt (EMBED-RUNTIME-READBACK-01 step 2).
+ *
+ * The receipt proves ONE artifact: the GGUF served by the strict llama.cpp lane. It says nothing about
+ * the bytes behind another executor; cross-executor cosine parity is evidence of agreement, never of
+ * identity. So:
+ *   - 'llama-server': the receipt's artifact revision and 768 dimension are bound if the receipt is
+ *     proven, fresh, self-consistent and recorded the loaded path matching the artifact.
+ *   - 'ollama': bound only if the caller supplies the observed artifact sha256 of Ollama's blob AND it
+ *     equals the receipt's artifact. A different blob stays unbound (reason names both hashes).
+ *   - 'cpu': never bound from this receipt.
+ * A stale or unproven receipt binds nothing. This function reads no files and makes no network calls.
+ */
+export function bindProbeToModelReceiptV1(
+  probe: EmbeddingRuntimeProbeV1,
+  receipt: EmbeddingModelReceiptV1,
+  options: { maxAgeHours?: number; now?: Date; observedArtifactSha256?: string | null } = {},
+): ReceiptBindingV1 {
+  const unbound = (reasons: string[]): ReceiptBindingV1 => ({ probe, bound: false, reasons });
+  const maxAgeHours = options.maxAgeHours ?? 168;
+  const now = options.now ?? new Date();
+
+  if (receipt.schema !== RECEIPT_SCHEMA_V1) return unbound(['receipt schema is not the EMB-PROV-01 v1 schema']);
+  if (receipt.status !== RECEIPT_PROVEN) return unbound([`receipt status is ${receipt.status}, not ${RECEIPT_PROVEN}`]);
+  if (!receipt.artifact?.artifactChecksumMatchesRevision) return unbound(['receipt artifact checksum does not match its recorded revision']);
+  const generated = Date.parse(receipt.generatedAt);
+  if (!Number.isFinite(generated)) return unbound(['receipt generatedAt is not a valid timestamp']);
+  const ageHours = (now.getTime() - generated) / 3_600_000;
+  if (ageHours > maxAgeHours) return unbound([`receipt is ${Math.round(ageHours)} h old (limit ${maxAgeHours} h)`]);
+  if (receipt.crossExecutorParity?.parity?.dim !== EXPECTED_EMBEDDING_DIMENSION_V1) return unbound(['receipt did not record a 768 dimension']);
+
+  const receiptSha = stripSha(receipt.artifact.liveArtifactSha256);
+  if (!receiptSha || receiptSha !== stripSha(receipt.artifact.recordedModelArtifactRevision)) return unbound(['receipt live sha256 and recorded revision disagree']);
+
+  const bind = (): ReceiptBindingV1 => ({
+    probe: { ...probe, dimension: EXPECTED_EMBEDDING_DIMENSION_V1, modelArtifactRevision: receipt.artifact.recordedModelArtifactRevision },
+    bound: true,
+    reasons: [],
+  });
+
+  switch (probe.provider) {
+    case 'llama-server':
+      if (receipt.runtimeLoadedArtifact?.loadedMatchesArtifact !== true) return unbound(['receipt did not record the loaded llama-server path matching the artifact']);
+      return bind();
+    case 'ollama': {
+      const observed = options.observedArtifactSha256 ? stripSha(options.observedArtifactSha256) : '';
+      if (!observed) return unbound(['Ollama artifact sha256 was not observed; cross-executor parity does not prove identity']);
+      if (observed !== receiptSha) {
+        return unbound([`Ollama blob sha256 ${observed.slice(0, 12)}... differs from the receipt artifact ${receiptSha.slice(0, 12)}...; executor parity is not artifact identity`]);
+      }
+      return bind();
+    }
+    default:
+      return unbound(['the cpu backend is not covered by this receipt']);
+  }
+}

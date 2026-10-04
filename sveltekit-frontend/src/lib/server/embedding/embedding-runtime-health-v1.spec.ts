@@ -1,9 +1,11 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
+  bindProbeToModelReceiptV1,
   classifyEmbeddingRuntimeV1,
   normalizeEmbeddingModelIdV1,
   probeOllamaEmbeddingRuntimeV1,
+  type EmbeddingModelReceiptV1,
   type EmbeddingRuntimeProbeV1,
 } from './embedding-runtime-health-v1.js';
 
@@ -120,5 +122,63 @@ describe('probeOllamaEmbeddingRuntimeV1 (read-only, no embedding request)', () =
       fetchImpl: async (url, init) => { urls.push(url); expect(init && 'method' in init).toBeFalsy(); return { ok: true, json: async () => ({ models: [] }) }; },
     });
     expect(urls.sort()).toEqual(['http://x/api/ps', 'http://x/api/tags']);
+  });
+});
+
+describe('bindProbeToModelReceiptV1 (EMBED-RUNTIME-READBACK-01 step 2)', () => {
+  const GGUF = 'bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7';
+  const OLLAMA_BLOB = '0800cbac9c2064dde519420e75e512a83cb360de3ad5df176185dc69652fc515';
+  const receipt = (over: Partial<EmbeddingModelReceiptV1> = {}): EmbeddingModelReceiptV1 => ({
+    schema: 'atlas.emb-prov-01-embedding-provenance-receipt.v1',
+    generatedAt: '2026-10-03T22:34:29.809Z',
+    status: 'EMB_PROV_01_PROVEN',
+    artifact: { liveArtifactSha256: GGUF, recordedModelArtifactRevision: GGUF, artifactChecksumMatchesRevision: true },
+    runtimeLoadedArtifact: { loadedMatchesArtifact: true },
+    crossExecutorParity: { executorsAgree: true, parity: { dim: 768 } },
+    provenanceFields: { serverModelAlias: 'embeddinggemma' },
+    ...over,
+  });
+  const now = new Date('2026-10-04T00:00:00.000Z');
+  const resident = (provider: 'ollama' | 'llama-server' | 'cpu') => probe({ provider, loadedModelIds: ['embeddinggemma'] });
+
+  it('llama-server lane + proven fresh receipt -> bound, and a resident model reaches MODEL_READY', () => {
+    const b = bindProbeToModelReceiptV1(resident('llama-server'), receipt(), { now });
+    expect(b.bound).toBe(true);
+    expect(b.probe).toMatchObject({ dimension: 768, modelArtifactRevision: GGUF });
+    expect(classifyEmbeddingRuntimeV1(REQUESTED, b.probe).status).toBe('MODEL_READY');
+  });
+
+  it('ollama with no observed blob hash -> NOT bound: parity is not identity', () => {
+    const b = bindProbeToModelReceiptV1(resident('ollama'), receipt(), { now });
+    expect(b.bound).toBe(false);
+    expect(b.reasons.join(' ')).toMatch(/parity does not prove identity/);
+    expect(classifyEmbeddingRuntimeV1(REQUESTED, b.probe).status).toBe('MODEL_IDENTITY_UNPROVEN');
+  });
+
+  it('the real Ollama blob is a different file from the receipt GGUF -> NOT bound, both hashes named', () => {
+    const b = bindProbeToModelReceiptV1(resident('ollama'), receipt(), { now, observedArtifactSha256: `sha256-${OLLAMA_BLOB}` });
+    expect(b.bound).toBe(false);
+    expect(b.reasons.join(' ')).toContain('0800cbac9c2');
+    expect(b.reasons.join(' ')).toContain('bc843658e96');
+    expect(classifyEmbeddingRuntimeV1(REQUESTED, b.probe).status).toBe('MODEL_IDENTITY_UNPROVEN');
+  });
+
+  it('ollama whose blob equals the receipt artifact -> bound and ready', () => {
+    const b = bindProbeToModelReceiptV1(resident('ollama'), receipt(), { now, observedArtifactSha256: GGUF.toUpperCase() });
+    expect(b.bound).toBe(true);
+    expect(classifyEmbeddingRuntimeV1(REQUESTED, b.probe).status).toBe('MODEL_READY');
+  });
+
+  it('a stale, unproven or inconsistent receipt binds nothing', () => {
+    expect(bindProbeToModelReceiptV1(resident('llama-server'), receipt({ generatedAt: '2026-09-01T00:00:00Z' }), { now }).bound).toBe(false);
+    expect(bindProbeToModelReceiptV1(resident('llama-server'), receipt({ status: 'EMB_PROV_01_UNPROVEN' }), { now }).bound).toBe(false);
+    expect(bindProbeToModelReceiptV1(resident('llama-server'), receipt({ artifact: { liveArtifactSha256: GGUF, recordedModelArtifactRevision: OLLAMA_BLOB, artifactChecksumMatchesRevision: true } }), { now }).bound).toBe(false);
+    expect(bindProbeToModelReceiptV1(resident('llama-server'), receipt({ runtimeLoadedArtifact: { loadedMatchesArtifact: false } }), { now }).bound).toBe(false);
+  });
+
+  it('the cpu backend is never bound from this receipt', () => {
+    const b = bindProbeToModelReceiptV1(resident('cpu'), receipt(), { now });
+    expect(b.bound).toBe(false);
+    expect(b.reasons.join(' ')).toMatch(/cpu backend/);
   });
 });
