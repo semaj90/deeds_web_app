@@ -1,0 +1,61 @@
+{
+  "schema": "atlas.chunk-lineage-writer-owner-census.v1",
+  "generatedAt": "2026-10-05T19:43:08.501Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "gate": "CHUNK-LINEAGE-OWNER-01",
+  "writers": [
+    {
+      "path": "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+      "kind": "INSERT ... ON CONFLICT (qdrant_id)",
+      "carries": {
+        "source_revision": false,
+        "workspace_revision": false,
+        "representation_revision": false,
+        "file_content_hash": false
+      }
+    },
+    {
+      "path": "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+      "kind": "INSERT ... ON CONFLICT (qdrant_id)",
+      "carries": {
+        "source_revision": false,
+        "workspace_revision": false,
+        "representation_revision": false,
+        "file_content_hash": false
+      }
+    }
+  ],
+  "lineageProducersAfterTheFact": [
+    {
+      "path": "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs",
+      "role": "mirrors source/workspace revision onto chunk rows on exact source_ref + whole-file digest match; representation revision deliberately untouched",
+      "state": "canary only (5 rows, rolled back); apply gated by explicit limit + confirmation token"
+    },
+    {
+      "table": "atlas_packet_chunk_lineage",
+      "role": "PROVEN packet<->chunk bridge (chunk_row_id = codebase_chunk_index.id)",
+      "rows": 127927
+    },
+    {
+      "table": "atlas_workspace_source_bindings",
+      "role": "exact source binding per workspace revision",
+      "rowsAtAdmittedWorkspace": 24456
+    }
+  ],
+  "fieldClassification": {
+    "file_content_hash": "NEVER_PRODUCED_BY_WRITER; backfilled afterwards (3,699 of 274,465 rows still null)",
+    "source_revision": "NEVER_PRODUCED_BY_WRITER; available upstream (bridge, bindings); chunk-row mirror NOT applied (0 rows)",
+    "workspace_revision": "NEVER_PRODUCED_BY_WRITER; available upstream via exact binding (179,221 chunks bind exactly); chunk-row mirror NOT applied (0 rows)",
+    "representation_revision": "NEVER_PRODUCED; no canonical producer proven; deliberately null in the backfill owner"
+  },
+  "firstMissingBoundary": "the two INSERT writers never receive or compute a whole-file digest or revision; lineage is attached only by after-the-fact producers, and the chunk-row mirror is unapplied",
+  "recommendation": {
+    "patchWriter": "NOT YET: both are legacy index paths; stamping revisions at INSERT would add a second lineage producer next to the gated backfill and bridge producers",
+    "next": [
+      "apply the existing exact-match mirror backfill as a bounded canary (operator token)",
+      "define the representationRevision producer (recipe decision)",
+      "route new chunk writes through one owner that stamps file_content_hash + revisions, then retire the legacy writers"
+    ]
+  }
+}
