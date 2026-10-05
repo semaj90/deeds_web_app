@@ -1,18 +1,19 @@
 {
   "schema": "atlas.kernel-real-02-orchestrator-live-proof.v1",
-  "generatedAt": "2026-10-05T19:39:07.697Z",
+  "generatedAt": "2026-10-05T19:52:39.720Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "executionMode": "READ_ONLY",
   "postgresPasswordPresentInEnv": true,
   "cohortNote": "frozen re-creation; original 01B question text was not recorded",
-  "verdict": "DISTINCT_SETS_BUT_REVISION_INCOMPLETE",
+  "verdict": "DISTINCT_SETS_PARTIALLY_CHUNK_QUALIFIED",
   "distinctCandidateSets": "3/3",
   "revisionQualifiedCandidates": "8/24",
+  "qualification": "qualifyEvidenceV1 (packet.workspace_revision_key == admitted, packet+bridge source_revision == admitted binding, PROVEN membership, exactly one canonical chunk)",
+  "representationRevisionRequiredForProofUsable": false,
   "missingContractFields": [
-    "representationRevision (0 in source rows)",
-    "workspaceRevision (0 in source rows)",
-    "proofUsable (requires every revision)"
+    "representationRevision (no producer; optional in the canonical coordinate)",
+    "candidateSnapshotRevision / ordinalMapChecksum / coordinateArtifactChecksum (retrieval-level coordinate, not produced by the orchestrator)"
   ],
   "rewireDecision": "DO_NOT_REWIRE_atlas_query_UNTIL_TRACE_PARITY_AND_READBACK",
   "cases": [
@@ -20,7 +21,7 @@
       "id": "code-owner",
       "query": "Which module owns unified retrieval and how does it fuse lanes with reciprocal rank fusion?",
       "ok": true,
-      "latencyMs": 1348,
+      "latencyMs": 4973,
       "candidateCount": 8,
       "candidateSetChecksum": "c065fde45b7022f28aedff2238e93c555f6e7a7d8a25b44fb02b7471b5e18b2b",
       "evidenceStatus": "OK",
@@ -96,7 +97,11 @@
         "workspaceRevision": 8,
         "identityComplete": 0,
         "evidenceRefs": 0,
-        "lineageProven": 0
+        "lineageProven": 0,
+        "eligibility": {
+          "INELIGIBLE": 8
+        },
+        "chunkRevisionQualified": 0
       },
       "candidates": [
         {
@@ -118,7 +123,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "2d696367-92b3-49cd-842c-5db1d3a86413",
@@ -139,7 +147,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "10a2d625-5e20-4c9e-99e3-72a4d2e5b0de",
@@ -160,7 +171,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "15da42e0-58a5-4828-b1d6-d0ebced835f4",
@@ -181,7 +195,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "c66eca32-1579-44c3-8cce-216563cf4520",
@@ -202,7 +219,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "47bf69d9-b7b3-49a4-a5d9-9a86588fce4b",
@@ -223,7 +243,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "6d644ce8-db39-4086-805b-47ce0c5fff70",
@@ -244,7 +267,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "103a6909-a2de-48b0-ac3d-0f9649b794ba",
@@ -265,7 +291,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         }
       ]
     },
@@ -273,7 +302,7 @@
       "id": "legal",
       "query": "What does the repository say about chain of custody for evidence?",
       "ok": true,
-      "latencyMs": 679,
+      "latencyMs": 988,
       "candidateCount": 8,
       "candidateSetChecksum": "200cb7c69dbc80c2b4906d8ed1031dab9b24793242833bd3f9e07ded9745c4ef",
       "evidenceStatus": "OK",
@@ -349,7 +378,12 @@
         "workspaceRevision": 7,
         "identityComplete": 7,
         "evidenceRefs": 7,
-        "lineageProven": 7
+        "lineageProven": 7,
+        "eligibility": {
+          "INELIGIBLE": 1,
+          "CHUNK_REVISION_QUALIFIED": 7
+        },
+        "chunkRevisionQualified": 7
       },
       "candidates": [
         {
@@ -372,7 +406,10 @@
             "workspaceRevision"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "90b585d4-7a2c-4650-b9c0-2dffe795a521",
@@ -392,8 +429,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts:1"
         },
         {
           "canonicalId": "d0b81855-25f2-4543-9f6f-a5e75ba3c8fc",
@@ -413,8 +453,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/drizzle/manual/20260311_audit_and_versions.sql:0"
         },
         {
           "canonicalId": "93d2a86b-a730-448f-9438-0ad5fa056c83",
@@ -434,8 +477,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte:0"
         },
         {
           "canonicalId": "6ede9535-56b3-4811-b823-d4685d8825e1",
@@ -455,8 +501,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/static/workers/recursive-evidence-chain-worker.js:6"
         },
         {
           "canonicalId": "599e5fe2-b1fb-42e4-b64f-d4cc2140180f",
@@ -476,8 +525,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte:1"
         },
         {
           "canonicalId": "6cd4bc53-3948-4b58-97a0-3d00a7f94989",
@@ -497,8 +549,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts:3"
         },
         {
           "canonicalId": "6750a92b-a3ec-4f9b-9125-719267d0a86b",
@@ -518,8 +573,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__evidence___id___chain-of-custody___server.md:1"
         }
       ]
     },
@@ -527,7 +585,7 @@
       "id": "embedding",
       "query": "How are 768-dimensional embeddings produced and validated?",
       "ok": true,
-      "latencyMs": 685,
+      "latencyMs": 1172,
       "candidateCount": 8,
       "candidateSetChecksum": "773f19752f56da041fa292c5acb0e8a3221f119dee05ac8e70aee22112263ea9",
       "evidenceStatus": "OK",
@@ -603,7 +661,12 @@
         "workspaceRevision": 8,
         "identityComplete": 1,
         "evidenceRefs": 1,
-        "lineageProven": 1
+        "lineageProven": 1,
+        "eligibility": {
+          "INELIGIBLE": 7,
+          "CHUNK_REVISION_QUALIFIED": 1
+        },
+        "chunkRevisionQualified": 1
       },
       "candidates": [
         {
@@ -625,7 +688,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "2bb65b3d-0fbc-40d1-b0f0-4759a309e299",
@@ -645,8 +711,11 @@
             "rg_lexical"
           ],
           "missingFields": [],
-          "proofUsable": false,
-          "identityComplete": true
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/scripts/create-phase78-embeddings-table.sql:0"
         },
         {
           "canonicalId": "d049dd34-98dc-4fb9-80cf-5fc1a128f62b",
@@ -667,7 +736,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "b9e7586f-5a7a-486b-af63-2fe574dc8d6d",
@@ -688,7 +760,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "589978b2-0e2d-43a3-a941-b52a79b125e5",
@@ -709,7 +784,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "a6cd6cb8-bfdd-4349-9af9-f6da42dd2ed9",
@@ -730,7 +808,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "91434dde-b85a-40ca-88fd-560ec2f6248f",
@@ -751,7 +832,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         },
         {
           "canonicalId": "c895f1b6-6030-4ba2-ad2b-89bcf482e6a5",
@@ -772,7 +856,10 @@
             "packetKey"
           ],
           "proofUsable": false,
-          "identityComplete": false
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
         }
       ]
     }
