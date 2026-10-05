@@ -69,7 +69,11 @@ export function combineRRFLanes(
   const contributions: FusionContributionV1[] = [];
 
   lanedHits.forEach((hits, laneName) => {
-    hits.forEach(hit => {
+    hits.forEach(rawHit => {
+      // Lane producers (Qdrant point ids, TurboVec) may emit numeric or missing ids at runtime
+      // despite the string typing; fuseContributionsV1 requires a string canonicalId.
+      if (rawHit.id === null || rawHit.id === undefined || String(rawHit.id).trim() === '') return;
+      const hit = { ...rawHit, id: String(rawHit.id) };
       const clampedRank = Math.max(1, hit.rank);
       contributions.push({
         canonicalId: hit.id,
