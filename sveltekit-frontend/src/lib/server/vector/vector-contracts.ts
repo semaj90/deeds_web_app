@@ -56,6 +56,7 @@ export interface DenseSearchParams {
   scoreThreshold?: number;
   filter?: Record<string, unknown>;
   skipCache?: boolean;
+  suppressObservability?: boolean;
   efSearch?: number;
 }
 

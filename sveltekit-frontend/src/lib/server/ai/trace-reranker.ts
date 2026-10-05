@@ -6,6 +6,7 @@ import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '$lib/server/embe
 import { CANONICAL_SEMANTIC_REPRESENTATION_REVISION } from '$lib/server/embedding/semantic-lineage.js';
 import { executeTraceSemanticV1, type TraceSemanticCohortRowV1, type TraceSemanticHitV1 } from './trace-semantic-executor-v1.js';
 import { createAtlasRapidsSemantic768Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic768-client.js';
+import type { QueryExecutionModeV1 } from '$lib/server/execution/query-execution-policy-v1.js';
 
 export type TraceRerankResult = {
 	id: string | number;
@@ -45,9 +46,27 @@ export async function traceRerank(params: {
 	admittedWorkspaceRevision?: string;
 	/** Explicit semantic representation revision forwarded to every executor. */
 	semanticRepresentationRevision?: string;
+	executionMode?: QueryExecutionModeV1;
+	recordSideEffect?: (entry: {
+		subsystem: string; operation: string; reads: number; attemptedWrites: number;
+		committedWrites: number; suppressionReason: string | null;
+	}) => void;
 }): Promise<TraceRerankResult[]> {
 	const qdrant = getQdrantManager();
 	const limit = params.limit ?? 10;
+	const skipCache = params.executionMode === 'READ_ONLY';
+	if (skipCache) {
+		for (const operation of ['semantic-search-cache', 'lens-search-cache', 'memory-search-cache', 'research-search-cache']) {
+			params.recordSideEffect?.({
+				subsystem: 'qdrant-search-cache', operation, reads: 0,
+				attemptedWrites: 1, committedWrites: 0, suppressionReason: 'READ_ONLY_CACHE_BYPASS',
+			});
+			params.recordSideEffect?.({
+				subsystem: 'langfuse', operation: `vector-search:${operation}`, reads: 0,
+				attemptedWrites: 1, committedWrites: 0, suppressionReason: 'READ_ONLY_NONPERSISTENT_OBSERVABILITY',
+			});
+		}
+	}
 
 	// 1. Triage Intent
 	const lensesToRetrieve = params.intentOverride ?? detectIntentLenses(params.query);
@@ -64,6 +83,8 @@ export async function traceRerank(params: {
 				query: params.query,
 				queryEmbedding: params.queryEmbedding,
 				limit: limit * 3,
+				skipCache,
+				suppressObservability: skipCache,
 			});
 			return result.results.map((hit) => ({
 				id: hit.id,
@@ -97,7 +118,9 @@ export async function traceRerank(params: {
 		query: params.query,
 		queryEmbedding: params.queryEmbedding,
 		filters: { lens_type: lensesToRetrieve },
-		limit: limit * 2
+		limit: limit * 2,
+		skipCache,
+		suppressObservability: skipCache,
 	});
 
 	// 4. Retrieve Synthesis Memory (Reasoning history level)
@@ -105,7 +128,9 @@ export async function traceRerank(params: {
 		collection: 'synthesis_memory',
 		query: params.query,
 		queryEmbedding: params.queryEmbedding,
-		limit: 5
+		limit: 5,
+		skipCache,
+		suppressObservability: skipCache,
 	});
 
 	// 5. Retrieve External Research (Lane 3 / World Evidence level)
@@ -115,7 +140,9 @@ export async function traceRerank(params: {
 		query: params.query,
 		queryEmbedding: params.queryEmbedding,
 		filters: { vector_type: 'research_note' },
-		limit: 3
+		limit: 3,
+		skipCache,
+		suppressObservability: skipCache,
 	});
 
 	const canonicalRows = await joinCanonicalTraceRows(

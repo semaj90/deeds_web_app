@@ -27,6 +27,7 @@
  */
 
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import type { QueryExecutionContextV1, QueryExecutionModeV1 } from '$lib/server/execution/query-execution-policy-v1.js';
 
 /**
  * Generate a session ID from MCP request context
@@ -50,9 +51,10 @@ export function createToolWithDispatcher(
   middleware: DispatcherMiddleware,
   toolName: string,
   sessionId: string,
-  handler: (input: unknown) => Promise<unknown>
+  handler: (input: unknown, context: QueryExecutionContextV1) => Promise<unknown>,
+  executionMode: QueryExecutionModeV1 = 'MUTATING'
 ): (input: unknown) => Promise<unknown> {
-  return middleware.wrap(handler, toolName, sessionId);
+  return middleware.wrap(handler, toolName, sessionId, executionMode);
 }
 
 /**

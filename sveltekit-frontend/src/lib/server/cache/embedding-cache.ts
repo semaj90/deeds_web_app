@@ -15,6 +15,7 @@
 
 import { createHash } from 'node:crypto';
 import { getRedis } from '$lib/server/redis.js';
+import { validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 
 export interface EmbeddingCacheResult {
   vector: Float32Array;
@@ -28,8 +29,9 @@ export interface EmbeddingCacheResult {
 const CACHE_TTL_SECONDS = 3600; // 1 hour
 const L1_PREFIX = 'embedding:exact:';
 
-function getCacheKey(text: string): string {
-  return L1_PREFIX + createHash('sha256').update(text).digest('hex');
+export function buildEmbeddingExactCacheKeyV1(text: string, model = 'embeddinggemma:latest'): string {
+  const identity = JSON.stringify({ model, representationId: 'semantic_768', text });
+  return L1_PREFIX + createHash('sha256').update(identity).digest('hex');
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -54,7 +56,7 @@ export async function getCachedEmbedding(
   const startTime = Date.now();
   const redis = getRedis();
 
-  const cacheKey = getCacheKey(text);
+  const cacheKey = buildEmbeddingExactCacheKeyV1(text, model);
 
   // ─────────────────────────────────────────────────────────────
 
@@ -62,14 +64,17 @@ export async function getCachedEmbedding(
   try {
     const cached = await redis.get(cacheKey);
     if (cached) {
-      const latencyMs = Date.now() - startTime;
-      const vector = new Float32Array(JSON.parse(cached));
-      return {
-        vector,
-        cached: true,
-        cacheHit: 'L1',
-        latencyMs,
-      };
+      try {
+        const vector = validateSemantic768OutputV1(JSON.parse(cached));
+        return {
+          vector,
+          cached: true,
+          cacheHit: 'L1',
+          latencyMs: Date.now() - startTime,
+        };
+      } catch {
+        await redis.del(cacheKey);
+      }
     }
   } catch (err) {
     // Redis error: continue to L2
@@ -90,7 +95,7 @@ export async function getCachedEmbedding(
     if (!response?.embedding) {
       throw new Error('Canonical embedding lane returned no vector');
     }
-    vector = new Float32Array(response.embedding);
+    vector = validateSemantic768OutputV1(response.embedding);
   } catch (err) {
     throw new Error(`Embedding failed: ${err instanceof Error ? err.message : String(err)}`);
   }

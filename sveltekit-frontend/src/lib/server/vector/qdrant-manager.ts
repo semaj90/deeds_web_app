@@ -262,10 +262,11 @@ export class QdrantManager {
 
   private async getSparseSupport(
     collectionName: string,
-    sparseVectorName: string
+    sparseVectorName: string,
+    bypassMemoization = false,
   ): Promise<boolean | null> {
     const cacheKey = this.sparseSupportCacheKey(collectionName, sparseVectorName);
-    if (sparseSupportCache.has(cacheKey)) {
+    if (!bypassMemoization && sparseSupportCache.has(cacheKey)) {
       return sparseSupportCache.get(cacheKey) ?? null;
     }
 
@@ -280,7 +281,7 @@ export class QdrantManager {
           typeof sparseVectors === 'object' &&
           Object.prototype.hasOwnProperty.call(sparseVectors, sparseVectorName)
       );
-      sparseSupportCache.set(cacheKey, supported);
+      if (!bypassMemoization) sparseSupportCache.set(cacheKey, supported);
       return supported;
     } catch {
       return null;
@@ -311,10 +312,11 @@ export class QdrantManager {
     collectionName: string,
     expectedVectorName: string | null,
     expectedDimensions: number,
+    options: { bypassMemoization?: boolean } = {},
   ): Promise<DenseRepresentationCapabilityV1> {
     const cacheKey = `${collectionName}:${expectedVectorName ?? 'unnamed'}:${expectedDimensions}`;
     const cached = denseCapabilityCache.get(cacheKey);
-    if (cached && cached.expiresAt > Date.now()) return cached.capability;
+    if (!options.bypassMemoization && cached && cached.expiresAt > Date.now()) return cached.capability;
 
     const unavailable = (reason: string) => buildDenseRepresentationCapabilityV1({
       schema: 'atlas.dense-representation-capability.v1',
@@ -333,7 +335,7 @@ export class QdrantManager {
       const vectors = (info as any).config?.params?.vectors ?? (info as any).config?.vectors;
       if (!vectors) {
         const capability = unavailable('VECTOR_SCHEMA_ABSENT');
-        denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
+        if (!options.bypassMemoization) denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
         return capability;
       }
 
@@ -355,11 +357,11 @@ export class QdrantManager {
         representationRevision: `qdrant-schema:${collectionName}`,
         writesPerformed: false,
       });
-      denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
+      if (!options.bypassMemoization) denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 30_000, capability });
       return capability;
     } catch (error) {
       const capability = unavailable(`COLLECTION_READ_FAILED:${error instanceof Error ? error.message : String(error)}`);
-      denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 5_000, capability });
+      if (!options.bypassMemoization) denseCapabilityCache.set(cacheKey, { expiresAt: Date.now() + 5_000, capability });
       return capability;
     }
   }
@@ -624,6 +626,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
     skipCache?: boolean;
+    suppressObservability?: boolean;
   }): Promise<QdrantSearchResult> {
     return traceVectorSearch(
       params.collection,
@@ -651,7 +654,7 @@ export class QdrantManager {
             .update(JSON.stringify(rawKeyObj))
             .digest('hex')
             .slice(0, 16);
-          if (this.inflightSearches.has(key)) {
+          if (!params.skipCache && this.inflightSearches.has(key)) {
             return await this.inflightSearches.get(key)!;
           }
 
@@ -703,14 +706,14 @@ export class QdrantManager {
             };
           })();
 
-          this.inflightSearches.set(key, promise);
+          if (!params.skipCache) this.inflightSearches.set(key, promise);
           try {
             return await promise;
           } finally {
-            this.inflightSearches.delete(key);
+            if (!params.skipCache) this.inflightSearches.delete(key);
           }
         } catch (err) {
-          console.debug(
+          if (!params.suppressObservability) console.debug(
             '[qdrant] multiQuerySearch dedupe failed, falling back:',
             err?.message ?? err
           );
@@ -747,7 +750,7 @@ export class QdrantManager {
 
           // Validate response structure
           if (!results || !results.points || !Array.isArray(results.points)) {
-            console.error('[qdrant] multiQuerySearch response missing .points array:', {
+            if (!params.suppressObservability) console.error('[qdrant] multiQuerySearch response missing .points array:', {
               hasResults: !!results,
               hasPoints: results?.points !== undefined,
               pointsType: typeof results?.points,
@@ -774,10 +777,11 @@ export class QdrantManager {
             },
           };
         } catch (err) {
-          console.error('[qdrant] multiQuerySearch fallback failed:', err?.message ?? err);
+          if (!params.suppressObservability) console.error('[qdrant] multiQuerySearch fallback failed:', err?.message ?? err);
           throw new Error(`Qdrant multiQuerySearch failed: ${err instanceof Error ? err.message : String(err)}`);
         }
-      }
+      },
+      { persist: params.suppressObservability !== true },
     );
   }
 
@@ -795,6 +799,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
     skipCache?: boolean;
+    suppressObservability?: boolean;
   }): Promise<QdrantSearchResult> {
     // Resolve aliases before consulting the vector schema.  Callers commonly
     // use the logical `summary_lenses`/`synthesis_memory` names, while Qdrant
@@ -814,11 +819,12 @@ export class QdrantManager {
       resolvedCollection,
       denseVectorName,
       params.queryEmbedding.length,
+      { bypassMemoization: params.skipCache === true },
     );
     if (!denseCapability.available) {
       throw new Error(`QDRANT_DENSE_CAPABILITY_UNAVAILABLE:${denseCapability.reason ?? 'UNKNOWN'}`);
     }
-    const sparseAvailable = await this.getSparseSupport(resolvedCollection, QDRANT_SPARSE_VECTOR_NAME);
+    const sparseAvailable = await this.getSparseSupport(resolvedCollection, QDRANT_SPARSE_VECTOR_NAME, params.skipCache === true);
 
     if (!sparseAvailable) {
       // Fall back to dense-only search when BM25 not available
@@ -832,6 +838,7 @@ export class QdrantManager {
         scoreThreshold: params.scoreThreshold,
         filter: params.filters,
         skipCache: params.skipCache,
+        suppressObservability: params.suppressObservability,
       });
     }
 
@@ -859,6 +866,7 @@ export class QdrantManager {
       limit: params.limit,
       scoreThreshold: params.scoreThreshold,
       skipCache: params.skipCache,
+      suppressObservability: params.suppressObservability,
       });
   }
 
@@ -959,7 +967,7 @@ export class QdrantManager {
         } catch (validationErr) {
           // For now, warn but allow legacy 768-dim vectors to pass through
           if (queryVector.length === 768) {
-            console.warn(
+            if (!params.suppressObservability) console.warn(
               `[qdrant] dimension mismatch: expected ${vectorName} but got 768-dim vector. ` +
               `This is a Phase 8.6 legacy call. Will be migrated in Phase 9.`
             );
@@ -982,7 +990,7 @@ export class QdrantManager {
             s: params.scoreThreshold ?? null,
           });
           const key = createHash('sha256').update(raw).digest('hex').slice(0, 16);
-          if (this.inflightSearches.has(key)) {
+          if (!params.skipCache && this.inflightSearches.has(key)) {
             return await this.inflightSearches.get(key)!;
           }
 
@@ -1072,19 +1080,19 @@ export class QdrantManager {
 
               return response;
             } catch (error: any) {
-              console.error('Qdrant dense search error:', error);
+              if (!params.suppressObservability) console.error('Qdrant dense search error:', error);
               throw new Error(`Qdrant search failed: ${error.message}`);
             }
           })();
 
-          this.inflightSearches.set(key, promise);
+          if (!params.skipCache) this.inflightSearches.set(key, promise);
           try {
             return await promise;
           } finally {
-            this.inflightSearches.delete(key);
+            if (!params.skipCache) this.inflightSearches.delete(key);
           }
         } catch (e) {
-          console.debug(
+          if (!params.suppressObservability) console.debug(
             '[qdrant] denseSearch dedupe failed, continuing without dedupe:',
             e?.message ?? e
           );
@@ -1147,10 +1155,11 @@ export class QdrantManager {
 
           return response;
         } catch (error: any) {
-          console.error('Qdrant dense search error:', error);
+          if (!params.suppressObservability) console.error('Qdrant dense search error:', error);
           throw new Error(`Qdrant search failed: ${error.message}`);
         }
-      }
+      },
+      { persist: params.suppressObservability !== true },
     ); // end traceVectorSearch
   }
 

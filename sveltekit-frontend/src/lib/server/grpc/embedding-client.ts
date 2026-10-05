@@ -20,6 +20,8 @@ import {
   type EmbeddingInputModeV1,
   type EmbeddingInputRecipeV1,
 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
+import type { QueryExecutionModeV1 } from '$lib/server/execution/query-execution-policy-v1.js';
+import { shouldPopulateEmbeddingCacheV1 } from '$lib/server/execution/query-execution-policy-v1.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -48,6 +50,11 @@ export interface EmbeddingOptions {
   skipCacheWrite?: boolean;
   taskMode?: EmbeddingInputModeV1;
   title?: string | null;
+  executionMode?: QueryExecutionModeV1;
+  recordSideEffect?: (entry: {
+    subsystem: string; operation: string; reads: number; attemptedWrites: number;
+    committedWrites: number; suppressionReason: string | null;
+  }) => void;
 }
 
 // `onnx-local` remains a legacy receipt/cache label only. This canonical
@@ -770,7 +777,13 @@ export async function generateEmbeddingsWithTags(
     ? await enrichEmbeddingWithQdrantTags(result.vectors[0], pipeline)
     : [];
   // Back-fill tags into cache entries for all texts (non-blocking)
-  if (qdrantTags.length && !options.skipCacheWrite) {
+  const lookupOnly = !shouldPopulateEmbeddingCacheV1(options);
+  if (qdrantTags.length && lookupOnly) options.recordSideEffect?.({
+    subsystem: 'embedding-cache', operation: 'populate-tags-on-miss', reads: 0,
+    attemptedWrites: texts.length, committedWrites: 0,
+    suppressionReason: 'READ_ONLY_CACHE_LOOKUP_ONLY',
+  });
+  if (qdrantTags.length && !lookupOnly) {
     for (let i = 0; i < texts.length; i++) {
       const cacheText = prepareEmbeddingInputV1({ text: texts[i], mode: options.taskMode, title: options.title }).formattedText;
       setCachedEmbedding(cacheText, result.vectors[i], result.source, qdrantTags).catch(() => {});
@@ -792,6 +805,7 @@ export async function generateEmbeddings(
   texts: string[],
   options: EmbeddingOptions = {}
 ): Promise<EmbeddingResult> {
+  const lookupOnly = !shouldPopulateEmbeddingCacheV1(options);
   const start = performance.now();
   const attempts: EmbeddingAttempt[] = [];
   const preparedInputs = texts.map((text) => prepareEmbeddingInputV1({
@@ -804,6 +818,10 @@ export async function generateEmbeddings(
   const cachedEntries = options.skipCacheRead
     ? texts.map(() => null)
     : await Promise.all(cacheTexts.map(getCachedEmbeddingEntry));
+  options.recordSideEffect?.({
+    subsystem: 'embedding-cache', operation: 'lookup', reads: options.skipCacheRead ? 0 : cacheTexts.length,
+    attemptedWrites: 0, committedWrites: 0, suppressionReason: null,
+  });
 
   // Check cache for each text
   const cachedResults = cachedEntries.map((entry) => entry?.vector ?? null);
@@ -968,7 +986,12 @@ export async function generateEmbeddings(
   }
 
   // Fire-and-forget cache writes for new embeddings
-  for (let j = 0; !options.skipCacheWrite && j < uncachedIndices.length; j++) {
+  if (lookupOnly && uncachedIndices.length > 0) options.recordSideEffect?.({
+    subsystem: 'embedding-cache', operation: 'populate-on-miss', reads: 0,
+    attemptedWrites: uncachedIndices.length, committedWrites: 0,
+    suppressionReason: 'READ_ONLY_CACHE_LOOKUP_ONLY',
+  });
+  for (let j = 0; !lookupOnly && j < uncachedIndices.length; j++) {
     setCachedEmbedding(cacheTexts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
   }
 
