@@ -37,8 +37,9 @@ Full 256-bit hashes; no truncation. The old `sha256(start:end:summary_head)` (16
 | `authority` | `{algorithm:'PAGERANK', graphRevision, min, mean, max, pathScore, scoringRevision}`; a path has no single PageRank. PPR is a retrieval signal, not evidence |
 | `path_quality` | `{length, redundancyScore, coverageScore, relationDiversity, evidenceDensity, unresolvedHopCount, pruningAlgorithm, pruningRevision}` (PathRAG-style pruning feeds ACE routing) |
 | `status`, `stale_reasons[]` | lifecycle below |
-| `embedding` | 768-d `semantic_768` vector using the document recipe `title: {title} | text: {summary}` from `embedding-contract-768`, never `unprompted_legacy` |
-| `manifold4` | 4D SOM coordinates (navigation only, not identity) |
+| `semantic_representation` | `{kind:'semantic_768', modelRevision, recipeRevision, inputChecksum, vectorRevision}` plus the 768-d vector. Recipe is the document form `title: {title} | text: {summary}` from `embedding-contract-768`, never `unprompted_legacy`. Same dimension is not the same representation space: `:8081`, `:8082` and Ollama `embeddinggemma` outputs must not be mixed without a parity receipt |
+| `synthesis` | `{model, modelRevision, adapterRevision?, promptTemplateRevision, contextManifestChecksum, inputEvidenceChecksum, generatedAt, hallucinationCheck?, citationCoverage?}`; synthesis identity = path checksum + ContextManifest checksum + model revision + prompt revision + evidence revisions |
+| `topology?` | optional `{representation:'SOM_4D', coordinates:[x,y,z,w], modelRevision, snapshotRevision}`, present only when an admitted manifold artifact exists. Navigation only: card validity never depends on it, so retraining the SOM does not invalidate valid evidence |
 | `canonical_authority` | always `false` |
 
 ## Lifecycle and invalidation
@@ -63,18 +64,24 @@ States: `ACTIVE`, `STALE`, `SUPERSEDED`, `INVALIDATED`, `REBUILD_REQUIRED`. A ca
 2. **Materialization**: `graph.materialize_pathway` is the only writer. It must be governed, not a free model-facing write.
 3. **Retrieval**: `kb.search_pathways` returns `ACTIVE` cards first and marks `STALE` cards explicitly.
 
-## Integration in staged retrieval
-Pathway Cards occupy the **Graph Expansion** stage:
-1. Sparse Gate (Lexical)
-2. Dense ANN (Candidate Generation)
-3. Late Interaction (Reranking)
-4. **Pathway Retrieval (Materialized Graph Memory)**: `ACTIVE` cards only, with their revisions checked against the current graph/workspace
-5. Structural Graph Expansion (Neo4j Fallback)
-6. Agentic Synthesis (Ornith 1.5 on llama-server `:8090`; resolve the served model, never hard-code)
+## Integration in retrieval: a logical lane, not a fixed stage
+Pathway Cards are a candidate **lane** (a retrieval representation); Neo4j traversal is an executor and the fallback. This keeps lane != executor.
+```
+query -> lexical | semantic_768 | pathway-card | ontology | graph  (parallel lanes)
+      -> fusion -> rerank -> evidence promotion -> ContextManifest -> synthesis
+pathway-card hit strong enough? yes -> use cached path evidence (ACTIVE cards only, revisions checked against current graph/workspace)
+                                 no  -> live graph expansion -> possibly create a new card
+```
+Synthesis runs on Ornith 1.5 via llama-server `:8090`; resolve the served model, never hard-code.
+
+## Related artifact: CommunityCardV1 (future, separate)
+GraphRAG's notable object is the community report (hierarchical communities summarized before query time). Keep two derived types and do not overload one:
+- `CommunityCardV1`: cluster/community-level synthesis ("what is the retrieval subsystem?")
+- `PathwayCardV1`: ordered relational-path synthesis ("how does `atlas.query` reach Qdrant and return evidence?")
 
 ## Implementation directives
 - **Utility-first**: optimize for answer utility and citation faithfulness.
-- **Topological grounding**: anchor to the 4D SOM manifold for navigation; it is never identity.
+- **Topological grounding is optional**: a card may carry a revision-qualified `topology` projection when an admitted manifold artifact exists; it is navigation, never identity, and never a validity requirement.
 - **Postgres holds the card**, as a derived artifact. JSONB for flexible payload fields, plain columns for lineage/status so staleness is queryable.
 - **Do not claim** token savings or reuse until real, admitted, query-specific evidence backs them.
 
@@ -106,8 +113,10 @@ CREATE TABLE IF NOT EXISTS graph_pathway_cards (
   status                 text NOT NULL DEFAULT 'ACTIVE'
     CHECK (status IN ('ACTIVE','STALE','SUPERSEDED','INVALIDATED','REBUILD_REQUIRED')),
   stale_reasons          text[] NOT NULL DEFAULT '{}',
+  semantic_representation jsonb NOT NULL,            -- {kind, modelRevision, recipeRevision, inputChecksum, vectorRevision}
   embedding              vector(768),
-  manifold4              real[] CHECK (manifold4 IS NULL OR array_length(manifold4,1) = 4),
+  synthesis              jsonb NOT NULL,             -- model/prompt/context-manifest/evidence provenance
+  topology               jsonb,                      -- optional SOM_4D projection; validity never depends on it
   canonical_authority    boolean NOT NULL DEFAULT false CHECK (canonical_authority = false),
   created_at             timestamptz NOT NULL DEFAULT now(),
   updated_at             timestamptz NOT NULL DEFAULT now()
