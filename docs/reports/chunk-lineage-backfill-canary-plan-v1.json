@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.chunk-lineage-backfill-canary-plan.v1",
+  "generatedAt": "2026-10-05T20:06:19.318Z",
+  "gate": "CHUNK-LINEAGE-BACKFILL-CANARY-PLAN-01",
+  "mode": "READ_ONLY_PLAN",
+  "writesPerformed": false,
+  "authorizationRequired": true,
+  "authorizationNote": "apply needs the operator confirmation token; this plan sets none",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "limit": 5000,
+  "representationRevision": null,
+  "representationRevisionPolicy": "REMAIN_NULL_UNTIL_CANONICAL_PRODUCER_PROVEN",
+  "applyScriptFacts": {
+    "alwaysRollsBack": true,
+    "hasCommitStatement": false,
+    "note": "the existing script has no commit path: --apply only proves the UPDATE and rolls back; a real apply needs an explicit, reviewed commit variant"
+  },
+  "population": {
+    "chunks": 274465,
+    "source_ref_null": 2355,
+    "file_hash_null": 3699,
+    "workspace_revision_filled": 0,
+    "source_revision_filled": 0,
+    "binding_checksum_filled": 0,
+    "producer_revision_filled": 0,
+    "representation_revision_filled": 0
+  },
+  "matching": {
+    "scanned_with_ref_and_hash": 268416,
+    "exact_source_ref_and_digest": 179237,
+    "hash_mismatch": 860,
+    "missing_binding": 88319
+  },
+  "exactBreakdown": {
+    "exact_rows": 179237,
+    "rows_that_would_update": 179237,
+    "rows_already_filled_skipped": 0,
+    "source_revision_fillable": 179237,
+    "binding_checksum_fillable": 179237,
+    "with_proven_bridge": 125971,
+    "missing_bridge": 53266,
+    "bridge_binding_source_revision_conflicts": 1,
+    "evidence_refs_available": 125971
+  },
+  "canarySlice": {
+    "slice_rows": 5000,
+    "with_bridge": 3498,
+    "conflicts": 0
+  },
+  "conflictRule": "a row whose bridge source_revision differs from the binding source_revision must be EXCLUDED from any apply (never pick one); the apply script does not check the bridge, so a reviewed variant must add that guard",
+  "contract": {
+    "mayMirror": [
+      "workspace_revision",
+      "source_revision",
+      "lineage_binding_checksum",
+      "lineage_producer_revision"
+    ],
+    "source": "exact proven binding only (source_ref + whole-file digest at the admitted workspace)",
+    "mustRemainNull": [
+      "representation_revision"
+    ]
+  },
+  "status": "CANARY_PLAN_READY_APPLY_NOT_AUTHORIZED"
+}
