@@ -1482,3 +1482,14 @@ BeautifulSoup for oaklib/ast-grep/ts-morph, Firecrawl v2 for trpc. Namespaces `d
 - [ ] `OAKLIB-WIRE-01`: oaklib's Postgres kernel adapter reads `atlas_ontology_concepts`/`atlas_ontology_relations`, both 0 rows. Populate only through OAKLIB-ADAPTER-01 candidates after review
       (`canonicalAuthority=false`). Also: the catalog URL `oaklib.readthedocs.io` in `library-docs-manifest-v1.json` returns 404 (current docs: `incatools.github.io/ontology-access-kit`),
       and `docker/miniforge-nlp-sidecar/docker-compose.yml` carries a default Postgres password in the `ATLAS_OAK_ADAPTER` DSN (move to an env file).
+
+- [x] `DOC-26-TOOLING-ADD-PLAN-01` (2026-10-05, read-only): ownership rule frozen: `run-external-doc-admission-v1.mts` is the original/static first-load path; DOC-26 (`plan_manifest_recrawl_delta_v1` +
+      `external-doc-versioned-recrawl-admission-v2.ts` + `run-external-doc-versioned-recrawl-v2.mts`) is the versioned corpus-evolution owner. Do NOT add `--envelopes`/`--also-expect` to v1.
+      Ran: combined manifest `docs/.okf/dev/pinned-plus-tooling-docs.manifest.json` (`okf-pinned-plus-tooling-r1`) vs pinned `okf-pinned-docs-r3` -> 7 UNCHANGED, 4 ADDED (oaklib, ast-grep, ts-morph, trpc), 0 blockers
+      (`docs/reports/doc-26-pinned-plus-tooling-delta-plan-v1.json`). The first runner attempt failed closed (`DOC_RECRAWL_ENVELOPE_MANIFEST_REVISION_MISMATCH`) because the envelopes carried their old manifest revision;
+      the selected envelopes were rebuilt with the builder's `--prior-manifest` against the combined manifest. Live `--plan-only`: `DOC_26_VERSIONED_RECRAWL_PLAN_PROVEN`, pages classified MISSING, `safeToAdmit`, 0 writer calls,
+      0 writes (`docs/reports/doc-26-pinned-plus-tooling-plan-only-v1.json`). Not applied: needs `ATLAS_DOC_VERSIONED_RECRAWL_AUTHORIZED=I_AUTHORIZE_DOC_VERSIONED_RECRAWL` from the operator.
+- [ ] `DOC-26-UPDATE-POLICY-01`: freeze update policy before any pinned-page refresh: update != overwrite (old revision -> SUPERSEDED, new admitted revision; chunk identity belongs to one document revision);
+      compare canonical URL, product/version/as-of, normalized and document checksums, acquisition and parser/fetch recipe revisions; classify UNCHANGED/ADDED/CONTENT_CHANGED/METADATA_CHANGED/REMOVED/AMBIGUOUS;
+      REMOVED sources are retained, never deleted; after a changed admission mark derived artifacts stale by revision (FTS/trgm refresh, semantic_768 recompute, Qdrant projection, ontology proposals, PathwayCard EVIDENCE_STALE);
+      keep exact / near-exact / breadth regression queries and compare old vs new (Recall@K, MRR, ranks) before a recrawl is admitted.
