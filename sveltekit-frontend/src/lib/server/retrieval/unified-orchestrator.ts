@@ -29,7 +29,6 @@ import {
   assertSemantic768,
   CANONICAL_QDRANT_COLLECTION,
 } from '$lib/server/embedding/embedding-contract-768.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createCodebaseSearchBackendFromEnv } from '$lib/server/search/create-codebase-search-backend.js';
 import type { SearchBackendResult } from '$lib/server/search/search-backend.js';
 import {
@@ -160,7 +159,7 @@ const DEFAULT_CONFIG: RetrievalConfig = {
     host: process.env.POSTGRES_HOST || '127.0.0.1',
     port: parseInt(process.env.POSTGRES_PORT || '5434'),
     user: process.env.POSTGRES_USER || 'legal_admin',
-    password: process.env.POSTGRES_PASSWORD || '123456',
+    password: process.env.POSTGRES_PASSWORD || '',
     database: process.env.POSTGRES_DB || 'legal_ai_db'
   },
   ollama: { host: '127.0.0.1', port: 11434 },
@@ -493,9 +492,13 @@ async function postgresJoin(
   qdrantIds: string[],
   config: RetrievalConfig
 ): Promise<Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>> {
+  if (qdrantIds.length === 0) return new Map();
+  if (!config.postgres.password) {
+    // No credential in source: an unconfigured join is an explicit failure, never a guess.
+    throw new Error('POSTGRES_ENRICHMENT_UNAVAILABLE:POSTGRES_PASSWORD');
+  }
   const pool = new Pool(config.postgres);
   try {
-    if (qdrantIds.length === 0) return new Map();
 
     const res = await pool.query(
       `SELECT id, qdrant_id, relative_path, symbol, kind
@@ -739,6 +742,9 @@ Query: ${query}
 
 Provide a 1-2 sentence summary of the relevant code structure and functionality.`;
 
+    // Loaded lazily: runtime-contract throws at import when ROTORQUANT_MODEL_PATH is unset, which
+    // must only affect synthesis, not importing or running retrieval.
+    const { LLM_MODEL_ID } = await import('$lib/server/llm/runtime-contract.js');
     const res = await fetch(`http://${config.gemma4.host}:${config.gemma4.port}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
