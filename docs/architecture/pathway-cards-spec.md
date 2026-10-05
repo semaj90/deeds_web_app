@@ -37,7 +37,7 @@ Full 256-bit hashes; no truncation. The old `sha256(start:end:summary_head)` (16
 | `authority` | `{algorithm:'PAGERANK', graphRevision, min, mean, max, pathScore, scoringRevision}`; a path has no single PageRank. PPR is a retrieval signal, not evidence |
 | `path_quality` | `{length, redundancyScore, coverageScore, relationDiversity, evidenceDensity, unresolvedHopCount, pruningAlgorithm, pruningRevision}` (PathRAG-style pruning feeds ACE routing) |
 | `status`, `stale_reasons[]` | lifecycle below |
-| `semantic_representation` | `{kind:'semantic_768', modelRevision, recipeRevision, inputChecksum, vectorRevision}` plus the 768-d vector. Recipe is the document form `title: {title} | text: {summary}` from `embedding-contract-768`, never `unprompted_legacy`. Same dimension is not the same representation space: `:8081`, `:8082` and Ollama `embeddinggemma` outputs must not be mixed without a parity receipt |
+| `semantic_representation` | `{kind:'semantic_768', modelRevision, recipeRevision, inputChecksum, vectorRevision}` plus the 768-d vector. Recipe: never `unprompted_legacy`. The pathway-specific recipe is an **open design gate**, not frozen here: a dedicated `PATHWAY_SEMANTIC_768_V1` is likely (e.g. `title: <start concept> -> <end concept> | text: <summary> | relations: <normalized relation sequence>`), to be proven compatible with the semantic lane before admission. Until then the current 768 contract is referenced only as a placeholder. Same dimension is not the same representation space: `:8081`, `:8082` and Ollama `embeddinggemma` outputs must not be mixed without a parity receipt |
 | `synthesis` | `{model, modelRevision, adapterRevision?, promptTemplateRevision, contextManifestChecksum, inputEvidenceChecksum, generatedAt, hallucinationCheck?, citationCoverage?}`; synthesis identity = path checksum + ContextManifest checksum + model revision + prompt revision + evidence revisions |
 | `topology?` | optional `{representation:'SOM_4D', coordinates:[x,y,z,w], modelRevision, snapshotRevision}`, present only when an admitted manifold artifact exists. Navigation only: card validity never depends on it, so retraining the SOM does not invalidate valid evidence |
 | `canonical_authority` | always `false` |
@@ -59,9 +59,17 @@ States: `ACTIVE`, `STALE`, `SUPERSEDED`, `INVALIDATED`, `REBUILD_REQUIRED`. A ca
 4. No silent fallback to another table. If the card table is absent or the insert fails, return a typed failure.
 5. Candidates that fail admission stay `PathwayCandidateV1` / `OBSERVATION_ONLY`.
 
+## Ownership (frozen)
+| Role | Owner |
+|------|-------|
+| candidate producer | `graph.semantic_path_synthesis` |
+| admission validator | `PathwayCardValidatorV1` (server-owned, not yet built) |
+| persistence owner | `PathwayCardWriterV1` (server-owned, not yet built) |
+| model-facing facade | `graph.materialize_pathway`: requests materialization only; the server decides whether it happens. It must not remain the canonical writer long term |
+
 ## Lifecycle of tools
 1. **Synthesis**: `graph.semantic_path_synthesis` traverses Neo4j and hydrates nodes from Postgres (read-only; yields candidates).
-2. **Materialization**: `graph.materialize_pathway` is the only writer. It must be governed, not a free model-facing write.
+2. **Materialization**: `graph.materialize_pathway` is currently the only writer (fail-closed since PATHWAY-SAFETY-01: no fallback table, typed failures). It must become a governed facade, not a free model-facing write.
 3. **Retrieval**: `kb.search_pathways` returns `ACTIVE` cards first and marks `STALE` cards explicitly.
 
 ## Integration in retrieval: a logical lane, not a fixed stage
@@ -113,6 +121,9 @@ CREATE TABLE IF NOT EXISTS graph_pathway_cards (
   status                 text NOT NULL DEFAULT 'ACTIVE'
     CHECK (status IN ('ACTIVE','STALE','SUPERSEDED','INVALIDATED','REBUILD_REQUIRED')),
   stale_reasons          text[] NOT NULL DEFAULT '{}',
+  producer_revision      text NOT NULL,              -- who/what produced the card (derived-artifact history)
+  validation_revision    text NOT NULL,              -- validator revision that admitted it
+  supersedes_pathway_card_id text REFERENCES graph_pathway_cards (pathway_card_id),
   semantic_representation jsonb NOT NULL,            -- {kind, modelRevision, recipeRevision, inputChecksum, vectorRevision}
   embedding              vector(768),
   synthesis              jsonb NOT NULL,             -- model/prompt/context-manifest/evidence provenance
@@ -121,7 +132,10 @@ CREATE TABLE IF NOT EXISTS graph_pathway_cards (
   created_at             timestamptz NOT NULL DEFAULT now(),
   updated_at             timestamptz NOT NULL DEFAULT now()
 );
-CREATE UNIQUE INDEX IF NOT EXISTS gpc_path_identity_active_uq ON graph_pathway_cards (path_identity, representation_revision) WHERE status = 'ACTIVE';
+-- Uniqueness is the primary key only. A partial unique index on (path_identity, representation_revision) WHERE status='ACTIVE' is deliberately NOT proposed:
+-- two valid cards may share a path yet differ in evidence/model/prompt lineage. "One path = one active synthesis" would be a product rule, not a default.
+-- If a preferred card is needed later, use a separate "current preferred card" projection.
+CREATE INDEX IF NOT EXISTS gpc_path_identity_status ON graph_pathway_cards (path_identity, status);
 CREATE INDEX IF NOT EXISTS gpc_status_workspace ON graph_pathway_cards (status, workspace_revision, graph_revision);
 CREATE INDEX IF NOT EXISTS gpc_embedding_hnsw ON graph_pathway_cards USING hnsw (embedding vector_cosine_ops);
 ```
