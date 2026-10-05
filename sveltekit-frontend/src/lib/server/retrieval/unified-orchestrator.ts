@@ -121,8 +121,26 @@ export interface RankedCandidate {
   rg_matches?: number;
 }
 
+export type RetrievalLaneStatusV1 =
+  | { status: 'OK' }
+  | { status: 'DISABLED' }
+  | { status: 'UNAVAILABLE'; reason: string; detail?: string };
+
+export type LexicalLaneResultV1 =
+  | { status: 'OK'; hits: Array<{ id: string; file: string; line: number; score: number; rank: number }> }
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'RG_EXEC_FAILED' | 'RG_NOT_FOUND' | 'INVALID_QUERY';
+      detail?: string;
+      hits: [];
+    };
+
 export interface RetrievalResult {
   candidates: RankedCandidate[];
+  /** Per-lane availability. An unavailable lane contributes zero votes and is never reported as OK. */
+  lanes?: { semantic: RetrievalLaneStatusV1; lexical: RetrievalLaneStatusV1 };
+  /** NO_EVIDENCE: no lane produced a candidate; nothing is fabricated. */
+  evidence_status?: 'OK' | 'NO_EVIDENCE';
   timing: {
     embedding: number;
     qdrant_search: number;
@@ -444,6 +462,28 @@ async function rgPoolLexicalSearch(
     onFailure?.(err instanceof Error ? err.message : String(err));
     return [];
   }
+}
+
+/** Typed lexical lane: a failed ripgrep run is UNAVAILABLE, never an OK lane with zero hits. */
+export async function rgPoolLexicalLaneV1(
+  query: string,
+  config: RetrievalConfig,
+  limit: number = 10,
+  filters?: SearchFilter
+): Promise<LexicalLaneResultV1> {
+  const effectiveQuery = filters?.keywords?.join(' ') || query;
+  if (!effectiveQuery.trim()) return { status: 'UNAVAILABLE', reason: 'INVALID_QUERY', hits: [] };
+  let failure: string | null = null;
+  const hits = await rgPoolLexicalSearch(query, config, limit, filters, (message) => {
+    failure = message;
+  });
+  const failureMessage = failure as string | null;
+  if (failureMessage !== null) {
+    const detail: string = failureMessage;
+    const reason = /rg binary not found|ENOENT/i.test(detail) ? 'RG_NOT_FOUND' : 'RG_EXEC_FAILED';
+    return { status: 'UNAVAILABLE', reason, detail, hits: [] };
+  }
+  return { status: 'OK', hits };
 }
 
 /**
@@ -805,75 +845,87 @@ export async function executeUnifiedRetrieval(
     // No legacy 384 lane is ever requested or normalized to, regardless of
     // what the caller passes in `request.lanes`.
     resolveSemanticLane();
-    const dense768 = await embedQueryForLane(request.query, 'dense_768');
-    const queryVectors: QueryVectorBundle = {
-      dense384: null,
-      dense768,
-      latent64: null,
-    };
-    const embedding = queryVectors.dense768?.vector;
-    if (!embedding) {
-      throw new Error('Failed to generate query vector bundle');
+    let semanticLane: RetrievalLaneStatusV1 = { status: 'OK' };
+    let queryVectors: QueryVectorBundle | null = null;
+    let embedding: Float32Array | null = null;
+    try {
+      const dense768 = await embedQueryForLane(request.query, 'dense_768');
+      if (!dense768?.vector) throw new Error('Failed to generate query vector bundle');
+      queryVectors = { dense384: null, dense768, latent64: null };
+      embedding = dense768.vector;
+    } catch (err) {
+      // Availability failure: the semantic lane is marked unavailable and retrieval continues
+      // with the remaining lanes. A returned vector of the wrong shape is a contract violation
+      // and still throws below.
+      const detail = err instanceof Error ? err.message : String(err);
+      semanticLane = { status: 'UNAVAILABLE', reason: 'EMBEDDING_FAILED', detail };
+      console.warn('Semantic lane unavailable (embedding failed):', detail);
+      stages.push('embedding_unavailable');
     }
-    assertSemantic768(Array.from(embedding));
-    stages.push('embedding');
+    if (embedding) {
+      assertSemantic768(Array.from(embedding));
+      stages.push('embedding');
+    }
 
     // STAGE 1.5: Rust N-API (optional, fallback to Qdrant)
-    let rustHits: Array<{ id: string; score: number; payload: any }> | null = null;
-    let qdrantHits: Array<{ id: string; score: number; payload: any }>;
-
-    if (queryVectors.dense768?.vector) {
-      rustHits = await rustNapiSearch(
-        queryVectors.dense768.vector,
-        request.filters,
-        retrievalLimit
-      );
-      if (rustHits && rustHits.length > 0) {
-        stages.push('rust_napi');
-        qdrantHits = rustHits; // Use Rust results
-      } else {
-        // Fallback to Qdrant
-        qdrantHits = await qdrantSearch(
-          queryVectors,
-          config,
-          request.useRRF ?? true,
-          request.useLexical ?? false,
-          request.filters,
-          retrievalTier,
-          retrievalLimit
-        );
-        stages.push('qdrant_search');
+    let qdrantHits: Array<{ id: string; score: number; payload: any }> = [];
+    if (queryVectors && embedding) {
+      try {
+        const rustHits = await rustNapiSearch(embedding, request.filters, retrievalLimit);
+        if (rustHits && rustHits.length > 0) {
+          stages.push('rust_napi');
+          qdrantHits = rustHits; // Use Rust results
+        } else {
+          qdrantHits = await qdrantSearch(
+            queryVectors,
+            config,
+            request.useRRF ?? true,
+            request.useLexical ?? false,
+            request.filters,
+            retrievalTier,
+            retrievalLimit
+          );
+          stages.push('qdrant_search');
+        }
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        semanticLane = { status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED', detail };
+        console.warn('Semantic lane unavailable (dense search failed):', detail);
+        stages.push('semantic_search_unavailable');
+        qdrantHits = [];
       }
-    } else {
-      // No 768d vector, use Qdrant directly
-      qdrantHits = await qdrantSearch(
-        queryVectors,
-        config,
-        request.useRRF ?? true,
-        request.useLexical ?? false,
-        request.filters,
-        retrievalTier,
-        retrievalLimit
-      );
-      stages.push('qdrant_search');
     }
 
     const qdrantIds = qdrantHits.map((h) => h.id);
 
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
+    let lexicalLane: RetrievalLaneStatusV1 = { status: 'DISABLED' };
     if (request.useRgPool ?? true) {
-      let lexicalFailure: string | null = null;
-      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, retrievalLimit, request.filters, (message) => {
-        lexicalFailure = message;
-      });
+      const lexical = await rgPoolLexicalLaneV1(request.query, config, retrievalLimit, request.filters);
+      rgLexicalHits = lexical.hits;
       // A failed lane is reported as unavailable, not as an executed lane with zero hits.
-      stages.push(lexicalFailure ? 'rg_pool_lexical_unavailable' : 'rg_pool_lexical');
+      if (lexical.status === 'OK') {
+        lexicalLane = { status: 'OK' };
+        stages.push('rg_pool_lexical');
+      } else {
+        lexicalLane = { status: 'UNAVAILABLE', reason: lexical.reason, detail: lexical.detail };
+        stages.push('rg_pool_lexical_unavailable');
+      }
     }
 
     // STAGE 3: TurboVec prefilter
-    const turboVecHits = await turboVecPrefilter(Array.from(embedding), config, retrievalLimit, request.filters);
-    stages.push('turbovec_prefilter');
+    // TurboVec is an additive prefilter: an outage drops its votes and is recorded, it never aborts retrieval.
+    let turboVecHits: Array<{ id: string; score: number; rank: number }> = [];
+    if (embedding) {
+      try {
+        turboVecHits = await turboVecPrefilter(Array.from(embedding), config, retrievalLimit, request.filters);
+        stages.push('turbovec_prefilter');
+      } catch (err) {
+        console.warn('TurboVec prefilter unavailable (non-blocking):', err instanceof Error ? err.message : err);
+        stages.push('turbovec_prefilter_unavailable');
+      }
+    }
 
     // STAGE 4: Postgres join
     const postgresMap = await postgresJoin(qdrantIds, config);
@@ -930,6 +982,8 @@ export async function executeUnifiedRetrieval(
 
     return {
       candidates: enhancedRanked,
+      lanes: { semantic: semanticLane, lexical: lexicalLane },
+      evidence_status: enhancedRanked.length === 0 ? 'NO_EVIDENCE' : 'OK',
       timing: {
         embedding: 0, // Placeholder
         qdrant_search: 0,
