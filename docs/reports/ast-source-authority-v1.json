@@ -1,0 +1,95 @@
+{
+  "schema": "atlas.ast-source-authority.v1",
+  "generatedAt": "2026-10-05T18:42:03.368Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "databaseError": null,
+  "results": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "status": "WORKSPACE_REVISION_MISMATCH",
+      "currentBytesDigest": "sha256:fe97769e45546ce241a420829cff8b2542e8dae927e095b31842b3ec99ae1514",
+      "currentGitBlobOid": "bf9673a95aa2d47309c7662d710fc68c5c6d04f7",
+      "workingTreeDirty": false,
+      "bindingsFound": 1,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+      ],
+      "edgesMayAdvance": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/parent-atlas-bridge.ts",
+      "status": "WORKSPACE_REVISION_MISMATCH",
+      "currentBytesDigest": "sha256:bb565420d6e84884102150cba42b7d7f3dc3e904f1fed84498cca060ff7ecb46",
+      "currentGitBlobOid": "50cb74871b076ed55e0bacdc85b88596bd747cc9",
+      "workingTreeDirty": false,
+      "bindingsFound": 1,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+      ],
+      "edgesMayAdvance": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/operations/atlas-operation-runtime-v1.ts",
+      "status": "WORKSPACE_REVISION_MISMATCH",
+      "currentBytesDigest": "sha256:81dead7affeaa6619229a3fec4a7ad58bcbfff51bdb43d0659017db79cb2f1d2",
+      "currentGitBlobOid": "ee9301145b4376d1c41fa3bfbef4163f88cfe271",
+      "workingTreeDirty": true,
+      "bindingsFound": 1,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+      ],
+      "edgesMayAdvance": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
+      "status": "WORKSPACE_REVISION_MISMATCH",
+      "currentBytesDigest": "sha256:5f9e0169d06cd63d862918711e319fabb5861e122ac62fb3328da49cdafce57f",
+      "currentGitBlobOid": "a5681d130bdd389e4281bbbf2e7e585e44f93b1c",
+      "workingTreeDirty": true,
+      "bindingsFound": 2,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [
+        "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+        "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb"
+      ],
+      "edgesMayAdvance": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
+      "status": "NO_ADMITTED_SOURCE_BINDING",
+      "currentBytesDigest": "sha256:3beb0fbb2157a1d779fead75ac3485073c58042a6e0b830f8034cc0a40216159",
+      "currentGitBlobOid": "03222077061b6ad4473d38c918833d0ba749d32e",
+      "workingTreeDirty": true,
+      "bindingsFound": 0,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [],
+      "edgesMayAdvance": false
+    },
+    {
+      "sourceRef": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
+      "status": "NO_ADMITTED_SOURCE_BINDING",
+      "currentBytesDigest": "sha256:6a947e6a0ebbdbb4f9c691fb3fa2acbf65b9f0fd1f48501bf6987e7377448244",
+      "currentGitBlobOid": "5c8aed4a4316252233829bf90b21993a2694d788",
+      "workingTreeDirty": false,
+      "bindingsFound": 0,
+      "bindingsAtAdmittedWorkspace": 0,
+      "binding": null,
+      "otherWorkspaceRevisions": [],
+      "edgesMayAdvance": false
+    }
+  ],
+  "summary": {
+    "WORKSPACE_REVISION_MISMATCH": 4,
+    "NO_ADMITTED_SOURCE_BINDING": 2
+  }
+}

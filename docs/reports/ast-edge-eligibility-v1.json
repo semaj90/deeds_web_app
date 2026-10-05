@@ -1,10 +1,14 @@
 {
   "schema": "atlas.ast-edge-eligibility.v1",
-  "generatedAt": "2026-10-05T18:36:44.410Z",
+  "generatedAt": "2026-10-05T18:42:22.555Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "sidecar": "http://127.0.0.1:8095/ast/chunk",
-  "note": "Diagnostic only. eligible is always 0 here because source authority is unproven; structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.",
+  "note": "Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.",
+  "sourceAuthority": {
+    "WORKSPACE_REVISION_MISMATCH": 4,
+    "NO_ADMITTED_SOURCE_BINDING": 2
+  },
   "totals": {
     "files": 6,
     "edges": 3084,
@@ -86,42 +90,42 @@
   "perFile": [
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 183,
       "edges": 1060,
       "structuralEligible": 537
     },
     {
       "file": "sveltekit-frontend/src/lib/server/retrieval/parent-atlas-bridge.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 34,
       "edges": 206,
       "structuralEligible": 86
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/operations/atlas-operation-runtime-v1.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 56,
       "edges": 315,
       "structuralEligible": 93
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "WORKSPACE_REVISION_MISMATCH",
       "chunks": 94,
       "edges": 575,
       "structuralEligible": 309
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "NO_ADMITTED_SOURCE_BINDING",
       "chunks": 87,
       "edges": 651,
       "structuralEligible": 293
     },
     {
       "file": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
-      "sourceAuthority": "UNPROVEN",
+      "sourceAuthority": "NO_ADMITTED_SOURCE_BINDING",
       "chunks": 44,
       "edges": 277,
       "structuralEligible": 121

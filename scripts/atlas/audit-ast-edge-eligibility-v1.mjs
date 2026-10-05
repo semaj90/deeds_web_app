@@ -35,6 +35,9 @@ const BUILTINS = new Set(['Array', 'Object', 'Map', 'Set', 'WeakMap', 'Promise',
   'console', 'process', 'parseInt', 'parseFloat', 'isNaN', 'isFinite', 'setTimeout', 'clearTimeout', 'fetch', 'AbortSignal', 'TextDecoder', 'TextEncoder', 'Uint8Array', 'Float32Array',
   'NodeJS', 'ProcessEnv', 'Record', 'Partial', 'Required', 'Readonly', 'Pick', 'Omit', 'ReturnType', 'Awaited', 'Parameters', 'globalThis', 'undefined', 'NaN', 'Infinity']);
 const bump = (o, k, n = 1) => { o[k] = (o[k] ?? 0) + n; };
+// Real per-file source authority from audit-ast-source-authority-v1.mjs (never assumed). Missing report or file => UNPROVEN.
+const AUTH_REPORT = path.join(ROOT, 'docs/reports/ast-source-authority-v1.json');
+const authorityByFile = new Map(fs.existsSync(AUTH_REPORT) ? JSON.parse(fs.readFileSync(AUTH_REPORT, 'utf8')).results.map((r) => [r.sourceRef, r.status]) : []);
 
 async function sidecar(file) {
   const source = fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -64,8 +67,8 @@ const kinds = ['DEFINES', 'CALLS', 'REFERENCES', 'IMPORTS', 'EXPORTS'];
 const blank = () => ({ total: 0, resolvedBySidecar: 0, structuralEligible: 0, eligible: 0, structuralReasons: {} });
 const out = { schema: 'atlas.ast-edge-eligibility.v1', generatedAt: new Date().toISOString(), canonicalAuthority: false, writesPerformed: false,
   sidecar: 'http://127.0.0.1:8095/ast/chunk',
-  note: 'Diagnostic only. eligible is always 0 here because source authority is unproven; structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.',
-  totals: { files: 0, edges: 0, ...blank() }, byKind: Object.fromEntries(kinds.map((k) => [k, blank()])), subjectClasses: {}, nodeClasses: {}, perFile: [] };
+  note: 'Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.',
+  sourceAuthority: {}, totals: { files: 0, edges: 0, ...blank() }, byKind: Object.fromEntries(kinds.map((k) => [k, blank()])), subjectClasses: {}, nodeClasses: {}, perFile: [] };
 
 for (const file of FILES) {
   const j = await sidecar(file);
@@ -80,7 +83,9 @@ for (const file of FILES) {
   const declared = new Set(chunks.filter((c) => c.name).map((c) => c.name));
   const exported = new Set(edges.filter((e) => e.type === 'EXPORTS').map((e) => e.to_evidence_key));
   const imports = importBindings(edges);
-  const per = { file, sourceAuthority: 'UNPROVEN', chunks: chunks.length, edges: edges.length, structuralEligible: 0 };
+  const authority = authorityByFile.get(file) ?? 'UNPROVEN';
+  bump(out.sourceAuthority, authority);
+  const per = { file, sourceAuthority: authority, chunks: chunks.length, edges: edges.length, structuralEligible: 0 };
   out.totals.files++;
   for (const e of edges) {
     const K = out.byKind[e.type] ?? (out.byKind[e.type] = blank());
@@ -113,7 +118,7 @@ for (const file of FILES) {
     bump(out.nodeClasses, nodeClass);
     const reason = subjectReason ?? (spanOk ? null : 'EDGE_SPAN_MISSING') ?? null;
     const structuralReason = subjectReason ?? (!spanOk ? 'EDGE_SPAN_MISSING' : targetReason);
-    if (!structuralReason) { K.structuralEligible++; out.totals.structuralEligible++; per.structuralEligible++; }
+    if (!structuralReason) { K.structuralEligible++; out.totals.structuralEligible++; per.structuralEligible++; if (authority === 'PROVEN') { K.eligible++; out.totals.eligible++; } }
     else { bump(K.structuralReasons, structuralReason); bump(out.totals.structuralReasons, structuralReason); }
     void reason;
   }
@@ -123,7 +128,7 @@ out.totals.structuralReasons = Object.fromEntries(Object.entries(out.totals.stru
 fs.mkdirSync(path.dirname(REPORT), { recursive: true });
 fs.writeFileSync(REPORT, JSON.stringify(out, null, 2) + '\n');
 const T = out.totals;
-console.log(`files=${T.files} edges=${T.edges} resolvedBySidecar=${T.resolvedBySidecar} structuralEligible=${T.structuralEligible} eligible=${T.eligible} (source authority UNPROVEN)`);
+console.log(`files=${T.files} edges=${T.edges} resolvedBySidecar=${T.resolvedBySidecar} structuralEligible=${T.structuralEligible} eligible=${T.eligible} sourceAuthority=${JSON.stringify(out.sourceAuthority)}`);
 for (const [k, v] of Object.entries(out.byKind)) if (v.total) console.log(`${k.padEnd(10)} total=${String(v.total).padStart(4)} sidecarResolved=${String(v.resolvedBySidecar).padStart(4)} structuralEligible=${String(v.structuralEligible).padStart(4)} reasons=${JSON.stringify(v.structuralReasons)}`);
 console.log('subject classes:', JSON.stringify(out.subjectClasses));
 console.log('node classes   :', JSON.stringify(out.nodeClasses));
