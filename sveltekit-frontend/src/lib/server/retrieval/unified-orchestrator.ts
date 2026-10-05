@@ -100,6 +100,8 @@ export interface CandidateIdentityV1 {
   evidenceRefs?: readonly string[] | null;
   /** How packetKey was bound: the proven lineage bridge, a unique source_ref (weaker, not revision-qualified), or not bound. */
   packetBinding?: 'LINEAGE_PROVEN' | 'SOURCE_REF_UNIQUE' | 'NONE';
+  /** EXACT_BINDING: source_ref + whole-file digest matched the admitted workspace binding. REVISION_CONFLICT: bridge and binding disagree, so no revision is attached. */
+  revisionBinding?: 'EXACT_BINDING' | 'REVISION_CONFLICT' | 'NONE';
   identitySource: 'QDRANT_PAYLOAD_V1' | 'POSTGRES_CANONICAL_V1' | 'NOT_AVAILABLE';
   missingFields: readonly (
     | 'packetKey'
@@ -555,6 +557,32 @@ async function turboVecPrefilter(
 const PGVECTOR_EXECUTOR_CAVEAT =
   'SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged';
 
+let admittedWorkspaceRevisionCache: string | null | undefined;
+/** The admitted workspace revision, from ATLAS_ADMITTED_WORKSPACE_REVISION or the committed admission report; null (never a guess) when neither proves it. */
+async function readAdmittedWorkspaceRevision(): Promise<string | null> {
+  const fromEnv = process.env.ATLAS_ADMITTED_WORKSPACE_REVISION?.trim();
+  if (fromEnv) return fromEnv; // an explicit override always wins and is never cached
+  if (admittedWorkspaceRevisionCache !== undefined) return admittedWorkspaceRevisionCache;
+  try {
+    const fsp = await import('node:fs/promises');
+    const path = await import('node:path');
+    let dir = process.cwd();
+    for (let i = 0; i < 6; i++, dir = path.dirname(dir)) {
+      const text = await fsp.readFile(path.join(dir, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json'), 'utf8').catch(() => null);
+      if (text) {
+        const j = JSON.parse(text);
+        return (admittedWorkspaceRevisionCache = j.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' && j.authority === true && typeof j.workspaceRevision === 'string' ? j.workspaceRevision : null);
+      }
+    }
+  } catch { /* unreadable report: no admitted revision */ }
+  return (admittedWorkspaceRevisionCache = null);
+}
+
+/** Bridge and binding must agree on source_revision; a disagreement attaches no revision rather than choosing one. */
+function revisionConflict(r: any): boolean {
+  return Boolean(r.lineage_source_revision && r.binding_source_revision && r.lineage_source_revision !== r.binding_source_revision);
+}
+
 async function postgresPgvectorSearch(
   queryVector: Float32Array,
   _config: RetrievalConfig,
@@ -569,16 +597,19 @@ async function postgresPgvectorSearch(
   const n = Math.min(Math.max(limit, 1), 50);
   // Lazy import: the shared pool owner is only loaded when this executor runs, so the orchestrator stays importable without app DB env.
   const { pool } = await import('$lib/server/db/client');
+  const admittedWorkspace = await readAdmittedWorkspaceRevision();
   const res = await pool.query(
     `WITH top AS (
-       SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
+       SELECT id, relative_path, symbol, kind, source_ref, file_content_hash, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
          FROM codebase_chunk_index
         WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\')
         ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
-     SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs
+     SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs,
+            b.workspace_revision AS binding_workspace_revision, b.source_revision AS binding_source_revision
        FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'
+       LEFT JOIN atlas_workspace_source_bindings b ON $4::text IS NOT NULL AND b.workspace_revision = $4 AND b.canonical_source_ref = t.source_ref AND b.content_digest = t.file_content_hash
       ORDER BY t.cosine DESC`,
-    [vec, n, refPrefix],
+    [vec, n, refPrefix, admittedWorkspace],
   );
   const merged = res.rows as any[];
   const refs = [...new Set(merged.filter((r) => !r.lineage_packet_key).map((r) => r.source_ref).filter(Boolean))];
@@ -589,9 +620,9 @@ async function postgresPgvectorSearch(
   }
   return merged.map((r, idx) => ({
     id: String(r.id), score: Number(r.cosine),
-    payload: { packet_key: r.lineage_packet_key ?? packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? r.lineage_source_revision ?? undefined,
+    payload: { packet_key: r.lineage_packet_key ?? packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: revisionConflict(r) ? undefined : (r.source_revision ?? r.lineage_source_revision ?? r.binding_source_revision ?? undefined),
       evidence_refs: Array.isArray(r.lineage_evidence_refs) ? r.lineage_evidence_refs.map(String) : undefined,
-      workspace_revision: r.workspace_revision ?? undefined, representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
+      workspace_revision: revisionConflict(r) ? undefined : (r.workspace_revision ?? r.binding_workspace_revision ?? undefined), revision_binding: revisionConflict(r) ? 'REVISION_CONFLICT' : r.binding_workspace_revision ? 'EXACT_BINDING' : 'NONE', representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
       backend: 'postgres_pgvector', embedding_column: 'content_embedding_768', packet_binding: r.lineage_packet_key ? 'LINEAGE_PROVEN' : packetByRef.get(r.source_ref) ? 'SOURCE_REF_UNIQUE' : 'NONE', pgvector_rank: idx + 1 },
   }));
 }
@@ -755,6 +786,7 @@ export function rankCandidates(
         symbolVersionId,
         evidenceRefs: Array.isArray(payload.evidence_refs) ? payload.evidence_refs : null,
         packetBinding: fromPostgres ? (payload.packet_binding ?? 'NONE') : undefined,
+        revisionBinding: fromPostgres ? (payload.revision_binding ?? 'NONE') : undefined,
         identitySource: fromPostgres ? 'POSTGRES_CANONICAL_V1' : qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
         missingFields,
       };

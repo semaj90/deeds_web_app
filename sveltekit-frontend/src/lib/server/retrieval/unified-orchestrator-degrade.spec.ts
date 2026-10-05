@@ -151,6 +151,26 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
     expect(vectorSql).toMatch(/revision_status = 'PROVEN'/);
   });
 
+  it('attaches workspaceRevision only through an exact binding at the admitted workspace; the query binds the admitted revision as a parameter', async () => {
+    process.env.ATLAS_ADMITTED_WORKSPACE_REVISION = 'sha256:ws-admitted';
+    try {
+      wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1'], binding_workspace_revision: 'sha256:ws-admitted', binding_source_revision: 'sha256:srcrev' }] });
+      const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+      expect(r.candidates[0].identity).toMatchObject({ workspaceRevision: 'sha256:ws-admitted', sourceRevision: 'sha256:srcrev', revisionBinding: 'EXACT_BINDING' });
+      expect(r.candidates[0].identity.missingFields).toEqual([]);
+      const call = mocks.pgQuery.mock.calls.find((c) => /atlas_workspace_source_bindings/.test(String(c[0])))!;
+      expect(String(call[0])).toMatch(/b.content_digest = t.file_content_hash/);
+      expect(call[1][3]).toBe('sha256:ws-admitted');
+    } finally { delete process.env.ATLAS_ADMITTED_WORKSPACE_REVISION; }
+  });
+
+  it('attaches NO revision when the bridge and the binding disagree on source_revision (conflict, never a pick)', async () => {
+    wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:A', binding_workspace_revision: 'sha256:ws-admitted', binding_source_revision: 'sha256:B' }] });
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.candidates[0].identity).toMatchObject({ sourceRevision: null, workspaceRevision: null, revisionBinding: 'REVISION_CONFLICT' });
+    expect(r.candidates[0].identity.missingFields).toEqual(expect.arrayContaining(['sourceRevision', 'workspaceRevision']));
+  });
+
   it('does not guess a packet_key when a source_ref has several packets', async () => {
     wirePg({ packets: [{ source_ref: 'src/a.ts', packet_key: 'packet:abc', n: 2 }] });
     const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
