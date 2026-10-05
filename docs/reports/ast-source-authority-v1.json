@@ -1,6 +1,6 @@
 {
   "schema": "atlas.ast-source-authority.v1",
-  "generatedAt": "2026-10-05T18:42:03.368Z",
+  "generatedAt": "2026-10-05T18:48:52.177Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -65,7 +65,7 @@
     },
     {
       "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
-      "status": "NO_ADMITTED_SOURCE_BINDING",
+      "status": "SOURCE_NOT_ADMITTED",
       "currentBytesDigest": "sha256:3beb0fbb2157a1d779fead75ac3485073c58042a6e0b830f8034cc0a40216159",
       "currentGitBlobOid": "03222077061b6ad4473d38c918833d0ba749d32e",
       "workingTreeDirty": true,
@@ -77,7 +77,7 @@
     },
     {
       "sourceRef": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
-      "status": "NO_ADMITTED_SOURCE_BINDING",
+      "status": "SOURCE_NOT_ADMITTED",
       "currentBytesDigest": "sha256:6a947e6a0ebbdbb4f9c691fb3fa2acbf65b9f0fd1f48501bf6987e7377448244",
       "currentGitBlobOid": "5c8aed4a4316252233829bf90b21993a2694d788",
       "workingTreeDirty": false,
@@ -90,6 +90,6 @@
   ],
   "summary": {
     "WORKSPACE_REVISION_MISMATCH": 4,
-    "NO_ADMITTED_SOURCE_BINDING": 2
+    "SOURCE_NOT_ADMITTED": 2
   }
 }

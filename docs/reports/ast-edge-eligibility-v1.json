@@ -1,13 +1,13 @@
 {
   "schema": "atlas.ast-edge-eligibility.v1",
-  "generatedAt": "2026-10-05T18:42:22.555Z",
+  "generatedAt": "2026-10-05T18:48:52.432Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "sidecar": "http://127.0.0.1:8095/ast/chunk",
   "note": "Diagnostic only. eligible counts only edges from files whose source authority is PROVEN (see ast-source-authority-v1.json); structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.",
   "sourceAuthority": {
     "WORKSPACE_REVISION_MISMATCH": 4,
-    "NO_ADMITTED_SOURCE_BINDING": 2
+    "SOURCE_NOT_ADMITTED": 2
   },
   "totals": {
     "files": 6,
@@ -118,14 +118,14 @@
     },
     {
       "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
-      "sourceAuthority": "NO_ADMITTED_SOURCE_BINDING",
+      "sourceAuthority": "SOURCE_NOT_ADMITTED",
       "chunks": 87,
       "edges": 651,
       "structuralEligible": 293
     },
     {
       "file": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
-      "sourceAuthority": "NO_ADMITTED_SOURCE_BINDING",
+      "sourceAuthority": "SOURCE_NOT_ADMITTED",
       "chunks": 44,
       "edges": 277,
       "structuralEligible": 121

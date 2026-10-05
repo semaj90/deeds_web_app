@@ -2,7 +2,7 @@
 /**
  * GPH-SOURCE-AUTHORITY-01: per-file source authority diagnostic (READ ONLY). For each tested file it compares the CURRENT bytes with the
  * registered Graphify binding (public.graphify_files) at the ADMITTED workspace revision, and reports one status:
- *   PROVEN | NO_ADMITTED_SOURCE_BINDING | SOURCE_REVISION_MISMATCH | WORKSPACE_REVISION_MISMATCH | AUTHORITY_RECORD_MISSING | AMBIGUOUS_BINDING
+ *   PROVEN | SOURCE_NOT_ADMITTED | SOURCE_REVISION_MISMATCH | WORKSPACE_REVISION_MISMATCH | AUTHORITY_RECORD_MISSING | AMBIGUOUS_SOURCE_BINDING
  * hash(current bytes) == recorded content_hash is necessary but NOT sufficient: the binding must also sit at the admitted workspace revision,
  * carry source_revision_authority = PROVEN, and belong to a COMPLETED run. Anything other than PROVEN stays OBSERVATION_ONLY.
  * It never writes a datastore and never assigns a revision. Reuses the repo connection helpers (no credentials in source).
@@ -50,9 +50,9 @@ try {
     const bindings = rows.filter((r) => r.source_ref === file);
     const atAdmitted = bindings.filter((r) => r.workspace_revision === ADMITTED_WORKSPACE_REVISION);
     let status; let chosen = null;
-    if (!bindings.length) status = 'NO_ADMITTED_SOURCE_BINDING';
+    if (!bindings.length) status = 'SOURCE_NOT_ADMITTED';
     else if (!ADMITTED_WORKSPACE_REVISION || !atAdmitted.length) status = 'WORKSPACE_REVISION_MISMATCH';
-    else if (new Set(atAdmitted.map((r) => `${r.content_hash}|${r.code_source_revision}`)).size > 1) status = 'AMBIGUOUS_BINDING';
+    else if (new Set(atAdmitted.map((r) => `${r.content_hash}|${r.code_source_revision}`)).size > 1) status = 'AMBIGUOUS_SOURCE_BINDING';
     else {
       chosen = atAdmitted[0];
       if (norm(chosen.content_hash) !== currentDigest || (chosen.byte_length != null && Number(chosen.byte_length) !== bytes.length)) status = 'SOURCE_REVISION_MISMATCH';
