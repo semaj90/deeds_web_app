@@ -420,7 +420,8 @@ async function rgPoolLexicalSearch(
   query: string,
   config: RetrievalConfig,
   limit: number = 10,
-  filters?: SearchFilter
+  filters?: SearchFilter,
+  onFailure?: (message: string) => void
 ): Promise<Array<{ id: string; file: string; line: number; score: number; rank: number }>> {
   const startTime = Date.now();
   try {
@@ -441,6 +442,7 @@ async function rgPoolLexicalSearch(
     }));
   } catch (err) {
     console.error('rg-pool lexical search failed:', err);
+    onFailure?.(err instanceof Error ? err.message : String(err));
     return [];
   }
 }
@@ -855,8 +857,12 @@ export async function executeUnifiedRetrieval(
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
     if (request.useRgPool ?? true) {
-      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, retrievalLimit, request.filters);
-      stages.push('rg_pool_lexical');
+      let lexicalFailure: string | null = null;
+      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, retrievalLimit, request.filters, (message) => {
+        lexicalFailure = message;
+      });
+      // A failed lane is reported as unavailable, not as an executed lane with zero hits.
+      stages.push(lexicalFailure ? 'rg_pool_lexical_unavailable' : 'rg_pool_lexical');
     }
 
     // STAGE 3: TurboVec prefilter
