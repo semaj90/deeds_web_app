@@ -35,7 +35,7 @@ for (const c of COHORT) {
       const id = k.identity ?? {};
       const complete = Boolean(id.candidateId && id.packetKey && id.sourceRef && id.sourceRevision && id.workspaceRevision);
       return { canonicalId: id.candidateId ?? null, packetKey: id.packetKey ?? null, sourceRef: id.sourceRef ?? null, sourceRevision: id.sourceRevision ?? null,
-        workspaceRevision: id.workspaceRevision ?? null, representationRevision: null, evidenceRefs: null, executor: null, lanes: Object.keys(k.ranks ?? {}), missingFields: id.missingFields ?? [],
+        workspaceRevision: id.workspaceRevision ?? null, representationRevision: id.representationRevision ?? null, evidenceRefs: id.evidenceRefs ?? null, packetBinding: id.packetBinding ?? null, executor: r.lanes?.semantic?.executor ?? null, lanes: Object.keys(k.ranks ?? {}), missingFields: id.missingFields ?? [],
         proofUsable: false, identityComplete: complete };
     });
     const ids = cands.map((k: any) => k.canonicalId ?? '').sort();
@@ -43,7 +43,7 @@ for (const c of COHORT) {
       lanes: r.lanes ?? null, degradedLanes: Object.entries(r.lanes ?? {}).filter(([, v]: any) => v.status !== 'OK').map(([k, v]: any) => `${k}:${v.status}${v.reason ? `:${v.reason}` : ''}`),
       readOnlyReceipt: r.read_only_receipt ?? null,
       counts: { candidateId: cands.filter((k: any) => k.canonicalId).length, packetKey: cands.filter((k: any) => k.packetKey).length, sourceRef: cands.filter((k: any) => k.sourceRef).length,
-        sourceRevision: cands.filter((k: any) => k.sourceRevision).length, workspaceRevision: cands.filter((k: any) => k.workspaceRevision).length, identityComplete: cands.filter((k: any) => k.identityComplete).length },
+        sourceRevision: cands.filter((k: any) => k.sourceRevision).length, workspaceRevision: cands.filter((k: any) => k.workspaceRevision).length, identityComplete: cands.filter((k: any) => k.identityComplete).length, evidenceRefs: cands.filter((k: any) => k.evidenceRefs?.length).length, lineageProven: cands.filter((k: any) => k.packetBinding === 'LINEAGE_PROVEN').length },
       candidates: cands });
   } catch (e: any) { cases.push({ id: c.id, query: c.query, ok: false, latencyMs: Date.now() - t0, error: String(e?.message ?? e).slice(0, 200) }); }
 }
@@ -55,10 +55,10 @@ const verdict = okCases.length === COHORT.length && distinct === COHORT.length &
   ? (revComplete === total && total > 0 ? 'ACCEPTANCE_DISTINCT_AND_REVISION_QUALIFIED' : 'DISTINCT_SETS_BUT_REVISION_INCOMPLETE') : 'NOT_PASSED';
 const report = { schema: 'atlas.kernel-real-02-orchestrator-live-proof.v1', generatedAt: new Date().toISOString(), canonicalAuthority: false, writesPerformed: false, executionMode: 'READ_ONLY',
   postgresPasswordPresentInEnv: hasPassword, cohortNote: 'frozen re-creation; original 01B question text was not recorded', verdict, distinctCandidateSets: `${distinct}/${COHORT.length}`,
-  revisionQualifiedCandidates: `${revComplete}/${total}`, missingContractFields: ['executor', 'representationRevision', 'evidenceRefs', 'proofUsable'], rewireDecision: 'DO_NOT_REWIRE_atlas_query_UNTIL_TRACE_PARITY_AND_READBACK', cases };
+  revisionQualifiedCandidates: `${revComplete}/${total}`, missingContractFields: ['representationRevision (0 in source rows)', 'workspaceRevision (0 in source rows)', 'proofUsable (requires every revision)'], rewireDecision: 'DO_NOT_REWIRE_atlas_query_UNTIL_TRACE_PARITY_AND_READBACK', cases };
 fs.writeFileSync(REPORT, JSON.stringify(report, null, 2) + '\n');
 console.log('postgresPassword', hasPassword ? 'present' : 'ABSENT (enrichment will degrade)');
-for (const c of cases) console.log(c.ok ? `${c.id.padEnd(10)} n=${c.candidateCount} ${c.latencyMs}ms set=${c.candidateSetChecksum.slice(0, 10)} evidence=${c.evidenceStatus} degraded=[${c.degradedLanes.join(',')}] ids=${c.counts.candidateId} pk=${c.counts.packetKey} srcRev=${c.counts.sourceRevision} wsRev=${c.counts.workspaceRevision}`
+for (const c of cases) console.log(c.ok ? `${c.id.padEnd(10)} n=${c.candidateCount} ${c.latencyMs}ms set=${c.candidateSetChecksum.slice(0, 10)} evidence=${c.evidenceStatus} degraded=[${c.degradedLanes.join(',')}] ids=${c.counts.candidateId} pk=${c.counts.packetKey} srcRev=${c.counts.sourceRevision} wsRev=${c.counts.workspaceRevision} evidenceRefs=${c.counts.evidenceRefs} lineageProven=${c.counts.lineageProven}`
   : `${c.id.padEnd(10)} THREW ${c.error}`);
 console.log(verdict, `distinct=${distinct}/${COHORT.length}`, `revisionQualified=${revComplete}/${total}`);
 process.exit(0);

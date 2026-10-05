@@ -1,6 +1,6 @@
 {
   "schema": "atlas.kernel-real-02-orchestrator-live-proof.v1",
-  "generatedAt": "2026-10-05T19:25:50.303Z",
+  "generatedAt": "2026-10-05T19:31:36.496Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "executionMode": "READ_ONLY",
@@ -10,10 +10,9 @@
   "distinctCandidateSets": "3/3",
   "revisionQualifiedCandidates": "0/24",
   "missingContractFields": [
-    "executor",
-    "representationRevision",
-    "evidenceRefs",
-    "proofUsable"
+    "representationRevision (0 in source rows)",
+    "workspaceRevision (0 in source rows)",
+    "proofUsable (requires every revision)"
   ],
   "rewireDecision": "DO_NOT_REWIRE_atlas_query_UNTIL_TRACE_PARITY_AND_READBACK",
   "cases": [
@@ -21,7 +20,7 @@
       "id": "code-owner",
       "query": "Which module owns unified retrieval and how does it fuse lanes with reciprocal rank fusion?",
       "ok": true,
-      "latencyMs": 2914,
+      "latencyMs": 4094,
       "candidateCount": 8,
       "candidateSetChecksum": "c065fde45b7022f28aedff2238e93c555f6e7a7d8a25b44fb02b7471b5e18b2b",
       "evidenceStatus": "OK",
@@ -95,7 +94,9 @@
         "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
-        "identityComplete": 0
+        "identityComplete": 0,
+        "evidenceRefs": 0,
+        "lineageProven": 0
       },
       "candidates": [
         {
@@ -106,7 +107,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -128,7 +130,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -150,7 +153,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -172,7 +176,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -194,7 +199,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -216,7 +222,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -238,7 +245,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -260,7 +268,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -280,7 +289,7 @@
       "id": "legal",
       "query": "What does the repository say about chain of custody for evidence?",
       "ok": true,
-      "latencyMs": 1492,
+      "latencyMs": 1228,
       "candidateCount": 8,
       "candidateSetChecksum": "200cb7c69dbc80c2b4906d8ed1031dab9b24793242833bd3f9e07ded9745c4ef",
       "evidenceStatus": "OK",
@@ -352,9 +361,11 @@
         "candidateId": 8,
         "packetKey": 8,
         "sourceRef": 8,
-        "sourceRevision": 0,
+        "sourceRevision": 7,
         "workspaceRevision": 0,
-        "identityComplete": 0
+        "identityComplete": 0,
+        "evidenceRefs": 7,
+        "lineageProven": 7
       },
       "candidates": [
         {
@@ -365,7 +376,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "SOURCE_REF_UNIQUE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -382,18 +394,20 @@
           "canonicalId": "90b585d4-7a2c-4650-b9c0-2dffe795a521",
           "packetKey": "packet:d9704f0b0a30",
           "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -403,18 +417,20 @@
           "canonicalId": "d0b81855-25f2-4543-9f6f-a5e75ba3c8fc",
           "packetKey": "packet:90da80cd1156",
           "sourceRef": "sveltekit-frontend/drizzle/manual/20260311_audit_and_versions.sql",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:deea1fafe26c11f31ed3c87376893e603c7700395114dbaed87e186dcbf26b95",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -424,18 +440,20 @@
           "canonicalId": "93d2a86b-a730-448f-9438-0ad5fa056c83",
           "packetKey": "packet:85bb6b98a2c1",
           "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:91e20cebaee0b9172b0414bebe8cad94886142789f3db550570c863f03fd40b9",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -445,18 +463,20 @@
           "canonicalId": "6ede9535-56b3-4811-b823-d4685d8825e1",
           "packetKey": "packet:383c31f090f8",
           "sourceRef": "sveltekit-frontend/static/workers/recursive-evidence-chain-worker.js",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:87c610b1556475a17a7c27f17b928f2724e74b1259e2ff10b8aa0fcd4c6d186b",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -466,18 +486,20 @@
           "canonicalId": "599e5fe2-b1fb-42e4-b64f-d4cc2140180f",
           "packetKey": "packet:85bb6b98a2c1",
           "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:91e20cebaee0b9172b0414bebe8cad94886142789f3db550570c863f03fd40b9",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -487,18 +509,20 @@
           "canonicalId": "6cd4bc53-3948-4b58-97a0-3d00a7f94989",
           "packetKey": "packet:d9704f0b0a30",
           "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -508,18 +532,20 @@
           "canonicalId": "6750a92b-a3ec-4f9b-9125-719267d0a86b",
           "packetKey": "packet:caeb7bae6f01",
           "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__evidence___id___chain-of-custody___server.md",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:b21358b86f1f551798c21f8c9ef8f9c03306821d436641f589d9afdf4764348f",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -531,7 +557,7 @@
       "id": "embedding",
       "query": "How are 768-dimensional embeddings produced and validated?",
       "ok": true,
-      "latencyMs": 1110,
+      "latencyMs": 1013,
       "candidateCount": 8,
       "candidateSetChecksum": "773f19752f56da041fa292c5acb0e8a3221f119dee05ac8e70aee22112263ea9",
       "evidenceStatus": "OK",
@@ -603,9 +629,11 @@
         "candidateId": 8,
         "packetKey": 1,
         "sourceRef": 8,
-        "sourceRevision": 0,
+        "sourceRevision": 1,
         "workspaceRevision": 0,
-        "identityComplete": 0
+        "identityComplete": 0,
+        "evidenceRefs": 1,
+        "lineageProven": 1
       },
       "candidates": [
         {
@@ -616,7 +644,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -634,18 +663,20 @@
           "canonicalId": "2bb65b3d-0fbc-40d1-b0f0-4759a309e299",
           "packetKey": "packet:31a23c9fc19e",
           "sourceRef": "sveltekit-frontend/scripts/create-phase78-embeddings-table.sql",
-          "sourceRevision": null,
+          "sourceRevision": "sha256:fdeb39acdb77045e8dba7898162f80656fff31fc20758136160369424e533564",
           "workspaceRevision": null,
           "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
             "workspaceRevision"
           ],
           "proofUsable": false,
@@ -659,7 +690,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -681,7 +713,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -703,7 +736,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -725,7 +759,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -747,7 +782,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",
@@ -769,7 +805,8 @@
           "workspaceRevision": null,
           "representationRevision": null,
           "evidenceRefs": null,
-          "executor": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
           "lanes": [
             "qdrant_dense",
             "turbovec",

@@ -141,6 +141,16 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
     expect(vectorSql[0]).not.toMatch(/content_embeddings*<=>/);
   });
 
+  it('prefers the PROVEN packet-chunk lineage bridge: exact packetKey, sourceRevision and evidenceRefs, binding LINEAGE_PROVEN', async () => {
+    wirePg({ chunkRows: [{ ...chunk, lineage_packet_key: 'packet:lineage', lineage_source_revision: 'sha256:srcrev', lineage_evidence_refs: ['chunk:c1', 'source:a'] }] });
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.candidates[0].identity).toMatchObject({ packetKey: 'packet:lineage', sourceRevision: 'sha256:srcrev', evidenceRefs: ['chunk:c1', 'source:a'], packetBinding: 'LINEAGE_PROVEN' });
+    expect(r.candidates[0].identity.missingFields).toEqual(['workspaceRevision']);
+    const vectorSql = mocks.pgQuery.mock.calls.map((c) => String(c[0])).find((q) => /<=>/.test(q))!;
+    expect(vectorSql).toMatch(/atlas_packet_chunk_lineage/);
+    expect(vectorSql).toMatch(/revision_status = 'PROVEN'/);
+  });
+
   it('does not guess a packet_key when a source_ref has several packets', async () => {
     wirePg({ packets: [{ source_ref: 'src/a.ts', packet_key: 'packet:abc', n: 2 }] });
     const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
@@ -154,7 +164,7 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
     expect(r.lanes?.semantic).toMatchObject({ status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED' });
     wirePg();
     await executeUnifiedRetrieval({ query: 'find a' }, config);
-    for (const [sql] of mocks.pgQuery.mock.calls) expect(String(sql)).toMatch(/^s*SELECT/i);
+    for (const [sql] of mocks.pgQuery.mock.calls) { expect(String(sql)).toMatch(/^\s*(WITH|SELECT)/i); expect(String(sql)).not.toMatch(/\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)\b/i); }
   });
 
   it('fails the lane instead of silently dropping a filter it cannot apply', async () => {

@@ -96,6 +96,10 @@ export interface CandidateIdentityV1 {
   sourceRevision: string | null;
   workspaceRevision: string | null;
   symbolVersionId: string | null;
+  /** Exact evidence references from the PROVEN packet-chunk lineage bridge; null when no bridge row exists. */
+  evidenceRefs?: readonly string[] | null;
+  /** How packetKey was bound: the proven lineage bridge, a unique source_ref (weaker, not revision-qualified), or not bound. */
+  packetBinding?: 'LINEAGE_PROVEN' | 'SOURCE_REF_UNIQUE' | 'NONE';
   identitySource: 'QDRANT_PAYLOAD_V1' | 'POSTGRES_CANONICAL_V1' | 'NOT_AVAILABLE';
   missingFields: readonly (
     | 'packetKey'
@@ -545,6 +549,8 @@ async function turboVecPrefilter(
  * Uses the shared repository pool (no per-query Pool). Filters this executor cannot honour fail the lane instead of being silently dropped.
  * packet_key is attached only when exactly one atlas_packets row exists for the source_ref; that binding is source_ref-only and NOT revision-qualified
  * (atlas_packets.chunk_id is a different id space: 0 of codebase_chunk_index.id match), so it is labelled packet_binding=SOURCE_REF_UNIQUE.
+ * Preferred binding: atlas_packet_chunk_lineage (chunk_row_id = codebase_chunk_index.id, revision_status PROVEN) supplies the exact packet_key, source_revision and
+ * evidence_refs (packet_binding=LINEAGE_PROVEN); the bridge covers only the chunks it contains, the rest keep the weaker binding.
  */
 const PGVECTOR_EXECUTOR_CAVEAT =
   'SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged';
@@ -564,14 +570,18 @@ async function postgresPgvectorSearch(
   // Lazy import: the shared pool owner is only loaded when this executor runs, so the orchestrator stays importable without app DB env.
   const { pool } = await import('$lib/server/db/client');
   const res = await pool.query(
-    `SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
-       FROM codebase_chunk_index
-      WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
-      ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2`,
+    `WITH top AS (
+       SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
+         FROM codebase_chunk_index
+        WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\')
+        ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
+     SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs
+       FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'
+      ORDER BY t.cosine DESC`,
     [vec, n, refPrefix],
   );
   const merged = res.rows as any[];
-  const refs = [...new Set(merged.map((r) => r.source_ref).filter(Boolean))];
+  const refs = [...new Set(merged.filter((r) => !r.lineage_packet_key).map((r) => r.source_ref).filter(Boolean))];
   const packetByRef = new Map<string, string | null>();
   if (refs.length) {
     const pk = await pool.query(`SELECT source_ref, min(packet_key) AS packet_key, count(*)::int AS n FROM atlas_packets WHERE source_ref = ANY($1::text[]) GROUP BY source_ref`, [refs]);
@@ -579,9 +589,10 @@ async function postgresPgvectorSearch(
   }
   return merged.map((r, idx) => ({
     id: String(r.id), score: Number(r.cosine),
-    payload: { packet_key: packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? undefined,
+    payload: { packet_key: r.lineage_packet_key ?? packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? r.lineage_source_revision ?? undefined,
+      evidence_refs: Array.isArray(r.lineage_evidence_refs) ? r.lineage_evidence_refs.map(String) : undefined,
       workspace_revision: r.workspace_revision ?? undefined, representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
-      backend: 'postgres_pgvector', embedding_column: 'content_embedding_768', packet_binding: 'SOURCE_REF_UNIQUE', pgvector_rank: idx + 1 },
+      backend: 'postgres_pgvector', embedding_column: 'content_embedding_768', packet_binding: r.lineage_packet_key ? 'LINEAGE_PROVEN' : packetByRef.get(r.source_ref) ? 'SOURCE_REF_UNIQUE' : 'NONE', pgvector_rank: idx + 1 },
   }));
 }
 
@@ -742,6 +753,8 @@ export function rankCandidates(
         sourceRevision: sourceRevision ?? null,
         workspaceRevision: workspaceRevision ?? null,
         symbolVersionId,
+        evidenceRefs: Array.isArray(payload.evidence_refs) ? payload.evidence_refs : null,
+        packetBinding: fromPostgres ? (payload.packet_binding ?? 'NONE') : undefined,
         identitySource: fromPostgres ? 'POSTGRES_CANONICAL_V1' : qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
         missingFields,
       };
