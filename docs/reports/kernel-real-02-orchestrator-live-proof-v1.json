@@ -1,6 +1,6 @@
 {
   "schema": "atlas.kernel-real-02-orchestrator-live-proof.v1",
-  "generatedAt": "2026-10-05T19:16:44.817Z",
+  "generatedAt": "2026-10-05T19:22:11.471Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "executionMode": "READ_ONLY",
@@ -21,13 +21,15 @@
       "id": "code-owner",
       "query": "Which module owns unified retrieval and how does it fuse lanes with reciprocal rank fusion?",
       "ok": true,
-      "latencyMs": 7302,
+      "latencyMs": 7224,
       "candidateCount": 8,
-      "candidateSetChecksum": "96411511fdeebd230f019c31992075d7b8373893c73ba2723dc0b9630086b3aa",
+      "candidateSetChecksum": "098aaf54eba96f76842a178242a932f5878399931bb0fab537d036e02249c4ef",
       "evidenceStatus": "OK",
       "lanes": {
         "semantic": {
-          "status": "OK"
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
         },
         "lexical": {
           "status": "UNAVAILABLE",
@@ -52,15 +54,6 @@
             "executionMode": "READ_ONLY"
           },
           {
-            "subsystem": "dense_search",
-            "operation": "qdrant_search",
-            "reads": 1,
-            "attemptedWrites": 0,
-            "committedWrites": 0,
-            "suppressionReason": null,
-            "executionMode": "READ_ONLY"
-          },
-          {
             "subsystem": "turbovec",
             "operation": "turbovec_prefilter",
             "reads": 1,
@@ -92,81 +85,16 @@
         "committedWrites": 0
       },
       "counts": {
-        "candidateId": 6,
-        "packetKey": 7,
-        "sourceRef": 7,
+        "candidateId": 8,
+        "packetKey": 1,
+        "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
         "identityComplete": 0
       },
       "candidates": [
         {
-          "canonicalId": "4b56538c-bd89-4126-8cf3-be831d022fe1",
-          "packetKey": "0d07ec39-69fb-4587-90fd-e3f0a9c1bd56",
-          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "2d696367-92b3-49cd-842c-5db1d3a86413",
-          "packetKey": "c23c83ae-a91b-4149-ac82-c8f201069332",
-          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
+          "canonicalId": "de259487-ffd8-458a-b305-80ed06c7d8ba",
           "packetKey": "packet:f6161a0fc5bb",
           "sourceRef": "docs/open-lanes/lane-retrieval-ranking.md",
           "sourceRevision": null,
@@ -187,8 +115,74 @@
           "identityComplete": false
         },
         {
+          "canonicalId": "4b56538c-bd89-4126-8cf3-be831d022fe1",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "2d696367-92b3-49cd-842c-5db1d3a86413",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "10a2d625-5e20-4c9e-99e3-72a4d2e5b0de",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
           "canonicalId": "15da42e0-58a5-4828-b1d6-d0ebced835f4",
-          "packetKey": "d3e04202-ddc1-4cec-a28e-9c0f583fb600",
+          "packetKey": null,
           "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
           "sourceRevision": null,
           "workspaceRevision": null,
@@ -201,48 +195,7 @@
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "10a2d625-5e20-4c9e-99e3-72a4d2e5b0de",
-          "packetKey": "8082bd2d-9808-4689-9e5d-1ed12f509945",
-          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "6d644ce8-db39-4086-805b-47ce0c5fff70",
-          "packetKey": "2fdb6e0a-a8bc-44b3-abdc-d6aff6c516ed",
-          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
+            "packetKey",
             "sourceRevision",
             "workspaceRevision"
           ],
@@ -251,7 +204,7 @@
         },
         {
           "canonicalId": "c66eca32-1579-44c3-8cce-216563cf4520",
-          "packetKey": "ba665178-ac25-49a3-bb60-f925357dad62",
+          "packetKey": null,
           "sourceRef": "scripts/atlas/audit-promotion-board-reconcile-v2.mjs",
           "sourceRevision": null,
           "workspaceRevision": null,
@@ -264,6 +217,51 @@
             "rg_lexical"
           ],
           "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "47bf69d9-b7b3-49a4-a5d9-9a86588fce4b",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/openspec/changes/phase1-rrf-semantic-fusion/tasks.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "6d644ce8-db39-4086-805b-47ce0c5fff70",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
             "sourceRevision",
             "workspaceRevision"
           ],
@@ -276,13 +274,15 @@
       "id": "legal",
       "query": "What does the repository say about chain of custody for evidence?",
       "ok": true,
-      "latencyMs": 1736,
+      "latencyMs": 13969,
       "candidateCount": 8,
-      "candidateSetChecksum": "3574910e02d07753fc613c46c9246ddae75136511a7202456d46b95cb42c6572",
+      "candidateSetChecksum": "200cb7c69dbc80c2b4906d8ed1031dab9b24793242833bd3f9e07ded9745c4ef",
       "evidenceStatus": "OK",
       "lanes": {
         "semantic": {
-          "status": "OK"
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
         },
         "lexical": {
           "status": "OK"
@@ -296,15 +296,6 @@
           {
             "subsystem": "embedding",
             "operation": "embedding",
-            "reads": 1,
-            "attemptedWrites": 0,
-            "committedWrites": 0,
-            "suppressionReason": null,
-            "executionMode": "READ_ONLY"
-          },
-          {
-            "subsystem": "dense_search",
-            "operation": "qdrant_search",
             "reads": 1,
             "attemptedWrites": 0,
             "committedWrites": 0,
@@ -352,105 +343,17 @@
         "committedWrites": 0
       },
       "counts": {
-        "candidateId": 2,
-        "packetKey": 5,
-        "sourceRef": 5,
+        "candidateId": 8,
+        "packetKey": 8,
+        "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
         "identityComplete": 0
       },
       "candidates": [
         {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": "ace:packet:7a67fd9715db",
-          "sourceRef": "src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": "ace:packet:1061048ef3c6",
-          "sourceRef": "src/lib/server/db/additional-tables.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
           "canonicalId": "8182bd27-22f6-4c26-aa47-506476634838",
-          "packetKey": "93d59187-3dd3-461b-8113-f13be28b386b",
+          "packetKey": "packet:bf0aea3c1ed3",
           "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/chat/+server.ts",
           "sourceRevision": null,
           "workspaceRevision": null,
@@ -470,53 +373,135 @@
           "identityComplete": false
         },
         {
-          "canonicalId": null,
-          "packetKey": "ace:packet:7a67fd9715db",
-          "sourceRef": "src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
           "canonicalId": "90b585d4-7a2c-4650-b9c0-2dffe795a521",
-          "packetKey": "92c563c0-197f-4b36-8f18-eadee313f3e3",
+          "packetKey": "packet:d9704f0b0a30",
           "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "d0b81855-25f2-4543-9f6f-a5e75ba3c8fc",
+          "packetKey": "packet:90da80cd1156",
+          "sourceRef": "sveltekit-frontend/drizzle/manual/20260311_audit_and_versions.sql",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "93d2a86b-a730-448f-9438-0ad5fa056c83",
+          "packetKey": "packet:85bb6b98a2c1",
+          "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "6ede9535-56b3-4811-b823-d4685d8825e1",
+          "packetKey": "packet:383c31f090f8",
+          "sourceRef": "sveltekit-frontend/static/workers/recursive-evidence-chain-worker.js",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "599e5fe2-b1fb-42e4-b64f-d4cc2140180f",
+          "packetKey": "packet:85bb6b98a2c1",
+          "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "6cd4bc53-3948-4b58-97a0-3d00a7f94989",
+          "packetKey": "packet:d9704f0b0a30",
+          "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "6750a92b-a3ec-4f9b-9125-719267d0a86b",
+          "packetKey": "packet:caeb7bae6f01",
+          "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__evidence___id___chain-of-custody___server.md",
           "sourceRevision": null,
           "workspaceRevision": null,
           "representationRevision": null,
@@ -540,13 +525,15 @@
       "id": "embedding",
       "query": "How are 768-dimensional embeddings produced and validated?",
       "ok": true,
-      "latencyMs": 1516,
+      "latencyMs": 2179,
       "candidateCount": 8,
-      "candidateSetChecksum": "6a456e3d2491279ebc7932c8a7b97bdb9d3eaf6716566d7d5c4607a05693a0db",
+      "candidateSetChecksum": "f21c388428f105ddf652d05431a5f0e1ede70c43f006d1d147ac3ab7946263f7",
       "evidenceStatus": "OK",
       "lanes": {
         "semantic": {
-          "status": "OK"
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
         },
         "lexical": {
           "status": "OK"
@@ -560,15 +547,6 @@
           {
             "subsystem": "embedding",
             "operation": "embedding",
-            "reads": 1,
-            "attemptedWrites": 0,
-            "committedWrites": 0,
-            "suppressionReason": null,
-            "executionMode": "READ_ONLY"
-          },
-          {
-            "subsystem": "dense_search",
-            "operation": "qdrant_search",
             "reads": 1,
             "attemptedWrites": 0,
             "committedWrites": 0,
@@ -616,39 +594,16 @@
         "committedWrites": 0
       },
       "counts": {
-        "candidateId": 1,
-        "packetKey": 4,
-        "sourceRef": 4,
+        "candidateId": 8,
+        "packetKey": 7,
+        "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
         "identityComplete": 0
       },
       "candidates": [
         {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
+          "canonicalId": "c41a4a3e-8a34-45d8-baae-aa3377bd66b3",
           "packetKey": "ace:packet:854bdefb7ef4",
           "sourceRef": "docs/EMBEDDING-DIMENSION-AUDIT-2026-06-28.md",
           "sourceRevision": null,
@@ -669,75 +624,8 @@
           "identityComplete": false
         },
         {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": "ace:packet:8f628dc827e1",
-          "sourceRef": "src/lib/ai/model-ids.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "packetKey",
-            "sourceRef",
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
           "canonicalId": "53a9450a-412d-4a7d-a29a-f425a21500ba",
-          "packetKey": "ef3ca1fc-94f3-4d0f-a754-7f1acd2b3351",
+          "packetKey": null,
           "sourceRef": "sveltekit-frontend/src/lib/server/config/embedding-config.ts",
           "sourceRevision": null,
           "workspaceRevision": null,
@@ -750,50 +638,133 @@
             "rg_lexical"
           ],
           "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": "ace:packet:6dd5036d91c2",
-          "sourceRef": "src/lib/server/retrieval/authority-chain.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": null,
-          "packetKey": null,
-          "sourceRef": null,
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
             "packetKey",
-            "sourceRef",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "d89ba0a9-0893-4517-b835-1fc24de793fa",
+          "packetKey": "ace:packet:b09dedb60456",
+          "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "45d70c7d-a415-4ba3-8074-62e5f0b450d4",
+          "packetKey": "ace:packet:f9c9a5d29402",
+          "sourceRef": "docs/dimension-policy.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "dbf45fc0-877f-4db0-9ea9-c7ce118eb33e",
+          "packetKey": "ace:packet:b09dedb60456",
+          "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "8089b8af-6986-4fec-b842-f2d9861b7f1a",
+          "packetKey": "ace:packet:f9c9a5d29402",
+          "sourceRef": "docs/dimension-policy.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "aedb9b6d-9e73-4985-b1d6-5e31841c373b",
+          "packetKey": "ace:packet:5e9caff35630",
+          "sourceRef": "src/lib/server/ai/embeddings-simple.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "2bb65b3d-0fbc-40d1-b0f0-4759a309e299",
+          "packetKey": "packet:31a23c9fc19e",
+          "sourceRef": "sveltekit-frontend/scripts/create-phase78-embeddings-table.sql",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
             "sourceRevision",
             "workspaceRevision"
           ],

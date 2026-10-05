@@ -35,6 +35,7 @@ const okVector = () => ({ vector: new Float32Array(768).fill(0.1), model: 'm', d
 const rgHit = { file: 'src/a.ts', line: 3, column: 0, content: 'x', match: 'x' };
 
 beforeEach(() => {
+  process.env.UNIFIED_SEMANTIC_EXECUTOR = 'qdrant'; // these cases exercise the Qdrant executor; the pgvector executor is covered below
   vi.spyOn(console, 'warn').mockImplementation(() => {});
   vi.spyOn(console, 'error').mockImplementation(() => {});
   Object.values(mocks).forEach((m) => m.mockReset());
@@ -110,5 +111,50 @@ describe('unified orchestrator execution mode (KERNEL-REAL-02B, E)', () => {
     expect(r.read_only_receipt?.executionMode).toBe('READ_ONLY');
     await expect(executeUnifiedRetrieval({ query: 'find a', executionMode: 'MUTATING' }, config))
       .rejects.toThrow('UNIFIED_RETRIEVAL_HAS_NO_MUTATING_MODE');
+  });
+});
+
+describe('unified orchestrator pgvector semantic executor (default; Qdrant projection unfinished)', () => {
+  const chunk = { id: 'chunk-uuid-1', relative_path: 'src/a.ts', symbol: 'a', kind: 'function', source_ref: 'src/a.ts', source_revision: null, workspace_revision: null, representation_revision: null, cosine: 0.9 };
+  const wirePg = (opts: { chunkRows?: unknown[]; packets?: unknown[]; fail?: boolean } = {}) => {
+    mocks.pgQuery.mockImplementation(async (sql: string) => {
+      if (opts.fail) throw new Error('pg down');
+      if (/atlas_packets/.test(sql)) return { rows: opts.packets ?? [{ source_ref: 'src/a.ts', packet_key: 'packet:abc', n: 1 }] };
+      if (/<=>/.test(sql)) return { rows: /content_embedding_768/.test(sql) ? [] : (opts.chunkRows ?? [chunk]) };
+      return { rows: [] };
+    });
+  };
+  beforeEach(() => { delete process.env.UNIFIED_SEMANTIC_EXECUTOR; });
+
+  it('uses Postgres by default: canonical candidateId comes straight from the chunk row, no Qdrant call, executor and caveat reported on the lane', async () => {
+    wirePg();
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.lanes?.semantic).toMatchObject({ status: 'OK', executor: 'postgres_pgvector', note: expect.stringMatching(/DIFFERENT_RECIPES/) });
+    expect(r.stages_completed).toContain('postgres_pgvector_search');
+    expect(mocks.fetch.mock.calls.some((c) => String(c[0]).includes('/points/query'))).toBe(false);
+    expect(r.candidates[0].identity).toMatchObject({ candidateId: 'chunk-uuid-1', packetKey: 'packet:abc', sourceRef: 'src/a.ts', identitySource: 'POSTGRES_CANONICAL_V1', qdrantPointId: null });
+    expect(r.candidates[0].identity.missingFields).toEqual(['sourceRevision', 'workspaceRevision']); // never invented
+  });
+
+  it('does not guess a packet_key when a source_ref has several packets', async () => {
+    wirePg({ packets: [{ source_ref: 'src/a.ts', packet_key: 'packet:abc', n: 2 }] });
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.candidates[0].identity.packetKey).toBeNull();
+    expect(r.candidates[0].identity.missingFields).toContain('packetKey');
+  });
+
+  it('only issues SELECTs and fails the lane (not the query) on a database error', async () => {
+    wirePg({ fail: true });
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.lanes?.semantic).toMatchObject({ status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED' });
+    wirePg();
+    await executeUnifiedRetrieval({ query: 'find a' }, config);
+    for (const [sql] of mocks.pgQuery.mock.calls) expect(String(sql)).toMatch(/^s*SELECT/i);
+  });
+
+  it('fails the lane instead of silently dropping a filter it cannot apply', async () => {
+    wirePg();
+    const r = await executeUnifiedRetrieval({ query: 'find a', filters: { feature_ids: ['f1'] } as never }, config);
+    expect(r.lanes?.semantic).toMatchObject({ status: 'UNAVAILABLE', detail: expect.stringMatching(/PGVECTOR_FILTER_UNSUPPORTED:feature_ids/) });
   });
 });

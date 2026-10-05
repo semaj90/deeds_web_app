@@ -96,7 +96,7 @@ export interface CandidateIdentityV1 {
   sourceRevision: string | null;
   workspaceRevision: string | null;
   symbolVersionId: string | null;
-  identitySource: 'QDRANT_PAYLOAD_V1' | 'NOT_AVAILABLE';
+  identitySource: 'QDRANT_PAYLOAD_V1' | 'POSTGRES_CANONICAL_V1' | 'NOT_AVAILABLE';
   missingFields: readonly (
     | 'packetKey'
     | 'sourceRef'
@@ -132,7 +132,7 @@ export interface RankedCandidate {
 }
 
 export type RetrievalLaneStatusV1 =
-  | { status: 'OK' }
+  | { status: 'OK'; executor?: string; note?: string }
   | { status: 'DISABLED' }
   | { status: 'UNAVAILABLE'; reason: string; detail?: string };
 
@@ -537,6 +537,64 @@ async function turboVecPrefilter(
 }
 
 /**
+ * STAGE 2 (executor): Postgres pgvector dense search, READ ONLY. Postgres is canonical truth, so this executor returns the canonical
+ * codebase_chunk_index.id directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor); never a second vote.
+ * Two storage columns hold different row sets with different embedding recipes (content_embedding halfvec + HNSW; content_embedding_768 raw vector,
+ * exact scan), so both are queried and the merge is by cosine; the caveat is reported on the lane, not hidden.
+ * Filters that this executor cannot honour fail the lane instead of being silently dropped. packet_key is attached only when exactly one
+ * atlas_packets row exists for the source_ref (no guess among duplicates).
+ */
+const PGVECTOR_EXECUTOR_CAVEAT =
+  'TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven';
+
+async function postgresPgvectorSearch(
+  queryVector: Float32Array,
+  config: RetrievalConfig,
+  filters: SearchFilter | undefined,
+  limit: number,
+): Promise<Array<{ id: string; score: number; payload: any }>> {
+  if (!config.postgres.password) throw new Error('POSTGRES_ENRICHMENT_UNAVAILABLE:POSTGRES_PASSWORD');
+  if (queryVector.length !== 768 || Array.from(queryVector).some((x) => !Number.isFinite(x))) throw new Error('QUERY_VECTOR_INVALID');
+  const unsupported = Object.entries(filters ?? {}).filter(([k, v]) => v != null && !(Array.isArray(v) && v.length === 0) && !['source_ref_pattern', 'per_lane_limit', 'keywords', 'keyword_variants'].includes(k));
+  if (unsupported.length) throw new Error(`PGVECTOR_FILTER_UNSUPPORTED:${unsupported.map(([k]) => k).join(',')}`);
+  const refPrefix = filters?.source_ref_pattern ? `${String(filters.source_ref_pattern).replace(/[%_\\]/g, '\\$&')}%` : null;
+  const vec = `[${Array.from(queryVector).join(',')}]`;
+  const n = Math.min(Math.max(limit, 1), 50);
+  const pool = new Pool(config.postgres);
+  try {
+    const cols: Array<[string, string]> = [['content_embedding', 'halfvec'], ['content_embedding_768', 'vector']];
+    const rows: any[] = [];
+    for (const [col, type] of cols) {
+      const res = await pool.query(
+        `SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (${col} <=> $1::${type}(768)) AS cosine
+           FROM codebase_chunk_index
+          WHERE ${col} IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
+          ORDER BY ${col} <=> $1::${type}(768) LIMIT $2`,
+        [vec, n, refPrefix],
+      );
+      for (const r of res.rows) rows.push({ ...r, embedding_column: col });
+    }
+    const best = new Map<string, any>();
+    for (const r of rows) { const prev = best.get(String(r.id)); if (!prev || Number(r.cosine) > Number(prev.cosine)) best.set(String(r.id), r); }
+    const merged = [...best.values()].sort((a, b) => Number(b.cosine) - Number(a.cosine)).slice(0, n);
+    const refs = [...new Set(merged.map((r) => r.source_ref).filter(Boolean))];
+    const packetByRef = new Map<string, string | null>();
+    if (refs.length) {
+      const pk = await pool.query(`SELECT source_ref, min(packet_key) AS packet_key, count(*)::int AS n FROM atlas_packets WHERE source_ref = ANY($1::text[]) GROUP BY source_ref`, [refs]);
+      for (const p of pk.rows) packetByRef.set(p.source_ref, p.n === 1 ? p.packet_key : null);
+    }
+    return merged.map((r, idx) => ({
+      id: String(r.id), score: Number(r.cosine),
+      payload: { packet_key: packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? undefined,
+        workspace_revision: r.workspace_revision ?? undefined, representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
+        backend: 'postgres_pgvector', embedding_column: r.embedding_column, pgvector_rank: idx + 1 },
+    }));
+  } finally {
+    pool.end().catch(() => {});
+  }
+}
+
+/**
  * STAGE 4: Postgres truth join
  * Merge Qdrant results with canonical Postgres metadata
  */
@@ -680,7 +738,8 @@ export function rankCandidates(
           : null;
       const missingFields = (['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'] as const)
         .filter(field => ({ packetKey, sourceRef, sourceRevision, workspaceRevision }[field] == null));
-      const qdrantPointId = qdrant?.id ?? null;
+      const fromPostgres = payload.backend === 'postgres_pgvector';
+      const qdrantPointId = fromPostgres ? null : (qdrant?.id ?? null);
       const candidateId = typeof pgData.candidateId === 'string' && pgData.candidateId.length > 0
         ? pgData.candidateId
         : null;
@@ -692,7 +751,7 @@ export function rankCandidates(
         sourceRevision: sourceRevision ?? null,
         workspaceRevision: workspaceRevision ?? null,
         symbolVersionId,
-        identitySource: qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
+        identitySource: fromPostgres ? 'POSTGRES_CANONICAL_V1' : qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
         missingFields,
       };
       const breakdown = new Map(result.rrfBreakdown.map((item) => [item.lane, item.contribution]));
@@ -906,7 +965,23 @@ export async function executeUnifiedRetrieval(
 
     // STAGE 1.5: Rust N-API (optional, fallback to Qdrant)
     let qdrantHits: Array<{ id: string; score: number; payload: any }> = [];
-    if (queryVectors && embedding) {
+    // Semantic executor (same lane, one vote): Postgres pgvector by default because Qdrant projection is not finished; UNIFIED_SEMANTIC_EXECUTOR=qdrant restores the Qdrant/Rust path.
+    const semanticExecutor = process.env.UNIFIED_SEMANTIC_EXECUTOR === 'qdrant' ? 'qdrant' : 'postgres_pgvector';
+    const pgMap = new Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>();
+    if (queryVectors && embedding && semanticExecutor === 'postgres_pgvector') {
+      try {
+        qdrantHits = await postgresPgvectorSearch(embedding, config, request.filters, retrievalLimit);
+        for (const h of qdrantHits) pgMap.set(h.id, { candidateId: h.id, relative_path: h.payload.relative_path, symbol: h.payload.symbol, kind: h.payload.kind });
+        semanticLane = { status: 'OK', executor: 'postgres_pgvector', note: PGVECTOR_EXECUTOR_CAVEAT };
+        stages.push('postgres_pgvector_search');
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        semanticLane = { status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED', detail };
+        console.warn('Semantic lane unavailable (pgvector search failed):', detail);
+        stages.push('semantic_search_unavailable');
+        qdrantHits = [];
+      }
+    } else if (queryVectors && embedding) {
       try {
         const rustHits = await rustNapiSearch(embedding, request.filters, retrievalLimit);
         if (rustHits && rustHits.length > 0) {
@@ -965,7 +1040,7 @@ export async function executeUnifiedRetrieval(
     }
 
     // STAGE 4: Postgres join
-    const postgresMap = await postgresJoin(qdrantIds, config);
+    const postgresMap = pgMap.size > 0 ? pgMap : await postgresJoin(qdrantIds, config);
     stages.push('postgres_join');
 
     // STAGE 4.5: Parent Atlas enrichment (canonical lineage validation + domain taxonomy)
