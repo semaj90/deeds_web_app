@@ -2470,30 +2470,11 @@ server.registerTool(
           content: [{ type: 'text', text: `Pathway materialized with ID: ${res.rows[0].id}` }],
         };
       } catch (e) {
-        // Fallback to embedded_summaries
-        const res = await pool.query(
-          `INSERT INTO embedded_summaries (
-            chunk_id, summary_text, source_type, source_hash, summary_type,
-            model, embedding_model, qdrant_collection, manifold4
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, ($9::real[]::vector))
-          RETURNING id`,
-          [
-            `${startKey}->${endKey}`,
-            summary,
-            'pathway',
-            pathKey,
-            'detailed',
-            'mcp-algorithmic',
-            OLLAMA_EMBED_MODEL,
-            'pathway_cards',
-            embedding,
-          ]
-        );
-        return {
-          content: [
-            { type: 'text', text: `Pathway materialized (fallback) with ID: ${res.rows[0].id}` },
-          ],
-        };
+        // No silent fallback: the previous fallback wrote into embedded_summaries and stored the 768-d embedding in the
+        // manifold4 column. Pathway Cards are derived evidence products; a failed card write is a typed failure
+        // (see docs/architecture/pathway-cards-spec.md, "Write path (gated)").
+        const code = /relation .* does not exist/i.test(String(e)) ? 'PATHWAY_CARD_TABLE_UNAVAILABLE' : 'PATHWAY_CARD_WRITE_FAILED';
+        return { content: [{ type: 'text', text: `${code}: ${String(e instanceof Error ? e.message : e).slice(0, 200)}` }], isError: true };
       }
     } catch (err) {
       return { content: [{ type: 'text', text: String(err) }], isError: true };
