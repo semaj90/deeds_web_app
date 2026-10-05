@@ -1,0 +1,30 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-10-05T18:33:35.127903Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "/work/docs/.okf/ts-morph/raw/ts-morph.com-utilities.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_checksum": "b44406f043b97593e4abee111c3a2e4e4dfcaec6d6c561e79c1863a7f6112cd8",
+  "outgoing_urls": [
+    "https://github.com/dsherret/ts-morph",
+    "https://ts-morph.com/",
+    "https://ts-morph.com/details/index",
+    "https://ts-morph.com/emitting",
+    "https://ts-morph.com/manipulation",
+    "https://ts-morph.com/navigation",
+    "https://ts-morph.com/setup",
+    "https://ts-morph.com/utilities"
+  ],
+  "raw_checksum": "ea1fc1261246bce6e6692af0ddf9b2d8b1f4ead52b3f3c32103936c433ded0ca",
+  "requested_url": "https://ts-morph.com/utilities",
+  "resolved_url": "https://ts-morph.com/utilities",
+  "retrieved_at": "2026-10-05T18:33:35.127903Z",
+  "source_id": "ts-morph",
+  "source_revision": "ts-morph-docs-2026-10-05",
+  "text": null,
+  "title": "ts-morph - Utilities"
+}

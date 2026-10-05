@@ -1,0 +1,35 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-10-05T18:33:35.068404Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "/work/docs/.okf/ts-morph/raw/ts-morph.com-setup.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_checksum": "a912d9728eb974fec2a730988f64868428e81fb2a88c391e6dcea775fcb01a87",
+  "outgoing_urls": [
+    "https://github.com/dsherret/ts-morph",
+    "https://ts-morph.com/",
+    "https://ts-morph.com/details/index",
+    "https://ts-morph.com/emitting",
+    "https://ts-morph.com/manipulation",
+    "https://ts-morph.com/navigation",
+    "https://ts-morph.com/setup",
+    "https://ts-morph.com/setup/adding-source-files",
+    "https://ts-morph.com/setup/ast-viewers",
+    "https://ts-morph.com/setup/diagnostics",
+    "https://ts-morph.com/setup/file-system",
+    "https://ts-morph.com/setup/index",
+    "https://ts-morph.com/utilities"
+  ],
+  "raw_checksum": "3c48492346850fa744c33380ae73c96030937549e9001003a71b2ba4fe1149a7",
+  "requested_url": "https://ts-morph.com/setup",
+  "resolved_url": "https://ts-morph.com/setup/",
+  "retrieved_at": "2026-10-05T18:33:35.068404Z",
+  "source_id": "ts-morph",
+  "source_revision": "ts-morph-docs-2026-10-05",
+  "text": null,
+  "title": "ts-morph - Instantiating"
+}

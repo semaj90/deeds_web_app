@@ -1,0 +1,1925 @@
+{
+  "schema": "atlas.okf-tooling-docs-analysis.v1",
+  "manifest_revision": "okf-tooling-docs-r1",
+  "canonical_authority": false,
+  "method": {
+    "nlp": "spaCy en_core_web_sm tagger+parser (ner disabled)",
+    "keywords": "lemma frequency over NOUN/PROPN, stop-words and generic terms removed",
+    "distinctiveness": "share of a term in a source divided by share across all sources",
+    "writes": {
+      "postgres": 0,
+      "qdrant": 0,
+      "valkey": 0,
+      "neo4j": 0
+    }
+  },
+  "sources": {
+    "oaklib": {
+      "validation": {
+        "chunks": 237,
+        "pages": 17,
+        "unique_chunk_ids": 237,
+        "unique_evidence_revisions": 237,
+        "empty_chunks": 0,
+        "checksum_mismatch": 0,
+        "byte_span_mismatch": 0,
+        "chunks_without_page": 0,
+        "canonical_authority_true": 0,
+        "coordinate_null": 0,
+        "max_chunk_chars": 1599,
+        "result": "PASS"
+      },
+      "domain_class_distribution": {
+        "graph": 166,
+        "training": 56,
+        "database": 15
+      },
+      "chunks_with_code_blocks": 114,
+      "chunks_with_api_signatures": 11,
+      "top_keywords": [
+        {
+          "term": "ontology",
+          "chunk_df": 131
+        },
+        {
+          "term": "obo",
+          "chunk_df": 122
+        },
+        {
+          "term": "default",
+          "chunk_df": 106
+        },
+        {
+          "term": "option",
+          "chunk_df": 101
+        },
+        {
+          "term": "type",
+          "chunk_df": 99
+        },
+        {
+          "term": "output",
+          "chunk_df": 97
+        },
+        {
+          "term": "usage",
+          "chunk_df": 88
+        },
+        {
+          "term": "command",
+          "chunk_df": 87
+        },
+        {
+          "term": "term",
+          "chunk_df": 85
+        },
+        {
+          "term": "shell",
+          "chunk_df": 85
+        },
+        {
+          "term": "runoak",
+          "chunk_df": 84
+        },
+        {
+          "term": "options",
+          "chunk_df": 83
+        },
+        {
+          "term": "oak",
+          "chunk_df": 81
+        },
+        {
+          "term": "list",
+          "chunk_df": 75
+        },
+        {
+          "term": "terms",
+          "chunk_df": 71
+        },
+        {
+          "term": "curie",
+          "chunk_df": 69
+        },
+        {
+          "term": "predicate",
+          "chunk_df": 67
+        },
+        {
+          "term": "optional",
+          "chunk_df": 63
+        },
+        {
+          "term": "label",
+          "chunk_df": 59
+        },
+        {
+          "term": "result",
+          "chunk_df": 54
+        },
+        {
+          "term": "adapter",
+          "chunk_df": 48
+        },
+        {
+          "term": "graph",
+          "chunk_df": 47
+        },
+        {
+          "term": "python",
+          "chunk_df": 47
+        },
+        {
+          "term": "entity",
+          "chunk_df": 47
+        },
+        {
+          "term": "model",
+          "chunk_df": 45
+        },
+        {
+          "term": "comma",
+          "chunk_df": 44
+        },
+        {
+          "term": "path",
+          "chunk_df": 43
+        },
+        {
+          "term": "sqlite",
+          "chunk_df": 43
+        },
+        {
+          "term": "format",
+          "chunk_df": 42
+        },
+        {
+          "term": "shorthand",
+          "chunk_df": 41
+        },
+        {
+          "term": "owl",
+          "chunk_df": 41
+        },
+        {
+          "term": "line",
+          "chunk_df": 39
+        },
+        {
+          "term": "mapping",
+          "chunk_df": 39
+        },
+        {
+          "term": "argument",
+          "chunk_df": 38
+        },
+        {
+          "term": "arguments",
+          "chunk_df": 38
+        },
+        {
+          "term": "source",
+          "chunk_df": 37
+        },
+        {
+          "term": "input",
+          "chunk_df": 36
+        },
+        {
+          "term": "relationship",
+          "chunk_df": 35
+        },
+        {
+          "term": "yaml",
+          "chunk_df": 34
+        },
+        {
+          "term": "property",
+          "chunk_df": 33
+        }
+      ],
+      "top_noun_phrases": [
+        {
+          "phrase": "obo file",
+          "count": 54
+        },
+        {
+          "phrase": "output type",
+          "count": 42
+        },
+        {
+          "phrase": "comma separate list",
+          "count": 22
+        },
+        {
+          "phrase": "oaklib content",
+          "count": 17
+        },
+        {
+          "phrase": "data model",
+          "count": 17
+        },
+        {
+          "phrase": "oak developer",
+          "count": 15
+        },
+        {
+          "phrase": "command line",
+          "count": 14
+        },
+        {
+          "phrase": "python api",
+          "count": 14
+        },
+        {
+          "phrase": "previous copyright",
+          "count": 14
+        },
+        {
+          "phrase": "output type arguments terms",
+          "count": 13
+        },
+        {
+          "phrase": "obo file argument terms",
+          "count": 11
+        },
+        {
+          "phrase": "entailment strategy",
+          "count": 11
+        },
+        {
+          "phrase": "oak command",
+          "count": 10
+        },
+        {
+          "phrase": "graph traversal",
+          "count": 10
+        },
+        {
+          "phrase": "oaklib import",
+          "count": 10
+        },
+        {
+          "phrase": "endomembrane system",
+          "count": 10
+        },
+        {
+          "phrase": "shell runoak",
+          "count": 8
+        },
+        {
+          "phrase": "configuration file",
+          "count": 7
+        },
+        {
+          "phrase": "sqlite file",
+          "count": 7
+        },
+        {
+          "phrase": "false arguments terms",
+          "count": 7
+        },
+        {
+          "phrase": "json file",
+          "count": 7
+        },
+        {
+          "phrase": "argument terms",
+          "count": 7
+        },
+        {
+          "phrase": "introduction tutorial",
+          "count": 7
+        },
+        {
+          "phrase": "basic ontology interface",
+          "count": 7
+        },
+        {
+          "phrase": "name class",
+          "count": 6
+        }
+      ],
+      "distinctive_terms": [
+        {
+          "term": "obo",
+          "lift": 1.93,
+          "chunk_df": 122
+        },
+        {
+          "term": "runoak",
+          "lift": 1.93,
+          "chunk_df": 84
+        },
+        {
+          "term": "options",
+          "lift": 1.93,
+          "chunk_df": 83
+        },
+        {
+          "term": "oak",
+          "lift": 1.93,
+          "chunk_df": 81
+        },
+        {
+          "term": "terms",
+          "lift": 1.93,
+          "chunk_df": 71
+        },
+        {
+          "term": "curie",
+          "lift": 1.93,
+          "chunk_df": 69
+        },
+        {
+          "term": "relationship",
+          "lift": 1.93,
+          "chunk_df": 35
+        },
+        {
+          "term": "uberon",
+          "lift": 1.93,
+          "chunk_df": 31
+        },
+        {
+          "term": "autolabel",
+          "lift": 1.93,
+          "chunk_df": 31
+        },
+        {
+          "term": "sql",
+          "lift": 1.93,
+          "chunk_df": 13
+        },
+        {
+          "term": "kgcl",
+          "lift": 1.93,
+          "chunk_df": 13
+        },
+        {
+          "term": "subject",
+          "lift": 1.93,
+          "chunk_df": 13
+        },
+        {
+          "term": "tsv",
+          "lift": 1.93,
+          "chunk_df": 13
+        },
+        {
+          "term": "oio",
+          "lift": 1.93,
+          "chunk_df": 13
+        },
+        {
+          "term": "fill",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "hop",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "entailment",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "bioportal",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "uris",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "obsoletion",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "rdf",
+          "lift": 1.93,
+          "chunk_df": 11
+        },
+        {
+          "term": "ontology",
+          "lift": 1.93,
+          "chunk_df": 131
+        },
+        {
+          "term": "predicate",
+          "lift": 1.93,
+          "chunk_df": 67
+        },
+        {
+          "term": "graph",
+          "lift": 1.93,
+          "chunk_df": 47
+        },
+        {
+          "term": "model",
+          "lift": 1.93,
+          "chunk_df": 45
+        }
+      ]
+    },
+    "ast-grep": {
+      "validation": {
+        "chunks": 196,
+        "pages": 16,
+        "unique_chunk_ids": 196,
+        "unique_evidence_revisions": 196,
+        "empty_chunks": 0,
+        "checksum_mismatch": 0,
+        "byte_span_mismatch": 0,
+        "chunks_without_page": 0,
+        "canonical_authority_true": 0,
+        "coordinate_null": 0,
+        "max_chunk_chars": 1599,
+        "result": "PASS"
+      },
+      "domain_class_distribution": {
+        "graph": 107,
+        "testing": 76,
+        "error_fixing": 13
+      },
+      "chunks_with_code_blocks": 112,
+      "chunks_with_api_signatures": 28,
+      "top_keywords": [
+        {
+          "term": "ast",
+          "chunk_df": 126
+        },
+        {
+          "term": "rule",
+          "chunk_df": 108
+        },
+        {
+          "term": "grep",
+          "chunk_df": 104
+        },
+        {
+          "term": "node",
+          "chunk_df": 68
+        },
+        {
+          "term": "pattern",
+          "chunk_df": 64
+        },
+        {
+          "term": "yaml",
+          "chunk_df": 55
+        },
+        {
+          "term": "string",
+          "chunk_df": 54
+        },
+        {
+          "term": "object",
+          "chunk_df": 50
+        },
+        {
+          "term": "match",
+          "chunk_df": 41
+        },
+        {
+          "term": "type",
+          "chunk_df": 40
+        },
+        {
+          "term": "language",
+          "chunk_df": 35
+        },
+        {
+          "term": "kind",
+          "chunk_df": 34
+        },
+        {
+          "term": "javascript",
+          "chunk_df": 31
+        },
+        {
+          "term": "field",
+          "chunk_df": 31
+        },
+        {
+          "term": "line",
+          "chunk_df": 30
+        },
+        {
+          "term": "syntax",
+          "chunk_df": 26
+        },
+        {
+          "term": "default",
+          "chunk_df": 26
+        },
+        {
+          "term": "command",
+          "chunk_df": 26
+        },
+        {
+          "term": "bash",
+          "chunk_df": 23
+        },
+        {
+          "term": "option",
+          "chunk_df": 23
+        },
+        {
+          "term": "format",
+          "chunk_df": 22
+        },
+        {
+          "term": "value",
+          "chunk_df": 22
+        },
+        {
+          "term": "end",
+          "chunk_df": 21
+        },
+        {
+          "term": "documentation",
+          "chunk_df": 20
+        },
+        {
+          "term": "detail",
+          "chunk_df": 20
+        },
+        {
+          "term": "variable",
+          "chunk_df": 20
+        },
+        {
+          "term": "tree",
+          "chunk_df": 18
+        },
+        {
+          "term": "root",
+          "chunk_df": 18
+        },
+        {
+          "term": "number",
+          "chunk_df": 18
+        },
+        {
+          "term": "function",
+          "chunk_df": 17
+        },
+        {
+          "term": "text",
+          "chunk_df": 17
+        },
+        {
+          "term": "sub",
+          "chunk_df": 17
+        },
+        {
+          "term": "matching",
+          "chunk_df": 17
+        },
+        {
+          "term": "playground",
+          "chunk_df": 17
+        },
+        {
+          "term": "target",
+          "chunk_df": 17
+        },
+        {
+          "term": "markdown",
+          "chunk_df": 16
+        },
+        {
+          "term": "llm",
+          "chunk_df": 16
+        },
+        {
+          "term": "world",
+          "chunk_df": 16
+        },
+        {
+          "term": "class",
+          "chunk_df": 16
+        },
+        {
+          "term": "regex",
+          "chunk_df": 16
+        }
+      ],
+      "top_noun_phrases": [
+        {
+          "phrase": "ast grep",
+          "count": 111
+        },
+        {
+          "phrase": "rule object",
+          "count": 32
+        },
+        {
+          "phrase": "meta variable",
+          "count": 28
+        },
+        {
+          "phrase": "relational rule",
+          "count": 23
+        },
+        {
+          "phrase": "ast node",
+          "count": 20
+        },
+        {
+          "phrase": "target node",
+          "count": 19
+        },
+        {
+          "phrase": "possible value",
+          "count": 19
+        },
+        {
+          "phrase": "well optimize documentation",
+          "count": 16
+        },
+        {
+          "phrase": "markdown format",
+          "count": 16
+        },
+        {
+          "phrase": "global utility rule",
+          "count": 14
+        },
+        {
+          "phrase": "sub rule",
+          "count": 14
+        },
+        {
+          "phrase": "yaml rule",
+          "count": 13
+        },
+        {
+          "phrase": "unnamed node",
+          "count": 12
+        },
+        {
+          "phrase": "local utility rule",
+          "count": 12
+        },
+        {
+          "phrase": "utility rule",
+          "count": 10
+        },
+        {
+          "phrase": "syntax tree",
+          "count": 9
+        },
+        {
+          "phrase": "atomic rule",
+          "count": 9
+        },
+        {
+          "phrase": "github action",
+          "count": 9
+        },
+        {
+          "phrase": "num line",
+          "count": 9
+        },
+        {
+          "phrase": "command line",
+          "count": 8
+        },
+        {
+          "phrase": "surround node",
+          "count": 8
+        },
+        {
+          "phrase": "match node",
+          "count": 8
+        },
+        {
+          "phrase": "composite rule",
+          "count": 8
+        },
+        {
+          "phrase": "shell ast grep",
+          "count": 7
+        },
+        {
+          "phrase": "ast grep rule",
+          "count": 7
+        }
+      ],
+      "distinctive_terms": [
+        {
+          "term": "grep",
+          "lift": 4.09,
+          "chunk_df": 104
+        },
+        {
+          "term": "scan",
+          "lift": 4.09,
+          "chunk_df": 13
+        },
+        {
+          "term": "playground",
+          "lift": 4.09,
+          "chunk_df": 17
+        },
+        {
+          "term": "markdown",
+          "lift": 4.09,
+          "chunk_df": 16
+        },
+        {
+          "term": "regex",
+          "lift": 4.09,
+          "chunk_df": 16
+        },
+        {
+          "term": "sgnode",
+          "lift": 4.09,
+          "chunk_df": 10
+        },
+        {
+          "term": "operator",
+          "lift": 4.09,
+          "chunk_df": 10
+        },
+        {
+          "term": "rewrite",
+          "lift": 4.09,
+          "chunk_df": 10
+        },
+        {
+          "term": "message",
+          "lift": 4.09,
+          "chunk_df": 10
+        },
+        {
+          "term": "print",
+          "lift": 4.09,
+          "chunk_df": 10
+        },
+        {
+          "term": "sitter",
+          "lift": 4.09,
+          "chunk_df": 9
+        },
+        {
+          "term": "util",
+          "lift": 4.09,
+          "chunk_df": 9
+        },
+        {
+          "term": "rust",
+          "lift": 4.09,
+          "chunk_df": 8
+        },
+        {
+          "term": "hashmap",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "precede",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "color",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "paths",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "long",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "item",
+          "lift": 4.09,
+          "chunk_df": 6
+        },
+        {
+          "term": "napi",
+          "lift": 4.09,
+          "chunk_df": 5
+        },
+        {
+          "term": "metavariable",
+          "lift": 4.09,
+          "chunk_df": 5
+        },
+        {
+          "term": "css",
+          "lift": 4.09,
+          "chunk_df": 5
+        },
+        {
+          "term": "dot",
+          "lift": 4.09,
+          "chunk_df": 5
+        },
+        {
+          "term": "cst",
+          "lift": 4.09,
+          "chunk_df": 5
+        },
+        {
+          "term": "completion",
+          "lift": 4.09,
+          "chunk_df": 5
+        }
+      ]
+    },
+    "ts-morph": {
+      "validation": {
+        "chunks": 188,
+        "pages": 15,
+        "unique_chunk_ids": 188,
+        "unique_evidence_revisions": 188,
+        "empty_chunks": 0,
+        "checksum_mismatch": 0,
+        "byte_span_mismatch": 0,
+        "chunks_without_page": 0,
+        "canonical_authority_true": 0,
+        "coordinate_null": 0,
+        "max_chunk_chars": 1310,
+        "result": "PASS"
+      },
+      "domain_class_distribution": {
+        "graph": 123,
+        "documentation": 61,
+        "api": 4
+      },
+      "chunks_with_code_blocks": 152,
+      "chunks_with_api_signatures": 25,
+      "top_keywords": [
+        {
+          "term": "const",
+          "chunk_df": 98
+        },
+        {
+          "term": "source",
+          "chunk_df": 45
+        },
+        {
+          "term": "type",
+          "chunk_df": 34
+        },
+        {
+          "term": "method",
+          "chunk_df": 30
+        },
+        {
+          "term": "export",
+          "chunk_df": 29
+        },
+        {
+          "term": "declaration",
+          "chunk_df": 29
+        },
+        {
+          "term": "node",
+          "chunk_df": 28
+        },
+        {
+          "term": "function",
+          "chunk_df": 25
+        },
+        {
+          "term": "import",
+          "chunk_df": 22
+        },
+        {
+          "term": "manipulation",
+          "chunk_df": 19
+        },
+        {
+          "term": "string",
+          "chunk_df": 18
+        },
+        {
+          "term": "navigation",
+          "chunk_df": 17
+        },
+        {
+          "term": "github",
+          "chunk_df": 17
+        },
+        {
+          "term": "setup",
+          "chunk_df": 17
+        },
+        {
+          "term": "expression",
+          "chunk_df": 17
+        },
+        {
+          "term": "details",
+          "chunk_df": 16
+        },
+        {
+          "term": "emitting",
+          "chunk_df": 16
+        },
+        {
+          "term": "identifier",
+          "chunk_df": 16
+        },
+        {
+          "term": "return",
+          "chunk_df": 16
+        },
+        {
+          "term": "utilities",
+          "chunk_df": 15
+        },
+        {
+          "term": "view",
+          "chunk_df": 15
+        },
+        {
+          "term": "overview",
+          "chunk_df": 15
+        },
+        {
+          "term": "signature",
+          "chunk_df": 15
+        },
+        {
+          "term": "object",
+          "chunk_df": 14
+        },
+        {
+          "term": "default",
+          "chunk_df": 14
+        },
+        {
+          "term": "morph",
+          "chunk_df": 13
+        },
+        {
+          "term": "literal",
+          "chunk_df": 13
+        },
+        {
+          "term": "files",
+          "chunk_df": 13
+        },
+        {
+          "term": "namespace",
+          "chunk_df": 13
+        },
+        {
+          "term": "ambient",
+          "chunk_df": 12
+        },
+        {
+          "term": "async",
+          "chunk_df": 12
+        },
+        {
+          "term": "class",
+          "chunk_df": 12
+        },
+        {
+          "term": "project",
+          "chunk_df": 12
+        },
+        {
+          "term": "system",
+          "chunk_df": 12
+        },
+        {
+          "term": "initializer",
+          "chunk_df": 11
+        },
+        {
+          "term": "modules",
+          "chunk_df": 11
+        },
+        {
+          "term": "docs",
+          "chunk_df": 11
+        },
+        {
+          "term": "module",
+          "chunk_df": 11
+        },
+        {
+          "term": "enums",
+          "chunk_df": 10
+        },
+        {
+          "term": "expressions",
+          "chunk_df": 10
+        }
+      ],
+      "top_noun_phrases": [
+        {
+          "phrase": "source file",
+          "count": 45
+        },
+        {
+          "phrase": "file system",
+          "count": 15
+        },
+        {
+          "phrase": "ts morph",
+          "count": 14
+        },
+        {
+          "phrase": "new project",
+          "count": 14
+        },
+        {
+          "phrase": "ts const",
+          "count": 12
+        },
+        {
+          "phrase": "js docs literals",
+          "count": 10
+        },
+        {
+          "phrase": "details source files classes",
+          "count": 9
+        },
+        {
+          "phrase": "decorator enums function",
+          "count": 9
+        },
+        {
+          "phrase": "type signature",
+          "count": 9
+        },
+        {
+          "phrase": "expression object literal expressions identifier ambient async export generators initializer",
+          "count": 9
+        },
+        {
+          "phrase": "modifiers comments utilities view",
+          "count": 9
+        },
+        {
+          "phrase": "export declaration",
+          "count": 7
+        },
+        {
+          "phrase": "ts const project",
+          "count": 6
+        },
+        {
+          "phrase": "emitting details utilities view",
+          "count": 5
+        },
+        {
+          "phrase": "ts export",
+          "count": 5
+        },
+        {
+          "phrase": "insert use",
+          "count": 5
+        },
+        {
+          "phrase": "follow method",
+          "count": 5
+        },
+        {
+          "phrase": "class declaration",
+          "count": 4
+        },
+        {
+          "phrase": "function body",
+          "count": 4
+        },
+        {
+          "phrase": "export class",
+          "count": 4
+        },
+        {
+          "phrase": "const project",
+          "count": 4
+        },
+        {
+          "phrase": "overview setup navigation manipulation",
+          "count": 3
+        },
+        {
+          "phrase": "ts const basetype",
+          "count": 3
+        },
+        {
+          "phrase": "ts const property",
+          "count": 3
+        },
+        {
+          "phrase": "name export",
+          "count": 3
+        }
+      ],
+      "distinctive_terms": [
+        {
+          "term": "manipulation",
+          "lift": 8.77,
+          "chunk_df": 19
+        },
+        {
+          "term": "navigation",
+          "lift": 8.77,
+          "chunk_df": 17
+        },
+        {
+          "term": "details",
+          "lift": 8.77,
+          "chunk_df": 16
+        },
+        {
+          "term": "emitting",
+          "lift": 8.77,
+          "chunk_df": 16
+        },
+        {
+          "term": "morph",
+          "lift": 8.77,
+          "chunk_df": 13
+        },
+        {
+          "term": "ambient",
+          "lift": 8.77,
+          "chunk_df": 12
+        },
+        {
+          "term": "initializer",
+          "lift": 8.77,
+          "chunk_df": 11
+        },
+        {
+          "term": "modules",
+          "lift": 8.77,
+          "chunk_df": 11
+        },
+        {
+          "term": "enums",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "expressions",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "parameters",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "imports",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "generators",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "variables",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "decorator",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "modifiers",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "comments",
+          "lift": 8.77,
+          "chunk_df": 10
+        },
+        {
+          "term": "myclass",
+          "lift": 8.77,
+          "chunk_df": 8
+        },
+        {
+          "term": "classdeclaration",
+          "lift": 8.77,
+          "chunk_df": 6
+        },
+        {
+          "term": "returntype",
+          "lift": 8.77,
+          "chunk_df": 5
+        },
+        {
+          "term": "sourcefile",
+          "lift": 8.77,
+          "chunk_df": 5
+        },
+        {
+          "term": "compileroption",
+          "lift": 8.77,
+          "chunk_df": 5
+        },
+        {
+          "term": "specifier",
+          "lift": 8.77,
+          "chunk_df": 4
+        },
+        {
+          "term": "functiondeclaration",
+          "lift": 8.77,
+          "chunk_df": 4
+        },
+        {
+          "term": "writer",
+          "lift": 8.77,
+          "chunk_df": 4
+        }
+      ]
+    },
+    "trpc": {
+      "validation": {
+        "chunks": 96,
+        "pages": 9,
+        "unique_chunk_ids": 96,
+        "unique_evidence_revisions": 96,
+        "empty_chunks": 0,
+        "checksum_mismatch": 0,
+        "byte_span_mismatch": 0,
+        "chunks_without_page": 0,
+        "canonical_authority_true": 0,
+        "coordinate_null": 0,
+        "max_chunk_chars": 1600,
+        "result": "PASS"
+      },
+      "domain_class_distribution": {
+        "api": 68,
+        "database": 26,
+        "training": 2
+      },
+      "chunks_with_code_blocks": 28,
+      "chunks_with_api_signatures": 14,
+      "top_keywords": [
+        {
+          "term": "trpc",
+          "chunk_df": 47
+        },
+        {
+          "term": "router",
+          "chunk_df": 40
+        },
+        {
+          "term": "type",
+          "chunk_df": 36
+        },
+        {
+          "term": "input",
+          "chunk_df": 36
+        },
+        {
+          "term": "function",
+          "chunk_df": 36
+        },
+        {
+          "term": "procedure",
+          "chunk_df": 36
+        },
+        {
+          "term": "client",
+          "chunk_df": 33
+        },
+        {
+          "term": "datum",
+          "chunk_df": 30
+        },
+        {
+          "term": "context",
+          "chunk_df": 30
+        },
+        {
+          "term": "validation",
+          "chunk_df": 27
+        },
+        {
+          "term": "server",
+          "chunk_df": 25
+        },
+        {
+          "term": "query",
+          "chunk_df": 25
+        },
+        {
+          "term": "middleware",
+          "chunk_df": 25
+        },
+        {
+          "term": "api",
+          "chunk_df": 23
+        },
+        {
+          "term": "stuff",
+          "chunk_df": 23
+        },
+        {
+          "term": "import",
+          "chunk_df": 22
+        },
+        {
+          "term": "approuter",
+          "chunk_df": 22
+        },
+        {
+          "term": "state",
+          "chunk_df": 21
+        },
+        {
+          "term": "thing",
+          "chunk_df": 21
+        },
+        {
+          "term": "const",
+          "chunk_df": 20
+        },
+        {
+          "term": "session",
+          "chunk_df": 20
+        },
+        {
+          "term": "connection",
+          "chunk_df": 20
+        },
+        {
+          "term": "database",
+          "chunk_df": 20
+        },
+        {
+          "term": "change",
+          "chunk_df": 19
+        },
+        {
+          "term": "export",
+          "chunk_df": 18
+        },
+        {
+          "term": "collection",
+          "chunk_df": 18
+        },
+        {
+          "term": "react",
+          "chunk_df": 17
+        },
+        {
+          "term": "namespace",
+          "chunk_df": 17
+        },
+        {
+          "term": "version",
+          "chunk_df": 16
+        },
+        {
+          "term": "usage",
+          "chunk_df": 15
+        },
+        {
+          "term": "app",
+          "chunk_df": 13
+        },
+        {
+          "term": "user",
+          "chunk_df": 13
+        },
+        {
+          "term": "return",
+          "chunk_df": 12
+        },
+        {
+          "term": "typescript",
+          "chunk_df": 11
+        },
+        {
+          "term": "mutation",
+          "chunk_df": 11
+        },
+        {
+          "term": "subscription",
+          "chunk_df": 11
+        },
+        {
+          "term": "tanstack",
+          "chunk_df": 10
+        },
+        {
+          "term": "update",
+          "chunk_df": 10
+        },
+        {
+          "term": "http",
+          "chunk_df": 9
+        },
+        {
+          "term": "integration",
+          "chunk_df": 9
+        }
+      ],
+      "top_noun_phrases": [
+        {
+          "phrase": "input datum",
+          "count": 116
+        },
+        {
+          "phrase": "right stuff",
+          "count": 115
+        },
+        {
+          "phrase": "session state database connection",
+          "count": 63
+        },
+        {
+          "phrase": "complex type",
+          "count": 51
+        },
+        {
+          "phrase": "share namespace",
+          "count": 45
+        },
+        {
+          "phrase": "persistent connection",
+          "count": 33
+        },
+        {
+          "phrase": "transformers use superjson",
+          "count": 32
+        },
+        {
+          "phrase": "server adapters express",
+          "count": 21
+        },
+        {
+          "phrase": "return user",
+          "count": 20
+        },
+        {
+          "phrase": "react query",
+          "count": 17
+        },
+        {
+          "phrase": "export type",
+          "count": 17
+        },
+        {
+          "phrase": "typeof approuter",
+          "count": 17
+        },
+        {
+          "phrase": "import type",
+          "count": 16
+        },
+        {
+          "phrase": "mutation procedure",
+          "count": 16
+        },
+        {
+          "phrase": "query procedure",
+          "count": 14
+        },
+        {
+          "phrase": "tanstack react query",
+          "count": 13
+        },
+        {
+          "phrase": "tanstack react query usage",
+          "count": 12
+        },
+        {
+          "phrase": "export const",
+          "count": 11
+        },
+        {
+          "phrase": "const input",
+          "count": 11
+        },
+        {
+          "phrase": "const user",
+          "count": 10
+        },
+        {
+          "phrase": "string const user",
+          "count": 10
+        },
+        {
+          "phrase": "input parser",
+          "count": 9
+        },
+        {
+          "phrase": "react integration",
+          "count": 9
+        },
+        {
+          "phrase": "date usage",
+          "count": 9
+        },
+        {
+          "phrase": "date use superjson",
+          "count": 8
+        }
+      ],
+      "distinctive_terms": [
+        {
+          "term": "trpc",
+          "lift": 8.13,
+          "chunk_df": 47
+        },
+        {
+          "term": "router",
+          "lift": 8.13,
+          "chunk_df": 40
+        },
+        {
+          "term": "approuter",
+          "lift": 8.13,
+          "chunk_df": 22
+        },
+        {
+          "term": "connection",
+          "lift": 8.13,
+          "chunk_df": 20
+        },
+        {
+          "term": "subscription",
+          "lift": 8.13,
+          "chunk_df": 11
+        },
+        {
+          "term": "tanstack",
+          "lift": 8.13,
+          "chunk_df": 10
+        },
+        {
+          "term": "update",
+          "lift": 8.13,
+          "chunk_df": 10
+        },
+        {
+          "term": "publicprocedure",
+          "lift": 8.13,
+          "chunk_df": 9
+        },
+        {
+          "term": "agent",
+          "lift": 8.13,
+          "chunk_df": 5
+        },
+        {
+          "term": "queryclient",
+          "lift": 8.13,
+          "chunk_df": 5
+        },
+        {
+          "term": "superjson",
+          "lift": 8.13,
+          "chunk_df": 5
+        },
+        {
+          "term": "transformers",
+          "lift": 8.13,
+          "chunk_df": 5
+        },
+        {
+          "term": "middleware",
+          "lift": 8.13,
+          "chunk_df": 25
+        },
+        {
+          "term": "stuff",
+          "lift": 8.13,
+          "chunk_df": 23
+        },
+        {
+          "term": "react",
+          "lift": 8.13,
+          "chunk_df": 17
+        },
+        {
+          "term": "vanilla",
+          "lift": 8.13,
+          "chunk_df": 8
+        },
+        {
+          "term": "katt",
+          "lift": 8.13,
+          "chunk_df": 8
+        },
+        {
+          "term": "httpbatchlink",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "createtrpcclient",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "userbyid",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "opt",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "express",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "fastify",
+          "lift": 8.13,
+          "chunk_df": 7
+        },
+        {
+          "term": "queryclientprovider",
+          "lift": 8.13,
+          "chunk_df": 6
+        },
+        {
+          "term": "zod",
+          "lift": 8.13,
+          "chunk_df": 6
+        }
+      ]
+    }
+  },
+  "cross_source_shared_terms": [
+    {
+      "term": "type",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "default",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "option",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "const",
+      "sources": [
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "node",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "output",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "usage",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "source",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "object",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "string",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "function",
+      "sources": [
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "input",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "result",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "import",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "path",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "query",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "method",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "api",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "value",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "class",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "export",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "documentation",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "case",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "information",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "property",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "context",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    },
+    {
+      "term": "interface",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph"
+      ]
+    },
+    {
+      "term": "change",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "library",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "ts-morph",
+        "trpc"
+      ]
+    },
+    {
+      "term": "bash",
+      "sources": [
+        "oaklib",
+        "ast-grep",
+        "trpc"
+      ]
+    }
+  ]
+}

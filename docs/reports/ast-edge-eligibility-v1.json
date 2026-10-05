@@ -1,0 +1,130 @@
+{
+  "schema": "atlas.ast-edge-eligibility.v1",
+  "generatedAt": "2026-10-05T18:36:44.410Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "sidecar": "http://127.0.0.1:8095/ast/chunk",
+  "note": "Diagnostic only. eligible is always 0 here because source authority is unproven; structuralEligible shows what the remaining predicates would allow. Not admission: imports still need a module resolver, and PacketKeyV2 / workspace / graph revisions are required.",
+  "totals": {
+    "files": 6,
+    "edges": 3084,
+    "total": 3084,
+    "resolvedBySidecar": 331,
+    "structuralEligible": 1439,
+    "eligible": 0,
+    "structuralReasons": {
+      "SUBJECT_SYMBOL_UNMAPPED": 664,
+      "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 634,
+      "NODE_UNQUALIFIED_BUILTIN": 222,
+      "TARGET_SYMBOL_UNRESOLVED_NEEDS_MODULE_RESOLVER": 80,
+      "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 45
+    }
+  },
+  "byKind": {
+    "DEFINES": {
+      "total": 331,
+      "resolvedBySidecar": 331,
+      "structuralEligible": 331,
+      "eligible": 0,
+      "structuralReasons": {}
+    },
+    "CALLS": {
+      "total": 948,
+      "resolvedBySidecar": 0,
+      "structuralEligible": 370,
+      "eligible": 0,
+      "structuralReasons": {
+        "NODE_UNQUALIFIED_BUILTIN": 143,
+        "SUBJECT_SYMBOL_UNMAPPED": 243,
+        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 174,
+        "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 18
+      }
+    },
+    "REFERENCES": {
+      "total": 1632,
+      "resolvedBySidecar": 0,
+      "structuralEligible": 645,
+      "eligible": 0,
+      "structuralReasons": {
+        "SUBJECT_SYMBOL_UNMAPPED": 421,
+        "NODE_UNQUALIFIED_BUILTIN": 79,
+        "NODE_UNQUALIFIED_LOCAL_OR_PARAMETER": 460,
+        "NODE_UNQUALIFIED_EXTERNAL_PACKAGE": 27
+      }
+    },
+    "IMPORTS": {
+      "total": 80,
+      "resolvedBySidecar": 0,
+      "structuralEligible": 0,
+      "eligible": 0,
+      "structuralReasons": {
+        "TARGET_SYMBOL_UNRESOLVED_NEEDS_MODULE_RESOLVER": 80
+      }
+    },
+    "EXPORTS": {
+      "total": 93,
+      "resolvedBySidecar": 0,
+      "structuralEligible": 93,
+      "eligible": 0,
+      "structuralReasons": {}
+    }
+  },
+  "subjectClasses": {
+    "FILE_MODULE": 504,
+    "CHUNK_NO_SYMBOL": 664,
+    "SYMBOL": 1916
+  },
+  "nodeClasses": {
+    "MODULE": 80,
+    "IMPORTED_INTERNAL": 415,
+    "EXPORTED_SYMBOL": 543,
+    "LOCAL_SYMBOL": 893,
+    "BUILTIN": 282,
+    "LOCAL_OR_PARAMETER": 787,
+    "EXTERNAL_PACKAGE": 84
+  },
+  "perFile": [
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 183,
+      "edges": 1060,
+      "structuralEligible": 537
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/retrieval/parent-atlas-bridge.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 34,
+      "edges": 206,
+      "structuralEligible": 86
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/operations/atlas-operation-runtime-v1.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 56,
+      "edges": 315,
+      "structuralEligible": 93
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-intelligence-adapter.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 94,
+      "edges": 575,
+      "structuralEligible": 309
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-symbol-projection-v1.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 87,
+      "edges": 651,
+      "structuralEligible": 293
+    },
+    {
+      "file": "packages/parent-atlas/src/core/ast-relation-graph-v1.ts",
+      "sourceAuthority": "UNPROVEN",
+      "chunks": 44,
+      "edges": 277,
+      "structuralEligible": 121
+    }
+  ]
+}

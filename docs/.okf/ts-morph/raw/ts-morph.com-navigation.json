@@ -1,0 +1,42 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-10-05T18:33:34.938709Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "/work/docs/.okf/ts-morph/raw/ts-morph.com-navigation.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_checksum": "254472a5d93d7bd971cde6d79199164566da85c5048ca2a2b939f5b390437de4",
+  "outgoing_urls": [
+    "http://ts-ast-viewer.com",
+    "https://github.com/dsherret/ts-morph",
+    "https://github.com/dsherret/ts-morph/blob/latest/packages/ts-morph/wrapped-nodes.md",
+    "https://github.com/dsherret/ts-morph/issues",
+    "https://ts-morph.com/",
+    "https://ts-morph.com/details/index",
+    "https://ts-morph.com/emitting",
+    "https://ts-morph.com/manipulation",
+    "https://ts-morph.com/navigation",
+    "https://ts-morph.com/navigation/ambient-modules",
+    "https://ts-morph.com/navigation/compiler-nodes",
+    "https://ts-morph.com/navigation/directories",
+    "https://ts-morph.com/navigation/example",
+    "https://ts-morph.com/navigation/finding-references",
+    "https://ts-morph.com/navigation/getting-source-files",
+    "https://ts-morph.com/navigation/language-service",
+    "https://ts-morph.com/navigation/program",
+    "https://ts-morph.com/navigation/type-checker",
+    "https://ts-morph.com/setup",
+    "https://ts-morph.com/utilities"
+  ],
+  "raw_checksum": "7175bd5bfec2486966a4d99601d36a45462ace9a59fffade6fc6d7c97084645f",
+  "requested_url": "https://ts-morph.com/navigation",
+  "resolved_url": "https://ts-morph.com/navigation/",
+  "retrieved_at": "2026-10-05T18:33:34.938709Z",
+  "source_id": "ts-morph",
+  "source_revision": "ts-morph-docs-2026-10-05",
+  "text": null,
+  "title": "ts-morph - Navigating the AST"
+}

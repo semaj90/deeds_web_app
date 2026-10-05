@@ -1,0 +1,144 @@
+{
+  "schema": "atlas.okf-crawled-docs-validation.v1",
+  "generatedAt": "2026-10-05T18:35:26.668Z",
+  "live": false,
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "sources": {
+    "oaklib": {
+      "integrity": {
+        "chunks": 237,
+        "pages": 17,
+        "duplicateChunkIds": 0,
+        "duplicateEvidenceRevisions": 0,
+        "emptyChunks": 0,
+        "checksumMismatch": 0,
+        "canonicalAuthorityTrue": 0,
+        "result": "PASS"
+      },
+      "fidelity": {
+        "fetchers": [
+          "BEAUTIFULSOUP_HTTP"
+        ],
+        "thinPagesUnder1KB": 1,
+        "chromeChunks": 0,
+        "languageLessFences": 9,
+        "leadingLanguageLabelInBody": 0,
+        "copySuffixBlocks": 0,
+        "blocks": 137
+      },
+      "syntax": {
+        "checked": 120,
+        "astGrepClean": 119,
+        "astGrepErrors": 1,
+        "toolFailures": 0,
+        "skippedNoLanguage": 9,
+        "sidecarCompared": 0,
+        "disagreements": []
+      }
+    },
+    "ast-grep": {
+      "integrity": {
+        "chunks": 196,
+        "pages": 16,
+        "duplicateChunkIds": 0,
+        "duplicateEvidenceRevisions": 0,
+        "emptyChunks": 0,
+        "checksumMismatch": 0,
+        "canonicalAuthorityTrue": 0,
+        "result": "PASS"
+      },
+      "fidelity": {
+        "fetchers": [
+          "BEAUTIFULSOUP_HTTP"
+        ],
+        "thinPagesUnder1KB": 0,
+        "chromeChunks": 0,
+        "languageLessFences": 1,
+        "leadingLanguageLabelInBody": 2,
+        "copySuffixBlocks": 0,
+        "blocks": 180
+      },
+      "syntax": {
+        "checked": 177,
+        "astGrepClean": 171,
+        "astGrepErrors": 6,
+        "toolFailures": 0,
+        "skippedNoLanguage": 1,
+        "sidecarCompared": 0,
+        "disagreements": []
+      }
+    },
+    "ts-morph": {
+      "integrity": {
+        "chunks": 188,
+        "pages": 15,
+        "duplicateChunkIds": 0,
+        "duplicateEvidenceRevisions": 0,
+        "emptyChunks": 0,
+        "checksumMismatch": 0,
+        "canonicalAuthorityTrue": 0,
+        "result": "PASS"
+      },
+      "fidelity": {
+        "fetchers": [
+          "BEAUTIFULSOUP_HTTP"
+        ],
+        "thinPagesUnder1KB": 2,
+        "chromeChunks": 0,
+        "languageLessFences": 3,
+        "leadingLanguageLabelInBody": 0,
+        "copySuffixBlocks": 0,
+        "blocks": 219
+      },
+      "syntax": {
+        "checked": 216,
+        "astGrepClean": 214,
+        "astGrepErrors": 2,
+        "toolFailures": 0,
+        "skippedNoLanguage": 3,
+        "sidecarCompared": 0,
+        "disagreements": []
+      }
+    },
+    "trpc": {
+      "integrity": {
+        "chunks": 96,
+        "pages": 9,
+        "duplicateChunkIds": 0,
+        "duplicateEvidenceRevisions": 0,
+        "emptyChunks": 0,
+        "checksumMismatch": 0,
+        "canonicalAuthorityTrue": 0,
+        "result": "PASS"
+      },
+      "fidelity": {
+        "fetchers": [
+          "BEAUTIFULSOUP_HTTP"
+        ],
+        "thinPagesUnder1KB": 1,
+        "chromeChunks": 16,
+        "languageLessFences": 65,
+        "leadingLanguageLabelInBody": 0,
+        "copySuffixBlocks": 0,
+        "blocks": 80
+      },
+      "syntax": {
+        "checked": 15,
+        "astGrepClean": 15,
+        "astGrepErrors": 0,
+        "toolFailures": 0,
+        "skippedNoLanguage": 65,
+        "sidecarCompared": 0,
+        "disagreements": []
+      }
+    }
+  },
+  "live_checks": null,
+  "result": "PASS"
+}

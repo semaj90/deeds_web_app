@@ -1,0 +1,484 @@
+Are you an LLM? You can read better optimized documentation at /reference/yaml.md for this page in Markdown format
+# Configuration Reference ​
+ast-grep's rules are written in YAML files.
+One YAML file can contain multiple rules, separated by
+`---`
+.
+An ast-grep rule is a YAML object with the following keys:
+Basic Information
+id
+language
+Finding
+rule
+constraints
+utils
+Patching
+transform
+fix
+rewriters
+Linting
+severity
+message
+note
+labels
+Globbing
+files
+ignores
+Other
+url
+metadata
+## Basic Information ​
+### id ​
+type:
+`String`
+required: true
+Unique, descriptive identifier, e.g.,
+`no-unused-variable`
+.
+Example:
+yaml
+```yaml
+id: no-console-log
+```
+### language ​
+type:
+`String`
+required: true
+Specify the language to parse and the file extension to include in matching.
+Valid values are:
+`Bash`
+,
+`C`
+,
+`Cpp`
+,
+`CSharp`
+,
+`Css`
+,
+`Elixir`
+,
+`Go`
+,
+`Haskell`
+,
+`Hcl`
+,
+`Html`
+,
+`Java`
+,
+`JavaScript`
+,
+`Json`
+,
+`Kotlin`
+,
+`Lua`
+,
+`Nix`
+,
+`Php`
+,
+`Python`
+,
+`Ruby`
+,
+`Rust`
+,
+`Scala`
+,
+`Solidity`
+,
+`Swift`
+,
+`Tsx`
+,
+`TypeScript`
+,
+`Yaml`
+Example:
+yaml
+```yaml
+language: JavaScript
+```
+## Finding ​
+### rule ​
+type:
+`Rule`
+required: true
+The object specify the method to find matching AST nodes. See details in
+rule object reference
+.
+yaml
+```yaml
+rule:
+  pattern: console.log($$$ARGS)
+```
+### constraints ​
+type:
+`HashMap<String, Rule>`
+required: false
+Additional meta variables pattern to filter matches. The key is matched meta variable name without
+`$`
+. The value is a
+rule object
+.
+Note, constraints only applies to the single meta variable like
+`$ARG`
+,
+not multiple meta variable like
+`$$$ARGS`
+. So the key name must only refer to a single meta variable.
+Example:
+yaml
+```yaml
+rule:
+  pattern: console.log($ARG)
+constraints:
+  ARG:
+    kind: number
+    # pattern: $A + $B
+    # regex: '[a-zA-Z]+'
+```
+`constraints`
+is applied after
+`rule`
+ast-grep will first match the
+`rule`
+while ignoring
+`constraints`
+, and then apply
+`constraints`
+to filter the matched nodes.
+Constrained meta-variables usually do not work inside
+`not`
+.
+### utils ​
+type:
+`HashMap<String, Rule>`
+required: false
+A dictionary of utility rules that can be used in
+`matches`
+locally. The dictionary key is the utility rule id and the value is the rule object. See
+utility rule guide
+.
+Example:
+yaml
+```yaml
+utils:
+  match-function:
+    any:
+      - kind: function
+      - kind: function_declaration
+      - kind: arrow_function
+```
+## Patching ​
+### transform ​
+type:
+`HashMap<String, Transformation>`
+required: false
+A dictionary to manipulate meta-variables. The dictionary key is the new variable name. The dictionary value is a transformation object or transformation string that specifies how meta var is processed.
+Please also see
+transformation reference
+for details.
+Example:
+yaml
+```yaml
+transform:
+  NEW_VAR_NAME:      # new variable name
+    replace:         # transform operation
+      source: $ARGS
+      replace: '^.+'
+      by: ', '
+
+# string style for ast-grep 0.38.3+
+transform:
+  NEW_VAR_NAME: replace($ARGS, replace='^.+', by=', ')
+```
+### fix ​
+type:
+`String`
+or
+`FixConfig`
+required: false
+A pattern or a
+`FixConfig`
+object to auto fix the issue. See details in
+fix object reference
+.
+It can reference meta variables that appeared in the rule.
+Example:
+yaml
+```yaml
+fix: logger.log($$$ARGS)
+
+# you can also use empty string to delete match
+fix: ""
+```
+### rewriters ​
+type:
+`Array<Rewriter>`
+required: false
+A list of rewriter rules that can be used in
+`rewrite`
+transformation
+.
+A rewriter rule is similar to ordinary YAML rule, but it ony contains
+finding
+fields,
+patching
+fields and
+`id`
+.
+Please also see
+rewriter reference
+for details.
+Example:
+yaml
+```yaml
+rewriters:
+- id: stringify
+  rule: { pattern: "'' + $A" }
+  fix: "String($A)"
+  # you can also use these fields
+  # transform, utils, constraints
+```
+## Linting ​
+### severity ​
+type:
+`String`
+required: false
+Specify the level of matched result. Available choice:
+`hint`
+,
+`info`
+,
+`warning`
+,
+`error`
+or
+`off`
+.
+When
+`severity`
+is
+`off`
+, ast-grep will disable the rule in scanning.
+Example:
+yaml
+```yaml
+severity: warning
+```
+### message ​
+type:
+`String`
+required: false
+Main message highlighting why this rule fired. It should be single line and concise, but specific enough to be understood without additional context.
+It can reference meta-variables that appeared in the rule.
+Example:
+yaml
+```yaml
+message: "console.log should not be used in production code"
+```
+### note ​
+type:
+`String`
+required: false
+Additional notes to elaborate the message and provide potential fix to the issue.
+`note`
+can contains markdown syntax, but it
+cannot
+reference meta-variables.
+Example:
+yaml
+```yaml
+note: "Use a logger instead"
+```
+### labels ​
+type:
+`HashMap<String, LabelConfig>`
+required: false
+A dictionary of labels to customize highlighting. The dictionary key is the meta-variable name without
+`$`
+, defined in
+`rules`
+or
+`constraints`
+. The value is a label config object containing the following fields:
+`style`
+: (required) the style of the label. Available choice:
+`primary`
+,
+`secondary`
+.
+`message`
+: (optional) the message to be displayed in the editor extension.
+Example:
+yaml
+```yaml
+labels:
+  ARG:
+    style: primary
+    message: "This is the argument"
+  FUNC:
+    style: secondary
+    message: "This is the function"
+```
+Please also see
+label guide
+for details.
+## Globbing ​
+### files ​
+type:
+`Array<Glob>`
+required: false
+Glob patterns to specify that the rule only applies to matching files. It is tested if
+`ignores`
+does not exist or a file does not match any
+`ignores`
+glob.
+Each item in the array can be either:
+A
+string
+: a simple glob pattern
+An
+object
+with the following fields:
+`glob`
+(required): the glob pattern string
+`caseInsensitive`
+(optional): whether the glob matching is case insensitive. Defaults to
+`false`
+.
+Example:
+yaml
+```yaml
+# Simple string globs
+files:
+  - src/**/*.js
+  - src/**/*.ts
+```
+yaml
+```yaml
+# Object syntax with case-insensitive matching
+files:
+  - glob: '*.ts'
+    caseInsensitive: true
+  - glob: 'README.md'
+    caseInsensitive: true
+```
+yaml
+```yaml
+# Mixed formats
+files:
+  - '*.ts'                          # simple string
+  - glob: 'README.md'               # object with case-insensitive
+    caseInsensitive: true
+  - 'src/**/*.tsx'                  # simple string
+```
+Don't add
+`./`
+Be sure to remove
+`./`
+to the beginning of your rules. ast-grep will not recognize the paths if you add
+`./`
+.
+Paths in
+`files`
+are relative to the project root directory, that is,
+`sgconfig.yml`
+'s directory.
+### ignores ​
+type:
+`Array<Glob>`
+required: false
+Glob patterns that exclude rules from applying to files. A file is tested against
+`ignores`
+list before matching
+`files`
+.
+Like
+`files`
+, each item can be either a string or an object with
+`glob`
+and
+`caseInsensitive`
+fields.
+Example:
+yaml
+```yaml
+# Simple string globs
+ignores:
+  - test/**/*.js
+  - test/**/*.ts
+```
+yaml
+```yaml
+# With case-insensitive matching
+ignores:
+  - 'test/**'
+  - glob: 'BUILD'
+    caseInsensitive: true
+```
+A typical globing process works as follows:
+If
+`ignores`
+is configured, a file will be skipped if it matches any of the glob in the list(
+`files`
+will not be tested).
+If
+`files`
+is configured, a file will be included if and only if it matches one of the glob in the list.
+If neither
+`ignores`
+/
+`files`
+is configured, a file is included by default.
+`ignores`
+in YAML is different from
+`--no-ignore`
+in CLI
+ast-grep respects common ignore files like
+`.gitignore`
+and hidden files by default. To disable this behavior, use
+`--no-ignore`
+in CLI.
+`ignores`
+is a rule-wise configuration that only filters files that are not ignored by the CLI.
+Paths in
+`ignores`
+are relative to the project root directory, that is,
+`sgconfig.yml`
+'s directory.
+## Other ​
+### url ​
+type:
+`String`
+required: false
+Documentation link to this rule. It will be displayed in editor extension if supported.
+Example:
+yaml
+```yaml
+url: 'https://ast-grep.github.io/catalog/python/#migrate-openai-sdk'
+```
+### metadata ​
+type:
+`HashMap<String, String>`
+required: false
+Extra information for the rule. This section can include custom data for external program to consume. For example, CVE/OWASP information can be added here for security research.
+ast-grep will output
+`metadata`
+with matches in
+`--json`
+mode if
+`--include-metadata`
+is on.
+Example:
+yaml
+```yaml
+metadata:
+  extraField: 'Extra information for other usages'
+  complexData:
+    key: value
+```

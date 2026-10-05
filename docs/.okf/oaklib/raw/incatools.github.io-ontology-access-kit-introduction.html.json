@@ -1,0 +1,37 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-10-05T18:33:29.899333Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "/work/docs/.okf/oaklib/raw/incatools.github.io-ontology-access-kit-introduction.html.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_checksum": "e0a453a6b1e3cba7a35374384737fc9fbb03fd0323a843f754959e20f98e90a4",
+  "outgoing_urls": [
+    "https://github.com/readthedocs/sphinx_rtd_theme",
+    "https://incatools.github.io/ontology-access-kit/_sources/introduction.rst.txt",
+    "https://incatools.github.io/ontology-access-kit/cli.html",
+    "https://incatools.github.io/ontology-access-kit/datamodels/index.html",
+    "https://incatools.github.io/ontology-access-kit/examples/index.html",
+    "https://incatools.github.io/ontology-access-kit/faq/index.html",
+    "https://incatools.github.io/ontology-access-kit/glossary.html",
+    "https://incatools.github.io/ontology-access-kit/guide/index.html",
+    "https://incatools.github.io/ontology-access-kit/howtos/index.html",
+    "https://incatools.github.io/ontology-access-kit/index.html",
+    "https://incatools.github.io/ontology-access-kit/intro/index.html",
+    "https://incatools.github.io/ontology-access-kit/introduction.html",
+    "https://incatools.github.io/ontology-access-kit/packages/index.html",
+    "https://readthedocs.org",
+    "https://www.sphinx-doc.org/"
+  ],
+  "raw_checksum": "814bd50d47b6102a6d294c18d82610375de376acebb17e007a87414453c4ccda",
+  "requested_url": "https://incatools.github.io/ontology-access-kit/introduction.html",
+  "resolved_url": "https://incatools.github.io/ontology-access-kit/introduction.html",
+  "retrieved_at": "2026-10-05T18:33:29.899333Z",
+  "source_id": "oaklib",
+  "source_revision": "oaklib-docs-2026-10-05",
+  "text": null,
+  "title": "Introduction \u2014 oaklib  documentation"
+}

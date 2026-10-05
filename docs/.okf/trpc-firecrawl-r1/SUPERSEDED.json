@@ -1,0 +1,97 @@
+{
+ "schema": "atlas.okf-corpus-supersession.v1",
+ "status": "SUPERSEDED",
+ "keptFor": "comparison and eval testing only",
+ "admit": false,
+ "corpus": "trpc",
+ "revision": "trpc-docs-2026-10-05",
+ "fetcher": "FIRECRAWL_V2",
+ "manifestRevision": "okf-tooling-docs-r1",
+ "supersededBy": {
+  "namespace": "docs/.okf/trpc",
+  "revision": "trpc-docs-2026-10-05-bs",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "manifestRevision": "okf-tooling-docs-r2"
+ },
+ "reason": "Firecrawl output lost code-fence languages, appended UI \"Copy\" text to code, leaked language labels into code bodies and kept site chrome",
+ "supersededAt": "2026-10-05T18:35:25.188Z",
+ "coldStorageCopy": "deeds_labs/archive/2026-10-05/okf-trpc-firecrawl-r1 (gitignored; sha256 manifest.json)",
+ "files": [
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/chunks.jsonl",
+   "sha256": "3c2e913a44174a0f82bcd63ac8adc20d7a9ed9c3688acd96bb089f4a58aaefef"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client-tanstack-react-query-setup.json",
+   "sha256": "8c919a8021ee14a6096a24b55e14517a75a6beb23a0923e1b2fdc291e9b9d4de"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client-tanstack-react-query-setup.md",
+   "sha256": "8344ac3f9d7f47d798a938e1f48af99930ae3dbf849710266b5eb62bf50f7e38"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client-vanilla-setup.json",
+   "sha256": "fa8702beead1b0eb20b2261f5cd8dcb95e365b8417a9897c07ee93f7c0d46c0e"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client-vanilla-setup.md",
+   "sha256": "fd5f3afa2ea7c5e980b12550736fe7f364ba750c87cbb968cbf7f41d0ab1da24"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client.json",
+   "sha256": "6662c0389c30d483755fe5443ee02fedfd66b87f85df93df73ee3a72dd716072"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-client.md",
+   "sha256": "5a38b1c9e4d9f1daf63373a253c4d3cc2da0856c17720b52663e758ad0075761"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-concepts.json",
+   "sha256": "3835606fb6056b8b970a82ba7cb0f1bfcdeea5f225fe20c2e9a8e886b5c0e07e"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-concepts.md",
+   "sha256": "2d4a68d5a71c1815e49529fdc8b2428d1a42e89aabb129d5bc21a84142b5eda3"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-faq.json",
+   "sha256": "e8ec3f1af4cc1917f0b1aad41404d41b32d3b55c4dcd6e9d93d5fdf2ab897df5"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-faq.md",
+   "sha256": "c7a32405ca54f65f0197d3c5fa6111ecefef3a01ea257765ae11f46137b8cea8"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-quickstart.json",
+   "sha256": "16099b0e6ac6d0424d8c1eccd384145d698f73023bdb7707191382252b2e6ace"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-quickstart.md",
+   "sha256": "778ff344373bd39d96c05d4d865b918299f9231d5d75174db186816193ece8b8"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-server-adapters.json",
+   "sha256": "06bbc02cab1b8f0d855f5382c493b1b036db297a7a01f543159f5e7803a838b3"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-server-adapters.md",
+   "sha256": "ad453203b7c9709f96b97c116a584b7d12558821b897be26af9a5b8ed3c76c01"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-server-overview.json",
+   "sha256": "07a45a7f4c45e3d272e44ed17b53e0d2d61fdef85b8f66f592703fe89c00646d"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs-server-overview.md",
+   "sha256": "bb2968805ff5fc0b77acdd58a40743364f7443299d720e99ce820503f12133c5"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs.json",
+   "sha256": "25c1506d3a648a103c2314cc616ebc5072745f8c40fa48c38bea5ef63069513d"
+  },
+  {
+   "path": "docs/.okf/trpc-firecrawl-r1/raw/trpc.io-docs.md",
+   "sha256": "0e4ca382710784b87d495e18cec5383e3e336edd9ea91ce493763749f4654119"
+  }
+ ]
+}
