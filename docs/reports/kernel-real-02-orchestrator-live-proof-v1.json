@@ -1,6 +1,6 @@
 {
   "schema": "atlas.kernel-real-02-orchestrator-live-proof.v1",
-  "generatedAt": "2026-10-05T19:22:11.471Z",
+  "generatedAt": "2026-10-05T19:25:50.303Z",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "executionMode": "READ_ONLY",
@@ -21,25 +21,21 @@
       "id": "code-owner",
       "query": "Which module owns unified retrieval and how does it fuse lanes with reciprocal rank fusion?",
       "ok": true,
-      "latencyMs": 7224,
+      "latencyMs": 2914,
       "candidateCount": 8,
-      "candidateSetChecksum": "098aaf54eba96f76842a178242a932f5878399931bb0fab537d036e02249c4ef",
+      "candidateSetChecksum": "c065fde45b7022f28aedff2238e93c555f6e7a7d8a25b44fb02b7471b5e18b2b",
       "evidenceStatus": "OK",
       "lanes": {
         "semantic": {
           "status": "OK",
           "executor": "postgres_pgvector",
-          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
         },
         "lexical": {
-          "status": "UNAVAILABLE",
-          "reason": "RG_EXEC_FAILED",
-          "detail": "rg exited with code null: unknown error"
+          "status": "OK"
         }
       },
-      "degradedLanes": [
-        "lexical:UNAVAILABLE:RG_EXEC_FAILED"
-      ],
+      "degradedLanes": [],
       "readOnlyReceipt": {
         "schema": "atlas.read-only-side-effect-receipt.v1",
         "executionMode": "READ_ONLY",
@@ -47,6 +43,15 @@
           {
             "subsystem": "embedding",
             "operation": "embedding",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "lexical_search",
+            "operation": "rg_pool_lexical",
             "reads": 1,
             "attemptedWrites": 0,
             "committedWrites": 0,
@@ -86,34 +91,13 @@
       },
       "counts": {
         "candidateId": 8,
-        "packetKey": 1,
+        "packetKey": 0,
         "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
         "identityComplete": 0
       },
       "candidates": [
-        {
-          "canonicalId": "de259487-ffd8-458a-b305-80ed06c7d8ba",
-          "packetKey": "packet:f6161a0fc5bb",
-          "sourceRef": "docs/open-lanes/lane-retrieval-ranking.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
         {
           "canonicalId": "4b56538c-bd89-4126-8cf3-be831d022fe1",
           "packetKey": null,
@@ -267,6 +251,28 @@
           ],
           "proofUsable": false,
           "identityComplete": false
+        },
+        {
+          "canonicalId": "103a6909-a2de-48b0-ac3d-0f9649b794ba",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
         }
       ]
     },
@@ -274,7 +280,7 @@
       "id": "legal",
       "query": "What does the repository say about chain of custody for evidence?",
       "ok": true,
-      "latencyMs": 13969,
+      "latencyMs": 1492,
       "candidateCount": 8,
       "candidateSetChecksum": "200cb7c69dbc80c2b4906d8ed1031dab9b24793242833bd3f9e07ded9745c4ef",
       "evidenceStatus": "OK",
@@ -282,7 +288,7 @@
         "semantic": {
           "status": "OK",
           "executor": "postgres_pgvector",
-          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
         },
         "lexical": {
           "status": "OK"
@@ -525,15 +531,15 @@
       "id": "embedding",
       "query": "How are 768-dimensional embeddings produced and validated?",
       "ok": true,
-      "latencyMs": 2179,
+      "latencyMs": 1110,
       "candidateCount": 8,
-      "candidateSetChecksum": "f21c388428f105ddf652d05431a5f0e1ede70c43f006d1d147ac3ab7946263f7",
+      "candidateSetChecksum": "773f19752f56da041fa292c5acb0e8a3221f119dee05ac8e70aee22112263ea9",
       "evidenceStatus": "OK",
       "lanes": {
         "semantic": {
           "status": "OK",
           "executor": "postgres_pgvector",
-          "note": "TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven"
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
         },
         "lexical": {
           "status": "OK"
@@ -595,34 +601,13 @@
       },
       "counts": {
         "candidateId": 8,
-        "packetKey": 7,
+        "packetKey": 1,
         "sourceRef": 8,
         "sourceRevision": 0,
         "workspaceRevision": 0,
         "identityComplete": 0
       },
       "candidates": [
-        {
-          "canonicalId": "c41a4a3e-8a34-45d8-baae-aa3377bd66b3",
-          "packetKey": "ace:packet:854bdefb7ef4",
-          "sourceRef": "docs/EMBEDDING-DIMENSION-AUDIT-2026-06-28.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
         {
           "canonicalId": "53a9450a-412d-4a7d-a29a-f425a21500ba",
           "packetKey": null,
@@ -646,111 +631,6 @@
           "identityComplete": false
         },
         {
-          "canonicalId": "d89ba0a9-0893-4517-b835-1fc24de793fa",
-          "packetKey": "ace:packet:b09dedb60456",
-          "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "45d70c7d-a415-4ba3-8074-62e5f0b450d4",
-          "packetKey": "ace:packet:f9c9a5d29402",
-          "sourceRef": "docs/dimension-policy.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "dbf45fc0-877f-4db0-9ea9-c7ce118eb33e",
-          "packetKey": "ace:packet:b09dedb60456",
-          "sourceRef": "docs/architecture/CORRECTED-embedding-dimension-policy.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "8089b8af-6986-4fec-b842-f2d9861b7f1a",
-          "packetKey": "ace:packet:f9c9a5d29402",
-          "sourceRef": "docs/dimension-policy.md",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
-          "canonicalId": "aedb9b6d-9e73-4985-b1d6-5e31841c373b",
-          "packetKey": "ace:packet:5e9caff35630",
-          "sourceRef": "src/lib/server/ai/embeddings-simple.ts",
-          "sourceRevision": null,
-          "workspaceRevision": null,
-          "representationRevision": null,
-          "evidenceRefs": null,
-          "executor": null,
-          "lanes": [
-            "qdrant_dense",
-            "turbovec",
-            "rg_lexical"
-          ],
-          "missingFields": [
-            "sourceRevision",
-            "workspaceRevision"
-          ],
-          "proofUsable": false,
-          "identityComplete": false
-        },
-        {
           "canonicalId": "2bb65b3d-0fbc-40d1-b0f0-4759a309e299",
           "packetKey": "packet:31a23c9fc19e",
           "sourceRef": "sveltekit-frontend/scripts/create-phase78-embeddings-table.sql",
@@ -765,6 +645,138 @@
             "rg_lexical"
           ],
           "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "d049dd34-98dc-4fb9-80cf-5fc1a128f62b",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/VECTOR-SCHEMA-768D-CANONICAL.md",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "b9e7586f-5a7a-486b-af63-2fe574dc8d6d",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/atlas/retrieval/semantic-768.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "589978b2-0e2d-43a3-a941-b52a79b125e5",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/tests/embedding-onnx-integration.spec.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "a6cd6cb8-bfdd-4349-9af9-f6da42dd2ed9",
+          "packetKey": null,
+          "sourceRef": "scripts/atlas/phase106-stage4-embedding-backfill.mjs",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "91434dde-b85a-40ca-88fd-560ec2f6248f",
+          "packetKey": null,
+          "sourceRef": "scripts/atlas/knowledge-layer/embedding-verification.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false
+        },
+        {
+          "canonicalId": "c895f1b6-6030-4ba2-ad2b-89bcf482e6a5",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/drizzle/manual/20260716_atlas_knowledge_layer.sql",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "executor": null,
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey",
             "sourceRevision",
             "workspaceRevision"
           ],

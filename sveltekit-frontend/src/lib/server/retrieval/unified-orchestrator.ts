@@ -538,60 +538,51 @@ async function turboVecPrefilter(
 
 /**
  * STAGE 2 (executor): Postgres pgvector dense search, READ ONLY. Postgres is canonical truth, so this executor returns the canonical
- * codebase_chunk_index.id directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor); never a second vote.
- * Two storage columns hold different row sets with different embedding recipes (content_embedding halfvec + HNSW; content_embedding_768 raw vector,
- * exact scan), so both are queried and the merge is by cosine; the caveat is reported on the lane, not hidden.
- * Filters that this executor cannot honour fail the lane instead of being silently dropped. packet_key is attached only when exactly one
- * atlas_packets row exists for the source_ref (no guess among duplicates).
+ * codebase_chunk_index.id and revision columns directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor); never a second vote.
+ * One representation only: semantic_768 = content_embedding_768 (raw vector). The older halfvec column content_embedding uses a different recipe and row population, so
+ * cosine scores from the two are not interchangeable and are never merged here; it would be a separate executor if ever enabled. content_embedding_768 has no ANN index,
+ * so this is an exact scan (measured slow; an HNSW index is a separate schema decision).
+ * Uses the shared repository pool (no per-query Pool). Filters this executor cannot honour fail the lane instead of being silently dropped.
+ * packet_key is attached only when exactly one atlas_packets row exists for the source_ref; that binding is source_ref-only and NOT revision-qualified
+ * (atlas_packets.chunk_id is a different id space: 0 of codebase_chunk_index.id match), so it is labelled packet_binding=SOURCE_REF_UNIQUE.
  */
 const PGVECTOR_EXECUTOR_CAVEAT =
-  'TWO_EMBEDDING_COLUMNS_DIFFERENT_RECIPES: content_embedding (title-prefixed, HNSW) and content_embedding_768 (raw, exact scan) are merged by cosine; query recipe parity unproven';
+  'SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged';
 
 async function postgresPgvectorSearch(
   queryVector: Float32Array,
-  config: RetrievalConfig,
+  _config: RetrievalConfig,
   filters: SearchFilter | undefined,
   limit: number,
 ): Promise<Array<{ id: string; score: number; payload: any }>> {
-  if (!config.postgres.password) throw new Error('POSTGRES_ENRICHMENT_UNAVAILABLE:POSTGRES_PASSWORD');
   if (queryVector.length !== 768 || Array.from(queryVector).some((x) => !Number.isFinite(x))) throw new Error('QUERY_VECTOR_INVALID');
   const unsupported = Object.entries(filters ?? {}).filter(([k, v]) => v != null && !(Array.isArray(v) && v.length === 0) && !['source_ref_pattern', 'per_lane_limit', 'keywords', 'keyword_variants'].includes(k));
   if (unsupported.length) throw new Error(`PGVECTOR_FILTER_UNSUPPORTED:${unsupported.map(([k]) => k).join(',')}`);
   const refPrefix = filters?.source_ref_pattern ? `${String(filters.source_ref_pattern).replace(/[%_\\]/g, '\\$&')}%` : null;
   const vec = `[${Array.from(queryVector).join(',')}]`;
   const n = Math.min(Math.max(limit, 1), 50);
-  const pool = new Pool(config.postgres);
-  try {
-    const cols: Array<[string, string]> = [['content_embedding', 'halfvec'], ['content_embedding_768', 'vector']];
-    const rows: any[] = [];
-    for (const [col, type] of cols) {
-      const res = await pool.query(
-        `SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (${col} <=> $1::${type}(768)) AS cosine
-           FROM codebase_chunk_index
-          WHERE ${col} IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
-          ORDER BY ${col} <=> $1::${type}(768) LIMIT $2`,
-        [vec, n, refPrefix],
-      );
-      for (const r of res.rows) rows.push({ ...r, embedding_column: col });
-    }
-    const best = new Map<string, any>();
-    for (const r of rows) { const prev = best.get(String(r.id)); if (!prev || Number(r.cosine) > Number(prev.cosine)) best.set(String(r.id), r); }
-    const merged = [...best.values()].sort((a, b) => Number(b.cosine) - Number(a.cosine)).slice(0, n);
-    const refs = [...new Set(merged.map((r) => r.source_ref).filter(Boolean))];
-    const packetByRef = new Map<string, string | null>();
-    if (refs.length) {
-      const pk = await pool.query(`SELECT source_ref, min(packet_key) AS packet_key, count(*)::int AS n FROM atlas_packets WHERE source_ref = ANY($1::text[]) GROUP BY source_ref`, [refs]);
-      for (const p of pk.rows) packetByRef.set(p.source_ref, p.n === 1 ? p.packet_key : null);
-    }
-    return merged.map((r, idx) => ({
-      id: String(r.id), score: Number(r.cosine),
-      payload: { packet_key: packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? undefined,
-        workspace_revision: r.workspace_revision ?? undefined, representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
-        backend: 'postgres_pgvector', embedding_column: r.embedding_column, pgvector_rank: idx + 1 },
-    }));
-  } finally {
-    pool.end().catch(() => {});
+  // Lazy import: the shared pool owner is only loaded when this executor runs, so the orchestrator stays importable without app DB env.
+  const { pool } = await import('$lib/server/db/client');
+  const res = await pool.query(
+    `SELECT id, relative_path, symbol, kind, source_ref, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
+       FROM codebase_chunk_index
+      WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\\')
+      ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2`,
+    [vec, n, refPrefix],
+  );
+  const merged = res.rows as any[];
+  const refs = [...new Set(merged.map((r) => r.source_ref).filter(Boolean))];
+  const packetByRef = new Map<string, string | null>();
+  if (refs.length) {
+    const pk = await pool.query(`SELECT source_ref, min(packet_key) AS packet_key, count(*)::int AS n FROM atlas_packets WHERE source_ref = ANY($1::text[]) GROUP BY source_ref`, [refs]);
+    for (const p of pk.rows) packetByRef.set(p.source_ref, p.n === 1 ? p.packet_key : null);
   }
+  return merged.map((r, idx) => ({
+    id: String(r.id), score: Number(r.cosine),
+    payload: { packet_key: packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: r.source_revision ?? undefined,
+      workspace_revision: r.workspace_revision ?? undefined, representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
+      backend: 'postgres_pgvector', embedding_column: 'content_embedding_768', packet_binding: 'SOURCE_REF_UNIQUE', pgvector_rank: idx + 1 },
+  }));
 }
 
 /**

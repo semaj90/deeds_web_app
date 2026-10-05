@@ -13,6 +13,7 @@ vi.mock('./embedding-service.js', () => ({ embedQueryForLane: mocks.embed }));
 vi.mock('$lib/server/search/rg-pool.js', () => ({ getRgPool: () => ({ search: mocks.rgSearch }) }));
 vi.mock('$lib/server/search/create-codebase-search-backend.js', () => ({ createCodebaseSearchBackendFromEnv: () => ({ kind: 'qdrant' }) }));
 vi.mock('node-fetch', () => ({ default: mocks.fetch }));
+vi.mock('$lib/server/db/client', () => ({ pool: { query: (...args: unknown[]) => mocks.pgQuery(...args) } }));
 vi.mock('pg', () => ({ Pool: class { query = mocks.pgQuery; end = () => Promise.resolve(); on = () => this; connect = () => Promise.resolve({ release() {} }); } }));
 vi.mock('./parent-atlas-bridge.js', () => ({
   resolveParentAtlasContext: vi.fn(),
@@ -120,7 +121,7 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
     mocks.pgQuery.mockImplementation(async (sql: string) => {
       if (opts.fail) throw new Error('pg down');
       if (/atlas_packets/.test(sql)) return { rows: opts.packets ?? [{ source_ref: 'src/a.ts', packet_key: 'packet:abc', n: 1 }] };
-      if (/<=>/.test(sql)) return { rows: /content_embedding_768/.test(sql) ? [] : (opts.chunkRows ?? [chunk]) };
+      if (/<=>/.test(sql)) return { rows: opts.chunkRows ?? [chunk] };
       return { rows: [] };
     });
   };
@@ -129,11 +130,15 @@ describe('unified orchestrator pgvector semantic executor (default; Qdrant proje
   it('uses Postgres by default: canonical candidateId comes straight from the chunk row, no Qdrant call, executor and caveat reported on the lane', async () => {
     wirePg();
     const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
-    expect(r.lanes?.semantic).toMatchObject({ status: 'OK', executor: 'postgres_pgvector', note: expect.stringMatching(/DIFFERENT_RECIPES/) });
+    expect(r.lanes?.semantic).toMatchObject({ status: 'OK', executor: 'postgres_pgvector', note: expect.stringMatching(/EXACT_SCAN.*parity unproven/) });
     expect(r.stages_completed).toContain('postgres_pgvector_search');
     expect(mocks.fetch.mock.calls.some((c) => String(c[0]).includes('/points/query'))).toBe(false);
     expect(r.candidates[0].identity).toMatchObject({ candidateId: 'chunk-uuid-1', packetKey: 'packet:abc', sourceRef: 'src/a.ts', identitySource: 'POSTGRES_CANONICAL_V1', qdrantPointId: null });
     expect(r.candidates[0].identity.missingFields).toEqual(['sourceRevision', 'workspaceRevision']); // never invented
+    const vectorSql = mocks.pgQuery.mock.calls.map((c) => String(c[0])).filter((q) => /<=>/.test(q));
+    expect(vectorSql).toHaveLength(1); // one representation, no cross-recipe merge
+    expect(vectorSql[0]).toMatch(/content_embedding_768/);
+    expect(vectorSql[0]).not.toMatch(/content_embeddings*<=>/);
   });
 
   it('does not guess a packet_key when a source_ref has several packets', async () => {
