@@ -37,6 +37,11 @@ import {
   batchResolveParentAtlasContext,
   type ParentAtlasContext
 } from './parent-atlas-bridge.js';
+import {
+  createReadOnlySideEffectReceiptBuilderV1,
+  type QueryExecutionModeV1,
+  type ReadOnlySideEffectReceiptV1,
+} from '$lib/server/execution/query-execution-policy-v1.js';
 import { selectDiverseCandidates } from './latent256-dedup.js';
 import type { Latent256CandidateProviderV1 } from './latent256-candidate-provider.js';
 
@@ -72,6 +77,11 @@ export interface RetrievalRequest {
   useRgPool?: boolean;
   retrievalTier?: SearchTier;
   filters?: SearchFilter;
+  /**
+   * Retrieval has no mutating mode: READ_ONLY (default) and OBSERVED_READ_ONLY are accepted,
+   * MUTATING is rejected. The orchestrator itself performs reads only.
+   */
+  executionMode?: QueryExecutionModeV1;
 }
 
 export type QdrantPointId = string | number;
@@ -137,6 +147,8 @@ export type LexicalLaneResultV1 =
 
 export interface RetrievalResult {
   candidates: RankedCandidate[];
+  /** Implementation telemetry of the stages that ran (all reads). Not independent proof of zero writes. */
+  read_only_receipt?: ReadOnlySideEffectReceiptV1;
   /** Per-lane availability. An unavailable lane contributes zero votes and is never reported as OK. */
   lanes?: { semantic: RetrievalLaneStatusV1; lexical: RetrievalLaneStatusV1 };
   /** NO_EVIDENCE: no lane produced a candidate; nothing is fabricated. */
@@ -815,6 +827,27 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
   }
 }
 
+const READ_STAGE_SUBSYSTEMS: Record<string, string> = {
+  embedding: 'embedding',
+  rust_napi: 'dense_search',
+  qdrant_search: 'dense_search',
+  rg_pool_lexical: 'lexical_search',
+  turbovec_prefilter: 'turbovec',
+  postgres_join: 'postgres',
+  parent_atlas_enrichment: 'postgres',
+  latent256_candidate_dedup: 'latent256',
+};
+
+function buildRetrievalReadReceipt(stages: string[], mode: QueryExecutionModeV1): ReadOnlySideEffectReceiptV1 {
+  const builder = createReadOnlySideEffectReceiptBuilderV1(mode);
+  for (const stage of stages) {
+    const subsystem = READ_STAGE_SUBSYSTEMS[stage];
+    if (!subsystem) continue;
+    builder.record({ subsystem, operation: stage, reads: 1, attemptedWrites: 0, committedWrites: 0, suppressionReason: null });
+  }
+  return builder.build();
+}
+
 /**
  * MAIN ORCHESTRATOR: Execute complete retrieval + summarization pipeline
  */
@@ -822,6 +855,10 @@ export async function executeUnifiedRetrieval(
   request: RetrievalRequest,
   config: RetrievalConfig = DEFAULT_CONFIG
 ): Promise<RetrievalResult> {
+  if (request.executionMode === 'MUTATING') {
+    throw new Error('UNIFIED_RETRIEVAL_HAS_NO_MUTATING_MODE');
+  }
+  const executionMode: QueryExecutionModeV1 = request.executionMode ?? 'READ_ONLY';
   const totalStart = Date.now();
   const stages: string[] = [];
   let fallbackUsed = false;
@@ -982,6 +1019,7 @@ export async function executeUnifiedRetrieval(
 
     return {
       candidates: enhancedRanked,
+      read_only_receipt: buildRetrievalReadReceipt(stages, executionMode),
       lanes: { semantic: semanticLane, lexical: lexicalLane },
       evidence_status: enhancedRanked.length === 0 ? 'NO_EVIDENCE' : 'OK',
       timing: {

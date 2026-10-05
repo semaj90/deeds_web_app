@@ -91,3 +91,24 @@ describe('unified orchestrator lane degradation (KERNEL-REAL-02B)', () => {
     await expect(executeUnifiedRetrieval({ query: 'find a' }, config)).rejects.toThrow();
   });
 });
+
+describe('unified orchestrator execution mode (KERNEL-REAL-02B, E)', () => {
+  it('READ_ONLY: receipt records reads only, every Postgres statement is a SELECT, no Qdrant write endpoint is called', async () => {
+    const r = await executeUnifiedRetrieval({ query: 'find a', executionMode: 'READ_ONLY' }, config);
+    expect(r.read_only_receipt).toMatchObject({ executionMode: 'READ_ONLY', attemptedWrites: 0, committedWrites: 0 });
+    expect(r.read_only_receipt!.entries.map((e) => e.operation)).toEqual(
+      expect.arrayContaining(['embedding', 'qdrant_search', 'rg_pool_lexical', 'postgres_join']),
+    );
+    for (const [sql] of mocks.pgQuery.mock.calls) expect(String(sql).trim().toUpperCase()).toMatch(/^SELECT/);
+    for (const [url] of mocks.fetch.mock.calls) {
+      expect(String(url)).not.toMatch(/upsert|\/points(\?|$)|\/payload|\/delete|\/snapshots/);
+    }
+  });
+
+  it('defaults to READ_ONLY and rejects MUTATING (retrieval has no mutating mode)', async () => {
+    const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
+    expect(r.read_only_receipt?.executionMode).toBe('READ_ONLY');
+    await expect(executeUnifiedRetrieval({ query: 'find a', executionMode: 'MUTATING' }, config))
+      .rejects.toThrow('UNIFIED_RETRIEVAL_HAS_NO_MUTATING_MODE');
+  });
+});
