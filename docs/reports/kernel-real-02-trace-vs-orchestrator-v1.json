@@ -1,0 +1,119 @@
+{
+  "schema": "atlas.kernel-real-02-trace-vs-orchestrator.v1",
+  "generatedAt": "2026-10-05T19:28:29.354Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "note": "TRACE side recorded by hand from three atlas_query calls (limit 8); relevance parity not scored (orchestrator report stores no paths).",
+  "trace": {
+    "fieldsReturned": [
+      "id",
+      "score",
+      "path",
+      "content",
+      "lenses",
+      "tags(optional)"
+    ],
+    "perQuestion": {
+      "code-owner": {
+        "hits": 8,
+        "distinctPaths": 7,
+        "idTypes": [
+          "uuid",
+          "int"
+        ],
+        "duplicatedProjectionHits": 2,
+        "identityFieldsPresent": 0
+      },
+      "legal": {
+        "hits": 8,
+        "distinctPaths": 5,
+        "idTypes": [
+          "uuid",
+          "int"
+        ],
+        "duplicatedProjectionHits": 3,
+        "identityFieldsPresent": 0
+      },
+      "embedding": {
+        "hits": 8,
+        "distinctPaths": 5,
+        "idTypes": [
+          "uuid",
+          "int"
+        ],
+        "duplicatedProjectionHits": 3,
+        "identityFieldsPresent": 0
+      }
+    }
+  },
+  "orchestrator": {
+    "distinctSets": "3/3",
+    "revisionQualified": "0/24",
+    "perQuestion": [
+      {
+        "id": "code-owner",
+        "counts": {
+          "candidateId": 8,
+          "packetKey": 0,
+          "sourceRef": 8,
+          "sourceRevision": 0,
+          "workspaceRevision": 0,
+          "identityComplete": 0
+        },
+        "degradedLanes": []
+      },
+      {
+        "id": "legal",
+        "counts": {
+          "candidateId": 8,
+          "packetKey": 8,
+          "sourceRef": 8,
+          "sourceRevision": 0,
+          "workspaceRevision": 0,
+          "identityComplete": 0
+        },
+        "degradedLanes": []
+      },
+      {
+        "id": "embedding",
+        "counts": {
+          "candidateId": 8,
+          "packetKey": 1,
+          "sourceRef": 8,
+          "sourceRevision": 0,
+          "workspaceRevision": 0,
+          "identityComplete": 0
+        },
+        "degradedLanes": []
+      }
+    ]
+  },
+  "matrix": {
+    "query-specific": {
+      "trace": "yes",
+      "orchestrator": "yes (3/3 distinct)"
+    },
+    "identity-bound": {
+      "trace": "no (no packetKey/sourceRef/candidateId fields; mixed int/uuid ids)",
+      "orchestrator": "partial (candidateId 24/24, packetKey 9/24)"
+    },
+    "revision-qualified": {
+      "trace": "no",
+      "orchestrator": "no (0/24; source data has none)"
+    },
+    "evidence-linked": {
+      "trace": "no",
+      "orchestrator": "no (evidenceRefs not emitted)"
+    },
+    "proof-usable": {
+      "trace": "no",
+      "orchestrator": "no"
+    },
+    "read-only": {
+      "trace": "yes (search tool)",
+      "orchestrator": "yes by design and tests; no independent before/after readback yet"
+    }
+  },
+  "verdict": "ORCHESTRATOR_STRICTLY_BETTER_ON_IDENTITY_NOT_YET_PROOF_USABLE",
+  "rewireDecision": "HOLD_atlas_query_REWIRE_UNTIL_REVISIONS_EXIST_AND_READBACK_DONE"
+}
