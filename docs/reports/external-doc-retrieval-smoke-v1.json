@@ -1,0 +1,118 @@
+{
+  "schema": "atlas.external-doc-retrieval-smoke.v1",
+  "generatedAt": "2026-10-05T19:09:17.418Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "cacheTouched": false,
+  "cases": [
+    {
+      "cls": "exact",
+      "query": "type Props =",
+      "expectChunk": "doc:bits-ui:933224c7e6a17940:14",
+      "lanes": {
+        "lexical": {
+          "status": "OK",
+          "returned": 10,
+          "expectedRank": 1,
+          "distinctPages": 5,
+          "top": [
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:14",
+              "url": "https://bits-ui.com/docs/components/dialog"
+            },
+            {
+              "chunk_id": "doc:sveltekit:62e6dd9932a74b58:9",
+              "url": "https://svelte.dev/docs/kit/load"
+            },
+            {
+              "chunk_id": "doc:sveltekit:e650ae13a0841739:19",
+              "url": "https://svelte.dev/docs/kit/form-actions"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "cls": "near-exact",
+      "query": "Reusable Components Building a Reusable Dialog",
+      "expectChunk": "doc:bits-ui:933224c7e6a17940:14",
+      "lanes": {
+        "lexical": {
+          "status": "OK",
+          "returned": 2,
+          "expectedRank": 2,
+          "distinctPages": 1,
+          "top": [
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:13",
+              "url": "https://bits-ui.com/docs/components/dialog"
+            },
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:14",
+              "url": "https://bits-ui.com/docs/components/dialog"
+            }
+          ]
+        },
+        "dense": {
+          "status": "OK",
+          "returned": 10,
+          "expectedRank": 2,
+          "distinctPages": 1,
+          "top": [
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:13",
+              "url": "https://bits-ui.com/docs/components/dialog",
+              "cos": 0.5860688572792879
+            },
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:14",
+              "url": "https://bits-ui.com/docs/components/dialog",
+              "cos": 0.5456364588846386
+            },
+            {
+              "chunk_id": "doc:bits-ui:933224c7e6a17940:56",
+              "url": "https://bits-ui.com/docs/components/dialog",
+              "cos": 0.5293130944521991
+            }
+          ]
+        }
+      }
+    },
+    {
+      "cls": "breadth",
+      "query": "how do I define typed procedures and call them from a client",
+      "expectChunk": null,
+      "lanes": {
+        "dense": {
+          "status": "OK",
+          "returned": 10,
+          "expectedRank": null,
+          "distinctPages": 8,
+          "top": [
+            {
+              "chunk_id": "doc:svelte5-runes:9d3a717d27cb2c0d:20",
+              "url": "https://svelte.dev/docs/svelte/$state",
+              "cos": 0.3238393295290136
+            },
+            {
+              "chunk_id": "doc:svelte5-runes:05fda9b18acd27b3:17",
+              "url": "https://svelte.dev/docs/svelte/$props",
+              "cos": 0.31763611611459774
+            },
+            {
+              "chunk_id": "doc:svelte5-runes:a9f84a9bc441daa2:11",
+              "url": "https://svelte.dev/docs/svelte/$derived",
+              "cos": 0.31624884024304123
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "error": null,
+  "corpus": {
+    "n": 852,
+    "embedded": 852,
+    "qdrant": 0
+  }
+}
