@@ -16,7 +16,8 @@ const SOURCES = ['oaklib', 'ast-grep', 'ts-morph', 'trpc'];
 const EXCLUDED = ['trpc-firecrawl-r1', 'trpc-beautifulsoup-r2'];
 const sha = (t: string) => createHash('sha256').update(t, 'utf8').digest('hex');
 const jsonl = (f: string) => fs.readFileSync(f, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
-const envelopes: any[] = JSON.parse(fs.readFileSync(path.join(ROOT, 'docs/.okf/dev/tooling-docs.admission-envelopes-v1.json'), 'utf8'));
+// ENVELOPES_PATH / REPORT_PATH overrides exist so negative fixtures can run this exact gate on mutated copies without touching the committed report.
+const envelopes: any[] = JSON.parse(fs.readFileSync(process.env.ENVELOPES_PATH ?? path.join(ROOT, 'docs/.okf/dev/tooling-docs.admission-envelopes-v1.json'), 'utf8'));
 const checks: { name: string; pass: boolean; detail: string }[] = [];
 const check = (name: string, pass: boolean, detail = '') => checks.push({ name, pass, detail });
 
@@ -63,7 +64,7 @@ const pass = checks.every((c) => c.pass);
 const report = { schema: 'atlas.semantic-doc-02-tooling-doc-envelope-gate.v1', generatedAt: new Date().toISOString(), result: pass ? 'SEMANTIC_DOC_02_PASS' : 'SEMANTIC_DOC_02_FAIL',
   pages: envelopes.length, chunks: total, canonicalAuthority: false, writes: { postgres: 0, qdrant: 0, valkey: 0, neo4j: 0 }, embeddingPerformed: false, authorizationPhraseUsed: false,
   next: 'operator review -> explicit authorization -> tiny canonical admission canary -> readback -> semantic_768 population (separate gates)', checks };
-fs.writeFileSync(path.join(ROOT, 'docs/reports/semantic-doc-02-tooling-doc-envelope-gate-v1.json'), JSON.stringify(report, null, 2) + '\n');
+fs.writeFileSync(process.env.REPORT_PATH ?? path.join(ROOT, 'docs/reports/semantic-doc-02-tooling-doc-envelope-gate-v1.json'), JSON.stringify(report, null, 2) + '\n');
 for (const c of checks) console.log(`${c.pass ? 'PASS' : 'FAIL'}  ${c.name}${c.detail ? `  [${c.detail}]` : ''}`);
 console.log(report.result, `pages=${envelopes.length} chunks=${total}`);
 process.exitCode = pass ? 0 : 1;
