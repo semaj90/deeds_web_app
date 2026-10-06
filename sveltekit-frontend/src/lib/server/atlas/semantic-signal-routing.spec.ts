@@ -7,7 +7,55 @@ import {
   buildRetrievalPlanFromAnalysis,
   buildSemanticSignalPacket,
   buildTraversalBudgetFromAnalysis,
+  selectPreAgentStages,
+  buildRetrievalParameterPlan,
 } from './semantic-signal-routing.js';
+
+describe('buildRetrievalParameterPlan (PARAM-PLAN-01)', () => {
+  const base = { subjectId: 's', workspaceId: 'w', workspaceRevision: 'r', producer: 't', producerRevision: 'p' };
+  const build = (query: string) => {
+    const a = analyzeSemanticQuery({ ...base, query });
+    const plan = buildRetrievalPlanFromAnalysis(a);
+    return { a, plan, params: buildRetrievalParameterPlan(query, a, plan, selectPreAgentStages(a)) };
+  };
+
+  it('symbol query gets no semantic parameters; values come from the bounded plan', () => {
+    const { params } = build('Where is buildLearningOutcomeV1 defined');
+    expect(params.semantic).toBeUndefined();
+    expect(params.sources).toContain('STATIC_POLICY');
+    expect(params.policyRevision).toBe('static-policy-v1');
+    expect(params.queryChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(params.canonicalAuthority).toBe(false);
+  });
+
+  it('conceptual query carries semantic topK/candidateCap equal to the plan limits, and is deterministic', () => {
+    const { plan, params } = build('how does retrieval caching work');
+    expect(params.semantic).toEqual({ topK: plan.final_evidence_limit, candidateCap: plan.candidate_limits.dense });
+    expect(build('how does retrieval caching work').params.queryChecksum).toBe(params.queryChecksum);
+  });
+});
+
+describe('selectPreAgentStages (CTX-PREAGENT-01)', () => {
+  const base = { subjectId: 's', workspaceId: 'w', workspaceRevision: 'r', producer: 't', producerRevision: 'p' };
+
+  it('named symbol query skips the semantic route and always brackets with analysis/cache and packet/handoff', () => {
+    const a = analyzeSemanticQuery({ ...base, query: 'Where is buildLearningOutcomeV1 defined' });
+    const plan = selectPreAgentStages(a);
+    expect(plan.stages.slice(0, 2)).toEqual(['QUERY_ANALYSIS', 'CACHE_LOOKUP']);
+    expect(plan.stages.slice(-2)).toEqual(['ACE_PACKET_ASSEMBLY', 'AGENT_HANDOFF']);
+    expect(plan.stages).toContain('LEXICAL');
+    expect(plan.stages).toContain('AST');
+    expect(plan.stages).not.toContain('SEMANTIC_ROUTE');
+    expect(plan.canonicalAuthority).toBe(false);
+  });
+
+  it('a plain conceptual query adds the semantic route and has no duplicate stages', () => {
+    const a = analyzeSemanticQuery({ ...base, query: 'how does retrieval caching work' });
+    const plan = selectPreAgentStages(a);
+    expect(plan.stages).toContain('SEMANTIC_ROUTE');
+    expect(new Set(plan.stages).size).toBe(plan.stages.length);
+  });
+});
 
 describe('semantic signal routing', () => {
   it('produces bounded query analysis and lane plans', () => {
@@ -101,7 +149,6 @@ describe('semantic signal routing', () => {
       workspaceRevision: 'rev-3',
       producer: 'test',
       producerRevision: 'rev-model-1',
-      activeGoal: 'retain decisions',
       currentPlanStep: 'validate',
       problem: 'Need a rollback-safe continuity policy',
       proposedAction: 'Persist checkpoints before compaction',

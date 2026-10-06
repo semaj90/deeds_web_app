@@ -51,9 +51,17 @@ Before calling any write tool (`ops.update_LLMS.md`, `ops.propose_patch`, `ops.r
 Never output:
 - `Thinking:` / `Thinking Process:` / `Plan:` / `Execution Plan:` / `Next Step:`
 - Task-completion announcements: "Task complete", "I have updated X", "I will now..."
-- TODO lists or numbered phase trackers unless the user explicitly requests them
+- TODO lists or numbered phase trackers written as chat text (use the `todowrite` tool instead, see Plan / Build workflow)
 
 For simple inputs, respond immediately and directly.
+
+## Plan / Build workflow
+
+- Work with 3 or more steps: call `todowrite` FIRST (one item per step, one `in_progress` at a time) before reading or editing anything else.
+- `plan` agent: read-only. Inspect with `rg`/`read`, record the steps with `todowrite`, write the plan to `.opencode/plans/<topic>.md`, then stop. Do not edit source.
+- `build` agent: read the plan and todo list, then implement ONE item at a time. Mark it `completed` only after a tool result proves it (test, build, or diff). Run the narrowest validation after each item.
+- Never mark an item completed from intent alone. If a step fails, keep it `in_progress` and report the failing output.
+- Keep todo items short (one line). Do not paste the list into chat; the tool shows it.
 
 ## Search discipline
 

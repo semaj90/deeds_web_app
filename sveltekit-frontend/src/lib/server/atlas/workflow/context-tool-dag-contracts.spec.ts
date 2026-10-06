@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildContextToolDagFromPreAgentStages,
+  executeContextToolDagV1,
   fromCanonicalWorkflowActionEvent,
   toCanonicalWorkflowActionEvent,
   validateContextToolDag,
   workflowActionFromDagNode,
 } from './context-tool-dag-contracts.js';
+import type { ContextToolDagV1 } from './context-tool-dag-contracts.js';
 
-function baseDag() {
+function baseDag(): ContextToolDagV1 {
   return {
     schema: 'atlas.context-tool-dag.v1' as const,
     workflowId: 'wf-1',
@@ -133,8 +136,109 @@ describe('context tool DAG contracts -- canonical workflow-action adapter (WORKF
       kind: 'scheduled', lane: 'tool', producerRevision: 'test',
     });
     const canonical = { ...toCanonicalWorkflowActionEvent(local), kind: 'suspended' as const };
-    expect(() => fromCanonicalWorkflowActionEvent(canonical)).toThrow(
+    // 'suspended' is deliberately outside the local DAG shape's kind union (that is what this test proves), so cast.
+    expect(() => fromCanonicalWorkflowActionEvent(canonical as unknown as Parameters<typeof fromCanonicalWorkflowActionEvent>[0])).toThrow(
       /WORKFLOW_ACTION_EVENT_KIND_NOT_REPRESENTABLE_IN_DAG_SHAPE/,
     );
+  });
+});
+
+describe('buildContextToolDagFromPreAgentStages + executeContextToolDagV1 (CONTEXT-DAG-01)', () => {
+  const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
+  const dag = () => buildContextToolDagFromPreAgentStages({
+    ...meta, stages: ['QUERY_ANALYSIS', 'CACHE_LOOKUP', 'LEXICAL', 'SEMANTIC_ROUTE', 'AST', 'ACE_PACKET_ASSEMBLY', 'AGENT_HANDOFF'],
+  });
+  const ok = (v: unknown) => async () => v;
+
+  it('maps stages to a valid read-only DAG with parallel lookups joined by exact promotion', () => {
+    const d = dag();
+    const byId = new Map(d.nodes.map((n) => [n.nodeId, n]));
+    expect(d.canonicalWritesAllowed).toBe(false);
+    expect(d.nodes.every((n) => n.readOnly)).toBe(true);
+    expect(byId.get('LEXICAL')?.dependsOn).toEqual(['QUERY_ANALYSIS', 'CACHE_LOOKUP']);
+    expect(byId.get('AST')?.dependsOn).toEqual(['QUERY_ANALYSIS', 'CACHE_LOOKUP']);
+    expect(byId.get('EXACT_PROMOTION')?.dependsOn).toEqual(['LEXICAL', 'SEMANTIC_ROUTE', 'AST']);
+    expect(byId.get('ACE_PACKET_ASSEMBLY')?.dependsOn).toEqual(['EXACT_PROMOTION']);
+    expect(byId.has('AGENT_HANDOFF')).toBe(false);
+  });
+
+  it('graph expansion is a fanout node and unknown stages are rejected', () => {
+    const d = buildContextToolDagFromPreAgentStages({ ...meta, stages: ['QUERY_ANALYSIS', 'GRAPH_EXPANSION', 'ACE_PACKET_ASSEMBLY'] });
+    expect(d.nodes.find((n) => n.nodeId === 'GRAPH_EXPANSION')?.kind).toBe('CONTEXT_FANOUT');
+    expect(() => buildContextToolDagFromPreAgentStages({ ...meta, stages: ['QUERY_ANALYSIS', 'BOGUS'] })).toThrow(/unknown pre-agent stage/);
+  });
+
+  it('executor runs independent lookups concurrently and passes dependency outputs', async () => {
+    let active = 0; let peak = 0;
+    const slow = (v: string) => async () => { active += 1; peak = Math.max(peak, active); await new Promise((r) => setTimeout(r, 30)); active -= 1; return v; };
+    const receipt = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: ok('qa'), CACHE_LOOKUP: ok('miss'), LEXICAL: slow('lex'), SEMANTIC_ROUTE: slow('sem'), AST: ok('ast'),
+      EXACT_PROMOTION: async ({ inputs }) => Object.values(inputs).join('+'),
+      ACE_PACKET_ASSEMBLY: async ({ inputs }) => `packet(${String(inputs.EXACT_PROMOTION)})`,
+    });
+    expect(receipt.ok).toBe(true);
+    expect(peak).toBe(2);
+    expect(receipt.levels[2]).toEqual(['AST', 'LEXICAL', 'SEMANTIC_ROUTE']);
+    expect(receipt.outputs.ACE_PACKET_ASSEMBLY).toBe('packet(lex+sem+ast)');
+    expect(receipt.writesPerformed).toBe(false);
+  });
+
+  it('a failed lookup degrades the join onto the surviving lookups', async () => {
+    const receipt = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: ok('qa'), CACHE_LOOKUP: ok('miss'), LEXICAL: async () => { throw new Error('boom'); }, SEMANTIC_ROUTE: ok('sem'), AST: ok('ast'),
+      EXACT_PROMOTION: ok('x'), ACE_PACKET_ASSEMBLY: ok('p'),
+    });
+    const st = Object.fromEntries(receipt.nodes.map((n) => [n.nodeId, n.status]));
+    expect(st.LEXICAL).toBe('FAILED');
+    expect(st.SEMANTIC_ROUTE).toBe('OK');
+    expect(st.AST).toBe('OK');
+    expect(st.EXACT_PROMOTION).toBe('OK');
+    expect(st.ACE_PACKET_ASSEMBLY).toBe('OK');
+    expect(receipt.nodes.find((n) => n.nodeId === 'EXACT_PROMOTION')?.degradedDependencies).toEqual(['LEXICAL']);
+    expect(receipt.ok).toBe(false);
+    expect(receipt.degraded).toBe(true);
+  });
+
+  it('times out slow nodes, reports missing handlers, and refuses non-read-only DAGs', async () => {
+    const slowDag = await executeContextToolDagV1(dag(), { QUERY_ANALYSIS: () => new Promise(() => {}) }, { nodeTimeoutMs: 20 });
+    expect(slowDag.nodes.find((n) => n.nodeId === 'QUERY_ANALYSIS')?.status).toBe('FAILED');
+    const none = await executeContextToolDagV1(dag(), {});
+    expect(none.nodes.find((n) => n.nodeId === 'QUERY_ANALYSIS')?.status).toBe('NO_HANDLER');
+    await expect(executeContextToolDagV1({ ...dag(), canonicalWritesAllowed: true }, {})).rejects.toThrow(/read-only/);
+  });
+});
+
+describe('executeContextToolDagV1 degradation (lexical-only / ast-less)', () => {
+  const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
+  const dag = () => buildContextToolDagFromPreAgentStages({ ...meta, stages: ['QUERY_ANALYSIS', 'LEXICAL', 'AST', 'ACE_PACKET_ASSEMBLY'] });
+
+  it('AST failing still yields a lexical-only packet', async () => {
+    const r = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: async () => 'qa', LEXICAL: async () => 'lex', AST: async () => { throw new Error('napi missing'); },
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs), ACE_PACKET_ASSEMBLY: async () => 'packet',
+    });
+    expect(r.degraded).toBe(true);
+    expect(r.outputs.EXACT_PROMOTION).toEqual(['LEXICAL']);
+    expect(r.nodes.find((n) => n.nodeId === 'EXACT_PROMOTION')?.degradedDependencies).toEqual(['AST']);
+  });
+
+  it('LEXICAL failing still yields an AST-only packet (vice versa)', async () => {
+    const r = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: async () => 'qa', LEXICAL: async () => { throw new Error('db down'); }, AST: async () => 'ast',
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs), ACE_PACKET_ASSEMBLY: async () => 'packet',
+    });
+    expect(r.degraded).toBe(true);
+    expect(r.outputs.EXACT_PROMOTION).toEqual(['AST']);
+  });
+
+  it('with no surviving lookup the join and packet are BLOCKED and the result is not degraded', async () => {
+    const boom = async () => { throw new Error('down'); };
+    const r = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: async () => 'qa', LEXICAL: boom, AST: boom, EXACT_PROMOTION: async () => 'x', ACE_PACKET_ASSEMBLY: async () => 'packet',
+    });
+    const st = Object.fromEntries(r.nodes.map((n) => [n.nodeId, n.status]));
+    expect([st.LEXICAL, st.AST, st.EXACT_PROMOTION, st.ACE_PACKET_ASSEMBLY]).toEqual(['FAILED', 'FAILED', 'BLOCKED', 'BLOCKED']);
+    expect(r.ok).toBe(false);
+    expect(r.degraded).toBe(false);
   });
 });

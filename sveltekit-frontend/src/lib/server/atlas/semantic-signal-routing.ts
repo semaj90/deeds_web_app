@@ -1,10 +1,10 @@
+import { createHash } from 'node:crypto';
 import {
   AtlasRecommendationV1Schema,
   ContinuityCheckpointV1Schema,
   LoopObservationV1Schema,
   QueryAnalysisV1Schema,
   RetrievalPlanV1Schema,
-  RetrievalLaneSchema,
   SemanticSignalEvidenceRefSchema,
   SemanticSignalProofManifestV1Schema,
   TraversalBudgetV1Schema,
@@ -356,6 +356,99 @@ export function buildRetrievalPlanFromAnalysis(
     provenance_required: true,
     created_at: nowIso(),
   });
+}
+
+// CTX-PREAGENT-01 first slice: which server-side stages run BEFORE the model's first step. Pure and deterministic; no I/O, no model call.
+// Only stages with an existing owner are listed; OKF/CENTROID/BITFROST_PREWARM are deferred until their callers are wired.
+export type PreAgentStageV1 =
+  | 'QUERY_ANALYSIS'
+  | 'CACHE_LOOKUP'
+  | 'LEXICAL'
+  | 'AST'
+  | 'MEMORY_PRIOR'
+  | 'SEMANTIC_ROUTE'
+  | 'GRAPH_EXPANSION'
+  | 'ACE_PACKET_ASSEMBLY'
+  | 'AGENT_HANDOFF';
+
+export interface PreAgentStagePlanV1 {
+  stages: PreAgentStageV1[];
+  reasons: Record<string, string>;
+  canonicalAuthority: false;
+}
+
+export function selectPreAgentStages(analysis: QueryAnalysisV1): PreAgentStagePlanV1 {
+  const lanes = new Set(analysis.recommended_lanes);
+  const reasons: Record<string, string> = {};
+  const stages: PreAgentStageV1[] = ['QUERY_ANALYSIS', 'CACHE_LOOKUP'];
+  const symbolQuery =
+    (analysis.retrieval_scope === 'single_symbol' || analysis.retrieval_scope === 'file') && analysis.symbol_hints.length > 0;
+
+  stages.push('LEXICAL');
+  reasons.LEXICAL = symbolQuery ? 'symbol/file entity named in query' : 'cheapest exact path first';
+  if (symbolQuery || lanes.has('symbol')) {
+    stages.push('AST');
+    reasons.AST = 'symbol lane selected';
+  }
+  if (analysis.uncertainty >= 0.5) {
+    stages.push('MEMORY_PRIOR');
+    reasons.MEMORY_PRIOR = `uncertainty ${analysis.uncertainty} >= 0.5`;
+  }
+  if (!symbolQuery) {
+    stages.push('SEMANTIC_ROUTE');
+    reasons.SEMANTIC_ROUTE = 'no named symbol/file; dense lane needed';
+  }
+  if (lanes.has('graph') && analysis.requested_traversal_depth >= 2) {
+    stages.push('GRAPH_EXPANSION');
+    reasons.GRAPH_EXPANSION = `graph lane and depth ${analysis.requested_traversal_depth}`;
+  }
+  stages.push('ACE_PACKET_ASSEMBLY', 'AGENT_HANDOFF');
+  return { stages, reasons, canonicalAuthority: false };
+}
+
+// PARAM-PLAN-01: every executor parameter is explainable (value, source, policyRevision) instead of ad hoc. Derived from the
+// existing bounded RetrievalPlanV1; no new numbers are invented here. EVAL_TUNED/CACHE_PROFILE sources are reserved for later.
+export type RetrievalParameterSourceV1 = 'STATIC_POLICY' | 'INTENT_CLASSIFIER' | 'DOMAIN_POLICY' | 'CACHE_PROFILE' | 'EVAL_TUNED';
+
+export interface RetrievalParameterPlanV1 {
+  schema: 'atlas.retrieval-parameter-plan.v1';
+  queryChecksum: string;
+  intentClass: string;
+  semantic?: { topK: number; candidateCap: number };
+  graph?: { maxDepth: number; maxNodes: number };
+  memory?: { maxObservations: number };
+  sources: RetrievalParameterSourceV1[];
+  policyRevision: string;
+  canonicalAuthority: false;
+}
+
+export const RETRIEVAL_PARAMETER_POLICY_REVISION = 'static-policy-v1';
+const MEMORY_MAX_OBSERVATIONS = 8;
+
+export function buildRetrievalParameterPlan(
+  query: string,
+  analysis: QueryAnalysisV1,
+  plan: RetrievalPlanV1,
+  stages: PreAgentStagePlanV1,
+): RetrievalParameterPlanV1 {
+  const out: RetrievalParameterPlanV1 = {
+    schema: 'atlas.retrieval-parameter-plan.v1',
+    queryChecksum: `sha256:${createHash('sha256').update(query.trim(), 'utf8').digest('hex')}`,
+    intentClass: analysis.intent_probabilities[0]?.intent ?? 'retrieval',
+    sources: ['STATIC_POLICY', 'INTENT_CLASSIFIER'],
+    policyRevision: RETRIEVAL_PARAMETER_POLICY_REVISION,
+    canonicalAuthority: false,
+  };
+  if (stages.stages.includes('SEMANTIC_ROUTE')) {
+    out.semantic = { topK: plan.final_evidence_limit, candidateCap: plan.candidate_limits.dense };
+  }
+  if (stages.stages.includes('GRAPH_EXPANSION')) {
+    out.graph = { maxDepth: plan.graph_limits.max_hops, maxNodes: plan.graph_limits.max_nodes };
+  }
+  if (stages.stages.includes('MEMORY_PRIOR')) {
+    out.memory = { maxObservations: MEMORY_MAX_OBSERVATIONS };
+  }
+  return out;
 }
 
 export function buildTraversalBudgetFromAnalysis(

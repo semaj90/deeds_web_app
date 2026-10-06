@@ -13969,3 +13969,682 @@ and [Docker Desktop release notes](https://docs.docker.com/desktop/release-notes
   provenance: [pgvector](https://github.com/pgvector/pgvector/blob/master/README.md),
   [Qdrant points](https://qdrant.tech/documentation/concepts/points/),
   [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md).
+
+### Graphify admission readback and startup guidance (2026-10-04)
+
+- [x] `GRAPHIFY-ADMISSION-READBACK-01`: inspected the exact read-only admission
+  report `docs/reports/atlas-canonical-projection-fabric-audit-2026-10-04.json`
+  and its Markdown companion. The verdict is `NOT_SAFE_TO_PROJECT`: 5/11
+  predicates PASS, 3/11 PARTIAL_PROVEN, and 3/11 NOT_PROVEN. PASS:
+  `IDENTITY_ALIGNED`, `REVISION_QUALIFIED`, `GRAPH_MANIFEST_SEALED`,
+  `ONTOLOGY_COHORT_NONEMPTY`, `ORDINAL_MAP_SEALED`. PARTIAL:
+  `SYMBOLS_RESOLVED` (18,881/20,750 source-extraction coverage; 704
+  unprocessed, 1,155 without exact Graphify source-revision rows, 10 parse
+  failures), `SEMANTIC_OWNER_PROVEN` (writer and row-level model/tokenizer/
+  representation/vector lineage unresolved), and `LATENT_FAMILY_PROVEN`
+  (candidate artifact lacks per-row training-input digest lineage and remains
+  unpromoted). NOT_PROVEN: `PROJECTIONS_CHECKSUM_ALIGNED`,
+  `BITFROST_KEYS_DERIVABLE`, and `ACE_EVIDENCE_GROUNDED`. The report binds the
+  admitted workspace revision to
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`.
+  The admission wrapper requires exactly `SAFE_TO_PROJECT`; it was not rerun.
+- [x] `GRAPHIFY-STARTUP-MSG-01`: service readiness output now explicitly says
+  canonical projection admission is separate and directs operators to inspect
+  admission before running `graphify:daily`. Added a source-level regression
+  test so a service-health success cannot imply projection admission.
+- [ ] `GRAPHIFY-PROJECTION-01`: keep projection blocked. Do not rerun
+  `graphify:daily` until a fresh admission report says `SAFE_TO_PROJECT` and
+  the separate apply authorization is satisfied. Graphify projection was not
+  run in this pass; no canonical graph state was changed. Independent Karpathy
+  Redis enrichment is not Graphify projection evidence.
+
+### LINEAGE-E2E-01 — single-packet derivation review (2026-10-05)
+
+**Status: PARTIAL_DIAGNOSTIC — keep the gate open.** Existing owners/contracts
+are present, but the current untracked proof script and report do not satisfy
+the end-to-end identity contract and are not promotion evidence.
+
+- Existing pieces confirmed: `qualifyEvidenceV1` resolves one real packet/chunk
+  as `CHUNK_REVISION_QUALIFIED`; `JsonlParsedEvidenceV1Schema`,
+  `PosTaggerOutputV1Schema`, `DomainClassificationV1Schema`, and
+  `FeatureMatrixSetupV1Schema` exist; the 8095 `/pos` call returned 218 token
+  assertions; and the read-only pgvector path returned the selected candidate
+  at rank 2. These are component observations, not a completed derivation DAG.
+- The current `docs/reports/lineage-e2e-01-derivation-slice-v1.json` reports
+  `E2E_01_SLICE_PARTIAL`, `canonicalAuthority=false`, and `proofUsable=false`.
+  Its script substitutes the legacy label `semantic_768@v1` for the absent
+  representation revision, directly constructs a JSONL-shaped object instead
+  of running an established JSONL parser/builder, and uses hard-coded parser,
+  producer, and feature revisions. Do not rerun or cite this artifact as proof
+  until those substitutions are removed.
+- The live `/classify` call was unavailable. The builder nevertheless produced
+  a `DomainClassificationV1` from its own request inputs; this does not prove
+  the classifier stage ran. The generated POS object uses a feature label and
+  token index 0 rather than preserving the returned token/span evidence, and
+  uses a builder-default confidence. Source span/tree-node binding is absent.
+- Routing was explicitly `NOT_EXERCISED`; retrieval was invoked separately and
+  returned a candidate with `representationRevision=null`; no
+  `ContextManifestCandidateV1` was assembled. The receipt's comparison treats
+  absent identity fields as acceptable and therefore overstates preservation.
+- Search found no exact `DerivedArtifactEdgeV1` owner. Reconcile existing
+  derivation/receipt contracts before proposing one; do not add a parallel
+  lineage schema in this gate.
+- No Postgres/Qdrant/Valkey/Neo4j writes were reported. Keep all future runs
+  read-only and proposal-only; use a database-enforced read-only transaction
+  for the live database portion.
+
+Next gates, in order:
+
+- [ ] LINEAGE-E2E-01A Select one of the currently qualified packets from the
+  authoritative live cohort and freeze its exact packet/chunk/source/workspace
+  identity and evidence refs. Do not infer representation revision.
+- [ ] LINEAGE-E2E-01B Run the existing JSONL evidence owner and POS/classifier
+  owners on the same frozen input; preserve exact token/span evidence and the
+  real producer/parser/extractor/tagger/classifier revisions. Missing
+  `representationRevision` remains null and yields
+  `REPRESENTATION_REVISION_UNQUALIFIED`.
+- [ ] LINEAGE-E2E-01C Build feature setup and execute the existing routing owner
+  from those actual stage outputs; compare required identity fields strictly
+  at every boundary. Missing fields are `MISSING_LINEAGE`, not a successful
+  comparison.
+- [ ] LINEAGE-E2E-01D Run read-only pgvector retrieval/readback against the
+  frozen query and candidate; preserve candidate identity and evidence refs.
+- [ ] LINEAGE-E2E-01E Assemble a ContextManifest candidate only, then emit a
+  checksummed stage receipt. Require exact identity equality, explicit
+  `representationRevision` qualification status, and zero committed writes.
+
+The prior workstation TODO checkbox for semantic retrieval/ContextManifest
+replay describes a separate earlier canary; it does not close this derivation
+gate. No E2E-02+ work, representation backfill, cache write, or apply is
+authorized by this diagnostic.
+
+### MCP / OpenCode / agent-context alignment — verification and next steps (2026-10-05)
+
+Read-only verification pass (no datastore writes; one TRACE source fix, OpenCode config alignment, one new checker).
+Status vocabulary: VERIFIED = observed in this pass; NOT_VERIFIED = not exercised end to end. Nothing here is
+production-promoted.
+
+| Surface | Result |
+|---|---|
+| `atlas-tools` MCP (repo-root `opencode.json`) | VERIFIED: handshake OK, 10 tools (~1.4k tokens). `classify_intent` returns intent/subdomain/safe command. Graph tools answer for older files (`ace-packet-writer.ts`: 1 dependency) but return `PROJECTION_MISSING_FILE` for new/touched files and `NO_OUTGOING_EDGES` for `unified-orchestrator.ts`, so the graph projection is stale or incomplete. `record_outcome` WRITES (NDJSON + Neo4j). |
+| TRACE MCP `:8788` | VERIFIED root cause of OpenCode "Failed to get tools": `atlas.packet_dense_search` advertised a top-level `anyOf`; the MCP SDK `ListToolsResultSchema` rejects the whole response (187 tools validate without it, 188 fail with it). 188 tools are ~33k tokens (half the 65,536 window); none carry `readOnlyHint`. |
+| claude-mem in OpenCode | PARTIAL: plugin + MCP installed globally (`~/.config/opencode`), plugin loads in this repo. A `bun --daemon` worker (pid 33196) was auto-started by the plugin load at 16:07 (not by an explicit start); provider `claude` via the Claude Code OAuth token; `lastInteraction: null`. NOT_VERIFIED: capture from an OpenCode session (all 10 stored sessions are `claude`; newest observation 2026-06-09). |
+| query -> tool trigger | PARTIAL: `runtime-mcp-tool-selector.mjs` runs (embed OK) but every score is `n/a` (0 `tool_manifest` points in `codebase_chunks_768`); for "fetch bitfrost kv cache" it picked wiki/karpathy tools, not `context.build_kv_packet`. |
+| OpenCode plan/build | VERIFIED root causes of "no to-do list": `.opencode/system.md` banned plans/TODO lists; default agent `ornith-atlas-kernel` had `todowrite: false`. Fixed; `npm run opencode:align:check` passes 15/15. NOT_VERIFIED: live model behavior. |
+
+Pipeline file anchors from a code-only `rg` census (counts = code files mentioning the capability; a name search is not
+proof of wiring, and no end-to-end replay across these hops exists yet). Paths are under `sveltekit-frontend/src/lib/server/`
+unless prefixed with `scripts/` or `packages/`:
+- LUT / ROM-bank / LOD / ordinals (95 files): `atlas/packet-lod-manifest.ts`, `atlas/lod-emission-integration.ts`,
+  `atlas/topology/topology-tile-v1.ts`, `atlas/retrieval/semantic-candidate-snapshot-v1.ts`,
+  `atlas/retrieval/search-runtime-selected-candidate-set-v1.ts`, `scripts/atlas/materialize-cei24-candidate-*-v1.mts`.
+- RPC packet assembler (52): `routes/api/hyperrag/packet-rpc/+server.ts` (under `src/`), `retrieval/hyperrag-packet-rpc.ts`,
+  `ace/ace-packet-writer.ts`, `hyperrag/replay-trace.ts`.
+- Materializers: `scripts/atlas/packet-materializer-lib.mjs` and 16+ `scripts/atlas/materialize-*` scripts.
+- Indexed retrieval (26): `retrieval/unified-orchestrator.ts`, `retrieval/semantic-search-workflow.ts`, `retrieval/packet-dense-search.ts`,
+  `retrieval/packet-dense-rerank.ts`, `retrieval/go-retrieval-facade.ts`.
+- BitFrost token/KV cache (187): `features/ai/ai/kv-context-controller.ts`, `features/ai/ace/context-assembler.ts`, `agent/context-loader.ts`,
+  `ace/context-compiler.parent-atlas.ts`, `ai/openai-facade.ts`, `retrieval/hyperrag-fusion-service.ts`.
+- DAG (36): `atlas/workflow/context-tool-dag-contracts.ts`, `features/ai/ace/kag-dag-runner.ts`, `atlas/retrieval/route-head-dag-builder-v1.ts`,
+  `atlas/kernel/atlas-kernel-session.ts`, `scripts/atlas/representation-derivation-dag-v1.mts`.
+- pgvector + embeddinggemma dense search (93): `retrieval/retrieve-candidates.ts`, `retrieval/embedding-service.ts`, `retrieval/search-lanes.ts`,
+  `config/vector-config.ts`, `packages/semantic-contracts/src/vector-manifest.ts`. The ownership registry still lists the `semantic_768` producer as UNKNOWN.
+
+Done this pass:
+- [x] MCP-TRACE-SCHEMA-01 Advertise a flat `type: object` schema for `atlas.packet_dense_search` (`atlasPacketDenseSearchAdvertisedSchema`);
+  the handler re-validates with the original strict union. Regression tests in `src/mcp/read-tool-bounds.spec.ts` (33 pass).
+  The running TRACE process must be restarted for this to take effect (not restarted here).
+- [x] OPENCODE-ALIGN-01 `system.md` plan/build workflow, `todowrite` for the default agent, `trace*`/`claude-mem*` tool schemas off by default
+  (re-enabled per agent that needs TRACE), `atlas-tools_record_outcome` and `claude-mem*` denied globally, `atlas-tools*` read tools allowed for
+  the three project agents; checker `scripts/opencode/verify-opencode-alignment.mjs` (`npm run opencode:align:check`).
+
+Next steps (ordered; human-owned items marked H):
+- [ ] MCP-TRACE-RESTART-01 (H) Restart TRACE `:8788`; confirm `opencode mcp list` shows `trace` connected.
+- [ ] MCP-TRACE-CONFORMANCE-01 Add a check that fetches live `tools/list` and validates it with the SDK `ListToolsResultSchema`
+  (guards all 188 tools; today only the one schema has a unit test). Add `readOnlyHint` annotations.
+- [ ] MCP-NAMING-01 Verify OpenCode's MCP tool-id naming from a live tool list before trusting the `atlas-tools_*` / `claude-mem_*` permission patterns.
+- [ ] MCP-TRACE-SCOPE-01 Decide a curated per-agent TRACE subset (188 tools ~ 33k tokens); reuse `selectMcpToolSubset`, not a second selector.
+- [ ] ATLAS-TOOLS-GRAPH-FRESHNESS-01 (H to run) Refresh the graph projection and re-test `find_dependencies` / `find_source_refs` on new files;
+  investigate why `unified-orchestrator.ts` has no outgoing IMPORTS edges.
+- [ ] ATLAS-TOOLS-RECORD-OUTCOME-01 Decide: route `record_outcome` through `LearningOutcomeV1` or retire it (it stays denied meanwhile).
+- [ ] TOOL-SELECT-01 (needs Qdrant write approval) Populate `tool_manifest` points (`packet_kind='tool_manifest'`, ~44 candidates: 12 helper-registry + ~32 ACP)
+  with `mutation_class READ|WRITE|LAUNCH`, `owner_ref`, `registry_revision`; add missing surfaces (Valkey centroid fetch, BitFrost token-cache read,
+  ACE JSON packet fetch, DAG synthesis). Embed with the same unprefixed `embedText` recipe the selector queries with.
+- [ ] TOOL-SELECT-02 Filter the selector by `mutation_class` so it never proposes ACP `fix:apply`; reconcile with the governed repair executor.
+- [ ] TOOL-VITERBI-01 Keep Viterbi `CHALLENGER_ONLY`; feed memory-derived transition priors labeled `OBSERVATION_ONLY`.
+- [ ] OPENCODE-TRIGGER-01 Define and replay ONE path: user query -> `classify_intent` -> selector -> plan/build agent (no single owner wires this today).
+- [ ] MEM-CLAUDE-WORKER-01 (H) Decide whether the auto-started claude-mem worker (Claude Code OAuth token, `--daemon`) stays; document its lifecycle.
+- [ ] MEM-CLAUDE-CAPTURE-01 After a human-run OpenCode session, verify an observation lands with `platform_source` opencode.
+- [ ] MEM-CLAUDE-ALLOWLIST-01 Re-enable the 7 read-only claude-mem tools per agent once naming is verified; keep write/launch tools denied.
+- [ ] MEM-CLAUDE-ADAPTER-01 Read-only `ClaudeMemObservationV1` adapter (structured `files_read` / `files_modified` only) -> identity resolver -> ACE recency signal;
+  observation text is never evidence; `taskId` / `workflowRunId` are absent and must stay null.
+- [ ] MEM-EVAL-01 A/B `token_saved_per_correct_context` (Atlas retrieval vs Atlas + session hints).
+- [ ] PIPE-E2E-01 One read-only replay across LUT/LOD -> RPC packet assembler -> materializer -> indexed retrieval -> BitFrost KV -> DAG with
+  revision-qualified identity at every hop (extends LINEAGE-E2E-01, which covers only packet -> retrieval -> manifest). Do not claim end-to-end before it exists.
+- [ ] PIPE-LUT-01 Map the "Pokemon ROM-bank" LUT frame (compressed-packets + LOD scripts, freeze Addendum 9) onto `packet-lod-manifest.ts` /
+  `lod-emission-integration.ts` and verify caller wiring.
+- [ ] PIPE-BITFROST-KV-01 Prove the BitFrost residency/KV prefill path is used by Ornith requests (`kv-context-controller.ts`,
+  `context-compiler.parent-atlas.ts`); BITFROST-LIVE-WARM-01 remains blocked on admitted packet identity.
+- [ ] PIPE-DENSE-01 Agentic dense search: settle the `semantic_768` producer (registry says UNKNOWN), pgvector exact vs HNSW vs Qdrant as executors of one
+  lane, and the prefix-aware embedding adapter (EMBED-CALLER-CONVERGENCE-01).
+- Carried over, unchanged: governed repair chain (DDL `drizzle/manual/20261005_governed_repair_executor_v1.sql` drafted and rehearsed, NOT applied;
+  `recordApproval` plan binding; executor), `LearningOutcomeV1` 0 of 100+ training-eligible, ONTO-CONCEPT-03 (use the source slice as evidence text and flag
+  `CASE_NORMALIZED`), GPU-PROJ-01 stage 2 (owner classification for centroid/KMeans/cuVS/PCA/CAGRA/HNSW/cuBLAS; none are in the ownership registry).
+
+#### Context engineering / agentic retrieval E2E — gate order and findings (2026-10-05, follow-up)
+
+Design rule: the OpenCode model sees the small `atlas-tools` facade (10 tools, ~1.4k schema tokens). Backends (TRACE, Claude-Mem, pgvector/HNSW,
+Qdrant, ACE, BitFrost/Valkey, AST, KAG/DAG) stay behind it. TRACE is a specialist diagnostic backend for the four TRACE agents, never the default surface.
+Stop rather than infer if any taskId, canonical id, packet key, source/workspace/representation/graph revision, or manifest checksum is missing.
+
+Findings from the read-only gates run so far:
+- VERIFIED: `atlas-tools.build_agentic_rag_context` is a FACADE OVER TRACE. `buildAgenticRagContextLive` calls TRACE `atlas.query` then
+  `atlas.packet_search` per file (own direct HTTP client, `ATLAS_TRACE_MCP_URL`, default `127.0.0.1:8788`). If TRACE is unreachable or
+  `ATLAS_CONTEXT_LIVE=0` it falls back to ONE static packet file (`.opencode/ace-packet.json`, which does not exist, then
+  `reports/semantic-contracts/reconciliation-ace-packet.json`) re-scored by keyword overlap and labels it `querySpecific:false`,
+  `candidateSetBasis:FIXED_PACKET_CARDS`, warning `LIVE_RETRIEVAL_UNAVAILABLE`. Live cards are tagged `NON_CANONICAL` with
+  `MISSING_SOURCE_REVISION` / `IDENTITY_UNBOUND` / `IDENTITY_CONFLICT` reasons, so the facade already reports evidence quality honestly.
+  Consequence: OpenCode's TRACE client failure does NOT break the atlas-tools live path; only TRACE availability matters.
+- VERIFIED (cold-start failure + stale fallback): the first facade call for "where is LearningOutcomeV1 built..." returned
+  `liveRetrieval: TRACE_EMPTY_RESPONSE` (TRACE emits an empty event stream on its ~5 s internal timeout, typically a cold embed) and silently served the
+  EXPIRED static packet (2026-07-29, `PACKET_EXPIRED`): six unrelated `NON_CANONICAL` / `IDENTITY_CONFLICT` cards about semantic-contract
+  reconciliation. After warm-up the same query returned live (`querySpecific:true`, `LIVE_TRACE_RANKED_SEARCH`, 2.5-3.5 s) but low relevance (scores ~0.43,
+  all `NON_CANONICAL` + `MISSING_SOURCE_REVISION`): the new `LearningOutcomeV1` contracts are not indexed, so a live session would not find them
+  through the facade and must fall back to `rg`. Preconditions observed: `:8090` serves `ornith-1.5-9b`, n_ctx 65536, slot idle; TRACE `:8788` up.
+- VERIFIED (TRACE-MCP-01, direct): resolved TRACE config is correct (merged url/Accept header/`timeout` 60000, `experimental.mcp_timeout` 60000);
+  `initialize` 0.06s, `tools/list` 0.04s (136 KB, 188 tools, all named + described); `prompts/list`, `resources/list`, `resources/templates/list`
+  return JSON-RPC -32601 (server advertises `tools` only). Confirmed cause of "Failed to get tools": SDK `ListToolsResultSchema` rejects the full
+  response because `atlas.packet_dense_search` had a top-level `anyOf` (fixed in source, TRACE not restarted). NOT_VERIFIED: whether OpenCode also
+  tolerates -32601 on the other three catalog methods; timeout and config mismatch are ruled out.
+  Largest schemas: `atlas.pos_concept_tagging` 9.3 KB, `atlas.packet_dense_search` 2.8 KB, `trace_dynamic_context` 1.8 KB.
+
+Gate order (supersedes ad-hoc order above; dedupe map: MEM-CLAUDE-ADAPTER-01 = MEM-LUT-01, PIPE-E2E-01 = CTX-MANIFEST-01, MEM-EVAL-01 = CTX-EVAL-01,
+TOOL-SELECT-01 is gated by TOOL-MANIFEST-01, PIPE-DENSE-01 = MEM-DENSE-01 plus the existing semantic_768 owner audit):
+- [ ] CTX-E2E-01 (H to launch) One ordinary query through `ornith-atlas-kernel` (no direct MCP): "Trace where LearningOutcomeV1 is built and where
+  validator-backed repair evidence becomes authoritative. Read-only; make a todo list first." Require `todowrite`, >=1 model-selected live read-only
+  `atlas-tools` call, captured sessionId/agent/normalized tool names/ordering/inputs/outputs/schema-token cost, `atlas-tools_record_outcome` = 0 calls,
+  edits = 0, datastore writes = 0, no lifecycle actions. States: LIVE_AGENT_TOOL_SELECTION_PROVEN | TOOL_NOT_SELECTED | PERMISSION_BLOCKED | MCP_UNAVAILABLE.
+  Preconditions to check first: `:8090` serving `ornith-1.5-9b`, TRACE `:8788` up, worker lifecycle decision made.
+- [ ] ATLAS-RAG-COLD-01 Decision needed: stop serving the expired static packet when live retrieval fails (return no cards plus an explicit
+  `LIVE_RETRIEVAL_UNAVAILABLE`) and/or warm the TRACE embed path / lengthen the retry delay. A 9B model should not receive expired, unrelated,
+  non-canonical cards; KERNEL-REAL-01B kept the fallback deliberately, so this is an owner decision, not a silent change.
+- [ ] CTX-INDEX-FRESH-01 (H to run) New/changed files (e.g. `LearningOutcomeV1` contracts) are not retrievable via `atlas.query` or the graph; refresh the
+  projection before CTX-E2E-01 can show useful evidence. Do not start Graphify merely because a stale-graph hook asks.
+- [ ] ATLAS-RAG-TRACE-01 Classify every downstream call of `build_agentic_rag_context` / `classify_intent` as LIVE | WIRED_BUT_DISABLED | CHALLENGER | DEAD | MISSING
+  (known so far: TRACE `atlas.query` + `atlas.packet_search` LIVE; static packet fallback LIVE; no semantic_768/pgvector, BitFrost/Valkey, centroid or
+  Claude-Mem call found in the facade).
+- [ ] TRACE-MCP-01B (H) After restarting TRACE, run OpenCode with TRACE only (no claude-mem), temporarily `timeout` 60s, and confirm `trace` connects;
+  do not change global availability based on the result. Record whether the -32601 catalog methods matter.
+- [ ] MEM-E2E-01 Put the Claude-Mem READ path behind ONE Atlas capability (`memory_context_search` or inside `build_agentic_rag_context`); Atlas decides
+  search -> timeline -> get_observations progressively. The model should not see 22 raw Claude-Mem tools. Writers, corpus build/prime/query and `smart_*`
+  stay denied; do not ingest the 1,439 historical observations.
+- [ ] MEM-LUT-01 Freeze `MemoryCanonicalLutV1` (observationId, taskId?, workflowRunId?, refs[{sourceRef, canonicalId, packetKey?, sourceRevision,
+  workspaceRevision}], resolverRevision, canonicalAuthority:false) from `files_read`/`files_modified`/`concepts`/session metadata; fail closed on
+  unresolved or revision-less refs; Windows slash normalization without case folding; observation ids are session identity, never canonical identity.
+- [ ] MEM-DENSE-01 Audit the running embedding service's output dimension and exact model/recipe first (EmbeddingGemma is 768 native; 512/256/128 are MRL
+  truncations: never label a 512 output `semantic_768`, record the truncation recipe). Deterministic bounded memory card from structured fields only;
+  pgvector exact before HNSW; MEM_SESSION is one logical lane with at most one fusion vote regardless of executor.
+- [ ] MEM-CACHE-01 Memory hit -> canonical ids -> BitFrost packet/source/summary lookup -> Valkey hot-set metadata. ACE owns residency; never cache
+  Claude-Mem narrative as evidence; emit cache hit/miss, tokens/bytes avoided, revision-qualified cache-key checksum (CACHE-EVAL-01 measures it).
+- [ ] MEM-CENTROID-01 SESSION_MEMORY centroid from revision-qualified memory embeddings only (member ids + checksum + recipe/centroid revision); routing
+  bias only, no independent RRF vote; compare with the no-memory baseline.
+- [ ] CTX-DAG-01 Memory-resolved canonical ids are traversal seeds only into the existing DAG/KAG/hypergraph owners; memory-derived relations stay
+  OBSERVATION_ONLY until validated against admitted evidence; record graph revision + traversal policy revision.
+- [ ] CTX-PACKET-01 `rg` and classify every packet assembler / materializer / QueryAnalysis / ContextManifest / PromptPlan / prefill implementation as
+  CANONICAL_OWNER | BACKEND | ADAPTER | EXPERIMENT | DEAD before adding any module (anchors in the census above); prove task/query/session/canonical/revision lineage.
+- [ ] CTX-MANIFEST-01 One real query -> agent selection -> memory/lexical/semantic/graph retrieval -> canonical promotion -> ContextManifest with query
+  checksum, helper path, evidence refs, revisions, manifest checksum, prompt revision, execution receipt. No Claude-Mem text, Qdrant point id, HNSW/CAGRA
+  ordinal, Redis key, BitFrost handle, GPU pointer or tool-call id qualifies as canonical evidence.
+- [ ] CTX-EVAL-01 A/B (A = current retrieval, B = memory/LUT/centroid/ACE-assisted): Recall@K, MRR, first-useful-evidence rank, retrieval/tool calls,
+  prompt tokens, duplicate evidence, latency, cache hits; primary metric `token_saved_per_correct_context`; no savings claim unless quality >= baseline.
+- [ ] TOOL-MANIFEST-01 Scope v1 to Helper Registry + ACP registry (TRACE deferred); `mutation_class` READ | PROPOSE | WRITE | LAUNCH; `fix:apply` stays WRITE
+  with `routingEnabled=false`; deterministic manifest/ordinal/embedding-input checksums reproduced twice; resolve canonical registry identity first;
+  NO Qdrant write in this gate. Only after the real runtime path above is known.
+- [ ] SYSTEM-PROMPT-01 Replace the stale "Gemma4 Legal-AI Code Agent" identity in `.opencode/system.md` with Ornith (after CTX-E2E-01, so the baseline is
+  not disturbed mid-measurement).
+- [ ] GPU-PROJ-01 stage 2 Extend `parent-atlas-gpu-compute-lanes-consolidation` (no parallel change): classify centroid/KMeans/PCA/pgvector HNSW/cuVS/CAGRA/
+  cuBLASLt/CUTLASS/TensorRT implementations; reuse CandidateOrdinalMap, representation DAG, graph snapshot, SOM coordinate and GPU residency owners; only then
+  define missing typed projection/execution receipts.
+Out of scope for these gates: mutation-capable MCP tools, `tool_manifest` Qdrant writes, importing Claude-Mem SQLite/Chroma, applying the governed-repair
+DDL, starting Graphify because a stale-graph hook asks.
+
+#### Owner table and atlas-tools receipts (2026-10-05, evidence for CTX-PACKET-01 / ATLAS-RAG-TRACE-01)
+
+Method: importer census (`rg` by module stem over `sveltekit-frontend/src`, `scripts/`, `packages/`, `python/`; callers bucketed route / runtime / package /
+script / test). Importer counts do not see CLI scripts run by shell/npm, dynamic imports, or `sveltekit-frontend/scripts/`. Classes below are PROVISIONAL
+heuristics (route caller => owner candidate; runtime-only => backend/adapter; script/test-only => experiment; none => unresolved) and need an owner confirmation
+before any contract is added or removed.
+
+| Stage | Module (under `sveltekit-frontend/src/lib/server/` unless noted) | Callers route/runtime/script/test | Provisional class |
+|---|---|---|---|
+| query routing | `ace/query-router.ts` | 4 / 13 / 14 / 8 | CANONICAL_OWNER |
+| query routing | `atlas/classification/query-router-control-plane-v2.ts` | 0 / 0 / 1 / 1 | EXPERIMENT |
+| ACE context assembly | `features/ai/ace/context-assembler.ts` | 13 / 40 / 29 / 12 | CANONICAL_OWNER |
+| ACE packet writer (BitFrost V3) | `ace/ace-packet-writer.ts` | 0 / 2 / 0 / 1 | UNRESOLVED (no route caller; callers are `index.ts`, `packet-io.ts`) |
+| ACE context compiler | `ace/context-compiler.parent-atlas.ts` | 0 / 5 / 4 / 4 | BACKEND |
+| RPC packet assembler | `retrieval/hyperrag-packet-rpc.ts` | 3 / 4 / 11 / 2 | CANONICAL_OWNER |
+| materializer | `scripts/atlas/packet-materializer-lib.mjs` (+ ~16 `materialize-*`) | 0 / 0 / 3 / 0 | ADAPTER (offline script tier, no request-path caller) |
+| ContextManifest | `ace/ace-context-manifest.ts` | 1 / 13 / 9 / 10 | CANONICAL_OWNER |
+| ContextManifest bridge | `ace/ace-route-context-manifest-bridge-v1.ts` | 0 / 2 / 0 / 1 | ADAPTER |
+| retrieval fusion | `retrieval/search-runtime.ts` | 3 / 32 / 18 / 31 | CANONICAL_OWNER (RRF) |
+| retrieval facades | `retrieval/unified-orchestrator.ts`, `retrieval/semantic-search-workflow.ts` | 1 / 3-4 / 0-11 / 1-2 | ADAPTER (facades over search-runtime) |
+| pgvector candidates | `retrieval/retrieve-candidates.ts` | 0 / 4 / 2 / 5 | BACKEND |
+| dense packet search | `retrieval/packet-dense-search.ts` | 0 / 2 / 0 / 1 (only TRACE + rerank) | BACKEND (TRACE-only reachability) |
+| Qdrant | `vector/qdrant-manager.ts` | 41 / 73 / 15 / 10 | BACKEND |
+| exact cache L1 | `cache/redis-exact-match.ts` | 6 / 9 / 5 / 5 | CANONICAL_OWNER (L1) |
+| KV context controller | `features/ai/ai/kv-context-controller.ts` | 0 / 8 / 1 / 1 (via `openai-facade`, TRACE) | BACKEND; BitFrost KV reuse NOT_VERIFIED |
+| topo candidate cache | `cache/topo-candidate-cache.ts` | 1 / 3 / 0 / 0 | BACKEND (ACE stage A0) |
+| DAG contracts | `atlas/workflow/context-tool-dag-contracts.ts` | 0 / 2 / 0 / 2 | ADAPTER |
+| KAG DAG runner | `features/ai/ace/kag-dag-runner.ts` | 0 / 3 / 0 / 2 (called by `semantic-search-workflow`) | BACKEND (inside the retrieval path) |
+| route-head DAG | `atlas/retrieval/route-head-dag-builder-v1.ts` | 0 / 1 / 0 / 1 | EXPERIMENT |
+| embedding producer | `retrieval/embedding-service.ts` | 0 / 11 / 35 / 7 | BACKEND; canonical `semantic_768` producer still UNRESOLVED in the ownership registry |
+| ordinal snapshot | `atlas/retrieval/semantic-candidate-snapshot-v1.ts` | 0 / 1 / 5 / 2 | ADAPTER |
+| selected candidate set | `atlas/retrieval/search-runtime-selected-candidate-set-v1.ts` | 0 / 0 / 0 / 1 | EXPERIMENT (test-only) |
+| LOD manifest | `atlas/packet-lod-manifest.ts` | 0 / 1 / 1 / 2 | ADAPTER |
+| LOD emission (ROM-bank LUT frame) | `atlas/lod-emission-integration.ts` | 0 / 0 / 0 / 0 | UNRESOLVED (zero importers by name; check dynamic use before treating as DEAD) |
+| Viterbi tool selector | `retrieval/hmm-tool-selector.ts` | 1 / 1 / 1 / 4 | CHALLENGER_ONLY per CLAUDE.md, but has a route caller: confirm which route |
+| Viterbi MCP bridge | `retrieval/mcp-tool-viterbi-bridge-v1.ts` | 0 / 2 / 2 / 2 | CHALLENGER_ONLY |
+| agent memory / prefetch | `memory/engram-memory.ts` (+ `ai/engram-registry.ts`, `adaptive-prefetch.ts`) | 0 / 7 / 1 / 2 | BACKEND: an existing agent-memory/prefetch owner; a MEM_SESSION lane should plug into it, not beside it |
+| claude-mem bridge | `scripts/opencode/{post-memory,ensure-claude-mem-detached,monitor-claude-mem-poll}.mjs`, `scripts/memory/import-claude-mem-observations.mjs` | CLI scripts (no importers) | ADAPTER (standalone); no runtime adapter reads observations |
+
+Findings: (1) the ROM-bank/LUT frame is only partly wired: `packet-lod-manifest` has one runtime importer (`lod-emission-integration`) and that module has none.
+(2) materializers are an offline script tier; no request-path materializer exists, so "RPC packet assembler -> materializer" is not a live runtime hop.
+(3) the retrieval path already contains a DAG hop (`semantic-search-workflow` -> `kag-dag-runner`) and an agent-memory owner (Engram); do not create parallel ones.
+(4) `dense packet search` is reachable only through TRACE; `build_agentic_rag_context` does not use it.
+
+atlas-tools call receipts (direct stdio, read-only, `writesPerformed=false`; result class = USEFUL | EMPTY_VALID | UNQUALIFIED | ERROR):
+| Tool | Input | Latency | Result | Class |
+|---|---|---|---|---|
+| `classify_intent` | repair/verifier/BitFrost prompt | <1 s | intent repair, subdomain cache, confidence 0.85, generic `rg` command | USEFUL (generic next command) |
+| `find_source_refs` | new `repair-episode-verifier-v1.ts` | <5 s | `sourceRefs: []`, kind PATH | EMPTY_VALID (file not in graph/packets yet) |
+| `find_dependencies` | new `agent-run-service.ts` | <5 s | `PROJECTION_MISSING_FILE`, `nodesMatched: []` | ERROR (stale projection) |
+| `find_dependencies` | `unified-orchestrator.ts` | <5 s | node matched, `NO_OUTGOING_EDGES` | UNQUALIFIED (implausible for a central module; edge projection incomplete) |
+| `find_dependencies` | `ace-packet-writer.ts` | <5 s | node matched, 1 dependency | USEFUL |
+| `build_agentic_rag_context` | LearningOutcomeV1 trace query | 10.4 s cold, then 2.5-3.5 s | cold: `TRACE_EMPTY_RESPONSE` + expired static packet; warm: live `LIVE_TRACE_RANKED_SEARCH`, scores ~0.43, `NON_CANONICAL`, `MISSING_SOURCE_REVISION` | UNQUALIFIED |
+No tool returned graph revision or workspace revision; `find_source_refs` is the only one designed to return packet identity (empty here).
+
+Status: OpenCode permissions PROVEN STATICALLY; atlas-tools catalog PROVEN; atlas-tools useful calls PARTIAL (see table); TRACE root cause PROVEN, patch + regression
+tests WRITTEN, live reconnect NOT_VERIFIED (needs TRACE restart); owner census PARTIAL (provisional classes above); BitFrost path, DAG/KAG path, pgvector/EmbeddingGemma
+path and ContextManifest closure NOT_WIRED_OR_UNVERIFIED end to end. Do not start `tool_manifest` indexing until the helper owners above are confirmed.
+
+#### CTX-E2E-01 baseline receipt and keyword-census reuse list (2026-10-05)
+
+Live baseline: `opencode run --pure --agent ornith-atlas-kernel --format json` (plugins disabled so claude-mem was not involved), session
+`ses_ef1946e4effeDK4zkYu0hZQulk`, query "Trace where LearningOutcomeV1 is built and where validator-backed repair evidence becomes authoritative.
+This is read-only. Make a todo list first and use Atlas context tools where appropriate."
+- Tool sequence (9 calls, 10 steps): `todowrite` -> `grep` -> `read` x2 -> `grep` -> `read` x3 -> `grep`. todowrite was the FIRST call (PROVEN).
+- `atlas-tools` calls: 0 => TOOL_NOT_SELECTED for the facade. Partly defensible: the query names a symbol, so lexical grep is the cheapest sufficient
+  path, and the facade returns nothing for new files (stale graph, unindexed contracts). Still unproven that the model selects atlas-tools when it should.
+- `record_outcome` calls 0, edit/write calls 0, process lifecycle actions 0 (PROVEN). Context at the last step: 31,998 tokens (29,958 cache-read).
+- FAILURE: the final answer was an empty `<think></think>`. The default agent has `steps: 10` (`.opencode/opencode.jsonc`); the session used exactly 10
+  steps, so OpenCode forced a text-only turn and the 9B model returned nothing. The user got no answer.
+- [ ] CTX-E2E-02 Raise the kernel agent's `steps` (or require an early summary) and re-run the same query; require a non-empty answer with cited file paths.
+  Then re-run with an explicit expectation fixture (first helper, allowed sequence, max tool calls) before changing the routing prompt (SYSTEM-PROMPT-01).
+- [ ] INJECTION-01 `scripts/atlas/smoke-ace-prompt-injection.mjs` tests its OWN inline mock (`validateForInjection`, 11 regexes, hard-coded strings); it never calls the
+  production ACE validator, so its PASS proves nothing. No production injection detector was found by name (only `semantic-loop-types.ts` mentions it).
+  Define the real untrusted-text boundary (summaries, retrieved text, Claude-Mem observations) and test the production path. Encoding (msgpack/bitmaps) does not
+  change this; sanitize where msgpack/bitmap paths decode strings back into packet text.
+- Reuse (do not rebuild), from the keyword census: `ace/context-cache-planner.ts` (candidate `ContextPlanV1` home), `retrieval/mcp-tool-policy-classifier-v1.ts`
+  (candidate `mutation_class` filter), `scripts/atlas/validate-mcp-tool-registry-parity.mjs` (extend for MCP-TRACE-CONFORMANCE-01),
+  `atlas/cache/bitfrost-residency-warming-v1.ts` (BitFrost warming owner), `serialization/packet-msgpack-codec.ts`, `ace/ace-packet-reader.ts`,
+  `scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs`, `scripts/atlas/audit-acp-packet-transport.mjs`, `atlas/agentic-file-compiler/parameter-binding-v1.ts`.
+  Duplicate owner to resolve: `gpu/libtorch-bridge.ts` exists in `sveltekit-frontend/src/lib/server/` and `packages/parent-atlas-retrieval/src/`.
+- TRACE gate status: live TRACE (pid 59052) still serves the old schema (SDK validation fails at tool 165); restart is human-owned. Idempotent
+  `npm run trace:mcp:ensure` (in `sveltekit-frontend`) returns immediately if `:8788` is healthy, so the old process must be stopped first.
+
+#### CTX-E2E-02 receipt: steps 10 -> 20 did not fix the empty final answer (2026-10-05)
+
+Same query, same agent, `--pure`, only `ornith-atlas-kernel` `steps` changed (10 -> 20). Session ran 477 s.
+- Steps used 20 (cap hit again); 18 tool calls (9 `read`, 7 `grep`, 2 `todowrite`); max 1 tool call per step (no batching); `atlas-tools` calls 0;
+  `record_outcome` 0; edits 0; lifecycle actions 0. `todowrite` first (PROVEN).
+- Context per step rose 16k -> 62.8k tokens (95% of the 65,536 window), then OpenCode compaction reset it to 9.7k and it climbed again to 42k. Compaction works
+  and produced a structured summary (Objective / Important Details / Work State), but the model then re-explored (stale grep line offsets after compaction).
+- FAILURE persists: the final turn was again an empty `<think></think>`. Both runs ended exactly at the step cap. The model never stopped on its own, so the
+  forced text-only final turn returns nothing for Ornith, and raising the cap only delays it. NOT_VERIFIED: whether Ornith answers when it ends naturally.
+- Answer quality risk: before the cap the model was heading toward a confident wrong claim (`scripts/phase79-agentic-repair.mts` as the "authoritative" orchestration,
+  `recordAnalysisPassResult` as the promotion path). Ground truth: validator evidence is authoritative NOWHERE yet (no governed executor; the verifier is exercised only by tests).
+- [ ] CTX-E2E-03 (prompt experiment, now justified) Same query with PROMPT-CONTEXT-V2: batch independent calls, hard budget of ~8 tool calls then answer, state
+  "unknown/not wired" instead of inferring. Compare steps, tool calls, batching, final answer, citations, and the wrong-claim rate against this baseline.
+- [ ] CTX-E2E-FINAL-01 Test the forced-final-turn behavior in isolation (can Ornith answer when tools are removed?). If not, a step cap can never end gracefully; consider a
+  template/`reasoning` setting or an earlier explicit "write the answer now" rule.
+- Config state: `.opencode/opencode.jsonc` kernel `steps` is 20 (was 10); revert or tune after CTX-E2E-03.
+
+#### CTX-E2E-03 receipt (routing-v2 prompt) and next steps (2026-10-05)
+
+A = steps 10 (CTX-E2E-01), B = steps 20 (CTX-E2E-02), C = steps 20 + `.opencode/prompts/context-routing-v2.md` appended to the kernel prompt via an inline
+`OPENCODE_CONFIG_CONTENT` override (repo config untouched; same query, `--pure`).
+| | A | B | C (routing-v2) |
+|---|---|---|---|
+| steps / cap | 10 / 10 | 20 / 20 | 20 / 20 |
+| tool calls (budget rule said 8) | 9 | 18 | 18 |
+| max calls in one step (batching) | 1 | 1 | 1 |
+| `atlas-tools` calls | 0 | 0 | 0 |
+| peak context tokens | ~32k | 62.8k | 61.7k (compaction to 2.8k) |
+| final answer | empty | empty | empty |
+Result: the prompt-only fix FAILED. The 9B model ignored the 8-call budget, the batching rule and the facade preference, and never stopped on its own; every run ends with an empty
+`<think></think>` on the forced final turn. Step savings must come from architecture (a pre-agent context packet), not from instructions. No writes, edits, `record_outcome` or lifecycle actions in any run.
+- [ ] CTX-E2E-04 Per OpenCode docs, new user input resets the step allowance: after the cap, send a continuation (`--continue`) "no more tools; write the final answer from what you found"
+  and check whether Ornith returns a real answer. Cheap harness-level workaround; also tells us whether the empty answer is the forced-turn template or the model.
+- [ ] CTX-PREAGENT-01 Pre-agent context DAG (server/orchestrator work BEFORE model step 1; `todowrite` stays the first model-visible tool). Extend, do not replace, existing owners:
+  `ace/query-router.ts` (QueryAnalysisV1), `ace/context-cache-planner.ts` (ContextDagPlanV1 home), `features/ai/ace/context-assembler.ts` + `ace/ace-packet-reader.ts` (bounded ACE JSON packet),
+  `semantic-search-workflow` -> `kag-dag-runner` (graph hop), `engram-memory` + `adaptive-prefetch` (MEM_SESSION), `atlas/cache/bitfrost-residency-warming-v1.ts` (prewarm).
+  Stages run only when selected by intent/freshness/complexity: QUERY_ANALYSIS, INTENT, FRESHNESS, LEXICAL, AST, MEMORY_PRIOR, OKF_DOMAIN_ROUTE, SEMANTIC_ROUTE, CENTROID_ROUTE,
+  GRAPH_EXPANSION, CACHE_LOOKUP, BITFROST_PREWARM, ACE_PACKET_ASSEMBLY, AGENT_HANDOFF. A symbol query ("where is buildLearningOutcomeV1") should run only analysis -> lexical -> AST -> packet.
+  Acceptance: A/B vs CTX-E2E-01/02/03 on steps consumed, tool calls, non-empty answer, canonical evidence rate, first-useful-evidence rank, `steps_saved_per_correct_context`, `token_saved_per_correct_context`.
+  - Owner audit (2026-10-05, new session): `QueryAnalysisV1` and `RetrievalPlanV1` ALREADY exist in `sveltekit-frontend/src/lib/server/atlas/contracts/semantic-signal-v1.ts`, with the lane chooser
+    (`chooseLanes`, `buildGraphLimits`, `buildAllowedFilters`, `analyzeSemanticQuery`) in `atlas/semantic-signal-routing.ts`. `ace/query-router.ts` (604 lines, `routeQuery`) is a separate fixed
+    cheapest-to-dearest lane cascade with no intent-based stage selection. Do NOT add a third planner: first slice = extend `chooseLanes`/`RetrievalPlanV1` with the stage list above
+    (symbol query -> analysis, lexical, AST, packet), as a pure function with a spec; no I/O, no model call. Callers of `analyzeSemanticQuery` still to be censused before wiring.
+  - Slice 1 DONE (2026-10-05, DRY_RUN_PROVEN only): `selectPreAgentStages(analysis)` + `PreAgentStageV1` in `atlas/semantic-signal-routing.ts`; 2 new specs, file 5/5 pass. Pure; NOT wired to any caller,
+    so no step savings are claimed. Remaining: census of `buildSemanticSignalPacket` callers; wire into the `opencode`/`atlas-tools` path; stage executors (LEXICAL/AST/CACHE_LOOKUP/ACE_PACKET_ASSEMBLY);
+    A/B vs CTX-E2E-01..05. Two other plan owners exist and need reconciliation before wiring: `atlas/agentic-file-compiler/retrieval-plan.ts` (phases) and `retrieval/cognitive-router.ts::buildRetrievalPlan`.
+  - Alignment (2026-10-05, from the pasted prime-agent/EXP guidance; name census run over `*.{ts,mjs,mts,py}`): `PrimeAgentRuntimeV1`, `RlmWorkingStateV1`, `AgentReplayManifestV1` EXIST only in
+    `sveltekit-frontend/src/lib/server/atlas/agentic/agent-execution-spine-v1.ts` (+ spec) => that is the execution spine; add no second prime-agent/REPL/state owner. `ContextDagPlanV1`,
+    `RetrievalParameterPlanV1`, `AgentSkillProgressV1`, `TodoObservationV1` have ZERO matches => genuinely new contracts; `selectPreAgentStages` (slice 1) is the stage-list seed for `ContextDagPlanV1`.
+    Not re-verified here: the claimed `context-tool-dag-contracts.ts`, `kag-dag-runner.ts` reuse, `parent_atlas_dspy_repair.py`/`build_gepa_optimizer_v1`, `listKanbanTaskAttempts` (a Glob timed out).
+    Proposed order (design only, none built): PRIME-ALIGN-01 (prove the spine is the sole owner) -> PARAM-PLAN-01 (`RetrievalParameterPlanV1`: each param carries a source + policyRevision) -> CONTEXT-DAG-01 (reuse the
+    existing DAG contracts) -> PRIME-CONTEXT-01 (ContextManifest -> PrimeAgentRuntimeV1) -> AGENT-EXP-01 (`AgentSkillProgressV1`, derived ONLY from `isTrainingEligible` LearningOutcomeV1, canonicalAuthority:false;
+    a plausible-looking patch earns nothing) -> REPAIR-LOOP-01 (needs the unapplied governed-repair DDL, authorization-gated) -> OAK-ROUTE-01 -> DSPY-SHADOW-01 (offline, frozen fixtures, shadow only) -> POLICY-FEEDBACK-01 -> REPL-01 only if needed.
+    Boundaries: todowrite stays ephemeral session progress (kanban = durable task record, LearningOutcome = history); OAK proposes concept candidates only; LUT/ordinal bytes are runtime addresses, never identity;
+    outcomes may influence future priors but never rewrite history. SPAN-DIAG-01 / LangExtract span work in the pasted report belongs to a separate thread and is untouched here.
+  - PRIME-ALIGN-01 result (2026-10-05, read-only): the spine is a CONTRACT-ONLY owner. `agent-execution-spine-v1.ts` (596 lines; spec 12/12 pass) exports PrimeAgentRuntimeV1 (binds a `contextManifestChecksum`
+    sha256 + policy/capability/tool registry revisions + maxSteps/maxToolCalls/maxTokens + state PLAN|EXECUTE|OBSERVE|VALIDATE|COMPLETE|FAILED), AgentActionProposalV1, ToolExecutionEnvelope/Receipt, RlmWorkingStateV1
+    (EPHEMERAL, canonicalAuthority:false), AgentReplayManifestV1, `runReadOnlyAgentReplayV1`; its own `agentExecutionSpineOwnerAuditV1` declares no second ContextManifest compiler or capability registry.
+    Importers: only its spec and `scripts/atlas/run-agent-execution-spine-fixture-v1.mts` => NOT_PROVEN as the live runtime: OpenCode's own loop (steps/todowrite/tools) is what actually executes agents today, and
+    nothing admits a ContextManifest into PrimeAgentRuntimeV1 at request time. So PRIME-CONTEXT-01 is partly already in the contract (checksum binding); the missing piece is a live producer/caller, not a schema.
+    Consequence for CTX-PREAGENT-01: `ContextDagPlanV1` output should end by producing a ContextManifestV2 checksum this spine consumes, rather than inventing a parallel handoff.
+  - PARAM-PLAN-01 slice DONE (2026-10-05, DRY_RUN_PROVEN only): `buildRetrievalParameterPlan(query, analysis, plan, stages)` + `RetrievalParameterPlanV1` in `atlas/semantic-signal-routing.ts` (file 7/7 pass).
+    Values are derived from the existing bounded `RetrievalPlanV1` (no new numbers); each plan carries `queryChecksum`, `intentClass`, `sources` (STATIC_POLICY, INTENT_CLASSIFIER now; EVAL_TUNED/CACHE_PROFILE reserved)
+    and `policyRevision` 'static-policy-v1'; semantic/graph/memory blocks appear only when the matching stage was selected. Pure and unwired. Still open: a zod schema in `contracts/semantic-signal-v1.ts`
+    (currently a plain TS interface), the `ContextDagPlanV1` that composes stages + parameters, and a caller.
+  - CONTEXT-DAG-01 slice DONE (2026-10-05, DRY_RUN_PROVEN only): no new DAG type. `buildContextToolDagFromPreAgentStages()` in `atlas/workflow/context-tool-dag-contracts.ts` projects the stage list onto the existing
+    `ContextToolDagV1` (the file's owner of nodes, cycle check and exact-promotion rules): QUERY_ANALYSIS -> optional CACHE_LOOKUP -> independent lookups in PARALLEL (same dependsOn) -> EXACT_PROMOTION -> ACE_PACKET_ASSEMBLY;
+    GRAPH_EXPANSION maps to CONTEXT_FANOUT; all nodes read-only, canonicalWritesAllowed false, unknown stage throws; AGENT_HANDOFF has no node (it is the boundary). CORRECTION (2026-10-05): the "5/5 (2 new)" originally recorded here was wrong: that spec append had silently failed (`python3` is not installed in this shell), so 5/5 was only the pre-existing tests. The mapper specs were actually added afterwards; see the executor entry below (spec now 10/10).
+    Not done: no executor runs this DAG, `kag-dag-runner.ts` (two copies exist: `ace/` and `features/ai/ace/`, a duplicate-owner question) was not reconciled, and nothing calls the mapper. The DAG's parallel shape is
+    the mechanism meant to replace the model's 18 sequential calls, but that is unproven until an executor exists and CTX-E2E is re-run.
+  - KAG-RUNNER-OWNER-01 result (2026-10-05, read-only): NOT a duplicate. `ace/kag-dag-runner.ts` is a 1-line re-export shim (`export * from '../features/ai/ace/kag-dag-runner.js'`); the owner is
+    `features/ai/ace/kag-dag-runner.ts` (337 lines: `KagDagRunner`, `topologicalSortDagNodes`, `persistKagDagRunFromSteps`; src importers: `retrieval/semantic-search-workflow.ts`, `features/ai/index.ts`, plus specs).
+    It executes registered nodes SEQUENTIALLY in topological order (a `for` over the plan, one `await node.run(ctx)` at a time), persists to `kagDagRuns/kagDagNodes/kagDagEdges` (so running it writes Postgres rows),
+    and its node vocabulary is the retrieval ladder (`normalize_query`, `L1_redis_exact` ... `L6_raw_file_read`, `gemma4_synthesis`, `write_audit`), a different layer from `ContextToolDagV1` (contract-only plan).
+    Consequence: reusing it as-is would NOT give the parallel fan-out CONTEXT-DAG-01 is meant to provide, and executing it writes DAG tables. Decision needed before building the executor: (a) a small read-only
+    parallel executor over `ContextToolDagV1` (Promise.all per dependency level, no DB writes, receipts only), or (b) add level-parallelism to `KagDagRunner`. Recommended (a): smaller, reversible, no schema/persistence change.
+  - CONTEXT-DAG-01 executor DONE (2026-10-05, DRY_RUN_PROVEN only; KAG-RUNNER-OWNER-01 option a): `executeContextToolDagV1(dag, handlers, {nodeTimeoutMs})` in `atlas/workflow/context-tool-dag-contracts.ts`.
+    Read-only, level-parallel (Promise.all per dependency level), no DB writes, refuses canonicalWritesAllowed=true or any non-read-only node; a FAILED/timed-out node marks dependents BLOCKED while siblings still run;
+    a node without a handler is NO_HANDLER (which also blocks its dependents); receipt `atlas.context-dag-execution-receipt.v1` (levels, per-node status/duration, outputs, writesPerformed:false, canonicalAuthority:false).
+    Spec 10/10 pass (5 pre-existing + 5 new: mapper x2, concurrency peak 2 with output passing, failure blocking, timeout/no-handler/non-read-only refusal). Handlers are caller-supplied: NO real LEXICAL/AST/CACHE_LOOKUP/
+    ACE_PACKET_ASSEMBLY handler exists yet, and no live caller, so no step saving is claimed. Next: real handlers (reuse rg/ast-grep helpers, `ace-packet-reader.ts`, BitFrost reader), then a caller that produces the
+    ContextManifestV2 checksum for PrimeAgentRuntimeV1, then re-run CTX-E2E-01 with the packet injected. Pre-existing spec TS diagnostics (`kind:'suspended'` at the old adapter test) are not from this work.
+  - HANDLER-CENSUS-01 (2026-10-05, read-only): the lookups already have owners; `helper-registry-v1.ts` is metadata only (12 READ_ONLY entries, no executors), the executors it points at are:
+    LEXICAL -> `agent/tools/ripgrep-search.ts::ripgrepSearch({pattern,fileType,contextLines,ignoreCase,maxResults})` (real `rg --json` spawn; gaps: cwd is `process.cwd()` = `sveltekit-frontend`, not the repo root;
+    `pattern` is a REGEX so a symbol must be escaped; `--max-count` is per file so the cap is approximate; no timeout). Other `rg` spawners exist (`indexer/rg-search-utility.ts`, `mcp/codebase_tools.ts`,
+    `atlas/retrieval/candidate-foundation.ts`) = a duplicate-owner question for a later sweep.
+    AST -> `atlas/language/ast-grep-structural-topk.ts::extractAstGrepStructuralCandidates` / `extractAndRankAstGrepStructuralTopK` (`@ast-grep/napi`, TS/JS only). It takes SOURCE TEXT, not a query, so an AST handler cannot
+    run in parallel with LEXICAL: it needs file bytes first. Design consequence: for symbol queries `AST` must `dependsOn` `LEXICAL` (or a file-list node), which changes the DAG shape built by
+    `buildContextToolDagFromPreAgentStages` (currently both depend only on analysis/cache). SEMANTIC_ROUTE -> `retrieval/semantic-search-workflow.ts`; CACHE_LOOKUP / ACE_PACKET_ASSEMBLY -> `ace/ace-packet-reader.ts`,
+    `ace/context-assembler.ts`: not inspected yet. Next: make AST depend on LEXICAL in the mapper, add an optional `cwd` to `ripgrepSearch` (additive), then thin handler adapters with specs.
+  - HANDLERS-01 slice DONE (2026-10-05, DRY_RUN_PROVEN only; 16/16 across `context-tool-dag-contracts.spec.ts` + new `context-dag-handlers-v1.spec.ts`): `atlas/workflow/context-dag-handlers-v1.ts` adds
+    `makeLexicalHandlerV1` (one literal rg search per symbol, started together, merged/ranked by file, <=8 symbols, <=12 files) and `makeAstHandlerV1` (consumes the LEXICAL output; parses only TS/JS files that have a
+    resolvable revision; a file with none is SKIPPED as NO_REVISION, never defaulted; missing LEXICAL input throws). All dependencies injected (real wiring = `ripgrepSearch`, `extractAstGrepStructuralCandidates`).
+    Mapper now makes AST depend on LEXICAL. `ripgrepSearch` gained additive `cwd` + `fixedStrings` options and a `--` before the pattern. DEGRADATION: the EXACT_PROMOTION join proceeds on the lookups that
+    succeeded (receipt lists `degradedDependencies`; `receipt.degraded` true when the packet node still succeeded); AST failing => lexical-only packet; LEXICAL failing => AST BLOCKED (needs its file list) and,
+    with no surviving lookup, the join and packet are BLOCKED. Gaps: still no handler for CACHE_LOOKUP/SEMANTIC_ROUTE/MEMORY_PRIOR/ACE_PACKET_ASSEMBLY and no live caller or real `resolveRevision`; `ripgrepSearch`
+    has no timeout of its own (executor's per-node timeout does not kill the spawned `rg`). Concurrency here is Promise.all over async handlers with each `rg` a separate OS process; it is not worker threads,
+    and synthesis stays AFTER the DAG as the agent's job. CENTROIDS: `retrieval/centroid-cache.ts::nearestCluster` needs a query embedding (an async embed call, so a CENTROID_ROUTE stage must depend on an embed node)
+    and it calls `redis.keys('taxonomy:clusters:gpu:*')` (a blocking KEYS scan; flag for a SCAN replacement before it sits on a request path). Scratch note: this shell has no `python3`, and the CRLF files defeat
+    multi-line `node -e` replaces; use the Edit tool.
+  - CTX-HANDLER-OWNER-01 result (2026-10-05, read-only; follows the pasted review: wrap existing owners, add no new search/AST/cache/packet implementation):
+    * LEXICAL / AST owner = `retrieval/retrieve-candidates.ts`: `retrieveExactMatches(query)`, `retrieveBM25(query)`, `retrieveASTMatches(query)`, `retrieveRipgrep(query)` -> `Candidate[]` carrying `sourceRef`,
+      `workspaceRevision`, `sourceRevision`, `representationId/Revision` + `deriveIdentity` (the qualification shape the review wants). `retrieveASTMatches` is NOT ast-grep: it is a Postgres `ILIKE '%term%'` over
+      `codebase_chunk_index` `metadata->>'tree_node_id'` for every word of the query (stop words included, LIMIT AST_LIMIT) = weak and DB-backed; it needs no file list, so AST could run IN PARALLEL with LEXICAL.
+      Callers: only `retrieveAllCandidates` inside the same file (not yet traced further). My earlier `makeLexicalHandlerV1`/`makeAstHandlerV1` (rg + ast-grep-napi on files) are therefore alternatives, not the
+      verified request-time owners; keep them injected-only and unwired. DECISION NEEDED: AST = (a) `retrieveASTMatches` adapter (parallel, revision-bearing, Postgres) or (b) ast-grep-napi over lexical files
+      (sequential, precise spans, TS/JS only). Recommended (a) first; if chosen, revert the AST->LEXICAL dependency in `buildContextToolDagFromPreAgentStages`.
+    * CACHE_LOOKUP owner = `ace/context-cache-planner.ts` (`buildAceContextPlannerState`, `loadAceContextPlannerHit`); src users: `features/ai/ace/context-assembler.ts`, `retrieval/hyperrag-fusion-service.ts`.
+    * ACE_PACKET_ASSEMBLY: `ace/parent-atlas-packet-assembler.ts::assemblePacketForSourceRef({sourceRef,query,featureId,forceRefresh})` is NOT read-only: on a cache miss it calls `writeAcePacket` (Redis write,
+      line 97), which the read-only executor must not do. A handler may use only its cache-read fast path (`readAcePacketBySourceRef`) or needs a no-write option added to the owner first.
+    * ContextManifest bridge: `atlas/context/ace-context-manifest-admission-v1.ts::admitCurrentAceContextManifestV1` REQUIRES `featureAdmission: CurrentCandidateFeatureAdmissionV1` with status ADMITTED and a
+      snapshot (`atlas/features/candidate-feature-snapshot-v1.ts`), else it returns `BLOCKED_FEATURE_SNAPSHOT`. No per-query producer of that snapshot is wired, so CTX-MANIFEST-BRIDGE-01 is blocked on it, not on a schema.
+    * `lexical_exact/lexical_fts/lexical_trigram` lane names live in `atlas/neural-routing/contracts.ts`, `retrieval/router-matrix.ts`, `query-router-4x4.ts`, `retrieval-executor-policy-v1.ts`: a routing
+      vocabulary; no single `SearchRuntime` executor function was found by name (`runSearchRuntime`/`executeSearchRuntime` do not exist) => still to locate before CTX-HANDLER-LEXICAL-01.
+  - CTX-HANDLER-LEXICAL/AST-01 DONE (2026-10-05, DRY_RUN_PROVEN only; decision (a) taken): `makeCandidateLaneHandlerV1({lane, query, retrieve, maxHits})` in `atlas/workflow/context-dag-handlers-v1.ts` wraps ONE existing
+    `retrieve-candidates.ts` lane (inject `retrieveExactMatches` for LEXICAL, `retrieveASTMatches` for AST) and returns compact refs only (sourceRef, canonicalId=packetKey, workspace/sourceRevision, score,
+    identityStatus, per-hit + aggregate qualification REVISION_QUALIFIED|UNQUALIFIED|EMPTY); NO content/summary leaves the handler (spec asserts a body string is absent). The AST->LEXICAL dependency was reverted:
+    LEXICAL and AST run side by side again (level `AST,LEXICAL`). The earlier rg/ast-grep file handlers remain, injected-only and unwired (candidate for a future AST_STRUCTURAL_REFINE node that depends on LEXICAL).
+    Degradation both ways verified: lexical-only (AST fails), AST-only (LEXICAL fails), both fail => join+packet BLOCKED, not degraded. Specs 18/18 (`context-tool-dag-contracts.spec.ts` + `context-dag-handlers-v1.spec.ts`).
+    NOT done: no call has been made to the real `retrieveExactMatches`/`retrieveASTMatches` (they hit Postgres) so live behaviour, latency and the weak-ILIKE precision are unmeasured; `SearchRuntime`
+    (`retrieval/search-runtime.ts`, `createSearchRuntime({readOnly})`) is the lane/fusion owner behind these and is the better long-term injection point (verify before wiring).
+  - EXTERNAL CHALLENGER (from the pasted codebase-memory-mcp review; none of its claims verified here): treat as a working-tree structural challenger behind a single Atlas `code.*` capability (find_symbol/callers/
+    dependencies/blast_radius/resolve_type), never as 17 tools exposed to Ornith, never as canonical graph/identity; evaluate in an ISOLATED config because its installer rewrites agent configs and persists its own
+    index (same hazard as the claude-mem install incident: snapshot configs and read the CLI source before any run). Benchmark set = the 5 failure queries (symbol definition, callers of context-cache-planner,
+    dependents of unified-orchestrator, validator-evidence authority trace, route->X) over grep baseline / Atlas AST / challenger / combined; measure correctness, canonical-resolution rate, tool calls, tokens, latency,
+    stale-worktree detection, false-edge rate. Logical lanes STRUCTURAL_EXACT / STRUCTURAL_GRAPH / TYPE_RESOLUTION / WORKTREE_GRAPH; lane != executor.
+  - REVISED MISSING LIST (from the second paste, accepted): exists/extend = ContextToolDag contract+executor, ContextManifest admission, PrimeAgent spine, RLM state. Build = (1) `RetrievalParameterProjectionV1`
+    (a PROJECTION of the current plan, not another plan; my `buildRetrievalParameterPlan` is its seed and should be renamed/moved when the routing owner is settled), (2) real handlers (CACHE_LOOKUP via
+    `context-cache-planner`, packet via a NO-WRITE path, SEMANTIC_ROUTE, GRAPH_EXPANSION), (3) LIVE-CONTEXT-HANDOFF-01 (DAG -> admitted ContextManifest -> PrimeAgentRuntimeV1; blocked on a per-query
+    `CurrentCandidateFeatureAdmissionV1`), (4) AgentSkillProgressV1, (5) outcome -> `AgentRoutingPriorV1`. Reconcile first: sole routing-plan owner (`query-classification-v2` / `query-router-control-plane-v2` vs
+    `semantic-signal-routing` vs `agentic-file-compiler/retrieval-plan` vs `cognitive-router`); `selectPreAgentStages` (built on `QueryAnalysisV1` from semantic-signal-routing) must become a projection of the winner.
+    Order: CTX-HANDLERS-01 -> CTX-LIVE-HANDOFF-01 -> E2E step-savings measurement -> PARAM-PROJECTION-01 -> REPAIR-LOOP-01 -> AGENT-EXP-01 -> POLICY-FEEDBACK-01 -> OAK -> DSPy/GEPA shadow.
+  - CTX-HANDLER-CACHE-01 DONE (2026-10-05, DRY_RUN_PROVEN only; `context-dag-handlers-v1.spec.ts` 7/7): `makeCacheLookupHandlerV1` over `ace/context-cache-planner.ts` with injected `buildState`/`load`.
+    Findings recorded from reading the owner: (1) `buildAceContextPlannerState` silently defaults `repoGitSha` ('unknown' unless GIT_SHA env), `corpusHash` ('codebase-graph:unknown') and `graphSnapshotHash`
+    ('graph:none'), so its cache key can look valid with no real revision behind it (violates the never-default-identity rule); the handler returns `UNQUALIFIED_KEY` and does NOT call the owner unless all three
+    are explicit non-sentinel values. (2) `loadAceContextPlannerHit` fires `bumpContextCacheHit` (a write) on every hit, so the read-only DAG must inject a read-only loader built on `getContextCacheWithSource`
+    (`ace/llm-context-cache.ts`) instead. Output is compact (status HIT|MISS|UNQUALIFIED_KEY, cacheKey, source, token estimate, delta fields); the cached packet body is not returned. Not wired; no live key probed.
+    Open: where a real per-request `repoGitSha/corpusHash/graphSnapshotHash` comes from (candidate: the admitted workspace revision + graph revision from the ContextManifest admission path).
+  - STRUCTURAL STACK (pasted review, accepted as the owner map, nothing verified/implemented here): Tree-sitter (syntax/byte spans) -> treesitter-chunker (chunks/symbols/xrefs) -> ast-grep (structural nomination)
+    -> ts-morph/LSP (semantics; LSP ranges must be converted via position encoding and validated against exact source bytes) -> `ObservationCoordinateV2` -> Graphify/Atlas promotion; Codebase-Memory MCP = challenger
+    observations (`CodebaseMemoryObservationV1` -> CANONICAL_MATCH|WORKTREE_MODIFIED|NEW_UNADMITTED|STALE|UNRESOLVED), never a second graph owner. Gates proposed: STRUCT-COORD-02, STRUCT-TS-03, STRUCT-LSP-04,
+    STRUCT-ASTGREP-05, CBM-ISOLATE-06 (isolated config/worktree; never run its installer against the shared OpenCode config), CBM-PARITY-07, CBM-IDENTITY-08, CODE-INTEL-E2E-09 (one Atlas MCP op returning definition/references/
+    callers/callees/dependencies/semantic neighbors/blast radius). Keep PyTorch out of the :8095 structural sidecar. The model-facing surface stays the small atlas kernel, not per-tool MCP servers.
+  - CTX-HANDLER-PACKET-01 + VALKEY READ PATHS DONE (2026-10-05, DRY_RUN_PROVEN only; both DAG spec files 23/23): `makeReadOnlyContextCacheLoaderV1` (over `getContextCacheWithSource`: redis `ace:ctx:*` -> postgres
+    `llm_context_cache` -> local-json; verified no write-back on a hit) and `makePacketReadHandlerV1` (read-only: injected `readAcePacketBySourceRef` = 2 Valkey GETs per ref, <=5 refs, deduped, started together; NEVER
+    assembles, because `assemblePacketForSourceRef` writes on a miss). Output is compact; `promptContext` only on request and truncated.
+    VALKEY FINDINGS (read-only, from source; no live key was touched): (1) `AceFullPacket` (`ace/ace-packet-store.ts`) has NO workspace/source revision field, so every ACE packet read is `UNQUALIFIED_NO_REVISION`; a
+    packet read can give bounded context but cannot by itself prove revision-qualified evidence (qualification must come from the lexical/AST candidates). (2) `llm-context-cache.ts` writes `ace:ctx:<key>` with a bare
+    `redis.set` and NO TTL (never expires, against the disposable-cache rule), and `bumpContextCacheHit` rewrites it AND writes a local JSON file on every hit; (3) two Valkey client owners are in play:
+    `cache/valkey-client.js::getValkeyClient` (packet store) vs `redis.js::getRedis` (context cache) = duplicate-owner question for the CLAUDE.md consolidation sweep; (4) the Postgres reader of `llm_context_cache`
+    re-defaults null revisions to 'unknown' (sentinel creep). `ace:packet:*` keys DO carry EX TTLs. `nearestCluster` centroid lookup still uses blocking `KEYS`. Fixes (TTL on `ace:ctx`, SCAN, client unification)
+    are NOT made here; they touch live callers and need their own decision.
+  - CTX-HANDLERS-01 LEDGER (2026-10-05, DRY_RUN_PROVEN only; `context-dag-handlers-v1.spec.ts` 11/11): `PRE_AGENT_STAGE_OWNER_MAP_V1` in `atlas/workflow/context-dag-handlers-v1.ts` records, per stage, the owner
+    function, the adapter and a status, with a spec that every DAG stage has an entry and every READY adapter really exists. Status now: READY = LEXICAL (`retrieveExactMatches`), SEMANTIC_ROUTE (`retrieveQdrant`, dense_768,
+    embeds then Qdrant ANN, read-only network calls; reuses `makeCandidateLaneHandlerV1`, no new adapter needed); READY_WITH_CAVEAT = CACHE_LOOKUP (needs real revision identity), AST (weak ILIKE), ACE_PACKET_ASSEMBLY
+    (read-only, UNQUALIFIED_NO_REVISION); NO_HANDLER = QUERY_ANALYSIS (constant input); NEEDS_OWNER = MEMORY_PRIOR (Engram read function not inspected) and GRAPH_EXPANSION (the only candidate,
+    `ace/graph-expander.ts::fetchDeepImportGraphExpansion(filePaths): Promise<string>`, returns unstructured text, so it cannot yield revision-qualified refs). Next owner hunts: a structured read-only graph/PPR reader
+    (`graph-analysis-runner`, Neo4j/KAG read APIs) and the Engram read path. Still unwired and never run live; `selectPreAgentStages` does not yet emit MEMORY_PRIOR/GRAPH_EXPANSION for real queries beyond its rules.
+  - ENGRAM-OWNER-01 census (2026-10-05, read-only; nothing installed or run): Engram is IN-REPO code, not an installed package (no `engram` dependency in either package.json, none in `node_modules`).
+    Files: `scripts/atlas/{engram-plugin-adapter.mjs (47 lines), sync-engram-memory.mjs (168), chr97-inject-engram-ace.mjs}`; `sveltekit-frontend/src/lib/server/ai/engram-registry.ts` (789, + spec);
+    `.../memory/{engram-memory.ts, engram-plugin-adapter.ts (49), local-engram-memory-adapter.ts (162)}`. No file under `scripts/atlas/*engram*` or `src/lib/server/memory` mentions "taxonomy" (a repo-wide rg timed out, so
+    cross-repo co-occurrence is unknown). `createRedisEngramAdapter` defaults to `redis://localhost:6379` with NO password (Valkey requires auth; REDIS_URL-string pattern the CLAUDE.md ioredis rule forbids), writes
+    `ace:engram:lesson:<id>` with no TTL plus a set `ace:engram:lessons`, and its search does `SMEMBERS` + `MGET` of every key (unbounded). OpenCode side: repo has no `.opencode/plugins`; the only plugin is
+    GLOBAL `~/.config/opencode/plugins/claude-mem.js`. `opencode --help` shows no `--ide` flag (only `--pure`, `-m`, and `opencode plugin <module>` = an INSTALLER that rewrites config: do not run it without
+    snapshotting configs and reading its source, per the claude-mem incident). bun 1.3.14 and opencode 1.18.18 are installed. MEMORY_PRIOR stays NEEDS_OWNER: a read-only, bounded, authenticated Engram search is not
+    available as-is. Recommended wiring: expose it through the `atlas-tools` facade (one read-only tool), not as another OpenCode plugin; fix the adapter's auth/TTL/SCAN first (own decision, live callers).
+  - CBM-INSTALL-01 / CBM-SECURITY-02 (2026-10-05; nothing executed, no config touched): upstream `DeusData/codebase-memory-mcp` latest = v0.11.0 (published 2026-09-15). Downloaded
+    `codebase-memory-mcp-windows-amd64.zip` (39,858,881 B) to `C:\Users\james\Tools\codebase-memory-mcp\dl\` (outside the repo) and extracted it, unexecuted, to `...\dist\`
+    (exe 301,530,624 B, install.ps1, LICENSE, THIRD_PARTY_NOTICES.md). SHA-256 `6eb6beaf261b19e419766e78baf93cbc3cf1c6338cff8fb7c0234859f96d1685` matches all three of: the file, `checksums.txt` (same release) and the
+    GitHub API asset digest. NOT verified: the sigstore `.bundle`, the SBOM, VirusTotal results, and the "17 tools"/benchmark claims. `install.ps1` read in full: it re-downloads `releases/latest` (not the pinned tag),
+    installs to `%LOCALAPPDATA%\Programs\codebase-memory-mcp`, runs `<exe> install -y --force --dir=<dir>`, and the BINARY persists the current-user PATH even with `--skip-config` (the script says so);
+    flag syntax is literal `--skip-config` / `--dir=<path>` read from `$args` (PowerShell `-SkipConfig` would not work). Therefore the least invasive path is to NOT run install.ps1: use the extracted exe in place
+    and register it manually. Not yet decided/run: `--version` smoke, where its index/db lives (unknown until it runs), OpenCode `mcp` entry, pinning the exe path in a repo-local `tools/codebase-memory/` manifest
+    (commit only README/version/SHA256SUMS, never the exe). The pasted `config set auto_index false` commands are unverified against v0.11.0.
+  - CBM-WORKSPACE-01 DONE (2026-10-05; VS Code workspace only; NOT indexed, NOT in OpenCode/Claude/Codex): ran the extracted exe: `--version` = `codebase-memory-mcp 0.11.0`. `--help` shows 17 tools (index_repository,
+    search_graph, query_graph, trace_path, get_code_snippet, get_file_outline, get_graph_schema, compare_graphs, get_architecture, search_code, list_projects, delete_project, index_status, check_index_coverage,
+    detect_changes, manage_adr, ingest_traces), subcommands `cli <tool>` (one tool locally, then exit), `install`, `uninstall`, `update`, `config <list|get|set|reset>`, and `--tool-profile=analysis|scout`
+    (restricted surface). Its data/config dir is `~/.cache/codebase-memory-mcp/` (created by `config list`: `_config.db`, `config.json`). Defaults were `auto_index=false` but `auto_watch=true`, `watcher_enabled=true`,
+    `ui_enabled=true` (HTTP UI port 9749): I set `auto_watch`, `watcher_enabled`, `ui_enabled` to false (reversible via `config reset`; the tool printed "restart the daemon", no daemon was running).
+    Registered in `.vscode/mcp.json` (gitignored; snapshot `.tmp/cbm-install-snapshot-20261005/vscode-mcp.json`, sha256 83c9f148...86f6) as stdio server `codebase-memory` with `--tool-profile=analysis`, absolute exe path.
+    NOT verified: which tools `analysis` actually exposes (must check `tools/list` before trusting it excludes `delete_project`/`manage_adr`/`ingest_traces`/`index_repository`); where per-project index files go
+    (not created until an index runs); whether VS Code auto-starts it. Observed in the existing `.vscode/mcp.json`: a plaintext `DATABASE_URL` with a password in the gitignored `parent-atlas-phase111` entry (local only; flag).
+    Next: `cli --json list_projects` / `cli index_status` smoke (read), then the first explicit index of the repo ROOT (writes index data under the cache dir; needs your OK), then the 5-query benchmark.
+  - CBM-QUERY-05 first use + DIAGNOSTIC FIXES (2026-10-05): (1) FIXED four pre-existing TS diagnostics: `kind:'suspended'` cast in `context-tool-dag-contracts.spec.ts`, unused `RetrievalLaneSchema` import in
+    `semantic-signal-routing.ts`, stray `activeGoal` in the `buildRecommendationFromAnalysis` call of `semantic-signal-routing.spec.ts`, unused `filePath` in `ripgrep-search.ts`; the 3 affected spec files pass 31/31.
+    (2) FIRST USE of codebase-memory-mcp v0.11.0 on ONE small folder (`sveltekit-frontend/src/lib/server/atlas/workflow`, 4 files): `cli index_repository` = 139 nodes / 373 edges, status indexed, 65.6 s wall
+    (includes starting a temporary daemon; none left running afterwards), wrote ONLY under `~/.cache/codebase-memory-mcp/` (project db 2.7 MB + logs), nothing inside the repo (git status line count unchanged 383/383).
+    Project name = the path with dashes. `cli search_graph` found `makeCandidateLaneHandlerV1` at lines 62-92 (file truth: starts at line 62); `cli trace_path` inbound callers = only the spec (correct: no live caller exists),
+    `executeContextToolDagV1` callers = the two specs (correct). So: correct on 3 of 3 spot checks (n=3, tiny scope; NOT a benchmark). Usage notes: raw-JSON positional args are deprecated (use flags, `--args-file`, or
+    piped stdin); `cli` args are tool args (`project`, `name_pattern`, `function_name`, `direction`, `depth`). Tool-profile `analysis` exposure still unchecked.
+  - CBM-INDEX-04 / CBM-QUERY-05 BENCHMARK v0 (2026-10-05; n=3 queries, ONE project, one run each; scored against grep/read ground truth; NOT PROVEN as parity):
+    INDEX: repo ROOT (`deeds-web-app`) ABORTED after 148 s with `aborted_previous_preserved` (the tool cites files changing mid-run or a transient discovery failure; its log shows no error; nothing published).
+    `sveltekit-frontend/src` indexed OK in 120 s: 74,735 nodes / 250,913 edges, status ready, 279 MB db under `~/.cache/codebase-memory-mcp/`, 117 parse_partial + 3 parse_unusable files, 4 env-named dirs excluded by
+    design (`routes/api/system/env`, `lib/env`, `lib/server/env`, `lib/server/atlas/identity/node_modules`), nothing written into the repo, no processes left. Python/scripts/packages/openspec are NOT indexed, so
+    cross-tree questions are out of scope until a root/multi-project index succeeds. TOOL PROFILE: raw `tools/list` with `--tool-profile=analysis` = 13 tools (search_graph, query_graph, trace_path, get_code_snippet,
+    get_file_outline, get_graph_schema, compare_graphs, get_architecture, search_code, list_projects, index_status, check_index_coverage, detect_changes); `index_repository`, `delete_project`, `manage_adr`,
+    `ingest_traces` ABSENT; all flagged readOnlyHint except `get_file_outline` (false). So the VS Code MCP server cannot index; indexing is CLI-only.
+    RESULTS: Q1 `buildLearningOutcomeV1` definition = CORRECT (`learning-outcome-v1.ts` 118-142, file truth 118), 6.1 s. Q2 callers of `loadAceContextPlannerHit` = INCOMPLETE (1 of 2 production callers: found
+    `context-assembler.ts::assembleACEContext`, MISSED `retrieval/hyperrag-fusion-service.ts:321`, which imports it via `$lib/server/ace/context-cache-planner.js`), 4.8 s. Q4 callers of `buildLearningOutcomeV1` =
+    INCOMPLETE (found `buildRepairEpisodeOutcomesV1` + specs, MISSED the execute route `routes/api/agent/execute/+server.ts:282`), 5.1 s. Q3/Q5 not run. DIAGNOSIS of the execute-route miss: the route's `POST` has 6
+    outbound edges, 2 right (`reviewAndSaveExecution`, `dispatchToolCall`, both `$lib` imports, so `$lib` IS resolved at least sometimes), 3 WRONG (`json`/`server` -> `embedding-runtime-health-v1.spec`, `uuid` ->
+    `outbox-authority.spec`, `sql` -> a phase89 route: common-name collisions) and `buildLearningOutcomeV1`/`buildOutcomeLedgerInsertV1`/`logError` absent. Conclusion: BOTH false negatives and false-positive edges on
+    this repo; recall is not yet good enough to trust caller lists, which supports the challenger-only boundary (every caller list must be re-verified by Atlas/rg before it becomes evidence).
+    LATENCY: ~5-6 s per `cli` call because each starts a temporary daemon; `codebase-memory-mcp daemon start` (a lifecycle action: human-owned) would remove that. Tool ambiguity handling is good: a bare `POST` returned
+    "ambiguous, 533 matches" and asked for a qualified name instead of guessing. TODO: Q3/Q5, `get_code_snippet`, multi-project/root index retry (try again when the tree is quiet, or index subtrees: `scripts`, `packages`,
+    `python`, `openspec`), compare against the Atlas helper path, token/tool-call counts vs CTX-E2E. Hardening NOT done: `CBM_ALLOWED_ROOT` (upstream-claimed, unverified) and the plaintext DATABASE_URL in `.vscode/mcp.json`.
+  - CBM-EMBED-BOUNDARY-01 (2026-10-05; codebase-memory-mcp v0.11.0 native binary): its bundled embedding is `nomic-embed-code` (768d int8, 40K-token table, compiled into the exe; no Ollama/API key/Docker), per upstream
+    README v0.11.0 line 202. A string scan of the exe does NOT show the model name (weights are embedded, only English-word hits like "nomics"), so the README is the evidence; runtime network behaviour NOT measured.
+    It serves ONLY `search_graph.semantic_query`, which must be an ARRAY of keyword strings (a plain sentence is rejected: "semantic_query must be an array of keyword strings"), scored per keyword (min-cosine) inside an
+    11-signal blend. One test on the 4-file `atlas/workflow` project (`["candidate","lane","qualified","hits"]`) ranked `makeCandidateLaneHandlerV1` first (0.9025); n=1, not a benchmark. BOUNDARY RULES: (1) 768-d here
+    is NOT `semantic_768` (EmbeddingGemma); same dimension != same representation, so never compare/mix scores or write CBM vectors to Qdrant/pgvector/Valkey; (2) CBM semantic scores are a CHALLENGER structural-lane
+    signal, never a second dense vote in `SearchRuntime`/RRF and never a `representation_id`; (3) EmbeddingGemma stays canonical, Ollama phase-out is unaffected; (4) the vectors live only in CBM's own project db
+    under `~/.cache/codebase-memory-mcp/`. The structural/call graph itself does not use embeddings.
+  - CBM-ALIGN-01 RANKING (2026-10-05; measured on the `sveltekit-frontend/src` graph only, tiny n, each scored against grep ground truth; supersedes the call-edge-only reading in CBM-QUERY-05):
+    1) DEFINITION / NODE LISTING (`search_graph` by name or `file_pattern`; gives label, line range, in/out degree): Q1 exact (118-142). Highest trust, cheapest.
+    2) MODULE IMPORTS INBOUND (`trace_path` on the MODULE qualified name `<project>.<dotted path without extension>`, `edge_types:["IMPORTS"]`, depth 1): Q3 `unified-orchestrator` found 4 of 6 true importers
+    (precision 4/4, recall 67%; missed `retrieval/embedding-service.ts` and `routes/api/admin/retrieval/stream/+server.ts`); Q5 `governed-repair-v1` found exactly its one importer (the spec) = matches rg truth.
+    NOTE the same query on the FILE node (`...ts.__file__`) returned 0, and my first Cypher guess (File IMPORTS File) returned 0 rows: IMPORTS hangs off Module nodes, so a zero is a query-shape artefact, never evidence.
+    3) ARCHITECTURE / SCHEMA COUNTS (`get_architecture`): 74,735 nodes / 250,913 edges, 21 labels (Function 19,927; File 6,668; Route 878; Table 71; EnvVar 375), edge types incl. CALLS 33,938, IMPORTS 16,913,
+    WRITES 6,533, HTTP_CALLS 1,042, TESTS_FILE 821; languages TS 5,220 / Svelte 928; cheap orientation, not an answer source. 4) KEYWORD `semantic_query`: 1 sensible result (n=1, see CBM-EMBED-BOUNDARY-01).
+    5) CALL EDGES (`trace_path` CALLS): LOWEST trust: Q2 1/2 callers, Q4 missed the execute route, and common names (json/sql/uuid/server) resolved to wrong spec/route nodes (false positives).
+    UNMEASURED (do next): `search_code`, `detect_changes` (blast radius), `Route`/`HTTP_CALLS` (which route reaches X), `WRITES`/`Table`/`EnvVar` (what writes table T), `get_code_snippet`, `get_file_outline` (readOnlyHint false).
+    HOW TO USE IN THIS REPO (alignment): graph-SEEDED, rg-VERIFIED. (a) use ranks 1-3 as the cheap first hop for the `WORKTREE_STRUCTURAL` DAG node; (b) every CALLS/IMPORTS list is a CANDIDATE set to be unioned with `rg -w <symbol>`/import
+    greps and tagged agreed/graph-only/rg-only before it becomes evidence; (c) an EMPTY or SHORT graph result means UNKNOWN, never "not connected" or "no callers" (negative claims need rg); (d) common-name symbols
+    (`json`, `sql`, `uuid`, `POST`) must be qualified or are refused/ambiguous; (e) scope is `sveltekit-frontend/src` only (root index aborted); (f) keep it behind one Atlas `code.*` capability, not 13 raw tools.
+  - CONVERGENCE LEDGER (2026-10-05; pasted cross-layer review, ACCEPTED AS A TASK LIST ONLY. Nothing below was re-verified here; the external claims (PyTorch `mmap=True`, cuTile on Ampere, Ornith architecture, simdjson
+    behaviour) and the "no current owner found" statements are the pasted reviewer's, to be re-censused before any build). Principle: lane != executor, projection != canonical authority, transport points at a packet and never
+    owns it. Five different "memories" stay separate: Ornith recurrent state, Titans-style neural memory (research only), Engram/Claude-Mem, BitFrost cache, RLM working state.
+    * CODE-INTELLIGENCE-CONVERGENCE-01: census + one `CodeIntelligenceObservationV1` surface for lexical/AST/CBM/LSP-type/graph; every observation resolved to canonicalId+sourceRef+workspaceRevision+sourceRevision+
+      representation revision before ContextManifest promotion. CBM's nomic-embed-code vectors stay isolated (no copy/cosine/fusion/promotion until representation-parity evidence exists).
+    * REPRESENTATION-DAG-01: freeze one canonical ordinal map + semantic_768 snapshot; bind KNN/KMeans/SOM 20x20/AE latents/PCA-SVD/graph features to that snapshot checksum; all derived = routing/features, never semantic truth;
+      UMAP diagnostic-only. KNN-TOPK-01 (exact vs cuVS/CAGRA/Qdrant HNSW as executors of ONE logical lane; Recall@K/MRR/nDCG/latency/VRAM/identity-resolution rate). KMEANS-CURRENT-01 and SOM-20X20-CURRENT-01 (re-run on the
+      admitted snapshot with seed/K/checksums; stale assignments diagnostic-only). AE-LINEAGE-01 (keep `ae:train` blocked until semantic input lineage is admitted; frozen inputs; weights receipts; evaluate latent_256/128/64).
+    * RERANK-OWNER-01: pick ONE runtime rerank owner, others challengers; rerank reorders only, never a new logical vote, fail open with a receipt. QUERY-FEATURE-ROUTING-01: finish QueryTemporalIntentV1; compile
+      intent/domain/taxonomy/temporal/mutation into the non-authoritative `RetrievalParameterProjectionV1` from the CURRENT routing-plan owner; never encode recency words in embedding text; OAK/OKF = enrichment only.
+    * GRAPH-READ-01: bounded read-only canonical graph reader returning typed records (canonicalId, sourceRef, sourceRevision, edgeType, depth, distance) over the existing NetworkX<->cuGraph(+Neo4j/KAG) owners;
+      CBM stays the dirty-worktree WORKTREE_STRUCTURAL challenger; no unstructured graph summary becomes evidence (this is what GRAPH_EXPANSION in `PRE_AGENT_STAGE_OWNER_MAP_V1` is missing).
+    * CBM-ALIGN-01 (extends the measured entry above): benchmark vs CTX-E2E fixtures on correctness, calls, tokens, latency, canonical-resolution rate, false-authority rate; admit ONLY as WORKTREE_STRUCTURAL.
+    * TENSOR-MMAP-01 (ordinal-aligned contiguous artifacts, registry canonicalId->ordinal->artifact revision->offset, offsets never identity, bounds/checksum/dtype/shape validation); PACKET-COMPACT-01 (reuse the existing
+      MessagePack codec; JSON = control/debug; no second binary authority; hex is not compression); SIMDJSON-01..03 (Node baseline -> native On-Demand/iterate_many -> identical row/count/checksum parity, large JSONL only;
+      Zod/Pydantic stay schema authority); GPU-KERNEL-OWNER-01 (cuBLASLt=dense GEMM, cuVS=ANN, cuGraph=graph, CUB=radix; SIMT/cuTile challengers needing parity + measured win; never co-reside a large decoder with
+      RAPIDS/cuVS/cuGraph/cuTile on the 8 GiB card without measured headroom); ORNITH-RUNTIME-01 (finish the exact YaRN launcher/process receipt before claiming YaRN; Titans ideas research-only; quaternion/S3 isolated).
+    * AGENT-CONTEXT-01: finish CACHE_LOOKUP (real revision identity), MEMORY_PRIOR, typed GRAPH_EXPANSION handlers; CBM handler only after benchmark + canonical-resolution proof; a ready/deque queue only when dependency-level
+      Promise.all is measurably limiting; reuse the ACE Packet V3 -> ContextManifest admission bridge and PrimeAgentRuntimeV1 (no new prime-agent/REPL owner). AGENT-LEARNING-01: candidate->approval->mutation->validator->
+      LearningOutcomeV1, then derived AgentSkillProgressV1/routing priors from validator-backed outcomes only; `.safetensors` adapters only after frozen-eval promotion.
+    * DEFERRED / NO NEW OWNER: hidden-state MLP, UMAP (visualization), Hilbert/"Hamed" (if Hamming: reuse the binary-quantize/Hamming ANN experiment; otherwise define it first), CouchDB (no new persistence authority).
+    Critical path (as pasted): canonical semantic snapshot -> shared ordinal LUT -> KNN/KMeans/SOM/AE/graph features -> CandidateFeatureMatrix -> query classifier/routing policy -> ContextToolDag -> CBM+lexical+AST+semantic+
+    graph+memory -> ContextManifest -> PrimeAgent/Ornith -> validator-backed LearningOutcome -> offline policy improvement. NOT done: `docs/parent-atlas-workstation-todo.md` was NOT edited (the review also asked for it; it has
+    uncommitted local changes, so confirm before touching it).
+  - CBM-ALIGN-02 MEASURED THE UNMEASURED (2026-10-05; v0.11.0, `sveltekit-frontend/src` graph, one run each, scored vs rg/file truth; supersedes the UNMEASURED line above):
+    GOOD: `get_file_outline` (learning-outcome-v1.ts: all 19 symbols with exact line ranges, 3,458 B vs the 9,170 B file = 38%) and `get_code_snippet` (`buildLearningOutcomeV1` = exactly lines 118-142, 1,464 B = 16% of the file)
+    are correct and save tokens (each ~6.4 s incl. daemon start). `search_code` BOUNDED (`mode:"files"`, `path_filter:"lib/server/atlas/agentic"`) = EXACT match with rg (3 files, 16 matches; 4.9 s), but the UNBOUNDED
+    call failed ("search_code scan exceeded its execution deadline", 36 s) where rg is instant: always pass `path_filter`/`file_pattern`.
+    WRONG-USAGE LESSONS (mine, not tool bugs): `detect_changes.scope` only accepts `files|impact` (my `unstaged` was silently ignored and it diffed against `main`: 3,813 files); it diffs a base branch, default `main`,
+    over the GIT ROOT, so with `base_branch:"HEAD"` it reported 556 changed files but `seed_symbols:0`/`impacted_total:0` (first page was .codex/.opencode/.claude paths outside the indexed `src` project, so no symbol mapping;
+    paging through to src files was NOT done) = INCONCLUSIVE for blast radius, ~20 s; project root is `src/` while changed paths are repo-root-relative, a probable mismatch to test. `Route` nodes are named
+    `__route__<METHOD>__<path>` with no file link (878; my `name_pattern:"agent/execute"` found 0; try `qn_pattern`); `Table` nodes (71) come from `.sql` migration files under `src` only (e.g. `ai_recommendations`), so
+    `outcome_ledger` (DDL outside `src`) is absent by scope, not by tool failure. WRITES-from-code -> Table and HTTP_CALLS -> Route queries remain UNMEASURED.
+    UPDATED TRUST TIERS: T1 exact seeds = `search_graph` symbol/file, `get_file_outline`, `get_code_snippet`, BOUNDED `search_code`; T2 candidate sets (verify) = module IMPORTS inbound, route/HTTP, change-impact;
+    T3 challenger-only = CALLS, `semantic_query`; NEGATIVE conclusions never from CBM alone. Upstream note (pasted web check, unverified): `analysis`/`scout` profiles are allowlisted, NOT guaranteed read-only (cache
+    maintenance may write); `tools/list` of the installed binary is the authority; keep measurements pinned to v0.11.0. Next: page `detect_changes` to its `src` files, `qn_pattern` Route test, HTTP_CALLS/WRITES queries.
+  - CBM-MEASURE-02B/C/D RESULTS + CBM-ADMISSION-01 (2026-10-05; v0.11.0, `src` graph, one run each):
+    detect_changes (`scope:"impact"`, `base_branch:"HEAD"`, 557 files, 25 s): FILE LIST is right (it includes the files I know changed: both `context-tool-dag-contracts` files, both `semantic-signal-routing` files,
+    `ripgrep-search.ts`, both `context-dag-handlers` files; the list is a compact directory-grouped tree, so substring counts on it are meaningless) but `seed_symbols:0`, `impacted_total:0`, `module_total:0`: ZERO symbol
+    mapping or blast radius, i.e. it only equals `git diff --name-only` here; cause undetermined (candidate: project root `src/` vs git-root-relative paths). => NOT usable for blast radius yet.
+    ROUTES: `Route` nodes (878) are URL/event strings, e.g. `__route__ANY__/api/acp/execute`, `__route__ANY__/api/tools/execute`, `__route__pubsub__agent.task.execute`; the real SvelteKit file route
+    `/api/agent/execute` (+server.ts `POST`, 73-392) has NO Route node, so Route/HTTP_CALLS (1,563 nodes carrying HTTP_CALLS) model URLs referenced by call sites, not file-based endpoints. For "which route reaches X" use the
+    `+server.ts` `POST/GET` Function nodes plus path convention, not Route nodes. `qn_pattern` with `label:Route` returned the misleading hint "No nodes have this label" (a filter quirk; `name_pattern:"execute"` works).
+    WRITES (7,546): code-level variable/field/method writes (samples: `ff1/planner.ts` functions, a `Variable` in `routes/(app)/+layout.svelte`, a `.cc` method), NOT database-table writes; `Table` nodes are `.sql`-defined tables only;
+    so "what code writes table X?" is NOT answerable from WRITES: use rg/SQL-aware helpers. EnvVar: nodes `__env__REDIS_HOST` etc. (16 REDIS-named) enumerate fine; usage edges unscored.
+    BATCH RANK (most to least useful here): 1 bounded `search_code`; 2 `get_file_outline`/`get_code_snippet` (token economy 38% / 16% of file bytes); 3 `detect_changes` file list (correct, no impact); 4 EnvVar listing (unscored);
+    5 Route/HTTP_CALLS (wrong abstraction for file routes); 6 WRITES (wrong semantics for table ownership).
+    ADMISSION DECISION (recommended, needs operator OK): admit CBM ONLY as `WORKTREE_STRUCTURAL` for query classes DEFINITION, OUTLINE/SNIPPET (source expansion), IMPORTS (candidate set, verify) and BOUNDED TEXT; NOT admitted
+    for BLAST_RADIUS, ROUTE, WRITES, CALLS-as-evidence. Receipt shape: `{backend:'CODEBASE_MEMORY_MCP', version:'0.11.0', queryClass:'DEFINITION'|'OUTLINE'|'SNIPPET'|'IMPORTS'|'TEXT', trustTier:1|2, project, indexedAt,
+    observations:[{sourceRef,symbol?,span?,relation?}], canonicalAuthority:false, emptyMeansUnknown:true}`. Handler NOT written. Stale-index risk: the index is a snapshot (indexed_at 2026-10-06T01:29Z); edits made after it are
+    invisible until re-indexed (auto_watch is off), so a handler must compare file mtime/git state or re-index first. Next: REPRESENTATION-SNAPSHOT-01 scoping (large), and the open CBM item: find why `detect_changes` maps 0 symbols.
+  - DIRECTORY-INTELLIGENCE-PREFILL-REPAIR-CLOSURE (2026-10-05; pasted architecture, ACCEPTED AS A DEPENDENCY LADDER, nothing built or re-verified here; every Graphify / CBM / AST / NLP / cache task below should point into
+    this ladder instead of staying a feature island).
+    (A) REVISION CHAIN FIRST (the gate before any projection claims same-snapshot proof; revision LOGIC already exists, the missing piece is a same-revision execution chain):
+    CURRENT-WORKSPACE-01 fresh read-only workspace source manifest -> workspaceRevision W (normalized sorted manifest of indexable files incl. dirty/untracked source; stronger than git HEAD);
+    GRAPHIFY-EXECUTION-MATCH-02 find an EXISTING Graphify execution whose workspaceRevision == W; none => `BLOCKED_NO_MATCHING_EXECUTION`, do NOT refresh automatically (the Sep 11 execution `3be790` vs the Sep 26 source
+    snapshot `e24bb9` mismatch must not be combined); SOURCE-BINDING-03 per candidate sourceRef: exact workspace binding + exact sourceRevision; PACKET-CHUNK-04 sourceRevision PROVEN + packet/chunk membership + physical
+    `codebase_chunk_index` row; LINEAGE-READBACK-05 workspaceRevision exact, sourceRevision exact, packetKey resolved, canonicalChunkId resolved, chunk row resolved, no revision conflict (a matching workspaceRevision alone does
+    NOT prove chunk lineage: whole-file revision identity and physical chunk identity are separate predicates). Gate status: WORKSPACE REVISION OWNER proven; CURRENT SELECTION needs fresh readback; GRAPHIFY WORKSPACE MATCH blocked;
+    SOURCE/PACKET/CHUNK LINEAGE held behind the match; Graphify refresh NOT authorized. EXISTING read-only scripts for the first step (`scripts/atlas/`; DB side runs in `BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY` but each
+    OVERWRITES a tracked `docs/reports/*.json`, so run only after you accept dirtying those files): `audit-current-workspace-frame-admission-v1.mjs`, `audit-graphify-workspace-snapshot-binding-v1.mts`,
+    `audit-current-workspace-packet-chunk-join-v1.mjs` (needs `--workspace-revision` and `--execution-id`), `audit-graphify-workspace-owner-v1.mjs`, `capture-/audit-workspace-source-snapshot-v1.mts`.
+    (B) DIRECTORY SPINE (`DirectoryObservationPlanV1`: directoryId, relativePath, workspaceRevision, directoryChecksum, roles [SOURCE_CODE DOCS OPENSPEC STRUCTURED_DATA CONFIG LOG GENERATED VENDOR BINARY + UNKNOWN routed only
+    through cheap inspection], helpers [RG TREE_SITTER TREE_SITTER_CHUNKER AST_GREP TS_MORPH LSP SIMDJSON NLP LANGEXTRACT SEMANTIC_768 CBM], maxFiles/maxBytes/maxRecords, canonicalAuthority:false; batches as
+    `DirectoryBatchV1` with byte/record caps: the cap bounds memory, it is not the ingestion architecture). Observation types (all with sourceRef, sourceRevision, workspaceRevision, startByte/endByte where applicable,
+    producerRevision, inputChecksum, outputChecksum, canonicalAuthority:false): Ast/Symbol/Lexical/Nlp/Ontology/Semantic observations + `DirectorySummaryV1`. LLMS.md/AGENTS.md = derived NAVIGATION projections, never evidence
+    authority. LOD ladder LOD0 identity packet -> LOD1 directory/LLMS card -> LOD2 feature/semantic/graph descriptors -> LOD3 source spans + AST neighborhood -> LOD4 Arrow/mmap batch -> LOD5 GPU active tile / ANN frontier ->
+    LOD6 full source; BitFrost/Valkey may cache cards, manifests, descriptors, hot neighborhoods; Postgres stays authoritative.
+    DIR-SPINE-01 freeze SourceRole + DirectoryObservationPlan; 02 deterministic directory file inventory; 03 route one directory of each kind (source, openspec, docs, jsonl, log); 04 typed observations with exact revisions
+    + spans; 05 resolve to canonical identities; 06 derived directory profile / LLMS projection; 07 freeze retrieval candidate set; 08 lexical/structural/semantic/graph tournament; 09 compile ContextDagPlan; 10 assemble ACE
+    ContextManifest; 11 warm BitFrost/Valkey ONLY after identity proof; 12 Ornith/OpenCode read-only repair session; 13 validator -> LearningOutcome. NOT blocking the first proof: KMeans, SOM, AE, UMAP, Titans, quaternion,
+    cuTile, PPO. Minimal spine = directory inventory -> source-role routing -> lexical/AST/symbol/LSP -> semantic/graph when needed -> ContextManifest -> Ornith -> validator. Terminology: Graphify output =
+    "directory intelligence materialization"; CBM's persistent graph is a separate challenger index; both may feed the Atlas query planner, neither silently replaces the other.
+    CBM NOTE (conflict with measured facts): the review advises ONE isolated full-repo CBM project, not one per subdirectory (cross-directory calls/imports fragment across projects). Measured: the repo-ROOT index
+    ABORTED once (`aborted_previous_preserved`, 148 s), only `sveltekit-frontend/src` (+ the small `atlas/workflow` test project) exist; retry the root index when the tree is quiet before adopting per-directory projects.
+- [ ] QUERY-TEMPORAL-01 Add `QueryTemporalIntentV1` (TIME_AGNOSTIC | RECENT | LATEST | AS_OF + `asOf`/`maxAgeDays`). Freshness is a feature weighted only when the query asks for it
+  (never blind recency; never encode "latest" in embedding text). Carry `observedAt`/`publishedAt`/`admittedAt`, `schemaRevision`, `ontologyRevision`, `sourceRevision`, `contentDigest` on `.okf` entries by
+  extending `okf-topic-ingestion.ts`, not a new corpus schema.
+- [ ] CTX-CACHE-KEYS-01 Valkey (disposable): `atlas:qanalysis:v1:<queryChecksum>`, `atlas:qplan:v1:<queryChecksum>:<policyRevision>`, `atlas:centroid:v1:<representationRevision>:<queryChecksum>`,
+  `atlas:retrieval:v1:<snapshotRevision>:<queryChecksum>:<filterChecksum>`. BitFrost: `canonicalId + sourceRevision + representationRevision + contextRecipeRevision`. Emit cache_hit, warm_hit, steps/tokens saved.
+- [ ] LANGEXTRACT-VERSION-01 Pinned `langextract[openai]==1.6.0` in `docker/miniforge-nlp-sidecar/Dockerfile` (and `docker/langextract-optimized`); upstream version claims are unverified here.
+  Record VERSION_AUDIT_REQUIRED and test grounding before any upgrade; LangExtract runs only when the DAG selects grounded extraction (not for query routing).
+- [ ] RANK-RADIX-01 Radix sort only as a deterministic tie-break/top-K ordering step AFTER relevance scoring is stable (ordering optimization, not retrieval). Deferred.
+- [ ] MEM-SINGLE-WORKER-01 Claude-Mem keeps ONE shared worker for Claude Code + OpenCode (`platform_source` distinguishes them); VS Code gets no separate memory owner (the OpenCode extension just runs OpenCode).
+- Carried: MCP-TRACE-RESTART-01 (human), MCP-TRACE-CONFORMANCE-01, INJECTION-01, ATLAS-RAG-COLD-01, CTX-INDEX-FRESH-01, TOOL-MANIFEST-01, PIPE-E2E-01. Config state: kernel `steps` 20; revert/tune after CTX-E2E-04.
+
+#### CTX-E2E-04 receipt: the empty answer is a forced-final-turn artifact, not model inability (2026-10-05)
+
+Continued the finished routing-v2 session (`ses_ef184b4fdffeeFd2Xr7ZmD5HiJ`, `--session`) with fresh user input: "Do not call any more tools. Write your final answer now... cite file paths. If it is not wired, say so."
+- 1 step, 0 tool calls, 36,645 context tokens (compacted session). The answer was non-empty and matched ground truth: `LearningOutcomeV1` is built by `buildLearningOutcomeV1()` in
+  `agentic/contracts/learning-outcome-v1.ts`, constructed at the execute route (`+server.ts` ~line 282, no validator at dispatch) and in `repair-episode-verifier-v1.ts`; validator-backed repair
+  evidence is NOT wired into any runtime owner (capture script, adapter and verifier are exercised only by their specs; `governed-repair-v1.ts` is not connected). It also avoided the
+  earlier wrong claim (`phase79-agentic-repair.mts` / `recordAnalysisPassResult` as the authoritative path).
+- Conclusion: the step-cap forced turn (tools removed) is what returns an empty `<think></think>`; a fresh user message resets the allowance and the same model answers correctly from the compacted context.
+  Raising `steps` or adding prompt rules (CTX-E2E-02/03) did not help; a continuation did.
+- [ ] ANSWER-FINALIZER-01 For automated/headless runs (`opencode run`, any wrapper), if the final text is empty or the step cap was hit, send ONE continuation message ("no more tools; answer now from what you found; cite
+  paths; say not wired if unknown") and record both turns in the receipt. Interactive users can do the same by sending a follow-up message. Do not rely on the forced final turn.
+- [ ] CTX-E2E-FINAL-01 (supersedes the earlier isolation task) Optionally confirm the forced-turn failure mechanism (template/reasoning handling when tools are removed) so it can be fixed at the source.
+- [ ] CTX-E2E-05 Re-run the baseline query with the finalizer and `atlas-tools` expected; score: answer correct vs ground truth, citations, steps + finalizer turn, tokens, wrong-claim rate. Then CTX-PREAGENT-01.
+- Evaluation note: the ground-truth answer for this query is "built in learning-outcome-v1.ts; validator-backed evidence not authoritative/wired anywhere yet"; any answer naming phase79 or analysis_pass_results as the authoritative path is a wrong claim.
+
+#### Status update: ANSWER-FINALIZER-01 implemented, CTX-E2E-05 in progress (2026-10-05)
+
+- [x] ANSWER-FINALIZER-01 `scripts/opencode/run-with-finalizer.mjs` (syntax-checked; not yet unit-tested). Runs one headless `opencode run --pure --agent <agent> --format json`, and if the final text is empty
+  or shorter than 40 characters after stripping `<think>` blocks, sends ONE `--session` continuation ("no more tools; answer now; cite paths; say not wired if unknown"). Writes
+  `atlas.opencode-run-receipt.v1` (`canonicalAuthority:false`, `writesPerformed:false`) with per-turn steps, tool-call counts, max calls per step, `atlas-tools` calls, write attempts
+  (edit/write/patch/record_outcome), context tokens, seconds, and the final answer. Exit code 1 when no answer. Use only with read-only agents.
+- [ ] CTX-E2E-05 (IN PROGRESS) Same baseline query through the finalizer (`ornith-atlas-kernel`, steps 20, `--pure`). Result not yet recorded: when the receipt lands, score answer vs the ground truth
+  in the CTX-E2E-04 note, citations, steps + finalizer turn, tokens, `atlas-tools` use, and write attempts (must be 0). Receipt path: session scratchpad `ctx_e2e_05_receipt.json` (ephemeral); regenerate with the script if lost.
+- [x] ANSWER-FINALIZER-02 (DONE 2026-10-05: pure functions exported from `scripts/opencode/run-with-finalizer.mjs`; `scripts/opencode/run-with-finalizer.test.mjs`, 6/6 `node --test` pass; the full `opencode run` flow was not re-run after the refactor) Add a unit test for the finalizer's decision logic (empty / short / think-only / non-empty final text; missing sessionId) by extracting the pure parsing/decision functions from the script.
+- [ ] CTX-PREAGENT-01 remains the main step-saving build (see the CTX-E2E-03 receipt): the finalizer only fixes the empty answer, not the 18 sequential tool calls or the unused `atlas-tools` facade.
+
+Human-owned items still open (nothing here was changed without you):
+- MCP-TRACE-RESTART-01: live TRACE (pid 59052) still serves the old `atlas.packet_dense_search` schema; restart, then re-validate 188/188 with the SDK validator and `opencode mcp list`.
+- MEM-CLAUDE-WORKER-01: the claude-mem `bun --daemon` worker (pid 33196, auto-started by the plugin load) is still running with the Claude Code OAuth token; keep or stop.
+- Config state to confirm: `.opencode/opencode.jsonc` kernel `steps` = 20 (was 10); `.opencode/prompts/context-routing-v2.md` exists but is NOT loaded by default (A/B only, result: no improvement).
+- Governed-repair DDL (`drizzle/manual/20261005_governed_repair_executor_v1.sql`) remains drafted, rehearsed, NOT applied.
+
+#### CTX-E2E-05 result: PASS_DIAGNOSTIC with the finalizer (2026-10-05)
+
+Receipt `atlas.opencode-run-receipt.v1` from `scripts/opencode/run-with-finalizer.mjs` (agent `ornith-atlas-kernel`, steps 20, `--pure`, same baseline query).
+- Primary turn: 20 steps (cap hit), 19 tool calls (11 `grep`, 5 `read`, 2 `glob`, 1 `todowrite` first), max 1 call per step, `atlas-tools` calls 0, final text empty. Finalizer turn fired automatically:
+  1 step, 0 tool calls, 48 s, non-empty answer (1,153 chars). Totals: 21 steps, 385 s, peak context 41k tokens (no compaction needed this time), write attempts 0 (no edit/write/patch/record_outcome).
+- Answer vs ground truth: CORRECT. Names `buildLearningOutcomeV1` (`learning-outcome-v1.ts` line 118) and `deriveReward` (line 100), the execute-route construction (~line 282, reward null at dispatch),
+  `verifyRepairEpisodeV1` (line 54) / `buildRepairEpisodeOutcomesV1` (line 77) consumed only by specs, `canonicalAuthority: false` (line 60), and concludes no runtime owner promotes
+  validator evidence to authoritative state. All cited line numbers were spot-checked against the files and match. No wrong-claim (phase79 / analysis_pass_results) this run.
+- Honest limits: one sample of a non-deterministic 9B model (temperature 0.4); the `atlas-tools` facade was still not selected (0 calls); 19 sequential calls remain the cost problem; the finalizer
+  masks, but does not fix, the forced-final-turn empty output.
+- Status: ANSWER-FINALIZER-01 PROVEN (diagnostic, n=1). CTX-E2E-05 PASS_DIAGNOSTIC. Next gates unchanged: CTX-PREAGENT-01 (steps), TOOL-SELECT/atlas-tools selection, ANSWER-FINALIZER-02 (unit test), repeat the
+  baseline n>=5 to estimate variance before claiming reliability.
+- [ ] CTX-E2E-VARIANCE-01 Run the finalizer harness 5 times on this query and 2 other fixtures (exact-symbol, memory/prior-session); report answer-correct rate, steps, finalizer-needed rate, wrong-claim rate.
