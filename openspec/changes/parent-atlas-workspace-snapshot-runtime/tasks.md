@@ -13,16 +13,11 @@
 - [ ] WSR-06 Generation-before == generation-after race check with bounded retry; test mutates a file mid-seal.
 - [ ] WSR-07 Full byte-level reseal retained as independent audit (FULL_RESEAL_AUDIT).
 - [ ] WSR-08 `valid` / `current` / `admitted` as independent states.
-- [ ] WSR-08a Add the `WorkspaceFrameStateV1` contract: independent `snapshotValid`, `currentAtEvaluation`, and `admitted`; bind snapshot/workspace revisions, immutable manifest checksum, independent validation receipt checksum, and exact admission identity. Define `CURRENT_WORKSPACE` / `PRIOR_IMMUTABLE_SNAPSHOT` / null admission modes and supersession without invalidating historical bytes. No implementation may infer one state from another.
-- [ ] WSR-08b Split current-frame consumers from explicit historical-snapshot readers. Current consumers require currentness plus admission; historical readers require an exact requested snapshot revision plus validity and admission, and must never fall back to the current frame.
 
 ## 3. Admission and control plane
 
 - [ ] WSR-13 Admission binds the exact workspaceRevision + manifest sha256 + sourceCount; refuses a mismatch. Operator phrase `AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1` still required.
-- [ ] WSR-13a Extend append-only admission evidence to bind `snapshotRevision`, `workspaceRevision`, `manifestSha256`, `sourceCount`, and `validationReceiptSha256`; keep the existing explicit operator phrase and fail closed on any mismatch. Review storage ownership/migration before persistence changes.
 - [ ] WSR-09 Read/control API in the existing control plane (`admit` is the only authority call).
-- [ ] WSR-09a Add `ProjectionFreshnessV1` through the existing artifact/freshness owner; classify current, workspace-superseded, source-changed, representation-changed, or owner-unknown without invalidating historical admission or writing a projection.
-- [ ] WSR-09b Compose existing runtime metadata adapters behind the Parent Atlas read facade; preserve per-owner revision/checksum references. Facade and SSR/SSE are projections only; only the existing admission owner may admit.
 - [ ] WSR-10 SSE status/progress stream (display only).
 - [ ] WSR-11 Admin Studio initial state via SSR + SSE.
 
@@ -55,7 +50,7 @@ Why: Gate2 admission of the clean seal `8cc50d57…` stalled because the existin
 
 Target state record (derived read model; the admission ledger stays the authority): `WorkspaceFrameStateV1 { workspaceRevision, snapshotValid, currentAtEvaluation, admitted, admissionMode: CURRENT_WORKSPACE | PRIOR_IMMUTABLE_SNAPSHOT | null, supersededByWorkspaceRevision?, manifestSha256, validationReceiptSha256? }`. Consumers ask the real question: current workspace needed -> `currentAtEvaluation && admitted`; exact historical snapshot -> `snapshotValid && admitted`; read-only comparison -> `snapshotValid`. A prior-snapshot admission must never satisfy a gate that requires current-workspace authority; frame-authority proof reports `ADMITTED_FRAME_PROVEN` and `CURRENT_FRAME_NOT_PROVEN` separately.
 
-- [ ] WSR-08a Define the VALID/CURRENT/ADMITTED state contract above; audit the existing admission/preflight/derivation/frame-authority owners first and extend them additively (new fields only, no rewrite of historical receipts, no second authority owner).
+- [ ] WSR-08a Define the VALID/CURRENT/ADMITTED state contract above; the normative delta is recorded in `specs/workspace-frame-state/spec.md`. Audit the existing admission/preflight/derivation/frame-authority owners first and extend them additively (new fields only, no rewrite of historical receipts, no second authority owner). Keep open until owner mapping and implementation/tests prove the independent states.
 - [ ] WSR-08b Add `PRIOR_IMMUTABLE_SNAPSHOT` admission mode: derivation validates a sealed snapshot against its recorded seal-time readback receipt (bound by sha256), not only live bytes; the receipt records `currentAtAdmission:false` and the superseding revision.
 - [ ] WSR-08c Split current-frame consumers: `resolveCurrentWorkspaceFrameV1()` / `computeWorkspaceFrameAuthorityV1()` keep current-workspace semantics and refuse a non-current admission; add an explicit historical-frame resolver for read-only owner reconciliation, exact packet/chunk joins, lineage readback and deterministic cohort proofs scoped to the admitted snapshot.
 - [ ] WSR-09a Authorization binds manifest sha256 + validation receipt sha256 + the derived `workspaceRevisionCandidate` (the operator phrase must name the DERIVED workspace revision, not the snapshot revision) and is recorded in the admission receipt.
@@ -65,3 +60,15 @@ Target state record (derived read model; the admission ledger stays the authorit
 - [ ] WSR-13b SSR initial status projection (admitted / current / superseded counts, dirty count, latest candidate) for Admin Studio; the browser never infers authority from raw JSON reports.
 - [ ] WSR-13c SSE runtime-status stream (display only); IndexedDB may cache UI state only and never owns admission, sourceRevision, workspaceRevision or freshness. `npm run dev:gpu` stays an execution bootstrap and must not alter snapshot authority.
 - Large immutable artifacts (manifests, matrices): Postgres holds metadata/identity; files/mmap hold bytes; an artifact record carries artifactId, workspaceRevision, sourceRevision(s), representationRevision, checksum, byteLength, path/offset (an offset is an address, never identity).
+
+## 8. Disk pressure and snapshot/evidence storage (2026-10-06)
+
+C: reached ~50-100 MB free of 931 GB (single drive). My captures had added nine 15.6 MB snapshot manifests (~141 MB) that day; the large consumers were elsewhere: Docker `docker_data.vhdx` 174.9 GiB (never shrinks on Windows 10), `AppData\Local\Temp` 21.3 GiB, `models/` 21 GiB, `.git` 11.9 GiB, `docs/reports/openspec-evidence` 11.3 GiB (83 generated run folders, ~196-222 MB each), `.cache` 7.1 GiB, npm cache 4.1 GiB.
+
+Audit findings: the repo's disposition manifest (`docs/reports/openspec-evidence-disposition-v1.json`, 2026-10-03) lists 1,255 files / 14.3 GB, every file `RETAIN_LOCAL`, with only 2 byte-identical checksum groups (5 files); the README says nothing there authorizes moving or deleting evidence. A name+size scan suggested 2.69 GiB of duplicates, but that was same-name/different-content, so duplicate deletion was not warranted. Run IDs are mentioned hundreds of times in other reports (enumerations, not live dependencies); the evidence cards file points at `pipeline-20261001232010241-12376`.
+
+Action taken (operator-authorized, reversible, no deletes, no path/hash/mtime changes): transparent NTFS compression (`compact /c /exe:lzx`) of `workspace-source-snapshots/` (92 files, 1.31 GB -> 183 MB, 7.2:1) and 82 `openspec-evidence` run folders (~7:1; skipped the run the evidence cards reference and anything modified in the last 6 h). Free space 1.2 GiB -> 11.65 GiB. Integrity: a single-file trial matched SHA-256 before/after with unchanged mtime; 12 sampled compressed files (6 largest + spread) all match the manifest SHA-256 (the manifest stores `sha256:<hex>`; a first check that compared bare hex was a harness bug). Undo: `compact /u`.
+
+- [ ] WSR-RET-01 Snapshot-manifest retention policy: keep the newest N and every manifest referenced by an admission/derivation/preflight/receipt uncompressed or compressed-in-place but never deleted; compress the rest (NTFS), record sha256 in a small manifest; never delete an admitted or referenced manifest. Decide N.
+- [ ] WSR-RET-02 Decide the retention rule for `docs/reports/openspec-evidence` runs (owner: openspec-task-triage-pipeline) now that disposition is all `RETAIN_LOCAL`; compression is done, deletion is not authorized.
+- [ ] WSR-RET-03 Operator-owned (not done, needs explicit approval each): Docker `system df` + prune + VHDX compaction (never `-v`/`--volumes` while Postgres/Qdrant/Neo4j/Valkey volumes are the only durable data), `AppData\Local\Temp` breakdown (live Claude scratchpad inside), npm cache clean, `.cache` inspection.
