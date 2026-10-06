@@ -786,3 +786,92 @@ export function decideCbmFallbackV1(observations: CbmObservationRefV1[]): CbmFal
   if (new Set(observations.map((o) => norm(o.sourceRef))).size > 1) return { use: 'RG_SOURCE_FALLBACK', reason: 'AMBIGUOUS', absence: 'UNKNOWN' };
   return { use: 'CBM', absence: 'NOT_CLAIMED' };
 }
+
+export interface CbmTextMatchV1 {
+  sourceRef: string;
+  line: number;
+  content: string;
+  contentTruncated: boolean;
+  stale: boolean | null;
+  identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY';
+}
+
+export interface CbmTextReceiptV1 {
+  backend: 'CODEBASE_MEMORY_MCP';
+  version: string;
+  queryClass: 'TEXT';
+  trustTier: 1;
+  project: string;
+  pattern: string;
+  matches: CbmTextMatchV1[];
+  totalGrepMatches: number;
+  truncated: boolean;
+  emptyMeansUnknown: true;
+  canonicalAuthority: false;
+}
+
+interface CbmTextJsonV1 {
+  raw_matches?: { cols?: string[]; rows?: Array<Array<string | number | boolean | null>> };
+  total_grep_matches?: number;
+  has_more?: boolean;
+  raw_has_more?: boolean;
+}
+
+/**
+ * TEXT query class: bounded `search_code`. Shape verified against CBM 0.11.0 `search_code format:json`
+ * (`raw_matches.{cols,rows}` with file/line/content). `file` is relative to the CBM project root, so callers
+ * pass `projectRootRelativeToRepo` to produce repo-relative sourceRefs. Empty is UNKNOWN, never ABSENT.
+ */
+export function makeCbmTextSearchHandlerV1(deps: {
+  runTool: (tool: 'search_code', args: Record<string, unknown>) => Promise<string>;
+  project: string;
+  pattern: string;
+  projectRootRelativeToRepo?: string;
+  pathFilter?: string;
+  version?: string;
+  maxMatches?: number;
+  maxContentChars?: number;
+  resolveSnapshotBinding?: (sourceRef: string) => Promise<CbmSnapshotBindingCheckV1 | null>;
+}): ContextDagNodeHandlerV1 {
+  return async () => {
+    const maxMatches = deps.maxMatches ?? 20;
+    const maxChars = deps.maxContentChars ?? 240;
+    if (!deps.pattern.trim()) throw new Error('CBM_TEXT_EMPTY_PATTERN');
+    if (!Number.isSafeInteger(maxMatches) || maxMatches < 1 || maxMatches > 200) throw new Error('CBM_TEXT_INVALID_LIMIT');
+    if (!Number.isSafeInteger(maxChars) || maxChars < 1 || maxChars > 2000) throw new Error('CBM_TEXT_INVALID_LIMIT');
+    const prefix = deps.projectRootRelativeToRepo ? norm(deps.projectRootRelativeToRepo).replace(/\/+$/, '') + '/' : '';
+    if (prefix && (prefix.startsWith('/') || prefix.split('/').includes('..'))) throw new Error('CBM_TEXT_INVALID_RELATIVE_PATH');
+    const args: Record<string, unknown> = { project: deps.project, pattern: deps.pattern, limit: maxMatches, format: 'json' };
+    if (deps.pathFilter) args.path_filter = deps.pathFilter;
+    const parsed = parseCbmJsonV1<CbmTextJsonV1>(await deps.runTool('search_code', args), 'CBM_TEXT_NOT_JSON');
+    const raw = parsed.raw_matches;
+    if (!raw || !Array.isArray(raw.cols) || !Array.isArray(raw.rows)) throw new Error('CBM_TEXT_UNEXPECTED_SHAPE');
+    const idx = (c: string) => raw.cols!.indexOf(c);
+    const [iFile, iLine, iContent] = [idx('file'), idx('line'), idx('content')];
+    if (iFile < 0 || iLine < 0 || iContent < 0) throw new Error('CBM_TEXT_UNEXPECTED_COLUMNS');
+    const rows = raw.rows.slice(0, maxMatches);
+    const freshness = new Map<string, Promise<boolean | null>>();
+    const matches: CbmTextMatchV1[] = [];
+    for (const row of rows) {
+      const file = norm(String(row[iFile]));
+      const line = Number(row[iLine]);
+      if (!file || file.startsWith('/') || file.split('/').includes('..') || !Number.isSafeInteger(line) || line < 1) {
+        throw new Error('CBM_TEXT_MALFORMED_ROW');
+      }
+      const sourceRef = prefix + file;
+      if (!freshness.has(sourceRef)) freshness.set(sourceRef, getCbmFreshnessV1(deps.resolveSnapshotBinding, sourceRef));
+      const text = String(row[iContent]);
+      matches.push({
+        sourceRef, line, content: text.slice(0, maxChars), contentTruncated: text.length > maxChars,
+        stale: await freshness.get(sourceRef)!, identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY',
+      });
+    }
+    return {
+      backend: 'CODEBASE_MEMORY_MCP', version: deps.version ?? '0.11.0', queryClass: 'TEXT', trustTier: 1,
+      project: deps.project, pattern: deps.pattern, matches,
+      totalGrepMatches: parsed.total_grep_matches ?? matches.length,
+      truncated: Boolean(parsed.has_more || parsed.raw_has_more || raw.rows.length > matches.length),
+      emptyMeansUnknown: true, canonicalAuthority: false,
+    } satisfies CbmTextReceiptV1;
+  };
+}
