@@ -17798,3 +17798,21 @@ Reported audit (another agent; file names partly verified here: `nibble-encoding
 - [ ] NE-23L1 Specify the crosswalk (no identity on offsets/tile IDs): inspect the existing Arrow artifact manifest and the executor adapter together, then define the join record and its checksums; extend existing owners, no new peer registry.
 - [ ] NE-23L2 One proof: a frozen artifact's identity -> ordinal -> layout -> checksum round-trip through the existing executor path (no live smoke run has been done).
 - [ ] NE-23L3 Reconcile with `FI-TITLE-ADDRESS-01` (`atlas-feature-intelligence`) before any `DomainTitleRegistryV1`/`PacketRoutingIndexV1` contract is proposed.
+
+### NE-23M Pokedex mapping (design analogy; derived routing layer, never a new authority) — recorded 2026-10-06
+
+| Pokedex idea | Atlas meaning | Existing owner / status |
+|---|---|---|
+| Dex number | `title_id` / bucket / ordinal: a compact address into a LUT, never identity | `FI-TITLE-ADDRESS-01`, NE-23L; `DomainTitleRegistryV1` / `PacketRoutingIndexV1` not implemented |
+| Species entry | compact packet header / LUT row located by the address | packet MessagePack tags, `packet-class-lut-v1.ts`, nibble encoding (revision-qualified, non-authoritative) |
+| An individual Pokemon | the canonical packet (`packet_key` + source/revision fields) | Postgres `atlas_packets`, `buildAcePacketV3` |
+| Type / type chart | domain taxonomy + policy LUT that routes a query | `QueryAnalysisV1` -> `RetrievalParameterPlanV1` (policy revision recorded) |
+| Ability | capability bits a packet/tool exposes | `ToolRoutingObservationV1.preferredCapabilities`, MCP registry profiles |
+| PP / move limit | traversal and cost budget | `TraversalBudgetV1` |
+| Evolution | revision supersession, never a newer timestamp alone | observation lifecycle (OBSERVE -> PROPOSE -> VERIFY -> SUPERSEDE -> RETAIN -> PROMOTE) |
+| **Move** | **a bounded DAG operation with a typed input/output, a capability, a policy revision, a cost and a permission — not an unconstrained tool call** | `QueryExecutionPlanV1` / `ExecutorRequestV1` scaffolding + MCP registry/policy/schema/approval boundary (`mcp-tool-viterbi-bridge-v2`); `ValidatorFabric` missing |
+
+Rules: a move declares `inputType`, `outputType`, `capability`, `policyRevision`, `cost` and `permission`, is proposed (never self-authorized), is checked by the validator against the frozen registry snapshot before it can enter the DAG, and writes a receipt; a model may propose a move but only the deterministic validator admits it. A move's cost and permission are enforced at invocation, not merely at tool visibility. Dex numbers, bucket IDs, tile indices and packed bytes stay lookup/routing metadata.
+
+- [ ] NE-23M1 Define the move descriptor by extending the existing `ExecutorRequestV1` / MCP registry contracts (no new peer owner): typed input/output, capability, policy revision, cost, permission; record the registry revision on every decoded path (see CONTROL-VITERBI-13).
+- [ ] NE-23M2 Validator rule set: reject a move with an undeclared type, a capability the packet lacks, a cost over the remaining `TraversalBudgetV1`, a permission not granted, or a stale policy/registry revision (negative controls under VITERBI-NEG-01).
