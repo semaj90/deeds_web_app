@@ -5,6 +5,11 @@ export type ToolRoutingPhaseV1 = 'DISCOVER' | 'INSPECT' | 'EXPAND' | 'VALIDATE' 
 
 export type ToolRoutingObservationV1 = {
   revision: string;
+  workspaceRevision: string;
+  producerRevision: string;
+  policyRevision: string;
+  taxonomyRevision: string;
+  evidenceChecksum: string;
   phase: ToolRoutingPhaseV1;
   intent: string;
   domain: string;
@@ -88,6 +93,13 @@ export function buildMcpToolViterbiFramesV1(input: {
 
   return input.observations.map((observation) => {
     if (!observation.revision.trim()) throw new Error('TOOL_ROUTING_OBSERVATION_REVISION_REQUIRED');
+    if (!observation.workspaceRevision.trim()) throw new Error('TOOL_ROUTING_WORKSPACE_REVISION_REQUIRED');
+    if (!observation.producerRevision.trim()) throw new Error('TOOL_ROUTING_PRODUCER_REVISION_REQUIRED');
+    if (!observation.policyRevision.trim()) throw new Error('TOOL_ROUTING_POLICY_REVISION_REQUIRED');
+    if (!observation.taxonomyRevision.trim()) throw new Error('TOOL_ROUTING_TAXONOMY_REVISION_REQUIRED');
+    if (!/^sha256:[a-f0-9]{64}$/.test(observation.evidenceChecksum)) {
+      throw new Error('TOOL_ROUTING_EVIDENCE_CHECKSUM_INVALID');
+    }
 
     const candidates = input.profiles
       .map((profile) => ({
