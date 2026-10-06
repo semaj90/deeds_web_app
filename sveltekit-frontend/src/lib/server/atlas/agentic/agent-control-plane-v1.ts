@@ -215,4 +215,169 @@ export const agentControlPlaneOwnerAuditV1 = Object.freeze({
   thisModuleOwnsTaskState: false,
   thisModuleOwnsModelWeights: false,
   thisModuleOwnsPolicyPromotion: false,
+  queryExecutionPlanIsCompositionOnly: true,
+  gpuIsExecutorDimensionOnly: true,
+  largeNumericPlane: 'ARROW_IPC_MMAP_ARTIFACT_REFERENCES',
 });
+
+
+const executorClass = z.enum([
+  'TS_CPU_WORKER',
+  'LOCAL_READ_ONLY',
+  'FASTAPI_CPU',
+  'FASTAPI_GPU',
+  'GRPC_CPU',
+  'GRPC_GPU',
+]);
+
+const controlTransport = z.enum(['LOCAL', 'HTTP_JSON', 'GRPC_PROTO']);
+
+/**
+ * One bounded helper node in the prefill/execution DAG.
+ *
+ * Large numeric payloads are deliberately absent. Nodes exchange artifact/evidence
+ * references and checksums; mmap/Arrow/GPU-resident buffers remain in the data plane.
+ */
+export const QueryExecutionNodeV1Schema = z.object({
+  nodeId: z.string().min(1),
+  helperId: z.string().min(1),
+  required: z.boolean(),
+  dependsOn: z.array(z.string().min(1)).max(16),
+  executorClass,
+  transport: controlTransport,
+  parametersChecksum: sha256,
+  inputArtifactRefs: z.array(z.string().min(1)).max(32),
+  evidenceRefs: z.array(z.string().min(1)).max(32),
+  outputSchemaRef: z.string().min(1),
+  maxTokens: nonNegativeInteger,
+  timeoutMs: z.number().int().positive().max(120_000),
+}).strict();
+export type QueryExecutionNodeV1 = z.infer<typeof QueryExecutionNodeV1Schema>;
+
+export const QueryExecutionPlanV1Schema = z.object({
+  schema: z.literal('atlas.query-execution-plan.v1'),
+  requestId: z.string().min(1),
+  queryChecksum: sha256,
+  workspaceRevision: z.string().min(1),
+  policyRevision: z.string().min(1),
+  taxonomyRevision: z.string().min(1),
+  retrievalParameterPlanRef: z.string().min(1),
+  traversalBudgetRef: z.string().min(1),
+  contextManifestChecksum: sha256,
+  nodes: z.array(QueryExecutionNodeV1Schema).min(1).max(32),
+  stopConditions: z.array(z.string().min(1)).min(1).max(16),
+  canonicalAuthority: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  const ids = value.nodes.map((node) => node.nodeId);
+  if (new Set(ids).size !== ids.length) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nodes'], message: 'DUPLICATE_DAG_NODE_ID' });
+    return;
+  }
+  const known = new Set(ids);
+  for (const [index, node] of value.nodes.entries()) {
+    for (const dependency of node.dependsOn) {
+      if (!known.has(dependency)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['nodes', index, 'dependsOn'],
+          message: 'UNKNOWN_DAG_DEPENDENCY',
+        });
+      }
+      if (dependency === node.nodeId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['nodes', index, 'dependsOn'],
+          message: 'SELF_DAG_DEPENDENCY',
+        });
+      }
+    }
+  }
+
+  const deps = new Map(value.nodes.map((node) => [node.nodeId, node.dependsOn]));
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (id: string): boolean => {
+    if (visiting.has(id)) return false;
+    if (visited.has(id)) return true;
+    visiting.add(id);
+    for (const dep of deps.get(id) ?? []) {
+      if (known.has(dep) && !visit(dep)) return false;
+    }
+    visiting.delete(id);
+    visited.add(id);
+    return true;
+  };
+  if (!ids.every(visit)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['nodes'], message: 'CYCLIC_QUERY_EXECUTION_DAG' });
+  }
+});
+export type QueryExecutionPlanV1 = z.infer<typeof QueryExecutionPlanV1Schema>;
+
+export function buildQueryExecutionPlanV1(
+  input: Omit<QueryExecutionPlanV1, 'schema' | 'canonicalAuthority'>,
+): QueryExecutionPlanV1 {
+  return QueryExecutionPlanV1Schema.parse({
+    schema: 'atlas.query-execution-plan.v1',
+    ...input,
+    canonicalAuthority: false,
+  });
+}
+
+/**
+ * Small control-plane request for TypeScript -> local/FastAPI/gRPC execution.
+ *
+ * It intentionally carries references/checksums rather than tensors, embeddings,
+ * Arrow buffers, or mmap bytes. GPU/RTX is an executor property, never identity.
+ */
+export const ExecutorRequestV1Schema = z.object({
+  schema: z.literal('atlas.executor-request.v1'),
+  requestId: z.string().min(1),
+  executionId: z.string().min(1),
+  nodeId: z.string().min(1),
+  helperId: z.string().min(1),
+  executorClass,
+  transport: controlTransport,
+  workspaceRevision: z.string().min(1),
+  policyRevision: z.string().min(1),
+  parametersChecksum: sha256,
+  inputArtifactRefs: z.array(z.string().min(1)).max(32),
+  evidenceRefs: z.array(z.string().min(1)).max(32),
+  expectedOutputSchemaRef: z.string().min(1),
+  timeoutMs: z.number().int().positive().max(120_000),
+  payloadPolicy: z.literal('REFERENCES_ONLY'),
+  canonicalAuthority: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  if ((value.executorClass === 'FASTAPI_GPU' || value.executorClass === 'GRPC_GPU') && value.inputArtifactRefs.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['inputArtifactRefs'],
+      message: 'GPU_EXECUTOR_REQUIRES_ARTIFACT_REFERENCE',
+    });
+  }
+  if (value.transport === 'LOCAL' && value.executorClass.startsWith('GRPC_')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['transport'],
+      message: 'GRPC_EXECUTOR_REQUIRES_GRPC_TRANSPORT',
+    });
+  }
+  if (value.transport === 'HTTP_JSON' && value.executorClass.startsWith('GRPC_')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['transport'],
+      message: 'GRPC_EXECUTOR_REQUIRES_GRPC_TRANSPORT',
+    });
+  }
+});
+export type ExecutorRequestV1 = z.infer<typeof ExecutorRequestV1Schema>;
+
+export function buildExecutorRequestV1(
+  input: Omit<ExecutorRequestV1, 'schema' | 'payloadPolicy' | 'canonicalAuthority'>,
+): ExecutorRequestV1 {
+  return ExecutorRequestV1Schema.parse({
+    schema: 'atlas.executor-request.v1',
+    ...input,
+    payloadPolicy: 'REFERENCES_ONLY',
+    canonicalAuthority: false,
+  });
+}
