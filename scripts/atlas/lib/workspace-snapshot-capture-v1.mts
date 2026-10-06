@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, lstatSync, realpathSync, readFileSync } from 'node:fs';
+import { existsSync, lstatSync, realpathSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION, type WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
@@ -27,6 +27,26 @@ function state(root: string) {
     indexChecksum: hash(git(root, ['ls-files', '--stage', '-z'])),
     trackedTree: git(root, ['rev-parse', 'HEAD^{tree}']).trim(),
   };
+}
+
+const DIGEST_CACHE_SCHEMA = 'atlas.workspace-digest-cache.v1';
+
+/** Load a persisted digest cache; any mismatch (schema, policy, corruption) yields an empty cache. */
+export function loadDigestCache(cachePath: string): WorkspaceDigestCacheV1 {
+  try {
+    const raw = JSON.parse(readFileSync(cachePath, 'utf8'));
+    if (raw?.schema !== DIGEST_CACHE_SCHEMA || raw?.inventoryPolicyRevision !== policy.inventoryPolicyRevision) return new Map();
+    return new Map(Object.entries(raw.entries ?? {}));
+  } catch { return new Map(); }
+}
+
+/** Persist derived digests atomically (temp + rename). Derived cache only; never authority. */
+export function saveDigestCache(cachePath: string, cache: WorkspaceDigestCacheV1) {
+  mkdirSync(path.dirname(cachePath), { recursive: true });
+  const body = { schema: DIGEST_CACHE_SCHEMA, inventoryPolicyRevision: policy.inventoryPolicyRevision, entries: Object.fromEntries(cache) };
+  const tmp = `${cachePath}.${process.pid}.tmp`;
+  writeFileSync(tmp, JSON.stringify(body));
+  renameSync(tmp, cachePath);
 }
 
 export function observeSnapshot(rootInput: string, workspaceId: string, options: { digestCache?: WorkspaceDigestCacheV1 } = {}) {
@@ -122,14 +142,14 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
 export function captureStableSnapshot(
   root: string,
   workspaceId: string,
-  options: { maxAttempts?: number } = {},
+  options: { maxAttempts?: number; digestCachePath?: string } = {},
 ) {
   const maxAttempts = Number.isInteger(options.maxAttempts) && (options.maxAttempts ?? 0) > 0
     ? options.maxAttempts!
     : 3;
   // One in-memory digest cache is shared by the scans of this capture so the confirming scan only
   // re-stats unchanged files. validateSnapshot() never uses it: byte readback stays the oracle.
-  const digestCache: WorkspaceDigestCacheV1 = new Map();
+  const digestCache: WorkspaceDigestCacheV1 = options.digestCachePath ? loadDigestCache(options.digestCachePath) : new Map();
   let first = observeSnapshot(root, workspaceId, { digestCache });
   let transientDriftObserved = false;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
@@ -141,6 +161,7 @@ export function captureStableSnapshot(
       // fields were appended after sealSnapshot() computed snapshotRevision,
       // making every stable capture fail readback with a false
       // MANIFEST_CHECKSUM_MISMATCH.
+      if (options.digestCachePath) saveDigestCache(options.digestCachePath, digestCache);
       const withCaptureMetadata = { ...report, captureAttempts: attempt, transientDriftObserved };
       const {
         schema,

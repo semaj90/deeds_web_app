@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, writeFileSync, utimesSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { observeSnapshot } from './workspace-snapshot-capture-v1.mts';
+import { observeSnapshot, loadDigestCache, saveDigestCache } from './workspace-snapshot-capture-v1.mts';
 import type { WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 // WSR-03/05 digest cache: derived facts only; byte output must be identical with or without it.
@@ -61,5 +61,21 @@ test('a just-written file is never cached (racy mtime guard)', () => {
     observeSnapshot(root, 'ws-test', { digestCache: cache });
     assert.ok(![...cache.keys()].some((k) => k.endsWith('fresh.ts')));
     assert.ok([...cache.keys()].some((k) => k.endsWith('a.ts')));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('persisted digest cache round-trips and any mismatch or corruption yields an empty cache', () => {
+  const root = makeRepo();
+  try {
+    const cache: WorkspaceDigestCacheV1 = new Map();
+    observeSnapshot(root, 'ws-test', { digestCache: cache });
+    const file = path.join(root, '.tmp', 'cache.json');
+    saveDigestCache(file, cache);
+    assert.deepEqual([...loadDigestCache(file).entries()], [...cache.entries()]);
+    writeFileSync(file, '{not json');
+    assert.equal(loadDigestCache(file).size, 0);
+    writeFileSync(file, JSON.stringify({ schema: 'other', entries: { x: 1 } }));
+    assert.equal(loadDigestCache(file).size, 0);
+    assert.equal(loadDigestCache(path.join(root, 'missing.json')).size, 0);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

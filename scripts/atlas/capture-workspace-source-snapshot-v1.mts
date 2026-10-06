@@ -5,10 +5,14 @@ import { parseArgs } from 'node:util';
 // A stale JavaScript sibling must never silently become a second snapshot owner.
 import { captureStableSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
-const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' } } });
+const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' }, 'no-digest-cache': { type: 'boolean' } } });
 if (!values['workspace-id']) throw new Error('--workspace-id must be supplied; no identity is inferred');
 const root = path.resolve(values.root ?? process.cwd());
-const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3 });
+// Derived per-file digest cache (never authority); --no-digest-cache forces a full byte read.
+const digestCachePath = values['no-digest-cache'] ? undefined : path.join(root, '.tmp', 'atlas', 'workspace-digest-cache-v1.json');
+const startedAt = Date.now();
+const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3, digestCachePath });
+console.error(JSON.stringify({ captureMs: Date.now() - startedAt, digestCache: digestCachePath ? 'ON' : 'OFF' }));
 const directory = path.join(root, 'docs/reports/workspace-source-snapshots');
 mkdirSync(directory, { recursive: true });
 const artifactPath = path.join(directory, `${report.snapshotRevision.slice(7)}.json`);
