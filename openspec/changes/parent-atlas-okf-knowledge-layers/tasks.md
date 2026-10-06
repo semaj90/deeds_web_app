@@ -424,3 +424,26 @@ any library, database feature, model, or accelerator into a canonical owner.
 - [x] Keep OKF as portable Markdown + YAML authoring/interchange, validated against existing local schemas and checksums. It may nominate documented use-cases, keywords, language/domain labels, and routing metadata; it cannot mint canonical packet/symbol IDs, ordinals, revisions, or promote classifier output.
 - [ ] Before adding a PostgreSQL registry table or admin editor, close the existing domain-class owner decision and map each OKF field to exactly one admitted owner. Prefer a read-only registry projection/API over a new table if the existing owner is sufficient. No DDL, row writes, OpenWiki integration install, or wiki initialization occurred in this audit.
 - [ ] If later approved, expose the reviewed registry through the existing Admin Unified Indexing Studio as a read-only inspector first. A Pokédex-like display is an ordinal/hex UI metaphor only; do not copy Pokémon source/assets or use display numbers as identity.
+
+## 2026-10-06 — Domain-specific context-engineering topic extraction
+
+This tranche reuses the existing documentation acquisition owners. It does not add a
+second crawler, vector store, graph projection, embedding writer, cache, or canonical
+taxonomy owner.
+
+- [ ] **OKF-TOPIC-01** Add `atlas_okf_topic_extractor.py` as a deterministic
+  post-acquisition topic layer over normalized text from the existing
+  Firecrawl/BeautifulSoup pipeline. It emits exact character and UTF-8 byte spans,
+  content checksum, source id/revision, page ref, topic id, manifest domain hint, and
+  `canonical_authority=false`. **IMPLEMENTED_UNPROVEN** until pytest runs.
+- [ ] **OKF-TOPIC-02** Initial profiles cover Mastra, MCP/tool registry, Viterbi/HMM,
+  DSPy/GEPA, ACE packets, BitFrost, Redis/Valkey, MessagePack/bit packing, gRPC/protobuf,
+  DuckDB, Arrow/mmap, FastAPI, GPU/RTX/cuVS/cuGraph/cuBLASLt, Hypergraph RAG/multi-hop,
+  and OAKlib/ontology. These are extraction hints, not reviewed domain truth.
+- [ ] **OKF-TOPIC-03** Keep acquisition ownership unchanged:
+  `atlas_okf_docs_pipeline.py::firecrawl_crawl_v2` for bounded Firecrawl discovery
+  and `atlas_external_docs.py` for BeautifulSoup normalization/fallback. No
+  Neo4j/Qdrant/embedding/cache call is permitted in the topic-extraction gate.
+- [ ] **OKF-TOPIC-04** After focused exact-span tests pass, wire the extractor as an
+  optional post-normalization stage that writes only run-local JSON/JSONL receipts under
+  the existing `docs/.okf/dev` convention. Admission/indexing remains a separate gate.
