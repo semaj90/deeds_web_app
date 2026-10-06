@@ -135,12 +135,18 @@ export function buildGroupRelativeCandidateEvalV1(input: {
   if (input.candidates.length < 2) throw new Error('GROUP_RELATIVE_EVAL_REQUIRES_AT_LEAST_TWO_CANDIDATES');
 
   const ordered = input.candidates
-    .map((candidate, originalIndex) => ({ ...candidate, originalIndex }))
+    .map((candidate, originalIndex) => ({
+      ...candidate,
+      tokenCost: candidate.tokenCost ?? 0,
+      latencyMs: candidate.latencyMs ?? 0,
+      mutationSize: candidate.mutationSize ?? 0,
+      originalIndex,
+    }))
     .sort((left, right) =>
       right.validatorReward - left.validatorReward ||
-      left.tokenCost! - right.tokenCost! ||
-      left.latencyMs! - right.latencyMs! ||
-      left.mutationSize! - right.mutationSize! ||
+      left.tokenCost - right.tokenCost ||
+      left.latencyMs - right.latencyMs ||
+      left.mutationSize - right.mutationSize ||
       left.candidateId.localeCompare(right.candidateId) ||
       left.originalIndex - right.originalIndex,
     );
