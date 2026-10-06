@@ -56,6 +56,11 @@ model-training path.
   CandidateOrdinal/feature artifact can be referenced through `ExecutorRequestV1`, executed by
   the existing accelerator sidecar, and read back with ordinal/checksum/numerical parity against
   the CPU oracle. FastAPI/gRPC are transports/executor surfaces, never identity or retrieval votes.
+- [ ] CONTROL-PY-BOUNDARY-10 — added strict Pydantic boundary mirrors for
+  `ExecutorRequestV1` and `GepaShadowInputV1` under `python/atlas_contract_parity/` with focused
+  Python tests. Zod/TypeScript remains the owner; Python only fails closed before FastAPI/gRPC/DSPy
+  execution. **IMPLEMENTED_UNPROVEN** until pytest runs and Zod↔Pydantic fixture parity is wired into
+  the existing parity registry/exporter; do not register or promote these mirrors before that parity gate.
 
 ## Taxonomy-scoped retrieval planning — 2026-09-06
 
