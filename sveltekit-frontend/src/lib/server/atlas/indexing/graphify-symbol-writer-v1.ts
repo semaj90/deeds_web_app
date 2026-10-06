@@ -297,8 +297,8 @@ async function insertAndReadbackSymbol(input: {
 
 /**
  * GSP-4 symbol-only persistence owner. The caller must already be inside a
- * transaction. GSP-5 owns edge persistence because graphify_edges currently has
- * no deterministic unique arbiter and therefore cannot yet support safe replay.
+ * transaction. GSP-5 is the planned edge-persistence gate, not an implemented
+ * writer: graphify_edges has no deterministic unique arbiter for safe replay.
  */
 export async function writeGraphifySymbolsInTransactionV1(
   input: GraphifySymbolWriterInputV1,

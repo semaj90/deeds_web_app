@@ -296,8 +296,19 @@ export function deriveUpstreamSymbolNominationKey(input: {
   kind: z.infer<typeof structuralSymbolKindSchema>;
   qualified_name: string;
   upstream_symbol_id?: string | null;
+  upstream_node_id?: string | null;
+  disambiguate_upstream_symbol_id?: boolean;
 }): string {
-  if (input.upstream_symbol_id) return `upstream-symbol:${input.upstream_symbol_id}`;
+  if (input.upstream_symbol_id) {
+    if (!input.disambiguate_upstream_symbol_id) return `upstream-symbol:${input.upstream_symbol_id}`;
+    return `upstream-symbol:${input.upstream_symbol_id}:${hash([
+      input.language.toLowerCase(),
+      input.source_ref.replaceAll('\\', '/').normalize('NFC'),
+      input.kind,
+      input.qualified_name.normalize('NFC'),
+      input.upstream_node_id ?? null,
+    ]).slice(0, 40)}`;
+  }
   return `symbol-key:${hash([
     input.language.toLowerCase(),
     input.source_ref.replaceAll('\\', '/').normalize('NFC'),

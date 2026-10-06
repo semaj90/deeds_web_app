@@ -14,6 +14,7 @@ import numpy as np
 from atlas_external_docs import ChunkRecord, chunk_document
 from atlas_okf_docs_pipeline import (
     PipelineManifest,
+    PageArtifact,
     SourceConfig,
     build_firecrawl_crawl_v2_request,
     build_qdrant_points,
@@ -24,6 +25,7 @@ from atlas_okf_docs_pipeline import (
     qdrant_payload_index_requests,
     qdrant_query_body,
     read_ldr_export_urls,
+    run_pipeline,
     preview_domain_ontology_admission,
     plan_manifest_recrawl_delta_v1,
     _sources_selected_by_recrawl_plan,
@@ -140,6 +142,44 @@ class OkfDocsPipelineTests(unittest.TestCase):
         receipt = json.loads(output.getvalue())
         self.assertTrue(receipt["canAcquire"])
         self.assertEqual(receipt["selectedSourceIds"], ["pgvector"])
+
+    def test_acquire_only_writes_local_cited_chunks_without_embedding_or_projection(self) -> None:
+        source = self._recrawl_source(pages=("https://docs.example.test/guide",))
+        manifest = self._recrawl_manifest("acquire-only-test", source)
+        page = PageArtifact(
+            source_id=source.source_id,
+            source_revision=source.source_revision,
+            requested_url="https://docs.example.test/guide",
+            resolved_url="https://docs.example.test/guide",
+            title="Guide",
+            text="# Guide\n\nA source-grounded computer engineering guide.",
+            fetcher="BEAUTIFULSOUP_HTTP",
+            raw_checksum="raw-sha256",
+            normalized_checksum="normalized-sha256",
+            outgoing_urls=(),
+            metadata={},
+            retrieved_at="2026-10-04T00:00:00Z",
+        )
+        with TemporaryDirectory() as tmp:
+            manifest = PipelineManifest(**{**manifest.__dict__, "output_root": tmp})
+            with patch("atlas_okf_docs_pipeline.discover_and_fetch", return_value=(page,)), \
+                 patch("atlas_okf_docs_pipeline.embed_llama_server_768", side_effect=AssertionError("EMBEDDING_RAN")):
+                receipt = run_pipeline(
+                    manifest,
+                    enable_stanza=False,
+                    enable_clusters=False,
+                    write_qdrant=False,
+                    smoke_query=None,
+                    acquire_only=True,
+                )
+            self.assertEqual(receipt["status"], "ACQUISITION_ONLY")
+            self.assertFalse(receipt["embedding_performed"])
+            self.assertFalse(receipt["qdrant"]["write"])
+            self.assertFalse(receipt["external_projection_writes"])
+            self.assertTrue(receipt["local_artifacts_written"])
+            self.assertTrue(receipt["writes_performed"])
+            self.assertEqual(receipt["page_count"], 1)
+            self.assertGreater(receipt["chunk_count"], 0)
 
     def test_firecrawl_request_uses_manifest_bounds_and_disables_domain_expansion(self) -> None:
         source = SourceConfig(

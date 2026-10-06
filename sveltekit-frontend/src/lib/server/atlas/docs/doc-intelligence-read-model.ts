@@ -145,6 +145,20 @@ export interface DocSearchResult {
 	filters?: { product: string | null; productVersion: string | null };
 }
 
+export interface DenseDocRepresentationAdmissionV1 {
+	status: 'PARITY_UNPROVEN';
+	queryDimension: 768;
+	corpusDimension: 768;
+	queryRecipeRevision: string | null;
+	corpusRecipeRevision: string | null;
+	proofUsable: false;
+}
+
+export interface DenseDocQueryIdentityV1 {
+	vectorChecksum: string;
+	queryRecipeRevision: string | null;
+}
+
 export interface VersionDriftRow {
 	sourceId: string;
 	provider: string;
@@ -562,11 +576,25 @@ function canonicalDocHit(r: Record<string, unknown>): DocSearchHit {
  * recipe/executor stamp yet, so `representationCaveat` is always reported. A vector lane has no local fallback: an invalid vector, absent pool or
  * database failure returns zero hits with a typed note.
  */
-export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult & { representationCaveat: string }> {
+export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null; queryRecipeRevision?: string | null }): Promise<DocSearchResult & { representationCaveat: string; representationAdmission: DenseDocRepresentationAdmissionV1; queryIdentity: DenseDocQueryIdentityV1 }> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const product = opts.product?.trim().slice(0, 100) || null;
 	const productVersion = opts.productVersion?.trim().slice(0, 100) || null;
-	const base = { query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[], representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only' };
+	const representationAdmission: DenseDocRepresentationAdmissionV1 = {
+		status: 'PARITY_UNPROVEN', queryDimension: 768, corpusDimension: 768,
+		queryRecipeRevision: opts.queryRecipeRevision ?? null, corpusRecipeRevision: null, proofUsable: false
+	};
+	const base = {
+		query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[],
+		representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only',
+		representationAdmission,
+		queryIdentity: {
+			vectorChecksum: opts.queryVector.every(Number.isFinite)
+				? `sha256:${sha256(JSON.stringify(opts.queryVector))}`
+				: '',
+			queryRecipeRevision: opts.queryRecipeRevision ?? null
+		}
+	};
 	if (opts.queryVector.length !== 768 || opts.queryVector.some((x) => !Number.isFinite(x))) return { ...base, postgresNote: 'QUERY_VECTOR_INVALID' };
 	if (!opts.pool) return { ...base, postgresNote: 'POSTGRES_UNAVAILABLE:no pool' };
 	try {
@@ -611,13 +639,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 				);
 				return {
 					query: q, mode: 'POSTGRES_FTS', postgresNote: null, filters: { product, productVersion },
-					hits: rows.map((r: Record<string, unknown>) => ({
-						provider: (r.provider as string | null) ?? null, title: String(r.title), sourceId: String(r.product ?? ''), url: (r.url as string | null) ?? null,
-						product: (r.product as string | null) ?? null, productVersion: (r.product_version as string | null) ?? null,
-						authorityClass: String(r.source_authority ?? ''), revision: (r.page_evidence_revision as string | null) ?? null, excerpt: String(r.excerpt ?? ''),
-						badge: 'CANONICAL_POSTGRES' as const, sourceClass: 'CANONICAL' as const, pageId: String(r.page_id), chunkId: String(r.chunk_id),
-						chunkEvidenceRevision: String(r.chunk_evidence_revision), headingPath: (r.heading_path as string[] | null) ?? []
-					}))
+					hits: rows.map(canonicalDocHit)
 				};
 			}
 			postgresNote = 'DOC_CORPUS_POSTGRES_EMPTY';

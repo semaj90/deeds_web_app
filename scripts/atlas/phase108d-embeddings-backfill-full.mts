@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
 /**
- * Phase 108D-3: Full 52,380-Row Embeddings Backfill
+ * RETIRED: the original backfill mixed native 768-D vectors with a
+ * stride-sampled 384-D lane. Use the separately admitted semantic_768 owner.
  *
- * Upserts all embeddings from codebase_chunk_index to Qdrant codebase_chunks_768.
- * Batched in 1000-row chunks with progress reporting and resumable checkpointing.
- *
- * Usage:
- *   npx tsx phase108d-embeddings-backfill-full.mts [--limit 52380]
+ * This compatibility entry point now fails before filesystem, database, or
+ * Qdrant access. It remains present for historical references.
  */
 
 import { createRequire } from 'module';
 import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { randomUUID } from 'crypto';
+
+console.error('LEGACY_384_QDRANT_BACKFILL_DISABLED: this script creates an unsupported 384-D stride projection; use the separately admitted semantic_768 projection owner');
+process.exit(2);
 
 const require_native = createRequire(import.meta.url);
 

@@ -95,6 +95,20 @@ export interface AtlasStructuralEvidenceEdge {
   evidence_end_column: number;
   resolved: boolean;
   resolution?: string | null;
+  occurrence_positions?: Array<[line1Based: number, utf8ByteColumn0Based: number]> | null;
+}
+
+function parseOccurrencePositions(value: unknown): Array<[number, number]> | null {
+  if (value == null) return null;
+  if (!Array.isArray(value)) throw new Error('[miniforge-nlp] ast/chunk returned invalid occurrence_positions');
+  return value.map((position) => {
+    if (!Array.isArray(position) || position.length !== 2
+      || !Number.isInteger(position[0]) || position[0] < 1
+      || !Number.isInteger(position[1]) || position[1] < 0) {
+      throw new Error('[miniforge-nlp] ast/chunk returned invalid occurrence_positions');
+    }
+    return [position[0] as number, position[1] as number];
+  });
 }
 
 export interface AtlasStructuralEvidence {
@@ -183,6 +197,22 @@ export interface NlpExtractResponse {
   processing_time: number;
 }
 
+export interface NlpPosResponse {
+  source: 'spacy' | 'unavailable';
+  coordinate_basis: 'UTF8_BYTES';
+  token_assertions: Array<{
+    text: string;
+    lemma: string;
+    pos: string;
+    tag: string;
+    dependency: string;
+    start_byte: number;
+    end_byte: number;
+  }>;
+  noun_phrase_spans: Array<{ text: string; start_byte: number; end_byte: number }>;
+  dependency_edges: Array<Record<string, string | number>>;
+}
+
 export interface NlpHealthResponse {
   status: string;
   model?: string;
@@ -217,6 +247,7 @@ export interface MiniforgeNlpSidecarClient {
   }>;
   analyze(req: NlpAnalyzeRequest): Promise<NlpAnalyzeResponse>;
   extract(req: NlpAnalyzeRequest): Promise<NlpExtractResponse>;
+  pos(text: string): Promise<NlpPosResponse>;
   astChunk(req: { source: string; language: string; filePath: string; sourceRevision: string }): Promise<AtlasStructuralEvidence>;
 }
 
@@ -445,6 +476,39 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
       };
     },
 
+    async pos(text) {
+      const response = await fetch(`${url}/pos`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      if (!response.ok) throw new Error(`[miniforge-nlp] pos failed: ${response.status} ${response.statusText}`);
+      const raw = asRecord(await readJson(response));
+      if (!raw || (raw.source !== 'spacy' && raw.source !== 'unavailable')
+        || raw.coordinate_basis !== 'UTF8_BYTES' || !Array.isArray(raw.token_assertions)
+        || !Array.isArray(raw.noun_phrase_spans) || !Array.isArray(raw.dependency_edges)) {
+        throw new Error('[miniforge-nlp] pos returned invalid response shape');
+      }
+      const tokenAssertions = raw.token_assertions.map((value) => {
+        const token = asRecord(value);
+        if (!token || typeof token.text !== 'string' || typeof token.lemma !== 'string'
+          || typeof token.pos !== 'string' || typeof token.tag !== 'string'
+          || typeof token.dependency !== 'string' || !Number.isInteger(token.start_byte)
+          || !Number.isInteger(token.end_byte) || Number(token.end_byte) < Number(token.start_byte)) {
+          throw new Error('[miniforge-nlp] pos returned invalid token assertion');
+        }
+        return token as NlpPosResponse['token_assertions'][number];
+      });
+      return {
+        source: raw.source,
+        coordinate_basis: 'UTF8_BYTES',
+        token_assertions: tokenAssertions,
+        noun_phrase_spans: raw.noun_phrase_spans as NlpPosResponse['noun_phrase_spans'],
+        dependency_edges: raw.dependency_edges as NlpPosResponse['dependency_edges'],
+      };
+    },
+
     async extract(req) {
       const response = await fetch(`${url}/extract`, {
         method: 'POST',
@@ -536,6 +600,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           evidence_end_column: Number(edge.evidence_end_column ?? 0),
           resolved: Boolean(edge.resolved),
           resolution: edge.resolution ?? null,
+          occurrence_positions: parseOccurrencePositions(edge.occurrence_positions),
         })) : [],
         diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
         error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null,

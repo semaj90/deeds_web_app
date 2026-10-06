@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
-  buildPacketIncidenceLineageV1, consumeExactRevisionIncidenceV1, verifyPacketIncidenceLineageV1,
+  buildPacketIncidenceLineageV1, consumeExactRevisionIncidenceV1, PacketIncidenceLineageV1Schema, verifyPacketIncidenceLineageV1,
   type PacketIncidenceExpectedV1, type PacketIncidenceIdentityV1,
 } from './packet-incidence-lineage-v1.js';
 
@@ -41,7 +41,9 @@ describe('PacketIncidenceLineageV1', () => {
   });
 
   it('a sealed row at the exact revisions is LINEAGE_PROVEN with all nine proofs', () => {
-    const v = verifyPacketIncidenceLineageV1(buildPacketIncidenceLineageV1(base), expected);
+    const row = buildPacketIncidenceLineageV1(base);
+    expect(row.canonicalAuthority).toBe(false);
+    const v = verifyPacketIncidenceLineageV1(row, expected);
     expect(v.status).toBe('LINEAGE_PROVEN');
     expect(Object.values(v.proofs).every(Boolean)).toBe(true);
     expect(Object.keys(v.proofs)).toHaveLength(9);
@@ -60,6 +62,12 @@ describe('PacketIncidenceLineageV1', () => {
   it('a tampered row fails both checksum proofs', () => {
     const row = { ...buildPacketIncidenceLineageV1(base), edgeType: 'CALLS' };
     expect(verifyPacketIncidenceLineageV1(row, expected).failed).toEqual(expect.arrayContaining(['INPUT_CHECKSUM_VALID', 'LINEAGE_CHECKSUM_VALID']));
+  });
+
+  it('rejects a promoted authority flag', () => {
+    expect(() => buildPacketIncidenceLineageV1(base)).not.toThrow();
+    const row = buildPacketIncidenceLineageV1(base);
+    expect(() => PacketIncidenceLineageV1Schema.parse({ ...row, canonicalAuthority: true })).toThrow();
   });
 
   it('the consumer returns only proven rows and EMPTY_EXACT_REVISION_INCIDENCE with no stale fallback', () => {

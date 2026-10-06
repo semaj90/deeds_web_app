@@ -5,7 +5,7 @@ import {
 	type SimdjsonTypedAdaptResultV1,
 	type TypedEvidenceEnvelopeV1,
 } from '@deeds/parent-atlas';
-import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
+import { fastJsonParseWithBackend } from '$lib/server/gpu/simdjson-bridge.js';
 
 const ADAPTER_REVISION = 'simdjson-typed-evidence-bridge:v1';
 
@@ -13,6 +13,12 @@ export interface NdjsonTypedEvidenceReport<T> {
 	artifactRef: string;
 	artifactRevision: string;
 	simdjsonUsed: boolean;
+	parserExecution: {
+		backend: 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'MIXED' | 'CACHE_ONLY' | 'NO_INPUT';
+		nativeParses: number;
+		fallbackParses: number;
+		cacheHits: number;
+	};
 	totalLines: number;
 	accepted: { envelope: TypedEvidenceEnvelopeV1; payload: T }[];
 	rejected: { recordIndex: number; code: string; reason: string }[];
@@ -41,11 +47,16 @@ export function parseNdjsonTypedEvidence<T>(input: {
 	payloadSchemaId: string;
 }): NdjsonTypedEvidenceReport<T> {
 	const lines = input.ndjson.split('\n').filter((line) => line.trim().length > 0);
+	const parserExecution = { nativeParses: 0, fallbackParses: 0, cacheHits: 0 };
 	const rawInputChecksums = lines.map((line) => createHash('sha256').update(line, 'utf8').digest('hex'));
 	const results: SimdjsonTypedAdaptResultV1<T>[] = lines.map((line, recordIndex) => {
 		let record: unknown;
 		try {
-			record = fastJsonParse<unknown>(line);
+			const parsed = fastJsonParseWithBackend<unknown>(line);
+			record = parsed.value;
+			if (parsed.backend === 'SIMDJSON_NAPI') parserExecution.nativeParses++;
+			else if (parsed.backend === 'V8_JSON_PARSE') parserExecution.fallbackParses++;
+			else parserExecution.cacheHits++;
 		} catch (error) {
 			return {
 				status: 'REJECTED' as const,
@@ -76,11 +87,21 @@ export function parseNdjsonTypedEvidence<T>(input: {
 		if (result.status === 'ACCEPTED') accepted.push({ envelope: result.envelope, payload: result.payload });
 		else rejected.push({ recordIndex: result.recordIndex, code: result.code, reason: result.reason });
 	}
+	const backend = parserExecution.nativeParses > 0 && parserExecution.fallbackParses > 0
+		? 'MIXED'
+		: parserExecution.nativeParses > 0
+			? 'SIMDJSON_NAPI'
+			: parserExecution.fallbackParses > 0
+				? 'V8_JSON_PARSE'
+				: parserExecution.cacheHits > 0
+					? 'CACHE_ONLY'
+					: 'NO_INPUT';
 
 	return {
 		artifactRef: input.artifactRef,
 		artifactRevision: input.artifactRevision,
-		simdjsonUsed: isSimdJsonAvailable(),
+		simdjsonUsed: parserExecution.nativeParses > 0,
+		parserExecution: { backend, ...parserExecution },
 		totalLines: lines.length,
 		accepted,
 		rejected,

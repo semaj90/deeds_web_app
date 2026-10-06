@@ -1,0 +1,308 @@
+{
+  "schema": "atlas.lineage-e2e-01-derivation-slice.v1",
+  "generatedAt": "2026-10-06T00:46:24.971Z",
+  "gate": "LINEAGE-E2E-01",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "proofUsable": false,
+  "representationRevisionSource": "LEGACY_LABEL semantic_768@v1 (not a derived identity; no producer exists)",
+  "picked": {
+    "caseId": "legal",
+    "query": "What does the repository say about chain of custody for evidence?",
+    "chunkId": "90b585d4-7a2c-4650-b9c0-2dffe795a521"
+  },
+  "stages": [
+    {
+      "stage": "0_HYDRATE_BASELINE",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": "semantic_768@v1"
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "SAME"
+      },
+      "chunkId": "90b585d4-7a2c-4650-b9c0-2dffe795a521",
+      "canonicalChunkId": "fullrepo:sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts:1",
+      "evidenceRefs": [
+        ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+      ],
+      "featureId": "sveltekit-frontend.+server"
+    },
+    {
+      "stage": "1_QUALIFY_qualifyEvidenceV1",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": "semantic_768@v1"
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "SAME"
+      },
+      "eligibility": "CHUNK_REVISION_QUALIFIED",
+      "chunkIdentity": "EXACT"
+    },
+    {
+      "stage": "2_JSONL_JsonlParsedEvidenceV1",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": null
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "ABSENT"
+      },
+      "contentHash": "18968b2b5009ba39b3e5279bd26803766e4da866ce68757cc962713bf3fec505",
+      "recordsWritten": 0
+    },
+    {
+      "stage": "3_POS_sidecar_/pos",
+      "status": "OK",
+      "identity": null,
+      "vsBaseline": null,
+      "textSource": "chunk.content",
+      "tokens": 218,
+      "coordinateBasis": "UTF8_BYTES",
+      "spansAreUtf8Bytes": true,
+      "nounPhrases": [
+        " {\r\n\taction: 'received' | 'transferred' | 'analyzed' | 'stored' | 'retrieved' | 'exported' | 'sealed';\r\n\tfrom?: string",
+        "* GET",
+        "*/\r\nexport const GET"
+      ]
+    },
+    {
+      "stage": "4_DOMAIN_sidecar_/analyze:classify",
+      "status": "PASS_CALLER_BOUND",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": null
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "ABSENT"
+      },
+      "backend": "sklearn-lr",
+      "modelRevision": "domain-classifier-nblr-v1-1788454983",
+      "naiveBayesProbability": 0.556197723771484,
+      "logisticRegressionProbability": 0.5486379785713311,
+      "selectedLabel": "ui",
+      "failures": []
+    },
+    {
+      "stage": "5_POS_PosTaggerOutputV1",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": null,
+        "representationRevision": "semantic_768@v1"
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "ABSENT",
+        "representationRevision": "SAME"
+      },
+      "confidence": 0.94,
+      "confidenceSource": "BUILDER_DEFAULT_NOT_MODEL_OUTPUT",
+      "surface": "+server.ts",
+      "tokenIndex": 0
+    },
+    {
+      "stage": "6_DOMAIN_DomainClassificationV1",
+      "status": "BUILDER_DERIVED_NOT_CLASSIFIER",
+      "identity": {
+        "packetKey": null,
+        "sourceRef": null,
+        "sourceRevision": null,
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": null
+      },
+      "vsBaseline": {
+        "packetKey": "ABSENT",
+        "sourceRef": "ABSENT",
+        "sourceRevision": "ABSENT",
+        "workspaceRevision": "SAME",
+        "representationRevision": "ABSENT"
+      },
+      "confidence": 0.96,
+      "classifierEvidenceAttached": false
+    },
+    {
+      "stage": "7_FEATURE_FeatureMatrixSetupV1",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": "semantic_768@v1"
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "SAME"
+      },
+      "featureRevision": "lineage-e2e-01-readonly-features-v1",
+      "graphRevision": null
+    },
+    {
+      "stage": "8_FEATURE_FeatureVector5Static",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": "semantic_768@v1"
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "SAME"
+      },
+      "presenceMask": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "features": [
+        0,
+        0.96,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "stage": "9_ROUTING",
+      "status": "NOT_EXERCISED",
+      "identity": null,
+      "vsBaseline": null,
+      "reason": "no routing owner was invoked: domain -> lane policy is a separate owner (query-routing-classifier); this slice stops at the feature packet"
+    },
+    {
+      "stage": "10_RETRIEVAL_pgvector",
+      "status": "OK",
+      "identity": {
+        "packetKey": "packet:d9704f0b0a30",
+        "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+        "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+        "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "representationRevision": null
+      },
+      "vsBaseline": {
+        "packetKey": "SAME",
+        "sourceRef": "SAME",
+        "sourceRevision": "SAME",
+        "workspaceRevision": "SAME",
+        "representationRevision": "ABSENT"
+      },
+      "executor": "postgres_pgvector",
+      "laneStatus": "OK",
+      "rank": 2,
+      "evidenceRefs": [
+        ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "code": "POS_CONFIDENCE_IS_BUILDER_DEFAULT",
+      "detail": "buildPosConceptTaggingPacket assigns 0.94 when partOfSpeech is given and 0.5 otherwise; spaCy returns no score, so PosTaggerOutputV1.confidence is not model output"
+    },
+    {
+      "code": "POS_OUTPUT_IS_FEATURE_LABEL_NOT_TOKEN",
+      "detail": "PosTaggerOutputV1 uses surface=featureLabel and token_index=0; the sidecar token assertions with UTF8 byte spans are not consumed by the builder"
+    },
+    {
+      "code": "WORKSPACE_REVISION_SILENT_FALLBACK",
+      "detail": "the builder uses workspaceRevision ?? graphRevision ?? sourceRevision (feature setup and FeatureVector5Static); a missing workspace revision is replaced silently by a different revision kind. This slice passed it explicitly."
+    },
+    {
+      "code": "REPRESENTATION_REVISION_REQUIRED_BY_CONTRACTS",
+      "detail": "PosTaggerOutputV1, FeatureMatrixSetupV1 and FeatureVector5Static require a non-empty representation_revision; with no producer the feature path cannot be proof-usable"
+    }
+  ],
+  "domainClassifierPass": {
+    "schema": "atlas.domain-classifier-pass-proof.v1",
+    "status": "PASS_CALLER_BOUND",
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "identityBinding": "CALLER_BOUND_AND_RESPONSE_CHECKED",
+    "packet": {
+      "packetKey": "packet:d9704f0b0a30",
+      "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+      "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+      "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "evidenceRefs": [
+        ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+      ]
+    },
+    "inputChecksum": "sha256:b9006d4e3bbf9e3bb3ddb2e73e437c6d78f587476896c69f2152c938d9ce57bd",
+    "pass": {
+      "family": "classify",
+      "passName": "domain_classifier",
+      "passRevision": "domain_classifier-v1",
+      "backend": "sklearn-lr",
+      "backendVersion": "domain-classifier-nblr-v1-1788454983",
+      "status": "succeeded",
+      "inputHash": "69557d31bd06ebd32050a27ebddb784a88d172174444fb81f9ac5352be19de3a",
+      "outputHash": "b0602408f17e10d0f52686cbb5e934ecac09f8f4876f155c44b98a4cbbf09300",
+      "modelRevision": "domain-classifier-nblr-v1-1788454983",
+      "selectedLabel": "ui",
+      "naiveBayesLabel": "ui",
+      "naiveBayesDomainProbability": 0.556197723771484,
+      "naiveBayesDomainProbabilities": null,
+      "logisticRegressionLabel": "ui",
+      "logisticRegressionDomainProbability": 0.5486379785713311,
+      "logisticRegressionDomainProbabilities": null,
+      "warnings": [],
+      "evidenceRefs": []
+    },
+    "failures": []
+  },
+  "identityPreserved": {
+    "packetKey": "NO_STAGE_DIFFERS",
+    "sourceRef": "NO_STAGE_DIFFERS",
+    "sourceRevision": "NO_STAGE_DIFFERS",
+    "workspaceRevision": "NO_STAGE_DIFFERS",
+    "representationRevision": "NO_STAGE_DIFFERS"
+  },
+  "verdict": "E2E_01_SLICE_PARTIAL"
+}

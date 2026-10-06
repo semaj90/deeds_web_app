@@ -108,6 +108,14 @@ DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU identifiers remain projection
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 
+## Embedding executor fallback
+
+- For read-only retrieval diagnostics, first health-check the configured approved embedding executors (including strict `:8081` and other configured services). If they are unavailable, retry with Ollama `embeddinggemma:latest` at `:11434` rather than abandoning the diagnostic immediately.
+- Label every result with its actual executor/provider and embedding recipe. Ollama fallback is an executor fallback, not proof of representation/recipe parity; equal model name or 768 dimensions alone is insufficient.
+- Keep fallback runs read-only: allow lookup-only cache access, disable cache population and all durable writes. Mark the result diagnostic/non-authoritative unless the exact model artifact, tokenizer, input policy, and representation revision are proven equivalent to the canonical recipe.
+- Never use Ollama fallback to authorize canonical embedding writes, backfills, Qdrant projection, or a canonical parity pass. If the fallback is used, report the primary-executor outage and keep the strict canonical gate blocked until parity is proven.
+- `:8090` is the Ornith synthesis endpoint, not an embedding fallback.
+
 ## GPU lane switch: WSL2 miniforge/conda work vs the Ornith :8090 server (2026-10-04)
 
 The RTX 3060 Ti (8 GiB) cannot hold the Ornith vision server (~6.4 GiB, plus ~1 GiB of Windows/desktop use) and a WSL2 RAPIDS/cuVS job together. With vision up only ~0.2 GiB is free.

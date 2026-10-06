@@ -247,6 +247,34 @@ promotion guard.
   output, not a (packet_key, source_revision, pass_name, pass_revision,
   input_hash)-keyed idempotency record.
 
+## DB-READY-TRISTATE-01: Startup Readiness Is Not a Repair Signal
+
+- [ ] DB-READY-TRISTATE-01 — use one shared PostgreSQL readiness classifier
+  for health routes and agentic repair admission. `STARTING` (including
+  SQLSTATE `57P03` / `pg_isready` rejection) must remain retryable and must not
+  create a repair task; successful query is `HEALTHY`; terminal connection
+  failure is `UNAVAILABLE`.
+  **Current evidence (2026-10-04):** implementation is wired through
+  `sveltekit-frontend/src/lib/server/db/readiness.ts`,
+  `sveltekit-frontend/src/routes/api/health/database/+server.ts`,
+  `sveltekit-frontend/src/routes/api/health/ready/+server.ts`, and the
+  repair-loop startup guard. Focused hermetic suites pass 24/24 across
+  the classifier, both health routes, and repair-task suppression. This proves
+  the code contract under injected states, not a live PostgreSQL crash-recovery
+  event. Status: `WIRED_FOCUSED_TESTS_PASS`; no live outage was induced and no
+  repair or database writes were performed. Keep the task open until the
+  deployment/runtime health readback confirms the intended stable JSON and
+  retry semantics without creating repair work during a real startup window.
+  **Live readback (2026-10-04):** GET `/api/health/database` returned stable
+  `healthy` / `OK`, SQLSTATE null, and both pools healthy. GET
+  `/api/health/ready` initially returned 500 because an absent optional Engram
+  URL was interpolated into a global `fetch`. The route now uses SvelteKit's
+  request-scoped fetch, guards missing URLs, and turns rejected/timeout probes
+  into fallback states; the ready response now returns 200 with PostgreSQL
+  healthy and optional Engram unavailable. The two health route suites pass
+  6/6. This is current healthy-state readback only; no live `57P03` startup or
+  repair-suppression event was induced.
+
 ## PF0-OLD: Audit Current Worker Behavior (30m)
 
 **Goal**: Establish baseline.
@@ -501,17 +529,542 @@ type PassExecution = {
 
 **BLOCKED**
 - [ ] PF4B — determine table semantics precisely: confirmed execution-history
-      shape for `summarization`; `embedding`/`cache_push` duplicate cause
-      still unknown (47 groups, ~97 rows — low volume, check before assuming
-      same pattern applies)
-      **Source trace refresh 2026-09-29:** `analysis-pass-orchestrator.mts`
-      is a legacy Gemma4-summary importer; the shared analysis worker calls
-      `recordAnalysisPassResult` with configured `passName` and nullable
-      lineage, but no current source literal for `embedding` or `cache_push`
-      was found in the scoped TypeScript callers. This cannot identify the
-      producer of the 27 unresolved embedding groups; the 10 cache-push groups
-      also remain untraced. No worker was run and no database was queried in
-      this source-only refresh, so PF4B stays open.
+      shape for `summarization`; classify the legacy `embedding`/`cache_push`
+      duplicate population without inferring retry semantics from missing
+      identity or revision fields.
+      **Source trace refresh 2026-09-29 (historical; superseded below):**
+      `analysis-pass-orchestrator.mts` is a legacy Gemma4-summary importer;
+      the shared analysis worker calls `recordAnalysisPassResult` with
+      configured `passName` and nullable lineage. That source-only search did
+      not find the legacy producers and did not query the database.
+      **Read-only source/provenance refresh 2026-10-04:** the 47 duplicate
+      groups / 97 rows split into 10 `cache_push` groups / 20 rows, 10
+      `embedding` groups / 20 rows, and 27 `embedding` groups / 57 rows:
+      - The first 20 `cache_push` rows and 20 `embedding` rows are tagged
+        `source=test_orchestrator` across 10 packets per pass. They match
+        `scripts/atlas/phase-b-test-orchestrator.mts`, whose header says it
+        logs test data without calling the model, whose writes require
+        `--apply`, and whose embedding payload is synthetic test metadata
+        declaring the canonical 768-D dimension (with only five sample
+        coordinates, not a real or complete vector). Historical rows emitted
+        by the older 384-D fixture remain unchanged and are not backfilled.
+        The cache payload names `chrom97_context`. These are repeated test-
+        harness inserts, not evidence for production retry or embedding
+        semantics.
+      - The remaining 57 duplicate embedding rows (27 groups) are tagged
+        `source=queue_consumer_embedding_batch`; across all rows with that
+        tag, the read-only census found 130 rows / 100 packets. They match
+        `scripts/atlas/phase-b-queue-consumer-embedding-batch.mts`, which
+        records 768-D embedding metadata. Its ledger insert omits `input_hash`
+        and uses a constant `pass_key`; `queue_message_id` is synthesized
+        from packet key plus `Date.now()`, not read from the broker. None of
+        these rows has source/pass revision or prompt/producer identity. In
+        the duplicate subset, 18 groups have one output version and 9 have
+        two; repeated processing is visible, but redelivery versus intentional
+        re-embedding/content change is not distinguishable. The consumer acks
+        after ledger logging and summary update, so a crash in that interval
+        could cause redelivery; no persisted broker message identity proves
+        that this caused the observed rows.
+      **PF4B-DIVERGENT-01 read-only evidence matrix 2026-10-04:** the nine
+      embedding groups with multiple stored output-metadata versions contain
+      21 rows. All nine have `input_hash`, `pass_identity_hash`,
+      `source_revision`, `pass_revision`, and `prompt_hash` NULL; model tag is
+      `embeddinggemma:latest` without artifact revision; temperature and
+      max-tokens metadata are NULL. `provenance.source` is the same queue
+      consumer label, but producer ID/revision and upstream execution/result
+      references are absent. Per-row `queue_message_id` values differ, but
+      source constructs these as `${packet_key}:${Date.now()}`; they are not
+      verified broker/attempt IDs. Each group has two distinct stored output
+      JSON hashes, differing in `embedding_norm`; the vector itself is not in
+      this table, so vector divergence is unknown. Classify these as
+      `DIVERGENT_OUTPUT_UNEXPLAINED` at metadata level and
+      `SAME_INPUT`/producer/revision/execution semantics UNKNOWN. Do not infer
+      retries from timestamps. Full row matrix:
+      `docs/reports/pass-fabric-pf4b-divergent-embedding-matrix-20261004.md`.
+      PF4B-DIVERGENT-01 = READ_ONLY_CENSUS_COMPLETE; duplicate semantics
+      remain UNPROVEN.
+      PF4B remains open; no deduplication, backfill, uniqueness change, or DB
+      write was performed.
+      PF4B remains open for those 27 queue-consumer groups. Do not collapse
+      rows, infer deterministic idempotency, or apply one pass semantic to
+      every `embedding` row based on this partial trace.
+- [ ] PF4B-EMBED-01 — enforce `semantic_768` (EmbeddingGemma, 768-D) as the
+      only canonical persisted embedding output for pass-fabric and canonical
+      retrieval. Reject new 384-D writes at writer/contract boundaries;
+      retain historical 384-D rows only for explicit legacy reads. The
+      `phase-b-test-orchestrator.mts` sample is synthetic metadata, not proof
+      of a valid 768-D vector writer. Partial route proof (2026-10-04):
+      `/api/embed` rejects every explicit EmbeddingGemma dimension other than
+      native 768, including raw/unprompted 384 and naive 512 truncation; MRL
+      remains a separate derivation from persisted `semantic_768`. Focused
+      route + representation-contract suites pass 19/19. The legacy
+      `backfill-content-embedding-384.mjs` writer is now retired: `--apply` and
+      `--resume` fail before DB connection, its 384-D UPDATE was removed, and
+      its policy tests pass 2/2. The legacy
+      `atlas-qdrant-projection-worker.mjs` also fails before environment/DB/
+      queue setup because it has no verified `semantic_768` source; startup
+      policy test passes. This does not close the task by itself; the remaining
+      production writer/caller census and live persistence proof are still
+      required.
+- [ ] PF4B-EMBED-02 — freeze representation identity on new canonical
+      embedding rows: producer/model identity, `representation_id=semantic_768`,
+      exact `representation_revision` and model-artifact revision, dimension
+      768, and source/pass revisions plus `input_hash`. Runtime aliases such as
+      `embeddinggemma:latest` alone do not identify an immutable artifact.
+- [ ] PF4B-EMBED-03 — if compact MRL projections are admitted, derive only
+      512/256/128-D prefixes from the exact persisted `semantic_768` vector,
+      then L2-renormalize. Record parent representation/revision/checksum,
+      derivation method/revision, dimension, and child checksum. These are
+      derived projections, never aliases or substitutes for `semantic_768`.
+- [ ] PF4B-EMBED-04 — keep `latent_*` under a separate learned-projection
+      contract with its own producer/parameter revision and checksums. Never
+      label learned latent vectors as EmbeddingGemma or MRL.
+- [ ] PF4B-EMBED-05 — complete a producer/consumer census of every remaining
+      384-dimensional surface before changing schemas or dimensions. Classify
+      each as EmbeddingGemma truncation/projection, another model's native
+      vector, cross-encoder/token limit, learned latent, historical schema, or
+      UNKNOWN; record producer, consumer, storage/index, runtime reachability,
+      representation identity, and write capability. Latest source audit
+      (2026-10-04, not a live data census): the Atlas `codebase_chunks_384*`
+      contracts are historical direct-slice EmbeddingGemma projections, not
+      MRL; `populate-packet-vector-bundles.mjs` slices `semantic_768` to 384
+      and requests `embeddinggemma:latest` before writing 384-D bundles;
+      `phase108d-embeddings-backfill-full.mts` creates a 384-D stride-sampled
+      alias; and `rebuild-gemma4-summaries-384.mjs` retains an explicit legacy
+      write opt-in. These three write paths are now blocked before database or
+      Qdrant work; their replacement with a schema-compatible, revision-bound
+      768-D producer remains open. Separately,
+      `semantic_embedding_cache_v2` declares halfvec(768), while the older
+      `knowledge_graph` Qdrant sync declares 384 and its actual model/producer
+      binding is UNKNOWN. Do not infer that it is MiniLM/MS MARCO or rewrite
+      it without producer and consumer proof. Historical migrations and
+      unrelated legal/domain vectors are not automatically EmbeddingGemma.
+      Model clarification: repository references to
+      `cross-encoder/ms-marco-MiniLM-L-6-v2` identify a sequence-classifier
+      reranker, and its `max-length=384` is a token count, not vector width.
+      Historical migrations explicitly name `nomic-embed-text` for some
+      384-D domain vectors; these are separate legacy/model-specific surfaces,
+      not EmbeddingGemma. Static source search found no caller for the old
+      `qdrant-sync.ts::startSyncWorker` path; treat that path as a dormant
+      candidate pending dynamic/runtime confirmation, not as a proven live
+      MiniLM semantic-search owner.
+      Focused writer guard passes 4/4; direct `--apply`/entry-point smoke for
+      the three retired scripts exits 2 with the intended disabled reason.
+      No database or Qdrant request was made. This is source/guard proof only;
+      it neither migrates existing 384-D rows nor proves the full writer census.
+      **Read-only recipe sample (2026-10-04):** persisted an 8,003-byte,
+      `canonicalAuthority=false` receipt at
+      `docs/reports/embedding-recipe-census-v1-20261004-n100.json` (100 rows
+      per deterministic stratum; no database writes). Populations were 739
+      rows with both columns, 54,430 `content_embedding`-only, 219,259
+      `content_embedding_768`-only, and 52,364 tagged with the task-prefix-v1
+      model tag. In the samples, `content_embedding` was mixed: the both-column
+      cohort yielded 24 path-prefixed, 52 trimmed path-prefixed, 21 raw, and 3
+      unknown; the content-only cohort yielded 27 path-prefixed, 66 trimmed
+      path-prefixed, 6 raw, and 1 unknown. The 768-only cohort matched raw in
+      all 100 sampled vectors; the both-column cohort's 100 `content_embedding_768`
+      samples were all UNKNOWN, and only 2 tagged-cohort 768-column vectors
+      were present (both UNKNOWN). Row tags also varied across strata. Treat
+      these as sample observations, not corpus-wide recipe or artifact proof:
+      the mixed recipes and UNKNOWN rows keep EMB-RECIPE-CLASSIFY and runtime
+      artifact binding open. Do not bulk-migrate, relabel, or promote from this
+      sample. Additional fail-closed policy tests cover legacy Qdrant collection
+      creation and restore apply (2/2); no database/Qdrant writes occurred.
+- [ ] PF4B-EMBED-06 — migrate or retire every confirmed EmbeddingGemma-backed
+      semantic writer to native 768-D `semantic_768`; prohibit slicing,
+      stride-sampling, or relabeling 384-D output as EmbeddingGemma/MRL.
+      Persist only the exact model/representation revision and recipe-qualified
+      768 vector. Cover the packet-vector-bundle, phase108d backfill, and
+      summary-rebuild paths found by PF4B-EMBED-05. The 768 API dimension guard
+      and the existing disabled legacy writers are partial protections, not
+      proof that every writer is migrated or that persisted rows are valid.
+- [ ] PF4B-EMBED-07 — prove the canonical semantic cache → search → Qdrant
+      path uses the same EmbeddingGemma `semantic_768` representation and
+      revision. Cache identity must include model artifact, representation,
+      input/recipe policy, and normalized input checksum; Qdrant remains a
+      rebuildable projection of the PostgreSQL-owned vector/identity. Keep
+      `codebase_chunks_384*` out of canonical nomination/fusion. Audit the
+      separate 384-D `knowledge_graph` sync and text-hash-only legacy cache
+      callers; no dimension-only alias or cross-model cache reuse is allowed.
+      Partial runtime proof (2026-10-04): `cache/embedding-cache.ts` now
+      includes the model and `semantic_768` role in its exact Redis key,
+      validates cached vectors and fresh outputs with the shared 768-D
+      validator, and evicts/recomputes legacy 384-D values. `knowledge-cache.ts`
+      retains model-qualified keys, now evicts invalid EmbeddingGemma cache
+      values and refuses new non-768 EmbeddingGemma writes while preserving
+      distinct non-EmbeddingGemma dimensions. Focused mocked-Redis tests pass
+      6/6 across both cache owners. These Redis caches still lack model-artifact,
+      tokenizer, and input-policy revisions and are not the revision-qualified
+      `semantic_embedding_cache_v2` owner; cache/search/Qdrant parity remains
+      open.
+      **Caller convergence slice 2026-10-04:** `/api/retrieval/dual-lane` now
+      uses the shared provider executor for Ollama `embeddinggemma:latest`,
+      retaining its prior `OLLAMA_HOST || OLLAMA_BASE_URL` precedence,
+      30-second timeout, and `unprompted_legacy` query recipe; its existing
+      `semantic_768` validator and `codebase_chunks_768` Qdrant named-vector
+      queries remain in place. The route no longer owns a direct Ollama
+      embedding transport. Focused route-adapter and provider-executor tests
+      pass 16/16. The read-only direct-endpoint guard passes with 75 live direct
+      callers, 3 resolved since baseline, and 0 new bypasses. This closes one
+      caller only; it does not prove corpus/query recipe parity or full
+      cache/search/Qdrant convergence.
+- [ ] PF4B-EMBED-08 — keep verified non-EmbeddingGemma model roles distinct.
+      The repository identifies `cross-encoder/ms-marco-MiniLM-L-6-v2` as a
+      sequence-classification/reranking model; its `--max-length=384` is a
+      token limit, not evidence of a 384-D embedding. The NLP sidecar records
+      that reranker as skipped/not invoked. Do not convert a reranker to
+      EmbeddingGemma or count it as a dense semantic vector lane. If runtime
+      evidence confirms the reported MiniLM/MS MARCO 384-D semantic-cache or
+      Qdrant search path is a separate dense-vector producer, record its actual
+      model/artifact, query and document recipes, dimension, cache key,
+      collection/vector name, producer, consumer, and reachability. Keep that
+      distinct model role explicitly separate; do not infer it from the number
+      384 or silently fold it into the canonical EmbeddingGemma lane. Source
+      trace (2026-10-04) found a real separate MiniLM-backed Chroma memory path:
+      the `claude-mem` worker initializes `ChromaMcpManager` unless disabled;
+      `ChromaSync` sends documents without explicit vectors and searches with
+      `query_texts`; the pinned `chroma-mcp` runtime's dependency note identifies
+      its shipped `all-MiniLM-L6-v2` embedding model. This is a Chroma memory
+      lane, not proof of a MiniLM→Qdrant codebase lane. The exact active model
+      artifact and vector dimension still need runtime readback. The separate
+      `scripts/INFERENCE_INFRASTRUCTURE.md` inventory says all-MiniLM is active
+      but is not itself runtime proof. Reconcile the reported Qdrant/cache path
+      independently; do not mistake the MS MARCO cross-encoder token limit for
+      this Chroma dense embedding model.
+- [ ] PF4B-EMBED-09 — classify remaining 384-D database columns, migrations,
+      fixtures, and learned-projection outputs by owner before schema changes.
+      Preserve historical data and compatibility where required; do not
+      mass-convert all `vector(384)` columns to 768, since dimension alone
+      does not establish model, semantic role, or migration safety. Any active
+      EmbeddingGemma semantic consumer must instead migrate through an
+      independently validated 768-D source and readback. Source-level finding
+      (2026-10-04): `sveltekit-frontend/drizzle/manual/feature_records_and_recommendation_events.sql`
+      still labels `embedding384` as `content_embedding_384` from EmbeddingGemma,
+      calls `embedding768` deprecated, and names `embeddinggemma-384-v1`; this
+      contradicts the current canonical policy. Determine whether this manual
+      SQL is active, applied, or historical before changing it. The separate
+      `latent_384d` schema field is explicitly a latent representation and is
+      not an EmbeddingGemma dense vector. Keep model, latent, domain, and legacy
+      schema meanings separate.
+- [ ] PF4B-EMBED-10 — finish a role-by-role audit of every production 384
+      vector/search/cache/Qdrant path and reconcile its owner here before
+      changing dimensions. Canonical pass-fabric and semantic query/document
+      embedding uses EmbeddingGemma native 768-D `semantic_768`; the canonical
+      semantic cache and canonical semantic Qdrant projection must use that
+      same model, representation, recipe, and revision-qualified identity.
+      Any active EmbeddingGemma writer currently producing or consuming 384-D
+      vectors is a migration/retirement blocker, not a second canonical lane.
+      Keep these model roles distinct:
+      - `sentence-transformers/all-MiniLM-L6-v2` is a separate Chroma memory
+        embedding model, not EmbeddingGemma and not proof of a Qdrant producer.
+      - `cross-encoder/ms-marco-MiniLM-L-6-v2` is a reranker; its configured
+        `max-length=384` is a token limit, not an embedding dimension.
+      - Legacy Atlas `codebase_chunks_384*` projections are direct-slice
+        EmbeddingGemma migration artifacts, not supported MRL outputs.
+      - Other 384-D columns/collections may be distinct-model, domain/legal,
+        learned latent, historical, fixture-only, or unknown; identify their
+        actual producer and consumer before changing them.
+      Specifically trace the reported MiniLM/MS MARCO semantic-cache and
+      Qdrant path end to end. Current repository evidence has not bound that
+      report to a live Qdrant writer/query, so label it
+      `REPORTED_UNVERIFIED`; do not infer vector production from the
+      cross-encoder name. If a 384-D model is producing active semantic
+      query/document vectors for canonical cache/search, migrate that canonical
+      path to EmbeddingGemma native 768-D `semantic_768`, with query/document
+      recipe parity, revision-qualified cache identity, and independent
+      pgvector/Qdrant readback. Keep any reranker as a separate post-retrieval
+      scoring role. For each remaining 384 hit, classify it as
+      `EMBEDDINGGEMMA_LEGACY`,
+      `DISTINCT_MODEL_VECTOR`, `RERANKER_OR_TOKEN_LIMIT`, `LEARNED_PROJECTION`,
+      `HISTORICAL_SCHEMA_OR_DATA`, `FIXTURE_OR_EXAMPLE`, or `UNKNOWN`; record
+      actual model/artifact, input recipe, vector-vs-token meaning, producer,
+      consumer, runtime reachability, storage/index, and write capability.
+      Preserve distinct latent, legal/domain, historical, and fixture roles
+      under their own contracts. Acceptance: no production 384 hit is silently
+      treated as canonical EmbeddingGemma; all unresolved runtime roles remain
+      explicitly `UNKNOWN` and block promotion. No bulk rewrite, relabel,
+      Qdrant restore, or database migration is authorized by this census task.
+      Narrow cleanup (2026-10-04): `search-runtime.ts` contained a private
+      `makeProjected384EmbedFn` → `projectEmbedding` → `makeEmbedFn` chain with
+      no repository callers. Removed that dead helper chain and its unused
+      `DenseEmbedding` import; this prevents that file from retaining an
+      unsupported 384-D projection path. This does not prove or change other
+      384-D producers/consumers, so PF4B-EMBED-10 remains open. Focused
+      `search-runtime.spec.ts` validation passed 17/17 tests; no live retrieval
+      or persistence behavior was exercised by that mocked suite.
+- [ ] PF4B-EMBED-12 — change the intended Chroma memory-lane model/configuration
+      name to canonical EmbeddingGemma `semantic_768` only; defer adapter and
+      storage integration. This is the requested name-only step, not proof that
+      the bundled Chroma MCP embedder uses EmbeddingGemma: source evidence shows
+      `ChromaSync` omits caller-supplied vectors and the pinned dependency
+      identifies bundled `all-MiniLM-L6-v2`. Do not relabel existing MiniLM
+      vectors or claim runtime/model/dimension changed without independent
+      readback. The inspected `ChromaMcpManager` exposes no proven model-name
+      option; if a supported name-only setting cannot be established, stop
+      without adding a guessed environment variable and continue at
+      PF4B-EMBED-12A. Do not silently proceed as canonical. Keep this Chroma
+      memory lane distinct from the reported MiniLM/MS MARCO Qdrant path until
+      that path has producer/consumer proof. No Chroma writes, collection
+      rebuild, backend switch, or service startup is authorized by this naming
+      task. Latest runtime check (2026-10-04) found no `claude-mem`/`chroma-mcp`
+      process and no listener on port 8000, so active model/dimension readback
+      remains unavailable.
+- [ ] PF4B-EMBED-12A — later integration fallback only if the PF4B-EMBED-12
+      model/configuration-name change cannot make new Chroma requests use the
+      canonical EmbeddingGemma `semantic_768` producer. Evaluate caller-supplied
+      768-D vectors through the existing adapter boundary or the existing
+      PostgreSQL/pgvector memory owner, after feature-parity and replay review.
+      This is the follow-up to use if the name-only change gets stuck or proves
+      unsupported; leave Chroma non-canonical until resolved. No Chroma write,
+      vector relabel, or collection rebuild until bounded parity and independent
+      768-D runtime/readback proof pass.
+- [ ] EMBED-RUNTIME-READBACK-01 — prove the active `:8097` service reports
+      backend reachability, requested model availability/residency, model
+      artifact digest, and dimension without issuing an embedding request.
+      The Go source now reads Ollama `/api/tags` and `/api/ps` for `/health` and
+      `/stats`; the legacy health keys remain, with additive typed readback
+      fields. Stats no longer claim the model is loaded or GPU-active by default.
+      `go test ./...` in `services/go-embedding-service` passes. **Live
+      discrepancy (2026-10-04):** the running `legal-ai-go-embedding` container
+      uses `OLLAMA_URL=http://host.docker.internal:11434` and
+      `EMBED_MODEL=embeddinggemma:latest`; read-only requests from that same
+      container show the exact tag installed with digest
+      `85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1` and
+      `embedding_length=768`, but `/api/ps` returns no resident models. The
+      active `:8097/health` and `/stats` still report `model_loaded=true` /
+      `is_loaded=true` and `gpu_available=true`, so the running image does not
+      match the corrected source behavior. Do not call `/ready` for metadata
+      verification: it sends an embedding request. Keep the gate open until an
+      authorized service rebuild/restart and independent live `/health`
+      readback prove the corrected contract. Tokenizer and per-call input-policy
+      bindings remain separate open model-receipt requirements; no embedding
+      request or persistence was performed for this census.
+- [ ] PF4B-EMBED-13 — converge canonical semantic cache/search vectors on
+      EmbeddingGemma native 768-D `semantic_768`, including PostgreSQL/pgvector
+      and any Qdrant semantic projection. Inventory cache/table/collection and
+      vector-key owners, producer and query embedder, consumers, dimensions,
+      recipes, revisions, runtime reachability, and readback. The repository
+      declares 768-D pgvector surfaces including
+      `codebase_chunk_index.content_embedding`,
+      `semantic_embedding_cache_v2.embedding` (`halfvec(768)`), and
+      `search-analytics` columns; verify the active schema and callers rather
+      than creating a parallel store. Source search has not established a
+      dedicated embedding LUT table; any claimed lookup table requires exact
+      schema and consumer evidence. Keep the reported MiniLM/MS MARCO Qdrant
+      path `REPORTED_UNVERIFIED` until its live producer/query chain is traced.
+      A confirmed non-EmbeddingGemma 384-D vector used for canonical semantic
+      cache/search is a migration blocker and requires a separately authorized
+      replacement with recipe-matched 768-D vectors and checksum/readback.
+      Preserve reranker, latent, legal/domain, and historical roles without
+      relabeling them. Changing a model name is not a vector migration: do not
+      claim existing MiniLM/384 vectors are EmbeddingGemma/768. If the provider,
+      cache, Chroma MCP, or Qdrant integration blocks the migration, add a
+      bounded follow-up task describing the adapter/compatibility gap and keep
+      the affected path non-canonical until that task passes. No mass
+      re-embedding, schema migration, Qdrant rebuild, or Chroma write is
+      authorized by this task.
+- [ ] PF4B-SEMANTIC-CACHE-01 — keep app-side semantic L2 fail-closed until
+      server-derived request context and cached-answer provenance are available.
+      Required admission: similarity >= 0.82; exact EmbeddingGemma model ID
+      and artifact revision; `semantic_768` at dimension 768; exact embedding
+      recipe and input-policy revisions; exact opaque domain ID plus taxonomy
+      ID and taxonomy revision; matching retrieval/task intents; matching
+      workspace revision or matching corpus and evidence-manifest revisions;
+      independently valid answer-artifact ref/checksum. Current callers do not
+      provide that authority. `/api/cache/bifrost/check` now returns MISS
+      without an upstream call, and its store route rejects unqualified writes.
+      `bifrostChat`'s direct Qdrant global L2 read/write and explicit Bifrost
+      semantic-cache key are disabled; disclosed gateway cache hits are rejected.
+      `inference-router.ts` no longer issues the 500 ms global-key cache probe;
+      it skips semantic reuse without server-owned admission metadata while
+      preserving the ordinary Bifrost synthesis fallback.
+      Existing exact-match caching is unchanged. Focused Vitest is currently
+      stalled/unverified; gateway/plugin behavior and stored-artifact metadata
+      support remain unproven. Domain IDs remain opaque here: do not mint a
+      competing taxonomy; resolve them through the existing `.okf`/domain
+      classification owner when proven. A cache-key partition or similarity
+      score alone is not admission. No Qdrant/cache write or Bifrost restart is
+      authorized by this task.
+- [ ] FANOUT-ALIGNMENT-AUDIT-01 — produce a read-only inventory of lexical,
+      semantic, structural, graph, ontology, classification, routing, cache,
+      GPU, MCP, SearXNG, and ACE fan-out capabilities using
+      `scripts/atlas/audit-fanout-fabric-alignment.mjs`. Report source-reference
+      files separately from AST-detected caller sites. Only explicit,
+      capability-matched owner declarations may be counted as owner candidates;
+      source mentions and signal co-location are not runtime, identity, lineage,
+      or revision proof. Keep routing-domain, ontology-domain, and artifact-domain
+      taxonomies distinct; treat SearXNG as external acquisition, not an internal
+      retrieval vote. No Graphify refresh, service/database request, persistence,
+      or canonical-authority claim is authorized by this audit.
+- [x] FANOUT-AUDIT-02 — corrected the AST-grep probes to variadic argument
+      patterns and persisted `docs/reports/fanout-capability-audit-v2.json`.
+      The old `%TEMP%/fanout-capability-audit-v1.json` remains
+      `SUPERSEDED_DIAGNOSTIC` (`CALL_PATTERN_ARITY_BUG`), SHA-256
+      `f1b7f8419c69d82a5028277e82c9aebd978f3e00e35d2fad2f723b10995306b3`;
+      it was not copied or changed. V2 (`AST_GREP_VARIADIC_ARGS_V2`) scanned
+      17,327 files and 29 capability families: `routeQuery` 3 call sites,
+      `buildRetrievalPlan` 4, `selectMcpToolSubset` 1, `requestAcquisition` 0.
+      The selector call is in `src/mcp/server.ts` inside the `tools/list`
+      handler (`ACTIVE_CALLER_PROVEN`); `requestAcquisition` remains unresolved
+      in the audited source scope. V2 is static inventory only; generic calls
+      are not attributed to capabilities, and this does not prove all owners,
+      runtime reachability, or revision lineage. Report size is 746,256 bytes;
+      embedded semantic checksum is `sha256:0bc6afa50f46ce2f12ff7337b4cb22f15f083cde4676d653e1f7c5a2f1aa581c`;
+      raw report-file SHA-256 is `sha256:d38ef2b07629f41c38db617fd65d15c1712369926f8fea9e136f9b421396c884`;
+      `writesPerformed=false`.
+- [ ] KERNEL-RETRIEVAL-REAL-01 — read-only trace of all six local
+      `atlas-task-kernel` tools. Do not patch until each first broken boundary
+      is isolated. Current evidence: A, `atlas_expand` maps `target` directly
+      to `find_dependencies`. KERNEL-PATCH-01 expanded the lookup across both
+      `CodebaseFile.path` and `CodebaseFile.filePath` key families, so the
+      earlier `QUERY_KEY_MISMATCH` diagnosis is superseded. The known symbol
+      `planGraphifyEdgeReplayV1` is not a file key and now fails explicitly as
+      `TARGET_NOT_A_PATH`; its containing file is absent from the live
+      projection (`PROJECTION_MISSING_FILE`). `atlas_inspect` returned 0 refs.
+      Live read-only replay on 2026-10-04 isolated the file lookup failure:
+      Neo4j contained 69,009 `CodebaseFile` nodes (65,342 with `path`, 3,667
+      with `filePath`), but the exact replay-planner file matched no node
+      (`PROJECTION_MISSING_FILE`). A control query for
+      `src/lib/server/ace/context-assembler.ts` matched both key families and
+      returned dependencies (bounded at the 500-row cap), proving the read
+      query is operational, not that its graph data is current. Its result
+      still has `graphRevision=null`, `evidenceRefs=[]`,
+      `status=UNRESOLVED`, and `canonicalAuthority=false`. Do not refresh
+      Graphify solely to make the missing file appear; graph-snapshot
+      admission remains a separate gate.
+      Both carry `graphRevision=null`, `evidenceRefs=[]`, and `UNRESOLVED`, so
+      a symbol-to-node resolver and admitted graph projection are unproven.
+      B, three distinct code/legal/embedding queries returned the same 10
+      packet candidates and static local diagnostic packet. This was the
+      pre-patch behavior and is superseded by the query-specific live smoke
+      below; retain its checksums only as historical evidence, not as the
+      current retrieval result. Historical card-set checksum:
+      `f001c4a167cf76361e1c5da46c5dc69ec9affde529622ce779f666a06c8888f4`;
+      historical card-order checksum:
+      `3e1436ed1b9cf716ef489849f124967339de3beca0d4516ffcfaa07fbcdfc631`.
+      The static packet was `NON_CANONICAL_DIAGNOSTIC_ONLY`, missing source
+      revision, and must not be confused with live retrieval. Historical
+      query SHA-256 values, in code/legal/embedding order:
+      `e25b2ad6ba592d970a2e9ef4cfcef7ea32a949402e74842e6d11d33c961e5ea5`,
+      `89a31df12e57e0e27ac110c9356ed61699464f1e3825fc229004c21ffe92b704`,
+      `68d47d34c88370a9dd5a303c663debbc90e8520db51df4a8f6d396388b305f5f`.
+      **Current live read-only smoke (2026-10-04; KERNEL-PATCH-03):**
+      `atlas_context` now calls TRACE `atlas.query`, binds candidate paths via
+      `atlas.packet_search`, and uses the static packet only as an explicitly
+      labelled fallback. A live EmbeddingGemma/`semantic_768` query returned
+      three query-specific candidates (`TRACE_MCP_LIVE`,
+      `LIVE_TRACE_RANKED_SEARCH`); it did not establish admission. All three
+      candidates lacked packet identity and source revision, were marked
+      `identityBound=false`, `proofUsable=false`, and
+      `UNADMITTED_RETRIEVAL_CANDIDATES`. Exact `atlas.packet_search` lookups
+      for the three returned source refs yielded no packet keys, with no RPC
+      error, so the missing identity is not explained by a failed lookup.
+      Candidate refs were
+      `src/lib/server/atlas/features/candidate-feature-snapshot-v1.spec.ts`,
+      `src/lib/server/vector/embeddinggemma-contracts.ts`, and
+      `src/lib/server/embedding/semantic-lineage.ts`. The API currently
+      constructs `promptPacket` text from these unadmitted candidate summaries;
+      downstream model consumption is not proven. Keep the MCP/context-to-LLM
+      admission gate open and do not treat query-specific ranking as evidence
+      admission. No writes were performed.
+      **KERNEL-REAL-02 owner reconciliation (2026-10-04):** the selected
+      patch owner is `SearchRuntime` (the unified fusion runtime);
+      `atlas.packet_dense_search` is an executor, not a second fusion owner;
+      the static reconciliation packet remains diagnostic. The current
+      `atlas.query` alias still dispatches to `handleTraceSearch`/`traceRerank`,
+      so this owner decision is not yet wired into the kernel. A repository
+      caller census also finds `runSemanticSearchWorkflow` invoked by the
+      search TRPC router and `/api/retrieval/search-unified` handlers. Treat it
+      as PATCH_EXCLUDED / RUNTIME_USE_UNVERIFIED, not globally dormant, until
+      route/runtime evidence resolves the apparent discrepancy.
+      `SearchRuntime` has a `readOnly` option guarding promotion-outbox,
+      recommendation exposure, and policy-training writes. The transitive
+      source audit found one additional write surface: the canonical reranker
+      defaults to Redis cache reads/writes and deletes malformed entries.
+      `SearchRuntime` now passes `cachePolicy='disabled'` in read-only mode,
+      covering those cache paths too. A second audit found shadow XGBoost
+      evaluation appends Redis Stream receipts; read-only calls now suppress
+      that receipt while preserving the served baseline. Regression checks
+      cover both policies; the SearchRuntime and canonical-reranker suites
+      pass 33/33. This is focused/injected proof, not a live production
+      zero-write proof across every transitive adapter. `runSemanticSearchWorkflow` also has
+      source-level TRPC and API route callers, so retain
+      `PATCH_EXCLUDED / RUNTIME_USE_UNVERIFIED` rather than declaring it globally
+      dormant. KERNEL-REAL-02 remains open: prove the production adapter chain,
+      candidate identity and revision fields, and zero writes before replacing
+      the interim TRACE path.
+      **Downstream admission guard (2026-10-04):**
+      `scripts/atlas/agentic-recommendation-workflow.mjs` now withholds ACE
+      packets/cards/signals unless the context status is `ADMITTED`; raw L4
+      reranker summaries and raw ACE cards are no longer forwarded into model
+      synthesis/recommendation inputs. Its focused fail-closed test and Node
+      syntax check pass. This proves only this checked-in consumer boundary;
+      it does not prove the external context builder or every MCP consumer
+      avoids constructing/consuming unadmitted text. Keep
+      KERNEL-CONTEXT-ADMISSION-01 held pending canonical revision evidence and
+      final-consumer readback.
+      No runtime orchestrator call was made in this audit.
+      C, `atlas_research.maxRounds` is
+      advertised and echoed in the envelope but dropped before the internal
+      `build_agentic_rag_context` call. D, the MCP facade dispatches context and
+      research through the live query path when available, with labelled
+      static fallback; inspect/expand use read-only Neo4j projection queries,
+      verify uses `classify_intent`, and validate-plan uses
+      `build_recommendation`. The owner choice above is a planned correction;
+      the present MCP/kernel path still does not call SearchRuntime or establish
+      a Go Retrieval fusion owner. No KAG write was run.
+      Focused MCP/kernel tests pass 41/41 on the current worktree; this is
+      hermetic contract evidence, not live identity or model-injection proof.
+- [ ] KERNEL-CONTEXT-ADMISSION-01 — held until real query-specific,
+      canonical, revision-qualified evidence is returned and independently
+      read back. Also withhold unadmitted candidate summaries from any
+      `promptPacket`/model-facing context; the current live builder labels
+      them unadmitted but still assembles their text into `promptPacket`.
+      Prove the final consumer receives only the admitted, canonicalized
+      context result; retrieval-specific ranking alone is insufficient.
+- [ ] KAG-DAG-CALLER-TRACE-01 — HELD. Do not run the KAG DAG live-write trace
+      or manufacture KAG rows until KERNEL-RETRIEVAL-REAL-01 proves that the
+      active production kernel path needs KAG execution receipts.
+
+**Frozen near-term order:** P0 BIFROST-L2-ADMISSION remains with its in-flight
+owner; P1 TOKEN-BUDGET-01's six-kernel-schema (445 token) and TRACE-schema
+(33,106 token) measurements are prior reported evidence, not a retrieval pass;
+P2 FANOUT-AUDIT-02 is complete; P3 KERNEL-RETRIEVAL-REAL-01 remains open for
+independent graph-node/readback resolution. KERNEL-REAL-02 is the next
+read-only gate before orchestrator wiring; keep the five-flag proof and
+model-facing admission open. Only after P3: CONTEXT-DEPTH-
+ALIGNMENT-01, CONTEXT-BUDGET-01, bounded `atlas_expand`/`atlas_inspect`
+argument alignment, CONTINUATION-01, DOMAIN-TAXONOMY-AUDIT-01 / DOMAIN-01 /
+FEATURE-01..04, ROUTER-02 / TOOL-LUT-01 / MCP-ROUTE-01, then ACE-ROUTE-01 with
+real result-token measurements. Keep KAG DDL/live write, Graphify edge
+projection, a new evidence-depth enum, numeric relation codes, cluster-to-
+domain mapping, SearXNG direct evidence, and Go Retrieval fusion ownership
+held.
+- [ ] PF4B-EMBED-11 — reconcile stale 384-D authority statements in active
+      schemas, manual SQL, documentation, fixtures, and generation templates.
+      Canonical policy is EmbeddingGemma native 768-D `semantic_768`; any
+      384-D EmbeddingGemma wording must be marked legacy/retired, while genuine
+      MiniLM reranking, other-model vectors, and learned latents retain their
+      own role. First establish whether each SQL artifact was applied and who
+      consumes it. Correct active guidance and tests; do not rewrite an
+      already-applied historical migration or change a persisted column
+      without a separately authorized migration and readback. Acceptance: no
+      active contract describes 384-D EmbeddingGemma as canonical, and every
+      historical statement is explicitly identified as historical or
+      migration-only. No migration or vector rewrite is authorized by this
+      documentation reconciliation task.
+- [ ] PF4B-QUEUE-01 — do not treat the current
+      `${packet_key}:${Date.now()}` value as broker or delivery identity.
+      Capture a broker-issued message/delivery identity when available; until
+      independently bound, execution/attempt identity stays UNKNOWN.
+- [ ] PF4B-QUEUE-02 — require the revision-qualified logical identity inputs
+      on new embedding writes: packet, pass type, exact source revision, pass
+      revision, producer/config identity, representation identity/revision,
+      and input hash. Preserve a separate attempt identity for executions.
+- [ ] PF4B-QUEUE-03 — rerun the duplicate classifier against a frozen cohort
+      of newly qualified rows. Distinguish retry/redelivery candidates from
+      separate executions only when logical identity and broker delivery
+      evidence support it; never auto-deduplicate historical rows.
 - [ ] PF4B-QUEUE-04 — consumer patch + terminal classification (2026-10-04).
       **Legacy classification (frozen, evidence-bounded):** the 9 divergent
       groups / 21 rows are `DIVERGENT_OUTPUT_METADATA_PROVEN` (two stored
@@ -567,8 +1120,8 @@ type PassExecution = {
       proof. `sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.identity.spec.ts`
       now also pins deterministic-idempotent, stochastic-history, and
       observed-event semantics; isolated contract tests pass 2/2. This does
-      not resolve PF4B's 47 embedding/cache_push duplicate groups or authorize
-      a migration/writer.
+      does not resolve PF4B's 27 remaining queue-consumer embedding groups or
+      authorize a migration/writer.
 - [x] PF4D — read-only recovery census completed 2026-09-27. No values were
       backfilled: all 11,076 legacy rows have both revisions NULL; none has an
       exact historical source-revision binding at or before its execution time,
@@ -805,6 +1358,28 @@ real, live, untriggered landmine, not inert code.
   dominant 58,304+ rows) but NOT as licensing PF9's eligibility query to
   assume every `packet_key` uniquely resolves — it must route through
   `resolveCanonicalPacketKey()`, not raw string equality, until P0-6 lands.
+
+**Current code reconciliation (2026-10-04):** the live 12-hex compatibility
+recipe now has a shared implementation in
+`scripts/atlas/lib/canonical-source-ref.mjs::legacyPacketKeyFromSourceRef()`.
+The audited packet-related scripts import it; the same module rejects
+truncation collisions and duplicate key/source pairs, and its focused static
+writer/guard suite passes 4/4. `upsert-whole-codebase-atlas-packets.mjs` is
+apply-quarantined pending revision-qualified packet admission. This proves a
+shared legacy recipe and code-level collision behavior only; it does not
+resolve file-vs-node packet grain, prove every production caller/runtime, or
+replace live-table collision/readback evidence. Keep the 64-hex builder and
+V2 scheme distinct; do not infer one from the legacy 12-hex population.
+
+**PLAYWRIGHT-CONFIG-ROLE-01 (2026-10-04; read-only):**
+`playwright.config.ts` is the general E2E owner (Chromium and WebGPU projects,
+dev-server policy, global setup/teardown). `playwright.screenshot.config.ts`
+is a lightweight screenshot-capture config (single Chromium project, fixed
+local base URL, no global setup/teardown); its name does not establish visual
+baseline comparison. No `toHaveScreenshot` assertion appeared in the scanned
+E2E tree. The repository contains additional Playwright configs, so the role
+census is partial; do not merge configs, create/approve goldens, or invoke the
+general config as a read-only proof because its global fixtures seed/clean DB.
 
 ### Job identity key (apply to PF4 ledger + PF1 queue going forward)
 
@@ -1171,6 +1746,233 @@ or model calls were made.
 
 ---
 
+### HYPERRAG packet-incidence lineage — prerequisite to PF13 / MULTIHOP-FILL-01
+
+**Authority boundary:** Graphify emits structural facts; the Parent Atlas packet
+identity resolver binds exact endpoints; `PacketIncidenceLineageV1` binds those
+facts to a frozen workspace/graph/source revision; PostgreSQL packet incidence
+is the admitted materialization; HyperRAG is a read-only exact-revision
+consumer. Neither taxonomy hyperedges nor HyperRAG may become the incidence
+writer.
+
+**Independent read-only PostgreSQL census (2026-10-04, `legal_ai_db.public`):**
+`graphify_edges` exists but has no rows; `atlas_packet_incidence` does not
+exist; `atlas_hyperedges` contains 62,802 taxonomy rows, all with
+`packet_key IS NULL` (zero packet-keyed rows), although those rows have
+workspace, graph, and source revisions plus evidence refs; and
+`atlas_ontology_linked_tuples` exists but has no rows. Revision/evidence fields
+do not turn a taxonomy relation into packet incidence without exact packet
+endpoints. Re-stamping or refreshing these taxonomy rows cannot satisfy the
+lineage gate. The local migration/writer files are untracked scaffolding, not
+an admitted or production-wired writer. No writes were performed.
+
+**Bounded live extractor probe (2026-10-04; diagnostic only):** the existing
+8095 Tree-sitter provider processed the unchanged
+`graphify-import-target-resolver-v1.ts` source revision
+`sha256:3d7e0b30b5f387e6d547ea1fd42be1bb2da6ba00688e3edb6109c7d90743b2e9` and
+returned 64 chunks, 344 raw edges, and 298 compiled reference facts. The
+projection adapter initially grounded 292/298. The six unresolved facts
+referenced TypeScript `type_identifier` nodes that the shared occurrence helper
+did not include. After adding that node type, the focused Python tests pass
+15/15 in the 8095 container, and the actual HTTP route now grounds all 298/298
+facts with no reference-span diagnostics. The provider response remains
+64 chunks/344 raw edges; `canonicalAuthority=false`, persistence was not
+attempted, and `writesPerformed=false`. This proves exact source-span
+extraction for this one source only. The diagnostic used
+`git:2b01bba4ed3fa7358cb60f55a2b6eee2b1cdf6b4` as a base revision, not a sealed
+working-tree/Graphify snapshot. It therefore does not prove packet endpoint
+identity, production projection wiring, or graph-output revision lineage.
+Four focused TypeScript files pass 29/29 tests. The container's read-only
+source mount required a controlled sidecar restart to load the helper change;
+no Graphify projection or database write was performed. A separate read-only
+PostgreSQL check found `graphify_edges` still has zero rows and `graphify_files`
+has no row for this probe's sourceRef, so this source cannot qualify for the
+canonical packet-endpoint resolver cohort.
+
+**Span-coordinate contract clarification (2026-10-04):** do not describe the
+8095 HTTP span fields as raw Tree-sitter `Point` values. The live chunker
+adapter's `startLine`/`endLine` are 1-based and its columns are zero-based
+Unicode code-point counts; the converter maps those to zero-based output rows
+and UTF-8 byte offsets. The converter regression uses an emoji prefix where
+API column 8 maps to byte offset 11, and verifies the exact UTF-8 source slice.
+The separate 298/298 live route span check validates resulting spans for this
+one source. Therefore `8095 adapter→UTF-8 byte span` is proven for the bounded
+probe; `8095 input column is already a byte column` is explicitly false. Do
+not apply native parser point semantics directly across this adapter boundary.
+
+**Production-consumer reachability (2026-10-04):** the ACE context assembler
+calls `retrieveMultihopContext` from `context-assembler.ts`; that existing path
+queries Qdrant and then performs a bounded Neo4j traversal over generic
+`stableKey`/`sourceRef`/`id` matches and populates `neo4j_neighbors`. The
+HyperRAG packet RPC forwards that field. In contrast, source search found no
+non-test production caller for `executeKagQuickHopV1`,
+`runKagQuickHopV1`, or `readKagHyperedgesStrictV1`; the PostgreSQL strict-reader
+composition currently exists as library/test coverage only. The existing ACE
+Neo4j path therefore proves a separate multi-hop implementation, not
+revision-qualified packet-incidence consumption.
+
+**Expanded read-only endpoint-join census (2026-10-04; correction):** an
+initial query compared the wrong `graphify_files.source_revision` field; the
+endpoint resolver correctly uses `code_source_revision`. Rechecking the live
+database found 17,475 exact `source_ref` file/packet pairs, of which 15,985
+also match `code_source_revision=atlas_packets.source_revision`. However, all
+56,646 joined source/revision rows have NULL packet `byte_start`/`byte_end`, so
+zero Graphify symbol spans can be contained by a packet. Zero file/packet pairs
+match `graphify_files.workspace_revision=atlas_packets.workspace_revision_key`;
+the current values belong to different revision sets. All 26,014
+`graphify_files` rows have `source_revision_authority` unset/not `PROVEN`, and
+44 lack a workspace revision. A separate exact `source_ref` join to
+      `codebase_chunk_index` found zero matching code-source revisions or workspace
+      revisions, so that projection does not currently fill the gap. This is not a
+      usable endpoint-resolver cohort: exact source revision alone cannot substitute
+      for packet span and workspace binding. The existing
+      `atlas_chunk_packet_identity_links` projection also cannot qualify: all
+      105,762 rows have NULL `source_revision`; its 4,517
+      `EXACT_CANONICAL_ID` rows therefore do not prove source-revision lineage.
+      Of 53,380 links joining to a `codebase_chunk_index` row, none has an exact
+      source-revision binding. The census ran in a read-only transaction and
+      rolled back.
+
+**Existing chunk-lineage bridge census (2026-10-04; candidate-only):**
+`atlas_packet_chunk_lineage` contains 125,065 rows whose exact `source_ref` and
+`source_revision` match a `graphify_files` source and `code_source_revision`.
+Joining `canonical_chunk_id` to `codebase_chunk_index.chunk_id`, then using the
+chunk's line bounds, yields 35,171 symbol→packet candidates with
+`EXACT_SINGLE_MEMBER` or `EXACT_MULTI_MEMBER` and `revision_status=PROVEN`.
+However, none has `graphify_files.workspace_revision` equal to its packet's
+`workspace_revision_key`. The joined `codebase_chunk_index` rows also have no
+matching source/workspace revision fields, so their line bounds cannot be
+independently bound to the graph file revision. This is a promising existing
+bridge to harden, not admitted endpoint evidence; do not bypass the workspace
+or chunk-revision checks.
+
+**Graph snapshot/run-owner readback (2026-10-04):** `atlas_graph_snapshots_v2`
+contains two rows and both are `SUPERSEDED`; the table stores source/topology/
+policy hashes but no explicit workspace or graph revision binding. The latest
+completed `graphify_runs` record (`01a8d8fc-2507-4f39-868e-039039237b98`) names
+the packet workspace key `sha256:e24bb971…` and 25,542 source files, but has
+zero `graphify_files` rows linked by either `first_seen_run_id` or
+`last_seen_run_id`. The latest run actually linked to a Graphify file
+population is the 2026-09-05 run at workspace `sha256:e0dc2711…`; its 23,758
+files have no `PROVEN` source-revision authority, and that workspace does not
+match current packet workspace keys. A separate sealed graph-snapshot artifact
+does exist for `repo:root` at workspace `sha256:e24bb971…`; its global manifest
+declares graph revision `dff9006f…`, while the root shard records 48,339 nodes,
+32,226 edges, `MATERIALIZED`, `replayMatches=true`, and `sealed=true`. This
+does not qualify as the structural graph-output revision needed for packet
+incidence: the inspected edge projection contains only `DERIVED_FROM` and
+`CONTAINS` (no code-reference/call/import facts), and its Parquet edge bytes do
+not match the declared legacy table hash. Preserve this as a sealed topology
+snapshot, not as packet-incidence evidence. The run ledger and this snapshot
+therefore still provide no admitted structural graph-output revision for
+`HYPERRAG-LIVE-BINDING-01`.
+
+**Workspace-binding hardening (2026-10-04):** the endpoint resolver now checks
+each packet's `workspace_revision_key` against the frozen edge workspace at
+both initial symbol/packet join and independent packet identity readback.
+The shared Postgres lineage verifier also selects and checks
+`workspace_revision_key` for both packet endpoints before resolving them;
+missing or cross-workspace values fail closed. A fresh focused resolver,
+materializer, and lineage run passes 12/12, including missing/stale workspace
+rejection. The full `npm run check` was stopped after several minutes at about
+4.7 GB process memory with no diagnostics; full Svelte/TypeScript validation
+remains `UNVERIFIED`, not failed. This closes a code-level fail-closed gap
+only; no live packet qualifies under the current mismatched revisions and
+missing packet spans.
+
+**Live extractor and projection-map probe (2026-10-04):** the running 8095
+`/ast/chunk` endpoint returned HTTP 200 for
+`sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-lineage-v1.ts`.
+The request source bytes were independently SHA-256 hashed and the response
+echoed that token; extraction returned 56 chunks, 314 edges, 270 edges with
+occurrence positions (471 positions), and zero diagnostics. This is a live
+extractor result, not a graph/workspace admission receipt: the response echoes
+the caller-supplied source revision, and no exact packet/symbol/workspace join
+was performed. The updated structural adapter and projection-map suites pass
+25/25 across four files. A repository search found no production caller of
+`compileGraphifyStructuralIntelligence`; it is currently exercised by tests
+only. Therefore the map builder is `CREATED_AND_FOCUSED_TESTED`, not wired to a
+live Graphify/Parent Atlas producer, and the real incidence cohort remains
+unproven.
+
+- [x] HYPERRAG-LINEAGE-01 — freeze and test `PacketIncidenceLineageV1` as a
+      deterministic derived record with schema-enforced
+      `canonicalAuthority=false`. Focused validation on 2026-10-04 passed 24/24
+      across six lineage, resolver, projection, and materializer suites; the
+      candidate materializer performs no persistence. This closes the pure
+      contract gate only, not live packet-incidence evidence or any canary-write
+      gate.
+- [ ] HYPERRAG-LINEAGE-02 — identify and admit exactly one existing Graphify
+      projection stage as the packet-incidence producer. Current live census
+      has zero `graphify_edges`; writer ownership remains unresolved. A
+      read-only source census across TypeScript, JavaScript, MJS, Python, Go,
+      and SQL found no `INSERT`/upsert producer for `graphify_edges`. The
+      existing `graphify-symbol-writer-v1.ts` persists symbols only; its GSP-5
+      edge path is planned, not implemented. The manual SQL file defines the
+      table but is not a producer. Do not designate Graphify merely because
+      its name or schema is present.
+- [ ] HYPERRAG-LINEAGE-03 — resolve both structural edge endpoints to exact
+      canonical packet identity using revision-qualified identity evidence.
+      No path/fuzzy/semantic/taxonomy identity fallback is allowed. A live
+      298-fact same-source extraction cohort now has exact source spans, but
+      no facts have yet been joined to two exact canonical packet endpoints:
+      although 15,985 live file/packet pairs match `code_source_revision`, the
+      joined packet rows lack byte spans and no matching workspace revision key
+      exists in the live Graphify/packet join. The sealed root topology snapshot
+      is workspace-bound but contains only `DERIVED_FROM`/`CONTAINS` edges, not
+      structural reference facts. The 35,171 candidates through chunk lineage remain ineligible
+      because `codebase_chunk_index` lacks its own exact revision binding. The
+      endpoint resolver now rejects packet workspace-revision drift on both
+      initial join and independent readback; this is focused-test evidence, not
+      a live admitted endpoint pair. No facts are bound to a sealed graph-output
+      structural-edge revision; the existing sealed root snapshot is topology
+      only and cannot supply incidence edges.
+- [ ] HYPERRAG-LINEAGE-04 — bind packet, neighbor, source, workspace, and graph
+      revisions from one frozen snapshot. A `source_manifest_digest` alone is
+      not proof of the graph-output revision; never substitute current `HEAD`.
+- [ ] HYPERRAG-LIVE-BINDING-01 — find and run a bounded live cohort of 1–5
+      files with exact `graphify_files.code_source_revision`, symbol spans,
+      packet identity/source revision/span, matching packet and file workspace
+      revision keys, and one admitted graph snapshot. Run the live 8095 extractor
+      and build `PacketIncidenceLineageV1` in memory; require at least one fully
+      qualified edge with non-empty evidence refs and `writesPerformed=false`.
+      Current read-only census result is `NO_REVISION_QUALIFIED_LIVE_SOURCE_COHORT`:
+      15,985 source-revision matches but zero packet span matches, zero exact
+      workspace-revision matches in the live Graphify/packet join, and no
+      admitted structural-edge snapshot. The sealed root topology artifact is
+      workspace-bound but contains no structural reference edges. Do not run
+      `graphify:daily` or write incidence rows to manufacture this cohort.
+- [ ] HYPERRAG-LINEAGE-05 — require non-empty, source-grounded `evidenceRefs`
+      for each endpoint relation; empty or guessed evidence rejects the edge.
+- [ ] HYPERRAG-LINEAGE-06 — calculate and independently recompute deterministic
+      `inputChecksum` and `lineageChecksum` over canonical serialization.
+- [ ] HYPERRAG-LINEAGE-07 — only after the prior gates and separate write
+      authorization, persist a bounded 20–100 row canary. No schema apply or
+      canary write is authorized by this ledger update. A working-tree draft
+      exists at
+      `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-packet-incidence-writer-v1.ts`,
+      but it has no discovered caller or focused writer spec. Its `apply=true`
+      plus non-empty string `authorizationRef` is not an independently
+      verified authorization receipt. Treat it as an unadmitted code candidate;
+      do not invoke it or apply its migration until a separately reviewed,
+      snapshot/checksum-bound authorization and writer tests exist.
+- [ ] HYPERRAG-LINEAGE-08 — independently read back every canary row and verify
+      both packet identities, all revisions, evidence refs, and checksums.
+- [ ] HYPERRAG-LINEAGE-09 — prove production HyperRAG consumes only those
+      exact-revision incidence rows. The strict reader and composition point
+      exist, but no non-test production caller was found; the live ACE Neo4j
+      traversal is a separate, non-equivalent path. No packet incidence is read.
+- [ ] MULTIHOP-FILL-01 — run the first real bounded packet→packet→packet
+      expansion only after exact-revision incidence readback succeeds.
+
+**Current state:** contract/resolver/reader paths have source and focused-test
+coverage; production incidence writer `UNRESOLVED`; live packet incidence
+`ABSENT`; taxonomy hyperedges `NOT VALID PACKET INCIDENCE`; `MULTIHOP-FILL-01`
+`BLOCKED`. Existing PF13 evidence (27/27 mocked/code tests) proves bounded
+Neo4j adapter behavior only, not this PostgreSQL packet-incidence path.
+
+---
+
 ## PF13: Real Multi-Hop Graph Expansion (1h)
 
 **Goal**: 1-2 hop neighbor traversal from ANN seed.
@@ -1410,6 +2212,518 @@ contract and mocked writer only. No cohort
 was frozen, no pass was run/persisted, no live readback occurred, no database status/migration was
 added, and bounded producer selection/readback remain open.
 
+## Computer-engineering knowledge classification and MCP tool ranking
+
+This sequence turns repository and admitted external evidence into cited,
+revision-bound computer-engineering topic/domain candidates, then uses the
+existing MCP tool-selection path to recommend bounded evidence tools. It does
+not add a second taxonomy, classifier owner, index, ranker, or MCP dispatcher.
+
+**Existing owner map to reconcile (presence is not runtime proof):**
+- `.okf/manifest.yaml` registers language, domain, corpus, and index manifests;
+  its language registry currently lists only `typescript.yaml`.
+- `.okf/domains/feature-intelligence.yaml` defines the feature-intelligence
+  vocabulary and authority boundary; `.okf/indexes/feature-intelligence.yaml`
+  and `.okf/indexes/code-exploration.yaml` describe derived index roles.
+- `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` owns the current
+  `domain_class` normalization/classification behavior. The existing runtime
+  contracts include `DomainClassificationV1Schema` and the language/evidence
+  schemas in `atlas/contracts/` and `atlas/language/`.
+- `sveltekit-frontend/src/lib/server/atlas/language/language-intelligence-plan.ts`
+  distinguishes Tree-sitter structure, TypeScript-family ts-morph semantics,
+  and cross-language LSP semantics. Its declared language enum and availability
+  flags do not prove that a grammar or language server is installed/live.
+- `sveltekit-frontend/src/lib/server/ai/tool-selection-policy.ts` already owns
+  deterministic `rankToolsByQuery()` and descriptor selection policy; reconcile
+  its caller in `tool-selection.ts`, the live MCP `tools/list` registry, and the
+  current dispatch boundary before changing ranking or adding tools.
+
+Keep these axes distinct and explicitly cross-walked rather than flattened into
+one `domain` enum: routing domain; ontology domain; artifact/source kind; topic
+or concept; algorithm family; programming language; data-source type; task
+intent; retrieval intent; query shape. Tree-sitter/LSP observations, model
+classifications, similarity scores, and tool ranks remain derived evidence, not
+canonical identity, authorization, task state, or proof.
+
+### Ordered implementation gates
+
+- [ ] ENG-CLASSIFICATION-OWNER-01 — reconcile `.okf/manifest.yaml`, existing
+  `.okf/domains/` and `.okf/languages/` schemas, index manifests,
+  `domain-taxonomy.ts`, `DomainClassificationV1Schema`, and the language
+  intelligence planner. Record one owner per vocabulary/behavior, its revision,
+  consumers, and exact crosswalks. Reuse existing domain classifiers; do not
+  create a parallel domain service or claim `OTHER` means supported.
+- [ ] ENG-CLASSIFICATION-PACKET-E2E-01 — invoke that owner on the same frozen
+  packet used by LINEAGE-E2E-01 and capture its real output, model/checkpoint
+  revision, input/output checksums, exact packet identity, and evidence refs in
+  the diagnostic receipt. A live `/analyze` or MCP smoke on another input is
+  component evidence only. Same-packet live classify receipt passed on
+  2026-10-05; see `docs/reports/lineage-e2e-01-derivation-slice-v1.json`.
+- [ ] ENG-CLASSIFICATION-FEATURE-ROUTING-01 — determine whether the existing
+  feature/routing contracts can carry NB/LR probabilities as derived evidence.
+  Do not coerce model output into `DomainClassificationV1` or canonical
+  taxonomy labels. Add a typed adapter only after owner/schema reconciliation;
+  preserve the classifier pass revision and checksum through routing.
+- [ ] ENG-CLASSIFIER-EVALUATION-01 — evaluate MultinomialNB and
+  LogisticRegression as separate domain-probability challengers using current
+  checkpoint provenance, a frozen independently labeled holdout, full normalized
+  probability vectors, training/holdout disjointness, calibration/metrics, and
+  same-corpus replay before selection or promotion. The diagnostic evaluator
+  exists at `scripts/atlas/lib/domain-classifier-evaluation-v1.mjs`; current
+  checkpoint membership and a qualifying holdout are not proven. Do not conflate
+  `P(domain | features)` with OKF heuristic fit or retrieval relevance.
+  Derive the holdout only from an explicitly frozen human-reviewed or admitted
+  label cohort; each row must bind sample ID, input checksum, source/evidence
+  refs, expected label, and complete NB/LR class-probability maps. The training
+  manifest must enumerate exact member input checksums for the evaluated
+  checkpoint; aggregate file/label-set checksums are insufficient. Print a
+  diagnostic receipt with separate accuracy, macro-F1, multiclass Brier, and
+  log-loss per model. Keep the cohort/report as review artifacts only: do not
+  index probabilities or predictions into PostgreSQL, Qdrant, Neo4j, or cache.
+  `scripts/atlas/evaluate-domain-classifier-holdout-v1.mjs` is a local read-only
+  printer; no qualifying cohort or exact checkpoint membership manifest exists.
+- [ ] ENG-ML-OPT-11 — inventory PyTorch/ATen, scikit-learn, RAPIDS/cuML,
+  cuVS/cuGraph, DSPy/GEPA, RLM, and Gymnasium owners and runtime callers. Keep
+  task/classifier truth, prompt optimization, policy learning, clustering, and
+  retrieval as separate capabilities; package presence is not wiring.
+- [ ] ENG-ML-OPT-12 — freeze environment boundaries and dependency locks before
+  adding packages: FastAPI/NLP sidecar, existing WSL2 RAPIDS Conda environment,
+  and any future PyTorch/RL environment remain independently versioned. Record
+  Python, NumPy, CUDA, framework, model, and artifact versions/checksums. Do not
+  install RAPIDS or PyTorch into the sidecar as a convenience dependency.
+- [ ] ENG-ML-OPT-13 — decide whether PyTorch/ATen is needed from a measured
+  tensor workload. If needed, prove a CPU-only reference first, then a separately
+  pinned optional executor; require bounded memory/device use and parity before
+  GPU execution. No live sidecar/container update is implied by this task.
+- [ ] ENG-ML-OPT-14 — freeze revision-qualified unsupervised feature inputs and
+  a deterministic CPU clustering baseline. Clusters are exploratory routing
+  features only; they do not create or relabel canonical domains.
+- [ ] ENG-ML-OPT-15 — define feature scaling, missing-value handling, and
+  normalization revisions for clustering/classification. Preserve raw values
+  and checksums; reject mismatched feature schemas rather than silently padding.
+- [ ] ENG-ML-OPT-16 — validate probability semantics on an independent holdout.
+  Softmax/normalization must not be applied to arbitrary scores and called
+  calibrated confidence; record class order, calibration method/revision, and
+  multiclass metrics. Keep NB/LR outputs as separate challengers.
+- [ ] ENG-ML-OPT-17 — compare optional cuML/cuGraph/cuVS execution against the
+  frozen CPU oracle on the same revisioned inputs. Require checksum-bound input,
+  ordinal LUT revision where applicable, numeric/tolerance policy, resource
+  approval, and replay receipt. GPU ordinals remain non-identity.
+- [ ] ENG-ML-OPT-18 — specify a read-only Gymnasium-style evaluation environment
+  before any policy-learning work. Actions must be simulated/proposal-only;
+  production tools, stores, task state, and agent mutations are unreachable.
+- [ ] ENG-ML-OPT-19 — define independently reviewed reward/outcome labels and
+  leakage-resistant train/validation/test splits for policy evaluation. Rewards
+  cannot be inferred from model confidence, retrieval rank, or unverified task
+  completion.
+- [ ] ENG-ML-OPT-20 — evaluate PPO only after the environment, action schema,
+  reward provenance, deterministic baseline, safety constraints, and held-out
+  metrics are frozen. Training artifacts remain noncanonical and promotion is
+  separately gated.
+- [ ] ENG-ML-OPT-21 — evaluate DSPy/GEPA as prompt/program optimizers on frozen
+  train/validation examples with an untouched test set, bounded model calls,
+  captured optimizer/model/prompt revisions, and regression checks. No automatic
+  prompt deployment or label/evidence promotion.
+- [ ] ENG-ML-OPT-22 — bound RLM/self-prompting recursion, tool permissions,
+  context/token budgets, retries, and termination. Retrieved text and model
+  reflections remain untrusted inputs, never policy/system instructions.
+- [ ] ENG-ML-OPT-23 — require independent review, reproducible replay, rollback
+  artifact, and explicit admission authorization before promoting any model,
+  prompt, policy, clustering, or routing change. No gate in ENG-ML-OPT-11..22
+  authorizes training on production data or persistent indexing.
+- [ ] ENG-LANGUAGE-COVERAGE-01 — inventory the languages/extensions present in
+  the target source corpus against installed/declared Tree-sitter grammars,
+  LSP servers, and supported operations (structure, symbols, definitions,
+  references, diagnostics). Record provider/server and grammar revisions,
+  availability, coverage, and unsupported/dormant cases. Reconcile the
+  `.okf` language registry with the runtime enum; package presence alone is not
+  live language support. Do not claim all languages are covered until every
+  advertised language has provider evidence and a bounded smoke test.
+
+- [ ] ENG-CODE-EVIDENCE-CITATION-01 — freeze a candidate evidence-unit contract
+  for source snippets and citations. Bind `sourceRef`, exact source/workspace
+  revision when available, language, producer/grammar/LSP revision, exact byte
+  span plus coordinate encoding, excerpt checksum, and non-empty evidence refs.
+  Derive display citations from the verified span; never fabricate line numbers
+  or packet identity. Preserve unresolved packet/workspace binding as unresolved.
+  External web citations require the admitted SearXNG acquisition receipt and
+  captured-source identity; a result snippet alone is not evidence.
+- [ ] ENG-TOPIC-ALGORITHM-CATALOG-01 — extend the existing `.okf` registries
+  only after the owner gate. Define computer-engineering topics, algorithms,
+  data-source kinds, and aliases as separately typed, revisioned vocabulary
+  entries with definitions and evidence examples. Topics/algorithms are not
+  domains; language labels are not topics; storage/executor names are not
+  retrieval lanes. Validate YAML/schema and semantic references, and keep
+  proposed/ambiguous terms reviewable rather than silently promoting them.
+- [ ] ENG-EXTERNAL-SOURCE-ACQUISITION-01 — after the local source-code index
+  has a frozen revision and bounded readback, use the existing reviewed
+  `docs/.okf/dev/library-docs-manifest-v1.json` catalog and
+  `atlas_okf_docs_pipeline.py` Firecrawl v2 / BeautifulSoup fetchers to acquire
+  official, exact-host-allowlisted language, algorithm, data-source, and
+  computer-engineering references. The current 24-source catalog is only a
+  package-inventory seed, not proof of coverage for every supported language
+  or engineering domain. Reconcile it against the measured Tree-sitter/LSP
+  language cohort and the reviewed `.okf` topic/algorithm/data-source
+  vocabularies before calling coverage complete. Use acquisition-only mode
+  first: bounded
+  pages/depth, immutable source/checksum/citation metadata, local run output,
+  no embeddings, rank features, Qdrant/DB/cache writes, or automatic vocabulary
+  promotion. Keep source-language tags linked to the catalog revision; let the
+  existing `.okf` schemas own domain/topic/algorithm meaning. AST/NLP analysis
+  of the acquired references waits until local code-index readback and this
+  acquisition receipt both pass.
+- [ ] ENG-DOMAIN-CLASSIFICATION-01 — use the admitted code/evidence units plus
+  Tree-sitter, available LSP, imports/dependencies, schema/package metadata, and
+  the frozen `.okf` vocabulary to produce multi-label classification
+  candidates. Deterministic signals run first; any model-produced label is a
+  proposal with confidence, alternatives, producer/taxonomy revisions, and
+  grounded evidence refs. Test ambiguity, multilingual coverage, unknown
+  labels, and conflicting signals. No classifier output may mint identities,
+  write canonical ontology/domain state, or become an independent retrieval
+  vote.
+- [ ] ENG-EVIDENCE-INDEX-READBACK-01 — map code snippets, citations,
+  classifications, and source metadata to the existing canonical identity and
+  retrieval/index owners. Prove a bounded read-only query returns the exact
+  source revision, span, citation, vocabulary revision, and projection lineage.
+  PostgreSQL remains canonical where already defined; Qdrant/Go Retrieval and
+  other indexes remain rebuildable executors/projections. No new table,
+  collection, bulk index, or persistent write is authorized by this gate.
+- [ ] MCP-TOOL-RANKING-01 — feed the frozen query shape, task/retrieval intent,
+  language, domain/topic/algorithm candidates, and evidence requirements into
+  the existing MCP registry and `rankToolsByQuery()` / selector path. Prove
+  exact registry revision and tool-schema identity against live `tools/list`;
+  evaluate deterministic top-k relevance, invalid/deprecated-tool rate,
+  repeatability, and latency on a frozen reviewed cohort. Ranking is advisory,
+  does not authorize execution, and must not add one vote per executor or create
+  a competing `selectMcpToolSubset` owner.
+- [ ] MCP-EVIDENCE-EXECUTION-01 — only after ranking proof, call selected tools
+  through the existing dispatcher with schema validation, declared read/write
+  effect, bounded time/cost, and per-tool authorization. The initial cohort is
+  read-only. Preserve tool/registry revisions and returned evidence refs in a
+  receipt; route selected evidence through ACE/ContextManifest before model
+  injection. Retrieved code, documents, and web pages are untrusted data, never
+  tool instructions. No raw retrieval hits go directly to the LLM.
+- [ ] ENG-CLASSIFICATION-MCP-E2E-01 — replay a bounded, revision-frozen corpus
+  through language evidence → exact code citation → `.okf` topic/algorithm and
+  domain candidates → existing index retrieval → MCP tool ranking → authorized
+  read-only evidence call → ACE/ContextManifest. Verify deterministic receipts,
+  identity/revision propagation, cited output, no duplicate owners, and
+  `writesPerformed=false`. Keep this incomplete until the end-to-end replay and
+  independent readback pass.
+
+**Dependency order:**
+```text
+ENG-CLASSIFICATION-OWNER-01
+  ├─ ENG-LANGUAGE-COVERAGE-01 ───────────┐
+  ├─ ENG-CODE-EVIDENCE-CITATION-01 ──────┼─> ENG-EVIDENCE-INDEX-READBACK-01
+  └─ ENG-TOPIC-ALGORITHM-CATALOG-01 ──────┘   (freeze local code corpus first)
+                                                   ↓
+                                         ENG-EXTERNAL-SOURCE-ACQUISITION-01
+                                                   ↓
+                               ENG-DOMAIN-CLASSIFICATION-01
+                                                   ↓
+  MCP-TOOL-RANKING-01
+        ↓
+  MCP-EVIDENCE-EXECUTION-01
+        ↓
+  ENG-CLASSIFICATION-MCP-E2E-01
+```
+
+Do not run `graphify:daily` just to refresh a stale warning. Do not classify
+taxonomy hyperedges as packet incidence, use ungrounded snippets as citations,
+or treat an MCP ranking result as permission to execute a write tool.
+
+
+### NLP/domain-classifier evidence reconciliation (2026-10-05)
+
+- This supersedes only the component-level claim that the classifier path was
+  wholly unavailable: the classifier-sidecar ledger records a live `:8095`
+  `/analyze` classify invocation on 2026-09-03, returning `sklearn-lr` and a
+  model revision. The best-fit ledger separately confirms real MultinomialNB
+  and LogisticRegression `predict_proba()` outputs.
+- It does not prove classification of the current LINEAGE-E2E-01 frozen
+  packet, current checkpoint admission, revision/evidence binding, or
+  propagation into feature setup and routing. Those remain open above.
+- `python/train_domain_classifier.py` is an offline weak-label trainer using
+  EmbeddingGemma/KMeans features and sklearn NB/LR. This status does not
+  authorize training, checkpoint replacement, or label promotion. Probabilities
+  remain derived routing evidence, not canonical domain truth.
+- PF10/PF11 describe a proposed NLP/enrichment ordering; they do not supersede
+  these owner, evaluation, or same-packet lineage gates and do not establish a
+  current vertical-slice pass.
+
+### Existing OpenSpec analysis pipeline gate closure (2026-10-05)
+
+These gates close gaps across existing owners; they do not create a second
+analysis system. Markdown/OpenSpec remains task-state authority. All derived
+facts, cards, edges, and algorithm projections remain
+`canonicalAuthority=false`. Keep every gate unchecked until its stated
+independent readback/evaluation passes. No model-driven task-state changes or
+unapproved durable writes are authorized.
+
+- [ ] 11.1 `ANALYSIS-MODEL-RECEIPT-01` — status is
+  `ARTIFACT_PROVEN / RUNTIME_BINDING_PARTIAL`, not wholly unproven. Existing
+  artifact evidence covers the local GGUF path/checksum and 768-dimensional
+  executor parity; tokenizer and input-policy revisions are separate. Runtime
+  path/name matching is not an independently measured loaded-artifact digest,
+  current executor availability, or per-call tokenizer/input-policy binding.
+  Historical plan denominator is 11,024 EvidenceCards × 5 = 55,120
+  representations (not 55,610). Child gate:
+  `MODEL-RECEIPT-READBACK-01` independently reads the receipt and checks
+  `modelId`, artifact checksum, dimension, pooling, tokenizer/model revision,
+  producer revision, active runtime/provider binding, and per-call
+  `tokenizerRevision` / `inputPolicyRevision`. Do not rerun the shared-output
+  producer as the independent verifier. Evidence:
+  `docs/reports/emb-prov-01-embedding-provenance-receipt.json`.
+  Supplied 2026-10-03 readback reports the configured 621,867,360-byte GGUF
+  SHA-256 matched
+  `bc843658e96d2e9cc7c3402332b158f0cc4f73e61b23cef9a41acee1c0d372b7`;
+  Ollama `embeddinggemma:latest` digest
+  `85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1`,
+  768 dimensions, but no loaded model in `/api/ps`; `:8081` refused
+  connections. `:8097/health`'s `model_loaded` was derived from `/api/tags`,
+  so it is not loaded-runtime proof. Source was changed to check `/api/ps`
+  and focused Go tests passed, but the service was not rebuilt/restarted and
+  no embedding request or persistence was performed. Semantic persistence
+  remains held pending independent readback, including pooling.
+- [ ] 11.2 `ANALYSIS-EVIDENCECARD-OWNER-01` — reconcile the generated
+  OpenSpec EvidenceCard corpus owner. The supplied audit distinguishes
+  `atlas.openspec-evidence-card.v1` (generated corpus) from legacy/drifted
+  `atlas.evidence-card.v1`; the persisted portfolio census still emits the
+  latter. Keep open until a current revision-bound producer/readback proves
+  schema, producer, identity/revision fields, and checksum. `TaskCardV1`
+  remains a derived projection; do not create a second card authority or
+  confuse this question with `CandidateEvidenceCardV1/V2`.
+- [ ] 11.3 `ANALYSIS-ORDINAL-MAP-01` — blocked on owner-contract compatibility.
+  Existing `CandidateOrdinalMapV1` binds packet/tree-node/symbol-version
+  identity; coercing TaskCard `stableKey` or task blocks into it would misstate
+  identity/revision. Do not reuse code-chunk ordinals or create a parallel
+  allocator. Reconcile a discriminated OpenSpec task-universe variant in the
+  existing owner, preserving packet consumers, then prove deterministic
+  ordering, per-row task revision, universe/source revisions, checksum, and
+  independent bounded readback. Evidence:
+  `docs/reports/analysis-openspec-ordinal-owner-census-v1-20261003.md`.
+- [ ] 11.4 `ANALYSIS-NLP-GROUNDING-01` — reuse the existing `:8095` NLP
+  sidecar and extraction owners for domain, concept, entity, action, artifact,
+  capability/tool, and dependency-phrase observations. Every observation must
+  retain an exact source span, source/task revision, and extractor revision;
+  outputs remain non-authoritative.
+- [ ] 11.5 `ANALYSIS-ONTOLOGY-TUPLE-01` — map grounded NLP observations through
+  the existing five tuple tables/owner; freeze the table owner for `DOMAIN`,
+  `CONCEPT`, `ENTITY`, `ARTIFACT`, and `CAPABILITY`. Prove no sixth tuple
+  store or duplicate relation authority. Persistence remains behind the
+  existing write gate.
+- [ ] 11.6 `ANALYSIS-DEPENDENCY-CANDIDATE-01` — derive revision-bound candidate
+  task edges only from grounded dependency phrases (`after`, `requires`,
+  `blocked by`, `depends on`). Exact declared task IDs may rank as stronger
+  evidence; text-only edges remain review proposals. Prove candidates cannot
+  alter task status, suppress retrieval, or enter confirmed graph ranking
+  without review.
+- [ ] 11.7 `ANALYSIS-HYPERGRAPH-01` — derive revision-bound hyperedges from
+  admitted EvidenceCard/ontology/task facts. Pairwise CSR/COO algorithm
+  projections must carry source/graph revisions, ordinal-map checksum, and
+  checksums. Hypergraph is a derived projection, not another canonical store.
+- [ ] 11.8 `HYPERRAG-INCIDENCE-OWNER-01` — identify an admitted producer for
+  packet-keyed, revision-qualified incidence before `MULTIHOP-FILL-01`.
+  Supplied owner audit reports 62,802 taxonomy `atlas_hyperedges` with null
+  packet keys and zero packet resolution; linked tuples are empty or lack
+  required provenance. `persistHyperedges()` in
+  `sveltekit-frontend/src/lib/server/atlas/kag-hyperedge-postgres.ts` is
+  reusable persistence infrastructure, but its discovered production caller
+  is taxonomy promotion, not packet incidence. The production strict reader
+  is statically reachable, but its default Qdrant candidate mapping omits
+  `graph_revision`, so the exact-revision SQL gate is not reached on that
+  path; the Postgres quick-hop composition has no production caller. Focused
+  tests are mocked and do not prove live expansion. Require a current exact
+  packet-incidence cohort and source/workspace/graph revisions; never rewrite
+  taxonomy edges into incidence. Keep `MULTIHOP_LINEAGE_UNPROVEN`.
+
+**Dependency DAG (not a serial checklist):**
+
+```text
+TASKCARD-PARITY-01 → EVIDENCE-TASK-JOIN-01 → 11.3 → CandidateFeatureMatrix
+11.1 → MODEL-RECEIPT-READBACK-01 → semantic persistence eligibility
+EMBED-OWNER-FREEZE-01 → live caller convergence
+11.8 → current packet-incidence cohort → MULTIHOP-FILL-01
+11.2 → 11.4 → 11.5 ─┬→ 11.7
+                    └→ 11.6 ─┘
+```
+
+The model receipt does not block NLP extraction; NLP does not wait for semantic
+indexing. Semantic indexing remains gated on 11.1–11.3. Graph ranking remains
+gated on reviewed dependency edges and 11.7 readback.
+
+### Codebase-Memory structural challenger (optional; no second graph owner)
+
+Codebase-Memory MCP, if evaluated, is a disposable-worktree structural
+challenger only. Its project/index/node IDs are not Atlas identity, Graphify
+authority, packet incidence, or an execution DAG. Do not install, configure,
+index, watch, or expose its tools to the default Ornith agent as part of this
+ledger entry. Any future bounded evaluation must first use a binary-only,
+hash/version-verified isolated install; disable automatic indexing/watch;
+index only a disposable repo copy; compare a frozen structural-query cohort
+against existing Atlas helpers; and resolve every returned path/symbol to exact
+Atlas source revision and byte-span evidence before considering an adapter.
+
+- [ ] `CBM-SECURITY-02` — verify release/version/hash before execution.
+- [ ] `CBM-ISOLATE-03` — prove disposable root and auto-index/watch disabled.
+- [ ] `CBM-INDEX-04` — explicitly index only that disposable root.
+- [ ] `CBM-QUERY-05` — run bounded admitted query classes: definition, outline,
+      snippet, import candidates, and path-bounded text. CALLS and impact output
+      remain diagnostic nominations, not evidence.
+- [ ] `CBM-PARITY-06` — compare correctness, latency, calls, and tokens against
+      the same Atlas-helper questions.
+- [ ] `CBM-IDENTITY-07` — resolve results to exact source revision and spans;
+      unresolved observations remain diagnostic-only.
+- [ ] `CBM-ADAPTER-08` — consider a thin helper-registry adapter only after
+      parity and identity gates pass; do not expose raw tools by default.
+- [ ] `CBM-KERNEL-09` — prove bounded reachability through the existing Atlas
+      inspect/expand facade, with no second agent or graph authority.
+- [ ] `CBM-WATCH-10` — consider background watch only after measured
+      correctness, staleness, and Windows stability; requires a separate
+      decision and authorization.
+
+**CBM policy decision (operator accepted 2026-10-05; policy only):** admit
+`CODEBASE_MEMORY_MCP` as a narrow `WORKTREE_STRUCTURAL` challenger for
+`DEFINITION`, `OUTLINE`, `SNIPPET`, `IMPORTS` (candidate set; verify elsewhere),
+and `BOUNDED_TEXT`. Keep `canonicalAuthority=false` and `emptyMeansUnknown=true`.
+Do not admit blast radius, SvelteKit route-to-handler ownership, database-table
+write ownership, CALLS as evidence, or negative connectivity claims. This does
+not mark a runtime handler, Atlas adapter, or identity/freshness gate complete.
+The handoff's `CBM-IDENTITY-01` maps to existing `CBM-IDENTITY-07`; do not add a
+parallel identity owner.
+
+- [x] `CBM-ADMISSION-01` — freeze the capability boundary above. This checkbox
+      records the operator policy decision, not production integration.
+- [ ] `CBM-FRESHNESS-01` — derive `CURRENT` only from a source/index snapshot
+      match. Missing binding or post-index worktree changes produce
+      `UNKNOWN`/`STALE_INDEX`, never silent structural use.
+- [ ] `CBM-NEGATIVE-01` — empty CBM results stay `UNKNOWN`; verify negative
+      claims with exact source/Atlas helpers.
+- [ ] `CBM-TOKEN-01` — record request/result bytes and token estimates for
+      outline, snippet, and bounded text queries.
+- [ ] `CBM-FALLBACK-01` — stale, ambiguous, or empty observations fall back to
+      `rg`/exact source inspection, not stale CBM evidence.
+- [ ] `CBM-DETECT-CHANGES-01` — diagnose symbol-impact failure using one changed
+      indexed file, one known symbol, and one known importer/caller. This is
+      separate from admission and must not block the admitted query classes.
+
+**CBM read-only measurement update (2026-10-05 local; installed 0.11.0; partial, not admission):**
+
+**Cross-ledger reconciliation:** the ACE/RLM ledger contains the follow-up
+CBM-MEASURE-02B/C/D measurements and the operator's narrow admission decision.
+They are existing recorded evidence, not reruns in this pass. The bounded
+`search_code`, outline/snippet, route/HTTP_CALLS, EnvVar, `WRITES`, and
+`detect_changes` findings are incorporated below. These measurements do not
+prove revision freshness or canonical identity, nor do they make CBM suitable
+for blast radius, route-to-handler ownership, SQL/table writes, or negative
+claims. Keep query parity and identity/freshness gates open; the standalone
+one-file/symbol `detect_changes` diagnosis remains open.
+
+**Import adapter follow-up (2026-10-06):** a bounded diagnostic `query_graph`
+adapter now parses JSON rows as File/Module path candidates, but does not bind
+the graph snapshot or Atlas identity and is not wired to runtime. One observed
+positive matched direct source import; one known-importer query returned zero,
+so import recall is not established and empty remains UNKNOWN. Verify each
+candidate independently; do not use the adapter for negative claims.
+
+**CBM source-parity microprobe (2026-10-05; read-only, not full CBM-PARITY-06):**
+on `lib/agent/bounded-tool-caller.ts`, `get_file_outline` returned six symbols;
+all six names matched current source at the reported start lines (6/6). A
+`get_code_snippet` query for `callToolSafely` returned lines 31-49 whose
+normalized-source SHA-256 exactly matched the current file slice
+(`164d6c997e742780c706c58e657e8a6c2bf41ef478f33b7ad84a58ed8bc60c67`). This
+proves bounded current-source agreement for one file only—not full index
+freshness, Atlas-helper parity, identity qualification, recall, or runtime
+wiring. Keep all CBM parity/freshness/identity gates open.
+
+**Atlas lexical coverage probe (2026-10-05; explicit PostgreSQL `READ ONLY`):**
+the existing `search_code_lexical('callToolSafely', 20, NULL)` returned zero,
+and `code_retrieval_chunks` had zero rows for `bounded-tool-caller.ts`. The same
+held for `buildLearningOutcomeV1` / `learning-outcome-v1.ts`. This does not
+compare like-for-like structural retrieval; it shows the Atlas lexical corpus
+does not contain either probe file, so FTS cannot serve as the parity oracle
+for them. Do not count CBM's result as a win; choose a frozen file present in
+both indexes or use the existing Atlas structural sidecar with valid source
+revision inputs. Transaction rolled back; zero rows written.
+
+**Shared-file same-query microprobe (2026-10-05; explicit PostgreSQL `READ ONLY`):**
+for `quantizeGemmaLegalOutput` in `sveltekit-frontend/src/lib/ai/base64-fp32-quantizer.ts`,
+bounded CBM `search_code` (`pattern`, `mode=files`, exact `path_filter`) returned
+one file / one reported grep match (1,151 ms); its `raw_match_count` was zero,
+so the provider's count semantics need clarification. CBM outline returned 25
+symbols and its snippet for lines 320-325 exactly matched the current source
+slice (SHA-256 `a50b49ed3b4d28342a3775f01788cb9fda6b2a82df81775d732d56de4274b4c1`).
+The current source `rg` hit is line 320. Atlas `search_code_lexical` returned
+three rows for the same identifier: the exact absolute-path row first
+(score 0.54545456), plus two relative-path rows (0.16666667 each); the table
+has eight rows for the absolute-path file. Read-only inspection showed the two
+relative-path rows are `card:` and `qdrant:` stable-key entries with identical
+content MD5s, while the absolute-path symbol result has a separate `file:` key.
+These appear to be separate projection classes, not proven canonical chunk
+identity. SearchRuntime's fusion key prefers `symbolVersionId`, else `packetKey`
+(optionally disambiguated by `canonicalChunkId`), else candidate ID; it adds a
+revision qualifier only when both source/workspace revisions are SHA-256. These
+FTS rows do not supply those fields; do not merge them by path/content hash.
+This is useful one-query overlap, but not equivalent
+structural-ranking parity, recall, or proof the CBM snapshot is revision-current.
+Keep `CBM-PARITY-06` and identity/freshness gates open; reconcile projection
+rows only through their existing identity owner.
+
+**Canonical identity resolver follow-up (2026-10-05; read-only):** inspected
+the three returned `code_retrieval_chunks` rows and the existing identity
+owners. The table has no dedicated packet/source/workspace revision columns;
+the inspected row metadata has no `packet_key`, `symbol_version_id`,
+`canonical_chunk_id`, `source_revision`, or `workspace_revision`. The
+`card:`/`qdrant:` rows contain content hashes, but no qualified hash contract
+was present, so those hashes cannot establish exact projection identity.
+`resolveCanonicalIdentityV2` has strict resolution rules but no production
+caller in the searched server tree; V1 is used by RRF normalization, but this
+audit did not establish that it owns these FTS rows. Result: no canonical
+candidate resolution is proven; a path-only resolution would be at most a
+source group, and a lane ID remains degraded. Do not merge or promote these
+rows. Keep CBM identity/parity gates open pending an existing-owner binding
+that supplies qualified identity and revisions. The inspection ran read-only;
+zero datastore writes.
+
+- Existing project scope is `sveltekit-frontend/src` (74,735 nodes,
+  250,913 edges; index status `ready`, indexed at 2026-10-06T01:29:49Z).
+  The second indexed project is only `src/lib/server/atlas/workflow`.
+  Branch metadata is `handoff/summary-enrichment-lineage-20260925`; no
+  immutable index-to-current-worktree revision binding was established.
+- Schema census reports 878 `Route`, 375 `EnvVar`, 71 `Table` nodes,
+  1,042 `HTTP_CALLS`, 6,533 `WRITES`, and 21 `HANDLES` edges.
+- Route lookup via `search_graph --qn-pattern` found GET/POST route
+  candidates for `/api/routes/{routeId}/interactions`; `query_graph` linked
+  both `HANDLES` edges to `routes/api/routes/[routeId]/interactions/+server.ts`.
+  Current source independently exports GET and POST. A different route query
+  returning no relationships is `UNKNOWN`, not proof of absence.
+- `HTTP_CALLS` for `/api/auth/login` returned five caller files; the five
+  exact direct `fetch('/api/auth/login', ...)` source callsites match that
+  bounded cohort (5/5). This is a path-level diagnostic comparison, not a
+  revision-qualified graph proof.
+- `DATABASE_URL` returned 18 `CONFIGURES` candidates. One selected positive,
+  `getPgPool` in `mcp/tools/vault-walker.tool.ts`, is confirmed by source; the
+  remaining candidates were not individually precision/recall audited.
+- `WRITES` is a code-level variable/field/method mutation relation, not a
+  database-table ownership relation. A table-directed query returned no
+  `users`/`atlas_packets` edge; that is not a negative SQL-write finding.
+- **Correction to this pass's initial note:** `detect_changes` was not rerun in
+  this pass, but the ACE/RLM ledger records a separate v0.11.0 `scope=impact`,
+  `base_branch=HEAD` run over 557 changed files (~25s): the bounded file set
+  matched known changed files, while `seed_symbols=0`, `impacted_total=0`, and
+  `module_total=0`. Classify it `FILE_DIFF_ONLY_PROVEN / SYMBOL_IMPACT_NOT_PROVEN`;
+  cause remains undetermined. The record did not establish `scope=files` as a
+  separate run or page through all indexed `src/` paths. Keep a tiny symbol
+  impact diagnosis separate from admission; do not patch Atlas around it.
+- No CBM indexing, watch/config change, Graphify refresh, canonical semantic
+  snapshot change, or Postgres/Qdrant/Neo4j/Valkey write was performed here.
+  Keep `CBM-QUERY-05`, `CBM-PARITY-06`, `CBM-IDENTITY-07`, freshness,
+  token-accounting, fallback, and negative-control gates open. Remaining work is
+  exact snapshot identity, same-query Atlas parity (including import-candidate
+  verification and token counts), and the small standalone `detect_changes`
+  symbol-impact diagnosis.
+
 ## Computer Engineering Knowledge Acquisition / Classification (recorded 2026-10-04; reconciled against existing owners; nothing built)
 Operator plan: `catalog -> classify -> acquire -> normalize -> cite -> admit -> index -> AST/NLP enrichment -> MCP rank`, with `.okf` owning catalogs/policy, Postgres owning admitted lineage, Qdrant/cuVS as projections, graph indexes derived, SearXNG discovery-only, MCP as routing not truth. Audited before recording (Duplication Prevention rule): most of the acquisition-to-index half already exists and is proven under `openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md` (DOC-00..DOC-27); the gates below are therefore tagged EXISTS / EXTEND / NEW instead of being added as new work.
 
@@ -1436,6 +2750,32 @@ Operator plan: `catalog -> classify -> acquire -> normalize -> cite -> admit -> 
 | CE-LSP-01 LSP enrichment | not audited here | NEW, optional, after admission |
 | CE-E2E-01/02 replay fixture | not present; the DOC admission canary receipts are the closest precedent | NEW |
 
+**CE-RECON-01 checkpoint (2026-10-04; source-ledger and artifact-presence
+cross-check only, not a fresh runtime replay):** the versioned-doc task ledger
+records DOC-01/02 contracts and focused tests, DOC-03's bounded 3-page live
+Firecrawl receipt, DOC-04/05 HTML/code-block normalization and chunk tests, and
+DOC-06A's 30-page/852-chunk canonical PostgreSQL admission with independent
+readback. The cited admission, Firecrawl, DOC-10/12, DOC-15, and DOC-19/20/21
+report files are present. These establish reusable owners, not that the proposed
+computer-engineering corpus is complete or ready for a new crawl/index run.
+Important limits from those same task records: DOC-07 proves 768-D vectors via
+the configured endpoint, but does not bind the current corpus to the required
+EmbeddingGemma model artifact/recipe; DOC-08's live Qdrant write/readback used a
+disposable collection and its target collection was still recorded at
+`points_count=0`; DOC-09 is a domain/ontology baseline, not the requested
+multi-axis classifier. Corrected DOC-10 receipt lineage: the cited
+`doc-10-12-live-contract-v1.json` is superseded for fixture results by
+`docs/reports/parent-atlas/doc-10-multiturn-fix-v1.json` (`DRY_RUN_PROVEN`,
+executed 2026-09-04, raw SHA-256
+`231d19699e0c084819642d398cd8ee1112f81c853d075cdda680375fbf432560`). The
+successor records 2/2 exact facts on the original fixture and 3/3 on a novel
+fixture; DOC-12 API-rule non-empty coverage remains open. DOC-13/14/15 plus
+DOC-26 also remain open. Therefore keep
+`CE-RECON-01` unchecked:
+independently inspect receipt fields/checksums and reconcile any drift before
+calling an `EXISTS` row proven. Do not crawl, embed, populate Qdrant, or mark
+the current owner map as end-to-end evidence from these records alone.
+
 ### Conflicts with the proposal as written (decide before building)
 - **Do not create a parallel pipeline.** The proposed `scripts/docs/{discover-doc-sources,acquire-beautifulsoup,acquire-firecrawl}.py` would duplicate `python/atlas_okf_docs_pipeline.py` + `python/atlas_external_docs.py` + `python/atlas_doc_manifest.py`. `scripts/docs/` currently holds only `build-file-profile-cards.mjs`. Extend the existing modules; a discovery step, if missing, belongs inside them or as one small addition to the pipeline, not as a second acquisition stack.
 - **Do not create `.okf/docs/sources/` and `.okf/docs/schemas/` yet.** The standing hold is "no new `.okf` hierarchy until OKF-OWNERSHIP-01 reconciles the two existing `.okf` shapes". Existing precedent for a source manifest is the DOC-01 manifest and `.okf/docs/dspy/` (a `corpus.json`, `corpus-3.4.0.json`, `postgres-index-contract.md`, timestamped `snapshots/`); put new source entries in that shape.
@@ -1443,17 +2783,167 @@ Operator plan: `catalog -> classify -> acquire -> normalize -> cite -> admit -> 
 - **Firecrawl defaults:** the proposal's point that the service default crawl limit is large (10,000 pages in its docs, not re-verified here) is right; DOC-03 already builds an explicit-limit request, so the rule is to keep that builder as the only entry and reject any call without an explicit catalog limit.
 - **Candidate limits come from the manifest, not the model.** Source `max_pages`/`max_depth` live in DOC-01's manifest; the proposed example values (500 pages, depth 4) are illustrative.
 
-### Preserved gates (dependency order, unchanged from the proposal)
-taxonomy -> language capability proof -> source catalog -> discovery -> BeautifulSoup/Firecrawl normalization -> immutable citation artifact -> canonical writer -> semantic index -> snippet extraction -> Tree-sitter -> optional LSP -> topic/algorithm classification -> graph edges -> MCP ranking -> acquisition gate -> E2E replay. Steps from "source catalog" through "semantic index" are largely satisfied by DOC-01..DOC-08; the genuinely new work starts at the taxonomy/catalog and language-capability steps and resumes at topic/algorithm classification, graph edges, MCP ranking and the acquisition gate.
-- [ ] CE-RECON-01 Confirm each EXISTS row above against the DOC task's own receipt before treating it as proven (this entry is a map, not a proof).
-- [ ] CE-DOMAIN-01 Freeze independent axes (domain, topic, algorithm, language, framework/library, source type, capability/tool); a language never implies a domain, a topic never implies an algorithm, a documentation host is never canonical identity. Reuse `CANONICAL_DOMAINS` and the 13-group ontology; alias lists live apart from canonical IDs. (Merge with DOMAIN-01 / DOMAIN-TAXONOMY-AUDIT-01 in the lane-consolidation ledger.)
-- [ ] CE-DOMAIN-02 Initial CE domain catalog (the 20 top-level domains in the proposal), mapped to existing ontology groups before any new ID is minted.
-- [ ] CE-LANG-01 Read `atlas/language/language-intelligence-plan.ts` first (it is the owner); extend it with the language catalog fields and independent, probe-backed `treeSitterReady` / `lspReady` flags rather than creating a second catalog.
-- [ ] CE-SOURCE-01/05 Compare the proposed source/page fields against DOC-01/DOC-02/DOC-05 and add only the missing ones.
-- [ ] CE-SNIPPET-01/02 Extend the existing code-block extractor with the snippet identity fields; Tree-sitter confirmation is evidence, failure never discards the snippet.
-- [ ] CE-TOPIC-01 / CE-ALGO-01 Topic and algorithm catalogs as separate axes (the proposal's lists are candidates); aliases, complexity metadata and applicable domains recorded without inferring source support.
-- [ ] CE-CLASSIFY-01..03 Multi-axis documentation classification over admitted artifacts: lexical baseline first (existing `classify_domain`), embedding challenger second with exact recipe/model revision, no silent taxonomy mutation, no replacement of source lineage.
-- [ ] CE-INDEX-03 One end-to-end readback proof over the already-admitted corpus (URL -> page artifact -> chunk -> vector projection -> citation); reject orphan Qdrant points.
-- [ ] CE-MCP-01..05 Documentation capabilities in the existing tool-selection policy (no second ranking authority); an explicit, bounded runtime caller for `selectMcpToolSubset` and for `requestAcquisition`, with external acquisition gated fail-closed (internal confidence insufficient AND query permits AND source policy allows) and kept out of retrieval fusion; re-run the variadic fan-out probes after wiring and do not mark complete from imports or text references.
-- [ ] CE-E2E-01/02 Frozen offline replay fixture (example: "Compare BFS, Dijkstra and A* implementations in Rust and Python."), same corpus revision plus same classifier/tool-policy revision must give identical admitted evidence identity; no live acquisition during replay.
-- Held, as before: no new `.okf` hierarchy, no new peer router, no second docs table, no direct Firecrawl or BeautifulSoup writes to canonical stores, SearXNG results are never evidence before admission, no database DDL solely for this plan.
+### Corrected implementation order (catalog -> classify -> acquire -> index -> enrich -> rank)
+
+Do not crawl every source or start bulk indexing. First freeze the vocabularies
+and source policy, then classify the request/source scope that is eligible to be
+acquired. This pre-acquisition routing classification is distinct from
+document classification: content-derived domain/topic/algorithm labels require
+an acquired, normalized, cited, admitted artifact. Existing DOC-01..DOC-08
+owners provide much of the acquisition and indexing machinery, but each reuse
+claim below remains subject to `CE-RECON-01` and its source task's receipts.
+
+#### 1. Catalog and capability proof
+- [ ] CE-RECON-01 Confirm every `EXISTS` owner-map row against the DOC task's
+     receipt and record the exact schema, producer, revision, and consumer; the
+     owner map alone is not proof.
+- [ ] CE-DOMAIN-01 Reconcile the existing `.okf` and runtime taxonomy owners;
+     keep domain, topic, algorithm, programming language, framework/library,
+     source type, and capability/tool as independent axes. A language does not
+     imply a domain, a topic does not imply an algorithm, and a documentation
+     host is never canonical evidence identity. Reuse `CANONICAL_DOMAINS` and
+     the existing ontology; aliases remain separate from canonical IDs.
+- [ ] CE-DOMAIN-02 Define the initial computer-engineering domain IDs and
+     map them to existing ontology groups before minting IDs: algorithms-data-
+     structures, programming-languages, compilers-parsers, operating-systems,
+     computer-architecture, gpu-computing, distributed-systems,
+     databases-storage, networking, security-cryptography, machine-learning,
+     information-retrieval, search-ranking, graph-computing, web-runtime,
+     systems-programming, developer-tooling, software-engineering,
+     formal-methods, numerical-computing. Keep aliases in a separate field.
+- [ ] CE-LANG-01 Extend the existing language-intelligence owner, not a
+     second registry. Reconcile canonical IDs, aliases/extensions, grammar and
+     package revisions, LSP server/revision, formatter/linter metadata, and
+     documentation roots. `treeSitterReady` and `lspReady` require executable
+     probes; declarations or package presence alone do not qualify.
+- [ ] CE-TOPIC-01 / CE-ALGO-01 Extend existing `.okf` registries only after
+     owner reconciliation. Keep topic families (data structures, algorithms,
+     concurrency, memory, parsing/AST/IR, indexing, embeddings, ANN, reranking,
+     clustering, graph ranking, and related catalog entries) distinct from
+     algorithm identities (BFS, DFS, shortest paths, PageRank/HITS, KMeans,
+     sorting/searching, top-k, cosine similarity, RRF, HNSW/CAGRA, union-find,
+     LRU/LFU). Version aliases, definitions, complexity metadata, and applicable
+     domains; catalog membership is not evidence that a source supports it.
+
+#### 2. Request classification and bounded source discovery
+- [ ] CE-REQUEST-CLASSIFY-01 Produce a deterministic, revisioned request
+     routing classification from the frozen catalogs (domain/topic/algorithm,
+     language, source kind, retrieval intent, query shape). Keep these axes
+     separate. This may select eligible catalog sources; it does not classify
+     unseen page content or authorize acquisition by itself.
+- [ ] CE-SOURCE-01 Reconcile and extend DOC-01's source manifest only for
+     missing contract fields: source ID, canonical origin, publisher/kind,
+     allowed hosts/paths, denied paths, discovery order, bounded driver/limits,
+     license/provenance, and topic/domain hints. SearXNG is discovery-only.
+- [ ] CE-SOURCE-02 Reuse the existing bounded discovery runner. Produce an
+     immutable, deterministically sorted discovery manifest; enforce host/path
+     allowlists, URL/page/depth/byte/time limits, canonical URL normalization,
+     and duplicate removal. Prefer `llms.txt`, sitemap, Firecrawl map, then
+     bounded HTML links. No DB/vector/graph writes and no Graphify invocation.
+- [ ] CE-SOURCE-03 / CE-SOURCE-04 Reuse DOC-04 BeautifulSoup and DOC-03
+     Firecrawl adapters; do not add `scripts/docs/` crawler peers. BeautifulSoup
+     normalizes an already selected page and cannot crawl arbitrary hosts.
+     Firecrawl requires explicit catalog limits and path filters; preserve its
+     source URL and HTTP status, and never rank by result order. Both emit local
+     normalized artifacts only, not canonical-store writes.
+
+#### 3. Normalize, cite, admit, and index
+- [ ] CE-SOURCE-05 Reconcile DOC-02/DOC-05 into the page-artifact contract:
+     source ID, canonical URL, content/source revision, acquisition run/driver,
+     fetch time, content SHA-256, MIME type, title, normalized text/markdown,
+     and citation anchors. URL alone is not identity. Retain heading structure,
+     code blocks, language hints, anchors, outbound citations, and fetched time.
+- [ ] CE-INDEX-01 Admit through the existing canonical docs writer only;
+     PostgreSQL owns admitted document/chunk lineage. Every chunk binds source,
+     page artifact, content revision, ordinal, and exact citation span. Preserve
+     `semantic_768` / EmbeddingGemma for canonical dense vectors.
+- [ ] CE-INDEX-02 Treat Qdrant as a rebuildable retrieval projection and
+     graph/Neo4j/cuGraph as derived projections. Require exact source/content/
+     revision lineage before projecting; no projection creates identity.
+- [ ] CE-INDEX-03 Independently read back a bounded sample through URL ->
+     page artifact -> canonical chunk -> vector projection -> citation. Reject
+     orphan points and chunks whose citation cannot be recovered. Do not infer
+     production corpus completeness from the existing pinned-corpus receipt.
+
+#### 4. Post-admission code, AST, and NLP enrichment
+- [ ] CE-SNIPPET-01 Extract source-code snippets from admitted page artifacts
+     with stable snippet ordinal, source/page identity, exact span or anchor,
+     declared and inferred language, confidence, snippet checksum, and heading
+     context. Every snippet resolves to its source citation; preserve snippets
+     on parser failure. Do not confuse snippets with canonical page identity.
+- [ ] CE-SNIPPET-02 / CE-AST-01 Run Tree-sitter only where a live grammar is
+     proven; preserve byte ranges and grammar revision. Parse failure or absent
+     grammar leaves the snippet as textual evidence. AST facts are derived and
+     cannot fabricate symbols, calls, or source spans.
+- [ ] CE-LSP-01 Optional LSP enrichment runs only after source admission.
+     Bind symbols/signatures/hover/references/tokens to snippet/source hash,
+     language, server revision, and configuration digest. LSP is not identity.
+- [ ] CE-CLASSIFY-01 / CE-CLASSIFY-02 Classify only admitted page/snippet
+     artifacts into independent domain, topic, algorithm, language, and
+     framework candidate sets. Start with the deterministic lexical baseline
+     using `.okf` aliases, headings, and code metadata; record matched terms
+     and source offsets.
+- [ ] CE-CLASSIFY-03 Add a model/embedding challenger only against the
+     lexical baseline, bound to exact artifact, model/recipe, and taxonomy
+     revisions. Retain confidence, alternatives, evidence refs, and producer
+     revision. No silent taxonomy mutation or lineage replacement.
+- [ ] CE-NLP-01 Extend the existing grounded extraction owner for concepts,
+     algorithms, APIs, libraries, data structures, complexity claims,
+     requirements, and comparisons. Every assertion carries exact source
+     offsets/citations and extractor revision; outputs remain proposals.
+- [ ] CE-GRAPH-01 Build documentation relations only from admitted, grounded
+     AST/NLP evidence. Require packet/source/revision evidence for every edge;
+     reuse the existing docs graph owner and deterministic PageRank, with no
+     new graph authority or ungrounded taxonomy-to-packet conversion.
+
+#### 5. MCP ranking, gated acquisition, and replay
+- [ ] CE-MCP-01 / CE-MCP-02 Extend the existing tool-selection policy with
+     documentation capabilities and query-to-capability features. Use catalog
+     and evidence features to rank a candidate tool subset; verify registry and
+     tool-schema revisions. Ranking recommends tools, never truth or permission.
+- [ ] CE-MCP-03 Keep `requestAcquisition()` behind a fail-closed gate:
+     internal evidence is insufficient, the query permits external acquisition,
+     and source policy allows the destination. SearXNG discovers; existing
+     bounded adapters acquire; admission precedes durable evidence use. Never
+     inject acquisition into retrieval fusion or write directly from MCP.
+- [ ] CE-MCP-04 Prove the existing `selectMcpToolSubset()` runtime caller
+     and selector/registry parity; the current static `tools/list` call is not
+     runtime proof. Do not create a second selector/ranker.
+- [ ] CE-MCP-05 Prove a bounded `requestAcquisition()` caller and its policy
+     receipt; test deny, missing-policy, internal-evidence-sufficient, and
+     allowed-acquisition paths without live external writes.
+- [ ] CE-E2E-01 Freeze an offline replay (e.g. compare BFS, Dijkstra, and A*
+     implementations in Rust and Python): request classification -> source
+     selection -> admitted pages/chunks -> citations/snippets -> optional
+     AST/NLP -> MCP ranking -> ACE/ContextManifest. No live acquisition.
+- [ ] CE-E2E-02 Prove replay identity and citation recovery: same admitted
+     corpus, taxonomy, classifier, and tool-policy revisions yield identical
+     admitted evidence identities and ordering; `writesPerformed=false`.
+
+**Dependency spine:**
+```text
+CE-DOMAIN-01/02 + CE-LANG-01 + CE-TOPIC-01/CE-ALGO-01
+                         ↓
+       CE-REQUEST-CLASSIFY-01 → CE-SOURCE-01 → CE-SOURCE-02
+                                                  ↓
+                         CE-SOURCE-03/04 → CE-SOURCE-05
+                                                  ↓
+                   CE-INDEX-01 → CE-INDEX-02 → CE-INDEX-03
+                                                  ↓
+             CE-SNIPPET-01 → CE-SNIPPET-02/CE-AST-01 + CE-LSP-01
+                                                  ↓
+              CE-CLASSIFY-01/02 → CE-CLASSIFY-03 + CE-NLP-01
+                                                  ↓
+                                           CE-GRAPH-01
+                                                  ↓
+                               CE-MCP-01/02 → CE-MCP-03/04/05
+                                                  ↓
+                                  CE-E2E-01 → CE-E2E-02
+```
+
+Do not crawl or bulk-index before the catalog, request classification, bounded
+discovery, and source-artifact contract are frozen. Do not create a second
+`.okf` hierarchy, docs table, crawler, classifier, MCP selector, or ranker.
+No Firecrawl/BeautifulSoup/Tree-sitter/LSP/SearXNG/MCP component becomes source,
+identity, admission, or fusion authority. No Graphify refresh, canonical-store
+write, broad external crawl, or live acquisition is authorized by this plan.

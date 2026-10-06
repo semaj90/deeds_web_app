@@ -79,9 +79,13 @@ describe('/api/embed task recipes', () => {
   it('rejects task modes for mock embeddings and non-native dimensions', async () => {
     const mockResponse = await post({ text: 'test', model: 'mock', taskMode: 'retrieval_query' });
     const projectedResponse = await post({ text: 'test', taskMode: 'retrieval_query', dimensions: 384 });
+    const unprompted384Response = await post({ text: 'test', dimensions: 384 });
+    const mrlRequestResponse = await post({ text: 'test', dimensions: 512 });
 
     expect(mockResponse.status).toBe(400);
     expect(projectedResponse.status).toBe(400);
+    expect(unprompted384Response.status).toBe(400);
+    expect(mrlRequestResponse.status).toBe(400);
     expect(mocks.embedText).not.toHaveBeenCalled();
   });
 });

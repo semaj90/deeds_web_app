@@ -73,7 +73,6 @@ try {
     ), packet_candidates AS (
       SELECT DISTINCT g.source_ref, g.source_revision, g.workspace_revision,
              g.content_digest, p.packet_key, p.source_revision AS packet_source_revision,
-             p.workspace_revision_key AS packet_workspace_revision,
              p.content_hash AS packet_content_hash,
              p.lineage_binding_checksum AS packet_lineage_binding_checksum,
              p.lineage_producer_revision AS packet_lineage_producer_revision
@@ -107,7 +106,6 @@ try {
           AND count(DISTINCT source_revision) = 1
           AND bool_or(
             lower(packet_source_revision) = source_revision
-            AND lower(packet_workspace_revision) = workspace_revision
             AND packet_lineage_binding_checksum IS NOT NULL
             AND packet_lineage_producer_revision IS NOT NULL
           )
@@ -121,16 +119,15 @@ try {
           AND count(DISTINCT source_revision) = 1
           AND bool_or(
             lower(packet_source_revision) = source_revision
-            AND lower(packet_workspace_revision) = workspace_revision
             AND packet_lineage_binding_checksum IS NOT NULL
             AND packet_lineage_producer_revision IS NOT NULL
           )
       ) exact_full_canonical)::integer AS packet_full_canonical_identity_matches,
-      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest AND packet_workspace_revision = workspace_revision)::integer AS packet_full_identity_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest)::integer AS packet_full_identity_matches,
       -- PACKET_AUDIT_SEMANTICS: canonical identity is source_revision; content_hash is legacy diagnostic evidence only.
       -- Named metrics (packet_revision_matches and packet_revision_workspace_binding_matches above keep their legacy keys).
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_identity_matches,
-      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_workspace_revision) = workspace_revision AND packet_lineage_binding_checksum IS NOT NULL AND packet_lineage_producer_revision IS NOT NULL)::integer AS packet_workspace_binding_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND packet_lineage_binding_checksum IS NOT NULL AND packet_lineage_producer_revision IS NOT NULL)::integer AS packet_workspace_binding_matches,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(btrim(packet_content_hash)) = content_digest)::integer AS packet_legacy_content_hash_matches,
       (SELECT count(*) FROM (SELECT source_ref FROM packet_candidates WHERE packet_key IS NOT NULL GROUP BY source_ref HAVING count(DISTINCT packet_key) > 1) ambiguous)::integer AS packet_ambiguous_sources,
       (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches,
@@ -292,6 +289,7 @@ try {
     pathCoverage: pathCoverage.rows[0],
     mismatchDiagnostics: mismatchDiagnostics.rows[0],
     currentGraphifyEvidenceOwner: 'graphify_execution_file_membership_v2; explicit execution only',
+    workspaceRevisionAuthority: 'atlas_workspace_source_bindings; packet workspace columns are not used for qualification',
     legacyGraphifyEvidenceExcludedFromCurrentJoin: true,
     mismatchDiagnosticScope: 'explicit admitted workspace revision and execution only; historical rows are not used for current-gate promotion',
     mismatchDiagnosticNote: mismatchDiagnostics.rows[0]?.status === 'NOT_RUN_STATEMENT_TIMEOUT'

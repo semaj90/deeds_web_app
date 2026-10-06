@@ -33,7 +33,7 @@ export interface GenerationRequest {
 	useBifrostCache?: boolean;
 	/** Allow client-side Gemma4 helper lanes when explicitly opted in */
 	allowClientGemma?: boolean;
-	/** Bifrost similarity threshold (default: 0.8) */
+	/** Bifrost similarity threshold (minimum/default: 0.82) */
 	bifrostThreshold?: number;
 }
 
@@ -64,7 +64,7 @@ interface BifrostCacheResult {
  */
 async function checkBifrostCache(
 	prompt: string,
-	threshold: number = 0.8
+	threshold: number = 0.82
 ): Promise<BifrostCacheResult> {
 	const start = performance.now();
 	const controller = new AbortController();
@@ -305,7 +305,7 @@ export async function generateText(request: GenerationRequest): Promise<Generati
 	if (request.useBifrostCache !== false && !request.forceLocal) {
 		const cacheResult = await checkBifrostCache(
 			request.prompt,
-			request.bifrostThreshold ?? 0.8
+			request.bifrostThreshold ?? 0.82
 		);
 
 		if (cacheResult.hit && cacheResult.response) {

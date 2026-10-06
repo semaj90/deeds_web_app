@@ -124,6 +124,7 @@ import { registerNativeAccelerationTools } from './native-acceleration-tools.js'
 import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
 import {
   atlasCoverageInputSchema,
+  atlasPacketDenseSearchAdvertisedSchema,
   atlasPacketDenseSearchInputSchema,
   atlasPacketSearchInputSchema,
   featureDocumentReadInputSchema,
@@ -173,6 +174,7 @@ import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '..
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
 import { runPacketDenseSearch } from '../lib/server/retrieval/packet-dense-search.js';
+import { searchDocCorpusDense } from '../lib/server/atlas/docs/doc-intelligence-read-model.js';
 import type { QdrantPointsQueryFn } from '../lib/server/retrieval/packet-dense-rerank.js';
 import { embedQueryForLane } from '../lib/server/retrieval/embedding-service.js';
 import { EMBEDDINGGEMMA_PROMPT_REVISION_V1 } from '../lib/server/atlas/embedding/embeddinggemma-task-representation-v1.js';
@@ -9532,28 +9534,61 @@ server.registerTool(
 // parent-atlas-rrf-weight-table-lane-registry-consolidation RRF weight-table registry. No
 // fusion code here — this is a standalone two-stage tool, not routed through
 // phase1-rrf-semantic-fusion (incomplete/untested) or the governance-gated phase18 reranker.
+// DOCS scope delegates to the canonical Postgres document read-model owner; it does not use Qdrant.
 server.registerTool(
   'atlas.packet_dense_search',
   {
     description:
-      'Bitmap-prefiltered structural narrowing over atlas_packets (using existing GIN/btree indexes, ' +
+      'CODE scope: bitmap-prefiltered structural narrowing over atlas_packets (using existing GIN/btree indexes, ' +
       'PG18 AIO-accelerated) followed by a Qdrant dense-ANN rerank restricted to the prefiltered ' +
       'candidate set, joined back to atlas_packets by packet_key. Requires at least one of feature_id, ' +
       'source_ref, concept_id, or tags (domain_class/workspace_revision alone are rejected — not ' +
       'selective enough). Requires an explicit target Qdrant collection — codebase_chunks_768 (older, ' +
       'richer payload) or codebase_chunks_768_v2 (leaner, EMB3A target); this tool does not default to ' +
-      'either. Provide either query_text (embedded via embeddinggemma) or query_vector directly. ' +
-      'Returns results in the compact packet-control-word projection with full payload attached only ' +
-      'to the top expand_top_k results.',
-    inputSchema: atlasPacketDenseSearchInputSchema.describe(
-      'Bounded dense packet search: selective packet filter plus exactly one finite semantic_768 query input.'
+      'either. DOCS scope instead requires a 768-D query_vector and delegates to searchDocCorpusDense ' +
+      'over canonical PostgreSQL document chunks; representation parity is reported as unproven.',
+    inputSchema: atlasPacketDenseSearchAdvertisedSchema.describe(
+      'Bounded dense search: CODE requires a selective packet filter and one semantic_768 query input; DOCS requires a 768-D query_vector and uses canonical document chunks.'
     ),
   },
-  async ({
-    feature_id, source_ref, concept_id, tags, domain_class, workspace_revision,
-    collection, query_text, query_vector, candidate_cap, dense_limit, score_threshold, expand_top_k,
-  }) => {
+  async (rawInput) => {
+    // Advertised schema is a flat object (MCP requires type: object); strict validation happens here against the union.
+    const parsedInput = atlasPacketDenseSearchInputSchema.safeParse(rawInput);
+    if (!parsedInput.success) {
+      return {
+        isError: true,
+        content: [{
+          type: 'text' as const,
+          text: JSON.stringify({
+            error: 'INVALID_INPUT',
+            issues: parsedInput.error.issues.slice(0, 10).map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
+          }),
+        }],
+      };
+    }
+    const input = parsedInput.data;
     try {
+      if (input.scope === 'DOCS') {
+        const response = await searchDocCorpusDense({
+          pool,
+          queryVector: input.query_vector,
+          product: input.product,
+          productVersion: input.product_version,
+          limit: input.limit,
+          queryRecipeRevision: input.query_recipe_revision,
+        });
+        return {
+          content: [{
+            type: 'text' as const,
+            text: serializeBoundedReadResult({ scope: 'DOCS', owner: 'searchDocCorpusDense', ...response }),
+          }],
+        };
+      }
+
+      const {
+        feature_id, source_ref, concept_id, tags, domain_class, workspace_revision,
+        collection, query_text, query_vector, candidate_cap, dense_limit, score_threshold, expand_top_k,
+      } = input;
       if (!query_vector?.length && !query_text) {
         throw new Error('Provide either query_text or query_vector.');
       }

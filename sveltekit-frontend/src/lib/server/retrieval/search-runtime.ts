@@ -16,7 +16,6 @@ import type { FeatureEnvelope } from './feature-envelope.js';
 import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
-import type { DenseEmbedding } from '../vector/vector-contracts.js';
 import { ENV } from '../env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 import type { HydrationProofContext, HydrationProofSummary, HydratedCandidatesWithProof } from './hydrate-candidates.js';
@@ -368,9 +367,10 @@ export interface SearchResult {
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
     /**
      * True when this SearchRuntime instance was constructed with
-     * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
-     * performed zero writes to the promotion outbox or recommendation
-     * ledger. Absent/false means the normal production write path ran.
+   * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
+   * performed no promotion-outbox, recommendation-ledger, policy-training,
+   * rerank-cache, or XGBoost shadow-receipt writes. Absent/false means the
+   * normal production write path ran.
      * Added for ACE-FEATURE-SOURCE-OWNER-01 / the SearchRuntime zero-write
      * boundary gate: a proof/canary script can assert on this field instead
      * of having to infer "no writes happened" from timing or DB state.
@@ -416,11 +416,13 @@ export interface SearchRuntimeConfig {
    */
   dislikedPacketKeys?: ReadonlySet<string>;
   /**
-   * When true, `search()` skips all known write side effects entirely -- not
+   * When true, `search()` skips known write side effects entirely -- not
    * just their errors: promotion-outbox enqueue, recommendation-ledger
-   * exposure logging, and policy-training JSONL export. Every other stage
-   * (retrieve/fuse/score/hydrate/rerank/postProcess/hypergraph lookup) is
-   * read-only and is unaffected.
+   * exposure logging, policy-training JSONL export, rerank-cache reads / writes
+   * (which may delete invalid entries), and XGBoost shadow-receipt writes.
+   * Retrieval, fusion, hydration, and baseline/shadow ranking remain enabled;
+   * shadow receipts are suppressed. Active learned reranking remains governed
+   * by the configured reranker mode.
    *
    * Added for the SearchRuntime zero-write read-only execution boundary gate
    * (ACE-FEATURE-SOURCE-OWNER-01 finding, parent-atlas-retrieval-lineage-dag-convergence
@@ -1011,6 +1013,8 @@ export class SearchRuntime {
           : (executionBudget.maxDeepRerankCandidates || executionBudget.maxFastRerankCandidates),
       ),
       rerankTier: query.rerankTier ?? (policyDecision.action === 'FAST_RERANK' ? 'fast' : 'deep'),
+      cachePolicy: this.readOnly ? 'disabled' : 'enabled',
+      shadowReceiptPolicy: this.readOnly ? 'disabled' : 'enabled',
       policyDecision,
       policyState,
       executionBudget,
@@ -1514,44 +1518,6 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
  */
 export function createSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
   return new SearchRuntime(config ?? {});
-}
-
-/**
- * Embed function adapter: wraps the project-canonical embedText path into the
- * DenseEmbedding contract expected by QdrantDenseRetrieverConfig.embedFn.
- *
- * Lazily imports embedText to avoid circular deps at module load time.
- */
-async function makeEmbedFn(text: string): Promise<DenseEmbedding> {
-  const { embedText } = await import('$lib/server/embedding/embed.js');
-  const values: number[] = await embedText(text.slice(0, 2000));
-  return {
-    values,
-    model: 'embeddinggemma:latest',
-    dimension: values.length,
-    version: '1',
-  };
-}
-
-function projectEmbedding(values: number[], dimension: number): number[] {
-  if (values.length <= dimension) return values;
-  const projected = values.slice(0, dimension);
-  let norm = 0;
-  for (let i = 0; i < projected.length; i++) {
-    norm += projected[i] * projected[i];
-  }
-  norm = Math.sqrt(norm);
-  return norm > 0 ? projected.map((value) => value / norm) : projected;
-}
-
-async function makeProjected384EmbedFn(text: string): Promise<DenseEmbedding> {
-  const embedding = await makeEmbedFn(text);
-  const values = projectEmbedding(embedding.values, 384);
-  return {
-    ...embedding,
-    values,
-    dimension: 384,
-  };
 }
 
 /**

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-cohort-lineage.v1",
-  "generatedAt": "2026-09-24T22:43:51.194Z",
+  "generatedAt": "2026-10-05T17:30:21.789Z",
   "mode": "READ_ONLY_LINEAGE_AUDIT",
   "inputs": {
     "cohortChecksum": "fd88703ca428261206575d95204c31795f956645dd46dc4607a2b3048d464151",
@@ -25,7 +25,7 @@
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
     "safeToPromote": false,
     "requiresSnapshotRefresh": true,
-    "deltaChecksum": "sha256:bc363ef0c1e4e8288ed4ec7b19be505846d3e880f105f60bc8dc6fedf9b25791"
+    "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
   },
   "counts": {
     "cohortRows": 52,
@@ -627,5 +627,5 @@
   "qdrantWrites": false,
   "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
   "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
-  "reportChecksum": "cee5631702ddc10e198d905577463e67d1ac97af1e2eca074248a0107df27ac8"
+  "reportChecksum": "e2447c3e3196a8ec6494fd900c13ce51d7aa62dca4afce44a188a59515cce4cf"
 }

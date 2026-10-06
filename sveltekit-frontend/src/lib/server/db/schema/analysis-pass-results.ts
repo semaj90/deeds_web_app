@@ -215,7 +215,7 @@ export function classifyAnalysisPassAdmissionV1(
 	const producerRevision = input.producerRevision?.trim() || null;
 	const inputChecksum = input.inputHash?.trim() || null;
 	const outputChecksum = input.outputHash?.trim() || null;
-	const executionStatus = input.status === 'succeeded' ? 'SUCCEEDED'
+	const executionStatus: AnalysisPassAdmissionEnvelopeV1['executionStatus'] = input.status === 'succeeded' ? 'SUCCEEDED'
 		: input.status === 'failed' ? 'FAILED' : 'SKIPPED';
 	const passExecutionId = input.analysisJobId.trim();
 	const packetResolution = options.packetIdentityResolution;

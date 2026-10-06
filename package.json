@@ -54,6 +54,7 @@
     "atlas:evidence:identity-contracts": "node scripts/atlas/record-graph-identity-contracts-receipt-v1.mjs",
     "atlas:tournament:owner-audit": "node scripts/atlas/audit-patch-tournament-owner-v1.mjs",
     "atlas:tournament:seam-preflight": "node scripts/atlas/plan-patch-tournament-worktree-seam-v1.mjs",
+    "opencode:align:check": "node scripts/opencode/verify-opencode-alignment.mjs",
     "atlas:agentic:receipt-owner-audit": "node scripts/atlas/audit-agentic-receipt-owner-v1.mjs",
     "atlas:agentic:receipt-schema-audit": "node scripts/atlas/audit-agentic-receipt-live-schema-v1.mjs",
     "atlas:temporal:schema:audit": "node scripts/atlas/audit-temporal-schema-surfaces-v1.mjs",

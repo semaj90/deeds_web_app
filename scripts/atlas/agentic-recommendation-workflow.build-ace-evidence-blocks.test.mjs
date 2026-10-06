@@ -21,6 +21,7 @@ const sampleCards = [{ title: 'unrelated cached card', sourceRef: 'src/some/unre
   const { acePacket, aceCards } = buildAceEvidenceBlocks(rejected);
   assert.equal(acePacket, '', 'acePacket must be empty for a REJECTED context');
   assert.equal(aceCards, '', 'aceCards must be empty for a REJECTED context even though cards[] is populated');
+  assert.deepEqual(buildAceEvidenceBlocks(rejected).admittedCards, [], 'rejected cards must not reach downstream evidence consumers');
 }
 
 // Admitted context -> both blocks are included.
@@ -30,17 +31,19 @@ const sampleCards = [{ title: 'unrelated cached card', sourceRef: 'src/some/unre
     promptPacket: 'real synthesized packet text',
     cards: sampleCards,
   };
-  const { acePacket, aceCards } = buildAceEvidenceBlocks(admitted);
+  const { acePacket, aceCards, admittedCards } = buildAceEvidenceBlocks(admitted);
   assert.ok(acePacket.includes('real synthesized packet text'));
   assert.ok(aceCards.includes('unrelated cached card'));
   assert.ok(aceCards.includes('src/some/unrelated/file.ts'));
+  assert.deepEqual(admittedCards, sampleCards);
 }
 
 // Missing/null aceContext (no ACE packet available at all) -> both blocks empty, no throw.
 {
-  const { acePacket, aceCards } = buildAceEvidenceBlocks(null);
+  const { acePacket, aceCards, admittedCards } = buildAceEvidenceBlocks(null);
   assert.equal(acePacket, '');
   assert.equal(aceCards, '');
+  assert.deepEqual(admittedCards, []);
 }
 
 // Legacy shape without `status` at all (e.g. an old cached response predating this fix) must be

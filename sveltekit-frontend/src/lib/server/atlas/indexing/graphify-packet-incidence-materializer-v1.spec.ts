@@ -45,12 +45,12 @@ describe('Graphify packet-incidence candidate materializer', () => {
 	it('joins, resolves, and seals one revision-qualified candidate without persistence', async () => {
 		queryMock
 			.mockResolvedValueOnce({ rows: [
-				{ stable_symbol_key: edge.subjectStableSymbolKey, workspace_revision: edge.workspaceRevision, code_source_revision: edge.sourceRevision, packet_key: 'packet:subject', source_ref: edge.sourceRef, source_revision: edge.sourceRevision },
-				{ stable_symbol_key: edge.objectStableSymbolKey, workspace_revision: edge.workspaceRevision, code_source_revision: 'source-b-r1', packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+				{ stable_symbol_key: edge.subjectStableSymbolKey, workspace_revision: edge.workspaceRevision, code_source_revision: edge.sourceRevision, packet_key: 'packet:subject', source_ref: edge.sourceRef, source_revision: edge.sourceRevision, workspace_revision_key: edge.workspaceRevision },
+				{ stable_symbol_key: edge.objectStableSymbolKey, workspace_revision: edge.workspaceRevision, code_source_revision: 'source-b-r1', packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: edge.workspaceRevision },
 			] })
 			.mockResolvedValueOnce({ rows: [
-				{ packet_key: 'packet:subject', source_ref: 'src/a.ts', source_revision: edge.sourceRevision },
-				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+				{ packet_key: 'packet:subject', source_ref: 'src/a.ts', source_revision: edge.sourceRevision, workspace_revision_key: edge.workspaceRevision },
+				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: edge.workspaceRevision },
 			] });
 
 		const { materializeGraphifyPacketIncidenceCandidateV1 } = await import('./graphify-packet-incidence-materializer-v1.js');

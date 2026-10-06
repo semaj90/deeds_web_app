@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { StructuralExtractionFabricResultV1 } from '@deeds/parent-atlas';
+import {
+  resolveReferenceTargetV1,
+  type ImportBindingV1,
+} from './graphify-import-target-resolver-v1.js';
 
 const nonEmpty = z.string().min(1);
 const uuid = z.string().uuid();
@@ -175,8 +179,15 @@ export type GraphifySymbolProjectionMapInputV1 = {
   fabric: StructuralExtractionFabricResultV1;
   nativeCoordinatesByUpstreamNodeId: Readonly<Record<string, GraphifyNativeSymbolCoordinateV1>>;
   referenceEvidenceByReferenceId: Readonly<Record<string, GraphifyReferenceEvidenceV1>>;
+  importResolutionContextBySourceRef?: ReadonlyMap<string, GraphifyImportResolutionContextV1>;
   parentStableSymbolKeyByNominationId?: Readonly<Record<string, string | null>>;
   mapperRevision?: string;
+};
+
+export type GraphifyImportResolutionContextV1 = {
+  bindingsByLocalName: ReadonlyMap<string, ImportBindingV1>;
+  knownSourceRefs: ReadonlySet<string>;
+  exportsBySourceRef: ReadonlyMap<string, ReadonlyMap<string, readonly string[]>>;
 };
 
 function normalizeSourceRef(value: string): string {
@@ -288,9 +299,19 @@ function toEdgeCandidate(
   byUpstreamNodeId: ReadonlyMap<string, string>,
 ): GraphifyEdgeProjectionCandidateV1 {
   const evidence = referenceEvidenceFor(fact, input.referenceEvidenceByReferenceId);
-  const objectStableSymbolKey = fact.upstream_target_node_id
+  const nativeTargetStableSymbolKey = fact.upstream_target_node_id
     ? byUpstreamNodeId.get(fact.upstream_target_node_id) ?? null
     : null;
+  const importContext = input.importResolutionContextBySourceRef?.get(normalizeSourceRef(input.sourceRef));
+  const importTarget = !nativeTargetStableSymbolKey && importContext
+    ? resolveReferenceTargetV1({
+      targetText: fact.target_text,
+      fromSourceRef: normalizeSourceRef(input.sourceRef),
+      ...importContext,
+    })
+    : null;
+  const objectStableSymbolKey = nativeTargetStableSymbolKey
+    ?? (importTarget?.status === 'RESOLVED_SYMBOL' ? importTarget.targetSymbolKey : null);
 
   return graphifyEdgeProjectionCandidateV1Schema.parse({
     schema: 'atlas.graphify-edge-projection-candidate.v1',

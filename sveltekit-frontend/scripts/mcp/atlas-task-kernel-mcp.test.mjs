@@ -35,10 +35,12 @@ test('every declared property is forwarded to the internal tool unless explicitl
   }
 });
 
-test('descriptions do not claim retrieval or a research circuit the tools do not perform', () => {
+test('context description promises fail-closed live retrieval without static fallback', () => {
   const byName = Object.fromEntries(TOOLS.map((t) => [t.name, t.description]));
-  assert.match(byName.atlas_context, /unadmitted/i);
-  assert.match(byName.atlas_context, /querySpecific:false/);
+  assert.match(byName.atlas_context, /live search/i);
+  assert.match(byName.atlas_context, /returns no evidence/i);
+  assert.match(byName.atlas_context, /never substitutes a static packet/i);
+  assert.doesNotMatch(byName.atlas_context, /falls back/i);
   assert.match(byName.atlas_research, /maxRounds is not applied/i);
   assert.doesNotMatch(byName.atlas_research, /bounded, read-only research circuit/i);
 });

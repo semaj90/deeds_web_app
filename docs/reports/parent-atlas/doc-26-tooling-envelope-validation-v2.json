@@ -1,0 +1,69 @@
+{
+  "schema": "atlas.semantic-doc-02-tooling-doc-envelope-gate.v1",
+  "generatedAt": "2026-10-05T19:11:50.802Z",
+  "result": "SEMANTIC_DOC_02_PASS",
+  "pages": 57,
+  "chunks": 717,
+  "canonicalAuthority": false,
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  },
+  "embeddingPerformed": false,
+  "authorizationPhraseUsed": false,
+  "next": "operator review -> explicit authorization -> tiny canonical admission canary -> readback -> semantic_768 population (separate gates)",
+  "checks": [
+    {
+      "name": "sources are exactly the four tooling-doc namespaces",
+      "pass": true,
+      "detail": "oaklib,ast-grep,ts-morph,trpc"
+    },
+    {
+      "name": "no duplicate canonical source identity",
+      "pass": true,
+      "detail": "57 pages, 57 unique"
+    },
+    {
+      "name": "every page has exactly one coordinate (unique page evidenceRevision + content hash present)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "every coordinate resolves to exactly one acquired document",
+      "pass": true,
+      "detail": "unresolved=0 ambiguous=0"
+    },
+    {
+      "name": "every chunk resolves to the committed artifact and its parent document",
+      "pass": true,
+      "detail": "chunks=717 missing=0 textMismatch=0 parentMismatch=0"
+    },
+    {
+      "name": "checksums and evidence revisions match the committed artifacts",
+      "pass": true,
+      "detail": "checksumMismatch=0 revisionMismatch=0"
+    },
+    {
+      "name": "no envelope chunk was produced by a non-canonical artifact (canonical_authority=false on every source chunk)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "superseded Firecrawl tRPC corpus is excluded",
+      "pass": true,
+      "detail": "supersededMarker=true leakedChunkIds=0"
+    },
+    {
+      "name": "foreign concurrent artifacts are excluded",
+      "pass": true,
+      "detail": "trpc-beautifulsoup-r2"
+    },
+    {
+      "name": "existing admission validator accepts the envelopes",
+      "pass": true,
+      "detail": "EXTERNAL_DOC_ADMISSION_HANDOFF_READY"
+    }
+  ]
+}

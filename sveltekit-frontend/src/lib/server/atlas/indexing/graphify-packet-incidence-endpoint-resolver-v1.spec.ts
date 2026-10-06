@@ -39,12 +39,13 @@ const snapshot = buildGraphRevisionSnapshotV1({
 	sourceRevisionCoverage: { qualified: 2, total: 2 },
 });
 
-function joinRows(overrides: Record<string, unknown> = {}) {
+function joinRows(overrides: Record<string, unknown> = {}, neighborOverrides: Record<string, unknown> = {}) {
 	return [
 		{
 			stable_symbol_key: edge.subjectStableSymbolKey,
 			workspace_revision: edge.workspaceRevision,
 			code_source_revision: edge.sourceRevision,
+			workspace_revision_key: edge.workspaceRevision,
 			packet_key: 'packet:subject',
 			source_ref: edge.sourceRef,
 			source_revision: edge.sourceRevision,
@@ -57,6 +58,8 @@ function joinRows(overrides: Record<string, unknown> = {}) {
 			packet_key: 'packet:neighbor',
 			source_ref: 'src/b.ts',
 			source_revision: 'source-b-r1',
+			workspace_revision_key: edge.workspaceRevision,
+			...neighborOverrides,
 		},
 	];
 }
@@ -68,8 +71,8 @@ describe('Graphify packet-incidence endpoint resolver', () => {
 		queryMock
 			.mockResolvedValueOnce({ rows: joinRows() })
 			.mockResolvedValueOnce({ rows: [
-				{ packet_key: 'packet:subject', source_ref: 'src/a.ts', source_revision: 'source-a-r1' },
-				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+				{ packet_key: 'packet:subject', source_ref: 'src/a.ts', source_revision: 'source-a-r1', workspace_revision_key: edge.workspaceRevision },
+				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: edge.workspaceRevision },
 			] });
 
 		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
@@ -90,6 +93,8 @@ describe('Graphify packet-incidence endpoint resolver', () => {
 			graphRevision: snapshot.graphRevision,
 		});
 		expect(queryMock).toHaveBeenCalledTimes(2);
+		expect(queryMock.mock.calls[0]?.[0]).toContain('packet.workspace_revision_key');
+		expect(queryMock.mock.calls[1]?.[0]).toContain('workspace_revision_key');
 	});
 
 	it('rejects missing, ambiguous, and revision-mismatched Graphify joins', async () => {
@@ -104,12 +109,31 @@ describe('Graphify packet-incidence endpoint resolver', () => {
 		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_SUBJECT_REVISION_BINDING_MISMATCH');
 	});
 
+	it('rejects packet rows bound to another workspace revision', async () => {
+		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
+		queryMock.mockResolvedValueOnce({ rows: joinRows({}, { workspace_revision_key: 'sha256:stale' }) });
+		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot))
+			.rejects.toThrow('GRAPHIFY_PACKET_NEIGHBOR_WORKSPACE_REVISION_BINDING_MISMATCH');
+	});
+
+	it('rejects workspace-revision drift on independent packet identity readback', async () => {
+		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
+		queryMock
+			.mockResolvedValueOnce({ rows: joinRows() })
+			.mockResolvedValueOnce({ rows: [
+				{ packet_key: 'packet:subject', source_ref: 'src/a.ts', source_revision: 'source-a-r1', workspace_revision_key: edge.workspaceRevision },
+				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: 'sha256:stale' },
+			] });
+		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot))
+			.rejects.toThrow('GRAPHIFY_PACKET_IDENTITY_READBACK_WORKSPACE_REVISION_MISMATCH');
+	});
+
 	it('rejects an endpoint whose canonical packet identity cannot be resolved', async () => {
 		queryMock
 			.mockResolvedValueOnce({ rows: joinRows({ packet_key: 'packet:unknown' }) })
 			.mockResolvedValueOnce({ rows: [
-				{ packet_key: 'packet:unknown', source_ref: 'src/a.ts', source_revision: 'source-a-r1' },
-				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+				{ packet_key: 'packet:unknown', source_ref: 'src/a.ts', source_revision: 'source-a-r1', workspace_revision_key: edge.workspaceRevision },
+				{ packet_key: 'packet:neighbor', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: edge.workspaceRevision },
 			] });
 		const { resolveGraphifyPacketIncidenceEndpointsV1 } = await import('./graphify-packet-incidence-endpoint-resolver-v1.js');
 		await expect(resolveGraphifyPacketIncidenceEndpointsV1(edge, snapshot)).rejects.toThrow('GRAPHIFY_PACKET_ENDPOINT_REVISION_UNPROVEN:packet:unknown');

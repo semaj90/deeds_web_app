@@ -8,7 +8,7 @@
  * row text under raw, `title: none | text:` and `title: {relative_path} | text:`. Cosine >= THRESHOLD names the recipe, else UNKNOWN
  * (preserved, never guessed). Also breaks results down by source root and content length.
  *
- * Usage: node scripts/atlas/audit-embedding-recipe-census-v1.mjs [--per-stratum=100]
+ * Usage: node scripts/atlas/audit-embedding-recipe-census-v1.mjs [--per-stratum=100] [--out=path]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,6 +20,7 @@ const require = createRequire(path.join(repoRoot, 'sveltekit-frontend', 'package
 const { Client } = require('pg');
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? '').split('=')[1] ?? d;
 const PER = Number(arg('per-stratum', 100));
+const OUTPUT_PATH = path.resolve(repoRoot, arg('out', 'docs/reports/embedding-recipe-census-v1.json'));
 const THRESHOLD = 0.995;
 const OLLAMA = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 
@@ -110,5 +111,6 @@ for (const [stratum, cond] of Object.entries(STRATA)) {
 await db.end();
 receipt.databaseWrites = false;
 receipt.outcome = 'RECIPE_CENSUS_PROVEN_UNKNOWN_ROWS_PRESERVED';
-fs.writeFileSync(path.join(repoRoot, 'docs/reports/embedding-recipe-census-v1.json'), JSON.stringify(receipt, null, 2) + '\n', 'utf8');
-console.log('receipt written: docs/reports/embedding-recipe-census-v1.json');
+fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
+fs.writeFileSync(OUTPUT_PATH, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
+console.log(`receipt written: ${OUTPUT_PATH}`);

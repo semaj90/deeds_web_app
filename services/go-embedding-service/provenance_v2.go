@@ -38,9 +38,10 @@ type ollamaVersionV2 struct {
 
 type ollamaPsV2 struct {
 	Models []struct {
-		Name   string `json:"name"`
-		Model  string `json:"model"`
-		Digest string `json:"digest"`
+		Name     string `json:"name"`
+		Model    string `json:"model"`
+		Digest   string `json:"digest"`
+		SizeVRAM int64  `json:"size_vram"`
 	} `json:"models"`
 }
 

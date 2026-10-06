@@ -1,8 +1,8 @@
 # Master Agentic Orchestration Specification
 ## Codebase Semantic Intelligence + Multi-Turn Error Fixing + Tool Calling
 
-**Date**: July 23, 2026  
-**Scope**: Daily graphify indexing → directory topology → semantic clustering → LLM synthesis with tool-aware agentic error fixing  
+**Date**: July 23, 2026
+**Scope**: Daily graphify indexing → directory topology → semantic clustering → LLM synthesis with tool-aware agentic error fixing
 **Authority**: Unified architecture spec (ACP + A2A + AHP + MCP + LangGraph)
 
 ---
@@ -121,32 +121,32 @@ Time:    ~5-10 minutes (Cypher traversal + writes)
    ├─ ripgrep enumerate current files
    ├─ SHA-256 hash all files
    └─ Classify as: new, changed, unchanged, deleted
-   
+
 2. STAGE 2 DELTA (changed files only)
    ├─ Extract structural facts for changed files
    ├─ Append to stage2/structural_facts.ndjson (append-only log)
    └─ Recompute embedding for changed symbols
-   
+
 3. STAGE 3 EMBEDDINGS
    ├─ Call embeddinggemma for new symbols
    ├─ Update Qdrant collection
    └─ Write to codebase_chunk_index (Postgres)
-   
+
 4. STAGE 4 TOPOLOGY (changed files + dependencies)
    ├─ Re-extract USES/IMPORTS for changed files
    ├─ Identify impacted symbols (reverse dependency closure)
    └─ Update topology edges in Neo4j
-   
+
 5. STAGE 5 PAGERANK (recompute from scratch)
    ├─ Load all edges from Neo4j
    ├─ Run PageRank power iteration
    └─ Write scores to atlas_packets.pagerank_authority
-   
+
 6. STAGE 6-8 CLUSTERING (if schedule allows)
    ├─ K-means on updated embedding set
    ├─ SOM training (optional, expensive)
    └─ Update Neo4j SIMILAR_TOPOLOGY edges
-   
+
 7. REPORTING & ALERTING
    ├─ Write execution log to docs/graphify-execution-log.md
    ├─ Emit metrics to Redis (hit rates, timing, errors)
@@ -191,11 +191,11 @@ export class ContextWindowCalculator {
     // Reserve tokens: query + system + response + buffer
     const reserved = queryTokens + systemPromptTokens + 2000;  // 2K buffer
     const available = contextWindowSize - reserved;
-    
+
     // For RAG: typically 10 chunks × 200 tokens/chunk = 2000 tokens
     const recommendedTopK = Math.floor(available / 200);
     const recommendedMaxSummary = Math.min(512, available / 2);
-    
+
     return { availableForContext: available, recommendedTopK, recommendedMaxSummary };
   }
 }
@@ -212,7 +212,7 @@ export class VectorCentroidCache {
     // 3. Write back to Redis + Valkey (with expiry)
     // 4. Return Float32Array
   }
-  
+
   // Multi-vector semantic summarization
   async computeClusterSummary(
     vectorIds: string[],
@@ -228,12 +228,12 @@ export class VectorCentroidCache {
   }
 }
 
-// Helper: TokenRemappingStrategy (Gemma4 dimension adaptation)
+// Helper: TokenRemappingStrategy (Ornith 1.5 dimension adaptation)
 export class TokenRemappingStrategy {
   // Problem: user may request longer output than context allows
   // Solution: remap token budget dynamically
-  
-  async adaptContextForGemma4(
+
+  async adaptContextForOnrith(
     originalTokenCount: number,
     requestedCompletionTokens: number,
     contextWindowSize: number = 65536
@@ -244,7 +244,7 @@ export class TokenRemappingStrategy {
     strategy: 'truncate' | 'summarize' | 'full';
   }> {
     const totalNeeded = originalTokenCount + requestedCompletionTokens;
-    
+
     if (totalNeeded <= contextWindowSize) {
       return {
         remappedInputTokens: originalTokenCount,
@@ -253,11 +253,11 @@ export class TokenRemappingStrategy {
         strategy: 'full'
       };
     }
-    
+
     // Aggressive truncation strategy
     const maxInput = Math.floor(contextWindowSize * 0.75);  // 75% for input
     const maxCompletion = contextWindowSize - maxInput;     // 25% for output
-    
+
     return {
       remappedInputTokens: Math.min(originalTokenCount, maxInput),
       remappedCompletionTokens: Math.min(requestedCompletionTokens, maxCompletion),
@@ -287,10 +287,10 @@ export class SQLAlchemyToJsonRedis {
       timestamp: packet.updated_at.toISOString(),
       model_version: packet.model_version
     };
-    
+
     await redisClient.set(key, JSON.stringify(value), 'EX', ttl);
   }
-  
+
   // Semantic multi-vector summarization in Redis
   async storeClusterCentroid(
     clusterId: string,
@@ -301,7 +301,7 @@ export class SQLAlchemyToJsonRedis {
     const key = `centroid:cluster:${clusterId}:768`;
     // Store as msgpack or base64-encoded float32
     const encoded = Buffer.from(centroidVector.buffer).toString('base64');
-    
+
     await redisClient.hset(`cluster_meta:${clusterId}`, {
       'centroid_encoded': encoded,
       'centroid_dim': '768',
@@ -314,7 +314,7 @@ export class SQLAlchemyToJsonRedis {
 // Helper: EditPatchInline (inline code editing + tool calls)
 export class EditPatchInline {
   // Enable multi-turn agentic error fixing
-  
+
   async applyInlinePatch(
     filePath: string,
     lineStart: number,
@@ -333,7 +333,7 @@ export class EditPatchInline {
     // 2. Require test pass before committing
     // 3. Record every edit in witness tree
     // 4. Allow human rollback within 5-minute window
-    
+
     // Implementation:
     // - Read file from Postgres + filesystem
     // - Apply line-based patch
@@ -341,7 +341,7 @@ export class EditPatchInline {
     // - If tests pass: commit with witness tree
     // - If tests fail: suggest rollback + alternatives
   }
-  
+
   // Tool-aware context (for Gemma4 tool calling)
   async getToolAwareContext(
     filePath: string,
@@ -374,33 +374,33 @@ export class EditPatchInline {
    ├─ Run tests (npm run test)
    ├─ Parse error output (stacktrace, type, location)
    └─ Create issue record: errors.issue_claimed
-   
+
 2. CLASSIFY ERROR
    ├─ Error type: type, runtime, logic, perf, security
    ├─ Scope: single file, multi-file, external dependency
    ├─ Severity: critical, high, medium, low
    └─ Category: bug, tech-debt, enhancement, refactor
-   
+
 3. CONTEXT GATHERING (Doc Fetch + API Docs)
    ├─ Load affected file(s) from Postgres + filesystem
    ├─ Fetch related API docs from docs/ directory
    ├─ Query Neo4j for dependent symbols
    ├─ Retrieve embedding context (top-5 similar symbols)
    └─ Budget tokens (see TokenRemappingStrategy above)
-   
+
 4. AGENTIC PROPOSAL
    ├─ Call Gemma4 with error + context + available tools
    ├─ Gemma4 generates fix proposal (with tool calls)
    ├─ Register proposal: errors.issue_proposal
    └─ Constraint: max 5 tool calls per turn (prevent loops)
-   
+
 5. VALIDATION (Test-Driven)
    ├─ Apply patch (EditPatchInline.applyInlinePatch)
    ├─ Run tests (npm run test)
    ├─ If PASS: commit with witness tree + advance
    ├─ If FAIL: revert + ask Gemma4 for alternative approach
    └─ Max 3 retry attempts per error
-   
+
 6. CLOSURE & WITNESS
    ├─ Mark issue as resolved
    ├─ Store witness tree (proof of fix authority)
@@ -417,24 +417,24 @@ TURN 1: Detect + Classify
   Error: "Property 'userId' does not exist on type 'Session'"
   Category: Type error
   Scope: src/lib/server/auth.ts
-  
+
 TURN 2: Gather Context
   - Load auth.ts (500 lines)
   - Fetch Session type definition (Neo4j + Postgres)
   - Load similar type-error fixes from doc archive
   - Budget tokens: 4000 available for prompt
-  
+
 TURN 3: Agentic Proposal
   Gemma4 proposes:
   - Tool 1: fetch Session type (atlas.packet.get)
   - Tool 2: search for userId field (atlas.search)
   - Tool 3: apply type fix inline (edit_patch_inline)
-  
+
 TURN 4: Validation
   - Apply patch: change `session.userId` → `session.user.id`
   - Run: npm run test src/lib/server/auth.test.ts
   - Result: PASS ✅
-  
+
 TURN 5: Closure
   - Commit with message: "fix(auth): correct Session type usage"
   - Record witness tree (tool calls + test results)
@@ -655,14 +655,14 @@ export const fetchDocumentation: MCPTool = {
 
 ### Dimension Strategy
 
-**768-dim canonical**: Full semantic capacity (native embeddinggemma output)  
-**384-dim retrieval**: Prefix truncation (retrieval only, not authority)  
-**64-dim routing**: Latent space (AE-compressed, routing clusters only)  
+**768-dim canonical**: Full semantic capacity (native embeddinggemma output)
+**384-dim retrieval**: Prefix truncation (retrieval only, not authority)
+**64-dim routing**: Latent space (AE-compressed, routing clusters only)
 
 ### Token Remapping for Gemma4
 
-**Context Window**: 65,536 tokens (gemma4-legal-iq4xs-direct.gguf)  
-**Reserve**: 2000 tokens (buffer for completion)  
+**Context Window**: 65,536 tokens (gemma4-legal-iq4xs-direct.gguf)
+**Reserve**: 2000 tokens (buffer for completion)
 
 **Example Budget**:
 ```
@@ -679,7 +679,7 @@ But we typically want shorter output:
 
 ### Multi-Vector Semantic Summarization
 
-**Problem**: N vectors in cluster, need 1 summary vector.  
+**Problem**: N vectors in cluster, need 1 summary vector.
 **Solution**: Average + store in Redis.
 
 ```typescript
@@ -693,7 +693,7 @@ async function computeClusterSummary(
     `SELECT content_embedding FROM codebase_chunk_index WHERE id = ANY($1)`,
     [vectorIds]
   );
-  
+
   // 2. Compute element-wise mean
   const dim = 768;
   const summary = new Float32Array(dim);
@@ -704,12 +704,12 @@ async function computeClusterSummary(
     }
     summary[i] = sum / vectors.rows.length;
   }
-  
+
   // 3. Store in Redis with expiry
   const key = `cluster_summary:${clusterId}:768`;
   const encoded = Buffer.from(summary.buffer).toString('base64');
   await redisClient.set(key, encoded, 'EX', 86400);  // 24 hours
-  
+
   return summary;
 }
 ```
@@ -846,17 +846,17 @@ docs/DAILY-GRAPHIFY-EXECUTION-LOG.md (runtime log, auto-generated)
 ```
 1. Complete Stage 4 (15 min)
    → node scripts/atlas/stage4-topology-extraction-parallel.mjs
-   
+
 2. Run Stage 4b + 5 (10 min)
    → node scripts/atlas/stage4b-edge-endpoint-validation.mjs
    → node scripts/atlas/stage5-pagerank-authority-validated.mjs
-   
+
 3. Create orchestrator (45 min)
    → daily-graphify-orchestrator.mjs + config.json
-   
+
 4. Create /admin/graphify (90 min)
    → Dashboard page + API endpoints + status board
-   
+
 5. Wire MCP tools (60 min)
    → 8 tool implementations + MCP server registration
 

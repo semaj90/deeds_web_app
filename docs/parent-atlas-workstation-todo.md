@@ -1166,6 +1166,11 @@ remains `DEFERRED_NO_FEATURE_MATRIX` until exact promotion/recall and identity
 parity are proven. Tang-style sampling is treated as routing inspiration, not
 an online theorem implementation. GEPA, GRPO, LoRA stitching, WebGPU/Dawn,
 and GPU residency mutation remain deferred.
+ML optimization gates ENG-ML-OPT-11..23 are now defined in the owning OpenSpec
+ledger. They keep FastAPI/NLP, WSL2 RAPIDS, optional PyTorch/ATen, Gymnasium/PPO,
+and DSPy/GEPA/RLM isolated until owner, pin, data-split, evaluation, parity, and
+promotion gates pass. No sidecar image or Conda environment was changed; no
+training, GPU job, model/prompt deployment, or persistent indexing was run.
 The next missing artifact is a validated
 `docs/reports/atlas-qas-candidate-features.jsonl` input. Existing Graphify
 task-candidate JSONL has task metadata but not the complete revisioned QAS
@@ -2226,3 +2231,222 @@ BeautifulSoup/web research, NLP enrichment, NetworkX, GPU/RTX, and BitFrost/ACE 
 separate downstream adapters; none may authorize a TypeScript edit or turn stale/crawled data
 into canonical error truth. Mutation remains behind `WorkflowActionEventV1`, exact preimage,
 approval, bounded execution, and independent validation.
+
+## LINEAGE-E2E-01 pipeline status (2026-10-05)
+
+This is a workstation dependency projection only; the authoritative open gates
+are recorded in
+`openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`.
+
+| Stage | Current status | Remaining proof |
+|---|---|---|
+| Qualified packet/chunk seed | `PARTIAL_PROVEN` — one real row passed `qualifyEvidenceV1` as `CHUNK_REVISION_QUALIFIED` | Re-select and freeze from the current qualified cohort with all evidence refs |
+| JSONL evidence | `CONTRACT_PRESENT / NOT_RUN` — current proof constructs a JSONL-shaped object directly | Run an existing parser/builder with real parser and producer revisions |
+| POS tagging | `COMPONENT_RESPONSE_PRESENT` — 8095 returned token assertions | Preserve exact token identity, UTF-8 byte spans, and tagger revision into the typed output |
+| Domain classification | `SAME_PACKET_CLASSIFIER_PASS_PROVEN / FEATURE_ROUTING_NOT_PROVEN` — the 2026-10-05 read-only E2E replay invoked `:8095 /analyze` on the frozen packet; exact packet/source/workspace identity and input hash matched; model revision and NB/LR outputs are in `docs/reports/lineage-e2e-01-derivation-slice-v1.json` | Evaluation remains `BLOCKED`: no independently labeled frozen holdout, exact checkpoint training-member manifest, or live full probability vectors. The local evaluator prints diagnostic metrics only; do not index model outputs or promote labels. |
+| Feature setup | `SCAFFOLD_OUTPUT_ONLY` — builder output uses hard-coded revisions and a legacy representation label | Use actual producer revisions; do not synthesize missing `representationRevision` |
+| Routing | `NOT_EXERCISED` | Invoke the existing routing owner from the same classified feature input |
+| pgvector retrieval | `CANDIDATE_RETURNED / LINEAGE_PARTIAL` — selected chunk was rank 2; representation revision absent | Repeat read-only against the frozen seed/query and retain exact candidate evidence |
+| ContextManifest | `NOT_ASSEMBLED` | Build a proposal only from the same identity-qualified candidate and prove readback shape |
+
+The current receipt is `E2E_01_SLICE_PARTIAL`, `canonicalAuthority=false`, and
+`proofUsable=false` at
+`docs/reports/lineage-e2e-01-derivation-slice-v1.json`. Its
+`semantic_768@v1` value is a legacy label, not a representation revision; the
+report's “no stage differs” summary accepts absent fields and must not be
+treated as identity-preservation proof. Keep the older checked semantic
+retrieval/ContextManifest canary scoped to that prior test; it does not close
+this vertical derivation path. No datastore writes, representation backfill,
+cache population, or admission apply are authorized here.
+
+## OpenSpec analysis pipeline and structural challenger status (2026-10-05)
+
+The owning unchecked gates are in
+`openspec/changes/parent-atlas-pass-fabric/tasks.md` under “Existing OpenSpec
+analysis pipeline gate closure” and “Codebase-Memory structural challenger.”
+This workstation section is only a dependency/status projection; it does not
+create owners or authorize install, indexing, model execution, persistence, or
+task-state changes.
+
+| Workstream | Current status | Remaining proof / boundary |
+|---|---|---|
+| Model/embedding receipt | `ARTIFACT_PROVEN / RUNTIME_BINDING_PARTIAL` per supplied 2026-10-03 independent readback | Independent receipt verifier must bind artifact checksum, pooling, model/tokenizer/input-policy revisions, producer, and active runtime; `:8097` source fix was not deployed in that readback |
+| EvidenceCard corpus owner | `OWNER_DRIFT_UNRESOLVED` | Reconcile generated `atlas.openspec-evidence-card.v1` against the legacy persisted census contract with current producer/readback |
+| OpenSpec task ordinal map | `BLOCKED_OWNER_COMPATIBILITY` | Extend/reconcile existing discriminated ordinal owner; preserve packet consumers and prove per-task revision and independent readback |
+| NLP grounding / ontology tuples / dependency candidates / hypergraph | `OPEN_DIAGNOSTIC_AND_ADMISSION_GATES` | Reuse `:8095` and existing tuple/hyperedge owners; exact grounded spans/revisions first; all durable writes stay gated |
+| Packet incidence / HyperRAG multihop | `MULTIHOP_LINEAGE_UNPROVEN` | Taxonomy hyperedges are not packet incidence; strict reader candidate mapping still lacks graph revision; require current packet-bound exact-revision cohort |
+| Codebase-Memory MCP | `POLICY_ADMITTED / RUNTIME_INTEGRATION_OPEN` (2026-10-06 local; v0.11.0) | Narrow `WORKTREE_STRUCTURAL` challenger only. Diagnostic definition, outline, snippet, and bounded import-candidate adapters parse measured JSON shapes but remain unwired; Atlas identity and graph snapshot binding are unresolved. One shared-file query (`quantizeGemmaLegalOutput`) returned one bounded CBM file hit; the snippet matched current source exactly. Atlas FTS returned the exact-path candidate plus two relative-path `card:`/`qdrant:` rows with identical content MD5 but distinct stable keys; they lack proven canonical chunk/source/workspace revision identity and must not be merged by path/hash. The `code_retrieval_chunks` rows inspected expose no packet/source/workspace revision fields; `card:`/`qdrant:` content hashes have no qualified hash contract. Strict `resolveCanonicalIdentityV2` has no production caller in the searched server tree; V1 RRF use was not proven to own these FTS rows. No canonical candidate resolution is proven. CBM `raw_match_count=0` despite its one reported match remains unexplained. The two earlier probes remain absent from the FTS corpus. This is not full parity or index freshness. Import probe: one source-verified positive, one known-importer false negative; empty remains UNKNOWN. Bounded `search_code` remains text-only. Exact snapshot binding, identity binding, same-query parity, `detect_changes` symbol diagnosis, negative-result verification, token accounting, and rg fallback remain open |
+
+**CBM measurement/admission addendum (2026-10-05 local):** the installed index is
+`sveltekit-frontend/src` (74,735 nodes / 250,913 edges; indexed
+2026-10-06T01:29:49Z) plus the existing workflow subtree; its branch metadata
+does not independently bind it to current HEAD. `qn_pattern` route discovery
+plus `HANDLES` returned the indexed GET/POST interaction handlers and matched
+the current source exports. `/api/auth/login` returned five direct caller
+files, matching the five exact source callsites. `DATABASE_URL` returned 18
+candidate consumers; one (`getPgPool`) was source-verified, not the entire
+set. The `users` Table node resolves to a historical migration and has no
+observed `WRITES` edge; current Drizzle defines `users` separately. CBM
+`WRITES` is a code-level variable/field/method relation, not database-table
+ownership. A separately recorded `scope=impact` run matched the known changed-
+file cohort (557 files) but returned zero seed/impact/module symbols:
+`FILE_DIFF_ONLY_PROVEN / SYMBOL_IMPACT_NOT_PROVEN`. Full paging through indexed
+`src/` files and the `scope=files` variant remain unverified. The operator
+accepted a narrow `WORKTREE_STRUCTURAL` policy for definitions, outlines,
+snippets, import candidates (verify independently), and bounded text only. The
+runtime handler remains unbuilt. Cross-ledger measurements are recorded
+evidence, not reruns in this pass; they do not prove same-query Atlas parity or
+revision freshness. Freshness, canonical identity, empty-as-unknown, external
+negative verification, token accounting, exact fallback, and import-candidate
+verification remain gates. Blast radius, route-to-handler ownership,
+SQL/table writes, CALLS-as-evidence, and negative connectivity claims are
+excluded. No semantic snapshot, Graphify, or canonical datastore was changed.
+
+Dependency ordering is a DAG: model receipt readback gates semantic
+persistence; task-card parity and evidence/task joins gate a task-universe
+ordinal map; grounded NLP feeds ontology tuples and dependency proposals;
+those feed hypergraph projection; packet incidence is an independent
+prerequisite to multihop. Codebase-Memory evaluation is optional and does not
+block canonical Graphify/HyperRAG work. No service restart, Graphify refresh,
+database/Qdrant/Neo4j/Valkey write, Codebase-Memory install/index, or model call
+was performed by recording this status.
+
+## Code intelligence indexing → agentic retrieval alignment (2026-10-05)
+
+This section consolidates the requested AST/CST, symbol, metadata, embedding,
+taxonomy, ranking, topology, graph, and accelerator work into the existing
+owners. It is a workstation dependency projection, not a new index/schema
+owner. OpenSpec task ledgers remain authoritative. Presence below means source
+or contract found; it does not mean a current complete-corpus run, live caller,
+or evidence-admissible output was proven.
+
+| Stage / capability | Current alignment | Gap / next proof |
+|---|---|---|
+| Source inventory and chunking | `PARTIAL` — 8095 Tree-sitter/AST sidecar and tRPC `astSidecar.chunk` exist; a real diagnostic composition has returned chunks/edges | Prove a deterministic, incremental, multi-repository source→chunk inventory with exact source bytes, byte spans, parser revision, source/workspace authority, and independent readback; do not equate sidecar output with admitted index rows |
+| CST/AST, functions/modules, symbols | `OWNERS_PRESENT / LINEAGE_PARTIAL` — AST operation, structural compiler, symbol/tree identity contracts, and code-index APIs exist | Carry exact `treeNodeId`/symbol version, file/module ownership, source span, source revision, and workspace revision through the actual index writer and retrieval response; raw names and Graphify nodes alone are not canonical identities |
+| Structured metadata and relation tuples | `PARTIAL` — `codebase_chunk_index` exposes chunk metadata; separate structural facts, ontology tuple, and hyperedge owners exist | Freeze a typed metadata vocabulary and map subject–predicate–object relations through grounded evidence; do not flatten graph relations into arbitrary key/value tags or create a duplicate tuple/index owner |
+| Canonical dense representation | `OWNER_PRESENT / CURRENT_LINEAGE_BLOCKED` — Atlas `semantic_768` uses `content_embedding_768`; Go Retrieval has a read-only retrieval role; Codebase-Memory's local Nomic/int8 vectors are a separate challenger | Independently bind producer/model artifact, tokenizer/input policy, pooling, normalization, recipe, input chunk identity, and representation revision; no vector import or cosine-score mixing based on dimension alone |
+| Lexical/trigram and query taxonomy | `OWNERS_PRESENT / FULL-PATH_UNPROVEN` — PostgreSQL lexical/trigram, QueryAnalysis/RetrievalPlan, and domain-classifier code exist | Prove query→taxonomy/intent→bounded lane/parameter plan→candidate results with policy revision and evaluation; classification may route, never create identity or evidence |
+| Go Retrieval and gRPC | `EXECUTOR_PRESENT / INDEX-WRITER_NOT_PROVEN` — Go Retrieval protobuf/gRPC returns candidate metadata and queries existing stores; Go CodeIntel has separate gRPC lookup/cluster-summary methods | Prove one caller chain from indexed AST artifact through identity normalization into Go Retrieval and the existing single fusion owner; keep Go Retrieval an executor, not a second index/fusion/canonical writer |
+| Top-K and reranking | `IMPLEMENTATIONS_PRESENT / LIVE_EVALUATION_PARTIAL` — SearchRuntime/reranker, deterministic Top-K fixtures, and cross-encoder/GPU challenger code exist | Freeze candidate snapshot, query/representation revisions, parameter source, tie-breaking, and held-out relevance evaluation; no extra vote for executor/reranker variants |
+| KMeans, SOM 20×20, centroids | `DERIVED_OWNERS_PRESENT / ADMISSION_BLOCKED` — scripts/workers/cache owners exist; existing SOM reconciliation is partial | Bind assignments to a sealed canonical ordinal map and source/representation revisions; prove CPU/GPU parity and bounded routing benefit before any cache or retrieval-policy use |
+| SVD/UMAP, latent/autoencoder, MLP features | `SCAFFOLDS_AND_ARTIFACTS_PRESENT / CURRENT_COHORT_BLOCKED` — latent, SVD/manifold, autoencoder and feature code exist | Resolve canonical training/input cohort, artifact/checkpoint provenance, reproducibility, and held-out quality; derived coordinates/features remain non-authoritative and cannot replace `semantic_768` |
+| Hidden state, KV, tensor residency | `POLICY_BOUNDARY_DEFINED / PERSISTENCE_FORBIDDEN` — residency/cache designs exist | Do not persist hidden thoughts, model KV cache, or raw hidden-state tensors. Any permitted derived feature needs a separately reviewed contract, privacy/retention policy, checksum, and noncanonical status |
+| Quaternion/SO(4), Hilbert, YaRN, Titans/SSM | `MIXED / NOT_ONE_PIPELINE` — quaternion/manifold and Hilbert routing references exist; YaRN belongs to generation-runtime configuration | Keep routing geometry separate from identity and retrieval truth. Treat Titans/SSM as model-architecture research unless a concrete owner/caller is found; do not imply that YaRN, rotations, or a model name enriches the code index |
+| PageRank/PPR and graph/hypergraph | `ALGORITHM_OWNERS_PRESENT / CURRENT_INCIDENCE_BLOCKED` — CPU/GPU parity and HyperGraphRAG/ontology owners exist | Use only a current revision-qualified graph and packet-bound incidence; taxonomy edges are not packet incidence. Keep ranking diagnostic until its nodes resolve to canonical evidence |
+| DAG synthesis and agentic dense search | `CONTRACTS_AND_FACADES_PRESENT / VERTICAL_PATH_PARTIAL` — query analysis, retrieval planning, execution-spine, ACE/ContextManifest, and Go retrieval contracts exist | Prove the same query/candidate through bounded plan→retrieval→canonical resolution→ContextManifest with identity/revision/checksum parity; generated parameter changes remain proposals until validators pass |
+| simdjson, queues, mmap/tensors, bit encoding, RTX/cuTile/SIMT | `OPTIMIZATION_CANDIDATES / NOT_END_TO_END_PROVEN` — parser bridge, queue/worker, memory-map, and GPU source artifacts exist | Benchmark only after the canonical CPU path is frozen. Require bounded concurrency, immutable input snapshot, explicit binary layout/encoding revisions, checksums, CPU-oracle parity, and resource approval; ordinals/packed bytes are never identity |
+
+### Consolidated existing-owner task crosswalk
+
+No new `CI-*` task IDs are created here. This projection maps the requested
+work to the existing OpenSpec owners; checked fixture/contract tasks remain
+checked only for their stated scope, and no open item is promoted by this
+crosswalk.
+
+| Workstation capability | Existing owner and task IDs | Consolidated completion state |
+|---|---|---|
+| Deterministic source inventory / chunking | `openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md`: `DIR-INDEX-00A..C`, `DIR-INDEX-01A..D`, `DIR-INDEX-02A..E`; retrieval-lineage ledger: `SOURCE-CHUNK-MATERIALIZATION-BINDING-01`, `INDEXED-PLACEHOLDER-ENRICHMENT-02B`, `CONTENT-HASH-FORMAT-HETEROGENEITY-01` | Ownership, fixture inventory, chunk contracts, and bounded replay are checked. Full live directory ingestion and exact current packet→chunk lineage remain open. No `CANONICAL-CHUNK-PRODUCER-OWNER-01` task exists in the ledger; do not treat that earlier crosswalk label as an OpenSpec task. The recorded blocker is structural: Graphify membership has whole-file SHA-256, while chunk `content_hash` is chunk-scoped and often legacy 16-hex; source-path matches do not prove chunk identity. Continue only through the existing `DIR-INDEX-05+` and exact-lineage gates. |
+| Representation registry / lexical metadata | Same directory-ingestion ledger: `DIR-INDEX-03A..D` checked; `DIR-INDEX-04A` and `04D` checked; `04B` open; `04C` partial | Descriptor/registry contract and one GIN plan-shape proof exist. Weighted lexical producer alignment and a true optional `pg_trgm` identifier lane are not complete; do not call the current fallback trigram search. |
+| AST/CST, functions/modules, symbol and source metadata | `openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/tasks.md`: `DIR-INDEX-02B`; `openspec/changes/parent-atlas-pass-fabric/tasks.md`: `ANALYSIS-NLP-GROUNDING-01`; retrieval-lineage ledger: canonical identity/chunk producer gates | Parser/chunk and symbol owners exist; task-level AST/POS live diagnostic is separate from index admission. Exact byte-span + source/workspace revision propagation through the production index writer remains unproven. |
+| Domain/concept/action/ontology facts and relation tuples | Pass-fabric `11.4..11.8` (`ANALYSIS-NLP-GROUNDING-01`, `ANALYSIS-ONTOLOGY-TUPLE-01`, `ANALYSIS-DEPENDENCY-CANDIDATE-01`, `ANALYSIS-HYPERGRAPH-01`, `HYPERRAG-INCIDENCE-OWNER-01`); `openspec/changes/atlas-feature-intelligence/tasks.md`: `FI-10`, `FI-11B` | All remain open. Reuse 8095 and existing tuple/hyperedge owners; exact grounded spans/revisions and admitted packet incidence are prerequisites, not implied by present schemas. |
+| EmbeddingGemma `semantic_768` provenance | Pass-fabric `11.1` / `MODEL-RECEIPT-READBACK-01`, `EMBED-RUNTIME-READBACK-01`, and `PF4B-EMBED-*`; directory-ingestion `DIR-INDEX-03` registry | Registry contract is present, but active runtime/receipt and per-row representation lineage remain partial or blocked. Keep CBM Nomic/int8 vectors isolated; do not import or merge scores. |
+| Query taxonomy / bounded retrieval parameters | `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`: `PARAM-PLAN-01`, `CONTEXT-DAG-01`, `CTX-PREAGENT-01` | `PARAM-PLAN-01` and the read-only `CONTEXT-DAG-01` executor are dry-run proven only; the live caller, policy/evaluation proof, and end-to-end context path remain open under `CTX-PREAGENT-01`. |
+| Go Retrieval, fusion, canonical candidate, ContextManifest | ACE/RLM ledger: `KERNEL-REAL-02`, `LINEAGE-E2E-01A..E`, `PIPE-E2E-01`, `CTX-MANIFEST-01`; directory-ingestion `DIR-INDEX-12A..D` | Go/gRPC executor and facade owners exist. The same indexed candidate has not yet been proven through revision-qualified resolution and proposal ContextManifest; keep these gates open and do not create another fusion or packet owner. |
+| Top-K, reranking, learned rank features | `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`: `CANDIDATE-FEATURE-MATRIX-01`, `XGBOOST-RERANKER-EVAL-01`; `openspec/changes/atlas-feature-intelligence/tasks.md`: `FI-18`, `FI-21`, `FI-21B`, `FI-22F`; ACE/RLM `RANK-RADIX-01` | Implementations and deterministic fixtures exist; candidate-snapshot, held-out quality, and same-query end-to-end ranking remain open. Radix is only post-score ordering, not relevance. |
+| KMeans, SOM 20×20, centroids, SVD/UMAP/AE | `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`: frozen ordinal/KNN→KMeans→SOM sequence; `openspec/changes/parent-atlas-topology-representation-admission/tasks.md`: `TOPO-02A`, `TOPO-03A`, `TOPO-05`; tensor-residency ledger; Feature Intelligence `FI-21/FI-22F` | Contracts, scripts, and some assignment audits exist, but canonical population/ordinal alignment and current artifact lineage are incomplete. SOM's partial match count is not an admission proof. Keep topology/latent features out of production routing until the owner gates close. |
+| PageRank/PPR and HyperGraphRAG | Retrieval-lineage `GRAPH-PAGERANK-PARITY-01`; Feature Intelligence `FI-15`, `FI-16I`; pass-fabric `HYPERRAG-LINEAGE-02..09` and `11.7..11.8` | CPU/GPU algorithm fixtures and parity receipts exist for bounded snapshots; current graph revision, packet-incidence population, and live reader qualification remain open. Taxonomy edges cannot substitute for packet incidence. |
+| gRPC/protobuf, mmap/tensors, bit encoding, simdjson, RTX/cuTile/SIMT, queues | Directory-ingestion `DIR-INDEX-14A..E` and `DIR-INDEX-15A..E`; ACE/RLM `GPU-PROJ-01` stage 2; existing simdjson bridge/fixtures | Transport/parser and accelerator artifacts exist; no single qualified index→RPC→retrieval round trip or production performance promotion is proven. GPU artifact-owner selection, environment execution, queue bounds, and parity/readback remain gates. |
+| Agentic synthesis / repair | ACE/RLM `CTX-PREAGENT-01`, `PIPE-E2E-01`, `CTX-MANIFEST-01`; `openspec/changes/parent-atlas-agentic-file-compiler/tasks.md`; existing repair-fabric validators | Existing DAG/compiler/validator owners should be composed. Keep generated parameter updates proposal-only until identity-qualified evidence, independent validation, and separate mutation authorization are proven. |
+
+**Not a code-index stage:** YaRN is an Ornith/llama.cpp generation-context setting. Quaternion/SO(4), Hilbert, SVD/UMAP, and topology coordinates are derived routing/analysis features. Titans/SSM references are not, by themselves, a Parent Atlas indexing owner. Hidden thoughts, raw hidden-state tensors, and KV cache remain non-persistable under repository policy.
+
+### Structural-index use in lineage, extraction, and context work
+
+An external structural index such as Codebase-Memory may help locate the
+existing producer, caller, parser, resolver, and cache owners for the gates
+above. Treat its results as `STRUCTURAL_CHALLENGER` observations: they can
+prioritize source inspection and nominate exact files/symbols, but cannot prove
+packet lineage, source authority, extraction grounding, RPC execution, or ACE
+eligibility. Resolve every nomination through the repository owner and exact
+source/checksum/revision evidence before using it in a gate receipt.
+
+| Area | Existing Atlas owner to reuse | What a structural index can contribute | Still required for gate closure |
+|---|---|---|---|
+| Source/chunk/packet lineage | `atlas_workspace_source_bindings` + `atlas_packet_chunk_lineage` + `codebase_chunk_index`; existing `SOURCE-CHUNK-MATERIALIZATION-BINDING-01` and open exact-lineage gates | Find writer/readers, callers, and likely missing bridge paths | Current exact packet/chunk membership, `PROVEN` status, source/workspace revisions, byte/checksum evidence, and independent readback; graph proximity or same-path hits are insufficient |
+| Extractions and code metadata | 8095 Tree-sitter/POS/extraction owners; existing task-enrichment and `ANALYSIS-NLP-GROUNDING-01` gates | Find CST/AST, symbol, module, route, and extraction call paths; nominate files for bounded analysis | Run the real owner; preserve exact byte spans, input checksum, source/task revision, producer revision, and evidence refs; all outputs remain proposals/non-authoritative |
+| RPC / retrieval | tRPC facade, Go Retrieval executor, SearchRuntime fusion owner | Map transport entry points and downstream callers | Capture a live request/response and canonical identity resolution; executor output or an indexed node ID is not lineage |
+| ACE / ContextManifest | Existing ACE admission and ContextManifest owners; `CTX-MANIFEST-01` / `DAG-RUNTIME-*` gates | Locate assembly and admission paths | Same candidate snapshot and revisions through selection, admission, manifest checksum, and readback; no fallback evidence or synthetic revisions |
+| Redis/Valkey and BitFrost | `ace-bitfrost-cache-identity-v1.ts`, `bitfrost-residency-warming-v1.ts`, centroid artifact owner | Find cache-key builders, warmers, and readers | Cache is disposable and never evidence; require revision/checksum-qualified identity and prove canonical hydration on hits. Diagnostic runs must not populate it |
+| Centroid / bucket routing | `centroid-artifact-v1.ts` plus existing centroid/cache audit gates | Find grouping inputs and routing callers | Use only as a routing feature after a frozen semantic population; record member/representation checksums, keep one semantic-lane vote, and compare recall/candidate reduction against the full-corpus baseline |
+| Model KV / token cache | No permission to persist model KV tensors under current policy | A structural index can locate runtime settings, but cannot authorize storage | Keep runtime KV ephemeral. Do not store hidden state/tensors in Redis/Valkey. Measure prompt/tool-result token counts separately; cache only approved context descriptors/manifests under their existing identity contract |
+
+This alignment creates no new lineage, extraction, RPC, centroid, or cache
+owner and adds no task completion claims. Use the structural index to reduce
+owner-discovery work; only the existing Atlas evidence/readback gates can
+close the corresponding task.
+
+### Directory-scoped agentic code-intelligence sequence
+
+Graphify-generated directory `LLMS.md` files are navigation/prefill aids, not
+the indexed evidence stream and not equivalent to the public `llms.txt`
+discovery convention. Codebase-Memory also maintains its own local structural
+index/graph, but the tested installation currently lists only two SvelteKit
+subtrees. Neither representation replaces the canonical directory/chunk and
+lineage owners.
+
+Use the existing dependency graph rather than one monolithic index job:
+
+1. **Freeze input scope:** choose repository + directory roots and immutable
+   source/workspace snapshot; exclude generated, ignored, and out-of-root files.
+   Reuse `DIR-INDEX-01/02`; do not begin with the whole 179k-row historical
+   cohort.
+2. **Stream deterministic chunks:** process one bounded directory shard at a
+   time; retain `sourceRef`, exact byte range, content checksum, parser/chunker
+   revision, parent-file checksum, and chunk identity. Stream transport or
+   simdjson may accelerate parsing but cannot supply identity.
+3. **Fan out diagnostic enrichment:** CST/Tree-sitter, AST-grep, symbols/LSP,
+   exact lexical terms, and metadata tuples are separate observations over the
+   same frozen chunk. Keep key/value metadata distinct from subject-predicate-
+   object relations. 8095 POS/NLP/classifier and LangExtract run only where
+   their triggers apply; every extracted claim must point to exact source bytes
+   and remain `canonicalAuthority=false` until its existing admission owner
+   accepts it.
+4. **Close canonical lineage before semantic work:** resolve source binding →
+   packet → exact chunk membership and current source/workspace revisions.
+   The existing hash-grain mismatch is a stop condition, not a reason to equate
+   whole-file and chunk digests. Keep `DIR-INDEX-05` and
+   `INDEXED-PLACEHOLDER-ENRICHMENT-02B` open until exact readback passes.
+5. **Add semantic and retrieval lanes only after qualification:** use the
+   existing EmbeddingGemma `semantic_768` recipe/producer receipt; compare
+   PostgreSQL FTS/bitmap, optional real `pg_trgm`, semantic, structural, and
+   graph candidates as separate lanes, with one fusion owner. Benchmark fixed
+   queries before HNSW/Qdrant/GPU challengers; the existing PostgreSQL 18
+   bitmap plan proof is a plan-shape result, not a latency claim.
+6. **Build candidate and context plans:** reuse the frozen ordinal/candidate
+   owners, OpenSpec task/evidence crosswalk, `ContextDagPlanV1`, ACE packet and
+   ContextManifest owners. Prefill from a bounded, revision-qualified evidence
+   set; generated task links, dependencies, and repair parameters remain
+   proposals and cannot change OpenSpec checkbox state.
+7. **Evaluate agentic repair in tournaments:** use existing OpenSpec challenger
+   and patch/worktree tournament owners on frozen tasks and isolated worktrees;
+   require independent validators and explicit mutation authorization. Keep
+   Ornith on `:8090` as synthesis/tool-use runtime, not an index or evidence
+   authority.
+8. **Cache only after context identity is stable:** ACE/BitFrost and Valkey may
+   reuse revision/checksum-qualified manifests, directory summaries, centroid
+   routing artifacts, or approved context descriptors. A hit must hydrate
+   canonical evidence; centroid routing is not another vote. Keep llama-server
+   KV blocks, hidden state, and tensors ephemeral and outside Redis/Valkey.
+
+The next concrete gates are existing ones: close exact directory/chunk lineage
+(`DIR-INDEX-02`, `INDEXED-PLACEHOLDER-ENRICHMENT-02B`), establish current
+EmbeddingGemma receipt/runtime (`MODEL-RECEIPT-READBACK-01`,
+`EMBED-RUNTIME-READBACK-01`, `DIR-INDEX-05`), then frozen retrieval parity and
+candidate population (`DIR-INDEX-10/11`), followed by the context/DAG/ACE
+vertical proof (`DIR-INDEX-12`, `PIPE-E2E-01`, `CTX-MANIFEST-01`). Only after
+those pass should centroid/cache or agent-repair tournament promotion be
+considered. This is a proposed execution order, not a claim that those gates
+passed.
+
+The dependency order is: `DIR-INDEX-01/02` source and chunk proof → canonical writer/lineage bridge → `DIR-INDEX-03/04` representation and lexical closure → model/runtime receipt and grounded enrichment → frozen ordinal/candidate snapshot → retrieval/ranking → graph incidence and bounded expansion → ACE/ContextManifest/agent proof → optional acceleration. Existing OpenSpec task statuses govern each completion. This crosswalk did not run an indexer, training job, graph refresh, GPU workload, model call, or datastore write.

@@ -1,0 +1,29 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 96,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "okf-tooling-docs-trpc-bs-r3",
+  "page_count": 9,
+  "producer_revision": "parent-atlas-okf-pipeline-r1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "8fba26546287a1d9662582ecc0bf146396d1db5394883b72e102ec343f453fb7",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 96,
+      "chunks_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\trpc-beautifulsoup-r2\\chunks.jsonl",
+      "page_receipt_checksum": "adaaf93a4ea36fe4ca9f6cae9dee081184d5ca9cfa2017e507ed048fde9950d7",
+      "pages": 9,
+      "source_id": "trpc",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "trpc-docs-2026-10-05-bs-r2",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "workspace-current",
+  "writes_performed": true
+}

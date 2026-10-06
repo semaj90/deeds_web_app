@@ -1,0 +1,133 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-graph-retrieval-proof:tree-node-identity-formula:5df4274a7f59:c8ae77ab68d5",
+  "evidenceType": "STATIC",
+  "changeId": "parent-atlas-graph-retrieval-proof",
+  "taskId": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1",
+  "canonicalTaskKey": "openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1",
+  "taskRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+  "claim": "Capture the current `atlas_tree_nodes.node_id` formula as a revision-bound parse-occurrence identity.",
+  "workspaceRevision": "sha256:5df4274a7f59b1dda26500772bc93a778358b79c4961b3492ca5fd94de5cc471",
+  "sourceRevision": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "lineStart": 133,
+      "lineEnd": 133,
+      "sourceRevision": "sha256:6e9f352f958eeb8227c5f83b653682153462708ff217c4cb1ba5b9c5127c0cf6"
+    },
+    {
+      "file": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+      "lineStart": 63,
+      "lineEnd": 66,
+      "sourceRevision": "sha256:48ff125148eefe594178a3a26a868c44261f67f973423672a90ce511fc7a3758"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/record-tree-node-identity-formula-receipt-v1.mjs",
+  "command": "node scripts/atlas/record-tree-node-identity-formula-receipt-v1.mjs",
+  "inputs": [
+    {
+      "kind": "source",
+      "uri": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+      "sourceRef": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs#L63-L66",
+      "checksum": "sha256:48ff125148eefe594178a3a26a868c44261f67f973423672a90ce511fc7a3758"
+    },
+    {
+      "kind": "task-ledger",
+      "uri": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
+      "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+      "checksum": "sha256:df5934a501f40bbbcd9de4aba6fa2e8fac32a25b15f04673414f135c7dc04b5d"
+    }
+  ],
+  "observedAt": "2026-10-02T23:38:50.303Z",
+  "expectedAssertions": [
+    {
+      "id": "functionPresent",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "sevenInputComponents",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "nulDelimited",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "sha256Digest",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "explicitUtf8Encoding",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    },
+    {
+      "id": "noWorkspaceRevisionInference",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "functionPresent",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "sevenInputComponents",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "nulDelimited",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "sha256Digest",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "explicitUtf8Encoding",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    },
+    {
+      "id": "noWorkspaceRevisionInference",
+      "claimRef": "sha256:d05bd35424dc55ae05cc040294b0aaaf86ff9cb6f3e16a25972b6727485076ef",
+      "expected": "current treeNodeId formula satisfies the static identity contract",
+      "actual": "static check passed",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "audit-report",
+      "uri": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/graph-tree-node-identity-formula-audit-v1.json",
+      "checksum": "sha256:1c71a28dea29a57b670a17828a666dd0620620be06abae16c14cbb6f184e0ec8"
+    }
+  ],
+  "verifier": "atlas-static-identity-audit",
+  "independentVerifier": "audit-tree-node-identity-formula-v1",
+  "readbackRequired": false,
+  "readbackPerformed": false,
+  "verdict": "PROVEN",
+  "checksum": "sha256:e5dc3eebd60dc07836e2234f6185ee3540e43046f99209fc43a51528d8b07115"
+}

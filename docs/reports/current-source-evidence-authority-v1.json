@@ -1,23 +1,23 @@
 {
   "schema": "atlas.current-source-evidence-authority.v1",
   "gate": "SOURCE-EVIDENCE-AUTHORITY-01",
-  "generatedAt": "2026-09-17T22:31:03.422Z",
+  "generatedAt": "2026-10-06T02:27:00.192Z",
   "mode": "READ_ONLY",
   "canonicalAuthority": false,
   "writesPerformed": false,
   "status": "NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER",
   "toleranceWindow": {
-    "toleranceMs": 300000,
-    "nowMs": 1789684248688,
-    "checkedAt": "2026-09-17T22:30:48.688Z"
+    "toleranceMs": 0,
+    "nowMs": 1791253570807,
+    "checkedAt": "2026-10-06T02:26:10.807Z"
   },
   "currentWorkspace": {
     "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
-    "workspaceRevision": "sha256:ceeeb5cd786ccb15082628fbeb011cbf4ea8f84cd749891f88710106628d4f8f",
-    "sourceManifestDigest": "ceeeb5cd786ccb15082628fbeb011cbf4ea8f84cd749891f88710106628d4f8f",
-    "sourceCount": 24665,
+    "workspaceRevision": "sha256:a2381c9a124b313a25a71a8ede04086bac8bf62a0e9e4f0c17d4ef1b2d931791",
+    "sourceManifestDigest": "a2381c9a124b313a25a71a8ede04086bac8bf62a0e9e4f0c17d4ef1b2d931791",
+    "sourceCount": 26792,
     "repositoryId": "semaj90/deeds_web_app",
-    "baseCommitOid": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
+    "baseCommitOid": "af93b2cad81f493800a77e526a29640b0a405bc4",
     "dirty": true
   },
   "runCounts": {
@@ -40,7 +40,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 174346688
+      "ageMsAtCheck": 1743668807
     },
     {
       "runId": "6daa5fc9-6b76-4774-a376-013a1bb8190e",
@@ -52,7 +52,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "575d5428-0154-43e7-a353-307b2443cbba",
@@ -64,7 +64,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "14643371-f6f2-4131-906b-235a5c06619a",
@@ -76,7 +76,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "b1a103ac-c717-430b-9643-a8c9818064ae",
@@ -87,7 +87,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "b3a5b14e-0065-41bb-bfe0-96e1062d1e07",
@@ -98,7 +98,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "a7377c07-acb2-4d68-bf83-19d8eca586d4",
@@ -110,7 +110,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "3f13703e-5944-487c-a5a9-10dcecc00124",
@@ -122,7 +122,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 773556688
+      "ageMsAtCheck": 2342878807
     },
     {
       "runId": "e9b9c13d-8acb-4e9f-801f-58a78a5f5441",
@@ -133,7 +133,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 839387688
+      "ageMsAtCheck": 2408709807
     },
     {
       "runId": "6c9d9642-e572-4d00-91bf-bd8370b238f1",
@@ -144,7 +144,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 855367688
+      "ageMsAtCheck": 2424689807
     },
     {
       "runId": "48485685-e773-4433-a1f8-00f5524cca44",
@@ -154,7 +154,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1034629688
+      "ageMsAtCheck": 2603951807
     },
     {
       "runId": "d8bb84bd-b4ba-4f85-a5b9-fad16327b5fe",
@@ -164,7 +164,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1035311688
+      "ageMsAtCheck": 2604633807
     },
     {
       "runId": "55888921-5f7e-4047-9ec4-96912659c2f7",
@@ -174,7 +174,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1035623688
+      "ageMsAtCheck": 2604945807
     },
     {
       "runId": "ddf92de5-bc56-43c2-a646-7b3c4f79e1a9",
@@ -185,7 +185,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1035929688
+      "ageMsAtCheck": 2605251807
     },
     {
       "runId": "9816c4d0-d2ad-42ca-8da9-f9d4393277b0",
@@ -196,7 +196,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1145499688
+      "ageMsAtCheck": 2714821807
     },
     {
       "runId": "78818366-2410-4643-8e5d-e995c75a2ad5",
@@ -207,7 +207,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1213730688
+      "ageMsAtCheck": 2783052807
     },
     {
       "runId": "9716c798-bb17-45c7-afb0-1c58955889bf",
@@ -218,7 +218,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1216681688
+      "ageMsAtCheck": 2786003807
     },
     {
       "runId": "862b952b-7623-434e-818e-407c1531abaf",
@@ -229,7 +229,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1272992688
+      "ageMsAtCheck": 2842314807
     },
     {
       "runId": "5b2e18fc-86e6-4fc2-932f-4887d5c14853",
@@ -240,7 +240,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1273962688
+      "ageMsAtCheck": 2843284807
     },
     {
       "runId": "369e4270-7689-4536-8816-4ec4a5517b3e",
@@ -250,7 +250,7 @@
         "STALE_WORKSPACE_REVISION",
         "SOURCE_MANIFEST_DIGEST_MISMATCH"
       ],
-      "ageMsAtCheck": 1287297688
+      "ageMsAtCheck": 2856619807
     }
   ],
   "selection": null,

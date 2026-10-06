@@ -14,6 +14,7 @@ interface GraphifySymbolPacketJoinRowV1 extends AtlasPacketRowV1 {
 	stable_symbol_key: string;
 	workspace_revision: string;
 	code_source_revision: string | null;
+	workspace_revision_key: string | null;
 }
 
 export async function resolveGraphifyPacketIncidenceEndpointsV1(
@@ -26,7 +27,8 @@ export async function resolveGraphifyPacketIncidenceEndpointsV1(
 	const symbolKeys = [...new Set([edge.subjectStableSymbolKey, edge.objectStableSymbolKey])];
 	const result = await pool.query<GraphifySymbolPacketJoinRowV1>(
 		`SELECT symbol.stable_symbol_key, file.workspace_revision, file.code_source_revision,
-	        packet.packet_key, packet.source_ref, packet.source_revision
+	        packet.packet_key, packet.source_ref, packet.source_revision,
+	        packet.workspace_revision_key
 	   FROM graphify_symbols AS symbol
 	   JOIN graphify_files AS file ON file.file_id = symbol.file_id
 	   JOIN atlas_packets AS packet
@@ -54,19 +56,28 @@ export async function resolveGraphifyPacketIncidenceEndpointsV1(
 		|| subject.code_source_revision !== edge.sourceRevision || subject.workspace_revision !== edge.workspaceRevision) {
 		throw new Error('GRAPHIFY_PACKET_SUBJECT_REVISION_BINDING_MISMATCH');
 	}
+	if (subject.workspace_revision_key !== edge.workspaceRevision) {
+		throw new Error('GRAPHIFY_PACKET_SUBJECT_WORKSPACE_REVISION_BINDING_MISMATCH');
+	}
 	if (neighbor.workspace_revision !== edge.workspaceRevision
 		|| !neighbor.code_source_revision || neighbor.source_revision !== neighbor.code_source_revision) {
 		throw new Error('GRAPHIFY_PACKET_NEIGHBOR_REVISION_BINDING_MISMATCH');
+	}
+	if (neighbor.workspace_revision_key !== edge.workspaceRevision) {
+		throw new Error('GRAPHIFY_PACKET_NEIGHBOR_WORKSPACE_REVISION_BINDING_MISMATCH');
 	}
 	const packetRows = [subject, neighbor];
 	const { resolvePacketKeyResolutionV2 } = await import('../identity/packet-identity-resolver.js');
 	const resolutions = await resolveIncidenceEndpointsV1(
 		packetRows.map((row) => row.packet_key),
 		async (keys) => {
-			const readback = await pool.query<AtlasPacketRowV1>(
-				'SELECT packet_key, source_ref, source_revision FROM atlas_packets WHERE packet_key = ANY($1::text[])',
+			const readback = await pool.query<AtlasPacketRowV1 & { workspace_revision_key: string | null }>(
+				'SELECT packet_key, source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE packet_key = ANY($1::text[])',
 				[keys],
 			);
+			if (readback.rows.some((row) => row.workspace_revision_key !== edge.workspaceRevision)) {
+				throw new Error('GRAPHIFY_PACKET_IDENTITY_READBACK_WORKSPACE_REVISION_MISMATCH');
+			}
 			return readback.rows;
 		},
 		async (key) => {

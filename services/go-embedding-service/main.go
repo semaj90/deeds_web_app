@@ -25,9 +25,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"math"
 	"log"
 	"log/slog"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -331,36 +331,16 @@ func (s *embeddingServer) StreamEmbeddings(stream pb.EmbeddingService_StreamEmbe
 }
 
 func (s *embeddingServer) Health(ctx context.Context, req *pb.HealthRequest) (*pb.HealthResponse, error) {
-	ollamaURL := strings.TrimRight(s.cfg.OllamaURL, "/")
-	ollamaReachable := false
-	httpReq, _ := http.NewRequestWithContext(ctx, "GET", ollamaURL+"/api/tags", nil)
-	if resp, err := httpClient.Do(httpReq); err == nil {
-		ollamaReachable = resp.StatusCode == http.StatusOK
-		resp.Body.Close()
-	}
-
-	modelLoaded := false
-	if ollamaReachable {
-		var running ollamaPsV2
-		if err := strictJSONGetV2(ctx, ollamaURL+"/api/ps", &running); err == nil {
-			for _, model := range running.Models {
-				if model.Name == s.cfg.EmbedModel || model.Model == s.cfg.EmbedModel {
-					modelLoaded = true
-					break
-				}
-			}
-		}
-	}
-
+	readback := s.modelRuntimeReadbackV1(ctx)
 	status := "healthy"
-	if !ollamaReachable {
+	if !readback.BackendReachable {
 		status = "unhealthy"
 	}
 
 	return &pb.HealthResponse{
 		Status:      status,
-		ModelLoaded: fmt.Sprintf("%v", modelLoaded),
-		Device:      "cpu", // Ollama handles GPU internally
+		ModelLoaded: fmt.Sprintf("%v", readback.ModelLoaded),
+		Device:      readback.Device,
 		Timestamp:   time.Now().Unix(),
 	}, nil
 }
@@ -372,38 +352,99 @@ func (s *embeddingServer) GetStats(ctx context.Context, req *pb.StatsRequest) (*
 	if total > 0 {
 		avgMs = float32(totalTimeMs) / float32(total)
 	}
+	readback := s.modelRuntimeReadbackV1(ctx)
 
 	return &pb.StatsResponse{
 		ModelName:            s.cfg.EmbedModel,
-		Device:               "ollama-gpu",
-		IsLoaded:             true,
-		EmbeddingDimension:   768,
+		Device:               readback.Device,
+		IsLoaded:             readback.ModelLoaded,
+		EmbeddingDimension:   int32(readback.EmbeddingDimension),
 		BatchSize:            int32(s.cfg.BatchMax),
 		MaxLength:            512,
 		TotalRequests:        total,
 		TotalProcessingTimeS: float32(totalTimeMs) / 1000.0,
 		AvgProcessingTimeMs:  avgMs,
-		GpuAvailable:         true,
+		GpuAvailable:         readback.GPUActive,
 		UptimeSeconds:        int32(time.Since(s.startTime).Seconds()),
 	}, nil
 }
 
+type modelRuntimeReadbackV1 struct {
+	BackendReachable   bool
+	ModelAvailable     bool
+	ModelLoaded        bool
+	ModelID            string
+	ArtifactRevision   string
+	EmbeddingDimension int
+	Device             string
+	GPUActive          bool
+}
+
+func (s *embeddingServer) modelRuntimeReadbackV1(ctx context.Context) modelRuntimeReadbackV1 {
+	result := modelRuntimeReadbackV1{
+		ModelID: s.cfg.EmbedModel,
+		Device:  "ollama-unavailable",
+	}
+	ollamaURL := strings.TrimRight(s.cfg.OllamaURL, "/")
+	var tags ollamaTagsV2
+	if err := strictJSONGetV2(ctx, ollamaURL+"/api/tags", &tags); err != nil {
+		return result
+	}
+	result.BackendReachable = true
+	for _, model := range tags.Models {
+		if model.Name != s.cfg.EmbedModel {
+			continue
+		}
+		result.ModelAvailable = true
+		result.ArtifactRevision = model.Digest
+		result.EmbeddingDimension = model.Details.EmbeddingLength
+		break
+	}
+	if !result.ModelAvailable {
+		result.Device = "ollama-model-unavailable"
+		return result
+	}
+
+	var running ollamaPsV2
+	if err := strictJSONGetV2(ctx, ollamaURL+"/api/ps", &running); err != nil {
+		result.Device = "ollama-residency-unavailable"
+		return result
+	}
+	for _, model := range running.Models {
+		if model.Name != s.cfg.EmbedModel && model.Model != s.cfg.EmbedModel {
+			continue
+		}
+		if result.ArtifactRevision != "" && model.Digest != "" && model.Digest != result.ArtifactRevision {
+			continue
+		}
+		result.ModelLoaded = true
+		result.GPUActive = model.SizeVRAM > 0
+		result.Device = "ollama"
+		if result.GPUActive {
+			result.Device = "ollama-gpu"
+		}
+		return result
+	}
+	result.Device = "ollama-model-unloaded"
+	return result
+}
+
 type readyProbeResult struct {
-	Ready               bool    `json:"ready"`
-	Status              string  `json:"status"`
-	Backend             string  `json:"backend"`
-	BackendURL          string  `json:"backend_url"`
-	ModelID             string  `json:"model_id"`
-	RepresentationID    string  `json:"representation_id"`
-	EmbeddingDimension  int     `json:"embedding_dimension"`
-	Normalized          bool    `json:"normalized"`
-	VectorNorm          float64 `json:"vector_norm"`
-	BackendReachable    bool    `json:"backend_reachable"`
-	ModelAvailable      bool    `json:"model_available"`
-	WarmupSucceeded     bool    `json:"warmup_succeeded"`
-	WarmupVectorLength  int     `json:"warmup_vector_length"`
-	RedisHealthy        bool    `json:"redis_healthy"`
-	Timestamp           int64   `json:"timestamp"`
+	Ready              bool    `json:"ready"`
+	Status             string  `json:"status"`
+	Backend            string  `json:"backend"`
+	BackendURL         string  `json:"backend_url"`
+	ModelID            string  `json:"model_id"`
+	RepresentationID   string  `json:"representation_id"`
+	EmbeddingDimension int     `json:"embedding_dimension"`
+	Normalized         bool    `json:"normalized"`
+	VectorNorm         float64 `json:"vector_norm"`
+	BackendReachable   bool    `json:"backend_reachable"`
+	ModelAvailable     bool    `json:"model_available"`
+	WarmupSucceeded    bool    `json:"warmup_succeeded"`
+	WarmupVectorLength int     `json:"warmup_vector_length"`
+	RedisHealthy       bool    `json:"redis_healthy"`
+	Timestamp          int64   `json:"timestamp"`
 }
 
 func vectorNorm(vec []float32) float64 {
@@ -480,9 +521,26 @@ func (s *embeddingServer) probeReady(ctx context.Context) readyProbeResult {
 
 func httpHealthHandler(srv *embeddingServer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		resp, _ := srv.Health(r.Context(), &pb.HealthRequest{})
+		readback := srv.modelRuntimeReadbackV1(r.Context())
+		status := "healthy"
+		if !readback.BackendReachable {
+			status = "unhealthy"
+		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"status":                  status,
+			"model_loaded":            fmt.Sprintf("%v", readback.ModelLoaded),
+			"device":                  readback.Device,
+			"timestamp":               time.Now().Unix(),
+			"backend_reachable":       readback.BackendReachable,
+			"model_available":         readback.ModelAvailable,
+			"requested_model_loaded":  readback.ModelLoaded,
+			"model_id":                readback.ModelID,
+			"model_artifact_revision": readback.ArtifactRevision,
+			"embedding_dimension":     readback.EmbeddingDimension,
+			"provider":                "ollama",
+			"gpu_active":              readback.GPUActive,
+		})
 	}
 }
 

@@ -1143,6 +1143,8 @@
     "atlas:contract:migrate": "node ../scripts/atlas/create-atlas-contract-fields.mjs",
     "atlas:backfill:packet-lineage": "node ../scripts/atlas/backfill-packet-lineage.mjs --apply",
     "atlas:backfill:packet-lineage:dry": "node ../scripts/atlas/backfill-packet-lineage.mjs",
+    "atlas:chunk-lineage:mirror:v2:dry": "node ../scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+    "atlas:chunk-lineage:mirror:v2:apply": "node ../scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs --apply",
     "atlas:replay:breadth:50": "node ../scripts/atlas/run-replay-breadth-50.mjs",
     "atlas:telemetry:evidence-quality:dry": "node ../scripts/atlas/telemetry-evidence-quality-layer.mjs",
     "atlas:telemetry:evidence-quality": "node ../scripts/atlas/telemetry-evidence-quality-layer.mjs --apply",

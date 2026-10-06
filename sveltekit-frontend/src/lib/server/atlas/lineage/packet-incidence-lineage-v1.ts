@@ -26,6 +26,7 @@ export interface PacketIncidenceIdentityV1 {
 
 export interface PacketIncidenceLineageV1 extends PacketIncidenceIdentityV1 {
   schema: typeof PACKET_INCIDENCE_LINEAGE_SCHEMA_V1;
+  canonicalAuthority: false;
   inputChecksum: string;
   lineageChecksum: string;
 }
@@ -35,6 +36,7 @@ const lineageDigest = z.string().regex(/^sha256:[0-9a-f]{64}$/i);
 
 export const PacketIncidenceLineageV1Schema = z.object({
   schema: z.literal(PACKET_INCIDENCE_LINEAGE_SCHEMA_V1),
+  canonicalAuthority: z.literal(false),
   packetKey: nonEmptyString,
   canonicalId: nonEmptyString,
   sourceRevision: nonEmptyString,
@@ -94,6 +96,7 @@ export function computeInputChecksumV1(i: PacketIncidenceIdentityV1): string {
 export function computeLineageChecksumV1(i: PacketIncidenceIdentityV1, inputChecksum: string): string {
   return sha256(canonicalJson({
     schema: PACKET_INCIDENCE_LINEAGE_SCHEMA_V1,
+    canonicalAuthority: false,
     packets: [
       { packetKey: i.packetKey, canonicalId: i.canonicalId, sourceRevision: i.sourceRevision },
       { packetKey: i.neighborPacketKey, canonicalId: i.neighborCanonicalId, sourceRevision: i.neighborSourceRevision },
@@ -122,7 +125,7 @@ export function buildPacketIncidenceLineageV1(i: PacketIncidenceIdentityV1): Pac
   const evidenceRefs = sortedEvidence(i.evidenceRefs.filter(nonEmpty));
   const sealed = { ...i, evidenceRefs };
   const inputChecksum = computeInputChecksumV1(sealed);
-  return { schema: PACKET_INCIDENCE_LINEAGE_SCHEMA_V1, ...sealed, inputChecksum, lineageChecksum: computeLineageChecksumV1(sealed, inputChecksum) };
+  return { schema: PACKET_INCIDENCE_LINEAGE_SCHEMA_V1, canonicalAuthority: false, ...sealed, inputChecksum, lineageChecksum: computeLineageChecksumV1(sealed, inputChecksum) };
 }
 
 /** What the verifier knows from Postgres at the exact revisions (supplied by the caller; this module reads nothing). */
