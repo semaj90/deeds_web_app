@@ -7,6 +7,10 @@ import {
   buildGepaShadowInputV1,
   buildGroupRelativeCandidateEvalV1,
   buildNextActionProposalV1,
+  buildQueryExecutionPlanV1,
+  buildExecutorRequestV1,
+  QueryExecutionPlanV1Schema,
+  ExecutorRequestV1Schema,
 } from './agent-control-plane-v1.js';
 
 const digest = `sha256:${'a'.repeat(64)}`;
@@ -178,5 +182,142 @@ describe('owner audit', () => {
     expect(agentControlPlaneOwnerAuditV1.thisModuleOwnsCanonicalEvidence).toBe(false);
     expect(agentControlPlaneOwnerAuditV1.thisModuleOwnsModelWeights).toBe(false);
     expect(agentControlPlaneOwnerAuditV1.thisModuleOwnsPolicyPromotion).toBe(false);
+  });
+});
+
+
+describe('QueryExecutionPlanV1', () => {
+  const base = {
+    requestId: 'req:1',
+    queryChecksum: digest,
+    workspaceRevision: 'workspace:v1',
+    policyRevision: 'policy:v1',
+    taxonomyRevision: 'taxonomy:v1',
+    retrievalParameterPlanRef: 'artifact:retrieval-plan',
+    traversalBudgetRef: 'artifact:traversal-budget',
+    contextManifestChecksum: digest,
+    stopConditions: ['stop when evidence is sufficient'],
+  };
+
+  it('accepts an acyclic bounded helper plan', () => {
+    const plan = buildQueryExecutionPlanV1({
+      ...base,
+      nodes: [
+        {
+          nodeId: 'lexical',
+          helperId: 'RG_EXACT_SEARCH',
+          required: true,
+          dependsOn: [],
+          executorClass: 'TS_CPU_WORKER',
+          transport: 'LOCAL',
+          parametersChecksum: digest,
+          inputArtifactRefs: [],
+          evidenceRefs: ['evidence:q'],
+          outputSchemaRef: 'atlas.lexical-observation.v1',
+          maxTokens: 128,
+          timeoutMs: 2_000,
+        },
+        {
+          nodeId: 'gpu-rerank',
+          helperId: 'GPU_FEATURE_RERANK',
+          required: false,
+          dependsOn: ['lexical'],
+          executorClass: 'FASTAPI_GPU',
+          transport: 'HTTP_JSON',
+          parametersChecksum: digest,
+          inputArtifactRefs: ['artifact:arrow:candidate-features'],
+          evidenceRefs: ['evidence:q'],
+          outputSchemaRef: 'atlas.rerank-observation.v1',
+          maxTokens: 0,
+          timeoutMs: 10_000,
+        },
+      ],
+    });
+    expect(plan.nodes).toHaveLength(2);
+    expect(plan.canonicalAuthority).toBe(false);
+  });
+
+  it('rejects cyclic dependency graphs', () => {
+    const parsed = QueryExecutionPlanV1Schema.safeParse({
+      schema: 'atlas.query-execution-plan.v1',
+      ...base,
+      nodes: [
+        {
+          nodeId: 'a',
+          helperId: 'A',
+          required: true,
+          dependsOn: ['b'],
+          executorClass: 'LOCAL_READ_ONLY',
+          transport: 'LOCAL',
+          parametersChecksum: digest,
+          inputArtifactRefs: [],
+          evidenceRefs: [],
+          outputSchemaRef: 'x',
+          maxTokens: 0,
+          timeoutMs: 1000,
+        },
+        {
+          nodeId: 'b',
+          helperId: 'B',
+          required: true,
+          dependsOn: ['a'],
+          executorClass: 'LOCAL_READ_ONLY',
+          transport: 'LOCAL',
+          parametersChecksum: digest,
+          inputArtifactRefs: [],
+          evidenceRefs: [],
+          outputSchemaRef: 'y',
+          maxTokens: 0,
+          timeoutMs: 1000,
+        },
+      ],
+      canonicalAuthority: false,
+    });
+    expect(parsed.success).toBe(false);
+  });
+});
+
+describe('ExecutorRequestV1', () => {
+  const base = {
+    requestId: 'req:1',
+    executionId: 'exec:1',
+    nodeId: 'gpu-rerank',
+    helperId: 'GPU_FEATURE_RERANK',
+    workspaceRevision: 'workspace:v1',
+    policyRevision: 'policy:v1',
+    parametersChecksum: digest,
+    evidenceRefs: ['evidence:q'],
+    expectedOutputSchemaRef: 'atlas.rerank-observation.v1',
+    timeoutMs: 10_000,
+  };
+
+  it('requires RTX/GPU execution to consume artifact references', () => {
+    expect(() => buildExecutorRequestV1({
+      ...base,
+      executorClass: 'FASTAPI_GPU',
+      transport: 'HTTP_JSON',
+      inputArtifactRefs: [],
+    })).toThrow();
+
+    const request = buildExecutorRequestV1({
+      ...base,
+      executorClass: 'FASTAPI_GPU',
+      transport: 'HTTP_JSON',
+      inputArtifactRefs: ['artifact:mmap:feature-matrix'],
+    });
+    expect(request.payloadPolicy).toBe('REFERENCES_ONLY');
+    expect(request.canonicalAuthority).toBe(false);
+  });
+
+  it('rejects gRPC executors sent over non-gRPC transports', () => {
+    expect(ExecutorRequestV1Schema.safeParse({
+      schema: 'atlas.executor-request.v1',
+      ...base,
+      executorClass: 'GRPC_GPU',
+      transport: 'HTTP_JSON',
+      inputArtifactRefs: ['artifact:arrow:matrix'],
+      payloadPolicy: 'REFERENCES_ONLY',
+      canonicalAuthority: false,
+    }).success).toBe(false);
   });
 });
