@@ -34,6 +34,28 @@ model-training path.
   TraversalBudget → ContextManifest → NextActionProposal → existing
   AgentActionProposal/validator → LearningOutcome → GepaShadowInput. No datastore write,
   prompt promotion, policy promotion, or model-weight update is allowed in this gate.
+- [ ] CONTROL-QUERY-PLAN-06 — added composition-only `QueryExecutionPlanV1` over the
+  existing retrieval-plan/traversal-budget/context-manifest owners. Nodes bind helper id,
+  dependencies, executor class, transport, parameter checksum, artifact/evidence refs,
+  output schema, token budget and timeout; duplicate/unknown/self/cyclic dependencies fail
+  closed. This is not a second planner or scheduler. **IMPLEMENTED_UNPROVEN** until focused tests run.
+- [ ] CONTROL-EXECUTOR-07 — added `ExecutorRequestV1` for TypeScript → local/FastAPI/gRPC
+  execution. The envelope is `REFERENCES_ONLY`: Arrow IPC/mmap/GPU-resident tensors stay in
+  the numeric data plane and are referenced by artifact id/checksum rather than serialized into
+  JSON/gRPC requests. GPU/RTX is an executor dimension only; GPU requests require an artifact
+  reference and gRPC executors require gRPC transport. **IMPLEMENTED_UNPROVEN** until tests and
+  one bounded service parity smoke run.
+- [ ] CONTROL-VALIDATION-08 — hardened the existing
+  `agentic-file-compiler/validation-barrier.ts` owner rather than adding a peer validator fabric.
+  Required validators now pass only with command, exit code, stdout/stderr digests, evidence refs,
+  producer revision, and `exitCode===0` for PASS/accepted WARN. Duplicate validators and missing
+  execution evidence fail closed. **IMPLEMENTED_UNPROVEN** until focused Vitest plus AFC-17 runner
+  proof; this patch does not itself establish Tree-sitter/typecheck/test execution.
+- [ ] CONTROL-GPU-PARITY-09 — reuse the existing CPU feature-matrix/GEMM oracle and RAPIDS
+  sidecar `:8098` exact-KNN/GPU contracts. Do not create another RTX worker. Prove one frozen
+  CandidateOrdinal/feature artifact can be referenced through `ExecutorRequestV1`, executed by
+  the existing accelerator sidecar, and read back with ordinal/checksum/numerical parity against
+  the CPU oracle. FastAPI/gRPC are transports/executor surfaces, never identity or retrieval votes.
 
 ## Taxonomy-scoped retrieval planning — 2026-09-06
 
