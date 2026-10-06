@@ -1,5 +1,67 @@
 # Tasks — Parent Atlas Candidate Feature Execution Fabric
 
+## Agent control-plane convergence — 2026-10-06
+
+This tranche fills only the missing coordination contracts. It explicitly reuses the
+existing RetrievalParameterPlanV1, TraversalBudgetV1, AgentActionProposalV1,
+PrimeAgentRuntimeV1, AgentReplayManifestV1, and LearningOutcomeV1 owners. It does
+not add a scheduler, memory store, canonical evidence owner, reward authority, or
+model-training path.
+
+- [ ] CONTROL-NEXT-ACTION-01 — added `NextActionProposalV1` in
+  `sveltekit-frontend/src/lib/server/atlas/agentic/agent-control-plane-v1.ts`.
+  It binds unresolved question, proposed capability, evidence needed, information-gain
+  estimate, stop condition, planner/policy revisions, ContextManifest checksum, and
+  remaining token/tool budgets. Schema rejects proposals whose estimated cost exceeds
+  remaining budgets. **IMPLEMENTED_UNPROVEN** until focused Vitest runs on the workstation.
+- [ ] CONTROL-GROUP-EVAL-02 — added `GroupRelativeCandidateEvalV1` as a GRPO-shaped
+  evaluation receipt only. It deterministically ranks validator-owned rewards, requires
+  validator receipt refs, records cost/latency/mutation size, and hard-codes
+  `trainingMode='NO_WEIGHT_UPDATE'`. It does not compute reward truth or update model
+  weights. **IMPLEMENTED_UNPROVEN** until focused Vitest runs.
+- [ ] CONTROL-GEPA-SHADOW-03 — added `GepaShadowInputV1` consuming sealed
+  LearningOutcome and validator-feedback references plus prompt/eval/metric/optimizer
+  revisions. It is hard-coded `SHADOW_ONLY`, `promotionAllowed=false`,
+  `writesAllowed=false`, and `canonicalAuthority=false`. **IMPLEMENTED_UNPROVEN**
+  until focused Vitest runs and the existing TypeScript ContextManifest → Python DSPy
+  guard is independently proven.
+- [ ] CONTROL-OWNER-AUDIT-04 — owner audit embedded in the module asserts that
+  RetrievalParameterPlanV1, TraversalBudgetV1, AgentActionProposalV1, and
+  LearningOutcomeV1 remain their existing owners and that the new module owns no
+  canonical evidence, task state, model weights, or policy promotion.
+- [ ] CONTROL-E2E-05 — after upstream current-revision candidate/graph/semantic gates
+  close, prove one read-only flow: QueryAnalysis → RetrievalParameterPlan →
+  TraversalBudget → ContextManifest → NextActionProposal → existing
+  AgentActionProposal/validator → LearningOutcome → GepaShadowInput. No datastore write,
+  prompt promotion, policy promotion, or model-weight update is allowed in this gate.
+- [ ] CONTROL-QUERY-PLAN-06 — added composition-only `QueryExecutionPlanV1` over the
+  existing retrieval-plan/traversal-budget/context-manifest owners. Nodes bind helper id,
+  dependencies, executor class, transport, parameter checksum, artifact/evidence refs,
+  output schema, token budget and timeout; duplicate/unknown/self/cyclic dependencies fail
+  closed. This is not a second planner or scheduler. **IMPLEMENTED_UNPROVEN** until focused tests run.
+- [ ] CONTROL-EXECUTOR-07 — added `ExecutorRequestV1` for TypeScript → local/FastAPI/gRPC
+  execution. The envelope is `REFERENCES_ONLY`: Arrow IPC/mmap/GPU-resident tensors stay in
+  the numeric data plane and are referenced by artifact id/checksum rather than serialized into
+  JSON/gRPC requests. GPU/RTX is an executor dimension only; GPU requests require an artifact
+  reference and gRPC executors require gRPC transport. **IMPLEMENTED_UNPROVEN** until tests and
+  one bounded service parity smoke run.
+- [ ] CONTROL-VALIDATION-08 — hardened the existing
+  `agentic-file-compiler/validation-barrier.ts` owner rather than adding a peer validator fabric.
+  Required validators now pass only with command, exit code, stdout/stderr digests, evidence refs,
+  producer revision, and `exitCode===0` for PASS/accepted WARN. Duplicate validators and missing
+  execution evidence fail closed. **IMPLEMENTED_UNPROVEN** until focused Vitest plus AFC-17 runner
+  proof; this patch does not itself establish Tree-sitter/typecheck/test execution.
+- [ ] CONTROL-GPU-PARITY-09 — reuse the existing CPU feature-matrix/GEMM oracle and RAPIDS
+  sidecar `:8098` exact-KNN/GPU contracts. Do not create another RTX worker. Prove one frozen
+  CandidateOrdinal/feature artifact can be referenced through `ExecutorRequestV1`, executed by
+  the existing accelerator sidecar, and read back with ordinal/checksum/numerical parity against
+  the CPU oracle. FastAPI/gRPC are transports/executor surfaces, never identity or retrieval votes.
+- [ ] CONTROL-PY-BOUNDARY-10 — added strict Pydantic boundary mirrors for
+  `ExecutorRequestV1` and `GepaShadowInputV1` under `python/atlas_contract_parity/` with focused
+  Python tests. Zod/TypeScript remains the owner; Python only fails closed before FastAPI/gRPC/DSPy
+  execution. **IMPLEMENTED_UNPROVEN** until pytest runs and Zod↔Pydantic fixture parity is wired into
+  the existing parity registry/exporter; do not register or promote these mirrors before that parity gate.
+
 ## Taxonomy-scoped retrieval planning — 2026-09-06
 
 These are additive, deterministic request artifacts. They do not create a taxonomy
@@ -1622,3 +1684,6 @@ an authorization or completion receipt for remaining gates.
 - [ ] Define and prove a versioned stream receipt/terminal-event contract (or a separately bound unary receipt) before any stream consumer promotes chunk lineage; reconcile/remove the stale frontend proto only after its actual generation/runtime consumers are identified.
 - [x] Syntax checks, static receipt invariants, stale-owner-phrase search, strict OpenSpec validation, and scoped diff checks pass. No database writes, embedding calls, projection/cache writes, or container changes.
 - [ ] Do not redirect or run any writer from this census. Reconcile every producer/reader, verify exact input/model/tokenizer/representation provenance, then obtain explicit authorization and independent readback before canonical materialization.
+
+- [ ] CONTROL-VITERBI-11 — added `mcp-tool-viterbi-frame-compiler-v1.ts` as the missing deterministic frame compiler over the existing admitted MCP tool registry and generic `decodeKBestViterbi()` decoder. It scores only supplied registry metadata and routing observations (domain, intent, phase, evidence state, capabilities, historical success/latency/cost), excludes write-capable tools, and performs no Neo4j/Qdrant/database lookup. **IMPLEMENTED_UNPROVEN** until focused Vitest runs and the live registry revision/checksum is proven current.
+- [ ] CONTROL-VITERBI-12 — keep the existing `mcp-tool-viterbi-bridge-v1.ts` V2 proposal boundary as owner for server authority, registry/policy revisions, tool schema digest and approval gating. Frame compilation must not authorize execution; Viterbi remains `CHALLENGER_ONLY` until a frozen current MCP registry plus held-out routing comparison proves lift over the deterministic selector.
