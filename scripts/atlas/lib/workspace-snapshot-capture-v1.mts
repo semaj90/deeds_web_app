@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, lstatSync, realpathSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
+import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION, type WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 export const hash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 const sourceRef = (value: string) => value.replaceAll('\\', '/').replace(/^\/+/, '').replace(/^\.\//, '');
@@ -29,7 +29,7 @@ function state(root: string) {
   };
 }
 
-export function observeSnapshot(rootInput: string, workspaceId: string) {
+export function observeSnapshot(rootInput: string, workspaceId: string, options: { digestCache?: WorkspaceDigestCacheV1 } = {}) {
   const root = realpathSync(rootInput);
   if (realpathSync(git(root, ['rev-parse', '--show-toplevel']).trim()) !== root) throw new Error('ROOT_IS_NOT_REPOSITORY_ROOT');
   const repositories: any[] = [];
@@ -56,6 +56,7 @@ export function observeSnapshot(rootInput: string, workspaceId: string) {
     const observed = materializeWorkspaceRevisionOriginV1({
       workspaceRoot: directory, repositoryId: workspaceId,
       producerRevision: policy.revision, generatedAt: '2000-01-01T00:00:00.000Z',
+      digestCache: options.digestCache,
     });
     const deletedTracked: string[] = [];
     for (const row of observed.bindings) {
@@ -126,10 +127,13 @@ export function captureStableSnapshot(
   const maxAttempts = Number.isInteger(options.maxAttempts) && (options.maxAttempts ?? 0) > 0
     ? options.maxAttempts!
     : 3;
-  let first = observeSnapshot(root, workspaceId);
+  // One in-memory digest cache is shared by the scans of this capture so the confirming scan only
+  // re-stats unchanged files. validateSnapshot() never uses it: byte readback stays the oracle.
+  const digestCache: WorkspaceDigestCacheV1 = new Map();
+  let first = observeSnapshot(root, workspaceId, { digestCache });
   let transientDriftObserved = false;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const second = observeSnapshot(root, workspaceId);
+    const second = observeSnapshot(root, workspaceId, { digestCache });
     const report = sealSnapshot(first, second);
     const drifted = report.violations.includes('WORKSPACE_CHANGED_BETWEEN_SCANS');
     if (!drifted || attempt === maxAttempts) {
