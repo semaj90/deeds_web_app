@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmDefinitionHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmWorktreeReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
+import { makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 
 const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
@@ -198,8 +198,13 @@ describe('CBM WORKTREE_STRUCTURAL definition handler (CBM-ADMISSION-01)', () => 
     }],
     total: 2, returned: 2, count: 2, has_more: false, truncated: false,
   });
-  const mk = (raw: string, isFresh?: (f: string) => Promise<boolean | null>) =>
-    makeCbmDefinitionHandlerV1({ runTool: async () => raw, project: 'P', symbol: 'buildLearningOutcomeV1', isFresh });
+  const binding = (same: boolean) => ({
+    indexedSourceRevision: 'source:r1', currentSourceRevision: same ? 'source:r1' : 'source:r2',
+    indexedContentDigest: 'sha256:a', currentContentDigest: same ? 'sha256:a' : 'sha256:b',
+    indexedWorkspaceRevision: 'workspace:r1', currentWorkspaceRevision: same ? 'workspace:r1' : 'workspace:r2',
+  });
+  const mk = (raw: string, resolveSnapshotBinding?: (f: string) => Promise<ReturnType<typeof binding> | null>) =>
+    makeCbmDefinitionHandlerV1({ runTool: async () => raw, project: 'P', symbol: 'buildLearningOutcomeV1', resolveSnapshotBinding });
 
   it('parses the real JSON shape, keeps exact-name definitions only, and stays a non-authoritative tier-1 seed', async () => {
     const r = (await mk(REAL)({ nodeId: 'WORKTREE_STRUCTURAL', inputs: {} })) as CbmWorktreeReceiptV1;
@@ -212,13 +217,15 @@ describe('CBM WORKTREE_STRUCTURAL definition handler (CBM-ADMISSION-01)', () => 
     expect(r.observations[0].qualifiedName).toBe('P.lib.server.atlas.agentic.contracts.learning-outcome-v1.buildLearningOutcomeV1');
   });
 
-  it('marks stale when the freshness guard says the file changed after indexing, and treats a throwing guard as unknown', async () => {
-    const stale = (await mk(REAL, async () => false)({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+  it('uses exact revision and digest binding for freshness; missing or failed proof stays unknown', async () => {
+    const stale = (await mk(REAL, async () => binding(false))({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
     expect(stale.observations[0].stale).toBe(true);
-    const fresh = (await mk(REAL, async () => true)({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    const fresh = (await mk(REAL, async () => binding(true))({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
     expect(fresh.observations[0].stale).toBe(false);
-    const unknown = (await mk(REAL, async () => { throw new Error('x'); })({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
-    expect(unknown.observations[0].stale).toBeNull();
+    const missing = (await mk(REAL, async () => ({ ...binding(true), indexedContentDigest: null }))({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(missing.observations[0].stale).toBeNull();
+    const failed = (await mk(REAL, async () => { throw new Error('x'); })({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(failed.observations[0].stale).toBeNull();
   });
 
   it('empty result is an empty observation list (UNKNOWN, not ABSENT); malformed output fails loudly', async () => {
@@ -227,5 +234,110 @@ describe('CBM WORKTREE_STRUCTURAL definition handler (CBM-ADMISSION-01)', () => 
     expect(empty.emptyMeansUnknown).toBe(true);
     await expect(mk('results: 1 (cols: qn label)')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/NOT_JSON/);
     await expect(mk(JSON.stringify({ cols: ['x'], groups: [] }))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/UNEXPECTED_COLUMNS/);
+  });
+});
+
+describe('CBM WORKTREE_STRUCTURAL outline and snippet adapters', () => {
+  const project = 'C-Users-james-Videos-deeds-web-app-sveltekit-frontend-src';
+  const relativeFile = 'lib/server/atlas/agentic/contracts/learning-outcome-v1.ts';
+  const qn = `${project}.lib.server.atlas.agentic.contracts.learning-outcome-v1.buildLearningOutcomeV1`;
+  const outlineJson = JSON.stringify({
+    file_path: relativeFile,
+    cols: ['name', 'label', 'lines', 'qn'],
+    rows: [['buildLearningOutcomeV1', 'Function', '118-142', qn]],
+    total: 1, offset: 0, limit: 100, returned: 1, has_more: false,
+  });
+  const snippetJson = JSON.stringify({
+    name: 'buildLearningOutcomeV1', qualified_name: qn, label: 'Function',
+    file_path: `C:/repo/sveltekit-frontend/src/${relativeFile}`,
+    start_line: 118, end_line: 142, source_mode: 'full', source: 'export function buildLearningOutcomeV1() {}',
+    callers: 2, callees: 2,
+  });
+
+  it('parses the real outline JSON rows and binds them to the requested relative path', async () => {
+    const handler = makeCbmFileOutlineHandlerV1({ runTool: async (_tool, args) => {
+      expect(args).toMatchObject({ project, file_path: relativeFile, format: 'json', offset: 0 });
+      return outlineJson;
+    }, project, filePath: relativeFile });
+    const result = await handler({ nodeId: 'WORKTREE_STRUCTURAL', inputs: {} }) as CbmOutlineReceiptV1;
+    expect(result).toMatchObject({ queryClass: 'OUTLINE', sourceRef: relativeFile, stale: null, emptyMeansUnknown: true, canonicalAuthority: false });
+    expect(result.symbols).toEqual([{ symbol: 'buildLearningOutcomeV1', label: 'Function', span: { startLine: 118, endLine: 142 }, qualifiedName: qn }]);
+  });
+
+  it('rejects path mismatch, traversal, malformed rows, and unbounded limits', async () => {
+    const make = (raw: string, filePath = relativeFile, maxSymbols = 100) => makeCbmFileOutlineHandlerV1({
+      runTool: async () => raw, project, filePath, maxSymbols,
+    });
+    await expect(make(outlineJson, '../outside.ts')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_RELATIVE_PATH/);
+    await expect(make(outlineJson.replace(relativeFile, 'other.ts'))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/UNEXPECTED_SHAPE/);
+    await expect(make(JSON.stringify({ file_path: relativeFile, cols: ['name', 'label', 'lines', 'qn'], rows: [['broken']], total: 1 }))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/MALFORMED_ROW/);
+    await expect(make(outlineJson, relativeFile, 501)({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_LIMIT/);
+  });
+
+  it('parses snippet JSON, constrains its returned path to the configured project root, and caps source text', async () => {
+    const handler = makeCbmCodeSnippetHandlerV1({
+      runTool: async (_tool, args) => {
+        expect(args).toMatchObject({ project, qualified_name: qn, format: 'json' });
+        return snippetJson;
+      }, project, projectRoot: 'C:/repo/sveltekit-frontend/src', qualifiedName: qn, maxChars: 16,
+    });
+    const result = await handler({ nodeId: 'WORKTREE_STRUCTURAL', inputs: {} }) as CbmSnippetReceiptV1;
+    expect(result).toMatchObject({
+      queryClass: 'SNIPPET', sourceRef: relativeFile, symbol: 'buildLearningOutcomeV1',
+      span: { startLine: 118, endLine: 142 }, source: 'export function ', sourceTruncated: true,
+      stale: null, identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY', emptyMeansUnknown: true, canonicalAuthority: false,
+    });
+  });
+
+  it('rejects snippets outside the configured root and malformed JSON', async () => {
+    const make = (raw: string) => makeCbmCodeSnippetHandlerV1({
+      runTool: async () => raw, project, projectRoot: 'C:/repo/sveltekit-frontend/src', qualifiedName: qn,
+    });
+    await expect(make(snippetJson.replace('C:/repo/sveltekit-frontend/src/', 'C:/other/'))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/OUTSIDE_PROJECT/);
+    await expect(make('{')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/NOT_JSON/);
+  });
+});
+
+describe('CBM WORKTREE_STRUCTURAL imports candidate adapter', () => {
+  const project = 'C-Users-james-Videos-deeds-web-app-sveltekit-frontend-src';
+  const requestedPath = 'lib/agent/bounded-tool-caller.ts';
+  const resultJson = JSON.stringify({
+    columns: ['source.name', 'source.label', 'source.path', 'target.name', 'target.label', 'target.path'],
+    rows: [['bounded-tool-caller.spec.ts', 'File', 'lib/agent/bounded-tool-caller.spec.ts', 'bounded-tool-caller.ts', 'Module', requestedPath]],
+    returned: 1, total: 1, total_relation: 'eq', has_more: false, truncated: false,
+  });
+
+  it('parses a bounded JSON IMPORTS result as a non-authoritative candidate', async () => {
+    const handler = makeCbmImportCandidateHandlerV1({
+      runTool: async (_tool, args) => {
+        expect(args.project).toBe(project);
+        expect(args.format).toBe('json');
+        expect(String(args.query)).toContain(`target.path = "${requestedPath}"`);
+        expect(String(args.query)).toContain('LIMIT 50');
+        return resultJson;
+      }, project, filePath: requestedPath, direction: 'IMPORTERS_OF',
+    });
+    const result = await handler({ nodeId: 'WORKTREE_STRUCTURAL', inputs: {} }) as CbmImportCandidateReceiptV1;
+    expect(result).toMatchObject({
+      queryClass: 'IMPORTS', trustTier: 2, direction: 'IMPORTERS_OF', requestedPath,
+      graphSnapshotBound: false, emptyMeansUnknown: true, canonicalAuthority: false, total: 1, truncated: false,
+      candidates: [{
+        fromPath: 'lib/agent/bounded-tool-caller.spec.ts', fromLabel: 'File',
+        toPath: requestedPath, toLabel: 'Module', relation: 'IMPORTS', identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY',
+      }],
+    });
+  });
+
+  it('keeps empty results unknown and rejects malformed, mismatched, or unsafe input', async () => {
+    const make = (raw: string, filePath = requestedPath, maxRows = 50) => makeCbmImportCandidateHandlerV1({
+      runTool: async () => raw, project, filePath, direction: 'IMPORTERS_OF', maxRows,
+    });
+    const empty = await make(JSON.stringify({ columns: ['source.name', 'source.label', 'source.path', 'target.name', 'target.label', 'target.path'], rows: [], total: 0 }))({ nodeId: 'W', inputs: {} }) as CbmImportCandidateReceiptV1;
+    expect(empty.candidates).toEqual([]);
+    expect(empty.emptyMeansUnknown).toBe(true);
+    await expect(make(resultJson.replace(requestedPath, 'other.ts'))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/PATH_MISMATCH/);
+    await expect(make('{')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/NOT_JSON/);
+    await expect(make(resultJson, '../outside.ts')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_RELATIVE_PATH/);
+    await expect(make(resultJson, requestedPath, 201)({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_LIMIT/);
   });
 });

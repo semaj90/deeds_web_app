@@ -1,4 +1,5 @@
 import type { ContextDagNodeHandlerV1 } from './context-tool-dag-contracts.js';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 
 /**
  * CONTEXT-DAG-01 handler adapters. Thin and read-only: every dependency is injected, so these never spawn
@@ -21,7 +22,7 @@ export const PRE_AGENT_STAGE_OWNER_MAP_V1: Readonly<Record<string, { status: Sta
   SEMANTIC_ROUTE: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveQdrant (dense_768, codebase_chunks_768)', adapter: 'makeCandidateLaneHandlerV1', note: 'embeds the query then Qdrant ANN (read-only network calls); SearchRuntime remains the sole fusion owner' },
   MEMORY_PRIOR: { status: 'NEEDS_OWNER', owner: 'memory/engram-memory.ts (not inspected)', adapter: null, note: 'Engram today, Claude-Mem adapter later; read function unverified' },
   GRAPH_EXPANSION: { status: 'NEEDS_OWNER', owner: 'ace/graph-expander.ts::fetchDeepImportGraphExpansion(filePaths): Promise<string>', adapter: null, note: 'returns an unstructured string, not revision-qualified refs; a structured read-only graph/PPR owner is still to be identified' },
-  WORKTREE_STRUCTURAL: { status: 'READY_WITH_CAVEAT', owner: 'codebase-memory-mcp v0.11.0 (`cli search_graph`, format json) - challenger, admitted for DEFINITION/OUTLINE/SNIPPET/IMPORTS/bounded TEXT', adapter: 'makeCbmDefinitionHandlerV1', note: 'DEFINITION only implemented; not a pre-agent stage in the mapper yet; no Atlas identity (UNRESOLVED), stale-index guard required, empty = UNKNOWN' },
+  WORKTREE_STRUCTURAL: { status: 'READY_WITH_CAVEAT', owner: 'codebase-memory-mcp v0.11.0 (read-only challenger; admitted for DEFINITION/OUTLINE/SNIPPET/IMPORTS/bounded TEXT)', adapter: 'makeCbmDefinitionHandlerV1 + makeCbmFileOutlineHandlerV1 + makeCbmCodeSnippetHandlerV1 + makeCbmImportCandidateHandlerV1', note: 'DEFINITION/OUTLINE/SNIPPET/IMPORTS diagnostic adapters only; not wired as a pre-agent stage; identity and graph snapshot remain unresolved; empty = UNKNOWN' },
   ACE_PACKET_ASSEMBLY: { status: 'READY_WITH_CAVEAT', owner: 'ace/ace-packet-store.ts::readAcePacketBySourceRef (read only; assemblePacketForSourceRef writes on miss)', adapter: 'makePacketReadHandlerV1', note: 'packets carry no revision => UNQUALIFIED_NO_REVISION; no assemble-on-miss path' },
 };
 
@@ -231,7 +232,9 @@ export function makePacketReadHandlerV1(deps: {
  * the plain `--json` flag only wraps the text table, so it is NOT used).
  * Output is a tier-1 SEED: no Atlas identity yet (UNRESOLVED_NEEDS_ATLAS_IDENTITY), `emptyMeansUnknown:true`
  * (an empty result is UNKNOWN, never ABSENT), and a stale-index guard: the index is a snapshot with the watcher off,
- * so `isFresh(file)` (e.g. file mtime <= indexedAt) decides `stale`; null = could not tell.
+ * `stale` is decided only from exact source revision, content digest, and workspace
+ * revision equality. Timestamps or branch labels alone are insufficient; null means
+ * the index snapshot cannot be bound to the current source.
  */
 export interface CbmDefinitionObservationV1 {
   sourceRef: string;
@@ -265,13 +268,30 @@ interface CbmSearchJsonV1 {
   truncated?: boolean;
 }
 
+export interface CbmSnapshotBindingCheckV1 {
+  indexedSourceRevision: string | null;
+  currentSourceRevision: string | null;
+  indexedContentDigest: string | null;
+  currentContentDigest: string | null;
+  indexedWorkspaceRevision: string | null;
+  currentWorkspaceRevision: string | null;
+}
+
+function isCbmSnapshotStaleV1(check: CbmSnapshotBindingCheckV1): boolean | null {
+  const values = Object.values(check);
+  if (values.some((value) => typeof value !== 'string' || value.length === 0)) return null;
+  return check.indexedSourceRevision !== check.currentSourceRevision
+    || check.indexedContentDigest !== check.currentContentDigest
+    || check.indexedWorkspaceRevision !== check.currentWorkspaceRevision;
+}
+
 export function makeCbmDefinitionHandlerV1(deps: {
   runTool: (tool: 'search_graph', args: Record<string, unknown>) => Promise<string>;
   project: string;
   symbol: string;
   version?: string;
   maxHits?: number;
-  isFresh?: (sourceRef: string) => Promise<boolean | null>;
+  resolveSnapshotBinding?: (sourceRef: string) => Promise<CbmSnapshotBindingCheckV1 | null>;
 }): ContextDagNodeHandlerV1 {
   return async () => {
     const raw = await deps.runTool('search_graph', {
@@ -285,7 +305,10 @@ export function makeCbmDefinitionHandlerV1(deps: {
     const observations: CbmDefinitionObservationV1[] = [];
     for (const g of parsed.groups ?? []) {
       const sourceRef = norm(g.file);
-      const stale = deps.isFresh ? await deps.isFresh(sourceRef).then((f) => (f === null ? null : !f)).catch(() => null) : null;
+      const binding = deps.resolveSnapshotBinding
+        ? await deps.resolveSnapshotBinding(sourceRef).catch(() => null)
+        : null;
+      const stale = binding ? isCbmSnapshotStaleV1(binding) : null;
       for (const row of g.rows) {
         const name = String(row[idx('name')]);
         if (name !== deps.symbol) continue; // name_pattern is a substring/regex match; keep exact definitions only
@@ -306,6 +329,268 @@ export function makeCbmDefinitionHandlerV1(deps: {
       emptyMeansUnknown: true, canonicalAuthority: false,
     };
     return receipt;
+  };
+}
+
+export interface CbmOutlineSymbolV1 {
+  symbol: string;
+  label: string;
+  span: { startLine: number; endLine: number } | null;
+  qualifiedName: string;
+}
+
+export interface CbmOutlineReceiptV1 {
+  backend: 'CODEBASE_MEMORY_MCP';
+  version: string;
+  queryClass: 'OUTLINE';
+  trustTier: 1;
+  project: string;
+  sourceRef: string;
+  symbols: CbmOutlineSymbolV1[];
+  total: number;
+  truncated: boolean;
+  stale: boolean | null;
+  emptyMeansUnknown: true;
+  canonicalAuthority: false;
+}
+
+interface CbmOutlineJsonV1 {
+  file_path?: string;
+  cols?: string[];
+  rows?: Array<Array<string | number>>;
+  total?: number;
+  has_more?: boolean;
+}
+
+function parseCbmJsonV1<T>(raw: string, errorCode: string): T {
+  try { return JSON.parse(raw) as T; } catch { throw new Error(errorCode); }
+}
+
+function parseCbmLineSpanV1(value: unknown): { startLine: number; endLine: number } | null {
+  const match = /^(\d+)-(\d+)$/.exec(String(value));
+  if (!match) return null;
+  const startLine = Number(match[1]);
+  const endLine = Number(match[2]);
+  return Number.isSafeInteger(startLine) && Number.isSafeInteger(endLine) && startLine > 0 && endLine >= startLine
+    ? { startLine, endLine }
+    : null;
+}
+
+function getCbmFreshnessV1(
+  check: ((sourceRef: string) => Promise<CbmSnapshotBindingCheckV1 | null>) | undefined,
+  sourceRef: string,
+): Promise<boolean | null> {
+  if (!check) return Promise.resolve(null);
+  return check(sourceRef)
+    .then((binding) => binding ? isCbmSnapshotStaleV1(binding) : null)
+    .catch(() => null);
+}
+
+export function makeCbmFileOutlineHandlerV1(deps: {
+  runTool: (tool: 'get_file_outline', args: Record<string, unknown>) => Promise<string>;
+  project: string;
+  filePath: string;
+  version?: string;
+  maxSymbols?: number;
+  resolveSnapshotBinding?: (sourceRef: string) => Promise<CbmSnapshotBindingCheckV1 | null>;
+}): ContextDagNodeHandlerV1 {
+  return async () => {
+    const sourceRef = norm(deps.filePath);
+    if (!sourceRef || sourceRef.startsWith('/') || sourceRef.split('/').some((part) => part === '..')) {
+      throw new Error('CBM_OUTLINE_INVALID_RELATIVE_PATH');
+    }
+    const limit = deps.maxSymbols ?? 100;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 500) throw new Error('CBM_OUTLINE_INVALID_LIMIT');
+    const raw = await deps.runTool('get_file_outline', {
+      project: deps.project, file_path: sourceRef, format: 'json', offset: 0, limit,
+    });
+    const parsed = parseCbmJsonV1<CbmOutlineJsonV1>(raw, 'CBM_OUTLINE_NOT_JSON');
+    if (norm(parsed.file_path ?? '') !== sourceRef || !Array.isArray(parsed.cols) || !Array.isArray(parsed.rows)) {
+      throw new Error('CBM_OUTLINE_UNEXPECTED_SHAPE');
+    }
+    const col = (name: string) => parsed.cols!.indexOf(name);
+    const nameIndex = col('name');
+    const labelIndex = col('label');
+    const lineIndex = col('lines');
+    const qnIndex = col('qn');
+    if ([nameIndex, labelIndex, lineIndex, qnIndex].some((index) => index < 0)) throw new Error('CBM_OUTLINE_UNEXPECTED_COLUMNS');
+    const symbols = parsed.rows.slice(0, limit).map((row) => {
+      if (row.length <= Math.max(nameIndex, labelIndex, lineIndex, qnIndex)) throw new Error('CBM_OUTLINE_MALFORMED_ROW');
+      return {
+        symbol: String(row[nameIndex]), label: String(row[labelIndex]),
+        span: parseCbmLineSpanV1(row[lineIndex]), qualifiedName: String(row[qnIndex]),
+      };
+    });
+    return {
+      backend: 'CODEBASE_MEMORY_MCP', version: deps.version ?? '0.11.0', queryClass: 'OUTLINE', trustTier: 1,
+      project: deps.project, sourceRef, symbols, total: parsed.total ?? symbols.length,
+      truncated: Boolean(parsed.has_more || (parsed.total !== undefined && parsed.total > symbols.length)),
+      stale: await getCbmFreshnessV1(deps.resolveSnapshotBinding, sourceRef),
+      emptyMeansUnknown: true, canonicalAuthority: false,
+    } satisfies CbmOutlineReceiptV1;
+  };
+}
+
+export interface CbmSnippetReceiptV1 {
+  backend: 'CODEBASE_MEMORY_MCP';
+  version: string;
+  queryClass: 'SNIPPET';
+  trustTier: 1;
+  project: string;
+  sourceRef: string;
+  symbol: string;
+  span: { startLine: number; endLine: number } | null;
+  sourceMode: string;
+  source: string;
+  sourceTruncated: boolean;
+  stale: boolean | null;
+  identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY';
+  emptyMeansUnknown: true;
+  canonicalAuthority: false;
+}
+
+interface CbmSnippetJsonV1 {
+  name?: string;
+  qualified_name?: string;
+  file_path?: string;
+  start_line?: number;
+  end_line?: number;
+  source_mode?: string;
+  source?: string;
+}
+
+function getCbmRelativePathV1(projectRoot: string, filePath: string): string {
+  const root = resolve(projectRoot);
+  const candidate = resolve(isAbsolute(filePath) ? filePath : resolve(root, filePath));
+  const relativePath = relative(root, candidate);
+  if (!relativePath || relativePath === '..' || relativePath.startsWith(`..${sep}`) || isAbsolute(relativePath)) {
+    throw new Error('CBM_SNIPPET_PATH_OUTSIDE_PROJECT');
+  }
+  return norm(relativePath);
+}
+
+export function makeCbmCodeSnippetHandlerV1(deps: {
+  runTool: (tool: 'get_code_snippet', args: Record<string, unknown>) => Promise<string>;
+  project: string;
+  projectRoot: string;
+  qualifiedName: string;
+  version?: string;
+  maxChars?: number;
+  resolveSnapshotBinding?: (sourceRef: string) => Promise<CbmSnapshotBindingCheckV1 | null>;
+}): ContextDagNodeHandlerV1 {
+  return async () => {
+    const maxChars = deps.maxChars ?? 12000;
+    if (!Number.isSafeInteger(maxChars) || maxChars < 1 || maxChars > 50000) throw new Error('CBM_SNIPPET_INVALID_LIMIT');
+    const raw = await deps.runTool('get_code_snippet', {
+      project: deps.project, qualified_name: deps.qualifiedName, format: 'json',
+    });
+    const parsed = parseCbmJsonV1<CbmSnippetJsonV1>(raw, 'CBM_SNIPPET_NOT_JSON');
+    if (parsed.qualified_name !== deps.qualifiedName || typeof parsed.name !== 'string'
+      || typeof parsed.file_path !== 'string' || typeof parsed.source !== 'string'
+      || typeof parsed.source_mode !== 'string') throw new Error('CBM_SNIPPET_UNEXPECTED_SHAPE');
+    const sourceRef = getCbmRelativePathV1(deps.projectRoot, parsed.file_path);
+    const startLine = parsed.start_line;
+    const endLine = parsed.end_line;
+    const span = Number.isSafeInteger(startLine) && Number.isSafeInteger(endLine)
+      && (startLine as number) > 0 && (endLine as number) >= (startLine as number)
+      ? { startLine: startLine as number, endLine: endLine as number }
+      : null;
+    const source = parsed.source.slice(0, maxChars);
+    return {
+      backend: 'CODEBASE_MEMORY_MCP', version: deps.version ?? '0.11.0', queryClass: 'SNIPPET', trustTier: 1,
+      project: deps.project, sourceRef, symbol: parsed.name, span, sourceMode: parsed.source_mode, source,
+      sourceTruncated: source.length < parsed.source.length,
+      stale: await getCbmFreshnessV1(deps.resolveSnapshotBinding, sourceRef),
+      identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY', emptyMeansUnknown: true, canonicalAuthority: false,
+    } satisfies CbmSnippetReceiptV1;
+  };
+}
+
+export type CbmImportDirectionV1 = 'IMPORTERS_OF' | 'IMPORTS_FROM';
+
+export interface CbmImportCandidateV1 {
+  fromPath: string;
+  fromLabel: string;
+  toPath: string;
+  toLabel: string;
+  relation: 'IMPORTS';
+  identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY';
+}
+
+export interface CbmImportCandidateReceiptV1 {
+  backend: 'CODEBASE_MEMORY_MCP';
+  version: string;
+  queryClass: 'IMPORTS';
+  trustTier: 2;
+  project: string;
+  direction: CbmImportDirectionV1;
+  requestedPath: string;
+  candidates: CbmImportCandidateV1[];
+  total: number;
+  truncated: boolean;
+  graphSnapshotBound: false;
+  emptyMeansUnknown: true;
+  canonicalAuthority: false;
+}
+
+interface CbmImportJsonV1 {
+  columns?: string[];
+  rows?: Array<Array<string | number>>;
+  total?: number;
+  has_more?: boolean;
+  truncated?: boolean;
+}
+
+function normalizeCbmRelativePathV1(value: string): string {
+  const result = norm(value);
+  if (!result || result.startsWith('/') || /^[A-Za-z]:/.test(result)
+    || result.split('/').some((part) => part === '..') || /[\u0000-\u001f]/.test(result)) {
+    throw new Error('CBM_IMPORT_INVALID_RELATIVE_PATH');
+  }
+  return result;
+}
+
+export function makeCbmImportCandidateHandlerV1(deps: {
+  runTool: (tool: 'query_graph', args: Record<string, unknown>) => Promise<string>;
+  project: string;
+  filePath: string;
+  direction: CbmImportDirectionV1;
+  version?: string;
+  maxRows?: number;
+}): ContextDagNodeHandlerV1 {
+  return async () => {
+    const requestedPath = normalizeCbmRelativePathV1(deps.filePath);
+    const limit = deps.maxRows ?? 50;
+    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 200) throw new Error('CBM_IMPORT_INVALID_LIMIT');
+    if (deps.direction !== 'IMPORTERS_OF' && deps.direction !== 'IMPORTS_FROM') throw new Error('CBM_IMPORT_INVALID_DIRECTION');
+    const endpoint = deps.direction === 'IMPORTERS_OF' ? 'target' : 'source';
+    const query = `MATCH (source)-[:IMPORTS]->(target) WHERE ${endpoint}.path = ${JSON.stringify(requestedPath)} RETURN source.name, source.label, source.path, target.name, target.label, target.path LIMIT ${limit}`;
+    const raw = await deps.runTool('query_graph', { project: deps.project, query, format: 'json' });
+    const parsed = parseCbmJsonV1<CbmImportJsonV1>(raw, 'CBM_IMPORT_NOT_JSON');
+    const requiredColumns = ['source.name', 'source.label', 'source.path', 'target.name', 'target.label', 'target.path'];
+    if (!Array.isArray(parsed.columns) || !Array.isArray(parsed.rows)
+      || requiredColumns.some((column) => !parsed.columns!.includes(column))) {
+      throw new Error('CBM_IMPORT_UNEXPECTED_SHAPE');
+    }
+    const index = (column: string) => parsed.columns!.indexOf(column);
+    const candidates = parsed.rows.map((row): CbmImportCandidateV1 => {
+      if (row.length <= Math.max(...requiredColumns.map(index))) throw new Error('CBM_IMPORT_MALFORMED_ROW');
+      const fromPath = normalizeCbmRelativePathV1(String(row[index('source.path')]));
+      const toPath = normalizeCbmRelativePathV1(String(row[index('target.path')]));
+      if ((endpoint === 'target' ? toPath : fromPath) !== requestedPath) throw new Error('CBM_IMPORT_PATH_MISMATCH');
+      return {
+        fromPath, fromLabel: String(row[index('source.label')]),
+        toPath, toLabel: String(row[index('target.label')]),
+        relation: 'IMPORTS', identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY',
+      };
+    });
+    const total = parsed.total ?? candidates.length;
+    return {
+      backend: 'CODEBASE_MEMORY_MCP', version: deps.version ?? '0.11.0', queryClass: 'IMPORTS', trustTier: 2,
+      project: deps.project, direction: deps.direction, requestedPath, candidates, total,
+      truncated: Boolean(parsed.truncated || parsed.has_more || total > candidates.length),
+      graphSnapshotBound: false, emptyMeansUnknown: true, canonicalAuthority: false,
+    } satisfies CbmImportCandidateReceiptV1;
   };
 }
 
