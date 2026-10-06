@@ -1874,3 +1874,7 @@ unblocked.
 - [ ] Evaluate Qdrant-side directory filtering availability; retain bounded server-side filtering unless a safe indexed prefix contract is proven.
 - [x] Reuse SvelteKit's request-scoped fetch for the internal `error-brain/diagnose` graph call so same-origin authorization is forwarded without bypassing the graph route guard.
 - [ ] Run a live authenticated error-diagnosis request and verify its bounded graph neighborhood is populated.
+
+### GS1-10-IDENTITY-CONTRACTS-01 — `concept_id` owner check (2026-10-06, read-only; no schema/data/code change)
+
+Live `legal-ai-postgres` (exact `count(*)`): `atlas_ontology_concepts` 0 rows (PK `concept_id` text), `concept_records` 0 (PK `concept_id` text), `atlas_concepts` 0 (PK `concept_id` **integer**, UNIQUE `name`), `atlas_ontology_tuples` 0; only `feature_ontology_tuples` is populated (539,124). Three empty tables use two different `concept_id` types, so no populated table can prove a `concept_id` key. Status: `concept_id` owner NOT_PROVEN; the other six ids keep the 2026-09-24 reconciliation. The parent box stays unticked. Closing it needs the operator ontology-population decision (`audit-ontology-population-decision-v1.mjs`) to pick the key type first; no new contract file should be written.
