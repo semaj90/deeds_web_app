@@ -101,7 +101,22 @@ CrossEncoder cache keys additionally include deterministic `RerankDocumentV1` co
 - PROMOTE-01 every promoted candidate resolves exact source/AST/graph evidence.
 - DSPY-01 program consumes ContextManifest, not raw stores.
 - GEPA-01 optimization metric derives from validators/receipts.
+- NEXT-ACTION-01 bounded next-action proposals must fit remaining token/tool budgets and remain non-authoritative.
+- GROUP-EVAL-01 group-relative candidate evaluation may rank validator-owned rewards but MUST NOT update model weights or invent reward authority.
+- GEPA-SHADOW-02 GEPA/DSPy optimization inputs must be sealed LearningOutcome/validator references, held-out-eval revision bound, shadow-only, and non-promotional.
 - TRAIN-01 only verified outcomes enter gold training corpus; heuristic/OKF labels remain weak supervision.
+
+## Agent control-plane convergence
+
+The agent control plane reuses existing owners rather than adding a second planner or scheduler:
+
+- `semantic-signal-routing.ts::RetrievalParameterPlanV1` owns explainable retrieval parameters.
+- `contracts/semantic-signal-v1.ts::TraversalBudgetV1` owns bounded graph/retrieval expansion.
+- `agent-execution-spine-v1.ts::AgentActionProposalV1` owns executable action proposals and read-only authorization/replay.
+- `agentic/contracts/learning-outcome-v1.ts` remains the validated outcome owner.
+- `agent-control-plane-v1.ts::NextActionProposalV1` is only the bounded bridge from an unresolved evidence question to the existing action proposal owner.
+- `GroupRelativeCandidateEvalV1` is GRPO-shaped evaluation only: it ranks already validator-scored candidates and performs no policy-gradient/model-weight update.
+- `GepaShadowInputV1` is a shadow optimizer input envelope only; it cannot promote prompts, policies, task state, evidence, or model weights.
 
 ## Promotion metrics
 
