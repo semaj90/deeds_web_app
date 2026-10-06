@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
+import { makeCbmTextSearchHandlerV1, type CbmTextReceiptV1, decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 
 const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
@@ -361,5 +361,38 @@ describe('CBM identity / fallback / negative (CBM-IDENTITY-01, CBM-FALLBACK-01, 
     expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: null }])).toMatchObject({ reason: 'STALE_UNKNOWN' });
     expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: false }, { sourceRef: 'b.ts', stale: false }])).toMatchObject({ reason: 'AMBIGUOUS' });
     expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: false }, { sourceRef: './a.ts', stale: false }])).toEqual({ use: 'CBM', absence: 'NOT_CLAIMED' });
+  });
+});
+
+describe('CBM TEXT adapter (bounded search_code)', () => {
+  const payload = JSON.stringify({
+    raw_matches: { cols: ['file', 'line', 'content'], rows: [['a.ts', 3, 'const x = foo();'], ['sub/b.ts', 9, 'y'.repeat(500)]] },
+    total_grep_matches: 7, has_more: true,
+  });
+  const run = (over: Record<string, unknown> = {}, body = payload) =>
+    makeCbmTextSearchHandlerV1({
+      runTool: async (_t: string, _a: Record<string, unknown>) => body, project: 'p', pattern: 'foo',
+      projectRootRelativeToRepo: 'src/lib', ...over,
+    } as Parameters<typeof makeCbmTextSearchHandlerV1>[0])({ nodeId: 'T', inputs: {} });
+  it('maps matches to repo-relative refs, bounds content, never claims authority', async () => {
+    const r = (await run({ maxContentChars: 100 })) as CbmTextReceiptV1;
+    expect(r).toMatchObject({ queryClass: 'TEXT', trustTier: 1, canonicalAuthority: false, emptyMeansUnknown: true, totalGrepMatches: 7, truncated: true });
+    expect(r.matches.map((m) => m.sourceRef)).toEqual(['src/lib/a.ts', 'src/lib/sub/b.ts']);
+    expect(r.matches[1]).toMatchObject({ contentTruncated: true, stale: null, identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY' });
+    expect(r.matches[1].content).toHaveLength(100);
+  });
+  it('rejects bad shape, empty pattern, traversal and bad limits', async () => {
+    await expect(run({}, '{')).rejects.toThrow(/NOT_JSON/);
+    await expect(run({}, '{}')).rejects.toThrow(/UNEXPECTED_SHAPE/);
+    await expect(run({ pattern: ' ' })).rejects.toThrow(/EMPTY_PATTERN/);
+    await expect(run({ projectRootRelativeToRepo: '../x' })).rejects.toThrow(/INVALID_RELATIVE_PATH/);
+    await expect(run({ maxMatches: 201 })).rejects.toThrow(/INVALID_LIMIT/);
+    const bad = JSON.stringify({ raw_matches: { cols: ['file', 'line', 'content'], rows: [['../e.ts', 1, 'x']] } });
+    await expect(run({}, bad)).rejects.toThrow(/MALFORMED_ROW/);
+  });
+  it('empty result is an UNKNOWN-flagged receipt, not an absence claim', async () => {
+    const r = (await run({}, JSON.stringify({ raw_matches: { cols: ['file', 'line', 'content'], rows: [] } }))) as CbmTextReceiptV1;
+    expect(r.matches).toEqual([]);
+    expect(r.emptyMeansUnknown).toBe(true);
   });
 });
