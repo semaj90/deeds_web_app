@@ -732,3 +732,57 @@ export function makeAstHandlerV1(deps: {
     return out;
   };
 }
+
+/**
+ * CBM-IDENTITY-01 / CBM-FALLBACK-01 / CBM-NEGATIVE-01. Pure decision helpers over CBM receipts; they never
+ * call CBM or Atlas themselves. An observation is QUALIFIED only when the injected Atlas lookup returns a
+ * canonicalId plus real (non-sentinel) workspace and source revisions AND the CBM index is provably fresh
+ * (stale === false). Everything else stays a diagnostic challenger observation.
+ */
+export interface CbmObservationRefV1 {
+  sourceRef: string;
+  symbol?: string;
+  span?: { startLine: number; endLine: number } | null;
+  stale: boolean | null;
+}
+
+export interface CbmAtlasIdentityLookupV1 {
+  canonicalId: string | null;
+  workspaceRevision: string | null;
+  sourceRevision: string | null;
+}
+
+export type CbmQualificationV1 =
+  | { status: 'QUALIFIED'; sourceRef: string; canonicalId: string; workspaceRevision: string; sourceRevision: string }
+  | { status: 'DIAGNOSTIC_ONLY'; sourceRef: string; reason: 'STALE_INDEX' | 'SNAPSHOT_UNBOUND' | 'IDENTITY_UNRESOLVED' | 'REVISION_UNQUALIFIED' | 'LOOKUP_FAILED' };
+
+const isRealId = (v: string | null | undefined): v is string => typeof v === 'string' && !CACHE_SENTINEL_VALUES.has(v.trim().toLowerCase());
+
+export async function qualifyCbmObservationV1(
+  obs: CbmObservationRefV1,
+  lookup: (sourceRef: string) => Promise<CbmAtlasIdentityLookupV1 | null>,
+): Promise<CbmQualificationV1> {
+  const sourceRef = norm(obs.sourceRef);
+  if (obs.stale === true) return { status: 'DIAGNOSTIC_ONLY', sourceRef, reason: 'STALE_INDEX' };
+  if (obs.stale === null) return { status: 'DIAGNOSTIC_ONLY', sourceRef, reason: 'SNAPSHOT_UNBOUND' };
+  let found: CbmAtlasIdentityLookupV1 | null;
+  try { found = await lookup(sourceRef); } catch { return { status: 'DIAGNOSTIC_ONLY', sourceRef, reason: 'LOOKUP_FAILED' }; }
+  if (!found || !isRealId(found.canonicalId)) return { status: 'DIAGNOSTIC_ONLY', sourceRef, reason: 'IDENTITY_UNRESOLVED' };
+  if (!isRealId(found.workspaceRevision) || !isRealId(found.sourceRevision)) {
+    return { status: 'DIAGNOSTIC_ONLY', sourceRef, reason: 'REVISION_UNQUALIFIED' };
+  }
+  return { status: 'QUALIFIED', sourceRef, canonicalId: found.canonicalId, workspaceRevision: found.workspaceRevision, sourceRevision: found.sourceRevision };
+}
+
+export type CbmFallbackDecisionV1 =
+  | { use: 'CBM'; absence: 'NOT_CLAIMED' }
+  | { use: 'RG_SOURCE_FALLBACK'; reason: 'EMPTY' | 'STALE' | 'STALE_UNKNOWN' | 'AMBIGUOUS'; absence: 'UNKNOWN' };
+
+/** Empty/stale/unknown-freshness/ambiguous CBM results route to rg/source; empty is UNKNOWN, never ABSENT. */
+export function decideCbmFallbackV1(observations: CbmObservationRefV1[]): CbmFallbackDecisionV1 {
+  if (observations.length === 0) return { use: 'RG_SOURCE_FALLBACK', reason: 'EMPTY', absence: 'UNKNOWN' };
+  if (observations.some((o) => o.stale === true)) return { use: 'RG_SOURCE_FALLBACK', reason: 'STALE', absence: 'UNKNOWN' };
+  if (observations.some((o) => o.stale === null)) return { use: 'RG_SOURCE_FALLBACK', reason: 'STALE_UNKNOWN', absence: 'UNKNOWN' };
+  if (new Set(observations.map((o) => norm(o.sourceRef))).size > 1) return { use: 'RG_SOURCE_FALLBACK', reason: 'AMBIGUOUS', absence: 'UNKNOWN' };
+  return { use: 'CBM', absence: 'NOT_CLAIMED' };
+}
