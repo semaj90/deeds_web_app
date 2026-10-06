@@ -30,3 +30,35 @@ lv AS (
     -- embedding gate: lineage + summary + classification. Keywords are CPU-derivable and do NOT gate embedding.
     (ident AND has_rev AND NOT sha_conflict AND has_summary AND has_domain AND has_concepts) AS embed_allowed
   FROM p)`;
+
+export const EMBED_ALLOWED_KEYSET_SCHEMA_V1 = 'atlas.embed-allowed-packet-keyset.v1';
+
+/**
+ * Read-only producer of the `embedAllowedPacketKeys` set the BitFrost writer requires.
+ * Same `embed_allowed` predicate as the census/guard above (one owner, cannot drift). It supplies
+ * keys only: it never mints identity, never writes, and is NOT an admission verdict - callers must
+ * still require SAFE_TO_PROJECT before any cache write. Empty set is returned as-is (caller fails closed).
+ * `client` is a connected pg client; runs in one REPEATABLE READ READ ONLY transaction.
+ */
+export async function loadEmbedAllowedPacketKeysV1(client) {
+  const { createHash } = await import('node:crypto');
+  await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  try {
+    const r = await client.query(`${ENRICHMENT_READINESS_CTE_V1} SELECT packet_key, (SELECT count(*)::int FROM lv) AS total FROM lv WHERE embed_allowed ORDER BY packet_key`);
+    const keys = r.rows.map((row) => row.packet_key);
+    if (keys.some((k) => typeof k !== 'string' || k === '')) throw new Error('EMBED_ALLOWED_KEYSET_BLANK_KEY');
+    if (new Set(keys).size !== keys.length) throw new Error('EMBED_ALLOWED_KEYSET_DUPLICATE_KEY');
+    return {
+      schema: EMBED_ALLOWED_KEYSET_SCHEMA_V1,
+      generatedAt: new Date().toISOString(),
+      keys: Object.freeze(new Set(keys)),
+      count: keys.length,
+      totalPackets: r.rows[0]?.total ?? null,
+      keysSha256: `sha256:${createHash('sha256').update(keys.join('\n')).digest('hex')}`,
+      canonicalAuthority: false,
+      admissionVerdict: null,
+    };
+  } finally {
+    await client.query('ROLLBACK');
+  }
+}
