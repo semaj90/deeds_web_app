@@ -13,6 +13,8 @@ def test_extracts_exact_char_and_utf8_byte_spans() -> None:
     rows = extract_topic_observations_v1(
         source_id="fixture",
         source_revision="source:v1",
+        workspace_revision="workspace:v1",
+        producer_revision="topic-extractor:v1",
         page_ref="fixture://page",
         normalized_text=text,
     )
@@ -21,6 +23,9 @@ def test_extracts_exact_char_and_utf8_byte_spans() -> None:
     for row in rows:
         assert text[row.start_char:row.end_char] == row.surface
         assert encoded[row.start_byte:row.end_byte].decode("utf-8") == row.surface
+        assert row.workspace_revision == "workspace:v1"
+        assert row.producer_revision == "topic-extractor:v1"
+        assert row.evidence_checksum.startswith("sha256:")
         assert row.canonical_authority is False
 
 
@@ -29,6 +34,8 @@ def test_preserves_manifest_domain_hint_as_unreviewed_metadata() -> None:
     [row] = extract_topic_observations_v1(
         source_id="fixture",
         source_revision="source:v1",
+        workspace_revision="workspace:v1",
+        producer_revision="topic-extractor:v1",
         page_ref="fixture://page",
         normalized_text="Viterbi",
         profiles=(profile,),
@@ -41,6 +48,8 @@ def test_is_deterministic_and_bounded_per_topic() -> None:
     rows = extract_topic_observations_v1(
         source_id="fixture",
         source_revision="source:v1",
+        workspace_revision="workspace:v1",
+        producer_revision="topic-extractor:v1",
         page_ref="fixture://page",
         normalized_text="Valkey Valkey Valkey",
         max_observations_per_topic=2,
@@ -53,3 +62,17 @@ def test_is_deterministic_and_bounded_per_topic() -> None:
 def test_default_profile_inventory_covers_requested_topics() -> None:
     ids = {profile.topic_id for profile in DEFAULT_CONTEXT_ENGINEERING_TOPICS_V1}
     assert {"mastra", "mcp", "viterbi-hmm", "dspy-gepa", "bitfrost", "redis-valkey", "grpc-protobuf", "duckdb", "gpu-rtx"} <= ids
+
+
+def test_rejects_missing_workspace_or_producer_revision() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="SOURCE_WORKSPACE_PRODUCER_REVISION_AND_PAGE_REQUIRED"):
+        extract_topic_observations_v1(
+            source_id="fixture",
+            source_revision="source:v1",
+            workspace_revision="",
+            producer_revision="topic-extractor:v1",
+            page_ref="fixture://page",
+            normalized_text="Viterbi",
+        )
