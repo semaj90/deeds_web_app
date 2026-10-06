@@ -237,6 +237,9 @@ export interface ContextDagExecutionReceiptV1 {
   canonicalAuthority: false;
 }
 
+/** Dependencies that only order execution: their failure is recorded as degraded but never blocks a dependent. */
+const SOFT_DEPENDENCY_IDS: ReadonlySet<string> = new Set(['CACHE_LOOKUP']);
+
 export async function executeContextToolDagV1(
   rawDag: ContextToolDagV1,
   handlers: Readonly<Record<string, ContextDagNodeHandlerV1>>,
@@ -279,10 +282,14 @@ export async function executeContextToolDagV1(
       // Join nodes degrade: EXACT_PROMOTION proceeds on the lookups that succeeded (a lexical-only or AST-less
       // result is still useful evidence) and records what failed; it is blocked only when NO dependency succeeded.
       // Everything else (e.g. AST, which parses the lexical hit list) is blocked by any failed dependency.
+      // A SOFT dependency (the best-effort cache probe) only orders execution: its failure never blocks a dependent,
+      // it is just recorded in `degradedDependencies` (review finding: a failed cache read must not become a total outage).
+      const softFailed = failedDeps.filter((d) => SOFT_DEPENDENCY_IDS.has(d));
+      const hardFailed = failedDeps.filter((d) => !SOFT_DEPENDENCY_IDS.has(d));
       const tolerant = node.kind === 'EXACT_PROMOTION' && okDeps.length > 0;
-      const base = { nodeId, kind: node.kind, level, degradedDependencies: tolerant ? failedDeps : [] };
-      if (failedDeps.length > 0 && !tolerant) {
-        receipts.set(nodeId, { ...base, status: 'BLOCKED', durationMs: 0, error: `dependency ${failedDeps[0]} not OK` });
+      const base = { nodeId, kind: node.kind, level, degradedDependencies: tolerant ? failedDeps : softFailed };
+      if (hardFailed.length > 0 && !tolerant) {
+        receipts.set(nodeId, { ...base, status: 'BLOCKED', durationMs: 0, error: `dependency ${hardFailed[0]} ${receipts.get(hardFailed[0])?.status ?? 'NOT_RUN'}` });
         return;
       }
       const handler = handlers[nodeId];
@@ -294,7 +301,8 @@ export async function executeContextToolDagV1(
       try {
         const inputs: Record<string, unknown> = {};
         for (const d of okDeps) inputs[d] = outputs[d];
-        outputs[nodeId] = await withTimeout(handler({ nodeId, inputs }));
+        // Promise.resolve: a handler that returns a plain value (not a Promise) is still a success.
+        outputs[nodeId] = await withTimeout(Promise.resolve(handler({ nodeId, inputs })));
         receipts.set(nodeId, { ...base, status: 'OK', durationMs: Date.now() - started, error: null });
       } catch (err) {
         receipts.set(nodeId, { ...base, status: 'FAILED', durationMs: Date.now() - started, error: err instanceof Error ? err.message : String(err) });

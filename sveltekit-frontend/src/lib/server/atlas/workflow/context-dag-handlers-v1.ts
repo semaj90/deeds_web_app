@@ -21,6 +21,7 @@ export const PRE_AGENT_STAGE_OWNER_MAP_V1: Readonly<Record<string, { status: Sta
   SEMANTIC_ROUTE: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveQdrant (dense_768, codebase_chunks_768)', adapter: 'makeCandidateLaneHandlerV1', note: 'embeds the query then Qdrant ANN (read-only network calls); SearchRuntime remains the sole fusion owner' },
   MEMORY_PRIOR: { status: 'NEEDS_OWNER', owner: 'memory/engram-memory.ts (not inspected)', adapter: null, note: 'Engram today, Claude-Mem adapter later; read function unverified' },
   GRAPH_EXPANSION: { status: 'NEEDS_OWNER', owner: 'ace/graph-expander.ts::fetchDeepImportGraphExpansion(filePaths): Promise<string>', adapter: null, note: 'returns an unstructured string, not revision-qualified refs; a structured read-only graph/PPR owner is still to be identified' },
+  WORKTREE_STRUCTURAL: { status: 'READY_WITH_CAVEAT', owner: 'codebase-memory-mcp v0.11.0 (`cli search_graph`, format json) - challenger, admitted for DEFINITION/OUTLINE/SNIPPET/IMPORTS/bounded TEXT', adapter: 'makeCbmDefinitionHandlerV1', note: 'DEFINITION only implemented; not a pre-agent stage in the mapper yet; no Atlas identity (UNRESOLVED), stale-index guard required, empty = UNKNOWN' },
   ACE_PACKET_ASSEMBLY: { status: 'READY_WITH_CAVEAT', owner: 'ace/ace-packet-store.ts::readAcePacketBySourceRef (read only; assemblePacketForSourceRef writes on miss)', adapter: 'makePacketReadHandlerV1', note: 'packets carry no revision => UNQUALIFIED_NO_REVISION; no assemble-on-miss path' },
 };
 
@@ -222,6 +223,92 @@ export function makePacketReadHandlerV1(deps: {
   };
 }
 
+/**
+ * WORKTREE_STRUCTURAL / DEFINITION adapter over codebase-memory-mcp v0.11.0 (CBM-ADMISSION-01: admitted ONLY for
+ * DEFINITION/OUTLINE/SNIPPET/IMPORTS/bounded TEXT; this file implements DEFINITION only). `runTool` is injected
+ * (real wiring: the exe's `cli --quiet search_graph` with `format:"json"`, whose shape is
+ * `{groups:[{qn_prefix,file,rows:[[name,label,lines,in,out]]}],cols,total,returned,has_more,truncated}`;
+ * the plain `--json` flag only wraps the text table, so it is NOT used).
+ * Output is a tier-1 SEED: no Atlas identity yet (UNRESOLVED_NEEDS_ATLAS_IDENTITY), `emptyMeansUnknown:true`
+ * (an empty result is UNKNOWN, never ABSENT), and a stale-index guard: the index is a snapshot with the watcher off,
+ * so `isFresh(file)` (e.g. file mtime <= indexedAt) decides `stale`; null = could not tell.
+ */
+export interface CbmDefinitionObservationV1 {
+  sourceRef: string;
+  symbol: string;
+  label: string;
+  span: { startLine: number; endLine: number } | null;
+  inDegree: number;
+  outDegree: number;
+  qualifiedName: string;
+  stale: boolean | null;
+  identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY';
+}
+
+export interface CbmWorktreeReceiptV1 {
+  backend: 'CODEBASE_MEMORY_MCP';
+  version: string;
+  queryClass: 'DEFINITION';
+  trustTier: 1;
+  project: string;
+  observations: CbmDefinitionObservationV1[];
+  total: number;
+  truncated: boolean;
+  emptyMeansUnknown: true;
+  canonicalAuthority: false;
+}
+
+interface CbmSearchJsonV1 {
+  cols?: string[];
+  groups?: Array<{ qn_prefix: string; file: string; rows: Array<Array<string | number>> }>;
+  total?: number;
+  truncated?: boolean;
+}
+
+export function makeCbmDefinitionHandlerV1(deps: {
+  runTool: (tool: 'search_graph', args: Record<string, unknown>) => Promise<string>;
+  project: string;
+  symbol: string;
+  version?: string;
+  maxHits?: number;
+  isFresh?: (sourceRef: string) => Promise<boolean | null>;
+}): ContextDagNodeHandlerV1 {
+  return async () => {
+    const raw = await deps.runTool('search_graph', {
+      project: deps.project, name_pattern: deps.symbol, limit: deps.maxHits ?? 10, format: 'json',
+    });
+    let parsed: CbmSearchJsonV1;
+    try { parsed = JSON.parse(raw) as CbmSearchJsonV1; } catch { throw new Error('CBM_SEARCH_GRAPH_NOT_JSON'); }
+    const cols = parsed.cols ?? [];
+    const idx = (c: string) => cols.indexOf(c);
+    if (idx('name') < 0 || idx('label') < 0 || idx('lines') < 0) throw new Error('CBM_SEARCH_GRAPH_UNEXPECTED_COLUMNS');
+    const observations: CbmDefinitionObservationV1[] = [];
+    for (const g of parsed.groups ?? []) {
+      const sourceRef = norm(g.file);
+      const stale = deps.isFresh ? await deps.isFresh(sourceRef).then((f) => (f === null ? null : !f)).catch(() => null) : null;
+      for (const row of g.rows) {
+        const name = String(row[idx('name')]);
+        if (name !== deps.symbol) continue; // name_pattern is a substring/regex match; keep exact definitions only
+        const m = /^(\d+)-(\d+)$/.exec(String(row[idx('lines')]));
+        observations.push({
+          sourceRef, symbol: name, label: String(row[idx('label')]),
+          span: m ? { startLine: Number(m[1]), endLine: Number(m[2]) } : null,
+          inDegree: idx('in') >= 0 ? Number(row[idx('in')]) : 0,
+          outDegree: idx('out') >= 0 ? Number(row[idx('out')]) : 0,
+          qualifiedName: g.qn_prefix === '' ? name : `${g.qn_prefix}.${name}`,
+          stale, identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY',
+        });
+      }
+    }
+    const receipt: CbmWorktreeReceiptV1 = {
+      backend: 'CODEBASE_MEMORY_MCP', version: deps.version ?? '0.11.0', queryClass: 'DEFINITION', trustTier: 1,
+      project: deps.project, observations, total: parsed.total ?? observations.length, truncated: Boolean(parsed.truncated),
+      emptyMeansUnknown: true, canonicalAuthority: false,
+    };
+    return receipt;
+  };
+}
+
 export interface LexicalHitV1 {
   filePath: string;
   lineNumbers: number[];
@@ -314,8 +401,13 @@ export type AstExtractLikeV1 = (input: {
 }) => Promise<Array<{ name: string; entityKind: string; startByte: number; endByte: number; startLine: number }>>;
 
 /**
- * Consumes the LEXICAL output (so the DAG makes AST depend on LEXICAL). Parses only TS/JS files that have a
- * resolvable revision; a file without one is skipped and reported, never given a defaulted revision.
+ * NOT the handler for the `AST` stage: `buildContextToolDagFromPreAgentStages` makes `AST` a sibling of `LEXICAL`
+ * (Postgres-backed `retrieveASTMatches` via `makeCandidateLaneHandlerV1`), so this handler would find no
+ * `inputs.LEXICAL` there and throw. It is for a FUTURE separate refinement node (e.g. `AST_STRUCTURAL_REFINE`) that
+ * depends on LEXICAL; that node does not exist in the mapper yet. It consumes the LEXICAL output, parses only TS/JS
+ * files that have a resolvable revision, and a file without one is skipped and reported, never given a defaulted
+ * revision. `filePath` values are relative to the lexical search `cwd`, so `readFile` must resolve against that
+ * same base (it receives the bare relative path).
  */
 export function makeAstHandlerV1(deps: {
   extract: AstExtractLikeV1;

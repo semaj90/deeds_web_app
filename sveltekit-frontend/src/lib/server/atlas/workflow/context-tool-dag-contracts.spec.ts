@@ -242,3 +242,41 @@ describe('executeContextToolDagV1 degradation (lexical-only / ast-less)', () => 
     expect(r.degraded).toBe(false);
   });
 });
+
+describe('executeContextToolDagV1 review fixes (soft cache dependency, sync handlers, clearer blocked reason)', () => {
+  const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
+  const dag = () => buildContextToolDagFromPreAgentStages({
+    ...meta, stages: ['QUERY_ANALYSIS', 'CACHE_LOOKUP', 'LEXICAL', 'AST', 'ACE_PACKET_ASSEMBLY'],
+  });
+
+  it('a failing or timed-out CACHE_LOOKUP does not block the lookups; the receipt is degraded and records it', async () => {
+    const r = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: async () => 'qa',
+      CACHE_LOOKUP: async () => { throw new Error('valkey down'); },
+      LEXICAL: async () => 'lex', AST: async () => 'ast',
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs), ACE_PACKET_ASSEMBLY: async () => 'packet',
+    });
+    const st = Object.fromEntries(r.nodes.map((n) => [n.nodeId, n.status]));
+    expect([st.CACHE_LOOKUP, st.LEXICAL, st.AST, st.EXACT_PROMOTION, st.ACE_PACKET_ASSEMBLY]).toEqual(['FAILED', 'OK', 'OK', 'OK', 'OK']);
+    expect(r.nodes.find((n) => n.nodeId === 'LEXICAL')?.degradedDependencies).toEqual(['CACHE_LOOKUP']);
+    expect(r.outputs.EXACT_PROMOTION).toEqual(['LEXICAL', 'AST']);
+    expect(r.ok).toBe(false);
+    expect(r.degraded).toBe(true);
+  });
+
+  it('a handler that returns a plain value (not a Promise) is a success', async () => {
+    const r = await executeContextToolDagV1(dag(), {
+      QUERY_ANALYSIS: (() => 'qa') as never, CACHE_LOOKUP: (() => null) as never, LEXICAL: (() => 'lex') as never, AST: (() => 'ast') as never,
+      EXACT_PROMOTION: (() => 'x') as never, ACE_PACKET_ASSEMBLY: (() => 'p') as never,
+    });
+    expect(r.ok).toBe(true);
+    expect(r.outputs.QUERY_ANALYSIS).toBe('qa');
+  });
+
+  it('a missing QUERY_ANALYSIS handler blocks dependents with a reason that names its status', async () => {
+    const r = await executeContextToolDagV1(dag(), { LEXICAL: async () => 'lex' });
+    const lex = r.nodes.find((n) => n.nodeId === 'LEXICAL');
+    expect(lex?.status).toBe('BLOCKED');
+    expect(lex?.error).toBe('dependency QUERY_ANALYSIS NO_HANDLER');
+  });
+});

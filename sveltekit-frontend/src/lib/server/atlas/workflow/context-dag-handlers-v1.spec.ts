@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeAstHandlerV1, makeCacheLookupHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
+import { makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmDefinitionHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmWorktreeReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 
 const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
@@ -183,5 +183,49 @@ describe('PRE_AGENT_STAGE_OWNER_MAP_V1 (CTX-HANDLERS-01 ledger)', () => {
       }
     }
     expect(Object.entries(mod.PRE_AGENT_STAGE_OWNER_MAP_V1).filter(([, e]) => e.status === 'NEEDS_OWNER').map(([s]) => s).sort()).toEqual(['GRAPH_EXPANSION', 'MEMORY_PRIOR']);
+  });
+});
+
+describe('CBM WORKTREE_STRUCTURAL definition handler (CBM-ADMISSION-01)', () => {
+  // Shape captured from the real binary: `cli search_graph` with format:"json" (v0.11.0), 2026-10-05.
+  const REAL = JSON.stringify({
+    qn_rule: 'qn = qn_prefix == "" ? name : qn_prefix + "." + name',
+    cols: ['name', 'label', 'lines', 'in', 'out'],
+    groups: [{
+      qn_prefix: 'P.lib.server.atlas.agentic.contracts.learning-outcome-v1',
+      file: 'lib/server/atlas/agentic/contracts/learning-outcome-v1.ts',
+      rows: [['buildLearningOutcomeV1', 'Function', '118-142', 2, 10], ['buildLearningOutcomeV1Extra', 'Function', '200-210', 0, 1]],
+    }],
+    total: 2, returned: 2, count: 2, has_more: false, truncated: false,
+  });
+  const mk = (raw: string, isFresh?: (f: string) => Promise<boolean | null>) =>
+    makeCbmDefinitionHandlerV1({ runTool: async () => raw, project: 'P', symbol: 'buildLearningOutcomeV1', isFresh });
+
+  it('parses the real JSON shape, keeps exact-name definitions only, and stays a non-authoritative tier-1 seed', async () => {
+    const r = (await mk(REAL)({ nodeId: 'WORKTREE_STRUCTURAL', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(r).toMatchObject({ backend: 'CODEBASE_MEMORY_MCP', version: '0.11.0', queryClass: 'DEFINITION', trustTier: 1, canonicalAuthority: false, emptyMeansUnknown: true });
+    expect(r.observations).toHaveLength(1);
+    expect(r.observations[0]).toMatchObject({
+      sourceRef: 'lib/server/atlas/agentic/contracts/learning-outcome-v1.ts', symbol: 'buildLearningOutcomeV1', label: 'Function',
+      span: { startLine: 118, endLine: 142 }, inDegree: 2, outDegree: 10, stale: null, identity: 'UNRESOLVED_NEEDS_ATLAS_IDENTITY',
+    });
+    expect(r.observations[0].qualifiedName).toBe('P.lib.server.atlas.agentic.contracts.learning-outcome-v1.buildLearningOutcomeV1');
+  });
+
+  it('marks stale when the freshness guard says the file changed after indexing, and treats a throwing guard as unknown', async () => {
+    const stale = (await mk(REAL, async () => false)({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(stale.observations[0].stale).toBe(true);
+    const fresh = (await mk(REAL, async () => true)({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(fresh.observations[0].stale).toBe(false);
+    const unknown = (await mk(REAL, async () => { throw new Error('x'); })({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(unknown.observations[0].stale).toBeNull();
+  });
+
+  it('empty result is an empty observation list (UNKNOWN, not ABSENT); malformed output fails loudly', async () => {
+    const empty = (await mk(JSON.stringify({ cols: ['name', 'label', 'lines', 'in', 'out'], groups: [], total: 0 }))({ nodeId: 'W', inputs: {} })) as CbmWorktreeReceiptV1;
+    expect(empty.observations).toEqual([]);
+    expect(empty.emptyMeansUnknown).toBe(true);
+    await expect(mk('results: 1 (cols: qn label)')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/NOT_JSON/);
+    await expect(mk(JSON.stringify({ cols: ['x'], groups: [] }))({ nodeId: 'W', inputs: {} })).rejects.toThrow(/UNEXPECTED_COLUMNS/);
   });
 });

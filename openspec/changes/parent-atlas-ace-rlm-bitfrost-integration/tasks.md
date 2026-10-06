@@ -14592,6 +14592,38 @@ Result: the prompt-only fix FAILED. The 9B model ignored the 8-call budget, the 
     "directory intelligence materialization"; CBM's persistent graph is a separate challenger index; both may feed the Atlas query planner, neither silently replaces the other.
     CBM NOTE (conflict with measured facts): the review advises ONE isolated full-repo CBM project, not one per subdirectory (cross-directory calls/imports fragment across projects). Measured: the repo-ROOT index
     ABORTED once (`aborted_previous_preserved`, 148 s), only `sveltekit-frontend/src` (+ the small `atlas/workflow` test project) exist; retry the root index when the tree is quiet before adopting per-directory projects.
+  - CURRENT-WORKSPACE-01 / GRAPHIFY-EXECUTION-MATCH-02 RESULT (2026-10-06T02:54Z; ran `scripts/atlas/audit-current-workspace-frame-admission-v1.mjs`: no database access, it reads the persisted cohort-lineage report and
+    the selector inputs; it ALWAYS rewrites `docs/reports/current-workspace-frame-admission-v1.json`; previous copy snapshotted at `.tmp/frame-admission-snapshot-20261005/before.json`; file diff = 3 lines):
+    status `STALE_WORKSPACE_PROJECTION`, nextGate `CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED`, `canonicalAuthority:false`, `promotionEligible:false`, `writesPerformed:false`. Admitted workspace revision =
+    `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` (source `WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT`, authority true, no selector conflict, no blockers) but
+    `admittedExecutionId = null`: NO Graphify execution is bound to that revision => `BLOCKED_NO_MATCHING_EXECUTION` (do not refresh automatically; refresh not authorized). Cohort lineage report (generated
+    2026-10-05T17:30Z) has 52 rows: `exactSourceRevisionMatches` 52, but `currentWorkspaceMatches` 0, `workspaceMismatches` 52, `staleProjectionCandidates` 52, `conflictingSourceRows` 0; distinct cohort workspace
+    revisions include `322ed1a6...` and `55edaaad...` besides e24bb9 (so those 52 rows are bound to older frames). `sourceAuthority`: `CURRENT_SOURCE_AUTHORITY_NOT_PROVEN`, `safeToPromote:false`,
+    `requiresSnapshotRefresh:true`, deltaChecksum moved from `sha256:b9ccee80...` (2026-09-20 receipt) to `sha256:3e91052e...`, i.e. the source tree has changed since the last admitted snapshot. PROVEN here: the blocker the
+    handoff described is still real. NOT done and NOT authorized: PACKET-CHUNK-04 / LINEAGE-READBACK-05 (they need an execution bound to W), any Graphify refresh, any source-binding apply script
+    (`apply-*-source-bindings-*.mjs` write). Because the worktree has ~370 concurrent edits, even a refreshed snapshot would race them; the honest next gate is `CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED`.
+  - CONVERGENCE LEDGER ADDENDUM (2026-10-06; second paste of the same review; only NEW identifiers recorded, the rest is already above): AE-LINEAGE-01 splits into AE-TRAIN-01 (train from the immutable snapshot),
+    AE-RECEIPT-01 (model checksum, architecture, seed, dataset checksum), AE-ENCODE-01 (canonicalId -> latent row exact binding), AE-EVAL-01 (Recall@K, MRR, cluster quality); RERANK-OWNER-01 adds RERANK-ONE-VOTE-01
+    (rerank changes order only); ORNITH-RUNTIME-01 names the gate ORNITH-YARN-LAUNCH-02 (YaRN not claimed active until the launcher process command shows rope scaling yarn + orig ctx + factor + model checksum +
+    llama.cpp revision); status reminders from the review's own ledger: KNN top-k NOT_PROVEN, KMeans PARTIAL/STALE, SOM 20x20 PARTIAL/STALE, PageRank persistence NOT_PROVEN, `docs/reports/som-ae-knn-kmeans-alignment-v1.json`
+    OPEN_ALIGNMENT_GAPS (all unverified here). STATUS OF THE REQUESTED ORDER: CBM-MEASURE-02A/B/C/D/E are DONE (see CBM-ALIGN-02 and CBM-MEASURE-02B/C/D RESULTS above); CBM-ADMISSION-01 has a RECOMMENDATION recorded but
+    NO operator decision yet; REPRESENTATION-SNAPSHOT-01 (semantic_768 frozen rows + canonicalId + packetKey + symbolVersionId + workspace/source/representation revision + ordinal + snapshot checksum) is NOT started and is
+    still gated by the CURRENT-WORKSPACE-01 result (STALE_WORKSPACE_PROJECTION, no execution bound to the admitted revision).
+  - CBM-ADMISSION-01 DECIDED (operator "yes", 2026-10-06): codebase-memory-mcp v0.11.0 is ADMITTED ONLY as the `WORKTREE_STRUCTURAL` challenger for query classes DEFINITION, OUTLINE, SNIPPET, IMPORTS (candidate set) and
+    BOUNDED TEXT (`search_code` with `path_filter`). NOT admitted for BLAST_RADIUS (`detect_changes` maps 0 symbols), ROUTE/HTTP (URL strings, not file routes), WRITES (variable writes, not table writes), or CALLS as evidence.
+    Rules in force: `canonicalAuthority:false`; EMPTY = UNKNOWN, never ABSENT; every observation must resolve through the Atlas identity resolver before ContextManifest promotion; negative claims need rg; stale-index
+    guard required (index is a snapshot, watcher off). This admission does not wire anything by itself: the handler is a separate step.
+  - CBM-HANDLER-DEFINITION-01 + SUBAGENT REVIEW FIXES (2026-10-06; both DAG spec files now 30/30; UNCOMMITTED, NOT in the pushed branch): `makeCbmDefinitionHandlerV1` (WORKTREE_STRUCTURAL, DEFINITION only) parses the REAL
+    `cli search_graph` output with the tool's own `format:"json"` argument (`{cols, groups:[{qn_prefix,file,rows:[[name,label,lines,in,out]]}], total, truncated}`; the `--json` flag only wraps the text table, so it
+    is NOT used); returns a tier-1 receipt (`backend:'CODEBASE_MEMORY_MCP'`, version, `canonicalAuthority:false`, `emptyMeansUnknown:true`), keeps exact-name rows only, identity `UNRESOLVED_NEEDS_ATLAS_IDENTITY`, and a
+    stale-index guard (`isFresh` injected; null = unknown); malformed output throws `CBM_SEARCH_GRAPH_NOT_JSON` / `..._UNEXPECTED_COLUMNS`. Owner map gained `WORKTREE_STRUCTURAL` (READY_WITH_CAVEAT); NOT a stage in
+    the mapper yet; OUTLINE/SNIPPET/IMPORTS/TEXT adapters not written (their JSON shapes are unverified).
+    Read-only subagent review of commit `eaa082d4a3` (its claims, each re-checked against the code before acting): FIXED (1) the file-parsing `makeAstHandlerV1` comment wrongly said the DAG makes AST depend on LEXICAL,
+    which the mapper no longer does (the AST stage uses the candidate-lane handler); it is now documented as a handler for a FUTURE `AST_STRUCTURAL_REFINE` node, with the relative-path/`readFile` base spelled out;
+    (2) a failed/timed-out CACHE_LOOKUP blocked every lookup and the packet: it is now a SOFT dependency (ordering only; failure recorded in `degradedDependencies`, receipt degraded, nothing blocked);
+    (3) blocked reason now names the status (`dependency QUERY_ANALYSIS NO_HANDLER`); (4) a handler returning a plain value (not a Promise) was reported FAILED: wrapped in `Promise.resolve`. KNOWN LIMITS NOT FIXED:
+    a timed-out handler is not cancelled (it keeps running, e.g. a spawned rg; no AbortSignal in the handler contract); a CACHE HIT still short-circuits nothing (the node is a latency gate until a hit can skip lookups);
+    the subagent did not open `llm-context-cache.ts`/`ace-packet-store.ts` (the "no write-back" claims there rest on my own earlier read). Review itself was not run against the specs (it did not execute vitest).
 - [ ] QUERY-TEMPORAL-01 Add `QueryTemporalIntentV1` (TIME_AGNOSTIC | RECENT | LATEST | AS_OF + `asOf`/`maxAgeDays`). Freshness is a feature weighted only when the query asks for it
   (never blind recency; never encode "latest" in embedding text). Carry `observedAt`/`publishedAt`/`admittedAt`, `schemaRevision`, `ontologyRevision`, `sourceRevision`, `contentDigest` on `.okf` entries by
   extending `okf-topic-ingestion.ts`, not a new corpus schema.
