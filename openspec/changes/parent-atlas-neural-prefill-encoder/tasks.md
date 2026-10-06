@@ -17775,3 +17775,18 @@ Acceptance: deterministic replay yields the same admitted evidence set and manif
 mutation-denial tests prove classification and tuple lookup cannot write canonical stores or
 bypass host authorization. Fixture/replay success does not by itself prove live production
 grounding or close `ACE_EVIDENCE_GROUNDED`.
+
+### NE-23 follow-on: bit-encoded search helper plane — review and plan (2026-10-06; plan only, nothing implemented)
+
+**Evidence reviewed.** `docs/reports/atlas-candidate-shortlist-receipt-v1.json` (2026-08-27, `EXECUTED_UNPROVEN`, `canonicalAuthority:false`): 512 → 96 candidates, rank 8, Recall@10 0.30, Recall@24 0.333, Top24 overlap 0.333, oracle NDCG@24 0.499 (the low-rank `ndcgAt24` is null). A 30% Recall@10 means the shortlist drops ~70% of the exact top-10, so it is NOT a safe pre-filter; exact rerank stays the authority and NE-23E (above) stays the promotion gate. n=512 is also too small for a stable estimate.
+
+**Ownership (extend, do not duplicate).** simdjson parse = `simdJsonParse` in `tensorrt_bridge.node` (`src/lib/server/gpu/simdjson-bridge.ts`); radix sort = ACE-RADIX-01 CUB backend (never a retrieval vote); bitmap prefilter + dense rerank = `atlas.packet_dense_search` (`parent-atlas-packet-dense-bitmap-search`); low-rank sampling = `python/atlas_compute/low_rank.py` + `sample-query-matrix-v1.ts`; parameter derivation from language/LSP classification = `agentic/contracts/parameter-resolver-v1`; live FastAPI helpers `:8095` NLP/OAK, `:8098` GPU graph/tile, `:8121` neural decoder, `:8097` Go embedding, `:8100` Go retrieval. A new owner for any of these is prohibited without an ownership-registry decision.
+
+**Encoding policy (decision for review).** Hot path = raw bitmaps/typed arrays/mmap, never text. Hex only for checksums/receipts/debug; base64url only to carry small binary descriptors inside JSON; Crockford base32 only for human-facing compact addresses. Bulk vectors/matrices never go through JSON, MessagePack, hex or base64 (existing wire-format rule). `title_id`/bucket/ordinal are addresses, never identity (`packet_key`, `sourceRevision` stay identity); see FI-TITLE-ADDRESS-01.
+
+- [ ] NE-23F Read-only audit of the bit/sort/parse helper surface above; record callers and extension points; no new files.
+- [ ] NE-23G Freeze the encoding policy above as a contract with a JSON <-> MessagePack parity test for descriptors; reject bulk numeric payloads.
+- [ ] NE-23H Profile first: measure parse, sort, bitmap-intersect and fan-out time on real frozen candidate sets before any C/N-API/AVX2 work; native helpers only if a measured stage dominates query latency, and only as a backend behind the existing owner.
+- [ ] NE-23I Concurrent helper fan-out contract: async gather over read-only FastAPI/Go executors with per-helper timeout and budget, deterministic stable merge by CandidateOrdinal, normalization to the shared ordinal universe before fusion, fail closed on missing identity; concurrency must never change ordering.
+- [ ] NE-23J Re-run the Tang-inspired shortlist on a larger frozen snapshot with Recall@K/NDCG and confidence intervals; stays advisory until NE-23E passes.
+- [ ] NE-23K Untrained-weights guard: any score from untrained `.safetensors` (AE, `AtlasGemmaRankV1` rank head) carries `modelState: UNTRAINED`, `canonicalAuthority:false`, and is excluded from fusion votes until a trained, evaluated artifact exists (NE-24/NE-25).

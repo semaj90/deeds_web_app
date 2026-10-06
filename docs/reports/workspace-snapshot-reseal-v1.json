@@ -1,16 +1,14 @@
 {
   "schema": "atlas.workspace-snapshot-reseal.v1",
-  "generatedAt": "2026-10-06T17:39:08.657Z",
+  "generatedAt": "2026-10-06T18:42:34.198Z",
   "mode": "READ_ONLY",
-  "snapshotPath": "docs/reports/workspace-source-snapshots/ebabbae67866eaee8d1752d4b2ea8ba64ae966528f95974f980fa9d0c07c6dbd.json",
-  "snapshotRevision": "sha256:ebabbae67866eaee8d1752d4b2ea8ba64ae966528f95974f980fa9d0c07c6dbd",
-  "sourceCount": 27881,
-  "exactMatches": 27879,
-  "violationCounts": {
-    "SOURCE_BYTES_CHANGED": 2
-  },
-  "totalViolations": 2,
-  "readbackStatus": "SNAPSHOT_READBACK_BLOCKED",
+  "snapshotPath": "docs/reports/workspace-source-snapshots/cfd3446a4968165a2d247a41475d703ad0d6a4b987b862f2ce31e5f6c750b3cb.json",
+  "snapshotRevision": "sha256:cfd3446a4968165a2d247a41475d703ad0d6a4b987b862f2ce31e5f6c750b3cb",
+  "sourceCount": 27937,
+  "exactMatches": 27937,
+  "violationCounts": {},
+  "totalViolations": 0,
+  "readbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
   "writesPerformed": false,
-  "status": "RESEAL_READBACK_BLOCKED"
+  "status": "RESEAL_READBACK_PROVEN"
 }
