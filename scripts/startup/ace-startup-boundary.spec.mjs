@@ -24,7 +24,8 @@ test('ACE packet step performs no cache or canonical writes', () => {
   assert.match(packetStep, /cacheWrites: 0, receipt:/);
   assert.doesNotMatch(packetStep, /ioredis|createClient|new Redis|\.hset\(|\.setex\(|\.set\(/);
   assert.doesNotMatch(packetStep, BITFROST_WRITE);
-  assert.match(packetStep, /READ ONLY/);
+  assert.match(packetStep, /loadEmbedAllowedPacketKeysV1/);
+  assert.doesNotMatch(packetStep, /ENRICHMENT_READINESS_CTE_V1|FROM lv/);
 });
 
 test('ACE packet step status vocabulary has no warmed/success state', () => {
@@ -68,4 +69,14 @@ test('BitFrost packet writer has no caller outside the packet writer and its tes
     'scripts/startup/ace-startup-boundary.spec.mjs',
   ]);
   assert.deepEqual(callers.filter((c) => !allowed.has(c)), []);
+});
+
+test('TRACE MCP startup is separate from the Graphify daily chain and never touches ACE/BitFrost', () => {
+  const ensure = stripComments(read('sveltekit-frontend/scripts/ensure-mcp-server.mjs'));
+  assert.doesNotMatch(ensure, BITFROST_WRITE);
+  assert.doesNotMatch(ensure, /AcePacketWriter|graphify|karpathy|ace:packet/i);
+  const pkg = JSON.parse(read('sveltekit-frontend/package.json'));
+  const chain = pkg.scripts['graphify:daily:chain'];
+  assert.ok(chain.includes('graphify-daily-ace-packet-step-v1.mjs'));
+  assert.doesNotMatch(chain, /ensure-mcp-server|mcp:trace|8788|karpathy/i);
 });
