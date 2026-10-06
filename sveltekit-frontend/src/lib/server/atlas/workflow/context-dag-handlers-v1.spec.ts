@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
+import { decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 
 const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
@@ -339,5 +339,27 @@ describe('CBM WORKTREE_STRUCTURAL imports candidate adapter', () => {
     await expect(make('{')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/NOT_JSON/);
     await expect(make(resultJson, '../outside.ts')({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_RELATIVE_PATH/);
     await expect(make(resultJson, requestedPath, 201)({ nodeId: 'W', inputs: {} })).rejects.toThrow(/INVALID_LIMIT/);
+  });
+});
+
+describe('CBM identity / fallback / negative (CBM-IDENTITY-01, CBM-FALLBACK-01, CBM-NEGATIVE-01)', () => {
+  const ok = { canonicalId: 'packet:abc', workspaceRevision: 'w1', sourceRevision: 's1' };
+  it('qualifies only fresh + real identity + real revisions', async () => {
+    const r = await qualifyCbmObservationV1({ sourceRef: String.raw`src\a.ts`, stale: false }, async () => ok);
+    expect(r).toMatchObject({ status: 'QUALIFIED', sourceRef: 'src/a.ts', canonicalId: 'packet:abc' });
+  });
+  it('stale, unbound, unresolved, sentinel and failing lookups stay diagnostic', async () => {
+    expect(await qualifyCbmObservationV1({ sourceRef: 'a.ts', stale: true }, async () => ok)).toMatchObject({ reason: 'STALE_INDEX' });
+    expect(await qualifyCbmObservationV1({ sourceRef: 'a.ts', stale: null }, async () => ok)).toMatchObject({ reason: 'SNAPSHOT_UNBOUND' });
+    expect(await qualifyCbmObservationV1({ sourceRef: 'a.ts', stale: false }, async () => null)).toMatchObject({ reason: 'IDENTITY_UNRESOLVED' });
+    expect(await qualifyCbmObservationV1({ sourceRef: 'a.ts', stale: false }, async () => ({ ...ok, sourceRevision: 'unknown' }))).toMatchObject({ reason: 'REVISION_UNQUALIFIED' });
+    expect(await qualifyCbmObservationV1({ sourceRef: 'a.ts', stale: false }, async () => { throw new Error('x'); })).toMatchObject({ reason: 'LOOKUP_FAILED' });
+  });
+  it('fallback: empty is UNKNOWN never absent; stale/unknown/ambiguous go to rg', () => {
+    expect(decideCbmFallbackV1([])).toEqual({ use: 'RG_SOURCE_FALLBACK', reason: 'EMPTY', absence: 'UNKNOWN' });
+    expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: true }])).toMatchObject({ reason: 'STALE' });
+    expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: null }])).toMatchObject({ reason: 'STALE_UNKNOWN' });
+    expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: false }, { sourceRef: 'b.ts', stale: false }])).toMatchObject({ reason: 'AMBIGUOUS' });
+    expect(decideCbmFallbackV1([{ sourceRef: 'a.ts', stale: false }, { sourceRef: './a.ts', stale: false }])).toEqual({ use: 'CBM', absence: 'NOT_CLAIMED' });
   });
 });
