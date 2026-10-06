@@ -31,6 +31,11 @@ describe('mcp-tool-viterbi-frame-compiler-v1', () => {
   it('prefers the domain/intent/capability matching tool deterministically', () => {
     const observation = {
       revision: 'routing:v1',
+      workspaceRevision: 'workspace:v1',
+      producerRevision: 'router:v1',
+      policyRevision: 'policy:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      evidenceChecksum: `sha256:${'a'.repeat(64)}`,
       phase: 'DISCOVER' as const,
       intent: 'symbol_lookup',
       domain: 'retrieval',
@@ -47,6 +52,11 @@ describe('mcp-tool-viterbi-frame-compiler-v1', () => {
       observations: [
         {
           revision: 'routing:discover:v1',
+          workspaceRevision: 'workspace:v1',
+      producerRevision: 'router:v1',
+      policyRevision: 'policy:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      evidenceChecksum: `sha256:${'a'.repeat(64)}`,
           phase: 'DISCOVER',
           intent: 'symbol_lookup',
           domain: 'retrieval',
@@ -55,6 +65,11 @@ describe('mcp-tool-viterbi-frame-compiler-v1', () => {
         },
         {
           revision: 'routing:expand:v1',
+          workspaceRevision: 'workspace:v1',
+      producerRevision: 'router:v1',
+      policyRevision: 'policy:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      evidenceChecksum: `sha256:${'a'.repeat(64)}`,
           phase: 'EXPAND',
           intent: 'dependency_trace',
           domain: 'graph',
@@ -70,11 +85,35 @@ describe('mcp-tool-viterbi-frame-compiler-v1', () => {
     expect(frames[1]?.candidates[0]?.value.ref.toolName).toBe('graph_expand_neighborhood');
   });
 
+  it('rejects unqualified routing observations', () => {
+    expect(() => buildMcpToolViterbiFramesV1({
+      observations: [{
+        revision: 'routing:v1',
+        workspaceRevision: '',
+        producerRevision: 'router:v1',
+        policyRevision: 'policy:v1',
+        taxonomyRevision: 'taxonomy:v1',
+        evidenceChecksum: `sha256:${'a'.repeat(64)}`,
+        phase: 'DISCOVER',
+        intent: 'tool_discovery',
+        domain: 'retrieval',
+        evidenceState: 'MISSING',
+        preferredCapabilities: ['registry_search'],
+      }],
+      profiles: [readTool],
+    })).toThrow('TOOL_ROUTING_WORKSPACE_REVISION_REQUIRED');
+  });
+
   it('excludes write-capable tools from proposal frames', () => {
     const writeTool = { ...readTool, ref: { serverAuthorityId: 'trace', toolName: 'record_outcome' }, readOnly: false };
     expect(() => buildMcpToolViterbiFramesV1({
       observations: [{
         revision: 'routing:v1',
+      workspaceRevision: 'workspace:v1',
+      producerRevision: 'router:v1',
+      policyRevision: 'policy:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      evidenceChecksum: `sha256:${'a'.repeat(64)}`,
         phase: 'DISCOVER',
         intent: 'tool_discovery',
         domain: 'retrieval',
