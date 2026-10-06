@@ -183,7 +183,7 @@ export function buildReportManifestCorpusV1({ workspaceHead, workspaceRevision =
       associatedTaskCount: manifests.reduce((count, item) => count + item.associatedTaskKeys.length, 0),
       coldCandidateCount: 0,
       verifiedColdCopies,
-      archiveWrites: verifiedColdCopies > 0,
+      archiveWrites: false,
       localSourcesRetained: manifests.every((item) => item.localDisposition === 'RETAIN_LOCAL' || item.localDisposition === 'REVIEW_REQUIRED_RETAIN_LOCAL'),
     },
     policy: {
@@ -193,7 +193,7 @@ export function buildReportManifestCorpusV1({ workspaceHead, workspaceRevision =
       mutationAuthorized: false,
     },
     artifacts: manifests,
-    writesPerformed: verifiedColdCopies > 0,
+    writesPerformed: false,
   };
 }
 

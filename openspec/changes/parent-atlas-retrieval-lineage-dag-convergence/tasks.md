@@ -5475,6 +5475,40 @@ Implementation references and current gaps:
 - Candidate ordinal authority: `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts` (`CandidateOrdinalMapV1`, `materializeCandidateOrdinalMap`). The map is schema-backed and checksum-bearing, but a production frozen population receipt for this tranche is not yet proven.
 - Exact KNN executor: `python/atlas_compute/cuvs_analytics.py` (`run_cuvs_exact_knn`, `run_cuvs_all_neighbors`). It already records `top_k`, metric, row/dimension counts, and neighbor/distance checksums; the missing gate is binding those results to the admitted candidate map and input population checksum.
 - KMeans executor: `python/atlas_compute/cluster_softmax.py` (`run_cuvs_soft_kmeans`). It records cluster parameters and replay data, but centroid membership/checksum admission is still open.
+- [ ] **KMEANS-HELPER-01 — existing RAPIDS endpoint and receipt audit (2026-10-06):**
+  The existing FastAPI RAPIDS sidecar is `python/atlas_rapids_sidecar_graph.py`,
+  which mounts `POST /v1/semantic512/kmeans` from
+  `python/atlas_semantic512_runtime.py`; do not add another service or route.
+  This endpoint clusters `latent_64` rows derived from `semantic_512`, not the
+  canonical `semantic_768` corpus. The legacy `scripts/ml/ml_sidecar/server.py`
+  `/cluster` route is Flask-based, gates cuML behind `CUVS_AVAILABLE`, and has
+  a misleading sklearn fallback under `rapids_umap`; it is not the selected
+  RAPIDS owner. WSL package metadata reports cuML/cuVS 26.6.0, CuPy 14.1.1,
+  NumPy 2.4.6, FastAPI 0.141.1; this proves installation only. `:8098` did not
+  answer the bounded health/capability probe. `:8090/slots` reported
+  `is_processing=false`; no GPU computation was run pending operator approval
+  for the existing GPU preparation workflow. The clustering receipt now adds
+  a checksum of the normalized float32 little-endian matrix and an input
+  checksum covering identity, recipe, and KMeans parameters. Direct WSL
+  checksum assertions pass; pytest is not installed in the WSL RAPIDS env or
+  the Windows interpreter. Live cuML execution, CPU-oracle parity, candidate
+  ordinal binding, and routing benefit remain unproven. See
+  `python/atlas_semantic512_runtime.py` and
+  `python/tests/test_atlas_semantic512_runtime.py`.
+  **Implementation addendum (2026-10-06):** the deployed service entrypoint
+  is `services/atlas-gpu-8098/app.py`, not
+  `python/atlas_rapids_sidecar_graph.py`. The former now has a thin
+  `/v1/semantic512/kmeans` adapter to the existing `cluster_latent64` owner,
+  requires the shared `cuml` residency lease, and marks the response
+  non-canonical with all persistent writes false. The Dockerfile copies the
+  runtime module. The live 8098 container was independently observed to be a
+  different FastAPI app without this route (its cuML/cuVS are 26.8.0, unlike
+  WSL's 26.6.0); no rebuild or restart was performed. A stubbed TestClient
+  contract smoke passed before lazy-import hardening, but WSL failed to start
+  the test process on the latest rerun; lazy-import changes are therefore
+  `NOT_REVERIFIED`. No cuML computation or GPU preparation was run. Keep this
+  gate open until Python validation, a bounded source-level smoke, deployed
+  runtime alignment, and separately authorized CPU-oracle/GPU parity pass.
 - SOM executor: `python/atlas_compute/som.py` (`train_deterministic_som`). It supports deterministic 20x20 execution; fixture mode may retain population-derived defaults, but `python/atlas_compute/aligned_snapshot_experiment_v2.py` now rejects omitted production values and requires explicit `som_grid_rows=20` and `som_grid_columns=20` alongside a ready candidate-freeze receipt.
 - Shared experiment coordinator: `python/atlas_compute/aligned_snapshot_experiment_v2.py`. It currently executes exact KNN, KMeans, and SOM over the same loaded semantic matrix, but does not yet prove the `CandidateOrdinalMapV1`/population receipt before downstream stages.
 - Required report: `docs/reports/som-ae-knn-kmeans-alignment-v1.json`; this is a read-only proof receipt, not an artifact writer.

@@ -1,0 +1,51 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cuml-kmeans",
+  "source_ref": "rapids-cuml-kmeans:docs-rapids-ai-api-cuml-cluster-cuml-cluster",
+  "url": "https://docs.rapids.ai/api/cuml/legacy/api/cuml.cluster/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "cuml",
+    "kmeans",
+    "centroid_routing",
+    "cpu_gpu_parity",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "[Skip to main content](https://docs.rapids.ai/api/cuml/legacy/api/cuml.cluster/#main-content) Back to top`Ctrl` + `K` [Home](https://docs.rapids.ai/api) cuml [cudf-java](https://docs.rapids.ai/api/cudf-java/stable) [libcudf](https://docs.rapids.ai/api/libcudf/stable/namespacecudf/) [libcuml](https://docs.rapids.ai/api/libcuml/stable) [libkvikio](https://docs.rapids.ai/api/libkvikio/stable) [librapidsmpf](https://docs.rapids.ai/api/librapidsmpf/stable) [libucxx](https://docs.rapids.ai/api/libucxx/stable) [ucxx](https://docs.rapids.ai/api/ucxx/stable) legacy (26.06) [legacy (26.06)](https://docs.rapids.ai/api/cuml/legacy) - System Settings - Light - Dark - [GitHub](https://github.com/rapidsai/cuml) - [Twitter](https://twitter.com/rapidsai) Collapse SidebarExpand Sidebar # cuml.cluster [\\#](https://docs.rapids.ai/api/cuml/legacy/api/cuml.cluster/\\#module-cuml.cluster \"Link to this heading\") | | | | --- | --- | | [`AgglomerativeClustering`](https://docs.rapids.ai/api/cuml/legacy/api/generated/cuml.cluster.AgglomerativeClustering/#cuml.cluster.AgglomerativeClustering \"cuml.cluster.AgglomerativeClustering\") | Agglomerative Clustering | | [`DBSCAN`](https://docs.rapids.ai/api/cuml/legacy/",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cuml-kmeans:docs-rapids-ai-api-cuml-cluster-cuml-cluster",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuML clustering API from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "4978106852e297080fefe3df8bd492edb780dff1bd93d867945487f40fc269b9",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\rapids-cuml-kmeans\\docs-rapids-ai-api-cuml-cluster-cuml-cluster.md",
+  "fetched_at": "2026-10-06T20:09:45.123Z",
+  "metadata": {
+    "kind": "official_api_documentation",
+    "source_id": "rapids-cuml-kmeans",
+    "source_title": "RAPIDS cuML clustering API",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\rapids-cuml-kmeans\\docs-rapids-ai-api-cuml-cluster-cuml-cluster.md"
+}

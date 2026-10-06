@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.embedding-runtime-readback.v1",
+  "observedAt": "2026-10-06",
+  "mode": "READ_ONLY_RUNTIME_INSPECTION",
+  "scope": "Health, Ollama tags, process residency, and container metadata only; the separate recipe census performed transient embedding inference.",
+  "provider": "ollama",
+  "configuredModel": "embeddinggemma:latest",
+  "modelTag": {
+    "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+    "embeddingDimension": 768
+  },
+  "modelArtifact": {
+    "bindingMethod": "ollama show embeddinggemma:latest --modelfile FROM path",
+    "path": "C:\\Users\\james\\.ollama\\blobs\\sha256-0800cbac9c2064dde519420e75e512a83cb360de3ad5df176185dc69652fc515",
+    "sizeBytes": 621867104,
+    "sha256": "0800cbac9c2064dde519420e75e512a83cb360de3ad5df176185dc69652fc515",
+    "filenameDigestMatchesFileHash": true,
+    "tokenizerRevisionSeparatelyQualified": false
+  },
+  "residentModel": {
+    "name": "embeddinggemma:latest",
+    "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+    "sizeVramBytes": 681417113,
+    "expiresAt": "2026-10-06T09:24:35.3124469-07:00"
+  },
+  "embeddingServiceHealth": {
+    "endpoint": "http://127.0.0.1:8097/health",
+    "status": "healthy",
+    "modelLoaded": "true",
+    "device": "cpu",
+    "reportedModelId": null,
+    "reportedArtifactRevision": null,
+    "reportedDimension": null
+  },
+  "container": {
+    "name": "legal-ai-go-embedding",
+    "containerId": "7788846bf731",
+    "imageId": "sha256:431ddc0acb6fb8252b003fb514727f2fee9dad6b81735a1cf485dc3d98617fd2",
+    "imageCreatedAt": "2026-07-29T16:00:28.069994873Z",
+    "startedAt": "2026-10-06T15:09:59.1325827Z",
+    "liveHealthcheckPath": "/health",
+    "currentComposeHealthcheckPath": "/ready",
+    "imageInspectableLocally": false,
+    "configuredModel": "embeddinggemma:latest"
+  },
+  "isolatedSourceBuild": {
+    "imageTag": "atlas-go-embedding-readback:20261006",
+    "imageId": "sha256:a0741f72e828aae0d37adc5f4c486727f2e7c7bb579d45f3688a6cc1f534886d",
+    "sourceCommit": "b15fc659e5",
+    "buildSucceeded": true,
+    "healthReadback": {
+      "status": "healthy",
+      "backendReachable": true,
+      "modelAvailable": true,
+      "requestedModelLoaded": true,
+      "modelId": "embeddinggemma:latest",
+      "modelArtifactRevision": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+      "embeddingDimension": 768,
+      "provider": "ollama",
+      "device": "ollama-gpu",
+      "gpuActive": true
+    },
+    "goTestAllPackages": "PASS (cached)",
+    "containerRemovedAfterSmoke": true,
+    "activeContainerModified": false,
+    "inferenceInvokedByHealthSmoke": false
+  },
+  "assessment": {
+    "tagAndResidentDigestMatch": true,
+    "modelArtifactFileChecksumVerified": true,
+    "requestedModelPresentInOllamaPs": true,
+    "embeddingServiceDetailedRuntimeBindingExposed": false,
+    "runningImageBoundToCheckedOutSource": false,
+    "isolatedSourceBuildRuntimeReadbackVerified": true,
+    "deviceSemanticsResolved": false,
+    "representationRevisionQualified": false,
+    "embeddingRequestPerformed": false,
+    "persistencePerformed": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false,
+    "status": "MODEL_ARTIFACT_AND_RESIDENCY_READBACK_PARTIAL"
+  }
+}

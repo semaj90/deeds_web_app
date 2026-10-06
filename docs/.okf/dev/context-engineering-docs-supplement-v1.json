@@ -1,0 +1,46 @@
+{
+  "schema_version": "okf.dev.manifest.v1",
+  "description": "Bounded official-source supplement for semantic representation, PostgreSQL vector retrieval, cuML clustering, ontology tooling, structural code analysis, and JSON stream parsing. Diagnostic reference only; not admitted evidence.",
+  "sources": [
+    {
+      "source_id": "embeddinggemma-model",
+      "title": "EmbeddingGemma model card",
+      "kind": "official_model_documentation",
+      "domain_class": "retrieval",
+      "focus_tags": ["embedding", "semantic_768", "model_revision", "representation_lineage"],
+      "pages": ["https://ai.google.dev/gemma/docs/embeddinggemma/model_card"]
+    },
+    {
+      "source_id": "pgvector-reference",
+      "title": "pgvector official reference",
+      "kind": "official_project_documentation",
+      "domain_class": "database",
+      "focus_tags": ["pgvector", "exact_search", "hnsw", "ivfflat", "cosine_distance"],
+      "pages": ["https://github.com/pgvector/pgvector"]
+    },
+    {
+      "source_id": "rapids-cuml-kmeans",
+      "title": "RAPIDS cuML clustering API",
+      "kind": "official_api_documentation",
+      "domain_class": "gpu",
+      "focus_tags": ["cuml", "kmeans", "centroid_routing", "cpu_gpu_parity"],
+      "pages": ["https://docs.rapids.ai/api/cuml/legacy/api/cuml.cluster/"]
+    },
+    {
+      "source_id": "oaklib-ontology-tooling",
+      "title": "Ontology Access Kit introduction",
+      "kind": "official_project_documentation",
+      "domain_class": "documentation",
+      "focus_tags": ["oaklib", "ontology", "adapter", "validation"],
+      "pages": ["https://incatools.github.io/ontology-access-kit/introduction.html"]
+    },
+    {
+      "source_id": "simdjson-project",
+      "title": "simdjson project documentation",
+      "kind": "official_project_documentation",
+      "domain_class": "tool",
+      "focus_tags": ["simdjson", "jsonl", "streaming_parse", "native_boundary"],
+      "pages": ["https://github.com/simdjson/simdjson"]
+    }
+  ]
+}

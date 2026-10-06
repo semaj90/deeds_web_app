@@ -3,12 +3,17 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync/atomic"
 	"testing"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func TestResolveEmbeddingCapabilityV2BindsImmutableOwners(t *testing.T) {
@@ -82,6 +87,37 @@ func TestEmbeddingCacheKeyV2SeparatesRepresentationAndInput(t *testing.T) {
 	}
 }
 
+func TestEmbeddingCapabilityCacheEligibilityV2RequiresIndependentBindings(t *testing.T) {
+	digest := "sha256:" + strings.Repeat("a", 64)
+	base := embeddingCapabilityV2{
+		GGUFArtifactDigest:        &digest,
+		GGUFArtifactBindingStatus: "INDEPENDENT_READBACK_VERIFIED",
+		TokenizerBindingStatus:    "INDEPENDENT_READBACK_VERIFIED",
+	}
+	if !embeddingCapabilityCacheEligibleV2(base) {
+		t.Fatal("independently read-back artifact and tokenizer bindings should permit cache access")
+	}
+
+	cases := []struct {
+		name   string
+		mutate func(*embeddingCapabilityV2)
+	}{
+		{name: "missing artifact digest", mutate: func(c *embeddingCapabilityV2) { c.GGUFArtifactDigest = nil }},
+		{name: "invalid artifact digest", mutate: func(c *embeddingCapabilityV2) { invalid := "sha256:unknown"; c.GGUFArtifactDigest = &invalid }},
+		{name: "unverified artifact", mutate: func(c *embeddingCapabilityV2) { c.GGUFArtifactBindingStatus = "UNAVAILABLE_NOT_PROVEN" }},
+		{name: "unverified tokenizer", mutate: func(c *embeddingCapabilityV2) { c.TokenizerBindingStatus = "CONFIGURED_REVISION_NOT_RUNTIME_ATTESTED" }},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			capability := base
+			testCase.mutate(&capability)
+			if embeddingCapabilityCacheEligibleV2(capability) {
+				t.Fatal("cache access must remain disabled without both independent bindings")
+			}
+		})
+	}
+}
+
 func TestStrictEmbeddingHandlerV2EmitsBoundReceiptWithoutCanonicalAuthority(t *testing.T) {
 	t.Setenv("EMBEDDING_SERVICE_BUILD_REVISION", "sha256:"+strings.Repeat("a", 64))
 	t.Setenv("EMBEDDING_TOKENIZER_REVISION", "sha256:"+strings.Repeat("c", 64))
@@ -121,6 +157,15 @@ func TestStrictEmbeddingHandlerV2EmitsBoundReceiptWithoutCanonicalAuthority(t *t
 		}
 	}))
 	defer ollama.Close()
+	var cacheDialAttempts atomic.Int64
+	cache := redis.NewClient(&redis.Options{
+		Addr: "127.0.0.1:6379",
+		Dialer: func(context.Context, string, string) (net.Conn, error) {
+			cacheDialAttempts.Add(1)
+			return nil, errors.New("unexpected cache access in unqualified embedding test")
+		},
+	})
+	defer cache.Close()
 
 	text := "exact admitted input bytes"
 	input := strictEmbeddingRequestV2{
@@ -134,7 +179,7 @@ func TestStrictEmbeddingHandlerV2EmitsBoundReceiptWithoutCanonicalAuthority(t *t
 	}
 	req := httptest.NewRequest(http.MethodPost, "/embed/v2", strings.NewReader(string(requestBody)))
 	response := httptest.NewRecorder()
-	httpStrictEmbedHandlerV2(&embeddingServer{cfg: config{OllamaURL: ollama.URL, EmbedModel: "embeddinggemma:latest"}})(response, req)
+	httpStrictEmbedHandlerV2(&embeddingServer{cfg: config{OllamaURL: ollama.URL, EmbedModel: "embeddinggemma:latest"}, rdb: cache})(response, req)
 	if response.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", response.Code, response.Body.String())
 	}
@@ -142,8 +187,11 @@ func TestStrictEmbeddingHandlerV2EmitsBoundReceiptWithoutCanonicalAuthority(t *t
 	if err := json.Unmarshal(response.Body.Bytes(), &decoded); err != nil {
 		t.Fatal(err)
 	}
-	if decoded.Status != "ADMITTED" || decoded.Receipt == nil || decoded.Capability == nil {
-		t.Fatalf("missing admitted receipt/capability: %+v", decoded)
+	if decoded.Status != "OBSERVATION_ONLY" || decoded.Receipt == nil || decoded.Capability == nil {
+		t.Fatalf("missing observation-only receipt/capability: %+v", decoded)
+	}
+	if cacheDialAttempts.Load() != 0 || decoded.Capability.GGUFArtifactBindingStatus != "UNAVAILABLE_NOT_PROVEN" || decoded.Capability.TokenizerBindingStatus != "CONFIGURED_REVISION_NOT_RUNTIME_ATTESTED" {
+		t.Fatalf("unqualified response touched cache or overstated binding: cache_dials=%d capability=%+v", cacheDialAttempts.Load(), decoded.Capability)
 	}
 	if decoded.Receipt.CanonicalAuthority || decoded.Receipt.InputChecksum != input.InputChecksum ||
 		decoded.Receipt.InputArtifactChecksum != input.InputArtifactChecksum ||

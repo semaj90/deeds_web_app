@@ -3,6 +3,9 @@
 import pg from 'pg';
 import crypto from 'node:crypto';
 
+console.error('LEGACY_384_QDRANT_UPSERT_DISABLED: this script reads content_embedding_384 and cannot write the canonical semantic_768 projection');
+process.exit(2);
+
 const packetKey = process.argv[2];
 const collection = process.argv[3] || 'codebase_chunks_384';
 const qdrantUrl = process.env.QDRANT_URL || 'http://127.0.0.1:6333';

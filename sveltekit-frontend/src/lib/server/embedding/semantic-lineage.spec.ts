@@ -6,7 +6,6 @@ import {
 	digestSemanticEmbedding,
 	CANONICAL_SEMANTIC_DIMENSION,
 	CANONICAL_SEMANTIC_REPRESENTATION_ID,
-	CANONICAL_SEMANTIC_REPRESENTATION_REVISION,
 } from './semantic-lineage.js';
 
 describe('semantic-lineage', () => {
@@ -18,10 +17,11 @@ describe('semantic-lineage', () => {
 		const lineage = buildCanonicalSemanticLineage({
 			vector,
 			encoderRevision: CANONICAL_SEMANTIC_ENCODER_REVISION,
+			representationRevision: 7,
 		});
 
 		expect(lineage.representationId).toBe(CANONICAL_SEMANTIC_REPRESENTATION_ID);
-		expect(lineage.representationRevision).toBe(CANONICAL_SEMANTIC_REPRESENTATION_REVISION);
+		expect(lineage.representationRevision).toBe(7);
 		expect(lineage.dimension).toBe(CANONICAL_SEMANTIC_DIMENSION);
 		expect(lineage.encoderRevision).toBe(CANONICAL_SEMANTIC_ENCODER_REVISION);
 		expect(lineage.embeddingDigest).toBe(digestSemanticEmbedding(vector));
@@ -39,6 +39,7 @@ describe('semantic-lineage', () => {
 			buildCanonicalSemanticLineage({
 				vector: vector as number[],
 				encoderRevision: CANONICAL_SEMANTIC_ENCODER_REVISION,
+				representationRevision: 7,
 			}),
 		).toThrow();
 	});
@@ -50,8 +51,20 @@ describe('semantic-lineage', () => {
 			buildCanonicalSemanticLineage({
 				vector,
 				encoderRevision: '   ',
+				representationRevision: 7,
 			}),
 		).toThrow();
+	});
+
+	it('requires an explicit valid representation revision', () => {
+		const vector = Array.from({ length: CANONICAL_SEMANTIC_DIMENSION }, () => 0);
+		for (const representationRevision of [-1, 1.5, Number.NaN]) {
+			expect(() => buildCanonicalSemanticLineage({
+				vector,
+				encoderRevision: CANONICAL_SEMANTIC_ENCODER_REVISION,
+				representationRevision,
+			})).toThrow('SEMANTIC_768_REPRESENTATION_REVISION_REQUIRED');
+		}
 	});
 
 	it('changes digest when the vector changes', () => {

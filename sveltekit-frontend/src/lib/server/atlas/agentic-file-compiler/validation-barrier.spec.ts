@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { aggregateValidationBarrier } from './validation-barrier.js';
-const obs=(validator:string,status:'PASS'|'FAIL'|'WARN')=>({schema:'atlas.validation-observation.v1' as const,validator,status,evidenceRefs:[],durationMs:1,producerRevision:'v'});
+const obs=(validator:string,status:'PASS'|'FAIL'|'WARN')=>({schema:'atlas.validation-observation.v1' as const,validator,status,exitCode:0,stdoutDigest:`sha256:${'a'.repeat(64)}`,stderrDigest:`sha256:${'b'.repeat(64)}`,evidenceRefs:['receipt:fixture'],durationMs:1,producerRevision:'v'});
 describe('validation barrier',()=>{
   it('fails when a required validator is absent',()=>{expect(aggregateValidationBarrier({mutationId:'m',requiredValidators:['tree-sitter','typecheck'],observations:[obs('tree-sitter','PASS')]}).status).toBe('FAIL');});
+  it('rejects PASS without successful execution evidence',()=>{
+    expect(aggregateValidationBarrier({mutationId:'m',requiredValidators:['typecheck'],observations:[{...obs('typecheck','PASS'),exitCode:undefined}]}).status).toBe('FAIL');
+    expect(aggregateValidationBarrier({mutationId:'m',requiredValidators:['typecheck'],observations:[{...obs('typecheck','PASS'),evidenceRefs:[]}]}).status).toBe('FAIL');
+  });
   it('passes only when every required validator passes',()=>{
     const result = aggregateValidationBarrier({
       mutationId:'m',

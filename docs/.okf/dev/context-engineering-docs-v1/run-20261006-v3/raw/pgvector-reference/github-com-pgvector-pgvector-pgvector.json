@@ -1,0 +1,61 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "pgvector-reference",
+  "source_ref": "pgvector-reference:github-com-pgvector-pgvector-pgvector",
+  "url": "https://github.com/pgvector/pgvector",
+  "title": "github.com",
+  "domain_class": "database",
+  "focus_tags": [
+    "pgvector",
+    "exact_search",
+    "hnsw",
+    "ivfflat",
+    "cosine_distance",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "github.com",
+    "markdown_excerpt": "[Skip to content](https://github.com/pgvector/pgvector#start-of-content) You signed in with another tab or window. [Reload](https://github.com/pgvector/pgvector) to refresh your session.You signed out in another tab or window. [Reload](https://github.com/pgvector/pgvector) to refresh your session.You switched accounts on another tab or window. [Reload](https://github.com/pgvector/pgvector) to refresh your session.Dismiss alert {{ message }} [pgvector](https://github.com/pgvector)/ **[pgvector](https://github.com/pgvector/pgvector)** Public - [Notifications](https://github.com/login?return_to=%2Fpgvector%2Fpgvector) You must be signed in to change notification settings - [Fork\\\\ 1.3k](https://github.com/login?return_to=%2Fpgvector%2Fpgvector) - [Star\\\\ 23.3k](https://github.com/login?return_to=%2Fpgvector%2Fpgvector) master [**137** Branches](https://github.com/pgvector/pgvector/branches) [**43** Tags](https://github.com/pgvector/pgvector/tags) [Go to Branches page](https://github.com/pgvector/pgvector/branches)[Go to Tags page](https://github.com/pgvector/pgvector/tags) Go to file Code Open more actions menu ## Latest commit [![ankane](https://avatars.githubusercontent.com/u/220358",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:pgvector-reference:github-com-pgvector-pgvector-pgvector",
+    "title": "github.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh pgvector official reference from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "848f996b69ffeaab2854480a2dc5fdeb76434c47009bb04799643f5d92f69e99",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\pgvector-reference\\github-com-pgvector-pgvector-pgvector.md",
+  "fetched_at": "2026-10-06T20:09:42.994Z",
+  "metadata": {
+    "kind": "official_project_documentation",
+    "source_id": "pgvector-reference",
+    "source_title": "pgvector official reference",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\pgvector-reference\\github-com-pgvector-pgvector-pgvector.md"
+}

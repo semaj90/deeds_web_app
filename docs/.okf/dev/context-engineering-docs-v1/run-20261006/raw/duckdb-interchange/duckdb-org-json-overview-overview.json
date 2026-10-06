@@ -1,0 +1,57 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "duckdb-interchange",
+  "source_ref": "duckdb-interchange:duckdb-org-json-overview-overview",
+  "url": "https://duckdb.org/docs/current/data/json/overview",
+  "title": "duckdb.org",
+  "domain_class": "database",
+  "focus_tags": [
+    "jsonl",
+    "parquet",
+    "batch_analysis",
+    "interchange",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "This page documents duckdb.org. DuckDB JSON and Parquet is classified as database. Use a bounded task envelope with stable evidence refs and a concise action list.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "duckdb.org",
+    "markdown_excerpt": "Search Shortcut cmd \\+ k \\| ctrl \\+ k - [Installation](https://duckdb.org/install/) - Documentation - [Getting Started](https://duckdb.org/docs/current/index) - Connect - [Overview](https://duckdb.org/docs/current/connect/overview) - [Concurrency](https://duckdb.org/docs/current/connect/concurrency) - Data Import and Export - [Overview](https://duckdb.org/docs/current/data/overview) - [Data Sources](https://duckdb.org/docs/current/data/data_sources) - CSV Files - [Overview](https://duckdb.org/docs/current/data/csv/overview) - [Auto Detection](https://duckdb.org/docs/current/data/csv/auto_detection) - [Reading Faulty CSV Files](https://duckdb.org/docs/current/data/csv/reading_faulty_csv_files) - [Tips](https://duckdb.org/docs/current/data/csv/tips) - JSON Files - [Overview](https://duckdb.org/docs/current/data/json/overview) - [Creating JSON](https://duckdb.org/docs/current/data/json/creating_json) - [Loading JSON](https://duckdb.org/docs/current/data/json/loading_json) - [Writing JSON](https://duckdb.org/docs/current/data/json/writing_json) - [JSON Type](https://duckdb.org/docs/current/data/json/json_type) - [JSON Functions](https://duckdb.org/docs/current/data/json/json_functions)",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:duckdb-interchange:duckdb-org-json-overview-overview",
+    "title": "duckdb.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh DuckDB JSON and Parquet from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "0de668419816142c84daa1576d64a753c09b539c80bcfc5337a291d2ef8129cb",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\duckdb-interchange\\duckdb-org-json-overview-overview.md",
+  "fetched_at": "2026-10-06T18:01:38.552Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "duckdb-interchange",
+    "source_title": "DuckDB JSON and Parquet",
+    "fetched_via": "firecrawl"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\duckdb-interchange\\duckdb-org-json-overview-overview.md"
+}

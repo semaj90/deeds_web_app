@@ -46,7 +46,7 @@ export const CodeEvidenceSynthesizerReceiptSchema = z.object({
 	featureId: z.string().min(1),
 	featureLabel: z.string().min(1),
 	representationId: z.string().min(1),
-	representationRevision: z.string().min(1),
+	representationRevision: z.string().min(1).nullable(),
 	producerId: z.string().min(1),
 	producerRevision: z.string().min(1),
 	featureRevision: z.string().min(1),
@@ -88,7 +88,7 @@ export interface BuildCodeEvidenceLedgerInputFromSourceInput
 	sourceRef: string;
 	sourceRevision: string;
 	workspaceRevision?: string | null;
-	representationRevision: string;
+	representationRevision: string | null;
 	family: string;
 	passName: string;
 	passRevision: string;

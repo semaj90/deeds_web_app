@@ -19,6 +19,17 @@
 
 Use canonical joins, not a chained pseudo-linked-list such as `packet_key -> source_ref -> feature_id -> som_cell -> qdrant_point_id`. Those values have different owners and cardinalities. Connect them with typed, revisioned relationships and preserve each identifier's namespace. A Qdrant point ID, tree-node ID, SOM cell, cluster ID, centroid cache key, and CandidateOrdinal are never aliases for `packet_key`.
 
+### Revision dimensions (independent, never inferred from one another)
+
+| Revision | Identifies | Must bind / be issued by | Does not prove |
+| --- | --- | --- | --- |
+| `sourceRevision` | One exact source artifact version (for code, the admitted source bytes/digest under the source-binding owner; for external docs, the page/content evidence revision) | Existing canonical source or document-coordinate owner; retain the revision scheme and namespace | Workspace snapshot membership, packet/chunk binding, or any derived representation |
+| `workspaceRevision` | One exact repository/workspace snapshot or workspace-source binding frame | Existing workspace revision/binding owner | That every source or chunk is present, admitted, or unchanged; never substitute it for `sourceRevision` |
+| `representationRevision` | One derived representation artifact/population produced from identified input under an exact recipe | Representation producer, bound to input identity/revision, model/config/recipe and output checksum | Identity merely from dimension/model nickname, or equivalence between different recipes |
+| `producerRevision` | The implementation/configuration revision that performed a derivation | The producer owner (code/build plus material configuration); not a caller-supplied label | Source, workspace, graph, or representation revision by itself |
+
+Related but distinct: `graphRevision` identifies a frozen relationship kernel/snapshot; `evidenceRevision` identifies a grounded evidence coordinate/content claim; external-document `productVersion` describes the upstream product release. A missing required revision stays null/unqualified; do not synthesize a fallback such as `semantic_768@v1` or derive a workspace revision from a path, timestamp, or graph node.
+
 ## 2. Domain taxonomy proposal (not yet the runtime enum)
 
 The requested top-level taxonomy is a proposed `domain_class` vocabulary. It does not replace the current `parent-atlas-domain-taxonomy-v1` labels (`auth`, `ui`, `retrieval`, `network`, `database`, `cache`, `agent`, `graph`, `ml`) or the distinct `QueryClassificationV2` intent vocabulary. In particular, `frontend -> ui` is a known legacy alias, but collapsing `backend`, `compiler`, `gpu`, or `documentation` into a legacy label is lossy. Do not change stored labels or classifier schemas until a versioned migration/compatibility decision is made.

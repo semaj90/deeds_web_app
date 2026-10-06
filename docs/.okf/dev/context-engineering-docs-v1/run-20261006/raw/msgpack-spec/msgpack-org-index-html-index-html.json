@@ -1,0 +1,58 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "msgpack-spec",
+  "source_ref": "msgpack-spec:msgpack-org-index-html-index-html",
+  "url": "https://msgpack.org/index.html",
+  "title": "msgpack.org",
+  "domain_class": "database",
+  "focus_tags": [
+    "serialization",
+    "wire_format",
+    "binary_encoding",
+    "llm_synthesis",
+    "llm_output",
+    "kanban",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "This page documents msgpack.org. MessagePack specification is classified as configuration. Keep nodes bounded and side-effect free until the final validation boundary.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "msgpack.org",
+    "markdown_excerpt": "## It's like JSON. but fast and small. MessagePack is an efficient binary serialization format. It lets you exchange data among multiple languages like JSON. But it's faster and smaller. Small integers are encoded into a single byte, and typical short strings require only one extra byte in addition to the strings themselves. ### Next: MessagePack is supported by over 50 programming languages and environments. See [list of implementations](https://msgpack.org/index.html#languages). [![Redis](https://msgpack.org/images/redis.png)](https://redis.io/) Redis scripting has support for MessagePack because it is a fast and compact serialization format with a simple to implement specification. I liked it so much that I implemented a MessagePack C extension for Lua just to include it into Redis. Salvatore Sanfilippo, creator of Redis [![Fluentd](https://msgpack.org/images/fluentd.png)](https://fluentd.org/) Fluentd uses MessagePack for all internal data representation. It's crazy fast because of zero-copy optimization of msgpack-ruby. Now MessagePack is an essential component of Fluentd to achieve high performance and flexibility at the same time. Sadayuki Furuhashi, creator of Fluentd [![Tr",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "configuration",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:msgpack-spec:msgpack-org-index-html-index-html",
+    "title": "msgpack.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh MessagePack specification from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "f6f3eeb084e722506b1b9bb3c847bf2b82fd8dd2155e662021212ebc62b751e1",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\msgpack-spec\\msgpack-org-index-html-index-html.md",
+  "fetched_at": "2026-10-06T18:01:35.111Z",
+  "metadata": {
+    "kind": "official_specification",
+    "source_id": "msgpack-spec",
+    "source_title": "MessagePack specification",
+    "fetched_via": "firecrawl"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\msgpack-spec\\msgpack-org-index-html-index-html.md"
+}

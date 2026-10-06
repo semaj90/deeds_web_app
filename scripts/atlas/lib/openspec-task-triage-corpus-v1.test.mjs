@@ -107,6 +107,18 @@ test('stale or tampered supersession receipts fail closed before default suppres
   assert.throws(() => buildTaskTriageCorpusV1({
     taskCardCorpus, reportManifestCorpus, workspaceHead: 'head', reviewedSupersessionLinks: [tampered],
   }), /SUPERSESSION_RECEIPT_CHECKSUM_MISMATCH/);
+
+  const missingReplacementEvidence = { ...link, evidenceRefs: ['openspec/changes/old/tasks.md#L2'] };
+  missingReplacementEvidence.checksum = supersessionLinkChecksumV1(missingReplacementEvidence);
+  assert.throws(() => buildTaskTriageCorpusV1({
+    taskCardCorpus, reportManifestCorpus, workspaceHead: 'head', reviewedSupersessionLinks: [missingReplacementEvidence],
+  }), /SUPERSESSION_RECEIPT_SOURCE_EVIDENCE_REQUIRED/);
+
+  const staleSuccessorSource = { ...link, successorSourceFileRevision: 'sha256:stale-file' };
+  staleSuccessorSource.checksum = supersessionLinkChecksumV1(staleSuccessorSource);
+  assert.throws(() => buildTaskTriageCorpusV1({
+    taskCardCorpus, reportManifestCorpus, workspaceHead: 'head', reviewedSupersessionLinks: [staleSuccessorSource],
+  }), /SUPERSESSION_RECEIPT_TASK_REVISION_MISMATCH/);
 });
 
 test('multiple successors and supersession cycles fail closed', () => {

@@ -11,11 +11,6 @@ import {
 } from '../atlas/pos-concept-tagging-lane.js';
 import { CANONICAL_SEMANTIC_REPRESENTATION_ID } from '../atlas/contracts/feature-extraction-v1.js';
 
-// Kept as a literal revision label (not derived from CANONICAL_SEMANTIC_REPRESENTATION_ID)
-// — representationRevision is a free-form string, and renaming an already-issued
-// revision tag is a bigger behavioral change than this migration's scope. New
-// revisions of this envelope should use a semantic_512-prefixed tag.
-const DEFAULT_REPRESENTATION_REVISION = 'semantic_768@1';
 const DEFAULT_SEMANTIC_FEATURE_ENVELOPE_REVISION = 'semantic-feature-envelope.v1';
 const DEFAULT_PRODUCER_ID = 'pos-concept-source-adapter';
 const DEFAULT_PRODUCER_REVISION = 'pos-concept-source-adapter-v1';
@@ -135,7 +130,7 @@ export const SemanticFeatureEnvelopeSchema = z
     featureId: z.string().min(1),
     featureLabel: z.string().min(1),
     representationId: z.literal(CANONICAL_SEMANTIC_REPRESENTATION_ID),
-    representationRevision: z.string().min(1),
+    representationRevision: z.string().min(1).nullable(),
     producerId: z.string().min(1),
     producerRevision: z.string().min(1),
     featureRevision: z.string().min(1),
@@ -346,7 +341,7 @@ export async function buildPosConceptTaggingPacketFromSource(
   const extractedFeatures = input.extractedFeatures ?? (await extractAstAndEntities(input.text, isCode));
   const featureId = (input.featureId?.trim() || packetKey).trim();
   const featureLabel = input.featureLabel.trim();
-  const representationRevision = input.representationRevision?.trim() || DEFAULT_REPRESENTATION_REVISION;
+  const representationRevision = input.representationRevision?.trim() || null;
   const producerId = input.producerId?.trim() || DEFAULT_PRODUCER_ID;
   const producerRevision = input.producerRevision?.trim() || DEFAULT_PRODUCER_REVISION;
   const featureRevision = input.featureRevision?.trim() || DEFAULT_FEATURE_REVISION;

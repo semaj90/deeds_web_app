@@ -84,9 +84,9 @@ test('cold manifest transition requires fresh checksum plus independent exact re
     hashedBytes: 5,
   });
   assert.equal(corpus.summary.verifiedColdCopies, 1);
-  assert.equal(corpus.summary.archiveWrites, true);
+  assert.equal(corpus.summary.archiveWrites, false);
   assert.equal(corpus.summary.localSourcesRetained, true);
-  assert.equal(corpus.writesPerformed, true);
+  assert.equal(corpus.writesPerformed, false);
 });
 
 test('cold manifest transition rejects cached checksums, mismatched readback, and unsafe pointers', () => {

@@ -12,6 +12,7 @@ const arg = (name) => {
 const workspaceRevision = arg('--workspace-revision');
 const executionId = arg('--execution-id');
 const outputPath = arg('--output');
+const bindingRepoId = arg('--binding-repo-id');
 
 if (!/^sha256:[0-9a-f]{64}$/.test(workspaceRevision ?? '')) {
   throw new Error('EXPLICIT_WORKSPACE_REVISION_REQUIRED');
@@ -19,16 +20,32 @@ if (!/^sha256:[0-9a-f]{64}$/.test(workspaceRevision ?? '')) {
 if (!/^[0-9a-f-]{36}$/i.test(executionId ?? '')) {
   throw new Error('EXPLICIT_EXECUTION_ID_REQUIRED');
 }
+if (!bindingRepoId?.trim()) {
+  throw new Error('EXPLICIT_BINDING_REPO_ID_REQUIRED');
+}
 
 const cohortCte = `WITH cohort AS (
   SELECT DISTINCT source_ref, lower(code_source_revision) AS source_revision,
-    lower(content_hash) AS content_hash
+    lower(content_hash) AS content_hash, workspace_revision::text AS workspace_revision,
+    repository_id
   FROM public.graphify_execution_file_membership_v2
-  WHERE execution_id = $1::uuid
+    WHERE execution_id = $1::uuid
     AND workspace_revision::text = $2
     AND repository_id = 'repo:root'
+), qualified_sources AS (
+  SELECT c.source_ref, c.source_revision, c.content_hash, c.workspace_revision,
+    b.repo_id, b.binding_checksum, b.producer_revision
+  FROM cohort c
+  JOIN public.atlas_workspace_source_bindings b
+    ON b.repo_id = $3
+    AND b.canonical_source_ref = c.source_ref
+    AND b.workspace_revision = c.workspace_revision
+    AND lower(b.source_revision) = c.source_revision
+    AND lower(b.content_digest) = c.content_hash
+    AND b.binding_checksum IS NOT NULL
+    AND b.producer_revision IS NOT NULL
 )`;
-const params = [executionId, workspaceRevision];
+const params = [executionId, workspaceRevision, bindingRepoId];
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
   max: 1,
@@ -40,9 +57,9 @@ const report = {
   schema: 'atlas.enrichment-lineage-gates.v1',
   mode: 'READ_ONLY',
   writesPerformed: false,
-  scope: { workspaceRevision, executionId },
+  scope: { workspaceRevision, executionId, bindingRepoId },
   authority: 'DIAGNOSTIC_ONLY',
-  joinPolicy: 'EXACT_SOURCE_REVISION_AND_PACKET_KEY_WHERE_AVAILABLE',
+  joinPolicy: 'EXACT_SOURCE_BINDING_THEN_PACKET_KEY_AND_SOURCE_REVISION; PACKET_WORKSPACE_KEY_IS_MIRROR_ONLY',
 };
 
 async function one(name, sql) {
@@ -68,45 +85,53 @@ try {
     count(*) FILTER (WHERE content_hash IS NOT NULL AND content_hash <> '')::int AS content_hashed_sources
     FROM cohort`);
 
+  await one('qualifiedSources', `SELECT count(*)::int AS rows,
+    count(DISTINCT source_ref)::int AS distinct_source_refs,
+    count(*) FILTER (WHERE binding_checksum IS NOT NULL AND producer_revision IS NOT NULL)::int AS binding_provenance_rows
+    FROM qualified_sources`);
+
   await one('semanticRepresentation', `SELECT representation_id, upstream_model_id, upstream_revision,
     artifact_digest, native_dimensions, output_dimensions, dimension_method, normalization,
     lifecycle_status, verification_status
     FROM public.atlas_representations WHERE representation_id = 'semantic_768'`);
 
   await one('packets', `, matched AS (
-    SELECT c.source_ref AS cohort_source_ref, c.source_revision AS admitted_source_revision,
-      p.packet_key, p.source_revision, p.workspace_revision_key, p.canonical
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
+    SELECT q.source_ref AS cohort_source_ref, q.source_revision AS admitted_source_revision,
+      q.workspace_revision AS admitted_workspace_revision, p.packet_key,
+      p.source_revision AS packet_source_revision,
+      p.workspace_revision_key AS packet_workspace_revision_key, p.canonical
+    FROM qualified_sources q JOIN public.atlas_packets p
+      ON p.source_ref = q.source_ref AND lower(p.source_revision) = q.source_revision
   ) SELECT count(*)::int AS rows,
     count(DISTINCT cohort_source_ref)::int AS sources_with_packet,
     count(DISTINCT packet_key)::int AS distinct_packet_keys,
-    count(*) FILTER (WHERE source_revision IS NOT NULL AND lower(source_revision) = admitted_source_revision)::int AS exact_source_revision_rows,
-    count(*) FILTER (WHERE workspace_revision_key = $2)::int AS exact_workspace_revision_rows,
-    count(*) FILTER (WHERE source_revision IS NOT NULL AND lower(source_revision) = admitted_source_revision AND workspace_revision_key = $2)::int AS exact_source_and_workspace_rows,
+    count(*) FILTER (WHERE packet_source_revision IS NOT NULL AND lower(packet_source_revision) = admitted_source_revision)::int AS exact_source_revision_rows,
+    count(*) FILTER (WHERE packet_workspace_revision_key = admitted_workspace_revision)::int AS packet_workspace_revision_mirror_rows,
+    count(*) FILTER (WHERE packet_source_revision IS NOT NULL AND lower(packet_source_revision) = admitted_source_revision)::int AS exact_source_and_binding_rows,
     count(*) FILTER (WHERE canonical IS TRUE)::int AS canonical_flag_rows
     FROM matched`);
 
   await one('treeNodes', `, matched AS (
     SELECT n.node_id, n.packet_key, n.node_type, n.ledger_type, p.source_ref,
-      p.source_revision, p.workspace_revision_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+      p.source_revision, q.workspace_revision AS admitted_workspace_revision
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
     JOIN public.atlas_tree_nodes n ON n.packet_key = p.packet_key
   ) SELECT count(*)::int AS rows,
     count(DISTINCT packet_key)::int AS packet_keys_with_tree_nodes,
     count(*) FILTER (WHERE ledger_type = 'canonical')::int AS canonical_ledger_rows,
     count(*) FILTER (WHERE node_type = 'chunk')::int AS chunk_nodes,
     count(*) FILTER (WHERE node_type = 'document')::int AS document_nodes,
-    count(*) FILTER (WHERE source_revision IS NOT NULL AND workspace_revision_key = $2)::int AS lineage_inherited_from_exact_packet
+    count(*) FILTER (WHERE source_revision IS NOT NULL AND admitted_workspace_revision = $2)::int AS lineage_inherited_from_exact_packet
     FROM matched`);
 
   await one('workspaceSourceBindings', `, matched AS (
     SELECT c.source_ref, c.source_revision AS admitted_source_revision, c.content_hash AS admitted_content_hash,
-      b.source_revision, b.content_digest, b.binding_checksum, b.producer_revision
+      c.workspace_revision AS admitted_workspace_revision, b.repo_id, b.source_revision,
+      b.content_digest, b.binding_checksum, b.producer_revision
     FROM cohort c JOIN public.atlas_workspace_source_bindings b
-      ON lower(regexp_replace(regexp_replace(btrim(b.canonical_source_ref), '\\\\', '/', 'g'), '^\\./', ''))
-       = lower(regexp_replace(regexp_replace(btrim(c.source_ref), '\\\\', '/', 'g'), '^\\./', ''))
-      AND b.workspace_revision = $2
+      ON b.repo_id = $3 AND b.canonical_source_ref = c.source_ref
+      AND b.workspace_revision = c.workspace_revision
   ) SELECT count(*)::int AS candidate_binding_rows,
     count(DISTINCT source_ref)::int AS sources_with_binding,
     count(*) FILTER (WHERE lower(source_revision) = admitted_source_revision
@@ -131,14 +156,15 @@ try {
     FROM matched`);
 
   await one('featureRows', `, packets AS (
-    SELECT c.source_ref, c.source_revision, p.packet_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+    SELECT q.source_ref, q.source_revision, q.workspace_revision, p.packet_key
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
   ), matched AS (
-    SELECT f.* FROM packets p JOIN public.atlas_observation_feature_rows f
+    SELECT f.*, p.workspace_revision AS admitted_workspace_revision
+    FROM packets p JOIN public.atlas_observation_feature_rows f
       ON f.packet_key = p.packet_key AND f.source_ref = p.source_ref
   ) SELECT count(*)::int AS rows,
-    count(*) FILTER (WHERE workspace_revision = $2)::int AS exact_workspace_revision_rows,
+    count(*) FILTER (WHERE workspace_revision = admitted_workspace_revision)::int AS exact_workspace_revision_rows,
     count(*) FILTER (WHERE representation_id = 'semantic_768' AND representation_revision IS NOT NULL AND btrim(representation_revision) <> '')::int AS semantic_768_revision_bound_rows,
     count(*) FILTER (WHERE tree_node_id IS NOT NULL)::int AS tree_node_bound_rows,
     count(*) FILTER (WHERE cardinality(evidence_refs) > 0)::int AS evidence_linked_rows,
@@ -149,9 +175,9 @@ try {
     FROM matched`);
 
   await one('analysisPassResults', `, packets AS (
-    SELECT c.source_ref, c.source_revision, p.packet_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+    SELECT q.source_ref, q.source_revision, q.workspace_revision, p.packet_key
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
   ), matched AS (
     SELECT r.* FROM packets p JOIN public.analysis_pass_results r
       ON r.packet_key = p.packet_key AND r.source_revision = p.source_revision
@@ -165,24 +191,25 @@ try {
     FROM matched`);
 
   await one('summaryLayers', `, packets AS (
-    SELECT c.source_ref, c.source_revision, p.packet_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+    SELECT q.source_ref, q.source_revision, q.workspace_revision, p.packet_key
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
   ), matched AS (
-    SELECT p.source_revision AS admitted_source_revision, p.source_ref AS admitted_source_ref, s.*
+    SELECT p.source_revision AS admitted_source_revision, p.source_ref AS admitted_source_ref,
+      p.workspace_revision AS admitted_workspace_revision, s.*
     FROM packets p JOIN public.atlas_summary_layers s
       ON s.packet_key = p.packet_key AND (s.source_ref IS NULL OR s.source_ref = p.source_ref)
   ) SELECT count(*)::int AS rows,
     count(*) FILTER (WHERE summary IS NOT NULL AND btrim(summary) <> '')::int AS populated_summaries,
     count(*) FILTER (WHERE metadata ? 'source_revision' AND metadata->>'source_revision' = admitted_source_revision)::int AS source_revision_metadata_matches,
-    count(*) FILTER (WHERE metadata ? 'workspace_revision' AND metadata->>'workspace_revision' = $2)::int AS workspace_revision_metadata_matches,
+    count(*) FILTER (WHERE metadata ? 'workspace_revision' AND metadata->>'workspace_revision' = admitted_workspace_revision)::int AS workspace_revision_metadata_matches,
     count(*) FILTER (WHERE metadata ? 'representation_revision' AND btrim(metadata->>'representation_revision') <> '')::int AS representation_revision_metadata_rows
     FROM matched`);
 
   await one('packetChunkLineage', `, packets AS (
-    SELECT c.source_ref, c.source_revision, p.packet_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+    SELECT q.source_ref, q.source_revision, q.workspace_revision, p.packet_key
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
   ), matched AS (
     SELECT l.*, p.source_ref AS admitted_source_ref, p.source_revision AS admitted_source_revision,
       p.packet_key AS admitted_packet_key, c.id AS physical_chunk_row_id,
@@ -202,12 +229,13 @@ try {
     FROM matched`);
 
   await one('chunkIndex', `, packets AS (
-    SELECT c.source_ref, c.source_revision, p.packet_key, p.workspace_revision_key
-    FROM cohort c JOIN public.atlas_packets p ON p.source_ref = c.source_ref
-      AND lower(p.source_revision) = c.source_revision AND p.workspace_revision_key = $2
+    SELECT q.source_ref, q.source_revision, q.workspace_revision AS admitted_workspace_revision,
+      p.packet_key, p.workspace_revision_key AS packet_workspace_revision_key
+    FROM qualified_sources q JOIN public.atlas_packets p ON p.source_ref = q.source_ref
+      AND lower(p.source_revision) = q.source_revision
   ), matched AS (
     SELECT i.*, l.source_revision AS lineage_source_revision,
-      p.workspace_revision_key AS admitted_workspace_revision
+      p.admitted_workspace_revision, p.packet_workspace_revision_key
     FROM packets p JOIN public.atlas_packet_chunk_lineage l
       ON l.packet_key = p.packet_key AND l.source_ref = p.source_ref
       AND lower(l.source_revision) = lower(p.source_revision) AND l.revision_status = 'PROVEN'
@@ -238,8 +266,8 @@ try {
 
 report.generatedAt = new Date().toISOString();
 report.gates = {
-  packetRevisionBinding: coverageGate(report.packets?.exact_source_and_workspace_rows, report.cohort?.source_rows),
-  packetKeyBoundTreeNodes: coverageGate(report.treeNodes?.packet_keys_with_tree_nodes, report.packets?.exact_source_and_workspace_rows),
+  packetRevisionBinding: coverageGate(report.packets?.exact_source_and_binding_rows, report.cohort?.source_rows),
+  packetKeyBoundTreeNodes: coverageGate(report.treeNodes?.packet_keys_with_tree_nodes, report.packets?.exact_source_and_binding_rows),
   astSourceRevision: coverageGate(report.astNodes?.exact_source_revision_rows, report.astNodes?.path_join_rows),
   workspaceSourceBinding: {
     ...coverageGate(report.workspaceSourceBindings?.exact_revision_digest_provenance_rows, report.cohort?.source_rows),

@@ -9,6 +9,11 @@ import {
   compareUtf8,
   materializeCandidateOrdinalMap,
   materializeRevisionQualifiedSourceChunkOrdinalMapV1,
+  materializeOpenSpecTaskOrdinalMapV1,
+  openSpecTaskOrdinalMapV1Schema,
+  ordinalUniverseMapV1Schema,
+  assertOpenSpecTaskOrdinalMapIntegrityV1,
+  assertOpenSpecTaskOrdinalMapReadbackV1,
   assertCandidateOrdinalMapIntegrityV1,
   resolveCanonicalCandidateByOrdinal,
   type CanonicalCandidateIdentityInput,
@@ -316,5 +321,94 @@ describe('resolveCanonicalCandidateByOrdinal — unaffected by the integrity-ass
     });
     const resolved = resolveCanonicalCandidateByOrdinal(map, 0);
     expect(resolved.canonicalId).toBe('cand:a');
+  });
+});
+
+describe('OpenSpec TaskCard ordinal universe', () => {
+  const taskFileHashes = {
+    'openspec/changes/a/tasks.md': `sha256:${'a'.repeat(64)}`,
+    'openspec/changes/b/tasks.md': `sha256:${'b'.repeat(64)}`,
+  };
+  const metadata = {
+    taskFileHashes,
+    workspaceRevision: 'workspace:fixture-r1',
+    sourcePopulationChecksum: `sha256:${'c'.repeat(64)}`,
+    producerRevision: 'openspec-task-ordinal-map-v1',
+  };
+  const cards = [
+    { stableKey: 'task:z', taskRevision: 'task-block:z1', sourcePath: 'openspec/changes/b/tasks.md', sourceLine: 9, retrievalState: 'WAITING', claim: 'Later task' },
+    { stableKey: 'task:a', taskRevision: 'task-block:a1', sourcePath: 'openspec/changes/a/tasks.md', sourceLine: 3, retrievalState: 'CURRENT', claim: 'Current task' },
+  ];
+
+  it('assigns deterministic dense task ordinals and binds file, block, workspace, source population, and card checksums', () => {
+    const map = materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: cards });
+    expect(map.universeKind).toBe('OPENSPEC_TASKCARD');
+    expect(map.candidates.map((row) => row.taskStableKey)).toEqual(['task:a', 'task:z']);
+    expect(map.candidates.map((row) => row.candidateOrdinal)).toEqual([0, 1]);
+    expect(map.candidates[0].taskRevision).toBe('task-block:a1');
+    expect(map.candidates[0].sourceFileRevision).toBe(taskFileHashes['openspec/changes/a/tasks.md']);
+    expect(map.candidates[0].workspaceRevision).toBe(metadata.workspaceRevision);
+    expect(map.identityAuthority).toBe(false);
+    expect(map.canonicalAuthority).toBe(false);
+    expect(() => assertOpenSpecTaskOrdinalMapIntegrityV1(map)).not.toThrow();
+  });
+
+  it('replays byte-identically when source card order changes', () => {
+    const first = materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: cards });
+    const second = materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: [...cards].reverse() });
+    expect(first).toEqual(second);
+  });
+
+  it('rejects duplicate task identities and missing source-file revision bindings', () => {
+    expect(() => materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: [cards[0], cards[0]] }))
+      .toThrow(/DUPLICATE_STABLE_KEY/);
+    expect(() => materializeOpenSpecTaskOrdinalMapV1({
+      ...metadata,
+      taskFileHashes: {},
+      taskCards: [cards[0]],
+    })).toThrow(/SOURCE_FILE_REVISION_MISSING/);
+  });
+
+  it('excludes historical or superseded cards from the default semantic universe', () => {
+    expect(() => materializeOpenSpecTaskOrdinalMapV1({
+      ...metadata,
+      taskCards: [{ ...cards[0], retrievalState: 'SUPERSEDED' }],
+    })).toThrow(/RETRIEVAL_STATE_NOT_INDEXABLE/);
+  });
+
+  it('detects row tampering and retains the existing packet map variant', () => {
+    const taskMap = materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: cards });
+    expect(() => assertOpenSpecTaskOrdinalMapIntegrityV1({
+      ...taskMap,
+      candidates: [{ ...taskMap.candidates[0], taskRevision: 'other-task-revision' }, taskMap.candidates[1]],
+    })).toThrow(/UNIVERSE_REVISION_MISMATCH|CHECKSUM_MISMATCH/);
+
+    const packetMap = materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snap-r1',
+      workspaceRevision: 'ws-r1',
+      producerRevision: 'prod-r1',
+      candidates: [candidate({ canonicalId: 'packet:candidate' })],
+    });
+    expect(ordinalUniverseMapV1Schema.parse({ universeKind: 'PACKET_CANDIDATE', ordinalMap: packetMap }).universeKind)
+      .toBe('PACKET_CANDIDATE');
+    expect(openSpecTaskOrdinalMapV1Schema.parse(taskMap)).toEqual(taskMap);
+  });
+
+  it('independently reads the bounded map back against source cards and rejects changed task revisions', () => {
+    const map = materializeOpenSpecTaskOrdinalMapV1({ ...metadata, taskCards: cards });
+    expect(() => assertOpenSpecTaskOrdinalMapReadbackV1({
+      ordinalMap: map,
+      taskCards: cards,
+      taskFileHashes,
+      workspaceRevision: metadata.workspaceRevision,
+      sourcePopulationChecksum: metadata.sourcePopulationChecksum,
+    })).not.toThrow();
+    expect(() => assertOpenSpecTaskOrdinalMapReadbackV1({
+      ordinalMap: map,
+      taskCards: [{ ...cards[0], taskRevision: 'changed-block' }, cards[1]],
+      taskFileHashes,
+      workspaceRevision: metadata.workspaceRevision,
+      sourcePopulationChecksum: metadata.sourcePopulationChecksum,
+    })).toThrow(/ROW_MISMATCH/);
   });
 });

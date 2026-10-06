@@ -184,6 +184,43 @@ export const candidateOrdinalMapV1Schema = z.object({
 }).strict();
 export type CandidateOrdinalMapV1 = z.infer<typeof candidateOrdinalMapV1Schema>;
 
+const sha256Revision = z.string().regex(/^sha256:[a-f0-9]{64}$/);
+
+export const openSpecTaskOrdinalRowV1Schema = z.object({
+  candidateOrdinal: z.number().int().nonnegative().max(CANDIDATE_ORDINAL_MAX_UINT32),
+  taskStableKey: z.string().min(1),
+  taskRevision: z.string().min(1),
+  sourcePath: z.string().min(1),
+  sourceLine: z.number().int().positive(),
+  sourceFileRevision: sha256Revision,
+  workspaceRevision: z.string().min(1),
+  taskCardChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  retrievalState: z.enum(['CURRENT', 'WAITING', 'REVIEW_REQUIRED']),
+}).strict();
+export type OpenSpecTaskOrdinalRowV1 = z.infer<typeof openSpecTaskOrdinalRowV1Schema>;
+
+export const openSpecTaskOrdinalMapV1Schema = z.object({
+  schema: z.literal('atlas.candidate-ordinal-map.v1'),
+  universeKind: z.literal('OPENSPEC_TASKCARD'),
+  workspaceRevision: z.string().min(1),
+  taskUniverseRevision: sha256Revision,
+  sourcePopulationChecksum: sha256Revision,
+  candidateSnapshotRevision: sha256Revision,
+  rowCount: z.number().int().nonnegative(),
+  candidates: z.array(openSpecTaskOrdinalRowV1Schema),
+  ordinalMapChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  identityAuthority: z.literal(false),
+  canonicalAuthority: z.literal(false),
+  producerRevision: z.string().min(1),
+}).strict();
+export type OpenSpecTaskOrdinalMapV1 = z.infer<typeof openSpecTaskOrdinalMapV1Schema>;
+
+export const ordinalUniverseMapV1Schema = z.discriminatedUnion('universeKind', [
+  z.object({ universeKind: z.literal('PACKET_CANDIDATE'), ordinalMap: candidateOrdinalMapV1Schema }).strict(),
+  z.object({ universeKind: z.literal('OPENSPEC_TASKCARD'), ordinalMap: openSpecTaskOrdinalMapV1Schema }).strict(),
+]);
+export type OrdinalUniverseMapV1 = z.infer<typeof ordinalUniverseMapV1Schema>;
+
 /**
  * Deterministic, locale-independent binary string comparator. `String.prototype.localeCompare()`
  * is ICU-driven and NOT guaranteed identical across Node builds (full-icu vs small-icu), default
@@ -205,6 +242,152 @@ function canonicalJson(value: unknown): string {
 
 export function candidateOrdinalMapChecksum(value: unknown): string {
   return createHash('sha256').update(canonicalJson(value)).digest('hex');
+}
+
+function revisionFromCanonicalValue(value: unknown): string {
+  return `sha256:${createHash('sha256').update(canonicalJson(value)).digest('hex')}`;
+}
+
+export function materializeOpenSpecTaskOrdinalMapV1(input: {
+  taskCards: readonly Record<string, unknown>[];
+  taskFileHashes: Readonly<Record<string, string>>;
+  workspaceRevision: string;
+  sourcePopulationChecksum: string;
+  producerRevision: string;
+}): OpenSpecTaskOrdinalMapV1 {
+  if (!input.workspaceRevision || !input.producerRevision) throw new Error('TASK_ORDINAL_MAP_REVISION_REQUIRED');
+  if (!sha256Revision.safeParse(input.sourcePopulationChecksum).success) throw new Error('TASK_SOURCE_POPULATION_CHECKSUM_INVALID');
+  if (!input.taskCards.length) throw new Error('TASK_ORDINAL_MAP_EMPTY_UNIVERSE');
+
+  const seenStableKeys = new Set<string>();
+  const rows = input.taskCards.map((card) => {
+    const taskStableKey = typeof card.stableKey === 'string' ? card.stableKey : '';
+    const taskRevision = typeof card.taskRevision === 'string' ? card.taskRevision : '';
+    const sourcePath = typeof card.sourcePath === 'string' ? card.sourcePath : '';
+    const sourceLine = card.sourceLine;
+    const retrievalState = card.retrievalState;
+    if (!taskStableKey || !taskRevision || !sourcePath || !Number.isInteger(sourceLine) || typeof sourceLine !== 'number') {
+      throw new Error('TASK_ORDINAL_MAP_IDENTITY_INCOMPLETE');
+    }
+    if (seenStableKeys.has(taskStableKey)) throw new Error(`TASK_ORDINAL_MAP_DUPLICATE_STABLE_KEY:${taskStableKey}`);
+    seenStableKeys.add(taskStableKey);
+    const sourceFileRevision = input.taskFileHashes[sourcePath];
+    if (!sha256Revision.safeParse(sourceFileRevision).success) {
+      throw new Error(`TASK_ORDINAL_MAP_SOURCE_FILE_REVISION_MISSING:${sourcePath}`);
+    }
+    if (!['CURRENT', 'WAITING', 'REVIEW_REQUIRED'].includes(String(retrievalState))) {
+      throw new Error(`TASK_ORDINAL_MAP_RETRIEVAL_STATE_NOT_INDEXABLE:${taskStableKey}`);
+    }
+    return {
+      taskStableKey,
+      taskRevision,
+      sourcePath,
+      sourceLine,
+      sourceFileRevision,
+      workspaceRevision: input.workspaceRevision,
+      taskCardChecksum: candidateOrdinalMapChecksum(card),
+      retrievalState,
+    };
+  });
+
+  rows.sort((a, b) => compareUtf8(a.taskStableKey, b.taskStableKey));
+  const taskUniverseRevision = revisionFromCanonicalValue(rows);
+  const candidateSnapshotRevision = revisionFromCanonicalValue({
+    universeKind: 'OPENSPEC_TASKCARD',
+    workspaceRevision: input.workspaceRevision,
+    taskUniverseRevision,
+    sourcePopulationChecksum: input.sourcePopulationChecksum,
+  });
+  const candidates = rows.map((row, candidateOrdinal) => openSpecTaskOrdinalRowV1Schema.parse({
+    ...row,
+    candidateOrdinal,
+  }));
+  const checksumPayload = {
+    schema: 'atlas.candidate-ordinal-map.v1',
+    universeKind: 'OPENSPEC_TASKCARD',
+    workspaceRevision: input.workspaceRevision,
+    taskUniverseRevision,
+    sourcePopulationChecksum: input.sourcePopulationChecksum,
+    candidateSnapshotRevision,
+    rowCount: candidates.length,
+    candidates,
+    identityAuthority: false,
+    canonicalAuthority: false,
+    producerRevision: input.producerRevision,
+  };
+  const map = openSpecTaskOrdinalMapV1Schema.parse({
+    ...checksumPayload,
+    ordinalMapChecksum: candidateOrdinalMapChecksum(checksumPayload),
+  });
+  assertOpenSpecTaskOrdinalMapIntegrityV1(map);
+  return map;
+}
+
+export function assertOpenSpecTaskOrdinalMapIntegrityV1(mapInput: unknown): asserts mapInput is OpenSpecTaskOrdinalMapV1 {
+  const map = openSpecTaskOrdinalMapV1Schema.parse(mapInput);
+  if (map.rowCount !== map.candidates.length) throw new Error('TASK_ORDINAL_MAP_ROW_COUNT_MISMATCH');
+  const seen = new Set<string>();
+  map.candidates.forEach((row, index) => {
+    if (row.candidateOrdinal !== index) throw new Error(`TASK_ORDINAL_MAP_ORDINAL_SEQUENCE_BROKEN:${index}`);
+    if (row.workspaceRevision !== map.workspaceRevision) throw new Error(`TASK_ORDINAL_MAP_WORKSPACE_REVISION_MISMATCH:${index}`);
+    if (seen.has(row.taskStableKey)) throw new Error(`TASK_ORDINAL_MAP_DUPLICATE_STABLE_KEY:${row.taskStableKey}`);
+    seen.add(row.taskStableKey);
+    if (index > 0 && compareUtf8(map.candidates[index - 1].taskStableKey, row.taskStableKey) >= 0) {
+      throw new Error(`TASK_ORDINAL_MAP_ORDER_INVALID:${index}`);
+    }
+  });
+  const rowsWithoutOrdinal = map.candidates.map(({ candidateOrdinal: _ordinal, ...row }) => row);
+  if (revisionFromCanonicalValue(rowsWithoutOrdinal) !== map.taskUniverseRevision) {
+    throw new Error('TASK_ORDINAL_MAP_UNIVERSE_REVISION_MISMATCH');
+  }
+  const snapshotRevision = revisionFromCanonicalValue({
+    universeKind: map.universeKind,
+    workspaceRevision: map.workspaceRevision,
+    taskUniverseRevision: map.taskUniverseRevision,
+    sourcePopulationChecksum: map.sourcePopulationChecksum,
+  });
+  if (snapshotRevision !== map.candidateSnapshotRevision) throw new Error('TASK_ORDINAL_MAP_SNAPSHOT_REVISION_MISMATCH');
+  const { ordinalMapChecksum, ...checksumPayload } = map;
+  if (candidateOrdinalMapChecksum(checksumPayload) !== ordinalMapChecksum) {
+    throw new Error('TASK_ORDINAL_MAP_CHECKSUM_MISMATCH');
+  }
+}
+
+export function assertOpenSpecTaskOrdinalMapReadbackV1(input: {
+  ordinalMap: unknown;
+  taskCards: readonly Record<string, unknown>[];
+  taskFileHashes: Readonly<Record<string, string>>;
+  workspaceRevision: string;
+  sourcePopulationChecksum: string;
+}): asserts input is typeof input & { ordinalMap: OpenSpecTaskOrdinalMapV1 } {
+  assertOpenSpecTaskOrdinalMapIntegrityV1(input.ordinalMap);
+  const map = input.ordinalMap;
+  if (map.workspaceRevision !== input.workspaceRevision) throw new Error('TASK_ORDINAL_READBACK_WORKSPACE_REVISION_MISMATCH');
+  if (map.sourcePopulationChecksum !== input.sourcePopulationChecksum) throw new Error('TASK_ORDINAL_READBACK_SOURCE_POPULATION_MISMATCH');
+  if (input.taskCards.length !== map.rowCount) throw new Error('TASK_ORDINAL_READBACK_ROW_COUNT_MISMATCH');
+
+  const expectedByKey = new Map<string, Record<string, unknown>>();
+  for (const card of input.taskCards) {
+    if (typeof card.stableKey !== 'string' || !card.stableKey || expectedByKey.has(card.stableKey)) {
+      throw new Error('TASK_ORDINAL_READBACK_SOURCE_IDENTITY_INVALID');
+    }
+    expectedByKey.set(card.stableKey, card);
+  }
+
+  for (const row of map.candidates) {
+    const card = expectedByKey.get(row.taskStableKey);
+    if (!card) throw new Error(`TASK_ORDINAL_READBACK_SOURCE_CARD_MISSING:${row.taskStableKey}`);
+    if (row.taskRevision !== card.taskRevision
+      || row.sourcePath !== card.sourcePath
+      || row.sourceLine !== card.sourceLine
+      || row.sourceFileRevision !== input.taskFileHashes[String(card.sourcePath)]
+      || row.taskCardChecksum !== candidateOrdinalMapChecksum(card)
+      || row.retrievalState !== card.retrievalState) {
+      throw new Error(`TASK_ORDINAL_READBACK_ROW_MISMATCH:${row.taskStableKey}`);
+    }
+    expectedByKey.delete(row.taskStableKey);
+  }
+  if (expectedByKey.size) throw new Error('TASK_ORDINAL_READBACK_SOURCE_CARD_UNMATCHED');
 }
 
 export type CanonicalCandidateIdentityInput = Omit<

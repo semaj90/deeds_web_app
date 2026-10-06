@@ -1,0 +1,50 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "valkey-cache-semantics",
+  "source_ref": "valkey-cache-semantics:valkey-io-topics-client-side-caching-client-side-caching",
+  "url": "https://valkey.io/topics/client-side-caching/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "cache_invalidation",
+    "ttl",
+    "client_side_cache",
+    "contextual_engineering",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "This page documents valkey.io. Valkey cache semantics is classified as cache. No canonical recommendation inferred.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Client-side caching Client-side caching is a technique used to create high performance services. It exploits the memory available on application servers, servers that are usually distinct computers compared to the Valkey nodes, to store some subset of the Valkey information directly in the application side. Normally when data is required, the application servers ask the Valkey about such information, like in the following diagram: ``` +-------------+ +----------+ | | ------- GET user:1234 -------> | | | Application | | Valkey | | | <---- username = Alice ------- | | +-------------+ +----------+ ``` When client-side caching is used, the application will store the reply of popular queries directly inside the application memory, so that it can reuse such replies later, without contacting the Valkey again: ``` +-------------+ +----------+ | | | | | Application | ( No chat needed ) | Valkey | | | | | +-------------+ +----------+ | Local cache | | | | user:1234 = | |",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:valkey-cache-semantics:valkey-io-topics-client-side-caching-client-side-caching",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Valkey cache semantics from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "a7095d9ae33ba4a19b3e4e2d279147b165eefe7853030f25330fb679b9db707d",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\valkey-cache-semantics\\valkey-io-topics-client-side-caching-client-side-caching.md",
+  "fetched_at": "2026-10-06T18:01:28.661Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "valkey-cache-semantics",
+    "source_title": "Valkey cache semantics",
+    "fetched_via": "firecrawl"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\valkey-cache-semantics\\valkey-io-topics-client-side-caching-client-side-caching.md"
+}

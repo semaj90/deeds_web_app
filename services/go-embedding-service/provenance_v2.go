@@ -62,6 +62,13 @@ type embeddingCapabilityV2 struct {
 	RepresentationRevision      string  `json:"representationRevision"`
 }
 
+func embeddingCapabilityCacheEligibleV2(capability embeddingCapabilityV2) bool {
+	return capability.GGUFArtifactDigest != nil &&
+		isSHA256PrefixedV2(*capability.GGUFArtifactDigest) &&
+		capability.GGUFArtifactBindingStatus == "INDEPENDENT_READBACK_VERIFIED" &&
+		capability.TokenizerBindingStatus == "INDEPENDENT_READBACK_VERIFIED"
+}
+
 type embeddingReceiptV2 struct {
 	Schema                    string  `json:"schema"`
 	InputChecksum             string  `json:"inputChecksum"`
@@ -373,7 +380,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 			return
 		}
 		cacheKey := embeddingCacheKeyV2(capability.RepresentationRevision, input.InputArtifactChecksum, input.InputChecksum)
-		if srv.rdb != nil {
+		if srv.rdb != nil && embeddingCapabilityCacheEligibleV2(capability) {
 			if cached, getErr := srv.rdb.Get(r.Context(), cacheKey).Bytes(); getErr == nil && len(cached) > 0 {
 				var entry strictEmbeddingCacheEntryV2
 				if json.Unmarshal(cached, &entry) == nil && entry.Schema == "atlas.embedding-cache-entry.v2" &&
@@ -388,7 +395,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 						receipt.CacheHit = true
 						receipt.RuntimeBindingStatus = "CACHE_HIT_NO_MODEL_EXECUTION"
 						srv.stats.cacheHits.Add(1)
-						writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "ADMITTED", Embedding: entry.Embedding, Capability: &capability, Receipt: &receipt})
+						writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "OBSERVATION_ONLY", Embedding: entry.Embedding, Capability: &capability, Receipt: &receipt})
 						return
 					}
 				}
@@ -442,7 +449,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 		receipt.ResidentModelDigestBefore = residentDigestBefore
 		receipt.ResidentModelDigestAfter = residentDigestAfter
 		receipt.ResponseModelName = responseModelName
-		if srv.rdb != nil {
+		if srv.rdb != nil && embeddingCapabilityCacheEligibleV2(capability) {
 			entry := strictEmbeddingCacheEntryV2{
 				Schema: "atlas.embedding-cache-entry.v2", InputChecksum: input.InputChecksum,
 				InputArtifactChecksum:    input.InputArtifactChecksum,
@@ -455,6 +462,6 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 				_ = srv.rdb.Set(r.Context(), cacheKey, data, srv.cfg.CacheTTL).Err()
 			}
 		}
-		writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "ADMITTED", Embedding: vectors[0], Capability: &capability, Receipt: &receipt})
+		writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "OBSERVATION_ONLY", Embedding: vectors[0], Capability: &capability, Receipt: &receipt})
 	}
 }

@@ -11,6 +11,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { classifyWorkboardTaskV1, workboardEvidenceDispositionV1 } from './lib/workboard-task-classification-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const WORKSTATION_SPINE = path.join(ROOT, 'docs', 'parent-atlas-workstation-todo.md');
@@ -73,16 +74,6 @@ function stepFor(text) {
   return 'STEP-07';
 }
 
-function classify(changeId, text) {
-  if (/\bSUPERSEDED\b|historical|archived|retired/i.test(text)) return 'SUPERSEDED';
-  if (/do not|don't|never|must not|no .* writes|without .* writes/i.test(text)) return 'NEGATIVE_CONSTRAINT';
-  if (/human|authorization|approval|required direction|HITL/i.test(text)) return 'HUMAN_DECISION_REQUIRED';
-  if (/\bBLOCKED\b|blocked by|unresolved|missing authoritative|workspace.*mismatch|revision.*unproven/i.test(text)) return 'BLOCKED_UPSTREAM';
-  if (changeId !== convergence) return 'OWNED_BY_OTHER_CHANGE';
-  if (/governance|authority|ledger|portfolio|task board|status|reconcile|receipt/i.test(text)) return 'GOVERNANCE_ONLY';
-  return 'UNVERIFIED';
-}
-
 function evidenceFor(classification, changeId, text) {
   const refs = [];
   if (changeId === convergence) {
@@ -100,18 +91,6 @@ function resolveEvidence(refs) {
   }));
 }
 
-function evidenceDisposition(classification, text) {
-  if (classification === 'SUPERSEDED') return 'SUPERSEDED';
-  if (classification === 'BLOCKED_UPSTREAM') return 'BLOCKED';
-  if (classification === 'HUMAN_DECISION_REQUIRED') return 'HUMAN_DECISION_REQUIRED';
-  if (classification === 'NEGATIVE_CONSTRAINT') return 'CONSTRAINT';
-  if (/regression|finding confirmed|follow[- ]?up open|confirmed.*unfixed/i.test(text)) {
-    return 'FINDING_CONFIRMED_FOLLOWUP_OPEN';
-  }
-  if (classification === 'OWNED_BY_OTHER_CHANGE') return 'OWNED_BY_OTHER_CHANGE';
-  return 'UNVERIFIED';
-}
-
 const tasks = [];
 for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { withFileTypes: true })) {
   if (!entry.isDirectory() || entry.name === 'archive') continue;
@@ -122,18 +101,22 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
     const gateMentioned = [...gateTokens].some((gate) => block.text.includes(gate));
     const convergenceRelevant = changeId === convergence && (/identity|source|revision|workspace|namespace|lineage|cohort|graphify|retrieval|qdrant|ace|dag|representation|promotion/i.test(block.text) || gateMentioned);
     if (!explicit && !convergenceRelevant) continue;
-    const classification = classify(changeId, block.text);
+    const classification = classifyWorkboardTaskV1(changeId, block.text, convergence);
     const step = stepFor(block.text);
     const owner = changeId === convergence ? 'parent-atlas-retrieval-lineage-dag-convergence' : changeId;
-    const evidenceRefs = evidenceFor(classification, changeId, block.text);
+    const evidenceRefs = classification === 'SUPERSESSION_REVIEW_REQUIRED'
+      ? []
+      : evidenceFor(classification, changeId, block.text);
     const evidenceResolution = resolveEvidence(evidenceRefs);
     const missingEvidenceRefs = evidenceResolution.filter((item) => !item.exists).map((item) => item.ref);
     const blocker = classification === 'BLOCKED_UPSTREAM'
       ? 'Current post-coordinator lineage is not coherent: source cohort 0/52 matches current workspace; packet/chunk join 0/111 exact.'
       : classification === 'OWNED_BY_OTHER_CHANGE'
         ? `Implementation owner is ${changeId}; this board may reference it but does not execute its unchecked backlog.`
-        : classification === 'NEGATIVE_CONSTRAINT'
+      : classification === 'NEGATIVE_CONSTRAINT'
           ? 'Constraint only; not executable work.'
+          : classification === 'SUPERSESSION_REVIEW_REQUIRED'
+            ? 'No task-specific predecessor/successor revisions and exact replacement evidence are available; prose and change-level supersededBy metadata are insufficient.'
           : classification === 'GOVERNANCE_ONLY'
             ? 'Governance/proof bookkeeping; requires evidence, not model selection.'
             : null;
@@ -144,8 +127,10 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
       ? 'Repair or identify the authoritative current source/chunk binding; do not apply a cohort.'
       : classification === 'OWNED_BY_OTHER_CHANGE'
         ? `Review the owning change's proof gate: ${changeId}`
-        : classification === 'NEGATIVE_CONSTRAINT'
+      : classification === 'NEGATIVE_CONSTRAINT'
           ? 'Preserve this constraint while executing its parent gate.'
+          : classification === 'SUPERSESSION_REVIEW_REQUIRED'
+            ? 'Keep the task visible for review; require exact predecessor and successor task keys/revisions plus grounded replacement evidence before marking superseded.'
           : classification === 'GOVERNANCE_ONLY'
             ? 'Attach current evidence before changing task status.'
             : 'Remain unexecuted until its prerequisites and proof receipt are present.';
@@ -157,7 +142,7 @@ for (const entry of fs.readdirSync(path.join(ROOT, 'openspec', 'changes'), { wit
       taskChecksum: sha256(`${changeId}\n${block.line}\n${block.text}`),
       taskLedgerState: 'UNCHECKED',
       classification,
-      evidenceDisposition: evidenceDisposition(classification, block.text),
+      evidenceDisposition: workboardEvidenceDispositionV1(classification, block.text),
       currentOwner: owner,
       dependencyOrBlocker: blocker,
       evidenceRefs,
@@ -201,7 +186,7 @@ const workPlan = {
 };
 
 const summary = Object.fromEntries(
-  ['OPEN_ACTIONABLE', 'BLOCKED_UPSTREAM', 'CLOSED_BY_CURRENT_EVIDENCE', 'SUPERSEDED', 'OWNED_BY_OTHER_CHANGE', 'GOVERNANCE_ONLY', 'NEGATIVE_CONSTRAINT', 'HUMAN_DECISION_REQUIRED', 'UNVERIFIED']
+  ['OPEN_ACTIONABLE', 'BLOCKED_UPSTREAM', 'CLOSED_BY_CURRENT_EVIDENCE', 'SUPERSESSION_REVIEW_REQUIRED', 'SUPERSEDED', 'OWNED_BY_OTHER_CHANGE', 'GOVERNANCE_ONLY', 'NEGATIVE_CONSTRAINT', 'HUMAN_DECISION_REQUIRED', 'UNVERIFIED']
     .map((classification) => [classification, tasks.filter((task) => task.classification === classification).length]),
 );
 const report = {

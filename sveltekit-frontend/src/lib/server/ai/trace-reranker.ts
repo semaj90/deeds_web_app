@@ -3,7 +3,6 @@ import { db } from '$lib/server/db/client.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { getActiveSemanticVectorLane } from '$lib/server/vector/lane-registry.js';
 import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
-import { CANONICAL_SEMANTIC_REPRESENTATION_REVISION } from '$lib/server/embedding/semantic-lineage.js';
 import { executeTraceSemanticV1, type TraceSemanticCohortRowV1, type TraceSemanticHitV1 } from './trace-semantic-executor-v1.js';
 import { createAtlasRapidsSemantic768Client } from '$lib/server/atlas/retrieval/atlas-rapids-semantic768-client.js';
 import type { QueryExecutionModeV1 } from '$lib/server/execution/query-execution-policy-v1.js';
@@ -74,7 +73,7 @@ export async function traceRerank(params: {
 	// 2. Retrieve Chunks (Codebase level)
 	const chunkExecution = await executeTraceSemanticV1({
 		admittedWorkspaceRevision: params.admittedWorkspaceRevision ?? '',
-		semanticRepresentationRevision: params.semanticRepresentationRevision ?? String(CANONICAL_SEMANTIC_REPRESENTATION_REVISION),
+		semanticRepresentationRevision: params.semanticRepresentationRevision ?? '',
 		queryVector: params.queryEmbedding,
 		topK: limit * 3,
 		qdrantSearch: async () => {
@@ -250,6 +249,7 @@ async function loadTraceSemanticCohort(workspaceRevision: string): Promise<Trace
 			c.source_ref::text AS source_ref,
 			b.workspace_revision::text AS workspace_revision,
 			l.source_revision::text AS source_revision,
+			c.representation_revision::text AS representation_revision,
 			c.content_embedding_768::text AS vector
 		FROM atlas_workspace_source_bindings b
 		JOIN atlas_packet_chunk_lineage l
@@ -269,6 +269,7 @@ async function loadTraceSemanticCohort(workspaceRevision: string): Promise<Trace
 		sourceRef: String(row.source_ref ?? ''),
 		workspaceRevision: String(row.workspace_revision ?? ''),
 		sourceRevision: String(row.source_revision ?? ''),
+		representationRevision: typeof row.representation_revision === 'string' ? row.representation_revision : null,
 		vector: parsePgVector(row.vector),
 	}));
 }

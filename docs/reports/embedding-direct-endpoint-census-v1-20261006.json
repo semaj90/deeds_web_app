@@ -1,0 +1,1728 @@
+{
+  "schema": "atlas.embedding-direct-endpoint-census.v2",
+  "scannedFiles": 5104,
+  "routeRoots": 1333,
+  "workerRoots": 13,
+  "summary": {
+    "LIVE_DIRECT_CALLER": 74,
+    "LIVE_WRAPPER": 9,
+    "ROUTE_REACHABLE_NONCALLER": 10,
+    "DORMANT": 18,
+    "TRANSPORT_OWNER": 6,
+    "DIAGNOSTIC": 4
+  },
+  "rows": [
+    {
+      "file": "hooks.server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 1,
+      "enclosing": [
+        "warmupLLMCache",
+        "export handle"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/ai/ollama-config.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/client/subscribeEmbedding.svelte.ts",
+      "kinds": [
+        "DIRECT_API_EMBED",
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 3,
+      "callCount": 0,
+      "enclosing": [
+        "notify",
+        "export getCachedEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/components/ai/Gemma270MWebAssembly.svelte",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "runAnalysis"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/components/evidence/CaseEvidenceOrganizer.svelte",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "getEmbeddings"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/components/evidence/EvidenceCanvas.svelte",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 3,
+      "callCount": 0,
+      "enclosing": [
+        "handleCreateConnection",
+        "analyzeAllEvidence"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/components/modals/EvidenceCRUDModal.svelte",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "analyzeEvidence"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/components/RAGSearchComponent.svelte",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "ingestDocument"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/gpu/gpu-embedding-bridge.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbeddings"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/machines/gpu-process-machine.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "getEndpointForTask"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/server/ace/ace-agent.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "hits"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ace/ace-error-kag.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ace/auto-tagger.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export autoTagDocument"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ace/chat-memory.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export recordChatMessageForRecall"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ace/query-router.ts",
+      "kinds": [
+        "V1_EMBEDDINGS",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 3,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/adapters/service-integrations.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 1,
+      "enclosing": [
+        "export getServiceUrls",
+        "embed"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/langgraph-research.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/llm-cache.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/multimodal-fusion.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateFusedEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/ollama-client.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/server/ai/onnx-server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "ollamaBase"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/prompt-router.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "embed"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/ai/scenario-cache.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/tool-dispatcher.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "dispatchQdrant"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ai/tool-selection.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "rawHost"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/api-registry.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/server/atlas/docs/semantic-768-client.ts",
+      "kinds": [
+        "V1_EMBEDDINGS",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 0,
+      "enclosing": [
+        "explicitBase",
+        "ollama"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/atlas/embedding/document-embedding-executor-v1.ts",
+      "kinds": [
+        "V1_EMBEDDINGS"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "embedDocuments"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/atlas/embedding/ollama-embedding-runtime-v1.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "embed"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/atlas/route-feature-map.ts",
+      "kinds": [
+        "INTERNAL_ROUTE",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 3,
+      "callCount": 0,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/server/audit/gemma-tool-router.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "communities"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/batch-embedder.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/cache/cluster-summary-forest.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/cache/code-llm-index.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedBatch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/cache/embedding-cache-unified.ts",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "fetchEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/server/cache/semantic-cache.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "lib/server/config/ollama.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export generateEmbedding"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/embedding/canonical-embed.ts",
+      "kinds": [
+        "V1_EMBEDDINGS",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 4,
+      "callCount": 2,
+      "enclosing": [
+        "baseUrl"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/embedding/embedding-backend-resolution.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "modelsData"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/embedding/embedding-contract.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/embedding/embedding-provider-executor-v1.ts",
+      "kinds": [
+        "DIRECT_API_EMBED",
+        "V1_EMBEDDINGS"
+      ],
+      "hitCount": 2,
+      "callCount": 0,
+      "enclosing": [
+        "export createProviderEmbeddingExecutorV1",
+        "body"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/embedding/ollama-embed.ts",
+      "kinds": [
+        "V1_EMBEDDINGS",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 6,
+      "callCount": 0,
+      "enclosing": [
+        "buildCandidates"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/embeddings/ollama.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export tryEmbedOllama"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/embeddings/representation-contract-validator.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export validateOllamaContract"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "TRANSPORT_OWNER"
+    },
+    {
+      "file": "lib/server/error-brain/knowledge-base.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/evidence/video/vision-service.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "getEmbedding"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/features/ai/ace/context-assembler.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "export fetchGlossaryMatches",
+        "getQueryEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/features/ai/ace/error-kag-writer.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/features/cases/external-research-agent.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export performExternalResearch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/features/feature-map-store.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export buildFeatureSummaryEmbedding"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/features/observability/search-analytics.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "getQuerySketch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/ff1/agent/gemma4-repair-planner.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "qdrantContext"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/ff1/agent/tool-registry.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "searchCodebase"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/fixer/fixer-memory.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/server/generation/semantic-diff-gate.ts",
+      "kinds": [
+        "V1_EMBEDDINGS"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/gpu/mapreduce-worker.mjs",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/grpc/embedding-client.ts",
+      "kinds": [
+        "V1_EMBEDDINGS",
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 5,
+      "callCount": 2,
+      "enclosing": [
+        "generateViaLlamaEmbed",
+        "generateViaHttp",
+        "fetchOllamaEmbeddingSingle"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/indexer/gpu-karpathy-tagger.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/indexer/karpathy-search-loop.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/memory/claude-mem-ingest.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedBatch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/rag/uiComplianceRag.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedWithGemma"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/representations/representation-registry-service.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export probeRepresentations"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/retrieval/auto-backfill.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/retrieval/embedding-models.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "embedSingle",
+        "embedViaOllama"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/retrieval/embedding-service.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedViaOllama"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/retrieval/go-retrieval-facade.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export executeGoRetrievalSearch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/router/semantic-ranking-bridge.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "export scoreSemanticSimilarity"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "lib/server/services/error-analysis/OllamaService.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/services/knowledge-search/KnowledgeIndexer.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "lib/server/streaming/chunked-response.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export streamRAGResponse"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/tools/handlers/chunkEmbed.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/tools/handlers/kbSearch.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/unified/legal-ai-service.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "search"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/vector/image-search.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/workers/audio-processor.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "analyzeWithACE",
+        "getEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/server/workers/document-embed-consumer.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedChunk"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": true,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "lib/utils/ollama.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "export getOllamaEmbeddingsEndpoint"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "mcp-gpu-orchestrator.ts",
+      "kinds": [
+        "V1_EMBEDDINGS"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "processingTime"
+      ],
+      "reachableFromRoutes": false,
+      "reachableFromWorkers": false,
+      "classification": "DORMANT"
+    },
+    {
+      "file": "mcp/bifrost_tools.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export registerBifrostTools"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "mcp/server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "_handleToolCallInner"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "mcp/tools/legal-skills.tool.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 1,
+      "enclosing": [
+        "hits"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "mcp/trace-mcp-server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "getOrComputeEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "routes/(app)/admin/dev-tools/+page.svelte",
+      "kinds": [
+        "INTERNAL_ROUTE"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "testEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_WRAPPER"
+    },
+    {
+      "file": "routes/(app)/system-configuration/+page.svelte",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "createDefaultConfig"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "DIAGNOSTIC"
+    },
+    {
+      "file": "routes/api/ace/health/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedOk"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "DIAGNOSTIC"
+    },
+    {
+      "file": "routes/api/admin/agent/fix/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "queryKnowledgeBase"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/admin/atlas/cluster-search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/admin/atlas/turbovec-prefilter/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/admin/seed-knowledge/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/analyze-file/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEnhancedTag"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/analyze-tag/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/audio/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 2,
+      "enclosing": [
+        "searchQdrant",
+        "searchTranscripts"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/cases/[id]/similar/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateCaseEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/chat/memory/backfill/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedAndUpsert"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/chat/memory/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase-index/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase-index/batch-gpu/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase-index/gpu-pipeline/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase-index/index-stream/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedTexts"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase/analyze/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codebase/auto-research/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embed"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codeintel/clusters/[id]/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/codeintel/semantic-health/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "chatModel"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "DIAGNOSTIC"
+    },
+    {
+      "file": "routes/api/embed/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 0,
+      "enclosing": [
+        "export POST"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    },
+    {
+      "file": "routes/api/evidence/upload/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedText"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/generate-cluster-summaries/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "updateQdrantTags"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/glossary/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/health/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 2,
+      "callCount": 0,
+      "enclosing": [
+        "export GET"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "DIAGNOSTIC"
+    },
+    {
+      "file": "routes/api/indexing/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/knowledge/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/knowledge/youtube/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/persons-of-interest/[id]/photos/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "runVLMAnalysisPipeline"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/phase89/node/[id]/docs/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/phase89/vector-search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "generateEmbedding"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/precedents/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/recommendations/[userId]/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/retrieval/reranked-search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/sse/chat/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 4,
+      "callCount": 4,
+      "enclosing": [
+        "retrieveContext",
+        "retrieveAttachmentContext",
+        "embedAuthority",
+        "consumeStream"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/statutes/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "embedQuery"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/tags/search/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 1,
+      "enclosing": [
+        "export GET"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "LIVE_DIRECT_CALLER"
+    },
+    {
+      "file": "routes/api/v1/agentic/tool-loop/+server.ts",
+      "kinds": [
+        "DIRECT_API_EMBED"
+      ],
+      "hitCount": 1,
+      "callCount": 0,
+      "enclosing": [
+        "handleKnowledgeSearch"
+      ],
+      "reachableFromRoutes": true,
+      "reachableFromWorkers": false,
+      "classification": "ROUTE_REACHABLE_NONCALLER"
+    }
+  ],
+  "guard": {
+    "pass": true,
+    "newBypasses": [],
+    "resolvedSinceBaseline": [
+      "lib/server/features/codebase-intel/indexer/cluster-summary.ts",
+      "lib/server/features/rag/codebase-context.ts",
+      "lib/server/ollama.ts",
+      "routes/api/retrieval/dual-lane/+server.ts"
+    ]
+  },
+  "writesPerformed": false
+}

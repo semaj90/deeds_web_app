@@ -1,5 +1,13 @@
 # Embedding Backfill Usage Guide
 
+> **Safety status: apply disabled.** Historical apply examples in this guide
+> must not be run. The current `backfill-codebase-chunk-embeddings.mjs` rejects
+> `--apply` before retrieval, embedding, or persistence because exact-revision
+> input binding and independent per-row provenance/readback are not implemented.
+> The authorization environment variable does not bypass that code gate. Use
+> dry-run only; disregard all later apply examples until the gate is explicitly
+> replaced and independently verified.
+
 **Quick Reference** for running the full-corpus embedding backfill script.
 
 ---

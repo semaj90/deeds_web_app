@@ -66,6 +66,13 @@ const db = new Client({ connectionString: envVal('DATABASE_URL'), statement_time
 await db.connect();
 const receipt = { schema: 'atlas.embedding-recipe-census.v1', canonicalAuthority: false, mode: 'READ_ONLY', perStratum: PER, threshold: THRESHOLD, strata: {} };
 
+try {
+  await db.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  const transactionMode = await db.query('SHOW transaction_read_only');
+  if (transactionMode.rows[0]?.transaction_read_only !== 'on') throw new Error('POSTGRES_READ_ONLY_TRANSACTION_NOT_CONFIRMED');
+  receipt.databaseTransactionReadOnly = true;
+  receipt.transactionIsolation = 'repeatable read';
+
 for (const [stratum, cond] of Object.entries(STRATA)) {
   const total = Number((await db.query(`SELECT count(*) FROM codebase_chunk_index WHERE ${cond}`)).rows[0].count);
   const rows = (await db.query(
@@ -108,9 +115,16 @@ for (const [stratum, cond] of Object.entries(STRATA)) {
   };
   console.log(`${stratum}: population=${total} sampled=${rows.length} ce=${JSON.stringify(cols.content_embedding)} ce768=${JSON.stringify(cols.content_embedding_768)}`);
 }
-await db.end();
+  await db.query('COMMIT');
 receipt.databaseWrites = false;
+receipt.localReceiptWrite = true;
 receipt.outcome = 'RECIPE_CENSUS_PROVEN_UNKNOWN_ROWS_PRESERVED';
 fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
 fs.writeFileSync(OUTPUT_PATH, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
 console.log(`receipt written: ${OUTPUT_PATH}`);
+} catch (error) {
+  await db.query('ROLLBACK').catch(() => {});
+  throw error;
+} finally {
+  await db.end();
+}

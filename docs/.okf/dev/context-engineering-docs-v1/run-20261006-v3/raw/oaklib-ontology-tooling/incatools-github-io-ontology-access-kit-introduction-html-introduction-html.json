@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "oaklib-ontology-tooling",
+  "source_ref": "oaklib-ontology-tooling:incatools-github-io-ontology-access-kit-introduction-html-introduction-html",
+  "url": "https://incatools.github.io/ontology-access-kit/introduction.html",
+  "title": "incatools.github.io",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "oaklib",
+    "ontology",
+    "adapter",
+    "validation",
+    "kanban",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "incatools.github.io",
+    "markdown_excerpt": "- [Home](https://incatools.github.io/ontology-access-kit/index.html) - Introduction - [View page source](https://incatools.github.io/ontology-access-kit/_sources/introduction.rst.txt) * * * # Introduction [](https://incatools.github.io/ontology-access-kit/introduction.html\\#introduction \"Link to this heading\") Ontology Access Toolkit (OAK) is a Python library for common [Ontology](https://incatools.github.io/ontology-access-kit/glossary.html#term-Ontology) operations over a variety of Adapters. This library provides a collection of different [Interfaces](https://incatools.github.io/ontology-access-kit/glossary.html#term-Interface) for different kinds of ontology operations, including: - basic features of an [Ontology Element](https://incatools.github.io/ontology-access-kit/glossary.html#term-Ontology-Element), such as its [Label](https://incatools.github.io/ontology-access-kit/glossary.html#term-Label), [Definition](https://incatools.github.io/ontology-access-kit/glossary.html#term-Definition), [Relationships](https://incatools.github.io/ontology-access-kit/glossary.html#term-Relationship), or [Synonyms](https://incatools.github.io/ontology-access-kit/glossary.html#term-Synonym). ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:oaklib-ontology-tooling:incatools-github-io-ontology-access-kit-introduction-html-introduction-html",
+    "title": "incatools.github.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Ontology Access Kit introduction from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "b28e71057c20d8f6856dbe7541cca4f9732c51bb82ef2ac03f8d6de06c707ac6",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\oaklib-ontology-tooling\\incatools-github-io-ontology-access-kit-introduction-html-introduction-html.md",
+  "fetched_at": "2026-10-06T20:09:46.313Z",
+  "metadata": {
+    "kind": "official_project_documentation",
+    "source_id": "oaklib-ontology-tooling",
+    "source_title": "Ontology Access Kit introduction",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\oaklib-ontology-tooling\\incatools-github-io-ontology-access-kit-introduction-html-introduction-html.md"
+}

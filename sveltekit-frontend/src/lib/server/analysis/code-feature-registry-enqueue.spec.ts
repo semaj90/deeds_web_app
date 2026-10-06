@@ -19,7 +19,7 @@ describe('code-feature-registry-enqueue', () => {
 		expect(result?.result.jsonlSourceDigest).toBe('sha256:abc123');
 		expect(result?.result.featureId).toBe('evidence-123');
 		expect(result?.result.featureLabel).toBe('src/lib/server/example.ts');
-		expect(result?.result.representationRevision).toBe('semantic_768@1');
+		expect(result?.result.representationRevision).toBeNull();
 		expect(result?.result.sourceTables).toContain('analysis_jobs');
 	});
 

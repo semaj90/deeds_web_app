@@ -151,7 +151,7 @@ export function resolveEmbeddingProviderV1(): EmbeddingProviderV1 {
 export interface EmbeddingReceiptV1 {
   embedding: number[];
   modelId: string;
-  representationRevision: string;
+  representationRevision: string | null;
   inputChecksum: string;
   vectorChecksum: string;
 }
@@ -211,17 +211,16 @@ export function sha256Hex(value: string): string {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
 
-/** Builds a complete EmbeddingReceiptV1 from a raw vector + source text. */
+/** Builds diagnostic execution evidence without claiming representation qualification. */
 export function buildEmbeddingReceiptV1(
   embedding: number[],
   inputText: string,
   modelId: string,
-  representationRevision = 'semantic_768:v1',
 ): EmbeddingReceiptV1 {
   return {
     embedding,
     modelId,
-    representationRevision,
+    representationRevision: null,
     inputChecksum: sha256Hex(inputText),
     vectorChecksum: sha256Hex(JSON.stringify(embedding)),
   };

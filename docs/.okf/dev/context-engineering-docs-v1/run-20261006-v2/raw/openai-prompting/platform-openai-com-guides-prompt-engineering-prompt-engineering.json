@@ -1,0 +1,65 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "openai-prompting",
+  "source_ref": "openai-prompting:platform-openai-com-guides-prompt-engineering-prompt-engineering",
+  "url": "https://platform.openai.com/docs/guides/prompt-engineering",
+  "title": "platform.openai.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "prompt_engineering",
+    "tool_use",
+    "agent_context",
+    "llm_output",
+    "kanban",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "platform.openai.com",
+    "markdown_excerpt": "For the complete documentation index, see [llms.txt](https://developers.openai.com/llms.txt). Markdown versions of documentation pages are available by appending `.md` to the page URL. ## Search the API docs Search docs ### Suggested response\\_formatreasoning\\_effortstreamingtools Primary navigation Search docs ### Suggested response\\_formatreasoning\\_effortstreamingtools Overview Models Agents Tools Audio & voice Production API reference OverviewModelsAgentsToolsAudio & voiceProductionAPI referenceDocsModels - [Model catalog](https://developers.openai.com/api/docs/models) ### Choose a model - [Pricing](https://developers.openai.com/api/docs/pricing) - [Model selection](https://developers.openai.com/api/docs/guides/model-selection) ### Text and code - [Text generation](https://developers.openai.com/api/docs/guides/text) - [Code generation](https://developers.openai.com/api/docs/guides/code-generation) - [Structured output](https://developers.openai.com/api/docs/guides/structured-outputs) ### Prompting - [Overview](https://developers.openai.com/api/docs/guides/prompting) - [Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering) - [Citation formatting](",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:openai-prompting:platform-openai-com-guides-prompt-engineering-prompt-engineering",
+    "title": "platform.openai.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenAI prompting and agent documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "dec9661c0593edff7a12cfaae573031590a1f9bf25145368782a60a77c2e4207",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\openai-prompting\\platform-openai-com-guides-prompt-engineering-prompt-engineering.md",
+  "fetched_at": "2026-10-06T18:04:43.774Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "openai-prompting",
+    "source_title": "OpenAI prompting and agent documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\openai-prompting\\platform-openai-com-guides-prompt-engineering-prompt-engineering.md"
+}

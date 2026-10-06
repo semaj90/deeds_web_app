@@ -1,8 +1,44 @@
 import { sha256Stable } from './contracts.js';
+
 export type ValidationStatus = 'PASS' | 'FAIL' | 'WARN';
-export interface ValidationObservationV1 { schema:'atlas.validation-observation.v1'; validator:string; status:ValidationStatus; command?:string|null; exitCode?:number|null; stdoutDigest?:string|null; stderrDigest?:string|null; evidenceRefs:string[]; durationMs:number; producerRevision:string; }
-export interface ValidationBarrierResultV1 { schema:'atlas.validation-barrier-result.v1'; mutationId:string; requiredValidators:string[]; observations:ValidationObservationV1[]; status:'PASS'|'FAIL'; checksum:string; }
-export function aggregateValidationBarrier(input:{ mutationId:string; requiredValidators:string[]; observations:ValidationObservationV1[]; warnAccepted?:string[] }):ValidationBarrierResultV1 {
+
+export interface ValidationObservationV1 {
+  schema: 'atlas.validation-observation.v1';
+  validator: string;
+  status: ValidationStatus;
+  command?: string | null;
+  exitCode?: number | null;
+  stdoutDigest?: string | null;
+  stderrDigest?: string | null;
+  evidenceRefs: string[];
+  durationMs: number;
+  producerRevision: string;
+}
+
+export interface ValidationBarrierResultV1 {
+  schema: 'atlas.validation-barrier-result.v1';
+  mutationId: string;
+  requiredValidators: string[];
+  observations: ValidationObservationV1[];
+  status: 'PASS' | 'FAIL';
+  checksum: string;
+}
+
+function hasSuccessfulExecutionEvidence(observation: ValidationObservationV1): boolean {
+  const validDigest = /^sha256:[a-f0-9]{64}$/;
+  return observation.exitCode === 0
+    && validDigest.test(observation.stdoutDigest ?? '')
+    && validDigest.test(observation.stderrDigest ?? '')
+    && observation.evidenceRefs.length > 0
+    && observation.producerRevision.trim().length > 0;
+}
+
+export function aggregateValidationBarrier(input: {
+  mutationId: string;
+  requiredValidators: string[];
+  observations: ValidationObservationV1[];
+  warnAccepted?: string[];
+}): ValidationBarrierResultV1 {
   const byValidator = new Map<string, ValidationObservationV1>();
   let duplicateValidator = false;
   for (const observation of input.observations) {
@@ -10,7 +46,18 @@ export function aggregateValidationBarrier(input:{ mutationId:string; requiredVa
     byValidator.set(observation.validator, observation);
   }
   const warnAccepted = new Set(input.warnAccepted ?? []);
-  const pass = !duplicateValidator && input.requiredValidators.every((name)=>{ const o=byValidator.get(name); return !!o && (o.status==='PASS' || (o.status==='WARN' && warnAccepted.has(name))); });
-  const body={ schema:'atlas.validation-barrier-result.v1' as const, mutationId:input.mutationId, requiredValidators:[...new Set(input.requiredValidators)].sort(), observations:[...input.observations].sort((a,b)=>a.validator.localeCompare(b.validator)), status:(pass?'PASS':'FAIL') as 'PASS'|'FAIL' };
-  return {...body, checksum:sha256Stable(body)};
+  const pass = !duplicateValidator && input.requiredValidators.every((name) => {
+    const observation = byValidator.get(name);
+    return !!observation
+      && hasSuccessfulExecutionEvidence(observation)
+      && (observation.status === 'PASS' || (observation.status === 'WARN' && warnAccepted.has(name)));
+  });
+  const body = {
+    schema: 'atlas.validation-barrier-result.v1' as const,
+    mutationId: input.mutationId,
+    requiredValidators: [...new Set(input.requiredValidators)].sort(),
+    observations: [...input.observations].sort((a, b) => a.validator.localeCompare(b.validator)),
+    status: (pass ? 'PASS' : 'FAIL') as 'PASS' | 'FAIL',
+  };
+  return { ...body, checksum: sha256Stable(body) };
 }
