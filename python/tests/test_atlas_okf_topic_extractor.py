@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from python.atlas_okf_topic_extractor import (
+from atlas_okf_topic_extractor import (
     DEFAULT_CONTEXT_ENGINEERING_TOPICS_V1,
     TopicProfileV1,
     extract_topic_observations_v1,
