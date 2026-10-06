@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 /** Bounded, explicit snapshot admission for the tournament control plane. */
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,19 +14,41 @@ const REQUIRED = 'AUTHORIZE_WORKSPACE_REVISION_TOURNAMENT_ADMISSION_V1';
 const confirm = process.argv.slice(2).find((value) => value.startsWith('--confirm='))?.slice('--confirm='.length)
   ?? (process.argv.includes('--confirm') ? process.argv[process.argv.indexOf('--confirm') + 1] : null);
 if (confirm !== REQUIRED) throw new Error(`EXPLICIT_CONFIRMATION_REQUIRED:${REQUIRED}`);
+// WSR-08b (additive): optional VALID/CURRENT/ADMITTED fields. Without these flags the receipt keeps its
+// legacy meaning and the new fields are null. `PRIOR_IMMUTABLE_SNAPSHOT` records a deliberate admission of a
+// sealed snapshot that is NOT the current workspace; the frame-authority consumer must not treat it as current.
+const ADMISSION_MODES = ['CURRENT_WORKSPACE', 'PRIOR_IMMUTABLE_SNAPSHOT'];
+const SHA256_PATTERN = /^sha256:[0-9a-f]{64}$/i;
+const admissionMode = argValue('--admission-mode') ?? null;
+const supersededByWorkspaceRevision = argValue('--superseded-by') ?? null;
+const validationReceiptSha256 = argValue('--validation-receipt-sha256') ?? null;
+const expectedManifestSha256 = argValue('--expect-manifest-sha256') ?? null;
+if (admissionMode !== null && !ADMISSION_MODES.includes(admissionMode)) throw new Error(`ADMISSION_MODE_UNKNOWN:${admissionMode}`);
+if (admissionMode === 'PRIOR_IMMUTABLE_SNAPSHOT'
+  && (!SHA256_PATTERN.test(supersededByWorkspaceRevision ?? '') || !SHA256_PATTERN.test(validationReceiptSha256 ?? ''))) {
+  throw new Error('PRIOR_IMMUTABLE_ADMISSION_REQUIRES_SUPERSEDING_REVISION_AND_VALIDATION_RECEIPT_SHA256');
+}
+if (expectedManifestSha256 !== null && !SHA256_PATTERN.test(expectedManifestSha256)) throw new Error('EXPECTED_MANIFEST_SHA256_INVALID');
 const preflight = JSON.parse(await readFile(PREFLIGHT, 'utf8'));
 const workspaceRevision = process.argv.slice(2).find((value) => value.startsWith('--workspace-revision='))?.slice('--workspace-revision='.length) ?? null;
 const manifestPath = typeof preflight.manifestPath === 'string' ? resolve(ROOT, preflight.manifestPath) : null;
 let snapshot = null;
+let manifestSha256: string | null = null;
 let snapshotBindingError = null;
 if (!manifestPath) {
   snapshotBindingError = 'PREFLIGHT_MANIFEST_PATH_MISSING';
 } else {
   try {
-    snapshot = JSON.parse(await readFile(manifestPath, 'utf8'));
+    const manifestBytes = await readFile(manifestPath);
+    manifestSha256 = `sha256:${createHash('sha256').update(manifestBytes).digest('hex')}`;
+    snapshot = JSON.parse(manifestBytes.toString('utf8'));
   } catch {
     snapshotBindingError = 'PREFLIGHT_MANIFEST_UNREADABLE';
   }
+}
+// The operator authorizes exact manifest bytes; refuse before writing anything if they differ.
+if (expectedManifestSha256 !== null && manifestSha256 !== null && expectedManifestSha256.toLowerCase() !== manifestSha256.toLowerCase()) {
+  throw new Error(`MANIFEST_SHA256_DOES_NOT_MATCH_AUTHORIZATION:${manifestSha256}`);
 }
 const snapshotBindingValid = snapshotBindingError === null
   && snapshot?.snapshotRevision === preflight.snapshotRevision
@@ -78,6 +101,11 @@ const report = {
   snapshotMembershipChecksum: preflight.snapshotMembershipChecksum,
   manifestPath,
   approval: { confirmation: REQUIRED, scope: 'TOURNAMENT_SOURCE_AUTHORITY_ONLY' },
+  admissionMode,
+  currentAtAdmission: admissionMode === 'PRIOR_IMMUTABLE_SNAPSHOT' ? false : (admissionMode === 'CURRENT_WORKSPACE' ? true : null),
+  supersededByWorkspaceRevision,
+  manifestSha256,
+  validationReceiptSha256,
   graphifyExecutionAuthorized: false,
   projectionWritesAuthorized: false,
   autoApply: false,

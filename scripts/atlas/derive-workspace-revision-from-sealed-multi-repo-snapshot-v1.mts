@@ -5,7 +5,8 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile, stat, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, extname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
+import { createHash as sha256Hash } from 'node:crypto';
+import { sealReadbackFromReceiptV1, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const SNAPSHOT_DIR = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
@@ -25,9 +26,18 @@ if (!snapshotPath) {
 }
 const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'));
 const readbackArg = argValue('--readback');
-const readback = readbackArg
-  ? JSON.parse(await readFile(resolve(ROOT, readbackArg), 'utf8'))
-  : validateSnapshot(snapshot);
+// WSR-08b: `--seal-readback=<reseal receipt>` binds a sealed snapshot to its seal-time readback evidence
+// instead of re-reading live bytes (needed once the workspace has moved on). Default stays the live readback.
+const sealReadbackArg = argValue('--seal-readback');
+let readback;
+if (sealReadbackArg) {
+  const receiptBytes = await readFile(resolve(ROOT, sealReadbackArg));
+  readback = sealReadbackFromReceiptV1(JSON.parse(receiptBytes.toString('utf8')), snapshot, `sha256:${sha256Hash('sha256').update(receiptBytes).digest('hex')}`);
+} else {
+  readback = readbackArg
+    ? JSON.parse(await readFile(resolve(ROOT, readbackArg), 'utf8'))
+    : validateSnapshot(snapshot);
+}
 const sources = Array.isArray(snapshot.sources) ? snapshot.sources : [];
 const repositories = Array.isArray(snapshot.repositories) ? snapshot.repositories : [];
 const sourceManifest = sources.map((source: any) => ({

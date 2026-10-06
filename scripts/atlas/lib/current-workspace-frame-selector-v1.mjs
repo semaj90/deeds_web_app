@@ -40,7 +40,10 @@ function admissionCandidate(value, explicitSnapshotRevision) {
   if (!workspaceRevision) return null;
   const snapshotRevision = snapshotRevisionFrom(value);
   if (explicitSnapshotRevision && snapshotRevision !== explicitSnapshotRevision) return null;
-  return { workspaceRevision, snapshotRevision, source: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT', authority: true };
+  return {
+    workspaceRevision, snapshotRevision, source: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT', authority: true,
+    admissionMode: clean(value.admissionMode) || null,
+  };
 }
 
 function snapshotAuthorityCandidate(value, explicitSnapshotRevision) {
@@ -126,6 +129,7 @@ export function resolveCurrentWorkspaceFrameV1({
     selectedSnapshotRevision: selected?.snapshotRevision ?? explicitSnapshotRevision ?? null,
     selectedSource: selected?.source ?? null,
     selectedAuthority: selected?.authority === true,
+    selectedAdmissionMode: selected?.admissionMode ?? null,
     explicitOverride: selected?.explicitOverride === true,
     manifestPath,
     explicitSnapshotRevision,
@@ -158,8 +162,10 @@ export function resolveCurrentWorkspaceFrameV1({
  * relaxing what "authoritative" itself means.
  */
 export function computeWorkspaceFrameAuthorityV1(frame) {
+  // WSR-08b: a deliberately admitted PRIOR_IMMUTABLE_SNAPSHOT is not current-workspace authority.
   const frameAuthoritative = frame.status === 'CURRENT_WORKSPACE_FRAME_SELECTED'
     && frame.selectedAuthority === true
+    && frame.selectedAdmissionMode !== 'PRIOR_IMMUTABLE_SNAPSHOT'
     && frame.authorityConflict === false
     && Array.isArray(frame.blockers)
     && frame.blockers.length === 0;
@@ -219,7 +225,7 @@ export function classifyWorkspaceFrameStateV1({
     admitted,
     snapshotValid,
     currentAtEvaluation,
-    admissionMode: admitted ? (clean(admission?.admissionMode) || null) : null,
+    admissionMode: admitted ? (clean(frame.selectedAdmissionMode) || clean(admission?.admissionMode) || null) : null,
     supersededByWorkspaceRevision: currentAtEvaluation === false ? liveRevision : (clean(admission?.supersededByWorkspaceRevision) || null),
     manifestSha256: clean(admission?.manifestSha256) || null,
     validationReceiptSha256: clean(validationReceiptSha256) || null,

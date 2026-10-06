@@ -367,3 +367,35 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
     canonicalAuthority: false, datastoreWritesPerformed: false,
     scope: 'Recorded sources only; this does not assert current full-workspace membership or Graphify admission' };
 }
+
+/**
+ * WSR-08b: validateSnapshot-shaped readback built from a SEAL-TIME readback receipt (the reseal script's
+ * output) instead of re-reading the live workspace. This lets a sealed snapshot that is no longer current
+ * keep its valid/admitted evidence. It never upgrades anything: the receipt must be for the same snapshot,
+ * be `RESEAL_READBACK_PROVEN`, report zero violations and a full exact readback. `receiptSha256` is
+ * caller-computed over the receipt bytes and recorded so the evidence is bound by digest.
+ */
+export function sealReadbackFromReceiptV1(
+  receipt: any,
+  snapshot: { snapshotRevision?: string; sources?: unknown[] },
+  receiptSha256: string | null,
+) {
+  const sourceCount = Array.isArray(snapshot?.sources) ? snapshot.sources.length : -1;
+  const valid = Boolean(receipt)
+    && receipt.snapshotRevision === snapshot?.snapshotRevision
+    && receipt.status === 'RESEAL_READBACK_PROVEN'
+    && receipt.readbackStatus === 'SNAPSHOT_BYTES_READBACK_PROVEN'
+    && receipt.totalViolations === 0
+    && receipt.sourceCount === sourceCount
+    && receipt.exactMatches === receipt.sourceCount
+    && typeof receiptSha256 === 'string' && /^sha256:[0-9a-f]{64}$/i.test(receiptSha256);
+  return {
+    status: valid ? 'SNAPSHOT_BYTES_READBACK_PROVEN' : 'SEAL_READBACK_RECEIPT_MISMATCH',
+    violations: valid ? [] : ['SEAL_READBACK_RECEIPT_MISMATCH'],
+    readbackSource: 'SEAL_TIME_RECEIPT',
+    receiptSha256: receiptSha256 ?? null,
+    receiptGeneratedAt: receipt?.generatedAt ?? null,
+    sourceCount: Math.max(sourceCount, 0),
+    exactMatches: valid ? receipt.exactMatches : 0,
+  };
+}
