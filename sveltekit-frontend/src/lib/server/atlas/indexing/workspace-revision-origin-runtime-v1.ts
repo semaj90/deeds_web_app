@@ -93,6 +93,8 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   sourceExtensions?: ReadonlySet<string>;
   onProgress?: (progress: { completed: number; total: number; sourceRef: string }) => void;
   digestCache?: WorkspaceDigestCacheV1;
+  /** Optional counters (observability only; not part of any checksum). */
+  digestStats?: { reused: number; rehashed: number };
 }): WorkspaceRevisionOriginRuntimeV1 {
   const workspaceRoot = path.resolve(input.workspaceRoot);
   const maxSourceBytes = input.maxSourceBytes ?? 5 * 1024 * 1024;
@@ -156,7 +158,9 @@ export function materializeWorkspaceRevisionOriginV1(input: {
       let revision: { sourceRevision: string; contentDigest: string; byteLength: number };
       if (cached && cached.size === Number(info.size) && cached.mtimeNs === mtimeNs) {
         revision = { sourceRevision: cached.sourceRevision, contentDigest: cached.contentDigest, byteLength: cached.byteLength };
+        if (input.digestStats) input.digestStats.reused += 1;
       } else {
+        if (input.digestStats) input.digestStats.rehashed += 1;
         const bytes = readFileSync(absolute);
         const sourceText = bytes.toString('utf8');
         if (!Buffer.from(sourceText, 'utf8').equals(bytes)) {

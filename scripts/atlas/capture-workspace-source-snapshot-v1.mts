@@ -11,8 +11,9 @@ const root = path.resolve(values.root ?? process.cwd());
 // Derived per-file digest cache (never authority); --no-digest-cache forces a full byte read.
 const digestCachePath = values['no-digest-cache'] ? undefined : path.join(root, '.tmp', 'atlas', 'workspace-digest-cache-v1.json');
 const startedAt = Date.now();
-const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3, digestCachePath });
-console.error(JSON.stringify({ captureMs: Date.now() - startedAt, digestCache: digestCachePath ? 'ON' : 'OFF' }));
+let scanStats: Array<{ reused: number; rehashed: number }> = [];
+const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3, digestCachePath, onDigestStats: (s) => { scanStats = s; } });
+console.error(JSON.stringify({ captureMs: Date.now() - startedAt, digestCache: digestCachePath ? 'ON' : 'OFF', scans: scanStats }));
 const directory = path.join(root, 'docs/reports/workspace-source-snapshots');
 mkdirSync(directory, { recursive: true });
 const artifactPath = path.join(directory, `${report.snapshotRevision.slice(7)}.json`);
