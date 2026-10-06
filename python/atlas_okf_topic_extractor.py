@@ -20,6 +20,8 @@ class TopicObservationV1:
     schema: str
     source_id: str
     source_revision: str
+    workspace_revision: str
+    producer_revision: str
     page_ref: str
     topic_id: str
     domain_hint: str
@@ -30,6 +32,7 @@ class TopicObservationV1:
     start_byte: int
     end_byte: int
     content_checksum: str
+    evidence_checksum: str
     canonical_authority: bool
 
 
@@ -70,13 +73,15 @@ def extract_topic_observations_v1(
     *,
     source_id: str,
     source_revision: str,
+    workspace_revision: str,
+    producer_revision: str,
     page_ref: str,
     normalized_text: str,
     profiles: Sequence[TopicProfileV1] = DEFAULT_CONTEXT_ENGINEERING_TOPICS_V1,
     max_observations_per_topic: int = 64,
 ) -> list[TopicObservationV1]:
-    if not source_id.strip() or not source_revision.strip() or not page_ref.strip():
-        raise ValueError("SOURCE_ID_REVISION_AND_PAGE_REQUIRED")
+    if not source_id.strip() or not source_revision.strip() or not workspace_revision.strip() or not producer_revision.strip() or not page_ref.strip():
+        raise ValueError("SOURCE_WORKSPACE_PRODUCER_REVISION_AND_PAGE_REQUIRED")
     if max_observations_per_topic < 1:
         raise ValueError("MAX_OBSERVATIONS_PER_TOPIC_MUST_BE_POSITIVE")
 
@@ -101,11 +106,30 @@ def extract_topic_observations_v1(
                 if encoded[start_byte:end_byte].decode("utf-8") != surface:
                     raise ValueError("UTF8_SPAN_MISMATCH")
 
+                evidence_checksum = _sha256_text(
+                    "|".join(
+                        [
+                            source_id,
+                            source_revision,
+                            workspace_revision,
+                            producer_revision,
+                            page_ref,
+                            profile.topic_id,
+                            str(match.start()),
+                            str(match.end()),
+                            surface,
+                            checksum,
+                        ]
+                    )
+                )
+
                 observations.append(
                     TopicObservationV1(
                         schema="atlas.okf-topic-observation.v1",
                         source_id=source_id,
                         source_revision=source_revision,
+                        workspace_revision=workspace_revision,
+                        producer_revision=producer_revision,
                         page_ref=page_ref,
                         topic_id=profile.topic_id,
                         domain_hint=profile.domain_hint,
@@ -116,6 +140,7 @@ def extract_topic_observations_v1(
                         start_byte=start_byte,
                         end_byte=end_byte,
                         content_checksum=checksum,
+                        evidence_checksum=evidence_checksum,
                         canonical_authority=False,
                     )
                 )
