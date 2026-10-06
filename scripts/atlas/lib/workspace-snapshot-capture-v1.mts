@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { closeSync, existsSync, fsyncSync, lstatSync, realpathSync, readFileSync, writeFileSync, mkdirSync, openSync, renameSync, rmSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, lstatSync, readdirSync, realpathSync, readFileSync, writeFileSync, mkdirSync, openSync, renameSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION, type WorkspaceDigestCacheEntryV1, type WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
@@ -132,9 +132,43 @@ export function saveDigestCache(
   }
 }
 
+/**
+ * WSR-03e: per-DIRECTORY symlink/junction/escape probe replacing the per-FILE realpathSync+lstatSync
+ * guard (~25k syscalls on this repo). A path is unsafe when the file itself, or any ancestor directory
+ * up to `root`, is a symlink/junction, or when the walk leaves `root`. Same violation semantics, one
+ * readdir per distinct directory.
+ */
+export function createSymlinkProbeV1(root: string) {
+  const dirEntries = new Map<string, Map<string, boolean>>();
+  const dirUnsafe = new Map<string, boolean>();
+  const entries = (dir: string) => {
+    let map = dirEntries.get(dir);
+    if (!map) {
+      map = new Map();
+      for (const entry of readdirSync(dir, { withFileTypes: true })) map.set(entry.name, entry.isSymbolicLink());
+      dirEntries.set(dir, map);
+    }
+    return map;
+  };
+  const unsafeDirectory = (dir: string): boolean => {
+    if (dir === root) return false;
+    const known = dirUnsafe.get(dir);
+    if (known !== undefined) return known;
+    const parent = path.dirname(dir);
+    const unsafe = parent === dir || unsafeDirectory(parent) || entries(parent).get(path.basename(dir)) === true;
+    dirUnsafe.set(dir, unsafe);
+    return unsafe;
+  };
+  return (full: string): boolean => {
+    const dir = path.dirname(full);
+    return unsafeDirectory(dir) || entries(dir).get(path.basename(full)) === true;
+  };
+}
+
 export function observeSnapshot(rootInput: string, workspaceId: string, options: { digestCache?: WorkspaceDigestCacheV1; digestStats?: { reused: number; rehashed: number } } = {}) {
   const root = realpathSync(rootInput);
   if (realpathSync(git(root, ['rev-parse', '--show-toplevel']).trim()) !== root) throw new Error('ROOT_IS_NOT_REPOSITORY_ROOT');
+  const isUnsafeSource = createSymlinkProbeV1(root);
   const repositories: any[] = [];
   const sources: any[] = [];
   const violations: string[] = [];
@@ -165,7 +199,7 @@ export function observeSnapshot(rootInput: string, workspaceId: string, options:
     const deletedTracked: string[] = [];
     for (const row of observed.bindings) {
       const full = path.resolve(directory, row.sourceRef);
-      if (!realpathSync(full).startsWith(root + path.sep) || lstatSync(full).isSymbolicLink()) {
+      if (isUnsafeSource(full)) {
         violations.push(`SOURCE_SYMLINK_OR_ESCAPE:${relativePath}/${row.sourceRef}`); continue;
       }
       const repositoryId = relativePath ? `repo:${sourceRef(relativePath)}` : 'repo:root';

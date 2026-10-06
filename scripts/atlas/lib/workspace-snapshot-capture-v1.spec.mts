@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, writeFileSync, utimesSync, rmSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, symlinkSync, realpathSync, lstatSync, mkdtempSync, writeFileSync, utimesSync, rmSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { captureStableSnapshot, createDigestCacheContext, hash, observeSnapshot, loadDigestCache, saveDigestCache, validateSnapshot } from './workspace-snapshot-capture-v1.mts';
+import { captureStableSnapshot, createSymlinkProbeV1, createDigestCacheContext, hash, observeSnapshot, loadDigestCache, saveDigestCache, validateSnapshot } from './workspace-snapshot-capture-v1.mts';
 import type { WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 // WSR-03/05 digest cache: derived facts only; byte output must be identical with or without it.
@@ -196,4 +196,25 @@ test('uncached byte oracle invalidates persisted cache after same-size same-mtim
     assert.equal(readback.digestCacheInvalidated, true);
     assert.equal(existsSync(cachePath), false);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('WSR-03e per-directory symlink probe matches the legacy per-file realpath/lstat guard', () => {
+  const base = mkdtempSync(path.join(tmpdir(), 'wsr-probe-'));
+  const root = realpathSync(base);
+  const outside = realpathSync(mkdtempSync(path.join(tmpdir(), 'wsr-outside-')));
+  try {
+    mkdirSync(path.join(root, 'a', 'b'), { recursive: true });
+    writeFileSync(path.join(root, 'a', 'b', 'ok.ts'), 'x');
+    writeFileSync(path.join(root, 'top.ts'), 'x');
+    writeFileSync(path.join(outside, 'leak.ts'), 'x');
+    let linked = false;
+    try { symlinkSync(outside, path.join(root, 'junction'), 'junction'); linked = true; } catch { /* no link privilege */ }
+    const legacy = (full: string) => !realpathSync(full).startsWith(root + path.sep) || lstatSync(full).isSymbolicLink();
+    const probe = createSymlinkProbeV1(root);
+    const files = [path.join(root, 'top.ts'), path.join(root, 'a', 'b', 'ok.ts')];
+    if (linked) files.push(path.join(root, 'junction', 'leak.ts'));
+    for (const file of files) assert.equal(probe(file), legacy(file), file);
+    assert.equal(probe(path.join(root, 'top.ts')), false);
+    if (linked) assert.equal(probe(path.join(root, 'junction', 'leak.ts')), true);
+  } finally { rmSync(base, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }); }
 });
