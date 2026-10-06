@@ -1,5 +1,40 @@
 # Tasks — Parent Atlas Candidate Feature Execution Fabric
 
+## Agent control-plane convergence — 2026-10-06
+
+This tranche fills only the missing coordination contracts. It explicitly reuses the
+existing RetrievalParameterPlanV1, TraversalBudgetV1, AgentActionProposalV1,
+PrimeAgentRuntimeV1, AgentReplayManifestV1, and LearningOutcomeV1 owners. It does
+not add a scheduler, memory store, canonical evidence owner, reward authority, or
+model-training path.
+
+- [ ] CONTROL-NEXT-ACTION-01 — added `NextActionProposalV1` in
+  `sveltekit-frontend/src/lib/server/atlas/agentic/agent-control-plane-v1.ts`.
+  It binds unresolved question, proposed capability, evidence needed, information-gain
+  estimate, stop condition, planner/policy revisions, ContextManifest checksum, and
+  remaining token/tool budgets. Schema rejects proposals whose estimated cost exceeds
+  remaining budgets. **IMPLEMENTED_UNPROVEN** until focused Vitest runs on the workstation.
+- [ ] CONTROL-GROUP-EVAL-02 — added `GroupRelativeCandidateEvalV1` as a GRPO-shaped
+  evaluation receipt only. It deterministically ranks validator-owned rewards, requires
+  validator receipt refs, records cost/latency/mutation size, and hard-codes
+  `trainingMode='NO_WEIGHT_UPDATE'`. It does not compute reward truth or update model
+  weights. **IMPLEMENTED_UNPROVEN** until focused Vitest runs.
+- [ ] CONTROL-GEPA-SHADOW-03 — added `GepaShadowInputV1` consuming sealed
+  LearningOutcome and validator-feedback references plus prompt/eval/metric/optimizer
+  revisions. It is hard-coded `SHADOW_ONLY`, `promotionAllowed=false`,
+  `writesAllowed=false`, and `canonicalAuthority=false`. **IMPLEMENTED_UNPROVEN**
+  until focused Vitest runs and the existing TypeScript ContextManifest → Python DSPy
+  guard is independently proven.
+- [ ] CONTROL-OWNER-AUDIT-04 — owner audit embedded in the module asserts that
+  RetrievalParameterPlanV1, TraversalBudgetV1, AgentActionProposalV1, and
+  LearningOutcomeV1 remain their existing owners and that the new module owns no
+  canonical evidence, task state, model weights, or policy promotion.
+- [ ] CONTROL-E2E-05 — after upstream current-revision candidate/graph/semantic gates
+  close, prove one read-only flow: QueryAnalysis → RetrievalParameterPlan →
+  TraversalBudget → ContextManifest → NextActionProposal → existing
+  AgentActionProposal/validator → LearningOutcome → GepaShadowInput. No datastore write,
+  prompt promotion, policy promotion, or model-weight update is allowed in this gate.
+
 ## Taxonomy-scoped retrieval planning — 2026-09-06
 
 These are additive, deterministic request artifacts. They do not create a taxonomy
