@@ -271,6 +271,16 @@ def _detect_code_language(tag: Any) -> str | None:
     for _ in range(4):
         if node is None:
             break
+        language_label = node.find(class_="language-id") if hasattr(node, "find") else None
+        if language_label is not None:
+            declared = language_label.get_text(strip=True)
+            if re.fullmatch(r"[a-zA-Z0-9+#]+", declared):
+                return declared.lower()
+        # Some sites (e.g. trpc.io) mark the language with a bare attribute: <pre language=bash title=shell>.
+        for attribute in ("language", "data-language", "data-lang"):
+            declared = node.get(attribute)
+            if isinstance(declared, str) and re.fullmatch(r"[a-zA-Z0-9+#]+", declared.strip()):
+                return declared.strip().lower()
         for cls in node.get("class") or []:
             github = _GITHUB_HIGHLIGHT_SOURCE_RE.match(str(cls))
             if github:
@@ -339,7 +349,9 @@ def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[st
     for tag in soup(["script", "style", "noscript", "svg"]):
         tag.decompose()
     title = soup.title.get_text(" ", strip=True) if soup.title else urlparse(base_url).netloc
-    main = soup.find("main") or soup.find("article") or soup.body or soup
+    main = soup.find("article") or soup.find("main") or soup.body or soup
+    for control in main.select("button, nav, .pagination-nav, .theme-doc-toc-mobile, .theme-doc-toc-desktop, .theme-edit-this-page"):
+        control.decompose()
 
     # Extract <pre> code blocks first (before flattening) so their content is
     # replaced in-place with a fenced block instead of being flattened into
@@ -351,6 +363,9 @@ def extract_structured_text(raw_html: bytes | str, *, base_url: str) -> tuple[st
     # fence text is substituted back in after normalization, verbatim.
     code_fences: list[str] = []
     for pre in main.find_all("pre"):
+        # UI controls rendered inside a code block (e.g. a "Copy" button) are never source code.
+        for control in pre.find_all("button"):
+            control.decompose()
         code_tag = pre.find("code")
         language = _detect_code_language(code_tag) or _detect_code_language(pre)
         code_text = _code_block_text(code_tag or pre).strip("\n")

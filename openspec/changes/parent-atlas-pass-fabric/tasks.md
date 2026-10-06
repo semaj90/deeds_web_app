@@ -512,6 +512,52 @@ type PassExecution = {
       producer of the 27 unresolved embedding groups; the 10 cache-push groups
       also remain untraced. No worker was run and no database was queried in
       this source-only refresh, so PF4B stays open.
+- [ ] PF4B-QUEUE-04 — consumer patch + terminal classification (2026-10-04).
+      **Legacy classification (frozen, evidence-bounded):** the 9 divergent
+      groups / 21 rows are `DIVERGENT_OUTPUT_METADATA_PROVEN` (two stored
+      output variants per group, differing only in `embedding_norm`) with
+      `VECTOR_DIVERGENCE`, `RETRY` and `LEGITIMATE_REEXECUTION` all UNPROVEN;
+      execution identity is `LEGACY_EXECUTION_IDENTITY_UNRECOVERABLE` unless an
+      external broker log later proves attempt identity. The 3 groups that
+      repeat a variant are `REPEATED_OUTPUT_METADATA` only (a matching
+      `embedding_norm` does not make them retries). No dedupe, no uniqueness
+      constraint.
+      **Identity split (no new type; PF4C already owns the logical half):**
+      logical = existing `passIdentityHash` (packet_key + source_revision +
+      pass_name + pass_revision + input_hash); execution = that + `execution_id`
+      + broker message identity. The execution half has no recorded home yet.
+      **Code (commit after d42287db21, `phase-b-queue-consumer-embedding{,-batch}.mts`):**
+      writers (raw INSERT, constant `pass_key` `embeddinggemma_summary_embed_v1`)
+      now persist `provenance.broker` (messageId, deliveryTag, redelivered,
+      routingKey, consumerTag), `input_hash` = sha256 of the summary, and
+      `output.representation_id=semantic_768` + `model_tag` (artifact revision
+      null: `:latest` is not an immutable revision). A failed ledger write now
+      requeues instead of acking. Still NULL: `source_revision`,
+      `pass_revision`, `pass_identity_hash` (messages do not carry them; not
+      invented), so `PF4B-QUEUE-02` stays open. NOT run against the DB: the
+      INSERT's `$12` mapping is read-checked only; a persistent DB failure now
+      requeues indefinitely (needs a retry cap or DLQ).
+- [ ] PF4B-QUEUE-05 — bounded redelivery / DLQ for the embedding consumers
+      (2026-10-04). `sveltekit-frontend/src/lib/server/queue/embedding-consumer-retry-policy-v1.ts`
+      (+ spec 8/8) owns the pure policy; both `phase-b-queue-consumer-embedding{,-batch}.mts`
+      call `processDeliveryV1`. Failure (embedding null, ledger write false,
+      summary update false, thrown error, unparseable body) -> `nack(requeue)`
+      up to `EMBED_CONSUMER_MAX_ATTEMPTS` (default 3), then publish the original
+      body + headers to the companion queue `atlas.enrichment.embedding.dlq`
+      (confirm channel) and ack the original; if the DLQ publish fails the
+      message is requeued, never dropped. A classic queue cannot gain a DLX
+      without PRECONDITION_FAILED, hence the explicit companion queue. The DLQ
+      path writes no `analysis_pass_results` row. Identities kept separate:
+      broker identity = broker `messageId` else a content digest (never a
+      timestamp); logical input key = packet_key + input_hash + `semantic_768`;
+      execution id = consumer run + delivery tag + attempt (all three persisted
+      under `provenance.execution`). Summary-update failures now count as
+      failures (they were silently acked before). KNOWN LIMITS: the attempt
+      counter is in-process, so a consumer restart resets it; a retry after a
+      failed summary update can add a second ledger row for the same logical
+      input (distinguishable by execution id, but still a PF4B-style duplicate
+      until an idempotent upsert on logical identity exists); nothing was run
+      against RabbitMQ or Postgres, only the pure policy tests.
 - [x] PF4C — prove `pass_key` semantics from code/history: it is job-scoped
       execution retry identity, not logical pass identity. Keep it unchanged;
       use the separate logical identity only when a stable `inputHash` is
@@ -1363,3 +1409,51 @@ unresolved identity, or deduplication against an unstaged row. Focused fixture t
 contract and mocked writer only. No cohort
 was frozen, no pass was run/persisted, no live readback occurred, no database status/migration was
 added, and bounded producer selection/readback remain open.
+
+## Computer Engineering Knowledge Acquisition / Classification (recorded 2026-10-04; reconciled against existing owners; nothing built)
+Operator plan: `catalog -> classify -> acquire -> normalize -> cite -> admit -> index -> AST/NLP enrichment -> MCP rank`, with `.okf` owning catalogs/policy, Postgres owning admitted lineage, Qdrant/cuVS as projections, graph indexes derived, SearXNG discovery-only, MCP as routing not truth. Audited before recording (Duplication Prevention rule): most of the acquisition-to-index half already exists and is proven under `openspec/changes/parent-atlas-versioned-doc-intelligence/tasks.md` (DOC-00..DOC-27); the gates below are therefore tagged EXISTS / EXTEND / NEW instead of being added as new work.
+
+### Owner census (what the proposed gates map onto)
+| Proposed gate | Existing owner (evidence) | Tag |
+|---|---|---|
+| CE-SOURCE-01 `DocumentationSourceCatalogV1` | DOC-01 `ExternalDocSourceManifestV1` (`python/atlas_doc_manifest.py`, Pydantic `SourceConfigV1`/`PipelineManifestV1`; loader in `python/atlas_okf_docs_pipeline.py`), done | EXTEND (add fields only if DOC-01 lacks them: publisher, license/provenance, allowed/denied paths, drivers) |
+| CE-SOURCE-02 discovery runner | DOC-03 Firecrawl bounded crawler (`atlas_okf_docs_pipeline.py::firecrawl_crawl_v2`, request builder unit-tested: page/depth/sitemap limits, external links, subdomains and whole-domain crawl disabled; live receipt `docs/reports/parent-atlas/doc-03-firecrawl-live-bounded-v1.json`) | EXISTS for Firecrawl; `llms.txt`-first and sitemap-first discovery NOT verified here (check before claiming) |
+| CE-SOURCE-03 BeautifulSoup adapter | DOC-04 BeautifulSoup deterministic normalizer (`atlas_external_docs.py::fetch_beautifulsoup`, `extract_structured_text`, `enforce_allowed_domain`), done, plus BS4 parity proof script | EXISTS |
+| CE-SOURCE-04 Firecrawl adapter | DOC-03 (`atlas_external_docs.py::fetch_firecrawl_v2`); `scripts/atlas/audit-doc-03-firecrawl-bounded-owner-v1.mjs` is the owner audit | EXISTS |
+| CE-SOURCE-05 `DocumentationPageArtifactV1` | DOC-02 `DocCoordinateV1` (version-qualified identity) + DOC-05 `ExternalDocChunkV1` | EXTEND only if a field in the proposal is missing |
+| CE-SNIPPET-01 `SourceCodeSnippetV1` | `atlas_external_docs.py::extract_code_blocks_and_signatures` is a deterministic regex over ONE already-chunked text (fenced blocks as `{language, code}` plus API-signature-like lines), called inside `chunk_document()`; `_detect_code_language` / `_code_block_text` handle HTML `<pre>/<code>` during BS4 normalization. It records no snippet ordinal, exact source span, inference confidence or snippet hash, and snippets do not exist independently of chunks. DOC-12 `ApiRuleV1` is a sibling output | EXTEND (add ordinal, span/anchor, declared vs inferred language with confidence, hash, heading context; a snippet cut by a chunk boundary is a known limitation to test) |
+| CE-SNIPPET-02 Tree-sitter confirmation | DOC-23 ast-grep repair planner; `ast-grep-observation-adapter.ts` | EXTEND (no new parser authority) |
+| CE-INDEX-01/02/03 canonical admission, projections, readback | DOC-06 / DOC-06A (Postgres canonical owner, pinned corpus admitted 2026-09-23), DOC-06b FTS, DOC-07 `semantic_768`, DOC-08 Qdrant dense, DOC-19/20/21 cuVS/CAGRA/IVF-PQ proofs over the admitted chunks | EXISTS; CE-INDEX-03's URL -> page -> chunk -> vector -> citation readback should be re-run as a single proof, not rebuilt |
+| CE-CLASSIFY-01/02 documentation classification and lexical baseline | DOC-09 (`atlas_external_docs.classify_domain` / `classify_ontology`; admission through `parent_atlas_ontology.domain_mapping.admit_domain_classification`, "classifies, does not own") | EXISTS as baseline; EXTEND to multi-axis output (domains/topics/algorithms/languages/frameworks) |
+| CE-NLP-01 grounded extraction | DOC-10 LangExtract source-grounded extraction (`DRY_RUN_PROVEN`), DOC-11 provider | EXTEND |
+| CE-GRAPH-01 documentation edges | DOC-14 Neo4j/cuGraph doc-relationship projection (open, `NEW`) and DOC-13 doc<->symbol index (open) | OPEN under DOC-14/DOC-13; also gated by GRAPH-INDEX-01 |
+| CE-MCP-01/02 documentation capabilities in tool policy | DOC-15 agentic docs retrieval fan-out (open, `EXTEND`); `sveltekit-frontend/src/lib/server/ai/tool-selection-policy.ts` (+spec) is the existing policy to extend; see TOOL-LUT-01 / MCP-ROUTE-01 in the lane-consolidation ledger | EXTEND |
+| CE-MCP-03/05 fail-closed external acquisition | `requestAcquisition` (`atlas/acquisition/acquisition-writer.ts`); variadic ast-grep probe found calls only in `scripts/atlas/smoke-acquisition-mvp.mts` (see FANOUT-AUDIT-02) | NEW caller required (MCP-WEB-01) |
+| CE-MCP-04 `selectMcpToolSubset` caller | static call at `src/mcp/server.ts:2093` in the `tools/list` handler (ACTIVE_CALLER_PROVEN, static) | EXISTS statically; a runtime proof is still the gate |
+| Incremental recrawl / revision drift | DOC-26 incremental version recrawl (open, `NEW`), DOC-27 stale version rejection (done) | OPEN under DOC-26 |
+| CE-DOMAIN-01/02, CE-TOPIC-01, CE-ALGO-01 catalogs | `.okf/domains` holds 3 yaml files (`feature-intelligence`, `parent-atlas-execution`, `structured-value`) and Postgres `atlas_domain_ontology` has 13 top-level groups; no computer-engineering topic or algorithm catalog was found in this pass | NEW, but reuse the 13-group ontology and `CANONICAL_DOMAINS` mappings first (DOMAIN-TAXONOMY-AUDIT-01, DOMAIN-01) |
+| CE-LANG-01 `ProgrammingLanguageCatalogV1` | Owner found: `sveltekit-frontend/src/lib/server/atlas/language/language-intelligence-plan.ts` (+ spec), with `ts-morph-semantic-enrichment.ts` and `api-contract-observation-v1.ts` beside it (contents not read in this pass, so what languages and readiness fields it already models is unverified). `.okf/languages` contains only `typescript.yaml` | EXTEND the language-intelligence plan; read it first; do not mark `treeSitterReady` or `lspReady` without a live probe |
+| CE-LSP-01 LSP enrichment | not audited here | NEW, optional, after admission |
+| CE-E2E-01/02 replay fixture | not present; the DOC admission canary receipts are the closest precedent | NEW |
+
+### Conflicts with the proposal as written (decide before building)
+- **Do not create a parallel pipeline.** The proposed `scripts/docs/{discover-doc-sources,acquire-beautifulsoup,acquire-firecrawl}.py` would duplicate `python/atlas_okf_docs_pipeline.py` + `python/atlas_external_docs.py` + `python/atlas_doc_manifest.py`. `scripts/docs/` currently holds only `build-file-profile-cards.mjs`. Extend the existing modules; a discovery step, if missing, belongs inside them or as one small addition to the pipeline, not as a second acquisition stack.
+- **Do not create `.okf/docs/sources/` and `.okf/docs/schemas/` yet.** The standing hold is "no new `.okf` hierarchy until OKF-OWNERSHIP-01 reconciles the two existing `.okf` shapes". Existing precedent for a source manifest is the DOC-01 manifest and `.okf/docs/dspy/` (a `corpus.json`, `corpus-3.4.0.json`, `postgres-index-contract.md`, timestamped `snapshots/`); put new source entries in that shape.
+- **A PageRank implementation already lives in the docs module** (`atlas_external_docs.py::deterministic_pagerank`), in addition to the repo reference oracle and the NetworkX/cuGraph parity oracles. Do not add another for documentation graphs (CE-GRAPH-01); record it as a candidate for OWNERSHIP classification.
+- **Firecrawl defaults:** the proposal's point that the service default crawl limit is large (10,000 pages in its docs, not re-verified here) is right; DOC-03 already builds an explicit-limit request, so the rule is to keep that builder as the only entry and reject any call without an explicit catalog limit.
+- **Candidate limits come from the manifest, not the model.** Source `max_pages`/`max_depth` live in DOC-01's manifest; the proposed example values (500 pages, depth 4) are illustrative.
+
+### Preserved gates (dependency order, unchanged from the proposal)
+taxonomy -> language capability proof -> source catalog -> discovery -> BeautifulSoup/Firecrawl normalization -> immutable citation artifact -> canonical writer -> semantic index -> snippet extraction -> Tree-sitter -> optional LSP -> topic/algorithm classification -> graph edges -> MCP ranking -> acquisition gate -> E2E replay. Steps from "source catalog" through "semantic index" are largely satisfied by DOC-01..DOC-08; the genuinely new work starts at the taxonomy/catalog and language-capability steps and resumes at topic/algorithm classification, graph edges, MCP ranking and the acquisition gate.
+- [ ] CE-RECON-01 Confirm each EXISTS row above against the DOC task's own receipt before treating it as proven (this entry is a map, not a proof).
+- [ ] CE-DOMAIN-01 Freeze independent axes (domain, topic, algorithm, language, framework/library, source type, capability/tool); a language never implies a domain, a topic never implies an algorithm, a documentation host is never canonical identity. Reuse `CANONICAL_DOMAINS` and the 13-group ontology; alias lists live apart from canonical IDs. (Merge with DOMAIN-01 / DOMAIN-TAXONOMY-AUDIT-01 in the lane-consolidation ledger.)
+- [ ] CE-DOMAIN-02 Initial CE domain catalog (the 20 top-level domains in the proposal), mapped to existing ontology groups before any new ID is minted.
+- [ ] CE-LANG-01 Read `atlas/language/language-intelligence-plan.ts` first (it is the owner); extend it with the language catalog fields and independent, probe-backed `treeSitterReady` / `lspReady` flags rather than creating a second catalog.
+- [ ] CE-SOURCE-01/05 Compare the proposed source/page fields against DOC-01/DOC-02/DOC-05 and add only the missing ones.
+- [ ] CE-SNIPPET-01/02 Extend the existing code-block extractor with the snippet identity fields; Tree-sitter confirmation is evidence, failure never discards the snippet.
+- [ ] CE-TOPIC-01 / CE-ALGO-01 Topic and algorithm catalogs as separate axes (the proposal's lists are candidates); aliases, complexity metadata and applicable domains recorded without inferring source support.
+- [ ] CE-CLASSIFY-01..03 Multi-axis documentation classification over admitted artifacts: lexical baseline first (existing `classify_domain`), embedding challenger second with exact recipe/model revision, no silent taxonomy mutation, no replacement of source lineage.
+- [ ] CE-INDEX-03 One end-to-end readback proof over the already-admitted corpus (URL -> page artifact -> chunk -> vector projection -> citation); reject orphan Qdrant points.
+- [ ] CE-MCP-01..05 Documentation capabilities in the existing tool-selection policy (no second ranking authority); an explicit, bounded runtime caller for `selectMcpToolSubset` and for `requestAcquisition`, with external acquisition gated fail-closed (internal confidence insufficient AND query permits AND source policy allows) and kept out of retrieval fusion; re-run the variadic fan-out probes after wiring and do not mark complete from imports or text references.
+- [ ] CE-E2E-01/02 Frozen offline replay fixture (example: "Compare BFS, Dijkstra and A* implementations in Rust and Python."), same corpus revision plus same classifier/tool-policy revision must give identical admitted evidence identity; no live acquisition during replay.
+- Held, as before: no new `.okf` hierarchy, no new peer router, no second docs table, no direct Firecrawl or BeautifulSoup writes to canonical stores, SearXNG results are never evidence before admission, no database DDL solely for this plan.

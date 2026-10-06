@@ -9,8 +9,13 @@
  *   npx tsx scripts/atlas/phase-b-queue-consumer-embedding-batch.mts [--batch-size=20] [--dry-run]
  */
 
-import amqp, { Channel, Connection, Message } from 'amqplib';
+import amqp, { Channel, ConfirmChannel, Connection, Message } from 'amqplib';
 import { Pool } from 'pg';
+import { createHash, randomUUID } from 'node:crypto';
+import {
+  createRetryTrackerV1, DEFAULT_MAX_DELIVERY_ATTEMPTS_V1, EMBEDDING_DLQ_NAME_V1, logicalInputKeyV1, processDeliveryV1,
+  type DeliveryContextV1,
+} from '../../src/lib/server/queue/embedding-consumer-retry-policy-v1.js';
 import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
@@ -30,6 +35,14 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@1
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 const EMBEDDING_DIM = 768;
+
+// PF4B-QUEUE-05: bounded redelivery. The counter is in-process (classic queue, no delivery count), so a restart resets it.
+const CONSUMER_RUN_ID = randomUUID();
+const MAX_DELIVERY_ATTEMPTS = Number(process.env.EMBED_CONSUMER_MAX_ATTEMPTS ?? DEFAULT_MAX_DELIVERY_ATTEMPTS_V1);
+const retryTracker = createRetryTrackerV1(MAX_DELIVERY_ATTEMPTS);
+let dlqChannel: ConfirmChannel | null = null;
+
+const summaryInputHash = (summary: string) => `sha256:${createHash('sha256').update(summary, 'utf8').digest('hex')}`;
 
 const pgPool = new Pool({
   host: PG_HOST,
@@ -94,10 +107,12 @@ async function batchEmbedSummaries(summaries: string[]): Promise<(number[] | nul
 async function logAnalysisPass(
   pool: Pool,
   packet: SummaryMessage,
-  embedding: number[]
-): Promise<void> {
+  embedding: number[],
+  msg?: Message,
+  ctx?: DeliveryContextV1
+): Promise<boolean> {
   if (DRY_RUN) {
-    return;
+    return true;
   }
 
   try {
@@ -106,13 +121,13 @@ async function logAnalysisPass(
       INSERT INTO analysis_pass_results (
         pass_key, packet_key, source_ref, feature_id,
         pass_type, status,
-        model_name,
+        model_name, input_hash,
         output, scores, index_push, provenance,
         created_at, updated_at
       ) VALUES (
         $1, $2, $3, $4,
         $5, $6,
-        $7,
+        $7, $12,
         $8, $9, $10, $11,
         NOW(), NOW()
       )
@@ -127,6 +142,9 @@ async function logAnalysisPass(
         EMBEDDING_MODEL,
         JSON.stringify({
           embedding_dim: EMBEDDING_DIM,
+          representation_id: 'semantic_768',
+          model_tag: EMBEDDING_MODEL,
+          model_artifact_revision: null,
           embedding_norm: Math.sqrt(embedding.reduce((a, b) => a + b * b, 0)),
           batch_processed: true,
         }),
@@ -139,17 +157,39 @@ async function logAnalysisPass(
         }),
         JSON.stringify({
           source: 'queue_consumer_embedding_batch',
+          // Legacy synthetic correlation value; NOT a broker or attempt identity (PF4B-QUEUE-01).
           queue_message_id: `${packet.packet_key}:${Date.now()}`,
+          broker: {
+            message_id: msg?.properties?.messageId ?? null,
+            delivery_tag: msg?.fields?.deliveryTag ?? null,
+            redelivered: msg?.fields?.redelivered ?? null,
+            routing_key: msg?.fields?.routingKey ?? null,
+            consumer_tag: msg?.fields?.consumerTag ?? null,
+          },
+          execution: {
+            execution_id: ctx?.executionId ?? null,
+            attempt: ctx?.attempt ?? null,
+            consumer_run_id: CONSUMER_RUN_ID,
+            broker_identity_key: ctx?.brokerIdentity ?? null,
+            logical_input_key: logicalInputKeyV1({
+              packetKey: packet.packet_key,
+              inputHash: summaryInputHash(packet.summary),
+              representationId: 'semantic_768',
+            }),
+          },
           identity: {
             identity_mutated: false,
             join_key: 'packet_key',
             fallback_join: `${packet.source_ref}:${packet.feature_id}`,
           },
         }),
+        summaryInputHash(packet.summary),
       ]
     );
+    return true;
   } catch (err) {
     console.error(`  ✗ Failed to log pass: ${err}`);
+    return false;
   }
 }
 
@@ -157,9 +197,9 @@ async function updateSummaryLayerEmbedding(
   pool: Pool,
   packet: SummaryMessage,
   embedding: number[]
-): Promise<void> {
+): Promise<boolean> {
   if (DRY_RUN) {
-    return;
+    return true;
   }
 
   try {
@@ -181,8 +221,10 @@ async function updateSummaryLayerEmbedding(
       `,
       [packet.packet_key, vectorLiteral(embedding), EMBEDDING_MODEL, EMBEDDING_DIM]
     );
+    return true;
   } catch (err) {
     console.error(`  ✗ Failed to update embedding: ${err}`);
+    return false;
   }
 }
 
@@ -209,6 +251,8 @@ async function main() {
 
     // Declare queue and set prefetch for batch
     await channel.assertQueue('atlas.enrichment.embedding', { durable: true });
+    dlqChannel = await connection.createConfirmChannel();
+    await dlqChannel.assertQueue(EMBEDDING_DLQ_NAME_V1, { durable: true });
     await channel.prefetch(BATCH_SIZE); // Prefetch batch-size messages
 
     console.log(`✅ Connected to atlas.enrichment.embedding\n`);
@@ -236,26 +280,31 @@ async function main() {
         const { msg, packet } = messageBatch[i];
         const embedding = embeddings[i];
 
-        if (!embedding) {
-          console.log(`  ⚠️  ${packet.packet_key}: empty embedding`);
-          channel!.nack(msg, false, true); // requeue
-          continue;
-        }
-
-        try {
-          // Log analysis pass
-          await logAnalysisPass(pgPool, packet, embedding);
-
-          // Update summary layer
-          await updateSummaryLayerEmbedding(pgPool, packet, embedding);
-
-          // Acknowledge message
-          channel!.ack(msg);
-          successCount++;
-        } catch (err) {
-          console.error(`  ✗ ${packet.packet_key}: ${err}`);
-          channel!.nack(msg, false, false); // discard
-        }
+        const outcome = await processDeliveryV1({
+          msg,
+          consumerRunId: CONSUMER_RUN_ID,
+          tracker: retryTracker,
+          logicalInputKey: logicalInputKeyV1({ packetKey: packet.packet_key, inputHash: summaryInputHash(packet.summary), representationId: 'semantic_768' }),
+          channel: {
+            ack: (m) => channel!.ack(m),
+            nack: (m, allUpTo, requeue) => channel!.nack(m, allUpTo, requeue),
+            publishDeadLetter: (content, headers) =>
+              new Promise<void>((resolve, reject) => {
+                if (!dlqChannel) return reject(new Error('DLQ_CHANNEL_UNAVAILABLE'));
+                dlqChannel.sendToQueue(EMBEDDING_DLQ_NAME_V1, Buffer.from(content), { persistent: true, headers }, (err) => (err ? reject(err) : resolve()));
+              }),
+          },
+          work: async (ctx) => {
+            if (!embedding) {
+              console.log(`  ⚠️  ${packet.packet_key}: empty embedding (attempt ${ctx.attempt}/${MAX_DELIVERY_ATTEMPTS})`);
+              return false;
+            }
+            if (!(await logAnalysisPass(pgPool, packet, embedding, msg, ctx))) return false; // never ack without a ledger row
+            return updateSummaryLayerEmbedding(pgPool, packet, embedding);
+          },
+        });
+        if (outcome === 'ACKED') successCount++;
+        else console.log(`  → ${packet.packet_key}: ${outcome}`);
       }
 
       console.log(`  ✅ Batch complete: ${successCount}/${messageBatch.length} success (${perPacket.toFixed(1)}ms/packet)`);
@@ -305,6 +354,7 @@ async function main() {
     }
 
     if (channel) await channel.close();
+    if (dlqChannel) await dlqChannel.close();
     if (connection) await connection.close();
     await pgPool.end();
     console.log('✅ Closed');

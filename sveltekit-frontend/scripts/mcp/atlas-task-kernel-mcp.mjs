@@ -17,17 +17,17 @@ const SERVER_INFO = { name: 'atlas-task-kernel', version: '1.0.0' };
 const INTERNAL_CALL_TIMEOUT_MS = 55_000;
 
 const TOOLS = [
-  { name: 'atlas_context', description: 'Build a bounded canonicalized Atlas context packet. Cache and retrieval implementations remain internal.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 50 }, domainFilter: { type: 'string' } }, required: ['query'], additionalProperties: false } },
-  { name: 'atlas_inspect', description: 'Inspect canonical source references relevant to a bounded query.', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], additionalProperties: false } },
+  { name: 'atlas_context', description: 'Query-specific ranked context from live search, bound to packet identity where unambiguous; candidates are unadmitted. Falls back to a labelled static packet (querySpecific:false) if search fails.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 50 }, domainFilter: { type: 'string' } }, required: ['query'], additionalProperties: false } },
+  { name: 'atlas_inspect', description: 'Resolve file paths (query or refs, max 10) to packet identity: packet key, feature, revision when known. Plain names search source-ref names. Identity only, not source content.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, refs: { type: 'array', maxItems: 10, items: { type: 'string', maxLength: 1024 } } }, additionalProperties: false } },
   { name: 'atlas_expand', description: 'Expand read-only structural dependencies for one target.', inputSchema: { type: 'object', properties: { target: { type: 'string' } }, required: ['target'], additionalProperties: false } },
   { name: 'atlas_verify', description: 'Classify a task and return a safe evidence-gathering direction without editing or executing work.', inputSchema: { type: 'object', properties: { prompt: { type: 'string' }, context: { type: 'string' } }, required: ['prompt'], additionalProperties: false } },
   { name: 'atlas_validate_plan', description: 'Validate a proposed plan; it cannot authorize execution.', inputSchema: { type: 'object', properties: { intent: { type: 'string' }, domain: { type: 'string' }, errorSummary: { type: 'string' }, evidenceLines: { type: 'array', items: { type: 'string' } }, patchTargets: { type: 'array', items: { type: 'string' } }, proposedFix: { type: 'string' } }, required: ['intent', 'domain', 'errorSummary', 'evidenceLines', 'patchTargets'], additionalProperties: false } },
-  { name: 'atlas_research', description: 'Run one bounded, read-only research circuit through Atlas context selection. It never exposes arbitrary Python or storage operations.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 32 }, maxRounds: { type: 'number', minimum: 1, maximum: 3 } }, required: ['query'], additionalProperties: false } },
+  { name: 'atlas_research', description: 'Run one round of atlas_context selection, read-only. maxRounds is not applied here; multi-round research is the separate ldr-research server.', inputSchema: { type: 'object', properties: { query: { type: 'string' }, maxCards: { type: 'number', minimum: 1, maximum: 32 }, maxRounds: { type: 'number', minimum: 1, maximum: 3 } }, required: ['query'], additionalProperties: false } },
 ];
 
 const IMPLEMENTATIONS = {
   atlas_context: ['build_agentic_rag_context', (a) => ({ query: a.query, maxCards: a.maxCards, domainFilter: a.domainFilter })],
-  atlas_inspect: ['find_source_refs', (a) => ({ query: a.query })],
+  atlas_inspect: ['find_source_refs', (a) => ({ query: a.query, refs: a.refs })],
   atlas_expand: ['find_dependencies', (a) => ({ target: a.target })],
   atlas_verify: ['classify_intent', (a) => ({ prompt: a.prompt, context: a.context })],
   atlas_validate_plan: ['build_recommendation', (a) => a],
@@ -108,6 +108,9 @@ async function dispatch(method, params) {
       schema: 'atlas.local-research-mcp-result.v1',
       query: params?.arguments?.query,
       maxRounds: params?.arguments?.maxRounds ?? 3,
+      // maxRounds is echoed for compatibility but never applied: exactly one atlas_context round runs.
+      maxRoundsApplied: false,
+      roundsExecuted: 1,
       maxCards: params?.arguments?.maxCards ?? 32,
       backend: 'atlas-task-kernel',
       ldrToolServer: 'ldr-research',

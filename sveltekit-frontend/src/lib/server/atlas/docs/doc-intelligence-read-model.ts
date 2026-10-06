@@ -138,7 +138,7 @@ export interface DocSearchHit {
 
 export interface DocSearchResult {
 	query: string;
-	mode: 'POSTGRES_FTS' | 'LOCAL_LEXICAL';
+	mode: 'POSTGRES_FTS' | 'POSTGRES_DENSE' | 'LOCAL_LEXICAL';
 	hits: DocSearchHit[];
 	postgresNote: string | null;
 	/** Applied bounded, exact-match filters (canonical lane only). */
@@ -544,6 +544,45 @@ function localLexicalSearch(root: string, q: string, limit: number, sources: Sou
 		});
 	}
 	return hits.sort((a, b) => b.score - a.score).slice(0, limit).map(({ score: _score, ...hit }) => hit);
+}
+
+function canonicalDocHit(r: Record<string, unknown>): DocSearchHit {
+	return {
+		provider: (r.provider as string | null) ?? null, title: String(r.title), sourceId: String(r.product ?? ''), url: (r.url as string | null) ?? null,
+		product: (r.product as string | null) ?? null, productVersion: (r.product_version as string | null) ?? null,
+		authorityClass: String(r.source_authority ?? ''), revision: (r.page_evidence_revision as string | null) ?? null, excerpt: String(r.excerpt ?? ''),
+		badge: 'CANONICAL_POSTGRES', sourceClass: 'CANONICAL', pageId: String(r.page_id), chunkId: String(r.chunk_id),
+		chunkEvidenceRevision: String(r.chunk_evidence_revision), headingPath: (r.heading_path as string[] | null) ?? []
+	};
+}
+
+/**
+ * Dense lane over the canonical chunks (READ ONLY, Postgres pgvector HNSW; no Qdrant, no cache write, no embedding performed here).
+ * The caller supplies the query vector, which keeps this pure and testable. Same dimension is not the same representation: corpus rows carry no
+ * recipe/executor stamp yet, so `representationCaveat` is always reported. A vector lane has no local fallback: an invalid vector, absent pool or
+ * database failure returns zero hits with a typed note.
+ */
+export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult & { representationCaveat: string }> {
+	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
+	const product = opts.product?.trim().slice(0, 100) || null;
+	const productVersion = opts.productVersion?.trim().slice(0, 100) || null;
+	const base = { query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[], representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only' };
+	if (opts.queryVector.length !== 768 || opts.queryVector.some((x) => !Number.isFinite(x))) return { ...base, postgresNote: 'QUERY_VECTOR_INVALID' };
+	if (!opts.pool) return { ...base, postgresNote: 'POSTGRES_UNAVAILABLE:no pool' };
+	try {
+		const { rows } = await opts.pool.query(
+			`SELECT c.chunk_id, c.evidence_revision AS chunk_evidence_revision, c.heading_path, p.id AS page_id, p.title, p.provider, p.product,
+			        p.product_version, p.url, p.source_authority, p.evidence_revision AS page_evidence_revision, left(c.text, 300) AS excerpt
+			   FROM atlas_external_doc_chunks c JOIN atlas_external_doc_pages p ON p.id = c.page_id
+			  WHERE c.content_embedding IS NOT NULL AND ($3::text IS NULL OR p.product = $3) AND ($4::text IS NULL OR p.product_version = $4)
+			  ORDER BY c.content_embedding <=> $1::vector, c.chunk_id
+			  LIMIT $2`,
+			[`[${opts.queryVector.join(',')}]`, limit, product, productVersion]
+		);
+		return { ...base, postgresNote: null, hits: rows.map(canonicalDocHit) };
+	} catch (error) {
+		return { ...base, postgresNote: `POSTGRES_UNAVAILABLE:${error instanceof Error ? error.message : String(error)}` };
+	}
 }
 
 export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q: string; limit?: number; runtime?: RuntimeVersions; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult> {

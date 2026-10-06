@@ -1,0 +1,246 @@
+{
+  "schema": "atlas.external-doc-admission-envelopes.v1",
+  "generatedAt": "2026-10-05T18:51:00.783139+00:00",
+  "manifestRevision": "okf-tooling-docs-r2",
+  "priorManifestRevision": null,
+  "recrawlPlan": null,
+  "acquired": false,
+  "acquisitionFailures": [],
+  "pages": 57,
+  "chunks": 717,
+  "envelopesDigest": "sha256:7ba3aaa1cad399fac178498e03ae0badbef8564f59efedd386cff72e4b76f5d5",
+  "envelopesFile": "docs/.okf/dev/tooling-docs.admission-envelopes-v1.json",
+  "native": {
+    "nativeChunks": 717,
+    "nativeChunksWithoutDocCoordinate": 0,
+    "pageNormalizationDiffersFromStoredText": 0,
+    "uniquePageEvidenceRevisionCount": 57,
+    "duplicatePageEvidenceRevision": {
+      "groups": 0,
+      "rows": 0
+    },
+    "uniqueChunkEvidenceRevisionCount": 717,
+    "duplicateChunkEvidenceRevision": {
+      "groups": 0,
+      "rows": 0
+    }
+  },
+  "coordinateSource": "manifest fields (provider/product/product_version/version_qualification/...) via atlas_okf_docs_pipeline.build_page_coordinate; sidecar mirrors and is checked for drift",
+  "sampleEnvelopes": [
+    {
+      "manifestRevision": "okf-tooling-docs-r2",
+      "sourceRevision": "oaklib-docs-2026-10-05",
+      "sourceId": "oaklib",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "incatools",
+        "product": "oaklib",
+        "productVersion": "CURRENT_UPSTREAM@2026-10-05",
+        "architecture": null,
+        "language": "python",
+        "url": "https://incatools.github.io/ontology-access-kit/cli.html",
+        "title": "Command Line — oaklib  documentation",
+        "publisher": "INCATools",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "oaklib-docs-2026-10-05",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "d704414534ab8cec180c89d3d3ce731e47fab2d19ac90c6598c38f62e7cf43b6",
+        "evidenceRevision": "sha256:fdd1ae5bc958afc7ff2541e63100e4619c4840a31bd864b57506a0a54cb6f8b0",
+        "retrievedAt": "2026-10-05T18:33:28.667571Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:oaklib:d704414534ab8cec:0",
+          "ordinal": 0,
+          "headingPath": [],
+          "sectionAnchor": null,
+          "startChar": 0,
+          "endChar": 1318,
+          "startByte": 0,
+          "endByte": 1318,
+          "text": "oaklib\nContents:\nIntroduction\nTutorial\nThe OAK Guide\nOAK Library Documentation\nCommand Line\nGeneral Guidelines\nCommon Patterns\nTerm Lists\nPredicates\nCache Control\nControlling the cache on the command line\nControlling the cache with a configuration file\nCommands\nrunoak\naliases\nancestors\nannotate\napply\napply-obsolete\napply-taxon-constraints\nassociations\nassociations-counts\nassociations-graph\nassociations-matrix\naxioms\ncache-clear\ncache-ls\nchains\ncrawl\ndefinitions\ndescendants\ndiff\ndiff-associations\ndiff-terms\ndiff-via-mappings\ndisjoints\ndump\nenrichment\nexpand-subsets\nextract\nfill-table\ngenerate-definitions\ngenerate-disjoints\ngenerate-lexical-replacements\ngenerate-logical-definitions\ngenerate-synonyms\ninfo\ninformation-content\nlabels\nlanguages\nleafs\nlexmatch\nlint\nlogical-definitions\nmappings\nmigrate-curies\nnormalize\nobsoletes\nontologies\nontology-metadata\nontology-versions\npaths\nprefixes\nquery\nrelationships\nrollup\nroots\nsearch\nset-apikey\nsiblings\nsimilarity\nsimilarity-pair\nsingletons\nstatistics\nsubsets\nsynonymize\ntaxon-constraints\nterm-categories\nterm-metadata\nterm-subsets\nterms\ntermset-similarity\ntransform\ntree\nusages\nvalidate\nvalidate-definitions\nvalidate-mappings\nvalidate-multiple\nvalidate-subset\nvalidate-synonyms\nviz\nDatamodels\nHow-To Guides\nExamples\nGlossary\nFAQ\noaklib\nCommand Line\nView page source",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "RETRIEVAL",
+            "GRAPH",
+            "TOOL"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "24554ece9efdf3808d4da2b6e64d196d7b4db42e2fb5f523e2e43b70ec182748",
+          "evidenceRevision": "sha256:de31b0d296969b0d9dbb0129ad5a5a1608d1b0387d3b8b199d0526b1b6b50e55"
+        },
+        {
+          "chunkId": "doc:oaklib:d704414534ab8cec:1",
+          "ordinal": 1,
+          "headingPath": [
+            "Command Line "
+          ],
+          "sectionAnchor": "Command Line ",
+          "startChar": 1336,
+          "endChar": 1389,
+          "startByte": 1338,
+          "endByte": 1391,
+          "text": "Note\nwe follow the\nCLIG\nguidelines as far as possible",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "CONCEPT"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "18ded1e2d06341b6cd3790b3b10c26204eb53b64be50db3d27bd55c79c930de7",
+          "evidenceRevision": "sha256:7f2cb87721222e3e0c15c865a56fa97ee2fbd4520626458751f848c0c387082c"
+        }
+      ]
+    },
+    {
+      "manifestRevision": "okf-tooling-docs-r2",
+      "sourceRevision": "oaklib-docs-2026-10-05",
+      "sourceId": "oaklib",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "incatools",
+        "product": "oaklib",
+        "productVersion": "CURRENT_UPSTREAM@2026-10-05",
+        "architecture": null,
+        "language": "python",
+        "url": "https://incatools.github.io/ontology-access-kit/datamodels/obograph/index.html",
+        "title": "Obographs Datamodel — oaklib  documentation",
+        "publisher": "INCATools",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "oaklib-docs-2026-10-05",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "9864353b8fca96185bd0c8eb63166418e5bf27de7150625ea050a9d54c9a3b4b",
+        "evidenceRevision": "sha256:4cb4245b8309596fbc1520ba2213f2c102c13c9e86e03672e50f3e3aecfd6144",
+        "retrievedAt": "2026-10-05T18:33:28.813746Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:oaklib:9864353b8fca9618:0",
+          "ordinal": 0,
+          "headingPath": [],
+          "sectionAnchor": null,
+          "startChar": 0,
+          "endChar": 550,
+          "startByte": 0,
+          "endByte": 550,
+          "text": "oaklib\nContents:\nIntroduction\nTutorial\nThe OAK Guide\nOAK Library Documentation\nCommand Line\nDatamodels\nOntology Metadata Ontology Schema\nsearch datamodel\nObographs Datamodel\nClasses\nSlots\nEnumerations\nTypes\nSubsets\nSSSOM\nFunOwl\nKGCL\nSemantic Similarity\nSummary Statistics Datamodel\nTaxon Constraints Reporting Datamodel\nValidation Results Data Model\nLexical Index\nMapping Rules Datamodel\nText Annotator Datamodel\nCross-Ontology Diff\nOAK Association Data Model\nHow-To Guides\nExamples\nGlossary\nFAQ\noaklib\nDatamodels\nObographs Datamodel\nView page source",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "TYPE",
+            "MODEL",
+            "RETRIEVAL",
+            "TEST",
+            "TOOL"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "a1e8a3fa7a20ee5cf74eb03e4bc70dc519d944e1274006d18a167a80bb9eb677",
+          "evidenceRevision": "sha256:36ef1c1cdd6f69844c9e1f1e4b8f5bc809cb83f2b7d46cfb9027e9a12c082388"
+        },
+        {
+          "chunkId": "doc:oaklib:9864353b8fca9618:1",
+          "ordinal": 1,
+          "headingPath": [
+            "Obographs Datamodel "
+          ],
+          "sectionAnchor": "Obographs Datamodel ",
+          "startChar": 575,
+          "endChar": 1314,
+          "startByte": 577,
+          "endByte": 1316,
+          "text": "A data model for graph-oriented representations of ontologies. Each ontology is represented as a Graph, and multiple ontologies can be connected together in a GraphDocument.\nThe principle elements of a Graph are Node objects and Edge objects. A Node represents an arbitrary ontology element, including but not limited to the core terms in the ontology. Edges represent simple relationships between Nodes. Nodes and Edges can both have Meta objects attached, providing additional metedata.\nNot everything in an ontology can be represented as nodes and edges. More complex axioms have specialized structures such as DomainRangeAxiom objects and LogicalDefinitionAxiom.\nURI: https://github.com/geneontology/obographs\nName: obographs_datamodel",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "MODEL",
+            "GRAPH"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "39be2031c2a22fd800d3bde593f7e294ff93e31b5fdd91033aa971eac74f246b",
+          "evidenceRevision": "sha256:731d9b2aeec4ae57941b980fc34a847a09c3db186eaa9f084aac784986d81741"
+        }
+      ]
+    },
+    {
+      "manifestRevision": "okf-tooling-docs-r2",
+      "sourceRevision": "oaklib-docs-2026-10-05",
+      "sourceId": "oaklib",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "page": {
+        "provider": "incatools",
+        "product": "oaklib",
+        "productVersion": "CURRENT_UPSTREAM@2026-10-05",
+        "architecture": null,
+        "language": "python",
+        "url": "https://incatools.github.io/ontology-access-kit/datamodels/search/index.html",
+        "title": "search datamodel — oaklib  documentation",
+        "publisher": "INCATools",
+        "sourceAuthority": "OFFICIAL",
+        "fetcher": "BEAUTIFULSOUP_HTTP",
+        "crawlRevision": "oaklib-docs-2026-10-05",
+        "parserRevision": "beautifulsoup4==4.15.0/html.parser",
+        "contentHash": "ed40c186e3c59c11b0b95e503f2c35c22e592e32f42726392def290a7269fd38",
+        "evidenceRevision": "sha256:dd901a77adf8a2dbf0c58bf4a5e0becb7b670e75d6ce2e6b6a3b0fa4c81578ab",
+        "retrievedAt": "2026-10-05T18:33:28.901637Z"
+      },
+      "chunks": [
+        {
+          "chunkId": "doc:oaklib:ed40c186e3c59c11:0",
+          "ordinal": 0,
+          "headingPath": [],
+          "sectionAnchor": null,
+          "startChar": 0,
+          "endChar": 547,
+          "startByte": 0,
+          "endByte": 547,
+          "text": "oaklib\nContents:\nIntroduction\nTutorial\nThe OAK Guide\nOAK Library Documentation\nCommand Line\nDatamodels\nOntology Metadata Ontology Schema\nsearch datamodel\nClasses\nSlots\nEnumerations\nTypes\nSubsets\nObographs Datamodel\nSSSOM\nFunOwl\nKGCL\nSemantic Similarity\nSummary Statistics Datamodel\nTaxon Constraints Reporting Datamodel\nValidation Results Data Model\nLexical Index\nMapping Rules Datamodel\nText Annotator Datamodel\nCross-Ontology Diff\nOAK Association Data Model\nHow-To Guides\nExamples\nGlossary\nFAQ\noaklib\nDatamodels\nsearch datamodel\nView page source",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "TYPE",
+            "MODEL",
+            "RETRIEVAL",
+            "TEST",
+            "TOOL"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "69560917988de8d8907174b77fd34cf105228cce9837f011dbe1991ebb4fc755",
+          "evidenceRevision": "sha256:f2d4915650719c659c80a940148b879ad26d23f8bccc032d2f5f614e43ba278c"
+        },
+        {
+          "chunkId": "doc:oaklib:ed40c186e3c59c11:1",
+          "ordinal": 1,
+          "headingPath": [
+            "search datamodel "
+          ],
+          "sectionAnchor": "search datamodel ",
+          "startChar": 569,
+          "endChar": 1058,
+          "startByte": 571,
+          "endByte": 1060,
+          "text": "A datamodel for representing a search configuration and results.\nThis is intended to provide a unified layer over both:\n(a) how searches are\nparameterized\n(b) the structure of search\nresults\n.\nThe scope is any kind of service that provides search over\nnamed entities\n, including ontology concepts. It is not intended to cover generic\nsearch results, e.g. google search, although parts could be generalized for this purpose.\nURI: https://w3id.org/oak/search-datamodel\nName: search-datamodel",
+          "domainClass": "graph",
+          "ontologyClasses": [
+            "RETRIEVAL"
+          ],
+          "codeBlocks": [],
+          "apiSignatures": [],
+          "chunkChecksum": "a65c483db0ff8f18eb9ad935ab7620e3b175739948735dd0fa050ac3be86a80a",
+          "evidenceRevision": "sha256:35b0be3b2848d52516d279883d2292209ab3f09575a5318c56dd12dedc38f4e6"
+        }
+      ]
+    }
+  ],
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0
+  }
+}

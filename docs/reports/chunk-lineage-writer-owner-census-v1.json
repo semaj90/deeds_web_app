@@ -1,0 +1,83 @@
+{
+  "schema": "atlas.chunk-lineage-writer-owner-census.v1",
+  "generatedAt": "2026-10-05T19:57:30.278Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "gate": "CHUNK-LINEAGE-OWNER-01",
+  "writers": [
+    {
+      "path": "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+      "kind": "INSERT ... ON CONFLICT (qdrant_id)",
+      "carries": {
+        "source_revision": false,
+        "workspace_revision": false,
+        "representation_revision": false,
+        "file_content_hash": false
+      }
+    },
+    {
+      "path": "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+      "kind": "INSERT ... ON CONFLICT (qdrant_id)",
+      "carries": {
+        "source_revision": false,
+        "workspace_revision": false,
+        "representation_revision": false,
+        "file_content_hash": false
+      }
+    },
+    {
+      "path": "scripts/atlas/index-full-repo-for-search.mjs",
+      "kind": "INSERT ... ON CONFLICT; --apply gated by ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1",
+      "carries": {
+        "file_content_hash": "yes, written to Postgres (whole-file sha256)",
+        "source_revision": "read from an input row and written to the Qdrant payload only when present; not in the Postgres INSERT columns",
+        "workspace_revision": "same as source_revision",
+        "representation_revision": "hard-coded label 'semantic_768@v1' in the Qdrant payload (a label, not a derived RepresentationRevision identity)"
+      }
+    },
+    {
+      "path": "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts",
+      "kind": "INSERT mirror from Qdrant",
+      "carries": {
+        "source_revision": false,
+        "workspace_revision": false,
+        "representation_revision": false,
+        "file_content_hash": false
+      }
+    }
+  ],
+  "lineageProducersAfterTheFact": [
+    {
+      "path": "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs",
+      "role": "mirrors source/workspace revision onto chunk rows on exact source_ref + whole-file digest match; representation revision deliberately untouched",
+      "state": "canary only (5 rows, rolled back); apply gated by explicit limit + confirmation token"
+    },
+    {
+      "table": "atlas_packet_chunk_lineage",
+      "role": "PROVEN packet<->chunk bridge (chunk_row_id = codebase_chunk_index.id)",
+      "rows": 127927
+    },
+    {
+      "table": "atlas_workspace_source_bindings",
+      "role": "exact source binding per workspace revision",
+      "rowsAtAdmittedWorkspace": 24456
+    }
+  ],
+  "fieldClassification": {
+    "file_content_hash": "NEVER_PRODUCED_BY_WRITER; backfilled afterwards (3,699 of 274,465 rows still null)",
+    "source_revision": "NOT_WRITTEN_TO_POSTGRES_BY_ANY_WRITER; the full-repo indexer forwards it to Qdrant payloads when its input has it; available upstream (bridge, bindings); chunk-row mirror NOT applied (0 rows)",
+    "workspace_revision": "NOT_WRITTEN_TO_POSTGRES_BY_ANY_WRITER (same as source_revision); available via exact binding (179,221 chunks); mirror unapplied",
+    "representation_revision": "a hard-coded 'semantic_768@v1' label exists in the indexer's Qdrant payload; NO derived RepresentationRevision identity producer"
+  },
+  "firstMissingBoundary": "Postgres chunk rows never receive revisions from any writer; the full-repo indexer carries them only into Qdrant payloads, and only if its input rows have them. Lineage reaches Postgres only through the after-the-fact bridge producers.",
+  "recommendation": {
+    "patchWriter": "NOT YET: reconcile with audit-semantic-768-writer-ownership-v1 first; the full-repo indexer is the one writer that already handles file_content_hash and revision payload fields, so it is the canonical owner candidate for stamping Postgres revisions, not the two legacy paths",
+    "next": [
+      "apply the existing exact-match mirror backfill as a bounded canary (operator token)",
+      "define the representationRevision producer (recipe decision)",
+      "route new chunk writes through one owner that stamps file_content_hash + revisions, then retire the legacy writers"
+    ]
+  },
+  "correction": "v1 (6809f600e3) listed 2 INSERT writers; a repo-wide search shows 4 live writers (excluding .tmp snapshot copies). The 2 added below change the conclusion: revisions are not absent everywhere, they are carried to Qdrant payloads, not Postgres columns.",
+  "existingOwnerAudit": "scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs (+ docs/reports/semantic-768-writer-ownership-*.json): the repo already has a writer-ownership census for semantic_768; reconcile with it rather than maintaining a second one"
+}

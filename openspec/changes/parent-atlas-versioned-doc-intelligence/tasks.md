@@ -1450,3 +1450,46 @@ This closes viewability only; the artifact remains noncanonical and unadmitted.
   found no duplicate for either new table but exits nonzero on 23 duplicate
   declarations elsewhere in the schema. No migration was generated/applied and
   no database or other datastore was contacted or written.
+
+## Tooling docs corpus: oaklib / ast-grep / ts-morph / trpc — 2026-10-05
+
+Manifest `docs/.okf/dev/tooling-docs.manifest.json` (revision `okf-tooling-docs-r1`). Acquired with the existing
+`atlas_okf_docs_pipeline.py --acquire-only` (run from the `deeds-miniforge-nlp-sidecar` image with the repo mounted; nothing installed on the host).
+BeautifulSoup for oaklib/ast-grep/ts-morph, Firecrawl v2 for trpc. Namespaces `docs/.okf/{oaklib,ast-grep,ts-morph,trpc}` (flat, not under `pinned/`).
+
+- [x] `TOOLING-DOCS-ACQUIRE-01`: 57 pages / 691 chunks (oaklib 17/237, ast-grep 16/196, ts-morph 15/188, trpc 9/70). `LOCAL_UNADMITTED`, `canonical_authority=false`;
+      no Postgres/Qdrant/Valkey/Neo4j writes. Receipt `docs/.okf/pipeline-receipt-okf-tooling-docs-r1.json`.
+- [x] `TOOLING-DOCS-VALIDATE-01`: unique chunk ids and evidence revisions, 0 empty, 0 checksum mismatch, 0 byte-span mismatch against the pipeline's own normalizer, 0 null doc coordinates,
+      all four PASS. Keyword/POS analysis (spaCy en_core_web_sm) in `docs/.okf/dev/tooling-docs.analysis.json` (derived, non-canonical).
+      Findings, not fixed: pipeline `domain_class` is coarse (oaklib ontology docs mostly `graph`, 56 `training`; ts-morph 123 `graph`); Firecrawl pages keep site chrome
+      ("Skip to main content", iframe/widget/twitter terms); thin index pages (ts-morph `/`, `details/index`, oaklib sssom, trpc server/overview, all under ~1 KB).
+- [x] pgvector read-only check: `vector` 0.8.3; `atlas_external_doc_chunks.content_embedding` is `vector(768)` with HNSW `vector_cosine_ops` (m=16, ef_construction=64);
+      the 852 pinned chunks all have 768-d unit-norm embeddings, none have `qdrant_point_id`. Tables for the new sources do not exist yet (no rows).
+- [x] `SEMANTIC-DOC-01` executor fallback: `populate-external-doc-embeddings-v1.mts` selects ONE executor per run (never per row): `EMBED_SERVER_URL`/:8081, then :8082 llama-server, then Ollama
+      `embeddinggemma:latest` (`/api/embed`, `truncate:false`). `--apply` requires parity evidence for the SELECTED executor: the existing parity receipt covers only the :8081 GGUF, so an Ollama
+      apply fails closed (`EMBED_PARITY_NOT_PROVEN_FOR_EXECUTOR`) until an Ollama parity receipt exists. :8081 and :8082 were not running on 2026-10-05; the dry run selected Ollama.
+- [ ] `TOOLING-DOCS-ADMIT-01`: build admission envelopes for the four sources (`scripts/atlas/build-external-doc-admission-envelopes-v1.py --manifest ... --output ... --receipt ...`; needs a
+      coordinates sidecar mirroring the manifest, and note the builder labels every `parserRevision` as `beautifulsoup4`, wrong for the Firecrawl-fetched trpc pages), then admit through
+      `run-external-doc-admission-v1.mts`. That script is hard-wired to the pinned envelope file and would count the 30 pinned pages as unexpected rows; parameterize or merge first.
+      `--apply` needs `ATLAS_DOC_ADMISSION_AUTHORIZED=I_AUTHORIZE_CANONICAL_ADMISSION` (operator). Not run.
+- [ ] `TOOLING-DOCS-EMBED-01`: after admission, populate `content_embedding` for the new rows (`ATLAS_DOC_EMBED_AUTHORIZED=I_AUTHORIZE_SEMANTIC_DOC_01`, parity for the chosen executor). Decide and
+      record whether the 852 pinned rows and the new rows share one executor/recipe before mixing in one column (same dimension is not the same representation).
+- [ ] `TOOLING-DOCS-QDRANT-FANOUT-01`: after Postgres admission + embeddings, project to `external_programming_docs_768` (pipeline `--write-qdrant` or the DOC-08 projection owner), with payload
+      indexes and a Postgres-joined readback. The pinned 852 chunks have no `qdrant_point_id` yet either.
+- [ ] `TOOLING-DOCS-NEO4J-01`: topology mirror of docs/chunks/concepts only after admission; Neo4j is a mirror, never identity.
+- [ ] `TOOLING-DOCS-NETWORKX-01`: NetworkX CPU parity oracle for any doc/concept graph metrics before a cuGraph or Neo4j result is trusted (existing graph-analysis-runner/adapters; do not add a graph owner).
+- [ ] `TOOLING-DOCS-GRAPHRAG-01`: HyperRAG/GraphRAG traversal over the admitted, embedded, projected docs through the existing packet RPC owner; retrieval must join back to Postgres.
+- [ ] `OAKLIB-WIRE-01`: oaklib's Postgres kernel adapter reads `atlas_ontology_concepts`/`atlas_ontology_relations`, both 0 rows. Populate only through OAKLIB-ADAPTER-01 candidates after review
+      (`canonicalAuthority=false`). Also: the catalog URL `oaklib.readthedocs.io` in `library-docs-manifest-v1.json` returns 404 (current docs: `incatools.github.io/ontology-access-kit`),
+      and `docker/miniforge-nlp-sidecar/docker-compose.yml` carries a default Postgres password in the `ATLAS_OAK_ADAPTER` DSN (move to an env file).
+
+- [x] `DOC-26-TOOLING-ADD-PLAN-01` (2026-10-05, read-only): ownership rule frozen: `run-external-doc-admission-v1.mts` is the original/static first-load path; DOC-26 (`plan_manifest_recrawl_delta_v1` +
+      `external-doc-versioned-recrawl-admission-v2.ts` + `run-external-doc-versioned-recrawl-v2.mts`) is the versioned corpus-evolution owner. Do NOT add `--envelopes`/`--also-expect` to v1.
+      Ran: combined manifest `docs/.okf/dev/pinned-plus-tooling-docs.manifest.json` (`okf-pinned-plus-tooling-r1`) vs pinned `okf-pinned-docs-r3` -> 7 UNCHANGED, 4 ADDED (oaklib, ast-grep, ts-morph, trpc), 0 blockers
+      (`docs/reports/doc-26-pinned-plus-tooling-delta-plan-v1.json`). The first runner attempt failed closed (`DOC_RECRAWL_ENVELOPE_MANIFEST_REVISION_MISMATCH`) because the envelopes carried their old manifest revision;
+      the selected envelopes were rebuilt with the builder's `--prior-manifest` against the combined manifest. Live `--plan-only`: `DOC_26_VERSIONED_RECRAWL_PLAN_PROVEN`, pages classified MISSING, `safeToAdmit`, 0 writer calls,
+      0 writes (`docs/reports/doc-26-pinned-plus-tooling-plan-only-v1.json`). Not applied: needs `ATLAS_DOC_VERSIONED_RECRAWL_AUTHORIZED=I_AUTHORIZE_DOC_VERSIONED_RECRAWL` from the operator.
+- [ ] `DOC-26-UPDATE-POLICY-01`: freeze update policy before any pinned-page refresh: update != overwrite (old revision -> SUPERSEDED, new admitted revision; chunk identity belongs to one document revision);
+      compare canonical URL, product/version/as-of, normalized and document checksums, acquisition and parser/fetch recipe revisions; classify UNCHANGED/ADDED/CONTENT_CHANGED/METADATA_CHANGED/REMOVED/AMBIGUOUS;
+      REMOVED sources are retained, never deleted; after a changed admission mark derived artifacts stale by revision (FTS/trgm refresh, semantic_768 recompute, Qdrant projection, ontology proposals, PathwayCard EVIDENCE_STALE);
+      keep exact / near-exact / breadth regression queries and compare old vs new (Recall@K, MRR, ranks) before a recrawl is admitted.

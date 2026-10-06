@@ -28,15 +28,44 @@ export interface ParentAtlasBridgeConfig {
   postgres: { host: string; port: number; user: string; password: string; database: string };
 }
 
+export type PostgresRuntimeConfigV1 =
+  | { status: 'CONFIGURED'; host: string; port: number; user: string; password: string; database: string }
+  | { status: 'UNAVAILABLE'; missing: string[] };
+
+/**
+ * Typed Postgres runtime config. No credential lives in source and a missing password is
+ * UNAVAILABLE rather than an empty-password attempt. The default port is the app's canonical
+ * Postgres (5434); host port 5432 is a different, Windows-native server and must never be a
+ * silent fallback.
+ */
+export function resolvePostgresRuntimeConfigV1(env: NodeJS.ProcessEnv = process.env): PostgresRuntimeConfigV1 {
+  const password = env.POSTGRES_PASSWORD?.trim();
+  if (!password) return { status: 'UNAVAILABLE', missing: ['POSTGRES_PASSWORD'] };
+  return {
+    status: 'CONFIGURED',
+    host: env.POSTGRES_HOST || '127.0.0.1',
+    port: parseInt(env.POSTGRES_PORT || '5434', 10),
+    user: env.POSTGRES_USER || 'legal_admin',
+    password,
+    database: env.POSTGRES_DB || 'legal_ai_db'
+  };
+}
+
 const DEFAULT_CONFIG: ParentAtlasBridgeConfig = {
   postgres: {
     host: process.env.POSTGRES_HOST || '127.0.0.1',
-    port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
+    port: parseInt(process.env.POSTGRES_PORT || '5434', 10),
     user: process.env.POSTGRES_USER || 'legal_admin',
     password: process.env.POSTGRES_PASSWORD || '',
     database: process.env.POSTGRES_DB || 'legal_ai_db'
   }
 };
+
+function postgresUnavailable(config: ParentAtlasBridgeConfig, operation: string): boolean {
+  if (config.postgres.password) return false;
+  console.warn(`POSTGRES_ENRICHMENT_UNAVAILABLE:${operation}: POSTGRES_PASSWORD is not set; skipping enrichment`);
+  return true;
+}
 
 /**
  * Resolve Parent Atlas context for a given source_ref
@@ -46,6 +75,7 @@ export async function resolveParentAtlasContext(
   sourceRef: string,
   config: ParentAtlasBridgeConfig = DEFAULT_CONFIG
 ): Promise<ParentAtlasContext | null> {
+  if (postgresUnavailable(config, 'resolveParentAtlasContext')) return null;
   const pool = new Pool({
     host: config.postgres.host,
     port: config.postgres.port,
@@ -102,6 +132,7 @@ export async function enrichFilterWithDomainTaxonomy(
   if (!filter || !filter.feature_ids || filter.feature_ids.length === 0) {
     return filter;
   }
+  if (postgresUnavailable(config, 'enrichFilterWithDomainTaxonomy')) return filter;
 
   const pool = new Pool({
     host: config.postgres.host,
@@ -185,6 +216,7 @@ export async function batchResolveParentAtlasContext(
   if (sourceRefs.length === 0) {
     return new Map();
   }
+  if (postgresUnavailable(config, 'batchResolveParentAtlasContext')) return new Map();
 
   const pool = new Pool({
     host: config.postgres.host,

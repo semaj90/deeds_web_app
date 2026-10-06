@@ -31,6 +31,12 @@ import type { Pool } from 'pg';
 import type { LangGraphBridge, DispatcherState } from './langgraph-bridge.js';
 import type { EngramMemoryBridge } from './memory-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
+import {
+  createQueryExecutionPolicyV1,
+  createReadOnlySideEffectReceiptBuilderV1,
+  type QueryExecutionContextV1,
+  type QueryExecutionModeV1,
+} from '$lib/server/execution/query-execution-policy-v1.js';
 
 /**
  * No-op LangGraph bridge for when LangGraph is disabled.
@@ -121,11 +127,17 @@ export class DispatcherMiddleware {
    * @returns Wrapped handler that routes through dispatcher state machine
    */
   wrap(
-    handler: (input: unknown) => Promise<unknown>,
+    handler: (input: unknown, context: QueryExecutionContextV1) => Promise<unknown>,
     toolName: string,
-    sessionId: string
+    sessionId: string,
+    executionMode: QueryExecutionModeV1 = 'MUTATING'
   ): (input: unknown) => Promise<unknown> {
     return async (input: unknown) => {
+      const useLangGraph = executionMode !== 'READ_ONLY' && this.langgraphEnabled;
+      const executionContext: QueryExecutionContextV1 = {
+        policy: createQueryExecutionPolicyV1(executionMode),
+        sideEffects: createReadOnlySideEffectReceiptBuilderV1(executionMode),
+      };
       const toolCallId = this.generateToolCallId();
       const invokedAt = new Date().toISOString();
       const startTime = Date.now();
@@ -139,18 +151,18 @@ export class DispatcherMiddleware {
 
       try {
         // Apply headroom constraints to input (if LangGraph enabled)
-        const headroomed = this.langgraphEnabled
+        const headroomed = useLangGraph
           ? this.langgraphBridge.applyHeadroom(currentState)
           : currentState;
 
         // Invoke the original tool handler
-        const result = await handler(input);
+        const result = await handler(input, executionContext);
 
         // Capture result in state (if LangGraph enabled)
         const resultSize = JSON.stringify(result).length;
         let constrainedResult = result;
 
-        if (this.langgraphEnabled) {
+        if (useLangGraph) {
           const { result: cResult, updatedState } = await this.langgraphBridge.applyToolResult({
             state: headroomed,
             toolCall: { toolName, toolCallId },
@@ -164,7 +176,7 @@ export class DispatcherMiddleware {
         }
 
         // Persist state to PostgreSQL (guarded by pool availability)
-        if (this.pool) {
+        if (executionContext.policy.observations.persistAudit && this.pool) {
           const config = this.langgraphBridge.getConfig();
           await this.persistExecution(
             {
@@ -183,16 +195,28 @@ export class DispatcherMiddleware {
         }
 
         // Record observation in Engram
-        await this.recordObservation(toolName, sessionId, 'success', constrainedResult);
+        if (executionContext.policy.observations.persistEngram) {
+          await this.recordObservation(toolName, sessionId, 'success', constrainedResult);
+        }
+        if (!executionContext.policy.observations.persistAudit) executionContext.sideEffects.record({
+          subsystem: 'dispatcher-audit', operation: 'persist-tool-call', reads: 0,
+          attemptedWrites: 1, committedWrites: 0, suppressionReason: 'READ_ONLY_NONPERSISTENT_OBSERVABILITY',
+        });
+        if (!executionContext.policy.observations.persistEngram) executionContext.sideEffects.record({
+          subsystem: 'engram', operation: 'record-tool-observation', reads: 0,
+          attemptedWrites: 1, committedWrites: 0, suppressionReason: 'READ_ONLY_NONPERSISTENT_OBSERVABILITY',
+        });
 
-        return constrainedResult;
+        return executionMode === 'READ_ONLY' && constrainedResult && typeof constrainedResult === 'object'
+          ? { ...constrainedResult, read_only_side_effect_receipt: executionContext.sideEffects.build() }
+          : constrainedResult;
       } catch (error) {
         // Capture error in state
         const errorMsg = error instanceof Error ? error.message : String(error);
         currentState = { ...currentState, action: 'error' };
 
         // Persist error state
-        await this.persistExecution(
+        if (executionContext.policy.observations.persistAudit) await this.persistExecution(
           {
             toolName,
             sessionId,
@@ -207,7 +231,9 @@ export class DispatcherMiddleware {
         );
 
         // Record observation in Engram
-        await this.recordObservation(toolName, sessionId, 'error', { error: errorMsg });
+        if (executionContext.policy.observations.persistEngram) {
+          await this.recordObservation(toolName, sessionId, 'error', { error: errorMsg });
+        }
 
         throw error;
       }

@@ -196,6 +196,8 @@
     "atlas:docs:actionable-audit": "node scripts/atlas/audit-openspec-actionable-readiness-v2.mjs",
     "atlas:docs:nlp:ast-runtime": "node scripts/atlas/prove-nlp-sidecar-ast-runtime-v1.mjs",
     "atlas:docs:nlp:ast-schema-alignment": "node scripts/atlas/audit-nlp-sidecar-ast-schema-alignment-v1.mjs",
+    "atlas:artifact:audit": "node scripts/atlas/audit-artifact-bloat.mjs",
+    "atlas:artifact:audit:dry": "node scripts/atlas/audit-artifact-bloat.mjs --dry-run",
     "atlas:docs:authority-text-review": "node scripts/atlas/audit-openspec-authority-text-review-v1.mjs",
     "atlas:lineage:source-bridge-audit": "node scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
     "atlas:fts:replay": "node scripts/atlas/prove-postgres-fts-replay-v1.mjs",

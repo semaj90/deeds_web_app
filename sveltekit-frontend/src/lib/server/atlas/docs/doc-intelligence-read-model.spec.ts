@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { Pool } from 'pg';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-	buildDocIntelligenceStudioSnapshotV1, collectLocalCaptures, computeCoverage, scanRequiredTerms, searchDocCorpus,
+	buildDocIntelligenceStudioSnapshotV1, collectLocalCaptures, computeCoverage, scanRequiredTerms, searchDocCorpus, searchDocCorpusDense,
 	type RuntimeVersions
 } from './doc-intelligence-read-model.js';
 
@@ -251,5 +251,39 @@ describe('search', () => {
 		writeDev(); writeAllGroups();
 		const r = await searchDocCorpus({ pool: null, root, q: 'zzzz-not-present' });
 		expect(r.hits).toEqual([]);
+	});
+});
+
+describe('dense search', () => {
+	const vec = Array.from({ length: 768 }, (_, i) => (i % 7) / 10);
+	const row = { chunk_id: 'doc:x:1:2', chunk_evidence_revision: 'sha256:c', heading_path: ['A'], page_id: 'p1', title: 'T', provider: 'x', product: 'x', product_version: '1', url: 'https://x', source_authority: 'OFFICIAL', page_evidence_revision: 'sha256:p', excerpt: 'e' };
+	const poolWith = (rows: Record<string, unknown>[], fail = false) => {
+		const calls: { sql: string; params: unknown[] }[] = [];
+		return { calls, pool: { async query(sql: string, params: unknown[]) { calls.push({ sql, params }); if (fail) throw new Error('down'); return { rows }; } } as never };
+	};
+
+	it('returns canonical hits with provenance, bounded limit, filters as parameters, and a representation caveat', async () => {
+		const { pool, calls } = poolWith([row]);
+		const r = await searchDocCorpusDense({ pool, queryVector: vec, limit: 99, product: 'x' });
+		expect(r.mode).toBe('POSTGRES_DENSE');
+		expect(r.hits[0]).toMatchObject({ sourceClass: 'CANONICAL', chunkId: 'doc:x:1:2', chunkEvidenceRevision: 'sha256:c', revision: 'sha256:p' });
+		expect(r.representationCaveat).toMatch(/PARITY_UNPROVEN/);
+		expect(calls[0].params.slice(1)).toEqual([25, 'x', null]);
+		expect(calls[0].sql).not.toMatch(/(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)/i);
+	});
+
+	it('rejects a wrong-length or non-finite vector without touching the database', async () => {
+		const { pool, calls } = poolWith([row]);
+		for (const bad of [vec.slice(0, 767), [...vec.slice(1), Number.NaN], [...vec.slice(1), Infinity]]) {
+			const r = await searchDocCorpusDense({ pool, queryVector: bad });
+			expect(r.hits).toEqual([]); expect(r.postgresNote).toBe('QUERY_VECTOR_INVALID');
+		}
+		expect(calls.length).toBe(0);
+	});
+
+	it('fails visibly with no local fallback when Postgres is absent or down', async () => {
+		expect((await searchDocCorpusDense({ pool: null, queryVector: vec })).postgresNote).toMatch(/^POSTGRES_UNAVAILABLE:/);
+		const r = await searchDocCorpusDense({ pool: poolWith([], true).pool, queryVector: vec });
+		expect(r.hits).toEqual([]); expect(r.postgresNote).toMatch(/^POSTGRES_UNAVAILABLE:down/);
 	});
 });

@@ -18,7 +18,9 @@ export const ripgrepSearchSchema = z.object({
 	fileType: z.string().optional().describe('File type filter (ts, py, svelte, js, etc.)'),
 	contextLines: z.number().optional().default(0).describe('Number of context lines before/after match'),
 	ignoreCase: z.boolean().optional().default(false).describe('Case-insensitive search'),
-	maxResults: z.number().optional().default(100).describe('Maximum number of matches to return')
+	maxResults: z.number().optional().default(100).describe('Maximum number of matches to return'),
+	cwd: z.string().optional().describe('Directory to search from (default: process.cwd())'),
+	fixedStrings: z.boolean().optional().default(false).describe('Treat pattern as a literal string, not a regex')
 });
 
 export type RipgrepSearchInput = z.input<typeof ripgrepSearchSchema>;
@@ -45,7 +47,7 @@ export interface RipgrepSearchResult {
  */
 export async function ripgrepSearch(input: RipgrepSearchInput): Promise<RipgrepSearchResult> {
 	const startTime = Date.now();
-	const { pattern, fileType, contextLines = 0, ignoreCase = false, maxResults = 100 } = input;
+	const { pattern, fileType, contextLines = 0, ignoreCase = false, maxResults = 100, cwd, fixedStrings = false } = input;
 
 	// Build ripgrep arguments
 	const args: string[] = [
@@ -73,15 +75,19 @@ export async function ripgrepSearch(input: RipgrepSearchInput): Promise<RipgrepS
 	// Max results (ripgrep uses --max-count per file)
 	args.push('--max-count', Math.ceil(maxResults / 10).toString());
 
-	// Pattern
-	args.push(pattern);
+	if (fixedStrings) {
+		args.push('--fixed-strings');
+	}
+
+	// Pattern (`--` so a pattern starting with '-' is never parsed as a flag)
+	args.push('--', pattern);
 
 	// Search path (current working directory)
 	args.push('.');
 
 	return new Promise((resolve, reject) => {
 		const rg = spawn('rg', args, {
-			cwd: process.cwd(),
+			cwd: cwd ?? process.cwd(),
 			env: { ...process.env },
 			windowsHide: true
 		});
@@ -148,7 +154,6 @@ export async function ripgrepSearch(input: RipgrepSearchInput): Promise<RipgrepS
 						currentLineNumber = lineNumber;
 					} else if (json.type === 'context' && contextLines > 0) {
 						// Context lines
-						const filePath = json.data.path.text;
 						const lineNumber = json.data.line_number;
 						const content = json.data.lines.text.trim();
 

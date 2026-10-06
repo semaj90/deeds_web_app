@@ -1,0 +1,330 @@
+{
+  "schema": "atlas.doc-26.versioned-recrawl-admission.v2",
+  "generatedAt": "2026-10-05T18:57:36.134Z",
+  "mode": "PLAN_ONLY",
+  "canonicalWriter": "admitExternalDocPage",
+  "deltaPlanChecksum": "d353aef15194eb50b047894cc88d371aed9191d618e9dbf53f96642e9a180cef",
+  "previousManifestRevision": "okf-pinned-docs-r3",
+  "currentManifestRevision": "okf-pinned-plus-tooling-r1",
+  "selectedSourceIds": [
+    "oaklib",
+    "ast-grep",
+    "ts-morph",
+    "trpc"
+  ],
+  "versionTransitions": [],
+  "prior": {
+    "expectedPages": 0,
+    "alreadyAdmitted": 0,
+    "missing": 0,
+    "conflicts": 0,
+    "pages": [],
+    "safeToAdmit": true,
+    "preserved": null,
+    "beforeSnapshotChecksum": "6455d82bc03fa14090dc1ef2f21ef5d500f99db8e377d1f62c91c30d887a98e5",
+    "afterSnapshotChecksum": null
+  },
+  "current": {
+    "expectedPages": 57,
+    "alreadyAdmitted": 0,
+    "missing": 57,
+    "conflicts": 0,
+    "pages": [
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/cli.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/datamodels/obograph/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/datamodels/search/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/datamodels/sssom/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/aliases.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/associations.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/basics.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/curies-and-uris.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/mappings.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/guide/relationships-and-graphs.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/intro/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/introduction.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/packages/architecture.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/packages/implementations/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/packages/interfaces/index.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://incatools.github.io/ontology-access-kit/packages/selectors.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/api-usage/js-api",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/introduction.html",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/pattern-syntax",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/quick-start",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rewrite-code",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rule-config/atomic-rule",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rule-config/composite-rule",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rule-config/relational-rule",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rule-config/utility-rule",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/rule-config",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/scan-project",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/tooling-overview",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/guide/tools/json",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/reference/cli",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/reference/rule",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ast-grep.github.io/reference/yaml",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/classes",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/exports",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/functions",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/imports",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/index",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/interfaces",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/source-files",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/type-aliases",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/details/types",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/emitting",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/manipulation/",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/navigation/",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/setup/",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/utilities",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://ts-morph.com/",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/client/tanstack-react-query/setup",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/client/vanilla/setup",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/client/vanilla",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/concepts",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/faq",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/quickstart",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/server/adapters",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/server/overview",
+        "classification": "MISSING",
+        "reasons": []
+      },
+      {
+        "url": "https://trpc.io/docs/",
+        "classification": "MISSING",
+        "reasons": []
+      }
+    ],
+    "safeToAdmit": true
+  },
+  "writerCalls": 0,
+  "result": "DOC_26_VERSIONED_RECRAWL_PLAN_PROVEN",
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "valkey": 0,
+    "neo4j": 0,
+    "graphify": 0
+  }
+}

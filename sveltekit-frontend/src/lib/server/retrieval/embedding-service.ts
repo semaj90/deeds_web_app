@@ -20,6 +20,7 @@ import { createProviderEmbeddingExecutorV1 } from '../embedding/embedding-provid
 import { embedSemantic768Canonical } from '../embedding/canonical-embed.js';
 
 import { ENV } from '../env.server.js';
+import { shouldPopulateEmbeddingCacheV1, type QueryExecutionModeV1 } from '../execution/query-execution-policy-v1.js';
 /**
  * Embedding result with provenance tracking
  */
@@ -122,7 +123,8 @@ export function getEmbeddingServiceConfig(): Required<EmbeddingServiceConfig> {
  */
 export async function embedQuery(
   query: string | Float32Array | number[],
-  target_dim?: number
+  target_dim?: number,
+  options: { executionMode?: QueryExecutionModeV1 } = {}
 ): Promise<EmbeddingResult> {
   const start = performance.now();
   const dim = target_dim ?? config.target_dim;
@@ -187,7 +189,7 @@ export async function embedQuery(
   const elapsed = performance.now() - start;
 
   // Store in L1 cache for future requests
-  if (config.enable_l1_cache) {
+  if (config.enable_l1_cache && shouldPopulateEmbeddingCacheV1({ executionMode: options.executionMode })) {
     setL1Cache(queryStr, result.vector, dim).catch((err) => {
       console.warn('[EmbeddingService] Failed to cache result', err instanceof Error ? err.message : '');
     });

@@ -1,0 +1,53 @@
+{
+  "canonical_authority": false,
+  "chunk_count": 691,
+  "embedding_performed": false,
+  "external_projection_writes": false,
+  "local_artifacts_written": true,
+  "manifest_revision": "okf-tooling-docs-r1",
+  "page_count": 57,
+  "producer_revision": "parent-atlas-okf-pipeline-r1",
+  "qdrant": {
+    "write": false
+  },
+  "receipt_checksum": "2ae9744a0ea283ba9432ddc104a3e56e923df9594dccfb4139593e4bd3bd48d3",
+  "schema": "atlas.okf-docs-pipeline-receipt.v1",
+  "source_receipts": [
+    {
+      "chunks": 237,
+      "chunks_path": "/work/docs/.okf/oaklib/chunks.jsonl",
+      "page_receipt_checksum": "20c2ca75d9808fa7efa51a295db1ca0656fa99e1a93bb47be606f1adf998291c",
+      "pages": 17,
+      "source_id": "oaklib",
+      "source_namespace": null
+    },
+    {
+      "chunks": 196,
+      "chunks_path": "/work/docs/.okf/ast-grep/chunks.jsonl",
+      "page_receipt_checksum": "f4a20c2644ba254139ce00a558667e6be248374933f0e16d89cc65f629c0fb2b",
+      "pages": 16,
+      "source_id": "ast-grep",
+      "source_namespace": null
+    },
+    {
+      "chunks": 188,
+      "chunks_path": "/work/docs/.okf/ts-morph/chunks.jsonl",
+      "page_receipt_checksum": "b2ba5c54e9ff85915a8d8958cee648033ddac30e56f4231d9ebc2f521ac3014f",
+      "pages": 15,
+      "source_id": "ts-morph",
+      "source_namespace": null
+    },
+    {
+      "chunks": 70,
+      "chunks_path": "/work/docs/.okf/trpc/chunks.jsonl",
+      "page_receipt_checksum": "36f3788b94dbf58907ab16a9ac3d58aa997ef2db6df41f8508f0b0fd4e55bbe0",
+      "pages": 9,
+      "source_id": "trpc",
+      "source_namespace": null
+    }
+  ],
+  "source_snapshot_revision": "tooling-docs-2026-10-05",
+  "status": "ACQUISITION_ONLY",
+  "workspace_revision": "workspace-current",
+  "writes_performed": true
+}

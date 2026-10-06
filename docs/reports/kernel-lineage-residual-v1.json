@@ -1,0 +1,17 @@
+{
+  "schema": "atlas.kernel-lineage-residual.v1",
+  "generatedAt": "2026-10-05T19:59:34.944Z",
+  "writesPerformed": false,
+  "unqualifiedCandidates": 16,
+  "reasonTally": {
+    "NO_PACKET_FOR_SOURCE_REF|BOUND_EXACT": 15,
+    "NO_LINEAGE_BRIDGE_UNIQUE_PACKET_EXISTS|NO_WORKSPACE_BINDING": 1
+  },
+  "admittedFileCoverage": {
+    "bound_files": 24456,
+    "with_packet": 16543,
+    "with_packet_at_admitted": 16151
+  },
+  "exactBoundChunksWhoseSourceRefHasNoPacket": 48690,
+  "finding": "Of the 16 unqualified candidates, 15 are exactly bound at the admitted workspace but have NO atlas_packets row for their source_ref (packet not materialized); 1 has a packet but no workspace binding. The dominant residual is packet materialization coverage, not binding or retrieval."
+}

@@ -1,0 +1,62 @@
+{
+  "blockers": [],
+  "canAcquire": true,
+  "canonicalAuthority": false,
+  "currentManifestRevision": "okf-pinned-plus-tooling-r1",
+  "entries": [
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "sveltekit"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "svelte5-runes"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "bits-ui"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "drizzle-orm"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "postgresql-18"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "pgvector"
+    },
+    {
+      "decision": "UNCHANGED",
+      "sourceId": "drizzle-kit"
+    },
+    {
+      "decision": "ADDED",
+      "sourceId": "oaklib"
+    },
+    {
+      "decision": "ADDED",
+      "sourceId": "ast-grep"
+    },
+    {
+      "decision": "ADDED",
+      "sourceId": "ts-morph"
+    },
+    {
+      "decision": "ADDED",
+      "sourceId": "trpc"
+    }
+  ],
+  "planChecksum": "d353aef15194eb50b047894cc88d371aed9191d618e9dbf53f96642e9a180cef",
+  "previousManifestRevision": "okf-pinned-docs-r3",
+  "retainedRemovedSourceIds": [],
+  "schema": "atlas.external-doc-manifest-recrawl-delta.v1",
+  "selectedSourceIds": [
+    "oaklib",
+    "ast-grep",
+    "ts-morph",
+    "trpc"
+  ]
+}

@@ -1,0 +1,867 @@
+{
+  "schema": "atlas.kernel-real-02-orchestrator-live-proof.v1",
+  "generatedAt": "2026-10-05T19:52:39.720Z",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "executionMode": "READ_ONLY",
+  "postgresPasswordPresentInEnv": true,
+  "cohortNote": "frozen re-creation; original 01B question text was not recorded",
+  "verdict": "DISTINCT_SETS_PARTIALLY_CHUNK_QUALIFIED",
+  "distinctCandidateSets": "3/3",
+  "revisionQualifiedCandidates": "8/24",
+  "qualification": "qualifyEvidenceV1 (packet.workspace_revision_key == admitted, packet+bridge source_revision == admitted binding, PROVEN membership, exactly one canonical chunk)",
+  "representationRevisionRequiredForProofUsable": false,
+  "missingContractFields": [
+    "representationRevision (no producer; optional in the canonical coordinate)",
+    "candidateSnapshotRevision / ordinalMapChecksum / coordinateArtifactChecksum (retrieval-level coordinate, not produced by the orchestrator)"
+  ],
+  "rewireDecision": "DO_NOT_REWIRE_atlas_query_UNTIL_TRACE_PARITY_AND_READBACK",
+  "cases": [
+    {
+      "id": "code-owner",
+      "query": "Which module owns unified retrieval and how does it fuse lanes with reciprocal rank fusion?",
+      "ok": true,
+      "latencyMs": 4973,
+      "candidateCount": 8,
+      "candidateSetChecksum": "c065fde45b7022f28aedff2238e93c555f6e7a7d8a25b44fb02b7471b5e18b2b",
+      "evidenceStatus": "OK",
+      "lanes": {
+        "semantic": {
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
+        },
+        "lexical": {
+          "status": "OK"
+        }
+      },
+      "degradedLanes": [],
+      "readOnlyReceipt": {
+        "schema": "atlas.read-only-side-effect-receipt.v1",
+        "executionMode": "READ_ONLY",
+        "entries": [
+          {
+            "subsystem": "embedding",
+            "operation": "embedding",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "lexical_search",
+            "operation": "rg_pool_lexical",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "turbovec",
+            "operation": "turbovec_prefilter",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "postgres_join",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "parent_atlas_enrichment",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          }
+        ],
+        "attemptedWrites": 0,
+        "committedWrites": 0
+      },
+      "counts": {
+        "candidateId": 8,
+        "packetKey": 0,
+        "sourceRef": 8,
+        "sourceRevision": 8,
+        "workspaceRevision": 8,
+        "identityComplete": 0,
+        "evidenceRefs": 0,
+        "lineageProven": 0,
+        "eligibility": {
+          "INELIGIBLE": 8
+        },
+        "chunkRevisionQualified": 0
+      },
+      "candidates": [
+        {
+          "canonicalId": "4b56538c-bd89-4126-8cf3-be831d022fe1",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+          "sourceRevision": "sha256:c1ad90f4637b0a9c28368966336c9be8183304de9c6f17c8ce0eee1200a11584",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "2d696367-92b3-49cd-842c-5db1d3a86413",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/retrieval-fusion-rrf.ts",
+          "sourceRevision": "sha256:a3c171cf292e98932abe10bef0037b20530a9d9167bacc35918c9eb38118e308",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "10a2d625-5e20-4c9e-99e3-72a4d2e5b0de",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
+          "sourceRevision": "sha256:68ac9ba44ef60775b56d174541c7e67dfe4382814c7521caf0b2f54c27748ad0",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "15da42e0-58a5-4828-b1d6-d0ebced835f4",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/rrf-fusion.ts",
+          "sourceRevision": "sha256:1127ee595ab193d3b98603518d0ce44356eff64920a0aedba9046d0f0e05c692",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "c66eca32-1579-44c3-8cce-216563cf4520",
+          "packetKey": null,
+          "sourceRef": "scripts/atlas/audit-promotion-board-reconcile-v2.mjs",
+          "sourceRevision": "sha256:6de569f7b0a7beee34373dbae32111068eca3ed3164a4cc6536af2f955d39f2a",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "47bf69d9-b7b3-49a4-a5d9-9a86588fce4b",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/openspec/changes/phase1-rrf-semantic-fusion/tasks.md",
+          "sourceRevision": "sha256:a319461a2c73b662fbdf9f453927b05a944bcf26ded10e815e3d95acf166fa9b",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "6d644ce8-db39-4086-805b-47ce0c5fff70",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/UNIFIED-RETRIEVAL-RUNTIME.md",
+          "sourceRevision": "sha256:68ac9ba44ef60775b56d174541c7e67dfe4382814c7521caf0b2f54c27748ad0",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "103a6909-a2de-48b0-ac3d-0f9649b794ba",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/__tests__/rrf-fusion.test.ts",
+          "sourceRevision": "sha256:c1ad90f4637b0a9c28368966336c9be8183304de9c6f17c8ce0eee1200a11584",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        }
+      ]
+    },
+    {
+      "id": "legal",
+      "query": "What does the repository say about chain of custody for evidence?",
+      "ok": true,
+      "latencyMs": 988,
+      "candidateCount": 8,
+      "candidateSetChecksum": "200cb7c69dbc80c2b4906d8ed1031dab9b24793242833bd3f9e07ded9745c4ef",
+      "evidenceStatus": "OK",
+      "lanes": {
+        "semantic": {
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
+        },
+        "lexical": {
+          "status": "OK"
+        }
+      },
+      "degradedLanes": [],
+      "readOnlyReceipt": {
+        "schema": "atlas.read-only-side-effect-receipt.v1",
+        "executionMode": "READ_ONLY",
+        "entries": [
+          {
+            "subsystem": "embedding",
+            "operation": "embedding",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "lexical_search",
+            "operation": "rg_pool_lexical",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "turbovec",
+            "operation": "turbovec_prefilter",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "postgres_join",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "parent_atlas_enrichment",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          }
+        ],
+        "attemptedWrites": 0,
+        "committedWrites": 0
+      },
+      "counts": {
+        "candidateId": 8,
+        "packetKey": 8,
+        "sourceRef": 8,
+        "sourceRevision": 7,
+        "workspaceRevision": 7,
+        "identityComplete": 7,
+        "evidenceRefs": 7,
+        "lineageProven": 7,
+        "eligibility": {
+          "INELIGIBLE": 1,
+          "CHUNK_REVISION_QUALIFIED": 7
+        },
+        "chunkRevisionQualified": 7
+      },
+      "candidates": [
+        {
+          "canonicalId": "8182bd27-22f6-4c26-aa47-506476634838",
+          "packetKey": "packet:bf0aea3c1ed3",
+          "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/legal/chat/+server.ts",
+          "sourceRevision": null,
+          "workspaceRevision": null,
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "SOURCE_REF_UNIQUE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "sourceRevision",
+            "workspaceRevision"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "90b585d4-7a2c-4650-b9c0-2dffe795a521",
+          "packetKey": "packet:d9704f0b0a30",
+          "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+          "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts:1"
+        },
+        {
+          "canonicalId": "d0b81855-25f2-4543-9f6f-a5e75ba3c8fc",
+          "packetKey": "packet:90da80cd1156",
+          "sourceRef": "sveltekit-frontend/drizzle/manual/20260311_audit_and_versions.sql",
+          "sourceRevision": "sha256:deea1fafe26c11f31ed3c87376893e603c7700395114dbaed87e186dcbf26b95",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/drizzle/manual/20260311_audit_and_versions.sql:0"
+        },
+        {
+          "canonicalId": "93d2a86b-a730-448f-9438-0ad5fa056c83",
+          "packetKey": "packet:85bb6b98a2c1",
+          "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "sourceRevision": "sha256:91e20cebaee0b9172b0414bebe8cad94886142789f3db550570c863f03fd40b9",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte:0"
+        },
+        {
+          "canonicalId": "6ede9535-56b3-4811-b823-d4685d8825e1",
+          "packetKey": "packet:383c31f090f8",
+          "sourceRef": "sveltekit-frontend/static/workers/recursive-evidence-chain-worker.js",
+          "sourceRevision": "sha256:87c610b1556475a17a7c27f17b928f2724e74b1259e2ff10b8aa0fcd4c6d186b",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/static/workers/recursive-evidence-chain-worker.js:6"
+        },
+        {
+          "canonicalId": "599e5fe2-b1fb-42e4-b64f-d4cc2140180f",
+          "packetKey": "packet:85bb6b98a2c1",
+          "sourceRef": "sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte",
+          "sourceRevision": "sha256:91e20cebaee0b9172b0414bebe8cad94886142789f3db550570c863f03fd40b9",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/lib/components/legal/ChainOfCustodyTracker.svelte:1"
+        },
+        {
+          "canonicalId": "6cd4bc53-3948-4b58-97a0-3d00a7f94989",
+          "packetKey": "packet:d9704f0b0a30",
+          "sourceRef": "sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts",
+          "sourceRevision": "sha256:cf93fde5058a966128c24aa525f687f2dfd1c5d477dd6cc9d3faa7fbd0a00f2d",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/src/routes/api/evidence/[id]/chain-of-custody/+server.ts:3"
+        },
+        {
+          "canonicalId": "6750a92b-a3ec-4f9b-9125-719267d0a86b",
+          "packetKey": "packet:caeb7bae6f01",
+          "sourceRef": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__evidence___id___chain-of-custody___server.md",
+          "sourceRevision": "sha256:b21358b86f1f551798c21f8c9ef8f9c03306821d436641f589d9afdf4764348f",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__evidence___id___chain-of-custody___server.md:1"
+        }
+      ]
+    },
+    {
+      "id": "embedding",
+      "query": "How are 768-dimensional embeddings produced and validated?",
+      "ok": true,
+      "latencyMs": 1172,
+      "candidateCount": 8,
+      "candidateSetChecksum": "773f19752f56da041fa292c5acb0e8a3221f119dee05ac8e70aee22112263ea9",
+      "evidenceStatus": "OK",
+      "lanes": {
+        "semantic": {
+          "status": "OK",
+          "executor": "postgres_pgvector",
+          "note": "SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged"
+        },
+        "lexical": {
+          "status": "OK"
+        }
+      },
+      "degradedLanes": [],
+      "readOnlyReceipt": {
+        "schema": "atlas.read-only-side-effect-receipt.v1",
+        "executionMode": "READ_ONLY",
+        "entries": [
+          {
+            "subsystem": "embedding",
+            "operation": "embedding",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "lexical_search",
+            "operation": "rg_pool_lexical",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "turbovec",
+            "operation": "turbovec_prefilter",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "postgres_join",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          },
+          {
+            "subsystem": "postgres",
+            "operation": "parent_atlas_enrichment",
+            "reads": 1,
+            "attemptedWrites": 0,
+            "committedWrites": 0,
+            "suppressionReason": null,
+            "executionMode": "READ_ONLY"
+          }
+        ],
+        "attemptedWrites": 0,
+        "committedWrites": 0
+      },
+      "counts": {
+        "candidateId": 8,
+        "packetKey": 1,
+        "sourceRef": 8,
+        "sourceRevision": 8,
+        "workspaceRevision": 8,
+        "identityComplete": 1,
+        "evidenceRefs": 1,
+        "lineageProven": 1,
+        "eligibility": {
+          "INELIGIBLE": 7,
+          "CHUNK_REVISION_QUALIFIED": 1
+        },
+        "chunkRevisionQualified": 1
+      },
+      "candidates": [
+        {
+          "canonicalId": "53a9450a-412d-4a7d-a29a-f425a21500ba",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/config/embedding-config.ts",
+          "sourceRevision": "sha256:5e24a432a41fb46d57df1edc7dcb9d8c03fb4e3f16c2fe8cf417927e0c587424",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "2bb65b3d-0fbc-40d1-b0f0-4759a309e299",
+          "packetKey": "packet:31a23c9fc19e",
+          "sourceRef": "sveltekit-frontend/scripts/create-phase78-embeddings-table.sql",
+          "sourceRevision": "sha256:fdeb39acdb77045e8dba7898162f80656fff31fc20758136160369424e533564",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": [
+            ".tmp/atlas/pkt-lineage-current-multi-chunk-frozen-proposal-v1.json"
+          ],
+          "packetBinding": "LINEAGE_PROVEN",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [],
+          "proofUsable": true,
+          "identityComplete": true,
+          "eligibility": "CHUNK_REVISION_QUALIFIED",
+          "chunkIdentityStatus": "EXACT",
+          "canonicalChunkId": "fullrepo:sveltekit-frontend/scripts/create-phase78-embeddings-table.sql:0"
+        },
+        {
+          "canonicalId": "d049dd34-98dc-4fb9-80cf-5fc1a128f62b",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/docs/VECTOR-SCHEMA-768D-CANONICAL.md",
+          "sourceRevision": "sha256:f74b234afb6fdfa6d345a7e274ea8d26b185d2efb6d99abd8e01b514f5d8e893",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "b9e7586f-5a7a-486b-af63-2fe574dc8d6d",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/src/lib/server/atlas/retrieval/semantic-768.ts",
+          "sourceRevision": "sha256:fcce430a4338f2c63e29980de56ad1c4711a05e01f5a7911f63b05427efb33a1",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "589978b2-0e2d-43a3-a941-b52a79b125e5",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/tests/embedding-onnx-integration.spec.ts",
+          "sourceRevision": "sha256:3987dc4e4648a5cecc50a4e0a34c1a8aa0f6588f8757cfd489c01f3652ad238b",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "a6cd6cb8-bfdd-4349-9af9-f6da42dd2ed9",
+          "packetKey": null,
+          "sourceRef": "scripts/atlas/phase106-stage4-embedding-backfill.mjs",
+          "sourceRevision": "sha256:af00d1d99e6bcbd942e6b59f89df069714b6b1d9ec40508d0b2807dae4cbce9d",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "91434dde-b85a-40ca-88fd-560ec2f6248f",
+          "packetKey": null,
+          "sourceRef": "scripts/atlas/knowledge-layer/embedding-verification.ts",
+          "sourceRevision": "sha256:e9ca17fde8b2d238609aad00df6e0d31183ba45e2e6b6f4f79a60984dadcbf1f",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        },
+        {
+          "canonicalId": "c895f1b6-6030-4ba2-ad2b-89bcf482e6a5",
+          "packetKey": null,
+          "sourceRef": "sveltekit-frontend/drizzle/manual/20260716_atlas_knowledge_layer.sql",
+          "sourceRevision": "sha256:aa11035902037b586b0b5a0ebb32fdfe0c4d33e31373bee83c8dcdeda92a22af",
+          "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+          "representationRevision": null,
+          "evidenceRefs": null,
+          "packetBinding": "NONE",
+          "executor": "postgres_pgvector",
+          "lanes": [
+            "qdrant_dense",
+            "turbovec",
+            "rg_lexical"
+          ],
+          "missingFields": [
+            "packetKey"
+          ],
+          "proofUsable": false,
+          "identityComplete": false,
+          "eligibility": "INELIGIBLE",
+          "chunkIdentityStatus": "MISSING_LINEAGE",
+          "canonicalChunkId": null
+        }
+      ]
+    }
+  ]
+}

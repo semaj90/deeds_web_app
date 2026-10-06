@@ -22,8 +22,9 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import neo4j from 'neo4j-driver';
+import { normalizeSourceRef } from '../../../scripts/atlas/lib/normalize-source-ref.mjs';
 
-const log = (...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
+const log =(...a) => process.stderr.write('[atlas-tools] ' + a.join(' ') + '\n');
 
 let neo4jDriver = null;
 function getNeo4jDriver() {
@@ -276,13 +277,15 @@ const TOOLS = [
   },
   {
     name: 'find_source_refs',
-    description: 'Query SourceRef or CodebaseFile nodes in the knowledge graph.',
+    description:
+      'Resolve file paths to Atlas packet identity (packet key, feature, revision when known); plain names search SourceRef names in the knowledge graph.',
     inputSchema: {
       type: 'object',
       properties: {
-        query: { type: 'string', description: 'Name pattern or file path substring.' },
+        query: { type: 'string', description: 'A file path, or a name pattern for SourceRef names.' },
+        refs: { type: 'array', maxItems: 10, items: { type: 'string', maxLength: 1024 }, description: 'File paths to resolve (any form).' },
       },
-      required: ['query'],
+      required: [],
       additionalProperties: false,
     },
   },
@@ -789,6 +792,25 @@ export function buildAgenticRagContext({
       : 'unknown',
     revisionStatus,
     freshnessStatus,
+    // The cards come from ONE static reconciliation packet on disk, rescored against the query text; the
+    // candidate set is not retrieved per query (KERNEL-REAL-01B). Say so in the result itself.
+    querySpecific: false,
+    candidateSetBasis: 'FIXED_PACKET_CARDS',
+    contextSource: {
+      kind: 'STATIC_PACKET_FILE',
+      packetKind: packet.packetKind ?? null,
+      packetId: packet.acePacketId ?? null,
+      packetPath: path.relative(root, packetPath).replace(/\\/g, '/'),
+      createdAt: packetCreatedAt,
+      expiresInSeconds: Number.isFinite(packetExpiresInSeconds) ? packetExpiresInSeconds : null,
+      expired: packetExpired,
+      workspaceRevision: packetWorkspaceRevision,
+    },
+    warnings: [
+      'NO_QUERY_SPECIFIC_RETRIEVAL',
+      ...(packetExpired ? ['PACKET_EXPIRED'] : []),
+      ...(packetSourceRevision ? [] : ['MISSING_SOURCE_REVISION']),
+    ],
     admissionStatus: packetAdmissionStatus,
     retrievalAdmission,
     retrievalRouting: {
@@ -812,6 +834,235 @@ export function buildAgenticRagContext({
           ? 'npm run ingest:pipeline'
           : 'node scripts/ingest/cache-ace-packet.mjs --audit',
   };
+}
+
+// ── Live, query-specific context (KERNEL-PATCH-03) ────────────────────────────────────────────────
+// `atlas_context` ranks live through TRACE `atlas.query` (a ranked chunk search whose result set varies with the
+// query, unlike the static packet) and binds each hit's path to packet identity through `atlas.packet_search`.
+// Candidates are NOT admitted evidence: no source revision is available, so proofUsable stays false.
+// Any TRACE failure falls back to the labelled static packet. ATLAS_CONTEXT_LIVE=0 forces the static packet.
+const TRACE_MCP_URL = process.env.ATLAS_TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
+const LIVE_CONTEXT_DISABLED = /^(0|false|no)$/i.test(process.env.ATLAS_CONTEXT_LIVE ?? '');
+const LIVE_HIT_CAP = 20;
+const LIVE_BIND_CONCURRENCY = 5;
+
+function typedError(code, message) {
+  return Object.assign(new Error(message ?? code), { code });
+}
+
+export async function callTraceTool(
+  name,
+  args,
+  { fetchImpl = globalThis.fetch, url = TRACE_MCP_URL, timeoutMs = 12000, retries = 1, retryDelayMs = 250 } = {}
+) {
+  let lastError;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetchImpl(url, {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name, arguments: args } }),
+      });
+      const text = await response.text();
+      if (!response.ok) throw typedError(`TRACE_HTTP_${response.status}`);
+      // An empty event stream is how TRACE reports an internal timeout (observed: exactly ~5 s, often on a cold call).
+      if (!text.trim()) throw typedError('TRACE_EMPTY_RESPONSE');
+      const framed = text.match(/data:\s*(\{.*\})/s);
+      const message = JSON.parse(framed ? framed[1] : text);
+      if (message.error) throw typedError('TRACE_RPC_ERROR', message.error.message);
+      const body = message.result?.content?.[0]?.text ?? '';
+      if (message.result?.isError) throw typedError('TRACE_TOOL_ERROR', body.slice(0, 200));
+      let parsed;
+      try {
+        parsed = JSON.parse(body);
+      } catch {
+        throw typedError('TRACE_UNPARSEABLE', body.slice(0, 120));
+      }
+      if (parsed && parsed.ok === false) throw typedError('TRACE_TOOL_ERROR', String(parsed.error ?? '').slice(0, 200));
+      return parsed;
+    } catch (error) {
+      lastError = error.code ? error : typedError(error.name === 'AbortError' ? 'TRACE_TIMEOUT' : 'TRACE_UNREACHABLE', error.message);
+    } finally {
+      clearTimeout(timer);
+    }
+    if (attempt < retries) await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+  }
+  throw lastError;
+}
+
+async function mapWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, async () => {
+      while (next < items.length) {
+        const index = next;
+        next += 1;
+        results[index] = await worker(items[index], index);
+      }
+    })
+  );
+  return results;
+}
+
+export async function buildLiveAtlasContext(
+  { query, maxCards = 20, domainFilter, maxPayloadBytes = 24576 },
+  { trace = (name, args) => callTraceTool(name, args) } = {}
+) {
+  const queryText = String(query ?? '').slice(0, 512);
+  const cap = Math.max(1, Math.min(LIVE_HIT_CAP, Number(maxCards) || LIVE_HIT_CAP));
+  const payloadBudget = Math.max(4096, Math.min(65536, Number(maxPayloadBytes) || 24576));
+  const raw = await trace('atlas.query', { query: queryText, limit: cap });
+  const hits = Array.isArray(raw) ? raw : (raw?.results ?? raw?.hits ?? []);
+
+  // One card per file: best score, best snippet, every chunk id kept.
+  const byFile = new Map();
+  for (const hit of hits) {
+    const display = workspaceRelativeDisplay(hit?.path);
+    const canonical = canonicalWorkspaceRef(hit?.path);
+    if (!canonical) continue;
+    const entry = byFile.get(canonical);
+    const score = Number.isFinite(Number(hit.score)) ? Number(hit.score) : 0;
+    if (!entry) {
+      byFile.set(canonical, { canonical, display, score, snippet: String(hit.content ?? ''), chunkIds: hit.id ? [hit.id] : [] });
+    } else {
+      if (hit.id) entry.chunkIds.push(hit.id);
+      if (score > entry.score) Object.assign(entry, { score, snippet: String(hit.content ?? '') });
+    }
+  }
+  const files = [...byFile.values()].sort((a, b) => b.score - a.score || a.canonical.localeCompare(b.canonical));
+
+  // Identity binding is best-effort per file: a lookup failure leaves that card unbound, it never fails the answer.
+  const bindings = await mapWithConcurrency(files, LIVE_BIND_CONCURRENCY, async (file) => {
+    try {
+      const found = await trace('atlas.packet_search', { source_ref: file.display, limit: 5 });
+      const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === file.canonical);
+      return { packets, error: null };
+    } catch (error) {
+      return { packets: [], error: error.code ?? 'BIND_FAILED' };
+    }
+  });
+
+  let cards = files.map((file, index) => {
+    const { packets, error } = bindings[index];
+    const packetKeys = [...new Set(packets.map((p) => p.packet_key).filter(Boolean))];
+    const identityBound = packetKeys.length === 1;
+    const identityConflict = packetKeys.length > 1;
+    const sourceRevisionKnown = packets.some((p) =>
+      typeof (p.source_revision ?? p.sourceRevision) === 'string' &&
+      (p.source_revision ?? p.sourceRevision).trim().length > 0,
+    );
+    const rejectionReasons = [
+      'NON_CANONICAL',
+      ...(sourceRevisionKnown ? [] : ['MISSING_SOURCE_REVISION']),
+      ...(identityBound ? [] : [identityConflict ? 'IDENTITY_CONFLICT' : 'IDENTITY_UNBOUND']),
+    ];
+    return {
+      title: file.display.slice(0, 240),
+      summary: file.snippet.replace(/\s+/g, ' ').trim().slice(0, 300),
+      sourceRef: file.display.slice(0, 512),
+      domain: null,
+      score: file.score,
+      kind: 'rankedChunk',
+      order: index + 1,
+      chunkIds: file.chunkIds.slice(0, 5),
+      packetKey: identityBound ? packetKeys[0] : null,
+      packetKeys,
+      featureId: packets[0]?.feature_id ?? null,
+      identityBound,
+      identityConflict,
+      identityLookupError: error,
+      retrievalUsable: true,
+      proofUsable: false,
+      rejectionReasons,
+    };
+  });
+
+  let payloadTruncated = queryText !== String(query ?? '');
+  let sourceRefs = [];
+  let promptPacket = '';
+  let payloadBytes = 0;
+  do {
+    sourceRefs = [...new Set(cards.map((c) => c.sourceRef).filter(Boolean))];
+    promptPacket = [
+      `[ACE CONTEXT — ${cards.length} live ranked cards, query: "${queryText}"]`,
+      ...cards.slice(0, 10).map(
+        (c, i) =>
+          `${i + 1}. ${c.title} (score: ${c.score.toFixed(3)})` +
+          (c.summary ? `\n   ${c.summary.slice(0, 120)}` : '') +
+          `\n   sourceRef: ${c.sourceRef}` +
+          (c.packetKey ? ` packet: ${c.packetKey}` : ' packet: unbound')
+      ),
+    ].join('\n');
+    payloadBytes = Buffer.byteLength(JSON.stringify({ query: queryText, cards, sourceRefs, promptPacket }), 'utf8');
+    if (payloadBytes <= payloadBudget || cards.length === 0) break;
+    cards.pop();
+    payloadTruncated = true;
+  } while (cards.length > 0);
+
+  const reasons = [...new Set(cards.flatMap((c) => c.rejectionReasons))];
+  const unbound = cards.filter((c) => !c.identityBound).length;
+  return {
+    ok: true,
+    canonicalAuthority: false,
+    writesPerformed: false,
+    query: queryText,
+    totalCards: cards.length,
+    signalSummary: { pagerank: null, summary: `Live ranked search: ${hits.length} chunk hits over ${files.length} files`, lexical: [], centroid: null, reranker: null },
+    packetAge: null,
+    revisionStatus: 'MISSING_SOURCE_REVISION',
+    freshnessStatus: 'LIVE_QUERY',
+    querySpecific: true,
+    candidateSetBasis: 'LIVE_TRACE_RANKED_SEARCH',
+    contextSource: {
+      kind: 'TRACE_MCP_LIVE',
+      rankingTool: 'atlas.query',
+      identityTool: 'atlas.packet_search',
+      hitCount: hits.length,
+      fileCount: files.length,
+      identityBoundCount: cards.length - unbound,
+    },
+    warnings: [
+      'UNADMITTED_RETRIEVAL_CANDIDATES',
+      'MISSING_SOURCE_REVISION',
+      ...(cards.length === 0 ? ['LIVE_QUERY_NO_HITS'] : []),
+      ...(unbound > 0 ? ['SOME_CARDS_IDENTITY_UNBOUND'] : []),
+      ...(domainFilter ? ['DOMAIN_FILTER_NOT_APPLIED'] : []),
+    ],
+    admissionStatus: 'UNADMITTED_RETRIEVAL_CANDIDATES',
+    retrievalAdmission: { retrievalUsable: true, proofUsable: false, rejectionReasons: reasons },
+    retrievalRouting: {
+      domain: null,
+      markers: [],
+      allowedDomains: [],
+      candidatesBeforeFilter: hits.length,
+      candidatesAfterFilter: cards.length,
+      filterAppliedBeforeRanking: false,
+    },
+    cards,
+    sourceRefs,
+    promptPacket,
+    payloadTruncated,
+    maxPayloadBytes: payloadBudget,
+    payloadBytes,
+    safeNextCommand: null,
+  };
+}
+
+export async function buildAgenticRagContextLive(args, deps = {}) {
+  const asFallback = (liveRetrieval) => {
+    const fallback = buildAgenticRagContext(args);
+    return { ...fallback, liveRetrieval, warnings: [...(fallback.warnings ?? []), 'LIVE_RETRIEVAL_UNAVAILABLE'] };
+  };
+  if (LIVE_CONTEXT_DISABLED || deps.disableLive) return asFallback({ attempted: false, failure: 'LIVE_DISABLED' });
+  try {
+    return await buildLiveAtlasContext(args, deps);
+  } catch (error) {
+    return asFallback({ attempted: true, failure: error.code ?? 'LIVE_FAILED', message: String(error.message ?? '').slice(0, 200) });
+  }
 }
 
 function buildRecommendation({
@@ -1003,22 +1254,146 @@ function diagnosticProvenance(tool, subject) {
   };
 }
 
-async function findDependencies({ target }) {
+// CodebaseFile nodes live in two key families (see KERNEL-REAL-01A in the lane-consolidation tasks.md):
+// `path` (indexed, workspace-relative, carries IMPORTS) and `filePath` (absolute or
+// `sveltekit-frontend/`-prefixed, carries CALLS). One canonical workspace-relative key is resolved
+// to the stored form of each family; the normalizer is the shared scripts/atlas/lib one.
+const WORKSPACE_ABS_ROOT = path
+  .resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
+  .replace(/\\/g, '/');
+const DEPENDENCY_ROW_CAP = 500;
+
+// The shared normalizer strips a drive letter and a leading `deeds-web-app/` or `sveltekit-frontend/`
+// but not an absolute `Users/<name>/.../deeds-web-app/` prefix, so that prefix is stripped here first.
+// `display` keeps the file's own case (the indexed `path` property is case-preserved);
+// `canonical` is the shared normalizer's lowercase workspace-relative form.
+function workspaceRelativeDisplay(raw) {
+  return String(raw ?? '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^file:\/+/i, '')
+    .replace(/^[A-Za-z]:\/+/, '')
+    .replace(/[?#].*$/, '')
+    .replace(/^\.\/+/, '')
+    .replace(/^(?:.*?\/)?deeds-web-app\//i, '')
+    .replace(/^sveltekit-frontend\//i, '')
+    .replace(/\/+/g, '/')
+    .replace(/^\/+/, '');
+}
+
+export function canonicalWorkspaceRef(raw) {
+  return normalizeSourceRef(workspaceRelativeDisplay(raw));
+}
+
+export function buildCodebaseFileLookupKeys(target, workspaceAbsRoot = WORKSPACE_ABS_ROOT) {
+  const display = workspaceRelativeDisplay(target);
+  const canonical = normalizeSourceRef(display);
+  if (!canonical) return null;
+  const absPrefix = `${workspaceAbsRoot}/sveltekit-frontend/`;
+  return {
+    canonical,
+    pathKeys: [...new Set([display, canonical])],
+    filePathKeys: [...new Set([`sveltekit-frontend/${display}`, `${absPrefix}${display}`])],
+    lowerFilePathKeys: [`sveltekit-frontend/${canonical}`, `${absPrefix}${canonical}`.toLowerCase()],
+  };
+}
+
+export function collapseDependencyRows(rows) {
+  const seen = new Map();
+  for (const row of rows) {
+    if (!row.type) continue; // OPTIONAL MATCH with no outgoing edge
+    const depRaw = row.depPath ?? row.depFilePath ?? row.depSourceRef ?? null;
+    const depCanonical = depRaw ? canonicalWorkspaceRef(depRaw) : null;
+    const key = `${row.type}|${depCanonical ?? row.depName ?? ''}|${row.depKind ?? ''}`;
+    const entry = seen.get(key);
+    if (entry) {
+      entry.viaFlaggedDuplicate = entry.viaFlaggedDuplicate && Boolean(row.flagged);
+      continue;
+    }
+    seen.set(key, {
+      dep: depRaw,
+      depCanonical,
+      depKind: row.depKind ?? null,
+      depName: row.depName ?? null,
+      type: row.type,
+      viaFlaggedDuplicate: Boolean(row.flagged),
+    });
+  }
+  return [...seen.values()];
+}
+
+const DEPENDENCY_RETURN = `OPTIONAL MATCH (f)-[r:IMPORTS|CALLS]->(dep)
+       RETURN f.path AS nodePath, f.filePath AS nodeFilePath, f.dataQualityFlag AS flagged,
+              type(r) AS type, dep.path AS depPath, dep.filePath AS depFilePath,
+              dep.sourceRef AS depSourceRef, labels(dep)[0] AS depKind, dep.name AS depName
+       LIMIT ${DEPENDENCY_ROW_CAP + 1}`;
+
+export async function findDependencies({ target }, { driver } = {}) {
   if (MOCK_MODE) return mockGraphResult('find_dependencies', { target });
-  const normalizedTarget = target.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '');
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-  try {
-    const res = await session.run(
-      `MATCH (f:CodebaseFile { filePath: $normalizedTarget })-[r:IMPORTS|CALLS]->(dep)
-       RETURN dep.filePath as dep, type(r) as type`,
-      { normalizedTarget }
-    );
-    const deps = res.records.map((r) => ({ dep: r.get('dep'), type: r.get('type') }));
+  const keys = buildCodebaseFileLookupKeys(target);
+  if (!keys) {
     return {
-      target: normalizedTarget,
-      dependencies: deps,
-      ...diagnosticProvenance('find_dependencies', normalizedTarget),
+      target: String(target ?? ''),
+      dependencies: [],
+      lookup: { failure: 'EMPTY_TARGET' },
+      ...diagnosticProvenance('find_dependencies', String(target ?? '')),
+    };
+  }
+  const session = (driver ?? getNeo4jDriver()).session();
+  try {
+    // Phase A: exact keys (the `path` property is indexed). Phase B: case-insensitive scan, run when phase A
+    // found nothing OR reached only one of the two node families (a case difference would otherwise hide the
+    // other family's edges). Phase B's rows are a superset of phase A's, so they replace them.
+    let phase = 'A';
+    let res = await session.run(
+      `MATCH (f:CodebaseFile)
+       WHERE f.path IN $pathKeys OR f.filePath IN $filePathKeys
+       ${DEPENDENCY_RETURN}`,
+      { pathKeys: keys.pathKeys, filePathKeys: keys.filePathKeys }
+    );
+    let rows = res.records.map((r) => r.toObject());
+    const familiesSeen = new Set(rows.map((row) => (row.nodePath != null ? 'path' : 'filePath')));
+    if (familiesSeen.size < 2) {
+      phase = 'B';
+      res = await session.run(
+        `MATCH (f:CodebaseFile)
+         WHERE toLower(f.path) = $canonical OR toLower(f.filePath) IN $lowerFilePathKeys
+         ${DEPENDENCY_RETURN}`,
+        { canonical: keys.canonical, lowerFilePathKeys: keys.lowerFilePathKeys }
+      );
+      const phaseBRows = res.records.map((r) => r.toObject());
+      if (phaseBRows.length >= rows.length) rows = phaseBRows;
+    }
+    const truncated = rows.length > DEPENDENCY_ROW_CAP;
+    if (truncated) rows = rows.slice(0, DEPENDENCY_ROW_CAP);
+    const nodes = new Map();
+    for (const row of rows) {
+      const family = row.nodePath != null ? 'path' : 'filePath';
+      nodes.set(`${family}|${row.nodePath ?? row.nodeFilePath}`, { family, key: row.nodePath ?? row.nodeFilePath, flagged: Boolean(row.flagged) });
+    }
+    const dependencies = collapseDependencyRows(rows);
+    return {
+      target: keys.canonical,
+      dependencies,
+      lookup: {
+        canonical: keys.canonical,
+        phase,
+        nodesMatched: [...nodes.values()],
+        // TARGET_NOT_A_PATH: no node and the input has neither a slash nor an extension (for example a symbol name;
+        // this tool is file-keyed). PROJECTION_MISSING_FILE: no node under any known key form.
+        // NO_OUTGOING_EDGES: node(s) found, none outgoing.
+        failure:
+          nodes.size === 0
+            ? /[/.]/.test(keys.canonical)
+              ? 'PROJECTION_MISSING_FILE'
+              : 'TARGET_NOT_A_PATH'
+            : dependencies.length === 0
+              ? 'NO_OUTGOING_EDGES'
+              : null,
+        truncated,
+        rowCap: DEPENDENCY_ROW_CAP,
+      },
+      ...diagnosticProvenance('find_dependencies', keys.canonical),
     };
   } finally {
     await session.close();
@@ -1069,21 +1444,112 @@ async function traceToolChain({ tool }) {
   }
 }
 
-async function findSourceRefs({ query }) {
+// ── Inspect: resolve inputs to packet identity (KERNEL-PATCH-04) ──────────────────────────────────
+// Path-like inputs resolve through TRACE `atlas.packet_search` (the canonical `atlas_packets` identity); plain
+// names keep the legacy Neo4j SourceRef name search. Identity only: this never returns source content, and a
+// packet-key lookup is reported as unsupported rather than guessed (`atlas.packet_search` has no key parameter).
+const INSPECT_REF_CAP = 10;
+
+export function classifyInspectRef(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return 'EMPTY';
+  if (/^(?:ace:)?packet:[0-9a-f]{6,}$/i.test(text)) return 'PACKET_KEY';
+  if (/[\\/]/.test(text) || /\.[A-Za-z0-9]{1,8}$/.test(text)) return 'PATH';
+  return 'NAME';
+}
+
+function packetIdentityView(packet) {
+  return {
+    packetKey: packet.packet_key ?? null,
+    sourceRef: packet.source_ref ?? null,
+    featureId: packet.feature_id ?? null,
+    featureLabel: packet.feature_label ?? null,
+    conceptIds: Array.isArray(packet.concept_ids) ? packet.concept_ids.slice(0, 16) : null,
+    summary: typeof packet.summary === 'string' ? packet.summary.replace(/\s+/g, ' ').trim().slice(0, 300) : null,
+    sha256: packet.sha256 ?? null,
+    sourceRevision: packet.source_revision ?? packet.sourceRevision ?? null,
+    byteStart: packet.byte_start ?? null,
+    byteEnd: packet.byte_end ?? null,
+    identityLane: packet.identity_lane ?? null,
+  };
+}
+
+export async function findSourceRefs({ query, refs } = {}, { trace = (name, args) => callTraceTool(name, args), driver } = {}) {
   if (MOCK_MODE) return mockGraphResult('find_source_refs', { query });
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-  try {
-    const res = await session.run(
-      `MATCH (s:SourceRef) WHERE s.name CONTAINS $query
-       RETURN s.name as name`,
-      { query }
-    );
-    const refs = res.records.map((r) => r.get('name'));
-    return { query, sourceRefs: refs, ...diagnosticProvenance('find_source_refs', query) };
-  } finally {
-    await session.close();
+  const requested = [
+    ...new Set(
+      [...(Array.isArray(refs) ? refs : []), ...(query ? [query] : [])].map((value) => String(value).trim()).filter(Boolean)
+    ),
+  ];
+  const inputs = requested.slice(0, INSPECT_REF_CAP);
+  const truncatedInputs = requested.length - inputs.length;
+  const base = { query: query ?? null, refs: Array.isArray(refs) ? refs : [], canonicalAuthority: false, writesPerformed: false };
+  if (inputs.length === 0) {
+    return {
+      ...base,
+      sourceRefs: [],
+      inspected: [],
+      lookup: { requested: 0, truncatedInputs: 0, failure: 'EMPTY_INSPECT_INPUT' },
+      provenance: { tool: 'find_source_refs', authority: 'none', graphRevision: null, evidenceRefs: [], status: 'UNRESOLVED', subject: null },
+    };
   }
+
+  const inspected = await mapWithConcurrency(inputs, 5, async (input) => {
+    const kind = classifyInspectRef(input);
+    if (kind === 'PACKET_KEY') {
+      return { ref: input, kind, status: 'UNSUPPORTED_REF_KIND', packets: [], packetKeys: [], failure: 'PACKET_KEY_LOOKUP_NOT_AVAILABLE' };
+    }
+    if (kind === 'NAME') return { ref: input, kind, status: 'NAME_SEARCH', packets: [], packetKeys: [], failure: null };
+    const canonical = canonicalWorkspaceRef(input);
+    try {
+      const found = await trace('atlas.packet_search', { source_ref: workspaceRelativeDisplay(input), limit: 5 });
+      const packets = (found?.packets ?? []).filter((p) => canonicalWorkspaceRef(p.source_ref) === canonical).map(packetIdentityView);
+      const packetKeys = [...new Set(packets.map((p) => p.packetKey).filter(Boolean))];
+      const status = packets.length === 0 ? 'NO_PACKET' : packetKeys.length === 1 ? 'IDENTITY_BOUND' : 'IDENTITY_CONFLICT';
+      return { ref: input, kind, canonical, status, packets, packetKeys, failure: null };
+    } catch (error) {
+      return { ref: input, kind, canonical, status: 'LOOKUP_FAILED', packets: [], packetKeys: [], failure: error.code ?? 'LOOKUP_FAILED' };
+    }
+  });
+
+  const names = inspected.filter((item) => item.kind === 'NAME');
+  const sourceRefs = [];
+  let nameFailure = null;
+  if (names.length > 0) {
+    const session = (driver ?? getNeo4jDriver()).session();
+    try {
+      for (const item of names) {
+        const res = await session.run(`MATCH (s:SourceRef) WHERE s.name CONTAINS $query RETURN s.name as name`, { query: item.ref });
+        const matches = res.records.map((r) => r.get('name'));
+        item.status = matches.length > 0 ? 'NAME_MATCHED' : 'NAME_NO_MATCH';
+        item.matchCount = matches.length;
+        sourceRefs.push(...matches);
+      }
+    } catch (error) {
+      nameFailure = 'NEO4J_LOOKUP_FAILED';
+      for (const item of names) item.status = 'LOOKUP_FAILED';
+    } finally {
+      await session.close();
+    }
+  }
+
+  const pathItems = inspected.filter((item) => item.kind === 'PATH');
+  const allBound = pathItems.length > 0 && pathItems.every((item) => item.status === 'IDENTITY_BOUND');
+  const allRevisioned = allBound && pathItems.every((item) => item.packets.every((p) => typeof p.sourceRevision === 'string' && p.sourceRevision.trim()));
+  return {
+    ...base,
+    sourceRefs: [...new Set(sourceRefs)],
+    inspected,
+    lookup: { requested: inputs.length, truncatedInputs, nameFailure },
+    provenance: {
+      tool: 'find_source_refs',
+      authority: pathItems.length > 0 ? 'atlas_packets_via_trace' : 'neo4j_projection',
+      graphRevision: null,
+      evidenceRefs: [],
+      status: allRevisioned ? 'IDENTITY_BOUND_REVISION_QUALIFIED' : allBound ? 'IDENTITY_BOUND_REVISION_UNQUALIFIED' : 'UNRESOLVED',
+      subject: inputs.join(', ').slice(0, 200),
+    },
+  };
 }
 
 async function findFeature({ feature }) {
@@ -1142,7 +1608,7 @@ async function dispatch(method, params, id) {
     try {
       let result;
       if (name === 'classify_intent') result = classifyIntent(args);
-      else if (name === 'build_agentic_rag_context') result = buildAgenticRagContext(args);
+      else if (name === 'build_agentic_rag_context') result = await buildAgenticRagContextLive(args);
       else if (name === 'build_recommendation') result = buildRecommendation(args);
       else if (name === 'record_outcome') result = await recordOutcome(args);
       else if (name === 'find_dependencies') result = await findDependencies(args);

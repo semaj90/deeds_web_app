@@ -126,9 +126,9 @@ class RgPool {
   ): void {
     const args: string[] = [];
 
-    // Query (literal string)
-    args.push('--literal');
-    args.push(options.query);
+    // Query (literal string). `--literal` is not a ripgrep flag (exit 2); `-e` also keeps a
+    // query that starts with `-` from being parsed as an option.
+    args.push('--fixed-strings', '-e', options.query);
 
     // File type filter
     if (options.type) {

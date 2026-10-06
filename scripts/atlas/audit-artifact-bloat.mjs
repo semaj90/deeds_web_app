@@ -20,6 +20,9 @@ const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const OUT_JSON = path.join(REPORTS_DIR, 'artifact-bloat-report.json');
 const OUT_MD = path.join(REPORTS_DIR, 'artifact-bloat-report.md');
 const JSON_OUT = process.argv.includes('--json');
+const DRY_RUN = process.argv.includes('--dry-run');
+const LARGE_BYTES = 10 * 1024 * 1024;
+const EVIDENCE_HASH_BYTES = 200 * 1024 * 1024;
 
 const IGNORE_DIRS = new Set([
   'node_modules',
@@ -45,6 +48,11 @@ const KIND_ORDER = [
   'embedding_checkpoint',
   'som_checkpoint',
   'report',
+  'report_large',
+  'evidence_run',
+  'tensor_bin',
+  'model_binary',
+  'tmp_artifact',
   'duplicate',
 ];
 
@@ -52,11 +60,15 @@ function classifyKind(relPath, sizeBytes) {
   const lower = relPath.toLowerCase();
   const ext = path.extname(lower);
 
-  if (lower.includes('/docs/reports/') || lower.includes('/reports/')) return 'report';
+  if (/\.tmp-\d+$/.test(lower)) return 'tmp_artifact';
+  if (ext === '.f32bin') return 'tensor_bin';
+  if (lower.includes('/openspec-evidence/') && sizeBytes > LARGE_BYTES) return 'evidence_run';
+  if (lower.includes('/docs/reports/') || lower.includes('/reports/')) return sizeBytes > LARGE_BYTES ? 'report_large' : 'report';
   if (lower.includes('checkpoint') || lower.includes('embeddinggemma') || lower.includes('model') && sizeBytes > 5 * 1024 * 1024) {
     if (lower.includes('som')) return 'som_checkpoint';
     return 'embedding_checkpoint';
   }
+  if (/\.(onnx|onnx\.data|gguf|safetensors|pt|pth)$/.test(lower)) return 'model_binary';
   if (ext === '.duckdb') return 'duckdb';
   if (ext === '.parquet') return 'parquet';
   if (ext === '.msgpack' || ext === '.mpack' || ext === '.mspack') return 'msgpack';
@@ -70,6 +82,11 @@ function recommendAction(kind, sizeBytes, relPath, duplicate = false) {
   const lower = relPath.toLowerCase();
   const sizeMB = sizeBytes / 1048576;
   if (kind === 'report') return 'keep_canonical';
+  if (kind === 'report_large') return 'review_large_report';
+  if (kind === 'evidence_run') return 'dedupe_then_cold';
+  if (kind === 'tensor_bin') return 'keep_manifest_only';
+  if (kind === 'model_binary') return 'model_registry_only';
+  if (kind === 'tmp_artifact') return 'review_stray';
   if (kind === 'duckdb' || kind === 'parquet' || kind === 'msgpack') {
     return sizeMB > 10 || lower.includes('.tmp/') ? 'move_cold' : 'keep_manifest_only';
   }
@@ -132,7 +149,7 @@ async function main() {
 
   for (const entry of artifactPaths) {
     let sha256 = null;
-    if (entry.sizeBytes <= maxHashBytes) {
+    if (entry.sizeBytes <= (entry.kind === 'evidence_run' ? EVIDENCE_HASH_BYTES : maxHashBytes)) {
       try {
         sha256 = await fileSha256(entry.absPath);
       } catch {
@@ -174,6 +191,10 @@ async function main() {
       .map(([sha256, paths]) => ({ sha256, paths })),
   };
 
+  if (DRY_RUN) {
+    console.log(JSON.stringify(summary, null, 2));
+    return;
+  }
   await mkdir(REPORTS_DIR, { recursive: true });
   await writeFile(OUT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   await writeFile(

@@ -1,6 +1,10 @@
 // @vitest-environment node
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('$lib/server/llm/runtime-contract.js', () => {
+  throw new Error('[llm-runtime-contract] ROTORQUANT_MODEL_PATH is required');
+});
 import { applyConfiguredLatent256Dedup, rankCandidates } from './unified-orchestrator';
 
 describe('unified orchestrator RRF fusion', () => {
@@ -159,5 +163,37 @@ describe('unified orchestrator RRF fusion', () => {
 
     expect(providerCalled).toBe(false);
     expect(output).toEqual(ranked);
+  });
+});
+
+describe('unified orchestrator config safety (KERNEL-REAL-02 blockers 3 and 4)', () => {
+  it('imports even when the LLM runtime contract throws at import (synthesis-only dependency)', async () => {
+    const mod = await import('./unified-orchestrator');
+    expect(typeof mod.executeUnifiedRetrieval).toBe('function');
+  });
+
+  it('carries no hard-coded database credential and no wrong-port fallback', async () => {
+    const { readFileSync } = await import('node:fs');
+    for (const file of ['unified-orchestrator.ts', 'parent-atlas-bridge.ts']) {
+      const src = readFileSync(new URL(`./${file}`, import.meta.url), 'utf8');
+      expect(src).not.toContain('123456');
+      expect(src).not.toMatch(/POSTGRES_PORT \|\| '5432'/);
+    }
+  });
+
+  it('resolves Postgres config as UNAVAILABLE without a password, CONFIGURED on 5434 by default', async () => {
+    const { resolvePostgresRuntimeConfigV1 } = await import('./parent-atlas-bridge');
+    expect(resolvePostgresRuntimeConfigV1({})).toEqual({ status: 'UNAVAILABLE', missing: ['POSTGRES_PASSWORD'] });
+    expect(resolvePostgresRuntimeConfigV1({ POSTGRES_PASSWORD: ' pw ' })).toMatchObject({
+      status: 'CONFIGURED', host: '127.0.0.1', port: 5434, password: 'pw',
+    });
+  });
+
+  it('postgres join fails explicitly, and bridge enrichment degrades, when no password is configured', async () => {
+    const { postgresJoin } = (await import('./unified-orchestrator')).default;
+    const { resolveParentAtlasContext } = await import('./parent-atlas-bridge');
+    const noPassword = { postgres: { host: '127.0.0.1', port: 5434, user: 'u', password: '', database: 'd' } };
+    await expect(postgresJoin(['q1'], noPassword as never)).rejects.toThrow('POSTGRES_ENRICHMENT_UNAVAILABLE');
+    expect(await resolveParentAtlasContext('src/a.ts', noPassword)).toBeNull();
   });
 });

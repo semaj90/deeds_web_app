@@ -31,17 +31,24 @@
             "maxTokens": 4096,
           },
         },
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096,
-          },
-        },
+        // The historical gemma4-legal-iq4xs-direct.gguf entry was removed 2026-10-04: it is not served on :8090 and a
+        // single-model llama-server would answer it with Ornith under a Gemma label. Recoverable from git history.
       },
     },
+  },
+  // Token/context alignment (measured 2026-10-05): MCP tool schemas ride on EVERY request. TRACE alone is 188 tools
+  // (~33k tokens of the 65,536 window) and claude-mem adds 22 (8 of them write data or launch LLM sessions). Both are
+  // off by default so plan/build keep their context; agents that need TRACE re-enable it per agent below.
+  // Server prefix naming (`<server>_<tool>`) is OpenCode's convention; verify with `npm run opencode:align:check`.
+  "tools": {
+    "trace*": false,
+    "claude-mem*": false,
+  },
+  // Backstop for every agent incl. built-in plan/build (which default to "* allow"). atlas-tools has 9 read tools and one
+  // writer (record_outcome: NDJSON ledger + Neo4j edges); outcomes must go through the governed LearningOutcomeV1 path.
+  "permission": {
+    "atlas-tools_record_outcome": "deny",
+    "claude-mem*": "deny",
   },
   "mcp": {
     "trace": {
@@ -64,12 +71,16 @@
     },
   },
   "agent": {
+    // Defined in repo-root opencode.json and merged by name: re-enable TRACE (globally off above) for agents that use it.
+    "ornith-trace-audit": { "tools": { "trace*": true } },
+    "trace-mcp-tooling": { "tools": { "trace*": true } },
+    "mcp-toolchain": { "tools": { "trace*": true } },
     "ornith-atlas-kernel": {
       "mode": "primary",
       "description": "Curated Parent Atlas task agent on Ornith 1.5 9B; backend stores and BitFrost remain behind Atlas capabilities",
       "model": "llama-server/ornith-1.5-9b",
       "temperature": 0.4,
-      "steps": 10,
+      "steps": 20,
       "prompt": "Use only the curated Atlas task capabilities. Never call storage, graph, cache, or raw backend tools directly. Do not narrate or imitate tool calls. Wait for actual tool results before making claims. Never edit files or execute mutations. Always use the canonicalized Atlas context rather than raw retrieval output.",
       "permission": {
         "*": "deny",
@@ -87,6 +98,9 @@
         "LLMS.md.*": "allow",
         "evidence.*": "allow",
         "image.*": "allow",
+        "todowrite": "allow",
+        "atlas-tools*": "allow",
+        "atlas-tools_record_outcome": "deny",
         "edit": "deny",
       },
     },
@@ -106,6 +120,8 @@
         "bash": "ask",
         "atlas-task-kernel*": "allow",
         "ldr-research*": "allow",
+        "atlas-tools*": "allow",
+        "atlas-tools_record_outcome": "deny",
         "edit": "deny",
       },
     },
@@ -115,6 +131,7 @@
       "model": "llama-server/ornith-1.5-9b",
       "temperature": 0,
       "steps": 8,
+      "tools": { "trace*": true },
       "prompt": "Use only revision-qualified Atlas/TRACE evidence. Classify verified errors, build bounded evidence packets, and return repair candidates plus validation plans. Never edit files, apply repairs, persist hidden reasoning, or treat transport logs, Qdrant IDs, cache keys, tensors, KV state, or GPU pointers as identity. A recommendation is not authorization. Always include writesPerformed=false and structured evidence references.",
       "permission": {
         "*": "deny",
@@ -125,7 +142,10 @@
         "bash": "ask",
         "atlas-task-kernel*": "allow",
         "trace.*": "allow",
+        "trace_*": "allow",
         "atlas.*": "allow",
+        "atlas-tools*": "allow",
+        "atlas-tools_record_outcome": "deny",
         "edit": "deny",
       },
     },

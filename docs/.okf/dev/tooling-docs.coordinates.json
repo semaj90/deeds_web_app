@@ -1,0 +1,38 @@
+{
+  "schema": "atlas.external-doc-coordinates.v1",
+  "note": "Sidecar mirroring docs/.okf/dev/tooling-docs.manifest.json (the manifest is the identity source of truth; the builder fails closed on drift). Never fabricates an exact version: live pages are CURRENT_UPSTREAM.",
+  "sources": {
+    "oaklib": {
+      "provider": "incatools",
+      "product": "oaklib",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "python",
+      "publisher": "INCATools",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "ast-grep": {
+      "provider": "ast-grep",
+      "product": "ast-grep",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "rust",
+      "publisher": "ast-grep",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "ts-morph": {
+      "provider": "dsherret",
+      "product": "ts-morph",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "David Sherret",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "trpc": {
+      "provider": "trpc",
+      "product": "trpc",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "tRPC",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    }
+  }
+}

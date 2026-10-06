@@ -1,0 +1,30 @@
+{
+  "canonical_authority": false,
+  "fetched_at": "2026-10-05T18:33:33.735824Z",
+  "fetcher": "BEAUTIFULSOUP_HTTP",
+  "markdown_path": "/work/docs/.okf/ts-morph/raw/ts-morph.com.md",
+  "metadata": {
+    "parser": "html.parser",
+    "parserVersion": "4.15.0",
+    "structured": true
+  },
+  "normalized_checksum": "cb9b71873c19f73853537088025200ce448afc46c011ad8cab173a81dff44a1d",
+  "outgoing_urls": [
+    "https://github.com/dsherret/ts-morph",
+    "https://ts-morph.com/",
+    "https://ts-morph.com/details/index",
+    "https://ts-morph.com/emitting",
+    "https://ts-morph.com/manipulation",
+    "https://ts-morph.com/navigation",
+    "https://ts-morph.com/setup",
+    "https://ts-morph.com/utilities"
+  ],
+  "raw_checksum": "9e2c828d5703c7d8be8bd9ab9a44074e8b35c99c4ef4a859dc6121d2043547aa",
+  "requested_url": "https://ts-morph.com/",
+  "resolved_url": "https://ts-morph.com/",
+  "retrieved_at": "2026-10-05T18:33:33.735824Z",
+  "source_id": "ts-morph",
+  "source_revision": "ts-morph-docs-2026-10-05",
+  "text": null,
+  "title": "ts-morph - Documentation"
+}

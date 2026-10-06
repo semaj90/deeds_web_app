@@ -29,7 +29,6 @@ import {
   assertSemantic768,
   CANONICAL_QDRANT_COLLECTION,
 } from '$lib/server/embedding/embedding-contract-768.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { createCodebaseSearchBackendFromEnv } from '$lib/server/search/create-codebase-search-backend.js';
 import type { SearchBackendResult } from '$lib/server/search/search-backend.js';
 import {
@@ -38,6 +37,11 @@ import {
   batchResolveParentAtlasContext,
   type ParentAtlasContext
 } from './parent-atlas-bridge.js';
+import {
+  createReadOnlySideEffectReceiptBuilderV1,
+  type QueryExecutionModeV1,
+  type ReadOnlySideEffectReceiptV1,
+} from '$lib/server/execution/query-execution-policy-v1.js';
 import { selectDiverseCandidates } from './latent256-dedup.js';
 import type { Latent256CandidateProviderV1 } from './latent256-candidate-provider.js';
 
@@ -73,6 +77,11 @@ export interface RetrievalRequest {
   useRgPool?: boolean;
   retrievalTier?: SearchTier;
   filters?: SearchFilter;
+  /**
+   * Retrieval has no mutating mode: READ_ONLY (default) and OBSERVED_READ_ONLY are accepted,
+   * MUTATING is rejected. The orchestrator itself performs reads only.
+   */
+  executionMode?: QueryExecutionModeV1;
 }
 
 export type QdrantPointId = string | number;
@@ -87,7 +96,13 @@ export interface CandidateIdentityV1 {
   sourceRevision: string | null;
   workspaceRevision: string | null;
   symbolVersionId: string | null;
-  identitySource: 'QDRANT_PAYLOAD_V1' | 'NOT_AVAILABLE';
+  /** Exact evidence references from the PROVEN packet-chunk lineage bridge; null when no bridge row exists. */
+  evidenceRefs?: readonly string[] | null;
+  /** How packetKey was bound: the proven lineage bridge, a unique source_ref (weaker, not revision-qualified), or not bound. */
+  packetBinding?: 'LINEAGE_PROVEN' | 'SOURCE_REF_UNIQUE' | 'NONE';
+  /** EXACT_BINDING: source_ref + whole-file digest matched the admitted workspace binding. REVISION_CONFLICT: bridge and binding disagree, so no revision is attached. */
+  revisionBinding?: 'EXACT_BINDING' | 'REVISION_CONFLICT' | 'NONE';
+  identitySource: 'QDRANT_PAYLOAD_V1' | 'POSTGRES_CANONICAL_V1' | 'NOT_AVAILABLE';
   missingFields: readonly (
     | 'packetKey'
     | 'sourceRef'
@@ -122,8 +137,28 @@ export interface RankedCandidate {
   rg_matches?: number;
 }
 
+export type RetrievalLaneStatusV1 =
+  | { status: 'OK'; executor?: string; note?: string }
+  | { status: 'DISABLED' }
+  | { status: 'UNAVAILABLE'; reason: string; detail?: string };
+
+export type LexicalLaneResultV1 =
+  | { status: 'OK'; hits: Array<{ id: string; file: string; line: number; score: number; rank: number }> }
+  | {
+      status: 'UNAVAILABLE';
+      reason: 'RG_EXEC_FAILED' | 'RG_NOT_FOUND' | 'INVALID_QUERY';
+      detail?: string;
+      hits: [];
+    };
+
 export interface RetrievalResult {
   candidates: RankedCandidate[];
+  /** Implementation telemetry of the stages that ran (all reads). Not independent proof of zero writes. */
+  read_only_receipt?: ReadOnlySideEffectReceiptV1;
+  /** Per-lane availability. An unavailable lane contributes zero votes and is never reported as OK. */
+  lanes?: { semantic: RetrievalLaneStatusV1; lexical: RetrievalLaneStatusV1 };
+  /** NO_EVIDENCE: no lane produced a candidate; nothing is fabricated. */
+  evidence_status?: 'OK' | 'NO_EVIDENCE';
   timing: {
     embedding: number;
     qdrant_search: number;
@@ -160,7 +195,7 @@ const DEFAULT_CONFIG: RetrievalConfig = {
     host: process.env.POSTGRES_HOST || '127.0.0.1',
     port: parseInt(process.env.POSTGRES_PORT || '5434'),
     user: process.env.POSTGRES_USER || 'legal_admin',
-    password: process.env.POSTGRES_PASSWORD || '123456',
+    password: process.env.POSTGRES_PASSWORD || '',
     database: process.env.POSTGRES_DB || 'legal_ai_db'
   },
   ollama: { host: '127.0.0.1', port: 11434 },
@@ -420,7 +455,8 @@ async function rgPoolLexicalSearch(
   query: string,
   config: RetrievalConfig,
   limit: number = 10,
-  filters?: SearchFilter
+  filters?: SearchFilter,
+  onFailure?: (message: string) => void
 ): Promise<Array<{ id: string; file: string; line: number; score: number; rank: number }>> {
   const startTime = Date.now();
   try {
@@ -441,8 +477,31 @@ async function rgPoolLexicalSearch(
     }));
   } catch (err) {
     console.error('rg-pool lexical search failed:', err);
+    onFailure?.(err instanceof Error ? err.message : String(err));
     return [];
   }
+}
+
+/** Typed lexical lane: a failed ripgrep run is UNAVAILABLE, never an OK lane with zero hits. */
+export async function rgPoolLexicalLaneV1(
+  query: string,
+  config: RetrievalConfig,
+  limit: number = 10,
+  filters?: SearchFilter
+): Promise<LexicalLaneResultV1> {
+  const effectiveQuery = filters?.keywords?.join(' ') || query;
+  if (!effectiveQuery.trim()) return { status: 'UNAVAILABLE', reason: 'INVALID_QUERY', hits: [] };
+  let failure: string | null = null;
+  const hits = await rgPoolLexicalSearch(query, config, limit, filters, (message) => {
+    failure = message;
+  });
+  const failureMessage = failure as string | null;
+  if (failureMessage !== null) {
+    const detail: string = failureMessage;
+    const reason = /rg binary not found|ENOENT/i.test(detail) ? 'RG_NOT_FOUND' : 'RG_EXEC_FAILED';
+    return { status: 'UNAVAILABLE', reason, detail, hits: [] };
+  }
+  return { status: 'OK', hits };
 }
 
 /**
@@ -484,6 +543,91 @@ async function turboVecPrefilter(
 }
 
 /**
+ * STAGE 2 (executor): Postgres pgvector dense search, READ ONLY. Postgres is canonical truth, so this executor returns the canonical
+ * codebase_chunk_index.id and revision columns directly instead of relying on a Qdrant id mapping. Same lane as qdrantSearch (lane != executor); never a second vote.
+ * One representation only: semantic_768 = content_embedding_768 (raw vector). The older halfvec column content_embedding uses a different recipe and row population, so
+ * cosine scores from the two are not interchangeable and are never merged here; it would be a separate executor if ever enabled. content_embedding_768 has no ANN index,
+ * so this is an exact scan (measured slow; an HNSW index is a separate schema decision).
+ * Uses the shared repository pool (no per-query Pool). Filters this executor cannot honour fail the lane instead of being silently dropped.
+ * packet_key is attached only when exactly one atlas_packets row exists for the source_ref; that binding is source_ref-only and NOT revision-qualified
+ * (atlas_packets.chunk_id is a different id space: 0 of codebase_chunk_index.id match), so it is labelled packet_binding=SOURCE_REF_UNIQUE.
+ * Preferred binding: atlas_packet_chunk_lineage (chunk_row_id = codebase_chunk_index.id, revision_status PROVEN) supplies the exact packet_key, source_revision and
+ * evidence_refs (packet_binding=LINEAGE_PROVEN); the bridge covers only the chunks it contains, the rest keep the weaker binding.
+ */
+const PGVECTOR_EXECUTOR_CAVEAT =
+  'SEMANTIC_768_COLUMN_content_embedding_768_EXACT_SCAN: single representation, query recipe parity unproven; content_embedding (halfvec, other recipe) is not merged';
+
+let admittedWorkspaceRevisionCache: string | null | undefined;
+/** The admitted workspace revision, from ATLAS_ADMITTED_WORKSPACE_REVISION or the committed admission report; null (never a guess) when neither proves it. */
+async function readAdmittedWorkspaceRevision(): Promise<string | null> {
+  const fromEnv = process.env.ATLAS_ADMITTED_WORKSPACE_REVISION?.trim();
+  if (fromEnv) return fromEnv; // an explicit override always wins and is never cached
+  if (admittedWorkspaceRevisionCache !== undefined) return admittedWorkspaceRevisionCache;
+  try {
+    const fsp = await import('node:fs/promises');
+    const path = await import('node:path');
+    let dir = process.cwd();
+    for (let i = 0; i < 6; i++, dir = path.dirname(dir)) {
+      const text = await fsp.readFile(path.join(dir, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json'), 'utf8').catch(() => null);
+      if (text) {
+        const j = JSON.parse(text);
+        return (admittedWorkspaceRevisionCache = j.status === 'WORKSPACE_REVISION_TOURNAMENT_ADMITTED' && j.authority === true && typeof j.workspaceRevision === 'string' ? j.workspaceRevision : null);
+      }
+    }
+  } catch { /* unreadable report: no admitted revision */ }
+  return (admittedWorkspaceRevisionCache = null);
+}
+
+/** Bridge and binding must agree on source_revision; a disagreement attaches no revision rather than choosing one. */
+function revisionConflict(r: any): boolean {
+  return Boolean(r.lineage_source_revision && r.binding_source_revision && r.lineage_source_revision !== r.binding_source_revision);
+}
+
+async function postgresPgvectorSearch(
+  queryVector: Float32Array,
+  _config: RetrievalConfig,
+  filters: SearchFilter | undefined,
+  limit: number,
+): Promise<Array<{ id: string; score: number; payload: any }>> {
+  if (queryVector.length !== 768 || Array.from(queryVector).some((x) => !Number.isFinite(x))) throw new Error('QUERY_VECTOR_INVALID');
+  const unsupported = Object.entries(filters ?? {}).filter(([k, v]) => v != null && !(Array.isArray(v) && v.length === 0) && !['source_ref_pattern', 'per_lane_limit', 'keywords', 'keyword_variants'].includes(k));
+  if (unsupported.length) throw new Error(`PGVECTOR_FILTER_UNSUPPORTED:${unsupported.map(([k]) => k).join(',')}`);
+  const refPrefix = filters?.source_ref_pattern ? `${String(filters.source_ref_pattern).replace(/[%_\\]/g, '\\$&')}%` : null;
+  const vec = `[${Array.from(queryVector).join(',')}]`;
+  const n = Math.min(Math.max(limit, 1), 50);
+  // Lazy import: the shared pool owner is only loaded when this executor runs, so the orchestrator stays importable without app DB env.
+  const { pool } = await import('$lib/server/db/client');
+  const admittedWorkspace = await readAdmittedWorkspaceRevision();
+  const res = await pool.query(
+    `WITH top AS (
+       SELECT id, relative_path, symbol, kind, source_ref, file_content_hash, source_revision, workspace_revision, representation_revision, 1 - (content_embedding_768 <=> $1::vector(768)) AS cosine
+         FROM codebase_chunk_index
+        WHERE content_embedding_768 IS NOT NULL AND ($3::text IS NULL OR source_ref LIKE $3 ESCAPE '\')
+        ORDER BY content_embedding_768 <=> $1::vector(768) LIMIT $2)
+     SELECT t.*, l.packet_key AS lineage_packet_key, l.source_revision AS lineage_source_revision, l.evidence_refs AS lineage_evidence_refs,
+            b.workspace_revision AS binding_workspace_revision, b.source_revision AS binding_source_revision
+       FROM top t LEFT JOIN atlas_packet_chunk_lineage l ON l.chunk_row_id = t.id AND l.revision_status = 'PROVEN'
+       LEFT JOIN atlas_workspace_source_bindings b ON $4::text IS NOT NULL AND b.workspace_revision = $4 AND b.canonical_source_ref = t.source_ref AND b.content_digest = t.file_content_hash
+      ORDER BY t.cosine DESC`,
+    [vec, n, refPrefix, admittedWorkspace],
+  );
+  const merged = res.rows as any[];
+  const refs = [...new Set(merged.filter((r) => !r.lineage_packet_key).map((r) => r.source_ref).filter(Boolean))];
+  const packetByRef = new Map<string, string | null>();
+  if (refs.length) {
+    const pk = await pool.query(`SELECT source_ref, min(packet_key) AS packet_key, count(*)::int AS n FROM atlas_packets WHERE source_ref = ANY($1::text[]) GROUP BY source_ref`, [refs]);
+    for (const p of pk.rows) packetByRef.set(p.source_ref, p.n === 1 ? p.packet_key : null);
+  }
+  return merged.map((r, idx) => ({
+    id: String(r.id), score: Number(r.cosine),
+    payload: { packet_key: r.lineage_packet_key ?? packetByRef.get(r.source_ref) ?? undefined, source_ref: r.source_ref ?? undefined, source_revision: revisionConflict(r) ? undefined : (r.source_revision ?? r.lineage_source_revision ?? r.binding_source_revision ?? undefined),
+      evidence_refs: Array.isArray(r.lineage_evidence_refs) ? r.lineage_evidence_refs.map(String) : undefined,
+      workspace_revision: revisionConflict(r) ? undefined : (r.workspace_revision ?? r.binding_workspace_revision ?? undefined), revision_binding: revisionConflict(r) ? 'REVISION_CONFLICT' : r.binding_workspace_revision ? 'EXACT_BINDING' : 'NONE', representation_revision: r.representation_revision ?? undefined, relative_path: r.relative_path, symbol: r.symbol, kind: r.kind,
+      backend: 'postgres_pgvector', embedding_column: 'content_embedding_768', packet_binding: r.lineage_packet_key ? 'LINEAGE_PROVEN' : packetByRef.get(r.source_ref) ? 'SOURCE_REF_UNIQUE' : 'NONE', pgvector_rank: idx + 1 },
+  }));
+}
+
+/**
  * STAGE 4: Postgres truth join
  * Merge Qdrant results with canonical Postgres metadata
  */
@@ -491,9 +635,13 @@ async function postgresJoin(
   qdrantIds: string[],
   config: RetrievalConfig
 ): Promise<Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>> {
+  if (qdrantIds.length === 0) return new Map();
+  if (!config.postgres.password) {
+    // No credential in source: an unconfigured join is an explicit failure, never a guess.
+    throw new Error('POSTGRES_ENRICHMENT_UNAVAILABLE:POSTGRES_PASSWORD');
+  }
   const pool = new Pool(config.postgres);
   try {
-    if (qdrantIds.length === 0) return new Map();
 
     const res = await pool.query(
       `SELECT id, qdrant_id, relative_path, symbol, kind
@@ -623,7 +771,8 @@ export function rankCandidates(
           : null;
       const missingFields = (['packetKey', 'sourceRef', 'sourceRevision', 'workspaceRevision'] as const)
         .filter(field => ({ packetKey, sourceRef, sourceRevision, workspaceRevision }[field] == null));
-      const qdrantPointId = qdrant?.id ?? null;
+      const fromPostgres = payload.backend === 'postgres_pgvector';
+      const qdrantPointId = fromPostgres ? null : (qdrant?.id ?? null);
       const candidateId = typeof pgData.candidateId === 'string' && pgData.candidateId.length > 0
         ? pgData.candidateId
         : null;
@@ -635,7 +784,10 @@ export function rankCandidates(
         sourceRevision: sourceRevision ?? null,
         workspaceRevision: workspaceRevision ?? null,
         symbolVersionId,
-        identitySource: qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
+        evidenceRefs: Array.isArray(payload.evidence_refs) ? payload.evidence_refs : null,
+        packetBinding: fromPostgres ? (payload.packet_binding ?? 'NONE') : undefined,
+        revisionBinding: fromPostgres ? (payload.revision_binding ?? 'NONE') : undefined,
+        identitySource: fromPostgres ? 'POSTGRES_CANONICAL_V1' : qdrant ? 'QDRANT_PAYLOAD_V1' : 'NOT_AVAILABLE',
         missingFields,
       };
       const breakdown = new Map(result.rrfBreakdown.map((item) => [item.lane, item.contribution]));
@@ -737,6 +889,9 @@ Query: ${query}
 
 Provide a 1-2 sentence summary of the relevant code structure and functionality.`;
 
+    // Loaded lazily: runtime-contract throws at import when ROTORQUANT_MODEL_PATH is unset, which
+    // must only affect synthesis, not importing or running retrieval.
+    const { LLM_MODEL_ID } = await import('$lib/server/llm/runtime-contract.js');
     const res = await fetch(`http://${config.gemma4.host}:${config.gemma4.port}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -767,6 +922,27 @@ Provide a 1-2 sentence summary of the relevant code structure and functionality.
   }
 }
 
+const READ_STAGE_SUBSYSTEMS: Record<string, string> = {
+  embedding: 'embedding',
+  rust_napi: 'dense_search',
+  qdrant_search: 'dense_search',
+  rg_pool_lexical: 'lexical_search',
+  turbovec_prefilter: 'turbovec',
+  postgres_join: 'postgres',
+  parent_atlas_enrichment: 'postgres',
+  latent256_candidate_dedup: 'latent256',
+};
+
+function buildRetrievalReadReceipt(stages: string[], mode: QueryExecutionModeV1): ReadOnlySideEffectReceiptV1 {
+  const builder = createReadOnlySideEffectReceiptBuilderV1(mode);
+  for (const stage of stages) {
+    const subsystem = READ_STAGE_SUBSYSTEMS[stage];
+    if (!subsystem) continue;
+    builder.record({ subsystem, operation: stage, reads: 1, attemptedWrites: 0, committedWrites: 0, suppressionReason: null });
+  }
+  return builder.build();
+}
+
 /**
  * MAIN ORCHESTRATOR: Execute complete retrieval + summarization pipeline
  */
@@ -774,6 +950,10 @@ export async function executeUnifiedRetrieval(
   request: RetrievalRequest,
   config: RetrievalConfig = DEFAULT_CONFIG
 ): Promise<RetrievalResult> {
+  if (request.executionMode === 'MUTATING') {
+    throw new Error('UNIFIED_RETRIEVAL_HAS_NO_MUTATING_MODE');
+  }
+  const executionMode: QueryExecutionModeV1 = request.executionMode ?? 'READ_ONLY';
   const totalStart = Date.now();
   const stages: string[] = [];
   let fallbackUsed = false;
@@ -797,74 +977,106 @@ export async function executeUnifiedRetrieval(
     // No legacy 384 lane is ever requested or normalized to, regardless of
     // what the caller passes in `request.lanes`.
     resolveSemanticLane();
-    const dense768 = await embedQueryForLane(request.query, 'dense_768');
-    const queryVectors: QueryVectorBundle = {
-      dense384: null,
-      dense768,
-      latent64: null,
-    };
-    const embedding = queryVectors.dense768?.vector;
-    if (!embedding) {
-      throw new Error('Failed to generate query vector bundle');
+    let semanticLane: RetrievalLaneStatusV1 = { status: 'OK' };
+    let queryVectors: QueryVectorBundle | null = null;
+    let embedding: Float32Array | null = null;
+    try {
+      const dense768 = await embedQueryForLane(request.query, 'dense_768');
+      if (!dense768?.vector) throw new Error('Failed to generate query vector bundle');
+      queryVectors = { dense384: null, dense768, latent64: null };
+      embedding = dense768.vector;
+    } catch (err) {
+      // Availability failure: the semantic lane is marked unavailable and retrieval continues
+      // with the remaining lanes. A returned vector of the wrong shape is a contract violation
+      // and still throws below.
+      const detail = err instanceof Error ? err.message : String(err);
+      semanticLane = { status: 'UNAVAILABLE', reason: 'EMBEDDING_FAILED', detail };
+      console.warn('Semantic lane unavailable (embedding failed):', detail);
+      stages.push('embedding_unavailable');
     }
-    assertSemantic768(Array.from(embedding));
-    stages.push('embedding');
+    if (embedding) {
+      assertSemantic768(Array.from(embedding));
+      stages.push('embedding');
+    }
 
     // STAGE 1.5: Rust N-API (optional, fallback to Qdrant)
-    let rustHits: Array<{ id: string; score: number; payload: any }> | null = null;
-    let qdrantHits: Array<{ id: string; score: number; payload: any }>;
-
-    if (queryVectors.dense768?.vector) {
-      rustHits = await rustNapiSearch(
-        queryVectors.dense768.vector,
-        request.filters,
-        retrievalLimit
-      );
-      if (rustHits && rustHits.length > 0) {
-        stages.push('rust_napi');
-        qdrantHits = rustHits; // Use Rust results
-      } else {
-        // Fallback to Qdrant
-        qdrantHits = await qdrantSearch(
-          queryVectors,
-          config,
-          request.useRRF ?? true,
-          request.useLexical ?? false,
-          request.filters,
-          retrievalTier,
-          retrievalLimit
-        );
-        stages.push('qdrant_search');
+    let qdrantHits: Array<{ id: string; score: number; payload: any }> = [];
+    // Semantic executor (same lane, one vote): Postgres pgvector by default because Qdrant projection is not finished; UNIFIED_SEMANTIC_EXECUTOR=qdrant restores the Qdrant/Rust path.
+    const semanticExecutor = process.env.UNIFIED_SEMANTIC_EXECUTOR === 'qdrant' ? 'qdrant' : 'postgres_pgvector';
+    const pgMap = new Map<string, { candidateId: string; relative_path: string; symbol: string; kind: string }>();
+    if (queryVectors && embedding && semanticExecutor === 'postgres_pgvector') {
+      try {
+        qdrantHits = await postgresPgvectorSearch(embedding, config, request.filters, retrievalLimit);
+        for (const h of qdrantHits) pgMap.set(h.id, { candidateId: h.id, relative_path: h.payload.relative_path, symbol: h.payload.symbol, kind: h.payload.kind });
+        semanticLane = { status: 'OK', executor: 'postgres_pgvector', note: PGVECTOR_EXECUTOR_CAVEAT };
+        stages.push('postgres_pgvector_search');
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        semanticLane = { status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED', detail };
+        console.warn('Semantic lane unavailable (pgvector search failed):', detail);
+        stages.push('semantic_search_unavailable');
+        qdrantHits = [];
       }
-    } else {
-      // No 768d vector, use Qdrant directly
-      qdrantHits = await qdrantSearch(
-        queryVectors,
-        config,
-        request.useRRF ?? true,
-        request.useLexical ?? false,
-        request.filters,
-        retrievalTier,
-        retrievalLimit
-      );
-      stages.push('qdrant_search');
+    } else if (queryVectors && embedding) {
+      try {
+        const rustHits = await rustNapiSearch(embedding, request.filters, retrievalLimit);
+        if (rustHits && rustHits.length > 0) {
+          stages.push('rust_napi');
+          qdrantHits = rustHits; // Use Rust results
+        } else {
+          qdrantHits = await qdrantSearch(
+            queryVectors,
+            config,
+            request.useRRF ?? true,
+            request.useLexical ?? false,
+            request.filters,
+            retrievalTier,
+            retrievalLimit
+          );
+          stages.push('qdrant_search');
+        }
+      } catch (err) {
+        const detail = err instanceof Error ? err.message : String(err);
+        semanticLane = { status: 'UNAVAILABLE', reason: 'SEMANTIC_SEARCH_FAILED', detail };
+        console.warn('Semantic lane unavailable (dense search failed):', detail);
+        stages.push('semantic_search_unavailable');
+        qdrantHits = [];
+      }
     }
 
     const qdrantIds = qdrantHits.map((h) => h.id);
 
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
+    let lexicalLane: RetrievalLaneStatusV1 = { status: 'DISABLED' };
     if (request.useRgPool ?? true) {
-      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, retrievalLimit, request.filters);
-      stages.push('rg_pool_lexical');
+      const lexical = await rgPoolLexicalLaneV1(request.query, config, retrievalLimit, request.filters);
+      rgLexicalHits = lexical.hits;
+      // A failed lane is reported as unavailable, not as an executed lane with zero hits.
+      if (lexical.status === 'OK') {
+        lexicalLane = { status: 'OK' };
+        stages.push('rg_pool_lexical');
+      } else {
+        lexicalLane = { status: 'UNAVAILABLE', reason: lexical.reason, detail: lexical.detail };
+        stages.push('rg_pool_lexical_unavailable');
+      }
     }
 
     // STAGE 3: TurboVec prefilter
-    const turboVecHits = await turboVecPrefilter(Array.from(embedding), config, retrievalLimit, request.filters);
-    stages.push('turbovec_prefilter');
+    // TurboVec is an additive prefilter: an outage drops its votes and is recorded, it never aborts retrieval.
+    let turboVecHits: Array<{ id: string; score: number; rank: number }> = [];
+    if (embedding) {
+      try {
+        turboVecHits = await turboVecPrefilter(Array.from(embedding), config, retrievalLimit, request.filters);
+        stages.push('turbovec_prefilter');
+      } catch (err) {
+        console.warn('TurboVec prefilter unavailable (non-blocking):', err instanceof Error ? err.message : err);
+        stages.push('turbovec_prefilter_unavailable');
+      }
+    }
 
     // STAGE 4: Postgres join
-    const postgresMap = await postgresJoin(qdrantIds, config);
+    const postgresMap = pgMap.size > 0 ? pgMap : await postgresJoin(qdrantIds, config);
     stages.push('postgres_join');
 
     // STAGE 4.5: Parent Atlas enrichment (canonical lineage validation + domain taxonomy)
@@ -918,6 +1130,9 @@ export async function executeUnifiedRetrieval(
 
     return {
       candidates: enhancedRanked,
+      read_only_receipt: buildRetrievalReadReceipt(stages, executionMode),
+      lanes: { semantic: semanticLane, lexical: lexicalLane },
+      evidence_status: enhancedRanked.length === 0 ? 'NO_EVIDENCE' : 'OK',
       timing: {
         embedding: 0, // Placeholder
         qdrant_search: 0,

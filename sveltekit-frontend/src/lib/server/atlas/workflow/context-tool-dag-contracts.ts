@@ -145,6 +145,185 @@ export function validateContextToolDag(raw: ContextToolDagV1): ContextToolDagV1 
   return dag;
 }
 
+/**
+ * CTX-PREAGENT-01 / CONTEXT-DAG-01: projects a pre-agent stage list (see `selectPreAgentStages` in
+ * `atlas/semantic-signal-routing.ts`) onto THIS DAG type, so no second DAG owner exists. Independent
+ * lookups depend only on the analysis (and the cache probe) so they can run in parallel instead of the
+ * model issuing them one per step; exact promotion joins them; the packet node depends on promotion.
+ * Every node is read-only and canonicalWritesAllowed is false. AGENT_HANDOFF is the boundary and has no node.
+ */
+const PRE_AGENT_STAGE_KIND: Record<string, ContextToolDagNodeKind> = {
+  QUERY_ANALYSIS: 'QUERY_CLASSIFICATION',
+  CACHE_LOOKUP: 'RETRIEVAL',
+  LEXICAL: 'RETRIEVAL',
+  AST: 'RETRIEVAL',
+  MEMORY_PRIOR: 'RETRIEVAL',
+  SEMANTIC_ROUTE: 'RETRIEVAL',
+  GRAPH_EXPANSION: 'CONTEXT_FANOUT',
+  ACE_PACKET_ASSEMBLY: 'MATERIALIZE',
+};
+
+export function buildContextToolDagFromPreAgentStages(input: {
+  stages: readonly string[];
+  workflowId: string;
+  requestId: string;
+  workspaceRevision: string;
+  graphRevision: string;
+  producerRevision: string;
+}): ContextToolDagV1 {
+  const lookups = input.stages.filter((s) => s !== 'QUERY_ANALYSIS' && s !== 'ACE_PACKET_ASSEMBLY' && s !== 'AGENT_HANDOFF');
+  for (const s of input.stages) {
+    if (s !== 'AGENT_HANDOFF' && !(s in PRE_AGENT_STAGE_KIND)) throw new Error(`unknown pre-agent stage ${s}`);
+  }
+  const node = (nodeId: string, kind: ContextToolDagNodeKind, dependsOn: string[]): ContextToolDagNodeV1 => ({
+    nodeId, kind, dependsOn, canonicalIds: [], toolName: null, readOnly: true,
+    requiresExactPromotion: false, requiresValidation: false, maxAttempts: 1,
+  });
+  const nodes: ContextToolDagNodeV1[] = [node('QUERY_ANALYSIS', 'QUERY_CLASSIFICATION', [])];
+  const gate = lookups.includes('CACHE_LOOKUP') ? ['CACHE_LOOKUP'] : [];
+  if (gate.length) nodes.push(node('CACHE_LOOKUP', 'RETRIEVAL', ['QUERY_ANALYSIS']));
+  for (const s of lookups) {
+    if (s === 'CACHE_LOOKUP') continue;
+    // AST here is the Postgres-backed lookup (retrieveASTMatches), which needs no file list, so it runs beside
+    // LEXICAL. A file-parsing AST refinement (ast-grep) would be a separate node that depends on LEXICAL.
+    nodes.push(node(s, PRE_AGENT_STAGE_KIND[s], ['QUERY_ANALYSIS', ...gate]));
+  }
+  const lookupIds = lookups.filter((s) => s !== 'CACHE_LOOKUP');
+  nodes.push(node('EXACT_PROMOTION', 'EXACT_PROMOTION', lookupIds.length ? lookupIds : ['QUERY_ANALYSIS']));
+  nodes.push(node('ACE_PACKET_ASSEMBLY', 'MATERIALIZE', ['EXACT_PROMOTION']));
+  return validateContextToolDag({
+    schema: 'atlas.context-tool-dag.v1',
+    workflowId: input.workflowId,
+    workflowRevision: 0,
+    requestId: input.requestId,
+    workspaceRevision: input.workspaceRevision,
+    graphRevision: input.graphRevision,
+    nodes,
+    canonicalWritesAllowed: false,
+    producerRevision: input.producerRevision,
+  });
+}
+
+/**
+ * CONTEXT-DAG-01 executor (KAG-RUNNER-OWNER-01 option a): read-only, level-parallel, no database writes.
+ * Runs each dependency level with Promise.all; a failed/timed-out node marks its dependents BLOCKED (never runs
+ * them), except the EXACT_PROMOTION join, which degrades onto the lookups that succeeded. Refuses any DAG with a non-read-only node or canonicalWritesAllowed=true. The receipt is
+ * transport evidence only (canonicalAuthority:false); it does not replace KagDagRunner or its persisted runs.
+ */
+export type ContextDagNodeHandlerV1 = (input: { nodeId: string; inputs: Record<string, unknown> }) => Promise<unknown>;
+
+export interface ContextDagNodeReceiptV1 {
+  nodeId: string;
+  kind: ContextToolDagNodeKind;
+  level: number;
+  status: 'OK' | 'FAILED' | 'BLOCKED' | 'NO_HANDLER';
+  durationMs: number;
+  error: string | null;
+  /** Dependencies that did not succeed but did not stop this join node. */
+  degradedDependencies: string[];
+}
+
+export interface ContextDagExecutionReceiptV1 {
+  schema: 'atlas.context-dag-execution-receipt.v1';
+  workflowId: string;
+  requestId: string;
+  levels: string[][];
+  nodes: ContextDagNodeReceiptV1[];
+  outputs: Record<string, unknown>;
+  ok: boolean;
+  /** Not every node succeeded, but the packet node did: usable partial evidence (see degradedDependencies). */
+  degraded: boolean;
+  writesPerformed: false;
+  canonicalAuthority: false;
+}
+
+/** Dependencies that only order execution: their failure is recorded as degraded but never blocks a dependent. */
+const SOFT_DEPENDENCY_IDS: ReadonlySet<string> = new Set(['CACHE_LOOKUP']);
+
+export async function executeContextToolDagV1(
+  rawDag: ContextToolDagV1,
+  handlers: Readonly<Record<string, ContextDagNodeHandlerV1>>,
+  options: { nodeTimeoutMs?: number } = {},
+): Promise<ContextDagExecutionReceiptV1> {
+  const dag = validateContextToolDag(rawDag);
+  if (dag.canonicalWritesAllowed || dag.nodes.some((n) => !n.readOnly)) {
+    throw new Error('executeContextToolDagV1 only runs read-only DAGs with canonicalWritesAllowed=false');
+  }
+  const timeoutMs = options.nodeTimeoutMs ?? 30_000;
+  const byId = new Map(dag.nodes.map((n) => [n.nodeId, n] as const));
+  const levelOf = new Map<string, number>();
+  const levelFor = (id: string): number => {
+    const cached = levelOf.get(id);
+    if (cached !== undefined) return cached;
+    const deps = byId.get(id)!.dependsOn;
+    const level = deps.length === 0 ? 0 : 1 + Math.max(...deps.map(levelFor));
+    levelOf.set(id, level);
+    return level;
+  };
+  for (const n of dag.nodes) levelFor(n.nodeId);
+  const maxLevel = Math.max(...levelOf.values());
+  const levels: string[][] = Array.from({ length: maxLevel + 1 }, () => []);
+  for (const n of dag.nodes) levels[levelOf.get(n.nodeId)!].push(n.nodeId);
+  for (const l of levels) l.sort();
+
+  const outputs: Record<string, unknown> = {};
+  const receipts = new Map<string, ContextDagNodeReceiptV1>();
+  const withTimeout = <T,>(p: Promise<T>): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+      const t = setTimeout(() => reject(new Error(`node timed out after ${timeoutMs}ms`)), timeoutMs);
+      p.then((v) => { clearTimeout(t); resolve(v); }, (e) => { clearTimeout(t); reject(e); });
+    });
+
+  for (let level = 0; level < levels.length; level += 1) {
+    await Promise.all(levels[level].map(async (nodeId) => {
+      const node = byId.get(nodeId)!;
+      const failedDeps = node.dependsOn.filter((d) => receipts.get(d)?.status !== 'OK');
+      const okDeps = node.dependsOn.filter((d) => receipts.get(d)?.status === 'OK');
+      // Join nodes degrade: EXACT_PROMOTION proceeds on the lookups that succeeded (a lexical-only or AST-less
+      // result is still useful evidence) and records what failed; it is blocked only when NO dependency succeeded.
+      // Everything else (e.g. AST, which parses the lexical hit list) is blocked by any failed dependency.
+      // A SOFT dependency (the best-effort cache probe) only orders execution: its failure never blocks a dependent,
+      // it is just recorded in `degradedDependencies` (review finding: a failed cache read must not become a total outage).
+      const softFailed = failedDeps.filter((d) => SOFT_DEPENDENCY_IDS.has(d));
+      const hardFailed = failedDeps.filter((d) => !SOFT_DEPENDENCY_IDS.has(d));
+      const tolerant = node.kind === 'EXACT_PROMOTION' && okDeps.length > 0;
+      const base = { nodeId, kind: node.kind, level, degradedDependencies: tolerant ? failedDeps : softFailed };
+      if (hardFailed.length > 0 && !tolerant) {
+        receipts.set(nodeId, { ...base, status: 'BLOCKED', durationMs: 0, error: `dependency ${hardFailed[0]} ${receipts.get(hardFailed[0])?.status ?? 'NOT_RUN'}` });
+        return;
+      }
+      const handler = handlers[nodeId];
+      if (!handler) {
+        receipts.set(nodeId, { ...base, status: 'NO_HANDLER', durationMs: 0, error: null });
+        return;
+      }
+      const started = Date.now();
+      try {
+        const inputs: Record<string, unknown> = {};
+        for (const d of okDeps) inputs[d] = outputs[d];
+        // Promise.resolve: a handler that returns a plain value (not a Promise) is still a success.
+        outputs[nodeId] = await withTimeout(Promise.resolve(handler({ nodeId, inputs })));
+        receipts.set(nodeId, { ...base, status: 'OK', durationMs: Date.now() - started, error: null });
+      } catch (err) {
+        receipts.set(nodeId, { ...base, status: 'FAILED', durationMs: Date.now() - started, error: err instanceof Error ? err.message : String(err) });
+      }
+    }));
+  }
+  const nodes = dag.nodes.map((n) => receipts.get(n.nodeId)!);
+  return {
+    schema: 'atlas.context-dag-execution-receipt.v1',
+    workflowId: dag.workflowId,
+    requestId: dag.requestId,
+    levels,
+    nodes,
+    outputs,
+    ok: nodes.every((n) => n.status === 'OK'),
+    degraded: !nodes.every((n) => n.status === 'OK') && nodes.some((n) => n.kind === 'MATERIALIZE' && n.status === 'OK'),
+    writesPerformed: false,
+    canonicalAuthority: false,
+  };
+}
+
 export function workflowActionFromDagNode(input: {
   dag: ContextToolDagV1;
   nodeId: string;

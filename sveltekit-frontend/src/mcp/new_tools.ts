@@ -252,9 +252,13 @@ export function registerNewTools(
     query: string;
     limit: number;
     intent?: string[];
-  }) {
+  }, executionContext) {
     try {
-      const emb = await generateEmbedding(query);
+      const emb = await generateEmbedding(query, {
+        executionMode: executionContext?.policy?.mode,
+        skipCacheWrite: executionContext?.policy?.cache?.populate === false,
+        recordSideEffect: (entry) => executionContext?.sideEffects?.record(entry),
+      });
       if (!emb) {
         return {
           content: [{ type: 'text' as const, text: serializeBoundedReadResult({ ok: false, error: 'EMBEDDING_SERVICE_UNAVAILABLE' }) }],
@@ -267,6 +271,8 @@ export function registerNewTools(
         queryEmbedding: emb,
         limit,
         intentOverride: intent,
+        executionMode: executionContext?.policy?.mode,
+        recordSideEffect: (entry) => executionContext?.sideEffects?.record(entry),
       });
 
       // Canonical join-back: Qdrant payloads carry identity (source_ref) but
@@ -360,7 +366,8 @@ export function registerNewTools(
       dispatcherMiddleware,
       'atlas.query',
       sessionId_atlas_query,
-      handleTraceSearch
+      handleTraceSearch,
+      'READ_ONLY'
     )
   );
 

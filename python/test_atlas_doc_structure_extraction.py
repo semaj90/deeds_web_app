@@ -40,6 +40,35 @@ class StructuredTextExtractionTests(unittest.TestCase):
         self.assertIn("    if x:", text)
         self.assertIn("        return 1", text)
 
+    def test_bare_language_attribute_and_copy_button_are_handled(self) -> None:
+        # trpc.io: <pre language=bash title=shell>code<button class=copy-button>Copy</button></pre>
+        html = (
+            b'<html><body><main><h1>T</h1>'
+            b'<pre language=bash title=shell class=InstallationSnippet__CodeBlock>npm install @trpc/server'
+            b'<button type=button aria-label="Copy code to clipboard" class=copy-button>Copy</button></pre>'
+            b'<pre language=ts><code>const a = 1;<button class=copy-button>Copy</button></code></pre>'
+            b'</main></body></html>'
+        )
+        _title, text, _urls = extract_structured_text(html, base_url="https://example.test/")
+        self.assertIn("```bash\nnpm install @trpc/server\n```", text)
+        self.assertIn("```ts\nconst a = 1;\n```", text)
+        self.assertNotIn("Copy", text)
+
+    def test_docusaurus_language_label_copy_control_and_pagination_are_removed(self) -> None:
+        html = (
+            b'<html><body><main><article><div class="theme-doc-markdown">'
+            b'<h1>Client</h1><pre class="shiki"><div class="language-id">ts</div>'
+            b'<div class="code-container"><code><div class="line">const answer = 42;</div>'
+            b'</code></div></pre><button class="copy-button">Copy</button>'
+            b'</div><nav class="pagination-nav"><a>Previous</a><a>Next</a></nav>'
+            b'</article><aside class="theme-doc-toc-desktop">On this page</aside></main></body></html>'
+        )
+        _title, text, _urls = extract_structured_text(html, base_url="https://trpc.io/docs/client")
+        self.assertIn("```ts\nconst answer = 42;\n```", text)
+        self.assertNotIn("Copy", text)
+        self.assertNotIn("Previous", text)
+        self.assertNotIn("On this page", text)
+
     def test_table_rows_serialized_pipe_delimited(self) -> None:
         html = (
             b"<html><body><main>"

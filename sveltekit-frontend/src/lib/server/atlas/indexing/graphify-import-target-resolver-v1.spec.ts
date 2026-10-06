@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import {
-  parseImportStatementV1, resolveImportSpecifierV1, resolveReferenceTargetV1, rootIdentifierOfV1, type ImportBindingV1,
+  buildExportsForSourceV1, isTopLevelExportRouteV1, parseImportStatementV1, resolveImportSpecifierV1, resolveReferenceTargetV1, rootIdentifierOfV1, type ImportBindingV1,
 } from './graphify-import-target-resolver-v1.js';
 
 const known = new Set([
@@ -91,5 +91,27 @@ describe('resolveReferenceTargetV1', () => {
     expect(rootIdentifierOfV1('await foo.bar')).toBe('foo');
     expect(rootIdentifierOfV1('  new Map')).toBe('Map');
     expect(rootIdentifierOfV1('(a || b)')).toBeNull();
+  });
+});
+
+describe('top-level export detection from parent_route', () => {
+  it('accepts direct exports and export const, rejects nested helpers and non-exports', () => {
+    expect(isTopLevelExportRouteV1(['export_statement', 'function_declaration'])).toBe(true);
+    expect(isTopLevelExportRouteV1(['export_statement', 'type_alias_declaration'])).toBe(true);
+    expect(isTopLevelExportRouteV1(['export_statement', 'lexical_declaration', 'variable_declarator'])).toBe(true);
+    expect(isTopLevelExportRouteV1(['export_statement', 'function_declaration', 'variable_declarator'])).toBe(false);
+    expect(isTopLevelExportRouteV1(['function_declaration'])).toBe(false);
+    expect(isTopLevelExportRouteV1([])).toBe(false);
+    expect(isTopLevelExportRouteV1(null)).toBe(false);
+  });
+
+  it('keeps duplicate names as multiple keys so the resolver reports EXPORT_AMBIGUOUS', () => {
+    const m = buildExportsForSourceV1([
+      { name: 'a', symbol_key: 'k1', parent_route: ['export_statement', 'function_declaration'] },
+      { name: 'push', symbol_key: 'k2', parent_route: ['export_statement', 'function_declaration', 'variable_declarator'] },
+      { name: 'a', symbol_key: 'k3', parent_route: ['export_statement', 'type_alias_declaration'] },
+    ]);
+    expect(m.get('a')).toEqual(['k1', 'k3']);
+    expect(m.has('push')).toBe(false);
   });
 });
