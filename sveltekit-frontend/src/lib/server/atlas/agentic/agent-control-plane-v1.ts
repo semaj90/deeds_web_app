@@ -227,6 +227,69 @@ export const agentControlPlaneOwnerAuditV1 = Object.freeze({
 });
 
 
+/**
+ * Pokédex-style bounded agent move.
+ *
+ * A move is an execution-plan descriptor, not a tool identity and never an
+ * authorization grant. Domain classification is referenced as evidence; it is
+ * not copied into identity coordinates and cannot authorize mutation.
+ */
+export const AgentMoveDescriptorV1Schema = z.object({
+  schema: z.literal('atlas.agent-move-descriptor.v1'),
+  moveId: z.string().min(1),
+  moveRevision: z.string().min(1),
+  capabilityId: z.string().min(1),
+  inputSchemaRef: z.string().min(1),
+  outputSchemaRef: z.string().min(1),
+  policyRevision: z.string().min(1),
+  permissionClass: z.enum(['READ', 'WRITE', 'ADMIN']),
+  approvalRequired: z.boolean(),
+  estimatedCost: z.object({
+    tokenCost: nonNegativeInteger,
+    toolCalls: nonNegativeInteger,
+    latencyMs: nonNegativeInteger,
+  }).strict(),
+  traversalBudgetRef: z.string().min(1).nullable(),
+  domainClassificationRef: z.string().min(1).nullable(),
+  domainConfidenceFloor: unitScore.nullable(),
+  classifierRevision: z.string().min(1).nullable(),
+  canonicalAuthority: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  const hasClassificationBinding =
+    value.domainClassificationRef !== null ||
+    value.domainConfidenceFloor !== null ||
+    value.classifierRevision !== null;
+  if (hasClassificationBinding && (
+    value.domainClassificationRef === null ||
+    value.domainConfidenceFloor === null ||
+    value.classifierRevision === null
+  )) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['domainClassificationRef'],
+      message: 'MOVE_DOMAIN_CLASSIFICATION_BINDING_INCOMPLETE',
+    });
+  }
+  if ((value.permissionClass === 'WRITE' || value.permissionClass === 'ADMIN') && !value.approvalRequired) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['approvalRequired'],
+      message: 'MUTATING_MOVE_REQUIRES_APPROVAL',
+    });
+  }
+});
+export type AgentMoveDescriptorV1 = z.infer<typeof AgentMoveDescriptorV1Schema>;
+
+export function buildAgentMoveDescriptorV1(
+  input: Omit<AgentMoveDescriptorV1, 'schema' | 'canonicalAuthority'>,
+): AgentMoveDescriptorV1 {
+  return AgentMoveDescriptorV1Schema.parse({
+    schema: 'atlas.agent-move-descriptor.v1',
+    ...input,
+    canonicalAuthority: false,
+  });
+}
+
 const executorClass = z.enum([
   'TS_CPU_WORKER',
   'LOCAL_READ_ONLY',
@@ -255,7 +318,7 @@ export const QueryExecutionNodeV1Schema = z.object({
   inputArtifactRefs: z.array(z.string().min(1)).max(32),
   evidenceRefs: z.array(z.string().min(1)).max(32),
   outputSchemaRef: z.string().min(1),
-  move: AgentMoveDescriptorV1Schema.nullable(),
+  move: AgentMoveDescriptorV1Schema.nullable().default(null),
   maxTokens: nonNegativeInteger,
   timeoutMs: z.number().int().positive().max(120_000),
 }).strict();
@@ -350,7 +413,7 @@ export const ExecutorRequestV1Schema = z.object({
   inputArtifactRefs: z.array(z.string().min(1)).max(32),
   evidenceRefs: z.array(z.string().min(1)).max(32),
   expectedOutputSchemaRef: z.string().min(1),
-  move: AgentMoveDescriptorV1Schema.nullable(),
+  move: AgentMoveDescriptorV1Schema.nullable().default(null),
   timeoutMs: z.number().int().positive().max(120_000),
   payloadPolicy: z.literal('REFERENCES_ONLY'),
   canonicalAuthority: z.literal(false),
@@ -393,70 +456,6 @@ export function buildExecutorRequestV1(
     schema: 'atlas.executor-request.v1',
     ...input,
     payloadPolicy: 'REFERENCES_ONLY',
-    canonicalAuthority: false,
-  });
-}
-
-
-/**
- * Pokédex-style bounded agent move.
- *
- * A move is an execution-plan descriptor, not a tool identity and never an
- * authorization grant. Domain classification is referenced as evidence; it is
- * not copied into identity coordinates and cannot authorize mutation.
- */
-export const AgentMoveDescriptorV1Schema = z.object({
-  schema: z.literal('atlas.agent-move-descriptor.v1'),
-  moveId: z.string().min(1),
-  moveRevision: z.string().min(1),
-  capabilityId: z.string().min(1),
-  inputSchemaRef: z.string().min(1),
-  outputSchemaRef: z.string().min(1),
-  policyRevision: z.string().min(1),
-  permissionClass: z.enum(['READ', 'WRITE', 'ADMIN']),
-  approvalRequired: z.boolean(),
-  estimatedCost: z.object({
-    tokenCost: nonNegativeInteger,
-    toolCalls: nonNegativeInteger,
-    latencyMs: nonNegativeInteger,
-  }).strict(),
-  traversalBudgetRef: z.string().min(1).nullable(),
-  domainClassificationRef: z.string().min(1).nullable(),
-  domainConfidenceFloor: unitScore.nullable(),
-  classifierRevision: z.string().min(1).nullable(),
-  canonicalAuthority: z.literal(false),
-}).strict().superRefine((value, ctx) => {
-  const hasClassificationBinding =
-    value.domainClassificationRef !== null ||
-    value.domainConfidenceFloor !== null ||
-    value.classifierRevision !== null;
-  if (hasClassificationBinding && (
-    value.domainClassificationRef === null ||
-    value.domainConfidenceFloor === null ||
-    value.classifierRevision === null
-  )) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['domainClassificationRef'],
-      message: 'MOVE_DOMAIN_CLASSIFICATION_BINDING_INCOMPLETE',
-    });
-  }
-  if ((value.permissionClass === 'WRITE' || value.permissionClass === 'ADMIN') && !value.approvalRequired) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['approvalRequired'],
-      message: 'MUTATING_MOVE_REQUIRES_APPROVAL',
-    });
-  }
-});
-export type AgentMoveDescriptorV1 = z.infer<typeof AgentMoveDescriptorV1Schema>;
-
-export function buildAgentMoveDescriptorV1(
-  input: Omit<AgentMoveDescriptorV1, 'schema' | 'canonicalAuthority'>,
-): AgentMoveDescriptorV1 {
-  return AgentMoveDescriptorV1Schema.parse({
-    schema: 'atlas.agent-move-descriptor.v1',
-    ...input,
     canonicalAuthority: false,
   });
 }
