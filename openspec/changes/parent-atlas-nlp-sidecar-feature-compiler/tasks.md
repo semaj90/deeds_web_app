@@ -2154,3 +2154,32 @@ repair, to stay converged. That periodic-reverification need is a real follow-up
 → `RETRIEVAL-ABLATION-RUN-01` → `CONTEXT-SUBGRAPH-MANIFEST-01` → `GPU-ADMISSION-POLICY-V1`) is
 recorded here as the proposed next sequence but **not started** — each is a substantial, separate
 gate and none was requested explicitly this session.
+
+
+## 2026-10-07 — Pokédex agent-move / domain-classifier alignment
+
+This extends the existing classification owner model; it does not create a new classifier, sidecar,
+training path, or taxonomy authority.
+
+- [ ] **CLASSIFIER-MOVE-ROUTING-01** — expose a read-only adapter from the existing
+  `DomainClassificationV1` envelope to bounded agent-move eligibility. Inputs must include the
+  classification artifact/reference, classifier revision, taxonomy revision, complete probability
+  map, caller-supplied confidence floor, and target move/capability. Output is routing evidence only
+  (`ELIGIBLE | BELOW_CONFIDENCE_FLOOR | DOMAIN_NOT_ALLOWED | NOT_PROVEN`), never authorization.
+- [ ] **CLASSIFIER-MOVE-ROUTING-02** — preserve the current classifier ownership:
+  `python/train_domain_classifier.py` remains the offline sklearn MultinomialNB +
+  LogisticRegression baseline; `python/atlas_nlp_classification_helper_v1.py` remains a read-only
+  seam; `:8095` remains an evidence executor. Do not add a second LR/NB trainer or a PyTorch LR
+  owner before the reviewed-set baseline is strong enough to compare challengers.
+- [ ] **CLASSIFIER-MOVE-EVAL-03** — evaluate move routing on the same reviewed domain corpus and
+  report top-k recall, per-class precision/recall, ECE, confidence-floor sweep, move-selection
+  accuracy, false WRITE/ADMIN eligibility rate, and fallback rate. Classification is probabilistic;
+  exact identity/revision coordinates remain fail-closed and are excluded from fuzzy scoring.
+- [ ] **CLASSIFIER-MOVE-LUT-04** — only after the classifier evaluation gate passes, derive a
+  revisioned domain→move eligibility LUT for prefill routing. The LUT stores allowed capability
+  masks / cost buckets / traversal-budget presets, not model reasoning, source identity, or
+  authorization. Bind the LUT to classifier, taxonomy, policy, and move-registry revisions.
+- [ ] **CLASSIFIER-MOVE-VITERBI-05** — feed domain-classification probabilities into the existing
+  Viterbi MCP-tool frame compiler as emission features only after registry revision and held-out
+  routing evaluation are frozen. Viterbi remains challenger-only until it beats the deterministic
+  selector without increasing write-capable false positives.
