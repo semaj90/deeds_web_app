@@ -11,6 +11,8 @@ import {
   buildExecutorRequestV1,
   QueryExecutionPlanV1Schema,
   ExecutorRequestV1Schema,
+  AgentMoveDescriptorV1Schema,
+  buildAgentMoveDescriptorV1,
 } from './agent-control-plane-v1.js';
 
 const digest = `sha256:${'a'.repeat(64)}`;
@@ -319,5 +321,136 @@ describe('ExecutorRequestV1', () => {
       payloadPolicy: 'REFERENCES_ONLY',
       canonicalAuthority: false,
     }).success).toBe(false);
+  });
+});
+
+
+describe('AgentMoveDescriptorV1', () => {
+  it('builds a bounded read move with a complete domain-classification binding', () => {
+    const move = buildAgentMoveDescriptorV1({
+      moveId: 'move:inspect-symbol',
+      moveRevision: 'move:v1',
+      capabilityId: 'RG_EXACT_SEARCH',
+      inputSchemaRef: 'atlas.search-request.v1',
+      outputSchemaRef: 'atlas.lexical-observation.v1',
+      policyRevision: 'policy:v1',
+      permissionClass: 'READ',
+      approvalRequired: false,
+      estimatedCost: { tokenCost: 64, toolCalls: 1, latencyMs: 50 },
+      traversalBudgetRef: 'artifact:traversal-budget',
+      domainClassificationRef: 'artifact:domain-classification',
+      domainConfidenceFloor: 0.7,
+      classifierRevision: 'sklearn-nb-lr:v1',
+    });
+    expect(move.canonicalAuthority).toBe(false);
+    expect(move.permissionClass).toBe('READ');
+  });
+
+  it('rejects partial classifier bindings', () => {
+    expect(AgentMoveDescriptorV1Schema.safeParse({
+      schema: 'atlas.agent-move-descriptor.v1',
+      moveId: 'move:x',
+      moveRevision: 'move:v1',
+      capabilityId: 'RG_EXACT_SEARCH',
+      inputSchemaRef: 'in',
+      outputSchemaRef: 'out',
+      policyRevision: 'policy:v1',
+      permissionClass: 'READ',
+      approvalRequired: false,
+      estimatedCost: { tokenCost: 0, toolCalls: 0, latencyMs: 0 },
+      traversalBudgetRef: null,
+      domainClassificationRef: 'artifact:domain-classification',
+      domainConfidenceFloor: null,
+      classifierRevision: null,
+      canonicalAuthority: false,
+    }).success).toBe(false);
+  });
+
+  it('requires approval for WRITE and ADMIN moves', () => {
+    expect(() => buildAgentMoveDescriptorV1({
+      moveId: 'move:write',
+      moveRevision: 'move:v1',
+      capabilityId: 'APPLY_PATCH',
+      inputSchemaRef: 'in',
+      outputSchemaRef: 'out',
+      policyRevision: 'policy:v1',
+      permissionClass: 'WRITE',
+      approvalRequired: false,
+      estimatedCost: { tokenCost: 0, toolCalls: 1, latencyMs: 1 },
+      traversalBudgetRef: null,
+      domainClassificationRef: null,
+      domainConfidenceFloor: null,
+      classifierRevision: null,
+    })).toThrow();
+  });
+
+  it('keeps legacy execution nodes compatible by defaulting move to null', () => {
+    const parsed = QueryExecutionPlanV1Schema.parse({
+      schema: 'atlas.query-execution-plan.v1',
+      requestId: 'req:legacy',
+      queryChecksum: digest,
+      workspaceRevision: 'workspace:v1',
+      policyRevision: 'policy:v1',
+      taxonomyRevision: 'taxonomy:v1',
+      retrievalParameterPlanRef: 'artifact:retrieval-plan',
+      traversalBudgetRef: 'artifact:traversal-budget',
+      contextManifestChecksum: digest,
+      nodes: [{
+        nodeId: 'lexical',
+        helperId: 'RG_EXACT_SEARCH',
+        required: true,
+        dependsOn: [],
+        executorClass: 'TS_CPU_WORKER',
+        transport: 'LOCAL',
+        parametersChecksum: digest,
+        inputArtifactRefs: [],
+        evidenceRefs: [],
+        outputSchemaRef: 'atlas.lexical-observation.v1',
+        maxTokens: 0,
+        timeoutMs: 1000,
+      }],
+      stopConditions: ['done'],
+      canonicalAuthority: false,
+    });
+    expect(parsed.nodes[0]?.move).toBeNull();
+  });
+
+  it('rejects an executor whose move capability does not match helperId', () => {
+    const result = ExecutorRequestV1Schema.safeParse({
+      schema: 'atlas.executor-request.v1',
+      requestId: 'req:1',
+      executionId: 'exec:1',
+      nodeId: 'n1',
+      helperId: 'RG_EXACT_SEARCH',
+      executorClass: 'TS_CPU_WORKER',
+      transport: 'LOCAL',
+      workspaceRevision: 'workspace:v1',
+      policyRevision: 'policy:v1',
+      parametersChecksum: digest,
+      inputArtifactRefs: [],
+      evidenceRefs: [],
+      expectedOutputSchemaRef: 'atlas.lexical-observation.v1',
+      move: {
+        schema: 'atlas.agent-move-descriptor.v1',
+        moveId: 'move:mismatch',
+        moveRevision: 'move:v1',
+        capabilityId: 'GRAPH_EXPAND',
+        inputSchemaRef: 'in',
+        outputSchemaRef: 'out',
+        policyRevision: 'policy:v1',
+        permissionClass: 'READ',
+        approvalRequired: false,
+        estimatedCost: { tokenCost: 0, toolCalls: 1, latencyMs: 1 },
+        traversalBudgetRef: null,
+        domainClassificationRef: null,
+        domainConfidenceFloor: null,
+        classifierRevision: null,
+        canonicalAuthority: false,
+      },
+      timeoutMs: 1000,
+      payloadPolicy: 'REFERENCES_ONLY',
+      canonicalAuthority: false,
+    });
+    expect(result.success).toBe(false);
   });
 });
