@@ -542,3 +542,19 @@ does not itself authorize or mint stable-file IDs.
   reports 22 shared `upstream_node_id` values, no observed multi-revision symbols or move/rename
   aliases, and no proof that active symbol-key hashes are path-independent. This is a refreshed
   blocker receipt, not gate closure; no DB writes or fixed-pointer update occurred.
+
+## CODE-KNOW — grounded code knowledge cards (isolated proposal branch; 2026-10-07)
+
+- [x] CODE-KNOW-01: Initial existing-owner census: repo-local .okf schema, source-symbol gate, document governance and retrieval authority checked against GitHub snapshot. Full live worktree census remains open.
+- [x] CODE-KNOW-02: Add optional card_kind discriminator to repo-local docs/.okf/schema.yaml, with no change to canonical identity authority.
+- [x] CODE-KNOW-03: Draft five discriminated TypeScript knowledge-card contracts and a fail-closed proposal bundle.
+- [x] CODE-KNOW-04: Draft strict extra=forbid Pydantic card mirror. Runtime parity validation pending.
+- [ ] CODE-KNOW-05: Bind oak.find_symbol_evidence to real OaK tool owner; proposal-only bundle is not a registered tool.
+- [ ] CODE-KNOW-06: Connect module/package compilation to verified compiler and manifest owners.
+- [ ] CODE-KNOW-07: Produce version-qualified library nuance and exact source citation cards.
+- [ ] CODE-KNOW-08: Bind validator registry and independent predicate/receipt readback.
+- [ ] CODE-KNOW-09: Wire ACE/TRACE projection with revision-qualified packet readback.
+- [ ] CODE-KNOW-10: Execute end-to-end retrieval bundle with real source, symbol and evidence admissions.
+- [ ] Run full unit/parity tests, strict OpenSpec validation and local worktree diff checks; no tests were executed by the GitHub connector.
+
+These are isolated source-contract edits only. No database/schema migration, embedding call, canonical write, LSP startup, or live tool admission occurred.
