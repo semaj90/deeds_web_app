@@ -93,6 +93,12 @@ root_schema:
       enum: ["Agent", "Feature", "Domain", "Concept", "Responsibility", "Directory"]
       description: "Entity kind for classification"
 
+    # Optional additive discriminator. Existing cards without it retain legacy behavior.
+    card_kind:
+      type: string
+      enum: ["symbol", "module", "package", "library_nuance", "citation"]
+      description: "Repo-local knowledge-card subtype; not canonical packet identity"
+
     metadata:
       type: object
       required:
@@ -418,3 +424,15 @@ storage_mapping:
     keys:
       - "okf:directory:{path} → DirectoryScopeEntry JSON (24h TTL)"
       - "okf:concepts:index → concept name → pattern JSONB"
+
+# CODE-KNOW-02: additive knowledge-card subtypes. No evidence admission or
+# canonical writes are implied by this schema declaration.
+knowledge_cards:
+  contract_version: "atlas.code-knowledge-card.v1"
+  canonical_authority: false
+  discriminator: card_kind
+  kinds: [symbol, module, package, library_nuance, citation]
+  required_provenance: [packet_key, source_ref, source_revision, workspace_revision, content_hash]
+  optional_symbol_provenance: [symbol_version_id, tree_node_id, start_byte, end_byte]
+  citation_policy: "Exact source spans and revisions only; similarity is not proof"
+  admission_policy: "Fail closed until receipt, task predicate and source revision agree"
