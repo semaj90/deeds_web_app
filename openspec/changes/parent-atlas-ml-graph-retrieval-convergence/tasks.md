@@ -111,3 +111,15 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] BOOST-01 Profile existing C++ graph and Python data-conversion path; if material, prototype Boost.Graph CSR BFS/SSSP challenger and validate node/edge/revision parity, CPU memory and latency against NetworkX. No duplicate graph registry.
 - [ ] RENDER-01 Source search did not show an `AnimationMixer` implementation. Audit actual WebGPU/three.js demo ownership before adding physics. Rendering physics state and animations are *visualization consumers*, never ranking or packet-revision authorities.
 - [ ] RENDER-02 If requested, implement a separately budgeted graph visualization animation with deterministic interpolation, fixed timestep, decoupled camera/layout physics and immutable evidence snapshots. Never mutate Graphify edges from visualization simulation.
+
+## AVX2 / SIMD JSON / N-ary tile and cache (2026-10-07)
+- [x] TILE-01 Documented dedicated `4x6` candidate feature tile, tuple identity and separate model KV in `avx2-nary-tile-cache-design.md`.
+- [x] TILE-02 Added CPU-only `python/atlas_compute/candidate_concept_tile_v1.py` and fixture tests; strict four-row layout, mask/padding, immutable digest, N-ary role/revision checks. Source flags are fixture assumptions, not actual lineage join verification.
+- [ ] TILE-03 Execute `PYTHONPATH=python python -m unittest discover -s python/tests -p test_candidate_concept_tile_v1.py -v`; record runtime receipt. No test was executed by GitHub connector.
+- [ ] TILE-04 Locate SIMD JSON bridge runtime dispatch, add scalar vs AVX2 equivalence on schema-qualified JSONL tuples and UTF-8 malformed inputs.
+- [ ] TILE-05 Bind real domain taxonomy revision, NaryFact/HyperEdge evidence and lineage table to tile admission; reject stale revisions based on canonical lookup rather than row flags.
+- [ ] TILE-06 Compare scalar vs AVX2 tile scoring with explicit 8-lane packing/padding masks, CPUID dispatch, benchmark including conversion overhead.
+- [ ] TILE-07 Bind TurboVec cuVS/Qdrant ordinal candidates to separately indexed semantic_768 vectors; no 4x6 tile ANN index and no extra semantic RRF vote.
+- [ ] TILE-08 Reuse existing ACE/BitFrost descriptor/lease/gen cache authorities, materialize tile only under revision+feature+content digest, state-machine transition receipts and invalidation tests.
+- [ ] TILE-09 Bind final admitted evidence to ContextManifest/prompt prefix checksum. llama-server owns KV; no writing tile bytes into model KV.
+- [ ] TILE-10 Run RTX 3060 Ti optional 4x6 scoring transfer vs CPU, accounting for allocation/padding and comparing end-to-end latency; CPU SIMD may be faster for a tiny tile.
