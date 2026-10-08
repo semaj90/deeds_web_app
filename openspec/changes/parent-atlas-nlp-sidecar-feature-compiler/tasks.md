@@ -2154,3 +2154,12 @@ repair, to stay converged. That periodic-reverification need is a real follow-up
 → `RETRIEVAL-ABLATION-RUN-01` → `CONTEXT-SUBGRAPH-MANIFEST-01` → `GPU-ADMISSION-POLICY-V1`) is
 recorded here as the proposed next sequence but **not started** — each is a substantial, separate
 gate and none was requested explicitly this session.
+
+
+## 2026-10-07 — Tree-sitter/PyTorch sidecar → chunk-profile alignment
+
+- [ ] **SIDECAR-PROFILE-BRIDGE-01** — Added `sidecar-chunk-profile-bridge-v1.ts` as a pure/read-only adapter from existing `:8095` Tree-sitter-chunker evidence into the existing `ChunkRetrievalProfileV1` hydration owner. Structural evidence is accepted only when its `sourceRevision` exactly matches the externally resolved canonical chunk identity; the adapter performs no identity resolution, service I/O, or persistence. **IMPLEMENTED_UNPROVEN** until focused Vitest runs.
+- [ ] **SIDECAR-PROFILE-BRIDGE-02** — Preserve Tree-sitter-chunker ownership: `:8095 /ast/chunk` emits parser/chunker evidence (`upstream_chunk_id`, node type/kind/name, byte spans, imports/exports/calls/edge observations). The bridge may map these fields into the lexical/structural feature group but MUST NOT treat upstream chunk ids as `canonicalChunkId` or packet identity.
+- [ ] **SIDECAR-PROFILE-BRIDGE-03** — Keep PyTorch/neural classification as `SHADOW_ONLY` until the reviewed-set baseline gate admits a classifier revision. Shadow observations may be retained as evidence refs but MUST NOT populate `ChunkRetrievalProfileV1.domainTopic`; only an explicitly `ADMITTED` classifier observation may populate domain fields.
+- [ ] **SIDECAR-PROFILE-BRIDGE-04** — Do not infer missing semantic/topology/graph/ontology groups. `semantic_768`, graph metrics, KMeans/SOM, and ontology tuples remain absent unless their independent representation/graph/topology/ontology revision owners supply exact evidence.
+- [ ] **SIDECAR-PROFILE-BRIDGE-05** — After the Graphify snapshot/profile lineage gate closes, prove one bounded fixture/live-read-only join: canonical candidate identity → `:8095` structural evidence → sidecar bridge → `ChunkRetrievalProfileV1` → existing candidate-feature-matrix adapter. No tile/residency caller or datastore write is permitted in this gate.
