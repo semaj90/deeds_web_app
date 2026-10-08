@@ -44,3 +44,19 @@ node --test scripts/atlas/audit-live-ontology-tuple-lineage-v1.spec.mjs
 ATLAS_CATALOG_REPORT=.tmp/atlas/ontology-tuple-catalog-001.json node scripts/atlas/audit-live-ontology-tuple-lineage-v1.mjs
 ```
 The audit's output uses exclusive file creation. Supply a new report path on subsequent runs. **Do not run** `prove-ontology-linked-tuple-persistence.mjs` for this read-only gate: it performs INSERT/DELETE.
+
+## TUPLE-STORE-03 read-only implementation (2026-10-08)
+- [x] `scripts/atlas/prove-one-ontology-tuple-readback-v1.mjs` selects exactly one persisted `atlas_ontology_linked_tuples` record by explicit `ATLAS_TUPLE_ID`, in a read-only transaction, after checking the deployed column list. It checks optional lineage fields in JSONB provenance and emits a new checksummed scratch receipt.
+- [x] `scripts/atlas/prove-one-ontology-tuple-readback-v1.spec.mjs` covers missing provenance, checksum/readback tampering, expected provenance mismatch, non-admission, absent tuple and missing fields.
+- [ ] Run catalog audit before the persisted tuple audit; establish the exact deployed owner and a real tuple ID. This script intentionally does not query the other KAG tuple surface.
+- [ ] Independently re-open authoritative source bytes; compare `evidenceSpanChecksum` over the original byte slice (the stored JSONB digest alone is not source proof).
+- [ ] Resolve the actual evidence receipts/card/task owner and exact packet-key-bound source execution membership, from *real catalog metadata*. Do not infer from `atlas_evidence` naming.
+- [ ] Verify Pydantic/Arrow live readback with the same persisted JSONB body; the earlier fixture-level mirrors are not database readback.
+- [ ] Only after admitted evidence is independently verified: request-scoped OaK invocation, canonical CandidateOrdinalMapV1 retrieval, ContextManifest checksum and separately approved durable DAG CAS.
+
+Run locally (Node with `pg` package and a known existing tuple ID):
+```sh
+node --test scripts/atlas/prove-one-ontology-tuple-readback-v1.spec.mjs
+ATLAS_TUPLE_ID='REAL_TUPLE_ID' ATLAS_TUPLE_READBACK_REPORT=.tmp/atlas/ontology-tuple-readback-001.json node scripts/atlas/prove-one-ontology-tuple-readback-v1.mjs
+```
+**Never run** the legacy write-capable `prove-ontology-linked-tuple-persistence.mjs` as part of this read-only check. No migration or persistent-store mutation is necessary.
