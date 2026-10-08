@@ -89,10 +89,48 @@ def prove(dsn: str) -> dict:
             final = conn.execute(f"SELECT status,version FROM {quoted}.steps").fetchone()
             events = conn.execute(f"SELECT count(*) FROM {quoted}.outbox").fetchone()[0]
             assert final==("SUCCEEDED",2) and events==1, "FINAL_READBACK_FAILED"
+            # Separate revision-pinned lease expiry and fencing scenario. Force an
+            # expired timestamp; no sleeps and no wall-clock race.
+            conn.execute(f"""INSERT INTO {quoted}.steps
+                (run_id,status,lease_id,lease_expires_at,generation,version,dag_revision,source_revision)
+                VALUES ('reclaim','RUNNING','dead-worker',
+                clock_timestamp()-interval '1 second',7,4,'dag2','source2')""")
+            conn.commit()
+            reclaimed = conn.execute(f"""UPDATE {quoted}.steps
+                SET lease_id='replacement-worker',
+                    lease_expires_at=clock_timestamp()+interval '30 seconds',
+                    generation=generation+1,version=version+1
+                WHERE run_id='reclaim' AND status='RUNNING'
+                  AND lease_expires_at<clock_timestamp()
+                  AND generation=7 AND version=4
+                  AND dag_revision='dag2' AND source_revision='source2'
+                RETURNING generation,version""").fetchall()
+            assert reclaimed==[(8,5)], "EXPIRED_LEASE_NOT_RECLAIMED"
+            conn.commit()
+            stale_after_reclaim = conn.execute(f"""UPDATE {quoted}.steps
+                SET status='SUCCEEDED'
+                WHERE run_id='reclaim' AND lease_id='dead-worker'
+                  AND generation=7 AND version=4
+                  AND dag_revision='dag2' AND source_revision='source2'
+                RETURNING run_id""").fetchall()
+            assert not stale_after_reclaim, "PREVIOUS_GENERATION_PROMOTED"
+            wrong_revision = conn.execute(f"""UPDATE {quoted}.steps
+                SET status='SUCCEEDED'
+                WHERE run_id='reclaim' AND lease_id='replacement-worker'
+                  AND generation=8 AND version=5
+                  AND dag_revision='dag2' AND source_revision='source-old'
+                RETURNING run_id""").fetchall()
+            assert not wrong_revision, "STALE_SOURCE_PROMOTED"
+            current = conn.execute(f"""SELECT lease_id,generation,version,status
+                FROM {quoted}.steps WHERE run_id='reclaim'""").fetchone()
+            assert current==('replacement-worker',8,5,'RUNNING'), "RECLAIM_READBACK_INVALID"
+            conn.rollback()
         return {"schema":"atlas.dag-concurrent-claim-proof.v1","verdict":"TWO_SESSION_FIXTURE_PASS",
                 "winner":winner,"loser":loser,"generation":generation,
                 "staleReject":True,"injectedRollbackAtomic":True,
-                "outboxEvents":events,"applicationTablesTouched":False}
+                "outboxEvents":events,"expiredLeaseReclaimed":True,
+                "fencingGenerationAdvanced":True,"oldOwnerRejected":True,
+                "sourceRevisionMismatchRejected":True,"applicationTablesTouched":False}
     finally:
         with psycopg.connect(dsn, autocommit=True) as cleanup:
             cleanup.execute(f"DROP SCHEMA IF EXISTS {quoted} CASCADE")
