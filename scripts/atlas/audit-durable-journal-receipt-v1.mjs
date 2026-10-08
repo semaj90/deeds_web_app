@@ -4,6 +4,7 @@
  * Usage: node scripts/atlas/audit-durable-journal-receipt-v1.mjs <receipt.json>
  */
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 const REQUIRED_TABLES = ['execution_runs','execution_journal_steps','execution_dependencies','execution_side_effects'];
 const FENCING = ['lease_id','lease_expires_at','generation','state_version'];
 export function evaluateJournalInventory(input) {
@@ -33,7 +34,7 @@ export function evaluateJournalInventory(input) {
     errors,
   };
 }
-if (process.argv[1] && import.meta.url === new URL('file://'+process.argv[1]).href) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   if (process.argv.length !== 3) { console.error('Usage: node scripts/atlas/audit-durable-journal-receipt-v1.mjs <receipt.json>'); process.exit(2); }
   try {
     const output=evaluateJournalInventory(JSON.parse(readFileSync(process.argv[2],'utf8')));
