@@ -41,7 +41,11 @@ export class EdgeModelHarness {
     this.state = 'loading';
     const controller = new AbortController();
     this.controller = controller;
-    const operation = Promise.resolve().then(() => this.engine.load(this.identity, controller.signal));
+    let operation: Promise<void>;
+    try {
+      if (controller.signal.aborted) throw new Error('load cancelled');
+      operation = Promise.resolve(this.engine.load(this.identity, controller.signal));
+    } catch (error) { operation = Promise.reject(error); }
     this.inFlight = operation;
     try {
       await operation;
@@ -62,10 +66,11 @@ export class EdgeModelHarness {
     const controller = new AbortController();
     this.controller = controller;
     const started = performance.now();
-    const operation = Promise.resolve().then(() => {
+    let operation: Promise<{ text: string; tokenCount: number }>;
+    try {
       if (controller.signal.aborted) throw new Error('generation cancelled');
-      return this.engine.generate(prompt, controller.signal);
-    });
+      operation = Promise.resolve(this.engine.generate(prompt, controller.signal));
+    } catch (error) { operation = Promise.reject(error); }
     this.inFlight = operation;
     try {
       const result = await operation;
