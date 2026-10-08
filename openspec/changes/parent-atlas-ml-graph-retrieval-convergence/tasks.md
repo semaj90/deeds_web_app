@@ -243,3 +243,10 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [x] JR-AUDIT-04 PowerShell now parses SQL JSON and fails closed when the schema identifier is unexpected, journal tables are missing, or fencing columns are incomplete. **Source change only; workstation execution not yet verified.**
 - [ ] JR-AUDIT-05 Run focused Python, OaK and GNN tests on real Windows/WSL environments. Verify receipt readback and source revision binding; no local execution was performed by this GitHub commit.
 - [ ] JR-AUDIT-06 Investigate the new-run/state persistence owner and transactional dependencies separately from the OpenSpec evidence ledger. No DDL or persistent writes until migration authorization.
+
+## Durable journal offline receipt gate (2026-10-08)
+- [x] JR-RECEIPT-01 Added `scripts/atlas/audit-durable-journal-receipt-v1.mjs`: offline validation of table presence, required columns/index coverage, fencing fields, and read-only marker; status remains SCHEMA_CANDIDATE_ONLY even if checks pass.
+- [x] JR-RECEIPT-02 Added `scripts/atlas/audit-durable-journal-receipt-v1.test.mjs`: three negative/control fixtures; tests authored, not executed via GitHub connector.
+- [x] JR-RECEIPT-03 Updated PowerShell runner to retain the parsed journal inventory in the local scratch receipt before reporting missing fencing columns.
+- [ ] JR-RECEIPT-04 Run `node scripts/atlas/audit-durable-journal-receipt-v1.test.mjs`; then run opt-in Docker probe and validate extracted `journalInventory` with offline validator. CI and workstation proof outstanding.
+- [ ] JR-RECEIPT-05 Independently inspect journal unique indexes, FK/dependency scope, lease-expiry SQL semantics, and transactional outbox presence before enabling actual claim writes. Presence of columns alone is insufficient.
