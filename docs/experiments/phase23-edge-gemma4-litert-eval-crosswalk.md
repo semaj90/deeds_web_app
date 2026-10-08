@@ -148,3 +148,34 @@ More gates:
 - [ ] EDGE-AGENT-02 Investigate local ACP/A2A protocol authority, capabilities, leases, allowlisted repair actions and human approvals.
 - [ ] EDGE-AGENT-03 Persist validated readback/receipt after authorized repair; no claim of successful fix before repeat tests.
 - [ ] EDGE-TEST-01 Execute Vitest in an environment where esbuild spawning is permitted; GitHub commits alone don't prove tests passed.
+
+## Phase 23 validation status expansion — 2026-10-08
+New experiment-only artifacts:
+- `sveltekit-frontend/src/lib/ai/edge/phase23-validation-status.ts`: static fail-closed gate inventory and aggregate missing evidence.
+- `sveltekit-frontend/src/lib/ai/edge/phase23-artifact-integrity.ts`: SHA256 compare for **caller-supplied bytes**, not streaming/model download.
+- Matching Vitest specs for both modules.
+- `sveltekit-frontend/scripts/phase23-edge-status.mjs`: read-only repo/source/asset census with original model URLs.
+
+Run from frontend:
+```bash
+node scripts/phase23-edge-status.mjs
+npx vitest run src/lib/ai/edge/phase23-validation-status.spec.ts src/lib/ai/edge/phase23-artifact-integrity.spec.ts
+```
+These commands have not been executed against a workstation in this work pass.
+
+### Summary of what is missing
+1. **Physical model evidence:** model files on workstation, pinned HF revisions, real SHA256, model graph and tokenizer validation.
+2. **Real inference:** pinned `@litert-lm/core`, browser-compatible E2B graph, generated-token callback, proper context reset, measured prefill/decode.
+3. **Lifecycle:** GPU/CPU backend abort, cancel/dispose races, WebGPU device-lost, memory release, repeated-load leak tests.
+4. **Client fallback:** match and compare Gemma3 270M, Gemma4 E2B ONNX, LiteRT-LM with explicit result attribution; no unmeasured speed claims.
+5. **Evidence-grounded SLM:** classification, pattern extraction, RAG/KAG/DAG/HITS, citations/abstentions and Eval Gym fixture thresholds.
+6. **Vector search:** EmbeddingGemma2 separate identity/index, MRR/Recall/nDCG parity, downstream RRF/reranker/ContextManifest checks.
+7. **Agentic repair:** connect descriptive ACP/A2A task candidates to existing TaskCard/EvidenceCard owner, capability/approval barrier, readback and audit.
+8. **Canonical runtime:** current Ornith :8090 and active embedding backend live health/props proof.
+9. **Optimization:** browser MTP, Paretrix/REAP, Cerebras-like weight streaming require separate measured ablations.
+
+### Important limitations
+- Hash checker currently takes a full ArrayBuffer: large multi-GiB model hashing needs memory-bounded streaming or native verification before use on browser devices.
+- Static gate list is a planning ledger, not connected to canonical OpenSpec receipt tables.
+- Model inventory only checks filesystem existence and byte sizes; it doesn't prove loaded model or correct inference.
+- All eval gates are NOT_PROVEN until actual receipts are captured. Avoid labeling authored tests as passed.
