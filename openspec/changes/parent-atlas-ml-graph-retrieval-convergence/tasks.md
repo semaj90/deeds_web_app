@@ -320,3 +320,12 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] PERSIST-04 Independently rederive row checksums from retained source and compiler contract and read back persisted tuple. A stored input_digest is insufficient on its own.
 - [ ] PERSIST-05 Run controlled new-row write/readback in approved test database, then bounded 16-row replay. Old unqualified rows remain blocked; no automatic backfill.
 - [ ] PERSIST-06 Rebuild [C,25] only after all admitted rows have required provenance and separate missing-data masks.
+
+## 2026-10-08 source vs snapshot feature lineage policy correction
+- [x] BIND-01 Added SOURCE_BOUND and SNAPSHOT_BOUND modes to `packages/parent-atlas/src/core/observation-feature-lineage-admission-v1.ts`. No blanket per-row workspace requirement. Requires exact source evidence, feature-definition proof, and source digest; graph/taxonomy features require contextual snapshot proof.
+- [x] BIND-02 Updated corresponding Vitest fixtures (nine scenarios), authored but not executed through GitHub.
+- [x] BIND-03 Updated feature-lineage persistence design to defer all additive columns and prefer lossless preexisting provenance receipts and CandidateOrdinalMap membership.
+- [ ] BIND-04 Inspect real producer feature-family scope and map graph/community, KMeans/SOM, ontology/taxonomy and AST/NLP outputs to SOURCE/WORKSPACE/GRAPH/TAXONOMY explicitly. Current scope field is a caller label, not independently verified.
+- [ ] BIND-05 Connect independent source/digest/registry/receipt readback owner; do not treat the boolean proof fields of the pure helper as authoritative.
+- [ ] BIND-06 Run focused tests/typecheck in actual repo checkout and compare 16-row profile readback; do not admit historical rows by inferring missing source or feature lineage.
+- [ ] BIND-07 Only revise storage writers/migrations after determining whether existing immutable receipt linkage is sufficient. Preserve the canonical 25,542-row snapshot and no persistent writes.
