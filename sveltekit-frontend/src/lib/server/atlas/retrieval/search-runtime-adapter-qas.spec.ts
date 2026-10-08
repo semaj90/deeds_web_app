@@ -74,6 +74,22 @@ describe('SearchRuntime QAS projection boundary', () => {
     expect(manifestResult.snapshot.rows[0]?.canonicalId).toBe('symbol:one');
     expect(manifestResult.snapshot.identityAuthority).toBe(false);
     expect(manifestResult.writesPerformed).toBe(false);
+    expect(manifestResult.candidateFeatureMatrixArtifact.matrix.rows).toBe(1);
+    expect(manifestResult.candidateFeatureMatrixArtifact.crosswalk.bindings[0]).toMatchObject({
+      candidateOrdinal: 0,
+      rowOrdinal: 0,
+      canonicalId: 'symbol:one',
+      packetKey: 'packet:one',
+      workspaceRevision: 'workspace:r1',
+    });
+    expect(manifestResult.candidateFeatureMatrixArtifact.cells).toHaveLength(11);
+    expect(manifestResult.candidateFeatureMatrixArtifact.cells.find((cell) => cell.featureName === 'semantic_score')).toMatchObject({
+      value: null, available: false, reason: 'SEMANTIC_COHORT_ADMISSION_NOT_SUPPLIED',
+    });
+    expect(manifestResult.candidateFeatureMatrixArtifact.cells.find((cell) => cell.featureName === 'global_pagerank')).toMatchObject({
+      value: null, available: false, reason: 'NO_ADMITTED_STRUCTURAL_GRAPH',
+    });
+    expect(manifestResult.candidateFeatureMatrixArtifact.receipt.matrixChecksum).toMatch(/^[a-f0-9]{64}$/);
     expect(manifestResult.retrievalCacheIdentity?.featureRevision).toBe('features:r1');
     expect(manifestResult.retrievalCacheIdentity?.workspaceRevision).toBe('workspace:r1');
 

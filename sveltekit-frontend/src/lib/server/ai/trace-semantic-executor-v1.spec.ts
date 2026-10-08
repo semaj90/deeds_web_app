@@ -5,7 +5,8 @@ const revision = `sha256:${'a'.repeat(64)}`;
 const vector = Array.from({ length: 768 }, (_, index) => index === 0 ? 1 : 0);
 const cohort: TraceSemanticCohortRowV1[] = [{
   canonicalId: 'chunk:one', packetKey: 'packet:one', sourceRef: 'src/one.ts',
-  workspaceRevision: revision, sourceRevision: `sha256:${'b'.repeat(64)}`, vector,
+  workspaceRevision: revision, sourceRevision: `sha256:${'b'.repeat(64)}`,
+  representationRevision: 'semantic-768-test-v1', vector,
 }];
 
 describe('TRACE semantic executor', () => {
@@ -60,5 +61,32 @@ describe('TRACE semantic executor', () => {
       cuvsExact: async () => { throw new Error('must not execute'); },
     });
     expect(result).toMatchObject({ status: 'BLOCKED', reason: 'CUVS_FALLBACK_QUERY_SEMANTIC_768_INVALID', writesPerformed: false });
+  });
+
+  it('blocks fallback when query representation revision is missing', async () => {
+    const result = await executeTraceSemanticV1({
+      admittedWorkspaceRevision: revision, queryVector: vector, topK: 1,
+      semanticRepresentationRevision: '',
+      qdrantSearch: async () => { throw new Error('qdrant unavailable'); },
+      loadCohort: async () => { throw new Error('must not load'); },
+      cuvsExact: async () => { throw new Error('must not execute'); },
+    });
+    expect(result).toMatchObject({ status: 'BLOCKED', reason: 'CUVS_FALLBACK_SEMANTIC_REPRESENTATION_REVISION_REQUIRED', writesPerformed: false });
+  });
+
+  it('blocks fallback when corpus representation revision is missing or mismatched', async () => {
+    for (const [representationRevision, reason] of [
+      [null, 'CUVS_FALLBACK_COHORT_REPRESENTATION_REVISION_MISSING'],
+      ['semantic-768-other-v1', 'CUVS_FALLBACK_COHORT_REPRESENTATION_REVISION_MISMATCH'],
+    ] as const) {
+      const result = await executeTraceSemanticV1({
+        admittedWorkspaceRevision: revision, queryVector: vector, topK: 1,
+        semanticRepresentationRevision: 'semantic-768-test-v1',
+        qdrantSearch: async () => { throw new Error('qdrant unavailable'); },
+        loadCohort: async () => [{ ...cohort[0], representationRevision }],
+        cuvsExact: async () => { throw new Error('must not execute'); },
+      });
+      expect(result).toMatchObject({ status: 'BLOCKED', reason, writesPerformed: false });
+    }
   });
 });

@@ -8,7 +8,7 @@
  * row text under raw, `title: none | text:` and `title: {relative_path} | text:`. Cosine >= THRESHOLD names the recipe, else UNKNOWN
  * (preserved, never guessed). Also breaks results down by source root and content length.
  *
- * Usage: node scripts/atlas/audit-embedding-recipe-census-v1.mjs [--per-stratum=100]
+ * Usage: node scripts/atlas/audit-embedding-recipe-census-v1.mjs [--per-stratum=100] [--out=path]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,6 +20,7 @@ const require = createRequire(path.join(repoRoot, 'sveltekit-frontend', 'package
 const { Client } = require('pg');
 const arg = (n, d) => (process.argv.find((a) => a.startsWith(`--${n}=`)) ?? '').split('=')[1] ?? d;
 const PER = Number(arg('per-stratum', 100));
+const OUTPUT_PATH = path.resolve(repoRoot, arg('out', 'docs/reports/embedding-recipe-census-v1.json'));
 const THRESHOLD = 0.995;
 const OLLAMA = process.env.OLLAMA_URL ?? 'http://127.0.0.1:11434';
 
@@ -65,6 +66,13 @@ const db = new Client({ connectionString: envVal('DATABASE_URL'), statement_time
 await db.connect();
 const receipt = { schema: 'atlas.embedding-recipe-census.v1', canonicalAuthority: false, mode: 'READ_ONLY', perStratum: PER, threshold: THRESHOLD, strata: {} };
 
+try {
+  await db.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  const transactionMode = await db.query('SHOW transaction_read_only');
+  if (transactionMode.rows[0]?.transaction_read_only !== 'on') throw new Error('POSTGRES_READ_ONLY_TRANSACTION_NOT_CONFIRMED');
+  receipt.databaseTransactionReadOnly = true;
+  receipt.transactionIsolation = 'repeatable read';
+
 for (const [stratum, cond] of Object.entries(STRATA)) {
   const total = Number((await db.query(`SELECT count(*) FROM codebase_chunk_index WHERE ${cond}`)).rows[0].count);
   const rows = (await db.query(
@@ -107,8 +115,16 @@ for (const [stratum, cond] of Object.entries(STRATA)) {
   };
   console.log(`${stratum}: population=${total} sampled=${rows.length} ce=${JSON.stringify(cols.content_embedding)} ce768=${JSON.stringify(cols.content_embedding_768)}`);
 }
-await db.end();
+  await db.query('COMMIT');
 receipt.databaseWrites = false;
+receipt.localReceiptWrite = true;
 receipt.outcome = 'RECIPE_CENSUS_PROVEN_UNKNOWN_ROWS_PRESERVED';
-fs.writeFileSync(path.join(repoRoot, 'docs/reports/embedding-recipe-census-v1.json'), JSON.stringify(receipt, null, 2) + '\n', 'utf8');
-console.log('receipt written: docs/reports/embedding-recipe-census-v1.json');
+fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
+fs.writeFileSync(OUTPUT_PATH, JSON.stringify(receipt, null, 2) + '\n', 'utf8');
+console.log(`receipt written: ${OUTPUT_PATH}`);
+} catch (error) {
+  await db.query('ROLLBACK').catch(() => {});
+  throw error;
+} finally {
+  await db.end();
+}

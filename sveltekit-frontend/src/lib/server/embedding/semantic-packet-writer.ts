@@ -33,7 +33,7 @@ export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	titleId?: string | null;
 	vector: readonly number[] | Float32Array;
 	encoderRevision?: string;
-	representationRevision?: number;
+	representationRevision: number;
 	sourceRepresentationId?: string;
 	sourceDimension?: number;
 	projectionRepresentationId?: string | null;

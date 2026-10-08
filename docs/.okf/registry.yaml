@@ -233,6 +233,15 @@ contracts:
       - no_runtime_taxonomy_migration
       - no_canonical_identity_authority
       - langchain_local_snapshot_is_unadmitted
+  - name: context-engineering-docs-v1
+    owner: docs/.okf/dev/context-engineering-docs-v1.json
+    role: bounded official-doc acquisition manifest for cache, serialization, RPC, data interchange, and context engineering references
+    notes:
+      - isolated_output_root_required
+      - local_reference_only
+      - canonical_authority_false
+      - no_external_doc_admission_or_embedding
+      - internal_ACE_and_BitFrost_contracts_remain_repo_owned
   - name: langchain-typescript-local-corpus-v1
     owner: docs/.okf/topics/langchain/corpus-typescript.json
     role: artifact-only official TypeScript/OpenWiki docs source scope for local retrieval

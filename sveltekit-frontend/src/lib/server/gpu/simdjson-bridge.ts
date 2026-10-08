@@ -206,7 +206,9 @@ const MIN_NATIVE_BYTES = 1024;
  * Results cached with 8 MB byte-budget LRU for 30 s.
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
-export function fastJsonParse<T = unknown>(input: string): T {
+export type FastJsonParseBackend = 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'CACHE';
+
+export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T; backend: FastJsonParseBackend } {
 	// OOM guard — bail before any allocation
 	if (input.length > MAX_INPUT_BYTES) {
 		throw new RangeError(
@@ -218,7 +220,7 @@ export function fastJsonParse<T = unknown>(input: string): T {
 	// Check LRU cache (hash computed over L1-friendly prefix)
 	const cacheKey = fnv1aKey(input);
 	const cached = lruGet(cacheKey);
-	if (cached !== undefined) return cached as T;
+	if (cached !== undefined) return { value: cached as T, backend: 'CACHE' };
 
 	stats.misses++;
 	stats.totalBytesParsed += input.length;
@@ -234,17 +236,24 @@ export function fastJsonParse<T = unknown>(input: string): T {
 			result = JSON.parse(validated) as T;
 			stats.nativeParses++;
 			stats.nativeTimeMs += (performance.now() - start);
+			lruSet(cacheKey, result);
+			return { value: result, backend: 'SIMDJSON_NAPI' };
 		} catch {
 			stats.fallbackParses++;
 			result = JSON.parse(input) as T;
+			lruSet(cacheKey, result);
+			return { value: result, backend: 'V8_JSON_PARSE' };
 		}
 	} else {
 		stats.fallbackParses++;
 		result = JSON.parse(input) as T;
+		lruSet(cacheKey, result);
+		return { value: result, backend: 'V8_JSON_PARSE' };
 	}
+}
 
-	lruSet(cacheKey, result);
-	return result;
+export function fastJsonParse<T = unknown>(input: string): T {
+	return fastJsonParseWithBackend<T>(input).value;
 }
 
 /**

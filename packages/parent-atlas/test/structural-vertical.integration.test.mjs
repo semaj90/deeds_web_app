@@ -77,6 +77,7 @@ const evidence = {
       from_evidence_key: 'node-patch',
       to_evidence_key: 'node-auth',
       type: 'CALLS',
+      occurrence_positions: [[1, Buffer.byteLength(source.slice(0, source.indexOf('authorizeCase')), 'utf8')]],
       evidence_start_line: 0,
       evidence_start_column: 30,
       evidence_end_line: 0,

@@ -32,8 +32,10 @@ function plan(overrides: Partial<SGraphSearchPlanV1>): SGraphSearchPlanV1 {
     algorithm: 'BREADTH_FIRST',
     sourceCanonicalId: 'A',
     targetCanonicalIds: ['D'],
+    allowedEdgeKinds: ['CALLS', 'REFERENCES'],
     maxDepth: 8,
     maxExpansions: 100,
+    maxPathCost: 100,
     beamWidth: null,
     edgeCostModel: 'UNIFORM',
     heuristicKind: 'ZERO',
@@ -53,6 +55,81 @@ describe('SGraph search ladder', () => {
     expect(receipt.pathCost).toBe(2);
     expect(receipt.optimalityClaim).toBe('SHORTEST_HOPS');
     expect(receipt.approximate).toBe(false);
+  });
+
+  it('restricts traversal to the edge kinds declared by the plan', () => {
+    const receipt = searchSGraph({
+      graph,
+      plan: plan({ allowedEdgeKinds: ['CALLS'] }),
+    });
+    expect(receipt.pathCanonicalIds).toEqual(['A', 'B', 'D']);
+    expect(receipt.allowedEdgeKinds).toEqual(['CALLS']);
+  });
+
+  it('searches from multiple roots with deterministic seed ordering', () => {
+    const first = searchSGraph({
+      graph,
+      plan: {
+        ...plan({}),
+        sourceCanonicalId: undefined,
+        sourceCanonicalIds: ['C', 'A'],
+      },
+    });
+    const reversed = searchSGraph({
+      graph,
+      plan: {
+        ...plan({}),
+        sourceCanonicalId: undefined,
+        sourceCanonicalIds: ['A', 'C'],
+      },
+    });
+    expect(first.sourceCanonicalIds).toEqual(['A', 'C']);
+    expect(first.pathCanonicalIds).toEqual(['A', 'B', 'D']);
+    expect(reversed.pathCanonicalIds).toEqual(first.pathCanonicalIds);
+  });
+
+  it('enforces and reports the path-cost ceiling', () => {
+    const boundedPlan = plan({
+      edgeCostModel: 'EDGE_KIND_COST',
+      maxPathCost: 6,
+      requireOptimalPath: false,
+    });
+    const receipt = searchSGraph({
+      graph,
+      plan: boundedPlan,
+      edgeCostsByKind: { CALLS: 5, REFERENCES: 1 },
+    });
+    expect(receipt.found).toBe(false);
+    expect(receipt.termination).toBe('PATH_COST_LIMIT_REACHED');
+    expect(receipt.maxPathCost).toBe(6);
+  });
+
+  it.each(['UNIFORM_COST', 'GREEDY_BEST_FIRST', 'BEAM', 'A_STAR'] as const)(
+    '%s honors the same path-cost ceiling',
+    (algorithm) => {
+      const receipt = searchSGraph({
+        graph,
+        plan: plan({
+          algorithm,
+          edgeCostModel: 'EDGE_KIND_COST',
+          maxPathCost: 6,
+          beamWidth: algorithm === 'BEAM' ? 2 : null,
+          heuristicKind: 'ZERO',
+          heuristicAdmissibility: 'NOT_REQUIRED',
+          requireOptimalPath: algorithm !== 'GREEDY_BEST_FIRST' && algorithm !== 'BEAM',
+        }),
+        edgeCostsByKind: { CALLS: 5, REFERENCES: 1 },
+      });
+      expect(receipt.found).toBe(false);
+      expect(receipt.termination).toBe('PATH_COST_LIMIT_REACHED');
+    },
+  );
+
+  it('rejects duplicate edge kinds in the plan', () => {
+    expect(() => searchSGraph({
+      graph,
+      plan: plan({ allowedEdgeKinds: ['CALLS', 'CALLS'] }),
+    })).toThrow(/allowedEdgeKinds must be unique/);
   });
 
   it('uniform-cost search chooses the cheaper weighted path even when it has more hops', () => {

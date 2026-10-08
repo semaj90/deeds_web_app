@@ -229,7 +229,7 @@ async function main() {
         COUNT(CASE WHEN outcome = 'success' THEN 1 END) AS success
         FROM agent_traces`).catch(() => null),
 
-      pool.query(`SELECT COUNT(DISTINCT concept_id) AS total FROM concept_evidence`).catch(() => null),
+      pool.query(`SELECT COUNT(DISTINCT concept_id) AS total FROM concept_records`).catch(() => null),
 
       pool.query(`SELECT
         COUNT(*) AS total,

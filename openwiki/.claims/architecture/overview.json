@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f58dcd0b959936b430ad9f9e55acd95f6fea3c1206410b6a940e777317ee06f3",
+  "claims": [
+    {
+      "id": "claim_983e98df9ac748bbb8acab020a893a32",
+      "statement": "Parent Atlas uses PostgreSQL as a packet authority, Qdrant for vector storage, and LangGraph/Mastra for agent orchestration.",
+      "evidence": [
+        {
+          "resource": "repo://ARCHITECTURE_SPEC.md",
+          "version": "repo-file-v1:sha256:9b42b94919fdcb421efeea86606f24e842ce195e8b64c84dae72f7247069867c"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

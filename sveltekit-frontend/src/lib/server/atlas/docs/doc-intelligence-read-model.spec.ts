@@ -262,19 +262,25 @@ describe('dense search', () => {
 		return { calls, pool: { async query(sql: string, params: unknown[]) { calls.push({ sql, params }); if (fail) throw new Error('down'); return { rows }; } } as never };
 	};
 
-	it('returns canonical hits with provenance, bounded limit, filters as parameters, and a representation caveat', async () => {
+	it('returns canonical hits with page/chunk evidence and a structured parity receipt', async () => {
 		const { pool, calls } = poolWith([row]);
-		const r = await searchDocCorpusDense({ pool, queryVector: vec, limit: 99, product: 'x' });
+		const r = await searchDocCorpusDense({ pool, queryVector: vec, limit: 99, product: 'x', productVersion: '1' });
 		expect(r.mode).toBe('POSTGRES_DENSE');
 		expect(r.hits[0]).toMatchObject({ sourceClass: 'CANONICAL', chunkId: 'doc:x:1:2', chunkEvidenceRevision: 'sha256:c', revision: 'sha256:p' });
 		expect(r.representationCaveat).toMatch(/PARITY_UNPROVEN/);
-		expect(calls[0].params.slice(1)).toEqual([25, 'x', null]);
+		expect(r.representationAdmission).toEqual({
+			status: 'PARITY_UNPROVEN', queryDimension: 768, corpusDimension: 768,
+			queryRecipeRevision: null, corpusRecipeRevision: null, proofUsable: false
+		});
+		expect(r.queryIdentity).toEqual({ vectorChecksum: `sha256:${sha(JSON.stringify(vec))}`, queryRecipeRevision: null });
+		expect(calls[0].params.slice(1)).toEqual([25, 'x', '1']);
+		expect(calls[0].sql).toContain('ORDER BY c.content_embedding <=> $1::vector, c.chunk_id');
 		expect(calls[0].sql).not.toMatch(/(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE)/i);
 	});
 
 	it('rejects a wrong-length or non-finite vector without touching the database', async () => {
 		const { pool, calls } = poolWith([row]);
-		for (const bad of [vec.slice(0, 767), [...vec.slice(1), Number.NaN], [...vec.slice(1), Infinity]]) {
+		for (const bad of [vec.slice(0, 767), [...vec.slice(1), Number.NaN], [...vec.slice(1), Infinity], [...vec.slice(1), -Infinity]]) {
 			const r = await searchDocCorpusDense({ pool, queryVector: bad });
 			expect(r.hits).toEqual([]); expect(r.postgresNote).toBe('QUERY_VECTOR_INVALID');
 		}

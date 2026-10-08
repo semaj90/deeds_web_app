@@ -501,6 +501,7 @@ describe('canonical rerank executor', () => {
         rendererVersion: 'renderer-v1',
         maxLength: 256,
         topK: 20,
+        cachePolicy: 'disabled',
       });
 
       // Sidecar was consulted (for the shadow receipt) ...
@@ -524,6 +525,18 @@ describe('canonical rerank executor', () => {
       // weighted fallback, never 'xgboost-sidecar'.
       expect(ranked.results[0]?.model_version).not.toBe('xgboost-sidecar');
       expect(ranked.provenance.fallbackUsed).toBe(true);
+
+      xadd.mockClear();
+      await rerankCanonicalFeatureEnvelopes('read-only shadow evaluation', [...envelopes], {
+        authScope: 'scope-a',
+        rendererVersion: 'renderer-v1',
+        maxLength: 256,
+        topK: 20,
+        cachePolicy: 'disabled',
+        shadowReceiptPolicy: 'disabled',
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+      expect(xadd).not.toHaveBeenCalled();
     } finally {
       if (previousMode === undefined) delete process.env.XGBOOST_RERANK_MODE; else process.env.XGBOOST_RERANK_MODE = previousMode;
     }

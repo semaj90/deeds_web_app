@@ -1,5 +1,10 @@
 import type { ContextDagNodeHandlerV1 } from './context-tool-dag-contracts.js';
+import { createHash } from 'node:crypto';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
+import {
+  AstGrepStructuralCandidateV1Schema,
+  type AstGrepStructuralCandidateV1,
+} from '../language/ast-grep-structural-topk.js';
 
 /**
  * CONTEXT-DAG-01 handler adapters. Thin and read-only: every dependency is injected, so these never spawn
@@ -19,6 +24,7 @@ export const PRE_AGENT_STAGE_OWNER_MAP_V1: Readonly<Record<string, { status: Sta
   CACHE_LOOKUP: { status: 'READY_WITH_CAVEAT', owner: 'ace/context-cache-planner.ts + ace/llm-context-cache.ts::getContextCacheWithSource', adapter: 'makeCacheLookupHandlerV1 + makeReadOnlyContextCacheLoaderV1', note: 'needs explicit non-sentinel repoGitSha/corpusHash/graphSnapshotHash; source of real values undecided' },
   LEXICAL: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveExactMatches', adapter: 'makeCandidateLaneHandlerV1', note: 'Postgres read; SearchRuntime is the long-term injection point' },
   AST: { status: 'READY_WITH_CAVEAT', owner: 'retrieval/retrieve-candidates.ts::retrieveASTMatches', adapter: 'makeCandidateLaneHandlerV1', note: 'weak ILIKE over tree_node_id, not structural parsing' },
+  AST_STRUCTURAL_REFINE: { status: 'READY_WITH_CAVEAT', owner: 'atlas/language/ast-grep-structural-topk.ts::extractAstGrepStructuralCandidates', adapter: 'makeAstHandlerV1', note: 'lexical-dependent source-span observations only; canonical tree/symbol join and production handler composition remain open' },
   SEMANTIC_ROUTE: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveQdrant (dense_768, codebase_chunks_768)', adapter: 'makeCandidateLaneHandlerV1', note: 'embeds the query then Qdrant ANN (read-only network calls); SearchRuntime remains the sole fusion owner' },
   MEMORY_PRIOR: { status: 'NEEDS_OWNER', owner: 'memory/engram-memory.ts (not inspected)', adapter: null, note: 'Engram today, Claude-Mem adapter later; read function unverified' },
   GRAPH_EXPANSION: { status: 'NEEDS_OWNER', owner: 'ace/graph-expander.ts::fetchDeepImportGraphExpansion(filePaths): Promise<string>', adapter: null, note: 'returns an unstructured string, not revision-qualified refs; a structured read-only graph/PPR owner is still to be identified' },
@@ -656,18 +662,14 @@ export function makeLexicalHandlerV1(deps: {
   };
 }
 
-export interface AstDeclarationV1 {
-  filePath: string;
-  name: string;
-  entityKind: string;
-  startByte: number;
-  endByte: number;
-  startLine: number;
-}
+export type AstDeclarationV1 = AstGrepStructuralCandidateV1 & { spanSha256: string };
 
 export interface AstOutputV1 {
+  schema: 'atlas.ast-grep-refinement-output.v1';
   declarations: AstDeclarationV1[];
-  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_REVISION' | 'READ_FAILED' | 'EXTRACT_FAILED' }>;
+  matchedLexicalFilePaths: string[];
+  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_SOURCE_BINDING' | 'READ_FAILED' | 'EXTRACT_FAILED' | 'EXTRACT_RESULT_MISMATCH' | 'INVALID_SPAN' }>;
+  producerRevision: string;
   canonicalAuthority: false;
 }
 
@@ -683,21 +685,21 @@ export type AstExtractLikeV1 = (input: {
   workspaceRevision: string;
   sourceRevision: string;
   producerRevision: string;
-}) => Promise<Array<{ name: string; entityKind: string; startByte: number; endByte: number; startLine: number }>>;
+}) => Promise<AstGrepStructuralCandidateV1[]>;
 
 /**
  * NOT the handler for the `AST` stage: `buildContextToolDagFromPreAgentStages` makes `AST` a sibling of `LEXICAL`
  * (Postgres-backed `retrieveASTMatches` via `makeCandidateLaneHandlerV1`), so this handler would find no
- * `inputs.LEXICAL` there and throw. It is for a FUTURE separate refinement node (e.g. `AST_STRUCTURAL_REFINE`) that
- * depends on LEXICAL; that node does not exist in the mapper yet. It consumes the LEXICAL output, parses only TS/JS
- * files that have a resolvable revision, and a file without one is skipped and reported, never given a defaulted
- * revision. `filePath` values are relative to the lexical search `cwd`, so `readFile` must resolve against that
- * same base (it receives the bare relative path).
+ * `inputs.LEXICAL` there and throw. It is used by the separate `AST_STRUCTURAL_REFINE` node, which depends on
+ * LEXICAL and is distinct from the Postgres-backed AST candidate lane. It parses only TS/JS files with an exact
+ * source binding, verifies extractor identity/revisions and UTF-8 byte bounds, and remains annotation-only. A
+ * missing binding is reported, never assigned a default revision. `filePath` values are relative to the lexical
+ * search `cwd`, so `readFile` and `resolveSourceBinding` must use that same base.
  */
 export function makeAstHandlerV1(deps: {
   extract: AstExtractLikeV1;
   readFile: (filePath: string) => Promise<string>;
-  resolveRevision: (filePath: string) => { workspaceRevision: string; sourceRevision: string } | null;
+  resolveSourceBinding: (filePath: string) => { sourceRef: string; workspaceRevision: string; sourceRevision: string } | null;
   symbols: readonly string[];
   producerRevision: string;
 }): ContextDagNodeHandlerV1 {
@@ -710,25 +712,53 @@ export function makeAstHandlerV1(deps: {
     await Promise.all(lexical.files.map(async ({ filePath }) => {
       const language = LANG_BY_EXT[filePath.split('.').pop()?.toLowerCase() ?? ''];
       if (!language) { skipped.push({ filePath, reason: 'NOT_TS_JS' }); return; }
-      const rev = deps.resolveRevision(filePath);
-      if (!rev) { skipped.push({ filePath, reason: 'NO_REVISION' }); return; }
+      const binding = deps.resolveSourceBinding(filePath);
+      if (!binding?.sourceRef.trim() || !binding.workspaceRevision.trim() || !binding.sourceRevision.trim()) {
+        skipped.push({ filePath, reason: 'NO_SOURCE_BINDING' });
+        return;
+      }
       let code: string;
       try { code = await deps.readFile(filePath); } catch { skipped.push({ filePath, reason: 'READ_FAILED' }); return; }
+      let found: AstGrepStructuralCandidateV1[];
       try {
-        const found = await deps.extract({
-          schema: 'atlas.ast-grep-structural-extraction-input.v1', code, filePath, sourceRef: filePath, language,
-          workspaceRevision: rev.workspaceRevision, sourceRevision: rev.sourceRevision, producerRevision: deps.producerRevision,
+        found = (await deps.extract({
+          schema: 'atlas.ast-grep-structural-extraction-input.v1', code, filePath, sourceRef: binding.sourceRef, language,
+          workspaceRevision: binding.workspaceRevision, sourceRevision: binding.sourceRevision, producerRevision: deps.producerRevision,
+        })).map((candidate) => AstGrepStructuralCandidateV1Schema.parse(candidate));
+      } catch { skipped.push({ filePath, reason: 'EXTRACT_FAILED' }); return; }
+      if (found.some((candidate) => candidate.filePath !== filePath
+        || candidate.sourceRef !== binding.sourceRef
+        || candidate.workspaceRevision !== binding.workspaceRevision
+        || candidate.sourceRevision !== binding.sourceRevision
+        || candidate.producerRevision !== deps.producerRevision
+        || candidate.logicalLaneVoteAdded
+        || candidate.canonicalWritesAllowed)) {
+        skipped.push({ filePath, reason: 'EXTRACT_RESULT_MISMATCH' });
+        return;
+      }
+      const sourceBytes = Buffer.from(code, 'utf8');
+      if (found.some((candidate) => candidate.endByte > sourceBytes.length)) {
+        skipped.push({ filePath, reason: 'INVALID_SPAN' });
+        return;
+      }
+      for (const candidate of found) {
+        if (wanted.size > 0 && !wanted.has(candidate.name)) continue;
+        declarations.push({
+          ...candidate,
+          spanSha256: createHash('sha256').update(sourceBytes.subarray(candidate.startByte, candidate.endByte)).digest('hex'),
         });
-        for (const c of found) {
-          if (wanted.size === 0 || wanted.has(c.name)) {
-            declarations.push({ filePath, name: c.name, entityKind: c.entityKind, startByte: c.startByte, endByte: c.endByte, startLine: c.startLine });
-          }
-        }
-      } catch { skipped.push({ filePath, reason: 'EXTRACT_FAILED' }); }
+      }
     }));
     declarations.sort((a, b) => a.filePath.localeCompare(b.filePath) || a.startByte - b.startByte);
     skipped.sort((a, b) => a.filePath.localeCompare(b.filePath));
-    const out: AstOutputV1 = { declarations, skipped, canonicalAuthority: false };
+    const out: AstOutputV1 = {
+      schema: 'atlas.ast-grep-refinement-output.v1',
+      declarations,
+      matchedLexicalFilePaths: [...new Set(declarations.map((declaration) => declaration.filePath))].sort(),
+      skipped,
+      producerRevision: deps.producerRevision,
+      canonicalAuthority: false,
+    };
     return out;
   };
 }

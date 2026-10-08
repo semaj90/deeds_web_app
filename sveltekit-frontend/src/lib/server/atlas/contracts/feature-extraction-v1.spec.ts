@@ -18,7 +18,7 @@ describe('feature-extraction-v1 contracts', () => {
 			tree_node_id: 'tree:1',
 			title_id: 'title:1',
 			representation_id: 'semantic_768',
-			representation_revision: 'semantic_768@1',
+			representation_revision: null,
 			semantic_dimension: 768,
 			feature_revision: 'feature:1',
 			producer_id: 'atlas.feature-extractor',

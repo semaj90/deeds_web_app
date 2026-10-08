@@ -1,0 +1,66 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "openai-prompting",
+  "source_ref": "openai-prompting:platform-openai-com-guides-tools-tools",
+  "url": "https://platform.openai.com/docs/guides/tools?api-mode=responses",
+  "title": "Using tools | OpenAI API",
+  "domain_class": "agent",
+  "focus_tags": [
+    "prompt_engineering",
+    "tool_use",
+    "agent_context",
+    "llm_synthesis",
+    "llm_output",
+    "kanban",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Using tools | OpenAI API",
+    "markdown_excerpt": "Using tools | OpenAI API For the complete documentation index, see llms.txt . Markdown versions of documentation pages are available by appending .md to the page URL. ChatGPT Start searching API Dashboard Try ChatGPT Home API Overview Get started with the OpenAI API Models Explore models and compare capabilities Agents Build persistent agents on hosted infrastructure Tools Connect models to tools and data Audio &amp; voice Build speech and realtime voice experiences Production Deploy and scale your API integrations API reference Explore endpoints, parameters, and responses ChatGPT Sign in with ChatGPT Apps powered by your user&#39;s ChatGPT plan Plugins Extend ChatGPT and Codex Workspace Agents Trigger published ChatGPT workspace agents Commerce Build commerce flows in ChatGPT Ads Publish and measure ads in ChatGPT ChatGPT + Codex user docs Guides and product docs for ChatGPT and Codex Use cases Example workflows and tasks teams can take on with ChatGPT or Codex Docs Use cases Training Resources Resources Showcase Demo apps to get inspired Blog Learnings and experiences from developers Cookbook Notebook examples for building with OpenAI models Learn Docs, videos, and demo apps for ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:openai-prompting:platform-openai-com-guides-tools-tools",
+    "title": "Using tools | OpenAI API",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenAI prompting and agent documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "068eb6297deeed5fd774ddbcaf9d75e0b0e3302a1eaad9631d58b01e05f680a0",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\openai-prompting\\platform-openai-com-guides-tools-tools.md",
+  "fetched_at": "2026-10-06T18:04:45.087Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "openai-prompting",
+    "source_title": "OpenAI prompting and agent documentation",
+    "fetched_via": "fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\openai-prompting\\platform-openai-com-guides-tools-tools.md"
+}

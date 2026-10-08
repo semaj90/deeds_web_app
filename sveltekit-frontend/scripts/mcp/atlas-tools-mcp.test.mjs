@@ -349,25 +349,42 @@ test('callTraceTool reports typed failures instead of returning empty data', asy
   await assert.rejects(callTraceTool('t', {}, { fetchImpl: fakeFetch([{ text: 'not json at all' }, { text: 'not json at all' }]), ...fast }), (error) => Boolean(error.code));
 });
 
-test('when live search fails the answer falls back to the labelled static packet and names the failure', async () => {
+test('when live search fails it returns no static fallback evidence and names the failure', async () => {
   const failing = async () => { throw Object.assign(new Error('boom'), { code: 'TRACE_EMPTY_RESPONSE' }); };
   const result = await withPacketCwd(() => {}, () => buildAgenticRagContextLive({ query: 'q', maxCards: 3 }, { trace: failing }));
+  assert.equal(result.ok, false);
   assert.equal(result.querySpecific, false);
-  assert.equal(result.contextSource.kind, 'STATIC_PACKET_FILE');
-  assert.deepEqual(result.liveRetrieval, { attempted: true, failure: 'TRACE_EMPTY_RESPONSE', message: 'boom' });
+  assert.equal(result.contextSource.kind, 'NONE');
+  assert.equal(result.candidateSetBasis, 'NONE');
+  assert.equal(result.totalCards, 0);
+  assert.deepEqual(result.cards, []);
+  assert.deepEqual(result.sourceRefs, []);
+  assert.equal(result.promptPacket, '');
+  assert.equal(result.fallbackUsed, false);
+  assert.equal(result.canonicalAuthority, false);
+  assert.equal(result.liveRetrieval.status, 'LIVE_RETRIEVAL_UNAVAILABLE');
+  assert.deepEqual(result.liveRetrieval, {
+    attempted: true,
+    failure: 'TRACE_EMPTY_RESPONSE',
+    message: 'boom',
+    status: 'LIVE_RETRIEVAL_UNAVAILABLE',
+  });
   assert.ok(result.warnings.includes('LIVE_RETRIEVAL_UNAVAILABLE'));
-  assert.ok(result.warnings.includes('NO_QUERY_SPECIFIC_RETRIEVAL'));
 });
 
-test('disableLive forces the static packet without calling TRACE, and a live success has no fallback marker', async () => {
+test('disableLive returns no evidence without calling TRACE, and live success is explicitly non-fallback', async () => {
   let called = 0;
   const trace = async (name) => { called += 1; return name === 'atlas.query' ? [hit('c1', 'src/a.ts', 0.5)] : { packets: [] }; };
   const disabled = await withPacketCwd(() => {}, () => buildAgenticRagContextLive({ query: 'q' }, { trace, disableLive: true }));
   assert.equal(called, 0);
   assert.equal(disabled.liveRetrieval.failure, 'LIVE_DISABLED');
+  assert.equal(disabled.totalCards, 0);
+  assert.deepEqual(disabled.cards, []);
+  assert.equal(disabled.fallbackUsed, false);
   const live = await buildAgenticRagContextLive({ query: 'q' }, { trace });
   assert.equal(live.querySpecific, true);
   assert.equal(live.liveRetrieval, undefined);
+  assert.equal(live.fallbackUsed, false);
   assert.ok(!live.warnings.includes('LIVE_RETRIEVAL_UNAVAILABLE'));
 });
 

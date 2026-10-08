@@ -249,3 +249,54 @@ writes are authorized by this change.
 - No drift found elsewhere in NLP-0 through NLP-9 on a spot-check of the checked/unchecked split
   against live code presence.
 - [ ] Compare XGBoost and PyTorch on the exact same frozen split and tensor.
+
+## Classifier-to-move eligibility handoff
+
+- [x] Add a pure Atlas adapter over the existing `DomainClassificationV1` contract
+  and the existing agentic execution area; do not add a classifier, move registry,
+  or executor owner.
+- [x] Require proven classifier state and exact classifier/workspace revision
+  matches before returning an eligible result.
+- [x] Return only `ELIGIBLE`, `BELOW_CONFIDENCE_FLOOR`,
+  `DOMAIN_NOT_ALLOWED`, or `NOT_PROVEN`; every result is non-authoritative and
+  explicitly grants no execution authorization.
+- [x] Add deterministic decision checksum and focused fixture tests.
+- [x] Add a bounded emission composer: only eligible decisions may contribute a
+  small score boost; other states leave the caller's base score unchanged.
+- [x] Compile the eligibility signal into a Viterbi frame using exact
+  `CapabilityRegistryV1.capabilityId` identity and registry revision; reject
+  decision checksum tampering and unknown capability IDs.
+- [ ] Connect a request-scoped caller using revision-qualified classification
+  evidence; fixture frame compilation does not establish runtime reachability.
+- [ ] Bind the policy to the complete `AgentMoveDescriptorV1` contract when that
+  contract is present in the active repository owner; this checkout currently
+  contains no such descriptor.
+- [ ] Prove classifier probabilities originate from the intended learned
+  classifier revision before enabling a runtime caller.
+
+### Request-path qualification audit (2026-10-07)
+
+- `sveltekit-frontend/src/lib/server/nlp/query-routing.ts` is called by the
+  `/api/nlp/query` and `/api/tools/search` routes. Its `QueryRoutingAnalysis`
+  carries `analysisSource` and `modelVersion`, but no workspace revision,
+  taxonomy revision, or qualified classifier artifact receipt. The fallback is
+  heuristic. It cannot currently qualify an eligibility decision.
+- `semantic-signal-routing.ts` carries a workspace revision and producer
+  revision, and derives domain probabilities from the deterministic taxonomy.
+  Its `QueryAnalysisV1` does not preserve the taxonomy's explicit primary
+  domain/classifier revision as separate fields, so it is not yet a lossless
+  move-policy input.
+- `classifyDomainTaxonomyWithLearned()` requires a source reference and
+  workspace revision and resolves an admitted source revision, but repository
+  search found no caller. Its learned bridge also does not preserve which
+  sklearn family produced the appended score.
+- The `api/atlas/concept-tagging` route accepts `modelRevision` in its request
+  body, while `pos-concept-tagging-lane.ts` maps any non-empty value to
+  `model_revision_state: PROVEN`. Treat that field as untrusted until the model
+  revision is independently resolved; do not feed this route's output to move
+  eligibility as proven classifier evidence.
+- Therefore the fixture eligibility and Viterbi frame compiler are
+  implemented, but request-scoped classification remains `NOT_PROVEN`. Next,
+  extend the existing server-owned query taxonomy output with explicit primary
+  domain and taxonomy revision, and bind any learned contribution to an
+  independently verified model artifact before adding a shadow caller.

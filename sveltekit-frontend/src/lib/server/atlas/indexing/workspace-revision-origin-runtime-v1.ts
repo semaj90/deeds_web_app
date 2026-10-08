@@ -34,6 +34,23 @@ export type WorkspaceRevisionOriginRuntimeV1 = {
   runtimeRevision: typeof WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION;
 };
 
+/**
+ * Optional per-file digest cache (WSR-03). An entry is reused only when path, byte size and
+ * mtime (ns) are all unchanged AND the mtime is older than RACY_MTIME_GUARD_MS at observation
+ * time, so a same-size edit inside the filesystem timestamp granularity can never be served
+ * from cache. The cache holds derived facts only and is never authority; omit it for the
+ * original byte-reading behaviour.
+ */
+export type WorkspaceDigestCacheEntryV1 = {
+  size: number;
+  mtimeNs: string;
+  sourceRevision: string;
+  contentDigest: string;
+  byteLength: number;
+};
+export type WorkspaceDigestCacheV1 = Map<string, WorkspaceDigestCacheEntryV1>;
+export const WORKSPACE_DIGEST_CACHE_RACY_MTIME_GUARD_MS = 2000;
+
 function git(workspaceRoot: string, args: string[]): string {
   return execFileSync('git', args, {
     cwd: workspaceRoot,
@@ -75,6 +92,9 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   maxSourceBytes?: number;
   sourceExtensions?: ReadonlySet<string>;
   onProgress?: (progress: { completed: number; total: number; sourceRef: string }) => void;
+  digestCache?: WorkspaceDigestCacheV1;
+  /** Optional counters (observability only; not part of any checksum). */
+  digestStats?: { reused: number; rehashed: number };
 }): WorkspaceRevisionOriginRuntimeV1 {
   const workspaceRoot = path.resolve(input.workspaceRoot);
   const maxSourceBytes = input.maxSourceBytes ?? 5 * 1024 * 1024;
@@ -124,22 +144,38 @@ export function materializeWorkspaceRevisionOriginV1(input: {
       continue;
     }
     try {
-      const info = statSync(absolute);
+      const info = statSync(absolute, { bigint: true });
       if (!info.isFile()) {
         skipped.push({ sourceRef, reason: 'NOT_REGULAR_FILE' });
         continue;
       }
-      if (info.size > maxSourceBytes) {
+      if (Number(info.size) > maxSourceBytes) {
         skipped.push({ sourceRef, reason: 'SOURCE_TOO_LARGE' });
         continue;
       }
-      const bytes = readFileSync(absolute);
-      const sourceText = bytes.toString('utf8');
-      if (!Buffer.from(sourceText, 'utf8').equals(bytes)) {
-        skipped.push({ sourceRef, reason: 'NOT_VALID_UTF8_SOURCE' });
-        continue;
+      const mtimeNs = String(info.mtimeNs);
+      const cached = input.digestCache?.get(absolute);
+      let revision: { sourceRevision: string; contentDigest: string; byteLength: number };
+      if (cached && cached.size === Number(info.size) && cached.mtimeNs === mtimeNs) {
+        revision = { sourceRevision: cached.sourceRevision, contentDigest: cached.contentDigest, byteLength: cached.byteLength };
+        if (input.digestStats) input.digestStats.reused += 1;
+      } else {
+        if (input.digestStats) input.digestStats.rehashed += 1;
+        const bytes = readFileSync(absolute);
+        const sourceText = bytes.toString('utf8');
+        if (!Buffer.from(sourceText, 'utf8').equals(bytes)) {
+          skipped.push({ sourceRef, reason: 'NOT_VALID_UTF8_SOURCE' });
+          continue;
+        }
+        revision = deriveCodeSourceRevisionV1(sourceText);
+        const settled = Date.now() - Number(info.mtimeMs) > WORKSPACE_DIGEST_CACHE_RACY_MTIME_GUARD_MS;
+        if (input.digestCache && settled && bytes.length === Number(info.size)) {
+          input.digestCache.set(absolute, {
+            size: Number(info.size), mtimeNs,
+            sourceRevision: revision.sourceRevision, contentDigest: revision.contentDigest, byteLength: revision.byteLength,
+          });
+        }
       }
-      const revision = deriveCodeSourceRevisionV1(sourceText);
       const isTracked = trackedAtHead.has(sourceRef);
       const gitBlobOid = trackedBlobByPath.get(sourceRef) ?? null;
       entries.push({

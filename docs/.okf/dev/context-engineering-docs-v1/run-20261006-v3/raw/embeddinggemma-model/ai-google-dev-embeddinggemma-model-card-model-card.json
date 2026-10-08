@@ -1,0 +1,53 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "embeddinggemma-model",
+  "source_ref": "embeddinggemma-model:ai-google-dev-embeddinggemma-model-card-model-card",
+  "url": "https://ai.google.dev/gemma/docs/embeddinggemma/model_card",
+  "title": "ai.google.dev",
+  "domain_class": "retrieval",
+  "focus_tags": [
+    "embedding",
+    "semantic_768",
+    "model_revision",
+    "representation_lineage",
+    "llm_synthesis",
+    "llm_output",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "ai.google.dev",
+    "markdown_excerpt": "[Skip to main content](https://ai.google.dev/gemma/docs/embeddinggemma/model_card#main-content) [![Google AI for Developers](https://www.gstatic.com/devrel-devsite/prod/vc572093a046b25fad0d22bd3210637939b9c971bea06a064d6f48a166bf893c5/googledevai/images/lockup-new.svg)](https://ai.google.dev/) `/` Language - [English](https://ai.google.dev/gemma/docs/embeddinggemma/model_card) - [Deutsch](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=de) - [Español – América Latina](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=es-419) - [Français](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=fr) - [Indonesia](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=id) - [Italiano](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=it) - [Polski](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=pl) - [Português – Brasil](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=pt-br) - [Shqip](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=sq) - [Tiếng Việt](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=vi) - [Türkçe](https://ai.google.dev/gemma/docs/embeddinggemma/model_card?hl=tr) ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "retrieval",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:embeddinggemma-model:ai-google-dev-embeddinggemma-model-card-model-card",
+    "title": "ai.google.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh EmbeddingGemma model card from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "ae8bafa3bf9d24f8e062c42f2436b263da5e75de6665529de1a00fbca5d6a591",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\embeddinggemma-model\\ai-google-dev-embeddinggemma-model-card-model-card.md",
+  "fetched_at": "2026-10-06T20:09:42.304Z",
+  "metadata": {
+    "kind": "official_model_documentation",
+    "source_id": "embeddinggemma-model",
+    "source_title": "EmbeddingGemma model card",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\embeddinggemma-model\\ai-google-dev-embeddinggemma-model-card-model-card.md"
+}

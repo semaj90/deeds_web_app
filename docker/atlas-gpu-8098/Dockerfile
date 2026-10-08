@@ -12,6 +12,7 @@ RUN python -m pip install --no-cache-dir \
 COPY services/atlas-gpu-8098/app.py /app/services/atlas-gpu-8098/app.py
 COPY services/atlas-gpu-8098/shared_residency.py /app/services/atlas-gpu-8098/shared_residency.py
 COPY python/atlas_rapids_graph_runtime.py /app/python/atlas_rapids_graph_runtime.py
+COPY python/atlas_semantic512_runtime.py /app/python/atlas_semantic512_runtime.py
 
 RUN mkdir -p /app/services/atlas-gpu-8098 /app/python \
     && chown -R rapids:conda /app

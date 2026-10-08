@@ -5,6 +5,8 @@ import { classifyToolResult, nextLegalState, attemptRecovery, finalizeTrace } fr
 import type { RouteTrace, ToolResult } from '$lib/server/router/router-types';
 import { v4 as uuid } from 'uuid';
 import { sql } from 'drizzle-orm';
+import { buildLearningOutcomeV1, buildOutcomeLedgerInsertV1 } from '$lib/server/atlas/agentic/contracts/learning-outcome-v1.js';
+import { logError } from '$lib/server/error-logging.js';
 import { requireUser } from '$lib/server/auth-utils.js';
 import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
 
@@ -276,24 +278,54 @@ export const POST: RequestHandler = async (event) => {
         )
       `);
 
-      // Write outcome_ledger (state transition record)
+      // Deterministic outcome (no validator at dispatch time => reward stays null, never guessed)
+      const learningOutcome = buildLearningOutcomeV1({
+        executionId: toolResult.executionId,
+        toolName: validated.selectedTool.name,
+        transportResultClass: toolResult.resultClass,
+        success: toolResult.success,
+        recoveryAttempted: recoveryPlan !== null,
+        evidenceRefs: toolResult.sourceRefs ?? []
+      });
+
+      if (learningOutcome.resultClass === 'FAILURE') {
+        await logError({
+          category: toolResult.resultClass === 'timeout' ? 'timeout_error' : toolResult.resultClass === 'validation_error' ? 'validation_error' : 'network_error',
+          severity: 'ERROR',
+          message: `Tool ${validated.selectedTool.name} failed: ${toolResult.toolError ?? toolResult.resultClass}`,
+          contextKey: `agent.execute:${toolResult.executionId}`,
+          routePath: '/api/agent/execute'
+        });
+      }
+
+      // Write outcome_ledger (state transition record); row is built + validated by the pure builder first
+      const ledgerRow = buildOutcomeLedgerInsertV1({
+        traceId: validated.traceId,
+        previousState: 'RETRIEVE',
+        nextState,
+        durationMs: toolResult.durationMs,
+        outcome: learningOutcome
+      });
       await db.execute(sql`
         INSERT INTO outcome_ledger (
           trace_id, previous_state, next_state, tool_name, execution_id,
           result_class, recovery_attempted, final_state, final_outcome,
-          total_duration_ms, created_at
+          total_duration_ms, created_at, outcome_type, reward, metadata
         ) VALUES (
-          ${validated.traceId},
-          'RETRIEVE',
-          ${nextState},
-          ${validated.selectedTool.name},
-          ${toolResult.executionId},
-          ${toolResult.resultClass},
-          ${recoveryPlan !== null},
-          ${nextState},
-          ${toolResult.success ? 'success' : 'failed'},
-          ${toolResult.durationMs},
-          ${now}
+          ${ledgerRow.trace_id},
+          ${ledgerRow.previous_state},
+          ${ledgerRow.next_state},
+          ${ledgerRow.tool_name},
+          ${ledgerRow.execution_id},
+          ${ledgerRow.result_class},
+          ${ledgerRow.recovery_attempted},
+          ${ledgerRow.final_state},
+          ${ledgerRow.final_outcome},
+          ${ledgerRow.total_duration_ms},
+          ${now},
+          ${ledgerRow.outcome_type},
+          ${ledgerRow.reward},
+          ${JSON.stringify(ledgerRow.metadata)}::jsonb
         )
       `);
 

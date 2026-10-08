@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, lstatSync, realpathSync, readFileSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, lstatSync, readdirSync, realpathSync, readFileSync, writeFileSync, mkdirSync, openSync, renameSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
+import { createHash, randomUUID } from 'node:crypto';
+import { materializeWorkspaceRevisionOriginV1, WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION, type WorkspaceDigestCacheEntryV1, type WorkspaceDigestCacheV1 } from '../../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
 export const hash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value)).digest('hex')}`;
 const sourceRef = (value: string) => value.replaceAll('\\', '/').replace(/^\/+/, '').replace(/^\.\//, '');
@@ -29,9 +29,146 @@ function state(root: string) {
   };
 }
 
-export function observeSnapshot(rootInput: string, workspaceId: string) {
+const DIGEST_CACHE_SCHEMA = 'atlas.workspace-digest-cache.v2';
+const digestCachePolicyRevision = hash({ capturePolicy: policy, originPolicy: WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION });
+
+function listRepositoryRoots(rootInput: string, workspaceId: string): Array<{ relativePath: string; realPath: string; head: string }> {
+  const root = realpathSync(rootInput);
+  const repositories: Array<{ relativePath: string; realPath: string; head: string }> = [];
+  const visited = new Set<string>();
+  const visit = (relativePath: string) => {
+    const directory = path.resolve(root, relativePath || '.');
+    const realPath = realpathSync(directory);
+    if (realPath !== root && !realPath.startsWith(`${root}${path.sep}`)) throw new Error(`NESTED_REPOSITORY_OUTSIDE_ROOT:${relativePath}`);
+    if (visited.has(realPath)) return;
+    visited.add(realPath);
+    repositories.push({ relativePath, realPath, head: git(directory, ['rev-parse', 'HEAD']).trim() });
+    const children = new Set<string>();
+    for (const row of git(directory, ['ls-files', '--stage', '-z']).split('\0')) {
+      if (row.startsWith('160000 ')) children.add(row.slice(row.indexOf('\t') + 1));
+    }
+    for (const row of git(directory, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']).split('\0').filter(Boolean)) {
+      const candidate = row.replace(/\/$/, '');
+      if (existsSync(path.join(directory, candidate, '.git'))) children.add(candidate);
+    }
+    for (const child of [...children].sort()) {
+      const childPath = path.resolve(directory, child);
+      if (childPath.startsWith(`${root}${path.sep}`) && existsSync(childPath) && existsSync(path.join(childPath, '.git')))
+        visit([relativePath, child].filter(Boolean).join('/'));
+    }
+  };
+  if (!workspaceId.trim()) throw new Error('WORKSPACE_ID_REQUIRED_FOR_DIGEST_CACHE');
+  visit('');
+  return repositories.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
+}
+
+export function createDigestCacheContext(root: string, workspaceId: string) {
+  const repositories = listRepositoryRoots(root, workspaceId);
+  return {
+    workspaceId,
+    repositoryRootsChecksum: hash({ workspaceId, repositories }),
+  };
+}
+
+function validDigestCacheEntries(entries: unknown): entries is Record<string, WorkspaceDigestCacheEntryV1> {
+  if (!entries || typeof entries !== 'object' || Array.isArray(entries)) return false;
+  return Object.entries(entries).every(([key, entry]) => {
+    if (!path.isAbsolute(key) || !entry || typeof entry !== 'object') return false;
+    const value = entry as { size?: unknown; mtimeNs?: unknown; sourceRevision?: unknown; contentDigest?: unknown; byteLength?: unknown };
+    return Number.isSafeInteger(value.size) && Number(value.size) >= 0
+      && typeof value.mtimeNs === 'string' && /^\d+$/.test(value.mtimeNs)
+      && typeof value.sourceRevision === 'string' && /^sha256:[a-f0-9]{64}$/.test(value.sourceRevision)
+      && typeof value.contentDigest === 'string' && /^[a-f0-9]{64}$/.test(value.contentDigest)
+      && Number.isSafeInteger(value.byteLength) && Number(value.byteLength) >= 0
+      && value.size === value.byteLength;
+  });
+}
+
+/** Load a persisted digest cache; any mismatch (schema, policy, corruption) yields an empty cache. */
+export function loadDigestCache(cachePath: string, context: ReturnType<typeof createDigestCacheContext>): WorkspaceDigestCacheV1 {
+  try {
+    const raw = JSON.parse(readFileSync(cachePath, 'utf8'));
+    const { checksum, ...body } = raw ?? {};
+    if (body.schema !== DIGEST_CACHE_SCHEMA
+      || body.policyRevision !== digestCachePolicyRevision
+      || body.workspaceId !== context.workspaceId
+      || body.repositoryRootsChecksum !== context.repositoryRootsChecksum
+      || !validDigestCacheEntries(body.entries)
+      || checksum !== hash(body)) return new Map();
+    return new Map(Object.entries(raw.entries ?? {})) as WorkspaceDigestCacheV1;
+  } catch { return new Map(); }
+}
+
+/** Persist derived digests atomically (temp + rename). Derived cache only; never authority. */
+export function saveDigestCache(
+  cachePath: string,
+  cache: WorkspaceDigestCacheV1,
+  context: ReturnType<typeof createDigestCacheContext>,
+  testHooks: { beforeAtomicRename?: () => void } = {},
+) {
+  mkdirSync(path.dirname(cachePath), { recursive: true });
+  const body = {
+    schema: DIGEST_CACHE_SCHEMA,
+    policyRevision: digestCachePolicyRevision,
+    workspaceId: context.workspaceId,
+    repositoryRootsChecksum: context.repositoryRootsChecksum,
+    entries: Object.fromEntries(cache),
+  };
+  const serialized = JSON.stringify({ ...body, checksum: hash(body) });
+  const tmp = `${cachePath}.${process.pid}.${randomUUID()}.tmp`;
+  let descriptor: number | undefined;
+  try {
+    descriptor = openSync(tmp, 'wx');
+    writeFileSync(descriptor, serialized);
+    fsyncSync(descriptor);
+    closeSync(descriptor);
+    descriptor = undefined;
+    testHooks.beforeAtomicRename?.();
+    renameSync(tmp, cachePath);
+  } catch (error) {
+    if (descriptor !== undefined) closeSync(descriptor);
+    rmSync(tmp, { force: true });
+    throw error;
+  }
+}
+
+/**
+ * WSR-03e: per-DIRECTORY symlink/junction/escape probe replacing the per-FILE realpathSync+lstatSync
+ * guard (~25k syscalls on this repo). A path is unsafe when the file itself, or any ancestor directory
+ * up to `root`, is a symlink/junction, or when the walk leaves `root`. Same violation semantics, one
+ * readdir per distinct directory.
+ */
+export function createSymlinkProbeV1(root: string) {
+  const dirEntries = new Map<string, Map<string, boolean>>();
+  const dirUnsafe = new Map<string, boolean>();
+  const entries = (dir: string) => {
+    let map = dirEntries.get(dir);
+    if (!map) {
+      map = new Map();
+      for (const entry of readdirSync(dir, { withFileTypes: true })) map.set(entry.name, entry.isSymbolicLink());
+      dirEntries.set(dir, map);
+    }
+    return map;
+  };
+  const unsafeDirectory = (dir: string): boolean => {
+    if (dir === root) return false;
+    const known = dirUnsafe.get(dir);
+    if (known !== undefined) return known;
+    const parent = path.dirname(dir);
+    const unsafe = parent === dir || unsafeDirectory(parent) || entries(parent).get(path.basename(dir)) === true;
+    dirUnsafe.set(dir, unsafe);
+    return unsafe;
+  };
+  return (full: string): boolean => {
+    const dir = path.dirname(full);
+    return unsafeDirectory(dir) || entries(dir).get(path.basename(full)) === true;
+  };
+}
+
+export function observeSnapshot(rootInput: string, workspaceId: string, options: { digestCache?: WorkspaceDigestCacheV1; digestStats?: { reused: number; rehashed: number } } = {}) {
   const root = realpathSync(rootInput);
   if (realpathSync(git(root, ['rev-parse', '--show-toplevel']).trim()) !== root) throw new Error('ROOT_IS_NOT_REPOSITORY_ROOT');
+  const isUnsafeSource = createSymlinkProbeV1(root);
   const repositories: any[] = [];
   const sources: any[] = [];
   const violations: string[] = [];
@@ -56,11 +193,13 @@ export function observeSnapshot(rootInput: string, workspaceId: string) {
     const observed = materializeWorkspaceRevisionOriginV1({
       workspaceRoot: directory, repositoryId: workspaceId,
       producerRevision: policy.revision, generatedAt: '2000-01-01T00:00:00.000Z',
+      digestCache: options.digestCache,
+      digestStats: options.digestStats,
     });
     const deletedTracked: string[] = [];
     for (const row of observed.bindings) {
       const full = path.resolve(directory, row.sourceRef);
-      if (!realpathSync(full).startsWith(root + path.sep) || lstatSync(full).isSymbolicLink()) {
+      if (isUnsafeSource(full)) {
         violations.push(`SOURCE_SYMLINK_OR_ESCAPE:${relativePath}/${row.sourceRef}`); continue;
       }
       const repositoryId = relativePath ? `repo:${sourceRef(relativePath)}` : 'repo:root';
@@ -121,15 +260,21 @@ export function sealSnapshot(first: ReturnType<typeof observeSnapshot>, second: 
 export function captureStableSnapshot(
   root: string,
   workspaceId: string,
-  options: { maxAttempts?: number } = {},
+  options: { maxAttempts?: number; digestCachePath?: string; onDigestStats?: (scans: Array<{ reused: number; rehashed: number }>) => void } = {},
 ) {
   const maxAttempts = Number.isInteger(options.maxAttempts) && (options.maxAttempts ?? 0) > 0
     ? options.maxAttempts!
     : 3;
-  let first = observeSnapshot(root, workspaceId);
+  // One in-memory digest cache is shared by the scans of this capture so the confirming scan only
+  // re-stats unchanged files. validateSnapshot() never uses it: byte readback stays the oracle.
+  const cacheContext = createDigestCacheContext(root, workspaceId);
+  const digestCache: WorkspaceDigestCacheV1 = options.digestCachePath ? loadDigestCache(options.digestCachePath, cacheContext) : new Map();
+  const scanStats: Array<{ reused: number; rehashed: number }> = [];
+  const newScanStats = () => { const s = { reused: 0, rehashed: 0 }; scanStats.push(s); return s; };
+  let first = observeSnapshot(root, workspaceId, { digestCache, digestStats: newScanStats() });
   let transientDriftObserved = false;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-    const second = observeSnapshot(root, workspaceId);
+    const second = observeSnapshot(root, workspaceId, { digestCache, digestStats: newScanStats() });
     const report = sealSnapshot(first, second);
     const drifted = report.violations.includes('WORKSPACE_CHANGED_BETWEEN_SCANS');
     if (!drifted || attempt === maxAttempts) {
@@ -137,6 +282,8 @@ export function captureStableSnapshot(
       // fields were appended after sealSnapshot() computed snapshotRevision,
       // making every stable capture fail readback with a false
       // MANIFEST_CHECKSUM_MISMATCH.
+      if (options.digestCachePath) saveDigestCache(options.digestCachePath, digestCache, cacheContext);
+      options.onDigestStats?.(scanStats);
       const withCaptureMetadata = { ...report, captureAttempts: attempt, transientDriftObserved };
       const {
         schema,
@@ -155,7 +302,7 @@ export function captureStableSnapshot(
   throw new Error('SNAPSHOT_CAPTURE_RETRY_EXHAUSTED');
 }
 
-export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string }) {
+export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, options?: { sourceReadRoot?: string; digestCachePath?: string }) {
   const { schema, snapshotRevision, workspaceRevision, status, canonicalAuthority, datastoreWritesPerformed, ...body } = snapshot;
   const violations: string[] = [];
   const violationDetails: Array<{ sourceRef: string; code: string }> = [];
@@ -166,6 +313,7 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
   if (body.sourceContentChecksum !== hash(body.sources.map(s => [s.sourceIdentityKey ?? `${s.repositoryId}:${s.repositoryRelativePath}`, s.sourceRevision, s.byteLength]))) violations.push('CONTENT_SET_INVALID');
   const root = realpathSync(body.repositoryRoot);
   let exactMatches = 0;
+  let digestCacheInvalidated = false;
   for (const source of body.sources) {
     // Nested-repository entries store a workspace-relative sourceRef for
     // reporting, but the bytes live under repositoryPath. Resolve against
@@ -202,6 +350,10 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
             : 'SOURCE_READBACK_ERROR';
       violations.push(`SOURCE_READBACK_FAILED:${source.sourceRef}`);
       violationDetails.push({ sourceRef: source.sourceRef, code });
+      if (code === 'SOURCE_BYTES_CHANGED' && options?.digestCachePath) {
+        rmSync(options.digestCachePath, { force: true });
+        digestCacheInvalidated = true;
+      }
     }
   }
   const violationCounts = violationDetails.reduce<Record<string, number>>((counts, detail) => {
@@ -211,6 +363,39 @@ export function validateSnapshot(snapshot: ReturnType<typeof sealSnapshot>, opti
   return { status: violations.length ? 'SNAPSHOT_READBACK_BLOCKED' : 'SNAPSHOT_BYTES_READBACK_PROVEN',
     snapshotRevision, sourceCount: body.sources.length, exactMatches, violations,
     violationDetails, violationCounts,
+    digestCacheInvalidated,
     canonicalAuthority: false, datastoreWritesPerformed: false,
     scope: 'Recorded sources only; this does not assert current full-workspace membership or Graphify admission' };
+}
+
+/**
+ * WSR-08b: validateSnapshot-shaped readback built from a SEAL-TIME readback receipt (the reseal script's
+ * output) instead of re-reading the live workspace. This lets a sealed snapshot that is no longer current
+ * keep its valid/admitted evidence. It never upgrades anything: the receipt must be for the same snapshot,
+ * be `RESEAL_READBACK_PROVEN`, report zero violations and a full exact readback. `receiptSha256` is
+ * caller-computed over the receipt bytes and recorded so the evidence is bound by digest.
+ */
+export function sealReadbackFromReceiptV1(
+  receipt: any,
+  snapshot: { snapshotRevision?: string; sources?: unknown[] },
+  receiptSha256: string | null,
+) {
+  const sourceCount = Array.isArray(snapshot?.sources) ? snapshot.sources.length : -1;
+  const valid = Boolean(receipt)
+    && receipt.snapshotRevision === snapshot?.snapshotRevision
+    && receipt.status === 'RESEAL_READBACK_PROVEN'
+    && receipt.readbackStatus === 'SNAPSHOT_BYTES_READBACK_PROVEN'
+    && receipt.totalViolations === 0
+    && receipt.sourceCount === sourceCount
+    && receipt.exactMatches === receipt.sourceCount
+    && typeof receiptSha256 === 'string' && /^sha256:[0-9a-f]{64}$/i.test(receiptSha256);
+  return {
+    status: valid ? 'SNAPSHOT_BYTES_READBACK_PROVEN' : 'SEAL_READBACK_RECEIPT_MISMATCH',
+    violations: valid ? [] : ['SEAL_READBACK_RECEIPT_MISMATCH'],
+    readbackSource: 'SEAL_TIME_RECEIPT',
+    receiptSha256: receiptSha256 ?? null,
+    receiptGeneratedAt: receipt?.generatedAt ?? null,
+    sourceCount: Math.max(sourceCount, 0),
+    exactMatches: valid ? receipt.exactMatches : 0,
+  };
 }

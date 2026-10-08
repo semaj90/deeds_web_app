@@ -21,7 +21,7 @@ describe('code-evidence-synthesizer', () => {
 			featureLabel: 'Session store',
 			text: 'export class SessionStore { loadSession(sessionId: string) { return sessionId; } }',
 			isCode: true,
-			representationRevision: 'semantic_768@1',
+			representationRevision: null,
 			producerId: 'source-pos-concept-adapter',
 			producerRevision: 'source-pos-concept-adapter-v1',
 			featureRevision: 'feature:v1',
@@ -59,6 +59,7 @@ describe('code-evidence-synthesizer', () => {
 		expect(result?.packet.packetKey).toBe(packetKey);
 		expect(result?.receipt.schemaVersion).toBe('code-evidence-synthesizer-receipt.v1');
 		expect(result?.receipt.packetKey).toBe(packetKey);
+		expect(result?.receipt.representationRevision).toBeNull();
 		expect(result?.receipt.semanticDimension).toBe(768);
 		expect(result?.receipt.extractedFeatureCount).toBe(3);
 		expect(result?.receipt.astSymbolCount).toBeGreaterThan(0);

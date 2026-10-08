@@ -5475,6 +5475,40 @@ Implementation references and current gaps:
 - Candidate ordinal authority: `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts` (`CandidateOrdinalMapV1`, `materializeCandidateOrdinalMap`). The map is schema-backed and checksum-bearing, but a production frozen population receipt for this tranche is not yet proven.
 - Exact KNN executor: `python/atlas_compute/cuvs_analytics.py` (`run_cuvs_exact_knn`, `run_cuvs_all_neighbors`). It already records `top_k`, metric, row/dimension counts, and neighbor/distance checksums; the missing gate is binding those results to the admitted candidate map and input population checksum.
 - KMeans executor: `python/atlas_compute/cluster_softmax.py` (`run_cuvs_soft_kmeans`). It records cluster parameters and replay data, but centroid membership/checksum admission is still open.
+- [ ] **KMEANS-HELPER-01 — existing RAPIDS endpoint and receipt audit (2026-10-06):**
+  The existing FastAPI RAPIDS sidecar is `python/atlas_rapids_sidecar_graph.py`,
+  which mounts `POST /v1/semantic512/kmeans` from
+  `python/atlas_semantic512_runtime.py`; do not add another service or route.
+  This endpoint clusters `latent_64` rows derived from `semantic_512`, not the
+  canonical `semantic_768` corpus. The legacy `scripts/ml/ml_sidecar/server.py`
+  `/cluster` route is Flask-based, gates cuML behind `CUVS_AVAILABLE`, and has
+  a misleading sklearn fallback under `rapids_umap`; it is not the selected
+  RAPIDS owner. WSL package metadata reports cuML/cuVS 26.6.0, CuPy 14.1.1,
+  NumPy 2.4.6, FastAPI 0.141.1; this proves installation only. `:8098` did not
+  answer the bounded health/capability probe. `:8090/slots` reported
+  `is_processing=false`; no GPU computation was run pending operator approval
+  for the existing GPU preparation workflow. The clustering receipt now adds
+  a checksum of the normalized float32 little-endian matrix and an input
+  checksum covering identity, recipe, and KMeans parameters. Direct WSL
+  checksum assertions pass; pytest is not installed in the WSL RAPIDS env or
+  the Windows interpreter. Live cuML execution, CPU-oracle parity, candidate
+  ordinal binding, and routing benefit remain unproven. See
+  `python/atlas_semantic512_runtime.py` and
+  `python/tests/test_atlas_semantic512_runtime.py`.
+  **Implementation addendum (2026-10-06):** the deployed service entrypoint
+  is `services/atlas-gpu-8098/app.py`, not
+  `python/atlas_rapids_sidecar_graph.py`. The former now has a thin
+  `/v1/semantic512/kmeans` adapter to the existing `cluster_latent64` owner,
+  requires the shared `cuml` residency lease, and marks the response
+  non-canonical with all persistent writes false. The Dockerfile copies the
+  runtime module. The live 8098 container was independently observed to be a
+  different FastAPI app without this route (its cuML/cuVS are 26.8.0, unlike
+  WSL's 26.6.0); no rebuild or restart was performed. A stubbed TestClient
+  contract smoke passed before lazy-import hardening, but WSL failed to start
+  the test process on the latest rerun; lazy-import changes are therefore
+  `NOT_REVERIFIED`. No cuML computation or GPU preparation was run. Keep this
+  gate open until Python validation, a bounded source-level smoke, deployed
+  runtime alignment, and separately authorized CPU-oracle/GPU parity pass.
 - SOM executor: `python/atlas_compute/som.py` (`train_deterministic_som`). It supports deterministic 20x20 execution; fixture mode may retain population-derived defaults, but `python/atlas_compute/aligned_snapshot_experiment_v2.py` now rejects omitted production values and requires explicit `som_grid_rows=20` and `som_grid_columns=20` alongside a ready candidate-freeze receipt.
 - Shared experiment coordinator: `python/atlas_compute/aligned_snapshot_experiment_v2.py`. It currently executes exact KNN, KMeans, and SOM over the same loaded semantic matrix, but does not yet prove the `CandidateOrdinalMapV1`/population receipt before downstream stages.
 - Required report: `docs/reports/som-ae-knn-kmeans-alignment-v1.json`; this is a read-only proof receipt, not an artifact writer.
@@ -16483,3 +16517,13 @@ signals in the controller rows (`priority`, `kind`, `eta`, `lastUpdatedAt`, `dep
 - [x] Classified all seven prior hard-failure samples against current PostgreSQL and the Windows checkout: 2 have valid root-file path shape but remain source-binding-unproven because historical hashes differ and `source_revision`/`workspace_revision_key` are absent; 1 is blank; 4 remain `NO_PATH_STRUCTURE` (`nul`, `utputFormat`, `1`, `--since 2h`). Conservation: 2 + 1 + 4 = 7.
 - [x] Fresh receipt `docs/reports/gan-readonly-live-proof-v1-20260926T212915Z.json`: 61,718 rows read, 61,713 pass, 5 hard failures; SQL/JS parity and all harness consistency checks true. The old extension rule falsely rejected 56,719 rows now accepted; 0 legacy-accepted rows were newly rejected. Exception detail: `docs/reports/source-ref-exception-classification-v1-20260926T213100Z.json`.
 - [x] Focused source/packet validator and GAN integration tests: 18/18; `atlas-core` `tsc --noEmit` passed. No canonical source refs, packet rows, or revisions were modified; PostgreSQL/Qdrant/Valkey/RabbitMQ/Neo4j/Graphify writes/runs: 0.
+- [x] CURRENT SOURCE AUTHORITY EXACT RECHECK (2026-10-06; read-only; no Graphify refresh or datastore writes): ran `npx tsx scripts/atlas/select-current-source-evidence-authority-v1.mts --tolerance-ms=0`, which invokes the existing `materializeWorkspaceRevisionOriginV1()` owner and queries Graphify run bindings. Fresh worktree identity: workspace `625743d2-092b-4fa8-abe0-9dc094920c80`, revision `sha256:a2381c9a124b313a25a71a8ede04086bac8bf62a0e9e4f0c17d4ef1b2d931791`, 26,792 source entries, `dirty=true`. Result: `NO_CURRENT_COMPLETED_BOUND_SOURCE_OWNER`; 20 total runs, 13 completed, 4 completed with file rows, 9 completed without file rows, 0 running; selected execution is null. Rejection counts: 20 `STALE_WORKSPACE_REVISION`, 20 `SOURCE_MANIFEST_DIGEST_MISMATCH`, 14 `UNBOUND_NEVER_SOURCE_AUTHORITY`, 7 `NON_TERMINAL_STATUS` (reason classes may overlap per run). Receipt: `docs/reports/current-source-evidence-authority-v1.json`; `canonicalAuthority=false`, `writesPerformed=false`. This confirms the prior 2026-09-11/09-26 receipt mismatch was a symptom: no current exact-bound Graphify owner exists for this fresh revision. Do not run the packet/chunk audit by combining older receipts; next safe prerequisite is an explicitly authorized Graphify execution/admission for a frozen workspace snapshot, followed by exact source-selection readback. This recheck did not authorize or start that execution.
+
+### PACKET-CHUNK-LINEAGE-BOUNDED-RECHECK (2026-10-07; read-only)
+- [x] Deployment preflight confirmed `public.atlas_packet_chunk_lineage` exists with 127,927 rows, all `revision_status='PROVEN'`; this proves deployment/population only, not coverage for a selected current cohort.
+- [x] Bounded join over 52 source bindings for workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` and explicit Graphify execution `74d50c86-8194-45ea-8c3d-61aab737ef83`: 52/52 source/workspace/content diagnostics matched; 0 revision mismatches, 0 content mismatches; 52 exact Graphify sources; 5 proven packet/chunk lineage rows; 24 exact canonical packet identity matches; 0 ambiguous packet sources. Legacy `content_hash` matches were 0 and remain diagnostic, not canonical identity.
+- [x] Deterministically classified a new 52-row bounded sample selected from the explicit Graphify execution using sorted source-reference order; receipt checksum `sha256:48985c3c2226d0606c459ba7df797824e609cf490811acab58e7d1892ed9770c`. Counts: `NO_PACKET_REFERENCE=38`, `CANONICAL_PACKET_IDENTITY_ONLY=14`, all other classes `0`; exact lineage in this sample is `0`. This is a different cohort from the earlier unordered 52-row audit: the earlier report did not persist row membership, so its 24 identity / 5 lineage totals cannot be row-reconciled against this deterministic sample. The current sorted sample is not population-representative and does not establish full-cohort coverage.
+- [ ] `CURRENT_PACKET_CHUNK_IDENTITY_RECONCILIATION` remains open: review the new deterministic row classifications and reconcile packet/chunk ownership before scaling. Do not infer a full-cohort rate, substitute legacy hashes/source paths, backfill, or authorize writes from either bounded sample.
+- [ ] `CURRENT-PACKET-CHUNK-IDENTITY-SCALE-01` remains gated: only after category assignment is deterministic, select 500 exact members by a reproducible rule and repeat the read-only lineage audit. Preserve the explicit workspace/execution binding and report selected/eligible denominators; do not extrapolate from 52 rows.
+- [x] Final GAN adversarial fixture validation after this slice: `ADVERSARIAL_FIXTURES_PROVEN`, 16/16 probes passed; receipt `docs/reports/gan-adversarial-proof-v1-20261008T043358Z.json`. This is contract/adversarial fixture evidence only and does not close packet/chunk identity or live lineage gates.
+- Audit report: `docs/reports/current-workspace-packet-chunk-join-v1.json`; all persistent-store write flags are false. The report is bounded diagnostic evidence, not current-workspace admission.

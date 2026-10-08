@@ -21,10 +21,19 @@ import { HEALTHY_DATABASE, classifyPostgresError, type DatabaseReadinessClassifi
 const PROBE_TIMEOUT = 3000;
 
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
-	return Promise.race([
-		p,
-		new Promise<T>((resolve) => setTimeout(() => resolve(fallback), PROBE_TIMEOUT)),
-	]);
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+	try {
+		return await Promise.race([
+			p,
+			new Promise<T>((resolve) => {
+				timeout = setTimeout(() => resolve(fallback), PROBE_TIMEOUT);
+			}),
+		]);
+	} catch {
+		return fallback;
+	} finally {
+		if (timeout) clearTimeout(timeout);
+	}
 }
 
 type ServiceState = {
@@ -67,7 +76,7 @@ async function probeNeo4j(): Promise<boolean> {
 	}
 }
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.user) return json({ ready: false, error: 'Unauthorized' }, { status: 401 });
 	const redis: Redis = getRedis();
 	const runtimeProfile = getParentAtlasRuntimeProfileManifest();
@@ -78,7 +87,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	const probeEngramEmbed = async (): Promise<boolean> => {
 		const baseUrl = ENV.TURBOVEC_SIDECAR_JSONRPC_URL ?? ENV.TURBOVEC_SIDECAR;
-		const response = await fetch(`${baseUrl}/health`, {
+		if (!baseUrl) return false;
+		const response = await fetch(new URL('/health', baseUrl), {
 			signal: AbortSignal.timeout(PROBE_TIMEOUT),
 		});
 		return response.ok;

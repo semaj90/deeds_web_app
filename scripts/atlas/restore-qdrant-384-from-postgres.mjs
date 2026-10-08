@@ -20,6 +20,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+const args = process.argv.slice(2);
+if (args.includes('--apply')) {
+  console.error('LEGACY_384_QDRANT_RESTORE_DISABLED: 384-D projections are retired; use the admitted semantic_768 projection path');
+  process.exit(2);
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const __root = path.resolve(__dirname, '../..');
 
@@ -35,7 +41,6 @@ const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 const COLLECTION_NAME = 'codebase_chunks_384';
 const TMP_DIR = path.resolve(__root, '.tmp');
 
-const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
 const verbose = args.includes('--verbose');
 const batchSize = parseInt(args.find(a => a.startsWith('--batch='))?.split('=')[1] || '100');

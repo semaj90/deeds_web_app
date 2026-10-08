@@ -15,29 +15,20 @@ import hashlib
 import json
 import math
 import os
+import struct
 import time
 from typing import Any, Callable
 
 from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel
 
-try:
-    import cupy as cp
-    from cuvs.neighbors import brute_force
-except Exception as exc:  # pragma: no cover - runtime dependent
-    cp = None  # type: ignore[assignment]
-    brute_force = None  # type: ignore[assignment]
-    _CUVS_ERROR: str | None = f"{type(exc).__name__}: {exc}"
-else:
-    _CUVS_ERROR = None
-
-try:
-    from cuml.cluster import KMeans
-except Exception as exc:  # pragma: no cover - runtime dependent
-    KMeans = None  # type: ignore[assignment]
-    _CUML_ERROR: str | None = f"{type(exc).__name__}: {exc}"
-else:
-    _CUML_ERROR = None
+cp = None
+brute_force = None
+KMeans = None
+_CUVS_ERROR: str | None = None
+_CUML_ERROR: str | None = None
+_CUVS_LOADED = False
+_CUML_LOADED = False
 
 SEMANTIC_DIM = 512
 LATENT_DIM = 64
@@ -113,6 +104,42 @@ def _fail(code: str, message: str, status_code: int = 422) -> None:
     raise HTTPException(status_code=status_code, detail={"code": code, "message": message})
 
 
+def _load_cuvs_runtime() -> None:
+    global cp, brute_force, _CUVS_ERROR, _CUVS_LOADED
+    if _CUVS_LOADED:
+        return
+    _CUVS_LOADED = True
+    try:
+        import cupy as cupy_module
+        from cuvs.neighbors import brute_force as brute_force_module
+    except Exception as exc:  # pragma: no cover - runtime dependent
+        cp = None
+        brute_force = None
+        _CUVS_ERROR = f"{type(exc).__name__}: {exc}"
+    else:  # pragma: no cover - runtime dependent
+        cp = cupy_module
+        brute_force = brute_force_module
+        _CUVS_ERROR = None
+
+
+def _load_cuml_runtime() -> None:
+    global cp, KMeans, _CUML_ERROR, _CUML_LOADED
+    if _CUML_LOADED:
+        return
+    _CUML_LOADED = True
+    try:
+        import cupy as cupy_module
+        from cuml.cluster import KMeans as kmeans_class
+    except Exception as exc:  # pragma: no cover - runtime dependent
+        cp = None
+        KMeans = None
+        _CUML_ERROR = f"{type(exc).__name__}: {exc}"
+    else:  # pragma: no cover - runtime dependent
+        cp = cupy_module
+        KMeans = kmeans_class
+        _CUML_ERROR = None
+
+
 def _l2_normalized(values: list[float], dim: int, label: str) -> list[float]:
     if len(values) != dim:
         raise ValueError(f"{label} dimension {len(values)} != {dim}")
@@ -159,6 +186,41 @@ def _manifest_checksum(rows: list[IdentityRow]) -> str:
     return hashlib.sha256(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()).hexdigest()
 
 
+def _vector_matrix_checksum(vectors: list[list[float]]) -> str:
+    digest = hashlib.sha256()
+    digest.update(f"atlas.latent64.float32-le.v1:{len(vectors)}x{LATENT_DIM}\0".encode())
+    for row in vectors:
+        if len(row) != LATENT_DIM:
+            raise ValueError(f"latent matrix dimension {len(row)} != {LATENT_DIM}")
+        for value in row:
+            if not math.isfinite(float(value)):
+                raise ValueError("latent matrix contains non-finite values")
+            digest.update(struct.pack("<f", float(value)))
+    return digest.hexdigest()
+
+
+def _kmeans_input_checksum(
+    req: Latent64KMeansRequest,
+    identity_manifest_checksum: str,
+    vector_matrix_checksum: str,
+) -> str:
+    payload = {
+        "algorithmRevision": KMEANS_ALGORITHM_REVISION,
+        "autoencoderRevision": req.autoencoderRevision,
+        "identityManifestChecksum": identity_manifest_checksum,
+        "latentRepresentationId": LATENT_REPRESENTATION,
+        "maxIter": req.maxIter,
+        "nClusters": req.nClusters,
+        "randomState": req.randomState,
+        "reconciliationReceiptId": req.reconciliationReceiptId,
+        "sourceRepresentationId": req.sourceRepresentationId,
+        "tol": req.tol,
+        "vectorMatrixChecksum": vector_matrix_checksum,
+    }
+    canonical = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def _identity_json(row: IdentityRow) -> dict[str, Any]:
     return {
         "packetKey": row.packetKey,
@@ -183,6 +245,7 @@ def _device_row(array: Any) -> list[Any]:
 
 
 def exact_semantic512(req: ExactSemantic512Request) -> dict[str, Any]:
+    _load_cuvs_runtime()
     if _CUVS_ERROR is not None or cp is None or brute_force is None:
         _fail("CUVS_UNAVAILABLE", _CUVS_ERROR or "cuVS unavailable", 503)
     if req.query.representationId != SEMANTIC_REPRESENTATION:
@@ -248,6 +311,7 @@ def exact_semantic512(req: ExactSemantic512Request) -> dict[str, Any]:
 
 
 def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
+    _load_cuml_runtime()
     if _CUML_ERROR is not None or cp is None or KMeans is None:
         _fail("CUML_UNAVAILABLE", _CUML_ERROR or "cuML unavailable", 503)
     if req.sourceRepresentationId != SEMANTIC_REPRESENTATION:
@@ -268,6 +332,10 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
         vectors = [_l2_normalized(row.vector, LATENT_DIM, f"rows[{i}]") for i, row in enumerate(req.rows)]
     except ValueError as exc:
         _fail("LATENT64_INVALID", str(exc))
+
+    identity_manifest_checksum = _manifest_checksum(req.rows)
+    vector_matrix_checksum = _vector_matrix_checksum(vectors)
+    input_checksum = _kmeans_input_checksum(req, identity_manifest_checksum, vector_matrix_checksum)
 
     receipt_ids = {row.reconciliationReceiptId for row in req.rows if row.reconciliationReceiptId}
     if req.reconciliationReceiptId and receipt_ids and receipt_ids != {req.reconciliationReceiptId}:
@@ -314,7 +382,9 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
         "maxIter": req.maxIter,
         "tol": req.tol,
         "inertia": float(model.inertia_),
-        "identityManifestChecksum": _manifest_checksum(req.rows),
+        "identityManifestChecksum": identity_manifest_checksum,
+        "vectorMatrixChecksum": vector_matrix_checksum,
+        "inputChecksum": input_checksum,
         "durationMs": round(duration_ms, 3),
         "centroids": centers_host,
         "assignments": assignments,
@@ -381,6 +451,8 @@ def install_semantic512_routes(
 
     @router.get("/capabilities")
     def semantic512_capabilities() -> dict[str, Any]:
+        _load_cuvs_runtime()
+        _load_cuml_runtime()
         return {
             "representationId": SEMANTIC_REPRESENTATION,
             "semanticDimension": SEMANTIC_DIM,

@@ -81,7 +81,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 	const jsonlRecordIndex = typeof meta.jsonlRecordIndex === 'number' ? meta.jsonlRecordIndex : null;
 	const jsonlLineNumber = typeof meta.jsonlLineNumber === 'number' ? meta.jsonlLineNumber : null;
 	const jsonlParserRevision = (meta.jsonlParserRevision as string | null | undefined) ?? null;
-	const representationRevision = (meta.representationRevision as string | null | undefined) ?? 'semantic_768@1';
+	const representationRevision = (meta.representationRevision as string | null | undefined)?.trim() || null;
 	const producerId = (meta.producerId as string | null | undefined) ?? 'parent-atlas-analysis-worker';
 	const producerRevision = (meta.producerRevision as string | null | undefined) ?? ANALYSIS_WORKER_REVISION;
 	const featureRevision = (meta.featureRevision as string | null | undefined) ?? 'ast-grep-feature-registry-v1';
@@ -465,7 +465,7 @@ async function pollOnce(): Promise<void> {
 									sourceRef: String((codeEvidenceReceipt as Record<string, unknown>).sourceRef ?? job.evidenceId),
 									sourceRevision: String((codeEvidenceReceipt as Record<string, unknown>).sourceRevision ?? jobResult.sourceRevision ?? ''),
 									workspaceRevision: (codeEvidenceReceipt as Record<string, unknown>).workspaceRevision as string | null | undefined,
-									representationRevision: String((codeEvidenceReceipt as Record<string, unknown>).representationRevision ?? 'semantic_768@1'),
+									representationRevision: (codeEvidenceReceipt as Record<string, unknown>).representationRevision as string | null | undefined ?? null,
 									family: cfg.family,
 									passName: cfg.passName,
 									passRevision: cfg.passRevision,

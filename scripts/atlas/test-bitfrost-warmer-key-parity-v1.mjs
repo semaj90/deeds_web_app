@@ -16,7 +16,7 @@ const checks = [
   ['WARM_SOM_SOURCE', warmer.includes("col('som_cell_x')") && warmer.includes("col('som_cell_y')")],
   ['WARM_SOM_LEGACY_NOT_ROUTING', !warmer.includes('packetFieldValue(row, \'som_cluster\')') && !warmer.includes('row.som_cluster ??')],
   ['WARM_PACKET_SOURCE', warmer.includes("table_name = 'atlas_packets'")],
-  ['WARM_LINEAGE_REQUIRED', warmer.includes("lineageColumns = ['source_revision', 'workspace_revision', 'canonical_source_ref']") && warmer.includes('BITFROST_WARM_SOURCE_LINEAGE_COLUMNS_MISSING')],
+  ['WARM_LINEAGE_REQUIRED', warmer.includes("lineageColumns = ['source_revision', 'canonical_source_ref']") && warmer.includes('BITFROST_WARM_SOURCE_LINEAGE_COLUMNS_MISSING') && warmer.includes('b.workspace_revision::text as workspace_revision') && warmer.includes('b.canonical_source_ref = p.canonical_source_ref') && warmer.includes('b.source_revision = p.source_revision')],
   ['WARM_EMPTY_CENTROID_REJECTED', warmer.includes("!/:$/.test(key)")],
 ];
 

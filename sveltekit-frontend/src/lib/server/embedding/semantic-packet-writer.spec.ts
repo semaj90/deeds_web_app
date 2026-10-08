@@ -38,6 +38,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				writesPerformed: false,
 			},
 			vector,
+			representationRevision: 7,
 			metadata: { test: true },
 		}, database);
 
@@ -71,6 +72,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				writesPerformed: false,
 			},
 			vector: Array.from({ length: 768 }, () => 0),
+			representationRevision: 7,
 		}, database)).rejects.toThrow();
 		expect(database.insert).not.toHaveBeenCalled();
 	});
@@ -86,6 +88,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:semantic:1',
 				sourceRef: 'src/lib/server/example.ts',
 				vector,
+				representationRevision: 7,
 				metadata: { source: 'unit-test' },
 			},
 			database,
@@ -101,7 +104,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		expect(row.packetKey).toBe('packet:semantic:1');
 		expect(row.featureId).toBe('semantic_768');
 		expect(row.featureLabel).toBe('semantic_768');
-		expect(row.representationRevision).toBe(0);
+		expect(row.representationRevision).toBe(7);
 		expect(row.sourceRepresentationId).toBe('semantic_768');
 		expect(row.sourceDimension).toBe(768);
 		expect(row.encoderRevision).toBe(CANONICAL_SEMANTIC_ENCODER_REVISION);
@@ -125,6 +128,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:semantic:2',
 				sourceRef: 'src/lib/server/example-2.ts',
 				vector,
+				representationRevision: 7,
 			},
 			database,
 		);
@@ -149,9 +153,10 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: '',
 				sourceRef,
 				treeNodeId,
-				titleId,
-				vector,
-			},
+					titleId,
+					vector,
+					representationRevision: 7,
+				},
 			database,
 		);
 
@@ -180,9 +185,10 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:legacy:alias',
 				sourceRef,
 				treeNodeId,
-				titleId,
-				vector,
-			},
+					titleId,
+					vector,
+					representationRevision: 7,
+				},
 			database,
 		);
 
@@ -205,6 +211,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				sourceRevision: 'sha256:abc123',
 				contentHash: 'sha256:def456',
 				vector,
+				representationRevision: 7,
 			},
 			database,
 		);
@@ -235,6 +242,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:semantic:6',
 				sourceRef: 'src/lib/server/example-6.ts',
 				vector,
+				representationRevision: 7,
 			},
 			database,
 		);
@@ -261,6 +269,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				sourceRef: 'src/lib/server/example-7.ts',
 				summary: 'Handles canonical semantic packet persistence.',
 				vector,
+				representationRevision: 7,
 			},
 			database,
 		);
@@ -287,6 +296,7 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 				packetKey: 'packet:semantic:8',
 				sourceRef: 'src/lib/server/example-8.ts',
 				vector,
+				representationRevision: 7,
 			},
 			database,
 		);

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import {
   atlasCoverageInputSchema,
   atlasContextInputSchema,
   atlasGetChunkInputSchema,
   traceSearchInputSchema,
   atlasGraphPageRankInputSchema,
+  atlasPacketDenseSearchAdvertisedSchema,
   atlasPacketDenseSearchInputSchema,
   atlasPacketSearchInputSchema,
   featureDocumentReadInputSchema,
@@ -428,6 +430,27 @@ describe('ORF-7 read-tool input bounds', () => {
     }).success).toBe(false);
   });
 
+  it('routes DOCS dense requests through a separate bounded contract', () => {
+    const valid = atlasPacketDenseSearchInputSchema.parse({
+      scope: 'DOCS',
+      query_vector: Array(PACKET_DENSE_VECTOR_DIMENSIONS).fill(0),
+      product: 'tRPC',
+      product_version: '11',
+      limit: 25,
+    });
+    expect(valid).toMatchObject({ scope: 'DOCS', product: 'tRPC', product_version: '11', limit: 25 });
+
+    expect(atlasPacketDenseSearchInputSchema.safeParse({
+      scope: 'DOCS', query_vector: Array(384).fill(0),
+    }).success).toBe(false);
+    expect(atlasPacketDenseSearchInputSchema.safeParse({
+      scope: 'DOCS', query_vector: Array(PACKET_DENSE_VECTOR_DIMENSIONS).fill(0), collection: 'codebase_chunks_768',
+    }).success).toBe(false);
+    expect(atlasPacketDenseSearchInputSchema.safeParse({
+      scope: 'DOCS', query_vector: Array(PACKET_DENSE_VECTOR_DIMENSIONS).fill(0), limit: 26,
+    }).success).toBe(false);
+  });
+
   it('bounds feature evidence tuple requests to a short id and sixteen existing rows', () => {
     expect(featureEvidenceTuplesInputSchema.parse({ featureId: 'feature-a' })).toEqual({
       featureId: 'feature-a',
@@ -476,4 +499,51 @@ describe('ORF-7 read-tool input bounds', () => {
     expect(FEATURE_DOCUMENT_MANIFEST_MAX_BYTES).toBe(256 * 1024);
     expect(FEATURE_DOCUMENT_DIRECTORY_MAX_ENTRIES).toBe(256);
   });
+});
+
+describe('atlas.packet_dense_search advertised schema (MCP tools/list conformance)', () => {
+  it('serializes as type: object with no top-level anyOf (a non-object inputSchema makes MCP clients reject ALL tools)', () => {
+    const json = z.toJSONSchema(atlasPacketDenseSearchAdvertisedSchema) as Record<string, unknown>;
+    expect(json.type).toBe('object');
+    expect(json.anyOf).toBeUndefined();
+    expect(json.oneOf).toBeUndefined();
+  });
+  it('documents the fields of both scopes so a model can call it', () => {
+    const props = Object.keys((z.toJSONSchema(atlasPacketDenseSearchAdvertisedSchema) as { properties: Record<string, unknown> }).properties);
+    expect(props).toEqual(expect.arrayContaining(['scope', 'collection', 'query_text', 'query_vector', 'feature_id', 'product']));
+  });
+  it('accepts every input the strict union accepts (no valid call is lost) and keeps unknown keys for strict DOCS rejection', () => {
+    const code = { feature_id: 'feature-a', collection: 'codebase_chunks_768', query_text: 'q' };
+    const docs = { scope: 'DOCS', query_vector: Array(PACKET_DENSE_VECTOR_DIMENSIONS).fill(0) };
+    for (const input of [code, docs]) {
+      expect(atlasPacketDenseSearchInputSchema.safeParse(input).success).toBe(true);
+      expect(atlasPacketDenseSearchAdvertisedSchema.safeParse(input).success).toBe(true);
+    }
+    const strayDocs = { ...docs, stray: 1 };
+    expect(atlasPacketDenseSearchAdvertisedSchema.parse(strayDocs)).toHaveProperty('stray');
+    expect(atlasPacketDenseSearchInputSchema.safeParse(strayDocs).success).toBe(false);
+  });
+});
+
+describe('atlas.packet_dense_search: advertised schema never weakens runtime validation', () => {
+  const vec = Array(PACKET_DENSE_VECTOR_DIMENSIONS).fill(0);
+  const samples: Array<[string, Record<string, unknown>, boolean]> = [
+    ['valid CODE with text', { feature_id: 'f', collection: 'codebase_chunks_768', query_text: 'q' }, true],
+    ['valid CODE with vector', { source_ref: 's', collection: 'codebase_chunks_768_v2', query_vector: vec }, true],
+    ['valid DOCS', { scope: 'DOCS', query_vector: vec }, true],
+    ['hybrid: DOCS scope carrying CODE-only fields (DOCS branch is strict)', { scope: 'DOCS', query_vector: vec, feature_id: 'f', collection: 'codebase_chunks_768' }, false],
+    ['CODE without any selective filter', { collection: 'codebase_chunks_768', query_text: 'q' }, false],
+    ['CODE with both query_text and query_vector', { feature_id: 'f', collection: 'codebase_chunks_768', query_text: 'q', query_vector: vec }, false],
+    ['DOCS without query_vector', { scope: 'DOCS' }, false],
+    ['wrong vector dimension', { scope: 'DOCS', query_vector: [0, 1] }, false],
+  ];
+  for (const [label, input, expected] of samples) {
+    it(`${label}: strict union => ${expected}; advertised-then-union decision is identical`, () => {
+      expect(atlasPacketDenseSearchInputSchema.safeParse(input).success).toBe(expected);
+      const viaAdvertised = atlasPacketDenseSearchAdvertisedSchema.safeParse(input);
+      // The advertised schema may reject malformed types earlier, but it must never turn an invalid call into a valid one.
+      const finalDecision = viaAdvertised.success && atlasPacketDenseSearchInputSchema.safeParse(viaAdvertised.data).success;
+      expect(finalDecision).toBe(expected);
+    });
+  }
 });

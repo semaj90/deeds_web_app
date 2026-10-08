@@ -73,15 +73,21 @@ const OkfDevCorpusEntrySchema = z.object({
 });
 
 const REPO_ROOT = resolve(process.cwd());
-const MANIFEST_PATH = join(REPO_ROOT, 'docs/.okf/dev/manifest.json');
-const OUTPUT_ROOT = join(REPO_ROOT, 'docs/.okf/dev');
+const args = process.argv.slice(2);
+function argValue(name: string, fallback: string): string {
+  const prefix = `--${name}=`;
+  const value = args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length);
+  return value ? resolve(REPO_ROOT, value) : fallback;
+}
+
+const MANIFEST_PATH = argValue('manifest', join(REPO_ROOT, 'docs/.okf/dev/manifest.json'));
+const OUTPUT_ROOT = argValue('output-root', join(REPO_ROOT, 'docs/.okf/dev'));
 const RAW_ROOT = join(OUTPUT_ROOT, 'raw');
 const RECORDS_PATH = join(OUTPUT_ROOT, 'corpus.jsonl');
 const INDEX_PATH = join(OUTPUT_ROOT, 'index.md');
 const SUMMARY_PATH = join(OUTPUT_ROOT, 'summary.json');
 const execFileAsync = promisify(execFile);
 
-const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const limitArg = args.find((arg) => arg.startsWith('--limit='));
 const limit = limitArg ? Number(limitArg.split('=')[1]) : Number.POSITIVE_INFINITY;
@@ -261,6 +267,9 @@ async function fetchWithBeautifulSoup(url: string) {
 }
 
 async function main() {
+  if (!dryRun && [RECORDS_PATH, INDEX_PATH, SUMMARY_PATH].some((path) => existsSync(path))) {
+    throw new Error(`refusing_to_overwrite_existing_corpus:${OUTPUT_ROOT}`);
+  }
   const manifest = JSON.parse(await readFile(MANIFEST_PATH, 'utf8')) as { sources: ManifestSource[] };
   const records: string[] = [];
   const summary: Record<string, { pages: number; domains: Record<string, number> }> = {};
@@ -306,11 +315,9 @@ async function main() {
         source_ref: `${source.source_id}:${slug}`,
         url,
         title: fetched.title,
-        domain_class: classifyDomain(source.source_id, fetched.title, markdown),
+        domain_class: source.domain_class,
         focus_tags: focusTags,
-        llm_synthesis: compress(
-          `This page documents ${fetched.title}. ${source.title} is classified as ${source.domain_class}. ${canonicalApiRecommendations[0]?.recommendation ?? 'No canonical recommendation inferred.'}`
-        ),
+        llm_synthesis: 'No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.',
         llm_output: {
           source: fetched.raw?.source ?? 'firecrawl',
           title: fetched.title,
@@ -341,6 +348,9 @@ async function main() {
           source_id: source.source_id,
           source_title: source.title,
           fetched_via: fetched.raw?.source ?? (process.env.FIRECRAWL_API_KEY ? 'firecrawl' : 'fallback'),
+          domain_classification: 'MANIFEST_SOURCE_HINT_UNREVIEWED',
+          detected_domain_hint: classifyDomain(source.source_id, fetched.title, markdown),
+          synthesis_status: 'NOT_RUN',
         },
       });
 

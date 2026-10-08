@@ -20,7 +20,7 @@ describe('source-pos-concept-packet', () => {
       featureLabel: 'Session store',
       text: 'export class SessionStore { loadSession(sessionId: string) { return sessionId; } }',
       isCode: true,
-      representationRevision: 'semantic_768@1',
+      representationRevision: null,
       producerId: 'source-pos-concept-adapter',
       producerRevision: 'source-pos-concept-adapter-v1',
       featureRevision: 'feature:v1',
@@ -58,6 +58,10 @@ describe('source-pos-concept-packet', () => {
     expect(result?.packet.packetKey).toBe(packetKey);
     expect(result?.packet.sourceRef).toBe('src/lib/server/example.ts');
     expect(result?.packet.sourceRevision).toBe('source:rev-1');
+    expect(result?.packet.representationRevision).toBeNull();
+    expect(result?.packet.posTaggerOutput.representation_revision).toBeNull();
+    expect(result?.packet.featureMatrixSetup.representation_revision).toBeNull();
+    expect(result?.semanticFeatureEnvelope.representationRevision).toBeNull();
     expect(result?.packet.posTaggerOutput.head_type).toBe('pytorch');
     expect(result?.packet.posTaggerOutput.part_of_speech).toBe('PROPN');
     expect(result?.packet.astSymbols).toEqual(expect.arrayContaining(['SessionStore', 'loadSession']));

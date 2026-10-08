@@ -14,7 +14,7 @@ import { db } from '$lib/server/db/client';
 import { env } from '$env/dynamic/private';
 import { ENV } from '$lib/server/env.server.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
-import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
+import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 
 interface QdrantResponse {
   result?: {
@@ -57,20 +57,15 @@ export const GET: RequestHandler = async ({ url }) => {
 
   try {
     // Step 1: preserve the existing raw query recipe while centralizing its contract.
-    const embeddingResult = await executeEmbeddingInputV1({
+    const embeddingResult = await executeProviderEmbeddingV1({
       text: q,
       mode: 'unprompted_legacy',
-      executor: async (prompt) => {
-        const embedResponse = await fetch(`${env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'embeddinggemma:latest', prompt }),
-          signal: AbortSignal.timeout(30_000),
-        });
-        if (!embedResponse.ok) throw new Error(`EMBEDDING_HTTP_${embedResponse.status}`);
-        const embedData = await embedResponse.json() as { embedding?: unknown };
-        return embedData.embedding;
+      provider: {
+        provider: 'ollama',
+        baseUrl: env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL,
+        modelId: 'embeddinggemma:latest',
       },
+      timeoutMs: 30_000,
     });
     const embedding = embeddingResult.embedding;
 

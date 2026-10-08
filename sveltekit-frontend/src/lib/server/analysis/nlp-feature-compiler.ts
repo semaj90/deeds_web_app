@@ -527,6 +527,12 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 			'Canonical workspaceRevision is required; sourceRevision cannot become workspace identity.',
 		);
 	}
+	const representationRevision = input.experimentFeatureMatrix?.representationRevision?.trim() || null;
+	if (!representationRevision) {
+		throw new HypergraphLineageUnavailableError(
+			'Qualified representationRevision is required; sourceRevision cannot become representation identity.',
+		);
+	}
 	const observedAt = new Date().toISOString();
 	const events: AtlasEvent[] = [];
 
@@ -574,7 +580,7 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 				treeNodeId: (passArtifacts?.tree_node_id as string | undefined) ?? null,
 				workspaceRevision,
 				sourceRevision,
-				representationRevision: input.experimentFeatureMatrix?.representationRevision ?? sourceRevision,
+				representationRevision,
 				producerId: 'nlp-feature-compiler',
 				producerRevision: 'event-hypergraph-v1',
 				canonicalizerRevision: 'event-canonicalizer-v1',
@@ -603,7 +609,7 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 				treeNodeId: null,
 				workspaceRevision,
 				sourceRevision,
-				representationRevision: input.experimentFeatureMatrix?.representationRevision ?? sourceRevision,
+				representationRevision,
 				producerId: 'nlp-feature-compiler',
 				producerRevision: 'event-hypergraph-v1',
 				canonicalizerRevision: 'event-canonicalizer-v1',
@@ -643,7 +649,7 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 		0;
 	const workflowScore = Math.min(1, eventBreadthFeatures.workflowBreadth / Math.max(1, events.length));
 	const breadthScore = Math.min(1, eventBreadthFeatures.eventTypeBreadth / 10);
-	const eventRevision = input.experimentFeatureMatrix?.representationRevision ?? sourceRevision;
+	const eventRevision = representationRevision;
 
 	const recommendationFeatureRows = events.slice(0, 8).map((event) =>
 		buildEventRecommendationFeatureRow({

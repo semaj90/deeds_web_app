@@ -31,6 +31,39 @@ export interface LegacyNlpFeatureV1 extends NlpFeature {
 
 export type NormalizedNlpFeatureV1 = LineageQualifiedNlpFeatureV1 | LegacyNlpFeatureV1;
 
+export interface GroundedNlpFactInputV1 {
+  feature: NlpFeature;
+  context: NlpObservationContextV1;
+  sourceBytes: Uint8Array;
+  taskRef: string;
+  canonicalTaskRef: string;
+  taskRevision: string;
+  evidenceCardChecksum: string;
+}
+
+export interface GroundedNlpFactV1 {
+  schema: 'atlas.grounded-nlp-fact.v1';
+  factId: string;
+  taskRef: string;
+  canonicalTaskRef: string;
+  taskRevision: string;
+  evidenceCardChecksum: string;
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  extractorRevision: string;
+  extractorKind: NlpFeature['source'];
+  featureKind: string;
+  featureName: string;
+  proposedLabel: string;
+  surfaceText: string;
+  confidence: number | null;
+  evidenceSpan: { byteStart: number; byteEnd: number; textSha256: string };
+  evidenceKey: string;
+  canonicalAuthority: false;
+  ontologyPromotionAllowed: false;
+}
+
 function nonEmpty(value: string): boolean {
   return value.trim().length > 0;
 }
@@ -84,4 +117,53 @@ export function qualifyNlpFeaturesV1(
   context?: NlpObservationContextV1,
 ): NormalizedNlpFeatureV1[] {
   return features.map((feature) => qualifyNlpFeatureV1(feature, context));
+}
+
+export function groundNlpFeatureV1(input: GroundedNlpFactInputV1): GroundedNlpFactV1 {
+  const { feature, context, sourceBytes } = input;
+  if (!input.taskRef || !input.canonicalTaskRef || !input.taskRevision || !input.evidenceCardChecksum) {
+    throw new Error('GROUNDED_NLP_TASK_BINDING_REQUIRED');
+  }
+  const digestPattern = /^sha256:[a-f0-9]{64}$/;
+  if (!digestPattern.test(context.sourceRevision) || !digestPattern.test(input.taskRevision) || !digestPattern.test(input.evidenceCardChecksum)) {
+    throw new Error('GROUNDED_NLP_SHA256_BINDING_REQUIRED');
+  }
+  const sourceDigest = `sha256:${createHash('sha256').update(sourceBytes).digest('hex')}`;
+  if (sourceDigest !== context.sourceRevision) throw new Error('GROUNDED_NLP_SOURCE_REVISION_MISMATCH');
+  if (feature.sourceRef != null && feature.sourceRef !== context.sourceRef) throw new Error('GROUNDED_NLP_SOURCE_REF_MISMATCH');
+  if (feature.sourceRevision != null && feature.sourceRevision !== context.sourceRevision) throw new Error('GROUNDED_NLP_FEATURE_SOURCE_REVISION_MISMATCH');
+  if (feature.providerRevision != null && feature.providerRevision !== context.providerRevision) throw new Error('GROUNDED_NLP_PROVIDER_REVISION_MISMATCH');
+  if (!Number.isInteger(feature.byteStart) || !Number.isInteger(feature.byteEnd)
+    || feature.byteStart! < 0 || feature.byteEnd! <= feature.byteStart! || feature.byteEnd! > sourceBytes.byteLength) {
+    throw new Error('GROUNDED_NLP_BYTE_SPAN_INVALID');
+  }
+  if (typeof feature.rawText !== 'string' || feature.rawText.length === 0) throw new Error('GROUNDED_NLP_SPAN_TEXT_REQUIRED');
+  const spanBytes = sourceBytes.slice(feature.byteStart, feature.byteEnd);
+  if (!Buffer.from(spanBytes).equals(Buffer.from(feature.rawText, 'utf8'))) throw new Error('GROUNDED_NLP_SPAN_TEXT_MISMATCH');
+  const textSha256 = createHash('sha256').update(spanBytes).digest('hex');
+  const lineage = qualifyNlpFeatureV1(feature, context);
+  if (!lineage.lineageQualified) throw new Error('GROUNDED_NLP_LINEAGE_NOT_QUALIFIED');
+  const body = {
+    schema: 'atlas.grounded-nlp-fact.v1' as const,
+    taskRef: input.taskRef,
+    canonicalTaskRef: input.canonicalTaskRef,
+    taskRevision: input.taskRevision,
+    evidenceCardChecksum: input.evidenceCardChecksum,
+    sourceRef: context.sourceRef,
+    sourceRevision: context.sourceRevision,
+    workspaceRevision: context.workspaceRevision,
+    extractorRevision: context.producerRevision,
+    extractorKind: feature.source,
+    featureKind: feature.kind,
+    featureName: feature.name,
+    proposedLabel: feature.name,
+    surfaceText: feature.rawText,
+    confidence: feature.confidence ?? null,
+    evidenceSpan: { byteStart: feature.byteStart!, byteEnd: feature.byteEnd!, textSha256 },
+    evidenceKey: lineage.evidenceKey,
+    canonicalAuthority: false as const,
+    ontologyPromotionAllowed: false as const,
+  };
+  const factDigest = createHash('sha256').update(JSON.stringify(body), 'utf8').digest('hex');
+  return { ...body, factId: `grounded-nlp:${factDigest}` };
 }

@@ -18,6 +18,7 @@
  */
 
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 
 const id = z.string().min(1);
 const revision = z.string().min(1);
@@ -74,6 +75,8 @@ export type CodeEvidenceGroundedEntryV1 = z.infer<typeof CodeEvidenceGroundedEnt
 export const CodeEvidenceExtractionV1Schema = z.object({
   schema: z.literal('atlas.code-evidence-extraction.v1').default('atlas.code-evidence-extraction.v1'),
   identity: CodeEvidenceIdentityV1Schema,
+  producerRevision: revision,
+  inputChecksum: sha256Hex,
   grounded: z.array(CodeEvidenceGroundedEntryV1Schema).default([]),
   structuralRefs: z.array(z.string()).default([]),
   ontologyRefs: z.array(z.string()).default([]),
@@ -91,22 +94,25 @@ export type CodeEvidenceExtractionV1 = z.infer<typeof CodeEvidenceExtractionV1Sc
 export function assertCodeEvidenceExtractionGrounded(
   extraction: CodeEvidenceExtractionV1,
   sourceText: string,
-  expected: { canonicalId: string; sourceRevision: string }
+  expected: { canonicalId: string; packetKey: string; sourceRevision: string; workspaceRevision: string }
 ): void {
-  if (extraction.identity.canonicalId !== expected.canonicalId) {
-    throw new Error(
-      `CodeEvidenceExtractionV1 identity mismatch: expected canonicalId=${expected.canonicalId}, ` +
-        `got ${extraction.identity.canonicalId}`
-    );
-  }
-  if (extraction.identity.sourceRevision !== expected.sourceRevision) {
-    throw new Error(
-      `CodeEvidenceExtractionV1 identity mismatch: expected sourceRevision=${expected.sourceRevision}, ` +
-        `got ${extraction.identity.sourceRevision}`
-    );
+  for (const field of ['canonicalId', 'packetKey', 'sourceRevision', 'workspaceRevision'] as const) {
+    if (extraction.identity[field] !== expected[field]) {
+      throw new Error(
+        `CodeEvidenceExtractionV1 identity mismatch: expected ${field}=${expected[field]}, ` +
+          `got ${extraction.identity[field]}`
+      );
+    }
   }
   const sourceBytes = Buffer.from(sourceText, 'utf8');
+  const inputChecksum = createHash('sha256').update(sourceBytes).digest('hex');
+  if (extraction.inputChecksum !== inputChecksum) {
+    throw new Error('CodeEvidenceExtractionV1 input checksum mismatch');
+  }
   extraction.grounded.forEach((entry, index) => {
+    if (entry.endByte > sourceBytes.byteLength) {
+      throw new Error(`CodeEvidenceExtractionV1.grounded[${index}] byte range exceeds input length`);
+    }
     const slice = sourceBytes.subarray(entry.startByte, entry.endByte).toString('utf8');
     if (slice !== entry.exactText) {
       throw new Error(

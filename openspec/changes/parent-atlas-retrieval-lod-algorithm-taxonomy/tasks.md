@@ -750,6 +750,26 @@ tested method. Earlier counts (226,350 / 100,350 / 71 / 90 / 100,331) came from 
   authority, stride-12 768->64, INT4, loaded at process start); `scripts/sidecars/turbovec-grpc-bridge.mjs` = ADAPTER
   (`:50062`); `scripts/ingest/turbovec-sidecar.py` = LEGACY; Node MCP sidecar is a separate `:8792` service (not a `:8791`
   competitor). The live index (327,820 vectors) cannot support any compression/recall claim.
+- **TurboVec runtime recheck (2026-10-07, read-only):** existing `scripts/atlas/turbovec-sidecar-health.mjs`
+  returned HTTP 200 from `127.0.0.1:8791/health`, but reported `indexed=0`, `dim=64`, `bits=4`, and `turbovec=false`.
+  This supersedes the older live-count observation as current runtime state; it does not prove an empty canonical corpus
+  or a retrieval failure. No index/search request or service operation was performed. Keep frozen-snapshot, model-revision,
+  owner-decision, and recall gates open; do not benchmark or promote TurboVec from this health response.
+- **Frozen-corpus artifact audit (2026-10-07, read-only):** an existing 5,000-row vector snapshot manifest
+  (`.tmp/atlas-vector-snapshots/vector-snapshot-5k-768-manifest.json`, generated 2026-08-25) records 5,000 vectors,
+  but only 4,999 identity-parity rows, 4,999 unique source refs, and a legacy `embeddinggemma-full768-v1` label; it has
+  no workspace revision or independently bound model-artifact checksum. It is not admitted as the benchmark truth set.
+  The 14,564-row candidate ordinal corpus/receipt is from workspace revision
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`, generated 2026-09-29, and explicitly
+  reports `fullAdmittedRootCoverage=false`; its matching receipt does not bind those rows to the 5,000-vector snapshot.
+  A separate 4,951-row admission receipt has `downstreamAllowed=false` and a fallback `workspace-active-v1` snapshot
+  revision. These artifacts cannot be combined or substituted for one frozen, identity- and recipe-qualified corpus.
+  **Gate remains `BLOCKED_FROZEN_TRUTH_SET_GATE`;** no approximate-vs-exact benchmark or index build was run.
+- **Small-cohort cross-check (2026-10-07, read-only):** `docs/reports/lineage-semantic-768-cohort-v1.json` is a separate
+  15-candidate cohort generated 2026-09-15. Its rows have content-qualified source revisions, but the per-row
+  `semanticRevision` includes `encoder-unspecified` and the cohort has no single independently attested
+  `representationRevision`; it is therefore not a TurboVec benchmark truth set. This confirms that simply shrinking
+  the old 5K population does not fix recipe qualification.
 - Existing `SemanticSnapshotManifest` (`tensor-artifact-contract.ts`, `atlas.semantic-snapshot.v1`) cannot express the
   cohort (fixed float32, single `sourceRevision` vs 558, non-empty `representationRevision`). Do not fork a second
   snapshot owner; the canary layers on it by id.

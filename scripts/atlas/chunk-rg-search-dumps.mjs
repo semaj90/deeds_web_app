@@ -84,7 +84,7 @@ async function streamLines(filePath, onLine) {
 
 async function main() {
   const inputs = INPUT_FILTER ? INPUTS.filter((input) => normalizePath(input).includes(INPUT_FILTER)) : INPUTS.slice();
-  await fs.promises.mkdir(OUT_DIR, { recursive: true });
+  if (!DRY_RUN) await fs.promises.mkdir(OUT_DIR, { recursive: true });
   const packetJsonlPath = path.join(OUT_DIR, 'rg-search-dump-packets.jsonl');
   const packetStream = DRY_RUN ? null : fs.createWriteStream(packetJsonlPath, { encoding: 'utf8' });
 
@@ -215,7 +215,6 @@ async function main() {
     note: 'Large ripgrep dumps are chunked into parent-atlas-ready packets keyed by title_id, feature_id, and sourceRef. The raw .txt dumps remain generated evidence, not the indexed working artifact.',
   };
 
-  await fs.promises.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   const md = [
     '# RG Search Dump Index Report',
     '',
@@ -233,10 +232,15 @@ async function main() {
     report.note,
     '',
   ].join('\n');
-  await fs.promises.writeFile(REPORT_MD, md, 'utf8');
 
-  console.log(`Wrote ${REPORT_JSON}`);
-  console.log(`Wrote ${REPORT_MD}`);
+  if (DRY_RUN) {
+    console.log(JSON.stringify(report, null, 2));
+  } else {
+    await fs.promises.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+    await fs.promises.writeFile(REPORT_MD, md, 'utf8');
+    console.log(`Wrote ${REPORT_JSON}`);
+    console.log(`Wrote ${REPORT_MD}`);
+  }
   console.log(`Packets: ${report.summary.packets}`);
   console.log(`Parsed hits: ${report.summary.parsedHits}`);
 }

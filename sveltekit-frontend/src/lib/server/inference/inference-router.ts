@@ -6,8 +6,8 @@
  * TEXT-ONLY CASCADE:
  *   1. TensorRT-LLM (INT4 AWQ on :8099) — if GPU lease available
  *   2. Triton TensorRT service (:8000) — production GPU fallback
- *   3. Bifrost cache-check (:3040, 500ms deadline) — ε-greedy; cache hits ~5ms (28× speedup)
- *      Bypassed adaptively for high-temp / long-prompt / vision (MeanCache algorithm)
+ *   3. Bifrost semantic cache reuse — disabled until server-derived scope and
+ *      cached-answer provenance satisfy the Parent Atlas admission contract
  *   4. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5× VRAM savings)
  *   4b. Bifrost full fallback — llama-server round-trip, only when TurboQuant is also down
  *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, text fallback
@@ -174,34 +174,11 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
     return tritonResult;
   }
 
-  // Tier 3: Bifrost semantic cache with ε-greedy variance
-  // Cache hits return in <100ms (Qdrant vector lookup). Adaptive bypass probability
-  // prevents stale semantic drift: high-temp, long, or vision requests skip cache.
-  // 500ms abort deadline: miss → TurboQuant; hit → instant return.
+  // Tier 3: Bifrost semantic reuse remains disabled until this route has
+  // server-derived request scope and independently verifiable answer provenance.
+  // Keep ordinary Bifrost inference fallback below; do not send a global cache key.
   if (ENV.BIFROST_ENABLED) {
-    const bypassProb = computeCacheBypassProb(request);
-    if (Math.random() >= bypassProb) {
-      const cacheResult = await tryBifrostCacheCheck(request, start);
-      if (cacheResult) {
-        const isCacheHit = cacheResult.latencyMs < 200;
-        console.info(
-          `[inference-router] backend=bifrost latency=${cacheResult.latencyMs}ms${isCacheHit ? ' CACHE_HIT' : ''}`
-        );
-        logLLMInference({
-          model: cacheResult.model,
-          backend: 'bifrost',
-          latencyMs: cacheResult.latencyMs,
-          tokenCount: cacheResult.usage?.total_tokens,
-          cacheHit: isCacheHit,
-        });
-        return cacheResult;
-      }
-      // Cache miss (>500ms timeout) — fall through to TurboQuant
-    } else {
-      console.debug(
-        `[inference-router] bifrost bypassed (ε-exploration p=${bypassProb.toFixed(2)})`
-      );
-    }
+    console.debug('[inference-router] Bifrost semantic reuse skipped: admission metadata unavailable');
   }
 
   // Tier 4: TurboQuant llama-server (turbo3/4 KV cache, same model, better VRAM usage)
@@ -466,152 +443,6 @@ async function tryTurboQuant(request: InferenceRequest, startTime: number): Prom
       latencyMs: Math.round(performance.now() - startTime),
     };
   } catch {
-    return null;
-  }
-}
-
-/**
- * Compute ε-greedy bypass probability for Bifrost semantic cache.
- *
- * Based on MeanCache (arXiv:2403.02694): deterministic semantic caching
- * degrades over time due to semantic drift. Periodic exploration (ε=10%)
- * injects fresh responses and keeps cache quality healthy.
- *
- * Factors that raise bypass probability (prefer fresh over cached):
- *  - High temperature (>0.6): stochastic requests → cached answer may diverge
- *  - Long prompts (>600 chars): unique context → low semantic hit-rate
- *  - Vision input: image bytes are non-cacheable by embedding alone
- */
-function computeCacheBypassProb(request: InferenceRequest): number {
-  if (request.imageBase64) return 1.0; // vision: image content can't be semantically hashed
-
-  const temp = request.temperature ?? 0.7;
-  if (temp >= 0.95) return 1.0; // near-max temperature = essentially stochastic output
-
-  const promptLen = request.prompt.length;
-  if (promptLen > 2000) return 1.0; // very long prompts are unique; hit rate is negligible
-
-  // Base ε = 10% exploration (prevents semantic drift accumulating in cache)
-  let p = 0.10;
-  // Temperature ramp: [0.6 → 0.95] contributes up to +0.25
-  if (temp > 0.6) p += 0.25 * ((temp - 0.6) / 0.35);
-  // Prompt length ramp: [600 → 2000 chars] contributes up to +0.15
-  if (promptLen > 600) p += 0.15 * ((promptLen - 600) / 1400);
-
-  return Math.min(p, 1.0);
-}
-
-/**
- * Fast cache-only Bifrost probe with 500ms hard deadline.
- *
- * Bifrost semantic cache hits return in <100ms (Qdrant vector lookup → stored response).
- * Cache misses trigger a full llama-server round-trip (30-120s for Gemma 4 thinking mode).
- * Aborting at 500ms means: hit → instant win; miss → hand off to TurboQuant.
- *
- * Cache key namespacing: uses a 6-char hash of the system prompt to partition the cache
- * by legal context (contract-law session won't collide with criminal-law session).
- * Falls back to 'legal-ai-global' when no system prompt is present.
- */
-
-/** Cheap FNV-1a 32-bit hash → 6-char hex string for short cache key suffixes. */
-function shortHash(s: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = (Math.imul(h, 0x01000193) | 0) >>> 0;
-  }
-  return h.toString(16).slice(0, 6);
-}
-
-/**
- * Normalize the user prompt before embedding to improve semantic cache hit rate.
- *
- * Strips filler preambles that hurt embedding similarity ("Can you please explain…"
- * and "I would like to know…" both reduce to the same semantic core). Normalizes
- * legal citation formats so variant spellings hit the same cache entry.
- */
-function normalizePromptForCache(prompt: string): string {
-  return prompt
-    // Strip common filler preambles (case-insensitive)
-    .replace(/^(can you (please )?|could you (please )?|i (want|need|would like) (you )?to |please )/i, '')
-    .replace(/^(help me (understand|with|explain)|tell me (about|how|what|why) )/i, '')
-    // Normalize legal citation variants: § 1234, sec. 1234, section 1234 → §1234
-    .replace(/\bsec(?:tion|\.)?\s*(\d+)/gi, '§$1')
-    .replace(/§\s+(\d)/g, '§$1')
-    // Normalize quotation marks
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .trim();
-}
-
-async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-  const CACHE_HIT_TIMEOUT_MS = 500;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), CACHE_HIT_TIMEOUT_MS);
-
-	  const model = SERVER_CHAT_MODEL;
-  // Normalize prompt to increase semantic cache hit rate
-  const normalizedPrompt = normalizePromptForCache(request.prompt);
-  const messages: Array<{ role: string; content: string }> = [];
-  if (request.systemPrompt) messages.push({ role: 'system', content: request.systemPrompt });
-  messages.push({ role: 'user', content: normalizedPrompt });
-
-  // Namespace cache key by system-prompt hash to avoid cross-context collisions.
-  // Different legal contexts (contract vs. criminal) stay in separate cache partitions.
-  const cacheKey = request.systemPrompt
-    ? `legal-ai-${shortHash(request.systemPrompt)}`
-    : 'legal-ai-global';
-
-  try {
-    const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Required: caching only activates when x-bf-cache-key is present.
-        // 500ms timeout means: if Bifrost doesn't return within that window, it is
-        // waiting on local inference (cache miss) — abort and let TurboQuant handle it.
-        'x-bf-cache-key': cacheKey,
-      },
-      body: JSON.stringify({
-        model: `ollama-local/${model}`,
-        messages,
-        max_tokens: request.maxTokens ?? 2048,
-        temperature: request.temperature ?? 0.7,
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
-
-    if (!res.ok) return null;
-    const data = await res.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
-      extra_fields?: { cache_debug?: { cache_hit?: boolean; hit_type?: string; similarity?: number; threshold?: number } };
-    };
-    const content = data.choices?.[0]?.message?.content ?? '';
-    if (!content) return null;
-
-    const debug = data.extra_fields?.cache_debug;
-    const isCacheHit = debug?.cache_hit ?? false;
-    if (!isCacheHit) {
-      // Got a response but Bifrost says it wasn't a cache hit — could be direct inference
-      // on a <500ms model (e.g. gemma3:270m coldstart). Accept it anyway.
-      console.debug('[inference-router] bifrost responded <500ms but cache_hit=false (fast inference?)');
-    } else {
-      console.debug(`[inference-router] bifrost CACHE HIT type=${debug?.hit_type} similarity=${debug?.similarity?.toFixed(3)} threshold=${debug?.threshold}`);
-    }
-
-    return {
-      text: content,
-      model: 'gemma4-rotorquant:latest-bifrost-cache',
-      backend: 'bifrost',
-      latencyMs: Math.round(performance.now() - startTime),
-    };
-  } catch (err: unknown) {
-    clearTimeout(timer);
-    if (err instanceof Error && err.name === 'AbortError') {
-      console.debug('[inference-router] bifrost cache miss (>500ms), routing to TurboQuant');
-    }
     return null;
   }
 }

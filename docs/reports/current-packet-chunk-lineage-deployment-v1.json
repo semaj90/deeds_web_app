@@ -1,7 +1,7 @@
 {
   "schema": "atlas.current-packet-chunk-lineage-deployment.v1",
   "gate": "CURRENT-PACKET-CHUNK-LINEAGE-DEPLOYMENT-01",
-  "generatedAt": "2026-09-20T23:54:48.762Z",
+  "generatedAt": "2026-10-08T02:11:27.021Z",
   "status": "LINEAGE_DEPLOYMENT_PRESENT",
   "firstBlocker": null,
   "nextGate": "CURRENT-PACKET-CHUNK-LINEAGE-BRIDGE-01",
@@ -15,8 +15,8 @@
   },
   "liveRelation": {
     "present": true,
-    "rowCount": 7421,
-    "provenRowCount": 7421,
+    "rowCount": 127927,
+    "provenRowCount": 127927,
     "columns": [
       {
         "column_name": "id",

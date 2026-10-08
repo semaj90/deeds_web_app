@@ -93,6 +93,24 @@ test('treesitter-chunker IDs remain upstream provenance and do not mint canonica
   assert.equal(result.langextract_observations[0].alignment_exact, true);
 });
 
+test('reused upstream symbol IDs produce distinct deterministic nomination keys', () => {
+  const chunks = [
+    chunk({ upstream_node_id: 'node-interface', symbol_name: 'materialize', kind: 'method_signature' }),
+    chunk({ upstream_node_id: 'node-function', symbol_name: 'materialize', kind: 'function_definition' }),
+    chunk({ upstream_node_id: 'node-class', symbol_name: 'materialize', kind: 'method_definition' }),
+  ];
+  const input = baseInput({ chunks });
+
+  const first = compileStructuralExtractionFabric(input, { producer_revision: 'atlas-test' });
+  const second = compileStructuralExtractionFabric(input, { producer_revision: 'atlas-test' });
+  const keys = first.symbol_nominations.map((nomination) => nomination.symbol_key);
+
+  assert.equal(new Set(keys).size, chunks.length);
+  assert.deepEqual(second.symbol_nominations.map((nomination) => nomination.symbol_key), keys);
+  assert.ok(keys.every((key) => key.startsWith('upstream-symbol:symbol-1:')));
+  assert.equal(first.receipt.canonical_identity_created, false);
+});
+
 test('XRef edges keyed by native symbol_id resolve back to chunk node coordinates', () => {
   const result = compileStructuralExtractionFabric(baseInput({
     chunks: [

@@ -7,7 +7,8 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
+import { createHash } from 'node:crypto';
+import { sealReadbackFromReceiptV1, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PLAN = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
@@ -20,9 +21,16 @@ const derivation = JSON.parse(await readFile(DERIVATION, 'utf8'));
 const hygiene = JSON.parse(await readFile(HYGIENE, 'utf8'));
 const snapshot = JSON.parse(await readFile(derivation.snapshotPath, 'utf8'));
 const readbackPath = argValue('--readback');
-const readback = readbackPath
-  ? JSON.parse(await readFile(resolve(ROOT, readbackPath), 'utf8'))
-  : validateSnapshot(snapshot);
+const sealReadbackPath = argValue('--seal-readback'); // WSR-08b: seal-time readback receipt instead of live bytes
+let readback;
+if (sealReadbackPath) {
+  const receiptBytes = await readFile(resolve(ROOT, sealReadbackPath));
+  readback = sealReadbackFromReceiptV1(JSON.parse(receiptBytes.toString('utf8')), snapshot, `sha256:${createHash('sha256').update(receiptBytes).digest('hex')}`);
+} else {
+  readback = readbackPath
+    ? JSON.parse(await readFile(resolve(ROOT, readbackPath), 'utf8'))
+    : validateSnapshot(snapshot);
+}
 const candidate = derivation.workspaceRevisionCandidate ?? null;
 const checks = {
   derivationReady: derivation.status === 'WORKSPACE_REVISION_CANDIDATE_READY_FOR_ADMISSION',

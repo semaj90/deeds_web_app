@@ -18,6 +18,7 @@ import { workflowActionEventSchema } from '@deeds/parent-atlas/core/workflow-act
 export const ContextToolDagNodeKindSchema = z.enum([
   'QUERY_CLASSIFICATION',
   'RETRIEVAL',
+  'STRUCTURAL_REFINE',
   'CONTEXT_FANOUT',
   'RERANK',
   'EXACT_PROMOTION',
@@ -157,6 +158,7 @@ const PRE_AGENT_STAGE_KIND: Record<string, ContextToolDagNodeKind> = {
   CACHE_LOOKUP: 'RETRIEVAL',
   LEXICAL: 'RETRIEVAL',
   AST: 'RETRIEVAL',
+  AST_STRUCTURAL_REFINE: 'STRUCTURAL_REFINE',
   MEMORY_PRIOR: 'RETRIEVAL',
   SEMANTIC_ROUTE: 'RETRIEVAL',
   GRAPH_EXPANSION: 'CONTEXT_FANOUT',
@@ -175,6 +177,9 @@ export function buildContextToolDagFromPreAgentStages(input: {
   for (const s of input.stages) {
     if (s !== 'AGENT_HANDOFF' && !(s in PRE_AGENT_STAGE_KIND)) throw new Error(`unknown pre-agent stage ${s}`);
   }
+  if (input.stages.includes('AST_STRUCTURAL_REFINE') && !input.stages.includes('LEXICAL')) {
+    throw new Error('AST_STRUCTURAL_REFINE requires the LEXICAL stage');
+  }
   const node = (nodeId: string, kind: ContextToolDagNodeKind, dependsOn: string[]): ContextToolDagNodeV1 => ({
     nodeId, kind, dependsOn, canonicalIds: [], toolName: null, readOnly: true,
     requiresExactPromotion: false, requiresValidation: false, maxAttempts: 1,
@@ -186,7 +191,10 @@ export function buildContextToolDagFromPreAgentStages(input: {
     if (s === 'CACHE_LOOKUP') continue;
     // AST here is the Postgres-backed lookup (retrieveASTMatches), which needs no file list, so it runs beside
     // LEXICAL. A file-parsing AST refinement (ast-grep) would be a separate node that depends on LEXICAL.
-    nodes.push(node(s, PRE_AGENT_STAGE_KIND[s], ['QUERY_ANALYSIS', ...gate]));
+    const dependsOn = s === 'AST_STRUCTURAL_REFINE'
+      ? ['LEXICAL']
+      : ['QUERY_ANALYSIS', ...gate];
+    nodes.push(node(s, PRE_AGENT_STAGE_KIND[s], dependsOn));
   }
   const lookupIds = lookups.filter((s) => s !== 'CACHE_LOOKUP');
   nodes.push(node('EXACT_PROMOTION', 'EXACT_PROMOTION', lookupIds.length ? lookupIds : ['QUERY_ANALYSIS']));

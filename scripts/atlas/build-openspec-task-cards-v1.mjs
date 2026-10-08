@@ -5,7 +5,7 @@ import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildPortfolioCensus } from './audit-openspec-evidence-fabric-v1.mjs';
-import { buildOpenSpecTaskCardReportV1 } from './lib/openspec-task-card-v1.mjs';
+import { buildCompactTaskCardSummaryV1, buildOpenSpecTaskCardReportV1, verifyCompactTaskCardSummaryV1, writeTaskCardShardsV1 } from './lib/openspec-task-card-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const reportLimitBytes = 10_000_000;
@@ -22,10 +22,14 @@ function getHead() {
 }
 
 function parseArgs(args) {
-  const parsed = { checkOnly: false };
+  const parsed = { checkOnly: false, compactSummary: false };
   for (const arg of args) {
     if (arg === '--check-only') {
       parsed.checkOnly = true;
+      continue;
+    }
+    if (arg === '--compact-summary') {
+      parsed.compactSummary = true;
       continue;
     }
     const match = /^--output=(.+)$/.exec(arg);
@@ -87,14 +91,65 @@ function main() {
     taskFileHashes: workboard.sourceFileHashes,
   });
   if (report.source.taskFileCount !== sourceTaskFileCount) throw new Error('TASK_FILE_COUNT_MISMATCH');
+  if (args.compactSummary) {
+    if (!args.output) throw new Error('COMPACT_SUMMARY_OUTPUT_REQUIRED');
+    const outputPath = safeRepoPath(args.output);
+    const outputRelativePath = relative(root, outputPath).replaceAll('\\', '/');
+    if (!outputRelativePath.startsWith('.tmp/')) throw new Error('COMPACT_SUMMARY_OUTPUT_MUST_BE_UNDER_TMP');
+    if (args.checkOnly) throw new Error('COMPACT_SUMMARY_REQUIRES_WRITE_FOR_READBACK');
+    if (getHead() !== headAtStart) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_CARD_BUILD');
+    verifyTaskFileHashes(workboard.sourceFileHashes);
+    const compactSummary = buildCompactTaskCardSummaryV1(report);
+    const serializedSummary = `${JSON.stringify(compactSummary)}\n`;
+    const summaryBytes = Buffer.byteLength(serializedSummary);
+    if (summaryBytes >= reportLimitBytes) throw new Error(`COMPACT_TASK_CARD_SUMMARY_OVER_LIMIT:${summaryBytes}`);
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, serializedSummary, { encoding: 'utf8', flag: 'wx' });
+    const readback = JSON.parse(readFileSync(outputPath, 'utf8'));
+    if (!verifyCompactTaskCardSummaryV1(readback) || readback.checksum !== compactSummary.checksum) {
+      throw new Error('COMPACT_TASK_CARD_SUMMARY_READBACK_MISMATCH');
+    }
+    if (getHead() !== headAtStart) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_SUMMARY_READBACK');
+    verifyTaskFileHashes(workboard.sourceFileHashes);
+    process.stdout.write(`${JSON.stringify({
+      status: 'COMPACT_SUMMARY_READBACK_PROVEN',
+      workspaceHead: readback.source.workspaceHead,
+      workspaceRevision: readback.source.workspaceRevision,
+      sourcePopulationChecksum: readback.source.sourcePopulationChecksum,
+      summary: readback.summary,
+      checksum: readback.checksum,
+      bytes: summaryBytes,
+      readbackChecksumMatched: true,
+      outputArtifactWritten: true,
+      outputPath: outputRelativePath,
+    }, null, 2)}\n`);
+    return;
+  }
   const serialized = `${JSON.stringify(report)}\n`;
   const outputBytes = Buffer.byteLength(serialized);
   if (outputBytes >= reportLimitBytes) {
-    const fieldSizes = Object.keys(report.cards[0] ?? {}).map((key) => ({
-      key,
-      bytes: Buffer.byteLength(JSON.stringify(report.cards.map((card) => card[key] ?? null))),
-    })).sort((left, right) => right.bytes - left.bytes).slice(0, 12);
-    throw new Error(`TASK_CARD_REPORT_OVER_LIMIT:${outputBytes}:${JSON.stringify(fieldSizes)}`);
+    const outputPath = safeRepoPath(args.output ?? relative(root, defaultOutput));
+    if (args.checkOnly) {
+      process.stdout.write(`${JSON.stringify({
+        status: 'SHARDING_REQUIRED', taskCount: report.summary.taskCount, reportBytes: outputBytes,
+        shardTargetBytes: 2_000_000, writesPerformed: false, outputArtifactWritten: false,
+      }, null, 2)}\n`);
+      return;
+    }
+    if (getHead() !== headAtStart) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_CARD_BUILD');
+    verifyTaskFileHashes(workboard.sourceFileHashes);
+    const shardResult = writeTaskCardShardsV1(report, outputPath);
+    if (getHead() !== headAtStart) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_SHARD_READBACK');
+    verifyTaskFileHashes(workboard.sourceFileHashes);
+    const outputRelativePath = relative(root, outputPath).replaceAll('\\', '/');
+    process.stdout.write(`${JSON.stringify({
+      status: 'TASK_CARD_SHARDS_READBACK_PROVEN', taskCount: report.summary.taskCount,
+      taskFileCount: sourceTaskFileCount, reportBytes: outputBytes, shardCount: shardResult.shardCount,
+      manifestBytes: shardResult.bytes, checksum: shardResult.checksum,
+      retrievalStateCounts: report.summary.retrievalStateCounts, evidenceStateCounts: report.summary.evidenceStateCounts,
+      writesPerformed: false, outputArtifactWritten: true, outputPath: outputRelativePath,
+    }, null, 2)}\n`);
+    return;
   }
 
   if (!args.checkOnly) {

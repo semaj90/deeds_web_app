@@ -1,0 +1,72 @@
+schema: atlas.okf.code-capability-knowledge-index.v1
+version: 1
+title: Code Capability Knowledge Cards
+authority: derived_projection
+canonical_authority: false
+design_only: true
+population_state: NOT_ADMITTED
+base_kind: Concept
+discriminator: spec.card_kind
+payload_path: spec.capability_card
+schema_ref: docs/.okf/schema.yaml#capability_card_contract
+canonical_identity_owner: PostgreSQL Parent Atlas packet and symbol identity owners
+identity_policy:
+  canonical_id: resolve_existing_only
+  packet_key: resolve_existing_only
+  source_ref: exact_source_locator
+  source_revision: exact_content_revision
+  workspace_revision: admitted_source_set_revision
+  ordinals_paths_and_labels_are_identity: false
+card_kinds:
+  SymbolKnowledgeCard:
+    required: [symbol_version_id]
+    describes: symbol purpose, signature, source span, and grounded relationships
+  ModuleKnowledgeCard:
+    required: [module_ref]
+    describes: module exports, responsibilities, and source-bound dependencies
+  PackageKnowledgeCard:
+    required: [package_ref]
+    describes: package boundary, entry points, and declared dependency surface
+  LibraryKnowledgeCard:
+    required: [library_name]
+    describes: external library identity, supported version scope, and API constraints
+  ValidatorKnowledgeCard:
+    required: [validator_id, validator_revision]
+    describes: validator contract, inputs, outputs, and execution evidence requirements
+  GeneratedArtifactBindingCard:
+    required: [artifact_id, artifact_checksum, input_refs]
+    describes: a derived artifact bound to exact input and producer revisions
+  AgentCapabilityCard:
+    required: [agent_id, allowed_move_ids]
+    describes: proposed capability vocabulary; never grants execution permission
+common_envelope:
+  required:
+    - canonical_id
+    - packet_key
+    - source_ref
+    - source_revision
+    - workspace_revision
+    - producer_revision
+    - content_hash
+    - evidence_refs
+    - citations
+    - capabilities
+    - constraints
+    - validators
+    - dependencies
+    - checksum
+  authority:
+    canonical_authority: false
+  representation_revision:
+    nullable: true
+    null_reason_required: true
+  derived_lists_are_authority: false
+  checksum: sha256(canonical_serialized_card_payload)
+boundaries:
+  creates_tables: false
+  mints_identity: false
+  promotes_ontology: false
+  grants_capabilities: false
+  openwiki_role: DERIVED_DOCUMENTATION
+  pydantic_role: strict_transport_validation_only
+  retrieval_admission: requires_existing_evidence_and_revision_gates

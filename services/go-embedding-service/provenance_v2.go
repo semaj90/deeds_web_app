@@ -38,9 +38,10 @@ type ollamaVersionV2 struct {
 
 type ollamaPsV2 struct {
 	Models []struct {
-		Name   string `json:"name"`
-		Model  string `json:"model"`
-		Digest string `json:"digest"`
+		Name     string `json:"name"`
+		Model    string `json:"model"`
+		Digest   string `json:"digest"`
+		SizeVRAM int64  `json:"size_vram"`
 	} `json:"models"`
 }
 
@@ -59,6 +60,13 @@ type embeddingCapabilityV2 struct {
 	NormalizationPolicyRevision string  `json:"normalizationPolicyRevision"`
 	PreprocessingPolicyRevision string  `json:"preprocessingPolicyRevision"`
 	RepresentationRevision      string  `json:"representationRevision"`
+}
+
+func embeddingCapabilityCacheEligibleV2(capability embeddingCapabilityV2) bool {
+	return capability.GGUFArtifactDigest != nil &&
+		isSHA256PrefixedV2(*capability.GGUFArtifactDigest) &&
+		capability.GGUFArtifactBindingStatus == "INDEPENDENT_READBACK_VERIFIED" &&
+		capability.TokenizerBindingStatus == "INDEPENDENT_READBACK_VERIFIED"
 }
 
 type embeddingReceiptV2 struct {
@@ -168,8 +176,23 @@ func verifyLoadedOllamaModelV2(ctx context.Context, baseURL, requestedModel, exp
 	return observedDigest, nil
 }
 
+func resolveEmbeddingServiceBuildRevisionV2(configuredRevision, compiledRevision string) string {
+	configuredRevision = strings.TrimSpace(configuredRevision)
+	compiledRevision = strings.TrimSpace(compiledRevision)
+	if compiledRevision != "" {
+		if !isSHA256PrefixedV2(compiledRevision) || configuredRevision != "" && configuredRevision != compiledRevision {
+			return ""
+		}
+		return compiledRevision
+	}
+	if isSHA256PrefixedV2(configuredRevision) {
+		return configuredRevision
+	}
+	return ""
+}
+
 func resolveEmbeddingCapabilityV2(ctx context.Context, cfg config, contentSelectionRevision, inputPolicyRevision string) (embeddingCapabilityV2, error) {
-	buildRevision := strings.TrimSpace(envOr("EMBEDDING_SERVICE_BUILD_REVISION", ""))
+	buildRevision := resolveEmbeddingServiceBuildRevisionV2(envOr("EMBEDDING_SERVICE_BUILD_REVISION", ""), compiledServiceBuildRevisionV1)
 	if !isSHA256PrefixedV2(buildRevision) || strings.TrimSpace(contentSelectionRevision) == "" || strings.TrimSpace(inputPolicyRevision) == "" {
 		return embeddingCapabilityV2{}, fmt.Errorf("EMBEDDING_CAPABILITY_IDENTITY_INCOMPLETE")
 	}
@@ -372,7 +395,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 			return
 		}
 		cacheKey := embeddingCacheKeyV2(capability.RepresentationRevision, input.InputArtifactChecksum, input.InputChecksum)
-		if srv.rdb != nil {
+		if srv.rdb != nil && embeddingCapabilityCacheEligibleV2(capability) {
 			if cached, getErr := srv.rdb.Get(r.Context(), cacheKey).Bytes(); getErr == nil && len(cached) > 0 {
 				var entry strictEmbeddingCacheEntryV2
 				if json.Unmarshal(cached, &entry) == nil && entry.Schema == "atlas.embedding-cache-entry.v2" &&
@@ -387,7 +410,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 						receipt.CacheHit = true
 						receipt.RuntimeBindingStatus = "CACHE_HIT_NO_MODEL_EXECUTION"
 						srv.stats.cacheHits.Add(1)
-						writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "ADMITTED", Embedding: entry.Embedding, Capability: &capability, Receipt: &receipt})
+						writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "OBSERVATION_ONLY", Embedding: entry.Embedding, Capability: &capability, Receipt: &receipt})
 						return
 					}
 				}
@@ -441,7 +464,7 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 		receipt.ResidentModelDigestBefore = residentDigestBefore
 		receipt.ResidentModelDigestAfter = residentDigestAfter
 		receipt.ResponseModelName = responseModelName
-		if srv.rdb != nil {
+		if srv.rdb != nil && embeddingCapabilityCacheEligibleV2(capability) {
 			entry := strictEmbeddingCacheEntryV2{
 				Schema: "atlas.embedding-cache-entry.v2", InputChecksum: input.InputChecksum,
 				InputArtifactChecksum:    input.InputArtifactChecksum,
@@ -454,6 +477,6 @@ func httpStrictEmbedHandlerV2(srv *embeddingServer) http.HandlerFunc {
 				_ = srv.rdb.Set(r.Context(), cacheKey, data, srv.cfg.CacheTTL).Err()
 			}
 		}
-		writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "ADMITTED", Embedding: vectors[0], Capability: &capability, Receipt: &receipt})
+		writeStrictEmbeddingResponseV2(w, http.StatusOK, strictEmbeddingResponseV2{Schema: "atlas.embedding-response.v2", Status: "OBSERVATION_ONLY", Embedding: vectors[0], Capability: &capability, Receipt: &receipt})
 	}
 }

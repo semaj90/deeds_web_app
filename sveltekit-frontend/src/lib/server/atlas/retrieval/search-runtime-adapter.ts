@@ -13,9 +13,10 @@ import {
   type SearchRuntimeQasFeatureSources,
 } from './search-runtime-qas-feature-resolver.js';
 import {
-  materializeCandidateFeatureSnapshotFromQasRowsV1,
+  materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1,
   type CandidateFeatureLaneV1,
 } from '../features/retrieval-router-to-candidate-feature-snapshot-v1.js';
+import { produceCandidateFeatureMatrixFromSnapshotV1 } from '../orchestration/atlas-pipeline-stage-contracts-v1.js';
 import {
   buildAceContextManifestAdmissionV1,
   retrievalCacheIdentityFromAceManifestV1,
@@ -121,7 +122,7 @@ export function admitSearchRuntimeQasToAceManifestV1(input: {
   modelRevision?: string | null;
   promptTemplateRevision?: string | null;
 }) {
-  const snapshot = materializeCandidateFeatureSnapshotFromQasRowsV1({
+  const { ordinalMap, snapshot } = materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1({
     rows: input.projection.accepted,
     candidateSnapshotRevision: input.candidateSnapshotRevision,
     producerRevision: input.producerRevision,
@@ -143,7 +144,7 @@ export function admitSearchRuntimeQasToAceManifestV1(input: {
   // Expose the exact snapshot that was admitted into the manifest boundary.
   // Callers must consume this value rather than rematerializing from raw
   // SearchRuntime packets. The snapshot remains derived/read-only.
-  return { ...admission, snapshot };
+  return { ...admission, ordinalMap, snapshot };
 }
 
 /**
@@ -345,8 +346,9 @@ export function createAtlasSearchAdapter(config?: {
         modelRevision: options.modelRevision,
         promptTemplateRevision: options.promptTemplateRevision,
       });
+      const { ordinalMap, ...aceAdmission } = ace;
       const retrievalCacheIdentity = options.retrievalCacheModel && options.retrievalCacheDim && options.contextPolicyRevision
-        ? retrievalCacheIdentityFromAceManifestV1(ace, {
+        ? retrievalCacheIdentityFromAceManifestV1(aceAdmission, {
             queryHash: buildAceTopRetrievalQueryHash(req.query),
             model: options.retrievalCacheModel,
             dim: options.retrievalCacheDim,
@@ -357,7 +359,7 @@ export function createAtlasSearchAdapter(config?: {
       const acePacketCacheIdentity = retrievalCacheIdentity && options.packetRepresentationId
         && options.packetNormalizationPolicyRevision && options.packetArtifactChecksum
           ? bridgeAceContextManifestToPacketIdentityV1({
-            admission: ace,
+            admission: aceAdmission,
             queryHash: retrievalCacheIdentity.queryHash,
             requestHash: hashQuery(req.query),
             model: options.retrievalCacheModel,
@@ -370,12 +372,19 @@ export function createAtlasSearchAdapter(config?: {
             artifactChecksum: options.packetArtifactChecksum,
           })
         : null;
+      const candidateFeatureMatrixArtifact = produceCandidateFeatureMatrixFromSnapshotV1({
+        requestId: options.requestId,
+        ordinalMap,
+        snapshot: ace.snapshot,
+        producerRevision: `${options.producerRevision}:candidate-feature-matrix-v1`,
+      });
       return {
         ...result,
         snapshot: ace.snapshot,
-        admission: ace,
+        admission: aceAdmission,
         retrievalCacheIdentity,
         acePacketCacheIdentity,
+        candidateFeatureMatrixArtifact,
         writesPerformed: false as const,
         canonicalAuthority: false as const,
       };

@@ -1,0 +1,38 @@
+{
+  "schema_version": "okf.dev.summary.v1",
+  "generated_at": "2026-10-06T20:09:48.288Z",
+  "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-supplement-v1.json",
+  "records": 5,
+  "summary": {
+    "embeddinggemma-model": {
+      "pages": 1,
+      "domains": {
+        "retrieval": 1
+      }
+    },
+    "pgvector-reference": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "rapids-cuml-kmeans": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "oaklib-ontology-tooling": {
+      "pages": 1,
+      "domains": {
+        "documentation": 1
+      }
+    },
+    "simdjson-project": {
+      "pages": 1,
+      "domains": {
+        "tool": 1
+      }
+    }
+  }
+}

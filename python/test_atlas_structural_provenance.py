@@ -142,6 +142,15 @@ def test_find_occurrence_positions_finds_every_call_to_a_repeated_name():
     assert rows == [0, 1, 2]  # one call per line, in source order
 
 
+def test_find_occurrence_positions_finds_typescript_type_identifiers():
+    source = (
+        'import type { ImportBindingV1 } from "./resolver";\n'
+        "export type Result = ImportBindingV1;\n"
+    )
+    result = find_occurrence_positions(source, "typescript", ["ImportBindingV1"])
+    assert result["ImportBindingV1"] == [(0, 14), (1, 21)]
+
+
 def test_find_occurrence_positions_returns_empty_list_for_absent_name():
     result = find_occurrence_positions("const x = 1;", "javascript", ["never.called"])
     assert result == {"never.called": []}

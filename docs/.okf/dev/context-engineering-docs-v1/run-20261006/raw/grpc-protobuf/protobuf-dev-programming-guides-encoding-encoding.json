@@ -1,0 +1,49 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "grpc-protobuf",
+  "source_ref": "grpc-protobuf:protobuf-dev-programming-guides-encoding-encoding",
+  "url": "https://protobuf.dev/programming-guides/encoding/",
+  "title": "protobuf.dev",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rpc",
+    "protobuf",
+    "streaming",
+    "wire_format",
+    "llm_output",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "This page documents protobuf.dev. gRPC and Protocol Buffers is classified as tool. No canonical recommendation inferred.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "protobuf.dev",
+    "markdown_excerpt": "# Encoding Explains how Protocol Buffers encodes data to files or to the wire. This document describes the protocol buffer _wire format_, which defines the details of how your message is sent on the wire and how much space it consumes on disk. You probably don’t need to understand this to use protocol buffers in your application, but it’s useful information for doing optimizations. If you already know the concepts but want a reference, skip to the [Condensed reference card](https://protobuf.dev/programming-guides/encoding/#cheat-sheet) section. [Protoscope](https://github.com/protocolbuffers/protoscope) is a very simple language for describing snippets of the low-level wire format, which we’ll use to provide a visual reference for the encoding of various messages. Protoscope’s syntax consists of a sequence of _tokens_ that each encode down to a specific byte sequence. For example, backticks denote a raw hex literal, like ```70726f746f6275660a```. This encodes into the exact bytes denoted as hex in the literal. Quotes denote UTF-8 strings, like `\"Hello, Protobuf!\"`. This literal is synonymous with ```48656c6c6f2c2050726f746f62756621``` (which, if you observe closely, is composed of ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:grpc-protobuf:protobuf-dev-programming-guides-encoding-encoding",
+    "title": "protobuf.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh gRPC and Protocol Buffers from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "6d1e980bffd034f3aad16b131aabb6f55f314a0e8c5e1158a783efa759d0e870",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\grpc-protobuf\\protobuf-dev-programming-guides-encoding-encoding.md",
+  "fetched_at": "2026-10-06T18:01:36.090Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "grpc-protobuf",
+    "source_title": "gRPC and Protocol Buffers",
+    "fetched_via": "firecrawl"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006\\raw\\grpc-protobuf\\protobuf-dev-programming-guides-encoding-encoding.md"
+}

@@ -21,7 +21,8 @@ const sample = a.tasks[0];
 if (!sample || !sample.taskChecksum) throw new Error('TASK_CHECKSUM_MISSING');
 const alteredText = `${sample.taskText} [fixture alteration]`;
 const alteredChecksum = `sha256:${crypto.createHash('sha256').update(`${sample.openspecChange}\n${sample.sourceLine}\n${alteredText}`, 'utf8').digest('hex')}`;
-const allowed = new Set(['OPEN_ACTIONABLE', 'BLOCKED_UPSTREAM', 'CLOSED_BY_CURRENT_EVIDENCE', 'SUPERSEDED', 'OWNED_BY_OTHER_CHANGE', 'GOVERNANCE_ONLY', 'NEGATIVE_CONSTRAINT', 'HUMAN_DECISION_REQUIRED', 'UNVERIFIED']);
+const allowed = new Set(['OPEN_ACTIONABLE', 'BLOCKED_UPSTREAM', 'CLOSED_BY_CURRENT_EVIDENCE', 'SUPERSESSION_REVIEW_REQUIRED', 'SUPERSEDED', 'OWNED_BY_OTHER_CHANGE', 'GOVERNANCE_ONLY', 'NEGATIVE_CONSTRAINT', 'HUMAN_DECISION_REQUIRED', 'UNVERIFIED']);
+const supersessionNotPromotedWithoutReceipt = a.tasks.every((task) => task.classification !== 'SUPERSEDED' || task.supersessionReceiptStatus === 'REVISION_BOUND_REPLACEMENT_PROVEN');
 const unclassifiedNotExecutable = a.tasks.every((task) => task.classification !== 'OPEN_ACTIONABLE' || task.executable === false);
 const percentageNotUsedForEligibility = a.tasks.every((task) => task.eligibilityBasis === 'EXPLICIT_CLASSIFICATION_AND_EVIDENCE_ONLY');
 const candidateBounded = a.planning.candidateLimit === 5 && a.planning.selectedCandidateCount <= a.planning.candidateLimit;
@@ -34,12 +35,25 @@ const evidenceResolution = a.tasks.flatMap((task) => task.evidenceResolution ?? 
 }));
 const proof = {
   schema: 'atlas.parent-atlas-workstation-openspec-workboard-proof.v1',
-  status: a.taskPopulationChecksum === b.taskPopulationChecksum && alteredChecksum !== sample.taskChecksum ? 'PROVEN' : 'FAILED',
+  status: a.taskPopulationChecksum === b.taskPopulationChecksum
+    && alteredChecksum !== sample.taskChecksum
+    && a.tasks.every((task) => allowed.has(task.classification))
+    && supersessionNotPromotedWithoutReceipt
+    && unclassifiedNotExecutable
+    && percentageNotUsedForEligibility
+    && candidateBounded
+    && noExecutableCandidateHonest
+    && planReplayStable
+    && noCandidatePlanExplicit
+    && a.summary.missingEvidenceRefs === 0
+    ? 'PROVEN'
+    : 'FAILED',
   taskPopulationChecksumA: a.taskPopulationChecksum,
   taskPopulationChecksumB: b.taskPopulationChecksum,
   unchangedReplay: a.taskPopulationChecksum === b.taskPopulationChecksum,
   changedTextChangesTaskChecksum: alteredChecksum !== sample.taskChecksum,
   classificationsValid: a.tasks.every((task) => allowed.has(task.classification)),
+  supersessionNotPromotedWithoutReceipt,
   unclassifiedNotExecutable,
   percentageNotUsedForEligibility,
   candidateBounded,
@@ -67,4 +81,4 @@ fs.writeFileSync(evidenceOut, `${JSON.stringify(evidenceReceipt, null, 2)}\n`, '
 proof.evidenceResolutionReceipt = 'docs/reports/parent-atlas-workstation-evidence-resolution-v1.json';
 fs.writeFileSync(out, `${JSON.stringify(proof, null, 2)}\n`, 'utf8');
 console.log(JSON.stringify({ ...proof, out, evidenceOut }, null, 2));
-if (proof.status !== 'PROVEN' || !unclassifiedNotExecutable || !percentageNotUsedForEligibility || !candidateBounded || !noExecutableCandidateHonest || !planReplayStable || !noCandidatePlanExplicit || evidenceReceipt.status !== 'PROVEN') process.exitCode = 1;
+if (proof.status !== 'PROVEN' || !unclassifiedNotExecutable || !percentageNotUsedForEligibility || !candidateBounded || !noExecutableCandidateHonest || !planReplayStable || !noCandidatePlanExplicit || !supersessionNotPromotedWithoutReceipt || evidenceReceipt.status !== 'PROVEN') process.exitCode = 1;

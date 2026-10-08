@@ -4,6 +4,7 @@ import pytest
 
 from python.parent_atlas_dspy_repair import (
     RepairMetricObservationV1,
+    admit_agentic_repair_example_v1,
     atlas_repair_score_v1,
     build_semantic_768_gepa_example_v1,
     compare_baseline_and_optimized_v1,
@@ -53,6 +54,76 @@ def _repair_output():
         "validationPlan": "Run the cache contract tests and typecheck.",
         "evidenceRefs": ["src/cache.ts#symbol:lookup", "tests/cache.test.ts"],
     }
+
+
+def _agentic_repair_example():
+    content = b"before\nrepair this function\nafter\n"
+    digest = lambda value: "sha256:" + value * 64
+    start = content.index(b"repair this function")
+    return {
+        "schema": "atlas.agentic-repair-example.v1",
+        "taskId": "task:example",
+        "canonicalId": "function:example.run",
+        "packetKey": "packet:example",
+        "sourceRevision": digest("a"),
+        "workspaceRevision": digest("b"),
+        "sourceRefs": [{
+            "locator": {
+                "schema": "atlas.evidence-locator.v1",
+                "canonicalId": "function:example.run",
+                "packetKey": "packet:example",
+                "sourceRef": "src/example.py",
+                "sourceKind": "code_file",
+                "filePath": "src/example.py",
+                "sourceUrl": None,
+                "contentHash": "sha256:" + __import__("hashlib").sha256(content).hexdigest(),
+                "workspaceRevision": digest("b"),
+                "sourceRevision": digest("a"),
+                "span": {"startByte": start, "endByte": start + len(b"repair this function")},
+                "domain": None,
+            },
+            "surface": "repair this function",
+        }],
+        "error": {"class": "TYPECHECK", "code": "TS2322", "message": "Type mismatch", "failingCommand": "npm run check", "failingTest": None},
+        "retrieval": {"queryText": "repair type mismatch", "semanticRecipe": "semantic_768", "candidateIds": ["function:example.run"]},
+        "expectedOutcome": {"validatorIds": ["validator:typecheck"], "mutationAllowed": False},
+    }, content
+
+
+def test_agentic_repair_example_requires_exact_grounded_source_and_qualified_inputs():
+    example, content = _agentic_repair_example()
+    admitted = admit_agentic_repair_example_v1(
+        example,
+        source_bytes_by_ref={"src/example.py": content},
+        qualified_candidate_ids=["function:example.run"],
+        known_validator_ids=["validator:typecheck"],
+    )
+    assert admitted["sourceRefs"][0]["surface"] == "repair this function"
+    assert admitted["expectedOutcome"]["mutationAllowed"] is False
+
+
+@pytest.mark.parametrize("failure", ["empty_refs", "bad_span", "unknown_revision", "unqualified_candidate", "unknown_validator", "mutation"])
+def test_agentic_repair_example_fails_closed(failure):
+    example, content = _agentic_repair_example()
+    if failure == "empty_refs":
+        example["sourceRefs"] = []
+    elif failure == "bad_span":
+        example["sourceRefs"][0]["surface"] = "fabricated"
+    elif failure == "unknown_revision":
+        example["workspaceRevision"] = "unknown"
+    elif failure == "unqualified_candidate":
+        example["retrieval"]["candidateIds"] = ["candidate:unresolved"]
+    elif failure == "unknown_validator":
+        example["expectedOutcome"]["validatorIds"] = ["validator:invented"]
+    else:
+        example["expectedOutcome"]["mutationAllowed"] = True
+    with pytest.raises(ValueError):
+        admit_agentic_repair_example_v1(
+            example,
+            source_bytes_by_ref={"src/example.py": content},
+            qualified_candidate_ids=["function:example.run"],
+            known_validator_ids=["validator:typecheck"],
+        )
 
 
 def test_semantic_768_gepa_example_is_metadata_only_and_deterministic():

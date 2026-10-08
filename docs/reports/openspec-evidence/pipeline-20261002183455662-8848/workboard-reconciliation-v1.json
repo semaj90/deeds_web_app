@@ -1,0 +1,1098 @@
+{
+  "schema": "atlas.openspec-workboard-evidence-reconciliation.v1",
+  "runId": "pipeline-20261002183455662-8848",
+  "milestone": "EVF-19",
+  "mode": "READ_ONLY_DIFF_RECEIPT",
+  "status": "WORKBOARD_PARITY_NOT_PROVEN",
+  "source": {
+    "workboard": "docs/reports/openspec-workboard-v1.json",
+    "evidenceCards": "docs/reports/openspec-evidence/pipeline-20261002183455662-8848/evidence-cards-v1.json",
+    "workboardGeneratedAt": "2026-09-26T16:51:28.717Z",
+    "evidenceGeneratedAt": "2026-10-02T18:36:34.108Z",
+    "workspaceRevision": "sha256:5a5beafc311fdca71d771c893193541de2adb5fe921f48beef1cb8a8df6083a5"
+  },
+  "baseline": {
+    "workboardTaskCount": 9619,
+    "workboardDoneCount": 6369,
+    "evidenceCardCount": 11095,
+    "evidenceProofStateCounts": {
+      "CLAIM_ONLY": 10993,
+      "BLOCKED": 60,
+      "STALE": 41,
+      "PROVEN": 1
+    },
+    "evidenceProofUsableCount": 0
+  },
+  "diff": {
+    "exactJoinCount": 8874,
+    "exactSourceRefJoinCount": 6366,
+    "exactSourceRevisionJoinCount": 2508,
+    "boardIdentityRows": 9619,
+    "evidenceIdentityRows": 11095,
+    "boardOnlyCount": 745,
+    "evidenceOnlyCount": 2221,
+    "duplicateBoardSourceRefCount": 0,
+    "duplicateEvidenceSourceRefCount": 0,
+    "duplicateBoardSourceRevisionCount": 28,
+    "duplicateEvidenceSourceRevisionCount": 28,
+    "doneWithoutProvenCount": 5909,
+    "openWithProvenCount": 1,
+    "doneWithStaleCount": 24,
+    "doneWithContradictionCount": 0
+  },
+  "parityChecks": {
+    "exactTaskRevisionJoin": false,
+    "noDuplicateBoardSourceRefs": true,
+    "noDuplicateEvidenceSourceRefs": true,
+    "noDuplicateSourceRevisions": false,
+    "sameTaskCardCount": false,
+    "noClaimStateMutation": true,
+    "noWorkboardOverwrite": true
+  },
+  "samples": {
+    "boardOnly": [
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:620",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L620",
+        "state": "DONE",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:620 Disposable ACE context-cache replay passed: cold `MISS`, same-identity",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:624",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L624",
+        "state": "DONE",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:624 `CACHE-PREFILL-02` full identity matrix completed 2026-09-15. The earlier",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:643",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L643",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:643 The exact-duplicate Graphify owner plan remains `DUPLICATE_EQUIVALENT_EXECUTIONS`",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:658",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L658",
+        "state": "DONE",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:658 Re-ran the packet/chunk identity reconciliation: `0` canonical packet digest",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:663",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L663",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:663 Current graph promotion remains blocked: the graph readiness audit reports `16`",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:696",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L696",
+        "state": "DONE",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:696 Re-ran the Graphify owner planner: `DUPLICATE_EQUIVALENT_EXECUTIONS`, two",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:726",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L726",
+        "state": "DONE",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:726 Extracted packet-digest classification into a pure helper and added Node",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:750",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L750",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:750 No migration or schema apply is authorized from this receipt. Resolve the",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:766",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L766",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:766 Canonical `semantic_768` remains partial: the active halfvec column has",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:836",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L836",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:836 The frontend-wide TypeScript check remains red on unrelated existing",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:852",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L852",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:852 Until the read-only queries succeed again, current table counts, index",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:859",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L859",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:859 Direct Qdrant read of `codebase_chunks_768` timed out after `10` seconds.",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-bitfrost-cache-correctness:876",
+        "sourceRef": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md#L876",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-bitfrost-cache-correctness:876 CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row infere",
+        "reason": "SOURCE_REVISION_AMBIGUOUS"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3399",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3399",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3399 Treat Valkey centroid loss as `CACHE_MISS`, not `CENTROID_LOST`; rebuild from the durable",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3421",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3421",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3421 Nil contexts and whitespace-only queries are rejected before timeout setup or lane fanout.",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3427",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3427",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3427 Searched the active repository for `buildContextFromGoHttp`,",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3429",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3429",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3429 No live helper implementation or matching Go HTTP endpoint was found.",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3433",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3433",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3433 Current caller review supersedes the earlier stale note: `buildContextFromGo()` and",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3519",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3519",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3519 Fixed the TypeScript gRPC client to forward `representationId` for unary and streaming",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3539",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3539",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3539 Freeze ownership: Tree-sitter/AST-grep may emit structural observations; compiler/LSP/",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3544",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3544",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3544 Prove `symbol_id` stability across two source revisions and `symbol_version_id` changes",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3564",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3564",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3564 Freeze the graph rule: NetworkX is the CPU/reference oracle; Neo4j is a projection/fanout",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3575",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3575",
+        "state": "OPEN",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3575 Run only bounded read-only parity first: Tree-sitter/AST-grep symbols, NetworkX/Neo4j",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3947",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3947",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3947 Freeze compiler lowering: PostgreSQL/source evidence → Graphify IR → deterministic ordinals,",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      },
+      {
+        "taskKey": "parent-atlas-ace-rlm-bitfrost-integration:3950",
+        "sourceRef": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md#L3950",
+        "state": "DONE",
+        "label": "parent-atlas-ace-rlm-bitfrost-integration:3950 Freeze executor ownership: NetworkX is the CPU graph oracle; Neo4j and cuGraph are graph",
+        "reason": "NO_EXACT_EVIDENCE_CARD"
+      }
+    ],
+    "evidenceOnly": [
+      {
+        "cardId": "sha256:61ac06ef4fb28718a3b48a4512a22d45cc2793d7d0a1305722bf396171b99ded",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L5",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:3dc0dfbbe85efa022a947933ffc2956d493056d4b314a01cc8199730e619efb5",
+        "sourceRevision": "sha256:543617fbb71591784d33dbedb78e064ddbce4dc75161ffbf054e03f506e8a1af"
+      },
+      {
+        "cardId": "sha256:72cd48a9c1e59633d9a31309678e6a65669eb969803794cb1b6e0def226e49db",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L7",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:64e76d92188e4b799108458c4fd77d5e24273a9626bf883318d313797dc62322",
+        "sourceRevision": "sha256:b41836436120431e62c5caa57139164cdbc821e950748de42f23d7f47ddb5746"
+      },
+      {
+        "cardId": "sha256:cca6ed63a008fa6d00593fc052ead5a171b18e03f74bd80c5e00d015bedc1dad",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L9",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:4d6fd4de0c6e8e6184ed193817a658bd0510b08c7d7209ad4c1304e428f0ce6f",
+        "sourceRevision": "sha256:d679fa4ded3f5d9bda2e7b8f9044d8dc493ffdbaaaa529715fb564372146333d"
+      },
+      {
+        "cardId": "sha256:b2d88158abc17b7b22ecd6948f9466c70aeacef5f26384602536492b62cef83f",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L11",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:8fc20a3ddccbd445f666cfe8bb549b0f644d10d0b832cd3d7d9c26fe40e210a9",
+        "sourceRevision": "sha256:78ecbb13fdac0a74abb61664eb43414fce9192ecb0be9da4725e650b685ef977"
+      },
+      {
+        "cardId": "sha256:d92b5d5c0eb5f778ff6bc4ed21a462e9dee9f2801c0bc601a6ccadfe104a56e5",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L14",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:b4691e00b0bf30fa484d0d3848880939ef3a806b9031b7f6475e2af9dc85de48",
+        "sourceRevision": "sha256:4964343dc0471a1a300b942cbf46caa91e758a7a359eb3a4d8b47674be0498df"
+      },
+      {
+        "cardId": "sha256:5822ea2454246c68174e08834a0e94955800745bcd629a89bdc8cc16835d57e1",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L15",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:92aa3af9752c7a0e795146f14571caa43c46770bde7b2919dc7dc28bc4ececc4",
+        "sourceRevision": "sha256:790a16cf80d1946de17cae049d12856482fb5ed9042554640d2a406d1933b0de"
+      },
+      {
+        "cardId": "sha256:4d7df90000634bcf117c2d9ee0e77fc46eac7299803ba740bbbce2f5b22c10c1",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L18",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:3317d4a6930c0e7584a3817ed5e69af62b0f6d23a86cae4ceef9484468278de3",
+        "sourceRevision": "sha256:f0970005f7fdab7fda9adb7ca1c778c5ad48d1090d8dfdc9c26ea8738d493ad9"
+      },
+      {
+        "cardId": "sha256:a18f83d39d5c9e95c0da2f2ddccfe7852bb4136754bda7ebb397e4f497a2ae5a",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L24",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:ad3be854777403d8881c99823e910fd4f351d6a640a82a81954ff5dea8f70e52",
+        "sourceRevision": "sha256:2fdc09db1d2f86d5844fc6bc36ccd757df7149906d11c58738d5eefbcefabcd1"
+      },
+      {
+        "cardId": "sha256:a95463fe398370fd2133fa5bf7a848268f85e59b5d08f589785db2d7b9461e1d",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L36",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:b08097ac09c8f542ef7bfd5bde0327308fb3e54864025c04153113446078b848",
+        "sourceRevision": "sha256:8a26b4c6cd2223342c0f7dfe158e6ba607f88ae3038af5386acb7342e0fee2cc"
+      },
+      {
+        "cardId": "sha256:f3bfb44f2273ac65439737ae7afdfea855cea072447fba6a183fa563ab97508c",
+        "sourceRef": "openspec/changes/archive/2026-08-23-parent-atlas-llama-server-chat-consolidation/tasks.md#L39",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/2026-08-23-parent-atlas-llama-server-chat-consolidation/sha256:2e07a2e0cf490bd1504f5100c60d04121efcdd76ae8bd70b4e60a63f763f11e8",
+        "sourceRevision": "sha256:8055ee5f0aa3331caf76b3c9baf9088792b29346b1ab62328e11000bbbae7742"
+      },
+      {
+        "cardId": "sha256:690230946d89a656b355cda7ab765f28835ed7c0f05d55c98f393107f66f0a39",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L3",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-01",
+        "sourceRevision": "sha256:25869a596565698ccd490b65a201d8b8307e41d4bf13bed7b823fd6553504906"
+      },
+      {
+        "cardId": "sha256:d57f6baeba872c0e967cedc02eb2f632093f263683647427d3f9647484bd3a0a",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L4",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-02",
+        "sourceRevision": "sha256:8f258f12e75778afcb61b7417d542445235d3f12770b3c680a030d4cb4453cf4"
+      },
+      {
+        "cardId": "sha256:9913cd7429040f4ce27637f26c03c39c104429a47e18a343dcff49c3a7d29202",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L5",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-03",
+        "sourceRevision": "sha256:1252df127425331af6355ba593b8273915ef4f768bf9f6d4ae1a9f20074664d6"
+      },
+      {
+        "cardId": "sha256:cbfbd751a56b2517f3da23477dcdd77afef692dd0a2064dc3c9f2b81ea231417",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L6",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-04",
+        "sourceRevision": "sha256:327eb9c6035cea7aee9664866d75fc826909cd0efe13bbc945d67974ad34a5cb"
+      },
+      {
+        "cardId": "sha256:d9e7cb5b1852ecfa606a0d0897267b0f2b364dec815e77974936786bf441ff07",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L7",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-05",
+        "sourceRevision": "sha256:987a01710e4e48aabb78475c5ec6f5785f405970bc22f664eb203aafa0fd920b"
+      },
+      {
+        "cardId": "sha256:8fef2a9c665746e50c37734510a7c7d13c56cb9388f4e4d3bf60851b4757e16e",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L8",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-06",
+        "sourceRevision": "sha256:0cb7d7df7efa2871b46d1fe070c5ff0bb448fab594fb7ee96a365fe3e9154484"
+      },
+      {
+        "cardId": "sha256:4c26d35af42f300ebd5851702902de33e7fa337ed4bae95cf433eb36fccc813e",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L9",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-07",
+        "sourceRevision": "sha256:400d5b8a924f64347278c612d31fd2f138b40a033c916c71ab023891850a8325"
+      },
+      {
+        "cardId": "sha256:f2e6501ea3d81b06e399ee24f899f7a5779e92df677aeacc931e61a9e80bb413",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L10",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-08",
+        "sourceRevision": "sha256:6df19ad76008b12e0bdfe65875d0381e8bbde5d2b509bd2d37fc69b66b806d04"
+      },
+      {
+        "cardId": "sha256:404ecfdb3505b1c5e5a216b51d333f99e3f065322f207c9ecb864d9c14ee4074",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L11",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-09",
+        "sourceRevision": "sha256:c9a97abec285656adf24e226ecd7667ef98b495e11f9ae86c3e5ee81123ff04c"
+      },
+      {
+        "cardId": "sha256:bd8a057c60a3ad3d2545dde35d960473745833f3f98335db6ffa7961cb74350f",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L12",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-10",
+        "sourceRevision": "sha256:43f2ee1b47093cf3a87a636720bc043be0c14e889830a511c3787cf4bf2b412c"
+      },
+      {
+        "cardId": "sha256:ab19cd266eac867767a4270ab0e89781dc355fc31937037889ae42de4713d3eb",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L13",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-11",
+        "sourceRevision": "sha256:fe212ae92874b5957ce7da049a4d5f3f9fc745e93e3290797b4967193bf6f217"
+      },
+      {
+        "cardId": "sha256:134b8cd7049c43a2f08be4471a53ddc43e79fb5a672ffb2a2f5ec76dfcef67bd",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L14",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-12",
+        "sourceRevision": "sha256:f10b647a229f55003e78c0a20f45735c81bf2b2f5ff4a58c0774f2a40ebaecf2"
+      },
+      {
+        "cardId": "sha256:7e21dd92d9dccaefb256a59fbb01c15a8384108c8b7a0f872310ea18f3f1b9f1",
+        "sourceRef": "openspec/changes/archive/2026-08-23-phase-alignment-hmm-prefill-dag-20260822/tasks.md#L15",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "PA-13",
+        "sourceRevision": "sha256:ef86b11fc4650ee1f4fe75343aacafac8b80720355e61cdac9942484a9a53628"
+      },
+      {
+        "cardId": "sha256:3ba28f01363d939f26152657f2634c3acc7dd85f1ba2bafc10c1170a0e738883",
+        "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L3",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.1",
+        "sourceRevision": "sha256:121afa792d883bbc6b3ffe627a23110d710124c1c87c056afe25de05c183710d"
+      },
+      {
+        "cardId": "sha256:7d3c66c4a2ff8261313126d08472aa53a0211c1069d20fa15a623c0a54dbdb62",
+        "sourceRef": "openspec/changes/archive/2026-09-14-workflow-action-schema-owner-01/tasks.md#L8",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.2",
+        "sourceRevision": "sha256:2aab1e32f146c4d43f28f275335a50dccc76a2bf783e4cc26652a50a5850b49d"
+      }
+    ],
+    "doneWithoutProven": [
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:5",
+        "cardId": "sha256:9f01d260411b46572432fec624fe025ce1eb3484a3b905ae5b21c40115b02850",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L5",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:3a23c99b6e5eb6acf3b2d1afb54504d140a727f8932b99ad014158a9b364d7f4"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:9",
+        "cardId": "sha256:bf2450048447ead57620070f140b8f1753f2411523dff2a52e1f83da2ffb781c",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L9",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:bd990e33985917ff4047d1ea23291e229abd6d5446a47436fed470f022633c10"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:23",
+        "cardId": "sha256:0fbc7ce4363ff3b7f8f5eb597bf4f912931461bbfebcb5305ed4ac196072c43e",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L23",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:8f57b7c38623cad8a51cfb269d0ce3b7d3a75fe2c8940796c0cf0a35e291e04f"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:30",
+        "cardId": "sha256:52ca0394892433e2284ab04010948aad4005a0de5e4d59c63b16863402797761",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L30",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:296705d6e54d435b4a963170df6c4ffefe5b75657aca2adf7d97058b55214933"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:45",
+        "cardId": "sha256:fbad5c975682350781c142c2358bf79d1c527a54bced8c669cf6cd2efb9f8cf1",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L45",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:1b2dfab7f227b6fd40721f7e67491b2351f92513e49aee655be4c1b66a88278c"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:51",
+        "cardId": "sha256:640bf147bce0492446df52b346ad7688cdb51a0a807ca9fc871f9563771b91eb",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L51",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:9470747a2e16c1e699eeca9698ccb70d11016728e09ab099cfc2977663458b43"
+      },
+      {
+        "taskKey": "ace-hyperrag-chr97-graphify-audit:59",
+        "cardId": "sha256:ff842d88736d8519f0b9ebb4d2be5b10f7769068bfb35cf1c8200e22e8fa62df",
+        "sourceRef": "openspec/changes/ace-hyperrag-chr97-graphify-audit/tasks.md#L59",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "openspec-task:openspec://root/ace-hyperrag-chr97-graphify-audit/sha256:7de25bf0683591f60aa4e237a389399f0880f5b9ab2a1d78a23f406e306f3421"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:3",
+        "cardId": "sha256:f45e9f229fa08d2f41cca6d6df467244521c250faa8ebbcca12514d11317ec73",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L3",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.1"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:4",
+        "cardId": "sha256:1537f92505545c9f28c791999bd411de4e5018fd7821c811ca5a3f4d462688db",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L4",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.2"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:5",
+        "cardId": "sha256:5dcd45e56147f1e3c78d8e23de85444eacb9024b8525058824e3a2f2bbe89f65",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L5",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.3"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:6",
+        "cardId": "sha256:bf0475f3441fa42cbc0ef125cf7813ccaa2b0ff7ae66fc0578fc918904e5bc3e",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L6",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "1.4"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:10",
+        "cardId": "sha256:23973a107392c52ceacb5166c401a46d68c658f3fd074e61eb06ee7ba287ca9d",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L10",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "2.1"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:11",
+        "cardId": "sha256:ec3c5b67f4eef925a6160b48bd2291ef1c30222a2ff76f28978ea0fa334c03cc",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L11",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "2.2"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:12",
+        "cardId": "sha256:89591946552f44dbb4c0c59301df2bfa23e14c166b32d2e84f24ae99d925c787",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L12",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "2.3"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:13",
+        "cardId": "sha256:8c8b9d9bd4a7a145478490cbf4a5575bdb91d7c7a6c2e9d1d826605eb0329f7f",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L13",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "2.4"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:14",
+        "cardId": "sha256:4b7cc4bfae6c9fb61007a377f95175da92351e23935de852308ec764b260fe4b",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L14",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "2.5"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:18",
+        "cardId": "sha256:a2efa026f9aa632f00a6729600cc6803120dee518f9105758351328521059c14",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L18",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.1a"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:19",
+        "cardId": "sha256:90f4bd3f572aeef013fd87d148a0b0c311a8bbee521c10c685eb3e7854717442",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L19",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.1b"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:20",
+        "cardId": "sha256:07bf5575dc9e92b44c3dd38fe64951e0b650e781137cef71e9037198cea92b39",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L20",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.1c"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:21",
+        "cardId": "sha256:f27d64bdf0b3456dd852c8dc7b9aaec7780d5f17f5dfd75f3392bbfc6bac4671",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L21",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.1d"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:22",
+        "cardId": "sha256:f3d812b55482045fd0e578c1ad43857abd53256c6a3b8bcbcb9439a39c96905e",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L22",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.1e"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:23",
+        "cardId": "sha256:c8af3a2d51ebaacffed193454874d3c193f3efb440fae237f3b14f14eae7093d",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L23",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "3.2"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:29",
+        "cardId": "sha256:97a6eb5130bf9adc58a48c277055d918f339695893be36883e37b3fda6fc84ee",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L29",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "4.1"
+      },
+      {
+        "taskKey": "agent-branch-review-fanout-ace-centroid-aug22:30",
+        "cardId": "sha256:daa73f9b4e5aea5d54034662953e2e4ae777b797434f9ee68595e14dfa8ef05f",
+        "sourceRef": "openspec/changes/agent-branch-review-fanout-ace-centroid-aug22/tasks.md#L30",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "4.2"
+      },
+      {
+        "taskKey": "atlas-feature-intelligence:9",
+        "cardId": "sha256:97cbb7e796b7583b7b43765f1bba8140eb0253932728559824a2b6a0a26df41e",
+        "sourceRef": "openspec/changes/atlas-feature-intelligence/tasks.md#L9",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "DONE",
+        "proofState": "CLAIM_ONLY",
+        "taskId": "FI-ONTO-01"
+      }
+    ],
+    "openWithProven": [
+      {
+        "taskKey": "parent-atlas-graph-retrieval-proof:133",
+        "cardId": "sha256:00fc6489b2036861c8f7458d4c31c836a97abbc767b415ec3f2d6c94e2bb48d8",
+        "sourceRef": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md#L133",
+        "joinType": "EXACT_SOURCE_REF",
+        "boardState": "OPEN",
+        "proofState": "PROVEN",
+        "taskId": "openspec-task:openspec://root/parent-atlas-graph-retrieval-proof/sha256:bba00d980fa6ed483f9e7db58e0b87e28af8912154715ce9936b2f5880fc0ee1"
+      }
+    ],
+    "duplicateBoardSourceRefs": [],
+    "duplicateEvidenceSourceRefs": [],
+    "duplicateBoardSourceRevisions": [
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:e40cd858f46a918b3fe598b3576a1731ed1994d0acc118bf0317ebe60fc23b1c",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:6984",
+          "parent-atlas-ace-rlm-bitfrost-integration:7504"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6a9d5f1fd80976c80b26a8d77495ac5eea8974639c8ed2e4efc91f90dea46ca4",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:6836",
+          "parent-atlas-ace-rlm-bitfrost-integration:8632"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:3b535a885cfa0cc5e3166e77e36bcf21dfd8fcb38388bd1205f8739cf192fa4a",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:8927",
+          "parent-atlas-ace-rlm-bitfrost-integration:8942"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:a83d2fad2e7e12511e01b23520ae6ad1e6be0fdcaedf7fd9ce684da648283cdc",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:8822",
+          "parent-atlas-ace-rlm-bitfrost-integration:8985"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:8a294561c3f312b07a32975e6b155a9a23227564b2334c1665bd5dcfce02c8f8",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:9163",
+          "parent-atlas-ace-rlm-bitfrost-integration:9182"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c0cefb06d31dcb1835586e637d17137f7841674a73df77cffad00b1d0056c1ef",
+        "taskKeys": [
+          "parent-atlas-ace-rlm-bitfrost-integration:6912",
+          "parent-atlas-ace-rlm-bitfrost-integration:9305"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:68bc1e4c3ac96ba76be6b7192e2808b4e9c523e1ed093298b65853ac1af48430",
+        "taskKeys": [
+          "parent-atlas-graph-analysis-contract:615",
+          "parent-atlas-graph-analysis-contract:649"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465",
+          "parent-atlas-native-acceleration-cabi:172"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:572b34337ce8b6edc50eec2a79f17d979309baa876a3f645007c2fcf9801aea5",
+        "taskKeys": [
+          "parent-atlas-ontology-kernel:3953",
+          "parent-atlas-ontology-kernel:3994"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:ca908aa189281ebb86501c57bd622bea33c9a65b384a2590f81f7b83a8174b8d",
+        "taskKeys": [
+          "parent-atlas-ontology-kernel:3982",
+          "parent-atlas-ontology-kernel:4317"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:797c9dd2b432cfa40685c838528e71d92494b90bc42e11a56f5054f94595b77e",
+        "taskKeys": [
+          "parent-atlas-ontology-kernel:3838",
+          "parent-atlas-ontology-kernel:4347"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465",
+          "parent-atlas-native-acceleration-cabi:172",
+          "parent-atlas-pca-svd-representation-baseline:178"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:efe84159fd660f486f9e7b021c66deae3adaccc781019891b1ecfaa4a5df6fd2",
+        "taskKeys": [
+          "parent-atlas-neural-prefill-encoder:16429",
+          "parent-atlas-qdrant-structural-payload-enrichment:96"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:9c60253da4c5e596816fb6bc9a1019c1cfea350320128f54fc80ad7d0f8987de",
+        "taskKeys": [
+          "parent-atlas-query-routing-classifier:154",
+          "parent-atlas-query-routing-classifier:162"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:374b887d8feeb11398553d4438f6f2142703fbdb2ef8e8dda14bd3920f5720c6",
+        "taskKeys": [
+          "parent-atlas-query-routing-classifier:155",
+          "parent-atlas-query-routing-classifier:163"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:9c60253da4c5e596816fb6bc9a1019c1cfea350320128f54fc80ad7d0f8987de",
+        "taskKeys": [
+          "parent-atlas-query-routing-classifier:154",
+          "parent-atlas-query-routing-classifier:162",
+          "parent-atlas-query-routing-classifier:171"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465",
+          "parent-atlas-native-acceleration-cabi:172",
+          "parent-atlas-pca-svd-representation-baseline:178",
+          "parent-atlas-retrieval-executor-compatibility-convergence:86"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465",
+          "parent-atlas-native-acceleration-cabi:172",
+          "parent-atlas-pca-svd-representation-baseline:178",
+          "parent-atlas-retrieval-executor-compatibility-convergence:86",
+          "parent-atlas-retrieval-fusion-reachability:1892"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c86641088c2c65ee4db2b6025e3d20c622ba5bef41e83cd265cd7a79e650be90",
+        "taskKeys": [
+          "parent-atlas-retrieval-lineage-dag-convergence:12728",
+          "parent-atlas-retrieval-lineage-dag-convergence:13431"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          "atlas-feature-intelligence:237",
+          "parent-atlas-ace-bitfrost-cache-correctness:876",
+          "parent-atlas-ace-rlm-bitfrost-integration:9546",
+          "parent-atlas-candidate-feature-execution-fabric:1460",
+          "parent-atlas-gpu-graph-vector-substrate:465",
+          "parent-atlas-native-acceleration-cabi:172",
+          "parent-atlas-pca-svd-representation-baseline:178",
+          "parent-atlas-retrieval-executor-compatibility-convergence:86",
+          "parent-atlas-retrieval-fusion-reachability:1892",
+          "parent-atlas-retrieval-logic-convergence:630"
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c782af96f0d860dfdff169cc927b617e66da9c252f95ee92892bc08d83a0342b",
+        "taskKeys": [
+          "parent-atlas-search-classifier-sidecar:644",
+          "parent-atlas-search-classifier-sidecar:751"
+        ]
+      }
+    ],
+    "duplicateEvidenceSourceRevisions": [
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:e40cd858f46a918b3fe598b3576a1731ed1994d0acc118bf0317ebe60fc23b1c",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6a9d5f1fd80976c80b26a8d77495ac5eea8974639c8ed2e4efc91f90dea46ca4",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:3b535a885cfa0cc5e3166e77e36bcf21dfd8fcb38388bd1205f8739cf192fa4a",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:a83d2fad2e7e12511e01b23520ae6ad1e6be0fdcaedf7fd9ce684da648283cdc",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:8a294561c3f312b07a32975e6b155a9a23227564b2334c1665bd5dcfce02c8f8",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c0cefb06d31dcb1835586e637d17137f7841674a73df77cffad00b1d0056c1ef",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:68bc1e4c3ac96ba76be6b7192e2808b4e9c523e1ed093298b65853ac1af48430",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:572b34337ce8b6edc50eec2a79f17d979309baa876a3f645007c2fcf9801aea5",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:ca908aa189281ebb86501c57bd622bea33c9a65b384a2590f81f7b83a8174b8d",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:797c9dd2b432cfa40685c838528e71d92494b90bc42e11a56f5054f94595b77e",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:efe84159fd660f486f9e7b021c66deae3adaccc781019891b1ecfaa4a5df6fd2",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:9c60253da4c5e596816fb6bc9a1019c1cfea350320128f54fc80ad7d0f8987de",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:374b887d8feeb11398553d4438f6f2142703fbdb2ef8e8dda14bd3920f5720c6",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:9c60253da4c5e596816fb6bc9a1019c1cfea350320128f54fc80ad7d0f8987de",
+        "taskKeys": [
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c86641088c2c65ee4db2b6025e3d20c622ba5bef41e83cd265cd7a79e650be90",
+        "taskKeys": [
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:6d645a65bc987b1614a26a26ecd1e3149bc03344c7c006a6c5c2c8ce76ff9114",
+        "taskKeys": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      {
+        "sourceRevision": "sha256:c782af96f0d860dfdff169cc927b617e66da9c252f95ee92892bc08d83a0342b",
+        "taskKeys": [
+          null,
+          null
+        ]
+      }
+    ]
+  },
+  "contract": {
+    "canonicalTaskAuthority": "openspec/changes/*/tasks.md",
+    "proofAuthority": "revision-bound evidence receipts; cards are retrieval artifacts",
+    "joinAuthority": "exact normalized task source path + task line, then unique source revision digest",
+    "outputIsRebuildable": true,
+    "sharedWorkboardMutated": false,
+    "taskCheckboxesMutated": false,
+    "receiptStateMutated": false
+  },
+  "likely_cause": "The existing workboard and evidence fabric use different corpus scopes and identity envelopes, so parity must be measured before either projection can influence the other.",
+  "evidence": [
+    "docs/reports/openspec-workboard-v1.json",
+    "docs/reports/openspec-evidence/pipeline-20261002183455662-8848/evidence-cards-v1.json"
+  ],
+  "patch_targets": [
+    "scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/reconcile-openspec-workboard-evidence-v1.mjs",
+  "report_path": "docs/reports/openspec-evidence/pipeline-20261002183455662-8848/workboard-reconciliation-v1.json",
+  "generatedAt": "2026-10-02T18:36:44.226Z",
+  "checksum": "sha256:c20e0721a65f6d6d6c306f51df03fd0fa2d5199fb1197ef2952ef0827d6d30a7"
+}

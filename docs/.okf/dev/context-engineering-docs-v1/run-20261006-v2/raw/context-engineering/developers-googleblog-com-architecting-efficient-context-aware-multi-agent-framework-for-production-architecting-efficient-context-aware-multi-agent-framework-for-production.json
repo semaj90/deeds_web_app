@@ -1,0 +1,65 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "context-engineering",
+  "source_ref": "context-engineering:developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production",
+  "url": "https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/",
+  "title": "developers.googleblog.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "context_engineering",
+    "bounded_context",
+    "agent_workflows",
+    "llm_synthesis",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "developers.googleblog.com",
+    "markdown_excerpt": "# Architecting efficient context-aware multi-agent framework for production DEC. 4, 2025 [Hangfei Lin](https://developers.googleblog.com/search/?author=Hangfei+Lin) Tech Lead Share - [Facebook](https://www.facebook.com/sharer/sharer.php?u=https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/ \"Share on Facebook\") - [Twitter](https://twitter.com/intent/tweet?text=https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/ \"Share on Twitter\") - [LinkedIn](https://www.linkedin.com/shareArticle?url=https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/&mini=true \"Share on LinkedIn\") - [Mail](mailto:name@example.com?subject=Check%20out%20this%20site&body=Check%20out%20https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/ \"Send via Email\") - [Get shareable link](https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/# \"Get shareable link\") ![Agent Development Kit: Making it easy to build multi-agent applications](https://storag",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:context-engineering:developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production",
+    "title": "developers.googleblog.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Context engineering for multi-agent systems from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "64a371a4ba90c80f65509b396ce178b9300a9a417d1a0d5c06c233614311931e",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\context-engineering\\developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.md",
+  "fetched_at": "2026-10-06T18:04:42.743Z",
+  "metadata": {
+    "kind": "official_engineering_article",
+    "source_id": "context-engineering",
+    "source_title": "Context engineering for multi-agent systems",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\context-engineering\\developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.md"
+}

@@ -1,24 +1,21 @@
 #!/usr/bin/env node
 
 /**
- * CREATE QDRANT COLLECTION: codebase_chunks_384
+ * RETIRED: this legacy 384-D collection is not the canonical EmbeddingGemma
+ * semantic search mirror. Canonical persisted retrieval uses semantic_768 in
+ * codebase_chunks_768. Do not create or repopulate this collection.
  *
- * Creates a clean 384-dim Qdrant collection for embeddinggemma vectors.
- * This is the canonical mirror for semantic search.
- *
- * Collection schema:
- * - Named vector: content (384-dim, Cosine distance)
- * - Named vector: summary (384-dim, Cosine distance)
- * - Payload indexes: packet_key, source_ref, feature_id, som_cluster, etc.
- *
- * Usage:
- *   node scripts/atlas/create-qdrant-codebase-384.mjs [--skip-if-exists]
+ * The implementation below remains for historical reference and is blocked
+ * before any Qdrant request or local report creation.
  */
 
 import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+console.error('LEGACY_384_QDRANT_COLLECTION_DISABLED: do not create or repopulate the retired 384-D collection');
+process.exit(2);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const __root = path.resolve(__dirname, '../..');

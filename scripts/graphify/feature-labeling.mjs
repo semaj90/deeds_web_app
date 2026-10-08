@@ -12,6 +12,7 @@ import { createReadStream, existsSync } from 'fs';
 import readline from 'readline';
 import path from 'path';
 import crypto from 'crypto';
+import { pathToFileURL } from 'node:url';
 import { normalizeSharedLabel, sharedLabelRegistrySignature } from '../atlas/shared-label-registry.mjs';
 
 const ROOT     = process.cwd();
@@ -33,9 +34,12 @@ const FEATURE_MAP = [
   { label: 'case-timeline',      patterns: [/case.*timeline|timeline.*case/i] },
   { label: 'ace-packet',         patterns: [/ace.packet|compress.card|rank.card/i] },
   { label: 'qdrant-search',      patterns: [/qdrant|vector.search|embed.search/i] },
+  { label: 'semantic-768-pgvector', patterns: [/semantic_768|pgvector|dense.retrieval/i] },
+  { label: 'embedding-cpu-workers', patterns: [/fastapi.{0,30}worker|cpu.worker|worker.pool|embedding.{0,30}concurren/i] },
+  { label: 'agentic-error-fixing', patterns: [/agentic.{0,30}(error|repair|fix)|(?:error|repair).{0,30}(fix|agent)/i] },
   { label: 'redis-cache',        patterns: [/redis|valkey|cache.*ttl|ttl.*cache/i] },
   { label: 'bifrost-cache',      patterns: [/bifrost|semantic.cache|l2.cache/i] },
-  { label: 'gemma4-inference',   patterns: [/gemma4|llama.server|turboquant|inference/i] },
+  { label: 'local-llm-inference', patterns: [/ornith|gemma4|llama.server|turboquant|inference/i] },
   { label: 'neo4j-graph',        patterns: [/neo4j|graph.edge|cypher|pagerank/i] },
   { label: 'som-topology',       patterns: [/som|self.organiz|topology|bmu/i] },
   { label: 'auth-session',       patterns: [/lucia|session|login|register|auth/i] },
@@ -47,7 +51,7 @@ const FEATURE_MAP = [
   { label: 'feature-labeling',   patterns: [/feature.label|domain.topology|graphify/i] },
 ];
 
-function assignDomain(text) {
+export function assignDomain(text) {
   const t = (text || '').toLowerCase();
   for (const { domain, patterns } of DOMAIN_MAP) {
     if (patterns.some(p => p.test(t))) return domain;
@@ -55,7 +59,7 @@ function assignDomain(text) {
   return 'General';
 }
 
-function assignFeatureLabel(text) {
+export function assignFeatureLabel(text) {
   const t = (text || '').toLowerCase();
   for (const { label, patterns } of FEATURE_MAP) {
     if (patterns.some(p => p.test(t))) return label;
@@ -67,7 +71,7 @@ function assignSharedLabel(featureLabel, domain, ownerArea, src) {
   return normalizeSharedLabel([featureLabel, domain, ownerArea, src].filter(Boolean).join(' '));
 }
 
-function ownerArea(src) {
+export function ownerArea(src) {
   const s = (src || '').replace(/\\/g, '/');
   if (/^src\/routes\/api/.test(s))     return 'api';
   if (/^src\/routes/.test(s))          return 'ui';
@@ -153,4 +157,6 @@ async function main() {
   console.log('──────────────────────────────────────────────────────────\n');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  main().catch(e => { console.error(e); process.exit(1); });
+}

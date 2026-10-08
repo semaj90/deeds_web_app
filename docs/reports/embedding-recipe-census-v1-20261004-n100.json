@@ -1,0 +1,283 @@
+{
+  "schema": "atlas.embedding-recipe-census.v1",
+  "canonicalAuthority": false,
+  "mode": "READ_ONLY",
+  "perStratum": 100,
+  "threshold": 0.995,
+  "strata": {
+    "both_columns": {
+      "populationRows": 739,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest:eg-task-prefix-v1": 78,
+        "embeddinggemma:latest": 22
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "title_relative_path": 24,
+          "title_relative_path_trimmed": 52,
+          "raw": 21,
+          "UNKNOWN": 3
+        },
+        "content_embedding_768": {
+          "UNKNOWN": 100
+        }
+      },
+      "byContentLength": {
+        "content_embedding|300-799": {
+          "title_relative_path": 7,
+          "title_relative_path_trimmed": 45,
+          "raw": 3
+        },
+        "content_embedding_768|300-799": {
+          "UNKNOWN": 55
+        },
+        "content_embedding|800-1499": {
+          "raw": 15,
+          "title_relative_path_trimmed": 5,
+          "title_relative_path": 4
+        },
+        "content_embedding_768|800-1499": {
+          "UNKNOWN": 24
+        },
+        "content_embedding|>=1500": {
+          "UNKNOWN": 3,
+          "title_relative_path": 1
+        },
+        "content_embedding_768|>=1500": {
+          "UNKNOWN": 4
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 12,
+          "raw": 3,
+          "title_relative_path_trimmed": 2
+        },
+        "content_embedding_768|<300": {
+          "UNKNOWN": 17
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "title_relative_path": 19,
+          "title_relative_path_trimmed": 27,
+          "UNKNOWN": 2
+        },
+        "content_embedding_768|src/lib": {
+          "UNKNOWN": 48
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path_trimmed": 22,
+          "UNKNOWN": 1,
+          "title_relative_path": 2
+        },
+        "content_embedding_768|src/routes": {
+          "UNKNOWN": 25
+        },
+        "content_embedding|sveltekit-frontend/docs": {
+          "raw": 21
+        },
+        "content_embedding_768|sveltekit-frontend/docs": {
+          "UNKNOWN": 21
+        },
+        "content_embedding|scripts/agent": {
+          "title_relative_path": 3
+        },
+        "content_embedding_768|scripts/agent": {
+          "UNKNOWN": 3
+        }
+      }
+    },
+    "content_embedding_only": {
+      "populationRows": 54430,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest": 6,
+        "embeddinggemma:latest:eg-task-prefix-v1": 94
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "raw": 6,
+          "title_relative_path_trimmed": 66,
+          "title_relative_path": 27,
+          "UNKNOWN": 1
+        },
+        "content_embedding_768": {}
+      },
+      "byContentLength": {
+        "content_embedding|800-1499": {
+          "raw": 4,
+          "title_relative_path_trimmed": 12,
+          "title_relative_path": 17
+        },
+        "content_embedding|300-799": {
+          "title_relative_path_trimmed": 49,
+          "title_relative_path": 5
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 5,
+          "title_relative_path_trimmed": 5
+        },
+        "content_embedding|>=1500": {
+          "raw": 2,
+          "UNKNOWN": 1
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "title_relative_path_trimmed": 32,
+          "title_relative_path": 9,
+          "UNKNOWN": 1
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path_trimmed": 21,
+          "title_relative_path": 1
+        },
+        "content_embedding|simd-bridge/cpp": {
+          "title_relative_path_trimmed": 3,
+          "title_relative_path": 2
+        },
+        "content_embedding|sveltekit-frontend/docs": {
+          "raw": 5
+        },
+        "content_embedding|scripts/api-cleanup": {
+          "title_relative_path_trimmed": 2,
+          "title_relative_path": 1
+        },
+        "content_embedding|docs/architecture": {
+          "title_relative_path": 3
+        },
+        "content_embedding|packages/atlas-core": {
+          "title_relative_path": 2,
+          "title_relative_path_trimmed": 1
+        },
+        "content_embedding|services/go-codeintel-service": {
+          "title_relative_path_trimmed": 2
+        }
+      }
+    },
+    "content_embedding_768_only": {
+      "populationRows": 219259,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest": 100
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {},
+        "content_embedding_768": {
+          "raw": 100
+        }
+      },
+      "byContentLength": {
+        "content_embedding_768|800-1499": {
+          "raw": 86
+        },
+        "content_embedding_768|>=1500": {
+          "raw": 7
+        },
+        "content_embedding_768|300-799": {
+          "raw": 4
+        },
+        "content_embedding_768|<300": {
+          "raw": 3
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding_768|sveltekit-frontend/memory": {
+          "raw": 29
+        },
+        "content_embedding_768|sveltekit-frontend/src": {
+          "raw": 28
+        },
+        "content_embedding_768|scripts/atlas": {
+          "raw": 9
+        },
+        "content_embedding_768|sveltekit-frontend/scripts": {
+          "raw": 6
+        },
+        "content_embedding_768|sveltekit-frontend/docs": {
+          "raw": 5
+        },
+        "content_embedding_768|sveltekit-frontend/tests": {
+          "raw": 3
+        },
+        "content_embedding_768|scripts/api-cleanup": {
+          "raw": 3
+        },
+        "content_embedding_768|sveltekit-frontend/docs_readme": {
+          "raw": 3
+        }
+      }
+    },
+    "tagged_eg_task_prefix_v1": {
+      "populationRows": 52364,
+      "sampled": 100,
+      "embeddingModelTagsInSample": {
+        "embeddinggemma:latest:eg-task-prefix-v1": 100
+      },
+      "recipeHistogramByColumn": {
+        "content_embedding": {
+          "title_relative_path_trimmed": 70,
+          "title_relative_path": 29,
+          "UNKNOWN": 1
+        },
+        "content_embedding_768": {
+          "UNKNOWN": 2
+        }
+      },
+      "byContentLength": {
+        "content_embedding|800-1499": {
+          "title_relative_path_trimmed": 12,
+          "title_relative_path": 18
+        },
+        "content_embedding|300-799": {
+          "title_relative_path_trimmed": 53,
+          "title_relative_path": 6
+        },
+        "content_embedding|<300": {
+          "title_relative_path": 5,
+          "title_relative_path_trimmed": 5
+        },
+        "content_embedding_768|300-799": {
+          "UNKNOWN": 2
+        },
+        "content_embedding|>=1500": {
+          "UNKNOWN": 1
+        }
+      },
+      "topSourceRoots": {
+        "content_embedding|src/lib": {
+          "title_relative_path_trimmed": 34,
+          "title_relative_path": 10,
+          "UNKNOWN": 1
+        },
+        "content_embedding|src/routes": {
+          "title_relative_path_trimmed": 22,
+          "title_relative_path": 1
+        },
+        "content_embedding|simd-bridge/cpp": {
+          "title_relative_path_trimmed": 3,
+          "title_relative_path": 2
+        },
+        "content_embedding|scripts/api-cleanup": {
+          "title_relative_path_trimmed": 2,
+          "title_relative_path": 1
+        },
+        "content_embedding|docs/architecture": {
+          "title_relative_path": 3
+        },
+        "content_embedding|packages/atlas-core": {
+          "title_relative_path": 2,
+          "title_relative_path_trimmed": 1
+        },
+        "content_embedding_768|src/lib": {
+          "UNKNOWN": 2
+        },
+        "content_embedding|services/go-codeintel-service": {
+          "title_relative_path_trimmed": 2
+        }
+      }
+    }
+  },
+  "databaseWrites": false,
+  "outcome": "RECIPE_CENSUS_PROVEN_UNKNOWN_ROWS_PRESERVED"
+}

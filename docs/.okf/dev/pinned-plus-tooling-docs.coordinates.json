@@ -1,0 +1,128 @@
+{
+  "schema": "atlas.external-doc-coordinates.v1",
+  "note": "DOC-26 composition of pinned-docs and tooling-docs coordinate sidecars; source entries unchanged.",
+  "sources": {
+    "sveltekit": {
+      "provider": "sveltejs",
+      "product": "sveltekit",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "@sveltejs/kit"
+      }
+    },
+    "svelte5-runes": {
+      "provider": "sveltejs",
+      "product": "svelte",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Svelte",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "svelte"
+      }
+    },
+    "bits-ui": {
+      "provider": "huntabyte",
+      "product": "bits-ui",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Bits UI",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "bits-ui"
+      }
+    },
+    "drizzle-orm": {
+      "provider": "drizzle-team",
+      "product": "drizzle-orm",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "drizzle-orm"
+      },
+      "urlOverrides": {
+        "https://github.com/drizzle-team/drizzle-orm/issues/5792": {
+          "authorityClass": "UPSTREAM_ISSUE_EVIDENCE",
+          "versionQualification": "UNVERSIONED"
+        }
+      }
+    },
+    "drizzle-kit": {
+      "provider": "drizzle-team",
+      "product": "drizzle-kit",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Drizzle Team",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "npm",
+        "package": "drizzle-kit"
+      }
+    },
+    "postgresql-18": {
+      "provider": "postgresql",
+      "product": "postgresql",
+      "versionQualification": "MAJOR_VERSION",
+      "productVersion": "18",
+      "language": "sql",
+      "publisher": "PostgreSQL Global Development Group",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "postgres",
+        "setting": "server_version"
+      }
+    },
+    "pgvector": {
+      "provider": "pgvector",
+      "product": "pgvector",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "sql",
+      "publisher": "pgvector",
+      "authorityClass": "OFFICIAL_PRIMARY",
+      "runtime": {
+        "kind": "pgvector"
+      }
+    },
+    "oaklib": {
+      "provider": "incatools",
+      "product": "oaklib",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "python",
+      "publisher": "INCATools",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "ast-grep": {
+      "provider": "ast-grep",
+      "product": "ast-grep",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "rust",
+      "publisher": "ast-grep",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "ts-morph": {
+      "provider": "dsherret",
+      "product": "ts-morph",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "David Sherret",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    },
+    "trpc": {
+      "provider": "trpc",
+      "product": "trpc",
+      "versionQualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "tRPC",
+      "authorityClass": "OFFICIAL_PRIMARY"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "okf.context-topic-extraction-receipt.v1",
+  "mode": "READ_ONLY_NONCANONICAL",
+  "inputsRead": 9,
+  "observationCount": 386,
+  "topicCounts": {
+    "ACE_CONTEXT_PACKET": 17,
+    "BITFROST_CACHE_RESIDENCY": 16,
+    "REDIS_VALKEY_CACHE": 16,
+    "DOMAIN_TAXONOMY_ONTOLOGY": 30,
+    "SOURCE_AND_WORKSPACE_LINEAGE": 3,
+    "SERIALIZATION_AND_RPC": 20,
+    "BATCH_DATA_INTERCHANGE": 4,
+    "CONTEXT_AND_PROMPT_ENGINEERING": 1,
+    "TASK_DAG_AND_SYNTHESIS": 0,
+    "SEMANTIC_768_AND_EMBEDDING_RECIPE": 18,
+    "POSTGRES_PGVECTOR_RETRIEVAL": 217,
+    "CUML_KMEANS_ROUTING": 14,
+    "ONTOLOGY_TOOLING": 1,
+    "STRUCTURAL_CODE_ANALYSIS": 1,
+    "JSON_STREAM_PARSING": 68
+  },
+  "sourceKinds": {
+    "EXTERNAL_DOC_CANDIDATE": 322,
+    "REPO_DOC_REFERENCE": 64
+  },
+  "exactCharAndByteSpans": true,
+  "outputPath": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/topic-extractions-replay.jsonl",
+  "writesPerformed": [
+    "local_diagnostic_artifacts_only"
+  ],
+  "canonicalAuthority": false
+}

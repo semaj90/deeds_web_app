@@ -23,6 +23,150 @@ except ImportError:  # pragma: no cover - runtime capability boundary
     dspy = None
 
 
+def admit_agentic_repair_example_v1(
+    value: Mapping[str, Any],
+    *,
+    source_bytes_by_ref: Mapping[str, bytes],
+    qualified_candidate_ids: Sequence[str],
+    known_validator_ids: Sequence[str],
+) -> dict[str, Any]:
+    """Admit one read-only repair example against caller-qualified evidence.
+
+    The caller must obtain source bytes, retrieval qualification, and validator
+    IDs from their existing owners. This function checks the supplied proof
+    material; it does not resolve canonical identity or create those proofs.
+    """
+    def exact_object(item: Any, label: str, fields: set[str]) -> dict[str, Any]:
+        if not isinstance(item, Mapping) or set(item) != fields:
+            raise ValueError(f"{label} must contain exactly {sorted(fields)}")
+        return dict(item)
+
+    def text(item: Any, label: str) -> str:
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(f"{label} must be non-empty")
+        normalized = item.strip()
+        if normalized.lower() in {"unknown", "latest", "unset", "null"}:
+            raise ValueError(f"{label} is unresolved")
+        return normalized
+
+    def digest(item: Any, label: str) -> str:
+        normalized = text(item, label)
+        if (
+            len(normalized) != 71
+            or not normalized.startswith("sha256:")
+            or any(char not in "0123456789abcdef" for char in normalized[7:])
+        ):
+            raise ValueError(f"{label} must be sha256:<64 lowercase hex>")
+        return normalized
+
+    row = exact_object(
+        value,
+        "example",
+        {"schema", "taskId", "canonicalId", "packetKey", "sourceRevision", "workspaceRevision", "sourceRefs", "error", "retrieval", "expectedOutcome"},
+    )
+    if row["schema"] != "atlas.agentic-repair-example.v1":
+        raise ValueError("unsupported agentic repair example schema")
+    identity = {
+        "taskId": text(row["taskId"], "taskId"),
+        "canonicalId": text(row["canonicalId"], "canonicalId"),
+        "packetKey": text(row["packetKey"], "packetKey"),
+        "sourceRevision": digest(row["sourceRevision"], "sourceRevision"),
+        "workspaceRevision": digest(row["workspaceRevision"], "workspaceRevision"),
+    }
+
+    refs = row["sourceRefs"]
+    if not isinstance(refs, list) or not refs:
+        raise ValueError("sourceRefs must be non-empty")
+    normalized_refs: list[dict[str, Any]] = []
+    seen_refs: set[tuple[str, int, int]] = set()
+    for index, raw in enumerate(refs):
+        ref = exact_object(raw, f"sourceRefs[{index}]", {"locator", "surface"})
+        locator = exact_object(
+            ref["locator"],
+            f"sourceRefs[{index}].locator",
+            {"schema", "canonicalId", "packetKey", "sourceRef", "sourceKind", "filePath", "sourceUrl", "contentHash", "workspaceRevision", "sourceRevision", "span", "domain"},
+        )
+        if locator["schema"] != "atlas.evidence-locator.v1":
+            raise ValueError("sourceRef locator schema is invalid")
+        for key in ("canonicalId", "packetKey", "workspaceRevision", "sourceRevision"):
+            expected = identity[key]
+            actual = locator[key]
+            if actual != expected:
+                raise ValueError(f"sourceRefs[{index}].{key} does not match example identity")
+        source_ref = text(locator["sourceRef"], f"sourceRefs[{index}].sourceRef")
+        content_hash = digest(locator["contentHash"], f"sourceRefs[{index}].contentHash")
+        span = locator["span"]
+        if not isinstance(span, Mapping) or set(span) != {"startByte", "endByte"}:
+            raise ValueError(f"sourceRefs[{index}].span is required")
+        start, end = span["startByte"], span["endByte"]
+        if isinstance(start, bool) or isinstance(end, bool) or not isinstance(start, int) or not isinstance(end, int) or start < 0 or end <= start:
+            raise ValueError(f"sourceRefs[{index}].span is invalid")
+        source_bytes = source_bytes_by_ref.get(source_ref)
+        if not isinstance(source_bytes, bytes):
+            raise ValueError(f"sourceRefs[{index}] source bytes are unavailable")
+        if "sha256:" + hashlib.sha256(source_bytes).hexdigest() != content_hash:
+            raise ValueError(f"sourceRefs[{index}] content checksum mismatch")
+        if end > len(source_bytes):
+            raise ValueError(f"sourceRefs[{index}].span exceeds source bytes")
+        surface = text(ref["surface"], f"sourceRefs[{index}].surface")
+        try:
+            byte_surface = source_bytes[start:end].decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"sourceRefs[{index}].span splits a UTF-8 character") from exc
+        if byte_surface != surface:
+            raise ValueError(f"sourceRefs[{index}].surface does not match source bytes")
+        key = (source_ref, start, end)
+        if key in seen_refs:
+            raise ValueError("sourceRefs contain duplicate locators")
+        seen_refs.add(key)
+        normalized_refs.append({"locator": dict(locator), "surface": surface})
+
+    error = exact_object(row["error"], "error", {"class", "code", "message", "failingCommand", "failingTest"})
+    normalized_error = {
+        "class": text(error["class"], "error.class"),
+        "code": None if error["code"] is None else text(error["code"], "error.code"),
+        "message": text(error["message"], "error.message"),
+        "failingCommand": None if error["failingCommand"] is None else text(error["failingCommand"], "error.failingCommand"),
+        "failingTest": None if error["failingTest"] is None else text(error["failingTest"], "error.failingTest"),
+    }
+    retrieval = exact_object(row["retrieval"], "retrieval", {"queryText", "semanticRecipe", "candidateIds"})
+    if retrieval["semanticRecipe"] != "semantic_768":
+        raise ValueError("retrieval.semanticRecipe must be semantic_768")
+    query_text = text(retrieval["queryText"], "retrieval.queryText")
+    candidate_ids = retrieval["candidateIds"]
+    if not isinstance(candidate_ids, list) or not candidate_ids:
+        raise ValueError("retrieval.candidateIds must be non-empty")
+    normalized_candidates = [text(item, "retrieval.candidateIds[]") for item in candidate_ids]
+    if len(normalized_candidates) != len(set(normalized_candidates)):
+        raise ValueError("retrieval.candidateIds contain duplicates")
+    qualified = set(qualified_candidate_ids)
+    if not set(normalized_candidates).issubset(qualified):
+        raise ValueError("retrieval contains an unqualified candidate")
+    if identity["canonicalId"] not in normalized_candidates:
+        raise ValueError("retrieval candidates do not include canonicalId")
+
+    outcome = exact_object(row["expectedOutcome"], "expectedOutcome", {"validatorIds", "mutationAllowed"})
+    if outcome["mutationAllowed"] is not False:
+        raise ValueError("mutationAllowed must be false")
+    validator_ids = outcome["validatorIds"]
+    if not isinstance(validator_ids, list) or not validator_ids:
+        raise ValueError("expectedOutcome.validatorIds must be non-empty")
+    normalized_validators = [text(item, "expectedOutcome.validatorIds[]") for item in validator_ids]
+    if len(normalized_validators) != len(set(normalized_validators)):
+        raise ValueError("validatorIds contain duplicates")
+    if not set(normalized_validators).issubset(set(known_validator_ids)):
+        raise ValueError("expectedOutcome contains an unknown validator")
+
+    return {
+        "schema": "atlas.agentic-repair-example.v1",
+        **identity,
+        "sourceRefs": normalized_refs,
+        "error": normalized_error,
+        "retrieval": {"queryText": query_text, "semanticRecipe": "semantic_768", "candidateIds": sorted(normalized_candidates)},
+        "expectedOutcome": {"validatorIds": sorted(normalized_validators), "mutationAllowed": False},
+    }
+
+
 @dataclass(frozen=True, slots=True)
 class RepairMetricObservationV1:
     retrieval_recall_at_5: float

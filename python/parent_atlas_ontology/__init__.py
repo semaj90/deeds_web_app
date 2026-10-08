@@ -14,3 +14,16 @@ operator's own boundary): create_identity(), mint_tuple_id(),
 guess_symbol(), resolve_canonical_id_from_embedding(). Those are Parent
 Atlas authority operations that live in TypeScript/Postgres, not here.
 """
+
+__all__ = ["GroundedNlpEvidenceSpanV1", "GroundedNlpFactV1"]
+
+
+def __getattr__(name: str):
+    if name in __all__:
+        from oak_agent.grounded_nlp_fact_v1 import GroundedNlpEvidenceSpanV1, GroundedNlpFactV1
+
+        return {
+            "GroundedNlpEvidenceSpanV1": GroundedNlpEvidenceSpanV1,
+            "GroundedNlpFactV1": GroundedNlpFactV1,
+        }[name]
+    raise AttributeError(name)

@@ -19,6 +19,12 @@ describe('classifyPostgresError', () => {
     expect(classifyPostgresError(wrapped).state).toBe('starting');
   });
 
+  it('classifies SQLSTATE 57P03 embedded in a persisted log string as STARTING', () => {
+    expect(classifyPostgresError('Postgres connection failed with SQLSTATE 57P03')).toMatchObject({
+      state: 'starting', reason: 'STARTING_UP', sqlstate: '57P03', retryable: true,
+    });
+  });
+
   it('classifies recovery mode as STARTING', () => {
     const result = classifyPostgresError(new Error('the database system is in recovery mode'));
     expect(result).toMatchObject({ state: 'starting', reason: 'IN_RECOVERY' });

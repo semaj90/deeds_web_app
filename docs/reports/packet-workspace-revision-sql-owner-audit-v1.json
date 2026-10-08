@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.packet-workspace-revision-sql-owner-audit.v1",
+  "date": "2026-10-05",
+  "status": "PATCHED_TESTED_ERROR_NOT_REPRODUCED",
+  "scope": "Read-only schema inspection and focused SQL-owner regression test; no Graphify, projection, or MCP execution.",
+  "finding": {
+    "reportedError": "column p.workspace_revision_key does not exist",
+    "currentScriptDatabase": {
+      "host": "127.0.0.1",
+      "port": 5434,
+      "database": "legal_ai_db"
+    },
+    "observedSchema": {
+      "atlas_packets.workspace_revision_key": "PRESENT",
+      "atlas_workspace_source_bindings.workspace_revision": "PRESENT",
+      "atlas_workspace_source_bindings.source_revision": "PRESENT"
+    },
+    "conclusion": "The reported missing-column error was not reproducible against the database configured for the audit script. The diagnostic nevertheless no longer uses the packet workspace column to qualify workspace membership; workspace revision is carried from atlas_workspace_source_bindings through the exact Graphify join."
+  },
+  "changes": [
+    "Removed packet.workspace_revision_key from packet candidate qualification metrics.",
+    "Recorded atlas_workspace_source_bindings as the workspace revision authority.",
+    "Added regression assertions that packet candidates carry the bound workspace revision and do not reference the packet workspace column."
+  ],
+  "validation": {
+    "readOnlySchemaInspection": "PASS",
+    "focusedTests": "9/9 PASS",
+    "nodeSyntaxCheck": "PASS",
+    "gitDiffCheck": "PASS",
+    "fullCensusReplay": "NOT_RUN; requires an explicit admitted workspace revision and Graphify execution ID"
+  },
+  "writes": {
+    "postgres": 0,
+    "qdrant": 0,
+    "neo4j": 0,
+    "valkey": 0,
+    "graphify": 0
+  },
+  "canonicalAuthority": false,
+  "nextSafeStep": "Identify the database/connection that emitted the reported error, then run the bounded audit with its explicit admitted workspace revision and execution ID."
+}

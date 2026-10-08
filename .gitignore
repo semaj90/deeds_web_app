@@ -474,6 +474,12 @@ src/proto/**
 !/services/go-embedding-service/
 !/services/embedding-onnx-webgpu/
 !/services/atlas-gpu-8098/
+!/services/go-health-aggregator/
+/services/go-health-aggregator/*
+!/services/go-health-aggregator/go.mod
+!/services/go-health-aggregator/go.sum
+!/services/go-health-aggregator/main.go
+!/services/go-health-aggregator/main_test.go
 Ollama/ollama.exe
 Ollama/ollama\ app.exe
 Ollama/unins000.exe
@@ -703,6 +709,8 @@ docs/.okf/pinned/admission-envelopes-v1.json
 !CONTRIBUTING*.txt
 !python-services/phase46_adapter/requirements.txt
 !python/requirements-atlas-unified-projection.txt
+!python/requirements-atlas-grounded-nlp.txt
+!python/requirements-oak-agent.txt
 !docker/docling-vlm/requirements.txt
 !docker/image-synthesis/requirements.txt
 !sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts
@@ -1105,3 +1113,4 @@ docs/reports/openspec-evidence/pipeline-20261003*/
 docs/reports/openspec-evidence/pipeline-attempt-20261003T*/
 docs/reports/openspec-evidence/pipeline-current-worktree-20261003*.json
 docs/reports/staging/
+!/services/go-health-aggregator/go.sum

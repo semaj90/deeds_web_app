@@ -637,6 +637,15 @@
       "appliedAt": "2026-09-04",
       "requiresJournalEntry": false,
       "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT count(*) FROM atlas_external_doc_pages; SELECT count(*) FROM atlas_external_doc_chunks;\""
+    },
+    {
+      "file": "manual/20261003_atlas_packet_incidence_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Dedicated immutable Graphify-to-packet incidence rows; taxonomy hyperedges remain untouched. Apply only after a reviewed 20-100-row exact-identity canary is eligible.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT to_regclass('public.atlas_packet_incidence') AS table_name;"
     }
   ]
 }

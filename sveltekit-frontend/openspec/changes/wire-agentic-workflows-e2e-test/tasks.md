@@ -134,3 +134,10 @@
 - ✅ Documentation complete: runbook with patterns, supervision strategies, telemetry interpretation, troubleshooting
 - ✅ No regressions: full test suite passes, no new TypeScript errors
 - ✅ All code committed with clear messages and docstrings
+
+## Role authorization E2E status (2026-10-07)
+
+- **NOT_PROVEN:** The default Playwright global setup authenticates as the development admin and seeds case rows through `/api/cases`; it does not exercise least-privilege role behavior. Do not use the default suite as evidence of viewer/admin authorization.
+- The existing ACP authorization boundary and tool-policy fixture suites do test viewer-denied write tools, viewer-allowed read tools, and the top-ten auth gates. Focused Vitest run passed 65/65. These are handler/policy proofs, not browser-to-session E2E proofs.
+- No Playwright run was attempted because the configured global setup performs database writes. A separate role-aware E2E harness still needs an explicitly isolated auth/session fixture and a route-by-route role matrix; do not reuse `DEV_BYPASS_AUTH` as a role credential.
+- No task checkboxes were changed; no DB/session writes or service starts were performed in this audit.

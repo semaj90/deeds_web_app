@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:cbf4f4138fc1dfdaf4fbc84790a5e399c2d1c631989c358f13df05547f3bfc26",
+  "claims": [
+    {
+      "id": "claim_32838ac6cfe540bb9a8736da68a38847",
+      "statement": "Parent Atlas treats HTTP, gRPC, MCP, A2A, and related transports as replaceable adapters around canonical retrieval behavior; protocol clients carry transport concerns and must not contain ranking, deduplication, or graph business logic.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L109-L117",
+          "version": "repo-lines-v1:sha256:f6a8012d89c10e45bf001513f3034d6197aa7604449537bef8e37e4b4ceded4a:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODM4MDczOGNhNWRhZGYxODMzZWQ1MzU1YjBiMjNlZTFkYTk5NGZhY2IzYjcwOGMyYzVjYjAwNjljZGQ1ODRkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjdiYjg5OGI1ZDViNzFjYWE3ZWE1NWFjNTMyYTU1NmU4MDdkYjUzNGFhNjg5ZjFhYWZlOTM4ZjIwOTUyZTdjMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmU3YzNlOTYwMDU2MDM0ZTJmNTEzM2Q5NzViNGZkM2RlYWFjZGYyMDY1MWQ1ZGNkOTlkMTdmZmMzNDcyZmQ2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L329-L345",
+          "version": "repo-lines-v1:sha256:41c8a0e41e1db9d748585b07e9f876acf152896b73b50fc7fe2cb172c6603577:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ODA3YTE2ZThhY2M4MzAyNmQwNjQ3NzIwNGQzMjVjYmY4ZjAyYjFmMTgyZGY3OTljMWZiY2VlZjgyNDAzZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyYmExMzk3NWIxZjljZDZkYmNjYjQyZDA5ZTc4ZmUzNmI0OGZkMTk0NTBkMGM3NzM3MjBiYTdkZGQ3ZDVhMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L5-L17",
+          "version": "repo-lines-v1:sha256:2879e3f35690149d14ef3753be071192f79cbc25582242558499f556f44b8c58:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNmEyYWJmNTIyZTlhZTNkMDlkYTQxYzljZThjY2FlNDMzZDY1NmE1MjUwMDBkMjliNzc5OTUyYjRkMTRmMTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljMWVjZTFlYjZhNTNkNDRjZTA4NDA5NzgwNDUxN2I0MjM3ZmVkYmJlOTEyNzE4NzIzNzE5N2Y1ZGRiNTI0YzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0OGIzZTM1NTk2ZWFjZGVjZjg0ZjljMmFhYjhjOGExOTQ1ZDZkZjkzYjgxMzFiNWJjMzY4NzdhMGM1ODNmZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlMjllOWY2NzAzNzI1NTMyZjdhMzMwZjBlMmQ0MDE2NGU4MGJmMDNhYjAxYzliNzI0NjQ1NTBlMmU4NjdhZGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e1f7c4c95a5943a4985f7c2600943a16",
+      "statement": "The Go RetrievalService provides unary and streaming evidence/codebase retrieval plus topology, research, registry, AST, and health RPCs, with HTTP health and search endpoints exposed as a parallel JSON adapter.",
+      "evidence": [
+        {
+          "resource": "repo://proto/active/retrieval.proto#L20-L56",
+          "version": "repo-lines-v1:sha256:64df121024aec0d9b447573b351656f672c84bad33dd92078b3c62198c2e026c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkNzUxMjdiMDAwYThkZmY3YmY4MmU1MWMzODIzNmQxMjRmYTJhYzY1N2M5NjIxOTg1NDYyMWI0ZGYxYjA2ZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxZGY2MTU4MmQ2ZGRlMDc5NDcwZWQxNWMwMWY4OWE5ZTI0NWQ0ZDgzNGFjZDg0NTc5YzExNGU4MzUyMzg1ZjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyNmY0Nzg5N2UyZTZmY2NiMzBlZGExMGE0NTMxYTFlNmM0YzViZjVhMGRhM2ZjMmUxZjA2OWY1N2E4OTU2ODQifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L1767-L1774",
+          "version": "repo-lines-v1:sha256:f0bfc891b524c1be98590a1c0e790eede14c778b6bc5092ae0f38c84f6455710:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2E5MjY2MGE2Yjk2YWE3NWFiNjc2NTYxYTgyODQ0M2MwZjBkMDlhNDU2NTE3YmNlMTgwNjAwYTY3NjUwODUzYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIxYjJiMWIwOWZkMjc5OWMyYTE1N2ZlMzMwMzUwYjE2NWQzMWIzODg1YzY4MzkxMjI1YjM2ZjYxYjI3YThiZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWMwYTEyYmYyNzI2N2E3ZGYzMDVmZGJiYjFhOWVlZjJmNjhiOTZiYzU5YjU1ZjBhNjI2NzdhNmFhNjkwZGI2ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTZlZGFhNmYzY2IzOWM4NzkxMWI1YTQ4N2M5MTM1ZWI5OTZjNGM0ZWViOWQ4MjNlNTZjNzYyOTYzZmY0M2FhOCJ9"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L2-L16",
+          "version": "repo-lines-v1:sha256:6584ba502280c8449e014854af2e8e3b105fd1f3c63120c482ee95e1af8fa4b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwMWVhZDkzNmEyMjgxZDUzZGNjMDY0YjdlMmEyYWIwZDUzYjkyZWYzZWY3YjM0YjY2ODY3MzAwNzg5NWM4NjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNDcwYzhkNmM5NmFjZTE4MDUyOWYxY2FjMDYzZjg1ZTkzYjUxMTkyYWMwZTFjZmZiNDQ1NGQ5MzliNjI1ZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzZjZmMWVlNTcxYzFlM2MzYTI5ODI2YjYxNzFlMzM2OWFlN2JlYTdiODc1ZDQ2MzY4MDZkOTgwMWM4Y2ZhYjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhOGI5NmY1Zjg1MWE3NzIxYjAxNGY0YmU5MTRkNjE3ZGI3N2U5OWRlOWU0MWRhYzE2NTNiNzMxMDQwNDJhMTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_05037150100349d88c284dee5749e103",
+      "statement": "SearchEvidence checks a Redis cache, embeds through the configured embedding service unless a 768-dimensional query embedding is supplied, searches pgvector and Qdrant in parallel, reranks merged results, then performs bounded sibling, graph-neighbor, and document-context enrichment before caching the response; streaming delegates to this unary path and emits progress/bundles.",
+      "evidence": [
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L1787-L1837",
+          "version": "repo-lines-v1:sha256:fa875dcfaa53cacee724f9d8924c99fbca0a7a2bda791287f4e63713500975ab:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjOTAxMjZjOTQzZWQ2MDg2YmM4MjdlOWY5ODdhNTRiYmYwZTEzMmNhN2M4MTkxZGVjOWU5NzgyOWQ4OGY1MTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2MTlhZjI0MzdmYTZlNDY3NjM0NzAwNzlkYmFkMjk5YTcxMzVlZmJjZjhjYTQ5MTYwMTRiZjg5ZmMxNjQyZTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4NTAwZGQ4ZGYzY2VmYTA4MDlkZWU3MDAyZmJkYzY3NjlkNzJkNGQ4MDE1YTQ0YjE5YTE0OWM5OTAzNGFlYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhZGMzZjYyYWZkZWE0YjU5NWIyYjY3MzUyODA4MGQ3MTFlNDMwYzUwNTZkZGUxNGY5NzRjNzE4Yzc1MmMxZmEifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L1843-L1929",
+          "version": "repo-lines-v1:sha256:8335c81e5231e938aa7d38afe58e5f82f3f469c1d6f9d35377441761d6dfecdc:eyJzZWxlY3RlZExpbmVDb3VudCI6ODcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2OThiZDcwZTYyMTY3NmJmMDlkOWNlYzk2NTNlNTJkMTVhYTNiODc2MTdmNTQwNmFkNGUxNmQyOGNlNWRlNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NzNiN2M5YTdlYzFlYjYxOTg4NTBkNzFhNWVlYjE3YjY4OGZmMjU4YzIzODBjZmY4YTA3YmE5MGNkZjBiNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJiYWVjN2Y2Zjk0NjgwZjJiZjllNzc1MTI5ODQ4NjJkODgyZTU0ZjkzZTcyMGYzZmFmYzY1OTUzNWQ1Y2VmNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI3ODNlNWVkODkxMDM4YzNhZTFjMDlmZmVjMzM1OWVjODA3YzkzNTFiMjY4OWVjYWZjOGYzOTg5ODIxZjFkMWIifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L2073-L2097",
+          "version": "repo-lines-v1:sha256:177d8a150b1da45da3fc8dad38413d793ffd0a66d4b671feb444013b2edeb2a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZTNiNGIwMmFkODMyYTdlMGNkMzU1NGJjN2JiOTY3MGM3NGE0NTMzM2ZkMjI3ZWMzY2U1MGIxZTQ4NTA1ZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkYTFkNzkxNDgwOWUzNDk5ZDQ1NzNlOGJmZTU4MjZhZTA4MmVhMmUyYTE0ZGI3Y2MxNDE3MjU3N2M2YTczNWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljMTRjYjZiOWUxZDExMjVkMTgxODlmY2RhY2RlZTlhMDA3MDQzNmIzZThkOTU1YTI2MDc3NTQzYWUzYzg2MTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3OWI1NTlhMTk4OWQ0M2UxZjg4ZTVmMzFhOTNjZDVhMjNjOGFkMTAyNzU1NWExY2NmYThiZDA2NDE0NDE1ZTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0dad1fbe4d9a44508bdf12b97962bfd3",
+      "statement": "The codebase retrieval response preserves explicit representation routing and canonical lineage fields, while semantic AST packet and packet-registry RPCs fail closed because the current service lacks an admitted canonical packet-revision producer; these surfaces are not registry writers.",
+      "evidence": [
+        {
+          "resource": "repo://proto/active/retrieval.proto#L180-L205",
+          "version": "repo-lines-v1:sha256:8c807aa17e53f4e58df5adb7a8879f175cbc341f3ce5871a0bb27d1cda40ff6a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMTFiZGMwMDNmY2ZlYjFmODJhY2JlYTkwNjkwNGE2NjNmZmU2MTJmY2QxYzliODM0ZjVkOTNiOTA2OTFhOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5ZTJjODVjZWU2MGU3MDc4MDZlNWMyMGE5OWY0ZmMzYTE2NWU3MzJlYTRkNjFkODkxZDRhN2Y2NWZiYTY1ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc4MTI5MzBkMzU1NzFlYTc2M2NiNDg5ZjI4Y2MwMmNiNDEzNzc1OWU2MTlkOWNjYzMwN2NkMTk4ZmM5M2JjNDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ0OGFiOWFiNWRiNDlmYTBkNTc0Yzc0ODQ3ZDlmODI2ZTgxYWY2YmIwNjE5N2RlNzQzZGU3MTlkNDdlYmMyZjEifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L2173-L2199",
+          "version": "repo-lines-v1:sha256:098fff479ed98542e6ea2aa5c9eca8378061d1dee151233f818d82f5515e8fdc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ODk5ZDRlZTQ4MzFkOThkZDM3Nzk0ODBjZmI4ZGYzMDhlOWMzYjllNTFiNjQwMDNkZTE5YzhmNDlhOWYzNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3ZmQyODVlNmNhMmZjMzZlYWYxYmJhMDU4YTZmMjBjZThhYzJmYmI4YjhjZTg2ODg0YTIwOWY5YTk2MzY4YTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg5ZWI3NjM0ODMzYmE1ZTU4YzUyZTEwZTRlODgxOTY2MWE5ZDM0M2Y4Njc4NTQ3MzE0YTIzM2FkNzc3MTZhM2QifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L2266-L2313",
+          "version": "repo-lines-v1:sha256:d8d39497fa6a166785c2abccbea3633bfa7b7c98260503cc1987630e7443f263:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwZDNmM2M3ZGNjMDg4MGEzNjBjZGMzOGZlMWQwNWFmYTY5OWJkMzNmMjQyNjIxNmQyYzIzOGQ5YjJmMmM3ZTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljOWJiNmZmNmJjMGE2MDlkMmUzYzFmMDg2ZDMxYmFlZTNjYjAwNGVlZGZkNjA3NmFmOGI2MzY5NzBhY2Q2ZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlMmRlMjM3MWNkODEyYzcwNWIwMDYxNGM1ZjdlY2I0OWRiYjc3OWM5ZWNkZWYyZWQzNjBkMzIyNjcyNDI4MzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiMmJkNWYwZmE5YjY0Yjg3YzA2YzdiZjkwZDIzZDBmYmZhZGY5NWRjZWQ3ZmIxYTE3YzM0MzE1YTBiODc4OTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_70adb85aef4245fa84c7377c8706bb0e",
+      "statement": "The FastAPI atlas-gpu-8098 service is execution-only: it validates bounded Arrow artifacts and optional GPU residency leases, and its health and operation responses explicitly report no PostgreSQL, Qdrant, or Valkey writes.",
+      "evidence": [
+        {
+          "resource": "repo://services/atlas-gpu-8098/app.py#L1-L5",
+          "version": "repo-lines-v1:sha256:67271a7585259d664d150db8cc0e823d36a60f8429389e2a6283ccf2c9d39768:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDc2OTYxYzZjZGJhZDJjMGNlMGIyZWRlMTM5ZmI4MWJiZDg1NWFiZjQ0MWEyNTk0Y2YzNTUzNmVmNGIwODEyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDc1ZDQ1ODllOTFjYzhjYjk3NDg4OWRhYjAxZGUxNWRiMTU3NGNhMTBlZWM3MjkwYTEwOWJmNTg4Yzk0ZTAxYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTY3OGJiNWE4ZGEyNjRjMzg0ZDFkMGFkMmJkZDZjNzk3NzQyNDE2MWMzMzBlZGUzYWIyZTg4N2Y3M2Y4YTdkZCJ9"
+        },
+        {
+          "resource": "repo://services/atlas-gpu-8098/app.py#L110-L118",
+          "version": "repo-lines-v1:sha256:da03eaed8745afb7b76f6b699680cbd8618e75c08bd74877276e38ffc6a77d68:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDY4ZjBkOTk2YmQ1MGQyMmVhNGEzY2FlODI3NzIwNzM3Y2I4NTQ5YTFjZjg2YjI4MGZkN2I1YzBhMzYzZmI4MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjc5MmYwNzdkYWE5YmEwYzhlMTg4ODRhNjFiNTJhZmI5MDQ5ZWM4YTI3NDQ3YzY1ZDliYjc4MmM2MjlhMGYyYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZWFjMzdhYzNmNjRlODI4MThlODU2YWRlNGZkYmQ3OTU1NDUzZTRhMGU3YjU4NjA4MTUwMWU4ZTYyMGZlN2IyNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDRjMzhhY2UwZjRkN2M0ODQ3YTk5NTE2ZGI1YTU0ZDNkMmI2YTljNTNhYTA3MjIzY2I2ZTAyMWM3MjFhNjRhMiJ9"
+        },
+        {
+          "resource": "repo://services/atlas-gpu-8098/app.py#L135-L160",
+          "version": "repo-lines-v1:sha256:549792c702b1f1ba9e7e4cfd3da131cc61bdfc7ea6c56dd6c7a8cfd077bbd2cd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5M2QzOTU1OGQxMDE5N2U4YjkzZTNlOGU4NDlmNzQ1YjRkMjk2Y2QwMWQ3YTk4ZTZmOGI0M2ZhYmRjOGQ5OGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YjhlNjczNDI2Njc0N2M4M2M1ZGRjNTYzNzM5YjY2ZmRiYjUzODQxMjlhODcxYjBlODc0OTc2ZDhjZTVkNWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmYjI1ZTA2ODMwN2ZhNWVlMDA0NjZjOGVkZGRlYzA4YzI5MzllMThjZTlmYjNlMDEyMzkyNzRmMzRiNmU2MmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5ODc3Y2M1ZmEyZWY4YTQzMGYyMTMwMDI4NWU2NjMzZGFmZjk0NzgwYWIyMzQzMzJkNDcyOTk3YWZmNGM1OGEifQ"
+        },
+        {
+          "resource": "repo://services/atlas-gpu-8098/app.py#L78-L84",
+          "version": "repo-lines-v1:sha256:1057cc4a709f5e7721b352310bfca256bfeacb15776b046a06dad0ba11fa246d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2Q2ZmE0NDY2NmM3M2RjZGJlMTM2YTIzOTVhMDM2MmE3MmIzZDFiMGFkYTk3YTAzMjQ0ZjM1MmZhM2VhNGNlYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGM0NTk2NmE0MzFkODNmY2YxZmViY2Q3MzM4M2IxNTQwZmQ1OGI4MzZlMWQ3YzY2MTA3ZjFmYzdjMWQ2ZjU4MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2ZlODg1NDA3NzQ3Mjg1YjIyZTNjNWM0NjI1YjA3MDA2ZmFhNzU1ZWZjYWUwMDUyZmRhNmJjZDY2N2ZjOTg0ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDZlMjczNjIzOWRiMWYyYzdmNzE4NzBlMTVlYmUyNDc1NzljY2EzNGUxMTlmMTQ4ODg2Y2FlMDg3ZjYxYzUyNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2ad642a525404c209daf1a73e44a2aad",
+      "statement": "The A2A client is a thin task-delegation implementation of RetrievalFacade: it supports Agent Card discovery, bearer authentication, synchronous completed-task projection, and JSON/SSE artifact streaming, while leaving canonical writes behind server-side validation and promotion gates.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-client/src/a2a/client.ts#L1-L17",
+          "version": "repo-lines-v1:sha256:56b675e8f267b1beaa5a3cda045e2a45a5f07ad182cdce0db52dcc9e373f3164:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5ZjNlMGVkMDEzYjI2YmUwZTc5M2Y0NDMyMjZiZDI2ZmZiMGI5Y2MxNzZlNDY2OWFhN2FkNzVhYTc5YTkyM2MifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-client/src/a2a/client.ts#L105-L159",
+          "version": "repo-lines-v1:sha256:4de9a37d63458a2c9912d38ddd7e9bd36f31770b049c201076d33d7f8283d75f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYWUyMzFlZmE1NzI0ZTI0MDI3ZDJmNzRjZGY2MDJiYTQzZDFlZTljMDA5MmY5ZjUwYTExYWNhMWU1MDJiZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlNjk1ZDRjMTYxZWIyOTc5N2FhMmI4ZWRjNDFkMTE0MGZlNDM2MGY1ZDVmYmQxMDUxZjNlMmY4ZGVjZmViYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhMDcxYTg2Mzc3YWE0OTdhNGE4MGQ4MDk2YTgzZGYyMmY1YjVhNTVkZGY2MWQxMWI3Yjk3N2JhNTVkYjgwYmMifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-client/src/a2a/client.ts#L165-L212",
+          "version": "repo-lines-v1:sha256:bff079341042b55a012fb67dbe1e06133bbdb296f1f9524cd72e8ba9db40eabc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlZWVmMWE1YWM2ZDBlODYxNTAyYzY1MTRmZWYwZWE3NThmYWUwZTM1M2Q4ZmEyZjU3MjhlMTIwODZmNjJmNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjZDlkYjBkNzJhNjRhZjEwNmY1MTY2YmRhMGJkNjYzOWQ0YjI4NTFlY2JiOWFkMWEzNTYwYzUwNmU2Njc3NDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhZTFhZDY2Yzc0NDg4NTI0ODIxZmVjZWMzMGUyYmJhODFhMTJjMDNhY2UxZjQ2YjNkYWYwZGViOTQ4NjgwMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlNGU1YzMyMzE2NGU3NDQ1YWU4MzUyZTk2NGVkZTYzYjg2YTM1NGY0NzhmNGVlM2Y5NWZkZGE5MDExNjdiYjMifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-client/src/a2a/client.ts#L43-L52",
+          "version": "repo-lines-v1:sha256:dcc318aa829f80b96f36654f56c90021946afa7598a917f4f5c574900493f727:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4MTM5ZTlmZTIzNWJiMzEyZGU3ZDg5N2EzMzdkOWYxMmJlYmYwMTNiNTM3YTA1OGNhNWY3NmQ2ZmQ1M2M4YjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOGI3YThlMjFhM2ZiZWYwODM0NTZlZmNhM2Y1M2NjMTQ3YmMxMTIxZDIzMzhiNzZlNjZhODZiNjZlOWYxZjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3MzczYTFjMmU4OTllMjU5MDkzMGI0YjUzZDgwNjFlZjM5NzhjZjU1OWMzMThlZTVkMjI5NzMzMWQ5Njk3MGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eaf8337b6e2946948443913c6f0277fb",
+      "statement": "The SvelteKit Go retrieval bridge is revision-aware and has HTTP fallback, but its gRPC stub is still a mock interface with TODOs for loading the actual proto and constructing the client; it should therefore be documented as partial rather than as proof of a fully wired generated TypeScript client.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts#L1-L27",
+          "version": "repo-lines-v1:sha256:2d41c21fe73e1c18e42f96230588606f4bd4f59dfd6e584cbc850cbc37537528:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlNjZiMTY1NDY3NjZhOTkwNjU3ZWMxZTcxNDg3NzBlOGM4OTVhMWRkZjIwNjM5YmVjMzI5YzhlYzBlYzRkZmQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts#L119-L151",
+          "version": "repo-lines-v1:sha256:3014706092505419ab77848c4f79789c38114de7bd6680fa91b5ebe9b342cc65:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMTMxOWYxM2UxZTQ0M2U3OGI2NWYwYzNkYmJlODg0Y2FmM2RhNGVjNmIwZDAyYWQwYTI3MmZlNDg3MTNkNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwNWRiY2U3Y2M4ODY3NThlNmQ5YWU3OGQxMmViMjI5NjVmNmRkZGFkMjg5Y2JmNDFlMjYxNTZhZjhjMDcxNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzMTQ5YzA2MTk4ZWMwM2Y0M2Q2MDc0NjcwZWJlMGRlYWRmNTlkNmY4NzIyODEwYTA4NTJlMDI0ZmUxOWZmYzgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts#L90-L104",
+          "version": "repo-lines-v1:sha256:d00cd37ab93c99ca769adc394588bcbb80a978724e1a3dade2c01b2a7880ed86:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5NjU4M2NiNmE1YTRhN2JkMzY5ZGI3NDQ3ZTlhYTk5NmQ1ODI1YTIwYzhiNzZjNGZjNWQ4NDhmY2UzYzViNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MzA5MTljODYzN2QwNGMwNTRmYWNmZGQ1YTEzMmFkZTE5MTk5ZGNmODA0YWJiNmM4ZmRmOWVhYmQyNjIzNWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNmY0Y2RjODkxNzM5MDBjNTBkZTgzZGE5ZmE4Y2RhZTRjMjViY2NlYWQ2OTI3ZTU2NGJlYzlmNGQwZjI5ZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0MTY1ZjFlM2UzYTM0ODkxNDViZWE1YjM3N2UxMmJkYzMwNDc0NDc3ZjM1MDE3NTE4M2NiMmI5MTM0ZmJhNGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e312bdcee9634ec992724095ab264d31",
+      "statement": "The Go retrieval service is configured around PostgreSQL, Qdrant, Redis/Valkey, and a configured embedding service; direct Ollama fallback and GPU embedding environment flags are explicitly ignored by the query embedding path, and the generated Go protobuf/gRPC surface is regenerated from proto/active/retrieval.proto by generate.sh.",
+      "evidence": [
+        {
+          "resource": "repo://services/go-retrieval-service/generate.sh#L1-L16",
+          "version": "repo-lines-v1:sha256:acffcab89dc9cc0afcd19b150f2d61ca1aee62538e74a5b3e6ad0cf2f097300f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4MmZhYWE1N2E5Y2I2MTQ5ZDRjMDlmZmNkZjMxNTBiZGM1ZGViMWY5ZDM3ZmEwZmI2MDEzNzZjNTQ2OGE1NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRlMDVhMjdjOWIyYzdlZjVmOTQxNmViOTRjMjMyYzg4Yjc4MjgzMTljMWZjZGI3NDA0ZTgxMTczOGRmYzc3Y2MifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/generate.sh#L100-L133",
+          "version": "repo-lines-v1:sha256:2820ea1b9716628071302683f3992ee6f49bf280010832beb5b28cd1319a92bb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZmZhYWRlZjM3Yzk5MzUyMzEzYjA5NDZkOWM1MWU3Yjk4MjcxY2Q1NDE1NzIwZGVlNzUyNGE0MGQzZDMxYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzZjgyMTI1MmJiZTI5ZGYzMDcxMzVkOTU0YzEwZWU1MWZiNTczYjdkN2JkYzZlYWZhNWM0MDM2OTI4MDMzNjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1ZGIyZmE5OWYyMDFmNThlNTA1ZjlmYTUwNDYyYWE4NzkwNTg4NzZmMDVlOWNmOGYxNTk1OGI5NDZjNmVkNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ2NWNjNDkzMGNiZmNkYTYzZDg2NmVhOTY4MDE4ZmRiNjAzNGExMmM0NDY5NDIyZDcxNmJlZDQyNmIwYTNkOTIifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L134-L162",
+          "version": "repo-lines-v1:sha256:f3e6f924a670c892f720f046ef7b1550b3fce7ad0b55e363a078208ec3b89498:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1YTExMTlkZTg2M2QwNzkwZjU4NjlhODIyZGQzMGNiYmEwYTg1YmRjZjVjNmI2MTBlYTU1MmFiMGUyZjZjZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3Y2RhODJkYTYwNjIzOGUwNWU2MjM5OTU2OWM1ZWUwMzk5MzQxOTY0OGFlNWQ0M2EyYmY4Y2Q2MzQ3ZjgyNjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjZmQ0OGNhYjFiNDFhNjJmOWNiODg2NzRiYzhiNTYwNzg0ZmU5ZThlYTUxNTljMDEwN2RjYmRkN2Q3MjgyM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0OWVkNzFlYzQxNGVlYzhiOGFlZGYzYThkNGI4ZGQzMTMxY2IyMmQ2N2FhZjAxODNhODRhNWRlNDQ2MjkyMWQifQ"
+        },
+        {
+          "resource": "repo://services/go-retrieval-service/main.go#L18-L42",
+          "version": "repo-lines-v1:sha256:446589f5e7897e44aff12bbdb42611cf90175a8270d013d9472ce8ae6d97f183:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3NjcyYjJjZjVjYjY3YmZiMjVjMTU3ZjliZWY2ZDQ1OTAyNDc0NWIwMjJmMzc4ZTVmZjQ3ZDBjMTEyMzVjMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzNjA2Y2JjYTdiNjljNjcxYjhhMjY0NjFmODY5OTQ3ZWViNWRjZDdlMDNlZDIxZTBhNTA0N2FlODE3ZjdmNTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0ZjYzNWY5MjczN2Q2MzJlMTE2NDQ2Y2I5ZWJhZjk5MzBkODAyMTlkNGZiZWVlMWNiYjc3YWExNjVmNmVlOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxM2ZmODZlYWZkYWUzMWVlOGFiNGMyNDc3MmY2MjNhYTBmMDc4OTIzYzc5NjU1ZjQ3ZGNjMWI2ZTMzYTgyNTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_65f6f0d280c44454a88365604eeec9aa",
+      "statement": "The MCP server surface registers tools, resources, and prompts through McpServer with a Valibot JSON-schema adapter; Atlas-facing tool integrations should remain bounded protocol projections rather than expose low-level durable storage operations.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L217-L238",
+          "version": "repo-lines-v1:sha256:5af48fc4c64ea73919516af829e74562008b26ecf976148a01d171eb8448cc5f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1YTg1YjBkZDRlNWY2NzJjNWM2MWE3MWYwOGRjMzQyNTA0YjVlMzYxNTY5MDgxOWZmM2ZiZGI5MWJiMWQ2YWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjYTJhMzcyZmFlOWUzMjJmOWNkYmYzODY2OTZkYmM0ZTZmOWYzMThiMGZkYTNiZWQyNzI4ZmU5NGM1NWFiOTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://mcp-server-mcp/packages/mcp-server/src/mcp/index.ts#L1-L23",
+          "version": "repo-lines-v1:sha256:de1fec268bfd9d5f43d35cd0cafc529d3dfbb68bbae96c5e8dc9350f25dfe293:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjNDVlNDcwMzA0ZTA2MzkxNTIxNGY1ZWVjODVlNTM0ZGExNjdiZmQ0NTRjY2MxNDJiNDBjZTgzMmY0ZGUwNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZGE1Y2VjZDZkNzRjOWMyZTdkMjY2ZjZlOGFkZDkzNDEzYWVkYmU3Yzc4MmU0YzdmN2MwNTJjNWVmNTU5NWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTczYjMxNzQ3ZTg3ZjliNTI0OWRlMDA1ZTExYzg5YzgwMzIzOWM5YTRiYTNhM2NhYWY5MmFmYmFmMWYwOTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

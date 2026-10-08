@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
 import { parseNdjsonTypedEvidence } from './simdjson-typed-evidence-bridge.js';
 
 const receiptSchema = z
@@ -52,6 +54,34 @@ describe('parseNdjsonTypedEvidence', () => {
 		const b = parseNdjsonTypedEvidence(args);
 		expect(a.accepted[0]!.envelope.envelopeId).toBe(b.accepted[0]!.envelope.envelopeId);
 		expect(a.accepted[0]!.envelope.payloadChecksum).toBe(b.accepted[0]!.envelope.payloadChecksum);
+	});
+
+	it('reports the parser backend actually used and aligns typed output with V8 JSON.parse', () => {
+		const expected = {
+			receiptId: `alignment-${randomUUID()}`,
+			status: 'PASS' as const,
+			durationMs: 23,
+		};
+		const line = `${JSON.stringify(expected)}${' '.repeat(1100)}`;
+		const report = parseNdjsonTypedEvidence({
+			artifactRef: 'artifact:test:napi-alignment',
+			artifactRevision: 'sha256:' + 'e'.repeat(64),
+			ndjson: line,
+			payloadSchema: receiptSchema,
+			payloadSchemaId: 'atlas.receipt.v1',
+		});
+
+		expect(report.accepted).toHaveLength(1);
+		expect(report.accepted[0]!.payload).toEqual(JSON.parse(line));
+		expect(report.parserExecution.nativeParses + report.parserExecution.fallbackParses).toBe(1);
+		expect(report.simdjsonUsed).toBe(report.parserExecution.nativeParses > 0);
+		if (isSimdJsonAvailable()) {
+			expect(report.parserExecution.backend).toBe('SIMDJSON_NAPI');
+			expect(report.parserExecution.nativeParses).toBe(1);
+		} else {
+			expect(report.parserExecution.backend).toBe('V8_JSON_PARSE');
+			expect(report.parserExecution.fallbackParses).toBe(1);
+		}
 	});
 
 	it('rejects a line failing the typed schema without throwing or stopping the stream', () => {

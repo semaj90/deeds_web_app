@@ -4,8 +4,8 @@
  * LEGACY ONLY: REBUILD SUMMARIES + HISTORICAL 384-DIM PROJECTIONS
  *
  * 384-D is not the canonical semantic lane. Use the sibling 768-D path for
- * new semantic work; this script is retained only for explicitly authorized
- * legacy migration/replay against its separate *_384 columns and collection.
+ * new semantic work. This script is retained for dry-run inspection only;
+ * writes are disabled because its target columns and collection are 384-D.
  *
  * Flow:
  * 1. Select chunks missing summary_text or summary_embedding_384
@@ -23,8 +23,7 @@
  *
  * Usage:
  *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs                    [dry-run, default]
- *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply --allow-legacy-384-write
- *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply --sample=10 --allow-legacy-384-write
+ *   node scripts/atlas/rebuild-gemma4-summaries-384.mjs --apply (rejected)
  */
 
 import pg from 'pg';
@@ -39,9 +38,8 @@ const __root = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const dryRun = !args.includes('--apply');
-const allowLegacy384Write = args.includes('--allow-legacy-384-write');
-if (!dryRun && !allowLegacy384Write) {
-  console.error('LEGACY_384_WRITE_BLOCKED: 384-D is not canonical. Pass --allow-legacy-384-write only for an explicitly approved legacy migration/replay.');
+if (!dryRun) {
+  console.error('EMBEDDINGGEMMA_384_SUMMARY_WRITE_DISABLED: 384-D is not canonical; use the 768-D summary path');
   process.exit(2);
 }
 const sampleSize = parseInt(args.find(a => a.startsWith('--sample='))?.split('=')[1] || '0');

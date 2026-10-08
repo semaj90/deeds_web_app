@@ -33,6 +33,9 @@ const embedRequestSchema = z.object({
 	if (value.model === 'mock' && value.taskMode) {
 		context.addIssue({ code: 'custom', path: ['taskMode'], message: 'Recipe modes require the EmbeddingGemma model' });
 	}
+	if (value.model === 'embeddinggemma' && value.dimensions !== undefined && value.dimensions !== 768) {
+		context.addIssue({ code: 'custom', path: ['dimensions'], message: 'EmbeddingGemma returns native 768 dimensions; derive MRL projections separately' });
+	}
 	if (value.taskMode && value.dimensions !== undefined && value.dimensions !== 768) {
 		context.addIssue({ code: 'custom', path: ['dimensions'], message: 'Recipe-qualified embeddings require native 768 dimensions' });
 	}

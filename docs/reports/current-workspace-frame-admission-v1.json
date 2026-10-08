@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-workspace-frame-receipt.v1",
-  "generatedAt": "2026-09-20T23:37:27.055Z",
+  "generatedAt": "2026-10-06T02:54:20.136Z",
   "mode": "READ_ONLY_GATE_1_ADMISSION",
   "admittedExecutionId": null,
   "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
@@ -8,7 +8,7 @@
   "admittedAuthority": true,
   "selectorAuthorityConflict": false,
   "selectorBlockers": [],
-  "cohortLineageReportGeneratedAt": "2026-09-20T23:37:22.320Z",
+  "cohortLineageReportGeneratedAt": "2026-10-05T17:30:21.789Z",
   "cohortLineageWorkspaceRevisionMatchesSelector": true,
   "cohortRows": 52,
   "distinctCohortWorkspaceRevisions": [
@@ -25,7 +25,7 @@
     "status": "CURRENT_SOURCE_AUTHORITY_NOT_PROVEN",
     "safeToPromote": false,
     "requiresSnapshotRefresh": true,
-    "deltaChecksum": "sha256:b9ccee8031f5e7f83da3662a8823c2c60a0240886f28c472992038196404a38d"
+    "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
   },
   "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
   "canonicalAuthority": false,

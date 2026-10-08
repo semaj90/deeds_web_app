@@ -2,6 +2,7 @@
 import hashlib
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -291,3 +292,95 @@ def test_event_hypergraph_skips_fabricated_request_identity_and_revision_fallbac
     assert event["workspace_revision"] == qualified.workspace_revision
     assert event["packet_key"] == qualified.packet_key
     assert event["representation_revision"] is None
+
+
+def test_grounded_span_probe_derives_utf8_bytes_from_exact_python_character_span():
+    text = "🙂 café"
+    probe = sidecar._grounded_span_probe(
+        text,
+        SimpleNamespace(extraction_text="café", start_char=2, end_char=6, alignment_status="match_exact"),
+    )
+
+    assert probe["classification"] == "SOURCE_EXACT"
+    assert probe["charSliceExact"] is True
+    assert probe["byteSliceExact"] is True
+    assert probe["startByte"] == len("🙂 ".encode("utf-8"))
+    assert probe["endByte"] == len(text.encode("utf-8"))
+
+
+def test_grounded_span_probe_classifies_newline_normalization_without_mutating_source():
+    text = "x\r\ny"
+    probe = sidecar._grounded_span_probe(
+        text,
+        SimpleNamespace(extraction_text="y", start_char=2, end_char=3, alignment_status="match_exact"),
+    )
+
+    assert probe["classification"] == "CRLF_NORMALIZATION"
+    assert probe["charSliceExact"] is False
+    assert probe["normalizationProbes"]["LF_NORMALIZED"]["exact"] is True
+    assert text == "x\r\ny"
+
+
+def test_grounded_span_probe_classifies_unicode_normalization_without_accepting_it():
+    text = "A Cafe\u0301."
+    probe = sidecar._grounded_span_probe(
+        text,
+        SimpleNamespace(extraction_text="Café", start_char=2, end_char=6, alignment_status="match_exact"),
+    )
+
+    assert probe["classification"] == "UNICODE_NORMALIZATION"
+    assert probe["charSliceExact"] is False
+    assert probe["normalizationProbes"]["NFC_NORMALIZED"]["exact"] is True
+
+
+def test_grounded_span_probe_rejects_invalid_offsets_as_sidecar_defect():
+    probe = sidecar._grounded_span_probe(
+        "short",
+        SimpleNamespace(extraction_text="long", start_char=3, end_char=99, alignment_status="match_exact"),
+    )
+
+    assert probe["classification"] == "SIDECAR_OFFSET_DEFECT"
+    assert probe["rejectionReason"] == "CHAR_INTERVAL_OUT_OF_BOUNDS"
+
+
+def test_grounded_extraction_receipt_distinguishes_completed_empty_from_not_attempted(monkeypatch):
+    monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
+    monkeypatch.setattr(sidecar, "langextract", SimpleNamespace(extract=lambda *args, **kwargs: SimpleNamespace(extractions=[])))
+    monkeypatch.setattr(sidecar, "_ensure_grounded_provider_controls", lambda: None)
+    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda: {})
+    receipt = {}
+
+    result = sidecar._grounded_extractions("no concepts", execution_receipt=receipt)
+
+    assert result == []
+    assert receipt["executorAttempted"] is True
+    assert receipt["executorCompleted"] is True
+    assert receipt["state"] == "COMPLETED_EMPTY"
+
+
+def test_grounded_extraction_receipt_retains_rejected_span_diagnostic(monkeypatch):
+    item = SimpleNamespace(
+        extraction_class="CONCEPT",
+        extraction_text="y",
+        start_char=2,
+        end_char=3,
+        alignment_status="match_exact",
+        attributes={},
+    )
+    monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
+    monkeypatch.setattr(sidecar, "langextract", SimpleNamespace(extract=lambda *args, **kwargs: SimpleNamespace(extractions=[item])))
+    monkeypatch.setattr(sidecar, "_ensure_grounded_provider_controls", lambda: None)
+    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda: {})
+    receipt = {}
+    diagnostics = []
+
+    result = sidecar._grounded_extractions(
+        "x\r\ny",
+        span_diagnostics=diagnostics,
+        execution_receipt=receipt,
+    )
+
+    assert result == []
+    assert receipt["state"] == "REJECTED_SPAN_MISMATCH"
+    assert diagnostics[0]["classification"] == "CRLF_NORMALIZATION"
+    assert diagnostics[0]["extractionText"] == "y"

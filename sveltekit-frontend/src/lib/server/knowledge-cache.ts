@@ -5,6 +5,7 @@ import type { Redis } from 'ioredis';
 import type { ScoredPoint } from '$lib/types/qdrant';
 import crypto from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
+import { validateSemantic768OutputV1 } from '$lib/server/atlas/embedding/embedding-runtime-v1.js';
 
 const TTL = {
     embeddings: 3600, // 1 hour
@@ -15,8 +16,18 @@ const TTL = {
 
 // Cache key generators
 function getEmbeddingCacheKey(text: string, model: string = 'text-embedding-3-small'): string {
-    const hash = crypto.createHash('sha256').update(`${model}:${text}`).digest('hex');
-    return `emb:${model}:${hash.substring(0, 16)}`;
+  const hash = crypto.createHash('sha256').update(`${model}:${text}`).digest('hex');
+  return `emb:${model}:${hash.substring(0, 16)}`;
+}
+
+function validateCachedEmbedding(model: string, value: unknown): number[] {
+    if (!Array.isArray(value) || value.some((item) => typeof item !== 'number' || !Number.isFinite(item))) {
+        throw new Error('EMBEDDING_CACHE_VECTOR_INVALID');
+    }
+    if (/^embeddinggemma(?::|$)/i.test(model)) {
+        return Array.from(validateSemantic768OutputV1(value));
+    }
+    return value;
 }
 
 function getSearchCacheKey(collection: string, queryHash: string, filters?: Record<string, unknown>): string {
@@ -88,8 +99,13 @@ export async function getCachedEmbedding(text: string, model: string): Promise<n
         const redis: Redis = getRedis();
         const cached = await redis.get(cacheKey);
         if (cached) {
-            await recordCacheMetric('hit', 'embeddings');
-            return JSON.parse(cached);
+            try {
+                const vector = validateCachedEmbedding(model, JSON.parse(cached));
+                await recordCacheMetric('hit', 'embeddings');
+                return vector;
+            } catch {
+                await redis.del(cacheKey);
+            }
         }
         await recordCacheMetric('miss', 'embeddings');
         return null;
@@ -102,8 +118,9 @@ export async function getCachedEmbedding(text: string, model: string): Promise<n
 export async function setCachedEmbedding(text: string, model: string, embedding: number[]): Promise<void> {
     const cacheKey = getEmbeddingCacheKey(text, model);
     try {
+        const validatedEmbedding = validateCachedEmbedding(model, embedding);
         const redis: Redis = getRedis();
-        await redis.setex(cacheKey, TTL.embeddings, JSON.stringify(embedding));
+        await redis.setex(cacheKey, TTL.embeddings, JSON.stringify(validatedEmbedding));
     } catch (error) {
         console.error('Failed to cache embedding', error);
     }

@@ -110,8 +110,8 @@ function packetIncidenceRows(overrides: Record<string, unknown> = {}) {
 
 function endpointRows() {
   return { rows: [
-    { packet_key: 'packet:0123456789ab', source_ref: 'src/a.ts', source_revision: 'source-a-r1' },
-    { packet_key: 'packet:abcdef012345', source_ref: 'src/b.ts', source_revision: 'source-b-r1' },
+    { packet_key: 'packet:0123456789ab', source_ref: 'src/a.ts', source_revision: 'source-a-r1', workspace_revision_key: 'ws-1' },
+    { packet_key: 'packet:abcdef012345', source_ref: 'src/b.ts', source_revision: 'source-b-r1', workspace_revision_key: 'ws-1' },
   ] };
 }
 

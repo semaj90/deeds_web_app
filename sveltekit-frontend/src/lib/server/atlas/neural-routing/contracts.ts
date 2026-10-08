@@ -83,7 +83,7 @@ export const CandidateFeatureRowV1Schema = z.object({
 export type CandidateFeatureRowV1 = z.infer<typeof CandidateFeatureRowV1Schema>;
 
 export const CandidateFeatureMatrixV1Schema = z.object({
-  schemaVersion: z.literal('atlas.candidate-feature-matrix.v1'),
+  schemaVersion: z.literal('atlas.tool-routing-feature-matrix.v1'),
   featureNames: z.array(RoutingFeatureNameSchema).length(ROUTING_FEATURE_NAMES.length),
   rows: z.array(CandidateFeatureRowV1Schema), checksum: z.string().length(64),
 }).strict();

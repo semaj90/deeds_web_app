@@ -1,0 +1,53 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "valkey-cache-semantics",
+  "source_ref": "valkey-cache-semantics:valkey-io-topics-lru-cache-lru-cache",
+  "url": "https://valkey.io/topics/lru-cache/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "cache_invalidation",
+    "ttl",
+    "client_side_cache",
+    "contextual_engineering",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Key eviction When Valkey is used as a cache, it is often convenient to let it automatically evict old data as you add new data. This behavior is well known in the developer community, since it is the default behavior for the popular _memcached_ system. This page covers the more general topic of the Valkey `maxmemory` directive used to limit the memory usage to a fixed amount. It also extensively covers the LRU eviction algorithm used by Valkey, which is actually an approximation of the exact LRU. ## `Maxmemory` configuration directive The `maxmemory` configuration directive configures Valkey to use a specified amount of memory for the data set. You can set the configuration directive using the `valkey.conf` file, or later using the `CONFIG SET` command at runtime. For example, to configure a memory limit of 100 megabytes, you can use the following directive inside the `valkey.conf` file: ``` maxmemory 100mb ``` Setting `maxmemory` to zero results into no memory",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:valkey-cache-semantics:valkey-io-topics-lru-cache-lru-cache",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Valkey cache semantics from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "e1cc848d37c595800bdb7543ebf14607131f63c2505c140179714287829f2414",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\valkey-cache-semantics\\valkey-io-topics-lru-cache-lru-cache.md",
+  "fetched_at": "2026-10-06T18:04:38.617Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "valkey-cache-semantics",
+    "source_title": "Valkey cache semantics",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "graph",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\valkey-cache-semantics\\valkey-io-topics-lru-cache-lru-cache.md"
+}

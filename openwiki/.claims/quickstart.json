@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:060f3ec4d2991e4dec5656e1d2f9145c2c4ef67f3a91d9b5c09395f9df73f0bc",
+  "claims": [
+    {
+      "id": "claim_f057f05be564445a97486e0e047dee4e",
+      "statement": "The Parent Atlas wiki is organized into architectural, conceptual, operational, workflow, and testing domains to facilitate navigation of the complex system.",
+      "evidence": [
+        {
+          "resource": "repo://ARCHITECTURE_SPEC.md",
+          "version": "repo-file-v1:sha256:9b42b94919fdcb421efeea86606f24e842ce195e8b64c84dae72f7247069867c"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c7f7a4baa7d461eacede1d78bd6f84a",
+      "statement": "The Parent Atlas infrastructure utilizes a parent-atlas-based model integrating data pipelines, agentic workflows, and GPU acceleration.",
+      "evidence": [
+        {
+          "resource": "repo://ARCHITECTURE_SPEC.md",
+          "version": "repo-file-v1:sha256:9b42b94919fdcb421efeea86606f24e842ce195e8b64c84dae72f7247069867c"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

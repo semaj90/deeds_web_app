@@ -11,8 +11,9 @@
  * without loading the entire embeddings stack at startup.
  */
 
+import { createHash } from 'node:crypto';
 import { ENV } from '../env.server.js';
-import { validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
+import { digestSemantic768OutputV1, validateSemantic768OutputV1 } from '../atlas/embedding/embedding-runtime-v1.js';
 
 export type CanonicalEmbeddingResult = {
   model: string;
@@ -32,6 +33,7 @@ export type OnnxChallengerEmbeddingResult = {
 
 export type Semantic768CanonicalResult = {
   representationId: 'semantic_768';
+  representationRevision: null;
   model: string;
   embedding: number[];
   executor: 'llama-server';
@@ -40,7 +42,12 @@ export type Semantic768CanonicalResult = {
   tokenizerRevision: string;
   inputPolicyRevision: string;
   admittedTokenCount: number;
+  inputChecksum: string;
+  outputChecksum: string;
+  qualification: 'REPRESENTATION_REVISION_UNQUALIFIED';
 };
+
+export type Semantic768QueryExecutionEvidence = Omit<Semantic768CanonicalResult, 'embedding'>;
 
 /** Strict canonical lane. No app-route, ONNX, Ollama, or zero-vector fallback. */
 export async function embedSemantic768Canonical(
@@ -84,25 +91,29 @@ export async function embedSemantic768Canonical(
   const body = await response.json() as { model?: string; data?: Array<{ embedding?: unknown }> };
   const embedding = body.data?.[0]?.embedding;
   if (!Array.isArray(embedding) || embedding.length !== 768) throw new Error(`SEMANTIC_768_INVALID_DIMENSIONS:${Array.isArray(embedding) ? embedding.length : 'missing'}`);
+  if (body.model && body.model !== opts.model) throw new Error(`SEMANTIC_768_MODEL_MISMATCH:${body.model}`);
   const vector = embedding.map(Number);
   if (vector.some((value) => !Number.isFinite(value))) throw new Error('SEMANTIC_768_NON_FINITE');
   try {
-    validateSemantic768OutputV1(vector);
+    const normalizedVector = validateSemantic768OutputV1(vector);
+    return {
+      representationId: 'semantic_768',
+      representationRevision: null,
+      model: body.model ?? opts.model,
+      embedding: Array.from(normalizedVector),
+      executor: 'llama-server',
+      endpoint: '/v1/embeddings',
+      modelArtifactRevision: opts.modelArtifactRevision,
+      tokenizerRevision: opts.tokenizerRevision,
+      inputPolicyRevision: opts.inputPolicyRevision,
+      admittedTokenCount: tokenBody.tokens.length,
+      inputChecksum: `sha256:${createHash('sha256').update(text, 'utf8').digest('hex')}`,
+      outputChecksum: digestSemantic768OutputV1(normalizedVector),
+      qualification: 'REPRESENTATION_REVISION_UNQUALIFIED',
+    };
   } catch {
     throw new Error('SEMANTIC_768_NOT_L2_NORMALIZED');
   }
-  if (body.model && body.model !== opts.model) throw new Error(`SEMANTIC_768_MODEL_MISMATCH:${body.model}`);
-  return {
-    representationId: 'semantic_768',
-    model: body.model ?? opts.model,
-    embedding: vector,
-    executor: 'llama-server',
-    endpoint: '/v1/embeddings',
-    modelArtifactRevision: opts.modelArtifactRevision,
-    tokenizerRevision: opts.tokenizerRevision,
-    inputPolicyRevision: opts.inputPolicyRevision,
-    admittedTokenCount: tokenBody.tokens.length,
-  };
 }
 
 export async function tryEmbedCanonical(

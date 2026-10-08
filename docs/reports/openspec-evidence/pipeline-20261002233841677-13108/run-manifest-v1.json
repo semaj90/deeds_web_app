@@ -1,0 +1,104 @@
+{
+  "schema": "atlas.openspec-evidence-run-manifest.v1",
+  "runId": "pipeline-20261002233841677-13108",
+  "gitRevision": "4f8fcc467a253972154601859ec39f082cbc9af6",
+  "generatedAt": "2026-10-02T23:40:26.511Z",
+  "workspaceRevision": "sha256:5df4274a7f59b1dda26500772bc93a778358b79c4961b3492ca5fd94de5cc471",
+  "stages": {
+    "census": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/census-v1.json",
+      "sha256": "sha256:1194f5fbcdf63cb4e6dba0ddfed7bc320f5622b1d28526b7896301532afe97c3"
+    },
+    "identityRecovery": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/identity-recovery-v1.json",
+      "sha256": "sha256:24766038929ed4ce057e8f0849bab47b619e6ad236ad1d5a0f9cc39b50fa963b"
+    },
+    "receiptTyping": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/receipt-typing-v1.json",
+      "sha256": "sha256:e525bf5277e3b7bab5054c7974c55c359df0ca3805cfd6bd23f91d8a6811a24c"
+    },
+    "receiptBinding": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/receipt-binding-v1.json",
+      "sha256": "sha256:07bf6665ee52f03da84f778828b137d6914b43f6ef8433a5e14abbdee4713404"
+    },
+    "reconciliation": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/reconciliation-v1.json",
+      "sha256": "sha256:69fc047694ec2cef6b1f51148d327aa4595455e067b09d9114f45ba7b7564a26"
+    },
+    "predicateResolution": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/predicate-resolution-v1.json",
+      "sha256": "sha256:493c1fef27a89f9ab1cabcfe71f10db415f21214037d6917f404091fe001346e"
+    }
+  },
+  "diagnostics": {
+    "evidenceCards": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/evidence-cards-v1.json",
+      "sha256": "sha256:d023accd1d2f31793fa57d7f1a3a260eb0d5ca617cf519759f5cb982711a894a"
+    },
+    "workboardProjection": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/workboard-projection-v1.json",
+      "sha256": "sha256:cef2dc09fad468ec21323dd0e0a086a1cf87c99dec6e22869d46eff01e3e9fac"
+    },
+    "workboardReconciliation": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/workboard-reconciliation-v1.json",
+      "sha256": "sha256:d2673af2e1a6bc82118d2fa7c73625feed0e2b8eac9c8302b202a1cde97c9938"
+    },
+    "goldenTask": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/golden-task-v1.json",
+      "sha256": "sha256:944f71c1534692ca54566caae9356194cc17da7d84b5433cce3bfce6c3253b24"
+    },
+    "goldenReceipt": {
+      "runId": "pipeline-20261002233841677-13108",
+      "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/tree-node-identity-formula-receipt-v1.json",
+      "sha256": "sha256:37993e864e8efe6410d2164399c84b27d41f59901be157cda041a1d236923045"
+    }
+  },
+  "finalSummary": {
+    "path": "docs/reports/openspec-evidence/pipeline-20261002233841677-13108/final-summary-v1.json",
+    "sha256": "sha256:958f095027c62f6513cf6efece460f568be9ea164e91dd563ee93f7a80c6ac3c"
+  },
+  "gates": [
+    {
+      "id": "EVF-RUN-01_SAME_RUN_INPUTS",
+      "status": "PASS",
+      "detail": "Authority and diagnostic inputs are run-scoped and revision-compatible."
+    },
+    {
+      "id": "EVF-RUN-02_CHECKSUM_BOUND",
+      "status": "PASS",
+      "detail": "Every authority and diagnostic artifact has a manifest-bound SHA-256."
+    },
+    {
+      "id": "EVF-RUN-03_STAGE_AUTHORITY",
+      "status": "PASS",
+      "detail": "Identity and binding stages, not raw census counters, determine interpreted identity counts."
+    },
+    {
+      "id": "EVF-RUN-04_NO_FILENAME_LATEST",
+      "status": "PASS",
+      "detail": "All stage inputs are explicit paths; no newest-file discovery is used."
+    },
+    {
+      "id": "EVF-RUN-05_FINAL_STATE_ONLY",
+      "status": "PASS",
+      "detail": "Final proof and binding counts come from their designated resolved stage outputs."
+    },
+    {
+      "id": "EVF-RUN-06_STALE_METRIC_DETECTION",
+      "status": "PASS",
+      "detail": "Final ambiguity counts are derived from identity recovery; raw census ambiguity fields cannot override them."
+    }
+  ],
+  "status": "PIPELINE_COMPLETED_READ_ONLY",
+  "checksum": "sha256:5b32003fb97f76543e94255aef7b945ec582812abce8e8ecb0bdb354f4b5b06a"
+}

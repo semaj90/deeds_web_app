@@ -804,6 +804,39 @@ authority=false; writesPerformed=false.
 First blocker: `AMBIGUOUS_SEMANTIC_768_OWNER`.
 Next gate: current source lineage and representation-owner reconciliation.
 
+### Strict embedding boundary implementation recheck (2026-10-06)
+
+- `services/go-embedding-service/provenance_v2.go` contains the strict
+  `/embed/v2` receipt boundary. `go test ./...` passes for that service after
+  the current provenance changes; this is source-level contract evidence only.
+- The source census still finds direct provider calls in
+  `services/go-index-worker/internal/embedder/ollama.go`,
+  `services/go-codeintel-service/main.go`, and diagnostic/legacy scripts.
+  They have not yet been classified and routed by role. A passing strict-owner
+  test does not establish caller convergence or prove the running service is
+  bound to the tested source.
+- Bounded caller-role classification from current source: the Go index worker
+  embeds batches of eight ingested-document chunks and writes resulting vectors
+  to a job-selected Qdrant collection while Redis records job progress. Its
+  `IndexJob` carries `contentHash`/`sourceRef`, but not source/workspace or
+  representation revisions; classify it as an unqualified projection writer,
+  not canonical `semantic_768`. The Go code-intel caller embeds generated
+  cluster summaries and writes `cluster_summaries.summary_embedding`; keep that
+  as a separate summary representation, not the code-chunk owner. Do not route
+  either through the canonical lane until their distinct inputs, destinations,
+  provenance requirements, and active callers are reconciled.
+- This is not a complete 19-surface caller census: numerous SvelteKit and
+  legacy/script callsites remain to be classified as query, document, cache,
+  diagnostic, or alternate-representation roles. Caller convergence remains
+  open; equal model dimension is not recipe/identity parity.
+- Keep `OWNER_NOT_PROVEN`, `CALLER_CONVERGENCE_OPEN`, and
+  `ACTIVE_RUNTIME_UNVERIFIED`. No embedding request, cache mutation, vector
+  persistence, or service restart was performed in this recheck.
+- WSL could not start a trivial process during the separate KMeans endpoint
+  validation, and Windows lacks the endpoint test dependencies. The KMeans
+  endpoint's latest lazy-import state remains unverified; this is not evidence
+  that the endpoint is available in the live 8098 container.
+
 ## CORE-LANE-RECHECK-2026-09-10
 
 - [x] Re-ran the live writer census: 19 writers remain and the canonical owner is not proven.

@@ -1,0 +1,7 @@
+{
+  "updatedAt": "2026-10-07T16:39:37.362Z",
+  "command": "init",
+  "model": "gemini-3.1-flash-lite",
+  "status": "interrupted",
+  "language": "en"
+}

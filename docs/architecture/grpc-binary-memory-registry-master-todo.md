@@ -12,7 +12,7 @@ Wire a binary packet path that lets the system:
 2. serialize it to protobuf or another binary transport
 3. land the bytes in a temporary registry keyed by `packet_key`
 4. hydrate the canonical envelope back on read
-5. feed DAG-assisted Gemma4, BitFrost, TurboVec, and Neo4j without re-parsing JSON in the hot path
+5. feed DAG-assisted use ornith 1.5 llama-server 8090 Gemma4, BitFrost, TurboVec, and Neo4j without re-parsing JSON in the hot path
 
 ## Canonical Rules
 
@@ -217,4 +217,4 @@ This todo is complete when:
 - queue/dequeue is wired
 - the codec is real
 - the open-lane router consumes the registry
-- DAG-assisted Gemma4 can reuse packets without reparsing JSON
+- DAG-assisted ornith 1.5 llama-server 8090 Gemma4 can reuse packets without reparsing JSON

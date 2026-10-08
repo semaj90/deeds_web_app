@@ -8,9 +8,9 @@
  *
  * Usage:
  *   node scripts/atlas/backfill-content-embedding-384.mjs --dry-run
- *   node scripts/atlas/backfill-content-embedding-384.mjs --apply
- *   node scripts/atlas/backfill-content-embedding-384.mjs --apply --resume
  *   node scripts/atlas/backfill-content-embedding-384.mjs --verify
+ *
+ * Legacy 384-D writes are retired. This script is read-only.
  */
 
 import pg from 'pg';
@@ -24,15 +24,19 @@ const PG_USER     = process.env.PG_USER     ?? 'legal_admin';
 const PG_PASS     = process.env.PG_PASSWORD ?? '123456';
 const PG_DB       = process.env.PG_DATABASE ?? 'legal_ai_db';
 const SCROLL_LIMIT = 250;   // Qdrant scroll page size (keep small — vectors are large)
-const WRITE_BATCH  = 100;   // Postgres UPDATE batch size
 
 const DRY_RUN  = process.argv.includes('--dry-run');
 const APPLY    = process.argv.includes('--apply');
 const RESUME   = process.argv.includes('--resume');
 const VERIFY   = process.argv.includes('--verify');
 
-if (!DRY_RUN && !APPLY && !VERIFY) {
-  console.error('Pass --dry-run, --apply, or --verify');
+if (APPLY || RESUME) {
+  console.error('LEGACY_384_WRITE_DISABLED: content_embedding_384 is retired; use semantic_768 or an admitted MRL projection');
+  process.exit(2);
+}
+
+if (!DRY_RUN && !VERIFY) {
+  console.error('Pass --dry-run or --verify; this legacy 384-D migration has no write mode');
   process.exit(1);
 }
 
@@ -111,7 +115,7 @@ let eligibleCount, alreadyDone;
 
 console.log('=== Gate 2: content_embedding_384 Backfill from Qdrant ===');
 console.log(`Collection   : ${COLLECTION}`);
-console.log(`Mode         : ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}${RESUME ? ' (resume)' : ''}`);
+console.log(`Mode         : ${DRY_RUN ? 'DRY-RUN (READ-ONLY)' : 'VERIFY (READ-ONLY)'}`);
 console.log(`Already done : ${alreadyDone.toLocaleString()}`);
 console.log(`Need backfill: ${eligibleCount.toLocaleString()}`);
 console.log('');
@@ -123,10 +127,10 @@ if (eligibleCount === 0) {
   process.exit(0);
 }
 
-// ── Scroll Qdrant and write to Postgres ──────────────────────────────────────
+// ── Read-only Qdrant/Postgres eligibility comparison ─────────────────────────
 let offset       = null;
 let totalFetched = 0;
-let totalWritten = 0;
+let totalWouldWrite = 0;
 let totalSkipped = 0; // already done (when not using --resume filter)
 const t0 = Date.now();
 
@@ -190,7 +194,7 @@ outer: while (true) {
     continue;
   }
 
-  // Build batch for UPDATE
+  // Count source candidates without constructing or persisting vectors.
   const batch = [];
   for (const id of needFill) {
     const vec = pointMap.get(id);
@@ -199,35 +203,16 @@ outer: while (true) {
   }
 
   if (DRY_RUN) {
-    console.log(`  [DRY-RUN] Would write ${batch.length} vectors (sample id: ${batch[0]?.id})`);
-    totalWritten += batch.length;
+    console.log(`  [DRY-RUN] ${batch.length} legacy 384-D rows have source candidates; no rows written`);
+    totalWouldWrite += batch.length;
   } else {
-    // Batched UPDATE using unnest
-    const ids_arr     = batch.map(b => b.id);
-    const vectors_arr = batch.map(b => `[${b.vec.join(',')}]`);
-
-    await client.query(`
-      UPDATE codebase_chunk_index AS cci
-      SET
-        content_embedding_384 = data.vec::vector(384),
-        embedding_dimension   = 384,
-        embedding_model       = 'embeddinggemma',
-        embedding_version     = 'qdrant-backfill-v1',
-        embedding_normalized  = true
-      FROM (
-        SELECT unnest($1::uuid[]) AS id, unnest($2::text[])::vector(384) AS vec
-      ) AS data
-      WHERE cci.id = data.id
-        AND cci.content_embedding_384 IS NULL
-    `, [ids_arr, vectors_arr]);
-
-    totalWritten += batch.length;
+    throw new Error('LEGACY_384_WRITE_DISABLED');
   }
 
   if (totalFetched % 2500 === 0 || points.length < SCROLL_LIMIT) {
     const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
-    const pct = ((totalWritten / eligibleCount) * 100).toFixed(1);
-    console.log(`  Fetched ${totalFetched.toLocaleString()}  Written ${totalWritten.toLocaleString()}/${eligibleCount.toLocaleString()} (${pct}%)  Skipped ${totalSkipped}  ${elapsed}s`);
+    const pct = ((totalWouldWrite / eligibleCount) * 100).toFixed(1);
+    console.log(`  Fetched ${totalFetched.toLocaleString()}  Read-only candidates ${totalWouldWrite.toLocaleString()}/${eligibleCount.toLocaleString()} (${pct}%)  Skipped ${totalSkipped}  ${elapsed}s`);
   }
 
   if (!offset) break;
@@ -239,13 +224,10 @@ await pool.end();
 const elapsed = ((Date.now() - t0) / 1000).toFixed(1);
 console.log('');
 console.log('─────────────────────────────────────────');
-console.log(`Gate 2 complete  (${DRY_RUN ? 'DRY-RUN' : 'APPLIED'})`);
+console.log('Gate 2 complete  (READ-ONLY)');
 console.log(`  Qdrant points fetched : ${totalFetched.toLocaleString()}`);
-console.log(`  Rows written          : ${totalWritten.toLocaleString()}`);
+console.log(`  Legacy write candidates: ${totalWouldWrite.toLocaleString()} (not written)`);
 console.log(`  Already done (skipped): ${totalSkipped.toLocaleString()}`);
 console.log(`  Elapsed               : ${elapsed}s`);
 console.log('─────────────────────────────────────────');
 console.log('');
-if (APPLY) {
-  console.log('Next: run --verify to confirm gate 3 (coverage, dimension, finiteness)');
-}

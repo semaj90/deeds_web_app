@@ -419,6 +419,7 @@ tree-lineage work is closed.
 - [ ] 4.3 Live-verify: one real function → card → `semantic_768` vector,
       confirm the `AstUnit` fields remain independently queryable afterward
       (not just recoverable by decoding the vector).
+  - **EMB2 safety/alignment correction (2026-10-07):** the old standalone builder called Ollama directly, hard-coded `embeddinggemma-native-768-v1`, and reported vector shape/normalization as `PROVEN`, despite lacking a runtime or recipe receipt. It now emits only a scratch-scoped diagnostic challenger: `representationRevision=null`, `representationId=null`, `runtimeBinding=UNPROVEN`, `canonicalAuthority=false`, and `promotionEligible=false`; successful output is `DIAGNOSTIC_ONLY`, never `PROVEN`. A two-case Node regression suite proves the `.tmp` output guard and non-authoritative metadata using a local mock endpoint (2/2 pass). This does not prove card dispatch through `embedSemantic768Canonical`, runtime artifact/tokenizer binding, persisted `semantic_768`, or Qdrant projection; tasks 0.4, 4.2, and 4.3 remain open.
 
 ## 5. HMM sequence pass (NLP4)
 

@@ -11,6 +11,16 @@ export interface AtlasPacketRowV1 {
   packet_key: string;
   source_ref: string | null;
   source_revision: string | null;
+  workspace_revision_key?: string | null;
+}
+
+export function assertPacketIncidenceWorkspaceRevisionV1(
+  rows: readonly AtlasPacketRowV1[],
+  workspaceRevision: string,
+): void {
+  if (!workspaceRevision.trim()) throw new Error('PACKET_INCIDENCE_WORKSPACE_REVISION_REQUIRED');
+  const mismatched = rows.find((row) => row.workspace_revision_key !== workspaceRevision);
+  if (mismatched) throw new Error(`PACKET_INCIDENCE_ENDPOINT_WORKSPACE_REVISION_MISMATCH:${mismatched.packet_key}`);
 }
 
 export type EndpointResolutionStatusV1 = 'RESOLVED' | 'NOT_FOUND' | 'REVISIONLESS' | 'MISSING_SOURCE_REF' | 'IDENTITY_UNRESOLVED';

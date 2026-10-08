@@ -1,0 +1,47 @@
+{
+  "schema_version": "okf.dev.summary.v1",
+  "generated_at": "2026-10-06T18:01:41.270Z",
+  "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1.json",
+  "records": 11,
+  "summary": {
+    "valkey-cache-semantics": {
+      "pages": 3,
+      "domains": {
+        "cache": 1,
+        "graph": 1,
+        "workflow": 1
+      }
+    },
+    "msgpack-spec": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "grpc-protobuf": {
+      "pages": 2,
+      "domains": {
+        "documentation": 1,
+        "tool": 1
+      }
+    },
+    "duckdb-interchange": {
+      "pages": 2,
+      "domains": {
+        "database": 2
+      }
+    },
+    "context-engineering": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "openai-prompting": {
+      "pages": 2,
+      "domains": {
+        "database": 2
+      }
+    }
+  }
+}

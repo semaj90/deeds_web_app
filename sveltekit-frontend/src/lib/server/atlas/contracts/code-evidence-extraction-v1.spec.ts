@@ -1,6 +1,7 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
 import {
   CodeEvidenceExtractionV1Schema,
   CodeEvidenceGroundedEntryV1Schema,
@@ -14,6 +15,8 @@ const validExtraction = {
     workspaceRevision: 'ws-r1',
     sourceRevision: 'src-r1',
   },
+  producerRevision: 'extractor:r1',
+  inputChecksum: 'b'.repeat(64),
   grounded: [
     {
       class: 'INVARIANT' as const,
@@ -92,6 +95,8 @@ describe('assertCodeEvidenceExtractionGrounded — round-trip byte-span verifica
 
   const extraction = {
     identity: { canonicalId: 'cand:1', packetKey: 'packet:abc123', workspaceRevision: 'ws-r1', sourceRevision: 'src-r1' },
+    producerRevision: 'extractor:r1',
+    inputChecksum: createHash('sha256').update(sourceText, 'utf8').digest('hex'),
     grounded: [
       { class: 'INVARIANT' as const, exactText: 'sums duplicate-identity scores', startByte, endByte, confidence: 0.9, attributes: {} },
     ],
@@ -103,26 +108,45 @@ describe('assertCodeEvidenceExtractionGrounded — round-trip byte-span verifica
 
   it('passes when exactText matches sourceText at the claimed span and identity matches', () => {
     expect(() =>
-      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:1', sourceRevision: 'src-r1' })
+      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1' })
     ).not.toThrow();
   });
 
   it('throws when exactText does not match sourceText at the claimed span', () => {
     const corrupted = { ...extraction, grounded: [{ ...extraction.grounded[0], exactText: 'something else entirely' }] };
     expect(() =>
-      assertCodeEvidenceExtractionGrounded(corrupted, sourceText, { canonicalId: 'cand:1', sourceRevision: 'src-r1' })
+      assertCodeEvidenceExtractionGrounded(corrupted, sourceText, { canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1' })
     ).toThrow(/exactText does not match/);
   });
 
   it('throws when canonicalId does not match the expected identity', () => {
     expect(() =>
-      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:WRONG', sourceRevision: 'src-r1' })
+      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:WRONG', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1' })
     ).toThrow(/identity mismatch/);
   });
 
   it('throws when sourceRevision does not match the expected identity', () => {
     expect(() =>
-      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:1', sourceRevision: 'WRONG-REV' })
+      assertCodeEvidenceExtractionGrounded(extraction, sourceText, { canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'WRONG-REV', workspaceRevision: 'ws-r1' })
     ).toThrow(/identity mismatch/);
+  });
+
+  it('rejects mismatched packet and workspace identity', () => {
+    expect(() => assertCodeEvidenceExtractionGrounded(extraction, sourceText, {
+      canonicalId: 'cand:1', packetKey: 'packet:wrong', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1',
+    })).toThrow(/packetKey/);
+    expect(() => assertCodeEvidenceExtractionGrounded(extraction, sourceText, {
+      canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws:wrong',
+    })).toThrow(/workspaceRevision/);
+  });
+
+  it('rejects a different input checksum and out-of-bounds byte range', () => {
+    expect(() => assertCodeEvidenceExtractionGrounded({ ...extraction, inputChecksum: 'c'.repeat(64) }, sourceText, {
+      canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1',
+    })).toThrow(/input checksum mismatch/);
+    const outOfBounds = { ...extraction, grounded: [{ ...extraction.grounded[0], endByte: Buffer.byteLength(sourceText, 'utf8') + 1 }] };
+    expect(() => assertCodeEvidenceExtractionGrounded(outOfBounds, sourceText, {
+      canonicalId: 'cand:1', packetKey: 'packet:abc123', sourceRevision: 'src-r1', workspaceRevision: 'ws-r1',
+    })).toThrow(/exceeds input length/);
   });
 });

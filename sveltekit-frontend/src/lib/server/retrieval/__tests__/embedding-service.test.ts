@@ -54,6 +54,58 @@ describe('embedQueryForLane — fail-closed dimension guard (dense_768)', () => 
     );
   });
 
+  it('preserves strict runtime evidence and leaves representation revision unqualified', async () => {
+    const keys = [
+      'ATLAS_CANONICAL_EMBEDDING_STRICT',
+      'EMBEDDING_SERVER_MODEL',
+      'EMBEDDING_MODEL_ARTIFACT_REVISION',
+      'EMBEDDING_TOKENIZER_REVISION',
+      'EMBEDDING_INPUT_POLICY_REVISION',
+      'EMBEDDING_STRICT_BASE_URL',
+    ] as const;
+    const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+    try {
+      process.env.ATLAS_CANONICAL_EMBEDDING_STRICT = 'true';
+      process.env.EMBEDDING_SERVER_MODEL = 'embeddinggemma';
+      process.env.EMBEDDING_MODEL_ARTIFACT_REVISION = 'artifact-r1';
+      process.env.EMBEDDING_TOKENIZER_REVISION = 'tokenizer-r1';
+      process.env.EMBEDDING_INPUT_POLICY_REVISION = 'input-policy-r1';
+      process.env.EMBEDDING_STRICT_BASE_URL = 'http://127.0.0.1:8081';
+      vi.resetModules();
+      fetchSpy.mockImplementation(async (input) => {
+        if (String(input).endsWith('/tokenize')) {
+          return new Response(JSON.stringify({ tokens: [1, 2, 3] }), { status: 200 });
+        }
+        return new Response(JSON.stringify({
+          model: 'embeddinggemma',
+          data: [{ embedding: new Array(768).fill(1 / Math.sqrt(768)) }],
+        }), { status: 200 });
+      });
+      const { embedQueryForLane } = await import('../embedding-service.js');
+
+      const result = await embedQueryForLane('query with provenance', 'dense_768');
+
+      expect(result.semantic768ExecutionEvidence).toMatchObject({
+        representationId: 'semantic_768',
+        representationRevision: null,
+        modelArtifactRevision: 'artifact-r1',
+        tokenizerRevision: 'tokenizer-r1',
+        inputPolicyRevision: 'input-policy-r1',
+        admittedTokenCount: 3,
+        qualification: 'REPRESENTATION_REVISION_UNQUALIFIED',
+      });
+      expect(result.semantic768ExecutionEvidence?.inputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+      expect(result.semantic768ExecutionEvidence?.outputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    } finally {
+      for (const key of keys) {
+        const value = previous[key];
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
+      vi.resetModules();
+    }
+  });
+
   it('does not send an Ollama-shaped request to LLAMA_SERVER_URL when it is the only llama setting', async () => {
     const keys = [
       'EMBEDDING_BASE_URL',

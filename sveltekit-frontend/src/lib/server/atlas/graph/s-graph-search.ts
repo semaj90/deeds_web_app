@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  SGraphEdgeKindSchema,
   SGraphV1Schema,
   type SGraphEdgeKind,
   type SGraphEdgeV1,
@@ -48,10 +49,15 @@ export const SGraphSearchPlanV1Schema = z.object({
   workspaceRevision: z.string().min(1),
   graphRevision: z.string().min(1),
   algorithm: SGraphSearchAlgorithmSchema,
-  sourceCanonicalId: z.string().min(1),
+  sourceCanonicalId: z.string().min(1).optional(),
+  sourceCanonicalIds: z.array(z.string().min(1)).min(1).max(256)
+    .refine((ids) => new Set(ids).size === ids.length, 'sourceCanonicalIds must be unique').optional(),
   targetCanonicalIds: z.array(z.string().min(1)).min(1).max(256),
+  allowedEdgeKinds: z.array(SGraphEdgeKindSchema).min(1).max(16)
+    .refine((kinds) => new Set(kinds).size === kinds.length, 'allowedEdgeKinds must be unique'),
   maxDepth: z.number().int().min(1).max(64),
   maxExpansions: z.number().int().min(1).max(1_000_000),
+  maxPathCost: z.number().finite().nonnegative().max(1_000_000_000),
   beamWidth: z.number().int().min(1).max(4096).nullable(),
   edgeCostModel: SGraphEdgeCostModelSchema,
   heuristicKind: SGraphHeuristicKindSchema,
@@ -59,8 +65,21 @@ export const SGraphSearchPlanV1Schema = z.object({
   requireOptimalPath: z.boolean(),
   exactPromotionRequired: z.literal(true),
   producerRevision: z.string().min(1),
-}).strict();
+}).strict().superRefine((plan, context) => {
+  if (Boolean(plan.sourceCanonicalId) === Boolean(plan.sourceCanonicalIds)) {
+    context.addIssue({
+      code: 'custom',
+      message: 'Provide exactly one of sourceCanonicalId or sourceCanonicalIds',
+      path: ['sourceCanonicalId'],
+    });
+  }
+});
 export type SGraphSearchPlanV1 = z.infer<typeof SGraphSearchPlanV1Schema>;
+
+function sourceCanonicalIdsForPlan(plan: SGraphSearchPlanV1): string[] {
+  const sourceIds = plan.sourceCanonicalIds ?? (plan.sourceCanonicalId ? [plan.sourceCanonicalId] : []);
+  return [...sourceIds].sort((left, right) => left.localeCompare(right));
+}
 
 export const SGraphSearchReceiptV1Schema = z.object({
   schema: z.literal('atlas.s-graph-search-receipt.v1'),
@@ -68,6 +87,11 @@ export const SGraphSearchReceiptV1Schema = z.object({
   workspaceRevision: z.string().min(1),
   graphRevision: z.string().min(1),
   algorithm: SGraphSearchAlgorithmSchema,
+  sourceCanonicalIds: z.array(z.string().min(1)).min(1).max(256)
+    .refine((ids) => new Set(ids).size === ids.length, 'sourceCanonicalIds must be unique'),
+  allowedEdgeKinds: z.array(SGraphEdgeKindSchema).min(1).max(16)
+    .refine((kinds) => new Set(kinds).size === kinds.length, 'allowedEdgeKinds must be unique'),
+  maxPathCost: z.number().finite().nonnegative().max(1_000_000_000),
   executor: z.literal('TYPESCRIPT_REFERENCE'),
   heuristicKind: SGraphHeuristicKindSchema,
   heuristicAdmissibility: SGraphHeuristicAdmissibilitySchema,
@@ -79,7 +103,7 @@ export const SGraphSearchReceiptV1Schema = z.object({
   expandedNodeCount: z.number().int().nonnegative(),
   frontierPeak: z.number().int().nonnegative(),
   maxDepthObserved: z.number().int().nonnegative(),
-  termination: z.enum(['TARGET_FOUND', 'BUDGET_EXHAUSTED', 'UNREACHABLE']),
+  termination: z.enum(['TARGET_FOUND', 'BUDGET_EXHAUSTED', 'PATH_COST_LIMIT_REACHED', 'UNREACHABLE']),
   optimalityClaim: z.enum([
     'SHORTEST_HOPS',
     'LOWEST_NONNEGATIVE_COST',
@@ -130,6 +154,10 @@ interface SearchCoreResult {
   budgetExhausted: boolean;
 }
 
+interface SearchBudgetState {
+  pathCostLimited: boolean;
+}
+
 const finiteNonNegative = (value: number, field: string): number => {
   if (!Number.isFinite(value) || value < 0) throw new Error(`${field} must be finite and non-negative`);
   return value;
@@ -172,12 +200,14 @@ function populateEdges(
   outgoing: Map<string, SearchEdge[]>,
   model: SGraphEdgeCostModel,
   costs: Partial<Record<SGraphEdgeKind, number>> | undefined,
+  allowedEdgeKinds: ReadonlySet<SGraphEdgeKind>,
 ): void {
   for (const edge of graph.edges) {
     const target = nodeById.get(edge.target);
     if (!nodeById.has(edge.source) || !target) {
       throw new Error(`SGraph search edge references missing node: ${edge.source} -> ${edge.target}`);
     }
+    if (!allowedEdgeKinds.has(edge.kind)) continue;
     outgoing.get(edge.source)?.push({ edge, target, cost: edgeCost(edge, model, costs) });
   }
   for (const [nodeId, edges] of outgoing) {
@@ -221,7 +251,7 @@ function validatePlan(plan: SGraphSearchPlanV1): void {
 }
 
 function reconstructPath(
-  sourceId: string,
+  sourceIds: ReadonlySet<string>,
   targetId: string,
   parents: Map<string, ParentStep>,
   nodeById: Map<string, SGraphNodeV1>,
@@ -229,7 +259,7 @@ function reconstructPath(
   const nodeIds = [targetId];
   const edgeKinds: SGraphEdgeKind[] = [];
   let cursor = targetId;
-  while (cursor !== sourceId) {
+  while (!sourceIds.has(cursor)) {
     const step = parents.get(cursor);
     if (!step) throw new Error(`broken parent chain at ${cursor}`);
     nodeIds.push(step.parentId);
@@ -250,18 +280,20 @@ function reconstructPath(
 }
 
 function runBreadthFirst(input: {
-  source: SGraphNodeV1;
+  sources: SGraphNodeV1[];
   targetIds: Set<string>;
   outgoing: Map<string, SearchEdge[]>;
   maxDepth: number;
   maxExpansions: number;
+  maxPathCost: number;
+  budgetState: SearchBudgetState;
 }): SearchCoreResult {
-  const queue: FrontierState[] = [{ nodeId: input.source.id, g: 0, h: 0, depth: 0 }];
-  const seen = new Set<string>([input.source.id]);
+  const queue: FrontierState[] = input.sources.map((source) => ({ nodeId: source.id, g: 0, h: 0, depth: 0 }));
+  const seen = new Set<string>(input.sources.map((source) => source.id));
   const parents = new Map<string, ParentStep>();
-  const bestG = new Map<string, number>([[input.source.id, 0]]);
+  const bestG = new Map<string, number>(input.sources.map((source) => [source.id, 0] as [string, number]));
   let expandedNodeCount = 0;
-  let frontierPeak = 1;
+  let frontierPeak = queue.length;
   let maxDepthObserved = 0;
 
   while (queue.length > 0) {
@@ -278,12 +310,17 @@ function runBreadthFirst(input: {
 
     for (const next of input.outgoing.get(current.nodeId) ?? []) {
       if (seen.has(next.target.id)) continue;
+      const nextCost = current.g + next.cost;
+      if (nextCost > input.maxPathCost) {
+        input.budgetState.pathCostLimited = true;
+        continue;
+      }
       seen.add(next.target.id);
       parents.set(next.target.id, { parentId: current.nodeId, edgeKind: next.edge.kind });
-      bestG.set(next.target.id, current.g + next.cost);
+      bestG.set(next.target.id, nextCost);
       const depth = current.depth + 1;
       maxDepthObserved = Math.max(maxDepthObserved, depth);
-      queue.push({ nodeId: next.target.id, g: current.g + next.cost, h: 0, depth });
+      queue.push({ nodeId: next.target.id, g: nextCost, h: 0, depth });
     }
     frontierPeak = Math.max(frontierPeak, queue.length);
   }
@@ -303,24 +340,24 @@ function priorityFor(algorithm: SGraphSearchAlgorithm, state: FrontierState): nu
 
 function runPrioritySearch(input: {
   algorithm: 'UNIFORM_COST' | 'GREEDY_BEST_FIRST' | 'A_STAR';
-  source: SGraphNodeV1;
+  sources: SGraphNodeV1[];
   targetIds: Set<string>;
   outgoing: Map<string, SearchEdge[]>;
   nodeById: Map<string, SGraphNodeV1>;
   plan: SGraphSearchPlanV1;
   heuristicValues?: Readonly<Record<string, number>>;
+  budgetState: SearchBudgetState;
 }): SearchCoreResult {
-  const start: FrontierState = {
-    nodeId: input.source.id,
+  const frontier: FrontierState[] = input.sources.map((source) => ({
+    nodeId: source.id,
     g: 0,
-    h: heuristic(input.source, input.plan, input.heuristicValues),
+    h: heuristic(source, input.plan, input.heuristicValues),
     depth: 0,
-  };
-  const frontier: FrontierState[] = [start];
+  }));
   const parents = new Map<string, ParentStep>();
-  const bestG = new Map<string, number>([[input.source.id, 0]]);
+  const bestG = new Map<string, number>(input.sources.map((source) => [source.id, 0] as [string, number]));
   let expandedNodeCount = 0;
-  let frontierPeak = 1;
+  let frontierPeak = frontier.length;
   let maxDepthObserved = 0;
 
   const sortFrontier = (): void => {
@@ -353,6 +390,10 @@ function runPrioritySearch(input: {
 
     for (const next of input.outgoing.get(current.nodeId) ?? []) {
       const nextG = current.g + next.cost;
+      if (nextG > input.plan.maxPathCost) {
+        input.budgetState.pathCostLimited = true;
+        continue;
+      }
       const previousG = bestG.get(next.target.id);
       const shouldRelax = previousG === undefined
         || nextG < previousG - 1e-12
@@ -379,25 +420,26 @@ function runPrioritySearch(input: {
 }
 
 function runBeam(input: {
-  source: SGraphNodeV1;
+  sources: SGraphNodeV1[];
   targetIds: Set<string>;
   outgoing: Map<string, SearchEdge[]>;
   nodeById: Map<string, SGraphNodeV1>;
   plan: SGraphSearchPlanV1;
   heuristicValues?: Readonly<Record<string, number>>;
+  budgetState: SearchBudgetState;
 }): SearchCoreResult {
   const width = input.plan.beamWidth ?? 1;
-  let frontier: FrontierState[] = [{
-    nodeId: input.source.id,
+  let frontier: FrontierState[] = input.sources.map((source) => ({
+    nodeId: source.id,
     g: 0,
-    h: heuristic(input.source, input.plan, input.heuristicValues),
+    h: heuristic(source, input.plan, input.heuristicValues),
     depth: 0,
-  }];
+  }));
   const parents = new Map<string, ParentStep>();
-  const bestG = new Map<string, number>([[input.source.id, 0]]);
-  const seen = new Set<string>([input.source.id]);
+  const bestG = new Map<string, number>(input.sources.map((source) => [source.id, 0] as [string, number]));
+  const seen = new Set<string>(input.sources.map((source) => source.id));
   let expandedNodeCount = 0;
-  let frontierPeak = 1;
+  let frontierPeak = frontier.length;
   let maxDepthObserved = 0;
 
   for (let depth = 0; frontier.length > 0 && depth <= input.plan.maxDepth; depth += 1) {
@@ -417,6 +459,10 @@ function runBeam(input: {
       for (const next of input.outgoing.get(current.nodeId) ?? []) {
         if (seen.has(next.target.id)) continue;
         const nextG = current.g + next.cost;
+        if (nextG > input.plan.maxPathCost) {
+          input.budgetState.pathCostLimited = true;
+          continue;
+        }
         const nextDepth = current.depth + 1;
         nextLayer.push({
           nodeId: next.target.id,
@@ -484,10 +530,23 @@ export function searchSGraph(input: SGraphSearchRuntimeInput): SGraphSearchRecei
   }
 
   const { nodeById, nodeByCanonicalId, outgoing } = buildIndex(graph);
-  populateEdges(graph, nodeById, outgoing, plan.edgeCostModel, input.edgeCostsByKind);
+  const budgetState: SearchBudgetState = { pathCostLimited: false };
+  populateEdges(
+    graph,
+    nodeById,
+    outgoing,
+    plan.edgeCostModel,
+    input.edgeCostsByKind,
+    new Set(plan.allowedEdgeKinds),
+  );
 
-  const source = nodeByCanonicalId.get(plan.sourceCanonicalId);
-  if (!source) throw new Error(`SGraph search source is missing: ${plan.sourceCanonicalId}`);
+  const sourceCanonicalIds = sourceCanonicalIdsForPlan(plan);
+  const sources = sourceCanonicalIds.map((canonicalId) => {
+    const source = nodeByCanonicalId.get(canonicalId);
+    if (!source) throw new Error(`SGraph search source is missing: ${canonicalId}`);
+    return source;
+  });
+  const sourceNodeIds = new Set(sources.map((source) => source.id));
   const targetIds = new Set<string>();
   for (const canonicalId of plan.targetCanonicalIds) {
     const node = nodeByCanonicalId.get(canonicalId);
@@ -498,23 +557,26 @@ export function searchSGraph(input: SGraphSearchRuntimeInput): SGraphSearchRecei
   let core: SearchCoreResult;
   if (plan.algorithm === 'BREADTH_FIRST') {
     core = runBreadthFirst({
-      source,
+      sources,
       targetIds,
       outgoing,
       maxDepth: plan.maxDepth,
       maxExpansions: plan.maxExpansions,
+      maxPathCost: plan.maxPathCost,
+      budgetState,
     });
   } else if (plan.algorithm === 'BEAM') {
-    core = runBeam({ source, targetIds, outgoing, nodeById, plan, heuristicValues: input.heuristicByCanonicalId });
+    core = runBeam({ sources, targetIds, outgoing, nodeById, plan, heuristicValues: input.heuristicByCanonicalId, budgetState });
   } else {
     core = runPrioritySearch({
       algorithm: plan.algorithm,
-      source,
+      sources,
       targetIds,
       outgoing,
       nodeById,
       plan,
       heuristicValues: input.heuristicByCanonicalId,
+      budgetState,
     });
   }
 
@@ -523,7 +585,7 @@ export function searchSGraph(input: SGraphSearchRuntimeInput): SGraphSearchRecei
   let pathEdgeKinds: SGraphEdgeKind[] = [];
   let pathCost: number | null = null;
   if (core.foundNodeId) {
-    const path = reconstructPath(source.id, core.foundNodeId, core.parents, nodeById);
+    const path = reconstructPath(sourceNodeIds, core.foundNodeId, core.parents, nodeById);
     targetCanonicalId = nodeById.get(core.foundNodeId)?.canonicalId ?? null;
     pathCanonicalIds = path.canonicalIds;
     pathEdgeKinds = path.edgeKinds;
@@ -540,6 +602,9 @@ export function searchSGraph(input: SGraphSearchRuntimeInput): SGraphSearchRecei
     workspaceRevision: plan.workspaceRevision,
     graphRevision: plan.graphRevision,
     algorithm: plan.algorithm,
+    sourceCanonicalIds,
+    allowedEdgeKinds: plan.allowedEdgeKinds,
+    maxPathCost: plan.maxPathCost,
     executor: 'TYPESCRIPT_REFERENCE',
     heuristicKind: plan.heuristicKind,
     heuristicAdmissibility: plan.heuristicAdmissibility,
@@ -555,7 +620,9 @@ export function searchSGraph(input: SGraphSearchRuntimeInput): SGraphSearchRecei
       ? 'TARGET_FOUND'
       : core.budgetExhausted
         ? 'BUDGET_EXHAUSTED'
-        : 'UNREACHABLE',
+        : budgetState.pathCostLimited
+          ? 'PATH_COST_LIMIT_REACHED'
+          : 'UNREACHABLE',
     optimalityClaim: claim,
     approximate,
     exactPromotionRequired: true,

@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7134d86c88c338a3fb99a308a5e03f32fdc013c15d8f0bf6ca930ba27f436ff2",
+  "claims": [
+    {
+      "id": "claim_beeed4ecfa6b47f2ae21f5eb650ae971",
+      "statement": "PostgreSQL atlas_packets is the canonical packet authority, while registry/projection rows must resolve their packet_key back to it rather than generate identity independently.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L8-L16",
+          "version": "repo-lines-v1:sha256:239e75e47d12bb71d9997b5950519bbfa3779f411deff2bfa31912ea45275578:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNlZGE1YzZjMTA0YjcxOWNkZmI0MmMzYTUxNWZiMjI1NGFiNDU4NjE4OGQ3NzI1ZjdiMGNkODEzNWNjOTE2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWNiMWI5ZTdiMDQxMGMxZWZiN2VmZTEwYmQzNWRiNzM3N2Q2OGFiNmZkNmY5N2RiMjk2MjIwMWQwNmU5ODExZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzg5MjA0ZjU0NTcwNGI2ODE2OTMzMmJkMmJkNzdmNDdmODE4ODM2Yjg2YWRiMzMyOWEwNDY4ZDhlNjI4ZDdlNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmEyMmYzZjMwMzIzMDQ2ODQyOTA3MzgwMDljMmMyMGQyZmY1ZjRjNTNmN2I1YWEzZjMwYzlhMjg4YWEwZjU5OCJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts#L10-L18",
+          "version": "repo-lines-v1:sha256:5407d6289f7518578fc5e7f74566fa89a12b1981ec4b03de90bd431b9e8c5835:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjg5MmZlOTEzODgxNmEyMWFlZjM4ODM2NjBiM2E4NDdjNTNiY2NlYmFiYjQxMTYzOGI5MWNlMTZmYzM5NDdiZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTY1YTIwYmNjYTA4MzRmNDU5ZmNhNDc1NTIyMTYzMGIxZWM2YTJiY2I1OGQ4MzcwMGQzYTk5YmE3ZGJiZjRkOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTJjNTljMGZiMmNkY2VmMWEwZGE1M2FmMThjZTIwMmQxYWE2ZTE4YTgxYzUzYjRlNzViNTljMGVhZDQ3ODM2OCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTI1ZDA0NGZiYTIwNGVkNDQ3ZTJlZmI3ODEyMjk3OThmM2UwN2Q0ODYxYTg1MmNmYmFlZDlmMzEyNDQyNzZiMyJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L44",
+          "version": "repo-lines-v1:sha256:7eebf041f0c1584b9161401ccc24ec78538479f97c05ef92cdebd7ab15574ae1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNWE5MThjNDIyYTQ4ZTJlYmY3YjQ1OWE4NDY3NjE0OWIzMGYyYWViOGE5ZTgwODk5NDFiZmY5NWZmYTI1NmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNDZhOGRjYTg2NmFhMjJmYjk3MTFlMzI4YmFlNWNlNjE0MWNkN2RmMmJhZWY4MTJlZWViMWQ2NmFkN2FhMjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c5e36135abe04535b5b0e5a36dd5928b",
+      "statement": "The RPC packet-registry v1 contract requires a strict canonical identity tuple containing workspace, packet, source, and content revision axes, and rejects empty identifiers or malformed content digests.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.spec.ts#L20-L24",
+          "version": "repo-lines-v1:sha256:1a144cbc78c4173a4eafad8b5c2381681bbb579d7246c55d649cd65a1a2ef762:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTgzZmIxYTAwYzIxYjEwNjAyYjJlODYyZTdjOWU4NzMyNTgwZGM5OTliZWM4MzdhNzE4ODU4NzljZWI1Zjg0ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2EzZTQ2Zjk0Mjc2YjZmNmY0ZWQxZjAyYWY3OGJlZjZhMmVlMWM0MzlkZDU1ODRiOTczOTQ4MzEzMjE0ZDJiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTU5MTA5MjA1ZGY0YjVjNDBhZTU2OTY3OWU4ZGU0ZWYxNzQwZWNjZmMxOTc3ZDc5OTE2YmExYjgzM2UyZjU0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmIwYjYwZTE5YjViZDFiODkxMWYyNTI4NzU4ODg1NjE1ZTc5YzcyNjM0OGYyNDZjNDYyMDQyODQzNDE1NDFlOSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L3-L32",
+          "version": "repo-lines-v1:sha256:06181129d147e2a64cc1f0ec7e5ebfd76c2239ea1d16fb39f35e8870b2e62c30:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5MDhkY2Q0NTc1NTJjYWE2Y2JhNTFjMmZmYjk2YWMzOWFhOWNjNGIwZDJmMzQ0MzFiZjU1YTUwYzNkYmFjY2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4ZjU5YjY3MmUyMmFiOTAyODllODYxYjJlZjNlMGNjZWM5Y2EzZmI5YTQyMGYxOTMzYzg2NTdmMGY2ZTY0NGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwMGZkZjRiZjYxNmMwNTdmYmQ5MjhkZDJmYzczNDUxNjU0YTcwNTg1MDMzMzFmZWNmZTZmMjBmMzk1MDBhNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzMzE4YWU0MDZiZGM2YjkyNGI0ZDYyODljMjgyZGJjMzU5ODJmMWE1YzBjYmVjYzQ1ODJhNDBmNDhjYTMyODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aaf529f493474f66b3d6fac6eb73eba8",
+      "statement": "Backfill safety constants designate packet_key, source_ref, feature_id, tree_node_id, and qdrant_point_id as immutable identity columns, while title backfills may write only title_id, title_generator_version, and updated_at.",
+      "evidence": [
+        {
+          "resource": "repo://packages/atlas/lib/packet-registry.mjs#L20-L39",
+          "version": "repo-lines-v1:sha256:4aeb3c18588755c7fea0c79612ee2255ef62533119e87d683c7b51568d03955d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZTI2Y2Q5MjM2NmY2MGQ4ZWQ5MmQwMjM5ZjA3ZmVmNzRjYWMxNGFhNjlhZGRmOWMyY2MwZDExZWIwMGE0NjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MjhkNWFmNzE0YWU1NzcyZGU3Nzg3YzJkMDRmMzE0Y2I2NGZhYjkyNjFlZWMzY2Y5NTZmOWM4YTJjZWIyOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d16e0dc540d43b8a1839189b9374cfb",
+      "statement": "The current additive registry implementation stores projection descriptors in atlas_packet_registry_projections with a foreign-key packet_key to atlas_packets and metadata for lane ownership, status, representations, indexing, checksum, and write policy.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts#L5-L36",
+          "version": "repo-lines-v1:sha256:f1077b7ecdf3daaf0645aa1ce1efadaecc1e5f5bbbc2f5ee588aa25ca11d3982:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxZmNjMGUyZDI5MDJlYjIyYTdjMGM2YTZhOTQ4MjNmZjFjMWIwZTU3Y2RkM2RiM2VlMTVjMzNhOTM3ZWM0MTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1YmY1NzczOGFlMWNkYTdhZjNmNzUwNmQ2NDFhMDhhMTgzY2Q0NzA1ZmRkOTYzZjViMTQxZDE1MmU1MDBmZGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fc5afe766d2348aab9fe3a9b173795f7",
+      "statement": "packet_binary_registry is transient transport storage separate from canonical packet authority: it retains packet_key as a stable lookup key, packet_id as the Postgres row identity, optional packet_ulid lineage, and binary payload lifecycle metadata.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/packet-binary-registry.ts#L15-L27",
+          "version": "repo-lines-v1:sha256:422c35100373f040aee04f83bcd1f6165e3173c9cf98eb42a057afc1ab7f9c30:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzODNhYzE5OThhZDg4Mjg4NDVjNzBlZGZmOWQyNWZjYzc4OTU3ZjU1MzBhNzk4MzhkNTE4NGExZTE3MGZlNDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0MTIxNDkzMjUzMmZiODFmYWRiNmRmMGQ4OTU3ZjdiMzE3ZDY5ZmJmYmZmMDkzNDg0ZmIwOGMyMTVhNzc1MTgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/packet-binary-registry.ts#L28-L60",
+          "version": "repo-lines-v1:sha256:47b3d437b6c3370b510c1e8c37a32fa9c02b81ae14fb9c02cc050aa0b78c36b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4OTQ4MGM3ZTcyMmQzNDExNzY1OTRkMTljMjk0ZGUyODFjMDBhNDhmZjIxZTcyOWNkMjg2ZTJmN2Y3OGQ3MDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjViNzQxZDJjMDhlNmY1MTBiN2U5YTI2NGYzNzhmOWNlMDA0OWE1MDRlMGU3ZWY1ZDY3Y2QzZWE4MTNmODU0NzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhYzMzMjljMWVmN2E0NWQ0N2UwY2NmMjVjOTVkOTg0Nzg1ZDI5Y2JkNGJlZTFmY2U0MzU4N2MzNDk3NWE1ZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1M2Y2YmIyMzAwOGY3OGZkNzM1YzA4ZTZjNjI5MGNkYmUxOWFmYTgzYjJjMmE3OTE1YjNmNjI5ZjcxZTMzNTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3f0814a249654fe5bafc16664ea4b007",
+      "statement": "Registry lane descriptors support six lane kinds, four statuses, and three write policies; a registry entry is promotion-eligible only when it has at least one READY lane and no lane uses CANONICAL_GATED.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.spec.ts#L43-L65",
+          "version": "repo-lines-v1:sha256:21ae39928424fc90ea8bd38a7f7b7d07b4ba5f33ca2dcf0c832caf25ecd0373f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlODk4YmUyOWIwNjY1NWUzZDY0NGU2MTVlMWYwZDhmZWJlZDRhODQzNGZkNDkyMDhhYjdkYTJlMDM4MjY0MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNDJhN2IzZjI4NThiMWI0Y2I3Yzc0ZTBkZWYxZDA2NDMxYTgyZjYwNzE2ZmMxYWMzNjUwZTI2ZGJhZWZhYjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L34-L49",
+          "version": "repo-lines-v1:sha256:f82ec5e1f4bb7a985a598272009b1f1f9d10569581b1832938b79d253acdd2b8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkYTg3ODRiNDBkZDBiNGRjYWViNjEwOGYxM2Y5NmM5MDFkMmVmNzA0OTRkYWY3NjMwZDRiZjRjYjk3NmQ1NmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjU5NWZjMTc1NWMwMGNiMDk2MWNlNzUyMzk5MTgzYjM5ODA2YTNmMDBkNTU0ZmM0Y2E1MDU3Yzk4NGRkMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzNDEwZDI0YTNiMzJkNzY0ZDhlOTlhMzg2YTM4NDQ5MTRlNzZlMjE5OGJjODk0YWZhOTU1NDkwZTRjYTRhZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0YWEyNzljNjliMDIyNWFjMTZjNDU2ZGZkZTJlMDE0OTJiYjYwNTVkNGZkNWE2YTYyZjc0NWM1MjY3ZjMwMWYifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L8-L19",
+          "version": "repo-lines-v1:sha256:97c380be1f9082030a6f157b3102448b16eed42601caab47fbc6e22e1d8e6af6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2ZjJiOTkxMzlkMzc2NWJjMjYwYmQ3NjE4OTk3MzVkZDBiZWJiYzRhMDFjYWIwOWQ5ZGE5MWJkOTI1NGYzMTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1ZTIwYmZjZWE5YzhhNTNmNDFjMjJkOWI0N2FkZGQ0YzM5MjZiNzg4NzUyODNiN2YwZjkzZDc4NTg5YTQ2M2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3OGM3MzNhYWNkMjdjMjE5ODY5NzJjYTRiZDJjNWM5NGY4YWY3NzkyYmNlYmYyZDg0YzVhMmYzYmIyMDA3MjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlZmFiMGExMjcxZjFjMDY5MDFjNWVhNmRjMWU5YjNjYjAxODZlN2M3OGM0OTBkNjlmNGRkMTFkNGViMWYwMjMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts#L80-L86",
+          "version": "repo-lines-v1:sha256:c3b7e2d8f78493b9d1fd9f12a815f51ef45ddd24276fa461097401fe272cadf6:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGJlMTU4MDJiOTA1ZDdlY2ViMDk5MjExNWRhNTJhNGMyYjAyOTcxNjI4ZTI3YTI2NDJhNTg2ODFjZjIzNDE1MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzY0ZGU3YzgxZmRhODIxNzI0MWY1YWQ2MjljMjkyOTNjYjAwZWRmZjBhOGJkNWEzMTQ3ZGI3NWU5MDg2MWIwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2e50a253e4254528a055876f9c9efd10",
+      "statement": "The architecture documentation proposes a wide lifecycle-oriented atlas_packet_registry containing embeddings, latent vectors, clustering, service references, ranking, retrieval metrics, cache state, activity, and status, with services updating it as they progress; this is a documented design rather than proof of the current implementation.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L11-L74",
+          "version": "repo-lines-v1:sha256:586f3550679750fc5269179804582a682f0d66c7e8309b2cb4c4abcdfbbaf6d8:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzM2FhYzFhNzJkNDk5ZWUwNGIwYmJlNjljYzljMDI0OWMzNzIyYjk0MzBhYTM4N2Y5ZmMxMWRhNWNhMTZmM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYzU2OGVhZGRjYzQ4NDAyNmYxZTMyYWYyMmM3NWYzODUzNjJjZjJjNWMxZGQ5NjhjMDU5MmY1NzE5NTgzMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L78-L118",
+          "version": "repo-lines-v1:sha256:41990019c3bb8396ebef9da570d06c7360520bea9df17e43020b3d52398109f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3ZjJlMjAzOWQ2YTM0ZDk4NTQzNjg1NmIyMGI4ZjM4ODA0ZDdhODdmYTZmMDAxYTFmNDgwMDI5OTQyZjBiYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYzU2OGVhZGRjYzQ4NDAyNmYxZTMyYWYyMmM3NWYzODUzNjJjZjJjNWMxZGQ5NjhjMDU5MmY1NzE5NTgzMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e6f9aa85da8141c481faccc074d9eef9",
+      "statement": "The read-only writer-ownership report records registry parity of 61,718 packets with zero missing, orphan, or duplicate registry keys, but the ownership gate remains unsatisfied because it reports four canonical-writer candidates, two production-capable unowned paths, and unspecified owners for key derivation and revision/conflict policy.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L2-L28",
+          "version": "repo-lines-v1:sha256:4f57a115be9a310c2d18558bd25798f18bcd12d8248c691280220b5c837a5629:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwOTY3OTgyMWQ1Yzg3OGVjOTYzN2NlMzk5MGE4MDY3ZDlhZDU2MzliN2I1NWJlNjdhODlmYjEyN2FkZmE4YzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4Mzc3MTdlYzNjNTZmYjVkZTIyNGJiZWUwN2RhNWI1MzQ4ODlhMmI1OGM0YzljN2UxZmViZjEzOTFkZTI5YjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNzkxNTcyZGI0M2QyZjEwMGY0NmEyYmI3YjVjODRlZGQzZDRjMjVhMThhZTA1ODA1M2NhYTY2YjZmODYxOGEifQ"
+        },
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L36-L60",
+          "version": "repo-lines-v1:sha256:a0db55f829b9911411d1f0fa5d5e19a404e57b6c7549a8cc6cdb4244f9b34643:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmNjcwMTZkMzBkYTI0ODE4OWUyNTdiMDcyYzA1YjUzMTMzNWFkMzg5MjEwMjlmZjM3YmI1MGNlZDRkNWFiNTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxMTI1NGMzMmZkNjMzMDFjMTJlNmRhZGJiYWUyYmY5NDE0ODljNjM1NDI2OTBiNTlhZjNiNmY1ZjZlNmUxYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxNjc1MmMyOTUwNTdjNTBlZDE4YzczNzVhODhmYjcwMWNhMTFmMDI0ZmIxNDhhNzY1OTgzNWY1NmJmOWVkMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0Y2VhOTU4NjI1NGIxZjU2NjM5ZTM5ZDliOTZmNDIxMzc1OTA4NDRmMjQzNjRkZmU4MjUyYjU1OTViZWNkMDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_941d6a9f817b467580293e429c775065",
+      "statement": "The focused contract tests verify valid canonical identity, reject empty packet revisions and inverted AST spans, and ensure a READY canonical-gated lane is not promotion-ready.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.spec.ts#L20-L65",
+          "version": "repo-lines-v1:sha256:ce881fbc670bc62adc1ecfe4867d771fe54a454ac508fe577e6373197802b7f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4M2ZiMWEwMGMyMWIxMDYwMmIyZTg2MmU3YzllODczMjU4MGRjOTk5YmVjODM3YTcxODg1ODc5Y2ViNWY4NGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1OTEwOTIwNWRmNGI1YzQwYWU1Njk2NzllOGRlNGVmMTc0MGVjY2ZjMTk3N2Q3OTkxNmJhMWI4MzNlMmY1NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dcdafb651db644868d530542a0ef71e5",
+      "statement": "The projection schema is explicitly read-only reflection pending an authorized migration, and the ownership report declares READ_ONLY mode with writesPerformed false; safe operational verification should therefore remain read-only.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L2-L7",
+          "version": "repo-lines-v1:sha256:a8a8cdb04eaacb3b5bd6efcc9dafebeb95675ee9e7c09fa46fe222dd0b193e1d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjA5Njc5ODIxZDVjODc4ZWM5NjM3Y2UzOTkwYTgwNjdkOWFkNTYzOWI3YjU1YmU2N2E4OWZiMTI3YWRmYThjNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNTU2NzQ3ZjQ2YWQyNDg2ZmQxY2M3MWE1OTg4NGE5YTQ1ZDFmNjhjZjcxYzRjYmRhZTAyMGYxZTdiODg0NzFiMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjEsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjViYzU1ODlmOTM4NWRkMTFmOTAyOWQ0ZDQ0MzdhOWIyMTA5NjA4ZjNjZDFmYjNiMjQ4Y2I0ZTdhNGY5YWI4MSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts#L5-L9",
+          "version": "repo-lines-v1:sha256:d2391ebfe843274ad25f9ff053bfb5f5f98f567eda13a180f3121f3d1e7c2021:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjFmY2MwZTJkMjkwMmViMjJhN2MwYzZhNmE5NDgyM2ZmMWMxYjBlNTdjZGQzZGIzZWUxNWMzM2E5MzdlYzQxMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDYwYmVlZjg3YzQ2MTIzMWM4N2JhYzYyNWY0Mjk0ZGQ1MTMxN2EzNjdiOTUzMDQ5ZDdiOTRiMDg5N2YxNTAxMyJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}
