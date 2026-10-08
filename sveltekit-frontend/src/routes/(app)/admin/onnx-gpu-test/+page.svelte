@@ -24,6 +24,23 @@
 			addResult('Browser Environment', 'fail', String(e));
 		}
 
+		// Phase 23 EDGE-02: capability checks do not imply model or token-generation parity.
+		try {
+			const gpu = typeof navigator !== 'undefined' ? (navigator as Navigator & {gpu?: {requestAdapter: () => Promise<unknown>}}).gpu : undefined;
+			const adapter = gpu ? await gpu.requestAdapter() : null;
+			addResult('WebGPU Adapter', adapter ? 'pass' : 'skip', adapter ? 'Adapter acquired (LLM execution NOT_PROVEN)' : 'No available WebGPU adapter');
+		} catch (e) {
+			addResult('WebGPU Adapter', 'fail', String(e));
+		}
+		try {
+			const storage = await navigator.storage?.estimate?.();
+			addResult('Model Storage Quota', storage?.quota ? 'pass' : 'skip', storage?.quota ? `Estimated quota ${Math.round(storage.quota / 2 ** 20)} MiB; free space not guaranteed` : 'Storage quota unavailable');
+		} catch (e) {
+			addResult('Model Storage Quota', 'skip', String(e));
+		}
+		addResult('LiteRT-LM Web Generate', 'skip', 'NOT_PROVEN: requires pinned @litert-lm/core + compatible .litertlm, actual token generation and unload receipt');
+		addResult('Browser MTP', 'skip', 'NOT_PROVEN: server MTP scripts do not establish browser speculative decoding');
+
 		// Test 2: IndexedDB availability
 		try {
 			const hasIndexedDB = typeof indexedDB !== 'undefined';
@@ -74,7 +91,7 @@
 			const duration = Date.now() - start;
 			if (session) {
 				const provider = getProviderLabel('/gemma4_e2b_onnx/model.onnx');
-				addResult('Gemma4 E2B Load', 'pass', `Loaded with ${provider} (120-255 tok/s)`, duration);
+				addResult('Gemma4 E2B Load', 'pass', `Loaded with ${provider}; inference speed NOT_MEASURED`, duration);
 			} else {
 				addResult('Gemma4 E2B Load', 'skip', 'Model not downloaded yet. Run: bash scripts/download-gemma4-e2b-onnx.sh');
 			}
