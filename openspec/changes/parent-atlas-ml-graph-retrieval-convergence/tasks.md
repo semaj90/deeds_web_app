@@ -155,3 +155,13 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] DAG-06 Add durable state projection derived from replayed events: PENDING→READY→RUNNING→SUCCEEDED/FAILED, cancellation, retries, lease expiry and worker readback. A graph edit creates a *new* DAG revision and invalidates stale run projection.
 - [ ] DAG-07 Bind task scheduling to approved ContextManifest, packet/evidence revisions and cache generations; do not use token KV or NetworkX graph objects as durable state.
 - [ ] DAG-08 Handle concurrently running nodes by per-run / per-step CAS or transaction and enforce dependency completion inside transaction; current pure state helper has no sequence monotonicity against external event history.
+
+## CRUD proposal / incremental AST search subhelpers
+- [x] SEARCH-01 Added `python/atlas_compute/graph_search_subhelpers_v1.py`: cosine, affine 0–100 cosine display scale (NOT calibrated probability), Manhattan, degree-1/2 binary interaction terms, bounded BFS, weighted A*, greedy best-first, NetworkX Louvain wrapper.
+- [x] SEARCH-02 Added `python/tests/test_graph_search_subhelpers_v1.py` with scoring, binary and path fixtures. Authored but not run through GitHub connector.
+- [ ] SEARCH-03 Test scalar metrics on mismatched dimensions, zeros, nonfinite values, negative feature inputs; document cosine rank vs Manhattan distance (different ordering) and query-specific normalization.
+- [ ] SEARCH-04 Bind subhelpers to existing AST/Graphify typed edges and immutable revision-qualified node ordinals. BFS/A*/greedy operate on structural edge costs; HNSW adjacency is not a source-code graph.
+- [ ] SEARCH-05 Community proof: reuse existing Louvain owner; Leiden support must be runtime-discovered and pinned (NetworkX version/backend support differs). Benchmark exact graph revision and community stability vs cuGraph.
+- [ ] SEARCH-06 Define CRUD as proposal-only Create/Read/Update/Delete operations: Create/Update/Delete write NEW packet/DAG revisions through existing authorized mutation gate and independent readback; Read is bounded and revision-pinned. No direct Python graph mutation authorization.
+- [ ] SEARCH-07 Record expansion cutoff, heuristic admissibility, visited-node count, negative control, graph revision and evidence IDs. A* optimality claim requires admissible heuristic; greedy has no optimality guarantee.
+- [ ] SEARCH-08 Add QueryClassification → graph lane policy → candidate feature tile → SearchRuntime RRF → ContextManifest dry-run receipt. Separate structural traversal from 768D cosine similarity and from calibrated relevance.
