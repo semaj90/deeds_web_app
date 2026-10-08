@@ -102,3 +102,25 @@ Professional pipeline lessons to reproduce:
 - [ ] P23-EDGE-01E Verify deployment mode/configured embedding owner (Ollama, dedicated :8081, or DirectML) and record actual base URL/provider.
 - [ ] P23-EDGE-01F Read exact LiteRT-LM JS API against pinned package before implementing web adapter. Python `litert_lm.Engine` is not equivalent.
 - [ ] P23-EDGE-01G Collect cold/warm generated-token timings and dedicated browser memory/use, *not* model-load timings.
+
+## Phase 23 EDGE scaffold / focused tests (2026-10-08)
+Files:
+- `sveltekit-frontend/src/lib/ai/edge/phase23-edge-model-harness.ts`: backend-neutral typed identity, load/generate/cancel/dispose states and generation receipt. **Experimental; not imported by production routing.**
+- `sveltekit-frontend/src/lib/ai/edge/phase23-edge-model-harness.spec.ts`: Vitest identity, ordering, empty output, load failure and cancellation tests.
+
+Run from `sveltekit-frontend`:
+```bash
+npx vitest run src/lib/ai/edge/phase23-edge-model-harness.spec.ts
+```
+
+TODO before attaching to `dev:gpu`:
+- [ ] EDGE-HARNESS-01 Test the above fixture locally/CI (tests were committed, not executed by GitHub connector).
+- [ ] EDGE-HARNESS-02 Support safe abort/dispose races, in-flight GPU synchronization, retry and multiple concurrent calls. Existing scaffold is single request only.
+- [ ] EDGE-HARNESS-03 Pin and inspect the real `@litert-lm/core` browser API and compatible E2B asset; implement real `EdgeEngine`.
+- [ ] EDGE-HARNESS-04 Add tokenizer/model revision hashes, model input asset availability and integrity proof without eager huge downloads.
+- [ ] EDGE-HARNESS-05 Add streaming token callbacks, usage token counts from actual runtime, cold/warm metrics and hardware/device receipt.
+- [ ] EDGE-HARNESS-06 Validate JSON/citations and factual grounding against a fixed Eval Gym dataset; model-generated strings alone do not prove grounding.
+- [ ] EDGE-HARNESS-07 Add isolated versioned IndexedDB cache with expiry, quota and privacy policy.
+- [ ] EDGE-HARNESS-08 Connect through a feature-flagged UI experiment only after runtime-specific tests pass.
+- [ ] EDGE-HARNESS-09 Preserve default Ornith :8090, optional native LiteRT :8070, and actual current embedding backend.
+- [ ] EDGE-HARNESS-10 Record NOT_PROVEN for LiteRT-LM, browser MTP, EmbeddingGemma 2, and end-to-end RAG until live tests.
