@@ -61,7 +61,8 @@ async function main() {
   const client = await pool.connect();
   let report;
   try {
-    await client.query('BEGIN READ ONLY');
+    await client.query('BEGIN');
+    await client.query('SET TRANSACTION READ ONLY');
     await client.query("SET LOCAL statement_timeout = '15000ms'");
     const relations = (await client.query(`
       SELECT table_name FROM information_schema.tables
