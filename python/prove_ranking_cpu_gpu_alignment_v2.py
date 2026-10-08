@@ -59,7 +59,9 @@ def probe(device: str, *, max_gpu_mb: int) -> dict:
             result["allocated_delta_bytes"] = max(0,int(torch.cuda.memory_allocated()-before))
             del gpu
         finally:
-            torch.cuda.empty_cache()
+            # Free only the probe tensor; do not clear shared allocator caches.
+            if 'gpu' in locals():
+                del gpu
     else:
         result["checks"].append("GPU_NOT_REQUESTED")
     return result
