@@ -220,3 +220,16 @@ Run from frontend:
 npx vitest run src/lib/ai/edge/
 ```
 All new tests are **AUTHORED / NOT_RUN** in this GitHub-only pass; no production process started.
+
+## 2026-10-08 UI diagnostic wiring
+- [x] EDGE-ASSET-UI-01 Wire `EDGE_EXPERIMENTAL_MANIFESTS` through `probeManifest` in existing `admin/onnx-gpu-test` page.
+- [x] EDGE-ASSET-UI-02 Missing asset prints the configured Hugging Face URL via `toRepairTask`, without downloads.
+- [x] EDGE-ASSET-UI-03 Record `UNVERIFIED` as skip, not success; error status shown as fail.
+- [ ] EDGE-ASSET-UI-04 Execute UI build/typecheck and Playwright browser tests on target workstation.
+- [ ] EDGE-ASSET-UI-05 Replace unpinned manifest with independently verified revision, SHA256, model format, tokenizer and source license.
+- [ ] EDGE-ASSET-UI-06 Gate client runtime readiness behind verified actual engine model ID; loaded weights and generated tokens are separately evidenced.
+- [ ] EDGE-ASSET-UI-07 Add explicit authorization to emit the proposed repair task to established TaskCard/ACP/A2A owner; no automatic edits/downloads.
+- [ ] EDGE-ASSET-UI-08 Bound probe latency via AbortSignal, distinguish HEAD unsupported (405) from not found (404), and avoid page-wide run failure from hanging asset checks.
+- [ ] EDGE-ASSET-UI-09 Add negative tests for malformed/hostile source URLs, cross-origin redirects, HTML SPA fallbacks and cancelled requests.
+- [ ] EDGE-ASSET-UI-10 Preserve Ornith :8090 and runtime embedding selection; no implicit fallback or change to default runtime.
+Evidence: files committed; browser/CI tests NOT_EXECUTED. HEAD response is NOT a content-integrity test.
