@@ -302,3 +302,12 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] FINAL-05 Replace caller-supplied CANONICAL_READBACK proof token with authoritative DB/Graphify readback (packet+source/workspace/graph/feature revisions, exact ordinals, edge evidence checksums). Current helper checks declared evidence metadata only.
 - [ ] FINAL-06 Execute CPU GraphSAGE mean/max/LSTM fixtures against the same real frozen graph; compare cuGraph BFS/PageRank and cuVS exact semantic_768 separately, bounded GPU allocation and actual backend receipts.
 - [ ] FINAL-07 Connect Python PROPOSED proposal over authenticated RPC to TypeScript/OaK transactional owner; any cached/late result must be requalified in final PostgreSQL transaction.
+
+## 2026-10-08 canonical snapshot proven; feature matrix still blocked
+- [x] LINEAGE-01 Incorporate externally reported canonical 25,542-member Graphify snapshot readback; this is user-provided local proof, not GitHub-side execution. Canonical member counts/matching are no longer the immediate blocker.
+- [x] LINEAGE-02 Source-located `observation-feature-compiler.ts`, `observation-feature-repository.ts`, and `build-candidate-feature-matrix-v1.mjs`. Writer takes featureRevision separately and row schema carries source/workspace/registry revisions. Need to locate actual producer/DB persistence and readback loss.
+- [x] LINEAGE-03 Added `observation-feature-lineage-admission-v1.ts` and five fixture tests. Reject missing feature revision/workspace/registry/digest/evidence; require independent readback flags and exact canonical/source/workspace match. Source only, tests not run.
+- [ ] LINEAGE-04 Verify 19 feature-row source refs against independently read back workspace-source bindings, producer revision and feature_revision; do not backfill guessed revisions or force admission using nominal PROVEN flags.
+- [ ] LINEAGE-05 Trace SQL SELECT/projection in chunk retrieval profile auditor to find whether feature columns are actually absent at source or simply dropped by query mapping. Run bounded read-only SQL via proper existing connection; compare schema, row and adapter fields.
+- [ ] LINEAGE-06 Run focused Vitest and typecheck on new admission helper. Do not claim full [C,25] representation until every admitted row has feature and workspace lineage; keep masks separate from unknown provenance.
+- [ ] LINEAGE-07 After qualified feature readback, rerun 16-row profile replay and expand to full frozen snapshot only after bounded checks pass. Then bind frozen GNN graph input and GPU comparisons. 
