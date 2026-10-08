@@ -311,3 +311,12 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] LINEAGE-05 Trace SQL SELECT/projection in chunk retrieval profile auditor to find whether feature columns are actually absent at source or simply dropped by query mapping. Run bounded read-only SQL via proper existing connection; compare schema, row and adapter fields.
 - [ ] LINEAGE-06 Run focused Vitest and typecheck on new admission helper. Do not claim full [C,25] representation until every admitted row has feature and workspace lineage; keep masks separate from unknown provenance.
 - [ ] LINEAGE-07 After qualified feature readback, rerun 16-row profile replay and expand to full frozen snapshot only after bounded checks pass. Then bind frozen GNN graph input and GPU comparisons. 
+
+## Persistence lineage loss confirmed — 2026-10-08
+- [x] PERSIST-00 Source audit confirmed package writer drops source_revision, registry_revision, row_ordinal and row_identity_checksum while storing separate feature_revision and workspace_revision; app materializer still accepts optional workspaceRevision and nullable source receipt.
+- [x] PERSIST-01 Added `feature-lineage-persistence-repair.md` documenting no-DDL decision, lossless receipt check first, and proposed minimal nullable four-column extension only if required.
+- [ ] PERSIST-02 Inspect deployed pg_catalog, exact migration owner, current feature table column/constraint inventory and historical source receipt linkage. Do not guess missing values.
+- [ ] PERSIST-03 Propose additive, review-only migration and extend both writers atomically with source/registry/ordinal/identity-checksum preservation, explicit workspace/source receipt checks. Gate new writes on deployed schema, no unreviewed DDL.
+- [ ] PERSIST-04 Independently rederive row checksums from retained source and compiler contract and read back persisted tuple. A stored input_digest is insufficient on its own.
+- [ ] PERSIST-05 Run controlled new-row write/readback in approved test database, then bounded 16-row replay. Old unqualified rows remain blocked; no automatic backfill.
+- [ ] PERSIST-06 Rebuild [C,25] only after all admitted rows have required provenance and separate missing-data masks.
