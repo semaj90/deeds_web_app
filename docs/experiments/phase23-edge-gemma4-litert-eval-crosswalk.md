@@ -124,3 +124,27 @@ TODO before attaching to `dev:gpu`:
 - [ ] EDGE-HARNESS-08 Connect through a feature-flagged UI experiment only after runtime-specific tests pass.
 - [ ] EDGE-HARNESS-09 Preserve default Ornith :8090, optional native LiteRT :8070, and actual current embedding backend.
 - [ ] EDGE-HARNESS-10 Record NOT_PROVEN for LiteRT-LM, browser MTP, EmbeddingGemma 2, and end-to-end RAG until live tests.
+
+## Asset/parameter checks and agentic remediation scaffolds (2026-10-08)
+New read-only, experimental modules under `sveltekit-frontend/src/lib/ai/edge/`:
+- `phase23-model-manifest.ts` — candidate model IDs, runtime selector, local asset URL, HF provenance URL. Values are intentionally UNPINNED.
+- `phase23-model-probe.ts` — validates local paths + HTTPS upstream provenance, performs HEAD-only asset probes, reports MISSING/UNVERIFIED/ERROR; **never downloads model weights**.
+- `phase23-runtime-readiness.ts` — requires an actual engine state and matching loadedModelId; asset HEAD/PRESENT alone is insufficient.
+- `phase23-agent-repair.ts` — descriptive `atlas.edge-model-repair.v1` ACP/A2A-compatible task candidate, always NEEDS_HUMAN_APPROVAL; no network or agent action.
+- `phase23-model-probe.spec.ts` and `phase23-runtime-readiness.spec.ts` — missing asset, URL, HEAD-only, HTML fallback, state and mismatch checks.
+
+To execute tests from `sveltekit-frontend`:
+```bash
+npx vitest run src/lib/ai/edge/phase23-model-probe.spec.ts src/lib/ai/edge/phase23-runtime-readiness.spec.ts src/lib/ai/edge/phase23-edge-model-harness.spec.ts
+```
+
+When an asset is missing, the probe result includes the local URL and original Hugging Face source URL for human/agent review. A compliant agent can propose a repair but must not download, change runtime bindings, alter indices or deploy without authorization. This is a **local descriptive adapter**, not implemented ACP or A2A protocol transport/handshake.
+
+More gates:
+- [ ] EDGE-ASSET-01 Pin trusted exact model revision, license, tokenizer digest and SHA256.
+- [ ] EDGE-ASSET-02 Validate assets by digest and binary format, not just HEAD.
+- [ ] EDGE-ASSET-03 Attach probes to actual browser runtime status and asset-load lifecycle.
+- [ ] EDGE-AGENT-01 Map the descriptive repair task to the existing TaskCard/EvidenceCard join owner; no duplicate task store.
+- [ ] EDGE-AGENT-02 Investigate local ACP/A2A protocol authority, capabilities, leases, allowlisted repair actions and human approvals.
+- [ ] EDGE-AGENT-03 Persist validated readback/receipt after authorized repair; no claim of successful fix before repeat tests.
+- [ ] EDGE-TEST-01 Execute Vitest in an environment where esbuild spawning is permitted; GitHub commits alone don't prove tests passed.
