@@ -228,3 +228,72 @@ def validate_evidence_slice_v1(*, normalized_text: str, fact: GroundedFactBridge
     expected = _sha256_hex(fact.evidence_text)
     if fact.evidence_checksum not in (expected, f"sha256:{expected}"):
         raise ValueError("EVIDENCE_CHECKSUM_MISMATCH")
+
+
+def build_grounded_fact_bridge_from_external_doc_chunk_v1(
+    *,
+    chunk: Mapping[str, Any],
+    workspace_revision: str,
+    producer_revision: str,
+    fact_id: str,
+    predicate: str,
+    evidence_start_byte_in_chunk: int,
+    evidence_end_byte_in_chunk: int,
+    evidence_text: str,
+    participants: Sequence[GroundedFactParticipantV1],
+    ontology_ids: Sequence[str] = (),
+    concept_ids: Sequence[str] = (),
+    confidence: float = 1.0,
+) -> GroundedFactBridgeV1:
+    """Map an existing ExternalDoc ChunkRecord dict into the hypergraph bridge.
+
+    The chunk is expected to be ChunkRecord.to_dict() or an equivalent
+    validated record from atlas_external_docs. Byte offsets supplied here are
+    relative to the chunk text; the emitted fact carries absolute byte offsets
+    within the normalized source document.
+    """
+
+    required = ("source_id", "source_revision", "source_url", "text", "start_byte", "end_byte")
+    missing = [key for key in required if key not in chunk or chunk[key] in (None, "")]
+    if missing:
+        raise ValueError(f"EXTERNAL_DOC_CHUNK_FIELDS_MISSING:{','.join(missing)}")
+    if not workspace_revision.strip():
+        raise ValueError("WORKSPACE_REVISION_REQUIRED")
+    if not producer_revision.strip():
+        raise ValueError("PRODUCER_REVISION_REQUIRED")
+
+    text = str(chunk["text"])
+    encoded = text.encode("utf-8")
+    if evidence_start_byte_in_chunk < 0 or evidence_end_byte_in_chunk < evidence_start_byte_in_chunk:
+        raise ValueError("INVALID_CHUNK_RELATIVE_EVIDENCE_SPAN")
+    if evidence_end_byte_in_chunk > len(encoded):
+        raise ValueError("CHUNK_RELATIVE_EVIDENCE_SPAN_OUT_OF_RANGE")
+    actual = encoded[evidence_start_byte_in_chunk:evidence_end_byte_in_chunk].decode("utf-8")
+    if actual != evidence_text:
+        raise ValueError("CHUNK_RELATIVE_EVIDENCE_TEXT_MISMATCH")
+
+    absolute_start = int(chunk["start_byte"]) + evidence_start_byte_in_chunk
+    absolute_end = int(chunk["start_byte"]) + evidence_end_byte_in_chunk
+    if absolute_end > int(chunk["end_byte"]):
+        raise ValueError("ABSOLUTE_EVIDENCE_SPAN_EXCEEDS_CHUNK")
+
+    evidence_checksum = _sha256_hex(evidence_text)
+    source_ref = str(chunk.get("source_url") or chunk.get("source_id"))
+
+    return GroundedFactBridgeV1(
+        fact_id=fact_id,
+        predicate=predicate,
+        source_ref=source_ref,
+        source_revision=str(chunk["source_revision"]),
+        workspace_revision=workspace_revision,
+        producer_revision=producer_revision,
+        evidence_start_byte=absolute_start,
+        evidence_end_byte=absolute_end,
+        evidence_text=evidence_text,
+        evidence_checksum=evidence_checksum,
+        participants=tuple(participants),
+        ontology_ids=tuple(ontology_ids),
+        concept_ids=tuple(concept_ids),
+        confidence=confidence,
+        canonical_authority=False,
+    )
