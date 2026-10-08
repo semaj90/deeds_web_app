@@ -65,6 +65,7 @@ try {
        $parsed = ($readback -join "`n" | ConvertFrom-Json -ErrorAction Stop)
        if ($parsed.schema -ne 'atlas.durable-journal-readback.v1') { throw 'Unexpected journal audit schema' }
        if (-not $parsed.allTablesPresent) { throw 'Journal tables missing in live schema' }
+       $report.journalInventory = $parsed
        if (-not $parsed.fencingColumnsPresent) { throw 'Journal fencing columns incomplete; activation prohibited' }
      }
    }
