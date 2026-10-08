@@ -62,7 +62,7 @@ export class EdgeModelHarness {
     const controller = new AbortController();
     this.controller = controller;
     const started = performance.now();
-    const operation = Promise.resolve().then(() => this.engine.generate(prompt, controller.signal));
+    const operation = this.engine.generate(prompt, controller.signal);
     this.inFlight = operation;
     try {
       const result = await operation;
