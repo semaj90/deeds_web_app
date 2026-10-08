@@ -1,0 +1,4 @@
+# Isolated OaK / agent validation environment only.
+# Do not add this requirement to the default :8095 NLP-sidecar environment.
+pydantic==2.13.5
+oaklib==0.7.4
