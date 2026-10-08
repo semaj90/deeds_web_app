@@ -270,3 +270,15 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] PG18-CONCURRENT-03 Review isolation levels, privilege limits and lock timeouts. Add cancellation, expired lease, generation rollover, source revision supersession and worker crash simulations. Capture PostgreSQL server version, index/query plan and receipt checksums.
 - [ ] PG18-CONCURRENT-04 Confirm the scratch test's nested transaction rollback covers *both* the step state and event insertion, with no collateral schema/object mutation. Production owner still unproven until actual journal migrations/readback.
 - [ ] PG18-CONCURRENT-05 Establish an authorized TypeScript durable journal transaction adapter only after deployed schema and fencing checks pass; Python worker remains proposal-only and never writes canonical execution state directly.
+
+## Four missing proof components — 2026-10-08
+- [x] NEXT-01 Added `python/atlas_compute/worker_promotion_gate_v1.py` and unit tests for strict proposal-only identity/revision checks; this is not a database authorization substitute.
+- [x] NEXT-02 Added `python/atlas_compute/gnn_snapshot_admission_v1.py` and tests for frozen ordinal/edge/revision validation; source-supplied digests require authoritative readback before promotion.
+- [x] NEXT-03 Added `python/prove_gnn_tensor_cuda_parity_v1.py` for opt-in 64MB-bounded PyTorch CPU/CUDA mean aggregation fixture. It does not prove cuGraph, a trained GraphSAGE LSTM, or production GPU ownership.
+- [x] NEXT-04 Added `scripts/atlas/sql/prove-dag-stale-lease-rollback-v1.sql` with expired lease, stale source and stale generation rejection, temp rows and ROLLBACK.
+- [ ] NEXT-05 Run new Python tests from existing env and inspect actual result; do not claim pass from GitHub commit.
+- [ ] NEXT-06 Run PostgreSQL negative controls on approved disposable PG18 database through psql; document temporary writes and independent readback.
+- [ ] NEXT-07 Extend two-session psycopg test to prove lease-expiry reclaim, fencing generation advancement, timeout/cancellation and crash recovery; keep DB write owner isolated.
+- [ ] NEXT-08 Integrate Python PROPOSED message into TypeScript OaK transaction port via authenticated service boundary and prove stale after-await result cannot be promoted.
+- [ ] NEXT-09 Feed the frozen GNN snapshot from real canonical Graphify/AST evidence and check independent lineage; execute CPU reference with same ordinal map.
+- [ ] NEXT-10 Run optional CUDA proof only after GPU resource preflight. cuGraph PageRank/BFS and cuVS exact 768d need distinct real-executor parity receipts.
