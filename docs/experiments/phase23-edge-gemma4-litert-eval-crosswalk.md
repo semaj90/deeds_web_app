@@ -69,3 +69,14 @@ Professional pipeline lessons to reproduce:
 - https://github.com/google-ai-edge/LiteRT-LM/tree/main/js
 - https://github.com/google-ai-edge/litert/tree/main/litert/js
 - https://github.com/vieenrose/meeting-summarizer
+
+## 2026-10-08 follow-up owner audit / implementation receipt
+- [x] P23-EDGE-01 partial: source owners located (Gemma4 ONNX session, admin test page, LiteRT startup and MTP launchers). Still need bundle/version/deployed artifact inventory.
+- [x] P23-EDGE-02 partial: ONNX GPU test page now queries an actual WebGPU adapter and storage quota. These are only capability indicators, not a LiteRT-LM inference test.
+- [ ] P23-EDGE-03 unproven: browser `.litertlm` text generation; don't substitute Python :8070.
+- [ ] P23-EDGE-04 unproven: executor-specific tokenization and generation parity.
+- [ ] P23-EDGE-05 unproven: cancel, unload, tabs and isolation.
+- **Source finding:** `scripts/startup/dev-gpu-runtime.mjs` is referenced in documentation but returned 404 from GitHub. Locate the real `dev:gpu` script owner before backend edits. The `gemma4-e2b-session.ts` currently reports historical speed estimates; no actual generated-token measurement surfaced during this review.
+- **Source finding:** `sveltekit-frontend/src/routes/(app)/admin/onnx-gpu-test/+page.svelte` previously marked a model-load success with a speed claim; changed to NOT_MEASURED. The new explicit browser LiteRT and browser MTP tests SKIP/NOT_PROVEN rather than presenting successful inference.
+- **Do not** delete legacy Gemma3 models, install weights, enable auto fallback, enable browser MTP or touch Ornith :8090 or EmbeddingGemma :8081 based on this UI-only progress.
+- **Next minimum code gate:** add a browser-engine wrapper behind an explicit experimental selection, with exact pinned package version, web-compatible model manifest, verified tokenizer, abort/dispose, and a response validator that only admits measured generated tokens; expose new PASS receipt after browser execution is reproducible.
