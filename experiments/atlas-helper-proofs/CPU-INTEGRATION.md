@@ -113,3 +113,17 @@ Local optional test:
 cd experiments/atlas-helper-proofs
 python -m unittest -v test_cpu_graph_torch.py
 ```
+
+## Graph rank and masked learning alignment (2026-10-07)
+- `cpu_rank_row_alignment.py` maps already qualified graph node scores to exact packet row ordering; mixed graph revisions, unmatched nodes and duplicate packet rows reject. It does not derive graph revisions or source execution membership.
+- `cpu_train_eval.py` adds group-disjoint deterministic holdout, **train-only imputation of missing features**, and classification metrics including abstention. This is preparation for a trained CPU classifier, not completed training or calibration.
+- `test_rank_train_alignment.py` adds 6 regression checks for row ordering, stale revisions, missing nodes, group split, imputation and metric calculation.
+- TODO: freeze the graph node-to-packet identity map and compare NetworkX reversed-graph CheiRank with the existing Graphify owner.
+- TODO: compare raw Python float32 [C,25] bytes and mask with the TypeScript owner; exact row keys and featureRevision must match.
+- TODO: verify KMeans center/label readback, empty cluster and repeated points, then compare with cuVS after approved idle GPU handoff.
+- TODO: add model training and safetensors export only with dataset split and optimizer receipts; maintain explicit UNKNOWN calibration thresholds.
+
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_rank_train_alignment.py
+```
