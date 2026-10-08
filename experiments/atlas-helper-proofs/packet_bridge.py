@@ -43,8 +43,39 @@ def proposal(ref: PacketRef, features: Mapping[str, float], registry: Mapping[st
     return {"status": "PROPOSAL_ONLY", "packet_ref": vars(ref),
             "features": dense, "feature_digest": digest}
 
-def admit_proposal(value: dict, expected: PacketRef) -> bool:
-    if value.get("status") != "PROPOSAL_ONLY":
-        raise ValueError("invalid status")
-    assert_revision(PacketRef(**value["packet_ref"]), expected)
+def verify_proposal(value: dict, expected: PacketRef, registry: Mapping[str, int]) -> bool:
+    """Verify integrity of a proposal; this does NOT admit canonical evidence."""
+    if not isinstance(value, dict) or set(value) != {"status", "packet_ref", "features", "feature_digest"}:
+        raise ValueError("INVALID_PROPOSAL_SHAPE")
+    if value["status"] != "PROPOSAL_ONLY":
+        raise ValueError("INVALID_PROPOSAL_STATUS")
+    try:
+        ref = PacketRef(**value["packet_ref"])
+    except (TypeError, ValueError, KeyError) as exc:
+        raise ValueError("INVALID_PACKET_REF") from exc
+    assert_revision(ref, expected)
+    dense = value["features"]
+    if not isinstance(dense, (list, tuple)) or len(dense) != len(registry):
+        raise ValueError("INVALID_FEATURE_WIDTH")
+    if any(type(x) not in (int, float) or not math.isfinite(x) for x in dense):
+        raise ValueError("INVALID_FEATURE_VALUE")
+    if not isinstance(value["feature_digest"], str) or len(value["feature_digest"]) != 64:
+        raise ValueError("INVALID_FEATURE_DIGEST")
+    # Reuse the canonical ordering and digest function instead of having a second serializer.
+    inverted = {v: k for k, v in registry.items()}
+    if len(inverted) != len(registry):
+        raise ValueError("INVALID_REGISTRY")
+    reconstructed = {inverted[i]: dense[i] for i in range(len(dense)) if i in inverted}
+    try:
+        expected_digest = proposal(ref, reconstructed, registry)["feature_digest"]
+    except (ValueError, KeyError, TypeError) as exc:
+        raise ValueError("INVALID_REGISTRY") from exc
+    from hmac import compare_digest
+    if not compare_digest(value["feature_digest"], expected_digest):
+        raise ValueError("FEATURE_DIGEST_MISMATCH")
     return True
+
+
+def admit_proposal(value: dict, expected: PacketRef, registry: Mapping[str, int]) -> bool:
+    """Legacy name: integrity check only. Never implies EvidenceCard admission."""
+    return verify_proposal(value, expected, registry)
