@@ -225,3 +225,13 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] JOURNAL-06 Prove transactional attempt fencing. Existing declaration lacks dedicated lease ID/expiry, generation and state version fields; design additive migration under Drizzle safety review ONLY after verified owner/deployment. No migration generated or applied in this PR.
 - [ ] JOURNAL-07 Implement one authorized transactional claim/completion+outbox adapter and run concurrent-worker, stale revision, crash, cancellation and replay tests; no direct Python writes.
 - [ ] JOURNAL-08 Execute focused Vitest tests and TypeScript checks in existing repo environment; commit/test success was not established by GitHub API file writes.
+
+## 2026-10-08 workstation preflight / GraphSAGE follow-up
+- [x] PS-01 Added `scripts/atlas/prove-dag-journal-gnn-preflight-v1.ps1`: no-install Python DAG/async tests; opt-in bounded NetworkX GNN/OaK fixtures; optional explicit Docker exec read-only information_schema query; local scratch JSON summary.
+- [ ] PS-02 Execute script with installed Windows Python and separately existing WSL Python/OaK pin; record Python executable/version, package revisions, each process exit, native GraphSAGE fixture readback. GitHub connector cannot access the user's local Docker/Windows environment.
+- [ ] PS-03 Use `-DockerReadback -PostgresContainer <exact> -Database <db> -DbUser <user>` only after identifying the correct container. Verify migration/pg_catalog state, indexes, expected unique keys and journal lease/generation support; do not apply DDL.
+- [ ] PS-04 Assert the proof runner is fail-closed on test errors, Docker errors and missing dependencies and inspect receipt correctness. It is newly authored and has not run on the workstation.
+- [ ] PS-05 Treat supplied 29 GNN + 14 TaskCard tests and 35 fixture CPU proof as historical fixture results, not verified trained GraphSAGE or CUDA production parity. Use the user's existing `python/atlas_graph_runtime/gnn_reference.py` as GraphSAGE mean/max/LSTM operator authority; do not reimplement.
+- [ ] PS-06 Confirm `SAGE_LSTM_V1` canonical ordinal ordering, 256-neighbor cap and parameter digest from the new operator receipt. Compare fixture checksums to real revision-qualified snapshot before GPU execution.
+- [ ] PS-07 Confirm WSL Pydantic 2.13.4 versus OaK pin 2.13.5 with existing isolated Windows `.venv`; never claim the 8095 container uses either without container package readback.
+- [ ] PS-08 Separate local focus test pass from deployed capability: verify 8095 health/model binding, AST/CST provenance, graph revision, and journal migration independently. Preserve Vitest and whitespace scope caveats.
