@@ -235,3 +235,11 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] PS-06 Confirm `SAGE_LSTM_V1` canonical ordinal ordering, 256-neighbor cap and parameter digest from the new operator receipt. Compare fixture checksums to real revision-qualified snapshot before GPU execution.
 - [ ] PS-07 Confirm WSL Pydantic 2.13.4 versus OaK pin 2.13.5 with existing isolated Windows `.venv`; never claim the 8095 container uses either without container package readback.
 - [ ] PS-08 Separate local focus test pass from deployed capability: verify 8095 health/model binding, AST/CST provenance, graph revision, and journal migration independently. Preserve Vitest and whitespace scope caveats.
+
+## Journal readback strengthening (2026-10-08)
+- [x] JR-AUDIT-01 Added `scripts/atlas/sql/audit-durable-journal-readonly-v1.sql` to inventory journal table presence, actual columns, index counts and four essential fencing columns, inside a read-only transaction.
+- [x] JR-AUDIT-02 Updated PowerShell preflight to use the checked-in SQL audit and record overall probe status. SQL inspection does **not** imply a deployed transactional claim path.
+- [ ] JR-AUDIT-03 Run opt-in Docker readback on the exact PostgreSQL container/database and capture parsed SQL JSON plus version, index definitions and migration provenance; current runner captures exit code, not structured database assertion decisions.
+- [ ] JR-AUDIT-04 Validate missing tables, partial fencing columns and accidental empty results as FAIL/UNPROVEN in the PowerShell runner rather than interpreting a successful psql exit as schema-ready.
+- [ ] JR-AUDIT-05 Run focused Python, OaK and GNN tests on real Windows/WSL environments. Verify receipt readback and source revision binding; no local execution was performed by this GitHub commit.
+- [ ] JR-AUDIT-06 Investigate the new-run/state persistence owner and transactional dependencies separately from the OpenSpec evidence ledger. No DDL or persistent writes until migration authorization.
