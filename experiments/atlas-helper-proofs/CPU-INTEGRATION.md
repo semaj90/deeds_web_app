@@ -52,3 +52,18 @@ The optional `treesitter-chunker` adapter still needs one installed-parser
 integration run. A passing synthetic CodeChunk normalizer fixture does not prove
 the installed grammar set, extraction coverage, or parity with the current AST
 producer. The adapter is not wired to FastAPI, Graphify or the production writer.
+
+## Additional opt-in scaffolds
+- `source_symbol_crosswalk.py`: exact `source_ref/source_revision/byte-span` match against **caller-supplied, already authoritative** SourceMember records; no DB reads, fuzzy membership or packet-key minting.
+- `cpu_sidecar_router.py`: `build_router()` factory. Existing FastAPI owner must deliberately call `app.include_router(build_router())`; routes remain disabled unless `ATLAS_CPU_HELPERS_ENABLED=1`. No automatic import or service startup.
+- `cpu_dag_fsm.py`: pure PLAN -> PLAN_VALIDATED checksum guard. This is not cross-turn persistence, replay protection or the existing execution-spine owner.
+- `cpu_capability_probe.py`: filesystem-only report on simdjson, TurboVec, symbol and sidecar paths; optional Python dependency discovery is not a runtime capability guarantee.
+- `test_cpu_remaining.py`: tests for exact/ambiguous/missing source membership, plan checks and static census.
+
+All scaffolds use proposal-only semantics. Before service integration: review existing authentication, CPU concurrency bounds, source membership authority, deployed Pydantic/FastAPI versions, health/readiness, and evidence admission. Do not expose these experimental endpoints publicly by default.
+
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest discover -p 'test_*.py' -v
+python -c "from cpu_capability_probe import probe; print(probe())"
+```
