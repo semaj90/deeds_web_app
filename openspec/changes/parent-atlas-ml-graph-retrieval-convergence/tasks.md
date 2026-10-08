@@ -240,6 +240,6 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [x] JR-AUDIT-01 Added `scripts/atlas/sql/audit-durable-journal-readonly-v1.sql` to inventory journal table presence, actual columns, index counts and four essential fencing columns, inside a read-only transaction.
 - [x] JR-AUDIT-02 Updated PowerShell preflight to use the checked-in SQL audit and record overall probe status. SQL inspection does **not** imply a deployed transactional claim path.
 - [ ] JR-AUDIT-03 Run opt-in Docker readback on the exact PostgreSQL container/database and capture parsed SQL JSON plus version, index definitions and migration provenance; current runner captures exit code, not structured database assertion decisions.
-- [ ] JR-AUDIT-04 Validate missing tables, partial fencing columns and accidental empty results as FAIL/UNPROVEN in the PowerShell runner rather than interpreting a successful psql exit as schema-ready.
+- [x] JR-AUDIT-04 PowerShell now parses SQL JSON and fails closed when the schema identifier is unexpected, journal tables are missing, or fencing columns are incomplete. **Source change only; workstation execution not yet verified.**
 - [ ] JR-AUDIT-05 Run focused Python, OaK and GNN tests on real Windows/WSL environments. Verify receipt readback and source revision binding; no local execution was performed by this GitHub commit.
 - [ ] JR-AUDIT-06 Investigate the new-run/state persistence owner and transactional dependencies separately from the OpenSpec evidence ledger. No DDL or persistent writes until migration authorization.
