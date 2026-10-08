@@ -97,3 +97,19 @@ a verified ast-grep kind; do not assume grammar coverage from parser load alone.
 Exact span matches can be zero even when both parsers are correct because
 their semantic chunk boundaries differ. Broader parent-child or intersecting
 spans must be labeled diagnostic, not exact identity parity.
+
+## CPU PyTorch/ATen and graph-rank evaluation (2026-10-07)
+- `cpu_graph_rank_features.py` uses NetworkX PageRank and PageRank on the reversed directed graph (CheiRank-style score). Typed, revision-qualified edges must come from an existing graph owner; these graph results are not admitted evidence.
+- `cpu_torch_alignment.py` lazily imports torch, allocates only CPU tensors, and provides deterministic toy Lloyd KMeans, a SiLU MLP and AdamW classification baseline. Neither implementation is a production cuVS replacement, and neither trains a language model.
+- The current graph scores are non-authoritative derived signals. Only attach them to [C,25] after resolving node-to-packet membership, graph revision, normalization/calibration and receipt parity.
+- TODO: compare torch tensor output against the existing [C,25] Float32Array and uint8 presence mask using explicit row ordinals; do not feed padded missing values into training without the mask.
+- TODO: separate query-group train/validation/test splits, fit normalization only on training data, record optimizer and torch versions, evaluate macro-F1/unknown abstention, and save reproducible CPU checkpoints.
+- TODO: verify CheiRank reversed-edge convention, dangling node treatment and alpha with the production Graphify owner.
+- TODO: test 0/1 clusters, empty clusters, repeated-point degeneracy, label stability, and final-center assignment consistency before any promotion.
+- GPU parity/cuVS, CUDA scheduling, safetensors persistence, and OaK ontology-grounded evidence remain open.
+
+Local optional test:
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_cpu_graph_torch.py
+```
