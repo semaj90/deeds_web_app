@@ -27,3 +27,22 @@ These modules are experiments, not proof of deployment or feature completion.
 `verify_proposal(value, expected_ref, registry)` now reconstructs the deterministic feature digest and compares it with the supplied SHA-256 value. It rejects tampered vectors, mismatched feature ordinals, malformed widths, and unexpected proposal fields. The old `admit_proposal` name is retained as an alias but now **requires a registry argument** and proves **only proposal integrity**, never EvidenceCard or packet admission.
 
 Before promotion: run `python -m unittest -v` from this directory, then compare this standalone JSON encoding with TypeScript canonical serialization under a golden fixture. Do not use this SHA-256 as a canonical packet-key algorithm or as a wire-format checksum. The fixture remains intentionally disconnected from production gRPC/QUIC, Kafka, pgvector/Qdrant, Graphify, GPU KMeans, and QLoRA.
+
+## ATXP v1 binary experiment envelope
+
+New `wire_envelope.py` and `wire_envelope.ts` implement exactly:
+`magic('ATXP':4) | version(u8:1) | payload_len(u32 big-endian) | SHA-256(payload):32 | payload`.
+The framing is **41-byte header + at most 2,000,000 payload bytes**. Both readers reject unknown versions, truncated headers, extra bytes, oversize fields and changed payloads. This is a byte-integrity envelope only; it does **not** authenticate senders, encrypt data, prove source lineage, define QUIC packet numbers, replace protobuf, or authorize canonical packet admission.
+
+Golden vector: UTF-8 `abc` must encode to
+`415458500100000003ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad616263`.
+The fixture is reproducible in Python and asserted in TypeScript.
+
+Run locally:
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v
+node --experimental-strip-types --test wire_envelope.test.ts
+```
+
+Remaining gates: verify TypeScript execution in the project Node toolchain; ensure Python and TypeScript decode each other's actual emitted bytes; add explicitly versioned payload codecs and stable registry serialization before using envelopes for feature proposals. Never confuse this transport framing with the production ContextManifest hash.
