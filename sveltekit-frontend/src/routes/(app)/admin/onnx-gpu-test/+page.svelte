@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { getOnnxSession, getProviderLabel } from '$lib/ai/onnx/session.js';
 	import { isOnnxAvailable } from '$lib/ai/onnx/inference.js';
+	import { EDGE_EXPERIMENTAL_MANIFESTS } from '$lib/ai/edge/phase23-model-manifest.js';
+	import { probeManifest } from '$lib/ai/edge/phase23-model-probe.js';
+	import { toRepairTask } from '$lib/ai/edge/phase23-agent-repair.js';
 
 	let results = $state<Array<{ name: string; status: 'pass' | 'fail' | 'skip'; message: string; duration?: number }>>([]);
 	let isRunning = $state(false);
@@ -40,6 +43,18 @@
 		}
 		addResult('LiteRT-LM Web Generate', 'skip', 'NOT_PROVEN: requires pinned @litert-lm/core + compatible .litertlm, actual token generation and unload receipt');
 		addResult('Browser MTP', 'skip', 'NOT_PROVEN: server MTP scripts do not establish browser speculative decoding');
+
+		// P23-EDGE-ASSET: HEAD-only; records a source URL on missing assets.
+		// TODO: pin revision/hash and connect runtime readiness only after real model loading.
+		for (const manifest of EDGE_EXPERIMENTAL_MANIFESTS) {
+			const probes = await probeManifest(manifest, { fetcher: (url, init) => fetch(url, init) });
+			for (const probe of probes) {
+				const repair = toRepairTask(probe);
+				const label = `Model Asset: ${manifest.id}/${probe.assetId}`;
+				const diagnostic = repair ? ` | Repair review source: ${repair.evidence.sourceUrl}` : '';
+				addResult(label, probe.status === 'ERROR' ? 'fail' : 'skip', `${probe.status}: ${probe.message}${diagnostic}`);
+			}
+		}
 
 		// Test 2: IndexedDB availability
 		try {
