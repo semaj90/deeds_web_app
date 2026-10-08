@@ -1,0 +1,7 @@
+# Optional graph helpers for the isolated OaK/agent environment.
+# Keeps NetworkX out of the default :8095 sidecar dependency surface.
+-r requirements-oak-agent.txt
+networkx>=3.4,<4
+# nx-cugraph is intentionally NOT pinned here. Install it in the RAPIDS/WSL
+# execution environment whose CUDA/cuGraph versions are proven by capability
+# receipts, then use convert_networkx_to_cugraph_once_v1().
