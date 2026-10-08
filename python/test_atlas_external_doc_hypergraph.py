@@ -6,6 +6,7 @@ from atlas_external_doc_hypergraph import (
     GroundedFactBridgeV1,
     GroundedFactParticipantV1,
     build_hypergraph_fact_proposal_v1,
+    build_grounded_fact_bridge_from_external_doc_chunk_v1,
     build_request_local_incidence_v1,
     validate_evidence_slice_v1,
 )
@@ -57,6 +58,37 @@ class ExternalDocHypergraphTests(unittest.TestCase):
     def test_exact_utf8_evidence_span(self) -> None:
         text = "BeautifulSoup feeds grounded facts into HyperGraphRAG proposals."
         validate_evidence_slice_v1(normalized_text=text, fact=self._fact())
+
+    def test_bridges_external_doc_chunk_with_absolute_byte_span(self) -> None:
+        chunk_text = "Prefix → grounded facts suffix"
+        evidence = "grounded facts"
+        encoded = chunk_text.encode("utf-8")
+        start = encoded.index(evidence.encode("utf-8"))
+        end = start + len(evidence.encode("utf-8"))
+        chunk = {
+            "source_id": "doc:1",
+            "source_revision": "sha256:source",
+            "source_url": "https://example.test/docs",
+            "text": chunk_text,
+            "start_byte": 100,
+            "end_byte": 100 + len(encoded),
+        }
+        fact = build_grounded_fact_bridge_from_external_doc_chunk_v1(
+            chunk=chunk,
+            workspace_revision="workspace:v1",
+            producer_revision="grounder:v1",
+            fact_id="fact:chunk",
+            predicate="MENTIONS",
+            evidence_start_byte_in_chunk=start,
+            evidence_end_byte_in_chunk=end,
+            evidence_text=evidence,
+            participants=(
+                GroundedFactParticipantV1("concept:grounded-facts", "concept", "target"),
+                GroundedFactParticipantV1("source:doc:1", "source_ref", "evidence"),
+            ),
+        )
+        self.assertEqual(fact.evidence_start_byte, 100 + start)
+        self.assertEqual(fact.evidence_end_byte, 100 + end)
 
     def test_rejects_canonical_authority(self) -> None:
         with self.assertRaises(ValueError):
