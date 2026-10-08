@@ -59,4 +59,23 @@ describe('Phase23 experimental browser lifecycle', () => {
     await h.dispose();
     expect(h.status).toBe('disposed');
   });
+  it('waits for in-flight generation cleanup before backend disposal', async () => {
+    let release!: () => void;
+    const pending = new Promise<void>((resolve) => { release = resolve; });
+    const events: string[] = [];
+    const engine = makeEngine();
+    engine.generate = async () => { await pending; events.push('generate-settled'); return { text: 'ok', tokenCount: 1 }; };
+    engine.dispose = async () => { events.push('disposed'); };
+    const h = new EdgeModelHarness(engine, identity);
+    await h.load();
+    const generation = h.generate('hello');
+    const disposing = h.dispose();
+    expect(h.status).toBe('disposed');
+    expect(events).toEqual([]);
+    release();
+    expect((await generation).status).toBe('FAIL');
+    await disposing;
+    expect(events).toEqual(['generate-settled', 'disposed']);
+  });
+
 });
