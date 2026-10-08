@@ -215,3 +215,13 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] CAS-07 Recover after crash: expired leases, monotonic attempt generation, duplicate idempotency keys, competing worker claims, cancellation/timeout and supersession, verified via rollback/readback.
 - [ ] CAS-08 Connect existing Python async worker `PROPOSED` output to this TypeScript port through approved sidecar RPC; never grant Python direct mutation ownership.
 - [ ] CAS-09 Run read-only reconciliation of Graphify/AST/NLP source/graph/model revisions before and after worker await, then protected transaction at commit boundary. Return stale results without ContextManifest admission.
+
+## Durable journal owner discovered — use before any new DAG state table
+- [x] JOURNAL-01 Source-located `sveltekit-frontend/src/lib/server/db/schema/durable-execution.ts` and `sveltekit-frontend/drizzle/manual/0040_durable_execution_journal.sql`: execution_runs, execution_journal_steps, execution_dependencies, execution_side_effects.
+- [x] JOURNAL-02 Existing journal statuses PENDING/EXECUTING/SUCCESS/FAILED/SKIPPED differ from experimental READY/RUNNING/SUCCEEDED/FAILED/SUPERSEDED. Added `durable-dag-status-adapter-v1.ts` mapping with null for unmatched statuses and activation gate. PENDING is not automatically ready; dependency checks remain necessary.
+- [x] JOURNAL-03 Added `durable-dag-status-adapter-v1.spec.ts` (authored, not executed).
+- [ ] JOURNAL-04 Read-only inspect actual PostgreSQL pg_catalog for table existence, columns, indexes, FK and applied migration receipt. Never equate Drizzle declaration with deployed schema.
+- [ ] JOURNAL-05 Reconcile existing durable journal ownership with OaK bounded executor and OpenSpec proof ledger; execution journal != OpenSpec tasks.md evidence ledger.
+- [ ] JOURNAL-06 Prove transactional attempt fencing. Existing declaration lacks dedicated lease ID/expiry, generation and state version fields; design additive migration under Drizzle safety review ONLY after verified owner/deployment. No migration generated or applied in this PR.
+- [ ] JOURNAL-07 Implement one authorized transactional claim/completion+outbox adapter and run concurrent-worker, stale revision, crash, cancellation and replay tests; no direct Python writes.
+- [ ] JOURNAL-08 Execute focused Vitest tests and TypeScript checks in existing repo environment; commit/test success was not established by GitHub API file writes.
