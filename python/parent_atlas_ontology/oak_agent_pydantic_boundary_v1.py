@@ -11,7 +11,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from .oaklib_external_adapter import OaklibCandidateBundleV1
 from atlas_external_doc_hypergraph import (
     GroundedFactBridgeV1,
     GroundedFactParticipantV1,
