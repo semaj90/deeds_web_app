@@ -60,7 +60,12 @@ try {
        # Avoid psql variable expansion or SQL assembled from user input.
        $sqlPath = Join-Path $RepoRoot 'scripts/atlas/sql/audit-durable-journal-readonly-v1.sql'
        if (-not (Test-Path $sqlPath)) { throw 'Journal audit SQL missing' }
-       Get-Content -Raw $sqlPath | docker exec -i $PostgresContainer psql -X -v ON_ERROR_STOP=1 -At -U $DbUser -d $Database
+       $readback = @(Get-Content -Raw $sqlPath | docker exec -i $PostgresContainer psql -X -qAt -v ON_ERROR_STOP=1 -U $DbUser -d $Database)
+       if ($LASTEXITCODE -ne 0) { throw "PostgreSQL readback exited $LASTEXITCODE" }
+       $parsed = ($readback -join "`n" | ConvertFrom-Json -ErrorAction Stop)
+       if ($parsed.schema -ne 'atlas.durable-journal-readback.v1') { throw 'Unexpected journal audit schema' }
+       if (-not $parsed.allTablesPresent) { throw 'Journal tables missing in live schema' }
+       if (-not $parsed.fencingColumnsPresent) { throw 'Journal fencing columns incomplete; activation prohibited' }
      }
    }
  } else { Record 'postgres_schema' 'NOT_RUN' 'Docker readback requires explicit -DockerReadback.' }
