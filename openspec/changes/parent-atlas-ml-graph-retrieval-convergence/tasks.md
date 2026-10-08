@@ -123,3 +123,15 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] TILE-08 Reuse existing ACE/BitFrost descriptor/lease/gen cache authorities, materialize tile only under revision+feature+content digest, state-machine transition receipts and invalidation tests.
 - [ ] TILE-09 Bind final admitted evidence to ContextManifest/prompt prefix checksum. llama-server owns KV; no writing tile bytes into model KV.
 - [ ] TILE-10 Run RTX 3060 Ti optional 4x6 scoring transfer vs CPU, accounting for allocation/padding and comparing end-to-end latency; CPU SIMD may be faster for a tiny tile.
+
+## Evidence and cache bridge increment (2026-10-07)
+- [x] BRIDGE-01 Add `python/atlas_compute/concept_tile_bridge_v1.py` pure adapter: N-ary roles, member candidate participation, graph revision, evidence refs, duplicate fact checks, no fabricated overlap score. Supplied checksums **not cryptographically verified against authoritative source**.
+- [x] BRIDGE-02 Add `python/atlas_compute/concept_tile_residency_v1.py`: complete revision- and artifact-qualified cache descriptor fingerprint; legal transitions and invalidation on descriptor mismatch. No existing cache owner is replaced.
+- [x] BRIDGE-03 Add `python/tests/test_concept_tile_bridge_v1.py`: four source fixtures for deterministic projection, participant membership, cache invalidation, transition guards. Tests not executed through GitHub connector.
+- [ ] BRIDGE-04 Run `PYTHONPATH=python python -m unittest discover -s python/tests -p 'test_*concept_tile*' -v` in established sidecar environment. Record import/test results, no new environment.
+- [ ] BRIDGE-05 Adapt real HyperGraphRAG NaryFactV1 API payload into bridge and prove source/fact checksums, evidence roles, version pins by independent read-only lookup. Reject caller-supplied PROVEN as proof.
+- [ ] BRIDGE-06 Integrate canonical domain classification confidence and concept denominator; derive overlap only with query grounded concept IDs and exact incidence evidence.
+- [ ] BRIDGE-07 Wire existing simdjson bridge with full schema walk/validation of consumed JSONL. simdjson On Demand does not validate unused fields automatically.
+- [ ] BRIDGE-08 Delegate descriptor/lease/cache generation transitions to existing ACE/BitFrost policy owner with readback, concurrency and tombstone tests. Do not independently write new store keys.
+- [ ] BRIDGE-09 Bind ContextManifest and llama-server prompt-prefix identity at model/template/tokenizer/adapter/evidence revisions; prohibit raw tile insertion into KV.
+- [ ] BRIDGE-10 Implement scalar/AVX2 bounded batch scorer only after owner census and exact CPU fixture parity; performance compare to GPU full roundtrip.
