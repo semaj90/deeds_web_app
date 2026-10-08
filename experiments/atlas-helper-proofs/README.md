@@ -21,3 +21,9 @@ Implemented here: immutable packet reference, dense deterministic feature encodi
 Not implemented: on-wire QUIC/gRPC, binary packet replacement, Kafka writes, PyTorch/QLoRA training, cache mutation, Graphify execution, local GPU tests, or production DAG integration.
 
 These modules are experiments, not proof of deployment or feature completion.
+
+## Integrity follow-up (2026-10-07)
+
+`verify_proposal(value, expected_ref, registry)` now reconstructs the deterministic feature digest and compares it with the supplied SHA-256 value. It rejects tampered vectors, mismatched feature ordinals, malformed widths, and unexpected proposal fields. The old `admit_proposal` name is retained as an alias but now **requires a registry argument** and proves **only proposal integrity**, never EvidenceCard or packet admission.
+
+Before promotion: run `python -m unittest -v` from this directory, then compare this standalone JSON encoding with TypeScript canonical serialization under a golden fixture. Do not use this SHA-256 as a canonical packet-key algorithm or as a wire-format checksum. The fixture remains intentionally disconnected from production gRPC/QUIC, Kafka, pgvector/Qdrant, Graphify, GPU KMeans, and QLoRA.
