@@ -67,3 +67,33 @@ cd experiments/atlas-helper-proofs
 python -m unittest discover -p 'test_*.py' -v
 python -c "from cpu_capability_probe import probe; print(probe())"
 ```
+
+## AST/CST and NetworkX parity scaffold (2026-10-07)
+
+Optional modules: `ast_graph_alignment.py`, `run_real_ast_alignment.py`,
+and `test_ast_graph_alignment.py`. The upstream ast-grep Python API uses
+`SgRoot(source, language).root().find_all(kind=...)` and each node's
+`range().start.index` / `range().end.index` for source coordinates.
+Compare these against `treesitter-chunker`'s `byte_start/byte_end` on the
+same immutable UTF-8 source snapshot. Content and source checksums must agree
+before declaring `EXACT_SYNTAX_SPAN`; a syntactic span is **not** a canonical
+symbol or packet identity.
+
+`explicit_graph` accepts only already-grounded directed edges and uses
+NetworkX's acyclic check and lexicographical topological order. It does not
+invent edges from parsing or assert admitted HyperRAG incidence.
+
+Run locally after verifying Python 3.11+ and installing or reusing compatible
+`treesitter-chunker`, `ast-grep-py` and `networkx` in an isolated CPU venv:
+
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_ast_graph_alignment.py
+python run_real_ast_alignment.py --source ../../python/miniforge_nlp_sidecar.py --ref python/miniforge_nlp_sidecar.py --language python --kind function_definition
+```
+
+Use actual tracked TypeScript and Svelte files with supported grammar names and
+a verified ast-grep kind; do not assume grammar coverage from parser load alone.
+Exact span matches can be zero even when both parsers are correct because
+their semantic chunk boundaries differ. Broader parent-child or intersecting
+spans must be labeled diagnostic, not exact identity parity.
