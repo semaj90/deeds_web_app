@@ -263,3 +263,10 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] CACHE-02 Prove cache hit/miss/superseded/tombstoned/expired/changed-model cases. No stale hit may skip atomic transition or evidence assertion. Valkey/BitFrost owns descriptor/key lifecycle; HyperLogLog is metrics only.
 - [ ] GNN-GPU-01 Bind GraphSAGE mean/max/LSTM CPU fixture to a frozen, independently verified Graphify ordinal map with source/workspace/graph/feature revisions and edge-evidence references. A graph neighborhood fixture is not real input lineage.
 - [ ] GNN-GPU-02 Only after explicit GPU allocation, compare NetworkX vs cuGraph for supported graph ops and PyTorch CPU vs GPU for mean/max/LSTM (when equivalent kernels exist), including tolerant scores, tie policy, effective GPU backend, conversion+transfer time and peak VRAM.
+
+## Concurrent PostgreSQL claim proof scaffold — 2026-10-08
+- [x] PG18-CONCURRENT-01 Added `python/prove_dag_concurrent_claim_v1.py` using two independent psycopg connections, a start barrier, conditional UPDATE, one-owner fencing check, injected completion/outbox rollback and final readback. Explicit disposable-DB acknowledgment required.
+- [ ] PG18-CONCURRENT-02 Execute on a **disposable** PostgreSQL 18 database with `ATLAS_DISPOSABLE_PG_DSN` set and `--ack-disposable-test-db`. This script creates and drops a private scratch schema; never point it at production.
+- [ ] PG18-CONCURRENT-03 Review isolation levels, privilege limits and lock timeouts. Add cancellation, expired lease, generation rollover, source revision supersession and worker crash simulations. Capture PostgreSQL server version, index/query plan and receipt checksums.
+- [ ] PG18-CONCURRENT-04 Confirm the scratch test's nested transaction rollback covers *both* the step state and event insertion, with no collateral schema/object mutation. Production owner still unproven until actual journal migrations/readback.
+- [ ] PG18-CONCURRENT-05 Establish an authorized TypeScript durable journal transaction adapter only after deployed schema and fencing checks pass; Python worker remains proposal-only and never writes canonical execution state directly.
