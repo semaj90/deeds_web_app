@@ -78,4 +78,41 @@ describe('Phase23 experimental browser lifecycle', () => {
     expect(events).toEqual(['generate-settled', 'disposed']);
   });
 
+  it('captures synchronous load and generation errors without unhandled state', async () => {
+    const engine = makeEngine();
+    engine.load = (() => { throw new Error('sync load'); }) as EdgeEngine['load'];
+    const h = new EdgeModelHarness(engine, identity);
+    await expect(h.load()).rejects.toThrow('sync load');
+    expect(h.status).toBe('failed');
+
+    const second = makeEngine();
+    second.generate = (() => { throw new Error('sync generate'); }) as EdgeEngine['generate'];
+    const g = new EdgeModelHarness(second, identity);
+    await g.load();
+    expect((await g.generate('hello')).error).toContain('sync generate');
+    await g.dispose();
+    expect(g.status).toBe('disposed');
+  });
+  it('rejects cancellation during model loading before accepting ready state', async () => {
+    let rejectLoad!: (reason?: unknown) => void;
+    const engine = makeEngine();
+    engine.load = (_identity, signal) => new Promise<void>((_resolve, reject) => {
+      rejectLoad = reject;
+      signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+    });
+    const h = new EdgeModelHarness(engine, identity);
+    const loading = h.load();
+    h.cancel();
+    await expect(loading).rejects.toThrow('aborted');
+    expect(h.status).toBe('failed');
+    await h.dispose();
+    expect(h.status).toBe('disposed');
+  });
+  it('runs engine disposal just once under concurrent requests', async () => {
+    const engine = makeEngine();
+    const h = new EdgeModelHarness(engine, identity);
+    await h.load();
+    await Promise.all([h.dispose(), h.dispose(), h.dispose()]);
+    expect(engine.dispose).toHaveBeenCalledTimes(1);
+  });
 });
