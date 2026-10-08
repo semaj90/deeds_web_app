@@ -59,3 +59,7 @@ Existing `phase-lane-registry.ts` already reserves Phase 23. Do not redefine
 it or promote its mock/eval-only status as a consequence of adding research
 scripts. Add links to its owner after the model manifest and source receipts
 are measured and reconciled.
+
+## Client Gemma 4 / LiteRT-LM / EmbeddingGemma 2 crosswalk
+
+See [Phase 23 Edge Gemma4 LiteRT Eval Crosswalk](phase23-edge-gemma4-litert-eval-crosswalk.md) for existing owner census, browser runtime boundaries, Gemma3-to-Gemma4 migration gates, server :8090 preservation, client IndexedDB, Eval Gym, KAG/DAG/HITS tasks, embedding-space isolation, and experimental MTP restrictions. All gates are **NOT_PROVEN** until receipts exist.
