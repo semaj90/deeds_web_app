@@ -287,3 +287,9 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [x] PG18-RECLAIM-01 Extend disposable two-session fixture with deterministic expired lease reclaim, generation 7→8, version 4→5, previous-owner rejection, wrong source-revision rejection and readback. **Added in source only; not executed.**
 - [ ] PG18-RECLAIM-02 Run actual PG18 disposable test and independently read back receipt. Distinguish competing READY claims from the new sequential reclaim scenario.
 - [ ] PG18-RECLAIM-03 Add simultaneous competing reclaim race, idempotency replay, worker-crash/cancellation and exact transactional outbox crash recovery proof before marking persistent DAG owner ready.
+
+## 2026-10-08 simultaneous lease-reclaim proof
+- [x] PG18-RACE-01 Added `python/prove_dag_reclaim_race_v1.py` using a disposable schema, PostgreSQL 18 version gate, two psycopg connections released from a barrier, conditional expired-lease update, generation fencing and source revision rejection.
+- [ ] PG18-RACE-02 Run `python python/prove_dag_reclaim_race_v1.py --ack-disposable-test-db` with existing psycopg3 and an explicitly disposable PG18 DSN. Inspect readback: exactly one qualifying claim, generation=8, old lease and old source rejected. Source only, **not executed**.
+- [ ] PG18-RACE-03 Add crash/cancellation and duplicate outbox event idempotency scenarios. Verify cleanup and capture failure receipts if Docker/test service unavailable.
+- [ ] PG18-RACE-04 Do not promote scratch proof to deployed-journal proof: check actual journal migration, lease/version fields, unique indexes, dependencies and transactional outbox before enabling OaK CAS port.
