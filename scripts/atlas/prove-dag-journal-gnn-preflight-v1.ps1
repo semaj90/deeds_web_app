@@ -26,7 +26,7 @@ function Record([string]$name,[string]$status,[string]$details) {
  $report.results += [ordered]@{name=$name;status=$status;details=$details}
 }
 function Probe([string]$name,[scriptblock]$work) {
- try { & $work; if ($LASTEXITCODE -ne 0) { throw "Exit code $LASTEXITCODE" }; Record $name 'PASS' 'Command completed' }
+ try { $global:LASTEXITCODE = 0; & $work; if ($LASTEXITCODE -ne 0) { throw "Exit code $LASTEXITCODE" }; Record $name 'PASS' 'Command completed' }
  catch { Record $name 'UNPROVEN' $_.Exception.Message }
 }
 Push-Location $RepoRoot
