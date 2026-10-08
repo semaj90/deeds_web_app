@@ -76,7 +76,29 @@ Professional pipeline lessons to reproduce:
 - [ ] P23-EDGE-03 unproven: browser `.litertlm` text generation; don't substitute Python :8070.
 - [ ] P23-EDGE-04 unproven: executor-specific tokenization and generation parity.
 - [ ] P23-EDGE-05 unproven: cancel, unload, tabs and isolation.
-- **Source finding:** `scripts/startup/dev-gpu-runtime.mjs` is referenced in documentation but returned 404 from GitHub. Locate the real `dev:gpu` script owner before backend edits. The `gemma4-e2b-session.ts` currently reports historical speed estimates; no actual generated-token measurement surfaced during this review.
+- **Correction:** the launcher lives under `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`; root-path 404 was a location error. See owner-resolution follow-up below. The `gemma4-e2b-session.ts` currently reports historical speed estimates; no actual generated-token measurement surfaced during this review.
 - **Source finding:** `sveltekit-frontend/src/routes/(app)/admin/onnx-gpu-test/+page.svelte` previously marked a model-load success with a speed claim; changed to NOT_MEASURED. The new explicit browser LiteRT and browser MTP tests SKIP/NOT_PROVEN rather than presenting successful inference.
 - **Do not** delete legacy Gemma3 models, install weights, enable auto fallback, enable browser MTP or touch Ornith :8090 or EmbeddingGemma :8081 based on this UI-only progress.
 - **Next minimum code gate:** add a browser-engine wrapper behind an explicit experimental selection, with exact pinned package version, web-compatible model manifest, verified tokenizer, abort/dispose, and a response validator that only admits measured generated tokens; expose new PASS receipt after browser execution is reproducible.
+
+## 2026-10-08 owner-resolution follow-up (source-verified)
+**Correction:** The live dev:gpu entry is `sveltekit-frontend/scripts/startup/dev-gpu-runtime.mjs`, not repository-root `scripts/startup/dev-gpu-runtime.mjs`. `sveltekit-frontend/package.json` binds `dev:gpu` to `node scripts/startup/dev-gpu-runtime.mjs`. The earlier root-path 404 is now RESOLVED; it was a path mistake, not a missing launcher.
+
+**Important implementation gaps established by reading files:**
+1. `sveltekit-frontend/src/lib/ai/onnx/gemma4-e2b-session.ts` only returns an ONNX InferenceSession; the function named `isGemma4E2BAvailable` actually attempts to load model weights. No generation/tokenization proof in that module; its published 120-255 tok/s figure is unaudited.
+2. `sveltekit-frontend/src/lib/ai/onnx/session.ts` caches sessions by URL and buffers in memory, handles WebGPU to WASM fallback, and has `invalidateGPUDevice()`; the browser cannot assume resetting a GPU device clears every cached model/promise/buffer. Add explicit per-model dispose/abort/eviction tests before promotion.
+3. `sveltekit-frontend/src/lib/ai/onnx/inference.ts` retains the Gemma3 270M ONNX inference path and tokenizer. It is an actual legacy owner, not safe for deletion based on a setup guide.
+4. `sveltekit-frontend/scripts/ensure-dev-runtime.mjs` still checks Gemma3, EmbeddingGemma 300M and local asset paths, while documenting remote Gemma4 ONNX behavior. Investigate discrepancy with the local `/gemma4_e2b_onnx/model.onnx` session path.
+5. `sveltekit-frontend/src/routes/(app)/admin/onnx-gpu-test/+page.svelte` is the real browser test route; existing tests load sessions but are not full autoregressive generation benchmarks.
+6. `scripts/litert-serve.py` implements the **Python native** FastAPI :8070 LiteRT-LM engine; it is not the browser LiteRT-LM JS backend.
+7. `scripts/launch-gemma4-mtp-canonical.ps1` targets **server** :8090 with model-specific atomic-mtp assets. Its existence doesn't establish browser MTP support, and launcher use must not replace Ornith default.
+8. Current `dev-gpu-runtime.mjs` documents **Ollama :11434 as default embedding backend** with dedicated :8081 as opt-in. Previous statements that :8081 always runs on dev:gpu were incorrect: verify the runtime selector/actual health per configuration.
+
+**Additional actionable gates**
+- [ ] P23-EDGE-01A Record exact path, owner, revision and consumer for the eight files above in a machine-checkable manifest.
+- [ ] P23-EDGE-01B Prove E2B local ONNX URL resolves, tokenizer exists and autoregressive decode works; a successful InferenceSession alone cannot PASS this.
+- [ ] P23-EDGE-01C Implement explicit model asset lifecycle audit (session promises/buffers/GPU device after unload/device lost); fail closed on retained leaks.
+- [ ] P23-EDGE-01D Reconcile `ensure-dev-runtime.mjs` with E2B session asset resolution and pin E2B vs Gemma3 fallback.
+- [ ] P23-EDGE-01E Verify deployment mode/configured embedding owner (Ollama, dedicated :8081, or DirectML) and record actual base URL/provider.
+- [ ] P23-EDGE-01F Read exact LiteRT-LM JS API against pinned package before implementing web adapter. Python `litert_lm.Engine` is not equivalent.
+- [ ] P23-EDGE-01G Collect cold/warm generated-token timings and dedicated browser memory/use, *not* model-load timings.
