@@ -15,6 +15,7 @@ import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs'
 import { classifyCurrentSourcesV1, classifyLiveDriftV1, membershipSetChecksumV1, type MembershipRowV1, type RegistryBindingV1, type SnapshotSourceV1 } from '../../sveltekit-frontend/src/lib/server/atlas/identity/current-source-authority-v1.ts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const STDOUT_ONLY = process.argv.includes('--stdout-only');
 const readJson = (rel: string) => JSON.parse(readFileSync(resolve(ROOT, rel), 'utf8'));
 const digest = (v: string | Buffer) => `sha256:${createHash('sha256').update(v).digest('hex')}`;
 
@@ -144,9 +145,11 @@ try {
   const receipt = { ...body, receiptChecksum };
   // Ownership: this audit writes ONLY current-source-authority-cohort-v1*.json. `current-source-authority-v1.json` belongs to seal-current-source-authority-v1.mjs (SEALER_OUTPUT).
   const versioned = resolve(ROOT, `docs/reports/current-source-authority-cohort-v1.${receiptChecksum.slice(7, 19)}.json`);
-  if (!existsSync(versioned)) writeFileSync(versioned, `${JSON.stringify(receipt, null, 2)}\n`);
-  writeFileSync(resolve(ROOT, 'docs/reports/current-source-authority-cohort-v1.json'), `${JSON.stringify({ ...receipt, versionedReceipt: versioned.slice(ROOT.length + 1).replaceAll('\\', '/') }, null, 2)}\n`);
-  console.log(JSON.stringify({ status, blockers, sourceCount: result.sourceCount, counts: result.counts, proof: result.proof, sourceSelectionChecksum: result.sourceSelectionChecksum, independent, registryCoverage: result.registryCoverage, liveDrift: drift ? { state: drift.driftCount === 0 ? 'NO_DRIFT' : 'DRIFT_PRESENT', exact: drift.liveExactMatch, changed: drift.changedSinceSeal, excludedNested: drift.excludedNestedRepository, unavailable: drift.unavailable, notObserved: drift.notObserved, driftCount: drift.driftCount } : null, versionedReceipt: versioned }, null, 2));
+  if (!STDOUT_ONLY) {
+    if (!existsSync(versioned)) writeFileSync(versioned, `${JSON.stringify(receipt, null, 2)}\n`);
+    writeFileSync(resolve(ROOT, 'docs/reports/current-source-authority-cohort-v1.json'), `${JSON.stringify({ ...receipt, versionedReceipt: versioned.slice(ROOT.length + 1).replaceAll('\\', '/') }, null, 2)}\n`);
+  }
+  console.log(JSON.stringify({ status, blockers, sourceCount: result.sourceCount, counts: result.counts, proof: result.proof, sourceSelectionChecksum: result.sourceSelectionChecksum, independent, registryCoverage: result.registryCoverage, liveDrift: drift ? { state: drift.driftCount === 0 ? 'NO_DRIFT' : 'DRIFT_PRESENT', exact: drift.liveExactMatch, changed: drift.changedSinceSeal, excludedNested: drift.excludedNestedRepository, unavailable: drift.unavailable, notObserved: drift.notObserved, driftCount: drift.driftCount } : null, reportWritten: !STDOUT_ONLY, versionedReceipt: STDOUT_ONLY ? null : versioned }, null, 2));
   process.exitCode = status === 'CURRENT_SOURCE_AUTHORITY_PROVEN' ? 0 : 1;
 } finally {
   await client.query('ROLLBACK');

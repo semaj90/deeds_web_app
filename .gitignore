@@ -709,6 +709,8 @@ docs/.okf/pinned/admission-envelopes-v1.json
 !CONTRIBUTING*.txt
 !python-services/phase46_adapter/requirements.txt
 !python/requirements-atlas-unified-projection.txt
+!python/requirements-atlas-grounded-nlp.txt
+!python/requirements-oak-agent.txt
 !docker/docling-vlm/requirements.txt
 !docker/image-synthesis/requirements.txt
 !sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts

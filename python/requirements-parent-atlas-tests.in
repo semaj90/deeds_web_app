@@ -1,0 +1,2 @@
+# Test runner only; does not install DSPy, GPU, or NLP runtime dependencies.
+pytest==9.1.1

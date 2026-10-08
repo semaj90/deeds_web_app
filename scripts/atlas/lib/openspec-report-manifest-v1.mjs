@@ -315,7 +315,13 @@ export function joinCurrentReceiptOutputsToReportManifestV1({
 }
 
 export function buildSupersessionLinkV1(card) {
-  if (!(card.reviewReasons ?? []).some((reason) => ['SUPERSESSION_REPLACEMENT_EVIDENCE_REQUIRED', 'SUPERSESSION_HEURISTIC_REQUIRES_REVIEW'].includes(reason))) return null;
+  const reviewReasons = card.reviewReasons ?? [];
+  const explicitDuplicateDeclaration = reviewReasons.includes('EXPLICIT_DUPLICATE_OF_DECLARATION_REQUIRES_REVIEW');
+  if (!reviewReasons.some((reason) => [
+    'SUPERSESSION_REPLACEMENT_EVIDENCE_REQUIRED',
+    'SUPERSESSION_HEURISTIC_REQUIRES_REVIEW',
+    'EXPLICIT_DUPLICATE_OF_DECLARATION_REQUIRES_REVIEW',
+  ].includes(reason))) return null;
   if (!card.stableKey || !card.taskRevision || !card.sourceFileRevision || !card.sourcePath
     || !Number.isSafeInteger(card.sourceLine) || card.sourceLine < 1) {
     throw new Error('SUPERSESSION_CANDIDATE_SOURCE_BINDING_REQUIRED');
@@ -329,7 +335,9 @@ export function buildSupersessionLinkV1(card) {
     successorTaskKey: null,
     successorRevision: null,
     relation: 'SUPERSESSION_REVIEW_CANDIDATE',
-    reason: 'Supersession candidate only; no exact successor link or reviewed revision-bound receipt is bound.',
+    reason: explicitDuplicateDeclaration
+      ? 'Explicit DUPLICATE_OF declaration requires human direction/replacement-evidence review; this is not a confirmed supersession.'
+      : 'Supersession candidate only; no exact successor link or reviewed revision-bound receipt is bound.',
     reviewState: 'REVIEW_REQUIRED',
     confirmed: false,
     retrievalSuppressed: false,

@@ -5,6 +5,7 @@ import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildTaskTriageCorpusV1 } from './lib/openspec-report-manifest-v1.mjs';
+import { loadTaskCardCorpusV1 } from './lib/openspec-task-card-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const taskCardsPath = resolve(root, 'docs/reports/openspec-task-cards-v1.json');
@@ -52,7 +53,7 @@ function main() {
   const head = getHead();
   const taskCardInput = repoPath(args.taskCards ?? relative(root, taskCardsPath));
   const reportManifestInput = repoPath(args.reportManifests ?? relative(root, reportManifestsPath));
-  const taskCardCorpus = JSON.parse(readFileSync(taskCardInput, 'utf8'));
+  const taskCardCorpus = loadTaskCardCorpusV1(taskCardInput);
   const reportManifestCorpus = JSON.parse(readFileSync(reportManifestInput, 'utf8'));
   verifyTaskFileHashes(taskCardCorpus.source?.taskFileHashes);
   let reviewedSupersessionLinks = [];

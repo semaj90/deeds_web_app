@@ -365,6 +365,7 @@ export type PreAgentStageV1 =
   | 'CACHE_LOOKUP'
   | 'LEXICAL'
   | 'AST'
+  | 'AST_STRUCTURAL_REFINE'
   | 'MEMORY_PRIOR'
   | 'SEMANTIC_ROUTE'
   | 'GRAPH_EXPANSION'
@@ -389,6 +390,8 @@ export function selectPreAgentStages(analysis: QueryAnalysisV1): PreAgentStagePl
   if (symbolQuery || lanes.has('symbol')) {
     stages.push('AST');
     reasons.AST = 'symbol lane selected';
+    stages.push('AST_STRUCTURAL_REFINE');
+    reasons.AST_STRUCTURAL_REFINE = 'refine lexical file candidates with revision-bound ast-grep declarations';
   }
   if (analysis.uncertainty >= 0.5) {
     stages.push('MEMORY_PRIOR');

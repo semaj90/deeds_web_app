@@ -5328,3 +5328,12 @@ persistent memories until SPINE-04 yields a joined, verified outcome corpus.
 Current score remains **0/5 (0% end-to-end proven)**. No code/runtime/data changes are claimed by
 this task-list update; the pre-existing component evidence above remains bounded to its own tests,
 receipts, and recorded dates.
+## 2026-10-07 — External-document HyperGraphRAG execution and alignment gates
+
+- [ ] **HGR-DOC-FABRIC-01** Reuse `python/atlas_external_docs.py` BeautifulSoup/Firecrawl acquisition and its exact UTF-8 `ChunkRecord` spans; do not add a second crawler or direct Neo4j/Qdrant writer.
+- [ ] **HGR-DOC-FABRIC-02** Exercise the external-chunk → grounded-fact bridge → `HypergraphFactProposalV1` fixture. Preserve source/workspace/producer revisions, exact byte span and checksum, role-bearing participants, `graphRevision=null`, proposal-only status, and zero writes.
+- [ ] **HGR-DOC-FABRIC-03** Build request-local incidence only from validated fixture proposals; independently verify role/ordinal/checksum preservation. Incidence remains a compute artifact, not admitted Hyperedge truth.
+- [ ] **HGR-DOC-FABRIC-04** Reuse the existing NetworkX graph-analysis owner as the CPU oracle for bounded PageRank/CheiRank/expansion; bind inputs and outputs to one immutable fixture artifact and graph revision (or explicit unavailable reason).
+- [ ] **HGR-DOC-FABRIC-05** Keep Neo4j as a rebuildable projection/storage adapter. Do not delete the adapter or treat its CRUD/degree/edge operations as n-ary fact admission, identity, or graph-revision authority.
+- [ ] **HGR-DOC-FABRIC-06** Keep ACE/ContextManifest and BitFrost/Valkey as downstream projections/residency only; proposals cannot enter canonical context or cache as admitted evidence.
+- [ ] **HGR-DOC-FABRIC-07** Add a root fixture runner and independent readback receipt for the complete no-write path; mark each stage separately as implemented, fixture-proven, or runtime-proven.

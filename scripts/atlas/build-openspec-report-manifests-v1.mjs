@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { computeOpenSpecWorkspaceRevisionV1, verifyEvidenceReceiptV1 } from './audit-openspec-evidence-fabric-v1.mjs';
 import { buildReportArtifactManifestV1, buildReportManifestCorpusV1, joinCurrentReceiptOutputsToReportManifestV1 } from './lib/openspec-report-manifest-v1.mjs';
+import { loadTaskCardCorpusV1 } from './lib/openspec-task-card-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const previousManifestPath = resolve(root, 'docs/reports/openspec-evidence-disposition-v1.json');
@@ -102,7 +103,7 @@ async function hashFile(path) {
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const headAtStart = getHead();
-  const taskCardCorpus = JSON.parse(readFileSync(repoPath(args.taskCards ?? relative(root, defaultTaskCards)), 'utf8'));
+  const taskCardCorpus = loadTaskCardCorpusV1(repoPath(args.taskCards ?? relative(root, defaultTaskCards)));
   verifyTaskCardCorpus(taskCardCorpus, headAtStart);
   const previousAudit = existsSync(previousManifestPath) ? JSON.parse(readFileSync(previousManifestPath, 'utf8')) : null;
   const previousByPath = new Map((previousAudit?.files ?? []).map((item) => [item.path, item]));

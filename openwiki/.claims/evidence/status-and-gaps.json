@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:5f0ba9a380ccb0b5b776b0682726f5eba9c20fe180f8a65fdd355dd75e1c0526",
+  "claims": [
+    {
+      "id": "claim_7dee39dc76894f1488ad0358dba39187",
+      "statement": "[proven] PostgreSQL `atlas_packets` is modeled as the canonical packet identity spine, carrying packet identity, source provenance, workspace/source revisions, representation revisions, and downstream mirror references.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L102-L137",
+          "version": "repo-lines-v1:sha256:586603ae01214e9e140b0af4e42c5349f4113df1a45d4eab2357a5c7bd502cc8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYjg5YzBjNjljOWZhMTFhZWZhNmQ4OWU2YzZjNDk2MjcxYjU0ZGNjZmU4ZTk2NzE2YjRjYjQzZmZlM2VhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNjdiY2NjZjI4ZDUzMjc3YjAyYjdlMTdmZWZhZjQyYzg3ZTQ3ODc1MzFkZWQ3YjY3Zjc1NmE3ZTI2NzgyMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMTM0OWU5MGE2MWE5OGY0ODBkNmEyZWQ5NzMwNjY3N2IzYTFmZjNiOWE1ZWM0MDZjMjc5YTg0ZWFkNTIwZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNWQ4Y2RkNzI5MjE5NTBhZDQ1YTVkMWE3NzE3ZWFmN2Y5MGZhYmJhZDAyM2RiMjYzY2ViZTZkNmFjOGVkMGQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L44",
+          "version": "repo-lines-v1:sha256:7eebf041f0c1584b9161401ccc24ec78538479f97c05ef92cdebd7ab15574ae1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNWE5MThjNDIyYTQ4ZTJlYmY3YjQ1OWE4NDY3NjE0OWIzMGYyYWViOGE5ZTgwODk5NDFiZmY5NWZmYTI1NmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNDZhOGRjYTg2NmFhMjJmYjk3MTFlMzI4YmFlNWNlNjE0MWNkN2RmMmJhZWY4MTJlZWViMWQ2NmFkN2FhMjQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L74-L76",
+          "version": "repo-lines-v1:sha256:d476757b4c293cebf4e0e841795f9638fd5d67fed82059a374cf594508a882b9:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjg4OTViNTc5NmFlMDlkMTNlMmY2NjY2MDcxMWUwMTVmZTJkNTc4ZDkxZDE2M2ZkNDNiMmFhMTFmNDkzZWE2OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGNiMGE3ZGZjN2RiYTYxM2M5ZGVmMjc1Njc5ZjZjOWFjM2FmMmEwOTZmOGJhZWI5YzFkYTZhOGIxMDViODFiMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU2NmFhNzk0MmM1NTQ1YjkyNzQyZmM4ZWM2Zjc2ODEwZDFjOTExNWY1YjY2ZTZkOTY4YjMyYWIzMTY0MTIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2YxZmRiZWFhYzhhMzdjYmUzYjA1YTJmOTZhNzg3MzM3ODQ4MmE1YjhmNTEwYjc2ZmM1YmNhMzJiZWY3OTA5MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_15063133e7454b3f912be3fd7dcda636",
+      "statement": "[proven] The canonical packet bridge validates the packet triple of `packet_key`, `source_ref`, and `feature_id`, and reports mismatches instead of silently merging inconsistent identities.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas/src/core/canonical-packet-bridge.ts#L29-L55",
+          "version": "repo-lines-v1:sha256:c895c593f7a250c3d3b7267d615f3acfcb8b850357df48ff496a2a40386bc43b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwNjE2MDhlM2Q0MzFlYTVmNzllYzJmMGQ0ZGU4ZTAxOWU5MGM2ZTM3MjEwMjlhMzk0Yjk0ZWE0YzA1Y2U0MGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzYzBjYmRiNGQyYzIzZTk2OTFkOTc2NTY2ZWI1YTg3NWU4Y2U1MzNlNDM2NDQyN2Q4ZGYyZTc4ZWMzNzZiNzUifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas/src/core/canonical-packet-bridge.ts#L57-L86",
+          "version": "repo-lines-v1:sha256:279ee90e2cef8fda0d4f078bd84386364842db250e33cd14500842daf10e8016:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMDAyYjUyNGM1ZWJiMzhmYWVlNTBkNDRiYmM4YTU3NTU2NDM3YTYwZDY4MjZlMGUzM2U4Y2MxNzg4ODhiZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2MzYzYjkzODlkNGM2OTQ1NTU2YjdjMGU0Y2YxNjljN2ZhYjFlZGU5OTNlZmJlMTZlMjNiZGM5ZTExY2NhODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ce9468c4fade40e3982c170ab181781f",
+      "statement": "[proven] The September 2026 read-only parity snapshots report 61,718 packet rows and 61,718 registry rows, with zero missing registry rows, orphan registry rows, or duplicate registry keys.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/atlas-packet-registry-gap-ws1.4.json#L204-L219",
+          "version": "repo-lines-v1:sha256:2a46b9d2f7b4fb9eab6870b06768cd7f02ce54ae65c81b9ac6927fc7f961c265:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzYTYwYTFmZWM2NDFjNmMxNmY3ZGJmOTFhYzlkNTU2MTAxOTBiOTMzODQyYjg0OGMwMmNkZTVjMzI5NzdmM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2YWQ3NDEwMjljNjQyZjUwMjgzMTIzZmUzYjAxMDE5NWM4ZGM1MTM4ZGZjYWZiZDZlZWYwN2E2OGE1N2FiNjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE3ZjYyYjNkNzVkZjdiNmM0MDlhYTc5ZjYyZjQzMDcxMWJkZjgyNzJlY2Q0NzNlZTc4MTM0ZTcwNTAxOWE0MjcifQ"
+        },
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L8-L16",
+          "version": "repo-lines-v1:sha256:239e75e47d12bb71d9997b5950519bbfa3779f411deff2bfa31912ea45275578:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDNlZGE1YzZjMTA0YjcxOWNkZmI0MmMzYTUxNWZiMjI1NGFiNDU4NjE4OGQ3NzI1ZjdiMGNkODEzNWNjOTE2NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWNiMWI5ZTdiMDQxMGMxZWZiN2VmZTEwYmQzNWRiNzM3N2Q2OGFiNmZkNmY5N2RiMjk2MjIwMWQwNmU5ODExZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzg5MjA0ZjU0NTcwNGI2ODE2OTMzMmJkMmJkNzdmNDdmODE4ODM2Yjg2YWRiMzMyOWEwNDY4ZDhlNjI4ZDdlNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmEyMmYzZjMwMzIzMDQ2ODQyOTA3MzgwMDljMmMyMGQyZmY1ZjRjNTNmN2I1YWEzZjMwYzlhMjg4YWEwZjU5OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f2dbe151afb0495ab314f7809b12b629",
+      "statement": "[blocked] Packet-registry identity ownership is not safe to promote because the ownership report finds four runtime canonical-writer candidates, two production-capable unowned writers, and no explicit owners for packet-key, source-revision, workspace-revision, or conflict policy.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L17-L45",
+          "version": "repo-lines-v1:sha256:3b450ecd95e54fce9cd95c3f1a1378b68a3635fa316d51932972542d4eaaf59d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhYjVlZTNhMjc5MmU1OTFiOGMyZDFmNWMyOWIzN2E0ODUyNjgwMThkYTNhOGQ2MmU5MWI4Y2UwYjgxMTc5YTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjYjU4NzEzOWRlNzAzZmE2YWQ4NmI4MmY1ZGE3YzM1NDUwZGY4NWYyM2UyZDFhMzI2MWZkNjU4NWY0OWQ0YjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmOTYzYTc4NjZlOTZjYWY1OWI5OTEyOWFlMzZkMzY4YjYwMzcxMzBlODUzMmNjYjVhOWY2NDk3MjBlMWNhNTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fdee8565712b4c69b37c10f71b4345bf",
+      "statement": "[unknown] The repository does not resolve which registry schema is the live operational owner: `atlas_packets` is documented as canonical, an older `atlas_packet_registry` schema comment claims canonical truth for all packet state, and the OpenSpec/report model treats the registry as a projection.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/packet-registry-writer-ownership-v1.json#L15-L16",
+          "version": "repo-lines-v1:sha256:6e3b282187daaa7332626751ed74e1dd8740da4e2dfdbaaf0523e40ce2fc1079:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmMwNTUxMDZiOThjOWRlYzY5YTBjNmY2NzkxMzEwMGY0Y2E4ZjNiMmY5NDIzNGQ4ZGZiMGVmNWQxY2EzNzg0MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWNiMWI5ZTdiMDQxMGMxZWZiN2VmZTEwYmQzNWRiNzM3N2Q2OGFiNmZkNmY5N2RiMjk2MjIwMWQwNmU5ODExZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTU3OWM1MzFiZWZlMzJmMTJhNGVjMjRlZDI4YzVlZDEzM2UyNmQ3MmE5NzhlNDNmM2JmNDQ3YmE3NDY1YTgyNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmEyMmYzZjMwMzIzMDQ2ODQyOTA3MzgwMDljMmMyMGQyZmY1ZjRjNTNmN2I1YWEzZjMwYzlhMjg4YWEwZjU5OCJ9"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L37-L47",
+          "version": "repo-lines-v1:sha256:5f7f734b036901bfad3054f90af67ca97e84fc8809ddeecca7d283002938d429:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjZjYyZmJiZGRiZDM1OTQ1NDk3MDg3NzZlNWExMGMyNWY2OWM4NTIyYmRiNTkzYmVhOTVjMzY4Zjg0ZTJhZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5MTI3ZTg3MDJiOTFlNTFiMTYzODVjNThiNzA3NDk4OThlMWEzMjY4ZjhmOTZkMGNhYmJhZWJjNDA0M2MzMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNGI0YTEwZGQ3ZWM3MTAwZDA0YjE1NDgyNDE0OGFlMjRlMGNhZTAxZWRiZGU1NzFjNTQyYzM1NDMwNGM5MTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZDgwYzY5NGM0MmJlMDgwNmYxYzQyYjQ1YWFjNGZiYzZhNzYxMjc5M2NlMWU5MjE2ZTc2YjI5YWJiZDgxNzcifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema-atlas-registry.ts#L1-L6",
+          "version": "repo-lines-v1:sha256:c52076ece2646a6405273e8d706cd749d4f6fc063214bd9987da44837549abc5:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmFlNDZlNGNmYWFmMGRlNzhhYzQ3ZWJmMjc2NTBmZDg1OGQ2NmIzNGUxNWM2YjNiM2ZlMzMxMTdmMDJhODg3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcyYTQyOTM4MmIyZTE0NzE4ZTBlMzdiMDU3MGE4YTE3MDI5OTFmY2Q4NDk4Y2Q4NDA2MGE4YmY0ZjA1MDE3YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODEwYmU2MDZhYWQ1NTIwODRiMmUwNTljYjUzMGU5MWIwZDJlYWI2YzU5ZjE3ZTQ4NzIxNTYwMWQwY2ViYTI4YSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L44",
+          "version": "repo-lines-v1:sha256:7eebf041f0c1584b9161401ccc24ec78538479f97c05ef92cdebd7ab15574ae1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNWE5MThjNDIyYTQ4ZTJlYmY3YjQ1OWE4NDY3NjE0OWIzMGYyYWViOGE5ZTgwODk5NDFiZmY5NWZmYTI1NmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNDZhOGRjYTg2NmFhMjJmYjk3MTFlMzI4YmFlNWNlNjE0MWNkN2RmMmJhZWY4MTJlZWViMWQ2NmFkN2FhMjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_565a427cf33341bdb02dedb81a87e256",
+      "statement": "[proposed] The additive registry projection schema is intended to reference `atlas_packets` and store lane, owner, representation/model/index revisions, checksum, and projection-only write policy without altering canonical packet identity.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts#L5-L30",
+          "version": "repo-lines-v1:sha256:e03ddd7e665134eef207c68292740d801730cf541125e05373ccdd8d6bb3dd07:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1N2RlMzRlNTNhZjIxNzMxZDRmNGIzOTA0NDBhZjk2NGIxNTM2MTFiZGYwYjI4ZjQ1ZDMwZjA5YmQ3YmY3MzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxZmNjMGUyZDI5MDJlYjIyYTdjMGM2YTZhOTQ4MjNmZjFjMWIwZTU3Y2RkM2RiM2VlMTVjMzNhOTM3ZWM0MTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5ZTIyNjRhMWJkYjgyZmRmZGJkOGMyM2JjYzdiMDAyMDRiZjNiNjE4YzZiYjVjZjE2NGNjYjAwZTE4NWJkY2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d5901f871bbd40079f8919006052cbdc",
+      "statement": "[blocked] Packet-registry backfills must not be treated as routine repair: the read-only gap report says no writes were performed, marks the state unsafe to backfill, and classifies several writer paths as requiring review.",
+      "evidence": [
+        {
+          "resource": "repo://docs/reports/atlas-packet-registry-gap-ws1.4.json#L1-L7",
+          "version": "repo-lines-v1:sha256:fb34aff2f03c39775de324c40a39a48e19b798049ed52b981256c6fc19f06750:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZmYjA4ZmRhMWFjYjk1N2I2MTE2YmQzNzgxMWExZmU0MWEwMTYxMWMwNjMxZWRiZjc4NmQ2ODg5YTI3YTU1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWYyOTY2YmM2NDUwOGNmZDZkZDEzZWNkOGFmMmE1Mzc3MTI2NjA3YWQ1ZDM3ZTc4MTNhZGQzODQyOTk4ZDRhOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjg3NzkxODhhNjU5MTk2ZWNhOWE3ZGI3N2NkMmMyYjIyMzU5NjMxNDU2YzA3ZTJlNjMwZWZlOWU3NzYxZDRjYiJ9"
+        },
+        {
+          "resource": "repo://docs/reports/atlas-packet-registry-gap-ws1.4.json#L221-L314",
+          "version": "repo-lines-v1:sha256:8f4f17bfcd311ab2d5903b59eb2e8a23c278fe9f5d738259b4849be273008406:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5Y2ViOTFmNjczZjdjMjIxZGZmMGY0NzBkYTBmNDA1OTY5NzM0ZWRjMWE0NTkxNWQxN2IwNmM3NDA3MDQwZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwZGFmNjIyMWEyNWZjOTgxZmMxZWQ2NTc2MjczZjBiYWJkNzgyNzI2M2Y4ZGJhNjk5YTUwYmFkMDcyZjBjZTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwNWQzZDJjZGExOTk1OTAwY2EwMWM4MDFjOWZmNGY2YWQ0YTYxNjI1YjM3MmVhOGEyNzlmNTVjZDMwMjczNWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NGNiYjAwZWQxMjFjMTZiNTA1ZDhiYTFlMTk1Yzg1MTUyMmEwMjJjNjJlNmNkZTk5YzMzNzE0NWQ2ZjJlMjUifQ"
+        },
+        {
+          "resource": "repo://docs/reports/atlas-packet-registry-gap-ws1.4.json#L317-L325",
+          "version": "repo-lines-v1:sha256:c18d6d64de3f646ff1a425889ca7dc06d7eea6772ab58fed6befe76f914cd0c9:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDk2NDVmZDQxNWMyYzc2MWJiNjIxMGY0MjU4YjVkYjVkNzA3NmFkZDY5YTdmZGEyZjI3MDJjNmE4MTkwOTJmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk3YWZkZTc1YTYwMGU5ZDg1NTZmZGJhMTIxMDYzMDdiZjJkMTgzNTZmYzcyMWVkOTc1YTcwMmY5NmYzNDc5ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzhlM2U1OTI3OTU2MjdkOTA2MGExYWUwNDMxZjQxM2MxOWYyYzFhNWU1MzdlMDAwYmQ5NmZlYTkyMTVhYmZmZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_0c83a22267304565aa909d642dc7af2c",
+      "statement": "[experimental] The evaluation framework and weak labels are implemented, but Gate 1 remains open pending per-query diversity audit, immutable dataset freeze, query-level splits, baseline metrics, and reproducible evaluation-run metadata.",
+      "evidence": [
+        {
+          "resource": "repo://PROJECT-STATUS-CORRECTED.md#L18-L28",
+          "version": "repo-lines-v1:sha256:64270a45fe4527723fce12b48ee8fed54b5d933c2b7b47ef3365f2af0212497f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFkMTNjNWEwOGVmMTUwODUzZThhOGRhMTFjMTc0NmExNzU4MjM0M2FlZTQ1N2QxOTNlOGIzNTJiNTdkMDdjNTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyYTMyNDU4MTBlZjBiNWFhZmJiMjZjNWM0NmM2MTcyMTlhMzU5ZDU5NDcyM2VjOTY5OTNmYzQ2M2UyYzFkNzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkNzBkZjhiNmIwNDFiMzM0YTJjZThjNTYyZGY0NDMxYTE4ZmJkZGNlYWUwNGVlNmRiODQ5NTFlNTA5NDgxYWEifQ"
+        },
+        {
+          "resource": "repo://PROJECT-STATUS-CORRECTED.md#L69-L82",
+          "version": "repo-lines-v1:sha256:8cb10b572b492ec8f2332cd2f5caa734e3fc6ea77365509c84bf914f396093be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjNDBkNjQ0MzhlMDBhNjZjNWMyOTU3ODYzYjczZDViMzMwYmIzMmJjNGNlZmFiZjI1OGU5MGE1NjM0MzIwNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1MWJkNWYwMTczZDc5YzM1YzBjYTE2Zjg4NTYwM2YyZmRjMzc4NWViZWUyNGI4Y2FjZDE2NmJiNWY4OTNkMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhNTMyZmY2N2UxOTQxZTEzYjk1MDVmMzY1MmU0YjQ0ZWZhZTc3NmExODhlNGI3Yjg1NmVhNzllM2FmYTgyZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c683519e41ff4265a13c6932ce1618fd",
+      "statement": "[proven] The documented architecture separates PostgreSQL packet truth from Qdrant, Redis/Valkey, Neo4j, and DuckDB mirror or analytics layers, with incomplete or planned coverage recorded separately.",
+      "evidence": [
+        {
+          "resource": "repo://docs/VERIFIED-VS-PLANNED-ARCHITECTURE.md#L57-L118",
+          "version": "repo-lines-v1:sha256:dce2b703c3af57b1060faf641a2cc529f5c1714ec05db59f567f2049890b5622:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzY2E3Njk1NDYyMWMxNzA1MmRiMTBmZTAzNDQ5YzBmYTQwNDNjZTAxNDQxNzhjMmRhOWJlZjFkMGNmZDFhMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmYmQ1MGVlNGJjMmRlNWM4NTk5ZDVhM2VhYTdiMDhkMzkxOGU2NDkwZTFkODY2NTBmZGE5OWMwNzIwMzJiYjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://docs/VERIFIED-VS-PLANNED-ARCHITECTURE.md#L8-L24",
+          "version": "repo-lines-v1:sha256:531af848b15da5a26ecfd34c2f98a7da83f827d98ad7c5cad5a7048bfef77733:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NjNjMmFhMTQzZTYyZTU2YjgxOGM5Njc4OWZjZmMzYjZhY2M3ZDIyODgxYzVkYTk3YzBlNTU4M2ZlMWFhYjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4Y2NlYWQ4ZDc1MjBmNGMxY2I0MDAxZTlkMGVmOTkwZjYzZjk2ZWY0MTlmMWU4YzFhYTU3MDE4OTU5NzljZDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllODE3MjQxZjY1ZjYxM2IzMDliMTAxYWNjNjQ5NzA1NTgxMGNlYTA4YWRiYWFjOWZjZDgyMDlkYzcxMjEzMGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2a19f49e2fe442e585b739ff28fa4506",
+      "statement": "[experimental] The proposed lane model requires logical-lane identity, revisioned descriptors, SearchRuntime-owned fusion and deduplication, and explicit unavailable receipts for optional GPU outages rather than granting mirrors authority.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L49-L57",
+          "version": "repo-lines-v1:sha256:83189996643a9a778e422eb65471b88d3ca5331466e2d49ad79db46a9f063eef:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNTllMmNjMjU1MDg0ZTQ1ODA0ODJjNmJiNmEyMWVkNzlmZmNhMzM4ZDZmNGEyZjBjNTQ3Njc4MWIzNjg3MGY2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzJlMjg0MzNhNGMyMzU4YzIzMmQzMDI0ZmRmNzE0OWYxYjc5YjE0NGUyZWY4OWZjOWQzMDYxMDg4NGUyOTAzOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjhkNjNjY2E3ZjM4NzRjMzBhYTY4ODIwNGRlZTM1NWNhZGVkMWEzMDFhYzQ4MzZhMTk2ZTNiOTA1OWVkZjZhMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzM2NjcwOWQ2NDQ0ODI4MWExMTdhZGFkY2VhYjIyMjFhYzE3MTFlNDM4YWVkMTM4ZTJhZjI0ZmJiNGJmMDI4MiJ9"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L68-L79",
+          "version": "repo-lines-v1:sha256:6df736b1bf05d7436cffef0c9f91f56fbadd6ccfe304a741914dbbef1dec4b17:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNzc1Yzg0NGZmZmFjNTYzZTg1ODc3MjZjODE3NmViZWU2YTYzNWQ0MWI0NDkyNWFkZWY3YTcyNTQ4NmZkZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NWIwZTM0NzY3NmM3YjMxYzEwY2VhZjg0MGYzMTg5NTI1ZGFkYTdmM2U4NTEyYTc2OWRlY2Q5NDM3ZWQ4NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3YzZkOThmZjY1NjNjOGI0NGQ2NjQ1NmYwYmFjYTJiNzg4MzA5NDM2MjQxNTIyNGYyNDkzNTk4OTJmMzYzYWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5Mjc1NGE4ODk4ZTkyNGM2ZjY3ZDg0NzVkMzZiOWExMzNkODQ2NzdiOGNhOTNlNDg5MDQzNGFiYWYwZDQyM2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f535671b63e14ce18af3f97271900bb0",
+      "statement": "[blocked] Planned retrieval backfills require report-backed verification and explicit coverage or count gates before they can be treated as complete.",
+      "evidence": [
+        {
+          "resource": "repo://docs/VERIFIED-VS-PLANNED-ARCHITECTURE.md#L200-L229",
+          "version": "repo-lines-v1:sha256:d91078eff9e7205a9f1e686ebd9469415c329c6bc3b7cd9eba49830da834067d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzNjJmZTBmOGM0NWM4OGU3ODJiM2JmYTVkZDQxYmZlNzc5ZWExNDM0MmViZTRiMGQ0YzRmMzk3MDMyNjk2ZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZDczYWQ3MzIyYzA2N2ZlZjRhOThmMDliMWRiOGZiNmUxNjAzMmU1ZTFmZjIyNzZhZGNiODU0YzAxOWI0NDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5Mzk5YjZkYzA0ZWI1YzMzNzZhYjNmNjFmMThiNGM1ZTJmNzAxNzdiNTQ4MjkyNzVhZWE4OWMyYjQzMWMwMzQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

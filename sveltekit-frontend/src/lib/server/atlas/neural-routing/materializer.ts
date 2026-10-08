@@ -55,7 +55,7 @@ export function buildCandidateFeatureMatrix(
     }));
 
   const payload = {
-    schemaVersion: 'atlas.candidate-feature-matrix.v1' as const,
+    schemaVersion: 'atlas.tool-routing-feature-matrix.v1' as const,
     featureNames: [...ROUTING_FEATURE_NAMES],
     rows,
   };

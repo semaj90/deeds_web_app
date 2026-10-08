@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:db67379560850d3f4584421a740e1bc47f6ea8f7181d6cb945a6e86c89823c76",
+  "claims": [
+    {
+      "id": "claim_c551ba1d8307402ca68091b271ccc3ee",
+      "statement": "PostgreSQL is the canonical owner of Parent Atlas packet identity, while Qdrant, Neo4j, Redis, and CouchDB are mirrors or projections that must preserve the identity chain.",
+      "evidence": [
+        {
+          "resource": "repo://docs/CANONICAL-ARCHITECTURE-CONTRACT.md#L9-L80",
+          "version": "repo-lines-v1:sha256:0352dbfb3a9d13cbe8fec9014c0ab3288644328e6049da5848680cf864aad908:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViZDA3ZjNiYTc2M2MxOWFlMzllNDk0OTM0NmI5OGQ5NTE0MWU0OTQ1OWQ3YTI3MDQyMzFkY2IyODVmNDRlODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiYWY1NWJiYmI3Njc3YWMxOWYxOTBkZDQ2ZmJlZDY4MDUzNmYyMGQ3MDFmYTA5ZTg2NTMwZTAxMDk4NGExOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-core/src/index.ts#L18-L34",
+          "version": "repo-lines-v1:sha256:f3af666c049c3d127565ad80af7c8abaf9cbf0e4cb4dc001169cefdda4302100:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmI4ZmMzYzYxZjlmMDAwZTUwOGMyZmQxMTM4ZmUwYzQ5ZmFiMTcxMTI3N2Y5NTQyOGQ2ZDM5ZTBkNDFmNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYzQ5ZGYzMTJlOWI4ZDgwYTRkODRiZjZmYTU0ODJjM2I3MThmODgxOGU4OWU2OTg4ZjRmNTcwNDk3N2JmNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3NDAxODkxNzFmN2ZiYTE0Mjc0ODNmM2JmOTc4ODJkNWFmMTFiMTk4NWUzOWE5YTI5NzVjNTI0NzcxNmFlYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYTljOThlM2M3Nzk2YjFjZWQxNjQ0YzI5YmZiYWZlYWQ4MmJhZDg0NDZkN2RlMGFjM2VjODc4ODNmMjdkN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3bfe5306a56542d4a1e37c6e1125b2c1",
+      "statement": "The SvelteKit Atlas server boundary exports runtime context and FSM policy, retrieval/tool adapters, Go retrieval functions, packet-consumer functions, ranking feature construction, and Kanban operations; it is an application orchestration boundary rather than the canonical packet store.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/atlas-index.ts#L1-L76",
+          "version": "repo-lines-v1:sha256:26c91662c2722fda976a751ffd6b79d5a690eabb0da743d65b4de872afec05f4:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjNTYyMWE2ZWIyYzFjMDc1YzU4ODc2MGQxY2U1M2JiOTBiZGRiYWQwYzZmNDE1ZjM2MGI0MmRjMzU2MDZjYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3ODBmZmFlODc4MWM0MjhiNThhMTg1YTQ1NmM1NzI3MGQzYWJjYzkyMmI1NzEzODZlMmYzNDMzMzc5MmM1OTQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/atlas-index.ts#L86-L124",
+          "version": "repo-lines-v1:sha256:db98c5ba0567feb6ff24e4441e6de52e93b5fef2eadca1dd6da8f3c93ef41573:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExNzQ0MjkwOTg3MDNlNjM0Y2M2NjRlNDk3NWQxNGFjNDkxMjc0OWU1MTYyNGFiMWEzNTNiZTI0NzNmOWMxMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhNGZkMjdkOGY2YjgxNDJiYmUwNjEyMGY5MDgwNGYwMWYzYWE2YjEyMjljMWE1OWMyMWJhZmI1NzRmZWZiN2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzMzdiNDkxNjQ4MjFhOWExN2I4ZjRkYTEzNmZiZWY1ZTk0ODEyYmQ4ZWQxYWI5ZWZiNWQ2NDk0NjJjYTFhZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhNjNlYjcxMDBmODcwYjFkNGZhYjZlOWQxZTQxNGQ3NWJlM2ExM2VhZTY0ZjJhZWNlZDlkYzI1MGU5MWZjMWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c4b1a775779c4c2d8a194c40772f033b",
+      "statement": "@deeds/parent-atlas-core defines retrieval contracts, policies, identity-chain types, lineage verification, context types, and provenance without owning retrieval infrastructure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-core/package.json#L30-L41",
+          "version": "repo-lines-v1:sha256:0c05fbfc348f04877d8bc9c9f9ac389dd89610b403c3928a612028b48fbb2086:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzMmIwZjZkZTU4ZTNhNGM3OGY2Y2QxYzgwMjZlOThlMTNhMTJiNzA0ZDI1ZWFhZDZlZGQyMDI2OGFhZDkzMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwODQ1NmNjNmJkMmJjNTdmNmY1Mjk4NmFlNzdhMTZiMGJlY2RlNzRmZjBiNGRkMjIzN2ZhZmRhOWEwMGRjMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmNzM5YTA2YzFjYmIxMjQ0ZTMzNjNkMzhiY2Y5ZmE1MGNlODRmZWQzOTljMjE5M2EzYzdmMDhkNTk5MThiMmEifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-core/src/index.ts#L18-L79",
+          "version": "repo-lines-v1:sha256:148ffbf998f4618c34473d94c8d7e4656a37db35deee71dc755df57e1637c558:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmI4ZmMzYzYxZjlmMDAwZTUwOGMyZmQxMTM4ZmUwYzQ5ZmFiMTcxMTI3N2Y5NTQyOGQ2ZDM5ZTBkNDFmNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3NDAxODkxNzFmN2ZiYTE0Mjc0ODNmM2JmOTc4ODJkNWFmMTFiMTk4NWUzOWE5YTI5NzVjNTI0NzcxNmFlYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzZDBiODY2YmUxZTM4NzkzNTkzYjA5NDNjODI0Y2JkNThiNWEzMTUzMGRjMTFkMjg4MzJjMmJiZDNmMTI3NjUifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-core/src/index.ts#L2-L16",
+          "version": "repo-lines-v1:sha256:12024e5c060379fe2e531ed67d0e2383198d73202fa5d2d7354f0de56e516c6a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1NWEyMjNkMjhlODUxZGEyMTdhNTE4ZTVmZjY5Mjg0YmU0YTliYjcyZGU2MzA2ZGFiNDMwNzlmZTU4NWEzYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDNkMzE3OTAwNTNmNjNiNTg0OGJhNDI5ZDMyMjgzNWM2ZDJmNTRmNWIyYTgwNzcyYTFhNmRjYzYyMjliODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYTlhYzVhOTI2MDBiOWMxN2ZkN2RlZjBkY2U5ZmVhZDI3OGQ1OTc3YTg2Nzk4NTdlNjFmYmEyZTY4OTJjNjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d003586f729b4fe4bd894bf6fe3890a7",
+      "statement": "ParentAtlasRetrievalFacade executes policy selection, PostgreSQL recall, the Qdrant lane, canonical identity resolution before RRF fusion, bounded graph and rerank stages, source validation, context assembly, and a stage trace.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L52-L63",
+          "version": "repo-lines-v1:sha256:f96197b2486ae68421e03a79f0afaf6737ad5ab7cbc3874ff78cf88ae29141d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlM2Q4MTA1NzJhYmM5ZWIzNDA4Y2E4ODZhNzI4NTcxMjNhYWRiYTRkYzZlMTVkNzM2OGNlZWI3N2Y0NDlmZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVlNGNmZmYxNWRkNGNlMDA0MmRiODJlM2YzMGNlZjcxYmMwMDM0NzE4NDI4YzM4ZDI0YmIzNTU5OWE4NTQ5MDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNTdiNmE4OTQwMjZlMGZlNDdkM2MxYmMyOTlhMTVhMGM5NGQ5MTI2NDM2MGQzMjcwMWVhMWU0ODdiNDM2N2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyMjFiZjNjZDIyZWM2ZmRmZDExNzY5NDA2N2Q2NTk4ZjBhMDMwZmY1YmVlNjQ4ZTRlMTI0MzUxYzFmY2MyZDMifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L67-L193",
+          "version": "repo-lines-v1:sha256:fdc5d4ecc30d77bfdc7171d86cf964d79b601a2d561f8e16d8ba330e3ca7a736:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxNjJiNDE0ZDcyYjIyNzU4NzQ2ZWI0NTAzNjU0ODhiMzExYThhMjQ2OWNhODVjNDg4ZDliMTc1ZTQ3MDgzNDA5IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkOGRmZjNjNTFlMzE3MzQ2YzdkOGVkOTNlOThmYTQwYjFmMjYyOTVkNDBmYzA0ZTA5NTMzYjkwOTJhYTNiMjE2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0MjIxYmYzY2QyMmVjNmZkZmQxMTc2OTQwNjdkNjU5OGYwYTAzMGZmNWJlZTY0OGU0ZTEyNDM1MWMxZmNjMmQzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlMzQ3NGEzYjNmYjdlOGNiY2IzYjJmMzRiMmEyYWYyNDExMDg0Y2Q0N2NmMWZlNzBmMjI4ZDE3NmFhNzFkY2ZlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_200ea4ad2fdf403296043b03ed4e3ab4",
+      "statement": "The live PostgreSQL lexical lane is native tsvector/GIN full-text search using websearch_to_tsquery and ts_rank_cd, not true BM25; the postgres-bm25 adapter is a deprecated compatibility re-export.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-bm25.adapter.ts#L1-L9",
+          "version": "repo-lines-v1:sha256:d7ff7cbb04e7e43190054ed372aff97395e47e459cd37a6db50fb5e5fda57132:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVkNWFiYWNhMjI2ODBhZTk1MzM2NzAwZGY3NjYzNjE5N2E3Y2I2YzAwNGY0Y2Q3OWFjMWIxZmQyZjBhYzRhNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzBjODJkMzdlNjVhZGMxNDkzMjA0N2EyNmJmNjhjZDkyN2NkN2Y5MGMwZGM3ZWY2NjFkY2JhNmJjZWUwMGM4MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNlOGMyYTZkOThhNzY0MzllZjI5OGM2YWZjNjJlZDU3ZTBhZmJhNDQwYmEyNDc5ZGJmZmIxOTFiYWUwZmE3YyJ9"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts#L4-L17",
+          "version": "repo-lines-v1:sha256:156a7f7780676bbf361db5913f6e4b3b96fe618799f79bb154ce5863c8c70224:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhZTkzOTZmNDVlYzMzYjgxYzkzNGQyODI4ZDhhNTE5OTU2YTc4NzUyN2Q4ZDA0MWQyNzIzOTE0M2ZiMGFkOWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwOTc4ZTMyYzFhNmQzMmU0YWM1OTQzZjlmODY2ZDU5NzI5YTZjZTRmZmExYWM2Nzk0YzBhM2EyN2MwNmNiMjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4ZTBlZGYzYTVhN2U0NTY0MWM5NDBjNmVhNGNkNDEwMTBiM2FmMWM1NWY0OWY3OWQyY2RiYmRlMDhmOWY3YWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyMzkwYmJkNDQwZmI3MTM2YmRmYWQwMjE3NzYxMGExYzcyM2I3MzhkNDMxZDQ3MTAwZTFkYzI2NThjZjc0MGMifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts#L87-L139",
+          "version": "repo-lines-v1:sha256:c98b9b8fac88ea6d9a973aad0ee3a99f009ed805cc08d9c5167b7c63c6f4f96f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2MWE0YzFlOTI1MmE4MTA1MTNlOTFlYzM3ZGU0ZDNlNDMwYTY2OWRiNGJlYTAzODVjOTg4MmY2ODQzOTY4NzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjMDFkM2Y0Yjg2ZWY0YTU0OTkxNDUxMTM4Y2Q2MWU3YTk4MTcyNGI2ZWY4NzgwMWQ1YWMwMzM4MzAzNzU4ZTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkNjk1ZjUxMWVjODAyYWRiOTZiOThhNmQxMTdiMGI5ODY4NWUyYjdjYjNmZTBhY2ZkNTYzMjAwZTY3YTcxZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f17523fc5d0e4b58bd388d361ec3305a",
+      "statement": "PostgreSQL retrieval resolves chunk candidates to canonical packets through exact source_ref/content_hash matching or an EXACT_CANONICAL_ID bridge, while unresolved or ambiguous identity links are excluded.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts#L140-L209",
+          "version": "repo-lines-v1:sha256:c79d5cc77d29954ec51b8667e6c9267e02af5deba90b4cecb734d722c33610e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiNmJiZjFjMzgyZGQ0YzE3OGVmMDIyY2RlZDEzZDhlNDBkZjVlMzQwYzg1M2E0NTAwM2NhOTk2OTk1MTBkYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NDY1Yzc2NDQ0Y2Q3MDIxNzQ1N2RiMjM4N2M5MWNlM2ZkZTMwMzc1NjhlZWI0NmIyMThkZDQyYjVkODk4YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmZmUwODVhMjIwMjkxMzY3ZmFiMDliNmYwNmVkMWFkMzQ1YWQ3OGUyNWMyNTIzN2Q0OGJjYTI0MzdjNTlhYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjYTdiMzhhYmQ3YWVkMzA5OTZiMzI2ZGU4ZDYwM2QxY2UxNzViMjQzYmI2OWQ5YTgzODc3MjY5OWQzYzIzODIifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts#L19-L37",
+          "version": "repo-lines-v1:sha256:63edf6f8575d91b28b231cc100bd703036fbace9e3e177935358925579a00bc9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxNDdlNjAwOWMzOWExMjMxZmIzMzlkZTE0ODQ2ODFhMzQ3ZGQ1M2UzOGRlMmVjMTdiODdiZmY1YWM4NWI4NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYjU0NGE1ODg2MzQzNTBjMTkxNjlhODI0M2I1MzFiZjMwOTVlYjU3YzhmYjAzZTQ0ODM2OTQzZjA4MTY4ODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiYmM1Y2M0ZjY3Nzc2NzI3ZGU0NzlhMDU4NjFjOTExYTgzYTVkYWEzM2Y5MjBjODBhNGI3YWVmNjBmNjlmNTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmOWFiM2QwODk3ZDQ2ODk2Nzg1ZmI5Nzg3ZTk5YWM4YzFmMTg5NTI5NDQ2ZTM5ZmI2NWI5MDYyNzQxMWIyZWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_103cc36c99ca4f1dabbc0ace038c610f",
+      "statement": "The runtime facade currently records but does not fully implement query embedding/Qdrant search, Neo4j expansion, XGBoost or CrossEncoder reranking, and backing-service health probes; these are placeholders or planned behavior.",
+      "evidence": [
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L122-L143",
+          "version": "repo-lines-v1:sha256:dfba99009d6cb9d3591432a0799cae30721b5631c89c5a224f1a0b144edf81c9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1YTc5OWUyNjU3OTQ1Mjc0ZDIwZWE3ZGQwYzBmZGViYTFhMDBlNjYxMDhmZTc4ZGE4MWM1ZGE0ZGM4YjIzMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NjJmYTU3OTcxMGIzZmY1ZTQyYThlMTAwMDJjNWFlN2JmMDUwOTllN2Y0Yzk5NWE2ODVmNTc2YWM3ODc1OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJlNzI0NTRlYjdlMTllNzgyNjRjNjU3MmJlYmRkMjE1OTEwNDI2OGQxNzNmNjFkZTE0YzQwZTA1OTBmMDhhZGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4OGZlMzQzNGM5NzRiNTE1MjM0ODUxODcxM2I4OTc4MDliYjc0M2YzYzcyMDRjMjY4YjZmNjFkNjFkMGY3ZDIifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L202-L211",
+          "version": "repo-lines-v1:sha256:05771a82d3ef46982f9405b2c1af0357c68733b038419d1cacfb337064291774:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMzVkOTg2NjE2NzYzM2ZlYjhhNWEwYWRiNGUyZjhlZTQ4YTk1ZjgyYmVkZjcyMDg1ZGM4Mzk3ZjcyNDY1MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0MTlhNmRjYzA0ZTIxM2EzYzdhNzdhNDU2YjAxZTc2ZDFlZjc4Y2QwMGJiZWMxZDhmODE0NThmZTkzZWRjNTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4NTA4YjZjYjA1ODlhYmE3NTAzMjAyZGUyYzhmODdlZDliMTljZDU4NjUzZmQwMWEzZTY3NWUzYWI3YjU5NjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhODcwZWQxZjA2MjAyZGExMzEyYWNmMjBjZmFmZTIyMjE3MmQ1NmY1NjIzZjk0YmNiMmVlODk5ZWEwNDU5YWQifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L85-L93",
+          "version": "repo-lines-v1:sha256:111c9919b05a5073a6413dbca8affe9c365e6d62e61afcdbf3c074ab3a49ccd1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjY2YmY2MTdkYjRmMTNhZDg0OWFhMzY0OGIwOGM0MjlhZTI5MWEyYmYyOTM1YzgzOTBhMWE5ODg0YWUzM2NiZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ2MmZhNTc5NzEwYjNmZjVlNDJhOGUxMDAwMmM1YWU3YmYwNTA5OWU3ZjRjOTk1YTY4NWY1NzZhYzc4NzU5NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzI1MWVkODE5MDRjM2RjNzg4ZTZiNjI3NmM4Nzc2YjI3NDFhODA3NDM0MTU1MjQwYWUwNTcyZjdhOTMxZjc1YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTRjMDRlOWE5MWRmZGMxZDcxNjIxMWY0NWZhMTdmYWMxZGQzZDBkNmE1ODk5NzFmMTRjMWUwZGEwMjA5MjZmZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_37a5b52f009049daa105363171a9800e",
+      "statement": "@deeds/parent-atlas-client is the transport-client package for HTTP/REST, gRPC, MCP, and A2A, with protocol handling separated from retrieval business logic; the documented gRPC/A2A service coverage includes design-intent TODOs.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L150-L173",
+          "version": "repo-lines-v1:sha256:a5fffbe9521fef4d579ce19873dbf0cde4a6f2d8f5b760750e53ef2c630d69e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhOWI0N2Q4ODcxOTJlZGEzYjkxMzhmMTJkMTk1NjM3Njg3MmUwZGNlMTNhYmMwMjBiZjQzYzVhYjFiZjA5MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1N2I1YmQ1ZDNiODZhNzllZGVlMTc2MTBlYmIyNjVmOGI3ODMwZTQ4NmZjNzZmOGExZjM2ZWU2OGMxZDEyOWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L92-L117",
+          "version": "repo-lines-v1:sha256:84daeab9636a8704cf99bd64762f2350f0a6439c1c03d21378e3048548224a65:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmMmNkYjllMTI5YThlNDM2NWEwMjdkYWY0YjhmNzI5ZGE3NzMyYTJmNjI3MjRkZjRmZTM1NDkwMGJjMTg4M2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3YmI4OThiNWQ1YjcxY2FhN2VhNTVhYzUzMmE1NTZlODA3ZGI1MzRhYTY4OWYxYWFmZTkzOGYyMDk1MmU3YzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-client/package.json#L1-L30",
+          "version": "repo-lines-v1:sha256:906fb28c165b21aaf7840f682865bd7237abe3f1f15416b485250b646afef263:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgzZWFlN2U2YTRkM2M3MWJjYzk2MzI4YzUxOWZiYTI5NDFlZTQ4Njk2OGE2ZDYzMjJmYjA4Y2ViNDRlM2VmZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMzQ1MTgwMTA1YjBjNjZhNzdkYWQ1MWJiMzc5MDFhMzczMmM5NjU0YmE0ZGUzOTgxZjgxZTE4MTc1MjQ4YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1e3ba9de678e4da6af493e43ae1b22e4",
+      "statement": "@deeds/atlas-orchestrator packages Mastra and LangGraph-based durable workflows, model/planning components, executors, and PostgreSQL/Redis-backed orchestration dependencies, but it is not the owner of canonical packet identity.",
+      "evidence": [
+        {
+          "resource": "repo://packages/atlas-orchestrator/package.json#L1-L25",
+          "version": "repo-lines-v1:sha256:8c8ffe904b2989e97ed781fb13b1f76821625e21daa0946cb7f717fedf7ec4c5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZTg5OWUzODdlMTQyOWY3OTBhMzg2NjNjMzE5N2JlOTEyM2E0MWNmYjE0ODA3ZTU4YTM3NjIwMDY4ZWYwYWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwMzk1YWFjOWNkMTQ2ODI2NmYzNTc5MzQ0YmYzZGI5ZDBiOGZhMjkxNWI0ZWQwY2E5NTg2NjEzYjVjOTI1MDIifQ"
+        },
+        {
+          "resource": "repo://packages/atlas-orchestrator/package.json#L27-L44",
+          "version": "repo-lines-v1:sha256:69a643987b2c971d5ec9c3187fbbb5a59ceda2d3ba999816afd82279b2705e4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2I0NjlkOWUwOTc1NzIyNDY2NjczNGM5ZWY3YjI1NGQ4ODUzNGY1ZDViYjcwOTg5NjA4MDVjNTUzZGMzMDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlYWIzZGYwMzkyODZkZTA1ZmFmYmZlNWU4YjIyNDlkNzlhYzIwNGQ4ZDUwNmM4Y2VmMGUxMjU1NTIyNmI3MGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY3OTNlN2QwNDc4ODVhYTQwMTllNDYzMTE2MDJiYjA5N2EzYmY2NmU2MGIzNzY2OGViNjlhMThhYjQxN2U5M2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyODg2Y2U2NzM1YjZiYjg5YTQ2ZDVmMGIyZjc3ZTJkZTRkYjExMDdjODQ1MWQzYWI3MDBmY2MxMmY3OGVlMTcifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-core/src/index.ts#L18-L34",
+          "version": "repo-lines-v1:sha256:f3af666c049c3d127565ad80af7c8abaf9cbf0e4cb4dc001169cefdda4302100:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmI4ZmMzYzYxZjlmMDAwZTUwOGMyZmQxMTM4ZmUwYzQ5ZmFiMTcxMTI3N2Y5NTQyOGQ2ZDM5ZTBkNDFmNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYzQ5ZGYzMTJlOWI4ZDgwYTRkODRiZjZmYTU0ODJjM2I3MThmODgxOGU4OWU2OTg4ZjRmNTcwNDk3N2JmNzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3NDAxODkxNzFmN2ZiYTE0Mjc0ODNmM2JmOTc4ODJkNWFmMTFiMTk4NWUzOWE5YTI5NzVjNTI0NzcxNmFlYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYTljOThlM2M3Nzk2YjFjZWQxNjQ0YzI5YmZiYWZlYWQ4MmJhZDg0NDZkN2RlMGFjM2VjODc4ODNmMjdkN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2f040e9b74a74e4d87799835eac92bb9",
+      "statement": "Ingestion and indexing must create or reconcile canonical PostgreSQL records before projecting them into lexical, vector, graph, cache, RPC, or agent surfaces; enrichment must not mutate packet_key, source_ref, feature_id, feature_label, or identity provenance.",
+      "evidence": [
+        {
+          "resource": "repo://docs/CANONICAL-ARCHITECTURE-CONTRACT.md#L9-L80",
+          "version": "repo-lines-v1:sha256:0352dbfb3a9d13cbe8fec9014c0ab3288644328e6049da5848680cf864aad908:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViZDA3ZjNiYTc2M2MxOWFlMzllNDk0OTM0NmI5OGQ5NTE0MWU0OTQ1OWQ3YTI3MDQyMzFkY2IyODVmNDRlODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiYWY1NWJiYmI3Njc3YWMxOWYxOTBkZDQ2ZmJlZDY4MDUzNmYyMGQ3MDFmYTA5ZTg2NTMwZTAxMDk4NGExOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/adapters/postgres-fts.adapter.ts#L140-L209",
+          "version": "repo-lines-v1:sha256:c79d5cc77d29954ec51b8667e6c9267e02af5deba90b4cecb734d722c33610e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiNmJiZjFjMzgyZGQ0YzE3OGVmMDIyY2RlZDEzZDhlNDBkZjVlMzQwYzg1M2E0NTAwM2NhOTk2OTk1MTBkYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1NDY1Yzc2NDQ0Y2Q3MDIxNzQ1N2RiMjM4N2M5MWNlM2ZkZTMwMzc1NjhlZWI0NmIyMThkZDQyYjVkODk4YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmZmUwODVhMjIwMjkxMzY3ZmFiMDliNmYwNmVkMWFkMzQ1YWQ3OGUyNWMyNTIzN2Q0OGJjYTI0MzdjNTlhYzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjYTdiMzhhYmQ3YWVkMzA5OTZiMzI2ZGU4ZDYwM2QxY2UxNzViMjQzYmI2OWQ5YTgzODc3MjY5OWQzYzIzODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ef03b5950d3c4c93a0238a7d2e6f7c15",
+      "statement": "The retrieval boundary requires identity resolution before RRF fusion and defines graceful degradation in which vector or graph failures can leave lexical/core candidates while transport retry belongs to client adapters.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L284-L310",
+          "version": "repo-lines-v1:sha256:8b63b76a300d2abff03c280785039f8dfdc4df4ce1c479b884346a2bac9e3f6f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4OTdjZWQ4MjhiN2E4OTE0YmNmZTNjZTUxMWRkMGU0MGQwMjhkNDQ0ZmY4YTcyMDkyMGI1MDNiMjJiOTRmNTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MGNhOWQzMTgwZDliYjA5Y2M5MzNjNzJlNTBhZmUwMzkxZjNiODBhOGE3MmQwMGI0NjU1ZmY0MDRkYzcxNTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://packages/parent-atlas-runtime/src/facade/retrieval-facade.ts#L95-L120",
+          "version": "repo-lines-v1:sha256:528db895567aec9b9db51511d298245dce5d3af5e422a4ac48279598d29c38be:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYTIwYmYyYTViMTRiZDhiYTA4ODhiYzI3ZmU3Yjg3YTM4MzA5ZjM4NDNiMDJiODhlYTNlZDU5MjE3ODY5YmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NjJmYTU3OTcxMGIzZmY1ZTQyYThlMTAwMDJjNWFlN2JmMDUwOTllN2Y0Yzk5NWE2ODVmNTc2YWM3ODc1OTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4YTM3OWJjNjhmNTA3Mzg5ODY1ZDUxNDU1NjVjZGQ4ZWZhYTJmYWYyZWU1ZmZhNDU4MDU5MGZkOTA5M2YxMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2Y2I3YTFkNjY1N2MyMTYzOTY2NjExY2VkZjhmZTA5MmZiNGMyY2E5ODAzOTIzNzgzOGY1ODMwMWNkZTg4YzMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

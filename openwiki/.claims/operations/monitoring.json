@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:c09cdf6c3e1d59840dce6c3b375ffd39cfeadbbb1e95e24fb731719931699147",
+  "claims": [
+    {
+      "id": "claim_089eb2c3184c4d8e91f9db294cdbca0c",
+      "statement": "The system uses Docker Compose for service orchestration, which includes health checks for infrastructure components.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yml",
+          "version": "repo-file-v1:sha256:00feba0de58221800ac2d8cc180947fe842ae075fb0b087f2ba32fd00932ed80"
+        }
+      ]
+    },
+    {
+      "id": "claim_674ff8a0b2e04e7f9ac69a425b6859b7",
+      "statement": "Database migrations are managed via the migrations directory and should be applied prior to code updates.",
+      "evidence": [
+        {
+          "resource": "repo://migrations/V_FEATURE_EVIDENCE_SCHEMA_SETUP.sql",
+          "version": "repo-file-v1:sha256:9c41d7713a6dd9f33d861d00e2c54cb93f8b8f7aec82b47e5240add175a53a60"
+        }
+      ]
+    },
+    {
+      "id": "claim_3b637eff0fea4a96a9bdd0ff11a58e6e",
+      "statement": "Audit and maintenance scripts, including backfill utilities and state auditors, are provided to ensure system integrity.",
+      "evidence": [
+        {
+          "resource": "repo://audit-opencode-state.mjs",
+          "version": "repo-file-v1:sha256:b5621bd3f78451b47d68f39520d806fe1ff9349c79d73d3dba35683e9a5c49d4"
+        },
+        {
+          "resource": "repo://backfill-neo4j-cell-id.mjs",
+          "version": "repo-file-v1:sha256:8f9dd8a493a792b27c84e8a66b8cdcd73361303f69afd27ffc692f64653218e8"
+        },
+        {
+          "resource": "repo://backfill-qdrant-by-packet-key.mjs",
+          "version": "repo-file-v1:sha256:0cc22845fe9cf9c4102b627fba9857e8acbb9be752a46c786143d89e423fa616"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

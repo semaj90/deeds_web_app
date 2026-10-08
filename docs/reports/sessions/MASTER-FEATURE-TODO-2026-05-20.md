@@ -572,13 +572,13 @@ dependency graph, sourceRefs, startup context, package scripts.
 
 ## Phase 101C — Local Deep Research / OpenCode / LangGraph Alignment
 
-**Goal**: Make `local-deep-research` a research backend for Gemma4/OpenCode, not a competing assistant stack.
+**Goal**: Make `local-deep-research` a research backend for ornith 1.5, Gemma4/OpenCode, not a competing assistant stack.
 
 **Reference**: `docs/architecture/local-deep-research-boundary.md`, `docs/architecture/scheduler-gpu-bridge-roadmap.md`
 
 **Tasks**:
 - [ ] Inventory the current `local-deep-research` compose and note the current boundary: local postgresql to replace sqlite state on the research side, canonical backend stores in the repo.
-- [ ] Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.
+- [ ] Compare the local-deep-research container against the repo's current OpenCode/ornith 1.5 update from Gemma4 function-calling path and document the exact role split.
 - [ ] Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model boundary before promoting it to the checklist.
 - [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes archived in deeds_labs/test-only unless it proves useful as a separate lane.
 - [ ] Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.
@@ -625,13 +625,13 @@ dependency graph, sourceRefs, startup context, package scripts.
     - the seam now includes GPU-safe load shedding and SOM/AE-aware rerank for oversubscribed batches
   - [x] Add a backend-toggle smoke (`scripts/smoke/turbovec-ann-backend-smoke.mjs`) so the default Qdrant vs `CODEBASE_ANN_BACKEND=turbovec` selection stays testable without loading the full ANN stack.
 - [ ] Keep LangGraph optional as orchestration only.
-  - LangGraph nodes may validate, route, inspect, and call Gemma4/function tools.
+  - LangGraph nodes may validate, route, inspect, and call  ornith 1.5 llama-server 8090 update it from Gemma4/function tools.
   - LangGraph nodes must not directly write to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS.
   - Durable writes must go through existing promotion queues, validation gates, and bounded apply scripts.
   - LangGraph is for agentic testing/planning/subagent coordination, not a replacement for SvelteKit routes, MCP tools, or the promotion ledger.
 - [x] Define the OpenCode-facing bridge so research queries can flow through TRACE MCP / function-caller without bypassing `sourceRef` provenance.
 - [x] Store docs and large artifacts in SeaweedFS, not in the research container's local SQLite boundary.
-- [ ] Summarize docs with Gemma4 and persist the compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where appropriate.
+  - [ ] Summarize docs with Ornith 1.5 through llama-server :8090 and persist compact outputs into Postgres 18 deep_research tables with JSONB / pgvector where authorized.
 - [ ] Keep BM25 and LangExtract as the lexical/provenance enrichment pass before the final recommendation fusion.
 - [x] Treat TurboVec, LlamaIndex, LangChain, and LangGraph as adapters only; the boundary is documented in `docs/architecture/dual-lane-hot-brain-cold-queue.md`.
 - [ ] Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available.
@@ -731,7 +731,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] **Track E — Model Configuration & Parallel Inference Hardening**
   - [x] Update `opencode.json` (both root and `sveltekit-frontend/`) model definitions to `"yorha/yorha-legal"` to align default and agent lanes to the active 40k context GGUF.
   - [x] Add dynamic parallel slots (`--parallel` / `-np`) support to `launch-turboquant.ps1` to enable multi-core concurrent request processing.
-  - [x] Validate cache key mapping and integration via targeted Vitest runs (`tests/openai-facade.spec.ts`).
+  - [x] Validate cache key mapping and integration via targeted Vitest runs (`tests/openai-facade.spec.ts`) make sure call  ornith 1.5 llama-server 8090
 
 - [x] **Phase 1 Runtime Blocker Verification (2026-05-21)**
   - [x] Verified TurboQuant runtime truth on `:8090`: `/health` returns `ok`, `/props` reports `n_ctx=65536`, `/slots` reports active slot metadata.
@@ -754,7 +754,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [x] Implement read-only prompt listener adapter (`src/lib/server/retrieval/prompt-listener.ts`) and logging loop writing to `.tmp/atlas-retrieval-loop.jsonl`
   - [ ] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
   - [x] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
-  - [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
+  - [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema make sure updated not gemma, call  ornith 1.5 llama-server 8090
   - [x] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
   - [x] Register new scripts in `package.json` and verify pipeline
   - [x] Confirm existing first-party ML/training assets already exist in-repo before adding new lanes:
@@ -802,7 +802,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `sveltekit-frontend/src/lib/server/atlas/contracts/validation-result-v1.ts`
     - `sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts`
     - `sveltekit-frontend/src/routes/api/ldr/research/+server.ts`
-  - [x] Wire the shared semantic search workflow through the live retrieval route, tRPC search, and daily board loader
+  - [x] Wire the shared semantic search workflow through the live retrieval route, tRPC search, and daily board loader make sure updated not gemma, call  ornith 1.5 llama-server 8090
     - `sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts`
     - `sveltekit-frontend/src/lib/server/trpc/routers/search.ts`
     - `sveltekit-frontend/src/routes/api/retrieval/search-unified/+server.ts`
@@ -835,7 +835,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
     - verification: `npx tsx -e "import('./sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts').then(() => console.log('rrf-integration:ok'))"`
   - [x] Compare the live MCP tool surface against the Codebase-Memory 14-tool reference and document the split ownership
-    - the example groups tools into indexing, query, analysis, and code surfaces; the repo currently splits those responsibilities across `sveltekit-frontend/src/mcp/codebase_tools.ts`, `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`, `sveltekit-frontend/src/mcp/engram_tools.ts`, `sveltekit-frontend/src/mcp/bifrost_tools.ts`, `sveltekit-frontend/src/mcp/topology_mgmt_tools.ts`, and `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+    - the example groups tools into indexing, query, analysis, and code surfaces; the repo currently splits those responsibilities across `sveltekit-frontend/src/mcp/codebase_tools.ts`, `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`, `sveltekit-frontend/src/mcp/engram_tools.ts`, `sveltekit-frontend/src/mcp/bifrost_tools.ts`, `sveltekit-frontend/src/mcp/topology_mgmt_tools.ts`, and `sveltekit-frontend/src/mcp/trace-mcp-server.ts` make sure updated not gemma, call  ornith 1.5 llama-server 8090
     - closest live analogs today are `codebase.rg_search` / `codebase.awk_analyze` for code search, `atlas.embedding_*` for embedding-derived enrichment, `atlas_get_active_context` for bounded resume context, `trace.bifrost_dispatch` for inference routing, and the TRACE server tools for broader graph/runtime work
     - the example’s single graph API surface includes `index_repository`, `index_status`, `list_projects`, `delete_project`, `search_graph`, `trace_call_path`, `query_graph`, `ingest_traces`, `detect_changes`, `get_graph_schema`, `get_architecture`, `get_code_snippet`, `search_code`, and `manage_adr`; these are not yet exposed as one unified interface here
     - missing or unverified public equivalents should be added only after the live proof gate decides which owner should expose them, and only if they are needed beyond the existing split ownership model
@@ -874,14 +874,14 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [ ] Align the LDR / HyperRAG / KAG pipeline to the current retrieval contract before expanding transport layers
     - canonical truth stays in Postgres `atlas_packets` / packet-ledger rows, keyed by `packet_key`, `source_ref`, `feature_id`, `content_hash`, `workspace_revision`, and lineage fields
     - Qdrant stores mirror candidates for dense ANN and neighbor search; Neo4j stores bounded topology / `k`-hop context; Redis/Valkey stores hot ACE packets and centroid caches; RRF remains the ranking authority
-    - the current retrieval contract already stages lexical `rg` search, AST / `ast-grep` signals, parallel Qdrant + BM25 + Neo4j candidates, and Gemma4 synthesis from top packets
+    - the current retrieval contract stages lexical `rg` search, AST / `ast-grep` signals, and parallel retrieval candidates; Ornith 1.5 on llama-server :8090 is the synthesis model, not the embedding model
     - review finding: `searchResultToHyperRagResult()` now surfaces canonical packet identity fields on HyperRAG hits (`packetKey`, `sourceRef`, `contentHash`, `workspaceRevision`, `treeNodeId`, `featureId`, `featureLabel`) instead of hiding them only in the payload blob
     - LDR ingestion should emit paired metadata and evidence payloads, not raw source blobs: JSON for structured metadata, MsgPack for small packet envelopes, Arrow IPC for columnar batches, and gRPC only for binary service boundaries that actually need streaming
     - if tensor cache synthesis is needed, keep it behind the same packet identity contract and write only versioned projection artifacts; do not make PyTorch or GPU caching the source of truth
     - TurvoVec / SIMD / DiskANN are candidate acceleration lanes only; they should compare against the existing Qdrant + RRF path, not replace the canonical retrieval contract
     - the next recommendation prompt should consume sorted JSON results from the ranked packet set and attach `next_steps` / Kanban updates after the proof gate passes
-  - [ ] Align the feature-matrix contract around one active dense semantic lane and explicit non-semantic projections
-    - Canonical dense semantic lane: `semantic_768` / `embeddinggemma` full `768`
+  - [ ] Align the feature-matrix contract around one active dense semantic lane and explicit non-semantic projections; track the bounded audit in `docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20-pgvector-embeddinggemma-agentic-dense-search-todo.md`
+    - Canonical dense semantic lane: EmbeddingGemma `semantic_768` / 768-D remains the embedding representation; Ornith 1.5 on llama-server :8090 is for generation and must not replace it
     - Legacy dense lane(s): `dense_384` or other bounded projections only as migration-source evidence or explicitly versioned internal projections, never as active retrieval lanes
     - Latent routing lane: compressed `latent_64` for cuVS / centroid / SOM / prefilter work
     - Sparse lexical lanes: BM25 baseline and BM42 experimental lane
@@ -1252,17 +1252,18 @@ output: .tmp/domain-topology.json + graphify refresh manifest
 
 **Sub-agentic orchestration** (`scripts/agent/prompt-generator.mjs`):
 ```
-intent → feature_labels → ACE context chunks → tool signatures
+intent → feature_labels → ACE context chunks → tool signatures make sure updated not gemma, call  ornith 1.5 llama-server 8090
        → Gemma4 system prompt with NES/glyph memory hints
        → sub-agent task list with sourceRef anchors
 ```
-
+ot gemma, call  ornith 1.5 llama-server 8090
+- Embedded intent vectors (768-dim compressed to 64-dim via autoencoder) through mrl embeddinggemma 512, 256, 128, for latent256, latent128. latent64
 **TurboVec search memory** (Redis hash `turbovec:memory:{user_id}`):
 - Embedded intent vectors (768-dim compressed to 64-dim via autoencoder)
 - TTL: 7 days
 - Used for: attention head selection, personalized rerank boosts
 
-**Tasks**:
+**Tasks**: make sure updated not gemma, call  ornith 1.5 llama-server 8090
 - [x] `scripts/agent/prompt-generator.mjs` — intent → structured Gemma4 system prompt (2026-05-28)
 - [x] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL (2026-05-28)
 - [x] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs

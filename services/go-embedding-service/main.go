@@ -1,21 +1,23 @@
 // Package main — Go gRPC Embedding Server
 //
 // Implements EmbeddingService proto (proto/active/embedding.proto):
-//   GenerateEmbeddings — batch Ollama proxy with Redis cache
-//   StreamEmbeddings   — streaming embedding generation
-//   Health             — deep health check (Ollama + Redis)
-//   GetStats           — service statistics
+//
+//	GenerateEmbeddings — batch Ollama proxy with Redis cache
+//	StreamEmbeddings   — streaming embedding generation
+//	Health             — deep health check (Ollama + Redis)
+//	GetStats           — service statistics
 //
 // Also exposes HTTP on :8097 for health checks.
 //
 // ENV:
-//   OLLAMA_URL         — Ollama API endpoint (default http://localhost:11434)
-//   REDIS_URL          — Redis connection string (default redis://localhost:6379)
-//   GRPC_PORT          — gRPC listen port (default 50051)
-//   HTTP_PORT          — HTTP health port (default 8097)
-//   EMBED_MODEL        — Embedding model name (default embeddinggemma:latest)
-//   EMBED_BATCH_MAX    — Max batch size (default 4, tuned for RTX 3060 Ti 8GB)
-//   EMBED_CACHE_TTL    — Redis cache TTL in seconds (default 86400 = 24h)
+//
+//	OLLAMA_URL         — Ollama API endpoint (default http://localhost:11434)
+//	REDIS_URL          — Redis connection string (default redis://localhost:6379)
+//	GRPC_PORT          — gRPC listen port (default 50051)
+//	HTTP_PORT          — HTTP health port (default 8097)
+//	EMBED_MODEL        — Embedding model name (default embeddinggemma:latest)
+//	EMBED_BATCH_MAX    — Max batch size (default 4, tuned for RTX 3060 Ti 8GB)
+//	EMBED_CACHE_TTL    — Redis cache TTL in seconds (default 86400 = 24h)
 package main
 
 import (
@@ -47,6 +49,8 @@ import (
 
 	pb "github.com/deeds-web-app/services/go-embedding-service/proto/embedding"
 )
+
+var compiledServiceBuildRevisionV1 string
 
 // ── Configuration ─────────────────────────────────────────────────────────
 
@@ -391,17 +395,23 @@ func (s *embeddingServer) modelRuntimeReadbackV1(ctx context.Context) modelRunti
 		return result
 	}
 	result.BackendReachable = true
+	tagMatches := 0
 	for _, model := range tags.Models {
 		if model.Name != s.cfg.EmbedModel {
 			continue
 		}
+		tagMatches++
 		result.ModelAvailable = true
-		result.ArtifactRevision = model.Digest
+		result.ArtifactRevision = strings.TrimSpace(model.Digest)
 		result.EmbeddingDimension = model.Details.EmbeddingLength
-		break
 	}
 	if !result.ModelAvailable {
 		result.Device = "ollama-model-unavailable"
+		return result
+	}
+	if tagMatches != 1 || !isSHA256PrefixedV2("sha256:"+normalizeOllamaDigestV1(result.ArtifactRevision)) || result.EmbeddingDimension <= 0 {
+		result.ArtifactRevision = ""
+		result.Device = "ollama-model-identity-ambiguous"
 		return result
 	}
 
@@ -410,23 +420,35 @@ func (s *embeddingServer) modelRuntimeReadbackV1(ctx context.Context) modelRunti
 		result.Device = "ollama-residency-unavailable"
 		return result
 	}
+	residentMatches := 0
 	for _, model := range running.Models {
 		if model.Name != s.cfg.EmbedModel && model.Model != s.cfg.EmbedModel {
 			continue
 		}
-		if result.ArtifactRevision != "" && model.Digest != "" && model.Digest != result.ArtifactRevision {
-			continue
+		residentMatches++
+		if normalizeOllamaDigestV1(model.Digest) != normalizeOllamaDigestV1(result.ArtifactRevision) {
+			result.Device = "ollama-resident-digest-mismatch"
+			return result
 		}
-		result.ModelLoaded = true
 		result.GPUActive = model.SizeVRAM > 0
-		result.Device = "ollama"
-		if result.GPUActive {
-			result.Device = "ollama-gpu"
+	}
+	if residentMatches != 1 {
+		result.Device = "ollama-model-unloaded"
+		if residentMatches > 1 {
+			result.Device = "ollama-residency-ambiguous"
 		}
 		return result
 	}
-	result.Device = "ollama-model-unloaded"
+	result.ModelLoaded = true
+	result.Device = "ollama"
+	if result.GPUActive {
+		result.Device = "ollama-gpu"
+	}
 	return result
+}
+
+func normalizeOllamaDigestV1(value string) string {
+	return strings.TrimPrefix(strings.ToLower(strings.TrimSpace(value)), "sha256:")
 }
 
 type readyProbeResult struct {
@@ -441,6 +463,9 @@ type readyProbeResult struct {
 	VectorNorm         float64 `json:"vector_norm"`
 	BackendReachable   bool    `json:"backend_reachable"`
 	ModelAvailable     bool    `json:"model_available"`
+	ModelLoaded        bool    `json:"model_loaded"`
+	ModelArtifact      string  `json:"model_artifact_revision"`
+	UnavailableReason  string  `json:"unavailable_reason"`
 	WarmupSucceeded    bool    `json:"warmup_succeeded"`
 	WarmupVectorLength int     `json:"warmup_vector_length"`
 	RedisHealthy       bool    `json:"redis_healthy"`
@@ -473,44 +498,25 @@ func (s *embeddingServer) probeReady(ctx context.Context) readyProbeResult {
 		}
 	}
 
-	tagsReq, err := http.NewRequestWithContext(ctx, http.MethodGet, s.cfg.OllamaURL+"/api/tags", nil)
-	if err == nil {
-		if resp, err := httpClient.Do(tagsReq); err == nil {
-			result.BackendReachable = resp.StatusCode == http.StatusOK
-			if result.BackendReachable {
-				var tags struct {
-					Models []struct {
-						Name string `json:"name"`
-					} `json:"models"`
-				}
-				if err := json.NewDecoder(resp.Body).Decode(&tags); err == nil {
-					for _, model := range tags.Models {
-						if model.Name == s.cfg.EmbedModel || strings.Contains(model.Name, s.cfg.EmbedModel) {
-							result.ModelAvailable = true
-							break
-						}
-					}
-				}
-			}
-			resp.Body.Close()
-		}
-	}
-
-	if !result.BackendReachable || !result.ModelAvailable {
-		result.Status = "not_ready"
-		return result
-	}
-
-	vectors, err := ollamaEmbed(ctx, s.cfg.OllamaURL, s.cfg.EmbedModel, []string{"embedding readiness probe"})
-	if err != nil || len(vectors) == 0 {
-		return result
-	}
-	vec := vectors[0]
-	result.WarmupSucceeded = true
-	result.WarmupVectorLength = len(vec)
-	result.VectorNorm = vectorNorm(vec)
-	if len(vec) == result.EmbeddingDimension {
-		result.Normalized = result.VectorNorm > 0.95 && result.VectorNorm < 1.05
+	readback := s.modelRuntimeReadbackV1(ctx)
+	result.BackendReachable = readback.BackendReachable
+	result.ModelAvailable = readback.ModelAvailable
+	result.ModelLoaded = readback.ModelLoaded
+	result.ModelArtifact = readback.ArtifactRevision
+	result.EmbeddingDimension = readback.EmbeddingDimension
+	if !readback.BackendReachable {
+		result.UnavailableReason = "OLLAMA_BACKEND_UNAVAILABLE"
+	} else if !readback.ModelAvailable {
+		result.UnavailableReason = "MODEL_NOT_INSTALLED"
+	} else if readback.ArtifactRevision == "" {
+		result.UnavailableReason = "MODEL_IDENTITY_UNQUALIFIED"
+	} else if readback.Device == "ollama-resident-digest-mismatch" {
+		result.UnavailableReason = "RESIDENT_MODEL_DIGEST_MISMATCH"
+	} else if !readback.ModelLoaded {
+		result.UnavailableReason = "MODEL_NOT_RESIDENT_OR_DIGEST_MISMATCH"
+	} else if readback.EmbeddingDimension != 768 {
+		result.UnavailableReason = "SEMANTIC_768_DIMENSION_REQUIRED"
+	} else {
 		result.Ready = true
 		result.Status = "ready"
 	}
@@ -529,6 +535,7 @@ func httpHealthHandler(srv *embeddingServer) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
 			"status":                  status,
+			"service_build_revision":  compiledServiceBuildRevisionV1,
 			"model_loaded":            fmt.Sprintf("%v", readback.ModelLoaded),
 			"device":                  readback.Device,
 			"timestamp":               time.Now().Unix(),

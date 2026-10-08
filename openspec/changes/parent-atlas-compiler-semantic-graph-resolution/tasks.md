@@ -785,6 +785,16 @@ live target identity enrichment and edge admission remain open.
 The source-registry contract is already proven separately for the current 111-source cohort
 (`EXISTING_EXACT: 111/111`); this reconciliation does not reopen or broaden that migration.
 
+## Structural-edge artifact recovery census (2026-10-07; read-only)
+
+- [ ] The claimed `419`-edge artifact and its revision-bound receipt remain `NOT_VERIFIED`; no exact artifact/receipt pair matching that claim was located in the scoped repository report search. Do not treat nearby counts as substitutes.
+- [ ] `docs/reports/current-structural-graph-artifact-v2/manifest.json` is explicitly `NON_PRODUCTION_DERIVED_ARTIFACT`: 2,545 nodes / 1,334 edges, workspace `sha256:55edaa...`, `candidateSnapshotRevision=null`, `ordinalMapChecksum=null`, `canonicalAuthority=false`. It is historical/diagnostic, not the claimed cohort.
+- [ ] `docs/reports/current-structural-edge-artifact-plan-v2.json` has 0 selected sources and 0 edges under workspace `sha256:f476b4...`; it is a read-only incomplete plan, not a receipt for the 1,334-edge artifact (the workspace revisions differ).
+- [ ] The 440-nomination live producer cohort proves 440 exact source spans/nodes across 50 source files and records zero writes, but it is extraction evidence—not endpoint-to-packet identity, exact workspace/graph qualification, or admitted incidence. A separate one-source replay reports 453 extracted edges but carries no `workspaceRevision` and records zero structural-edge writes. Neither proves a 419-edge admitted cohort.
+- [ ] Keep the gate `BLOCKED / NOT_MEASURABLE`, not `EMPTY`: endpoint resolution rates and incidence coverage are undefined without a qualifying edge cohort. Next safe action remains recovery of the exact 419 artifact/receipt or an explicit owner decision authorizing a new exact-snapshot producer; no Graphify refresh, schema change, endpoint backfill, or HyperRAG incidence write is authorized here.
+- [ ] Before changing the extractor, run the existing read-only edge/endpoint census when an exact-revision cohort is available and report separately: extracted edges; source endpoint uniquely packet-bound; target endpoint uniquely packet-bound; both endpoints bound; both endpoints snapshot-qualified by workspace/graph/source revisions. Classify unresolved, ambiguous, revision-mismatched, missing/duplicate packet, syntax-only, and admissible outcomes. Current plan has 0 edges and the saved resolution report is stale (`2026-09-14`, workspace `sha256:f476b4...`), so neither provides a current denominator; do not interpret those zeros as an empty structural graph.
+- [ ] Inspect the existing AST extractor → Graphify adapter → endpoint resolver → packet-incidence materializer handoff before modifying extraction. The intended next proof is bounded replay of exact extracted endpoint payloads through the existing resolver, not Graphify refresh or inferred incidence.
+
 ## LSP-POSITION-KEY-VALUE-ALIGNMENT-01 (2026-09-03, bounded fixture)
 
 - [x] Proved that an LSP observation carries source, workspace, server,
@@ -939,3 +949,56 @@ resolve back into its own source file and so never exercises true cross-file ali
   testing the identical import pair manually in an editor with the same `typescript-language-server`
   version) to determine whether this is a known limitation of plain-JS cross-module go-to-definition
   or something specific to this repo's project configuration.
+
+## CODE-KNOW-01..18 — Typed code-capability knowledge projection (OPEN)
+
+Design-only extension of the repo-local `.okf` projection. These gates do not authorize card population,
+canonical identity creation, evidence admission, schema migration, index creation, or datastore writes.
+The normative design is in `docs/architecture/code-symbol-semantic-retrieval-v1.md`; current schema
+and registry inputs are `docs/.okf/schema.yaml`, `.okf/manifest.yaml`, and
+`.okf/indexes/code-capability-knowledge-v1.yaml`. A reusable read-only contract check is
+`npm run atlas:okf:code-capability:validate`; passing it verifies schema/registry/gate alignment only,
+not card population, evidence admission, or runtime integration.
+
+- [ ] `CODE-KNOW-01` Confirm `.okf` schema/manifest as the sole projection owner.
+- [ ] `CODE-KNOW-02` Keep `spec.card_kind` optional and backward-compatible.
+- [ ] `CODE-KNOW-03` Preserve base `kind: Concept`; do not widen its enum.
+- [ ] `CODE-KNOW-04` Resolve canonical ID and packet key only from existing Atlas owners.
+- [ ] `CODE-KNOW-05` Bind source and workspace revisions as distinct dimensions.
+- [ ] `CODE-KNOW-06` Require exact evidence references and source citations.
+- [ ] `CODE-KNOW-07` Specify SymbolKnowledgeCard using existing `symbol_version_id`.
+- [ ] `CODE-KNOW-08` Specify ModuleKnowledgeCard with a source-qualified module reference.
+- [ ] `CODE-KNOW-09` Specify PackageKnowledgeCard with a source-qualified package reference.
+- [ ] `CODE-KNOW-10` Specify LibraryKnowledgeCard with an explicit version scope.
+- [ ] `CODE-KNOW-11` Specify ValidatorKnowledgeCard using existing validator ID/revision.
+- [ ] `CODE-KNOW-12` Specify GeneratedArtifactBindingCard with checksum and input bindings.
+- [ ] `CODE-KNOW-13` Specify AgentCapabilityCard as descriptive, not permission-granting.
+- [ ] `CODE-KNOW-14` Type capabilities, constraints, validators, and dependencies.
+- [ ] `CODE-KNOW-15` Keep all cards `canonical_authority: false`; prohibit identity/ontology minting.
+- [ ] `CODE-KNOW-16` Keep Pydantic strict and transport-only if a mirror is later required.
+- [ ] `CODE-KNOW-17` Mark OpenWiki consumption as DERIVED_DOCUMENTATION, never evidence.
+- [ ] `CODE-KNOW-18` Prove schema/checksum/revision validation before any separately authorized population.
+
+## SYMBOL-SEMANTIC-RETRIEVAL-01 — Agentic symbol evidence bridge (OPEN)
+
+- [ ] Reuse `atlas_symbol_versions` / `atlas_callable_search`, compiler/LSP, Tree-sitter, ast-grep,
+  canonical chunk `semantic_768`, SearchRuntime, and the existing OaK/PrimeAgent DAG owners. Do not
+  add a second symbol registry, vector authority, or retrieval fusion owner.
+- [ ] Implement one bounded read-only OaK function, `oak.find_symbol_evidence(query, scope,
+  budget)`, that returns exact symbol/source identities, revisions, byte spans, lane provenance,
+  and unavailable reasons for unqualified lanes. It must not authorize writes or claim graph facts.
+- [ ] Freeze the language-specific extraction boundary: TypeScript/JavaScript uses the existing
+  compiler/ts-morph/LSP owners for semantic symbols and types; Tree-sitter supplies multi-language
+  CST/ranges; ast-grep supplies syntax-pattern candidates only. A compiler symbol, AST node,
+  qualified name, path, or ordinal is not canonical Atlas identity.
+- [ ] Define a symbol-to-chunk semantic join and representation/input recipe before embedding
+  symbols. Existing `semantic_768` chunk vectors do not prove a symbol-level vector population.
+- [ ] Add a fixture proof and one read-only DAG/ContextManifest caller; require exact
+  `symbolVersionId`, `sourceRevision`, `workspaceRevision`, grounded span, deduplication, bounded
+  budget, and independent evidence receipt. Keep unavailable graph/semantic results distinct from
+  numeric zero.
+- [ ] Only after the read-only proof, evaluate whether a persisted symbol-semantic projection,
+  migration, or index is needed using actual query plans; no DDL, backfill, Qdrant/Valkey upsert, or
+  production ranking change is authorized by this task.
+- References: Microsoft TypeScript Compiler API and Language Service API; Tree-sitter; ast-grep
+  Node API (experimental). See `docs/.okf/architecture/domain-classification-and-agentic-retrieval-v1.md`.

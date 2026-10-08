@@ -2905,6 +2905,20 @@ Evidence boundary: current centroid data is a rebuildable Valkey projection of t
 centroid source. Cluster IDs, SOM cells, topology coordinates, and Valkey keys are not canonical
 identity. Existing legacy readers remain unchanged pending the new manifest contract.
 
+**TurboVec/Valkey path recheck (2026-10-07; source inspection only):**
+`scripts/atlas/warm-turbovec-centroids-redis.mjs` reads the legacy
+`gpu:autoencoder:centroids_64` hash and Qdrant payloads, then writes `ace:cluster:*`,
+`centroid:*`, and `som:*` keys without a candidate-snapshot, ordinal-map, representation,
+workspace, or graph revision in the key/value contract. It is therefore not an admissible
+centroid publisher and was not run. `scripts/atlas/audit-turbovec-runtime-v1.mjs` overwrites
+`docs/reports/turbovec-runtime-v1.json`; `audit-turbovec-ordinal-bridge-v1.mjs` also writes a
+report by default after a bounded Qdrant scroll. Neither was run because the default report
+targets can overwrite tracked evidence. Existing source keeps the correct division: TurboVec
+is a non-authoritative semantic prefilter challenger; it needs a fresh ordinal-map-bound
+read-only census and exact rerank proof before any integration, and Valkey warming still needs
+the revision-qualified manifest/pointer and atomic readback gate above. No Qdrant or Valkey
+operation was performed.
+
 ### RABBITMQ-PARENT-ATLAS-BOUNDARY-01 — queue ownership review 2026-09-08
 
 - [x] Confirmed Parent Atlas durable dispatch uses RabbitMQ/AMQP and the existing publisher,
@@ -3429,6 +3443,12 @@ artifact, or projection write was created in this pass.
 - [x] Add deterministic ordering, checksum/tamper, duplicate ID, ordinal range,
   and non-authority fixture tests. These prove contract behavior only; they do
   not prove a live clustering run or candidate admission.
+- **Focused recheck (2026-10-07; fixture-only):**
+  `centroid-artifact-v1.spec.ts` and `gpu-cluster-centroids-writers.guard.spec.ts`
+  pass 15/15 tests. This reconfirms manifest/card integrity and writer guards;
+  it does not qualify current embeddings, candidate ordinals, cuML output, or
+  Valkey publication, so the live-admission and cache-publication gates below
+  remain open. No GPU job or store write was run.
 - [ ] Bind manifests/cards to an exact admitted candidate snapshot and verified
   `CentroidArtifactV1` readback. Keep KMeans/SOM outputs diagnostic until the
   representation/ordinal-map parity gates pass.
@@ -10191,6 +10211,18 @@ authority for `graphify_execution_file_membership_v2.repository_id` (status `VER
 `register-orphaned-chunks.mjs` non-V2 path. None of these four are mine to push through unilaterally either — the decision
 file explicitly withholds `writesAuthorized` pending exactly this authorization.
 
+**Collision-guard verification (2026-10-07; fixture-only):** reran
+`node --test scripts/atlas/lib/packet-key-v2-admission-v1.test.mjs` (8/8 pass).
+The existing owner rejects duplicate derived V2 keys, a V2 key stored for a different source,
+multiple aliases, and alias/source conflicts; it emits a collision receipt for unique violations
+and deliberately generates a plain `INSERT` with no `ON CONFLICT` suppression. This proves the
+deterministic guard behavior, not current live-table collision freedom. The checked-in gate report
+`docs/reports/packet-key-v2-admission-gate-v1.json` is dated 2026-09-25 and remains historical;
+its 7,350-row / zero-collision counts must not be presented as a current census. The alias-kind
+DDL remains unapplied, no live collision audit was run because the existing audit overwrites a
+tracked report, and no admission or database writes were attempted. Keep the V2 apply gate blocked
+until a fresh isolated read-only census and explicit DDL/admission authorization are available.
+
 **GRAPH_MANIFEST_SEALED query fix, applied (2026-09-28), plus a git-stash near-miss and one pre-existing bug found:**
 Confirmed `materializeCanonicalGraphSnapshotFromPostgres` has exactly one real caller
 (`export-graph-snapshot-v2.mts`) before touching the shared query -- safe to edit directly. Fixed
@@ -10228,6 +10260,33 @@ either a `vite-node`-based invocation or a new package.json script wired the sam
 SvelteKit-context scripts in this repo are -- real setup work, not attempted in this pass given
 context budget. This is the concrete next step: get one real export run against the admitted
 revision, producing a manifest with `workspaceRevision` bound correctly, then re-audit.
+
+**PacketKeyV2 owner/collision recheck (2026-10-07, read-only):** The existing pure
+`PacketKeyV2` recipe and `PacketKeyResolutionV2` remain the identity owners; no second registry
+was added. A `BEGIN TRANSACTION READ ONLY` census found 61,718 `atlas_packets` rows, zero V2
+UUID keys, 61,656 legacy-shaped keys, and 61,718 distinct non-null `source_ref` values (zero
+duplicate groups in this observation). The alias table has 3,294 `PREFIX_DIVERGENCE_ACE_PACKET`
+rows, no `PACKET_KEY_V1_STORAGE_TO_V2` rows, a primary key on `alias_key`, and a foreign key
+requiring `canonical_packet_key` to already exist in `atlas_packets`. Therefore V2 admission
+remains blocked on the separately prepared alias DDL and explicit authorization; the older
+September admission report was not rerun because its producer overwrites shared reports.
+The legacy `resolvePacketKeyForWrite()` source-ref fallback now fetches at most two matches and
+throws `PacketIdentityAmbiguousError` rather than picking the first; no production callsite was
+found. Focused packet-key/identity tests pass 30/30. This readback is current-state evidence only,
+not migration authorization, V2 adoption, or a write receipt.
+
+**Bounded PacketKeyV2 derivation replay (2026-10-07; REPEATABLE READ READ ONLY):** added an
+optional `--output` argument to `scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts`,
+restricted to `.tmp/` so an isolated run cannot overwrite tracked reports. The fresh replay read
+61,718 packets: 17,399 rows were derivable from unique execution-membership repository scope,
+including 17,301 V1-shaped and 98 ACE-prefixed stored keys; 44,256 had no execution membership,
+61 were `rpc_method`, 1 was `cluster-summary`, and 1 source ref failed the upstream contract.
+The 17,399 derived keys were distinct (zero collisions in this derivable cohort). Alias readback
+remains 3,294 `PREFIX_DIVERGENCE_ACE_PACKET` rows and zero `PACKET_KEY_V1_STORAGE_TO_V2` rows.
+Scratch receipt: `.tmp/goal-packet-key/census-v1.json`, SHA-256
+`d1c4eb49f51da627408f1676e292459348fb89ce11fdd0efa1e9e3c06020e2b0`. This proves only the
+bounded derivation/collision result for rows with unique execution membership; it does not qualify
+the 44,256 unbound rows, prove V2 admission, authorize alias DDL, or change canonical identity.
 
 **GRAPH-SNAPSHOT-SCOPE-V2-01, applied (2026-09-28) -- `workspace_revision_key` alone was still
 insufficient scope; a repository + execution partition was missing.** An external review correctly

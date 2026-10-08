@@ -19,6 +19,19 @@ test('heuristic supersession candidate never suppresses a task', () => {
   assert.equal(link.canonicalAuthority, false);
 });
 
+test('explicit duplicate declarations become review-only links with no inferred successor', () => {
+  const link = buildSupersessionLinkV1({
+    ...card,
+    reviewReasons: ['EXPLICIT_DUPLICATE_OF_DECLARATION_REQUIRES_REVIEW'],
+  });
+  assert.equal(link.relation, 'SUPERSESSION_REVIEW_CANDIDATE');
+  assert.equal(link.successorTaskKey, null);
+  assert.equal(link.reviewState, 'REVIEW_REQUIRED');
+  assert.equal(link.confirmed, false);
+  assert.equal(link.retrievalSuppressed, false);
+  assert.match(link.reason, /not a confirmed supersession/);
+});
+
 function supersessionFixture() {
   const taskCardCorpus = {
     schema: 'atlas.openspec-task-card-corpus.v1',

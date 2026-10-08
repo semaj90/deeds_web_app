@@ -45,6 +45,7 @@ describe('selectPreAgentStages (CTX-PREAGENT-01)', () => {
     expect(plan.stages.slice(-2)).toEqual(['ACE_PACKET_ASSEMBLY', 'AGENT_HANDOFF']);
     expect(plan.stages).toContain('LEXICAL');
     expect(plan.stages).toContain('AST');
+    expect(plan.stages).toContain('AST_STRUCTURAL_REFINE');
     expect(plan.stages).not.toContain('SEMANTIC_ROUTE');
     expect(plan.canonicalAuthority).toBe(false);
   });

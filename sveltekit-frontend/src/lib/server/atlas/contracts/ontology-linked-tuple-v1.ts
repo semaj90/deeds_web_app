@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { ClassificationEnvelopeV1 } from './classification-envelope-v1.js';
 import type { FeatureMatrixRowV1 } from '../feature-matrix-schema.js';
+import type { GroundedNlpFactV1 } from '../../nlp/nlp-observation-lineage-v1.js';
 
 export const OntologyLinkedTupleEvidenceStateSchema = z.enum([
   'ACTIVE_VERIFIED',
@@ -85,6 +86,7 @@ export const OntologyLinkedTupleProvenanceSchema = z.object({
   ontologyVersion: z.string().min(1).nullable(),
   nlpVersion: z.string().min(1).nullable(),
   sourceRevision: z.string().min(1).nullable().optional(),
+  workspaceRevision: z.string().min(1).nullable().optional(),
   representationId: z.string().min(1).nullable().optional(),
   representationRevision: z.string().min(1).nullable().optional(),
   producerId: z.string().min(1).nullable().optional(),
@@ -154,6 +156,84 @@ function hashTupleId(parts: string[]): string {
 
 export function buildOntologyLinkedTupleId(parts: string[]): string {
   return hashTupleId(parts);
+}
+
+export function projectGroundedNlpFactToOntologyTupleV1(input: {
+  fact: GroundedNlpFactV1;
+  ontologyIds: string[];
+  conceptIds: string[];
+  labelKind: z.infer<typeof OntologyLinkedTupleLabelKindSchema>;
+  ontologyRevision: string;
+}): {
+  schema: 'atlas.grounded-nlp-ontology-projection.v1';
+  factId: string;
+  workspaceRevision: string;
+  sourceRevision: string;
+  tuple: OntologyLinkedTupleV1;
+  canonicalAuthority: false;
+  writesPerformed: false;
+} {
+  const { fact } = input;
+  if (fact.canonicalAuthority || fact.ontologyPromotionAllowed) throw new Error('GROUNDED_NLP_FACT_AUTHORITY_INVALID');
+  if (fact.confidence == null || !input.ontologyRevision) throw new Error('GROUNDED_NLP_TUPLE_PROJECTION_INPUT_MISSING');
+  if (!Array.isArray(input.ontologyIds) || !Array.isArray(input.conceptIds)) throw new Error('GROUNDED_NLP_TUPLE_LABELS_INVALID');
+  const labelSourceByExtractor = { langextract: 'llm', regex: 'regex', spacy: 'ner' } as const;
+  const labelSource = labelSourceByExtractor[fact.extractorKind as keyof typeof labelSourceByExtractor];
+  if (!labelSource) throw new Error(`GROUNDED_NLP_EXTRACTOR_NOT_MAPPABLE_TO_TUPLE_LABEL_SOURCE:${fact.extractorKind}`);
+  const ontologyIds = [...new Set(input.ontologyIds)].sort();
+  const conceptIds = [...new Set(input.conceptIds)].sort();
+  const tupleId = buildOntologyLinkedTupleId([
+    fact.factId,
+    input.ontologyRevision,
+    input.labelKind,
+    labelSource,
+    fact.proposedLabel,
+    ontologyIds.join('\0'),
+    conceptIds.join('\0'),
+  ]);
+  const tuple = OntologyLinkedTupleV1Schema.parse({
+    tupleId,
+    schemaVersion: 'ontology-linked-tuple.v1',
+    sourceRef: fact.sourceRef,
+    surfaceText: fact.surfaceText,
+    label: fact.proposedLabel,
+    labelKind: input.labelKind,
+    labelSource,
+    ontologyIds,
+    conceptIds,
+    evidenceRefs: [fact.evidenceKey, fact.taskRef, fact.canonicalTaskRef],
+    evidenceSpan: {
+      sourceRef: fact.sourceRef,
+      start: fact.evidenceSpan.byteStart,
+      end: fact.evidenceSpan.byteEnd,
+    },
+    confidence: fact.confidence,
+    evidenceState: 'GATED',
+    lifecycle: 'OBSERVED',
+    provenance: {
+      sourceTables: [],
+      labelerVersion: null,
+      taggerVersion: null,
+      ontologyVersion: input.ontologyRevision,
+      nlpVersion: fact.extractorRevision,
+      sourceRevision: fact.sourceRevision,
+      workspaceRevision: fact.workspaceRevision,
+      producerId: 'atlas.grounded-nlp-ontology-projection',
+      producerRevision: 'atlas.grounded-nlp-ontology-projection:v1',
+      ontologyRevision: input.ontologyRevision,
+      inputDigest: fact.factId,
+      outputDigest: tupleId,
+    },
+  });
+  return {
+    schema: 'atlas.grounded-nlp-ontology-projection.v1',
+    factId: fact.factId,
+    workspaceRevision: fact.workspaceRevision,
+    sourceRevision: fact.sourceRevision,
+    tuple,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  };
 }
 
 function normalizeSourceTables(sourceTables: string[]): string[] {

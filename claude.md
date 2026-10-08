@@ -1731,3 +1731,11 @@ Verbatim original: `docs/archive/claude-md-status-and-governance-2026-10-03.md`.
 **Domain review sheet + rules (2026-09-20):** `node scripts/atlas/build-domain-review-sheet-v1.mjs` builds an offline searchable review page `docs/reports/domain-review-sheet-v1.html` (blind mode, localStorage autosave, JSONL export the eval harness reads via `python python/atlas_domain_classifier_eval_v1.py --input <file>`). Labeling rules: judge primary responsibility from the path/file (the LLM evidence text is not truth); one of the 13 top-level `atlas_domain_ontology` groups; `AMBIGUOUS` / `NOT_A_DOMAIN` / `SKIP` are counted, never gold; second reviewer on >=10%. Trust floor 200 reviewed rows AND 30 per class; the 49 revision-qualified rows are far short (largest class 11; machine-learning, compiler, error-handling have 0), and closing that depends on CURRENT_SOURCE_AUTHORITY_PROVEN, not on labelling alone. Report Tier A (revision-qualified) and Tier B (unresolved-revision, evaluation only) separately.
 
 **Searching gitignored evidence (2026-09-20):** files over ~10 MB are kept out of git by convention (advisory 10 MB audit `audit-openspec-report-disposition-v1.mjs`; the 20 MB `.githooks/pre-commit` is inactive by default and many tracked reports already exceed it), so the AST/classification evidence lives under gitignored `.tmp/atlas/` and `*.jsonl`. `.rgignore` re-includes a selected set so a plain `rg` from the repo root finds them (draft/reviewed domain JSONL, AST candidates, canary-eligible rows, source-authority cohort, symbol nominations/resolution, knowledge snapshot). Test from the repo ROOT: searching inside an ignored directory bypasses ignore rules and gives a false pass. Searchable is not authoritative; regenerate before citing.
+
+<!-- OPENWIKI:START -->
+
+## OpenWiki
+
+@AGENTS.md
+
+<!-- OPENWIKI:END -->

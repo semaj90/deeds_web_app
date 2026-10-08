@@ -59,8 +59,9 @@ function errorChain(error: unknown): Array<{ code: string | null; message: strin
 /** Classify a thrown pg / Drizzle / network error. Walks `.cause` (Drizzle wraps pg errors). */
 export function classifyPostgresError(error: unknown): DatabaseReadinessClassification {
   const chain = errorChain(error);
-  const sqlstate = chain.find((entry) => entry.code && /^[0-9A-Z]{5}$/.test(entry.code))?.code ?? null;
   const text = chain.map((entry) => entry.message).join(' | ').toLowerCase();
+  const sqlstate = chain.find((entry) => entry.code && /^[0-9A-Z]{5}$/.test(entry.code))?.code
+    ?? (/(?:sqlstate\s*)?57p03\b/i.test(text) ? '57P03' : null);
 
   if (/database system is shutting down/.test(text)) {
     return { state: 'unavailable', reason: 'SHUTTING_DOWN', sqlstate, retryable: true };
@@ -68,7 +69,8 @@ export function classifyPostgresError(error: unknown): DatabaseReadinessClassifi
   if (/database system is in recovery mode/.test(text)) {
     return { state: 'starting', reason: 'IN_RECOVERY', sqlstate, retryable: true };
   }
-  if (/database system is starting up/.test(text) || (sqlstate === '57P03' && !/shutting down/.test(text))) {
+  const containsStartingSqlstate = sqlstate === '57P03' || /\b(?:sqlstate\s*)?57p03\b/i.test(text);
+  if (/database system is starting up/.test(text) || (containsStartingSqlstate && !/shutting down/.test(text))) {
     return { state: 'starting', reason: 'STARTING_UP', sqlstate, retryable: true };
   }
   if (chain.some((entry) => entry.code === 'ECONNREFUSED') || /econnrefused/.test(text)) {

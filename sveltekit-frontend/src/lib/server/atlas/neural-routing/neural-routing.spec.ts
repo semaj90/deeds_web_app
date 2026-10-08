@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildGpuAdmissionReceipt, buildRuntimeIdentity } from './gpu-admission.js';
 import { buildQueryRoutingSnapshot, buildToolRoutingReceipt } from './materializer.js';
 import { buildToolTrainingExamples } from './training-example-builder.js';
+import { CandidateFeatureMatrixV1Schema } from './contracts.js';
 
 const envelope = {
   maxVramBytes: 8_000_000_000,
@@ -89,6 +90,11 @@ function snapshot() {
 describe('Parent Atlas neural routing lineage', () => {
   it('builds a deterministic feature matrix and excludes FSM-masked tools', () => {
     const snap = snapshot();
+    expect(snap.candidateFeatureMatrix.schemaVersion).toBe('atlas.tool-routing-feature-matrix.v1');
+    expect(() => CandidateFeatureMatrixV1Schema.parse({
+      ...snap.candidateFeatureMatrix,
+      schemaVersion: 'atlas.candidate-feature-matrix.v1',
+    })).toThrow();
     expect(snap.candidateFeatureMatrix.rows).toHaveLength(2);
     const receipt = buildToolRoutingReceipt({ snapshot: snap, topK: 3 });
     expect(receipt.selectedToolIds).toEqual(['atlas.graph.expand']);

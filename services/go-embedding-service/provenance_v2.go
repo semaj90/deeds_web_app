@@ -176,8 +176,23 @@ func verifyLoadedOllamaModelV2(ctx context.Context, baseURL, requestedModel, exp
 	return observedDigest, nil
 }
 
+func resolveEmbeddingServiceBuildRevisionV2(configuredRevision, compiledRevision string) string {
+	configuredRevision = strings.TrimSpace(configuredRevision)
+	compiledRevision = strings.TrimSpace(compiledRevision)
+	if compiledRevision != "" {
+		if !isSHA256PrefixedV2(compiledRevision) || configuredRevision != "" && configuredRevision != compiledRevision {
+			return ""
+		}
+		return compiledRevision
+	}
+	if isSHA256PrefixedV2(configuredRevision) {
+		return configuredRevision
+	}
+	return ""
+}
+
 func resolveEmbeddingCapabilityV2(ctx context.Context, cfg config, contentSelectionRevision, inputPolicyRevision string) (embeddingCapabilityV2, error) {
-	buildRevision := strings.TrimSpace(envOr("EMBEDDING_SERVICE_BUILD_REVISION", ""))
+	buildRevision := resolveEmbeddingServiceBuildRevisionV2(envOr("EMBEDDING_SERVICE_BUILD_REVISION", ""), compiledServiceBuildRevisionV1)
 	if !isSHA256PrefixedV2(buildRevision) || strings.TrimSpace(contentSelectionRevision) == "" || strings.TrimSpace(inputPolicyRevision) == "" {
 		return embeddingCapabilityV2{}, fmt.Errorf("EMBEDDING_CAPABILITY_IDENTITY_INCOMPLETE")
 	}

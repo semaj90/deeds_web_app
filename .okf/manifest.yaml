@@ -75,6 +75,7 @@ registries:
     schemas:
       - feature-intelligence.yaml
       - code-exploration.yaml
+      - code-capability-knowledge-v1.yaml
 
 # Extractor versions (bump on breaking changes)
 extractors:

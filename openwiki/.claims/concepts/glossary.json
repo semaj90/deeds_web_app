@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:cbe83b66de06403c20130cd34a67b8029a9ca318ac3c3a31064f74d273d5d83f",
+  "claims": [
+    {
+      "id": "claim_8fb86a6580244781a83e951789427ebf",
+      "statement": "A Packet is the fundamental unit of data encapsulation, carrying payload, metadata, and routing information between ingestion and storage layers.",
+      "evidence": [
+        {
+          "resource": "repo://ACE-QUICK-REFERENCE.md",
+          "version": "repo-file-v1:sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09"
+        }
+      ]
+    },
+    {
+      "id": "claim_184f44093d924ea49d4f5b49b9561427",
+      "statement": "Bitfrost is the caching and memory-streaming layer that manages high-priority hot data buckets to reduce retrieval latency.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/cold-warm-hot-packet-lifecycle.md",
+          "version": "repo-file-v1:sha256:d77c6f6c6832b4d63cd8b5b8ebe3134486800c9cd7762a92c0fd8b70be210f89"
+        }
+      ]
+    },
+    {
+      "id": "claim_e95eca83615b4d069a7a4914adf727b6",
+      "statement": "Graphify constructs and maintains a semantic graph structure over data to enable complex traversal and retrieval.",
+      "evidence": [
+        {
+          "resource": "repo://AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
+          "version": "repo-file-v1:sha256:f2368151d3bbdc3abc848ba13f2527eae4feddb25c19095ffbb573d142624864"
+        }
+      ]
+    },
+    {
+      "id": "claim_84329ee6329342a1a8018017a610fcc9",
+      "statement": "The ACE Pipeline is the multi-stage engine responsible for orchestrating data flow, context enrichment, and retrieval from ingestion to output.",
+      "evidence": [
+        {
+          "resource": "repo://ACE-SUMMARY-LATENCY-IMPACT.md",
+          "version": "repo-file-v1:sha256:0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12"
+        }
+      ]
+    },
+    {
+      "id": "claim_6f2f91130c5947ada4ef24b29cfa9d87",
+      "statement": "Tensor Residency defines the strategy for pre-staging and pinning tensor data in GPU memory to minimize retrieval and inference latency.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/changes/parent-atlas-tensor-residency-integration/specs/tensor-residency/spec.md",
+          "version": "repo-file-v1:sha256:1c1255b089b95f15b53292e6452f18b57cf579f0730154b79b6b5e0734078d30"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

@@ -3,7 +3,7 @@
 **Your Current State:**
 - ✅ Phase 1 Glyphs complete (78 ACE cards ingested)
 - ✅ Parent Atlas Phase 1 complete (semantic cache tested)
-- ✅ Gemma4 agentic workflows ready
+- ✅ Gemma4 agentic workflows ready call ornith 1.5 llama-server 8090 UPDATE THIS! from  Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs
 - ⏳ 70 GB repository (optimization opportunities available)
 
 **Decision Required:** Which work stream to prioritize over next 48 hours?
@@ -41,7 +41,7 @@ Extract: Function call expressions using TypeScript AST
   ↓
 Build Edges: file1.ts → calls → file2.ts (5K-10K edges)
   ↓
-Sync: Neo4j graph + Redis cache
+Sync: Networkx graph + Redis-valkey centroid cache
   ↓
 Test: Verify edges resolve correctly
 ```
@@ -49,7 +49,7 @@ Test: Verify edges resolve correctly
 - Risk: Low (read-only extraction, tested on samples)
 - ROI: High (5K-10K new edges immediately useful)
 
-**Time Commitment:** ~7 hours (can be split across 2-3 sessions)  
+**Time Commitment:** ~7 hours (can be split across 2-3 sessions)
 **Outcome:** Production-ready training data + knowledge graph foundation
 
 ---
@@ -67,15 +67,15 @@ Test: Verify edges resolve correctly
 - `/api/glyphs/[id]` endpoint (1h)
 - Integration tests (1h)
 
-**Infrastructure:** Mostly existing  
+**Infrastructure:** Mostly existing
 - GlyphAtlasPanel.svelte (784 LoC, fully operational) ✅
 - API routes `/api/glyph/*` ✅
 - UnoCSS styling ✅
 
-**Risk:** Low (straightforward Svelte 5 components, design complete)  
+**Risk:** Low (straightforward Svelte 5 components, design complete)
 **Value:** User-facing feature (useful for exploration + demos)
 
-**Time Commitment:** 7 hours for UI, plus 7 hours core  
+**Time Commitment:** 7 hours for UI, plus 7 hours core
 **Total:** ~14 hours
 
 ---
@@ -102,7 +102,7 @@ Test: Verify edges resolve correctly
 - Phase 3 (USES_DB edges) — 2-3 hours
 - Phase 4 (USES_TOOL edges) — 2-3 hours
 
-**Time Commitment:** 20-28 hours across sessions  
+**Time Commitment:** 20-28 hours across sessions
 **Outcome:** Production-ready platform with all features active
 
 ---
@@ -126,7 +126,7 @@ Test: Verify edges resolve correctly
 ### Option A Enables:
 - ✅ GRPO training pipeline (fine-tune Gemma on legal glyphs)
 - ✅ Neo4j knowledge graph (5K-10K CALLS edges)
-- ✅ Production analysis (Gemma4 + MCP + Atlas)
+- ✅ Production analysis (call ornith 1.5 llama-server 8090 UPDATE THIS! from  Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs ornith 1.5 llama-server 8090 update from Gemma4 + MCP + Atlas)
 - ✅ Phase 3-5 Atlas work (next 20-30 hours planned)
 
 ### Option B Enables (all of A, plus):
@@ -159,7 +159,7 @@ Test: Verify edges resolve correctly
 3. **Then decide:** Add NES UI (Option B) if time permits, or defer to next session
 
 **Why this order?**
-- **Glyphs first:** Data drives everything (GRPO training, demo data, validation)
+- **Glyphs first:** Data drives everything (GRPO gepa like OaK 2026 training, demo data, validation)
 - **Atlas second:** Knowledge graph enables intelligent routing (MCP tool selection, reasoning)
 - **UI third:** Polish/presentation (valuable but not blocking production)
 
@@ -243,8 +243,8 @@ Test: Verify edges resolve correctly
 
 ---
 
-**Status:** All options ready to execute  
-**Blockers:** None — decision is yours  
+**Status:** All options ready to execute
+**Blockers:** None — decision is yours
 **Recommendation:** Option A (core), with Option B a strong second choice
 
 ---

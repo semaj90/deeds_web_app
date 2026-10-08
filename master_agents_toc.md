@@ -219,6 +219,7 @@ npx vitest run src/lib/server/ai/error-agent src/routes/api/ai/error-agent --rep
 
 ## Evidence reports
 
+- `docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20-pgvector-embeddinggemma-agentic-dense-search-todo.md` — deferred dense-search, sourceRef, DSPy/GEPA, OaK, and 8095→DSPy two-hop integration tasks.
 - `docs/reports/openspec-execution-controller-v1.json`
 - `docs/reports/openspec-blocker-audit-v1.json`
 - `docs/reports/okf-claim-freshness-v1.json`

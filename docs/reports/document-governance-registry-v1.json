@@ -56,8 +56,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:a54ff182c7e8acf56acfd6e4b9c3ff41e2c41a31c9b211b2deb9df75d9a478f9",
       "path": "AGENTS.md",
-      "sha256": "afa11f316562a2890e5b46a3ee4dbaa07235ecda89afa9e876ee60d7f2221c97",
-      "bytes": 15856,
+      "sha256": "287ec1d91fd264b5cecae97862697b734f7dc542bea4b7c1dab340d38f4383ca",
+      "bytes": 17282,
       "title": null,
       "documentKind": "AGENT_INSTRUCTIONS",
       "status": "CANONICAL_CURRENT",
@@ -99,8 +99,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ebdb617a8104a7756d0cf36578ab01103dc9f07e4dc6feb751296b9c402faf7",
       "path": "CLAUDE.md",
-      "sha256": "e2e8b564745247727a03633c62b365e6add20c6687467e867e91ef78d85ee60d",
-      "bytes": 152078,
+      "sha256": "6bb7baf527a6afc70064a418d8e2b1949124d9d0ff9ced899d6f5def8d789b87",
+      "bytes": 152150,
       "title": null,
       "documentKind": "CLAUDE_INSTRUCTIONS",
       "status": "CANONICAL_CURRENT",
@@ -279,8 +279,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:f41379e498cf2dfe00ebad780e9b0957bf2e14ec96adebcd3829349a57104438",
       "path": "docs/.okf/architecture/domain-classification-and-agentic-retrieval-v1.md",
-      "sha256": "2e49e7f9841ecadd255fc15a4a97dbfe1a0059e7d3a9759d4377201d345a6908",
-      "bytes": 18551,
+      "sha256": "35d66361ba81fd1390f57630b260c14584368cbf932a6796321b4893e250cacf",
+      "bytes": 20631,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "UNCLASSIFIED",
@@ -1700,6 +1700,2844 @@
       "path": "docs/.okf/dev/atlas-doc-fabric.manifest.example.json",
       "sha256": "218db540f8983fe645c04c3811570761f15bb41c7df630f6e77495bf8480cc78",
       "bytes": 2009,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:b93f4c4f690331655f51ad07b0ab0e67e2d8ca4ef61ceee057980634c84acef8",
+      "path": "docs/.okf/dev/context-engineering-docs-supplement-v1.json",
+      "sha256": "1410092c62f99d95797d67004e1112bd5fc4439cd0c71cd309f32b145c27cdbe",
+      "bytes": 1987,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:13ea2372c24247de03b3cc454186322ecdf6d5fb535d927ca45c6211e8640a1d",
+      "path": "docs/.okf/dev/context-engineering-docs-v1.json",
+      "sha256": "88fb1064054e31552c2c571fe7a5dd1f6242058d3eb1f5eb0d31338dca26c818",
+      "bytes": 2575,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:2d9f1b456c57fd55ce5462627337dbde8b85a4c5cffb9d9ac8e62cd7f984ba84",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/index.md",
+      "sha256": "e9911addf3d2fa70e3cbf4f77d9bb87b86e33dcc78e5f5367ed6601c75d7ba00",
+      "bytes": 488,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:83368e50139840605f81748cbc59dae7d213d09fc90b158d7a58dad6cdeba74f",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/context-engineering/developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.json",
+      "sha256": "c3cea1b224214bbcf04f6e2d2d8f06c2656c91ae7ac9a86cc0bdcaf988c45757",
+      "bytes": 4519,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:19c5e9a4b83e3840c5efd14ff3f0d3298cb6c5f392efe51d07cfe9bbd26ecc1c",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/context-engineering/developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.md",
+      "sha256": "64a371a4ba90c80f65509b396ce178b9300a9a417d1a0d5c06c233614311931e",
+      "bytes": 21905,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:5c98a333657b2697cde0dfad6aa0615779a5a1400cf2de17df4c07b6c6c171e5",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/duckdb-interchange/duckdb-org-json-overview-overview.json",
+      "sha256": "8570ca9c0c671d1ea3c5a36d08a3055aecd55ba654857d81af9a729b3a0cdb23",
+      "bytes": 3514,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:43f9d6693611fdb43a42077f1af25c6d9a626dbf647e2d285a40e2b355e7c60a",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/duckdb-interchange/duckdb-org-json-overview-overview.md",
+      "sha256": "0de668419816142c84daa1576d64a753c09b539c80bcfc5337a291d2ef8129cb",
+      "bytes": 44474,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:1e780727cbda39f57d9b36928ee76f0479be5ce086b28b2b298d2b94dd50eabb",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/duckdb-interchange/duckdb-org-parquet-overview-overview.json",
+      "sha256": "fa450afc6dbac3064e22b9ad0e9b5cc78b4c06b084d4fc39f7ff2cf3e78a4136",
+      "bytes": 3529,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:70b9c2326dea9ec3ea42a78bbc73638c2bcc914ed49bc29d6695071a94063838",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/duckdb-interchange/duckdb-org-parquet-overview-overview.md",
+      "sha256": "74cc0c97212ff40e1a3d77bc183c9e106f2a3bca8549410744da0bd1bedd879d",
+      "bytes": 52276,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:56d5ce6c1392d674c8546a7a816b48ae80d0d3d8acd3d35156c3e7b4dd538341",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/grpc-protobuf/grpc-io-what-is-grpc-introduction-introduction.json",
+      "sha256": "65a0ca567e27ff453aacc4327bdaa6fd318881e194a0e1c2e03c0a3db3ac1df8",
+      "bytes": 3212,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:cd92c62c2cdba8dbbbcd2cd3f437bd2e66b5447a31fde1150b511350f73910a2",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/grpc-protobuf/grpc-io-what-is-grpc-introduction-introduction.md",
+      "sha256": "e5088dad436ed11a1f7e27a7ee92ccb7dd97573ac356505ea67a428a48ab6434",
+      "bytes": 7118,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:9dc020b636d99c73c793de541ded9640d0d3b8e972ddebfc9e6e62dfc6adf611",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/grpc-protobuf/protobuf-dev-programming-guides-encoding-encoding.json",
+      "sha256": "6a6c65fb72d2800d91c0809de11ba4f15f0b722df3d108d991f22c485f1862d0",
+      "bytes": 3229,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:d0d288f45f132aed0dbc7c5b5288b071cf691ec949995acfa1bb7f0763c55a79",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/grpc-protobuf/protobuf-dev-programming-guides-encoding-encoding.md",
+      "sha256": "6d1e980bffd034f3aad16b131aabb6f55f314a0e8c5e1158a783efa759d0e870",
+      "bytes": 22040,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:2b237eacfa7806700d837631ead4b75b54db8f3f70ba70b0802a7e53160040ec",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/msgpack-spec/msgpack-org-index-html-index-html.json",
+      "sha256": "71d57a870f4010167d6b1c3c38ffad0679ae348a0759f17fd9663ec1cab80a64",
+      "bytes": 3504,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e3e1efc6abf6046ef4cc3eb67888689bb71755e9188815a0b3e81592ddb1b7f3",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/msgpack-spec/msgpack-org-index-html-index-html.md",
+      "sha256": "f6f3eeb084e722506b1b9bb3c847bf2b82fd8dd2155e662021212ebc62b751e1",
+      "bytes": 560885,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:572d316647578d0784bbf77eaa3f4230b77df4cdb1b7239815e43448a221a60f",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/openai-prompting/platform-openai-com-guides-prompt-engineering-prompt-engineering.json",
+      "sha256": "700cf0a7824b8c9fec387efd39bb00498c88aebcb0aa213922da4b6b0d040fd7",
+      "bytes": 3953,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:6126ae413597702cb8bcf8b85283f576c902910c95f438e89048e274d2be53d0",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/openai-prompting/platform-openai-com-guides-prompt-engineering-prompt-engineering.md",
+      "sha256": "dec9661c0593edff7a12cfaae573031590a1f9bf25145368782a60a77c2e4207",
+      "bytes": 46542,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:a26574bc5a8dcc23e83b631a977b46674d7982562d249d3608366fd53c30ea88",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/openai-prompting/platform-openai-com-guides-tools-tools.json",
+      "sha256": "3bbcfa3d7229d0c778dc464699ddea6bcdf857f1ad7e4bfb2d82abb042d81480",
+      "bytes": 3885,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:60f656a4db2b1daff1ad94f06b8c52c8f544d82a623076c735e7a24a4b730458",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/openai-prompting/platform-openai-com-guides-tools-tools.md",
+      "sha256": "068eb6297deeed5fd774ddbcaf9d75e0b0e3302a1eaad9631d58b01e05f680a0",
+      "bytes": 44859,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:7bd7b893e0a5f569260804347630ca144cfc7be9091f393f4e44664aece553e1",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-client-side-caching-client-side-caching.json",
+      "sha256": "36c16581bbbc005008a999d86dbcaaedab3f9ae2aeb3734fec77996ce422f651",
+      "bytes": 3353,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:1c784a5d7d128c23cbd033e28bbeb19d2beb650778155783acbdc771f0635149",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-client-side-caching-client-side-caching.md",
+      "sha256": "a7095d9ae33ba4a19b3e4e2d279147b165eefe7853030f25330fb679b9db707d",
+      "bytes": 19533,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:ec671f10779b87800c85115cbc7617181765fcee85bf753128fabe0b3fbdfc36",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-keyspace-keyspace.json",
+      "sha256": "fad3ceed1eb5e6fec492efad4c858e6ff30866f9c9a4084740b07d6ee749510b",
+      "bytes": 3263,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:8f63c68f49e3829383e939a7422bed2e3d5b6be1de9257592c290cb5618c0168",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-keyspace-keyspace.md",
+      "sha256": "f8009f1f368b1f9f6e34f849ab3f1630459dfcea813e242ae9e8dd4ddae666da",
+      "bytes": 5906,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:94dceeffc8dfb29437bc82be4028eb787a7786b8135a9e5fdc5be885225a4a5b",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-lru-cache-lru-cache.json",
+      "sha256": "42c95484a94d7f5754e38792503af433ce3527c9eb6532a86485705652ee8c06",
+      "bytes": 3263,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:6077c9cbd800e49538e8804f7af28c1ecec5d05be79a75f206214d05a36c4d9f",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/raw/valkey-cache-semantics/valkey-io-topics-lru-cache-lru-cache.md",
+      "sha256": "e1cc848d37c595800bdb7543ebf14607131f63c2505c140179714287829f2414",
+      "bytes": 13775,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e79766ed0fe7195d47959ca0cd3dc1354b84d26c7d6c8b4d7288547dc01a1795",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/summary.json",
+      "sha256": "b9347dce5d5cb0dba0b21160e6bdedc68f3cd8733b101d2ef18993400703667b",
+      "bytes": 830,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:028d7bbff60e86e5329a4dcca9dfe8f3bf317b5b06d17f59ff98b0a220673f52",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/topic-extraction-receipt.json",
+      "sha256": "e734b34e110d826af40052861d4e376cc1c3fde9dcfd564e8c40f9e433f71ad8",
+      "bytes": 799,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:41d0af0132a55e12f95e2f6f82d5e8c5ff20cfb1801aa48204ade59492e4df52",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/index.md",
+      "sha256": "346d8d3795eece4241f011d9dd9101944ae738b70e98afb8478b30a133deba32",
+      "bytes": 471,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f6adfef4ba5b520ef9a59d58406a8a83aedd8ab0870e835808acc36b8a1864c9",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/embeddinggemma-model/ai-google-dev-embeddinggemma-model-card-model-card.json",
+      "sha256": "b337e1884dee37c1aca1c8ed0825e52b3e8cc2f2bef85173c05fb5c7fde50400",
+      "bytes": 3376,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e9e8165b46efbaf44d72e45e10bc9c6c5790d1c5098fc3685a0190757e3977a2",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/embeddinggemma-model/ai-google-dev-embeddinggemma-model-card-model-card.md",
+      "sha256": "ae8bafa3bf9d24f8e062c42f2436b263da5e75de6665529de1a00fbca5d6a591",
+      "bytes": 15481,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:fab4c846e8db8f05030e3b937219c75e63c9a73af47ccd9914d959a674c1e923",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/oaklib-ontology-tooling/incatools-github-io-ontology-access-kit-introduction-html-introduction-html.json",
+      "sha256": "f0004dad044ba73351efb6ee84de74163e937aefcc57d3f4585311bb0d065fbe",
+      "bytes": 3483,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:8b10b8a9fe2f55708949015190b762a0e5a42b3c3e7e5a5fdd2db0dbd633fa2a",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/oaklib-ontology-tooling/incatools-github-io-ontology-access-kit-introduction-html-introduction-html.md",
+      "sha256": "b28e71057c20d8f6856dbe7541cca4f9732c51bb82ef2ac03f8d6de06c707ac6",
+      "bytes": 3867,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:3ea20b3182d1b72a9cc995dbc0b12662fb910ebf844d1dc344e225ca3f532837",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/pgvector-reference/github-com-pgvector-pgvector-pgvector.json",
+      "sha256": "86795e674bfe4827d6c4351df98ed3286ea2ec23c8e27ed9a833be5110604d85",
+      "bytes": 3553,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:c9425e2309e1e736443f4d501c76af56377c9e6f6d68efb28fd3f60304042110",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/pgvector-reference/github-com-pgvector-pgvector-pgvector.md",
+      "sha256": "848f996b69ffeaab2854480a2dc5fdeb76434c47009bb04799643f5d92f69e99",
+      "bytes": 60580,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:5e6fd5c4bb520dfb28c5de31eb0450f28ec3ab04226ce4c337dde6f004ef882f",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/rapids-cuml-kmeans/docs-rapids-ai-api-cuml-cluster-cuml-cluster.json",
+      "sha256": "d5ebbca26ade70551123ac374cf694268ae43e7a13028a9124969b4b104c0cc7",
+      "bytes": 3265,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:9e1c89a702a1d58fb976841ec23d7f7535b868305a1c48ecc85d02441a931d30",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/rapids-cuml-kmeans/docs-rapids-ai-api-cuml-cluster-cuml-cluster.md",
+      "sha256": "4978106852e297080fefe3df8bd492edb780dff1bd93d867945487f40fc269b9",
+      "bytes": 3270,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:d335235d441852e586410074fd2bec76a4e45f181d68ec23c20b898600bb98de",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/simdjson-project/github-com-simdjson-simdjson-simdjson.json",
+      "sha256": "b54bb262db3bdb3e9508422303a6001f0e4f7114447b676f023df08cc9a10896",
+      "bytes": 3528,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:c3a6afba85bfd772b8feb003fbef6a44b82ff8ac87a22ddf50cfbed43b0e61ec",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/raw/simdjson-project/github-com-simdjson-simdjson-simdjson.md",
+      "sha256": "fa39423fc2f137310c104ea95e0b8302a6417ddea1ed8599d5b693f53a416ba2",
+      "bytes": 81084,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:fff5e7f120a595270c50f0a286f7a71cbd9d0b5fbca7a82f37e9bd3f283ebcb7",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/summary.json",
+      "sha256": "f1de2f1a1720df1cfd8b5a061c994fc41b311797b986dd1155c062c29d0169b2",
+      "bytes": 756,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f6bbc4a9579055adb31dce4c67915ebb5f038db56188ea536cf32b9ac19bfbeb",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/topic-extraction-receipt-replay.json",
+      "sha256": "fb63756476c1a3e031d21113c889132344979e7bcf383911081474eb2bd1232e",
+      "bytes": 1009,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:0b789a100defbd7f45f349b87f1c1d913b1534d9d1bf9ffe4cb508cb7c242766",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/topic-extraction-receipt.json",
+      "sha256": "478cd7b97350e0f94eea0517512581eea626af59dccc894d01b57eda16c74ba6",
+      "bytes": 1002,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:234d0dd2469e04ac44f6fcbe50f9669230cd5046984bb73955d4c365163609b1",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/index.md",
+      "sha256": "ad009b7f411f735ada7fce22fdb8a82b6429c9adf326f3b14346c3f1f6264065",
+      "bytes": 482,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e075efb55585f96de510e1e50c352b36cac894c7539ea2a12cb954846c086311",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/context-engineering/developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.json",
+      "sha256": "680e5ee3d8683dc1188afc95f8b2fbeb2f9dcc6676e73dcb6451aa50bca905ad",
+      "bytes": 4470,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e506bfbcd50c4026eee9b0c6ec353838461b75b1bbb8a9260152f76562294d9b",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/context-engineering/developers-googleblog-com-architecting-efficient-context-aware-multi-agent-framework-for-production-architecting-efficient-context-aware-multi-agent-framework-for-production.md",
+      "sha256": "64a371a4ba90c80f65509b396ce178b9300a9a417d1a0d5c06c233614311931e",
+      "bytes": 21905,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:012aa532cc02072269ea1daf31868be945e76efddef0f89e16c82df79939990e",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/duckdb-interchange/duckdb-org-json-overview-overview.json",
+      "sha256": "5fcfe2761e01eeb1e3a75128009963a46240a89ccf50746c6470cbcd29763528",
+      "bytes": 3434,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:73eecc6dbb89f4a21ee975a2b1477d59539b6e0555369224ad0dc9ca3a4cb567",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/duckdb-interchange/duckdb-org-json-overview-overview.md",
+      "sha256": "0de668419816142c84daa1576d64a753c09b539c80bcfc5337a291d2ef8129cb",
+      "bytes": 44474,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:11f7f1b063fed3a3f22a100e298d10fda687b850fd13599632db259b1e70f2d4",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/duckdb-interchange/duckdb-org-parquet-overview-overview.json",
+      "sha256": "38a7061db72924b82ff72f29f6edf910b50668a74eeeb093b49b7eb29b33e310",
+      "bytes": 3449,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f6ce1f1b1b96b8193d4402981658c6c20e129b18a909d8560174808de29a2eaa",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/duckdb-interchange/duckdb-org-parquet-overview-overview.md",
+      "sha256": "74cc0c97212ff40e1a3d77bc183c9e106f2a3bca8549410744da0bd1bedd879d",
+      "bytes": 52276,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:856b77eaf07a8fec4ad0c3b53cf8ce7aab8f773eb1953fb786edaca0190f48cd",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/grpc-protobuf/grpc-io-what-is-grpc-introduction-introduction.json",
+      "sha256": "3ab78071549fc87078f183174d3f19e0b6153e964dd2b06f036214819c878dd0",
+      "bytes": 3088,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:800d1c430d5dc47a472277d4a1ae1037dcb9a477eb1ffb0810a903bb82889a2a",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/grpc-protobuf/grpc-io-what-is-grpc-introduction-introduction.md",
+      "sha256": "e5088dad436ed11a1f7e27a7ee92ccb7dd97573ac356505ea67a428a48ab6434",
+      "bytes": 7118,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:ff7d2fb5b2c06687e3dd2c859de2b110d8cb2b390a72c45a05048080f7758d9e",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/grpc-protobuf/protobuf-dev-programming-guides-encoding-encoding.json",
+      "sha256": "a932d779f800fca1418d2138f34bd020bad675515ca09b86f07fc74dafcecc94",
+      "bytes": 3110,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:42218ea6f4fdcb78df36392d54ecce9da6c882b125c93826c7da4787d52f7f30",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/grpc-protobuf/protobuf-dev-programming-guides-encoding-encoding.md",
+      "sha256": "6d1e980bffd034f3aad16b131aabb6f55f314a0e8c5e1158a783efa759d0e870",
+      "bytes": 22040,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:82349c98441bc714a2c32021f1211f0abe7322cf81c400e216dea7933920e9ba",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/msgpack-spec/msgpack-org-index-html-index-html.json",
+      "sha256": "9393073d95278779dca574fff7f797dc8556f9535ce5477d50b1848b3507dfd4",
+      "bytes": 3423,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:ac903a2c07db9394406271f09eae269aba7f21f8c07db21400b02a0c00dfa446",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/msgpack-spec/msgpack-org-index-html-index-html.md",
+      "sha256": "f6f3eeb084e722506b1b9bb3c847bf2b82fd8dd2155e662021212ebc62b751e1",
+      "bytes": 560885,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:c5f92955e16feda8cb51fda8898aa6c5441f41b0b8e98ba84d8ad370886d7d7a",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/openai-prompting/platform-openai-com-guides-prompt-engineering-prompt-engineering.json",
+      "sha256": "f0693e4fe622202871fef25d1384bcc854f17a35d5cc7e9935de0d6a4f68687c",
+      "bytes": 3895,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:3e80ffd4b25ed296eac2d4c07f4c44cd3089f90ce6671b39be685affaccd1c85",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/openai-prompting/platform-openai-com-guides-prompt-engineering-prompt-engineering.md",
+      "sha256": "dec9661c0593edff7a12cfaae573031590a1f9bf25145368782a60a77c2e4207",
+      "bytes": 46542,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:d86bd947737c636368db5e524b4da0adc32b22f7556725a81f3a9fb855b42193",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/openai-prompting/platform-openai-com-guides-tools-tools.json",
+      "sha256": "d7c6ab91556d1ffab0ed735e05b1c8451ff7c0704304666b330f93fae9ca238b",
+      "bytes": 3832,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:06a1f771f2aee78d80a10ce17db4914e432842cd7b92acb427976c2666aa5701",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/openai-prompting/platform-openai-com-guides-tools-tools.md",
+      "sha256": "068eb6297deeed5fd774ddbcaf9d75e0b0e3302a1eaad9631d58b01e05f680a0",
+      "bytes": 44859,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:6053a9a84217e6765a1ea0c50e46613a15b33ebe7261afca8d6db9a9b67eb61c",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-client-side-caching-client-side-caching.json",
+      "sha256": "0c060395ae0baa4824b9ecc7a0fe37fcdb47ce6e2904f860a41265be5af708f6",
+      "bytes": 3228,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:3e02bd7aa747a1ff9072b39e2a8ac79d4b30b8859cdf7d7a9149908cbf144943",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-client-side-caching-client-side-caching.md",
+      "sha256": "a7095d9ae33ba4a19b3e4e2d279147b165eefe7853030f25330fb679b9db707d",
+      "bytes": 19533,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:73bc98e62451c74e4f70cdbfd2c0eeee57d1c16cb4687d2077131aa0bb6e86a2",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-keyspace-keyspace.json",
+      "sha256": "8889f99347daacdf79893dd2576ad102e9b4865e5e46fa15366a0a53d5a4140f",
+      "bytes": 3138,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e132436dd62340befe250edf850cfcec34c1c51d6347aaef02cad5a5a14e34ac",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-keyspace-keyspace.md",
+      "sha256": "f8009f1f368b1f9f6e34f849ab3f1630459dfcea813e242ae9e8dd4ddae666da",
+      "bytes": 5906,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:63d24c65c673f48a69fedfbe15d145ba93caf7fe2352ff03325e0810b72ac15a",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-lru-cache-lru-cache.json",
+      "sha256": "f5fc0c31762de320073273243f9b99889b3b799819ccc06e48ff26393d613cea",
+      "bytes": 3138,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:4cdcc8a69ccca77e04fcf189e53757fd746225464ac1923194a3e04c3fc91cfe",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/raw/valkey-cache-semantics/valkey-io-topics-lru-cache-lru-cache.md",
+      "sha256": "e1cc848d37c595800bdb7543ebf14607131f63c2505c140179714287829f2414",
+      "bytes": 13775,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f91dbd9c473a1275666d3c0efd0c8450280f23ba86b1287c449ef4b709ab0697",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/summary.json",
+      "sha256": "fa6b1fc1acd0d777cf645151efa49af4d5798bc2fbc58840d1ec863df3dcec2e",
+      "bytes": 902,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:de53baddc4311e27bc7bda989350e54a0eec57a79523dfbfbd885cf989a39f0b",
+      "path": "docs/.okf/dev/context-engineering-docs-v1/run-20261006/topic-extraction-receipt.json",
+      "sha256": "0aee0eaa9629529567f1d38df4853155b81b7a295987d1a7c76f4500af2bb1e3",
+      "bytes": 796,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "UNCLASSIFIED",
@@ -40355,8 +43193,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:323582d5924bcc89557c91f9bb1b88dc41bba2888cc7a25d409f1fa9b1104a38",
       "path": "docs/architecture/NES-CHROM97-GLYPH-BITENCODING-ALIGNED.md",
-      "sha256": "d484162bf640c7132a09c64ac0d563fb1e2cc48dfe0caee8e8e4539dca051119",
-      "bytes": 22288,
+      "sha256": "052ae2a7a78fe1b543b7d09c5ddce915300b75029ac63a3cecec723965135786",
+      "bytes": 22315,
       "title": null,
       "documentKind": "ARCHITECTURE",
       "status": "UNCLASSIFIED",
@@ -41256,6 +44094,51 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:d3dc6a6bd6019fe45b36a52608d4ecb73cef46e082b06d53261a7f52ee21d0f6",
+      "path": "docs/architecture/code-symbol-semantic-retrieval-v1.md",
+      "sha256": "0a68e24fcf4b1ecae7ac58e778d1a22eba86ec5f27e6cd825ea04c3e8492304f",
+      "bytes": 8292,
+      "title": null,
+      "documentKind": "ARCHITECTURE",
+      "status": "ACTIVE_SUPPORTING",
+      "topicIds": [
+        "code-symbol-semantic-retrieval"
+      ],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "ASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:7bdd002729b0320ba0340cb5e31cad76bdcf4bcf869f68468f16e174ef81a528",
       "path": "docs/architecture/codebase-memory-mcp-cli-and-atlas-alignment-v1.md",
       "sha256": "97cfb83d4f350f909f15ff006ee7708468bcdafb3fb5f271eb41136e02acf758",
@@ -41860,8 +44743,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:61197986b19a688810b5be08bde83c27f1fef9ae2339e30d5fbd5b7a54f3bfef",
       "path": "docs/architecture/grpc-binary-memory-registry-master-todo.md",
-      "sha256": "5a17e3aa53d72b74066fff0adbad7ced2d1ce9438883825a1cdea8c6a45a4ae8",
-      "bytes": 8318,
+      "sha256": "80d25df251e9db685e3900a8904626b2f4677fc26a98a9f026b60526fb0e0c30",
+      "bytes": 8380,
       "title": null,
       "documentKind": "ARCHITECTURE",
       "status": "UNCLASSIFIED",
@@ -46848,8 +49731,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:06de21082abec191a73c34cae4ef13226f044c559825feec114dc34eb101976b",
       "path": "docs/atlas/parent-atlas-table-of-contents.md",
-      "sha256": "d32458619b0b625c53094e2daf72021dccc50711bd1c2b0f9bb574a2fbfcf0e3",
-      "bytes": 17193,
+      "sha256": "b46c6e396581ab0822e63b7bd2a588e0e31d84aeac807dbce7eb4978ed5a0db3",
+      "bytes": 19800,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "UNCLASSIFIED",
@@ -51533,6 +54416,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:5b05799eba075f4ccfe5adbffe0c6360e0b8f1287b8d3a4b2f5eb551e470e9ff",
+      "path": "docs/okf/OaK2026/findings-and-integration-gates.md",
+      "sha256": "bf25d1b86b81c510c8ffd9c3c0416becda3e7ca49dab08bf241b11f058025baa",
+      "bytes": 10063,
+      "title": null,
+      "documentKind": "DOCUMENT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:daf89ecc1f562ce6651aae76f718cb7edb7def58faad1acabdd2d9e1e8b9c2df",
       "path": "docs/okf/library-module-sources.json",
       "sha256": "101a3b960ee20caa1839048dd95dad40c155c1e74d2e51a0c48d27a9564095d2",
@@ -54502,8 +57428,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c24b0654b9c7637adce75a6ad159f742ee6402c68ffbf41b955fc09909ab7eb2",
       "path": "docs/parent-atlas-workstation-todo.md",
-      "sha256": "40fe9e5b896a5a3a9d6fd1380919189429fbd3f41ef8d1e4175d40a3635244b2",
-      "bytes": 172855,
+      "sha256": "4867400ebe7ce1ade6fd12c181427e74cfeb743fdde238a9e46cc1b5ee1f8e34",
+      "bytes": 193654,
       "title": null,
       "documentKind": "DOCUMENT",
       "status": "UNCLASSIFIED",
@@ -74947,6 +77873,49 @@
       "path": "docs/reports/atlas-index-pilot-reconciliation-v1.json",
       "sha256": "b9347beb7876eacbd5508aa7190e4bc460bffb92ed385279525b7dd5fc23e92d",
       "bytes": 9898,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:5d91c714151817a0763406d14e82d47e9ec7760a064c3c9a2f0a297eb92548c8",
+      "path": "docs/reports/atlas-indexing-surfaces-embedding-audit-v1-20261006.json",
+      "sha256": "8b2bc65e5c91d1a86fd34f5fbc567c30c4f2ae474ae8bc2b2a933e68d8e8a709",
+      "bytes": 88106,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -95540,6 +98509,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:91d8db1637239faaf2019f2bc80a40de614e8c6c3d9734443f63f489c6e73b5c",
+      "path": "docs/reports/embedding-direct-endpoint-census-v1-20261006.json",
+      "sha256": "b761567a993865e3dfb3e225f2fc87e8bc5127b938d1922d5d0e8df2991a9c82",
+      "bytes": 41708,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:8efa1412671fad335b69ddf7f276623f37e31b9be70e5b01275adbf5700f93cf",
       "path": "docs/reports/embedding-direct-endpoint-reconciliation-v1-20261003.md",
       "sha256": "cf47b19c5ac57270348feb7fb3a834e9d7bd81aef0b0c0f6defdf4f6d9b37edd",
@@ -96273,8 +99285,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:027945937698001834f8737f88bf9520c1a186f875fff4891ff0f863d3b8acee",
       "path": "docs/reports/embedding-runtime-readback-v1-20261006.json",
-      "sha256": "4b9cdca0ac1c7b3a167c15b21930ed4b0388e7e21dee34dbef08142fee966014",
-      "bytes": 1687,
+      "sha256": "e9a74fe14b633b75d303fb1398f9d526c6a92a74e51dead4f2cdf8e2da76fab2",
+      "bytes": 3271,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -114032,7 +117044,50 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:88e5c2c9f58bcc099f05890a8b2527521befecc07963bf0cd3cca8460fb626c9",
       "path": "docs/reports/graphify-downstream-chain-2026-10-06.json",
-      "sha256": "390bdfd79b040b76fbe75be49af32794ad953f60459fd75299cf5af7ee1ad03a",
+      "sha256": "9f01f5cc927b7face432a1992cc4bf357fbf0bd10fbfe7617d7704c4154818dd",
+      "bytes": 660,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:5004e24565777adad992c1d0238949895f399e7dafa92567384948ce122249e5",
+      "path": "docs/reports/graphify-downstream-chain-2026-10-07.json",
+      "sha256": "6dc3212127e4c5a68eb1d0654231f9ce1f62351b97112234929ffaa91e312eda",
       "bytes": 660,
       "title": null,
       "documentKind": "REPORT",
@@ -132565,8 +135620,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:e67733b49d27c57fbccb99fccfd70bb0ec9d06096c7a632e4cfc70e56607bdb6",
       "path": "docs/reports/graphify-workspace-snapshot-binding-v1.json",
-      "sha256": "3437235d2e931fa8d9f2457674041c802863ab721cb2048f8fd452797203f3c8",
-      "bytes": 45424582,
+      "sha256": "1515c0039b097becf7d340cd61f462c47460b3c71eb8bdd7ca237f0772d85e85",
+      "bytes": 44897588,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -135962,8 +139017,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:bbd8db540b450d25352cd3d524b407c537a9463d6534629b456eb9482269176f",
       "path": "docs/reports/kanban-turbovec-consolidation-latest.json",
-      "sha256": "d31c4e1d8837a6e9e194fcd41fd7d9d2154bebb35d1c21cc9c01425ac33c0e29",
-      "bytes": 93082,
+      "sha256": "25bd0b73620255d1412aa689781f55411cb8a39008e8ff1e1e1a5b32e046bf3f",
+      "bytes": 93107,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -136005,8 +139060,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:0086e7222a68d5951449fbbaf866f71068ffbc9507bb3fdc802b3a63502c56f6",
       "path": "docs/reports/kanban-turbovec-consolidation-latest.md",
-      "sha256": "9120fb8c5fd5d9bb2c4928c6989878daec55fcdd35d96e9688e122ca763c783d",
-      "bytes": 13878,
+      "sha256": "4a886bb4d24a3e4f494ff63ea75e50f17596ef110893dcbf30501bc569a751cb",
+      "bytes": 13892,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -200290,8 +203345,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:f20b66431533d28db713807abd5534cf27a4c9e6a645ed962e173302adba9e45",
       "path": "docs/reports/openspec-report-artifact-manifests-v1.json",
-      "sha256": "5dec8317bb64046701a39d49aece532d9a192fb39fcdabf24f6a94547a608608",
-      "bytes": 879795,
+      "sha256": "92770ef7441da6c413867a929c11c7b7b37cd178c7c0e7235df8762621a26be2",
+      "bytes": 879796,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -200548,8 +203603,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:e3ac6e8420e7d321a574227e56ea5632cd8fe95471a7de88028129a2eed65972",
       "path": "docs/reports/openspec-task-cards-v1.json",
-      "sha256": "206d4965cd7f1437b0d054f7a3ba08dbc7c8e05c8904eabd2c21d4a73058e988",
-      "bytes": 8330159,
+      "sha256": "8bb558bb3cfb4814cefdeac378c2ff3a89734f840e157d6bfc2fb405bb6a2930",
+      "bytes": 8330160,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -200804,10 +203859,96 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:064f2141cd39bfb5a8ad3bfaa6dfaa23b0da9fe9581218a7daf55fba3c480603",
+      "path": "docs/reports/openspec-task-triage-validation-receipt-v1-2cc98105cc02-20261007212949526.json",
+      "sha256": "bf8c5fede1cc4e740e219989d4dfbf2918b2fc29c4b8bf1a53609e81d57f46c8",
+      "bytes": 4563,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:168e5ff29cec6f918589b3085332bbc4cc84102b69e140532a8820cf4b00d1e4",
       "path": "docs/reports/openspec-task-triage-validation-receipt-v1-6d50ee6624db-20261003205828495.json",
       "sha256": "d97aaa7e9e10314d40c4402512b75bc56c21cdce65ae5782f36746475bd5fe28",
       "bytes": 4470,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:70f588d0d27241bf09a6bd05d97c1ffbf2d118e33dda5d0e30835cdf5fbd9b00",
+      "path": "docs/reports/openspec-task-triage-validation-receipt-v1-a848fc04ef2e-20261007215755591.json",
+      "sha256": "8eebb86d860a10302a2772197cea6f8f36039d2dd128440c703883aad60cef87",
+      "bytes": 4525,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -200890,10 +204031,96 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:a62c899f3d941d146a78bf3bcb82f6f78c83e85a408d25e08a8e4fac85785083",
+      "path": "docs/reports/openspec-task-triage-validation-run-v1-2cc98105cc02-20261007212949526.json",
+      "sha256": "8cb028f8e0b4d657e37a419ee1e8904303de57d4bf3831c7a56373faa82322d6",
+      "bytes": 2457,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:f69e6fdb435af3f3fac08ff2cb2f8e052486027bc3dc68083826537eb996ead6",
       "path": "docs/reports/openspec-task-triage-validation-run-v1-6d50ee6624db-20261003205828495.json",
       "sha256": "90085cdf3daa37f28ab65e56744c3bfb5e201e9e92a3b7bebe12a2c5c255de6b",
       "bytes": 2364,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:59138f57b7b74dbe2f578d36414e0b62000b8f3567a5cd4efee5708d1a22f8f2",
+      "path": "docs/reports/openspec-task-triage-validation-run-v1-a848fc04ef2e-20261007215755591.json",
+      "sha256": "2fff8b8eeaa225ea6d900d83e700fac0dd0b40e8ed1a6e6cc90064598face6d2",
+      "bytes": 2419,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -220758,8 +223985,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:f4473bbf3f92086e4791e45b4c981dba9d4ec8a5ce5f16e1d1d68c04f4847f6b",
       "path": "docs/reports/playwright-config-roles-v1-20261003.md",
-      "sha256": "f0408c3ec3822e448595afb9d02db1a5b2546921c7df912fb2ddc7e6ef3ff5a8",
-      "bytes": 3775,
+      "sha256": "4b25e6445c4b31701a6b5a512f72047f0554641091240524f3f177b57428d3a1",
+      "bytes": 4051,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -238042,6 +241269,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:4025f11fa816fd0d59264377423abf45240f5b2b723133bd4106ad3578ee5281",
+      "path": "docs/reports/semantic-768-writer-ownership-v1-20261006.json",
+      "sha256": "16cdb36d38fc1277d7f21222e63a57ec5480d171f0f36fe2056866a71fb9221c",
+      "bytes": 20198,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c390ce6738a2bf0f0e3f157490079e369b9edb77dd0a49fd9ed6862553eea59a",
       "path": "docs/reports/semantic-768-writer-ownership-v1.json",
       "sha256": "fc4609a95659ba51bcec8359545763e6dc61789663c6ff6894155d60fb2cebaf",
@@ -243589,10 +246859,53 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:4ea2ad6a14165523421ff6c876b6ab4bd80d0c935268b449352d2870482960f6",
+      "path": "docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20-pgvector-embeddinggemma-agentic-dense-search-todo.md",
+      "sha256": "438dde181086ed49e0fb85d52bda33b79b53a1b697b2185655b48da1fc45dbed",
+      "bytes": 29713,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:8909bdc8eb46812f91c41c9164e2aae07c4797045e27bbd9cb7b830ae814d998",
       "path": "docs/reports/sessions/MASTER-FEATURE-TODO-2026-05-20.md",
-      "sha256": "0e6e1206a9eb05f307466c75d7404ce72e4350adbf242414d3b7e2ee3ab00bea",
-      "bytes": 117073,
+      "sha256": "18a5465c5458158dd51fdd5cfb520d2c9229dfc25a1deebe137dbcddeda677ce",
+      "bytes": 118021,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -243806,8 +247119,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:f878ef317c31f95b62f37d19067fcfd9b95e1c470c35c24f04afcbb98e3dbb9a",
       "path": "docs/reports/sessions/NEXT-PHASE-DECISION-MATRIX.md",
-      "sha256": "774762e20301421474710885c347dca8c9e702fa4666a3ca60ce3c4904be7b79",
-      "bytes": 7645,
+      "sha256": "0c82e8919ece1a4cf91834f65b0f98b4646415bea8fd635ea9d2852c9815241b",
+      "bytes": 8058,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -244150,8 +247463,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:41404ee34e4f55ff1ff4e4540a463ed91104d0ee7ada2cc186947f864b009268",
       "path": "docs/reports/sessions/PARENT_ATLAS_CONTINUITY_AUDIT_2026-07-27.md",
-      "sha256": "2e488b71777ab1c3df7eea2e8cda83a510bbf2d304dffd6865151056358d4957",
-      "bytes": 7418,
+      "sha256": "31fdbb70c26622a86c4b9b0c65e7bfc58a79a7d16dfd47c078b30247ec7e4e8f",
+      "bytes": 7555,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -273517,6 +276830,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:9413aa2afcd3f4c2604741080b4ce2a9b84abf9ef422af9d21a1c8ef1c1a443a",
+      "path": "docs/reports/workboard-supersession-readonly-rebuild-v1-20261006.md",
+      "sha256": "247abcd5d1d47be060e1e2ef461170233526e5ad3e4daf8f9c782958f8ae55a8",
+      "bytes": 1651,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:efb9e1942fa06dc6791b5fac9c643c35b61c0dd7d9020deb0c6a2b4df4e36bb9",
       "path": "docs/reports/workflow-action-schema-owner-01-results.json",
       "sha256": "a50a88f9ffe636212662bb99cb95785a7d1ec816b4d6c922d246d31b992a571e",
@@ -274852,7 +278208,7 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:d2127241963e0461e7c6cf121ac93df8e0751d5610e4cd0232d55b7bf3c2d8a9",
       "path": "docs/reports/workspace-snapshot-reseal-v1.json",
-      "sha256": "eb7a29ef7d74918ee4b40aa6d296541a8ddbed496dd695bd576fe6ff187d61e1",
+      "sha256": "d44cd7758853cd9dbca26de2884dba0f92e9f73d1a77abf897a2e29f6b2ae34c",
       "bytes": 567,
       "title": null,
       "documentKind": "REPORT",
@@ -276097,6 +279453,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e01dadac0d35bee35e27eb295426a47abad6eb891aa523ea3bb50d23fe414e5a",
+      "path": "docs/reports/workspace-source-snapshots/2fb5c64e124270757a77a886cd052f8a048af27e0ecf492ac45ef9f897832f09.json",
+      "sha256": "4d7d117d767dc14fa548c9d977a75e0d3619d4c0bf3fd083d8811816de67cf61",
+      "bytes": 16379447,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:eb1d7897c54787409c6468538936ea8856a9eb41c0164bac6dc3393f6f3921bd",
       "path": "docs/reports/workspace-source-snapshots/36010ff3130518334e779f5da7fafd80ca0de7b6ac55f2ec29e328b7f828da7f.json",
       "sha256": "7f34e3dab137d2633bd0b5a77124fe6f1571c7c294acd1fe90ee2c716865a314",
@@ -276914,6 +280313,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:e434be04f78725eb0e99d7fc533d7631662fe9b12c0e57d8af031786ec5f2900",
+      "path": "docs/reports/workspace-source-snapshots/75afec126d2f3bc3f73ede676fb0364fe6fbb6037b97a7f9cec51f94fa384f0e.json",
+      "sha256": "7524aa418933176f734880bb0d1511bcf14b8a9d244d72fd1f818d01e6720e87",
+      "bytes": 16379445,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:854c523df99ece2bb5fb4350239998819300a5b9bd4c6c6dd7da15e8ba84492a",
       "path": "docs/reports/workspace-source-snapshots/78551de866977aa76456428668df6f5050c184f002ad2cbbe3d1063f0bc8b076.json",
       "sha256": "be1040679ce227a73ed7fd3870914b62ee57006607cb176bddb3f99060773b63",
@@ -277090,6 +280532,49 @@
       "path": "docs/reports/workspace-source-snapshots/8c111828f88eb42afcc7444ac78cf33352e671cdb56ae9e68edafc54143db846.json",
       "sha256": "28dae3b527b8ccfb68d88dff772b2822c786c37d54243059feffa44131598a49",
       "bytes": 14723740,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:edd355bb3a9d763daa79234e4ae530b69d31520ca5176c04089ac171ffc384c9",
+      "path": "docs/reports/workspace-source-snapshots/8cc50d57af86e908a2d63ebf7a61a9a742fcc682b4bf46e04338e1e089b5d76b.json",
+      "sha256": "594528034bd99eaa59cc1cbbe2b44bab3c12da0fcadab621384b7b4b79c6c1b6",
+      "bytes": 16379996,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -277688,6 +281173,49 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:842e74f1591cbfd490dbbd02883021d63b2220852ca204e61d945bad53aba8cc",
+      "path": "docs/reports/workspace-source-snapshots/bb5c001d54b37f73e3e55f19fd25039327df88aaaeb0155cca10726ad6df4289.json",
+      "sha256": "5126a279090e9bbd9e0a25a91109e7120897d2fdf60cef9fd2171dfe836f8ab9",
+      "bytes": 16337625,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:e7c800e922521dd8543e818a2d98fdf8e6fdbd16ad47fd4681ebe175e903c512",
       "path": "docs/reports/workspace-source-snapshots/c0c349de87ec897e5b3660ffc297415481b11333be4508f5bf13ebe3a1148687.json",
       "sha256": "0aa8d45bca0f1a96843ee7e35ac5a06f2818ca28f9900f7e1fd2a375d6536399",
@@ -277903,6 +281431,92 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:bcc99d2666008fc947e6864359d440e38cf5ec2f7bf75b79fc543569ae76738a",
+      "path": "docs/reports/workspace-source-snapshots/cc6b21a8312837f2a9ef3673726dfd97bcc5b9a05fdeb5aaf68c92808b608d35.json",
+      "sha256": "53c1e4b5784737b87168bb608d7b9c71dae61c60bcf3da2d0264b35c96303b24",
+      "bytes": 16393231,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:313c19989459291f2f450c6d480e71a6104cc41c036cde406a451f91caeb3d89",
+      "path": "docs/reports/workspace-source-snapshots/cfd3446a4968165a2d247a41475d703ad0d6a4b987b862f2ce31e5f6c750b3cb.json",
+      "sha256": "af4a71e9405542e895919640a9c7d7b3125dac2903fb1cb80137f91bd5c1dc85",
+      "bytes": 16379447,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:41d27ffebbdd142e134f3e93f8159db7b9b38c68c5a571477210f1d3a7f175a1",
       "path": "docs/reports/workspace-source-snapshots/d0b7f2416248e25d306ec0a332f89eea9cd3d28ff48da9f87a42f1b521d6ed4b.json",
       "sha256": "74a5d9584857501b6ed90c0f2a36eafac8c99de18afd988e21d2a267af77e7c0",
@@ -277950,6 +281564,49 @@
       "path": "docs/reports/workspace-source-snapshots/d25810ade66736ca8bc7fa31c683d09972f10ef7d241b4ab8e64b2cdd7ef6122.json",
       "sha256": "7a305772c5962df0b02e75b920ef855a0bc394f1f662b8ad1f342b8fc2f8992f",
       "bytes": 14952397,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:96c7fce7ff522c366f72a9fbf610b86555b3b544c4e38a66bb4ae9f8ca6a1fac",
+      "path": "docs/reports/workspace-source-snapshots/d7d01e6b27a4ed254ec4001366906f0e7fa7151c339bf04e6cd0ec59e8e0b493.json",
+      "sha256": "f98a4430a3935a37051ce583d803e2b3391585ad331bb542ca61a32f36f9da5e",
+      "bytes": 16379447,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -278462,10 +282119,96 @@
     },
     {
       "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:827c3c2a94fa04a48f405a6dce225774f0e366e7082df3a7e9aa929951cb51f8",
+      "path": "docs/reports/workspace-source-snapshots/ebabbae67866eaee8d1752d4b2ea8ba64ae966528f95974f980fa9d0c07c6dbd.json",
+      "sha256": "a9a0dea9d0d9d6be270a41b56a90794fcffe2a8b1575dccb3ccfee170a617c08",
+      "bytes": 16336959,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:4d544e3c748a41f64704ff8557b3371524ef18d6074373a11ed7dc2cfd657baf",
       "path": "docs/reports/workspace-source-snapshots/ec1a8a57191f61c1fa01227a0f50512b140edc96aed05700c5c522eb9ead4711.json",
       "sha256": "de31fc0de30ec3401541d4fa436f27e9fce58f2d669ba797ac0869b1749d5d08",
       "bytes": 14723740,
+      "title": null,
+      "documentKind": "REPORT",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": null,
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:60cd22e5c9726241ace04bd4901adb7fb88e6d18a862f1ae407bf61eef7580e1",
+      "path": "docs/reports/workspace-source-snapshots/f136b97a9efe97c99d61d531b8fe757cf451dbcc4c6d3f1e6bc10fe76b53db4c.json",
+      "sha256": "5e475906bbe499a5dc93f67d57be5f116e643074a656f9c5a37a78f57186c435",
+      "bytes": 16379455,
       "title": null,
       "documentKind": "REPORT",
       "status": "UNCLASSIFIED",
@@ -283546,8 +287289,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:ccadfc1330ddf24185ddf72757a18ccf5e6e36ba40480d4f5aae1fb985ffe516",
       "path": "openspec/changes/atlas-feature-intelligence/tasks.md",
-      "sha256": "328721b7421e15352d948c792a77ce5b9da65cbd1f02bc9afeae816bfa4b3f34",
-      "bytes": 25236,
+      "sha256": "74ebdac7287c6a45f006700514ef27cca8008990b1a347f3cb83b3fd5b677e8e",
+      "bytes": 29251,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -283562,8 +287305,8 @@
         "change": "atlas-feature-intelligence",
         "taskRefs": [],
         "completedTasks": 27,
-        "totalTasks": 80,
-        "progressFraction": 0.3375
+        "totalTasks": 82,
+        "progressFraction": 0.32926829268292684
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -284320,8 +288063,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:703f2f77239975c14fe239a7b7583ee03efaffa79bace46ec11b31c79a6418f1",
       "path": "openspec/changes/deep-audit-code-gates-aug22/tasks.md",
-      "sha256": "633815e7e562353f6fc76bd8e48fdb5bfe1d9dc48466e6b822d4024fd34ceebd",
-      "bytes": 20230,
+      "sha256": "5648ead88d886968aec039b812f4b5ca770e4fe55a9b1b893a102e68f06fa9ce",
+      "bytes": 20814,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -285051,8 +288794,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:3d3e9fb745033da46109b4387b9dbc0facad8dd1e1db0e59d6927800493d03fd",
       "path": "openspec/changes/manual-migration-reconciliation/tasks.md",
-      "sha256": "2e6aeedfa86d942ed5baca10d3bbcec5553d5704661984f2a1d80db7d729f897",
-      "bytes": 70143,
+      "sha256": "01fe287ae89001c199291e990f948078c575588f4a0b4314cd16e53d12c4413e",
+      "bytes": 76684,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -285309,8 +289052,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:946916a013d6cab9769da4c5d106997cddb86772e6222a849b98d9af1bd6696b",
       "path": "openspec/changes/parent-atlas-ace-bitfrost-cache-correctness/tasks.md",
-      "sha256": "4a59addc3cc0f54f2650fded123dbb9f067869c90c47c0a2d8bb562712624efb",
-      "bytes": 71275,
+      "sha256": "f6aeb37d97e2bd2c25cc05147dad84bb13242623385175c05457ac244055aadf",
+      "bytes": 75663,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -285325,8 +289068,8 @@
         "change": "parent-atlas-ace-bitfrost-cache-correctness",
         "taskRefs": [],
         "completedTasks": 56,
-        "totalTasks": 100,
-        "progressFraction": 0.56
+        "totalTasks": 106,
+        "progressFraction": 0.5283018867924528
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -285739,8 +289482,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:6ceaa383eaee756c4354de38eda50f9455333af51aa369a1be723b37919e4fed",
       "path": "openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md",
-      "sha256": "ab7e0d368e58d32271f68a73aa6da40baafcb9eba311dd22320adfb07ca5e384",
-      "bytes": 1123468,
+      "sha256": "85d4f794a006346e5a65bcbd5127245afc82745c8391827229df8f74c5ab4320",
+      "bytes": 1136269,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -288233,8 +291976,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:9fb438c79eeaf7477aca4dfa2fae189b3354621d73b1aa2080e3c93c2e100b61",
       "path": "openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md",
-      "sha256": "34fc2dbb7477eaa09be9a8eb6bd7432409f770bcd6286716ab94462525c06fc4",
-      "bytes": 224364,
+      "sha256": "6946e3ea1804334ba23878039b0fed9911a85cea5feee36c6b7277307ca67d9d",
+      "bytes": 235344,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -288249,8 +291992,8 @@
         "change": "parent-atlas-candidate-feature-execution-fabric",
         "taskRefs": [],
         "completedTasks": 279,
-        "totalTasks": 384,
-        "progressFraction": 0.7265625
+        "totalTasks": 398,
+        "progressFraction": 0.7010050251256281
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -289093,8 +292836,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:915fc7b9e48cef22fa9ac8b5efa347b566eb0a653da1decd90057ab72e557e53",
       "path": "openspec/changes/parent-atlas-code-ingestion-pipeline/tasks.md",
-      "sha256": "2ce0b06b4541a3d9d0740f185376a78562608cd73df84ad132d1e815c09a6972",
-      "bytes": 82624,
+      "sha256": "d02d9fd3c7b4d850fbc24af902636d96af5231acc7a962b50806174a4088c8c2",
+      "bytes": 88026,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -289351,8 +293094,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:4cce2144e996a72f727b53f68ce230c6880c94755282d5f6af82de661e98177a",
       "path": "openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md",
-      "sha256": "ba0d171da01fbba1be578cbfdeb3f0a76dc1d01f08a5cfad609531340d634f0b",
-      "bytes": 69807,
+      "sha256": "7a3e681baf45f67a513a38bf83a37058ba2e38242d84507b95f06452bacddc58",
+      "bytes": 75746,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -289367,8 +293110,8 @@
         "change": "parent-atlas-compiler-semantic-graph-resolution",
         "taskRefs": [],
         "completedTasks": 40,
-        "totalTasks": 58,
-        "progressFraction": 0.6896551724137931
+        "totalTasks": 87,
+        "progressFraction": 0.45977011494252873
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -289480,8 +293223,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:8a2548b3c966757d8004cfec6522e4a76875f4bd5293715a67da6ee93e5bbaba",
       "path": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
-      "sha256": "f2004a6a7e21919804f9f9382463bbe02c1bbfc799757fa30c3c103581cfd622",
-      "bytes": 24436,
+      "sha256": "495f3a9142889f3a45dcf87149f4562d28f7efc6ddd359f98e8c1a09a60123ec",
+      "bytes": 49308,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -289495,9 +293238,9 @@
       "openspec": {
         "change": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
         "taskRefs": [],
-        "completedTasks": 23,
-        "totalTasks": 73,
-        "progressFraction": 0.3150684931506849
+        "completedTasks": 24,
+        "totalTasks": 84,
+        "progressFraction": 0.2857142857142857
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -290641,8 +294384,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:fbfa7b71de9b51cf410f64894b314edd57b12c6e0ca1e4e6738ecf32879cc220",
       "path": "openspec/changes/parent-atlas-gate2-chunk-lineage-convergence/tasks.md",
-      "sha256": "5b32f3955a33a5878d3f79008ab3000c255ab1938263abd5fb3c9a176fd5397e",
-      "bytes": 12884,
+      "sha256": "c55abf8a2ffe8fb2554b2cbc6924ef6b73ed6bf92ce9bc8c7e86d507535ac45f",
+      "bytes": 15413,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -292318,8 +296061,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c5283bc6b1df9c9aa63eaf17adc41feca6d46368c2de58111e8ccdea51b519ff",
       "path": "openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md",
-      "sha256": "6e9f352f958eeb8227c5f83b653682153462708ff217c4cb1ba5b9c5127c0cf6",
-      "bytes": 266326,
+      "sha256": "16b0965e655b8e8b6cbeba26c0b52957a1bfca72374a0d66abddf31effe8b377",
+      "bytes": 267141,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -294425,8 +298168,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:c64cb69eaf88c4a744cb37be41b6949bcdf6b3b567fd2b463dea19d9c53b21fd",
       "path": "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
-      "sha256": "8684bb6b09514a50d66e0d7844b461abfb868951e0612dd06f9642b007217680",
-      "bytes": 1157211,
+      "sha256": "7a8c466090c8dd12702976fcff01caf0afcdd2f5190b81bac769bc7178b0093d",
+      "bytes": 1179584,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -294441,8 +298184,8 @@
         "change": "parent-atlas-neural-prefill-encoder",
         "taskRefs": [],
         "completedTasks": 1531,
-        "totalTasks": 2188,
-        "progressFraction": 0.6997257769652651
+        "totalTasks": 2215,
+        "progressFraction": 0.691196388261851
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -294855,8 +298598,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:46c03e8c0f5b6b825ddafff517ec4002599c6364832aa18da24cad907476d4a8",
       "path": "openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md",
-      "sha256": "82b12a0b42f12efda37dd05543c4e3bcbc1aa58e64a6388f0a1e29243670ed1b",
-      "bytes": 335472,
+      "sha256": "c57cc0c49a87275ebbc4617466d88c0746f859c61bf1dddeb8e782190f23104d",
+      "bytes": 336299,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -295242,8 +298985,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:bdcfca4c0c4b00052853b6c2fee3d79d096426c73723916cab5e0b0738aeb83e",
       "path": "openspec/changes/parent-atlas-okf-knowledge-layers/tasks.md",
-      "sha256": "578fc4c391903992f731096e03807484a932e289ad9de2e9f9ec35473c78f4f8",
-      "bytes": 29431,
+      "sha256": "91a15f87b57e0f977abfb7a9279f26e051ba9bc68b74be98aec1703ede8d00d4",
+      "bytes": 32733,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -295257,9 +299000,9 @@
       "openspec": {
         "change": "parent-atlas-okf-knowledge-layers",
         "taskRefs": [],
-        "completedTasks": 38,
-        "totalTasks": 45,
-        "progressFraction": 0.8444444444444444
+        "completedTasks": 39,
+        "totalTasks": 49,
+        "progressFraction": 0.7959183673469388
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -296231,8 +299974,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:d05e72ef691d5ddb72f85f62d8a2bd828454a0b26132e1ad40bb27e9b54dd32d",
       "path": "openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md",
-      "sha256": "31e81168ebfd16701be88571896fc9aa3086ce79b63c3fbb10b950e9e6745143",
-      "bytes": 29552,
+      "sha256": "bc6b675232d6e8dfb26b416c0482116f94ccd5aa52a9282d373b325fb9e9aa2d",
+      "bytes": 70461,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -296246,9 +299989,9 @@
       "openspec": {
         "change": "parent-atlas-openspec-task-triage-pipeline",
         "taskRefs": [],
-        "completedTasks": 10,
+        "completedTasks": 12,
         "totalTasks": 54,
-        "progressFraction": 0.18518518518518517
+        "progressFraction": 0.2222222222222222
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -296833,8 +300576,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:79d3c232f7bf36645cf7fb508046a541d7154ae7aa107e53e3dd44bfd29ce929",
       "path": "openspec/changes/parent-atlas-pass-fabric/tasks.md",
-      "sha256": "f5dbf94afa7c74c406d0a6f5a3d197611dc15fa6ea17a305af5f74f4bdb1008f",
-      "bytes": 198872,
+      "sha256": "22b687d8885b3402e29467e08791d2971b2e2939a374847043328ef78ff0ae30",
+      "bytes": 301972,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -296849,8 +300592,8 @@
         "change": "parent-atlas-pass-fabric",
         "taskRefs": [],
         "completedTasks": 36,
-        "totalTasks": 175,
-        "progressFraction": 0.2057142857142857
+        "totalTasks": 184,
+        "progressFraction": 0.1956521739130435
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -298467,8 +302210,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:d1f72aaca72e8e5dd5a2f3c23e790e8c9390fd72046b75060a80031bcbedd5f8",
       "path": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
-      "sha256": "7d5bf0a68deaaeee6873db5eb3640d3613acde031b0dcbe5a1b1209a94266fbf",
-      "bytes": 1457706,
+      "sha256": "89d25165f7cee5bb6523357133592fbd8e945fe00cb0462e8986eeb7282d341c",
+      "bytes": 1460169,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -298483,8 +302226,8 @@
         "change": "parent-atlas-retrieval-lineage-dag-convergence",
         "taskRefs": [],
         "completedTasks": 813,
-        "totalTasks": 1066,
-        "progressFraction": 0.7626641651031895
+        "totalTasks": 1067,
+        "progressFraction": 0.7619493908153702
       },
       "validation": {
         "status": "NOT_CHECKED",
@@ -298639,8 +302382,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:e07f7335322444502d0bb7256406207a1d6270b4850d098ada01421370dc9788",
       "path": "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
-      "sha256": "d1a36a4e9c2a2bc7132cbfad6d0d8a180b50940c2cf779d0fd0d96e58aa34fea",
-      "bytes": 57031,
+      "sha256": "1ffcadca89e14b52ee5056c5995c8dd50890372ea2784469f0235eadffbacbda",
+      "bytes": 59235,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -300187,8 +303930,8 @@
       "schema": "atlas.document-governance-record.v1",
       "documentId": "doc:sha256:353db8ae7b135650f4e710735de78df7c7d7d105c9f658c6fcca8736e4c5e2e8",
       "path": "openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md",
-      "sha256": "ab54df57be3146a111a21362ef850db06ecf3b01ab864727c32f4ab4f00b6d4a",
-      "bytes": 94549,
+      "sha256": "3065d571cd32c047f1c359828b7d329244e1a05e91a89f714ef9302fb230170d",
+      "bytes": 96757,
       "title": null,
       "documentKind": "OPENSPEC_TASKS",
       "status": "ACTIVE_SUPPORTING",
@@ -302398,6 +306141,135 @@
         "completedTasks": 28,
         "totalTasks": 70,
         "progressFraction": 0.4
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:46c6935dda9ac14262a599f4ddef244b1bbfb2beb086c40e48653673eb36b011",
+      "path": "openspec/changes/parent-atlas-workspace-snapshot-runtime/proposal.md",
+      "sha256": "783c1bd80e0e491a660377e807a13ea2ca6e5a919aaa33c5b8481f6166556b08",
+      "bytes": 1244,
+      "title": null,
+      "documentKind": "OPENSPEC_PROPOSAL",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": "parent-atlas-workspace-snapshot-runtime",
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:f1a774a50d6ec907ba64ee40be6166fc9e6bb8f29bfe1f8ee7638f9c8bdc9de6",
+      "path": "openspec/changes/parent-atlas-workspace-snapshot-runtime/specs/workspace-frame-state/spec.md",
+      "sha256": "5253eb405c58106a00d8663792727d5076b6b03a91203feebaff87004a2e6aa7",
+      "bytes": 4272,
+      "title": null,
+      "documentKind": "OPENSPEC_SPEC",
+      "status": "UNCLASSIFIED",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": "parent-atlas-workspace-snapshot-runtime",
+        "taskRefs": [],
+        "completedTasks": null,
+        "totalTasks": null,
+        "progressFraction": null
+      },
+      "validation": {
+        "status": "NOT_CHECKED",
+        "linksChecked": false,
+        "referencesChecked": false,
+        "smokePassed": false,
+        "testsPassed": false,
+        "contradictions": [],
+        "receiptRefs": []
+      },
+      "workflow": null,
+      "archive": {
+        "eligible": false,
+        "blockedReasons": [
+          "NO_EXPLICIT_SUPERSESSION_RECEIPT",
+          "NO_OPERATOR_ARCHIVE_AUTHORIZATION"
+        ],
+        "archivedPath": null
+      },
+      "instructionScope": null
+    },
+    {
+      "schema": "atlas.document-governance-record.v1",
+      "documentId": "doc:sha256:9e7b001bd4393aab28f6b638a2fb92c864ce9a82cebcc4ab115a65f55f19bd41",
+      "path": "openspec/changes/parent-atlas-workspace-snapshot-runtime/tasks.md",
+      "sha256": "d6bcba468cfdd9030be3f5c624f857601d36b1a36acd45bf6c55110c48f44843",
+      "bytes": 16939,
+      "title": null,
+      "documentKind": "OPENSPEC_TASKS",
+      "status": "ACTIVE_SUPPORTING",
+      "topicIds": [],
+      "canonicalForTopics": [],
+      "topicOwnershipStatus": "UNASSIGNED",
+      "supersedes": [],
+      "supersededBy": [],
+      "supersessionStatus": "UNASSESSED",
+      "supersessionReason": null,
+      "openspec": {
+        "change": "parent-atlas-workspace-snapshot-runtime",
+        "taskRefs": [],
+        "completedTasks": 6,
+        "totalTasks": 35,
+        "progressFraction": 0.17142857142857143
       },
       "validation": {
         "status": "NOT_CHECKED",

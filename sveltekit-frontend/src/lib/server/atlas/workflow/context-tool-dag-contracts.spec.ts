@@ -168,6 +168,35 @@ describe('buildContextToolDagFromPreAgentStages + executeContextToolDagV1 (CONTE
     expect(() => buildContextToolDagFromPreAgentStages({ ...meta, stages: ['QUERY_ANALYSIS', 'BOGUS'] })).toThrow(/unknown pre-agent stage/);
   });
 
+  it('wires ast-grep refinement after lexical candidates and rejects missing lexical input', async () => {
+    const stages = ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE', 'ACE_PACKET_ASSEMBLY'];
+    const d = buildContextToolDagFromPreAgentStages({ ...meta, stages });
+    const byId = new Map(d.nodes.map((n) => [n.nodeId, n]));
+    expect(byId.get('AST_STRUCTURAL_REFINE')?.kind).toBe('STRUCTURAL_REFINE');
+    expect(byId.get('AST_STRUCTURAL_REFINE')?.dependsOn).toEqual(['LEXICAL']);
+    expect(byId.get('EXACT_PROMOTION')?.dependsOn).toEqual(['LEXICAL', 'AST_STRUCTURAL_REFINE']);
+    expect(() => buildContextToolDagFromPreAgentStages({
+      ...meta,
+      stages: ['QUERY_ANALYSIS', 'AST_STRUCTURAL_REFINE'],
+    })).toThrow('AST_STRUCTURAL_REFINE requires the LEXICAL stage');
+
+    let lexicalInput: unknown;
+    const lexical = { candidateFiles: ['src/example.ts'], canonicalAuthority: false };
+    const receipt = await executeContextToolDagV1(d, {
+      QUERY_ANALYSIS: async () => 'query',
+      LEXICAL: async () => lexical,
+      AST_STRUCTURAL_REFINE: async ({ inputs }) => {
+        lexicalInput = inputs.LEXICAL;
+        return { declarations: [], canonicalAuthority: false };
+      },
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs),
+      ACE_PACKET_ASSEMBLY: async () => 'packet',
+    });
+    expect(lexicalInput).toBe(lexical);
+    expect(receipt.outputs.EXACT_PROMOTION).toEqual(['LEXICAL', 'AST_STRUCTURAL_REFINE']);
+    expect(receipt.writesPerformed).toBe(false);
+  });
+
   it('executor runs independent lookups concurrently and passes dependency outputs', async () => {
     let active = 0; let peak = 0;
     const slow = (v: string) => async () => { active += 1; peak = Math.max(peak, active); await new Promise((r) => setTimeout(r, 30)); active -= 1; return v; };

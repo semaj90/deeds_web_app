@@ -56,6 +56,7 @@
 - [bounded-tool-gateway-implementation](./bounded-tool-gateway-implementation.md)
 - [CANONICAL-PACKET-WIRING-BLUEPRINT](./CANONICAL-PACKET-WIRING-BLUEPRINT.md)
 - [canonical-tool-catalog](./canonical-tool-catalog.md)
+- [code-symbol-semantic-retrieval-v1](./code-symbol-semantic-retrieval-v1.md)
 - [codebase-memory-mcp-cli-and-atlas-alignment-v1](./codebase-memory-mcp-cli-and-atlas-alignment-v1.md)
 - [cold-warm-hot-packet-lifecycle](./cold-warm-hot-packet-lifecycle.md)
 - [compressed-semantic-geometry](./compressed-semantic-geometry.md)

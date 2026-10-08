@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:cf155a655d1f1af1d4da04b3d0c71eea78c06b64f2de83e9a056ff59bf390535",
+  "claims": [
+    {
+      "id": "claim_796cc6becd3844d293e1d4d337ab34c6",
+      "statement": "Parent Atlas separates infrastructure-free contracts, infrastructure-backed runtime adapters, protocol clients, agent wrappers, and service endpoints with one-way dependencies: runtime implements contracts, clients depend on contracts but not runtime, and agent wrappers reach runtime through clients rather than direct calls.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L30-L55",
+          "version": "repo-lines-v1:sha256:60f20819be5feb209b22de05ae74893206b854870902ccf4bc936b161b1db100:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MzQwNmYxZmM5YjgyNjJiNDRiZDQ5OGFmNTg5MjM3ODVkODJhMjgyZGZkYzBmMWYzM2RjY2QyNDhlN2M0MTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZjdjMWIzMzdlZTQ5YzIxN2VkOWVjMjJjMGYwZmJiOThmMWE3NTk1MGViMmI2NTkyOGVjMjQwNDM0ZGViMWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1MTgzNjE2NjEyY2JkZmFkM2QxMzY3YjRiYWE5ZTk5YWUzYjUxNDJkODBjMTVlNWQxYzI5YjMzNzU2M2NlNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L314-L345",
+          "version": "repo-lines-v1:sha256:1cb797686eb3fbd138a82c65f37e00515a394a944a1a7ae2b43d1c562b277298:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM5YTUzMzdjNmEwNzk2MGZhZWQyYTU3YTIyNTY5MWM0MTZkNjE1MTQzYmNhMWQxMzBlMDZjODY3MzY2ZjMxYTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyYmExMzk3NWIxZjljZDZkYmNjYjQyZDA5ZTc4ZmUzNmI0OGZkMTk0NTBkMGM3NzM3MjBiYTdkZGQ3ZDVhMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L59-L88",
+          "version": "repo-lines-v1:sha256:36f681f859e8b9b891675efdc77cdd63c9c8a56000a06c2432f26b41054377a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyNzI1NjYzMmVlY2ExZGY5OTliYTNmMDc1ZjdmNGM5ZGI0ZGE5ZDQzNGNmZjViZmVhOTllNTQyMGJmZTNlN2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4NmU4YmQ2NzllYTQ3ODA5NjA0ZmZhMTUyMDQ4NGY2ZTYyYjI0M2FjZTRmNDhjOTgwNjlhYTdlMjJiNzMwNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L92-L147",
+          "version": "repo-lines-v1:sha256:f5c9278c36a92f87cd5d71727b799390d3e758cb35c823a25615478ef907353c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmMmNkYjllMTI5YThlNDM2NWEwMjdkYWY0YjhmNzI5ZGE3NzMyYTJmNjI3MjRkZjRmZTM1NDkwMGJjMTg4M2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5ZmMyODY0ODY0ZGUyYjdjZDNhNzk3OTVhM2Q4NjQyMWM5ODEzNWI3YjBiYzY4MzkwMjQ0ZDhhODdmMWQzMmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1489ebc25df84f3ca8b8f3ad3f68c919",
+      "statement": "Protocol adapters are transport boundaries rather than retrieval engines: HTTP, gRPC, MCP, and A2A delegate to the retrieval facade, while ranking, deduplication, and graph traversal remain outside protocol clients and handlers.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L109-L117",
+          "version": "repo-lines-v1:sha256:f6a8012d89c10e45bf001513f3034d6197aa7604449537bef8e37e4b4ceded4a:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODM4MDczOGNhNWRhZGYxODMzZWQ1MzU1YjBiMjNlZTFkYTk5NGZhY2IzYjcwOGMyYzVjYjAwNjljZGQ1ODRkNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjdiYjg5OGI1ZDViNzFjYWE3ZWE1NWFjNTMyYTU1NmU4MDdkYjUzNGFhNjg5ZjFhYWZlOTM4ZjIwOTUyZTdjMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmU3YzNlOTYwMDU2MDM0ZTJmNTEzM2Q5NzViNGZkM2RlYWFjZGYyMDY1MWQ1ZGNkOTlkMTdmZmMzNDcyZmQ2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSJ9"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L150-L173",
+          "version": "repo-lines-v1:sha256:a5fffbe9521fef4d579ce19873dbf0cde4a6f2d8f5b760750e53ef2c630d69e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhOWI0N2Q4ODcxOTJlZGEzYjkxMzhmMTJkMTk1NjM3Njg3MmUwZGNlMTNhYmMwMjBiZjQzYzVhYjFiZjA5MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1N2I1YmQ1ZDNiODZhNzllZGVlMTc2MTBlYmIyNjVmOGI3ODMwZTQ4NmZjNzZmOGExZjM2ZWU2OGMxZDEyOWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        },
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L329-L345",
+          "version": "repo-lines-v1:sha256:41c8a0e41e1db9d748585b07e9f876acf152896b73b50fc7fe2cb172c6603577:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1ODA3YTE2ZThhY2M4MzAyNmQwNjQ3NzIwNGQzMjVjYmY4ZjAyYjFmMTgyZGY3OTljMWZiY2VlZjgyNDAzZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyYmExMzk3NWIxZjljZDZkYmNjYjQyZDA5ZTc4ZmUzNmI0OGZkMTk0NTBkMGM3NzM3MjBiYTdkZGQ3ZDVhMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ba15c1677f244eb954a8025238a32c2",
+      "statement": "PostgreSQL remains the canonical packet, source, workspace identity, and provenance authority; proposed registry metadata must retain foreign-key and revision linkage to PostgreSQL rather than creating a second packet identity store.",
+      "evidence": [
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L159-L166",
+          "version": "repo-lines-v1:sha256:587df537a417d4bc409c39f17056b43d75ab976e15e59658c309f46fd0b44b13:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmM2MDc3MmQ1Yjc0YTI4ZTdhMDEwZmRhZDUxZDRiZTI3ODk0YmM4MzlkNjNkOGYwNzZiNDMzNDYxZTVlOTc3OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2Q1NWJhZDE5YTBmNTAzOTBhMDc3YTBlOTk5MDEwYzBjMzVlNmJmNjBkMjEzMDQ2MGM0YWJlNDM2Y2Y5NjA1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTg5NDQwZDcyYjc1N2MzMDY4ZmE1ZWNjZDg4YjFlYTQ0OGRiOTVkZWQ5ZmQyZjk1NjhmNmVlMDUwMWMwYWUxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjdkYWJlNDY1ZjE5ZmUyZjA4MjRjNjUzZDAwMDk2ZDRmYmYzYWVlMTQ4NDQyOGEzNjkwMDRlMWU3ODBhNzc5ZiJ9"
+        },
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L23-L41",
+          "version": "repo-lines-v1:sha256:d35e5440f45c532de4ccad8c180f12e385cbd825f56b7214de99fcdc5492cd76:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYjkwYmZlNzQxNDk2YWJmMmNiNzg0MzQ1ZTI2NTNhYmZkNTMxODNhZTI0ZDkwNDQwY2ZlZjMzNjM0NDkzZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZGZmYzYyNWM2ZDA0Mzc2YjA1NDZhNTJlMzIwYzQ4YzQzZDFlNWQ3NzQzZjRlYTNhYjdmNDAwYjM3ZWQwNDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0YmY3NWE4NjgwYmU2ZjAwYjRhNjIxMTg3OGRlZGNiYzI4NmMyZmMzYzg0ZTkyYzY5MGQ0M2E2ZjhiNmVkNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwNTY1MWIzODMyYjc4OTg4ZWZhZWM1ZGU0ODU1NjhmM2RiNGY4OTYzOGM4ZTlkYWVhNWQzMDZjNzZmOWE3ZWUifQ"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L1-L9",
+          "version": "repo-lines-v1:sha256:ba3bf55a205d7662345ec248c49d820da9b00aacd0cb9e32b54b16afe1445308:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGUzNjM0ZGJiODAxYTczYjcwZTg5ZWQ3NzU0NmM3N2IxMDkzYmI4OGM5ZTQ3OTE4ZTk2NjU5NGRhNDk5NGFmOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2RhM2FjNTk5ZWM0NTQ0YWY0Njg1YTdmNDI3NWUyMzZiMzg5ZjhjMGU4NDk0MjUzMGFiNmU4ZjM2OWRjOWY1NSJ9"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L12-L35",
+          "version": "repo-lines-v1:sha256:dafd70ba1f0e412731c5b72a5a4968e3db298c3a46e3ca1bf9724559aabd930d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzZjAwZTM0YmY1ZDM4YTFmOGU3Nzc1NGI3MjU3NzBiMGI3MWJiMjE1YmQ5NDJlZWM1MTg5NTI0YjY0ZTIzMmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczOGM4MWQ5ZGVlOTI1OTgxNWVmZGExYjMyMTYxMmExOWI4ZDBlMzFjZDFmMTdlZjA2N2IzZGU2NGM5NjFhOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlZGE1NWMzYmUxMWVkOWViZWY4NmFiZTQ4ZDkzMDYzY2IzOTk5ODU1MWNlYjc3NWI5MjEyOGU5MzBlMDgwMmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjNjFjYjJjZDZjMGQyMzVjMGU0MDg4YzYzNmM1ZjE1ZWY4NGY5MzI4ZTA4Zjg5N2ExNjljYzc1YjIyMjYzYjcifQ"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L37-L47",
+          "version": "repo-lines-v1:sha256:5f7f734b036901bfad3054f90af67ca97e84fc8809ddeecca7d283002938d429:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjZjYyZmJiZGRiZDM1OTQ1NDk3MDg3NzZlNWExMGMyNWY2OWM4NTIyYmRiNTkzYmVhOTVjMzY4Zjg0ZTJhZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc5MTI3ZTg3MDJiOTFlNTFiMTYzODVjNThiNzA3NDk4OThlMWEzMjY4ZjhmOTZkMGNhYmJhZWJjNDA0M2MzMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNGI0YTEwZGQ3ZWM3MTAwZDA0YjE1NDgyNDE0OGFlMjRlMGNhZTAxZWRiZGU1NzFjNTQyYzM1NDMwNGM5MTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmZDgwYzY5NGM0MmJlMDgwNmYxYzQyYjQ1YWFjNGZiYzZhNzYxMjc5M2NlMWU5MjE2ZTc2YjI5YWJiZDgxNzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_01bbc5e661ed4f5cba8278158ab4403b",
+      "statement": "Qdrant, Neo4j, caches, queues, export formats, and embedding lanes are lookup, graph-proof, cache, work, transport, or projection surfaces and must not be treated as canonical packet identity stores.",
+      "evidence": [
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L159-L166",
+          "version": "repo-lines-v1:sha256:587df537a417d4bc409c39f17056b43d75ab976e15e59658c309f46fd0b44b13:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmM2MDc3MmQ1Yjc0YTI4ZTdhMDEwZmRhZDUxZDRiZTI3ODk0YmM4MzlkNjNkOGYwNzZiNDMzNDYxZTVlOTc3OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2Q1NWJhZDE5YTBmNTAzOTBhMDc3YTBlOTk5MDEwYzBjMzVlNmJmNjBkMjEzMDQ2MGM0YWJlNDM2Y2Y5NjA1ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTg5NDQwZDcyYjc1N2MzMDY4ZmE1ZWNjZDg4YjFlYTQ0OGRiOTVkZWQ5ZmQyZjk1NjhmNmVlMDUwMWMwYWUxNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjdkYWJlNDY1ZjE5ZmUyZjA4MjRjNjUzZDAwMDk2ZDRmYmYzYWVlMTQ4NDQyOGEzNjkwMDRlMWU3ODBhNzc5ZiJ9"
+        },
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L23-L41",
+          "version": "repo-lines-v1:sha256:d35e5440f45c532de4ccad8c180f12e385cbd825f56b7214de99fcdc5492cd76:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiYjkwYmZlNzQxNDk2YWJmMmNiNzg0MzQ1ZTI2NTNhYmZkNTMxODNhZTI0ZDkwNDQwY2ZlZjMzNjM0NDkzZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyZGZmYzYyNWM2ZDA0Mzc2YjA1NDZhNTJlMzIwYzQ4YzQzZDFlNWQ3NzQzZjRlYTNhYjdmNDAwYjM3ZWQwNDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0YmY3NWE4NjgwYmU2ZjAwYjRhNjIxMTg3OGRlZGNiYzI4NmMyZmMzYzg0ZTkyYzY5MGQ0M2E2ZjhiNmVkNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwNTY1MWIzODMyYjc4OTg4ZWZhZWM1ZGU0ODU1NjhmM2RiNGY4OTYzOGM4ZTlkYWVhNWQzMDZjNzZmOWE3ZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_532e871021ef4a19824e82b2316a549d",
+      "statement": "Retrieval must resolve candidates to canonical identity before reciprocal-rank fusion; otherwise duplicate representations can receive multiple ranking contributions, while documented failures permit BM25-only or core-candidate fallback.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md#L284-L310",
+          "version": "repo-lines-v1:sha256:8b63b76a300d2abff03c280785039f8dfdc4df4ce1c479b884346a2bac9e3f6f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4OTdjZWQ4MjhiN2E4OTE0YmNmZTNjZTUxMWRkMGU0MGQwMjhkNDQ0ZmY4YTcyMDkyMGI1MDNiMjJiOTRmNTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MGNhOWQzMTgwZDliYjA5Y2M5MzNjNzJlNTBhZmUwMzkxZjNiODBhOGE3MmQwMGI0NjU1ZmY0MDRkYzcxNTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8963f7928acb44239ebfa1f3ecd17488",
+      "statement": "The packet registry centralizes the title generator version and canonical title_id format, and title backfills are prohibited from modifying packet_key, source_ref, feature_id, tree_node_id, or qdrant_point_id; only title fields and updated_at are declared writable.",
+      "evidence": [
+        {
+          "resource": "repo://packages/atlas/lib/packet-registry.mjs#L1-L39",
+          "version": "repo-lines-v1:sha256:871085afc94f82d5d1989bdcc4840365c9fbe58ddeacd4468dd6ae62fb72502d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1ZTI2Y2Q5MjM2NmY2MGQ4ZWQ5MmQwMjM5ZjA3ZmVmNzRjYWMxNGFhNjlhZGRmOWMyY2MwZDExZWIwMGE0NjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4408e7be4e6842919ff7740c4f22ada4",
+      "statement": "The revision-qualified registry design records distinct logical executor lanes and requires projection health to be checked by independent readback and checksums against PostgreSQL packet and source revisions; mirrors must not add retrieval votes merely because they contain the same packet.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L14-L23",
+          "version": "repo-lines-v1:sha256:4f82cbb015773816622a06c8894cbfc3bd80829cf606c4ee4c123884a5ddaff6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmMzdiMzk5ZDY0Y2VmNDUzNTY0NDY4NWQ2NDQyNTQyNzcxNWIzMWYyMzNhM2Q4NjcxMWUzZTU0ODViMzIzNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQxZGI4YTA4NDMxZDhmNDY2YjA4OTcxMDU3MTk4NDQ5NGI2ZDdkNzBjNTU1MDYwM2Q1YjRkMzczNjJlYTU4MzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhMDFkMDNkNjIwZTY0NzEyZDIyMDVmNmU5NmY4MGU0Yzg4NTNiYTFkMzllNTZlODQwZGU4ZWMzNmYyNjkxNDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyMmNkOGVkYTg5NDM3ZDAzYWI3YTQyZjA0M2ZlNzA4MDI4ODA4ZjRkZWIwNWJiNzkzYWVjMGQwY2MxOTUzN2YifQ"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L39-L57",
+          "version": "repo-lines-v1:sha256:67f16541375684adccc2d1c7a1d1649d811d672143d00f16fa8d98977647b88c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwNDI4NmQyZTUzZjIxYTNlNjBlZTg1M2I0YmUzMmE3MWE2ZWZjZmQ5Y2UwNDAyODBjNjdmNTliYTJhODVkZWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyZTI4NDMzYTRjMjM1OGMyMzJkMzAyNGZkZjcxNDlmMWI3OWIxNDRlMmVmODlmYzlkMzA2MTA4ODRlMjkwMzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNjFjYjJjZDZjMGQyMzVjMGU0MDg4YzYzNmM1ZjE1ZWY4NGY5MzI4ZTA4Zjg5N2ExNjljYzc1YjIyMjYzYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzNjY3MDlkNjQ0NDgyODFhMTE3YWRhZGNlYWIyMjIxYWMxNzExZTQzOGFlZDEzOGUyYWYyNGZiYjRiZjAyODIifQ"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L68-L79",
+          "version": "repo-lines-v1:sha256:6df736b1bf05d7436cffef0c9f91f56fbadd6ccfe304a741914dbbef1dec4b17:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmNzc1Yzg0NGZmZmFjNTYzZTg1ODc3MjZjODE3NmViZWU2YTYzNWQ0MWI0NDkyNWFkZWY3YTcyNTQ4NmZkZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NWIwZTM0NzY3NmM3YjMxYzEwY2VhZjg0MGYzMTg5NTI1ZGFkYTdmM2U4NTEyYTc2OWRlY2Q5NDM3ZWQ4NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ3YzZkOThmZjY1NjNjOGI0NGQ2NjQ1NmYwYmFjYTJiNzg4MzA5NDM2MjQxNTIyNGYyNDkzNTk4OTJmMzYzYWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5Mjc1NGE4ODk4ZTkyNGM2ZjY3ZDg0NzVkMzZiOWExMzNkODQ2NzdiOGNhOTNlNDg5MDQzNGFiYWYwZDQyM2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_262e203f2e014311b8207e304f23f7db",
+      "statement": "The data-spine workflow is dry-run by default and requires an explicit --write gate for external database or vector writes; the registry change separately excludes automatic migrations, backfills, Qdrant writes, cache warming, promotion, and direct Mastra or LangGraph durable writes.",
+      "evidence": [
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L153-L157",
+          "version": "repo-lines-v1:sha256:9bd206d6e98be1107820da4a9ce8be261d74d5cfe894c572f09bc95a85b39bf0:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmYzNmI2NDA1ZTg0MjYyNGFiZDZhZmQyMDIxMzBlNjVmZDJjYjM1ZWMxNmQ5YmYyMWM2OGM1NzExNmVmYTIzMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDkxZDhkYjE1OWQ3ZWQ4YTU5OTc4OGI5OTYzY2M0YWZiZDllZDliODk5M2JlMWU4YzI3ZDc3N2M3NGU0NjE2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2UxMWQ4YzkwNjYwZjVjMjU3ZmQ2YWI2MjlmZTY0ZjM3NGM5OWE3NzUzYzRlYzdhZmJhNTgxMTk3N2E1OGY0ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjczZGNmMzRjMWE1NTFkY2UyOWJkZThiOTdhMmU1MzQ2YmVmNTU0ZmVhYjBiM2EzY2Y1NDc4ZDU4MjcxNTEwZCJ9"
+        },
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L168-L182",
+          "version": "repo-lines-v1:sha256:1c39d1bcef656c172be3af22ab97e471561d1d981e8765d53544978188d2dcec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMzY0ZTkxOWI0YTE0N2RkMzNhOTFlNWIxMzQ5MTY2Y2UyMzM3NzAzYjI0YzVhNjJmYzZkNDEwNTFlZGI5ZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMzJlYmE0ZDk1MmNmZTJkODdjOTIxMjc5MDE5ZTY1MmI4MzFiZTU5MTk4MzkzNmU5NDZiNzA4YzRkMjU2MDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzYmY2NjgzMjA4NDBkNmY0ZjZiYzkyOGRkY2JmMDdmZjk0NWRkMmM5M2VmOGUwMGM1YWVkZGEzZTUwNWFkYzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhYjcxZTUxYTA1ODIzMmZkZWI3NzFiOWQzZjU1YmZkNmUwMzc3NTFkODcyYTAzY2JiM2RjYzYyMWRkZDYxM2UifQ"
+        },
+        {
+          "resource": "repo://docs/atlas/parent-atlas-data-spine.md#L90-L95",
+          "version": "repo-lines-v1:sha256:5855a5c7baea34c4a3d4423c8e3bb4cdae9c410b63e8236bbc48f3e65afad728:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGYzOTJlMDY5ZGU2ZTkzNGVkYzIyOTA2MGFjYTBmNTJiODQzZDU3MDVlZTg2YTQ3M2E4ZTIzNGJlZWMxOTE5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjNkNDAwNWI2ODI4ZGVjOGI0N2U0NGZmYzZlZmNkMGI0ZTBmY2YwNzg0ODc3NjM0MjY4MzFiNDM4YmExZjg1NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDdhMTNmZGVlYzdmZTVlYjhiZTk4OTNhZTdmOWViZGJhNGIzZmNhZTMzOTdjNjhjMjRmZGE2MDI4ZDYzN2U0NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTIxOTY5ZGI0MmI0NGI4ZGVhMTE1MGNiMjk4Mjg1OGM4ZDA5Nzg3MTJmM2M5ZTIwNGY1MjY1NDBjYTY4YzgzMSJ9"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L25-L35",
+          "version": "repo-lines-v1:sha256:da294495a0f915a8489c68c7139ee291ae959273fb0ec538d0ce008c5a705192:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0Y2Q1ZTM0M2RhNmU4YjZhZmE2MWU5ZTdkZmI4YjQwYTViMjVmOWIzYTU5MjU3ZjY5MmM5NDRhYjZiMTNlNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczOGM4MWQ5ZGVlOTI1OTgxNWVmZGExYjMyMTYxMmExOWI4ZDBlMzFjZDFmMTdlZjA2N2IzZGU2NGM5NjFhOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0NzM4OGRmZWZiNTU4ZjQzZDk2MDljMDE3MTY1MzRmYmFjZWRmYWUwZWEyOTA4ZTY2Yzc3ZTQzMWI4ZmJjN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjNjFjYjJjZDZjMGQyMzVjMGU0MDg4YzYzNmM1ZjE1ZWY4NGY5MzI4ZTA4Zjg5N2ExNjljYzc1YjIyMjYzYjcifQ"
+        },
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L81-L89",
+          "version": "repo-lines-v1:sha256:511e197ef58253f106f34049f339059d8602b682dd00aec9eb06fd1cc18b4d57:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmU3YjRiZDRjNmI0NjRlZTMzYjE0NzdhZTUxMzcwY2Q3Y2E3MTkwZjBhY2RiMzJiYmI4MDM5OTg5M2YyM2Y3NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDNjNTA0M2M3MDZiMGU2ZTdlNWVmN2IwM2QyODI3NTQzM2FiYzE5Y2VmZGNlNjYwYTAwMDJmYTVlMWRjZGU1MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDBkZjE3Nzc1ZWNlYWE4MDZkNTQ3Y2FmMzc5ZTNhM2M2ZjgzYjU3ZDhkY2ZjZDM3MTEzMjlhYzk3NzY1MDU4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2IzMjJjZDhjYTlmOWFlZGY2YWE5NTA0NjYwZmFmMzkxNDBhYzUxOTg2NGUxOTUxMTY3MzMzMmRkNzUyNDI4NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e81ffe908b8141a6a0e19c93802c21cb",
+      "statement": "The semantic-AST RPC is designed as read-only and carries workspace or packet revisions, source references, AST spans, parser or grammar revisions, and receipts; a separate gated producer-admission path is required for writes.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L44-L47",
+          "version": "repo-lines-v1:sha256:ceceabb97f6632196d9dce56be6be56c22704c56d1412239b731aa4ab740066e:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTcwODhhMjc5YzQ0ZjlmZDYzNzA5MThhYTE3ODVlZTJkMWY2YmFiOTc4ZTgxODkwYzM3ODY3ZTI4Y2Q1ZTc3NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzkxMjdlODcwMmI5MWU1MWIxNjM4NWM1OGI3MDc0OTg5OGUxYTMyNjhmOGY5NmQwY2FiYmFlYmM0MDQzYzMzOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOWJlYTk5OWVhY2Q1NjI1OGQzY2JiYWZjMDEwMjE3YjM5MzQ2MzRhZmViMDcyZjc4MzQxNGE1MzY1YjMxODMwMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZkODBjNjk0YzQyYmUwODA2ZjFjNDJiNDVhYWM0ZmJjNmE3NjEyNzkzY2UxZTkyMTZlNzZiMjlhYmJkODE3NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1f45bb4ee36e421ea1e1a5bac65b8055",
+      "statement": "Drizzle migration policy distinguishes journaled SQL, documented sidecars, and undocumented pending SQL: documented sidecars are intentional and informational, while unjournaled and undocumented numbered SQL is classified as a stale migration rather than silently executed.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/atlas/drizzle-sidecar-policy.mjs#L13-L36",
+          "version": "repo-lines-v1:sha256:c1d6a14d2dcfb899e54d45264e4e17d8ea65df6a395c6c3145e067a8a8656c63:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkMzVlNzQ5MWE5MGRhODQwNDUzODFlY2E1OTIwNjhjZWI4YTQyNGFiMzhkYjhkNmU4YzRiOTdmZDIxZjBkNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMxMWRiMGVhMzMxYTA1MWRmODY3MDEyMzBkMGJkYjg3YWUwNzMyOTc0NTExOGY3ZWRlNWFmZWY2YmQyMWViOTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoyLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiNDQ2MmQwNzIyZmRmYzA2YmE3YmZlNWMyMTA5ZThhM2RlZDY0N2U3MGNjYTY4MTU1NzBhOWU4MzE1ZDBkM2IifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/drizzle-sidecar-policy.spec.ts#L3-L39",
+          "version": "repo-lines-v1:sha256:be98b21919dad0e9ba0ded6a7cfeaa7d006cba634a09687387cc23287ea92038:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY5MTc0NjE5ZGExMDExNmYyYTBiZTk3MmQ2OTdkOGJjOGIzOGQxOGQwMzAwZjA4NzM4MzdlOWVmY2E3YzYwYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwOGI2OWIxMjMxZTc1MDMzNWQ5ZGQxZjc5ZDc4NmVjOGQzMjEzZTQ2MDRmMzRhMGExMmRjZTRjMDM0ZTBlYTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2Y2RhZjkxOTdlZGFkZmYxZjAwY2I0NWVjMTk1NTc2NDQ2YThhODNlYTA3NTBlNWJiMTE5YmIxMzUwZTZiZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4629cef66f21431eac09f08c42f0c4e1",
+      "statement": "The registry design leaves several boundaries unresolved: the final registry relation, the authorized first AST producer, and whether the FastAPI GPU lane speaks gRPC directly or remains behind a Go adapter require further implementation or live-schema decisions.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md#L91-L98",
+          "version": "repo-lines-v1:sha256:8539c16c706cf475af1468c78226d985348e9bf2e1fe3f6df2f47af3a105f887:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTAwNjcwZGIxNTZhMzNlZTlkMDUyNGNkOGJiYjI4YTg3ZGVjOGQzZjFiOTRhNTBlNWU3M2RjYzI2OWRlODIyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFkYWEyMzgyNGU0YzE5NTY5ODhiMTg1OTlhMDc4Njg3OWYzOTAzYmExYmM3OWUzOTYyNjY5OTUxMzAzYjA5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzJiNDAxNGEyODBjOWIzYTE1YmU4OGI0ZGU4NDc1MTRhNjVkZmViZWJhN2YxZWE0ODIwY2Q1NGFjZDI2NzRiNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

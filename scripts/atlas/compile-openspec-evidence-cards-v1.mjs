@@ -30,13 +30,13 @@ function compactContext({ task, binding, predicates }) {
   return raw.slice(0, 1600);
 }
 
-export function compileOpenSpecEvidenceCardsV1(bindingsReport) {
+export function compileOpenSpecEvidenceCardsV1(bindingsReport, censusOverride = null, sourceRefs = {}) {
   if (bindingsReport?.schema !== 'atlas.openspec-task-evidence-bindings.v1') throw new Error('BINDINGS_SCHEMA_UNSUPPORTED');
   const censusPath = process.env.OPENSPEC_CENSUS_PATH
     ? path.resolve(ROOT, process.env.OPENSPEC_CENSUS_PATH)
     : path.join(ROOT, 'docs', 'reports', 'openspec-evidence-portfolio-census-v2.json');
-  const censusRef = path.relative(ROOT, censusPath).replaceAll('\\', '/');
-  const census = JSON.parse(fs.readFileSync(censusPath, 'utf8'));
+  const censusRef = sourceRefs.census ?? path.relative(ROOT, censusPath).replaceAll('\\', '/');
+  const census = censusOverride ?? JSON.parse(fs.readFileSync(censusPath, 'utf8'));
   const expectedRunId = process.env.OPENSPEC_EVIDENCE_RUN_ID ?? census.runId ?? null;
   if (expectedRunId && bindingsReport.runId !== expectedRunId) throw new Error('CARD_BINDINGS_RUN_ID_MISMATCH');
   if (!census.source?.workspaceRevision || bindingsReport.source?.workspaceRevision !== census.source.workspaceRevision) {
@@ -91,7 +91,7 @@ export function compileOpenSpecEvidenceCardsV1(bindingsReport) {
     generatedAt: new Date().toISOString(),
     source: {
       census: censusRef,
-      bindings: path.relative(ROOT, BINDINGS_PATH).replaceAll('\\', '/'),
+      bindings: sourceRefs.bindings ?? path.relative(ROOT, BINDINGS_PATH).replaceAll('\\', '/'),
       workspaceRevision: bindingsReport.source?.workspaceRevision ?? null,
       canonicalAuthority: false,
     },

@@ -1,0 +1,111 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-openspec-task-triage-pipeline:2.2:a848fc04ef2e:20261007215755591",
+  "evidenceType": "VALIDATION",
+  "changeId": "parent-atlas-openspec-task-triage-pipeline",
+  "taskId": "2.2",
+  "claim": "The compact OpenSpec task, report-manifest, and triage pipeline passes focused contracts and strict change validation against one current workspace revision; report associations remain derived and advisory.",
+  "gitCommit": "35871d115516bc5e6df18cf60dd773b7958d7a11",
+  "workspaceRevision": "sha256:a848fc04ef2e7876bc88e4d699ae81f88fbf61d605aa86a912d7e01459186c1d",
+  "sourceRevision": "sha256:69b2187332fae099e671c4ad0f0759ce97b55d545e025154df8983d17a9066df",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md",
+      "lineStart": 11,
+      "lineEnd": 11,
+      "sourceRevision": "sha256:e2c3cffef308d7b13eb93bf4fe46cacd4bec6148590699f78b14d757575f11d0"
+    }
+  ],
+  "producer": "scripts/atlas/record-openspec-task-triage-validation-receipt-v1.mjs",
+  "command": "node scripts/atlas/record-openspec-task-triage-validation-receipt-v1.mjs",
+  "inputs": [
+    {
+      "kind": "taskCards",
+      "uri": ".tmp/goal-cache-alignment/triage-proof-a848fc04/task-cards.json",
+      "checksum": "sha256:35030f2ef8a547386a3fb86e01cdb0984db7ba8c4c4e02ca927507d7672566e8"
+    },
+    {
+      "kind": "reportManifests",
+      "uri": ".tmp/goal-cache-alignment/triage-proof-a848fc04/report-manifests.json",
+      "checksum": "sha256:a1265a577fa5564fbcfe8c97f7b6c01ac2b2b12aae058cdc62f269f41f420da3"
+    },
+    {
+      "kind": "triage",
+      "uri": ".tmp/goal-cache-alignment/triage-proof-a848fc04/triage-corpus.json",
+      "checksum": "sha256:8d75e5f58542dfddeb158508bdd74c64d8b1b17ee4ff853f4d5755e2d524e755"
+    }
+  ],
+  "observedAt": "2026-10-07T21:57:55.591Z",
+  "expectedAssertions": [
+    {
+      "id": "focused-contracts",
+      "expected": "all focused evidence, TaskCard, manifest, and triage tests pass"
+    },
+    {
+      "id": "strict-change-validation",
+      "expected": "the owning OpenSpec change passes strict validation"
+    },
+    {
+      "id": "revision-bound-corpus",
+      "expected": "all three corpus stages share the current HEAD and OpenSpec workspace revision"
+    },
+    {
+      "id": "bounded-derived-artifacts",
+      "expected": "each corpus output is below 10,000,000 bytes"
+    },
+    {
+      "id": "authority-boundary",
+      "expected": "derived artifacts remain non-authoritative and no datastore/archive writes occur"
+    },
+    {
+      "id": "receipt-readback",
+      "expected": "the evidence-fabric independently binds this receipt to the exact task and output checksum"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "focused-contracts",
+      "actual": "45 focused tests passed; 0 failed",
+      "passed": true
+    },
+    {
+      "id": "strict-change-validation",
+      "actual": "1 change passed; 0 failed",
+      "passed": true
+    },
+    {
+      "id": "revision-bound-corpus",
+      "actual": "all corpus stages use sha256:a848fc04ef2e7876bc88e4d699ae81f88fbf61d605aa86a912d7e01459186c1d at HEAD 35871d115516bc5e6df18cf60dd773b7958d7a11",
+      "passed": true
+    },
+    {
+      "id": "bounded-derived-artifacts",
+      "actual": "3 outputs below 10000000 bytes",
+      "passed": true
+    },
+    {
+      "id": "authority-boundary",
+      "actual": "only local report artifacts were written; canonical, cache, vector, graph, database, and archive writes are disabled",
+      "passed": true
+    },
+    {
+      "id": "receipt-readback",
+      "actual": "independent census readback matched the exact task span, workspace/source revisions, and output checksum",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "validation_run_report",
+      "uri": "docs/reports/openspec-task-triage-validation-run-v1-a848fc04ef2e-20261007215755591.json",
+      "checksum": "sha256:2fff8b8eeaa225ea6d900d83e700fac0dd0b40e8ed1a6e6cc90064598face6d2"
+    }
+  ],
+  "verifier": "scripts/atlas/audit-openspec-evidence-fabric-v1.mjs",
+  "independentVerifier": "buildPortfolioCensus readback with exact task span, workspace revision, receipt checksum, and output checksum",
+  "readbackRequired": true,
+  "readbackPerformed": true,
+  "readbackCommand": "node scripts/atlas/record-openspec-task-triage-validation-receipt-v1.mjs (post-write census readback)",
+  "verdict": "PROVEN",
+  "checksum": "sha256:bf9e9e08af9c9b43c9afde474667ccc59bf7f8359ab3688a8702186a7bfbdeb9"
+}

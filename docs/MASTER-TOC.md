@@ -3,13 +3,13 @@
 > Generated projection from `docs/reports/document-governance-registry-v1.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7daccc`
+Registry checksum: `90e017c05b76cde3e09c5f6aa171c03fee38dedb40f209452c35dfea75b07d28`
 
 ## Canonical source documents
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
-- [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `afa11f316562`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `e2e8b5647452`
+- [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `287ec1d91fd2`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `6bb7baf527a6`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -30,14 +30,128 @@ Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7d
 
 - [Parent Atlas Architecture TOC V2](architecture/ARCH-TOC.md) — complete navigation, workstation owner map, and explicit temporal snapshot receipts.
 
+## Code Capability Knowledge and Agentic DAG Retrieval
+
+- [Code-symbol semantic retrieval](architecture/code-symbol-semantic-retrieval-v1.md) — typed, source-grounded symbol evidence and existing DAG/OaK ownership boundaries.
+- [Repo-local capability-card contract](.okf/indexes/code-capability-knowledge-v1.yaml) — design-only `spec.card_kind` projections; canonical identity remains with Parent Atlas.
+- [CODE-KNOW-01..18](../openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md) — open schema, evidence, transport, and admission gates; no datastore writes authorized.
+
+## NLP Grounding, Classification, and Retrieval Context
+
+> Navigation across existing owners; this is not a new registry or an admission claim. Domain/class labels, topics, extracted entities/concepts, clusters, ranked Top-K results, and future-context indexes are derived projections until their source, workspace, taxonomy, and representation revisions are qualified.
+
+- [Task/evidence-card grounding and tuple lineage](../openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md) — task proof join, `GroundedNlpFactV1`, deployed-schema check, tuple lineage, and read-only admission gates.
+- [OpenSpec task evidence cards](../openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md) — TaskCard/EvidenceCard receipts and predicate-level proof binding.
+- [NLP sidecar feature compiler](../openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md) — extraction, feature compilation, source spans, and sidecar/runtime boundaries.
+- [Domain classifier and taxonomy](../openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md) — domain/intent classification and non-authoritative routing signals.
+- [Feature-label derivation](../openspec/changes/feature-label-semantic-derivation/tasks.md) — sourceRef-to-feature labels and review-gated canonical reconciliation.
+- [Ontology kernel: entities, concepts, and tuples](../openspec/changes/parent-atlas-ontology-kernel/tasks.md) — ontology ownership, entity extraction, tuple lineage, and domain normalization.
+- [Feature intelligence: entity fanout and clustering](../openspec/changes/atlas-feature-intelligence/tasks.md) — entity/evidence admission, bounded fanout, feature convergence, and KMeans/SOM projections.
+- [Topology representation admission](../openspec/changes/parent-atlas-topology-representation-admission/tasks.md) — snapshot/ordinal-bound clustering and topology artifacts.
+- [Candidate feature execution](../openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md) — candidate feature production, ranking signals, and evidence-aligned feature rows.
+- [Retrieval lineage and DAG convergence](../openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md) — retrieval/top-K candidate flow, context assembly, and revision-bound downstream consumption.
+- [Semantic representation and retrieval](../openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md) — `semantic_768` representation lineage and retrieval projection gates.
+
+## Architecture documents
+
+- [ACP-GEMMA4-MEMORY-HIERARCHY](docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md) — UNCLASSIFIED
+- [ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW](docs/architecture/ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md) — UNCLASSIFIED
+- [AGENTIC-ERROR-FIXING-ARCHITECTURE](docs/architecture/AGENTIC-ERROR-FIXING-ARCHITECTURE.md) — UNCLASSIFIED
+- [AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL](docs/architecture/AGENTIC-ERROR-FIXING-DIMENSIONAL-MODEL.md) — UNCLASSIFIED
+- [agentic-error-proposal-flow](docs/architecture/agentic-error-proposal-flow.md) — UNCLASSIFIED
+- [agentic-openspec-tasks-error-fixing-playbook](docs/architecture/agentic-openspec-tasks-error-fixing-playbook.md) — UNCLASSIFIED
+- [atlas-topic-identity-read-model-v1](docs/architecture/atlas-topic-identity-read-model-v1.md) — UNCLASSIFIED
+- [atlas-work-items-design-v1](docs/architecture/atlas-work-items-design-v1.md) — UNCLASSIFIED
+- [README](docs/architecture/autoencoder/README.md) — UNCLASSIFIED
+- [bounded-tool-gateway-implementation](docs/architecture/bounded-tool-gateway-implementation.md) — UNCLASSIFIED
+- [CANONICAL-PACKET-WIRING-BLUEPRINT](docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md) — UNCLASSIFIED
+- [canonical-tool-catalog](docs/architecture/canonical-tool-catalog.md) — UNCLASSIFIED
+- [code-symbol-semantic-retrieval-v1](docs/architecture/code-symbol-semantic-retrieval-v1.md) — ACTIVE_SUPPORTING
+- [codebase-memory-mcp-cli-and-atlas-alignment-v1](docs/architecture/codebase-memory-mcp-cli-and-atlas-alignment-v1.md) — UNCLASSIFIED
+- [cold-warm-hot-packet-lifecycle](docs/architecture/cold-warm-hot-packet-lifecycle.md) — UNCLASSIFIED
+- [compressed-semantic-geometry](docs/architecture/compressed-semantic-geometry.md) — UNCLASSIFIED
+- [consolidation-and-schema-alignment](docs/architecture/consolidation-and-schema-alignment.md) — UNCLASSIFIED
+- [consolidation-and-schema-migration-checklist](docs/architecture/consolidation-and-schema-migration-checklist.md) — UNCLASSIFIED
+- [CORRECTED-embedding-dimension-policy](docs/architecture/CORRECTED-embedding-dimension-policy.md) — UNCLASSIFIED
+- [couchdb-mapreduce-atlas-ingestion](docs/architecture/couchdb-mapreduce-atlas-ingestion.md) — UNCLASSIFIED
+- [CUVS-DOCKER-IMPLEMENTATION-CHECKLIST](docs/architecture/CUVS-DOCKER-IMPLEMENTATION-CHECKLIST.md) — UNCLASSIFIED
+- [CUVS-INSTALLATION-WINDOWS-RESEARCH](docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md) — UNCLASSIFIED
+- [CUVS-QUICK-REFERENCE](docs/architecture/CUVS-QUICK-REFERENCE.md) — UNCLASSIFIED
+- [CUVS-RESEARCH-SUMMARY](docs/architecture/CUVS-RESEARCH-SUMMARY.md) — UNCLASSIFIED
+- [DAG-ACP-OPEN-MEMORY-WIRING](docs/architecture/DAG-ACP-OPEN-MEMORY-WIRING.md) — UNCLASSIFIED
+- [deepseek-engram-architecture-search](docs/architecture/deepseek-engram-architecture-search.md) — UNCLASSIFIED
+- [domain-registry-contract-v1](docs/architecture/domain-registry-contract-v1.md) — UNCLASSIFIED
+- [DRIZZLE-TOC](docs/architecture/DRIZZLE-TOC.md) — UNCLASSIFIED
+- [dual-lane-hot-brain-cold-queue](docs/architecture/dual-lane-hot-brain-cold-queue.md) — UNCLASSIFIED
+- [engram-plugin-memory-support](docs/architecture/engram-plugin-memory-support.md) — UNCLASSIFIED
+- [feature-consolidation-review-queue](docs/architecture/feature-consolidation-review-queue.md) — UNCLASSIFIED
+- [gemma4-bounded-tool-system-prompt](docs/architecture/gemma4-bounded-tool-system-prompt.md) — UNCLASSIFIED
+- [gemma4-retrieval-loop-hook](docs/architecture/gemma4-retrieval-loop-hook.md) — UNCLASSIFIED
+- [GPU-CUDA-NAPI-MEMORY-LAYOUT](docs/architecture/GPU-CUDA-NAPI-MEMORY-LAYOUT.md) — UNCLASSIFIED
+- [grpc-binary-memory-registry-master-todo](docs/architecture/grpc-binary-memory-registry-master-todo.md) — UNCLASSIFIED
+- [grpc-binary-memory-registry-plan](docs/architecture/grpc-binary-memory-registry-plan.md) — UNCLASSIFIED
+- [HEADROOM-COMPRESSION-CRYPTO-PROVENANCE-ALIGNMENT](docs/architecture/HEADROOM-COMPRESSION-CRYPTO-PROVENANCE-ALIGNMENT.md) — UNCLASSIFIED
+- [kanban-parent-atlas-alignment](docs/architecture/kanban-parent-atlas-alignment.md) — UNCLASSIFIED
+- [langextract-atlas-integrations](docs/architecture/langextract-atlas-integrations.md) — UNCLASSIFIED
+- [legal-ai-parent-atlas-product-integration](docs/architecture/legal-ai-parent-atlas-product-integration.md) — UNCLASSIFIED
+- [llm-synthesis-memory-policy](docs/architecture/llm-synthesis-memory-policy.md) — UNCLASSIFIED
+- [local-deep-research-boundary](docs/architecture/local-deep-research-boundary.md) — UNCLASSIFIED
+- [MCP-TOOL-AUDIT-AND-ACE-PACKET-FLOW](docs/architecture/MCP-TOOL-AUDIT-AND-ACE-PACKET-FLOW.md) — UNCLASSIFIED
+- [neo4j-graphrag-parent-atlas](docs/architecture/neo4j-graphrag-parent-atlas.md) — UNCLASSIFIED
+- [NES-CHROM97-GLYPH-BITENCODING-ALIGNED](docs/architecture/NES-CHROM97-GLYPH-BITENCODING-ALIGNED.md) — UNCLASSIFIED
+- [oaklib-external-ontology-adapter-v1](docs/architecture/oaklib-external-ontology-adapter-v1.md) — UNCLASSIFIED
+- [offline-synthesis-parent-atlas](docs/architecture/offline-synthesis-parent-atlas.md) — UNCLASSIFIED
+- [okf-v02-validation-profile-v1](docs/architecture/okf-v02-validation-profile-v1.md) — UNCLASSIFIED
+- [opencode-claude-mem-bridge](docs/architecture/opencode-claude-mem-bridge.md) — UNCLASSIFIED
+- [PACKET-COMPILER-STAGES](docs/architecture/PACKET-COMPILER-STAGES.md) — UNCLASSIFIED
+- [packet-truth-flow-canonical-pattern](docs/architecture/packet-truth-flow-canonical-pattern.md) — UNCLASSIFIED
+- [PARENT_ATLAS_INSTRUCTION_AUTHORITY](docs/architecture/PARENT_ATLAS_INSTRUCTION_AUTHORITY.md) — UNCLASSIFIED
+- [PARENT_ATLAS_PACKAGE_BOUNDARIES](docs/architecture/PARENT_ATLAS_PACKAGE_BOUNDARIES.md) — UNCLASSIFIED
+- [PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY](docs/architecture/PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md) — UNCLASSIFIED
+- [parent-atlas-karpathy-pipeline](docs/architecture/parent-atlas-karpathy-pipeline.md) — UNCLASSIFIED
+- [parent-atlas-native-dawn-viewer-contract-v1](docs/architecture/parent-atlas-native-dawn-viewer-contract-v1.md) — UNCLASSIFIED
+- [parent-atlas-policy-routing](docs/architecture/parent-atlas-policy-routing.md) — UNCLASSIFIED
+- [parent-atlas-representation-structural-contract](docs/architecture/parent-atlas-representation-structural-contract.md) — UNCLASSIFIED
+- [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](docs/architecture/PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md) — UNCLASSIFIED
+- [parent-atlas-unreal-client-contract-v1](docs/architecture/parent-atlas-unreal-client-contract-v1.md) — UNCLASSIFIED
+- [pathway-cards-spec](docs/architecture/pathway-cards-spec.md) — UNCLASSIFIED
+- [phase-101-completion-plan](docs/architecture/phase-101-completion-plan.md) — UNCLASSIFIED
+- [phase-17g-gpu-json-tensor-mapping](docs/architecture/phase-17g-gpu-json-tensor-mapping.md) — UNCLASSIFIED
+- [phase-3-gpu-graph-adaptive-architecture](docs/architecture/phase-3-gpu-graph-adaptive-architecture.md) — UNCLASSIFIED
+- [phase-3d-telemetry-instrumentation](docs/architecture/phase-3d-telemetry-instrumentation.md) — UNCLASSIFIED
+- [PHASE-85-ARTIFACT-REGISTRY-SPEC](docs/architecture/PHASE-85-ARTIFACT-REGISTRY-SPEC.md) — UNCLASSIFIED
+- [PHASE-C-OPTION-B-ARCHITECTURE-DECISION](docs/architecture/PHASE-C-OPTION-B-ARCHITECTURE-DECISION.md) — UNCLASSIFIED
+- [phase8-query-optimization-taxonomy](docs/architecture/phase8-query-optimization-taxonomy.md) — UNCLASSIFIED
+- [POSTGRESQL-TOC](docs/architecture/POSTGRESQL-TOC.md) — UNCLASSIFIED
+- [qdrant-search-contract](docs/architecture/qdrant-search-contract.md) — UNCLASSIFIED
+- [rabbitmq-workflow-fabric](docs/architecture/rabbitmq-workflow-fabric.md) — UNCLASSIFIED
+- [residency-scheduler-boundary-v1](docs/architecture/residency-scheduler-boundary-v1.md) — UNCLASSIFIED
+- [retrieval-architecture](docs/architecture/retrieval-architecture.md) — UNCLASSIFIED
+- [retrieval-boundary-and-langgraph](docs/architecture/retrieval-boundary-and-langgraph.md) — UNCLASSIFIED
+- [retrieval-layer-separation](docs/architecture/retrieval-layer-separation.md) — UNCLASSIFIED
+- [rtx-visual-enhancement-boundary-v1](docs/architecture/rtx-visual-enhancement-boundary-v1.md) — UNCLASSIFIED
+- [runtime-owner-deduplication](docs/architecture/runtime-owner-deduplication.md) — UNCLASSIFIED
+- [RUST-BACKEND-DECISION-TREE](docs/architecture/RUST-BACKEND-DECISION-TREE.md) — UNCLASSIFIED
+- [scheduler-gpu-bridge-roadmap](docs/architecture/scheduler-gpu-bridge-roadmap.md) — UNCLASSIFIED
+- [SESSION-84-MISSING-LAYERS-ANALYSIS](docs/architecture/SESSION-84-MISSING-LAYERS-ANALYSIS.md) — UNCLASSIFIED
+- [storage-tier-schema](docs/architecture/storage-tier-schema.md) — UNCLASSIFIED
+- [subgraph-instruction-programming-kag-ace-topology](docs/architecture/subgraph-instruction-programming-kag-ace-topology.md) — UNCLASSIFIED
+- [trace-kag-web-development-guide](docs/architecture/trace-kag-web-development-guide.md) — UNCLASSIFIED
+- [trace-runtime-split](docs/architecture/trace-runtime-split.md) — UNCLASSIFIED
+- [TRANSPORT-WORKER-CHROM97-ALIGNMENT](docs/architecture/TRANSPORT-WORKER-CHROM97-ALIGNMENT.md) — UNCLASSIFIED
+- [unified-ace-engram-pipeline](docs/architecture/unified-ace-engram-pipeline.md) — UNCLASSIFIED
+- [UNIFIED-ID-HIERARCHY-AND-RETRIEVAL](docs/architecture/UNIFIED-ID-HIERARCHY-AND-RETRIEVAL.md) — UNCLASSIFIED
+- [UNIFIED-RETRIEVAL-HMM-POLICY-ARCHITECTURE](docs/architecture/UNIFIED-RETRIEVAL-HMM-POLICY-ARCHITECTURE.md) — UNCLASSIFIED
+- [vram-hygiene-policy](docs/architecture/vram-hygiene-policy.md) — UNCLASSIFIED
+
 ## Active OpenSpec task progress
 
 - [agent-branch-review-fanout-ace-centroid-aug22](openspec/changes/agent-branch-review-fanout-ace-centroid-aug22) — 17/20 tasks (85%)
-- [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/80 tasks (34%)
+- [atlas-feature-intelligence](openspec/changes/atlas-feature-intelligence) — 27/82 tasks (33%)
 - [deep-audit-code-gates-aug22](openspec/changes/deep-audit-code-gates-aug22) — 16/28 tasks (57%)
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 46/67 tasks (69%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/131 tasks (75%)
-- [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 56/100 tasks (56%)
+- [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 56/106 tasks (53%)
 - [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 850/1232 tasks (69%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 11/13 tasks (85%)
 - [parent-atlas-agentic-completion](openspec/changes/parent-atlas-agentic-completion) — 10/11 tasks (91%)
@@ -47,12 +161,12 @@ Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7d
 - [parent-atlas-analysis-pass-ornith-adapter](openspec/changes/parent-atlas-analysis-pass-ornith-adapter) — 24/25 tasks (96%)
 - [parent-atlas-best-fit-score-fabric](openspec/changes/parent-atlas-best-fit-score-fabric) — 406/682 tasks (60%)
 - [parent-atlas-branch-merge-consolidation-aug20](openspec/changes/parent-atlas-branch-merge-consolidation-aug20) — 18/35 tasks (51%)
-- [parent-atlas-candidate-feature-execution-fabric](openspec/changes/parent-atlas-candidate-feature-execution-fabric) — 279/384 tasks (73%)
+- [parent-atlas-candidate-feature-execution-fabric](openspec/changes/parent-atlas-candidate-feature-execution-fabric) — 279/398 tasks (70%)
 - [parent-atlas-canonical-directory-ingestion-fabric](openspec/changes/parent-atlas-canonical-directory-ingestion-fabric) — 21/66 tasks (32%)
 - [parent-atlas-code-ingestion-pipeline](openspec/changes/parent-atlas-code-ingestion-pipeline) — 26/35 tasks (74%)
 - [parent-atlas-code-intel-e2e](openspec/changes/parent-atlas-code-intel-e2e) — 2/19 tasks (11%)
-- [parent-atlas-compiler-semantic-graph-resolution](openspec/changes/parent-atlas-compiler-semantic-graph-resolution) — 40/58 tasks (69%)
-- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 23/73 tasks (32%)
+- [parent-atlas-compiler-semantic-graph-resolution](openspec/changes/parent-atlas-compiler-semantic-graph-resolution) — 40/87 tasks (46%)
+- [parent-atlas-compute-rank-cache-eval-dspy-gepa](openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa) — 24/84 tasks (29%)
 - [parent-atlas-deep-research-ingestion](openspec/changes/parent-atlas-deep-research-ingestion) — 6/7 tasks (86%)
 - [parent-atlas-document-governance-master-index](openspec/changes/parent-atlas-document-governance-master-index) — 52/64 tasks (81%)
 - [parent-atlas-error-embedding-768-migration](openspec/changes/parent-atlas-error-embedding-768-migration) — 12/25 tasks (48%)
@@ -74,17 +188,17 @@ Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7d
 - [parent-atlas-memory-architecture-freeze](openspec/changes/parent-atlas-memory-architecture-freeze) — 44/57 tasks (77%)
 - [parent-atlas-multi-agent-wave-plan](openspec/changes/parent-atlas-multi-agent-wave-plan) — 21/36 tasks (58%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 39/63 tasks (62%)
-- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1531/2188 tasks (70%)
+- [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1531/2215 tasks (69%)
 - [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 102/154 tasks (66%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 19/26 tasks (73%)
-- [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 38/45 tasks (84%)
+- [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/49 tasks (80%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 11/17 tasks (65%)
 - [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 221/330 tasks (67%)
 - [parent-atlas-ontology-oaklib-fanout-bitmap](openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap) — 33/36 tasks (92%)
 - [parent-atlas-opencode-replay-proof](openspec/changes/parent-atlas-opencode-replay-proof) — 2/19 tasks (11%)
-- [parent-atlas-openspec-task-triage-pipeline](openspec/changes/parent-atlas-openspec-task-triage-pipeline) — 10/54 tasks (19%)
+- [parent-atlas-openspec-task-triage-pipeline](openspec/changes/parent-atlas-openspec-task-triage-pipeline) — 12/54 tasks (22%)
 - [parent-atlas-openspec-tasks-audit-fabric](openspec/changes/parent-atlas-openspec-tasks-audit-fabric) — 16/18 tasks (89%)
-- [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric) — 36/175 tasks (21%)
+- [parent-atlas-pass-fabric](openspec/changes/parent-atlas-pass-fabric) — 36/184 tasks (20%)
 - [parent-atlas-pca-svd-representation-baseline](openspec/changes/parent-atlas-pca-svd-representation-baseline) — 7/18 tasks (39%)
 - [parent-atlas-policy-routing-integration](openspec/changes/parent-atlas-policy-routing-integration) — 36/40 tasks (90%)
 - [parent-atlas-prefill-routing-residency-convergence](openspec/changes/parent-atlas-prefill-routing-residency-convergence) — 125/152 tasks (82%)
@@ -93,7 +207,7 @@ Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7d
 - [parent-atlas-repair-candidate-feature-matrix](openspec/changes/parent-atlas-repair-candidate-feature-matrix) — 135/174 tasks (78%)
 - [parent-atlas-retrieval-executor-compatibility-convergence](openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence) — 39/48 tasks (81%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 119/144 tasks (83%)
-- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 813/1066 tasks (76%)
+- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 813/1067 tasks (76%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 52/109 tasks (48%)
 - [parent-atlas-retrieval-logic-convergence](openspec/changes/parent-atlas-retrieval-logic-convergence) — 32/74 tasks (43%)
 - [parent-atlas-rrf-fusion-consolidation](openspec/changes/parent-atlas-rrf-fusion-consolidation) — 5/6 tasks (83%)
@@ -107,6 +221,7 @@ Registry checksum: `622744378c1e74cb8d257b0e6c1d7059c42040c17d2af105c250bd792f7d
 - [parent-atlas-unordered-execution-contract](openspec/changes/parent-atlas-unordered-execution-contract) — 7/26 tasks (27%)
 - [parent-atlas-versioned-doc-intelligence](openspec/changes/parent-atlas-versioned-doc-intelligence) — 55/69 tasks (80%)
 - [parent-atlas-workboard-feature-utility-fabric](openspec/changes/parent-atlas-workboard-feature-utility-fabric) — 28/70 tasks (40%)
+- [parent-atlas-workspace-snapshot-runtime](openspec/changes/parent-atlas-workspace-snapshot-runtime) — 6/35 tasks (17%)
 - [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 127/179 tasks (71%)
 - [parent-atlas-xgboost-cuda-runtime-proof](openspec/changes/parent-atlas-xgboost-cuda-runtime-proof) — 12/30 tasks (40%)
 - [route-import-infra-isolation](openspec/changes/route-import-infra-isolation) — 16/17 tasks (94%)

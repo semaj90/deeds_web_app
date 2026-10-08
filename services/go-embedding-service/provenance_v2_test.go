@@ -16,6 +16,23 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+func TestResolveEmbeddingServiceBuildRevisionV2PrefersCompiledDigest(t *testing.T) {
+	compiled := "sha256:" + strings.Repeat("a", 64)
+	other := "sha256:" + strings.Repeat("b", 64)
+	if got := resolveEmbeddingServiceBuildRevisionV2("", compiled); got != compiled {
+		t.Fatalf("compiled build revision = %q; want %q", got, compiled)
+	}
+	if got := resolveEmbeddingServiceBuildRevisionV2(compiled, compiled); got != compiled {
+		t.Fatalf("matching configured build revision = %q; want %q", got, compiled)
+	}
+	if got := resolveEmbeddingServiceBuildRevisionV2(other, compiled); got != "" {
+		t.Fatalf("mismatched configured revision must fail closed, got %q", got)
+	}
+	if got := resolveEmbeddingServiceBuildRevisionV2(compiled, ""); got != compiled {
+		t.Fatalf("unlinked test/development build fallback = %q; want %q", got, compiled)
+	}
+}
+
 func TestResolveEmbeddingCapabilityV2BindsImmutableOwners(t *testing.T) {
 	t.Setenv("EMBEDDING_SERVICE_BUILD_REVISION", "sha256:"+strings.Repeat("a", 64))
 	t.Setenv("EMBEDDING_TOKENIZER_REVISION", "sha256:"+strings.Repeat("c", 64))

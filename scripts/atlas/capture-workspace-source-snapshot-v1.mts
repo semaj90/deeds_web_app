@@ -5,7 +5,7 @@ import { parseArgs } from 'node:util';
 // A stale JavaScript sibling must never silently become a second snapshot owner.
 import { captureStableSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
-const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' }, 'no-digest-cache': { type: 'boolean' } } });
+const { values } = parseArgs({ options: { root: { type: 'string' }, 'workspace-id': { type: 'string' }, 'no-digest-cache': { type: 'boolean' }, output: { type: 'string' } } });
 if (!values['workspace-id']) throw new Error('--workspace-id must be supplied; no identity is inferred');
 const root = path.resolve(values.root ?? process.cwd());
 // Derived per-file digest cache (never authority); --no-digest-cache forces a full byte read.
@@ -14,9 +14,13 @@ const startedAt = Date.now();
 let scanStats: Array<{ reused: number; rehashed: number }> = [];
 const report = captureStableSnapshot(root, values['workspace-id'], { maxAttempts: 3, digestCachePath, onDigestStats: (s) => { scanStats = s; } });
 console.error(JSON.stringify({ captureMs: Date.now() - startedAt, digestCache: digestCachePath ? 'ON' : 'OFF', scans: scanStats }));
-const directory = path.join(root, 'docs/reports/workspace-source-snapshots');
-mkdirSync(directory, { recursive: true });
-const artifactPath = path.join(directory, `${report.snapshotRevision.slice(7)}.json`);
+const defaultArtifactPath = path.join(root, 'docs/reports/workspace-source-snapshots', `${report.snapshotRevision.slice(7)}.json`);
+const artifactPath = values.output ? path.resolve(root, values.output) : defaultArtifactPath;
+const relativeArtifactPath = path.relative(root, artifactPath);
+if (relativeArtifactPath === '..' || relativeArtifactPath.startsWith(`..${path.sep}`) || path.isAbsolute(relativeArtifactPath)) {
+  throw new Error('--output must resolve inside --root');
+}
+mkdirSync(path.dirname(artifactPath), { recursive: true });
 const serialized = `${JSON.stringify(report, null, 2)}\n`;
 try { writeFileSync(artifactPath, serialized, { flag: 'wx' }); }
 catch (error: any) { if (error.code !== 'EEXIST' || readFileSync(artifactPath, 'utf8') !== serialized) throw error; }

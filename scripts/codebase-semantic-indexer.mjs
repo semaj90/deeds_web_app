@@ -5,7 +5,8 @@
  * 
  * Scans Drizzle-ORM schema files, maps their tables to feature domains
  * from CODEBASE_MAP.md and llms.md, generates 768-dimensional embeddings
- * using Ollama, stores them in PostgreSQL (metadata_envelopes, codebase_files,
+ * through the SvelteKit embedding API with an Ollama EmbeddingGemma fallback,
+ * stores them in PostgreSQL (metadata_envelopes, codebase_files,
  * and codebase_embeddings), and updates Redis hot cache.
  * 
  * Usage:

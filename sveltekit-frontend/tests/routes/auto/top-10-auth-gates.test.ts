@@ -13,9 +13,16 @@ function createMockEvent(user: any = null, method = 'GET'): Partial<RequestEvent
 }
 
 // Import the actual auth utils to test against real implementations
-import { requireUser, requireAdmin } from '$lib/server/auth-utils.js';
+import { requireUser, requireAdmin, isAdminRole } from '$lib/server/auth-utils.js';
 
 describe('Top 10 API Routes Authorization Gates', () => {
+  it('keeps the shared admin policy aligned for admin and superadmin only', () => {
+    expect(isAdminRole('admin')).toBe(true);
+    expect(isAdminRole('superadmin')).toBe(true);
+    expect(isAdminRole('viewer')).toBe(false);
+    expect(isAdminRole(undefined)).toBe(false);
+  });
+
   describe('Routes 1-3: Admin-level routes (acp/service-ports, acp/rpc, batch-embeddings/packets)', () => {
     it('route 1: /api/acp/service-ports GET should reject unauthenticated', () => {
       const event = createMockEvent(null, 'GET');

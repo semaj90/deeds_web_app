@@ -33,13 +33,17 @@ export function requireUser(event: RequestEvent): AuthUser {
   return user as AuthUser;
 }
 
+export function isAdminRole(role: unknown): boolean {
+  return role === 'admin' || role === 'superadmin';
+}
+
 /**
  * Asserts the request is from an authenticated admin user.
  * Throws 401 if not authenticated, 403 if not admin.
  */
 export function requireAdmin(event: RequestEvent): AuthUser {
   const user = requireUser(event);
-  if (user.role !== 'admin' && user.role !== 'superadmin') {
+  if (!isAdminRole(user.role)) {
     throw error(403, 'Admin access required');
   }
   return user;

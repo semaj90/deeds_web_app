@@ -56,14 +56,22 @@ export function verifyEvidenceReceiptV1(receipt) {
 }
 
 export function buildEvidenceCardV1(input) {
-  const required = ['schema', 'taskRef', 'changeId', 'taskId', 'claim', 'proofState', 'sourceRef', 'conceptID', 'confidenceScore', 'contextBlob', 'evidenceIds', 'workspaceRevision'];
+  const required = ['schema', 'taskRef', 'changeId', 'taskId', 'claim', 'proofState', 'sourceRef', 'conceptID', 'confidenceScore', 'contextBlob', 'evidenceIds', 'sourceRevision', 'workspaceRevision'];
   for (const field of required) if (input[field] === undefined || input[field] === null || input[field] === '') throw new Error(`EvidenceCardV1 missing ${field}`);
   if (input.schema !== 'atlas.evidence-card.v1') throw new Error('EvidenceCardV1 schema mismatch');
   if (!proofStates.has(input.proofState)) throw new Error('EvidenceCardV1 proof state mismatch');
+  if (!/^sha256:[a-f0-9]{64}$/i.test(input.sourceRevision)) throw new Error('EvidenceCardV1 source revision invalid');
   if (!Number.isFinite(input.confidenceScore) || input.confidenceScore < 0 || input.confidenceScore > 1) throw new Error('EvidenceCardV1 confidence score out of range');
   if (!Array.isArray(input.evidenceIds)) throw new Error('EvidenceCardV1 evidenceIds must be an array');
   const { checksum: _checksum, ...unsignedInput } = input;
-  const unsigned = { retrievalUsable: true, proofUsable: false, rejectionReasons: [], ...unsignedInput };
+  const unsigned = {
+    retrievalUsable: true,
+    rejectionReasons: [],
+    ...unsignedInput,
+    proofUsable: unsignedInput.proofUsable === true
+      && unsignedInput.proofState === 'PROVEN'
+      && /^sha256:[a-f0-9]{64}$/i.test(unsignedInput.sourceRevision),
+  };
   return { ...unsigned, checksum: sha256(canonicalJson(unsigned)) };
 }
 
@@ -295,7 +303,7 @@ export function extractDependencyCandidates(task) {
 
   for (const target of task.declaredDependencies ?? []) add(target, 'REQUIRES', 'EXPLICIT_FIELD', 1);
 
-  const text = task.dependencySourceText ?? task.taskText;
+  const text = task.taskText ?? '';
   for (const match of text.matchAll(/\bdependsOn\s*:\s*\[([^\]]*)\]|\bdepends_on\s*=\s*([^;\n]+)/gi)) {
     for (const target of taskIdTokens(match[1] ?? match[2])) add(target, 'REQUIRES', 'EXPLICIT_FIELD', 0.99);
   }
@@ -961,6 +969,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
   const cycleAffectedTaskKeys = new Set(cycles.flat());
   const cycleAffectedTasks = taskRows.filter((task) => task.dependencyCycleAffected || cycleAffectedTaskKeys.has(task.canonicalTaskRef)).map((task) => task.taskRef);
   const workspaceSourceManifest = sourceManifest(root);
+  const sourceRevisionByPath = new Map(workspaceSourceManifest.map((entry) => [entry.source, entry.checksum]));
   const workspaceRevision = sha256(canonicalJson(workspaceSourceManifest));
   const receiptInventory = [
     ...receipts.map((receipt) => ({ ...receipt, canonicalSchemaValid: true })),
@@ -1055,6 +1064,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
       confidenceScore: proofState === 'PROVEN' ? 1 : proofState === 'STALE' ? 0.25 : 0,
       contextBlob: `${proofState}: ${task.taskText}`.slice(0, 2000),
       evidenceIds: allBindings.map((receipt) => receipt.evidenceId).filter(Boolean),
+      sourceRevision: sourceRevisionByPath.get(task.tasksPath),
       workspaceRevision,
     });
   });

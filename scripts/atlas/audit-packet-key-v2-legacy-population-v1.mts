@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Read-only census: derive PacketKeyV2 for the existing atlas_packets population and test the alias model.
- * No writes. Run from sveltekit-frontend/:  npx tsx ../scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts
+ * Read-only database census: derive PacketKeyV2 for the existing atlas_packets population and test the alias model.
+ * The report is a local diagnostic output; use --output=.tmp/... to avoid replacing the default tracked report.
+ * Run from sveltekit-frontend/:  npx tsx ../scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts [--output=.tmp/packet-key-census.json]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,6 +11,14 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 import { computePacketKeyV2, PacketKeyV2InputError } from '../../sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2';
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, connectionTimeoutMillis: 5000, statement_timeout: 170000 });
+const outputArg = process.argv.slice(2).find((arg) => arg.startsWith('--output='));
+const unknownArgs = process.argv.slice(2).filter((arg) => !arg.startsWith('--output='));
+if (unknownArgs.length > 0 || process.argv.slice(2).filter((arg) => arg.startsWith('--output=')).length > 1) {
+  throw new Error('Usage: audit-packet-key-v2-legacy-population-v1.mts [--output=<repo-relative-path>]');
+}
+const reportPath = path.resolve(REPO_ROOT, outputArg?.slice('--output='.length) ?? 'docs/reports/packet-key-v2-legacy-population-census-v1.json');
+const scratchRoot = `${path.resolve(REPO_ROOT, '.tmp')}${path.sep}`;
+if (outputArg && !reportPath.startsWith(scratchRoot)) throw new Error('--output must resolve under the repository .tmp directory');
 const client = await pool.connect();
 try {
   await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
@@ -69,7 +78,8 @@ try {
       canPointAtKeysNotStoredInAtlasPackets: !aliasMeta.constraints.some((c) => /REFERENCES atlas_packets\(packet_key\)/.test(c.def)),
     },
   };
-  fs.writeFileSync(path.join(REPO_ROOT, 'docs/reports/packet-key-v2-legacy-population-census-v1.json'), `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
   console.log(JSON.stringify({ atlasPacketsTotal: receipt.atlasPacketsTotal, classes, v2: receipt.v2, gate: receipt.gate, alias: { existing: aliases.length, byKind: aliasByKind, canPointAtUnstored: receipt.aliasOwner.canPointAtKeysNotStoredInAtlasPackets, reverseLookup: receipt.aliasOwner.reverseLookup, triggers: aliasMeta.triggers, inboundFks: aliasMeta.inboundForeignKeys } }, null, 2));
 } finally {
   client.release();

@@ -23,6 +23,7 @@ import { pool } from '$lib/server/db/client';
 import { cacheExport } from '$lib/server/cache/pdf-export-cache.js';
 import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
+import { isAdminRole } from '$lib/server/auth-utils.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
@@ -865,7 +866,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
       // Admin-only routes additionally require admin role
       const needsAdmin = ADMIN_ONLY.some((p) => path.startsWith(p));
-      if (needsAdmin && event.locals.user?.role !== 'admin') {
+      if (needsAdmin && !isAdminRole(event.locals.user?.role)) {
         return new Response(JSON.stringify({ error: 'Admin access required' }), {
           status: 403,
           headers: { 'Content-Type': 'application/json', 'X-Request-ID': requestId },

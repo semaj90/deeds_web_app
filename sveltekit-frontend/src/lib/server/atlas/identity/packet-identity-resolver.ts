@@ -37,6 +37,13 @@ export class PacketIdentityUnresolvedError extends Error {
 	}
 }
 
+export class PacketIdentityAmbiguousError extends Error {
+	constructor(public readonly sourceRef: string) {
+		super(`PACKET_IDENTITY_AMBIGUOUS: multiple atlas_packets rows match source_ref "${sourceRef}"`);
+		this.name = 'PacketIdentityAmbiguousError';
+	}
+}
+
 export class PacketIdentityMalformedError extends Error {
 	constructor(public readonly inputKey: string) {
 		super(`PACKET_IDENTITY_MALFORMED: "${inputKey}" is not a usable packet identity`);
@@ -119,7 +126,10 @@ export async function resolvePacketKeyForWrite(
 				.select({ packetKey: atlasPackets.packetKey })
 				.from(atlasPackets)
 				.where(eq(atlasPackets.sourceRef, trimmedRef))
-				.limit(1);
+				.limit(2);
+			if (bySourceRef.length > 1) {
+				throw new PacketIdentityAmbiguousError(trimmedRef);
+			}
 			if (bySourceRef.length > 0) {
 				return bySourceRef[0].packetKey;
 			}
