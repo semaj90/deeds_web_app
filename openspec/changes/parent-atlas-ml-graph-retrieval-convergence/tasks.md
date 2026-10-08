@@ -293,3 +293,12 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] PG18-RACE-02 Run `python python/prove_dag_reclaim_race_v1.py --ack-disposable-test-db` with existing psycopg3 and an explicitly disposable PG18 DSN. Inspect readback: exactly one qualifying claim, generation=8, old lease and old source rejected. Source only, **not executed**.
 - [ ] PG18-RACE-03 Add crash/cancellation and duplicate outbox event idempotency scenarios. Verify cleanup and capture failure receipts if Docker/test service unavailable.
 - [ ] PG18-RACE-04 Do not promote scratch proof to deployed-journal proof: check actual journal migration, lease/version fields, unique indexes, dependencies and transactional outbox before enabling OaK CAS port.
+
+## 2026-10-08 crash/idempotency, Graphify snapshot and GPU proof
+- [x] FINAL-01 Added `scripts/atlas/sql/prove-dag-outbox-idempotency-rollback-v1.sql`: temporary cancelled-owner and superseded-source negative controls; guarded completion plus ON CONFLICT idempotent event; duplicate retry produces no extra event; final transaction ROLLBACK. **Not executed.**
+- [x] FINAL-02 Added `python/atlas_compute/graph_gpu_proof_plan_v1.py` and focused tests: frozen Graphify node/edge ordinal validation, independent-readback marker, import discovery for torch/nx_cugraph/cuvs, explicit gpu_executed=false.
+- [ ] FINAL-03 Run PostgreSQL SQL on approved disposable PG18 DB; demonstrate transaction rollback under injected failure, cancellation/crash before commit, lease takeover and idempotency with independent readback. No production DB access in this session.
+- [ ] FINAL-04 Actual durable journal schema readback and authorized, migration-reviewed claim adapter with lease/row version, immutable event and transactional outbox. Scratch proof does not activate production writes.
+- [ ] FINAL-05 Replace caller-supplied CANONICAL_READBACK proof token with authoritative DB/Graphify readback (packet+source/workspace/graph/feature revisions, exact ordinals, edge evidence checksums). Current helper checks declared evidence metadata only.
+- [ ] FINAL-06 Execute CPU GraphSAGE mean/max/LSTM fixtures against the same real frozen graph; compare cuGraph BFS/PageRank and cuVS exact semantic_768 separately, bounded GPU allocation and actual backend receipts.
+- [ ] FINAL-07 Connect Python PROPOSED proposal over authenticated RPC to TypeScript/OaK transactional owner; any cached/late result must be requalified in final PostgreSQL transaction.
