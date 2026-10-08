@@ -28,6 +28,8 @@ export interface EdgeEngine {
 export class EdgeModelHarness {
   private state: EdgeModelStatus = 'idle';
   private controller: AbortController | undefined;
+  private inFlight: Promise<unknown> | undefined;
+  private disposal: Promise<void> | undefined;
   constructor(private readonly engine: EdgeEngine, readonly identity: EdgeModelIdentity) {
     for (const [key, value] of Object.entries(identity)) {
       if (typeof value !== 'string' || value.trim().length === 0) throw new Error('missing model identity: ' + key);
@@ -37,16 +39,20 @@ export class EdgeModelHarness {
   async load(): Promise<void> {
     if (this.state !== 'idle') throw new Error('invalid load state: ' + this.state);
     this.state = 'loading';
-    this.controller = new AbortController();
+    const controller = new AbortController();
+    this.controller = controller;
+    const operation = this.engine.load(this.identity, controller.signal);
+    this.inFlight = operation;
     try {
-      await this.engine.load(this.identity, this.controller.signal);
-      if (this.controller.signal.aborted) throw new Error('load cancelled');
-      this.state = 'ready';
+      await operation;
+      if (controller.signal.aborted) throw new Error('load cancelled');
+      if (this.state !== 'disposed') this.state = 'ready';
     } catch (e) {
-      this.state = 'failed';
+      if (this.state !== 'disposed') this.state = 'failed';
       throw e;
     } finally {
-      this.controller = undefined;
+      if (this.controller === controller) this.controller = undefined;
+      if (this.inFlight === operation) this.inFlight = undefined;
     }
   }
   async generate(prompt: string): Promise<EdgeGenerationReceipt> {
@@ -56,8 +62,10 @@ export class EdgeModelHarness {
     const controller = new AbortController();
     this.controller = controller;
     const started = performance.now();
+    const operation = Promise.resolve().then(() => this.engine.generate(prompt, controller.signal));
+    this.inFlight = operation;
     try {
-      const result = await this.engine.generate(prompt, controller.signal);
+      const result = await operation;
       if (controller.signal.aborted) throw new Error('generation cancelled');
       if (!result.text.trim() || !Number.isSafeInteger(result.tokenCount) || result.tokenCount <= 0) {
         throw new Error('no verifiable generated tokens');
@@ -66,16 +74,23 @@ export class EdgeModelHarness {
     } catch (e) {
       return { status: 'FAIL', model: this.identity, output: '', generatedTokenCount: 0, elapsedMs: performance.now() - started, error: String(e) };
     } finally {
-      this.controller = undefined;
+      if (this.controller === controller) this.controller = undefined;
+      if (this.inFlight === operation) this.inFlight = undefined;
       if (this.state !== 'disposed') this.state = 'ready';
     }
   }
   cancel(): void { this.controller?.abort(); }
   async dispose(): Promise<void> {
-    if (this.state === 'disposed') return;
+    if (this.disposal) return this.disposal;
     this.cancel();
-    // TODO(EDGE-05): engine.dispose must wait for outstanding in-flight GPU operations.
     this.state = 'disposed';
-    await this.engine.dispose();
+    const pending = this.inFlight;
+    this.disposal = (async () => {
+      // Wait for backend operation to settle BEFORE releasing tensors.
+      // TODO(EDGE-05): add bounded cancellation timeout and worker termination for hung engines.
+      if (pending) await pending.catch(() => undefined);
+      await this.engine.dispose();
+    })();
+    return this.disposal;
   }
 }
