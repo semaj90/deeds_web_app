@@ -88,3 +88,15 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] SCAF-06 Tie the new 8-feature adapter to the actual existing `ranking-features.ts` / XGBoost/ListMLE feature shape and model inputs via explicit versioned conversion, rather than silently exchanging incompatible schemas.
 - [ ] SCAF-07 Extend the baseline with query-wise ranking loss (e.g. ListMLE), early stopping, evaluation, artifact hashes and checkpoint readback; current MLP uses MSE and is only a smoke challenger, not a complete ranker.
 - [ ] SCAF-08 Implement tests for cross-revision candidate aliases, missing features, nonfinite labels and split leakage at document revisions across queries.
+
+## V2 feature / RTX parity addendum
+- [x] ALIGN-01 Added `python/atlas_compute/ranking_feature_layout_v2.py` with 8x float32 features, 8x uint8 missing mask, and optional 16x float32 scoring layout. Keeps semantic_768 independent from ranking features. `axv2` search returned no indexed matches; do **not** equate this provisional schema with an existing "AXV2" owner.
+- [x] ALIGN-02 Added `python/prove_ranking_cpu_gpu_alignment_v2.py`: bounded synthetic CPU probe, optional explicit cuda:0 float32 copy/readback, fail-closed CUDA availability/VRAM budget, machine-readable receipt, no datastore writes.
+- [x] ALIGN-03 Added `python/tests/test_ranking_feature_layout_v2.py` with mask-offset and semantic-dimension failure checks (authored, **not run** on GitHub checkout).
+- [ ] ALIGN-04 Execute CPU fixture tests and `PYTHONPATH=python python python/prove_ranking_cpu_gpu_alignment_v2.py --device cpu`; record output.
+- [ ] ALIGN-05 On idle RTX 3060 Ti, run `PYTHONPATH=python python python/prove_ranking_cpu_gpu_alignment_v2.py --device cuda --max-gpu-mb 64 --output docs/reports/ranking-cpu-gpu-parity-v2.json`. CUDA execution must be observed; do not use torch.cuda.is_available() alone as proof.
+- [ ] ALIGN-06 Add **separate** cuVS brute-force oracle test on frozen 768d vectors with index/distance TopK parity vs deterministic NumPy exact reference. Check distance metric, normalization, tied ranks, stable canonical ordinal map, k bounds, CUDA package availability, device synchronization and GPU memory budget. cuVS similarity results are not the 16-column ranking feature tensor.
+- [ ] ALIGN-07 Add cuVS CAGRA challenger and Qdrant HNSW Recall@K vs the same exact brute-force oracle, seed and representation revision. Keep only one semantic logical lane regardless of executor count.
+- [ ] ALIGN-08 Add CPU/GPU ranker parity for a frozen fitted model, not just tensor-copy equality; compare float tolerance, ordering/ties, missing masks, dataset/model checksum, p50/p95 latency, VRAM peak and result receipt.
+- [ ] ALIGN-09 Verify actual `axv2` name/contract from local working tree or artifacts before integration; no indexed GitHub source matched the term.
+- [ ] ALIGN-10 Avoid empty_cache as a service-wide eviction mechanism; constrain the probe to its own tensors and verify available memory before allocating. Inspect scope and side effects before running.
