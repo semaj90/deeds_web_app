@@ -64,3 +64,17 @@ To test:
 cd experiments/atlas-helper-proofs
 python -m unittest -v test_partition_and_receipts.py
 ```
+
+## HYBRID-01..06 CPU scaffold and blockers
+- [x] HYBRID-01 `hybrid_ablation_cpu.py`: frozen-candidate scoring and leave-one-signal-out retrieval recall (not generation benchmark).
+- [x] HYBRID-02 Bounded directed typed-edge graph spreading; requires source/graph revisions from Graphify before production use.
+- [x] HYBRID-03 Timezone-aware Gaussian proximity; event-time vs ingestion-time policy still unresolved.
+- [x] HYBRID-04 `hybrid_context_cpu.py`: dedup + per-session cap + token budget. Does not implement topic-dense optimal packing or call canonical ContextManifest owner.
+- [x] HYBRID-05 `hybrid_cache_key_cpu.py`: revision-qualified SHA-256 query identity fixture. No production cache-key changes.
+- [x] HYBRID-06 `test_hybrid_cpu.py`: signals, deterministic ranking and cache negative cases; actual cross-encoder top-K uplift/latency unmeasured.
+- [ ] HYBRID-PROOF-01 Run the test suite and validate all six gates with a frozen data snapshot and admitted relevance labels; report recall/MRR/latency plus source exact evidence retention.
+- [ ] HYBRID-PROOF-02 Compare the existing `rrf-combiner.ts` live owner with baseline, graph/temporal enrichment and reranker ablations without double-voting executors.
+- [ ] HYBRID-PROOF-03 Verify actual event-time/ingest-time timestamps and external session IDs; temporal preference must not override source revision.
+- [ ] HYBRID-PROOF-04 Wire existing ContextManifest readback and token-budget owner, not a second persistent assembler.
+- [ ] HYBRID-PROOF-05 Check actual cross-encoder owner and cache-key field coverage; benchmark CPU rerank p50/p95 and admitted-evidence retention.
+- [ ] HYBRID-PROOF-06 Admission and security: exact symbol, ACL, namespace, tenant, query filter and revision gates run before ranking; **never** use learned signal weights to authorize evidence.
