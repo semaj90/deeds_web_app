@@ -145,3 +145,13 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] NX-06 Reuse existing `python/atlas_compute/gpu_mini_fabric/retrieval_01l_08a_cuvs_exact_v1.py`, `scripts/gpu/cuvs-bruteforce-smoke.py` and PyTorch/cuVS exact-TopK proof; compare frozen **semantic_768** vectors/metric/ordinal checksum to CPU NumPy. Do not run cuVS against N-ary graph incidence or 4×6 scoring tiles.
 - [ ] NX-07 Add common request receipt binding graph candidate IDs and cuVS TopK IDs to revision-qualified candidates, without extra semantic vote in SearchRuntime.
 - [ ] NX-08 Benchmark WSL/RAPIDS GPU availability, conversion overhead, execution time and peak VRAM with idle-owner allocation gate and failure receipts; no automatic service eviction or installs.
+
+## DAG snapshot and event-state bridge
+- [x] DAG-01 Source-search existing frozen DAG, mutation-gate, Oak execution and evidence receipt owners. No replacement authority is created.
+- [x] DAG-02 Added `python/atlas_compute/dag_snapshot_state_v1.py` with revision-qualified immutable dependency DAG snapshot, cycle rejection, deterministic topological ordering and pure transition validator.
+- [x] DAG-03 Added `python/tests/test_dag_snapshot_state_v1.py` (authored, not executed).
+- [ ] DAG-04 Invoke tests using existing Python environment and prove non-mutating replay against TS `prove-frozen-dag-v1.mjs` and `parent-atlas-mutation-gate.mjs`.
+- [ ] DAG-05 Do not write this Python oracle to Postgres as an independent authority. Integrate canonical execution receipts and evidence assertions with the existing OpenSpec schema/agent execution spine. Append events per run, enforce expected prior state, monotonic sequence, idempotency key, authorization and independently checked evidence.
+- [ ] DAG-06 Add durable state projection derived from replayed events: PENDING→READY→RUNNING→SUCCEEDED/FAILED, cancellation, retries, lease expiry and worker readback. A graph edit creates a *new* DAG revision and invalidates stale run projection.
+- [ ] DAG-07 Bind task scheduling to approved ContextManifest, packet/evidence revisions and cache generations; do not use token KV or NetworkX graph objects as durable state.
+- [ ] DAG-08 Handle concurrently running nodes by per-run / per-step CAS or transaction and enforce dependency completion inside transaction; current pure state helper has no sequence monotonicity against external event history.
