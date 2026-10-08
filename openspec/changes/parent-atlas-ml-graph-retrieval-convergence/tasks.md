@@ -78,3 +78,13 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] ALG-06 Define feature alignment in a frozen `CandidateFeatureSchemaV1`: exact-symbol, FTS score, semantic similarity, PageRank, graph distance, hyperedge overlap, source authority, domain confidence, revision-validity mask. Fit scaler only on training groups; consistent feature order, missing masks, checksum and transformation parity across NB/LR/XGB/MLP.
 - [ ] ALG-07 Keep eligibility upstream of ML: a model score cannot override stale-source, unauthorized candidate, graph revision mismatch, or ungrounded N-ary incidence.
 - [ ] ALG-08 If GraphSAGE is built, prefer a CPU GraphSAGE 1-hop/2-hop sampled mean aggregator, distinct typed relation treatment, frozen ordinal map and graph revision; compare against simpler neighbor-statistics + XGBoost/MLP. No automatic 128-d embedding writer.
+
+## Scaffold implementation status — 2026-10-07 (PR #110)
+- [x] SCAF-01 Added `python/atlas_compute/ranking_alignment_v1.py`: ordered feature schema, strict nonempty revision tuple, PROVEN gate, finite labeled data, per-query dedup, digest and deterministic query-group split. **Adapter only**: does not prove rows against the live lineage table.
+- [x] SCAF-02 Added `python/atlas_compute/ranking_baselines_v1.py`: CPU logistic binary classification and AdamW regression-score MLP, with train-only normalization; shadow-only.
+- [x] SCAF-03 Added `python/tests/test_ranking_alignment_v1.py`: four focused stdlib unit tests **authored, not run in this GitHub-only session**.
+- [ ] SCAF-04 Run tests in existing Python environment: `PYTHONPATH=python python -m unittest discover -s python/tests -p test_ranking_alignment_v1.py -v`; Python import/compile and complete model smoke remain unverified.
+- [ ] SCAF-05 Provide authoritative lineage join and real label provenance before a training dataset is admitted; a row-provided `revision_status=PROVEN` is NOT independent proof.
+- [ ] SCAF-06 Tie the new 8-feature adapter to the actual existing `ranking-features.ts` / XGBoost/ListMLE feature shape and model inputs via explicit versioned conversion, rather than silently exchanging incompatible schemas.
+- [ ] SCAF-07 Extend the baseline with query-wise ranking loss (e.g. ListMLE), early stopping, evaluation, artifact hashes and checkpoint readback; current MLP uses MSE and is only a smoke challenger, not a complete ranker.
+- [ ] SCAF-08 Implement tests for cross-revision candidate aliases, missing features, nonfinite labels and split leakage at document revisions across queries.
