@@ -29,3 +29,13 @@ Require schema/migration owner signoff, additive-nullable DDL, audited deploymen
 - PERSIST-05: bounded 16-row profile and matrix negative controls.
 - PERSIST-06: full snapshot gate after coverage and provenance qualified.
 - PERSIST-07: no migrations, persistent writes, GPU execution or Graphify rebuild until separate approval.
+
+## Revised decision: SOURCE_BOUND vs SNAPSHOT_BOUND (2026-10-08)
+Do not mandate per-feature-row workspace_revision, row_ordinal or row_identity_checksum when exact source and feature provenance can be independently verified through existing immutable receipts and the frozen CandidateOrdinalMap.
+
+- SOURCE_BOUND: only source-local feature families, requires exact packet/source revision and source digest, evidence verification, feature revision and registry definition proof. Workspace membership is enforced when assembling a snapshot, not copied into the reusable feature.
+- SNAPSHOT_BOUND: requires separately proven snapshot/ordinal/workspace binding. Graph/taxonomy-dependent features additionally require their own independently qualified graph/taxonomy context.
+- A database-null workspace_revision is not by itself a rejection; a non-null conflicting workspace_revision *is* rejected.
+- Existing 1,808 historical rows are NOT retroactively admitted. The 19 current rows remain blocked until source, feature-definition and receipt binding is proven.
+- The new admission helper is pure; its proof fields must be supplied by independent readback logic. A boolean asserted by a caller is not proof. No migration, producer change or readback adapter is implemented here.
+- Review feature_revision versus registry_revision semantics and whether the source receipt/existing provenance envelopes losslessly bind input_digest. Propose minimal additive storage only if verified receipts cannot recover it.
