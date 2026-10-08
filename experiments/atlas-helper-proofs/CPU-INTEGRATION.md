@@ -32,3 +32,23 @@ python -m unittest -v test_cpu_helpers.py
 # Optional, when treesitter-chunker is installed:
 python -c "from chunker import chunk_text; print(chunk_text('def f(): pass\n', language='python', file_path='fixture.py'))"
 ```
+
+## CPU C25 parity adapter (new)
+`cpu_candidate_matrix.py` mirrors **only** the explicit 25 feature positions from
+`sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts`.
+It distinguishes measured zero (presence=1) from unavailable (presence=0),
+casts to binary32, and rejects duplicate packet keys, mixed workspace revisions,
+unknown feature keys, and nonfinite coefficients. Checksums are labeled
+experiment-specific, not canonical adapter checksums. It does not fabricate
+`featureRevision`, executor provenance, source execution membership or
+an admitted EvidenceCard. SvelteKit still owns runtime feature/profile projection.
+
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_cpu_helpers.py test_cpu_candidate_matrix.py
+```
+
+The optional `treesitter-chunker` adapter still needs one installed-parser
+integration run. A passing synthetic CodeChunk normalizer fixture does not prove
+the installed grammar set, extraction coverage, or parity with the current AST
+producer. The adapter is not wired to FastAPI, Graphify or the production writer.
