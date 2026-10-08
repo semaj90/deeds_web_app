@@ -179,3 +179,9 @@ These commands have not been executed against a workstation in this work pass.
 - Static gate list is a planning ledger, not connected to canonical OpenSpec receipt tables.
 - Model inventory only checks filesystem existence and byte sizes; it doesn't prove loaded model or correct inference.
 - All eval gates are NOT_PROVEN until actual receipts are captured. Avoid labeling authored tests as passed.
+
+## 2026-10-08 lifecycle race remediation
+- `phase23-edge-model-harness.ts` now retains in-flight load/generate promises and waits for them to settle before `engine.dispose()`; concurrent calls to dispose reuse the same promise.
+- `phase23-edge-model-harness.spec.ts` adds a deferred-generation disposal ordering regression test.
+- Cancellation semantics remain **experimental**: engines that ignore abort can leave disposal pending. TODO: bounded timeout, worker termination, loading-state cancellation race, backend synchronous-throw handling, deterministic abort during GPU execution, and repeat browser memory measurements.
+- These changes were committed but not executed against a model/browser. Keep P23-EDGE-05 = NOT_PROVEN until actual tests and memory release evidence.
