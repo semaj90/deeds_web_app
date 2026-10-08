@@ -267,7 +267,7 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 ## Concurrent PostgreSQL claim proof scaffold — 2026-10-08
 - [x] PG18-CONCURRENT-01 Added `python/prove_dag_concurrent_claim_v1.py` using two independent psycopg connections, a start barrier, conditional UPDATE, one-owner fencing check, injected completion/outbox rollback and final readback. Explicit disposable-DB acknowledgment required.
 - [ ] PG18-CONCURRENT-02 Execute on a **disposable** PostgreSQL 18 database with `ATLAS_DISPOSABLE_PG_DSN` set and `--ack-disposable-test-db`. This script creates and drops a private scratch schema; never point it at production.
-- [ ] PG18-CONCURRENT-03 Review isolation levels, privilege limits and lock timeouts. Add cancellation, expired lease, generation rollover, source revision supersession and worker crash simulations. Capture PostgreSQL server version, index/query plan and receipt checksums.
+- [ ] PG18-CONCURRENT-03 Review isolation levels, privilege limits and lock timeouts. Expired lease reclamation, generation increment and stale revision rejection are now coded as a **sequential second scenario**, but unexecuted; cancellation, concurrent reclaim, crash simulation, version/index plan and receipt checksum remain open.
 - [ ] PG18-CONCURRENT-04 Confirm the scratch test's nested transaction rollback covers *both* the step state and event insertion, with no collateral schema/object mutation. Production owner still unproven until actual journal migrations/readback.
 - [ ] PG18-CONCURRENT-05 Establish an authorized TypeScript durable journal transaction adapter only after deployed schema and fencing checks pass; Python worker remains proposal-only and never writes canonical execution state directly.
 
@@ -282,3 +282,8 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] NEXT-08 Integrate Python PROPOSED message into TypeScript OaK transaction port via authenticated service boundary and prove stale after-await result cannot be promoted.
 - [ ] NEXT-09 Feed the frozen GNN snapshot from real canonical Graphify/AST evidence and check independent lineage; execute CPU reference with same ordinal map.
 - [ ] NEXT-10 Run optional CUDA proof only after GPU resource preflight. cuGraph PageRank/BFS and cuVS exact 768d need distinct real-executor parity receipts.
+
+## 2026-10-08 expired lease/fencing extension
+- [x] PG18-RECLAIM-01 Extend disposable two-session fixture with deterministic expired lease reclaim, generation 7→8, version 4→5, previous-owner rejection, wrong source-revision rejection and readback. **Added in source only; not executed.**
+- [ ] PG18-RECLAIM-02 Run actual PG18 disposable test and independently read back receipt. Distinguish competing READY claims from the new sequential reclaim scenario.
+- [ ] PG18-RECLAIM-03 Add simultaneous competing reclaim race, idempotency replay, worker-crash/cancellation and exact transactional outbox crash recovery proof before marking persistent DAG owner ready.
