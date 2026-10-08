@@ -216,3 +216,50 @@ the sidecar requirements or runtime.
 - [ ] **LC-OAK-TOOL-01** — Added strict `FindFailureContextArgsV1`/`FailureContextResultV1` contracts as the future LangChain/OaK structured-tool boundary. The tool may accept only admitted fact IDs/checksums plus workspace/ontology/policy revisions and bounded hops/neighbors; no raw SQL, unrestricted source paths, or arbitrary graph query input.
 - [ ] **DEEPAGENT-OAK-01** — Deep Agents remains unavailable/unproven in the repo. When introduced, use the strict models only as structured tool/subagent input/output nested inside framework-owned state; do not replace Deep Agent runtime state with Atlas domain models.
 - [ ] **NETWORKX-OAK-01** — NetworkX remains downstream of admission. Only admitted facts/checksums may enter request-local graphs; graph traversal never upgrades fact authority or writes canonical stores.
+
+
+### 2026-10-07 — HyperGraphRAG-inspired custom helper layer (source implemented, proof open)
+
+The custom helper seam is intentionally smaller than upstream HyperGraphRAG. Parent Atlas reuses the
+useful bipartite entity<->hyperedge representation and stable graph ordering ideas, while rejecting
+upstream display-name/content-hash identity, generic graph upsert authority, and LLM extraction as
+canonical truth. The default :8095 runtime remains untouched.
+
+- [ ] **HGRAG-HELPER-01** — `python/oak_agent/hypergraph_helpers_v1.py` now defines strict
+  `AdmittedHypergraphFactV1`, role-bearing participants, deterministic incidence rows, frozen
+  `HypergraphIncidenceSnapshotV1`, stable dense ordinals, and snapshot checksums. Source status:
+  **IMPLEMENTED_UNPROVEN**. Acceptance: identical admitted facts in different input order yield the
+  same rows/ordinals/checksum; mismatched workspace/ontology/policy revision fails closed; duplicate
+  participant-role rows fail closed; `canonical_authority=false`; `writes_performed=false`.
+- [ ] **HGRAG-HELPER-02** — `build_networkx_incidence_graph_v1()` builds only request-local,
+  role-preserving bipartite graphs from frozen snapshots. A relation/entity role collision fails
+  closed instead of silently collapsing incidence. NetworkX remains CPU oracle, never identity or
+  persistence owner.
+- [ ] **HGRAG-HELPER-03** — `bounded_traverse_networkx_v1()` adds deterministic bounded BFS with
+  `max_hops <= 4`, `max_neighbors <= 256`, sorted seeds/frontiers/neighbors, explicit truncation,
+  and unknown-seed rejection. This is the implementation target for the existing
+  `FindFailureContextArgsV1` bounds; tool wiring remains open.
+- [ ] **NETWORKX-RTX-01** — Optional `nx-cugraph` support is represented by
+  `nx_cugraph_available_v1()` and `convert_networkx_to_cugraph_once_v1()`. Conversion is explicit
+  and caller-owned so repeated algorithms can reuse one GPU graph. Do not use automatic backend
+  dispatch as proof by itself; record executor/version/capability in a receipt.
+- [ ] **NETWORKX-RTX-02** — `compare_score_maps_v1()` provides backend-parity metrics
+  (`keys_equal`, max/mean absolute delta, deterministic top-K overlap). Extend fixture proof to
+  PageRank/PPR, connected components, BFS distances, degree/centrality where supported, and record
+  unsupported algorithms as `CPU_FALLBACK_REQUIRED` rather than silently changing semantics.
+- [ ] **NETWORKX-RTX-03** — Add persistent-conversion benchmark receipt:
+  `networkx_build_ms`, `networkx_to_cugraph_ms`, warm executor latency, transfer latency,
+  peak VRAM, executor revision, input checksum, output checksum, and CPU-oracle parity. The GPU graph
+  is disposable/rebuildable from the same snapshot and cannot create another retrieval vote.
+- [ ] **HGRAG-HELPER-TEST-01** — Added
+  `python/tests/test_oak_agent_hypergraph_helpers_v1.py` covering deterministic snapshot ordering,
+  revision mismatch rejection, duplicate participant rejection, bounded traversal and score parity.
+  Run in the isolated environment before completion; tests have not been claimed executed here.
+- [ ] **HGRAG-HELPER-DEPS-01** — Added `python/requirements-oak-agent-graph.txt` as an optional
+  graph-only layer over `requirements-oak-agent.txt`. NetworkX stays out of the default :8095
+  dependency surface. `nx-cugraph` is deliberately not pinned there because the RAPIDS/CUDA/WSL
+  executor environment must be version-qualified separately.
+- [ ] **HGRAG-HELPER-NEXT-01** — Wire admitted `GroundedNlpFactV1`/Pydantic parity output into
+  `AdmittedHypergraphFactV1` only after `PY-NLP-PYDANTIC-ALIGN-01` is proven. Then map traversal
+  hits back to `FailureContextEvidenceV1` without raw SQL, unrestricted filesystem paths, arbitrary
+  Neo4j queries, graph writes, or identity minting.
