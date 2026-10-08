@@ -58,8 +58,9 @@ try {
      Probe 'postgres_schema' {
        # Explicit transaction read-only and short statement timeout.
        # Avoid psql variable expansion or SQL assembled from user input.
-       $sql = "BEGIN READ ONLY; SET LOCAL statement_timeout='3000ms'; SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('execution_runs','execution_journal_steps','execution_dependencies','execution_side_effects') ORDER BY table_name,ordinal_position; ROLLBACK;"
-       $sql | docker exec -i $PostgresContainer psql -X -v ON_ERROR_STOP=1 -U $DbUser -d $Database
+       $sqlPath = Join-Path $RepoRoot 'scripts/atlas/sql/audit-durable-journal-readonly-v1.sql'
+       if (-not (Test-Path $sqlPath)) { throw 'Journal audit SQL missing' }
+       Get-Content -Raw $sqlPath | docker exec -i $PostgresContainer psql -X -v ON_ERROR_STOP=1 -At -U $DbUser -d $Database
      }
    }
  } else { Record 'postgres_schema' 'NOT_RUN' 'Docker readback requires explicit -DockerReadback.' }
@@ -68,6 +69,7 @@ try {
  $target = Join-Path $RepoRoot $OutputPath
  $parent=Split-Path $target -Parent
  if (-not (Test-Path $parent)) { New-Item -ItemType Directory -Path $parent -Force | Out-Null }
+ $report.overallStatus = if (@($report.results | Where-Object { $_.status -eq 'UNPROVEN' }).Count -gt 0) { 'UNPROVEN' } else { 'COMPLETED_REQUESTED_PROBES' }
  $report | ConvertTo-Json -Depth 8 | Set-Content -Path $target -Encoding utf8
  Write-Host "Receipt: $target"
 }
