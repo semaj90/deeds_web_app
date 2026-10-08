@@ -135,3 +135,13 @@ Source trace, **not** an execution proof. The original GraphSAGE method is Hamil
 - [ ] BRIDGE-08 Delegate descriptor/lease/cache generation transitions to existing ACE/BitFrost policy owner with readback, concurrency and tombstone tests. Do not independently write new store keys.
 - [ ] BRIDGE-09 Bind ContextManifest and llama-server prompt-prefix identity at model/template/tokenizer/adapter/evidence revisions; prohibit raw tile insertion into KV.
 - [ ] BRIDGE-10 Implement scalar/AVX2 bounded batch scorer only after owner census and exact CPU fixture parity; performance compare to GPU full roundtrip.
+
+## N-ary NetworkX / RAPIDS alignment increment
+- [x] NX-01 Added `python/atlas_compute/nary_networkx_alignment_v1.py`: deterministic bipartite packet↔fact incidence snapshot with typed role metadata, graph-revision checks, checksum and bounded CPU NetworkX neighborhood/Pagerank exploration. This is a **fixture-only CPU oracle**, not the canonical graph runtime or independent evidence verification.
+- [x] NX-02 Added `python/tests/test_nary_networkx_alignment_v1.py`: four unit tests (authored, not executed remotely).
+- [ ] NX-03 Execute `PYTHONPATH=python python -m unittest discover -s python/tests -p test_nary_networkx_alignment_v1.py -v` with NetworkX installed; verify fixture and compare with `python/atlas_graph_runtime/networkx_executor.py`. No duplicate production graph owner.
+- [ ] NX-04 Adapt actual ontology-tuple NaryFactV1 participants/roles/evidence to the CPU oracle using independently verified packet/source/graph revisions. Current adapter trusts caller-supplied fact checksum and role labels.
+- [ ] NX-05 Add exact graph snapshot ↔ cuGraph projection parity: identical packet/fact ordinals, incidence edges, directed semantics, PageRank tolerance, neighborhood membership, isolate handling, deterministic graph checksum. Require actual GPU compute proof, not `nx-cugraph` import.
+- [ ] NX-06 Reuse existing `python/atlas_compute/gpu_mini_fabric/retrieval_01l_08a_cuvs_exact_v1.py`, `scripts/gpu/cuvs-bruteforce-smoke.py` and PyTorch/cuVS exact-TopK proof; compare frozen **semantic_768** vectors/metric/ordinal checksum to CPU NumPy. Do not run cuVS against N-ary graph incidence or 4×6 scoring tiles.
+- [ ] NX-07 Add common request receipt binding graph candidate IDs and cuVS TopK IDs to revision-qualified candidates, without extra semantic vote in SearchRuntime.
+- [ ] NX-08 Benchmark WSL/RAPIDS GPU availability, conversion overhead, execution time and peak VRAM with idle-owner allocation gate and failure receipts; no automatic service eviction or installs.
