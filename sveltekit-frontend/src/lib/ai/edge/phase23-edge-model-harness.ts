@@ -41,7 +41,7 @@ export class EdgeModelHarness {
     this.state = 'loading';
     const controller = new AbortController();
     this.controller = controller;
-    const operation = this.engine.load(this.identity, controller.signal);
+    const operation = Promise.resolve().then(() => this.engine.load(this.identity, controller.signal));
     this.inFlight = operation;
     try {
       await operation;
@@ -62,7 +62,10 @@ export class EdgeModelHarness {
     const controller = new AbortController();
     this.controller = controller;
     const started = performance.now();
-    const operation = this.engine.generate(prompt, controller.signal);
+    const operation = Promise.resolve().then(() => {
+      if (controller.signal.aborted) throw new Error('generation cancelled');
+      return this.engine.generate(prompt, controller.signal);
+    });
     this.inFlight = operation;
     try {
       const result = await operation;
@@ -80,6 +83,8 @@ export class EdgeModelHarness {
     }
   }
   cancel(): void { this.controller?.abort(); }
+  // TODO(EDGE-05B): add an engine-specific hard termination capability; an AbortSignal
+  // cannot interrupt blocking native/GPU kernels which disregard cancellation.
   async dispose(): Promise<void> {
     if (this.disposal) return this.disposal;
     this.cancel();
