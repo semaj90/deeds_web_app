@@ -19,6 +19,17 @@
 
 Use canonical joins, not a chained pseudo-linked-list such as `packet_key -> source_ref -> feature_id -> som_cell -> qdrant_point_id`. Those values have different owners and cardinalities. Connect them with typed, revisioned relationships and preserve each identifier's namespace. A Qdrant point ID, tree-node ID, SOM cell, cluster ID, centroid cache key, and CandidateOrdinal are never aliases for `packet_key`.
 
+### Revision dimensions (independent, never inferred from one another)
+
+| Revision | Identifies | Must bind / be issued by | Does not prove |
+| --- | --- | --- | --- |
+| `sourceRevision` | One exact source artifact version (for code, the admitted source bytes/digest under the source-binding owner; for external docs, the page/content evidence revision) | Existing canonical source or document-coordinate owner; retain the revision scheme and namespace | Workspace snapshot membership, packet/chunk binding, or any derived representation |
+| `workspaceRevision` | One exact repository/workspace snapshot or workspace-source binding frame | Existing workspace revision/binding owner | That every source or chunk is present, admitted, or unchanged; never substitute it for `sourceRevision` |
+| `representationRevision` | One derived representation artifact/population produced from identified input under an exact recipe | Representation producer, bound to input identity/revision, model/config/recipe and output checksum | Identity merely from dimension/model nickname, or equivalence between different recipes |
+| `producerRevision` | The implementation/configuration revision that performed a derivation | The producer owner (code/build plus material configuration); not a caller-supplied label | Source, workspace, graph, or representation revision by itself |
+
+Related but distinct: `graphRevision` identifies a frozen relationship kernel/snapshot; `evidenceRevision` identifies a grounded evidence coordinate/content claim; external-document `productVersion` describes the upstream product release. A missing required revision stays null/unqualified; do not synthesize a fallback such as `semantic_768@v1` or derive a workspace revision from a path, timestamp, or graph node.
+
 ## 2. Domain taxonomy proposal (not yet the runtime enum)
 
 The requested top-level taxonomy is a proposed `domain_class` vocabulary. It does not replace the current `parent-atlas-domain-taxonomy-v1` labels (`auth`, `ui`, `retrieval`, `network`, `database`, `cache`, `agent`, `graph`, `ml`) or the distinct `QueryClassificationV2` intent vocabulary. In particular, `frontend -> ui` is a known legacy alias, but collapsing `backend`, `compiler`, `gpu`, or `documentation` into a legacy label is lossy. Do not change stored labels or classifier schemas until a versioned migration/compatibility decision is made.
@@ -56,7 +67,64 @@ Keep three decisions separate:
 2. **Retrieve candidates.** Exact identity/FTS, semantic `content` (the Qdrant projection of canonical `semantic_768`), AST/symbol, and graph lanes may run in parallel under their existing executors. Normalize and deduplicate by canonical identity/revision, then let the one SearchRuntime fusion owner combine lane scores (for example RRF). Multiple executors within one logical lane do not receive multiple votes.
 3. **Rerank and promote.** A bounded reranker or classifier feature can reorder the fused candidates; it does not supply an additional independent retrieval vote. Promotion requires a canonical packet/source resolver and exact source/workspace revision evidence. Only promoted evidence enters ContextManifest/PromptPlan and then synthesis.
 
-Naive Bayes, logistic regression, and XGBoost are alternative classifier/reranker families, not three sequential truth sources. A GNN is an optional graph-derived scoring model, not a substitute for graph lineage. PCA/SVD and RFF are deterministic or fitted geometry transforms with their own input digest and revision; they reduce/expand features but cannot supply missing source provenance. KMeans and SOM 20x20 assignments are revisioned descriptive features for diversification/residency, never identity. Keep CPU control-plane work (parsing, metadata, rules, small classifiers, validation) distinct from optional GPU numerical work (large matrix products, ANN, clustering, graph kernels). The GPU executor is replaceable and cannot write canonical identity.
+Naive Bayes, logistic regression, and XGBoost are alternative classifier/reranker families, not three sequential truth sources. A GNN is an optional graph-derived scoring model, not a substitute for graph lineage. The current deterministic CPU fixture roster includes symmetric GCN, GraphSAGE mean and max-pooling aggregation, single- and multi-head additive GAT, dynamic GATv2, GIN sum aggregation with a two-layer MLP, K-step SGC, APPNP-style prediction propagation, Chebyshev spectral convolution, a GCNII initial-residual/identity-mapping layer, relation-aware R-GCN over explicit directed relation edges, PNA with mean/max/min/std neighborhood aggregators and degree scalers, GPR-GNN polynomial propagation, MixHop channel-specific hop aggregation, and other bounded operators enumerated in the coverage matrix below. GATv2 follows [Brody et al.](https://arxiv.org/abs/2105.14491); APPNP follows [Gasteiger et al.](https://arxiv.org/abs/1810.05997); Chebyshev filtering follows [Defferrard et al.](https://arxiv.org/abs/1606.09375); GCNII follows [Chen et al.](https://arxiv.org/abs/2007.02133); R-GCN follows [Schlichtkrull et al.](https://arxiv.org/abs/1703.06103); PNA follows [Corso et al.](https://arxiv.org/abs/2004.05718); GPR-GNN follows [Chien et al.](https://arxiv.org/abs/2006.07988); and MixHop follows [Abu-El-Haija et al.](https://arxiv.org/abs/1905.00067). The typed relation labels and ordinals are included in the input checksum; the CPU/GPU implementation uses the same NetworkX topology conversion and PyTorch tensor path. NetworkX supplies the ordered topology projection while PyTorch performs tensor math on CPU or CUDA; this does not mean NetworkX itself implements learned GNN layers or that the finite roster covers every GNN family. The GNN output is a derived embedding/score, never the `.okf` 4D `topology` coordinates (`x/y/z/w`) unless a separately versioned and validated projection explicitly maps it. The `.okf` schema already explicitly keeps those topology coordinates distinct from GNN embeddings. PCA/SVD and RFF are deterministic or fitted geometry transforms with their own input digest and revision; they reduce/expand features but cannot supply missing source provenance. KMeans and SOM 20x20 assignments are revisioned descriptive features for diversification/residency, never identity. Keep CPU control-plane work (parsing, metadata, rules, small classifiers, validation) distinct from optional GPU numerical work (large matrix products, ANN, clustering, graph kernels). The GPU executor is replaceable and cannot write canonical identity.
+
+**Graph/GPU executor boundary:** NetworkX owns deterministic CPU topology construction and oracle algorithms; `nx-cugraph`/cuGraph may accelerate only operations declared by the installed backend, with unsupported operations remaining on CPU and declared support still requiring semantic parity. PyTorch owns the shared CPU/CUDA tensor implementation for the bounded learned-GNN fixtures. cuTile is a challenger for custom dense kernels (feature transforms, reductions, scoring, and incidence-matrix products), not a replacement for cuGraph graph algorithms. Existing cuTile probes cover generic vector addition and GEMM only; they do not prove an Atlas candidate/incidence tile contract or graph-kernel parity. Candidate-feature tiles and hypergraph participant/incidence manifests are distinct revisioned inputs, and neither may be assumed admitted from a proposal or fixture. Require one immutable input/ordinal checksum, an explicit CPU oracle and tolerance, source/model/runtime revisions, resource-safe preflight, and a no-write receipt before any accelerator result is compared or consumed. RTX hardware is not itself an executor or evidence authority.
+
+The CPU/CUDA fixture roster also includes `GPR_GNN_V1`: a feature projection followed by a bounded learned generalized-PageRank polynomial over normalized adjacency. Its coefficient vector and propagation depth are revision/checksum-bound; this is a fixture executor, not a trained or admitted Parent Atlas model. The formulation follows [Chien et al.](https://arxiv.org/abs/2006.07988).
+
+The finite CPU/CUDA fixture roster also includes `H2GCN_CHANNEL_CONCAT_V1`, a bounded single-layer H2GCN-style operator that preserves ego, one-hop, and exact two-hop feature channels separately before projection. NetworkX supplies deterministic shortest-path neighborhoods; the node budget is part of the model checksum. This is not the full multi-layer H2GCN training architecture or a trained/admitted Parent Atlas model. The design follows [Zhu et al., NeurIPS 2020](https://arxiv.org/abs/2006.11468).
+
+`AGNN_PROPAGATION_V1` adds a bounded attention-only propagation fixture: cosine similarity over input hidden states supplies masked self/neighborhood attention, and `agnn_beta` is model-checksum-bound in `[0,16]`. It has no intermediate dense projection, matching the paper's propagation-layer distinction. This is a single layer for CPU/CUDA operator parity, not a trained/admitted model. It follows [Thekumparampil et al., 2018](https://arxiv.org/abs/1803.03735).
+
+`HGNN_INCIDENCE_CONV_V1` applies normalized hypergraph incidence convolution using a NetworkX bipartite node↔fact topology and the shared PyTorch CPU/CUDA tensor path. Its bounded fixture checksum-binds fact ID, participant ordinal/role, source revision, evidence references, and producer revision; the math uses unweighted membership incidence (roles remain provenance, not learned role weights). It rejects unbound participants and is not an admission or persistence path. It is a single operator fixture, not full HGNN training or a production HyperGraphRAG model.
+
+`ARMA_RECURSIVE_V1` is a bounded single-stack ARMA-style recurrence over symmetrically normalized NetworkX adjacency. It uses a checksum-bound recurrent projection `W`, input skip projection `V`, and 1–8 recurrence steps. This is a fixed-graph CPU/CUDA operator fixture, not the full multi-stack trained ARMA architecture. Formulation basis: [Bianchi et al., 2019](https://arxiv.org/abs/1901.01343).
+
+`LIGHTGCN_PROPAGATION_V1` performs projection-free linear propagation over symmetrically normalized NetworkX adjacency and averages the initial embedding with each of 1–8 propagated layers. The embedding width and layer count are checksum-bound; this fixture does not include user/item loss, training, or recommendation evaluation. Formulation basis: [He et al., 2020](https://arxiv.org/abs/2002.02126).
+
+The bounded operator coverage matrix below describes code and proof status, not full paper reproduction. Each row has a deterministic CPU fixture and is routed through the shared PyTorch device implementation; the CUDA column means an executor path exists in code, not that GPU execution or CPU/GPU parity has been run. Every model remains untrained and non-authoritative.
+
+| Operator | CPU fixture | Shared CUDA path | CUDA parity |
+| --- | --- | --- | --- |
+| `GCN_SYMMETRIC_V1` | Present | Present, unverified | Not proven |
+| `SAGE_MEAN_V1` | Present | Present, unverified | Not proven |
+| `GAT_SINGLE_HEAD_V1` | Present | Present, unverified | Not proven |
+| `GAT_MULTI_HEAD_V1` | Present | Present, unverified | Not proven |
+| `GIN_SUM_MLP_V1` | Present | Present, unverified | Not proven |
+| `SGC_K_STEP_V1` | Present | Present, unverified | Not proven |
+| `SAGE_MAXPOOL_V1` | Present | Present, unverified | Not proven |
+| `GAT_V2_V1` | Present | Present, unverified | Not proven |
+| `APPNP_PROPAGATION_V1` | Present | Present, unverified | Not proven |
+| `CHEB_CONV_V1` | Present | Present, unverified | Not proven |
+| `GCNII_LAYER_V1` | Present | Present, unverified | Not proven |
+| `ARMA_RECURSIVE_V1` | Present | Present, unverified | Not proven |
+| `LIGHTGCN_PROPAGATION_V1` | Present | Present, unverified | Not proven |
+| `RGCN_LAYER_V1` | Present | Present, unverified | Not proven |
+| `COMPGCN_MULTIPLICATIVE_V1` | Present | Present, unverified | Not proven |
+| `GGNN_GRU_PROPAGATION_V1` | Present | Present, unverified | Not proven |
+| `GRAND_DROP_NODE_AVERAGE_V1` | Present | Present, unverified | Not proven |
+| `GRAPHORMER_SPATIAL_ATTENTION_V1` | Present | Present, unverified | Not proven |
+| `HGT_TYPED_ATTENTION_V1` | Present | Present, unverified | Not proven |
+| `PNA_LAYER_V1` | Present | Present, unverified | Not proven |
+| `GPR_GNN_V1` | Present | Present, unverified | Not proven |
+| `MIXHOP_LAYER_V1` | Present | Present, unverified | Not proven |
+| `SIGN_CONCAT_V1` | Present | Present, unverified | Not proven |
+| `EDGE_CONV_FIXED_GRAPH_V1` | Present | Present, unverified | Not proven |
+| `JKNET_CONCAT_V1` | Present | Present, unverified | Not proven |
+| `JKNET_MAXPOOL_V1` | Present | Present, unverified | Not proven |
+| `JKNET_LSTM_ATTENTION_V1` | Present | Present, unverified | Not proven |
+| `H2GCN_CHANNEL_CONCAT_V1` | Present | Present, unverified | Not proven |
+| `AGNN_PROPAGATION_V1` | Present | Present, unverified | Not proven |
+| `HGNN_INCIDENCE_CONV_V1` | Present | Present, unverified | Not proven |
+
+`JKNET_MAXPOOL_V1` performs coordinate-wise max selection across layer outputs without selector parameters. `JKNET_LSTM_ATTENTION_V1` uses a bounded bidirectional LSTM to score layer representations, then softmax-weights them per node; its recurrent and attention parameters are checksum-bound. These are fixture operators, not trained or admitted models. The Jumping Knowledge family is based on [Xu et al., 2018](https://arxiv.org/abs/1806.03536).
+
+`GRAPHORMER_SPATIAL_ATTENTION_V1` also binds a bounded shortest-path edge encoding: every topology edge must map to exactly one typed relation, and per-hop/per-relation forward-versus-reverse biases are added to attention logits only when the complete shortest path fits the configured cap. Paths beyond the cap receive spatial-distance bias only. Path-length cap, relation vocabulary, and bias tensor are checksum-bound. This remains a one-head, one-layer fixture; it is not full Graphormer edge-feature encoding or training.
+
+This is a finite, bounded inventory rather than a claim to implement every GNN architecture. GPU parity remains gated on explicit operator approval, an idle runtime slot, and the required free-memory floor.
+
+The fixture roster also includes `MIXHOP_LAYER_V1`: bounded hop-specific normalized-adjacency channels with distinct checksum-bound projection matrices. This validates operator wiring and deterministic CPU behavior only; it does not prove trained weights, GPU parity, or admitted Parent Atlas evidence. The formulation follows [Abu-El-Haija et al.](https://arxiv.org/abs/1905.00067).
 
 ## 4. Ontology-linked evidence, not a linked list
 
@@ -130,3 +198,7 @@ The reported `filekind does not exist` error is consistent with PostgreSQL ident
 - Existing LangChain reference artifacts: Python snapshot retained; TypeScript/OpenWiki snapshot checksum verified and locally searchable through the KB MCP tool, both noncanonical.
 - Canonical external-doc admission / Qdrant upsert / Valkey cache / production MCP tool caller: not proven by this review; none was written.
 - Graphify SQL alias diagnosis: explained; no checked-in query owner found to patch.
+
+Code-symbol semantic retrieval for agentic DAG synthesis is tracked separately in
+[`docs/architecture/code-symbol-semantic-retrieval-v1.md`](../../architecture/code-symbol-semantic-retrieval-v1.md)
+and `SYMBOL-SEMANTIC-RETRIEVAL-01`; it is an open design gate, not an implemented or admitted lane.
