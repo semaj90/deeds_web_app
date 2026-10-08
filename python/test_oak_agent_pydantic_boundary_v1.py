@@ -1,8 +1,11 @@
 """Offline strict OaK proposal boundary tests (no agent, network or database)."""
 import hashlib
 import unittest
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pydantic import ValidationError
-from python.parent_atlas_ontology.oak_agent_pydantic_boundary_v1 import (
+from parent_atlas_ontology.oak_agent_pydantic_boundary_v1 import (
     OakAgentRequestV1, propose_read_only, proposal_json,
 )
 
