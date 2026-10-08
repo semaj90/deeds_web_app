@@ -204,3 +204,14 @@ Source-only status. Smoke scripts and historical artifacts are not current live 
 - [ ] POLICY-07 KMeans unsupervised: reuse current scripts; fit only on revision-qualified frozen semantic_768 snapshot, save centroid/basis digest, cluster revision, seed and membership receipt. Do not promote clusters to evidence, packet identity or a second semantic vote.
 - [ ] POLICY-08 Incremental graph/AST changes create new snapshot revision; compute affected dependency closure, invalidate feature tiles/candidate caches and supersede outstanding attempts without marking old results as wrong for their pinned snapshot.
 - [ ] POLICY-09 Add tournament shadow replay with on-time/current, late/stale, superseded-model, stale-graph and invalid N-ary fact controls; final commit guarded in PostgreSQL event/evidence owner, not Redis or Python local state.
+
+## Transactional DAG port implementation increment
+- [x] CAS-01 Confirmed `sveltekit-frontend/src/lib/server/db/openspec-evidence-schema.ts` explicitly says OpenSpec evidence migrations are not applied and docs/reports receipts remain authority pending deployment/readback. This is not a verified running state table.
+- [x] CAS-02 Added `sveltekit-frontend/src/lib/server/atlas/policy/dag-attempt-cas-v1.ts`: typed attempted READY→RUNNING and RUNNING→SUCCEEDED/FAILED/SUPERSEDED transitions, full revisions, lease/generation, expected row version, evidence digest, idempotency key and fail-closed transactional port.
+- [x] CAS-03 Added `dag-attempt-cas-v1.spec.ts`: four Vitest cases for allowed/forbidden transitions, stale response, and mock transactional commit. **Not executed** through GitHub.
+- [ ] CAS-04 Run focused Vitest on existing frontend installation. No dependency installs/migrations before operator review.
+- [ ] CAS-05 Identify actual deployed DAG *run-state* table owner; OpenSpec evidence_receipts is a proof ledger, not automatically a step-claim table. Verify DB schema and migrations read-only; don't generate a parallel table from this scaffold.
+- [ ] CAS-06 Implement transactional adapter against verified run-state owner: WHERE full attempt/revision/lease/generation/status/version, dependent-step completion and authorization, UPDATE RETURNING row plus append-only immutable event and outbox write in the *same transaction*. Reject zero/ambiguous rows.
+- [ ] CAS-07 Recover after crash: expired leases, monotonic attempt generation, duplicate idempotency keys, competing worker claims, cancellation/timeout and supersession, verified via rollback/readback.
+- [ ] CAS-08 Connect existing Python async worker `PROPOSED` output to this TypeScript port through approved sidecar RPC; never grant Python direct mutation ownership.
+- [ ] CAS-09 Run read-only reconciliation of Graphify/AST/NLP source/graph/model revisions before and after worker await, then protected transaction at commit boundary. Return stale results without ContextManifest admission.
