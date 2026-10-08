@@ -1,0 +1,3 @@
+# Optional isolated OaK proposal boundary; not part of core Python requirements.
+# Reuse an existing dedicated virtual environment; do not install in default interpreter.
+pydantic==2.13.5
