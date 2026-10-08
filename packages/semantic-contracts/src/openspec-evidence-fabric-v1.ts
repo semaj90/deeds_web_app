@@ -80,6 +80,7 @@ const EvidenceReceiptV1UnsignedSchema = z.object({
   gitCommit: z.string().min(1).optional(),
   workspaceRevision: sha256Schema,
   sourceRevision: sha256Schema,
+  taskRevision: sha256Schema.optional(),
   sourceRefs: z.array(EvidenceSourceRefV1Schema).min(1),
   environmentFingerprint: sha256Schema,
   graphRevision: z.string().min(1).optional(),

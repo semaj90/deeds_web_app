@@ -147,7 +147,8 @@ test('TaskCard carries report outputs only from current revision-qualified recei
         uri: 'docs/reports/receipt.json',
         canonicalTaskRef: evidenceTask.canonicalTaskRef,
         evidenceId: 'receipt:example:task:v1',
-        sourceRevision: task.blockHash,
+        sourceRevision: sourceFileRevision,
+        taskRevision: task.blockHash,
         workspaceRevision: 'sha256:workspace',
         proofEligible: true,
         sourceCurrent: true,
@@ -166,6 +167,7 @@ test('TaskCard carries report outputs only from current revision-qualified recei
     receiptUri: 'docs/reports/receipt.json',
     taskRef: evidenceTask.taskRef,
     taskRevision: task.blockHash,
+    sourceRevision: sourceFileRevision,
     workspaceRevision: 'sha256:workspace',
   }]);
 });

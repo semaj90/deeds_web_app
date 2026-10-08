@@ -24,7 +24,8 @@ const receipt = buildEvidenceReceiptV1({
   claim: 'The existing PatchTournament planner has a bounded three-candidate isolated-worktree fixture worker with source readback, static checks, focused tests, deterministic ranking, ACE output, and no automatic apply.',
   gitCommit: census.source.gitCommit,
   workspaceRevision: census.source.workspaceRevision,
-  sourceRevision: task.taskHash,
+  sourceRevision: checksumFile(path.join(root, task.tasksPath)),
+  taskRevision: task.taskHash,
   sourceRefs: [{
     file: task.tasksPath,
     lineStart: task.sourceLine,

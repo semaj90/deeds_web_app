@@ -192,6 +192,7 @@ test('selector owns optional lifecycle narrowing and keeps it in the selection r
 function reportJoinFixture({
   receiptWorkspaceRevision = 'sha256:workspace',
   receiptTaskRevision = 'sha256:task',
+  receiptSourceRevision = 'sha256:file',
   outputChecksum = 'sha256:report',
   receiptTaskId = '2.2',
   receiptLineStart = 4,
@@ -215,6 +216,7 @@ function reportJoinFixture({
         receiptUri: 'docs/reports/receipt.json',
         taskRef: 'openspec/changes/example/tasks.md#L4',
         taskRevision: receiptTaskRevision,
+        sourceRevision: receiptSourceRevision,
         workspaceRevision: receiptWorkspaceRevision,
       }],
     }],
@@ -241,7 +243,8 @@ function reportJoinFixture({
         evidenceId: 'receipt:example:task-a:v1',
         changeId: 'example',
         taskId: receiptTaskId,
-        sourceRevision: 'sha256:task',
+        sourceRevision: 'sha256:file',
+        taskRevision: 'sha256:task',
         workspaceRevision: 'sha256:workspace',
         sourceRefs: [{ file: 'openspec/changes/example/tasks.md', lineStart: receiptLineStart, lineEnd: receiptLineEnd }],
         outputs: [{ uri: 'docs/reports/example.json', checksum: outputChecksum }],
@@ -266,8 +269,9 @@ test('current task receipt output joins only on exact identity, revision, and fr
 test('stale workspace, task revision, and output checksum cannot create report associations', () => {
   const staleWorkspace = joinCurrentReceiptOutputsToReportManifestV1(reportJoinFixture({ receiptWorkspaceRevision: 'sha256:old-workspace' }));
   const staleTask = joinCurrentReceiptOutputsToReportManifestV1(reportJoinFixture({ receiptTaskRevision: 'sha256:old-task' }));
+  const staleSource = joinCurrentReceiptOutputsToReportManifestV1(reportJoinFixture({ receiptSourceRevision: 'sha256:old-file' }));
   const changedOutput = joinCurrentReceiptOutputsToReportManifestV1(reportJoinFixture({ outputChecksum: 'sha256:old-report' }));
-  for (const corpus of [staleWorkspace, staleTask, changedOutput]) {
+  for (const corpus of [staleWorkspace, staleTask, staleSource, changedOutput]) {
     assert.deepEqual(corpus.artifacts[0].associatedTaskKeys, []);
     assert.equal(corpus.artifacts[0].taskAssociationState, 'NOT_JOINED');
     assert.equal(corpus.summary.associatedTaskCount, 0);

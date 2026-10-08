@@ -243,7 +243,9 @@ export function joinCurrentReceiptOutputsToReportManifestV1({
         || receipt.changeId !== card.changeId
         || (card.declaredTaskId != null && receipt.taskId !== card.declaredTaskId)
         || !receiptSourceBoundToTask
-        || receipt.sourceRevision !== receiptOutput.taskRevision || receipt.workspaceRevision !== receiptOutput.workspaceRevision
+        || receipt.sourceRevision !== receiptOutput.sourceRevision
+        || receipt.taskRevision !== receiptOutput.taskRevision
+        || receipt.workspaceRevision !== receiptOutput.workspaceRevision
       || !outputBoundToReceipt || !receiptOutput.receiptRef || receiptOutput.taskKey !== card.stableKey
       || receiptOutput.taskRef !== expectedTaskRef || receiptOutput.taskRevision !== card.taskRevision
       || receiptOutput.workspaceRevision !== taskCardCorpus.source.workspaceRevision) {

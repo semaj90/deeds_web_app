@@ -150,6 +150,7 @@ def test_graphormer_attention_binds_degree_and_shortest_path_biases() -> None:
     rewired = GnnInputV1(**{
         **graph_input.__dict__,
         "edges": ((10, 20), (10, 30), (30, 40)),
+        "edge_features": (),
         "relation_edges": ((10, 20, "CALLS"), (10, 30, "IMPORTS"), (30, 40, "TESTS")),
     })
     rewired_output, rewired_receipt = run_gnn_v1(rewired, model)
@@ -226,6 +227,7 @@ def test_pna_uses_degree_scalers_and_handles_isolated_candidates() -> None:
     isolated_input = GnnInputV1(**{
         **graph_input.__dict__,
         "edges": (),
+        "edge_features": (),
         "relation_edges": (),
     })
     isolated, _ = run_gnn_v1(isolated_input, pna)
@@ -330,7 +332,7 @@ def test_fixed_graph_edgeconv_uses_neighbor_max_and_handles_isolates() -> None:
     output, receipt = run_gnn_v1(graph_input, edgeconv)
     reversed_edges = GnnInputV1(**{**graph_input.__dict__, "edges": tuple(reversed(graph_input.edges))})
     reversed_output, _ = run_gnn_v1(reversed_edges, edgeconv)
-    isolated_input = GnnInputV1(**{**graph_input.__dict__, "edges": (), "relation_edges": ()})
+    isolated_input = GnnInputV1(**{**graph_input.__dict__, "edges": (), "edge_features": (), "relation_edges": ()})
     isolated_output, _ = run_gnn_v1(isolated_input, edgeconv)
 
     assert output == reversed_output

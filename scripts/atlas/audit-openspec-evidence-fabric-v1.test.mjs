@@ -263,7 +263,8 @@ test('canonical taskId fields bind before ambiguous source references', () => {
       claims: [],
       commands: [],
       workspaceRevisions: ['sha256:workspace'],
-      sourceRevisions: [tasks[1].taskHash],
+      sourceRevisions: [`sha256:${'f'.repeat(64)}`],
+      taskRevisions: [tasks[1].taskHash],
       checksums: ['sha256:receipt'],
       verdicts: ['PROVEN'],
     },
@@ -369,7 +370,8 @@ test('promotes only an exact current receipt and marks it stale after task-sourc
     taskId: 'ABC-1',
     claim: 'The task implementation passed independent verification',
     workspaceRevision: initial.source.workspaceRevision,
-    sourceRevision: task.taskHash,
+    sourceRevision,
+    taskRevision: task.taskHash,
     sourceRefs: [
       { file: 'openspec/changes/change-a/tasks.md', lineStart: 1, lineEnd: 1, sourceRevision },
       { file: 'src/implementation.mjs', lineStart: 1, lineEnd: 1, sourceRevision: implementationRevision },
@@ -450,6 +452,10 @@ test('does not bind a whole tasks.md source path to every task in that file', ()
     taskText: `claim ${line}`,
     dependencySourceText: `- [ ] claim ${line}`,
   }));
+  const previousIdentityPath = process.env.OPENSPEC_IDENTITY_RECOVERY_PATH;
+  const previousReceiptTypesPath = process.env.OPENSPEC_RECEIPT_TYPES_PATH;
+  process.env.OPENSPEC_IDENTITY_RECOVERY_PATH = 'docs/reports/fixture-identity-recovery.json';
+  process.env.OPENSPEC_RECEIPT_TYPES_PATH = 'docs/reports/fixture-receipt-types.json';
   const report = resolveOpenSpecOrphanBindingsV1({
     schema: 'atlas.openspec-evidence-portfolio-census.v2',
     source: { workspaceRevision: 'sha256:workspace' },
@@ -462,6 +468,10 @@ test('does not bind a whole tasks.md source path to every task in that file', ()
       fields: { sourceRefs: ['openspec/changes/change-a/tasks.md'], taskRefs: [], canonicalTaskKeys: [], taskIds: [], claimIds: [], migrationKeys: [], changeIds: [], gateIds: [], claims: [], workspaceRevisions: [], sourceRevisions: [], verdicts: [], commands: [], checksums: [] },
     }],
   }, { mappings: tasks.map((task) => ({ sourceRef: task.taskRef, canonicalTaskKey: task.canonicalTaskRef.replace('openspec-task:', ''), legacyCandidates: [] })) }, { receipts: [{ uri: 'docs/reports/legacy.json', candidateType: 'UNKNOWN' }] });
+  if (previousIdentityPath === undefined) delete process.env.OPENSPEC_IDENTITY_RECOVERY_PATH;
+  else process.env.OPENSPEC_IDENTITY_RECOVERY_PATH = previousIdentityPath;
+  if (previousReceiptTypesPath === undefined) delete process.env.OPENSPEC_RECEIPT_TYPES_PATH;
+  else process.env.OPENSPEC_RECEIPT_TYPES_PATH = previousReceiptTypesPath;
   assert.equal(report.summary.ambiguousCount, 0);
   assert.equal(report.bindings[0].strategy, null);
   assert.equal(report.bindings[0].bindingDisposition, 'TRUE_ORPHAN');

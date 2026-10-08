@@ -17,6 +17,7 @@ from typing import Literal, Sequence
 GnnArchitectureV1 = Literal[
     "GCN_SYMMETRIC_V1",
     "SAGE_MEAN_V1",
+    "SAGE_LSTM_V1",
     "GAT_SINGLE_HEAD_V1",
     "GAT_MULTI_HEAD_V1",
     "GAT_V2_V1",
@@ -45,6 +46,10 @@ GnnArchitectureV1 = Literal[
     "HGNN_INCIDENCE_CONV_V1",
     "ARMA_RECURSIVE_V1",
     "LIGHTGCN_PROPAGATION_V1",
+    "FAGCN_FREQUENCY_ADAPTATION_V1",
+    "GATED_GCN_EDGE_GATE_V1",
+    "MONET_GAUSSIAN_PSEUDOCOORD_V1",
+    "ECC_EDGE_CONDITIONED_FILTER_V1",
 ]
 GnnBackendV1 = Literal["networkx_torch_cpu", "networkx_torch_cuda"]
 
@@ -99,6 +104,32 @@ class GnnHyperedgeV1:
 
 
 @dataclass(frozen=True)
+class GnnEdgeFeatureV1:
+    source_ordinal: int
+    target_ordinal: int
+    values: tuple[float, ...]
+    source_revision: str
+    evidence_refs: tuple[str, ...]
+    producer_revision: str
+
+    def __post_init__(self) -> None:
+        if any(
+            isinstance(value, bool) or not isinstance(value, int)
+            for value in (self.source_ordinal, self.target_ordinal)
+        ) or self.source_ordinal >= self.target_ordinal:
+            raise ValueError("GNN_EDGE_FEATURE_ENDPOINTS_INVALID")
+        _finite_matrix((self.values,), code="GNN_EDGE_FEATURE_VALUES_INVALID")
+        if not all(isinstance(value, str) and value.strip() for value in (
+            self.source_revision, self.producer_revision
+        )):
+            raise ValueError("GNN_EDGE_FEATURE_LINEAGE_REQUIRED")
+        if not self.evidence_refs or any(
+            not isinstance(ref, str) or not ref.strip() for ref in self.evidence_refs
+        ):
+            raise ValueError("GNN_EDGE_FEATURE_EVIDENCE_REQUIRED")
+
+
+@dataclass(frozen=True)
 class GnnInputV1:
     candidate_snapshot_revision: str
     workspace_revision: str
@@ -112,6 +143,7 @@ class GnnInputV1:
     relation_edges: tuple[tuple[int, int, str], ...] = ()
     node_types: tuple[str, ...] = ()
     hyperedges: tuple[GnnHyperedgeV1, ...] = ()
+    edge_features: tuple[GnnEdgeFeatureV1, ...] = ()
 
     def __post_init__(self) -> None:
         for value, code in (
@@ -157,6 +189,23 @@ class GnnInputV1:
             normalized_edges.append((min(source, target), max(source, target)))
         if len(set(normalized_edges)) != len(normalized_edges):
             raise ValueError("GNN_DUPLICATE_UNDIRECTED_EDGE")
+        normalized_edge_set = set(normalized_edges)
+        edge_feature_keys: set[tuple[int, int]] = set()
+        for edge_feature in self.edge_features:
+            if not isinstance(edge_feature, GnnEdgeFeatureV1):
+                raise ValueError("GNN_EDGE_FEATURE_SCHEMA_INVALID")
+            key = (edge_feature.source_ordinal, edge_feature.target_ordinal)
+            if key not in normalized_edge_set:
+                raise ValueError("GNN_EDGE_FEATURE_MISSING_TOPOLOGY_EDGE")
+            if edge_feature.source_ordinal not in node_set or edge_feature.target_ordinal not in node_set:
+                raise ValueError("GNN_EDGE_FEATURE_ENDPOINT_NOT_IN_ORDINAL_MAP")
+            if key in edge_feature_keys:
+                raise ValueError("GNN_EDGE_FEATURE_DUPLICATE_BINDING")
+            edge_feature_keys.add(key)
+        if self.edge_features and edge_feature_keys != normalized_edge_set:
+            raise ValueError("GNN_EDGE_FEATURE_COVERAGE_MISMATCH")
+        if self.edge_features and len({len(edge.values) for edge in self.edge_features}) != 1:
+            raise ValueError("GNN_EDGE_FEATURE_WIDTH_MISMATCH")
         if any(not isinstance(edge, GnnHyperedgeV1) for edge in self.hyperedges):
             raise ValueError("GNN_HYPEREDGE_SCHEMA_INVALID")
         if len(self.hyperedges) > 256 or sum(len(edge.participants) for edge in self.hyperedges) > 4096:
@@ -202,6 +251,17 @@ class GnnInputV1:
                 )
             ],
             "edges": [list(edge) for edge in sorted((min(a, b), max(a, b)) for a, b in self.edges)],
+            "edgeFeatures": [
+                {
+                    "sourceOrdinal": edge.source_ordinal,
+                    "targetOrdinal": edge.target_ordinal,
+                    "values": list(edge.values),
+                    "sourceRevision": edge.source_revision,
+                    "evidenceRefs": list(sorted(edge.evidence_refs)),
+                    "producerRevision": edge.producer_revision,
+                }
+                for edge in sorted(self.edge_features, key=lambda item: (item.source_ordinal, item.target_ordinal))
+            ],
             "relationEdges": [list(edge) for edge in sorted(self.relation_edges)],
             "nodeTypes": list(self.node_types),
             "hyperedges": [
@@ -294,11 +354,29 @@ class GnnModelV1:
     arma_skip_weight_matrix: tuple[tuple[float, ...], ...] = ()
     lightgcn_embedding_width: int = 0
     lightgcn_layer_count: int = 0
+    fagcn_gate_vector: tuple[float, ...] = ()
+    fagcn_epsilon: float = 0.0
+    fagcn_layer_count: int = 0
+    gated_edge_source_vector: tuple[float, ...] = ()
+    gated_edge_target_vector: tuple[float, ...] = ()
+    gated_edge_feature_vector: tuple[float, ...] = ()
+    gated_edge_layer_count: int = 0
+    monet_kernel_centers: tuple[tuple[float, ...], ...] = ()
+    monet_kernel_variances: tuple[tuple[float, ...], ...] = ()
+    monet_kernel_weight_matrices: tuple[tuple[tuple[float, ...], ...], ...] = ()
+    ecc_filter_generator: tuple[tuple[float, ...], ...] = ()
+    ecc_root_weight_matrix: tuple[tuple[float, ...], ...] = ()
+    sage_lstm_weight_ih: tuple[tuple[float, ...], ...] = ()
+    sage_lstm_weight_hh: tuple[tuple[float, ...], ...] = ()
+    sage_lstm_bias_ih: tuple[float, ...] = ()
+    sage_lstm_bias_hh: tuple[float, ...] = ()
+    sage_lstm_max_neighbor_count: int = 0
 
     def __post_init__(self) -> None:
         if self.architecture not in (
             "GCN_SYMMETRIC_V1",
             "SAGE_MEAN_V1",
+            "SAGE_LSTM_V1",
             "GAT_SINGLE_HEAD_V1",
             "GAT_MULTI_HEAD_V1",
             "GAT_V2_V1",
@@ -327,6 +405,10 @@ class GnnModelV1:
             "HGNN_INCIDENCE_CONV_V1",
             "ARMA_RECURSIVE_V1",
             "LIGHTGCN_PROPAGATION_V1",
+            "FAGCN_FREQUENCY_ADAPTATION_V1",
+            "GATED_GCN_EDGE_GATE_V1",
+            "MONET_GAUSSIAN_PSEUDOCOORD_V1",
+            "ECC_EDGE_CONDITIONED_FILTER_V1",
         ):
             raise ValueError("GNN_ARCHITECTURE_UNSUPPORTED")
         if not isinstance(self.model_revision, str) or not self.model_revision.strip():
@@ -353,13 +435,100 @@ class GnnModelV1:
                 tuple(float(row == column) for column in range(input_width))
                 for row in range(input_width)
             )
+        elif self.architecture in ("MONET_GAUSSIAN_PSEUDOCOORD_V1", "ECC_EDGE_CONDITIONED_FILTER_V1"):
+            if self.weight_matrix or self.weight_matrix_2:
+                raise ValueError("GNN_EDGE_CONDITIONED_GENERIC_WEIGHT_MATRIX_UNEXPECTED")
+            if self.architecture == "MONET_GAUSSIAN_PSEUDOCOORD_V1":
+                if not 1 <= len(self.monet_kernel_centers) <= 8:
+                    raise ValueError("GNN_MONET_KERNEL_COUNT_INVALID")
+                centers = _finite_matrix(self.monet_kernel_centers, code="GNN_MONET_KERNEL_CENTERS_INVALID")
+                variances = _finite_matrix(self.monet_kernel_variances, code="GNN_MONET_KERNEL_VARIANCES_INVALID")
+                kernel_matrices = tuple(
+                    _finite_matrix(matrix, code="GNN_MONET_KERNEL_WEIGHT_MATRIX_INVALID")
+                    for matrix in self.monet_kernel_weight_matrices
+                )
+                if len(centers) != len(variances) or len(centers) != len(kernel_matrices):
+                    raise ValueError("GNN_MONET_KERNEL_PARAMETER_COUNT_MISMATCH")
+                if len(centers[0]) != len(variances[0]) or any(
+                    len(row) != len(centers[0]) for row in centers + variances
+                ):
+                    raise ValueError("GNN_MONET_PSEUDOCOORD_WIDTH_MISMATCH")
+                input_width = len(kernel_matrices[0])
+                output_width = len(kernel_matrices[0][0])
+                if any(
+                    any(value <= 0.0 or value > 64.0 for value in row)
+                    or len(matrix) != input_width
+                    or any(len(row) != output_width for row in matrix)
+                    for row, matrix in zip(variances, kernel_matrices, strict=True)
+                ):
+                    raise ValueError("GNN_MONET_KERNEL_PARAMETER_SHAPE_OR_VARIANCE_INVALID")
+                if not 1 <= input_width <= 1024 or not 1 <= output_width <= 1024:
+                    raise ValueError("GNN_MONET_FEATURE_WIDTH_OUT_OF_BOUNDS")
+                weights = kernel_matrices[0]
+            else:
+                if self.monet_kernel_centers or self.monet_kernel_variances or self.monet_kernel_weight_matrices:
+                    raise ValueError("GNN_ECC_MONET_PARAMETERS_UNEXPECTED")
+                generator = _finite_matrix(self.ecc_filter_generator, code="GNN_ECC_FILTER_GENERATOR_INVALID")
+                root_weights = _finite_matrix(self.ecc_root_weight_matrix, code="GNN_ECC_ROOT_WEIGHT_MATRIX_INVALID")
+                input_width = len(root_weights)
+                output_width = len(root_weights[0])
+                if any(len(row) != output_width for row in root_weights) or not 1 <= input_width <= 256 or not 1 <= output_width <= 256:
+                    raise ValueError("GNN_ECC_ROOT_WEIGHT_SHAPE_INVALID")
+                if not 1 <= len(generator) <= 64 or any(
+                    len(row) != input_width * output_width for row in generator
+                ):
+                    raise ValueError("GNN_ECC_FILTER_GENERATOR_SHAPE_INVALID")
+                weights = root_weights
         else:
             weights = _finite_matrix(self.weight_matrix, code="GNN_WEIGHT_MATRIX_INVALID")
-        if self.architecture == "GIN_SUM_MLP_V1":
+        if self.architecture == "SAGE_LSTM_V1":
+            input_width = len(weights) // 2
+            weight_ih = _finite_matrix(self.sage_lstm_weight_ih, code="GNN_SAGE_LSTM_WEIGHT_IH_INVALID")
+            weight_hh = _finite_matrix(self.sage_lstm_weight_hh, code="GNN_SAGE_LSTM_WEIGHT_HH_INVALID")
+            if (
+                len(weights) != input_width * 2
+                or len(weight_ih) != input_width * 4
+                or any(len(row) != input_width for row in weight_ih)
+                or len(weight_hh) != input_width * 4
+                or any(len(row) != input_width for row in weight_hh)
+                or len(self.sage_lstm_bias_ih) != input_width * 4
+                or len(self.sage_lstm_bias_hh) != input_width * 4
+                or any(
+                    isinstance(value, bool)
+                    or not isinstance(value, (int, float))
+                    or not math.isfinite(float(value))
+                    for value in self.sage_lstm_bias_ih + self.sage_lstm_bias_hh
+                )
+            ):
+                raise ValueError("GNN_SAGE_LSTM_PARAMETER_SHAPE_INVALID")
+            if (
+                isinstance(self.sage_lstm_max_neighbor_count, bool)
+                or not isinstance(self.sage_lstm_max_neighbor_count, int)
+                or not 1 <= self.sage_lstm_max_neighbor_count <= 256
+            ):
+                raise ValueError("GNN_SAGE_LSTM_NEIGHBOR_BUDGET_INVALID")
+        elif any((
+            self.sage_lstm_weight_ih,
+            self.sage_lstm_weight_hh,
+            self.sage_lstm_bias_ih,
+            self.sage_lstm_bias_hh,
+            self.sage_lstm_max_neighbor_count,
+        )):
+            raise ValueError("GNN_SAGE_LSTM_PARAMETERS_UNEXPECTED")
+        if self.architecture in ("GIN_SUM_MLP_V1", "FAGCN_FREQUENCY_ADAPTATION_V1", "GATED_GCN_EDGE_GATE_V1"):
             second_weights = _finite_matrix(self.weight_matrix_2, code="GNN_WEIGHT_MATRIX_2_INVALID")
             if len(second_weights) != len(weights[0]):
-                raise ValueError("GNN_GIN_HIDDEN_WIDTH_MISMATCH")
-            if isinstance(self.epsilon, bool) or not isinstance(self.epsilon, (int, float)) or not math.isfinite(self.epsilon):
+                mismatch_code = {
+                    "GIN_SUM_MLP_V1": "GNN_GIN_HIDDEN_WIDTH_MISMATCH",
+                    "FAGCN_FREQUENCY_ADAPTATION_V1": "GNN_FAGCN_OUTPUT_WEIGHT_INPUT_WIDTH_MISMATCH",
+                    "GATED_GCN_EDGE_GATE_V1": "GNN_GATED_GCN_OUTPUT_WEIGHT_INPUT_WIDTH_MISMATCH",
+                }[self.architecture]
+                raise ValueError(mismatch_code)
+            if self.architecture == "GIN_SUM_MLP_V1" and (
+                isinstance(self.epsilon, bool)
+                or not isinstance(self.epsilon, (int, float))
+                or not math.isfinite(self.epsilon)
+            ):
                 raise ValueError("GNN_GIN_EPSILON_INVALID")
         elif self.weight_matrix_2:
             raise ValueError("GNN_SECOND_WEIGHT_MATRIX_UNEXPECTED")
@@ -577,6 +746,68 @@ class GnnModelV1:
                 raise ValueError("GNN_LIGHTGCN_LAYER_COUNT_INVALID")
         elif self.lightgcn_embedding_width or self.lightgcn_layer_count:
             raise ValueError("GNN_LIGHTGCN_PARAMETERS_UNEXPECTED")
+        if self.architecture == "FAGCN_FREQUENCY_ADAPTATION_V1":
+            hidden_width = len(weights[0])
+            if len(self.fagcn_gate_vector) != 2 * hidden_width or any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+                for value in self.fagcn_gate_vector
+            ):
+                raise ValueError("GNN_FAGCN_GATE_VECTOR_INVALID")
+            if (
+                isinstance(self.fagcn_epsilon, bool)
+                or not isinstance(self.fagcn_epsilon, (int, float))
+                or not math.isfinite(float(self.fagcn_epsilon))
+                or not 0.0 <= self.fagcn_epsilon <= 1.0
+            ):
+                raise ValueError("GNN_FAGCN_EPSILON_INVALID")
+            if (
+                isinstance(self.fagcn_layer_count, bool)
+                or not isinstance(self.fagcn_layer_count, int)
+                or not 1 <= self.fagcn_layer_count <= 8
+            ):
+                raise ValueError("GNN_FAGCN_LAYER_COUNT_INVALID")
+        elif self.fagcn_gate_vector or self.fagcn_epsilon or self.fagcn_layer_count:
+            raise ValueError("GNN_FAGCN_PARAMETERS_UNEXPECTED")
+        if self.architecture == "GATED_GCN_EDGE_GATE_V1":
+            input_width = len(weights)
+            if len(weights) != len(weights[0]) or len(second_weights) != input_width or len(second_weights[0]) != input_width:
+                raise ValueError("GNN_GATED_GCN_WEIGHT_MATRICES_MUST_BE_SQUARE")
+            for vector, code in (
+                (self.gated_edge_source_vector, "GNN_GATED_GCN_SOURCE_GATE_INVALID"),
+                (self.gated_edge_target_vector, "GNN_GATED_GCN_TARGET_GATE_INVALID"),
+                (self.gated_edge_feature_vector, "GNN_GATED_GCN_EDGE_GATE_INVALID"),
+            ):
+                if len(vector) != input_width or any(
+                    isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value))
+                    for value in vector
+                ):
+                    raise ValueError(code)
+            if (
+                isinstance(self.gated_edge_layer_count, bool)
+                or not isinstance(self.gated_edge_layer_count, int)
+                or not 1 <= self.gated_edge_layer_count <= 4
+            ):
+                raise ValueError("GNN_GATED_GCN_LAYER_COUNT_INVALID")
+        elif any((
+            self.gated_edge_source_vector,
+            self.gated_edge_target_vector,
+            self.gated_edge_feature_vector,
+            self.gated_edge_layer_count,
+        )):
+            raise ValueError("GNN_GATED_GCN_PARAMETERS_UNEXPECTED")
+        if self.architecture != "MONET_GAUSSIAN_PSEUDOCOORD_V1" and any((
+            self.monet_kernel_centers,
+            self.monet_kernel_variances,
+            self.monet_kernel_weight_matrices,
+        )):
+            raise ValueError("GNN_MONET_PARAMETERS_UNEXPECTED")
+        if self.architecture != "ECC_EDGE_CONDITIONED_FILTER_V1" and any((
+            self.ecc_filter_generator,
+            self.ecc_root_weight_matrix,
+        )):
+            raise ValueError("GNN_ECC_PARAMETERS_UNEXPECTED")
         if self.architecture == "AGNN_PROPAGATION_V1":
             if len(weights) != len(weights[0]):
                 raise ValueError("GNN_AGNN_WEIGHT_MATRIX_MUST_BE_SQUARE")
@@ -922,6 +1153,11 @@ class GnnModelV1:
             "headAttentionTarget": [list(head) for head in self.head_attention_target],
             "neighborPoolWeightMatrix": [list(row) for row in self.neighbor_pool_weight_matrix],
             "neighborPoolBias": list(self.neighbor_pool_bias),
+            "sageLstmWeightIh": [list(row) for row in self.sage_lstm_weight_ih],
+            "sageLstmWeightHh": [list(row) for row in self.sage_lstm_weight_hh],
+            "sageLstmBiasIh": list(self.sage_lstm_bias_ih),
+            "sageLstmBiasHh": list(self.sage_lstm_bias_hh),
+            "sageLstmMaxNeighborCount": self.sage_lstm_max_neighbor_count,
             "teleportProbability": self.teleport_probability,
             "polynomialWeightMatrices": [
                 [list(row) for row in matrix] for matrix in self.polynomial_weight_matrices
@@ -1002,6 +1238,20 @@ class GnnModelV1:
             "armaSkipWeightMatrix": [list(row) for row in self.arma_skip_weight_matrix],
             "lightgcnEmbeddingWidth": self.lightgcn_embedding_width,
             "lightgcnLayerCount": self.lightgcn_layer_count,
+            "fagcnGateVector": list(self.fagcn_gate_vector),
+            "fagcnEpsilon": self.fagcn_epsilon,
+            "fagcnLayerCount": self.fagcn_layer_count,
+            "gatedEdgeSourceVector": list(self.gated_edge_source_vector),
+            "gatedEdgeTargetVector": list(self.gated_edge_target_vector),
+            "gatedEdgeFeatureVector": list(self.gated_edge_feature_vector),
+            "gatedEdgeLayerCount": self.gated_edge_layer_count,
+            "monetKernelCenters": [list(row) for row in self.monet_kernel_centers],
+            "monetKernelVariances": [list(row) for row in self.monet_kernel_variances],
+            "monetKernelWeightMatrices": [
+                [list(row) for row in matrix] for matrix in self.monet_kernel_weight_matrices
+            ],
+            "eccFilterGenerator": [list(row) for row in self.ecc_filter_generator],
+            "eccRootWeightMatrix": [list(row) for row in self.ecc_root_weight_matrix],
         }
 
     def model_checksum(self) -> str:
@@ -1045,12 +1295,18 @@ def run_gnn_v1(
     if backend not in ("networkx_torch_cpu", "networkx_torch_cuda"):
         raise ValueError("GNN_BACKEND_UNSUPPORTED")
     expected_weight_input_width = len(graph_input.features[0]) * (
-        2 if model.architecture in ("SAGE_MEAN_V1", "SAGE_MAXPOOL_V1") else
+        2 if model.architecture in ("SAGE_MEAN_V1", "SAGE_MAXPOOL_V1", "SAGE_LSTM_V1") else
         2 if model.architecture == "EDGE_CONV_FIXED_GRAPH_V1" else
         3 if model.architecture == "H2GCN_CHANNEL_CONCAT_V1" else
         12 if model.architecture == "PNA_LAYER_V1" else 1
     )
-    if model.architecture not in ("AGNN_PROPAGATION_V1", "ARMA_RECURSIVE_V1", "LIGHTGCN_PROPAGATION_V1") and len(model.weight_matrix) != expected_weight_input_width:
+    if model.architecture not in (
+        "AGNN_PROPAGATION_V1",
+        "ARMA_RECURSIVE_V1",
+        "LIGHTGCN_PROPAGATION_V1",
+        "MONET_GAUSSIAN_PSEUDOCOORD_V1",
+        "ECC_EDGE_CONDITIONED_FILTER_V1",
+    ) and len(model.weight_matrix) != expected_weight_input_width:
         if model.architecture == "PNA_LAYER_V1":
             raise ValueError("GNN_PNA_WEIGHT_INPUT_WIDTH_MISMATCH")
         if model.architecture == "AGNN_PROPAGATION_V1":
@@ -1061,6 +1317,11 @@ def run_gnn_v1(
             raise ValueError("GNN_SAGE_POOL_INPUT_WIDTH_MISMATCH")
         if len(model.weight_matrix) != len(graph_input.features[0]) + len(model.neighbor_pool_bias):
             raise ValueError("GNN_WEIGHT_INPUT_WIDTH_MISMATCH")
+    if model.architecture == "SAGE_LSTM_V1" and any(
+        sum(ordinal in edge for edge in graph_input.edges) > model.sage_lstm_max_neighbor_count
+        for ordinal in graph_input.node_ordinals
+    ):
+        raise ValueError("GNN_SAGE_LSTM_NEIGHBOR_BUDGET_EXCEEDED")
     if model.architecture == "CHEB_CONV_V1" and any(
         len(matrix) != len(graph_input.features[0]) for matrix in model.polynomial_weight_matrices
     ):
@@ -1122,6 +1383,25 @@ def run_gnn_v1(
         len(matrix) != len(graph_input.features[0]) for matrix in model.head_weight_matrices
     ):
         raise ValueError("GNN_GAT_HEAD_INPUT_WIDTH_MISMATCH")
+    if model.architecture == "GATED_GCN_EDGE_GATE_V1":
+        if not graph_input.edge_features or len(graph_input.edge_features) != len(graph_input.edges):
+            raise ValueError("GNN_GATED_GCN_EDGE_FEATURES_REQUIRED")
+        if any(len(edge.values) != len(graph_input.features[0]) for edge in graph_input.edge_features):
+            raise ValueError("GNN_GATED_GCN_EDGE_FEATURE_WIDTH_MISMATCH")
+    if model.architecture == "MONET_GAUSSIAN_PSEUDOCOORD_V1":
+        if not graph_input.edge_features or len(graph_input.edge_features) != len(graph_input.edges):
+            raise ValueError("GNN_MONET_EDGE_PSEUDOCOORDS_REQUIRED")
+        if any(len(edge.values) != len(model.monet_kernel_centers[0]) for edge in graph_input.edge_features):
+            raise ValueError("GNN_MONET_PSEUDOCOORD_WIDTH_MISMATCH")
+        if len(graph_input.features[0]) != len(model.monet_kernel_weight_matrices[0]):
+            raise ValueError("GNN_MONET_INPUT_FEATURE_WIDTH_MISMATCH")
+    if model.architecture == "ECC_EDGE_CONDITIONED_FILTER_V1":
+        if not graph_input.edge_features or len(graph_input.edge_features) != len(graph_input.edges):
+            raise ValueError("GNN_ECC_EDGE_FEATURES_REQUIRED")
+        if any(len(edge.values) != len(model.ecc_filter_generator) for edge in graph_input.edge_features):
+            raise ValueError("GNN_ECC_EDGE_FEATURE_WIDTH_MISMATCH")
+        if len(graph_input.features[0]) != len(model.ecc_root_weight_matrix):
+            raise ValueError("GNN_ECC_INPUT_FEATURE_WIDTH_MISMATCH")
     if backend == "networkx_torch_cuda" and not torch.cuda.is_available():
         raise RuntimeError("GNN_CUDA_UNAVAILABLE")
 
@@ -1163,6 +1443,143 @@ def run_gnn_v1(
             hidden = normalized @ hidden
             layer_embeddings.append(hidden)
         output = torch.stack(layer_embeddings, dim=0).mean(dim=0)
+    elif model.architecture == "FAGCN_FREQUENCY_ADAPTATION_V1":
+        degree = adjacency.sum(dim=1).clamp_min(1.0)
+        inverse_sqrt = degree.rsqrt()
+        gate = torch.as_tensor(model.fagcn_gate_vector, dtype=torch.float32, device=device)
+        initial = functional.relu(features @ weights)
+        gate_coefficients = torch.zeros_like(adjacency)
+        for source_index, source_ordinal in enumerate(order):
+            for target_ordinal in sorted(graph.neighbors(source_ordinal)):
+                target_index = ordinal_to_index[target_ordinal]
+                pair_features = torch.cat((initial[source_index], initial[target_index]))
+                gate_coefficients[source_index, target_index] = torch.tanh(torch.dot(gate, pair_features))
+        normalized_gates = inverse_sqrt[:, None] * gate_coefficients * inverse_sqrt[None, :]
+        hidden = initial
+        for _ in range(model.fagcn_layer_count):
+            hidden = model.fagcn_epsilon * initial + normalized_gates @ hidden
+        output_weights = torch.as_tensor(model.weight_matrix_2, dtype=torch.float32, device=device)
+        output = hidden @ output_weights
+    elif model.architecture == "GATED_GCN_EDGE_GATE_V1":
+        edge_features_by_pair = {
+            (edge.source_ordinal, edge.target_ordinal): torch.as_tensor(
+                edge.values, dtype=torch.float32, device=device
+            )
+            for edge in graph_input.edge_features
+        }
+        source_gate = torch.as_tensor(model.gated_edge_source_vector, dtype=torch.float32, device=device)
+        target_gate = torch.as_tensor(model.gated_edge_target_vector, dtype=torch.float32, device=device)
+        edge_gate = torch.as_tensor(model.gated_edge_feature_vector, dtype=torch.float32, device=device)
+        message_weights = torch.as_tensor(model.weight_matrix_2, dtype=torch.float32, device=device)
+        hidden = features
+        for _ in range(model.gated_edge_layer_count):
+            updated_rows: list[torch.Tensor] = []
+            for target_ordinal in order:
+                target_index = ordinal_to_index[target_ordinal]
+                neighbors = sorted(graph.neighbors(target_ordinal))
+                gate_values: list[torch.Tensor] = []
+                messages: list[torch.Tensor] = []
+                for source_ordinal in neighbors:
+                    source_index = ordinal_to_index[source_ordinal]
+                    pair = (min(source_ordinal, target_ordinal), max(source_ordinal, target_ordinal))
+                    edge_value = edge_features_by_pair[pair]
+                    gate_logit = (
+                        torch.dot(hidden[target_index], source_gate)
+                        + torch.dot(hidden[source_index], target_gate)
+                        + torch.dot(edge_value, edge_gate)
+                    )
+                    gate_values.append(torch.sigmoid(gate_logit))
+                    messages.append(hidden[source_index] @ message_weights)
+                if gate_values:
+                    gate_tensor = torch.stack(gate_values)
+                    normalized_gates = gate_tensor / (gate_tensor.sum() + 1e-6)
+                    aggregate = torch.sum(
+                        normalized_gates[:, None] * torch.stack(messages), dim=0
+                    )
+                else:
+                    aggregate = torch.zeros_like(hidden[target_index])
+                updated_rows.append(
+                    hidden[target_index] + functional.relu(hidden[target_index] @ weights + aggregate)
+                )
+            hidden = torch.stack(updated_rows)
+        output = hidden
+    elif model.architecture == "MONET_GAUSSIAN_PSEUDOCOORD_V1":
+        edge_features_by_pair = {
+            (edge.source_ordinal, edge.target_ordinal): torch.as_tensor(
+                edge.values, dtype=torch.float32, device=device
+            )
+            for edge in graph_input.edge_features
+        }
+        centers = [
+            torch.as_tensor(row, dtype=torch.float32, device=device)
+            for row in model.monet_kernel_centers
+        ]
+        variances = [
+            torch.as_tensor(row, dtype=torch.float32, device=device)
+            for row in model.monet_kernel_variances
+        ]
+        kernel_weights = [
+            torch.as_tensor(matrix, dtype=torch.float32, device=device)
+            for matrix in model.monet_kernel_weight_matrices
+        ]
+        output_rows: list[torch.Tensor] = []
+        for target_ordinal in order:
+            target_messages: list[torch.Tensor] = []
+            for source_ordinal in sorted(graph.neighbors(target_ordinal)):
+                pair = (min(source_ordinal, target_ordinal), max(source_ordinal, target_ordinal))
+                pseudo_coordinates = edge_features_by_pair[pair]
+                source_features = features[ordinal_to_index[source_ordinal]]
+                for center, variance, kernel_weight in zip(
+                    centers, variances, kernel_weights, strict=True
+                ):
+                    kernel_weighting = torch.exp(
+                        -0.5 * (((pseudo_coordinates - center) ** 2) / variance).sum()
+                    )
+                    target_messages.append(kernel_weighting * (source_features @ kernel_weight))
+            if target_messages:
+                aggregate = torch.stack(target_messages).sum(dim=0)
+            else:
+                aggregate = torch.zeros(
+                    len(model.monet_kernel_weight_matrices[0][0]),
+                    dtype=torch.float32,
+                    device=device,
+                )
+            output_rows.append(functional.relu(aggregate))
+        output = torch.stack(output_rows)
+    elif model.architecture == "ECC_EDGE_CONDITIONED_FILTER_V1":
+        edge_features_by_pair = {
+            (edge.source_ordinal, edge.target_ordinal): torch.as_tensor(
+                edge.values, dtype=torch.float32, device=device
+            )
+            for edge in graph_input.edge_features
+        }
+        filter_generator = torch.as_tensor(
+            model.ecc_filter_generator, dtype=torch.float32, device=device
+        )
+        root_weights = torch.as_tensor(
+            model.ecc_root_weight_matrix, dtype=torch.float32, device=device
+        )
+        output_rows: list[torch.Tensor] = []
+        output_width = root_weights.shape[1]
+        for target_ordinal in order:
+            target_index = ordinal_to_index[target_ordinal]
+            messages: list[torch.Tensor] = []
+            for source_ordinal in sorted(graph.neighbors(target_ordinal)):
+                pair = (min(source_ordinal, target_ordinal), max(source_ordinal, target_ordinal))
+                edge_vector = edge_features_by_pair[pair]
+                generated_filter = (edge_vector @ filter_generator).reshape(
+                    len(graph_input.features[0]), output_width
+                )
+                messages.append(features[ordinal_to_index[source_ordinal]] @ generated_filter)
+            neighbor_sum = (
+                torch.stack(messages).sum(dim=0)
+                if messages
+                else torch.zeros(output_width, dtype=torch.float32, device=device)
+            )
+            output_rows.append(
+                functional.relu(features[target_index] @ root_weights + neighbor_sum)
+            )
+        output = torch.stack(output_rows)
     elif model.architecture == "HGNN_INCIDENCE_CONV_V1":
         incidence_graph = nx.Graph()
         node_keys = [("node", ordinal) for ordinal in order]
@@ -1192,6 +1609,30 @@ def run_gnn_v1(
         degree = adjacency.sum(dim=1).clamp_min(1.0)
         neighbor_mean = (adjacency @ features) / degree[:, None]
         output = functional.relu(torch.cat((features, neighbor_mean), dim=1) @ weights)
+    elif model.architecture == "SAGE_LSTM_V1":
+        input_width = len(graph_input.features[0])
+        aggregator = torch.nn.LSTM(input_width, input_width, batch_first=True).to(device)
+        aggregator.load_state_dict({
+            "weight_ih_l0": torch.as_tensor(model.sage_lstm_weight_ih, dtype=torch.float32, device=device),
+            "weight_hh_l0": torch.as_tensor(model.sage_lstm_weight_hh, dtype=torch.float32, device=device),
+            "bias_ih_l0": torch.as_tensor(model.sage_lstm_bias_ih, dtype=torch.float32, device=device),
+            "bias_hh_l0": torch.as_tensor(model.sage_lstm_bias_hh, dtype=torch.float32, device=device),
+        }, strict=True)
+        aggregator.eval()
+        aggregated_rows = []
+        for ordinal in order:
+            neighbors = sorted(graph.neighbors(ordinal))
+            if not neighbors:
+                aggregated_rows.append(torch.zeros(input_width, dtype=torch.float32, device=device))
+                continue
+            indices = torch.as_tensor(
+                [ordinal_to_index[neighbor] for neighbor in neighbors], dtype=torch.long, device=device
+            )
+            sequence = features.index_select(0, indices).unsqueeze(0)
+            _sequence_outputs, (hidden_state, _cell_state) = aggregator(sequence)
+            aggregated_rows.append(hidden_state[-1, 0])
+        aggregate = torch.stack(aggregated_rows)
+        output = functional.relu(torch.cat((features, aggregate), dim=1) @ weights)
     elif model.architecture == "EDGE_CONV_FIXED_GRAPH_V1":
         messages_by_node = []
         for ordinal in order:

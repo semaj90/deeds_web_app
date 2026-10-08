@@ -7,7 +7,7 @@ import re
 import unittest
 
 from atlas_graph_runtime.gnn_fixtures import fixture_gnn_input_v1, fixture_gnn_models_v1
-from atlas_graph_runtime.gnn_reference import GnnHyperedgeV1, GnnInputV1, GnnModelV1, compare_gnn_outputs_v1, run_gnn_v1
+from atlas_graph_runtime.gnn_reference import GnnEdgeFeatureV1, GnnHyperedgeV1, GnnInputV1, GnnModelV1, compare_gnn_outputs_v1, run_gnn_v1
 
 
 class NetworkxGnnReferenceTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
         documented = set(re.findall(r"^\| `([A-Z0-9_]+_V1)` \| Present \| Present, unverified \| Not proven \|$", doc, re.MULTILINE))
         executable = {model.architecture for model in fixture_gnn_models_v1()}
         self.assertEqual(documented, executable)
-        self.assertEqual(len(documented), 30)
+        self.assertEqual(len(documented), 35)
 
     def test_all_fixture_operators_are_deterministic_and_non_authoritative(self) -> None:
         graph_input = fixture_gnn_input_v1()
@@ -60,6 +60,25 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "GNN_ARMA_SKIP_INPUT_WIDTH_MISMATCH"):
             run_gnn_v1(graph_input, replace(model, arma_skip_weight_matrix=((1.0, 0.0), (0.0, 1.0))))
 
+    def test_sage_lstm_uses_ordinal_order_and_bounded_neighbors(self) -> None:
+        graph_input = fixture_gnn_input_v1()
+        model = next(item for item in fixture_gnn_models_v1() if item.architecture == "SAGE_LSTM_V1")
+        output, receipt = run_gnn_v1(graph_input, model)
+        reversed_input = replace(graph_input, edges=tuple(reversed(graph_input.edges)))
+        reversed_output, _ = run_gnn_v1(reversed_input, model)
+        changed_bias = replace(model, sage_lstm_bias_ih=(0.2,) + model.sage_lstm_bias_ih[1:])
+        changed_output, changed_receipt = run_gnn_v1(graph_input, changed_bias)
+
+        self.assertEqual(output, reversed_output)
+        self.assertNotEqual(output, changed_output)
+        self.assertNotEqual(receipt.model_checksum, changed_receipt.model_checksum)
+        self.assertFalse(receipt.canonical_authority)
+        self.assertFalse(receipt.writes_performed)
+        with self.assertRaisesRegex(ValueError, "GNN_SAGE_LSTM_NEIGHBOR_BUDGET_EXCEEDED"):
+            run_gnn_v1(graph_input, replace(model, sage_lstm_max_neighbor_count=1))
+        with self.assertRaisesRegex(ValueError, "GNN_SAGE_LSTM_PARAMETER_SHAPE_INVALID"):
+            replace(model, sage_lstm_weight_hh=model.sage_lstm_weight_hh[:-1])
+
     def test_lightgcn_averages_projection_free_propagation_depths(self) -> None:
         graph_input = fixture_gnn_input_v1()
         model = next(model for model in fixture_gnn_models_v1() if model.architecture == "LIGHTGCN_PROPAGATION_V1")
@@ -81,6 +100,158 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
             replace(model, weight_matrix=((1.0, 0.0, 0.0),) * 3)
         with self.assertRaisesRegex(ValueError, "GNN_LIGHTGCN_INPUT_WIDTH_MISMATCH"):
             run_gnn_v1(graph_input, replace(model, lightgcn_embedding_width=2))
+
+    def test_fagcn_signed_gates_are_deterministic_bounded_and_checksum_bound(self) -> None:
+        graph_input = fixture_gnn_input_v1()
+        model = next(
+            item for item in fixture_gnn_models_v1()
+            if item.architecture == "FAGCN_FREQUENCY_ADAPTATION_V1"
+        )
+        output, receipt = run_gnn_v1(graph_input, model)
+        repeated, repeated_receipt = run_gnn_v1(graph_input, model)
+        changed_gate = replace(model, fagcn_gate_vector=(-0.6, 0.2, 0.4, -0.5))
+        changed_output, changed_receipt = run_gnn_v1(graph_input, changed_gate)
+        reversed_edges = replace(graph_input, edges=tuple(reversed(graph_input.edges)))
+        reversed_output, _ = run_gnn_v1(reversed_edges, model)
+
+        self.assertEqual(output, repeated)
+        self.assertEqual(receipt.output_checksum, repeated_receipt.output_checksum)
+        self.assertNotEqual(output, changed_output)
+        self.assertNotEqual(receipt.model_checksum, changed_receipt.model_checksum)
+        self.assertEqual(output, reversed_output)
+        self.assertEqual(len(next(iter(output.values()))), 2)
+        self.assertFalse(receipt.canonical_authority)
+        self.assertFalse(receipt.writes_performed)
+        with self.assertRaisesRegex(ValueError, "GNN_FAGCN_GATE_VECTOR_INVALID"):
+            replace(model, fagcn_gate_vector=(1.0, 2.0))
+        with self.assertRaisesRegex(ValueError, "GNN_FAGCN_EPSILON_INVALID"):
+            replace(model, fagcn_epsilon=1.1)
+        with self.assertRaisesRegex(ValueError, "GNN_FAGCN_LAYER_COUNT_INVALID"):
+            replace(model, fagcn_layer_count=9)
+
+    def test_gated_gcn_edge_features_are_lineage_bound_and_order_invariant(self) -> None:
+        graph_input = fixture_gnn_input_v1()
+        model = next(
+            item for item in fixture_gnn_models_v1()
+            if item.architecture == "GATED_GCN_EDGE_GATE_V1"
+        )
+        output, receipt = run_gnn_v1(graph_input, model)
+        repeated, repeated_receipt = run_gnn_v1(graph_input, model)
+        reversed_edges = replace(
+            graph_input,
+            edges=tuple(reversed(graph_input.edges)),
+            edge_features=tuple(reversed(graph_input.edge_features)),
+        )
+        reversed_output, _ = run_gnn_v1(reversed_edges, model)
+        changed_edge = replace(
+            graph_input.edge_features[0], values=(0.9, 0.1, 0.2)
+        )
+        changed_input = replace(
+            graph_input,
+            edge_features=(changed_edge,) + graph_input.edge_features[1:],
+        )
+        changed_output, changed_receipt = run_gnn_v1(changed_input, model)
+
+        self.assertEqual(output, repeated)
+        self.assertEqual(output, reversed_output)
+        self.assertEqual(receipt.output_checksum, repeated_receipt.output_checksum)
+        self.assertNotEqual(graph_input.input_checksum(), changed_input.input_checksum())
+        self.assertNotEqual(output, changed_output)
+        self.assertNotEqual(receipt.input_checksum, changed_receipt.input_checksum)
+        self.assertEqual(len(next(iter(output.values()))), 3)
+        self.assertFalse(receipt.canonical_authority)
+        self.assertFalse(receipt.writes_performed)
+        with self.assertRaisesRegex(ValueError, "GNN_GATED_GCN_EDGE_FEATURES_REQUIRED"):
+            run_gnn_v1(replace(graph_input, edge_features=()), model)
+        with self.assertRaisesRegex(ValueError, "GNN_EDGE_FEATURE_COVERAGE_MISMATCH"):
+            replace(graph_input, edge_features=graph_input.edge_features[:-1])
+        with self.assertRaisesRegex(ValueError, "GNN_EDGE_FEATURE_LINEAGE_REQUIRED"):
+            GnnEdgeFeatureV1(10, 20, (0.2,), "", ("fixture:evidence",), "fixture:producer")
+        with self.assertRaisesRegex(ValueError, "GNN_EDGE_FEATURE_WIDTH_MISMATCH"):
+            replace(graph_input, edge_features=graph_input.edge_features[:-1] + (
+                replace(graph_input.edge_features[-1], values=(0.2,)),
+            ))
+
+    def test_monet_gaussian_kernels_bind_edge_pseudocoordinates(self) -> None:
+        graph_input = fixture_gnn_input_v1()
+        model = next(
+            item for item in fixture_gnn_models_v1()
+            if item.architecture == "MONET_GAUSSIAN_PSEUDOCOORD_V1"
+        )
+        output, receipt = run_gnn_v1(graph_input, model)
+        repeated, repeated_receipt = run_gnn_v1(graph_input, model)
+        reordered = replace(
+            graph_input,
+            edges=tuple(reversed(graph_input.edges)),
+            edge_features=tuple(reversed(graph_input.edge_features)),
+        )
+        reordered_output, _ = run_gnn_v1(reordered, model)
+        changed_center = replace(
+            model,
+            monet_kernel_centers=((0.25, 0.0, 0.0),) + model.monet_kernel_centers[1:],
+        )
+        changed_output, changed_receipt = run_gnn_v1(graph_input, changed_center)
+
+        self.assertEqual(output, repeated)
+        self.assertEqual(output, reordered_output)
+        self.assertEqual(receipt.output_checksum, repeated_receipt.output_checksum)
+        self.assertNotEqual(output, changed_output)
+        self.assertNotEqual(receipt.model_checksum, changed_receipt.model_checksum)
+        self.assertEqual(len(next(iter(output.values()))), 2)
+        self.assertFalse(receipt.canonical_authority)
+        self.assertFalse(receipt.writes_performed)
+        with self.assertRaisesRegex(ValueError, "GNN_MONET_EDGE_PSEUDOCOORDS_REQUIRED"):
+            run_gnn_v1(replace(graph_input, edge_features=()), model)
+        with self.assertRaisesRegex(ValueError, "GNN_MONET_INPUT_FEATURE_WIDTH_MISMATCH"):
+            run_gnn_v1(graph_input, replace(
+                model,
+                monet_kernel_weight_matrices=(
+                    ((0.5, 0.1), (0.0, 0.6)),
+                    model.monet_kernel_weight_matrices[1][:2],
+                ),
+            ))
+        with self.assertRaisesRegex(ValueError, "GNN_MONET_KERNEL_PARAMETER_SHAPE_OR_VARIANCE_INVALID"):
+            replace(model, monet_kernel_variances=((0.0, 1.0, 1.0),) + model.monet_kernel_variances[1:])
+
+    def test_ecc_generates_edge_specific_filters_from_grounded_features(self) -> None:
+        graph_input = fixture_gnn_input_v1()
+        model = next(
+            item for item in fixture_gnn_models_v1()
+            if item.architecture == "ECC_EDGE_CONDITIONED_FILTER_V1"
+        )
+        output, receipt = run_gnn_v1(graph_input, model)
+        repeated, repeated_receipt = run_gnn_v1(graph_input, model)
+        reordered = replace(
+            graph_input,
+            edges=tuple(reversed(graph_input.edges)),
+            edge_features=tuple(reversed(graph_input.edge_features)),
+        )
+        reordered_output, _ = run_gnn_v1(reordered, model)
+        changed_edge = replace(graph_input.edge_features[0], values=(0.9, 0.1, 0.2))
+        changed_input = replace(
+            graph_input,
+            edge_features=(changed_edge,) + graph_input.edge_features[1:],
+        )
+        changed_output, changed_receipt = run_gnn_v1(changed_input, model)
+
+        self.assertEqual(output, repeated)
+        self.assertEqual(output, reordered_output)
+        self.assertEqual(receipt.output_checksum, repeated_receipt.output_checksum)
+        self.assertNotEqual(output, changed_output)
+        self.assertNotEqual(receipt.input_checksum, changed_receipt.input_checksum)
+        self.assertEqual(len(next(iter(output.values()))), 2)
+        self.assertFalse(receipt.canonical_authority)
+        self.assertFalse(receipt.writes_performed)
+        with self.assertRaisesRegex(ValueError, "GNN_ECC_EDGE_FEATURES_REQUIRED"):
+            run_gnn_v1(replace(graph_input, edge_features=()), model)
+        wrong_width = replace(
+            graph_input,
+            edge_features=tuple(replace(edge, values=(0.1, 0.2)) for edge in graph_input.edge_features),
+        )
+        with self.assertRaisesRegex(ValueError, "GNN_ECC_EDGE_FEATURE_WIDTH_MISMATCH"):
+            run_gnn_v1(wrong_width, model)
+        with self.assertRaisesRegex(ValueError, "GNN_ECC_FILTER_GENERATOR_SHAPE_INVALID"):
+            replace(model, ecc_filter_generator=tuple(row[:-1] for row in model.ecc_filter_generator))
 
     def test_hgnn_uses_role_bound_incidence_and_rejects_unbound_members(self) -> None:
         graph_input = fixture_gnn_input_v1()
@@ -217,6 +388,7 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
         without_second_branch = GnnInputV1(**{
             **graph_input.__dict__,
             "edges": ((10, 20), (20, 30)),
+            "edge_features": graph_input.edge_features[:2],
             "relation_edges": ((10, 20, "CALLS"), (20, 30, "IMPORTS")),
         })
         changed_scores, _ = run_gnn_v1(without_second_branch, model)
@@ -269,6 +441,7 @@ class NetworkxGnnReferenceTests(unittest.TestCase):
             "source_revisions": ("fixture:source-99",),
             "evidence_refs": (("fixture:evidence-99",),),
             "edges": (),
+            "edge_features": (),
             "relation_edges": (),
             "hyperedges": (),
             "features": ((0.25, -0.5, 1.0),),

@@ -43,6 +43,17 @@ describe('projectGroundedNlpFactToOntologyTupleV1', () => {
     expect(projection.tuple.evidenceState).toBe('GATED');
     expect(projection.tuple.provenance.sourceRevision).toBe(fact.sourceRevision);
     expect(projection.tuple.provenance.workspaceRevision).toBe(fact.workspaceRevision);
+    expect(projection.tuple.provenance.taskRevision).toBe(fact.taskRevision);
+    expect(projection.tuple.provenance.evidenceCardChecksum).toBe(fact.evidenceCardChecksum);
+    expect(projection.tuple.provenance.evidenceSpanChecksum).toBe(`sha256:${fact.evidenceSpan.textSha256}`);
+    const persistedProvenance = JSON.parse(JSON.stringify(projection.tuple.provenance)) as typeof projection.tuple.provenance;
+    expect(persistedProvenance).toMatchObject({
+      sourceRevision: fact.sourceRevision,
+      workspaceRevision: fact.workspaceRevision,
+      taskRevision: fact.taskRevision,
+      evidenceCardChecksum: fact.evidenceCardChecksum,
+      evidenceSpanChecksum: `sha256:${fact.evidenceSpan.textSha256}`,
+    });
     expect(projection.tuple.provenance.producerRevision).toBe('atlas.grounded-nlp-ontology-projection:v1');
     expect(projection.tuple.evidenceSpan).toEqual({ sourceRef: fact.sourceRef, start: 6, end: 11 });
     expect(projection.tuple.evidenceRefs).toContain(fact.canonicalTaskRef);

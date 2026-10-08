@@ -105,6 +105,8 @@ export function evaluateTaskEvidenceAdmissionV1({ taskCard, evidenceTask, eviden
   if (evidenceCard.proofState !== 'PROVEN' || evidenceCard.proofUsable !== true) reasons.push('DIAGNOSTIC_ONLY');
 
   const matchedBindings = receiptBindings.filter((binding) => evidenceCard.evidenceIds?.includes(binding.evidenceId));
+  if (!matchedBindings.some((binding) => binding.taskRevision === evidenceTask.taskHash)) reasons.push('RECEIPT_TASK_REVISION_MISMATCH');
+  if (!matchedBindings.some((binding) => binding.sourceRevision === taskCard.sourceRevision)) reasons.push('RECEIPT_SOURCE_FILE_REVISION_MISMATCH');
   const verifiedBindings = matchedBindings.filter((binding) => binding.proofEligible === true
     && binding.workspaceCurrent === true
     && binding.sourceCurrent === true
@@ -112,7 +114,8 @@ export function evaluateTaskEvidenceAdmissionV1({ taskCard, evidenceTask, eviden
     && binding.taskSpanMatched === true
     && binding.canonicalTaskRef === evidenceTask.canonicalTaskRef
     && binding.workspaceRevision === taskCard.workspaceRevision
-    && binding.sourceRevision === evidenceTask.taskHash
+    && binding.sourceRevision === taskCard.sourceRevision
+    && binding.taskRevision === evidenceTask.taskHash
     && Array.isArray(binding.sourceRefChecks)
     && binding.sourceRefChecks.length > 0
     && binding.sourceRefChecks.every((check) => check.current === true));
@@ -124,6 +127,7 @@ export function evaluateTaskEvidenceAdmissionV1({ taskCard, evidenceTask, eviden
     evidenceCardChecksum: evidenceCard.checksum ?? null,
     canonicalTaskRef: evidenceTask.canonicalTaskRef ?? null,
     taskRevision: taskCard.taskRevision ?? null,
+    receiptTaskRevision: matchedBindings.find((binding) => binding.taskRevision === evidenceTask.taskHash)?.taskRevision ?? null,
     evidenceRevision: evidenceCard.checksum ?? null,
     sourceRef: evidenceCard.sourceRef ?? null,
     sourceRevision: evidenceCard.sourceRevision ?? null,
@@ -435,7 +439,10 @@ export function buildOpenSpecTaskCardReportV1({ workboard, evidenceCensus, head,
     if (receipt.proofEligible !== true || receipt.workspaceCurrent !== true || receipt.sourceCurrent !== true
       || !receipt.canonicalTaskRef || !receipt.evidenceId) continue;
     const evidenceTask = evidenceTasksByCanonicalRef.get(receipt.canonicalTaskRef);
-    if (!evidenceTask || receipt.sourceRevision !== evidenceTask.taskHash) continue;
+    const expectedSourceRevision = evidenceTask
+      ? taskFileHashes?.[evidenceTask.tasksPath] ?? workboard.sourceFileHashes?.[evidenceTask.tasksPath] ?? null
+      : null;
+    if (!evidenceTask || receipt.taskRevision !== evidenceTask.taskHash || receipt.sourceRevision !== expectedSourceRevision) continue;
     const refs = currentReceiptOutputsByCanonicalRef.get(receipt.canonicalTaskRef) ?? [];
     for (const output of receipt.outputs ?? []) {
       if (typeof output.uri !== 'string' || !output.uri.startsWith('docs/reports/') || typeof output.checksum !== 'string') continue;
@@ -446,6 +453,7 @@ export function buildOpenSpecTaskCardReportV1({ workboard, evidenceCensus, head,
         receiptUri: receipt.uri,
         taskRef: evidenceTask.taskRef,
         taskRevision: evidenceTask.taskHash,
+        sourceRevision: expectedSourceRevision,
         workspaceRevision: evidenceCensus.source.workspaceRevision,
       });
     }

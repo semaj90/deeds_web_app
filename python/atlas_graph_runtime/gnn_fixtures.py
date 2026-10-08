@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .gnn_reference import GnnHyperedgeV1, GnnInputV1, GnnModelV1
+from .gnn_reference import GnnEdgeFeatureV1, GnnHyperedgeV1, GnnInputV1, GnnModelV1
 
 
 def fixture_gnn_input_v1() -> GnnInputV1:
@@ -32,6 +32,11 @@ def fixture_gnn_input_v1() -> GnnInputV1:
                 producer_revision="fixture:grounded-fact-producer-r1",
             ),
         ),
+        edge_features=(
+            GnnEdgeFeatureV1(10, 20, (0.2, 0.7, 0.1), "fixture:edge-source-10-20-r1", ("fixture:edge-evidence-10-20",), "fixture:edge-feature-producer-r1"),
+            GnnEdgeFeatureV1(20, 30, (0.6, 0.1, 0.3), "fixture:edge-source-20-30-r1", ("fixture:edge-evidence-20-30",), "fixture:edge-feature-producer-r1"),
+            GnnEdgeFeatureV1(20, 40, (0.1, 0.4, 0.8), "fixture:edge-source-20-40-r1", ("fixture:edge-evidence-20-40",), "fixture:edge-feature-producer-r1"),
+        ),
     )
 
 
@@ -46,6 +51,22 @@ def fixture_gnn_models_v1() -> tuple[GnnModelV1, ...]:
             architecture="SAGE_MEAN_V1",
             model_revision="fixture:sage-r1",
             weight_matrix=((0.5, 0.1), (0.2, 0.6), (0.1, 0.4), (0.3, 0.5), (0.7, 0.2), (0.4, 0.3)),
+        ),
+        GnnModelV1(
+            architecture="SAGE_LSTM_V1",
+            model_revision="fixture:sage-lstm-ordinal-r1",
+            weight_matrix=((0.5, 0.1), (0.2, 0.6), (0.1, 0.4), (0.3, 0.5), (0.7, 0.2), (0.4, 0.3)),
+            sage_lstm_weight_ih=tuple(
+                tuple(0.12 if row % 3 == column else -0.04 for column in range(3))
+                for row in range(12)
+            ),
+            sage_lstm_weight_hh=tuple(
+                tuple(0.08 if row % 3 == column else 0.01 for column in range(3))
+                for row in range(12)
+            ),
+            sage_lstm_bias_ih=(0.01, -0.02, 0.03, 0.1, 0.08, 0.12, -0.01, 0.02, 0.0, 0.04, -0.03, 0.02),
+            sage_lstm_bias_hh=(0.0,) * 12,
+            sage_lstm_max_neighbor_count=32,
         ),
         GnnModelV1(
             architecture="GAT_SINGLE_HEAD_V1",
@@ -344,5 +365,44 @@ def fixture_gnn_models_v1() -> tuple[GnnModelV1, ...]:
             model_revision="fixture:lightgcn-propagation-r1",
             lightgcn_embedding_width=3,
             lightgcn_layer_count=2,
+        ),
+        GnnModelV1(
+            architecture="FAGCN_FREQUENCY_ADAPTATION_V1",
+            model_revision="fixture:fagcn-frequency-adaptation-r1",
+            weight_matrix=((0.7, 0.1), (0.05, 0.6), (0.3, 0.4)),
+            weight_matrix_2=((0.8, 0.1), (0.2, 0.7)),
+            fagcn_gate_vector=(0.6, -0.2, -0.4, 0.5),
+            fagcn_epsilon=0.1,
+            fagcn_layer_count=2,
+        ),
+        GnnModelV1(
+            architecture="GATED_GCN_EDGE_GATE_V1",
+            model_revision="fixture:gated-gcn-edge-gate-r1",
+            weight_matrix=((0.7, 0.1, 0.0), (0.0, 0.8, 0.1), (0.1, 0.0, 0.6)),
+            weight_matrix_2=((0.8, 0.0, 0.1), (0.1, 0.7, 0.0), (0.0, 0.2, 0.9)),
+            gated_edge_source_vector=(0.2, -0.1, 0.3),
+            gated_edge_target_vector=(0.1, 0.25, -0.2),
+            gated_edge_feature_vector=(0.4, -0.3, 0.15),
+            gated_edge_layer_count=2,
+        ),
+        GnnModelV1(
+            architecture="MONET_GAUSSIAN_PSEUDOCOORD_V1",
+            model_revision="fixture:monet-gaussian-pseudocoord-r1",
+            monet_kernel_centers=((0.0, 0.0, 0.0), (0.5, 0.25, 0.75)),
+            monet_kernel_variances=((1.0, 1.0, 1.0), (0.5, 1.5, 0.75)),
+            monet_kernel_weight_matrices=(
+                ((0.5, 0.1), (0.0, 0.6), (0.2, 0.3)),
+                ((0.1, 0.4), (0.7, 0.0), (0.3, 0.2)),
+            ),
+        ),
+        GnnModelV1(
+            architecture="ECC_EDGE_CONDITIONED_FILTER_V1",
+            model_revision="fixture:ecc-edge-conditioned-r1",
+            ecc_filter_generator=(
+                (0.2, 0.0, 0.1, 0.0, 0.3, 0.0),
+                (0.0, 0.4, 0.0, 0.2, 0.0, 0.1),
+                (0.3, 0.1, 0.0, 0.2, 0.1, 0.4),
+            ),
+            ecc_root_weight_matrix=((0.5, 0.1), (0.0, 0.6), (0.2, 0.3)),
         ),
     )

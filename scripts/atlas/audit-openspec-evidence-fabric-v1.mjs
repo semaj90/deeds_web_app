@@ -27,6 +27,7 @@ export function buildEvidenceReceiptV1(input) {
   const required = ['evidenceId', 'evidenceType', 'changeId', 'taskId', 'claim', 'workspaceRevision', 'sourceRevision', 'sourceRefs', 'producer', 'inputs', 'observedAt', 'expectedAssertions', 'actualAssertions', 'outputs', 'readbackRequired', 'readbackPerformed', 'verdict'];
   for (const field of required) if (input[field] === undefined || input[field] === null || input[field] === '') throw new Error(`EvidenceReceiptV1 missing ${field}`);
   if (input.schema !== 'atlas.evidence-receipt.v1') throw new Error('EvidenceReceiptV1 schema mismatch');
+  if (input.taskRevision != null && !/^sha256:[a-f0-9]{64}$/i.test(input.taskRevision)) throw new Error('EvidenceReceiptV1 task revision invalid');
   if (!proofStates.has(input.verdict) || input.verdict === 'CLAIM_ONLY') throw new Error('EvidenceReceiptV1 verdict mismatch');
   if (!Array.isArray(input.expectedAssertions) || !Array.isArray(input.actualAssertions) || !Array.isArray(input.sourceRefs)) throw new Error('EvidenceReceiptV1 arrays required');
   if (input.verdict === 'PROVEN') {
@@ -604,6 +605,7 @@ const RECEIPT_FIELD_NAMES = {
   commands: new Set(['command', 'verificationcommand', 'testcommand']),
   workspaceRevisions: new Set(['workspacerevision', 'workspace_revision']),
   sourceRevisions: new Set(['sourcerevision', 'source_revision']),
+  taskRevisions: new Set(['taskrevision', 'task_revision']),
   checksums: new Set(['checksum', 'receiptchecksum']),
   verdicts: new Set(['verdict', 'proofstate', 'status']),
 };
@@ -803,6 +805,7 @@ export function resolveReceiptBindings(receiptInventory, tasks) {
     const binding = resolveReceiptBinding(receipt, indexes, tasks);
     const revisions = receipt.fields?.workspaceRevisions ?? [receipt.workspaceRevision].filter(Boolean);
     const sourceRevisions = receipt.fields?.sourceRevisions ?? [receipt.sourceRevision].filter(Boolean);
+    const taskRevisions = receipt.fields?.taskRevisions ?? [receipt.taskRevision].filter(Boolean);
     return {
       uri: receipt.uri,
       schema: receipt.schema ?? null,
@@ -815,7 +818,8 @@ export function resolveReceiptBindings(receiptInventory, tasks) {
       canonicalSchemaValid: receipt.canonicalSchemaValid === true,
       workspaceRevision: revisions[0] ?? null,
       sourceRevision: sourceRevisions[0] ?? null,
-      revisionStatus: revisions[0] && sourceRevisions[0] ? 'PRESENT' : 'MISSING_REVISION',
+      taskRevision: taskRevisions[0] ?? null,
+      revisionStatus: revisions[0] && sourceRevisions[0] && taskRevisions[0] ? 'PRESENT' : 'MISSING_REVISION',
       proofEligible: receipt.canonicalSchemaValid === true && binding.resolution === 'BOUND' && ['BOUND_EXACT', 'BOUND_ALIAS', 'BOUND_SOURCE_REF'].includes(binding.bindingType),
     };
   });
@@ -970,6 +974,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
   const cycleAffectedTasks = taskRows.filter((task) => task.dependencyCycleAffected || cycleAffectedTaskKeys.has(task.canonicalTaskRef)).map((task) => task.taskRef);
   const workspaceSourceManifest = sourceManifest(root);
   const sourceRevisionByPath = new Map(workspaceSourceManifest.map((entry) => [entry.source, entry.checksum]));
+  for (const task of taskRows) task.sourceFileRevision = sourceRevisionByPath.get(task.tasksPath) ?? null;
   const workspaceRevision = sha256(canonicalJson(workspaceSourceManifest));
   const receiptInventory = [
     ...receipts.map((receipt) => ({ ...receipt, canonicalSchemaValid: true })),
@@ -998,8 +1003,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
         const fileRevision = withinRoot && fs.existsSync(sourceFile) ? sha256(fs.readFileSync(sourceFile)) : null;
         sourceRefChecks.push({
           file: relativeSource || null,
-          current: Boolean(fileRevision && sourceRef.sourceRevision
-            && (sourceRef.sourceRevision === fileRevision || (isTaskSource && sourceRef.sourceRevision === task.taskHash))),
+          current: Boolean(fileRevision && sourceRef.sourceRevision === fileRevision),
           expectedRevision: sourceRef.sourceRevision ?? null,
           observedRevision: fileRevision,
         });
@@ -1007,13 +1011,17 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
     }
     const workspaceCurrent = Boolean(receipt && receipt.workspaceRevision === workspaceRevision);
     const sourceRefsCurrent = sourceRefChecks.length > 0 && sourceRefChecks.every((sourceRef) => sourceRef.current);
-    const sourceCurrent = Boolean(receipt && task && receipt.sourceRevision === task.taskHash && taskSpanMatched && sourceRefsCurrent);
+    const expectedTaskSourceRevision = task ? sourceRevisionByPath.get(task.tasksPath) : null;
+    const taskRevisionCurrent = Boolean(receipt && task && binding.taskRevision === task.taskHash);
+    const sourceCurrent = Boolean(receipt && task && expectedTaskSourceRevision
+      && receipt.sourceRevision === expectedTaskSourceRevision && taskRevisionCurrent && taskSpanMatched && sourceRefsCurrent);
     return {
       ...binding,
       verdict: receipt?.verdict ?? null,
       observedAt: receipt?.observedAt ?? null,
       workspaceCurrent,
       sourceCurrent,
+      taskRevisionCurrent,
       sourceRefsCurrent,
       sourceRefChecks,
       taskSpanMatched,
@@ -1047,6 +1055,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
     if (allBindings.some((receipt) => receipt.bindingType === 'CANDIDATE_ONLY')) rejectionReasons.push('CANDIDATE_ONLY_BINDING');
     if (allBindings.some((receipt) => receipt.resolution === 'AMBIGUOUS')) rejectionReasons.push('IDENTITY_AMBIGUOUS');
     if (allBindings.some((receipt) => !receipt.workspaceCurrent)) rejectionReasons.push('WORKSPACE_REVISION_MISMATCH');
+    if (allBindings.some((receipt) => !receipt.taskRevisionCurrent)) rejectionReasons.push('TASK_REVISION_MISMATCH');
     if (allBindings.some((receipt) => !receipt.sourceCurrent || !receipt.taskSpanMatched)) rejectionReasons.push('SOURCE_REVISION_OR_SPAN_MISMATCH');
     if (!latest && allBindings.some((receipt) => !receipt.canonicalSchemaValid)) rejectionReasons.push('NON_CANONICAL');
     return buildEvidenceCardV1({

@@ -228,7 +228,7 @@ export class VectorCentroidCache {
   }
 }
 
-// Helper: TokenRemappingStrategy (ornith 1.5 llama-server 8090, Gemma4 dimension adaptation)
+// Helper: TokenRemappingStrategy (ornith 1.5 llama-server 8090 updatingg from Gemma4 dimension adaptation)
 export class TokenRemappingStrategy {
   // Problem: user may request longer output than context allows
   // Solution: remap token budget dynamically

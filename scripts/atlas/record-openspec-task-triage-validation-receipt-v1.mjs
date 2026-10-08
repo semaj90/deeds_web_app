@@ -201,7 +201,8 @@ function main() {
     claim: 'The compact OpenSpec task, report-manifest, and triage pipeline passes focused contracts and strict change validation against one current workspace revision; report associations remain derived and advisory.',
     gitCommit: head,
     workspaceRevision,
-    sourceRevision: task.taskHash,
+    sourceRevision: hashFile(task.tasksPath),
+    taskRevision: task.taskHash,
     sourceRefs: [{
       file: task.tasksPath,
       lineStart: task.sourceLine,

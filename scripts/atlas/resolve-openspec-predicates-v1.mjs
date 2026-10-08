@@ -149,7 +149,8 @@ export function buildOpenSpecTaskEvidenceBindingsV1(census) {
       ],
       contradictions: [...contradictions, ...predicateRows.flatMap((predicate) => predicate.contradictions)],
       workspaceRevision: census.source?.workspaceRevision ?? null,
-      sourceRevision: task.taskHash,
+      taskRevision: task.taskHash,
+      sourceRevision: task.sourceFileRevision ?? null,
       claimOnlyReason: proofState === 'CLAIM_ONLY' ? 'No current canonical receipt satisfies the exact task/source/workspace identity gate.' : null,
     };
     bindings.push({ ...binding, checksum: sha256(canonicalJson(binding)) });

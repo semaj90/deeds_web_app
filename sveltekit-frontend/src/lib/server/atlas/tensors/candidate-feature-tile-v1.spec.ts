@@ -3,6 +3,7 @@ import { CANDIDATE_FEATURE_NAMES } from '../contracts/feature-extraction-v1.js';
 import { buildCandidateFeatureTileV1 } from './candidate-feature-tile-v1.js';
 import { adaptProfilesToCandidateFeatureMatrixV1 } from '../../retrieval/candidate-feature-matrix-adapter-v1.js';
 import type { ChunkRetrievalProfileV1 } from '../../retrieval/chunk-retrieval-profile-v1.js';
+import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-v1.js';
 
 function profile(packetKey: string, sourceRevision = 'sha256:source-a'): ChunkRetrievalProfileV1 {
   return {
@@ -33,8 +34,28 @@ function profile(packetKey: string, sourceRevision = 'sha256:source-a'): ChunkRe
 }
 
 function adapter() {
+  const profiles = [profile('a'), profile('b'), profile('c')];
   return adaptProfilesToCandidateFeatureMatrixV1({
-    profiles: [profile('a'), profile('b'), profile('c')],
+    profiles,
+    ordinalMap: materializeCandidateOrdinalMap({
+      candidateSnapshotRevision: 'snapshot:tile-fixture-v1',
+      workspaceRevision: 'sha256:workspace-a',
+      producerRevision: 'fixture:tile-ordinal-map-v1',
+      candidates: profiles.map((candidate) => ({
+        canonicalId: `canonical:${candidate.packetKey}`,
+        packetKey: candidate.packetKey,
+        sourceRef: candidate.sourceRef,
+        treeNodeId: null,
+        symbolVersionId: null,
+        workspaceRevision: candidate.workspaceRevision,
+        sourceRevision: candidate.sourceRevision,
+        graphRevision: null,
+        semanticRevision: null,
+        degradedIdentity: false,
+        evidenceRefs: [],
+        representationBindings: [],
+      })),
+    }),
     executorProvenance: [{ executor: 'fixture', executorRevision: 'fixture:v1' }],
   });
 }

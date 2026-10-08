@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bridge.js';
-import { parseNdjsonTypedEvidence } from './simdjson-typed-evidence-bridge.js';
+import { parseNdjsonTypedEvidence, parseNdjsonTypedEvidenceStream } from './simdjson-typed-evidence-bridge.js';
 
 const receiptSchema = z
 	.object({
@@ -125,5 +125,69 @@ describe('parseNdjsonTypedEvidence', () => {
 		expect(report.rejected).toHaveLength(1);
 		expect(report.rejected[0]!.code).toBe('JSON_PARSE_FAILED');
 		expect(report.rejected[0]!.reason).toContain('SIMDJSON_TYPED_EVIDENCE_PARSE_FAILED');
+	});
+
+	it('incrementally streams split UTF-8 chunks with the same envelope checksums', async () => {
+		const ndjson = [
+			JSON.stringify({ receiptId: 'stream-1', status: 'PASS', durationMs: 7, note: '東京 🧪' }),
+			JSON.stringify({ receiptId: 'stream-2', status: 'FAIL', durationMs: 9, note: 'café' }),
+		].join('\n');
+		const expected = parseNdjsonTypedEvidence({
+			artifactRef: 'artifact:test:stream',
+			artifactRevision: 'sha256:' + 'f'.repeat(64),
+			ndjson,
+			payloadSchema: receiptSchema.extend({ note: z.string() }),
+			payloadSchemaId: 'atlas.receipt.v1',
+		});
+		const bytes = new TextEncoder().encode(ndjson);
+		async function* splitBytes() {
+			for (let offset = 0; offset < bytes.length; offset += 7) yield bytes.slice(offset, offset + 7);
+		}
+		const actual = [];
+		for await (const row of parseNdjsonTypedEvidenceStream({
+			artifactRef: 'artifact:test:stream',
+			artifactRevision: 'sha256:' + 'f'.repeat(64),
+			chunks: splitBytes(),
+			payloadSchema: receiptSchema.extend({ note: z.string() }),
+			payloadSchemaId: 'atlas.receipt.v1',
+		})) actual.push(row);
+
+		expect(actual.map((row) => row.status)).toEqual(['ACCEPTED', 'ACCEPTED']);
+		expect(actual.map((row) => row.status === 'ACCEPTED' ? row.envelope.typedEvidenceChecksum : null))
+			.toEqual(expected.accepted.map((row) => row.envelope.typedEvidenceChecksum));
+		expect(actual.map((row) => row.recordIndex)).toEqual([0, 1]);
+	});
+
+	it('fails closed on malformed UTF-8 bytes', async () => {
+		async function* invalidBytes() {
+			yield new Uint8Array([0x7b, 0x22, 0x78, 0x22, 0x3a, 0x22, 0xc3, 0x28, 0x22, 0x7d]);
+		}
+		const consume = async () => {
+			for await (const _row of parseNdjsonTypedEvidenceStream({
+				artifactRef: 'artifact:test:invalid-utf8',
+				artifactRevision: 'sha256:' + '1'.repeat(64),
+				chunks: invalidBytes(),
+				payloadSchema: receiptSchema,
+				payloadSchemaId: 'atlas.receipt.v1',
+			})) { }
+		};
+		await expect(consume()).rejects.toThrow('NDJSON_UTF8_DECODE_FAILED');
+	});
+
+	it('rejects a record exceeding the configured line bound', async () => {
+		async function* oversizedLine() {
+			yield new TextEncoder().encode('{"receiptId":"long"}');
+		}
+		const consume = async () => {
+			for await (const _row of parseNdjsonTypedEvidenceStream({
+				artifactRef: 'artifact:test:oversized',
+				artifactRevision: 'sha256:' + '2'.repeat(64),
+				chunks: oversizedLine(),
+				payloadSchema: receiptSchema,
+				payloadSchemaId: 'atlas.receipt.v1',
+				maxLineBytes: 8,
+			})) { }
+		};
+		await expect(consume()).rejects.toThrow('maxLineBytes=8');
 	});
 });

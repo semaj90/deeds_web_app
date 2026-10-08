@@ -20,7 +20,17 @@ const { groundNlpFeatureV1 } = await tsImport(
   '../../sveltekit-frontend/src/lib/server/nlp/nlp-observation-lineage-v1.ts',
   import.meta.url,
 );
-const sourceBytes = Buffer.from('const x = 1;', 'utf8');
+const { projectGroundedNlpFactToOntologyTupleV1 } = await tsImport(
+  '../../sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts',
+  import.meta.url,
+);
+const sourceFixtureRelativePath = '.tmp/atlas/grounded-nlp-source-fixture-v1/fixture.ts';
+const sourceFixturePath = resolve(root, sourceFixtureRelativePath);
+mkdirSync(resolve(root, '.tmp/atlas/grounded-nlp-source-fixture-v1'), { recursive: true });
+writeFileSync(sourceFixturePath, 'const x = 1;', 'utf8');
+const sourceBytes = readFileSync(sourceFixturePath);
+const sourceSpan = sourceBytes.subarray(6, 11);
+assert.equal(sourceSpan.toString('utf8'), 'x = 1');
 const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 const canonicalJson = (value) => Array.isArray(value)
   ? `[${value.map(canonicalJson).join(',')}]`
@@ -39,7 +49,7 @@ const fact = groundNlpFeatureV1({
     confidence: 0.8,
   },
   context: {
-    sourceRef: 'src/fixture.ts',
+    sourceRef: sourceFixtureRelativePath,
     sourceRevision: sha256(sourceBytes),
     workspaceRevision: 'workspace:fixture-v1',
     providerRevision: 'langextract:fixture-v1',
@@ -51,6 +61,30 @@ const fact = groundNlpFeatureV1({
   taskRevision: sha256(Buffer.from('task block', 'utf8')),
   evidenceCardChecksum: sha256(Buffer.from('evidence card', 'utf8')),
 });
+
+assert.equal(fact.sourceRevision, sha256(sourceBytes));
+assert.equal(fact.evidenceSpan.textSha256, createHash('sha256').update(sourceSpan).digest('hex'));
+const reopenedSourceBytes = readFileSync(sourceFixturePath);
+assert.equal(sha256(reopenedSourceBytes), fact.sourceRevision);
+assert.equal(reopenedSourceBytes.subarray(fact.evidenceSpan.byteStart, fact.evidenceSpan.byteEnd).toString('utf8'), fact.surfaceText);
+assert.equal(sha256(reopenedSourceBytes.subarray(fact.evidenceSpan.byteStart, fact.evidenceSpan.byteEnd)), `sha256:${fact.evidenceSpan.textSha256}`);
+const ontologyProjection = projectGroundedNlpFactToOntologyTupleV1({
+  fact,
+  ontologyIds: ['ontology:fixture'],
+  conceptIds: ['concept:fixture'],
+  labelKind: 'tag',
+  ontologyRevision: 'ontology:fixture-v1',
+});
+const projectionJson = canonicalJson(ontologyProjection);
+const projectionChecksum = sha256(Buffer.from(projectionJson, 'utf8'));
+const projectionPath = resolve(root, '.tmp/atlas/grounded-nlp-ontology-tuple-projection-v1.json');
+writeFileSync(projectionPath, `${JSON.stringify(ontologyProjection, null, 2)}\n`, 'utf8');
+const projectionReadback = JSON.parse(readFileSync(projectionPath, 'utf8'));
+assert.equal(sha256(Buffer.from(canonicalJson(projectionReadback), 'utf8')), projectionChecksum);
+assert.equal(projectionReadback.tuple.provenance.evidenceSpanChecksum, `sha256:${fact.evidenceSpan.textSha256}`);
+assert.equal(projectionReadback.tuple.evidenceState, 'GATED');
+assert.equal(projectionReadback.canonicalAuthority, false);
+assert.equal(projectionReadback.writesPerformed, false);
 
 assert.equal(fact.canonicalAuthority, false);
 assert.equal(fact.ontologyPromotionAllowed, false);
@@ -112,6 +146,11 @@ const receiptBody = {
   taskRevision: fact.taskRevision,
   evidenceCardChecksum: fact.evidenceCardChecksum,
   evidenceSpan: fact.evidenceSpan,
+  sourceFixturePath: sourceFixtureRelativePath,
+  sourceSpanReadback: 'MATCH',
+  sourceSpanReadbackChecksum: sha256(reopenedSourceBytes.subarray(fact.evidenceSpan.byteStart, fact.evidenceSpan.byteEnd)),
+  ontologyTupleProjectionChecksum: projectionChecksum,
+  ontologyTupleProjectionReadback: 'MATCH',
   inputChecksum: sha256(Buffer.from(canonicalJson(fact), 'utf8')),
   dataclassReadbackChecksum: sha256(Buffer.from(canonicalJson(dataclassReadback), 'utf8')),
   pydanticReadbackChecksum: sha256(Buffer.from(canonicalJson(pydanticReadback), 'utf8')),
@@ -125,6 +164,7 @@ const receiptBody = {
   topologyUnavailableReason: 'NO_ADMITTED_TOPOLOGY_REPRESENTATION',
   evidenceRefs: [
     'sveltekit-frontend/src/lib/server/nlp/nlp-observation-lineage-v1.ts',
+    'sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts',
     'python/atlas_grounded_nlp_fact_v1.py',
     'python/oak_agent/grounded_nlp_fact_v1.py',
   ],
@@ -144,6 +184,9 @@ console.log(JSON.stringify({
   status: 'GROUNDED_NLP_DATACLASS_PYDANTIC_PARITY_PROVEN',
   factId: fact.factId,
   sourceRevision: fact.sourceRevision,
+  sourceSpanReadback: 'MATCH',
+  ontologyTupleProjectionReadback: 'MATCH',
+  ontologyTupleProjectionChecksum: projectionChecksum,
   taskRevision: fact.taskRevision,
   inputChecksum: sha256(Buffer.from(canonicalJson(fact), 'utf8')),
   dataclassReadbackChecksum: sha256(Buffer.from(canonicalJson(dataclassReadback), 'utf8')),

@@ -69,8 +69,8 @@ test('admits task-claim proof only with checksummed card and exact receipt linea
     receiptBindings: [{
       evidenceId, canonicalTaskRef: 'openspec-task:example/EX-1', proofEligible: true,
       workspaceCurrent: true, sourceCurrent: true, sourceRefsCurrent: true, taskSpanMatched: true,
-      sourceRevision: taskRevision, workspaceRevision,
-      sourceRefChecks: [{ current: true, expectedRevision: taskRevision, observedRevision: sourceRevision }],
+      sourceRevision, taskRevision, workspaceRevision,
+      sourceRefChecks: [{ current: true, expectedRevision: sourceRevision, observedRevision: sourceRevision }],
     }],
   });
   assert.equal(admission.admitted, true);
@@ -100,7 +100,43 @@ test('does not admit a reference-only or source-revision-mismatched evidence car
   });
   assert.equal(admission.admitted, false);
   assert.equal(admission.reason, 'DIAGNOSTIC_ONLY');
-  assert.deepEqual(admission.reasonCodes, ['DIAGNOSTIC_ONLY', 'NO_EXACT_VERIFIED_RECEIPT_BINDING', 'SOURCE_REVISION_MISMATCH']);
+  assert.deepEqual(admission.reasonCodes, [
+    'DIAGNOSTIC_ONLY',
+    'NO_EXACT_VERIFIED_RECEIPT_BINDING',
+    'RECEIPT_SOURCE_FILE_REVISION_MISMATCH',
+    'RECEIPT_TASK_REVISION_MISMATCH',
+    'SOURCE_REVISION_MISMATCH',
+  ]);
+});
+
+test('rejects receipts that bind the current task file but the wrong task-block revision', () => {
+  const taskRef = 'openspec/changes/example/tasks.md#L5';
+  const sourceRevision = `sha256:${'a'.repeat(64)}`;
+  const taskRevision = `sha256:${'b'.repeat(64)}`;
+  const workspaceRevision = `sha256:${'c'.repeat(64)}`;
+  const evidenceId = 'receipt:example:EX-1';
+  const unsignedCard = {
+    schema: 'atlas.evidence-card.v1', taskRef, changeId: 'example', taskId: 'EX-1',
+    claim: 'Validate exact evidence', proofState: 'PROVEN', retrievalUsable: true,
+    proofUsable: true, rejectionReasons: [], sourceRef: taskRef, sourceRevision,
+    conceptID: 'openspec:example:EX-1', confidenceScore: 1, contextBlob: 'PROVEN',
+    evidenceIds: [evidenceId], workspaceRevision,
+  };
+  const evidenceCard = { ...unsignedCard, checksum: sha256(canonicalJson(unsignedCard)) };
+  const admission = evaluateTaskEvidenceAdmissionV1({
+    taskCard: { stableKey: 'task:example:EX-1', taskRef, canonicalTaskRef: 'openspec-task:example/EX-1', taskRevision, sourceRevision, workspaceRevision },
+    evidenceTask: { taskRef, canonicalTaskRef: 'openspec-task:example/EX-1', taskHash: taskRevision },
+    evidenceCard,
+    receiptBindings: [{
+      evidenceId, canonicalTaskRef: 'openspec-task:example/EX-1', proofEligible: true,
+      workspaceCurrent: true, sourceCurrent: true, sourceRefsCurrent: true, taskSpanMatched: true,
+      sourceRevision, taskRevision: `sha256:${'d'.repeat(64)}`, workspaceRevision,
+      sourceRefChecks: [{ current: true, expectedRevision: sourceRevision, observedRevision: sourceRevision }],
+    }],
+  });
+  assert.equal(admission.admitted, false);
+  assert.ok(admission.reasonCodes.includes('RECEIPT_TASK_REVISION_MISMATCH'));
+  assert.ok(admission.reasonCodes.includes('NO_EXACT_VERIFIED_RECEIPT_BINDING'));
 });
 
 test('classifies every EvidenceCard against TaskCards, including orphan and ambiguous refs', () => {

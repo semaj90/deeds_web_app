@@ -115,7 +115,8 @@ class OakAgentResponseV1(_Strict):
 
 def propose_read_only(payload: dict) -> dict:
     """Return deterministic proposal only; do not call an agent or any store."""
-    request = OakAgentRequestV1.model_validate(payload)
+    request_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    request = OakAgentRequestV1.model_validate_json(request_json)
     proposal = build_hypergraph_fact_proposal_v1(
         request.grounded_fact.to_existing_bridge()
     )

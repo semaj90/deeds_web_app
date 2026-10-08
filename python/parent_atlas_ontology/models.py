@@ -60,6 +60,10 @@ class OntologyLinkedTupleProvenanceV1:
     ontologyVersion: Optional[str]
     nlpVersion: Optional[str]
     sourceRevision: Optional[str] = None
+    workspaceRevision: Optional[str] = None
+    taskRevision: Optional[str] = None
+    evidenceCardChecksum: Optional[str] = None
+    evidenceSpanChecksum: Optional[str] = None
     representationId: Optional[str] = None
     representationRevision: Optional[str] = None
     producerId: Optional[str] = None
@@ -82,6 +86,10 @@ class OntologyLinkedTupleProvenanceV1:
             ontologyVersion=d.get("ontologyVersion"),
             nlpVersion=d.get("nlpVersion"),
             sourceRevision=d.get("sourceRevision"),
+            workspaceRevision=d.get("workspaceRevision"),
+            taskRevision=d.get("taskRevision"),
+            evidenceCardChecksum=d.get("evidenceCardChecksum"),
+            evidenceSpanChecksum=d.get("evidenceSpanChecksum"),
             representationId=d.get("representationId"),
             representationRevision=d.get("representationRevision"),
             producerId=d.get("producerId"),
@@ -104,6 +112,10 @@ class OntologyLinkedTupleProvenanceV1:
             "ontologyVersion": self.ontologyVersion,
             "nlpVersion": self.nlpVersion,
             "sourceRevision": self.sourceRevision,
+            "workspaceRevision": self.workspaceRevision,
+            "taskRevision": self.taskRevision,
+            "evidenceCardChecksum": self.evidenceCardChecksum,
+            "evidenceSpanChecksum": self.evidenceSpanChecksum,
             "representationId": self.representationId,
             "representationRevision": self.representationRevision,
             "producerId": self.producerId,

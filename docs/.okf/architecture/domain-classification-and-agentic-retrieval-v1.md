@@ -83,12 +83,23 @@ The finite CPU/CUDA fixture roster also includes `H2GCN_CHANNEL_CONCAT_V1`, a bo
 
 `LIGHTGCN_PROPAGATION_V1` performs projection-free linear propagation over symmetrically normalized NetworkX adjacency and averages the initial embedding with each of 1–8 propagated layers. The embedding width and layer count are checksum-bound; this fixture does not include user/item loss, training, or recommendation evaluation. Formulation basis: [He et al., 2020](https://arxiv.org/abs/2002.02126).
 
+`FAGCN_FREQUENCY_ADAPTATION_V1` uses a shared feature-pair self-gate `tanh(gᵀ[hᵢ∥hⱼ])` that permits signed neighbor coefficients, degree-normalized message passing, an epsilon-scaled initial residual, and a bounded propagation depth. The gate and both projections are checksum-bound. This is a deterministic fixed-graph operator fixture, not the complete trained FAGCN model. Formulation basis: [Bo et al., 2021](https://arxiv.org/abs/2101.00797).
+
+`GATED_GCN_EDGE_GATE_V1` is a bounded residual edge-gated convolution over explicit edge-feature vectors. Each undirected topology edge must have exactly one endpoint-ordered feature binding with source revision, evidence refs, and producer revision; those values join the input checksum. Per-layer gates combine source-node, target-node, and edge-feature logits, normalize across each target's neighbors, and weight transformed messages before the residual update. Edge features remain fixed and the operator omits batch normalization and training, so this is not a full GatedGCN reproduction. Formulation basis: [Bresson and Laurent, 2017](https://arxiv.org/abs/1711.07553) and the GatedGCN definition in [Dwivedi et al., 2023](https://www.jmlr.org/papers/v24/22-0567.html).
+
+`MONET_GAUSSIAN_PSEUDOCOORD_V1` implements a bounded single-layer mixture-model convolution. It consumes the exact, lineage-bound edge feature vectors as pseudo-coordinates, evaluates checksum-bound diagonal Gaussian kernels, and sums each kernel's transformed neighbor messages. It omits learned pseudo-coordinate transforms, batch normalization, and training; it is a MoNet-style operator fixture, not a full model reproduction. Formulation basis: [Monti et al., CVPR 2017](https://arxiv.org/abs/1611.08402).
+
+`ECC_EDGE_CONDITIONED_FILTER_V1` is a bounded single-layer edge-conditioned convolution. It uses the lineage-bound edge feature vector to generate a per-edge linear filter, applies that filter to the neighboring node features, and sums messages with a shared root transform. The filter generator and root matrix are checksum-bound. The fixture uses symmetric edge attributes in the undirected input graph and a single linear filter generator; it is not full ECC training or directed-edge-label support. Formulation basis: [Simonovsky and Komodakis, CVPR 2017](https://arxiv.org/abs/1704.02901).
+
+`SAGE_LSTM_V1` completes a third bounded GraphSAGE aggregator alongside mean and max-pooling: it feeds each node's neighbors through a checksum-bound LSTM, then concatenates the final hidden state with the center feature before projection. Neighbors use ascending canonical ordinal order for deterministic replay; this intentionally replaces GraphSAGE's randomized neighbor permutation and is not a trained or sampled full-model reproduction. The per-node neighbor count is bounded at 256. Formulation basis: [Hamilton et al., NeurIPS 2017](https://arxiv.org/abs/1706.02216).
+
 The bounded operator coverage matrix below describes code and proof status, not full paper reproduction. Each row has a deterministic CPU fixture and is routed through the shared PyTorch device implementation; the CUDA column means an executor path exists in code, not that GPU execution or CPU/GPU parity has been run. Every model remains untrained and non-authoritative.
 
 | Operator | CPU fixture | Shared CUDA path | CUDA parity |
 | --- | --- | --- | --- |
 | `GCN_SYMMETRIC_V1` | Present | Present, unverified | Not proven |
 | `SAGE_MEAN_V1` | Present | Present, unverified | Not proven |
+| `SAGE_LSTM_V1` | Present | Present, unverified | Not proven |
 | `GAT_SINGLE_HEAD_V1` | Present | Present, unverified | Not proven |
 | `GAT_MULTI_HEAD_V1` | Present | Present, unverified | Not proven |
 | `GIN_SUM_MLP_V1` | Present | Present, unverified | Not proven |
@@ -100,6 +111,10 @@ The bounded operator coverage matrix below describes code and proof status, not 
 | `GCNII_LAYER_V1` | Present | Present, unverified | Not proven |
 | `ARMA_RECURSIVE_V1` | Present | Present, unverified | Not proven |
 | `LIGHTGCN_PROPAGATION_V1` | Present | Present, unverified | Not proven |
+| `FAGCN_FREQUENCY_ADAPTATION_V1` | Present | Present, unverified | Not proven |
+| `GATED_GCN_EDGE_GATE_V1` | Present | Present, unverified | Not proven |
+| `MONET_GAUSSIAN_PSEUDOCOORD_V1` | Present | Present, unverified | Not proven |
+| `ECC_EDGE_CONDITIONED_FILTER_V1` | Present | Present, unverified | Not proven |
 | `RGCN_LAYER_V1` | Present | Present, unverified | Not proven |
 | `COMPGCN_MULTIPLICATIVE_V1` | Present | Present, unverified | Not proven |
 | `GGNN_GRU_PROPAGATION_V1` | Present | Present, unverified | Not proven |

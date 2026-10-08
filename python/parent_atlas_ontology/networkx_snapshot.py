@@ -29,7 +29,12 @@ def _json_safe(value: Any) -> Any:
     return json.loads(json.dumps(value, sort_keys=True, default=str))
 
 
-def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
+def _canonical_graph_payload(
+    graph: Any,
+    graph_revision: str | None,
+    *,
+    request_local: bool = False,
+) -> dict[str, Any]:
     nodes = [
         {"graph_ordinal": ordinal, "node_id": str(node), "attributes": _json_safe(dict(graph.nodes[node]))}
         for ordinal, node in enumerate(sorted(graph.nodes, key=lambda n: _node_key(n, graph.nodes[n])))
@@ -51,7 +56,11 @@ def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
         for row in nodes
     ]
     payload = {
-        "schema": "atlas.ontology-networkx-projection.v1",
+        "schema": (
+            "atlas.ontology-networkx-request-local-projection.v1"
+            if request_local
+            else "atlas.ontology-networkx-projection.v1"
+        ),
         "graph_revision": graph_revision,
         "nodes": nodes,
         "edges": edges,
@@ -61,6 +70,8 @@ def _canonical_graph_payload(graph: Any, graph_revision: str) -> dict[str, Any]:
         "canonical_authority": False,
         "writes_performed": False,
     }
+    if request_local:
+        payload["graph_revision_available"] = False
     payload["projection_checksum"] = logical_checksum(payload)
     return payload
 
@@ -177,6 +188,15 @@ def build_networkx_snapshot(
         raise ValueError("graph_revision is required")
     graph = build_networkx_projection(assertions, relations)
     return _canonical_graph_payload(graph, graph_revision)
+
+
+def build_request_local_networkx_projection_v1(
+    assertions: Sequence[SemanticAssertion],
+    relations: Sequence[NarySemanticRelation] = tuple(),
+) -> dict[str, Any]:
+    """Build a deterministic, non-admitted projection without inventing a graph revision."""
+    graph = build_networkx_projection(assertions, relations)
+    return _canonical_graph_payload(graph, None, request_local=True)
 
 
 def replay_networkx_snapshot(

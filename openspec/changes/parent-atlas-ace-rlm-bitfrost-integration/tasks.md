@@ -2407,10 +2407,12 @@ revision authority envelope required by strict admission.
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Resolver contract and fail-closed parity | PROVEN_BOUNDED | `search-runtime-ace-resolver-v1.spec.ts` 4/4 |
+| Resolver contract and fail-closed parity | PROVEN_BOUNDED | `search-runtime-ace-resolver-v1.spec.ts` 5/5 |
 | SearchRuntime feature-bundle contract | IMPLEMENTED_NOT_LIVE | provider exists; no production resolver binding |
 | Canonical route source owner | OPEN | `docs/reports/ace-revision-source-owner-v1.json` |
 | Live ACE stream adoption | BLOCKED | legacy query-only cache remains in `api/ace/stream` |
+
+**2026-10-08 regression replay:** candidate-ordinal dense executor, Qdrant ordinal adapter, and SearchRuntime ACE resolver suites passed 13/13 under the isolated lane-contract Vitest config. The existing TaskCard/evidence-card parser, join, summary, and shard Node suites passed 14/14. These are contract/regression checks only; they do not establish a production ACE caller, evidence admission, or persistence.
 
 Next implementation gate: `ACE-FEATURE-SOURCE-OWNER-01` production adapter only. It must compose
 the existing SearchRuntime result and canonical ordinal/feature owners; it must not query Qdrant,
