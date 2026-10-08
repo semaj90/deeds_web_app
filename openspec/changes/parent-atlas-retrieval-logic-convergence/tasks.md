@@ -628,3 +628,10 @@ Qdrant v2 mirror matches neither). No canonical vector promotion until that and 
 - [ ] **QUERY-EXPANSION-01 — Bounded Ornith expansion only when needed.** Deterministic `KeywordBundleV1` first; call Ornith only on low retrieval
   confidence; cache the result (`QueryExpansionPacketV1`) keyed by normalized query hash + workspace/taxonomy/model/prompt revisions.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+
+## 2026-10-07 — Sidecar structural profile source
+
+- [ ] **RETRIEVAL-PROFILE-SIDECAR-01** — Reuse `sidecar-chunk-profile-bridge-v1.ts` as a candidate `ChunkRetrievalProfileV1` source for exact request candidates. It requires canonical identity to be supplied by an external lineage owner and rejects source-revision mismatch; it cannot resolve or invent `canonicalChunkId`, `packetKey`, workspace revision, or representation revision.
+- [ ] **RETRIEVAL-PROFILE-SIDECAR-02** — Keep the bridge partial by design: Tree-sitter fills lexical/structural only; admitted NB/LR classifier evidence may fill domain/topic; PyTorch shadow output stays excluded; semantic/topology/ontology remain missing until independently qualified. Missing groups must remain visible through the existing hydration presence/missing-group contract.
+- [ ] **RETRIEVAL-PROFILE-SIDECAR-03** — Do not wire SearchRuntime tile/residency or QAS feature callbacks to this adapter until the blocked snapshot/profile census resolves a current admitted candidate cohort. A valid parser observation does not satisfy packet/chunk lineage or graph/semantic revision gates.
