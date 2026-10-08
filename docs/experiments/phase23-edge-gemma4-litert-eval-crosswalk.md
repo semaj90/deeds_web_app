@@ -185,3 +185,38 @@ These commands have not been executed against a workstation in this work pass.
 - `phase23-edge-model-harness.spec.ts` adds a deferred-generation disposal ordering regression test.
 - Cancellation semantics remain **experimental**: engines that ignore abort can leave disposal pending. TODO: bounded timeout, worker termination, loading-state cancellation race, backend synchronous-throw handling, deterministic abort during GPU execution, and repeat browser memory measurements.
 - These changes were committed but not executed against a model/browser. Keep P23-EDGE-05 = NOT_PROVEN until actual tests and memory release evidence.
+
+## EDGE-05A–09 scaffold delivery and KAG/OaK proof preflight (2026-10-08)
+
+New source+spec files:
+- `phase23-litert-adapter.ts` / `.spec.ts`: explicit pinned runtime bridge; **not** actual LiteRT-LM JS binding.
+- `phase23-cache-identity.ts` / `.spec.ts`: full revision-based cache keys with TTL read validation; **not** IndexedDB transactions.
+- `phase23-eval-gym.ts` / `.spec.ts`: extraction citation and label scoring; **not** trained model or frozen authoritative Eval Gym suite.
+- `phase23-repair-admission.ts` / `.spec.ts`: synthetic approval-proposal guard; actual TaskCard/EvidenceCard owner join not wired.
+- `phase23-edge-model-harness.ts`: handles synchronous throwing backend methods via microtask trapping, checks abort before load/generate entry. Full browser proof outstanding.
+- `scripts/atlas/prove-kag-oak-context-request-v1.mjs`: request-scoped Postgres read-only transaction that inventories both ontology tables and rows for one packet; deliberately emits NOT_PROVEN pending authoritative lineage joins.
+
+Read-only proof:
+```bash
+node scripts/atlas/prove-kag-oak-context-request-v1.mjs --packet-key=<EXISTING_PACKET_KEY>
+```
+This command **only preflights** tuple tables and does not prove PostgreSQL→OaK→retrieval→ContextManifest yet. It must not be advertised as a full proof runner.
+
+### Remaining mandatory next steps
+- [ ] EDGE-05A run sync-throw and aborted-load tests against actual/fixture backends; ensure no unhandled rejection on synchronous throw.
+- [ ] EDGE-05B bound cancellation and worker termination without freeing tensors before completed GPU work; test hung load and repeated dispose.
+- [ ] EDGE-06 pin actual LiteRT-LM web release and API; implement PinnedLitertBridge and run token-generation browser proof.
+- [ ] EDGE-07 implement IndexedDB schema, atomic transactions, expiry and revision invalidation; cache authorization and quota policy.
+- [ ] EDGE-08 import canonical Eval Gym fixtures, record dataset checksum, test zh-TW/legal/code grounded annotations.
+- [ ] EDGE-09 attach authorized repair proposal to existing TaskCard↔EvidenceCard join, real policy/lease fencing/readback and receipt.
+- [ ] KAG-PROOF-01 find canonical ontology tuple source and writer between `atlas_ontology_tuples` and `atlas_ontology_linked_tuples`.
+- [ ] KAG-PROOF-02 resolve one revision-qualified NLP-grounded fact → tuple → OaK identity.
+- [ ] KAG-PROOF-03 replay retrieval and RRF with same request revision and evidence refs.
+- [ ] KAG-PROOF-04 verify ContextManifest selection/checksum and source-span readback, including failure cases.
+- [ ] EVIDENCE-01 execute all tests and run actual browser/DB probes before PASS.
+
+Run from frontend:
+```bash
+npx vitest run src/lib/ai/edge/
+```
+All new tests are **AUTHORED / NOT_RUN** in this GitHub-only pass; no production process started.
