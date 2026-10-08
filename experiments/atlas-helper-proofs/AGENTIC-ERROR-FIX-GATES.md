@@ -29,3 +29,18 @@ python -m unittest discover -p 'test_*.py' -v
 ```
 
 **No new database tables, remote calls, automatic model downloads, sidecar startup or agent mutations.** Source-only tests cannot establish deployed functionality.
+
+## New source snapshot membership gate (2026-10-08)
+- [x] SOURCE `agentic_fix_membership_gate.py` requires exact source SHA-256, workspace revision, source coordinates, slice checksum, source execution ID, packet key, symbol version and native tree-node ID in caller-supplied snapshot records.
+- [x] SOURCE `agentic_fix_smoke.py` accepts explicit file and snapshot arguments, emits proposal-only report to stdout. No SQL, model execution or source edits.
+- [x] TEST `test_agentic_fix_membership_gate.py`: 6 fixture assertions (exact, absent, ambiguous, stale, tampered, missing tree ID).
+- [ ] TODO: do not confuse `EXACT_SNAPSHOT_MEMBERSHIP` with live canonical admission; use the existing source-execution authority and check DB lineage under a read-only snapshot.
+- [ ] TODO: fetch actual native AST coordinates from Tree-sitter/ast-grep owners, verify span parity and use current symbol revisions; source chunk boundaries can differ.
+- [ ] TODO: run these tests in your checkout and record a revision-bound immutable receipt.
+- [ ] TODO: resolve owner drift between newer dirty Windows checkout and remote branch before merging.
+
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_agentic_fix_membership_gate.py test_agentic_fix_pipeline.py
+python agentic_fix_smoke.py --help
+```
