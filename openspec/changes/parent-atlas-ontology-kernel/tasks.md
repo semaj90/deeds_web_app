@@ -5328,3 +5328,13 @@ persistent memories until SPINE-04 yields a joined, verified outcome corpus.
 Current score remains **0/5 (0% end-to-end proven)**. No code/runtime/data changes are claimed by
 this task-list update; the pre-existing component evidence above remains bounded to its own tests,
 receipts, and recorded dates.
+
+
+## 2026-10-07 — External-doc HyperGraphRAG fabric alignment
+
+- [ ] **HGR-DOC-FABRIC-01** — Reuse `atlas_external_docs.py` BeautifulSoup/Firecrawl acquisition and `ChunkRecord` exact UTF-8 byte spans as the only external-doc ingestion owner. Do not add a second crawler or direct Neo4j/Qdrant writer.
+- [ ] **HGR-DOC-FABRIC-02** — Added `python/atlas_external_doc_hypergraph.py` as a read-only bridge from revision-qualified grounded facts to `HypergraphFactProposalV1`. The proposal carries source/workspace/producer revisions, exact evidence span/checksum, role-bearing participants, ontology/concept candidates, `graph_revision=None`, `PROPOSAL_ONLY`, `canonical_authority=false`, and `writes_performed=false`. **IMPLEMENTED_UNPROVEN** until focused unittest runs.
+- [ ] **HGR-DOC-FABRIC-03** — Added a direct adapter from existing external-doc chunk dictionaries (`ChunkRecord.to_dict()`) into the grounded-fact bridge with exact chunk-relative → source-absolute UTF-8 byte-span checks. This is an adapter only; the local `grounded_nlp_fact_v1.py` contract remains the grounded-fact owner after merge.
+- [ ] **HGR-DOC-FABRIC-04** — Admit a proposal to existing `OntologyLinkedTupleV1`/`HyperedgeV1` only after tuple/fact validation and an existing graph owner supplies the current compatible `graphRevision`. Ingestion must never invent graph revision or structural authority.
+- [ ] **HGR-DOC-FABRIC-05** — Keep external HyperGraphRAG's Neo4j adapter as a reference implementation only. Parent Atlas Neo4j remains a projection/mirror; canonical graph facts stay revision-qualified under the existing Postgres/tuple/hyperedge owners.
+- [ ] **HGR-DOC-FABRIC-06** — Extend the .okf glossary/topic corpus with the architecture note `docs/.okf/architecture/hypergraphrag-external-doc-fabric-v1.md`; keep OAK/OAKLIB ontology lookup, n-gram/Engram memory, MCP/Viterbi routing, LSP/Tree-sitter language evidence, ACE/BitFrost context, and GPU executors as distinct taxonomy branches.
