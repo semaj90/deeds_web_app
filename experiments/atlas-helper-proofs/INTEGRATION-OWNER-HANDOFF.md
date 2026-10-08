@@ -27,3 +27,20 @@ Run: `python -m unittest -v test_agentic_integration_gates.py`
 
 NO database migrations, indexing, native addon compilation, model downloads,
 source modifications or service activation occur in this scaffold.
+
+## DB-CATALOG-01 implementation (2026-10-08)
+- [x] `scripts/atlas/audit-live-ontology-tuple-lineage-v1.mjs`: catalog-only PostgreSQL transaction with `SET TRANSACTION READ ONLY`; no assumed join, table write or migration. Separately inventories `atlas_ontology_tuples` and `atlas_ontology_linked_tuples`, plus available evidence and symbol relations.
+- [x] `scripts/atlas/audit-live-ontology-tuple-lineage-v1.spec.mjs`: five source tests covering dual tables, missing evidence relations, shape and readback tampering.
+- [ ] Execute the script locally with a **fresh** scratch filename; validate deployed table/column/constraint inventory and record the report checksum.
+- [ ] Determine the tuple writer/reader owner from actual application call sites. A table's existence does not establish runtime authority.
+- [ ] TUPLE-LINEAGE-02: create a *separate* bounded read-only query for one exact tuple/provenance and authoritative source bytes after catalog results reveal real join keys.
+- [ ] TUPLE-STORE-03: independently re-read persisted lineage, then check Python/Pydantic/Arrow serialization parity. No writes.
+- [ ] OAK-CALLER-04: request-scoped resolver for admitted tuple and version-qualified external vocabulary.
+- [ ] RETRIEVAL-DAG-05: real SearchRuntime ordinal-map provider, ContextManifest readback and deployed CAS/approval adapter.
+
+From the repo root (Node dependencies including `pg` available):
+```sh
+node --test scripts/atlas/audit-live-ontology-tuple-lineage-v1.spec.mjs
+ATLAS_CATALOG_REPORT=.tmp/atlas/ontology-tuple-catalog-001.json node scripts/atlas/audit-live-ontology-tuple-lineage-v1.mjs
+```
+The audit's output uses exclusive file creation. Supply a new report path on subsequent runs. **Do not run** `prove-ontology-linked-tuple-persistence.mjs` for this read-only gate: it performs INSERT/DELETE.
