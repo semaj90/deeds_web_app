@@ -46,3 +46,21 @@ This is a **source census and worklist**, not deployed proof. Reuse owners, do n
 - [ ] Bind qualified outputs to admitted evidence and existing ContextManifest/DAG owner; proposal-only until then.
 
 Do not claim a passing test, production wiring or migrated store from this checklist.
+
+## P0 — Frozen semantic_768 → KMeans partition hint → exact oracle → graph expansion → learned rank
+- [x] SOURCE drafted: `semantic_partition_oracle.py` compares full exact squared-L2 ranking to centroid-restricted ranking and explicit typed-edge expansion.
+- [x] SOURCE drafted: `immutable_attempt_receipt.py` writes attempt-terminal receipts with exclusive-create semantics; HMM predictions remain advisory.
+- [x] TEST drafted: `test_partition_and_receipts.py` covers lost neighbors, graph expansion, forged edges, supersession and tamper readback.
+- [ ] TEST local unit suite in actual checkout, then record command, versions, outputs and immutable receipt.
+- [ ] REVIEW production exact oracle metric (L2 vs cosine/dot), normalization, float dtype, deterministic tie order and frozen embedding revision; CPU L2 cannot be claimed to prove cuVS exact parity.
+- [ ] TEST Recall@K for probe counts 1..N and full partition; record candidate counts, latency, recall and worst-case missed packet IDs.
+- [ ] REVIEW real graph edge source and graph revision before expansion; current experimental edges are supplied fixture tuples, not qualified Graphify provenance.
+- [ ] IMPLEMENT existing [C,25] candidate feature adapter mapping for centroid similarity/rank, PageRank/graph distance/n-ary overlap and exact lexicalness only after their individual provenance/normalization gates.
+- [ ] REVIEW receipt terminal outcomes and supersession owner: preserve old receipts append-only; no rewrites, no HMM authorization; bind retry/new attempt to a distinct ID.
+- [ ] PROVE deployment parity with existing Qdrant and cuVS exact executor; only then evaluate bounded candidate restrictions in proposal mode.
+
+To test:
+```sh
+cd experiments/atlas-helper-proofs
+python -m unittest -v test_partition_and_receipts.py
+```
