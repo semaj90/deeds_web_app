@@ -6,21 +6,7 @@ const output=document.getElementById('log');
 const x=Float32Array.from([1,2,3,4,-4,-3,-2,-1]);
 const w=Float32Array.from([1,.5,2,1.25]);
 const rows=2,width=4,epsilon=1e-5,atol=2e-5,rtol=1e-5;
-const shader=`struct Config { rows:u32, width:u32, epsilon:f32, padding:u32, };
-@group(0) @binding(0) var<storage,read> x:array<f32>;
-@group(0) @binding(1) var<storage,read> weight:array<f32>;
-@group(0) @binding(2) var<storage,read_write> out:array<f32>;
-@group(0) @binding(3) var<uniform> cfg:Config;
-@compute @workgroup_size(64)
-fn main(@builtin(global_invocation_id) id:vec3<u32>){
- let row=id.x; if(row>=cfg.rows){return;}
- var sum:f32=0.0;
- for(var j:u32=0u;j<cfg.width;j=j+1u){let v=x[row*cfg.width+j];sum=sum+v*v;}
- let scale=inverseSqrt(sum/f32(cfg.width)+cfg.epsilon);
- for(var j:u32=0u;j<cfg.width;j=j+1u){
-  out[row*cfg.width+j]=x[row*cfg.width+j]*scale*weight[j];
- }
-}`;
+let shader='';
 const f32=Math.fround;
 function cpu(){
  const result=[];
@@ -39,6 +25,7 @@ document.getElementById('run').addEventListener('click',async()=>{
     dispatchWorkgroups:1,modelLoaded:false,weightsDownloaded:false};
  let dev=null,dispatchFinished=false;
  try{
+   shader=await fetch('/atlas-kernels/rmsnorm-f32-v1.wgsl',{cache:'no-store'}).then(async response=>{if(!response.ok)throw Error('SHADER_ASSET_UNAVAILABLE');return response.text()});
   if(!isSecureContext||!navigator.gpu)throw Error('WEBGPU_UNAVAILABLE');
   const adapter=await navigator.gpu.requestAdapter();
   if(!adapter)throw Error('NO_GPU_ADAPTER');
