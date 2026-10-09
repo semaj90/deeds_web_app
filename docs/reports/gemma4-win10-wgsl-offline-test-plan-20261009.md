@@ -92,3 +92,12 @@ MTP, REAP and neural-memory proposals remain independent evidence domains. No co
 - [ ] CACHE-10 **Telemetry:** append-only receipt includes requestId/packetKey, artifactDigest, shaderDigest, backend, dtype/shape, bytesUploaded/readBack, cacheHitByTier, deviceGeneration, executionDurationMs, prefill/decode, blocked reason and authoritative evidenceRefs. Any comparator run with a missing backend is BLOCKED, not PASS.
 
 The immediate implementation increment is CACHE-02/CACHE-03 pure TypeScript contract + negative tests (without GPU, model, native build, dependency install or datastore writes). Later wire to verified existing registry/device owner; do NOT allocate persistent caches as part of contract-only work.
+
+## 2026-10-09 browser backend comparator and tensor descriptor scaffold
+- Added `src/lib/ai/gemma4-browser-backend-compare-v1.ts` and five `node:test` cases. Pure receipts, no inference. A fixture PASS is NOT a verified runtime receipt. Cross-export mismatches are labeled quality/throughput comparisons only. Measurements from actual model runs are pending.
+- Added `src/lib/ai/atlas-tensor-cache-descriptor-v1.ts` and four `node:test` cases. These reject stale generation/revisions, unsupported strides, checksum shape and byte-count mismatch. They do NOT create a cache, validate actual content bytes, authorize materialization or supersede the canonical packet registry.
+- [ ] BACKEND-REAL-01 Resolve compatible LiteRT-LM browser JS runtime and complete E2B web model artifact manifest; check licensing/import API and avoid automatic downloads. Keep separate from Transformers.js model owner.
+- [ ] BACKEND-REAL-02 Run sequential user-approved browser inference with same logical fixture, real model/tokenizer SHA-256 and execution timing. Independently verify receipts before comparison; do not trust caller self-reported PASS.
+- [ ] CACHE-IMPLEMENT-01 Check existing packet registry, device owner and evidence writer. Bind descriptors only after authoritative lease and byte/digest checks, with IndexedDB/OPFS and WebGPU cache as separately owned materializations.
+- Offline, no-install commands from `sveltekit-frontend`: `npx --no-install tsx --test src/lib/ai/gemma4-browser-backend-compare-v1.test.ts` and `npx --no-install tsx --test src/lib/ai/atlas-tensor-cache-descriptor-v1.test.ts`.
+- **Test execution:** not performed by GitHub edits. No local runtime, browser, model or GPU proof claimed.
