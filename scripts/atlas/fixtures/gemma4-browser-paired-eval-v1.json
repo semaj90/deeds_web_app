@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.gemma4-browser-paired-eval-fixtures.v1",
+  "description": "Deterministic prompt fixtures; no model download or invocation.",
+  "cases": [
+    {
+      "id": "classify-explicit",
+      "task": "classification",
+      "prompt": "Classify the intent of: Find the function that checks source revisions. Return JSON with intent only.",
+      "expect": {
+        "intent": "code_search"
+      }
+    },
+    {
+      "id": "grounding-no-relation",
+      "task": "grounded_extract",
+      "prompt": "Source excerpt: 'Consider Valkey caching later.' Extract only explicit typed operational relationships as JSON.",
+      "expect": {
+        "relations": [],
+        "mustAbstainFrom": [
+          "USES_VALKEY"
+        ]
+      }
+    },
+    {
+      "id": "abstain-unknown",
+      "task": "abstention",
+      "prompt": "Does function foo definitely call a remote service? No source is provided. Return supported evidence only.",
+      "expect": {
+        "abstain": true
+      }
+    },
+    {
+      "id": "unicode",
+      "task": "classification",
+      "prompt": "請分類：搜尋程式碼中的函式定義。回傳 JSON intent。",
+      "expect": {
+        "intent": "code_search"
+      }
+    }
+  ]
+}
