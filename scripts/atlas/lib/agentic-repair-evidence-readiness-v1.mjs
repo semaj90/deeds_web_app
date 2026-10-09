@@ -37,7 +37,12 @@ const DEFERRED = Object.freeze({
   orchestration: 'TODO: current request caller, task/evidence receipt, approved repair tournament and independent validator',
 });
 const nonblank = (value) => typeof value === 'string' && value.trim().length > 0;
-const stable = (value) => JSON.stringify(value, Object.keys(value).sort());
+const stable = (value) => JSON.stringify(value, (_key, val) => {
+  if (val && typeof val === 'object' && !Array.isArray(val)) {
+    return Object.fromEntries(Object.entries(val).sort(([a], [b]) => a.localeCompare(b)));
+  }
+  return val;
+});
 export function evaluateRepairEvidenceReadiness(manifest) {
   if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
     return { status:'BLOCKED_INVALID_INPUT', canMutate:false, canonicalAuthority:false, writesPerformed:false, checks:{}, todos:['TODO: provide JSON object of existing evidence receipts'] };
