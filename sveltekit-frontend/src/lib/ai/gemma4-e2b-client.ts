@@ -4,7 +4,7 @@
  * Primary client-side LLM. Falls back to 270M ONNX (client-router handles fallback).
  *
  * Pipeline:
- *   1. Check GPU memory via navigator.gpu adapter limits
+ *   1. Require independently verified GPU budget and offline admission (currently blocked)
  *   2. Load Gemma4ForConditionalGeneration with q4f16 + WebGPU
  *   3. Apply chat template → generate → stream tokens
  *   4. Cache synthesis results in IndexedDB for RAG/KAG/DAG responses
@@ -57,35 +57,31 @@ let _model: any = null;
 let _processor: any = null;
 let _tokenizer: any = null;
 let _loadPromise: Promise<void> | null = null;
-let _gpuMemoryMB: number | null = null;
 let _loadError: string | null = null;
 
-// ── GPU Memory Check ─────────────────────────────────────────────────────
-
-/**
- * Estimate available WebGPU memory from adapter limits.
- * Returns null if WebGPU is unavailable.
- */
-async function estimateGPUMemoryMB(): Promise<number | null> {
-	if (typeof navigator === 'undefined' || !navigator.gpu) return null;
-
-	try {
-		const gpu = navigator.gpu as { requestAdapter(): Promise<{ limits: Record<string, number> } | null> };
-		const adapter = await gpu.requestAdapter();
-		if (!adapter) return null;
-
-		// maxBufferSize is the best proxy for total GPU memory available
-		const maxBuffer = adapter.limits.maxBufferSize;
-		// Also check maxStorageBufferBindingSize as a secondary signal
-		const maxStorage = adapter.limits.maxStorageBufferBindingSize;
-
-		// Use the larger value, convert bytes → MB
-		const estimatedMB = Math.round(Math.max(maxBuffer, maxStorage) / (1024 * 1024));
-		_gpuMemoryMB = estimatedMB;
-		return estimatedMB;
-	} catch {
-		return null;
-	}
+// ── GPU Memory Admission ────────────────────────────────────────────────
+// WebGPU maxBufferSize and maxStorageBufferBindingSize are per-resource limits,
+// NOT total/free VRAM. Until a separately verified allocation budget and an
+// explicit offline model policy are provided, this entrypoint fails closed.
+// Do not probe/request a GPUDevice and do not import Transformers.js on denial.
+export function evaluateE2BMemoryAdmission(input: {
+  browser: boolean;
+  webgpu: boolean;
+  minimumMB: number;
+  verifiedFreeMB?: number | null;
+}): E2BStatus {
+  const loaded = _model !== null;
+  if (!input.browser) return { available: false, loaded, gpuMemoryMB: null, reason: 'ssr' };
+  if (!input.webgpu) return { available: false, loaded, gpuMemoryMB: null, reason: 'no-webgpu' };
+  // Intentionally never infer available memory from adapter.limits.
+  if (input.verifiedFreeMB == null || !Number.isFinite(input.verifiedFreeMB)) {
+    return { available: false, loaded, gpuMemoryMB: null, reason: 'gpu-memory-unverified' };
+  }
+  if (input.verifiedFreeMB < input.minimumMB) {
+    return { available: false, loaded, gpuMemoryMB: input.verifiedFreeMB, reason: 'gpu-memory-low' };
+  }
+  // Memory alone does not authorize a remote-model download or GPU allocation.
+  return { available: false, loaded, gpuMemoryMB: input.verifiedFreeMB, reason: 'model-admission-unverified' };
 }
 
 // ── Model Loading ────────────────────────────────────────────────────────
@@ -94,34 +90,11 @@ async function estimateGPUMemoryMB(): Promise<number | null> {
  * Check if E2B can run on this device (WebGPU available + sufficient memory).
  */
 export async function isE2BAvailable(): Promise<E2BStatus> {
-	if (typeof window === 'undefined') {
-		return { available: false, loaded: false, gpuMemoryMB: null, reason: 'ssr' };
-	}
-
-	if (!navigator.gpu) {
-		return { available: false, loaded: false, gpuMemoryMB: null, reason: 'no-webgpu' };
-	}
-
-	const memMB = await estimateGPUMemoryMB();
-	if (memMB === null) {
-		return { available: false, loaded: false, gpuMemoryMB: null, reason: 'gpu-probe-failed' };
-	}
-
-	if (memMB < CLIENT_E2B_MIN_GPU_MB) {
-		return {
-			available: false,
-			loaded: false,
-			gpuMemoryMB: memMB,
-			reason: `gpu-memory-low (${memMB}MB < ${CLIENT_E2B_MIN_GPU_MB}MB required)`
-		};
-	}
-
-	return {
-		available: true,
-		loaded: _model !== null,
-		gpuMemoryMB: memMB,
-		reason: 'ok'
-	};
+  return evaluateE2BMemoryAdmission({
+    browser: typeof window !== 'undefined',
+    webgpu: typeof navigator !== 'undefined' && !!navigator.gpu,
+    minimumMB: CLIENT_E2B_MIN_GPU_MB
+  });
 }
 
 /**
@@ -148,7 +121,7 @@ async function _initE2BInternal(): Promise<void> {
 	}
 
 	console.info(`[E2B] Loading Gemma 4 E2B (${CLIENT_E2B_DTYPE}) on ${CLIENT_E2B_DEVICE}...`);
-	console.info(`[E2B] GPU memory estimate: ${status.gpuMemoryMB}MB`);
+	console.info(`[E2B] Verified GPU memory budget: ${status.gpuMemoryMB}MB`);
 
 	const startMs = performance.now();
 
