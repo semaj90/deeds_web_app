@@ -37,6 +37,21 @@ class DomainOracleTests(unittest.TestCase):
     def test_invalid_subject_kind(self):
         with self.assertRaises(ValidationError):
             DomainClassificationV1.model_validate({**BASE, "subjectKind": "unknown"})
+    def test_evidence_ref_maximum(self):
+        row = {**BASE, "evidenceRefs": ["fixture:span:" + str(i) for i in range(64)]}
+        self.assertEqual(len(DomainClassificationV1.model_validate(row).evidenceRefs), 64)
+        with self.assertRaises(ValidationError):
+            DomainClassificationV1.model_validate({**row, "evidenceRefs": row["evidenceRefs"] + ["fixture:extra"]})
+    def test_nonfinite_confidence(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(value=value), self.assertRaises(ValidationError):
+                DomainClassificationV1.model_validate({**BASE, "confidence": value})
+    def test_domain_lifecycle_rejects_admission_claim(self):
+        with self.assertRaises(ValidationError):
+            DomainClassificationV1.model_validate({**BASE, "lifecycle": "PROVEN"})
+    def test_no_auto_coercion_of_evidence_ref(self):
+        with self.assertRaises(ValidationError):
+            DomainClassificationV1.model_validate({**BASE, "evidenceRefs": [123]})
     def test_canonical_sorted(self):
         self.assertEqual(canonical({"b": 1, "a": 2}), '{"a":2,"b":1}')
 
