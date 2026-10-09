@@ -1,0 +1,12 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {planOntologyContextInputsV1 as plan} from './derive-ontology-context-inputs-v1.mjs';
+const candidate={packetKey:'p',sourceRef:'src/file.ts',sourceRevision:'sr',workspaceRevision:'wr',ordinalMapChecksum:'map',ordinalMapIntegrityVerified:true};
+const relation={kind:'RELATION',packetKey:'p',sourceRef:'src/file.ts',sourceRevision:'sr',spanVerified:true,participantRolesVerified:true,evidenceRef:'span:e'};
+const tuple={tupleId:'t',packetKey:'p',sourceRef:'src/file.ts',provenance:{sourceRevision:'sr',ontologyRevision:'or'},evidenceRefs:['span:e'],admissionReadbackVerified:true};
+const manifest={identityChecksumVerified:true,sourceRefs:['src/file.ts'],admittedTupleIds:['t'],sourceRevision:'sr',ontologyRevision:'or'};
+test('cache hint alone cannot become candidate or fact',()=>{const x=plan({cacheHint:{centroidId:7}});assert.equal(x.nextRequiredOwner,'CANONICAL_CANDIDATE');assert.equal(x.verifiedFactAdmission,false)});
+test('candidate alone leaves grounded relation missing',()=>{const x=plan({candidate});assert.equal(x.nextRequiredOwner,'GROUNDED_RELATION')});
+test('concept mention cannot become relation',()=>{const x=plan({candidate,relation:{...relation,kind:'CONCEPT'}});assert.equal(x.nextRequiredOwner,'GROUNDED_RELATION')});
+test('unverified or absent tuple blocks manifest',()=>{const x=plan({candidate,relation,tuple:{...tuple,admissionReadbackVerified:false},manifest});assert.equal(x.nextRequiredOwner,'ONTOLOGY_TUPLE_READBACK')});
+test('manifest must bind exact source',()=>{const x=plan({candidate,relation,tuple,manifest:{...manifest,sourceRefs:['tasks.md']}});assert.equal(x.nextRequiredOwner,'CONTEXT_MANIFEST_READBACK')});
+test('even all coherent synthetic inputs are not admission',()=>{const x=plan({candidate,relation,tuple,manifest});assert.equal(x.nextRequiredOwner,null);assert.equal(x.liveProven,false)});
