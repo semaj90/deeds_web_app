@@ -3,9 +3,47 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body><h1>Parent Atlas — WebGPU kernel parity</h1>
 <p>Explicit local GPU test. No model weights, external requests, DB writes, or automatic initialization.</p>
-<button id="run">Run 2×2 WGSL matmul</button><pre id="result">Not run</pre>
+<button id="run">Run 2×2 WGSL matmul</button> <button id="cancel" disabled>Cancel</button> <label><input type="checkbox" id="persist"> Save validated diagnostic to IndexedDB (opt-in)</label><p id="state">idle</p><pre id="result">Not run</pre>
 <script type="module">
 const button=document.getElementById('run'), out=document.getElementById('result');
+const cancelButton=document.getElementById('cancel'), persist=document.getElementById('persist'), stateLabel=document.getElementById('state');
+let generation=0, activeDevice=null;
+const states={idle:['probing'],probing:['ready','failed','blocked'],ready:['executing','failed'],executing:['validating','failed'],validating:['complete','failed'],complete:['probing'],failed:['probing'],blocked:['probing']};
+let state='idle';
+function transition(next){if(!states[state]?.includes(next))throw new Error('INVALID_STATE_TRANSITION');state=next;stateLabel.textContent=next;}
+async function cacheDiagnostic(receipt) {
+ if(!persist.checked)return 'NOT_REQUESTED';
+ if(!receipt.actualWebgpuExecution||receipt.status!=='REAL_WEBGPU_CPU_PARITY')return 'INVALID_DIAGNOSTIC';
+ const identity={shader:receipt.shaderSha256,revision:'wgsl-matmul-v1',browser:navigator.userAgent,
+  model:'NONE',sourceRevision:'NONE'};
+ const bytes=new TextEncoder().encode(JSON.stringify(receipt));
+ const checksum=await sha(bytes);
+ const key=await sha(new TextEncoder().encode(JSON.stringify(identity)));
+ const database=await new Promise((resolve,reject)=>{
+  const req=indexedDB.open('deeds-ai-cache',5);
+  req.onerror=()=>reject(req.error);
+  req.onupgradeneeded=()=>{req.transaction.abort();reject(new Error('CACHE_SCHEMA_NOT_INITIALIZED_BY_APP'));};
+  req.onsuccess=()=>resolve(req.result);
+ });
+ try {
+  if(!database.objectStoreNames.contains('gpuResults'))return 'GPU_RESULT_STORE_MISSING';
+  const stored=await new Promise((resolve,reject)=>{
+   const tx=database.transaction('gpuResults','readwrite');
+   tx.objectStore('gpuResults').put({computeHash:key,backend:'webgpu-diagnostic',
+    result:{receipt,checksum,identity},timestamp:Date.now()});
+   tx.oncomplete=()=>resolve(true);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+  });
+  const row=await new Promise((resolve,reject)=>{
+   const tx=database.transaction('gpuResults','readonly');
+   const req=tx.objectStore('gpuResults').get(key);
+   req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+  });
+  const digest=await sha(new TextEncoder().encode(JSON.stringify(row?.result?.receipt)));
+  return stored&&digest===checksum?'READBACK_MATCH':'READBACK_MISMATCH';
+ }finally{database.close();}
+}
+cancelButton.addEventListener('click',()=>{generation++;activeDevice?.destroy();cancelButton.disabled=true;state='failed';stateLabel.textContent='cancelled (GPU device destroyed; completion ignored)';});
+
 const A=new Float32Array([1,2,3,4]), B=new Float32Array([5,6,7,8]);
 const oracle=[19,22,43,50];
 const code=`@group(0) @binding(0) var<storage, read> a: array<f32>;
@@ -28,7 +66,8 @@ const sha = async bytes => {
   return 'sha256:'+Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2,'0')).join('');
 };
 button.addEventListener('click',async()=>{
- button.disabled=true;
+ const runId=++generation;
+ button.disabled=true;cancelButton.disabled=false;transition('probing');
  const start=performance.now();
  const receipt={schema:'atlas.webgpu-real-kernel-probe.v1',status:'NOT_PROVEN',
   actualWebgpuExecution:false,modelLoaded:false,modelInference:false,canonicalAuthority:false,
@@ -39,7 +78,11 @@ button.addEventListener('click',async()=>{
   if(!isSecureContext||!navigator.gpu)throw new Error('WEBGPU_UNAVAILABLE_OR_INSECURE_CONTEXT');
   const adapter=await navigator.gpu.requestAdapter();
   if(!adapter)throw new Error('ADAPTER_UNAVAILABLE');
-  device=await adapter.requestDevice();
+  if(runId!==generation)throw new Error('PROBE_CANCELLED');
+  transition('ready');
+  device=await adapter.requestDevice();activeDevice=device;
+  if(runId!==generation)throw new Error('PROBE_CANCELLED');
+  transition('executing');
   const module=device.createShaderModule({code});
   const diagnostics=await module.getCompilationInfo();
   if(diagnostics.messages.some(x=>x.type==='error'))throw new Error('WGSL_COMPILE_ERROR');
@@ -67,12 +110,20 @@ button.addEventListener('click',async()=>{
   const observed=Array.from(new Float32Array(read.getMappedRange().slice(0)));
   read.unmap();
   const maxAbsError=Math.max(...oracle.map((v,i)=>Math.abs(v-observed[i])));
+  if(runId!==generation)throw new Error('PROBE_CANCELLED');
+  transition('validating');
   receipt.shaderSha256=await sha(new TextEncoder().encode(code));
   receipt.actualWebgpuExecution=true;receipt.observed=observed;receipt.maxAbsError=maxAbsError;
   receipt.status=observed.every(Number.isFinite)&&maxAbsError<=receipt.tolerance?
    'REAL_WEBGPU_CPU_PARITY':'WEBGPU_NUMERICAL_MISMATCH';
- }catch(e){receipt.status='WEBGPU_PROBE_FAILED';receipt.reason=String(e?.message??e).slice(0,120);}
+  transition(receipt.status==='REAL_WEBGPU_CPU_PARITY'?'complete':'failed');
+ }catch(e){receipt.status='WEBGPU_PROBE_FAILED';receipt.reason=String(e?.message??e).slice(0,120);if(runId===generation&&state!=='failed')transition('failed');}
  finally{for(const b of buffers)b.destroy();device?.destroy();receipt.durationMs=performance.now()-start;
-  out.textContent=JSON.stringify(receipt,null,2);button.disabled=false;}
+  if(runId===generation){
+    try{receipt.cacheStatus=await cacheDiagnostic(receipt);}catch(e){receipt.cacheStatus='CACHE_FAILED:'+String(e?.message??e).slice(0,70);}
+    out.textContent=JSON.stringify(receipt,null,2);
+  }
+  if(activeDevice===device)activeDevice=null;
+  cancelButton.disabled=true;button.disabled=false;}
 });
 </script></body></html>
