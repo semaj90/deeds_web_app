@@ -3,6 +3,57 @@
   "description": "Curated official docs pages for OKF dev corpus generation",
   "sources": [
     {
+      "source_id": "zod",
+      "title": "Zod Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["typescript", "schema_validation", "error_handling"],
+      "pages": ["https://zod.dev/"]
+    },
+    {
+      "source_id": "redis-valkey",
+      "title": "Redis and Valkey Documentation",
+      "kind": "official_docs",
+      "domain_class": "cache",
+      "focus_tags": ["key_value", "expiry", "streams", "pubsub", "ace", "bitfrost", "json_packets", "vector_similarity", "optional_search_module"],
+      "pages": [
+        "https://valkey.io/topics/",
+        "https://valkey.io/topics/valkey-json/",
+        "https://valkey.io/topics/streams-intro/",
+        "https://valkey.io/topics/pubsub/",
+        "https://valkey.io/topics/keyspace/",
+        "https://valkey.io/topics/search-query/",
+        "https://valkey.io/topics/valkey.conf/"
+      ]
+    },
+    {
+      "source_id": "svelte-typescript-bits-ui",
+      "title": "SvelteKit, Svelte, TypeScript, and Bits UI Documentation",
+      "kind": "official_docs",
+      "domain_class": "documentation",
+      "focus_tags": ["sveltekit", "svelte5", "typescript", "bits_ui", "routing", "runes", "accessibility"],
+      "pages": [
+        "https://bits-ui.com/docs/getting-started",
+        "https://svelte.dev/docs/kit",
+        "https://svelte.dev/docs/svelte",
+        "https://www.typescriptlang.org/docs/"
+      ]
+    },
+    {
+      "source_id": "drizzle-orm-kit",
+      "title": "Drizzle ORM and Drizzle Kit Documentation",
+      "kind": "official_docs",
+      "domain_class": "database",
+      "focus_tags": ["drizzle_orm", "postgresql", "pgvector", "indexes", "migrations"],
+      "pages": [
+        "https://orm.drizzle.team/docs/column-types/pg",
+        "https://orm.drizzle.team/docs/drizzle-kit-generate",
+        "https://orm.drizzle.team/docs/drizzle-kit-migrate",
+        "https://orm.drizzle.team/docs/guides/vector-similarity-search",
+        "https://orm.drizzle.team/docs/indexes-constraints"
+      ]
+    },
+    {
       "source_id": "firecrawl",
       "title": "Firecrawl Docs",
       "kind": "official_docs",
@@ -28,12 +79,284 @@
       "pages": [
         "https://qdrant.tech/documentation/manage-data/quantization/",
         "https://qdrant.tech/course/essentials/day-4/rescoring-oversampling-indexing/",
+        "https://qdrant.tech/documentation/concepts/points/",
         "https://qdrant.tech/documentation/manage-data/points/",
         "https://qdrant.tech/documentation/manage-data/vectors/",
         "https://qdrant.tech/documentation/manage-data/collections/",
         "https://qdrant.tech/documentation/search/hybrid-queries/",
         "https://api.qdrant.tech/api-reference/search/query-points"
       ]
+    },
+    {
+      "source_id": "mcp",
+      "title": "Model Context Protocol Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["mcp", "protocol", "tools", "resources", "prompts", "transport", "authorization"],
+      "pages": [
+        "https://modelcontextprotocol.io/docs/",
+        "https://modelcontextprotocol.io/specification/"
+      ]
+    },
+    {
+      "source_id": "langchain-langgraph-python",
+      "title": "LangChain and LangGraph Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["langchain", "langgraph", "python", "agents", "graph-workflows"],
+      "pages": [
+        "https://docs.langchain.com/oss/python/langchain/overview",
+        "https://docs.langchain.com/oss/python/langgraph/overview"
+      ]
+    },
+    {
+      "source_id": "langchain-langgraph-typescript",
+      "title": "LangChain and LangGraph JavaScript Documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["langchain", "langgraph", "javascript", "typescript", "agents", "graph-workflows"],
+      "pages": [
+        "https://docs.langchain.com/oss/javascript/langchain/overview",
+        "https://docs.langchain.com/oss/javascript/langgraph/overview"
+      ]
+    },
+    {
+      "source_id": "tree-sitter-ast-grep",
+      "title": "Tree-sitter, ast-grep, and N-API Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["tree_sitter", "ast_grep", "syntax_trees", "structural_search", "napi"],
+      "pages": [
+        "https://ast-grep.github.io/guide/",
+        "https://napi.rs/",
+        "https://tree-sitter.github.io/tree-sitter/"
+      ]
+    },
+    {
+      "source_id": "networkx-python",
+      "title": "NetworkX Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "graph",
+      "focus_tags": ["networkx", "graph-algorithms", "pagerank", "graph-traversal", "communities"],
+      "pages": ["https://networkx.org/documentation/stable/"]
+    },
+    {
+      "source_id": "rust-workspace",
+      "title": "Rust, Rayon, Tokio, and Serde Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["rust", "rayon", "tokio", "serde", "native-runtime"],
+      "pages": [
+        "https://doc.rust-lang.org/book/",
+        "https://docs.rs/rayon/latest/rayon/",
+        "https://docs.rs/tokio/latest/tokio/",
+        "https://serde.rs/"
+      ]
+    },
+    {
+      "source_id": "pytorch-numpy-pyarrow",
+      "title": "PyTorch, NumPy, and Apache Arrow Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["pytorch", "numpy", "pyarrow", "tensor", "columnar-data"],
+      "pages": [
+        "https://arrow.apache.org/docs/cpp/",
+        "https://arrow.apache.org/docs/python/",
+        "https://numpy.org/doc/stable/",
+        "https://pytorch.org/cppdocs/",
+        "https://pytorch.org/docs/stable/"
+      ]
+    },
+    {
+      "source_id": "fastapi-pydantic-langextract",
+      "title": "FastAPI, Pydantic, and LangExtract Documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["fastapi", "pydantic", "langextract", "grounded-extraction", "structured-output"],
+      "pages": [
+        "https://docs.pydantic.dev/latest/",
+        "https://fastapi.tiangolo.com/",
+        "https://github.com/google/langextract"
+      ]
+    },
+    {
+      "source_id": "rapids-cuvs-python",
+      "title": "RAPIDS cuVS Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cuvs", "cuda", "nearest-neighbors", "cagra", "clustering"],
+      "pages": ["https://docs.rapids.ai/api/cuvs/stable/"]
+    },
+    {
+      "source_id": "rapids-cugraph-python",
+      "title": "RAPIDS cuGraph Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cugraph", "cuda", "graph-algorithms", "networkx-backend"],
+      "pages": [
+        "https://docs.rapids.ai/api/cugraph/stable/",
+        "https://docs.rapids.ai/api/cugraph/stable/api_docs/"
+      ]
+    },
+    {
+      "source_id": "onnx-runtime",
+      "title": "ONNX Runtime Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["onnx-runtime", "inference", "execution-providers", "cpu-gpu"],
+      "pages": ["https://onnxruntime.ai/docs/"]
+    },
+    {
+      "source_id": "go-grpc-protobuf-pgx",
+      "title": "Go gRPC, Protocol Buffers, and pgx Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["go", "grpc", "protobuf", "pgx", "service-runtime"],
+      "pages": [
+        "https://grpc.io/docs/languages/go/",
+        "https://pkg.go.dev/github.com/jackc/pgx/v5/",
+        "https://protobuf.dev/reference/go/go-generated/"
+      ]
+    },
+    {
+      "source_id": "oaklib",
+      "title": "OAKlib Documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["oaklib", "ontology", "knowledge-graph", "ontology-adapters"],
+      "pages": ["https://oaklib.readthedocs.io/en/latest/"]
+    },
+    {
+      "source_id": "beautifulsoup-firecrawl",
+      "title": "Beautiful Soup and Firecrawl Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["beautifulsoup", "firecrawl", "html-parsing", "bounded-crawling"],
+      "pages": [
+        "https://www.crummy.com/software/BeautifulSoup/bs4/doc/",
+        "https://docs.firecrawl.dev/"
+      ]
+    },
+    {
+      "source_id": "rapids-cudf-python",
+      "title": "RAPIDS cuDF and pylibcudf Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cudf", "pylibcudf", "cuda", "columnar-data"],
+      "pages": [
+        "https://docs.rapids.ai/api/cudf/stable/",
+        "https://docs.rapids.ai/api/cudf/latest/pylibcudf/api_docs/"
+      ]
+    },
+    {
+      "source_id": "rapids-libcudf-cpp",
+      "title": "RAPIDS libcudf C++ Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "libcudf", "cpp", "cuda", "memory-resources"],
+      "pages": [
+        "https://docs.rapids.ai/api/libcudf/stable/",
+        "https://docs.rapids.ai/api/libcudf/stable/classes.html",
+        "https://docs.rapids.ai/api/libcudf/stable/modules.html"
+      ]
+    },
+    {
+      "source_id": "rapids-cugraph-cpp",
+      "title": "RAPIDS cuGraph C++ Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cugraph", "cpp", "cuda", "graph-algorithms"],
+      "pages": [
+        "https://docs.rapids.ai/api/cugraph/stable/graph_support/cugraph_cpp/",
+        "https://docs.rapids.ai/api/cugraph/stable/api_docs/cugraph_cpp/algorithms_cpp/",
+        "https://docs.rapids.ai/api/cugraph/stable/api_docs/libcugraph/"
+      ]
+    },
+    {
+      "source_id": "cuda-cublas-cpp",
+      "title": "NVIDIA cuBLAS Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["cuda", "cublas", "gemm", "gpu-linear-algebra"],
+      "pages": ["https://docs.nvidia.com/cuda/cublas/index.html"]
+    },
+    {
+      "source_id": "rapids-cuml-python",
+      "title": "RAPIDS cuML Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cuml", "python", "kmeans", "pca", "cuda"],
+      "pages": ["https://docs.rapids.ai/api/cuml/stable/"]
+    },
+    {
+      "source_id": "openwiki-agent-docs",
+      "title": "OpenWiki Agent Documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["openwiki", "agent", "code-mode", "integrations"],
+      "pages": [
+        "https://docs.langchain.com/oss/openwiki/overview.md",
+        "https://docs.langchain.com/oss/openwiki/code-mode.md",
+        "https://docs.langchain.com/oss/openwiki/integrations.md"
+      ]
+    },
+    {
+      "source_id": "rapids-raft-cpp-python",
+      "title": "RAPIDS RAFT C++ and Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "raft", "pylibraft", "cpp", "python", "cuda"],
+      "pages": [
+        "https://docs.rapids.ai/api/raft/stable/",
+        "https://docs.rapids.ai/api/raft/stable/cpp_api/",
+        "https://docs.rapids.ai/api/raft/stable/pylibraft_api/"
+      ]
+    },
+    {
+      "source_id": "rapids-cuvs-cpp",
+      "title": "RAPIDS cuVS C++ Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "cuvs", "cpp", "ann", "cagra", "cuda"],
+      "pages": [
+        "https://docs.rapids.ai/api/cuvs/stable/",
+        "https://docs.rapids.ai/api/cuvs/stable/integrations/"
+      ]
+    },
+    {
+      "source_id": "rapids-libcuml-cpp",
+      "title": "RAPIDS libcuml C++ Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "libcuml", "cuml", "cpp", "cuda"],
+      "pages": ["https://docs.rapids.ai/api/libcuml/stable/"]
+    },
+    {
+      "source_id": "rapids-rmm-cpp-python",
+      "title": "RAPIDS RMM C++ and Python Documentation",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["rapids", "rmm", "memory-resources", "cpp", "python", "cuda"],
+      "pages": [
+        "https://docs.rapids.ai/api/rmm/stable/",
+        "https://docs.rapids.ai/api/rmm/stable/cpp/"
+      ]
+    },
+    {
+      "source_id": "simdjson-cpp",
+      "title": "simdjson C++ Documentation",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["simdjson", "cpp", "json", "ondemand", "streaming"],
+      "pages": ["https://simdjson.org/", "https://github.com/simdjson/simdjson"]
+    },
+    {
+      "source_id": "postgresql-pgvector",
+      "title": "PostgreSQL 18 Documentation",
+      "kind": "official_docs",
+      "domain_class": "database",
+      "focus_tags": ["postgresql", "sql", "database", "version-18"],
+      "pages": ["https://www.postgresql.org/docs/18/"]
     },
     {
       "source_id": "mastra",

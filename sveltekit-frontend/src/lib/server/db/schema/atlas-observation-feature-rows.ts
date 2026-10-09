@@ -22,6 +22,8 @@ export const atlasObservationFeatureRows = pgTable(
     packetKey: text('packet_key').notNull(),
     featureRevision: text('feature_revision').notNull(),
     sourceRef: text('source_ref').notNull(),
+    sourceRevision: text('source_revision'),
+    registryRevision: text('registry_revision'),
     sourceVersionReceiptId: text('source_version_receipt_id'),
     workspaceRevision: text('workspace_revision'),
     representationId: text('representation_id'),

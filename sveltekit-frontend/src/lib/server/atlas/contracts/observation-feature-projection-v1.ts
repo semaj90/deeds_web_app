@@ -37,6 +37,8 @@ export const ObservationFeatureProjectionV1Schema = z.object({
   schema: z.literal('atlas.observation-feature-projection.v1'),
   packetKey: z.string().min(1),
   sourceRef: z.string().min(1),
+  sourceRevision: z.string().min(1).nullable().default(null),
+  registryRevision: z.string().min(1),
   treeNodeId: z.string().min(1).nullable(),
   sourceVersionReceiptId: z.string().min(1).nullable(),
   representationId: z.string().min(1).nullable(),
@@ -67,6 +69,8 @@ export type ObservationFeatureProjectionV1 = z.infer<typeof ObservationFeaturePr
 export interface BuildObservationFeatureProjectionInputV1 {
   packetKey: string;
   sourceRef: string;
+  sourceRevision?: string | null;
+  registryRevision: string;
   treeNodeId?: string | null;
   sourceVersionReceiptId?: string | null;
   representationId?: string | null;
@@ -117,6 +121,8 @@ export function buildObservationFeatureProjectionV1(
   const normalizedInput = {
     packetKey: input.packetKey,
     sourceRef: input.sourceRef,
+    sourceRevision: input.sourceRevision ?? null,
+    registryRevision: input.registryRevision,
     treeNodeId: input.treeNodeId ?? null,
     sourceVersionReceiptId: input.sourceVersionReceiptId ?? null,
     representationId: input.representationId ?? null,

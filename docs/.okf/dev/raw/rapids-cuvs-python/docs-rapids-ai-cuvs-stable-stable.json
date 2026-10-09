@@ -1,0 +1,66 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cuvs-python",
+  "source_ref": "rapids-cuvs-python:docs-rapids-ai-cuvs-stable-stable",
+  "url": "https://docs.rapids.ai/api/cuvs/stable/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "cuvs",
+    "cuda",
+    "nearest-neighbors",
+    "cagra",
+    "clustering",
+    "llm_output",
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) For AI agents: a documentation index is available at the root level at /llms.txt. Append /llms.txt to any URL for a page-level index, or .md for the markdown version of any page. NVIDIA cuVS is a GPU-accelerated library for vector search on the GPU. Vector search includes nearest neighbors, vector compression and clustering. It provides both core building blocks for constructing new algorithms and end-to-end algorithms that can be used directly or through a growing list of [integrations](https://docs.nvidia.com/cuvs/getting-started/integrations). ![NVIDIA cuVS accelerates preprocessing, nearest-neighbor search, and clustering on the GPU.](https://fdr-prod-docs-files-public.s3.us-east-1.amazonaws.com/nvidia-cuvs.docs.buildwithfern.com/ae77b46ca3e781feac2bd94ad085e9fdbc3b6c5a45c7dd1bf18d4813cc106e27/assets/images/cuvs-overview.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA6KXJSKKNFOCF7G4B%2F20261008%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20261008T232329Z&X-Amz-Expires=604800&X-Amz-Signature=a8182549524a140d5c432718c286de83c10d05c67845d2b4b1d6c6ea84c66f5f&X-Amz-Si",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cuvs-python:docs-rapids-ai-cuvs-stable-stable",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuVS Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    },
+    {
+      "api": "cuVS / cuGraph",
+      "recommendation": "Treat GPU ANN and PageRank as optional acceleration lanes behind the same search contract.",
+      "rationale": "This matches the repository rule that acceleration must not become the canonical store."
+    }
+  ],
+  "content_hash": "f1bb9c4e131ae820b7565182a61fff66c6ba4025ecb512a5c7f116ef1e9f68c3",
+  "markdown_path": "docs/.okf/dev/raw/rapids-cuvs-python/docs-rapids-ai-cuvs-stable-stable.md",
+  "fetched_at": "2026-10-09T05:32:32.647Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-cuvs-python",
+    "source_title": "RAPIDS cuVS Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-cuvs-python/docs-rapids-ai-cuvs-stable-stable.md"
+}

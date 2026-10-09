@@ -72,6 +72,8 @@ Keep these concepts separate in every future integration:
 - Hash the exact source bytes. Do not hash a decoded/re-encoded string, newline-normalized text, JSON reserialization, or a UTF-16 representation unless that encoding is explicitly the producer contract.
 - A whole-source digest and a chunk digest are different grains. `file_content_hash` identifies whole source bytes; `codebase_chunk_index.content_hash` identifies a chunk. Never compare them directly.
 - `workspace_revision`, `source_revision`, `representation_revision`, and `feature_revision` are separate namespaces. A SHA-256-shaped value in one namespace must not be copied into another without an explicit producer contract.
+- `workspace_revision` identifies a workspace snapshot; it is required at the snapshot/cohort receipt boundary, but it is not automatically required as a duplicated column on every source-local feature row. A row may be bound by exact `source_ref + source_revision` through the authoritative workspace-source binding, while the CandidateOrdinalMap and matrix receipt bind the complete ordered cohort to the admitted workspace snapshot. Require a row-level workspace revision only when the feature's semantics or its storage/join contract depend on that field; never infer it from timestamps, ordinals, or a caller-supplied default.
+- Missing row-level `workspace_revision` is not by itself proof that a source-local observation is invalid. Admission still requires independently verified source bytes/revision, feature-definition and producer revision, evidence references/checksum, exact candidate identity, and a snapshot-bound matrix receipt. Workspace-/graph-derived values require their own applicable workspace/graph revision. Missing provenance is unavailable/rejected, not a numeric zero.
 - `packet_key` is a deterministic packet identity/projection key. It is not a substitute for the source digest, workspace revision, or canonical candidate ordinal.
 - Qdrant point IDs, Redis/BitFrost keys, centroids, GPU pointers, and topology coordinates are derived projections. They cannot promote or replace PostgreSQL source identity.
 
@@ -88,6 +90,8 @@ immutable workspace snapshot
 ```
 
 Promotion requires exact readback of every identity field. Upserts must be idempotent only when the existing row has the same identity and digest. Any differing value is an identity collision, revision mismatch, or content mismatch and must fail closed; never coerce a SHA-256 workspace revision into a legacy integer such as `0`.
+
+Do not add or require `workspace_revision` on a feature-row table solely to duplicate the cohort snapshot revision. First prove whether exact source bindings plus the CandidateOrdinalMap/matrix receipt preserve the required lineage losslessly. If they do not, ask the existing schema owner for the smallest reviewed provenance change. A nullable column is not a substitute for an admission contract, and a missing value must not be backfilled by inference.
 
 Reference standards: NIST FIPS 180-4 defines SHA-256 message digests; Python documents bytes as sequences of integers constrained to `0 <= x < 256`.
 

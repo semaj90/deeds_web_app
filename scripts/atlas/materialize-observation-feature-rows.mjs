@@ -46,6 +46,7 @@ import {
   buildObservationFeatureProjectionV1,
 } from './../../sveltekit-frontend/src/lib/server/atlas/contracts/observation-feature-projection-v1.js';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
+import { validateObservationFeaturePlanRowsV1 } from './lib/observation-feature-lineage-admission-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 loadAtlasEnv(ROOT);
@@ -64,20 +65,22 @@ async function materializeDirect(pool, projection, workspaceRevision) {
   };
   await pool.query(
     `INSERT INTO atlas_observation_feature_rows (
-       packet_key, feature_revision, source_ref, source_version_receipt_id,
+       packet_key, feature_revision, source_ref, source_revision, registry_revision, source_version_receipt_id,
        workspace_revision, representation_id, representation_revision, tree_node_id,
        ontology_classes, ast_observation_kinds, langextract_classes, flattened_tags,
        ontology_mask, ast_pattern_mask, structural_flags, evidence_refs,
        kmeans_cluster_id, som_row, som_col, community_id,
        producer_revision, input_digest, updated_at
      ) VALUES (
-       $1,$2,$3,$4,$5,$6,$7,$8,
-       $9::text[],$10::text[],$11::text[],$12::text[],
-       $13::jsonb,$14::jsonb,$15::jsonb,$16::text[],
-       $17,$18,$19,$20,$21,$22,now()
+       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+       $11::text[],$12::text[],$13::text[],$14::text[],
+       $15::jsonb,$16::jsonb,$17::jsonb,$18::text[],
+       $19,$20,$21,$22,$23,$24,now()
      )
      ON CONFLICT (packet_key, feature_revision) DO UPDATE SET
        source_ref = EXCLUDED.source_ref,
+       source_revision = EXCLUDED.source_revision,
+       registry_revision = EXCLUDED.registry_revision,
        source_version_receipt_id = EXCLUDED.source_version_receipt_id,
        workspace_revision = EXCLUDED.workspace_revision,
        representation_id = EXCLUDED.representation_id,
@@ -100,7 +103,8 @@ async function materializeDirect(pool, projection, workspaceRevision) {
        updated_at = now()`,
     [
       projection.packetKey, projection.featureRevision, projection.sourceRef,
-      projection.sourceVersionReceiptId, workspaceRevision, projection.representationId,
+      projection.sourceRevision, projection.registryRevision, projection.sourceVersionReceiptId,
+      workspaceRevision, projection.representationId,
       projection.representationRevision, projection.treeNodeId,
       projection.ontologyClasses, projection.astObservationKinds,
       projection.langextractClasses, projection.flattenedTags,
@@ -117,6 +121,11 @@ const APPLY = args.includes('--apply');
 const LIMIT = Number((args.find((a) => a.startsWith('--limit=')) || '').split('=')[1] || 0) || null;
 const WORKSPACE_REVISION = (args.find((a) => a.startsWith('--workspace-revision=')) || '').split('=').slice(1).join('=').trim() || null;
 const PRODUCER_REVISION = 'materialize-observation-feature-rows:v1';
+const PERSISTED_LINEAGE_FIELDS = new Set([
+  'feature_revision', 'source_revision', 'registry_revision', 'workspace_revision', 'source_version_receipt_id',
+  'producer_revision', 'input_digest', 'evidence_refs',
+]);
+const REQUIRED_LINEAGE_FIELDS = ['source_revision', 'registry_revision'];
 const isAdmittedSourceRevision = (value) => {
   const normalized = typeof value === 'string' ? value.trim() : '';
   return Boolean(normalized) && normalized !== 'workspace:0' && !normalized.endsWith('_PENDING');
@@ -166,7 +175,45 @@ async function main() {
   };
 
   const rowsToProcess = APPLY ? lines.slice(0, LIMIT) : lines;
+  if (APPLY) {
+    const selectedRows = rowsToProcess.map((line) => JSON.parse(line));
+    const lineage = validateObservationFeaturePlanRowsV1(selectedRows, WORKSPACE_REVISION);
+    const storageMissing = REQUIRED_LINEAGE_FIELDS.filter((field) => !PERSISTED_LINEAGE_FIELDS.has(field));
+    const storageLineageUnsupported = storageMissing.length > 0;
+    if (!lineage.admitted || storageLineageUnsupported) {
+      console.error(JSON.stringify({
+        error: 'Refusing --apply because the plan and existing ORF writer/storage contract do not preserve complete feature lineage.',
+        blocker: storageLineageUnsupported ? 'ORF_STORAGE_LINEAGE_CONTRACT_INCOMPLETE' : 'OBSERVATION_FEATURE_LINEAGE_NOT_ADMITTED',
+        rowCount: lineage.rowCount,
+        rejected: lineage.rejected.slice(0, 20),
+        rejectedCount: lineage.rejected.length,
+        storageMissing,
+        writesPerformed: false,
+      }, null, 2));
+      process.exit(1);
+    }
+  }
   const pool = APPLY ? new pg.Pool({ connectionString: DATABASE_URL }) : null;
+  if (pool) {
+    const schemaReadback = await pool.query(
+      `SELECT column_name FROM information_schema.columns
+       WHERE table_schema = 'public' AND table_name = 'atlas_observation_feature_rows'
+         AND column_name = ANY($1::text[])`,
+      REQUIRED_LINEAGE_FIELDS,
+    );
+    const deployedColumns = new Set(schemaReadback.rows.map((row) => row.column_name));
+    const missingColumns = REQUIRED_LINEAGE_FIELDS.filter((field) => !deployedColumns.has(field));
+    if (missingColumns.length > 0) {
+      await pool.end();
+      console.error(JSON.stringify({
+        error: 'Refusing --apply because the deployed ORF schema lacks lineage columns.',
+        blocker: 'ORF_STORAGE_LINEAGE_COLUMNS_NOT_DEPLOYED',
+        missingColumns,
+        writesPerformed: false,
+      }, null, 2));
+      process.exit(1);
+    }
+  }
 
   for (const line of rowsToProcess) {
     const planRow = JSON.parse(line);
@@ -183,7 +230,9 @@ async function main() {
         ontologyClasses: [], // deliberately empty — see file header
         astObservationKinds: planRow.astObservationKinds ?? [],
         langextractClasses: [], // deliberately empty — see file header
-        evidenceRefs: [planRow.packetKey],
+        sourceRevision: planRow.sourceRevision,
+        registryRevision: planRow.registryRevision,
+        evidenceRefs: planRow.evidenceRefs ?? [],
         featureRevision: planRow.featureRevision,
         producerRevision: PRODUCER_REVISION,
       });

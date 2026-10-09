@@ -1,0 +1,70 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "openwiki-agent-docs",
+  "source_ref": "openwiki-agent-docs:docs-langchain-com-openwiki-code-mode-md-code-mode-md",
+  "url": "https://docs.langchain.com/oss/openwiki/code-mode.md",
+  "title": "docs.langchain.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "openwiki",
+    "agent",
+    "code-mode",
+    "integrations",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.langchain.com",
+    "markdown_excerpt": "> ## Documentation Index > Fetch the complete documentation index at: https://docs.langchain.com/llms.txt > Use this file to discover all available pages before exploring further. # Code mode > Generate and maintain repository documentation for coding agents with OpenWiki Code mode builds a repository wiki in `openwiki/` with durable details such as architecture, integrations, and workflows. Coding agents use that wiki as context so they can work in the package more efficiently, with less rediscovery and fewer tokens. Humans can read the same Markdown, but agents are the primary audience. Agents discover the wiki through pointers OpenWiki adds to `AGENTS.md` and `CLAUDE.md`. `openwiki`, `openwiki --init`, and `openwiki --update` run in code mode. You can also pass the mode explicitly: ```bash theme={\"theme\":{\"light\":\"catppuccin-latte\",\"dark\":\"catppuccin-mocha\"}} openwiki code --init openwiki code --update openwiki code --update --print ``` Running `openwiki --init` again replaces the existing generated repository wiki and Claims with a new generation while preserving the user-authored `openwiki/INSTRUCTIONS.md` brief. On a persistent checkout, OpenWiki records in-progress generatio",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:openwiki-agent-docs:docs-langchain-com-openwiki-code-mode-md-code-mode-md",
+    "title": "docs.langchain.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenWiki Agent Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "OpenCode models / tools",
+      "recommendation": "Prefer explicit model/provider/tool configuration over implicit chat defaults.",
+      "rationale": "The repo needs canonical API recommendations, not hidden prompt state."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "6feb1432591a1e6da55ef3117635bd76c47ce10b836f2800b5c4de7c4823c8c7",
+  "markdown_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md",
+  "fetched_at": "2026-10-09T05:37:49.016Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "openwiki-agent-docs",
+    "source_title": "OpenWiki Agent Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md"
+}

@@ -40,12 +40,14 @@ export const AssertionResultV1Schema = z.object({
 export const ExpectedAssertionV1Schema = z.object({
   id: z.string().min(1),
   expected: z.string().min(1),
+  claimRef: sha256Schema.optional(),
 });
 
 export const ActualAssertionV1Schema = z.object({
   id: z.string().min(1),
   actual: z.string().min(1),
   passed: z.boolean(),
+  claimRef: sha256Schema.optional(),
 });
 
 export const EvidenceSourceRefV1Schema = z.object({
@@ -119,6 +121,13 @@ export const EvidenceReceiptV1Schema = EvidenceReceiptV1UnsignedSchema.extend({
   if (expectedIds.length !== actualIds.length || expectedIds.some((id) => !actualIds.includes(id))) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['actualAssertions'], message: 'actual assertions must cover every expected assertion exactly once' });
   }
+  const actualById = new Map(value.actualAssertions.map((assertion) => [assertion.id, assertion]));
+  for (const expectedAssertion of value.expectedAssertions) {
+    const actualAssertion = actualById.get(expectedAssertion.id);
+    if (actualAssertion && expectedAssertion.claimRef !== actualAssertion.claimRef) {
+      context.addIssue({ code: z.ZodIssueCode.custom, path: ['actualAssertions'], message: `assertion ${expectedAssertion.id} claimRef must match its expected assertion` });
+    }
+  }
   if (value.verdict === 'PROVEN' && value.actualAssertions.some((assertion) => !assertion.passed)) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['verdict'], message: 'PROVEN receipt contains an unsatisfied assertion' });
   }
@@ -133,6 +142,10 @@ export const EvidenceReceiptV1Schema = EvidenceReceiptV1UnsignedSchema.extend({
   }
 });
 
+const EvidenceReceiptV1CreateSchema = EvidenceReceiptV1UnsignedSchema.extend({
+  taskRevision: sha256Schema,
+});
+
 export type EvidenceTypeV1 = z.infer<typeof EvidenceTypeV1Schema>;
 export type EvidenceVerdictV1 = z.infer<typeof EvidenceVerdictV1Schema>;
 export type EvidenceRefV1 = z.infer<typeof EvidenceRefV1Schema>;
@@ -142,8 +155,8 @@ export type ActualAssertionV1 = z.infer<typeof ActualAssertionV1Schema>;
 export type EvidenceSourceRefV1 = z.infer<typeof EvidenceSourceRefV1Schema>;
 export type EvidenceReceiptV1 = z.infer<typeof EvidenceReceiptV1Schema>;
 
-export function buildEvidenceReceiptV1(input: z.input<typeof EvidenceReceiptV1UnsignedSchema>): EvidenceReceiptV1 {
-  const unsigned = EvidenceReceiptV1UnsignedSchema.parse(input);
+export function buildEvidenceReceiptV1(input: z.input<typeof EvidenceReceiptV1CreateSchema>): EvidenceReceiptV1 {
+  const unsigned = EvidenceReceiptV1CreateSchema.parse(input);
   return EvidenceReceiptV1Schema.parse({ ...unsigned, checksum: `sha256:${canonicalHashJSON(unsigned)}` });
 }
 

@@ -1,0 +1,53 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "svelte-typescript-bits-ui",
+  "source_ref": "svelte-typescript-bits-ui:svelte-dev-docs-svelte-svelte",
+  "url": "https://svelte.dev/docs/svelte",
+  "title": "svelte.dev",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "sveltekit",
+    "svelte5",
+    "typescript",
+    "bits_ui",
+    "routing",
+    "runes",
+    "accessibility"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "svelte.dev",
+    "markdown_excerpt": "[Skip to main content](https://svelte.dev/docs/svelte/overview#main) Svelte is a framework for building user interfaces on the web. It uses a compiler to turn declarative components written in HTML, CSS and JavaScript... App ``` <script> function greet() { alert('Welcome to Svelte!'); } </script> <button onclick={greet}>click me</button> <style> button { font-size: 2em; } </style> ``` ``` <script lang=\"ts\"> function greet() { alert('Welcome to Svelte!'); } </script> <button onclick={greet}>click me</button> <style> button { font-size: 2em; } </style> ``` ...into lean, tightly optimized JavaScript. You can use it to build anything on the web, from standalone components to ambitious full stack apps (using Svelte’s companion application framework, [SvelteKit](https://svelte.dev/docs/kit)) and everything in between. These pages serve as reference documentation. If you’re new to Svelte, we recommend starting with the [interactive tutorial](https://svelte.dev/tutorial) and coming back here when you have questions. You can also try Svelte online in the [playground](https://svelte.dev/playground) or, if you need a more fully-featured environment, on [StackBlitz](https://sveltekit.new/). [E",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:svelte-typescript-bits-ui:svelte-dev-docs-svelte-svelte",
+    "title": "svelte.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh SvelteKit, Svelte, TypeScript, and Bits UI Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "a5bd4efd3621e9e2aacca3864c56f6c59e8b12a0d9a2bf4bd393a14f77062e8d",
+  "markdown_path": "docs/.okf/dev/raw/svelte-typescript-bits-ui/svelte-dev-docs-svelte-svelte.md",
+  "fetched_at": "2026-10-09T05:23:37.684Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "svelte-typescript-bits-ui",
+    "source_title": "SvelteKit, Svelte, TypeScript, and Bits UI Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "documentation",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/svelte-typescript-bits-ui/svelte-dev-docs-svelte-svelte.md"
+}

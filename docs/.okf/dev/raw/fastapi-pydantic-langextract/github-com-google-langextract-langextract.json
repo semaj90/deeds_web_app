@@ -1,0 +1,61 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "fastapi-pydantic-langextract",
+  "source_ref": "fastapi-pydantic-langextract:github-com-google-langextract-langextract",
+  "url": "https://github.com/google/langextract",
+  "title": "github.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "fastapi",
+    "pydantic",
+    "langextract",
+    "grounded-extraction",
+    "structured-output",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "github.com",
+    "markdown_excerpt": "[Skip to content](https://github.com/google/langextract#start-of-content) You signed in with another tab or window. [Reload](https://github.com/google/langextract) to refresh your session.You signed out in another tab or window. [Reload](https://github.com/google/langextract) to refresh your session.You switched accounts on another tab or window. [Reload](https://github.com/google/langextract) to refresh your session.Dismiss alert {{ message }} main [**78** Branches](https://github.com/google/langextract/branches) [**19** Tags](https://github.com/google/langextract/tags) [Go to Branches page](https://github.com/google/langextract/branches)[Go to Tags page](https://github.com/google/langextract/tags) Go to file Code Open more actions menu ## Latest commit [![aksg87](https://avatars.githubusercontent.com/u/19271735?v=4&size=40)](https://github.com/aksg87)[aksg87](https://github.com/google/langextract/commits?author=aksg87) [Prepare v1.7.1 release (](https://github.com/google/langextract/commit/24298305d6998061fadd01080def4288c653d243) [#554](https://github.com/google/langextract/pull/554) [)](https://github.com/google/langextract/commit/24298305d6998061fadd01080def4288c653d243) succe",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:fastapi-pydantic-langextract:github-com-google-langextract-langextract",
+    "title": "github.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh FastAPI, Pydantic, and LangExtract Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "99c175b1c10746d59b7f34c1892122f75e14ae9ec2e7e44bd4ccc01d0ab40b5b",
+  "markdown_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/github-com-google-langextract-langextract.md",
+  "fetched_at": "2026-10-09T05:31:46.893Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "fastapi-pydantic-langextract",
+    "source_title": "FastAPI, Pydantic, and LangExtract Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/github-com-google-langextract-langextract.md"
+}

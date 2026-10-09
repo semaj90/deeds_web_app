@@ -1680,6 +1680,7 @@ an authorization or completion receipt for remaining gates.
   12/12 and `neural-routing.spec.ts` 5/5 (17/17 total). This confirms the
   fixture contracts and distinct schema IDs only; it does not prove a live
   matrix producer, caller, or independent persisted readback.
+- **2026-10-08 live-feature-join syntax repair:** corrected a malformed escaped-newline type literal in `search-runtime-live-feature-join-v1.ts` that prevented TypeScript parsing and caused cascading diagnostics. Its focused spec now passes 4/4. This restores source parseability only; no live matrix caller, admitted input, or readback is implied.
 - **SearchRuntime caller recheck (2026-10-08):** focused canonical row-binding,
   tile, QAS resolver, and QAS adapter suites passed 12/12. Source-call search
   confirms application code reaches `createAtlasSearchAdapter().search()`;

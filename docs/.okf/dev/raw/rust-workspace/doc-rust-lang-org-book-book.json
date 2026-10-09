@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rust-workspace",
+  "source_ref": "rust-workspace:doc-rust-lang-org-book-book",
+  "url": "https://doc.rust-lang.org/book/",
+  "title": "doc.rust-lang.org",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rust",
+    "rayon",
+    "tokio",
+    "serde",
+    "native-runtime",
+    "kanban"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "doc.rust-lang.org",
+    "markdown_excerpt": "## Keyboard shortcuts Press `←` or `→` to navigate between chapters Press `S` or `/` to search in the book Press `?` to show this help Press `Esc` to hide this help - Auto - Light - Rust - Coal - Navy - Ayu # The Rust Programming Language [Print this book](https://doc.rust-lang.org/book/print.html \"Print this book\")[Git repository](https://github.com/rust-lang/book \"Git repository\") _by Steve Klabnik, Carol Nichols, and Chris Krycho, with contributions from the_ _Rust Community_ This version of the text assumes you’re using Rust 1.97.0 (released 2026-07-09) or later with `edition = \"2024\"` in the _Cargo.toml_ file of all projects to configure them to use Rust 2024 Edition idioms. See the [“Installation” section\\\\ of Chapter 1](https://doc.rust-lang.org/book/ch01-01-installation.html) for instructions on installing or updating Rust, and see [Appendix E](https://doc.rust-lang.org/book/appendix-05-editions.html) for information on editions. The HTML format is available online at [https://doc.rust-lang.org/stable/book/](https://doc.rust-lang.org/stable/book/) and offline with installations of Rust made with `rustup`; run `rustup doc --book` to open. Several community [translations](htt",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rust-workspace:doc-rust-lang-org-book-book",
+    "title": "doc.rust-lang.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Rust, Rayon, Tokio, and Serde Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "b8da70b34f3e79349a2fa2f472e8a9c670c3b8b177d57cd60f95525ab5d9a251",
+  "markdown_path": "docs/.okf/dev/raw/rust-workspace/doc-rust-lang-org-book-book.md",
+  "fetched_at": "2026-10-09T05:30:30.251Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rust-workspace",
+    "source_title": "Rust, Rayon, Tokio, and Serde Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rust-workspace/doc-rust-lang-org-book-book.md"
+}

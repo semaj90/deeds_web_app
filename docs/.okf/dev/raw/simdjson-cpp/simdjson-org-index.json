@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "simdjson-cpp",
+  "source_ref": "simdjson-cpp:simdjson-org-index",
+  "url": "https://simdjson.org/",
+  "title": "The simdjson library",
+  "domain_class": "tool",
+  "focus_tags": [
+    "simdjson",
+    "cpp",
+    "json",
+    "ondemand",
+    "streaming",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "The simdjson library",
+    "markdown_excerpt": "The simdjson library simdjson About Publications Software Talks GitHub Parsing JSON at the speed of memory Parsing gigabytes of JSON per second JSON is everywhere on the Internet. Servers spend a lot of time parsing it. We need a fresh approach. Browse the API Star on GitHub $ brew install simdjson · $ apt install libsimdjson-dev · $ vcpkg install simdjson quickstart.cpp #include \"simdjson.h\" using namespace simdjson; int main () { ondemand::parser parser; padded_string json = padded_string::load( \"twitter.json\" ); ondemand::document tweets = parser.iterate(json); std::cout &lt;&lt; uint64_t (tweets[ \"search_metadata\" ][ \"count\" ]) &lt;&lt; \" results.\" &lt;&lt; std::endl; } up to 25 GB/s Parsing throughput 25 × Faster than JSON for Modern C++ Why simdjson Highlights Fast Over 4× faster than RapidJSON and 25× faster than JSON for Modern C++. Easy First-class, easy-to-use, and carefully documented APIs. Strict Full JSON and UTF-8 validation, lossless parsing. Performance with no compromises. Automatic Selects a CPU-tailored parser at runtime. No configuration needed. Reliable From memory allocation to error handling, simdjson's design avoids surprises. Peer Reviewed Research publishe",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:simdjson-cpp:simdjson-org-index",
+    "title": "The simdjson library",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh simdjson C++ Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "17f08ed0bd617279ba5e0e1a3b4b4c3041d5a4bf612111ee1747aba4e8d562e9",
+  "markdown_path": "docs/.okf/dev/raw/simdjson-cpp/simdjson-org-index.md",
+  "fetched_at": "2026-10-09T05:38:05.664Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "simdjson-cpp",
+    "source_title": "simdjson C++ Documentation",
+    "fetched_via": "fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/simdjson-cpp/simdjson-org-index.md"
+}

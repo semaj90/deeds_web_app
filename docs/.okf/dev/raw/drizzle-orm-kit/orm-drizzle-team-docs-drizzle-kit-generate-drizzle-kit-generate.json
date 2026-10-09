@@ -1,0 +1,55 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "drizzle-orm-kit",
+  "source_ref": "drizzle-orm-kit:orm-drizzle-team-docs-drizzle-kit-generate-drizzle-kit-generate",
+  "url": "https://orm.drizzle.team/docs/drizzle-kit-generate",
+  "title": "orm.drizzle.team",
+  "domain_class": "database",
+  "focus_tags": [
+    "drizzle_orm",
+    "postgresql",
+    "pgvector",
+    "indexes",
+    "migrations",
+    "llm_output",
+    "kanban",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "orm.drizzle.team",
+    "markdown_excerpt": "[We've merged alternation-engine into Beta release. Try it out!](https://github.com/drizzle-team/drizzle-orm/releases/tag/v1.0.0-beta.2) [v1.0\\\\ \\\\ 98%](https://orm.drizzle.team/roadmap) [Benchmarks](https://orm.drizzle.team/benchmarks) [Extension](https://driz.link/extension) [Studio](https://orm.drizzle.team/drizzle-studio/overview) [Studio Package](https://github.com/drizzle-team/drizzle-studio-npm) [Gateway](https://gateway.drizzle.team/) [Drizzle Run](https://drizzle.run/) Our goodies! [Our Primary backer\\\\ \\\\ ![](<Base64-Image-Removed>)![PlanetScale](<Base64-Image-Removed>)](https://driz.link/planetscale) [Our Cloud Partner\\\\ \\\\ ![](<Base64-Image-Removed>)![Railway](<Base64-Image-Removed>)](https://driz.link/railway) [![](<Base64-Image-Removed>)![Replit](<Base64-Image-Removed>)](https://driz.link/replit)[![](<Base64-Image-Removed>)![Sentry](<Base64-Image-Removed>)](https://driz.link/sentry)[![](<Base64-Image-Removed>)![Sevalla](<Base64-Image-Removed>)](https://driz.link/sevalla)[![](<Base64-Image-Removed>)![Clerk](<Base64-Image-Removed>)](https://clerk.com/)[![](<Base64-Image-Removed>)![Warp](<Base64-Image-Removed>)](https://driz.link/warp)[![](<Base64-Image-Removed>)![Appwri",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:drizzle-orm-kit:orm-drizzle-team-docs-drizzle-kit-generate-drizzle-kit-generate",
+    "title": "orm.drizzle.team",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Drizzle ORM and Drizzle Kit Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "f5aa5c468a8cdfed9d132f1e4e9949c6c717c1381481b472b8537d9317627237",
+  "markdown_path": "docs/.okf/dev/raw/drizzle-orm-kit/orm-drizzle-team-docs-drizzle-kit-generate-drizzle-kit-generate.md",
+  "fetched_at": "2026-10-09T05:23:39.927Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "drizzle-orm-kit",
+    "source_title": "Drizzle ORM and Drizzle Kit Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "tool",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/drizzle-orm-kit/orm-drizzle-team-docs-drizzle-kit-generate-drizzle-kit-generate.md"
+}

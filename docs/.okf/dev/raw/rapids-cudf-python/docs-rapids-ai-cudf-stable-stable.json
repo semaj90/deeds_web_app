@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cudf-python",
+  "source_ref": "rapids-cudf-python:docs-rapids-ai-cudf-stable-stable",
+  "url": "https://docs.rapids.ai/api/cudf/stable/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "cudf",
+    "pylibcudf",
+    "cuda",
+    "columnar-data",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) [Skip to main content](https://docs.nvidia.com/cudf/latest/#main-content) Back to top`Ctrl` + `K` [![NVIDIA cuDF - Home](https://docs.nvidia.com/cudf/latest/_static/nvidia-logo-horiz-rgb-blk-for-screen.svg)![NVIDIA cuDF - Home](https://docs.nvidia.com/cudf/latest/_static/nvidia-logo-horiz-rgb-wht-for-screen.svg)\\\\ NVIDIA cuDF](https://docs.nvidia.com/cudf/latest/#) latest [latest](https://docs.nvidia.com/cudf/latest/) [26.10](https://docs.nvidia.com/cudf/26.10/) [26.08](https://docs.nvidia.com/cudf/26.08/) [26.06](https://archive.docs.nvidia.com/cudf/26.06/) [26.04](https://archive.docs.nvidia.com/cudf/26.04/) [26.02](https://archive.docs.nvidia.com/cudf/26.02/) [25.12](https://archive.docs.nvidia.com/cudf/25.12/) [25.10](https://archive.docs.nvidia.com/cudf/25.10/) [25.08](https://archive.docs.nvidia.com/cudf/25.08/) [25.06](https://archive.docs.nvidia.com/cudf/25.06/) [25.04](https://archive.docs.nvidia.com/cudf/25.04/) [25.02](https://archive.docs.nvidia.com/cudf/25.02/) [24.12](https://archive.docs.nvidia.com/cudf/24.12/) [24.10](https://archive.docs.nvidia.com/cudf/24.10/) [24.08](https://archive.docs.nvidia.",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cudf-python:docs-rapids-ai-cudf-stable-stable",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuDF and pylibcudf Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "392befcf4c33d1fb566402965a6fdaece8a73808070d3098d0a90857b9d52bda",
+  "markdown_path": "docs/.okf/dev/raw/rapids-cudf-python/docs-rapids-ai-cudf-stable-stable.md",
+  "fetched_at": "2026-10-09T05:35:04.343Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-cudf-python",
+    "source_title": "RAPIDS cuDF and pylibcudf Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "tool",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-cudf-python/docs-rapids-ai-cudf-stable-stable.md"
+}

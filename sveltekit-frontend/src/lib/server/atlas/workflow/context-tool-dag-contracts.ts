@@ -47,7 +47,7 @@ export const ContextToolDagV1Schema = z.object({
   workflowRevision: z.number().int().nonnegative(),
   requestId: z.string().min(1),
   workspaceRevision: z.string().min(1),
-  graphRevision: z.string().min(1),
+  graphRevision: z.string().min(1).nullable(),
   nodes: z.array(ContextToolDagNodeV1Schema).min(1).max(4096),
   canonicalWritesAllowed: z.boolean(),
   producerRevision: z.string().min(1),
@@ -111,6 +111,9 @@ function assertDag(nodes: readonly ContextToolDagNodeV1[]): void {
 export function validateContextToolDag(raw: ContextToolDagV1): ContextToolDagV1 {
   const dag = ContextToolDagV1Schema.parse(raw);
   assertDag(dag.nodes);
+  if (dag.nodes.some((node) => node.nodeId === 'GRAPH_EXPANSION') && dag.graphRevision === null) {
+    throw new Error('GRAPH_EXPANSION requires an admitted graphRevision');
+  }
   const byId = new Map(dag.nodes.map((node) => [node.nodeId, node] as const));
 
   const ancestors = (node: ContextToolDagNodeV1): ContextToolDagNodeV1[] => {
@@ -170,7 +173,7 @@ export function buildContextToolDagFromPreAgentStages(input: {
   workflowId: string;
   requestId: string;
   workspaceRevision: string;
-  graphRevision: string;
+  graphRevision: string | null;
   producerRevision: string;
 }): ContextToolDagV1 {
   const lookups = input.stages.filter((s) => s !== 'QUERY_ANALYSIS' && s !== 'ACE_PACKET_ASSEMBLY' && s !== 'AGENT_HANDOFF');

@@ -1,0 +1,53 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "postgresql-pgvector",
+  "source_ref": "postgresql-pgvector:www-postgresql-org-docs-18-18",
+  "url": "https://www.postgresql.org/docs/18/",
+  "title": "www.postgresql.org",
+  "domain_class": "database",
+  "focus_tags": [
+    "postgresql",
+    "sql",
+    "database",
+    "version-18",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "www.postgresql.org",
+    "markdown_excerpt": "September 24, 2026: [PostgreSQL 19 Beta 4 Released!](https://www.postgresql.org/about/news/postgresql-19-beta-4-released-3386/) [Documentation](https://www.postgresql.org/docs/ \"Documentation\") → [PostgreSQL 18](https://www.postgresql.org/docs/18/index.html) Supported Versions: [Current](https://www.postgresql.org/docs/current/index.html \"PostgreSQL 18 - PostgreSQL 18.6 Documentation\") ( [18](https://www.postgresql.org/docs/18/index.html \"PostgreSQL 18 - PostgreSQL 18.6 Documentation\")) / [17](https://www.postgresql.org/docs/17/index.html \"PostgreSQL 17 - PostgreSQL 18.6 Documentation\") / [16](https://www.postgresql.org/docs/16/index.html \"PostgreSQL 16 - PostgreSQL 18.6 Documentation\") / [15](https://www.postgresql.org/docs/15/index.html \"PostgreSQL 15 - PostgreSQL 18.6 Documentation\") / [14](https://www.postgresql.org/docs/14/index.html \"PostgreSQL 14 - PostgreSQL 18.6 Documentation\") Development Versions: [19](https://www.postgresql.org/docs/19/index.html \"PostgreSQL 19 - PostgreSQL 18.6 Documentation\") / [devel](https://www.postgresql.org/docs/devel/index.html \"PostgreSQL devel - PostgreSQL 18.6 Documentation\") Unsupported versions: [13](https://www.postgresql.org/docs/13/index",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:postgresql-pgvector:www-postgresql-org-docs-18-18",
+    "title": "www.postgresql.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh PostgreSQL 18 Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "2c2427eb7f8218c44b9603bf82175e2c13b7dbd2a942bde310f7636014fb8498",
+  "markdown_path": "docs/.okf/dev/raw/postgresql-pgvector/www-postgresql-org-docs-18-18.md",
+  "fetched_at": "2026-10-09T05:27:46.435Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "postgresql-pgvector",
+    "source_title": "PostgreSQL 18 Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/postgresql-pgvector/www-postgresql-org-docs-18-18.md"
+}

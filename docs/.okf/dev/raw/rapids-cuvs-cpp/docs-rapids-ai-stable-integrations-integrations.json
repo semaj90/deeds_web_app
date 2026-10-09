@@ -1,0 +1,60 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cuvs-cpp",
+  "source_ref": "rapids-cuvs-cpp:docs-rapids-ai-stable-integrations-integrations",
+  "url": "https://docs.rapids.ai/api/cuvs/stable/integrations/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "cuvs",
+    "cpp",
+    "ann",
+    "cagra",
+    "cuda",
+    "taskboard",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "For AI agents: a documentation index is available at the root level at /llms.txt. Append /llms.txt to any URL for a page-level index, or .md for the markdown version of any page. # Sorry, we couldn't find that page We've been notified so we can fix this for next time. Finding similar pages... Ask AI Assistant Responses are generated using AI and may contain mistakes. Hi, I'm an AI assistant with access to documentation and other content. Tip: You can toggle this pane with `⌘` + `/`",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cuvs-cpp:docs-rapids-ai-stable-integrations-integrations",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuVS C++ Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "9669d18f52460873d9e94605063364506362770702b75bb6fcbb495636b602c4",
+  "markdown_path": "docs/.okf/dev/raw/rapids-cuvs-cpp/docs-rapids-ai-stable-integrations-integrations.md",
+  "fetched_at": "2026-10-09T05:38:00.236Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-cuvs-cpp",
+    "source_title": "RAPIDS cuVS C++ Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-cuvs-cpp/docs-rapids-ai-stable-integrations-integrations.md"
+}

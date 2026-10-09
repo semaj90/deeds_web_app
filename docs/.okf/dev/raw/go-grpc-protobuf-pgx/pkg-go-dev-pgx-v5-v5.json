@@ -1,0 +1,62 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "go-grpc-protobuf-pgx",
+  "source_ref": "go-grpc-protobuf-pgx:pkg-go-dev-pgx-v5-v5",
+  "url": "https://pkg.go.dev/github.com/jackc/pgx/v5/",
+  "title": "pkg.go.dev",
+  "domain_class": "tool",
+  "focus_tags": [
+    "go",
+    "grpc",
+    "protobuf",
+    "pgx",
+    "service-runtime",
+    "llm_output",
+    "kanban",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "pkg.go.dev",
+    "markdown_excerpt": "## ![](https://pkg.go.dev/static/shared/icon/chrome_reader_mode_gm_grey_24dp.svg) README [¶](https://pkg.go.dev/github.com/jackc/pgx/v5\\#section-readme \"Go to Readme\") [![Go Reference](https://pkg.go.dev/badge/github.com/jackc/pgx/v5.svg)](https://pkg.go.dev/github.com/jackc/pgx/v5)[![Build Status](https://github.com/jackc/pgx/actions/workflows/ci.yml/badge.svg)](https://github.com/jackc/pgx/actions/workflows/ci.yml) ### pgx - PostgreSQL Driver and Toolkit pgx is a pure Go driver and toolkit for PostgreSQL. The pgx driver is a low-level, high performance interface that exposes PostgreSQL-specific features such as `LISTEN` / `NOTIFY` and `COPY`. It also includes an adapter for the standard `database/sql` interface. The toolkit component is a related set of packages that implement PostgreSQL functionality such as parsing the wire protocol and type mapping between PostgreSQL and Go. These underlying packages can be used to implement alternative drivers, proxies, load balancers, logical replication clients, etc. #### Quick Start ##### Installation ``` go get github.com/jackc/pgx/v5 ``` ##### Example Usage ``` package main import ( \"context\" \"fmt\" \"os\" \"github.com/jackc/pgx/v5\" ) func m",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:go-grpc-protobuf-pgx:pkg-go-dev-pgx-v5-v5",
+    "title": "pkg.go.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Go gRPC, Protocol Buffers, and pgx Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "d01c2441e20229b1d4f9192887f1504cda2083aef576325eadee0b94cd3a8f7f",
+  "markdown_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/pkg-go-dev-pgx-v5-v5.md",
+  "fetched_at": "2026-10-09T05:33:34.421Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "go-grpc-protobuf-pgx",
+    "source_title": "Go gRPC, Protocol Buffers, and pgx Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/pkg-go-dev-pgx-v5-v5.md"
+}

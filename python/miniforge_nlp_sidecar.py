@@ -1465,6 +1465,19 @@ def _grounded_extractions(
     return extracted
 
 
+def _grounded_source_binding_status(req: AnalyzeRequest, analyzed_text: str) -> tuple[str, str]:
+    required = (req.source_ref, req.source_revision, req.workspace_revision, req.packet_key)
+    if not all(isinstance(value, str) and value.strip() for value in required):
+        return "INCOMPLETE", "SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED"
+    source_revision = str(req.source_revision)
+    if re.fullmatch(r"sha256:[a-f0-9]{64}", source_revision) is None:
+        return "INVALID_SOURCE_REVISION_FORMAT", "SOURCE_REVISION_MUST_BE_SHA256_OF_ANALYZED_BYTES"
+    analyzed_revision = "sha256:" + hashlib.sha256(analyzed_text.encode("utf-8")).hexdigest()
+    if source_revision != analyzed_revision:
+        return "SOURCE_REVISION_MISMATCH", "ANALYZED_TEXT_BYTES_DO_NOT_MATCH_SOURCE_REVISION"
+    return "SOURCE_BYTES_BOUND", ""
+
+
 def _chunk_field(item: Any, *names: str) -> Any:
     if isinstance(item, dict):
         for name in names:
@@ -2787,8 +2800,23 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     concepts = _code_concepts(text, entities, chunks) if code_mode else [entity.text for entity in entities[:50]]
     grounded_extractions: list[dict[str, Any]] = []
     grounded_span_diagnostics: list[dict[str, Any]] = []
+    source_binding_status, source_binding_reason = (
+        _grounded_source_binding_status(req, text)
+        if req.grounded_extraction_required
+        else ("NOT_REQUESTED", "")
+    )
     grounded_execution_receipt: dict[str, Any] = {
         "requested": bool(req.grounded_extraction_required),
+        "inputChecksum": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "inputByteLength": len(text.encode("utf-8")),
+        "requestBinding": {
+            "sourceRef": req.source_ref,
+            "sourceRevision": req.source_revision,
+            "workspaceRevision": req.workspace_revision,
+            "packetKey": req.packet_key,
+            "status": source_binding_status,
+            "reason": source_binding_reason or None,
+        },
         "executorAttempted": False,
         "executorCompleted": False,
         "resultCount": 0,
@@ -2796,13 +2824,17 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     }
     grounded_used = False
     if req.grounded_extraction_required:
-        grounded_extractions = _grounded_extractions(
-            text,
-            req.model_id,
-            span_diagnostics=grounded_span_diagnostics,
-            execution_receipt=grounded_execution_receipt,
-        )
-        grounded_used = bool(grounded_extractions)
+        if source_binding_status == "SOURCE_BYTES_BOUND":
+            grounded_extractions = _grounded_extractions(
+                text,
+                req.model_id,
+                span_diagnostics=grounded_span_diagnostics,
+                execution_receipt=grounded_execution_receipt,
+            )
+            grounded_used = bool(grounded_extractions)
+        else:
+            grounded_execution_receipt["state"] = "UNAVAILABLE_SOURCE_BINDING"
+            grounded_execution_receipt["failureClass"] = source_binding_reason
     pass_results, ast_units, semantic_cards, hmm_observations, control5, experiment_feature_matrix = _build_pass_results(
         req,
         text,

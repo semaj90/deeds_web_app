@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "go-grpc-protobuf-pgx",
+  "source_ref": "go-grpc-protobuf-pgx:protobuf-dev-go-go-generated-go-generated",
+  "url": "https://protobuf.dev/reference/go/go-generated/",
+  "title": "protobuf.dev",
+  "domain_class": "tool",
+  "focus_tags": [
+    "go",
+    "grpc",
+    "protobuf",
+    "pgx",
+    "service-runtime",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "protobuf.dev",
+    "markdown_excerpt": "# Go Generated Code Guide (Open) Describes exactly what Go code the Protobuf compiler generates for any given protocol definition. Any differences between proto2, proto3, and editions generated code are highlighted - note that these differences are in the generated code as described in this document, not the base API, which are the same in both versions. You should read the [proto2 language guide](https://protobuf.dev/programming-guides/proto2), [proto3 language guide](https://protobuf.dev/programming-guides/proto3), or [editions language guide](https://protobuf.dev/programming-guides/editions) before reading this document. #### Note You are looking at documentation for the old generated code API (Open Struct API). See [Go Generated Code (Opaque)](https://protobuf.dev/reference/go/go-generated-opaque) for the corresponding documentation of the (new) Opaque API. See [Go Protobuf: The new Opaque API](https://go.dev/blog/protobuf-opaque) for the introduction of the Opaque API. ## Compiler Invocation The Protobuf compiler requires a plugin to generate Go code. Install it using Go 1.16 or higher by running: ```shell go install google.golang.org/protobuf/cmd/protoc-gen-go@latest ``` This",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:go-grpc-protobuf-pgx:protobuf-dev-go-go-generated-go-generated",
+    "title": "protobuf.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Go gRPC, Protocol Buffers, and pgx Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "37f610763f85a923eeca44e7352ee45f37f686eca05f7a51323d7a83feabc78f",
+  "markdown_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/protobuf-dev-go-go-generated-go-generated.md",
+  "fetched_at": "2026-10-09T05:33:34.806Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "go-grpc-protobuf-pgx",
+    "source_title": "Go gRPC, Protocol Buffers, and pgx Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "tool",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/protobuf-dev-go-go-generated-go-generated.md"
+}

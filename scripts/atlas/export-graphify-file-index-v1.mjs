@@ -53,7 +53,7 @@ function query() {
       'feature_label', ap.feature_label,
       'title_id', ap.title_id,
       'tree_node_id', ap.tree_node_id,
-      'source_revision', COALESCE(NULLIF(ap.content_hash, ''), NULLIF(ap.sha256, ''), CASE WHEN ap.workspace_revision IS NOT NULL THEN 'workspace:' || ap.workspace_revision::text END),
+      'source_revision', ap.source_revision,
       'workspace_revision', ap.workspace_revision,
       'representation_revision', ap.representation_revision,
       'content_hash', ap.content_hash,

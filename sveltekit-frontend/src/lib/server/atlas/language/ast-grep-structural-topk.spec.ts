@@ -62,6 +62,68 @@ describe('ast-grep structural top-K', () => {
     }
   });
 
+  it('does not emit destructuring patterns as named variable symbols', async () => {
+    const rows = await extractAstGrepStructuralCandidates({
+      ...EXTRACTION,
+      code: 'const { Pool } = pkg; const [first, second] = values; const { options: config = {} } = input;',
+    });
+
+    expect(rows.filter((row) => row.nodeKind === 'variable_declarator')).toEqual([]);
+  });
+
+  it('uses only JavaScript grammar node kinds for JavaScript inputs', async () => {
+    const rows = await extractAstGrepStructuralCandidates({
+      ...EXTRACTION,
+      code: 'export function addBlocker(value) { return value; }',
+      filePath: 'scripts/example.mjs',
+      sourceRef: 'scripts/example.mjs',
+      language: 'JAVASCRIPT',
+    });
+
+    expect(rows.map((row) => `${row.entityKind}:${row.name}`)).toContain('FUNCTION:addBlocker');
+    expect(rows.every((row) => row.filePath === 'scripts/example.mjs')).toBe(true);
+  });
+
+  it('reports UTF-8 byte spans when non-ASCII text precedes a declaration', async () => {
+    const code = '// 🐉\nexport function addBlocker(value) { return value; }';
+    const rows = await extractAstGrepStructuralCandidates({
+      ...EXTRACTION,
+      code,
+      filePath: 'scripts/example.mjs',
+      sourceRef: 'scripts/example.mjs',
+      language: 'JAVASCRIPT',
+    });
+    const declaration = rows.find((row) => row.name === 'addBlocker');
+    const bytes = Buffer.from(code, 'utf8');
+
+    expect(declaration).toBeDefined();
+    expect(bytes.subarray(declaration!.startByte, declaration!.endByte).toString('utf8'))
+      .toBe('function addBlocker(value) { return value; }');
+    expect(declaration!.startByte).toBe(Buffer.byteLength('// 🐉\nexport ', 'utf8'));
+  });
+
+  it('keeps UTF-8 byte spans for Unicode-prefixed TypeScript enums and methods', async () => {
+    const code = '// 🧬\nexport enum SearchState { Idle, Ready }\nexport class SearchRunner { run() { return SearchState.Ready; } }';
+    const rows = await extractAstGrepStructuralCandidates({
+      ...EXTRACTION,
+      code,
+      filePath: 'src/search-state.ts',
+      sourceRef: 'src/search-state.ts',
+      language: 'TYPESCRIPT',
+    });
+    const enumCandidate = rows.find((row) => row.entityKind === 'ENUM' && row.name === 'SearchState');
+    const methodCandidate = rows.find((row) => row.entityKind === 'METHOD' && row.name === 'run');
+    const bytes = Buffer.from(code, 'utf8');
+
+    expect(enumCandidate).toBeDefined();
+    expect(bytes.subarray(enumCandidate!.startByte, enumCandidate!.endByte).toString('utf8'))
+      .toBe('enum SearchState { Idle, Ready }');
+    expect(enumCandidate!.startByte).toBe(Buffer.byteLength('// 🧬\nexport ', 'utf8'));
+    expect(methodCandidate).toBeDefined();
+    expect(bytes.subarray(methodCandidate!.startByte, methodCandidate!.endByte).toString('utf8'))
+      .toBe('run() { return SearchState.Ready; }');
+  });
+
   it('ranks exact/prefix identifier matches above generic exported candidates', async () => {
     const candidates = await extractAstGrepStructuralCandidates(EXTRACTION);
     const result = rankAstGrepStructuralTopK({

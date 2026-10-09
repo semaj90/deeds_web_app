@@ -162,7 +162,10 @@ export function compileSearchRuntimeLiveFeatureJoinV1(input: {
   candidateSnapshotRevision: string;
   producerRevision: string;
   taskKind: string;
-  response: {\n    packets: SearchResult['packets'];\n    provenance: Pick<SearchResult['provenance'], 'readOnly'>;\n  };
+  response: {
+    packets: SearchResult['packets'];
+    provenance: Pick<SearchResult['provenance'], 'readOnly'>;
+  };
   profiles: readonly ChunkRetrievalProfileV2[];
   supplements: readonly SearchRuntimeLiveFeatureSupplementV1[];
 }): SearchRuntimeLiveFeatureJoinV1 {

@@ -56,11 +56,28 @@ export const AstCanonicalCoordinateJoinInputV1Schema = z.object({
 }).strict();
 export type AstCanonicalCoordinateJoinInputV1 = z.infer<typeof AstCanonicalCoordinateJoinInputV1Schema>;
 
+export const AstGrepCanonicalJoinedCandidateV1Schema = z.object({
+  ...AstGrepStructuralCandidateV1Schema.shape,
+  treeNodeId: z.string().min(1),
+  requiresCanonicalTreeJoin: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  if (value.endByte < value.startByte) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endByte'], message: 'endByte must be >= startByte' });
+  }
+});
+export type AstGrepCanonicalJoinedCandidateV1 = z.infer<typeof AstGrepCanonicalJoinedCandidateV1Schema>;
+
+const AstGrepCandidateAfterJoinV1Schema = z.union([
+  AstGrepStructuralCandidateV1Schema,
+  AstGrepCanonicalJoinedCandidateV1Schema,
+]);
+type AstGrepCandidateAfterJoinV1 = z.infer<typeof AstGrepCandidateAfterJoinV1Schema>;
+
 export const AstCanonicalCoordinateJoinResultV1Schema = z.object({
   schema: z.literal('atlas.ast-canonical-coordinate-join-result.v1'),
   status: AstCanonicalCoordinateJoinStatusSchema,
   candidateBefore: AstGrepStructuralCandidateV1Schema,
-  candidateAfter: AstGrepStructuralCandidateV1Schema,
+  candidateAfter: AstGrepCandidateAfterJoinV1Schema,
   matchedObservation: CanonicalStructuralObservationV1Schema.nullable(),
   matchingObservationCount: z.number().int().nonnegative(),
   provisionalIdentityObserved: z.boolean(),
@@ -96,7 +113,7 @@ function nodeKindsCompatible(candidateKind: string, observationKind: string): bo
 
 function baseResult(input: AstCanonicalCoordinateJoinInputV1, values: {
   status: AstCanonicalCoordinateJoinStatus;
-  candidateAfter: AstGrepStructuralCandidateV1;
+  candidateAfter: AstGrepCandidateAfterJoinV1;
   matchedObservation: CanonicalStructuralObservationV1 | null;
   matchingObservationCount: number;
   provisionalIdentityObserved: boolean;
@@ -183,7 +200,7 @@ export function joinAstCandidateToCanonicalCoordinates(
     });
   }
 
-  const candidateAfter = AstGrepStructuralCandidateV1Schema.parse({
+  const candidateAfter = AstGrepCanonicalJoinedCandidateV1Schema.parse({
     ...candidate,
     treeNodeId: match.treeNodeId,
     symbolVersionId: match.symbolVersionId,

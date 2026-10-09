@@ -1,0 +1,62 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "fastapi-pydantic-langextract",
+  "source_ref": "fastapi-pydantic-langextract:fastapi-tiangolo-com-index",
+  "url": "https://fastapi.tiangolo.com/",
+  "title": "fastapi.tiangolo.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "fastapi",
+    "pydantic",
+    "langextract",
+    "grounded-extraction",
+    "structured-output",
+    "llm_synthesis",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "fastapi.tiangolo.com",
+    "markdown_excerpt": "[Skip to content](https://fastapi.tiangolo.com/#fastapi) [FastAPI Conf '26October 28, 2026Amsterdam, NLAll about FastAPI, right from the source.Learn more →](https://fastapiconf.com/) [FastAPI Conf '26October 28, 2026Amsterdam, NLAll about FastAPI, right from the source.Learn more →](https://fastapiconf.com/) # FastAPI [¶](https://fastapi.tiangolo.com/\\#fastapi \"Permanent link\") [![FastAPI](https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png)](https://fastapi.tiangolo.com/) _FastAPI framework, high performance, easy to learn, fast to code, ready for production_ [![Test](https://github.com/fastapi/fastapi/actions/workflows/test.yml/badge.svg?event=push&branch=master)](https://github.com/fastapi/fastapi/actions?query=workflow%3ATest+event%3Apush+branch%3Amaster)[![Coverage](https://coverage-badge.samuelcolvin.workers.dev/fastapi/fastapi.svg)](https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/fastapi)[![Package version](https://img.shields.io/pypi/v/fastapi?color=%2334D058&label=pypi%20package)](https://pypi.org/project/fastapi)[![Supported Python versions](https://img.shields.io/pypi/pyversions/fastapi.svg?color=%2334D058)](https://pypi.org/project/fastapi) * * ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:fastapi-pydantic-langextract:fastapi-tiangolo-com-index",
+    "title": "fastapi.tiangolo.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh FastAPI, Pydantic, and LangExtract Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "edc1025d1452f829d59e92a831fa7cf130c9dbb4258aff47a738ff33a8e82c4a",
+  "markdown_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/fastapi-tiangolo-com-index.md",
+  "fetched_at": "2026-10-09T05:31:46.444Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "fastapi-pydantic-langextract",
+    "source_title": "FastAPI, Pydantic, and LangExtract Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/fastapi-tiangolo-com-index.md"
+}

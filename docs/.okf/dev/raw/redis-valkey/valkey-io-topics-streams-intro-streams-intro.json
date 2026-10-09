@@ -1,0 +1,58 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "redis-valkey",
+  "source_ref": "redis-valkey:valkey-io-topics-streams-intro-streams-intro",
+  "url": "https://valkey.io/topics/streams-intro/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "key_value",
+    "expiry",
+    "streams",
+    "pubsub",
+    "ace",
+    "bitfrost",
+    "json_packets",
+    "vector_similarity",
+    "optional_search_module",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Streams A Stream is a data structure that acts like an append-only log but also implements several operations to overcome some of the limits of a typical append-only log. These include random access in O(1) time and complex consumption strategies, such as consumer groups. You can use streams to record and simultaneously syndicate events in real time. Examples of Stream use cases include: - Event sourcing (e.g., tracking user actions, clicks, etc.) - Sensor monitoring (e.g., readings from devices in the field) - Notifications (e.g., storing a record of each user's notifications in a separate stream) Valkey generates a unique ID for each stream entry. You can use these IDs to retrieve their associated entries later or to read and process all subsequent entries in the stream. Note that because these IDs are related to time, the ones shown here may vary and will be different from the IDs you see in your own Valkey instance. Streams support several trimming strategi",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:redis-valkey:valkey-io-topics-streams-intro-streams-intro",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Redis and Valkey Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "642166a2b2fb00a64887e09f9d85fccf1e1b9d45dd3b4bf88b290e8b2fbcf197",
+  "markdown_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-streams-intro-streams-intro.md",
+  "fetched_at": "2026-10-09T05:16:34.563Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "redis-valkey",
+    "source_title": "Redis and Valkey Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-streams-intro-streams-intro.md"
+}

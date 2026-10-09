@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { Pool } from 'pg';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-	buildDocIntelligenceStudioSnapshotV1, collectLocalCaptures, computeCoverage, scanRequiredTerms, searchDocCorpus, searchDocCorpusDense,
+	buildDocIntelligenceStudioSnapshotV1, collectLocalCaptures, computeCoverage, findRepoRoot, scanRequiredTerms, searchDocCorpus, searchDocCorpusDense,
 	type RuntimeVersions
 } from './doc-intelligence-read-model.js';
 
@@ -251,6 +251,70 @@ describe('search', () => {
 		writeDev(); writeAllGroups();
 		const r = await searchDocCorpus({ pool: null, root, q: 'zzzz-not-present' });
 		expect(r.hits).toEqual([]);
+	});
+
+	it('reads the atomically published corpus generation and rejects damaged publication artifacts', () => {
+		writeDev(); writeAllGroups();
+		const dev = join(root, 'docs', '.okf', 'dev');
+		const generationDir = join(dev, '.publications', 'run-pointer');
+		mkdirSync(generationDir, { recursive: true });
+		const markdownPath = 'docs/.okf/dev/raw/fixture/page.md';
+		const markdown = '# Published fixture';
+		mkdirSync(join(root, 'docs', '.okf', 'dev', 'raw', 'fixture'), { recursive: true });
+		writeFileSync(join(root, markdownPath), markdown);
+		const row = {
+			schema_version: 'okf.dev.corpus.v1', source_id: 'fixture', source_ref: 'fixture:page',
+			url: 'https://example.org/page', title: 'Published fixture', content_hash: sha(markdown),
+			fetched_at: daysAgo(1), markdown_path: markdownPath
+		};
+		const corpusBytes = Buffer.from(`${JSON.stringify(row)}\n`);
+		const indexBytes = Buffer.from('# Published index');
+		const summaryBytes = Buffer.from('{}');
+		writeFileSync(join(generationDir, 'corpus.jsonl'), corpusBytes);
+		writeFileSync(join(generationDir, 'index.md'), indexBytes);
+		writeFileSync(join(generationDir, 'summary.json'), summaryBytes);
+		const checksum = (bytes: Buffer) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+		const generation = {
+			schema: 'atlas.okf-dev-corpus-generation.v1', run_id: 'run-pointer', canonical_authority: false,
+			artifacts: { 'corpus.jsonl': checksum(corpusBytes), 'index.md': checksum(indexBytes), 'summary.json': checksum(summaryBytes) }
+		};
+		const generationBytes = Buffer.from(JSON.stringify(generation));
+		writeFileSync(join(generationDir, 'manifest.json'), generationBytes);
+		writeFileSync(join(dev, 'published-current.json'), JSON.stringify({
+			schema: 'atlas.okf-crawl-publication-receipt.v1', run_id: 'run-pointer',
+			generation_manifest: '.publications/run-pointer/manifest.json',
+			generation_manifest_checksum: checksum(generationBytes),
+			publication_status: 'PUBLISHED_READBACK_VERIFIED', canonical_authority: false
+		}));
+
+		const publishedCapture = collectLocalCaptures(root, RUNTIME);
+		expect(publishedCapture.issues).toEqual([]);
+		expect(publishedCapture.sources.some((source) => source.sourceUrl === 'https://example.org/page')).toBe(true);
+		writeFileSync(join(generationDir, 'summary.json'), 'tampered');
+		expect(collectLocalCaptures(root, RUNTIME).issues.map((issue) => issue.code)).toContain('DEV_PUBLICATION_INVALID');
+		expect(collectLocalCaptures(root, RUNTIME).sources.some((source) => source.sourceUrl === 'https://example.org/page')).toBe(false);
+	});
+
+	it('resolves portable corpus markdown paths against the repository root', async () => {
+		const markdown = '# Zod schema parsing\nZod provides schema parsing and validation.';
+		const markdownPath = 'docs/.okf/dev/raw/zod/zod-dev-index.md';
+		writeDev([{
+			source_id: 'zod', source_ref: 'zod:zod-dev-index', url: 'https://zod.dev/', title: 'Zod',
+			content_hash: sha(markdown), fetched_at: daysAgo(1), markdown_path: markdownPath
+		}]);
+		const filePath = join(root, markdownPath);
+		mkdirSync(join(root, 'docs', '.okf', 'dev', 'raw', 'zod'), { recursive: true });
+		writeFileSync(filePath, markdown);
+		const result = await searchDocCorpus({ pool: null, root, q: 'zod schema parsing' });
+		expect(result.hits).toHaveLength(1);
+		expect(result.hits[0]).toMatchObject({ sourceId: 'zod', sourceClass: 'GENERATED_CORPUS', badge: 'GENERATED_CORPUS' });
+	});
+
+	it('finds the newly indexed OpenWiki documentation through local lexical search only', async () => {
+		const result = await searchDocCorpus({ pool: null, root: findRepoRoot(), q: 'coding-agent integrations', limit: 5 });
+		expect(result.mode).toBe('LOCAL_LEXICAL');
+		expect(result.hits.some((hit) => hit.sourceId === 'openwiki-agent-docs'
+			&& hit.sourceClass === 'GENERATED_CORPUS' && hit.badge === 'GENERATED_CORPUS')).toBe(true);
 	});
 });
 

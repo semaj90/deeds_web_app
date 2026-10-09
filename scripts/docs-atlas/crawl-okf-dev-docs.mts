@@ -2,11 +2,14 @@
 import 'dotenv/config';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import { mergeOkfDevCorpusRowsV1, summarizeOkfDevCorpusRowsV1 } from './lib/okf-dev-corpus-merge-v1.mjs';
+import { recoverOkfDevPartialPageV1 } from './lib/okf-dev-partial-page-recovery-v1.mjs';
+import { publishOkfDevCorpusGenerationV1, resolveOkfDevPublishedCorpusV1, writeOkfCrawlFailureReceiptV1 } from './lib/okf-dev-publication-v1.mjs';
 
 type ManifestSource = {
   source_id: string;
@@ -89,8 +92,28 @@ const SUMMARY_PATH = join(OUTPUT_ROOT, 'summary.json');
 const execFileAsync = promisify(execFile);
 
 const dryRun = args.includes('--dry-run');
+const append = args.includes('--append');
+const sourceIdFilter = args.find((arg) => arg.startsWith('--source-id='))?.slice('--source-id='.length);
 const limitArg = args.find((arg) => arg.startsWith('--limit='));
 const limit = limitArg ? Number(limitArg.split('=')[1]) : Number.POSITIVE_INFINITY;
+const crawlRunId = `${new Date().toISOString().replace(/[^0-9TZ]/g, '')}-${crypto.randomBytes(8).toString('hex')}`;
+const crawlRunState: {
+  selectedCount: number;
+  stagedCount: number;
+  validatedCount: number;
+  demandSnapshotChecksum: string | null;
+  allowlistChecksum: string | null;
+  failedItems: Array<Record<string, unknown>>;
+  currentPage: { source_id: string; url: string } | null;
+} = {
+  selectedCount: 0,
+  stagedCount: 0,
+  validatedCount: 0,
+  demandSnapshotChecksum: null,
+  allowlistChecksum: null,
+  failedItems: [],
+  currentPage: null,
+};
 
 function slugFromUrl(url: string): string {
   const parsed = new URL(url);
@@ -267,20 +290,41 @@ async function fetchWithBeautifulSoup(url: string) {
 }
 
 async function main() {
-  if (!dryRun && [RECORDS_PATH, INDEX_PATH, SUMMARY_PATH].some((path) => existsSync(path))) {
+  if (!dryRun && !append && [RECORDS_PATH, INDEX_PATH, SUMMARY_PATH].some((path) => existsSync(path))) {
     throw new Error(`refusing_to_overwrite_existing_corpus:${OUTPUT_ROOT}`);
   }
-  const manifest = JSON.parse(await readFile(MANIFEST_PATH, 'utf8')) as { sources: ManifestSource[] };
-  const records: string[] = [];
-  const summary: Record<string, { pages: number; domains: Record<string, number> }> = {};
+  const manifestBytes = await readFile(MANIFEST_PATH);
+  const manifest = JSON.parse(manifestBytes.toString('utf8')) as { sources: ManifestSource[] };
+  const selectedSources = sourceIdFilter
+    ? manifest.sources.filter((source) => source.source_id === sourceIdFilter)
+    : manifest.sources;
+  if (sourceIdFilter && selectedSources.length === 0) throw new Error(`manifest_source_not_found:${sourceIdFilter}`);
+  const selectedPages = selectedSources.flatMap((source) => source.pages.map((url) => ({ source_id: source.source_id, url })));
+  const boundedSelectedPages = Number.isFinite(limit) ? selectedPages.slice(0, limit) : selectedPages;
+  crawlRunState.selectedCount = boundedSelectedPages.length;
+  crawlRunState.allowlistChecksum = `sha256:${sha256(manifestBytes.toString('utf8'))}`;
+  crawlRunState.demandSnapshotChecksum = `sha256:${sha256(JSON.stringify({
+    schema: 'atlas.documentation-crawl-selection.v1',
+    source_id_filter: sourceIdFilter ?? null,
+    selected_pages: boundedSelectedPages,
+  }))}`;
+  let existingEntries: z.infer<typeof OkfDevCorpusEntrySchema>[] = [];
+  const publishedCorpus = resolveOkfDevPublishedCorpusV1(OUTPUT_ROOT);
+  const priorCorpusPath = publishedCorpus?.corpusPath ?? RECORDS_PATH;
+  if (!dryRun && append && existsSync(priorCorpusPath)) {
+    existingEntries = (await readFile(priorCorpusPath, 'utf8')).split(/\r?\n/).filter(Boolean)
+      .map((line) => OkfDevCorpusEntrySchema.parse(JSON.parse(line)));
+    mergeOkfDevCorpusRowsV1(existingEntries, []);
+  }
+  const newEntries: z.infer<typeof OkfDevCorpusEntrySchema>[] = [];
+  const dryRunSummary: Record<string, { pages: number; domains: Record<string, number> }> = {};
   const maxPages = Number.isFinite(limit) ? limit : Number.POSITIVE_INFINITY;
   let processed = 0;
 
   await mkdir(RAW_ROOT, { recursive: true });
   await mkdir(OUTPUT_ROOT, { recursive: true });
 
-  for (const source of manifest.sources) {
-    summary[source.source_id] ??= { pages: 0, domains: {} };
+  for (const source of selectedSources) {
     for (const url of source.pages) {
       if (processed >= maxPages) break;
 
@@ -288,22 +332,74 @@ async function main() {
       const sourceDir = join(RAW_ROOT, source.source_id);
       const rawPath = join(sourceDir, `${slug}.md`);
       const jsonPath = join(sourceDir, `${slug}.json`);
+      const sourceRef = `${source.source_id}:${slug}`;
+      const markdownPath = relative(REPO_ROOT, rawPath).replaceAll('\\', '/');
+      crawlRunState.currentPage = { source_id: source.source_id, url };
+
+      if (append && !dryRun) {
+        const knownEntries = [...existingEntries, ...newEntries];
+        const priorRef = knownEntries.find((entry) => entry.source_ref === sourceRef);
+        if (priorRef) {
+          if (priorRef.url !== url) throw new Error(`CORPUS_SOURCE_REF_CONFLICT:${sourceRef}`);
+          processed += 1;
+          crawlRunState.currentPage = null;
+          continue;
+        }
+        if (knownEntries.some((entry) => entry.url === url)) throw new Error(`CORPUS_URL_CONFLICT:${url}`);
+        const rawExists = existsSync(rawPath);
+        const sidecarExists = existsSync(jsonPath);
+        if (rawExists !== sidecarExists) throw new Error(`PARTIAL_PAGE_PAIR_INCOMPLETE:${sourceRef}`);
+        if (rawExists && sidecarExists) {
+          const sidecar = JSON.parse(await readFile(jsonPath, 'utf8')) as Record<string, unknown>;
+          const recovered = OkfDevCorpusEntrySchema.parse(recoverOkfDevPartialPageV1({
+            sidecar,
+            markdown: await readFile(rawPath, 'utf8'),
+            sourceId: source.source_id,
+            sourceRef,
+            url,
+            markdownPath,
+          }));
+          mergeOkfDevCorpusRowsV1(knownEntries, [recovered]);
+          newEntries.push(recovered);
+          crawlRunState.stagedCount += 1;
+          processed += 1;
+          console.log(`[okf-dev] recovered verified partial page ${sourceRef}`);
+          crawlRunState.currentPage = null;
+          continue;
+        }
+      }
 
       if (dryRun) {
         console.log(`[dry-run] ${source.source_id} -> ${url}`);
         processed += 1;
-        summary[source.source_id].pages += 1;
-        summary[source.source_id].domains[source.domain_class] =
-          (summary[source.source_id].domains[source.domain_class] ?? 0) + 1;
+        dryRunSummary[source.source_id] ??= { pages: 0, domains: {} };
+        dryRunSummary[source.source_id].pages += 1;
+        dryRunSummary[source.source_id].domains[source.domain_class] =
+          (dryRunSummary[source.source_id].domains[source.domain_class] ?? 0) + 1;
         continue;
       }
 
       await mkdir(sourceDir, { recursive: true });
 
+      const fetchAttempts: Array<Record<string, string>> = [];
+      const attemptFetch = async (executor: string, operation: () => Promise<{ title: string; markdown: string; raw?: Record<string, unknown> } | null>) => {
+        try {
+          const result = await operation();
+          if (!result) fetchAttempts.push({ executor, status: 'EMPTY_RESULT' });
+          return result;
+        } catch (error) {
+          fetchAttempts.push({ executor, status: 'FAILED', error: error instanceof Error ? error.message.slice(0, 300) : 'UNKNOWN_ERROR' });
+          return null;
+        }
+      };
       const fetched =
-        (await fetchWithFirecrawl(url).catch(() => null)) ??
-        (await fetchWithBeautifulSoup(url).catch(() => null)) ??
-        (await fetchWithFallback(url));
+        (await attemptFetch('firecrawl', () => fetchWithFirecrawl(url))) ??
+        (await attemptFetch('beautifulsoup', () => fetchWithBeautifulSoup(url))) ??
+        (await attemptFetch('fallback', () => fetchWithFallback(url)));
+      if (!fetched) {
+        crawlRunState.failedItems.push({ source_id: source.source_id, url, category: 'FETCH_ALL_EXECUTORS_FAILED', attempts: fetchAttempts });
+        throw new Error(`FETCH_ALL_EXECUTORS_FAILED:${source.source_id}:${url}`);
+      }
       const markdown = fetched.markdown || '';
       const contentHash = sha256(markdown);
       const focusTags = [...new Set([...source.focus_tags, ...classifyFocusTags(markdown)])];
@@ -312,7 +408,7 @@ async function main() {
       const entry = OkfDevCorpusEntrySchema.parse({
         schema_version: 'okf.dev.corpus.v1',
         source_id: source.source_id,
-        source_ref: `${source.source_id}:${slug}`,
+        source_ref: sourceRef,
         url,
         title: fetched.title,
         domain_class: source.domain_class,
@@ -341,7 +437,7 @@ async function main() {
         },
         canonical_api_recommendations: canonicalApiRecommendations,
         content_hash: contentHash,
-        markdown_path: rawPath,
+        markdown_path: markdownPath,
         fetched_at: new Date().toISOString(),
         metadata: {
           kind: source.kind,
@@ -354,24 +450,23 @@ async function main() {
         },
       });
 
-      await writeFile(rawPath, markdown, 'utf8');
-      await writeFile(jsonPath, JSON.stringify({ ...entry, raw_path: rawPath }, null, 2), 'utf8');
-      records.push(JSON.stringify(entry));
+      await writeFile(rawPath, markdown, { encoding: 'utf8', flag: 'wx' });
+      await writeFile(jsonPath, JSON.stringify({ ...entry, raw_path: entry.markdown_path }, null, 2), { encoding: 'utf8', flag: 'wx' });
+      newEntries.push(entry);
+      crawlRunState.stagedCount += 1;
       processed += 1;
-      summary[source.source_id].pages += 1;
-      summary[source.source_id].domains[entry.domain_class] =
-        (summary[source.source_id].domains[entry.domain_class] ?? 0) + 1;
       console.log(`[okf-dev] ${source.source_id} -> ${url}`);
+      crawlRunState.currentPage = null;
     }
   }
 
   if (dryRun) {
-    console.log(JSON.stringify({ manifest: MANIFEST_PATH, processed, summary }, null, 2));
+    console.log(JSON.stringify({ manifest: MANIFEST_PATH, processed, summary: dryRunSummary }, null, 2));
     return;
   }
 
-  await writeFile(RECORDS_PATH, `${records.join('\n')}\n`, 'utf8');
-
+  const allEntries = mergeOkfDevCorpusRowsV1(existingEntries, newEntries);
+  const summary = summarizeOkfDevCorpusRowsV1(allEntries);
   const indexLines = [
     '# OKF Dev Corpus',
     '',
@@ -383,28 +478,74 @@ async function main() {
   for (const [sourceId, value] of Object.entries(summary)) {
     indexLines.push(`- ${sourceId}: ${value.pages} pages`);
   }
-  indexLines.push('', '## Output', '', `- Corpus: \`${RECORDS_PATH}\``, `- Raw markdown: \`${RAW_ROOT}\``);
-  await writeFile(INDEX_PATH, indexLines.join('\n'), 'utf8');
-  await writeFile(
-    SUMMARY_PATH,
-    JSON.stringify(
-      {
-        schema_version: 'okf.dev.summary.v1',
-        generated_at: new Date().toISOString(),
-        manifest: MANIFEST_PATH,
-        records: records.length,
-        summary,
-      },
-      null,
-      2
-    ),
-    'utf8'
+  indexLines.push(
+    '',
+    '## Output',
+    '',
+    `- Corpus: \`${relative(REPO_ROOT, RECORDS_PATH).replaceAll('\\', '/')}\``,
+    `- Raw markdown: \`${relative(REPO_ROOT, RAW_ROOT).replaceAll('\\', '/')}\``
   );
-
-  console.log(`[okf-dev] wrote ${records.length} records to ${RECORDS_PATH}`);
+  const summaryArtifact = {
+    schema_version: 'okf.dev.summary.v1',
+    generated_at: new Date().toISOString(),
+    manifest: MANIFEST_PATH,
+    records: allEntries.length,
+    summary,
+  };
+  const published = await publishOkfDevCorpusGenerationV1({
+    output_root: OUTPUT_ROOT,
+    artifact_root: REPO_ROOT,
+    run_id: crawlRunId,
+    demand_snapshot_checksum: crawlRunState.demandSnapshotChecksum!,
+    allowlist_checksum: crawlRunState.allowlistChecksum!,
+    selected_count: crawlRunState.selectedCount,
+    allowed_pages: boundedSelectedPages,
+    entries: allEntries,
+    pages: await Promise.all(newEntries.map(async (entry) => ({
+      source_id: entry.source_id,
+      source_ref: entry.source_ref,
+      url: entry.url,
+      markdown_path: entry.markdown_path,
+      entry,
+    }))),
+    retained_pages: existingEntries.map((entry) => ({
+      source_id: entry.source_id,
+      source_ref: entry.source_ref,
+      url: entry.url,
+      markdown_path: entry.markdown_path,
+      entry,
+    })),
+    index_markdown: indexLines.join('\n'),
+    summary: summaryArtifact,
+    validate_entry: (entry: unknown) => OkfDevCorpusEntrySchema.parse(entry),
+  });
+  crawlRunState.validatedCount = published.counts.validated;
+  console.log(`[okf-dev] ${append ? 'published merged' : 'published'} ${allEntries.length} records via ${join(OUTPUT_ROOT, 'published-current.json')}`);
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error('[okf-dev] crawl failed:', error);
+  if (!dryRun) {
+    const currentPage = crawlRunState.currentPage;
+    if (crawlRunState.failedItems.length === 0) {
+      crawlRunState.failedItems.push({
+        ...(currentPage ?? {}),
+        category: currentPage ? 'CRAWL_STEP_FAILED' : crawlRunState.stagedCount > crawlRunState.validatedCount ? 'PUBLICATION_FAILED' : 'CRAWL_RUN_FAILED',
+        error: error instanceof Error ? error.message.slice(0, 500) : 'UNKNOWN_ERROR',
+      });
+    }
+    await writeOkfCrawlFailureReceiptV1({
+      receipt_root: join(REPO_ROOT, '.tmp/atlas/documentation-crawl-failures'),
+      run_id: crawlRunId,
+      demand_snapshot_checksum: crawlRunState.demandSnapshotChecksum,
+      allowlist_checksum: crawlRunState.allowlistChecksum,
+      selected_count: crawlRunState.selectedCount,
+      staged_count: crawlRunState.stagedCount,
+      validated_count: crawlRunState.validatedCount,
+      failed_count: Math.max(1, crawlRunState.failedItems.length),
+      failed_items: crawlRunState.failedItems,
+      error_category: error instanceof Error ? error.message.split(':', 1)[0].slice(0, 120) : 'UNKNOWN_ERROR',
+    }).catch((receiptError) => console.error('[okf-dev] failure receipt write failed:', receiptError));
+  }
   process.exitCode = 1;
 });

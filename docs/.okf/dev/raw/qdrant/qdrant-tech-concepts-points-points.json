@@ -1,0 +1,56 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "qdrant",
+  "source_ref": "qdrant:qdrant-tech-concepts-points-points",
+  "url": "https://qdrant.tech/documentation/concepts/points/",
+  "title": "qdrant.tech",
+  "domain_class": "database",
+  "focus_tags": [
+    "llm_synthesis",
+    "llm_output",
+    "canonical_api_recommendations",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "qdrant.tech",
+    "markdown_excerpt": "- [Documentation](https://qdrant.tech/documentation/) - [Manage Data](https://qdrant.tech/documentation/manage-data/) - Points # [Anchor](https://qdrant.tech/documentation/manage-data/points/\\#points) Points The points are the central entity that Qdrant operates with. A point is a record consisting of a [vector](https://qdrant.tech/documentation/manage-data/vectors/) and an optional [payload](https://qdrant.tech/documentation/manage-data/payload/). It looks like this: ```json // This is a simple point { \"id\": 129, \"vector\": [0.1, 0.2, 0.3, 0.4], \"payload\": {\"color\": \"red\"}, } ``` You can search among the points grouped in one [collection](https://qdrant.tech/documentation/manage-data/collections/) based on vector similarity. This procedure is described in more detail in the [search](https://qdrant.tech/documentation/search/search/) and [filtering](https://qdrant.tech/documentation/search/filtering/) sections. This section explains how to create and manage points. Any point modification operation is asynchronous and takes place in 2 steps. At the first stage, the operation is written to the Write-ahead-log. After this moment, the service will not lose the data, even if the machine l",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:qdrant:qdrant-tech-concepts-points-points",
+    "title": "qdrant.tech",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Qdrant Docs from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Qdrant query points / named vectors",
+      "recommendation": "Use named vectors for logical lanes and keep oversampling/rescore on quantized search only.",
+      "rationale": "The official docs separate vector spaces, quantization, and search-time rescoring."
+    }
+  ],
+  "content_hash": "37a8b31c3a4100dfa28d9e0005a503e73b34c6a09b8d4bb8ca0df509c5b43b06",
+  "markdown_path": "docs/.okf/dev/raw/qdrant/qdrant-tech-concepts-points-points.md",
+  "fetched_at": "2026-10-09T05:26:37.104Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "qdrant",
+    "source_title": "Qdrant Docs",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/qdrant/qdrant-tech-concepts-points-points.md"
+}

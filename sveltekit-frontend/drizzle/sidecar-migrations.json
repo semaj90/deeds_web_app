@@ -497,6 +497,15 @@
       "validationCommand": "node scripts/atlas/audit-observation-feature-row-contract.mjs && node scripts/atlas/audit-atlas-migration-owners.mjs"
     },
     {
+      "file": "manual/20261008_atlas_observation_feature_lineage_v1.sql",
+      "status": "planned_sidecar",
+      "reason": "Proposed nullable source_revision and registry_revision on the active ORF table. Not applied; no backfill. Requires migration-owner review and explicit operator authorization.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "node scripts/atlas/audit-atlas-migration-owners.mjs"
+    },
+    {
       "file": "manual/20260819_atlas_observation_feature_rows_v1.sql",
       "status": "superseded_unapplied",
       "reason": "Candidate ID/vector contract conflicts with the active packet-key ORF table. Preserved for historical review; never applied.",

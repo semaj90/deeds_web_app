@@ -21,9 +21,39 @@ function registry() {
       { feature_id: 'graph.pagerank', family: 'GRAPH_CONTINUOUS', value_kind: 'CONTINUOUS', description: 'PageRank prior' },
       { feature_id: 'cluster.kmeans', family: 'CLUSTER_CATEGORICAL', value_kind: 'CATEGORICAL', description: 'KMeans assignment' },
       { feature_id: 'context.validation_passed', family: 'CONTEXT_CONTINUOUS', value_kind: 'BINARY', description: 'validator passed' },
-    ],
+    ].map((definition) => ({
+      ...definition,
+      evidence_requirements: ['SOURCE_REF', 'SOURCE_REVISION', 'EVIDENCE_REFERENCE'],
+      missing_value_policy: 'UNAVAILABLE_NOT_ZERO',
+    })),
   });
 }
+
+test('feature registry rejects definitions without evidence and missing-value policy', () => {
+  assert.throws(() => buildObservationFeatureRegistry({
+    registryRevision: 'registry-missing-contract',
+    definitions: [{
+      feature_id: 'ast.unqualified',
+      family: 'AST_BINARY',
+      value_kind: 'BINARY',
+      description: 'Unqualified legacy definition',
+    }],
+  }));
+});
+
+test('feature registry rejects duplicate evidence requirements', () => {
+  assert.throws(() => buildObservationFeatureRegistry({
+    registryRevision: 'registry-duplicate-evidence-requirement',
+    definitions: [{
+      feature_id: 'ast.duplicate-requirement',
+      family: 'AST_BINARY',
+      value_kind: 'BINARY',
+      description: 'Duplicate evidence requirement',
+      evidence_requirements: ['SOURCE_REF', 'SOURCE_REF'],
+      missing_value_policy: 'UNAVAILABLE_NOT_ZERO',
+    }],
+  }), /EVIDENCE_REQUIREMENTS_MUST_BE_UNIQUE/);
+});
 
 const ast = {
   schema: 'atlas.ast-grep-observation.v1',
@@ -116,6 +146,32 @@ test('observation compiler rejects cross-revision observation mixing', () => {
     registry: registry(),
     astObservations: [ast],
   }), /SOURCE_REVISION_MISMATCH/);
+});
+
+test('observation compiler rejects observed AST features missing from the registry', () => {
+  assert.throws(() => compileObservationFeatures({
+    candidateId: 'candidate-unknown-ast',
+    rowOrdinal: 2,
+    sourceRef: 'src/a.ts',
+    sourceRevision: 'src-r1',
+    workspaceRevision: 'workspace-r1',
+    rowIdentityChecksum: H('3'),
+    registry: registry(),
+    astObservations: [{ ...ast, observation_kind: 'unreviewed_new_ast_kind' }],
+  }), /OBSERVATION_FEATURE_DEFINITION_MISSING:ast\.unreviewed_new_ast_kind/);
+});
+
+test('observation compiler rejects supplied graph values without a registered definition', () => {
+  assert.throws(() => compileObservationFeatures({
+    candidateId: 'candidate-unknown-graph',
+    rowOrdinal: 3,
+    sourceRef: 'src/a.ts',
+    sourceRevision: 'src-r1',
+    workspaceRevision: 'workspace-r1',
+    rowIdentityChecksum: H('4'),
+    registry: registry(),
+    graph: { ppr: 0.5 },
+  }), /OBSERVATION_FEATURE_DEFINITION_MISSING:graph\.ppr/);
 });
 
 test('default MCP surface keeps .okf as resources and mutations explicitly authorized', () => {

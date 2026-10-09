@@ -10,6 +10,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { z } from 'zod';
 import {
   AnalysisPassResultSchema,
   compileExperimentFeatureMatrix,
@@ -172,6 +173,7 @@ export interface NlpAnalyzeResponse {
   chunks: NlpChunk[];
   features: NlpFeature[];
   metadata: Record<string, unknown>;
+  groundedExecutionObservation?: GroundedExecutionObservationV1 | null;
   capabilities: {
     spacy: boolean;
     langextract: boolean;
@@ -187,6 +189,63 @@ export interface NlpAnalyzeResponse {
   experiment_feature_matrix?: ExperimentFeatureMatrix | null;
   event_hypergraph?: Record<string, unknown> | null;
   processing_time_ms: number;
+}
+
+export interface GroundedExecutionObservationV1 {
+  requested: boolean;
+  requestBinding: {
+    sourceRef: string | null;
+    sourceRevision: string | null;
+    workspaceRevision: string | null;
+    packetKey: string | null;
+    status: 'SUPPLIED' | 'INCOMPLETE';
+  };
+  executorAttempted?: boolean;
+  executorCompleted?: boolean;
+  resultCount?: number;
+  inputChecksum?: string;
+  providerRevision?: string;
+  requestBindingMatchesRequest: boolean;
+}
+
+const groundedExecutionObservationSchema = z.object({
+  requested: z.boolean(),
+  requestBinding: z.object({
+    sourceRef: z.string().nullable(),
+    sourceRevision: z.string().nullable(),
+    workspaceRevision: z.string().nullable(),
+    packetKey: z.string().nullable(),
+    status: z.enum(['SUPPLIED', 'INCOMPLETE']),
+  }).strict(),
+  executorAttempted: z.boolean().optional(),
+  executorCompleted: z.boolean().optional(),
+  resultCount: z.number().int().nonnegative().optional(),
+  inputChecksum: z.string().optional(),
+  providerRevision: z.string().optional(),
+}).passthrough();
+
+function normalizeGroundedExecutionObservation(
+  metadata: Record<string, unknown>,
+  request: NlpAnalyzeRequest,
+): GroundedExecutionObservationV1 | null {
+  const parsed = groundedExecutionObservationSchema.safeParse(metadata.grounded_execution);
+  if (!parsed.success) return null;
+  const binding = parsed.data.requestBinding;
+  const requestBindingMatchesRequest = binding.sourceRef === (request.sourceRef ?? null)
+    && binding.sourceRevision === (request.sourceRevision ?? null)
+    && binding.workspaceRevision === (request.workspaceRevision ?? null)
+    && binding.packetKey === (request.packetKey ?? null);
+  return {
+    ...parsed.data,
+    requestBinding: {
+      sourceRef: binding.sourceRef ?? null,
+      sourceRevision: binding.sourceRevision ?? null,
+      workspaceRevision: binding.workspaceRevision ?? null,
+      packetKey: binding.packetKey ?? null,
+      status: binding.status,
+    },
+    requestBindingMatchesRequest,
+  };
 }
 
 export interface NlpExtractResponse {
@@ -216,6 +275,14 @@ export interface NlpPosResponse {
 export interface NlpHealthResponse {
   status: string;
   model?: string;
+  contract?: string;
+  runtimeSourceBindings?: {
+    modules?: Record<string, string>;
+    groundedExtractionAdapter?: {
+      acceptsSpanDiagnostics?: boolean;
+      acceptsExecutionReceipt?: boolean;
+    };
+  };
   capabilities?: {
     spacy?: boolean;
     langextract?: boolean;
@@ -242,6 +309,8 @@ export interface MiniforgeNlpSidecarClient {
     ready: boolean;
     status?: string;
     model?: string;
+    contract?: string;
+    runtimeSourceBindings?: NlpHealthResponse['runtimeSourceBindings'];
     capabilities?: NlpHealthResponse['capabilities'];
     capabilityDetails?: NlpHealthResponse['capabilityDetails'];
   }>;
@@ -249,6 +318,15 @@ export interface MiniforgeNlpSidecarClient {
   extract(req: NlpAnalyzeRequest): Promise<NlpExtractResponse>;
   pos(text: string): Promise<NlpPosResponse>;
   astChunk(req: { source: string; language: string; filePath: string; sourceRevision: string }): Promise<AtlasStructuralEvidence>;
+}
+
+export class MiniforgeNlpRuntimeBindingUnavailableError extends Error {
+  readonly code = 'GROUNDED_SIDECAR_RUNTIME_BINDING_UNAVAILABLE';
+
+  constructor() {
+    super('Grounded extraction requires a verified provenance-v2 sidecar runtime binding');
+    this.name = 'MiniforgeNlpRuntimeBindingUnavailableError';
+  }
 }
 
 const HEALTH_CACHE_TTL = 30_000;
@@ -272,6 +350,30 @@ async function readJson(response: Response): Promise<unknown> {
     return JSON.parse(text);
   } catch {
     return { raw: text };
+  }
+}
+
+async function requireGroundedRuntimeBinding(url: string): Promise<void> {
+  try {
+    const response = await fetch(`${url}/health`, { signal: AbortSignal.timeout(3000) });
+    if (!response.ok) throw new MiniforgeNlpRuntimeBindingUnavailableError();
+    const health = asRecord(await readJson(response));
+    const bindings = asRecord(health?.runtimeSourceBindings);
+    const modules = asRecord(bindings?.modules);
+    const adapter = asRecord(bindings?.groundedExtractionAdapter);
+    const digestPattern = /^sha256:[a-f0-9]{64}$/;
+    if (health?.contract !== 'provenance-v2'
+      || typeof modules?.miniforge_nlp_sidecar_v2 !== 'string'
+      || !digestPattern.test(modules.miniforge_nlp_sidecar_v2)
+      || typeof modules?.miniforge_nlp_sidecar !== 'string'
+      || !digestPattern.test(modules.miniforge_nlp_sidecar)
+      || adapter?.acceptsSpanDiagnostics !== true
+      || adapter?.acceptsExecutionReceipt !== true) {
+      throw new MiniforgeNlpRuntimeBindingUnavailableError();
+    }
+  } catch (error) {
+    if (error instanceof MiniforgeNlpRuntimeBindingUnavailableError) throw error;
+    throw new MiniforgeNlpRuntimeBindingUnavailableError();
   }
 }
 
@@ -362,6 +464,8 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           ready: true,
           status: data.status,
           model: data.model,
+          contract: data.contract,
+          runtimeSourceBindings: data.runtimeSourceBindings,
           capabilities: data.capabilities,
           capabilityDetails: data.capabilityDetails,
         };
@@ -373,6 +477,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
     },
 
     async analyze(req) {
+      if (req.groundedExtractionRequired === true) await requireGroundedRuntimeBinding(url);
       const start = Date.now();
       const response = await fetch(`${url}/analyze`, {
         method: 'POST',
@@ -458,6 +563,10 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         chunks: Array.isArray(raw.chunks) ? raw.chunks : [],
         features: Array.isArray(raw.features) ? raw.features : [],
         metadata: (raw.metadata ?? {}) as Record<string, unknown>,
+        groundedExecutionObservation: normalizeGroundedExecutionObservation(
+          (raw.metadata ?? {}) as Record<string, unknown>,
+          req,
+        ),
         capabilities: {
           spacy: Boolean(raw.capabilities?.spacy),
           langextract: Boolean(raw.capabilities?.langextract),
@@ -510,6 +619,7 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
     },
 
     async extract(req) {
+      if (req.groundedExtractionRequired === true) await requireGroundedRuntimeBinding(url);
       const response = await fetch(`${url}/extract`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },

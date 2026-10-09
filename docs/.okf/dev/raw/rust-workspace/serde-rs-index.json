@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rust-workspace",
+  "source_ref": "rust-workspace:serde-rs-index",
+  "url": "https://serde.rs/",
+  "title": "serde.rs",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rust",
+    "rayon",
+    "tokio",
+    "serde",
+    "native-runtime",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "serde.rs",
+    "markdown_excerpt": "[Edit](https://serde.rs/#) [Font Settings](https://serde.rs/#) AA SerifSans WhiteSepiaNight # [Overview](https://serde.rs/) [![GitHub](https://serde.rs/img/github.svg)](https://github.com/serde-rs/serde)[![rustdoc](https://serde.rs/img/rustdoc.svg)](https://docs.rs/serde)[![Latest Version](https://img.shields.io/crates/v/serde.svg?style=social)](https://crates.io/crates/serde) # Serde Serde is a framework for **_ser_** ializing and **_de_** serializing Rust data structures efficiently and generically. The Serde ecosystem consists of data structures that know how to serialize and deserialize themselves along with data formats that know how to serialize and deserialize other things. Serde provides the layer by which these two groups interact with each other, allowing any supported data structure to be serialized and deserialized using any supported data format. Decrusting the serde crate - YouTube Tap to unmute [Decrusting the serde crate](https://www.youtube.com/watch?v=BI_bHCGRgMY) [Jon Gjengset](https://www.youtube-nocookie.com/channel/UC_iD0xppBwwsrM9DegC5cQQ) ![thumbnail-image](https://yt3.ggpht.com/qeOPL5VD3HyYtB2IR45AamePTTlAPLAVMIJR1gnqB8-RB5giim7SBLhOz2NRYZx-CeBAF3wp=s68-c-k",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rust-workspace:serde-rs-index",
+    "title": "serde.rs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Rust, Rayon, Tokio, and Serde Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "169e7fa6cb8e515d2bb92af74138ef3578ec75baff70133fa3da665a454f0862",
+  "markdown_path": "docs/.okf/dev/raw/rust-workspace/serde-rs-index.md",
+  "fetched_at": "2026-10-09T05:30:34.478Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rust-workspace",
+    "source_title": "Rust, Rayon, Tokio, and Serde Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "configuration",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rust-workspace/serde-rs-index.md"
+}

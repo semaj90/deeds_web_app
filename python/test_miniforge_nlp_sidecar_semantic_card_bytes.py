@@ -200,7 +200,7 @@ def test_grounded_opt_in_adds_only_grounded_evidence_without_changing_structural
     monkeypatch.setattr(
         sidecar,
         "_grounded_extractions",
-        lambda source, _model: extraction_calls.append(source) or [{
+        lambda source, _model, **_kwargs: extraction_calls.append(source) or [{
             "extraction_class": "function_behavior",
             "extraction_text": "Runs a value.",
             "char_interval": {"start_pos": 1, "end_pos": 15},
@@ -229,6 +229,32 @@ def test_grounded_opt_in_adds_only_grounded_evidence_without_changing_structural
     assert grounded_ast == default_ast
     assert grounded_cards == default_cards
     assert grounded_result.metadata["grounded_extractions"][0]["extraction_text"] == "Runs a value."
+    assert grounded_result.metadata["grounded_execution"]["requestBinding"]["status"] == "SOURCE_BYTES_BOUND"
+    assert grounded_result.metadata["grounded_execution"]["requestBinding"] == {
+        "sourceRef": "fixture/grounded-identity.ts",
+        "sourceRevision": revision,
+        "workspaceRevision": "workspace-fixture-v1",
+        "packetKey": "packet:grounded-identity",
+        "status": "SOURCE_BYTES_BOUND",
+        "reason": None,
+    }
+    unbound_result = sidecar._analyze(request.model_copy(update={
+        "source_ref": " ",
+        "source_revision": None,
+        "workspace_revision": None,
+        "packet_key": None,
+        "grounded_extraction_required": True,
+    }))
+    assert unbound_result.metadata["grounded_execution"]["requestBinding"]["status"] == "INCOMPLETE"
+    assert unbound_result.metadata["grounded_execution"]["state"] == "UNAVAILABLE_SOURCE_BINDING"
+    mismatched_result = sidecar._analyze(request.model_copy(update={
+        "source_revision": "sha256:" + "0" * 64,
+        "grounded_extraction_required": True,
+    }))
+    assert extraction_calls == [text]
+    assert mismatched_result.metadata["grounded_extractions"] == []
+    assert mismatched_result.metadata["grounded_execution"]["requestBinding"]["status"] == "SOURCE_REVISION_MISMATCH"
+    assert mismatched_result.metadata["grounded_execution"]["state"] == "UNAVAILABLE_SOURCE_BINDING"
     assert all(unit["canonical_authority"] is False for unit in grounded_ast)
     assert all(card["canonical_authority"] is False for card in grounded_cards)
     assert pass_artifact(grounded_result, "semantic", "embedding_status") == "NOT_RUN"

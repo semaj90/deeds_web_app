@@ -1,0 +1,66 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "mcp",
+  "source_ref": "mcp:modelcontextprotocol-io-docs-docs",
+  "url": "https://modelcontextprotocol.io/docs/",
+  "title": "modelcontextprotocol.io",
+  "domain_class": "tool",
+  "focus_tags": [
+    "mcp",
+    "protocol",
+    "tools",
+    "resources",
+    "prompts",
+    "transport",
+    "authorization",
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "modelcontextprotocol.io",
+    "markdown_excerpt": "> ## Documentation Index > > Fetch the complete documentation index at: [/llms.txt](https://modelcontextprotocol.io/llms.txt) > > Use this file to discover all available pages before exploring further. [Skip to main content](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro#content-area) MCP (Model Context Protocol) is an open-source standard for connecting AI applications to external systems.Using MCP, AI applications like Claude or ChatGPT can connect to data sources (e.g. local files, databases), tools (e.g. search engines, calculators) and workflows (e.g. specialized prompts)—enabling them to access key information and perform tasks.Think of MCP like a USB-C port for AI applications. Just as USB-C provides a standardized way to connect electronic devices, MCP provides a standardized way to connect AI applications to external systems. ![](https://mintcdn.com/mcp/bEUxYpZqie0DsluH/images/mcp-simple-diagram.png?fit=max&auto=format&n=bEUxYpZqie0DsluH&q=85&s=35268aa0ad50b8c385913810e7604550) ## [​](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro\\#what-can-mcp-enable) What can MCP enable? - Agents can access your Google Calendar and Notion, ac",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:mcp:modelcontextprotocol-io-docs-docs",
+    "title": "modelcontextprotocol.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Model Context Protocol Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "46cd0598ff8406a6d92891c7193b991a792587e29100be0107940ea1d7ad3e44",
+  "markdown_path": "docs/.okf/dev/raw/mcp/modelcontextprotocol-io-docs-docs.md",
+  "fetched_at": "2026-10-09T05:26:37.477Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "mcp",
+    "source_title": "Model Context Protocol Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/mcp/modelcontextprotocol-io-docs-docs.md"
+}

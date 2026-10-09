@@ -1,0 +1,56 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "redis-valkey",
+  "source_ref": "redis-valkey:valkey-io-topics-pubsub-pubsub",
+  "url": "https://valkey.io/topics/pubsub/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "key_value",
+    "expiry",
+    "streams",
+    "pubsub",
+    "ace",
+    "bitfrost",
+    "json_packets",
+    "vector_similarity",
+    "optional_search_module",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Pub/Sub `SUBSCRIBE`, `UNSUBSCRIBE` and `PUBLISH` implement the [Publish/Subscribe messaging paradigm](https://en.wikipedia.org/wiki/Publish/subscribe) where publishers send their messages to channels, without knowledge of what receivers (subscribers) there may be. Subscribers express interest in one or more channels and only receive messages that are of interest, without knowledge of what (if any) publishers there are. This decoupling of publishers and subscribers allows for greater scalability and a more dynamic network topology. Pubsub channels are not persisted. If there are no subscribes to a channel when a message is published, the message is lost. If you're looking for persisted messages queues, you may want to look into [Streams](https://valkey.io/topics/streams-intro) instead. To subscribe to channels \"channel11\" and \"ch:00\" the client issues a `SUBSCRIBE` providing the names of the channels: ``` SUBSCRIBE channel11 ch:00 ``` Messages sent by other clie",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:redis-valkey:valkey-io-topics-pubsub-pubsub",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Redis and Valkey Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "e2f132835f566d10ff763a6e569d982edd625e85b565e7525fc45b2d733202a7",
+  "markdown_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-pubsub-pubsub.md",
+  "fetched_at": "2026-10-09T05:16:36.723Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "redis-valkey",
+    "source_title": "Redis and Valkey Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "cache",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-pubsub-pubsub.md"
+}

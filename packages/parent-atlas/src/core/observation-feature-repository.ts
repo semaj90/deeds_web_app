@@ -65,18 +65,20 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
 
       await pool.query(`
         INSERT INTO atlas_observation_feature_rows (
-          packet_key, feature_revision, source_ref, source_version_receipt_id,
+          packet_key, feature_revision, source_ref, source_revision, registry_revision, source_version_receipt_id,
           workspace_revision, representation_id, representation_revision, tree_node_id,
           ontology_classes, ast_observation_kinds, langextract_classes, flattened_tags,
           ontology_mask, ast_pattern_mask, structural_flags, evidence_refs,
           kmeans_cluster_id, som_row, som_col, community_id,
           producer_revision, input_digest, updated_at
         ) VALUES (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9::text[],$10::text[],$11::text[],$12::text[],
-          $13::jsonb,$14::jsonb,$15::jsonb,$16::text[],$17,$18,$19,$20,$21,$22,now()
+          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::text[],$12::text[],$13::text[],$14::text[],
+          $15::jsonb,$16::jsonb,$17::jsonb,$18::text[],$19,$20,$21,$22,$23,$24,now()
         )
         ON CONFLICT (packet_key, feature_revision) DO UPDATE SET
           source_ref = EXCLUDED.source_ref,
+          source_revision = EXCLUDED.source_revision,
+          registry_revision = EXCLUDED.registry_revision,
           source_version_receipt_id = EXCLUDED.source_version_receipt_id,
           workspace_revision = EXCLUDED.workspace_revision,
           representation_id = EXCLUDED.representation_id,
@@ -101,6 +103,8 @@ export function createObservationFeatureRepository(pool: Pool, options: Observat
         input.packetKey,
         input.featureRevision,
         row.source_ref,
+        row.source_revision,
+        row.registry_revision,
         input.sourceVersionReceiptId ?? null,
         row.workspace_revision,
         input.representationId ?? null,

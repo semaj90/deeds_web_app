@@ -86,6 +86,50 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     await expect(handler({ nodeId: 'AST', inputs: {} })).rejects.toThrow(/LEXICAL/);
   });
 
+  it('executes lexical-dependent ast-grep refinement through the shared read-only DAG', async () => {
+    const source = 'export function target() {}';
+    const dag = buildContextToolDagFromPreAgentStages({
+      ...meta,
+      stages: ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE'],
+    });
+    const receipt = await executeContextToolDagV1(dag, {
+      QUERY_ANALYSIS: async () => ({ query: 'target' }),
+      LEXICAL: makeLexicalHandlerV1({
+        symbols: ['target'],
+        search: async () => ({ matches: [{ filePath: 'src/a.ts', lineNumber: 1 }], totalMatches: 1, truncated: false }),
+      }),
+      AST_STRUCTURAL_REFINE: makeAstHandlerV1({
+        symbols: ['target'],
+        producerRevision: 'ast-grep-fixture-v1',
+        readFile: async () => source,
+        resolveSourceBinding: (filePath) => filePath === 'src/a.ts'
+          ? { sourceRef: 'repo:src/a.ts', workspaceRevision: 'w1', sourceRevision: 'sha256:source-a' }
+          : null,
+        extract: async (input) => [astCandidate(input, { name: 'target', startByte: 0, endByte: Buffer.byteLength(source, 'utf8') })],
+      }),
+      EXACT_PROMOTION: async ({ inputs }) => Object.keys(inputs),
+      ACE_PACKET_ASSEMBLY: async () => ({ status: 'FIXTURE_ONLY' }),
+    });
+
+    expect(receipt.ok).toBe(true);
+    expect(receipt.levels).toContainEqual(['LEXICAL']);
+    expect(receipt.levels).toContainEqual(['AST_STRUCTURAL_REFINE']);
+    expect(receipt.nodes.find((node) => node.nodeId === 'AST_STRUCTURAL_REFINE')?.status).toBe('OK');
+    expect(receipt.outputs.AST_STRUCTURAL_REFINE).toMatchObject({
+      schema: 'atlas.ast-grep-refinement-output.v1',
+      producerRevision: 'ast-grep-fixture-v1',
+      canonicalAuthority: false,
+      declarations: [{
+        name: 'target',
+        sourceRef: 'repo:src/a.ts',
+        sourceRevision: 'sha256:source-a',
+        workspaceRevision: 'w1',
+        logicalLaneVoteAdded: false,
+      }],
+    });
+    expect(dag.canonicalWritesAllowed).toBe(false);
+  });
+
   it('candidate lane adapter returns compact qualified refs only (no content/summary) and flags unqualified hits', async () => {
     const handler = makeCandidateLaneHandlerV1({
       lane: 'ast', query: 'buildA', maxHits: 2,

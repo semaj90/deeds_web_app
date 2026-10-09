@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cudf-python",
+  "source_ref": "rapids-cudf-python:docs-rapids-ai-pylibcudf-api-docs-api-docs",
+  "url": "https://docs.rapids.ai/api/cudf/latest/pylibcudf/api_docs/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "cudf",
+    "pylibcudf",
+    "cuda",
+    "columnar-data",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) [Skip to main content](https://docs.rapids.ai/api/cudf/latest/pylibcudf/api_docs/#main-content) Back to top`Ctrl` + `K` [![NVIDIA RAPIDS Documentation - Home](https://docs.nvidia.com/datascience/_static/nvidia-logo-horiz-rgb-blk-for-screen.svg)![NVIDIA RAPIDS Documentation - Home](https://docs.nvidia.com/datascience/_static/nvidia-logo-horiz-rgb-wht-for-screen.svg)\\\\ NVIDIA RAPIDS Documentation](https://docs.rapids.ai/api/cudf/latest/pylibcudf/api_docs/#) - System Settings - Light - Dark - [GitHub](https://github.com/rapidsai/docs) [Is this page helpful?](https://surveys.hotjar.com/4904bf71-6484-47a7-83ff-4715cceabdb5) # Page Not Found [\\#](https://docs.rapids.ai/api/cudf/latest/pylibcudf/api_docs/\\#page-not-found \"Link to this heading\") We could not find the page you were looking for.",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cudf-python:docs-rapids-ai-pylibcudf-api-docs-api-docs",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuDF and pylibcudf Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "47cd43dc453b38adcd1debc20b250d9fc4fd238525d699b6c74e313a5f4da745",
+  "markdown_path": "docs/.okf/dev/raw/rapids-cudf-python/docs-rapids-ai-pylibcudf-api-docs-api-docs.md",
+  "fetched_at": "2026-10-09T05:35:05.903Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-cudf-python",
+    "source_title": "RAPIDS cuDF and pylibcudf Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "gpu",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-cudf-python/docs-rapids-ai-pylibcudf-api-docs-api-docs.md"
+}

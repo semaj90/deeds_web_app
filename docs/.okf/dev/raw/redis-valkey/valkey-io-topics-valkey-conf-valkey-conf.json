@@ -1,0 +1,57 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "redis-valkey",
+  "source_ref": "redis-valkey:valkey-io-topics-valkey-conf-valkey-conf",
+  "url": "https://valkey.io/topics/valkey.conf/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "key_value",
+    "expiry",
+    "streams",
+    "pubsub",
+    "ace",
+    "bitfrost",
+    "json_packets",
+    "vector_similarity",
+    "optional_search_module",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Configuration Valkey is able to start without a configuration file using a built-in default configuration, however this setup is only recommended for testing and development purposes. The proper way to configure Valkey is by providing a Valkey configuration file, usually called `valkey.conf`. The `valkey.conf` file contains a number of directives that have a very simple format: ``` keyword argument1 argument2 ... argumentN ``` This is an example of a configuration directive: ``` replicaof 127.0.0.1 6380 ``` It is possible to provide strings containing spaces as arguments using (double or single) quotes, as in the following example: ``` requirepass \"hello world\" ``` Single-quoted string can contain characters escaped by backslashes, and double-quoted strings can additionally include any ASCII symbols encoded using backslashed hexadecimal notation \"\\\\xff\". The list of configuration directives, and their meaning and intended usage is available in the self document",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:redis-valkey:valkey-io-topics-valkey-conf-valkey-conf",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Redis and Valkey Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "94ab303d8e4ffc6faf8628977b0eb1acd4803611691368f1489f5e26b9cc6f40",
+  "markdown_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-valkey-conf-valkey-conf.md",
+  "fetched_at": "2026-10-09T05:16:42.460Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "redis-valkey",
+    "source_title": "Redis and Valkey Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "cache",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-valkey-conf-valkey-conf.md"
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "openwiki-agent-docs",
+  "source_ref": "openwiki-agent-docs:docs-langchain-com-openwiki-integrations-md-integrations-md",
+  "url": "https://docs.langchain.com/oss/openwiki/integrations.md",
+  "title": "docs.langchain.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "openwiki",
+    "agent",
+    "code-mode",
+    "integrations",
+    "taskboard",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.langchain.com",
+    "markdown_excerpt": "> ## Documentation Index > Fetch the complete documentation index at: https://docs.langchain.com/llms.txt > Use this file to discover all available pages before exploring further. # Coding-agent integrations > Run OpenWiki inside Codex, Claude Code, OpenCode, or Cursor using the host model and tools OpenWiki can run inside an existing coding agent instead of launching its own model. The coding agent investigates the repository, plans the wiki, and writes each assigned page with its native repository tools. OpenWiki owns the durable page-job lifecycle, Claims validation and persistence, source-drift handling, and deterministic finalization. Host-driven runs support only repository [code mode](/oss/openwiki/code-mode) wikis, not [personal mode](/oss/openwiki/personal-mode). They use the coding agent's authenticated model session, so OpenWiki provider credentials are not required. Connector-sourced context, including LangSmith, is not yet supported on this path. ## Install an integration Supported hosts are **Codex**, **Claude Code**, **OpenCode**, and **Cursor**. Installations default to user level, so one install works from any Git repository: ```bash theme={\"theme\":{\"light\":\"catppu",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:openwiki-agent-docs:docs-langchain-com-openwiki-integrations-md-integrations-md",
+    "title": "docs.langchain.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenWiki Agent Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "OpenCode models / tools",
+      "recommendation": "Prefer explicit model/provider/tool configuration over implicit chat defaults.",
+      "rationale": "The repo needs canonical API recommendations, not hidden prompt state."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "23fd08eb0129db12d8239ff1057ecb26178d45ba15b431723c942898da07fe89",
+  "markdown_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md",
+  "fetched_at": "2026-10-09T05:37:49.689Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "openwiki-agent-docs",
+    "source_title": "OpenWiki Agent Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md"
+}

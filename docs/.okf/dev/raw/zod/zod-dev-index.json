@@ -1,0 +1,69 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "zod",
+  "source_ref": "zod:zod-dev-index",
+  "url": "https://zod.dev/",
+  "title": "zod.dev",
+  "domain_class": "tool",
+  "focus_tags": [
+    "typescript",
+    "schema_validation",
+    "error_handling",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "zod.dev",
+    "markdown_excerpt": "💎 Zod 4.6 is out! [Read the announcement.](https://zod.dev/blog/zod-4-6) Ask AI ![Chat avatar](https://zod.dev/logo/logo.png) [NewZod 4.6](https://zod.dev/blog/zod-4-6) ![Zod logo](https://zod.dev/_next/image?url=%2Flogo%2Flogo-glow.png&w=640&q=100)![Zod logo](https://zod.dev/_next/image?url=%2Flogo%2Flogo-glow.png&w=640&q=100) # Zod TypeScript-first schema validation with static type inference by [@colinhacks](https://x.com/colinhacks) [![Zod CI status](https://github.com/colinhacks/zod/actions/workflows/test.yml/badge.svg?event=push&branch=main)](https://github.com/colinhacks/zod/actions?query=branch%3Amain)[![Created by Colin McDonnell](https://img.shields.io/badge/created%20by-@colinhacks-4BBAAB.svg)](https://twitter.com/colinhacks)[![License](https://img.shields.io/github/license/colinhacks/zod)](https://opensource.org/licenses/MIT)[![npm](https://img.shields.io/npm/dw/zod.svg)](https://www.npmjs.com/package/zod)[![stars](https://img.shields.io/github/stars/colinhacks/zod)](https://github.com/colinhacks/zod) [Website](https://zod.dev/) • [Discord](https://discord.gg/RcG33DQJdf) • [𝕏](https://twitter.com/colinhacks) • [Bluesky](https://bsky.app/profile/zod.dev) Zod 4 is stabl",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:zod:zod-dev-index",
+    "title": "zod.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Zod Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "tRPC procedures + validators",
+      "recommendation": "Validate every input with Zod and keep procedure contracts narrow.",
+      "rationale": "The repo already treats validated procedures as the stable application boundary."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "71c439a51b20701cc1cab320b784d33f2ae2c4e04bc4022f3848166d1caadc40",
+  "markdown_path": "docs/.okf/dev/raw/zod/zod-dev-index.md",
+  "fetched_at": "2026-10-09T00:42:43.676Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "zod",
+    "source_title": "Zod Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/zod/zod-dev-index.md"
+}

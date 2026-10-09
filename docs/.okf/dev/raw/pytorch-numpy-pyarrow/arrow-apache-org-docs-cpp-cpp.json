@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "pytorch-numpy-pyarrow",
+  "source_ref": "pytorch-numpy-pyarrow:arrow-apache-org-docs-cpp-cpp",
+  "url": "https://arrow.apache.org/docs/cpp/",
+  "title": "arrow.apache.org",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "pytorch",
+    "numpy",
+    "pyarrow",
+    "tensor",
+    "columnar-data",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "arrow.apache.org",
+    "markdown_excerpt": "[Skip to main content](https://arrow.apache.org/docs/cpp/#main-content) Back to top`Ctrl` + `K` 25.0 (stable) [26.0 (dev)](https://arrow.apache.org/docs/dev/cpp/index.html) [25.0 (stable)](https://arrow.apache.org/docs/cpp/index.html) [24.0](https://arrow.apache.org/docs/24.0/cpp/index.html) [23.0](https://arrow.apache.org/docs/23.0/cpp/index.html) [22.0](https://arrow.apache.org/docs/22.0/cpp/index.html) [21.0](https://arrow.apache.org/docs/21.0/cpp/index.html) [20.0](https://arrow.apache.org/docs/20.0/cpp/index.html) [19.0](https://arrow.apache.org/docs/19.0/cpp/index.html) [18.1](https://arrow.apache.org/docs/18.1/cpp/index.html) [18.0](https://arrow.apache.org/docs/18.0/cpp/index.html) [17.0](https://arrow.apache.org/docs/17.0/cpp/index.html) [16.1](https://arrow.apache.org/docs/16.1/cpp/index.html) [16.0](https://arrow.apache.org/docs/16.0/cpp/index.html) [15.0](https://arrow.apache.org/docs/15.0/cpp/index.html) [14.0](https://arrow.apache.org/docs/14.0/cpp/index.html) [13.0](https://arrow.apache.org/docs/13.0/cpp/index.html) [12.0](https://arrow.apache.org/docs/12.0/cpp/index.html) [11.0](https://arrow.apache.org/docs/11.0/cpp/index.html) [10.0](https://arrow.apache.org/docs/",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:pytorch-numpy-pyarrow:arrow-apache-org-docs-cpp-cpp",
+    "title": "arrow.apache.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh PyTorch, NumPy, and Apache Arrow Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "4e8a56d459992e389ca3be60f4c2fc2291245670e235f99ec35cb50f7ea051ed",
+  "markdown_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/arrow-apache-org-docs-cpp-cpp.md",
+  "fetched_at": "2026-10-09T05:30:41.955Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "pytorch-numpy-pyarrow",
+    "source_title": "PyTorch, NumPy, and Apache Arrow Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/arrow-apache-org-docs-cpp-cpp.md"
+}

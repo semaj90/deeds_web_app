@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalizeFreshOntologyCandidate } from './lib/feature-ontology-fresh-candidate-v1.mjs';
+import { normalizeFreshOntologyCandidate, verifyFreshOntologySourceSpan } from './lib/feature-ontology-fresh-candidate-v1.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
@@ -93,16 +93,19 @@ async function extract(sourceRef, sourceRevision) {
     const grounded = groundedByConcept.get(concept.toLowerCase()) || groundedByConcept.get(objectId.replace(/^concept:/, '').toLowerCase());
     const startChar = Number(grounded?.char_interval?.start_pos ?? grounded?.start_char);
     const endChar = Number(grounded?.char_interval?.end_pos ?? grounded?.end_char);
-    const sourceSpan = grounded && Number.isInteger(startChar) && Number.isInteger(endChar)
-      ? { startChar, endChar, text: inputText.slice(startChar, endChar) }
-      : undefined;
+    const groundedText = grounded?.extraction_text ?? grounded?.text;
+    const verifiedSpan = grounded && Number.isInteger(startChar) && Number.isInteger(endChar) && typeof groundedText === 'string'
+      ? verifyFreshOntologySourceSpan(inputText, startChar, endChar, groundedText)
+      : null;
+    const sourceSpan = verifiedSpan?.valid ? verifiedSpan : undefined;
     return normalizeFreshOntologyCandidate({
     candidateId: `fresh:${digest(`${sourceRef}|${sourceRevision}|${concept}`).slice(0, 32)}`,
-    packetKey: `source:${sourceRef}`,
+    packetKey: null,
+    identityStatus: 'SOURCE_ONLY_UNBOUND',
     sourceRef,
     sourceRevision,
     workspaceRevision: text(observationWorkspaceRevision),
-    subjectId: `source:${sourceRef}`,
+    subjectId: sourceRef,
     objectId: objectId || `concept:${slug(concept) || `unnamed-${index}`}`,
     objectValue: concept,
     evidenceRefs: [

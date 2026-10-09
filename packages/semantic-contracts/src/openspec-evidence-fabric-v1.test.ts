@@ -15,6 +15,7 @@ const baseReceipt = {
   claim: 'The task contract validates',
   workspaceRevision: `sha256:${'1'.repeat(64)}`,
   sourceRevision: `sha256:${'2'.repeat(64)}`,
+  taskRevision: `sha256:${'4'.repeat(64)}`,
   sourceRefs: [{ file: 'src/example.ts', lineStart: 1, lineEnd: 4, sourceRevision: `sha256:${'2'.repeat(64)}` }],
   environmentFingerprint: `sha256:${'3'.repeat(64)}`,
   producer: 'vitest',
@@ -38,6 +39,25 @@ describe('OpenSpec evidence fabric contracts', () => {
     const receipt = buildEvidenceReceiptV1(baseReceipt);
     expect(verifyEvidenceReceiptV1(receipt)).toEqual(receipt);
     expect(() => verifyEvidenceReceiptV1({ ...receipt, claim: 'tampered' })).toThrow(/checksum/);
+  });
+
+  it('preserves predicate claim references through strict receipt validation', () => {
+    const claimRef = `sha256:${'a'.repeat(64)}`;
+    const receipt = buildEvidenceReceiptV1({
+      ...baseReceipt,
+      expectedAssertions: [{ id: 'assert-1', expected: 'pass', claimRef }],
+      actualAssertions: [{ id: 'assert-1', actual: 'pass', passed: true, claimRef }],
+    });
+    expect(verifyEvidenceReceiptV1(receipt).actualAssertions[0].claimRef).toBe(claimRef);
+    expect(() => buildEvidenceReceiptV1({
+      ...baseReceipt,
+      expectedAssertions: [{ id: 'assert-1', expected: 'pass', claimRef }],
+      actualAssertions: [{ id: 'assert-1', actual: 'pass', passed: true, claimRef: `sha256:${'b'.repeat(64)}` }],
+    })).toThrow(/claimRef must match/);
+  });
+
+  it('requires a task-block revision when creating receipts', () => {
+    expect(() => buildEvidenceReceiptV1({ ...baseReceipt, taskRevision: undefined } as never)).toThrow();
   });
 
   it('does not promote stale receipts', () => {

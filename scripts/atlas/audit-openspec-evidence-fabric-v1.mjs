@@ -23,8 +23,9 @@ function canonicalJson(value) {
 
 const proofStates = new Set(['CLAIM_ONLY', 'PROVEN', 'PARTIAL', 'BLOCKED', 'FAILED', 'STALE']);
 
-export function buildEvidenceReceiptV1(input) {
+function buildEvidenceReceiptV1Internal(input, { requireTaskRevision }) {
   const required = ['evidenceId', 'evidenceType', 'changeId', 'taskId', 'claim', 'workspaceRevision', 'sourceRevision', 'sourceRefs', 'producer', 'inputs', 'observedAt', 'expectedAssertions', 'actualAssertions', 'outputs', 'readbackRequired', 'readbackPerformed', 'verdict'];
+  if (requireTaskRevision) required.push('taskRevision');
   for (const field of required) if (input[field] === undefined || input[field] === null || input[field] === '') throw new Error(`EvidenceReceiptV1 missing ${field}`);
   if (input.schema !== 'atlas.evidence-receipt.v1') throw new Error('EvidenceReceiptV1 schema mismatch');
   if (input.taskRevision != null && !/^sha256:[a-f0-9]{64}$/i.test(input.taskRevision)) throw new Error('EvidenceReceiptV1 task revision invalid');
@@ -49,11 +50,15 @@ export function buildEvidenceReceiptV1(input) {
   return { ...unsigned, checksum: sha256(canonicalJson(unsigned)) };
 }
 
+export function buildEvidenceReceiptV1(input) {
+  return buildEvidenceReceiptV1Internal(input, { requireTaskRevision: true });
+}
+
 export function verifyEvidenceReceiptV1(receipt) {
   if (!receipt || typeof receipt !== 'object' || !receipt.checksum) throw new Error('EvidenceReceiptV1 checksum missing');
   const { checksum, ...unsigned } = receipt;
   if (checksum !== sha256(canonicalJson(unsigned))) throw new Error('EvidenceReceiptV1 checksum mismatch');
-  return buildEvidenceReceiptV1(receipt);
+  return buildEvidenceReceiptV1Internal(receipt, { requireTaskRevision: false });
 }
 
 export function buildEvidenceCardV1(input) {

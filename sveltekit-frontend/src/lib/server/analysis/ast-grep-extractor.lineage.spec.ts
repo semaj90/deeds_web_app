@@ -42,6 +42,19 @@ describe('ast-grep extractor lineage', () => {
     expect(functionRow?.evidenceKey).toMatch(/^astgrep:[a-f0-9]{64}$/);
   });
 
+  it('returns UTF-8 byte spans when non-ASCII text precedes a declaration', async () => {
+    const source = `// café 🧭\nexport function resumeCase() { return true; }\n`;
+    const rows = await extractAstFeatures(source, 'ts', context);
+    const declaration = rows.find((row) => row.type === 'ast_function');
+    const expectedStart = Buffer.byteLength(source.slice(0, source.indexOf('function resumeCase')), 'utf8');
+    const expectedEnd = Buffer.byteLength(source.trimEnd(), 'utf8');
+
+    expect(declaration?.byteStart).toBe(expectedStart);
+    expect(declaration?.byteEnd).toBe(expectedEnd);
+    expect(Buffer.from(source, 'utf8').subarray(declaration?.byteStart, declaration?.byteEnd).toString('utf8'))
+      .toContain('resumeCase');
+  });
+
   it('changes evidence identity when source revision changes', async () => {
     const first = await extractAstFeatures(code, 'ts', context);
     const second = await extractAstFeatures(code, 'ts', {

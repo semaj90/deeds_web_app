@@ -1,0 +1,56 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "qdrant",
+  "source_ref": "qdrant:qdrant-tech-manage-data-vectors-vectors",
+  "url": "https://qdrant.tech/documentation/manage-data/vectors/",
+  "title": "qdrant.tech",
+  "domain_class": "database",
+  "focus_tags": [
+    "llm_synthesis",
+    "llm_output",
+    "canonical_api_recommendations",
+    "agentic_error_fixing"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "qdrant.tech",
+    "markdown_excerpt": "- [Documentation](https://qdrant.tech/documentation/) - [Manage Data](https://qdrant.tech/documentation/manage-data/) - Vectors # [Anchor](https://qdrant.tech/documentation/manage-data/vectors/\\#vectors) Vectors Vectors (or embeddings) are the core concept of the Qdrant Vector Search engine. Vectors define the similarity between objects in the vector space. If a pair of vectors are similar in vector space, it means that the objects they represent are similar in some way. For example, if you have a collection of images, you can represent each image as a vector. If two images are similar, their vectors will be close to each other in the vector space. In order to obtain a vector representation of an object, you need to apply a vectorization algorithm to the object. Usually, this algorithm is a neural network that converts the object into a fixed-size vector. The neural network is usually [trained](https://qdrant.tech/articles/metric-learning-tips/) on a pairs or [triplets](https://qdrant.tech/articles/triplet-loss/) of similar and dissimilar objects, so it learns to recognize a specific type of similarity. By using this property of vectors, you can explore your data in a number of way",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "database",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:qdrant:qdrant-tech-manage-data-vectors-vectors",
+    "title": "qdrant.tech",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Qdrant Docs from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Qdrant query points / named vectors",
+      "recommendation": "Use named vectors for logical lanes and keep oversampling/rescore on quantized search only.",
+      "rationale": "The official docs separate vector spaces, quantization, and search-time rescoring."
+    }
+  ],
+  "content_hash": "828dcda3ab5aa5e0f15998a48edc51aed51fed115593454e0f30e4d269ed5016",
+  "markdown_path": "docs/.okf/dev/raw/qdrant/qdrant-tech-manage-data-vectors-vectors.md",
+  "fetched_at": "2026-10-09T04:46:29.409Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "qdrant",
+    "source_title": "Qdrant Docs",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/qdrant/qdrant-tech-manage-data-vectors-vectors.md"
+}

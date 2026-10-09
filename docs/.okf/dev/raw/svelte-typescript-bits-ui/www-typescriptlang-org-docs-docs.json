@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "svelte-typescript-bits-ui",
+  "source_ref": "svelte-typescript-bits-ui:www-typescriptlang-org-docs-docs",
+  "url": "https://www.typescriptlang.org/docs/",
+  "title": "www.typescriptlang.org",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "sveltekit",
+    "svelte5",
+    "typescript",
+    "bits_ui",
+    "routing",
+    "runes",
+    "accessibility",
+    "llm_output"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "www.typescriptlang.org",
+    "markdown_excerpt": "# TypeScript Documentation #### Get Started Quick introductions based on your background or preference. - [TS for the New Programmer](https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html) - [TypeScript for JS Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html) - [TS for Java/C# Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-oop.html) - [TS for Functional Programmers](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes-func.html) - [TypeScript Tooling in 5 minutes](https://www.typescriptlang.org/docs/handbook/typescript-tooling-in-5-minutes.html) #### Handbook A great first read for your daily TS work. - [The TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html) - [The Basics](https://www.typescriptlang.org/docs/handbook/2/basic-types.html) - [Everyday Types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html) - [Narrowing](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) - [More on Functions](https://www.typescriptlang.org/docs/handbook/2/functions.html) - [Object Types](https://www.typescriptlang.org/docs/handbook/2/obje",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:svelte-typescript-bits-ui:www-typescriptlang-org-docs-docs",
+    "title": "www.typescriptlang.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh SvelteKit, Svelte, TypeScript, and Bits UI Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "b721c3bb10fbfadc54083cccf615d1f1a3cbf4c57422fadc949fb7ef256b305c",
+  "markdown_path": "docs/.okf/dev/raw/svelte-typescript-bits-ui/www-typescriptlang-org-docs-docs.md",
+  "fetched_at": "2026-10-09T05:25:28.435Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "svelte-typescript-bits-ui",
+    "source_title": "SvelteKit, Svelte, TypeScript, and Bits UI Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "tool",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/svelte-typescript-bits-ui/www-typescriptlang-org-docs-docs.md"
+}

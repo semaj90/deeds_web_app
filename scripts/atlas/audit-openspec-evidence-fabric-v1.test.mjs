@@ -50,6 +50,7 @@ function receiptInput(overrides = {}) {
     claim: 'Verify the implementation',
     workspaceRevision: 'sha256:workspace',
     sourceRevision: 'sha256:source',
+    taskRevision: `sha256:${'a'.repeat(64)}`,
     sourceRefs: [{ file: 'openspec/changes/change-a/tasks.md', lineStart: 1, lineEnd: 1, sourceRevision: 'sha256:source' }],
     producer: 'vitest',
     inputs: [],
@@ -66,6 +67,7 @@ function receiptInput(overrides = {}) {
 }
 
 test('requires complete uniquely identified assertions before a PROVEN receipt can be built', () => {
+  assert.throws(() => buildEvidenceReceiptV1(receiptInput({ taskRevision: undefined })), /missing taskRevision/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ expectedAssertions: [], actualAssertions: [] })), /proven requires assertions/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'other', passed: true }] })), /assertion identity mismatch/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'assert-1', passed: false }] })), /unsatisfied assertion/);

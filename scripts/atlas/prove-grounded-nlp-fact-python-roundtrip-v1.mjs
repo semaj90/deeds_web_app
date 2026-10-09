@@ -24,6 +24,10 @@ const { projectGroundedNlpFactToOntologyTupleV1 } = await tsImport(
   '../../sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts',
   import.meta.url,
 );
+const { toAtlasOntologyTuplePersistenceRowV1 } = await tsImport(
+  '../../sveltekit-frontend/src/lib/server/atlas/integration/kag-persistence-row-v1.ts',
+  import.meta.url,
+);
 const sourceFixtureRelativePath = '.tmp/atlas/grounded-nlp-source-fixture-v1/fixture.ts';
 const sourceFixturePath = resolve(root, sourceFixtureRelativePath);
 mkdirSync(resolve(root, '.tmp/atlas/grounded-nlp-source-fixture-v1'), { recursive: true });
@@ -33,9 +37,9 @@ const sourceSpan = sourceBytes.subarray(6, 11);
 assert.equal(sourceSpan.toString('utf8'), 'x = 1');
 const sha256 = (bytes) => `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
 const canonicalJson = (value) => Array.isArray(value)
-  ? `[${value.map(canonicalJson).join(',')}]`
+  ? `[${value.map((item) => item === undefined ? 'null' : canonicalJson(item)).join(',')}]`
   : value && typeof value === 'object'
-    ? `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`
+    ? `{${Object.keys(value).filter((key) => value[key] !== undefined).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(',')}}`
     : JSON.stringify(value);
 const fact = groundNlpFeatureV1({
   feature: {
@@ -75,6 +79,23 @@ const ontologyProjection = projectGroundedNlpFactToOntologyTupleV1({
   labelKind: 'tag',
   ontologyRevision: 'ontology:fixture-v1',
 });
+const persistenceRow = toAtlasOntologyTuplePersistenceRowV1(ontologyProjection.tuple);
+assert.equal(persistenceRow.sourceRef, fact.sourceRef);
+assert.equal(persistenceRow.evidenceSpan.sourceRef, fact.sourceRef);
+assert.equal(persistenceRow.evidenceSpan.start, fact.evidenceSpan.byteStart);
+assert.equal(persistenceRow.evidenceSpan.end, fact.evidenceSpan.byteEnd);
+assert.equal(persistenceRow.provenance.sourceRevision, fact.sourceRevision);
+assert.equal(persistenceRow.provenance.workspaceRevision, fact.workspaceRevision);
+assert.equal(persistenceRow.provenance.taskRevision, fact.taskRevision);
+assert.equal(persistenceRow.provenance.evidenceCardChecksum, fact.evidenceCardChecksum);
+assert.equal(persistenceRow.provenance.evidenceSpanChecksum, `sha256:${fact.evidenceSpan.textSha256}`);
+assert.equal(persistenceRow.evidenceState, 'GATED');
+const persistenceRowChecksum = sha256(Buffer.from(canonicalJson(persistenceRow), 'utf8'));
+const persistenceRowPath = resolve(root, '.tmp/atlas/grounded-nlp-ontology-tuple-persistence-row-v1.json');
+writeFileSync(persistenceRowPath, `${JSON.stringify(persistenceRow, null, 2)}\n`, 'utf8');
+const persistenceRowReadback = JSON.parse(readFileSync(persistenceRowPath, 'utf8'));
+assert.equal(sha256(Buffer.from(canonicalJson(persistenceRowReadback), 'utf8')), persistenceRowChecksum);
+assert.equal(canonicalJson(persistenceRowReadback), canonicalJson(persistenceRow));
 const projectionJson = canonicalJson(ontologyProjection);
 const projectionChecksum = sha256(Buffer.from(projectionJson, 'utf8'));
 const projectionPath = resolve(root, '.tmp/atlas/grounded-nlp-ontology-tuple-projection-v1.json');
@@ -151,6 +172,9 @@ const receiptBody = {
   sourceSpanReadbackChecksum: sha256(reopenedSourceBytes.subarray(fact.evidenceSpan.byteStart, fact.evidenceSpan.byteEnd)),
   ontologyTupleProjectionChecksum: projectionChecksum,
   ontologyTupleProjectionReadback: 'MATCH',
+  persistenceRowReadbackPath: '.tmp/atlas/grounded-nlp-ontology-tuple-persistence-row-v1.json',
+  persistenceRowChecksum,
+  persistenceRowReadback: 'MATCH',
   inputChecksum: sha256(Buffer.from(canonicalJson(fact), 'utf8')),
   dataclassReadbackChecksum: sha256(Buffer.from(canonicalJson(dataclassReadback), 'utf8')),
   pydanticReadbackChecksum: sha256(Buffer.from(canonicalJson(pydanticReadback), 'utf8')),
@@ -165,6 +189,7 @@ const receiptBody = {
   evidenceRefs: [
     'sveltekit-frontend/src/lib/server/nlp/nlp-observation-lineage-v1.ts',
     'sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts',
+    'sveltekit-frontend/src/lib/server/atlas/integration/kag-persistence-row-v1.ts',
     'python/atlas_grounded_nlp_fact_v1.py',
     'python/oak_agent/grounded_nlp_fact_v1.py',
   ],
@@ -187,6 +212,9 @@ console.log(JSON.stringify({
   sourceSpanReadback: 'MATCH',
   ontologyTupleProjectionReadback: 'MATCH',
   ontologyTupleProjectionChecksum: projectionChecksum,
+  persistenceRowReadback: 'MATCH',
+  persistenceRowReadbackPath: '.tmp/atlas/grounded-nlp-ontology-tuple-persistence-row-v1.json',
+  persistenceRowChecksum,
   taskRevision: fact.taskRevision,
   inputChecksum: sha256(Buffer.from(canonicalJson(fact), 'utf8')),
   dataclassReadbackChecksum: sha256(Buffer.from(canonicalJson(dataclassReadback), 'utf8')),

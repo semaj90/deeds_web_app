@@ -1,0 +1,65 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-cugraph-python",
+  "source_ref": "rapids-cugraph-python:docs-rapids-ai-cugraph-stable-stable",
+  "url": "https://docs.rapids.ai/api/cugraph/stable/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "cugraph",
+    "cuda",
+    "graph-algorithms",
+    "networkx-backend",
+    "kanban",
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) [Skip to main content](https://docs.nvidia.com/cugraph/latest/#main-content) Back to top`Ctrl` + `K` [![NVIDIA cuGraph - Home](https://docs.nvidia.com/cugraph/latest/_static/nvidia-logo-horiz-rgb-blk-for-screen.svg)![NVIDIA cuGraph - Home](https://docs.nvidia.com/cugraph/latest/_static/nvidia-logo-horiz-rgb-wht-for-screen.svg)\\\\ NVIDIA cuGraph](https://docs.nvidia.com/cugraph/latest/#) latest [latest](https://docs.nvidia.com/cugraph/latest/) [26.10](https://docs.nvidia.com/cugraph/26.10/) [26.08](https://docs.nvidia.com/cugraph/26.08/) [26.06](https://archive.docs.nvidia.com/cugraph/26.06/) [26.04](https://archive.docs.nvidia.com/cugraph/26.04/) [26.02](https://archive.docs.nvidia.com/cugraph/26.02/) [25.12](https://archive.docs.nvidia.com/cugraph/25.12/) [25.10](https://archive.docs.nvidia.com/cugraph/25.10/) [25.08](https://archive.docs.nvidia.com/cugraph/25.08/) [25.06](https://archive.docs.nvidia.com/cugraph/25.06/) [25.04](https://archive.docs.nvidia.com/cugraph/25.04/) [25.02](https://archive.docs.nvidia.com/cugraph/25.02/) [24.12](https://archive.docs.nvidia.com/cugraph/24.12/) [24.10](https://archive.docs.",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-cugraph-python:docs-rapids-ai-cugraph-stable-stable",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS cuGraph Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "cuVS / cuGraph",
+      "recommendation": "Treat GPU ANN and PageRank as optional acceleration lanes behind the same search contract.",
+      "rationale": "This matches the repository rule that acceleration must not become the canonical store."
+    }
+  ],
+  "content_hash": "bfd7d05e0454c1662102d450a8db5df689cab82ea3f56eeb2ad37de0d1586df6",
+  "markdown_path": "docs/.okf/dev/raw/rapids-cugraph-python/docs-rapids-ai-cugraph-stable-stable.md",
+  "fetched_at": "2026-10-09T05:32:34.068Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-cugraph-python",
+    "source_title": "RAPIDS cuGraph Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-cugraph-python/docs-rapids-ai-cugraph-stable-stable.md"
+}

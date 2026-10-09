@@ -1,0 +1,200 @@
+{
+  "schema_version": "okf.dev.summary.v1",
+  "generated_at": "2026-10-09T06:45:22.902Z",
+  "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\manifest.json",
+  "records": 75,
+  "summary": {
+    "firecrawl": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "zod": {
+      "pages": 1,
+      "domains": {
+        "tool": 1
+      }
+    },
+    "redis-valkey": {
+      "pages": 7,
+      "domains": {
+        "cache": 7
+      }
+    },
+    "qdrant": {
+      "pages": 3,
+      "domains": {
+        "database": 3
+      }
+    },
+    "svelte-typescript-bits-ui": {
+      "pages": 4,
+      "domains": {
+        "documentation": 4
+      }
+    },
+    "drizzle-orm-kit": {
+      "pages": 5,
+      "domains": {
+        "database": 5
+      }
+    },
+    "mcp": {
+      "pages": 2,
+      "domains": {
+        "tool": 2
+      }
+    },
+    "langchain-langgraph-python": {
+      "pages": 2,
+      "domains": {
+        "agent": 2
+      }
+    },
+    "postgresql-pgvector": {
+      "pages": 1,
+      "domains": {
+        "database": 1
+      }
+    },
+    "langchain-langgraph-typescript": {
+      "pages": 2,
+      "domains": {
+        "agent": 2
+      }
+    },
+    "tree-sitter-ast-grep": {
+      "pages": 3,
+      "domains": {
+        "tool": 3
+      }
+    },
+    "networkx-python": {
+      "pages": 1,
+      "domains": {
+        "graph": 1
+      }
+    },
+    "rust-workspace": {
+      "pages": 4,
+      "domains": {
+        "tool": 4
+      }
+    },
+    "pytorch-numpy-pyarrow": {
+      "pages": 5,
+      "domains": {
+        "gpu": 5
+      }
+    },
+    "fastapi-pydantic-langextract": {
+      "pages": 3,
+      "domains": {
+        "agent": 3
+      }
+    },
+    "rapids-cuvs-python": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "rapids-cugraph-python": {
+      "pages": 2,
+      "domains": {
+        "gpu": 2
+      }
+    },
+    "onnx-runtime": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "go-grpc-protobuf-pgx": {
+      "pages": 3,
+      "domains": {
+        "tool": 3
+      }
+    },
+    "oaklib": {
+      "pages": 1,
+      "domains": {
+        "agent": 1
+      }
+    },
+    "beautifulsoup-firecrawl": {
+      "pages": 2,
+      "domains": {
+        "tool": 2
+      }
+    },
+    "rapids-cudf-python": {
+      "pages": 2,
+      "domains": {
+        "gpu": 2
+      }
+    },
+    "rapids-libcudf-cpp": {
+      "pages": 3,
+      "domains": {
+        "gpu": 3
+      }
+    },
+    "rapids-cugraph-cpp": {
+      "pages": 3,
+      "domains": {
+        "gpu": 3
+      }
+    },
+    "cuda-cublas-cpp": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "rapids-cuml-python": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "openwiki-agent-docs": {
+      "pages": 3,
+      "domains": {
+        "agent": 3
+      }
+    },
+    "rapids-raft-cpp-python": {
+      "pages": 3,
+      "domains": {
+        "gpu": 3
+      }
+    },
+    "rapids-cuvs-cpp": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "rapids-libcuml-cpp": {
+      "pages": 1,
+      "domains": {
+        "gpu": 1
+      }
+    },
+    "rapids-rmm-cpp-python": {
+      "pages": 2,
+      "domains": {
+        "gpu": 2
+      }
+    },
+    "simdjson-cpp": {
+      "pages": 1,
+      "domains": {
+        "tool": 1
+      }
+    }
+  }
+}

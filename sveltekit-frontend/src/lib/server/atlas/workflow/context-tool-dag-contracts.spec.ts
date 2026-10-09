@@ -168,6 +168,20 @@ describe('buildContextToolDagFromPreAgentStages + executeContextToolDagV1 (CONTE
     expect(() => buildContextToolDagFromPreAgentStages({ ...meta, stages: ['QUERY_ANALYSIS', 'BOGUS'] })).toThrow(/unknown pre-agent stage/);
   });
 
+  it('allows graph-free DAGs without a graph revision but requires one for graph expansion', () => {
+    const graphFree = buildContextToolDagFromPreAgentStages({
+      ...meta,
+      graphRevision: null,
+      stages: ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE'],
+    });
+    expect(graphFree.graphRevision).toBeNull();
+    expect(() => buildContextToolDagFromPreAgentStages({
+      ...meta,
+      graphRevision: null,
+      stages: ['QUERY_ANALYSIS', 'GRAPH_EXPANSION'],
+    })).toThrow('GRAPH_EXPANSION requires an admitted graphRevision');
+  });
+
   it('wires ast-grep refinement after lexical candidates and rejects missing lexical input', async () => {
     const stages = ['QUERY_ANALYSIS', 'LEXICAL', 'AST_STRUCTURAL_REFINE', 'ACE_PACKET_ASSEMBLY'];
     const d = buildContextToolDagFromPreAgentStages({ ...meta, stages });
