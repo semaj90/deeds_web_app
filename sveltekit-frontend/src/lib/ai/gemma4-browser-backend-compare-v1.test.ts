@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {compareBrowserBackendsV1,type BackendObservationV1} from './gemma4-browser-backend-compare-v1.ts';
+const d='sha256:'+'a'.repeat(64),e='sha256:'+'b'.repeat(64);
+const a:BackendObservationV1={backend:'transformersjs-webgpu',modelDigest:d,tokenizerDigest:d,templateDigest:d,quantization:'q4f16',runtimeVersion:'fixture',fixtureDigest:d,startedAtEpochMs:0,finishedAtEpochMs:10,promptTokenIds:[1],outputTokenIds:[2],firstTokenMs:2,prefillTokensPerSecond:3,decodeTokensPerSecond:4,gpuExecutionObserved:true,memoryPeakBytes:null,status:'PASS'};
+const b:BackendObservationV1={...a,backend:'litertlm-js-webgpu',startedAtEpochMs:10,finishedAtEpochMs:20};
+test('missing LiteRT receipt blocks',()=>assert.deepEqual(compareBrowserBackendsV1(a,null).reasons,['MISSING_BACKEND_RECEIPT']));
+test('overlapping model runs block',()=>assert.ok(compareBrowserBackendsV1(a,{...b,startedAtEpochMs:9}).reasons.includes('RUNS_OVERLAP')));
+test('different export is quality comparison, not numerical parity',()=>{const r=compareBrowserBackendsV1(a,{...b,modelDigest:e});assert.equal(r.status,'COMPARABLE');assert.equal(r.classification,'CROSS_ARTIFACT_QUALITY_COMPARISON')});
+test('same artifacts with sequential verified receipts are comparable',()=>{const r=compareBrowserBackendsV1(a,b);assert.equal(r.status,'COMPARABLE');assert.equal(r.classification,'SAME_ARTIFACT_BACKEND_COMPARISON')});
+test('stale/unverified receipt never admitted',()=>assert.ok(compareBrowserBackendsV1(a,{...b,gpuExecutionObserved:false}).reasons.includes('litertlm-js-webgpu:EXECUTION_UNPROVEN')));
