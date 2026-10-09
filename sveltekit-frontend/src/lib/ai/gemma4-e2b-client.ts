@@ -4,13 +4,15 @@
  * Primary client-side LLM. Falls back to 270M ONNX (client-router handles fallback).
  *
  * Pipeline:
- *   1. Require independently verified GPU budget and offline admission (currently blocked)
+ *   1. Check WebGPU capabilities; adapter limits are NOT free VRAM
  *   2. Load Gemma4ForConditionalGeneration with q4f16 + WebGPU
  *   3. Apply chat template → generate → stream tokens
  *   4. Cache synthesis results in IndexedDB for RAG/KAG/DAG responses
  *
  * Source: https://huggingface.co/onnx-community/gemma-4-E2B-it-ONNX
  */
+
+import { inspectE2BGpuAdmissionV1 } from './gemma4-gpu-admission-v1.js';
 
 import {
 	CLIENT_E2B_MODEL_ID,
@@ -59,29 +61,17 @@ let _tokenizer: any = null;
 let _loadPromise: Promise<void> | null = null;
 let _loadError: string | null = null;
 
-// ── GPU Memory Admission ────────────────────────────────────────────────
-// WebGPU maxBufferSize and maxStorageBufferBindingSize are per-resource limits,
-// NOT total/free VRAM. Until a separately verified allocation budget and an
-// explicit offline model policy are provided, this entrypoint fails closed.
-// Do not probe/request a GPUDevice and do not import Transformers.js on denial.
-export function evaluateE2BMemoryAdmission(input: {
-  browser: boolean;
-  webgpu: boolean;
-  minimumMB: number;
-  verifiedFreeMB?: number | null;
-}): E2BStatus {
-  const loaded = _model !== null;
-  if (!input.browser) return { available: false, loaded, gpuMemoryMB: null, reason: 'ssr' };
-  if (!input.webgpu) return { available: false, loaded, gpuMemoryMB: null, reason: 'no-webgpu' };
-  // Intentionally never infer available memory from adapter.limits.
-  if (input.verifiedFreeMB == null || !Number.isFinite(input.verifiedFreeMB)) {
-    return { available: false, loaded, gpuMemoryMB: null, reason: 'gpu-memory-unverified' };
+// ── GPU Memory Check ─────────────────────────────────────────────────────
+
+/** WebGPU limits are NOT free VRAM. This probe never requests a GPUDevice. */
+async function inspectBrowserGpu(): Promise<{ present:boolean; reason:string }> {
+  try {
+    if (typeof navigator === 'undefined' || !navigator.gpu) return { present:false, reason:'no-webgpu' };
+    const adapter = await navigator.gpu.requestAdapter();
+    return { present:adapter !== null, reason:adapter ? 'adapter-present' : 'no-adapter' };
+  } catch {
+    return { present:false, reason:'gpu-probe-failed' };
   }
-  if (input.verifiedFreeMB < input.minimumMB) {
-    return { available: false, loaded, gpuMemoryMB: input.verifiedFreeMB, reason: 'gpu-memory-low' };
-  }
-  // Memory alone does not authorize a remote-model download or GPU allocation.
-  return { available: false, loaded, gpuMemoryMB: input.verifiedFreeMB, reason: 'model-admission-unverified' };
 }
 
 // ── Model Loading ────────────────────────────────────────────────────────
@@ -90,11 +80,22 @@ export function evaluateE2BMemoryAdmission(input: {
  * Check if E2B can run on this device (WebGPU available + sufficient memory).
  */
 export async function isE2BAvailable(): Promise<E2BStatus> {
-  return evaluateE2BMemoryAdmission({
-    browser: typeof window !== 'undefined',
-    webgpu: typeof navigator !== 'undefined' && !!navigator.gpu,
-    minimumMB: CLIENT_E2B_MIN_GPU_MB
+  if (typeof window === 'undefined') {
+    return { available:false, loaded:_model !== null, gpuMemoryMB:null, reason:'ssr' };
+  }
+  const probe = await inspectBrowserGpu();
+  const policy = inspectE2BGpuAdmissionV1({
+    browser:true, webgpu:typeof navigator !== 'undefined' && !!navigator.gpu,
+    adapterPresent:probe.present,
+    requiredMemoryMB:CLIENT_E2B_MIN_GPU_MB,
+    // No independently verified free-VRAM receipt or offline artifact
+    // admission owner exists here. Therefore do not request model weights.
   });
+  return {
+    available:policy.eligible, loaded:_model !== null, gpuMemoryMB:null,
+    reason:policy.reason === 'GPU_MEMORY_UNVERIFIED' ? 'gpu-memory-unverified' :
+      probe.present ? policy.reason.toLowerCase() : probe.reason
+  };
 }
 
 /**
@@ -121,7 +122,7 @@ async function _initE2BInternal(): Promise<void> {
 	}
 
 	console.info(`[E2B] Loading Gemma 4 E2B (${CLIENT_E2B_DTYPE}) on ${CLIENT_E2B_DEVICE}...`);
-	console.info(`[E2B] Verified GPU memory budget: ${status.gpuMemoryMB}MB`);
+	// Admission is intentionally blocked until trustworthy budget and artifact receipt wiring exists.
 
 	const startMs = performance.now();
 

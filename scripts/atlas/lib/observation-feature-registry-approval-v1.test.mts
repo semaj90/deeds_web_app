@@ -161,3 +161,41 @@ test('rejects a signed review receipt without its trusted reviewer key', () => {
     trustedApprovalReceiptChecksum: observationFeatureChecksum(receipt),
   }), /REVIEWER_PUBLIC_KEY_UNAVAILABLE/);
 });
+
+test('rejects a validly signed receipt when the trusted reviewer key is different', () => {
+  const fixture = artifactFixture();
+  const signer = generateKeyPairSync('ed25519');
+  const unrelated = generateKeyPairSync('ed25519');
+  const receipt = fixture.review_receipt as ObservationFeatureReviewReceiptV1;
+  receipt.signature_algorithm = 'Ed25519';
+  receipt.signature = sign(null, observationFeatureReviewReceiptSigningBytesV1(receipt), signer.privateKey).toString('base64');
+  assert.throws(() => validateApprovedObservationFeatureRegistryArtifactV1({
+    artifact: fixture,
+    authorizedReviewerIds: ['reviewer-fixture'],
+    trustedApprovalReceiptChecksum: observationFeatureChecksum(receipt),
+    reviewerPublicKeys: { 'reviewer-fixture': unrelated.publicKey.export({ type: 'spki', format: 'pem' }).toString() },
+  }), /REVIEW_SIGNATURE_INVALID/);
+});
+
+test('rejects a signed receipt that has no algorithm envelope', () => {
+  const fixture = artifactFixture();
+  const signer = generateKeyPairSync('ed25519');
+  const receipt = fixture.review_receipt as ObservationFeatureReviewReceiptV1;
+  receipt.signature = sign(null, observationFeatureReviewReceiptSigningBytesV1(receipt), signer.privateKey).toString('base64');
+  assert.throws(() => validateApprovedObservationFeatureRegistryArtifactV1({
+    artifact: fixture,
+    authorizedReviewerIds: ['reviewer-fixture'],
+    trustedApprovalReceiptChecksum: observationFeatureChecksum(receipt),
+    reviewerPublicKeys: { 'reviewer-fixture': signer.publicKey.export({ type: 'spki', format: 'pem' }).toString() },
+  }), /REVIEW_SIGNATURE_ENVELOPE_INCOMPLETE/);
+});
+
+test('a forged approval cannot change the registry revision even with a matching receipt anchor', () => {
+  const fixture = artifactFixture();
+  fixture.review_receipt.registry_revision = 'proposal:sha256:' + 'f'.repeat(64);
+  assert.throws(() => validateApprovedObservationFeatureRegistryArtifactV1({
+    artifact: fixture,
+    authorizedReviewerIds: ['reviewer-fixture'],
+    trustedApprovalReceiptChecksum: observationFeatureChecksum(fixture.review_receipt),
+  }), /REVIEW_RECEIPT_REVISION_MISMATCH/);
+});

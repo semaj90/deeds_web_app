@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Parent Atlas RMSNorm WGSL parity</title>
+<h1>RMSNorm WGSL / CPU f32 parity</h1><p>Fixture only. No model, weights, network imports or inference.</p>
+<button id="run">Run GPU RMSNorm parity</button><pre id="log">Not run</pre>
+<script type="module">
+const output=document.getElementById('log');
+const x=Float32Array.from([1,2,3,4,-4,-3,-2,-1]);
+const w=Float32Array.from([1,.5,2,1.25]);
+const rows=2,width=4,epsilon=1e-5,atol=2e-5,rtol=1e-5;
+let shader='';
+const f32=Math.fround;
+function cpu(){
+ const result=[];
+ for(let i=0;i<rows;i++){
+  let sq=f32(0);
+  for(let j=0;j<width;j++){const v=f32(x[i*width+j]);sq=f32(sq+f32(v*v));}
+  const s=f32(1/Math.sqrt(f32(f32(sq/width)+f32(epsilon))));
+  for(let j=0;j<width;j++)result.push(f32(f32(x[i*width+j]*s)*f32(w[j])));
+ }
+ return result;
+}
+document.getElementById('run').addEventListener('click',async()=>{
+ const begin=performance.now(),buffers=[];
+ const receipt={schema:'atlas.rmsnorm.webgpu.parity.v1',status:'BLOCKED',reason:null,operation:'RMSNorm-f32',rows,width,
+    epsilon,atol,rtol,maxAbsError:null,adapterLimitBytes:null,freeVramBytes:null,
+    dispatchWorkgroups:1,modelLoaded:false,weightsDownloaded:false};
+ let dev=null,dispatchFinished=false;
+ try{
+   shader=await fetch('/atlas-kernels/rmsnorm-f32-v1.wgsl',{cache:'no-store'}).then(async response=>{if(!response.ok)throw Error('SHADER_ASSET_UNAVAILABLE');return response.text()});
+  if(!isSecureContext||!navigator.gpu)throw Error('WEBGPU_UNAVAILABLE');
+  const adapter=await navigator.gpu.requestAdapter();
+  if(!adapter)throw Error('NO_GPU_ADAPTER');
+  receipt.adapterLimitBytes=adapter.limits.maxBufferSize;
+  dev=await adapter.requestDevice();
+  const module=dev.createShaderModule({code:shader});
+  const info=await module.getCompilationInfo();
+  const errors=info.messages.filter(m=>m.type==='error');
+  if(errors.length)throw Error('WGSL_COMPILE_ERROR: '+errors.map(m=>m.message).join('; '));
+  const make=(size,usage)=>{const b=dev.createBuffer({size,usage});buffers.push(b);return b};
+  const xb=make(x.byteLength,GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST);
+  const wb=make(w.byteLength,GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_DST);
+  const ob=make(x.byteLength,GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC);
+  const ub=make(16,GPUBufferUsage.UNIFORM|GPUBufferUsage.COPY_DST);
+  const read=make(x.byteLength,GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ);
+  dev.queue.writeBuffer(xb,0,x);dev.queue.writeBuffer(wb,0,w);
+  const header=new ArrayBuffer(16),v=new DataView(header);
+  v.setUint32(0,rows,true);v.setUint32(4,width,true);v.setFloat32(8,epsilon,true);
+  dev.queue.writeBuffer(ub,0,header);
+  const pipe=dev.createComputePipeline({layout:'auto',compute:{module,entryPoint:'main'}});
+  const group=dev.createBindGroup({layout:pipe.getBindGroupLayout(0),entries:[
+   {binding:0,resource:{buffer:xb}},{binding:1,resource:{buffer:wb}},
+   {binding:2,resource:{buffer:ob}},{binding:3,resource:{buffer:ub}}
+  ]});
+  const command=dev.createCommandEncoder();
+  const pass=command.beginComputePass();pass.setPipeline(pipe);pass.setBindGroup(0,group);
+  pass.dispatchWorkgroups(1);pass.end();
+  command.copyBufferToBuffer(ob,0,read,0,x.byteLength);
+  dev.queue.submit([command.finish()]);
+  await read.mapAsync(GPUMapMode.READ);dispatchFinished=true;
+  const actual=new Float32Array(read.getMappedRange().slice(0));read.unmap();
+  const expected=cpu(),diffs=expected.map((ref,i)=>Math.abs(ref-actual[i]));
+  const valid=expected.every((ref,i)=>Number.isFinite(actual[i])&&diffs[i]<=atol+rtol*Math.abs(ref));
+  receipt.maxAbsError=Math.max(...diffs);
+  receipt.status=valid?'PASS':'FAIL';
+  receipt.reason=valid?null:'NUMERICAL_MISMATCH';
+  receipt.reference=expected;receipt.actual=Array.from(actual);
+ }catch(e){receipt.status=dispatchFinished?'FAIL':'BLOCKED';receipt.reason=String(e?.message??e)}
+ finally{
+  receipt.durationMs=performance.now()-begin;
+  for(const b of buffers){try{b.destroy()}catch{}}
+  if(dev){try{dev.destroy()}catch{}}
+  output.textContent=JSON.stringify(receipt,null,2);
+  console.log('[ATLAS_RMSNORM_GPU_TELEMETRY]',JSON.stringify(receipt));
+ }
+});
+</script></html>
