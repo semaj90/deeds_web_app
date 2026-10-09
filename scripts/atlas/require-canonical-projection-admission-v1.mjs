@@ -7,6 +7,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { summarizeCanonicalProjectionAdmissionV1 } from './canonical-projection-admission-summary-v1.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const reportPath = resolve(root, 'docs/reports', `atlas-canonical-projection-fabric-audit-${new Date().toISOString().slice(0, 10)}.json`);
@@ -22,8 +23,15 @@ if (!existsSync(reportPath)) {
 }
 
 const report = JSON.parse(readFileSync(reportPath, 'utf8'));
-if (report.overall_verdict !== 'SAFE_TO_PROJECT') {
-  throw new Error(`GRAPHIFY_PROMOTION_ADMISSION_BLOCKED:${report.overall_verdict ?? 'MISSING_VERDICT'}`);
+const summary = summarizeCanonicalProjectionAdmissionV1(report);
+if (!summary.admitted) {
+	console.error(JSON.stringify({
+		code: 'GRAPHIFY_PROMOTION_ADMISSION_BLOCKED',
+		...summary,
+		reportPath,
+	}, null, 2));
+	process.exitCode = 1;
+	throw new Error('GRAPHIFY_PROMOTION_ADMISSION_BLOCKED');
 }
 
 console.log('GRAPHIFY_PROMOTION_ADMISSION_PROVEN');

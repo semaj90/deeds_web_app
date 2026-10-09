@@ -2407,10 +2407,12 @@ revision authority envelope required by strict admission.
 
 | Gate | Status | Evidence |
 |---|---|---|
-| Resolver contract and fail-closed parity | PROVEN_BOUNDED | `search-runtime-ace-resolver-v1.spec.ts` 4/4 |
+| Resolver contract and fail-closed parity | PROVEN_BOUNDED | `search-runtime-ace-resolver-v1.spec.ts` 5/5 |
 | SearchRuntime feature-bundle contract | IMPLEMENTED_NOT_LIVE | provider exists; no production resolver binding |
 | Canonical route source owner | OPEN | `docs/reports/ace-revision-source-owner-v1.json` |
 | Live ACE stream adoption | BLOCKED | legacy query-only cache remains in `api/ace/stream` |
+
+**2026-10-08 regression replay:** candidate-ordinal dense executor, Qdrant ordinal adapter, and SearchRuntime ACE resolver suites passed 13/13 under the isolated lane-contract Vitest config. The existing TaskCard/evidence-card parser, join, summary, and shard Node suites passed 14/14. These are contract/regression checks only; they do not establish a production ACE caller, evidence admission, or persistence.
 
 Next implementation gate: `ACE-FEATURE-SOURCE-OWNER-01` production adapter only. It must compose
 the existing SearchRuntime result and canonical ordinal/feature owners; it must not query Qdrant,
@@ -2904,6 +2906,20 @@ non-semantic; neither value should be overwritten.
 Evidence boundary: current centroid data is a rebuildable Valkey projection of the Postgres
 centroid source. Cluster IDs, SOM cells, topology coordinates, and Valkey keys are not canonical
 identity. Existing legacy readers remain unchanged pending the new manifest contract.
+
+**TurboVec/Valkey path recheck (2026-10-07; source inspection only):**
+`scripts/atlas/warm-turbovec-centroids-redis.mjs` reads the legacy
+`gpu:autoencoder:centroids_64` hash and Qdrant payloads, then writes `ace:cluster:*`,
+`centroid:*`, and `som:*` keys without a candidate-snapshot, ordinal-map, representation,
+workspace, or graph revision in the key/value contract. It is therefore not an admissible
+centroid publisher and was not run. `scripts/atlas/audit-turbovec-runtime-v1.mjs` overwrites
+`docs/reports/turbovec-runtime-v1.json`; `audit-turbovec-ordinal-bridge-v1.mjs` also writes a
+report by default after a bounded Qdrant scroll. Neither was run because the default report
+targets can overwrite tracked evidence. Existing source keeps the correct division: TurboVec
+is a non-authoritative semantic prefilter challenger; it needs a fresh ordinal-map-bound
+read-only census and exact rerank proof before any integration, and Valkey warming still needs
+the revision-qualified manifest/pointer and atomic readback gate above. No Qdrant or Valkey
+operation was performed.
 
 ### RABBITMQ-PARENT-ATLAS-BOUNDARY-01 — queue ownership review 2026-09-08
 
@@ -3429,6 +3445,12 @@ artifact, or projection write was created in this pass.
 - [x] Add deterministic ordering, checksum/tamper, duplicate ID, ordinal range,
   and non-authority fixture tests. These prove contract behavior only; they do
   not prove a live clustering run or candidate admission.
+- **Focused recheck (2026-10-07; fixture-only):**
+  `centroid-artifact-v1.spec.ts` and `gpu-cluster-centroids-writers.guard.spec.ts`
+  pass 15/15 tests. This reconfirms manifest/card integrity and writer guards;
+  it does not qualify current embeddings, candidate ordinals, cuML output, or
+  Valkey publication, so the live-admission and cache-publication gates below
+  remain open. No GPU job or store write was run.
 - [ ] Bind manifests/cards to an exact admitted candidate snapshot and verified
   `CentroidArtifactV1` readback. Keep KMeans/SOM outputs diagnostic until the
   representation/ordinal-map parity gates pass.
@@ -10191,6 +10213,18 @@ authority for `graphify_execution_file_membership_v2.repository_id` (status `VER
 `register-orphaned-chunks.mjs` non-V2 path. None of these four are mine to push through unilaterally either — the decision
 file explicitly withholds `writesAuthorized` pending exactly this authorization.
 
+**Collision-guard verification (2026-10-07; fixture-only):** reran
+`node --test scripts/atlas/lib/packet-key-v2-admission-v1.test.mjs` (8/8 pass).
+The existing owner rejects duplicate derived V2 keys, a V2 key stored for a different source,
+multiple aliases, and alias/source conflicts; it emits a collision receipt for unique violations
+and deliberately generates a plain `INSERT` with no `ON CONFLICT` suppression. This proves the
+deterministic guard behavior, not current live-table collision freedom. The checked-in gate report
+`docs/reports/packet-key-v2-admission-gate-v1.json` is dated 2026-09-25 and remains historical;
+its 7,350-row / zero-collision counts must not be presented as a current census. The alias-kind
+DDL remains unapplied, no live collision audit was run because the existing audit overwrites a
+tracked report, and no admission or database writes were attempted. Keep the V2 apply gate blocked
+until a fresh isolated read-only census and explicit DDL/admission authorization are available.
+
 **GRAPH_MANIFEST_SEALED query fix, applied (2026-09-28), plus a git-stash near-miss and one pre-existing bug found:**
 Confirmed `materializeCanonicalGraphSnapshotFromPostgres` has exactly one real caller
 (`export-graph-snapshot-v2.mts`) before touching the shared query -- safe to edit directly. Fixed
@@ -10228,6 +10262,33 @@ either a `vite-node`-based invocation or a new package.json script wired the sam
 SvelteKit-context scripts in this repo are -- real setup work, not attempted in this pass given
 context budget. This is the concrete next step: get one real export run against the admitted
 revision, producing a manifest with `workspaceRevision` bound correctly, then re-audit.
+
+**PacketKeyV2 owner/collision recheck (2026-10-07, read-only):** The existing pure
+`PacketKeyV2` recipe and `PacketKeyResolutionV2` remain the identity owners; no second registry
+was added. A `BEGIN TRANSACTION READ ONLY` census found 61,718 `atlas_packets` rows, zero V2
+UUID keys, 61,656 legacy-shaped keys, and 61,718 distinct non-null `source_ref` values (zero
+duplicate groups in this observation). The alias table has 3,294 `PREFIX_DIVERGENCE_ACE_PACKET`
+rows, no `PACKET_KEY_V1_STORAGE_TO_V2` rows, a primary key on `alias_key`, and a foreign key
+requiring `canonical_packet_key` to already exist in `atlas_packets`. Therefore V2 admission
+remains blocked on the separately prepared alias DDL and explicit authorization; the older
+September admission report was not rerun because its producer overwrites shared reports.
+The legacy `resolvePacketKeyForWrite()` source-ref fallback now fetches at most two matches and
+throws `PacketIdentityAmbiguousError` rather than picking the first; no production callsite was
+found. Focused packet-key/identity tests pass 30/30. This readback is current-state evidence only,
+not migration authorization, V2 adoption, or a write receipt.
+
+**Bounded PacketKeyV2 derivation replay (2026-10-07; REPEATABLE READ READ ONLY):** added an
+optional `--output` argument to `scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts`,
+restricted to `.tmp/` so an isolated run cannot overwrite tracked reports. The fresh replay read
+61,718 packets: 17,399 rows were derivable from unique execution-membership repository scope,
+including 17,301 V1-shaped and 98 ACE-prefixed stored keys; 44,256 had no execution membership,
+61 were `rpc_method`, 1 was `cluster-summary`, and 1 source ref failed the upstream contract.
+The 17,399 derived keys were distinct (zero collisions in this derivable cohort). Alias readback
+remains 3,294 `PREFIX_DIVERGENCE_ACE_PACKET` rows and zero `PACKET_KEY_V1_STORAGE_TO_V2` rows.
+Scratch receipt: `.tmp/goal-packet-key/census-v1.json`, SHA-256
+`d1c4eb49f51da627408f1676e292459348fb89ce11fdd0efa1e9e3c06020e2b0`. This proves only the
+bounded derivation/collision result for rows with unique execution membership; it does not qualify
+the 44,256 unbound rows, prove V2 admission, authorize alias DDL, or change canonical identity.
 
 **GRAPH-SNAPSHOT-SCOPE-V2-01, applied (2026-09-28) -- `workspace_revision_key` alone was still
 insufficient scope; a repository + execution partition was missing.** An external review correctly
@@ -14681,3 +14742,37 @@ Receipt `atlas.opencode-run-receipt.v1` from `scripts/opencode/run-with-finalize
 - [ ] CTX-E2E-VARIANCE-01 Run the finalizer harness 5 times on this query and 2 other fixtures (exact-symbol, memory/prior-session); report answer-correct rate, steps, finalizer-needed rate, wrong-claim rate.
 
   - SESSION SUMMARY 2026-10-06 (CTX-PREAGENT-01 / CBM slice; merged to `origin/main`): branch `handoff/summary-enrichment-lineage-20260925` merged into main (merge commits built with `git merge-tree` + `commit-tree`, no checkout, because C: was 100% full; the merged result was NOT built, tested or run through CI; branch handler specs 26/26, finalizer 6/6). Shipped as code, nothing wired to a live request path, no step savings claimed: pre-agent stage selector, retrieval-parameter plan, DAG mapper + level-parallel read-only executor, handlers, OpenCode finalizer; CBM `WORKTREE_STRUCTURAL` adapters DEFINITION/OUTLINE/SNIPPET/IMPORTS/TEXT (TEXT shape verified against the real CBM 0.11.0 `search_code format:json`; OUTLINE/SNIPPET/IMPORTS shapes still fixture-only), freshness = exact source revision + content digest + workspace revision equality (else unknown), `qualifyCbmObservationV1` (QUALIFIED only with fresh index + real canonicalId + real revisions, else diagnostic-only), `decideCbmFallbackV1` (empty/stale/unknown/ambiguous -> rg, absence UNKNOWN). Still open: the Atlas source-path -> canonicalId/revision lookup the qualifier needs (blocked by STALE_WORKSPACE_PROJECTION, no Graphify execution bound to the admitted revision); REPRESENTATION-SNAPSHOT-01 and AE/KMeans/SOM requalification stay blocked on CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED; MEMORY_PRIOR/GRAPH_EXPANSION owners; C: disk full (1.4 GB free; a read-only `du` inventory was too slow and was stopped, nothing deleted); plaintext DATABASE_URL in gitignored `.vscode/mcp.json`; TRACE restart / claude-mem worker decisions; ~370 other dirty files belong to other sessions and were not committed.
+
+### ACE-STARTUP-BOUNDARY-01 — static boundary spec (2026-10-06, read-only; no DB/Redis/BitFrost write)
+
+Added `scripts/startup/ace-startup-boundary.spec.mjs` (`node --test`, 5/5 pass). It pins, from source only: (1) `graphify-daily-ace-packet-step-v1.mjs` hard-codes `cacheWrites: 0`/`canonicalWrites: 0`, imports no Redis client, runs in a READ ONLY transaction and is gated by `require-canonical-projection-admission-v1.mjs`; (2) its `receipt.status` vocabulary is only `BLOCKED` / `DISABLED_BY_OPERATOR` / `ADMITTED_COMPOSITION_NOT_WIRED` / `ERROR` (no warmed/success state); (3) `run-graphify-daily-startup.mjs` and `run-karpathy-gpu-admitted-v1.mjs` never reference `writeRevisionQualifiedV3ToBitfrost`, `bitfrost:{packet,trace,source}` or `AcePacketWriter`; (4) `writeRevisionQualifiedV3ToBitfrost` has no caller under `scripts/` or `sveltekit-frontend/src` other than the writer, its test and the packet step's comment. Boundaries: Graphify apply and Karpathy enrichment never warm ACE packets; a Karpathy `gpu:karpathy:*` write is not BitFrost admission; ACE packet warming has no live caller.
+
+Residual (box left UNTICKED): the packet step exits 0 on a recorded `BLOCKED` by design (header comment), so the exit code alone cannot show a warm happened; the receipt `status` is the only signal and the root wrapper fails closed separately. TRACE MCP `:8788` startup is not covered by the spec (no start script was located in `package.json`; it runs on its own task). Close the box once the TRACE start entry point is identified and pinned.
+
+### ACE-PRODUCER-TRACE-01 — read-only `embedAllowedPacketKeys` producer (2026-10-06)
+
+Need vs practice: the BitFrost writer needs a caller-supplied `ReadonlySet<string>`; the repo already owned the predicate (`embed_allowed` in `ENRICHMENT_READINESS_CTE_V1`) but only exposed a count. Added `loadEmbedAllowedPacketKeysV1(client)` beside it (`scripts/atlas/lib/enrichment-readiness-sql-v1.mjs`): same predicate (one owner), one REPEATABLE READ READ ONLY transaction, sorted keys, blank/duplicate-key fail-closed, frozen Set, `keysSha256`, `canonicalAuthority:false`, `admissionVerdict:null` (supplies keys only; NOT an admission verdict, so the caller must still require SAFE_TO_PROJECT). Spec `enrichment-readiness-sql-v1.spec.mjs` (fake client) + boundary spec: 7/7 pass. Live read-only run 2026-10-06T16:35Z: 3,295 of 61,718 packets, `sha256:129d2909…8e8c` — matches the 2026-09-26 packet-step census (3,295/61,718). Nothing written. Box stays UNTICKED: packet-step wiring, `buildAcePacketV3` readback and revision-qualified admission (`SEMANTIC_OWNER_PROVEN`, `BITFROST_KEYS_DERIVABLE`) are still open; the producer is not yet called by the packet step.
+
+### Operator decisions + ACE chain progress (2026-10-06)
+
+**Decision 1 — `semantic_768` physical owner = `codebase_chunk_index.content_embedding_768` (`vector(768)`).** `content_embedding` (`halfvec(768)`) is the legacy/executor/index coordinate (HNSW), NOT semantic authority. Historical receipts keep their coordinate and are not rewritten. `SEMANTIC-OWNER-01` must PROVE the owner, not assert it: column + 768 dims; producer/writer path identified; model revision; representation revision; source/workspace revisions preserved; readback shows writer → same column; no second writer silently populates a competing semantic truth. Status until proven: decided, `SEMANTIC_OWNER_PROVEN` stays NOT_PROVEN.
+
+**Decision 2 — canonical `concept_id` = text** (`atlas_ontology_concepts.concept_id`). Integers are derived `concept_ordinal`/surrogates only and never replace `concept_id`; `atlas_concepts` (integer PK, 0 rows) and `concept_records` (0 rows) reconcile through an explicit mapping/migration plan, archived not deleted. Not yet applied to any schema.
+
+**Done:** `ACE-STARTUP-BOUNDARY-01` spec now also pins TRACE MCP startup (`sveltekit-frontend/scripts/ensure-mcp-server.mjs`) as separate from `graphify:daily:chain` and free of ACE/BitFrost references (6/6). `graphify-daily-ace-packet-step-v1.mjs` now obtains its census from `loadEmbedAllowedPacketKeysV1()` (no second eligibility query; receipt gains `embedAllowedKeysSha256`); still writes nothing, still `BLOCKED` while admission is NOT_SAFE_TO_PROJECT. Eligibility is derived and non-authoritative; BitFrost never decides it.
+
+**Still open (order):** `ACE-PRODUCER-TRACE-01` until admitted snapshot → `loadEmbedAllowedPacketKeysV1()` → packet-build caller → `buildAcePacketV3` → readback → exact packet-key/checksum agreement is proven; `ACE-BITFROST-CALLER-01` blocked until that passes; `ACE-BITFROST-CANARY-01` blocked on explicit operator authorization.
+
+**Gated-write rehearsal contract (draft; nothing run).** Applies to projection checksum alignment, ordinal completion (14,368/16,151; 1,783 `(packet_key, source_ref)` pairs) and `ace_context_sources` grounding. Before any write: pre-image archive with checksum; row counts; workspace/source revision; representation revision; target projection checksum; dry-run diff; bounded canary cohort; transaction + post-write readback; rollback artifact. No revision is manufactured and no stale semantic/graph artifact is promoted; each step needs its own explicit operator authorization.
+
+**ACE-PRODUCER-TRACE-01 readback evidence (2026-10-06):** `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-residency-warming-v1.test.ts` 25/25 pass (vitest). It proves, against an in-memory `FakeRedis` only: a `makeCurrentAcePacketV3()` packet is written via `AcePacketWriter.writeRevisionQualifiedV3ToBitfrost` and read back as `HIT` through `AcePacketReader`; unadmitted keys are blocked; stale/malformed entries are invalidated; hint-only packets and key-checksum drift fail closed; a different packet revision is a miss. It does NOT prove the live chain (admitted snapshot → `loadEmbedAllowedPacketKeysV1()` → packet-build caller → `buildAcePacketV3` from real packets → live Valkey readback). Box stays UNTICKED; `ACE-BITFROST-CALLER-01` stays blocked.
+
+### SEMANTIC-OWNER-01 — live census + classification (2026-10-06, read-only)
+
+Existing owner: `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs` (receipt `docs/reports/semantic-768-writer-ownership-v1.json`, 2026-09-30, verdict `OWNER_NOT_PROVEN`, 15 writers, one guarded revision-qualified writer `apply-lineage-qualified-semantic-768-backfill-v1.mjs`); this pass reused it and did NOT add a second audit. 01B (writer trace) is therefore already covered there; the live census below reproduces its provenance numbers exactly.
+
+**01A census** (`codebase_chunk_index.content_embedding_768`, 219,998 populated, all 768-dim, `embedding_model` present on all): `embedding_version` 759, `embedding_created_at` 739, `source_revision` 0, `workspace_revision` 0, `representation_revision` 0, `lineage_binding_checksum` 0, `lineage_producer_revision` 0; fully stamped 0. Models: `embeddinggemma:latest` 219,422, `embeddinggemma:latest:eg-task-prefix-v1` 576. 739 rows also hold the halfvec `content_embedding`.
+
+**01C classification:** `PROVEN_CURRENT_WRITER` 0 (strict: no row carries source/workspace/representation revision); `LEGACY_UNATTRIBUTED` ≈219,239 (no version/timestamp/revision); version-stamped but revision-unqualified 759 (the guarded writer's own cohort is documented as 15 rows, so the 759 attribution is unresolved); `CONFLICTING_PROVENANCE` candidates = the 739 both-column rows (recipe UNKNOWN per EMB-RECIPE-03). Not a two-active-writer conflict: one bounded writer plus a large legacy population with missing provenance.
+
+**Status:** `SEMANTIC_OWNER_PROVEN` = NOT_PROVEN. Acceptance (agreed): one admitted writer contract that emits modelRevision, representationRevision and source/workspace lineage; readback proves the same artifact; the promoted cohort contains only qualified rows. Path: leave the legacy ~219k diagnostic/excluded from promotion (do not invent provenance) and build a fresh bounded revision-qualified cohort through the admitted writer. Not started; any write is gated.

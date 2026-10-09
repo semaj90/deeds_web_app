@@ -1,0 +1,69 @@
+{
+  "schema_version": "okf.dev.manifest.v1",
+  "description": "Bounded official documentation supplement for serialization, cache semantics, analytical interchange, and context engineering. Local reference only; not admitted evidence.",
+  "sources": [
+    {
+      "source_id": "valkey-cache-semantics",
+      "title": "Valkey cache semantics",
+      "kind": "official_docs",
+      "domain_class": "cache",
+      "focus_tags": ["cache_invalidation", "ttl", "client_side_cache", "contextual_engineering"],
+      "pages": [
+        "https://valkey.io/topics/client-side-caching/",
+        "https://valkey.io/topics/lru-cache/",
+        "https://valkey.io/topics/keyspace/"
+      ]
+    },
+    {
+      "source_id": "msgpack-spec",
+      "title": "MessagePack specification",
+      "kind": "official_specification",
+      "domain_class": "configuration",
+      "focus_tags": ["serialization", "wire_format", "binary_encoding"],
+      "pages": ["https://msgpack.org/index.html"]
+    },
+    {
+      "source_id": "grpc-protobuf",
+      "title": "gRPC and Protocol Buffers",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["rpc", "protobuf", "streaming", "wire_format"],
+      "pages": [
+        "https://grpc.io/docs/what-is-grpc/introduction/",
+        "https://protobuf.dev/programming-guides/encoding/"
+      ]
+    },
+    {
+      "source_id": "duckdb-interchange",
+      "title": "DuckDB JSON and Parquet",
+      "kind": "official_docs",
+      "domain_class": "database",
+      "focus_tags": ["jsonl", "parquet", "batch_analysis", "interchange"],
+      "pages": [
+        "https://duckdb.org/docs/current/data/json/overview",
+        "https://duckdb.org/docs/current/data/parquet/overview"
+      ]
+    },
+    {
+      "source_id": "context-engineering",
+      "title": "Context engineering for multi-agent systems",
+      "kind": "official_engineering_article",
+      "domain_class": "agent",
+      "focus_tags": ["context_engineering", "bounded_context", "agent_workflows"],
+      "pages": [
+        "https://developers.googleblog.com/architecting-efficient-context-aware-multi-agent-framework-for-production/"
+      ]
+    },
+    {
+      "source_id": "openai-prompting",
+      "title": "OpenAI prompting and agent documentation",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["prompt_engineering", "tool_use", "agent_context"],
+      "pages": [
+        "https://platform.openai.com/docs/guides/prompt-engineering",
+        "https://platform.openai.com/docs/guides/tools?api-mode=responses"
+      ]
+    }
+  ]
+}

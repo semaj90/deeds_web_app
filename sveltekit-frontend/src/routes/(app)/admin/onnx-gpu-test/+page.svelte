@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { getOnnxSession, getProviderLabel } from '$lib/ai/onnx/session.js';
 	import { isOnnxAvailable } from '$lib/ai/onnx/inference.js';
+	import { EDGE_EXPERIMENTAL_MANIFESTS } from '$lib/ai/edge/phase23-model-manifest.js';
+	import { probeManifest } from '$lib/ai/edge/phase23-model-probe.js';
+	import { toRepairTask } from '$lib/ai/edge/phase23-agent-repair.js';
 
 	let results = $state<Array<{ name: string; status: 'pass' | 'fail' | 'skip'; message: string; duration?: number }>>([]);
 	let isRunning = $state(false);
@@ -22,6 +25,35 @@
 			addResult('Browser Environment', isBrowser ? 'pass' : 'fail', isBrowser ? 'Browser detected' : 'Not running in browser');
 		} catch (e) {
 			addResult('Browser Environment', 'fail', String(e));
+		}
+
+		// Phase 23 EDGE-02: capability checks do not imply model or token-generation parity.
+		try {
+			const gpu = typeof navigator !== 'undefined' ? (navigator as Navigator & {gpu?: {requestAdapter: () => Promise<unknown>}}).gpu : undefined;
+			const adapter = gpu ? await gpu.requestAdapter() : null;
+			addResult('WebGPU Adapter', adapter ? 'pass' : 'skip', adapter ? 'Adapter acquired (LLM execution NOT_PROVEN)' : 'No available WebGPU adapter');
+		} catch (e) {
+			addResult('WebGPU Adapter', 'fail', String(e));
+		}
+		try {
+			const storage = await navigator.storage?.estimate?.();
+			addResult('Model Storage Quota', storage?.quota ? 'pass' : 'skip', storage?.quota ? `Estimated quota ${Math.round(storage.quota / 2 ** 20)} MiB; free space not guaranteed` : 'Storage quota unavailable');
+		} catch (e) {
+			addResult('Model Storage Quota', 'skip', String(e));
+		}
+		addResult('LiteRT-LM Web Generate', 'skip', 'NOT_PROVEN: requires pinned @litert-lm/core + compatible .litertlm, actual token generation and unload receipt');
+		addResult('Browser MTP', 'skip', 'NOT_PROVEN: server MTP scripts do not establish browser speculative decoding');
+
+		// P23-EDGE-ASSET: HEAD-only; records a source URL on missing assets.
+		// TODO: pin revision/hash and connect runtime readiness only after real model loading.
+		for (const manifest of EDGE_EXPERIMENTAL_MANIFESTS) {
+			const probes = await probeManifest(manifest, { fetcher: (url, init) => fetch(url, init) });
+			for (const probe of probes) {
+				const repair = toRepairTask(probe);
+				const label = `Model Asset: ${manifest.id}/${probe.assetId}`;
+				const diagnostic = repair ? ` | Repair review source: ${repair.evidence.sourceUrl}` : '';
+				addResult(label, probe.status === 'ERROR' ? 'fail' : 'skip', `${probe.status}: ${probe.message}${diagnostic}`);
+			}
 		}
 
 		// Test 2: IndexedDB availability
@@ -74,7 +106,7 @@
 			const duration = Date.now() - start;
 			if (session) {
 				const provider = getProviderLabel('/gemma4_e2b_onnx/model.onnx');
-				addResult('Gemma4 E2B Load', 'pass', `Loaded with ${provider} (120-255 tok/s)`, duration);
+				addResult('Gemma4 E2B Load', 'pass', `Loaded with ${provider}; inference speed NOT_MEASURED`, duration);
 			} else {
 				addResult('Gemma4 E2B Load', 'skip', 'Model not downloaded yet. Run: bash scripts/download-gemma4-e2b-onnx.sh');
 			}

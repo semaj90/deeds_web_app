@@ -53,6 +53,41 @@ describe('KAG-01/02: persistOntologyLinkedTuples', () => {
     });
   });
 
+  it('passes grounded lineage and span checksum through the existing JSONB columns', async () => {
+    queryMock.mockClear();
+    const { persistOntologyLinkedTuples } = await import('./ontology-linked-tuple-postgres.js');
+    const grounded = tuple({
+      evidenceSpan: { sourceRef: 'src/fixture.ts', start: 6, end: 11 },
+      provenance: {
+        sourceTables: [],
+        labelerVersion: null,
+        taggerVersion: null,
+        ontologyVersion: 'ontology:fixture-v1',
+        nlpVersion: 'extractor:fixture-v1',
+        sourceRevision: `sha256:${'a'.repeat(64)}`,
+        workspaceRevision: `sha256:${'b'.repeat(64)}`,
+        taskRevision: `sha256:${'c'.repeat(64)}`,
+        evidenceCardChecksum: `sha256:${'d'.repeat(64)}`,
+        evidenceSpanChecksum: `sha256:${'e'.repeat(64)}`,
+        inputDigest: 'grounded-nlp:fixture-fact',
+      },
+    });
+
+    const result = await persistOntologyLinkedTuples([grounded], 'test-producer:v1');
+
+    expect(result).toEqual({ attempted: 1, written: 1, errors: [] });
+    const params = queryMock.mock.calls[0][1];
+    expect(JSON.parse(params[18])).toEqual({ sourceRef: 'src/fixture.ts', start: 6, end: 11 });
+    expect(JSON.parse(params[22])).toMatchObject({
+      sourceRevision: grounded.provenance.sourceRevision,
+      workspaceRevision: grounded.provenance.workspaceRevision,
+      taskRevision: grounded.provenance.taskRevision,
+      evidenceCardChecksum: grounded.provenance.evidenceCardChecksum,
+      evidenceSpanChecksum: grounded.provenance.evidenceSpanChecksum,
+      inputDigest: 'grounded-nlp:fixture-fact',
+    });
+  });
+
   it('is a no-op for an empty tuple array (never issues a query)', async () => {
     queryMock.mockClear();
     const { persistOntologyLinkedTuples } = await import('./ontology-linked-tuple-postgres.js');

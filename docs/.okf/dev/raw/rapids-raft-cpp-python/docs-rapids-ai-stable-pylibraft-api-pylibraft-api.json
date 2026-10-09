@@ -1,0 +1,53 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-raft-cpp-python",
+  "source_ref": "rapids-raft-cpp-python:docs-rapids-ai-stable-pylibraft-api-pylibraft-api",
+  "url": "https://docs.rapids.ai/api/raft/stable/pylibraft_api/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "raft",
+    "pylibraft",
+    "cpp",
+    "python",
+    "cuda",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) [Skip to main content](https://docs.nvidia.com/raft/latest/pylibraft_api/#main-content) Back to top`Ctrl` + `K` [![NVIDIA RAFT - Home](https://docs.nvidia.com/raft/latest/_static/nvidia-logo-horiz-rgb-blk-for-screen.svg)![NVIDIA RAFT - Home](https://docs.nvidia.com/raft/latest/_static/nvidia-logo-horiz-rgb-wht-for-screen.svg)\\\\ NVIDIA RAFT](https://docs.nvidia.com/raft/latest/) latest [latest](https://docs.nvidia.com/raft/latest/pylibraft_api/) [26.10](https://docs.nvidia.com/raft/26.10/pylibraft_api/) [26.08](https://docs.nvidia.com/raft/26.08/pylibraft_api/) [26.06](https://archive.docs.nvidia.com/raft/26.06/pylibraft_api/) [26.04](https://archive.docs.nvidia.com/raft/26.04/pylibraft_api/) [26.02](https://archive.docs.nvidia.com/raft/26.02/pylibraft_api/) [25.12](https://archive.docs.nvidia.com/raft/25.12/pylibraft_api/) [25.10](https://archive.docs.nvidia.com/raft/25.10/pylibraft_api/) [25.08](https://archive.docs.nvidia.com/raft/25.08/pylibraft_api/) [25.06](https://archive.docs.nvidia.com/raft/25.06/pylibraft_api/) [25.04](https://archive.docs.nvidia.com/raft/25.04/pylibraft_api/) [25.02](https://archive.docs",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-raft-cpp-python:docs-rapids-ai-stable-pylibraft-api-pylibraft-api",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS RAFT C++ and Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "227f5339e806d6011bc133e5dd790dee0aa414c3463e683fece524cc3b13002a",
+  "markdown_path": "docs/.okf/dev/raw/rapids-raft-cpp-python/docs-rapids-ai-stable-pylibraft-api-pylibraft-api.md",
+  "fetched_at": "2026-10-09T05:37:57.234Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-raft-cpp-python",
+    "source_title": "RAPIDS RAFT C++ and Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "gpu",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-raft-cpp-python/docs-rapids-ai-stable-pylibraft-api-pylibraft-api.md"
+}

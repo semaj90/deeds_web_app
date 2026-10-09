@@ -2,8 +2,7 @@
 
 ## Decision
 
-PostgreSQL is the canonical source for packet identity, graph snapshots,
-interaction events, recommendation outcomes, and model artifacts. Qdrant,
+PostgreSQL is the canonical source for packet identity, graph snapshots, interaction events, recommendation outcomes, and model artifacts. Qdrant,
 TurboVec, Valkey, and Neo4j are derived execution or acceleration layers.
 
 Neo4j is a derived relationship index. It may serve a snapshot-scoped,
@@ -40,8 +39,7 @@ query analysis
   -> ACP action proposal or ACE evidence packet
 ```
 
-`tree_node_id` is an identity and containment join key. It is not a learned
-feature by itself. It may select a directory or ancestor scope only after its
+`tree_node_id` is an identity and containment join key. It is not a learned feature by itself. It may select a directory or ancestor scope only after its
 collision audit and snapshot membership are proven.
 
 K-means and SOM are soft routing signals: select the nearest few centroids or
@@ -106,24 +104,16 @@ costs must be measured per run; do not fabricate a single productivity label.
 
 ## Staged Work
 
-1. Persist dispatcher and ACP recommendation impressions, clicks, accepts,
-   dismissals, execution outcomes, latency, token usage, and canonical packet
-   identities to PostgreSQL.
+1. Persist dispatcher and ACP recommendation impressions, clicks, accepts, dismissals, execution outcomes,latency, token usage, and canonical packet identities to PostgreSQL.
 2. Materialize the V2 full-corpus snapshot and prove live NetworkX/GDS parity.
-3. Implement bounded V2 graph traversal and graph RRF canary before allowing
-   graph features into any recommendation model.
-4. Persist deterministic K-means outputs with snapshot, seed, dimension,
-   centroid vectors, assignments, and evaluation metrics; keep Valkey as a
-   rebuildable warm cache.
-5. Repair TurboVec as a single named lane with a declared dimension and source
-   snapshot, then compare it to Qdrant through recall and latency evaluation.
-6. Build an offline logistic regression dataset, train/calibrate it, and prove
-   a temporal holdout improvement over deterministic ranking.
+3. Implement bounded V2 graph traversal and graph RRF canary before allowing graph features into any recommendation model.
+4. Persist deterministic K-means outputs with snapshot, seed, dimension, centroid vectors, assignments, and evaluation metrics; keep Valkey as a rebuildable warm cache.
+5. Repair TurboVec as a single named lane with a declared dimension and source snapshot, then compare it to Qdrant through recall and latency evaluation.
+6. Build an offline logistic regression dataset, train/calibrate it, and prove a temporal holdout improvement over deterministic ranking.
 7. Only then evaluate a personalized or matrix-factorization experiment.
 
 ## Deferred Work
 
 Token remapping follows the retrieval and recommendation audit so it can use
-measured ACE evidence and outcome data. Gradient checkpointing belongs to
-offline PyTorch training or adapter experiments. It is not part of LangGraph or
+measured ACE evidence and outcome data. Gradient checkpointing belongs to offline PyTorch training or adapter experiments. It is not part of LangGraph or
 Mastra orchestration and must remain outside the online retrieval request path.

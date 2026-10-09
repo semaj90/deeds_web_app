@@ -2,18 +2,28 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-const SKIP_DIRS = new Set(['.git', '.next', '.svelte-kit', '.turbo', '.tmp', 'tmp', 'deeds_labs', 'dist', 'build', 'coverage', 'node_modules', 'target', 'vendor']);
+const SKIP_DIRS = new Set(['.git', '.next', '.svelte-kit', '.turbo', '.tmp', 'tmp', 'deeds_labs', 'dist', 'build', 'coverage', 'node_modules', 'target', 'vendor', '.venv', 'venv', '.conda', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache', '.idea', '.vscode']);
 const sha256 = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
 const rel = (root, file) => path.relative(root, file).replaceAll('\\', '/') || '.';
+const isExcludedDirectoryName = (name) => SKIP_DIRS.has(name)
+  || /^\.?(?:venv|virtualenv)(?:[-_.].*)?$/i.test(name)
+  || /^\.?(?:python|py)(?:[-_.]?\d+)(?:[-_.].*)?$/i.test(name)
+  || /^(?:gsd_archives|archive|archives|backups?)$/i.test(name)
+  || /^backup(?:s|[-_].*)$/i.test(name)
+  || /-backups?$/i.test(name)
+  || /^(?:site-packages|dist-packages)$/i.test(name);
 
-export function findFiles(root, wanted) {
+export function findFiles(root, wanted, options = {}) {
   const found = [];
+  const excludedRootDirs = (options.excludedRootDirs ?? []).map((value) => value.replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/$/, ''));
   const visit = (dir) => {
+    const relativeDir = rel(root, dir);
+    if (excludedRootDirs.some((excluded) => relativeDir === excluded || relativeDir.startsWith(`${excluded}/`))) return;
     let entries;
     try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
     for (const entry of entries) {
       if (entry.isDirectory()) {
-        if (!SKIP_DIRS.has(entry.name)) visit(path.join(dir, entry.name));
+        if (!isExcludedDirectoryName(entry.name)) visit(path.join(dir, entry.name));
       } else if (wanted.has(entry.name)) found.push(path.join(dir, entry.name));
     }
   };
@@ -61,8 +71,8 @@ function installedPackageVersion(packageDir, name, repoRoot) {
   return { installed: false, installedVersion: null };
 }
 
-export function inventoryNpm(root, catalog) {
-  const manifests = findFiles(root, new Set(['package.json']));
+export function inventoryNpm(root, catalog, options = {}) {
+  const manifests = findFiles(root, new Set(['package.json']), options);
   const all = new Map();
   const manifestRows = [];
   for (const manifestPath of manifests) {
@@ -130,7 +140,7 @@ export function inventoryNpm(root, catalog) {
   return { manifestCount: manifestRows.length, packageDeclarationCount: packages.reduce((n, item) => n + item.declarations.length, 0), uniqueNpmPackages: packages.length, manifests: manifestRows, packages };
 }
 
-export function inventoryNonNpmManifests(root) {
+export function inventoryNonNpmManifests(root, options = {}) {
   const names = new Set(['requirements.txt', 'pyproject.toml', 'go.mod', 'Cargo.toml']);
-  return findFiles(root, names).map((file) => ({ path: rel(root, file), ecosystem: ({ 'requirements.txt': 'python-requirements', 'pyproject.toml': 'python-project', 'go.mod': 'go', 'Cargo.toml': 'rust' })[path.basename(file)], sha256: sha256(fs.readFileSync(file)), installedInventory: 'REQUIRES_EXPLICIT_ENVIRONMENT_PROBE' }));
+  return findFiles(root, names, options).map((file) => ({ path: rel(root, file), ecosystem: ({ 'requirements.txt': 'python-requirements', 'pyproject.toml': 'python-project', 'go.mod': 'go', 'Cargo.toml': 'rust' })[path.basename(file)], sha256: sha256(fs.readFileSync(file)), installedInventory: 'REQUIRES_EXPLICIT_ENVIRONMENT_PROBE' }));
 }

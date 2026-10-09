@@ -1,0 +1,68 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "openwiki-agent-docs",
+  "source_ref": "openwiki-agent-docs:docs-langchain-com-openwiki-overview-md-overview-md",
+  "url": "https://docs.langchain.com/oss/openwiki/overview.md",
+  "title": "docs.langchain.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "openwiki",
+    "agent",
+    "code-mode",
+    "integrations",
+    "llm_output",
+    "taskboard"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.langchain.com",
+    "markdown_excerpt": "> ## Documentation Index > Fetch the complete documentation index at: https://docs.langchain.com/llms.txt > Use this file to discover all available pages before exploring further. # OpenWiki > CLI that writes and maintains agent wikis so coding agents work faster OpenWiki is an open source CLI that writes and maintains a Markdown wiki about your codebase or personal knowledge. The wiki captures details such as architecture, integrations, evals, and workflows so [coding agents](/oss/python/deepagents/overview) can use it as durable context instead of rediscovering the repository on every task. That makes agent work faster and cheaper in tokens: agents read a curated wiki first, then inspect source only where they need more detail. Humans can browse the same Markdown (and the local [visualizer](/oss/openwiki/visualize)), but the primary audience is agents. OpenWiki is built on [Deep Agents](/oss/python/deepagents/overview) and supports tracing with [LangSmith](/langsmith/observability-quickstart). ## Get started Install the CLI, then initialize documentation for the current repository: ```bash theme={\"theme\":{\"light\":\"catppuccin-latte\",\"dark\":\"catppuccin-mocha\"}} npm install -g openw",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:openwiki-agent-docs:docs-langchain-com-openwiki-overview-md-overview-md",
+    "title": "docs.langchain.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenWiki Agent Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "OpenCode models / tools",
+      "recommendation": "Prefer explicit model/provider/tool configuration over implicit chat defaults.",
+      "rationale": "The repo needs canonical API recommendations, not hidden prompt state."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "b5622f6835a9d56b9bafe31e490cd07103a8a57b34c20bc2b3fcb4efc6d697f9",
+  "markdown_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md",
+  "fetched_at": "2026-10-09T05:37:48.519Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "openwiki-agent-docs",
+    "source_title": "OpenWiki Agent Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md"
+}

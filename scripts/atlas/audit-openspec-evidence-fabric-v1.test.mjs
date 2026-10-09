@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import {
+  buildEvidenceCardV1,
   buildPortfolioCensus,
   classifyTaskDuplicates,
   detectCycles,
@@ -14,6 +15,27 @@ import {
   resolveDependencyCandidate,
   verifyEvidenceReceiptV1,
 } from './audit-openspec-evidence-fabric-v1.mjs';
+
+test('EvidenceCard proof usability cannot be caller-asserted for non-PROVEN state', () => {
+  const card = buildEvidenceCardV1({
+    schema: 'atlas.evidence-card.v1',
+    taskRef: 'openspec/changes/example/tasks.md#L1',
+    changeId: 'example',
+    taskId: 'EX-1',
+    claim: 'Check evidence',
+    proofState: 'PARTIAL',
+    retrievalUsable: true,
+    proofUsable: true,
+    sourceRef: 'openspec/changes/example/tasks.md#L1',
+    sourceRevision: `sha256:${'a'.repeat(64)}`,
+    conceptID: 'openspec:example:EX-1',
+    confidenceScore: 0.5,
+    contextBlob: 'PARTIAL',
+    evidenceIds: [],
+    workspaceRevision: `sha256:${'b'.repeat(64)}`,
+  });
+  assert.equal(card.proofUsable, false);
+});
 import { buildEvidenceReceiptV1 } from './audit-openspec-evidence-fabric-v1.mjs';
 import { compileOpenSpecFeaturePacketsV1 } from './compile-openspec-feature-packets-v1.mjs';
 import { resolveOpenSpecOrphanBindingsV1 } from './resolve-openspec-orphan-bindings-v1.mjs';
@@ -28,6 +50,7 @@ function receiptInput(overrides = {}) {
     claim: 'Verify the implementation',
     workspaceRevision: 'sha256:workspace',
     sourceRevision: 'sha256:source',
+    taskRevision: `sha256:${'a'.repeat(64)}`,
     sourceRefs: [{ file: 'openspec/changes/change-a/tasks.md', lineStart: 1, lineEnd: 1, sourceRevision: 'sha256:source' }],
     producer: 'vitest',
     inputs: [],
@@ -44,6 +67,7 @@ function receiptInput(overrides = {}) {
 }
 
 test('requires complete uniquely identified assertions before a PROVEN receipt can be built', () => {
+  assert.throws(() => buildEvidenceReceiptV1(receiptInput({ taskRevision: undefined })), /missing taskRevision/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ expectedAssertions: [], actualAssertions: [] })), /proven requires assertions/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'other', passed: true }] })), /assertion identity mismatch/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'assert-1', passed: false }] })), /unsatisfied assertion/);
@@ -105,6 +129,16 @@ test('does not parse the prefix of required as a dependency relation', () => {
 
 test('does not mistake hash algorithms or gate ranges for task references', () => {
   const [task] = parseTasksMarkdown('- [ ] **SRC-01** This note supersedes the G1-G26 gate range; use SHA-256 for the checksum.', 'change-a', 'openspec/changes/change-a/tasks.md');
+  assert.deepEqual(extractDependencyCandidates(task), []);
+});
+
+test('does not turn nested evidence narrative into task dependencies', () => {
+  const markdown = [
+    '- [x] **SRC-02** Produce the bounded receipt.',
+    '  - Evidence: the earlier diagnostic compared GPH-25 -> GPH-02 and reports GPH-17.',
+    '  - This receipt is not a dependency on those Graphify tasks.',
+  ].join('\n');
+  const [task] = parseTasksMarkdown(markdown, 'change-a', 'openspec/changes/change-a/tasks.md');
   assert.deepEqual(extractDependencyCandidates(task), []);
 });
 
@@ -231,7 +265,8 @@ test('canonical taskId fields bind before ambiguous source references', () => {
       claims: [],
       commands: [],
       workspaceRevisions: ['sha256:workspace'],
-      sourceRevisions: [tasks[1].taskHash],
+      sourceRevisions: [`sha256:${'f'.repeat(64)}`],
+      taskRevisions: [tasks[1].taskHash],
       checksums: ['sha256:receipt'],
       verdicts: ['PROVEN'],
     },
@@ -337,7 +372,8 @@ test('promotes only an exact current receipt and marks it stale after task-sourc
     taskId: 'ABC-1',
     claim: 'The task implementation passed independent verification',
     workspaceRevision: initial.source.workspaceRevision,
-    sourceRevision: task.taskHash,
+    sourceRevision,
+    taskRevision: task.taskHash,
     sourceRefs: [
       { file: 'openspec/changes/change-a/tasks.md', lineStart: 1, lineEnd: 1, sourceRevision },
       { file: 'src/implementation.mjs', lineStart: 1, lineEnd: 1, sourceRevision: implementationRevision },
@@ -360,6 +396,8 @@ test('promotes only an exact current receipt and marks it stale after task-sourc
   assert.equal(proven.summary.checkedWithEvidence, 1);
   assert.equal(proven.summary.checkedWithoutEvidence, 0);
   assert.equal(proven.evidenceCards[0].proofState, 'PROVEN');
+  assert.equal(proven.evidenceCards[0].sourceRevision, sourceRevision);
+  assert.equal(proven.evidenceCards[0].proofUsable, true);
   assert.equal(proven.evidenceMatches[0].actualAssertions[0].claimRef, 'predicate-abc');
   assert.equal(proven.evidenceMatches[0].sourceRefsCurrent, true);
 
@@ -373,6 +411,8 @@ test('promotes only an exact current receipt and marks it stale after task-sourc
   const stale = buildPortfolioCensus(root);
   assert.equal(stale.summary.staleEvidenceCount, 1);
   assert.equal(stale.evidenceCards[0].proofState, 'STALE');
+  assert.equal(stale.evidenceCards[0].sourceRevision, `sha256:${crypto.createHash('sha256').update(fs.readFileSync(tasksFile)).digest('hex')}`);
+  assert.equal(stale.evidenceCards[0].proofUsable, false);
   fs.rmSync(root, { recursive: true, force: true });
 });
 
@@ -414,6 +454,10 @@ test('does not bind a whole tasks.md source path to every task in that file', ()
     taskText: `claim ${line}`,
     dependencySourceText: `- [ ] claim ${line}`,
   }));
+  const previousIdentityPath = process.env.OPENSPEC_IDENTITY_RECOVERY_PATH;
+  const previousReceiptTypesPath = process.env.OPENSPEC_RECEIPT_TYPES_PATH;
+  process.env.OPENSPEC_IDENTITY_RECOVERY_PATH = 'docs/reports/fixture-identity-recovery.json';
+  process.env.OPENSPEC_RECEIPT_TYPES_PATH = 'docs/reports/fixture-receipt-types.json';
   const report = resolveOpenSpecOrphanBindingsV1({
     schema: 'atlas.openspec-evidence-portfolio-census.v2',
     source: { workspaceRevision: 'sha256:workspace' },
@@ -426,6 +470,10 @@ test('does not bind a whole tasks.md source path to every task in that file', ()
       fields: { sourceRefs: ['openspec/changes/change-a/tasks.md'], taskRefs: [], canonicalTaskKeys: [], taskIds: [], claimIds: [], migrationKeys: [], changeIds: [], gateIds: [], claims: [], workspaceRevisions: [], sourceRevisions: [], verdicts: [], commands: [], checksums: [] },
     }],
   }, { mappings: tasks.map((task) => ({ sourceRef: task.taskRef, canonicalTaskKey: task.canonicalTaskRef.replace('openspec-task:', ''), legacyCandidates: [] })) }, { receipts: [{ uri: 'docs/reports/legacy.json', candidateType: 'UNKNOWN' }] });
+  if (previousIdentityPath === undefined) delete process.env.OPENSPEC_IDENTITY_RECOVERY_PATH;
+  else process.env.OPENSPEC_IDENTITY_RECOVERY_PATH = previousIdentityPath;
+  if (previousReceiptTypesPath === undefined) delete process.env.OPENSPEC_RECEIPT_TYPES_PATH;
+  else process.env.OPENSPEC_RECEIPT_TYPES_PATH = previousReceiptTypesPath;
   assert.equal(report.summary.ambiguousCount, 0);
   assert.equal(report.bindings[0].strategy, null);
   assert.equal(report.bindings[0].bindingDisposition, 'TRUE_ORPHAN');

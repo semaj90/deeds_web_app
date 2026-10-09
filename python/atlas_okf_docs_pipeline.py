@@ -967,6 +967,7 @@ def run_pipeline(
     enable_clusters: bool,
     write_qdrant: bool,
     smoke_query: str | None,
+    acquire_only: bool = False,
     maximum_chars: int = 1600,
     overlap_chars: int = 200,
 ) -> Json:
@@ -1005,6 +1006,33 @@ def run_pipeline(
 
     if not all_chunks:
         raise RuntimeError("NO_EXTERNAL_DOC_CHUNKS")
+    if acquire_only:
+        receipt = {
+            "schema": "atlas.okf-docs-pipeline-receipt.v1",
+            "status": "ACQUISITION_ONLY",
+            "manifest_revision": manifest.manifest_revision,
+            "workspace_revision": manifest.workspace_revision,
+            "source_snapshot_revision": manifest.source_snapshot_revision,
+            "producer_revision": manifest.producer_revision,
+            "source_receipts": source_receipts,
+            "page_count": len(all_pages),
+            "chunk_count": len(all_chunks),
+            "embedding_performed": False,
+            "qdrant": {"write": False},
+            "canonical_authority": False,
+            "local_artifacts_written": True,
+            "external_projection_writes": False,
+            "writes_performed": True,
+        }
+        if recrawl_plan is not None:
+            receipt["recrawl_delta"] = recrawl_plan
+        receipt["receipt_checksum"] = _sha(_stable(receipt))
+        receipt_root = root / "docs/.okf"
+        receipt_root.mkdir(parents=True, exist_ok=True)
+        receipt_path = receipt_root / f"pipeline-receipt-{manifest.manifest_revision}.json"
+        receipt_path.write_text(json.dumps(receipt, indent=2, sort_keys=True), encoding="utf-8")
+        return receipt
+
     embeddings = embed_llama_server_768(
         [chunk.text for chunk in all_chunks],
         base_url=manifest.embedding_url,
@@ -1090,6 +1118,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--prior-manifest", help="Compare against a prior manifest and process only safe source additions/version changes")
     parser.add_argument("--plan-only", action="store_true", help="Print a read-only manifest delta plan; do not fetch or write artifacts")
+    parser.add_argument("--acquire-only", action="store_true", help="Fetch, normalize, cite, and chunk locally; do not embed, rank, or project")
     parser.add_argument("--stanza", action="store_true", help="Run Stanza POS/lemma/dependency extraction")
     parser.add_argument("--clusters", action="store_true", help="Run existing cuVS KMeans + deterministic SOM stages")
     parser.add_argument("--write-qdrant", action="store_true", help="Create payload indexes and upsert external_programming_docs_768")
@@ -1108,6 +1137,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         plan = plan_manifest_recrawl_delta_v1(prior_manifest, manifest)
         print(json.dumps(plan, indent=2, sort_keys=True))
         return 0 if plan["canAcquire"] else 2
+    if args.acquire_only and (args.stanza or args.clusters or args.write_qdrant or args.smoke_query):
+        parser.error("--acquire-only cannot be combined with --stanza, --clusters, --write-qdrant, or --smoke-query")
     receipt = run_pipeline(
         manifest,
         prior_manifest=prior_manifest,
@@ -1115,6 +1146,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         enable_clusters=args.clusters,
         write_qdrant=args.write_qdrant,
         smoke_query=args.smoke_query,
+        acquire_only=args.acquire_only,
         maximum_chars=args.maximum_chars,
         overlap_chars=args.overlap_chars,
     )

@@ -112,4 +112,34 @@ describe('embedSemantic768Canonical', () => {
     })).rejects.toThrow('SEMANTIC_768_NOT_L2_NORMALIZED');
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
+
+  it('returns exact runtime revisions and checksums without inventing a representation revision', async () => {
+    const vector = new Array(768).fill(1 / Math.sqrt(768));
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      if (String(input).endsWith('/tokenize')) {
+        return new Response(JSON.stringify({ tokens: [1, 2, 3] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ model: 'embeddinggemma', data: [{ embedding: vector }] }), { status: 200 });
+    }));
+    const { embedSemantic768Canonical } = await import('./canonical-embed.js');
+    const result = await embedSemantic768Canonical('exact query bytes', {
+      model: 'embeddinggemma',
+      modelArtifactRevision: 'artifact-sha256:abc',
+      tokenizerRevision: 'tokenizer-r1',
+      inputPolicyRevision: 'input-policy-r1',
+      baseUrl: 'http://127.0.0.1:8081',
+    });
+
+    expect(result).toMatchObject({
+      representationId: 'semantic_768',
+      representationRevision: null,
+      modelArtifactRevision: 'artifact-sha256:abc',
+      tokenizerRevision: 'tokenizer-r1',
+      inputPolicyRevision: 'input-policy-r1',
+      admittedTokenCount: 3,
+      qualification: 'REPRESENTATION_REVISION_UNQUALIFIED',
+    });
+    expect(result.inputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(result.outputChecksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+  });
 });

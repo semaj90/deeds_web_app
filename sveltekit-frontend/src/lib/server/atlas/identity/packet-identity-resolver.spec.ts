@@ -116,5 +116,17 @@ describe('resolvePacketKeyForWrite', () => {
 		const { PacketIdentityUnresolvedError, resolvePacketKeyForWrite } = await import('./packet-identity-resolver.js');
 		await expect(resolvePacketKeyForWrite('invalid_key', 'unknown/file.ts')).rejects.toBeInstanceOf(PacketIdentityUnresolvedError);
 	});
-});
 
+	it('rejects an ambiguous sourceRef instead of selecting the first packet row', async () => {
+		mockDirectLookup([]);
+		mockExecute.mockResolvedValueOnce({ rows: [] });
+		const sourceRows = mockDirectLookup([
+			{ packetKey: 'packet:canonical:first' },
+			{ packetKey: 'packet:canonical:second' },
+		]);
+
+		const { PacketIdentityAmbiguousError, resolvePacketKeyForWrite } = await import('./packet-identity-resolver.js');
+		await expect(resolvePacketKeyForWrite('unresolved_key', 'src/ambiguous.ts')).rejects.toBeInstanceOf(PacketIdentityAmbiguousError);
+		expect(sourceRows.limit).toHaveBeenCalledWith(2);
+	});
+});

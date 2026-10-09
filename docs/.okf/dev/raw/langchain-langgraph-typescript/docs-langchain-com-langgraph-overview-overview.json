@@ -1,0 +1,67 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "langchain-langgraph-typescript",
+  "source_ref": "langchain-langgraph-typescript:docs-langchain-com-langgraph-overview-overview",
+  "url": "https://docs.langchain.com/oss/javascript/langgraph/overview",
+  "title": "docs.langchain.com",
+  "domain_class": "agent",
+  "focus_tags": [
+    "langchain",
+    "langgraph",
+    "javascript",
+    "typescript",
+    "agents",
+    "graph-workflows",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.langchain.com",
+    "markdown_excerpt": "> ## Documentation Index > > Fetch the complete documentation index at: [/llms.txt](https://docs.langchain.com/llms.txt) > > Use this file to discover all available pages before exploring further. [Skip to main content](https://docs.langchain.com/oss/javascript/langgraph/overview#content-area) Trusted by companies shaping the future of agents—including Klarna, Uber, J.P. Morgan, and more—LangGraph is a low-level orchestration framework and runtime for building, managing, and deploying long-running, stateful agents. LangGraph gives you fine-grained control to mix deterministic, hand-coded steps with LLM-driven agentic steps in the same graph, so you can build bespoke agents that behave exactly the way your application requires.LangGraph is very low-level, and focused entirely on agent **orchestration**. Before using LangGraph, we recommend you familiarize yourself with some of the components used to build agents, starting with [models](https://docs.langchain.com/oss/javascript/langchain/models) and [tools](https://docs.langchain.com/oss/javascript/langchain/tools).We will commonly use [LangChain](https://docs.langchain.com/oss/javascript/langchain/overview) components throughout the",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:langchain-langgraph-typescript:docs-langchain-com-langgraph-overview-overview",
+    "title": "docs.langchain.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh LangChain and LangGraph JavaScript Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "39af46c9b17e77f096b921bf2c78308d68e19f22fda36e7d71df399698ad7462",
+  "markdown_path": "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md",
+  "fetched_at": "2026-10-09T05:28:28.119Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "langchain-langgraph-typescript",
+    "source_title": "LangChain and LangGraph JavaScript Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+}

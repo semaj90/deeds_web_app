@@ -15,10 +15,21 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const changeId = 'parent-atlas-openspec-task-triage-pipeline';
 const taskId = '2.2';
 const reportLimitBytes = 10_000_000;
+function scratchCorpusPath(environmentKey, fallback) {
+  const requested = process.env[environmentKey];
+  if (!requested) return fallback;
+  const resolved = path.resolve(root, requested);
+  const scratchRoot = path.resolve(root, '.tmp');
+  const relative = path.relative(scratchRoot, resolved);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error(`${environmentKey}_MUST_TARGET_REPOSITORY_TMP`);
+  }
+  return path.relative(root, resolved).replaceAll('\\', '/');
+}
 const corpusPaths = {
-  taskCards: 'docs/reports/openspec-task-cards-v1.json',
-  reportManifests: 'docs/reports/openspec-report-artifact-manifests-v1.json',
-  triage: 'docs/reports/openspec-task-triage-corpus-v1.json',
+  taskCards: scratchCorpusPath('OPENSPEC_TASK_CARDS_OUTPUT', 'docs/reports/openspec-task-cards-v1.json'),
+  reportManifests: scratchCorpusPath('OPENSPEC_REPORT_MANIFESTS_OUTPUT', 'docs/reports/openspec-report-artifact-manifests-v1.json'),
+  triage: scratchCorpusPath('OPENSPEC_TRIAGE_CORPUS_OUTPUT', 'docs/reports/openspec-task-triage-corpus-v1.json'),
 };
 const testPaths = [
   'scripts/atlas/audit-openspec-evidence-fabric-v1.test.mjs',
@@ -91,6 +102,7 @@ function main() {
   const head = run('git', ['rev-parse', 'HEAD']).trim();
   const taskCardBuild = JSON.parse(run(process.execPath, [
     'scripts/atlas/build-openspec-task-cards-v1.mjs',
+    `--output=${corpusPaths.taskCards}`,
   ]));
   if (taskCardBuild.status !== 'TASK_CARDS_WRITTEN' || taskCardBuild.writesPerformed !== false) {
     throw new Error('TASK_CARD_REFRESH_FAILED');
@@ -98,6 +110,7 @@ function main() {
   const manifestBuild = JSON.parse(run(process.execPath, [
     'scripts/atlas/build-openspec-report-manifests-v1.mjs',
     `--task-cards=${corpusPaths.taskCards}`,
+    `--output=${corpusPaths.reportManifests}`,
   ]));
   if (manifestBuild.status !== 'REPORT_MANIFESTS_WRITTEN' || manifestBuild.archiveWrites !== false) {
     throw new Error('REPORT_MANIFEST_REFRESH_FAILED');
@@ -106,6 +119,7 @@ function main() {
     'scripts/atlas/build-openspec-task-triage-corpus-v1.mjs',
     `--task-cards=${corpusPaths.taskCards}`,
     `--report-manifests=${corpusPaths.reportManifests}`,
+    `--output=${corpusPaths.triage}`,
   ]));
   if (triageBuild.status !== 'TRIAGE_CORPUS_WRITTEN' || triageBuild.writesPerformed !== false) {
     throw new Error('TRIAGE_CORPUS_REFRESH_FAILED');
@@ -187,7 +201,8 @@ function main() {
     claim: 'The compact OpenSpec task, report-manifest, and triage pipeline passes focused contracts and strict change validation against one current workspace revision; report associations remain derived and advisory.',
     gitCommit: head,
     workspaceRevision,
-    sourceRevision: task.taskHash,
+    sourceRevision: hashFile(task.tasksPath),
+    taskRevision: task.taskHash,
     sourceRefs: [{
       file: task.tasksPath,
       lineStart: task.sourceLine,

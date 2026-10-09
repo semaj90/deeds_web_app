@@ -16,6 +16,10 @@ import {
 import type { ExtractedFeature } from '$lib/server/analysis/ast-grep-extractor.js';
 import type { StructuralMaterializationResult } from './graphify-structural-materializer.js';
 import type { ExecutionStageReceiptV1 } from './graphify-daily-coordinator-v1.js';
+import type {
+  GraphifyNativeSymbolCoordinateV1,
+  GraphifyReferenceEvidenceV1,
+} from './graphify-symbol-projection-v1.js';
 
 export type StructuralFabricCompilationStatus =
   | 'COMPILED_NATIVE'
@@ -67,6 +71,18 @@ export type GraphifyStructuralIntelligenceResult = {
   fabric: StructuralExtractionFabricResultV1 | null;
   relationGraph: AstRelationGraphAdapterResultV1 | null;
   groundedDomainCandidates: GroundedDomainCandidateV1[];
+  projectionEvidence: {
+    schema: 'atlas.graphify-symbol-projection-evidence.v1';
+    sourceRef: string;
+    sourceRevision: string;
+    workspaceRevision: string;
+    producerRevision: string;
+    nativeCoordinatesByUpstreamNodeId: Record<string, GraphifyNativeSymbolCoordinateV1>;
+    referenceEvidenceByReferenceId: Record<string, GraphifyReferenceEvidenceV1>;
+    diagnostics: string[];
+    checksum: string;
+    canonicalAuthority: false;
+  } | null;
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
 
@@ -76,6 +92,160 @@ function structuralStageChecksum(value: unknown): string {
 
 function bytesChecksum(value: Uint8Array): string {
   return `sha256:${createHash('sha256').update(value).digest('hex')}`;
+}
+
+function sourceByteAtPosition(sourceBytes: Uint8Array, line1Based: number, byteColumn0Based: number): number | null {
+  if (!Number.isInteger(line1Based) || line1Based < 1 || !Number.isInteger(byteColumn0Based) || byteColumn0Based < 0) {
+    return null;
+  }
+  let lineStart = 0;
+  for (let line = 1; line < line1Based; line += 1) {
+    const newline = sourceBytes.indexOf(10, lineStart);
+    if (newline < 0) return null;
+    lineStart = newline + 1;
+  }
+  let lineEnd = sourceBytes.indexOf(10, lineStart);
+  if (lineEnd < 0) lineEnd = sourceBytes.length;
+  else if (lineEnd > lineStart && sourceBytes[lineEnd - 1] === 13) lineEnd -= 1;
+  const byte = lineStart + byteColumn0Based;
+  return byte <= lineEnd ? byte : null;
+}
+
+function buildProjectionEvidenceV1(input: {
+  source: string;
+  sourceRevision: string;
+  evidence: NonNullable<StructuralMaterializationResult['evidence']>;
+  fabric: StructuralExtractionFabricResultV1;
+}): NonNullable<GraphifyStructuralIntelligenceResult['projectionEvidence']> {
+  const sourceBytes = Buffer.from(input.source, 'utf8');
+  const nativeCoordinatesByUpstreamNodeId: Record<string, GraphifyNativeSymbolCoordinateV1> = {};
+  const referenceEvidenceByReferenceId: Record<string, GraphifyReferenceEvidenceV1> = {};
+  const diagnostics: string[] = [];
+
+  for (const chunk of input.fabric.chunks) {
+    if (chunk.byte_end > sourceBytes.length) {
+      diagnostics.push(`PROJECTION_COORDINATE_OUTSIDE_SOURCE:${chunk.upstream_node_id}`);
+      continue;
+    }
+    const sourceSpanHash = createHash('sha256')
+      .update(sourceBytes.subarray(chunk.byte_start, chunk.byte_end))
+      .digest('hex');
+    const astFingerprint = createHash('sha256').update(JSON.stringify([
+      'atlas.graphify-ast-span-fingerprint.v1',
+      input.evidence.engine,
+      input.evidence.engine_version,
+      input.fabric.receipt.chunker_revision,
+      chunk.upstream_node_id,
+      chunk.node_type,
+      chunk.kind,
+      chunk.byte_start,
+      chunk.byte_end,
+      sourceSpanHash,
+    ]), 'utf8').digest('hex');
+    const coordinate: GraphifyNativeSymbolCoordinateV1 = {
+      upstreamNodeId: chunk.upstream_node_id,
+      startByte: chunk.byte_start,
+      endByte: chunk.byte_end,
+      startRow: chunk.start_line,
+      endRow: chunk.end_line,
+      astFingerprint,
+    };
+    const prior = nativeCoordinatesByUpstreamNodeId[chunk.upstream_node_id];
+    if (prior && JSON.stringify(prior) !== JSON.stringify(coordinate)) {
+      delete nativeCoordinatesByUpstreamNodeId[chunk.upstream_node_id];
+      diagnostics.push(`PROJECTION_COORDINATE_AMBIGUOUS:${chunk.upstream_node_id}`);
+      continue;
+    }
+    if (!diagnostics.includes(`PROJECTION_COORDINATE_AMBIGUOUS:${chunk.upstream_node_id}`)) {
+      nativeCoordinatesByUpstreamNodeId[chunk.upstream_node_id] = coordinate;
+    }
+  }
+
+  for (const fact of input.fabric.reference_facts) {
+    if (fact.source_ref !== input.evidence.file_path || fact.source_revision !== input.sourceRevision) {
+      diagnostics.push(`PROJECTION_REFERENCE_REVISION_MISMATCH:${fact.reference_id}`);
+      continue;
+    }
+    const sourceKey = fact.captures.xref_source_key;
+    const targetKey = fact.captures.xref_target_key;
+    const xrefType = fact.captures.xref_type;
+    const matchingEdges = input.evidence.edges.filter((edge) =>
+      edge.from_evidence_key === sourceKey
+      && edge.to_evidence_key === targetKey
+      && edge.type.toUpperCase() === xrefType?.toUpperCase());
+    if (matchingEdges.length === 0) {
+      diagnostics.push(`PROJECTION_REFERENCE_EDGE_MISSING:${fact.reference_id}`);
+      continue;
+    }
+    const targetBytes = Buffer.from(fact.target_text, 'utf8');
+    const exactOccurrenceMap = new Map<string, { line: number; startByte: number; endByte: number }>();
+    for (const edge of matchingEdges) {
+      for (const [line, column] of edge.occurrence_positions ?? []) {
+        const startByte = sourceByteAtPosition(sourceBytes, line, column);
+        if (startByte === null) continue;
+        const endByte = startByte + targetBytes.length;
+        if (endByte > sourceBytes.length || !sourceBytes.subarray(startByte, endByte).equals(targetBytes)) continue;
+        exactOccurrenceMap.set(`${line}:${startByte}:${endByte}`, { line, startByte, endByte });
+      }
+      if ((edge.occurrence_positions ?? []).length === 0) {
+        const spanStart = sourceByteAtPosition(sourceBytes, edge.evidence_start_line, edge.evidence_start_column);
+        const spanEnd = sourceByteAtPosition(sourceBytes, edge.evidence_end_line, edge.evidence_end_column);
+        if (spanStart === null || spanEnd === null || spanEnd <= spanStart) continue;
+        const enclosingSpan = sourceBytes.subarray(spanStart, spanEnd);
+        const targetOffset = enclosingSpan.indexOf(targetBytes);
+        if (targetOffset < 0 || enclosingSpan.indexOf(targetBytes, targetOffset + 1) >= 0) continue;
+        const startByte = spanStart + targetOffset;
+        const endByte = startByte + targetBytes.length;
+        const line = edge.evidence_start_line
+          + sourceBytes.subarray(spanStart, startByte).filter((byte) => byte === 10).length;
+        exactOccurrenceMap.set(`${line}:${startByte}:${endByte}`, { line, startByte, endByte });
+      }
+    }
+    const exactOccurrences = [...exactOccurrenceMap.values()]
+      .sort((left, right) => left.startByte - right.startByte);
+    if (exactOccurrences.length === 0) {
+      diagnostics.push(`PROJECTION_REFERENCE_EXACT_SPAN_MISSING:${fact.reference_id}`);
+      continue;
+    }
+    const occurrence = exactOccurrences[0]!;
+    const occurrenceRefs = exactOccurrences.map(({ line, startByte, endByte }) => {
+      const checksum = createHash('sha256').update(sourceBytes.subarray(startByte, endByte)).digest('hex');
+      return `source-span:${fact.source_ref}@${fact.source_revision}:${line}:${startByte}-${endByte}:sha256:${checksum}`;
+    });
+    referenceEvidenceByReferenceId[fact.reference_id] = {
+      referenceId: fact.reference_id,
+      evidenceKind: 'treesitter_chunker_exact_occurrence',
+      startByte: occurrence.startByte,
+      endByte: occurrence.endByte,
+      startRow: occurrence.line - 1,
+      endRow: occurrence.line - 1,
+      confidence: 1,
+      evidenceRefs: occurrenceRefs,
+    };
+  }
+
+  const checksumInput = {
+    schema: 'atlas.graphify-symbol-projection-evidence.v1',
+    sourceRef: input.evidence.file_path,
+    sourceRevision: input.sourceRevision,
+    workspaceRevision: input.fabric.receipt.workspace_revision,
+    producerRevision: input.fabric.receipt.producer_revision,
+    coordinates: Object.entries(nativeCoordinatesByUpstreamNodeId).sort(([a], [b]) => a.localeCompare(b)),
+    references: Object.entries(referenceEvidenceByReferenceId).sort(([a], [b]) => a.localeCompare(b)),
+    diagnostics: [...diagnostics].sort(),
+  };
+  return {
+    schema: 'atlas.graphify-symbol-projection-evidence.v1',
+    sourceRef: input.evidence.file_path,
+    sourceRevision: input.sourceRevision,
+    workspaceRevision: input.fabric.receipt.workspace_revision,
+    producerRevision: input.fabric.receipt.producer_revision,
+    nativeCoordinatesByUpstreamNodeId,
+    referenceEvidenceByReferenceId,
+    diagnostics,
+    checksum: bytesChecksum(Buffer.from(JSON.stringify(checksumInput), 'utf8')),
+    canonicalAuthority: false,
+  };
 }
 
 /** Pure bridge from the existing structural receipt to coordinator stage receipts. It does not
@@ -100,6 +270,7 @@ export function buildGraphifyStructuralStageReceiptsV1(input: {
   const extractOutput = structuralStageChecksum({
     receipt,
     fabricReceipt: fabric?.receipt ?? null,
+    projectionEvidenceChecksum: input.result.projectionEvidence?.checksum ?? null,
     relationGraphChecksum: input.result.relationGraph?.graph?.checksum ?? null,
     relationGraphStatus: receipt.relationGraphStatus,
   });
@@ -145,6 +316,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         fabric: null,
       relationGraph: null,
       groundedDomainCandidates: [],
+      projectionEvidence: null,
       receipt: {
         schema: 'atlas.graphify-structural-intelligence-receipt.v1',
         sourceRef: materialization.sourceRef,
@@ -280,6 +452,15 @@ export function compileGraphifyStructuralIntelligence(input: {
     workspaceRevision: input.workspaceRevision,
     graphProducerRevision: input.revisions.fabric,
   });
+  const projectionEvidence = materialization.sourceRevision && materialization.sourceRevisionAuthority === 'PROVEN'
+    && materialization.evidence.source_revision === materialization.parserSourceRevisionToken
+    ? buildProjectionEvidenceV1({
+      source: input.source,
+      sourceRevision: materialization.sourceRevision,
+      evidence: materialization.evidence,
+      fabric,
+    })
+    : null;
 
   const groundedDomainCandidates = input.groundedDomainMapping
     ? buildGroundedDomainCandidates({
@@ -316,6 +497,7 @@ export function compileGraphifyStructuralIntelligence(input: {
     fabric,
     relationGraph,
     groundedDomainCandidates,
+    projectionEvidence,
     receipt: {
       schema: 'atlas.graphify-structural-intelligence-receipt.v1',
       sourceRef: materialization.sourceRef,
@@ -354,6 +536,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         ...(!parserBufferMatchesSource ? ['LANGEXTRACT_PARSER_BUFFER_SOURCE_TEXT_MISMATCH'] : []),
         ...utf8Diagnostics,
         ...fabric.receipt.diagnostics,
+        ...(projectionEvidence?.diagnostics ?? []),
         ...(relationGraph.reason ? [`AST_RELATION_GRAPH_DEFERRED:${relationGraph.reason}`] : []),
       ]),
       canonicalIdentityCreated: false,

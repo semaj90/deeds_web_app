@@ -9,6 +9,8 @@ export interface ObservationFeatureMaterializationReceiptV1 {
   schema: 'atlas.observation-feature-materialization-receipt.v1';
   packetKey: string;
   sourceRef: string;
+  sourceRevision: string;
+  registryRevision: string;
   featureRevision: string;
   inputDigest: string;
   operation: 'inserted-or-updated';
@@ -30,6 +32,14 @@ export async function materializeObservationFeatureProjectionV1(
   const projection = ObservationFeatureProjectionV1Schema.parse(projectionInput);
   const cluster = options.cluster ?? null;
 
+  if (!projection.sourceRevision || !/^sha256:[a-f0-9]{64}$/.test(projection.sourceRevision)) {
+    throw new Error('ORF_SOURCE_REVISION_NOT_QUALIFIED');
+  }
+  if (!projection.registryRevision.trim()) throw new Error('ORF_REGISTRY_REVISION_REQUIRED');
+  if (projection.evidenceRefs.length === 0 || projection.evidenceRefs.includes(projection.packetKey)) {
+    throw new Error('ORF_SOURCE_EVIDENCE_REFS_REQUIRED');
+  }
+
   if (cluster && (cluster.packetKey !== projection.packetKey || cluster.sourceRef !== projection.sourceRef)) {
     throw new Error('ORF_CLUSTER_IDENTITY_MISMATCH');
   }
@@ -48,6 +58,8 @@ export async function materializeObservationFeatureProjectionV1(
        packet_key,
        feature_revision,
        source_ref,
+       source_revision,
+       registry_revision,
        source_version_receipt_id,
        workspace_revision,
        representation_id,
@@ -69,14 +81,16 @@ export async function materializeObservationFeatureProjectionV1(
        input_digest,
        updated_at
      ) VALUES (
-       $1,$2,$3,$4,$5,$6,$7,$8,
-       $9::text[],$10::text[],$11::text[],$12::text[],
-       $13::jsonb,$14::jsonb,$15::jsonb,$16::text[],
-       $17,$18,$19,$20,$21,$22,now()
+       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+       $11::text[],$12::text[],$13::text[],$14::text[],
+       $15::jsonb,$16::jsonb,$17::jsonb,$18::text[],
+       $19,$20,$21,$22,$23,$24,now()
      )
      ON CONFLICT (packet_key, feature_revision)
      DO UPDATE SET
        source_ref = EXCLUDED.source_ref,
+       source_revision = EXCLUDED.source_revision,
+       registry_revision = EXCLUDED.registry_revision,
        source_version_receipt_id = EXCLUDED.source_version_receipt_id,
        workspace_revision = EXCLUDED.workspace_revision,
        representation_id = EXCLUDED.representation_id,
@@ -101,6 +115,8 @@ export async function materializeObservationFeatureProjectionV1(
       projection.packetKey,
       projection.featureRevision,
       projection.sourceRef,
+      projection.sourceRevision,
+      projection.registryRevision,
       projection.sourceVersionReceiptId,
       options.workspaceRevision ?? null,
       projection.representationId,
@@ -127,6 +143,8 @@ export async function materializeObservationFeatureProjectionV1(
     schema: 'atlas.observation-feature-materialization-receipt.v1',
     packetKey: projection.packetKey,
     sourceRef: projection.sourceRef,
+    sourceRevision: projection.sourceRevision,
+    registryRevision: projection.registryRevision,
     featureRevision: projection.featureRevision,
     inputDigest: projection.inputDigest,
     operation: 'inserted-or-updated',

@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "networkx-python",
+  "source_ref": "networkx-python:networkx-org-documentation-stable-stable",
+  "url": "https://networkx.org/documentation/stable/",
+  "title": "networkx.org",
+  "domain_class": "graph",
+  "focus_tags": [
+    "networkx",
+    "graph-algorithms",
+    "pagerank",
+    "graph-traversal",
+    "communities",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "networkx.org",
+    "markdown_excerpt": "[Skip to main content](https://networkx.org/documentation/stable/#main-content) Back to top`Ctrl` + `K` - System Settings - Light - Dark - [Home Page](https://networkx.org/) - [GitHub](https://github.com/networkx/networkx) 3.7 (stable) [latest](https://networkx.org/documentation/latest/index.html) [3.7 (stable)](https://networkx.org/documentation/stable/index.html) [3.6.1](https://networkx.org/documentation/networkx-3.6.1/index.html) [3.6](https://networkx.org/documentation/networkx-3.6/index.html) [3.5](https://networkx.org/documentation/networkx-3.5/index.html) [3.4.2](https://networkx.org/documentation/networkx-3.4.2/index.html) [3.4.1](https://networkx.org/documentation/networkx-3.4.1/index.html) [3.4](https://networkx.org/documentation/networkx-3.4/index.html) [3.3](https://networkx.org/documentation/networkx-3.3/index.html) [3.2.1](https://networkx.org/documentation/networkx-3.2.1/index.html) [3.2](https://networkx.org/documentation/networkx-3.2/index.html) # Software for Complex Networks [\\#](https://networkx.org/documentation/stable/\\#software-for-complex-networks \"Link to this heading\") Release: 3.7 Date: Sep 21, 2026 NetworkX is a Python package for the creation, manipula",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "graph",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:networkx-python:networkx-org-documentation-stable-stable",
+    "title": "networkx.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh NetworkX Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "3dafa7f76f0b18642b1608d195981c78837244e4b1a72b6923a37c80a3e5b747",
+  "markdown_path": "docs/.okf/dev/raw/networkx-python/networkx-org-documentation-stable-stable.md",
+  "fetched_at": "2026-10-09T05:29:13.684Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "networkx-python",
+    "source_title": "NetworkX Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/networkx-python/networkx-org-documentation-stable-stable.md"
+}

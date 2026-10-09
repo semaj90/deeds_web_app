@@ -19,6 +19,7 @@
 ## 4. Fix gate fails needing per-file judgment
 
 - [ ] 4.1 G4 (47 fails): review each `+server.ts` missing `locals.user` — some (`/api/acp/rpc`, `/api/admin/atlas/*`) may be intentionally internal/service-to-service and not need a user-session guard; don't blanket-add auth without checking intended access model per route.
+  - **Role-policy alignment (2026-10-07; partial):** `requireAdmin()` accepted both `admin` and `superadmin`, while the global API guard admitted only `admin`. Both now use the existing `isAdminRole()` predicate; focused regression coverage asserts admin/superadmin allow and viewer/unknown deny. This closes only the role-predicate mismatch, not the per-route G4 review. Browser-level Playwright authorization remains unverified: the configured global setup deletes seeded test cases, and current auth E2E suites also register users/write DB rows, so they were not run in this audit.
 - [ ] 4.2 G5 (47 fails, pending task 2's resolution): Zod-validate request bodies on confirmed-real fails only, per CLAUDE.md's Superforms/Zod pattern.
 - [ ] 4.3 G11 (41 fails): wrap bare `localhost`/`127.0.0.1` literals in `ENV.SERVICE_URL ?? 'http://localhost:N'` per the repo's own G11 fix pattern.
 - [ ] 4.4 G20 (16 cyclic pairs): not yet enumerated per-file — run CLAUDE.md's G20 gate command directly to get the pair list before deciding whether any need breaking.

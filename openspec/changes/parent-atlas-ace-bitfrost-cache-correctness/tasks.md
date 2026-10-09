@@ -925,3 +925,72 @@ Verbatim source: `docs/archive/claude-md-stale-status-and-bitfrost-audit-2026-10
 - [ ] Fix `bitfrost:packet:{key}` dead-shape strings in `packet-truth-flow.mts` and spelling drift across phase8*/9/10* writers.
 - [ ] Domain vocabulary owner decision (`atlas_domain_ontology` recommended) → DOMAIN-VOCAB-01 … SYNTH-12 tranche tracked in `parent-atlas-nlp-sidecar-feature-compiler/tasks.md`.
 - [ ] Operator-gated DDL (4 items): `atlas_ast_nodes.ast_generation`, `atlas_symbol_versions` indexes, topology revision columns, `atlas_ontology_linked_tuples` revision columns + `GroundedExtractionV1` writer contract.
+
+## Phase 11D–11F cache, recommendation, and routing alignment (2026-10-06)
+
+**Source audit, not runtime proof:** keep PostgreSQL/Atlas packet identity and
+revision truth separate from MessagePack/Arrow/mmap transport, Qdrant/TurboVec
+retrieval projections, Neo4j/cuGraph topology, Redis/Valkey residency, ranking,
+and ACE context assembly. A cached retrieval result is not a second canonical
+packet store: query hashes identify lookup inputs only; cache values must
+reference the exact packet/evidence identities and revisions they contain.
+
+Existing owners found:
+- `AceBitfrostCacheIdentityV1` is already the ACE/BitFrost cache-key owner and
+  requires `representationRevision`, but `workspaceRevision` is optional and
+  currently falls back to `workspace:unspecified` in key construction. Reconcile
+  this with `PacketSemanticCacheIdentityV2` before adding or freezing any third
+  envelope/identity. The proposed query hash, packet checksum, retrieval/policy
+  revisions, expiry, and encoding fields are review requirements—not a new
+  canonical packet contract.
+- `CanonicalAcePacketEnvelope` already owns a validated ACE packet projection;
+  its presence does not make Redis/MessagePack canonical storage. Extend or
+  adapt existing cache owners only after identity/key parity and stale-rejection
+  tests; do not add a parallel `CachedAcePacketEnvelopeV1` authority.
+- Retrieval candidate features and recommendation priority are different
+  semantics. Reconcile the existing retrieval feature-matrix and recommendation
+  owners before introducing names such as `CandidateFeatureMatrixV1` or
+  `RecommendationV1`; never let recommendation priority overwrite retrieval
+  relevance or canonical evidence.
+- The live routing owner is `QueryRouter4x4` in
+  `sveltekit-frontend/src/lib/server/routing/query-router-4x4.ts`, called by
+  `features/ai/ace/context-assembler.ts`. It emits backend weights/dispatch,
+  then the request path adapts the matrix from fused Qdrant/Postgres hit shares
+  and persists that mutable matrix to Redis. This is online per-query policy
+  mutation, not an offline evaluated `RouterPolicyCandidate`. A separate
+  `retrieval/query-router-4x4.ts` is a simulation/placeholder and must not be
+  treated as another production router. `ace/search-router.ts` remains
+  documented as unwired/dead; do not wire it as a competing owner.
+
+Keep these gates open until implemented and independently evaluated:
+- [ ] 11D-CACHE-IDENTITY-01 — reconcile the two existing cache identity owners;
+  bind cache key/value to packet/evidence identity, source/workspace and
+  representation/retrieval revisions, checksums, and expiry; reject missing
+  workspace identity instead of accepting `workspace:unspecified` for
+  qualified evidence.
+- [ ] 11E-RETRIEVAL-RECOMMENDATION-01 — keep evidence candidate generation,
+  ranking features, and developer-work recommendation as separate outputs;
+  bind each to the same frozen corpus/revisions without rewriting retrieval
+  scores or task state.
+- [ ] 11F-A-ROUTING-POLICY-01 — make the existing QueryRouter owner emit a
+  bounded, revisioned lane-budget/policy decision consumed by existing
+  retrieval lanes; it must not become another retrieval executor or fusion
+  owner.
+- [ ] 11F-A-OFFLINE-UPDATE-01 — replace direct production Hebbian matrix
+  mutation with revision-bound `OutcomeObservation` collection and an
+  offline/shadow `RouterPolicyCandidate`; evaluate on a frozen held-out query
+  corpus and promote only by explicit policy revision. Production queries must
+  not mutate the admitted router policy.
+- [ ] 11F-B-SPECULATION-BOUNDARY-01 — separate speculative decoding from
+  retrieval routing; inference speculation consumes a sealed ContextManifest
+  and cannot change evidence selection or identity mid-generation.
+- [ ] 11F-BENCH-01 — compare cold retrieval, warm result cache, warm process
+  LRU, serialization, parse, retrieval, rerank, ACE packing, and model prefill
+  on identical query/corpus/revision/model/budget inputs; report latency,
+  bytes, token counts, cache correctness, and stale-hit rate before claiming
+  MessagePack/LRU benefit.
+
+No routing/cache source was modified, no live route was called, and no cache,
+database, model, or service state was changed in this audit. The existing
+online adaptation remains present and is a migration gate, not a proven safe
+policy-learning path.

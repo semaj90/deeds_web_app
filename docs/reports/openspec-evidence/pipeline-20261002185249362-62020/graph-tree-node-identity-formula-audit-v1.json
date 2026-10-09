@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.graph-tree-node-identity-formula-audit.v1",
+  "generatedAt": "2026-10-02T18:53:04.277Z",
+  "status": "STATIC_FORMULA_PROVEN_LIVE_POPULATION_UNPROVEN",
+  "proofLevel": "STATIC_SOURCE_PROVEN",
+  "source": {
+    "sourceRef": "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+    "sourceRevision": "sha256:48ff125148eefe594178a3a26a868c44261f67f973423672a90ce511fc7a3758",
+    "lineStart": 63,
+    "lineEnd": 66,
+    "function": "treeNodeId",
+    "role": "revision-bound parse-occurrence identity derivation",
+    "canonicalAuthority": false
+  },
+  "formula": {
+    "inputComponents": [
+      "repoId",
+      "normalizedPath",
+      "language",
+      "nodeKind",
+      "qualifiedSymbol",
+      "parentKey",
+      "normalizedSig"
+    ],
+    "delimiter": "\\x00",
+    "digest": "sha256 hex",
+    "nullNormalization": "parentKey ?? '' and normalizedSig ?? ''"
+  },
+  "checks": {
+    "functionPresent": true,
+    "sevenInputComponents": true,
+    "nulDelimited": true,
+    "sha256Digest": true,
+    "explicitUtf8Encoding": true,
+    "noWorkspaceRevisionInference": true
+  },
+  "sideEffects": {
+    "sourceFilesMutated": false,
+    "persistentStoresMutated": false
+  },
+  "nextGate": "LIVE_ATLAS_TREE_NODES_POPULATION_AND_CROSS_REVISION_READBACK",
+  "likely_cause": "The task ledger named the parse-occurrence formula but had no revision-bound static receipt for the current writer implementation.",
+  "evidence": [
+    "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+    "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs#L63-L66",
+    "sha256 formula source revision"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-tree-node-identity-formula-v1.mjs",
+    "scripts/atlas/record-tree-node-identity-formula-receipt-v1.mjs"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-tree-node-identity-formula-v1.mjs",
+  "smoke_command": "node --check scripts/atlas/audit-tree-node-identity-formula-v1.mjs",
+  "report_path": "docs/reports/graph-tree-node-identity-formula-audit-v1.json",
+  "checksum": "sha256:3d948874324578f479c369bde55028806405f466520542d7f66570cc243a367f"
+}

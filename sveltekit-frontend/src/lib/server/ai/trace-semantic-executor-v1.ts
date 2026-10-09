@@ -9,6 +9,7 @@ export type TraceSemanticCohortRowV1 = {
   sourceRef: string;
   workspaceRevision: string;
   sourceRevision: string;
+  representationRevision: string | null;
   vector: number[];
 };
 
@@ -56,14 +57,21 @@ function blocked(reason: string): TraceSemanticExecutionResultV1 {
   };
 }
 
-function validateCohort(rows: TraceSemanticCohortRowV1[], expectedWorkspaceRevision: string): string | null {
+function validateCohort(
+  rows: TraceSemanticCohortRowV1[],
+  expectedWorkspaceRevision: string,
+  expectedRepresentationRevision: string,
+): string | null {
   if (!expectedWorkspaceRevision.trim()) return 'ADMITTED_WORKSPACE_REVISION_REQUIRED';
+  if (!expectedRepresentationRevision.trim()) return 'SEMANTIC_REPRESENTATION_REVISION_REQUIRED';
   if (rows.length === 0) return 'CURRENT_SEMANTIC_COHORT_EMPTY';
   const seen = new Set<string>();
   for (const row of rows) {
     if (!row.canonicalId || !row.packetKey || !row.sourceRef) return 'COHORT_CANONICAL_IDENTITY_MISSING';
     if (row.workspaceRevision !== expectedWorkspaceRevision) return 'COHORT_WORKSPACE_REVISION_MISMATCH';
     if (!row.sourceRevision) return 'COHORT_SOURCE_REVISION_MISSING';
+    if (!row.representationRevision) return 'COHORT_REPRESENTATION_REVISION_MISSING';
+    if (row.representationRevision !== expectedRepresentationRevision) return 'COHORT_REPRESENTATION_REVISION_MISMATCH';
     if (row.vector.length !== 768) return 'COHORT_SEMANTIC_768_DIMENSION_MISMATCH';
     const identity = `${row.packetKey}\u0000${row.sourceRevision}`;
     if (seen.has(identity)) return 'COHORT_DUPLICATE_PACKET_SOURCE_REVISION';
@@ -90,6 +98,7 @@ function mapCuvsHits(
         workspace_revision: row.workspaceRevision,
         source_revision: row.sourceRevision,
         representation_id: 'semantic_768',
+        representation_revision: row.representationRevision,
         executor: 'CUVS_EXACT',
       },
     }];
@@ -114,13 +123,20 @@ export async function executeTraceSemanticV1(
       executor: 'QDRANT', fallbackUsed: false, hits, reason: null, writesPerformed: false,
     };
   } catch {
+    if (!input.semanticRepresentationRevision.trim()) {
+      return blocked('CUVS_FALLBACK_SEMANTIC_REPRESENTATION_REVISION_REQUIRED');
+    }
     let cohort: TraceSemanticCohortRowV1[];
     try {
       cohort = await input.loadCohort(input.admittedWorkspaceRevision);
     } catch {
       return blocked('CUVS_FALLBACK_COHORT_LOAD_FAILED');
     }
-    const validationError = validateCohort(cohort, input.admittedWorkspaceRevision);
+    const validationError = validateCohort(
+      cohort,
+      input.admittedWorkspaceRevision,
+      input.semanticRepresentationRevision,
+    );
     if (validationError) return blocked(`CUVS_FALLBACK_${validationError}`);
 
     const receipt = await input.cuvsExact({

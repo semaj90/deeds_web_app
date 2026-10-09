@@ -153,6 +153,15 @@ export function compileStructuralExtractionFabric(
   const symbolNominations: StructuralSymbolNominationV1[] = [];
   let nativeSymbolNominations = 0;
   let pathAffineSymbolNominations = 0;
+  const upstreamSymbolIdCounts = new Map<string, number>();
+  for (const chunk of chunks) {
+    if (chunk.upstream_symbol_id) {
+      upstreamSymbolIdCounts.set(
+        chunk.upstream_symbol_id,
+        (upstreamSymbolIdCounts.get(chunk.upstream_symbol_id) ?? 0) + 1,
+      );
+    }
+  }
   for (const chunk of chunks) {
     const kind = mapChunkKindToSymbolKind(chunk.kind || chunk.node_type);
     if (!kind || !chunk.symbol_name) continue;
@@ -164,6 +173,8 @@ export function compileStructuralExtractionFabric(
       kind,
       qualified_name: qualifiedName,
       upstream_symbol_id: chunk.upstream_symbol_id,
+      upstream_node_id: chunk.upstream_node_id,
+      disambiguate_upstream_symbol_id: (upstreamSymbolIdCounts.get(chunk.upstream_symbol_id ?? '') ?? 0) > 1,
     });
     if (chunk.upstream_symbol_id) nativeSymbolNominations += 1;
     else pathAffineSymbolNominations += 1;

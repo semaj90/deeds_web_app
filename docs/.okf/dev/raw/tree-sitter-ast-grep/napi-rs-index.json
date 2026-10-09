@@ -1,0 +1,60 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "tree-sitter-ast-grep",
+  "source_ref": "tree-sitter-ast-grep:napi-rs-index",
+  "url": "https://napi.rs/",
+  "title": "napi.rs",
+  "domain_class": "tool",
+  "focus_tags": [
+    "tree_sitter",
+    "ast_grep",
+    "syntax_trees",
+    "structural_search",
+    "napi",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "napi.rs",
+    "markdown_excerpt": "[Skip to content](https://napi.rs/#main-content) # Building pre-compiled Node.js addons in Rust ### Seamless WebAssembly integration, safer API designs with lifetime management, and simplified cross-compilation for broader platform support. [Get Started](https://napi.rs/docs/introduction/getting-started) [![GitHub logo](https://napi.rs/assets/github.svg)GitHub](https://github.com/napi-rs/napi-rs) Rust CratesC/C++Node.jsNode.js addonWASI moduleTypeScript typesnpm packages ![NAPI-RS Logo](https://napi.rs/img/favicon.png) ## Live WASM + NAPI-RS Demo ### This is a sample app using NAPI-RS WebAssembly. You can transform the image to webp, jpeg or avif with different quality. Transform Image App TS Code ``` import { Transformer } from '@napi-rs/image' export async function transform() { const imageResponse = await fetch( 'https://upload.wikimedia.org/wikipedia/commons/5/5d/ISS-45_EVA-2_%28a%29_Scott_Kelly.jpg' ) const imageBytes = await imageResponse.arrayBuffer() const transformer = new Transformer(imageBytes) const webp = await transformer.toWebp() } ``` Rust Code ``` use napi::bindgen_prelude::*; use napi_derive::napi; #[napi] pub struct Transformer { inner: Uint8Array, } #[napi] impl",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:tree-sitter-ast-grep:napi-rs-index",
+    "title": "napi.rs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Tree-sitter, ast-grep, and N-API Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "3b04e9c5eb005628beb8f718d62726865e66fe2e0d3a77cb8fbf79596cd3ff2f",
+  "markdown_path": "docs/.okf/dev/raw/tree-sitter-ast-grep/napi-rs-index.md",
+  "fetched_at": "2026-10-09T05:28:31.301Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "tree-sitter-ast-grep",
+    "source_title": "Tree-sitter, ast-grep, and N-API Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/tree-sitter-ast-grep/napi-rs-index.md"
+}

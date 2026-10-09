@@ -6,6 +6,8 @@ import {
   RlmWorkingStateV1Schema,
   ToolExecutionEnvelopeV1Schema,
   ToolExecutionReceiptV1Schema,
+  acceptAgentPlanV1,
+  assertAgentActionAllowedAfterPlanAcceptanceV1,
   authorizeAndBuildToolEnvelopeV1,
   buildAgentActionProposalV1,
   buildAgentReplayManifestV1,
@@ -200,6 +202,66 @@ async function execution(action = proposal()) {
 }
 
 describe('read-only PrimeAgent execution spine', () => {
+  it('seals one plan acceptance and rejects planning or consumed actions afterward', () => {
+    const receipt = acceptAgentPlanV1({
+      requestId: 'request:loop-guard',
+      executionId: 'execution:loop-guard',
+      planRevision: 'plan-r1',
+      planChecksum: `sha256:${'a'.repeat(64)}`,
+      consumedActionIds: ['build_recommendation'],
+      planningActionIds: ['build_recommendation', 'recommendation:plan'],
+      allowedNextActionIds: ['read_file', 'run_validator'],
+    });
+    expect(receipt.toState).toBe('PLAN_VALIDATED');
+    expect(receipt.canonicalAuthority).toBe(false);
+    expect(receipt.writesPerformed).toBe(false);
+    expect(() => assertAgentActionAllowedAfterPlanAcceptanceV1({
+      receipt,
+      requestId: receipt.requestId,
+      executionId: receipt.executionId,
+      planRevision: receipt.planRevision,
+      planChecksum: receipt.planChecksum,
+      actionId: 'read_file',
+    })).not.toThrow();
+    expect(() => assertAgentActionAllowedAfterPlanAcceptanceV1({
+      receipt,
+      requestId: receipt.requestId,
+      executionId: receipt.executionId,
+      planRevision: receipt.planRevision,
+      planChecksum: receipt.planChecksum,
+      actionId: 'build_recommendation',
+    })).toThrow('PLAN_ACTION_ALREADY_CONSUMED');
+    expect(() => assertAgentActionAllowedAfterPlanAcceptanceV1({
+      receipt,
+      requestId: receipt.requestId,
+      executionId: receipt.executionId,
+      planRevision: 'plan-r2',
+      planChecksum: receipt.planChecksum,
+      actionId: 'read_file',
+    })).toThrow('PLAN_ACCEPTANCE_REVISION_MISMATCH');
+  });
+
+  it('rejects plan acceptance with duplicate IDs or planning actions in the next-action mask', () => {
+    expect(() => acceptAgentPlanV1({
+      requestId: 'request:loop-guard',
+      executionId: 'execution:loop-guard',
+      planRevision: 'plan-r1',
+      planChecksum: `sha256:${'a'.repeat(64)}`,
+      consumedActionIds: ['plan', 'plan'],
+      planningActionIds: ['plan'],
+      allowedNextActionIds: ['read_file'],
+    })).toThrow();
+    expect(() => acceptAgentPlanV1({
+      requestId: 'request:loop-guard',
+      executionId: 'execution:loop-guard',
+      planRevision: 'plan-r1',
+      planChecksum: `sha256:${'a'.repeat(64)}`,
+      consumedActionIds: ['plan'],
+      planningActionIds: ['plan'],
+      allowedNextActionIds: ['plan'],
+    })).toThrow('PLANNING_ACTION_CANNOT_FOLLOW_ACCEPTANCE');
+  });
+
   it('replays a checksum-bound manifest deterministically', () => {
     const first = replayManifest();
     const second = replayManifest();

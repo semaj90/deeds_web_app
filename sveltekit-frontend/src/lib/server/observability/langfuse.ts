@@ -220,10 +220,12 @@ export async function traceRAG<T>(
 export async function traceVectorSearch<T>(
 	collection: string,
 	metadata: Record<string, unknown>,
-	callback: () => Promise<T>
+	callback: () => Promise<T>,
+	options: { persist?: boolean } = {},
 ): Promise<T> {
-	const langfuse = await getLangfuse();
 	const safeCb = _safeCallback(callback, undefined as unknown as T);
+	if (options.persist === false) return safeCb();
+	const langfuse = await getLangfuse();
 	if (!langfuse) return safeCb();
 
 	const trace = langfuse.trace({

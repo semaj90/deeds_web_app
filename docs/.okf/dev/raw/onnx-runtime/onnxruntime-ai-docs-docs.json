@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "onnx-runtime",
+  "source_ref": "onnx-runtime:onnxruntime-ai-docs-docs",
+  "url": "https://onnxruntime.ai/docs/",
+  "title": "onnxruntime.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "onnx-runtime",
+    "inference",
+    "execution-providers",
+    "cpu-gpu",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "onnxruntime.ai",
+    "markdown_excerpt": "[Skip to main content](https://onnxruntime.ai/docs/#main-content)LinkMenuExpand(external link)DocumentSearchCopyCopied Search onnxruntime # Welcome to ONNX Runtime ONNX Runtime is a cross-platform machine-learning model accelerator, with a flexible interface to integrate hardware-specific libraries. ONNX Runtime can be used with models from PyTorch, Tensorflow/Keras, TFLite, scikit-learn, and other frameworks. v1.14 ONNX Runtime - Release Review - YouTube Tap to unmute [v1.14 ONNX Runtime - Release Review](https://www.youtube.com/watch?v=waIeC3OIn70) [ONNX Runtime](https://www.youtube.com/channel/UC_SJk17KdRvDulXz-nc1uFg) ONNX Runtime3.85K subscribers ## How to use ONNX Runtime | | | | --- | --- | | [Get started with ORT](https://onnxruntime.ai/docs/get-started) | [API Docs](https://onnxruntime.ai/docs/api) | | [Tutorials](https://onnxruntime.ai/docs/tutorials) | [Ecosystem](https://onnxruntime.ai/docs/ecosystem) | | [ONNX Runtime YouTube](https://www.youtube.com/channel/UC_SJk17KdRvDulXz-nc1uFg/featured) | | ## Contribute and Customize | | | | --- | --- | | [Build ORT Packages](https://onnxruntime.ai/docs/build) | [ONNX Runtime GitHub](https://github.com/microsoft/onnxruntime) | *",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:onnx-runtime:onnxruntime-ai-docs-docs",
+    "title": "onnxruntime.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh ONNX Runtime Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "deb64256b54a62d4a1f3f36edb22a40bd82b541e7aa1228a321efc83125cf160",
+  "markdown_path": "docs/.okf/dev/raw/onnx-runtime/onnxruntime-ai-docs-docs.md",
+  "fetched_at": "2026-10-09T05:33:30.610Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "onnx-runtime",
+    "source_title": "ONNX Runtime Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/onnx-runtime/onnxruntime-ai-docs-docs.md"
+}

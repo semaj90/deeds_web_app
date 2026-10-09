@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "pytorch-numpy-pyarrow",
+  "source_ref": "pytorch-numpy-pyarrow:pytorch-org-cppdocs-cppdocs",
+  "url": "https://pytorch.org/cppdocs/",
+  "title": "pytorch.org",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "pytorch",
+    "numpy",
+    "pyarrow",
+    "tensor",
+    "columnar-data",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "pytorch.org",
+    "markdown_excerpt": "[Skip to main content](https://docs.pytorch.org/cppdocs/#main-content) Back to top `Ctrl` + `K` [main](https://docs.pytorch.org/cppdocs/#) [Go topytorch.org](https://pytorch.org/) `Ctrl` + `K` - [X](https://x.com/PyTorch) - [GitHub](https://github.com/pytorch/pytorch) - [PyTorch Forum](https://discuss.pytorch.org/) - [PyPi](https://pypi.org/project/torch/) # PyTorch C++ API [\\#](https://docs.pytorch.org/cppdocs/\\#pytorch-c-api \"Link to this heading\") These pages provide the documentation for the public portions of the PyTorch C++ API. This API can roughly be divided into five parts: - **ATen**: The foundational tensor and mathematical operation library on which all else is built. - **Autograd**: Augments ATen with automatic differentiation. - **C++ Frontend**: High level constructs for training and evaluation of machine learning models. - **TorchScript**: An interface to the TorchScript JIT compiler and interpreter. - **C++ Extensions**: A means of extending the Python API with custom C++ and CUDA routines. Combined, these building blocks form a research and production ready C++ library for tensor computation and dynamic neural networks with strong emphasis on GPU acceleration as w",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:pytorch-numpy-pyarrow:pytorch-org-cppdocs-cppdocs",
+    "title": "pytorch.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh PyTorch, NumPy, and Apache Arrow Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "02e24346f56944bc9414381553c390c8df1e762ca3d80d70f48e5c0961e0966e",
+  "markdown_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/pytorch-org-cppdocs-cppdocs.md",
+  "fetched_at": "2026-10-09T05:30:47.518Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "pytorch-numpy-pyarrow",
+    "source_title": "PyTorch, NumPy, and Apache Arrow Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/pytorch-org-cppdocs-cppdocs.md"
+}

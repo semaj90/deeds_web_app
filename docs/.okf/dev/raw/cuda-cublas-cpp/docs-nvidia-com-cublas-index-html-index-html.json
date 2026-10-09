@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "cuda-cublas-cpp",
+  "source_ref": "cuda-cublas-cpp:docs-nvidia-com-cublas-index-html-index-html",
+  "url": "https://docs.nvidia.com/cuda/cublas/index.html",
+  "title": "docs.nvidia.com",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "cuda",
+    "cublas",
+    "gemm",
+    "gpu-linear-algebra",
+    "llm_output",
+    "kanban",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.nvidia.com",
+    "markdown_excerpt": "- » - 1\\. Introduction - v13.4 \\| [PDF](https://docs.nvidia.com/cuda/pdf/CUBLAS_Library.pdf) \\| [Archive](https://developer.nvidia.com/cuda-toolkit-archive) * * * cuBLAS The API Reference guide for cuBLAS, the CUDA Basic Linear Algebra Subroutine library. # 1\\. Introduction [](https://docs.nvidia.com/cuda/cublas/index.html\\#introduction \"Permalink to this headline\") The cuBLAS library is an implementation of BLAS (Basic Linear Algebra Subprograms) on top of the NVIDIA®CUDA™ runtime. It allows the user to access the computational resources of NVIDIA Graphics Processing Unit (GPU). The cuBLAS Library exposes four sets of APIs: - The [cuBLAS API](https://docs.nvidia.com/cuda/cublas/index.html#using-the-cublas-api), which is simply called cuBLAS API in this document (starting with CUDA 6.0), - The [cuBLASXt API](https://docs.nvidia.com/cuda/cublas/index.html#using-the-cublasxt-api) (starting with CUDA 6.0), and - The [cuBLASLt API](https://docs.nvidia.com/cuda/cublas/index.html#using-the-cublaslt-api) (starting with CUDA 10.1) - The [cuBLASDx API](https://docs.nvidia.com/cuda/cublas/index.html#using-the-cublasdx-api) (not shipped with the CUDA Toolkit) To use the cuBLAS API, the appli",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:cuda-cublas-cpp:docs-nvidia-com-cublas-index-html-index-html",
+    "title": "docs.nvidia.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh NVIDIA cuBLAS Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "dab34e5a19a41792f07eaa38e2e4c75e7211ced8a917d06a91b575a348d60f63",
+  "markdown_path": "docs/.okf/dev/raw/cuda-cublas-cpp/docs-nvidia-com-cublas-index-html-index-html.md",
+  "fetched_at": "2026-10-09T05:35:32.080Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "cuda-cublas-cpp",
+    "source_title": "NVIDIA cuBLAS Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/cuda-cublas-cpp/docs-nvidia-com-cublas-index-html-index-html.md"
+}

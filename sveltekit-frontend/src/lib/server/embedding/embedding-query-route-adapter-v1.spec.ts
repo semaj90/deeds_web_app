@@ -3,7 +3,6 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const routePaths = [
-  'src/routes/api/retrieval/dual-lane/+server.ts',
   'src/routes/api/retrieval/reranked-search/+server.ts',
   'src/routes/api/tags/search/+server.ts',
 ];
@@ -19,6 +18,17 @@ describe('embedding query route adapter wiring', () => {
     expect(source).toContain('executeEmbeddingInputV1');
     expect(source).toContain("mode: 'unprompted_legacy'");
     expect(source).toContain('executor: async');
+  });
+
+  it('routes dual-lane EmbeddingGemma queries through the shared provider executor', () => {
+    const source = readFileSync(resolve(process.cwd(), 'src/routes/api/retrieval/dual-lane/+server.ts'), 'utf8');
+    expect(source).toContain('executeProviderEmbeddingV1');
+    expect(source).toContain("mode: 'unprompted_legacy'");
+    expect(source).toContain("provider: 'ollama'");
+    expect(source).toContain("baseUrl: env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL");
+    expect(source).toContain("modelId: 'embeddinggemma:latest'");
+    expect(source).toContain('timeoutMs: 30_000');
+    expect(source).not.toContain('/api/embeddings');
   });
 
   it('routes the shared server batch client through recipe preparation and batch validation', () => {

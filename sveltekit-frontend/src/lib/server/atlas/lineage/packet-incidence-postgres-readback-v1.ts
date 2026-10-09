@@ -1,5 +1,6 @@
 import { pool } from '$lib/server/db/client.js';
 import {
+	assertPacketIncidenceWorkspaceRevisionV1,
 	expectedFromResolutionsV1,
 	resolveIncidenceEndpointsV1,
 	type AtlasPacketRowV1,
@@ -20,9 +21,10 @@ export async function verifyPacketIncidenceLineagesAgainstPostgresV1(
 		endpointKeys,
 		async (keys) => {
 			const result = await pool.query<AtlasPacketRowV1>(
-				'SELECT packet_key, source_ref, source_revision FROM atlas_packets WHERE packet_key = ANY($1::text[])',
+				'SELECT packet_key, source_ref, source_revision, workspace_revision_key FROM atlas_packets WHERE packet_key = ANY($1::text[])',
 				[keys],
 			);
+			assertPacketIncidenceWorkspaceRevisionV1(result.rows, snapshot.workspaceRevision);
 			return result.rows;
 		},
 		async (key) => {

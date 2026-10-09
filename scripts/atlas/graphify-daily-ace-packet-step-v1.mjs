@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import pg from 'pg';
-import { ENRICHMENT_READINESS_CTE_V1 } from './lib/enrichment-readiness-sql-v1.mjs';
+import { loadEmbedAllowedPacketKeysV1 } from './lib/enrichment-readiness-sql-v1.mjs';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
 
 export const ACE_DAILY_TTL_SECONDS = 86_400; // writer hard cap; 7-day WARM tier is a separate, later decision
@@ -47,14 +47,12 @@ try {
     receipt.reasons.push(`PROJECTION_NOT_ADMITTED:${receipt.admission}`);
   }
 
-  // 2) read-only census of packets the pre-embedding guard would allow (no writes)
+  // 2) read-only keyset from the single readiness-predicate owner (no second eligibility query, no writes)
   const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1, statement_timeout: 300000 });
   const client = await pool.connect();
   try {
-    await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
-    const r = await client.query(`${ENRICHMENT_READINESS_CTE_V1} SELECT count(*) FILTER (WHERE embed_allowed)::int AS allowed, count(*)::int AS total FROM lv`);
-    await client.query('ROLLBACK');
-    receipt.embedAllowedPackets = r.rows[0].allowed; receipt.totalPackets = r.rows[0].total;
+    const keyset = await loadEmbedAllowedPacketKeysV1(client);
+    receipt.embedAllowedPackets = keyset.count; receipt.totalPackets = keyset.totalPackets; receipt.embedAllowedKeysSha256 = keyset.keysSha256;
   } finally { client.release(); await pool.end(); }
 
   if (receipt.embedAllowedPackets === 0) receipt.reasons.push('NO_EMBED_ALLOWED_PACKETS');

@@ -19,6 +19,63 @@ OpenSpec owner remains responsible for each task and its evidence.
 
 Ordering is dependency-driven: query-seed identity → entity/evidence admission → bounded fanout and canonical relationship readback → feature matrix → Qdrant/clustering projections → ContextManifest/cache identity → BitFrost readback → recommendation outcome. Live writes stay blocked until the owning change's prerequisites and independent readback gates pass.
 
+- [ ] **FI-TITLE-ADDRESS-01** Reconcile `title_id` semantics before designing a
+  compact domain/title LUT. Existing terminology is ambiguous: the title
+  generator calls its value an identity, while the binary-registry plan uses
+  it as a semantic grouping key. Neither makes it canonical packet identity;
+  `packet_key` remains distinct. Preserve existing consumers; audit the live
+  schema, writers, and joins first. Any new taxonomy-derived compact value must have a
+  distinct, revisioned address name and LUT/checksum, and must resolve to
+  canonical packet identity rather than replacing `packet_key` or
+  `sourceRevision`. No packed-ID registry or cache is admitted by this task.
+
+  **Read-only source audit (2026-10-06):** `packages/atlas/lib/packet-registry.mjs`
+  calls `title_id` a generated title identity (`semantic-title-v1`,
+  `title:<slug>:<hash8>`) and explicitly protects `packet_key` as a distinct
+  identity column. Read together, “title identity” means generated title/group
+  identity, not packet identity. `acp/packet-materializer-pipeline.ts` validates/regenerates
+  the title from `packet_key`/`feature_id`; `atlas_packets.title_id` is nullable
+  text with a non-unique lookup index. In contrast,
+  `packet-binary-registry.ts` requires `title_id` and indexes it for grouping,
+  while `grpc-binary-memory-registry-plan.md` calls it a semantic grouping key.
+  The packet assembler also has a short `title:<packet-key-prefix>` fallback
+  which the materializer may replace. This supports keeping title metadata
+  separate from canonical packet identity, but does not prove a stable
+  taxonomy address or a live, consistent writer/join contract. Reconcile that
+  fallback and inspect actual consumers before closing this task. No new
+  `title_id` semantics, registry, LUT, cache, or write path is introduced.
+
+- [ ] **PACKET-ROUTING-INDEX-01** After `FI-TITLE-ADDRESS-01` and a frozen,
+  revision-qualified packet/ordinal snapshot pass, specify and fixture-test a
+  derived compact routing projection. Keep `DomainTitleRegistryV1` taxonomy
+  revision/checksum-bound and give compact addresses a distinct name (never
+  reuse `title_id` by assumption). Bind each `PacketRoutingIndexV1` row to the
+  snapshot revision, ordinal, canonical `packet_key` lookup, packet/source/
+  workspace revisions, and taxonomy revision; packet-key hashes are lookup
+  aids only. Define deterministic ordering/checksums, collision and unknown-
+  domain rejection, LUT resolution/readback, and bitfield version/semantics.
+  Prove round-trip resolution to canonical packet identity before considering
+  MessagePack, mmap, Valkey/BitFrost, or GPU formats. Diagnostic fixtures only;
+  no database/cache writes, no embedding/Graphify refresh, and no use of routing
+  bits as authority or an independent retrieval vote.
+
+  The proposed Pokémon-style address is explicitly a compact lookup/routing
+  coordinate, not identity: taxonomy revision → domain assignment → address
+  registry/LUT → snapshot ordinal → canonical `packet_key` readback. Keep
+  `packetKeyHash`, bucket IDs, ordinals, bitmaps, and capability/evidence bits
+  as derived accelerators only. The current task is design/fixture-only; no
+  durable `DomainTitleRegistryV1` or `PacketRoutingIndexV1` owner is admitted.
+  **Compact-index layering (2026-10-06):** define the future derived read path
+  as L0 taxonomy bucket → ordinal bitmap; L1 ordinal → packet header and
+  revision-qualified LUT reference; L2 compact `AcePacketV3` serialization;
+  L3 expanded evidence spans/neighborhood. The taxonomy revision and snapshot
+  checksum scope each layer. JSON remains the canonical/debug interchange;
+  MessagePack is only an exact serialization projection, bitfields encode
+  versioned flags/membership, and mmap/GPU layouts remain deferred. Do not
+  derive addresses from filenames or truncated hashes. Cache warming and
+  residency are downstream of proven LUT round-trip and must never qualify
+  identity or supply evidence by themselves.
+
 ## 2026-09-05 — Feature ontology projection alignment
 
 - [x] **FI-ONTO-01** Reuse canonical `FeatureV1` for the behavioral feature node

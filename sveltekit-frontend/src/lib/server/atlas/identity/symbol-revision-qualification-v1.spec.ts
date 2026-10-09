@@ -65,7 +65,7 @@ describe('promotion nomination (registry + aliases + version in one package tran
   it('needs both admissions', () => {
     expect(qualifyPromotionNominationV1({ source_ref: REF, source_revision: SRC, workspace_revision: WS }, 'r', PROV).admitted).toBe(true);
     expect(qualifyPromotionNominationV1({ source_ref: REF, source_revision: SRC, workspace_revision: 'workspace:0' }, 'r', PROV).reasons).toEqual(['WORKSPACE_REVISION_PLACEHOLDER']);
-    // reconciliation writer historically set source_revision = workspace revision: shape ok, no source binding -> rejected
+    // A workspace digest is not a source-byte revision; the reconciliation writer must preserve the binding's source revision.
     expect(qualifyPromotionNominationV1({ source_ref: REF, source_revision: WS, workspace_revision: WS }, 'r', PROV).reasons).toEqual(['REVISION_PROVENANCE_MISSING']);
   });
 });

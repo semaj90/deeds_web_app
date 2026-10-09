@@ -29,6 +29,13 @@ If a feature exists in another lane, carry the logic forward only if it maps cle
 
 ## OpenSpec audit execution
 
+## Main repository and package ownership
+
+- The root repository remains the active Parent Atlas implementation and proof surface. Keep repository-level runners, bounded materializers, audits, independent readback/verifiers, and root npm commands under `scripts/atlas/`; the SvelteKit runtime composition stays under `sveltekit-frontend/src/lib/server/atlas/` and existing Python service owners stay under `python/` or `services/`.
+- `packages/parent-atlas` and future `packages/atlas*` locations are reusable-contract/pure-logic destinations, not replacements for the current root implementation. Do not delete, move, or hollow out existing root scripts or package work to force this separation.
+- Copying or extracting code into `packages/atlas*` is a later, deliberate migration. Before relocation, preserve the root command/API, prove package-to-root parity, retain existing callers, and record the migration in the owning OpenSpec ledger. Until then, work in the current owner and keep root proof runners runnable from the main repository.
+- Avoid parallel canonical owners: package code may provide reusable contracts/adapters; root scripts prove repository behavior; the SvelteKit/Python owners compose runtime behavior. PostgreSQL and the existing Atlas identity/revision owners remain authoritative.
+
 - `scripts/atlas/run-openspec-evidence-fabric-v1.mjs` uses a bounded CPU stage pool only for independent readers of the same frozen census. The default is at most two concurrent stages; the hard cap is three. Set `OPENSPEC_EVIDENCE_MAX_CONCURRENT_STAGES=1` to force serial execution or `2`/`3` only when memory headroom is adequate.
 - The parser must finish before pooled readers start; receipt binding, reconciliation, cards, workboard projections, final authority, and dependent stages stay serialized in dependency order. Each concurrent stage must have a distinct run-scoped output path and the same `runId`/census checksum.
 - Do not add Redis/Valkey caching or GPU work to Markdown/JSON census parsing by default. Consider caching only after profiling demonstrates material repeat cost; cache keys must include workspace revision, exact input checksums, parser/schema revision, and deterministic output checksum. Cache hits are rebuildable intermediates, never proof or canonical state.
@@ -65,6 +72,8 @@ Keep these concepts separate in every future integration:
 - Hash the exact source bytes. Do not hash a decoded/re-encoded string, newline-normalized text, JSON reserialization, or a UTF-16 representation unless that encoding is explicitly the producer contract.
 - A whole-source digest and a chunk digest are different grains. `file_content_hash` identifies whole source bytes; `codebase_chunk_index.content_hash` identifies a chunk. Never compare them directly.
 - `workspace_revision`, `source_revision`, `representation_revision`, and `feature_revision` are separate namespaces. A SHA-256-shaped value in one namespace must not be copied into another without an explicit producer contract.
+- `workspace_revision` identifies a workspace snapshot; it is required at the snapshot/cohort receipt boundary, but it is not automatically required as a duplicated column on every source-local feature row. A row may be bound by exact `source_ref + source_revision` through the authoritative workspace-source binding, while the CandidateOrdinalMap and matrix receipt bind the complete ordered cohort to the admitted workspace snapshot. Require a row-level workspace revision only when the feature's semantics or its storage/join contract depend on that field; never infer it from timestamps, ordinals, or a caller-supplied default.
+- Missing row-level `workspace_revision` is not by itself proof that a source-local observation is invalid. Admission still requires independently verified source bytes/revision, feature-definition and producer revision, evidence references/checksum, exact candidate identity, and a snapshot-bound matrix receipt. Workspace-/graph-derived values require their own applicable workspace/graph revision. Missing provenance is unavailable/rejected, not a numeric zero.
 - `packet_key` is a deterministic packet identity/projection key. It is not a substitute for the source digest, workspace revision, or canonical candidate ordinal.
 - Qdrant point IDs, Redis/BitFrost keys, centroids, GPU pointers, and topology coordinates are derived projections. They cannot promote or replace PostgreSQL source identity.
 
@@ -81,6 +90,8 @@ immutable workspace snapshot
 ```
 
 Promotion requires exact readback of every identity field. Upserts must be idempotent only when the existing row has the same identity and digest. Any differing value is an identity collision, revision mismatch, or content mismatch and must fail closed; never coerce a SHA-256 workspace revision into a legacy integer such as `0`.
+
+Do not add or require `workspace_revision` on a feature-row table solely to duplicate the cohort snapshot revision. First prove whether exact source bindings plus the CandidateOrdinalMap/matrix receipt preserve the required lineage losslessly. If they do not, ask the existing schema owner for the smallest reviewed provenance change. A nullable column is not a substitute for an admission contract, and a missing value must not be backfilled by inference.
 
 Reference standards: NIST FIPS 180-4 defines SHA-256 message digests; Python documents bytes as sequences of integers constrained to `0 <= x < 256`.
 
@@ -107,6 +118,14 @@ collision. Manifests must record `uuidAlgorithm`, `uuidNamespace`, `uuidName`, a
 DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU identifiers remain projection layers.
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
+
+## Embedding executor fallback
+
+- For read-only retrieval diagnostics, first health-check the configured approved embedding executors (including strict `:8081` and other configured services). If they are unavailable, retry with Ollama `embeddinggemma:latest` at `:11434` rather than abandoning the diagnostic immediately.
+- Label every result with its actual executor/provider and embedding recipe. Ollama fallback is an executor fallback, not proof of representation/recipe parity; equal model name or 768 dimensions alone is insufficient.
+- Keep fallback runs read-only: allow lookup-only cache access, disable cache population and all durable writes. Mark the result diagnostic/non-authoritative unless the exact model artifact, tokenizer, input policy, and representation revision are proven equivalent to the canonical recipe.
+- Never use Ollama fallback to authorize canonical embedding writes, backfills, Qdrant projection, or a canonical parity pass. If the fallback is used, report the primary-executor outage and keep the strict canonical gate blocked until parity is proven.
+- `:8090` is the Ornith synthesis endpoint, not an embedding fallback.
 
 ## GPU lane switch: WSL2 miniforge/conda work vs the Ornith :8090 server (2026-10-04)
 

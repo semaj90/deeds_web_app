@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-rmm-cpp-python",
+  "source_ref": "rapids-rmm-cpp-python:docs-rapids-ai-rmm-stable-stable",
+  "url": "https://docs.rapids.ai/api/rmm/stable/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "rmm",
+    "memory-resources",
+    "cpp",
+    "python",
+    "cuda",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "![country_code](https://www.nvidia.com/content/dam/1x1-00000000.png) [Skip to main content](https://docs.nvidia.com/rmm/latest/#main-content) Back to top`Ctrl` + `K` [![NVIDIA RMM - Home](https://docs.nvidia.com/rmm/latest/_static/nvidia-logo-horiz-rgb-blk-for-screen.svg)![NVIDIA RMM - Home](https://docs.nvidia.com/rmm/latest/_static/nvidia-logo-horiz-rgb-wht-for-screen.svg)\\\\ NVIDIA RMM](https://docs.nvidia.com/rmm/latest/#) Choose version - System Settings - Light - Dark - [GitHub](https://github.com/rapidsai/rmm) [Is this page helpful?](https://surveys.hotjar.com/4904bf71-6484-47a7-83ff-4715cceabdb5) # NVIDIA RMM Documentation [\\#](https://docs.nvidia.com/rmm/latest/\\#nvidia-rmm-documentation \"Link to this heading\") NVIDIA RMM is a library for CUDA memory management. Contents - [User Guide](https://docs.nvidia.com/rmm/latest/user_guide/guide/) - [Installation](https://docs.nvidia.com/rmm/latest/user_guide/guide/#installation) - [Migration Guides](https://docs.nvidia.com/rmm/latest/user_guide/guide/#migration-guides) - [Using RMM](https://docs.nvidia.com/rmm/latest/user_guide/guide/#using-rmm) - [Using RMM with third-party libraries](https://docs.nvidia.com/rmm/latest/user_guide/",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-rmm-cpp-python:docs-rapids-ai-rmm-stable-stable",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS RMM C++ and Python Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "36076516c2dc3813fda6aa9949a02f041aa79c520cf6c8f77e8b4a877a830199",
+  "markdown_path": "docs/.okf/dev/raw/rapids-rmm-cpp-python/docs-rapids-ai-rmm-stable-stable.md",
+  "fetched_at": "2026-10-09T05:38:03.735Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-rmm-cpp-python",
+    "source_title": "RAPIDS RMM C++ and Python Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "gpu",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-rmm-cpp-python/docs-rapids-ai-rmm-stable-stable.md"
+}

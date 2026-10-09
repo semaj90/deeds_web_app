@@ -515,6 +515,21 @@ DONE, `upstream_file_id` backfill still OPEN (100% null, unaffected by this repa
 column, separate task, `UPSTREAM-FILE-ID-BINDING-01`), `SOURCE-REF-KEY-CONVERGENCE-01` (path+fragment
 vs. bare-filename mismatch) still OPEN. The gate itself stays unchecked until both close.
 
+**Current-source symbol reconciliation follow-up (2026-10-08; read-only):** five current LangExtract
+source packets have exact admitted workspace bindings and 118 Graphify symbols whose file source
+revisions match those bindings. A direct crosswalk found zero existing `atlas_symbol_versions`
+rows by either exact upstream symbol/node ID, and the existing canonical resolver returned 118
+unresolved nominations with no active alias/key candidates. The reconciliation writer had also
+substituted the workspace digest for each nomination's source revision; it now selects both
+revisions from the exact workspace-source binding. A further fail-closed kind check excludes
+unsupported Graphify kinds instead of coercing them to `function`: 86 of 118 rows qualify under
+the canonical structural-kind vocabulary; 27 imports, 4 type aliases, and 1 export are excluded.
+All 86 remain unresolved. Bounded no-apply receipt:
+`.tmp/atlas/symbol-reconciliation-writer-lineage-dry-run-20261008-v5.json`; independent live
+crosswalk receipt `.tmp/atlas/live-approved-langextract-symbol-version-crosswalk-20261008.json`.
+This narrows, but does not close, the gate: stable-file/source-ref convergence remains open, and
+canonical identity creation remains disabled pending review. No registry/version writes occurred.
+
 **Dependency correction (2026-09-28; read-only cross-board trace):** `upstream_file_id` is a text
 observation in the current Drizzle symbol-version schema, not yet a canonical stable-file ID. The
 canonical stable-file population is a separate, frozen but unapplied S01-08K gate; its ledger

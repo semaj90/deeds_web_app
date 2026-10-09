@@ -269,9 +269,9 @@ async function main() {
   if (criticalPassed) {
     if (hasWarnings) {
       console.log('\n⚠️  CRITICAL SERVICES OK (warnings above)\n');
-      console.log('Optional services offline but graphify:daily can proceed\n');
+      console.log('Service checks passed; canonical projection admission is still required.\n');
     } else {
-      console.log('\n✅ ALL CHECKS PASSED — Ready for graphify:daily\n');
+      console.log('\n✅ SERVICE CHECKS PASSED — projection admission remains separate\n');
     }
 
     // Report schema conformance
@@ -282,7 +282,7 @@ async function main() {
     console.log(`  OpenTelemetry: ${otelServices.length > 0 ? otelServices.join(', ') : 'Not detected'}`);
     console.log();
 
-    console.log('Next: npm run graphify:daily\n');
+    console.log('Next: inspect canonical projection admission; run graphify:daily only when SAFE_TO_PROJECT\n');
     process.exit(0);
   } else {
     console.log('\n❌ CRITICAL SERVICES OFFLINE — Cannot proceed\n');

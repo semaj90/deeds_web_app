@@ -47,3 +47,11 @@ def test_rejects_executor_substitution_and_over_budget():
 def test_compatibility_mode_is_explicitly_unbound():
     receipt = validate_shared_residency_lease(None, expected_executor="cuvs", required=False)
     assert receipt["status"] == "UNBOUND_COMPATIBILITY_MODE"
+
+
+def test_accepts_cuml_executor_for_existing_kmeans_lane():
+    receipt = validate_shared_residency_lease(
+        lease(executor="cuml"), expected_executor="cuml", required=True
+    )
+    assert receipt["status"] == "SHARED_LEASE_ACCEPTED"
+    assert receipt["executor"] == "cuml"

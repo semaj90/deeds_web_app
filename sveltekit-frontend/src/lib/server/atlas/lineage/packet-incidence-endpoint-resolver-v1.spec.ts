@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { buildPacketIncidenceLineageV1, consumeExactRevisionIncidenceV1 } from './packet-incidence-lineage-v1.js';
 import {
-  expectedFromResolutionsV1, resolveIncidenceEndpointsV1, summarizeResolutionsV1, type AtlasPacketRowV1,
+	assertPacketIncidenceWorkspaceRevisionV1, expectedFromResolutionsV1, resolveIncidenceEndpointsV1, summarizeResolutionsV1, type AtlasPacketRowV1,
 } from './packet-incidence-endpoint-resolver-v1.js';
 
 const rows: AtlasPacketRowV1[] = [
@@ -13,7 +13,22 @@ const rows: AtlasPacketRowV1[] = [
 ];
 
 describe('incidence endpoint resolver', () => {
-  it('classifies resolved, missing, revisionless and source_ref-less endpoints and issues one batched read', async () => {
+	it('rejects packet readback from another or unknown workspace revision', () => {
+		const packetRows: AtlasPacketRowV1[] = [
+			{ packet_key: 'packet:current', source_ref: 'src/current.ts', source_revision: 'sha256:current', workspace_revision_key: 'git:current' },
+			{ packet_key: 'packet:stale', source_ref: 'src/stale.ts', source_revision: 'sha256:stale', workspace_revision_key: 'git:old' },
+		];
+		expect(() => assertPacketIncidenceWorkspaceRevisionV1(packetRows.slice(0, 1), 'git:current')).not.toThrow();
+		expect(() => assertPacketIncidenceWorkspaceRevisionV1(packetRows, 'git:current')).toThrow(
+			'PACKET_INCIDENCE_ENDPOINT_WORKSPACE_REVISION_MISMATCH:packet:stale',
+		);
+		expect(() => assertPacketIncidenceWorkspaceRevisionV1([
+			{ packet_key: 'packet:unknown', source_ref: 'src/unknown.ts', source_revision: 'sha256:unknown' },
+		], 'git:current')).toThrow('PACKET_INCIDENCE_ENDPOINT_WORKSPACE_REVISION_MISMATCH:packet:unknown');
+		expect(() => assertPacketIncidenceWorkspaceRevisionV1([], '  ')).toThrow('PACKET_INCIDENCE_WORKSPACE_REVISION_REQUIRED');
+	});
+
+	it('classifies resolved, missing, revisionless and source_ref-less endpoints and issues one batched read', async () => {
     const fetch = vi.fn(async (keys: string[]) => rows.filter((r) => keys.includes(r.packet_key)));
     const resolveCanonicalId = async (key: string) => key === 'packet:aaa' ? 'packet:00000000-0000-5000-8000-000000000001' : null;
     const res = await resolveIncidenceEndpointsV1(['packet:aaa', 'packet:aaa', 'packet:old', 'packet:nosr', 'packet:ghost'], fetch, resolveCanonicalId);

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { compileExperimentFeatureMatrix, AnalysisPassResultSchema } from './nlp-feature-compiler';
+import {
+	compileEventHypergraphBundle,
+	compileExperimentFeatureMatrix,
+	AnalysisPassResultSchema,
+} from './nlp-feature-compiler';
 
 const now = '2026-08-09T00:00:00.000Z';
 
@@ -186,5 +190,19 @@ describe('compileExperimentFeatureMatrix', () => {
 			workspaceRevision: 'workspace-v1',
 			passResults: qualifiedPasses,
 		})).toThrow(/packet/i);
+	});
+});
+
+describe('compileEventHypergraphBundle representation lineage', () => {
+	it('rejects missing representation revision instead of substituting source revision', () => {
+		expect(() => compileEventHypergraphBundle({
+			requestId: 'req:representation-unqualified',
+			packetKey: 'packet:1',
+			sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v1',
+			passResults,
+			experimentFeatureMatrix: null,
+		})).toThrow(/representationRevision is required/i);
 	});
 });

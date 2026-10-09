@@ -29,6 +29,63 @@ export const PrimeAgentRuntimeV1Schema = z.object({
 }).strict();
 export type PrimeAgentRuntimeV1 = z.infer<typeof PrimeAgentRuntimeV1Schema>;
 
+const actionIdList = z.array(z.string().min(1)).max(128).superRefine((values, ctx) => {
+  if (new Set(values).size !== values.length) ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'ACTION_IDS_MUST_BE_UNIQUE' });
+});
+
+const AgentPlanAcceptanceReceiptV1BodySchema = z.object({
+  schema: z.literal('atlas.agent-plan-acceptance-receipt.v1'),
+  requestId: z.string().min(1),
+  executionId: z.string().min(1),
+  planRevision: z.string().min(1),
+  planChecksum: sha256,
+  fromState: z.literal('PLAN'),
+  toState: z.literal('PLAN_VALIDATED'),
+  consumedActionIds: actionIdList,
+  planningActionIds: actionIdList,
+  allowedNextActionIds: actionIdList,
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict();
+
+export const AgentPlanAcceptanceReceiptV1Schema = AgentPlanAcceptanceReceiptV1BodySchema.extend({ receiptChecksum: sha256 }).strict().superRefine((receipt, ctx) => {
+  if (receipt.consumedActionIds.length === 0) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['consumedActionIds'], message: 'PLAN_ACCEPTANCE_REQUIRES_CONSUMED_ACTION' });
+  const planningIds = new Set(receipt.planningActionIds);
+  if (receipt.allowedNextActionIds.some((actionId) => planningIds.has(actionId))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['allowedNextActionIds'], message: 'PLANNING_ACTION_CANNOT_FOLLOW_ACCEPTANCE' });
+  }
+  const { receiptChecksum, ...body } = receipt;
+  if (receiptChecksum !== checksum(body)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['receiptChecksum'], message: 'PLAN_ACCEPTANCE_RECEIPT_CHECKSUM_MISMATCH' });
+});
+export type AgentPlanAcceptanceReceiptV1 = z.infer<typeof AgentPlanAcceptanceReceiptV1Schema>;
+
+export function acceptAgentPlanV1(input: Omit<AgentPlanAcceptanceReceiptV1, 'schema' | 'fromState' | 'toState' | 'canonicalAuthority' | 'writesPerformed' | 'receiptChecksum'>): AgentPlanAcceptanceReceiptV1 {
+  const body = AgentPlanAcceptanceReceiptV1BodySchema.parse({
+    schema: 'atlas.agent-plan-acceptance-receipt.v1',
+    ...input,
+    fromState: 'PLAN',
+    toState: 'PLAN_VALIDATED',
+    canonicalAuthority: false,
+    writesPerformed: false,
+  });
+  return AgentPlanAcceptanceReceiptV1Schema.parse({ ...body, receiptChecksum: checksum(body) });
+}
+
+export function assertAgentActionAllowedAfterPlanAcceptanceV1(input: {
+  receipt: AgentPlanAcceptanceReceiptV1;
+  requestId: string;
+  executionId: string;
+  planRevision: string;
+  planChecksum: string;
+  actionId: string;
+}): void {
+  const receipt = AgentPlanAcceptanceReceiptV1Schema.parse(input.receipt);
+  if (receipt.requestId !== input.requestId || receipt.executionId !== input.executionId) throw new Error('PLAN_ACCEPTANCE_RUN_BINDING_MISMATCH');
+  if (receipt.planRevision !== input.planRevision || receipt.planChecksum !== input.planChecksum) throw new Error('PLAN_ACCEPTANCE_REVISION_MISMATCH');
+  if (receipt.consumedActionIds.includes(input.actionId) || receipt.planningActionIds.includes(input.actionId)) throw new Error('PLAN_ACTION_ALREADY_CONSUMED');
+  if (!receipt.allowedNextActionIds.includes(input.actionId)) throw new Error('ACTION_NOT_ALLOWED_AFTER_PLAN_ACCEPTANCE');
+}
+
 export const AgentActionProposalV1Schema = z.object({
   schema: z.literal('atlas.agent-action-proposal.v1'),
   proposalId: z.string().min(1),

@@ -40,7 +40,10 @@ function admissionCandidate(value, explicitSnapshotRevision) {
   if (!workspaceRevision) return null;
   const snapshotRevision = snapshotRevisionFrom(value);
   if (explicitSnapshotRevision && snapshotRevision !== explicitSnapshotRevision) return null;
-  return { workspaceRevision, snapshotRevision, source: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT', authority: true };
+  return {
+    workspaceRevision, snapshotRevision, source: 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT', authority: true,
+    admissionMode: clean(value.admissionMode) || null,
+  };
 }
 
 function snapshotAuthorityCandidate(value, explicitSnapshotRevision) {
@@ -126,6 +129,7 @@ export function resolveCurrentWorkspaceFrameV1({
     selectedSnapshotRevision: selected?.snapshotRevision ?? explicitSnapshotRevision ?? null,
     selectedSource: selected?.source ?? null,
     selectedAuthority: selected?.authority === true,
+    selectedAdmissionMode: selected?.admissionMode ?? null,
     explicitOverride: selected?.explicitOverride === true,
     manifestPath,
     explicitSnapshotRevision,
@@ -158,8 +162,10 @@ export function resolveCurrentWorkspaceFrameV1({
  * relaxing what "authoritative" itself means.
  */
 export function computeWorkspaceFrameAuthorityV1(frame) {
+  // WSR-08b: a deliberately admitted PRIOR_IMMUTABLE_SNAPSHOT is not current-workspace authority.
   const frameAuthoritative = frame.status === 'CURRENT_WORKSPACE_FRAME_SELECTED'
     && frame.selectedAuthority === true
+    && frame.selectedAdmissionMode !== 'PRIOR_IMMUTABLE_SNAPSHOT'
     && frame.authorityConflict === false
     && Array.isArray(frame.blockers)
     && frame.blockers.length === 0;
@@ -169,4 +175,76 @@ export function computeWorkspaceFrameAuthorityV1(frame) {
     canonicalAuthority: frameAuthoritative,
     promotionEligible: frameAuthoritative,
   };
+}
+
+/**
+ * WSR-08a/08c: VALID / CURRENT / ADMITTED split. Pure and additive: it does not change
+ * `resolveCurrentWorkspaceFrameV1()`, `computeWorkspaceFrameAuthorityV1()` or the admission receipt
+ * shape. A frame can be admitted without being current, and a snapshot can be valid without being
+ * admitted; consumers must state which question they are asking via `requireWorkspaceFrameForPurposeV1`.
+ *
+ * Inputs are evidence the CALLER already holds (no live reads here):
+ *  - `frame`: the object returned by `resolveCurrentWorkspaceFrameV1()`
+ *  - `validationReceipt`: a seal-time readback receipt (e.g. `workspace-snapshot-reseal-v1.json`)
+ *  - `validationReceiptSha256`: caller-computed digest of that receipt
+ *  - `currentWorkspaceRevision`: the revision of the live workspace right now, or null when the
+ *    caller cannot evaluate it (then currentness is UNKNOWN, never assumed true)
+ *  - `admission`: the admission receipt, for the optional additive fields (admissionMode,
+ *    supersededByWorkspaceRevision, manifestSha256); legacy receipts lack them (null).
+ */
+export const WORKSPACE_FRAME_STATE_REVISION = 'atlas.workspace-frame-state.v1';
+export const WORKSPACE_FRAME_PURPOSES = Object.freeze(['CURRENT_WORKSPACE', 'HISTORICAL_EXACT_SNAPSHOT', 'READ_ONLY_COMPARISON']);
+
+export function classifyWorkspaceFrameStateV1({
+  frame,
+  validationReceipt = null,
+  validationReceiptSha256 = null,
+  currentWorkspaceRevision = null,
+  admission = null,
+} = {}) {
+  if (!frame || typeof frame !== 'object') throw new Error('WORKSPACE_FRAME_STATE_FRAME_REQUIRED');
+  const workspaceRevision = clean(frame.selectedWorkspaceRevision) || null;
+  const snapshotRevision = clean(frame.selectedSnapshotRevision) || null;
+  const admitted = frame.status === 'CURRENT_WORKSPACE_FRAME_SELECTED'
+    && frame.selectedSource === 'WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT'
+    && frame.selectedAuthority === true
+    && frame.authorityConflict === false
+    && Array.isArray(frame.blockers) && frame.blockers.length === 0;
+  const snapshotValid = validationReceipt && snapshotRevision
+    ? validationReceipt.snapshotRevision === snapshotRevision
+      && validationReceipt.status === 'RESEAL_READBACK_PROVEN'
+      && validationReceipt.totalViolations === 0
+      && validationReceipt.sourceCount === validationReceipt.exactMatches
+    : null;
+  const liveRevision = clean(currentWorkspaceRevision) || null;
+  const currentAtEvaluation = liveRevision && workspaceRevision ? liveRevision === workspaceRevision : null;
+  return {
+    schema: WORKSPACE_FRAME_STATE_REVISION,
+    workspaceRevision,
+    snapshotRevision,
+    admitted,
+    snapshotValid,
+    currentAtEvaluation,
+    admissionMode: admitted ? (clean(frame.selectedAdmissionMode) || clean(admission?.admissionMode) || null) : null,
+    supersededByWorkspaceRevision: currentAtEvaluation === false ? liveRevision : (clean(admission?.supersededByWorkspaceRevision) || null),
+    manifestSha256: clean(admission?.manifestSha256) || null,
+    validationReceiptSha256: clean(validationReceiptSha256) || null,
+  };
+}
+
+/** Answers "is this frame usable for THIS purpose?" without collapsing valid/current/admitted. */
+export function requireWorkspaceFrameForPurposeV1(state, purpose) {
+  if (!WORKSPACE_FRAME_PURPOSES.includes(purpose)) throw new Error(`WORKSPACE_FRAME_PURPOSE_UNKNOWN:${purpose}`);
+  const blockers = [];
+  if (purpose === 'CURRENT_WORKSPACE') {
+    if (state.admitted !== true) blockers.push('FRAME_NOT_ADMITTED');
+    if (state.currentAtEvaluation === null) blockers.push('CURRENT_NOT_EVALUATED');
+    else if (state.currentAtEvaluation === false) blockers.push('FRAME_SUPERSEDED_BY_CURRENT_WORKSPACE');
+  } else if (purpose === 'HISTORICAL_EXACT_SNAPSHOT') {
+    if (state.admitted !== true) blockers.push('FRAME_NOT_ADMITTED');
+    if (state.snapshotValid !== true) blockers.push('SNAPSHOT_VALIDITY_NOT_PROVEN');
+  } else if (state.snapshotValid !== true) {
+    blockers.push('SNAPSHOT_VALIDITY_NOT_PROVEN');
+  }
+  return { purpose, ok: blockers.length === 0, blockers };
 }

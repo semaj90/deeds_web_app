@@ -1,0 +1,60 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "simdjson-project",
+  "source_ref": "simdjson-project:github-com-simdjson-simdjson-simdjson",
+  "url": "https://github.com/simdjson/simdjson",
+  "title": "github.com",
+  "domain_class": "tool",
+  "focus_tags": [
+    "simdjson",
+    "jsonl",
+    "streaming_parse",
+    "native_boundary",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "github.com",
+    "markdown_excerpt": "[Skip to content](https://github.com/simdjson/simdjson#start-of-content) You signed in with another tab or window. [Reload](https://github.com/simdjson/simdjson) to refresh your session.You signed out in another tab or window. [Reload](https://github.com/simdjson/simdjson) to refresh your session.You switched accounts on another tab or window. [Reload](https://github.com/simdjson/simdjson) to refresh your session.Dismiss alert {{ message }} [simdjson](https://github.com/simdjson)/ **[simdjson](https://github.com/simdjson/simdjson)** Public - [Notifications](https://github.com/login?return_to=%2Fsimdjson%2Fsimdjson) You must be signed in to change notification settings - [Fork\\\\ 1.3k](https://github.com/login?return_to=%2Fsimdjson%2Fsimdjson) - [Star\\\\ 24.4k](https://github.com/login?return_to=%2Fsimdjson%2Fsimdjson) master [**69** Branches](https://github.com/simdjson/simdjson/branches) [**128** Tags](https://github.com/simdjson/simdjson/tags) [Go to Branches page](https://github.com/simdjson/simdjson/branches)[Go to Tags page](https://github.com/simdjson/simdjson/tags) Go to file Code Open more actions menu ## Latest commit ![mvanslobbe](https://avatars.githubusercontent.com/u/264",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:simdjson-project:github-com-simdjson-simdjson-simdjson",
+    "title": "github.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh simdjson project documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "fa39423fc2f137310c104ea95e0b8302a6417ddea1ed8599d5b693f53a416ba2",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\simdjson-project\\github-com-simdjson-simdjson-simdjson.md",
+  "fetched_at": "2026-10-06T20:09:48.279Z",
+  "metadata": {
+    "kind": "official_project_documentation",
+    "source_id": "simdjson-project",
+    "source_title": "simdjson project documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v3\\raw\\simdjson-project\\github-com-simdjson-simdjson-simdjson.md"
+}

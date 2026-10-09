@@ -1,0 +1,58 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "redis-valkey",
+  "source_ref": "redis-valkey:valkey-io-topics-valkey-json-valkey-json",
+  "url": "https://valkey.io/topics/valkey-json/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "key_value",
+    "expiry",
+    "streams",
+    "pubsub",
+    "ace",
+    "bitfrost",
+    "json_packets",
+    "vector_similarity",
+    "optional_search_module",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation: Valkey JSON In Valkey, the JSON data type and commands are implemented in the [valkey-json](https://github.com/valkey-io/valkey-json) module which is an official valkey module compatible with versions 8.0 and above. Users will need to load this module onto their valkey server in order to use this feature. Valkey JSON is a Valkey module written in C++ that provides native JSON (JavaScript Object Notation) support for Valkey. The implementation complies with [RFC7159](https://www.ietf.org/rfc/rfc7159.txt) and [ECMA-404](https://www.ietf.org/rfc/rfc7159.txt) JSON data interchange standards. Users can natively store, query, and modify JSON data structures using the JSONPath query language. The query expressions support advanced capabilities including wildcard selections, filter expressions, array slices, union operations, and recursive searches. ## Example Valkey JSON Commands - `JSON.SET` sets JSON values at the path. - `JSON.GET` gets the serialized JSON at one o",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:redis-valkey:valkey-io-topics-valkey-json-valkey-json",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Redis and Valkey Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "c8e700869adcb86c1e89db3a73c39f9fb947320aaa87793c9cf8feeb3225c701",
+  "markdown_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-valkey-json-valkey-json.md",
+  "fetched_at": "2026-10-09T05:16:32.736Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "redis-valkey",
+    "source_title": "Redis and Valkey Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-valkey-json-valkey-json.md"
+}

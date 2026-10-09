@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "redis-valkey",
+  "source_ref": "redis-valkey:valkey-io-topics-topics",
+  "url": "https://valkey.io/topics/",
+  "title": "valkey.io",
+  "domain_class": "cache",
+  "focus_tags": [
+    "key_value",
+    "expiry",
+    "streams",
+    "pubsub",
+    "ace",
+    "bitfrost",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "valkey.io",
+    "markdown_excerpt": "**[Save Your Spot for ValkeyConf 2026](https://events.linuxfoundation.org/valkeyconf)** \\| October 5, 2026 \\| Prague, Czechia [![Icon Close](https://valkey.io/img/icon-outline-close.svg)](https://valkey.io/) # Documentation by Topic The Valkey documentation is managed in markdown files in the [valkey-doc repository](https://github.com/valkey-io/valkey-doc). It's released under the [Creative Commons Attribution-ShareAlike 4.0 International license](https://creativecommons.org/licenses/by-sa/4.0/). # Valkey Documentation ## 1\\. Introduction - What is Valkey? See [Introduction](https://valkey.io/topics/introduction). - [Quick start](https://valkey.io/topics/quickstart): Get started with Valkey. - [Valkey Bundle](https://valkey.io/topics/valkey-bundle): Get started with Valkey Bundle. - [FAQ](https://valkey.io/topics/faq): Frequently asked questions. ## 2\\. Developer Guide ### Core Concepts - [Data types](https://valkey.io/topics/data-types): Keys are strings, but values can be of many different data types. - [The full list of commands](https://valkey.io/commands/), with documentation for each of them. - [Pipelining](https://valkey.io/topics/pipelining): How to send multiple commands a",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "cache",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:redis-valkey:valkey-io-topics-topics",
+    "title": "valkey.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Redis and Valkey Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "9a898c8fcdd6ee77b1411e3a4b7a1bb43f5979ce21a3aed1eea2ddae7902ec0d",
+  "markdown_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-topics.md",
+  "fetched_at": "2026-10-09T00:44:49.010Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "redis-valkey",
+    "source_title": "Redis and Valkey Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/redis-valkey/valkey-io-topics-topics.md"
+}

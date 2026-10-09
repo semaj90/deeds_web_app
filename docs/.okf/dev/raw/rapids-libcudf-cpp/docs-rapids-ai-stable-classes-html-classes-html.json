@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-libcudf-cpp",
+  "source_ref": "rapids-libcudf-cpp:docs-rapids-ai-stable-classes-html-classes-html",
+  "url": "https://docs.rapids.ai/api/libcudf/stable/classes.html",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "libcudf",
+    "cpp",
+    "cuda",
+    "memory-resources",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "[Home](https://docs.rapids.ai/api) libcudf [cudf-java](https://docs.rapids.ai/api/cudf-java/stable) [libcudf](https://docs.rapids.ai/api/libcudf/stable/namespacecudf/) [libcuml](https://docs.rapids.ai/api/libcuml/stable) [libkvikio](https://docs.rapids.ai/api/libkvikio/stable) [librapidsmpf](https://docs.rapids.ai/api/librapidsmpf/stable) [libucxx](https://docs.rapids.ai/api/libucxx/stable) [ucxx](https://docs.rapids.ai/api/ucxx/stable) stable (26.08) [stable (26.08)](https://docs.rapids.ai/api/libcudf/stable/namespacecudf/) [legacy (26.06)](https://docs.rapids.ai/api/libcudf/legacy/namespacecudf/) - [Main Page](https://docs.rapids.ai/api/libcudf/stable/index.html) - [Related Pages](https://docs.rapids.ai/api/libcudf/stable/pages.html) - [Developer Guide](https://docs.rapids.ai/api/libcudf/stable/DEVELOPER_GUIDE.html) - [Modules](https://docs.rapids.ai/api/libcudf/stable/modules.html) - [Namespaces](https://docs.rapids.ai/api/libcudf/stable/namespaces.html) - [Namespace List](https://docs.rapids.ai/api/libcudf/stable/namespaces.html) - [Namespace Members](https://docs.rapids.ai/api/libcudf/stable/namespacemembers.html) - [All](https://docs.rapids.ai/api/libcudf/stable/namespacememb",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-libcudf-cpp:docs-rapids-ai-stable-classes-html-classes-html",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS libcudf C++ Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "664538dba536c1957413716e0dedfbf9052dbd769be93a25da5a9c6c23b58420",
+  "markdown_path": "docs/.okf/dev/raw/rapids-libcudf-cpp/docs-rapids-ai-stable-classes-html-classes-html.md",
+  "fetched_at": "2026-10-09T05:35:09.802Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-libcudf-cpp",
+    "source_title": "RAPIDS libcudf C++ Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-libcudf-cpp/docs-rapids-ai-stable-classes-html-classes-html.md"
+}

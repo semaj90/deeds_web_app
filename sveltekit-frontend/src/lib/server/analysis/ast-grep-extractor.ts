@@ -86,12 +86,12 @@ function detectLang(hint?: string): SgLang {
 	return 'TypeScript';
 }
 
-function nodeRange(node: SgNode): { lineNumber: number; byteStart: number; byteEnd: number } {
+function nodeRange(node: SgNode, sourceText: string): { lineNumber: number; byteStart: number; byteEnd: number } {
 	const range = node.range();
 	return {
 		lineNumber: range.start.line + 1,
-		byteStart: range.start.index,
-		byteEnd: range.end.index,
+		byteStart: Buffer.byteLength(sourceText.slice(0, range.start.index), 'utf8'),
+		byteEnd: Buffer.byteLength(sourceText.slice(0, range.end.index), 'utf8'),
 	};
 }
 
@@ -186,7 +186,7 @@ export async function extractAstFeatures(
 	for (const node of root.root().findAll({ rule: { kind: 'function_declaration' } })) {
 		const nameNode = node.child(1);
 		const name = nameNode?.text() ?? '<anon>';
-		const range = nodeRange(node);
+		const range = nodeRange(node, code);
 		const key = `fn:${name}:${range.byteStart}:${range.byteEnd}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
@@ -211,7 +211,7 @@ export async function extractAstFeatures(
 		const arrow = declarator.find({ rule: { kind: 'arrow_function' } });
 		if (!arrow) continue;
 		const name = declarator.child(0)?.text() ?? '<anon>';
-		const range = nodeRange(node);
+		const range = nodeRange(node, code);
 		const key = `arrow:${name}:${range.byteStart}:${range.byteEnd}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
@@ -231,7 +231,7 @@ export async function extractAstFeatures(
 	for (const node of root.root().findAll({ rule: { kind: 'class_declaration' } })) {
 		const nameNode = node.find({ rule: { kind: 'type_identifier' } });
 		const name = nameNode?.text() ?? '<anon>';
-		const range = nodeRange(node);
+		const range = nodeRange(node, code);
 		const key = `cls:${name}:${range.byteStart}:${range.byteEnd}`;
 		if (seen.has(key)) continue;
 		seen.add(key);
@@ -251,7 +251,7 @@ export async function extractAstFeatures(
 		for (const method of node.findAll({ rule: { kind: 'method_definition' } })) {
 			const mName = method.child(0)?.text() ?? '<anon>';
 			if (['constructor', 'get', 'set'].includes(mName)) continue;
-			const methodRange = nodeRange(method);
+			const methodRange = nodeRange(method, code);
 			const mKey = `method:${name}.${mName}:${methodRange.byteStart}:${methodRange.byteEnd}`;
 			if (seen.has(mKey)) continue;
 			seen.add(mKey);
@@ -292,7 +292,7 @@ export async function extractDependencyFeatures(
 		const moduleName = spec?.text() ?? node.text().match(/['\"]([^'\"]+)['\"]/)?.[1] ?? '';
 		if (!moduleName || seen.has(moduleName)) continue;
 		seen.add(moduleName);
-		const range = nodeRange(node);
+		const range = nodeRange(node, code);
 		features.push(qualifyFeature({
 			type: 'ast_import',
 			name: moduleName,
@@ -326,7 +326,7 @@ export async function extractComplexityFeatures(
 		const lineCount = fnText.split('\n').length;
 		if (lineCount <= 50) continue;
 		const name = node.child(1)?.text() ?? '<anon>';
-		const range = nodeRange(node);
+		const range = nodeRange(node, code);
 		features.push(qualifyFeature({
 			type: 'ast_function',
 			name,

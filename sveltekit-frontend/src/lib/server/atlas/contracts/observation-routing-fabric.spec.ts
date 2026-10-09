@@ -9,6 +9,8 @@ describe('Observation Routing Fabric contracts', () => {
     const input = {
       packetKey: 'packet:db-upsert',
       sourceRef: 'src/lib/db/upsert.ts',
+      sourceRevision: `sha256:${'a'.repeat(64)}`,
+      registryRevision: 'orf-registry:fixture-v1',
       treeNodeId: 'tree:42',
       sourceVersionReceiptId: 'svr:abc',
       representationId: 'semantic_768',
@@ -36,10 +38,30 @@ describe('Observation Routing Fabric contracts', () => {
     expect(first.evidenceRefs).toEqual(['evidence:1', 'evidence:2']);
   });
 
+  it('binds source and feature-registry revisions into the projection digest', () => {
+    const base = {
+      packetKey: 'packet:lineage',
+      sourceRef: 'src/lineage.ts',
+      sourceRevision: `sha256:${'c'.repeat(64)}`,
+      registryRevision: 'orf-registry:r1',
+      evidenceRefs: ['source-span:src/lineage.ts:0-10'],
+      featureRevision: 'orf:r1',
+      producerRevision: 'producer:r1',
+    };
+    const original = buildObservationFeatureProjectionV1(base);
+    const changedSource = buildObservationFeatureProjectionV1({ ...base, sourceRevision: `sha256:${'d'.repeat(64)}` });
+    const changedRegistry = buildObservationFeatureProjectionV1({ ...base, registryRevision: 'orf-registry:r2' });
+
+    expect(changedSource.inputDigest).not.toBe(original.inputDigest);
+    expect(changedRegistry.inputDigest).not.toBe(original.inputDigest);
+  });
+
   it('builds semantic_768 + latent_64 router rows without conflating representations', () => {
     const observation = buildObservationFeatureProjectionV1({
       packetKey: 'packet:qdrant-upsert',
       sourceRef: 'src/lib/qdrant/upsert.ts',
+      sourceRevision: `sha256:${'b'.repeat(64)}`,
+      registryRevision: 'orf-registry:fixture-v7',
       treeNodeId: 'tree:99',
       sourceVersionReceiptId: 'svr:99',
       representationId: 'semantic_768',
@@ -118,6 +140,7 @@ describe('Observation Routing Fabric contracts', () => {
     const observation = buildObservationFeatureProjectionV1({
       packetKey: 'packet:a',
       sourceRef: 'src/a.ts',
+      registryRevision: 'orf-registry:fixture-v1',
       featureRevision: 'orf:1',
       producerRevision: 'test:1',
     });

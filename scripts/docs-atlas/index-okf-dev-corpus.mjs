@@ -12,9 +12,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Project, SyntaxKind } from 'ts-morph';
+import { resolveOkfDevIndexRootV1 } from './lib/okf-dev-index-root-v1.mjs';
 
 const ROOT = process.cwd();
-const CORPUS_ROOT = path.join(ROOT, 'docs/.okf/dev');
+const corpusRootArg = process.argv.find((argument) => argument.startsWith('--corpus-root='))?.slice('--corpus-root='.length);
+const CORPUS_ROOT = resolveOkfDevIndexRootV1({ repoRoot: ROOT, requestedRoot: corpusRootArg });
 const RAW_ROOT = path.join(CORPUS_ROOT, 'raw');
 const SYMBOLS_PATH = path.join(CORPUS_ROOT, 'symbol-index.jsonl');
 const SUMMARY_PATH = path.join(CORPUS_ROOT, 'symbol-summary.json');
@@ -88,7 +90,7 @@ function astGrepSymbols(text, language) {
     if (declaration) {
       const [kind, nameKinds] = declaration;
       const name = firstNamedChild(node, nameKinds);
-      if (name) symbols.push({ kind, name: name.text(), line: node.startPosition().row + 1 });
+      if (name) symbols.push({ kind, name: name.text(), line: node.range().start.line + 1 });
     }
     for (const child of node.children()) visit(child);
   };

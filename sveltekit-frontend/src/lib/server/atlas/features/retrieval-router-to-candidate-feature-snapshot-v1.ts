@@ -115,6 +115,15 @@ export function materializeCandidateFeatureSnapshotFromQasRowsV1(input: {
   producerRevision: string;
   laneMaskByCanonicalId: Readonly<Record<string, readonly CandidateFeatureLaneV1[]>>;
 }): CandidateFeatureSnapshotV1 {
+  return materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1(input).snapshot;
+}
+
+export function materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1(input: {
+  rows: readonly z.input<typeof QueryAdaptiveFeatureRowV1Schema>[];
+  candidateSnapshotRevision: string;
+  producerRevision: string;
+  laneMaskByCanonicalId: Readonly<Record<string, readonly CandidateFeatureLaneV1[]>>;
+}): { ordinalMap: CandidateOrdinalMapV1; snapshot: CandidateFeatureSnapshotV1 } {
   const rows = input.rows.map((row) => QueryAdaptiveFeatureRowV1Schema.parse(row));
   if (rows.length === 0) throw new Error('ACE_QAS_SNAPSHOT_EMPTY');
   const workspaceRevision = rows[0]!.workspaceRevision;
@@ -176,10 +185,11 @@ export function materializeCandidateFeatureSnapshotFromQasRowsV1(input: {
       evidenceRefs: row.evidenceRefs,
     };
   });
-  return materializeCandidateFeatureSnapshot({
+  const snapshot = materializeCandidateFeatureSnapshot({
     ordinalMap,
     rows: mappedRows,
     featureRevision,
     producerRevision: input.producerRevision,
   });
+  return { ordinalMap, snapshot };
 }

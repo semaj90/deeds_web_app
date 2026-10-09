@@ -1,0 +1,413 @@
+{
+  "schema": "atlas.graphify-structural-projection-diagnostic-run.v1",
+  "observedAt": "2026-10-05T16:51:25Z",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "execution": {
+    "operation": "executeAtlasOperationV1",
+    "provider": "treesitter-chunker-8095",
+    "endpoint": "http://127.0.0.1:8095",
+    "providerHealth": "ok",
+    "route": "direct production operation module; live tRPC HTTP transport not exercised",
+    "canonicalAuthority": false,
+    "persistence": "NOT_ATTEMPTED",
+    "writesPerformed": false
+  },
+  "source": {
+    "sourceRef": "src/lib/server/atlas/indexing/graphify-structural-materializer.ts",
+    "byteLength": 10034,
+    "parserCorrelationToken": "sha256:6fc3827b49b36f0eef1cbeb889546c54743258fceb5faa3838a28b02bb47790a",
+    "parserCorrelationTokenIsCanonicalSourceRevision": false
+  },
+  "workspace": {
+    "inputHint": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "inputHintAuthority": "UNPROVEN_HISTORICAL_VALUE",
+    "workspaceBindingVerified": false,
+    "graphRevision": null
+  },
+  "result": {
+    "operationStatus": "SUCCESS",
+    "providerStatus": "PROVEN",
+    "structuralStatus": "COMPILED",
+    "projectionStatus": "BLOCKED_WORKSPACE_BINDING",
+    "strictProjectionMapper": "NOT_INVOKED_SOURCE_BINDING_REQUIRED",
+    "counts": {
+      "chunks": 47,
+      "rawEdges": 246,
+      "compiledFacts": 214,
+      "compiledCoordinates": 47,
+      "spanEvidenceCandidates": 214,
+      "evidenceMapEntries": 0,
+      "sourceSymbolNominated": 95,
+      "sourceSpanPresent": 214,
+      "sourceEligible": 95,
+      "targetSymbolNominated": 0,
+      "bothSymbolEndpointsNominated": 0,
+      "workspaceQualified": 0,
+      "graphQualified": 0,
+      "admissible": 0,
+      "rejectedFacts": 214
+    },
+    "rawEdgeKinds": {
+      "IMPORTS": 4,
+      "REFERENCES": 140,
+      "DEFINES": 32,
+      "EXPORTS": 14,
+      "CALLS": 56
+    },
+    "failureCounts": {
+      "GRAPHIFY_EDGE_SUBJECT_SYMBOL_UNMAPPED": 119,
+      "GRAPHIFY_EDGE_TARGET_SYMBOL_UNRESOLVED": 95,
+      "WORKSPACE_REVISION_UNBOUND": 214,
+      "GRAPH_REVISION_MISSING": 214
+    },
+    "diagnostics": [
+      "PARSER_SOURCE_REVISION_TOKEN_MISMATCH",
+      "SOURCE_REVISION_AUTHORITY_UNPROVEN",
+      "AST_RELATION_GRAPH_DEFERRED:SOURCE_REVISION_AUTHORITY_UNPROVEN",
+      "PROJECTION_MAPPER_BLOCKED_SOURCE_BINDING"
+    ]
+  },
+  "importSubjectSample": {
+    "edgeType": "IMPORTS",
+    "subjectNodeType": "import_statement",
+    "subjectKind": "import",
+    "subjectHasLocalSymbolNomination": false,
+    "targetHasLocalSymbolNomination": false,
+    "targetResolution": "syntax_only"
+  },
+  "interpretation": [
+    "The live sidecar output now reaches structural compilation in memory.",
+    "Import declarations are emitted as non-symbol chunks; do not fabricate a symbol subject.",
+    "Target symbol nomination remains zero in this cohort.",
+    "Span candidates are not projection evidence-map entries; exact source binding is still required.",
+    "The historical workspace hint was supplied only to run diagnostic compilation and is not accepted as snapshot authority."
+  ],
+  "databaseOrGraphWrites": false,
+  "schemaApplied": false,
+  "validation": {
+    "focusedTestCommand": "npx vitest run src/lib/server/atlas/operations/atlas-operation-runtime-v1.spec.ts src/lib/server/trpc/routers/ast-sidecar.spec.ts",
+    "testFilesPassed": 2,
+    "testsPassed": 7,
+    "result": "PASS",
+    "incidenceContractTestCommand": "npx vitest run src/lib/server/atlas/indexing/graphify-packet-incidence-materializer-v1.spec.ts src/lib/server/atlas/indexing/graphify-packet-incidence-endpoint-resolver-v1.spec.ts src/lib/server/atlas/lineage/packet-incidence-endpoint-resolver-v1.spec.ts src/lib/server/atlas/lineage/packet-incidence-lineage-v1.spec.ts src/lib/server/atlas/integration/kag-hypergraph-reader-v1.spec.ts",
+    "incidenceContractTestFilesPassed": 5,
+    "incidenceContractTestsPassed": 31,
+    "incidenceContractResult": "PASS"
+  },
+  "readOnlyDatabaseCensus": {
+    "observedAt": "2026-10-05",
+    "transactionReadOnly": true,
+    "sourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-materializer.ts",
+    "localSourceRevision": "sha256:6fc3827b49b36f0eef1cbeb889546c54743258fceb5faa3838a28b02bb47790a",
+    "localByteLength": 10034,
+    "graphifyFileRows": [
+      {
+        "workspaceRevision": "sha256:e0dc2711f632e38607cb19fe3ca74e9e37ff864027857062e6e4be6ac86241bb",
+        "sourceRevision": "b05e25b18ec817b9c21aafdf39196465e206179e",
+        "codeSourceRevision": "sha256:6fc3827b49b36f0eef1cbeb889546c54743258fceb5faa3838a28b02bb47790a",
+        "sourceRevisionAuthority": null,
+        "producerRevision": null,
+        "lastRunStatus": "COMPLETED",
+        "lastRunCompletedAt": "2026-09-05T23:06:59.988Z",
+        "sourceManifestSourceCount": 23758,
+        "coordinatorExecutionCountForWorkspace": 0,
+        "executionAuthorityRowsForWorkspace": 0,
+        "sourceManifestDigestIsGraphRevisionProof": false
+      },
+      {
+        "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+        "sourceRevision": "85e6f3d509856c75d77e175fc823623c2cd4e18c",
+        "codeSourceRevision": "sha256:0f211b4dc26c2b2a0a05a361811efa893cbf01bdc7de10a44e13d3de5739e129",
+        "sourceRevisionAuthority": null,
+        "producerRevision": null,
+        "lastRunStatus": "COMPLETED",
+        "sourceManifestDigestIsGraphRevisionProof": false
+      }
+    ],
+    "admittedSourceBindingsForGraphifyWorkspace": 0,
+    "sameSourceRevisionBindingsAtOtherWorkspaces": [
+      "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc"
+    ],
+    "otherWorkspaceBindingsMayQualifyGraphifyRun": false,
+    "sourceRefNamespaceAudit": {
+      "sidecarSourceRef": "src/lib/server/atlas/indexing/graphify-structural-materializer.ts",
+      "bindingCanonicalSourceRef": "sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-materializer.ts",
+      "existingNormalizersAddRepositoryPrefix": false,
+      "status": "REPO_NAMESPACE_BRIDGE_UNPROVEN"
+    },
+    "latestSealedSnapshotReadback": {
+      "snapshotRevision": "sha256:8a22069c7db9c5e89c6630b26a8ef67981793098faf4859a4a11e42201bff715",
+      "readbackStatus": "SNAPSHOT_READBACK_BLOCKED",
+      "sourceCount": 27395,
+      "exactMatches": 27121,
+      "changedFiles": 272,
+      "missingFiles": 2,
+      "targetSourceExactAtSnapshot": true,
+      "workspaceRevisionCandidate": "sha256:582d7f7350152a53982598aa0934b58e116b589f5d890b32fd3fe3aeee677105",
+      "candidateIsAuthority": false,
+      "reportPath": "%TEMP%/workspace-source-snapshot-readback-20261005.json"
+    },
+    "currentWorktreeCapture": {
+      "snapshotRevision": "sha256:83950f6a7bed490a9d35b2f4d91060e08441d72941f1a1802f0f167d9a4b8923",
+      "workspaceRevisionCandidate": "sha256:0533a63259dcb95943924cc90fc6de22259f10474434417e66b011f7cbbddaa5",
+      "status": "CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK",
+      "workspaceRevision": null,
+      "canonicalAuthority": false,
+      "writesPerformed": false,
+      "persisted": false,
+      "sourceCount": 27787,
+      "repositoryCount": 7,
+      "captureViolations": 0,
+      "readbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+      "exactMatches": 27787,
+      "readbackViolations": 0,
+      "targetSourceIdentityKey": "repo:root:sveltekit-frontend/src/lib/server/atlas/indexing/graphify-structural-materializer.ts",
+      "targetSourceRevision": "sha256:6fc3827b49b36f0eef1cbeb889546c54743258fceb5faa3838a28b02bb47790a"
+    },
+    "currentCandidateDatabaseCensus": {
+      "transactionReadOnly": true,
+      "sourceBindingRows": 0,
+      "targetSourceBindingRows": 0,
+      "graphifyRunRows": 0,
+      "coordinatorExecutionRows": 0,
+      "executionAuthorityRows": 0,
+      "graphifyEdgeRows": 0
+    },
+    "latestWorkspaceCandidateDatabaseCensus": {
+      "observedAt": "2026-10-05T18:00:01Z",
+      "workspaceRevisionCandidate": "sha256:f392f2ace10f3051a679b51b47675e9ca4c1edcb5d17d9693ed6000f3c33b110",
+      "transactionIsolation": "REPEATABLE_READ_READ_ONLY",
+      "transactionReadOnly": true,
+      "sourceBindingRows": 0,
+      "distinctBoundSources": 0,
+      "graphifyExecutionRows": 0,
+      "canonicalAuthorityExecutionRows": 0,
+      "graphifyEdgeRowsGlobal": 0,
+      "atlasPacketIncidenceTablePresent": false,
+      "writesPerformed": false
+    },
+    "currentWorkspaceAuthorityRefresh": {
+      "observedAt": "2026-10-05T17:32:14.031Z",
+      "sourceOwnerAudit": {
+        "reportPath": "docs/reports/current-source-owner-reconciliation-v1.json",
+        "sourceCount": 26748,
+        "inventoryScope": "ROOT_REPOSITORY_ONLY",
+        "latestCaptureRootSourceCount": 26702,
+        "rootInventoryCountDifference": 46,
+        "rootInventoryDifferenceDisposition": "UNCLASSIFIED",
+        "worktreeDirty": true,
+        "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
+        "selectedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "selectedExecutionWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "admittedSnapshotSourceCount": 25542,
+        "delta": {
+          "currentOnly": 2302,
+          "admittedOnly": 1096,
+          "sharedDigestMismatch": 1181,
+          "requiresSnapshotRefresh": true,
+          "checksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
+        },
+        "scopeCompatibilityWithSevenRepositorySnapshots": "NOT_PROVEN",
+        "deltaCountsAreAuthorityComparable": false,
+        "admissionReasons": [
+          "WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY",
+          "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"
+        ],
+        "safeToPromote": false,
+        "writesPerformed": false
+      },
+      "cohortLineageAudit": {
+        "reportPath": "docs/reports/current-source-cohort-lineage-v1.json",
+        "status": "WORKSPACE_REVISION_SOURCE_MISMATCH",
+        "cohortRows": 52,
+        "sourceRevisionQualified": 52,
+        "currentWorkspaceMatched": 0,
+        "workspaceMismatchAfterSourceQualification": 52,
+        "revisionQualified": 0,
+        "writesPerformed": false
+      },
+      "workspaceFrameAdmission": {
+        "reportPath": "docs/reports/current-workspace-frame-admission-v1.json",
+        "status": "STALE_WORKSPACE_PROJECTION",
+        "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "staleProjectionCandidates": 52,
+        "nextGate": "CURRENT_SOURCE_AUTHORITY_RECONCILIATION_REQUIRED",
+        "writesPerformed": false
+      },
+      "existingTournamentSnapshotPreflight": {
+        "reportPath": "docs/reports/workspace-revision-tournament-source-authority-v1.json",
+        "status": "CANDIDATE_ADMISSION_PREFLIGHT_BLOCKED",
+        "workspaceRevisionCandidate": "sha256:dc05165afa0e89a168807bd5097459a8709844a806b67c04d0fd61f76091a7d9",
+        "sourceCount": 26185,
+        "snapshotRevision": "sha256:1078418eb36e16f84ab913b64c45ffdbf8e70859a675ed86a9ee31cbc0049224",
+        "firstBlockingInvariant": "snapshotReadback",
+        "nextGate": "WORKSPACE-SNAPSHOT-RECAPTURE-01",
+        "authority": false,
+        "writesPerformed": false
+      },
+      "graphifySnapshotBindingAudit": {
+        "reportPath": "%TEMP%/graphify-workspace-snapshot-binding-v1-809a659a48f54c21b4733b39f1cd8851.json",
+        "reportSha256": "sha256:abe2cf8270a488e161e97ddee43367aae54462aa7ba22f7fa9e01645705efe5a",
+        "status": "GRAPHIFY_SNAPSHOT_BINDING_PROVEN",
+        "proofLevel": "PARTIAL_PROVEN",
+        "authority": false,
+        "admittedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "snapshotReadbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+        "snapshotSourceCount": 25542,
+        "snapshotExactMatches": 25542,
+        "terminalExecutionCount": 34,
+        "exactSnapshotMembershipMatches": 2,
+        "canonicalAuthorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+        "secondMatchingExecutionId": "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
+        "scopeNote": "Exact recorded-source membership and readback for the admitted e24 snapshot; does not assert current full-workspace membership or prove live packet incidence.",
+        "writesPerformed": false,
+        "datastoreWritesPerformed": false
+      },
+      "graphifySourceSelectionManifestComparison": {
+        "selectionPlanPath": "docs/reports/graphify-source-selection-plan-v1.json",
+        "selectionPlanStatus": "SOURCE_SELECTION_PLAN_BLOCKED",
+        "selectionPlanSnapshotRevision": "sha256:3b9b0e2ba445142987c3885f11fda705b78ab8587df34063a261e4545fdb700a",
+        "selectionPlanSourceCount": 26528,
+        "selectionPlanRepositoryCount": 7,
+        "currentCaptureSnapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "currentCaptureSourceCount": 27788,
+        "currentCaptureRepositoryCount": 7,
+        "currentCaptureReadbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+        "currentCaptureExactMatches": 27788,
+        "currentOnly": 1262,
+        "selectionPlanOnly": 2,
+        "shared": 26526,
+        "sharedContentDigestMismatches": 521,
+        "candidateAuthority": false,
+        "writesPerformed": false
+      },
+      "currentCaptureVsAdmittedSnapshot": {
+        "admittedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "admittedSnapshotSourceCount": 25542,
+        "currentCaptureSnapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "currentCaptureSourceCount": 27788,
+        "currentOnly": 2256,
+        "admittedOnly": 10,
+        "shared": 25532,
+        "sharedContentDigestMismatches": 1181,
+        "candidateAuthority": false
+      },
+      "earlierInMemoryCapture": {
+        "snapshotRevision": "sha256:83950f6a7bed490a9d35b2f4d91060e08441d72941f1a1802f0f167d9a4b8923",
+        "workspaceRevisionCandidate": "sha256:0533a63259dcb95943924cc90fc6de22259f10474434417e66b011f7cbbddaa5",
+        "sourceCount": 27787,
+        "repositoryCount": 7,
+        "readbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+        "authority": false,
+        "persisted": false,
+        "databaseBindingsForCandidate": 0,
+        "scopeCompatibilityWithRootGraphifyInventory": "NOT_PROVEN",
+        "scopeNote": "The source-owner audit enumerates the root repository; this capture spans seven repositories and cannot substitute for root-scoped Graphify source authority without an explicit shared scope contract."
+      },
+      "latestVerifiedInMemoryCapture": {
+        "snapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "sourceCount": 27788,
+        "repositoryCount": 7,
+        "rootSourceCount": 26702,
+        "readbackStatus": "SNAPSHOT_BYTES_READBACK_PROVEN",
+        "exactMatches": 27788,
+        "readbackViolations": 0,
+        "workspaceRevision": null,
+        "canonicalAuthority": false,
+        "persisted": false,
+        "writesPerformed": false
+      },
+      "latestSourceSelectionPlan": {
+        "status": "SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED",
+        "workspaceRevisionCandidate": "sha256:f392f2ace10f3051a679b51b47675e9ca4c1edcb5d17d9693ed6000f3c33b110",
+        "snapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "sourceCount": 27788,
+        "repositoryCount": 7,
+        "exactByteReadback": 27788,
+        "readbackViolations": 0,
+        "duplicateSourceRefs": 0,
+        "sourceSelectionChecksumMatchesSnapshot": true,
+        "workspaceRevision": null,
+        "candidateAuthority": false,
+        "canonicalAuthority": false,
+        "writesPerformed": false,
+        "nextGate": "GRAPHIFY-SNAPSHOT-CONSUMPTION-AUTHORIZATION-01"
+      },
+      "latestWorkspaceTournamentPreflight": {
+        "observedAt": "2026-10-05T18:12:40Z",
+        "status": "CANDIDATE_READY_FOR_EXPLICIT_TOURNAMENT_ADMISSION",
+        "proofLevel": "CONTRACT_PROVEN",
+        "workspaceRevisionCandidate": "sha256:f392f2ace10f3051a679b51b47675e9ca4c1edcb5d17d9693ed6000f3c33b110",
+        "snapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "sourceCount": 27788,
+        "repositoryCount": 7,
+        "snapshotReadback": "SNAPSHOT_BYTES_READBACK_PROVEN",
+        "exactMatches": 27788,
+        "violations": 0,
+        "checks": {
+          "derivationReady": true,
+          "snapshotReadback": true,
+          "candidateIsDerived": true,
+          "derivationMatchesSnapshot": true,
+          "authorityStillFalse": true,
+          "revisionStillNull": true
+        },
+        "independentSourceSelectionAndDerivationParity": {
+          "status": "SOURCE_SELECTION_AND_DERIVATION_PARITY_PASS",
+          "sourceSelectionChecksum": "sha256:2f158ab0f70a0a6186716419360b6033a6d764179f2d1e75f604926509380000",
+          "snapshotMembershipChecksum": "sha256:2f158ab0f70a0a6186716419360b6033a6d764179f2d1e75f604926509380000",
+          "duplicateSourceRefs": 0,
+          "allSourcesHaveIdentityAndRevision": true,
+          "allRepositoriesHaveRevision": true,
+          "candidateRecomputedMatchesMaintainedDerivation": true
+        },
+        "approvalRequired": true,
+        "authority": false,
+        "workspaceRevision": null,
+        "graphifyExecutionAuthorized": false,
+        "projectionWritesAuthorized": false,
+        "scratchSnapshotPath": "%TEMP%/atlas-workspace-snapshot-7e41d85c35c5461db7603763c3c2f0cb.json",
+        "scratchSnapshotSha256": "sha256:6f64ed636709b063736429441be841bffb88122cf3a33aa311a0b96963898b42",
+        "scratchDerivationSha256": "sha256:eb6a3f179b04daa07f1415797e3117debad40af98305230270617ec2a8460e6c",
+        "scratchPreflightSha256": "sha256:8f1717a2e945e394e3c3532cc9ab8b334af4552009b6389399332cef92426e11",
+        "scratchArtifactsPersistedToRepository": false,
+        "datastoreWritesPerformed": false,
+        "nextGate": "EXPLICIT-WORKSPACE-REVISION-TOURNAMENT-ADMISSION-01"
+      },
+      "persistedWorkspaceFrameSelectorReadback": {
+        "selectorRevision": "atlas.current-workspace-frame-selector.v1",
+        "status": "CURRENT_WORKSPACE_FRAME_SELECTED",
+        "selectedWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+        "selectedSnapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+        "selectedSource": "WORKSPACE_REVISION_TOURNAMENT_ADMISSION_RECEIPT",
+        "selectedAuthority": true,
+        "authoritativeCandidateCount": 2,
+        "authorityConflict": false,
+        "derivedFallback": null,
+        "frameAuthorityPromotionEligible": true,
+        "latestCaptureSnapshotRevision": "sha256:2608633db8151898deef8dbd2c0f63863b4580c1797fb9811af2a03a0d0c6aec",
+        "latestCaptureWorkspaceRevision": null,
+        "latestCaptureCandidateIsSelected": false,
+        "interpretation": "The selector chooses the historically admitted e24 frame. Its promotionEligible flag reflects receipt authority and selector blockers only; it does not prove that the frame matches the latest unadmitted seven-repository capture.",
+        "focusedSelectorTests": {
+          "command": "node scripts/atlas/test-current-workspace-frame-selector-v1.mjs",
+          "passed": 10,
+          "failed": 0,
+          "result": "PASS"
+        },
+        "writesPerformed": false
+      },
+      "firstUnprovenBoundary": "CURRENT_MULTI_REPOSITORY_SNAPSHOT_TO_GRAPHIFY_SOURCE_SELECTION_AND_AUTHORITY",
+      "classification": "THE_E24_SNAPSHOT_AND_SELECTED_GRAPHIFY_EXECUTION_BIND_EXACTLY_TO_EACH_OTHER_BUT_ARE_HISTORICAL; THE_LATEST_CAPTURE_READS_BACK_EXACTLY_AND_MATCHES_THE_SEVEN_REPOSITORY_SCOPE_POLICY, BUT_DIFFERS_FROM_THE_BLOCKED_SELECTION_MANIFEST_AND_HAS_NO_ADMITTED_WORKSPACE_REVISION; ROOT_ONLY_SOURCE_OWNER_COUNTS_ARE_NOT_COMPARABLE_TO_THE_MULTI_REPOSITORY_SNAPSHOT_DELTA"
+    },
+    "exactPacketMatchesForSourceRef": 0,
+    "packetCandidatesForEitherRepoRootPathOrExactContentDigest": 0,
+    "graphifyEdgeRows": 0,
+    "packetIncidenceTablePresent": false,
+    "graphRevision": null,
+    "firstUnprovenBoundary": "GRAPHIFY_SOURCE_BINDING_AND_SNAPSHOT_ADMISSION",
+    "classification": "CURRENT_BYTES_MATCH_GRAPHIFY_CONTENT_DIGEST_BUT_GRAPHIFY_WORKSPACE_HAS_NO_EXACT_ADMITTED_SOURCE_BINDING; SOURCE_REVISION_AUTHORITY_AND_GRAPH_REVISION_ARE_MISSING"
+  }
+}

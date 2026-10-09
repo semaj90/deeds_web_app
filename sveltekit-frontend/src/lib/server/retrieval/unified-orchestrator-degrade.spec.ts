@@ -52,6 +52,30 @@ beforeEach(() => {
 });
 
 describe('unified orchestrator lane degradation (KERNEL-REAL-02B)', () => {
+  it('preserves unqualified query embedding metadata as diagnostic-only result metadata', async () => {
+    const executionEvidence = {
+      representationId: 'semantic_768',
+      representationRevision: null,
+      model: 'embeddinggemma:latest',
+      executor: 'llama-server',
+      endpoint: '/v1/embeddings',
+      modelArtifactRevision: 'artifact-r1',
+      tokenizerRevision: 'tokenizer-r1',
+      inputPolicyRevision: 'input-r1',
+      admittedTokenCount: 3,
+      inputChecksum: `sha256:${'a'.repeat(64)}`,
+      outputChecksum: `sha256:${'b'.repeat(64)}`,
+      qualification: 'REPRESENTATION_REVISION_UNQUALIFIED',
+    } as const;
+    mocks.embed.mockResolvedValue({ ...okVector(), semantic768ExecutionEvidence: executionEvidence });
+
+    const result = await executeUnifiedRetrieval({ query: 'find a' }, config);
+
+    expect(result.queryEmbeddingEvidence).toEqual(executionEvidence);
+    expect(result.queryEmbeddingEvidence?.representationRevision).toBeNull();
+    expect(result.candidates[0]).not.toHaveProperty('semantic768ExecutionEvidence');
+  });
+
   it('A: semantic + lexical both available -> both participate', async () => {
     const r = await executeUnifiedRetrieval({ query: 'find a' }, config);
     expect(r.lanes).toEqual({ semantic: { status: 'OK' }, lexical: { status: 'OK' } });

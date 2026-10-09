@@ -19,11 +19,13 @@ from __future__ import annotations
 
 import os
 import hashlib
+import inspect
 import json
 import re
 import tempfile
 import time
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Literal, Optional
 
 from fastapi import FastAPI, HTTPException, Request
@@ -39,6 +41,9 @@ from atlas_structural_provenance import (
     occurrence_to_absolute_position,
 )
 from atlas_treesitter_span_compat import resolve_chunk_byte_span
+
+_RUNTIME_MODULE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+_LEGACY_MODULE_SHA256 = hashlib.sha256(Path(legacy.__file__).read_bytes()).hexdigest()
 
 
 class AstEvidenceChunkV2(BaseModel):
@@ -123,12 +128,45 @@ async def request_timer(request: Request, call_next):
     return response
 
 
-def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
+def _native_grounded_extractions(
+    text: str,
+    model_id: Optional[str] = None,
+    *,
+    span_diagnostics: Optional[list[dict[str, Any]]] = None,
+    execution_receipt: Optional[dict[str, Any]] = None,
+) -> list[dict[str, Any]]:
     """Run LangExtract and retain its actual grounding/alignment metadata."""
 
     legacy._grounded_extraction_error = None
+    source_bytes = text.encode('utf-8')
+    if execution_receipt is not None:
+        execution_receipt.update({
+            'requested': True,
+            'executorAttempted': False,
+            'executorAvailable': bool(legacy.LANGEXTRACT_AVAILABLE and legacy.langextract is not None),
+            'executorCompleted': False,
+            'resultCount': 0,
+            'rawResultCount': 0,
+            'provider': 'langextract',
+            'providerRevision': legacy._provider_revision(),
+            'modelId': model_id or os.getenv('LANGEXTRACT_MODEL', 'miniforge-nlp-sidecar'),
+            'inputChecksum': hashlib.sha256(source_bytes).hexdigest(),
+            'inputByteLength': len(source_bytes),
+            'inputCharacterLength': len(text),
+            'state': 'FAILED',
+            'failureClass': None,
+        })
+
+    def finish(state: str, failure_class: Optional[str] = None) -> None:
+        if execution_receipt is not None:
+            execution_receipt['resultCount'] = len(extracted)
+            execution_receipt['state'] = state
+            execution_receipt['failureClass'] = failure_class
+
+    extracted: list[dict[str, Any]] = []
     if not legacy.LANGEXTRACT_AVAILABLE or legacy.langextract is None:
         legacy._grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
+        finish('FAILED', 'NOT_IMPORTABLE')
         return []
     try:
         # The v2 facade is the active container entrypoint. Reuse the proven
@@ -137,6 +175,7 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         extract_fn = getattr(legacy.langextract, "extract", None)
         if extract_fn is None:
             legacy._grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
+            finish('FAILED', 'NOT_IMPORTABLE')
             return []
         data_module = getattr(legacy.langextract, "data", None)
         example_data = getattr(data_module, "ExampleData", None)
@@ -208,6 +247,8 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         # legacy's build_params() patch so it rebuilds a real multi-turn request instead.
         try:
             legacy._set_grounded_extraction_context(extract_kwargs["prompt_description"], examples)
+            if execution_receipt is not None:
+                execution_receipt['executorAttempted'] = True
             result = getattr(extract_fn, "extract", extract_fn)(**extract_kwargs)
         finally:
             legacy._clear_grounded_extraction_context()
@@ -216,10 +257,15 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         # behavior returned an empty list, making provider/runtime failures
         # indistinguishable from a valid zero-extraction result.
         legacy._grounded_extraction_error = f"{type(error).__name__}: {str(error)[:240]}"
+        finish('FAILED', 'EXECUTION_ERROR')
         return []
 
-    extracted: list[dict[str, Any]] = []
-    for item in (getattr(result, "extractions", None) or [])[:50]:
+    raw_extractions = getattr(result, "extractions", None) or []
+    if execution_receipt is not None:
+        execution_receipt['executorCompleted'] = True
+        execution_receipt['rawResultCount'] = len(raw_extractions)
+    rejected_span = False
+    for item in raw_extractions[:50]:
         normalized = normalize_langextract_extraction(item)
         interval = normalized.get("char_interval")
         if not normalized.get("extraction_text") or interval is None:
@@ -227,6 +273,21 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
         start_pos = int(interval["start_pos"])
         end_pos = int(interval["end_pos"])
         if start_pos < 0 or end_pos <= start_pos or end_pos > len(text):
+            rejected_span = True
+            if span_diagnostics is not None:
+                span_diagnostics.append({"classification": "SIDECAR_OFFSET_DEFECT", "rejectionReason": "CHAR_INTERVAL_OUT_OF_BOUNDS", "startChar": start_pos, "endChar": end_pos})
+            continue
+        probe_item = SimpleNamespace(
+            extraction_text=normalized['extraction_text'],
+            start_char=start_pos,
+            end_char=end_pos,
+            alignment_status=normalized.get('alignment_status'),
+        )
+        probe = legacy._grounded_span_probe(text, probe_item)
+        if probe['classification'] != 'SOURCE_EXACT':
+            rejected_span = True
+            if span_diagnostics is not None:
+                span_diagnostics.append(probe)
             continue
         extracted.append(
             {
@@ -235,6 +296,8 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
                 "text": normalized["extraction_text"],
                 "start_char": start_pos,
                 "end_char": end_pos,
+                "start_byte": int(probe['startByte']),
+                "end_byte": int(probe['endByte']),
                 # Native LangExtract grounding contract.
                 "extraction_class": normalized["extraction_class"],
                 "extraction_text": normalized["extraction_text"],
@@ -244,6 +307,10 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
                 "attributes": normalized.get("attributes") or {},
             }
         )
+    finish(
+        'REJECTED_SPAN_MISMATCH' if rejected_span else 'COMPLETED_GROUNDED' if extracted else 'COMPLETED_EMPTY',
+        'SPAN_REJECTION' if rejected_span else None,
+    )
     return extracted
 
 
@@ -1054,6 +1121,17 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
 def health() -> dict[str, Any]:
     result = dict(legacy.health())
     result["contract"] = "provenance-v2"
+    grounded_parameters = inspect.signature(_native_grounded_extractions).parameters
+    result["runtimeSourceBindings"] = {
+        "modules": {
+            "miniforge_nlp_sidecar_v2": f"sha256:{_RUNTIME_MODULE_SHA256}",
+            "miniforge_nlp_sidecar": f"sha256:{_LEGACY_MODULE_SHA256}",
+        },
+        "groundedExtractionAdapter": {
+            "acceptsSpanDiagnostics": "span_diagnostics" in grounded_parameters,
+            "acceptsExecutionReceipt": "execution_receipt" in grounded_parameters,
+        },
+    }
     return result
 
 

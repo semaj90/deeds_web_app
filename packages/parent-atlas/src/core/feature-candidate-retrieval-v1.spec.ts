@@ -5,9 +5,9 @@ import { retrieveFeatureCandidatesV1 } from './feature-candidate-retrieval-v1.js
 const registry = buildObservationFeatureRegistry({
   registryRevision: 'feature-registry:test:v1',
   definitions: [
-    { feature_id: 'ast.function_call', family: 'AST_BINARY', value_kind: 'BINARY', description: 'Function call syntax' },
-    { feature_id: 'ontology.contract', family: 'ONTOLOGY_BINARY', value_kind: 'BINARY', description: 'Contract concept' },
-    { feature_id: 'graph.pagerank', family: 'GRAPH_CONTINUOUS', value_kind: 'CONTINUOUS', description: 'Graph authority score' },
+    { feature_id: 'ast.function_call', family: 'AST_BINARY', value_kind: 'BINARY', description: 'Function call syntax', evidence_requirements: ['OBSERVATION_ID', 'SOURCE_REF'], missing_value_policy: 'UNAVAILABLE_NOT_ZERO' },
+    { feature_id: 'ontology.contract', family: 'ONTOLOGY_BINARY', value_kind: 'BINARY', description: 'Contract concept', evidence_requirements: ['OBSERVATION_ID', 'EVIDENCE_REFERENCE'], missing_value_policy: 'UNAVAILABLE_NOT_ZERO' },
+    { feature_id: 'graph.pagerank', family: 'GRAPH_CONTINUOUS', value_kind: 'CONTINUOUS', description: 'Graph authority score', evidence_requirements: ['GRAPH_REVISION', 'EVIDENCE_REFERENCE'], missing_value_policy: 'ABSTAIN' },
   ],
 });
 

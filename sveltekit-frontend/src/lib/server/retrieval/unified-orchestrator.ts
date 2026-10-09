@@ -23,6 +23,7 @@ import type { SearchFilter, SearchLane } from './types.js';
 import type { SearchTier } from './search-contract.js';
 import { inferRetrievalTier } from './search-contract.js';
 import { embedQueryForLane, type QueryVectorBundle } from './embedding-service.js';
+import type { Semantic768QueryExecutionEvidence } from '../embedding/canonical-embed.js';
 import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 import {
   resolveSemanticLane,
@@ -153,6 +154,8 @@ export type LexicalLaneResultV1 =
 
 export interface RetrievalResult {
   candidates: RankedCandidate[];
+  /** Query-side embedding receipt only; unqualified metadata is diagnostic, not candidate evidence. */
+  queryEmbeddingEvidence?: Semantic768QueryExecutionEvidence | null;
   /** Implementation telemetry of the stages that ran (all reads). Not independent proof of zero writes. */
   read_only_receipt?: ReadOnlySideEffectReceiptV1;
   /** Per-lane availability. An unavailable lane contributes zero votes and is never reported as OK. */
@@ -980,11 +983,13 @@ export async function executeUnifiedRetrieval(
     let semanticLane: RetrievalLaneStatusV1 = { status: 'OK' };
     let queryVectors: QueryVectorBundle | null = null;
     let embedding: Float32Array | null = null;
+    let queryEmbeddingEvidence: Semantic768QueryExecutionEvidence | null = null;
     try {
       const dense768 = await embedQueryForLane(request.query, 'dense_768');
       if (!dense768?.vector) throw new Error('Failed to generate query vector bundle');
       queryVectors = { dense384: null, dense768, latent64: null };
       embedding = dense768.vector;
+      queryEmbeddingEvidence = dense768.semantic768ExecutionEvidence ?? null;
     } catch (err) {
       // Availability failure: the semantic lane is marked unavailable and retrieval continues
       // with the remaining lanes. A returned vector of the wrong shape is a contract violation
@@ -1130,6 +1135,7 @@ export async function executeUnifiedRetrieval(
 
     return {
       candidates: enhancedRanked,
+      queryEmbeddingEvidence,
       read_only_receipt: buildRetrievalReadReceipt(stages, executionMode),
       lanes: { semantic: semanticLane, lexical: lexicalLane },
       evidence_status: enhancedRanked.length === 0 ? 'NO_EVIDENCE' : 'OK',

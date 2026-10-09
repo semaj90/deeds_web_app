@@ -33,6 +33,10 @@ if str(RUNTIME_ROOT) not in sys.path:
 
 from atlas_rapids_graph_runtime import install_graph_routes  # noqa: E402
 from shared_residency import SharedGpuResidencyLease, validate_shared_residency_lease  # noqa: E402
+from atlas_semantic512_runtime import (  # noqa: E402
+    Latent64KMeansRequest,
+    cluster_latent64,
+)
 
 
 ARTIFACT_ROOT = Path(os.getenv("ATLAS_GPU_ARTIFACT_ROOT", "/mnt/c/Users/james/Videos/deeds-web-app")).resolve()
@@ -52,6 +56,10 @@ class ExactScanRequest(ArtifactRequest):
 
 class EnrichmentRequest(ArtifactRequest):
     featurePath: str = Field(min_length=1)
+
+
+class Latent64KMeansExecutionRequest(Latent64KMeansRequest):
+    residencyLease: SharedGpuResidencyLease | None = None
 
 
 app = FastAPI(title="Parent Atlas GPU Executor", version="1.0.0")
@@ -99,7 +107,7 @@ def load_table(path: Path) -> tuple[Any, str]:
     return table, checksum
 
 
-def require_residency(request: ExactScanRequest, expected_executor: str) -> dict[str, object]:
+def require_residency(request: Any, expected_executor: str) -> dict[str, object]:
     try:
         return validate_shared_residency_lease(
             request.residencyLease,
@@ -134,6 +142,21 @@ def health() -> dict[str, Any]:
         "cudaAvailable": has_cuda,
         "device": cupy.cuda.runtime.getDeviceProperties(0).get("name", b"").decode(errors="replace") if has_cuda else None,
         "torchAvailable": torch is not None,
+        "writes": {"postgres": False, "qdrant": False, "valkey": False},
+    }
+
+
+@app.post("/v1/semantic512/kmeans")
+def semantic512_kmeans(request: Latent64KMeansExecutionRequest) -> dict[str, Any]:
+    residency = require_residency(request, "cuml")
+    cluster_request = Latent64KMeansRequest.model_validate(
+        request.model_dump(exclude={"residencyLease"})
+    )
+    result = cluster_latent64(cluster_request)
+    return {
+        **result,
+        "canonicalAuthority": False,
+        "residency": residency,
         "writes": {"postgres": False, "qdrant": False, "valkey": False},
     }
 

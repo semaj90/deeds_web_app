@@ -43,7 +43,7 @@ def test_personalization_supports_query_conditioned_ppr():
         personalization={"A": 1.0, "B": 0.0, "C": 0.0},
     )
     assert math.isclose(sum(scores.values()), 1.0, abs_tol=1e-12)
-    assert scores["A"] > scores["C"] > scores["B"]
+    assert scores["A"] > scores["B"] > scores["C"]
 
 
 def test_rejects_invalid_edges():

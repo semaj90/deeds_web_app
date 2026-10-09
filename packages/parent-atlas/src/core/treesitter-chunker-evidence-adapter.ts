@@ -33,6 +33,10 @@ const atlasAstEvidenceEdgeSchema = z.object({
   from_evidence_key: id,
   to_evidence_key: id,
   type: z.string().min(1),
+  occurrence_positions: z.array(z.tuple([
+    z.number().int().positive(),
+    z.number().int().nonnegative(),
+  ])).nullable().optional(),
   evidence_start_line: z.number().int().nonnegative().optional(),
   evidence_start_column: z.number().int().nonnegative().optional(),
   evidence_end_line: z.number().int().nonnegative().optional(),

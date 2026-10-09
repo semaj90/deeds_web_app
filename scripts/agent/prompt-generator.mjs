@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * prompt-generator.mjs — Phase 11H
- * intent → structured Gemma4 system prompt with ACE context + tool manifest.
+ * intent → structured Ornith-ready system prompt with ACE context + tool manifest.
  *
  * Fallback chain (local first, never skips steps):
  *   1. ACE Redis cache (ace:packet:latest / intent:{hash})
@@ -29,6 +29,7 @@ const ROOT    = process.cwd();
 const TMP_DIR = path.join(ROOT, '.tmp');
 const DRY_RUN = process.argv.includes('--dry-run');
 const REPLAY = process.argv.includes('--replay');
+const GENERATE = process.argv.includes('--generate');
 
 const intentArg = process.argv
   .slice(2)
@@ -39,7 +40,7 @@ const intentArg = process.argv
 // Domains that are stable (7d TTL) vs volatile (1d TTL)
 const STABLE_DOMAINS = new Set(['Legal', 'Graph', 'Infra']);
 
-// Gemma4 tool manifest — ordered by priority (cheap first)
+// Tool manifest — ordered by priority (cheap first)
 const TOOLS = [
   {
     name: 'rg',
@@ -164,7 +165,7 @@ function buildSystemPrompt(intent, chunks, domain, tools) {
     `- **${t.name}**: ${t.description}\n  params: ${JSON.stringify(t.parameters)}\n  example: \`${t.example}\``
   ).join('\n\n');
 
-  return `You are a legal-domain AI assistant with access to a local codebase and knowledge base.
+  return `You are the Parent Atlas research assistant, served by the configured local Ornith model, with access to a local codebase and knowledge base.
 
 ## Current Task
 ${intent}
@@ -209,7 +210,7 @@ function promptChecksum(result) {
 }
 
 async function main() {
-  console.log('\n── Prompt Generator (Phase 11H) ──────────────────────────');
+  console.log('\n── Prompt Generator (Phase 11H / Ornith) ─────────────────');
   console.log(`  intent   : "${intentArg}"`);
 
   const ih = intentHash(intentArg);
@@ -224,7 +225,7 @@ async function main() {
   console.log(`  labels   : ${featureLabels.length}`);
 
   // Check if prompt already cached
-  if (redis && !DRY_RUN) {
+  if (redis && !DRY_RUN && !GENERATE) {
     const cached = await redis.get(`prompt:${ih}`).catch(() => null);
     if (cached) {
       console.log(`  cache    : HIT prompt:${ih} — skipping rebuild`);
@@ -261,6 +262,26 @@ async function main() {
     ttlSecs,
     generatedAt:   new Date().toISOString(),
   };
+
+  if (GENERATE) {
+    const { generateWithOrnithV1 } = await import('./ornith-chat-client.mjs');
+    const generated = await generateWithOrnithV1({
+      systemPrompt,
+      userPrompt: intentArg,
+    });
+    console.log(JSON.stringify({
+      schema: 'atlas.prompt-generation-result.v1',
+      intentHash: ih,
+      modelId: generated.modelId,
+      endpoint: generated.endpoint,
+      response: generated.content,
+      promptTokens: generated.promptTokens,
+      completionTokens: generated.completionTokens,
+      writesPerformed: false,
+    }, null, 2));
+    if (redis) redis.disconnect();
+    return;
+  }
 
   if (REPLAY) {
     const first = stablePromptProjection(result);

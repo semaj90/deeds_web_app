@@ -1,0 +1,61 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "fastapi-pydantic-langextract",
+  "source_ref": "fastapi-pydantic-langextract:docs-pydantic-dev-latest-latest",
+  "url": "https://docs.pydantic.dev/latest/",
+  "title": "docs.pydantic.dev",
+  "domain_class": "agent",
+  "focus_tags": [
+    "fastapi",
+    "pydantic",
+    "langextract",
+    "grounded-extraction",
+    "structured-output",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.pydantic.dev",
+    "markdown_excerpt": "[Skip to content](https://pydantic.dev/docs/validation/latest/get-started/#_top) # Pydantic Validation [![CI](https://img.shields.io/github/actions/workflow/status/pydantic/pydantic/ci.yml?branch=main&logo=github&label=CI)](https://github.com/pydantic/pydantic/actions?query=event%3Apush+branch%3Amain+workflow%3ACI)[![Coverage](https://coverage-badge.samuelcolvin.workers.dev/pydantic/pydantic.svg)](https://coverage-badge.samuelcolvin.workers.dev/redirect/pydantic/pydantic) [![pypi](https://img.shields.io/pypi/v/pydantic.svg)](https://pypi.python.org/pypi/pydantic)[![CondaForge](https://img.shields.io/conda/v/conda-forge/pydantic.svg)](https://anaconda.org/conda-forge/pydantic)[![downloads](https://static.pepy.tech/badge/pydantic/month)](https://pepy.tech/project/pydantic) [![license](https://img.shields.io/github/license/pydantic/pydantic.svg)](https://github.com/pydantic/pydantic/blob/main/LICENSE)[![llms.txt](https://img.shields.io/badge/llms.txt-green)](https://pydantic.dev/docs/validation/latest/llms.txt) Documentation for version: v2.14.0. Pydantic is the most widely used data validation library for Python. Fast and extensible, Pydantic plays nicely with your linters/IDE/brain.",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:fastapi-pydantic-langextract:docs-pydantic-dev-latest-latest",
+    "title": "docs.pydantic.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh FastAPI, Pydantic, and LangExtract Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    }
+  ],
+  "content_hash": "3a7ed836cb648ae6a1619a7d175b148e65bca7eb00363fdbf0a5dc718edbc8d7",
+  "markdown_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/docs-pydantic-dev-latest-latest.md",
+  "fetched_at": "2026-10-09T05:31:45.954Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "fastapi-pydantic-langextract",
+    "source_title": "FastAPI, Pydantic, and LangExtract Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "workflow",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/fastapi-pydantic-langextract/docs-pydantic-dev-latest-latest.md"
+}

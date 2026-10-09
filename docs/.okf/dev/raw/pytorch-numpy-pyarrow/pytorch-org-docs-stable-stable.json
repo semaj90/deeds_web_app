@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "pytorch-numpy-pyarrow",
+  "source_ref": "pytorch-numpy-pyarrow:pytorch-org-docs-stable-stable",
+  "url": "https://pytorch.org/docs/stable/",
+  "title": "pytorch.org",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "pytorch",
+    "numpy",
+    "pyarrow",
+    "tensor",
+    "columnar-data",
+    "kanban",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "pytorch.org",
+    "markdown_excerpt": "[Skip to main content](https://docs.pytorch.org/docs/2.14/index.html#main-content) Back to top `Ctrl` + `K` v2.14.0 (stable) [v2.15.0 (unstable)](https://docs.pytorch.org/docs/main/index.html) [v2.14.0 (stable)](https://docs.pytorch.org/docs/2.14/index.html) [v2.13.0](https://docs.pytorch.org/docs/2.13/index.html) [v2.12.0](https://docs.pytorch.org/docs/2.12/index.html) [v2.11.0](https://docs.pytorch.org/docs/2.11/index.html) [v2.10.0](https://docs.pytorch.org/docs/2.10/index.html) [v2.9.1](https://docs.pytorch.org/docs/2.9/index.html) [v2.8.0](https://docs.pytorch.org/docs/2.8/index.html) [v2.7.0](https://docs.pytorch.org/docs/2.7/index.html) [v2.6.0](https://docs.pytorch.org/docs/2.6/index.html) [v2.5.0](https://docs.pytorch.org/docs/2.5/index.html) [v2.4.0](https://docs.pytorch.org/docs/2.4/index.html) [v2.3.0](https://docs.pytorch.org/docs/2.3/index.html) [v2.2.0](https://docs.pytorch.org/docs/2.2/index.html) [v2.1.0](https://docs.pytorch.org/docs/2.1/index.html) [v2.0.0](https://docs.pytorch.org/docs/2.0/index.html) [v1.13](https://docs.pytorch.org/docs/1.13/index.html) [v1.12](https://docs.pytorch.org/docs/1.12/index.html) [v1.11](https://docs.pytorch.org/docs/1.11/index.html",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:pytorch-numpy-pyarrow:pytorch-org-docs-stable-stable",
+    "title": "pytorch.org",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh PyTorch, NumPy, and Apache Arrow Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "8af32bc6c996398a5049a59752de3dd8904bcb7e0220a28fd21e8286ef0cf96b",
+  "markdown_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/pytorch-org-docs-stable-stable.md",
+  "fetched_at": "2026-10-09T05:30:50.468Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "pytorch-numpy-pyarrow",
+    "source_title": "PyTorch, NumPy, and Apache Arrow Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/pytorch-numpy-pyarrow/pytorch-org-docs-stable-stable.md"
+}

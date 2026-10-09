@@ -128,9 +128,7 @@ const TOOLS = [
   {
     name: 'build_agentic_rag_context',
     description:
-      'Build a compact RAG context packet from the ACE cache. Reads .opencode/ace-packet.json, ' +
-      'scores cards against the query by keyword overlap, and returns the top-K cards with ' +
-      'sourceRefs and a ready-to-inject prompt snippet. Use before sending a codebase question to Gemma4.',
+      'Build query-specific context using live Atlas retrieval. If live retrieval is unavailable, returns an empty diagnostic result and no fallback evidence.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -1053,15 +1051,35 @@ export async function buildLiveAtlasContext(
 }
 
 export async function buildAgenticRagContextLive(args, deps = {}) {
-  const asFallback = (liveRetrieval) => {
-    const fallback = buildAgenticRagContext(args);
-    return { ...fallback, liveRetrieval, warnings: [...(fallback.warnings ?? []), 'LIVE_RETRIEVAL_UNAVAILABLE'] };
-  };
-  if (LIVE_CONTEXT_DISABLED || deps.disableLive) return asFallback({ attempted: false, failure: 'LIVE_DISABLED' });
+  const unavailable = (liveRetrieval) => ({
+    ok: false,
+    query: String(args.query ?? '').slice(0, 2048),
+    totalCards: 0,
+    packetAge: 'unknown',
+    querySpecific: false,
+    candidateSetBasis: 'NONE',
+    contextSource: { kind: 'NONE' },
+    cards: [],
+    sourceRefs: [],
+    promptPacket: '',
+    liveRetrieval: { ...liveRetrieval, status: 'LIVE_RETRIEVAL_UNAVAILABLE' },
+    fallbackUsed: false,
+    canonicalAuthority: false,
+    error: 'LIVE_RETRIEVAL_UNAVAILABLE',
+    warnings: ['LIVE_RETRIEVAL_UNAVAILABLE'],
+    safeNextCommand: null,
+  });
+  if (LIVE_CONTEXT_DISABLED || deps.disableLive) {
+    return unavailable({ attempted: false, failure: 'LIVE_DISABLED' });
+  }
   try {
-    return await buildLiveAtlasContext(args, deps);
+    return { ...(await buildLiveAtlasContext(args, deps)), fallbackUsed: false };
   } catch (error) {
-    return asFallback({ attempted: true, failure: error.code ?? 'LIVE_FAILED', message: String(error.message ?? '').slice(0, 200) });
+    return unavailable({
+      attempted: true,
+      failure: error.code ?? 'LIVE_FAILED',
+      message: String(error.message ?? '').slice(0, 200),
+    });
   }
 }
 

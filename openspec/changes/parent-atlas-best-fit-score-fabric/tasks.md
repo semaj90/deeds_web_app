@@ -5607,6 +5607,180 @@ Status: `STAGE_10_RESIDENCY_SCAFFOLD_COMPLETE`; `GPU_LIVE_PROOF_BLOCKED`;
 Evidence: `sveltekit-frontend/src/lib/server/atlas/tensors/unified-residency-adapter-v1.ts`
 and its focused spec.
 
+### CandidateTileV1 bounded projection proposal (2026-10-07)
+
+- [ ] **CANDIDATE-TILE-01** Reuse the canonical retrieval matrix and
+      `CandidateOrdinalMapV1`; define `CandidateTileV1` only as a bounded,
+      non-authoritative projection of at most 32 candidate rows and 16
+      explicitly named canonical feature columns. Do not create a second
+      candidate identity, feature vocabulary, or matrix owner. The existing
+      routing `RoutingFeatureTile4x6V1` remains a separate contract.
+- [ ] **CANDIDATE-TILE-02** Freeze the ordered feature-ID crosswalk from the
+      canonical 25-feature vocabulary to the selected 16 columns, with a
+      vocabulary/crosswalk checksum. Reject duplicate, unknown, or reordered
+      feature IDs; do not select columns by object/map iteration order.
+- [ ] **CANDIDATE-TILE-03** Bind each row to its canonical candidate ordinal,
+      identity, source/workspace revisions, matrix revision, and source row
+      checksum. Preserve unavailable values as null plus availability/reason
+      metadata; never coerce unavailable graph, semantic, or HyperRAG features
+      to zero.
+- [ ] **CANDIDATE-TILE-04** Define dtype and byte layout before SIMD/GPU claims.
+      `[32,16]` is 512 scalar coordinates, not 512 bits: fp32 occupies 2,048
+      bytes and fp16 1,024 bytes before metadata. Any fp16 conversion must
+      report bounded numerical error against the canonical fp32 source rows.
+      AVX-512/warp alignment is an implementation hypothesis, not a portability
+      or correctness guarantee.
+- [ ] **CANDIDATE-TILE-05** Prove a deterministic fixture projection and
+      independent serialize/readback checksum parity before performance work.
+      Benchmark native canonical-row Top-K against tile-based selection on the
+      same frozen candidates and feature mapping; compare ranking parity,
+      numerical error, throughput, and bytes moved. Do not replace the existing
+      ranker or production ordering based on a shape/alignment claim alone.
+- [ ] **CANDIDATE-TILE-06** Keep mmap/GPU residency blocked until the source
+      CandidateFeatureMatrix, ordinal map, tile crosswalk, artifact checksum,
+      and readback are all revision-qualified. Tile/LUT outputs remain derived
+      execution hints and cannot mint identity, permissions, or canonical
+      evidence.
+
+Status: `PURE_PROJECTION_IMPLEMENTED_UNVALIDATED`; no runtime benchmark or
+residency proof is claimed. Existing canonical matrix and routing-tile owners
+remain unchanged; no data-store writes are authorized by these tasks.
+
+Implementation update (2026-10-07): a pure TypeScript bounded projection was
+added at `sveltekit-frontend/src/lib/server/atlas/tensors/candidate-feature-tile-v1.ts`.
+It requires explicit ascending candidate ordinals and 16 named canonical
+features, carries the source identities/revisions and presence mask, and emits
+source-matrix, ordered-crosswalk, and tile checksums. Focused fixture tests were
+added but have not been run; the items above remain open pending validation,
+independent readback, and performance evaluation. No runtime caller, mmap/GPU
+residency, or ranker change was added.
+
+### Two-plane packet-fabric owner alignment (2026-10-07)
+
+- [x] **PACKET-FABRIC-OWNER-01** Locate existing owners before proposing a new
+      packet/representation authority: logical `RepresentationDescriptorV1`
+      and directory adapter are specified in
+      `openspec/changes/parent-atlas-canonical-directory-ingestion-fabric/`; the
+      semantic-family manifest is in `packages/semantic-contracts/src/vector-manifest.ts`;
+      LOD representation metadata is in
+      `sveltekit-frontend/src/lib/server/atlas/residency/packet-lod-v1.ts`;
+      ACE and ACP have separate packet assembly/materialization implementations.
+      These are related owners, not proof of one unified packet registry or
+      request-scoped materializer.
+- [x] **PACKET-FABRIC-OWNER-02** Record the key registry distinction: the
+      `atlas_representations` database registry describes representation/model
+      families and lifecycle; it does not itself provide proven per-packet mmap
+      arena offsets or a physical representation-address registry. Do not treat
+      `RepresentationDescriptorV1` projection references as proof of a live
+      physical address or applied schema migration.
+- [ ] **PACKET-FABRIC-01** Trace the exact source-to-ACE/ACP caller paths and
+      decide whether the existing assemblers/materializers can be reused as
+      separate logical owners. Do not add a competing `AtlasPacketV1`, assembler,
+      materializer, or registry before this caller/authority audit is complete.
+- [ ] **PACKET-FABRIC-02** If a physical mmap/GPU address registry is still
+      required after owner reconciliation, specify it as a derived projection
+      referencing existing canonical packet and representation identities;
+      offsets/arena IDs are mutable storage metadata, never identity. Record the
+      owning table/artifact decision before proposing DDL or persistent writes.
+- [ ] **PACKET-FABRIC-03** Keep JSON/RPC envelopes, simdjson parsing, Valkey
+      directory hints, SSE/gRPC/QUIC transports, and mmap/GPU buffers as adapters
+      or projections. They must preserve canonical IDs and revision bindings;
+      none may become packet authority or expose physical addresses to browser
+      clients.
+- [ ] **PACKET-FABRIC-04** Materialize multi-LOD views only from individually
+      admitted representation references sharing compatible canonical
+      identity/source/workspace revisions. AST, CST, semantic vectors, graph
+      facts, and source remain separately addressable; do not concatenate them
+      into a monolithic packet blob.
+- [ ] **PACKET-FABRIC-05** Consider row-major/warp-major tile storage as
+      alternative derived layouts only after canonical tile readback and
+      parity. Preserve one logical tile checksum/lineage and benchmark CPU/GPU
+      executors independently; do not assume AVX-512 or a 32-lane warp is
+      available on every target.
+
+Status: `OWNER_AUDIT_PARTIAL`; existing related contracts and separate assembly
+paths were located, but unified runtime reachability, physical address
+ownership, schema application, and generation-safe publication are not proven.
+No migration, registry table, transport change, or service/store write is
+authorized by this audit.
+
+Caller-trace update (2026-10-07): source inspection confirms
+`buildIndexedSourcePacket()` calls `assemblePacketForSourceRef()` from
+`sveltekit-frontend/src/lib/server/ace/indexed-source-packet.ts`; the ACE context
+assembler also calls it directly for `filePath` requests. That legacy assembler
+reads NES/SOM metadata and reads/writes `AceFullPacket` through Redis, but its
+input/output contract does not establish exact source/workspace/representation
+revision admission for a materialized multi-LOD view. Reuse is limited to that
+existing ACE assembly responsibility unless a separate lineage adapter is
+proven.
+
+The similarly named `sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts`
+is a five-step durable write pipeline, not a read-only packet materializer; the
+existing ownership audit reports zero importers of that module in
+`sveltekit-frontend/src`. `ace/ace-materializer.ts` is another distinct
+implementation, with no production callers found by that audit. Do not count
+same-named local functions as caller edges. Evidence: source call sites above
+and `scripts/atlas/prove-bitfrost-invalidation-owner-v1.mjs`'s recorded
+correction. `PACKET-FABRIC-01` remains open for an exact admitted request-path
+trace and ownership decision; this source-level audit did not execute a request
+or write any store.
+
+Request-path trace (2026-10-07): `/api/v1/query` and `/api/ace/summarize` call
+`assembleACEContext()` and return/use the resulting legacy `ACEContext`. In
+`features/ai/ace/context-assembler.ts`, the Parent Atlas preflight can attach a
+ContextManifest, while the general ACE branch attaches one only in the
+opt-in neural-decoder shadow path. This does not establish strict candidate
+snapshot admission or a physical packet materializer. The separate
+`atlas/retrieval/search-runtime-adapter.ts` exposes `searchWithAceManifest()`
+and `searchWithUnifiedResidencyFeaturePack()`, but inspected application callers
+use `createAtlasSearchAdapter().search()`; no caller of either composed method
+was found. Thus the code path exists as callable composition, not as a proven
+request-scoped tile/residency caller. Keep `CandidateFeatureTileV1` detached
+from production ordering until an authorized caller supplies the exact admitted
+snapshot, row/ordinal bindings, feature map, and revision/checksum inputs.
+
+Status remains `REQUEST_PATH_NOT_PROVEN`; source-level route and composition
+edges are present, but no request execution, independent artifact readback, or
+live runtime receipt was produced in this audit.
+
+Input-source follow-up (2026-10-07): `SearchRuntimeQasFeatureSources` is an
+injected pair of `projection(candidate)` and `context(candidate)` callbacks;
+the join helper itself performs no store reads and has no default production
+resolver. Its QAS row contract requires nonempty source/workspace/graph,
+feature, representation, and policy revisions. That differs from the canonical
+`[C,25]` matrix's explicit per-cell presence mask, so QAS rows cannot simply be
+relabelled as tile input, especially when graph or semantic evidence is
+unavailable. The canonical matrix adapter consumes
+`ChunkRetrievalProfileV1` records, but the audited query routes do not bridge
+their SearchRuntime packet results into that profile adapter.
+
+- [ ] **PACKET-FABRIC-INPUT-01** Identify an existing source that can resolve
+      each request candidate to an admitted `ChunkRetrievalProfileV1` or an
+      equivalent exact identity/revision-bound 25-feature row. Verify the
+      producer, source-reference and source/workspace revision joins, feature
+      availability mask, feature revision, and independent row checksum.
+- [ ] **PACKET-FABRIC-INPUT-02** Select a server-owned, read-only shadow caller
+      only after INPUT-01 passes. It must obtain revision values from their
+      existing owners, reject client-supplied identity/revision claims, preserve
+      unavailable features, and record baseline output without changing
+      retrieval ordering.
+
+Until these gates pass, no application caller should synthesize `CandidateTileV1`
+from the QAS row contract or from array/ranking order. No caller, request, or
+store mutation was performed for this input-source audit.
+
+Bounded source-census attempt (2026-10-07): inspected and invoked the existing
+`scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs` with
+`--no-report --limit=16`. It failed closed on its prerequisite receipt before
+opening a database connection: `graphify-snapshot-native-readback-v1.json` is
+`SNAPSHOT_NATIVE_READBACK_BLOCKED`, has no selected execution ID, and lists
+`MULTIPLE_TERMINAL_EXECUTIONS_MATCH_ADMITTED_SNAPSHOT` plus
+`SNAPSHOT_MEMBERSHIP_MISSING` (25,542 missing memberships). Therefore no live
+ChunkRetrievalProfile cohort was measured; this is a prerequisite blockage, not
+evidence that profiles or source facts are absent. No PostgreSQL query or report
+write occurred. Resolve the existing Graphify terminal-execution/membership
+gate before retrying the profile census; do not bypass its receipt check.
+
 ### Stage 11 Phase 17 provider admission scaffold (2026-09-15)
 
 - [x] Reuse the existing `phase17-schema` owner and pure provider-admission

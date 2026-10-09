@@ -8,13 +8,12 @@ import {
 
 export const CANONICAL_SEMANTIC_REPRESENTATION_ID = SEMANTIC_REPRESENTATION_ID;
 export const CANONICAL_SEMANTIC_DIMENSION = SEMANTIC_DIMENSION;
-export const CANONICAL_SEMANTIC_REPRESENTATION_REVISION = 0 as const;
 export const CANONICAL_SEMANTIC_ENCODER_REVISION =
 	EMBEDDING_CONTRACT.representations.semantic_768.projection_version;
 
 export interface CanonicalSemanticLineage {
 	representationId: typeof CANONICAL_SEMANTIC_REPRESENTATION_ID;
-	representationRevision: typeof CANONICAL_SEMANTIC_REPRESENTATION_REVISION;
+	representationRevision: number;
 	dimension: typeof CANONICAL_SEMANTIC_DIMENSION;
 	encoderRevision: string;
 	embeddingDigest: string;
@@ -32,7 +31,7 @@ export interface CanonicalSemanticLineage {
 export interface CanonicalSemanticLineageInput {
 	vector: readonly number[] | Float32Array;
 	encoderRevision: string;
-	representationRevision?: number;
+	representationRevision: number;
 	/** Defaults to PROMPT_REVISION_UNPROMPTED when omitted — matches current callers. */
 	promptRevision?: string;
 }
@@ -77,6 +76,9 @@ export function buildCanonicalSemanticLineage(
 	if (!encoderRevision) {
 		throw new Error('SEMANTIC_768_ENCODER_REVISION_REQUIRED');
 	}
+	if (!Number.isSafeInteger(input.representationRevision) || input.representationRevision < 0) {
+		throw new Error('SEMANTIC_768_REPRESENTATION_REVISION_REQUIRED');
+	}
 
 	assertCanonicalSemanticEmbedding(input.vector);
 
@@ -84,7 +86,7 @@ export function buildCanonicalSemanticLineage(
 
 	return {
 		representationId: CANONICAL_SEMANTIC_REPRESENTATION_ID,
-		representationRevision: CANONICAL_SEMANTIC_REPRESENTATION_REVISION,
+		representationRevision: input.representationRevision,
 		promptRevision,
 		dimension: CANONICAL_SEMANTIC_DIMENSION,
 		encoderRevision,

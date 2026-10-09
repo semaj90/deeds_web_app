@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import { ChatOllama } from "@langchain/ollama";
+import { ChatOpenAI } from "@langchain/openai";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, SystemMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
 import { db } from '../src/lib/server/db/client'; // Adjust path if needed
@@ -16,8 +16,9 @@ const execAsync = promisify(exec);
 // --- Configuration ---
 const MAX_ITERATIONS = 5;
 const MAX_RETRIES = 3;
-const LLM_PROVIDER = process.env.LLM_PROVIDER || 'ollama'; // 'ollama' | 'gemini'
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3-legal:latest';
+const LLM_PROVIDER = process.env.LLM_PROVIDER || 'ornith';
+const LLAMA_SERVER_URL = (process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090').replace(/\/+$/, '').replace(/\/v1$/i, '');
+const LLAMA_SERVER_MODEL = process.env.LLAMA_SERVER_MODEL || 'ornith-1.5-9b';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp';
 
 // --- Tools ---
@@ -88,11 +89,17 @@ export class AgenticRepair {
                 maxOutputTokens: 8192,
                 temperature: 0.1, // Low temp for precise code
             });
-        } else {
-            this.llm = new ChatOllama({
-                model: OLLAMA_MODEL,
+        } else if (LLM_PROVIDER === 'ornith') {
+            this.llm = new ChatOpenAI({
+                configuration: {
+                    baseURL: `${LLAMA_SERVER_URL}/v1`,
+                    apiKey: process.env.LLAMA_SERVER_API_KEY || 'local-no-key',
+                },
+                model: LLAMA_SERVER_MODEL,
                 temperature: 0.1,
             });
+        } else {
+            throw new Error(`Unsupported LLM_PROVIDER: ${LLM_PROVIDER}`);
         }
     }
 

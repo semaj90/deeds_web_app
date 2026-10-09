@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const source = fs.readFileSync(path.join(here, 'run-graphify-daily-startup.mjs'), 'utf8');
+const startupValidator = fs.readFileSync(path.join(here, '..', 'validate-graphify-startup.mjs'), 'utf8');
 
 test('ordinary daily apply chain remains downstream of canonical admission and lifecycle open', () => {
   const admission = source.indexOf('PROMOTION_ADMISSION_SCRIPT');
@@ -32,4 +33,10 @@ test('daily gate uses verdict-enforcing wrapper, not the zero-exit audit directl
 
 test('terminal authorization cannot enter the fallback mutation path', () => {
   assert.match(source, /!allowFallback\s*\|\|\s*process\.env\.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION/);
+});
+
+test('service readiness does not recommend projection without admission', () => {
+  assert.doesNotMatch(startupValidator, /Next: npm run graphify:daily/);
+  assert.match(startupValidator, /inspect canonical projection admission/);
+  assert.match(startupValidator, /only when SAFE_TO_PROJECT/);
 });

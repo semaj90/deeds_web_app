@@ -17,7 +17,7 @@
 import { assertSemantic768 } from '../embedding/embedding-contract-768.js';
 import { executeEmbeddingInputV1 } from '../embedding/embedding-execution-adapter-v1.js';
 import { createProviderEmbeddingExecutorV1 } from '../embedding/embedding-provider-executor-v1.js';
-import { embedSemantic768Canonical } from '../embedding/canonical-embed.js';
+import { embedSemantic768Canonical, type Semantic768QueryExecutionEvidence } from '../embedding/canonical-embed.js';
 
 import { ENV } from '../env.server.js';
 import { shouldPopulateEmbeddingCacheV1, type QueryExecutionModeV1 } from '../execution/query-execution-policy-v1.js';
@@ -42,6 +42,9 @@ export interface EmbeddingResult {
 
   /** Execution time in ms */
   exec_ms: number;
+
+  /** Diagnostic execution metadata; representationRevision remains null until independently frozen. */
+  semantic768ExecutionEvidence?: Semantic768QueryExecutionEvidence;
 }
 
 /**
@@ -264,6 +267,20 @@ async function embedViaCanonicalRuntime(
     dimension: 768,
     cached: false,
     exec_ms: performance.now() - startTime,
+    semantic768ExecutionEvidence: {
+      representationId: result.representationId,
+      representationRevision: result.representationRevision,
+      model: result.model,
+      executor: result.executor,
+      endpoint: result.endpoint,
+      modelArtifactRevision: result.modelArtifactRevision,
+      tokenizerRevision: result.tokenizerRevision,
+      inputPolicyRevision: result.inputPolicyRevision,
+      admittedTokenCount: result.admittedTokenCount,
+      inputChecksum: result.inputChecksum,
+      outputChecksum: result.outputChecksum,
+      qualification: result.qualification,
+    },
   };
 }
 

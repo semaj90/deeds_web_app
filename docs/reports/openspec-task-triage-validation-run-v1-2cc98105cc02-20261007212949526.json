@@ -1,0 +1,63 @@
+{
+  "schema": "atlas.openspec-task-triage-validation-run.v1",
+  "generatedAt": "2026-10-07T21:29:49.526Z",
+  "changeId": "parent-atlas-openspec-task-triage-pipeline",
+  "taskId": "2.2",
+  "taskRef": "openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md#L11",
+  "taskRevision": "sha256:69b2187332fae099e671c4ad0f0759ce97b55d545e025154df8983d17a9066df",
+  "workspaceHead": "35871d115516bc5e6df18cf60dd773b7958d7a11",
+  "workspaceRevision": "sha256:2cc98105cc020926516550215cece53e04f62ecda7b7685e7d8d1e305cfb0225",
+  "taskPopulationRevision": "sha256:27c37a6d6790a24c5c5654f3cacf2a0d17d7643444f4ed01f504f8aef5acc166",
+  "tests": {
+    "command": "node --test scripts/atlas/audit-openspec-evidence-fabric-v1.test.mjs scripts/atlas/lib/openspec-report-manifest-v1.test.mjs scripts/atlas/lib/openspec-task-card-v1.test.mjs scripts/atlas/lib/openspec-task-triage-corpus-v1.test.mjs",
+    "passed": 44,
+    "failed": 0
+  },
+  "openSpecValidation": {
+    "command": "openspec validate parent-atlas-openspec-task-triage-pipeline --type change --strict --json --no-interactive",
+    "passed": 1,
+    "failed": 0
+  },
+  "corpus": {
+    "artifacts": [
+      {
+        "name": "taskCards",
+        "uri": ".tmp/goal-evidence-fabric-detail-20261007/triage-validation-v2/task-cards.json",
+        "checksum": "sha256:d7166fb1984598f05b174a3c4b3b718e0481d36e91b14a63a50be44086af26f9",
+        "sizeBytes": 8688696
+      },
+      {
+        "name": "reportManifests",
+        "uri": ".tmp/goal-evidence-fabric-detail-20261007/triage-validation-v2/report-manifests.json",
+        "checksum": "sha256:c63dd41ce819244222a77c5cf35f62c4f954f379c822ce9bc5e21cbf3fda3976",
+        "sizeBytes": 920987
+      },
+      {
+        "name": "triage",
+        "uri": ".tmp/goal-evidence-fabric-detail-20261007/triage-validation-v2/triage.json",
+        "checksum": "sha256:85349d33f1025b5e6b6ebb2bbb075635b207cb7b435545be73235588e71ab55e",
+        "sizeBytes": 9618482
+      }
+    ],
+    "taskCount": 10772,
+    "reportArtifactCount": 1265,
+    "taskCardBytes": 8688696,
+    "reportManifestBytes": 920987,
+    "triageBytes": 9618482,
+    "joinedReportCount": 0,
+    "supersededCount": 0,
+    "archiveEligibleCount": 0
+  },
+  "authority": {
+    "canonicalAuthority": false,
+    "mutationAuthorized": false
+  },
+  "writes": {
+    "reportArtifactsWritten": true,
+    "database": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "seaweedfs": false
+  }
+}

@@ -618,6 +618,106 @@ done this pass (would be a code change, out of read-only scope).
 `writesPerformed=false` across Postgres/Qdrant/Valkey/Neo4j; no code changed.
 Evidence: `docs/reports/packet-key-single-owner-convergence-v2-addendum.json`.
 
+#### PACKET-KEY-LEGACY-GUARD-RECHECK — 2026-10-06
+
+The 2026-09-22 addendum above is historical for formula sharing and writer
+conflict handling. The current source has since added the shared
+`scripts/atlas/lib/canonical-source-ref.mjs::legacyPacketKeyFromSourceRef()`
+compatibility builder, exact source/key collision assertions, and corpus-level
+duplicate-key checks. `upsert-whole-codebase-atlas-packets.mjs` uses that
+builder and validates an existing key against its source ref; its apply path
+is quarantined. `register-orphaned-chunks.mjs` uses the shared builder and
+rejects duplicate candidate keys; its packet insert paths no longer ignore
+packet-key conflicts. `backfill-summary-layers-from-chunks.mjs` reuses the
+builder for read/join identity. The focused tests statically guard these
+selected script owners against reintroducing conflict-ignore behavior.
+
+This closes the narrow legacy-helper/candidate-collision guard gap only. It
+does not establish a sole production canonical key owner: the shared builder
+names the 12-hex compatibility formula, while PacketKeyV2 and the future
+production writer remain distinct decisions/gates. Nor does it prove
+collision-free historical admission: the live UNIQUE constraint prevents
+duplicate keys from coexisting, and no independent complete attempted-source
+denominator has been reconciled against `atlas_packets` to detect a silently
+skipped historical source. Treat the 2026-10-03 report as `WIRED` for the
+selected legacy writers and `NOT_PROVEN` for complete writer census, current
+live collision absence, and historical silent-drop absence. No writer,
+database, cache, or alias operation was run in this recheck.
+
+Evidence: `docs/reports/packet-key-legacy-owner-v1-20261003.md`,
+`scripts/atlas/lib/canonical-source-ref.mjs`, and
+`scripts/atlas/lib/canonical-source-ref.test.mjs`. Next gate: build a fresh,
+read-only complete source-ref denominator from an admitted source snapshot;
+join by exact source ref and independently verify the corresponding packet
+key/source ref pair, classifying missing, duplicate, collision, alias, and
+out-of-scope rows. Do not use the UNIQUE constraint or packet count as a
+collision proof, and do not apply any packet-key migration or writer.
+
+**Source-denominator feasibility check (2026-10-06; explicit PostgreSQL
+`REPEATABLE READ READ ONLY`, `ROLLBACK`):** the newest recorded
+`atlas_workspace_source_bindings` cohort for `repo_id=deeds-web-app` is
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+24,456 distinct refs, last observed `2026-09-15T01:23:43.296Z`. Against
+`atlas_packets`, 16,543 refs have an exact source-ref row and 7,913 do not;
+16,151 have both exact packet source revision and exact packet
+`workspace_revision_key`. `file_path` matched the binding's canonical source
+ref for 16,395 rows, but remains a display hint, not an identity join. This
+cohort is too old to claim a current-worktree denominator or to close the
+historical silent-drop audit.
+
+Schema check for the requested metadata: the source-binding table owns
+`canonical_source_ref`, `source_revision`, `workspace_revision`,
+`content_digest`, and `observed_at`; it has no `created_at` or `file_path`.
+`atlas_packets.file_path` and `workspaces.created_at` exist, but neither is
+source-revision authority, and the binding row has no `workspace_id` join to
+the workspace timestamp. Do not add these columns to the canonical binding
+table. A diagnostic receipt may carry `bindingObservedAt` and optional
+`packetFilePath`/`workspaceCreatedAt` as explicitly non-authoritative context;
+preserve source/workspace revisions and content digest as separate fields.
+`source_revision` also did not equal `content_digest` for any binding row in
+this sample, so do not substitute one for the other. No schema or data writes
+were performed.
+
+**Repeatable-read packet-key census recheck (2026-10-06; `READ ONLY`,
+explicit `ROLLBACK`):** grouped bindings by `workspace_revision` before
+selecting the cohort. The newest recorded group remains
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+(24,456 distinct refs; `observed_at` is `2026-09-15T01:23:43.296Z` for both
+the minimum and maximum). This is a coherent recorded cohort, but its age and
+revision do not prove it represents the current dirty worktree. Against the
+24,456-row cohort and 61,718 current packet rows, exact
+`canonical_source_ref + source_revision + workspace_revision_key` produced
+16,150 unique matches, 1 binding with multiple qualified packet rows, 13
+same-ref/source-revision mismatches, and 8,292 with no exact canonical packet
+match; no same-source-revision/different-workspace match was observed. The
+legacy expected key `packet:` + first 12 SHA-256 hex of the exact
+`canonical_source_ref` matched a same-source packet row for 16,445 bindings;
+zero expected keys were occupied by a packet whose `source_ref` and
+`canonical_source_ref` both differed. The 295-row difference between key
+matches and uniquely revision-qualified matches is not yet classified and is
+not a lineage pass. In this readback, all 24,456 binding `source_revision`
+values exactly equaled their `content_digest` values; this supersedes the
+preceding sample's contrary equality statement for this same recorded cohort.
+The current UNIQUE constraint still cannot detect a source silently omitted
+by a prior conflict-ignore writer, and this census does not close the current-
+worktree denominator or historical silent-drop gate. No report file or store
+was written.
+
+**Fresh PacketKeyV2 legacy-population diagnostic (2026-10-07, read-only):**
+the existing census completed against 61,718 `atlas_packets` rows in a
+`REPEATABLE READ READ ONLY` transaction with explicit rollback, writing only
+`.tmp/goal-cache-alignment/packet-key-legacy-census-current.json`. It derived
+17,399 distinct V2 keys with zero collisions among rows carrying a unique
+repository membership from any recorded execution; 17,301 rows use the
+12-hex legacy storage form, 98 use the ACE prefix, and 44,256 rows have no
+membership in any execution. The report has no workspace/source-population
+revision binding and the membership is not restricted to an admitted current
+snapshot. Therefore `NO_PACKET_KEY_CANONICAL_COLLISION` is scoped to this
+derivable legacy subset only: it does not prove current-worktree collision
+freedom, source-denominator completeness, or absence of historical silent
+drops. No packet-key writer, alias mutation, cache, or canonical store write
+occurred; keep the collision/admission gate open.
+
 #### PACKET-KEY-LIFECYCLE-CONTRACT-01 — 2026-09-23 (read-only)
 
 - [x] Traced 7 runtime packet_key **consumers** (bounded/representative, not

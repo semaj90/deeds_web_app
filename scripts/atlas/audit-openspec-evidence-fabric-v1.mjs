@@ -23,10 +23,12 @@ function canonicalJson(value) {
 
 const proofStates = new Set(['CLAIM_ONLY', 'PROVEN', 'PARTIAL', 'BLOCKED', 'FAILED', 'STALE']);
 
-export function buildEvidenceReceiptV1(input) {
+function buildEvidenceReceiptV1Internal(input, { requireTaskRevision }) {
   const required = ['evidenceId', 'evidenceType', 'changeId', 'taskId', 'claim', 'workspaceRevision', 'sourceRevision', 'sourceRefs', 'producer', 'inputs', 'observedAt', 'expectedAssertions', 'actualAssertions', 'outputs', 'readbackRequired', 'readbackPerformed', 'verdict'];
+  if (requireTaskRevision) required.push('taskRevision');
   for (const field of required) if (input[field] === undefined || input[field] === null || input[field] === '') throw new Error(`EvidenceReceiptV1 missing ${field}`);
   if (input.schema !== 'atlas.evidence-receipt.v1') throw new Error('EvidenceReceiptV1 schema mismatch');
+  if (input.taskRevision != null && !/^sha256:[a-f0-9]{64}$/i.test(input.taskRevision)) throw new Error('EvidenceReceiptV1 task revision invalid');
   if (!proofStates.has(input.verdict) || input.verdict === 'CLAIM_ONLY') throw new Error('EvidenceReceiptV1 verdict mismatch');
   if (!Array.isArray(input.expectedAssertions) || !Array.isArray(input.actualAssertions) || !Array.isArray(input.sourceRefs)) throw new Error('EvidenceReceiptV1 arrays required');
   if (input.verdict === 'PROVEN') {
@@ -48,22 +50,34 @@ export function buildEvidenceReceiptV1(input) {
   return { ...unsigned, checksum: sha256(canonicalJson(unsigned)) };
 }
 
+export function buildEvidenceReceiptV1(input) {
+  return buildEvidenceReceiptV1Internal(input, { requireTaskRevision: true });
+}
+
 export function verifyEvidenceReceiptV1(receipt) {
   if (!receipt || typeof receipt !== 'object' || !receipt.checksum) throw new Error('EvidenceReceiptV1 checksum missing');
   const { checksum, ...unsigned } = receipt;
   if (checksum !== sha256(canonicalJson(unsigned))) throw new Error('EvidenceReceiptV1 checksum mismatch');
-  return buildEvidenceReceiptV1(receipt);
+  return buildEvidenceReceiptV1Internal(receipt, { requireTaskRevision: false });
 }
 
 export function buildEvidenceCardV1(input) {
-  const required = ['schema', 'taskRef', 'changeId', 'taskId', 'claim', 'proofState', 'sourceRef', 'conceptID', 'confidenceScore', 'contextBlob', 'evidenceIds', 'workspaceRevision'];
+  const required = ['schema', 'taskRef', 'changeId', 'taskId', 'claim', 'proofState', 'sourceRef', 'conceptID', 'confidenceScore', 'contextBlob', 'evidenceIds', 'sourceRevision', 'workspaceRevision'];
   for (const field of required) if (input[field] === undefined || input[field] === null || input[field] === '') throw new Error(`EvidenceCardV1 missing ${field}`);
   if (input.schema !== 'atlas.evidence-card.v1') throw new Error('EvidenceCardV1 schema mismatch');
   if (!proofStates.has(input.proofState)) throw new Error('EvidenceCardV1 proof state mismatch');
+  if (!/^sha256:[a-f0-9]{64}$/i.test(input.sourceRevision)) throw new Error('EvidenceCardV1 source revision invalid');
   if (!Number.isFinite(input.confidenceScore) || input.confidenceScore < 0 || input.confidenceScore > 1) throw new Error('EvidenceCardV1 confidence score out of range');
   if (!Array.isArray(input.evidenceIds)) throw new Error('EvidenceCardV1 evidenceIds must be an array');
   const { checksum: _checksum, ...unsignedInput } = input;
-  const unsigned = { retrievalUsable: true, proofUsable: false, rejectionReasons: [], ...unsignedInput };
+  const unsigned = {
+    retrievalUsable: true,
+    rejectionReasons: [],
+    ...unsignedInput,
+    proofUsable: unsignedInput.proofUsable === true
+      && unsignedInput.proofState === 'PROVEN'
+      && /^sha256:[a-f0-9]{64}$/i.test(unsignedInput.sourceRevision),
+  };
   return { ...unsigned, checksum: sha256(canonicalJson(unsigned)) };
 }
 
@@ -295,7 +309,7 @@ export function extractDependencyCandidates(task) {
 
   for (const target of task.declaredDependencies ?? []) add(target, 'REQUIRES', 'EXPLICIT_FIELD', 1);
 
-  const text = task.dependencySourceText ?? task.taskText;
+  const text = task.taskText ?? '';
   for (const match of text.matchAll(/\bdependsOn\s*:\s*\[([^\]]*)\]|\bdepends_on\s*=\s*([^;\n]+)/gi)) {
     for (const target of taskIdTokens(match[1] ?? match[2])) add(target, 'REQUIRES', 'EXPLICIT_FIELD', 0.99);
   }
@@ -596,6 +610,7 @@ const RECEIPT_FIELD_NAMES = {
   commands: new Set(['command', 'verificationcommand', 'testcommand']),
   workspaceRevisions: new Set(['workspacerevision', 'workspace_revision']),
   sourceRevisions: new Set(['sourcerevision', 'source_revision']),
+  taskRevisions: new Set(['taskrevision', 'task_revision']),
   checksums: new Set(['checksum', 'receiptchecksum']),
   verdicts: new Set(['verdict', 'proofstate', 'status']),
 };
@@ -795,6 +810,7 @@ export function resolveReceiptBindings(receiptInventory, tasks) {
     const binding = resolveReceiptBinding(receipt, indexes, tasks);
     const revisions = receipt.fields?.workspaceRevisions ?? [receipt.workspaceRevision].filter(Boolean);
     const sourceRevisions = receipt.fields?.sourceRevisions ?? [receipt.sourceRevision].filter(Boolean);
+    const taskRevisions = receipt.fields?.taskRevisions ?? [receipt.taskRevision].filter(Boolean);
     return {
       uri: receipt.uri,
       schema: receipt.schema ?? null,
@@ -807,7 +823,8 @@ export function resolveReceiptBindings(receiptInventory, tasks) {
       canonicalSchemaValid: receipt.canonicalSchemaValid === true,
       workspaceRevision: revisions[0] ?? null,
       sourceRevision: sourceRevisions[0] ?? null,
-      revisionStatus: revisions[0] && sourceRevisions[0] ? 'PRESENT' : 'MISSING_REVISION',
+      taskRevision: taskRevisions[0] ?? null,
+      revisionStatus: revisions[0] && sourceRevisions[0] && taskRevisions[0] ? 'PRESENT' : 'MISSING_REVISION',
       proofEligible: receipt.canonicalSchemaValid === true && binding.resolution === 'BOUND' && ['BOUND_EXACT', 'BOUND_ALIAS', 'BOUND_SOURCE_REF'].includes(binding.bindingType),
     };
   });
@@ -961,6 +978,8 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
   const cycleAffectedTaskKeys = new Set(cycles.flat());
   const cycleAffectedTasks = taskRows.filter((task) => task.dependencyCycleAffected || cycleAffectedTaskKeys.has(task.canonicalTaskRef)).map((task) => task.taskRef);
   const workspaceSourceManifest = sourceManifest(root);
+  const sourceRevisionByPath = new Map(workspaceSourceManifest.map((entry) => [entry.source, entry.checksum]));
+  for (const task of taskRows) task.sourceFileRevision = sourceRevisionByPath.get(task.tasksPath) ?? null;
   const workspaceRevision = sha256(canonicalJson(workspaceSourceManifest));
   const receiptInventory = [
     ...receipts.map((receipt) => ({ ...receipt, canonicalSchemaValid: true })),
@@ -989,8 +1008,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
         const fileRevision = withinRoot && fs.existsSync(sourceFile) ? sha256(fs.readFileSync(sourceFile)) : null;
         sourceRefChecks.push({
           file: relativeSource || null,
-          current: Boolean(fileRevision && sourceRef.sourceRevision
-            && (sourceRef.sourceRevision === fileRevision || (isTaskSource && sourceRef.sourceRevision === task.taskHash))),
+          current: Boolean(fileRevision && sourceRef.sourceRevision === fileRevision),
           expectedRevision: sourceRef.sourceRevision ?? null,
           observedRevision: fileRevision,
         });
@@ -998,13 +1016,17 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
     }
     const workspaceCurrent = Boolean(receipt && receipt.workspaceRevision === workspaceRevision);
     const sourceRefsCurrent = sourceRefChecks.length > 0 && sourceRefChecks.every((sourceRef) => sourceRef.current);
-    const sourceCurrent = Boolean(receipt && task && receipt.sourceRevision === task.taskHash && taskSpanMatched && sourceRefsCurrent);
+    const expectedTaskSourceRevision = task ? sourceRevisionByPath.get(task.tasksPath) : null;
+    const taskRevisionCurrent = Boolean(receipt && task && binding.taskRevision === task.taskHash);
+    const sourceCurrent = Boolean(receipt && task && expectedTaskSourceRevision
+      && receipt.sourceRevision === expectedTaskSourceRevision && taskRevisionCurrent && taskSpanMatched && sourceRefsCurrent);
     return {
       ...binding,
       verdict: receipt?.verdict ?? null,
       observedAt: receipt?.observedAt ?? null,
       workspaceCurrent,
       sourceCurrent,
+      taskRevisionCurrent,
       sourceRefsCurrent,
       sourceRefChecks,
       taskSpanMatched,
@@ -1038,6 +1060,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
     if (allBindings.some((receipt) => receipt.bindingType === 'CANDIDATE_ONLY')) rejectionReasons.push('CANDIDATE_ONLY_BINDING');
     if (allBindings.some((receipt) => receipt.resolution === 'AMBIGUOUS')) rejectionReasons.push('IDENTITY_AMBIGUOUS');
     if (allBindings.some((receipt) => !receipt.workspaceCurrent)) rejectionReasons.push('WORKSPACE_REVISION_MISMATCH');
+    if (allBindings.some((receipt) => !receipt.taskRevisionCurrent)) rejectionReasons.push('TASK_REVISION_MISMATCH');
     if (allBindings.some((receipt) => !receipt.sourceCurrent || !receipt.taskSpanMatched)) rejectionReasons.push('SOURCE_REVISION_OR_SPAN_MISMATCH');
     if (!latest && allBindings.some((receipt) => !receipt.canonicalSchemaValid)) rejectionReasons.push('NON_CANONICAL');
     return buildEvidenceCardV1({
@@ -1055,6 +1078,7 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
       confidenceScore: proofState === 'PROVEN' ? 1 : proofState === 'STALE' ? 0.25 : 0,
       contextBlob: `${proofState}: ${task.taskText}`.slice(0, 2000),
       evidenceIds: allBindings.map((receipt) => receipt.evidenceId).filter(Boolean),
+      sourceRevision: sourceRevisionByPath.get(task.tasksPath),
       workspaceRevision,
     });
   });

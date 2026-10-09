@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "grpc-protobuf",
+  "source_ref": "grpc-protobuf:grpc-io-what-is-grpc-introduction-introduction",
+  "url": "https://grpc.io/docs/what-is-grpc/introduction/",
+  "title": "grpc.io",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rpc",
+    "protobuf",
+    "streaming",
+    "wire_format",
+    "llm_output",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "grpc.io",
+    "markdown_excerpt": "# Introduction to gRPC An introduction to gRPC and protocol buffers. [Contents](https://grpc.io/docs/what-is-grpc/introduction/#td-content__toc) # Introduction to gRPC An introduction to gRPC and protocol buffers. This page introduces you to gRPC and protocol buffers. gRPC can use protocol buffers as both its Interface Definition Language ( **IDL**) and as its underlying message interchange format. If you’re new to gRPC and/or protocol buffers, read this! If you just want to dive in and see gRPC in action first, [select a language](https://grpc.io/docs/languages/) and try its **Quick start**. gRPC in 5 minutes \\| Eric Anderson & Ivy Zhuang, Google - YouTube Tap to unmute [gRPC in 5 minutes \\| Eric Anderson & Ivy Zhuang, Google](https://www.youtube.com/watch?v=njC24ts24Pg) [gRPC](https://www.youtube.com/channel/UCrnk1HWelWnYtF78YZX80fg) gRPC3.92K subscribers ## Overview In gRPC, a client application can directly call a method on a server application on a different machine as if it were a local object, making it easier for you to create distributed applications and services. As in many RPC systems, gRPC is based around the idea of defining a service, specifying the methods that can b",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:grpc-protobuf:grpc-io-what-is-grpc-introduction-introduction",
+    "title": "grpc.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh gRPC and Protocol Buffers from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "e5088dad436ed11a1f7e27a7ee92ccb7dd97573ac356505ea67a428a48ab6434",
+  "markdown_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\grpc-protobuf\\grpc-io-what-is-grpc-introduction-introduction.md",
+  "fetched_at": "2026-10-06T18:04:41.058Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "grpc-protobuf",
+    "source_title": "gRPC and Protocol Buffers",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "documentation",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\dev\\context-engineering-docs-v1\\run-20261006-v2\\raw\\grpc-protobuf\\grpc-io-what-is-grpc-introduction-introduction.md"
+}

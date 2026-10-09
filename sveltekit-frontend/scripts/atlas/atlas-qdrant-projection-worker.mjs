@@ -27,6 +27,9 @@ import amqp     from 'amqplib';
 import { createHash } from 'crypto';
 import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 
+console.error('LEGACY_384_QDRANT_PROJECTION_DISABLED: this worker labels the projection as 384-D and has no verified semantic_768 source');
+process.exit(2);
+
 loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const QDRANT_URL  = process.env.QDRANT_URL   ?? 'http://localhost:6333';

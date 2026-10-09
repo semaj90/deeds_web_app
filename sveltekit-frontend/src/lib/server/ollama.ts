@@ -133,11 +133,6 @@ function isAbortTimeoutError(error: unknown): boolean {
 }
 
 const BIFROST_GATEWAY_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_TIMEOUT_MS, 30000);
-const BIFROST_L2_EMBED_TIMEOUT_MS = parseTimeoutMs(process.env?.BIFROST_L2_EMBED_TIMEOUT_MS, 2000);
-const BIFROST_L2_QDRANT_TIMEOUT_MS = parseTimeoutMs(
-  process.env?.BIFROST_L2_QDRANT_TIMEOUT_MS,
-  1500
-);
 const BIFROST_GATEWAY_FAILURE_COOLDOWN_MS = parseTimeoutMs(
   process.env?.BIFROST_GATEWAY_COOLDOWN_MS,
   30_000
@@ -763,19 +758,17 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   }
 }
 
-// ── Bifrost Gateway (OpenAI-compatible gateway with semantic caching) ─────
+// ── Bifrost Gateway (OpenAI-compatible synthesis routing; semantic L2 disabled) ─
 
 /**
- * Call Bifrost gateway using OpenAI-compatible format.
- * Bifrost applies semantic caching before
- * forwarding to Ollama. Returns the content string.
+ * Call Bifrost using the OpenAI-compatible format. Synthesis routes to
+ * llama-server; semantic L2 reuse is disabled until admission metadata is proven.
  *
  * Exported so other modules can use it directly.
  */
 /**
- * Normalize a user message before embedding for Bifrost semantic cache.
- * Strips filler preambles and normalizes legal citation variants so that
- * semantically equivalent queries consistently hit the same cache entry.
+ * Normalize user-message phrasing before synthesis while preserving the
+ * existing request behavior; this does not authorize semantic-cache reuse.
  */
 function normalizeBifrostMessage(content: string): string {
   return content
@@ -796,14 +789,9 @@ type BifrostChatOptions = {
   temperature?: number;
   maxTokens?: number;
   timeoutMs?: number;
+  /** @deprecated Semantic cache admission is disabled until server-owned context is available. */
   cacheKey?: string;
-  /**
-   * Entity tags from Qdrant payload enrichment (e.g. from generateEmbeddingsWithTags).
-   * Top-4 sorted tags are appended to the Bifrost x-bf-cache-key so that semantically
-   * similar queries about different legal domains get distinct cache entries.
-   * Example: 'hearsay evidence' vs 'hearsay objection' both embed similarly but
-   * tag differently (evidence-rules vs courtroom-procedure) → separate cache slots.
-   */
+  /** @deprecated Semantic cache admission is disabled until server-owned context is available. */
   entityTags?: string[];
   tools?: ReadonlyArray<unknown>;
   toolChoice?: string | object;
@@ -1011,17 +999,7 @@ export async function bifrostChat(
   const bifrostModel = effectiveModel.includes('/')
     ? effectiveModel
     : resolveOrnithRequestModelV1('BIFROST_OPENAI', loadedLlamaModel).requestModelId;
-  // x-bf-cache-key is REQUIRED for Bifrost semantic caching to activate.
-  // Without it, every request bypasses the cache entirely (Bifrost docs).
-  // 'legal-ai-global' creates a shared namespace: semantically similar questions
-  // from any user hit the same cache entry (ideal for repeatable legal queries).
-  // If entityTags are provided, append top-4 sorted tags to differentiate legal domains.
-  const baseKey = options?.cacheKey ?? 'legal-ai-global';
-  const tagSuffix = options?.entityTags?.length
-    ? ':' + [...options.entityTags].sort().slice(0, 4).join(',')
-    : '';
-  const cacheKey = `${baseKey}${tagSuffix}`;
-  // Normalize user messages to improve semantic cache hit rate (filler stripping, citation normalization)
+  // Preserve existing user-message normalization for the synthesis request.
   const normalizedMessages = messages.map((m) =>
     m.role === 'user' ? { ...m, content: normalizeBifrostMessage(m.content) } : m
   );
@@ -1043,8 +1021,6 @@ export async function bifrostChat(
   let t_qdrant = 0;
   let t_l3 = 0;
   let cacheHitLevel: 'L1' | 'L2' | 'L3' = 'L3';
-  let writebackQueued = false;
-
   const exactMatch = await getExactMatchCache(exactCacheKey);
   t_l1 = performance.now() - t_start;
 
@@ -1058,112 +1034,15 @@ export async function bifrostChat(
     return sanitizeModelOutput(exactMatch.content);
   }
 
-  // ── L2 Cache: Qdrant HTTP Semantic Search (bypasses Bifrost gRPC bug) ──
-  // Bifrost's semantic_cache plugin uses gRPC to Qdrant which hangs due to Docker IPv6 resolution.
-  // We implement equivalent functionality using Qdrant's HTTP REST API directly.
+  // Semantic L2 reuse is disabled until both request scope and cached-answer
+  // provenance can be read from an authoritative server-owned contract.
   const bifrostGatewayTimeoutMs = Math.min(
     options?.timeoutMs ?? BIFROST_GATEWAY_TIMEOUT_MS,
     BIFROST_GATEWAY_TIMEOUT_MS
   );
-  const L2_SEMANTIC_THRESHOLD = 0.82;
-  const BIFROST_CACHE_COLLECTION = 'BifrostSemanticCachePlugin';
-
-  const lastUserMsg = normalizedMessages.findLast((m) => m.role === 'user')?.content ?? '';
-  let l2CacheHit = false;
-  if (lastUserMsg) {
-    try {
-      // Embed the query using Ollama (embeddinggemma, 768-dim)
-      const t0_embed = performance.now();
-      const embedRes = await fetch(`${EMBED_BASE_URL}/api/embed`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),
-        signal: AbortSignal.timeout(BIFROST_L2_EMBED_TIMEOUT_MS),
-      });
-      t_embed = performance.now() - t0_embed;
-
-      if (embedRes.ok) {
-        const embedData = (await embedRes.json()) as { embeddings?: number[][] };
-        const vec = embedData.embeddings?.[0];
-        if (vec?.length === 768) {
-          // Search Qdrant HTTP for similar cached response (filter by model + cache_key)
-          const t0_qdrant = performance.now();
-          const searchRes = await fetch(
-            `${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points/query`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: vec,
-                limit: 1,
-                score_threshold: L2_SEMANTIC_THRESHOLD,
-                with_payload: true,
-                with_vector: false,
-                filter: {
-                  must: [
-                    { key: 'model', match: { value: bifrostModel } },
-                    { key: 'cache_key', match: { value: 'global' } },
-                  ],
-                },
-              }),
-              signal: AbortSignal.timeout(BIFROST_L2_QDRANT_TIMEOUT_MS),
-            }
-          );
-          t_qdrant = performance.now() - t0_qdrant;
-
-          if (searchRes.ok) {
-            const searchText = await searchRes.text();
-            const searchData = fastJsonParse<{
-              result?: { points?: Array<{ score: number; payload?: { response?: string } }> };
-            }>(searchText);
-            const hit = searchData.result?.points?.[0];
-            if (hit && hit.score >= L2_SEMANTIC_THRESHOLD && hit.payload?.response) {
-              try {
-                const parsed = JSON.parse(hit.payload.response) as {
-                  choices?: Array<{ message?: { content?: string } }>;
-                };
-                const cachedContent = sanitizeModelOutput(parsed.choices?.[0]?.message?.content ?? '');
-                if (cachedContent) {
-                  cacheHitLevel = 'L2';
-                  console.debug(
-                    `[bifrost] L2 QDRANT-HTTP HIT score=${hit.score.toFixed(
-                      3
-                    )} — qdrant_ms=${t_qdrant.toFixed(2)}`
-                  );
-                  await setExactMatchCache(exactCacheKey, {
-                    content: cachedContent,
-                    model: bifrostModel,
-                    backend: 'qdrant-semantic',
-                  });
-                  l2CacheHit = true;
-                  logBifrostCacheTrace(
-                    bifrostModel,
-                    buildBifrostCacheTrace(
-                      'L2',
-                      Math.round(performance.now() - t_start),
-                      hit.score
-                    ),
-                    {
-                      source: 'bifrostChat',
-                      cache_backend: 'qdrant-semantic',
-                    }
-                  );
-                  return cachedContent;
-                }
-              } catch {
-                // malformed response JSON in Qdrant payload — fall through
-              }
-            }
-          }
-        }
-      }
-    } catch {
-      // L2 probe failed — fall through to Bifrost gateway (L3)
-    }
-  }
 // ── L3: Bifrost Gateway → llama-server/TurboQuant ──────────────────────────
-  // Bifrost acts as a pure forwarding gateway (vector_store removed from config to
-  // avoid Docker gRPC hang). L1/L2 handled above; L3 does the actual inference.
+  // Bifrost is used for inference routing only. Exact L1 remains; semantic L2
+  // is disabled until revision-qualified admission and cache-entry provenance exist.
   const bifrostStart = performance.now();
   let content = '';
   let cacheHit = false;
@@ -1297,10 +1176,7 @@ export async function bifrostChat(
         } else {
           const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-bf-cache-key': cacheKey,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: bifrostModel,
               messages: normalizedMessages,
@@ -1327,11 +1203,12 @@ export async function bifrostChat(
             };
           }>(rawText);
           const debug = data.extra_fields?.cache_debug;
+          if (debug?.cache_hit) {
+            throw new Error('Unadmitted Bifrost semantic cache hit rejected');
+          }
           const choice = data.choices?.[0]?.message;
           content = sanitizeModelOutput(choice?.content ?? '');
           tool_calls = choice?.tool_calls;
-          cacheHit = !!debug?.cache_hit;
-          hitType = debug?.hit_type;
           bifrostGatewayUnavailableUntil = 0;
 
           if (!content.trim() && !tool_calls?.length) {
@@ -1339,11 +1216,6 @@ export async function bifrostChat(
           }
 
           t_l3 = performance.now() - bifrostStart;
-          if (debug?.cache_hit) {
-            console.debug(
-              `[bifrost] L2 SEMANTIC HIT type=${debug.hit_type} similarity=${debug.similarity?.toFixed(3)}`
-            );
-          }
         }
 
         gen.end({
@@ -1414,65 +1286,8 @@ export async function bifrostChat(
     }
   }
 
-  // Store in Redis exact-match cache for instant future retrieval
-  if (content && !l2CacheHit) {
-    // Write-back to Qdrant semantic cache (L2) so future similar queries hit L2
-    // Fire-and-forget (non-blocking) — we don't want to delay the response
-    if (lastUserMsg) {
-      writebackQueued = true;
-      (async () => {
-        try {
-          const embedRes = await fetch(`${EMBED_BASE_URL}/api/embed`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: VLM_MODELS.embedding, input: lastUserMsg }),
-            signal: AbortSignal.timeout(5_000),
-          });
-          if (embedRes.ok) {
-            const embedData = (await embedRes.json()) as { embeddings?: number[][] };
-            const vec = embedData.embeddings?.[0];
-            if (vec?.length === 768) {
-              const pointId = crypto.randomUUID();
-              const cachedResponse = JSON.stringify({
-                id: `bifrost-l3-${Date.now()}`,
-                object: 'chat.completion',
-                model: bifrostModel,
-                choices: [
-                  { index: 0, message: { role: 'assistant', content }, finish_reason: 'stop' },
-                ],
-                usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-              });
-              await fetch(`${ENV.QDRANT_URL}/collections/${BIFROST_CACHE_COLLECTION}/points`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  points: [
-                    {
-                      id: pointId,
-                      vector: vec,
-                      payload: {
-                        request_hash: exactCacheKey,
-                        params_hash: cacheKey,
-                        cache_key: 'global',
-                        model: bifrostModel,
-                        provider: 'llama-server',
-                        response: cachedResponse,
-                        stream_chunks: '',
-                        from_bifrost_semantic_cache_plugin: true,
-                        expires_at: Math.floor(Date.now() / 1000) + 7200, // 2h TTL
-                      },
-                    },
-                  ],
-                }),
-                signal: AbortSignal.timeout(3_000),
-              });
-            }
-          }
-        } catch {
-          // write-back failure is non-fatal
-        }
-      })();
-    }
+  // Store only the existing exact-match entry; semantic L2 write-back remains disabled.
+  if (content) {
     await setExactMatchCache(exactCacheKey, {
       content,
       model: bifrostModel,
@@ -1486,7 +1301,7 @@ export async function bifrostChat(
       2
     )} l1_ms=${t_l1.toFixed(2)} embed_ms=${t_embed.toFixed(2)} qdrant_ms=${t_qdrant.toFixed(
       2
-    )} l3_ms=${t_l3.toFixed(2)} writeback=${writebackQueued}`
+    )} l3_ms=${t_l3.toFixed(2)} writeback=false`
   );
 
   // ── Hypergraph Recording End ──
@@ -1506,7 +1321,7 @@ export async function bifrostChat(
       chatTemplate: 'gemma',
       response: content.slice(0, 20_000),
       temperature: options?.temperature ?? 0.7,
-      writebackQueued,
+      writebackQueued: false,
     });
   }
 
@@ -1571,7 +1386,7 @@ function sanitizeModelOutput(text: string): string {
 // ── Chat Functions (llama-server :8090; legacy Ollama-compatible API names) ──
 
 export async function generateText(prompt: string): Promise<string> {
-  // Route through Bifrost gateway when enabled (gets semantic caching)
+  // Route through Bifrost for synthesis; semantic cache reuse is disabled.
   if (ENV.BIFROST_ENABLED) {
     return traceLLM(
       'generate-text',
@@ -1630,7 +1445,7 @@ export async function callOllamaChat(
   userPrompt: string,
   options?: { format?: 'json'; num_predict?: number; temperature?: number }
 ): Promise<string> {
-  // Route through Bifrost gateway when enabled (gets semantic caching)
+  // Route through Bifrost for synthesis; semantic cache reuse is disabled.
   if (ENV.BIFROST_ENABLED) {
     return traceLLM(
       'llama-server-chat',

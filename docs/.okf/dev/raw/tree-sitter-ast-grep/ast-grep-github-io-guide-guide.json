@@ -1,0 +1,51 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "tree-sitter-ast-grep",
+  "source_ref": "tree-sitter-ast-grep:ast-grep-github-io-guide-guide",
+  "url": "https://ast-grep.github.io/guide/",
+  "title": "ast-grep.github.io",
+  "domain_class": "tool",
+  "focus_tags": [
+    "tree_sitter",
+    "ast_grep",
+    "syntax_trees",
+    "structural_search",
+    "napi"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "ast-grep.github.io",
+    "markdown_excerpt": "[Skip to content](https://ast-grep.github.io/guide/#VPContent) 404 # PAGE NOT FOUND > But if you don't change your direction, and if you keep looking, you may end up where you are heading. [Take me home](https://ast-grep.github.io/)",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:tree-sitter-ast-grep:ast-grep-github-io-guide-guide",
+    "title": "ast-grep.github.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Tree-sitter, ast-grep, and N-API Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "e93f002fea376f0e9087cade3c3711e044c54689b09babed47104c1599cf15f8",
+  "markdown_path": "docs/.okf/dev/raw/tree-sitter-ast-grep/ast-grep-github-io-guide-guide.md",
+  "fetched_at": "2026-10-09T05:28:29.017Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "tree-sitter-ast-grep",
+    "source_title": "Tree-sitter, ast-grep, and N-API Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "documentation",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/tree-sitter-ast-grep/ast-grep-github-io-guide-guide.md"
+}

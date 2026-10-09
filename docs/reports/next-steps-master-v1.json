@@ -1,0 +1,651 @@
+{
+  "schema": "next-steps-master-audit.v1",
+  "status": "READ_ONLY_SYNTHESIS_PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": {
+    "markdownSources": 0,
+    "databases": 0,
+    "caches": 0,
+    "graphProjections": 0
+  },
+  "inputs": [
+    {
+      "file": "docs/next_steps/litert-conversion-pathway.md",
+      "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+    }
+  ],
+  "counts": {
+    "markdownFiles": 1,
+    "uncheckedCandidates": 7,
+    "conditionalTriggers": 4,
+    "roadmapTriggers": 3
+  },
+  "method": {
+    "inventory": "deterministic_markdown_checkbox_scan_outside_fenced_code",
+    "normalization": "whitespace_only",
+    "taskId": "sha256(relative_path + line + normalized_checkbox_text + source_checksum)",
+    "lexical": "single exact-identifier search over bounded code roots",
+    "astGrep": "NOT_RUN",
+    "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+    "nlp": "NOT_RUN",
+    "langExtract": "NOT_RUN",
+    "pagerank": "NOT_RUN",
+    "fusion": "NOT_RUN"
+  },
+  "candidates": [
+    {
+      "taskId": "next-step:sha256:3e266e3d5fc05f5ec3431e2d8b40596ea7344c68eeae1aba824b34d2ee724ab6",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 188,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "Mobile/PWA offline mode becomes critical (iOS/Android native)",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "Mobile/PWA offline mode becomes critical (iOS/Android native)",
+        "domain": null,
+        "taskType": "CONDITIONAL_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "iOS",
+          "PWA"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "NO_CODE_HITS",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:4f82e72af653e7e002b0c37277ceaae1aaaf9db5093e2bbc4f142590331b540b",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 189,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "File size optimization is blocking deployment (CDN cost)",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "File size optimization is blocking deployment (CDN cost)",
+        "domain": null,
+        "taskType": "CONDITIONAL_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "CDN"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [
+          {
+            "term": "CDN",
+            "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+            "line": 4363,
+            "text": "modelUrl: varchar('model_url', { length: 500 }).notNull(), // path to .glb file (static/ or CDN)"
+          },
+          {
+            "term": "CDN",
+            "file": "sveltekit-frontend/src/lib/server/middleware/cache-headers.ts",
+            "line": 38,
+            "text": "/** Private - browser cache only, not CDN (user-specific data) */"
+          },
+          {
+            "term": "CDN",
+            "file": "sveltekit-frontend/src/routes/+layout.server.ts",
+            "line": 15,
+            "text": "// Public - cache for 10 minutes (CDN: 1 hour)"
+          }
+        ],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "EVIDENCE_FOUND_UNRANKED",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:81ee74baae88606a8db845c841657228f90ecaf3fcc5fd547e049d8d4f3b7d15",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 190,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "Server inference throughput becomes bottleneck (>1000 req/s)",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "Server inference throughput becomes bottleneck (>1000 req/s)",
+        "domain": null,
+        "taskType": "CONDITIONAL_TRIGGER",
+        "ownerHint": null,
+        "identifiers": []
+      },
+      "codeEvidence": {
+        "lexicalHits": [],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "NO_CODE_HITS",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:aa2b8cf81d7d947ba4a6472c6db18ac0b7e1cbe9fd6774a31ba62bac26905ce3",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 191,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "MediaPipe Tasks ecosystem provides a direct win (audio/video multimodal)",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "MediaPipe Tasks ecosystem provides a direct win (audio/video multimodal)",
+        "domain": null,
+        "taskType": "CONDITIONAL_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "MediaPipe"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "NO_CODE_HITS",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:93d014e1c593726d356fbe60d779184bb4b4a9031991a600818a66a3de8351bd",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 194,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "Phase 106 completes ahead of schedule",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "Phase 106 completes ahead of schedule",
+        "domain": null,
+        "taskType": "ROADMAP_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "Phase 106"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/apply-naive-bayes-predictions.mjs",
+            "line": 3,
+            "text": "* Phase 106: Apply Naive Bayes predictions."
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/audit-topology-completion-gaps.mjs",
+            "line": 3,
+            "text": "* Phase 106: Audit topology completion gaps."
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/audit-topology-completion-gaps.mjs",
+            "line": 214,
+            "text": "'# Phase 106 Next Production Gaps',"
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/export-semantic-training-rows.mjs",
+            "line": 3,
+            "text": "* Phase 106: Export semantic training rows."
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/phase1-ast-grep-extraction.mjs",
+            "line": 4,
+            "text": "* Phase 106 Stage 1: AST-Grep Structural Extraction"
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/phase1-ast-grep-extraction.mjs",
+            "line": 389,
+            "text": "console.log('Phase 106 Stage 1: AST-Grep Structural Extraction');"
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/phase106-add-768-column.mjs",
+            "line": 4,
+            "text": "* Phase 106: Add content_embedding_768 column to codebase_chunk_index"
+          },
+          {
+            "term": "Phase 106",
+            "file": "scripts/atlas/phase106-stage4-embedding-backfill.mjs",
+            "line": 4,
+            "text": "* Phase 106 Stage 4: Canonical 768-dim Embedding Backfill"
+          }
+        ],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "EVIDENCE_FOUND_UNRANKED",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:01eab26c85301ef408752afa020b98faf3b16f3fc0e142f33ec1f4570f4c229e",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 195,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "Phase 107+ roadmap includes mobile support",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "Phase 107+ roadmap includes mobile support",
+        "domain": null,
+        "taskType": "ROADMAP_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "Phase 107"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+            "line": 5162,
+            "text": "// ── Feature Packet Bindings (Phase 107 F: Identity + Precedence Only) ────────"
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+            "line": 5165,
+            "text": "// Phase 107 F: schema only (table empty), no automatic binding creation."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 2,
+            "text": "* Content Identity Semantics (Phase 107 Phase F Provenance)"
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 153,
+            "text": "* Used in Phase 107 Phase F to measure fallback rates and detect patterns."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 188,
+            "text": "* Field-level resolution result for Phase 107 Phase F materialization."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/types.ts",
+            "line": 3,
+            "text": "* Phase 107 - Unified Restoration"
+          },
+          {
+            "term": "Phase 107",
+            "file": "scripts/atlas/generate-ontology-tuples.mjs",
+            "line": 349,
+            "text": "console.log('   Phase 107 Complete: All 5 evidence lanes ready for fusion\\n');"
+          },
+          {
+            "term": "Phase 107",
+            "file": "scripts/atlas/phase107-operations-orchestrator.mjs",
+            "line": 5,
+            "text": "* Unified entry point for post-Gate-3 Phase 107 execution"
+          }
+        ],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "EVIDENCE_FOUND_UNRANKED",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    },
+    {
+      "taskId": "next-step:sha256:9f8ebe5e7a1cc443a44f108092949fd5865ae1a8a64ee51fb01f22647980c98a",
+      "source": {
+        "file": "docs/next_steps/litert-conversion-pathway.md",
+        "line": 196,
+        "headingPath": [
+          "LiteRT.js Conversion Pathway (Optional Post-Phase 106)",
+          "When to Prioritize LiteRT Conversion"
+        ],
+        "rawText": "Vector quantization lane (Phase 107) needs smaller base models",
+        "sourceChecksum": "sha256:66068dbc803d086ffcb0902447de2636ef8072dd5700a8472a7f2e740a90ca0f"
+      },
+      "normalized": {
+        "text": "Vector quantization lane (Phase 107) needs smaller base models",
+        "domain": null,
+        "taskType": "ROADMAP_TRIGGER",
+        "ownerHint": null,
+        "identifiers": [
+          "Phase 107"
+        ]
+      },
+      "codeEvidence": {
+        "lexicalHits": [
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+            "line": 5162,
+            "text": "// ── Feature Packet Bindings (Phase 107 F: Identity + Precedence Only) ────────"
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+            "line": 5165,
+            "text": "// Phase 107 F: schema only (table empty), no automatic binding creation."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 2,
+            "text": "* Content Identity Semantics (Phase 107 Phase F Provenance)"
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 153,
+            "text": "* Used in Phase 107 Phase F to measure fallback rates and detect patterns."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/server/types/content-identity.ts",
+            "line": 188,
+            "text": "* Field-level resolution result for Phase 107 Phase F materialization."
+          },
+          {
+            "term": "Phase 107",
+            "file": "sveltekit-frontend/src/lib/types.ts",
+            "line": 3,
+            "text": "* Phase 107 - Unified Restoration"
+          },
+          {
+            "term": "Phase 107",
+            "file": "scripts/atlas/generate-ontology-tuples.mjs",
+            "line": 349,
+            "text": "console.log('   Phase 107 Complete: All 5 evidence lanes ready for fusion\\n');"
+          },
+          {
+            "term": "Phase 107",
+            "file": "scripts/atlas/phase107-operations-orchestrator.mjs",
+            "line": 5,
+            "text": "* Unified entry point for post-Gate-3 Phase 107 execution"
+          }
+        ],
+        "symbolHits": [],
+        "astHits": []
+      },
+      "graphEvidence": {
+        "graphRevision": null,
+        "nodes": [],
+        "edges": [],
+        "callers": [],
+        "callees": [],
+        "dependencies": [],
+        "pagerank": null,
+        "qualification": "NOT_VERIFIED"
+      },
+      "nlpEvidence": {
+        "spans": [],
+        "classification": null,
+        "confidence": null,
+        "status": "NOT_RUN"
+      },
+      "dependencies": [],
+      "blockers": [],
+      "scores": {
+        "lexical": null,
+        "symbol": null,
+        "graph": null,
+        "pagerank": null,
+        "explicitPriority": null,
+        "dependency": null,
+        "final": null
+      },
+      "qualification": "UNRESOLVED",
+      "enrichmentStatus": {
+        "lexical": "EVIDENCE_FOUND_UNRANKED",
+        "astGrep": "NOT_RUN",
+        "graphify": "NOT_RUN_SNAPSHOT_NOT_VERIFIED",
+        "langExtract": "NOT_RUN",
+        "pagerank": "NOT_RUN",
+        "fusion": "NOT_RUN"
+      }
+    }
+  ],
+  "limitations": [
+    "Unchecked boxes are preserved as source status; this report does not assert they are ready work items.",
+    "No task is completed, prioritized, deduplicated, superseded, or created by enrichment.",
+    "Exact-text lexical matches are diagnostic candidates only; they do not prove that a code owner implements the condition named by a checkbox.",
+    "Graphify/AST/NLP/PageRank/LangExtract/fusion were not invoked; only bounded lexical hits are recorded.",
+    "Graph evidence remains NOT_VERIFIED because a current revision-qualified graph snapshot was not established.",
+    "Chat-only design notes, including Mastra/OpenCode execution identity, were not promoted into tasks because source Markdown is authoritative and the requested inventory is docs/next_steps."
+  ]
+}

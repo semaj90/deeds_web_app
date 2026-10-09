@@ -8,7 +8,7 @@ Scope: Correct the attached "What Was Working On Yesterday" note against the liv
 
 The attached note is directionally useful, but several items are now stale:
 
-- `Gemma4 -> MCP tool dispatch` is not missing. A real dispatch loop exists in [gemma4-tool-controller.ts](C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts).
+- ornith 1.5 llama-server 8090 `Gemma4 -> MCP tool dispatch` is not missing. A real dispatch loop exists in [gemma4-tool-controller.ts](C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts).
 - `Embed dimensions metadata` is not missing. The embed route already returns `dimensions`.
 - `TurboVec Stage 1.5 prefilter` exists as a retriever-sidecar client, but it is not visibly wired into the ACE query-router path named in the note.
 - `Phase 108D` is now stronger than the note implies: cross-store packet proof is live for one canonical packet across `POSTGRES`, `QDRANT`, `REDIS`, `HYPERRAG_RPC`, and `ACE`.
@@ -22,7 +22,7 @@ Current highest-value gap is no longer "make proof work". It is tightening the r
 - `sveltekit-frontend/src/lib/server/ace/query-router.ts`
   - Real multi-lane ACE router.
   - Uses centroid lookup, Qdrant search, and GPU reranking.
-- `sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts`
+- `sveltekit-frontend/src/lib/server/ai/gemma4-tool-controller.ts` ornith 1.5 llama-server
   - Has tool loop, `dispatchToolCall`, MCP HTTP dispatch, in-process fallback, dedup, and round limits.
 - `sveltekit-frontend/src/routes/api/embed/+server.ts`
   - Already returns `model` and `dimensions`.
@@ -50,7 +50,7 @@ Current highest-value gap is no longer "make proof work". It is tightening the r
 
 ## Corrections To The Attached Note
 
-### 1. Gemma4 -> MCP dispatch
+### 1. ornith 1.5 llama-server 8090 update from Gemma4 -> MCP dispatch
 
 Attached note status: `MISSING`
 
@@ -173,8 +173,7 @@ If continuing from this checkpoint, the most defensible next slice is:
 
 ## Current Classification
 
-- `EMBED_DIMENSIONS_METADATA`: `ALREADY_WIRED`
-- `GEMMA4_TOOL_DISPATCH`: `WIRED_NEEDS_ROUTE_LEVEL_PROOF`
+- `EMBED_DIMENSIONS_METADATA`: `ALREADY_WIRED` update to ornith 1.5 llama-server 8090  from `GEMMA4_TOOL_DISPATCH`: `WIRED_NEEDS_ROUTE_LEVEL_PROOF`
 - `TURBOVEC_PREFILTER_CLIENT`: `PRESENT`
 - `TURBOVEC_PREFILTER_IN_ACE_QUERY_ROUTER`: `NOT_EVIDENT`
 - `PHASE_108D_CROSS_STORE_PACKET_PROOF`: `CROSS_STORE_PROVEN`

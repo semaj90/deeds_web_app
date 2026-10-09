@@ -31,6 +31,7 @@ import re
 import sys
 import tempfile
 import time
+import unicodedata
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -40,6 +41,8 @@ from typing import Any, Literal, Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+from atlas_structural_provenance import find_occurrence_positions, occurrence_to_absolute_byte_position
 
 try:
     from atlas_nlp_classification_helper_v1 import ClassificationRequestV1, classify_request
@@ -262,12 +265,7 @@ class AstEvidenceEdge(BaseModel):
     resolution: Optional[str] = None
     # Additive, optional (2026-08-29, CSGR-3) — evidence_start_line/column above remain the
     # enclosing CHUNK's boundary, unchanged, for backward compatibility with existing consumers.
-    # occurrence_positions carries every real per-occurrence [row_0indexed, column_0indexed] found
-    # by re-parsing the chunk with find_occurrence_positions() (atlas_structural_provenance.py) —
-    # None when not computed (e.g. unsupported language, parse failure), [] when computed but the
-    # name genuinely wasn't found, and >1 entries when the same name occurs multiple times in one
-    # chunk (the exact case that made 94.8% of unresolved_target edges share one chunk-level
-    # position — see openspec/changes/parent-atlas-compiler-semantic-graph-resolution/tasks.md).
+    # Absolute source positions as [1-based line, 0-based UTF-8 byte column].
     occurrence_positions: Optional[list[list[int]]] = None
 
 
@@ -1270,20 +1268,130 @@ def _grounded_output_schema() -> dict[str, Any]:
     return langextract.schema.extractions_schema(item_schema, additional_properties=False)  # type: ignore[union-attr]
 
 
-def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
+def _grounded_span_probe(text: str, item: Any) -> dict[str, Any]:
+    extraction_text = getattr(item, "extraction_text", None) or getattr(item, "text", None) or ""
+    start_char = getattr(item, "start_char", None)
+    end_char = getattr(item, "end_char", None)
+    alignment_status = getattr(item, "alignment_status", None)
+    source_bytes = text.encode("utf-8")
+    result: dict[str, Any] = {
+        "extractionText": str(extraction_text),
+        "startChar": start_char if isinstance(start_char, int) and not isinstance(start_char, bool) else None,
+        "endChar": end_char if isinstance(end_char, int) and not isinstance(end_char, bool) else None,
+        "alignmentStatus": str(alignment_status) if alignment_status is not None else None,
+        "inputSha256": hashlib.sha256(source_bytes).hexdigest(),
+        "inputByteLength": len(source_bytes),
+        "inputCharacterLength": len(text),
+        "crCount": text.count("\r"),
+        "lfCount": text.count("\n"),
+        "crlfCount": text.count("\r\n"),
+        "nfcState": "NORMALIZED" if unicodedata.normalize("NFC", text) == text else "NOT_NORMALIZED",
+        "nfdState": "NORMALIZED" if unicodedata.normalize("NFD", text) == text else "NOT_NORMALIZED",
+        "charSliceExact": False,
+        "byteSliceExact": False,
+        "classification": "UNRESOLVED",
+    }
+    if not isinstance(start_char, int) or isinstance(start_char, bool) or not isinstance(end_char, int) or isinstance(end_char, bool):
+        result["rejectionReason"] = "CHAR_INTERVAL_MISSING_OR_INVALID"
+        return result
+    if start_char < 0 or end_char <= start_char or end_char > len(text):
+        result["rejectionReason"] = "CHAR_INTERVAL_OUT_OF_BOUNDS"
+        result["classification"] = "SIDECAR_OFFSET_DEFECT"
+        return result
+
+    char_slice = text[start_char:end_char]
+    result["sourceSliceAtReturnedOffsets"] = char_slice
+    result["charSliceExact"] = char_slice == str(extraction_text)
+    byte_start = len(text[:start_char].encode("utf-8"))
+    byte_end = len(text[:end_char].encode("utf-8"))
+    result["startByte"] = byte_start
+    result["endByte"] = byte_end
+    try:
+        byte_slice = source_bytes[byte_start:byte_end].decode("utf-8")
+    except UnicodeDecodeError:
+        byte_slice = None
+    result["byteSliceExact"] = byte_slice == str(extraction_text)
+    if result["charSliceExact"] and result["byteSliceExact"]:
+        result["classification"] = "SOURCE_EXACT"
+        return result
+
+    newline_lf = text.replace("\r\n", "\n").replace("\r", "\n")
+    newline_crlf = newline_lf.replace("\n", "\r\n")
+    probes = {
+        "LF_NORMALIZED": newline_lf,
+        "CRLF_NORMALIZED": newline_crlf,
+        "NFC_NORMALIZED": unicodedata.normalize("NFC", text),
+        "NFD_NORMALIZED": unicodedata.normalize("NFD", text),
+    }
+    result["normalizationProbes"] = {
+        name: {
+            "sliceAtReturnedOffsets": candidate[start_char:end_char] if end_char <= len(candidate) else None,
+            "exact": end_char <= len(candidate) and candidate[start_char:end_char] == str(extraction_text),
+        }
+        for name, candidate in probes.items()
+    }
+    exact_probes = [name for name, probe in result["normalizationProbes"].items() if probe["exact"]]
+    if any(name in exact_probes for name in ("LF_NORMALIZED", "CRLF_NORMALIZED")):
+        result["classification"] = "CRLF_NORMALIZATION"
+    elif any(name in exact_probes for name in ("NFC_NORMALIZED", "NFD_NORMALIZED")):
+        result["classification"] = "UNICODE_NORMALIZATION"
+    elif str(extraction_text) and text.find(str(extraction_text)) >= 0:
+        result["classification"] = "TOKEN_ALIGNMENT_DIFFERENCE"
+    result["rejectionReason"] = "RETURNED_SPAN_NOT_EXACT_IN_ORIGINAL_SOURCE"
+    return result
+
+
+def _grounded_extractions(
+    text: str,
+    model_id: Optional[str] = None,
+    *,
+    span_diagnostics: Optional[list[dict[str, Any]]] = None,
+    execution_receipt: Optional[dict[str, Any]] = None,
+) -> list[dict[str, Any]]:
     global _grounded_extraction_error
     _grounded_extraction_error = None
+    source_bytes = text.encode("utf-8")
+    if execution_receipt is not None:
+        execution_receipt.update({
+            "requested": True,
+            "executorAttempted": False,
+            "executorAvailable": bool(LANGEXTRACT_AVAILABLE and langextract is not None),
+            "executorCompleted": False,
+            "resultCount": 0,
+            "rawResultCount": 0,
+            "provider": "langextract",
+            "providerRevision": _provider_revision(),
+            "modelId": model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
+            "inputChecksum": hashlib.sha256(source_bytes).hexdigest(),
+            "inputByteLength": len(source_bytes),
+            "inputCharacterLength": len(text),
+            "crCount": text.count("\r"),
+            "lfCount": text.count("\n"),
+            "crlfCount": text.count("\r\n"),
+            "nfcState": "NORMALIZED" if unicodedata.normalize("NFC", text) == text else "NOT_NORMALIZED",
+            "nfdState": "NORMALIZED" if unicodedata.normalize("NFD", text) == text else "NOT_NORMALIZED",
+            "state": "FAILED",
+            "failureClass": None,
+        })
     if not LANGEXTRACT_AVAILABLE or langextract is None:
         _grounded_extraction_error = "LANGEXTRACT_UNAVAILABLE"
+        if execution_receipt is not None:
+            execution_receipt["failureClass"] = "NOT_IMPORTABLE"
         return []
     _ensure_grounded_provider_controls()
     if _grounded_extraction_error:
+        if execution_receipt is not None:
+            execution_receipt["failureClass"] = "EXECUTION_ERROR"
         return []
     try:
         extract_fn = getattr(langextract, "extract", None)
         if extract_fn is None:
             _grounded_extraction_error = "LANGEXTRACT_EXTRACT_FUNCTION_UNAVAILABLE"
+            if execution_receipt is not None:
+                execution_receipt["failureClass"] = "NOT_IMPORTABLE"
             return []
+        if execution_receipt is not None:
+            execution_receipt["executorAttempted"] = True
         result = getattr(extract_fn, "extract", extract_fn)(  # type: ignore[misc]
             text,
             prompt_description=(
@@ -1308,34 +1416,66 @@ def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dic
         )
     except Exception as exc:
         _grounded_extraction_error = f"{type(exc).__name__}:{str(exc)[:240]}"
+        if execution_receipt is not None:
+            execution_receipt["executorAttempted"] = True
+            execution_receipt["failureClass"] = "EXECUTION_ERROR"
         return []
 
     raw_extractions = getattr(result, "extractions", None) or []
+    if execution_receipt is not None:
+        execution_receipt["executorAttempted"] = True
+        execution_receipt["executorCompleted"] = True
+        execution_receipt["rawResultCount"] = len(raw_extractions)
     extracted: list[dict[str, Any]] = []
     for item in raw_extractions[:50]:
         extraction_class = getattr(item, "extraction_class", None) or getattr(item, "label", None) or "UNKNOWN"
         extraction_text = getattr(item, "extraction_text", None) or getattr(item, "text", None) or ""
         if not extraction_text:
+            if span_diagnostics is not None:
+                span_diagnostics.append({"classification": "UNRESOLVED", "rejectionReason": "EMPTY_EXTRACTION_TEXT"})
             continue
-        start_char = getattr(item, "start_char", None)
-        end_char = getattr(item, "end_char", None)
-        if not isinstance(start_char, int) or not isinstance(end_char, int):
+        probe = _grounded_span_probe(text, item)
+        if probe["classification"] != "SOURCE_EXACT":
+            if span_diagnostics is not None:
+                span_diagnostics.append(probe)
             continue
-        if start_char < 0 or end_char <= start_char or end_char > len(text):
-            continue
-        if text[start_char:end_char] != str(extraction_text):
-            continue
+        start_char = int(probe["startChar"])
+        end_char = int(probe["endChar"])
         extracted.append(
             {
                 "class": str(extraction_class),
                 "text": str(extraction_text),
                 "start_char": start_char,
                 "end_char": end_char,
+                "start_byte": int(probe["startByte"]),
+                "end_byte": int(probe["endByte"]),
                 "attributes": getattr(item, "attributes", None) or {},
                 "alignment_status": getattr(item, "alignment_status", None),
             }
         )
+    if execution_receipt is not None:
+        execution_receipt["resultCount"] = len(extracted)
+        execution_receipt["state"] = (
+            "REJECTED_SPAN_MISMATCH" if span_diagnostics
+            else "COMPLETED_GROUNDED" if extracted
+            else "COMPLETED_EMPTY"
+        )
+        if span_diagnostics:
+            execution_receipt["failureClass"] = "SPAN_REJECTION"
     return extracted
+
+
+def _grounded_source_binding_status(req: AnalyzeRequest, analyzed_text: str) -> tuple[str, str]:
+    required = (req.source_ref, req.source_revision, req.workspace_revision, req.packet_key)
+    if not all(isinstance(value, str) and value.strip() for value in required):
+        return "INCOMPLETE", "SOURCE_PACKET_WORKSPACE_LINEAGE_REQUIRED"
+    source_revision = str(req.source_revision)
+    if re.fullmatch(r"sha256:[a-f0-9]{64}", source_revision) is None:
+        return "INVALID_SOURCE_REVISION_FORMAT", "SOURCE_REVISION_MUST_BE_SHA256_OF_ANALYZED_BYTES"
+    analyzed_revision = "sha256:" + hashlib.sha256(analyzed_text.encode("utf-8")).hexdigest()
+    if source_revision != analyzed_revision:
+        return "SOURCE_REVISION_MISMATCH", "ANALYZED_TEXT_BYTES_DO_NOT_MATCH_SOURCE_REVISION"
+    return "SOURCE_BYTES_BOUND", ""
 
 
 def _chunk_field(item: Any, *names: str) -> Any:
@@ -2326,23 +2466,27 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
 
     nb_label: Optional[str] = None
     nb_score = 0.0
+    nb_probabilities: dict[str, float] = {}
     nb = checkpoint.get("nb")
     if nb is not None:
         try:
             proba = nb.predict_proba(feature_vector)[0]
             idx = int(proba.argmax())
             nb_label, nb_score = labels[idx], float(proba[idx])
+            nb_probabilities = {str(labels[int(class_index)]): float(score) for class_index, score in zip(nb.classes_, proba)}
         except Exception:
             pass
 
     lr_label: Optional[str] = None
     lr_score = 0.0
+    lr_probabilities: dict[str, float] = {}
     lr = checkpoint.get("lr")
     if lr is not None:
         try:
             proba = lr.predict_proba(feature_vector)[0]
             idx = int(proba.argmax())
             lr_label, lr_score = labels[idx], float(proba[idx])
+            lr_probabilities = {str(labels[int(class_index)]): float(score) for class_index, score in zip(lr.classes_, proba)}
         except Exception:
             pass
 
@@ -2363,6 +2507,8 @@ def _classify_domain_pass(text: str) -> tuple[str, dict[str, Any], dict[str, Any
     features_map: dict[str, Any] = {
         "naive_bayes_domain_probability": nb_score,
         "logistic_regression_domain_probability": lr_score,
+        "naive_bayes_domain_probabilities": nb_probabilities,
+        "logistic_regression_domain_probabilities": lr_probabilities,
         # Deprecated compatibility aliases -- do not add new readers of these.
         "naive_bayes_score": nb_score,
         "logistic_regression_score": lr_score,
@@ -2653,10 +2799,42 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
 
     concepts = _code_concepts(text, entities, chunks) if code_mode else [entity.text for entity in entities[:50]]
     grounded_extractions: list[dict[str, Any]] = []
+    grounded_span_diagnostics: list[dict[str, Any]] = []
+    source_binding_status, source_binding_reason = (
+        _grounded_source_binding_status(req, text)
+        if req.grounded_extraction_required
+        else ("NOT_REQUESTED", "")
+    )
+    grounded_execution_receipt: dict[str, Any] = {
+        "requested": bool(req.grounded_extraction_required),
+        "inputChecksum": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "inputByteLength": len(text.encode("utf-8")),
+        "requestBinding": {
+            "sourceRef": req.source_ref,
+            "sourceRevision": req.source_revision,
+            "workspaceRevision": req.workspace_revision,
+            "packetKey": req.packet_key,
+            "status": source_binding_status,
+            "reason": source_binding_reason or None,
+        },
+        "executorAttempted": False,
+        "executorCompleted": False,
+        "resultCount": 0,
+        "state": "NOT_ATTEMPTED",
+    }
     grounded_used = False
     if req.grounded_extraction_required:
-        grounded_extractions = _grounded_extractions(text, req.model_id)
-        grounded_used = bool(grounded_extractions)
+        if source_binding_status == "SOURCE_BYTES_BOUND":
+            grounded_extractions = _grounded_extractions(
+                text,
+                req.model_id,
+                span_diagnostics=grounded_span_diagnostics,
+                execution_receipt=grounded_execution_receipt,
+            )
+            grounded_used = bool(grounded_extractions)
+        else:
+            grounded_execution_receipt["state"] = "UNAVAILABLE_SOURCE_BINDING"
+            grounded_execution_receipt["failureClass"] = source_binding_reason
     pass_results, ast_units, semantic_cards, hmm_observations, control5, experiment_feature_matrix = _build_pass_results(
         req,
         text,
@@ -2687,6 +2865,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         "text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "is_code": code_mode,
         "language": language,
+        "grounded_execution": grounded_execution_receipt,
         **_torch_summary(text),
     }
     if ast_units:
@@ -2698,6 +2877,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     if req.grounded_extraction_required:
         metadata["grounded_extraction_required"] = True
         metadata["grounded_extraction_used"] = grounded_used
+        metadata["grounded_span_diagnostics"] = grounded_span_diagnostics
         metadata["grounded_generation_controls"] = {
             "temperature": float(os.getenv("LANGEXTRACT_TEMPERATURE", "0")),
             "top_p": float(os.getenv("LANGEXTRACT_TOP_P", "1")),
@@ -2950,6 +3130,27 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
     for evidence_chunk, chunk in zip(evidence_chunks, chunks):
         metadata = chunk.metadata or {}
         symbol_key = evidence_chunk.upstream_chunk_id or file_key
+        reference_names = [
+            str(name)
+            for field_name in ("calls", "dependencies", "imports", "exports")
+            for name in metadata.get(field_name, [])
+        ]
+        occurrence_positions_by_name = find_occurrence_positions(
+            _slice_utf8_bytes(req.source, evidence_chunk.start_byte, evidence_chunk.end_byte),
+            language,
+            list(dict.fromkeys(reference_names)),
+        ) if reference_names else {}
+
+        def absolute_occurrence_positions(name: str) -> list[list[int]]:
+            return [
+                list(occurrence_to_absolute_byte_position(
+                    req.source,
+                    evidence_chunk.start_byte,
+                    row,
+                    column,
+                ))
+                for row, column in occurrence_positions_by_name.get(name, [])
+            ]
 
         if evidence_chunk.kind not in {"import", "export"} and evidence_chunk.name:
             candidate = (file_key, symbol_key, "DEFINES", evidence_chunk.start_line)
@@ -2981,6 +3182,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
                     evidence_end_column=evidence_chunk.end_column,
                     resolved=False,
                     resolution="syntax_only",
+                    occurrence_positions=absolute_occurrence_positions(str(import_value)),
                 ))
 
         for export_value in metadata.get("exports", []):
@@ -2997,6 +3199,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
                     evidence_end_column=evidence_chunk.end_column,
                     resolved=False,
                     resolution="syntax_only",
+                    occurrence_positions=absolute_occurrence_positions(str(export_value)),
                 ))
 
         for call in metadata.get("calls", []):
@@ -3014,6 +3217,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
                     evidence_end_column=evidence_chunk.end_column,
                     resolved=False,
                     resolution="unresolved_target",
+                    occurrence_positions=absolute_occurrence_positions(call_name),
                 ))
 
         for dependency in metadata.get("dependencies", []):
@@ -3031,6 +3235,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
                     evidence_end_column=evidence_chunk.end_column,
                     resolved=False,
                     resolution="unresolved_target",
+                    occurrence_positions=absolute_occurrence_positions(dependency_name),
                 ))
 
     if not edges:

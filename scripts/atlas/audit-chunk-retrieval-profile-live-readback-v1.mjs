@@ -16,8 +16,22 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const require = createRequire(import.meta.url);
 const { Pool } = require('pg');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const readbackPath = path.join(root, 'docs/reports/graphify-snapshot-native-readback-v1.json');
-const reportPath = path.join(root, 'docs/reports/chunk-retrieval-profile-live-readback-v1.json');
+const option = (name) => process.argv.find((arg) => arg.startsWith(`${name}=`))?.slice(name.length + 1);
+const scratchRoot = path.resolve(root, '.tmp');
+const resolveScratchOption = (name) => {
+  const value = option(name);
+  if (!value) return null;
+  const resolved = path.resolve(root, value);
+  const relative = path.relative(scratchRoot, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error(`${name.slice(2).replaceAll('-', '_').toUpperCase()}_MUST_BE_UNDER_TMP`);
+  }
+  return resolved;
+};
+const readbackPath = resolveScratchOption('--readback')
+  ?? path.join(root, 'docs/reports/graphify-snapshot-native-readback-v1.json');
+const reportPath = resolveScratchOption('--report')
+  ?? path.join(root, 'docs/reports/chunk-retrieval-profile-live-readback-v1.json');
 const noReport = process.argv.includes('--no-report');
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const limit = Math.max(1, Math.min(Number.parseInt(limitArg?.split('=')[1] ?? '16', 10) || 16, 128));

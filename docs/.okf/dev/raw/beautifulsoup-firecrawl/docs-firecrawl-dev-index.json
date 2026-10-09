@@ -1,0 +1,75 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "beautifulsoup-firecrawl",
+  "source_ref": "beautifulsoup-firecrawl:docs-firecrawl-dev-index",
+  "url": "https://docs.firecrawl.dev/",
+  "title": "docs.firecrawl.dev",
+  "domain_class": "tool",
+  "focus_tags": [
+    "beautifulsoup",
+    "firecrawl",
+    "html-parsing",
+    "bounded-crawling",
+    "llm_output",
+    "kanban",
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.firecrawl.dev",
+    "markdown_excerpt": "> ## Documentation Index > > Fetch the complete documentation index at: [/llms.txt](https://docs.firecrawl.dev/llms.txt) > > Use this file to discover all available pages before exploring further. [Skip to main content](https://docs.firecrawl.dev/introduction#content-area) Firecrawl is the web data API for AI agents. Search, scrape, and interact with the live web to get clean Markdown or structured data. ## [​](https://docs.firecrawl.dev/introduction\\#get-started) Get started ### Set up Firecrawl MCP Sign in via browser. [See all setup options](https://docs.firecrawl.dev/mcp-server/oauth) ![](https://docs.firecrawl.dev/images/agent-clients/codex.svg)**ChatGPT & Codex** Install plugin![](https://docs.firecrawl.dev/images/agent-clients/claude-code.svg)**Claude & Claude Code** Install plugin![](https://docs.firecrawl.dev/images/agent-clients/cursor.svg)**Cursor** One click![](https://docs.firecrawl.dev/images/agent-clients/opencode.svg)**OpenCode** Copy config Install the Firecrawl plugin, or use the command below for a direct MCP connection. [![](https://docs.firecrawl.dev/images/agent-clients/codex.svg)Add to ChatGPT & Codex](https://chatgpt.com/plugins/plugin_asdk_app_6a314a73f8ac8",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:beautifulsoup-firecrawl:docs-firecrawl-dev-index",
+    "title": "docs.firecrawl.dev",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Beautiful Soup and Firecrawl Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Firecrawl /scrape",
+      "recommendation": "Use /scrape for known official docs pages and /crawl only when you need site-wide discovery.",
+      "rationale": "Firecrawl documents scrape, crawl, search, extract, and parse as distinct surfaces."
+    },
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "OpenCode models / tools",
+      "recommendation": "Prefer explicit model/provider/tool configuration over implicit chat defaults.",
+      "rationale": "The repo needs canonical API recommendations, not hidden prompt state."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "f1fd5d8352a039fc91ab18afc939bf1f3c963f4251518aa9430eec1d740c91a9",
+  "markdown_path": "docs/.okf/dev/raw/beautifulsoup-firecrawl/docs-firecrawl-dev-index.md",
+  "fetched_at": "2026-10-09T05:34:18.567Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "beautifulsoup-firecrawl",
+    "source_title": "Beautiful Soup and Firecrawl Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/beautifulsoup-firecrawl/docs-firecrawl-dev-index.md"
+}

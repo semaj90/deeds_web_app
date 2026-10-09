@@ -12,7 +12,7 @@ const workspaceRevision = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 const sourceRevision = 'sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 const declarationHash = 'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc';
 
-function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: string } = {}) {
+function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: string; targetText?: string } = {}) {
   const srcRev = overrides.sourceRevision ?? sourceRevision;
   const wsRev = overrides.workspaceRevision ?? workspaceRevision;
   return compileStructuralExtractionFabric({
@@ -71,7 +71,7 @@ function makeFabric(overrides: { sourceRevision?: string; workspaceRevision?: st
     xref_edges: [
       {
         src: 'node-method',
-        dst: 'external:helper',
+        dst: overrides.targetText ?? 'external:helper',
         type: 'CALLS',
         weight: 1,
       },
@@ -104,8 +104,8 @@ function coordinates() {
   } as const;
 }
 
-function referenceEvidence() {
-  const referenceId = `treesitter-chunker-xref:node-method:external:helper:CALLS:${sourceRevision}`;
+function referenceEvidence(targetText = 'external:helper') {
+  const referenceId = `treesitter-chunker-xref:node-method:${targetText}:CALLS:${sourceRevision}`;
   return {
     [referenceId]: {
       referenceId,
@@ -166,6 +166,47 @@ describe('Graphify symbol projection mapper v1', () => {
       unresolvedTarget: 'external:helper',
       evidenceKind: 'treesitter_chunker_xref',
       confidence: 1,
+    });
+  });
+
+  it('resolves an imported reference only through an exact module and unique export binding', () => {
+    const context = {
+      bindingsByLocalName: new Map([['helper', {
+        localName: 'helper',
+        importedName: 'runHelper',
+        specifier: './helper.js',
+        typeOnly: false,
+      }]]),
+      knownSourceRefs: new Set(['src/lib/helper.ts']),
+      exportsBySourceRef: new Map([
+        ['src/lib/helper.ts', new Map([['runHelper', ['upstream-symbol:helper']]])],
+      ]),
+    };
+    const batch = mapFixture({
+      importResolutionContextBySourceRef: new Map([[sourceRef, context]]),
+      referenceEvidenceByReferenceId: referenceEvidence('helper'),
+      fabric: makeFabric({ targetText: 'helper' }),
+    });
+
+    expect(batch.edges[0]).toMatchObject({
+      objectStableSymbolKey: 'upstream-symbol:helper',
+      unresolvedTarget: null,
+    });
+
+    const ambiguousContext = {
+      ...context,
+      exportsBySourceRef: new Map([
+        ['src/lib/helper.ts', new Map([['runHelper', ['upstream-symbol:helper-a', 'upstream-symbol:helper-b']]])],
+      ]),
+    };
+    const ambiguousBatch = mapFixture({
+      importResolutionContextBySourceRef: new Map([[sourceRef, ambiguousContext]]),
+      referenceEvidenceByReferenceId: referenceEvidence('helper'),
+      fabric: makeFabric({ targetText: 'helper' }),
+    });
+    expect(ambiguousBatch.edges[0]).toMatchObject({
+      objectStableSymbolKey: null,
+      unresolvedTarget: 'helper',
     });
   });
 

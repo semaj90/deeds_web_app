@@ -1,6 +1,6 @@
 {
   "schema": "atlas.current-source-owner-reconciliation.v1",
-  "generatedAt": "2026-09-24T22:43:47.024Z",
+  "generatedAt": "2026-10-05T17:29:31.487Z",
   "mode": "READ_ONLY",
   "writesPerformed": false,
   "databaseWrites": 0,
@@ -11,17 +11,17 @@
     "root": "C:\\Users\\james\\Videos\\deeds-web-app",
     "gitRoot": "C:/Users/james/Videos/deeds-web-app",
     "gitCommonDir": ".git",
-    "headCommit": "14bcc00f75b566d3a546d80fbd4112eaa2e95126",
-    "headTree": "5fbb43c332b79ff5446df9ce650c2ad45bd6002d",
+    "headCommit": "ae9651941ea3ed0ebfd5630ca22be4ccdb496b45",
+    "headTree": "0f7b71ef26b575b6ec44df4ec345cd48d83ecf11",
     "hostname": "DESKTOP-Q18MPHM",
     "dirty": true,
-    "sourceCount": 25485,
-    "sourceRefChecksum": "sha256:7d9c84dc9a6d84eb1dffdbfebf35913839778872f4ea81a6ceb6537cc66e65e3",
+    "sourceCount": 26748,
+    "sourceRefChecksum": "sha256:2eed529628ede1aab620bc5bd3f4f0b4ffe328f4e8630d0346e32bbbe18e4141",
     "inventoryPolicy": {
       "command": "git ls-files --cached --others --exclude-standard -z",
-      "trackedAtHeadCount": 30007,
-      "candidateCount": 25524,
-      "admittedCount": 25485,
+      "trackedAtHeadCount": 32739,
+      "candidateCount": 26787,
+      "admittedCount": 26748,
       "skippedCount": 39,
       "maxSourceBytes": 5242880,
       "generatedPrefixesExcluded": [
@@ -77,40 +77,40 @@
     "admittedSnapshotDelta": {
       "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
       "snapshotSourceCount": 25542,
-      "currentSourceCount": 25485,
-      "sharedSourceCount": 24448,
-      "currentOnlyCount": 1037,
-      "admittedOnlyCount": 1094,
-      "sharedDigestMatchCount": 23604,
-      "sharedDigestMismatchCount": 844,
+      "currentSourceCount": 26748,
+      "sharedSourceCount": 24446,
+      "currentOnlyCount": 2302,
+      "admittedOnlyCount": 1096,
+      "sharedDigestMatchCount": 23265,
+      "sharedDigestMismatchCount": 1181,
       "dispositionCounts": {
-        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23604,
-        "WORKTREE_BYTES_DRIFTED": 844,
-        "WORKTREE_ADDED_AFTER_SNAPSHOT": 1037,
-        "MISSING_FROM_CURRENT_WORKTREE": 1094
+        "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23265,
+        "WORKTREE_BYTES_DRIFTED": 1181,
+        "WORKTREE_ADDED_AFTER_SNAPSHOT": 2302,
+        "MISSING_FROM_CURRENT_WORKTREE": 1096
       },
       "requiresSnapshotRefresh": true,
       "currentOnlySample": [
         ".claude/skills/openspec-quickhit/SKILL.md",
+        ".claude/skills/parent-atlas-workstation/SKILL.md",
+        ".claude/skills/validating-parent-atlas/SKILL.md",
+        ".claude/skills/validating-parent-atlas/reference/adversarial-probes.md",
+        ".claude/skills/validating-parent-atlas/reference/identity-and-lineage.md",
+        ".claude/skills/validating-parent-atlas/reference/proof-levels.md",
+        ".claude/skills/validating-parent-atlas/reference/runtime-side-effects.md",
+        ".claude/skills/validating-parent-atlas/reference/semantic-projection.md",
+        ".claude/skills/validating-parent-atlas/reference/structural-lineage.md",
         ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
-        ".okf/pipelines/sveltekit-vitest-validation.md",
-        ".scripts/find-and-kill-udp8443.ps1",
-        ".scripts/fix-ports-and-restart-vec-ai.ps1",
-        ".scripts/git-commit-and-push.ps1",
-        ".scripts/show-quic-diagnostics.ps1",
-        ".scripts/start-core-services.ps1",
-        ".scripts/start-quic-health.ps1",
-        ".scripts/start-vector-and-ai.ps1",
-        "atlas-openspec-awareness-v2/README.md",
-        "atlas-openspec-awareness-v2/READMEv3.md",
-        "atlas-openspec-awareness-v2/package-scripts-snippet.json",
-        "atlas-openspec-awareness-v2/scripts/atlas/adapt-openspec-controller-to-ranker-v2.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-atlas-runtime-readiness-v1.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-actionable-readiness-v2.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-board-topics-v1.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-directory-graph-v1.mjs",
-        "atlas-openspec-awareness-v2/scripts/atlas/audit-openspec-progress-v2.mjs"
+        ".okf/docs/dspy/corpus-3.4.0.json",
+        ".okf/docs/dspy/corpus.json",
+        ".okf/docs/dspy/postgres-index-contract.md",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/indexes/firecrawl-map.json",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/manifest.json",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0150a9bf3908b8d567987f068e43b5108781feff2b8ccbb7edc2ba0aa090d051.md",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/04565bee03781ddd66524ca26fcf64c4a8425f3ebabfc57f99ba9d904d6ab69a.md",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0507794de7baf379eb626ddd1ebde433a82b06b3e0910e2203b0d9cc24c79ae0.md",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/07ae7e91bf239d28c4d0a4eaffbefdfd07ed73a3cf5b50b179ffe998178cbc5e.md",
+        ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/097569378fbff92f48e8e3af03f37b06107c6467bb36897ef5e85fc48733bba0.md"
       ],
       "admittedOnlySample": [
         "claude-mem/.agent/rules/claude-mem-context.md",
@@ -135,28 +135,28 @@
         "claude-mem/.windsurf/rules/claude-mem-context.md"
       ],
       "sharedDigestMismatchSample": [
+        ".claude/settings.local.json",
         ".claude/skills/drizzle-schema-review/SKILL.md",
         ".okf/index.md",
+        ".vscode/tasks.json",
+        "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+        "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+        "AGENTS.md",
         "claude.md",
         "codex.md",
+        "crates/turbovec-napi/index.d.ts",
+        "crates/turbovec-napi/index.js",
+        "crates/turbovec-napi/src/lib.rs",
         "docker-compose.yml",
+        "docker/bifrost/config.json",
         "docker/clickhouse-mirror/clickhouse-mirror.py",
         "docker/docker-compose.gpu.yml",
         "docker/docling-vlm/app.py",
         "docker/image-synthesis/app.py",
         "docker/langgraph-synthesis/app.py",
-        "docs/.okf/schema.yaml",
-        "docs/GAN-DEEP-AUDIT-GUIDE.md",
-        "docs/MASTER-TOC.md",
-        "docs/OPENSPEC-WORKBOARD.md",
-        "docs/PHASE-3-IMPLEMENTATION-SUMMARY.md",
-        "docs/architecture/runtime-ownership-baseline.json",
-        "docs/architecture/runtime-ownership-registry.json",
-        "docs/archive-manifest.json",
-        "docs/graph/contract-error-map.json",
-        "docs/parent-atlas-workstation-todo.md"
+        "docs/.okf/registry.yaml"
       ],
-      "deltaChecksum": "sha256:bc363ef0c1e4e8288ed4ec7b19be505846d3e880f105f60bc8dc6fedf9b25791"
+      "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
     }
   },
   "currentExecutionCandidates": [
@@ -1341,5 +1341,5 @@
       }
     ]
   },
-  "checksum": "sha256:a939d4c5bffba33cf31f6cb6b1ee137cbea6dc705281def66c825ae3fc262510"
+  "checksum": "sha256:ff75a46dcaea076347ff1bc0c20beb53ac50de1857629869c319f301a3848a6f"
 }

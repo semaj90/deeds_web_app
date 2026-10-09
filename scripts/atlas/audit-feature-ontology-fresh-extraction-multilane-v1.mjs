@@ -25,7 +25,9 @@ for (const row of extraction.candidates ?? []) {
   const key = `${text(row.sourceRef)}|${text(row.objectId)}`;
   const current = groups.get(key) ?? {
     sourceRef: text(row.sourceRef), sourceRevision: text(row.sourceRevision), workspaceRevision: text(row.workspaceRevision),
-    packetKey: text(row.packetKey), subjectId: text(row.subjectId), predicate: 'USES_CONCEPT', objectId: text(row.objectId),
+    packetKey: null,
+    identityStatus: 'SOURCE_ONLY_UNBOUND',
+    subjectId: text(row.subjectId), predicate: 'USES_CONCEPT', objectId: text(row.objectId),
     conceptLabel: text(row.objectValue), evidenceRefs: new Set(), lanes: new Set(), evidenceModes: new Set(), confidences: [],
     sourceSpanGrounded: row.sourceSpanGrounded === true, sourceSpan: row.sourceSpan ?? null,
   };
@@ -53,7 +55,7 @@ const candidates = [...groups.values()].map((row) => {
   return {
     schema: 'atlas.feature-ontology-fresh-candidate.v1',
     candidateId: `fresh-multilane:${digest([row.sourceRef, row.sourceRevision, row.objectId]).slice(0, 32)}`,
-    packetKey: row.packetKey, sourceRef: row.sourceRef, sourceRevision: row.sourceRevision, workspaceRevision: row.workspaceRevision,
+    packetKey: null, identityStatus: 'SOURCE_ONLY_UNBOUND', sourceRef: row.sourceRef, sourceRevision: row.sourceRevision, workspaceRevision: row.workspaceRevision,
     subjectType: 'SOURCE', subjectId: row.subjectId, predicate: row.predicate, objectType: 'CONCEPT', objectId: row.objectId,
     objectValue: row.conceptLabel, evidenceRefs, evidenceModes, extractorKinds: lanes,
     extractorRevision: 'parent-atlas-fresh-ontology:multilane-merger-v1',

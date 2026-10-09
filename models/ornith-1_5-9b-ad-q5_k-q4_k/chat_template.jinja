@@ -42,6 +42,19 @@
 {%- if not messages %}
     {{- raise_exception('No messages provided.') }}
 {%- endif %}
+{#- Local patch (2026-10-06): clients such as OpenCode send system messages that are not first.
+    Hoist and merge every system message into the single leading system block instead of
+    raising 'System message must be at the beginning.'; original in .archive/2026-10-06-ornith-template/. #}
+{%- set sys = namespace(parts=[]) %}
+{%- for message in messages %}
+    {%- if message.role == "system" %}
+        {%- set sys_content = render_content(message.content, false, true)|trim %}
+        {%- if sys_content %}
+            {%- set sys.parts = sys.parts + [sys_content] %}
+        {%- endif %}
+    {%- endif %}
+{%- endfor %}
+{%- set merged_system = sys.parts | join('\n\n') %}
 {%- if tools and tools is iterable and tools is not mapping %}
     {{- '<|im_start|>system\n' }}
     {{- "# Tools\n\nYou have access to the following functions:\n\n<tools>" }}
@@ -51,17 +64,13 @@
     {%- endfor %}
     {{- "\n</tools>" }}
     {{- '\n\nIf you choose to call a function ONLY reply in the following format with NO suffix:\n\n<tool_call>\n<function=example_function_name>\n<parameter=example_parameter_1>\nvalue_1\n</parameter>\n<parameter=example_parameter_2>\nThis is the value for the second parameter\nthat can span\nmultiple lines\n</parameter>\n</function>\n</tool_call>\n\n<IMPORTANT>\nReminder:\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\n- Required parameters MUST be specified\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\n</IMPORTANT>' }}
-    {%- if messages[0].role == 'system' %}
-        {%- set content = render_content(messages[0].content, false, true)|trim %}
-        {%- if content %}
-            {{- '\n\n' + content }}
-        {%- endif %}
+    {%- if merged_system %}
+        {{- '\n\n' + merged_system }}
     {%- endif %}
     {{- '<|im_end|>\n' }}
 {%- else %}
-    {%- if messages[0].role == 'system' %}
-        {%- set content = render_content(messages[0].content, false, true)|trim %}
-        {{- '<|im_start|>system\n' + content + '<|im_end|>\n' }}
+    {%- if merged_system %}
+        {{- '<|im_start|>system\n' + merged_system + '<|im_end|>\n' }}
     {%- endif %}
 {%- endif %}
 {%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}
@@ -81,9 +90,7 @@
 {%- for message in messages %}
     {%- set content = render_content(message.content, true)|trim %}
     {%- if message.role == "system" %}
-        {%- if not loop.first %}
-            {{- raise_exception('System message must be at the beginning.') }}
-        {%- endif %}
+        {#- already rendered above in merged_system #}
     {%- elif message.role == "user" %}
         {{- '<|im_start|>' + message.role + '\n' + content + '<|im_end|>' + '\n' }}
     {%- elif message.role == "assistant" %}

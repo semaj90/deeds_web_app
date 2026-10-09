@@ -387,6 +387,53 @@ any library, database feature, model, or accelerator into a canonical owner.
   recommendation schemas do not prove semantic embedding, sparse BM42,
   TurboVec/CAGRA, PageRank, or agent execution behavior.
 
+### 2026-10-06 — Context-engineering topic documentation diagnostic
+
+- [x] **OKF-DOC-TOPIC-01** Add a bounded source manifest and topic-specific
+  noncanonical extractor using the existing Firecrawl → BeautifulSoup
+  acquisition owner. The isolated run captured 11 official pages (Valkey,
+  MessagePack, gRPC/Protobuf, DuckDB JSON/Parquet, context engineering, and
+  OpenAI prompt/tool docs) and four repo-owned references. The extractor emitted
+  758 topic observations with exact character and UTF-8 byte spans; each binds
+  a source checksum and extractor revision. `sourceRevision` is a content
+  checksum for this diagnostic artifact; `workspaceRevision` and
+  `representationRevision` remain null, not inferred. Corpus records preserve
+  the source manifest's domain hint and state explicitly that model synthesis
+  was not run. Evidence:
+  `docs/.okf/dev/context-engineering-docs-v1.json`,
+  `docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/summary.json`,
+  `docs/.okf/dev/context-engineering-docs-v1/run-20261006-v2/topic-extraction-receipt.json`.
+  The initial v1 run is retained as diagnostic history but superseded: its
+  keyword-derived domain labels and templated `llm_synthesis` field were not
+  truthful enough. The v2 crawler preserves the manifest's unreviewed
+  source-domain hint and records `synthesis_status=NOT_RUN`; 10 pages used
+  Firecrawl and one OpenAI tool-doc URL used the bounded fallback fetcher.
+  This is a local documentation diagnostic only; no admission, indexing,
+  embedding, Postgres, Qdrant, Neo4j, or Valkey write occurred.
+- [ ] **OKF-DOC-TOPIC-02A — focused official-source supplement (2026-10-06):**
+  Reused the existing bounded crawler and exact-span extractor; added five
+  official references for EmbeddingGemma, pgvector, cuML KMeans, OAKlib, and
+  simdjson. The extractor now reports those topic families separately from
+  ACE/BitFrost/cache, serialization, and task-DAG observations. The isolated
+  run read 9 inputs and emitted 386 observations (322 external-source, 64
+  repository-reference); a second extraction was byte-identical, and an
+  independent check found 0 missing source files and 0 character/UTF-8-byte
+  span failures. All outputs remain `canonicalAuthority=false`; no database,
+  Qdrant, Neo4j, or Valkey operation occurred. This does not create `title_id`
+  assignments or a DomainTitleRegistry; taxonomy/identity ownership remains
+  separate. Evidence: `docs/.okf/dev/context-engineering-docs-supplement-v1.json`,
+  `docs/.okf/dev/context-engineering-docs-v1/run-20261006-v3/`.
+- [ ] **OKF-DOC-TOPIC-02** Review extracted topic observations and reconcile
+  them with the existing domain/taxonomy and ontology-linked-tuple owners.
+  Resolve internal ACE/BitFrost glossary terms from repo-owned contracts;
+  external docs are not authority for Atlas-specific meanings. Admission and
+  semantic indexing require their existing independent gates.
+- [ ] **OKF-DOC-TOPIC-03** Extend coverage with a reviewed source-coordinate
+  contract for upstream release/version metadata and decide whether official
+  PDFs/GitHub repository specifications need a separate parser/fetch profile.
+  Existing OAKlib documentation is already present; do not duplicate it or
+  promote the new corpus without the versioned-doc admission owner.
+
 ## Slice 7 — Karpathy wiki to OKF bundle bridge (2026-09-07)
 
 - [x] **OKF-WIKI-01** Establish `karpathy-wiki/` as the portable OKF-facing

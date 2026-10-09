@@ -19,12 +19,11 @@ const SKIP_DIRS = new Set(['node_modules', '.git', 'archive', 'dist', '.svelte-k
 const WRITE_RE =
 	/(INSERT\s+INTO|UPDATE)[^;]{0,600}?(content_embedding_384|summary_embedding_384|latent_384d|packet_vector_bundles)/is;
 
-// Writers that exist today (found 2026-09-19). Migrate to semantic_768 or archive, then delete here.
+// Legacy write surfaces remain inventoried until their schema/consumer migrations are proven.
 const KNOWN_LEGACY_WRITERS: string[] = [
-	'scripts/atlas/populate-packet-vector-bundles.mjs', // packet_vector_bundles: first-384-dims slice of 768 vectors
+	'scripts/atlas/populate-packet-vector-bundles.mjs', // VECTOR(384) bundle schema; --apply now fails closed
 	'scripts/atlas/rebuild-gemma4-summaries-384.mjs',
 	'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
-	'sveltekit-frontend/scripts/atlas/backfill-content-embedding-384.mjs',
 ];
 
 function walk(dir: string, out: string[]): void {
@@ -63,11 +62,22 @@ describe('384-dim embedding writers are frozen', () => {
 		expect(findWriters()).toEqual([...KNOWN_LEGACY_WRITERS].sort());
 	});
 
-	it('keeps the legacy summary exporter opt-in and non-canonical', () => {
+	it('blocks legacy bundle and summary writes before environment or database setup', () => {
+		const bundle = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/populate-packet-vector-bundles.mjs'), 'utf8');
+		expect(bundle).toContain('EMBEDDINGGEMMA_384_BUNDLE_WRITE_DISABLED');
+		expect(bundle.indexOf('EMBEDDINGGEMMA_384_BUNDLE_WRITE_DISABLED')).toBeLessThan(bundle.indexOf("config({ path: resolve('.', '.env')"));
+
 		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/rebuild-gemma4-summaries-384.mjs'), 'utf8');
-		expect(source).toContain('--allow-legacy-384-write');
-		expect(source).toContain('LEGACY_384_WRITE_BLOCKED');
-		expect(source).toContain('384-D is not canonical');
+		expect(source).toContain('EMBEDDINGGEMMA_384_SUMMARY_WRITE_DISABLED');
+		expect(source.indexOf('EMBEDDINGGEMMA_384_SUMMARY_WRITE_DISABLED')).toBeLessThan(source.indexOf('const env = loadRepoEnv()'));
+	});
+
+	it('retires the full backfill before filesystem, database, or Qdrant work', () => {
+		const source = readFileSync(resolve(REPO_ROOT, 'scripts/atlas/phase108d-embeddings-backfill-full.mts'), 'utf8');
+		expect(source).toContain('LEGACY_384_QDRANT_BACKFILL_DISABLED');
+		expect(source.indexOf('LEGACY_384_QDRANT_BACKFILL_DISABLED')).toBeLessThan(source.indexOf('mkdirSync(LOG_DIR'));
+		expect(source.indexOf('LEGACY_384_QDRANT_BACKFILL_DISABLED')).toBeLessThan(source.indexOf('function queryPostgres'));
+		expect(source.indexOf('LEGACY_384_QDRANT_BACKFILL_DISABLED')).toBeLessThan(source.indexOf('await fetch('));
 	});
 
 	it('keeps the SOM writer on strict 768-D input and gates unqualified writes', () => {

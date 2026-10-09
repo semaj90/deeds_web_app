@@ -552,27 +552,23 @@ async function l5Rerank(query, evidence) {
 
 export function buildAceEvidenceBlocks(aceContext) {
   if (!aceContext || aceContext.status !== 'ADMITTED') {
-    return { acePacket: '', aceCards: '' };
+    return { acePacket: '', aceCards: '', admittedCards: [] };
   }
 
+  const admittedCards = Array.isArray(aceContext.cards) ? aceContext.cards.slice(0, 5) : [];
   const acePacket = typeof aceContext.promptPacket === 'string' && aceContext.promptPacket.length > 0
     ? `ACE packet:\n${aceContext.promptPacket}\n`
     : '';
-  const aceCards = Array.isArray(aceContext.cards) && aceContext.cards.length > 0
-    ? `ACE cards:\n${aceContext.cards.slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`).join('\n')}\n`
+  const aceCards = admittedCards.length > 0
+    ? `ACE cards:\n${admittedCards.map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`).join('\n')}\n`
     : '';
 
-  return { acePacket, aceCards };
+  return { acePacket, aceCards, admittedCards };
 }
 
 // ── L6: Gemma4 synthesis (bounded) ───────────────────────────────────────────
 
-async function l6Synthesis(query, identity, ranked, memory, aceContext = null) {
-  const summaries = ranked.slice(0, 5)
-    .map(h => h.summary ?? h.content ?? '')
-    .filter(Boolean)
-    .join('\n\n');
-
+async function l6Synthesis(query, identity, memory, aceContext = null) {
   const { acePacket, aceCards } = buildAceEvidenceBlocks(aceContext);
 
   const priorFix = memory.prior_fix
@@ -585,7 +581,6 @@ async function l6Synthesis(query, identity, ranked, memory, aceContext = null) {
     'Evidence from the codebase retrieval system:',
     acePacket,
     aceCards,
-    summaries || '(no retrieved summaries)',
     priorFix,
     '',
     `User query: ${query}`,
@@ -768,7 +763,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
 
   // L6 — Synthesis
   process.stdout.write('  [L6] Gemma4 synthesis (bounded)... ');
-  const gemma4 = await l6Synthesis(userQuery, identity, rerankResult.ranked, memory, aceContext);
+  const gemma4 = await l6Synthesis(userQuery, identity, memory, aceContext);
   appendWorkflowStage(workflow, 'synthesize', 'SYNTHESIZE', {
     dependsOn: ['rerank'],
     outputRef: 'workflow.gemma4',
@@ -790,12 +785,11 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
         activeContext.signalSummary?.summary ? `summary-lens: ${activeContext.signalSummary.summary}` : '',
         activeContext.signalSummary?.pagerank != null ? `pagerank-lens: ${activeContext.signalSummary.pagerank}` : '',
         ...(Array.isArray(activeContext.signalSummary?.lexical) ? activeContext.signalSummary.lexical.map((term) => `lexical-lens: ${term}`) : []),
-        aceContext.signalSummary?.summary ? `ace-summary-lens: ${aceContext.signalSummary.summary}` : '',
-        aceContext.signalSummary?.pagerank != null ? `ace-pagerank-lens: ${aceContext.signalSummary.pagerank}` : '',
-        aceContext.signalSummary?.reranker ? `reranker-lens: ${aceContext.signalSummary.reranker}` : '',
+        aceContext.status === 'ADMITTED' && aceContext.signalSummary?.summary ? `ace-summary-lens: ${aceContext.signalSummary.summary}` : '',
+        aceContext.status === 'ADMITTED' && aceContext.signalSummary?.pagerank != null ? `ace-pagerank-lens: ${aceContext.signalSummary.pagerank}` : '',
+        aceContext.status === 'ADMITTED' && aceContext.signalSummary?.reranker ? `reranker-lens: ${aceContext.signalSummary.reranker}` : '',
         ...rgMatches.slice(0, 10),
-        ...(aceContext.cards ?? []).slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`),
-        ...(rerankResult.ranked ?? []).slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
+        ...buildAceEvidenceBlocks(aceContext).admittedCards.map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`),
       ].filter(Boolean).slice(0, 20),
       patchTargets: rgMatches.slice(0, 5),
       proposedFix: gemma4.rationale ?? null,

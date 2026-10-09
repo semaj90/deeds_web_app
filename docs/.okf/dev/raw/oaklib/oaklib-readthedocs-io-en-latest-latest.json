@@ -1,0 +1,50 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "oaklib",
+  "source_ref": "oaklib:oaklib-readthedocs-io-en-latest-latest",
+  "url": "https://oaklib.readthedocs.io/en/latest/",
+  "title": "oaklib.readthedocs.io",
+  "domain_class": "agent",
+  "focus_tags": [
+    "oaklib",
+    "ontology",
+    "knowledge-graph",
+    "ontology-adapters"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "oaklib.readthedocs.io",
+    "markdown_excerpt": "[oaklib.readthedocs.io](https://oaklib.readthedocs.io/) The project you requested does not exist or may have been removed. Hosted by [![Read the Docs logo](https://app-assets.readthedocs.org/readthedocsext/theme/images/logo-wordmark-dark.8035ede2e46d.svg)](https://app.readthedocs.org/)",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "agent",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:oaklib:oaklib-readthedocs-io-en-latest-latest",
+    "title": "oaklib.readthedocs.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OAKlib Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "ed73225372335f09fc0f5b7bbb3a637041d067b94f0b1b8a6bdb41715541d408",
+  "markdown_path": "docs/.okf/dev/raw/oaklib/oaklib-readthedocs-io-en-latest-latest.md",
+  "fetched_at": "2026-10-09T05:34:17.681Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "oaklib",
+    "source_title": "OAKlib Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "documentation",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/oaklib/oaklib-readthedocs-io-en-latest-latest.md"
+}

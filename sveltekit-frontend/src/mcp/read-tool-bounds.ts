@@ -377,7 +377,8 @@ export const atlasPacketSearchInputSchema = z.object({
   { message: 'At least one non-empty packet search filter is required.' },
 );
 
-export const atlasPacketDenseSearchInputSchema = z.object({
+const atlasPacketDenseCodeSearchInputSchema = z.object({
+  scope: z.literal('CODE').optional(),
   feature_id: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),
   source_ref: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),
   concept_id: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),
@@ -410,3 +411,45 @@ export const atlasPacketDenseSearchInputSchema = z.object({
     });
   }
 });
+
+const atlasPacketDenseDocsSearchInputSchema = z.object({
+  scope: z.literal('DOCS'),
+  query_vector: z.array(z.number().finite()).length(PACKET_DENSE_VECTOR_DIMENSIONS),
+  query_recipe_revision: z.string().trim().min(1).max(256).optional(),
+  product: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),
+  product_version: z.string().trim().min(1).max(PACKET_DENSE_FILTER_MAX_CHARS).optional(),
+  limit: z.number().int().min(1).max(25).default(10).optional(),
+}).strict();
+
+export const atlasPacketDenseSearchInputSchema = z.union([
+  atlasPacketDenseDocsSearchInputSchema,
+  atlasPacketDenseCodeSearchInputSchema,
+]);
+
+/**
+ * Schema ADVERTISED in tools/list for atlas.packet_dense_search. MCP requires inputSchema.type === 'object', and the
+ * official SDK client validates the whole tools/list response, so one top-level `anyOf` (what the union above serializes
+ * to) made OpenCode report "Failed to get tools" and load none of TRACE's 188 tools. The handler re-parses with the strict
+ * union above, so no input becomes valid that was not valid before. `loose()` keeps unknown keys so the DOCS `.strict()`
+ * branch still rejects them in the handler.
+ */
+export const atlasPacketDenseSearchAdvertisedSchema = z.object({
+  scope: z.enum(['CODE', 'DOCS']).optional().describe('CODE (default): packet prefilter + Qdrant rerank. DOCS: canonical document chunks, requires query_vector.'),
+  feature_id: z.string().optional().describe('CODE: exact feature_id filter.'),
+  source_ref: z.string().optional().describe('CODE: source_ref filter.'),
+  concept_id: z.string().optional().describe('CODE: concept_ids containment filter.'),
+  tags: z.array(z.string()).optional().describe('CODE: tag filter. CODE needs at least one of feature_id, source_ref, concept_id, tags.'),
+  domain_class: z.string().optional().describe('CODE: optional domain_class narrowing (not selective enough alone).'),
+  workspace_revision: z.string().optional().describe('CODE: optional workspace_revision narrowing (not selective enough alone).'),
+  collection: z.enum(['codebase_chunks_768', 'codebase_chunks_768_v2']).optional().describe('CODE: required target Qdrant collection.'),
+  query_text: z.string().optional().describe('CODE: exactly one of query_text or query_vector.'),
+  query_vector: z.array(z.number()).optional().describe(`${PACKET_DENSE_VECTOR_DIMENSIONS}-D semantic_768 vector. CODE: alternative to query_text. DOCS: required.`),
+  candidate_cap: z.number().optional().describe('CODE: max prefiltered candidates (1-2000, default 500).'),
+  dense_limit: z.number().optional().describe('CODE: max dense results (1-50, default 10).'),
+  score_threshold: z.number().optional().describe('CODE: minimum score (0-1).'),
+  expand_top_k: z.number().optional().describe('CODE: expand top-K hits (0-50, default 10).'),
+  query_recipe_revision: z.string().optional().describe('DOCS: query embedding recipe revision.'),
+  product: z.string().optional().describe('DOCS: product filter.'),
+  product_version: z.string().optional().describe('DOCS: product version filter.'),
+  limit: z.number().optional().describe('DOCS: max results (1-25, default 10).'),
+}).loose();

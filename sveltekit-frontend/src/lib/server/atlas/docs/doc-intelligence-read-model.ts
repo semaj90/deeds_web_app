@@ -11,7 +11,7 @@
  */
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import type { Pool } from 'pg';
 import { ExternalDocAnalysisV1Schema, externalDocAnalysisId } from './external-doc-intelligence-contracts-v1.js';
 
@@ -143,6 +143,20 @@ export interface DocSearchResult {
 	postgresNote: string | null;
 	/** Applied bounded, exact-match filters (canonical lane only). */
 	filters?: { product: string | null; productVersion: string | null };
+}
+
+export interface DenseDocRepresentationAdmissionV1 {
+	status: 'PARITY_UNPROVEN';
+	queryDimension: 768;
+	corpusDimension: 768;
+	queryRecipeRevision: string | null;
+	corpusRecipeRevision: string | null;
+	proofUsable: false;
+}
+
+export interface DenseDocQueryIdentityV1 {
+	vectorChecksum: string;
+	queryRecipeRevision: string | null;
 }
 
 export interface VersionDriftRow {
@@ -287,14 +301,50 @@ export function collectLocalCaptures(root: string, runtime: RuntimeVersions): { 
 	const issues: ValidationIssue[] = [];
 	const sources: SourceCapture[] = [];
 	const dev = join(root, 'docs', '.okf', 'dev');
+	const legacyIndexPath = join(dev, 'index.md');
+	const legacySummaryPath = join(dev, 'summary.json');
+	let publishedPaths: { corpus: string; index: string; summary: string } | null = null;
+	const publicationPath = join(dev, 'published-current.json');
+	let invalidPublication = false;
+	if (existsSync(publicationPath)) {
+		try {
+			const pointer = JSON.parse(readFileSync(publicationPath, 'utf8')) as Record<string, unknown>;
+			if (pointer.schema !== 'atlas.okf-crawl-publication-receipt.v1' || pointer.publication_status !== 'PUBLISHED_READBACK_VERIFIED' || pointer.canonical_authority !== false) {
+				throw new Error('PUBLICATION_POINTER_FIELDS_INVALID');
+			}
+			const manifestPath = resolve(dev, String(pointer.generation_manifest ?? ''));
+			const manifestRelative = relative(dev, manifestPath);
+			if (!manifestRelative || manifestRelative.startsWith('..') || isAbsolute(manifestRelative)) throw new Error('PUBLICATION_MANIFEST_PATH_INVALID');
+			const manifestBytes = readFileSync(manifestPath);
+			if (`sha256:${createHash('sha256').update(manifestBytes).digest('hex')}` !== pointer.generation_manifest_checksum) throw new Error('PUBLICATION_MANIFEST_CHECKSUM_MISMATCH');
+			const generation = JSON.parse(manifestBytes.toString('utf8')) as Record<string, unknown>;
+			if (generation.schema !== 'atlas.okf-dev-corpus-generation.v1' || generation.run_id !== pointer.run_id || generation.canonical_authority !== false) {
+				throw new Error('PUBLICATION_GENERATION_FIELDS_INVALID');
+			}
+			const artifactHashes = generation.artifacts as Record<string, string>;
+			const paths = { corpus: '', index: '', summary: '' };
+			for (const [name, field] of [['corpus.jsonl', 'corpus'], ['index.md', 'index'], ['summary.json', 'summary']] as const) {
+				const artifactPath = resolve(manifestPath, '..', name);
+				const artifactBytes = readFileSync(artifactPath);
+				if (`sha256:${createHash('sha256').update(artifactBytes).digest('hex')}` !== artifactHashes?.[name]) throw new Error(`PUBLICATION_ARTIFACT_CHECKSUM_MISMATCH:${name}`);
+				paths[field] = artifactPath;
+			}
+			publishedPaths = paths;
+		} catch (error) {
+			invalidPublication = true;
+			issues.push({ code: 'DEV_PUBLICATION_INVALID', detail: error instanceof Error ? error.message : 'UNKNOWN_ERROR' });
+		}
+	}
 
 	if (!existsSync(join(dev, 'manifest.json'))) issues.push({ code: 'DEV_MANIFEST_MISSING', detail: 'docs/.okf/dev/manifest.json' });
-	if (!existsSync(join(dev, 'index.md'))) issues.push({ code: 'DEV_INDEX_MISSING', detail: 'docs/.okf/dev/index.md' });
-	if (existsSync(join(dev, 'summary.json'))) {
-		try { JSON.parse(readFileSync(join(dev, 'summary.json'), 'utf8')); } catch { issues.push({ code: 'DEV_SUMMARY_UNPARSEABLE', detail: 'docs/.okf/dev/summary.json' }); }
-	} else issues.push({ code: 'DEV_SUMMARY_MISSING', detail: 'docs/.okf/dev/summary.json' });
+	const indexPath = publishedPaths?.index ?? (invalidPublication ? join(dev, '.invalid-publication-index') : legacyIndexPath);
+	const summaryPath = publishedPaths?.summary ?? (invalidPublication ? join(dev, '.invalid-publication-summary') : legacySummaryPath);
+	if (!existsSync(indexPath)) issues.push({ code: 'DEV_INDEX_MISSING', detail: relative(root, indexPath).replace(/\\/g, '/') });
+	if (existsSync(summaryPath)) {
+		try { JSON.parse(readFileSync(summaryPath, 'utf8')); } catch { issues.push({ code: 'DEV_SUMMARY_UNPARSEABLE', detail: relative(root, summaryPath).replace(/\\/g, '/') }); }
+	} else issues.push({ code: 'DEV_SUMMARY_MISSING', detail: relative(root, summaryPath).replace(/\\/g, '/') });
 
-	const corpusPath = join(dev, 'corpus.jsonl');
+	const corpusPath = publishedPaths?.corpus ?? (invalidPublication ? join(dev, '.invalid-publication-corpus') : join(dev, 'corpus.jsonl'));
 	// corpus.jsonl is a gitignored, rebuildable index (`*.jsonl`); the tracked raw pages are the evidence. Its absence is
 	// only an issue when there is no raw evidence at all (a fresh checkout has raw pages but not the JSONL).
 	if (!existsSync(corpusPath) && listFiles(join(dev, 'raw'), '.md').length === 0) issues.push({ code: 'DEV_CORPUS_MISSING', detail: 'docs/.okf/dev/corpus.jsonl' });
@@ -313,7 +363,8 @@ export function collectLocalCaptures(root: string, runtime: RuntimeVersions): { 
 		if (urlKey && seenUrl.has(urlKey)) issues.push({ code: 'DEV_DUPLICATE_URL', detail: urlKey });
 		seenUrl.add(urlKey);
 
-		const mdPath = row.markdown_path ? resolve(String(row.markdown_path)) : null;
+		const markdownPath = row.markdown_path ? String(row.markdown_path) : null;
+		const mdPath = markdownPath ? (isAbsolute(markdownPath) ? resolve(markdownPath) : resolve(root, markdownPath)) : null;
 		const fileExists = !!mdPath && existsSync(mdPath);
 		let checksumMatches: boolean | null = null;
 		if (mdPath && fileExists) {
@@ -562,11 +613,25 @@ function canonicalDocHit(r: Record<string, unknown>): DocSearchHit {
  * recipe/executor stamp yet, so `representationCaveat` is always reported. A vector lane has no local fallback: an invalid vector, absent pool or
  * database failure returns zero hits with a typed note.
  */
-export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null }): Promise<DocSearchResult & { representationCaveat: string }> {
+export async function searchDocCorpusDense(opts: { pool: Pool | null; queryVector: readonly number[]; limit?: number; product?: string | null; productVersion?: string | null; queryRecipeRevision?: string | null }): Promise<DocSearchResult & { representationCaveat: string; representationAdmission: DenseDocRepresentationAdmissionV1; queryIdentity: DenseDocQueryIdentityV1 }> {
 	const limit = Math.min(Math.max(opts.limit ?? 10, 1), 25);
 	const product = opts.product?.trim().slice(0, 100) || null;
 	const productVersion = opts.productVersion?.trim().slice(0, 100) || null;
-	const base = { query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[], representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only' };
+	const representationAdmission: DenseDocRepresentationAdmissionV1 = {
+		status: 'PARITY_UNPROVEN', queryDimension: 768, corpusDimension: 768,
+		queryRecipeRevision: opts.queryRecipeRevision ?? null, corpusRecipeRevision: null, proofUsable: false
+	};
+	const base = {
+		query: '', mode: 'POSTGRES_DENSE' as const, filters: { product, productVersion }, hits: [] as DocSearchHit[],
+		representationCaveat: 'CORPUS_EXECUTOR_PARITY_UNPROVEN: corpus vectors carry no recipe/executor stamp; cosine order is indicative only',
+		representationAdmission,
+		queryIdentity: {
+			vectorChecksum: opts.queryVector.every(Number.isFinite)
+				? `sha256:${sha256(JSON.stringify(opts.queryVector))}`
+				: '',
+			queryRecipeRevision: opts.queryRecipeRevision ?? null
+		}
+	};
 	if (opts.queryVector.length !== 768 || opts.queryVector.some((x) => !Number.isFinite(x))) return { ...base, postgresNote: 'QUERY_VECTOR_INVALID' };
 	if (!opts.pool) return { ...base, postgresNote: 'POSTGRES_UNAVAILABLE:no pool' };
 	try {
@@ -611,13 +676,7 @@ export async function searchDocCorpus(opts: { pool: Pool | null; root: string; q
 				);
 				return {
 					query: q, mode: 'POSTGRES_FTS', postgresNote: null, filters: { product, productVersion },
-					hits: rows.map((r: Record<string, unknown>) => ({
-						provider: (r.provider as string | null) ?? null, title: String(r.title), sourceId: String(r.product ?? ''), url: (r.url as string | null) ?? null,
-						product: (r.product as string | null) ?? null, productVersion: (r.product_version as string | null) ?? null,
-						authorityClass: String(r.source_authority ?? ''), revision: (r.page_evidence_revision as string | null) ?? null, excerpt: String(r.excerpt ?? ''),
-						badge: 'CANONICAL_POSTGRES' as const, sourceClass: 'CANONICAL' as const, pageId: String(r.page_id), chunkId: String(r.chunk_id),
-						chunkEvidenceRevision: String(r.chunk_evidence_revision), headingPath: (r.heading_path as string[] | null) ?? []
-					}))
+					hits: rows.map(canonicalDocHit)
 				};
 			}
 			postgresNote = 'DOC_CORPUS_POSTGRES_EMPTY';

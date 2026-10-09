@@ -19,7 +19,7 @@ class SharedGpuResidencyLease(BaseModel):
     leaseId: str = Field(min_length=1)
     leaseEpoch: int = Field(ge=1)
     budgetRevision: str = Field(min_length=1)
-    executor: Literal["pytorch_cuda", "cuvs", "tensorrt_rtx", "directml", "webgpu", "llm_runtime"]
+    executor: Literal["pytorch_cuda", "cuvs", "cuml", "tensorrt_rtx", "directml", "webgpu", "llm_runtime"]
     requestedBytes: int = Field(ge=0)
     activeReservedBytes: int = Field(ge=0)
     availableBytes: int = Field(ge=0)

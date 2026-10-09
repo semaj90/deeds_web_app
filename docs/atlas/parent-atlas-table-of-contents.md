@@ -82,6 +82,7 @@ VRAM, and latency receipts before changing the `:8098` owner.
 The packet identity spine is frozen at the canonical contract:
 
 - `packet_key` is immutable identity.
+- Legacy packet-key hardening and open collision-proof gate: [Manual Migration Reconciliation tasks](</C:/Users/james/Videos/deeds-web-app/openspec/changes/manual-migration-reconciliation/tasks.md>) — the shared 12-hex builder and selected writer guards are implemented; full source-denominator and historical silent-drop proof remain open. The legacy helper is not the unresolved future PacketKeyV2 production owner.
 - `source_ref` remains canonical source provenance.
 - `feature_id` may be enriched, but not repurposed as an identity rewrite.
 - `feature_label` remains the human-readable owner.
@@ -160,6 +161,13 @@ The next derived surfaces are compare-only until the live contract exists:
 - Graphify is the structural discovery lane: file, import, call, and topology scanning for codebase shape.
 - Parent Atlas is the canonical join lane: `source_ref`, `feature_id`, `feature_label`, `packet_key`, and provenance contracts.
 - Graphify may classify and surface gaps, but it must not replace the canonical storage spine.
+- HyperRAG packet-incidence status and gates: [Parent Atlas Pass Fabric tasks](</C:/Users/james/Videos/deeds-web-app/openspec/changes/parent-atlas-pass-fabric/tasks.md>) — distinguish taxonomy hyperedges from structural Graphify edges and packet incidence; current endpoint resolvers require exact source/span/workspace bindings.
+- Next sequenced Workboard gate: [OpenSpec task-triage tasks](</C:/Users/james/Videos/deeds-web-app/openspec/changes/parent-atlas-openspec-task-triage-pipeline/tasks.md>) — reuse `buildSupersessionLinkV1()` / `buildTaskTriageCorpusV1()`. A fresh isolated corpus replay is recorded there; exact reviewed successor receipts remain absent. Do not infer supersession from text similarity or dates.
+- Exact endpoint resolution: `sveltekit-frontend/src/lib/server/atlas/indexing/graphify-packet-incidence-endpoint-resolver-v1.ts` → `sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-endpoint-resolver-v1.ts` → canonical packet identity resolver. This is a future-candidate resolver, not a matcher/backfill for existing taxonomy rows.
+- Historical local structural artifact census: `docs/reports/current-structural-graph-artifact-v2/manifest.json` and the HyperRAG artifact-follow-up section in the linked tasks ledger. It contains 1,334 `DEFINES` edges with internal GPU-node endpoint matches, but zero packet-keyed nodes and a superseded workspace revision; diagnostic only, not an incidence source.
+- Domain classification: `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts` supplies derived classification/routing features only; it cannot establish packet identity or incidence endpoints.
+- Hyperedge persistence owner: `sveltekit-frontend/src/lib/server/atlas/kag-hyperedge-postgres.ts`; taxonomy bridge: `scripts/atlas/populate-hyperedges-from-taxonomy-edges-v1.mts`. Do not repurpose either as a packet-identity repair path.
+- Integration order: structural-edge producer and current revisions → exact two-endpoint resolution → diagnostic mapping/readback → separately authorized incidence materialization → strict-reader wiring → bounded multihop proof. No Graphify refresh or datastore write is implied by these links.
 
 ### HyperRAG Dense Search
 - Qdrant dense ANN + payload tags for semantic recall

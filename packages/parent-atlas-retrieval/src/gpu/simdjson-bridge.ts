@@ -48,6 +48,7 @@ function getSimdJsonAddon(): SimdJsonAddon | null {
 
 	const paths = [
 		resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		resolve(process.cwd(), '../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
 		resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),

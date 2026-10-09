@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import test from 'node:test';
 import { buildSnapshot, diffSnapshots } from '../openspec-dirty-set-v1.mjs';
-import { buildEmbeddingInputV1, documentString, normalizeCardText } from './openspec-embedding-input-v1.mjs';
+import { buildEmbeddingInputV1, buildTaskCardEmbeddingInputBatchV1, buildTaskCardEmbeddingInputV1, documentString, normalizeCardText } from './openspec-embedding-input-v1.mjs';
+
+const sha256 = (value) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
 
 const card = (n, over = {}) => ({
   cardId: `id-${n}-a`,
@@ -21,6 +24,31 @@ const bumpRevision = (c, ws) => ({
   checksum: `${c.checksum}-${ws}`,
   revisions: { ...c.revisions, workspaceRevision: ws },
   contextBlob: c.contextBlob.replace('workspace=sha256:aaa', `workspace=${ws}`)
+});
+
+const taskCardCorpus = (cards = []) => ({
+  schema: 'atlas.openspec-task-card-corpus.v1',
+  cardSchema: 'atlas.openspec-task-card.v1',
+  source: {
+    workspaceRevision: sha256('workspace'),
+    sourcePopulationChecksum: sha256('source-population'),
+    taskFileHashes: { 'openspec/changes/example/tasks.md': sha256('task-file') },
+  },
+  cards,
+});
+
+const taskCard = (overrides = {}) => ({
+  stableKey: 'example#task-1',
+  changeId: 'example',
+  taskRevision: sha256('task-block'),
+  claim: '  Add bounded semantic retrieval.\r\n',
+  sourcePath: 'openspec/changes/example/tasks.md',
+  sourceLine: 12,
+  sourceCoordinateRole: 'LOCATOR_ONLY',
+  retrievalState: 'CURRENT',
+  evidenceState: 'CLAIM_ONLY',
+  canonicalAuthority: false,
+  ...overrides,
 });
 
 test('the revision decoration is stripped and the rest of the text is kept', () => {
@@ -94,4 +122,71 @@ test('a suffix cut inside the word REVISION is stripped, but a trailing RE is le
   for (const w of ['REVISI', 'REVISIO', 'REVISION']) assert.equal(normalizeCardText(`RECEIPTS none ${w}`), 'RECEIPTS none', w);
   assert.equal(normalizeCardText('RECEIPTS none ARE'), 'RECEIPTS none ARE');
   assert.equal(normalizeCardText('the REVISION of the plan was approved'), 'the REVISION of the plan was approved');
+});
+
+test('TaskCard embedding input binds task, source-file, and workspace revisions separately', () => {
+  const corpus = taskCardCorpus([taskCard()]);
+  const input = buildTaskCardEmbeddingInputV1(corpus.cards[0], corpus);
+  assert.equal(input.schema, 'atlas.openspec-task-card-embedding-input.v1');
+  assert.equal(input.taskKey, 'example#task-1');
+  assert.equal(input.taskRevision, sha256('task-block'));
+  assert.equal(input.sourceRef.sourceRevision, sha256('task-file'));
+  assert.equal(input.sourceRef.workspaceRevision, sha256('workspace'));
+  assert.equal(input.sourceRef.role, 'LOCATOR_ONLY');
+  assert.equal(input.normalizedText, 'Add bounded semantic retrieval.');
+  assert.equal(documentString(input), 'title: example | text: Add bounded semantic retrieval.');
+  assert.equal(input.canonicalAuthority, false);
+  assert.equal(input.cacheKeyBound, false);
+  assert.equal(input.embeddingCacheKey, null);
+});
+
+test('TaskCard cache identity requires a model artifact revision but lineage changes do not rewrite text identity', () => {
+  const modelArtifactRevision = sha256('model');
+  const corpus = taskCardCorpus([taskCard()]);
+  const base = buildTaskCardEmbeddingInputV1(corpus.cards[0], corpus, { modelArtifactRevision });
+  const nextWorkspace = { ...corpus, source: { ...corpus.source, workspaceRevision: sha256('next-workspace') } };
+  const moved = buildTaskCardEmbeddingInputV1(nextWorkspace.cards[0], nextWorkspace, { modelArtifactRevision });
+  assert.equal(base.cacheKeyBound, true);
+  assert.equal(base.embeddingCacheKey, moved.embeddingCacheKey);
+  assert.notEqual(base.sourceRef.workspaceRevision, moved.sourceRef.workspaceRevision);
+  assert.throws(() => buildTaskCardEmbeddingInputV1(corpus.cards[0], corpus, { modelArtifactRevision: 'unverified-model' }), /TASK_CARD_MODEL_ARTIFACT_REVISION_INVALID/);
+});
+
+test('TaskCard input batches sort by stable task key and checksum their row bindings deterministically', () => {
+  const first = taskCard({ stableKey: 'example#b', claim: 'second' });
+  const second = taskCard({ stableKey: 'example#a', claim: 'first' });
+  const left = buildTaskCardEmbeddingInputBatchV1(taskCardCorpus([first, second]));
+  const right = buildTaskCardEmbeddingInputBatchV1(taskCardCorpus([second, first]));
+  assert.deepEqual(left.rowBindings.map((row) => row.taskKey), ['example#a', 'example#b']);
+  assert.equal(left.inputSetChecksum, right.inputSetChecksum);
+  assert.equal(left.rowBindingChecksum, right.rowBindingChecksum);
+  assert.equal('normalizedText' in left.rowBindings[0], false);
+  assert.equal('sourceRevision' in left.rowBindings[0], false);
+  assert.equal(left.sourceFileHashes['openspec/changes/example/tasks.md'], sha256('task-file'));
+  assert.equal(left.indexPromotionAllowed, false);
+  assert.equal(left.vectorWritesPerformed, false);
+  assert.equal(left.canonicalAuthority, false);
+});
+
+test('TaskCard row-binding checksum changes when either source or workspace revision changes', () => {
+  const corpus = taskCardCorpus([taskCard()]);
+  const base = buildTaskCardEmbeddingInputBatchV1(corpus);
+  const sourceChanged = {
+    ...corpus,
+    source: {
+      ...corpus.source,
+      taskFileHashes: { ...corpus.source.taskFileHashes, 'openspec/changes/example/tasks.md': sha256('changed-task-file') },
+    },
+  };
+  const workspaceChanged = { ...corpus, source: { ...corpus.source, workspaceRevision: sha256('changed-workspace') } };
+  assert.notEqual(buildTaskCardEmbeddingInputBatchV1(sourceChanged).rowBindingChecksum, base.rowBindingChecksum);
+  assert.notEqual(buildTaskCardEmbeddingInputBatchV1(workspaceChanged).rowBindingChecksum, base.rowBindingChecksum);
+});
+
+test('TaskCard embedding input rejects missing or mismatched lineage and duplicate keys', () => {
+  const corpus = taskCardCorpus([taskCard()]);
+  assert.throws(() => buildTaskCardEmbeddingInputV1(taskCard(), { ...corpus, source: { ...corpus.source, taskFileHashes: {} } }), /TASK_CARD_SOURCE_REVISION_UNBOUND/);
+  assert.throws(() => buildTaskCardEmbeddingInputV1(taskCard({ workspaceRevision: sha256('wrong') }), corpus), /TASK_CARD_WORKSPACE_REVISION_MISMATCH/);
+  assert.throws(() => buildTaskCardEmbeddingInputV1(taskCard({ canonicalAuthority: true }), corpus), /TASK_CARD_NONCANONICAL_PROJECTION_REQUIRED/);
+  assert.throws(() => buildTaskCardEmbeddingInputBatchV1(taskCardCorpus([taskCard(), taskCard()])), /TASK_CARD_KEY_DUPLICATE/);
 });

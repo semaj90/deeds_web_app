@@ -37,7 +37,7 @@ export function buildTreeNodeIdentityFormulaReceiptV1(census, audit, auditUri, r
   if (!identity?.canonicalKeyAdmitted || !identity.canonicalTaskKey) throw new Error('GS1_10_CANONICAL_IDENTITY_NOT_ADMITTED');
   const formulaSourcePath = audit.source.sourceRef;
   const formulaSourceRevision = audit.source.sourceRevision;
-  const taskSourceRevision = task.taskHash;
+  const taskSourceRevision = sha256(fs.readFileSync(path.join(root, task.tasksPath)));
   const claimRef = predicateIdForTaskClaim(task.canonicalTaskRef, 0, task.taskText);
   const assertions = Object.entries(audit.checks).map(([id, passed]) => ({
     id,
@@ -57,6 +57,7 @@ export function buildTreeNodeIdentityFormulaReceiptV1(census, audit, auditUri, r
     claim: task.taskText,
     workspaceRevision: census.source.workspaceRevision,
     sourceRevision: taskSourceRevision,
+    taskRevision: task.taskHash,
     sourceRefs: [
       { file: task.tasksPath, lineStart: task.sourceLine, lineEnd: task.sourceLine, sourceRevision: sha256(fs.readFileSync(path.join(root, task.tasksPath))) },
       { file: formulaSourcePath, lineStart: audit.source.lineStart, lineEnd: audit.source.lineEnd, sourceRevision: formulaSourceRevision },

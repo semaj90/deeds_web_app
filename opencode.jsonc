@@ -52,6 +52,11 @@
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
       "timeout": 60000
+    },
+    "openwiki": {
+      "type": "local",
+      "command": ["openwiki", "mcp", "--host", "opencode"],
+      "enabled": true
     }
   },
   "agent": {

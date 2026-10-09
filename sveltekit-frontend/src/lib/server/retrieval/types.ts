@@ -3,6 +3,7 @@
  * Consolidates RawCandidate, QdrantSearchResult, and GpuSearchCandidate into single SearchResult
  */
 
+import type { Semantic768QueryExecutionEvidence } from '../embedding/canonical-embed.js';
 import type { LaneRegistryKind } from '../vector/lane-registry.js';
 import type { SearchTier } from './search-contract.js';
 import type { QueryVectorBundle } from './embedding-service.js';
@@ -457,6 +458,9 @@ export interface EmbeddingResult {
 
   /** Execution time in ms */
   exec_ms: number;
+
+  /** Diagnostic strict-runtime evidence; not a promotion or persistence receipt. */
+  semantic768ExecutionEvidence?: Semantic768QueryExecutionEvidence;
 }
 
 /**

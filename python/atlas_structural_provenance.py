@@ -237,9 +237,8 @@ def find_occurrence_positions(
                     row, column = getattr(node, "start_point", (0, 0))
                     result[callee_text].append((int(row), int(column)))
 
-        # Bare identifier / property occurrences: match REFERENCES/imports/exports name lists,
-        # which are typically single identifiers rather than dotted call expressions.
-        elif node_type in ("identifier", "property_identifier", "shorthand_property_identifier"):
+        # Bare identifier, property, and TypeScript type occurrences match reference/import/export names.
+        elif node_type in ("identifier", "property_identifier", "shorthand_property_identifier", "type_identifier"):
             start = getattr(node, "start_byte", None)
             end = getattr(node, "end_byte", None)
             if start is not None and end is not None:
@@ -254,7 +253,7 @@ def find_occurrence_positions(
         stack.extend(reversed(list(getattr(node, "children", []))))
 
     for name in result:
-        result[name].sort()
+        result[name] = sorted(set(result[name]))
     return result
 
 
@@ -278,3 +277,39 @@ def occurrence_to_absolute_position(
     if occurrence_row == 0:
         return (chunk_start_line, chunk_start_column + occurrence_column)
     return (chunk_start_line + occurrence_row, occurrence_column)
+
+
+def occurrence_to_absolute_byte_position(
+    source_text: str,
+    chunk_start_byte: int,
+    occurrence_row: int,
+    occurrence_byte_column: int,
+) -> tuple[int, int]:
+    source_bytes = source_text.encode("utf-8")
+    if chunk_start_byte < 0 or chunk_start_byte > len(source_bytes):
+        raise ValueError("chunk_start_byte is outside the source buffer")
+    if occurrence_row < 0 or occurrence_byte_column < 0:
+        raise ValueError("occurrence row and byte column must be non-negative")
+
+    chunk_prefix = source_bytes[chunk_start_byte:]
+    row_start = 0
+    for _ in range(occurrence_row):
+        newline = chunk_prefix.find(b"\n", row_start)
+        if newline < 0:
+            raise ValueError("occurrence row is outside the source chunk")
+        row_start = newline + 1
+
+    absolute_line_start = chunk_start_byte + row_start
+    line_end = source_bytes.find(b"\n", absolute_line_start)
+    if line_end < 0:
+        line_end = len(source_bytes)
+    elif line_end > absolute_line_start and source_bytes[line_end - 1] == ord("\r"):
+        line_end -= 1
+    if absolute_line_start + occurrence_byte_column > line_end:
+        raise ValueError("occurrence byte column is outside the source line")
+    absolute_byte = absolute_line_start + occurrence_byte_column
+
+    line_prefix = source_bytes[:absolute_byte]
+    line = line_prefix.count(b"\n") + 1
+    column = len(line_prefix.rsplit(b"\n", 1)[-1])
+    return line, column

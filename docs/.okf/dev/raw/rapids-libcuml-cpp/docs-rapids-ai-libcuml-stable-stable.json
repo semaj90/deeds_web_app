@@ -1,0 +1,52 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rapids-libcuml-cpp",
+  "source_ref": "rapids-libcuml-cpp:docs-rapids-ai-libcuml-stable-stable",
+  "url": "https://docs.rapids.ai/api/libcuml/stable/",
+  "title": "docs.rapids.ai",
+  "domain_class": "gpu",
+  "focus_tags": [
+    "rapids",
+    "libcuml",
+    "cuml",
+    "cpp",
+    "cuda",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rapids.ai",
+    "markdown_excerpt": "Loading \\[MathJax\\]/extensions/tex2jax.js [Home](https://docs.rapids.ai/api) libcuml [cudf-java](https://docs.rapids.ai/api/cudf-java/stable) [libcudf](https://docs.rapids.ai/api/libcudf/stable/namespacecudf/) [libcuml](https://docs.rapids.ai/api/libcuml/stable) [libkvikio](https://docs.rapids.ai/api/libkvikio/stable) [librapidsmpf](https://docs.rapids.ai/api/librapidsmpf/stable) [libucxx](https://docs.rapids.ai/api/libucxx/stable) [ucxx](https://docs.rapids.ai/api/ucxx/stable) stable (26.08) [nightly (26.10)](https://docs.rapids.ai/api/libcuml/nightly) [stable (26.08)](https://docs.rapids.ai/api/libcuml/stable) [legacy (26.06)](https://docs.rapids.ai/api/libcuml/legacy) - [Main Page](https://docs.rapids.ai/api/libcuml/stable/index.html) - [Related Pages](https://docs.rapids.ai/api/libcuml/stable/pages.html) - [Modules](https://docs.rapids.ai/api/libcuml/stable/modules.html) - [Namespaces](https://docs.rapids.ai/api/libcuml/stable/namespaces.html) - [Namespace List](https://docs.rapids.ai/api/libcuml/stable/namespaces.html) - [Namespace Members](https://docs.rapids.ai/api/libcuml/stable/namespacemembers.html) - [All](https://docs.rapids.ai/api/libcuml/stable/namespacemembers.html) ",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "gpu",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rapids-libcuml-cpp:docs-rapids-ai-libcuml-stable-stable",
+    "title": "docs.rapids.ai",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh RAPIDS libcuml C++ Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "3a95abeecbb3c1037413ab131880666692403fb2183145ce672896ddd8ac5918",
+  "markdown_path": "docs/.okf/dev/raw/rapids-libcuml-cpp/docs-rapids-ai-libcuml-stable-stable.md",
+  "fetched_at": "2026-10-09T05:38:02.056Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rapids-libcuml-cpp",
+    "source_title": "RAPIDS libcuml C++ Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rapids-libcuml-cpp/docs-rapids-ai-libcuml-stable-stable.md"
+}

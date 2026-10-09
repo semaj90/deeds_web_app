@@ -21,15 +21,20 @@ import pg from 'pg';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
-config({ path: resolve('.', '.env') });
-config({ path: resolve('.', 'sveltekit-frontend/.env.local'), override: false });
-
 const APPLY        = process.argv.includes('--apply');
 const DRY_RUN      = !APPLY;
 const CONTENT_ONLY = process.argv.includes('--content-only');
 const LIMIT_IDX    = process.argv.indexOf('--limit');
 const LIMIT        = LIMIT_IDX >= 0 ? parseInt(process.argv[LIMIT_IDX + 1]) : 999999;
 const EMBED_BATCH  = 20;
+
+if (APPLY) {
+  console.error('EMBEDDINGGEMMA_384_BUNDLE_WRITE_DISABLED: packet_vector_bundles uses VECTOR(384); migrate the schema and use revision-qualified semantic_768 before writing');
+  process.exit(2);
+}
+
+config({ path: resolve('.', '.env') });
+config({ path: resolve('.', 'sveltekit-frontend/.env.local'), override: false });
 
 const _ollamaRaw   = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;

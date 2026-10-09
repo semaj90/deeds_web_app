@@ -3,11 +3,21 @@
 /** Read-only census of current workspace bindings through Graphify, packets, and chunks. */
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { classifyPacketChunkIdentityV1, summarizePacketChunkIdentityClassificationsV1 } from './lib/packet-chunk-identity-classification-v1.mjs';
 
 const root = REPO_ROOT;
-const reportPath = path.join(root, 'docs/reports/current-workspace-packet-chunk-join-v1.json');
+const defaultReportPath = path.join(root, 'docs/reports/current-workspace-packet-chunk-join-v1.json');
+const outputArg = process.argv.slice(2).find((value) => value.startsWith('--output='));
+const reportPath = outputArg ? path.resolve(root, outputArg.slice('--output='.length)) : defaultReportPath;
+if (outputArg) {
+  const relativeOutputPath = path.relative(root, reportPath);
+  if (!relativeOutputPath.startsWith(`.tmp${path.sep}`)) {
+    throw new Error('CUSTOM_AUDIT_OUTPUT_MUST_BE_UNDER_TMP');
+  }
+}
 const env = loadRepoEnv(process.env);
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(env),
@@ -48,6 +58,8 @@ try {
       WHERE repo_id = 'deeds-web-app'
         AND workspace_revision::text = lower($1::text)
         AND workspace_revision::text = $1
+      ORDER BY lower(regexp_replace(regexp_replace(btrim(canonical_source_ref), '\\\\', '/', 'g'), '^\\./', '')),
+               lower(source_revision::text), lower(content_digest::text)
       ${auditLimit == null ? '' : 'LIMIT $3'}
     ), current_members AS (
       SELECT lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
@@ -59,7 +71,6 @@ try {
         AND repository_id = 'repo:root'
         AND workspace_revision::text = lower($1::text)
         ${auditLimit == null ? '' : "AND lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) IN (SELECT source_ref FROM bindings)"}
-        ${auditLimit == null ? '' : 'LIMIT $3'}
     ), graphify_exact AS (
       SELECT b.source_ref, b.workspace_revision, b.source_revision, b.content_digest
       FROM bindings b
@@ -73,28 +84,51 @@ try {
     ), packet_candidates AS (
       SELECT DISTINCT g.source_ref, g.source_revision, g.workspace_revision,
              g.content_digest, p.packet_key, p.source_revision AS packet_source_revision,
-             p.workspace_revision_key AS packet_workspace_revision,
              p.content_hash AS packet_content_hash,
              p.lineage_binding_checksum AS packet_lineage_binding_checksum,
              p.lineage_producer_revision AS packet_lineage_producer_revision
       FROM graphify_exact g
       LEFT JOIN public.atlas_packets p
         ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
-    ), proven_lineage AS (
+    ), source_revision_lineage AS (
       SELECT DISTINCT g.source_ref, g.content_digest, l.packet_key, l.chunk_row_id,
-             c.file_content_hash
+             g.source_revision, c.file_content_hash
       FROM graphify_exact g
       JOIN public.atlas_packet_chunk_lineage l
         ON lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref
        AND lower(btrim(l.source_revision::text)) = g.source_revision
        AND l.revision_status = 'PROVEN'
       JOIN public.codebase_chunk_index c ON c.id = l.chunk_row_id
+    ), packet_key_counts AS (
+      SELECT source_ref, count(DISTINCT packet_key::text)::integer AS packet_key_count
+      FROM packet_candidates
+      WHERE packet_key IS NOT NULL
+      GROUP BY source_ref
+    ), qualified_packet_bindings AS (
+      SELECT pc.source_ref, pc.source_revision, min(pc.packet_key::text) AS packet_key
+      FROM packet_candidates pc
+      JOIN packet_key_counts pk USING (source_ref)
+      WHERE pk.packet_key_count = 1 AND pc.packet_key IS NOT NULL
+      GROUP BY pc.source_ref, pc.source_revision
+      HAVING bool_or(
+        lower(pc.packet_source_revision) = pc.source_revision
+        AND pc.packet_lineage_binding_checksum IS NOT NULL
+        AND pc.packet_lineage_producer_revision IS NOT NULL
+      )
+    ), proven_lineage AS (
+      SELECT DISTINCT sl.source_ref, sl.content_digest, sl.packet_key,
+             sl.chunk_row_id, sl.file_content_hash
+      FROM source_revision_lineage sl
+      JOIN qualified_packet_bindings qp
+        ON qp.source_ref = sl.source_ref
+       AND qp.source_revision = sl.source_revision
+       AND qp.packet_key = sl.packet_key::text
     )
     SELECT
       (SELECT count(*) FROM bindings)::integer AS binding_rows,
       (SELECT count(DISTINCT source_ref) FROM bindings)::integer AS binding_sources,
       (SELECT count(*) FROM graphify_exact)::integer AS graphify_exact_sources,
-      (SELECT count(DISTINCT source_ref) FROM proven_lineage)::integer AS binding_proven_lineage_sources,
+      (SELECT count(DISTINCT source_ref) FROM source_revision_lineage)::integer AS binding_proven_lineage_sources,
       (SELECT count(DISTINCT source_ref) FROM proven_lineage)::integer AS packet_chunk_exact_sources,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL)::integer AS packet_source_rows,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_matches,
@@ -107,7 +141,6 @@ try {
           AND count(DISTINCT source_revision) = 1
           AND bool_or(
             lower(packet_source_revision) = source_revision
-            AND lower(packet_workspace_revision) = workspace_revision
             AND packet_lineage_binding_checksum IS NOT NULL
             AND packet_lineage_producer_revision IS NOT NULL
           )
@@ -121,21 +154,141 @@ try {
           AND count(DISTINCT source_revision) = 1
           AND bool_or(
             lower(packet_source_revision) = source_revision
-            AND lower(packet_workspace_revision) = workspace_revision
             AND packet_lineage_binding_checksum IS NOT NULL
             AND packet_lineage_producer_revision IS NOT NULL
           )
       ) exact_full_canonical)::integer AS packet_full_canonical_identity_matches,
-      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest AND packet_workspace_revision = workspace_revision)::integer AS packet_full_identity_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision AND lower(packet_content_hash) = content_digest)::integer AS packet_full_identity_matches,
       -- PACKET_AUDIT_SEMANTICS: canonical identity is source_revision; content_hash is legacy diagnostic evidence only.
       -- Named metrics (packet_revision_matches and packet_revision_workspace_binding_matches above keep their legacy keys).
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_source_revision) = source_revision)::integer AS packet_revision_identity_matches,
-      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(packet_workspace_revision) = workspace_revision AND packet_lineage_binding_checksum IS NOT NULL AND packet_lineage_producer_revision IS NOT NULL)::integer AS packet_workspace_binding_matches,
+      (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND packet_lineage_binding_checksum IS NOT NULL AND packet_lineage_producer_revision IS NOT NULL)::integer AS packet_workspace_binding_matches,
       (SELECT count(DISTINCT source_ref) FROM packet_candidates WHERE packet_key IS NOT NULL AND lower(btrim(packet_content_hash)) = content_digest)::integer AS packet_legacy_content_hash_matches,
       (SELECT count(*) FROM (SELECT source_ref FROM packet_candidates WHERE packet_key IS NOT NULL GROUP BY source_ref HAVING count(DISTINCT packet_key) > 1) ambiguous)::integer AS packet_ambiguous_sources,
       (SELECT count(DISTINCT p.source_ref) FROM graphify_exact g JOIN public.atlas_packets p ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = g.source_ref AND lower(btrim(p.content_hash)) = g.content_digest)::integer AS packet_content_matches,
-      (SELECT count(DISTINCT source_ref) FROM proven_lineage WHERE file_content_hash IS NOT NULL AND lower(btrim(file_content_hash)) = content_digest)::integer AS chunk_file_content_matches
+      (SELECT count(DISTINCT source_ref) FROM source_revision_lineage WHERE file_content_hash IS NOT NULL AND lower(btrim(file_content_hash)) = content_digest)::integer AS chunk_file_content_matches
   `, auditLimit == null ? [explicitWorkspaceRevision, explicitExecutionId] : [explicitWorkspaceRevision, explicitExecutionId, auditLimit]);
+  let identityClassifications = [];
+  let identityClassificationSummary = null;
+  let identityClassificationStatus = 'NOT_RUN_FULL_SCOPE';
+  if (auditLimit != null) {
+    const identityRows = await client.query(`
+      WITH bindings AS (
+        SELECT lower(regexp_replace(regexp_replace(btrim(canonical_source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
+               workspace_revision::text AS workspace_revision,
+               lower(source_revision::text) AS source_revision,
+               lower(content_digest::text) AS content_digest
+        FROM public.atlas_workspace_source_bindings
+        WHERE repo_id = 'deeds-web-app' AND workspace_revision::text = $1
+        ORDER BY lower(regexp_replace(regexp_replace(btrim(canonical_source_ref), '\\\\', '/', 'g'), '^\\./', '')),
+                 lower(source_revision::text), lower(content_digest::text)
+        LIMIT $3
+      ), graphify AS (
+        SELECT lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
+               workspace_revision::text AS workspace_revision,
+               lower(code_source_revision::text) AS source_revision,
+               lower(content_hash::text) AS content_digest
+        FROM public.graphify_execution_file_membership_v2
+        WHERE execution_id = $2::uuid AND repository_id = 'repo:root' AND workspace_revision::text = $1
+      ), exact_members AS (
+        SELECT b.source_ref, b.workspace_revision, b.source_revision, b.content_digest
+        FROM bindings b
+        JOIN graphify g USING (source_ref, workspace_revision, source_revision, content_digest)
+        GROUP BY b.source_ref, b.workspace_revision, b.source_revision, b.content_digest
+        HAVING count(*) = 1
+      ), selected AS MATERIALIZED (
+        SELECT * FROM exact_members
+        ORDER BY source_ref, source_revision, content_digest
+        LIMIT $3
+      ), packet_data AS MATERIALIZED (
+        SELECT s.source_ref,
+          jsonb_agg(jsonb_build_object(
+            'packet_key', p.packet_key::text,
+            'source_revision', lower(p.source_revision::text),
+            'content_hash', lower(p.content_hash::text),
+            'legacy_sha256', lower(p.sha256::text),
+            'lineage_binding_checksum', p.lineage_binding_checksum,
+            'lineage_producer_revision', p.lineage_producer_revision
+          ) ORDER BY p.packet_key::text) AS packet_rows
+        FROM selected s
+        JOIN public.atlas_packets p
+          ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+        GROUP BY s.source_ref
+      ), lineage_data AS MATERIALIZED (
+        SELECT s.source_ref,
+          jsonb_agg(jsonb_build_object(
+            'packet_key', l.packet_key::text,
+            'source_revision', lower(l.source_revision::text),
+            'revision_status', l.revision_status,
+            'chunk_row_exists', c.id IS NOT NULL
+          ) ORDER BY l.packet_key::text, l.chunk_row_id::text) AS lineage_rows
+        FROM selected s
+        JOIN public.atlas_packet_chunk_lineage l
+          ON lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+         AND lower(l.source_revision::text) = s.source_revision
+         AND l.revision_status = 'PROVEN'
+        LEFT JOIN public.codebase_chunk_index c ON c.id = l.chunk_row_id
+        GROUP BY s.source_ref
+      ), packet_keys AS MATERIALIZED (
+        SELECT DISTINCT s.source_ref, p.packet_key::text AS packet_key
+        FROM selected s
+        JOIN public.atlas_packets p
+          ON lower(regexp_replace(regexp_replace(btrim(p.source_ref), '\\\\', '/', 'g'), '^\\./', '')) = s.source_ref
+        WHERE p.packet_key IS NOT NULL
+      ), packet_lineage_data AS MATERIALIZED (
+        SELECT pk.source_ref,
+          jsonb_agg(jsonb_build_object(
+            'packet_key', l.packet_key::text,
+            'lineage_source_ref', lower(regexp_replace(regexp_replace(btrim(l.source_ref), '\\\\', '/', 'g'), '^\\./', '')),
+            'source_revision', lower(l.source_revision::text),
+            'revision_status', l.revision_status,
+            'chunk_row_exists', c.id IS NOT NULL
+          ) ORDER BY l.packet_key::text, l.source_revision::text, l.chunk_row_id::text) AS packet_lineage_rows
+        FROM packet_keys pk
+        JOIN public.atlas_packet_chunk_lineage l ON l.packet_key::text = pk.packet_key
+        LEFT JOIN public.codebase_chunk_index c ON c.id = l.chunk_row_id
+        GROUP BY pk.source_ref
+      ), source_chunk_diagnostic AS MATERIALIZED (
+        SELECT s.source_ref,
+          count(c.id)::integer AS exact_source_ref_chunk_count
+        FROM selected s
+        LEFT JOIN public.codebase_chunk_index c ON c.source_ref::text = s.source_ref
+        GROUP BY s.source_ref
+      )
+      SELECT s.source_ref, s.workspace_revision, s.source_revision, s.content_digest,
+        COALESCE(packet_data.packet_rows, '[]'::jsonb) AS packet_rows,
+        COALESCE(lineage_data.lineage_rows, '[]'::jsonb) AS lineage_rows,
+        COALESCE(packet_lineage_data.packet_lineage_rows, '[]'::jsonb) AS packet_lineage_rows,
+        jsonb_build_object(
+          'exactSourceRefChunkCount', source_chunk_diagnostic.exact_source_ref_chunk_count,
+          'revisionQualified', false,
+          'reason', 'CODEBASE_CHUNK_INDEX_SOURCE_REVISION_COLUMN_UNAVAILABLE'
+        ) AS source_chunk_diagnostic
+      FROM selected s
+      LEFT JOIN packet_data ON packet_data.source_ref = s.source_ref
+      LEFT JOIN lineage_data ON lineage_data.source_ref = s.source_ref
+      LEFT JOIN packet_lineage_data ON packet_lineage_data.source_ref = s.source_ref
+      LEFT JOIN source_chunk_diagnostic ON source_chunk_diagnostic.source_ref = s.source_ref
+      ORDER BY s.source_ref, s.source_revision, s.content_digest
+    `, [explicitWorkspaceRevision, explicitExecutionId, auditLimit]);
+    identityClassifications = identityRows.rows.map(classifyPacketChunkIdentityV1);
+    identityClassificationSummary = summarizePacketChunkIdentityClassificationsV1(identityClassifications);
+    identityClassificationStatus = identityClassificationSummary.rowCount === auditLimit
+      ? 'DETERMINISTIC_EXACT_GRAPHIFY_COHORT_CLASSIFIED'
+      : 'DETERMINISTIC_COHORT_INCOMPLETE';
+  }
+  const identitySelectionRule = auditLimit == null
+    ? null
+    : 'exact source/workspace/content bindings joined to the explicit Graphify execution; sorted by normalized source_ref, source_revision, content_digest; bounded by --limit';
+  const identityClassificationChecksum = identityClassificationSummary == null
+    ? null
+    : `sha256:${createHash('sha256').update(JSON.stringify({
+      schema: 'atlas.current-packet-chunk-identity-classification.v1',
+      workspaceRevision: explicitWorkspaceRevision,
+      executionId: explicitExecutionId,
+      selectionRule: identitySelectionRule,
+      rows: identityClassifications,
+    }), 'utf8').digest('hex')}`;
   const lineageSamples = await client.query(`
     WITH current_members AS (
       SELECT lower(regexp_replace(regexp_replace(btrim(source_ref), '\\\\', '/', 'g'), '^\\./', '')) AS source_ref,
@@ -280,6 +433,7 @@ try {
   const revisionResult = await client.query(`SELECT DISTINCT workspace_revision::text AS workspace_revision FROM public.atlas_workspace_source_bindings WHERE repo_id = 'deeds-web-app' ORDER BY workspace_revision::text`);
   const report = {
     schema: 'atlas.current-workspace-packet-chunk-join.v1',
+    observedAt: new Date().toISOString(),
     mode: 'READ_ONLY_CENSUS',
     executionId: explicitExecutionId,
     workspaceRevisionInput: explicitWorkspaceRevision,
@@ -287,11 +441,20 @@ try {
     sampleLimit: auditLimit,
     workspaceRevisions: revisionResult.rows.map((row) => row.workspace_revision),
     counts: result.rows[0],
+    identityClassification: {
+      status: identityClassificationStatus,
+      selectionRule: identitySelectionRule,
+      summary: identityClassificationSummary,
+      checksum: identityClassificationChecksum,
+      representativeness: auditLimit == null ? 'NOT_APPLICABLE' : 'BOUNDED_DETERMINISTIC_SAMPLE_NOT_A_POPULATION_ESTIMATE',
+      rows: identityClassifications,
+    },
     lineageSamples: lineageSamples.rows,
     chunkInventory: inventory.rows[0],
     pathCoverage: pathCoverage.rows[0],
     mismatchDiagnostics: mismatchDiagnostics.rows[0],
     currentGraphifyEvidenceOwner: 'graphify_execution_file_membership_v2; explicit execution only',
+    workspaceRevisionAuthority: 'atlas_workspace_source_bindings; packet workspace columns are not used for qualification',
     legacyGraphifyEvidenceExcludedFromCurrentJoin: true,
     mismatchDiagnosticScope: 'explicit admitted workspace revision and execution only; historical rows are not used for current-gate promotion',
     mismatchDiagnosticNote: mismatchDiagnostics.rows[0]?.status === 'NOT_RUN_STATEMENT_TIMEOUT'

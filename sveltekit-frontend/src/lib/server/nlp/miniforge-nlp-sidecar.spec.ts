@@ -25,6 +25,17 @@ describe('miniforge-nlp-sidecar', () => {
         return new Response(JSON.stringify({
           status: 'ok',
           model: 'miniforge-nlp-sidecar',
+          contract: 'provenance-v2',
+          runtimeSourceBindings: {
+            modules: {
+              miniforge_nlp_sidecar_v2: `sha256:${'1'.repeat(64)}`,
+              miniforge_nlp_sidecar: `sha256:${'2'.repeat(64)}`,
+            },
+            groundedExtractionAdapter: {
+              acceptsSpanDiagnostics: true,
+              acceptsExecutionReceipt: true,
+            },
+          },
           capabilities: { spacy: true, spacy_pos: false },
           capabilityDetails: { spacy_model: { installed: false, loaded: false, pos_ready: false } },
         }), { status: 200 });
@@ -47,7 +58,23 @@ describe('miniforge-nlp-sidecar', () => {
           concepts: ['tree-sitter'],
           chunks: [],
           features: [],
-          metadata: {},
+          metadata: {
+            grounded_execution: {
+              requested: true,
+              requestBinding: {
+                sourceRef: 'src/example.ts',
+                sourceRevision: 'sha256:source-rev-1',
+                workspaceRevision: 'sha256:workspace-rev-1',
+                packetKey: 'packet:1',
+                status: 'SUPPLIED',
+              },
+              executorAttempted: true,
+              executorCompleted: true,
+              resultCount: 1,
+              inputChecksum: 'a'.repeat(64),
+              providerRevision: 'parent-atlas-nlp-sidecar:analysis-v1',
+            },
+          },
           capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false, classification_helper: true },
           classification_proposal: {
             schema: 'atlas.nlp-classification-proposal.v1',
@@ -87,6 +114,7 @@ describe('miniforge-nlp-sidecar', () => {
       sourceType: 'codebase',
       extractionMode: 'full',
       documentId: 'doc-1',
+      packetKey: 'packet:1',
       sourceRef: 'src/example.ts',
       sourceRevision: 'sha256:source-rev-1',
       workspaceRevision: 'sha256:workspace-rev-1',
@@ -104,7 +132,69 @@ describe('miniforge-nlp-sidecar', () => {
     expect(analysis.capabilities.classification_helper).toBe(true);
     expect(analysis.classification_proposal?.sourceRevision).toBe('sha256:source-rev-1');
     expect(analysis.classification_proposal?.canonicalAuthority).toBe(false);
+    expect(analysis.groundedExecutionObservation).toMatchObject({
+      requestBinding: {
+        sourceRef: 'src/example.ts',
+        sourceRevision: 'sha256:source-rev-1',
+        workspaceRevision: 'sha256:workspace-rev-1',
+        packetKey: 'packet:1',
+        status: 'SUPPLIED',
+      },
+      requestBindingMatchesRequest: true,
+    });
+    const mismatchedBindingAnalysis = await client.analyze({
+      text: 'export function hello() { return 1; }',
+      sourceType: 'codebase',
+      documentId: 'doc-1',
+      packetKey: 'packet:1',
+      sourceRef: 'src/different.ts',
+      sourceRevision: 'sha256:source-rev-1',
+      workspaceRevision: 'sha256:workspace-rev-1',
+      sourceNamespace: 'src',
+      treeNodeId: 'tree:hello',
+      passes: ['structural', 'semantic', 'sequence'],
+      groundedExtractionRequired: true,
+    });
+    expect(mismatchedBindingAnalysis.groundedExecutionObservation?.requestBindingMatchesRequest).toBe(false);
     expect(fetchSpy).toHaveBeenCalled();
+  });
+
+  it('rejects grounded analysis before POST when runtime source binding is absent', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any) => {
+      expect(String(input)).toBe('http://127.0.0.1:9997/health');
+      return new Response(JSON.stringify({ status: 'ok', model: 'old-sidecar' }), { status: 200 });
+    });
+    const { createMiniforgeNlpSidecarClient, MiniforgeNlpRuntimeBindingUnavailableError } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+
+    await expect(client.analyze({ text: 'const x = 1;', groundedExtractionRequired: true }))
+      .rejects.toBeInstanceOf(MiniforgeNlpRuntimeBindingUnavailableError);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects grounded extraction before POST when the adapter signature is incompatible', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any) => {
+      expect(String(input)).toBe('http://127.0.0.1:9997/health');
+      return new Response(JSON.stringify({
+        contract: 'provenance-v2',
+        runtimeSourceBindings: {
+          modules: {
+            miniforge_nlp_sidecar_v2: `sha256:${'1'.repeat(64)}`,
+            miniforge_nlp_sidecar: `sha256:${'2'.repeat(64)}`,
+          },
+          groundedExtractionAdapter: {
+            acceptsSpanDiagnostics: false,
+            acceptsExecutionReceipt: true,
+          },
+        },
+      }), { status: 200 });
+    });
+    const { createMiniforgeNlpSidecarClient, MiniforgeNlpRuntimeBindingUnavailableError } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+
+    await expect(client.extract({ text: 'const x = 1;', groundedExtractionRequired: true }))
+      .rejects.toBeInstanceOf(MiniforgeNlpRuntimeBindingUnavailableError);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   it('normalizes sidecar pass evidence and compiles one noncanonical matrix only with explicit lineage', async () => {
@@ -213,6 +303,7 @@ describe('miniforge-nlp-sidecar', () => {
           evidence_end_column: 32,
           resolved: false,
           resolution: 'unresolved',
+          occurrence_positions: [[1, 7], [3, 4]],
         }],
         diagnostics: [],
       }), { status: 200 });
@@ -232,5 +323,53 @@ describe('miniforge-nlp-sidecar', () => {
     expect(evidence.chunks[0]?.kind).toBe('function');
     expect(evidence.edges[0]?.type).toBe('CALLS');
     expect(evidence.edges[0]?.resolved).toBe(false);
+    expect(evidence.edges[0]?.occurrence_positions).toEqual([[1, 7], [3, 4]]);
+  });
+
+  it('rejects malformed occurrence coordinates instead of dropping span evidence', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      chunks: [],
+      edges: [{
+        from_evidence_key: 'example:hello',
+        to_evidence_key: 'world',
+        type: 'CALLS',
+        evidence_start_line: 1,
+        evidence_start_column: 0,
+        evidence_end_line: 1,
+        evidence_end_column: 8,
+        occurrence_positions: [[0, 1]],
+      }],
+    }), { status: 200 }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    await expect(client.astChunk({
+      source: 'hello();',
+      language: 'typescript',
+      filePath: 'src/example.ts',
+      sourceRevision: 'rev-1',
+    })).rejects.toThrow(/invalid occurrence_positions/);
+  });
+
+  it('calls the read-only POS endpoint and preserves UTF-8 token byte offsets', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any, init?: any) => {
+      expect(String(input)).toBe('http://127.0.0.1:9997/pos');
+      expect(init?.method).toBe('POST');
+      expect(JSON.parse(String(init?.body))).toEqual({ text: 'Trace the parser.' });
+      return new Response(JSON.stringify({
+        source: 'spacy',
+        coordinate_basis: 'UTF8_BYTES',
+        token_assertions: [{ text: 'parser', lemma: 'parser', pos: 'NOUN', tag: 'NN', dependency: 'obj', start_byte: 10, end_byte: 16 }],
+        noun_phrase_spans: [],
+        dependency_edges: [],
+      }), { status: 200 });
+    });
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().pos('Trace the parser.');
+    expect(result.source).toBe('spacy');
+    expect(result.token_assertions[0]).toMatchObject({ text: 'parser', start_byte: 10, end_byte: 16 });
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 });

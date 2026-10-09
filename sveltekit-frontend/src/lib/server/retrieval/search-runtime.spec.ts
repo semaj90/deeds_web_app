@@ -632,6 +632,9 @@ describe('search runtime bridge', () => {
     expect(expandedResult.provenance.promotionAttempted).toBe(false);
     expect(mockRecordPromotionIntent).not.toHaveBeenCalled();
     expect(mockAppendSearchRuntimeTrainingRow).not.toHaveBeenCalled();
+    expect(mockRerankCanonicalFeatureEnvelopes.mock.calls).toHaveLength(2);
+    expect(mockRerankCanonicalFeatureEnvelopes.mock.calls.every(([, , options]) =>
+      options.cachePolicy === 'disabled' && options.shadowReceiptPolicy === 'disabled')).toBe(true);
     expect(expandedResult.packets.some((packet: any) => packet.packet_key === 'dense-expanded')).toBe(true);
   });
 });

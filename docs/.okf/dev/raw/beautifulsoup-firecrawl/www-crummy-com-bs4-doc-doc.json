@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "beautifulsoup-firecrawl",
+  "source_ref": "beautifulsoup-firecrawl:www-crummy-com-bs4-doc-doc",
+  "url": "https://www.crummy.com/software/BeautifulSoup/bs4/doc/",
+  "title": "www.crummy.com",
+  "domain_class": "tool",
+  "focus_tags": [
+    "beautifulsoup",
+    "firecrawl",
+    "html-parsing",
+    "bounded-crawling",
+    "llm_output",
+    "kanban",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "www.crummy.com",
+    "markdown_excerpt": "# Beautiful Soup Documentation [¶](https://www.crummy.com/software/BeautifulSoup/bs4/doc/\\#beautiful-soup-documentation \"Link to this heading\") ![\"The Fish-Footman began by producing from under his arm a great letter, nearly as large as himself.\"](https://www.crummy.com/software/BeautifulSoup/bs4/doc/_images/6.1.jpg) [Beautiful Soup](http://www.crummy.com/software/BeautifulSoup/) is a Python library for pulling data out of HTML and XML files. It works with your favorite parser to provide idiomatic ways of navigating, searching, and modifying the parse tree. It commonly saves programmers hours or days of work. These instructions illustrate all major features of Beautiful Soup 4, with examples. I show you what the library is good for, how it works, how to use it, how to make it do what you want, and what to do when it violates your expectations. This document covers Beautiful Soup version 4.15.0. The examples in this documentation were written for Python 3.8. You might be looking for the documentation for [Beautiful Soup 3](http://www.crummy.com/software/BeautifulSoup/bs3/documentation.html). If so, you should know that Beautiful Soup 3 is no longer being developed and that all suppo",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:beautifulsoup-firecrawl:www-crummy-com-bs4-doc-doc",
+    "title": "www.crummy.com",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Beautiful Soup and Firecrawl Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "afb6d7d3530445ea6565a4725e0d07be46ce86a6ebfacdb386af58e7ca3691a6",
+  "markdown_path": "docs/.okf/dev/raw/beautifulsoup-firecrawl/www-crummy-com-bs4-doc-doc.md",
+  "fetched_at": "2026-10-09T05:34:18.294Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "beautifulsoup-firecrawl",
+    "source_title": "Beautiful Soup and Firecrawl Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/beautifulsoup-firecrawl/www-crummy-com-bs4-doc-doc.md"
+}

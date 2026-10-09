@@ -1,11 +1,11 @@
 # NES/CHROM97/Glyph BitEncoding Architecture — Phase 110+
 
 **Status**: Derived visualization design only; not an active retrieval or embedding owner.
-**Goal**: Unified memory hierarchy for feature extraction → latent encoding → glyph bitpacking → CHROM97 visualization  
+**Goal**: Unified memory hierarchy for feature extraction → latent encoding → glyph bitpacking → CHROM97 visualization
 **Layers**: 5 (Canonical → Features → Latents → Glyphs → CHROM97)
 
 > **2026-08-22 alignment note:** The active Parent Atlas semantic representation is
-> `semantic_768`. Any `384` dimensions in this historical design are legacy or
+> `semantic_768`. Any `768` dimensions in this historical design are legacy or
 > explicitly derived projection examples and must not be used as a Qdrant,
 > Postgres, or embedding-writer default. Glyph/CHR97 bytes are visualization
 > artifacts keyed by canonical identity and revision; they do not become a
@@ -23,24 +23,24 @@ export interface CanonicalEnvelope {
   source_ref: string;              // "src/lib/server/auth.ts"
   feature_id: string;              // "auth.sessions"
   directory_path: string;          // "src/lib/server"
-  
+
   // Metadata (filterable, scalar)
   created_at: number;              // Unix ms
   updated_at: number;              // Unix ms
   token_count: number;             // 0–65535 (uint16)
   confidence: number;              // 0–255 (uint8, scaled)
   coverage_percent: number;        // 0–100 (uint8)
-  
+
   // Tagging (searchable, string array)
   tags: string[];                  // ["auth", "session", "lucia"]
   domain_class: string;            // "auth" | "retrieval" | "inference"
-  
+
   // Topology (optional, set by batch processors)
   topology_cluster?: string;       // "cluster:42" (SOM output)
   community_id?: string;           // "community:7" (Louvain output)
   pagerank?: number;               // 0.0–10.0 (Neo4j GDS)
   graph_degree?: number;           // 0–N (edge count)
-  
+
   // Encoded pointers (link to external storage, not inline)
   content_embedding_id?: string;   // Points to pgvector row
   latent64_id?: string;            // Points to bytea blob
@@ -58,7 +58,7 @@ CREATE TABLE atlas_packets (
   feature_id TEXT NOT NULL,
   -- ... other columns ...
   envelope JSONB,                  -- Canonical envelope above
-  content_embedding vector(384),   -- pgvector, searchable
+  content_embedding vector( UPDATE 384 to 768!!!),   -- pgvector, searchable
   latent64_blob bytea,             -- uint8 quantized, NOT searchable
   latent128_blob bytea,            -- float16 compressed, NOT searchable
   glyph_record_id TEXT             -- FK to glyph_records.id
@@ -82,11 +82,11 @@ export interface ExtractedFeatures {
   ast_kinds: string[];                  // ["function", "class", "import"]
   imports: string[];                    // ["lucia", "sveltekit"]
   exports: string[];                    // ["validateSession", "createSession"]
-  
+
   // Lexical features (keyword extraction, LangExtract)
   lexical_features: string[];           // ["auth", "session", "validate", "lucia"]
   entity_types: string[];               // ["import", "export", "define"]
-  
+
   // Domain features (pattern matching, regex + LangExtract)
   domain_patterns: {
     error_handling?: boolean;           // Contains error/throw/catch
@@ -94,7 +94,7 @@ export interface ExtractedFeatures {
     persistence?: boolean;              // DB/store keywords
     network?: boolean;                  // API/fetch keywords
   };
-  
+
   // Structural features (AST depth, complexity)
   nesting_depth: number;                // Max depth in AST
   function_count: number;               // How many functions defined
@@ -141,8 +141,8 @@ CREATE TABLE atlas_packet_features (
 **What happens offline** (batch, no per-request compute):
 
 ```
-1. content_embedding (384-dim float32, from embeddinggemma)
-2. Sparse AutoEncoder: 384 → 128 (bottleneck)
+1. content_embedding ( UPDATE 384 to 768!!!384-dim float32, from embeddinggemma)
+2. Sparse AutoEncoder: UPDATE 384 to 768!!! 768 → 128 (bottleneck)
 3. Quantize + store: latent128 (float16, 256 bytes per packet)
 4. Project + quantize: latent64 (uint8, 64 bytes per packet)
 5. SOM/KMeans: latent64 → topology_cluster (uint16 cluster ID)
@@ -152,18 +152,18 @@ CREATE TABLE atlas_packet_features (
 
 | Representation | Size | Speed | Use | Storage |
 |---|---|---|---|---|
-| **content_embedding** | 384 × 4B = 1.5KB | 100ms (Qdrant HNSW) | Semantic search, ranked ANN | pgvector (indexed) |
+| **content_embedding** | 768 × 4B = 1.5KB | 100ms (Qdrant HNSW) | Semantic search, ranked ANN | pgvector (indexed) |
 | **latent128** | 128 × 2B = 256B | 500ms (BERT rerank, offline) | Rich features for HMM/reranking | bytea blob |
 | **latent64** | 64 × 1B = 64B | <5ms (TurboVec ANN) | Fast topology probe, SOM input | bytea blob |
 
-**Architecture**:
+**Architecture**: UPDATE 384 to 768!!!
 
 ```python
 # Offline: compute once, store forever
 class LatentAutoencoder:
     def __init__(self):
         self.encoder_768_to_128 = nn.Sequential(
-            nn.Linear(384, 256),
+            nn.Linear(7684, 256),
             nn.ReLU(),
             nn.Linear(256, 128)
         )
@@ -171,15 +171,15 @@ class LatentAutoencoder:
             nn.Linear(128, 64),
             nn.Tanh()  # Output in [-1, 1] for quantization
         )
-    
-    def encode(self, embedding_384: torch.Tensor) -> tuple:
-        latent128 = self.encoder_768_to_128(embedding_384)
+
+    def encode(self, embedding_768: torch.Tensor) -> tuple:
+        latent128 = self.encoder_768_to_128(embedding_768)
         latent64 = self.projector_128_to_64(latent128)
-        
+
         # Quantize for storage
         latent128_fp16 = latent128.half()                     # float16
         latent64_uint8 = ((latent64 + 1) / 2 * 255).uint8()   # 0–255
-        
+
         return latent128_fp16, latent64_uint8
 
 # Online: unpack from bytea only when needed
@@ -220,11 +220,11 @@ A glyph is a **compact, searchable card** representing one packet. Think Nintend
 export interface GlyphRecord {
   id: string;                          // Unique ID
   packet_key: string;                  // Link to canonical
-  
+
   // Identity snippet (1 line)
   title: string;                       // "validateSession()"
   label: string;                       // "auth.ts:42"
-  
+
   // Bitpacked summary (compressed via CHROM97)
   bitpack: string;                     // "0x[hex bitstring]" or base64
   bitpack_format: 'chrom97' | 'ndjson'; // Encoding method
@@ -238,11 +238,11 @@ export interface GlyphRecord {
     confidence: number;                // 0–255 (uint8)
     freshness_days: number;            // 0–255 (uint8, clamped)
   };
-  
+
   // Searchable tags
   tags: string[];                      // ["auth", "session", "lucia"]
   semantic_tags: string[];             // Derived from latent128
-  
+
   // Provenance
   created_at: number;
   latent64_id: string;                 // Link to blob
@@ -336,7 +336,7 @@ Glyph → Bitunpack → Feature vector → Styling rules → HTML/SVG tile
 Example:
   bitpack_hex: "0x1A5F8C"
   unpack → {is_exported: 1, complexity: 3, authority: 200, ...}
-  apply rules: 
+  apply rules:
     - Border color = ROLE_COLORS[domain_class]    (NES-style palette)
     - Text size ∝ authority
     - Icon = ANIMATION_TYPES[complexity] (idle/speaking/objection/...)
@@ -349,17 +349,17 @@ Example:
 ```svelte
 <script lang="ts">
   import type { GlyphRecord } from '$lib/types/glyph';
-  
+
   interface Props {
     glyph: GlyphRecord;
   }
-  
+
   let { glyph } = $props();
-  
+
   const bitpacked = $derived(unpackGlyphBits(BigInt('0x' + glyph.bitpack_hex)));
   const roleColor = $derived(ROLE_COLORS[DOMAIN_CLASSES[bitpacked.domain_class]]);
   const animIcon = $derived(ANIMATION_TYPES[bitpacked.complexity]);
-  
+
   const style = $derived({
     borderColor: roleColor,
     borderWidth: Math.ceil(bitpacked.confidence / 50) + 'px',
@@ -389,7 +389,7 @@ Example:
     background: var(--glyph-bg);
     transition: all 0.1s;
   }
-  
+
   .glyph-tile:hover {
     transform: scale(1.05);
     box-shadow: 0 0 8px var(--border-color);
@@ -438,7 +438,7 @@ export const DOMAIN_CLASSES = [
          ↓ (offline embeddings + compression)
 ┌─────────────────────────────────────────────────────────────┐
 │ 3. LATENT ENCODING (Postgres bytea blobs)                   │
-│    content_embedding (384-dim, pgvector, searchable)        │
+│    content_embedding (768-dim, pgvector, searchable)        │
 │    latent128 (128-dim, float16, for reranking)              │
 │    latent64 (64-dim, uint8, for SOM/KMeans)                 │
 │    topology_cluster (uint16, SOM output)                    │

@@ -364,7 +364,12 @@ async function emitShadowReceipt(input: {
 async function resolveLearnedRerankerFallback(
   query: string,
   candidates: RerankCandidate[],
-  context: { requestId: string; baseline: { modelVersion: string; ranked: RerankedCandidate[] }; eligibilityReason: RerankEligibilityReason },
+  context: {
+    requestId: string;
+    baseline: { modelVersion: string; ranked: RerankedCandidate[] };
+    eligibilityReason: RerankEligibilityReason;
+    shadowReceiptPolicy: 'enabled' | 'disabled';
+  },
 ): Promise<{ modelVersion: string; ranked: RerankedCandidate[] } | null> {
   const mode = resolveXgboostRerankMode();
   if (mode === 'off') return null;
@@ -373,13 +378,15 @@ async function resolveLearnedRerankerFallback(
   if (!result) return null;
 
   if (mode === 'shadow') {
-    await emitShadowReceipt({
-      query,
-      requestId: context.requestId,
-      baseline: context.baseline,
-      challenger: result,
-      eligibilityReason: context.eligibilityReason,
-    });
+    if (context.shadowReceiptPolicy !== 'disabled') {
+      await emitShadowReceipt({
+        query,
+        requestId: context.requestId,
+        baseline: context.baseline,
+        challenger: result,
+        eligibilityReason: context.eligibilityReason,
+      });
+    }
     return null;
   }
 
@@ -459,6 +466,7 @@ export interface CanonicalRerankOptions {
   topK?: number;
   cacheTtlSeconds?: number;
   cachePolicy?: 'enabled' | 'disabled';
+  shadowReceiptPolicy?: 'enabled' | 'disabled';
   rerankTier?: CanonicalRerankTier;
   policyDecision?: PolicyDecision;
   policyState?: PolicyStateVector;
@@ -880,7 +888,11 @@ function retrievalOrderFallback(
 async function runFallbackRerank(
   query: string,
   candidates: RerankCandidate[],
-  context: { requestId: string; crossEncoderErrorMessage?: string },
+  context: {
+    requestId: string;
+    crossEncoderErrorMessage?: string;
+    shadowReceiptPolicy: 'enabled' | 'disabled';
+  },
 ): Promise<{ modelVersion: string; ranked: RerankedCandidate[]; fallbackReason: string }> {
   // Compute the baseline (what will actually be served if the learned reranker doesn't take
   // over) FIRST, unconditionally — cheap, pure JS, and required so shadow mode can emit a
@@ -912,6 +924,7 @@ async function runFallbackRerank(
     requestId: context.requestId,
     baseline,
     eligibilityReason: classifyEligibilityReason(context.crossEncoderErrorMessage),
+    shadowReceiptPolicy: context.shadowReceiptPolicy,
   });
   if (learned) {
     // Retain the sidecar's real model identity so reports can distinguish true learned-reranker
@@ -1145,6 +1158,7 @@ export async function rerankCanonicalFeatureEnvelopes(
     const fallback = await runFallbackRerank(query, candidates, {
       requestId: primaryCacheKey,
       crossEncoderErrorMessage: (err as Error)?.message,
+      shadowReceiptPolicy: options.shadowReceiptPolicy ?? 'enabled',
     });
     if (fallback.ranked.length > 0) {
       ranked = fallback.ranked;

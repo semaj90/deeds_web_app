@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { inventoryNpm } from './library-doc-inventory-v1.mjs';
+import { inventoryNpm, inventoryNonNpmManifests } from './library-doc-inventory-v1.mjs';
 
 test('counts direct declarations and preserves nested lock versions separately from installed state', (t) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-doc-inventory-'));
@@ -37,10 +37,28 @@ test('does not call a declared package installed when its root node_modules copy
 test('excludes ignored temporary and archival trees from the active-repository census', (t) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-doc-inventory-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  for (const dir of ['active', '.tmp/snapshot', 'deeds_labs/archive']) {
+  for (const dir of ['active', '.tmp/snapshot', 'deeds_labs/archive', 'gsd_archives', 'backup-2026-10-08', 'scripts/api-cleanup/reports/backup-2025-12']) {
     fs.mkdirSync(path.join(root, dir), { recursive: true });
     fs.writeFileSync(path.join(root, dir, 'package.json'), JSON.stringify({ name: dir, dependencies: { visible: '1' } }));
   }
   const report = inventoryNpm(root, { sources: [] });
   assert.deepEqual(report.manifests.map((manifest) => manifest.path), ['active/package.json']);
+});
+
+test('excludes gitlink manifests and Python environments from dependency evidence', (t) => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-doc-inventory-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ dependencies: { app_owned: '1.0.0' } }));
+  fs.mkdirSync(path.join(root, 'turbovec'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'turbovec/package.json'), JSON.stringify({ dependencies: { submodule_only: '9.0.0' } }));
+  fs.writeFileSync(path.join(root, 'turbovec/Cargo.toml'), '[package]\nname="turbovec"\n');
+  fs.mkdirSync(path.join(root, '.python311'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.python311/requirements.txt'), 'environment_only==1.0.0\n');
+
+  const options = { excludedRootDirs: ['turbovec'] };
+  const npm = inventoryNpm(root, { sources: [] }, options);
+  const nonNpm = inventoryNonNpmManifests(root, options);
+  assert.deepEqual(npm.manifests.map((manifest) => manifest.path), ['package.json']);
+  assert.deepEqual(npm.packages.map((item) => item.name), ['app_owned']);
+  assert.deepEqual(nonNpm, []);
 });

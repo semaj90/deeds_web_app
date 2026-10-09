@@ -49,8 +49,12 @@ test('writer preserves opaque workspace revision strings exactly', async () => {
     packetKey: 'packet-1',
     featureRevision: 'features-r1',
   });
-  assert.equal(captured[4], 'workspace-r1');
+  assert.equal(captured[3], 'source-r1');
+  assert.equal(captured[4], 'registry-r1');
+  assert.equal(captured[6], 'workspace-r1');
   for (const column of [
+    'source_revision',
+    'registry_revision',
     'source_version_receipt_id',
     'workspace_revision',
     'representation_id',

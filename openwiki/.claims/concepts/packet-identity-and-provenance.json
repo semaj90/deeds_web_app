@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:60eaacb9654cfe43a3edde2bb773b4ca9001a3215c3ccc871dc56a9afee0cd7e",
+  "claims": [
+    {
+      "id": "claim_9e421445d1bd4dd3905bfaee5915dcff",
+      "statement": "The current packet identity contract defines a file packet key from exactly repository scope, canonical source_ref, and packet kind; source revisions, workspace revisions, Qdrant IDs, graph-node keys, ordinals, and latest/current markers cannot influence the key, and revision qualifies rather than changes packet identity.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L2-L21",
+          "version": "repo-lines-v1:sha256:4d9a9ad2cc5da21960dd9e3040103cab3f8f095b493c38c0f89bbb713d6e4f26:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MTFhYWI5ZWJkOTJjOTU2MmYzYWFiNjQ5NjkyMDY5NGFkY2QzMzRiNmJmOGYzODljOWY3ZWQ1N2E5ZTEzMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5NWQ1YTUwMmU3Y2Q3MDFiM2IwYWFhMzljMmEzMjU1NGYxODlkNDM5NTc5MDNlNzBiYWQ1MTVmYjkyMmRmODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk2ZDM4MzFmODUyMDFiODY2MGY3Yjg4YTdmMTM5NTJlMzBhNTIyZTI0OGYzNDRmOGU3YTIzYzRjOGQ2NjQyODgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L27-L35",
+          "version": "repo-lines-v1:sha256:763e87f06374c3284ab2ed1589db5c6abe64255bfc5734959e958288563500ed:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTVkY2FiMDBmOTI0NjFkMjU5YWI1NWFhMDI4OWQzYjM1ZDBmMTVlYzE2ZWRiOTRkMjU3ZjdmZGE5YTZkYmUyMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDI4YTIyNTQ2NTQyMTAyYmY3ZWE2MjE0Yzc2NDBiNmQxY2IyOGZmNDU0ZGI5MWJmYjQ1ODkxOTg4MWZkNjAwMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI5ZWRiYjU3ZWUzYmM4ODE4YThhYzcyZTY2YmM2Y2VlZTYyN2ZlNDc5YTFiOGYxNWIyZTY4ZjllMzc5YjYzMiJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L44-L50",
+          "version": "repo-lines-v1:sha256:0ef6c46892461816a9084a9c74397f4bd9f0a46edb4591b48986c6903ecc7e8c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWQ5MGJmOGJmYzI4ZDg4M2NkNWMyYWIwNzlkOTk1MWFiODA0YWFmNWFiZGMwNWQ2MjY3NTcxOTkzYTQ4MzQ3YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODNjOThlMTkyMGY4MmQ4NDhhYzBhYjY3MzBlZDIxYTNjZDYwN2VhMzliNzYyN2MyMDEyZjRhYTg2NWUyODkzNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjI5NjQwNzljM2M1YzgxNTIwZWYzM2EyYjlkMmUxNWExYjg0ZDcyODBkYjg1OTBkY2Q2NTc0N2UzZTAxMmE0MCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTc1ZWFhNDMxZjlmNmY5OWM1YjdmY2MxMTk4OGQ2ZDVjODVmZjQzMzRiOWNhM2FjMWJlNTM2MzU4MWJmNTAxOSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L66-L95",
+          "version": "repo-lines-v1:sha256:e68aba12c6090f99b6517b0522e98fa2e1689b87b8ff66df12f67e7307a9fd62:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhN2JkMTJjNDczNmUyNGI0NTNlOTBjN2I0NTBjM2YwMTk4MWQ2YjIwOTNiNjQzZmYxMTAzZjc1ZTVjNzk2NjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZGZmZDdkMTY1Mzc5NTI3MGM0YTAwZThlOGVhNTg3YzJjMDUzOGE1YjkzMDEyMjhjNzU1M2JmZjRjOGY1MjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cf594ed0a6e04758bd0451438abc372d",
+      "statement": "Packet Key V2 fails closed on non-canonical source_ref values and requires repositoryScope to be a membership repository identifier; it does not normalize source_ref locally, so upstream canonicalization is an identity boundary.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L17-L21",
+          "version": "repo-lines-v1:sha256:2a4a06e8cd0e7a79f8bc9b7db3cc43520cf5334b1930e9a005b89ffb1ee4df3e:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjYwMDFjMzhiZmI5ZThiODkyZWZkN2Y5YmFlMzYzZTkxMmU5M2E5OGI3YzYxMmE5NTJjZWMyZWQzNzU5NmY2NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzk1ZDVhNTAyZTdjZDcwMWIzYjBhYWEzOWMyYTMyNTU0ZjE4OWQ0Mzk1NzkwM2U3MGJhZDUxNWZiOTIyZGY4NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWFhNGJmODVkYjQwMjhmNWM0Y2JiOTkxOTU3YmNiMDFkYzYxMWI5M2NiM2ZlODc0ODExNjAyOTdiYjJmOGEzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTZkMzgzMWY4NTIwMWI4NjYwZjdiODhhN2YxMzk1MmUzMGE1MjJlMjQ4ZjM0NGY4ZTdhMjNjNGM4ZDY2NDI4OCJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L52-L79",
+          "version": "repo-lines-v1:sha256:bdb7605694b6cd186860506016818dda22bb17645dcfea22aeebc68f3ae0fc13:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0NmIzNjQyODNjYjlmZDY2MzRhNzdiYjBjYzU3OTcwOWE3YTY3MDliYTQ0OGJkZjRmOWU5ZjczYmMwNmE1MjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE5YTU4NDBmNGIwNDNjNTNkYjA2NTUxNDhmNTA3NWRhYWE3N2Y0N2FkZjZlNjlmNGQ1OGI2MDhkMzZjMDQ5ODMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f0d04e8e0054bf28b6d203a1d6a71a9",
+      "statement": "Packet revision derivation is deterministic over packet key, source_ref, source revision, content digest, and packet schema revision, while workspace, execution, representation, executor, graph, feature, projection, cache, and timestamp metadata are excluded; the derived result is explicitly non-authoritative and performs no writes.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.ts#L13-L31",
+          "version": "repo-lines-v1:sha256:6fb1d0ad29db06192b9e84c6b56aec351b1020219cde397b880541b1dbea0495:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3NDFhNjk1ZTNlMTA2MWEyYjI1ZGRhYjIzMTBlYTg0ODlhYTdlYjIwZjA3NzFjNDhkZTc1NWRjODM4MDU5YmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlMjU5NWZjMTc1NWMwMGNiMDk2MWNlNzUyMzk5MTgzYjM5ODA2YTNmMDBkNTU0ZmM0Y2E1MDU3Yzk4NGRkMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkzZWIxZDdjYTJlYzNiNGYzMDYxZmJiYTE2ZDczYTk3Y2I0YjI0ZDI5ZWJlZDI4ZDU2MGQyYjI4ZmI0MzUzMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwODcxMDlmNDczYzFkYmZjOGU3YjAwODVkOTIxMWZjNGY5MTgzOGRiYjQxNjliNmRkY2ViZjc0NWI2MmMwY2YifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.ts#L43-L66",
+          "version": "repo-lines-v1:sha256:ce0793e9df93b9d76fa32fca0083ea52512e5a4410b6bf1f5939b2644f2de9e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjMmFmYmQ1NzU4MWNjMWQ5Yzk4ZDg2MzE4M2I3M2UwYTA2ODFjMDZmMzMzMDVlMTI5ZDAwZjliMzllZWIzM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b5718334aff43e490c39ba140ddb061",
+      "statement": "The source-lineage contract keeps workspace revision, repository/compiler revision, and exact source-content revision as separate axes, reports matched/missing/conflict states, and never selects an authority or rewrites either claim during reconciliation.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/source-lineage-axes-v1.ts#L4-L24",
+          "version": "repo-lines-v1:sha256:f6378d87c3ca06dc3d87e0923420be1fdc1c9883c20b52e084938283046a282d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxMTc0ZTMwOTVlNjA1MzQzYmQyNDI4OGViYWM3MzI1Njg2MzdlZTM0YjNiZTZlMGFhZWQyNGM1ZTY0YWU4NjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAwZTZhZjJiODQ0ZWRjNTcxZDJmZWFjZmVhOTI3M2IzMDYyYzczYTYzOTIyNTY4N2I0Yzg0NTU2MGYxMDFlMjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkZjgwOGIyOTNjZmU4OTEzMjEyNGEzNzdiYzI5NTU1NDc3ZDgyNzA4MGVlY2YxZGQ3YzdlMzkyYjk2M2JiODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmZThmYTk2NjU4ZjhmYzY0ODI2NmM0NjAwNmI1YThiYTJmNzRmMmI2NzY2NWI3OTk2YTYwZDZmZWIxMjU1N2YifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/source-lineage-axes-v1.ts#L53-L85",
+          "version": "repo-lines-v1:sha256:e2ef86a17d69b4ee750321ece36757bd8d191e9f6b13822d2979f42ce3b6ed5d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhOGFmMDAzOGM0N2MzODZiOWUyYTRhYjJhYWRmMjQ2Y2VkZGFkZjg4ZWM2ZGU3NDAwM2VhZGE2YTc2ZDVkOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxMmNjMmFhNDQ5YzFkOTA5MjdmMWI3NjIzZDAwMjFhNjY2MTY5ZDY1ODgwOWJlZjVkNzZiOTllMzkxNTc4ZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjOTY1M2ViNTZiNzMyYmUxOTVmYjI3M2M4ZjhiZWVlZTJmZjljMjEzNzliYWI4ZWZlYjllYmUzMDU0OWZiNmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fda7ed2326aa4dfcb536b2468b3dc2d3",
+      "statement": "Canonical packet content identity is computed from exact bytes and an admitted workspace revision as a read-only observation; it records the byte digest as source_revision and marks itself non-authoritative until a guarded canonical write accepts it.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts#L32-L47",
+          "version": "repo-lines-v1:sha256:073caa7f0c242f16c40a61069f8d397de28fc3f36fffca4bda23e999b5604b7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjYmRlMzVjZWU0NDQ3ZDNkNGFiMzA0MTA3NjI3NjE0OTlhOTc0ZGY3NTViNzkyZDhhNjlmNmM1MGE0ZDUwMWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0N2I0MGNjNzQ2ZDhlYzdjODA4NzZjMGJiZWI2YTI2MWRiMmIzOGE1NzhlNzY3MzZlMjliMDNmNTIxM2QxOTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlNjMwM2YwMDhjMDE0ODlkMDY1ZDUzM2E2MDRkM2NlYWFlZGI1ZTk4NjM4NDE4NTQwN2IyOWNiNjIwNzBhYTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxMDBiNDczMmNjNTc1ZWQ4YmEyMjMxNjc2MDY0OTY5Y2U0YWQ2MTYzNWI0Yjg2Y2VjNmFiZDllZGQ2MDZkNjgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts#L57-L81",
+          "version": "repo-lines-v1:sha256:8f3d2997070a0b4a8c4490689eb19f79de747dd79fe59b446102cfe55fd8a347:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiNTU5ZDE2YjdjYTNhOTY5NGE2NTkxMTZiZWEzNzc0Yjc1Y2FhM2QwMzhmMDgxMWEwNjEzODdmNDI3ZTIyZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhNzM0OTJkODk0NmIxZDBmOWQ5YzA0YjcwNGE5MjBmMjRmODllZjdjN2Y3MzExYTg1OTlkMTBjN2Y2MzU4ZDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZTJkMjAyNDY3NDYzZGYxMjkyZDY4YmQwNmQ3OGFhYjc2Yzc4ZTUyYmE5ZTM4M2Y5NTg0YjFiYTcwYjYwMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5MTMwYzk4YWJmZGNkNzkyYmI4ZjcwNzBjZjkxMDRjNWVhMjNjODJiNzU1OWY1NTIwNGU2MzdlZDE2ZWU3MzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8af910f89bb0415b90f3a9e532451d45",
+      "statement": "Canonical packet writes must read current atlas_packets state in the same transaction before deciding semantics; the write decision layer distinguishes insert, idempotent replay, legitimate revision advance, identity/content/workspace conflicts, stale reads, and unproven revisions instead of inferring meaning from ON CONFLICT or row counts.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts#L132-L150",
+          "version": "repo-lines-v1:sha256:5aa4eeb30ba1f29fda573fb20f533b1b40260c7c325f53877db826caf75fd017:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzYjU1YWQ5YmJlZDYwYTg0YTkxYTQ0YjgxZTkzNDY2ZDg2OWY3ODlmNDVkNTZmMjUyMWNlNTZiZTNjODJjZmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZTM0YWQ0MzZlZWU4ZWE0NmQzYWVkYTMxNGVhYjgzZDEyZWQwMmU4ODlhOGI1ZTk0OGE4M2U0ODgxMTg4ZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2YTZjMmU0MzhiYmQ0N2IzMmUwZjJjOTE4MWJmODYzMDAwOWNjMTIwYjIzYTE0MzE4ZTc3MmVlMWIzMjY4MDAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts#L2-L23",
+          "version": "repo-lines-v1:sha256:d53be71eed86dec215543fd6361bc5f98c6c46934ec425fb2f2df7d271dac97f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjZTNjMWYyMzU5MzUxZDA4MzcyNzIzZDljYmNiYTg2N2IwMTc5MjFlODFhYWJlMGU5MWYxYWNiOWU1YWU0ZWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5OWQ4NGZlZGU1YmE0MWRjMTEyNTNmN2I1OGQ2YWZiNWNkOTc5Y2NhNGIyOTExMjIzMDQ2NTk2NzZmZDg0MWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRiNDBiMWVkMWQxYjAxYjdmNjBjMTVjNzNkZjQ3MGM3M2JiODdjNzliZmIzMmQ5ODAwZGIwNDYxNmQzYjU2ZjEifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts#L84-L122",
+          "version": "repo-lines-v1:sha256:ffd200d58e9047aabe8fe921bd9b0d4c8fe2b069da7766ed479ec2423271fe0c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhOGZhYTEzYmI4ODkzMDE3ZDgwYjBjNTllMWVhOTI2M2QwNzM3ZDRkZmE4OTFmMTk2ZDE0OTdmMWFiYTRhNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmNDE3MmIyODhjZWExMWEzOWIxZDJlMTcyOTc0NDRhNTQ0MDBlOTRkYmIzYmFlODQxMDI2ZWRiYTc0MTJiNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkMmVhMDgzMzI4NDE5NTI4OGVlMDQ5OWI3YmQwYTdlMzU0NTgwY2NlNjMzNWQyYjRiYzVlMTE5NGY0NWJiOTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c5ac1db77d0440bac2dd4784f9ed04a",
+      "statement": "Packet-to-chunk lineage is a one-to-many relationship distinct from packet identity: atlas_packets remains file-granularity, proven memberships use packet_key plus canonical_chunk_id, canonical chunk IDs must come from existing codebase_chunk_index rows, and unresolved or ambiguous candidates are excluded from the canonical membership table.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L3-L32",
+          "version": "repo-lines-v1:sha256:4f9b9ecd706fe1eb910a3677b2e65bf6bcbad2fd0a0fefa2cd5fc420bde8df12:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiMTRjZWMwOTJlNjc4MjJmYjQ5NjNmYjFiZDQ5NWNiZjg0YjA3YTBmOWYyNDA2NzRjNTI1OGQyMDIyMmRlNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUwMGZkZjRiZjYxNmMwNTdmYmQ5MjhkZDJmYzczNDUxNjU0YTcwNTg1MDMzMzFmZWNmZTZmMjBmMzk1MDBhNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5MmU5OWRjNDM2ZjkzNDI2MmY0NjY0NjIyNjJkNzRlNTZlYzdhMWNlOWZiZWU0ZDhjY2EzMTE2M2MzM2FjZDUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L43-L86",
+          "version": "repo-lines-v1:sha256:7dbe5a08ade3fc65413953b1700d07a290e21968161f774509f9c000d9ea4bb7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1OWRiYmNmZmU4NTQ4Nzc2ZTk5ZjFlNTU1MGRmMTdjMGFjMDYxNzEwM2QzNTY4N2JhZGQzMDUzOTI4NTNiZWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyNTIxMDk1YzM4YWIxMjBjNGRiMGY5YzVkODBmZDllYjc2MzI2ZDU5ZjEzZDE5ZTU0NTcxMmYyZmQ2NThjOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkZjliNjZjNTgyYTg5ZjNjZWQzZDNmMzM3N2MzZWI4NDFhYTZmYTY2YTcyZTNmYWE5NjA0ZTE1NDFmY2UxY2MifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L90-L121",
+          "version": "repo-lines-v1:sha256:21f14d0750e7e5b97ff8e46de5738588688c94e5ffb5d0bc648effd845a4cd2a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzYzJmNDg2MmE4ZTcwNjcxMThkNDNhODM5NGMwMWQyNTQ0ZGY2OWVlNDRjZjUxNWM4MTE4ZTdhYjQxNjgzZmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZkZjliNjZjNTgyYTg5ZjNjZWQzZDNmMzM3N2MzZWI4NDFhYTZmYTY2YTcyZTNmYWE5NjA0ZTE1NDFmY2UxY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkMDA3YThjMjJhY2EzZTU1OTQwMWM5MDVmNzMzNWEwMmQ0NWU5NzE5OWRkMTcxY2ZlYzkxODk4YTQ1ZWRmZTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e0d40f767f8d43609b41275ab1882c25",
+      "statement": "Graph revision snapshots must pair workspace and graph revisions from one immutable snapshot receipt, are checksum-sealed, and admit edges only when endpoints, source revisions, workspace and graph revisions, and evidence references all prove consistently; failures are named and there is no partial promotion.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L129-L152",
+          "version": "repo-lines-v1:sha256:60fc9044cf95a6de32ff6b0caac49850a07a2ab4439693b1a228baf6f7deb8b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MDFiZTNmNjdjZjFhYTVlMTRmMWM2OGNhOGM1OTQyMWEzODM1NmJmZGI2MGVmYmY4YTNmOTMyMGQ4ZDFmZmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhjODM4MzJhM2JlNDQ5NzAwNGYyMDE2MzQxNjZjZDRmNzM2Mzg0MmE2MjA5ODViYjFjNzcyZGVmZThjZTJmZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzMmQ0YzJiMjQ4MmU4MDQ5MTQ5NWZjN2NmZGUzYzY1NzhlZjg0OTcwNzllY2ZkODVlODI3YmQ1ZmEwMGMxYmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyOTI1NDJlZWI2MDg4MTg1OTFlNTQyZmVhYjY2MjljMmRhMGJhZjIwOGEzZDRiMTVlNDI1ZjA3ZWM1NzliNWIifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L2-L12",
+          "version": "repo-lines-v1:sha256:983db152b83ffb02d054ab91e366eab256a6b02a6c00255edbfc38d6d644f94a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYzI1NzNhZTU5NjYzZGI2NmUwZTcyODU2NTg4YWRhNmQ0ZGQ3MjZiYzI5ZDAwODU3YzQzYzIzMzA0MGU1NDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyNmUzYTc1YTlhNDVkNmVjOTY1NzUwMTczMzkxYWY3Zjg0ZmE2MDA2N2MyNTFmNWRjN2I2M2UzNWQzODdjYTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyOTQ1ODk0MTgwMWJkNDc3NGVlNTU0YWFhODdhYTMzZDc2YjVlY2IwOTZlODc5M2M5NGIxZDQ1MjBjNGI2MGMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L49-L84",
+          "version": "repo-lines-v1:sha256:28bf9f590233882d591d2db6da6dc390e1edcde24939b4a5a2812452780ef7eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5OTZhODVjOWQ4M2I3NmEwNzJmNWZkZGRhY2Y0NWI2MGU3ZjUzZjk2MmE3MGMzNmE4MTE2NTM5Yjc0YTIzM2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2ODQ3OTdkMTQ3MGE4YmZmN2JkNWE2YTAyMTRlOTViOWYzMzMwNzg4MWU2NmMzNWZmNzAwNTgxYzcyMDhiZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxYzNlY2ZiMDJiMzY4MDFiMzBiYTQ0MzU5YTYzNTczZDdmZTE2YjcyMDEzODgzYTA0OTg1YzI0OTgxNTE5NzQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts#L94-L101",
+          "version": "repo-lines-v1:sha256:7ac700b46e6c7ee6c2431793c45d986f01186d48b3513cae580f07497a235dd6:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODFlNmEyYTRjMTc0NDA2ZmY4NjMyYWNiNzZmMGFkMzNkMGQ3YzE2M2E3NDQxNTFkYjRmMDAzODUwOGQxNGRiMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjUwNTBjYmNhMGYwZjE0ZjIwZjE3NjI3NzY5MjQwOWIwNzBmN2U0Mjk4NzcwNDQ0NDM1MTFmZDQ2MDVmOTI3ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmI1ODBlOTY0ZjgzYTQ3M2Y0M2Q0NDM4NDYyOTQ5ZDY4YjU2MDBmZGE3ODdmMTYzNzQ1ZDAwZGU4OWNiZjM2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNWJmOTkyZGNhNDc2ODY2NzFlN2IwMWEwNTFjMWU0ZTI0ZWEzOTJjNDI5NGJkOGRlNjg0YzFlNjg5ZTk2N2IxYSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c60d6e502464e9abcee166a7c904bec",
+      "statement": "The repository provenance workflow models snapshot, inventory, structural identity, lexical and semantic enrichment, relationships, labeling, projection, validation, evaluation, and incremental reuse as separately reportable stages, with repository revision, file hashes, producer metadata, and output artifacts in its report.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/repository-provenance-workflow.ts#L39-L94",
+          "version": "repo-lines-v1:sha256:8de4029483f6c3606816fa4b760b2f451eb8f153bc9b5f75b25da65e069f9a91:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlZGQ4NjMwYzA3MDQwNzAzZjMzODYzYTgyMWFhMzI4MzRiZTRmY2Q2MDYxNjQwMzU2ODYwNjBjNWUwOTBhODUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmZTExYTcxMmI4YzczYzA5N2U4YTFmMGFjYmE5YzQyMjYxNWMzYjllZTc3ZjdhNzBiMTZhZGYxMTk3MTNlMGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0N2YyMjAzZGUzYWNhNjVhNjVhNjFmYjU3MmVmOTRkMTA5YzQ3OWZiNDQzMjZkMThhZWEzNGU2YjhiNTM5YjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NDE0ZDhlNTFiNTJjYWU2NTIzMGE3NGE3NDZkZDg2NzlmMWJkYWY3NzAwNWJiZmQ0MGMzYzg3ZTJhZDg4NTQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/repository-provenance-workflow.ts#L96-L228",
+          "version": "repo-lines-v1:sha256:c0a55d75a459582afbcfd89939d9c4a86723c9efe84c4a289220d5014ba6e975:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMGIyMTdkYTE4YjI0ODY3YjZmMjRmYjZjOTIzZWE5MThmZWY1OGQ0MzJlZjRkNTZkYzEwMGMxMTE3MDljYzYxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyZmUxMWE3MTJiOGM3M2MwOTdlOGExZjBhY2JhOWM0MjI2MTVjM2I5ZWU3N2Y3YTcwYjE2YWRmMTE5NzEzZTBkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzYTAwYzFlYTBjMGQ0ZTUwN2VkMWMwMWVlNTc3ZWZkNWMzZWVjMGM1NTk5ODhhODEyNThkMTQ2ZThhNDBjNTI4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZjIyOTk1Y2UzODhlYjBmZGYxNjFjZDVkN2E1ZjFiZmJmNTlmYmQxZjFmZDNiZGY5YzBkNmQ2OTY3NjY5Y2FjIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_55f61821addc491780c471544a36cdb7",
+      "statement": "The implementation contracts establish PostgreSQL atlas_packets as the canonical packet/source authority while chunk lineage and external retrieval stores are distinct relations or projections; a proposed atlas_packet_registry design in older documentation must not be treated as current authority without migration evidence.",
+      "evidence": [
+        {
+          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L11-L20",
+          "version": "repo-lines-v1:sha256:2fb5194b16d2e93b2a2131c59765f228d1a13fe4e24e0ff48f91aa9994827a94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzM2FhYzFhNzJkNDk5ZWUwNGIwYmJlNjljYzljMDI0OWMzNzIyYjk0MzBhYTM4N2Y5ZmMxMWRhNWNhMTZmM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwNDA5Y2E2ZTBjZTEyMzMwYTc4ZmNhMmRkZDdkNzBkYmU5YTE5YzUyN2FjYmE5OTk4OGYxNTBmNTAwYWIzMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyYzEyZmJmMmJjYzBmNzc2YzBkNTRmZjE2NTE4YjBlMTk3Nzc2Y2UxNDhkMTc2YTBkNTA2OGM0ZjA3MTFmYjgifQ"
+        },
+        {
+          "resource": "repo://docs/PACKET-CENTRIC-ARCHITECTURE.md#L3-L8",
+          "version": "repo-lines-v1:sha256:dbc2d5a5e3381e47cf15df3cbbd23f0d86827bd25f63b0b9bd5b585405ce73e9:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY5NjlmYWYzMTQyNTAwZDYxNDljNjRjZTZmMGIwZDliMWZkNmRlODJkMmYyMTg4NjY5ZTViOTA1MDQ0ZTFhYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ViNzAyNTc1OTNkYTA2ZjY4MmEzZGRkYTU0YTlkMjYwZDRmYzUxNGY2NDUyMzdmNWNhNzRiMDhmOGRhNjFhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjJkNDNkYWE2NGVkNDMwOGEyYmJlZDhiMmU3NjY4MTNjNjVkOGJiZjcwY2U5NzFkMGEwNjZmNDQ2ZGRkNjFhNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmRiMmRjNmIxOTViNTJjMTgxMDJiOTY1ZDI3NTEzMzY0MmVmYmI4ODM4YjY1MmYzODY4N2U3ZGViZTk0Yzc2ZSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts#L3-L11",
+          "version": "repo-lines-v1:sha256:5369204895fc91ba054dfc6a67b014e1651321fb6a7f98da07cd60b0a59a4ec1:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFmMjJjZjA3MzI1OTJjMjQ3MTQxY2JlNjFlZmExMTAxMjYxMmY1YTMxMjJiOWFmOWJiYWY1MmY1NzI0ZDE5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIwOGZiMDRiYzNjOWFhYTg0YmNhNDQ2Y2NlMDBkMTc3NWM3MDkzODQzMGJkNGJmYWE4NTQ1OGY5YzFiY2RmMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjIsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTAwZmRmNGJmNjE2YzA1N2ZiZDkyOGRkMmZjNzM0NTE2NTRhNzA1ODUwMzMzMWZlY2ZlNmYyMGYzOTUwMGE1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDdmNTAzNTRlOGUyMThmYTNmZTUyZTIzNzhkYTIyZGU1ZmQ4NWYwNTM0NWE3ODBlZDJhOWEwMzE1ZTBmOGMwOCJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/lineage/packet-incidence-postgres-readback-v1.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:11ae8708738a39688b2041e698981d04a976c727b1713f568cad7a6eb0bb613f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4MzU5YjFiNzU4OTM3ODZiOTA3NTdmMTVlMjg3NzI3OTNiNjQwZmZkMGIwNTE5NjE5OGM4NTY5NjZjNmNkZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyM2QwOTRjZWZhNTMzNTQ0MGMyZTJkMDg4ZWQyNGU5MzJkZGQxMDRjNGQ1Y2QwM2U1ZGJmZjhkNmM0MGI0YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmMTZmMGYxZWM5Njc2YzJjZTk3MTkyN2FiYWY0ZGM3NDI5MWRhNzljOWY3NjcwYjhmNTlmODYxNTg3YmRiNWIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.1",
+    "at": "2026-10-07T02:11:06.802Z"
+  }
+}

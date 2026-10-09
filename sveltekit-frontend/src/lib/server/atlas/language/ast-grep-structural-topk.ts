@@ -181,6 +181,13 @@ function nodeName(node: SgNode): string | null {
   return firstIdentifier?.text()?.trim() || null;
 }
 
+function declaratorName(node: SgNode): string | null {
+  const name = field(node, 'name');
+  if (!name) return null;
+  if (name.kind() === 'object_pattern' || name.kind() === 'array_pattern') return null;
+  return name.text().trim() || null;
+}
+
 function relationMatches(node: SgNode, required: AstGrepRequiredRelationV1 | null): boolean {
   if (!required) return true;
   const matcher = { rule: { kind: required.surroundingKind } };
@@ -197,9 +204,11 @@ function toCandidate(input: AstGrepStructuralExtractionInputV1, node: SgNode, va
   declarationForm: AstGrepStructuralCandidateV1['declarationForm'];
   name?: string | null;
 }): AstGrepStructuralCandidateV1 | null {
-  const name = (value.name ?? nodeName(node))?.trim();
+  const name = (value.name !== undefined ? value.name : nodeName(node))?.trim();
   if (!name) return null;
   const range = node.range();
+  const startByte = Buffer.byteLength(input.code.slice(0, range.start.index), 'utf8');
+  const endByte = Buffer.byteLength(input.code.slice(0, range.end.index), 'utf8');
   return AstGrepStructuralCandidateV1Schema.parse({
     schema: 'atlas.ast-grep-structural-candidate.v1',
     entityKind: value.entityKind,
@@ -211,8 +220,8 @@ function toCandidate(input: AstGrepStructuralExtractionInputV1, node: SgNode, va
     isAsync: isAsync(node),
     sourceRef: input.sourceRef,
     filePath: input.filePath,
-    startByte: range.start.index,
-    endByte: range.end.index,
+    startByte,
+    endByte,
     startLine: range.start.line,
     startColumn: range.start.column,
     endLine: range.end.line,
@@ -266,20 +275,22 @@ export async function extractAstGrepStructuralCandidates(
     add(node, {
       entityKind: valueNode?.kind() === 'arrow_function' ? 'FUNCTION' : 'VARIABLE',
       declarationForm: valueNode?.kind() === 'arrow_function' ? 'ARROW_FUNCTION' : 'VARIABLE_DECLARATOR',
-      name: field(node, 'name')?.text() ?? null,
+      name: declaratorName(node),
     });
   }
   for (const node of root.findAll({ rule: { kind: 'class_declaration' } })) {
     add(node, { entityKind: 'CLASS', declarationForm: 'CLASS_DECLARATION' });
   }
-  for (const node of root.findAll({ rule: { kind: 'interface_declaration' } })) {
-    add(node, { entityKind: 'INTERFACE', declarationForm: 'INTERFACE_DECLARATION' });
-  }
-  for (const node of root.findAll({ rule: { kind: 'type_alias_declaration' } })) {
-    add(node, { entityKind: 'TYPE_ALIAS', declarationForm: 'TYPE_ALIAS_DECLARATION' });
-  }
-  for (const node of root.findAll({ rule: { kind: 'enum_declaration' } })) {
-    add(node, { entityKind: 'ENUM', declarationForm: 'ENUM_DECLARATION' });
+  if (input.language === 'TYPESCRIPT' || input.language === 'TSX') {
+    for (const node of root.findAll({ rule: { kind: 'interface_declaration' } })) {
+      add(node, { entityKind: 'INTERFACE', declarationForm: 'INTERFACE_DECLARATION' });
+    }
+    for (const node of root.findAll({ rule: { kind: 'type_alias_declaration' } })) {
+      add(node, { entityKind: 'TYPE_ALIAS', declarationForm: 'TYPE_ALIAS_DECLARATION' });
+    }
+    for (const node of root.findAll({ rule: { kind: 'enum_declaration' } })) {
+      add(node, { entityKind: 'ENUM', declarationForm: 'ENUM_DECLARATION' });
+    }
   }
 
   return candidates.sort((a, b) =>
@@ -447,7 +458,7 @@ export async function extractAndRankAstGrepStructuralTopK(input: {
     addIf(node, {
       entityKind: valueNode?.kind() === 'arrow_function' ? 'FUNCTION' : 'VARIABLE',
       declarationForm: valueNode?.kind() === 'arrow_function' ? 'ARROW_FUNCTION' : 'VARIABLE_DECLARATOR',
-      name: field(node, 'name')?.text() ?? null,
+      name: declaratorName(node),
     });
   }
   for (const node of root.findAll({ rule: { kind: 'class_declaration' } })) {

@@ -30,7 +30,7 @@ export interface CodeFeatureRegistryEnqueuePayload {
 	jsonlRecordIndex: number;
 	jsonlLineNumber: number;
 	jsonlParserRevision: string;
-	representationRevision: string;
+	representationRevision: string | null;
 	producerId: string;
 	producerRevision: string;
 	featureRevision: string;
@@ -61,7 +61,7 @@ export function buildCodeFeatureRegistryEnqueueResult(
 			jsonlRecordIndex: 0,
 			jsonlLineNumber: 0,
 			jsonlParserRevision: 'upload-route-v1',
-			representationRevision: input.representationRevision ?? 'semantic_768@1',
+			representationRevision: input.representationRevision?.trim() || null,
 			producerId: input.producerId ?? 'evidence-upload-route',
 			producerRevision: input.producerRevision ?? 'upload-route-v1',
 			featureRevision: input.featureRevision ?? 'upload-route-v1',

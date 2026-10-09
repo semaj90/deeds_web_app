@@ -1,0 +1,55 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rust-workspace",
+  "source_ref": "rust-workspace:docs-rs-latest-rayon-rayon",
+  "url": "https://docs.rs/rayon/latest/rayon/",
+  "title": "docs.rs",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rust",
+    "rayon",
+    "tokio",
+    "serde",
+    "native-runtime",
+    "llm_synthesis",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rs",
+    "markdown_excerpt": "[Docs.rs](https://docs.rs/) - [rayon-1.12.0](https://docs.rs/rayon/latest/rayon/# \"Simple work-stealing parallelism for Rust\") - rayon 1.12.0 - [Permalink](https://docs.rs/rayon/1.12.0/rayon/ \"Get a link to this specific version\") - [Docs.rs crate page](https://docs.rs/crate/rayon/latest \"See rayon in docs.rs\") - [MIT](https://spdx.org/licenses/MIT) OR [Apache-2.0](https://spdx.org/licenses/Apache-2.0) - 22 September 2026 - Links - [Repository](https://github.com/rayon-rs/rayon) - [crates.io](https://crates.io/crates/rayon \"See rayon in crates.io\") - [Source](https://docs.rs/crate/rayon/latest/source/ \"Browse source of rayon-1.12.0\") - Owners - [nikomatsakis](https://crates.io/users/nikomatsakis) - [cuviper](https://crates.io/users/cuviper) - Dependencies - - [either ^1\\\\ \\\\ _normal_](https://docs.rs/either/%5E1/) - [rayon-core ^1.13.0\\\\ \\\\ _normal_](https://docs.rs/rayon-core/%5E1.13.0/) - [wasm\\_sync ^0.1.0\\\\ \\\\ _normal_ _optional_](https://docs.rs/wasm_sync/%5E0.1.0/) - [rand ^0.9\\\\ \\\\ _dev_](https://docs.rs/rand/%5E0.9/) - [rand\\_xorshift ^0.4\\\\ \\\\ _dev_](https://docs.rs/rand_xorshift/%5E0.4/) - Versions - [**100%**\\\\ of the crate is documented](https://docs.rs/crate/rayon/late",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rust-workspace:docs-rs-latest-rayon-rayon",
+    "title": "docs.rs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Rust, Rayon, Tokio, and Serde Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "3190b4695e9fd2957fcfce9c4e3c624d117ea811c153a1bd3c4a54af6db8a368",
+  "markdown_path": "docs/.okf/dev/raw/rust-workspace/docs-rs-latest-rayon-rayon.md",
+  "fetched_at": "2026-10-09T05:30:31.416Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rust-workspace",
+    "source_title": "Rust, Rayon, Tokio, and Serde Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rust-workspace/docs-rs-latest-rayon-rayon.md"
+}

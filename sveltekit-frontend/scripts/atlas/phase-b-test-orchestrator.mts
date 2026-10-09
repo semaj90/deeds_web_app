@@ -77,7 +77,7 @@ async function logAnalysisPass(pool: Pool, packet: any, passKey: string, passTyp
       scores = { confidence: 0.85, coherence: 0.90 };
     } else if (passKey === 'embeddinggemma_summary_embed_v1') {
       output = {
-        embedding_dim: 384,
+        embedding_dim: 768,
         embedding_sample: [0.1, 0.2, 0.3, 0.4, 0.5],
       };
       scores = { magnitude: 15.8 };

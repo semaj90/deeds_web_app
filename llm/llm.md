@@ -1,7 +1,7 @@
 # llm
 
 Repo-local context hub for agentic retrieval, ACE packet preparation, and KAG-style navigation.
-Treat this as the repo's `llms.txt`-style context entrypoint for ingestion, ACE packet injection, 4D topology lookup, and Gemma4 tool-calling.
+Treat this as the repo's `llms.txt`-style context entrypoint for ingestion, ACE packet injection, 4D topology lookup, and Ornith 1.5 synthesis/tool-use through llama-server :8090. EmbeddingGemma remains a separate embedding model and must not be used as the chat model.
 
 ## Use this hub for
 

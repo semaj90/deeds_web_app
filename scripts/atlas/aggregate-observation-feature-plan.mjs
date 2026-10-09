@@ -11,6 +11,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { mapAstGrepDeclarationToOrfKindV1 } from './lib/orf-ast-kind-crosswalk-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const featureRevision = 'atlas-ast-entity-prefill-v2';
@@ -24,22 +25,11 @@ const readJsonl = async (file) => (await fs.readFile(file, 'utf8'))
   .split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
 const unique = (values) => [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
 const digest = (value) => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const astKinds = new Map([
-  ['function', 'FUNCTION_DECL'], ['function_declaration', 'FUNCTION_DECL'],
-  ['method', 'FUNCTION_DECL'], ['method_definition', 'FUNCTION_DECL'],
-  ['class', 'CLASS_DECL'], ['class_declaration', 'CLASS_DECL'],
-  ['interface', 'INTERFACE_DECL'], ['interface_declaration', 'INTERFACE_DECL'],
-  ['type', 'TYPE_ALIAS'], ['type_alias_declaration', 'TYPE_ALIAS'],
-  ['enum', 'TYPE_ALIAS'], ['enum_declaration', 'TYPE_ALIAS'],
-  ['variable', 'VARIABLE_DECL'], ['variable_declarator', 'VARIABLE_DECL'],
-  ['constant', 'VARIABLE_DECL'],
-]);
-
 const identity = await readJsonl(inputPath);
 const domains = await readJsonl(domainPath);
 const invalidRevisionRows = identity.filter((row) => {
   const revision = typeof row.source_revision === 'string' ? row.source_revision.trim() : '';
-  return !revision || revision === 'workspace:0' || revision.endsWith('_PENDING');
+  return !/^sha256:[a-f0-9]{64}$/.test(revision);
 });
 if (invalidRevisionRows.length > 0 && !allowHistoricalUnqualified) {
   const report = {
@@ -83,7 +73,7 @@ const projections = [...groups.values()].map((rows) => {
   const astObservationKinds = unique(rows.flatMap((row) => {
     const kind = String(row.symbol_kind ?? '').toLowerCase();
     const astKind = String(row.ast_kind ?? '').toLowerCase();
-    return [astKinds.get(kind), astKinds.get(astKind)];
+    return [mapAstGrepDeclarationToOrfKindV1(kind), mapAstGrepDeclarationToOrfKindV1(astKind)];
   }));
   const flattenedTags = unique([
     ...primaryDomains.map((domain) => `domain=${domain}`),

@@ -26,6 +26,20 @@ export const observationFeatureDefinitionSchema = z.object({
   ordinal: z.number().int().nonnegative(),
   value_kind: z.enum(['BINARY', 'CONTINUOUS', 'CATEGORICAL']),
   description: z.string().min(1),
+  evidence_requirements: z.array(z.enum([
+    'OBSERVATION_ID',
+    'SOURCE_REF',
+    'SOURCE_REVISION',
+    'BYTE_SPAN',
+    'PRODUCER_REVISION',
+    'EVIDENCE_CHECKSUM',
+    'EVIDENCE_REFERENCE',
+    'GRAPH_REVISION',
+    'ONTOLOGY_REVISION',
+  ])).min(1).refine((requirements) => new Set(requirements).size === requirements.length, {
+    message: 'EVIDENCE_REQUIREMENTS_MUST_BE_UNIQUE',
+  }),
+  missing_value_policy: z.enum(['UNAVAILABLE_NOT_ZERO', 'ABSTAIN', 'NOT_APPLICABLE']),
 }).strict();
 export type ObservationFeatureDefinitionV1 = z.infer<typeof observationFeatureDefinitionSchema>;
 
@@ -188,13 +202,29 @@ function binaryFeature(definition: ObservationFeatureDefinitionV1, evidenceRefs:
   });
 }
 
-function compileBinaryMap(source: Map<string, string[]>, definitions: Map<string, ObservationFeatureDefinitionV1>): ObservationFeatureValueV1[] {
+function requireFeatureDefinition(
+  definitions: Map<string, ObservationFeatureDefinitionV1>,
+  featureId: string,
+  family: ObservationFeatureDefinitionV1['family'],
+  valueKind: ObservationFeatureDefinitionV1['value_kind'],
+): ObservationFeatureDefinitionV1 {
+  const definition = definitions.get(featureId);
+  if (!definition) throw new Error(`OBSERVATION_FEATURE_DEFINITION_MISSING:${featureId}`);
+  if (definition.family !== family) throw new Error(`OBSERVATION_FEATURE_FAMILY_MISMATCH:${featureId}`);
+  if (definition.value_kind !== valueKind) throw new Error(`OBSERVATION_FEATURE_VALUE_KIND_MISMATCH:${featureId}`);
+  return definition;
+}
+
+function compileBinaryMap(
+  source: Map<string, string[]>,
+  definitions: Map<string, ObservationFeatureDefinitionV1>,
+  family: ObservationFeatureDefinitionV1['family'],
+): ObservationFeatureValueV1[] {
   return [...source.entries()]
     .map(([featureId, refs]) => {
-      const definition = definitions.get(featureId);
-      return definition ? binaryFeature(definition, refs) : null;
+      const definition = requireFeatureDefinition(definitions, featureId, family, 'BINARY');
+      return binaryFeature(definition, refs);
     })
-    .filter((value): value is ObservationFeatureValueV1 => value !== null)
     .sort((a, b) => a.feature_ordinal - b.feature_ordinal);
 }
 
@@ -259,8 +289,7 @@ export function compileObservationFeatures(input: {
   const graphFeatures: ObservationFeatureValueV1[] = [];
   for (const [suffix, raw] of Object.entries({ pagerank: input.graph?.pagerank, ppr: input.graph?.ppr, degree: input.graph?.degree })) {
     if (raw == null) continue;
-    const definition = definitions.get(`graph.${suffix}`);
-    if (!definition || definition.value_kind !== 'CONTINUOUS') continue;
+    const definition = requireFeatureDefinition(definitions, `graph.${suffix}`, 'GRAPH_CONTINUOUS', 'CONTINUOUS');
     const ref = `graph:${suffix}:${input.sourceRevision}`;
     allEvidenceRefs.add(ref);
     graphFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, continuous_value: raw, evidence_refs: [ref] }));
@@ -269,8 +298,7 @@ export function compileObservationFeatures(input: {
   const clusterFeatures: ObservationFeatureValueV1[] = [];
   for (const [suffix, raw] of Object.entries({ kmeans: input.cluster?.kmeansCluster, som: input.cluster?.somCell, community: input.cluster?.communityId })) {
     if (raw == null) continue;
-    const definition = definitions.get(`cluster.${suffix}`);
-    if (!definition || definition.value_kind !== 'CATEGORICAL') continue;
+    const definition = requireFeatureDefinition(definitions, `cluster.${suffix}`, 'CLUSTER_CATEGORICAL', 'CATEGORICAL');
     const ref = `cluster:${suffix}:${input.sourceRevision}`;
     allEvidenceRefs.add(ref);
     clusterFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, categorical_value: String(raw), evidence_refs: [ref] }));
@@ -280,19 +308,16 @@ export function compileObservationFeatures(input: {
   const contextFeatures: ObservationFeatureValueV1[] = [];
   for (const [suffix, raw] of Object.entries({ authority: input.context?.authorityWeight, recency: input.context?.recency })) {
     if (raw == null) continue;
-    const definition = definitions.get(`context.${suffix}`);
-    if (!definition || definition.value_kind !== 'CONTINUOUS') continue;
+    const definition = requireFeatureDefinition(definitions, `context.${suffix}`, 'CONTEXT_CONTINUOUS', 'CONTINUOUS');
     const ref = `context:${suffix}:${input.sourceRevision}`;
     allEvidenceRefs.add(ref);
     contextFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, continuous_value: raw, evidence_refs: [ref] }));
   }
   if (input.context?.validationPassed != null) {
-    const definition = definitions.get('context.validation_passed');
-    if (definition) {
-      const ref = `validation:${input.sourceRevision}`;
-      allEvidenceRefs.add(ref);
-      contextFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, binary_value: input.context.validationPassed ? 1 : 0, evidence_refs: [ref] }));
-    }
+    const definition = requireFeatureDefinition(definitions, 'context.validation_passed', 'CONTEXT_CONTINUOUS', 'BINARY');
+    const ref = `validation:${input.sourceRevision}`;
+    allEvidenceRefs.add(ref);
+    contextFeatures.push(observationFeatureValueSchema.parse({ feature_id: definition.feature_id, feature_ordinal: definition.ordinal, family: definition.family, binary_value: input.context.validationPassed ? 1 : 0, evidence_refs: [ref] }));
   }
 
   if (allEvidenceRefs.size === 0) throw new Error('OBSERVATION_FEATURE_ROW_REQUIRES_EVIDENCE');
@@ -305,9 +330,9 @@ export function compileObservationFeatures(input: {
     workspace_revision: input.workspaceRevision,
     row_identity_checksum: input.rowIdentityChecksum,
     registry_revision: registry.registry_revision,
-    ast_features: compileBinaryMap(astByFeature, definitions),
-    ontology_features: compileBinaryMap(ontologyByFeature, definitions),
-    langextract_features: compileBinaryMap(langExtractByFeature, definitions),
+    ast_features: compileBinaryMap(astByFeature, definitions, 'AST_BINARY'),
+    ontology_features: compileBinaryMap(ontologyByFeature, definitions, 'ONTOLOGY_BINARY'),
+    langextract_features: compileBinaryMap(langExtractByFeature, definitions, 'LANGEXTRACT_BINARY'),
     graph_features: byOrdinal(graphFeatures),
     cluster_features: byOrdinal(clusterFeatures),
     context_features: byOrdinal(contextFeatures),

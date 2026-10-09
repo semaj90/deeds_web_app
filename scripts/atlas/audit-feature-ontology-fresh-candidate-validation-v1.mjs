@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { validateFreshOntologyCandidate } from './lib/feature-ontology-fresh-candidate-v1.mjs';
+import { validateFreshOntologyCandidate, verifyFreshOntologyCandidateSourceReadback } from './lib/feature-ontology-fresh-candidate-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const inputPath = path.join(ROOT, 'docs/reports/feature-ontology-fresh-extraction-multilane-v1.json');
@@ -19,10 +19,27 @@ const bindings = observation.bindings ?? observation.record?.bindings ?? [];
 const workspaceRevision = text(observation.record?.workspaceRevision ?? observation.workspaceRevision);
 const bindingBySource = new Map(bindings.map((row) => [text(row.sourceRef), row]));
 
+function sourceReadback(candidate) {
+  const sourceRef = text(candidate.sourceRef);
+  if (!sourceRef || path.isAbsolute(sourceRef) || sourceRef.split(/[\\/]/).includes('..')) return { valid: false, reason: 'SOURCE_FILE_PATH_INVALID' };
+  const sourcePath = path.resolve(ROOT, sourceRef);
+  if (sourcePath !== ROOT && !sourcePath.startsWith(`${ROOT}${path.sep}`)) return { valid: false, reason: 'SOURCE_FILE_PATH_INVALID' };
+  try {
+    const realRoot = fs.realpathSync(ROOT);
+    const realPath = fs.realpathSync(sourcePath);
+    if (realPath !== realRoot && !realPath.startsWith(`${realRoot}${path.sep}`)) return { valid: false, reason: 'SOURCE_FILE_PATH_INVALID' };
+    return verifyFreshOntologyCandidateSourceReadback(candidate, fs.readFileSync(realPath));
+  } catch {
+    return { valid: false, reason: 'SOURCE_FILE_READBACK_UNAVAILABLE' };
+  }
+}
+
 const rows = (input.candidates ?? []).map((candidate) => {
   const binding = bindingBySource.get(text(candidate.sourceRef));
   const validation = validateFreshOntologyCandidate(candidate);
   const errors = [...validation.errors];
+  const spanReadback = candidate.sourceSpanGrounded === true ? sourceReadback(candidate) : null;
+  if (candidate.sourceSpanGrounded === true && !spanReadback.valid) errors.push(`SOURCE_SPAN_READBACK:${spanReadback.reason}`);
   if (text(candidate.workspaceRevision) !== workspaceRevision) errors.push('WORKSPACE_REVISION_MISMATCH');
   if (!sha.test(text(candidate.sourceRevision))) errors.push('SOURCE_REVISION_NOT_SHA256');
   if (!sha.test(workspaceRevision)) errors.push('WORKSPACE_REVISION_NOT_SHA256');
@@ -32,13 +49,14 @@ const rows = (input.candidates ?? []).map((candidate) => {
   if (binding && text(binding.contentDigest) !== text(candidate.sourceRevision).replace(/^sha256:/, '')) errors.push('SOURCE_DIGEST_MISMATCH');
   if (!Array.isArray(candidate.evidenceRefs) || candidate.evidenceRefs.length === 0) errors.push('EVIDENCE_REFERENCE_MISSING');
   const structuralEvidence = (candidate.evidenceRefs ?? []).some((ref) => text(ref).startsWith('structural-observation:'));
-  const groundedEvidence = candidate.sourceSpanGrounded === true || (candidate.evidenceModes ?? []).includes('TEXT_GROUNDED');
+  const groundedEvidence = spanReadback?.valid === true;
   if (!structuralEvidence && !groundedEvidence) errors.push('GROUNDED_OR_STRUCTURAL_EVIDENCE_REQUIRED');
   return {
     candidateId: candidate.candidateId, sourceRef: candidate.sourceRef, objectId: candidate.objectId,
     workspaceRevision: candidate.workspaceRevision, sourceRevision: candidate.sourceRevision,
     structuralEvidence, groundedEvidence, sourceSpanGrounded: candidate.sourceSpanGrounded === true,
-    sourceSpan: candidate.sourceSpan ?? null, evidenceModes: candidate.evidenceModes ?? [], errors: [...new Set(errors)],
+    sourceSpan: candidate.sourceSpan ?? null, spanReadback: spanReadback ? { valid: spanReadback.valid, reason: spanReadback.reason ?? null, startByte: spanReadback.startByte ?? null, endByte: spanReadback.endByte ?? null } : null,
+    evidenceModes: candidate.evidenceModes ?? [], errors: [...new Set(errors)],
     classification: errors.length ? (errors.includes('GROUNDED_OR_STRUCTURAL_EVIDENCE_REQUIRED') ? 'REJECTED_UNGROUNDED' : 'REJECTED_LINEAGE_OR_SHAPE') : 'VALID_REVIEW_CANDIDATE',
   };
 });

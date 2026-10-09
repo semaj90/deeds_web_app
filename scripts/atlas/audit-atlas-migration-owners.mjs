@@ -44,9 +44,12 @@ const targets = [
   {
     id: 'observation_feature_rows_active',
     table: 'atlas_observation_feature_rows',
-    sql: ['drizzle/manual/20260819_atlas_observation_feature_rows.sql'],
+    sql: [
+      'drizzle/manual/20260819_atlas_observation_feature_rows.sql',
+      'drizzle/manual/20261008_atlas_observation_feature_lineage_v1.sql',
+    ],
     drizzle: ['src/lib/server/db/schema/atlas-observation-feature-rows.ts'],
-    expectedColumns: ['packet_key', 'feature_revision', 'tree_node_id', 'ontology_mask', 'input_digest'],
+    expectedColumns: ['packet_key', 'feature_revision', 'tree_node_id', 'ontology_mask', 'input_digest', 'source_revision', 'registry_revision'],
   },
   {
     id: 'observation_feature_rows_superseded_candidate',

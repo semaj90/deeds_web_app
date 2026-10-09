@@ -1,0 +1,54 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "go-grpc-protobuf-pgx",
+  "source_ref": "go-grpc-protobuf-pgx:grpc-io-languages-go-go",
+  "url": "https://grpc.io/docs/languages/go/",
+  "title": "grpc.io",
+  "domain_class": "tool",
+  "focus_tags": [
+    "go",
+    "grpc",
+    "protobuf",
+    "pgx",
+    "service-runtime",
+    "kanban",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "grpc.io",
+    "markdown_excerpt": "# Go #### [Quick start](https://grpc.io/docs/languages/go/quickstart/) Run your first Go gRPC app in minutes! #### [Basics tutorial](https://grpc.io/docs/languages/go/basics/) Learn about Go gRPC basics. * * * ### Learn more - [ALTS authentication](https://grpc.io/docs/languages/go/alts/) - [Additional docs](https://github.com/grpc/grpc-go/tree/master/Documentation) - [Examples](https://github.com/grpc/grpc-go/tree/master/examples) - [FAQ](https://github.com/grpc/grpc-go#faq) ### Reference - [API](https://grpc.io/docs/languages/go/api/) - [Generated code](https://grpc.io/docs/languages/go/generated-code/) ### Other - [grpc-go repo](https://github.com/grpc/grpc-go) - [Performance benchmark](https://performance-dot-grpc-testing.appspot.com/explore?dashboard=5180705743044608) - [Installation](https://github.com/grpc/grpc-go#installation) ### Developer stories and talks - **[Stubbing gRPC in Go](https://github.com/jeanbza/jadekler.github.io/blob/master/_posts/2020-10-09-stubbing-grpc.md)**, by [Jean de Klerk](https://github.com/jeanbza), Google. October 8, 2020. - **Talking to Go gRPC Services Via HTTP/1** A [gRPC Conf 2020 presentation](https://sched.co/cRfW) by Malte Isberner, StackR",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:go-grpc-protobuf-pgx:grpc-io-languages-go-go",
+    "title": "grpc.io",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Go gRPC, Protocol Buffers, and pgx Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "520b483f0350e09334ff690d91915851c9d83da3f66ee165025048b12ab44620",
+  "markdown_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/grpc-io-languages-go-go.md",
+  "fetched_at": "2026-10-09T05:33:31.908Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "go-grpc-protobuf-pgx",
+    "source_title": "Go gRPC, Protocol Buffers, and pgx Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "documentation",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/go-grpc-protobuf-pgx/grpc-io-languages-go-go.md"
+}

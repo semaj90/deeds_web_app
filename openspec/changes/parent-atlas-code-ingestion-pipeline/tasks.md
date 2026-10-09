@@ -703,3 +703,84 @@ are 8095 fragment/function recovery details, one class span mismatch, and
 fewer typed edges than 8095. This is an honest compatibility result, not a
 provider-switch gate. Report:
 `docs/reports/ast-node-8095-parity.{json,md}`. No canonical writes occurred.
+
+## Directory-role / AST-grep enrichment checklist reconciliation (2026-10-07)
+
+The proposed directory-analysis checklist is not yet an implemented composed
+pipeline. Do not mark its percentages as completion evidence.
+
+- Structural chunking ownership is split by caller: `ast-chunker.ts` has live
+  interactive API callers; `ast-langextract-bridge.ts` serves the background
+  `code_feature_registry` path; the Python `treesitter-chunker` route recorded
+  in the owner audit has no live `src/` caller. None of those facts proves
+  `ast-chunker.ts` is the primary chunker specifically for file-role analysis.
+  Keep CHUNK0/ownership reconciliation open and do not rewrite the owner from
+  this checklist.
+- `ast-grep-map.mjs`, the `phase1*` extractors, and `run-ast-grep.mjs` exist,
+  but the current `analyze-directory-roles.mjs` uses a static role map and has
+  no AST-map input/caller. Its `--dry-run --json` scan was run on 2026-10-07;
+  it produced diagnostic JSON to stdout and wrote no report. Directory-role
+  plus AST evidence must be joined as non-authoritative diagnostics before it
+  can distinguish missing functionality from redundancy.
+- The ast-grep map emits `symbols.jsonl` and `ast-summary.json`; no deterministic
+  directory-analysis composition/replay or bounded pruning receipt was proven.
+  Keep JSON/JSONL outputs diagnostic, source-revision-bound, and compact; do
+  not let the analysis change source task or feature state.
+- `docs/reports/rg_turbovec.txt` and `docs/reports/rg_napi.txt` were absent in
+  the bounded 2026-10-07 probe. The `chunk-rg-search-dumps.mjs` dry-run writer
+  boundary was subsequently fixed: dry-run now avoids output-directory and
+  packet/report writes. The older `extract-rg-dump-packets.mjs` has a
+  parse-only flag but targets separate packet outputs and is not proof that
+  these two inputs were processed.
+- The prior Obsidian-vault indexing proposal is superseded by operator
+  direction (2026-10-06): Obsidian is no longer an active surface. Keep
+  Graphify in its existing graph/documentation role; do not recursively ingest
+  the old vault mirror as a source corpus. LangChain OpenWiki is a separate
+  repository-documentation projection, not an Atlas evidence authority.
+- Broad LangExtract summarization remains held until the outstanding grounded
+  span mismatches and execution-state contract are resolved. Any future notes
+  remain diagnostic and require exact source-span validation; they cannot
+  establish task completion or authorize archive/mutation.
+
+**Dry-run writer fix (2026-10-07):** `scripts/atlas/chunk-rg-search-dumps.mjs`
+now skips output-directory creation and all packet/report writes under
+`--dry-run`; it emits diagnostic JSON to stdout. `node --check`,
+`git diff --check`, and a bounded dry-run passed. Both expected raw inputs were
+absent (`ENOENT`), so this proves only the missing-input dry-run path—not
+packet extraction. No tracked report delta was observed; output paths already
+existed and are not attributed to this run. Normal write mode remains unrun.
+
+**Checklist status reconciliation (2026-10-07):** Treat the pasted completion
+percentages and checked items as proposals, not proof. The structural chunker
+choice for file-role analysis is still unresolved; directory-role analysis
+does not yet consume the ast-grep map; deterministic compact pruning/replay is
+not proven; and no dump packets can be built until the two checksum-bound
+inputs are available. The existing Obsidian vault is not an active indexing
+surface. Broad LangExtract summaries remain held on span/execution-contract closure.
+Keep these as separate gates; none authorizes source/task mutation, embedding,
+datastore projection, Graphify refresh, or archival.
+
+**OpenWiki alignment correction (2026-10-06):** The operator has retired
+Obsidian as an indexing surface and selected LangChain OpenWiki for a
+project-scoped OpenCode documentation projection. The earlier attempted
+`opencode integrations install openwiki` command was not the OpenWiki CLI
+syntax; current upstream documentation specifies `openwiki integrations
+install opencode --project .` and `openwiki integrations list --project .`.
+The installed Node runtime is `v22.23.3`, meeting the documented `v22.22.0`
+minimum, and an `openwiki` command shim is present. The documented
+`openwiki integrations list --project .` returned `opencode=not-installed`;
+the documented project-scoped install then succeeded and its list now returns
+`opencode=installed`. The only observed repo changes were the `openwiki` MCP
+entry in root `opencode.jsonc` and `.opencode/skills/openwiki/SKILL.md`; no
+global integration was installed. OpenCode must restart in this repository
+before that MCP server is available. Wiki generation has not run. After
+restart, initialize only into `openwiki/`, preserve `.okf`, OpenSpec, and
+Graphify-owned material, and keep claims evidence-qualified. OpenWiki's repo
+integration uses repository source/tests; it does not automatically ingest
+external connector data or satisfy Atlas packet/source/workspace lineage.
+
+Next gate: restore or explicitly generate the checksum-bound raw dump inputs,
+then run the fixed dry-run and verify packet counts/lineage. Separately compose
+the directory-role map with existing ast-grep observations under a bounded,
+deterministic receipt. This does not authorize embedding, database projection,
+Graphify refresh, or archive work.

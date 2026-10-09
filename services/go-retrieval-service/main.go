@@ -15,10 +15,13 @@
 //	POST /search/codebase  — codebase dual-vector (JSON body)
 //	GET  /stats            — request counts + cache hit rate
 //
+// Retrieval embedding uses only the configured embedding service. Direct
+// Ollama fallback and recipe-insensitive query-vector Redis caching are off.
+//
 // Enhancement overview:
 //
-//	GPU embedding   — dedicated go-embedding :8097 (RTX 3060 Ti) with Redis embedding cache
-//	ONNX passthrough — pre-computed 768-dim client embeddings bypass the GPU call
+//	Embedding        — configured go-embedding service; failures are fail-closed
+//	ONNX passthrough — pre-computed 768-dim client embeddings bypass the service call
 //	JSONB matching  — metadata @> filter for section_type / entity_type / tags
 //	Proto-binary cache — cache stores gob-encoded proto bytes (2-3× smaller than JSON)
 //
@@ -31,18 +34,19 @@
 //	REDIS_URL           — Redis (default redis://localhost:6379)
 //	EMBEDDING_BASE_URL  — Go embedding service HTTP (legacy alias; default http://localhost:8097)
 //	EMBED_SERVICE_URL   — Go embedding service HTTP (preferred runtime alias; default http://localhost:8097)
-//	OLLAMA_URL          — Ollama API GPU fallback (default http://localhost:11434)
 //	EMBED_MODEL         — Model name (default embeddinggemma:latest)
 //	GRPC_PORT           — gRPC port (default 50053)
 //	HTTP_PORT           — HTTP port (default 8100)
 //	RETRIEVAL_CACHE_TTL — Redis cache TTL seconds (default 300)
-//	GPU_EMBED_ENABLED   — "true" to permit Ollama fallback if embedding service is unavailable
+//	OLLAMA_URL, GPU_EMBED_ENABLED, and EMBEDDING_REQUIRE_GPU are ignored by the
+//	query embedding path; they cannot enable an unqualified executor fallback.
 package main
 
 import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/gob"
 	"encoding/hex"
 	"encoding/json"
@@ -84,24 +88,24 @@ func init() {
 // ── Configuration ─────────────────────────────────────────────────────────
 
 type config struct {
-	DatabaseURL             string
-	QdrantURL               string
-	QdrantHost              string
-	QdrantPort              int
-	QdrantCollection        string
-	QdrantVectorName        string
-	RedisURL                string
-	EmbeddingBaseURL        string
-	EmbeddingRepresentation string
-	EmbeddingDimension      int
-	EmbeddingRequireGPU     bool
-	EmbedServiceURL         string
-	OllamaURL               string
-	EmbedModel              string
-	GRPCPort                string
-	HTTPPort                string
-	CacheTTL                time.Duration
-	GPUEmbedEnabled         bool
+	DatabaseURL                       string
+	QdrantURL                         string
+	QdrantHost                        string
+	QdrantPort                        int
+	QdrantCollection                  string
+	QdrantVectorName                  string
+	RedisURL                          string
+	EmbeddingBaseURL                  string
+	EmbeddingRepresentation           string
+	EmbeddingRepresentationRevision   string
+	EmbeddingContentSelectionRevision string
+	EmbeddingInputPolicyRevision      string
+	EmbeddingDimension                int
+	EmbedServiceURL                   string
+	EmbedModel                        string
+	GRPCPort                          string
+	HTTPPort                          string
+	CacheTTL                          time.Duration
 }
 
 func resolveQdrantGrpcHostWithLookup(host string, lookup func(string) ([]net.IP, error)) string {
@@ -131,7 +135,6 @@ func loadConfig() config {
 	qdPort, _ := strconv.Atoi(envOr("QDRANT_GRPC_PORT", "6334"))
 	embedDim, _ := strconv.Atoi(envOr("EMBEDDING_DIMENSION", "768"))
 	cacheTTL, _ := strconv.Atoi(envOr("RETRIEVAL_CACHE_TTL", "300"))
-	gpuEnabled := envOr("GPU_EMBED_ENABLED", "true") == "true"
 	embeddingBaseURL := envOrAny("EMBED_SERVICE_URL", "EMBEDDING_BASE_URL", "http://localhost:8097")
 	return config{
 		DatabaseURL: mustEnv("DATABASE_URL"),
@@ -143,19 +146,19 @@ func loadConfig() config {
 		QdrantCollection: envOr("QDRANT_COLLECTION", "codebase_chunks_768"),
 		// `semantic_768` is the representation id; the active collection stores
 		// that vector under the named Qdrant vector key `content`.
-		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "content"),
-		RedisURL:                envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
-		EmbeddingBaseURL:        embeddingBaseURL,
-		EmbeddingRepresentation: envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
-		EmbeddingDimension:      embedDim,
-		EmbeddingRequireGPU:     envOr("EMBEDDING_REQUIRE_GPU", "true") == "true",
-		EmbedServiceURL:         embeddingBaseURL,
-		OllamaURL:               envOr("OLLAMA_URL", "http://localhost:11434"),
-		EmbedModel:              envOr("EMBED_MODEL", "embeddinggemma:latest"),
-		GRPCPort:                envOr("GRPC_PORT", "50053"),
-		HTTPPort:                envOr("HTTP_PORT", "8100"),
-		CacheTTL:                time.Duration(cacheTTL) * time.Second,
-		GPUEmbedEnabled:         gpuEnabled,
+		QdrantVectorName:                  envOr("QDRANT_VECTOR_NAME", "content"),
+		RedisURL:                          envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
+		EmbeddingBaseURL:                  embeddingBaseURL,
+		EmbeddingRepresentation:           envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
+		EmbeddingRepresentationRevision:   envOr("EMBEDDING_REPRESENTATION_REVISION", ""),
+		EmbeddingContentSelectionRevision: envOr("EMBEDDING_CONTENT_SELECTION_REVISION", ""),
+		EmbeddingInputPolicyRevision:      envOr("EMBEDDING_INPUT_POLICY_REVISION", ""),
+		EmbeddingDimension:                embedDim,
+		EmbedServiceURL:                   embeddingBaseURL,
+		EmbedModel:                        envOr("EMBED_MODEL", "embeddinggemma:latest"),
+		GRPCPort:                          envOr("GRPC_PORT", "50053"),
+		HTTPPort:                          envOr("HTTP_PORT", "8100"),
+		CacheTTL:                          time.Duration(cacheTTL) * time.Second,
 	}
 }
 
@@ -286,62 +289,26 @@ func resolveRepresentation(requested string) (id string, entry representationEnt
 	return requested, found, ""
 }
 
-// ── GPU / ONNX Embedding ───────────────────────────────────────────────────
-//
-// Priority order:
-//  1. Pre-computed client embedding (ONNX from browser): if query_embedding matches the canonical dimension
-//  2. Go embedding service (:8097): batched, Redis-cached, canonical embedding authority
-//  3. Direct Ollama GPU (:11434): fallback only when explicitly allowed
-//  4. Ollama HTTP fallback:         last resort when GPU fallback is permitted
-//
-// Redis embed cache key: "rembed:<sha256(model:text)[:16]>"
-// TTL: 24h (embeddings are deterministic per model version)
-
-const embedCachePrefix = "rembed:"
-const embedCacheTTL = 24 * time.Hour
+// ── Query Embedding ─────────────────────────────────────────────────────────
+// Semantic queries use only the configured embedding-service owner. Direct
+// Ollama fallbacks and the legacy recipe-insensitive Redis vector cache are
+// intentionally excluded until their representation lineage is qualified.
 
 func (s *retrievalServer) embed(ctx context.Context, text string) ([]float32, error) {
-	if text == "" {
-		return make([]float32, s.cfg.EmbeddingDimension), nil
+	if strings.TrimSpace(text) == "" {
+		return nil, fmt.Errorf("embedding query is empty")
 	}
 	ctx, cancel := context.WithTimeout(ctx, embedTimeout)
 	defer cancel()
 
-	// Check embed cache first
-	ck := embedCacheKey(s.cfg.EmbeddingRepresentation, s.cfg.EmbeddingDimension, s.cfg.EmbedModel, text)
-	if cached := s.cachedEmbedding(ctx, ck); cached != nil {
-		return cached, nil
-	}
-
-	var vec []float32
-	var err error
-
-	// Canonical path: the dedicated embedding service on :8097.
-	vec, err = s.embedViaService(ctx, text)
-	if vec == nil && !s.cfg.EmbeddingRequireGPU {
-		if s.cfg.GPUEmbedEnabled {
-			vec, err = s.embedGPU(ctx, text)
-		}
-		if vec == nil {
-			vec, err = s.embedOllama(ctx, text)
-		}
-	}
-	if err != nil || vec == nil {
-		return nil, fmt.Errorf("all embedding paths failed: %w", err)
+	vec, err := s.embedViaService(ctx, text)
+	if err != nil {
+		return nil, fmt.Errorf("configured embedding service failed; unqualified fallbacks are disabled: %w", err)
 	}
 	if err := validateEmbeddingVector(vec, s.cfg.EmbeddingDimension); err != nil {
 		return nil, err
 	}
-
-	// Store in embed cache
-	s.storeEmbedding(ctx, ck, vec)
 	return vec, nil
-}
-
-func embedCacheKey(representation string, dimension int, model, text string) string {
-	h := sha256.New()
-	fmt.Fprintf(h, "%s:%d:%s:%s", representation, dimension, model, text)
-	return embedCachePrefix + hex.EncodeToString(h.Sum(nil))[:16]
 }
 
 func validateEmbeddingVector(vec []float32, expected int) error {
@@ -356,72 +323,28 @@ func validateEmbeddingVector(vec []float32, expected int) error {
 	return nil
 }
 
-func (s *retrievalServer) cachedEmbedding(ctx context.Context, key string) []float32 {
-	data, err := s.rdb.Get(ctx, key).Bytes()
-	if err != nil {
-		return nil
-	}
-	var vec []float32
-	if err := gob.NewDecoder(bytes.NewReader(data)).Decode(&vec); err != nil {
-		return nil
-	}
-	return vec
-}
-
-func (s *retrievalServer) storeEmbedding(ctx context.Context, key string, vec []float32) {
-	var buf bytes.Buffer
-	if err := gob.NewEncoder(&buf).Encode(vec); err == nil {
-		s.rdb.Set(ctx, key, buf.Bytes(), embedCacheTTL)
-	}
-}
-
-// embedGPU calls Ollama directly on the GPU (RTX 3060 Ti, flash attention enabled).
-// Uses the /api/embeddings endpoint which is synchronous and single-batch.
-func (s *retrievalServer) embedGPU(ctx context.Context, text string) ([]float32, error) {
-	payload, _ := json.Marshal(map[string]any{
-		"model":  s.cfg.EmbedModel,
-		"prompt": text,
-	})
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-		s.cfg.OllamaURL+"/api/embeddings", bytes.NewReader(payload))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := s.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("ollama gpu embed: status %d", resp.StatusCode)
-	}
-
-	var result struct {
-		Embedding []float64 `json:"embedding"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil, err
-	}
-	if len(result.Embedding) == 0 {
-		return nil, fmt.Errorf("empty gpu embedding")
-	}
-	vec := make([]float32, len(result.Embedding))
-	for i, v := range result.Embedding {
-		vec[i] = float32(v)
-	}
-	return vec, nil
-}
-
-// embedViaService calls the Go embedding service (Redis-cached, batch-aware).
+// embedViaService calls the receipt-bearing strict embedding boundary.
 func (s *retrievalServer) embedViaService(ctx context.Context, text string) ([]float32, error) {
-	payload, _ := json.Marshal(map[string]any{
-		"texts": []string{text},
-		"model": s.cfg.EmbedModel,
+	if strings.TrimSpace(s.cfg.EmbeddingContentSelectionRevision) == "" ||
+		strings.TrimSpace(s.cfg.EmbeddingInputPolicyRevision) == "" ||
+		!isSHA256Revision(s.cfg.EmbeddingRepresentationRevision) ||
+		s.cfg.EmbeddingRepresentation != "semantic_768" {
+		return nil, fmt.Errorf("embedding receipt policy or expected representation revision is not configured")
+	}
+	inputChecksum := sha256Revision([]byte(text))
+	inputArtifactChecksum := sha256Revision(append([]byte("atlas.query-embedding-input.v1\x00"), []byte(text)...))
+	payload, err := json.Marshal(map[string]string{
+		"text":                     text,
+		"inputChecksum":            inputChecksum,
+		"inputArtifactChecksum":    inputArtifactChecksum,
+		"contentSelectionRevision": s.cfg.EmbeddingContentSelectionRevision,
+		"inputPolicyRevision":      s.cfg.EmbeddingInputPolicyRevision,
 	})
+	if err != nil {
+		return nil, fmt.Errorf("marshal strict embedding request: %w", err)
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-		s.cfg.EmbeddingBaseURL+"/embed", bytes.NewReader(payload))
+		s.cfg.EmbeddingBaseURL+"/embed/v2", bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -437,24 +360,103 @@ func (s *retrievalServer) embedViaService(ctx context.Context, text string) ([]f
 	}
 
 	var result struct {
-		Embeddings [][]float32 `json:"embeddings"`
+		Schema     string    `json:"schema"`
+		Status     string    `json:"status"`
+		Embedding  []float32 `json:"embedding"`
+		Capability struct {
+			ModelName                 string  `json:"modelName"`
+			OllamaModelDigest         string  `json:"ollamaModelDigest"`
+			GGUFArtifactDigest        *string `json:"ggufArtifactDigest"`
+			GGUFArtifactBindingStatus string  `json:"ggufArtifactBindingStatus"`
+			TokenizerBindingStatus    string  `json:"tokenizerBindingStatus"`
+			Dimensions                int     `json:"dimensions"`
+			DType                     string  `json:"dtype"`
+			RepresentationRevision    string  `json:"representationRevision"`
+		} `json:"capability"`
+		Receipt struct {
+			InputChecksum             string `json:"inputChecksum"`
+			InputArtifactChecksum     string `json:"inputArtifactChecksum"`
+			ContentSelectionRevision  string `json:"contentSelectionRevision"`
+			InputPolicyRevision       string `json:"inputPolicyRevision"`
+			RepresentationRevision    string `json:"representationRevision"`
+			OllamaModelDigest         string `json:"ollamaModelDigest"`
+			ResidentModelDigestBefore string `json:"residentModelDigestBefore"`
+			ResidentModelDigestAfter  string `json:"residentModelDigestAfter"`
+			ResponseModelName         string `json:"responseModelName"`
+			RuntimeBindingStatus      string `json:"runtimeBindingStatus"`
+			AtomicPerCallModelBinding bool   `json:"atomicPerCallModelBinding"`
+			Dimensions                int    `json:"dimensions"`
+			DType                     string `json:"dtype"`
+			Normalized                bool   `json:"normalized"`
+			VectorChecksum            string `json:"vectorChecksum"`
+		} `json:"receipt"`
+		Error string `json:"error"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
-	if len(result.Embeddings) == 0 || len(result.Embeddings[0]) == 0 {
-		return nil, fmt.Errorf("empty embed service response")
+	if result.Schema != "atlas.embedding-response.v2" || result.Status != "OBSERVATION_ONLY" {
+		return nil, fmt.Errorf("strict embedding response is not an observation: %s", result.Error)
 	}
-	return result.Embeddings[0], nil
+	capability := result.Capability
+	receipt := result.Receipt
+	if capability.RepresentationRevision != s.cfg.EmbeddingRepresentationRevision ||
+		capability.ModelName != s.cfg.EmbedModel || capability.Dimensions != s.cfg.EmbeddingDimension ||
+		capability.DType != "float32-le" ||
+		capability.GGUFArtifactBindingStatus != "INDEPENDENT_READBACK_VERIFIED" ||
+		capability.TokenizerBindingStatus != "INDEPENDENT_READBACK_VERIFIED" ||
+		capability.GGUFArtifactDigest == nil || !isSHA256Revision(*capability.GGUFArtifactDigest) ||
+		!isSHA256Revision(capability.OllamaModelDigest) {
+		return nil, fmt.Errorf("strict embedding capability is not revision-qualified")
+	}
+	if receipt.InputChecksum != inputChecksum || receipt.InputArtifactChecksum != inputArtifactChecksum ||
+		receipt.ContentSelectionRevision != s.cfg.EmbeddingContentSelectionRevision ||
+		receipt.InputPolicyRevision != s.cfg.EmbeddingInputPolicyRevision ||
+		receipt.RepresentationRevision != capability.RepresentationRevision ||
+		receipt.OllamaModelDigest != capability.OllamaModelDigest ||
+		receipt.ResidentModelDigestBefore != capability.OllamaModelDigest ||
+		receipt.ResidentModelDigestAfter != capability.OllamaModelDigest ||
+		receipt.ResponseModelName != s.cfg.EmbedModel || receipt.RuntimeBindingStatus != "OBSERVED_PRE_POST_RESIDENT_DIGEST_STABLE" ||
+		!receipt.AtomicPerCallModelBinding || receipt.Dimensions != s.cfg.EmbeddingDimension ||
+		receipt.DType != "float32-le" || !receipt.Normalized {
+		return nil, fmt.Errorf("strict embedding receipt does not prove the requested input and active representation")
+	}
+	if err := validateEmbeddingVector(result.Embedding, s.cfg.EmbeddingDimension); err != nil {
+		return nil, err
+	}
+	var squaredNorm float64
+	for _, value := range result.Embedding {
+		squaredNorm += float64(value) * float64(value)
+	}
+	norm := math.Sqrt(squaredNorm)
+	if norm < 0.99 || norm > 1.01 {
+		return nil, fmt.Errorf("strict embedding vector is not unit normalized")
+	}
+	if vectorChecksum(result.Embedding) != receipt.VectorChecksum {
+		return nil, fmt.Errorf("strict embedding vector checksum mismatch")
+	}
+	return result.Embedding, nil
 }
 
-// embedOllama is the final HTTP fallback (same as GPU but logs differently).
-func (s *retrievalServer) embedOllama(ctx context.Context, text string) ([]float32, error) {
-	vec, err := s.embedGPU(ctx, text)
-	if err != nil {
-		slog.Warn("[retrieval] embedOllama fallback failed", "err", err)
+func sha256Revision(value []byte) string {
+	digest := sha256.Sum256(value)
+	return "sha256:" + hex.EncodeToString(digest[:])
+}
+
+func isSHA256Revision(value string) bool {
+	if len(value) != len("sha256:")+64 || !strings.HasPrefix(value, "sha256:") {
+		return false
 	}
-	return vec, err
+	_, err := hex.DecodeString(strings.TrimPrefix(value, "sha256:"))
+	return err == nil
+}
+
+func vectorChecksum(vector []float32) string {
+	values := make([]byte, len(vector)*4)
+	for index, value := range vector {
+		binary.LittleEndian.PutUint32(values[index*4:], math.Float32bits(value))
+	}
+	return sha256Revision(values)
 }
 
 // ── Proto-binary cache (gob-encoded) ─────────────────────────────────────
@@ -2978,7 +2980,7 @@ func (s *retrievalServer) httpStats(w http.ResponseWriter, r *http.Request) {
 		"cacheHits":        hits,
 		"totalRequests":    total,
 		"cacheHitRate":     hitRate,
-		"gpuEmbedEnabled":  s.cfg.GPUEmbedEnabled,
+		"gpuEmbedEnabled":  false,
 	})
 }
 
@@ -3125,7 +3127,7 @@ func main() {
 		"embedding", embeddingConnected,
 		"grpc", cfg.GRPCPort,
 		"http", cfg.HTTPPort,
-		"gpu_embed", cfg.GPUEmbedEnabled,
+		"direct_ollama_embedding_fallback", false,
 		"cache_ttl", cfg.CacheTTL,
 	)
 

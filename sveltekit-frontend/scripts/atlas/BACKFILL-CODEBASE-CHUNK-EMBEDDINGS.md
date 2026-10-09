@@ -1,8 +1,16 @@
 # Full-Corpus Embedding Backfill: `backfill-codebase-chunk-embeddings.mjs`
 
+> **Apply is blocked.** The historical `--apply` examples below are not
+> executable guidance. The script rejects every `--apply` invocation before
+> calling the backfill routine because it lacks a frozen exact-revision input
+> manifest and independent per-row provenance/readback. Setting
+> `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1` does not override this gate. Use
+> `--dry-run` only. Do not treat `content_embedding_768` population as proof of
+> source, workspace, or representation lineage.
+
 **Purpose**: Backfill canonical 768-dim EmbeddingGemma embeddings (`content_embedding_768`) for eligible chunks in `codebase_chunk_index` that are missing canonical vectors (WHERE `content_embedding_768 IS NULL`). The generic `content_embedding` column is legacy compatibility storage and is not written by this tool.
 
-**Status**: ✅ Production-ready. Handles 40K+ chunks with graceful failure recovery, atomic Postgres updates, and streaming progress logging.
+**Status**: APPLY BLOCKED. Historical throughput/recovery descriptions do not establish lineage-safe production readiness. Only dry-run is currently supported; the code rejects `--apply` before backfill execution.
 
 ---
 
@@ -62,7 +70,7 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--dry-run` | true | Preview mode (no writes) |
-| `--apply` | false | Execute the backfill; also requires `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1` |
+| `--apply` | false | **Blocked**; invocation fails closed before DB queries, embedding requests, or writes |
 | `--batch-size=N` | 48 | Embeddings per HTTP request (1-128) |
 | `--limit=N` | 0 | Max chunks to process (0 = all) |
 | `--checkpoint=N` | 100 | Progress log every N chunks |
@@ -75,17 +83,8 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
 # Preview: dry-run the first 1000 chunks
 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --dry-run --limit=1000
 
-# Apply: full corpus, smaller batches for stability (explicit authorization required)
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=32
-
-# Apply: full corpus with debugging output
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --verbose --checkpoint=50
-
-# Apply: custom timeout for slow Ollama
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --timeout=60000
-
-# Apply: limit to first 5000 for testing
-ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1 node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --limit=5000
+# Historical apply examples were removed: this writer is fail-closed pending
+# exact-revision input binding and independent per-row provenance/readback.
 ```
 
 ---

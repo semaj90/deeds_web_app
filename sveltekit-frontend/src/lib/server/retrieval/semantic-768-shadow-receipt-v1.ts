@@ -14,7 +14,8 @@ export interface Semantic768ShadowReceiptV1 {
   representationId: 'semantic_768';
   dimensions: 768;
   modelId: string;
-  representationRevision: string;
+  representationRevision: null;
+  qualification: 'REPRESENTATION_REVISION_UNQUALIFIED';
   inputChecksum: string;
   vectorChecksum: string;
   executorReceipt: 'EmbeddingReceiptV1';
@@ -36,10 +37,10 @@ export function buildSemantic768ShadowReceiptV1(
   const shape = checkVectorShapeV1(receipt.embedding);
   if (!shape.ok) throw new Error(`SEMANTIC_768_SHADOW_VECTOR_INVALID:${shape.failures.join(',')}`);
   if (!receipt.modelId.trim()) throw new Error('SEMANTIC_768_SHADOW_MODEL_REQUIRED');
-  if (!receipt.representationRevision.trim()) throw new Error('SEMANTIC_768_SHADOW_REPRESENTATION_REVISION_REQUIRED');
   const expectedInputChecksum = sha256Hex(retrievalText.text);
   if (receipt.inputChecksum !== expectedInputChecksum) throw new Error('SEMANTIC_768_SHADOW_INPUT_CHECKSUM_MISMATCH');
-  if (!receipt.vectorChecksum.trim()) throw new Error('SEMANTIC_768_SHADOW_VECTOR_CHECKSUM_REQUIRED');
+  const expectedVectorChecksum = sha256Hex(JSON.stringify(receipt.embedding));
+  if (receipt.vectorChecksum !== expectedVectorChecksum) throw new Error('SEMANTIC_768_SHADOW_VECTOR_CHECKSUM_MISMATCH');
   return {
     schema: 'atlas.semantic-768-shadow-receipt.v1',
     canonicalChunkId: retrievalText.canonicalChunkId,
@@ -52,7 +53,8 @@ export function buildSemantic768ShadowReceiptV1(
     representationId: 'semantic_768',
     dimensions: 768,
     modelId: receipt.modelId,
-    representationRevision: receipt.representationRevision,
+    representationRevision: null,
+    qualification: 'REPRESENTATION_REVISION_UNQUALIFIED',
     inputChecksum: receipt.inputChecksum,
     vectorChecksum: receipt.vectorChecksum,
     executorReceipt: 'EmbeddingReceiptV1',

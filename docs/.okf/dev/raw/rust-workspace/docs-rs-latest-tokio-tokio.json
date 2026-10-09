@@ -1,0 +1,55 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "rust-workspace",
+  "source_ref": "rust-workspace:docs-rs-latest-tokio-tokio",
+  "url": "https://docs.rs/tokio/latest/tokio/",
+  "title": "docs.rs",
+  "domain_class": "tool",
+  "focus_tags": [
+    "rust",
+    "rayon",
+    "tokio",
+    "serde",
+    "native-runtime",
+    "llm_synthesis",
+    "llm_output",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "firecrawl",
+    "title": "docs.rs",
+    "markdown_excerpt": "[Docs.rs](https://docs.rs/) - [tokio-1.53.2](https://docs.rs/tokio/latest/tokio/# \"An event-driven, non-blocking I/O platform for writing asynchronous I/O backed applications. \") - tokio 1.53.2 - [Permalink](https://docs.rs/tokio/1.53.2/tokio/ \"Get a link to this specific version\") - [Docs.rs crate page](https://docs.rs/crate/tokio/latest \"See tokio in docs.rs\") - [MIT](https://spdx.org/licenses/MIT) - 03 October 2026 - Links - [Homepage](https://tokio.rs/) - [Repository](https://github.com/tokio-rs/tokio) - [crates.io](https://crates.io/crates/tokio \"See tokio in crates.io\") - [Source](https://docs.rs/crate/tokio/latest/source/ \"Browse source of tokio-1.53.2\") - Owners - [carllerche](https://crates.io/users/carllerche) - [Darksonn](https://crates.io/users/Darksonn) - [github:tokio-rs:core](https://crates.io/teams/github:tokio-rs:core) - Dependencies - - [bytes ^1.2.1\\\\ \\\\ _normal_ _optional_](https://docs.rs/bytes/%5E1.2.1/) - [mio ^1.2.0\\\\ \\\\ _normal_ _optional_](https://docs.rs/mio/%5E1.2.0/) - [parking\\_lot ^0.12.0\\\\ \\\\ _normal_ _optional_](https://docs.rs/parking_lot/%5E0.12.0/) - [pin-project-lite ^0.2.11\\\\ \\\\ _normal_](https://docs.rs/pin-project-lite/%5E0.2.11/) - [tokio-ma",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "tool",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:rust-workspace:docs-rs-latest-tokio-tokio",
+    "title": "docs.rs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Rust, Rayon, Tokio, and Serde Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [],
+  "content_hash": "e410efec7c0bee8087a2573b61d73e8f8cdbd11068e8c692c7532e0ee1319c31",
+  "markdown_path": "docs/.okf/dev/raw/rust-workspace/docs-rs-latest-tokio-tokio.md",
+  "fetched_at": "2026-10-09T05:30:32.424Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "rust-workspace",
+    "source_title": "Rust, Rayon, Tokio, and Serde Documentation",
+    "fetched_via": "firecrawl",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/rust-workspace/docs-rs-latest-tokio-tokio.md"
+}

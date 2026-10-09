@@ -11,6 +11,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { mapAstGrepDeclarationToOrfKindV1 } from './lib/orf-ast-kind-crosswalk-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const args = new Map(process.argv.slice(2).map((value) => {
@@ -40,17 +41,6 @@ const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex'
 const unique = (values) => [...new Set(values.filter((value) => typeof value === 'string' && value.trim()))]
   .map((value) => value.trim()).sort((a, b) => a.localeCompare(b));
 
-const astKinds = new Map([
-  ['function', 'FUNCTION_DECL'], ['function_declaration', 'FUNCTION_DECL'],
-  ['method', 'FUNCTION_DECL'], ['method_definition', 'FUNCTION_DECL'],
-  ['class', 'CLASS_DECL'], ['class_declaration', 'CLASS_DECL'],
-  ['interface', 'INTERFACE_DECL'], ['interface_declaration', 'INTERFACE_DECL'],
-  ['type', 'TYPE_ALIAS'], ['type_alias_declaration', 'TYPE_ALIAS'],
-  ['enum', 'TYPE_ALIAS'], ['enum_declaration', 'TYPE_ALIAS'],
-  ['variable', 'VARIABLE_DECL'], ['variable_declarator', 'VARIABLE_DECL'],
-  ['constant', 'VARIABLE_DECL'],
-]);
-
 const toSubject = (row) => row.entity_id || row.subject_ref || [
   row.packet_key,
   row.symbol_kind || row.entity_kind || 'unknown',
@@ -74,8 +64,8 @@ for (const row of identity.slice(0, limit)) {
     row.packet_key, row.symbol_name || row.name, row.symbol_kind || row.entity_kind,
   ].join('|'));
   const observations = unique([
-    astKinds.get(String(row.symbol_kind || '').toLowerCase()),
-    astKinds.get(String(row.ast_kind || '').toLowerCase()),
+    mapAstGrepDeclarationToOrfKindV1(row.symbol_kind),
+    mapAstGrepDeclarationToOrfKindV1(row.ast_kind),
   ]);
   const primaryDomain = typeof domain?.domain_id === 'string' && domain.domain_id.trim()
     ? domain.domain_id.trim()
