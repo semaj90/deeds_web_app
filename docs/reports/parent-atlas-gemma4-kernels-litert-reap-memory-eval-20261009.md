@@ -28,3 +28,21 @@ Status: **research + offline evaluation gates only**. Do not import upstream mod
 - Existing `scripts/atlas/prove-gemma4-browser-paired-eval-preflight-v1.mjs` is **offline fixture only**.
 - Existing `sveltekit-frontend/src/lib/ai/gemma4-browser-mtp-readiness-v1.ts` returns **runtimeEligible:false** until independent verification.
 - No inference, LiteRT browser call, Kafka event, database write or GPU kernel proof was performed as part of this crosswalk.
+
+## NES / glyph / virtual-texture / SIMDJSON execution split
+
+The NES PPU analogy is a **memory-residency and tile-transfer analogy**, not a literal Nintendo video-memory design or evidence that shader tensors have NES formats.
+
+- [ ] **TILE-01** Browser Canvas/WebGPU renderer: distinguish screen-space pixel/glyph atlas textures from numerical tensor buffers. Float32/Float16 tensors are not RGBA pixels unless an explicit encoding/decoding contract exists. Test endian, row stride, alignment, quant block scale/zero point and f16 feature.
+- [ ] **TILE-02** CPU Web Workers: bound UTF-8 decoding, packet validation, deterministic glyph/tile preparation and transfer using transferable ArrayBuffers; benchmark structured-clone vs transfer and prove the buffer ownership contract.
+- [ ] **TILE-03** XState lifecycle: map probe transitions, cancel and reset into existing state-machine owner. GPU cancellation is best-effort; destroying a device and ignoring late results does not prove the GPU never executed.
+- [ ] **TILE-04** IndexedDB residency: use existing `deeds-ai-cache.gpuResults` cache and explicit consent; key by source/model/representation/shader revision; readback digest, TTL and quota/eviction tests. No sensitive raw source cached without policy.
+- [ ] **TILE-05** SIMT WebGPU shader: separate numeric WGSL compute from image texture rendering; compare CPU oracle, f32/f16 tolerance, dispatch sizes, bounds and readback. cuTile is a separate CUDA-native challenger; not browser WebGPU.
+- [ ] **TILE-06** LOD swaps: identity → latent64 → semantic768 → structural graph → source spans → token detail. These are *typed representations*, not freely interchangeable byte/tile mip levels; exact source/representation revisions must survive every promotion.
+- [ ] **TILE-07** 4D topology/manifold: treat coordinates as derived navigation/projection; require a coordinate-basis/version/transform and canonical identity join. No graph or source authority from a projected point alone.
+- [ ] **TILE-08** SIMDJSON CPU ingress: test actual native simdjson against V8 `JSON.parse` on the same bounded UTF-8 receipt and JSONL fixture. Record CPUID support, selected implementation, actual dispatched ISA and timing. AVX2 support by CPU does *not* prove AVX2 dispatch. SIMDJSON does not directly move GPU texture tiles.
+- [ ] **TILE-09** Off-main-thread data pipeline: `fetch → bounded bytes → worker validation/decode → transferable typed arrays → WGSL buffers/textures → GPU readback → diagnostic receipt → IndexedDB`; test cancellation, transfer detachment, backpressure and stale revision.
+- [ ] **TILE-10** Server boundary: packet hash and evidence verifier remain authoritative; Kafka can carry validated bounded telemetry descriptors later, never raw GPU pointers or browser self-asserted fact admission.
+
+## Actual probe state
+The page `sveltekit-frontend/static/atlas-eval/gemma4-wgsl-matmul-v1.html` now has explicit run/cancel controls and optional IndexedDB diagnostic readback. It has **not** been verified in an actual Windows 10 browser, and its lightweight lifecycle is not yet XState v5. The real GPU probe executes a reference matmul shader, not the pinned Xenova/Fable kernel. Never label cached browser JSON as GPU attestation.
