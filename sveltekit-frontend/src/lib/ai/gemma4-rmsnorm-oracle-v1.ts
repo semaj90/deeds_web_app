@@ -1,24 +1,5 @@
 /** RMSNorm f32 illustrative Gemma-style operator, not a model-specific kernel proof. */
-export const RMSNORM_WGSL_V1 = `
-struct Config { rows:u32, width:u32, epsilon:f32, padding:u32, };
-@group(0) @binding(0) var<storage, read> x:array<f32>;
-@group(0) @binding(1) var<storage, read> weight:array<f32>;
-@group(0) @binding(2) var<storage, read_write> out:array<f32>;
-@group(0) @binding(3) var<uniform> cfg:Config;
-@compute @workgroup_size(64)
-fn main(@builtin(global_invocation_id) id:vec3<u32>) {
-  let row=id.x;
-  if (row >= cfg.rows) { return; }
-  var sum:f32=0.0;
-  for(var j:u32=0u; j<cfg.width; j=j+1u) {
-    let v=x[row*cfg.width+j];
-    sum=sum+v*v;
-  }
-  let scale=inverseSqrt(sum/f32(cfg.width)+cfg.epsilon);
-  for(var j:u32=0u; j<cfg.width; j=j+1u) {
-    out[row*cfg.width+j]=x[row*cfg.width+j]*scale*weight[j];
-  }
-}`;
+export const RMSNORM_WGSL_V1_ASSET_V1 = '/atlas-kernels/rmsnorm-f32-v1.wgsl';
 export const RMSNORM_FIXTURE_V1 = Object.freeze({
  rows:2,width:4,epsilon:1e-5,
  values:[1,2,3,4,-4,-3,-2,-1],
