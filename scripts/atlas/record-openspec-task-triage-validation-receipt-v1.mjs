@@ -10,6 +10,8 @@ import {
   computeOpenSpecWorkspaceRevisionV1,
   verifyEvidenceReceiptV1,
 } from './audit-openspec-evidence-fabric-v1.mjs';
+import { loadTaskCardCorpusV1 } from './lib/openspec-task-card-v1.mjs';
+import { loadTaskTriageCorpusV1 } from './lib/openspec-task-triage-shards-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const changeId = 'parent-atlas-openspec-task-triage-pipeline';
@@ -36,6 +38,7 @@ const testPaths = [
   'scripts/atlas/lib/openspec-report-manifest-v1.test.mjs',
   'scripts/atlas/lib/openspec-task-card-v1.test.mjs',
   'scripts/atlas/lib/openspec-task-triage-corpus-v1.test.mjs',
+  'scripts/atlas/lib/openspec-task-triage-shards-v1.test.mjs',
 ];
 
 function sha256(value) {
@@ -65,9 +68,9 @@ function run(command, args, { shell = false } = {}) {
 }
 
 function validateCorpus(workspaceRevision, head) {
-  const taskCards = readJson(corpusPaths.taskCards);
+  const taskCards = loadTaskCardCorpusV1(path.join(root, corpusPaths.taskCards));
   const reportManifests = readJson(corpusPaths.reportManifests);
-  const triage = readJson(corpusPaths.triage);
+  const triage = loadTaskTriageCorpusV1(path.join(root, corpusPaths.triage));
   const inputs = [taskCards, reportManifests, triage];
   if (taskCards.source?.workspaceHead !== head || reportManifests.workspaceHead !== head || triage.workspaceHead !== head) {
     throw new Error('TRIAGE_CORPUS_HEAD_MISMATCH');
@@ -104,7 +107,8 @@ function main() {
     'scripts/atlas/build-openspec-task-cards-v1.mjs',
     `--output=${corpusPaths.taskCards}`,
   ]));
-  if (taskCardBuild.status !== 'TASK_CARDS_WRITTEN' || taskCardBuild.writesPerformed !== false) {
+  if (!['TASK_CARDS_WRITTEN', 'TASK_CARD_SHARDS_READBACK_PROVEN'].includes(taskCardBuild.status)
+    || taskCardBuild.writesPerformed !== false || taskCardBuild.outputArtifactWritten !== true) {
     throw new Error('TASK_CARD_REFRESH_FAILED');
   }
   const manifestBuild = JSON.parse(run(process.execPath, [
@@ -121,7 +125,8 @@ function main() {
     `--report-manifests=${corpusPaths.reportManifests}`,
     `--output=${corpusPaths.triage}`,
   ]));
-  if (triageBuild.status !== 'TRIAGE_CORPUS_WRITTEN' || triageBuild.writesPerformed !== false) {
+  if (!['TRIAGE_CORPUS_WRITTEN', 'TRIAGE_CORPUS_SHARDS_READBACK_PROVEN'].includes(triageBuild.status)
+    || triageBuild.writesPerformed !== false || triageBuild.outputArtifactWritten !== true) {
     throw new Error('TRIAGE_CORPUS_REFRESH_FAILED');
   }
 

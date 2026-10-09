@@ -134,6 +134,14 @@ contracts:
       - flattened_key_value_tags
       - source_version_receipt_id
       - representation_explicit
+  - name: orf-ast-feature-registry-proposal-v1
+    owner: docs/.okf/registries/orf-ast-feature-registry-proposal-v1.json
+    role: Immutable review proposal for the five AST observation feature definitions
+    notes:
+      - REQUIRES_REVIEW
+      - runtime_eligible false
+      - canonical_authority false
+      - no registry table or production loader
   - name: external-doc-projection-v1
     owner: sveltekit-frontend/src/lib/server/atlas/contracts/external-doc-projection-v1.ts
     role: ORF-3 target payload/index contract for one programming-doc evidence family

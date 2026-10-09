@@ -16,6 +16,7 @@ test('maps the declaration producer vocabulary to the five established ORF class
   ]);
   assert.equal(mapAstGrepDeclarationToOrfKindV1('FUNCTION_DECLARATION'), 'FUNCTION_DECL');
   assert.equal(mapAstGrepDeclarationToOrfKindV1('method_definition'), 'FUNCTION_DECL');
+  assert.equal(mapAstGrepDeclarationToOrfKindV1('generator_function_declaration'), 'FUNCTION_DECL');
   assert.equal(mapAstGrepDeclarationToOrfKindV1('enum_declaration'), null);
   assert.equal(mapAstGrepDeclarationToOrfKindV1('enum'), null);
   assert.equal(mapAstGrepDeclarationToOrfKindV1('constant'), null);

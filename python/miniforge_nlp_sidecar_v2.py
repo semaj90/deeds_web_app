@@ -132,6 +132,7 @@ def _native_grounded_extractions(
     text: str,
     model_id: Optional[str] = None,
     *,
+    extraction_mode: str = "concepts",
     span_diagnostics: Optional[list[dict[str, Any]]] = None,
     execution_receipt: Optional[dict[str, Any]] = None,
 ) -> list[dict[str, Any]]:
@@ -150,6 +151,7 @@ def _native_grounded_extractions(
             'provider': 'langextract',
             'providerRevision': legacy._provider_revision(),
             'modelId': model_id or os.getenv('LANGEXTRACT_MODEL', 'miniforge-nlp-sidecar'),
+            'extractionMode': 'relationships' if extraction_mode == 'relationships' else 'concepts',
             'inputChecksum': hashlib.sha256(source_bytes).hexdigest(),
             'inputByteLength': len(source_bytes),
             'inputCharacterLength': len(text),
@@ -180,20 +182,50 @@ def _native_grounded_extractions(
         data_module = getattr(legacy.langextract, "data", None)
         example_data = getattr(data_module, "ExampleData", None)
         extraction_type = getattr(data_module, "Extraction", None)
+        grounded_mode = 'relationships' if extraction_mode == 'relationships' else 'concepts'
+        if grounded_mode == 'relationships':
+            prompt_description = (
+                "Extract only binary relationships explicitly asserted in the supplied source text. "
+                "Return only the required JSON envelope. Every extraction must use extraction_class RELATION; "
+                "extraction_text must be the shortest complete contiguous source substring that explicitly "
+                "states the relation and contains its subject, predicate, and object. Copy all three attribute "
+                "values verbatim from that substring. Do not infer relationships from filenames, code symbols, "
+                "external knowledge, or co-occurrence. If no exact relation exists, return an empty extractions array."
+            )
+        else:
+            prompt_description = "Extract grounded evidence for Parent Atlas. Return exact source-backed spans only."
         examples = None
         if example_data is not None and extraction_type is not None:
-            examples = [
-                example_data(
-                    text="This module uses PostgreSQL for persistence.",
-                    extractions=[
-                        extraction_type(
-                            extraction_class="CONCEPT",
-                            extraction_text="PostgreSQL",
-                            attributes={"concept_id": "DATABASE"},
-                        )
-                    ],
-                )
-            ]
+            if grounded_mode == 'relationships':
+                examples = [
+                    example_data(
+                        text="This module uses PostgreSQL for persistence.",
+                        extractions=[
+                            extraction_type(
+                                extraction_class="RELATION",
+                                extraction_text="This module uses PostgreSQL for persistence.",
+                                attributes={
+                                    "subject": "This module",
+                                    "predicate": "uses",
+                                    "object": "PostgreSQL for persistence",
+                                },
+                            )
+                        ],
+                    )
+                ]
+            else:
+                examples = [
+                    example_data(
+                        text="This module uses PostgreSQL for persistence.",
+                        extractions=[
+                            extraction_type(
+                                extraction_class="CONCEPT",
+                                extraction_text="PostgreSQL",
+                                attributes={"concept_id": "DATABASE"},
+                            )
+                        ],
+                    )
+                ]
         selected_model = model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar")
         extraction_max_tokens = int(os.getenv("LANGEXTRACT_MAX_TOKENS", "256"))
         extraction_reasoning_budget = int(os.getenv("LANGEXTRACT_REASONING_BUDGET", "0"))
@@ -201,7 +233,7 @@ def _native_grounded_extractions(
         model_config_type = getattr(factory, "ModelConfig", None)
         extract_kwargs: dict[str, Any] = {
             "text_or_documents": text,
-            "prompt_description": "Extract grounded evidence for Parent Atlas. Return exact source-backed spans only.",
+            "prompt_description": prompt_description,
             "examples": examples,
             "extraction_passes": 1,
             "max_workers": 1,
@@ -231,8 +263,8 @@ def _native_grounded_extractions(
                     "reasoning_effort": "none",
                     "cache_prompt": False,
                     "openai_schema": OpenAISchema(
-                        legacy._grounded_output_schema(),
-                        schema_name="atlas_grounded_extraction_v1",
+                        legacy._grounded_output_schema(grounded_mode),
+                        schema_name=f"atlas_grounded_{grounded_mode}_v1",
                         strict=True,
                         from_output_schema=True,
                     ),
@@ -265,6 +297,7 @@ def _native_grounded_extractions(
         execution_receipt['executorCompleted'] = True
         execution_receipt['rawResultCount'] = len(raw_extractions)
     rejected_span = False
+    rejected_relation = False
     for item in raw_extractions[:50]:
         normalized = normalize_langextract_extraction(item)
         interval = normalized.get("char_interval")
@@ -289,6 +322,20 @@ def _native_grounded_extractions(
             if span_diagnostics is not None:
                 span_diagnostics.append(probe)
             continue
+        attributes = normalized.get('attributes') or {}
+        if grounded_mode == 'relationships':
+            relation_values = (attributes.get('subject'), attributes.get('predicate'), attributes.get('object'))
+            if normalized['extraction_class'].upper() != 'RELATION' or any(
+                not isinstance(value, str) or not value.strip() or value not in normalized['extraction_text']
+                for value in relation_values
+            ):
+                rejected_relation = True
+                if span_diagnostics is not None:
+                    span_diagnostics.append({
+                        'classification': 'RELATION_SHAPE_INVALID',
+                        'rejectionReason': 'RELATION_CLASS_AND_VERBATIM_SUBJECT_PREDICATE_OBJECT_REQUIRED',
+                    })
+                continue
         extracted.append(
             {
                 # Compatibility aliases retained while current callers migrate.
@@ -304,12 +351,12 @@ def _native_grounded_extractions(
                 "char_interval": interval,
                 "alignment_status": normalized.get("alignment_status"),
                 "grounded": True,
-                "attributes": normalized.get("attributes") or {},
+                "attributes": attributes,
             }
         )
     finish(
-        'REJECTED_SPAN_MISMATCH' if rejected_span else 'COMPLETED_GROUNDED' if extracted else 'COMPLETED_EMPTY',
-        'SPAN_REJECTION' if rejected_span else None,
+        'REJECTED_SPAN_MISMATCH' if rejected_span else 'REJECTED_RELATION_SHAPE' if rejected_relation else 'COMPLETED_GROUNDED' if extracted else 'COMPLETED_EMPTY',
+        'SPAN_REJECTION' if rejected_span else 'RELATION_SHAPE_REJECTION' if rejected_relation else None,
     )
     return extracted
 

@@ -28,6 +28,7 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
 
 /** Gemma 4 E2B 2.3B — opt-in helper via @huggingface/transformers v4 */
 export const CLIENT_E2B_MODEL_ID = 'onnx-community/gemma-4-E2B-it-ONNX';
+export const CLIENT_E2B_MODEL_REVISION = '7c6d3d1d4092253ea241428e88312ab34bfa9c26';
 export const CLIENT_E2B_DTYPE = 'q4f16' as const;
 export const CLIENT_E2B_DEVICE = 'webgpu' as const;
 /** Minimum WebGPU adapter memory (bytes) to attempt E2B loading */

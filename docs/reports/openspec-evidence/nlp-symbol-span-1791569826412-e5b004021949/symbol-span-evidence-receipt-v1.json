@@ -1,0 +1,97 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-retrieval-lineage-dag-convergence:NLP-GROUND-SYMBOL-SPAN-READBACK-01:1791569826412-e5b004021949",
+  "evidenceType": "STATIC",
+  "changeId": "parent-atlas-retrieval-lineage-dag-convergence",
+  "taskId": "NLP-GROUND-SYMBOL-SPAN-READBACK-01",
+  "canonicalTaskKey": "openspec://root/parent-atlas-retrieval-lineage-dag-convergence/NLP-GROUND-SYMBOL-SPAN-READBACK-01",
+  "taskRef": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md#L16648",
+  "claim": "**NLP-GROUND-SYMBOL-SPAN-READBACK-01:** independently reopen current source bytes and verify the reported Valkey mention's exact byte span and checksum; preserve proposal-only status. This proves source-byte alignment for the reported mention only—not extractor-response authenticity, a typed fact, ontology admission, runtime use, or persistence.",
+  "workspaceRevision": "sha256:e5b004021949ce9bd90b9e43815d0ca1c587279483dc87dd97b43a37fd19c6d3",
+  "sourceRevision": "sha256:e68cd1c231ae6b856707e8a44be736582bf33138e0118da9f775768a7e0dcc2d",
+  "taskRevision": "sha256:eae82316f041c9a84039b5d76e6af1960ad60d6ef50b363bb0550f9340aca1db",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md",
+      "lineStart": 16648,
+      "lineEnd": 16648,
+      "sourceRevision": "sha256:e68cd1c231ae6b856707e8a44be736582bf33138e0118da9f775768a7e0dcc2d"
+    },
+    {
+      "file": "scripts/agent/ace-assembler-recommendations.mjs",
+      "lineStart": 147,
+      "lineEnd": 147,
+      "sourceRevision": "sha256:56de36ade7c280e272112d26051f1aa99219cac33dbb8bb5ac723b961ee4ec97"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/prove-task-bound-symbol-span-v1.mjs",
+  "command": "node scripts/atlas/prove-task-bound-symbol-span-v1.mjs .tmp/atlas/live-langextract-grounding-goal-20261009.json",
+  "inputs": [
+    {
+      "kind": "source",
+      "uri": "scripts/agent/ace-assembler-recommendations.mjs",
+      "sourceRef": "scripts/agent/ace-assembler-recommendations.mjs#byte:4109-4115",
+      "checksum": "sha256:56de36ade7c280e272112d26051f1aa99219cac33dbb8bb5ac723b961ee4ec97"
+    },
+    {
+      "kind": "prior-observation",
+      "uri": ".tmp/atlas/live-langextract-grounding-goal-20261009.json",
+      "checksum": "sha256:d5491af832c9f654b0063dacab06b3d8ce0dfc23194153dff3119490c3c13f33"
+    }
+  ],
+  "observedAt": "2026-10-09T18:17:06.412Z",
+  "expectedAssertions": [
+    {
+      "id": "source-revision-current",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "sourceRevision equals the independently recomputed full-file SHA-256"
+    },
+    {
+      "id": "span-bytes-match",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "the recorded UTF-8 byte range resolves exactly to Valkey and matches the span checksum"
+    },
+    {
+      "id": "proposal-only",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "the source-grounded mention remains non-authoritative and no admission or writes occur"
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "source-revision-current",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "sourceRevision equals the independently recomputed full-file SHA-256",
+      "actual": "sourceRevision equals the independently recomputed full-file SHA-256",
+      "passed": true
+    },
+    {
+      "id": "span-bytes-match",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "the recorded UTF-8 byte range resolves exactly to Valkey and matches the span checksum",
+      "actual": "the recorded UTF-8 byte range resolves exactly to Valkey and matches the span checksum",
+      "passed": true
+    },
+    {
+      "id": "proposal-only",
+      "claimRef": "sha256:f5b2f27a7a9f6401ecfd7bbabf596a672a7dbdd3f647b57fe1210c6a2fd01dc1",
+      "expected": "the source-grounded mention remains non-authoritative and no admission or writes occur",
+      "actual": "the source-grounded mention remains non-authoritative and no admission or writes occur",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "source-span-readback",
+      "uri": "docs/reports/openspec-evidence/nlp-symbol-span-1791569826412-e5b004021949/symbol-span-readback-v1.json",
+      "checksum": "sha256:1cf5c0ed6b316b93135fc0005a60e957c2d311afa3e1f293d16b9902ec7a29f4"
+    }
+  ],
+  "verifier": "independent-source-byte-span-readback",
+  "independentVerifier": "prove-task-bound-symbol-span-v1",
+  "readbackRequired": false,
+  "readbackPerformed": true,
+  "verdict": "PROVEN",
+  "checksum": "sha256:69e14b4e4ab03749cdcdd72e7773f25aaf1a9b41ecdef318892fa32b381d123a"
+}

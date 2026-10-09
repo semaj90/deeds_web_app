@@ -12,7 +12,7 @@
  *   - Singleton session (shared across app)
  */
 
-import { CLIENT_E2B_MODEL_ID, CLIENT_E2B_DTYPE, CLIENT_E2B_DEVICE, CLIENT_E2B_MIN_GPU_MB } from '../model-ids.js';
+import { CLIENT_E2B_MODEL_ID, CLIENT_E2B_MODEL_REVISION, CLIENT_E2B_DTYPE, CLIENT_E2B_DEVICE, CLIENT_E2B_MIN_GPU_MB } from '../model-ids.js';
 
 // ══════════════════════════════════════════════════════════════
 // Types (mirrors Transformers.js v4 API)
@@ -216,6 +216,7 @@ async function loadE2bPipeline(): Promise<TextGenerationPipeline | null> {
 		const pipeline = await transformers.pipeline('text-generation', CLIENT_E2B_MODEL_ID, {
 			dtype: CLIENT_E2B_DTYPE, // Q4F16 quantization
 			device: CLIENT_E2B_DEVICE, // 'webgpu' (preferred) or 'wasm' (fallback)
+			revision: CLIENT_E2B_MODEL_REVISION,
 		});
 
 		console.info('[e2b-session] ✅ Gemma 4 E2B loaded successfully');

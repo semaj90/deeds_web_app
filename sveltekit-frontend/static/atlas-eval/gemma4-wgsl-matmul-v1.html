@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Atlas Eval — Gemma4 WGSL 2×2 MatMul Parity Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      background: #0f1117;
+      color: #e6edf3;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 1.4rem;
+      color: #58a6ff;
+      margin-bottom: 8px;
+    }
+    p {
+      color: #8b949e;
+      margin-top: 0;
+    }
+    button {
+      background: #238636;
+      color: white;
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    button:disabled {
+      background: #30363d;
+      color: #8b949e;
+      cursor: not-allowed;
+    }
+    pre {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin-top: 16px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .pass {
+      background: #1f6feb22;
+      color: #58a6ff;
+      border: 1px solid #388bfd66;
+    }
+    .fail {
+      background: #f8514922;
+      color: #f85149;
+      border: 1px solid #f8514966;
+    }
+  </style>
+</head>
+<body>
+  <h1>Atlas Evaluation: Gemma4 WGSL MatMul (2×2 CPU Oracle Parity)</h1>
+  <p>Tests basic WGSL shader compilation, buffer mapping, WebGPU execution, and CPU oracle parity.</p>
+
+  <button id="runBtn" onclick="runMatMulTest()">Run 2×2 WGSL matmul</button>
+
+  <pre id="output">Ready. Click the button above to execute.</pre>
+
+  <script>
+    const WGSL_SOURCE = /* wgsl */ `
+@group(0) @binding(0) var<storage, read> matrixA : array<f32>;
+@group(0) @binding(1) var<storage, read> matrixB : array<f32>;
+@group(0) @binding(2) var<storage, read_write> matrixC : array<f32>;
+
+@compute @workgroup_size(2, 2)
+fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+    let row = global_id.x;
+    let col = global_id.y;
+    if (row >= 2u || col >= 2u) {
+        return;
+    }
+    var sum : f32 = 0.0;
+    for (var k : u32 = 0u; k < 2u; k = k + 1u) {
+        let a = matrixA[row * 2u + k];
+        let b = matrixB[k * 2u + col];
+        sum = sum + a * b;
+    }
+    matrixC[row * 2u + col] = sum;
+}
+`;
+
+    async function computeSha256(text) {
+      const msgBuffer = new TextEncoder().encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function runMatMulTest() {
+      const out = document.getElementById('output');
+      const btn = document.getElementById('runBtn');
+      btn.disabled = true;
+      out.textContent = 'Initializing WebGPU adapter and device...';
+
+      const startTime = performance.now();
+
+      try {
+        if (!navigator.gpu) {
+          throw new Error('WebGPU is not supported in this browser (navigator.gpu is undefined).');
+        }
+
+        const adapter = await navigator.gpu.requestAdapter();
+        if (!adapter) {
+          throw new Error('Failed to obtain WebGPU adapter.');
+        }
+
+        const device = await adapter.requestDevice();
+        const adapterInfo = await (adapter.requestAdapterInfo ? adapter.requestAdapterInfo() : Promise.resolve({ vendor: 'unknown', architecture: 'unknown' }));
+
+        out.textContent = 'Compiling WGSL shader and uploading buffers...';
+
+        // CPU inputs and reference oracle
+        // Matrix A (2x2): [[1, 2], [3, 4]]
+        // Matrix B (2x2): [[5, 6], [7, 8]]
+        // Expected Matrix C:
+        // [1*5 + 2*7, 1*6 + 2*8] = [19, 22]
+        // [3*5 + 4*7, 3*6 + 4*8] = [43, 50]
+        const inputA = new Float32Array([1.0, 2.0, 3.0, 4.0]);
+        const inputB = new Float32Array([5.0, 6.0, 7.0, 8.0]);
+        const expectedCPU = [19.0, 22.0, 43.0, 50.0];
+
+        // Create GPU buffers
+        const gpuA = device.createBuffer({
+          size: inputA.byteLength,
+          usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        device.queue.writeBuffer(gpuA, 0, inputA);
+
+        const gpuB = device.createBuffer({
+          size: inputB.byteLength,
+          usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        });
+        device.queue.writeBuffer(gpuB, 0, inputB);
+
+        const gpuC = device.createBuffer({
+          size: 4 * Float32Array.BYTES_PER_ELEMENT,
+          usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+        });
+
+        const readbackBuffer = device.createBuffer({
+          size: 4 * Float32Array.BYTES_PER_ELEMENT,
+          usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+        });
+
+        // Pipeline and bind group
+        const shaderModule = device.createShaderModule({ code: WGSL_SOURCE });
+        const bindGroupLayout = device.createBindGroupLayout({
+          entries: [
+            { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+            { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+            { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } },
+          ],
+        });
+
+        const pipeline = device.createComputePipeline({
+          layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
+          compute: { module: shaderModule, entryPoint: 'main' },
+        });
+
+        const bindGroup = device.createBindGroup({
+          layout: bindGroupLayout,
+          entries: [
+            { binding: 0, resource: { buffer: gpuA } },
+            { binding: 1, resource: { buffer: gpuB } },
+            { binding: 2, resource: { buffer: gpuC } },
+          ],
+        });
+
+        // Encode and submit commands
+        const commandEncoder = device.createCommandEncoder();
+        const pass = commandEncoder.beginComputePass();
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bindGroup);
+        pass.dispatchWorkgroups(1, 1);
+        pass.end();
+
+        commandEncoder.copyBufferToBuffer(gpuC, 0, readbackBuffer, 0, 4 * Float32Array.BYTES_PER_ELEMENT);
+        device.queue.submit([commandEncoder.finish()]);
+
+        // Map and read back results
+        await readbackBuffer.mapAsync(GPUMapMode.READ);
+        const copyArray = new Float32Array(readbackBuffer.getMappedRange());
+        const actualResults = Array.from(copyArray);
+        readbackBuffer.unmap();
+
+        const durationMs = performance.now() - startTime;
+        const shaderChecksum = await computeSha256(WGSL_SOURCE.trim());
+
+        // Parity comparison against CPU oracle
+        let maxAbsError = 0.0;
+        for (let i = 0; i < 4; i++) {
+          const err = Math.abs(actualResults[i] - expectedCPU[i]);
+          if (err > maxAbsError) maxAbsError = err;
+        }
+
+        const isParityPass = maxAbsError <= 0.00001;
+        const status = isParityPass ? 'REAL_WEBGPU_CPU_PARITY' : 'NUMERICAL_ERROR_EXCEEDED';
+
+        const receipt = {
+          status,
+          cpuOracleResult: expectedCPU,
+          webGpuResult: actualResults,
+          maxAbsoluteError: maxAbsError,
+          parityPass: isParityPass,
+          durationMs: Number(durationMs.toFixed(2)),
+          shaderChecksum: `sha256:${shaderChecksum}`,
+          adapter: {
+            vendor: adapterInfo.vendor,
+            architecture: adapterInfo.architecture,
+            description: adapterInfo.description || 'standard',
+          },
+          timestamp: new Date().toISOString(),
+        };
+
+        out.textContent = JSON.stringify(receipt, null, 2);
+      } catch (err) {
+        out.textContent = JSON.stringify({
+          status: 'ERROR',
+          errorMessage: err.message || String(err),
+          timestamp: new Date().toISOString(),
+        }, null, 2);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

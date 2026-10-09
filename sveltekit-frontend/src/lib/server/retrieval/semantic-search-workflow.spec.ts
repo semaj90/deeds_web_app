@@ -118,6 +118,13 @@ describe('semantic search workflow', () => {
     );
 
     expect(result.workflowState).toBe('COMPLETE');
+    expect(result.contextManifestShadow).toMatchObject({
+      status: 'UNAVAILABLE',
+      reason: 'REVISION_QUALIFIED_FEATURE_SOURCE_PROVIDER_NOT_CONFIGURED',
+      writesPerformed: false,
+      canonicalAuthority: false,
+      rankingPromotion: false,
+    });
     expect(writeFileMock).toHaveBeenCalled();
     expect(memoryStore.size).toBeGreaterThan(0);
 

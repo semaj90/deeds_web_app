@@ -11,6 +11,7 @@ import { deriveTreeNodeOccurrenceId } from './lib/tree-node-occurrence-v1.mjs';
 import { isSha256SourceRevisionV1, sourceBytesMatchRevisionV1 } from './lib/source-byte-revision-v1.mjs';
 import { classifyAstPrefillDeclarationV1 } from './lib/ast-prefill-declaration-classification-v1.mjs';
 import { resolveAstGrepExtractorRevisionV1 } from './lib/ast-grep-extractor-revision-v1.mjs';
+import { ORF_AST_PREFILL_NODE_KIND_TO_SYMBOL_KIND_V1 } from './lib/orf-ast-kind-crosswalk-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const configPath = path.resolve(ROOT, process.argv.find((a) => a.startsWith('--config='))?.slice(9) ?? '.okf/pipelines/ast-entity-prefill.yaml');
@@ -119,12 +120,7 @@ function extract(text, file, packet) {
   const language = languageFor(file);
   if (!language) return [];
   const root = parse(language, text).root();
-  const kinds = new Map([
-    ['function_declaration', 'function'], ['generator_function_declaration', 'function'],
-    ['class_declaration', 'class'], ['method_definition', 'method'],
-    ['variable_declarator', 'variable'], ['interface_declaration', 'interface'],
-    ['type_alias_declaration', 'type'], ['enum_declaration', 'enum'],
-  ]);
+  const kinds = new Map(Object.entries(ORF_AST_PREFILL_NODE_KIND_TO_SYMBOL_KIND_V1));
   const rows = [];
   function visit(node) {
     const entityKind = kinds.get(node.kind());

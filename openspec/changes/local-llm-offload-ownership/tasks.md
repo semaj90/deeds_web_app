@@ -454,3 +454,108 @@ Evidence: live Docker inspect and `/health`; `torch.cuda` probe and `nvidia-smi`
 `legal-ai-image-synthesis`; source review of `docker-compose.yml` and
 `docker/image-synthesis/app.py`. No build, deployment, model inference, or datastore/cache write
 was performed during this recheck.
+
+## Gemma 4 browser-generation runtime comparison (2026-10-09)
+
+This is a generation/runtime evaluation track, separate from EmbeddingGemma `semantic_768`
+parity and promotion. The local Transformers.js ONNX export and LiteRT model artifacts are
+different representations; matching model family, parameter count, or output format does not
+establish equivalent prompt handling or generated results. Keep both as non-authoritative
+evaluation candidates. Do not install model/runtime dependencies, download model weights,
+start a GPU model, or change production routing as part of the scaffold.
+
+- [ ] **BROWSER-GEN-EVAL-01 — Freeze exact artifact identity and footprint.** Record the local
+      ONNX model plus external weight-file checksums/combined bytes, tokenizer and processor
+      revisions, remote Transformers.js repository revision, LiteRT artifact variant/revision,
+      and runtime versions. Distinguish disk/download bytes from peak RAM/VRAM. Recompute sizes
+      from the selected files; do not treat an approximate model-card footprint or one `.onnx`
+      graph file as the complete browser download. Validate that the ONNX graph's external-data
+      references resolve to the inventoried files and match declared offsets/lengths before
+      considering the artifact loadable; a file inventory alone is not graph validation.
+      **Local inventory progress (2026-10-09):** added the offline root runner and deterministic
+      inventory helper. It hashed all 16 files in the local ONNX directory: `3,131,212,061`
+      bytes (`2,986.16 MiB`, `2.916 GiB`), inventory SHA-256
+      `48f3ba91f05c08419397997c004da48c3a2534d9ed5a30a6c60b2946cb008d5f`. Readback is at
+      `.tmp/atlas/gemma4-browser-artifact-inventory-v1.json`. The current Hugging Face model
+      revision is `7c6d3d1d4092253ea241428e88312ab34bfa9c26`; all Gemma 4 Transformers.js load
+      calls now pass that immutable revision. A metadata-only Hub API read confirmed both local
+      modular Q4F16 graph/weight pairs and `tokenizer.json` match remote byte sizes and available
+      SHA-256 values at that commit. The local `tokenizer_config.json` is 18,807 bytes versus
+      19,795 bytes remotely, `chat_template.jinja` is absent locally, and the root graph remains
+      an orphaned legacy artifact. The app loads the remote model ID, not this local directory.
+      The app's LiteRT artifact revision remains `UNPINNED`; this gate stays open.
+      **External-data preflight:** `py -3.13 scripts/atlas/verify-gemma4-browser-onnx-artifact-v1.py`
+      rejected the directory as a whole: root `model.onnx` references missing
+      `decoder_model_merged_q4.onnx_data` (required end byte `1,864,102,912`), while the two
+      modular Q4F16 graphs each have their complete external-data ranges present. The small
+      verifier tests pass 4/4; report `.tmp/atlas/gemma4-browser-onnx-artifact-preflight-v1.json`
+      has SHA-256 `4395d7d5d6b0e904627aace90b6156673246f09743a270895f4325f36b78bd44`. This local
+      preflight covers local files only and does not establish execution-provider compatibility.
+- [ ] **BROWSER-GEN-EVAL-02 — Resolve the actual LiteRT execution surface.** Trace the current
+      `:8070` sidecar route and determine whether the intended comparison is browser-local
+      LiteRT JavaScript/WASM/WebGPU or the existing local HTTP sidecar. Capture health/model
+      identity readback and fail as `UNAVAILABLE` when the executor is absent. Do not add a
+      second runtime or assume the existing sidecar is browser inference. Establish an explicit
+      admission policy that runs before remote model fetching or GPU/session initialization;
+      unadmitted or offline-only requests must reject without network access or allocation.
+- [ ] **BROWSER-GEN-EVAL-03 — Define a shared, versioned prompt corpus.** Include short and
+      long inputs, instruction-following, structured extraction, grounded summarization, and
+      refusal/boundary cases. Freeze rendered chat template, tokenizer/processor revisions,
+      truncation, sampling settings, stop tokens, and output schema. Use the same logical inputs
+      in both runtimes and retain prompt and fixture checksums.
+- [ ] **BROWSER-GEN-EVAL-04 — Add a no-model-load contract harness.** Adapt the existing
+      Transformers.js browser-generation owner and the verified LiteRT adapter behind a
+      test-only interface. Unit tests must cover identical fixture delivery, model/runtime
+      identity capture, unavailable-runtime behavior, bounded outputs, timeout handling, and
+      result receipt checksums using injected fakes. Reuse the existing ONNX `token-sampling.ts`
+      owner for pure deterministic greedy selection tests; do not create another sampler. Tests
+      must not fetch weights or initialize WebGPU, WASM, or a sidecar.
+- [ ] **BROWSER-GEN-EVAL-05 — Run paired runtime quality/performance evaluation.** Only after
+      both exact artifacts and executors are available, run the frozen corpus in an isolated
+      browser profile. Record per-runtime output, task-level rubric results, schema validity,
+      first-token/total latency, peak browser memory and GPU memory where measurable, errors,
+      and repeatability. Report differences; do not claim bitwise generation parity where
+      sampling or kernels are nondeterministic.
+- [ ] **BROWSER-GEN-EVAL-06 — Keep routing and promotion gated.** Publish an independently
+      readable, checksum-bound comparison receipt with `canonicalAuthority:false` and
+      `writesPerformed:false`. No runtime becomes the default, no summary is persisted, and no
+      browser cache is promoted until an explicit reviewed decision. Keep this generation
+      comparison independent from EmbeddingGemma vector-space or retrieval parity.
+- [ ] **BROWSER-GEN-EVAL-07 — Add browser GPU capability preflight.** Read adapter presence,
+      required features and limits without allocating model buffers. Return typed `SUPPORTED`,
+      `UNSUPPORTED`, or `UNAVAILABLE` results; never infer free VRAM from WebGPU limits or start
+      model loading as part of preflight.
+
+**Initial evidence (local source/artifact audit, 2026-10-09):** the local
+`sveltekit-frontend/static/gemma4_e2b_onnx` directory totals about 2.92 GiB including external
+ONNX weight data. The existing client uses Transformers.js/WebGPU; a separate LiteRT `:8070`
+health probe was unavailable, and no paired model inference or comparison harness was found.
+These observations are not a remote-download size guarantee or runtime parity proof. No weights
+were downloaded and no model was loaded for this audit.
+
+**Sampler progress (2026-10-09):** the existing ONNX sampler is runtime-import-free and now
+exports a deterministic greedy helper with first-index tie breaking, accepts negative infinity
+as a masked logit, and rejects empty, NaN, positive-infinity, and all-masked vocabularies. Seven
+direct TypeScript assertions pass. The focused Vitest suite passes 6/6 with the single-thread
+pool; default and single-fork runs stalled before collection in this environment. This sampler
+is a reusable pure helper, not Gemma 4 runtime parity evidence.
+
+**Admission-policy progress (2026-10-09):** added a pure fail-closed evaluation decision to the
+existing browser model policy; focused policy tests pass 7/7 with the single-thread pool. It
+requires explicit approval, a SHA-256 artifact revision, a local source, and remote loading
+disabled. This contract is not yet called by `gemma4-e2b-client.ts` before its Transformers.js
+loads, so production fetch/session enforcement remains open and no offline-safety claim is made.
+
+**Artifact preflight implementation (2026-10-09):** added a read-only ONNX external-data
+verifier and standard-library unittest coverage for valid ranges, missing files, out-of-bounds
+ranges, and path traversal. `onnx==1.19.0` was already available; nothing was installed. The
+local root graph failure is retained as `REJECTED`, not patched or silently substituted with the
+modular graphs. No model inference or weight-store changes occurred.
+
+**Browser GPU capability preflight (2026-10-09):** added a pure injected-provider check under
+`sveltekit-frontend/src/lib/ai/browser-gpu-preflight.ts`. It reports adapter absence/query
+failure separately from unsupported features or limits, returns deterministic capability
+evidence, and never requests a GPU device or allocates model buffers. The focused browser GPU,
+model-policy, and pure sampler suites pass 17/17. This is capability preflight only: no WebGPU
+adapter was queried in a live browser, no model was loaded, and the BROWSER-GEN-EVAL-07 live
+runtime gate remains open.

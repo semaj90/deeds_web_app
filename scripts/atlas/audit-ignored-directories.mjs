@@ -25,9 +25,18 @@ const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
 const FRONTEND_ROOT = path.join(ROOT, 'sveltekit-frontend');
 
-const REPORT_JSON = path.join(ROOT, 'docs', 'reports', 'ignored-directory-audit.json');
-const REPORT_MD = path.join(ROOT, 'docs', 'reports', 'ignored-directory-audit.md');
-const TASKS_JSONL = path.join(FRONTEND_ROOT, '.tmp', 'hidden_directory_tasks.jsonl');
+function argumentValue(name, fallback) {
+  const argument = process.argv.find((value) => value.startsWith(`${name}=`));
+  return argument ? argument.slice(name.length + 1) : fallback;
+}
+
+const applyMode = argumentValue('--apply', 'false');
+if (applyMode !== 'false') throw new Error('APPLY_MODE_UNSUPPORTED_READ_ONLY_AUDIT');
+
+const OUTPUT_DIR = path.resolve(argumentValue('--output-dir', path.join(ROOT, 'docs', 'reports')));
+const REPORT_JSON = path.join(OUTPUT_DIR, 'ignored-directory-audit.json');
+const REPORT_MD = path.join(OUTPUT_DIR, 'ignored-directory-audit.md');
+const TASKS_JSONL = path.resolve(argumentValue('--tasks-output', path.join(FRONTEND_ROOT, '.tmp', 'hidden_directory_tasks.jsonl')));
 
 const TEXT_EXTENSIONS = new Set(['.md', '.txt', '.json', '.log', '.jsonl', '.ndjson']);
 const RG_EXCLUDES = [
@@ -61,6 +70,7 @@ const FOCUS_SEGMENTS = [
 const GENERATED_CACHE_PREFIXES = [
   '.opencode/cards',
   '.opencode/embeddings',
+  '.tmp',
 ];
 
 const STALE_MARKERS = [
@@ -368,7 +378,7 @@ function main() {
     ...directorySummaries.map((directory) => [
       `- ${directory.directory_path}`,
       `  - hidden: ${directory.hiddenDirectory ? 'yes' : 'no'}`,
-      `  - generated cache: ${isGeneratedCacheSurface(directory.directory_path) ? 'yes' : 'no'}`,
+      `  - generated or scratch surface: ${isGeneratedCacheSurface(directory.directory_path) ? 'yes' : 'no'}`,
       `  - files: ${directory.file_count}`,
       `  - stale files: ${directory.stale_file_count}`,
       `  - missing-todo hits: ${directory.missing_todo_hits}`,

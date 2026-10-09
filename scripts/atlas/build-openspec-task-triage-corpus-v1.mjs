@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { buildTaskTriageCorpusV1 } from './lib/openspec-report-manifest-v1.mjs';
 import { loadTaskCardCorpusV1 } from './lib/openspec-task-card-v1.mjs';
+import { writeTaskTriageShardsV1 } from './lib/openspec-task-triage-shards-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const taskCardsPath = resolve(root, 'docs/reports/openspec-task-cards-v1.json');
@@ -69,7 +70,38 @@ function main() {
   const corpus = buildTaskTriageCorpusV1({ taskCardCorpus, reportManifestCorpus, workspaceHead: head, reviewedSupersessionLinks });
   const serialized = `${JSON.stringify(corpus)}\n`;
   const reportBytes = Buffer.byteLength(serialized);
-  if (reportBytes >= reportLimitBytes) throw new Error(`TRIAGE_CORPUS_OVER_LIMIT:${reportBytes}`);
+  if (reportBytes >= reportLimitBytes) {
+    const outputPath = repoPath(args.output ?? relative(root, defaultOutput));
+    if (args.checkOnly) {
+      process.stdout.write(`${JSON.stringify({
+        status: 'TRIAGE_SHARDING_REQUIRED',
+        taskCount: corpus.summary.taskCount,
+        reportBytes,
+        shardTargetBytes: 2_000_000,
+        writesPerformed: false,
+        outputArtifactWritten: false,
+      }, null, 2)}\n`);
+      return;
+    }
+    if (getHead() !== head) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_TRIAGE_BUILD');
+    verifyTaskFileHashes(taskCardCorpus.source?.taskFileHashes);
+    const shardResult = writeTaskTriageShardsV1(corpus, outputPath);
+    if (getHead() !== head) throw new Error('WORKSPACE_HEAD_CHANGED_DURING_TRIAGE_READBACK');
+    verifyTaskFileHashes(taskCardCorpus.source?.taskFileHashes);
+    process.stdout.write(`${JSON.stringify({
+      status: 'TRIAGE_CORPUS_SHARDS_READBACK_PROVEN',
+      taskCount: corpus.summary.taskCount,
+      reportBytes,
+      shardCount: shardResult.shardCount,
+      manifestBytes: shardResult.manifestBytes,
+      checksum: shardResult.checksum,
+      rowsChecksum: shardResult.rowsChecksum,
+      writesPerformed: false,
+      outputArtifactWritten: true,
+      outputPath: args.output ?? relative(root, defaultOutput),
+    }, null, 2)}\n`);
+    return;
+  }
   if (!args.checkOnly) {
     const output = repoPath(args.output ?? relative(root, defaultOutput));
     mkdirSync(dirname(output), { recursive: true });

@@ -4,7 +4,12 @@ import {
   ORF_AST_FEATURE_DEFINITION_PROPOSAL_V1 as definitions,
   buildOrfAstFeatureRegistryProposalEnvelopeV1,
 } from './orf-ast-feature-definition-proposal-v1.mjs';
-import { mapAstGrepDeclarationToOrfKindV1 } from './orf-ast-kind-crosswalk-v1.mjs';
+import {
+  mapAstGrepDeclarationToOrfKindV1,
+  ORF_AST_KIND_CROSSWALK_V1,
+  ORF_AST_PREFILL_NODE_KIND_TO_SYMBOL_KIND_V1,
+  ORF_AST_PREFILL_UNMAPPED_NODE_KINDS_V1,
+} from './orf-ast-kind-crosswalk-v1.mjs';
 
 test('proposes exactly the five census AST kinds with explicit mappings', () => {
   const outputs = new Set(definitions.map((definition) => definition.feature_id.slice('ast.'.length).toUpperCase()));
@@ -15,10 +20,22 @@ test('proposes exactly the five census AST kinds with explicit mappings', () => 
       assert.ok(!['class', 'function', 'interface', 'type', 'variable', 'constant', 'method'].includes(producerKind));
     }
   }
-  assert.equal(definitions.find((definition) => definition.feature_id === 'ast.function_decl').producer_mapping.join(','), 'function_declaration,method_definition');
+  assert.equal(definitions.find((definition) => definition.feature_id === 'ast.function_decl').producer_mapping.join(','), 'function_declaration,generator_function_declaration,method_definition');
   assert.equal(definitions.find((definition) => definition.feature_id === 'ast.variable_decl').producer_mapping.join(','), 'variable_declarator');
   assert.deepEqual(definitions.find((definition) => definition.feature_id === 'ast.variable_decl').symbol_kind_hints, ['variable']);
   assert.match(definitions.find((definition) => definition.feature_id === 'ast.variable_decl').description, /variable binding/);
+});
+
+test('root prefill node vocabulary is completely mapped or explicitly fail-closed', () => {
+  const mappedKinds = new Set(definitions.flatMap((definition) => definition.producer_mapping));
+  const unmappedKinds = new Set(ORF_AST_PREFILL_UNMAPPED_NODE_KINDS_V1);
+  const rootKinds = Object.keys(ORF_AST_PREFILL_NODE_KIND_TO_SYMBOL_KIND_V1);
+  for (const nodeKind of rootKinds) {
+    assert.equal(mappedKinds.has(nodeKind) || unmappedKinds.has(nodeKind), true, `unclassified root AST kind: ${nodeKind}`);
+    if (mappedKinds.has(nodeKind)) assert.ok(ORF_AST_KIND_CROSSWALK_V1[nodeKind], `missing feature mapping: ${nodeKind}`);
+    if (unmappedKinds.has(nodeKind)) assert.equal(ORF_AST_KIND_CROSSWALK_V1[nodeKind], undefined);
+  }
+  for (const nodeKind of mappedKinds) assert.ok(rootKinds.includes(nodeKind), `proposal kind not emitted by root prefill: ${nodeKind}`);
 });
 
 test('proposal cannot be consumed as an approved runtime registry', () => {

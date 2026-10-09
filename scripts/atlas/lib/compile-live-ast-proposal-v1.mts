@@ -5,13 +5,20 @@ import {
   compileObservationFeatures,
   observationFeatureChecksum,
 } from '../../../packages/parent-atlas/src/core/observation-feature-compiler.ts';
-import { ORF_AST_FEATURE_DEFINITION_PROPOSAL_V1 } from './orf-ast-feature-definition-proposal-v1.mjs';
+import {
+  buildOrfAstFeatureRegistryProposalEnvelopeV1,
+  ORF_AST_FEATURE_DEFINITION_PROPOSAL_V1,
+} from './orf-ast-feature-definition-proposal-v1.mjs';
 
 function sha256Json(value: unknown): string {
   return createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex');
 }
 
-export function compileLiveAstObservationProposalV1(proof: Record<string, any>, rootObservation?: Record<string, any>) {
+export function compileLiveAstObservationProposalV1(
+  proof: Record<string, any>,
+  rootObservation: Record<string, any> | undefined,
+  registryProposal: Record<string, any> | undefined,
+) {
   const { checksum, ...payload } = proof;
   if (proof.schema !== 'atlas.live-packet-symbol-ast-observation-proof.v1'
     || proof.status !== 'READ_ONLY_SOURCE_AND_AST_OBSERVATION_MATCH'
@@ -50,6 +57,10 @@ export function compileLiveAstObservationProposalV1(proof: Record<string, any>, 
   }));
   const registryRevision = `proposal:sha256:${observationFeatureChecksum(definitions)}`;
   const registry = buildObservationFeatureRegistry({ registryRevision, definitions });
+  const expectedRegistryProposal = buildOrfAstFeatureRegistryProposalEnvelopeV1(registry);
+  if (!registryProposal || !isDeepStrictEqual(registryProposal, expectedRegistryProposal)) {
+    throw new Error('ORF_REGISTRY_PROPOSAL_ARTIFACT_MISMATCH');
+  }
   const row = compileObservationFeatures({
     candidateId: binding.packetKey,
     rowOrdinal: 0,
@@ -80,6 +91,8 @@ export function compileLiveAstObservationProposalV1(proof: Record<string, any>, 
     rootObservationChecksum: rootObservation ? sha256Json(rootObservation) : null,
     featureRegistryRevision: registry.registry_revision,
     featureRegistryChecksum: registry.registry_checksum,
+    featureRegistryProposalRevision: registryProposal.proposal_revision,
+    featureRegistryProposalChecksum: registryProposal.proposal_checksum,
     featureIds: row.ast_features.map((feature) => feature.feature_id),
     featureOrdinals: row.ast_features.map((feature) => feature.feature_ordinal),
     observationRefs: row.observation_refs,

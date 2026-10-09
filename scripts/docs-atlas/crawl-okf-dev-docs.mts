@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { mergeOkfDevCorpusRowsV1, summarizeOkfDevCorpusRowsV1 } from './lib/okf-dev-corpus-merge-v1.mjs';
 import { recoverOkfDevPartialPageV1 } from './lib/okf-dev-partial-page-recovery-v1.mjs';
 import { publishOkfDevCorpusGenerationV1, resolveOkfDevPublishedCorpusV1, writeOkfCrawlFailureReceiptV1 } from './lib/okf-dev-publication-v1.mjs';
+import { normalizeOkfDevSourceManifestV1, orderOkfDevFetchersV1 } from './lib/okf-dev-source-manifest-adapter-v1.mjs';
 
 type ManifestSource = {
   source_id: string;
@@ -18,6 +19,9 @@ type ManifestSource = {
   domain_class: string;
   focus_tags: string[];
   pages: string[];
+  source_revision?: string;
+  preferred_fetcher?: string;
+  source_metadata?: Record<string, unknown>;
 };
 
 const OkfDevDomainClassEnum = z.enum([
@@ -295,6 +299,7 @@ async function main() {
   }
   const manifestBytes = await readFile(MANIFEST_PATH);
   const manifest = JSON.parse(manifestBytes.toString('utf8')) as { sources: ManifestSource[] };
+  manifest.sources = normalizeOkfDevSourceManifestV1(manifest);
   const selectedSources = sourceIdFilter
     ? manifest.sources.filter((source) => source.source_id === sourceIdFilter)
     : manifest.sources;
@@ -392,10 +397,20 @@ async function main() {
           return null;
         }
       };
-      const fetched =
-        (await attemptFetch('firecrawl', () => fetchWithFirecrawl(url))) ??
-        (await attemptFetch('beautifulsoup', () => fetchWithBeautifulSoup(url))) ??
-        (await attemptFetch('fallback', () => fetchWithFallback(url)));
+      const fetchOperations: Record<string, () => Promise<{ title: string; markdown: string; raw?: Record<string, unknown> } | null>> = {
+        FIRECRAWL: () => fetchWithFirecrawl(url),
+        BEAUTIFULSOUP_HTTP: () => fetchWithBeautifulSoup(url),
+        HTTP_FALLBACK: () => fetchWithFallback(url),
+      };
+      let fetched: { title: string; markdown: string; raw?: Record<string, unknown> } | null = null;
+      let fetchedVia: string | null = null;
+      for (const fetcher of orderOkfDevFetchersV1(source.preferred_fetcher)) {
+        fetched = await attemptFetch(fetcher.toLowerCase(), fetchOperations[fetcher]);
+        if (fetched) {
+          fetchedVia = fetcher.toLowerCase();
+          break;
+        }
+      }
       if (!fetched) {
         crawlRunState.failedItems.push({ source_id: source.source_id, url, category: 'FETCH_ALL_EXECUTORS_FAILED', attempts: fetchAttempts });
         throw new Error(`FETCH_ALL_EXECUTORS_FAILED:${source.source_id}:${url}`);
@@ -443,7 +458,10 @@ async function main() {
           kind: source.kind,
           source_id: source.source_id,
           source_title: source.title,
-          fetched_via: fetched.raw?.source ?? (process.env.FIRECRAWL_API_KEY ? 'firecrawl' : 'fallback'),
+          source_revision: source.source_revision ?? null,
+          source_manifest: source.source_metadata ?? null,
+          preferred_fetcher: source.preferred_fetcher ?? null,
+          fetched_via: fetched.raw?.source ?? fetchedVia,
           domain_classification: 'MANIFEST_SOURCE_HINT_UNREVIEWED',
           detected_domain_hint: classifyDomain(source.source_id, fetched.title, markdown),
           synthesis_status: 'NOT_RUN',

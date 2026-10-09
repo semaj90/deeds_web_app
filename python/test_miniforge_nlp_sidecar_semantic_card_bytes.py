@@ -373,7 +373,7 @@ def test_grounded_extraction_receipt_distinguishes_completed_empty_from_not_atte
     monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
     monkeypatch.setattr(sidecar, "langextract", SimpleNamespace(extract=lambda *args, **kwargs: SimpleNamespace(extractions=[])))
     monkeypatch.setattr(sidecar, "_ensure_grounded_provider_controls", lambda: None)
-    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda: {})
+    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda *_args: {})
     receipt = {}
 
     result = sidecar._grounded_extractions("no concepts", execution_receipt=receipt)
@@ -396,7 +396,7 @@ def test_grounded_extraction_receipt_retains_rejected_span_diagnostic(monkeypatc
     monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
     monkeypatch.setattr(sidecar, "langextract", SimpleNamespace(extract=lambda *args, **kwargs: SimpleNamespace(extractions=[item])))
     monkeypatch.setattr(sidecar, "_ensure_grounded_provider_controls", lambda: None)
-    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda: {})
+    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda *_args: {})
     receipt = {}
     diagnostics = []
 
@@ -410,3 +410,48 @@ def test_grounded_extraction_receipt_retains_rejected_span_diagnostic(monkeypatc
     assert receipt["state"] == "REJECTED_SPAN_MISMATCH"
     assert diagnostics[0]["classification"] == "CRLF_NORMALIZATION"
     assert diagnostics[0]["extractionText"] == "y"
+
+
+def test_grounded_relationship_mode_requires_exact_typed_relation_attributes(monkeypatch):
+    text = "This service stores vectors in PostgreSQL."
+    attributes = {
+        "subject": "This service",
+        "predicate": "stores",
+        "object": "vectors in PostgreSQL",
+    }
+    item = SimpleNamespace(
+        extraction_class="RELATION",
+        extraction_text=text,
+        start_char=0,
+        end_char=len(text),
+        alignment_status="match_exact",
+        attributes=attributes,
+    )
+    captured = {}
+
+    def fake_extract(*_args, **kwargs):
+        captured.update(kwargs)
+        return SimpleNamespace(extractions=[item])
+
+    monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
+    monkeypatch.setattr(sidecar, "langextract", SimpleNamespace(extract=fake_extract))
+    monkeypatch.setattr(sidecar, "_ensure_grounded_provider_controls", lambda: None)
+    monkeypatch.setattr(sidecar, "_set_grounded_extraction_context", lambda *_args: None)
+    monkeypatch.setattr(sidecar, "_clear_grounded_extraction_context", lambda: None)
+    monkeypatch.setattr(sidecar, "_grounded_output_schema", lambda mode: {"mode": mode})
+    diagnostics = []
+    receipt = {}
+
+    result = sidecar._grounded_extractions(
+        text,
+        extraction_mode="relationships",
+        span_diagnostics=diagnostics,
+        execution_receipt=receipt,
+    )
+
+    assert len(result) == 1
+    assert result[0]["attributes"] == attributes
+    assert "binary relationships" in captured["prompt_description"]
+    assert receipt["extractionMode"] == "relationships"
+    assert receipt["state"] == "COMPLETED_GROUNDED"
+    assert diagnostics == []

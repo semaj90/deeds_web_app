@@ -1,0 +1,24 @@
+{
+  "schema": "atlas.task-bound-symbol-span-readback.v1",
+  "status": "SOURCE_SPAN_READBACK_MATCH",
+  "sourceRef": "scripts/agent/ace-assembler-recommendations.mjs",
+  "sourceRevision": "sha256:56de36ade7c280e272112d26051f1aa99219cac33dbb8bb5ac723b961ee4ec97",
+  "sourceByteLength": 5034,
+  "packetKey": "ace:packet:3d01c1df26b3",
+  "symbolVersionId": "symbol-version:c066120a5abcdd24335815bb3695adcdd611a58b21374ecbda575511395ce5d4",
+  "span": {
+    "startByte": 4109,
+    "endByte": 4115,
+    "text": "Valkey",
+    "checksum": "sha256:2392ad6b339f5133a727fb4f6b99824b403fdc453a059073ec710beebbd2d9cf"
+  },
+  "extractorRevision": "parent-atlas-nlp-sidecar:analysis-v1|ast-grep=0.45.3|tree-sitter=0.9.0|chunker=4.0.0",
+  "extractionResponseChecksum": "sha256:839aedd0e0a70ae1dffbab18328868156dda819aa36dc6ea30e7244baadf8995",
+  "priorReceiptChecksum": "sha256:d5491af832c9f654b0063dacab06b3d8ce0dfc23194153dff3119490c3c13f33",
+  "historicalExtractorWorkspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "currentTaskCensusWorkspaceRevision": "NOT_BOUND_BY_THIS_SPAN_PROOF",
+  "semanticFactAdmission": "NOT_PERFORMED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "generatedAt": "2026-10-09T18:22:18.494Z"
+}

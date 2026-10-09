@@ -37,8 +37,13 @@ import readline from 'readline';
 // CONFIGURATION
 // ============================================================================
 
-const OUTPUT_DIR = 'memory/reports';
-const EXPORT_DIR = 'memory/exports';
+function argumentValue(name, fallback) {
+  const argument = process.argv.find(value => value.startsWith(`${name}=`));
+  return argument ? argument.slice(name.length + 1) : fallback;
+}
+
+const OUTPUT_DIR = path.resolve(argumentValue('--output-dir', 'memory/reports'));
+const EXPORT_DIR = path.resolve(argumentValue('--export-dir', 'memory/exports'));
 const VERBOSE = process.argv.includes('--verbose');
 
 // Directory patterns → sourceRef mapping
@@ -256,9 +261,9 @@ async function main() {
   Collections: ${new Set(sorted.map(d => d.qdrant_collection)).size}
 
 📂 Outputs:
-  - memory/reports/directory-source-map.json
-  - memory/reports/directory-source-map.md
-  - memory/exports/directory-source-map.jsonl
+  - ${path.join(OUTPUT_DIR, 'directory-source-map.json')}
+  - ${path.join(OUTPUT_DIR, 'directory-source-map.md')}
+  - ${path.join(EXPORT_DIR, 'directory-source-map.jsonl')}
 
 🎯 Next Step:
   node scripts/atlas/verify-feature-lineage.mjs

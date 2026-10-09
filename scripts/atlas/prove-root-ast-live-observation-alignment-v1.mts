@@ -36,15 +36,17 @@ const proofPath = resolveScratchPath('proof');
 const observationsPath = resolveScratchPath('observations');
 const bridgeReceiptPath = resolveScratchPath('bridge-receipt');
 const outputPath = resolveScratchPath('output');
+const registryProposalPath = path.join(ROOT, 'docs/.okf/registries/orf-ast-feature-registry-proposal-v1.json');
 if (new Set([proofPath, observationsPath, bridgeReceiptPath, outputPath]).size !== 4) {
   throw new Error('INPUT_OUTPUT_PATHS_MUST_BE_DISTINCT');
 }
 
-const [proofBytes, observationBytes, bridgeReceiptBytes] = await Promise.all([
-  readFile(proofPath), readFile(observationsPath), readFile(bridgeReceiptPath),
+const [proofBytes, observationBytes, bridgeReceiptBytes, registryProposalBytes] = await Promise.all([
+  readFile(proofPath), readFile(observationsPath), readFile(bridgeReceiptPath), readFile(registryProposalPath),
 ]);
 const proof = JSON.parse(proofBytes.toString('utf8')) as Record<string, any>;
 const bridgeReceipt = JSON.parse(bridgeReceiptBytes.toString('utf8')) as Record<string, any>;
+const registryProposal = JSON.parse(registryProposalBytes.toString('utf8')) as Record<string, any>;
 const observations = observationBytes.toString('utf8').trim().split(/\r?\n/).filter(Boolean).map((line) => JSON.parse(line));
 const binding = proof.exactBinding;
 const { checksum: proofChecksum, ...proofPayload } = proof;
@@ -82,7 +84,7 @@ if (sourceSpanChecksum !== binding.spanChecksum
 
 const { row: exactObservationRow, identityBindingMode } = selectRootAstObservationBoundByLiveSymbolProofV1(proof, observations);
 
-const compiled = compileLiveAstObservationProposalV1(proof, exactObservationRow.observation);
+const compiled = compileLiveAstObservationProposalV1(proof, exactObservationRow.observation, registryProposal);
 const payload = {
   schema: 'atlas.root-ast-live-observation-alignment-proof.v1',
   status: 'ROOT_OBSERVATION_AND_LIVE_SYMBOL_PROOF_EXACT_MATCH',
@@ -100,6 +102,12 @@ const payload = {
   extractorRevision: binding.astObservation.extractor_revision,
   observationId: binding.astObservation.observation_id,
   rootObservationChecksum: canonicalJsonChecksum(exactObservationRow.observation),
+  registryProposalPath: path.relative(ROOT, registryProposalPath).replaceAll('\\', '/'),
+  registryProposalArtifactSha256: sha256(registryProposalBytes),
+  featureRegistryRevision: compiled.featureRegistryRevision,
+  featureRegistryChecksum: compiled.featureRegistryChecksum,
+  featureRegistryProposalRevision: compiled.featureRegistryProposalRevision,
+  featureRegistryProposalChecksum: compiled.featureRegistryProposalChecksum,
   compiledFeatureRowChecksum: compiled.compiledFeatureRowChecksum,
   compiledFeatureRowProposal: compiled.compiledFeatureRowProposal,
   compiledStatus: compiled.featureRowStatus,
@@ -122,6 +130,10 @@ console.log(JSON.stringify({
   unselectedCandidateSpanMismatchCount: readback.unselectedCandidateSpanMismatchCount,
   extractorRevision: readback.extractorRevision,
   observationId: readback.observationId,
+  featureRegistryRevision: readback.featureRegistryRevision,
+  featureRegistryChecksum: readback.featureRegistryChecksum,
+  featureRegistryProposalRevision: readback.featureRegistryProposalRevision,
+  featureRegistryProposalChecksum: readback.featureRegistryProposalChecksum,
   compiledFeatureRowChecksum: readback.compiledFeatureRowChecksum,
   registryApproval: readback.registryApproval,
   readback: 'MATCH',

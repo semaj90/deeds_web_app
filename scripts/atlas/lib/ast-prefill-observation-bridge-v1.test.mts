@@ -51,6 +51,30 @@ test('bridges exact UTF-8 source spans through the canonical observation adapter
   assert.equal(result.row.workspaceRevision, 'workspace:fixture-1');
 });
 
+test('maps generator function declarations to the reviewed function feature proposal', async () => {
+  const generatorBytes = Buffer.from('export function* stream() { yield 1; }', 'utf8');
+  const start = generatorBytes.indexOf(Buffer.from('export function* stream'));
+  const end = generatorBytes.length;
+  const projected = await projectAstPrefillRowToObservationV1({
+    row: row({
+      source_ref: 'src/generator.ts',
+      source_revision: sourceByteRevisionV1(generatorBytes),
+      start_byte: start,
+      end_byte: end,
+      name: 'stream',
+      symbol_kind: 'function',
+      ast_kind: 'generator_function_declaration',
+    }),
+    repoRoot,
+    readBytes: async () => generatorBytes,
+  });
+  assert.ok('row' in projected);
+  assert.equal(projected.row.observation.observation_kind, 'FUNCTION_DECL');
+  assert.equal(projected.row.observation.byte_start, start);
+  assert.equal(projected.row.observation.byte_end, end);
+  assert.equal(projected.row.admissionStatus, 'PROPOSAL_ONLY');
+});
+
 test('rejects stale source bytes and does not substitute another revision', async () => {
   const result = await projectAstPrefillRowToObservationV1({
     row: row({ source_revision: `sha256:${'0'.repeat(64)}` }),

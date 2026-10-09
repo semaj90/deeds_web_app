@@ -1,0 +1,123 @@
+{
+  "schema": "atlas.evidence-receipt.v1",
+  "evidenceId": "receipt:parent-atlas-compute-rank-cache-eval-dspy-gepa:ACE-ASSEMBLER-BEHAVIOR-01:1791572465347-b3f95c01ee66",
+  "evidenceType": "EXECUTION",
+  "changeId": "parent-atlas-compute-rank-cache-eval-dspy-gepa",
+  "taskId": "ACE-ASSEMBLER-BEHAVIOR-01",
+  "canonicalTaskKey": "openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+  "taskRef": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md#L3",
+  "claim": "**ACE-ASSEMBLER-BEHAVIOR-01:** Prove `ACEAssemblerRecommendations.rankCandidates()` sorts by descending score, enforces `maxCandidates`, and that `assembleContext()` contains only the selected top-K candidates, using the canonical task/source/workspace revisions and an independently read-back execution receipt.",
+  "gitCommit": null,
+  "workspaceRevision": "sha256:b3f95c01ee6621db02c6b32235e6f4b2fe611b491906e8b380afb39ce139f21b",
+  "sourceRevision": "sha256:b9008746df8d50d1d0f60acc7e2ec3672ecd0a70758dbe992708ed6e571458b8",
+  "taskRevision": "sha256:f14a00fcbcfa5092e5e5e086d0496cd060dd7dfc0bd05fcc0ad76ff63d2d7fd4",
+  "sourceRefs": [
+    {
+      "file": "openspec/changes/parent-atlas-compute-rank-cache-eval-dspy-gepa/tasks.md",
+      "lineStart": 3,
+      "lineEnd": 3,
+      "sourceRevision": "sha256:b9008746df8d50d1d0f60acc7e2ec3672ecd0a70758dbe992708ed6e571458b8"
+    },
+    {
+      "file": "scripts/agent/ace-assembler-recommendations.mjs",
+      "lineStart": 42,
+      "lineEnd": 42,
+      "sourceRevision": "sha256:56de36ade7c280e272112d26051f1aa99219cac33dbb8bb5ac723b961ee4ec97"
+    },
+    {
+      "file": "scripts/atlas/lib/ace-assembler-behavior-v1.test.mjs",
+      "lineStart": 13,
+      "lineEnd": 13,
+      "sourceRevision": "sha256:86f217b8f759e9ad4205f27ac639256fda1c8dfab53705ee5f78348a0a32acce"
+    }
+  ],
+  "environmentFingerprint": "sha256:d30a34a4da245bd1dd21c115978b1bf8c59817eae91f3e96bb42760077ea8efb",
+  "producer": "scripts/atlas/prove-ace-assembler-behavior-v1.mjs",
+  "command": "node --test scripts/atlas/lib/ace-assembler-behavior-v1.test.mjs",
+  "inputs": [
+    {
+      "kind": "implementation-span",
+      "uri": "scripts/agent/ace-assembler-recommendations.mjs#byte:1068-1162",
+      "checksum": "sha256:a804d2acdec60e0b443b7eda937806a4b987d904746493e0ceb8d3b76f88de04"
+    },
+    {
+      "kind": "behavior-test-span",
+      "uri": "scripts/atlas/lib/ace-assembler-behavior-v1.test.mjs#byte:561-640",
+      "checksum": "sha256:877430e87c780547d6560e7d2bc65727e517f10f1c5d67ed5cdc023bfbec6c33"
+    }
+  ],
+  "observedAt": "2026-10-09T19:01:05.347Z",
+  "expectedAssertions": [
+    {
+      "id": "descending-top-k",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "rankCandidates returns candidates ordered by descending score and capped at maxCandidates."
+    },
+    {
+      "id": "context-top-k",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "assembleContext includes selected candidates and evidence while excluding candidates below top-K."
+    },
+    {
+      "id": "recommendation-order",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "generateRecommendations preserves selected candidate order and assigns sequential ranks."
+    }
+  ],
+  "actualAssertions": [
+    {
+      "id": "descending-top-k",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "rankCandidates returns candidates ordered by descending score and capped at maxCandidates.",
+      "actual": "The corresponding node:test behavioral assertion passed in the captured execution; the three-test TAP output was independently reopened and checksum-matched.",
+      "passed": true
+    },
+    {
+      "id": "context-top-k",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "assembleContext includes selected candidates and evidence while excluding candidates below top-K.",
+      "actual": "The corresponding node:test behavioral assertion passed in the captured execution; the three-test TAP output was independently reopened and checksum-matched.",
+      "passed": true
+    },
+    {
+      "id": "recommendation-order",
+      "claimRef": "openspec-task:openspec://root/parent-atlas-compute-rank-cache-eval-dspy-gepa/ACE-ASSEMBLER-BEHAVIOR-01",
+      "expected": "generateRecommendations preserves selected candidate order and assigns sequential ranks.",
+      "actual": "The corresponding node:test behavioral assertion passed in the captured execution; the three-test TAP output was independently reopened and checksum-matched.",
+      "passed": true
+    }
+  ],
+  "outputs": [
+    {
+      "kind": "node-test-tap-output",
+      "uri": "docs/reports/openspec-evidence/ace-assembler-behavior-1791572465347-b3f95c01ee66/node-test-output.tap",
+      "checksum": "sha256:cd6a0b462b3797bd4fb255d229227e0ad304a6953a24a9e468fb03533c5e2e23"
+    }
+  ],
+  "verifier": "node --test plus independent TAP output readback and checksum verification",
+  "independentVerifier": "scripts/atlas/prove-ace-assembler-behavior-v1.mjs",
+  "readbackRequired": true,
+  "readbackPerformed": true,
+  "verdict": "PROVEN",
+  "sourceEvidenceChecks": [
+    {
+      "role": "implementation",
+      "file": "scripts/agent/ace-assembler-recommendations.mjs",
+      "sourceRevision": "sha256:56de36ade7c280e272112d26051f1aa99219cac33dbb8bb5ac723b961ee4ec97",
+      "startByte": 1068,
+      "endByte": 1162,
+      "spanChecksum": "sha256:a804d2acdec60e0b443b7eda937806a4b987d904746493e0ceb8d3b76f88de04"
+    },
+    {
+      "role": "test",
+      "file": "scripts/atlas/lib/ace-assembler-behavior-v1.test.mjs",
+      "sourceRevision": "sha256:86f217b8f759e9ad4205f27ac639256fda1c8dfab53705ee5f78348a0a32acce",
+      "startByte": 561,
+      "endByte": 640,
+      "spanChecksum": "sha256:877430e87c780547d6560e7d2bc65727e517f10f1c5d67ed5cdc023bfbec6c33"
+    }
+  ],
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "checksum": "sha256:7a94957930f9344c45cd74af1cdf7ac169b40beb300330075951ace5a34820b1"
+}

@@ -124,10 +124,12 @@ fn process_chunk(
     chunk_index: usize,
 ) -> Result<ChunkInfo> {
     // Parse in parallel using Rayon
-    let parsed_rows: Vec<serde_json::Value> = lines
+    let parsed_rows: std::result::Result<Vec<serde_json::Value>, serde_json::Error> = lines
         .par_iter()
-        .filter_map(|line| serde_json::from_str(line).ok())
+        .map(|line| serde_json::from_str(line))
         .collect();
+    let parsed_rows = parsed_rows
+        .map_err(|e| Error::from_reason(format!("Invalid JSON row: {}", e)))?;
 
     let row_count = parsed_rows.len();
     if row_count == 0 {
@@ -157,4 +159,68 @@ fn process_chunk(
         row_count,
         byte_size,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::process_chunk;
+    use serde_json::{json, Value};
+    use std::fs;
+    use std::path::PathBuf;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    static NEXT_TEMP_ID: AtomicUsize = AtomicUsize::new(0);
+
+    fn temp_dir(name: &str) -> PathBuf {
+        let id = NEXT_TEMP_ID.fetch_add(1, Ordering::Relaxed);
+        let path = std::env::temp_dir().join(format!(
+            "atlas-packet-parser-{name}-{}-{id}",
+            std::process::id()
+        ));
+        fs::create_dir_all(&path).unwrap();
+        path
+    }
+
+    #[test]
+    fn msgpack_chunk_matches_deterministic_packet_snapshot() {
+        let first_dir = temp_dir("snapshot-a");
+        let second_dir = temp_dir("snapshot-b");
+        let lines = vec![
+            r#"{"packetKey":"P-001","label":"café","revision":3}"#.to_string(),
+            r#"{"packetKey":"P-002","label":"brief","revision":4}"#.to_string(),
+        ];
+
+        let first = process_chunk(&lines, first_dir.to_str().unwrap(), 1).unwrap();
+        let second = process_chunk(&lines, second_dir.to_str().unwrap(), 1).unwrap();
+        let first_bytes = fs::read(&first.chunk_path).unwrap();
+        let second_bytes = fs::read(&second.chunk_path).unwrap();
+        let decoded: Vec<Value> = rmp_serde::from_slice(&first_bytes).unwrap();
+
+        assert_eq!(PathBuf::from(&first.chunk_path).file_name().unwrap(), "chunk-0001.msgpack");
+        assert_eq!(first.row_count, 2);
+        assert_eq!(first.byte_size, first_bytes.len());
+        assert_eq!(first_bytes, second_bytes);
+        assert_eq!(decoded, vec![
+            json!({"packetKey": "P-001", "label": "café", "revision": 3}),
+            json!({"packetKey": "P-002", "label": "brief", "revision": 4}),
+        ]);
+
+        fs::remove_dir_all(first_dir).unwrap();
+        fs::remove_dir_all(second_dir).unwrap();
+    }
+
+    #[test]
+    fn malformed_json_is_rejected_instead_of_silently_dropped() {
+        let output_dir = temp_dir("malformed");
+        let lines = vec![
+            r#"{"packetKey":"P-001"}"#.to_string(),
+            "{not-json}".to_string(),
+        ];
+
+        let result = process_chunk(&lines, output_dir.to_str().unwrap(), 1);
+
+        assert!(result.is_err());
+        assert_eq!(fs::read_dir(&output_dir).unwrap().count(), 0);
+        fs::remove_dir_all(output_dir).unwrap();
+    }
 }

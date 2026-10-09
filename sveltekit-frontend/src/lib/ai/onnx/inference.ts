@@ -9,6 +9,7 @@
  */
 
 import { getOnnxSession } from './session.js';
+import { topKTopPSample } from './token-sampling.js';
 
 type OrtTensorLike = {
   data: Float32Array | Int32Array | BigInt64Array | number[];
@@ -35,46 +36,6 @@ function encodeFallback(text: string, maxLen: number): number[] {
 
 function clamp(v: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, v));
-}
-
-function softmax(logits: number[], temperature: number): number[] {
-  const temp = Math.max(temperature, 1e-4);
-  const scaled = logits.map((v) => v / temp);
-  const maxLogit = Math.max(...scaled);
-  const exps = scaled.map((v) => Math.exp(v - maxLogit));
-  const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map((v) => v / Math.max(sum, 1e-12));
-}
-
-function topKTopPSample(logits: number[], topK: number, topP: number, temperature: number): number {
-  const withIdx = logits.map((value, index) => ({ value, index }));
-  withIdx.sort((a, b) => b.value - a.value);
-
-  const k = clamp(Math.floor(topK), 1, withIdx.length);
-  const topKSlice = withIdx.slice(0, k);
-  const probs = softmax(
-    topKSlice.map((x) => x.value),
-    temperature
-  );
-  const ranked = topKSlice.map((token, i) => ({ tokenId: token.index, p: probs[i] }));
-
-  const pThreshold = clamp(topP, 0.05, 1);
-  let cumulative = 0;
-  const nucleus: Array<{ tokenId: number; p: number }> = [];
-  for (const item of ranked) {
-    nucleus.push(item);
-    cumulative += item.p;
-    if (cumulative >= pThreshold) break;
-  }
-
-  const total = nucleus.reduce((acc, item) => acc + item.p, 0);
-  let r = Math.random() * Math.max(total, 1e-12);
-  for (const item of nucleus) {
-    r -= item.p;
-    if (r <= 0) return item.tokenId;
-  }
-
-  return nucleus[0]?.tokenId ?? ranked[0].tokenId;
 }
 
 function buildFeeds(ort: any, session: any, inputIds: number[]): Record<string, unknown> {

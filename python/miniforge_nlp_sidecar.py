@@ -1255,8 +1255,21 @@ def _ensure_grounded_provider_controls() -> None:
         _grounded_extraction_error = f"GROUND_PROVIDER_CONTROL_PATCH_FAILED:{type(exc).__name__}:{str(exc)[:180]}"
 
 
-def _grounded_output_schema() -> dict[str, Any]:
-    """Return the strict LangExtract envelope for source-grounded concepts."""
+def _grounded_output_schema(extraction_mode: str = "concepts") -> dict[str, Any]:
+    """Return a strict LangExtract envelope for the requested grounded proposal mode."""
+    if extraction_mode == "relationships":
+        item_schema = langextract.schema.extraction_item_schema(  # type: ignore[union-attr]
+            "RELATION",
+            attributes={
+                "subject": {"type": "string"},
+                "predicate": {"type": "string"},
+                "object": {"type": "string"},
+            },
+            additional_properties=False,
+        )
+        return langextract.schema.extractions_schema(item_schema, additional_properties=False)  # type: ignore[union-attr]
+    if extraction_mode not in {"concepts", "entities", "full"}:
+        raise ValueError("UNSUPPORTED_GROUNDED_EXTRACTION_MODE")
     item_schema = langextract.schema.extraction_item_schema(  # type: ignore[union-attr]
         "CONCEPT",
         attributes={
@@ -1345,11 +1358,13 @@ def _grounded_extractions(
     text: str,
     model_id: Optional[str] = None,
     *,
+    extraction_mode: str = "concepts",
     span_diagnostics: Optional[list[dict[str, Any]]] = None,
     execution_receipt: Optional[dict[str, Any]] = None,
 ) -> list[dict[str, Any]]:
     global _grounded_extraction_error
     _grounded_extraction_error = None
+    grounded_mode = "relationships" if extraction_mode == "relationships" else "concepts"
     source_bytes = text.encode("utf-8")
     if execution_receipt is not None:
         execution_receipt.update({
@@ -1362,6 +1377,7 @@ def _grounded_extractions(
             "provider": "langextract",
             "providerRevision": _provider_revision(),
             "modelId": model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
+            "extractionMode": "relationships" if extraction_mode == "relationships" else "concepts",
             "inputChecksum": hashlib.sha256(source_bytes).hexdigest(),
             "inputByteLength": len(source_bytes),
             "inputCharacterLength": len(text),
@@ -1392,17 +1408,28 @@ def _grounded_extractions(
             return []
         if execution_receipt is not None:
             execution_receipt["executorAttempted"] = True
-        result = getattr(extract_fn, "extract", extract_fn)(  # type: ignore[misc]
-            text,
-            prompt_description=(
+        if grounded_mode == "relationships":
+            prompt_description = (
+                "Extract only binary relationships explicitly asserted in the supplied source text. "
+                "Return only the required JSON envelope. Every extraction must use extraction_class RELATION; "
+                "extraction_text must be the shortest complete contiguous source substring that explicitly "
+                "states the relation and contains its subject, predicate, and object. Copy all three attribute "
+                "values verbatim from that substring. Do not infer relationships from filenames, code symbols, "
+                "external knowledge, or co-occurrence. If no such exact relation exists, return an empty array."
+            )
+        else:
+            prompt_description = (
                 "Extract only concepts explicitly present in the supplied source text for Parent Atlas. "
                 "Return only the required JSON envelope. Every extraction must use extraction_class CONCEPT, "
                 "extraction_text copied verbatim as one contiguous substring, and attributes containing a "
                 "stable concept_id plus ontology_class. Never infer a concept from a filename, path, or summary. "
                 "If no exact source span supports a concept, return an empty extractions array."
-            ),
+            )
+        result = getattr(extract_fn, "extract", extract_fn)(  # type: ignore[misc]
+            text,
+            prompt_description=prompt_description,
             model_id=model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
-            output_schema=_grounded_output_schema(),
+            output_schema=_grounded_output_schema(grounded_mode),
             extraction_passes=max(1, int(os.getenv("LANGEXTRACT_EXTRACTION_PASSES", "1"))),
             max_workers=max(1, int(os.getenv("LANGEXTRACT_MAX_WORKERS", "1"))),
             max_char_buffer=max(256, int(os.getenv("LANGEXTRACT_MAX_CHAR_BUFFER", "2000"))),
@@ -1427,6 +1454,7 @@ def _grounded_extractions(
         execution_receipt["executorCompleted"] = True
         execution_receipt["rawResultCount"] = len(raw_extractions)
     extracted: list[dict[str, Any]] = []
+    rejected_relation = False
     for item in raw_extractions[:50]:
         extraction_class = getattr(item, "extraction_class", None) or getattr(item, "label", None) or "UNKNOWN"
         extraction_text = getattr(item, "extraction_text", None) or getattr(item, "text", None) or ""
@@ -1434,6 +1462,20 @@ def _grounded_extractions(
             if span_diagnostics is not None:
                 span_diagnostics.append({"classification": "UNRESOLVED", "rejectionReason": "EMPTY_EXTRACTION_TEXT"})
             continue
+        attributes = getattr(item, "attributes", None) or {}
+        if grounded_mode == "relationships":
+            relation_values = (attributes.get("subject"), attributes.get("predicate"), attributes.get("object"))
+            if str(extraction_class).upper() != "RELATION" or any(
+                not isinstance(value, str) or not value.strip() or value not in str(extraction_text)
+                for value in relation_values
+            ):
+                rejected_relation = True
+                if span_diagnostics is not None:
+                    span_diagnostics.append({
+                        "classification": "RELATION_SHAPE_INVALID",
+                        "rejectionReason": "RELATION_CLASS_AND_VERBATIM_SUBJECT_PREDICATE_OBJECT_REQUIRED",
+                    })
+                continue
         probe = _grounded_span_probe(text, item)
         if probe["classification"] != "SOURCE_EXACT":
             if span_diagnostics is not None:
@@ -1449,19 +1491,24 @@ def _grounded_extractions(
                 "end_char": end_char,
                 "start_byte": int(probe["startByte"]),
                 "end_byte": int(probe["endByte"]),
-                "attributes": getattr(item, "attributes", None) or {},
+                "attributes": attributes,
                 "alignment_status": getattr(item, "alignment_status", None),
             }
         )
     if execution_receipt is not None:
         execution_receipt["resultCount"] = len(extracted)
         execution_receipt["state"] = (
-            "REJECTED_SPAN_MISMATCH" if span_diagnostics
+            "REJECTED_SPAN_MISMATCH" if span_diagnostics and any(
+                item.get("classification") != "RELATION_SHAPE_INVALID" for item in span_diagnostics
+            )
+            else "REJECTED_RELATION_SHAPE" if rejected_relation
             else "COMPLETED_GROUNDED" if extracted
             else "COMPLETED_EMPTY"
         )
-        if span_diagnostics:
+        if execution_receipt["state"] == "REJECTED_SPAN_MISMATCH":
             execution_receipt["failureClass"] = "SPAN_REJECTION"
+        elif rejected_relation:
+            execution_receipt["failureClass"] = "RELATION_SHAPE_REJECTION"
     return extracted
 
 
@@ -2828,6 +2875,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
             grounded_extractions = _grounded_extractions(
                 text,
                 req.model_id,
+                extraction_mode=req.extraction_mode,
                 span_diagnostics=grounded_span_diagnostics,
                 execution_receipt=grounded_execution_receipt,
             )

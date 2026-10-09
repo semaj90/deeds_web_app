@@ -14,6 +14,7 @@
 
 import {
 	CLIENT_E2B_MODEL_ID,
+	CLIENT_E2B_MODEL_REVISION,
 	CLIENT_E2B_DTYPE,
 	CLIENT_E2B_DEVICE,
 	CLIENT_E2B_MIN_GPU_MB
@@ -160,13 +161,13 @@ async function _initE2BInternal(): Promise<void> {
 	// surface, although the model family may expose it at runtime. Keep this
 	// optional and fail closed when the installed build cannot provide it.
 	const AutoProcessor = (transformers as typeof transformers & {
-		AutoProcessor?: { from_pretrained: (modelId: string) => Promise<unknown> };
+		AutoProcessor?: { from_pretrained: (modelId: string, options: { revision: string }) => Promise<unknown> };
 	}).AutoProcessor;
 	if (!AutoProcessor) throw new Error('E2B_AUTOPROCESSOR_UNAVAILABLE');
-	_processor = await AutoProcessor.from_pretrained(CLIENT_E2B_MODEL_ID);
+	_processor = await AutoProcessor.from_pretrained(CLIENT_E2B_MODEL_ID, { revision: CLIENT_E2B_MODEL_REVISION });
 
 	// Load tokenizer separately for decode operations
-	_tokenizer = await transformers.AutoTokenizer.from_pretrained(CLIENT_E2B_MODEL_ID);
+	_tokenizer = await transformers.AutoTokenizer.from_pretrained(CLIENT_E2B_MODEL_ID, { revision: CLIENT_E2B_MODEL_REVISION });
 
 	// Load model with Q4F16 quantization on WebGPU
 	_model = await (transformers as any).Gemma4ForConditionalGeneration.from_pretrained(
@@ -174,6 +175,7 @@ async function _initE2BInternal(): Promise<void> {
 		{
 			dtype: CLIENT_E2B_DTYPE,
 			device: CLIENT_E2B_DEVICE,
+			revision: CLIENT_E2B_MODEL_REVISION,
 		}
 	);
 

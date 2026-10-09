@@ -4,6 +4,10 @@ import { z } from 'zod';
 
 import { buildStreamPreamble } from '$lib/server/mcp/atlas-tools-client.js';
 import { createAtlasSearchAdapter } from '$lib/server/atlas/retrieval/search-runtime-adapter.js';
+import {
+  runSearchRuntimeContextManifestShadowV1,
+  type SearchRuntimeContextManifestShadowConfigV1,
+} from '$lib/server/atlas/retrieval/search-runtime-context-manifest-shadow-v1.js';
 import { searchResultToHyperRagResult } from './canonical-hyperrag-adapter.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { SearchMetadataFilterSchema } from './search-contract.js';
@@ -47,6 +51,7 @@ const SemanticSearchWorkflowReportSchema = z.object({
   top_packet_keys: z.array(z.string().min(1)),
   preamble: z.record(z.string(), z.unknown()).nullable(),
   ace: z.record(z.string(), z.unknown()).nullable(),
+  contextManifestShadow: z.record(z.string(), z.unknown()),
   metadata: z.record(z.string(), z.unknown()),
   provenance: z.record(z.string(), z.unknown()),
   shadow: SearchShadowSchema.nullable(),
@@ -96,6 +101,7 @@ export const SemanticSearchWorkflowResultSchema = z.object({
   metadata: z.record(z.string(), z.unknown()),
   provenance: z.record(z.string(), z.unknown()),
   ace: z.record(z.string(), z.unknown()).nullable(),
+  contextManifestShadow: z.record(z.string(), z.unknown()),
   graphExpanded: z.array(z.record(z.string(), z.unknown())).optional(),
   shadow: SearchShadowSchema.nullable(),
   error: z.string().nullable().optional(),
@@ -144,6 +150,7 @@ async function persistSemanticSearchWorkflowReport(
     top_packet_keys: result.topPacketKeys,
     preamble: result.preamble,
     ace: result.ace,
+    contextManifestShadow: result.contextManifestShadow,
     metadata: result.metadata,
     provenance: result.provenance,
     shadow: result.shadow,
@@ -159,6 +166,7 @@ export async function runSemanticSearchWorkflow(
   runtimeOptions?: {
     userId?: string | null;
     caseId?: string | null;
+    contextManifestShadow?: SearchRuntimeContextManifestShadowConfigV1;
   },
 ): Promise<SemanticSearchWorkflowResult> {
   const validated = SemanticSearchWorkflowRequestSchema.parse(request);
@@ -224,6 +232,14 @@ export async function runSemanticSearchWorkflow(
       )
     : null;
 
+  const contextManifestShadow = await runSearchRuntimeContextManifestShadowV1({
+    response: {
+      packets: adapterResult.packets,
+      provenance: adapterResult.provenance,
+    },
+    config: runtimeOptions?.contextManifestShadow,
+  });
+
   const topPacketKeys = adapterResult.topPacketKeys;
 
   let shadow: SemanticSearchWorkflowResult['shadow'] = null;
@@ -287,6 +303,7 @@ export async function runSemanticSearchWorkflow(
     metadata: adapterResult.metadata as Record<string, unknown>,
     provenance: adapterResult.provenance as Record<string, unknown>,
     ace,
+    contextManifestShadow,
     ...(adapterResult.graphExpanded ? { graphExpanded: adapterResult.graphExpanded as unknown as Array<Record<string, unknown>> } : {}),
     shadow,
   });

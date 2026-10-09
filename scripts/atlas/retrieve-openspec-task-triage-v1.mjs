@@ -2,15 +2,17 @@
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { dirname, resolve, sep } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { selectOpenSpecTaskCardsV1 } from './lib/openspec-report-manifest-v1.mjs';
+import { loadTaskTriageCorpusV1 } from './lib/openspec-task-triage-shards-v1.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const corpusPath = resolve(root, 'docs/reports/openspec-task-triage-corpus-v1.json');
-
 function repoPath(relativePath) {
-  return resolve(root, relativePath.split('/').join(sep));
+  const target = resolve(root, relativePath.split('/').join(sep));
+  const rel = relative(root, target);
+  if (!rel || rel === '..' || rel.startsWith(`..${sep}`) || isAbsolute(rel)) throw new Error('TRIAGE_CORPUS_PATH_OUTSIDE_REPOSITORY');
+  return target;
 }
 
 function verifyCurrentTaskLedgers(corpus) {
@@ -25,10 +27,11 @@ function verifyCurrentTaskLedgers(corpus) {
 }
 
 function parseArgs(argv) {
-  const args = { includeHistory: false, limit: 100 };
+  const args = { includeHistory: false, limit: 100, corpus: 'docs/reports/openspec-task-triage-corpus-v1.json' };
   for (const value of argv) {
     if (value === '--history') args.includeHistory = true;
     else if (value.startsWith('--limit=')) args.limit = Number(value.slice('--limit='.length));
+    else if (value.startsWith('--corpus=')) args.corpus = value.slice('--corpus='.length);
     else throw new Error(`UNKNOWN_ARGUMENT:${value}`);
   }
   return args;
@@ -36,9 +39,9 @@ function parseArgs(argv) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const corpus = JSON.parse(readFileSync(corpusPath, 'utf8'));
+  const corpus = loadTaskTriageCorpusV1(repoPath(args.corpus));
   verifyCurrentTaskLedgers(corpus);
-  const result = selectOpenSpecTaskCardsV1({ corpus, ...args });
+  const result = selectOpenSpecTaskCardsV1({ ...args, corpus });
   process.stdout.write(`${JSON.stringify(result)}\n`);
 }
 

@@ -33,8 +33,13 @@ import crypto from 'crypto';
 const VERBOSE = process.argv.includes('--verbose');
 const STRICT  = process.argv.includes('--strict');
 const EMOJI   = process.argv.includes('--emoji');
-const OUTPUT_DIR = 'docs/reports';
-const EXPORTS_DIR = 'memory/exports';
+function argumentValue(name, fallback) {
+  const argument = process.argv.find(value => value.startsWith(`${name}=`));
+  return argument ? argument.slice(name.length + 1) : fallback;
+}
+
+const OUTPUT_DIR = path.resolve(argumentValue('--output-dir', 'docs/reports'));
+const INPUT_MAP_PATH = path.resolve(argumentValue('--input-map', path.join('memory', 'exports', 'directory-source-map.jsonl')));
 
 // ASCII-safe icons (same pattern as atlas-startup-intelligence.mjs)
 const IC = EMOJI
@@ -97,14 +102,20 @@ class LineageValidator {
 // ============================================================================
 
 async function livePostgresCheck(validator) {
-  const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+  const DATABASE_URL = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
+  if (!DATABASE_URL) {
+    validator.addGate('G0: Postgres live check', false, 'DATABASE_URL or POSTGRES_URL must be configured; no embedded connection string is used');
+    return;
+  }
   try {
     const { default: pg } = await import('pg');
     const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2, connectionTimeoutMillis: 5000 });
+    const client = await pool.connect();
     try {
+      await client.query('BEGIN TRANSACTION READ ONLY');
       // feature_label lives in payload JSONB (not a top-level column)
       // Filter out source_kind='unknown' (SOM topology slots, not real packets)
-      const r = await pool.query(`SELECT
+      const r = await client.query(`SELECT
         COUNT(*)                                                                          AS total,
         COUNT(*) FILTER (WHERE source_ref IS NULL OR source_ref = '')                    AS missing_source_ref,
         COUNT(*) FILTER (WHERE feature_id  IS NULL OR feature_id  = '')                  AS missing_feature_id,
@@ -134,6 +145,8 @@ async function livePostgresCheck(validator) {
         console.log(`  Summaries >20 chars: ${row.with_summary}/${total}`);
       }
     } finally {
+      await client.query('ROLLBACK').catch(() => {});
+      client.release();
       await pool.end().catch(() => {});
     }
   } catch (e) {
@@ -153,8 +166,7 @@ async function validateLineage() {
   // Load directory-source-map
   let directoryMap = [];
   try {
-    const mapPath = path.join(EXPORTS_DIR, 'directory-source-map.jsonl');
-    const content = fs.readFileSync(mapPath, 'utf-8');
+    const content = fs.readFileSync(INPUT_MAP_PATH, 'utf-8');
     directoryMap = content
       .trim()
       .split('\n')
@@ -169,7 +181,7 @@ async function validateLineage() {
       })
       .filter(Boolean);
 
-    console.log(`${IC.data} Loaded ${directoryMap.length} directory entries from directory-source-map.jsonl\n`);
+  console.log(`${IC.data} Loaded ${directoryMap.length} directory entries from ${INPUT_MAP_PATH}\n`);
   } catch (e) {
     validator.addGate('Load directory-source-map', false, `Cannot read: ${e.message}`);
     return validator;
@@ -496,9 +508,9 @@ async function validateLineage() {
 // ============================================================================
 
 try {
-  await validateLineage();
-  process.exit(0);
+  const validator = await validateLineage();
+  process.exitCode = validator.summary().success ? 0 : 1;
 } catch (err) {
   console.error('[FAIL] Error:', err);
-  process.exit(1);
+  process.exitCode = 1;
 }

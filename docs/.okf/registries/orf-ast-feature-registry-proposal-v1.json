@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.orf-ast-feature-registry-proposal.v1",
+  "registry": {
+    "schema": "atlas.observation-feature-registry.v1",
+    "registry_revision": "proposal:sha256:0aecb825dbc194976c3e3ec261457863f92e05250e1ce3c0c6e3039aec26c73f",
+    "definitions": [
+      {
+        "feature_id": "ast.class_decl",
+        "family": "AST_BINARY",
+        "ordinal": 0,
+        "value_kind": "BINARY",
+        "description": "An AST-grep observation classified as a class declaration.",
+        "evidence_requirements": ["OBSERVATION_ID", "SOURCE_REF", "SOURCE_REVISION", "BYTE_SPAN", "PRODUCER_REVISION", "EVIDENCE_CHECKSUM"],
+        "missing_value_policy": "UNAVAILABLE_NOT_ZERO"
+      },
+      {
+        "feature_id": "ast.function_decl",
+        "family": "AST_BINARY",
+        "ordinal": 1,
+        "value_kind": "BINARY",
+        "description": "An AST-grep observation classified as a function or method declaration.",
+        "evidence_requirements": ["OBSERVATION_ID", "SOURCE_REF", "SOURCE_REVISION", "BYTE_SPAN", "PRODUCER_REVISION", "EVIDENCE_CHECKSUM"],
+        "missing_value_policy": "UNAVAILABLE_NOT_ZERO"
+      },
+      {
+        "feature_id": "ast.interface_decl",
+        "family": "AST_BINARY",
+        "ordinal": 2,
+        "value_kind": "BINARY",
+        "description": "An AST-grep observation classified as an interface declaration.",
+        "evidence_requirements": ["OBSERVATION_ID", "SOURCE_REF", "SOURCE_REVISION", "BYTE_SPAN", "PRODUCER_REVISION", "EVIDENCE_CHECKSUM"],
+        "missing_value_policy": "UNAVAILABLE_NOT_ZERO"
+      },
+      {
+        "feature_id": "ast.type_alias",
+        "family": "AST_BINARY",
+        "ordinal": 3,
+        "value_kind": "BINARY",
+        "description": "An AST-grep observation classified as a type alias declaration.",
+        "evidence_requirements": ["OBSERVATION_ID", "SOURCE_REF", "SOURCE_REVISION", "BYTE_SPAN", "PRODUCER_REVISION", "EVIDENCE_CHECKSUM"],
+        "missing_value_policy": "UNAVAILABLE_NOT_ZERO"
+      },
+      {
+        "feature_id": "ast.variable_decl",
+        "family": "AST_BINARY",
+        "ordinal": 4,
+        "value_kind": "BINARY",
+        "description": "An AST-grep observation classified as a variable binding declaration.",
+        "evidence_requirements": ["OBSERVATION_ID", "SOURCE_REF", "SOURCE_REVISION", "BYTE_SPAN", "PRODUCER_REVISION", "EVIDENCE_CHECKSUM"],
+        "missing_value_policy": "UNAVAILABLE_NOT_ZERO"
+      }
+    ],
+    "registry_checksum": "f0f85acf167a94d1849a8b4e5031ab30c5affba957d940215ca8c74656032c4f",
+    "canonical_authority": false
+  },
+  "ast_grep_mappings": [
+    {"feature_id": "ast.class_decl", "ast_kinds": ["class_declaration"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.function_decl", "ast_kinds": ["function_declaration", "generator_function_declaration", "method_definition"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.interface_decl", "ast_kinds": ["interface_declaration"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.type_alias", "ast_kinds": ["type_alias_declaration"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.variable_decl", "ast_kinds": ["variable_declarator"], "review_state": "REVIEW_REQUIRED"}
+  ],
+  "symbol_kind_hints": [
+    {"feature_id": "ast.class_decl", "symbol_kinds": ["class"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.function_decl", "symbol_kinds": ["function", "method"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.interface_decl", "symbol_kinds": ["interface"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.type_alias", "symbol_kinds": ["type"], "review_state": "REVIEW_REQUIRED"},
+    {"feature_id": "ast.variable_decl", "symbol_kinds": ["variable"], "review_state": "REVIEW_REQUIRED"}
+  ],
+  "status": "PROPOSAL_ONLY_REQUIRES_REVIEW",
+  "proposal_revision": "proposal:sha256:dbb614dcdf07b5cea7a5af2fda9a4f531cd7ed7a3325b7a18802c4a462c72abb",
+  "proposal_checksum": "dbb614dcdf07b5cea7a5af2fda9a4f531cd7ed7a3325b7a18802c4a462c72abb",
+  "reviewer_id": null,
+  "review_receipt": null,
+  "runtime_eligible": false,
+  "canonical_authority": false,
+  "persistent_store_writes_performed": false
+}

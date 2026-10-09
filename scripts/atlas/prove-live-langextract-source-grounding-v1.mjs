@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildLangExtractProbeInputV1, validateLangExtractSourceSpansV1 } from './lib/langextract-probe-input-v1.mjs';
+import { resolveLangExtractModeV1 } from './lib/langextract-mode-v1.mjs';
 import { verifySidecarRuntimeBindingV1 } from './lib/sidecar-runtime-binding-v1.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -25,6 +26,7 @@ function sha256(bytes) {
 
 const proofPath = scratchPath(argument('--proof'), 'PROOF_PATH');
 const outputPath = scratchPath(argument('--output'), 'OUTPUT_PATH');
+const extractionMode = resolveLangExtractModeV1(argument('--mode'));
 if (fs.existsSync(outputPath)) throw new Error('OUTPUT_ALREADY_EXISTS');
 const proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
 const binding = proof.exactBinding;
@@ -39,6 +41,7 @@ const maxChars = Number.isInteger(configuredMaxChars) && configuredMaxChars >= 1
 const receipt = {
   schema: 'atlas.live-langextract-source-grounding-receipt.v1',
   mode: 'BOUNDED_PROPOSAL_ONLY',
+  extractionMode,
   proofReceipt: path.relative(root, proofPath).replaceAll('\\', '/'),
   proofStatus: proof.status ?? null,
   proofReadback: proofChecksumVerified ? 'MATCH' : 'MISMATCH',
@@ -133,7 +136,7 @@ if (proof.status !== 'READ_ONLY_SOURCE_AND_AST_OBSERVATION_MATCH' || !proofCheck
             language: path.extname(binding.sourceRef).toLowerCase() === '.ts' ? 'typescript' : 'javascript',
             text: probeInput.text,
             max_chars: maxChars,
-            extraction_mode: 'concepts',
+            extraction_mode: extractionMode,
             grounded_extraction_required: true,
           }),
         });

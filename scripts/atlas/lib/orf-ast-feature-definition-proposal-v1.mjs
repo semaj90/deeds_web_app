@@ -17,7 +17,7 @@ export const ORF_AST_FEATURE_DEFINITION_PROPOSAL_V1 = Object.freeze([
     family: 'AST_BINARY',
     value_kind: 'BINARY',
     description: 'An AST-grep observation classified as a function or method declaration.',
-    producer_mapping: ['function_declaration', 'method_definition'],
+    producer_mapping: ['function_declaration', 'generator_function_declaration', 'method_definition'],
     symbol_kind_hints: ['function', 'method'],
     evidence_requirements: ['OBSERVATION_ID', 'SOURCE_REF', 'SOURCE_REVISION', 'BYTE_SPAN', 'PRODUCER_REVISION', 'EVIDENCE_CHECKSUM'],
     missing_value_policy: 'UNAVAILABLE_NOT_ZERO',
