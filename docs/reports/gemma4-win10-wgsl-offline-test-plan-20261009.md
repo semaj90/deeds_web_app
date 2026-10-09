@@ -50,3 +50,31 @@ Once the server starts, open `http://localhost:5173/atlas-rmsnorm-parity-v1.html
 - [ ] RMS-06 Audit real Gemma 4 E2B ONNX weights and operator graph; freeze shape, epsilon, weight convention, quantization and source digest; port fixture-only shader to actual graph-compatible test.
 - [ ] RMS-07 Remove dual-source WGSL definition by routing fixture/browser through one audited asset owner; static runner currently duplicates the shader for no-build offline use. Enforce shader digest equality before claiming parity.
 - [ ] RMS-08 Implement actual model inference receipt only after trusted GPU owner lease, offline artifact manifest, user approval and explicit model load; never use static fixture pass for inference.
+
+## Canonical WGSL source ownership (2026-10-09)
+- Source-of-truth shaders: `sveltekit-frontend/static/atlas-kernels/add-f32-v1.wgsl` and `rmsnorm-f32-v1.wgsl`.
+- The HTML5 test pages fetch the versioned static WGSL assets on the operator's click; the Node TS numerical oracle tests use `node:fs` to read those exact assets. **Browser access via a localhost fetch is local asset I/O, not model-weight download.** Do not remove these assets after a build.
+- The TS oracle exports asset paths, not duplicate shader contents. Production app should use the same versioned URL with checked SHA-256 and browser-only lazy loader; backend-specific code must not own a second copy of the shader.
+- [ ] WGSL-SHA-01 Pin asset SHA-256 hashes in a generated manifest and independently verify browser-fetched bytes; fail closed on mismatches and log `shaderSha256`, `fixtureChecksum`, backend/runtime, adapter identity where permitted.
+- [ ] WGSL-STATIC-02 Confirm Vite/SvelteKit static deployment serves `.wgsl` consistently with correct MIME/CSP/fetch policy and no silent cache revision mismatch.
+- [ ] WGSL-WIDTH-03 Run odd-width (e.g. 7/65), varying row counts, zero-valued rows and f32 accumulation-bound tests; create actual model-revision-specific shape + norm convention fixtures before Gemma parity claims.
+
+## Executor separation / enhancement order
+| Owner | Role | Immediate requirement |
+| --- | --- | --- |
+| Browser HTML5 + JS WebGPU | canonical first GPU parity executor in Chrome/Edge on Windows 10 | verified WGSL, CPU oracle and readback receipt |
+| Node/V8 test runner | pure fixture/spec/receipt validator; NOT a browser WebGPU device | existing `tsx` or TS transform, `node:test` |
+| Dawn C++ native | optional separate WebGPU executor/adapter for cross-runtime driver parity | CMake-native smoke only after browser parity, no duplicate shader |
+| Node N-API native addon | optional bridge to Dawn if there is a measured Node-specific orchestration need | use versioned binary/ABI contract; no raw pointers over RPC |
+| LiteRT-LM JS | independent Gemma E2B browser inference backend, NOT an extension of the fixture shader | backend-specific model packaging, tokenizer/template, tested admission |
+| Transformers.js/ONNX Runtime Web | current Gemma E2B browser inference owner | memory/artifact/explicit approval gates before load |
+| gRPC/QUIC | remote orchestration/telemetry/evidence boundary; not WebGPU browser-native dispatch API | typed descriptors, immutable packet identities, bounded transfers |
+
+### Incremental JS optimizations (not assumed gains)
+1. Cache shader module/pipeline by (`shaderSha256`, adapter/device generation, specialization parameters) inside the existing session/device owner; clear on device loss. Do not cache stale pipelines.
+2. For small tensors, batch dispatches and recycle GPU buffers with explicit lifetime/generation tracking; benchmark copying overhead instead of blindly increasing concurrency.
+3. Use workgroup tiled/parallel reduction for larger real RMSNorm widths, benchmarking scalar baseline; ensure synchronization and numerical tolerance across shapes and f16/f32. Current scalar loop per row is a *correctness baseline only*.
+4. Avoid readbacks in inference hot path, but retain explicit test readback. Prefer `queue.onSubmittedWorkDone()` and CPU timing (not GPU kernel timing) unless timestamp-query feature is supported and verified.
+5. Keep model weights/sequence KV/quantized matmul separate from toy f32 fixture and explicitly budget VRAM; no unverified free-memory inference from WebGPU adapter limits.
+
+MTP, REAP and neural-memory proposals remain independent evidence domains. No compilation, GPU run, dependency install or model load was performed by these GitHub edits.
