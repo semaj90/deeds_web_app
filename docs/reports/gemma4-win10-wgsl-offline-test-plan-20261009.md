@@ -33,3 +33,20 @@ The user-provided `gemma-4-e2b.js` from a Hugging Face Space is a bundled/minifi
 - Node/V8 runs unit tests and server-side JS; it cannot run WebGPU compute by itself without a compatible GPU implementation. Browser WebGPU uses Chromium's GPU stack/Dawn; no CUDA kernel or DirectML execution is implied.
 - Chrome/Edge GPU process and native Torch/cuVS services may compete for RTX 3060 Ti VRAM. Use sequential model execution and do not evict running model owners.
 - Real shader compilation errors -> `BLOCKED` with cause; numerical mismatch after successful dispatch -> `FAIL`. Preserve environment metadata for reproduction.
+
+## 2026-10-09 RMSNorm real-operator increment
+Three additional committed files: `gemma4-rmsnorm-oracle-v1.ts`, `gemma4-rmsnorm-oracle-v1.test.ts`, and `static/atlas-rmsnorm-parity-v1.html`. This is a fixed 2x4 **illustrative RMSNorm f32** operator; it has NOT been verified against the E2B graph tensor layout, Gemma weight convention (e.g. weight offset), epsilon, fused quantized implementation, or shape. Never label it `GEMMA4_MODEL_OPERATOR_PARITY` from this fixture.
+
+PowerShell, using existing dependencies (no installs):
+```powershell
+cd C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+npx --no-install tsx --test src/lib/ai/gemma4-rmsnorm-oracle-v1.test.ts
+npm run dev
+```
+Once the server starts, open `http://localhost:5173/atlas-rmsnorm-parity-v1.html` (adjust port) and deliberately click **Run GPU RMSNorm parity**. Collect the on-screen JSON receipt and console line `[ATLAS_RMSNORM_GPU_TELEMETRY]`. Required: status PASS, valid reference/actual vectors, maximum absolute and relative error inside declared tolerances, observed GPU submission and mapAsync readback, browser/device/driver evidence collected separately. BLOCKED is not PASS. Add true execution traces and shader/program digests before any production evidence-admission step.
+
+- [ ] RMS-04 Run 2x4 browser RMSNorm shader/readback on Windows 10 Chrome/Edge GPU, save telemetry and operator receipt.
+- [ ] RMS-05 Add a second odd-width and multi-workgroup shape with bounds protection and f32/f16 tolerance study.
+- [ ] RMS-06 Audit real Gemma 4 E2B ONNX weights and operator graph; freeze shape, epsilon, weight convention, quantization and source digest; port fixture-only shader to actual graph-compatible test.
+- [ ] RMS-07 Remove dual-source WGSL definition by routing fixture/browser through one audited asset owner; static runner currently duplicates the shader for no-build offline use. Enforce shader digest equality before claiming parity.
+- [ ] RMS-08 Implement actual model inference receipt only after trusted GPU owner lease, offline artifact manifest, user approval and explicit model load; never use static fixture pass for inference.
