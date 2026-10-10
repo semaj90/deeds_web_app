@@ -1,7 +1,7 @@
 import { pool } from '$lib/server/db/client.js';
 import { buildKagMutualIndexV1 } from './kag-mutual-index-v1.js';
 import type { HyperedgeV1, HyperedgeParticipantV1 } from '../../graph/hyperedge-contract.js';
-import type { OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v1.js';
+import { OntologyLinkedTupleV1Schema, type OntologyLinkedTupleV1 } from '../contracts/ontology-linked-tuple-v1.js';
 import { PACKET_KEY_V2_PATTERN } from '../identity/packet-key-v2.js';
 import {
   PacketIncidenceLineageV1Schema,
@@ -26,6 +26,7 @@ import { verifyPacketIncidenceLineagesAgainstPostgresV1 } from '../lineage/packe
 
 const MAX_CANONICAL_IDS = 256;
 export const MAX_KAG_HYPEREDGE_MEMBER_ROWS_V1 = 4096;
+export const MAX_KAG_TUPLE_READBACK_ROWS_V1 = 1024;
 
 export interface KagTraversalSnapshotV1 {
   workspaceRevision: string;
@@ -44,6 +45,13 @@ export interface KagHypergraphNeighborsReceiptV1 {
   matchedTuples: number;
   matchedHyperedges: number;
   neighbors: KagHypergraphNeighborV1[];
+}
+
+export interface QualifiedOntologyTupleReadbackV1 {
+  requestedPacketKeys: number;
+  matchedTupleCount: number;
+  unmatchedPacketKeys: string[];
+  tuples: OntologyLinkedTupleV1[];
 }
 
 const EMPTY_RECEIPT: KagHypergraphNeighborsReceiptV1 = {
@@ -77,6 +85,9 @@ interface OntologyLinkedTupleRow {
   evidence_state: string;
   lifecycle: string;
   provenance: unknown;
+  packet_source_ref?: string;
+  packet_source_revision?: string | null;
+  packet_workspace_revision?: string | null;
 }
 
 interface HyperedgeMemberRow {
@@ -122,6 +133,79 @@ function rowToOntologyLinkedTupleV1(row: OntologyLinkedTupleRow): OntologyLinked
     evidenceState: row.evidence_state as OntologyLinkedTupleV1['evidenceState'],
     lifecycle: row.lifecycle as OntologyLinkedTupleV1['lifecycle'],
     provenance: row.provenance as OntologyLinkedTupleV1['provenance'],
+  };
+}
+
+/** Strict, read-only tuple readback against the canonical packet/source/workspace owner.
+ * This proves row binding only; it does not admit the relation or its evidence. */
+export async function readQualifiedOntologyTuplesStrictV1(
+  packetKeys: readonly string[],
+  snapshot: KagTraversalSnapshotV1,
+): Promise<QualifiedOntologyTupleReadbackV1> {
+  const uniquePacketKeys = [...new Set(packetKeys.map((key) => key.trim()).filter(Boolean))].sort();
+  if (uniquePacketKeys.length === 0) {
+    return { requestedPacketKeys: 0, matchedTupleCount: 0, unmatchedPacketKeys: [], tuples: [] };
+  }
+  if (uniquePacketKeys.length > MAX_CANONICAL_IDS) throw new Error('KAG_TUPLE_PACKET_LIMIT_EXCEEDED');
+  if (!snapshot.workspaceRevision.trim() || !snapshot.graphRevision.trim()) {
+    throw new Error('KAG_TRAVERSAL_SNAPSHOT_REQUIRED');
+  }
+  if (uniquePacketKeys.some((key) => !PACKET_KEY_V2_PATTERN.test(key))) {
+    throw new Error('KAG_CANONICAL_PACKET_KEY_V2_REQUIRED');
+  }
+
+  const result = await pool.query<OntologyLinkedTupleRow>(
+    `
+      SELECT t.tuple_id, t.schema_version, t.packet_key, t.source_ref, t.tree_node_id, t.document_id,
+             t.title_id, t.surface_text, t.token_index, t.part_of_speech, t.label, t.label_kind,
+             t.label_source, t.ontology_ids, t.concept_ids, t.participants, t.evidence_refs,
+             t.relation_revision, t.evidence_span, t.confidence, t.evidence_state, t.lifecycle,
+             t.provenance, p.source_ref AS packet_source_ref,
+             p.source_revision AS packet_source_revision,
+             p.workspace_revision_key AS packet_workspace_revision
+        FROM atlas_ontology_linked_tuples t
+        JOIN atlas_packets p ON p.packet_key = t.packet_key
+       WHERE t.packet_key = ANY($1::text[])
+         AND p.workspace_revision_key = $2
+         AND t.provenance->>'workspaceRevision' = $2
+         AND t.provenance->>'graphRevision' = $3
+         AND p.source_ref = t.source_ref
+         AND p.source_revision = t.provenance->>'sourceRevision'
+       ORDER BY t.packet_key, t.tuple_id
+       LIMIT $4
+    `,
+    [uniquePacketKeys, snapshot.workspaceRevision, snapshot.graphRevision, MAX_KAG_TUPLE_READBACK_ROWS_V1 + 1],
+  );
+  if (result.rows.length > MAX_KAG_TUPLE_READBACK_ROWS_V1) {
+    throw new Error('KAG_TUPLE_READBACK_ROW_LIMIT_EXCEEDED');
+  }
+
+  const requested = new Set(uniquePacketKeys);
+  const tupleIds = new Set<string>();
+  const tuples = result.rows.map((row) => {
+    const tuple = OntologyLinkedTupleV1Schema.parse(rowToOntologyLinkedTupleV1(row));
+    const sourceRevision = tuple.provenance.sourceRevision;
+    if (!tuple.packetKey || !requested.has(tuple.packetKey)) throw new Error('KAG_TUPLE_PACKET_KEY_READBACK_MISMATCH');
+    if (tupleIds.has(tuple.tupleId)) throw new Error(`KAG_TUPLE_DUPLICATE_ID:${tuple.tupleId}`);
+    tupleIds.add(tuple.tupleId);
+    if (!sourceRevision || sourceRevision !== row.packet_source_revision) {
+      throw new Error(`KAG_TUPLE_SOURCE_REVISION_READBACK_MISMATCH:${tuple.tupleId}`);
+    }
+    if (tuple.sourceRef !== row.packet_source_ref || row.packet_workspace_revision !== snapshot.workspaceRevision) {
+      throw new Error(`KAG_TUPLE_PACKET_BINDING_READBACK_MISMATCH:${tuple.tupleId}`);
+    }
+    if (tuple.provenance.workspaceRevision !== snapshot.workspaceRevision
+      || tuple.provenance.graphRevision !== snapshot.graphRevision) {
+      throw new Error(`KAG_TUPLE_SNAPSHOT_READBACK_MISMATCH:${tuple.tupleId}`);
+    }
+    return tuple;
+  });
+  const matchedPackets = new Set(tuples.map((tuple) => tuple.packetKey!));
+  return {
+    requestedPacketKeys: uniquePacketKeys.length,
+    matchedTupleCount: tuples.length,
+    unmatchedPacketKeys: uniquePacketKeys.filter((key) => !matchedPackets.has(key)),
+    tuples,
   };
 }
 

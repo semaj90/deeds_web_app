@@ -267,3 +267,79 @@ describe('KAG next-steps item 1: readKagHypergraphNeighborsV1', () => {
     expect(params[0]).toEqual(['packet:a', 'packet:b']);
   });
 });
+
+describe('strict ontology tuple readback', () => {
+  const packetKey = 'packet:00000000-0000-5000-8000-000000000001';
+  const sourceRevision = 'sha256:' + 'a'.repeat(64);
+
+  function qualifiedTupleRow(overrides: Record<string, unknown> = {}) {
+    return tupleRow({
+      packet_key: packetKey,
+      source_ref: 'src/lib/example.ts',
+      provenance: {
+        sourceTables: ['fixture'],
+        labelerVersion: null,
+        taggerVersion: null,
+        ontologyVersion: 'ontology-version:v1',
+        ontologyRevision: 'ontology-revision:v1',
+        nlpVersion: null,
+        sourceRevision,
+        workspaceRevision: 'ws-1',
+        graphRevision: 'graph-1',
+      },
+      packet_source_ref: 'src/lib/example.ts',
+      packet_source_revision: sourceRevision,
+      packet_workspace_revision: 'ws-1',
+      ...overrides,
+    });
+  }
+
+  it('reads only exact packet, source, workspace and graph revision bindings', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: [qualifiedTupleRow()] });
+    const { readQualifiedOntologyTuplesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    const result = await readQualifiedOntologyTuplesStrictV1([packetKey], {
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+    });
+
+    expect(result).toMatchObject({
+      requestedPacketKeys: 1,
+      matchedTupleCount: 1,
+      unmatchedPacketKeys: [],
+    });
+    expect(result.tuples[0]).toMatchObject({
+      packetKey,
+      sourceRef: 'src/lib/example.ts',
+      provenance: { sourceRevision, workspaceRevision: 'ws-1', graphRevision: 'graph-1', ontologyRevision: 'ontology-revision:v1' },
+    });
+    expect(String(queryMock.mock.calls[0][0])).toContain('p.source_revision = t.provenance->>\'sourceRevision\'');
+    expect(queryMock.mock.calls[0][1]).toEqual([[packetKey], 'ws-1', 'graph-1', 1025]);
+  });
+
+  it('rejects tuple rows whose source revision disagrees with the canonical packet row', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: [qualifiedTupleRow({ packet_source_revision: 'sha256:' + 'b'.repeat(64) })] });
+    const { readQualifiedOntologyTuplesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readQualifiedOntologyTuplesStrictV1([packetKey], {
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+    })).rejects.toThrow(`KAG_TUPLE_SOURCE_REVISION_READBACK_MISMATCH:tuple:1`);
+  });
+
+  it('rejects a tuple joined to another workspace snapshot', async () => {
+    queryMock.mockClear();
+    queryMock.mockResolvedValue({ rows: [qualifiedTupleRow({ packet_workspace_revision: 'ws-stale' })] });
+    const { readQualifiedOntologyTuplesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readQualifiedOntologyTuplesStrictV1([packetKey], {
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+    })).rejects.toThrow('KAG_TUPLE_PACKET_BINDING_READBACK_MISMATCH:tuple:1');
+  });
+
+  it('rejects non-v2 packet aliases before querying', async () => {
+    queryMock.mockClear();
+    const { readQualifiedOntologyTuplesStrictV1 } = await import('./kag-hypergraph-reader-v1.js');
+    await expect(readQualifiedOntologyTuplesStrictV1(['packet:legacy-alias'], {
+      workspaceRevision: 'ws-1', graphRevision: 'graph-1',
+    })).rejects.toThrow('KAG_CANONICAL_PACKET_KEY_V2_REQUIRED');
+    expect(queryMock).not.toHaveBeenCalled();
+  });
+});

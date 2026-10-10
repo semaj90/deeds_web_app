@@ -6,9 +6,9 @@ import { materializeCandidateOrdinalMap } from '../features/canonical-candidate-
 const WS = 'sha256:' + 'e'.repeat(64);
 const REV = 'feature-rev:v1';
 const mask = (i: number) => Array.from({ length: 32 }, (_, k) => (k === i ? 1 : 0));
-const cand = (n: number): OrfCandidateV1 => ({ candidateOrdinal: n, canonicalId: `ace:packet:${n}`, packetKey: `ace:packet:${n}`, sourceRef: `src/f${n}.ts`, workspaceRevision: WS });
+const cand = (n: number): OrfCandidateV1 => ({ candidateOrdinal: n, canonicalId: `ace:packet:${n}`, packetKey: `ace:packet:${n}`, sourceRef: `src/f${n}.ts`, sourceRevision: `sha256:${String(n).padStart(64, 'a')}`, workspaceRevision: WS });
 const row = (n: number, over: Partial<OrfDbRowV1> = {}): OrfDbRowV1 => ({
-  packet_key: `ace:packet:${n}`, feature_revision: REV, source_ref: `src/f${n}.ts`, source_version_receipt_id: null,
+  packet_key: `ace:packet:${n}`, feature_revision: REV, source_revision: `sha256:${String(n).padStart(64, 'a')}`, registry_revision: 'registry:r1', source_ref: `src/f${n}.ts`, source_version_receipt_id: null,
   workspace_revision: WS, representation_id: 'semantic_768', representation_revision: 'repr:r1', tree_node_id: null,
   ontology_classes: [], ast_observation_kinds: ['FUNCTION'], langextract_classes: [], flattened_tags: ['ast=function'],
   ontology_mask: mask(0), ast_pattern_mask: mask(1), structural_flags: { hasFunction: true }, evidence_refs: ['e:1'],
@@ -17,7 +17,7 @@ const row = (n: number, over: Partial<OrfDbRowV1> = {}): OrfDbRowV1 => ({
 const ordinalMap = (count = 2) => materializeCandidateOrdinalMap({
   candidates: Array.from({ length: count }, (_, n) => ({
     canonicalId: `ace:packet:${n}`, packetKey: `ace:packet:${n}`, sourceRef: `src/f${n}.ts`,
-    treeNodeId: null, symbolVersionId: null, workspaceRevision: WS, sourceRevision: `source:${n}`,
+    treeNodeId: null, symbolVersionId: null, workspaceRevision: WS, sourceRevision: `sha256:${String(n).padStart(64, 'a')}`,
     graphRevision: null, semanticRevision: null, degradedIdentity: false, evidenceRefs: [], representationBindings: [],
   })),
   candidateSnapshotRevision: 'sha256:' + 'a'.repeat(64), workspaceRevision: WS, producerRevision: 'candidate-map-producer:v1',
@@ -39,6 +39,9 @@ describe('ACE-FSO-03 exact-gate ORF reader', () => {
       [{ representation_revision: null }, 'ORF_REPRESENTATION_REVISION_NULL'],
       [{ representation_revision: 'repr:other' }, 'ORF_REPRESENTATION_REVISION_MISMATCH'],
       [{ source_ref: 'src/other.ts' }, 'SOURCE_REF_MISMATCH'],
+      [{ source_revision: null }, 'ORF_SOURCE_REVISION_NULL'],
+      [{ source_revision: `sha256:${'f'.repeat(64)}` }, 'ORF_SOURCE_REVISION_MISMATCH'],
+      [{ registry_revision: null }, 'ORF_REGISTRY_REVISION_NULL'],
       [{ feature_revision: 'old-rev' }, 'FEATURE_REVISION_MISMATCH'],
       [{ input_digest: 'short' }, 'PROJECTION_INVALID'],
       [{ ontology_mask: [1, 0] }, 'PROJECTION_INVALID'],
@@ -48,6 +51,27 @@ describe('ACE-FSO-03 exact-gate ORF reader', () => {
       expect(r.accepted).toHaveLength(0);
       expect(r.rejected[0].reason, JSON.stringify(over)).toBe(reason);
     }
+  });
+
+  it('rejects legacy DB rows when proposed lineage columns are absent', () => {
+    const legacySource = { ...row(0) };
+    delete legacySource.source_revision;
+    delete legacySource.registry_revision;
+    const missingSource = readOrfRowsForCandidatesV1({
+      candidates: [cand(0)], rows: [legacySource], expectedFeatureRevision: REV, expectedRepresentationRevision: 'repr:r1',
+    });
+    expect(missingSource.rejected).toEqual([
+      { candidateOrdinal: 0, packetKey: 'ace:packet:0', reason: 'ORF_SOURCE_REVISION_NULL' },
+    ]);
+
+    const missingRegistryRow = { ...row(0) };
+    delete missingRegistryRow.registry_revision;
+    const missingRegistry = readOrfRowsForCandidatesV1({
+      candidates: [cand(0)], rows: [missingRegistryRow], expectedFeatureRevision: REV, expectedRepresentationRevision: 'repr:r1',
+    });
+    expect(missingRegistry.rejected).toEqual([
+      { candidateOrdinal: 0, packetKey: 'ace:packet:0', reason: 'ORF_REGISTRY_REVISION_NULL' },
+    ]);
   });
 
   it('rejects duplicate rows for one packet at the expected revision', () => {

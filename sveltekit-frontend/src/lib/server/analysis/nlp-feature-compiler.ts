@@ -546,8 +546,9 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 			: passResult.family === 'semantic' ? 'semantic_annotation'
 			: passResult.family === 'sequence' ? 'workflow_transition'
 			: passResult.family === 'rerank' ? 'rerank_decision'
-			: passResult.family === 'grounded' ? 'ontology_link'
+			: passResult.family === 'grounded' ? 'semantic_annotation'
 			: 'reference_link';
+		const groundedProposal = passResult.family === 'grounded';
 
 		const primaryEntity = firstNonEmpty(
 			passResult.packetKey,
@@ -592,8 +593,13 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 					passName: passResult.passName,
 					passRevision: passResult.passRevision,
 					passFamily: passResult.family,
+					passStatus: passResult.status,
 					passIndex: index,
 					featureKeys: Object.keys(passResult.features ?? {}),
+					canonicalAuthority: false,
+					...(groundedProposal
+						? { claimAuthority: 'PROPOSAL_ONLY', ontologyAdmission: 'NOT_PERFORMED' }
+						: {}),
 				},
 			}),
 		);

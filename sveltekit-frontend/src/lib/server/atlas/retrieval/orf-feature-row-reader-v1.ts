@@ -22,6 +22,8 @@ import {
 export interface OrfDbRowV1 {
   packet_key: string;
   feature_revision: string;
+  source_revision?: string | null;
+  registry_revision?: string | null;
   source_ref: string;
   source_version_receipt_id: string | null;
   workspace_revision: string | null;
@@ -45,6 +47,7 @@ export interface OrfCandidateV1 {
   canonicalId: string;
   packetKey: string;
   sourceRef: string;
+  sourceRevision: string;
   workspaceRevision: string;
 }
 
@@ -53,6 +56,9 @@ export type OrfRejectionReasonV1 =
   | 'MULTIPLE_ORF_ROWS'
   | 'FEATURE_REVISION_MISMATCH'
   | 'SOURCE_REF_MISMATCH'
+  | 'ORF_SOURCE_REVISION_NULL'
+  | 'ORF_SOURCE_REVISION_MISMATCH'
+  | 'ORF_REGISTRY_REVISION_NULL'
   | 'ORF_WORKSPACE_REVISION_NULL'
   | 'ORF_WORKSPACE_REVISION_MISMATCH'
   | 'ORF_REPRESENTATION_REVISION_NULL'
@@ -108,13 +114,17 @@ export function readOrfRowsForCandidatesV1(input: {
     if (ofRevision.length > 1) { reject(c, 'MULTIPLE_ORF_ROWS'); continue; }
     const r = ofRevision[0];
     if (r.source_ref !== c.sourceRef) { reject(c, 'SOURCE_REF_MISMATCH'); continue; }
+    if (r.source_revision == null) { reject(c, 'ORF_SOURCE_REVISION_NULL'); continue; }
+    if (r.source_revision !== c.sourceRevision) { reject(c, 'ORF_SOURCE_REVISION_MISMATCH'); continue; }
+    if (r.registry_revision == null || !r.registry_revision.trim()) { reject(c, 'ORF_REGISTRY_REVISION_NULL'); continue; }
     if (r.workspace_revision == null) { reject(c, 'ORF_WORKSPACE_REVISION_NULL'); continue; }
     if (r.workspace_revision !== c.workspaceRevision) { reject(c, 'ORF_WORKSPACE_REVISION_MISMATCH'); continue; }
     if (r.representation_revision == null) { reject(c, 'ORF_REPRESENTATION_REVISION_NULL'); continue; }
     if (r.representation_revision !== input.expectedRepresentationRevision) { reject(c, 'ORF_REPRESENTATION_REVISION_MISMATCH'); continue; }
     const parsed = ObservationFeatureProjectionV1Schema.safeParse({
       schema: 'atlas.observation-feature-projection.v1',
-      packetKey: r.packet_key, sourceRef: r.source_ref, treeNodeId: r.tree_node_id,
+      packetKey: r.packet_key, sourceRef: r.source_ref, sourceRevision: r.source_revision,
+      registryRevision: r.registry_revision, treeNodeId: r.tree_node_id,
       sourceVersionReceiptId: r.source_version_receipt_id,
       representationId: r.representation_id, representationRevision: r.representation_revision,
       ontologyClasses: r.ontology_classes ?? [], ontologyMask: r.ontology_mask,
@@ -160,6 +170,7 @@ export function readOrfRowsForCandidateMapV1(input: {
   const candidates = map.candidates.map((candidate) => {
     if (candidate.packetKey === null) throw new Error(`ORF_CANDIDATE_PACKET_KEY_REQUIRED:${candidate.candidateOrdinal}`);
     if (candidate.sourceRef === null) throw new Error(`ORF_CANDIDATE_SOURCE_REF_REQUIRED:${candidate.candidateOrdinal}`);
+    if (candidate.sourceRevision === null) throw new Error(`ORF_CANDIDATE_SOURCE_REVISION_REQUIRED:${candidate.candidateOrdinal}`);
     if (seenPacketKeys.has(candidate.packetKey)) throw new Error(`ORF_CANDIDATE_PACKET_KEY_DUPLICATE:${candidate.packetKey}`);
     seenPacketKeys.add(candidate.packetKey);
     return {
@@ -167,6 +178,7 @@ export function readOrfRowsForCandidateMapV1(input: {
       canonicalId: candidate.canonicalId,
       packetKey: candidate.packetKey,
       sourceRef: candidate.sourceRef,
+      sourceRevision: candidate.sourceRevision,
       workspaceRevision: candidate.workspaceRevision,
     };
   });

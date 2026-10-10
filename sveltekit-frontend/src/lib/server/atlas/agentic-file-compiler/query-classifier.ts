@@ -37,20 +37,24 @@ export function classifyAtlasQuery(input: { requestId: string; query: string; pr
   const requiresMutation = create || remove || rename || patch;
   const operation: QueryOperation = requiresMutation ? 'FILE_MUTATION' : /\bvalidate|test|check\b/.test(lower) ? 'VALIDATE' : /\bworkflow|dag\b/.test(lower) ? 'WORKFLOW' : /\bindex|reindex\b/.test(lower) ? 'INDEX' : 'INSPECT';
   const mutationKind: MutationKind | null = create ? 'CREATE' : remove ? 'DELETE' : rename ? 'RENAME' : patch ? 'PATCH' : null;
+  const codeLookup = /\b(code|source|file|function|method|class|symbol|implementation|assembler|caller|callee)\b/.test(lower);
+  const crossComponentRelation = /\b(connect(?:s|ed|ing)?|call(?:s|ed|ing)?|invok(?:e|es|ed|ing)|integrat(?:e|es|ed|ion)|handoff|relationship|between)\b/.test(lower);
   const targetHints = uniq([...rawQuery.matchAll(FILE_HINT)].map((m) => m[1]!.replaceAll('\\', '/')));
   const symbols = uniq([...rawQuery.matchAll(SYMBOL_HINT)].map((m) => m[1]!));
   const artifactKinds = uniq(targetHints.map((p) => p.endsWith('.sql') ? 'migration_script' : p.endsWith('.okf') ? 'okf_schema' : /\.(ts|tsx|js|mjs|mts|svelte)$/.test(p) ? 'source_module' : 'UNKNOWN'));
   const domains = uniq([
     lower.includes('parent atlas') || lower.includes('atlas') ? 'parent-atlas' : '',
-    lower.includes('cache') || lower.includes('redis') || lower.includes('bitfrost') ? 'cache' : '',
+    /\b(cache|caching|redis|valkey|bitfrost)\b/.test(lower) ? 'cache' : '',
+    /\b(agent|mcp|tools?)\b/.test(lower) ? 'agent' : '',
+    /\b(ace|assembler)\b|\bcontext[\s_-]*manifest\b/.test(lower) ? 'ace' : '',
     lower.includes('retrieval') || lower.includes('cagra') || lower.includes('diskann') || lower.includes('qdrant') ? 'retrieval' : '',
     lower.includes('workflow') || lower.includes('mastra') || lower.includes('dag') ? 'workflow' : '',
   ]);
   const retrievalNeeds = {
     lexical: true,
-    ast: requiresMutation || symbols.length > 0 || artifactKinds.includes('source_module'),
+    ast: requiresMutation || symbols.length > 0 || artifactKinds.includes('source_module') || codeLookup,
     semantic: !/^\s*(delete|rename)\s+[^\s]+\s*$/i.test(rawQuery),
-    graph: requiresMutation || /\bdependency|caller|callee|relation|graph|n-ary\b/i.test(rawQuery),
+    graph: requiresMutation || /\bdependency|caller|callee|relation|graph|n-ary\b/i.test(rawQuery) || (codeLookup && crossComponentRelation),
   };
   const base = {
     schema: 'atlas.query-classification.v1' as const, requestId: input.requestId, rawQuery, operation,

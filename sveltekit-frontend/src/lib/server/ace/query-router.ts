@@ -19,7 +19,11 @@ import { ENV } from '$lib/server/env.server.js';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 import { bifrostKey } from '$lib/server/cache-keys.js';
-import { bifrostRetrievalCacheLookupKey, type BifrostRetrievalCacheIdentityV3 } from './cache-keys.js';
+import {
+  bifrostRetrievalCacheLookupKey,
+  shouldReadUnrevisionedSemanticCacheV1,
+  type BifrostRetrievalCacheIdentityV3,
+} from './cache-keys.js';
 import {
   writeAcePacket,
   readAcePacketBySourceRef,
@@ -264,7 +268,10 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   // ambiguity this migration removes) — they simply expire under their original 3600s TTL,
   // and this lane cache-misses (fails open to the next retrieval lane) until repopulated
   // under the new prefix.
-  if (cacheHit === 'none') {
+  if (cacheHit === 'none' && shouldReadUnrevisionedSemanticCacheV1({
+    hasRevisionedIdentity: opts.retrievalCacheIdentityV3 !== undefined,
+    disabled: opts.disableRetrievalCache === true,
+  })) {
     const t0 = Date.now();
     try {
       // 1. Direct query-hash lookup
@@ -364,8 +371,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   }
 
   // ── Lane 3.5: Centroid nearest-cluster lookup ─────────────────────────────
-  // Embed query once and find the nearest precomputed cluster centroid.
-  // Resolves a clusterId hint before Qdrant ANN, improving cluster-scoped recall.
+  // Embed query once and find the nearest cached cluster centroid.
+  // The cluster is retained as packet/context metadata; qdrantSearch below does not filter by it.
   let sharedEmbedding: number[] | null = null;
   if (!clusterId) {
     const t0 = Date.now();

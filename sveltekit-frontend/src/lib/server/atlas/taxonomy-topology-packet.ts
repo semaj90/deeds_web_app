@@ -10,12 +10,58 @@ import {
 import { persistOntologyLinkedTuples } from './ontology-linked-tuple-postgres.js';
 import { deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1 } from './taxonomy-candidate-producer-v1.js';
 import { persistTaxonomyAssignmentCandidates } from './kag-taxonomy-candidate-postgres.js';
+import { resolvePacketKeyResolutionV2 } from './identity/packet-identity-resolver.js';
+import { PACKET_KEY_V2_PATTERN } from './identity/packet-key-v2.js';
 
 export const TaxonomyTupleSchema = z.object({
   source: z.string().min(1),
   relation: z.enum(['PARENT_OF', 'CHILD_OF', 'SAME_SOM_CLUSTER', 'IN_KMEANS_CLUSTER', 'HAS_ONTOLOGY_TAG']),
   target: z.string().min(1),
 });
+
+export function resolveTaxonomyWorkspaceRevisionV1(env: {
+  WORKSPACE_REVISION?: string;
+  REPOSITORY_REVISION?: string;
+}): string | null {
+  const revision = String(env.WORKSPACE_REVISION ?? '').trim()
+    || String(env.REPOSITORY_REVISION ?? '').trim();
+  return revision && revision.toLowerCase() !== 'unknown' ? revision : null;
+}
+
+export function buildTaxonomyReferenceTuplesV1(
+  packetId: string | null,
+  nodeKey: string,
+  tuples: readonly z.infer<typeof TaxonomyTupleSchema>[],
+) {
+  if (!packetId || !PACKET_KEY_V2_PATTERN.test(packetId)) return [];
+
+  return tuples.map((tuple, index) => ({
+    tupleId: `${packetId}:${index}`,
+    schemaVersion: 'ontology-linked-tuple.v1' as const,
+    packetKey: packetId,
+    sourceRef: `taxonomy:${nodeKey}`,
+    surfaceText: tuple.target,
+    tokenIndex: index,
+    partOfSpeech: null,
+    label: tuple.target,
+    labelKind: (tuple.relation === 'HAS_ONTOLOGY_TAG' ? 'ontology' : 'tag') as 'ontology' | 'tag',
+    labelSource: 'semantic_tagger' as const,
+    ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+    conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+    participants: [],
+    evidenceRefs: [],
+    confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
+    evidenceState: 'REFERENCE_ONLY' as const,
+    lifecycle: 'OBSERVED' as const,
+    provenance: {
+      sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
+      labelerVersion: null,
+      taggerVersion: null,
+      ontologyVersion: null,
+      nlpVersion: null,
+    },
+  }));
+}
 
 export const TaxonomyClassifierEvidenceSchema = z.object({
   domainClass: z.string().nullable(),
@@ -86,6 +132,20 @@ export interface BuildTaxonomyTopologyPacketInput {
 export interface BuildTaxonomyTopologyPacketResult {
   summary: TaxonomyTopologyPacketSummary;
   packet: AceFullPacket;
+  tuplePacketIdentityStatus: 'RESOLVED' | 'UNRESOLVED';
+}
+
+export async function resolveTaxonomyPacketKeyV1(
+  packetId: string,
+  resolver: (inputKey: string) => Promise<{ canonicalPacketKey: string }>,
+): Promise<string | null> {
+  try {
+    const resolution = await resolver(packetId);
+    const canonicalPacketKey = String(resolution.canonicalPacketKey ?? '').trim();
+    return PACKET_KEY_V2_PATTERN.test(canonicalPacketKey) ? canonicalPacketKey : null;
+  } catch {
+    return null;
+  }
 }
 
 type TaxonomyNodeRow = {
@@ -426,36 +486,28 @@ export async function buildTaxonomyTopologyPacket(
     { asLatest: input.asLatest ?? false, ttl: 3600 }
   );
 
-  const rawOntologyLinkedTuples = summary.linkedTuples.map((tuple, index) => ({
-    tupleId: `${packet.packet_id}:${index}`,
-    schemaVersion: 'ontology-linked-tuple.v1' as const,
-    packetKey: packet.packet_id,
-    sourceRef: `taxonomy:${summary.nodeKey}`,
-    surfaceText: tuple.target,
-    tokenIndex: index,
-    partOfSpeech: null,
-    label: tuple.target,
-    labelKind: (tuple.relation === 'HAS_ONTOLOGY_TAG' ? 'ontology' : 'tag') as 'ontology' | 'tag',
-    labelSource: 'semantic_tagger' as const,
-    ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
-    conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
-    participants: [],
-    evidenceRefs: [],
-    confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
-    evidenceState: 'ACTIVE_VERIFIED' as const,
-    lifecycle: 'OBSERVED' as const,
-    provenance: {
-      sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
-      labelerVersion: classifier.domainClassifierTier ?? null,
-      taggerVersion: classifier.evidenceSource ?? null,
-      ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
-      nlpVersion: null,
-    },
-  }));
+  const canonicalPacketKey = await resolveTaxonomyPacketKeyV1(
+    packet.packet_id,
+    resolvePacketKeyResolutionV2,
+  );
+  const rawOntologyLinkedTuples = buildTaxonomyReferenceTuplesV1(
+    canonicalPacketKey,
+    summary.nodeKey,
+    summary.linkedTuples,
+  ).map((tuple) => ({
+      ...tuple,
+      provenance: {
+        ...tuple.provenance,
+        labelerVersion: classifier.domainClassifierTier ?? null,
+        taggerVersion: classifier.evidenceSource ?? null,
+        ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
+      },
+    }));
 
-  const ontologyCachePlan = buildOntologyLinkedTupleCachePlan({
-    packetId: packet.packet_id,
-    packetRevision: packet.packet_ulid ?? packet.packet_id,
+  const workspaceRevision = resolveTaxonomyWorkspaceRevisionV1(process.env);
+  const ontologyCachePlan = workspaceRevision && canonicalPacketKey ? buildOntologyLinkedTupleCachePlan({
+    packetId: canonicalPacketKey,
+    packetRevision: packet.packet_ulid,
     featureId,
     sourceRef: `taxonomy:${summary.nodeKey}`,
     tuples: rawOntologyLinkedTuples,
@@ -475,12 +527,12 @@ export async function buildTaxonomyTopologyPacket(
       ontologyTags: summary.topology.ontologyTags,
     },
     revisions: {
-      workspaceRevision: String(process.env.WORKSPACE_REVISION ?? process.env.REPOSITORY_REVISION ?? 'unknown'),
+      workspaceRevision,
       ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
       centroidVersion: String(summary.centroid.redisCentroidTrainedAt ?? summary.centroid.redisCentroidCount ?? '').trim() || null,
     },
     blockedContentHashes: [],
-  });
+  }) : null;
 
   // KAG-05E: Postgres is truth; Redis is cache — and the cache MUST NOT run
   // ahead of truth. Persist to Postgres FIRST, then cache only the tuples
@@ -489,10 +541,12 @@ export async function buildTaxonomyTopologyPacket(
   // exist in canonical storage, which breaks "Postgres is truth" outright.
   // Fail-open at the MCP-response level (a persistence failure must not
   // break this tool's response), but never fail-open on what gets cached.
-  const persistence = await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
-    console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed (DEGRADED_PERSISTENCE, no Redis cache this cycle):', err);
-    return { attempted: rawOntologyLinkedTuples.length, written: 0, errors: rawOntologyLinkedTuples.map((tuple) => ({ tupleId: tuple.tupleId, message: 'persistOntologyLinkedTuples threw' })) };
-  });
+  const persistence = rawOntologyLinkedTuples.length > 0
+    ? await persistOntologyLinkedTuples(rawOntologyLinkedTuples, 'taxonomy-topology-packet:v1').catch((err) => {
+        console.warn('[taxonomy-topology-packet] Postgres tuple persistence failed (DEGRADED_PERSISTENCE, no Redis cache this cycle):', err);
+        return { attempted: rawOntologyLinkedTuples.length, written: 0, errors: rawOntologyLinkedTuples.map((tuple) => ({ tupleId: tuple.tupleId, message: 'persistOntologyLinkedTuples threw' })) };
+    })
+    : { attempted: 0, written: 0, errors: [] };
 
   if (persistence.errors.length > 0) {
     console.warn(
@@ -504,12 +558,12 @@ export async function buildTaxonomyTopologyPacket(
   const failedTupleIds = new Set(persistence.errors.map((error) => error.tupleId));
   const persistedTuples = rawOntologyLinkedTuples.filter((tuple) => !failedTupleIds.has(tuple.tupleId));
 
-  if (persistedTuples.length > 0) {
+  if (persistedTuples.length > 0 && ontologyCachePlan && workspaceRevision) {
     const cacheableCachePlan = persistedTuples.length === rawOntologyLinkedTuples.length
       ? ontologyCachePlan
       : buildOntologyLinkedTupleCachePlan({
-          packetId: packet.packet_id,
-          packetRevision: packet.packet_ulid ?? packet.packet_id,
+          packetId: canonicalPacketKey!,
+          packetRevision: packet.packet_ulid,
           featureId,
           sourceRef: `taxonomy:${summary.nodeKey}`,
           tuples: persistedTuples,
@@ -529,7 +583,7 @@ export async function buildTaxonomyTopologyPacket(
             ontologyTags: summary.topology.ontologyTags,
           },
           revisions: {
-            workspaceRevision: String(process.env.WORKSPACE_REVISION ?? process.env.REPOSITORY_REVISION ?? 'unknown'),
+            workspaceRevision,
             ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
             centroidVersion: String(summary.centroid.redisCentroidTrainedAt ?? summary.centroid.redisCentroidCount ?? '').trim() || null,
           },
@@ -552,5 +606,9 @@ export async function buildTaxonomyTopologyPacket(
     }
   }
 
-  return { summary, packet };
+  return {
+    summary,
+    packet,
+    tuplePacketIdentityStatus: canonicalPacketKey ? 'RESOLVED' : 'UNRESOLVED',
+  };
 }

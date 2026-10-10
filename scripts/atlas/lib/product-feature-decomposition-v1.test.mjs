@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { decomposeProductRequestV1 as decompose } from './product-feature-decomposition-v1.mjs';
+const base={requestId:'req-1',query:'Build a mobile offline sync and push notification app',surface:'mobile'};
+test('recognizes mobile feature proposals',()=>{const r=decompose(base);assert.deepEqual(r.features.map(f=>f.id),['offline.sync','collaboration.notifications']);assert.equal(r.ontologyAdmission,false)});
+test('website feature categories',()=>{const r=decompose({...base,query:'Build a checkout with product catalog and blog',surface:'website'});assert.deepEqual(r.features.map(f=>f.id),['commerce.catalog','commerce.checkout','content.cms'])});
+test('topK truncates deterministically',()=>{const q={...base,query:'login signup profile notifications offline sync search checkout',topK:2};assert.deepEqual(decompose(q),decompose(q));assert.equal(decompose(q).features.length,2)});
+test('domain labels do not become ontology identity',()=>{const r=decompose({...base,query:'agent workflow messaging',surface:'webapp'});assert.ok(r.unresolvedDomains.includes('agent'));assert.ok(r.features.every(f=>f.ontologyId===null&&f.admission==='PROPOSAL_ONLY'))});
+test('no features matched never invents features',()=>assert.equal(decompose({...base,query:'xyzabc'}).features.length,0));
+test('bad surface rejected',()=>assert.throws(()=>decompose({...base,surface:'desktop'}),/INVALID_SURFACE/));
+test('no source evidence manufactured',()=>{const r=decompose({...base,sources:[{sourceRef:'src/app.ts',sourceRevision:'sha256:abc'}]});assert.equal(r.features[0].evidenceRefs.length,0);assert.equal(r.sourceHints.length,1)});

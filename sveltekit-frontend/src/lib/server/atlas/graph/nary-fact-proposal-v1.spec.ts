@@ -42,4 +42,27 @@ describe('NaryFactProposalV1', () => {
       ],
     })).toThrow('NARY_PROPOSAL_DUPLICATE_PARTICIPANT');
   });
+
+  it('binds the ontology revision into the proposal checksum', () => {
+    const base = {
+      sourceRef: 'src/ontology.ts',
+      sourceRevision: 'source:v1',
+      workspaceRevision: 'workspace:v1',
+      packetKey: 'packet:ontology',
+      graphRevision: 'graph:v1',
+      producerRevision: 'proposal:v1',
+      predicate: 'ONTOLOGY_RELATION',
+      participants: [
+        { canonicalId: 'entity:a', role: 'subject', entityType: 'ENTITY' },
+        { canonicalId: 'entity:b', role: 'object', entityType: 'ENTITY' },
+        { canonicalId: 'entity:c', role: 'qualifier', entityType: 'ENTITY' },
+      ],
+      evidenceRefs: ['evidence:ontology'],
+      admission: 'PROPOSED' as const,
+    };
+    const first = createNaryFactProposalV1({ ...base, ontologyRevision: 'ontology-revision:a' });
+    const second = createNaryFactProposalV1({ ...base, ontologyRevision: 'ontology-revision:b' });
+
+    expect(first.proposalChecksum).not.toBe(second.proposalChecksum);
+  });
 });

@@ -45,6 +45,7 @@ export function proposeApiContractNaryFactV1(
     packetKey: input.packetKey,
     graphRevision: input.graphRevision,
     producerRevision: input.producerRevision,
+    ontologyRevision: null,
     predicate: 'API_CONTRACT_OBSERVED',
     participants: resolutions.participants,
     evidenceRefs: [...new Set([...observation.evidenceRefs, ...resolutions.evidenceRefs])],

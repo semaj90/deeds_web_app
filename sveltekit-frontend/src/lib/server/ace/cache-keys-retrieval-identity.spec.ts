@@ -5,6 +5,7 @@ import {
   bifrostRetrievalCacheKeyV2,
   bifrostRetrievalCacheKeyV3,
   bifrostRetrievalCacheLookupKey,
+  shouldReadUnrevisionedSemanticCacheV1,
   type BifrostRetrievalCacheIdentityV3,
   type RetrievalCacheIdentityV1,
 } from './cache-keys.js';
@@ -111,5 +112,11 @@ describe('Bifrost retrieval cache v3 identity', () => {
     expect(bifrostRetrievalCacheLookupKey('different-query', base)).toBeNull();
     expect(bifrostRetrievalCacheLookupKey('query-1')).toBe('bitfrost:retrieval:query-1');
     expect(bifrostRetrievalCacheLookupKey('query-1', undefined, true)).toBeNull();
+  });
+
+  it('suppresses the legacy semantic cache when disabled or when strict identity is present', () => {
+    expect(shouldReadUnrevisionedSemanticCacheV1({ hasRevisionedIdentity: false, disabled: true })).toBe(false);
+    expect(shouldReadUnrevisionedSemanticCacheV1({ hasRevisionedIdentity: true, disabled: false })).toBe(false);
+    expect(shouldReadUnrevisionedSemanticCacheV1({ hasRevisionedIdentity: false, disabled: false })).toBe(true);
   });
 });

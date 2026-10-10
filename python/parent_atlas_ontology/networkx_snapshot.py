@@ -8,7 +8,9 @@ edges; no participant clique is created.
 
 from __future__ import annotations
 
+import heapq
 import json
+from collections import deque
 from itertools import combinations
 from typing import Any, Sequence
 
@@ -268,3 +270,140 @@ def bounded_bfs_receipt(
     }
     payload["traversal_checksum"] = logical_checksum(payload)
     return payload
+
+
+def bounded_role_aware_incidence_expansion_receipt(
+    relations: Sequence[NarySemanticRelation],
+    *,
+    graph_revision: str,
+    source_entity_id: str,
+    depth_limit: int = 2,
+    max_relation_expansions: int = 32,
+    max_participants_per_relation: int = 128,
+) -> dict[str, Any]:
+    if not graph_revision.strip():
+        raise ValueError("graph_revision is required")
+    if not source_entity_id.strip():
+        raise ValueError("source_entity_id is required")
+    if depth_limit < 0:
+        raise ValueError("depth_limit must be non-negative")
+    if max_relation_expansions <= 0:
+        raise ValueError("max_relation_expansions must be positive")
+    if max_participants_per_relation <= 0:
+        raise ValueError("max_participants_per_relation must be positive")
+
+    graph = build_networkx_projection((), relations)
+    if source_entity_id not in graph or graph.nodes[source_entity_id].get("node_kind") != "ENTITY":
+        raise ValueError("source_entity_id is not an entity in the graph")
+
+    snapshot = _canonical_graph_payload(graph, graph_revision)
+    ordinal_by_node = {row["node_id"]: row["graph_ordinal"] for row in snapshot["nodes"]}
+    queue = deque([(source_entity_id, 0)])
+    visited_entities = {source_entity_id}
+    entity_depths = {source_entity_id: 0}
+    visited_relations: set[str] = set()
+    steps: list[dict[str, Any]] = []
+    participant_limit_reached = False
+
+    while queue and len(visited_relations) < max_relation_expansions:
+        source_entity, depth = queue.popleft()
+        if depth >= depth_limit:
+            continue
+        remaining_relation_budget = max_relation_expansions - len(visited_relations)
+        relation_nodes = heapq.nsmallest(
+            remaining_relation_budget,
+            (
+                str(node)
+                for node in graph.predecessors(source_entity)
+                if graph.nodes[node].get("node_kind") == "NARY_RELATION"
+                and str(graph.nodes[node].get("relationship_id", "")) not in visited_relations
+            ),
+        )
+        for relation_node in relation_nodes:
+            relation_id = str(graph.nodes[relation_node].get("relationship_id", ""))
+            if not relation_id or relation_id in visited_relations:
+                continue
+            if len(visited_relations) >= max_relation_expansions:
+                break
+
+            def incidence_rows():
+                for participant_id in graph.successors(relation_node):
+                    entity_id = str(participant_id)
+                    edge_map = graph.get_edge_data(relation_node, participant_id) or {}
+                    for attributes in edge_map.values():
+                        yield {
+                            "graphOrdinal": ordinal_by_node[entity_id],
+                            "entityId": entity_id,
+                            "role": str(attributes.get("role", "")),
+                            "participantOrdinal": int(attributes.get("ordinal", -1)),
+                        }
+
+            participant_rows = heapq.nsmallest(
+                max_participants_per_relation + 1,
+                incidence_rows(),
+                key=lambda row: (
+                    row["entityId"] != source_entity,
+                    row["participantOrdinal"],
+                    row["graphOrdinal"],
+                    row["role"],
+                ),
+            )
+            has_more_participants = len(participant_rows) > max_participants_per_relation
+            if has_more_participants:
+                participant_limit_reached = True
+                participant_rows = participant_rows[:max_participants_per_relation]
+            if not participant_rows:
+                continue
+
+            relation_attributes = graph.nodes[relation_node]
+            source_roles = sorted({
+                str(attributes.get("role", ""))
+                for attributes in (graph.get_edge_data(relation_node, source_entity) or {}).values()
+            })
+            visited_relations.add(relation_id)
+            steps.append({
+                "depth": depth + 1,
+                "sourceEntityId": source_entity,
+                "sourceRoles": source_roles,
+                "relationId": relation_id,
+                "relationType": str(relation_attributes.get("relation_type", "")),
+                "sourceRef": str(relation_attributes.get("source_ref", "")),
+                "sourceRevision": str(relation_attributes.get("source_revision", "")),
+                "evidenceRefs": sorted(str(value) for value in relation_attributes.get("evidence_refs", ())),
+                "participantCountTotal": int(relation_attributes.get("degree", len(participant_rows))),
+                "participantLimitReached": has_more_participants,
+                "participants": participant_rows,
+            })
+            for participant in participant_rows:
+                entity_id = participant["entityId"]
+                if entity_id != source_entity and entity_id not in visited_entities:
+                    visited_entities.add(entity_id)
+                    entity_depths[entity_id] = depth + 1
+                    queue.append((entity_id, depth + 1))
+
+    body = {
+        "schema": "atlas.ontology-networkx-role-aware-incidence-expansion.v1",
+        "status": "NETWORKX_INCIDENCE_TRAVERSAL_PROVEN",
+        "graphRevision": graph_revision,
+        "projectionChecksum": snapshot["projection_checksum"],
+        "graphOrdinalMapChecksum": snapshot["graph_ordinal_map_checksum"],
+        "sourceEntityId": source_entity_id,
+        "depthLimit": depth_limit,
+        "maxRelationExpansions": max_relation_expansions,
+        "maxParticipantsPerRelation": max_participants_per_relation,
+        "expandedRelationCount": len(visited_relations),
+        "truncated": participant_limit_reached or any(
+            depth < depth_limit
+            and any(
+                str(graph.nodes[node].get("relationship_id", "")) not in visited_relations
+                for node in graph.predecessors(entity_id)
+                if graph.nodes[node].get("node_kind") == "NARY_RELATION"
+            )
+            for entity_id, depth in entity_depths.items()
+        ),
+        "steps": steps,
+        "canonicalAuthority": False,
+        "evidenceAdmission": "NOT_PERFORMED",
+        "writesPerformed": False,
+    }
+    return {**body, "traversalChecksum": logical_checksum(body)}

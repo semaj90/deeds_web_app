@@ -29,6 +29,25 @@ import { prepareUnifiedResidencyAceBridgeV1, type UnifiedResidencyAceBridgeInput
 import { materializeCandidateFeatureColumnar } from '../features/candidate-feature-columnar-v1.js';
 import { materializeCandidateFeatureGpuPack } from '../features/candidate-feature-gpu-pack-v1.js';
 import { prepareUnifiedResidencyFeaturePackBatchV1 } from '../tensors/unified-residency-feature-pack-v1.js';
+import {
+  resolveCachedPacketCandidatesV1,
+  verifyCachedPacketCandidateSourceSpanV1,
+  verifyCachedPacketCandidateSourceBindingSpanV1,
+  type CachedPacketHintV1,
+  type CachedPacketSourceSpanEvidenceV1,
+  type CachedPacketSourceSpanVerificationV1,
+} from './cached-packet-candidate-resolution-v1.js';
+import type { GroundedExtractionSourceBindingReceiptV1 } from '../identity/grounded-extraction-source-binding-v1.js';
+import {
+  resolveCentroidCardCandidatesV1,
+  type CentroidCardCandidateCrosswalkV1,
+} from './centroid-card-candidate-crosswalk-v1.js';
+import type { CentroidCardV1, CentroidManifestV1 } from '../cache/centroid-artifact-v1.js';
+
+interface CachedPacketSourceEvidenceInputV1 {
+  evidence: CachedPacketSourceSpanEvidenceV1;
+  sourceBindingReceipt?: GroundedExtractionSourceBindingReceiptV1;
+}
 
 export interface AtlasSearchRequest {
   query: string;
@@ -79,6 +98,12 @@ export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
   packetRepresentationId?: string;
   packetNormalizationPolicyRevision?: string;
   packetArtifactChecksum?: string;
+  /** Optional cache hints; resolved only against the SearchRuntime-owned ordinal map. */
+  cachedPacketHints?: readonly CachedPacketHintV1[];
+  /** Optional centroid hint; exemplars are crosswalked to this request's ordinal map only. */
+  centroidCandidateHint?: { card: CentroidCardV1; manifest: CentroidManifestV1 };
+  /** Optional independently acquired source bytes/spans; verified but never admitted here. */
+  cachedPacketSourceEvidence?: readonly ({ hintId: string } & CachedPacketSourceEvidenceInputV1)[];
 }
 
 export type SearchRuntimeUnifiedResidencyOptions = AtlasSearchAceManifestOptions
@@ -347,6 +372,65 @@ export function createAtlasSearchAdapter(config?: {
         promptTemplateRevision: options.promptTemplateRevision,
       });
       const { ordinalMap, ...aceAdmission } = ace;
+      const cachedPacketCandidateResolution = options.cachedPacketHints
+        ? resolveCachedPacketCandidatesV1({
+            workspaceRevision: options.workspaceRevision,
+            ordinalMap,
+            hints: options.cachedPacketHints,
+          })
+        : null;
+      let centroidCandidateCrosswalk: CentroidCardCandidateCrosswalkV1 | null = null;
+      let centroidCandidateCrosswalkRejection: string | null = null;
+      if (options.centroidCandidateHint) {
+        try {
+          centroidCandidateCrosswalk = resolveCentroidCardCandidatesV1({
+            card: options.centroidCandidateHint.card,
+            manifest: options.centroidCandidateHint.manifest,
+            ordinalMap,
+          });
+        } catch (error) {
+          centroidCandidateCrosswalkRejection = error instanceof Error
+            ? error.message
+            : 'CENTROID_CANDIDATE_CROSSWALK_FAILED';
+        }
+      }
+      const cachedPacketSourceSpanVerifications: CachedPacketSourceSpanVerificationV1[] = [];
+      const cachedPacketSourceSpanRejections: Array<{ hintId: string; reason: string }> = [];
+      const sourceEvidenceByHint = new Map<string, CachedPacketSourceEvidenceInputV1>();
+      const duplicateSourceEvidenceHints = new Set<string>();
+      for (const item of options.cachedPacketSourceEvidence ?? []) {
+        if (sourceEvidenceByHint.has(item.hintId)) {
+          sourceEvidenceByHint.delete(item.hintId);
+          duplicateSourceEvidenceHints.add(item.hintId);
+          cachedPacketSourceSpanRejections.push({ hintId: item.hintId, reason: 'DUPLICATE_SOURCE_EVIDENCE_HINT' });
+        } else if (!duplicateSourceEvidenceHints.has(item.hintId)) {
+          sourceEvidenceByHint.set(item.hintId, item);
+        }
+      }
+      for (const match of cachedPacketCandidateResolution?.matches ?? []) {
+        if (duplicateSourceEvidenceHints.has(match.hintId)) continue;
+        const evidence = sourceEvidenceByHint.get(match.hintId);
+        if (!evidence) {
+          cachedPacketSourceSpanRejections.push({ hintId: match.hintId, reason: 'SOURCE_EVIDENCE_NOT_SUPPLIED' });
+          continue;
+        }
+        try {
+          cachedPacketSourceSpanVerifications.push(evidence.sourceBindingReceipt
+            ? verifyCachedPacketCandidateSourceBindingSpanV1(match, evidence.evidence, evidence.sourceBindingReceipt)
+            : verifyCachedPacketCandidateSourceSpanV1(match, evidence.evidence));
+        } catch (error) {
+          cachedPacketSourceSpanRejections.push({
+            hintId: match.hintId,
+            reason: error instanceof Error ? error.message : 'SOURCE_EVIDENCE_VERIFICATION_FAILED',
+          });
+        }
+      }
+      const matchedHintIds = new Set((cachedPacketCandidateResolution?.matches ?? []).map(({ hintId }) => hintId));
+      for (const hintId of sourceEvidenceByHint.keys()) {
+        if (!matchedHintIds.has(hintId) && !duplicateSourceEvidenceHints.has(hintId)) {
+          cachedPacketSourceSpanRejections.push({ hintId, reason: 'SOURCE_EVIDENCE_HINT_NOT_RESOLVED' });
+        }
+      }
       const retrievalCacheIdentity = options.retrievalCacheModel && options.retrievalCacheDim && options.contextPolicyRevision
         ? retrievalCacheIdentityFromAceManifestV1(aceAdmission, {
             queryHash: buildAceTopRetrievalQueryHash(req.query),
@@ -382,6 +466,11 @@ export function createAtlasSearchAdapter(config?: {
         ...result,
         snapshot: ace.snapshot,
         admission: aceAdmission,
+        cachedPacketCandidateResolution,
+        centroidCandidateCrosswalk,
+        centroidCandidateCrosswalkRejection,
+        cachedPacketSourceSpanVerifications,
+        cachedPacketSourceSpanRejections,
         retrievalCacheIdentity,
         acePacketCacheIdentity,
         candidateFeatureMatrixArtifact,

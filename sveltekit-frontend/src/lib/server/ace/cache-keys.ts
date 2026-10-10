@@ -132,6 +132,13 @@ export interface BifrostRetrievalCacheIdentityV3 {
 	dimension: number;
 }
 
+export function shouldReadUnrevisionedSemanticCacheV1(input: {
+	hasRevisionedIdentity: boolean;
+	disabled: boolean;
+}): boolean {
+	return !input.hasRevisionedIdentity && !input.disabled;
+}
+
 export const bifrostRetrievalCacheKeyV3 = (identity: BifrostRetrievalCacheIdentityV3): string => {
 	const required = [
 		identity.queryHash,

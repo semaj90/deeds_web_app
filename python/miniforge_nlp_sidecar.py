@@ -2579,6 +2579,8 @@ def _build_pass_results(
     concepts: list[str],
     chunks: list[Chunk],
     features: list[Feature],
+    grounded_extraction_used: bool = False,
+    grounded_extraction_failure: Optional[str] = None,
 ) -> tuple[list[AnalysisPassResult], list[AstUnit], list[SemanticCodeCard], list[HMMObservation], Optional[Control5], Optional[ExperimentFeatureMatrix]]:
     requested = req.passes or []
     if not requested and not req.grounded_extraction_required:
@@ -2736,7 +2738,7 @@ def _build_pass_results(
         )
 
     if req.grounded_extraction_required:
-        grounded_status = "succeeded" if LANGEXTRACT_AVAILABLE else "skipped"
+        grounded_status = "succeeded" if grounded_extraction_used else "skipped"
         add_pass(
             "grounded",
             "langextract",
@@ -2744,9 +2746,13 @@ def _build_pass_results(
             _package_version("langextract") or "unknown",
             "external",
             {},
-            {"grounded_only": bool(LANGEXTRACT_AVAILABLE and req.grounded_extraction_required)},
+            {"grounded_only": grounded_extraction_used},
             status=grounded_status,
-            warnings=[] if LANGEXTRACT_AVAILABLE else ["LangExtract unavailable; grounded extraction skipped"],
+            warnings=(
+                []
+                if grounded_extraction_used
+                else [grounded_extraction_failure or "Grounded extraction did not produce an eligible result"]
+            ),
         )
 
     if "classify" in requested:
@@ -2891,6 +2897,13 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         concepts,
         chunks,
         features,
+        grounded_extraction_used=grounded_used,
+        grounded_extraction_failure=(
+            grounded_execution_receipt.get("failureClass")
+            or grounded_execution_receipt.get("state")
+            if req.grounded_extraction_required and not grounded_used
+            else None
+        ),
     )
     event_hypergraph = _build_event_hypergraph(
         req,

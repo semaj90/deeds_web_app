@@ -32,3 +32,12 @@ test('all expected relations are reported, even when missing',()=>{
   const r=buildCatalogReport([],[],[]);
   assert.deepEqual(Object.keys(r.relations),TABLES);
 });
+test('tuple lineage census remains explicit and does not imply admission',()=>{
+  const census={status:'READ_ONLY_CENSUS',total_rows:0,exact_packet_lineage_matches:0};
+  const scope={database_name:'atlas_test',server_address:'127.0.0.1',server_port:5432,server_version:'18.4'};
+  const r=buildCatalogReport([],[],[],census,scope);
+  assert.equal(r.tupleLineageCensus,census);
+  assert.equal(r.databaseScope,scope);
+  assert.equal(r.evidenceAdmissionProven,false);
+  assert.equal(r.canonicalWrites,false);
+});

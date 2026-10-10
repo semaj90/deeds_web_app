@@ -668,7 +668,7 @@ export interface AstOutputV1 {
   schema: 'atlas.ast-grep-refinement-output.v1';
   declarations: AstDeclarationV1[];
   matchedLexicalFilePaths: string[];
-  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_SOURCE_BINDING' | 'READ_FAILED' | 'EXTRACT_FAILED' | 'EXTRACT_RESULT_MISMATCH' | 'INVALID_SPAN' }>;
+  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_SOURCE_BINDING' | 'SOURCE_REVISION_MISMATCH' | 'READ_FAILED' | 'INVALID_UTF8_SOURCE' | 'EXTRACT_FAILED' | 'EXTRACT_RESULT_MISMATCH' | 'INVALID_SPAN' }>;
   producerRevision: string;
   canonicalAuthority: false;
 }
@@ -698,7 +698,7 @@ export type AstExtractLikeV1 = (input: {
  */
 export function makeAstHandlerV1(deps: {
   extract: AstExtractLikeV1;
-  readFile: (filePath: string) => Promise<string>;
+  readSourceBytes: (filePath: string) => Promise<Uint8Array>;
   resolveSourceBinding: (filePath: string) => { sourceRef: string; workspaceRevision: string; sourceRevision: string } | null;
   symbols: readonly string[];
   producerRevision: string;
@@ -713,12 +713,28 @@ export function makeAstHandlerV1(deps: {
       const language = LANG_BY_EXT[filePath.split('.').pop()?.toLowerCase() ?? ''];
       if (!language) { skipped.push({ filePath, reason: 'NOT_TS_JS' }); return; }
       const binding = deps.resolveSourceBinding(filePath);
-      if (!binding?.sourceRef.trim() || !binding.workspaceRevision.trim() || !binding.sourceRevision.trim()) {
+      if (!binding?.sourceRef.trim() || !/^sha256:[a-f0-9]{64}$/i.test(binding.workspaceRevision)
+        || !/^sha256:[a-f0-9]{64}$/i.test(binding.sourceRevision)) {
         skipped.push({ filePath, reason: 'NO_SOURCE_BINDING' });
         return;
       }
+      let sourceBytes: Buffer;
+      try {
+        const raw = await deps.readSourceBytes(filePath);
+        if (!ArrayBuffer.isView(raw) || Object.prototype.toString.call(raw) !== '[object Uint8Array]') {
+          skipped.push({ filePath, reason: 'READ_FAILED' });
+          return;
+        }
+        sourceBytes = Buffer.from(raw);
+      } catch { skipped.push({ filePath, reason: 'READ_FAILED' }); return; }
       let code: string;
-      try { code = await deps.readFile(filePath); } catch { skipped.push({ filePath, reason: 'READ_FAILED' }); return; }
+      try { code = new TextDecoder('utf-8', { fatal: true }).decode(sourceBytes); }
+      catch { skipped.push({ filePath, reason: 'INVALID_UTF8_SOURCE' }); return; }
+      const sourceDigest = createHash('sha256').update(sourceBytes).digest('hex');
+      if (binding.sourceRevision.toLowerCase() !== `sha256:${sourceDigest}`) {
+        skipped.push({ filePath, reason: 'SOURCE_REVISION_MISMATCH' });
+        return;
+      }
       let found: AstGrepStructuralCandidateV1[];
       try {
         found = (await deps.extract({
@@ -736,8 +752,9 @@ export function makeAstHandlerV1(deps: {
         skipped.push({ filePath, reason: 'EXTRACT_RESULT_MISMATCH' });
         return;
       }
-      const sourceBytes = Buffer.from(code, 'utf8');
-      if (found.some((candidate) => candidate.endByte > sourceBytes.length)) {
+      if (found.some((candidate) => candidate.endByte > sourceBytes.length
+        || (candidate.startByte > 0 && (sourceBytes[candidate.startByte]! & 0xc0) === 0x80)
+        || (candidate.endByte < sourceBytes.length && (sourceBytes[candidate.endByte]! & 0xc0) === 0x80))) {
         skipped.push({ filePath, reason: 'INVALID_SPAN' });
         return;
       }

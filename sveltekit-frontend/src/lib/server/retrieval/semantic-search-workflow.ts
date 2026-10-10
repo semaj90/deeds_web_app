@@ -4,6 +4,8 @@ import { z } from 'zod';
 
 import { buildStreamPreamble } from '$lib/server/mcp/atlas-tools-client.js';
 import { createAtlasSearchAdapter } from '$lib/server/atlas/retrieval/search-runtime-adapter.js';
+import { classifyAtlasQuery } from '$lib/server/atlas/agentic-file-compiler/query-classifier.js';
+import { sha256Stable } from '$lib/server/atlas/agentic-file-compiler/contracts.js';
 import {
   runSearchRuntimeContextManifestShadowV1,
   type SearchRuntimeContextManifestShadowConfigV1,
@@ -182,13 +184,25 @@ export async function runSemanticSearchWorkflow(
     });
   };
 
+  const queryClassification = classifyAtlasQuery({
+    requestId: validated.traceId ?? validated.spanContext?.traceId ?? `search:${sha256Stable({ query })}`,
+    query,
+    producerRevision: 'semantic-search-workflow-v1',
+  });
+  addStep(
+    'classify_query_intent',
+    'completed',
+    Date.now(),
+    `domains=${queryClassification.domains.join(',') || 'none'}; ast=${queryClassification.retrievalNeeds.ast}; graph=${queryClassification.retrievalNeeds.graph}`,
+  );
+
   const searchRequest = {
     query,
     topK: validated.topK,
     userId: validated.userId ?? runtimeOptions?.userId ?? undefined,
     caseId: validated.caseId ?? runtimeOptions?.caseId ?? undefined,
     filters: validated.filters,
-    withGraphExpansion: validated.withGraphExpansion,
+    withGraphExpansion: validated.withGraphExpansion || queryClassification.retrievalNeeds.graph,
     traceId: validated.traceId ?? validated.spanContext?.traceId ?? undefined,
   };
 
@@ -300,7 +314,18 @@ export async function runSemanticSearchWorkflow(
     preamble,
     topPacketKeys,
     packets: adapterResult.packets as Array<Record<string, unknown>>,
-    metadata: adapterResult.metadata as Record<string, unknown>,
+    metadata: {
+      ...adapterResult.metadata,
+      queryClassification: {
+        schema: queryClassification.schema,
+        requestId: queryClassification.requestId,
+        producerRevision: queryClassification.producerRevision,
+        checksum: queryClassification.checksum,
+        domains: queryClassification.domains,
+        retrievalNeeds: queryClassification.retrievalNeeds,
+        operation: queryClassification.operation,
+      },
+    } as Record<string, unknown>,
     provenance: adapterResult.provenance as Record<string, unknown>,
     ace,
     contextManifestShadow,

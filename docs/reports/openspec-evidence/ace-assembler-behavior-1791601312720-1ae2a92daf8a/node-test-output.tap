@@ -1,0 +1,28 @@
+TAP version 13
+# Subtest: rankCandidates sorts descending and enforces maxCandidates
+ok 1 - rankCandidates sorts descending and enforces maxCandidates
+  ---
+  duration_ms: 1.4015
+  type: 'test'
+  ...
+# Subtest: assembleContext includes only evidence from the selected top-K candidates
+ok 2 - assembleContext includes only evidence from the selected top-K candidates
+  ---
+  duration_ms: 0.2845
+  type: 'test'
+  ...
+# Subtest: generateRecommendations preserves the ranked order and sequential rank labels
+ok 3 - generateRecommendations preserves the ranked order and sequential rank labels
+  ---
+  duration_ms: 0.2169
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73.6171

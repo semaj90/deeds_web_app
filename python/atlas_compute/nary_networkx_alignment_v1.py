@@ -35,7 +35,7 @@ def build_snapshot(facts: Sequence[Mapping[str,object]], *, graph_revision: str)
             if not isinstance(participant,str) or not participant.strip() or not isinstance(role,str) or not role.strip():
                 raise ValueError("GRAPH_FACT_PARTICIPANT_INVALID")
             node="packet:"+participant
-            nodes.add(node); edges.add((node,fact_node,role))
+            nodes.add(node); edges.add((fact_node,node,role))
     ordered_nodes=tuple(sorted(nodes))
     ordered_edges=tuple(sorted(edges))
     payload=dict(revision=graph_revision,nodes=ordered_nodes,edges=ordered_edges)
@@ -57,7 +57,7 @@ def pagerank_cpu(snapshot: GraphSnapshot, *, alpha:float=.85)->dict[str,float]:
     import networkx as nx
     graph=nx.DiGraph()
     graph.add_nodes_from(snapshot.nodes)
-    # Incidence traversability is directed only for ranking, and not equivalent
-    # to a canonical typed code edge or a hypergraph fact itself.
+    # Preserve the canonical tuple -> participant direction. This incidence
+    # projection is still not a canonical typed code edge or an admitted fact.
     graph.add_edges_from((a,b) for a,b,_ in snapshot.edges)
     return dict(nx.pagerank(graph,alpha=alpha)) if snapshot.nodes else {}

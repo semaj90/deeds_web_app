@@ -463,6 +463,19 @@ applied by the coordinating session afterward, not by the fork itself).
   `assembleACEContext()` in production. The next implementation is a read-only server-owned
   admitted-cohort provider plus one route handoff; do not derive identity from client fields,
 
+### Query-router legacy-cache bypass — 2026-10-09
+
+- Fixed one concrete bypass in `ace/query-router.ts`: the caller can set
+  `disableRetrievalCache=true` when no server-validated V3 identity is available, but the
+  separate `bifrost:sem:query` / intent-cache lane previously ignored that flag and read
+  unrevisioned `source_refs` anyway. The legacy semantic lane now runs only when no strict
+  V3 identity is supplied and retrieval caching has not been disabled.
+- Added focused policy tests for disabled, revisioned, and explicitly legacy-compatible cases;
+  `cache-keys-retrieval-identity.spec.ts` passes 7/7. This closes that bypass only. It does not
+  prove a production caller supplies V3 identity, validate cached source refs against current
+  canonical packet/source evidence, or close `CACHE-RETRIEVAL-IDENTITY-03` / ContextManifest
+  readback.
+
 ## Storage and packet-artifact reconciliation — 2026-09-15
 
 - **DOCKER-DISK-PRESSURE-01 remains open and mutation-blocking:** read-only host census found
@@ -963,6 +976,8 @@ Existing owners found:
   documented as unwired/dead; do not wire it as a competing owner.
 
 Keep these gates open until implemented and independently evaluated:
+- [ ] 11D-CENTROID-COSINE-INDEX-01 — reuse `CentroidManifestV1`/`CentroidArtifactV1` to build a deterministic cosine-ranked centroid list and `centroidId` lookup dictionary for indexing. Bind every row to the manifest/artifact checksums, workspace/candidate-snapshot/representation revisions, and query-vector checksum; reject stale, duplicate, dimension-mismatched, non-finite, or zero-norm inputs. Keep the result a read-only routing projection (`canonicalAuthority=false`), add no PostgreSQL table or competing centroid owner, and replace wildcard cache enumeration only through a separately proven revision-qualified manifest read + bounded MGET path.
+- [ ] 11D-CENTROID-CANDIDATE-CROSSWALK-01 — resolve `CentroidCardV1.exemplarOrdinals` only through an integrity-checked `CandidateOrdinalMapV1` whose workspace revision, candidate snapshot revision, ordinal-map checksum, and row count exactly match the centroid manifest/card. Return candidate hints as `UNVERIFIED` and non-authoritative; do not convert them into evidence, score changes, or hard retrieval filters without the separate source-evidence and admission owners.
 - [ ] 11D-CACHE-IDENTITY-01 — reconcile the two existing cache identity owners;
   bind cache key/value to packet/evidence identity, source/workspace and
   representation/retrieval revisions, checksums, and expiry; reject missing
@@ -994,3 +1009,22 @@ No routing/cache source was modified, no live route was called, and no cache,
 database, model, or service state was changed in this audit. The existing
 online adaptation remains present and is a migration gate, not a proven safe
 policy-learning path.
+### Proof-chain verifier progress — 2026-10-09
+
+- Added a read-only verifier that reuses the existing TaskEvidenceAdmission evaluator, EvidenceReceipt checksum verifier, OntologyLinkedTuple schema, and ContextManifest V2 checksum verifier. It reports per-stage failures and never grants canonical authority or performs writes.
+- Added negative tests proving incomplete input and missing independent checksum readback cannot produce `LIVE_PROVEN`.
+- Validation: focused Node/tsx test passed 2/2; strict validation for this OpenSpec change passed; scoped `git diff --check` passed.
+- This is a contract-level gate only. A root runner that reopens actual owner artifacts and a real task→receipt→admitted tuple→request-scoped ContextManifest chain remain open; fixture evidence cannot close those gates.
+- Added the root read-only `scripts/atlas/prove-proof-chain-v1.mts` runner and `atlas:proof-chain:verify` command. It resolves artifacts inside the repository, reopens each twice, checks stable raw checksums, and deliberately reports only fixture-level status; it does not connect to live databases or assert live admission.
+- Preserved revision semantics across the chain: TaskCard/EvidenceCard source revision is the `tasks.md` revision; the ontology tuple source revision must instead match the exact code `sourceRef` and revision inside the verified EvidenceReceipt. A regression test protects this separation.
+- Fresh owner census: `.tmp/atlas/proof-chain-task-evidence-20261009T145359.json` read back successfully at workspace revision `sha256:572d6c5d3e67e4cc2eb798e3f14a88e17f5bb4264ee468a2738b0475ba59a204`; 11,192/11,192 active tasks joined, 0 admitted. Dominant blockers: `DIAGNOSTIC_ONLY` and `NO_EXACT_VERIFIED_RECEIPT_BINDING` (11,192 each), then receipt source/task revision mismatches (11,189 / 11,188). This proves the first live gate is currently blocked, not that ontology or ContextManifest stages ran.
+
+### Centroid cosine index increment — 2026-10-09
+
+- Reused the existing `CentroidManifestV1` and `CentroidArtifactV1` contracts; added `centroid-cosine-index-v1.ts` to produce deterministic cosine-ranked rows plus a `centroidId` lookup dictionary. Each result binds the exact manifest, workspace/candidate snapshot/representation revisions, ordinal-map checksum, query-vector checksum, and centroid artifact checksum.
+- Rejects stale revisions, checksum/artifact mismatches, incomplete or duplicate centroid bindings, non-finite/zero-norm vectors, and dimension mismatches. Output is an in-memory read-only routing projection with `canonicalAuthority=false` and `writesPerformed=false`; no database table, Valkey write, or replacement centroid owner was introduced.
+- Focused centroid artifact, cosine index, and candidate-foundation tests pass 25/25. The separate 11D-CENTROID-COSINE-INDEX-01 gate remains open for revision-qualified Valkey manifest readback, bounded MGET integration, live cache parity, and caller proof; legacy `centroid-cache.ts` wildcard key enumeration is not yet changed.
+- Caller safety follow-up: `features/ai/ace/context-assembler.ts` previously turned `nearestCluster()`'s unversioned cache result into a Qdrant `must` filter. It now records the hit as `centroidHint` diagnostic telemetry and does not restrict retrieval without a canonical candidate-map binding. The `centroid-routing-hint-v1` unit test protects this fail-open contract. Revision-qualified manifest/MGET integration and real ACE-to-ContextManifest readback remain open.
+- Candidate crosswalk composition: `searchWithAceManifest()` accepts an optional centroid card/manifest hint and resolves it against the exact ordinal map built by that SearchRuntime request. The returned crosswalk remains `CANDIDATE_HINTS_ONLY` / `UNVERIFIED`; it does not change the response packets or ranking. The adapter fixture verifies exact candidate identity and unchanged packet ordering. Independent checksum readback and crosswalk tests cover revision, checksum, row-count, and card-integrity rejection. A live producer/manifest readback and production route caller remain open, as do source-byte verification, task/evidence admission, and ContextManifest V2 readback.
+- Added a SearchRuntime-level stale-centroid regression: a stale manifest is rejected as diagnostic output and the exact response packet ordering remains identical to the ordinary search path. Focused cosine-index, crosswalk, and SearchRuntime suites pass 14/14. The cosine-ranked rows and `centroidId` dictionary remain an in-memory derived index; no persistent centroid table or Valkey write is required or introduced.
+- Production integration remains blocked: `/api/retrieval/search-unified` calls the existing semantic workflow, but no authoritative request-scoped feature-source provider or live centroid manifest reader is configured there. Do not call the fixture composition `LIVE_PROVEN`; the next owner must supply revision-qualified candidates/features and independently read back the centroid manifest before route wiring, ACE admission, or ContextManifest claims.

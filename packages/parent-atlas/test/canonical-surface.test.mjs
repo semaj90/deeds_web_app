@@ -94,6 +94,18 @@ test('chrom97 packets preserve canonical summary identity fields', () => {
   assert.ok(packet.record_hash);
 });
 
+test('chrom97 feature labels do not fall back to generated summary text', () => {
+  const packet = pkg.makeChrom97Packet({
+    packet_key: 'packet-label-fallback',
+    source_ref: 'src/retrieval/centroid-router.ts',
+    feature_id: 'feature.retrieval.centroid-router',
+    summary: 'A generated summary describing cache routing and taxonomy classification.',
+  });
+
+  assert.equal(packet.feature_label, 'centroid-router.ts');
+  assert.notEqual(packet.feature_label, packet.summary);
+});
+
 test('Qdrant payload carries tree lineage and graph ranking fields', async () => {
   const originalFetch = globalThis.fetch;
   let requestBody = null;

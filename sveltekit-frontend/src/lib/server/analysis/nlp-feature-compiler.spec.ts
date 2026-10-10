@@ -194,6 +194,53 @@ describe('compileExperimentFeatureMatrix', () => {
 });
 
 describe('compileEventHypergraphBundle representation lineage', () => {
+	it('keeps grounded NLP passes as proposal annotations, not ontology links', () => {
+		const sourceRef = 'src/lib/server/retrieval/canonical-rerank-executor.ts';
+		const groundedPass = AnalysisPassResultSchema.parse({
+			...passResults[0],
+			requestId: 'req:grounded-proposal',
+			workspaceRevision: 'workspace-v1',
+			family: 'grounded',
+			passName: 'langextract',
+			status: 'skipped',
+			features: {},
+			artifacts: { grounded_only: false },
+		});
+		const experimentFeatureMatrix = compileExperimentFeatureMatrix({
+			requestId: 'req:grounded-proposal',
+			packetKey: 'packet:1',
+			sourceRef,
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v1',
+			representationRevision: 'representation-v1',
+			passResults: [groundedPass],
+		}).matrix;
+		const bundle = compileEventHypergraphBundle({
+			requestId: 'req:grounded-proposal',
+			packetKey: 'packet:1',
+			sourceRef,
+			sourceRevision: 'source-v1',
+			workspaceRevision: 'workspace-v1',
+			passResults: [groundedPass],
+			experimentFeatureMatrix,
+		});
+		const groundedEvent = bundle.events.find((event) => event.metadata.passFamily === 'grounded');
+
+		expect(groundedEvent?.eventType).toBe('semantic_annotation');
+		expect(groundedEvent?.metadata).toMatchObject({
+			passStatus: 'skipped',
+			canonicalAuthority: false,
+			claimAuthority: 'PROPOSAL_ONLY',
+			ontologyAdmission: 'NOT_PERFORMED',
+		});
+		expect(bundle.events.filter((event) => event.eventType === 'ontology_link')).toHaveLength(0);
+		expect(
+			bundle.ontologyEventTuples
+				.filter((tuple) => tuple.eventId === groundedEvent?.eventId)
+				.every((tuple) => tuple.predicate.startsWith('participant:')),
+		).toBe(true);
+	});
+
 	it('rejects missing representation revision instead of substituting source revision', () => {
 		expect(() => compileEventHypergraphBundle({
 			requestId: 'req:representation-unqualified',

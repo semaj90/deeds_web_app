@@ -389,8 +389,8 @@ export class EditPatchInline {
    └─ Budget tokens (see TokenRemappingStrategy above)
 
 4. AGENTIC PROPOSAL
-   ├─ Call Gemma4 with error + context + available tools
-   ├─ Gemma4 generates fix proposal (with tool calls)
+   ├─ Call ornith 1.5 llama-server 8090 with error + context + available tools
+   ├─ ornith 1.5 llama-server 8090 generates fix proposal (with tool calls)
    ├─ Register proposal: errors.issue_proposal
    └─ Constraint: max 5 tool calls per turn (prevent loops)
 
@@ -398,7 +398,7 @@ export class EditPatchInline {
    ├─ Apply patch (EditPatchInline.applyInlinePatch)
    ├─ Run tests (npm run test)
    ├─ If PASS: commit with witness tree + advance
-   ├─ If FAIL: revert + ask Gemma4 for alternative approach
+   ├─ If FAIL: revert + ask ornith 1.5 llama-server 8090 for alternative approach
    └─ Max 3 retry attempts per error
 
 6. CLOSURE & WITNESS
@@ -544,8 +544,8 @@ export const proposeErrorFix: MCPTool = {
     required: ['claimId', 'errorMessage']
   },
   handler: async (input) => {
-    // Call Gemma4 with error + context + tool list
-    // Gemma4 proposes fix + tool sequence
+    // Call ornith 1.5 llama-server 8090 with error + context + tool list
+    // ornith 1.5 llama-server 8090 proposes fix + tool sequence
     // Store in errors.issue_proposal
     // Return: { proposalId, fixDescription, toolSequence }
   }
@@ -656,12 +656,12 @@ export const fetchDocumentation: MCPTool = {
 ### Dimension Strategy
 
 **768-dim canonical**: Full semantic capacity (native embeddinggemma output)
-**384-dim retrieval**: Prefix truncation (retrieval only, not authority)
-**64-dim routing**: Latent space (AE-compressed, routing clusters only)
+**768-dim retrieval**: Prefix truncation (retrieval only, not authority)
+**latent256 -latent128 -latent64-dim routing**: Latent space (AE-compressed, routing clusters only)
 
 ### Token Remapping for Gemma4
 
-**Context Window**: 65,536 tokens (gemma4-legal-iq4xs-direct.gguf)
+**Context Window**: 65,536 tokens (/models/ornith1.5/ (sp?)hfrof.gguf)
 **Reserve**: 2000 tokens (buffer for completion)
 
 **Example Budget**:
@@ -834,11 +834,12 @@ docs/DAILY-GRAPHIFY-EXECUTION-LOG.md (runtime log, auto-generated)
 - **MEDIUM PRIORITY**:
   - [ ] Implement K-means clustering (Stage 6)
   - [ ] Implement SOM clustering (Stage 7)
-  - [ ] Neo4j topology materialization (Stage 8)
+  - [ ] Neo4j topology materialization (Stage 8) hyoergraphrag
+    [ ]create networkx python graph analysis simdjson rtx cuvs nx-cugraph rapids duckdb aligned.
   - [ ] Error fixing loop complete (multi-turn witness trees)
 
 - **LOWER PRIORITY**:
-  - [ ] AE (autoencoder) training for 64-dim latent
+  - [ ] AE (autoencoder) training for latent256, latent128, latent64-dim latent
   - [ ] Production hardening (monitoring, alerting, rollback)
   - [ ] OKF export for Karpathy method
 

@@ -13,6 +13,7 @@ from parent_atlas_ontology.networkx_snapshot import (
     build_networkx_snapshot,
     node_link_roundtrip_receipt,
     bounded_incidence_jaccard,
+    bounded_role_aware_incidence_expansion_receipt,
     replay_networkx_snapshot,
 )
 
@@ -74,6 +75,112 @@ class NetworkXSnapshotReplayTests(unittest.TestCase):
         self.assertEqual(receipt["results"][0]["jaccard"], 1.0)
         self.assertFalse(receipt["canonicalAuthority"])
         self.assertFalse(receipt["writesPerformed"])
+
+    def test_role_aware_expansion_preserves_relation_and_participant_roles(self):
+        assertions, relations = self._fixture()
+        receipt = bounded_role_aware_incidence_expansion_receipt(
+            relations,
+            graph_revision="graph:1",
+            source_entity_id="symbol:a",
+            depth_limit=1,
+        )
+        self.assertEqual(receipt["status"], "NETWORKX_INCIDENCE_TRAVERSAL_PROVEN")
+        self.assertEqual(receipt["expandedRelationCount"], 1)
+        self.assertEqual(receipt["steps"][0]["sourceRoles"], ["actor"])
+        self.assertEqual(
+            [(row["entityId"], row["role"]) for row in receipt["steps"][0]["participants"]],
+            [("symbol:a", "actor"), ("symbol:b", "target")],
+        )
+        self.assertFalse(receipt["canonicalAuthority"])
+        self.assertEqual(receipt["evidenceAdmission"], "NOT_PERFORMED")
+        self.assertFalse(receipt["writesPerformed"])
+        at_depth_limit = bounded_role_aware_incidence_expansion_receipt(
+            relations,
+            graph_revision="graph:1",
+            source_entity_id="symbol:a",
+            depth_limit=1,
+            max_relation_expansions=1,
+        )
+        self.assertFalse(at_depth_limit["truncated"])
+
+    def test_role_aware_expansion_replay_is_deterministic_and_bounded(self):
+        first = NarySemanticRelation(
+            relation_id="rel:1",
+            relation_type="CAUSES",
+            source_ref="src/a.ts",
+            source_revision="rev-1",
+            participants=(
+                RelationParticipant("symbol:a", "cause", 0),
+                RelationParticipant("symbol:b", "effect", 1),
+            ),
+            producer_revision="atlas:r1",
+        )
+        second = NarySemanticRelation(
+            relation_id="rel:2",
+            relation_type="CITES",
+            source_ref="src/b.ts",
+            source_revision="rev-2",
+            participants=(
+                RelationParticipant("symbol:a", "citation", 0),
+                RelationParticipant("symbol:c", "target", 1),
+            ),
+            producer_revision="atlas:r1",
+        )
+        args = {
+            "graph_revision": "graph:1",
+            "source_entity_id": "symbol:a",
+            "depth_limit": 2,
+            "max_relation_expansions": 1,
+        }
+        receipt = bounded_role_aware_incidence_expansion_receipt((second, first), **args)
+        replay = bounded_role_aware_incidence_expansion_receipt((first, second), **args)
+        self.assertEqual(receipt, replay)
+        self.assertEqual(receipt["expandedRelationCount"], 1)
+        self.assertTrue(receipt["truncated"])
+        self.assertEqual(receipt["steps"][0]["relationId"], "rel:1")
+
+    def test_role_aware_expansion_bounds_high_arity_and_keeps_source_incidence(self):
+        relation = NarySemanticRelation(
+            relation_id="rel:wide",
+            relation_type="CONTRIBUTES_TO",
+            source_ref="src/wide.py",
+            source_revision="rev-wide",
+            participants=(
+                RelationParticipant("symbol:z", "later", 2),
+                RelationParticipant("symbol:a", "source", 0),
+                RelationParticipant("symbol:b", "target", 1),
+            ),
+            producer_revision="atlas:r1",
+        )
+        receipt = bounded_role_aware_incidence_expansion_receipt(
+            (relation,),
+            graph_revision="graph:wide",
+            source_entity_id="symbol:a",
+            depth_limit=1,
+            max_participants_per_relation=2,
+        )
+        step = receipt["steps"][0]
+        self.assertEqual(
+            [(row["entityId"], row["role"]) for row in step["participants"]],
+            [("symbol:a", "source"), ("symbol:b", "target")],
+        )
+        self.assertEqual(step["participantCountTotal"], 3)
+        self.assertTrue(step["participantLimitReached"])
+        self.assertTrue(receipt["truncated"])
+
+    def test_role_aware_expansion_rejects_invalid_seeds_and_limits(self):
+        assertions, relations = self._fixture()
+        with self.assertRaisesRegex(ValueError, "source_entity_id is not an entity"):
+            bounded_role_aware_incidence_expansion_receipt(
+                relations, graph_revision="graph:1", source_entity_id="relation:rel:1"
+            )
+        with self.assertRaisesRegex(ValueError, "max_relation_expansions must be positive"):
+            bounded_role_aware_incidence_expansion_receipt(
+                relations,
+                graph_revision="graph:1",
+                source_entity_id="symbol:a",
+                max_relation_expansions=0,
+            )
 
 
 if __name__ == "__main__":

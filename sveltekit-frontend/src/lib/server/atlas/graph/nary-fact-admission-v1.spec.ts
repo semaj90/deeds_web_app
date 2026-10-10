@@ -23,6 +23,7 @@ function proposal() {
     packetKey: 'packet:search',
     graphRevision: 'graph:v1',
     producerRevision: 'proposal:v1',
+    ontologyRevision: 'ontology-revision:v1',
     predicate: 'API_CONTRACT_OBSERVED',
     participants: owners.map((owner) => ({ ...owner, role: owner.entityType.toLowerCase() })),
     evidenceRefs: ['evidence:api'],
@@ -42,6 +43,7 @@ describe('NaryFactProposal admission', () => {
 
     expect(admitted.admission).toBe('ADMITTED');
     expect(admitted.canonicalAuthority).toBe(false);
+    expect(admitted.ontologyRevision).toBe('ontology-revision:v1');
   });
 
   it('rejects revision drift and never returns an admitted proposal', () => {

@@ -13,10 +13,11 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 
 export const TABLES = Object.freeze([
   'atlas_ontology_tuples', 'atlas_ontology_linked_tuples',
+  'atlas_packets',
   'evidence_receipts', 'task_evidence', 'evidence_assertion',
   'openspec_task_predicate', 'atlas_symbol_versions',
 ]);
-export function buildCatalogReport(columns, relations, constraints) {
+export function buildCatalogReport(columns, relations, constraints, tupleLineageCensus = null, databaseScope = null) {
   const byTable = Object.fromEntries(TABLES.map(name => [name, {
     exists: false, columns: [], constraints: [],
   }]));
@@ -37,6 +38,8 @@ export function buildCatalogReport(columns, relations, constraints) {
     verdict: present.length === 0 ? 'TUPLE_RELATION_NOT_FOUND' :
       present.length === 2 ? 'DUAL_TUPLE_SURFACES_REQUIRE_OWNER_REVIEW' : 'TUPLE_SURFACE_DISCOVERED_REVIEW_REQUIRED',
     relations: byTable, tupleSurfaces: present,
+    tupleLineageCensus: tupleLineageCensus ?? { status: 'NOT_RUN', reason: 'CENSUS_INPUTS_UNAVAILABLE' },
+    databaseScope: databaseScope ?? { status: 'NOT_RECORDED' },
     storageOwnerProven: false, evidenceAdmissionProven: false,
     readonlyTransaction: true, canonicalWrites: false,
     todo: [
@@ -64,6 +67,9 @@ async function main() {
     await client.query('BEGIN');
     await client.query('SET TRANSACTION READ ONLY');
     await client.query("SET LOCAL statement_timeout = '15000ms'");
+    const databaseScope = (await client.query(`SELECT current_database() AS database_name,
+      inet_server_addr()::text AS server_address, inet_server_port() AS server_port,
+      current_setting('server_version') AS server_version`)).rows[0];
     const relations = (await client.query(`
       SELECT table_name FROM information_schema.tables
       WHERE table_schema='public' AND table_name = ANY($1::text[])
@@ -80,7 +86,34 @@ async function main() {
       JOIN pg_namespace n ON n.oid=t.relnamespace
       WHERE n.nspname='public' AND t.relname = ANY($1::text[])
       ORDER BY t.relname,c.conname`, [TABLES])).rows;
-    report = sealReport(buildCatalogReport(columns,relations,constraints));
+    const columnSet = new Set(columns.map(column => `${column.table_name}.${column.column_name}`));
+    const censusColumns = [
+      'atlas_ontology_linked_tuples.packet_key',
+      'atlas_ontology_linked_tuples.source_ref',
+      'atlas_ontology_linked_tuples.provenance',
+      'atlas_packets.packet_key',
+      'atlas_packets.source_ref',
+      'atlas_packets.source_revision',
+      'atlas_packets.workspace_revision_key',
+    ];
+    let tupleLineageCensus;
+    if (censusColumns.some(column => !columnSet.has(column))) {
+      tupleLineageCensus = { status: 'BLOCKED_SCHEMA_INCOMPLETE', missingColumns: censusColumns.filter(column => !columnSet.has(column)) };
+    } else {
+      const census = (await client.query(`
+        SELECT count(*)::int AS total_rows,
+          count(*) FILTER (WHERE t.packet_key IS NOT NULL)::int AS packet_key_rows,
+          count(*) FILTER (WHERE nullif(btrim(t.provenance->>'sourceRevision'),'') IS NOT NULL)::int AS source_revision_rows,
+          count(*) FILTER (WHERE nullif(btrim(t.provenance->>'workspaceRevision'),'') IS NOT NULL)::int AS workspace_revision_rows,
+          count(*) FILTER (WHERE EXISTS (SELECT 1 FROM public.atlas_packets p WHERE p.packet_key=t.packet_key))::int AS packet_matches,
+          count(*) FILTER (WHERE EXISTS (SELECT 1 FROM public.atlas_packets p WHERE p.packet_key=t.packet_key AND p.source_ref=t.source_ref))::int AS source_matches,
+          count(*) FILTER (WHERE EXISTS (SELECT 1 FROM public.atlas_packets p WHERE p.packet_key=t.packet_key AND p.source_ref=t.source_ref AND p.source_revision=t.provenance->>'sourceRevision'))::int AS source_revision_matches,
+          count(*) FILTER (WHERE EXISTS (SELECT 1 FROM public.atlas_packets p WHERE p.packet_key=t.packet_key AND p.source_ref=t.source_ref AND p.source_revision=t.provenance->>'sourceRevision' AND p.workspace_revision_key=t.provenance->>'workspaceRevision'))::int AS exact_packet_lineage_matches
+        FROM public.atlas_ontology_linked_tuples t
+      `)).rows[0];
+      tupleLineageCensus = { status: 'READ_ONLY_CENSUS', ...census };
+    }
+    report = sealReport(buildCatalogReport(columns,relations,constraints,tupleLineageCensus,databaseScope));
     await client.query('ROLLBACK');
   } catch (e) { await client.query('ROLLBACK').catch(()=>{}); throw e; }
   finally { client.release(); await pool.end(); }

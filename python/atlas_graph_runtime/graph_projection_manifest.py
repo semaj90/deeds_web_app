@@ -10,11 +10,147 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import math
+from dataclasses import dataclass
 from collections.abc import Mapping, Sequence
 from typing import Any
 
+from .contracts import TypedGraphEdge
+
 
 _SHA256 = re.compile(r"^[a-f0-9]{64}$")
+
+
+@dataclass(frozen=True)
+class VerifiedGraphProjectionSnapshotV1:
+    graph_revision: str
+    workspace_revision: str
+    graph_ordinal_map_checksum: str
+    node_ordinals: tuple[int, ...]
+    edges: tuple[TypedGraphEdge, ...]
+    node_checksum: str
+    edge_checksum: str
+
+
+def validate_graph_projection_artifact_v1(
+    manifest: Mapping[str, Any],
+    node_rows: Sequence[Mapping[str, Any]],
+    edge_rows: Sequence[Mapping[str, Any]],
+) -> VerifiedGraphProjectionSnapshotV1:
+    if manifest.get("schema") != "atlas.graph-projection-artifact.v1":
+        raise ValueError("GRAPH_PROJECTION_SCHEMA_INVALID")
+    if manifest.get("canonicalAuthority") is not False or manifest.get("writesPerformed") is not False:
+        raise ValueError("GRAPH_PROJECTION_AUTHORITY_FLAGS_INVALID")
+    if manifest.get("mode") != "NON_PRODUCTION_DERIVED_ARTIFACT":
+        raise ValueError("GRAPH_PROJECTION_MODE_INVALID")
+    workspace_revision = manifest.get("workspaceRevision")
+    graph_revision = manifest.get("graphRevision")
+    if not isinstance(workspace_revision, str) or not workspace_revision or not isinstance(graph_revision, str):
+        raise ValueError("GRAPH_PROJECTION_REVISION_REQUIRED")
+    if not _SHA256.fullmatch(graph_revision.removeprefix("sha256:")) or not graph_revision.startswith("sha256:"):
+        raise ValueError("GRAPH_PROJECTION_GRAPH_REVISION_INVALID")
+    node_count = manifest.get("nodeCount")
+    edge_count = manifest.get("edgeCount")
+    if (isinstance(node_count, bool) or not isinstance(node_count, int)
+            or isinstance(edge_count, bool) or not isinstance(edge_count, int)
+            or len(node_rows) != node_count or len(edge_rows) != edge_count):
+        raise ValueError("GRAPH_PROJECTION_ROW_COUNT_MISMATCH")
+
+    normalized_nodes: list[dict[str, Any]] = []
+    seen_keys: set[str] = set()
+    for expected_ordinal, row in enumerate(node_rows):
+        ordinal = row.get("gpu_node_id")
+        node_key = row.get("graph_node_key")
+        if isinstance(ordinal, bool) or not isinstance(ordinal, int) or ordinal != expected_ordinal:
+            raise ValueError("GRAPH_PROJECTION_NODE_ORDINAL_INVALID")
+        if not isinstance(node_key, str) or not node_key or node_key in seen_keys:
+            raise ValueError("GRAPH_PROJECTION_NODE_KEY_INVALID")
+        if any(row.get(field) is not None and not isinstance(row.get(field), str)
+               for field in ("packet_key", "source_ref", "source_revision", "workspace_revision")):
+            raise ValueError("GRAPH_PROJECTION_NODE_FIELD_INVALID")
+        seen_keys.add(node_key)
+        node_workspace = row.get("workspace_revision")
+        if node_workspace is not None and node_workspace != workspace_revision:
+            raise ValueError("GRAPH_PROJECTION_NODE_WORKSPACE_MISMATCH")
+        normalized_nodes.append({
+            "gpu_node_id": ordinal,
+            "graph_node_key": node_key,
+            "packet_key": row.get("packet_key"),
+            "source_ref": row.get("source_ref"),
+            "source_revision": row.get("source_revision"),
+            "workspace_revision": node_workspace,
+        })
+
+    normalized_edges: list[dict[str, Any]] = []
+    endpoint_pairs: set[tuple[int, int]] = set()
+    for row in edge_rows:
+        source = row.get("src_gpu_node_id")
+        target = row.get("dst_gpu_node_id")
+        edge_type = row.get("edge_type")
+        weight = row.get("weight")
+        if (isinstance(source, bool) or not isinstance(source, int) or source < 0
+                or isinstance(target, bool) or not isinstance(target, int) or target < 0
+                or source >= len(normalized_nodes) or target >= len(normalized_nodes)):
+            raise ValueError("GRAPH_PROJECTION_EDGE_ENDPOINT_INVALID")
+        if not isinstance(edge_type, str) or not edge_type.strip():
+            raise ValueError("GRAPH_PROJECTION_EDGE_TYPE_INVALID")
+        if isinstance(weight, bool) or not isinstance(weight, (int, float)) or not math.isfinite(float(weight)) or weight < 0:
+            raise ValueError("GRAPH_PROJECTION_EDGE_WEIGHT_INVALID")
+        pair = (source, target)
+        if pair in endpoint_pairs:
+            raise ValueError("GRAPH_PROJECTION_PARALLEL_EDGE_UNSUPPORTED")
+        endpoint_pairs.add(pair)
+        normalized_edges.append({
+            "src_gpu_node_id": source,
+            "dst_gpu_node_id": target,
+            "edge_type": edge_type,
+            "weight": float(weight),
+        })
+    normalized_edges.sort(key=lambda row: (row["src_gpu_node_id"], row["dst_gpu_node_id"], row["edge_type"]))
+
+    node_text = "\n".join(
+        f"{row['gpu_node_id']}|{row['graph_node_key']}|{row['packet_key'] or ''}|{row['source_ref'] or ''}|{row['source_revision'] or ''}|{row['workspace_revision'] or ''}"
+        for row in normalized_nodes
+    )
+    edge_text = "\n".join(
+        f"{row['src_gpu_node_id']}|{row['dst_gpu_node_id']}|{row['edge_type']}|{row['weight']}"
+        for row in normalized_edges
+    )
+    node_checksum = f"sha256:{hashlib.sha256(node_text.encode('utf-8')).hexdigest()}"
+    edge_checksum = f"sha256:{hashlib.sha256(edge_text.encode('utf-8')).hexdigest()}"
+    if manifest.get("nodeChecksum") != node_checksum or manifest.get("nodeTableHash") != node_checksum:
+        raise ValueError("GRAPH_PROJECTION_NODE_CHECKSUM_MISMATCH")
+    if manifest.get("edgeChecksum") != edge_checksum or manifest.get("edgeTableHash") != edge_checksum:
+        raise ValueError("GRAPH_PROJECTION_EDGE_CHECKSUM_MISMATCH")
+    expected_graph_revision = f"sha256:{hashlib.sha256(f'{workspace_revision}|{node_checksum}|{edge_checksum}'.encode('utf-8')).hexdigest()}"
+    if graph_revision != expected_graph_revision:
+        raise ValueError("GRAPH_PROJECTION_GRAPH_REVISION_MISMATCH")
+    expected_projection_revision = f"sha256:{hashlib.sha256(f'{graph_revision}|projection-v1'.encode('utf-8')).hexdigest()}"
+    if manifest.get("projectionRevision") != expected_projection_revision:
+        raise ValueError("GRAPH_PROJECTION_PROJECTION_REVISION_MISMATCH")
+    ordinal_rows = [
+        {"graphOrdinal": row["gpu_node_id"], "graphNodeKey": row["graph_node_key"]}
+        for row in normalized_nodes
+    ]
+    validate_graph_projection_ordinal_checksum_v1(manifest, ordinal_rows)
+    graph_map_checksum = str(manifest["graphOrdinalMapChecksum"])
+    return VerifiedGraphProjectionSnapshotV1(
+        graph_revision=graph_revision,
+        workspace_revision=workspace_revision,
+        graph_ordinal_map_checksum=graph_map_checksum,
+        node_ordinals=tuple(row["gpu_node_id"] for row in normalized_nodes),
+        edges=tuple(
+            TypedGraphEdge(
+                src_ordinal=row["src_gpu_node_id"],
+                dst_ordinal=row["dst_gpu_node_id"],
+                kind=row["edge_type"],
+                weight=row["weight"],
+            )
+            for row in normalized_edges
+        ),
+        node_checksum=node_checksum,
+        edge_checksum=edge_checksum,
+    )
 
 
 def graph_ordinal_map_checksum_v1(

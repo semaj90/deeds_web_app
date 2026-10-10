@@ -24,6 +24,7 @@ describe('analyze-this ACE adapter', () => {
 		expect(adapted.promptPlan.schema).toBe('atlas.agentic-file-compiler.block-plan.v1');
 		expect(adapted.manifest.v1.snapshotId).toMatch(/^worktree-diagnostic:/);
 		expect(adapted.manifest.identityInput.evidenceRevisions.sourceRevision).toBeNull();
+		expect(adapted.manifest.identityInput.evidenceRevisions.featureRevision).toBeNull();
 		expect(adapted.canonicalAuthority).toBe(false);
 		expect(adapted.writesPerformed).toBe(false);
 	});

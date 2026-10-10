@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import hashlib
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
@@ -11,6 +11,7 @@ from atlas_contract_parity.research_evidence_v1 import ResearchEvidenceV1
 NonEmpty = Annotated[str, StringConstraints(min_length=1)]
 Sha256 = Annotated[str, StringConstraints(pattern=r"^sha256:[0-9a-f]{64}$")]
 HexChecksum = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+ProposalChecksum = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{64}$")]
 
 
 def _sha(text: str) -> str:
@@ -49,6 +50,19 @@ class HyperEdgeEvidenceBindingV1(BaseModel):
     evidenceRef: NonEmpty
 
 
+class HyperEdgeEvidenceOriginBindingV1(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    proposalChecksum: ProposalChecksum
+    packetKey: NonEmpty
+    sourceRef: NonEmpty
+    sourceRevision: NonEmpty
+    workspaceRevision: NonEmpty
+    ontologyRevision: Optional[NonEmpty]
+    graphRevision: NonEmpty
+    proposalProducerRevision: NonEmpty
+
+
 class HyperEdgeEvidenceV1(BaseModel):
     """Independent Pydantic mirror; this envelope is evidence-only, not graph authority."""
 
@@ -58,6 +72,7 @@ class HyperEdgeEvidenceV1(BaseModel):
     hyperedge: HyperedgeV1
     evidence: Annotated[list[ResearchEvidenceV1], Field(min_length=1)]
     bindings: Annotated[list[HyperEdgeEvidenceBindingV1], Field(min_length=1)]
+    originBinding: HyperEdgeEvidenceOriginBindingV1 = Field(default=None)
     producerRevision: NonEmpty
     checksum: Sha256
     writesPerformed: Literal[False]
@@ -92,6 +107,23 @@ class HyperEdgeEvidenceV1(BaseModel):
             raise ValueError("UNBOUND_OR_DUPLICATE_EVIDENCE")
         if set(edge_refs) != bound_refs:
             raise ValueError("HYPEREDGE_EVIDENCE_REF_SET_MISMATCH")
+        origin = dump.get("originBinding")
+        if origin is not None:
+            edge = dump["hyperedge"]
+            if (
+                edge["workspaceRevision"] != origin["workspaceRevision"]
+                or edge["graphRevision"] != origin["graphRevision"]
+                or edge["sourceRevision"] != origin["sourceRevision"]
+                or edge["producerRevision"] != origin["proposalProducerRevision"]
+            ):
+                raise ValueError("ORIGIN_BINDING_REVISION_MISMATCH")
+            if not any(
+                item["sourceKind"] == "CODE"
+                and item["sourceRef"] == origin["sourceRef"]
+                and item["sourceRevision"] == origin["sourceRevision"]
+                for item in evidence
+            ):
+                raise ValueError("ORIGIN_SOURCE_EVIDENCE_MISSING")
         body = {key: value for key, value in dump.items() if key != "checksum"}
         if _sha(canonical(body)) != self.checksum:
             raise ValueError("HYPEREDGE_EVIDENCE_CHECKSUM_MISMATCH")

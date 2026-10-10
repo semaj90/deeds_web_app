@@ -41,6 +41,7 @@ describe('ApiContract NaryFactProposalV1 adapter', () => {
     expect(result.status).toBe('RESOLVED');
     expect(result.proposal?.admission).toBe('PROPOSED');
     expect(result.proposal?.canonicalAuthority).toBe(false);
+    expect(result.proposal?.ontologyRevision).toBeNull();
     expect(result.proposal?.participants.map((value) => value.canonicalId)).toEqual([
       'symbol:search', 'schema:request', 'route:search',
     ]);

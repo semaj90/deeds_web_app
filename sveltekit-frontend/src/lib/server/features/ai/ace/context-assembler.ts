@@ -166,6 +166,7 @@ import { getClusterBowTexture, getSomBowTexture } from '$lib/server/langextract/
 import { classifyQuerySection, analyzeACEFlow } from '$lib/server/analysis/hmm-ace-analyzer.js';
 import { buildAdaptivePrefetch } from '$lib/server/ace/adaptive-prefetch.js';
 import { nearestCluster } from '$lib/server/retrieval/centroid-cache.js';
+import { classifyLegacyCentroidHintV1 } from '$lib/server/atlas/retrieval/centroid-routing-hint-v1.js';
 import {
   computeManifold4Centroid,
   searchManifold4,
@@ -6470,6 +6471,7 @@ async function writeTokenDensityBudget(
 
 /** Stats collected during a codebase context fetch — surfaced in retrieval run logs. */
 export interface CodebaseFetchStats {
+  centroidHint?: ReturnType<typeof classifyLegacyCentroidHintV1>;
   topoPrefilter?: TopoPrefilterStats;
   graphAuthority?: {
     used: boolean;
@@ -6712,16 +6714,14 @@ export async function fetchCodebaseContext(
       }
     }
 
-    // ── Stage 2: centroid-based GPU-cluster pre-filter (embedding-space) ──────
-    // Resolves query embedding once → Redis MGET nearest centroid (O(k)).
-    // Falls back gracefully when centroids aren't seeded.
-    let clusterFilter: Record<string, unknown> | undefined;
+    // ── Stage 2: legacy centroid hint (diagnostic only) ───────────────────────
+    // This cache result has no candidate-map proof and must not restrict Qdrant.
     try {
       const emb = await embedText(query);
       if (emb && emb.length === 768) {
         const hit = await nearestCluster(new Float32Array(emb), 50);
-        if (hit && hit.similarity > 0.35) {
-          clusterFilter = { must: [{ key: 'neo4j_gpuCluster', match: { value: hit.clusterId } }] };
+        if (hit && statsOut) {
+          statsOut.centroidHint = classifyLegacyCentroidHintV1(hit);
         }
       }
     } catch {
@@ -6830,14 +6830,13 @@ export async function fetchCodebaseContext(
       }
     }
 
-    // Merge: topo (must) + encoded-cluster (must) + centroid cluster (must) +
+    // Merge: topo (must) + encoded-cluster (must) +
     //        BoW clusters (should) + Karpathy member boost (should) +
     //        GraphRAG structural neighbors (should, damped top-2).
     // Qdrant: `should` boosts scores of matching docs without restricting the set.
     const mustClauses: unknown[] = [
       ...(topoFilter ? (topoFilter.must as unknown[]) : []),
       ...(encodedClusterFilter ? (encodedClusterFilter.must as unknown[]) : []),
-      ...(clusterFilter ? (clusterFilter.must as unknown[]) : []),
     ];
     const allShould = [...bowClusterShould, ...karpathyMemberShould, ...graphragNeighborShould];
     const combinedFilter: Record<string, unknown> | undefined =

@@ -57,6 +57,7 @@ export function proposeOntologyLinkedTupleNaryFactV1(
       packetKey: tuple.packetKey,
       graphRevision: context.graphRevision,
       producerRevision: context.producerRevision,
+      ontologyRevision: tuple.provenance.ontologyRevision ?? null,
       predicate: `ONTOLOGY_${tuple.labelKind.toUpperCase()}`,
       participants: resolutions.participants,
       evidenceRefs: tuple.evidenceRefs,

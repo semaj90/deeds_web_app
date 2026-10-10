@@ -22,12 +22,25 @@ export const hyperedgeEvidenceBindingV1Schema = z.object({
   evidenceId: z.string().min(1),
   evidenceRef: z.string().min(1),
 }).strict();
+export type HyperEdgeEvidenceBindingV1 = z.infer<typeof hyperedgeEvidenceBindingV1Schema>;
+
+export const hyperedgeEvidenceOriginBindingV1Schema = z.object({
+  proposalChecksum: z.string().regex(/^[a-f0-9]{64}$/),
+  packetKey: z.string().min(1),
+  sourceRef: z.string().min(1),
+  sourceRevision: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  ontologyRevision: z.string().min(1).nullable(),
+  graphRevision: z.string().min(1),
+  proposalProducerRevision: z.string().min(1),
+}).strict();
 
 export const hyperEdgeEvidenceV1Schema = z.object({
   schema: z.literal(HYPEREDGE_EVIDENCE_SCHEMA_V1),
   hyperedge: HyperedgeV1Schema,
   evidence: z.array(researchEvidenceV1Schema).min(1),
   bindings: z.array(hyperedgeEvidenceBindingV1Schema).min(1),
+  originBinding: hyperedgeEvidenceOriginBindingV1Schema.optional(),
   producerRevision: z.string().min(1),
   checksum: z.string().regex(SHA256),
   writesPerformed: z.literal(false),
@@ -63,6 +76,20 @@ export const hyperEdgeEvidenceV1Schema = z.object({
   }
   if (hyperEdgeEvidenceChecksumV1(envelope) !== envelope.checksum) {
     ctx.addIssue({ code: 'custom', path: ['checksum'], message: 'HYPEREDGE_EVIDENCE_CHECKSUM_MISMATCH' });
+  }
+  const origin = envelope.originBinding;
+  if (origin) {
+    if (envelope.hyperedge.workspaceRevision !== origin.workspaceRevision
+      || envelope.hyperedge.graphRevision !== origin.graphRevision
+      || envelope.hyperedge.sourceRevision !== origin.sourceRevision
+      || envelope.hyperedge.producerRevision !== origin.proposalProducerRevision) {
+      ctx.addIssue({ code: 'custom', path: ['originBinding'], message: 'ORIGIN_BINDING_REVISION_MISMATCH' });
+    }
+    if (!envelope.evidence.some((item) => item.sourceKind === 'CODE'
+      && item.sourceRef === origin.sourceRef
+      && item.sourceRevision === origin.sourceRevision)) {
+      ctx.addIssue({ code: 'custom', path: ['originBinding'], message: 'ORIGIN_SOURCE_EVIDENCE_MISSING' });
+    }
   }
 });
 

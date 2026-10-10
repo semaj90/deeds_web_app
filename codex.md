@@ -138,6 +138,13 @@ RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 - Never use Ollama fallback to authorize canonical embedding writes, backfills, Qdrant projection, or a canonical parity pass. If the fallback is used, report the primary-executor outage and keep the strict canonical gate blocked until parity is proven.
 - `:8090` is the Ornith synthesis endpoint, not an embedding fallback.
 
+## Agentic validation and review authority
+
+- TRACE MCP tool calls (including `atlas.query` and `miniforge.health`) are read-only diagnostics. Validation output must print retrieval/tool status, NLP sidecar readiness/capabilities when available, and `AGENTIC_REVIEW=ADVISORY_ONLY; HUMAN_APPROVAL=NOT_GRANTED` unless a separately verified approval receipt exists.
+- A successful TRACE/MCP call or FastAPI NLP health response does not establish ACP/A2A protocol conformance, Mastra/OpenCode MCP integration, a trusted non-human reviewer, source/module digest parity, evidence admission, or human authorization. Report each as unverified unless its owning protocol and evidence checks pass.
+- Model, agent, HMM, or Viterbi review/routing may produce advisory proposals only. Tool invocation remains governed by the existing allowlisted registry, input/output schema validation, permissions, execution policy, and independent readback. Never infer authorization from a score, tool name, or successful health check.
+- Ontology tuples must come from grounded typed relations and the existing tuple admission owner; Oaklib term resolution, cosine/centroid similarity, summaries, cache hints, and TaskCard admission do not create relation evidence. ContextManifest synthesis must consume independently admitted evidence and bind its receipt to the exact manifest, model, and prompt revisions.
+
 ## GPU lane switch: WSL2 miniforge/conda work vs the Ornith :8090 server (2026-10-04)
 
 The RTX 3060 Ti (8 GiB) cannot hold the Ornith vision server (~6.4 GiB, plus ~1 GiB of Windows/desktop use) and a WSL2 RAPIDS/cuVS job together. With vision up only ~0.2 GiB is free.

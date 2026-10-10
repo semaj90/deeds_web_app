@@ -14,7 +14,7 @@ import {
 } from '../../../sveltekit-frontend/src/lib/server/atlas/contracts/research-evidence-bundle-v1.js';
 import { createHyperedgeV1 } from '../../../sveltekit-frontend/src/lib/server/graph/hyperedge-contract.js';
 import {
-  buildHyperEdgeEvidenceV1, HYPEREDGE_EVIDENCE_SCHEMA_V1, hyperEdgeEvidenceV1Schema, hyperEdgeEvidenceV1JsonSchema,
+  buildHyperEdgeEvidenceV1, hyperEdgeEvidenceChecksumV1, HYPEREDGE_EVIDENCE_SCHEMA_V1, hyperEdgeEvidenceV1Schema, hyperEdgeEvidenceV1JsonSchema,
 } from '../../../sveltekit-frontend/src/lib/server/atlas/contracts/hyperedge-evidence-v1.js';
 import {
   recommendationOutcomeReceiptSchema,
@@ -186,17 +186,36 @@ function hyperEdgeEvidenceFixtures(): ParityFixture[] {
     { schema: 'atlas.research-evidence.v1', evidenceId: 'evidence:a', sourceKind: 'CODE', sourceRef: 'src/a.ts', sourceRevision: 'source:rev-1', contentDigest: D, proposition: 'Code evidence supports the relation.', confidence: 0.8, evidenceRefs: [refA], webProvenance: null, producerRevision: 'research:rev-1', canonicalAuthority: false },
     { schema: 'atlas.research-evidence.v1', evidenceId: 'evidence:b', sourceKind: 'WEB', sourceRef: 'https://example.org/spec', sourceRevision: null, contentDigest: D, proposition: 'Pinned web evidence supports the relation.', confidence: 0.7, evidenceRefs: [refB], webProvenance: { url: 'https://example.org/spec', fetchedAt: '2026-09-27T00:00:00Z', responseDigest: D }, producerRevision: 'research:rev-1', canonicalAuthority: false },
   ];
+  const originBinding = {
+    proposalChecksum: 'b'.repeat(64), packetKey: 'packet:alpha', sourceRef: 'src/a.ts',
+    sourceRevision: 'source:rev-1', workspaceRevision: 'workspace:rev-1', ontologyRevision: 'ontology:rev-1',
+    graphRevision: 'graph:rev-1', proposalProducerRevision: 'graphify:rev-1',
+  };
   const good = buildHyperEdgeEvidenceV1({
     hyperedge: edge, evidence: evidence as any,
     bindings: [{ evidenceId: 'evidence:a', evidenceRef: refA }, { evidenceId: 'evidence:b', evidenceRef: refB }],
+    originBinding,
     producerRevision: 'hyperedge-evidence-fixture:v1',
   });
   const reorderedBindings = buildHyperEdgeEvidenceV1({
     hyperedge: edge, evidence: evidence as any,
     bindings: [{ evidenceId: 'evidence:b', evidenceRef: refB }, { evidenceId: 'evidence:a', evidenceRef: refA }],
+    originBinding,
     producerRevision: 'hyperedge-evidence-fixture:v1',
   });
   const mutate = (over: Record<string, unknown>) => ({ ...good, ...over });
+  const rechecksum = (value: Record<string, unknown>) => ({
+    ...value,
+    checksum: hyperEdgeEvidenceChecksumV1(value as any),
+  });
+  const originRevisionMismatch = rechecksum({
+    ...good,
+    originBinding: { ...originBinding, sourceRevision: 'source:stale' },
+  });
+  const originEvidenceMismatch = rechecksum({
+    ...good,
+    evidence: [{ ...evidence[0], sourceRevision: 'source:stale' }, evidence[1]],
+  });
   return [
     fx('valid bound code and web evidence', good),
     fx('valid reordered bindings with resealed checksum', reorderedBindings),
@@ -214,6 +233,8 @@ function hyperEdgeEvidenceFixtures(): ParityFixture[] {
     fx('tampered checksum', mutate({ checksum: 'sha256:' + 'f'.repeat(64) }), true),
     fx('nested hyperedge extra field', mutate({ hyperedge: { ...edge, packetKey: 'not-authority' } })),
     fx('nested evidence extra field', mutate({ evidence: [{ ...evidence[0], score: 1 }, evidence[1]] })),
+    fx('origin source revision mismatch', originRevisionMismatch, true),
+    fx('origin without matching source evidence', originEvidenceMismatch, true),
   ];
 }
 

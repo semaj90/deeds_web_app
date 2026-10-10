@@ -170,7 +170,7 @@ const projected = rows.map((row) => {
   const somCell = Number.isInteger(Number(somX)) && Number.isInteger(Number(somY))
     ? Number(somY) * 20 + Number(somX)
     : null;
-  const featureRevision = row.observation_feature_revision || row.observation_producer_revision || null;
+  const featureRevision = row.observation_feature_revision || null;
   const evidenceRefs = [
     ...(Array.isArray(row.lineage_evidence_refs) ? row.lineage_evidence_refs : []),
     ...(Array.isArray(row.observation_evidence_refs) ? row.observation_evidence_refs : []),
@@ -215,12 +215,7 @@ const projected = rows.map((row) => {
       manifold4: Array.isArray(row.manifold4) && row.manifold4.length === 4 ? row.manifold4.map(Number) : undefined,
       topologyRevision: row.topology_revision,
     } : undefined,
-    ontology: Array.isArray(row.ontology_classes) && row.ontology_classes.length > 0 && row.observation_producer_revision ? {
-      conceptIds: row.ontology_classes,
-      entityIds: Array.isArray(row.entities) ? row.entities : undefined,
-      ontologyTupleIds: undefined,
-      ontologyRevision: row.observation_producer_revision,
-    } : undefined,
+    ontology: undefined,
     evidenceRefs,
     sourceEvidence: {
       astLanguage: row.ast_language || null,

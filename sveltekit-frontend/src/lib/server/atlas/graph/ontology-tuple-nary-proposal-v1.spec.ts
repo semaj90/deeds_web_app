@@ -15,6 +15,7 @@ const tuple = {
   provenance: {
     sourceTables: ['fixture'], labelerVersion: null, taggerVersion: null, ontologyVersion: 'oak:v1',
     nlpVersion: null, sourceRevision: 'source:v1', graphRevision: 'graph:v1',
+    ontologyRevision: 'ontology-revision:v1',
   },
 };
 
@@ -32,7 +33,19 @@ describe('OntologyLinkedTupleV1 n-ary proposal adapter', () => {
 
     expect(result.status).toBe('RESOLVED');
     expect(result.proposal?.participants).toHaveLength(3);
+    expect(result.proposal?.ontologyRevision).toBe('ontology-revision:v1');
     expect(result.proposal?.admission).toBe('PROPOSED');
+  });
+
+  it('does not infer ontology revision from ontologyVersion', () => {
+    const result = proposeOntologyLinkedTupleNaryFactV1({
+      ...tuple,
+      provenance: { ...tuple.provenance, ontologyRevision: null },
+    }, {
+      workspaceRevision: 'workspace:v1', graphRevision: 'graph:v1', producerRevision: 'ontology-proposal:v1',
+    }, owners);
+
+    expect(result.proposal?.ontologyRevision).toBeNull();
   });
 
   it('rejects degraded tuples before participant resolution', () => {

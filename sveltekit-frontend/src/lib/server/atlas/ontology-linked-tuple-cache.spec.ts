@@ -69,6 +69,30 @@ describe('ontology-linked-tuple-cache', () => {
     expect(plan.records[0]?.centroid.domainCentroidKey).toBe('atlas:centroid:domain:retrieval');
   });
 
+  it('keeps reference-only taxonomy tuples derived rather than canonical in cache metadata', () => {
+    const plan = buildOntologyLinkedTupleCachePlan({
+      packetId: 'packet-123',
+      packetRevision: 'packet-rev-1',
+      featureId: 'feature-123',
+      sourceRef: 'taxonomy:node-1',
+      tuples: [{ ...baseTuple, evidenceState: 'REFERENCE_ONLY' }],
+      centroid: {
+        domainClass: 'retrieval',
+        domainCentroidKey: 'atlas:centroid:domain:retrieval',
+        somCluster: null,
+        somRow: null,
+        somCol: null,
+        kmeansClusters: [],
+        ontologyTags: ['retrieval'],
+      },
+      revisions: { workspaceRevision: 'workspace-rev-1' },
+    });
+
+    expect(plan.records[0]?.evidenceState).toBe('REFERENCE_ONLY');
+    expect(plan.records[0]?.trustTier).toBe('derived');
+    expect(plan.records[0]?.trustTier).not.toBe('canonical');
+  });
+
   it('writes tuple, token-map, and blocked-hash entries to a redis-like pipeline', async () => {
     const plan = buildOntologyLinkedTupleCachePlan({
       packetId: 'packet-123',

@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import json
 import subprocess
 import sys
@@ -114,10 +115,16 @@ def test_miniforge_sidecar_prefers_treesitter_chunker_module(monkeypatch):
 
     class FakeChunkerModule:
         @staticmethod
-        def chunk_file(text, language):
+        def chunk_file(source_path, language, **kwargs):
             assert language == "typescript"
-            assert "function demo" in text
-            return [FakeChunk()]
+            source_text = Path(source_path).read_text(encoding="utf-8")
+            assert "function demo" in source_text
+            assert kwargs["identity_path"] == "atlas-input.ts"
+            chunk = FakeChunk()
+            chunk.start_byte = 0
+            chunk.end_byte = len(source_text.encode("utf-8"))
+            chunk.text = source_text
+            return [chunk]
 
     monkeypatch.setattr(sidecar, "TREESITTER_CHUNKER_AVAILABLE", True)
     monkeypatch.setattr(sidecar, "TREESITTER_CHUNKER_MODULE", FakeChunkerModule)
@@ -133,7 +140,7 @@ def test_miniforge_sidecar_prefers_treesitter_chunker_module(monkeypatch):
     assert chunks[0].text.startswith("function demo")
 
 
-def test_miniforge_sidecar_grounded_extraction_is_opt_in():
+def test_miniforge_sidecar_grounded_extraction_requires_source_lineage():
     from python.miniforge_nlp_sidecar import AnalyzeRequest, _analyze
 
     default_response = _analyze(
@@ -155,7 +162,67 @@ def test_miniforge_sidecar_grounded_extraction_is_opt_in():
         )
     )
     assert grounded_response.metadata["grounded_extraction_required"] is True
-    assert grounded_response.metadata["grounded_extraction_used"] is True
-    assert isinstance(grounded_response.metadata["grounded_extractions"], list)
-    assert grounded_response.metadata["grounded_extractions"]
-    assert grounded_response.pass_results and grounded_response.pass_results[-1].family == "grounded"
+    assert grounded_response.metadata["grounded_extraction_used"] is False
+    assert grounded_response.metadata["grounded_extractions"] == []
+    assert grounded_response.metadata["grounded_execution"]["state"] == "UNAVAILABLE_SOURCE_BINDING"
+    assert grounded_response.pass_results == []
+
+
+def test_miniforge_sidecar_skips_grounded_pass_for_source_revision_mismatch():
+    from python.miniforge_nlp_sidecar import AnalyzeRequest, _analyze
+
+    grounded_response = _analyze(
+        AnalyzeRequest(
+            text="On 2026-08-09, Dr. Jane Doe paid $100.",
+            source_type="plain_text",
+            source_ref="repo:docs/example.txt",
+            source_revision=f"sha256:{'0' * 64}",
+            workspace_revision="workspace:r1",
+            packet_key="packet:example",
+            grounded_extraction_required=True,
+            passes=["grounded"],
+        )
+    )
+    assert grounded_response.metadata["grounded_extraction_used"] is False
+    assert grounded_response.metadata["grounded_execution"]["state"] == "UNAVAILABLE_SOURCE_BINDING"
+    assert grounded_response.metadata["grounded_execution"]["failureClass"] == "ANALYZED_TEXT_BYTES_DO_NOT_MATCH_SOURCE_REVISION"
+    grounded_pass = next(result for result in grounded_response.pass_results if result.family == "grounded")
+    assert grounded_pass.status == "skipped"
+    assert grounded_pass.artifacts["grounded_only"] is False
+    assert grounded_pass.warnings == ["ANALYZED_TEXT_BYTES_DO_NOT_MATCH_SOURCE_REVISION"]
+
+
+def test_miniforge_sidecar_marks_grounded_pass_succeeded_only_for_bound_result(monkeypatch):
+    import python.miniforge_nlp_sidecar as sidecar
+
+    text = "On 2026-08-09, Dr. Jane Doe paid $100."
+    source_revision = f"sha256:{hashlib.sha256(text.encode('utf-8')).hexdigest()}"
+
+    def fake_grounded_extractions(text, model_id, **kwargs):
+        kwargs["execution_receipt"].update(
+            executorAttempted=True,
+            executorCompleted=True,
+            resultCount=1,
+            state="SUCCEEDED",
+        )
+        return [{"factId": "fixture:grounded-fact", "text": text}]
+
+    monkeypatch.setattr(sidecar, "LANGEXTRACT_AVAILABLE", True)
+    monkeypatch.setattr(sidecar, "_grounded_extractions", fake_grounded_extractions)
+    response = sidecar._analyze(
+        sidecar.AnalyzeRequest(
+            text=text,
+            source_type="plain_text",
+            source_ref="repo:docs/example.txt",
+            source_revision=source_revision,
+            workspace_revision="workspace:fixture",
+            packet_key="packet:fixture",
+            grounded_extraction_required=True,
+            passes=["grounded"],
+        )
+    )
+    grounded_pass = next(result for result in response.pass_results if result.family == "grounded")
+    assert response.metadata["grounded_extraction_used"] is True
+    assert response.metadata["grounded_execution"]["state"] == "SUCCEEDED"
+    assert grounded_pass.status == "succeeded"
+    assert grounded_pass.artifacts["grounded_only"] is True

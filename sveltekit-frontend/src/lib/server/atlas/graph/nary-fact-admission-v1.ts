@@ -70,6 +70,7 @@ export function admitNaryFactProposalV1(input: NaryFactAdmissionInputV1): NaryFa
     packetKey: proposal.packetKey,
     graphRevision: proposal.graphRevision,
     producerRevision: proposal.producerRevision,
+    ontologyRevision: proposal.ontologyRevision ?? null,
     predicate: proposal.predicate,
     participants: proposal.participants,
     evidenceRefs: proposal.evidenceRefs,

@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
 import { makeCbmTextSearchHandlerV1, type CbmTextReceiptV1, decideCbmFallbackV1, qualifyCbmObservationV1, makeAstHandlerV1, makeCacheLookupHandlerV1, makeCbmCodeSnippetHandlerV1, makeCbmDefinitionHandlerV1, makeCbmFileOutlineHandlerV1, makeCbmImportCandidateHandlerV1, makeCandidateLaneHandlerV1, makeLexicalHandlerV1, makePacketReadHandlerV1, makeReadOnlyContextCacheLoaderV1, type AstExtractLikeV1, type CacheLookupOutputV1, type CandidateLaneOutputV1, type CbmImportCandidateReceiptV1, type CbmSnippetReceiptV1, type CbmWorktreeReceiptV1, type CbmOutlineReceiptV1, type PacketReadOutputV1, type LexicalOutputV1 } from './context-dag-handlers-v1.js';
 import { buildContextToolDagFromPreAgentStages, executeContextToolDagV1 } from './context-tool-dag-contracts.js';
 import { AstGrepStructuralCandidateV1Schema } from '../language/ast-grep-structural-topk.js';
 
 const meta = { workflowId: 'wf', requestId: 'rq', workspaceRevision: 'w1', graphRevision: 'g1', producerRevision: 'p1' };
+const revisionOfBytes = (source: Uint8Array) => `sha256:${createHash('sha256').update(source).digest('hex')}`;
+const revisionOf = (source: string) => revisionOfBytes(Buffer.from(source, 'utf8'));
+const workspaceRevision = `sha256:${'a'.repeat(64)}`;
 
 function astCandidate(input: Parameters<AstExtractLikeV1>[0], values: { name: string; startByte: number; endByte: number }) {
   return AstGrepStructuralCandidateV1Schema.parse({
@@ -46,8 +50,8 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     const handler = makeAstHandlerV1({
       symbols: ['buildA'],
       producerRevision: 'p1',
-      readFile: async (f) => { if (f === 'src/bad.ts') throw new Error('nope'); return `// ${f}`; },
-      resolveSourceBinding: (f) => (f === 'src/norev.ts' ? null : { sourceRef: `repo:${f}`, workspaceRevision: 'w', sourceRevision: `s:${f}` }),
+      readSourceBytes: async (f) => { if (f === 'src/bad.ts') throw new Error('nope'); return Buffer.from(`// ${f}`, 'utf8'); },
+      resolveSourceBinding: (f) => (f === 'src/norev.ts' ? null : { sourceRef: `repo:${f}`, workspaceRevision, sourceRevision: revisionOf(`// ${f}`) }),
       extract: async (i) => (i.filePath === 'src/boom.ts'
         ? Promise.reject(new Error('parse'))
         : [astCandidate(i, { name: 'buildA', startByte: 0, endByte: 9 }), astCandidate(i, { name: 'other', startByte: 2, endByte: 5 })]),
@@ -58,7 +62,7 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     };
     const out = (await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: { LEXICAL: lexical } })) as { declarations: Array<{ filePath: string; name: string; sourceRef: string; sourceRevision: string; workspaceRevision: string; spanSha256: string; logicalLaneVoteAdded: false }>; matchedLexicalFilePaths: string[]; skipped: Array<{ filePath: string; reason: string }> };
     expect(out.declarations.map((d) => `${d.filePath}:${d.name}`)).toEqual(['src/a.ts:buildA']);
-    expect(out.declarations[0]).toMatchObject({ sourceRef: 'repo:src/a.ts', sourceRevision: 's:src/a.ts', workspaceRevision: 'w', logicalLaneVoteAdded: false });
+    expect(out.declarations[0]).toMatchObject({ sourceRef: 'repo:src/a.ts', sourceRevision: revisionOf('// src/a.ts'), workspaceRevision, logicalLaneVoteAdded: false });
     expect(out.declarations[0]?.spanSha256).toMatch(/^[a-f0-9]{64}$/);
     expect(out.matchedLexicalFilePaths).toEqual(['src/a.ts']);
     expect(Object.fromEntries(out.skipped.map((s) => [s.filePath, s.reason]))).toEqual({
@@ -70,8 +74,8 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     const handler = makeAstHandlerV1({
       symbols: [],
       producerRevision: 'p1',
-      readFile: async () => 'short',
-      resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision: 'w', sourceRevision: 'sha256:source' }),
+      readSourceBytes: async () => Buffer.from('short', 'utf8'),
+      resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf('short') }),
       extract: async (input) => [astCandidate(input, { name: 'buildA', startByte: 0, endByte: 99 })],
     });
     const out = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
@@ -81,8 +85,47 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
     expect(out.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'INVALID_SPAN' }]);
   });
 
+  it('rejects stale bound source revisions and spans that split UTF-8 code points', async () => {
+    const stale = makeAstHandlerV1({
+      symbols: [], producerRevision: 'p1', readSourceBytes: async () => Buffer.from('current bytes', 'utf8'),
+      resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf('old bytes') }),
+      extract: async () => { throw new Error('must not extract stale bytes'); },
+    });
+    const staleOutput = await stale({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+      LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
+    } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
+    expect(staleOutput.declarations).toEqual([]);
+    expect(staleOutput.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'SOURCE_REVISION_MISMATCH' }]);
+
+    const unicode = 'é';
+    const split = makeAstHandlerV1({
+      symbols: [], producerRevision: 'p1', readSourceBytes: async () => Buffer.from(unicode, 'utf8'),
+      resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf(unicode) }),
+      extract: async (input) => [astCandidate(input, { name: 'accent', startByte: 1, endByte: 2 })],
+    });
+    const splitOutput = await split({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+      LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
+    } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
+    expect(splitOutput.declarations).toEqual([]);
+    expect(splitOutput.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'INVALID_SPAN' }]);
+  });
+
+  it('rejects invalid UTF-8 bytes even when their digest matches the binding', async () => {
+    const raw = Buffer.from([0xc3, 0x28]);
+    const handler = makeAstHandlerV1({
+      symbols: [], producerRevision: 'p1', readSourceBytes: async () => raw,
+      resolveSourceBinding: () => ({ sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOfBytes(raw) }),
+      extract: async () => { throw new Error('must not extract invalid UTF-8'); },
+    });
+    const output = await handler({ nodeId: 'AST_STRUCTURAL_REFINE', inputs: {
+      LEXICAL: { files: [{ filePath: 'src/a.ts', lineNumbers: [1] }], symbols: [], totalMatches: 1, truncated: false, canonicalAuthority: false },
+    } }) as { declarations: unknown[]; skipped: Array<{ reason: string }> };
+    expect(output.declarations).toEqual([]);
+    expect(output.skipped).toEqual([{ filePath: 'src/a.ts', reason: 'INVALID_UTF8_SOURCE' }]);
+  });
+
   it('ast without LEXICAL output fails loudly (never fabricates input)', async () => {
-    const handler = makeAstHandlerV1({ symbols: [], producerRevision: 'p', readFile: async () => '', resolveSourceBinding: () => null, extract: async () => [] });
+    const handler = makeAstHandlerV1({ symbols: [], producerRevision: 'p', readSourceBytes: async () => Buffer.alloc(0), resolveSourceBinding: () => null, extract: async () => [] });
     await expect(handler({ nodeId: 'AST', inputs: {} })).rejects.toThrow(/LEXICAL/);
   });
 
@@ -101,9 +144,9 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       AST_STRUCTURAL_REFINE: makeAstHandlerV1({
         symbols: ['target'],
         producerRevision: 'ast-grep-fixture-v1',
-        readFile: async () => source,
+        readSourceBytes: async () => Buffer.from(source, 'utf8'),
         resolveSourceBinding: (filePath) => filePath === 'src/a.ts'
-          ? { sourceRef: 'repo:src/a.ts', workspaceRevision: 'w1', sourceRevision: 'sha256:source-a' }
+          ? { sourceRef: 'repo:src/a.ts', workspaceRevision, sourceRevision: revisionOf(source) }
           : null,
         extract: async (input) => [astCandidate(input, { name: 'target', startByte: 0, endByte: Buffer.byteLength(source, 'utf8') })],
       }),
@@ -122,8 +165,8 @@ describe('context DAG handlers (CONTEXT-DAG-01)', () => {
       declarations: [{
         name: 'target',
         sourceRef: 'repo:src/a.ts',
-        sourceRevision: 'sha256:source-a',
-        workspaceRevision: 'w1',
+        sourceRevision: revisionOf(source),
+        workspaceRevision,
         logicalLaneVoteAdded: false,
       }],
     });

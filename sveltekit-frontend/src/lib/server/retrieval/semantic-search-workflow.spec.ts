@@ -82,6 +82,10 @@ vi.mock('$lib/server/search/rust-napi-search-backend.js', () => ({
   RustNapiSearchBackend: vi.fn(),
 }));
 
+vi.mock('$lib/server/features/ai/ace/kag-dag-runner.js', () => ({
+  persistKagDagRunFromSteps: vi.fn(async () => null),
+}));
+
 vi.mock('./embedding-service.js', () => ({
   embedQueryForLane: vi.fn(),
 }));
@@ -118,6 +122,9 @@ describe('semantic search workflow', () => {
     );
 
     expect(result.workflowState).toBe('COMPLETE');
+    expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({
+      withGraphExpansion: false,
+    }));
     expect(result.contextManifestShadow).toMatchObject({
       status: 'UNAVAILABLE',
       reason: 'REVISION_QUALIFIED_FEATURE_SOURCE_PROVIDER_NOT_CONFIGURED',
@@ -133,5 +140,34 @@ describe('semantic search workflow', () => {
     expect(board.workflowDag.length).toBeGreaterThan(0);
     expect(board.recommendationSource).toContain('semantic-search-workflow.json');
     expect(board.temporalRecommendations).toHaveLength(0);
+  });
+
+  it('carries bounded query classification through the real workflow caller', async () => {
+    const result = await runSemanticSearchWorkflow({
+      query: 'Find the code that connects Valkey caching to the ACE assembler and explain its behavior',
+      topK: 5,
+      includeWorkflowPreamble: false,
+      includeAcePacket: true,
+      compareRustShadow: false,
+      withGraphExpansion: true,
+      persistReport: false,
+    });
+
+    expect(result.metadata.queryClassification).toMatchObject({
+      schema: 'atlas.query-classification.v1',
+      producerRevision: 'semantic-search-workflow-v1',
+      domains: ['ace', 'cache'],
+      retrievalNeeds: { lexical: true, ast: true, semantic: true, graph: true },
+      operation: 'INSPECT',
+    });
+    expect(result.workflowDag).toContainEqual(expect.objectContaining({
+      name: 'classify_query_intent',
+      status: 'completed',
+      detail: 'domains=ace,cache; ast=true; graph=true',
+    }));
+    expect(searchMock).toHaveBeenCalledWith(expect.objectContaining({
+      withGraphExpansion: true,
+    }));
+    expect(result.metadata.queryClassification).not.toHaveProperty('canonicalAuthority');
   });
 });

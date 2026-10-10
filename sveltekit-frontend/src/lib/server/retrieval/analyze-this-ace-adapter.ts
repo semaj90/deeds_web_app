@@ -68,7 +68,7 @@ export function buildAnalyzeThisAceAdapterV1(
 		evidenceRevisions: {
 			sourceRevision: null,
 			representationRevision: null,
-			featureRevision: result.contextManifest.checksum,
+			featureRevision: null,
 			ontologyRevision: null,
 			modelRevision: input.modelRevision ?? null,
 			promptTemplateRevision: input.promptTemplateRevision ?? null,

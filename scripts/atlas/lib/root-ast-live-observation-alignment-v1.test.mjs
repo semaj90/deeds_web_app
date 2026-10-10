@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { selectRootAstObservationBoundByLiveSymbolProofV1 } from './root-ast-live-observation-alignment-v1.mjs';
+import {
+	diagnoseRootAstObservationAlignmentV1,
+	selectRootAstObservationBoundByLiveSymbolProofV1,
+} from './root-ast-live-observation-alignment-v1.mjs';
 
 const observation = { observation_id: 'obs-1', source_ref: 'src/a.ts', source_revision: 'sha256:source', byte_start: 0, byte_end: 3 };
 const proof = {
@@ -18,6 +21,43 @@ test('joins a source-only AST row only through the exact live symbol proof', () 
 test('accepts an already packet-bound exact observation', () => {
 	const row = { identityStatus: 'PACKET_REFERENCE', packetKey: 'packet-1', sourceRef: 'src/a.ts', sourceRevision: 'sha256:source', workspaceRevision: 'sha256:workspace', observation };
 	assert.equal(selectRootAstObservationBoundByLiveSymbolProofV1(proof, [row]).identityBindingMode, 'PACKET_REFERENCE');
+});
+
+test('reports a producer revision mismatch without allowing feature compilation', () => {
+	const row = {
+		identityStatus: 'PACKET_REFERENCE', packetKey: 'packet-1', sourceRef: 'src/a.ts',
+		sourceRevision: 'sha256:source', workspaceRevision: 'sha256:workspace',
+		observation: { ...observation, extractor_revision: 'root-prefill-v2' },
+	};
+	const unrelated = { ...row, observation: { ...observation, observation_id: 'obs-other', byte_start: 8 } };
+	const result = diagnoseRootAstObservationAlignmentV1(proof, [row, unrelated]);
+	assert.equal(result.status, 'BLOCKED_PRODUCER_REVISION_MISMATCH');
+	assert.equal(result.producerRevisionMismatchCount, 1);
+	assert.equal(result.observationMismatchCount, 1);
+	assert.equal(result.candidates[0].differences[0].field, 'extractor_revision');
+	assert.equal(result.featureCompilationAllowed, false);
+	assert.equal(result.canonicalAuthority, false);
+	assert.throws(() => selectRootAstObservationBoundByLiveSymbolProofV1(proof, [row]), /ROOT_OBSERVATION_NOT_UNIQUE_EXACT_MATCH:0/);
+});
+
+test('reports structural observation drift separately from producer revision drift', () => {
+	const row = {
+		identityStatus: 'PACKET_REFERENCE', packetKey: 'packet-1', sourceRef: 'src/a.ts',
+		sourceRevision: 'sha256:source', workspaceRevision: 'sha256:workspace',
+		observation: { ...observation, byte_end: 4, extractor_revision: 'root-prefill-v2' },
+	};
+	const result = diagnoseRootAstObservationAlignmentV1(proof, [row]);
+	assert.equal(result.status, 'BLOCKED_OBSERVATION_MISMATCH');
+	assert.deepEqual(result.candidates[0].differences.map(({ field }) => field), ['byte_end', 'extractor_revision']);
+	assert.equal(result.featureCompilationAllowed, false);
+});
+
+test('reports missing identity candidates without guessing from source paths', () => {
+	const row = {
+		identityStatus: 'PACKET_REFERENCE', packetKey: 'packet-other', sourceRef: 'src/a.ts',
+		sourceRevision: 'sha256:source', workspaceRevision: 'sha256:workspace', observation,
+	};
+	assert.equal(diagnoseRootAstObservationAlignmentV1(proof, [row]).status, 'NO_IDENTITY_MATCH');
 });
 
 test('rejects source, workspace, AST, packet, duplicate, and unverified identity mismatches', () => {

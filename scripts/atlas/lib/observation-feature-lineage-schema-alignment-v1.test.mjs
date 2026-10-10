@@ -79,3 +79,12 @@ test('AST prefill reads packet source_revision without substituting content or w
   assert.match(projection, /featureRevision:\s*z\.string\(\)\.min\(1\)/);
   assert.match(projection, /registryRevision:\s*z\.string\(\)\.min\(1\)/);
 });
+
+test('live profile readback never substitutes producer revision for feature or ontology revision', async () => {
+  const source = await read('scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs');
+
+  assert.match(source, /const featureRevision = row\.observation_feature_revision \|\| null;/);
+  assert.doesNotMatch(source, /observation_feature_revision \|\| row\.observation_producer_revision/);
+  assert.doesNotMatch(source, /ontologyRevision:\s*row\.observation_producer_revision/);
+  assert.match(source, /ontology:\s*undefined,/);
+});

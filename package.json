@@ -96,6 +96,8 @@
     "atlas:task-semantic-packet:lifecycle-audit": "node scripts/atlas/audit-task-semantic-packet-lifecycle-order-v1.mjs",
     "atlas:error-fixing:plan": "node scripts/atlas/run-agentic-error-fixing-v1.mjs",
     "atlas:error-fixing:validate": "node scripts/atlas/run-agentic-error-fixing-v1.mjs --validate",
+    "atlas:agentic:runtime-smoke": "node scripts/atlas/agentic-validation-runtime-smoke-v1.mjs",
+    "atlas:proof-chain:verify": "tsx scripts/atlas/prove-proof-chain-v1.mts",
     "atlas:error:evidence:capture": "node scripts/atlas/run-typescript-error-evidence-capture-v1.mjs",
     "atlas:error:evidence:normalize": "node scripts/atlas/capture-typescript-error-evidence-v1.mjs",
     "atlas:packet-lineage:promotion:preflight": "node scripts/atlas/plan-packet-chunk-lineage-promotion-v1.mjs",
