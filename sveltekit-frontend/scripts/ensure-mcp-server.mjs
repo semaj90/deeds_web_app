@@ -51,36 +51,101 @@ export async function isTraceMcpHealthy() {
   }
 }
 
-async function getTraceMcpTools() {
-  try {
-    const { base } = getTraceMcpBase();
+/**
+ * Capability readiness is a distinct gate from /health.
+ * Initialize a real MCP session, inspect tool input schemas and follow
+ * pagination. Fail closed on protocol errors, empty/malformed inventories,
+ * missing tools, or missing authorization.
+ */
+export async function probeTraceMcpCapabilities() {
+  const { base } = getTraceMcpBase();
+  let sessionId;
+  let rpcId = 0;
+  const request = async (method, params = {}, notification = false) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json, text/event-stream',
+      ...(sessionId ? { 'Mcp-Session-Id': sessionId } : {}),
+      ...(process.env.TRACE_MCP_AUTH_TOKEN ? { Authorization: `Bearer ${process.env.TRACE_MCP_AUTH_TOKEN}` } : {}),
+    };
+    const payload = { jsonrpc: '2.0', method, params, ...(!notification ? { id: ++rpcId } : {}) };
     const res = await fetch(`${base}/mcp`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
-      signal: AbortSignal.timeout(TIMEOUT),
+      method: 'POST', headers, body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return null;
-
+    if (!res.ok) throw new Error(`MCP_HTTP_${res.status}`);
+    sessionId = res.headers.get('mcp-session-id') ?? sessionId;
+    if (notification || res.status === 202 || res.status === 204) return null;
     const raw = await res.text();
-    let parsed = null;
-    for (const line of raw.split('\n')) {
-      if (line.startsWith('data: ')) {
-        try {
-          parsed = JSON.parse(line.slice(6));
-          break;
-        } catch {}
+    const messages = [];
+    if (res.headers.get('content-type')?.includes('text/event-stream')) {
+      for (const line of raw.split(/\r?\n/)) {
+        if (!line.startsWith('data:')) continue;
+        try { messages.push(JSON.parse(line.slice(5).trim())); } catch { /* ignore non-JSON event */ }
       }
+    } else {
+      messages.push(JSON.parse(raw));
     }
-    if (!parsed) {
-      try { parsed = JSON.parse(raw); } catch { return null; }
+    const response = messages.find((value) => value?.id === rpcId);
+    if (!response || response.error) throw new Error(response?.error?.message ?? 'MCP_RPC_RESPONSE_MISSING');
+    return response.result;
+  };
+  const fail = (reason, discovered = []) => ({
+    schema: 'TraceCapabilityReceiptV1',
+    server: 'trace', port: Number(getTraceMcpBase().port),
+    health: 'PASS', mcp_initialized: false, tool_discovery: 'FAIL',
+    required_tools: REQUIRED_TOOLS, discovered_tools: discovered,
+    missing_tools: REQUIRED_TOOLS.filter((name) => !discovered.includes(name)),
+    production_ready: false, reason,
+  });
+  try {
+    const initialized = await request('initialize', {
+      protocolVersion: '2025-06-18',
+      capabilities: {},
+      clientInfo: { name: 'trace-startup-capability-check', version: '1.0.0' },
+    });
+    if (!initialized?.capabilities?.tools) return fail('MCP_TOOLS_CAPABILITY_NOT_ADVERTISED');
+    await request('notifications/initialized', {}, true);
+    const names = new Set();
+    const cursors = new Set();
+    let cursor;
+    for (let page = 0; page < 100; page++) {
+      const result = await request('tools/list', cursor ? { cursor } : {});
+      if (!Array.isArray(result?.tools)) return fail('MCP_TOOL_LIST_INVALID', [...names]);
+      for (const tool of result.tools) {
+        if (typeof tool?.name !== 'string' || !tool.name ||
+            !tool.inputSchema || tool.inputSchema.type !== 'object')
+          return fail('MCP_TOOL_SCHEMA_INVALID', [...names]);
+        names.add(tool.name);
+      }
+      if (!result.nextCursor) {
+        const discovered = [...names].sort();
+        const missing = REQUIRED_TOOLS.filter((name) => !names.has(name));
+        return {
+          schema: 'TraceCapabilityReceiptV1', server: 'trace',
+          port: Number(getTraceMcpBase().port), health: 'PASS',
+          mcp_initialized: true, tool_discovery: 'PASS',
+          required_tools: REQUIRED_TOOLS, discovered_tools: discovered,
+          missing_tools: missing, production_ready: missing.length === 0,
+          reason: missing.length ? 'REQUIRED_TOOLS_MISSING' : null,
+        };
+      }
+      if (cursors.has(result.nextCursor)) return fail('MCP_PAGINATION_CYCLE', [...names]);
+      cursors.add(result.nextCursor);
+      cursor = result.nextCursor;
     }
-
-    const tools = parsed?.result?.tools;
-    if (!Array.isArray(tools)) return null;
-    return tools.map((tool) => typeof tool?.name === 'string' ? tool.name : null).filter(Boolean);
-  } catch {
-    return null;
+    return fail('MCP_PAGINATION_LIMIT', [...names]);
+  } catch (err) {
+    return fail(err instanceof Error ? err.message : 'MCP_CAPABILITY_PROBE_FAILED');
+  } finally {
+    if (sessionId) {
+      try {
+        await fetch(`${base}/mcp`, {
+          method: 'DELETE', headers: { 'Mcp-Session-Id': sessionId },
+          signal: AbortSignal.timeout(1000),
+        });
+      } catch { /* session teardown is best effort */ }
+    }
   }
 }
 
@@ -122,8 +187,9 @@ function hasTraceMcpListener() {
 
 export async function ensureTraceMcp() {
   if (await isTraceMcpHealthy()) {
-    const tools = await getTraceMcpTools();
-    if (tools && REQUIRED_TOOLS.every((tool) => tools.includes(tool))) return true;
+    const receipt = await probeTraceMcpCapabilities();
+    if (receipt.production_ready) return true;
+    console.warn('[ensure-mcp-server] capability gate:', receipt.reason, receipt.missing_tools);
 
     console.warn('[ensure-mcp-server] TRACE MCP is healthy but missing required tools; restarting listener...');
     stopTraceMcpListener();
@@ -168,7 +234,11 @@ export async function ensureTraceMcp() {
 
   for (let i = 0; i < RETRIES; i++) {
     await new Promise((r) => setTimeout(r, 500));
-    if (await isTraceMcpHealthy()) return true;
+    if (await isTraceMcpHealthy()) {
+      const receipt = await probeTraceMcpCapabilities();
+      if (receipt.production_ready) return true;
+      if (i === RETRIES - 1) console.error('[ensure-mcp-server] capability gate failed:', JSON.stringify(receipt));
+    }
     if (child.exitCode !== null) {
       console.error(`[ensure-mcp-server] TRACE MCP exited code=${child.exitCode} after ${(i + 1) * 500}ms`);
       try {
@@ -191,5 +261,7 @@ if (args.includes('--spawn')) {
   process.exit(ok ? 0 : 1);
 } else {
   const healthy = await isTraceMcpHealthy();
-  console.log(healthy ? 'TRACE MCP server: healthy' : 'TRACE MCP server: not running');
+  const receipt = healthy ? await probeTraceMcpCapabilities() : null;
+  console.log(JSON.stringify({ healthy, capability: receipt }, null, 2));
+  if (healthy && !receipt?.production_ready) process.exitCode = 1;
 }
