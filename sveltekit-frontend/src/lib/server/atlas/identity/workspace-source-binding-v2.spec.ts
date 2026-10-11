@@ -1,9 +1,9 @@
 import {describe,it,expect} from 'vitest';
 import {createHash} from 'node:crypto';
-import {buildWorkspaceRevisionV2} from './workspace-source-binding-v2.js';
+import {buildWorkspaceRevisionV2, type WorkspaceRevisionV2Input} from './workspace-source-binding-v2.js';
 const e=(ref:string,bytes:string)=>{const d=createHash('sha256').update(bytes).digest('hex');
  return {sourceRef:ref,sourceRevision:'sha256:'+d,contentDigest:d,byteLength:Buffer.byteLength(bytes)};};
-const input=()=>({repositoryId:'repo:root',sources:[e('src/a.ts','abc'),e('src/b.ts','xyz')],
+const input=():WorkspaceRevisionV2Input=>({repositoryId:'repo:root',sources:[e('src/a.ts','abc'),e('src/b.ts','xyz')],
  skippedSources:[],sourceExtensionSet:['.ts','.md'],excludedPrefixes:['docs/reports/'],
  discoveryPolicyRevision:'policy:v2'});
 describe('workspace revision v2 opt-in',()=>{
