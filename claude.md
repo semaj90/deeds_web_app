@@ -285,6 +285,20 @@ does new work belong in `scripts/atlas/` (script-side, still mid-migration)
 or `sveltekit-frontend/src` (app-side consumer/bridge, per the Duplication
 Prevention section above).
 
+**Operator direction update (2026-10-11) — placement, not lookup:** new Atlas work (first applied to the
+tensor-residency / multicore-mmap lane, `openspec/changes/parent-atlas-tensor-residency-integration/tasks.md`)
+is implemented in `scripts/atlas/` FIRST. `packages/atlas-*` / `packages/parent-atlas*` are a MIRROR, populated
+only after smoke validation + eval testing pass; adapters are packaged as a library/plugin later. The audit rule
+above is unchanged: still grep `packages/parent-atlas/src/core/` and `packages/atlas-core/src/` for an existing
+contract before writing anything, and before mirroring, so no second contract owner is created. What changes is
+where new, not-yet-validated code lands (scripts first), not whether packages/ is checked.
+**Check `scripts/atlas/` first for the current implementation, but `packages/` may hold NEWER files** (e.g. the
+`residencyTransitionToWorkflowAction` adapter was written in `packages/parent-atlas` first). Compare both sides
+(`git log -1 -- <path>` and a diff) before editing either. **During production hardening, reconcile and mirror:**
+every `scripts/atlas/` implementation that passed smoke/eval is mirrored into `packages/`, and any newer
+`packages/` file is back-ported or explicitly recorded as divergent. Track each pending mirror in the owning
+change's `tasks.md`; do not leave the two sides silently diverged.
+
 ---
 
 ## 🚫 Duplication Prevention — Audit Before You Build (HARD RULE, condensed)

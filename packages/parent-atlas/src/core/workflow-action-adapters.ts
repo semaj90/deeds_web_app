@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { acePacketV2Schema, type AcePacketV2 } from './ace-packet-v2.js';
+import { instructionCardV1Schema, type InstructionCardV1 } from './instruction-card-v1.js';
 import { retrievalActionReceiptSchema, type RetrievalActionReceiptV1 } from './retrieval-action-receipt.js';
 import {
   WORKFLOW_ACTION_LANES,
@@ -141,6 +142,121 @@ export function acePacketToWorkflowArtifact(input: {
       semantic_projection_revision: packet.hypergraph.lineage.semantic_projection_revision ?? null,
       semantic_model_revision: packet.hypergraph.lineage.semantic_model_revision ?? null,
       feature_matrix_revision: packet.hypergraph.lineage.feature_matrix_revision ?? null,
+    },
+    producerRevision: input.producer_revision,
+  });
+}
+
+/**
+ * Read-only: announce an InstructionCardV1 as a `scheduled` workflow event.
+ * The card is a NOT_ADMITTED reference descriptor, so this never implies
+ * admission or execution; the orchestrator still owns identity and sequence.
+ */
+export function instructionCardToWorkflowAction(input: {
+  identity: WorkflowIdentityInputV1;
+  sequence: number;
+  card: InstructionCardV1;
+  producer_revision: string;
+}): WorkflowActionEventV1 {
+  const identity = workflowIdentitySchema.parse(input.identity);
+  const card = instructionCardV1Schema.parse(input.card);
+  if (identity.actionId !== card.actionId) {
+    throw new Error(`INSTRUCTION_CARD_WORKFLOW_ACTION_MISMATCH:${card.actionId}`);
+  }
+  return workflowActionEventSchema.parse({
+    ...identity,
+    schema: 'atlas.workflow-action.v1',
+    sequence: input.sequence,
+    lane: 'planner',
+    transport: 'local',
+    kind: 'scheduled',
+    resourceRefs: [{ resource_type: 'packet', resource_id: card.packetKey, role: 'packet', identity_status: 'canonical' }],
+    evidenceRefs: [],
+    artifactRefs: [card.instructionCardId],
+    revisions: { workspace: card.workspaceRevision, source: card.sourceRevision },
+    metadata: {
+      instruction_card_id: card.instructionCardId,
+      descriptor_revision: card.descriptorRevision,
+      execution_binding_checksum: card.executionBindingChecksum,
+      algorithm_manifest_checksum: card.algorithmExecutionManifestChecksum,
+      required_capability_ids: card.requiredCapabilityIds,
+      device_class: card.deviceClass,
+      admission_status: card.admissionStatus,
+    },
+    producerRevision: input.producer_revision,
+  });
+}
+
+export const RESIDENCY_STATES = [
+  'QUEUED', 'DEQUEUED', 'EVIDENCE_CHECK', 'PREFETCHING', 'RESIDENT',
+  'EXECUTING', 'READBACK', 'RELEASED', 'BLOCKED', 'FAILED',
+] as const;
+export const RESIDENCY_EXECUTORS = ['CPU', 'CUDA', 'LLAMA_SERVER'] as const;
+
+const RESIDENCY_STATE_TO_KIND = {
+  QUEUED: 'scheduled',
+  DEQUEUED: 'started',
+  EVIDENCE_CHECK: 'progress',
+  PREFETCHING: 'progress',
+  RESIDENT: 'progress',
+  EXECUTING: 'progress',
+  READBACK: 'progress',
+  RELEASED: 'completed',
+  BLOCKED: 'blocked',
+  FAILED: 'failed',
+} as const satisfies Record<(typeof RESIDENCY_STATES)[number], WorkflowActionEventV1['kind']>;
+
+const residencyTransitionSchema = z.object({
+  sequence: z.number().int().nonnegative(),
+  state: z.enum(RESIDENCY_STATES),
+  executor: z.enum(RESIDENCY_EXECUTORS),
+  materializationId: z.string().min(1),
+  generation: z.number().int().nonnegative(),
+  packetKey: z.string().min(1).optional(),
+  featureId: z.string().min(1).optional(),
+  instructionRevision: z.string().min(1).optional(),
+  receiptId: z.string().min(1).optional(),
+  reasonCode: z.string().min(1).optional(),
+}).strict();
+
+export type ResidencyTransitionV1 = z.infer<typeof residencyTransitionSchema>;
+
+/**
+ * Map a tensor-residency/execution state transition onto the common workflow
+ * event. Residency state is lossless in metadata; materializationId and
+ * generation are derived-cache descriptors, never canonical resourceRefs.
+ * RELEASED requires a receiptId and FAILED a reasonCode (schema enforced).
+ */
+export function residencyTransitionToWorkflowAction(input: {
+  identity: WorkflowIdentityInputV1;
+  transition: ResidencyTransitionV1;
+  producer_revision: string;
+}): WorkflowActionEventV1 {
+  const identity = workflowIdentitySchema.parse(input.identity);
+  const t = residencyTransitionSchema.parse(input.transition);
+  const resourceRefs: WorkflowActionEventV1['resourceRefs'] = [];
+  if (t.packetKey) resourceRefs.push({ resource_type: 'packet', resource_id: t.packetKey, role: 'packet', identity_status: 'canonical' });
+  if (t.featureId) resourceRefs.push({ resource_type: 'feature', resource_id: t.featureId, role: 'feature', identity_status: 'canonical' });
+
+  return workflowActionEventSchema.parse({
+    ...identity,
+    schema: 'atlas.workflow-action.v1',
+    sequence: t.sequence,
+    lane: t.executor === 'CUDA' ? 'gpu' : 'tool',
+    transport: 'local',
+    kind: RESIDENCY_STATE_TO_KIND[t.state],
+    receiptId: t.receiptId,
+    errorCode: t.state === 'FAILED' ? t.reasonCode : undefined,
+    resourceRefs,
+    evidenceRefs: [],
+    artifactRefs: [],
+    metadata: {
+      residency_state: t.state,
+      executor: t.executor,
+      materialization_id: t.materializationId,
+      generation: t.generation,
+      instruction_revision: t.instructionRevision ?? null,
+      reason_code: t.reasonCode ?? null,
     },
     producerRevision: input.producer_revision,
   });

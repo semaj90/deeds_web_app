@@ -7,27 +7,27 @@
  * Uses deterministic name-based UUID v5 to ensure consistency across runs.
  *
  * Input: 804 fanout labels from structured-lexical-fanout.json
- * Output: Backfill report + SQL statements
+ * Output: Read-only ID derivation proposal; persistence is disabled pending source binding.
  *
  * Modes:
  *   --dry-run (default)   Show what would be inserted
- *   --apply               Actually update Postgres
+ *   --apply               REFUSED (exit 3): no apply path until independent source-binding admission
+ *   --packets-snapshot F  read-only atlas_packets snapshot (TSV: packet_key, source_ref, title_id) to compare against
+ *   --aliases-snapshot F  optional alias_key list, one per line
  *   --limit N             Limit to first N files
  *   --report FILE         Save report to FILE (default: docs/reports/gsd-id-derivation.json)
  */
 
-import pg from 'pg';
 import { v5 as uuidv5 } from 'uuid';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
 import path from 'path';
-import dotenv from 'dotenv';
+import { planPacketKeyIdUpdatesV1, parsePacketsSnapshotTsvV1 } from './lib/packet-key-id-update-plan-v1.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-dotenv.config({ path: `${__dirname}/../../.env` });
 
 // Deterministic UUID v5 namespace for GSD IDs
 const GSD_NAMESPACE = '550e8400-e29b-41d4-a716-446655440001';
@@ -75,7 +75,6 @@ const PURPOSE_CRITICALITY_TO_GSD = {
 
 const args = {
   dryRun: !process.argv.includes('--apply'),
-  apply: process.argv.includes('--apply'),
   limit: (() => {
     const argv = process.argv.slice(2);
     const eq = argv.find((a) => a.startsWith('--limit='));
@@ -92,7 +91,22 @@ const args = {
   })(),
 };
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+// REGISTRY-LUT-01d: READ-ONLY. This script has no Postgres client; --apply is refused before any other work.
+// The former title-keyed `UPDATE atlas_packets ... WHERE title_id = $2` branch was removed (git history keeps it).
+if (process.argv.some((a) => a === '--apply' || a.startsWith('--apply='))) {
+  console.error('BLOCKED_APPLY: packet-key/source-binding readback and approval are absent (REGISTRY-LUT-01d)');
+  process.exit(3);
+}
+const argvValue = (name) => {
+  const argv = process.argv.slice(2);
+  const eq = argv.find((a) => a.startsWith(`${name}=`));
+  if (eq) return eq.slice(name.length + 1);
+  const pos = argv.findIndex((a) => a === name);
+  return pos >= 0 ? argv[pos + 1] : null;
+};
+const packetsSnapshotPath = argvValue('--packets-snapshot');
+const aliasesSnapshotPath = argvValue('--aliases-snapshot');
+const reportExplicit = process.argv.some((a) => a === '--report' || a.startsWith('--report='));
 
 const log = {
   info: (msg) => console.log(`[gsd-id] ${msg}`),
@@ -157,7 +171,7 @@ async function main() {
     });
 
     // Step 3: Build update statements
-    log.info('Building update statements...');
+    log.info('Building packet-key ID proposals...');
     const updates = [];
 
     for (const file of files.slice(0, args.limit)) {
@@ -166,75 +180,72 @@ async function main() {
       const criticality = (file.app_criticality && file.app_criticality.trim()) || 'unknown';
       const pair = `${purpose}:${criticality}`;
       const gsdId = PURPOSE_CRITICALITY_TO_GSD[pair] || PURPOSE_CRITICALITY_TO_GSD['unknown:unknown'];
-      const titleId = file.title_id;
-
-      if (!titleId) {
+      const titleId = file.title_id; // label only: consistency check, never the key
+      const packetKey = file.packet_key;
+      const sourceRef = file.source_ref;
+      if (typeof packetKey !== 'string' || !packetKey.trim() || typeof sourceRef !== 'string' || !sourceRef.trim()) {
         report.stats.filesSkipped++;
         continue;
       }
 
       updates.push({
         titleId,
+        packetKey,
+        sourceRef,
         pair,
         gsdId,
       });
     }
 
     report.stats.filesNewlyAssigned = updates.length;
-    log.info(`Prepared ${updates.length} update statements`);
+    log.info(`Prepared ${updates.length} ID proposals; no database updates are enabled`);
 
     // Step 4: Preview (dry-run)
     if (args.dryRun) {
-      log.info(`DRY-RUN: Would update ${updates.length} files`);
+      log.info(`DRY-RUN: ${updates.length} packet-key identity hints; none authorized for DB updates`);
       if (updates.length > 0 && updates.length <= 5) {
         log.info('Sample updates:');
         updates.forEach((u, i) => {
           log.info(`  ${i + 1}. ${u.titleId} (${u.pair}) → ${u.gsdId}`);
         });
       }
-      report.status = 'DRY_RUN_COMPLETE';
-    } else {
-      // Step 5: Apply updates to Postgres
-      log.info('Applying updates to Postgres...');
-      const client = await pool.connect();
-
-      try {
-        await client.query('BEGIN');
-
-        for (const update of updates) {
-          // Assuming there's a way to link title_id to a row in the database
-          // This is a placeholder — adjust table/column names as needed
-          await client.query(
-            `UPDATE atlas_packets
-             SET gsd_id = $1
-             WHERE title_id = $2`,
-            [update.gsdId, update.titleId]
-          );
-        }
-
-        await client.query('COMMIT');
-        report.stats.filesWithGsdId = updates.length;
-        report.status = 'APPLY_COMPLETE';
-        log.success(`Applied ${updates.length} updates to Postgres`);
-      } catch (err) {
-        await client.query('ROLLBACK');
-        throw err;
-      } finally {
-        client.release();
+      report.applyReady = false;
+      report.sourceBindingEvidence = 'NOT_PROVIDED';
+      if (packetsSnapshotPath) {
+        const snapshotRows = parsePacketsSnapshotTsvV1(fs.readFileSync(packetsSnapshotPath, 'utf-8'));
+        const aliasKeys = aliasesSnapshotPath
+          ? new Set(fs.readFileSync(aliasesSnapshotPath, 'utf-8').split(/\r?\n/).filter(Boolean))
+          : new Set();
+        const plan = planPacketKeyIdUpdatesV1({
+          files: updates.map((u) => ({ packet_key: u.packetKey, source_ref: u.sourceRef, title_id: u.titleId, __value: u.gsdId })),
+          packetRows: snapshotRows,
+          assign: (f) => f.__value,
+          aliasKeys,
+        });
+        report.plan = { counts: plan.counts, statementShape: plan.statementShape, snapshotRows: snapshotRows.length };
+        report.status = 'QUALIFIED_DRY_RUN_ONLY';
+      } else {
+        report.status = 'DRY_RUN_UNVERIFIED_NO_SNAPSHOT';
       }
+    } else {
+      throw new Error('REGISTRY_LUT_01D_APPLY_DISABLED');
     }
 
     // Step 6: Generate report
     report.timing.elapsedMs = Date.now() - startTime;
     report.completedAt = new Date().toISOString();
 
-    const reportDir = path.dirname(args.report);
-    if (!fs.existsSync(reportDir)) {
-      fs.mkdirSync(reportDir, { recursive: true });
+    // A report file is written ONLY when --report is passed explicitly (the default path is a tracked file).
+    if (reportExplicit) {
+      const reportDir = path.dirname(args.report);
+      if (!fs.existsSync(reportDir)) {
+        fs.mkdirSync(reportDir, { recursive: true });
+      }
+      fs.writeFileSync(args.report, JSON.stringify(report, null, 2));
+      log.success(`Report saved to ${args.report}`);
+    } else {
+      console.log(JSON.stringify(report, null, 2));
     }
-
-    fs.writeFileSync(args.report, JSON.stringify(report, null, 2));
-    log.success(`Report saved to ${args.report}`);
 
     // Summary
     log.info('');
@@ -242,7 +253,7 @@ async function main() {
     log.info(`Status: ${report.status}`);
     log.info(`Mode: ${report.mode}`);
     log.info(`Files Processed: ${report.stats.filesProcessed}`);
-    log.info(`Files Newly Assigned GSD ID: ${report.stats.filesNewlyAssigned}`);
+    log.info(`Files With GSD ID Proposal: ${report.stats.filesNewlyAssigned}`);
     log.info(`Unique Pairs: ${Object.keys(report.pairCounts).length}`);
     log.info(`Elapsed Time: ${report.timing.elapsedMs}ms`);
     log.info('═'.repeat(60));
@@ -254,7 +265,7 @@ async function main() {
     console.error(err);
     process.exit(1);
   } finally {
-    await pool.end();
+    // read-only: no Postgres client was created
   }
 }
 

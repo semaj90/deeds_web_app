@@ -9,6 +9,11 @@ export interface ProductFeatureOrdinalCandidateV1 {
   packetKey: string;
   sourceRef: string;
   sourceRevision: string;
+  /**
+   * Optional but, when supplied, VERIFIED: the ordinal the product-feature row was joined on. Without it the verifier
+   * binds only by canonicalId and cannot detect a row attached to the wrong ordinal (CANDIDATE-JOIN-NEG-01).
+   */
+  candidateOrdinal?: number;
 }
 
 export interface ProductFeatureOrdinalMapVerificationInputV1 {
@@ -57,6 +62,9 @@ export function verifyProductFeatureOrdinalMapV1(
       || canonical.workspaceRevision !== input.workspaceRevision
       || canonical.candidateSnapshotRevision !== input.candidateSnapshotRevision) {
       throw new Error('PRODUCT_FEATURE_CANDIDATE_NOT_BOUND_TO_ORDINAL_MAP');
+    }
+    if (selected.candidateOrdinal !== undefined && selected.candidateOrdinal !== canonical.candidateOrdinal) {
+      throw new Error('PRODUCT_FEATURE_CANDIDATE_ORDINAL_MISMATCH');
     }
   }
 

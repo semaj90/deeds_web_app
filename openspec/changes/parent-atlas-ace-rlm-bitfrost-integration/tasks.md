@@ -14776,3 +14776,91 @@ Existing owner: `scripts/atlas/audit-semantic-768-writer-ownership-v1.mjs` (rece
 **01C classification:** `PROVEN_CURRENT_WRITER` 0 (strict: no row carries source/workspace/representation revision); `LEGACY_UNATTRIBUTED` ≈219,239 (no version/timestamp/revision); version-stamped but revision-unqualified 759 (the guarded writer's own cohort is documented as 15 rows, so the 759 attribution is unresolved); `CONFLICTING_PROVENANCE` candidates = the 739 both-column rows (recipe UNKNOWN per EMB-RECIPE-03). Not a two-active-writer conflict: one bounded writer plus a large legacy population with missing provenance.
 
 **Status:** `SEMANTIC_OWNER_PROVEN` = NOT_PROVEN. Acceptance (agreed): one admitted writer contract that emits modelRevision, representationRevision and source/workspace lineage; readback proves the same artifact; the promoted cohort contains only qualified rows. Path: leave the legacy ~219k diagnostic/excluded from promotion (do not invent provenance) and build a fresh bounded revision-qualified cohort through the admitted writer. Not started; any write is gated.
+
+### 2026-10-11 VAL-ACE-01 — Valkey->ACE diagnostic bridge (operator-supplied scaffold; NOT merged, NOT production proof)
+
+Source: `~/Downloads/valkey-ace-handoff-v1.zip` (2 files: `atlas-bridge/valkey-ace-handoff-v1.mjs` + `.spec.mjs`), read in full before running;
+no fs/network/process use, only `node:crypto`. `node --test` 6/6 pass on injected observations (not production Valkey data).
+Behavior: `inspectValkeyAceHandoffV1({cacheRead, resolution, sourceSpanVerification})` -> `SOURCE_VERIFIED_NOT_ADMITTED` or `BLOCKED`;
+`admitted:false`, `canonicalAuthority:false`, `ontologyTuple:null`, `contextManifest:null`, `aceInjectionAuthorized:false`. Its schema/status strings match
+`sveltekit-frontend/src/lib/server/atlas/retrieval/cached-packet-candidate-resolution-v1.ts`. Placement when adopted: `scripts/atlas/` first, mirror later.
+
+Review gaps to fix before adoption (none applied; file not copied into the repo):
+- [ ] `cacheRead` carries `workspaceRevision` but no `sourceRevision`: a stale cached source revision is not detected.
+- [ ] Receipt checksums are only checked non-empty; resolver / span-receipt checksums are not recomputed (`canonicalSha256V1`) or bound to the ordinal map.
+- [ ] Uses `localeCompare` in its stable-JSON helper; repo uses `compareUtf8` / `canonicalSha256V1` for deterministic hashing.
+- [ ] No Zod schema (repo contracts use strict schemas); `.mjs` vs repo TS conventions.
+
+Live proof ladder (all NOT_PROVEN; none may close from this scaffold):
+1. [ ] **VALKEY-GET-01** one read-only Valkey GET + cache generation observed through the production caller (no writes; password from `.env.local`, ioredis options object, not a URL).
+2. [ ] **VALKEY-RESOLVE-02** feed its `sourceRef` to `resolveCachedPacketCandidatesV1` with an independent request-local ordinal map.
+3. [ ] **VALKEY-SPAN-03** verify bytes/span via the existing source-binding owner (`verifyCachedPacketCandidateSourceBindingSpanV1`).
+4. [ ] **VALKEY-RECEIPT-04** emit and independently read back the handoff receipt (identity + revisions preserved).
+5. [ ] **VALKEY-TUPLE-05** separately admitted ontology tuple, then ContextManifest build + independent readback before any synthesis.
+Maps onto existing gates `ACE-BITFROST-CALLER-01` / `ACE-BITFROST-CANARY-01` (canary needs explicit operator authorization). Atlas (10 tools) / TRACE (188 tools) MCP
+reachability and the 3-hit read-only smoke are runtime reachability only, not evidence for any step above.
+- 2026-10-11 **VAL-ACE-01 adopted into `scripts/atlas/` (FIXTURE_ONLY):** `scripts/atlas/valkey-ace-handoff-v1.mjs` +
+  `valkey-ace-handoff-v1.test.mjs` (`node --test` 11/11). Fixed 3 of 4 review gaps: `cacheRead.sourceRevision` now required and
+  must equal the resolved match's (`CACHE_SOURCE_REVISION_STALE`); receipt checksums verified through an INJECTED
+  `verifyReceiptChecksum(kind, receipt)` (hash owner = `canonicalSha256V1` in sveltekit-frontend; no verifier -> BLOCKED, non-`true`
+  return rejected) so the hashing is not reimplemented; code-point ordering instead of `localeCompare`. Gap NOT fixed: no Zod
+  schema (plain structural checks). Still `admitted:false`, `canonicalAuthority:false`, no tuple/manifest/injection. No real Valkey
+  caller wired and the production verifier is not written. VALKEY-GET-01..05 remain open; `~/Downloads` originals untouched.
+- 2026-10-11 **VAL-ACE-01 enhanced (FIXTURE_ONLY):**
+  - `scripts/atlas/valkey-ace-handoff-v1.mjs`: added strict Zod `valkeyCacheReadV1Schema` (unknown/missing fields -> `CACHE_READ_SCHEMA_INVALID`) and
+    `valkeyAceHandoffV1Schema` (discriminated SOURCE_VERIFIED_NOT_ADMITTED | BLOCKED; `admitted`, `canonicalAuthority`, `aceInjectionAuthorized` are
+    literal `false`, tuple/manifest literal `null`); every return, including BLOCKED, is parsed through it. `node --test` 11/11. Closes the "no Zod" gap.
+  - `scripts/atlas/valkey-ace-handoff-verifier-v1.mts`: production `verifyReceiptChecksumV1(kind, receipt)` = recompute `canonicalSha256V1` over the receipt
+    minus `checksum` (no encoding reimplemented).
+  - `scripts/atlas/valkey-ace-handoff-owner-wiring-v1.test.mts` (run `cd sveltekit-frontend && npx tsx ../scripts/atlas/...`): bridge fed by the REAL
+    `materializeCandidateOrdinalMap` -> `resolveCachedPacketCandidatesV1` -> `verifyCachedPacketCandidateSourceSpanV1` (fixture source bytes) with the real
+    verifier: valid path `SOURCE_VERIFIED_NOT_ADMITTED`; tampered resolver/span checksum, stale cached source revision and an extra cacheRead field all BLOCK.
+    First run failed (my evidence input lacked identity fields; the real verifier correctly rejected it) -> fixed in the test only.
+  - Still `cacheRead` is an injected observation: VALKEY-GET-01 (real read-only GET) NOT done and needs explicit operator go-ahead; source-binding-owner receipt
+    (`verifyCachedPacketCandidateSourceBindingSpanV1`, with live bytes) and VALKEY-RECEIPT-04/TUPLE-05 remain open.
+- 2026-10-11 **VALKEY-GET-01 live read-only observation (result: BLOCKED for the bridge contract; no writes performed):**
+  Method: `docker exec -e REDISCLI_AUTH=<from .env.local, never printed> legal-ai-valkey valkey-cli` using only `PING`, `DBSIZE`, `SCAN`,
+  `TYPE`, `TTL`, `MEMORY USAGE`, `OBJECT ENCODING`, `ZCARD`, bounded `ZRANGE`/`GET`. `PONG`; `DBSIZE` 253 (SCAN COUNT 500; not exhaustive).
+  - `bitfrost:*` = exactly one key found: `bitfrost:summary:index:ranked:v1`, type `zset` (skiplist), 4,826 members, ~382 KB, TTL -1 (no expiry);
+    members are legacy-scheme `packet:<12hex>` keys with scores (first three scored 12). It is a ranked index, not a packet-cache entry.
+  - `ace:packet:*` and `ace:rank:*` = no keys. Other `ace:*` keys are `ace:chunk:hits:<path>` (16-byte strings, TTL -1) and `ace:path:cluster:<n>`
+    (e.g. `unclassified:community-26562`, TTL ~20,338 s) = coarse path hints, consistent with the hit-demand note in CLAUDE.md.
+  - **No observed key carries `cacheGeneration`, `representationRevision`, `sourceRevision` or `workspaceRevision`**, so no live object can satisfy
+    `valkeyCacheReadV1Schema`; feeding one in would require inventing revisions (forbidden). The bridge correctly has nothing real to ingest.
+  - Matches CLAUDE.md "Admission closed"/`BITFROST-LIVE-WARM-01` blocked: the missing link is an admitted producer that writes revision-qualified
+    ACE packet entries with a readback. Do not treat the zset as ACE-packet evidence.
+  - Credential note: Redis/Valkey password lives in `.env.local` (and duplicated/conflicting `REDIS_PASSWORD` lines in `.env`: use `.env.local`);
+    value not recorded here. Open: [ ] ACE-CACHE-REV-01 (producer must write source/workspace revision + generation) is the prerequisite for VALKEY-GET-01.
+
+### 2026-10-11 — repository decomposition, analysis, and execution sequencing (proposal; no promotion)
+
+Keep this roadmap attached to the existing owners above; it does not authorize a new index, ontology table, cache writer, queue, model, or execution service.
+
+- [ ] **REPO-DECOMP-01** Preserve `featureLabel` as a proposal vocabulary distinct from summaries, domain-taxonomy labels, ontology IDs, and admission. Use canonical SearchRuntime/OpenWiki retrieval to identify relevant files, symbols, and documentation; keep source-ranked TopFiles in the existing SearchRuntime order and bind them to the same request snapshot.
+- [ ] **REPO-DECOMP-02** Produce deterministic directory/repository summaries and low-rank recommendations only from revision-qualified retrieved evidence. Label inferred recommendations as proposals; do not let summaries or embeddings create source facts, ontology relations, or extra retrieval votes.
+- [ ] **NLP-ROUTE-01** Reuse the bounded FastAPI/Pydantic and LangExtract/Oaklib proposal owners. Require service/module digest, request trace, cancellation and exact source-span checks; ontology resolution remains a proposal and admission remains with the existing canonical tuple owner.
+- [ ] **AGENT-PLAN-01** Route Deep Agents/LangChain/MCP tool selection through the existing capability registry, permission/schema checks, PromptPlan and DAG owners. DSPy/GEPA/RLM/Prime-style optimization is offline and evaluation-bound; self-prompting may propose candidates but cannot authorize execution or mutate prompts in production.
+- [ ] **GRAPH-CPU-01** On one admitted frozen packet/ordinal snapshot, build the existing role-preserving tuple incidence projection and compare bounded NetworkX traversals/PageRank against an independently read-back CPU receipt. Keep graph coordinates and cosine/centroid neighborhoods as derived routing features, not facts.
+- [ ] **TENSOR-CPU-01** Establish deterministic NumPy/PyTorch CPU tensor baselines (including PCA/SVD or low-rank projections only where a measured retrieval/ranking use case exists), with frozen inputs, model/recipe identity, numerical tolerances, and readback. Do not introduce a second feature-matrix or embedding-space owner.
+- [ ] **GPU-PARITY-01** Only after CPU parity and explicit resource admission, compare the same frozen tensors/graph on supported PyTorch/CUDA, cuGraph/cuVS, and SIMT/cuTile paths. Record actual device/kernel execution, numerical deltas, timing and memory; a planner, import, or WebGPU smoke kernel is not model/GPU parity.
+- [ ] **CACHE-RESIDENCY-01** Keep BitFrost/Valkey as revision/checksum-addressed residency and routing projections. Do not warm ACE JSON packets or cache GPU blocks/KV tensors until canonical ACE packet and ContextManifest admission/readback pass. Titans-style neural memory remains research-only and is not a substitute for runtime KV cache or canonical evidence.
+- [ ] **INGEST-TRANSPORT-01** Treat Kafka as optional bounded transport only if measured ingestion volume requires it. Preserve idempotent packet identity, backpressure, retry/dead-letter receipts and PostgreSQL ownership; indexing and JSON/JSONL parsing never confer admission.
+- [ ] **TOOL-PROTOCOL-01** Reconcile MCP, OpenCode, ACP, A2A, tRPC and any Mastra workflow against the existing tool/capability registry before adding adapters. MCP is the tool contract/transport; OpenCode and ACP are client/agent integration surfaces; A2A is inter-agent messaging; tRPC is an application RPC boundary; Mastra is optional orchestration. Preserve one schema/permission/approval authority, request and trace identity, cancellation, bounded retries, and auditable receipts. Do not register duplicate tool owners or let protocol reachability imply execution authorization.
+- [ ] **GRAPHIFY-TOOL-DISCOVERY-01** If daily Graphify should discover tool capabilities, index only reviewed, revision-qualified tool manifests and source/schema references through existing inventory and packet owners. Emit a read-only capability snapshot with source revision, schema digest, server identity and discovery time; keep discovered tools PROPOSED until the existing registry independently validates schemas, permissions and health. Daily Graphify must not auto-enable MCP/ACP/A2A/tRPC/Mastra tools or trigger them as a side effect of indexing.
+- [ ] **VALIDATION-MATRIX-01** Add CPU smoke/regression tests first for feature decomposition, retrieval identity, Pydantic schemas, tuple incidence, cache-key invalidation, and deterministic tensor output. Add GPU tests only behind the approved resource slot and exact CPU-oracle comparison; keep unavailable hardware explicitly `NOT_RUN`.
+
+**2026-10-11 feature-decomposition contract refresh:** `node --test scripts/atlas/lib/audit-feature-runtime-wiring-v1.test.mjs scripts/atlas/lib/product-feature-decomposition-v1.test.mjs scripts/atlas/lib/product-feature-retrieval-bridge-v1.test.mjs` passes **29/29**. These tests prove deterministic proposal behavior, preservation of canonical SearchRuntime ordering, and fail-closed missing-owner/source cases. They do not exercise a live route, MCP/TRACE tool invocation, daily Graphify execution, production task admission, ontology tuple, ContextManifest readback, or GPU. Related live gates remain open.
+
+**2026-10-11 live TRACE surface audit (read-only):** `npm run trace:mcp:audit` passed **7/7**: health probe, tool discovery, schema coverage, breadth, concurrent `tools/list`, idempotent response shape and domain completeness. The endpoint exposed 188 schema-described tools; this audit only called `tools/list` and health, not an Atlas/TRACE execution tool. It proves server/tool-surface reachability, not capability authorization, successful tool execution, daily Graphify pickup, evidence admission or ACE/ContextManifest linkage.
+
+**2026-10-11 TRACE OpenSpec/Atlas MCP readback:** `openspec.census` and `openspec.frontier(limit=8)` both returned `UNAVAILABLE`/empty with `workspaceRevision=null`, so TRACE does not currently provide a usable revision-bound OpenSpec workboard view. Read-only `atlas.workstation_status` returned 61,718 packets and packet-registry rows, canonical spine `READY`, but phase-lane snapshot reports 15/15 lanes `execution_mode=mock` and says the live workspace scan is pending. `atlas.coverage` reports source refs 100%, feature IDs 100%, embeddings 99.9%, summaries 6,886/61,718 (11.2%), and `phase4a_ready=true` because only source-ref coverage is enforced. These broad warehouse metrics do not establish current task evidence, Graphify execution admission, summary completeness, or the goal’s selected ACE/ContextManifest proof chain. Do not treat phase4a readiness as end-to-end readiness.
+
+**2026-10-11 OpenSpec MCP census selector correction:** `openspec.census` returned `UNAVAILABLE` because the selector chose the lexicographically newest run directory even when it had no `census-v1.json`. The selector now scans existing parseable run census files and chooses the greatest `generatedAt`, with deterministic directory-name fallback; the portfolio report remains a fallback only when no valid run census exists. Added regression coverage for an incomplete newest directory, chronological selection, malformed reports, and fallback. The latest available checked-in report remains dated 2026-10-03 and marked `DIAGNOSTIC_ONLY_NOT_PROMOTABLE`; this fixes report discovery, not freshness or evidence authority. Live TRACE must be restarted/reloaded before this source change is reflected by the running server.
+
+**2026-10-11 live reload check:** A read-only `openspec.census` call to `127.0.0.1:8788/mcp` still returned `source:null`, `workspaceRevision:null`, and `UNAVAILABLE`. The listener PID `12160` started at 00:48 before this selector patch, so this result does not contradict the unit-tested source fix; it proves the running process has not loaded it. No restart was initiated. Runtime validation remains pending an operator-managed reload and fresh read-only tool call.
+
+**2026-10-11 ontology tuple census refresh:** Extended the existing catalog-only audit to count both `atlas_ontology_tuples` and `atlas_ontology_linked_tuples` in its existing read-only transaction, without treating row counts as admission. Focused tests pass **7/7**. Fresh PostgreSQL 18.4 read-only receipt `.tmp/atlas/ontology-tuple-catalog-v1-surface-counts-20261011T033742049.json` (`sha256:bd6ac2d7a23b64f82587de0a3a6b2a78abc6249b30d8bd53c947b1ef8578dfa4`) reports **0 rows in each table**, zero packet/source/revision lineage matches, `evidenceAdmissionProven=false`, and `canonicalWrites=false`. This confirms the configured database has no tuple available for the target proof chain; ontology-backed ContextManifest remains blocked. No schema, database, cache, or model writes occurred.
+
+These are proposed implementation gates, not completion claims. Existing ACE cache revision binding, canonical packet/tuple admission, ContextManifest readback and GPU resource gates remain authoritative and open until their own receipts pass.
+
+**2026-10-11 Valkey/ACE request-path audit refinement:** Extended `scripts/atlas/lib/audit-feature-runtime-wiring-v1.mjs` with explicit `LIVE_CACHE_HINT_PROVIDER` and `ROUTE_ACE_MANIFEST_PATH` checks and regression coverage. Focused audit tests pass **12/12**. Source census finds the canonical SearchRuntime adapter owns `searchWithAceManifest`, cached-packet resolution and centroid crosswalk, but `semantic-search-workflow.ts` calls only `adapter.search`; the `/api/retrieval/search-unified` route does not supply the ACE/ContextManifest path or a request-scoped Valkey hint provider. Current audit returns both checks `NOT_WIRED`, `SEARCH_ACE_CALLER=BLOCKED`, `ONTOLOGY_ADMISSION=NOT_ESTABLISHED`, `MANIFEST_READBACK=NOT_ESTABLISHED`, and `allLiveProven=false`. Do not wire a synthetic provider: the configured DB census has zero rows in both ontology tuple tables, and the reported live Valkey surface lacks revision-qualified ACE packet objects. Next gate remains identifying an existing authorized producer for a request-scoped ordinal snapshot and cache read before application wiring; ontology-backed ContextManifest remains separately blocked. No DB/cache/model writes occurred.

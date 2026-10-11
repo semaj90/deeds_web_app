@@ -2212,3 +2212,608 @@ previous empty-matrix formatting crash is fixed. No training or artifact overwri
 The two endpoint failures are operational readiness gates, independent of current source/packet/
 chunk authority. They must not be resolved by substituting placeholder URLs or by promoting a
 fixture/isolated-process result to production evidence.
+
+## 2026-10-11 Multicore CPU + mmap tensor cache + instruction cards (design targets, NOT_PROVEN)
+
+Source: operator-pasted design review. Audit before drafting: name search for `AtlasExecutionEvent`,
+`InstructionCard`, `CacheRecommendation`, `PREFETCH_CPU` over `packages/`, `sveltekit-frontend/src/lib/server/atlas`
+and `python/` returned 0 hits (name-only; not proof of absence). TRACE `openspec_census` was `UNAVAILABLE`
+(null workspaceRevision) during this pass. Extends, never replaces: `TENSOR-MMAP-01`, `GPU-EXP-03/04/12`,
+`LOD-03/07/08` (`parent-atlas-retrieval-lod-algorithm-taxonomy`). One GPU owner; no per-worker CUDA contexts.
+
+- [x] **EXEC-EVENT-01** (REVISED 2026-10-11 after audit; DONE fixture/code-only) Do NOT add a new `AtlasExecutionEventV1`.
+      `packages/parent-atlas/src/core/workflow-action-event.ts` (`atlas.workflow-action.v1`) is the existing
+      canonical owner: runId, monotonic `sequence`, `lane` incl. `gpu`, `kind` (scheduled/started/progress/
+      artifact/blocked/retrying/completed/failed/cancelled), receiptId, artifactRefs, revisions, errorCode, and
+      "completed requires receiptId". A second event schema would be a peer owner. Work: add an additive
+      mapping (residency states QUEUED/EVIDENCE_CHECK/PREFETCHING/RESIDENT/EXECUTING/READBACK/RELEASED ->
+      `kind` + `metadata.residencyState`, `materializationId`/`generation`/`executor` in `metadata`) plus a spec
+      proving round-trip and sequence monotonicity. Promote residency state to a first-class field only if
+      the mapping proves lossy, and then as an extension of that schema.
+      Done: `residencyTransitionToWorkflowAction` in `packages/parent-atlas/src/core/workflow-action-adapters.ts`
+      + `workflow-action-adapters.residency.spec.ts` (4/4 pass via repo-root `node_modules/.bin/vitest run`).
+      Residency state is lossless in `metadata.residency_state`; CUDA->`gpu` lane, CPU->`tool`;
+      RELEASED requires receiptId, FAILED requires reasonCode; materializationId stays out of `resourceRefs`.
+      No production caller exists yet (code/fixture evidence only, not production proof).
+- [x] **EXEC-CARD-02** (FIXTURE_ONLY, see 2026-10-11 notes) Schema-only `InstructionCardV1` descriptor (operation, executor, input representation,
+      derived output, exact-revision reuse condition, fallback). A card names work; it carries no code or pointers.
+- [x] **EXEC-CACHE-03** (FIXTURE_ONLY, see 2026-10-11 notes) Schema-only `CacheRecommendationV1` + `MemoryAction`. Stale revision and active lease
+      always override any HMM/cluster prefetch score.
+- [x] **EXEC-MMAP-04** (FIXTURE_ONLY, stdlib; see 2026-10-11 notes) Implement `TENSOR-MMAP-01` read path against `EmbeddingTensorArtifactV2`: frozen
+      `[N,dim]` f32 fixture, digest + shape verify, read-only mmap, `candidateOrdinal` gather. `FIXTURE_ONLY`.
+- [~] **EXEC-CPU-05** (parity FIXTURE_ONLY on stdlib scoring; torch/BLAS thread caps NOT proven) Bounded spawn-context process pool (default 2, cap 4) reopening the mmap per worker;
+      pin native BLAS/torch threads per worker. Proof: single-process vs multicore byte-identical top-k.
+- [ ] **EXEC-SMOKE-06** Smoke gates: cancel, queue saturation, stale-revision reject, duplicate message,
+      GPU-OOM fallback, codebook-version mismatch.
+- [ ] **EXEC-SSE-07** FastAPI SSE adapter streaming `atlas.workflow-action.v1` events with resumable persisted sequence (check installed FastAPI >= 0.135
+      before using native SSE; do not upgrade for it). Read-only event stream; no mutation path.
+- [ ] **EXEC-LOD-08** Wire LOD receipts (`LOD-08`) to execution receipts. Blocked on source-binding gates
+      (`UNIFIED-RESIDENCY-CURRENT-COHORT-ADMISSION-01`, `REV-OWNER-GRAPH-05B`); no live promotion until cleared.
+
+### 2026-10-11 Ownership direction + scripts/atlas census (operator direction; append-only)
+
+**Direction (operator):** `scripts/atlas/` is the FIRST implementation home for this lane. `packages/atlas-*` /
+`packages/parent-atlas*` are a MIRROR, populated only after smoke validation + eval testing pass. Adapters are
+later packaged as a library/plugin. This inverts the "packages first" lookup order for NEW work in this lane
+only; the packages/ name audit is still done before mirroring so no second contract owner is created.
+Consequence: the `residencyTransitionToWorkflowAction` adapter (`EXEC-EVENT-01`) lives in
+`packages/parent-atlas/src/core/workflow-action-adapters.ts`; it only wraps the existing
+`atlas.workflow-action.v1` contract, so it is treated as staged-mirror code, not the primary implementation.
+A script-side smoke (EXEC-SMOKE-06) must exercise it before it counts as validated.
+
+**scripts/atlas census (read-only, name/header based; classification is a first pass):**
+- `prove-candidate-feature-arrow-mmap.py` (FEAT-03C-MMAP) — EXISTING_ADAPTER/FIXTURE_ONLY: true OS `mmap`
+  ACCESS_READ + ArtifactAddressV1 checksum/revision check + dense-ordinal readback. Extend for `EXEC-MMAP-04`;
+  it is Arrow-based, NOT `torch.from_file` / `[N,768]` f32.
+- `gpu-tensor-worker.mjs` — CANONICAL single GPU owner (N-API bridge, RabbitMQ batches, VRAM semaphore).
+  CPU pool workers must never open CUDA contexts.
+- `audit-gpu-residency-wiring-v1.mjs` — read-only census bound to `gpu-residency-budget.ts`
+  (`admitGpuExecutionLeaseV1`) and `tensors/unified-residency-adapter-v1.ts`; runtime budget enforcement
+  NOT_PROVEN. `EXEC-LOD-08` binds here; MEM-04/MEM-05 cannot close from contract tests.
+- `build-parent-atlas-workstation-residency-v1.mjs` — BitFrost descriptor + read-only GET probe, not a writer.
+- `audit-mcp-prefetch-duplicate-owner-v1.mjs` — prefetch duplicate-owner audit exists; reuse, do not add a prefetch owner.
+- Not found by name: instruction cards, execution-event SSE. `*-card*` scripts (`build-neschrom97-card-registry.mjs`,
+  `cache-feature-cards.mjs`, `build-openspec-task-cards-v1.mjs`, ...) are UNREAD; `EXEC-CARD-02` stays blocked on
+  reading them (the word "card" is overloaded here).
+
+**Gate ordering (from operator review, supersedes the earlier EXEC ordering where they conflict):**
+TRACE-MCP-01 (actual `tools/list` vs required names/schemas; the 2026-10-11 "healthy but missing required tools"
+restart is a capability failure, not recovery; census/frontier tools returned UNAVAILABLE/empty during this pass)
+-> LANG-REG-01 (declared/installed/loadable/enabled/smoke-proven kept separate) -> SOURCE-LIVE-01 ->
+TUPLE-LIVE-01 -> GRAPH-LIVE-01 (frozen CPU oracle) -> FEATURE-LIVE-01 -> MANIFEST-LIVE-01 ->
+CACHE-BOUND-01 -> PREFILL-LIVE-01 -> ROUTE-LIVE-01 -> GPU-PARITY-01. Cache residency, prefill and GPU work stay
+downstream. Source-only retrieval may proceed when ontology admission is missing; graph scoring stays blocked.
+No gate moves to `[x]` from fixture evidence; use FIXTURE_ONLY / BLOCKED / PROVEN_LIVE labels.
+
+### Mirror-pending ledger (scripts/atlas first; reconcile during production hardening)
+
+Rule: `CLAUDE.md` 2026-10-11 operator direction. Each row = code that exists on one side only. Reconcile =
+mirror forward or back-port, or record as intentionally divergent; compare with `git log -1 -- <path>` + diff first.
+
+- [ ] **MIRROR-01** `residencyTransitionToWorkflowAction` + `RESIDENCY_STATES`/`RESIDENCY_EXECUTORS`
+      (`packages/parent-atlas/src/core/workflow-action-adapters.ts`) and
+      `workflow-action-adapters.residency.spec.ts` exist ONLY in `packages/` (written there first, 2026-10-11).
+      Needed: a `scripts/atlas/` smoke that exercises it (EXEC-SMOKE-06), then decide canonical home per the
+      scripts-first direction; until then it is FIXTURE_ONLY staged mirror code, not validated. Direction: package
+      side stays the thin wrapper over `atlas.workflow-action.v1`; do not fork the contract.
+
+## Tensor, event-stream, and residency follow-up
+
+- [ ] TENSOR-ANALYSIS-01 Keep tensor/feature analysis as derived, revision-bound artifacts on the existing CPU/PyTorch and Arrow/mmap owners; prove frozen-input CPU reference and checksum readback before GPU projection.
+- [ ] TENSOR-GPU-01 Benchmark existing PyTorch CUDA/cuGraph paths before any custom SIMT/cuTile kernel; require CPU parity, device/resource receipt, bounded memory, numerical tolerance, and independent output readback.
+- [ ] EVENT-QUEUE-01 Treat Kafka as an optional transport/queue only if a current producer-consumer need is demonstrated; document event identity, ordering, replay, backpressure, and idempotency against canonical packet IDs before adding a runtime dependency.
+- [ ] KV-RESIDENCY-01 Evaluate H2O/Titans-style KV-memory policies only as model-runtime residency experiments; reuse BitFrost/Valkey descriptors for revision-qualified hot/cold routing, never persist hidden thoughts or raw KV tensors in canonical stores, and require a model/runtime-specific benchmark before adoption.
+- [ ] ACE-PACKET-01 Preserve the existing ACE JSON packet and ContextManifest owners; bind prompt/template/model revisions and selected evidence checksums, then independently read back the manifest-bound execution receipt before synthesis can be called proven.
+- 2026-10-11 **MIRROR-01 progress:** added `scripts/atlas/smoke-residency-workflow-action-v1.mjs` (read-only; loads
+  `packages/parent-atlas/dist`, walks the QUEUED..RELEASED ladder, sequence monotonicity, negative cases).
+  Result after `tsc -p` rebuild of the gitignored `dist`: `FIXTURE_ONLY`, 0 failures; before rebuild it returned
+  `BLOCKED DIST_MISSING_EXPORT` (stale dist). MIRROR-01 stays open: canonical-home decision and the rest of
+  `EXEC-SMOKE-06` (cancel, saturation, stale revision, duplicate, OOM fallback) are not done. Not production proof.
+- 2026-10-11 **EXEC-CARD-02 (steps 1-3 FIXTURE_ONLY; step 4 open):** owner audit reused
+  `kernel-dag-execution-binding-v1.ts` (binding owner) and `algorithm-execution-manifest.ts` (manifest owner);
+  `build-neschrom97-card-registry.mjs` is a separate content-card domain, not an execution authority. Added
+  `packages/parent-atlas/src/core/instruction-card-v1.ts` (`InstructionCardV1`: reference-only, checksums of the
+  binding + manifest, `admissionStatus: NOT_ADMITTED`, `canonicalSourceAuthority:false`, `executionAuthorized:false`,
+  no bound arguments) + `instruction-card-v1.spec.ts` 7/7 pass (valid build, stale source revision, input-checksum/
+  action mismatch, missing capability, non-read-only binding / mutating manifest, tamper detection, authority
+  escalation rejected). `tsc --noEmit` clean for the package. Placed in `packages/` (contracts it wraps live there);
+  per scripts-first direction this is staged mirror code -> add MIRROR-02: script-side smoke. NOT done: step 4
+  read-only card->workflow-action adapter. Not production proof; capability ids are caller-supplied strings until
+  LANG-REG-01/capability receipt exists. Next gate: EXEC-CACHE-03.
+- [ ] **MIRROR-02** `instruction-card-v1.ts` + spec exist only in `packages/`; needs a `scripts/atlas/` smoke and
+      the production-hardening reconcile.
+
+### 2026-10-11 Operator review: external memory vs neural memory (planning only; nothing implemented)
+
+Modes: `EXTERNAL_MEMORY_V1` (ACE/BitFrost retrieval, selective prefill, residency; no Ornith weight change) and
+`NEURAL_MEMORY_LAB_V1` (separate small PyTorch Titans/HOPE sidecar). Titans blocks inside Ornith = research only.
+Different state kinds (Titans memory, QLoRA weights, Valkey, mmap tensors) connect only through typed,
+revision-qualified descriptors; never one interchangeable cache.
+
+- **Overlap warning:** the proposed `AtlasMemoryMaterializationV1` must extend `EmbeddingTensorArtifactV2`
+  (`sveltekit-frontend/src/lib/server/atlas/contracts/embedding-tensor-artifact-v2.ts`) and the
+  `InstructionCardV1` references, not become a third descriptor. Prior "Titans" mentions already exist in
+  `parent-atlas-kv-cache-adaptation-research/tasks.md` and 4 other changes; extend that, no new change.
+- **New gate ids (all open, none evidenced):** SNAPSHOT-LIVE-01, WSL-CUTILE-01 (capability receipt first),
+  BITFROST-MEM-01, ACE-LOD-01, TENSOR-PARITY-01 (PCA/SVD/SwiGLU head, CPU oracle first), TITANS-LAB-01/ACE-02
+  (must beat an equally budgeted static-retrieval baseline on held-out data), QLORA-01/MERGE-02 (audit Ornith target
+  modules first; isolated merge; no GPU train+serve concurrently on 8 GiB), CUTILE-FUSION-01, MODEL-PROMOTE-01.
+- **Priority:** P0 live authority gates (SNAPSHOT/SOURCE/TUPLE/MANIFEST) before any P1+ work; QLoRA only after
+  frozen, manifest-checksummed training examples exist.
+
+- 2026-10-11 **EXEC-CARD-02 step 4 done (FIXTURE_ONLY):** `instructionCardToWorkflowAction` added to
+  `packages/parent-atlas/src/core/workflow-action-adapters.ts` (read-only; emits a `scheduled` `atlas.workflow-action.v1`
+  event, carries `admission_status: NOT_ADMITTED`, refuses an action-id mismatch, no bound arguments). 2 specs in
+  `instruction-card-v1.spec.ts` (now 9 tests).
+- 2026-10-11 **EXEC-CACHE-03 done (FIXTURE_ONLY):** `packages/parent-atlas/src/core/cache-recommendation-v1.ts`
+  (`CacheRecommendationV1`, `MemoryAction`, pure `decideMemoryActionV1`) + `cache-recommendation-v1.spec.ts` 8/8.
+  Guard order is stale revision -> active lease -> GPU admission -> recomputability; the advisory KMeans/SOM/HMM
+  action is kept in `advisoryAction` for audit and never overrides a guard. Stale + leased => `WAIT_FOR_LEASE`
+  (never evict under a lease); stale unleased => `REJECT_STALE`, `servable:false`. `canonicalAuthority` literal false.
+  Verification this pass: `tsc -p` (parent-atlas) no errors; vitest 21/21 across the three new/changed specs;
+  `scripts/atlas/smoke-residency-workflow-action-v1.mjs` FIXTURE_ONLY. No caller wires `decideMemoryActionV1` into a
+  live residency owner yet, and `gpuAdmissibleBytes` must come from outside the CUDA process (WDDM `cudaMemGetInfo`
+  overstated free VRAM ~20x here). Not production proof.
+- [ ] **MIRROR-03** `cache-recommendation-v1.ts` + spec are package-only; needs a `scripts/atlas/` smoke and the
+      production-hardening reconcile (same treatment as MIRROR-01/02).
+
+- 2026-10-11 **Script-side smokes added (scripts-first):**
+  - `scripts/atlas/smoke-instruction-card-cache-policy-v1.mjs` -> `FIXTURE_ONLY`, 0 failures (card build/stale/tamper/
+    capability/escalation/card->workflow event; cache guards stale-overrides-score, lease protection, GPU-OOM downgrade,
+    duplicate determinism). Closes the smoke half of MIRROR-02 and MIRROR-03 and the policy cases of EXEC-SMOKE-06.
+    Needs `packages/parent-atlas/dist` built (`tsc -p`); returns `BLOCKED DIST_MISSING_EXPORT` otherwise.
+  - `scripts/atlas/prove-mmap-tensor-block-fixture-v1.py` (`python -I`, stdlib only) -> `FIXTURE_ONLY`: [64,768] f32
+    row-major temp fixture; exact byte length, dtype/shape, content digest, stale-revision, truncated-file and
+    file-disappearance rejection, read-only mmap (write raises), deterministic `candidateOrdinal` gather matching source
+    bytes, per-worker reopen, 1-process vs 2-worker spawn-pool top-k byte-identical, no CUDA context, temp dir cleaned.
+  - Still open: EXEC-SMOKE-06 cancel / queue saturation / worker-crash / duplicate-job cases (need the real scheduler,
+    not yet located); EXEC-CPU-05 PyTorch/NumPy thread caps (default `python` here has no numpy/torch; use the WSL
+    interpreter per the environments rule); descriptor is a fixture shape, not `EmbeddingTensorArtifactV2` yet - bind
+    to it before any production use. MIRROR-01..03 stay open until the production-hardening reconcile; the package and
+    script sides now have matching smokes. Nothing here is PROVEN_LIVE.
+
+### 2026-10-11 Scheduler + residency owner audit (read-only; corrects earlier EXEC-CACHE-03 scope)
+
+Searched `scripts/atlas`, `packages/*/src`, `sveltekit-frontend/src/lib/server` (names + headers; not exhaustive).
+Existing owners found (all under `sveltekit-frontend/src/lib/server/`):
+- `concurrency/resource-scheduler.ts` `ResourceAwareScheduler` (+ `resource-scheduler.spec.ts`) — CANONICAL_OWNER for
+  bounded per-stage queues: `admit/enqueue/claimNext/complete/fail/block/snapshot`, idempotency-key dedupe, per-stage
+  `maxConcurrent/maxQueued`, disk/GPU admission context. **Missing vs the EXEC-SMOKE-06 list: cancel, retry policy,
+  drain, worker-crash/expired-lease recovery.** Extend this class; do not add a second scheduler.
+- `workers/compute-pool.ts` `ComputePool` (worker_threads, sticky FNV-1a routing, kmeans/som tasks) and
+  `atlas/tensors/cpu-worker-pool.ts` `CpuFeatureWorkerPool` (thread pool with shared counters) — CPU thread workers,
+  NOT process pools. `gpu/gpu-job-queue.ts` — GPU mutex/queue (`runGpuJob`, `withCpuFallback`).
+- `atlas/tensors/gpu-memory-admission-v1.ts` `decideGpuMemoryAdmissionV1` (ADMIT/DEFER/EVICT_THEN_ADMIT/REJECT; pure,
+  already encodes the WDDM-vs-nvidia-smi caveat), `ace-residency-policy.ts` (`tileUtility`, `rankEvictionCandidates`),
+  `cache-tier-contract.ts` (`DataResidency` COLD/MMAPPED/WARM/PINNED/GPU_RESIDENT/IN_USE, `ResidencyEvent`,
+  `JobProgressEvent`), `bitfrost-valkey-contract.ts`, `ace-lod-promoter.ts`, `lod-promotion-contract.ts`.
+
+**Correction to EXEC-CACHE-03:** `decideMemoryActionV1` (packages/parent-atlas) overlaps these owners — its GPU-admission
+step duplicates `decideGpuMemoryAdmissionV1` and its `MemoryAction`/tier vocabulary parallels `DataResidency`. Its
+unique value is the guard ORDER (stale revision > lease > admission > recomputable) with advisory scores demoted.
+- [ ] **CACHE-RECONCILE-01** Rework `decideMemoryActionV1` to (a) take the admission verdict from
+      `decideGpuMemoryAdmissionV1` instead of a raw `gpuAdmissibleBytes`, (b) map its actions onto `DataResidency`
+      transitions / `ResidencyEvent`, (c) take advisory scores from `rankEvictionCandidates`/`tileUtility`. Keep the
+      stale+lease guards as the only new logic; if nothing else is unique, fold them into `ace-residency-policy.ts`
+      and demote `cache-recommendation-v1.ts` to a thin adapter. Status of EXEC-CACHE-03 stays FIXTURE_ONLY and
+      "possible duplicate owner" until this closes. (`MIRROR-03` depends on it.)
+- [ ] **SCHED-EXTEND-01** Implement cancel / retry / drain / crash-recovery on `ResourceAwareScheduler` with specs, then
+      point EXEC-SMOKE-06 cancel/saturation/duplicate/crash cases at it (script-side smoke drives the compiled class).
+- [ ] **CPU-PROCESS-POOL-01** Decide whether a process pool is needed at all: existing CPU owners are worker_threads.
+      The stdlib spawn-pool proof (`prove-mmap-tensor-block-fixture-v1.py`) only shows Python-side mmap parity; do not
+      claim it as the production CPU pool. Keep CUDA out of CPU pool workers.
+
+### 2026-10-11 REGISTRY-LUT-01 — title_id / UUID / inverse-retrieval LUT census (read-only; name+header based)
+
+Question: do we need UUIDv5-v8 for a registry `title_id` bound to source revision, plus an indexing LUT for inverse
+retrieval (DAG synthesis, KAG)? **Answer: no new UUID scheme and no new registry; the owners below already exist.**
+
+| Concern | Existing owner (classification) | Notes |
+|---|---|---|
+| UUID namespaces | `sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts` — CANONICAL_OWNER | Frozen `ATLAS_ROOT/PACKET_AGGREGATE/TITLE/UNKNOWN_RESOLUTION_NAMESPACE_V1`. `TITLE_NAMESPACE_V1` already exists; never regenerate. |
+| UUID derive helpers | `src/lib/utils/uuid.ts` (`randomUUIDv7`, `deriveUUID` = sha256 canonical-JSON UUIDv8) | v7 for new events/receipts; v8 only with frozen bit layout. |
+| `title_id` format | `scripts/atlas/backfill-title-identity.mjs` header: `title:<slug>:<hash8>`, `hash8 = sha256(packet_key + '\0' + TITLE_GENERATOR_VERSION)[:8]` | Keyed by `packet_key`, NOT source revision: a stable label across revisions. Do not fold `source_revision` into `title_id`; carry the revision as a separate field. |
+| `title_id` in envelopes | `packages/atlas-core/src/types/packet-envelope.ts` (`identity.titleId` + `packetKey` + `chunkId`; `QdrantPayloadShape.title_id`), `packages/parent-atlas/src/adapters/{qdrant,neo4j}.ts`, `qdrant-semantic-payload-envelope.ts` | Mirrors carry `title_id` as payload; not identity. |
+| Legacy key -> canonical key | `identity/packet-identity-resolver.ts` (`resolveCanonicalPacketKey`), `packet-key-legacy-alias-v1.ts` (COMPATIBILITY), table `atlas_packet_identity_aliases` (`drizzle/manual/20260925_..._PREPARED.sql` + `_ROLLBACK.sql`) | The existing inverse LUT for packet keys. Storage migration is prepared, not shown applied here. |
+| Candidate ordinal <-> canonical id (inverse retrieval LUT) | `atlas/features/canonical-candidate-v1.ts` `CandidateOrdinalMapV1` + `assertCandidateOrdinalMapIntegrityV1`; consumers `retrieval/cached-packet-candidate-resolution-v1.ts`, `retrieval/centroid-card-candidate-crosswalk-v1.ts`, `retrieval/product-feature-ordinal-map-verifier-v1.ts` | THE revision-qualified inverse map used by ranking/ACE. New LUT work extends this, not a parallel table. |
+| Class byte/nibble LUT | `atlas/residency/packet-class-lut-v1.ts` (`canonicalAuthority:false`, `LUT-REGISTRY-ALIGN-01` spec `compressed-packets-lut-align.spec.ts`) | PRESENTATION/COMPRESSION layer only; never identity. |
+
+**Rules to keep:** a UUIDv5 hit is admissible only after exact equality of `packet_key`, `source_ref`, `workspace_revision`,
+`source_revision` and the source digest (CLAUDE.md UUID policy); `source_revision` stays `sha256:<64 hex>` text; any
+LUT/index is derived, rebuildable, revision-qualified, `canonicalAuthority:false`; Postgres stays truth.
+
+- [x] **REGISTRY-LUT-01a** (FIXTURE_ONLY; see 2026-10-11 note below) Read-only gap check: does `CandidateOrdinalMapV1` expose a reverse lookup keyed by `titleId` and by
+      UUIDv5(`packet_key`,`source_ref`,`source_revision`)? If not, add the reverse index to that owner (index+spec), not a
+      new registry. Needed for DAG synthesis / KAG hit -> canonical identity resolution.
+- [x] **REGISTRY-LUT-01b** (read-only live check done 2026-10-11; see note below) Confirm the `atlas_packet_identity_aliases` PREPARED migration state against the live DB
+      (read-only `\d` + row count) before any consumer assumes alias coverage. Do not apply the migration from this task.
+- [x] **REGISTRY-LUT-01c** (classification done, name+pattern based; see note below) Audit the other ~15 `scripts/atlas` files and `packages/*` adapters that read `title_id` for
+      identity-vs-label misuse (classify each); record divergences, do not mass-edit.
+
+- 2026-10-11 **REGISTRY-LUT-01a result (FIXTURE_ONLY):** `CandidateOrdinalMapV1` only had a forward lookup
+  (`resolveCanonicalCandidateByOrdinal`); the reverse direction existed as an O(n) `candidates.filter(sourceRef===...)`
+  inside `cached-packet-candidate-resolution-v1.ts`. Candidates carry no `titleId`, so none was added (schema is strict and
+  the map checksum would change). Added `buildCandidateReverseIndexV1` to
+  `sveltekit-frontend/src/lib/server/atlas/features/canonical-candidate-v1.ts`: verified-map-only (re-runs
+  `assertCandidateOrdinalMapIntegrityV1`), `lookup(canonicalId|packetKey|sourceRef)` -> UNIQUE/AMBIGUOUS/NOT_FOUND,
+  `lookupExact({packetKey, sourceRef, sourceRevision})`, `canonicalAuthority:false`, derived and rebuildable.
+  4 new specs; `canonical-candidate-v1.spec.ts` 30/30 pass. Title resolution path: `title_id` -> `packet_key` in Postgres
+  -> `lookup('packetKey', ...)`. NOT done: the existing linear-scan consumer was not refactored (working module; swap in a
+  later pass), no UUIDv5 key (exact tuple lookup covers it), no live-corpus run.
+
+- 2026-10-11 **REGISTRY-LUT-01b live result (read-only SELECT/`\d` via `docker exec legal-ai-postgres psql`; no writes):**
+  server PG 18.4, data_directory `/var/lib/postgresql/18/docker` (container socket, `inet_server_port()` empty).
+  - `atlas_packet_identity_aliases` EXISTS: PK `alias_key`, index on `canonical_packet_key`, FK -> `atlas_packets(packet_key)`.
+  - 3,294 rows, all `alias_kind = PREFIX_DIVERGENCE_ACE_PACKET`: `alias_key` = dominant-scheme `packet:<12hex>`,
+    canonical = live `ace:packet:<12hex>` row. 0 aliases with a missing canonical; 0 alias keys that are themselves live
+    `atlas_packets.packet_key`; all 3,294 `ace:packet:` rows are covered.
+  - `atlas_packets` key census: 58,362 `packet:<12hex>` (legacy v1), 3,294 `ace:packet:`, 62 other.
+  - **The `20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql` migration is NOT applied**: there are zero
+    `LEGACY_PACKET_V1_12HEX` aliases and the 58,362 legacy v1 rows are still stored as v1. Consumers must not assume
+    alias coverage for legacy v1 -> PacketKeyV2; resolution there stays the resolver's exact-match fast path.
+  - Side note: the 3,294 `ace:packet:` rows are the CANONICAL side here (the shorter key is the alias), the reverse of the
+    "fix the prefix typo" direction in older notes; recorded, not acted on.
+  Not done: no migration applied, no rows changed.
+
+- 2026-10-11 **REGISTRY-LUT-01c result (read-only; `rg` over `packages/*/src`, `scripts/atlas`, `sveltekit-frontend/src/lib/server`,
+  specs excluded; plus read-only SELECTs). Classification is a first pass from matched lines, not a full read of every file.**
+  - **CANONICAL generator/validators (label contract holds):** `sveltekit-frontend/src/lib/server/ace/title-id-generator.ts`
+    (`TITLE_GENERATOR_VERSION = semantic-title-v2`; stable per packet_key + version; summary/rerank do not change it),
+    `acp/packet-assembler.ts:204`, `acp/packet-materializer-pipeline.ts:261` (`CANONICAL_TITLE_RE`),
+    `scripts/atlas/backfill-title-identity.mjs`, `validate-title-identity-projection.mjs`, `sync-tree-node-title-ids.mjs`.
+  - **LABEL/PAYLOAD use (fine):** Qdrant payload writers (`backfill-qdrant-payloads-from-postgres.mjs:107`,
+    `index-summaries-qdrant.mjs`), `build-vector-index-lanes.mts:189` (concept), summary/report scripts, `create-atlas-contract-fields.mjs`
+    (non-unique index on `retrieval_provenance(title_id)`).
+  - **FLAGGED identity-style use of a label (do not fix piecemeal; record only):**
+    1. `scripts/atlas/derive-openspec-ids.mjs:179` and `derive-gsd-ids.mjs:210`: `UPDATE atlas_packets SET openspec_id|gsd_id ... WHERE title_id = $2`.
+       Joins on a label, not `packet_key`; source comment itself says "placeholder". Violates join-by-packet_key (+source_ref/feature_id).
+    2. `scripts/atlas/chunk-rg-search-dumps.mjs:134`: `title_id = shortHash(title|source, 12)` — a DIFFERENT, non-canonical
+       formula from `title:<slug>:<hash8>`; output must not be merged into canonical `atlas_packets.title_id` without conversion.
+  - **Live data (read-only, `atlas_packets`, 61,718 rows):** 61,660 non-null `title_id`, 61,660 distinct (0 duplicates),
+    61,659 match the canonical regex, 1 non-canonical, 58 NULL. Uniqueness holds only by data: indexes
+    `idx_atlas_packets_title_id` and `idx_atlas_packets_identity_compound_idx` are not shown as UNIQUE here — verify before
+    relying on it as a key (`\d atlas_packets`). Never use it as a key regardless: it is stable per packet_key, not per revision.
+  - Follow-ups (open, unassigned): [ ] REGISTRY-LUT-01d decide fate of the two `WHERE title_id` updaters (rekey to `packet_key`
+    or archive); [x] REGISTRY-LUT-01e (done, see below) identify the 1 non-canonical + 58 NULL rows (read-only) and whether `backfill-title-identity.mjs`
+    covers them.
+
+- 2026-10-11 **REGISTRY-LUT-01e result (read-only SELECTs on live `atlas_packets`; no writes):**
+  - The 1 non-canonical `title_id`: `packet_key sha256:4ff58c17ae76b8b115e4cd94`, `title_id = cluster:0`,
+    `source_ref = cluster:summary:0`, generator `v1` — a cluster-summary packet, not a file packet. Likely intentionally
+    outside the `title:<slug>:<hash8>` contract; confirm before "fixing" it.
+  - The 58 NULL `title_id` rows: all legacy `packet:<12hex>` keys, all `source_ref` under `sveltekit-frontend/`
+    (artifacts/docs files e.g. `sveltekit-frontend/artifacts/*.json|md`); every one has `source_ref` and `feature_id`, so they are
+    backfillable by the existing generator (not run).
+  - **Generator-version drift:** stored `title_generator_version` = `deterministic-title-v1` (58,245), `v1` (3,353),
+    `deterministic-title-v2` (120). The code constant `TITLE_GENERATOR_VERSION` is `semantic-title-v2`
+    (`ace/title-id-generator.ts:25`) and NO stored row carries it; `deterministic-title-v1/v2` are not in current source
+    (name search). Because `hash8 = sha256(packet_key + '\0' + version)[:8]`, regenerating with today's constant would change
+    nearly every `title_id`. Treat stored `title_id` as frozen labels; `backfill-title-identity.mjs` must not be run with
+    `--apply` on the whole table without an operator decision (REGISTRY-LUT-01d scope grows: version policy).
+  - Open: [ ] REGISTRY-LUT-01f locate where `deterministic-title-v1/v2` were produced (git history, `-S`) and record the
+    version-to-formula map; do not infer it.
+- 2026-10-11 **Title identity safety guard adopted into `scripts/atlas/` (FIXTURE_ONLY; REGISTRY-LUT-01d/01e support):**
+  `scripts/atlas/lib/title-identity-safety-v1.mjs` + `scripts/atlas/title-identity-safety-v1.test.mjs` (`node --test` 12/12), adapted from
+  `~/Downloads/title-identity-review.zip` (original 8/8; originals untouched, nothing committed). Pure/read-only: `classifyTitleIdentityRowsV1`
+  (TITLE_MISSING / TITLE_FORMAT_NONCANONICAL / TITLE_AMBIGUOUS, optional injected `regenerate` -> informational `TITLE_DIFFERS_FROM_CURRENT_GENERATOR`)
+  and `qualifyPacketUpdateTargetV1` (exact packet_key/source_ref/source_revision/workspace_revision/source_digest/title_id; `QUALIFIED_TARGET_ONLY`,
+  `canonicalAuthority:false`, `writesPerformed:false`). Fixes vs the supplied patch: regex now the repo grammar
+  `^title:[a-z0-9]+(-[a-z0-9]+)*:[a-f0-9]{8}$` (supplied one accepted `title:some-slug-:...` and `title:a--b:...` as consistent — verified by running it);
+  `source_digest` must be `sha256:<64 hex>`. Caveats: `atlas_packets` has `source_revision`/`workspace_revision` but NO `source_digest` column (checked live), so the
+  digest must come from the source-binding owner; the guard compares caller-supplied records and cannot prove they came from an independent owner; the two
+  `WHERE title_id` updaters (`derive-openspec-ids.mjs`, `derive-gsd-ids.mjs`) are NOT modified and must not run until independent readback exists.
+  REGISTRY-LUT-01d remains open (decision + rekey to packet_key); 01f (generator-version history) remains open.
+
+### 2026-10-11 Proof-level alignment with `validating-parent-atlas` (levels: STATIC < WIRED < LIVE_READ_ONLY < LIVE_MUTATING < PROVEN, or BLOCKED)
+
+Ran step 1 of the skill workflow only: `cd sveltekit-frontend && npx tsx ../scripts/atlas/prove-gan-adversarial-v1.mts` (no DB). Exit 0; captured tail shows
+`failed: []`, `knownGaps: []`, all five self-tests true, and passing lane totals for structuralLineage 4/4, semanticProjection 2/2, runtimeSideEffects 3/3
+(the first lane's header line was cut off in the captured tail). Adversarial fixtures passing = validator gate WIRED, NOT PROVEN. The live census
+(`prove-gan-audit-readonly-v1.mts --adversarial-receipt <named receipt>`, one REPEATABLE READ READ ONLY txn, writes an exclusive-create receipt) was NOT run.
+Skill rule applied: "N/N tests" and my `FIXTURE_ONLY` labels mean WIRED at most — never PROVEN.
+
+| Artifact (this session) | Level reached | Lane | Blocker to next level |
+|---|---|---|---|
+| `workflow-action-adapters.ts` residency + card adapters, `instruction-card-v1`, `cache-recommendation-v1` | WIRED (unit + script smoke) | Runtime/Side effects | no live caller; cache policy overlaps `decideGpuMemoryAdmissionV1` (CACHE-RECONCILE-01) |
+| `buildCandidateReverseIndexV1` | WIRED | Authority/Lineage | not run on a live ordinal map; consumers still linear-scan |
+| `valkey-ace-handoff-v1` (+ real-owner wiring test) | WIRED; live Valkey read BLOCKED | Authority/Semantic | no Valkey object carries cacheGeneration/source/workspace revision (VALKEY-GET-01) |
+| `title-identity-safety-v1` | WIRED; live title census read earlier = LIVE_READ_ONLY facts only (counts, not a validator proof) | Authority | no authoritative `source_digest` column; guard compares supplied records only |
+| `prove-mmap-tensor-block-fixture-v1.py` | WIRED (stdlib fixture) | Semantic/Projection | NOT_EXERCISED per skill; no live tensor artifact |
+
+TRACE `atlas_packet_search` check (read-only): `source_ref=sveltekit-frontend/src/lib/server/ace/title-id-generator.ts` returned five unrelated
+`.tmp/parent_atlas_packets/*.json` packets (variant matching returned non-matching rows), and a second `source_ref` query timed out
+(`statement timeout`). Do not use that tool for exact identity resolution; use the Postgres resolver / `lookupExact`. Recorded, not fixed.
+
+### 2026-10-11 UUID helper question (no code written): `PacketKeyV2` already is the UUIDv5 owner
+
+`sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts`: `packet_key = "packet:" + UUIDv5(PACKET_AGGREGATE_NAMESPACE_V1, "packet:v2" NUL repositoryScope NUL canonicalSourceRef NUL packetKind)`;
+inputs are exactly `{repositoryScope, sourceRef, packetKind}`; `source_revision`/`workspace_revision`/ordinals/Qdrant ids are FORBIDDEN inputs ("revision qualifies the key, it never changes it").
+Legacy `packet:<12hex>` keys are COMPATIBILITY ALIASES (`packet-key-legacy-alias-v1.ts`). Therefore: no new UUID version/helper for source-revision-bound ids; a revision-qualified lookup is the
+exact tuple `{packet_key, source_ref, source_revision}` (`buildCandidateReverseIndexV1().lookupExact`), not a hashed UUID. Hashing that tuple into a v5/v8 id would add a second identity surface.
+Live `atlas_packets` key census (read-only): 0 PacketKeyV2-pattern rows; 58,362 `packet:<12hex>`; 3,294 `ace:packet:`; 1 `sha256:`; 61 other. So PacketKeyV2 is defined but NOT yet adopted in storage
+(the v1->v2 alias migration is unapplied, see REGISTRY-LUT-01b). Open: [ ] PKV2-ADOPT-01 decide adoption/migration order (operator decision; no schema change from here).
+- 2026-10-11 **Packet key scheme audit adopted into `scripts/atlas/` (WIRED; REGISTRY-LUT-01d support / PKV2-ADOPT-01 input):**
+  `scripts/atlas/lib/packet-key-scheme-audit-v2.mjs`, `scripts/atlas/packet-key-scheme-audit-v2.test.mjs` (`node --test` 11/11) and
+  `scripts/atlas/packet-key-scheme-audit-v2.parity.test.mts` (`cd sveltekit-frontend && npx tsx ../scripts/atlas/...parity.test.mts` -> `PARITY_OK`:
+  pattern source+flags equal to `PACKET_KEY_V2_PATTERN` / `LEGACY_PACKET_KEY_V1_PATTERN` owners; legacy generator output classifies LEGACY_V1_12HEX).
+  Adapted from `~/Downloads/packet-key-audit-v2` (original 10/10; originals untouched; nothing committed). Changes: ACE prefix tightened to
+  `ace:packet:<12hex>` (live: all 3,294 match strictly); `requireCanonicalV2Proof` renamed `requireCanonicalV2ProofClaimV1` (old name kept as alias) because
+  its `verified*` flags are caller assertions (best result `DERIVATION_CLAIM_CHECKED_ONLY`, `canonicalAuthority:false`). Limits: shape only — not namespace derivation,
+  alias correctness, source authority or migration state; regexes are duplicated and guarded only by the parity test, so re-run it when either owner changes.
+  Not run against the live corpus in code (the live key census was a separate read-only SQL count). PKV2-ADOPT-01 and REGISTRY-LUT-01d/01f remain open.
+
+- 2026-10-11 **REGISTRY-LUT-01f result (read-only `git log -S`, file reads; no writes):** CONTRACT CONFLICT FOUND between the title generator and its validators.
+  - **Current generator** `sveltekit-frontend/src/lib/server/ace/title-id-generator.ts` (`TITLE_GENERATOR_VERSION = 'semantic-title-v2'`) returns
+    `titleId: 'title:' + sha256(packet_key + '\0' + version)[:8]` = **`title:<hash8>` (no slug)**; slug/title are carried separately. Its spec asserts
+    `/^title:[a-f0-9]{8}$/`. Introduced by commit `c96a914872` (2026-07-13), which also removed the earlier `title:${slug}:${hash}` form.
+  - **Stored data** (live, 61,659 rows) and the validators are the OLD form `title:<slug>:<hash8>`: `acp/packet-materializer-pipeline.ts:20`
+    `CANONICAL_TITLE_RE = /^title:[a-z0-9]+(?:-[a-z0-9]+)*:[a-f0-9]{8}$/`, `scripts/atlas/backfill-title-identity.mjs` (expects `deterministic-title-v1`),
+    and my `title-identity-safety-v1` guard. Stored `title_generator_version`: `deterministic-title-v1` (58,245), `v1` (3,353), `deterministic-title-v2` (120).
+  - `git log -S"deterministic-title-v1"` hits only `9c7df80125` (2026-07-13) and `93479b0be9` (2026-07-14), both touching the backfill script/smoke report;
+    `git log -S"deterministic-title-v2"` has NO hits (those 120 rows were produced by code not present in git history, or DB-only). Version-to-formula map is
+    therefore: `deterministic-title-v1` = slug form (backfill script); `deterministic-title-v2` = UNKNOWN; `semantic-title-v2` = hash-only form (current code).
+  - **Live write-path hazard (static read, not executed):** `packet-materializer-pipeline.ts:261` regenerates a missing/non-matching `title_id` with
+    `generateTitleIdentity(...)`, which now emits `title:<hash8>` — a value that its own `CANONICAL_TITLE_RE` rejects — and does not re-validate. Likewise
+    `acp/packet-assembler.ts:204` always regenerates via the new generator. Live DB has 0 `title:<hash8>` rows, so this path has not persisted any yet (or is not live).
+  - Decision needed (operator; do not resolve from here): which form is canonical (`title:<hash8>` immutable-ID + separate slug, per `c96a914872`, vs stored `title:<slug>:<hash8>`),
+    then align validators, `backfill-title-identity.mjs` and the safety guard to ONE form. Until then do not run `backfill-title-identity.mjs --apply`, and the
+    safety guard's `TITLE_FORMAT_NONCANONICAL` verdict reflects the stored/validator form only.
+  - [ ] **TITLE-FORMAT-DECISION-01** operator decision on the canonical `title_id` form + generator-version policy; [ ] **TITLE-VALIDATOR-ALIGN-01** after the decision, align materializer/assembler/backfill/guard.
+- 2026-10-11 **REGISTRY-LUT-01f addendum — independent digest reproduction (HIST-02 evidence) + operator-supplied GitHub audit cross-check (read-only SELECT + local node; no writes):**
+  - Formula under test: `hash8 = sha256(packet_key + NUL + <version>)[:8]`, compared to the stored title suffix (3-part titles), random `TABLESAMPLE` + targeted samples.
+  - `deterministic-title-v1` rows: **575/576 match** `sha256(packet_key\0"deterministic-title-v1")[:8]` (1 mismatch unexplained). Confirms the formula claimed by the supplied audit for the dominant population.
+    A first, packet_key-sorted sample showed 0/40 — biased toward `ace:packet:` keys (below), not a formula failure.
+  - `deterministic-title-v2` rows (120 stored): **40/40 + 1/1 sampled match the `deterministic-title-v1` hash input**, i.e. the "v2" label does NOT change the hash; whatever differs (slug rule?) is still UNKNOWN. Do not infer a formula from the name.
+  - `v1`-labelled rows (3,353; 391 sampled were all `ace:packet:` keys): **0 match** under the stored key OR the `packet:<12hex>` alias form with `deterministic-title-v1`. Origin formula UNKNOWN.
+    `deterministic-title-v1` rows whose key is neither `packet:<12hex>` nor `ace:packet:` matched 3/9 (small n).
+  - Locally verified from the supplied audit: `backfill-title-identity.mjs` `normalizeSlug` trims dashes BEFORE `.slice(0,64)` (lines 67-73) so truncation can leave a trailing hyphen
+    (the strict regex then rejects it, `return null`); both of its row selects filter `WHERE title_id IS NOT NULL` (lines 172, 330), so the 58 NULL titles are NOT repaired by it.
+    Not independently re-read here: `scripts/phase-1-title-id-backfill.mjs` loose regex, `phase-1-promotion-batch.mjs` slug difference, and `packages/atlas/lib/packet-registry.mjs` `semantic-title-v1`
+    declaration (file exists locally; contents not read). Treat those as reviewer claims until read.
+  - Gate status vs the supplied HIST list: HIST-01 DONE (version inventory: 58,245 / 3,353 / 120); HIST-02 PARTIAL (v1 formula reproduced; v2 and `v1` unexplained); HIST-03..07 OPEN.
+    REGISTRY-LUT-01d, PKV2-ADOPT-01, TITLE-FORMAT-DECISION-01 remain open.
+
+### 2026-10-11 TITLE-VALIDATOR-ALIGN-01 — version-aware title contract (scripts-first, PROVISIONAL, WIRED; nothing applied)
+
+Operator-supplied review (3 production blockers: title conflict, feature-lineage mismatch, runtime evidence gap) recommends one version-aware validation contract and keeping the 3-part form for persisted
+`atlas_packets.title_id` during compatibility hardening. Implemented the pure contract only; no generator, validator, materializer, assembler or backfill file was changed.
+- `scripts/atlas/lib/title-identity-contract-v1.mjs` + `scripts/atlas/title-identity-contract-v1.test.mjs` (`node --test` 11/11) + `title-identity-contract-v1.parity.test.mts`
+  (`cd sveltekit-frontend && npx tsx ../scripts/atlas/title-identity-contract-v1.parity.test.mts` -> `PARITY_OK`: the real `generateTitleIdentity` output for 3 packet-key shapes is classified TWO_PART and its
+  `semantic-title-v2` derivation is reproduced; fails if generator version/shape drifts).
+- Three separated concerns: FORMAT (`classifyTitleFormatV1`: THREE_PART / TWO_PART / UNRECOGNIZED / MISSING), DERIVATION (`verifyTitleDerivationV1`: recompute hash8 per recorded generator version;
+  `DERIVATION_REPRODUCED` / `DERIVATION_MISMATCH` / `FORMULA_UNKNOWN_FOR_VERSION` / `SHAPE_DIFFERS_FROM_VERSION_RULE`), PERSISTENCE (`decideTitlePersistenceV1`, provisional policy: 3-part + reproduced derivation +
+  SOURCE-backed version only). Evidence classes recorded per version: `deterministic-title-v1` SOURCE_AND_OBSERVED; `deterministic-title-v2` OBSERVED_ONLY (hash reproduces the v1 input on 41/41 samples but no source
+  found, so it is never persistable by this contract); `semantic-title-v2` SOURCE (2-part, blocked from persistence under the provisional policy); `v1`, `semantic-title-v1`, unknown -> never reproduced.
+- Still open: TITLE-FORMAT-DECISION-01 (operator; the policy constant is labelled `PROVISIONAL_PENDING_TITLE_FORMAT_DECISION_01`), then wiring this contract into the generator/assembler/materializer/backfill (TITLE-VALIDATOR-ALIGN-01
+  proper), a version-aware crosswalk keyed by canonical packet_key for any conversion, REGISTRY-LUT-01d (rekey the two `WHERE title_id` updaters), and the other P0/P1 gates in the review (ORF-REGISTRY-APPROVAL, FEATURE-LINEAGE-01
+  nullable-column review — do not apply, SEARCH-SHADOW-LIVE-01, OPENSPEC-MCP-WORKSPACE-01, GRAPHIFY-ACE-LIVE-01, VALKEY-TUPLE-MANIFEST-01) — none touched here. The 58 NULL titles and the strict-regex trailing-hyphen case are not repaired.
+
+### 2026-10-11 Negative-case coverage map (operator-recommended focused tests; planning/coverage only, no new code)
+
+Sequence from the review: freeze identity + title-version contracts -> qualify feature lineage -> verify ONE production retrieval candidate -> ontology tuple + ContextManifest admission -> ACE/KAG/DAG/BitFrost.
+No `graphify:daily`, title backfill, PacketKeyV2 migration, feature-column migration or historical-row promotion was triggered by any of this work. Historical rows stay unqualified until provenance is independently established;
+adding nullable lineage columns does not create valid registry revisions or source-version receipts.
+
+| Negative case | Covered by (verified this session) | Level |
+|---|---|---|
+| historical generator-version mismatch | `scripts/atlas/title-identity-contract-v1.test.mjs` (mismatch / unknown version / observed-only / shape differs) + parity `.mts` | WIRED |
+| ambiguous title resolution | `title-identity-safety-v1.test.mjs` (`TITLE_AMBIGUOUS`); `buildCandidateReverseIndexV1` AMBIGUOUS (`canonical-candidate-v1.spec.ts`) | WIRED |
+| stale workspace / source revision | `canonical-candidate-v1` map integrity (workspace/snapshot mismatch), `valkey-ace-handoff-v1.test.mjs`, `instruction-card-v1.spec.ts`, `cache-recommendation-v1.spec.ts` | WIRED |
+| incorrect candidate-ordinal join | map integrity (`ORDINAL_SEQUENCE_BROKEN`, checksum mismatch), reverse-index tamper test; `product-feature-ordinal-map-verifier-v1.ts` exists but NOT read | WIRED (partial) |
+| missing registry approval | candidate owners found by name only: `packages/parent-atlas/src/core/observation-feature-repository.ts`, `scripts/atlas/sql/audit-orf-lineage-migration-readiness-v1.sql`, `scripts/atlas/audit-observation-feature-row-contract.mjs` — NOT read | NOT_EXERCISED |
+| absent source-version receipts | same ORF owners + `search-runtime-ace-resolver-v1.ts`; not read | NOT_EXERCISED |
+
+Next focused work (no migration, read-only first): [ ] FEATURE-LINEAGE-NEG-01 read the ORF owners above and write the missing-registry-approval / absent-receipt negative cases against them (extend their specs; no new owner);
+[ ] CANDIDATE-JOIN-NEG-01 read `product-feature-ordinal-map-verifier-v1.ts` and add the wrong-ordinal join cases there. A live check of one real retrieval candidate (step 3 of the sequence) remains blocked on the Valkey/ACE producer (ACE-CACHE-REV-01).
+
+### 2026-10-11 TITLE-WRITER-ALIGN-02 — read-only writer compatibility diagnostic (WIRED; no writer, validator, DB row or alias changed)
+
+Operator-selected gate. Reads each owner as TEXT only (never executes it, no DB/network) and derives facts by regex; verdict is computed, not hard-coded:
+`COMPATIBLE_READ_ONLY` | `BLOCKED_FORMAT_OR_DERIVATION` | `BLOCKED_AUTHORITY`. `persistenceEligible` is always false: a recognized title is never auto-eligible, and the contract's provisional policy now also
+returns `productionWriteAuthorized:false` (`POLICY_ALLOWS_SHAPE_ONLY`) — reproducing a checksum shows formula compatibility, not source-binding authority or migration safety.
+- Files: `scripts/atlas/lib/title-writer-compat-v1.mjs`, `scripts/atlas/audit-title-writers-v1.mjs` (`node scripts/atlas/audit-title-writers-v1.mjs [--json]`), `scripts/atlas/title-writer-compat-v1.test.mjs` (`node --test` 9/9);
+  contract updated: `title-identity-contract-v1.mjs` adds `semantic-title-v1` (SOURCE: registry+backfill; 0 stored rows) -> `node --test` 12/12.
+- Current-state result (regression-pinned by the live-pin test; update deliberately when writers are fixed):
+
+| Writer | Verdict | Key findings |
+|---|---|---|
+| `ace/title-id-generator.ts` | COMPATIBLE_READ_ONLY | intentional `semantic-title-v2` 2-part output preserved; slug-trim-before-slice is INFO only (slug not in id) |
+| `packages/atlas/lib/packet-registry.mjs` | COMPATIBLE_READ_ONLY | declares `semantic-title-v1`, strict 3-part regex; **cross-check REGISTRY_VERSION_DIFFERS_FROM_RUNTIME_GENERATOR** (registry says all writers must import its version; runtime generator declares `semantic-title-v2`) |
+| `acp/packet-assembler.ts` | BLOCKED_FORMAT_OR_DERIVATION | always regenerates via the generator -> 2-part id enters packets |
+| `acp/packet-materializer-pipeline.ts` | BLOCKED_FORMAT_OR_DERIVATION | regenerates 2-part then validates with 3-part `CANONICAL_TITLE_RE`, no re-check; DB write without source-binding evidence |
+| `scripts/atlas/backfill-title-identity.mjs` | BLOCKED_FORMAT_OR_DERIVATION | would write under `semantic-title-v1` (stored population is `deterministic-title-v1`: suffixes would change); NULL titles excluded; trim-before-slice trailing hyphen; no source-binding evidence |
+| `scripts/phase-1-title-id-backfill.mjs` | BLOCKED_FORMAT_OR_DERIVATION | loose `[a-z0-9-]{0,64}` validator, non-collapsing slug (double hyphens); writes keyed by packet_key; includes NULL titles |
+| `scripts/phase-1-promotion-batch.mjs` | BLOCKED_FORMAT_OR_DERIVATION | non-collapsing slug; deterministic-title-v1 hash |
+| `derive-openspec-ids.mjs`, `derive-gsd-ids.mjs` | BLOCKED_AUTHORITY | `UPDATE atlas_packets ... WHERE title_id = $2`; dry-run is default, `--apply` writes — do not run `--apply` |
+Not classified (callers of `generateTitleIdentity` seen by name only, NOT read): `ace/promotion-enrichment-service.ts`, `retrieval/hydrate-candidates.ts`, `ace/packet-io.ts`.
+Correction to my earlier note: phase-1 backfill DOES include NULL titles (`WHERE title_id IS NULL OR ...`) and keys by packet_key; only `backfill-title-identity.mjs` excludes them.
+
+**HIST-02 follow-up (read-only SELECT over all 61,660 titled rows + local sha256):**
+- `deterministic-title-v1` (58,245 rows): 58,195 reproduce `sha256(packet_key\0deterministic-title-v1)[:8]`; **50 do not (not 1)** — all are bare 16-hex packet_keys (no `packet:` prefix) with `proto:*` source_refs and feature `grpc_service`
+  (61 bare-16-hex keys exist; 11 reproduce, 50 do not). Tried `packet:`+key, source_ref, feature_id, key-only: 0 hits. Origin input for those 50 is UNKNOWN.
+- `deterministic-title-v2` (120): 120/120 reproduce the `deterministic-title-v1` hash input (observed only; no source found).
+- `v1` (3,295 = 3,294 `ace:packet:` + the `cluster:0` row): 0 reproduce under 9 candidate inputs (stored key, `packet:<12hex>` alias, bare hex, +/- version strings, source_ref, source_ref-derived keys). Origin UNKNOWN; do not infer.
+- Open: [ ] HIST-02b find the generator for the 50 `proto:` rows and the 3,294 `v1` ACE rows (git `-S` on slug logic / writers of `title_generator_version='v1'`); [ ] REGISTRY-LUT-01d packet-key-based replacement for the two label-keyed updaters (next after this);
+  [ ] TITLE-FORMAT-DECISION-01 stays open (operator). No title backfill, alias, or migration was run.
+
+### 2026-10-11 TITLE-WRITER-ALIGN-02 completion + REGISTRY-LUT-01d dry-run design (nothing applied; both updaters untouched)
+
+- **Unclassified callers read** (`promotion-enrichment-service.ts`, `retrieval/hydrate-candidates.ts`, `ace/packet-io.ts`): promotion-enrichment builds `enrichment.titleId` (2-part) + `titleGeneratorVersion` with no SQL write in the file;
+  hydrate-candidates RECOMPUTES a 2-part `title_id` at read time from key + row metadata (not read from storage, not persisted) so it will not equal the stored 3-part label; packet-io is a pure re-export. Added to
+  `audit-title-writers-v1.mjs` (12 writers, 0 unclassified): COMPATIBLE_READ_ONLY 3 / BLOCKED_FORMAT_OR_DERIVATION 7 / BLOCKED_AUTHORITY 2; `title-writer-compat-v1.test.mjs` live-pin updated (9/9).
+- **REGISTRY-LUT-01d design (pure, dry-run only):** `scripts/atlas/lib/packet-key-id-update-plan-v1.mjs` + `scripts/atlas/packet-key-id-update-plan-v1.test.mjs` (`node --test` 8/8). `planPacketKeyIdUpdatesV1` replaces the label key with
+  `packet_key` + `source_ref` (title_id only as a consistency check); statement shape is DATA with `executable:false` (`UPDATE atlas_packets SET <openspec_id|gsd_id> = $1 WHERE packet_key = $2 AND source_ref = $3`);
+  best status `QUALIFIED_DRY_RUN_ONLY`, `applyReady` always false, `sourceBindingEvidence: NOT_PROVIDED` (the fanout report has no source_revision/source_digest). Blocks: missing key/ref/assignment, duplicate or conflicting input,
+  duplicate DB key, alias-only key (needs the resolver; never string similarity), key not found, source_ref mismatch, stale/mismatched label.
+- **Read-only run against real data** (inputs: `docs/reports/structured-lexical-fanout.json` 58,365 files, each with `packet_key`/`source_ref`/`title_id`; live `atlas_packets` 61,718 rows; 3,294 alias keys; snapshots written to the session scratchpad, not the repo):
+  `QUALIFIED_DRY_RUN_ONLY` 58,315; `BLOCKED_TITLE_LABEL_STALE_OR_MISMATCHED` 50 (the same 50 bare-16-hex `proto:*` rows: fanout label `title:proto-<svc>:...` vs DB `title:grpc-service:...`).
+  What the OLD label-keyed updaters would do today: 58,315 match exactly the same row, 0 match a different/multiple row, 50 match NOTHING (silent no-op). So no mis-targeting exists in current data; the hazard is latent
+  (any title regeneration/backfill/format change would shift labels and could silently skip or mis-target rows). Do not run either updater with `--apply`; rewiring them to this plan is a separate, unapplied step.
+- Open: [ ] REGISTRY-LUT-01d-wire (rewire the two scripts to consume the plan, still dry-run default; requires independent source-binding readback before any apply); [ ] reconcile the 50 `proto:` rows' stale labels (which label is right: fanout vs DB) — operator/owner decision;
+  [ ] HIST-02b (origin of those 50 + the 3,294 `v1` ACE titles); [ ] TITLE-FORMAT-DECISION-01.
+
+### 2026-10-11 REGISTRY-LUT-01e — checksum/title/packet boundary clarification
+
+- Interpret bare 64-character SHA-256 and `sha256:<64-hex>` only as field-specific digest encodings. Existing canonical SHA-256, synthesis/ContextManifest, and Smart RPC packet checksum contracts use bare hex; revision/receipt contracts that declare the prefix keep it. Convert formats only at a typed boundary and recompute the enclosing checksum after representation changes. Do not loosen canonical schemas globally or infer a digest from a title.
+- `title_id` remains a versioned presentation/fanout label, not a checksum or packet identity. Preserve the original label in fanout and RPC payloads as metadata; resolve packet rows only by canonical `packet_key` plus source/workspace revision bindings. The packet-key update planner's stale-label result remains a block/consistency signal, not permission to rewrite either label.
+- Synthesis should consume the existing verified ContextManifest checksum in the exact encoding its schema declares; title derivation/normalization is deferred until `TITLE-FORMAT-DECISION-01` and the generator-history audit are resolved. Do not regenerate labels to make synthesis, fanout, or RPC joins succeed.
+- No updater was rewired or applied in this step. The two `--apply` paths remain unsafe until `REGISTRY-LUT-01d-wire` uses the dry-run planner and independent source-binding evidence is available; the 50 `proto:` label disagreements remain owner-review items.
+- Added `normalizeSha256HexV1` / `formatSha256RevisionV1` to the existing canonical hash owner and replaced the matrix adapter's inline prefix handling. The utility accepts only lowercase 64-hex or that value with `sha256:`; it does not parse or rewrite title labels.
+- Validation: focused title/planner/parser tests 30/30 and candidate-matrix readback suite 9/9; strict OpenSpec validation passed. Both updater dry-runs returned `DRY_RUN_UNVERIFIED_NO_SNAPSHOT`; both `--apply` attempts exited 3 with `BLOCKED_APPLY`. No fresh fanout/index rebuild, synthesis run, RPC publication, or database/cache write was performed.
+- Open: [ ] add cross-boundary fixture with enclosing checksum recomputation for digest fields whose schemas permit both encodings; [ ] add explicit synthesis/ContextManifest and Smart RPC consumer tests (their current canonical checksum fields remain bare hex); [ ] complete `REGISTRY-LUT-01d-wire` in dry-run mode only after source revision/digest are present; [ ] resolve the 50 label conflicts and canonical title format by reviewed owner decision.
+- Follow-up dry-run check: both `derive-openspec-ids.mjs --limit 1` and `derive-gsd-ids.mjs --limit 1` now return `DRY_RUN_UNVERIFIED_NO_SNAPSHOT`, perform no DB connection, and leave tracked default reports untouched; both `--apply` invocations exit 3 with `BLOCKED_APPLY`. These single-row runs do not resolve the live 50-label conflict cohort or prove source binding.
+- Added `scripts/atlas/derive-id-packet-key-wiring-v1.test.mjs`: both scripts statically prove packet-key/source-ref planning, no executable title-keyed UPDATE or PostgreSQL client, and refuse `--apply` before fanout access. Combined with planner/parser regressions: 11/11 passed. This is source/fixture evidence, not live snapshot reconciliation.
+
+### 2026-10-11 FEATURE-LINEAGE-NEG-01 step 1 — independent admission over the V1 field check (WIRED; V1 and the materializer unchanged)
+
+"Find what's missing" result (read-only): an approval owner ALREADY exists — `scripts/atlas/lib/observation-feature-registry-approval-v1.mts` (+ its 201-line test): reviewer allowlist, proposal/registry checksum and revision bindings,
+trust-anchor receipt checksum, optional Ed25519, returns `runtime_eligible:false`, throws on any failure. The gap was composition: `observation-feature-lineage-admission-v1.mjs` (used by `materialize-observation-feature-rows.mjs:180`)
+only checks `registryRevision` is non-empty, and `materialize-observation-feature-rows.mjs:227` passes `sourceVersionReceiptId: null`; `observation-feature-projection-v1.ts:127` defaults it with `?? null`.
+- Added `scripts/atlas/lib/observation-feature-lineage-admission-v2.mjs` + `.test.mjs` (`node --test` with the V1 suite: 16/16). Per-row state: `LEGACY_UNQUALIFIED` | `STRUCTURALLY_VALID_NOT_ADMITTED` | `ADMITTED_FOR_PROJECTION` | `BLOCKED_STRUCTURALLY_INVALID`.
+  Negative cases now pinned: `BLOCKED_REGISTRY_APPROVAL_MISSING` (registryRevision "registry-r7", no approval), `..._INVALID` (validator threw), `..._REVISION_MISMATCH`, `BLOCKED_SOURCE_VERSION_RECEIPT_MISSING` (valid sha256 source revision + evidence refs but null/blank receipt),
+  `..._UNRESOLVED`, `..._MISMATCH` (receipt sourceRef/sourceRevision differ), resolvers-not-provided, stale workspace revision. Admission needs BOTH injected resolvers (`resolveRegistryApproval`, `resolveSourceVersionReceipt`);
+  `canonicalAuthority:false`, `writesPerformed:false`; `ADMITTED_FOR_PROJECTION` is not a write grant.
+- NOT done: no production resolver is wired (the approval resolver would wrap `validateApprovedObservationFeatureRegistryArtifactV1` with an allowlist + trust-anchor checksum that nobody has provisioned; the receipt resolver has no source-version owner located yet);
+  the materializer still uses V1 and still writes null receipts, so every current plan row would be STRUCTURALLY_VALID_NOT_ADMITTED under V2; `observation-feature-repository.ts` (named by the reviewer) was not located by name search here; `audit-observation-feature-row-contract.mjs`
+  writes a report file and was NOT run. Registry approval and live feature lineage remain BLOCKED.
+- Open: [ ] FEATURE-LINEAGE-WIRE-01 provision the reviewer allowlist/trust anchor and locate the source-version receipt owner (operator + owner), then switch the materializer's gate to V2 in dry-run first; [ ] CANDIDATE-JOIN-NEG-01 read `product-feature-ordinal-map-verifier-v1.ts`.
+
+### 2026-10-11 CANDIDATE-JOIN-NEG-01 — product-feature ordinal-map verifier (WIRED; additive change to an existing owner)
+
+Read `sveltekit-frontend/src/lib/server/atlas/retrieval/product-feature-ordinal-map-verifier-v1.ts` (72 lines). It already schema+integrity-checks the map, binds workspace/snapshot/checksum, and binds each candidate by `canonicalId` +
+`packetKey` + `sourceRef` + `sourceRevision`. **Real gap:** candidates carried NO ordinal, so a feature row joined to the WRONG ordinal (valid ids, shifted row) could not be detected. It has no production caller (only its spec).
+- Change: optional `candidateOrdinal` on `ProductFeatureOrdinalCandidateV1`; when supplied it must equal the map row's ordinal, else `PRODUCT_FEATURE_CANDIDATE_ORDINAL_MISMATCH`. Omitting it keeps the old behavior (backward compatible).
+- `product-feature-ordinal-map-verifier-v1.spec.ts` 4 -> 9 tests, all pass (`cd sveltekit-frontend && npx vitest run src/lib/server/atlas/retrieval/product-feature-ordinal-map-verifier-v1.spec.ts`).
+  New negatives: stale snapshot revision, request checksum differing from a valid map, swapped packetKey/sourceRef, unknown canonical id, empty/duplicate id, wrong ordinal on a 2-row map (valid ids), right ordinal matches.
+- Not done: no caller passes ordinals yet (a producer must supply the join ordinal for this check to bite); the reverse index (`buildCandidateReverseIndexV1`) is the natural source. Stale-snapshot protection beyond revision equality (e.g. a newer snapshot existing) is not modelled here.
+- Open: [ ] CANDIDATE-JOIN-WIRE-01 make the first real caller supply `candidateOrdinal` from the SearchRuntime join.
+
+### 2026-10-11 REGISTRY-LUT-01d-wire — both title-keyed updaters now read-only and planner-backed (WIRED; nothing applied; the Downloads installer was NOT run)
+
+Reviewed `~/Downloads/registry-lut-01d-dryrun` (`install.py` read in full; 6.9 KB zip incl. a compiled `.pyc` that was not run). It edits only the two scripts and writes `.bak` files, but it (a) only checks that the planner file EXISTS and never calls it,
+(b) still labels every entry with a packet_key+source_ref `QUALIFIED_DRY_RUN_ONLY` with no comparison to the database (the planner shows 58,315 vs 50 blocked, so that status would be misleading), and (c) leaves `.bak` clutter in `scripts/atlas`.
+Integrated the intent myself instead, with assertion-guarded edits (git is the backup; the working copies are CRLF and were preserved; the transform ran from the session scratchpad):
+- `scripts/atlas/derive-openspec-ids.mjs`, `scripts/atlas/derive-gsd-ids.mjs`: removed `pg`, `dotenv`, the pool and the whole `UPDATE atlas_packets ... WHERE title_id = $2` apply branch (now `throw REGISTRY_LUT_01D_APPLY_DISABLED`);
+  `--apply` / `--apply=...` exits 3 (`BLOCKED_APPLY`) before any work; packet_key + source_ref are now REQUIRED inputs (title is a label only); a report file is written ONLY with an explicit `--report` (default prints JSON to stdout; the old default path was a tracked file);
+  new `--packets-snapshot <tsv>` / `--aliases-snapshot <file>` feed `planPacketKeyIdUpdatesV1`. Without a snapshot the status is `DRY_RUN_UNVERIFIED_NO_SNAPSHOT`; with one, `QUALIFIED_DRY_RUN_ONLY` plus real per-entry counts. `applyReady:false` and `sourceBindingEvidence:'NOT_PROVIDED'` always.
+- `scripts/atlas/lib/packet-key-id-update-plan-v1.mjs`: added `parsePacketsSnapshotTsvV1`.
+- Verified: `node --check` both; `--apply` exit 3 for both; dry-run without snapshot -> `DRY_RUN_UNVERIFIED_NO_SNAPSHOT`, no report file created (git status of `docs/reports` unchanged);
+  with the live snapshot (scratchpad, 61,718 rows, 3,294 aliases) BOTH scripts report `QUALIFIED_DRY_RUN_ONLY` 58,315 / `BLOCKED_TITLE_LABEL_STALE_OR_MISMATCHED` 50 (the 50 `proto:` rows stay blocked, not replaced).
+- Tests: `scripts/atlas/packet-key-id-update-plan-v1.test.mjs` + `scripts/atlas/derive-ids-readonly-guard.test.mjs` (`node --test` 15/15): exit 3 on `--apply`/`--apply=true` with empty stdout, static guard (no `pg`, no `pool.`, no live `UPDATE atlas_packets`/`WHERE title_id`), planner consumed, never apply-ready.
+- Not done / still open: no independent source-binding readback (so no apply path exists or is proposed); the mapping tables use a fixed example UUID namespace (`550e8400-e29b-41d4-a716-446655440000/1`), NOT an Atlas frozen namespace — flagged, unchanged; reconcile the 50 stale `proto:` labels (owner decision);
+  TITLE-FORMAT-DECISION-01, PKV2-ADOPT-01, ontology tuple and ContextManifest gates remain open.
+
+### 2026-10-11 GSD/openspec ID census (read-only) + hardened-installer review
+
+- Reviewed `~/Downloads/registry-lut-01d-hardened` (install.py + synthetic-stub test_install.py, nothing run): same installer as the earlier download with honest status wording (`UNVERIFIED_DRY_RUN_ONLY`, `qualifiedUpdateCount 0`); still never calls the planner, leaves `.bak` files, and it
+  would now REFUSE on this repo (it requires exactly one `WHERE title_id = $2`, which was removed). Redundant; not installed.
+- GSD: operator does not use it. `derive-gsd-ids.mjs` stays guarded (read-only, `--apply` exit 3); NOT deleted, NOT restored to its writer form. Code consumers of `gsd_id` (name search, code only): the derive script, its tests/guards, `scripts/atlas/generate-structured-lexical-fanout.mjs` (1 ref),
+  `sveltekit-frontend/drizzle/schema.ts` (column declaration), `recommendations/spec-recommendation-bridge.spec.ts` (1 ref); no `package.json` script references it. Classification: LEGACY_OPTIONAL pending a full consumer read (refs not opened).
+- **Live finding — the old label-keyed updaters HAVE ALREADY WRITTEN to production:** `atlas_packets` (61,718 rows): `gsd_id` non-null 58,315 and `openspec_id` non-null 58,315 (the same 58,315 rows, both set), 0 rows with only one set, the 50 stale `grpc-service`-titled rows NULL —
+  exactly the set the old `WHERE title_id` updaters match. So a past `--apply` run is the evident source (inferred from counts; run history not located). **`count(distinct gsd_id) = 1` and `count(distinct openspec_id) = 2`**: the stored values are almost constant buckets
+  (the mapping tables fall back to `unknown` for unmapped classes, e.g. fanout `domain_class` values like `mcp_agents` are not keys of `DOMAIN_CLASS_TO_OPENSPEC`), so these columns currently carry ~no information. Treat them as unreliable; do not backfill or "repair" from here.
+- `scripts/atlas/derive-id-packet-key-wiring-v1.test.mjs` (untracked, created 03:59, NOT by this session) tests the same two scripts (planner consumed, `--apply` exits 3); it passes 2/2 here. Left untouched.
+- `atlas_observation_feature_rows` (live, 1,808 rows) has `source_version_receipt_id` (0 non-null: no receipts anywhere) but NO `registry_revision` or `source_revision` column — confirms FEATURE-LINEAGE-WIRE-01 cannot be live until the schema gains them (migration NOT proposed/applied here; nullable columns do not create valid lineage).
+  Receipt-owner candidates by name only (unread): `packages/parent-atlas/src/core/observation-feature-repository.ts` (`input.sourceVersionReceiptId ?? null`, line 108), `sveltekit-frontend/src/lib/server/atlas/materializers/observation-feature-materializer.ts`, `.../contracts/observation-feature-projection-v1.ts`, `.../retrieval/qdrant-semantic-projection.ts`.
+  The `python/atlas_semantic512_*` hits are the same field name in a different lane. No source-version RECEIPT table exists (name search of tables found none).
+- Open: [ ] GSD-CONSUMER-CENSUS-01 (read the 3 non-script refs, classify active/historical/dead; no deletion); [ ] ID-COLUMNS-QUALITY-01 decide whether `openspec_id`/`gsd_id` (near-constant) should be nulled/ignored/regenerated — operator decision, no writes proposed;
+  [ ] FEATURE-LINEAGE-WIRE-01 first needs: a source-version receipt owner (none found) and the two missing columns; then provision the reviewer allowlist/trust anchor.
+
+### 2026-10-11 FEATURE-LINEAGE-WIRE-01 read-through (read-only; authoritative ledger: parent-atlas-retrieval-lineage-dag-convergence LINEAGE-05/06 + parent-atlas-ml-graph-retrieval-convergence/feature-lineage-persistence-repair.md)
+
+OpenSpec check: this lane is already owned there; entries below are cross-references, not parallel tracking (`npx openspec validate parent-atlas-tensor-residency-integration --strict` and the ace-rlm-bitfrost change pass).
+- Read `observation-feature-repository.ts`, `observation-feature-materializer.ts`, `observation-feature-projection-v1.ts`, `plan-observation-feature-materialization.mjs`, `audit-orf-lineage-migration-readiness-v1.sql`: all writers INSERT `source_revision`, `registry_revision`, `source_version_receipt_id`; the deployed table has only the receipt column,
+  so the writers cannot run against it; the readiness SQL is `BEGIN READ ONLY ... migrationAuthorized:false`; the plan producer treats the receipt as optional by design (comment at line 77).
+- Nearest existing source-evidence owner: `atlas_workspace_source_bindings` (47,936 rows) + `workspace-source-binding-v1.ts` + `grounded-extraction-source-binding-v1.ts` (`resolveGroundedExtractionSourceBindingV1`). `observation-feature-lineage-admission-v2.mjs` now accepts exact source-binding evidence as the SOURCE_BOUND alternative when a row has no receipt id (tests 20/20 with V1); live: 19/1,808 ORF rows have any binding by source_ref.
+- Still blocked (unchanged): schema migration (needs the migration owner; not proposed from here), approved feature-definition registry + reviewer allowlist/trust anchor, a real source-version receipt producer, and the plan producer's missing `registryRevision`/`evidenceRefs`.
+- [x] FEATURE-LINEAGE-WIRE-01a owner read-through done; [ ] FEATURE-LINEAGE-WIRE-01b production `resolveSourceBinding` adapter over `atlas_workspace_source_bindings` (read-only, request-scoped); [ ] 01c reviewer allowlist/trust-anchor provisioning (operator).
+
+- 2026-10-11 **FEATURE-LINEAGE-WIRE-01b done (WIRED, read-only; no DB code in the module):** `scripts/atlas/lib/source-binding-resolver-v1.mjs` (+ `.test.mjs`, 19/19 with the V2 admission suite).
+  `createSourceBindingResolverV1(fetchBindingRows)` is request-scoped and fail-closed over rows of `atlas_workspace_source_bindings`: exactly one row for the exact (workspace_revision, canonical_source_ref), sha256-prefixed `source_revision`, non-empty `binding_checksum`,
+  and `content_digest` equal to `source_revision`; returns frozen `{sourceRevision, contentDigest, bindingChecksum, byteLength, canonicalAuthority:false}` or null. The caller injects the (READ ONLY / snapshot) fetcher, so no write is possible here; it plugs into V2 admission as `resolveSourceBinding`.
+  **Live finding that drove a fix:** `content_digest` is stored as BARE 64-hex while `source_revision` is `sha256:`-prefixed (37/37 rows; the hex is identical). My first version required both prefixed and rejected 37/37; it now accepts either spelling at this boundary, normalizes to the prefixed form and requires equality with `source_revision`
+  (a differing digest fails closed). Replay over a read-only snapshot of the live bindings for ORF source refs: 37 (workspace, source_ref) keys, 37 resolved, 0 unresolved. Note 18 of the 19 ORF source refs have bindings in 2 different workspace revisions, so resolution is only meaningful for the exact workspace the row was planned under.
+  Not done: no production fetcher (a bounded `REPEATABLE READ READ ONLY` query needs the DB connection decision), no materializer wiring, ORF rows still lack `source_revision`/`registry_revision` columns so none of the 1,808 historical rows can be admitted. Parallel-session note (not verified here): another session reports both updaters planner-backed with `canonical-hash-v1.ts` now tolerating bare and `sha256:` digests at the matrix-revision boundary; consistent with this finding.
+
+- 2026-10-11 **FEATURE-LINEAGE-WIRE-01 source-owner evaluation (read-only; the five reviewer-listed owners compared):**
+  - `workspace-source-binding-v1.ts` (CANONICAL owner of the binding contract): `WorkspaceSourceManifestEntryV1` stores `contentDigest` as BARE sha256 hex and enforces `sourceRevision === sha256:<contentDigest>`; `workspaceRevision === sha256:<sourceManifestDigest>`. So the bare-digest spelling seen in `atlas_workspace_source_bindings` is the owner's contract, not drift; `source-binding-resolver-v1.mjs` mirrors that exact invariant.
+  - `grounded-extraction-source-binding-v1.ts`: reopens SUBMITTED bytes and checks sha256 against the stored binding (`validate...`) and resolves from the DB (`resolve...`); it is the right owner for evidence-span grounding, not for ORF rows (they carry no bytes).
+  - `scripts/atlas/lib/canonical-source-binding-v1.mjs`: script-side packet/source binding vs the current workspace (WORKSPACE_MISMATCH etc.); candidate for packet_key <-> source binding, not read in detail.
+  - `revision-authority-v1.ts`: content-addressed revisions for `retrieval-policy` / `ace-playbook` configs only — NOT a source-version owner (a pattern reference for registry-revision verification; the approval validator already enforces `registry_revision == proposal:sha256:<defs checksum>`).
+  - `python/atlas_semantic512_reconcile.py`: its `atlas.source-version-receipt.v1` belongs to the semantic-512 lane; not an ORF receipt and does not authorize feature materialization.
+  Conclusion: the nearest source-version owner for ORF is the binding table + `workspace-source-binding-v1.ts`; no separate ORF receipt producer exists. No new table or persistence was designed.
+- Resolver hardening added to `scripts/atlas/lib/source-binding-resolver-v1.mjs` (tests 28/28 with V1+V2 admission): optional OPERATOR-PROVIDED `trustedProducerPrefixes` (untrusted producer -> unresolved; live producer families: `graphify-execution-membership-v2:` 24,456 rows, `workspace-revision-content-reconciliation.v1:` 23,369, `graphify-current-source-batch-v1:` 111 — which are trusted is an operator decision, no default);
+  `verifySourceBytesAgainstBindingV1(binding, bytes)` = independent byte readback (digest + length; the caller reopens the bytes, the module reads no files); stale-workspace test. Negative cases from the review now covered: missing receipt (V2), wrong source revision, stale workspace revision, untrusted producer, digest/length mismatch. NOT covered: wrong packet_key (the binding table carries no packet_key; packet<->source needs the packet owner / `canonical-source-binding-v1.mjs`).
+- Open: [ ] FEATURE-LINEAGE-WIRE-01c operator: trusted producer-family allowlist + registry reviewer allowlist/trust anchor; [ ] 01d packet_key <-> source binding via `canonical-source-binding-v1.mjs` (read it first); [ ] production read-only fetcher; materializer stays on its blocked V1 path.
+
+- 2026-10-11 **Download review: `~/Downloads/feature-lineage-wire-01b` (one TypeScript file + README; read in full, not executed) -> adopted with tests.** It is a thin read-only wrapper, `orf-source-binding-adapter-v1.ts`, over the EXISTING DB owner `sveltekit-frontend/src/lib/server/atlas/identity/admitted-source-revision-resolver-v1.ts`
+  (`resolveAdmittedSourceRevisionV1`: one parameterized `SELECT ... FROM atlas_workspace_source_bindings WHERE canonical_source_ref = $1 AND workspace_revision = $2`, NOT_FOUND / AMBIGUOUS / scope / digest / checksum checks). Copied unchanged into `sveltekit-frontend/src/lib/server/atlas/identity/` and added `orf-source-binding-adapter-v1.spec.ts` (7 tests, vitest; with the owner's spec 10/10; the DB query itself is not exercised).
+  Comparison with `scripts/atlas/lib/source-binding-resolver-v1.mjs` (mine): LAYERED, not competing — the TS owner is the production DB read path (also returns `repoId`; checks the caller's expected `sourceRevision`; throws typed errors); mine is the pure/snapshot resolver used by the script-side V2 admission, adds the operator-provided producer allowlist and `verifySourceBytesAgainstBindingV1` byte readback, and is synchronous.
+  Live fit (read-only): all 47,936 binding rows have a BARE 64-hex `binding_checksum` (passes the TS owner's format check), `source_revision = sha256:<content_digest>` on 47,936/47,936, and 0 ambiguous (workspace, source_ref) pairs, so the TS owner works on real data.
+  **Gaps the README states and this review confirms:** `packetKey` is correlated, NOT verified (the binding table has no packet_key; needs `resolvePacketKeyResolutionV2` + packet row, or `canonical-source-binding-v1.mjs` — still unread); the checksum is only format-checked, not independently recomputed; the adapter's output is a readback, never a source-version receipt, approval or admission (`sourceVersionReceiptVerified:false`, `admissionAuthorized:false`) and must not be fed to V2 as a receipt.
+  **Integration gap:** V2 admission is synchronous; the TS owner is async/DB-backed. Production flow must pre-fetch a bounded, request-scoped snapshot of binding rows (read-only) and pass it through `snapshotBindingFetcherV1` into the sync resolver. Not built. Open: [ ] FEATURE-LINEAGE-WIRE-01d (read `canonical-source-binding-v1.mjs` for packet<->source), [ ] 01e bounded snapshot fetch, [ ] 01c operator allowlists.
+
+- 2026-10-11 **FEATURE-LINEAGE-WIRE-01d (partial) — byte-reopening owner found and chained; first real-bytes canary (read-only, nothing written).** The reviewer-listed `packages/parent-atlas/src/core/exact-promotion-workspace-source-reader.ts` (`createWorkspaceExactPromotionSourceReader(repoRoot)`: rejects empty/absolute/`..` refs, `realpath` both root and file and refuses escapes incl. symlinks, reads raw bytes, returns `file_sha256` bare hex + `file_byte_length`, never the bytes) is the existing exact source reader; no new reader is needed.
+  Added `verifyBindingAgainstExactReaderV1(binding, readerResult)` to `scripts/atlas/lib/source-binding-resolver-v1.mjs` (pure; tests 9/9): WORKING_TREE_BYTES_MATCH_BINDING | BLOCKED_WORKING_TREE_DIGEST_DIFFERS_FROM_BINDING | BLOCKED_BYTE_LENGTH_MISMATCH | BLOCKED_SOURCE_FILE_UNAVAILABLE | BLOCKED_BINDING_OR_READER_RESULT_MISSING.
+  **Canary (real bytes, real bindings):** for the 37 (workspace_revision, source_ref) bindings of the 19 ORF source refs, resolver -> real reader over the repo working tree -> comparison: **16 match, 21 differ** (those source files have changed since the older workspace revision recorded the binding). This demonstrates the stale-source detection on real data; it also means a binding is only usable for the workspace it was recorded under AND while the bytes are unchanged.
+  Chain now: packet row -> (still unverified: packet_key<->source_ref via `resolvePacketKeyResolutionV2` / `canonical-source-binding-v1.mjs`) -> `atlas_workspace_source_bindings` (existing TS owner / snapshot) -> exact reader bytes -> digest+length comparison -> V2 admission (+ registry approval, still blocked). Dirty working trees fail closed; the reader reads the CURRENT tree, so it validates "bytes unchanged since admission", not "bytes at the historical revision".
+  Reviewer notes read but NOT acted on (different lane, GRAPHIFY-STRUCTURAL-OWNER-01): `workflow/context-dag-handlers-v1.ts` (owner map says canonical symbol joins/production composition incomplete) and `native-structural-materializer.mts` (has `--apply`; must not be used for a first canary); the four proposed structural-integration checks (outdated revision, symlink escape, cross-revision relation endpoints, zero-edge receipt) are not implemented here. Live graph edges remain 0 per the parallel session's census (not re-verified).
+  Open: [ ] 01d packet_key<->source_ref owner read (`canonical-source-binding-v1.mjs`, `resolvePacketKeyResolutionV2`); [ ] 01e bounded snapshot fetch; [ ] 01c operator allowlists; [ ] regression test using real files in a temp dir (symlink escape through the real reader) — the reader has its own spec.
+
+- 2026-10-11 **Download review: `~/Downloads/feature-lineage-readonly-fetcher` (2 identical zips; `.mjs` + test + README; read in full, not executed) -> adopted = FEATURE-LINEAGE-WIRE-01e (WIRED).** `scripts/atlas/lib/source-binding-readonly-fetch-v1.mjs` (+ `.test.mjs`) copied (no overwrite of existing files) into `scripts/atlas/lib/`.
+  It is the production fetch port I had left open: injected dedicated pg client (no credentials in code), `BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY`, `statement_timeout 5s`, `lock_timeout 1s`, parameterized `WHERE workspace_revision = $1 AND canonical_source_ref = $2 ORDER BY repo_id LIMIT 2` (two rows preserved so the pure resolver rejects ambiguity), always `ROLLBACK`, scope validation before any transaction (sha256 workspace revision; rejects empty/absolute/drive/`..`/`$lib` refs), and a bounded (<=20) per-scope helper that is NOT a cross-scope snapshot.
+  **One change made on adoption:** the SQL did not select `producer_revision`, so the operator producer allowlist in `source-binding-resolver-v1.mjs` could never pass; added `producer_revision` to the SELECT (column exists live) with a test. Tests: fetcher 7 + resolver 9 + V2 admission 14 = 30/30 (`node --test`), incl. a composition test fetch -> pure resolver (allowlist match, allowlist miss, two-row ambiguity -> null).
+  Live checks (read-only, psql, `BEGIN ... READ ONLY` + `ROLLBACK`): all 47,936 `workspace_revision` values are `sha256:`-prefixed (compatible with the scope validator); the exact SQL shape returns real rows (repo `deeds-web-app`, producer `graphify-current-source-batch-v1:...`). The fetcher itself was NOT run against a live pg client (needs the connection decision).
+  Remaining gates unchanged: packet_key<->source_ref owner (01d), operator producer/registry allowlists (01c), independent binding-checksum recompute (format-only today), registry approval, materializer stays blocked, historical ORF rows unqualified.
+
+- 2026-10-11 **FEATURE-LINEAGE-WIRE-01d — packet_key <-> source_ref link (WIRED; read-only).** Read `scripts/atlas/lib/canonical-source-binding-v1.mjs` and `resolvePacketKeyResolutionV2` (`identity/packet-identity-resolver.ts`):
+  - `resolveCanonicalSourceBinding` classifies a packet's `packetSourceRef` against current revision-qualified observations as EXACT | EXPLICIT_ALIAS | CONTENT_PROVEN | AMBIGUOUS | UNRESOLVED | WORKSPACE_MISMATCH (checksum = JSON digest). Its EXACT case equals what `source-binding-resolver-v1.mjs` accepts; EXPLICIT_ALIAS and CONTENT_PROVEN are bridges my resolver deliberately does NOT accept (fail closed) — a feature row must be bound by its own exact source ref.
+  - `resolvePacketKeyResolutionV2` returns `canonicalPacketKey` (logical) vs `storagePacketKey` (physical row that joins `atlas_packets` today); the doc warns `resolveCanonicalPacketKey` returns the STORAGE key.
+  - The binding table has no packet_key, so the packet<->source relation comes from the canonical packet row. Added `verifyPacketSourceLinkV1({packetKey, sourceRef}, packetRows)` to `source-binding-resolver-v1.mjs` (pure; caller supplies the read-only `atlas_packets` row for that exact key): exactly ONE row with the same packet_key AND source_ref, else BLOCKED_PACKET_NOT_FOUND / _KEY_AMBIGUOUS / _KEY_MISMATCH / _SOURCE_REF_MISMATCH / _LINK_INPUT_INVALID. No alias or similarity resolution (an alias-only key must go through the identity owner first). Tests: resolver 10 + fetcher 7 + V2 admission 14 = 31/31.
+  - **Live (read-only SELECT):** all 1,808 ORF rows join `atlas_packets` by exact `packet_key` and `source_ref` agrees on 1,808/1,808 (0 without a packet row). ORF packet keys are ALL in the `ace:packet:<12hex>` form (0 legacy `packet:<12hex>`, 0 PacketKeyV2) — the canonical side of `atlas_packet_identity_aliases`. The complete chain (exact packet row -> source binding by exact ref) exists for only 19 of 1,808 rows.
+  - Chain status: packet link (verifiable) -> binding resolver (snapshot/fetcher) -> exact-reader byte comparison -> V2 admission; still needs registry approval + operator allowlists; materializer unchanged and blocked; historical ORF rows unqualified.
+  Open: [ ] 01c operator allowlists (producer families, reviewer allowlist + trust anchor); [ ] a single composed read-only canary that runs packet link + fetcher + reader + V2 for one real source ref against a live pg client; [ ] independent binding-checksum recompute.
+
+## HANDOFF 2026-10-11 (session end, context exhausted) - read this first
+
+**TL;DR.** Scripts-first (`scripts/atlas/`), packages as mirror (see root `CLAUDE.md` 2026-10-11 paragraph and memory `feedback_scripts_atlas_first_packages_mirror`). Everything below is WIRED/fixture or read-only; NOTHING is PROVEN_LIVE, nothing is committed, and no migration, backfill, `--apply` or DB write was run. Live blockers are unchanged: the ORF table lacks `source_revision`/`registry_revision`; 0/1,808 rows carry a receipt; no ontology tuple or ContextManifest; operator allowlists are missing.
+
+**Operator decisions still needed (I cannot make these):**
+
+| Decision | Task id |
+|---|---|
+| Canonical `title_id` form: `title:<hash8>` (current generator, semantic-title-v2) vs stored `title:<slug>:<hash8>` (61,659 rows) | TITLE-FORMAT-DECISION-01 |
+| Trusted producer-family allowlist for source bindings (live families: graphify-execution-membership-v2, workspace-revision-content-reconciliation.v1, graphify-current-source-batch-v1) plus the registry reviewer allowlist and trust anchor | FEATURE-LINEAGE-WIRE-01c |
+| How a script obtains a read-only pg client (for the composed canary and the fetcher) | FEATURE-LINEAGE-WIRE-01e |
+| Which label is right for the 50 stale `proto:` rows; fate of the near-constant `openspec_id`/`gsd_id` columns (1 and 2 distinct values; the old updaters evidently already ran) | REGISTRY-LUT-01d, ID-COLUMNS-QUALITY-01 |
+| PacketKeyV2 adoption (0 stored rows; the v1-to-v2 alias migration is unapplied) | PKV2-ADOPT-01 |
+
+**What exists now (all uncommitted).**
+- `scripts/atlas/`: smoke-residency-workflow-action-v1.mjs, smoke-instruction-card-cache-policy-v1.mjs, prove-mmap-tensor-block-fixture-v1.py, valkey-ace-handoff-v1.mjs (+ test, verifier `.mts`, owner-wiring `.mts`), packet-key-id-update-plan-v1 (lib + test), derive-ids-readonly-guard.test.mjs, audit-title-writers-v1.mjs, and title-identity-safety-v1 / title-identity-contract-v1 / title-writer-compat-v1 / packet-key-scheme-audit-v2 (each lib + test; two with a `.parity.test.mts`). EDITED and now read-only (`--apply` exits 3): derive-openspec-ids.mjs and derive-gsd-ids.mjs (GSD is LEGACY_OPTIONAL: keep guarded, do not restore).
+- `scripts/atlas/lib/`: observation-feature-lineage-admission-v2, source-binding-resolver-v1 (producer allowlist, byte readback, exact-reader comparison, packet-to-source link), source-binding-readonly-fetch-v1 (adopted download; its SQL now selects `producer_revision`), each with tests.
+- `packages/parent-atlas/src/core/`: instruction-card-v1 (+ spec), cache-recommendation-v1 (+ spec; overlaps `decideGpuMemoryAdmissionV1`, see CACHE-RECONCILE-01), and `workflow-action-adapters.ts` EDITED (residency and instruction-card adapters; spec `workflow-action-adapters.residency.spec.ts`). Staged mirror code: MIRROR-01, MIRROR-02, MIRROR-03.
+- `sveltekit-frontend/src/lib/server/atlas/`: `features/canonical-candidate-v1.ts` EDITED (`buildCandidateReverseIndexV1`), `retrieval/product-feature-ordinal-map-verifier-v1.ts` EDITED (optional `candidateOrdinal` check), `identity/orf-source-binding-adapter-v1.ts` ADDED from a download (+ spec).
+- Ledger cross-references also written to `parent-atlas-ace-rlm-bitfrost-integration/tasks.md` (VAL-ACE-01, VALKEY-*) and `parent-atlas-retrieval-lineage-dag-convergence/tasks.md` (LINEAGE-06 helper status). Root `CLAUDE.md` got the scripts-first paragraph. A memory file was added.
+- NOT mine (other sessions; leave alone): `scripts/atlas/derive-id-packet-key-wiring-v1.test.mjs`, edits to ace/context-assembler, agentic-validation-runtime, audit-feature-runtime-wiring, and other changes' tasks.md. The Downloads installers (`registry-lut-01d-*`) were NOT run and must not be; they refuse on this repo anyway.
+
+**Re-run everything (read-only).**
+- `node --test` on the `.test.mjs` files under `scripts/atlas/` and `scripts/atlas/lib/`.
+- `cd sveltekit-frontend && npx vitest run src/lib/server/atlas/features/canonical-candidate-v1.spec.ts src/lib/server/atlas/retrieval/product-feature-ordinal-map-verifier-v1.spec.ts src/lib/server/atlas/identity/orf-source-binding-adapter-v1.spec.ts`
+- From the repo root: `node_modules/.bin/vitest run packages/parent-atlas/src/core/instruction-card-v1.spec.ts packages/parent-atlas/src/core/cache-recommendation-v1.spec.ts packages/parent-atlas/src/core/workflow-action-adapters.residency.spec.ts`
+- `.mts` parity and wiring tests: `cd sveltekit-frontend && npx tsx ../scripts/atlas/<file>.mts`
+- `node scripts/atlas/audit-title-writers-v1.mjs`
+- `npx openspec validate parent-atlas-tensor-residency-integration --strict`
+- Build `packages/parent-atlas` first (`node ../../node_modules/typescript/bin/tsc -p tsconfig.json`) before the dist-based smokes.
+
+**Next steps, in order.**
+1. Operator: the decisions above.
+2. Composed read-only canary for ONE real source ref: packet link (`verifyPacketSourceLinkV1`), then the fetcher (live read-only pg client), then the resolver, then the exact reader (`verifyBindingAgainstExactReaderV1`), then V2 admission with an injected approval. Expect STRUCTURALLY_VALID_NOT_ADMITTED until registry approval exists.
+3. CACHE-RECONCILE-01, SCHED-EXTEND-01 (cancel/retry/drain/crash recovery on `ResourceAwareScheduler`), HIST-02b (origin of the 50 `proto:` titles and the 3,294 `v1` ACE titles), GSD-CONSUMER-CENSUS-01.
+4. Only after the live gates: ACE-CACHE-REV-01, then VALKEY-GET-01 to 05, ontology tuple, ContextManifest.
+
+**Gotchas learned.**
+- The Bash tool mangles backslashes in inline commands: put any script containing backslash escapes in a file (the session scratchpad) and run it. Never put a backslash-zero sequence in a non-raw Python string that writes ledger text (I introduced 2 NUL bytes that way and fixed them).
+- Working-tree files are CRLF while the git index is LF (autocrlf): edit with line-ending-preserving scripts or `git diff` shows whole-file changes.
+- Cheap final checks: `git diff --check`, `openspec validate --strict`, and a NUL-byte count on `tasks.md`.
+- The Valkey password lives in `.env.local` (`REDIS_PASSWORD`); it was never printed or recorded.
+- Windows `cudaMemGetInfo` overstates free VRAM by about 20x.

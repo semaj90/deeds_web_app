@@ -16,6 +16,7 @@ import {
   assertOpenSpecTaskOrdinalMapReadbackV1,
   assertCandidateOrdinalMapIntegrityV1,
   resolveCanonicalCandidateByOrdinal,
+  buildCandidateReverseIndexV1,
   type CanonicalCandidateIdentityInput,
 } from './canonical-candidate-v1.js';
 
@@ -410,5 +411,52 @@ describe('OpenSpec TaskCard ordinal universe', () => {
       workspaceRevision: metadata.workspaceRevision,
       sourcePopulationChecksum: metadata.sourcePopulationChecksum,
     })).toThrow(/ROW_MISMATCH/);
+  });
+});
+
+describe('buildCandidateReverseIndexV1 — inverse retrieval LUT', () => {
+  const build = (rows: Array<Partial<CanonicalCandidateIdentityInput>>) =>
+    materializeCandidateOrdinalMap({
+      candidates: rows.map((row) => candidate(row)),
+      candidateSnapshotRevision: 'snap-r1',
+      workspaceRevision: 'ws-r1',
+      producerRevision: 'test',
+    });
+
+  it('resolves unique keys to the same ordinal as the forward map', () => {
+    const map = build([
+      { canonicalId: 'c:a', packetKey: 'p:a', sourceRef: 'src/a.ts' },
+      { canonicalId: 'c:b', packetKey: 'p:b', sourceRef: 'src/b.ts' },
+    ]);
+    const index = buildCandidateReverseIndexV1(map);
+    expect(index.canonicalAuthority).toBe(false);
+    expect(index.lookup('canonicalId', 'c:b')).toEqual({ status: 'UNIQUE', candidateOrdinal: 1 });
+    expect(index.lookup('packetKey', 'p:a')).toEqual({ status: 'UNIQUE', candidateOrdinal: 0 });
+    expect(index.lookup('sourceRef', 'src/b.ts')).toEqual({ status: 'UNIQUE', candidateOrdinal: 1 });
+    const back = resolveCanonicalCandidateByOrdinal(map, 1);
+    expect(back.canonicalId).toBe('c:b');
+  });
+
+  it('reports duplicates as AMBIGUOUS and misses as NOT_FOUND (fail closed)', () => {
+    const index = buildCandidateReverseIndexV1(build([
+      { canonicalId: 'c:a', packetKey: 'p:a', sourceRef: 'src/shared.ts' },
+      { canonicalId: 'c:b', packetKey: 'p:b', sourceRef: 'src/shared.ts' },
+    ]));
+    expect(index.lookup('sourceRef', 'src/shared.ts')).toEqual({ status: 'AMBIGUOUS', candidateOrdinals: [0, 1] });
+    expect(index.lookup('packetKey', 'p:zzz')).toEqual({ status: 'NOT_FOUND' });
+  });
+
+  it('exact tuple lookup requires packetKey, sourceRef and sourceRevision to all match', () => {
+    const index = buildCandidateReverseIndexV1(build([
+      { canonicalId: 'c:a', packetKey: 'p:a', sourceRef: 'src/a.ts', sourceRevision: 'src-r1' },
+    ]));
+    expect(index.lookupExact({ packetKey: 'p:a', sourceRef: 'src/a.ts', sourceRevision: 'src-r1' }).status).toBe('UNIQUE');
+    expect(index.lookupExact({ packetKey: 'p:a', sourceRef: 'src/a.ts', sourceRevision: 'src-r2' }).status).toBe('NOT_FOUND');
+    expect(index.lookupExact({ packetKey: 'p:a', sourceRef: 'src/other.ts', sourceRevision: 'src-r1' }).status).toBe('NOT_FOUND');
+  });
+
+  it('rejects a tampered map', () => {
+    const map = build([{ canonicalId: 'c:a', packetKey: 'p:a', sourceRef: 'src/a.ts' }]);
+    expect(() => buildCandidateReverseIndexV1({ ...map, ordinalMapChecksum: 'f'.repeat(64) })).toThrow(/CHECKSUM_MISMATCH/);
   });
 });
