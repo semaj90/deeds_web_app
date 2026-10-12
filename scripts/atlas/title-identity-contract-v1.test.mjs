@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import {
-  classifyTitleFormatV1, verifyTitleDerivationV1, decideTitlePersistenceV1,
+  classifyTitleFormatV1, verifyTitleDerivationV1, decideTitlePersistenceV1, PERSISTENCE_POLICY_V1,
 } from './lib/title-identity-contract-v1.mjs';
 
 const h8 = (pk, v) => createHash('sha256').update(`${pk}\0${v}`).digest('hex').slice(0, 8);
@@ -42,14 +42,20 @@ test('unknown versions are never reported as reproduced', () => {
 test('packet_key is required', () => {
   assert.equal(verifyTitleDerivationV1({ packetKey: '', titleId: 'title:deadbeef', generatorVersion: 'semantic-title-v2' }).status, 'PACKET_KEY_REQUIRED');
 });
-test('persistence: three-part reproduced from a SOURCE-backed version is allowed', () => {
+test('selected persisted title format is three-part and remains a label, not packet identity', () => {
+  assert.equal(PERSISTENCE_POLICY_V1.status, 'DECISION_RECORDED_IMPLEMENTATION_AND_LIVE_ADMISSION_PENDING');
+  assert.equal(PERSISTENCE_POLICY_V1.persistedShape, 'THREE_PART');
+  assert.equal(classifyTitleFormatV1(three('auth-handler', 'deterministic-title-v1')), 'THREE_PART');
+  assert.notEqual(three('auth-handler', 'deterministic-title-v1'), pk);
+});
+test('persistence: three-part reproduced from a SOURCE-backed version is format-compatible but not write-authorized', () => {
   const d = decideTitlePersistenceV1({ packetKey: pk, titleId: three('auth', 'deterministic-title-v1'), generatorVersion: 'deterministic-title-v1' });
   assert.equal(d.allowed, true);
   assert.equal(d.reason, 'POLICY_ALLOWS_SHAPE_ONLY');
   assert.equal(d.productionWriteAuthorized, false);
   assert.equal(d.writesPerformed, false);
 });
-test('persistence: two-part semantic-title-v2 is blocked under the provisional policy', () => {
+test('persistence: separate two-part semantic-title-v2 generator output remains blocked', () => {
   const d = decideTitlePersistenceV1({ packetKey: pk, titleId: two('semantic-title-v2'), generatorVersion: 'semantic-title-v2' });
   assert.equal(d.allowed, false);
   assert.equal(d.reason, 'TWO_PART_NOT_PERSISTABLE_UNDER_POLICY');

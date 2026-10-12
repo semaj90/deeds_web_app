@@ -1,6 +1,22 @@
 # Parent Atlas workstation status and deferred integration queue
 
-Updated: 2026-09-05
+Updated: 2026-09-05 (status projection added 2026-10-11)
+
+## Status projection (2026-10-11)
+
+Projection only. The OpenSpec ledger `openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md` is the authority for these items.
+
+| Gate | Status | Evidence / next step |
+|---|---|---|
+| HIST-ATTR-REVIEW-01 / DECIDE-01 | Done | V2 receipt `.tmp/atlas/historical-chunk-attribution-v2.json`; 220 unmatched |
+| HIST-ATTR-TRACKED-17 | Done (review) | Register `.tmp/atlas/unresolved-chunk-register-v1.json`: 11 JSON unchanged since index (transformed text); 2 TypeScript rows stale |
+| HIST-ATTR-IGNORED-203 | Labelled | `GITIGNORED_SOURCE_NOT_GIT_ATTRIBUTABLE`; artifact status needs producer confirmation |
+| WORKSPACE-REVISION-OWNER-01 | Backfill blocked | Latest COMPLETED Graphify run (`01a8d8fc`, workspace `e24bb97…`) has zero `graphify_files` rows. Current diagnostic workspace candidate `sha256:679ef520…` (27,749 source files; 85 skipped) has 0 exact `atlas_workspace_source_bindings` rows. A fresh daily run would use the current candidate, not recreate `e24bb97…`; requires a reviewed binding producer/admission path before Graphify writes. Read-only receipt/details: `openspec/changes/parent-atlas-prefill-routing-residency-convergence/tasks.md`. |
+| PGVECTOR-PLAN-01 | Done | HNSW index used by scalar-subquery shape; earlier slow query was a join shape (Seq Scan + Sort) |
+| TRACE-DENSE-ERROR-01 | Implemented, not live | `DENSE_SEARCH_STAGE_FAILED:<stage>:cause=<code>` in `sveltekit-frontend/src/mcp/trace-mcp-server.ts`. Needs TRACE restart and a live call |
+| CHUNK-REFRESH-PLAN-01 | Not started | Needs a decision on the 2 stale TypeScript rows (writes) |
+| SEARCH-AST-DAG-BRIDGE-01 | Not started | Shadow-only; needs scope approval |
+| GRAPH-CSR-LIVE-01 | Blocked | `graphify_edges` has zero rows in total |
 
 ## Current OpenSpec reconciliation (2026-09-05)
 

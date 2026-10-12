@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { tracedQuery } from '$lib/server/db/client.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 import { CLASSIFIER_VERSION } from '$lib/server/enrichment/domain-classifier.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import {
   OntologyLinkedTupleV1Schema,
   buildOntologyLinkedTuplesFromFeatureRow,
@@ -393,8 +394,8 @@ export async function buildFeatureDocumentEnrichmentPlan(
     },
     modelPlan: {
       embeddingModel: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-      summarizerModel: process.env.GEMMA4_MODEL || 'gemma4',
-      summarizerEndpoint: process.env.LLAMA_SERVER_URL || process.env.GEMMA4_URL || 'http://127.0.0.1:8090/v1',
+      summarizerModel: LOCAL_VLM_MODEL,
+      summarizerEndpoint: LLAMA_SERVER_BASE_URL,
       qloraAdapter: process.env.QLORA_ADAPTER || undefined,
     },
     warnings: evidence.warnings.slice(0, 64),

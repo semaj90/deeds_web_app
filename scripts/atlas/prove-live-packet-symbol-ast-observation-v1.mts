@@ -15,6 +15,7 @@ const requestedSourceRefs = process.argv.flatMap((value, index, all) => value ==
 const workspaceArgIndex = process.argv.indexOf('--workspace-revision');
 const requestedWorkspaceRevision = workspaceArgIndex >= 0 ? process.argv[workspaceArgIndex + 1] : null;
 if (requestedWorkspaceRevision && !/^sha256:[0-9a-f]{64}$/i.test(requestedWorkspaceRevision)) throw new Error('INVALID_REQUESTED_WORKSPACE_REVISION');
+if (requestedSourceRefs.length && !requestedWorkspaceRevision) throw new Error('SOURCE_REF_REQUIRES_WORKSPACE_REVISION');
 const outputPath = path.resolve(root, outputArg);
 const scratchRoot = path.join(root, '.tmp', 'atlas') + path.sep;
 if (!outputPath.startsWith(scratchRoot)) throw new Error('OUTPUT_MUST_BE_UNDER_TMP_ATLAS');
@@ -62,9 +63,10 @@ try {
        AND v.byte_start IS NOT NULL AND v.byte_end > v.byte_start
        AND v.qualified_name IS NOT NULL
        AND ($1::text[] IS NULL OR p.source_ref = ANY($1::text[]))
+       AND ($2::text IS NULL OR p.workspace_revision_key = $2::text)
      ORDER BY p.source_ref, v.qualified_name, v.symbol_version_id
      LIMIT 100
-  `, [requestedSourceRefs.length ? requestedSourceRefs : null]);
+  `, [requestedSourceRefs.length ? requestedSourceRefs : null, requestedWorkspaceRevision]);
   const packetRows = requestedSourceRefs.length
     ? await client.query(`
         SELECT packet_key, source_ref, source_revision, workspace_revision_key
@@ -361,8 +363,11 @@ try {
       canonicalAuthority: false,
     };
   }
+  const currentBytesWithStaleWorkspace = packetDiagnostics.some((row) =>
+    row.sourceByteRevisionMatches && row.workspaceRevisionMatchesRequested === false);
   const status = proven ? 'READ_ONLY_SOURCE_AND_AST_OBSERVATION_MATCH'
-    : spanMismatches.length ? 'BLOCKED_SYMBOL_SPAN_MISMATCH' : 'BLOCKED_NO_EXACT_AST_MATCH';
+    : requestedWorkspaceRevision && currentBytesWithStaleWorkspace ? 'BLOCKED_WORKSPACE_REVISION_MISMATCH'
+      : spanMismatches.length ? 'BLOCKED_SYMBOL_SPAN_MISMATCH' : 'BLOCKED_NO_EXACT_AST_MATCH';
   const payload = {
     schema: 'atlas.live-packet-symbol-ast-observation-proof.v1',
     status,

@@ -1,0 +1,72 @@
+{
+  "schema": "atlas.production-hardening-snapshot.v1",
+  "createdAt": "2026-10-12T06:14:58.617Z",
+  "method": "copy only; no source files moved or deleted",
+  "entries": [
+    {
+      "file": ".opencode/candidates/ace-packet-2026-10-12T05-48-24-210Z.json",
+      "bytes": 205,
+      "sha256": "sha256:8ce7e51aff07f98381f102fa167c614636414ab08e6eea95e1b4c4320e1fc027"
+    },
+    {
+      "file": ".opencode/production/ace-packet-2026-06-12.json",
+      "bytes": 146882,
+      "sha256": "sha256:534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f"
+    },
+    {
+      "file": ".opencode/production/ace-packet-summary-2026-06-12.md",
+      "bytes": 1108,
+      "sha256": "sha256:d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef"
+    },
+    {
+      "file": ".opencode/production/manifest.json",
+      "bytes": 1021,
+      "sha256": "sha256:618b3402074ba0e991d60a1726af5f037d059f3156a47bdcee6fd08e751e58c3"
+    },
+    {
+      "file": ".tmp/atlas/ace-packet-empty-2026-10-12/ace-packet-summary.md",
+      "bytes": 156,
+      "sha256": "sha256:f507e869628e7244cddc7afc6146a69de2c0b91eee3e16d45541a4f9753e2337"
+    },
+    {
+      "file": ".tmp/atlas/ace-packet-empty-2026-10-12/ace-packet.json",
+      "bytes": 205,
+      "sha256": "sha256:5556d4f1025ea0cb392329df4d439232885b7843499efde5c3153f002bb57717"
+    },
+    {
+      "file": ".tmp/atlas/ace-recovery/ace-packet-20260612.json",
+      "bytes": 146882,
+      "sha256": "sha256:534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f"
+    },
+    {
+      "file": ".tmp/atlas/ace-recovery/ace-packet-summary-20260612.md",
+      "bytes": 1108,
+      "sha256": "sha256:d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef"
+    },
+    {
+      "file": ".tmp/atlas/ace-recovery/active-path-june-packet-moved-2026-10-12.json",
+      "bytes": 146882,
+      "sha256": "sha256:534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f"
+    },
+    {
+      "file": ".tmp/atlas/ace-recovery/active-path-june-summary-moved-2026-10-12.md",
+      "bytes": 1108,
+      "sha256": "sha256:d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef"
+    },
+    {
+      "file": "docs/architecture/ARCH-TOC.md",
+      "bytes": 10780,
+      "sha256": "sha256:3e5b6b198388308ad2afc71ba07b1f9e9c7c659d0156a818f513e81ee97a51a5"
+    },
+    {
+      "file": "docs/MASTER-TOC.md",
+      "bytes": 27569,
+      "sha256": "sha256:8b4357db9de50b35ced055cdee0dce62fbdbbfc75f648bbf6ea8779c6db22e4b"
+    },
+    {
+      "file": "docs/reports/document-governance-registry-v1.json",
+      "bytes": 9983782,
+      "sha256": "sha256:cb1296871d9b131282d7e517ee567afc2b966293bee834d93f7a38bbd619d7ca"
+    }
+  ]
+}

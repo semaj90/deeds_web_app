@@ -47,7 +47,10 @@ function admissionCandidate(value, explicitSnapshotRevision) {
 }
 
 function snapshotAuthorityCandidate(value, explicitSnapshotRevision) {
-  if (!value || value.status !== 'CURRENT_SNAPSHOT_PROVEN') return null;
+  if (!value
+    || value.status !== 'CURRENT_SNAPSHOT_PROVEN'
+    || value.canonicalAuthority !== true
+    || value.graphSnapshot?.status !== 'GRAPH_CANONICAL_AUTHORITY_PROVEN') return null;
   const workspaceRevision = clean(value.sourceSnapshot?.workspaceRevision);
   if (!workspaceRevision) return null;
   const snapshotRevision = snapshotRevisionFrom(value);

@@ -131,6 +131,37 @@ describe('runPacketDenseSearch', () => {
     expect(response.results).toEqual([]);
     expect(response.status).toBe('IDENTITY_BRIDGE_UNAVAILABLE');
     expect(response.degradedReasons).toContain('IDENTITY_BRIDGE_UNAVAILABLE');
+    expect(response.receipt?.degradedReasons).toContain('IDENTITY_BRIDGE_UNAVAILABLE');
+    expect(response.receipt?.joinedResultCount).toBe(0);
+  });
+
+  it('PDS-08 representation guard: fails closed with REPRESENTATION_MISMATCH when vector dimension != 768', async () => {
+    const invalidVector = [0.1, 0.2, 0.3];
+    const response = await runPacketDenseSearch(fakeDeps(), {
+      featureId: 'auth',
+      collection: 'codebase_chunks_768',
+      queryVector: invalidVector,
+    });
+    expect(response.status).toBe('REPRESENTATION_MISMATCH');
+    expect(response.degradedReasons).toContain('REPRESENTATION_MISMATCH');
+    expect(response.receipt?.queryDimensions).toBe(3);
+    expect(response.receipt?.degradedReasons).toContain('REPRESENTATION_MISMATCH');
+  });
+
+  it('issues an immutable receipt schema on valid run', async () => {
+    const response = await runPacketDenseSearch(fakeDeps(), {
+      featureId: 'auth',
+      collection: 'codebase_chunks_768',
+      queryVector,
+    });
+    expect(response.receipt).toBeDefined();
+    expect(response.receipt?.schema).toBe('atlas.packet-dense-search-receipt.v1');
+    expect(response.receipt?.queryDimensions).toBe(768);
+    expect(response.receipt?.collection).toBe('codebase_chunks_768');
+    expect(response.receipt?.candidateCount).toBe(2);
+    expect(response.receipt?.qdrantHitCount).toBe(1);
+    expect(response.receipt?.joinedResultCount).toBe(1);
+    expect(response.receipt?.degradedReasons).toEqual([]);
   });
 });
 

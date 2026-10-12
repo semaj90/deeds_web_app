@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const graphTraversalDirections = ['outbound', 'inbound', 'both'] as const;
 export type GraphTraversalDirection = (typeof graphTraversalDirections)[number];
 
@@ -138,9 +140,9 @@ export interface ContextManifestV1 {
   schema: 'atlas.context-manifest.v1';
   requestId: string;
   snapshotId: string;
-  graphRevision: string | null;
+  graphRevision?: string | null;
   query: string;
-  candidateBucket: AtlasCandidateBucket;
+  candidateBucket: AtlasCandidateBucket | number;
   candidateCount: number;
   tokenBudget: number;
   selectedNodeKeys: string[];
@@ -156,6 +158,31 @@ export interface ContextManifestV1 {
   };
   producerRevision: string;
 }
+
+const ContextManifestMutationAwarenessV1Schema = z.object({
+  proofPolicy: z.literal('content-hash-plus-tracked-git-provenance'),
+  freshCount: z.number().int().nonnegative(),
+  staleCount: z.number().int().nonnegative(),
+  unknownCount: z.number().int().nonnegative(),
+  missingCount: z.number().int().nonnegative(),
+  staleNodeKeys: z.array(z.string().min(1)),
+  unknownNodeKeys: z.array(z.string().min(1)),
+}).strict();
+
+export const ContextManifestV1Schema = z.object({
+  schema: z.literal('atlas.context-manifest.v1'),
+  requestId: z.string().min(1),
+  snapshotId: z.string().min(1),
+  graphRevision: z.string().min(1).nullable().optional(),
+  query: z.string(),
+  candidateBucket: z.number().int().positive(),
+  candidateCount: z.number().int().nonnegative(),
+  tokenBudget: z.number().int().positive(),
+  selectedNodeKeys: z.array(z.string().min(1)),
+  evidenceRefs: z.array(z.string().min(1)),
+  mutationAwareness: ContextManifestMutationAwarenessV1Schema.optional(),
+  producerRevision: z.string().min(1),
+}).strict();
 
 export function chooseCandidateBucket(candidateCount: number): AtlasCandidateBucket {
   const normalized = Math.max(1, Math.min(512, Math.ceil(candidateCount)));

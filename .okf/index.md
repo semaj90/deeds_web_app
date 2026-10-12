@@ -47,6 +47,7 @@ OKF serves as curated knowledge export, not replacement.
 
 ## Related Documents
 
+- [Parent Atlas Compute and Retrieval Ownership](systems/parent-atlas-compute-ownership.md)
 - [SvelteKit Vite/Vitest Lane](pipelines/sveltekit-vitest-validation.md)
 
 - [Parent Atlas Canonical Architecture](../docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md)

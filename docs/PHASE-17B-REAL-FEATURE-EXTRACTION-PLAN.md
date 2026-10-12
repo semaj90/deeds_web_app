@@ -1,6 +1,6 @@
 # Phase 17B — Real Feature Extraction — PLAN
 
-**Status**: 🔄 **READY FOR EXECUTION** (Phase 17A ✅ complete, Phase 17B scaffolding wired)
+**Status**: ⚠️ **HISTORICAL PROPOSAL — PRODUCTION EXECUTION BLOCKED** (see the 2026-10-11 status correction in `PHASE-17-PYTORCH-FEATURE-EXTRACTOR-PLAN.md`)
 **Estimated Duration**: 2-3 hours
 **Next Step**: Execute Phase 17B.1 → Phase 17B.2 → Testing
 **Blocker Status**: NONE

@@ -22,6 +22,7 @@ export const TaxonomyTupleSchema = z.object({
 export function resolveTaxonomyWorkspaceRevisionV1(env: {
   WORKSPACE_REVISION?: string;
   REPOSITORY_REVISION?: string;
+  [key: string]: string | undefined;
 }): string | null {
   const revision = String(env.WORKSPACE_REVISION ?? '').trim()
     || String(env.REPOSITORY_REVISION ?? '').trim();

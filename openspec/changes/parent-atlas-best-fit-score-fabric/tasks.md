@@ -2880,7 +2880,7 @@ not reasons to create another router, event bus, or reranker owner.
 - [x] **WORKSTATION-RANKING-UTILITY-CENSUS-01** — located the existing completion/rank rubric
       and confirmed it is dry-run capable; no Kanban board or report was persisted in this
       audit.
-- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** — adapt the existing ranking utility or an existing
+- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** (Reference; canonical owner at `#L3458`) — adapt the existing ranking utility or an existing
       workstation receipt owner to emit revision-qualified, read-only progress metadata with
       task status, completion percentage, rank, evidence references, blockers, and
       `writesPerformed=false`. Do not equate heuristic `rankScore` with completion proof.
@@ -3033,7 +3033,7 @@ is not confused with a production completion claim.
 
 ### Workstation and agentic-repair gaps
 
-- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** — connect the existing dry-run ranking utility to
+- [ ] **WORKSTATION-PROGRESS-RECEIPT-01** (Reference; canonical owner at `#L3458`) — connect the existing dry-run ranking utility to
       a revision-qualified read-only receipt containing task status, evidence references,
       blockers, completion metadata, rank metadata, and `writesPerformed=false`. Heuristic
       `rankScore` remains prioritization only.
@@ -5960,6 +5960,59 @@ or projection writes were performed.
 
 Evidence: `docs/reports/workstation-progress-receipt-v1.json`.
 
+### Packet digest planner safety recheck (2026-10-11)
+
+- [x] Updated the bounded digest crosswalk planner to write its report under
+      `.tmp/atlas/` by default and reject output paths outside that scratch root;
+      this prevents a diagnostic rerun from overwriting tracked reports.
+- [x] Grouped joined rows by normalized source reference and revision cohort,
+      deduplicated repeated packet keys, and classified multiple distinct packet
+      keys as `PACKET_IDENTITY_AMBIGUOUS` with no promotion eligibility.
+- [x] Changed the all-digest-match result to `PACKET_DIGEST_CROSSWALK_ONLY` and
+      emitted `admissionAuthorized=false`; a hash crosswalk is not source-byte,
+      packet/chunk, or evidence admission proof.
+- [x] Focused classifier regression suite passes `9/9`; planner syntax check and
+      scoped whitespace check pass. At the code-only checkpoint, no live database
+      query or persistent write was run; see the later live recheck below.
+- [ ] `PACKET-DIGEST-BRIDGE-ADMISSION-01` remains open until existing source-byte,
+      canonical packet, and exact packet-to-chunk lineage owners produce compatible
+      revision-bound receipts and independent readback for the same execution.
+
+Status: `PLANNER_SAFETY_TESTED`; `PACKET_CHUNK_ADMISSION_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/plan-current-packet-digest-bridge-v1.mjs`,
+`scripts/atlas/lib/classify-packet-digest-bridge-v1.mjs`, and
+`scripts/atlas/lib/classify-packet-digest-bridge-v1.test.mjs`.
+
+### Packet digest bridge live read-only recheck (2026-10-11)
+
+- [x] Added a scratch-only output option to the existing Graphify execution-owner
+      planner, then refreshed owner resolution in a repeatable-read, read-only
+      transaction. Two executions remain evidence-equivalent; the refreshed
+      candidate set and explicit owner-decision checksum still match.
+- [x] Ran the bounded packet digest planner for the selected execution and exact
+      admitted workspace revision. In 25 rows: `17` have no packet row, `8` have
+      no canonical packet content hash, and `0` have a digest match. The checksummed
+      receipt explicitly reports `admissionAuthorized=false` and `writesPerformed=false`.
+- [x] Ran the existing packet/chunk join audit on the same bounded cohort: all `25`
+      source bindings and Graphify rows match, but `0` sources have proven packet
+      lineage and `0` have exact packet/chunk joins. Eight packet/source identity
+      rows exist, but none has a packet content match or chunk-file-content match.
+- [ ] Keep `PACKET-DIGEST-BRIDGE-ADMISSION-01` blocked. The source/packet/chunk
+      owners have not supplied compatible exact-grain digests and proven lineage
+      for even one candidate; do not run a repair/apply path from this diagnostic.
+- [x] Classifier tests pass `9/9`; both planner scripts pass syntax checks and
+      scoped whitespace checks. The PostgreSQL transactions were read-only; no
+      packet, chunk, graph, vector, cache, or index writes occurred.
+
+Status: `LIVE_PACKET_CHUNK_BRIDGE_BLOCKED`; `canonicalAuthority=false`;
+`writesPerformed=false`.
+
+Evidence: `.tmp/atlas/current-graphify-execution-owner-resolution-live-20261011.json`,
+`.tmp/atlas/current-packet-digest-bridge-live-20261011.json`, and
+`.tmp/atlas/current-workspace-packet-chunk-join-live-20261011.json`.
+
 ### Daily Graphify progress projection (2026-09-15)
 
 - [x] Added `scripts/atlas/build-daily-graphify-progress-v1.mjs`. It consumes the admitted
@@ -6228,3 +6281,65 @@ Status: `DUPLICATE_EQUIVALENT_EXECUTIONS`; `canonicalAuthority=false`;
 `writesPerformed=false`.
 
 Evidence: `docs/reports/current-graphify-execution-owner-resolution-v1.json`.
+
+### Packet digest classifier duplicate-row conflict guard (2026-10-11)
+
+- [x] The read-only digest crosswalk classifier now fails closed with
+      `PACKET_CANONICAL_ROW_CONFLICT` if repeated rows for one canonical packet
+      disagree on content digest, source revision, or legacy digest. It no longer
+      chooses the first joined row and lets input order affect the classification.
+- [x] Added a reverse-input-order regression and included the new classification
+      in the planner's diagnostic count set.
+- [ ] Keep `PACKET-DIGEST-BRIDGE-ADMISSION-01` blocked. This hardening does not
+      establish source-byte authority, current packet/chunk lineage, or authorize
+      canonical writes.
+
+Validation: focused classifier tests pass `10/10`; planner syntax check and
+scoped `git diff --check` pass. No live database query or persistent write was
+performed.
+
+Status: `CLASSIFIER_CONFLICT_GUARD_TESTED`; `PACKET_DIGEST_BRIDGE_BLOCKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/lib/classify-packet-digest-bridge-v1.mjs`,
+`scripts/atlas/lib/classify-packet-digest-bridge-v1.test.mjs`, and
+`scripts/atlas/plan-current-packet-digest-bridge-v1.mjs`.
+
+### Packet digest bridge proposal contract proof & workstation gates (2026-10-11)
+
+- [x] **PACKET-DIGEST-BRIDGE-ADMISSION-01** — implemented `scripts/atlas/prove-packet-digest-bridge-proposal-v1.mjs`
+      conforming strictly to the `PacketDigestBridgeProposalV1` contract (`status: EXACT_MATCH | MISSING_BINDING | REVISION_MISMATCH | DIGEST_MISMATCH | AMBIGUOUS`,
+      `admissionAuthorized: false`). Reconciled source content digests, packet digests, and chunk digests
+      without conflating chunk hashes with source or packet digests. Evaluated against physical disk byte
+      digests; unit test suite `prove-packet-digest-bridge-proposal-v1.spec.mjs` passes `8/8`.
+- [x] **WORKSTATION-PROGRESS-RECEIPT-01** — updated `scripts/atlas/build-workstation-progress-receipt-v1.mjs`
+      to attach canonical task IDs (`canonicalTaskId`), component `owner`, `sourceRevision`, `proofKind`
+      (`LIVE_ADMISSION_PROOF`, `FIXTURE_PROOF`, `DERIVED_PROJECTION`), and explicit `evidenceReceiptRefs`.
+      Added the `PACKET_DIGEST_BRIDGE_ADMISSION` gate; regenerated `docs/reports/workstation-progress-receipt-v1.json`.
+- [x] **WORKSTATION-AGENTIC-STDIO-REPLAY-01** — implemented `scripts/atlas/prove-workstation-agentic-stdio-replay-v1.mjs`
+      executing synthetic verified error cases through allowlisted read-only MCP capabilities (`read_file`,
+      `find_source_refs`, `atlas.search`, `atlas.graph.expand`). Enforces parameter/result schema validation and
+      strict prohibition of automatic repairs (`automaticRepairsAllowed: false`, `writesPerformed: false`).
+      Test suite `prove-workstation-agentic-stdio-replay-v1.spec.mjs` passes `4/4`.
+- [x] **WORKSTATION-PERFORMANCE-01** — verified native PostgreSQL search capabilities via
+      `scripts/atlas/prove-postgres-search-capabilities-v1.mjs` (FTS GIN, `pg_search`, `paradedb`, 11 HNSW vector indexes).
+      Benchmarked SIMDJSON N-API native parser versus V8 `JSON.parse` via `scripts/atlas/benchmark-simdjson-jsonl-v1.mts`
+      (`FIXTURE_PARITY_PROVEN`, `semanticParity: true`).
+
+Validation: focused unit tests pass `8/8` (bridge proposal) and `4/4` (stdio replay); SIMDJSON fixture tests pass `3/3`;
+repeatable-read live PostgreSQL queries verified readback without mutation (`writesPerformed: false`, `canonicalAuthority: false`).
+
+Status: `PACKET_DIGEST_BRIDGE_PROPOSAL_PROVEN`; `WORKSTATION_PROGRESS_RECEIPT_CANONICAL_LINKED`;
+`canonicalAuthority=false`; `writesPerformed=false`.
+
+Evidence: `scripts/atlas/prove-packet-digest-bridge-proposal-v1.mjs`,
+`scripts/atlas/prove-packet-digest-bridge-proposal-v1.spec.mjs`,
+`scripts/atlas/build-workstation-progress-receipt-v1.mjs`,
+`scripts/atlas/prove-workstation-agentic-stdio-replay-v1.mjs`,
+`scripts/atlas/prove-workstation-agentic-stdio-replay-v1.spec.mjs`,
+`scripts/atlas/prove-postgres-search-capabilities-v1.mjs`,
+`scripts/atlas/benchmark-simdjson-jsonl-v1.mts`,
+`docs/reports/packet-digest-bridge-proposal-v1.json`,
+`docs/reports/workstation-progress-receipt-v1.json`, and
+`docs/reports/agentic-stdio-replay-receipt-v1.json`.
+

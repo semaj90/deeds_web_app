@@ -137,3 +137,13 @@ It contains 466 archived checklist rows, 297 historically checked and 169 histor
 the archived `sourceRef` and the TODO SHA-256 `sourceRevision`. These are candidate mappings only:
 no OpenSpec task was copied, closed, or merged. DOC-GOV-MASTER-TODO-05 remains open until
 ambiguous-match review is explicitly represented and human-reviewed.
+
+## Next steps — TOC check drift and disk-bounded verification (2026-10-11)
+
+Evidence: `node scripts/atlas/build-master-toc.mjs` is deterministic for fixed inputs (two runs into scratch produced identical `MASTER-TOC.md` bytes only when no input changed). Between two runs, three `openspec/changes/*/tasks.md` files were modified by concurrent writers, which changed the registry checksum. `--check` therefore fails on input drift, not generator logic. A clean HEAD export previously passed build-then-check.
+
+- [ ] **DOC-GOV-TOC-CHECK-01** Make `--check` report `INPUT_DRIFT` (inputs hashed before and after the read pass changed) separately from `OUTPUT_MISMATCH` (inputs stable, bytes differ). Acceptance: a deliberate edit during the run yields `INPUT_DRIFT`; a quiescent tree yields `MASTER_TOC_CHECK_OK`.
+- [ ] **DOC-GOV-TOC-VERIFY-01** Verify without copying directories: run the build with output redirected to scratch (preload that rewrites the three output paths), then `cmp` against the repo files. Record the result in a receipt. Do not `robocopy` or junction the repo into scratch.
+- [ ] **DOC-GOV-TOC-SNAPSHOT-01** Optional: pin the generator's inputs to a git revision (`git ls-files` + `git show`) when a deterministic receipt is required, instead of reading the live working tree. Defer until DOC-GOV-TOC-CHECK-01 shows whether drift is the only cause.
+- [ ] **DOC-GOV-TOC-CLAUDE-SYNC-01** Keep the "Revision definitions" table in `scripts/atlas/build-master-toc.mjs` identical in wording to the `sourceRevision and workspaceRevision` sections in `codex.md` and `CLAUDE.md`. Add a check so future edits to either side are caught.
+- [ ] **DOC-GOV-DISK-GUARD-01** Before any build that writes the 9.9 MB registry, check free space on the repo drive and refuse below a set threshold. Disk exhaustion at 0.1 GB free was the reason the earlier reproduction copy never completed.

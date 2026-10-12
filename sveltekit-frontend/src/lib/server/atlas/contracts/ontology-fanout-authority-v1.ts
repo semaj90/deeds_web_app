@@ -47,6 +47,15 @@ export const OntologyFanoutBlockerCodeSchema = z.enum([
   'FANOUT_PRODUCER_REVISION_INVALID',
   'FANOUT_EVIDENCE_REQUIRED',
   'FANOUT_EVIDENCE_NOT_GROUNDED_IN_TUPLE',
+  'FANOUT_TUPLE_SOURCE_REVISION_MISMATCH',
+  'FANOUT_TUPLE_WORKSPACE_REVISION_MISMATCH',
+  'FANOUT_TUPLE_REPRESENTATION_ID_MISMATCH',
+  'FANOUT_TUPLE_REPRESENTATION_REVISION_MISMATCH',
+  'FANOUT_TUPLE_FEATURE_REVISION_MISMATCH',
+  'FANOUT_TUPLE_ONTOLOGY_REVISION_MISMATCH',
+  'FANOUT_TUPLE_PRODUCER_REVISION_MISMATCH',
+  'FANOUT_TUPLE_GRAPH_REVISION_MISMATCH',
+  'FANOUT_TUPLE_EVIDENCE_NOT_ACTIVE_VERIFIED',
   'FANOUT_ONTOLOGY_IDS_REQUIRED',
   'FANOUT_CONCEPT_IDS_REQUIRED',
   'FANOUT_ONTOLOGY_ID_MISMATCH',
@@ -83,13 +92,16 @@ export interface OntologyFanoutEvaluationV1 {
   taxonomyCandidateEligible: boolean;
   canonicalTupleEligible: boolean;
   graphFanoutEligible: boolean;
+  canonicalAuthority: false;
+  admissionAuthorized: false;
   blockers: OntologyFanoutBlockerCode[];
 }
 
 /**
- * Evaluate a linked tuple against explicit authority. No ID/revision is
- * synthesized and no fallback such as sourceRevision -> graphRevision is
- * permitted.
+ * Compare a linked tuple to a caller-provided lineage envelope. This pure
+ * contract check is not an independent authority readback or admission decision.
+ * No ID/revision is synthesized and no fallback such as sourceRevision to
+ * graphRevision is permitted.
  */
 export function evaluateOntologyFanoutAuthorityV1(
   tuple: OntologyLinkedTupleV1,
@@ -102,6 +114,8 @@ export function evaluateOntologyFanoutAuthorityV1(
       taxonomyCandidateEligible: false,
       canonicalTupleEligible: false,
       graphFanoutEligible: false,
+      canonicalAuthority: false,
+      admissionAuthorized: false,
       blockers: ['FANOUT_AUTHORITY_MISSING'],
     };
   }
@@ -113,6 +127,8 @@ export function evaluateOntologyFanoutAuthorityV1(
       taxonomyCandidateEligible: false,
       canonicalTupleEligible: false,
       graphFanoutEligible: false,
+      canonicalAuthority: false,
+      admissionAuthorized: false,
       blockers: ['FANOUT_AUTHORITY_MISSING'],
     };
   }
@@ -128,6 +144,17 @@ export function evaluateOntologyFanoutAuthorityV1(
   if (!isAuthoritativeRevisionToken(authority.ontologyRevision)) blockers.push('FANOUT_ONTOLOGY_REVISION_INVALID');
   if (!isAuthoritativeRevisionToken(authority.producerRevision)) blockers.push('FANOUT_PRODUCER_REVISION_INVALID');
 
+  if (tuple.provenance.sourceRevision !== authority.sourceRevision) blockers.push('FANOUT_TUPLE_SOURCE_REVISION_MISMATCH');
+  if (tuple.provenance.workspaceRevision !== authority.workspaceRevision) blockers.push('FANOUT_TUPLE_WORKSPACE_REVISION_MISMATCH');
+  if (tuple.provenance.representationId !== authority.representationId) blockers.push('FANOUT_TUPLE_REPRESENTATION_ID_MISMATCH');
+  if (String(tuple.provenance.representationRevision ?? '') !== String(authority.representationRevision)) {
+    blockers.push('FANOUT_TUPLE_REPRESENTATION_REVISION_MISMATCH');
+  }
+  if (tuple.provenance.featureRevision !== authority.featureRevision) blockers.push('FANOUT_TUPLE_FEATURE_REVISION_MISMATCH');
+  if (tuple.provenance.ontologyRevision !== authority.ontologyRevision) blockers.push('FANOUT_TUPLE_ONTOLOGY_REVISION_MISMATCH');
+  if (tuple.provenance.producerRevision !== authority.producerRevision) blockers.push('FANOUT_TUPLE_PRODUCER_REVISION_MISMATCH');
+  if (tuple.evidenceState !== 'ACTIVE_VERIFIED') blockers.push('FANOUT_TUPLE_EVIDENCE_NOT_ACTIVE_VERIFIED');
+
   if (tuple.evidenceRefs.length === 0 || authority.evidenceRefs.length === 0) blockers.push('FANOUT_EVIDENCE_REQUIRED');
   else if (!includesAll(tuple.evidenceRefs, authority.evidenceRefs)) blockers.push('FANOUT_EVIDENCE_NOT_GROUNDED_IN_TUPLE');
 
@@ -138,19 +165,26 @@ export function evaluateOntologyFanoutAuthorityV1(
     if (!includesAll(tuple.conceptIds, authority.conceptIds)) blockers.push('FANOUT_CONCEPT_ID_MISMATCH');
   }
 
-  const canonicalBlockers = blockers.filter((code) => code !== 'GRAPH_FANOUT_GRAPH_REVISION_REQUIRED');
+  const canonicalBlockers = blockers.filter((code) =>
+    code !== 'GRAPH_FANOUT_GRAPH_REVISION_REQUIRED' &&
+    code !== 'FANOUT_TUPLE_GRAPH_REVISION_MISMATCH'
+  );
   const canonicalTupleEligible =
     tuple.evidenceState === 'ACTIVE_VERIFIED' &&
     canonicalBlockers.length === 0;
 
   const graphRevisionValid = isAuthoritativeRevisionToken(authority.graphRevision);
   if (!graphRevisionValid) blockers.push('GRAPH_FANOUT_GRAPH_REVISION_REQUIRED');
+  else if (tuple.provenance.graphRevision !== authority.graphRevision) blockers.push('FANOUT_TUPLE_GRAPH_REVISION_MISMATCH');
 
   return {
     cacheEligible: canonicalTupleEligible,
     taxonomyCandidateEligible: canonicalTupleEligible && tuple.labelKind === 'ontology',
     canonicalTupleEligible,
-    graphFanoutEligible: canonicalTupleEligible && graphRevisionValid,
+    graphFanoutEligible: canonicalTupleEligible && graphRevisionValid &&
+      !blockers.includes('FANOUT_TUPLE_GRAPH_REVISION_MISMATCH'),
+    canonicalAuthority: false,
+    admissionAuthorized: false,
     blockers: Array.from(new Set(blockers)),
   };
 }

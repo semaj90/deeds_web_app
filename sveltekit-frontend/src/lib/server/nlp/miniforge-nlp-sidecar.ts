@@ -673,13 +673,19 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
       if (raw.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(raw.chunks)) {
         throw new Error('[miniforge-nlp] ast/chunk returned an invalid atlas.ast.evidence.v1 payload');
       }
+      if (raw.source_revision !== req.sourceRevision) {
+        throw new Error('[miniforge-nlp] ast/chunk source_revision does not match the request correlation token');
+      }
+      if (raw.file_path !== req.filePath) {
+        throw new Error('[miniforge-nlp] ast/chunk file_path does not match the requested source reference');
+      }
       return {
         schema: raw.schema,
         engine: String(raw.engine ?? 'unknown'),
         engine_version: String(raw.engine_version ?? 'unknown'),
         language: String(raw.language ?? req.language),
-        file_path: String(raw.file_path ?? req.filePath),
-        source_revision: String(raw.source_revision ?? req.sourceRevision),
+        file_path: raw.file_path,
+        source_revision: raw.source_revision,
         chunks: raw.chunks.map((chunk) => ({
           upstream_chunk_id: chunk.upstream_chunk_id,
           upstream_node_id: chunk.upstream_node_id,

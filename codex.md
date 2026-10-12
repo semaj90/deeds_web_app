@@ -74,6 +74,23 @@ Object storage rule:
 - Legacy names such as `minio_key`, `MINIO_*`, or `minio-client.ts` may remain only where the live schema or compatibility layer still requires them.
 - New ingestion paths should describe and generate SeaweedFS or generic S3 object keys, while preserving legacy column names until a deliberate schema rename lands.
 
+## sourceRevision and workspaceRevision (canonical definitions, 2026-10-11)
+
+Use these terms exactly. Agentic workflows must not infer a revision from a filename, mtime, git HEAD alone, or a chunk hash.
+
+| Term | Definition | Owner |
+|---|---|---|
+| `sourceRevision` | `sha256:<64 lowercase hex>` over the exact UTF-8 bytes of one source file. Empty, non-UTF-8, or unreadable files have no `sourceRevision`. | `identity/code-source-revision-v1.ts` (`deriveCodeSourceRevisionV1`) |
+| `workspaceRevision` | `sha256:` over a sorted manifest of `(sourceRef, sourceRevision, contentDigest, byteLength, gitBlobOid)` for the indexed source set. Git commit/tree and `dirty` are provenance only. Non-authoritative. | `identity/workspace-source-binding-v1.ts`, `indexing/workspace-revision-origin-runtime-v1.ts` |
+
+Rules:
+
+- A `sourceRevision` is valid only when the exact bytes were read. Never recompute it from a re-encoded or normalized string.
+- `workspaceRevision` is not a substitute for `sourceRevision`. Compare the two only through a recorded binding.
+- Known gap: files skipped for size (over 5 MB), encoding, or read error are absent from the digest, so two trees differing only in a skipped file share a `workspaceRevision`. Do not cite a `workspaceRevision` as complete coverage until the `v2` hardening lands (skipped-set, extension-set, and excluded-prefix digests).
+- Git blob OIDs (`gitBlobOid`) are provenance anchors, never identity.
+- Each revision is a separate namespace from `packet_key`, `chunk_content_hash`, `representation_revision`, and `feature_revision`.
+
 ## Binary bytes, SHA-256, and Parent Atlas revision lineage (2026-09-16)
 
 Keep these concepts separate in every future integration:
@@ -130,6 +147,13 @@ DuckDB, Redis/BitFrost, Qdrant, centroids, and GPU identifiers remain projection
 
 RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 
+### Qdrant document point IDs
+
+- `deterministicPointId()` remains the legacy integer helper; do not silently change its return type or existing callers.
+- New document-index experiments may use `deterministicQdrantDocumentPointIdV1()` with the separately derived, frozen `QDRANT_DOCUMENT_POINT_NAMESPACE_V1` and the length-framed tuple `(packetKey, chunkId, sourceRevision, representationRevision, embeddingModelRevision)`.
+- Record `uuidAlgorithm`, `uuidNamespace`, `uuidName`, and `canonicalIdentity: false` in any derived-index manifest. The UUID is a projection key, not packet identity or upsert authorization.
+- Do not switch an indexer or migrate persisted IDs until the exact canonical input fields, existing integer-ID compatibility, collection state, and independent readback are reviewed and the migration is explicitly authorized.
+
 ## Embedding executor fallback
 
 - For read-only retrieval diagnostics, first health-check the configured approved embedding executors (including strict `:8081` and other configured services). If they are unavailable, retry with Ollama `embeddinggemma:latest` at `:11434` rather than abandoning the diagnostic immediately.
@@ -144,6 +168,11 @@ RFC 9562 is the reference for UUIDv4, UUIDv5, UUIDv7, and UUIDv8 semantics.
 - A successful TRACE/MCP call or FastAPI NLP health response does not establish ACP/A2A protocol conformance, Mastra/OpenCode MCP integration, a trusted non-human reviewer, source/module digest parity, evidence admission, or human authorization. Report each as unverified unless its owning protocol and evidence checks pass.
 - Model, agent, HMM, or Viterbi review/routing may produce advisory proposals only. Tool invocation remains governed by the existing allowlisted registry, input/output schema validation, permissions, execution policy, and independent readback. Never infer authorization from a score, tool name, or successful health check.
 - Ontology tuples must come from grounded typed relations and the existing tuple admission owner; Oaklib term resolution, cosine/centroid similarity, summaries, cache hints, and TaskCard admission do not create relation evidence. ContextManifest synthesis must consume independently admitted evidence and bind its receipt to the exact manifest, model, and prompt revisions.
+- Cross-runtime serialization and transport tiers:
+  - `simdjson` N-API threshold: use native V8 `JSON.parse()` for $< 1\text{ KB}$; dispatch to native N-API addon (`simd_bridge_rs.node` / `tensorrt_bridge.node`) via `parseNdjsonTypedEvidence` for $\ge 1\text{ KB}$ (NDJSON, bulk batches). Validate via Zod before promoting to `TypedEvidenceEnvelopeV1`.
+  - Python OakLib `Tuple[str, str, str, float]` serializes over HTTP JSON as arrays `[s, p, o, conf]`. TypeScript maps them as `RawOaklibTuple = readonly [string, string, string, number?]` and adapts into structured `OntologyLinkedTupleV1`.
+  - Tuples must be committed to PostgreSQL `atlas_ontology_linked_tuples` before writing to Valkey cache via `buildOntologyLinkedTupleCachePlan`. Valkey cache plans are partitioned by centroid keys (`atlas:centroid:domain:...`, `atlas:centroid:kmeans:...`, `atlas:centroid:som:...`). Review candidates are derived via `deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1` fail-open only from verified persisted tuples.
+  - Transport Matrix: Browser $\leftrightarrow$ SvelteKit uses `tRPC`; SvelteKit $\leftrightarrow$ Python NLP/OakLib uses `FastAPI` (HTTP/NDJSON); SvelteKit $\leftrightarrow$ Go Retrieval uses `gRPC`; SvelteKit $\leftrightarrow$ Valkey uses `RESP3` (`ioredis` with credentials and error handlers).
 
 ## GPU lane switch: WSL2 miniforge/conda work vs the Ornith :8090 server (2026-10-04)
 

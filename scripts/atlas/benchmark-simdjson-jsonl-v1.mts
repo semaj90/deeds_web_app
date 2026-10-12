@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
-import { createReadStream, mkdirSync, statSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { z } from 'zod';
 import {
 	clearSimdjsonCache,
@@ -13,8 +13,20 @@ import { parseNdjsonTypedEvidenceStream } from '../../sveltekit-frontend/src/lib
 type ParsedBackend = 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'CACHE';
 
 const root = resolve(import.meta.dirname, '../..');
-const records = parseRecordCount(process.argv[2]);
-const scratch = resolve(root, '.tmp/atlas/simdjson-jsonl-benchmark-v1');
+const args = process.argv.slice(2);
+const scratchArgument = args.find((argument) => argument.startsWith('--scratch='))?.slice('--scratch='.length);
+const recordsArgument = args.find((argument) => !argument.startsWith('--scratch='));
+const records = parseRecordCount(recordsArgument);
+const defaultScratch = resolve(root, '.tmp/atlas/simdjson-jsonl-benchmark-v1');
+const scratch = scratchArgument ? resolve(root, scratchArgument) : defaultScratch;
+const atlasScratchRoot = resolve(root, '.tmp/atlas');
+const relativeScratch = relative(atlasScratchRoot, scratch);
+if (scratchArgument && (relativeScratch === '' || relativeScratch === '..' || relativeScratch.startsWith(`..${sep}`) || isAbsolute(relativeScratch))) {
+	throw new Error('SIMDJSON_BENCHMARK_SCRATCH_MUST_BE_A_NEW_PATH_UNDER_TMP_ATLAS');
+}
+if (scratchArgument && existsSync(scratch)) {
+	throw new Error('SIMDJSON_BENCHMARK_SCRATCH_ALREADY_EXISTS');
+}
 const inputPath = resolve(scratch, 'fixture.jsonl');
 const reportPath = resolve(scratch, `receipt-${new Date().toISOString().replace(/[-:.]/g, '')}.json`);
 const addonAvailable = isSimdJsonAvailable();

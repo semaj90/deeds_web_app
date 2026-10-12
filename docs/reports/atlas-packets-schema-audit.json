@@ -1,0 +1,1528 @@
+{
+  "timestamp": "2026-10-11T22:49:00.852Z",
+  "table": "atlas_packets",
+  "totalRows": 61718,
+  "totalSize": "1825 MB",
+  "tableSize": "354 MB",
+  "indexesSize": "966 MB",
+  "columns": {
+    "total": 144,
+    "list": [
+      {
+        "name": "packet_id",
+        "type": "text",
+        "nullable": false,
+        "default": null
+      },
+      {
+        "name": "artifact_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "packet_key",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_ref",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_ref_key",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "file_path",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "directory_path",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "feature_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "feature_label",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "community_id",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "concept_ids",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "cluster_id",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "embedding",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "payload",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'{}'::jsonb"
+      },
+      {
+        "name": "metadata",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'{}'::jsonb"
+      },
+      {
+        "name": "permissions",
+        "type": "jsonb",
+        "nullable": false,
+        "default": "'{\"source\": \"repo_index\", \"can_write\": false, \"can_export\": false, \"visibility\": \"internal\", \"can_execute\": false}'::jsonb"
+      },
+      {
+        "name": "topology",
+        "type": "jsonb",
+        "nullable": false,
+        "default": "'{}'::jsonb"
+      },
+      {
+        "name": "vectors",
+        "type": "jsonb",
+        "nullable": false,
+        "default": "'{}'::jsonb"
+      },
+      {
+        "name": "summary",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "tags",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "byte_start",
+        "type": "bigint",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "byte_end",
+        "type": "bigint",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "sha256",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_kind",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_path",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "group_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "packet_universe",
+        "type": "text",
+        "nullable": true,
+        "default": "'atlas'::text"
+      },
+      {
+        "name": "qdrant_point_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "qdrant_collection",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "qdrant_vector_dim",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "identity_lane",
+        "type": "text",
+        "nullable": true,
+        "default": "'qdrant_chunk'::text"
+      },
+      {
+        "name": "identity_confidence",
+        "type": "double precision",
+        "nullable": true,
+        "default": "1.0"
+      },
+      {
+        "name": "som_cluster",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_row",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_col",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_index",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "kmeans_cluster",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "pagerank",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "betweenness",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "eigenvector",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "neo4j_node_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "redis_centroid_key",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "latent_64",
+        "type": "bytea",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "reward_prior",
+        "type": "double precision",
+        "nullable": true,
+        "default": "0"
+      },
+      {
+        "name": "created_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": "now()"
+      },
+      {
+        "name": "updated_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": "now()"
+      },
+      {
+        "name": "function_symbol",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "content_embedding_384",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "embedding_status",
+        "type": "text",
+        "nullable": true,
+        "default": "'pending'::text"
+      },
+      {
+        "name": "embedding_timestamp",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "extracted_entities",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'[]'::jsonb"
+      },
+      {
+        "name": "keywords",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": "'{}'::text[]"
+      },
+      {
+        "name": "error_pattern",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "feature_group_id",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "domain_class",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "taxonomy_level",
+        "type": "integer",
+        "nullable": true,
+        "default": "0"
+      },
+      {
+        "name": "bm25_indexed_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "bm25_score",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "bm25_terms",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "packet_ulid",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "title_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "canonical_source_ref",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "page_rank_score",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "kmeans_cluster_id",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "tree_node_id",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "routing_hints",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "community_source",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "community_confidence",
+        "type": "numeric",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "lineage_version",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ledger_type",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "canonical",
+        "type": "boolean",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "payload_backfilled_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "k_core",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ngrams",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "trigrams",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "engrams",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "used_concepts",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "topolog_cluster",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "topolog_confidence",
+        "type": "real",
+        "nullable": true,
+        "default": "0.5"
+      },
+      {
+        "name": "topolog_method",
+        "type": "text",
+        "nullable": true,
+        "default": "'unassigned'::text"
+      },
+      {
+        "name": "topolog_applied_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "repository_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "directory_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "file_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "module_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "symbol_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "chunk_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "recovery_lane",
+        "type": "text",
+        "nullable": true,
+        "default": "'canonical'::text"
+      },
+      {
+        "name": "som_cluster_id",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ontology",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "packet_type_test",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "packet_type",
+        "type": "text",
+        "nullable": true,
+        "default": "'code'::text"
+      },
+      {
+        "name": "packet_ontology",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'{\"tags\": [], \"examples\": {}, \"constraints\": {}, \"capabilities\": []}'::jsonb"
+      },
+      {
+        "name": "parent_packet_key",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "related_packets",
+        "type": "ARRAY",
+        "nullable": true,
+        "default": "'{}'::text[]"
+      },
+      {
+        "name": "telemetry",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'{\"failure_count\": 0, \"success_count\": 0, \"avg_latency_ms\": 0, \"execution_count\": 0}'::jsonb"
+      },
+      {
+        "name": "embedding_eligible",
+        "type": "boolean",
+        "nullable": false,
+        "default": "false"
+      },
+      {
+        "name": "summary_hash",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "embedding_version",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "embedding_claimed_at",
+        "type": "timestamp with time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "embedding_claimed_by",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "feature_envelope",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "domain_confidence",
+        "type": "double precision",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "title_generator_version",
+        "type": "text",
+        "nullable": true,
+        "default": "'v1'::text"
+      },
+      {
+        "name": "file_purpose",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": "'other'::file_purpose_enum"
+      },
+      {
+        "name": "thoroughness",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": "'stub'::thoroughness_enum"
+      },
+      {
+        "name": "app_criticality",
+        "type": "USER-DEFINED",
+        "nullable": true,
+        "default": "'optional'::app_criticality_enum"
+      },
+      {
+        "name": "test_coverage_pct",
+        "type": "integer",
+        "nullable": true,
+        "default": "0"
+      },
+      {
+        "name": "file_understanding_computed_at",
+        "type": "timestamp without time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "file_understanding_method",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "openspec_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "gsd_id",
+        "type": "uuid",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "enrichment_updated_at",
+        "type": "timestamp without time zone",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_cell_x",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_cell_y",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "ast_score",
+        "type": "real",
+        "nullable": true,
+        "default": "0.0"
+      },
+      {
+        "name": "community_boost",
+        "type": "real",
+        "nullable": true,
+        "default": "1.0"
+      },
+      {
+        "name": "rerank_features",
+        "type": "jsonb",
+        "nullable": true,
+        "default": "'{}'::jsonb"
+      },
+      {
+        "name": "pagerank_score",
+        "type": "real",
+        "nullable": true,
+        "default": "0.0"
+      },
+      {
+        "name": "som_distance",
+        "type": "real",
+        "nullable": true,
+        "default": "0.0"
+      },
+      {
+        "name": "predicted_domain",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "classifier_kind",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "classifier_version",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "pagerank_raw",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "authority_score",
+        "type": "real",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "workspace_id",
+        "type": "character varying",
+        "nullable": true,
+        "default": "'unknown'::character varying"
+      },
+      {
+        "name": "semantic_anchor",
+        "type": "character varying",
+        "nullable": true,
+        "default": "'unknown'::character varying"
+      },
+      {
+        "name": "ontology_version",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "content_hash",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "domain_memberships",
+        "type": "jsonb",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "primary_domain",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "workspace_revision",
+        "type": "integer",
+        "nullable": false,
+        "default": "0"
+      },
+      {
+        "name": "representation_revision",
+        "type": "integer",
+        "nullable": false,
+        "default": "0"
+      },
+      {
+        "name": "embedding_digest",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_representation_id",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_dimension",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "projection_representation_id",
+        "type": "character varying",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "projection_dimension",
+        "type": "integer",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "encoder_revision",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "som_revision",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "source_revision",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "workspace_revision_key",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "lineage_binding_checksum",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      },
+      {
+        "name": "lineage_producer_revision",
+        "type": "text",
+        "nullable": true,
+        "default": null
+      }
+    ]
+  },
+  "indexes": {
+    "total": 92,
+    "gin": 24,
+    "btree": 67,
+    "hnsw": 0,
+    "list": [
+      {
+        "name": "atlas_packets_domain_unclassified_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX atlas_packets_domain_unclassified_idx ON public.atlas_packets USING btree (packet_key) WHERE (domain_class IS NULL)"
+      },
+      {
+        "name": "atlas_packets_metadata_gin_idx",
+        "type": "GIN",
+        "definition": "CREATE INDEX atlas_packets_metadata_gin_idx ON public.atlas_packets USING gin (metadata)"
+      },
+      {
+        "name": "atlas_packets_packet_key_key",
+        "type": "BTREE",
+        "definition": "CREATE UNIQUE INDEX atlas_packets_packet_key_key ON public.atlas_packets USING btree (packet_key)"
+      },
+      {
+        "name": "atlas_packets_pkey",
+        "type": "BTREE",
+        "definition": "CREATE UNIQUE INDEX atlas_packets_pkey ON public.atlas_packets USING btree (packet_id)"
+      },
+      {
+        "name": "atlas_packets_workspace_representation_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX atlas_packets_workspace_representation_idx ON public.atlas_packets USING btree (workspace_revision, representation_revision, packet_key) WHERE (workspace_revision IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_ast_score",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_ast_score ON public.atlas_packets USING btree (ast_score)"
+      },
+      {
+        "name": "idx_atlas_packets_bm25_indexed_at",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_bm25_indexed_at ON public.atlas_packets USING btree (bm25_indexed_at DESC)"
+      },
+      {
+        "name": "idx_atlas_packets_bm25_terms",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_bm25_terms ON public.atlas_packets USING gin (bm25_terms)"
+      },
+      {
+        "name": "idx_atlas_packets_canonical_source_ref",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_canonical_source_ref ON public.atlas_packets USING btree (canonical_source_ref)"
+      },
+      {
+        "name": "idx_atlas_packets_chunk_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_chunk_id ON public.atlas_packets USING btree (chunk_id)"
+      },
+      {
+        "name": "idx_atlas_packets_community_boost",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_community_boost ON public.atlas_packets USING btree (community_boost)"
+      },
+      {
+        "name": "idx_atlas_packets_community_confidence_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_community_confidence_idx ON public.atlas_packets USING btree (community_confidence)"
+      },
+      {
+        "name": "idx_atlas_packets_community_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_community_id ON public.atlas_packets USING btree (community_id)"
+      },
+      {
+        "name": "idx_atlas_packets_community_id_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_community_id_idx ON public.atlas_packets USING btree (community_id)"
+      },
+      {
+        "name": "idx_atlas_packets_community_source_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_community_source_idx ON public.atlas_packets USING btree (community_source)"
+      },
+      {
+        "name": "idx_atlas_packets_concept_ids",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_concept_ids ON public.atlas_packets USING gin (concept_ids)"
+      },
+      {
+        "name": "idx_atlas_packets_directory_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_directory_id ON public.atlas_packets USING btree (directory_id)"
+      },
+      {
+        "name": "idx_atlas_packets_domain_class",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_domain_class ON public.atlas_packets USING btree (domain_class)"
+      },
+      {
+        "name": "idx_atlas_packets_domain_class_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_domain_class_idx ON public.atlas_packets USING btree (domain_class)"
+      },
+      {
+        "name": "idx_atlas_packets_domain_confidence",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_domain_confidence ON public.atlas_packets USING btree (domain_confidence) WHERE ((domain_confidence IS NOT NULL) AND (domain_confidence > (0.7)::double precision))"
+      },
+      {
+        "name": "idx_atlas_packets_domain_memberships",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_domain_memberships ON public.atlas_packets USING gin (domain_memberships)"
+      },
+      {
+        "name": "idx_atlas_packets_embedding_digest",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_embedding_digest ON public.atlas_packets USING btree (embedding_digest)"
+      },
+      {
+        "name": "idx_atlas_packets_embedding_status",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_embedding_status ON public.atlas_packets USING btree (embedding_status) WHERE (embedding_status = 'pending'::text)"
+      },
+      {
+        "name": "idx_atlas_packets_envelope_fts",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_envelope_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, ((((((COALESCE((payload ->> 'title'::text), ''::text) || ' '::text) || COALESCE(summary, ''::text)) || ' '::text) || COALESCE(feature_label, ''::text)) || ' '::text) || COALESCE(feature_id, ''::text))))"
+      },
+      {
+        "name": "idx_atlas_packets_error_pattern",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_error_pattern ON public.atlas_packets USING btree (error_pattern)"
+      },
+      {
+        "name": "idx_atlas_packets_extracted_entities",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_extracted_entities ON public.atlas_packets USING gin (extracted_entities)"
+      },
+      {
+        "name": "idx_atlas_packets_feature_group_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_feature_group_id ON public.atlas_packets USING btree (feature_group_id)"
+      },
+      {
+        "name": "idx_atlas_packets_feature_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_feature_id ON public.atlas_packets USING btree (feature_id)"
+      },
+      {
+        "name": "idx_atlas_packets_feature_id_composite",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_feature_id_composite ON public.atlas_packets USING btree (feature_id, feature_label)"
+      },
+      {
+        "name": "idx_atlas_packets_feature_id_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_feature_id_idx ON public.atlas_packets USING btree (feature_id)"
+      },
+      {
+        "name": "idx_atlas_packets_feature_label_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_feature_label_idx ON public.atlas_packets USING btree (feature_label)"
+      },
+      {
+        "name": "idx_atlas_packets_file_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_file_id ON public.atlas_packets USING btree (file_id)"
+      },
+      {
+        "name": "idx_atlas_packets_file_path",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_file_path ON public.atlas_packets USING btree (file_path)"
+      },
+      {
+        "name": "idx_atlas_packets_file_path_trgm",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_file_path_trgm ON public.atlas_packets USING gin (file_path gin_trgm_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_hierarchy",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_hierarchy ON public.atlas_packets USING btree (repository_id, directory_id, file_id, module_id, symbol_id, feature_id)"
+      },
+      {
+        "name": "idx_atlas_packets_identity_compound_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_identity_compound_idx ON public.atlas_packets USING btree (packet_key, source_ref, feature_id, title_id)"
+      },
+      {
+        "name": "idx_atlas_packets_identity_lane",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_identity_lane ON public.atlas_packets USING btree (identity_lane)"
+      },
+      {
+        "name": "idx_atlas_packets_keywords",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_keywords ON public.atlas_packets USING gin (keywords)"
+      },
+      {
+        "name": "idx_atlas_packets_kmeans_cluster_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_kmeans_cluster_id ON public.atlas_packets USING btree (kmeans_cluster_id)"
+      },
+      {
+        "name": "idx_atlas_packets_kmeans_cluster_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_kmeans_cluster_idx ON public.atlas_packets USING btree (kmeans_cluster)"
+      },
+      {
+        "name": "idx_atlas_packets_ledger_type_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_ledger_type_idx ON public.atlas_packets USING btree (ledger_type)"
+      },
+      {
+        "name": "idx_atlas_packets_lineage_binding_checksum",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_lineage_binding_checksum ON public.atlas_packets USING btree (lineage_binding_checksum) WHERE (lineage_binding_checksum IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_lineage_version_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_lineage_version_idx ON public.atlas_packets USING btree (lineage_version)"
+      },
+      {
+        "name": "idx_atlas_packets_metadata_gin",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_metadata_gin ON public.atlas_packets USING gin (metadata)"
+      },
+      {
+        "name": "idx_atlas_packets_metadata_gin_pathops",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_metadata_gin_pathops ON public.atlas_packets USING gin (metadata jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_module_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_module_id ON public.atlas_packets USING btree (module_id)"
+      },
+      {
+        "name": "idx_atlas_packets_neo4j_node_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_neo4j_node_id ON public.atlas_packets USING btree (neo4j_node_id) WHERE (neo4j_node_id IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_ontology_gin",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_ontology_gin ON public.atlas_packets USING gin (packet_ontology)"
+      },
+      {
+        "name": "idx_atlas_packets_packet_key",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_packet_key ON public.atlas_packets USING btree (packet_key)"
+      },
+      {
+        "name": "idx_atlas_packets_packet_key_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_packet_key_idx ON public.atlas_packets USING btree (packet_key)"
+      },
+      {
+        "name": "idx_atlas_packets_packet_ulid",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_packet_ulid ON public.atlas_packets USING btree (packet_ulid)"
+      },
+      {
+        "name": "idx_atlas_packets_page_rank_score",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_page_rank_score ON public.atlas_packets USING btree (page_rank_score DESC NULLS LAST)"
+      },
+      {
+        "name": "idx_atlas_packets_pagerank_score",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_pagerank_score ON public.atlas_packets USING btree (pagerank_score)"
+      },
+      {
+        "name": "idx_atlas_packets_payload_gin",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_gin ON public.atlas_packets USING gin (payload)"
+      },
+      {
+        "name": "idx_atlas_packets_payload_gin_pathops",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_gin_pathops ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_payload_path",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_payload_path ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_permissions_gin_pathops",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_permissions_gin_pathops ON public.atlas_packets USING gin (permissions jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_primary_domain",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_primary_domain ON public.atlas_packets USING btree (primary_domain) WHERE (primary_domain IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_qdrant_point_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_qdrant_point_id ON public.atlas_packets USING btree (qdrant_point_id)"
+      },
+      {
+        "name": "idx_atlas_packets_redis_centroid_key",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_redis_centroid_key ON public.atlas_packets USING btree (redis_centroid_key) WHERE (redis_centroid_key IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_repository_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_repository_id ON public.atlas_packets USING btree (repository_id)"
+      },
+      {
+        "name": "idx_atlas_packets_representation_revision",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_representation_revision ON public.atlas_packets USING btree (representation_revision)"
+      },
+      {
+        "name": "idx_atlas_packets_rerank_features",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_rerank_features ON public.atlas_packets USING gin (rerank_features)"
+      },
+      {
+        "name": "idx_atlas_packets_routing_hints",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_routing_hints ON public.atlas_packets USING gin (routing_hints)"
+      },
+      {
+        "name": "idx_atlas_packets_som_cell",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_som_cell ON public.atlas_packets USING btree (som_cell_x, som_cell_y)"
+      },
+      {
+        "name": "idx_atlas_packets_som_cluster",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_som_cluster ON public.atlas_packets USING btree (som_cluster)"
+      },
+      {
+        "name": "idx_atlas_packets_som_distance",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_som_distance ON public.atlas_packets USING btree (som_distance)"
+      },
+      {
+        "name": "idx_atlas_packets_som_index",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_som_index ON public.atlas_packets USING btree (som_index)"
+      },
+      {
+        "name": "idx_atlas_packets_som_index_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_som_index_idx ON public.atlas_packets USING btree (som_index)"
+      },
+      {
+        "name": "idx_atlas_packets_source_feature",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_feature ON public.atlas_packets USING btree (source_ref, feature_id)"
+      },
+      {
+        "name": "idx_atlas_packets_source_kind",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_kind ON public.atlas_packets USING btree (source_kind)"
+      },
+      {
+        "name": "idx_atlas_packets_source_ref",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_ref ON public.atlas_packets USING btree (source_ref)"
+      },
+      {
+        "name": "idx_atlas_packets_source_ref_idx",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_ref_idx ON public.atlas_packets USING btree (source_ref)"
+      },
+      {
+        "name": "idx_atlas_packets_source_ref_key",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_ref_key ON public.atlas_packets USING btree (source_ref_key)"
+      },
+      {
+        "name": "idx_atlas_packets_source_revision",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_source_revision ON public.atlas_packets USING btree (source_revision) WHERE (source_revision IS NOT NULL)"
+      },
+      {
+        "name": "idx_atlas_packets_summary_fts",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_summary_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, COALESCE(summary, ''::text)))"
+      },
+      {
+        "name": "idx_atlas_packets_symbol_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_symbol_id ON public.atlas_packets USING btree (symbol_id)"
+      },
+      {
+        "name": "idx_atlas_packets_tags",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_tags ON public.atlas_packets USING gin (tags)"
+      },
+      {
+        "name": "idx_atlas_packets_tags_gin",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_tags_gin ON public.atlas_packets USING gin (tags)"
+      },
+      {
+        "name": "idx_atlas_packets_taxonomy_level",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_taxonomy_level ON public.atlas_packets USING btree (taxonomy_level)"
+      },
+      {
+        "name": "idx_atlas_packets_title_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_title_id ON public.atlas_packets USING btree (title_id)"
+      },
+      {
+        "name": "idx_atlas_packets_topology_gin_pathops",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_topology_gin_pathops ON public.atlas_packets USING gin (topology jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_tree_node_id",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_tree_node_id ON public.atlas_packets USING btree (tree_node_id)"
+      },
+      {
+        "name": "idx_atlas_packets_type",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_type ON public.atlas_packets USING btree (packet_type)"
+      },
+      {
+        "name": "idx_atlas_packets_vectors_gin_pathops",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_atlas_packets_vectors_gin_pathops ON public.atlas_packets USING gin (vectors jsonb_path_ops)"
+      },
+      {
+        "name": "idx_atlas_packets_workspace_revision",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_workspace_revision ON public.atlas_packets USING btree (workspace_revision)"
+      },
+      {
+        "name": "idx_atlas_packets_workspace_revision_key_source",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_atlas_packets_workspace_revision_key_source ON public.atlas_packets USING btree (workspace_revision_key, source_ref) WHERE ((workspace_revision_key IS NOT NULL) AND (source_ref IS NOT NULL))"
+      },
+      {
+        "name": "idx_latent_64_not_null",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_latent_64_not_null ON public.atlas_packets USING hash (packet_id) WHERE (latent_64 IS NOT NULL)"
+      },
+      {
+        "name": "idx_packets_centroid_cache",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_packets_centroid_cache ON public.atlas_packets USING btree (feature_id) WHERE (som_cluster_id IS NOT NULL)"
+      },
+      {
+        "name": "idx_packets_feature_envelope",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_packets_feature_envelope ON public.atlas_packets USING gin (feature_envelope)"
+      },
+      {
+        "name": "idx_packets_source_feature_multi_hop",
+        "type": "BTREE",
+        "definition": "CREATE INDEX idx_packets_source_feature_multi_hop ON public.atlas_packets USING btree (source_ref, feature_id)"
+      },
+      {
+        "name": "idx_packets_used_concepts_gin",
+        "type": "GIN",
+        "definition": "CREATE INDEX idx_packets_used_concepts_gin ON public.atlas_packets USING gin (used_concepts)"
+      }
+    ]
+  },
+  "enrichmentCoverage": {
+    "identity": {
+      "expected": 5,
+      "found": 5,
+      "present": [
+        {
+          "name": "packet_key",
+          "type": "text",
+          "nullable": "YES"
+        },
+        {
+          "name": "source_ref",
+          "type": "text",
+          "nullable": "YES"
+        },
+        {
+          "name": "feature_id",
+          "type": "text",
+          "nullable": "YES"
+        },
+        {
+          "name": "feature_label",
+          "type": "text",
+          "nullable": "YES"
+        },
+        {
+          "name": "file_path",
+          "type": "text",
+          "nullable": "YES"
+        }
+      ],
+      "missing": []
+    },
+    "enrichment": {
+      "expected": 2,
+      "found": 2,
+      "present": [
+        {
+          "name": "community_id",
+          "type": "integer",
+          "nullable": "YES"
+        },
+        {
+          "name": "community_confidence",
+          "type": "numeric",
+          "nullable": "YES"
+        }
+      ],
+      "missing": []
+    },
+    "qdrant": {
+      "expected": 2,
+      "found": 1,
+      "present": [
+        {
+          "name": "qdrant_point_id",
+          "type": "text",
+          "nullable": "YES"
+        }
+      ],
+      "missing": [
+        "qdrant_tags"
+      ]
+    },
+    "som": {
+      "expected": 3,
+      "found": 3,
+      "present": [
+        {
+          "name": "som_row",
+          "type": "integer",
+          "nullable": "YES"
+        },
+        {
+          "name": "som_col",
+          "type": "integer",
+          "nullable": "YES"
+        },
+        {
+          "name": "som_cluster",
+          "type": "text",
+          "nullable": "YES"
+        }
+      ],
+      "missing": []
+    },
+    "karpathy": {
+      "expected": 2,
+      "found": 1,
+      "present": [
+        {
+          "name": "authority_score",
+          "type": "real",
+          "nullable": "YES"
+        }
+      ],
+      "missing": [
+        "karpathy_score"
+      ]
+    },
+    "latent": {
+      "expected": 1,
+      "found": 0,
+      "present": [],
+      "missing": [
+        "encoded_latent"
+      ]
+    },
+    "metadata": {
+      "expected": 2,
+      "found": 2,
+      "present": [
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "YES"
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": "YES"
+        }
+      ],
+      "missing": []
+    },
+    "tree": {
+      "expected": 1,
+      "found": 1,
+      "present": [
+        {
+          "name": "tree_node_id",
+          "type": "text",
+          "nullable": "YES"
+        }
+      ],
+      "missing": []
+    }
+  },
+  "missingFields": [
+    "qdrant:qdrant_tags",
+    "karpathy:karpathy_score",
+    "latent:encoded_latent"
+  ],
+  "dataCoverage": {
+    "packet_key": {
+      "count": 61718,
+      "percentage": 100
+    },
+    "source_ref": {
+      "count": 61718,
+      "percentage": 100
+    },
+    "feature_id": {
+      "count": 61718,
+      "percentage": 100
+    },
+    "feature_label": {
+      "count": 61660,
+      "percentage": 99.9
+    },
+    "community_id": {
+      "count": 61660,
+      "percentage": 99.9
+    },
+    "file_path": {
+      "count": 58366,
+      "percentage": 94.6
+    }
+  },
+  "readinessSummary": {
+    "identityFieldsComplete": true,
+    "enrichmentFieldsPresent": true,
+    "qdrantFieldsPresent": true,
+    "somFieldsPresent": true,
+    "karpathyFieldsPresent": true,
+    "latentFieldsPresent": false,
+    "metadataFieldsPresent": true,
+    "treeFieldsPresent": true
+  },
+  "recommendations": [
+    "Missing 3 enrichment fields: qdrant:qdrant_tags, karpathy:karpathy_score, latent:encoded_latent",
+    "Ready for multihop regeneration with schema-adaptive queries (null fields for missing columns)"
+  ]
+}

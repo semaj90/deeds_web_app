@@ -47,6 +47,25 @@ export const aceTopkRevisionedKeyV1 = (identity: RetrievalCacheIdentityV1): stri
 	return `ace:topk:v1:${digest}`;
 };
 
+export interface AcePromptBundleCacheIdentityV2 {
+	promptChecksum: string;
+	sourceIdentityChecksum: string;
+}
+
+export const acePromptBundleKeyV2 = (identity: AcePromptBundleCacheIdentityV2): string => {
+	const checksumPattern = /^sha256:[a-f0-9]{64}$/;
+	if (!checksumPattern.test(identity.promptChecksum) || !checksumPattern.test(identity.sourceIdentityChecksum)) {
+		throw new Error('ACE_PROMPT_BUNDLE_V2_IDENTITY_INCOMPLETE');
+	}
+	const canonical = JSON.stringify({
+		schema: 'atlas.ace-prompt-bundle-cache-key.v2',
+		promptChecksum: identity.promptChecksum,
+		sourceIdentityChecksum: identity.sourceIdentityChecksum,
+	});
+	const digest = createHash('sha256').update(canonical).digest('hex');
+	return `ace:prompt:v2:${digest}`;
+};
+
 // Gemma4 agentic hit cache — 24hr TTL, keyed by query+limit hash.
 // Written by trace-mcp-server.ts `trace.kag_search` handler; read on
 // subsequent Gemma4 tool calls to avoid re-running the retrieval pipeline.

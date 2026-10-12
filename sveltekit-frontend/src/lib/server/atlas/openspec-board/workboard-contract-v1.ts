@@ -3,8 +3,7 @@
  * (built by scripts/atlas/build-openspec-workboard-v1.mjs from openspec/changes/*\/tasks.md).
  *
  * This is a DIFFERENT, narrower contract than openspec-board/types.ts's OpenSpecBoardSnapshotV1, which
- * describes a DERIVED composite of ~17 downstream analysis reports (execution-controller, actionable-work,
- * etc.), consumed by /atlas/studio/openspec today. Per OCP-00's census (docs/reports/openspec-control-plane-owner-census-v1.json):
+ * describes a DERIVED composite of ~17 downstream analysis reports (execution-controller, actionable-work, * etc.), consumed by /atlas/studio/openspec today. Per OCP-00's census (docs/reports/openspec-control-plane-owner-census-v1.json):
  * the two are layered, not competing -- this file models the L0 canonical source those L1 reports derive from.
  *
  * Hard rules:

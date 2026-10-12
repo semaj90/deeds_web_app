@@ -78,7 +78,7 @@ export type ExtractedFeatures = z.infer<typeof extractedFeaturesSchema>;
 // ══════════════════════════════════════════════════════════════
 
 export const phase17OutputSchema = z.object({
-  packet_key: z.string().min(1),
+  packet_key: z.string().min(1).nullable(),
   source_ref: z.string().min(1),
   feature_id: z.string().min(1),
   feature_label: z.string().min(1),

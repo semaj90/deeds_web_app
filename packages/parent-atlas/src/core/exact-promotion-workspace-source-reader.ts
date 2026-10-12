@@ -23,6 +23,7 @@ function unavailable(): ExactPromotionSourceBytesV1 {
     span_found: false,
     span_sha256: null,
     span_byte_length: null,
+    span_utf8_valid: false,
     evidence_ref: null,
   };
 }
@@ -55,6 +56,12 @@ export function createWorkspaceExactPromotionSourceReader(
       const bytes = await readFile(candidate);
       if (request.span_end > bytes.byteLength) return unavailable();
       const span = bytes.subarray(request.span_start, request.span_end);
+      let spanUtf8Valid = true;
+      try {
+        new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(span);
+      } catch {
+        spanUtf8Valid = false;
+      }
 
       return {
         file_found: true,
@@ -63,6 +70,7 @@ export function createWorkspaceExactPromotionSourceReader(
         span_found: true,
         span_sha256: sha256(span),
         span_byte_length: span.byteLength,
+        span_utf8_valid: spanUtf8Valid,
         evidence_ref: `workspace-bytes:${sourceRef}:${request.span_start}-${request.span_end}`,
       };
     } catch {

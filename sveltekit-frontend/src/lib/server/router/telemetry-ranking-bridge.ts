@@ -168,32 +168,62 @@ export async function getCacheWarmth(toolName: string): Promise<number> {
  * Returns: successRate, totalAttempts, recentSuccessRate, avgLatency, lastSeen
  */
 async function loadHistoricalMetrics(
-  previousState: string,
+  _previousState: string,
   toolName: string,
-  queryIntent?: string
+  _queryIntent?: string
 ): Promise<HistoricalSuccessMetrics> {
+  const neutral: HistoricalSuccessMetrics = {
+    successRate: 0.5,
+    totalAttempts: 0,
+    successCount: 0,
+    confidence: 0,
+    recentSuccessRate: 0.5,
+    avgLatencyMs: 0,
+    lastSeenAt: null
+  };
   try {
-    // TODO: Implement actual database query
-    // For now, return mock data
+    // Per-tool aggregate over the last 90 days, across ALL previous states. The live
+    // tool_call_events rows carry no state: trace_id is null on every row, and
+    // agent_traces has no initial_state column, so state-conditioning is not possible
+    // from the current schema. Callers must not treat this as state-specific evidence.
+    // Dynamic import keeps the DB client out of this module's import graph.
+    const { db, pgRows } = await import('$lib/server/db/client');
+    const { sql } = await import('drizzle-orm');
+    const rows = pgRows<{
+      total: number;
+      success: number;
+      recent_total: number;
+      recent_success: number;
+      avg_latency: number | null;
+      last_seen: string | null;
+    }>(await db.execute(sql`
+      SELECT
+        count(*)::int AS total,
+        count(*) FILTER (WHERE result_ok = true)::int AS success,
+        count(*) FILTER (WHERE called_at > now() - interval '7 days')::int AS recent_total,
+        count(*) FILTER (WHERE result_ok = true AND called_at > now() - interval '7 days')::int AS recent_success,
+        avg(latency_ms)::float8 AS avg_latency,
+        max(called_at)::text AS last_seen
+      FROM tool_call_events
+      WHERE tool_name = ${toolName}
+        AND result_ok IS NOT NULL
+        AND called_at > now() - interval '90 days'
+    `));
+    const row = rows[0];
+    if (!row || row.total === 0) return neutral;
+
     return {
-      successRate: 0.5,
-      totalAttempts: 0,
-      successCount: 0,
-      confidence: 0,
-      recentSuccessRate: 0.5,
-      avgLatencyMs: 0,
-      lastSeenAt: null
+      successRate: row.success / row.total,
+      totalAttempts: row.total,
+      successCount: row.success,
+      // Same formula as getHistoricalSuccessRateAsync, which recomputes it rather than reading this field. Change both together.
+      confidence: 1 - 1 / (1 + row.total / 20),
+      recentSuccessRate: row.recent_total > 0 ? row.recent_success / row.recent_total : 0.5,
+      avgLatencyMs: row.avg_latency ?? 0,
+      lastSeenAt: row.last_seen ? new Date(row.last_seen) : null
     };
   } catch (err) {
-    return {
-      successRate: 0.5,
-      totalAttempts: 0,
-      successCount: 0,
-      confidence: 0,
-      recentSuccessRate: 0.5,
-      avgLatencyMs: 0,
-      lastSeenAt: null
-    };
+    return neutral;
   }
 }
 
@@ -205,7 +235,8 @@ async function loadTransitionCounts(
   targetState: string
 ): Promise<{ targetCount: number; totalCount: number }> {
   try {
-    // TODO: Implement actual database query
+    // Not persisted: no live table records state-to-state transitions (tool_call_events
+    // has no state column). Returning zero counts is the honest value, not a pending query.
     return { targetCount: 0, totalCount: 0 };
   } catch (err) {
     return { targetCount: 0, totalCount: 0 };

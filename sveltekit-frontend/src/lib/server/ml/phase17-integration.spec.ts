@@ -73,6 +73,42 @@ describe('Phase 17B: Integration Tests', () => {
       ).toBe(true);
     });
 
+    test.each([
+      { packetKey: 'pkt-missing', packets: [] },
+      {
+        packetKey: 'pkt-whitespace',
+        packets: [
+          { packetKey: ' pkt-whitespace ', sourceRef: 'src/qualified.ts', featureId: 'auth.sessions', aliasId: 'alias-qualified' },
+        ],
+      },
+      {
+        packetKey: 'pkt-duplicate',
+        packets: [
+          { packetKey: 'pkt-a', sourceRef: 'src/qualified.ts', featureId: 'auth.sessions', aliasId: 'alias-qualified' },
+          { packetKey: 'pkt-b', sourceRef: 'src/qualified.ts', featureId: 'auth.sessions', aliasId: 'alias-qualified' },
+        ],
+      },
+    ])('returns an unkeyed pending proposal for missing or ambiguous packet identity', async ({ packets }) => {
+      const output = await extractFeatures({
+        reconciliationResult: {
+          aliasId: 'alias-qualified',
+          queryHash: 'query-qualified',
+          sourceRefs: ['src/qualified.ts'],
+          featureIds: ['auth.sessions'],
+          clusterCards: [],
+          packets,
+          scoreProfile: { qdrant: 0.8, cluster: 0.7, topological: 0.6, fusion: 0.75 },
+        },
+        sourceRef: 'src/qualified.ts',
+        featureId: 'auth.sessions',
+        aliasId: 'alias-qualified',
+      });
+
+      expect(output.packet_key).toBeNull();
+      expect(output.validation_status).toBe('pending');
+      expect(output.error_message).toMatch(/NO_EXACT|AMBIGUOUS/);
+    });
+
     test('applies test coverage boost correctly', async () => {
       const input: Phase17Input = {
         reconciliationResult: {
@@ -87,7 +123,7 @@ describe('Phase 17B: Integration Tests', () => {
               authorityScore: 0.5,
             },
           ],
-          packets: [],
+          packets: [{ packetKey: 'pkt-spec', sourceRef: 'src/lib/auth.spec.ts', featureId: 'auth.sessions', aliasId: 'alias-test-2' }],
           scoreProfile: {
             qdrant: 0.5,
             cluster: 0.5,
@@ -135,7 +171,7 @@ describe('Phase 17B: Integration Tests', () => {
             sourceRefs: [],
             featureIds: [],
             clusterCards: [],
-            packets: [],
+            packets: [{ packetKey: 'pkt-module-1', sourceRef: 'src/lib/module1.ts', featureId: 'feature1', aliasId: 'alias-1' }],
             scoreProfile: { qdrant: 0.5, cluster: 0.5, topological: 0.5, fusion: 0.5 },
           },
           sourceRef: 'src/lib/module1.ts',
@@ -155,7 +191,7 @@ describe('Phase 17B: Integration Tests', () => {
                 authorityScore: 0.8,
               },
             ],
-            packets: [],
+            packets: [{ packetKey: 'pkt-module-2', sourceRef: 'src/lib/module2.ts', featureId: 'feature2', aliasId: 'alias-2' }],
             scoreProfile: { qdrant: 0.8, cluster: 0.75, topological: 0.7, fusion: 0.75 },
           },
           sourceRef: 'src/lib/module2.ts',
@@ -183,7 +219,7 @@ describe('Phase 17B: Integration Tests', () => {
           sourceRefs: [],
           featureIds: [],
           clusterCards: [],
-          packets: [],
+          packets: [{ packetKey: 'pkt-test', sourceRef: 'src/lib/test.ts', featureId: 'test.feature', aliasId }],
           scoreProfile: { qdrant: 0.5, cluster: 0.5, topological: 0.5, fusion: 0.5 },
         },
         sourceRef: 'src/lib/test.ts',
@@ -212,7 +248,7 @@ describe('Phase 17B: Integration Tests', () => {
               authorityScore: 1.0, // Maximum
             },
           ],
-          packets: [],
+          packets: [{ packetKey: 'pkt-max', sourceRef: 'src/lib/test.ts', featureId: 'test.max', aliasId: 'alias-max' }],
           scoreProfile: { qdrant: 1.0, cluster: 1.0, topological: 1.0, fusion: 1.0 },
         },
         sourceRef: 'src/lib/test.ts',
@@ -240,7 +276,7 @@ describe('Phase 17B: Integration Tests', () => {
               authorityScore: 0.0,
             },
           ],
-          packets: [],
+          packets: [{ packetKey: 'pkt-min', sourceRef: 'src/lib/test.ts', featureId: 'test.min', aliasId: 'alias-min' }],
           scoreProfile: { qdrant: 0.0, cluster: 0.0, topological: 0.0, fusion: 0.0 },
         },
         sourceRef: 'src/lib/test.ts',
@@ -251,8 +287,10 @@ describe('Phase 17B: Integration Tests', () => {
       const output = await extractFeatures(input);
 
       expect(output.extracted_features.metadata.authority_score).toBeGreaterThanOrEqual(0.1);
-      // Scores default to 0.5 when provided as 0
-      expect(output.extracted_features.qdrant_score).toBe(0.5);
+      expect(output.extracted_features.qdrant_score).toBe(0);
+      expect(output.extracted_features.cluster_score).toBe(0);
+      expect(output.extracted_features.topological_score).toBe(0);
+      expect(output.extracted_features.fusion_score).toBe(0);
     });
   });
 });

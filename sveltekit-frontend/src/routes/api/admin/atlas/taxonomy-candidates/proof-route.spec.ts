@@ -76,10 +76,11 @@ describe('/api/admin/atlas/taxonomy-candidates', () => {
       fakeEvent({
         candidateId: 'taxonomy-candidate:1',
         decision: 'promoted',
-        reviewedBy: 'reviewer-1',
+        reviewedBy: 'spoofed-reviewer',
         workspaceRevision: 'workspace:1',
         sourceRevision: 'source:1',
         graphRevision: 'graph:1',
+        promotionEvidenceRefs: ['evidence:reviewed-1'],
         producerRevision: 'taxonomy-review:1',
       })
     );
@@ -88,6 +89,7 @@ describe('/api/admin/atlas/taxonomy-candidates', () => {
     expect(response.status).toBe(200);
     expect(body.result.outcome).toBe('promoted_degraded');
     expect(body.result.hyperedgeError).toBe('connection refused');
+    expect(decideTaxonomyAssignmentCandidateV1).toHaveBeenCalledWith(expect.objectContaining({ reviewedBy: 'reviewer-1' }));
   });
 
   it('POST: 409 when the candidate was already decided', async () => {

@@ -32,6 +32,7 @@ function tuple(overrides: Partial<OntologyLinkedTupleV1> = {}): OntologyLinkedTu
       ontologyVersion: 'ontology:v1',
       nlpVersion: null,
       sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
       representationId: 'semantic_768',
       representationRevision: 'repr:1',
       featureRevision: 'feature:1',
@@ -72,6 +73,8 @@ describe('OntologyFanoutAuthorityV1', () => {
     expect(result.taxonomyCandidateEligible).toBe(true);
     expect(result.canonicalTupleEligible).toBe(true);
     expect(result.graphFanoutEligible).toBe(true);
+    expect(result.canonicalAuthority).toBe(false);
+    expect(result.admissionAuthorized).toBe(false);
   });
 
   it('rejects missing authority rather than synthesizing revisions', () => {
@@ -92,11 +95,46 @@ describe('OntologyFanoutAuthorityV1', () => {
     expect(result.canonicalTupleEligible).toBe(false);
   });
 
+  it.each([
+    ['sourceRevision', 'FANOUT_TUPLE_SOURCE_REVISION_MISMATCH'],
+    ['workspaceRevision', 'FANOUT_TUPLE_WORKSPACE_REVISION_MISMATCH'],
+    ['representationId', 'FANOUT_TUPLE_REPRESENTATION_ID_MISMATCH'],
+    ['representationRevision', 'FANOUT_TUPLE_REPRESENTATION_REVISION_MISMATCH'],
+    ['featureRevision', 'FANOUT_TUPLE_FEATURE_REVISION_MISMATCH'],
+    ['ontologyRevision', 'FANOUT_TUPLE_ONTOLOGY_REVISION_MISMATCH'],
+    ['producerRevision', 'FANOUT_TUPLE_PRODUCER_REVISION_MISMATCH'],
+  ] as const)('rejects tuple provenance that does not bind authority field %s', (field, blocker) => {
+    const provenance = { ...tuple().provenance, [field]: 'different-revision' };
+    const result = evaluateOntologyFanoutAuthorityV1(tuple({ provenance }), authority());
+    expect(result.blockers).toContain(blocker);
+    expect(result.canonicalTupleEligible).toBe(false);
+  });
+
+  it('blocks graph fanout when the tuple graph revision differs from authority', () => {
+    const result = evaluateOntologyFanoutAuthorityV1(
+      tuple({ provenance: { ...tuple().provenance, graphRevision: 'graph:stale' } }),
+      authority(),
+    );
+    expect(result.canonicalTupleEligible).toBe(true);
+    expect(result.graphFanoutEligible).toBe(false);
+    expect(result.blockers).toContain('FANOUT_TUPLE_GRAPH_REVISION_MISMATCH');
+  });
+
   it('rejects empty tuple evidence', () => {
     const result = evaluateOntologyFanoutAuthorityV1(tuple({ evidenceRefs: [] }), authority());
     expect(result.blockers).toContain('FANOUT_EVIDENCE_REQUIRED');
     expect(result.taxonomyCandidateEligible).toBe(false);
   });
+
+  it.each(['GATED', 'REFERENCE_ONLY', 'ACTIVE_DEGRADED', 'SUPERSEDED', 'FAILED'] as const)(
+    'reports a blocker for tuple evidence state %s',
+    (evidenceState) => {
+      const result = evaluateOntologyFanoutAuthorityV1(tuple({ evidenceState }), authority());
+      expect(result.canonicalTupleEligible).toBe(false);
+      expect(result.cacheEligible).toBe(false);
+      expect(result.blockers).toContain('FANOUT_TUPLE_EVIDENCE_NOT_ACTIVE_VERIFIED');
+    },
+  );
 
   it('rejects non-semantic_768 authority at schema boundary', () => {
     const invalid = { ...authority(), representationId: 'legacy_384' } as unknown as OntologyFanoutAuthorityV1;

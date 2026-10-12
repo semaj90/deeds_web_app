@@ -22,6 +22,7 @@ export type ContextCacheIdentity = {
   evidenceBundleHash: string;
   ragBundleHash: string;
   graphSnapshotHash: string;
+  retrievalCacheIdentityKey?: string;
   retrievalModeHash: string;
   sectionTypesHash: string;
   personaKey: string;
@@ -122,6 +123,7 @@ export function buildContextCacheKey(identity: ContextCacheIdentity): string {
     tokenizerHash: identity.tokenizerHash,
     toolDefinitionsHash: identity.toolDefinitionsHash,
     tokenAwarePacking: identity.tokenAwarePacking,
+    ...(identity.retrievalCacheIdentityKey ? { retrievalCacheIdentityKey: identity.retrievalCacheIdentityKey } : {}),
     userId: identity.userId ?? '',
     ...(identity.kvQuant ? { kvQuant: identity.kvQuant } : {}),
     ...(typeof identity.draftModel === 'boolean' ? { draftModel: identity.draftModel } : {}),

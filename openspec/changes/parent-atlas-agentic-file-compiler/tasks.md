@@ -817,3 +817,13 @@ changed.
   The source-level outcome is therefore **DISCONNECTED_IN_CURRENT_PATH**, not
   producer-to-row lineage proven. Historical JSONB population/readback remains
   a separate owner question. No live database query or write was run.
+
+## Orchestration and prompt-input follow-up
+
+- [ ] AFC-ORCHESTRATION-01 Inventory installed and invoked Deep Agents/LangChain/Mastra/ACP/A2A/tRPC/MCP surfaces; assign each to existing routing, delegation, transport, or tool-registry owners, and add no parallel orchestrator. Pydantic validates bounded sidecar contracts; it does not confer source or ontology authority.
+- [ ] AFC-PROMPT-01 Build ACE JSON/prompt inputs only from the existing admitted ContextManifest and PromptPlan owners; bind template, model, tool-schema and evidence revisions and test rejection of raw retrieval hits, cache-only hints, unadmitted summaries, and hidden-state persistence.
+- [ ] AFC-TOOL-ROUTING-01 Verify MCP/Viterbi selection remains advisory and dispatch uses the existing allowlisted tool registry with schema/permission validation; ACP/A2A delegation and tRPC transport must preserve request, workspace, and evidence identities.
+
+### 2026-10-11 read-only DAG structural refinement check
+
+The existing `context-dag-handlers-v1.spec.ts` exercises lexical-dependent ast-grep refinement through the shared read-only DAG. Focused Vitest passed **30/30**. This proves the handler/DAG fixture path only; it does not prove a production caller, current Graphify evidence persistence/readback, ontology admission, or ranking promotion. Keep `AFC-ORCHESTRATION-01`, `AFC-PROMPT-01`, and `AFC-TOOL-ROUTING-01` open pending their own owner-level evidence.

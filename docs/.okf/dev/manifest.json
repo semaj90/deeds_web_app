@@ -381,6 +381,19 @@
       ]
     },
     {
+      "source_id": "cuda-tile-simt",
+      "title": "NVIDIA CUDA Tile and SIMT Programming Guide",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["cuda", "cutile", "tile-ir", "simt", "kernel-parity"],
+      "preferred_fetcher": "BEAUTIFULSOUP_HTTP",
+      "pages": [
+        "https://docs.nvidia.com/cuda/cutile-python/quickstart.html",
+        "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-tile-kernels.html",
+        "https://docs.nvidia.com/cuda/cuda-programming-guide/02-basics/writing-cuda-kernels.html"
+      ]
+    },
+    {
       "source_id": "acp",
       "title": "Agent Client Protocol",
       "kind": "official_docs",

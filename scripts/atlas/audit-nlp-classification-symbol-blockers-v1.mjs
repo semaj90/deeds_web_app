@@ -42,9 +42,18 @@ const classifierCalibrated = Boolean(
   Number(classifierEval.goldRows ?? 0) > 0 &&
   classifierEval.status !== 'NO_GOLD_LABELS'
 );
-const sourceAdmitted = Boolean(
+const sourceSnapshotParity = Boolean(
   classifierReadiness?.sourceSnapshot?.worktreeFingerprintParity === true &&
   classifierReadiness?.sourceSnapshot?.status === 'CURRENT_SNAPSHOT_PROVEN'
+);
+const sourceAdmitted = Boolean(
+  classifierReadiness?.status === 'TRAINING_READY_REVIEW_REQUIRED' &&
+  classifierReadiness?.canonicalAuthority === true &&
+  classifierReadiness?.coverage?.rowCount > 0 &&
+  classifierReadiness?.coverage?.currentAdmittedRows === classifierReadiness?.coverage?.rowCount &&
+  classifierReadiness?.coverage?.revisionQualifiedRows === classifierReadiness?.coverage?.rowCount &&
+  classifierReadiness?.coverage?.contentQualifiedRows === classifierReadiness?.coverage?.rowCount &&
+  sourceSnapshotParity
 );
 
 const blockers = [
@@ -83,7 +92,16 @@ const blockers = [
   {
     key: 'CURRENT_SOURCE_AUTHORITY_FOR_CLASSIFICATION',
     state: sourceAdmitted ? 'PROVEN' : 'BLOCKED_SOURCE_AUTHORITY',
-    evidence: classifierReadiness?.sourceSnapshot ?? {
+    evidence: classifierReadiness ? {
+      sourceSnapshot: classifierReadiness.sourceSnapshot ?? null,
+      readinessStatus: classifierReadiness.status ?? null,
+      canonicalAuthority: classifierReadiness.canonicalAuthority === true,
+      currentAdmittedRows: classifierReadiness.coverage?.currentAdmittedRows ?? null,
+      rowCount: classifierReadiness.coverage?.rowCount ?? null,
+      revisionQualifiedRows: classifierReadiness.coverage?.revisionQualifiedRows ?? null,
+      contentQualifiedRows: classifierReadiness.coverage?.contentQualifiedRows ?? null,
+      sourceSnapshotParity,
+    } : {
       missingReport: 'docs/reports/domain-classifier-training-readiness-v1.json'
     },
     nextAction: sourceAdmitted

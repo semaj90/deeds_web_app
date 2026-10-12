@@ -20,15 +20,47 @@ type CandidateEntry = {
 
 type SourceRecord = { source: string; sourceRevision: string };
 
-function sha256(value: string): string {
-  return createHash('sha256').update(value, 'utf8').digest('hex');
+function sha256(value: string | Buffer): string {
+  return createHash('sha256').update(value).digest('hex');
 }
 
-function languageFor(sourceRef: string): string {
-  if (/\.(tsx?|mts|cts)$/.test(sourceRef)) return 'typescript';
-  if (/\.(jsx?|mjs|cjs)$/.test(sourceRef)) return 'javascript';
-  if (/\.rs$/.test(sourceRef)) return 'rust';
-  return 'typescript';
+export function sha256Utf8ByteSpanV1(source: string, startByte: number, endByte: number): string | null {
+  if (!Number.isInteger(startByte) || !Number.isInteger(endByte) || startByte < 0 || endByte <= startByte) {
+    return null;
+  }
+  const sourceBytes = Buffer.from(source, 'utf8');
+  if (sourceBytes.toString('utf8') !== source || endByte > sourceBytes.length) return null;
+  const spanBytes = sourceBytes.subarray(startByte, endByte);
+  if (!Buffer.from(spanBytes.toString('utf8'), 'utf8').equals(spanBytes)) return null;
+  return sha256(spanBytes);
+}
+
+export function resolveStructuralLanguageV1(sourceRef: string): string | null {
+  const extension = sourceRef.toLowerCase().match(/\.[^./\\]+$/)?.[0];
+  switch (extension) {
+    case '.ts':
+    case '.mts':
+    case '.cts':
+      return 'typescript';
+    case '.tsx':
+      return 'tsx';
+    case '.js':
+    case '.jsx':
+    case '.mjs':
+    case '.cjs':
+      return 'javascript';
+    case '.py':
+    case '.pyi':
+      return 'python';
+    case '.rs':
+      return 'rust';
+    case '.go':
+      return 'go';
+    case '.java':
+      return 'java';
+    default:
+      return null;
+  }
 }
 
 /**
@@ -50,18 +82,24 @@ export function createLiveStructuralLaneRetrieverV1(input: {
         : [];
       if (requestedRefs.length === 0) return [];
       const allowed = new Set(requestedRefs);
-      const entries = input.candidateEntries.filter((entry) => allowed.has(entry.sourceRef));
+      const entries = input.candidateEntries.filter(
+        (entry) => allowed.has(entry.sourceRef) && resolveStructuralLanguageV1(entry.sourceRef) !== null,
+      );
       if (entries.length === 0) return [];
       const observations = [];
       for (const sourceRef of [...new Set(entries.map((entry) => entry.sourceRef))].sort()) {
+        const language = resolveStructuralLanguageV1(sourceRef);
+        if (language === null) continue;
         const record = await input.loadSource(sourceRef);
         const matchingEntries = entries.filter((entry) => entry.sourceRef === sourceRef);
         const sourceRevision = record.sourceRevision;
         if (!matchingEntries.every((entry) => entry.sourceRevision === sourceRevision)) continue;
-        const evidence = await input.sidecar.astChunk({ source: record.source, language: languageFor(sourceRef), filePath: sourceRef, sourceRevision });
+        const evidence = await input.sidecar.astChunk({ source: record.source, language, filePath: sourceRef, sourceRevision });
         for (const chunk of evidence.chunks) {
           const start = chunk.start_byte;
-          const end = Math.max(chunk.end_byte, start + 1);
+          const end = chunk.end_byte;
+          const matchedTextHash = sha256Utf8ByteSpanV1(record.source, start, end);
+          if (matchedTextHash === null) continue;
           observations.push({
             schema: 'atlas.ast-grep-observation.v1' as const,
             observation_id: `treesitter:${sha256(JSON.stringify([sourceRef, sourceRevision, start, end, chunk.upstream_node_id ?? null])).slice(0, 40)}`,
@@ -72,7 +110,7 @@ export function createLiveStructuralLaneRetrieverV1(input: {
             byte_end: end,
             upstream_node_id: chunk.upstream_node_id,
             upstream_chunk_id: chunk.upstream_chunk_id,
-            matched_text_hash: sha256(record.source.slice(start, end)),
+            matched_text_hash: matchedTextHash,
             captures: { name: chunk.name ?? '', calls: chunk.calls.join(','), imports: chunk.imports.join(','), exports: chunk.exports.join(',') },
             observation_kind: chunk.node_type,
             confidence: 1,

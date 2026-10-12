@@ -15,6 +15,15 @@
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceCouchDB } from '$lib/server/observability/langfuse.js';
+import { getRedis } from '$lib/server/redis.js';
+import {
+	type KarpathyDagHit,
+	KarpathyDagHitSchema,
+	buildKarpathyDagCacheKey,
+	resolveValidDagHits,
+	rankDenseDagHits,
+} from '$lib/server/indexer/karpathy-dag-subhelpers.js';
+import type { SemanticTag } from '$lib/server/indexer/gpu-karpathy-tagger.js';
 
 const DAG_CACHE_DB = 'dag_cache';
 const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1 hour
@@ -214,5 +223,63 @@ export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error
 		const msg = (err as Error)?.message ?? String(err);
 		console.warn('[DAG Cache] Cleanup failed (non-fatal):', msg);
 		return { deleted: 0, error: msg };
+	}
+}
+
+// ── Karpathy Dense DAG Cache Integration (Redis Quick-Hit) ─────────────────
+
+const KARPATHY_DAG_TTL = 3600; // 1 hour
+
+/**
+ * Attempt to retrieve cached Karpathy DAG hits for a given file and revision.
+ * Validates hit schema and revision matching (stale hit rejection).
+ */
+export async function getCachedKarpathyDagHits(
+	filePath: string,
+	sourceRevision: string,
+	tag: SemanticTag,
+	currentRevisions: Readonly<Record<string, string>>,
+): Promise<KarpathyDagHit[] | null> {
+	try {
+		const redis = getRedis();
+		const key = buildKarpathyDagCacheKey(filePath, sourceRevision, tag);
+		const raw = await redis.get(key);
+		if (!raw) return null;
+
+		const parsed = JSON.parse(raw);
+		if (!Array.isArray(parsed)) return null;
+
+		const validHits: KarpathyDagHit[] = [];
+		for (const item of parsed) {
+			const check = KarpathyDagHitSchema.safeParse(item);
+			if (check.success) {
+				validHits.push(check.data);
+			}
+		}
+
+		if (validHits.length === 0) return null;
+		return resolveValidDagHits(validHits, currentRevisions);
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Cache valid Karpathy DAG hits in Redis with bounded TTL.
+ * Guaranteed canonicalAuthority: false.
+ */
+export async function setCachedKarpathyDagHits(
+	filePath: string,
+	sourceRevision: string,
+	tag: import('$lib/server/indexer/gpu-karpathy-tagger.js').SemanticTag,
+	hits: readonly KarpathyDagHit[],
+): Promise<void> {
+	try {
+		const redis = getRedis();
+		const key = buildKarpathyDagCacheKey(filePath, sourceRevision, tag);
+		const payload = JSON.stringify(hits);
+		await redis.setex(key, KARPATHY_DAG_TTL, payload);
+	} catch {
+		// Non-fatal cache failure
 	}
 }

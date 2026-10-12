@@ -70,12 +70,38 @@ export interface PacketDenseSearchResult {
   };
 }
 
+export type PacketDenseSearchDegradationReason =
+  | 'NO_SELECTIVE_FILTER'
+  | 'CANDIDATE_CAP_EXCEEDED'
+  | 'QUERY_REPRESENTATION_UNAVAILABLE'
+  | 'REPRESENTATION_MISMATCH'
+  | 'DENSE_REPRESENTATION_UNAVAILABLE'
+  | 'IDENTITY_BRIDGE_UNAVAILABLE'
+  | 'REVISION_MISMATCH'
+  | 'STALE_REPRESENTATION'
+  | 'QDRANT_UNAVAILABLE'
+  | 'DENSE_TIMEOUT'
+  | 'EXACT_ORACLE_UNAVAILABLE';
+
+export interface PacketDenseSearchReceiptV1 {
+  schema: 'atlas.packet-dense-search-receipt.v1';
+  timestamp: string;
+  queryDimensions: number;
+  collection: DenseRerankCollection;
+  candidateCount: number;
+  candidateSetTruncated: boolean;
+  qdrantHitCount: number;
+  joinedResultCount: number;
+  degradedReasons: PacketDenseSearchDegradationReason[];
+}
+
 export interface PacketDenseSearchResponse {
-  status: 'OK' | 'NO_RESULTS' | 'IDENTITY_BRIDGE_UNAVAILABLE';
-  degradedReasons: string[];
+  status: 'OK' | 'NO_RESULTS' | 'IDENTITY_BRIDGE_UNAVAILABLE' | 'REPRESENTATION_MISMATCH' | 'DENSE_REPRESENTATION_UNAVAILABLE';
+  degradedReasons: PacketDenseSearchDegradationReason[];
   results: PacketDenseSearchResult[];
   candidateSetTruncated: boolean;
   candidateCount: number;
+  receipt?: PacketDenseSearchReceiptV1;
 }
 
 interface JoinBackRow {
@@ -153,20 +179,61 @@ export async function runPacketDenseSearch(
   req: PacketDenseSearchRequest
 ): Promise<PacketDenseSearchResponse> {
   const expandTopK = req.expandTopK ?? DEFAULT_EXPAND_TOP_K;
+  const degradedReasons: PacketDenseSearchDegradationReason[] = [];
+
+  // Validation: queryVector representation check
+  if (!req.queryVector || req.queryVector.length !== 768) {
+    degradedReasons.push('REPRESENTATION_MISMATCH');
+    return {
+      status: 'REPRESENTATION_MISMATCH',
+      degradedReasons,
+      results: [],
+      candidateSetTruncated: false,
+      candidateCount: 0,
+      receipt: {
+        schema: 'atlas.packet-dense-search-receipt.v1',
+        timestamp: new Date().toISOString(),
+        queryDimensions: req.queryVector?.length ?? 0,
+        collection: req.collection,
+        candidateCount: 0,
+        candidateSetTruncated: false,
+        qdrantHitCount: 0,
+        joinedResultCount: 0,
+        degradedReasons,
+      },
+    };
+  }
 
   // Stage 1 — Postgres bitmap prefilter (returns packetKey + sourceRef pairs)
   const prefilter = await runPacketBitmapPrefilter(deps.db, req, req.candidateCap);
   const candidateCount = prefilter.candidates.length;
 
-  if (candidateCount === 0) {
-    return { status: 'NO_RESULTS', degradedReasons: [], results: [], candidateSetTruncated: prefilter.candidateSetTruncated, candidateCount: 0 };
+  if (prefilter.candidateSetTruncated) {
+    degradedReasons.push('CANDIDATE_CAP_EXCEEDED');
   }
 
-  // Stage 2 — Qdrant ANN restricted to the candidate source_ref set. source_ref is indexed and
-  // 100%-populated on both Qdrant collections; packet_key is unindexed (though present) on
-  // codebase_chunks_768 and only ~12% populated on _768_v2 (see packet-dense-rerank.ts's header
-  // comment for the full finding, corrected twice 2026-09-16 — earlier versions of this comment
-  // wrongly said packet_key doesn't exist at all, first on neither collection then on _v2 alone).
+  if (candidateCount === 0) {
+    return {
+      status: 'NO_RESULTS',
+      degradedReasons,
+      results: [],
+      candidateSetTruncated: prefilter.candidateSetTruncated,
+      candidateCount: 0,
+      receipt: {
+        schema: 'atlas.packet-dense-search-receipt.v1',
+        timestamp: new Date().toISOString(),
+        queryDimensions: req.queryVector.length,
+        collection: req.collection,
+        candidateCount: 0,
+        candidateSetTruncated: prefilter.candidateSetTruncated,
+        qdrantHitCount: 0,
+        joinedResultCount: 0,
+        degradedReasons,
+      },
+    };
+  }
+
+  // Stage 2 — Qdrant ANN restricted to the candidate source_ref set.
   const candidateSourceRefs = [...new Set(prefilter.candidates.map((c) => c.sourceRef))];
   const hits = await runPacketDenseRerank(deps.queryQdrantPoints, {
     queryVector: req.queryVector,
@@ -177,22 +244,34 @@ export async function runPacketDenseSearch(
   });
 
   if (hits.length === 0) {
-    return { status: 'NO_RESULTS', degradedReasons: [], results: [], candidateSetTruncated: prefilter.candidateSetTruncated, candidateCount };
+    return {
+      status: 'NO_RESULTS',
+      degradedReasons,
+      results: [],
+      candidateSetTruncated: prefilter.candidateSetTruncated,
+      candidateCount,
+      receipt: {
+        schema: 'atlas.packet-dense-search-receipt.v1',
+        timestamp: new Date().toISOString(),
+        queryDimensions: req.queryVector.length,
+        collection: req.collection,
+        candidateCount,
+        candidateSetTruncated: prefilter.candidateSetTruncated,
+        qdrantHitCount: 0,
+        joinedResultCount: 0,
+        degradedReasons,
+      },
+    };
   }
 
-  // Map Qdrant hits (keyed by source_ref) back to Stage 1's packet_key candidates. One
-  // source_ref can back several packets (different symbols in the same file) — each shares the
-  // file-level dense score, which is an honest limitation of chunk-level (not symbol-level)
-  // embeddings, not a bug; documented in design.md.
+  // Map Qdrant hits (keyed by source_ref) back to Stage 1's packet_key candidates.
   const packetKeysBySourceRef = new Map<string, string[]>();
   for (const candidate of prefilter.candidates) {
     const list = packetKeysBySourceRef.get(candidate.sourceRef) ?? [];
     list.push(candidate.packetKey);
     packetKeysBySourceRef.set(candidate.sourceRef, list);
   }
-  // Keep only the highest-scoring occurrence per packetKey — multiple Qdrant chunks for the
-  // same source_ref (and therefore the same candidate packets) can each match, which would
-  // otherwise duplicate a packet in the response at descending scores (observed live 2026-09-16).
+
   const bestScoreByPacketKey = new Map<string, number>();
   for (const hit of hits) {
     for (const packetKey of packetKeysBySourceRef.get(hit.sourceRef) ?? []) {
@@ -207,7 +286,24 @@ export async function runPacketDenseSearch(
     .sort((a, b) => b.score - a.score);
 
   if (scoredPacketKeys.length === 0) {
-    return { status: 'NO_RESULTS', degradedReasons: [], results: [], candidateSetTruncated: prefilter.candidateSetTruncated, candidateCount };
+    return {
+      status: 'NO_RESULTS',
+      degradedReasons,
+      results: [],
+      candidateSetTruncated: prefilter.candidateSetTruncated,
+      candidateCount,
+      receipt: {
+        schema: 'atlas.packet-dense-search-receipt.v1',
+        timestamp: new Date().toISOString(),
+        queryDimensions: req.queryVector.length,
+        collection: req.collection,
+        candidateCount,
+        candidateSetTruncated: prefilter.candidateSetTruncated,
+        qdrantHitCount: hits.length,
+        joinedResultCount: 0,
+        degradedReasons,
+      },
+    };
   }
 
   // Stage 3 — join back to atlas_packets by packet_key (never feature_id or source_ref alone)
@@ -217,8 +313,8 @@ export async function runPacketDenseSearch(
            feature_id, summary, reward_prior, community_id, page_rank_score, domain_class,
            ast_score, tree_node_id, bm25_terms, trigrams, taxonomy_level, ontology,
            neo4j_node_id, used_concepts, latent_64, qdrant_point_id, rerank_features, canonical
-    FROM atlas_packets
-    WHERE packet_key = ANY($1::text[])
+     FROM atlas_packets
+     WHERE packet_key = ANY($1::text[])
   `;
   const joinResult = await deps.db.query<JoinBackRow>(joinSql, [packetKeys]);
   const byPacketKey = new Map<string, JoinBackRow>(joinResult.rows.map((row) => [row.packet_key, row]));
@@ -228,7 +324,9 @@ export async function runPacketDenseSearch(
       const row = byPacketKey.get(scored.packetKey);
       if (!row) return null; // no matching canonical row — drop rather than fabricate identity
       const candidate = prefilter.candidates.find((item) => item.packetKey === row.packet_key);
-      if (!candidate || candidate.sourceRef !== row.source_ref || candidate.sourceRevision !== (row.source_revision ?? null) || String(candidate.workspaceRevision ?? '') !== String(row.workspace_revision ?? '')) return null;
+      if (!candidate || candidate.sourceRef !== row.source_ref || candidate.sourceRevision !== (row.source_revision ?? null) || String(candidate.workspaceRevision ?? '') !== String(row.workspace_revision ?? '')) {
+        return null;
+      }
       const result: PacketDenseSearchResult = {
         packetKey: row.packet_key,
         titleId: row.title_id,
@@ -253,11 +351,26 @@ export async function runPacketDenseSearch(
     })
     .filter((r): r is PacketDenseSearchResult => r !== null);
 
+  if (results.length < scoredPacketKeys.length) {
+    degradedReasons.push('IDENTITY_BRIDGE_UNAVAILABLE');
+  }
+
   return {
     status: results.length > 0 ? 'OK' : 'IDENTITY_BRIDGE_UNAVAILABLE',
-    degradedReasons: results.length === scoredPacketKeys.length ? [] : ['IDENTITY_BRIDGE_UNAVAILABLE'],
+    degradedReasons,
     results,
     candidateSetTruncated: prefilter.candidateSetTruncated,
     candidateCount,
+    receipt: {
+      schema: 'atlas.packet-dense-search-receipt.v1',
+      timestamp: new Date().toISOString(),
+      queryDimensions: req.queryVector.length,
+      collection: req.collection,
+      candidateCount,
+      candidateSetTruncated: prefilter.candidateSetTruncated,
+      qdrantHitCount: hits.length,
+      joinedResultCount: results.length,
+      degradedReasons,
+    },
   };
 }

@@ -1,6 +1,6 @@
 {
   "schema": "atlas.parent-atlas-promotion-gates.v1",
-  "generatedAt": "2026-09-18T19:42:40.237Z",
+  "generatedAt": "2026-10-12T03:09:53.180Z",
   "mode": "READ_ONLY",
   "status": "BLOCKED",
   "proofLevel": "BLOCKED",
@@ -393,7 +393,7 @@
           "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
           "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
           "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-          "observedAt": "2026-09-17T17:40:25.997Z"
+          "observedAt": "2026-09-21T22:53:47.662Z"
         },
         "qualifyingExecutionIds": [
           "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -401,8 +401,8 @@
         ],
         "ownerSelection": {
           "requestedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-          "preflightStatus": "OWNER_SELECTION_VALIDATED_NOT_APPLIED",
-          "ownerPlanChecksum": "sha256:d99907af3d4a87b8463272151bbbf38bb1df68daf7f5fd963e7d42024c363e4d",
+          "preflightStatus": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+          "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
           "validated": true,
           "reason": null
         },
@@ -462,6 +462,24 @@
           "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
           "canonicalAuthorityTrueExecutions": 1
         },
+        "authorityShadow": {
+          "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+          "error": null,
+          "observation": {
+            "schema": "atlas.graphify-authority-shadow-observation.v1",
+            "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+            "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "authorityState": "LEGACY_IMPORTED",
+            "parityStatus": "PARITY_PROVEN",
+            "readParityProven": true,
+            "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+            "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+            "shadowAuthorityObserved": true,
+            "mutationAuthorized": false
+          }
+        },
         "canonicalAuthority": false,
         "readOnly": true,
         "writesPerformed": false,
@@ -473,7 +491,7 @@
       "exists": true,
       "value": {
         "schema": "atlas.current-source-owner-reconciliation.v1",
-        "generatedAt": "2026-09-18T01:55:54.056Z",
+        "generatedAt": "2026-10-05T17:29:31.487Z",
         "mode": "READ_ONLY",
         "writesPerformed": false,
         "databaseWrites": 0,
@@ -484,17 +502,17 @@
           "root": "C:\\Users\\james\\Videos\\deeds-web-app",
           "gitRoot": "C:/Users/james/Videos/deeds-web-app",
           "gitCommonDir": ".git",
-          "headCommit": "5de75715fb65f9aaae94aa6d2af4fdc68929d253",
-          "headTree": "55680c58ddb6584c50ae01c2a78f0202e58030c3",
+          "headCommit": "ae9651941ea3ed0ebfd5630ca22be4ccdb496b45",
+          "headTree": "0f7b71ef26b575b6ec44df4ec345cd48d83ecf11",
           "hostname": "DESKTOP-Q18MPHM",
           "dirty": true,
-          "sourceCount": 24735,
-          "sourceRefChecksum": "sha256:fec90060aca9dafa356fbf13a19d6585e22d2672650d499d9b290987367cb415",
+          "sourceCount": 26748,
+          "sourceRefChecksum": "sha256:2eed529628ede1aab620bc5bd3f4f0b4ffe328f4e8630d0346e32bbbe18e4141",
           "inventoryPolicy": {
             "command": "git ls-files --cached --others --exclude-standard -z",
-            "trackedAtHeadCount": 28548,
-            "candidateCount": 24774,
-            "admittedCount": 24735,
+            "trackedAtHeadCount": 32739,
+            "candidateCount": 26787,
+            "admittedCount": 26748,
             "skippedCount": 39,
             "maxSourceBytes": 5242880,
             "generatedPrefixesExcluded": [
@@ -546,7 +564,91 @@
               "NOT_VALID_UTF8_SOURCE": 8
             }
           },
-          "status": "PROVEN"
+          "status": "PROVEN",
+          "admittedSnapshotDelta": {
+            "snapshotRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+            "snapshotSourceCount": 25542,
+            "currentSourceCount": 26748,
+            "sharedSourceCount": 24446,
+            "currentOnlyCount": 2302,
+            "admittedOnlyCount": 1096,
+            "sharedDigestMatchCount": 23265,
+            "sharedDigestMismatchCount": 1181,
+            "dispositionCounts": {
+              "CURRENT_BYTES_MATCH_ADMITTED_SNAPSHOT": 23265,
+              "WORKTREE_BYTES_DRIFTED": 1181,
+              "WORKTREE_ADDED_AFTER_SNAPSHOT": 2302,
+              "MISSING_FROM_CURRENT_WORKTREE": 1096
+            },
+            "requiresSnapshotRefresh": true,
+            "currentOnlySample": [
+              ".claude/skills/openspec-quickhit/SKILL.md",
+              ".claude/skills/parent-atlas-workstation/SKILL.md",
+              ".claude/skills/validating-parent-atlas/SKILL.md",
+              ".claude/skills/validating-parent-atlas/reference/adversarial-probes.md",
+              ".claude/skills/validating-parent-atlas/reference/identity-and-lineage.md",
+              ".claude/skills/validating-parent-atlas/reference/proof-levels.md",
+              ".claude/skills/validating-parent-atlas/reference/runtime-side-effects.md",
+              ".claude/skills/validating-parent-atlas/reference/semantic-projection.md",
+              ".claude/skills/validating-parent-atlas/reference/structural-lineage.md",
+              ".codex/skills/parent-atlas-openspec-progress/SKILL.md",
+              ".okf/docs/dspy/corpus-3.4.0.json",
+              ".okf/docs/dspy/corpus.json",
+              ".okf/docs/dspy/postgres-index-contract.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/indexes/firecrawl-map.json",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/manifest.json",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0150a9bf3908b8d567987f068e43b5108781feff2b8ccbb7edc2ba0aa090d051.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/04565bee03781ddd66524ca26fcf64c4a8425f3ebabfc57f99ba9d904d6ab69a.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/0507794de7baf379eb626ddd1ebde433a82b06b3e0910e2203b0d9cc24c79ae0.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/07ae7e91bf239d28c4d0a4eaffbefdfd07ed73a3cf5b50b179ffe998178cbc5e.md",
+              ".okf/docs/dspy/snapshots/20260928T203954Z-1d0dffe4ef63/pages/097569378fbff92f48e8e3af03f37b06107c6467bb36897ef5e85fc48733bba0.md"
+            ],
+            "admittedOnlySample": [
+              "claude-mem/.agent/rules/claude-mem-context.md",
+              "claude-mem/.agents/plugins/marketplace.json",
+              "claude-mem/.claude-plugin/marketplace.json",
+              "claude-mem/.claude-plugin/plugin.json",
+              "claude-mem/.claude/commands/anti-pattern-czar.md",
+              "claude-mem/.claude/plans/animated-installer.md",
+              "claude-mem/.claude/reports/test-audit-2026-01-05.md",
+              "claude-mem/.claude/settings.json",
+              "claude-mem/.codex-plugin/plugin.json",
+              "claude-mem/.github/FUNDING.yml",
+              "claude-mem/.github/ISSUE_TEMPLATE/bug_report.md",
+              "claude-mem/.github/ISSUE_TEMPLATE/feature_request.md",
+              "claude-mem/.github/copilot-instructions.md",
+              "claude-mem/.markdownlint.json",
+              "claude-mem/.plan/issue-2341-reliability-slice.md",
+              "claude-mem/.plan/npx-distribution.md",
+              "claude-mem/.plan/subagent-summary-disable-and-labeling.md",
+              "claude-mem/.plan/worktree-adoption.md",
+              "claude-mem/.translation-cache.json",
+              "claude-mem/.windsurf/rules/claude-mem-context.md"
+            ],
+            "sharedDigestMismatchSample": [
+              ".claude/settings.local.json",
+              ".claude/skills/drizzle-schema-review/SKILL.md",
+              ".okf/index.md",
+              ".vscode/tasks.json",
+              "ACE-MATERIALIZATION-BLOCKER-1-FIXED.md",
+              "ACE-TO-RETRIEVAL-COMPLETION-AUDIT.md",
+              "AGENTS.md",
+              "claude.md",
+              "codex.md",
+              "crates/turbovec-napi/index.d.ts",
+              "crates/turbovec-napi/index.js",
+              "crates/turbovec-napi/src/lib.rs",
+              "docker-compose.yml",
+              "docker/bifrost/config.json",
+              "docker/clickhouse-mirror/clickhouse-mirror.py",
+              "docker/docker-compose.gpu.yml",
+              "docker/docling-vlm/app.py",
+              "docker/image-synthesis/app.py",
+              "docker/langgraph-synthesis/app.py",
+              "docs/.okf/registry.yaml"
+            ],
+            "deltaChecksum": "sha256:3e91052e8ec5db65de3401a6af3869f88528dd1a6cd789b2c0cb91e69f737c1a"
+          }
         },
         "currentExecutionCandidates": [
           {
@@ -557,16 +659,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-15T01:13:15.628Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25542,
+            "distinctSourceCount": 25542,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
               "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -577,16 +680,17 @@
             "canonical_authority": true,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-15T01:11:57.965Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25542,
+            "distinctSourceCount": 25542,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:841f106d08e55a3b61fd29133eaa47cf5df5373e325d762d94479609e893b59d",
               "receipt_ref": "sealed-snapshot:sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:b868fdd93445a245f576944c0c0225da6799856f3cbffd9262899fe152990bc5",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -597,16 +701,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-13T01:40:49.787Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -617,16 +722,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-13T01:40:07.535Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -637,16 +743,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-13T01:39:34.179Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 1,
+            "distinctSourceCount": 1,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:609eb801e691e1c48184910501f9a55a12729e05251d4c4bf1ff1031b9ce0e98",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9112393e48e6e926fdce33b2be1df7cabccca8b80b62890028b2fe1a69934b22",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -657,16 +764,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-13T01:08:02.795Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:6b356954650330b3e17abbd19533a89ce5db3904ea35840f9117d4ca315c2bd5",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:c21bb5a366c1dcdb44fceb84a966763f2cf2cc88680faad2680324fcb605ae73",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -677,16 +785,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-13T01:04:14.357Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:dd7ef6419773d004445845b19bb1e280aa35c717284fa0b5795ae6b8432237d2",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9a27e2d43d28913ef1c97256a5fe2e374ff3ceea4e4d0d24401bfa086f5001ae",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -697,16 +806,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-11T15:44:01.520Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25291,
+            "distinctSourceCount": 25291,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:d7eaf600123b6d55bb8be3193e154e9f24acf217e8e79bc2b3c383a99c2d1869",
               "receipt_ref": "sealed-snapshot:sha256:06af15600298886a171ca3af0b66b43e4c15632c8cc0e51daf3dce7c94eb5a36"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:15bca318677e8624a2bf4e44a03a91a5d02636516973b120e61e26c21e1e00a5",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -717,16 +827,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T22:46:18.679Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25271,
+            "distinctSourceCount": 25271,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:889d6a1457a73e5c42b6d650bbd012e214d1ea7d6838a453558b612ed4df22de",
               "receipt_ref": "sealed-snapshot:sha256:9b61929b85a6c4e2d8e459e4cca1294c934746f1430e6535f9546cf16e83c9a5"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:e3c9e8ddd4f96516825e658a82d01c0e6553aaf5c5f8ed1cc26337ea4dccab02",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -737,16 +848,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T03:17:24.206Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -757,16 +869,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T03:15:00.376Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -777,16 +890,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-10T03:13:04.218Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -797,16 +911,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T01:51:09.991Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -817,16 +932,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T01:47:48.343Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -837,16 +953,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T01:44:15.257Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -857,16 +974,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T01:36:37.458Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -877,16 +995,17 @@
             "canonical_authority": false,
             "trigger_kind": "CURRENT_WORKSPACE_SOURCE_SELECTION",
             "completed_at": "2026-09-10T01:33:01.264Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 25266,
+            "distinctSourceCount": 25266,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:a94f4e6aa4608eb411fe5254426e6366565ab136dddb751c624f6ae882fad249",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:9031f8185a6714ef55ba7f6b155cb8a3e022370b22f4d6511704927ee68d7419",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -897,16 +1016,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-10T01:29:33.761Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 50,
+            "distinctSourceCount": 50,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:f0f64e3d6831fe2ea1e3e2c29fb70f37b2b18fb287dedf26f24bf63cc88f1bd1",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:3a0f9c2425e73280ec0e2cd5629c1b0135990667b8f667a2ae949604a696cda3",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -917,16 +1037,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-10T01:28:48.283Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -937,16 +1058,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-10T01:19:52.474Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -957,16 +1079,17 @@
             "canonical_authority": false,
             "trigger_kind": "BOUNDED_COMMITTED_CANARY",
             "completed_at": "2026-09-10T01:18:59.683Z",
-            "memberCount": 0,
-            "distinctSourceCount": 0,
-            "workspaceRevisionCount": 0,
+            "memberCount": 3,
+            "distinctSourceCount": 3,
+            "workspaceRevisionCount": 1,
             "sourceSelection": {
               "status": "COMPLETED",
               "output_checksum": "sha256:ca82728c635983da5dcc33a05c1dc2c873bc0451332b89ae2df87fbdfaf0a1b2",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
-            "sourceRefChecksum": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            "selectionMembershipReadback": false,
+            "membershipSource": "GRAPHIFY_EXECUTION_FILE_MEMBERSHIP_V2",
+            "sourceRefChecksum": "sha256:7b30664bc6faa9604ab5f1270b563a94715b80bdb72cb5dcab59f2f52abf1978",
+            "selectionMembershipReadback": true,
             "canonicalAuthority": false
           },
           {
@@ -985,6 +1108,7 @@
               "output_checksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:5fa4a0ef539ced4a7481b523e049cb1adf2c62435a664b900dd70593cbc153dd",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1005,6 +1129,7 @@
               "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1025,6 +1150,7 @@
               "output_checksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
               "receipt_ref": "graphify-current-workspace-source-selection:v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:2f65bb1dc2705f89e7400be2ca4707828939e03d7d4a2d30ae841ba453de19a6",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1045,6 +1171,7 @@
               "output_checksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:97482736f84a82982481ac22daabd08d8ccde258ea3c66d2b1d2f9c3168b8e50",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1065,6 +1192,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1085,6 +1213,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1105,6 +1234,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1125,6 +1255,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1145,6 +1276,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": "committed-canary-fresh-materialization-v1"
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1165,6 +1297,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": null
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1185,6 +1318,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": null
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1205,6 +1339,7 @@
               "output_checksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
               "receipt_ref": null
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:c8f14f107ed38991b01b7d243d820007f3bb86e94b277fe932c256bcbfe6c030",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1225,6 +1360,7 @@
               "output_checksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
               "receipt_ref": null
             },
+            "membershipSource": "GRAPHIFY_EXECUTION_FILES",
             "sourceRefChecksum": "sha256:91af4e42a1f1ec186c104f981e8264a333e16100351a1b7c671bfe8b196cae43",
             "selectionMembershipReadback": true,
             "canonicalAuthority": false
@@ -1288,7 +1424,7 @@
             "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
             "snapshotSourceMembershipChecksum": "sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb",
             "snapshotSourceContentChecksum": "sha256:fd93382dbe0bfbbd19dafbb92752ece2d4829a0ec29043cbc3f91a0ebde58c5d",
-            "observedAt": "2026-09-17T17:40:25.997Z"
+            "observedAt": "2026-09-21T22:53:47.662Z"
           },
           "qualifyingExecutionIds": [
             "0dba1c0d-2cf7-4f35-a61b-c77956f60d3d",
@@ -1296,8 +1432,8 @@
           ],
           "ownerSelection": {
             "requestedExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
-            "preflightStatus": "OWNER_SELECTION_VALIDATED_NOT_APPLIED",
-            "ownerPlanChecksum": "sha256:d99907af3d4a87b8463272151bbbf38bb1df68daf7f5fd963e7d42024c363e4d",
+            "preflightStatus": "OWNER_SELECTION_APPLIED_READBACK_VERIFIED",
+            "ownerPlanChecksum": "sha256:ae591c99013c268ba48251978f48fe339597b02c06f774def82bbc6edec83f97",
             "validated": true,
             "reason": null
           },
@@ -1357,17 +1493,34 @@
             "status": "GRAPH_CANONICAL_AUTHORITY_PROVEN",
             "canonicalAuthorityTrueExecutions": 1
           },
+          "authorityShadow": {
+            "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+            "error": null,
+            "observation": {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+              "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityState": "LEGACY_IMPORTED",
+              "parityStatus": "PARITY_PROVEN",
+              "readParityProven": true,
+              "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            }
+          },
           "canonicalAuthority": false,
           "readOnly": true,
           "writesPerformed": false,
           "producerRevision": "atlas.current-graphify-snapshot-authority.v1"
         },
-        "ownerDecision": "LEGACY_ONLY_NO_CURRENT_OWNER",
+        "ownerDecision": "CURRENT_EXECUTION_OWNER_CANDIDATE",
         "admission": {
           "canonicalAuthority": false,
           "safeToPromote": false,
           "reasons": [
-            "EXACT_CURRENT_COMPLETED_OWNER_COUNT_NOT_ONE",
             "WORKTREE_DIRTY_REQUIRES_SNAPSHOT_POLICY",
             "STATIC_WORKTREE_INVENTORY_DIFFERS_FROM_WORKSPACE_REVISION_MANIFEST"
           ],
@@ -1379,7 +1532,307 @@
             "625743d2-092b-4fa8-abe0-9dc094920c80"
           ]
         },
-        "checksum": "sha256:205459f9eebfa0f78578d11ef9bb996078dc10649019d4b1c15e780a2817f5b1"
+        "authorityShadow": {
+          "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+          "error": null,
+          "observations": [
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+              "legacyExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityExecutionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "authorityState": "LEGACY_IMPORTED",
+              "parityStatus": "PARITY_PROVEN",
+              "readParityProven": true,
+              "runtimeSelection": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:3be7901e1b6bc4f6499185f775eac2ae93e56305940703a7da66a436e4e3a3e0",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:f623a2ec15fd5f1af3e5bd67481d99315bed04359b185bf27ec7d0efb15c502c",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:bf3acebd9e4140b8d77ee4fd8839a888b57c3401d26a74e06aeca7e4ae2579e2",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:8ebe1fdd07b6e2c0c78d55e42c7fc9bf73ee21a6f87d31dbf2ca4032eb624669",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:578fc2602ee7ad6c29afea852f011cbff297b42ec0d4e8509e083e74f3d85500",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:2978d34eaf82a1b5f01882fe61950a295256adf7253ca07777fbee31a4e97690",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c57775da8eb8320fbeae542e7e9ee608f35db56f19d76ed00363ed8c759fe1f0",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:0b5cb14bd9014009ea8debc779df62cb3f6e669f8de94c79ad98ca8b88ff5e24",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5320597bf4e26adc0d71dabd34faf3eec74a5f2b10f57d92c33771f2b7691f82",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5db2bc428d4dcf07c2a11096039aad18c916b50aa17e849b2325a782d981dcdc",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:5d4ee74f53ea47ba80d4835494856fd0cfbc9ae532cabf8db1a17277d937510f",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c44511cb21e26ca33b97ae6a7f3878827883dd11680db7aeefd60c477711be70",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:ec2cc83d87c6f88c7fea4980f3d6d50db8a5d8686f6f4899d87645f0b5cd6507",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:bc74ddc7e74af1e6fa9681182e2bc97fa4b2dc49d59c40c251fb505d22bf3ba1",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:817549d78646b52a0f34f8af96970ae95256b87e59125d1542611f8f386d69bb",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:c17c40c28da9c0ec831c4a5beb7390fb73a581c6b147cae95c8da79d3fcfb4d2",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:fc051ccfc7e5627b480d369c84eeb3cc73e790b4d3a0ae2ee6da971585c05c11",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            },
+            {
+              "schema": "atlas.graphify-authority-shadow-observation.v1",
+              "workspaceId": "625743d2-092b-4fa8-abe0-9dc094920c80",
+              "workspaceRevision": "sha256:7a95c0843ebb4203309bc4396ba31313fbd973d08439822ee2bdbd39531fb401",
+              "legacyExecutionId": null,
+              "authorityExecutionId": null,
+              "authorityState": null,
+              "parityStatus": "NO_SELECTION",
+              "readParityProven": false,
+              "runtimeSelection": null,
+              "runtimeOwner": "LEGACY_CANONICAL_AUTHORITY",
+              "shadowAuthorityObserved": true,
+              "mutationAuthorized": false
+            }
+          ]
+        },
+        "checksum": "sha256:ff75a46dcaea076347ff1bc0c20beb53ac50de1857629869c319f301a3848a6f"
       }
     },
     "sourceHydration": {

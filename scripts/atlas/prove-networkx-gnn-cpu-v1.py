@@ -46,6 +46,7 @@ def main() -> int:
         ROOT / "python" / "atlas_graph_runtime" / "gnn_reference.py",
         ROOT / "python" / "tests" / "test_networkx_gnn_reference.py",
         ROOT / "python" / "tests" / "test_networkx_gnn_reference_unittest.py",
+        ROOT / "docs" / ".okf" / "architecture" / "domain-classification-and-agentic-retrieval-v1.md",
         Path(__file__).resolve(),
     )
     source_checksums = {

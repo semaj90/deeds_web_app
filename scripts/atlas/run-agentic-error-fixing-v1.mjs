@@ -88,6 +88,23 @@ function actionFor(kind) {
   return actions[kind];
 }
 
+function recommendedMcpToolsFor(kind, file) {
+  switch (kind) {
+    case 'GRAPH_OR_GPU':
+      return ['atlas.graph.expand', 'trace_tool_chain', 'read_file'];
+    case 'TYPECHECK_OR_SCHEMA':
+      return ['find_source_refs', 'read_file'];
+    case 'LINEAGE_ADMISSION':
+      return ['find_source_refs', 'trace_database', 'read_file'];
+    case 'RETRIEVAL_OR_PROJECTION':
+      return ['atlas.search', 'build_agentic_rag_context', 'read_file'];
+    case 'DATABASE_SCHEMA':
+      return ['trace_database', 'read_file'];
+    default:
+      return ['read_file'];
+  }
+}
+
 function buildPlan(text) {
   const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const candidates = [];
@@ -107,6 +124,7 @@ function buildPlan(text) {
       owner: ownerFor(kind, file),
       diagnostic: line.slice(0, 1000),
       proposedAction: actionFor(kind),
+      recommendedMcpTools: recommendedMcpToolsFor(kind, file),
       status: 'PROPOSED',
       mutationAllowed: false,
     });
@@ -192,7 +210,7 @@ const modelResolution = await resolveLlamaModel();
 const deterministicBody = {
   schema: 'atlas.agentic-error-fixing.v1',
   inputChecksum: sha256(diagnostics),
-  candidates: candidates.map(({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed }) => ({ fingerprint, errorCode, kind, file, owner, proposedAction, status, mutationAllowed })),
+  candidates: candidates.map(({ fingerprint, errorCode, kind, file, owner, proposedAction, recommendedMcpTools, status, mutationAllowed }) => ({ fingerprint, errorCode, kind, file, owner, proposedAction, recommendedMcpTools, status, mutationAllowed })),
   validation: validation ? { command: validation.command, exitCode: validation.exitCode, timedOut: validation.timedOut, outputChecksum: validation.outputChecksum } : null,
   modelResolution: {
     status: modelResolution.status,
@@ -201,6 +219,45 @@ const deterministicBody = {
     resolutionSource: modelResolution.resolutionSource ?? null,
   },
 };
+
+async function synthesizePlanWithOrnith(planCandidates, resolvedModel) {
+  if (!resolvedModel.runtimeModelId || resolvedModel.status !== 'PROVEN_RUNTIME') {
+    return { status: 'SKIPPED', reason: 'MODEL_NOT_AVAILABLE', synthesis: null };
+  }
+  const prompt = [
+    `You are the Parent Atlas diagnostic planner. Given these error repair candidates:`,
+    JSON.stringify(planCandidates, null, 2),
+    ``,
+    `Synthesize a grounded, minimal, non-mutating repair advice sequence.`,
+    `Do not invent new files. Preserve existing interfaces and canonical rules.`,
+  ].join('\n');
+
+  try {
+    const res = await fetch(`${resolvedModel.endpoint}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: resolvedModel.runtimeModelId,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.1,
+        max_tokens: 512,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return { status: 'SYNTHESIS_FAILED', reason: `HTTP_${res.status}`, synthesis: null };
+    const data = await res.json();
+    return {
+      status: 'SYNTHESIS_COMPLETE',
+      modelUsed: resolvedModel.runtimeModelId,
+      synthesis: data.choices?.[0]?.message?.content ?? null,
+    };
+  } catch (err) {
+    return { status: 'SYNTHESIS_FAILED', reason: err instanceof Error ? err.message : String(err), synthesis: null };
+  }
+}
+
+const synthesize = args.includes('--synthesize');
+const synthesisResult = synthesize ? await synthesizePlanWithOrnith(deterministicBody.candidates, modelResolution) : null;
 
 const report = {
   ...deterministicBody,
@@ -212,6 +269,7 @@ const report = {
   canonicalAuthority: false,
   validationDetails: validation ? { launchError: validation.launchError, outputExcerpt: validation.outputExcerpt } : null,
   modelResolution,
+  synthesis: synthesisResult,
   deterministicPlanChecksum: sha256(JSON.stringify(deterministicBody)),
   candidateCount: candidates.length,
   nextGate: candidates.length ? 'OPERATOR_REVIEW_THEN_SCOPED_VALIDATION' : 'SUPPLY_DIAGNOSTICS',

@@ -315,7 +315,7 @@ async function getOllamaSummary(
 	health: ClusterHealth
 ): Promise<string | null> {
 	try {
-		const { callOllamaChat } = await import('$lib/server/ollama.js');
+		const { callLlamaServerChat } = await import('$lib/server/ollama.js');
 
 		const collectionStatus = collections
 			.map((c) => `- ${c.name}: ${c.points} points (${c.status})`)
@@ -325,7 +325,7 @@ async function getOllamaSummary(
 		const user = `Vector store status:\n${collectionStatus}\n\nCluster health: ${health.totalClusters} error clusters, ${health.errorEvents} error events, codebase index: ${health.codebaseChunksInQdrant} chunks.\n\nIdentify the most important issue and suggest a fix.`;
 
 		const result = await Promise.race([
-			callOllamaChat(system, user),
+			callLlamaServerChat(system, user),
 			new Promise<null>((resolve) => setTimeout(() => resolve(null), 15_000)),
 		]);
 

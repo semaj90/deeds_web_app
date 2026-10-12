@@ -50,6 +50,7 @@ export interface RevisionQualifiedHydrationFailureV1 {
 }
 
 export interface RevisionQualifiedHydrationDbRowV1 {
+  [key: string]: unknown;
   chunk_row_id: string;
   canonical_chunk_id: string;
   chunk_id: string | null;

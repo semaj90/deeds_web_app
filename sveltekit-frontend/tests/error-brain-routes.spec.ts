@@ -72,7 +72,7 @@ vi.mock('$lib/server/ollama.js', () => ({
 	getChatModel: () => 'gemma4-rotorquant:latest',
 	getEmbedModel: () => 'embeddinggemma:latest',
 	getOllamaGenerationEndpoint: () => 'http://ollama.test',
-	callOllamaChat: mockCallOllamaChat,
+	callLlamaServerChat: mockCallOllamaChat,
 	ollamaFetch: mockOllamaFetch,
 }));
 

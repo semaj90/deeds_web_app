@@ -1,8 +1,8 @@
 {
-  "generated": "2026-09-14T20:58:42.619Z",
+  "generated": "2026-10-11T20:02:29.249Z",
   "mode": "dry-run",
-  "traces_loaded": 1000,
-  "synthetic_traces_excluded": 1000,
+  "traces_loaded": 1100,
+  "synthetic_traces_excluded": 1100,
   "eligible_traces": 0,
   "total_rows": 0,
   "positive_rows": 0,

@@ -3,13 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
 import { buildPromptPlanV1 } from '$lib/server/atlas/prefill/prompt-plan-v1.js';
 
-const { executeMastraPromptPlanV1, resolveLoadedLlamaModel } = vi.hoisted(() => ({
+const { executeMastraPromptPlanV1, resolveLoadedLlamaModel, readContextManifestV2FromPostgresV1 } = vi.hoisted(() => ({
   executeMastraPromptPlanV1: vi.fn(),
   resolveLoadedLlamaModel: vi.fn(),
+  readContextManifestV2FromPostgresV1: vi.fn(),
 }));
 
 vi.mock('@deeds/atlas-orchestrator/prompt-plan-agent', () => ({ executeMastraPromptPlanV1 }));
 vi.mock('$lib/server/ai/llama-server-model-resolver.js', () => ({ resolveLoadedLlamaModel }));
+vi.mock('$lib/server/atlas/graph/context-manifest-v2-postgres-readback-v1.js', () => ({ readContextManifestV2FromPostgresV1 }));
 vi.mock('$lib/server/env.server.js', () => ({ ENV: {
   LLAMA_SERVER_URL: 'https://llama.fixture',
   LLAMA_SERVER_MODEL: 'configured-model',
@@ -86,6 +88,13 @@ describe('POST /api/atlas/mastra-agent', () => {
       resolvedModel: 'opaque-loaded-model-id',
       source: 'llama-server-loaded',
     });
+    readContextManifestV2FromPostgresV1.mockResolvedValue({
+      status: 'BLOCKED',
+      reason: 'MANIFEST_READBACK_NOT_FOUND',
+      manifest: null,
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
     executeMastraPromptPlanV1.mockResolvedValue({
       schema: 'atlas.mastra-prompt-plan-execution-receipt.v1',
       content: 'Grounded response.',
@@ -101,6 +110,15 @@ describe('POST /api/atlas/mastra-agent', () => {
 
   it('executes only an admitted packet-key manifest and its checksum-bound evidence plan', async () => {
     const data = requestData();
+    readContextManifestV2FromPostgresV1.mockResolvedValue({
+      status: 'READBACK_MATCH_NOT_ADMITTED',
+      reason: null,
+      manifest: data.admission.manifest,
+      identityChecksum: data.admission.manifest.identityChecksum,
+      payloadChecksum: sha(JSON.stringify(data.admission.manifest)),
+      canonicalAuthority: false,
+      writesPerformed: false,
+    });
     const response = await POST({
       request: new Request('https://app.fixture/api/atlas/mastra-agent', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data),
@@ -109,6 +127,7 @@ describe('POST /api/atlas/mastra-agent', () => {
     } as never);
     expect(response.status).toBe(200);
     expect(resolveLoadedLlamaModel).toHaveBeenCalledWith('https://llama.fixture', 'configured-model');
+    expect(readContextManifestV2FromPostgresV1).toHaveBeenCalledWith(data.admission.manifest.identityChecksum);
     expect(executeMastraPromptPlanV1).toHaveBeenCalledWith(expect.objectContaining({
       baseUrl: 'https://llama.fixture',
       resolvedModel: 'opaque-loaded-model-id',
@@ -119,6 +138,21 @@ describe('POST /api/atlas/mastra-agent', () => {
       success: true,
       result: { model: 'opaque-loaded-model-id', writesPerformed: false, canonicalAuthority: false },
     });
+  });
+
+  it('blocks synthesis when the manifest has no independent Postgres readback', async () => {
+    const data = requestData();
+    const response = await POST({
+      request: new Request('https://app.fixture/api/atlas/mastra-agent', {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data),
+      }),
+      locals: { user: { id: 'user-fixture' } },
+    } as never);
+
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({ success: false, error: 'CONTEXT_MANIFEST_READBACK_BLOCKED' });
+    expect(resolveLoadedLlamaModel).not.toHaveBeenCalled();
+    expect(executeMastraPromptPlanV1).not.toHaveBeenCalled();
   });
 
   it('blocks packet/evidence identity drift before model resolution', async () => {

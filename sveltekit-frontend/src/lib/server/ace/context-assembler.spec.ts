@@ -1,6 +1,53 @@
 import { describe, expect, it, vi } from 'vitest';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { ACEContextAssembler, estimateContentTokensV1, selectTopCandidatesV1 } from './context-assembler.js';
+import { buildTopologicalKagCacheScopeV1, readAceCacheProjectionIdentityV1 } from '../features/ai/ace/context-assembler.js';
+
+describe('buildTopologicalKagCacheScopeV1', () => {
+  const base = {
+    files: ['1. src/ace.ts [PR=0.42]'],
+    fileGraphBindings: [{ key: 'packet:ace', packetKey: 'packet:ace', sourceRef: 'src/ace.ts', sourceRevision: 'source:r1', workspaceRevision: 'workspace:r1', graphRevision: 'graph:r1', projectionRevision: 'projection:r1', neighborhoodHash: 'sha256:a' }],
+    clusters: ['- cluster:gpu:3 [backend] tags=cache'],
+    lanes: ['ast', 'graph'],
+    laneTopFiles: ['src/ace.ts'],
+    agentsScope: 'root',
+  };
+
+  it('changes cache scope when rendered topology content or graph revisions change', () => {
+    const original = buildTopologicalKagCacheScopeV1(base);
+    expect(buildTopologicalKagCacheScopeV1({ ...base, files: ['1. src/ace.ts [PR=0.81]'] })).not.toBe(original);
+    expect(buildTopologicalKagCacheScopeV1({
+      ...base,
+      fileGraphBindings: [{ ...base.fileGraphBindings[0], graphRevision: 'graph:r2' }],
+    })).not.toBe(original);
+    expect(buildTopologicalKagCacheScopeV1({
+      ...base,
+      fileGraphBindings: [{ ...base.fileGraphBindings[0], sourceRevision: 'source:r2' }],
+    })).not.toBe(original);
+    expect(buildTopologicalKagCacheScopeV1({
+      ...base,
+      fileGraphBindings: [{ ...base.fileGraphBindings[0], workspaceRevision: 'workspace:r2' }],
+    })).not.toBe(original);
+  });
+
+  it('is deterministic for an identical bounded prompt scope', () => {
+    expect(buildTopologicalKagCacheScopeV1(base)).toBe(buildTopologicalKagCacheScopeV1(base));
+  });
+});
+
+describe('readAceCacheProjectionIdentityV1', () => {
+  it('preserves explicitly supplied identity fields without inferring missing revisions', () => {
+    expect(readAceCacheProjectionIdentityV1({ packet_key: 'p1', source_ref: 'src/a.ts', source_revision: 'src:r1' })).toEqual({
+      packetKey: 'p1', sourceRef: 'src/a.ts', sourceRevision: 'src:r1', workspaceRevision: null,
+    });
+  });
+
+  it('ignores non-string projection values and leaves them unavailable', () => {
+    expect(readAceCacheProjectionIdentityV1({ packet_key: 4, source_revision: null, workspaceRevision: false })).toEqual({
+      packetKey: null, sourceRef: null, sourceRevision: null, workspaceRevision: null,
+    });
+  });
+});
 
 describe('estimateContentTokensV1', () => {
   it('estimates from evidence bytes rather than packet identity fields', () => {

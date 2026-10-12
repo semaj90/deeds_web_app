@@ -13,7 +13,18 @@ import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.
 import { loadAuthorityShadowModuleV1 } from './lib/load-authority-shadow-v1.mjs';
 import { materializeWorkspaceRevisionOriginV1 } from '../../sveltekit-frontend/src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 
-const reportPath = path.join(REPO_ROOT, 'docs/reports/current-source-authority-repair-plan-v1.json');
+const outputArg = process.argv.slice(2).find((arg) => arg.startsWith('--output='));
+const defaultReportPath = path.join(REPO_ROOT, 'docs/reports/current-source-authority-repair-plan-v1.json');
+const scratchRoot = path.resolve(REPO_ROOT, '.tmp/atlas');
+const reportPath = outputArg
+  ? path.resolve(REPO_ROOT, outputArg.slice('--output='.length))
+  : defaultReportPath;
+if (outputArg && (reportPath === scratchRoot || !reportPath.startsWith(`${scratchRoot}${path.sep}`))) {
+  throw new Error('--output must resolve to a file beneath .tmp/atlas');
+}
+if (outputArg && fs.existsSync(reportPath)) {
+  throw new Error(`refusing to overwrite existing scratch report: ${reportPath}`);
+}
 const digest = (value: string | Buffer) => `sha256:${crypto.createHash('sha256').update(value).digest('hex')}`;
 const normalizeHash = (value: unknown) => {
   const raw = String(value ?? '').trim().toLowerCase();
@@ -162,6 +173,11 @@ const rows = graphRows.map((row) => {
   // instead. Legacy `source_revision` is still reported (below) for debugging visibility, just
   // no longer used as the comparison authority.
   const graphRevision = row.code_source_revision ? normalizeHash(row.code_source_revision) : null;
+  const currentSourceWorkingTreeState = !binding.trackedAtBaseCommit
+    ? 'UNTRACKED_CURRENT_SOURCE'
+    : binding.dirtyRelativeToBaseCommit
+      ? 'TRACKED_DIRTY_CURRENT_SOURCE'
+      : 'TRACKED_CLEAN_CURRENT_SOURCE';
   const mismatchReasons = [
     ...(currentHash !== graphHash ? ['CONTENT_DIGEST_MISMATCH'] : []),
     ...(graphRevision !== null && binding.sourceRevision !== graphRevision ? ['SOURCE_REVISION_MISMATCH'] : []),
@@ -177,6 +193,7 @@ const rows = graphRows.map((row) => {
     currentSourceRevision: binding.sourceRevision,
     graphContentHash: row.content_hash ?? null,
     currentContentDigest: binding.contentDigest,
+    currentSourceWorkingTreeState,
     graphWorkspaceRevision: row.workspace_revision ?? null,
     currentWorkspaceRevision: currentWorkspace?.record.workspaceRevision ?? null,
     graphByteLength: row.byte_length ?? null,
@@ -191,6 +208,13 @@ const counts = rows.reduce<Record<string, number>>((out, row) => {
 }, {});
 const mismatchReasonCounts = rows.reduce<Record<string, number>>((out, row) => {
   for (const reason of row.mismatchReasons ?? []) out[reason] = (out[reason] ?? 0) + 1;
+  return out;
+}, {});
+const mismatchSourceStateCounts = rows.reduce<Record<string, number>>((out, row) => {
+  if (row.status === 'CURRENT_BINDING_MISMATCH' && row.currentSourceWorkingTreeState) {
+    const state = row.currentSourceWorkingTreeState as string;
+    out[state] = (out[state] ?? 0) + 1;
+  }
   return out;
 }, {});
 const exactRows = rows.filter((row) => row.status === 'EXACT_CURRENT_BINDING');
@@ -216,6 +240,7 @@ const report = {
   currentBindingCount: currentWorkspace?.bindings?.length ?? 0,
   counts,
   mismatchReasonCounts,
+  mismatchSourceStateCounts,
   exactCurrentBindingCount: exactRows.length,
   submodulePaths,
   excludedSubmoduleCount: rows.length - inScopeRowCount,
@@ -223,7 +248,7 @@ const report = {
   planIdentity,
   canonicalAuthority: false,
   authorizationRequired: true,
-  writesPerformed: { postgres: false, qdrant: false, neo4j: false, valkey: false, filesystem: true },
+  writesPerformed: { postgres: false, qdrant: false, neo4j: false, valkey: false, filesystem: true, filesystemScope: reportPath },
   status: databaseError || materializationError
     ? 'REPAIR_PLAN_FAILED'
     : exactRows.length === inScopeRowCount && inScopeRowCount > 0
@@ -244,6 +269,7 @@ console.log(JSON.stringify({
   currentBindingCount: report.currentBindingCount,
   counts,
   mismatchReasonCounts,
+  mismatchSourceStateCounts,
   exactCurrentBindingCount: report.exactCurrentBindingCount,
   canonicalAuthority: false,
   authorizationRequired: true,

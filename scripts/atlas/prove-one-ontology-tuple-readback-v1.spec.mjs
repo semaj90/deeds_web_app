@@ -3,8 +3,12 @@ import {test} from 'node:test';
 import {assessTuple,sealReceipt,verifyReceipt,REQUIRED,REQUIRED_PACKET,TABLE,PACKET_TABLE} from './prove-one-ontology-tuple-readback-v1.mjs';
 
 const sample=()=>({
-  tuple_id:'tuple-1',source_ref:'src/a.py',evidence_span:{startByte:0,endByte:5},
+  tuple_id:'tuple-1',source_ref:'src/a.py',evidence_span:{sourceRef:'src/a.py',start:0,end:5},
   evidence_state:'ACTIVE_VERIFIED',packet_key:'pk',evidence_refs:['card-1'],
+  label:'USES',label_kind:'ontology',participants:[
+    {entityId:'ace',entityKind:'ast_symbol',role:'actor'},
+    {entityId:'valkey',entityKind:'ast_symbol',role:'target'},
+  ],lifecycle:'OBSERVED',
   canonical_packet_key:'pk',packet_source_ref:'src/a.py',packet_source_revision:'src-r',
   packet_workspace_revision:'ws-r',
   provenance:{sourceRevision:'src-r',workspaceRevision:'ws-r',taskRevision:'task-r',
@@ -21,6 +25,18 @@ test('provenance matching does not establish admission',()=>{
   assert.equal(x.verdict,'PERSISTED_TUPLE_VERIFIED');
   assert.equal(x.admitted,false);
   assert.equal(x.sourceSpan,'NOT_INDEPENDENTLY_VERIFIED');
+});
+test('non-active evidence state cannot satisfy grounded tuple readback',()=>{
+  const row=sample();row.evidence_state='REFERENCE_ONLY';
+  assert.equal(assessTuple(row).reason,'TUPLE_EVIDENCE_STATE_NOT_ACTIVE_VERIFIED');
+});
+test('untyped, ungrounded, and participant-free rows remain blocked',()=>{
+  const wrongKind=sample();wrongKind.label_kind='tag';
+  assert.equal(assessTuple(wrongKind).reason,'TYPED_ONTOLOGY_RELATION_REQUIRED');
+  const wrongSpan=sample();wrongSpan.evidence_span.sourceRef='src/other.py';
+  assert.equal(assessTuple(wrongSpan).reason,'GROUNDED_SOURCE_SPAN_SHAPE_INVALID');
+  const noParticipants=sample();noParticipants.participants=[];
+  assert.equal(assessTuple(noParticipants).reason,'TYPED_RELATION_PARTICIPANTS_INCOMPLETE');
 });
 test('missing task revision is explicitly blocked',()=>{
   const row=sample();delete row.provenance.taskRevision;
@@ -46,6 +62,10 @@ test('unexpected expectation is rejected',()=>{
 test('expected digest mismatch blocks',()=>{
   const result=assessTuple(sample(),{evidenceCardChecksum:'sha256:other'});
   assert.equal(result.reason,'EXPECTED_PROVENANCE_MISMATCH');
+});
+test('expected EvidenceCard reference must be present in the tuple',()=>{
+  const result=assessTuple(sample(),{evidenceRef:'card-other'});
+  assert.equal(result.reason,'EXPECTED_EVIDENCE_REFERENCE_MISMATCH');
 });
 test('receipt checksum is tamper evident',()=>{
   const receipt=sealReceipt('tuple-1',assessTuple(sample()),{table:TABLE});

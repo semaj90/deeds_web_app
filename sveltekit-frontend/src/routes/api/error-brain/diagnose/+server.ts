@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { createHash } from 'crypto';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { callOllamaChat, bifrostChat } from '$lib/server/ollama.js';
+import { callLlamaServerChat, bifrostChat } from '$lib/server/ollama.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { setCache, cognitiveCache } from '$lib/server/cache.js';
 import { searchSimilarErrors, embedErrorEvent } from '$lib/server/pipeline/error-embedding-pipeline.js';
@@ -502,7 +502,7 @@ ${errorContext || 'No past error matches'}`;
 				);
 			} else {
 				// Direct Ollama (fallback when Bifrost disabled)
-				content = await callOllamaChat(systemPrompt, userPrompt, {
+				content = await callLlamaServerChat(systemPrompt, userPrompt, {
 					format: 'json',
 					num_predict: 2048,
 					temperature: 0.3,

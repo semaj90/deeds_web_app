@@ -1,0 +1,281 @@
+{
+  "schema": "atlas.chunk-producer-provenance-report.v1",
+  "gate": "CHUNK_PRODUCER_01",
+  "generatedAt": "2026-10-12T01:47:59.110Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "admissionAuthorized": false,
+  "producerCensus": {
+    "knownContentProducers": [
+      "scripts/atlas/index-full-repo-for-search.mjs",
+      "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+      "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+      "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+    ],
+    "knownLineageProducers": [
+      "scripts/atlas/register-orphaned-chunks.mjs",
+      "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+      "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+    ]
+  },
+  "totalAudited": 10,
+  "counts": {
+    "exactCurrentSourceMatch": 4,
+    "historicalSourceMatches": 0,
+    "lineageQualified": 4,
+    "producerIdentified": 0
+  },
+  "records": [
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "4ab17d22ffb18de4aa549598531a68d07f1869979d4cdbe02a778958d5f403bc",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "051741a3-33d7-4693-82fb-b55e6cc36b60",
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "a258ce333661fee889bbb5b3ed381c9501fb8b9cabcbe568ae1842acb671946f",
+      "exactCurrentSourceMatch": true,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": true,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "062e2f41-d136-4a3a-8dc8-43165f6db05b",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "62f97ac23c9eccf8ba1c9dc9fbf4ed7fb3d0fb0263e2350b12f68fd3a6e123c6",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "065ee0a4-e0a5-4de0-aeff-eebe12da787d",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "29ac05c30eb6c56fd1181889b30693de5f8a62cf7da328e1bd162b84084a7a8d",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "07199b08-8459-4261-b55e-e34c4d6c8222",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "f84f38f6dc2310b3e6471f114e63d0fef8c9d5fd4c9a366ed07c059af468f4d9",
+      "exactCurrentSourceMatch": true,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": true,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "07858e93-049b-41f8-8b91-a161ac7c4bdb",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "d9471be439f5383117f077fc854b2962f24456252cf5b16c00a8c498daed59ee",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "07fcc1e9-2f88-4b08-aeda-aab926c70afa",
+      "sourceRef": "sveltekit-frontend/docs/profile-cards/data/sveltekit-frontend_src_lib_server_ace_context-assembler.ts.json",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "d5e1e15b4bd7bc9035907441e4114d9393d8a1d86cacb7ed8418fbbda36aa992",
+      "exactCurrentSourceMatch": true,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": true,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "09298111-1924-4454-9ef9-62dfd91a85c3",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "0c913536168a0fba81d04719daa61839437d51c31be3def16fc1f739a562c8e7",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "093ad403-1bd4-4f58-8b8c-c84e0ad59234",
+      "sourceRef": "src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "a85fbc83d212f616aec630b9faaf9aac29f4b4698d63642810e9dd29ce85f972",
+      "exactCurrentSourceMatch": false,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": false,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    },
+    {
+      "schema": "atlas.chunk-producer-provenance.v1",
+      "gate": "CHUNK_PRODUCER_01",
+      "chunkId": "0adaa578-52c1-4707-8749-3caa0ab7ef8a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+      "claimedSourceRevision": "UNASSIGNED",
+      "storedChunkDigest": "4943765dd282284a30ad7689c2a28769605e774cec2527025a999a325019d218",
+      "exactCurrentSourceMatch": true,
+      "historicalSourceMatches": [],
+      "possibleContentProducers": [
+        "scripts/atlas/index-full-repo-for-search.mjs",
+        "sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts",
+        "sveltekit-frontend/scripts/batch-upsert-codeintel.mjs",
+        "sveltekit-frontend/scripts/mirror-qdrant-to-postgres.ts"
+      ],
+      "possibleLineageProducers": [
+        "scripts/atlas/register-orphaned-chunks.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs"
+      ],
+      "producerIdentified": false,
+      "lineageQualified": true,
+      "admissionAuthorized": false,
+      "writesPerformed": false
+    }
+  ]
+}

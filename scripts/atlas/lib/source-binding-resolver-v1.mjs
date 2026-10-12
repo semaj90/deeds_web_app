@@ -37,9 +37,12 @@ export function createSourceBindingResolverV1(fetchBindingRows, options = {}) {
     if (!nonEmpty(row.binding_checksum)) return null;
     if (trusted && !(typeof row.producer_revision === 'string' && trusted.some((prefix) => row.producer_revision.startsWith(prefix)))) return null;
     return Object.freeze({
+      sourceRef: row.canonical_source_ref,
+      workspaceRevision: row.workspace_revision,
       sourceRevision: row.source_revision,
       contentDigest,
       bindingChecksum: row.binding_checksum,
+      producerRevision: row.producer_revision ?? null,
       byteLength: row.byte_length === undefined || row.byte_length === null ? null : Number(row.byte_length),
       canonicalAuthority: false,
     });
@@ -82,16 +85,18 @@ export function verifyBindingAgainstExactReaderV1(binding, readerResult) {
 /**
  * Packet-identity link (FEATURE-LINEAGE-WIRE-01d): the binding table carries no packet_key, so the packet<->source relation must come from the
  * canonical packet row. Pure: `packetRows` are rows of atlas_packets read read-only by the caller for this exact packet_key
- * ({ packet_key, source_ref }). Requires exactly ONE row whose packet_key equals the request's AND whose source_ref equals the request's
+ * ({ packet_key, source_ref, source_revision }). Requires exactly ONE row whose packet_key and source_ref equal the request's; when
+ * `sourceRevision` is supplied, the row must also match it exactly.
  * (no alias or string-similarity resolution here; an alias-only key must first be resolved by the packet-identity owner,
  * `resolvePacketKeyResolutionV2`, and the canonical/storage key passed in).
  */
-export function verifyPacketSourceLinkV1({ packetKey, sourceRef }, packetRows) {
-  if (!nonEmpty(packetKey) || !nonEmpty(sourceRef) || !Array.isArray(packetRows)) return { status: 'BLOCKED_PACKET_LINK_INPUT_INVALID', verified: false };
+export function verifyPacketSourceLinkV1({ packetKey, sourceRef, sourceRevision }, packetRows) {
+  if (!nonEmpty(packetKey) || !nonEmpty(sourceRef) || (sourceRevision !== undefined && !nonEmpty(sourceRevision)) || !Array.isArray(packetRows)) return { status: 'BLOCKED_PACKET_LINK_INPUT_INVALID', verified: false };
   if (packetRows.length === 0) return { status: 'BLOCKED_PACKET_NOT_FOUND', verified: false };
   if (packetRows.length > 1) return { status: 'BLOCKED_PACKET_KEY_AMBIGUOUS', verified: false };
   const row = packetRows[0];
   if (row?.packet_key !== packetKey) return { status: 'BLOCKED_PACKET_KEY_MISMATCH', verified: false };
   if (row?.source_ref !== sourceRef) return { status: 'BLOCKED_PACKET_SOURCE_REF_MISMATCH', verified: false };
+  if (sourceRevision !== undefined && row?.source_revision !== sourceRevision) return { status: 'BLOCKED_PACKET_SOURCE_REVISION_MISMATCH', verified: false };
   return { status: 'PACKET_SOURCE_LINK_VERIFIED', verified: true, canonicalAuthority: false };
 }

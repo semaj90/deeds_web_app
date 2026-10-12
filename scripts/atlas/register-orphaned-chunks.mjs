@@ -65,16 +65,20 @@
 import pg        from 'pg';
 import Redis     from 'ioredis';
 import { createHash } from 'node:crypto';
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync, realpathSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path      from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveBoundedPacketSourceRevisionV1, resolvePacketSourceRevisionV1 } from './lib/packet-source-revision-admission-v1.mjs';
 import { assertApplyAuthorized, classifyV2AdmissionLiveState, loadPacketKeyV2AdmissionManifest } from './lib/packet-key-v2-admission-v1.mjs';
 import { assertLegacyPacketKeyCorpusV1, legacyPacketKeyFromSourceRef } from './lib/canonical-source-ref.mjs';
+import { qualifyChunkLineageRowsV1 } from './lib/chunk-source-span-v1.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
+const MAX_CHUNK_LINEAGE_BATCH_FILES = 500;
+const MAX_CHUNK_LINEAGE_BATCH_BYTES = 64 * 1024 * 1024;
+const MAX_CHUNKS_PER_LINEAGE_SOURCE = 500;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const APPLY     = process.argv.includes('--apply');
@@ -325,6 +329,20 @@ function assertBoundedLineageReceipt() {
     }
     if (bytes.byteLength !== Number(binding.byteLength)) throw new Error(`TARGET_SOURCE_BYTE_LENGTH_DRIFT:${sourceRef}`);
   }
+}
+
+function readWorkspaceSourceBytes(sourceRef) {
+  const normalized = String(sourceRef ?? '').replaceAll('\\', '/');
+  if (!normalized || path.isAbsolute(normalized) || normalized.split('/').includes('..')) {
+    throw new Error('CHUNK_SOURCE_PATH_INVALID');
+  }
+  const root = realpathSync(ROOT);
+  const target = realpathSync(path.resolve(root, normalized));
+  const relative = path.relative(root, target);
+  if (!relative || relative === '.' || relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error('CHUNK_SOURCE_PATH_OUTSIDE_WORKSPACE');
+  }
+  return readFileSync(target);
 }
 
 // ── PacketKeyV2 admission (preflight only) ───────────────────────────────────
@@ -604,10 +622,18 @@ async function main() {
       membershipsPlanned: 0,
       membershipsWritten: 0,
       membershipsSkipped: 0,
+      chunksSourceVerified: 0,
+      chunksSourceBlocked: 0,
+      chunkSourceBlockReasons: {},
     };
 
     const admittedSourceRevisionByRef = new Map();
     if (APPLY && CAPTURE_LINEAGE) {
+      if (toRegister.length > MAX_CHUNK_LINEAGE_BATCH_FILES) {
+        throw new Error('CHUNK_LINEAGE_BATCH_FILE_LIMIT_EXCEEDED');
+      }
+      let sourceBytesRead = 0;
+      let chunkBytesRead = 0;
       for (const registration of toRegister) {
         const candidates = lineageBySourceRef.get(registration.source_ref) ?? [];
         const sourceRevision = BOUNDED_LINEAGE_RECEIPT
@@ -639,6 +665,91 @@ async function main() {
               })),
             });
         admittedSourceRevisionByRef.set(registration.source_ref, sourceRevision);
+        const chunkIds = [...new Set(candidates.map((row) => row.canonicalChunkId ?? row.canonical_chunk_id).filter(Boolean))];
+        try {
+          if (chunkIds.length === 0) throw new Error('CHUNK_LINEAGE_MEMBERSHIP_EMPTY');
+          const sourceBytes = readWorkspaceSourceBytes(registration.source_ref);
+          sourceBytesRead += sourceBytes.byteLength;
+          if (sourceBytesRead > MAX_CHUNK_LINEAGE_BATCH_BYTES) {
+            const error = new Error('CHUNK_LINEAGE_BATCH_SOURCE_BYTES_LIMIT_EXCEEDED');
+            error.code = 'CHUNK_LINEAGE_BATCH_LIMIT_EXCEEDED';
+            throw error;
+          }
+          const { rows: chunkSummaryRows } = await pool.query(`
+            SELECT COUNT(*)::int AS chunk_count,
+                   COALESCE(SUM(max_content_bytes), 0)::bigint AS chunk_bytes
+              FROM (
+                SELECT chunk_id, MAX(octet_length(content)) AS max_content_bytes
+                  FROM codebase_chunk_index
+                 WHERE relative_path = $1 AND chunk_id = ANY($2::text[])
+                 GROUP BY chunk_id
+              ) bounded_chunks
+          `, [registration.source_ref, chunkIds]);
+          const chunkCount = Number(chunkSummaryRows[0]?.chunk_count ?? 0);
+          const sourceChunkBytes = Number(chunkSummaryRows[0]?.chunk_bytes ?? 0);
+          if (chunkCount > MAX_CHUNKS_PER_LINEAGE_SOURCE) throw new Error('CHUNK_LINEAGE_SOURCE_CHUNK_LIMIT_EXCEEDED');
+          chunkBytesRead += sourceChunkBytes;
+          if (chunkBytesRead > MAX_CHUNK_LINEAGE_BATCH_BYTES) {
+            const error = new Error('CHUNK_LINEAGE_BATCH_CHUNK_BYTES_LIMIT_EXCEEDED');
+            error.code = 'CHUNK_LINEAGE_BATCH_LIMIT_EXCEEDED';
+            throw error;
+          }
+          const { rows: chunkRows } = await pool.query(`
+            SELECT chunk_id AS canonical_chunk_id,
+                   MIN(content) AS content,
+                   COUNT(DISTINCT content)::int AS content_variant_count
+              FROM codebase_chunk_index
+             WHERE relative_path = $1 AND chunk_id = ANY($2::text[])
+             GROUP BY chunk_id
+          `, [registration.source_ref, chunkIds]);
+          const qualification = qualifyChunkLineageRowsV1({
+            sourceBytes,
+            sourceRef: registration.source_ref,
+            sourceRevision,
+            chunks: chunkRows.map((row) => ({
+              canonicalChunkId: row.canonical_chunk_id,
+              content: row.content,
+              contentVariantCount: Number(row.content_variant_count),
+            })),
+          });
+          const verifiedIds = new Set(qualification.qualifiedChunks.map((chunk) => chunk.canonicalChunkId));
+          const candidateCounts = new Map();
+          for (const row of candidates) {
+            const canonicalChunkId = row.canonicalChunkId ?? row.canonical_chunk_id;
+            candidateCounts.set(canonicalChunkId, (candidateCounts.get(canonicalChunkId) ?? 0) + 1);
+          }
+          for (const [canonicalChunkId, count] of candidateCounts) {
+            if (count > 1) {
+              verifiedIds.delete(canonicalChunkId);
+              lineageStats.chunkSourceBlockReasons.CHUNK_ID_MISSING_OR_DUPLICATE =
+                (lineageStats.chunkSourceBlockReasons.CHUNK_ID_MISSING_OR_DUPLICATE ?? 0) + 1;
+            }
+          }
+          lineageBySourceRef.set(registration.source_ref, candidates.filter((row) =>
+            verifiedIds.has(row.canonicalChunkId ?? row.canonical_chunk_id)));
+          lineageStats.chunksSourceVerified += verifiedIds.size;
+          lineageStats.chunksSourceBlocked += chunkIds.length - verifiedIds.size;
+          const fetchedIds = new Set(chunkRows.map((row) => row.canonical_chunk_id));
+          const missingContentRows = chunkIds.filter((chunkId) => !fetchedIds.has(chunkId)).length;
+          if (missingContentRows > 0) {
+            lineageStats.chunkSourceBlockReasons.CHUNK_CONTENT_ROW_MISSING =
+              (lineageStats.chunkSourceBlockReasons.CHUNK_CONTENT_ROW_MISSING ?? 0) + missingContentRows;
+          }
+          for (const chunk of qualification.blockedChunks) {
+            const reason = chunk.reason;
+            lineageStats.chunkSourceBlockReasons[reason] = (lineageStats.chunkSourceBlockReasons[reason] ?? 0) + 1;
+          }
+          if (qualification.status === 'BLOCKED') {
+            const reason = qualification.reason;
+            lineageStats.chunkSourceBlockReasons[reason] = (lineageStats.chunkSourceBlockReasons[reason] ?? 0) + chunkIds.length;
+          }
+        } catch (error) {
+          if (error?.code === 'CHUNK_LINEAGE_BATCH_LIMIT_EXCEEDED') throw error;
+          lineageBySourceRef.set(registration.source_ref, []);
+          lineageStats.chunksSourceBlocked += chunkIds.length;
+          const reason = error instanceof Error ? error.message : String(error);
+          lineageStats.chunkSourceBlockReasons[reason] = (lineageStats.chunkSourceBlockReasons[reason] ?? 0) + chunkIds.length;
+        }
       }
     }
 

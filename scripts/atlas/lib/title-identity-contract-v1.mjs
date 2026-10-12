@@ -18,8 +18,8 @@
  *   semantic-title-v1       hash input "semantic-title-v1", 3-part   SOURCE (packages/atlas/lib/packet-registry.mjs + scripts/atlas/backfill-title-identity.mjs); 0 stored rows (live)
  *   v1, anything else                                                UNKNOWN -> never reported as reproduced
  *
- * PERSISTENCE_POLICY_V1 is PROVISIONAL and mirrors the operator-reviewed recommendation to keep the 3-part form
- * for persisted atlas_packets.title_id; TITLE-FORMAT-DECISION-01 (operator) is still open.
+ * TITLE-FORMAT-DECISION-01 selects the existing 3-part form for persisted atlas_packets.title_id.
+ * This format policy does not authorize production writes; packet_key and revision-bound source evidence remain identity.
  */
 import { createHash } from 'node:crypto';
 
@@ -34,7 +34,7 @@ export const TITLE_VERSION_RULES_V1 = Object.freeze({
 });
 
 export const PERSISTENCE_POLICY_V1 = Object.freeze({
-  status: 'PROVISIONAL_PENDING_TITLE_FORMAT_DECISION_01',
+  status: 'DECISION_RECORDED_IMPLEMENTATION_AND_LIVE_ADMISSION_PENDING',
   persistedShape: 'THREE_PART',
   requireReproducedDerivation: true,
 });

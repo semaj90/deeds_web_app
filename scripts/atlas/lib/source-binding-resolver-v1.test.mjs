@@ -17,6 +17,9 @@ test('one exact binding resolves, non-authoritative and frozen', () => {
   const r = resolverFor([binding()])(q);
   assert.equal(r.sourceRevision, hash('b'));
   assert.equal(r.bindingChecksum, 'bc-1');
+  assert.equal(r.sourceRef, q.sourceRef);
+  assert.equal(r.workspaceRevision, q.workspaceRevision);
+  assert.equal(r.producerRevision, null);
   assert.equal(r.byteLength, 123);
   assert.equal(r.canonicalAuthority, false);
   assert.ok(Object.isFrozen(r));
@@ -86,12 +89,15 @@ test('exact-reader comparison: matching file digest + length verify; dirty/missi
 
 test('packet<->source link: exactly one packet row with the same packet_key and source_ref; everything else blocks', () => {
   const req = { packetKey: 'ace:packet:0123456789ab', sourceRef: 'src/a.ts' };
-  const row = { packet_key: req.packetKey, source_ref: req.sourceRef };
+  const row = { packet_key: req.packetKey, source_ref: req.sourceRef, source_revision: 'sha256:source-r1' };
   assert.equal(verifyPacketSourceLinkV1(req, [row]).status, 'PACKET_SOURCE_LINK_VERIFIED');
   assert.equal(verifyPacketSourceLinkV1(req, []).status, 'BLOCKED_PACKET_NOT_FOUND');
   assert.equal(verifyPacketSourceLinkV1(req, [row, row]).status, 'BLOCKED_PACKET_KEY_AMBIGUOUS');
   assert.equal(verifyPacketSourceLinkV1(req, [{ ...row, packet_key: 'packet:0123456789ab' }]).status, 'BLOCKED_PACKET_KEY_MISMATCH');
   assert.equal(verifyPacketSourceLinkV1(req, [{ ...row, source_ref: 'src/other.ts' }]).status, 'BLOCKED_PACKET_SOURCE_REF_MISMATCH');
+  assert.equal(verifyPacketSourceLinkV1({ ...req, sourceRevision: row.source_revision }, [row]).status, 'PACKET_SOURCE_LINK_VERIFIED');
+  assert.equal(verifyPacketSourceLinkV1({ ...req, sourceRevision: 'sha256:source-r2' }, [row]).status, 'BLOCKED_PACKET_SOURCE_REVISION_MISMATCH');
+  assert.equal(verifyPacketSourceLinkV1({ ...req, sourceRevision: row.source_revision }, [{ ...row, source_revision: null }]).status, 'BLOCKED_PACKET_SOURCE_REVISION_MISMATCH');
   assert.equal(verifyPacketSourceLinkV1({ packetKey: '', sourceRef: 'x' }, [row]).status, 'BLOCKED_PACKET_LINK_INPUT_INVALID');
   assert.equal(verifyPacketSourceLinkV1(req, null).verified, false);
 });

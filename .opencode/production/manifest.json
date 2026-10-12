@@ -1,0 +1,28 @@
+{
+  "schema": "atlas.ace-packet-production-manifest.v1",
+  "canonicalAuthority": false,
+  "entries": [
+    {
+      "file": "ace-packet-2026-06-12.json",
+      "sha256": "sha256:534f494fd0bd66fbdfbcc73576a648f005d2ee4fe1833a929e47e0233e5cc29f",
+      "generatedAt": "2026-06-12T01:26:46.128Z",
+      "totalCards": 224,
+      "tokenEstimate": 5990,
+      "producer": "scripts/ingest/compress-cards.mjs",
+      "inputs": {
+        "rankingReport": ".tmp/retrieval-ranking-report.json (generatedAt 2026-06-11, 500 entries)",
+        "cardBodies": ".opencode/cards (never git-tracked; missing as of 2026-10-12)"
+      },
+      "provenance": {
+        "restoredFrom": "git commit 1a5be399d7^ (path .opencode/ace-packet.json)",
+        "restoredAt": "2026-10-12"
+      },
+      "status": "BASELINE_UNVERIFIED_INPUTS"
+    },
+    {
+      "file": "ace-packet-summary-2026-06-12.md",
+      "sha256": "sha256:d180a74e2c4dc46868351a6f3be7a246e75837d659d0ab5e320724866aa7c3ef",
+      "status": "BASELINE_UNVERIFIED_INPUTS"
+    }
+  ]
+}

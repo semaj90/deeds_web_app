@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { db } from '$lib/server/db/client';
 import { chatMessages } from '$lib/server/db/schema.js';
 import { z } from 'zod';
@@ -35,7 +36,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     userId: userId,
     role: 'user',
     content: message,
-    metadata: JSON.stringify({ model: ENV.GEMMA4_MODEL, systemContext })
+    metadata: JSON.stringify({ model: SERVER_CHAT_MODEL, systemContext })
   });
 
   // 2. Prepare Context (Indexing Studio Context + RabbitMQ Health)

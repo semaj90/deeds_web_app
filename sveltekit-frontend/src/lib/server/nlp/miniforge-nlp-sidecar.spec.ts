@@ -326,9 +326,33 @@ describe('miniforge-nlp-sidecar', () => {
     expect(evidence.edges[0]?.occurrence_positions).toEqual([[1, 7], [3, 4]]);
   });
 
+  it('rejects absent or mismatched parser source identity instead of echoing request values', async () => {
+    const response = (overrides: Record<string, unknown>) => new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      chunks: [],
+      edges: [],
+      diagnostics: [],
+      ...overrides,
+    }), { status: 200 });
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(response({ source_revision: 'stale-rev' }))
+      .mockResolvedValueOnce(response({ file_path: undefined }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const request = { source: 'const value = 1;', language: 'typescript', filePath: 'src/example.ts', sourceRevision: 'rev-1' };
+
+    await expect(client.astChunk(request)).rejects.toThrow(/source_revision does not match/);
+    await expect(client.astChunk(request)).rejects.toThrow(/file_path does not match/);
+  });
+
   it('rejects malformed occurrence coordinates instead of dropping span evidence', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
       schema: 'atlas.ast.evidence.v1',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
       chunks: [],
       edges: [{
         from_evidence_key: 'example:hello',

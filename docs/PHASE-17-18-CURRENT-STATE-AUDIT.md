@@ -1,5 +1,11 @@
 # Phase 17-18 Current State Audit — IMPLEMENTATION FOUND ✅
 
+> **Status note (2026-10-11):** This audit is a historical implementation snapshot, not a
+> production-readiness claim. The extractor and specs exist, but the SQL persistence path is
+> intent-only, its derived key is not canonical packet identity, and PyTorch does not own semantic
+> embedding generation. See `PHASE-17-PYTORCH-FEATURE-EXTRACTOR-PLAN.md`'s status correction and
+> the `PHASE17-UPGRADE-STATUS-01` OpenSpec entry for current gates.
+
 **Date**: July 26, 2026  
 **Status**: ✅ **EXISTING IMPLEMENTATION DISCOVERED** (not greenfield)  
 **Quality**: ⏳ **Requires Upgrade** (fallback-heavy, limited feature extraction)

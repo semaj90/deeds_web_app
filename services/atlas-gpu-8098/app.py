@@ -37,6 +37,10 @@ from atlas_semantic512_runtime import (  # noqa: E402
     Latent64KMeansRequest,
     cluster_latent64,
 )
+from knn_contract import (  # noqa: E402
+    deterministic_topk_from_scores,
+    deterministic_topk_with_boundary,
+)
 
 
 ARTIFACT_ROOT = Path(os.getenv("ATLAS_GPU_ARTIFACT_ROOT", "/mnt/c/Users/james/Videos/deeds-web-app")).resolve()
@@ -129,7 +133,53 @@ def vectors_on_cuda(table: Any) -> torch.Tensor:
         if blob is None or len(blob) != 768 * 4:
             raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_BYTES_INVALID")
         rows.append(torch.frombuffer(bytearray(blob), dtype=torch.float32).clone())
-    return torch.stack(rows, dim=0).to(device="cuda", dtype=torch.float32)
+    vectors = torch.stack(rows, dim=0).to(device="cuda", dtype=torch.float32)
+    if not bool(torch.isfinite(vectors).all().item()):
+        raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_NONFINITE")
+    norms = torch.linalg.vector_norm(vectors, dim=1, keepdim=True)
+    if bool((norms <= 0).any().item()):
+        raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_ZERO_NORM")
+    return vectors / norms
+
+
+def vectors_on_cupy(table: Any) -> Any:
+    if cupy is None or not cuda_available():
+        raise HTTPException(status_code=503, detail="CUDA_DEVICE_UNAVAILABLE")
+    blobs = table.column("vector_f32").to_pylist()
+    if not blobs:
+        raise HTTPException(status_code=400, detail="ARROW_TILE_ARTIFACT_EMPTY")
+    rows = []
+    for blob in blobs:
+        if blob is None or len(blob) != 768 * 4:
+            raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_BYTES_INVALID")
+        rows.append(cupy.frombuffer(blob, dtype=cupy.float32).copy())
+    vectors = cupy.stack(rows, axis=0).astype(cupy.float32, copy=False)
+    if not bool(cupy.isfinite(vectors).all().item()):
+        raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_NONFINITE")
+    norms = cupy.linalg.norm(vectors, axis=1, keepdims=True)
+    if bool((norms <= 0).any().item()):
+        raise HTTPException(status_code=400, detail="ARROW_TILE_VECTOR_ZERO_NORM")
+    return vectors / norms
+
+
+def query_on_cuda(query_values: list[float]) -> torch.Tensor:
+    query = torch.tensor(query_values, dtype=torch.float32, device="cuda")
+    if not bool(torch.isfinite(query).all().item()):
+        raise HTTPException(status_code=400, detail="QUERY_VECTOR_NONFINITE")
+    norm = torch.linalg.vector_norm(query)
+    if float(norm.item()) <= 0:
+        raise HTTPException(status_code=400, detail="QUERY_VECTOR_ZERO_NORM")
+    return query / norm
+
+
+def query_on_cupy(query_values: list[float]) -> Any:
+    query = cupy.asarray(query_values, dtype=cupy.float32)
+    if not bool(cupy.isfinite(query).all().item()):
+        raise HTTPException(status_code=400, detail="QUERY_VECTOR_NONFINITE")
+    norm = cupy.linalg.norm(query)
+    if float(norm.item()) <= 0:
+        raise HTTPException(status_code=400, detail="QUERY_VECTOR_ZERO_NORM")
+    return query / norm
 
 
 @app.get("/health")
@@ -220,21 +270,25 @@ def exact_scan(request: ExactScanRequest) -> dict[str, Any]:
     path = resolve_artifact(request.artifactPath)
     table, checksum = load_table(path)
     vectors = vectors_on_cuda(table)
-    query = torch.tensor(request.query, dtype=torch.float32, device="cuda")
-    query = query / torch.linalg.vector_norm(query)
+    query = query_on_cuda(request.query)
     scores = torch.mv(vectors, query)
-    limit = min(request.limit, int(scores.numel()))
-    values, indices = torch.topk(scores, k=limit, largest=True, sorted=True)
     ordinals = table.column("candidate_ordinal").to_pylist()
+    try:
+        ranked = deterministic_topk_from_scores(
+            scores.cpu().tolist(), ordinals, limit=request.limit
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"KNN_RESULT_INVALID:{exc}") from exc
     tiles = table.column("tile_index").to_pylist()
     rows = [
-        {"candidateOrdinal": int(ordinals[int(index)]), "tileIndex": int(tiles[int(index)]), "score": float(value)}
-        for value, index in zip(values.cpu().tolist(), indices.cpu().tolist(), strict=True)
+        {"candidateOrdinal": int(ordinal), "tileIndex": int(tiles[index]), "score": score}
+        for score, ordinal, index in ranked
     ]
     return {
         "status": "CUDA_EXACT_TILE_SCAN_PROVEN",
         "artifactChecksum": checksum,
         "executionBackend": "PYTORCH_CUDA_EXACT_TILE_SCAN",
+        "metricContract": "float32_l2_normalized_cosine_similarity_higher_is_better",
         "rows": rows,
         "canonicalAuthority": False,
         "logicalLaneVote": "NONE",
@@ -254,31 +308,38 @@ def cuvs_exact_scan(request: ExactScanRequest) -> dict[str, Any]:
 
     path = resolve_artifact(request.artifactPath)
     table, checksum = load_table(path)
-    dataset = vectors_on_cuda(table)
-    query = torch.tensor(request.query, dtype=torch.float32, device="cuda")
-    query = query / torch.linalg.vector_norm(query)
+    dataset = vectors_on_cupy(table)
+    query = query_on_cupy(request.query)
     index = brute_force.build(dataset, metric="cosine")
-    distances, neighbors = brute_force.search(index, query.reshape(1, -1), min(request.limit, int(dataset.shape[0])))
-    if hasattr(distances, "copy_to_host"):
-        distances = distances.copy_to_host()
-    elif hasattr(distances, "get"):
-        distances = distances.get()
-    if hasattr(neighbors, "copy_to_host"):
-        neighbors = neighbors.copy_to_host()
-    elif hasattr(neighbors, "get"):
-        neighbors = neighbors.get()
-    distance_values = distances[0].tolist()
-    neighbor_values = neighbors[0].tolist()
     ordinals = table.column("candidate_ordinal").to_pylist()
+
+    def search(search_limit: int) -> tuple[list[float], list[int]]:
+        distances, neighbors = brute_force.search(index, query.reshape(1, -1), search_limit)
+        if hasattr(distances, "copy_to_host"):
+            distances = distances.copy_to_host()
+        elif hasattr(distances, "get"):
+            distances = distances.get()
+        if hasattr(neighbors, "copy_to_host"):
+            neighbors = neighbors.copy_to_host()
+        elif hasattr(neighbors, "get"):
+            neighbors = neighbors.get()
+        return distances[0].tolist(), neighbors[0].tolist()
+
+    try:
+        ranked = deterministic_topk_with_boundary(search, ordinals, limit=request.limit)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"KNN_RESULT_INVALID:{exc}") from exc
     tiles = table.column("tile_index").to_pylist()
     rows = [
-        {"candidateOrdinal": int(ordinals[int(index)]), "tileIndex": int(tiles[int(index)]), "distance": float(distance), "score": float(1 - distance)}
-        for distance, index in zip(distance_values, neighbor_values, strict=True)
+        {"candidateOrdinal": int(ordinal), "tileIndex": int(tiles[index]), "distance": distance, "score": float(1 - distance)}
+        for distance, ordinal, index in ranked
     ]
     return {
         "status": "CUVS_EXACT_TILE_SCAN_PROVEN",
         "artifactChecksum": checksum,
         "executionBackend": "CUVS_BRUTE_FORCE",
+        "metricContract": "float32_l2_normalized_cosine_distance_1_minus_similarity",
+        "tieBreak": "distance_ascending_then_candidate_ordinal_ascending_after_complete_boundary_tie_fetch",
         "rows": rows,
         "canonicalAuthority": False,
         "logicalLaneVote": "NONE",

@@ -25,7 +25,7 @@
  *   4. Upsert embedding projection into Qdrant codebase_chunks_768 (named vector "content")
  *
  * Idempotent: uses content_hash ON CONFLICT (qdrant_id) DO UPDATE.
- * Skips files already indexed (content_hash matches).
+ * Reuses chunks only when chunk/file hashes and available diagnostic span metadata match.
  *
  * Usage:
  *   node scripts/atlas/index-full-repo-for-search.mjs --dry-run
@@ -43,6 +43,13 @@ import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import { DEFAULT_SCAN_ROOTS, parseRoots, shouldSkipDirectory } from './lib/repo-scan-roots.mjs';
 import { buildTopologyEnvelope, deriveDomainClass, deriveFeatureId, deriveCentroidKeys } from './lib/topology-ontology.mjs';
+import { qualifyChunkSourceSpanV1 } from './lib/chunk-source-span-v1.mjs';
+import { classifyIndexedChunkReuseV1 } from './lib/indexed-chunk-reuse-v1.mjs';
+import { resolveExactIndexFileTargetV1 } from './lib/exact-index-file-target-v1.mjs';
+import {
+  chunkLargeTextAtSourceV1,
+  chunkTextAtUtf8BoundariesV1,
+} from './lib/source-span-aware-chunk-metadata-v1.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dir, '../..');
@@ -78,6 +85,7 @@ const TARGET = getArgValue('--target');
 const ROOTS_ARG = getArgValue('--roots');
 const AST_MANIFEST_PATH = getArgValue('--ast-manifest');
 const SOURCE_PLAN_PATH = getArgValue('--source-plan');
+const FILE_ARG = getArgValue('--file');
 
 // ── Config ───────────────────────────────────────────────────────────────────
 const OLLAMA_URL   = process.env.OLLAMA_URL   ?? 'http://localhost:11434';
@@ -156,15 +164,7 @@ function detectLanguage(ext) {
 
 /** Split text into overlapping windows */
 function chunkText(text, size, overlap) {
-  const chunks = [];
-  let start = 0;
-  while (start < text.length) {
-    const end = Math.min(start + size, text.length);
-    chunks.push({ text: text.slice(start, end), start, end });
-    if (end === text.length) break;
-    start += size - overlap;
-  }
-  return chunks;
+  return chunkTextAtUtf8BoundariesV1(text, size, overlap);
 }
 
 function isGeneratedFile(relPath) {
@@ -282,6 +282,8 @@ function buildAstChunks(text, relPath, rows) {
       text: body,
       start: prefix.length,
       end: prefix.length + body.length,
+      sourceByteStart: row.start_byte,
+      sourceByteEnd: row.end_byte,
       chunk_kind: 'ast-declaration',
       chunk_source: 'AST_DECLARATION',
       ast_status: row.ast_status,
@@ -354,46 +356,11 @@ function chunkLargeJson(text, relPath, maxChunks = MAX_CHUNKS_PER_FILE) {
  * Falls back to uniform windows capped at MAX_CHUNKS_PER_FILE.
  */
 function chunkLargeText(text, ext, maxChunks = MAX_CHUNKS_PER_FILE) {
-  // Try to split on blank-line boundaries (paragraphs / code blocks)
-  const paragraphs = text.split(/\n{2,}/);
-  if (paragraphs.length >= 4) {
-    const chunks = [];
-    let buf = '';
-    const flushBuf = () => {
-      if (buf.trim().length > 40) chunks.push({ text: buf.trim(), start: 0, end: buf.length, chunk_kind: 'large-text' });
-      buf = '';
-    };
-    for (const para of paragraphs) {
-      if (chunks.length >= maxChunks) break;
-      // A single paragraph larger than CHUNK_SIZE (e.g. a big table or
-      // unbroken text block, no blank-line breaks inside it) was previously
-      // pushed whole via `buf = para` -- confirmed live 2026-08-26 this
-      // produced chunks Ollama rejected with "input length exceeds the
-      // context length" (AGENTS.md: 10/40 chunk embeds failed this way).
-      // Split any oversized paragraph itself via the sliding-window chunker
-      // instead of ever letting one through unsplit.
-      if (para.length > CHUNK_SIZE) {
-        flushBuf();
-        for (const sub of chunkText(para, CHUNK_SIZE, CHUNK_OVERLAP)) {
-          if (chunks.length >= maxChunks) break;
-          if (sub.text.trim().length > 40) chunks.push({ ...sub, chunk_kind: 'large-text' });
-        }
-        continue;
-      }
-      if (buf.length + para.length + 2 > CHUNK_SIZE) {
-        flushBuf();
-        buf = para;
-      } else {
-        buf += (buf ? '\n\n' : '') + para;
-      }
-    }
-    if (chunks.length < maxChunks) flushBuf();
-    if (chunks.length >= 4) return chunks;
-  }
-  return chunkText(text, CHUNK_SIZE, CHUNK_OVERLAP).slice(0, maxChunks).map((chunk) => ({
-    ...chunk,
-    chunk_kind: 'large-text',
-  }));
+  return chunkLargeTextAtSourceV1(text, {
+    size: CHUNK_SIZE,
+    overlap: CHUNK_OVERLAP,
+    maxChunks,
+  });
 }
 
 function estimateEmbeddingTokens(text) {
@@ -568,14 +535,16 @@ async function upsertPostgresMetadata(pool, chunk) {
   );
 }
 
-// ── Skip check — already indexed with same hash ───────────────────────────────
-async function alreadyIndexed(pool, qdrantIds) {
-  if (qdrantIds.length === 0) return new Set();
+// ── Skip check — exact content and file identity readback ──────────────────────
+async function alreadyIndexed(pool, chunks) {
+  if (chunks.length === 0) return new Map();
   const res = await pool.query(
-    `SELECT qdrant_id FROM codebase_chunk_index WHERE qdrant_id = ANY($1)`,
-    [qdrantIds]
+    `SELECT qdrant_id, content_hash, file_content_hash, metadata
+       FROM codebase_chunk_index
+      WHERE qdrant_id = ANY($1)`,
+    [chunks.map(chunk => chunk.qdrant_id)]
   );
-  return new Set(res.rows.map(r => r.qdrant_id));
+  return new Map(classifyIndexedChunkReuseV1(chunks, res.rows).map((entry) => [entry.qdrant_id, entry]));
 }
 
 // ── Process one file ──────────────────────────────────────────────────────────
@@ -590,8 +559,10 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
   } catch { return; }
 
   let text;
+  let sourceBytes;
   try {
-    text = fs.readFileSync(absPath, 'utf8');
+    sourceBytes = fs.readFileSync(absPath);
+    text = sourceBytes.toString('utf8');
   } catch {
     return; // binary or unreadable
   }
@@ -621,6 +592,14 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
 
   // Build chunk metadata
   const chunks = rawChunks.map((c, idx) => {
+    const sourceSpan = qualifyChunkSourceSpanV1({
+      sourceBytes,
+      chunkContent: c.text,
+      sourceRef: relPath,
+      ...(Number.isSafeInteger(c.sourceByteStart) && Number.isSafeInteger(c.sourceByteEnd)
+        ? { startByte: c.sourceByteStart, endByte: c.sourceByteEnd }
+        : {}),
+    });
     const contentHash = sha256(`${relPath}:${idx}:${c.text}`);
     const qdrantId    = hashToUuid(sha256(`fullrepo:${relPath}:${idx}`));
     const titleId = path.basename(relPath).replace(/\.[^.]+$/, '') || 'file';
@@ -647,8 +626,8 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
       community_id: null,
     });
     // Approximate line numbers from char offsets
-      const lineStart = text.slice(0, c.start).split('\n').length;
-      const lineEnd   = text.slice(0, c.end).split('\n').length;
+      const lineStart = Number.isSafeInteger(c.start) ? text.slice(0, c.start).split('\n').length : null;
+      const lineEnd   = Number.isSafeInteger(c.end) ? text.slice(0, c.end).split('\n').length : null;
     return {
       qdrant_id:     qdrantId,
       chunk_id:      `fullrepo:${relPath}:${idx}`,
@@ -719,13 +698,18 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
           'fullrepo',
         ].filter(Boolean),
         source_ref: relPath,
+        source_span: sourceSpan.status === 'BYTE_MATCH_NOT_ADMITTED' ? sourceSpan : null,
       },
     };
   });
 
-  // Check which qdrant_ids already exist
-  const existingIds = await alreadyIndexed(pool, chunks.map(c => c.qdrant_id));
-  const toIndex = chunks.filter(c => !existingIds.has(c.qdrant_id));
+  // Reuse only rows whose current content, file digest, and available span match.
+  const indexedReuse = await alreadyIndexed(pool, chunks);
+  const toIndex = chunks.filter(c => !indexedReuse.get(c.qdrant_id)?.reusable);
+  for (const chunk of toIndex) {
+    const status = indexedReuse.get(chunk.qdrant_id)?.status ?? 'STORED_ROW_MISSING';
+    stats.reuseReasons[status] = (stats.reuseReasons[status] ?? 0) + 1;
+  }
 
   if (VERBOSE && astChunks.length > 0) {
     console.log(`  [ast] ${relPath} -> ${astChunks.length} declaration chunks (alias-resolved manifest)`);
@@ -738,6 +722,9 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
 
   if (DRY_RUN) {
     if (VERBOSE) console.log(`  [dry-run] ${relPath} → ${toIndex.length} chunks`);
+    if (VERBOSE && toIndex.length > 0) {
+      console.log(`  [dry-run] reuse disposition: ${JSON.stringify(stats.reuseReasons)}`);
+    }
     stats.files++;
     stats.chunks += toIndex.length;
     // Accumulate domain/feature counts for dry-run ontology report (no embeddings)
@@ -856,11 +843,17 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+  if (argv.some((argument) => argument === '--file' || argument.startsWith('--file=')) && !FILE_ARG) {
+    throw new Error('INDEX_FILE_TARGET_REQUIRED');
+  }
   if (APPLY && process.env.ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL !== '1') {
     throw new Error('EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED');
   }
   if (!/^embeddinggemma(?::|$)/i.test(EMBED_MODEL)) {
     throw new Error(`CANONICAL_EMBEDDING_MODEL_REQUIRED:received=${EMBED_MODEL}`);
+  }
+  if (FILE_ARG && (TARGET || ROOTS_ARG || SOURCE_PLAN_PATH)) {
+    throw new Error('INDEX_FILE_TARGET_CANNOT_COMBINE_WITH_DIRECTORY_OR_SOURCE_PLAN_FILTERS');
   }
   if (AST_MANIFEST_PATH) {
     try {
@@ -877,17 +870,27 @@ async function main() {
 
   console.log('╔══════════════════════════════════════════════════════════════╗');
   console.log('║  Full-Repo Indexer (chunks → Postgres + Qdrant)             ║');
-  console.log(`║  Mode: ${APPLY ? 'APPLY   ' : 'DRY-RUN '}  Target: ${(TARGET ?? 'all').padEnd(42)}║`);
+  console.log(`║  Mode: ${APPLY ? 'APPLY   ' : 'DRY-RUN '}  Target: ${(FILE_ARG ?? TARGET ?? 'all').padEnd(42)}║`);
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
 
   // Collect all files
   console.log('Scanning repo directories...');
   const allFiles = [];
-  for (const scanDir of SCAN_DIRS) {
-    const absDir = path.join(REPO_ROOT, scanDir);
-    const files = walk(absDir);
-    console.log(`  ${scanDir}/: ${files.length} indexable files`);
-    allFiles.push(...files);
+  if (FILE_ARG) {
+    const target = resolveExactIndexFileTargetV1({
+      workspaceRoot: REPO_ROOT,
+      relativePath: FILE_ARG,
+      indexableExtensions: INDEXABLE_EXTS,
+      skipPath: shouldSkipDirectory,
+    });
+    allFiles.push(target.absolutePath);
+  } else {
+    for (const scanDir of SCAN_DIRS) {
+      const absDir = path.join(REPO_ROOT, scanDir);
+      const files = walk(absDir);
+      console.log(`  ${scanDir}/: ${files.length} indexable files`);
+      allFiles.push(...files);
+    }
   }
   console.log(`\nTotal: ${allFiles.length} files\n`);
 
@@ -923,7 +926,7 @@ async function main() {
   const pool = new pg.Pool({ connectionString: DATABASE_URL });
 
   const stats = {
-    files: 0, chunks: 0, skipped: 0, errors: 0,
+    files: 0, chunks: 0, skipped: 0, errors: 0, reuseReasons: {},
     // centroid accumulation: domain → float32 vectors[], feature_id → float32 vectors[]
     centroidAcc: {},
     featureCentroidAcc: {},
@@ -1025,7 +1028,7 @@ async function main() {
       console.warn('     (pass --no-redis to suppress, or check REDIS_HOST/REDIS_PORT/REDIS_PASSWORD)');
       if (redis) { try { await redis.quit(); } catch { /* ignore */ } }
     }
-  } else if (DRY_RUN && stats.chunks > 0) {
+  } else if (DRY_RUN && WARM_CENTROIDS && stats.chunks > 0) {
     const domainCentroidsWould = Object.keys(stats.centroidAcc).length;
     const featureCentroidsWould = Object.keys(stats.featureCentroidAcc).filter(k => (stats.featureCentroidAcc[k]?.length ?? 0) >= 3).length;
     console.log(`\n[DRY-RUN] Would warm ${domainCentroidsWould} domain centroids and ${featureCentroidsWould} feature centroids in Redis`);

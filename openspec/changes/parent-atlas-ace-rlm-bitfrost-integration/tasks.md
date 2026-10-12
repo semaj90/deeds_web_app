@@ -3205,6 +3205,37 @@ Evidence: `docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
 
 Evidence: `docs/reports/task-semantic-packet-production-target-v1.json`.
 
+### PHASE17-UPGRADE-STATUS-01 — existing derived-feature boundary (2026-10-11)
+
+- [x] Reconciled the Phase 17 proposal with the existing implementation in
+  `sveltekit-frontend/src/lib/server/ml/phase17-feature-extractor.ts`,
+  `phase17-schema.ts`, and `phase17-advanced-features.ts`; this is not a greenfield module.
+- [x] Confirmed `persistPhase17Output()` logs a would-write message and leaves its SQL execution
+  commented out. The extractor is not an active persistence owner.
+- [x] Recorded the distinction between fixture/schema admission for derived features and canonical
+  source, packet, ontology, or ContextManifest admission.
+- [ ] Align feature identity and source/revision inputs with the canonical candidate/packet owners;
+  the helper-generated `sourceRef:featureId:hash` value is not canonical packet identity.
+- [ ] Preserve SearchRuntime's lane normalization/fusion owner; do not add the proposal's unverified
+  fixed fusion weights or substitute missing scores with plausible defaults.
+- [ ] Keep EmbeddingGemma `semantic_768` as the embedding owner; Phase 17 pooling must not mint or
+  replace semantic vectors.
+- [ ] Identify a governed writer and independent readback before enabling any task-semantic-packet
+  persistence. No migration or production write is authorized by this audit.
+- [ ] Run the focused CPU fixture suite after contract changes; GPU parity remains a separate gate
+  requiring a qualified frozen candidate/feature snapshot and resource admission.
+
+Evidence: source inspection of the Phase 17 modules and the existing task-semantic-packet writer
+matrix above. No tests, GPU work, database reads, or persistent writes were run for this status
+correction.
+
+- [x] Fixed Phase 17's score normalization to preserve observed zero scores instead of replacing
+  them with `0.5`; added regression assertions for all four score lanes in the existing integration
+  spec. This is a local transformation correctness fix, not proof of production ranking ownership.
+- [x] Focused regression verified: `vitest run src/lib/server/ml/phase17-integration.spec.ts
+  --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=dot` passes 7/7 tests on 2026-10-11.
+  The earlier default-pool attempt stalled; the bounded single-worker invocation completed.
+
 ### TASK-SEMANTIC-PACKET-INDEX-PLAN-01 — additive index candidate 2026-09-08
 
 - [x] Confirmed no new table is required: `public.task_semantic_packets` exists and is the live
@@ -14864,3 +14895,317 @@ Keep this roadmap attached to the existing owners above; it does not authorize a
 These are proposed implementation gates, not completion claims. Existing ACE cache revision binding, canonical packet/tuple admission, ContextManifest readback and GPU resource gates remain authoritative and open until their own receipts pass.
 
 **2026-10-11 Valkey/ACE request-path audit refinement:** Extended `scripts/atlas/lib/audit-feature-runtime-wiring-v1.mjs` with explicit `LIVE_CACHE_HINT_PROVIDER` and `ROUTE_ACE_MANIFEST_PATH` checks and regression coverage. Focused audit tests pass **12/12**. Source census finds the canonical SearchRuntime adapter owns `searchWithAceManifest`, cached-packet resolution and centroid crosswalk, but `semantic-search-workflow.ts` calls only `adapter.search`; the `/api/retrieval/search-unified` route does not supply the ACE/ContextManifest path or a request-scoped Valkey hint provider. Current audit returns both checks `NOT_WIRED`, `SEARCH_ACE_CALLER=BLOCKED`, `ONTOLOGY_ADMISSION=NOT_ESTABLISHED`, `MANIFEST_READBACK=NOT_ESTABLISHED`, and `allLiveProven=false`. Do not wire a synthetic provider: the configured DB census has zero rows in both ontology tuple tables, and the reported live Valkey surface lacks revision-qualified ACE packet objects. Next gate remains identifying an existing authorized producer for a request-scoped ordinal snapshot and cache read before application wiring; ontology-backed ContextManifest remains separately blocked. No DB/cache/model writes occurred.
+
+**2026-10-11 revisioned ACE cache manifest integrity hardening (implementation only; tests not run):** `getRevisionedAceContextPackV1()` now recomputes the stored `ContextManifestV2` checksum with the existing canonical builder and compares the canonical hash of the complete stored V1 body against the request's V1 body before returning a cached pack. A mismatch becomes a cache miss. This closes the cache envelope's prior trust in a caller/stored checksum string, without adding a checksum scheme or storage owner. Redis remains an ephemeral cache: this is not durable ContextManifest readback, ontology admission, or production route proof. No Redis/database/model operations were run; focused tests remain intentionally unrun.
+
+### Phase 17 proposal reconciliation (2026-10-11)
+
+- [x] Superseded the attached greenfield Phase 17 plan with a repository-grounded plan at
+  `docs/architecture/phase17-feature-extractor-upgrade-v2.md`.
+- [x] Confirmed existing Zod contracts, TypeScript derived-feature extraction, provider-admission
+  boundary, and Phase 18 consumer; this is not a missing Python/PyTorch extractor scaffold.
+- [x] Confirmed `persistPhase17Output()` only logs a would-write message; SQL remains disabled.
+- [ ] Bind proposals to canonical request/workspace/candidate/packet/source/chunk revisions and
+  verified evidence references; local generated keys and aliases are not canonical identity.
+- [ ] Preserve SearchRuntime's score/fusion owner and observed zero scores; reject fixed fusion
+  weights and plausible defaults for unavailable lanes.
+- [ ] Preserve EmbeddingGemma `semantic_768` as vector owner and keep Phase 17 persistence disabled
+  until a governed writer and independent readback exist.
+- [ ] Revisit CPU/PyTorch/GPU implementation only after a frozen qualified feature snapshot and
+  separate executor parity/resource gates.
+
+Evidence: `sveltekit-frontend/src/lib/server/ml/phase17-schema.ts`,
+`sveltekit-frontend/src/lib/server/ml/phase17-feature-extractor.ts`, and
+`docs/architecture/phase17-feature-extractor-upgrade-v2.md`. Source review only; no tests or runtime
+checks were run in this reconciliation.
+
+- [x] Identified that extraction-error fallback emits placeholder `0.5` values marked
+  `validation_status: pending`; these are not evidence-backed ranking features.
+- [ ] Before Phase 18 wiring, require `validation_status: valid` at the consumer boundary or use a
+  distinct type that excludes pending fallback rows. Source search found no Phase 17-to-Phase 18
+  production caller; verify the caller census before enabling this path.
+
+### Phase 18 untrained-reranker fail-closed behavior (2026-10-11)
+
+- [x] Replaced the authority-score placeholder with explicit `MODEL_UNAVAILABLE` and null score /
+  confidence; pending or invalid Phase 17 outputs return `BLOCKED_INPUT`.
+- [x] Made the Phase 18 result a discriminated union: `SCORED` requires numeric score/confidence;
+  blocked/unavailable outcomes require nulls and a reason.
+- [x] Removed score-based batch sorting when no trained model score exists; preserve input order.
+- [x] Added focused regression cases for invalid/pending inputs, unavailable model, and order.
+- [ ] Run the focused Phase 18 suite when testing resumes. The test is authored, not executed.
+- [ ] Before any production caller is wired, bind model identity/revision, calibration, and input
+  lineage to the existing ranking and evidence owners.
+
+Evidence: `sveltekit-frontend/src/lib/server/ml/phase18-reranker.ts` and
+`sveltekit-frontend/src/lib/server/ml/phase18-reranker.spec.ts`. Source/fixture contract only;
+tests, model execution, and production caller validation remain pending.
+
+### Phase 17 packet-key reuse refinement (2026-10-11)
+
+- [x] Replaced the generated `sourceRef:featureId:hash` key in extractor output with an exact-one
+  match from `reconciliationResult.packets` on `sourceRef`, `featureId`, and `aliasId`.
+- [x] Changed `packet_key` to nullable for blocked diagnostic outputs; missing and duplicate matches
+  return `pending` with no packet key. The persistence function rejects pending or unkeyed outputs.
+- [x] Reject empty/whitespace-padded packet keys and added regression fixtures for missing,
+  duplicate, and padded-key cases. Tests are authored, not run.
+- [ ] Independently bind matched packets to current request/workspace ordinal map, source bytes and
+  revision, chunk lineage, and evidence refs. Matching a reconciliation record alone is not source
+  authority or evidence admission.
+
+Evidence: `sveltekit-frontend/src/lib/server/ml/phase17-schema.ts`,
+`sveltekit-frontend/src/lib/server/ml/phase17-feature-extractor.ts`,
+`sveltekit-frontend/src/lib/server/ml/phase17-integration.spec.ts`, and
+`docs/architecture/phase17-feature-extractor-upgrade-v2.md`.
+
+### Phase 17/18 implementation sequence refresh (2026-10-11)
+
+- [x] Update the architecture plan to reflect exact-one reconciliation packet-key reuse and the
+  Phase 18 untrained-model fail-closed contract; distinguish these code changes from authority.
+- [x] Keep Phase 17 persistence intent-only and Phase 18 unconnected to production until canonical
+  source/candidate providers, model identity, and independent readbacks are established.
+- [ ] Resume authored focused tests only when testing is explicitly resumed; tests remain unrun.
+- [ ] Establish a frozen revision-qualified candidate/feature snapshot and independently verified
+  source evidence before CPU ranking evaluation.
+- [ ] Compare deterministic CPU behavior with SearchRuntime's existing ranking/fusion owner; do not
+  add a second fusion score or treat advisory features as another retrieval vote.
+- [ ] Consider PyTorch CPU and then GPU/cuGraph/cuVS/cuTile/SIMT challengers only after the same
+  frozen input, parity criteria, and explicit resource admission are available.
+- [ ] Keep feature persistence, ontology-backed synthesis, and ContextManifest proof blocked until
+  their existing governed owners and independent readbacks succeed.
+
+Status: `PLAN_REFRESHED_CODE_AUTHORED_VALIDATION_PAUSED_LIVE_LINEAGE_BLOCKED`. No completion
+checkbox above claims live source authority, model execution, GPU parity, or manifest admission.
+
+### Model-facing AWK shell boundary containment (2026-10-12)
+
+- [x] Removed the dormant `codebase.awk_analyze` handler, shell-interpolated command construction,
+  and associated `exec`/schema imports from `codebase_tools.ts`; retained bounded `codebase.rg_search`
+  through `execFile` argument arrays.
+- [x] Confirmed source registration is still behind the optional codebase registry, and the
+  dispatcher independently rejects direct shell/cmd/bash model-facing tool names.
+- [x] Performed read-only MCP `initialize`/paginated `tools/list` discovery: Atlas tools and TRACE
+  are reachable (10 and 188 tools respectively), and neither advertises `codebase.awk_analyze`.
+  Receipt: `.tmp/atlas/mcp-tool-surface-shell-cleanup-check.json`. This proves current tool-list
+  absence, not that every historical server process has reloaded the source.
+- [ ] Confirm intended safe search exposure: `codebase.rg_search` remains shell-free in source,
+  but the TRACE runtime's 188-tool listing does not include it; `registerCodebaseTools` is behind
+  `MCP_OPTIONAL_REGISTRIES=true`. Do not enable the optional registry without an explicit decision.
+- [ ] If AWK analysis is still needed, replace it with a narrow structured operation that accepts
+  fixed analysis modes and validated workspace-relative paths, never caller-provided AWK programs.
+
+Evidence: `sveltekit-frontend/src/mcp/codebase_tools.ts`,
+`sveltekit-frontend/src/mcp/dispatcher-middleware.ts`, and
+`.tmp/atlas/mcp-tool-surface-shell-cleanup-check.json`. Static source checks plus read-only live
+discovery; no tool invocation, test suite, database/cache write, model, or GPU operation was
+performed. Gate status: `PATCHED_UNVERIFIED`; the unsafe handler is removed and its live tool
+absence is confirmed, while safe search is preserved in code but not exposed by current TRACE
+configuration and the full test/startup checks remain pending.
+
+Follow-up read-only check: a fresh `tools/list` call to `http://127.0.0.1:8788/mcp` returned 188
+tools; neither `codebase.awk_analyze` nor `codebase.rg_search` is exposed. `codebase_tools.ts`
+contains only the bounded `execFile('rg', args)` search handler and no `exec`, `execAsync`, AWK
+command construction, or shell interpolation. TRACE startup still invokes the existing core tool
+registrations; `registerCodebaseTools` remains behind `MCP_OPTIONAL_REGISTRIES=true`, which was
+not enabled. Thus the safe handler is preserved, but its exposure and a full startup regression
+remain unverified; no TRACE restart or tests were run.
+
+### GNN CPU reference inventory (2026-10-12; source census only)
+
+- [x] Counted 35 `GnnArchitectureV1` variants in `python/atlas_graph_runtime/gnn_reference.py` and
+  35 matching parameterized model fixtures in `gnn_fixtures.py`; the CPU executor defaults to
+  `networkx_torch_cpu` and routes topology through NetworkX with tensor math in PyTorch.
+- [x] Confirmed `python/tests/test_networkx_gnn_reference.py` parameterizes its deterministic
+  reference test over `fixture_gnn_models_v1()`; this establishes authored coverage structure, not
+  a test run in this continuation.
+- [ ] Resume the CPU suite when testing is explicitly resumed; record the actual result and
+  environment/backend receipt before claiming fixture execution.
+- [ ] Keep Atlas applicability blocked until a current, admitted graph/feature snapshot and
+  CandidateOrdinalMap readback exist; fixtures do not establish live graph availability.
+- [ ] Only after CPU validation and resource admission, attempt GPU parity on the identical frozen
+  inputs. Do not add a second implementation of existing NetworkX/PyTorch operators merely to
+  claim broader GNN coverage.
+
+Evidence: `python/atlas_graph_runtime/gnn_reference.py`,
+`python/atlas_graph_runtime/gnn_fixtures.py`, and
+`python/tests/test_networkx_gnn_reference.py`. No test, graph-service, GPU, or persistence action
+was performed for this inventory.
+
+### AST-grep DAG composition owner audit (2026-10-12; source only)
+
+- [x] Confirmed `AST_STRUCTURAL_REFINE` is a declared DAG node with a `LEXICAL` dependency and an
+  existing default AST-grep handler; the extraction/byte-span implementation is not missing.
+- [x] Confirmed `makeAdmittedAstGrepRefinementHandlerV1` validates CandidateOrdinalMap integrity,
+  workspace/source revisions, repository path containment, reopened source bytes, and UTF-8 spans.
+- [x] Searched production TypeScript call sites: the admitted-provider factory has no caller and
+  `executeContextToolDagV1` has no non-test caller. Existing compositions are fixture-only.
+- [ ] Identify the actual request-scoped production caller and canonical candidate/source owners
+  before wiring. Do not invent ordinal maps, add a second retrieval route, or turn AST observations
+  into Graphify/ontology admission.
+- [ ] Keep `ASTG-01` open until an authorized request reaches the DAG and independent source/map
+  readback is recorded; production ranking and ContextManifest must remain unchanged meanwhile.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/workflow/admitted-ast-grep-provider-v1.ts`,
+`context-dag-handlers-v1.ts`, and `context-tool-dag-contracts.ts`. Static caller census only; no
+tests or live request were executed.
+
+### Graph-search owner reuse audit (2026-10-12; source only)
+
+- [x] Located the existing revision-bound `SGraphSearchPlanV1` / `SGraphSearchReceiptV1` owner in
+  `s-graph-search.ts`; it already implements bounded BFS, uniform-cost, greedy best-first, beam,
+  and A* search with declared optimality caveats.
+- [x] Located the distinct NetworkX PPR/PageRank CPU oracle and cuGraph executor/parity owner in
+  `python/atlas_graph_runtime`; cuVS remains a vector-search executor, not a graph-traversal owner.
+- [x] Confirmed no non-test caller of `searchSGraph` exists in the app source, so these are
+  implemented owners without a proven production request path.
+- [ ] Reuse these plan/receipt owners instead of adding another GraphSearch implementation. Wire
+  only after a canonical admitted graph snapshot and ordinal map are available; keep all graph
+  derived features unavailable when the structural graph is unadmitted.
+- [ ] Treat Leiden/Louvain/community assignment separately: identify the existing producer and
+  revision/readback owner before calling it an available search operation.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/graph/s-graph-search.ts`,
+`python/atlas_graph_runtime/networkx_executor.py`, `cugraph_executor.py`, and `ppr_parity.py`.
+Static source census only; no traversal, test, GPU operation, or graph readback was performed.
+
+### Live TRACE OpenSpec task-retrieval capability check (2026-10-12)
+
+- [x] Refreshed live TRACE `tools/list` rather than relying on the saved MCP surface report: 188
+  tools are currently listed, including `openspec.census`, `openspec.task`, and
+  `openspec.frontier`, but not `openspec.search`.
+- [x] A read-only `openspec.search` invocation returned MCP error `-32602: Tool openspec.search not
+  found`; the local source registers this tool, so the deployed capability surface and checked-out
+  source differ.
+- [ ] Reconcile TRACE deployment/registry revision and restore revision-bound task search before
+  using MCP as an OpenSpec indexing authority. Do not infer workboard freshness from tool health or
+  a previously saved tool-surface receipt.
+- [ ] Use `openspec.task` / `openspec.frontier` only after confirming their returned census source
+  and workspace revision are non-null and current; preserve local task ledgers as authoritative.
+
+Evidence: current read-only `tools/list` from `127.0.0.1:8788/mcp`, the rejected `openspec.search`
+call, and `sveltekit-frontend/src/mcp/openspec-evidence-tools.ts`. The subsequent `openspec.census`
+call produced no inspectable response within the command window. No task mutation, store write, or
+MCP tool other than read-only discovery/search was attempted.
+
+**Root-cause refinement:** the current listener is PID `40468`, launched as
+`C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\src\mcp\trace-mcp-server.ts` at
+2026-10-11 10:05 local; `trace-mcp-server.ts` was modified 2026-10-11 21:13 and
+`openspec-evidence-tools.ts` 2026-10-11 14:47. The live process therefore predates both source
+changes. This supports stale in-memory code as the cause of the missing live tool, but not the
+correctness of a future reload. Keep the gate `STALE_TRACE_PROCESS_CONFIRMED_RELOAD_PENDING`; do not
+restart the operator-owned listener automatically.
+
+### ACE packet candidate-only recovery hardening (2026-10-11)
+
+- [x] Reused `scripts/atlas/_neschrom-paths.mjs` as the card and embedding directory owner; the
+  compressor no longer reads the retired `.opencode/cards` path.
+- [x] Changed `scripts/ingest/compress-cards.mjs` to emit only timestamped, unadmitted candidates
+  under `.opencode/candidates/`. It rejects an empty/malformed ranking report, missing card
+  directory, and zero packable cards; `--promote` fails closed. It does not write active packet or
+  summary paths, supersede/archive active packets, or enable ACE injection.
+- [x] Redirected the legacy `scripts/ingest/build-ace-packet.mjs` writer to the shared card and
+  embedding paths and candidate-only output, preventing it from recreating `.opencode/ace-packet.json`.
+- [ ] Inspect the resulting candidate and verify all selected bodies, source references, and
+  checksums before any separate packet-admission/promotion design. Historical June summaries remain
+  recovery-only and are not used as current card bodies.
+- [ ] Identify and validate the canonical card-body producer for the 8,170-file `neschrom97/cards`
+  store; locating the store and matching ranked IDs does not prove current source revisions.
+- [ ] Verify every ACE context consumer returns `ACE_PACKET_UNAVAILABLE` when the active packet is
+  absent; no historical fallback may silently repopulate current context.
+
+Status: `CANDIDATE_ONLY_IMPLEMENTED_UNTESTED`; no packer run, packet promotion, active-path write,
+or ACE injection was performed. The existing production manifest still labels the June packet
+`BASELINE_UNVERIFIED_INPUTS`. Source-level writer changes do not prove source lineage, packet
+admission, ContextManifest readback, or production ACE behavior.
+
+### Chat runtime naming and default alignment (2026-10-11)
+
+- [x] Added `callLlamaServerChat` as the canonical name for the existing llama-server chat owner;
+  migrated contextual chat and task-summary callers while preserving `callOllamaChat` as a
+  compatibility export.
+- [x] Removed `OLLAMA_MODEL_CHAT`/`OLLAMA_MODEL` from the llama-server client's default model
+  selection; it now uses `LOCAL_VLM_MODEL`, and reports chat errors as llama-server errors.
+- [x] Routed the audited Bifrost chat callers through `BIFROST_CHAT_MODEL`, removed the
+  `GEMMA4_MODEL` chat default, and aligned admin-chat metadata and feature-document model plans to
+  the shared llama-server model/URL owner.
+- [x] Updated the active OpenCode system and retrieval-agent instructions to identify Ornith 1.5
+  through llama-server `/v1/models`; Ollama remains the embedding service.
+- [ ] Audit remaining Phase-101 packetizer fallbacks, model catalog entries, compatibility aliases,
+  and generated historical briefs before changing their contracts; names alone do not prove model
+  selection.
+
+Status: `SOURCE_ALIGNED_UNTESTED`. A read-only `GET /v1/models` returned `ornith-1.5-9b`; no
+inference request or test suite was run. Runtime model identity comes from that endpoint, not the
+source edit.
+
+### Intent-aware ACE / TurboVec proposal reconciliation (2026-10-12)
+
+This addendum reconciles the proposed intent-cache, feature-label, topology, TurboVec, prompt,
+summary, and later-training stages with the existing owners. It is a dependency plan, not an
+authorization to write stores, start services, promote retrieval results, or mark the larger ACE
+pipeline complete.
+
+**Fresh evidence and corrections**
+
+- A read-only `GET http://127.0.0.1:8090/v1/models` returned `ornith-1.5-9b`; the response reports
+  `n_ctx_train=262144`, which is model metadata and does not by itself prove the effective serving
+  context. `:8095/health` was unavailable during this audit.
+- Source search still finds legacy `/api/chat` and `/api/generate` compatibility callers. The
+  active `:8090` model is Ornith, but an exhaustive proof of zero Ollama-backed chat execution is
+  not established by model discovery or the raw-fetch guard alone. Keep Ollama as the configured
+  EmbeddingGemma owner; audit compatibility wrappers and remaining callers before claiming
+  Ollama-chat exclusion.
+- Focused tests passed: packet dense search **7/7**, ACE startup boundary **6/6**, and dispatcher
+  shell boundary **9/9**. These are fixture/source-boundary results, not live ACE admission,
+  ContextManifest readback, or MCP invocation proof.
+- The workspace-source dry-run proposes 27,749 bindings for
+  `sha256:69e37be3a985552b9195b07fb8848ba42f5f137ebfe688a209b5eb02446f25cb`, with zero persisted
+  bindings for that revision. The Graphify authority receipt is for
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`; these revisions must
+  not be joined as if they were the same snapshot.
+- The current ACE boundary tests do not establish the claimed consumer result
+  `ACE_PACKET_UNAVAILABLE`; no implementation of that status was found in the audited startup and
+  packet-consumer paths. The June packet stays recovery-only and ACE injection stays disabled
+  until each consumer's missing-packet behavior is verified.
+- Dense search remains fixture-tested. Its 7/7 focused tests do not close the full PDS-00 census,
+  row-level source/representation lineage, production request-caller proof, or independent
+  readback. GPU/CAGRA remains quarantined and is not a second semantic vote.
+
+**Dependency-ordered implementation gates**
+
+- [ ] `INTENT-ACE-LINEAGE-01`: Reuse the existing request/query checksum and revision-qualified
+  cache owners. Keep intent entries advisory; do not add a parallel durable memory table or cache
+  prompt text, hidden reasoning, tensors, or model KV state. Require an admitted source/candidate
+  snapshot before any source reference is cached.
+- [ ] `ACE-MISSING-CONSUMER-01`: Trace every active ACE packet reader, feature-label builder,
+  prompt builder, and retrieval-context consumer. Make each return an explicit unavailable or
+  blocked result on a missing/unqualified active packet; prohibit silent fallback to June or other
+  historical packets. Preserve candidate-only packer output until packet admission is authorized.
+- [ ] `FEATURE-LABEL-PROPOSAL-01`: Reuse the existing feature registry and classifier owners to
+  emit source-bound proposals from the current ranked packet/candidate set. Keep label/domain
+  outputs advisory; do not infer ontology identity or let label scores change canonical file rank.
+- [ ] `DOMAIN-TOPOLOGY-SHADOW-01`: Reuse existing graph/ontology projection owners. Build
+  `IMPLEMENTS`, `DEPENDS_ON`, `MENTIONS`, `DUPLICATES`, `BLOCKED_BY`, and domain associations only
+  from qualified source observations and an admitted graph snapshot. If those are absent, emit a
+  blocked diagnostic, not graph edges or Neo4j writes.
+- [ ] `TURBOVEC-ONE-LANE-01`: Evaluate TurboVec only as an optional executor behind existing
+  SearchRuntime normalization/fusion. Preserve one semantic-lane vote, source references,
+  deterministic fallbacks, and ACE assembly when TurboVec is unavailable. Record the rerank trace
+  as observability; do not mutate Qdrant or canonical graph state.
+- [ ] `PRIMEAGENT-ORNITH-HANDOFF-01`: Reuse the existing PrimeAgent/DAG, MCP registry, and
+  ContextManifest owners. Resolve the synthesis model from the live `:8090/v1/models` response;
+  provide Ornith only admitted, bounded context. Do not introduce a parallel Gemma4 model owner or
+  expose mutation tools through a generated prompt plan.
+- [ ] `ACE-SUMMARY-TRAINING-ISOLATION-01`: Nightly/weekly summaries must retain their source and
+  validation references and remain outside hot exact caches unless the existing cache policy
+  qualifies them. Training-candidate exports are offline proposals; never turn routing feedback,
+  attention/hidden state, or cache telemetry into canonical evidence or model updates.
+- [ ] `ACE-PIPELINE-VERTICAL-READBACK-01`: Prove one current, source-bound candidate through
+  retrieval, canonical identity resolution, admitted ACE packet, independent ContextManifest
+  readback, and an Ornith request receipt. Missing workspace/source binding, ontology tuple, or
+  manifest readback remains `BLOCKED`; do not backfill or warm Valkey to manufacture the proof.
+
+**Current disposition:** architecture aligned to Ornith 1.5 on llama-server `:8090` for synthesis
+and EmbeddingGemma via Ollama for embeddings; source compatibility routes still require caller
+audit. Intent caching, graph topology, TurboVec-in-ACE wiring, and prompt subagent handoff remain
+proposals. No database, Qdrant, Neo4j, Valkey, model, or GPU writes were performed in this audit.

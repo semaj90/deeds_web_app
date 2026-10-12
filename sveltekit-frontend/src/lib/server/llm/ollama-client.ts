@@ -1,5 +1,5 @@
 /**
- * Local llama-server/Gemma4 LLM Client - Task 5.3
+ * Local llama-server chat client - Task 5.3
  *
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
@@ -11,22 +11,9 @@ import { bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const DEFAULT_URL = LLAMA_SERVER_BASE_URL;
-const DEFAULT_MODEL =
-  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? LOCAL_VLM_MODEL;
+const DEFAULT_MODEL = LOCAL_VLM_MODEL;
 
-// Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
-// All TS callers previously missed num_ctx and repeat_penalty, letting the local server
-// silently fall back to its own built-in defaults instead of the Modelfile values.
-const GEMMA3_DEFAULTS = {
-  temperature: 0.1, // Modelfile: temperature 0.1  (legal precision, not creativity)
-  top_k: 20, // Modelfile: top_k 20
-  top_p: 0.8, // Modelfile: top_p 0.8
-  num_ctx: 8192, // Modelfile: num_ctx 8192  — was MISSING from all TS callers
-  repeat_penalty: 1.05, // Modelfile: repeat_penalty 1.05 — was MISSING from all TS callers
-  num_predict: 2048, // sensible completion cap
-} as const;
-
-const GEMMA4_DEFAULTS = {
+const DEFAULT_CHAT_PARAMETERS = {
   temperature: 0.1,
   top_k: 20,
   top_p: 0.8,
@@ -38,13 +25,8 @@ const GEMMA4_DEFAULTS = {
       65536
   ),
   repeat_penalty: 1.05,
-  num_predict: 4096, // Gemma 4 can handle longer completions
+  num_predict: 4096,
 } as const;
-
-/** Pick model defaults based on model name */
-function getModelDefaults(model: string) {
-  return model.startsWith('gemma4') ? GEMMA4_DEFAULTS : GEMMA3_DEFAULTS;
-}
 
 export interface LLMMessage {
   role: 'system' | 'user' | 'assistant';
@@ -98,10 +80,10 @@ export async function generateCompletion(
         model,
         messages: [{ role: 'user', content: prompt }],
         stream: false,
-        temperature: options.temperature ?? getModelDefaults(model).temperature,
-        max_tokens: options.maxTokens ?? getModelDefaults(model).num_predict,
-        top_p: options.topP ?? getModelDefaults(model).top_p,
-        top_k: options.topK ?? getModelDefaults(model).top_k,
+        temperature: options.temperature ?? DEFAULT_CHAT_PARAMETERS.temperature,
+        max_tokens: options.maxTokens ?? DEFAULT_CHAT_PARAMETERS.num_predict,
+        top_p: options.topP ?? DEFAULT_CHAT_PARAMETERS.top_p,
+        top_k: options.topK ?? DEFAULT_CHAT_PARAMETERS.top_k,
       }),
       signal: AbortSignal.timeout(120_000),
     });
@@ -159,17 +141,17 @@ export async function chatCompletion(
         model,
         messages,
         stream: false,
-        temperature: options.temperature ?? getModelDefaults(model).temperature,
-        max_tokens: options.maxTokens ?? getModelDefaults(model).num_predict,
-        top_p: options.topP ?? getModelDefaults(model).top_p,
-        top_k: options.topK ?? getModelDefaults(model).top_k,
+        temperature: options.temperature ?? DEFAULT_CHAT_PARAMETERS.temperature,
+        max_tokens: options.maxTokens ?? DEFAULT_CHAT_PARAMETERS.num_predict,
+        top_p: options.topP ?? DEFAULT_CHAT_PARAMETERS.top_p,
+        top_k: options.topK ?? DEFAULT_CHAT_PARAMETERS.top_k,
       }),
       signal: AbortSignal.timeout(120_000),
     });
 
     if (!response.ok) {
       const error = await response.text();
-      throw new Error(`Ollama chat error: ${response.status} - ${error}`);
+      throw new Error(`llama-server chat error: ${response.status} - ${error}`);
     }
 
     const data = await response.json();

@@ -110,6 +110,25 @@ export async function extractFeaturesViaMock(
  * Extract features via Gemma4 + structured prompting
  * Falls back to LangExtract if Gemma4 unavailable
  */
+/** Assemble assistant text from an OpenAI-style SSE stream (llama-server requires stream:true). */
+async function readChatStream(response: Response): Promise<string> {
+  const raw = await response.text();
+  let out = '';
+  for (const line of raw.split('\n')) {
+    const t = line.trim();
+    if (!t.startsWith('data:')) continue;
+    const payload = t.slice(5).trim();
+    if (payload === '[DONE]') break;
+    try {
+      const chunk = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+      for (const c of chunk.choices ?? []) out += c.delta?.content ?? '';
+    } catch {
+      /* skip malformed SSE line */
+    }
+  }
+  return out;
+}
+
 export async function extractFeaturesViaGemma4(
   request: LangExtractRequest,
   gemma4Url: string = 'http://127.0.0.1:8090'
@@ -144,26 +163,27 @@ Features (JSON):
 `;
 
   try {
-    const response = await fetch(`${gemma4Url}/api/generate`, {
+    // llama-server (Ornith 1.5). Model alias and URL come from the environment; never a GGUF name.
+    const baseUrl = (process.env.LLAMA_SERVER_URL ?? gemma4Url).replace(/\/$/, '');
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt,
-        stream: false,
-        think: false,
-        options: { temperature: 0.1, num_predict: 1024 }
+        model: process.env.CHAT_MODEL ?? 'ornith-1.5-9b',
+        messages: [{ role: 'user', content: prompt }],
+        stream: true,
+        max_tokens: 1024,
+        temperature: 0.1
       }),
       signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) {
-      console.warn(`Gemma4 extraction failed (${response.status}), falling back to mock`);
+      console.warn(`llama-server extraction failed (${response.status}), falling back to mock`);
       return extractFeaturesViaMock(request);
     }
 
-    const data = (await response.json()) as any;
-    const responseText = data.response || '';
+    const responseText = await readChatStream(response);
 
     // Parse JSON from response
     const jsonMatch = responseText.match(/\[[\s\S]*\]/);

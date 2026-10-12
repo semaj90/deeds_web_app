@@ -98,6 +98,7 @@ const execFileAsync = promisify(execFile);
 const dryRun = args.includes('--dry-run');
 const append = args.includes('--append');
 const sourceIdFilter = args.find((arg) => arg.startsWith('--source-id='))?.slice('--source-id='.length);
+const allowFirecrawl = !args.includes('--no-firecrawl');
 const limitArg = args.find((arg) => arg.startsWith('--limit='));
 const limit = limitArg ? Number(limitArg.split('=')[1]) : Number.POSITIVE_INFINITY;
 const crawlRunId = `${new Date().toISOString().replace(/[^0-9TZ]/g, '')}-${crypto.randomBytes(8).toString('hex')}`;
@@ -404,7 +405,7 @@ async function main() {
       };
       let fetched: { title: string; markdown: string; raw?: Record<string, unknown> } | null = null;
       let fetchedVia: string | null = null;
-      for (const fetcher of orderOkfDevFetchersV1(source.preferred_fetcher)) {
+      for (const fetcher of orderOkfDevFetchersV1(source.preferred_fetcher, { allowFirecrawl })) {
         fetched = await attemptFetch(fetcher.toLowerCase(), fetchOperations[fetcher]);
         if (fetched) {
           fetchedVia = fetcher.toLowerCase();
@@ -461,7 +462,7 @@ async function main() {
           source_revision: source.source_revision ?? null,
           source_manifest: source.source_metadata ?? null,
           preferred_fetcher: source.preferred_fetcher ?? null,
-          fetched_via: fetched.raw?.source ?? fetchedVia,
+          fetched_via: fetchedVia,
           domain_classification: 'MANIFEST_SOURCE_HINT_UNREVIEWED',
           detected_domain_hint: classifyDomain(source.source_id, fetched.title, markdown),
           synthesis_status: 'NOT_RUN',

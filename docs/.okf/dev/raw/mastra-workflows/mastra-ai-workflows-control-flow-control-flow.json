@@ -1,0 +1,79 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "mastra-workflows",
+  "source_ref": "mastra-workflows:mastra-ai-workflows-control-flow-control-flow",
+  "url": "https://mastra.ai/docs/workflows/control-flow",
+  "title": "Control flow | Workflows | Mastra Docs",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "llm_synthesis",
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Control flow | Workflows | Mastra Docs",
+    "markdown_excerpt": "Control flow | Workflows | Mastra Docs Skip to main content Docs Models Integrations Reference Learn Platform Search Ask AI system mode Get Started Develop Build Agents Workflows Harness Memory Extend Subagents Skills Channels Sandboxes Browser Connections Develop / Deploy Storage Server Studio Auth Deploy Observe Traces Metrics Evals More Guides Workflows Overview Workflow State Control Flow Agents and Tools Dynamic Workflows Snapshots Suspend and Resume Human-in-the-Loop Time Travel Error Handling Scheduled Workflows Build Workflows Control Flow On this page Control flow Workflows give you control over predefined tasks by dividing each task into steps . Those steps can run sequentially or in parallel, and they can follow conditional paths. Each step connects to the next in the workflow through defined schemas that keep data controlled and consistent. Core principles Direct link to Core principles The first step’s inputSchema must match the workflow’s inputSchema . The final step’s outputSchema must match the workflow’s outputSchema . Each step’s outputSchema must match the next step’s inputSchema . If it doesn’t, use Input data mapping to transform the data into the required shap",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:mastra-workflows:mastra-ai-workflows-control-flow-control-flow",
+    "title": "Control flow | Workflows | Mastra Docs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Mastra Workflows Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "247f0e50ba41bd8490a377fe7da4d75a5d6b6476a1c0e517865913ee18db8252",
+  "markdown_path": "docs/.okf/dev/raw/mastra-workflows/mastra-ai-workflows-control-flow-control-flow.md",
+  "fetched_at": "2026-10-11T19:44:37.924Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "mastra-workflows",
+    "source_title": "Mastra Workflows Documentation",
+    "source_revision": "mastra-workflows-docs-2026-10-11",
+    "source_manifest": {
+      "manifest_revision": "okf-tooling-docs-r3",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "output_namespace": "docs/.okf/mastra-workflows",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "allowed_domains": [
+        "mastra.ai"
+      ],
+      "provider": "mastra",
+      "product": "mastra-workflows",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Mastra"
+    },
+    "preferred_fetcher": "HTTP_FALLBACK",
+    "fetched_via": "http_fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/mastra-workflows/mastra-ai-workflows-control-flow-control-flow.md"
+}

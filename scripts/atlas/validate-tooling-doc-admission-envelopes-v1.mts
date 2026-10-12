@@ -18,6 +18,7 @@ const sha = (t: string) => createHash('sha256').update(t, 'utf8').digest('hex');
 const jsonl = (f: string) => fs.readFileSync(f, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
 // ENVELOPES_PATH / REPORT_PATH overrides exist so negative fixtures can run this exact gate on mutated copies without touching the committed report.
 const envelopes: any[] = JSON.parse(fs.readFileSync(process.env.ENVELOPES_PATH ?? path.join(ROOT, 'docs/.okf/dev/tooling-docs.admission-envelopes-v1.json'), 'utf8'));
+const sourceManifest: any = JSON.parse(fs.readFileSync(process.env.SOURCE_MANIFEST_PATH ?? path.join(ROOT, 'docs/.okf/dev/tooling-docs.manifest.json'), 'utf8'));
 const checks: { name: string; pass: boolean; detail: string }[] = [];
 const check = (name: string, pass: boolean, detail = '') => checks.push({ name, pass, detail });
 
@@ -38,6 +39,16 @@ check('every page has exactly one coordinate (unique page evidenceRevision + con
 let noRaw = 0, multiRaw = 0;
 for (const e of envelopes) { const hits = (rawBySource.get(e.sourceId) ?? []).filter((r) => r.resolved_url === e.page.url); if (hits.length === 0) noRaw++; if (hits.length > 1) multiRaw++; }
 check('every coordinate resolves to exactly one acquired document', noRaw === 0 && multiRaw === 0, `unresolved=${noRaw} ambiguous=${multiRaw}`);
+const manifestSources = new Map(sourceManifest.sources.map((source: any) => [source.source_id, source]));
+let unboundRequests = 0, sourceRevisionMismatch = 0;
+for (const e of envelopes) {
+  const source = manifestSources.get(e.sourceId);
+  const hits = (rawBySource.get(e.sourceId) ?? []).filter((r) => r.resolved_url === e.page.url);
+  if (!source || hits.length !== 1 || !source.pages.includes(hits[0].requested_url)) unboundRequests++;
+  if (!source || source.source_revision !== e.sourceRevision || (hits.length === 1 && hits[0].source_revision !== source.source_revision)) sourceRevisionMismatch++;
+}
+check('resolved pages preserve exact manifest request and source revision lineage', unboundRequests === 0 && sourceRevisionMismatch === 0,
+  `unboundRequests=${unboundRequests} sourceRevisionMismatch=${sourceRevisionMismatch}`);
 let chunkMissing = 0, textMismatch = 0, checksumMismatch = 0, revMismatch = 0, parentMismatch = 0, total = 0;
 for (const e of envelopes) for (const c of e.chunks) {
   total++;

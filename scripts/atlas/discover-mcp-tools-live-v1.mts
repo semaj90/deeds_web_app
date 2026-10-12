@@ -47,7 +47,9 @@ import {
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '../..');
-const OUTPUT_PATH = path.resolve(REPO_ROOT, 'docs/reports/mcp-tool-surface-live-v1.json');
+const OUTPUT_PATH = path.resolve(
+  process.env.ATLAS_MCP_TOOL_SURFACE_OUTPUT ?? path.join(REPO_ROOT, 'docs/reports/mcp-tool-surface-live-v1.json'),
+);
 const TRUST_POLICY_IDENTITY = 'internal-first-party';
 
 type DiscoverResult =

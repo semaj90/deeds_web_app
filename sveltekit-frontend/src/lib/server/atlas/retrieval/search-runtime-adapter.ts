@@ -10,7 +10,9 @@ import {
 import type { CandidateProjectionInput } from '$lib/server/retrieval/retrieval-candidate-feature-matrix-v1.js';
 import {
   joinSearchRuntimeQasFeatureSources,
+  joinSearchRuntimeQasAsyncFeatureSources,
   type SearchRuntimeQasFeatureSources,
+  type SearchRuntimeQasAsyncFeatureSources,
 } from './search-runtime-qas-feature-resolver.js';
 import {
   materializeCandidateFeatureSnapshotWithOrdinalMapFromQasRowsV1,
@@ -71,15 +73,19 @@ export interface AtlasSearchResponse {
   graphExpanded?: GraphCandidate[];
 }
 
-export interface AtlasSearchQasOptions {
+interface AtlasSearchQasOptionsBase {
   requestId: string;
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  sources: SearchRuntimeQasFeatureSources;
 }
 
-export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
+export type AtlasSearchQasOptions = AtlasSearchQasOptionsBase & (
+  | { sources: SearchRuntimeQasFeatureSources; asyncSources?: never }
+  | { sources?: never; asyncSources: SearchRuntimeQasAsyncFeatureSources }
+);
+
+export type AtlasSearchAceManifestOptions = AtlasSearchQasOptions & {
   candidateSnapshotRevision: string;
   retrievalPolicyRevision: string;
   acePlaybookRevision: string;
@@ -104,7 +110,7 @@ export interface AtlasSearchAceManifestOptions extends AtlasSearchQasOptions {
   centroidCandidateHint?: { card: CentroidCardV1; manifest: CentroidManifestV1 };
   /** Optional independently acquired source bytes/spans; verified but never admitted here. */
   cachedPacketSourceEvidence?: readonly ({ hintId: string } & CachedPacketSourceEvidenceInputV1)[];
-}
+};
 
 export type SearchRuntimeUnifiedResidencyOptions = AtlasSearchAceManifestOptions
   & Pick<UnifiedResidencyAceBridgeInputV1, 'domain' | 'lutRevision' | 'lut' | 'tokenizerRevision' | 'ropeRevision' | 'artifactChecksum' | 'dtype'>
@@ -275,6 +281,38 @@ export function projectAtlasSearchResponseToQasFromSources(input: {
   });
 }
 
+export async function projectAtlasSearchResponseToQasFromAsyncSources(input: {
+  requestId: string;
+  policyRevision: string;
+  workspaceRevision: string;
+  representationRevision: string;
+  response: Pick<AtlasSearchResponse, 'packets'>;
+  sources: SearchRuntimeQasAsyncFeatureSources;
+}): Promise<SearchRuntimeQasProjectionResult> {
+  const candidates = input.response.packets.map((packet) => ({
+    packetKey: packet.packet_key ?? packet.chunk_id,
+    sourceRef: packet.source_ref ?? packet.relative_path ?? '',
+    stableSymbolId: packet.stable_symbol_id ?? null,
+    symbolVersionId: packet.symbol_version_id ?? null,
+    workspaceRevision: packet.workspace_revision ?? null,
+    sourceRevision: packet.source_revision ?? null,
+    representationRevision: packet.representation_revision ?? null,
+    score: packet.retrieval_score,
+    fusionScore: packet.fusion_score,
+    rankBefore: packet.fusion_rank,
+  }));
+  const joined = await joinSearchRuntimeQasAsyncFeatureSources(candidates, input.sources, {});
+  return projectAtlasSearchResponseToQas({
+    requestId: input.requestId,
+    policyRevision: input.policyRevision,
+    workspaceRevision: input.workspaceRevision,
+    representationRevision: input.representationRevision,
+    response: input.response,
+    projections: joined.projections,
+    resolveFeatures: joined.resolveFeatures,
+  });
+}
+
 export function createAtlasSearchAdapter(config?: {
   userId?: string;
   caseId?: string;
@@ -337,14 +375,16 @@ export function createAtlasSearchAdapter(config?: {
       qas: AtlasSearchQasOptions,
     ): Promise<{ response: AtlasSearchResponse; qas: SearchRuntimeQasProjectionResult }> {
       const response = await this.search(req);
-      const projection = projectAtlasSearchResponseToQasFromSources({
+      const projectionInput = {
         requestId: qas.requestId,
         policyRevision: qas.policyRevision,
         workspaceRevision: qas.workspaceRevision,
         representationRevision: qas.representationRevision,
         response,
-        sources: qas.sources,
-      });
+      };
+      const projection = 'sources' in qas
+        ? projectAtlasSearchResponseToQasFromSources({ ...projectionInput, sources: qas.sources })
+        : await projectAtlasSearchResponseToQasFromAsyncSources({ ...projectionInput, sources: qas.asyncSources });
       return { response, qas: projection };
     },
     /**

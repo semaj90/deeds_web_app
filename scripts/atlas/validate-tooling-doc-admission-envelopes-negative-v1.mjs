@@ -16,6 +16,7 @@ const fixtures = [
   { name: 'superseded Firecrawl fetcher marked admissible', expect: 'superseded Firecrawl tRPC corpus is excluded', mutate: (e) => { const t = e.find((x) => x.sourceId === 'trpc'); t.page.fetcher = 'FIRECRAWL_V2'; } },
   { name: 'chunk points at the wrong parent page', expect: 'every chunk resolves', mutate: (e) => { e[0].page.url = e[1].page.url; } },
   { name: 'stale evidence revision', expect: 'checksums and evidence revisions', mutate: (e) => { e[0].chunks[0].evidenceRevision = 'sha256:' + '1'.repeat(64); } },
+  { name: 'wrong source revision', expect: 'resolved pages preserve exact manifest request', mutate: (e) => { e[0].sourceRevision = 'unqualified-stale-revision'; } },
   { name: 'unknown source namespace', expect: 'sources are exactly', mutate: (e) => { e[0].sourceId = 'trpc-beautifulsoup-r2'; } },
 ];
 let failed = 0;

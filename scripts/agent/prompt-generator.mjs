@@ -111,7 +111,11 @@ async function readAcePacketFromRedis(redis) {
 
 async function readAcePacketFromDisk() {
   const p = path.join(ROOT, '.opencode', 'ace-packet.json');
-  if (!existsSync(p)) return null;
+  if (!existsSync(p)) {
+    // Explicit status: the static feature-label fallback is used, never historical packet data.
+    console.warn('ACE_PACKET_UNAVAILABLE: .opencode/ace-packet.json missing; using static feature labels only.');
+    return null;
+  }
   try { return JSON.parse(await fs.readFile(p, 'utf8')); } catch { return null; }
 }
 

@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { computeDefaultComputePoolSize } from './compute-pool.js';
+import {
+	canQueueComputeTask,
+	computeGpuSimilarityChunkSize,
+	computeDefaultComputePoolSize,
+	DEFAULT_MAX_QUEUED_COMPUTE_BYTES,
+	DEFAULT_MAX_QUEUED_COMPUTE_TASKS,
+	computeSimilarityChunkSize,
+	estimateComputePayloadBytes,
+	MAX_SIMILARITY_CANDIDATES_PER_BATCH,
+	MAX_GPU_SIMILARITY_VALUES_PER_BATCH,
+} from './compute-pool.js';
 
 /**
  * Proves T7 (openspec/changes/parent-atlas-tensor-residency-integration/tasks.md):
@@ -47,4 +57,62 @@ describe('computeDefaultComputePoolSize', () => {
       expect(computeDefaultComputePoolSize(12, false)).toBe(4);
     }
   });
+});
+
+describe('bounded compute-pool queue admission', () => {
+	it('caps queued tasks at the configured limit', () => {
+		expect(canQueueComputeTask(DEFAULT_MAX_QUEUED_COMPUTE_TASKS - 1, DEFAULT_MAX_QUEUED_COMPUTE_TASKS)).toBe(true);
+		expect(canQueueComputeTask(DEFAULT_MAX_QUEUED_COMPUTE_TASKS, DEFAULT_MAX_QUEUED_COMPUTE_TASKS)).toBe(false);
+	});
+
+	it('rejects all waiting tasks when the queue limit is zero', () => {
+		expect(canQueueComputeTask(0, 0)).toBe(false);
+	});
+
+	it('rejects invalid queue bounds', () => {
+		expect(canQueueComputeTask(-1, 4)).toBe(false);
+		expect(canQueueComputeTask(0, -1)).toBe(false);
+		expect(canQueueComputeTask(1.5, 4)).toBe(false);
+	});
+
+	it('estimates UTF-8 strings and binary buffers within the queue byte budget', () => {
+		expect(estimateComputePayloadBytes({ text: 'é' })).toBeGreaterThan(Buffer.byteLength('é', 'utf8'));
+		expect(estimateComputePayloadBytes(new Uint8Array([1, 2, 3]))).toBe(19);
+	});
+
+	it('rejects payloads that exceed the queue byte budget or traversal bound', () => {
+		expect(estimateComputePayloadBytes('x'.repeat(DEFAULT_MAX_QUEUED_COMPUTE_BYTES + 1))).toBe(Number.POSITIVE_INFINITY);
+		expect(estimateComputePayloadBytes(Array(250_001).fill(0))).toBe(Number.POSITIVE_INFINITY);
+	});
+
+	it('accounts for cycles once rather than recursing indefinitely', () => {
+		const value: Record<string, unknown> = {};
+		value.self = value;
+		expect(Number.isFinite(estimateComputePayloadBytes(value))).toBe(true);
+	});
+});
+
+describe('bounded cosine-similarity batches', () => {
+	it('preserves small batches and caps larger ones at 500 candidates', () => {
+		expect(computeSimilarityChunkSize(120, 768)).toBe(120);
+		expect(computeSimilarityChunkSize(MAX_SIMILARITY_CANDIDATES_PER_BATCH + 1, 768)).toBe(MAX_SIMILARITY_CANDIDATES_PER_BATCH);
+	});
+
+	it('reduces chunk size when one candidate row approaches the byte limit', () => {
+		expect(computeSimilarityChunkSize(10_000, 32_768)).toBeLessThan(500);
+	});
+
+	it('bounds GPU nested-array expansion separately from typed-buffer bytes', () => {
+		const chunkSize = computeGpuSimilarityChunkSize(10_000, 768);
+		expect(chunkSize).toBeLessThan(computeSimilarityChunkSize(10_000, 768));
+		expect((chunkSize + 1) * 768).toBeLessThanOrEqual(MAX_GPU_SIMILARITY_VALUES_PER_BATCH);
+		expect(computeGpuSimilarityChunkSize(10_000, 32_768)).toBeLessThan(10);
+	});
+
+	it('rejects malformed shapes and allows an empty candidate set', () => {
+		expect(computeSimilarityChunkSize(0, 768)).toBe(0);
+		expect(() => computeSimilarityChunkSize(-1, 768)).toThrow('SIMILARITY_SHAPE_INVALID');
+		expect(() => computeSimilarityChunkSize(1, 0)).toThrow('SIMILARITY_SHAPE_INVALID');
+		expect(() => computeSimilarityChunkSize(Number.MAX_SAFE_INTEGER, 1)).not.toThrow();
+	});
 });

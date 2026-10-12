@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildContextManifestV2 } from './context-manifest-v2.js';
+import { buildContextManifestV2, ContextManifestV2Schema } from './context-manifest-v2.js';
 import type { ContextManifestV1 } from './graph-runtime-contracts.js';
 
 const V1: ContextManifestV1 = {
@@ -36,6 +36,15 @@ describe('CM-02: ContextManifestV2', () => {
     const v2 = buildContextManifestV2(V1, IDENTITY_INPUT);
     expect(v2.v1).toEqual(V1);
     expect(v2.schema).toBe('atlas.context-manifest.v2');
+  });
+
+  it('rejects an embedded V1 payload with unknown fields during readback validation', () => {
+    const manifest = buildContextManifestV2(V1, IDENTITY_INPUT);
+    const invalid = {
+      ...manifest,
+      v1: { ...manifest.v1, unverifiedSourceRevision: 'sha256:untrusted' },
+    };
+    expect(ContextManifestV2Schema.safeParse(invalid).success).toBe(false);
   });
 
   it('produces a deterministic 64-hex identityChecksum for identical input', () => {

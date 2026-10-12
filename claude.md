@@ -1,5 +1,15 @@
 # Legal AI Platform — Claude Project Instructions
 
+## ACE packet production, provenance and supersession (2026-10-12)
+
+- **Producer:** `scripts/ingest/compress-cards.mjs` packs `.tmp/retrieval-ranking-report.json` (written by `scripts/ingest/rank-cards.mjs`) into `.opencode/ace-packet.json` and `-summary.md`. Packing reads each card body from `.opencode/cards/*.json`. An entry with no card file is dropped, so a missing cards directory produces an empty packet with exit 0 before this change.
+- **Card bodies were never git-tracked.** `.opencode/cards/` is absent as of 2026-10-12, so the June 2026 packet cannot be rebuilt from its inputs. Treat cards as a required input to protect, not as a cache.
+- **Production baseline:** `.opencode/production/` holds promoted packets with `manifest.json` (sha256, producer, inputs, status). The 2026-06-12 packet is `BASELINE_UNVERIFIED_INPUTS`: its inputs cannot be re-run.
+- **Archive, do not delete:** before a packet is replaced, the current file is copied to `.opencode/archive/` and a `SUPERSEDED` event is appended to `.opencode/archive/index.ndjson`. Each new packet appends a `CURRENT` event with its hash and what it supersedes. Delete nothing; supersede instead.
+- **Fail closed:** a run that packs 0 cards does not replace the current packet. It writes the empty packet to `.opencode/candidates/` and exits 1.
+- **Promotion:** only a validated, non-empty packet (`totalCards > 0`, checksum recorded) is copied into `.opencode/production/`, with a manifest entry.
+- **Authority:** packets are retrieval artifacts with `canonicalAuthority: false`. They never override Postgres truth or source revisions.
+
 ## Current runtime and ACE/BitFrost status (2026-09-28) — condensed (full text archived 2026-10-03)
 
 Verbatim original (all bullets, the 8-step remaining implementation order, the MCP/Atlas census note): `docs/archive/claude-md-status-and-governance-2026-10-03.md`. Detailed checklist: `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md`. Historical status banners later in this file must not override this note.
@@ -174,6 +184,24 @@ Verbatim original (Phase 108D status tables, Qdrant API Strategy with code sampl
 
 ---
 
+## ▶ Next steps (2026-10-11)
+
+Ordered. Each item needs its own explicit approval where it writes or deletes; none is started by this section.
+
+1. **Disk (C: at ~9 GB free).** Approve, in order: `docker builder prune -f` (~13.5 GB reclaimable), `docker image prune -a` (~21.7 GB, unused images only), `npm cache clean --force` and `uv cache clean`. Then an elevated `diskpart` compact of `docker_data.vhdx` with Docker stopped (operator-run). Do not prune volumes: they hold Postgres, Qdrant, and Neo4j data.
+2. **TOC check drift.** Tracked as `DOC-GOV-TOC-CHECK-01` in `openspec/changes/parent-atlas-document-governance-master-index/tasks.md`. Verify without copying directories: redirect the build's three outputs to scratch and `cmp` them.
+3. **Workstation.** `PACKET-DIGEST-BRIDGE-ADMISSION-01` before any SIMDJSON routing or new Postgres indexes. Consolidate the duplicated `WORKSTATION-*` entries to one canonical owner each.
+4. **workspaceRevision v2.** Approve the versioned v2 design (skipped-source, extension-set, excluded-prefix, and discovery-policy inputs digested; oversized files stream-hashed; unreadable eligible files fail closed). v1 stays unchanged. The OpenSpec index keeps workspace provenance and uses its own corpus fingerprint for rebuild decisions.
+5. **OKF tooling lineage.** Close `OKF-TOOLING-LINEAGE-01` (negative fixtures for mismatched requests and revisions; preserve requested and resolved URLs). Keep development-publication admission separate. These come from a review note and have not been verified here.
+6. **Viterbi / MCP tool selection (prefill → DAG → tool calling).** Open owners: `parent-atlas-agentic-repair-bundle-integration/tasks.md` T15 (real Viterbi + Baum-Welch for MCP tool selection, re-parameterize the proven kernel, compare to `deterministic-tool-ranker.ts`); `parent-atlas-ace-rlm-bitfrost-integration/tasks.md` TOOL-VITERBI-01 (keep `CHALLENGER_ONLY`); `parent-atlas-agentic-file-compiler/tasks.md` AFC-TOOL-ROUTING-01 (advisory only; dispatch through the allowlisted registry). Existing `mcp-tool-viterbi-bridge-v1/v2` suites: 18/18 pass (2026-10-11). TRACE MCP `:8788` was refusing connections earlier on 2026-10-11 and is now up: `/health` 200, `tools/list` returns 188 tools (120 registered in `src/mcp/trace-mcp-server.ts`, 68 from other registries), and one bounded read-only call (`file.read_window`) succeeded. Receipt: `.tmp/atlas/trace-live-tools-receipt-v1.json`. Atlas DAG lookups (`find_feature`, `find_source_refs`, `build_agentic_rag_context`) returned `UNRESOLVED` / `TRACE_EMPTY_RESPONSE` in the same session, so the Atlas graph projection is still unresolved. Tool selection is still `CHALLENGER_ONLY`. **`ops.*` gate is not authentication:** `requireToken` accepts any non-empty string (probe receipt `.tmp/atlas/trace-ops-gate-probe-v1.json`: empty token refused; a fake token passed and reached execution on `ops.propose_patch`). Treat the "OPERATOR-GATED" label as documentation only until a real verification exists. Do not expose `ops.*` write paths to models.
+
+## 🧭 sourceRevision and workspaceRevision (canonical definitions, 2026-10-11)
+
+- `sourceRevision` = `sha256:<64 lowercase hex>` over the exact UTF-8 bytes of one source file (`identity/code-source-revision-v1.ts`, `deriveCodeSourceRevisionV1`). Empty, non-UTF-8, or unreadable files have none.
+- `workspaceRevision` = `sha256:` over a sorted manifest of `(sourceRef, sourceRevision, contentDigest, byteLength, gitBlobOid)` for the indexed source set (`identity/workspace-source-binding-v1.ts`, `indexing/workspace-revision-origin-runtime-v1.ts`). Git commit/tree and `dirty` are provenance only; `canonicalAuthority:false`.
+- Known gap: skipped files (over 5 MB, non-UTF-8, read errors) are not digested. Do not cite `workspaceRevision` as full coverage until the `v2` hardening lands.
+- Never interchange `sourceRevision`, `workspaceRevision`, `codebase_chunk_index.content_hash`, `packet_key`, or the representation/feature revisions. Full definitions: `codex.md` and the MASTER-TOC "Revision definitions" table.
+
 ## 🧮 Wire Format Layering Rule (CANONICAL — recorded 2026-08-23)
 
 **JSON/MessagePack describe things. Bitmaps select things. Ordinals address things. mmap/Arrow
@@ -204,6 +232,13 @@ raised are recorded in
 a companion rule already consistent with this file's existing AST/ast-grep guidance: a
 model/regex/NLP classifier proposes structural facts (is this a function, is this the caller) but
 never decides them — ast-grep/Tree-sitter/Graphify evidence is the decision-maker.
+
+## 🧩 Cross-Runtime Serialization & Transport Tiers (Python FastAPI, simdjson, OakLib, gRPC, tRPC)
+
+- **`simdjson` N-API Threshold**: For payloads $< 1\text{ KB}$, use native V8 `JSON.parse()`. For batch / NDJSON ($\ge 1\text{ KB}$), dispatch to the native N-API addon (`simd_bridge_rs.node` / `tensorrt_bridge.node`) via `parseNdjsonTypedEvidence`. Never promote raw `simdjson` outputs without Zod schema validation into `TypedEvidenceEnvelopeV1`.
+- **Python Tuples `()` $\leftrightarrow$ TypeScript Arrays `[]` (OakLib)**: Python `Tuple[str, str, str, float]` serializes over HTTP JSON as arrays `[s, p, o, conf]`. TypeScript types these as positional `RawOaklibTuple = readonly [string, string, string, number?]` and adapts them into structured `OntologyLinkedTupleV1`.
+- **Centroid-Addressed Ontology Caching**: Tuples must be committed to PostgreSQL `atlas_ontology_linked_tuples` before building `buildOntologyLinkedTupleCachePlan`. Valkey cache plans are partitioned by centroid keys (`atlas:centroid:domain:...`, `atlas:centroid:kmeans:...`, `atlas:centroid:som:...`). Review candidates are derived via `deriveTaxonomyAssignmentCandidatesFromOntologyTuplesV1` fail-open only from verified persisted tuples.
+- **Transport Matrix**: Browser $\leftrightarrow$ SvelteKit uses `tRPC`; SvelteKit $\leftrightarrow$ Python NLP/OakLib uses `FastAPI` (HTTP/NDJSON); SvelteKit $\leftrightarrow$ Go Retrieval uses `gRPC`; SvelteKit $\leftrightarrow$ Valkey uses `RESP3` (`ioredis` with credentials and error handlers).
 
 ---
 

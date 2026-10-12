@@ -115,32 +115,35 @@ async function main(): Promise<void> {
   }
 
   const result = await pool.query<ChunkRow>(`
-    WITH lineage_one AS (
-      SELECT
-        chunk_row_id,
-        min(canonical_chunk_id::text) AS canonical_chunk_id,
-        min(packet_key::text) AS packet_key,
-        min(source_ref::text) AS source_ref,
-        min(source_revision::text) AS source_revision
-      FROM public.atlas_packet_chunk_lineage
-      WHERE revision_status = 'PROVEN'
-        AND canonical_chunk_id IS NOT NULL
-        AND packet_key IS NOT NULL
-        AND source_ref IS NOT NULL
-        AND source_revision IS NOT NULL
-      GROUP BY chunk_row_id
-      HAVING count(*) = 1
-         AND count(DISTINCT canonical_chunk_id::text) = 1
-         AND count(DISTINCT packet_key::text) = 1
-         AND count(DISTINCT source_ref::text) = 1
-         AND count(DISTINCT source_revision::text) = 1
-    ), bound AS (
+    WITH bound AS (
       SELECT DISTINCT
         canonical_source_ref::text AS source_ref,
         source_revision::text AS source_revision,
         workspace_revision::text AS workspace_revision
       FROM public.atlas_workspace_source_bindings
       WHERE workspace_revision::text = $1
+    ), lineage_one AS (
+      SELECT
+        l.chunk_row_id,
+        min(canonical_chunk_id::text) AS canonical_chunk_id,
+        min(l.packet_key::text) AS packet_key,
+        min(l.source_ref::text) AS source_ref,
+        min(l.source_revision::text) AS source_revision
+      FROM public.atlas_packet_chunk_lineage l
+      JOIN bound b
+        ON b.source_ref = l.source_ref::text
+       AND b.source_revision = l.source_revision::text
+      WHERE l.revision_status = 'PROVEN'
+        AND l.canonical_chunk_id IS NOT NULL
+        AND l.packet_key IS NOT NULL
+        AND l.source_ref IS NOT NULL
+        AND l.source_revision IS NOT NULL
+      GROUP BY l.chunk_row_id
+      HAVING count(*) = 1
+         AND count(DISTINCT l.canonical_chunk_id::text) = 1
+         AND count(DISTINCT l.packet_key::text) = 1
+         AND count(DISTINCT l.source_ref::text) = 1
+         AND count(DISTINCT l.source_revision::text) = 1
     )
     SELECT
       c.id::text AS chunk_row_id,

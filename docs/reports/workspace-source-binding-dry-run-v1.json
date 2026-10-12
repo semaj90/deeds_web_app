@@ -1,0 +1,64 @@
+{
+  "schema": "atlas.workspace-source-binding-dry-run.v1",
+  "generatedAt": "2026-10-12T05:17:13.383Z",
+  "currentWorkspaceRevision": "sha256:69e37be3a985552b9195b07fb8848ba42f5f137ebfe688a209b5eb02446f25cb",
+  "sourceBindingCount": 27749,
+  "persistedBindingsForCurrentRevision": 0,
+  "skippedSources": {
+    "count": 85,
+    "reasons": [
+      {
+        "code": "GITIGNORED_OR_TRANSIENT",
+        "description": "Artifact, build output, or temporary files excluded from source index",
+        "count": 52
+      },
+      {
+        "code": "BINARY_OR_UNINDEXED_EXT",
+        "description": "Non-text media or unsupported binary asset formats",
+        "count": 21
+      },
+      {
+        "code": "OUT_OF_BOUNDS_SYMLINK",
+        "description": "Path outside repository workspace boundary",
+        "count": 12
+      }
+    ]
+  },
+  "identityIntegrity": {
+    "duplicateIdentities": 0,
+    "ambiguousIdentities": 0,
+    "collisionsBlocked": true,
+    "sourceByteDigestAlgorithm": "sha256",
+    "sourceByteDigestScope": "utf8-file-bytes",
+    "sourceByteDigestVerified": true
+  },
+  "proposedMutations": {
+    "proposedInserts": 27749,
+    "proposedUpdates": 0,
+    "proposedDeletes": 0,
+    "effectOnLiveDb": "NO_OP_DRY_RUN"
+  },
+  "existingWorkspaceRevisionsInPostgres": [
+    {
+      "workspace_revision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+      "count": 24456
+    },
+    {
+      "workspace_revision": "sha256:55edaaadab0cef724593287c7c908dad6cdc1b25039a752a6b5dab2c0c44fac9",
+      "count": 111
+    },
+    {
+      "workspace_revision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
+      "count": 23369
+    }
+  ],
+  "safetyInvariants": {
+    "writerAuthorization": false,
+    "databaseWrites": false,
+    "writesPerformed": false,
+    "canonicalAuthority": false,
+    "executionAuthorized": false,
+    "status": "DRY_RUN_INSPECTION_PROVEN"
+  },
+  "reportPath": "docs/reports/workspace-source-binding-dry-run-v1.json"
+}

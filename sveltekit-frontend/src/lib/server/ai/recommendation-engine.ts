@@ -1,5 +1,5 @@
 import { bifrostChat } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 
 export interface Recommendation {
 	id: string;
@@ -29,7 +29,7 @@ Return ONLY a JSON array of recommendations with:
 		try {
 			const response = await bifrostChat(
 				[{ role: 'user', content: prompt }],
-				ENV.GEMMA4_MODEL,
+				BIFROST_CHAT_MODEL,
 				{ temperature: 0.1, maxTokens: 300 }
 			);
 

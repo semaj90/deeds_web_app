@@ -1,0 +1,77 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "opencode-tools-mcp",
+  "source_ref": "opencode-tools-mcp:docs-opencode-ai-docs-tools-tools",
+  "url": "https://docs.opencode.ai/docs/tools/",
+  "title": "Tools | OpenCode",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "llm_output",
+    "taskboard",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Tools | OpenCode",
+    "markdown_excerpt": "Tools | OpenCode Skip to content OpenCode app.header.home app.header.docs Search Ctrl K Cancel New OpenCode v2 is now available &rarr; Intro Config Providers Network Enterprise Troubleshooting Windows Usage Go TUI CLI Web IDE Zen Share GitHub GitLab Configure Tools Rules Agents Models Themes Keybinds Commands Formatters Permissions Policies LSP Servers MCP servers ACP Support Agent Skills References Custom Tools Develop SDK Server Plugins Ecosystem GitHub Discord Select theme Dark Light Auto Select language English العربية Bosanski Dansk Deutsch Español Français Italiano 日本語 한국어 Norsk Bokmål Polski Português (Brasil) Русский ไทย Türkçe 简体中文 繁體中文 On this page Overview Configure Built-in bash edit write read grep glob lsp (experimental) apply_patch skill webfetch websearch question Custom tools MCP servers Internals Ignore patterns On this page Overview Configure Built-in bash edit write read grep glob lsp (experimental) apply_patch skill webfetch websearch question Custom tools MCP servers Internals Ignore patterns Tools Manage the tools an LLM can use. Tools allow the LLM to perform actions in your codebase. OpenCode comes with a set of built-in tools, but you can extend it with cu",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:opencode-tools-mcp:docs-opencode-ai-docs-tools-tools",
+    "title": "Tools | OpenCode",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh OpenCode Tools and MCP Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "OpenCode models / tools",
+      "recommendation": "Prefer explicit model/provider/tool configuration over implicit chat defaults.",
+      "rationale": "The repo needs canonical API recommendations, not hidden prompt state."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "18c65b6b6387241edf29b759f89714d2124e39e44031368d3f7f6b20a885716e",
+  "markdown_path": "docs/.okf/dev/raw/opencode-tools-mcp/docs-opencode-ai-docs-tools-tools.md",
+  "fetched_at": "2026-10-11T19:44:38.490Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "opencode-tools-mcp",
+    "source_title": "OpenCode Tools and MCP Documentation",
+    "source_revision": "opencode-tools-mcp-docs-2026-10-11",
+    "source_manifest": {
+      "manifest_revision": "okf-tooling-docs-r3",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "output_namespace": "docs/.okf/opencode-tools-mcp",
+      "maximum_pages": 4,
+      "maximum_depth": 0,
+      "allowed_domains": [
+        "docs.opencode.ai"
+      ],
+      "provider": "opencode",
+      "product": "opencode-tools-mcp",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "OpenCode"
+    },
+    "preferred_fetcher": "HTTP_FALLBACK",
+    "fetched_via": "http_fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/opencode-tools-mcp/docs-opencode-ai-docs-tools-tools.md"
+}

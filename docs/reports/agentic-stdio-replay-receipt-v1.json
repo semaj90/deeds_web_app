@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.agentic-stdio-replay-receipt.v1",
+  "gate": "WORKSTATION-AGENTIC-STDIO-REPLAY-01",
+  "generatedAt": "2026-10-12T00:37:24.119Z",
+  "syntheticCase": {
+    "caseId": "SYNTHETIC-TS2307-SEMANTIC-WRITER",
+    "diagnostic": "TS2307: Cannot find module '$lib/server/embedding/semantic-packet-writer' or its corresponding type declarations in src/routes/api/embeddings/+server.ts",
+    "errorCode": "TS2307",
+    "targetFile": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts"
+  },
+  "timeline": [
+    {
+      "timestamp": "2026-10-12T00:37:24.105Z",
+      "stage": "REPLAY_START",
+      "elapsedMs": 8,
+      "detail": {
+        "caseId": "SYNTHETIC-TS2307-SEMANTIC-WRITER"
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.114Z",
+      "stage": "DIAGNOSIS",
+      "elapsedMs": 9,
+      "detail": {
+        "diagnostic": "TS2307: Cannot find module '$lib/server/embedding/semantic-packet-writer' or its corresponding type declarations in src/routes/api/embeddings/+server.ts",
+        "classifiedKind": "TYPECHECK_OR_SCHEMA",
+        "automaticRepairsAllowed": false
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.114Z",
+      "stage": "TOOL_CALL_PROPOSED",
+      "elapsedMs": 9,
+      "detail": {
+        "tool": "find_source_refs",
+        "params": {
+          "query": "semantic-packet-writer"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.115Z",
+      "stage": "TOOL_CALL_COMPLETED",
+      "elapsedMs": 10,
+      "detail": {
+        "tool": "find_source_refs",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.115Z",
+      "stage": "TOOL_CALL_PROPOSED",
+      "elapsedMs": 10,
+      "detail": {
+        "tool": "read_file",
+        "params": {
+          "path": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.119Z",
+      "stage": "TOOL_CALL_COMPLETED",
+      "elapsedMs": 14,
+      "detail": {
+        "tool": "read_file",
+        "status": "SUCCESS"
+      }
+    },
+    {
+      "timestamp": "2026-10-12T00:37:24.119Z",
+      "stage": "REPAIR_PLAN_FORMULATED",
+      "elapsedMs": 14,
+      "detail": {
+        "action": "Preserve existing contract; verify tsconfig path alias mappings and package exports.",
+        "automaticRepairsAllowed": false,
+        "mutationAllowed": false,
+        "writesPerformed": false,
+        "safeNextCommand": "npm run check"
+      }
+    }
+  ],
+  "toolReceipts": [
+    {
+      "tool": "find_source_refs",
+      "validatedParams": {
+        "query": "semantic-packet-writer"
+      },
+      "resultChecksum": "sha256:718ed3fa958ae8b4b22c24fe73a9f518968a940d5e23bc9236f825765572e929",
+      "result": {
+        "query": "semantic-packet-writer",
+        "matchCount": 1,
+        "hits": [
+          {
+            "sourceRef": "sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts",
+            "matchType": "EXACT_PATH"
+          }
+        ]
+      },
+      "status": "SUCCESS"
+    },
+    {
+      "tool": "read_file",
+      "validatedParams": {
+        "path": "sveltekit-frontend\\src\\lib\\server\\embedding\\semantic-packet-writer.ts"
+      },
+      "resultChecksum": "sha256:aeeecec9fa0a33c5c648afdbb3eb2eef082553a7c76c1c4c2e3dfb55424836ee",
+      "result": {
+        "exists": true,
+        "byteLength": 9918,
+        "checksum": "sha256:1b752c434624580d6e08169dfc14df53e393a53d60df9f2d958e57c23d1dcf18",
+        "excerpt": "import path from 'node:path';\r\nimport { sql } from 'drizzle-orm';\r\nimport { db } from '$lib/server/db/client.js';\r\nimport { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';\r\nimport { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';\r\nimport { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';\r\nimport {\r\n\tCANONICAL_SEMANTIC_ENCODER_REVISION,\r\n\tbuildCanonicalSemanticLineage,\r\n\ttype Canonical"
+      },
+      "status": "SUCCESS"
+    }
+  ],
+  "proposedRepairPlan": {
+    "action": "Preserve existing contract; verify tsconfig path alias mappings and package exports.",
+    "automaticRepairsAllowed": false,
+    "mutationAllowed": false,
+    "writesPerformed": false,
+    "safeNextCommand": "npm run check"
+  },
+  "constraints": {
+    "readOnlyEnforced": true,
+    "automaticRepairsProhibited": true,
+    "writesPerformed": false,
+    "canonicalAuthority": false
+  },
+  "receiptChecksum": "sha256:b8fa7e0fe19307f85716bd85edef1b3e67c7d15d15e95a8c0032f466ba04573d"
+}

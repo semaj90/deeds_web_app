@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { loadLatestOpenSpecCensus } from './openspec-census-selector-v1.mjs';
+import { searchOpenSpecClaims } from '../../../scripts/atlas/openspec-task-fts-index-v1.mjs';
 
 type JsonRecord = Record<string, any>;
 
@@ -17,17 +19,9 @@ function readJson(filePath: string): JsonRecord | null {
   }
 }
 
-function latestCensus(): JsonRecord | null {
-  const runRoot = path.join(REPORTS, 'openspec-evidence');
-  const runs = fs.existsSync(runRoot)
-    ? fs.readdirSync(runRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
-    : [];
-  return readJson(runs.length ? path.join(runRoot, runs.at(-1)!, 'census-v1.json') : path.join(REPORTS, 'openspec-evidence-portfolio-census-v2.json'));
-}
-
 function loadFabric() {
   return {
-    census: latestCensus(),
+    census: loadLatestOpenSpecCensus(REPORTS),
     graph: readJson(path.join(REPORTS, 'openspec-dependency-graph-v1.json')),
     bindings: readJson(path.join(REPORTS, 'openspec-task-evidence-bindings-v1.json')),
     receipts: readJson(path.join(REPORTS, 'openspec-receipt-binding-v1.json')),
@@ -86,6 +80,11 @@ export function registerOpenSpecEvidenceTools(server: McpServer) {
     const task = fabric.census?.tasks?.find((item: JsonRecord) => item.canonicalTaskRef === taskId || item.taskId === taskId || item.taskKey === taskId);
     return result({ schema: 'atlas.openspec-mcp-task.v1', task: task ? { taskRef: task.taskRef, taskId: task.canonicalTaskRef ?? task.taskId, claim: task.taskText, declaredChecked: task.declaredChecked, taskIdStatus: task.taskIdStatus } : null, card: card ? cardView(card) : null, writesPerformed: false });
   });
+
+  server.registerTool('openspec.search', {
+    description: 'Search current OpenSpec task ledgers and proposals with the existing BM25 preview index. Results are claims only, not evidence admission.',
+    inputSchema: z.object({ query: z.string().trim().min(1).max(512), limit: z.number().int().min(1).max(20).optional() }),
+  }, async ({ query, limit }) => result(searchOpenSpecClaims(query, { limit: limit ?? 10 })));
 
   server.registerTool('openspec.frontier', {
     description: 'Read a bounded frontier of unresolved OpenSpec claims; no task state is changed.',

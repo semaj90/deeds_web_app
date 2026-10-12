@@ -71,6 +71,35 @@ async function verifyPageArtifact(root, page, validateEntry, allowedPages) {
   return { entry, markdown_checksum: sha256(markdownBytes), sidecar_checksum: sha256(sidecarBytes) };
 }
 
+export function verifyOkfDevPageArtifactReadbackV1(root, pageReadback) {
+  const entry = pageReadback?.entry;
+  if (!entry || typeof entry.source_id !== 'string' || typeof entry.source_ref !== 'string' ||
+      typeof entry.url !== 'string' || typeof entry.markdown_path !== 'string' || typeof entry.content_hash !== 'string') {
+    throw new Error('PUBLICATION_PAGE_READBACK_IDENTITY_INVALID');
+  }
+  const markdownPath = resolveContained(root, entry.markdown_path);
+  const sidecarPath = markdownPath.replace(/\.md$/i, '.json');
+  if (sidecarPath === markdownPath) throw new Error('PUBLICATION_SIDECAR_PATH_INVALID');
+  const markdownBytes = readFileSync(markdownPath);
+  const sidecarBytes = readFileSync(sidecarPath);
+  const markdownChecksum = sha256(markdownBytes);
+  if (markdownChecksum !== pageReadback.markdown_checksum || markdownChecksum !== entry.content_hash) {
+    throw new Error('PUBLICATION_PAGE_MARKDOWN_READBACK_CHECKSUM_MISMATCH');
+  }
+  if (sha256(sidecarBytes) !== pageReadback.sidecar_checksum) {
+    throw new Error('PUBLICATION_PAGE_SIDECAR_READBACK_CHECKSUM_MISMATCH');
+  }
+  const sidecar = JSON.parse(sidecarBytes.toString('utf8'));
+  const normalizedSidecarPath = typeof sidecar.markdown_path === 'string'
+    ? path.relative(path.resolve(root), resolveContained(root, sidecar.markdown_path)).replaceAll('\\', '/')
+    : null;
+  if (sidecar.source_id !== entry.source_id || sidecar.source_ref !== entry.source_ref || sidecar.url !== entry.url ||
+      normalizedSidecarPath !== entry.markdown_path || sidecar.content_hash !== entry.content_hash) {
+    throw new Error('PUBLICATION_PAGE_SIDECAR_READBACK_IDENTITY_MISMATCH');
+  }
+  return { sourceId: entry.source_id, sourceRef: entry.source_ref, url: entry.url, status: 'VERIFIED' };
+}
+
 export async function publishOkfDevCorpusGenerationV1(input) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(input.run_id)) throw new Error('PUBLICATION_RUN_ID_INVALID');
   if (!/^sha256:[a-f0-9]{64}$/.test(input.demand_snapshot_checksum) || !/^sha256:[a-f0-9]{64}$/.test(input.allowlist_checksum)) {

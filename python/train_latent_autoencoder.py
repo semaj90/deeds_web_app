@@ -51,6 +51,13 @@ def blocked_training_report() -> dict:
             "writerAndPerRowProvenance": "NOT_PROVEN",
         },
         "encoderDimensions": [768, 512, 256, 128],
+        "precisionPolicy": {
+            "parameterDtype": "float32",
+            "activationDtype": "float32",
+            "autocast": "DISABLED",
+            "quantization": "NONE",
+            "lowerPrecisionChallengers": "NOT_ENABLED",
+        },
         "outputs": {
             "latent_256": "learned_intermediate",
             "latent_128": "learned_bottleneck",
@@ -271,6 +278,12 @@ def main() -> None:
     )
     receipt["training_duration_s"] = duration_s
     receipt["device"] = str(device)
+    receipt["precision_policy"] = {
+        "parameter_dtype": "float32",
+        "input_dtype": "float32",
+        "autocast": "disabled",
+        "quantization": "none",
+    }
     receipt["train_rows"] = len(train_idx)
     receipt["val_rows"] = len(val_idx)
     receipt["checkpoint_path"] = args.out

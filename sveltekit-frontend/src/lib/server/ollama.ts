@@ -4,7 +4,7 @@
  * Exports:
  *   - getOllamaEndpoint(): string — resolve Ollama URL from env
  *   - generateText(prompt): string — llama-server chat (non-streaming)
- *   - callOllamaChat(system, user): string — legacy API name; llama-server owner
+ *   - callLlamaServerChat(system, user): string — llama-server chat owner
  *   - bifrostChat(messages, model, options): string — OpenAI-format call via Bifrost gateway
  *   - checkOllamaHealth(): boolean — health probe via /api/tags
  *   - listAvailableModels(): string[] — available model names
@@ -170,12 +170,10 @@ export function assertDirectOllamaAllowed(
 // Populate VLM_MODELS from ENV now that ENV is initialized.
 // CRITICAL: Embedding uses Ollama. Synthesis uses llama-server :8090.
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-// Synthesis models: derived from ROTORQUANT_MODEL_PATH (runtime-contract.ts), not a
-// second chat-model env var. GEMMA4_MODEL/OLLAMA_VLM_MODEL/FUNCTION_GEMMA_MODEL remain
-// as explicit per-role overrides ONLY for operators running a second llama-server
-// instance on a different port for that role.
+// Synthesis models resolve through the canonical llama-server runtime contract.
+// The gemma4 key remains a compatibility name for older callers.
 VLM_MODELS.legal = LLM_MODEL_ID;
-VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL ?? LLM_MODEL_ID;
+VLM_MODELS.gemma4 = LLM_MODEL_ID;
 VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL ?? LLM_MODEL_ID;
 VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL ?? LLM_MODEL_ID;
 
@@ -1440,7 +1438,7 @@ export async function generateText(prompt: string): Promise<string> {
   );
 }
 
-export async function callOllamaChat(
+export async function callLlamaServerChat(
   systemPrompt: string,
   userPrompt: string,
   options?: { format?: 'json'; num_predict?: number; temperature?: number }
@@ -1510,7 +1508,7 @@ export async function callOllamaChat(
             const result = data.choices?.[0]?.message?.content ?? '';
             console.log(`[llama-server] Chat completed in ${duration}ms (${result.length} chars)`);
 
-            // Fire-and-forget token tracking (covers all callOllamaChat callers)
+            // Fire-and-forget token tracking for llama-server chat callers.
             import('$lib/server/ai/token-tracker.js')
               .then(({ trackTokenUsage }) => {
                 trackTokenUsage({
@@ -1537,6 +1535,8 @@ export async function callOllamaChat(
     }
   );
 }
+
+export const callOllamaChat = callLlamaServerChat;
 
 // ── Health & Model Discovery ────────────────────────────────────────────
 

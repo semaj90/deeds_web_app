@@ -16,7 +16,6 @@ import {
   extractedFeaturesSchema,
   phase17OutputSchema,
   extractFeatureLabel,
-  generatePacketKey,
   type Phase17Input,
   type ExtractedFeatures,
   type Phase17Output,
@@ -58,10 +57,10 @@ function extractScoreProfile(input: Phase17Input): {
   const { qdrant, cluster, topological, fusion } = input.reconciliationResult.scoreProfile;
 
   return {
-    qdrant: Math.max(0, Math.min(1, qdrant || 0.5)),
-    cluster: Math.max(0, Math.min(1, cluster || 0.5)),
-    topological: Math.max(0, Math.min(1, topological || 0.5)),
-    fusion: Math.max(0, Math.min(1, fusion || 0.5)),
+    qdrant: Math.max(0, Math.min(1, qdrant ?? 0.5)),
+    cluster: Math.max(0, Math.min(1, cluster ?? 0.5)),
+    topological: Math.max(0, Math.min(1, topological ?? 0.5)),
+    fusion: Math.max(0, Math.min(1, fusion ?? 0.5)),
   };
 }
 
@@ -132,6 +131,8 @@ function extractMetadata(
  * Handles upsert logic: insert if new, update if exists
  */
 export async function persistPhase17Output(output: Phase17Output): Promise<void> {
+  if (output.validation_status !== 'valid' || output.packet_key === null) return;
+
   try {
     // Prepare the row for insertion
     // Note: Using raw SQL insert since Drizzle schema for this table isn't generated yet
@@ -199,6 +200,20 @@ export async function extractFeatures(input: unknown): Promise<Phase17Output> {
 
   const { data } = validation;
 
+  const matchingPackets = data.reconciliationResult.packets.filter((packet) =>
+    packet.sourceRef === data.sourceRef &&
+    packet.featureId === data.featureId &&
+    packet.aliasId === data.aliasId &&
+    packet.packetKey.length > 0 &&
+    packet.packetKey === packet.packetKey.trim()
+  );
+  if (matchingPackets.length !== 1) {
+    return defaultFeatures(
+      input,
+      matchingPackets.length === 0 ? 'NO_EXACT_RECONCILED_PACKET' : 'AMBIGUOUS_RECONCILED_PACKET'
+    );
+  }
+
   try {
     // Step 2: Extract score lanes
     const scores = extractScoreProfile(data);
@@ -243,7 +258,7 @@ export async function extractFeatures(input: unknown): Promise<Phase17Output> {
 
     // Construct output packet
     const output: Phase17Output = {
-      packet_key: generatePacketKey(data.sourceRef, data.featureId),
+      packet_key: matchingPackets[0].packetKey,
       source_ref: data.sourceRef,
       feature_id: data.featureId,
       feature_label: extractFeatureLabel(data.featureId),
@@ -271,7 +286,7 @@ export async function extractFeatures(input: unknown): Promise<Phase17Output> {
 // FALLBACK: Default features (validation_status: pending)
 // ══════════════════════════════════════════════════════════════
 
-function defaultFeatures(input: unknown): Phase17Output {
+function defaultFeatures(input: unknown, errorMessage = 'Feature extraction unavailable'): Phase17Output {
   const sourceRef = typeof input === 'object' && input !== null && 'sourceRef' in input
     ? String((input as Record<string, unknown>).sourceRef)
     : 'unknown';
@@ -285,7 +300,7 @@ function defaultFeatures(input: unknown): Phase17Output {
     : 'unknown';
 
   return {
-    packet_key: generatePacketKey(sourceRef, featureId),
+    packet_key: null,
     source_ref: sourceRef,
     feature_id: featureId,
     feature_label: extractFeatureLabel(featureId),
@@ -308,7 +323,7 @@ function defaultFeatures(input: unknown): Phase17Output {
       },
     },
     validation_status: 'pending',
-    error_message: 'All extraction methods failed, using default score',
+    error_message: errorMessage,
   };
 }
 

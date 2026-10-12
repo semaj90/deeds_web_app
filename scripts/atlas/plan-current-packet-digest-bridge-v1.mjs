@@ -11,11 +11,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
-import { classifyPacketDigestBridgeRow } from './lib/classify-packet-digest-bridge-v1.mjs';
+import { classifyPacketDigestBridgeRows } from './lib/classify-packet-digest-bridge-v1.mjs';
 
 const root = REPO_ROOT;
-const reportPath = path.join(root, 'docs/reports/current-packet-digest-bridge-v1.json');
-const ownerPreflightPath = path.join(root, 'docs/reports/selected-graphify-execution-owner-v1.json');
+const scratchRoot = path.resolve(root, '.tmp/atlas');
 const arg = (name, fallback = null) => {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] ?? fallback : fallback;
@@ -23,12 +22,22 @@ const arg = (name, fallback = null) => {
 const workspaceRevision = arg('--workspace-revision');
 const executionId = arg('--execution-id');
 const limit = Math.max(1, Math.min(Number(arg('--limit', '25')), 500));
+const ownerPreflightPath = path.resolve(root, arg('--owner-preflight', 'docs/reports/selected-graphify-execution-owner-v1.json'));
+const ownerPlanPath = path.resolve(root, arg('--owner-plan', 'docs/reports/current-graphify-execution-owner-resolution-v1.json'));
+const reportPath = path.resolve(root, arg('--output', '.tmp/atlas/current-packet-digest-bridge-v1.json'));
+for (const inputPath of [ownerPreflightPath, ownerPlanPath]) {
+  const relative = path.relative(root, inputPath);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('OWNER_RECEIPT_PATH_MUST_REMAIN_UNDER_REPOSITORY');
+}
+const reportRelativeToScratch = path.relative(scratchRoot, reportPath);
+if (reportRelativeToScratch.startsWith('..') || path.isAbsolute(reportRelativeToScratch)) {
+  throw new Error('REPORT_OUTPUT_MUST_REMAIN_UNDER_TMP_ATLAS');
+}
 if (!workspaceRevision || !executionId) {
   throw new Error('EXPLICIT_WORKSPACE_REVISION_AND_EXECUTION_ID_REQUIRED');
 }
 if (!(await fs.stat(ownerPreflightPath).catch(() => null))) throw new Error('GRAPHIFY_EXECUTION_OWNER_PREFLIGHT_REQUIRED');
 const ownerPreflight = JSON.parse(await fs.readFile(ownerPreflightPath, 'utf8'));
-const ownerPlanPath = path.join(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
 const ownerPlan = JSON.parse(await fs.readFile(ownerPlanPath, 'utf8'));
 const ownerPlanForChecksum = { ...ownerPlan };
 delete ownerPlanForChecksum.generatedAt;
@@ -36,6 +45,12 @@ delete ownerPlanForChecksum.reportPath;
 const currentOwnerPlanChecksum = `sha256:${crypto.createHash('sha256').update(JSON.stringify(ownerPlanForChecksum), 'utf8').digest('hex')}`;
 const ownerDecisionValid = (ownerPreflight.status === 'OWNER_SELECTION_VALIDATED_NOT_APPLIED'
   || ownerPreflight.status === 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED')
+  && ownerPlan.admittedWorkspaceRevision === workspaceRevision
+  && ownerPlan.canonicalAuthority === false
+  && ownerPlan.writesPerformed === false
+  && ownerPlan.safeToApply === false
+  && ownerPlan.candidates?.some((candidate) => candidate.execution_id === executionId
+    && candidate.sourceMembershipExact === true)
   && ownerPreflight.selectedExecutionId === executionId
   && ownerPreflight.ownerPlanChecksum === currentOwnerPlanChecksum
   && (ownerPreflight.status === 'OWNER_SELECTION_APPLIED_READBACK_VERIFIED'
@@ -56,6 +71,7 @@ const writeReport = async (report) => {
   await fs.writeFile(tempPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
   await fs.rename(tempPath, reportPath);
 };
+const reportRef = () => path.relative(root, reportPath).replaceAll('\\', '/');
 
 const pool = new pg.Pool({
   connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)),
@@ -130,7 +146,8 @@ if (databaseError) {
     canonicalAuthority: false,
     writesPerformed: false,
     nextGate: 'POSTGRES_HEALTH_THEN_PACKET-DIGEST-BRIDGE-RERUN',
-    reportPath: path.relative(root, reportPath).replaceAll('\\', '/'),
+    reportPath: reportRef(),
+    admissionAuthorized: false,
   };
   await writeReport(report);
   console.log(JSON.stringify({ status: report.status, databaseError,
@@ -138,14 +155,20 @@ if (databaseError) {
   process.exit(0);
 }
 
-const planned = rows.map((row) => {
-  const { classification, promotionEligible } = classifyPacketDigestBridgeRow(row);
+const classifications = classifyPacketDigestBridgeRows(rows);
+const planned = classifications.map((item) => {
+  const row = rows.find((candidate) => normalizeRef(candidate.source_ref) === normalizeRef(item.sourceRef)
+    && candidate.workspace_revision === item.workspaceRevision
+    && candidate.code_source_revision === item.codeSourceRevision
+    && candidate.member_content_hash === item.memberContentHash
+    && (item.packetKey === null || candidate.packet_key === item.packetKey)) ?? {};
   return {
-    sourceRef: row.source_ref,
-    normalizedSourceRef: normalizeRef(row.source_ref),
-    packetKey: row.packet_key,
-    workspaceRevision: row.workspace_revision,
-    codeSourceRevision: row.code_source_revision,
+    sourceRef: item.sourceRef,
+    normalizedSourceRef: normalizeRef(item.sourceRef),
+    packetKey: item.packetKey,
+    packetCandidates: item.packetCandidates ?? [],
+    workspaceRevision: item.workspaceRevision,
+    codeSourceRevision: item.codeSourceRevision,
     packetSourceRevision: row.packet_source_revision
       ? String(row.packet_source_revision).toLowerCase()
       : null,
@@ -153,19 +176,20 @@ const planned = rows.map((row) => {
     packetContentHash: row.packet_content_hash,
     legacySha256: row.legacy_sha256,
     byteLength: Number(row.byte_length),
-    classification,
-    promotionEligible,
+    classification: item.classification,
+    digestCrosswalkEligible: item.promotionEligible,
+    admissionAuthorized: false,
   };
 });
 
 const counts = Object.fromEntries(['CANONICAL_CONTENT_DIGEST_MATCH', 'PACKET_SOURCE_REVISION_MISSING',
-  'LEGACY_DIGEST_ONLY', 'PACKET_CONTENT_DIGEST_MISSING', 'MISSING_PACKET',
-  'PACKET_CONTENT_DIGEST_MISMATCH']
+  'LEGACY_DIGEST_ONLY', 'PACKET_CONTENT_DIGEST_MISSING', 'MISSING_PACKET', 'PACKET_IDENTITY_AMBIGUOUS',
+  'PACKET_CANONICAL_ROW_CONFLICT', 'PACKET_CONTENT_DIGEST_MISMATCH']
   .map((kind) => [kind, planned.filter((row) => row.classification === kind).length]));
 const report = {
   schema: 'parent-atlas.current-packet-digest-bridge.v1',
   status: counts.CANONICAL_CONTENT_DIGEST_MATCH === planned.length && planned.length > 0
-    ? 'READY_FOR_BOUNDED_BRIDGE'
+    ? 'PACKET_DIGEST_CROSSWALK_ONLY'
     : 'PACKET_DIGEST_BRIDGE_BLOCKED',
   generatedAt: new Date().toISOString(),
   inputs: { workspaceRevision, executionId, limit, membershipOwner: 'graphify_execution_file_membership_v2',
@@ -186,10 +210,12 @@ const report = {
     row.memberContentHash, row.packetContentHash, row.legacySha256, row.codeSourceRevision, row.packetSourceRevision])),
   safeToApply: false,
   canonicalAuthority: false,
+  admissionAuthorized: false,
   writesPerformed: false,
   nextGate: 'PACKET-DIGEST-BRIDGE-AUTHORIZATION-AND-READBACK-01',
-  reportPath: path.relative(root, reportPath).replaceAll('\\', '/'),
+  reportPath: reportRef(),
 };
+report.reportChecksum = sha256(JSON.stringify(report));
 await writeReport(report);
 console.log(JSON.stringify({ status: report.status, counts: report.counts, candidateChecksum: report.candidateChecksum,
   writesPerformed: false, reportPath: report.reportPath }, null, 2));

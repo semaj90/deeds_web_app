@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { createInterface } from 'node:readline';
 import { evaluateTaskPromotion } from './lib/task-promotion-gate.mjs';
+import { decideRecommendationActionV1 } from './lib/recommendation-l7-decision-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -639,13 +640,9 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
 
 // ── L7: Decision ─────────────────────────────────────────────────────────────
 
+// Pure decision lives in lib/recommendation-l7-decision-v1.mjs (see its header for check order).
 function l7Decision(identity, rerankResult, gemma4, memory) {
-  if (!identity.packet_key) return 'ask_permission';
-  if (gemma4.risk === 'high') return 'ask_permission';
-  if (rerankResult.top_score < 0.4) return 'ask_permission';
-  if (memory.prior_fix) return 'merge_card';
-  if (rerankResult.top_score >= 0.65) return 'patch_existing';
-  return 'create_card';
+  return decideRecommendationActionV1({ identity, rerankResult, gemma4, memory });
 }
 
 // ── Main export: checkParentAtlasRegistry (v2) ────────────────────────────────

@@ -481,6 +481,54 @@ tables remain correctly empty (0 rows) until real execution events accumulate.
       materially riskier to add to a live, 5-caller production file than a pure-function bound
       proof; left as a distinct, still-open future step if a stronger empirical proof is ever
       needed.
+
+### T7B — CPU worker queue backpressure and timeout cleanup (2026-10-12)
+
+- [x] Added a finite default queue limit of 64 to the existing canonical `ComputePool`; a full
+  queue now rejects new work instead of retaining unbounded payloads in process memory.
+- [x] Added a 64 MiB queued-payload budget with bounded UTF-8/buffer/object-size estimation and a
+  traversal-node ceiling; oversized or non-estimable queued payloads fail closed.
+- [x] Timed-out queued work is removed before dispatch; queue draining also rejects expired work,
+  and pool disposal rejects queued promises and clears their timers.
+- [x] Added pure regression cases for task/byte capacity boundaries, binary and UTF-8 sizing,
+  cycle handling, and traversal limits.
+- [ ] Run the focused `compute-pool.spec.ts` after the operator resumes testing; this change has
+  not been executed or empirically load-tested. Live worker saturation, cancellation, and memory
+  behavior remain unproven.
+
+### T7C — Bounded CPU/GPU cosine-similarity batches (2026-10-12)
+
+- [x] Bound each similarity executor request to at most 500 candidates and 64 MiB of typed
+  numeric input/output; reject invalid dimensions and undersized query/corpus buffers.
+- [x] Keep GPU conversion to nested JavaScript arrays chunk-local; CPU SharedArrayBuffer
+  allocations now cover only one chunk at a time and preserve result order. GPU chunks also have
+  a separate 250,000-number expansion cap because JS number arrays can exceed typed-buffer size.
+- [x] Add fixture cases for small/large dimensions, typed-buffer and GPU-array chunk ceilings,
+  empty inputs, and invalid
+  shapes. This is a code-level memory bound, not a live RSS/latency benchmark or GPU proof.
+- [ ] Run focused worker tests after the operator resumes testing. No active production caller
+  was found in the searched SvelteKit source tree; caller reachability and backend execution
+  remain unverified.
+
+### T7D — Route retrieval reranking through bounded LibTorch chunks (2026-10-12)
+
+- [x] Reuse `batchCosineSimilarityChunked` in both `gpuRerank` and
+  `gpuRerankQdrantResults`; the shared LibTorch owner now defaults to 500-row chunks and validates
+  explicit chunk sizes.
+- [x] Preserve result ordering and report `gpu` only when every chunk used the GPU; any CPU
+  fallback marks the aggregate result `cpu`. Reject any chunk whose reported count or score length
+  does not exactly match its input rows before merging scores with candidate identities.
+- [x] Align successful-path telemetry with the actual aggregate executor: CPU chunks are
+  `cpu_fallback`, GPU chunks are `cuda`, and local execution reports `direct` transport (not
+  `webgpu` or a CUDA RPC).
+- [x] Static source search found real call sites for `gpuRerank` in ACE context assembly and for
+  `gpuRerankQdrantResults` as an exported route helper. This confirms source reachability only,
+  not a production request execution or GPU run.
+- [ ] Add/run focused chunk parity and result-source tests after testing resumes. Caller-specific
+  reranking quality, score parity, GPU memory and runtime execution remain unverified.
+- [x] Added an unexecuted pure chunk-boundary spec for 500/500/1 stable-order splitting and
+  invalid sizes at `sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.chunked.spec.ts`;
+  validation remains pending under the test pause.
 - [x] T8 unordered packet/chunk assembly deterministic under shuffled completion —
       closed 2026-09-07. **Researched before implementing, per this file's own established
       discipline of not guessing scope from a one-line checkbox**: `specs/packet-assembly/spec.md`
@@ -1958,13 +2006,13 @@ informational one.
       `.opencode/command/atlas-residency-proof.md` with the workstation repair path.
       OpenCode receives bounded evidence and returns a repair candidate/validation plan;
       it does not edit, apply, or authorize repairs.
-- [ ] **WORKSTATION-AGENTIC-STDIO-REPLAY-01** prove a local OpenCode/stdio replay using
+- [ ] **WORKSTATION-AGENTIC-STDIO-REPLAY-01** (Reference; canonical owner at `parent-atlas-best-fit-score-fabric/tasks.md#L3466`) prove a local OpenCode/stdio replay using
       one synthetic verified error and one bounded residency receipt. Require stable
       `repairCaseKey`, `workspaceRevision`, `sourceRevision`, `executionId`,
       `evidenceRefs`, replay checksum, and `writesPerformed=false`. This must use the
       existing repair registry and workstation receipt shape; do not create a new A2A
       protocol, REPL service, TOML control file, or event bus.
-- [ ] **WORKSTATION-TIMELINE-AUTHORITY-01** connect the replay result to the existing
+- [ ] **WORKSTATION-TIMELINE-AUTHORITY-01** (Reference; canonical owner at `parent-atlas-best-fit-score-fabric/tasks.md#L3470`) connect the replay result to the existing
       authoritative Parent Atlas receipt/event owner, then independently read it back.
       Console logs, NATS delivery, MCP responses, and OpenCode transcripts remain
       evidence only until durable persistence and replay identity are proven.
@@ -2817,3 +2865,55 @@ OpenSpec check: this lane is already owned there; entries below are cross-refere
 - Cheap final checks: `git diff --check`, `openspec validate --strict`, and a NUL-byte count on `tasks.md`.
 - The Valkey password lives in `.env.local` (`REDIS_PASSWORD`); it was never printed or recorded.
 - Windows `cudaMemGetInfo` overstates free VRAM by about 20x.
+
+## OPERATOR DECISIONS 2026-10-11 (recorded after the handoff; append-only)
+
+| Decision | Answer | Effect |
+|---|---|---|
+| TITLE-FORMAT-DECISION-01: canonical persisted `title_id` form | **Keep the 3-part form `title:<slug>:<hash8>`.** | The 2-part hash-only output of `semantic-title-v2` (`ace/title-id-generator.ts`) stays a separate GENERATED label and is NOT persistable into `atlas_packets.title_id` until its consumers are audited. The provisional persistence policy in `scripts/atlas/lib/title-identity-contract-v1.mjs` (`PERSISTENCE_POLICY_V1.persistedShape = THREE_PART`) now matches the decision; its status label `PROVISIONAL_PENDING_TITLE_FORMAT_DECISION_01` is stale and should be renamed in a follow-up. This does NOT authorize any title backfill, regeneration or migration; derivation (HIST-02/02b), writer alignment (TITLE-VALIDATOR-ALIGN-01) and the per-version crosswalk remain open. |
+| FEATURE-LINEAGE-WIRE-01c: trusted source-binding producer families | **None yet.** | No producer family is approved. `createSourceBindingResolverV1` has no default trust: with an allowlist option it needs explicit prefixes; production admission must keep failing closed until the operator approves at least one family. Live families for reference (unchanged): graphify-execution-membership-v2 (24,456 rows), workspace-revision-content-reconciliation.v1 (23,369), graphify-current-source-batch-v1 (111). The registry reviewer allowlist and trust anchor are still unprovided. |
+
+**Follow-ups created by these decisions (status refreshed 2026-10-11):**
+- [x] TITLE-POLICY-LABEL-01: changed `PERSISTENCE_POLICY_V1.status` to `DECISION_RECORDED_IMPLEMENTATION_AND_LIVE_ADMISSION_PENDING`; focused tests pin the three-part persisted format and keep `productionWriteAuthorized:false`. The two-part `semantic-title-v2` parity remains a separate, blocked generated-label boundary.
+- [ ] TITLE-VALIDATOR-ALIGN-01 (now decided direction): make the generator's 2-part output non-persistable at the materializer/assembler boundary (the materializer currently regenerates a 2-part id and does not re-validate), preferably by carrying the generated label in a separate field; requires a reviewed change to `acp/packet-materializer-pipeline.ts` and `acp/packet-assembler.ts` — not done.
+- [ ] TITLE-FORMAT-GENERATOR-01: decide how the generator should emit a 3-part persisted form (slug from the separately returned `slug`) or whether the 3-part form is produced only by the backfill/registry owner; version string and hash input must be fixed before any write (`deterministic-title-v1` is the only SOURCE-and-observed formula; `semantic-title-v1` is declared by the registry but has 0 stored rows).
+- [ ] PRODUCER-ALLOWLIST-01: when the operator approves producer families, supply them as `trustedProducerPrefixes` from one reviewed config source (not hardcoded in callers) and add a test pinning the approved list.
+
+**TITLE-FORMAT-DECISION-01 acceptance evidence (2026-10-11, read-only):** Existing three-part rows remain unchanged; no backfill, migration, alias, or database write was run. Compatibility and generator-boundary tests passed **22/22**, including the existing live-writer census pin; `title-identity-contract-v1.parity.test.mts` returned `PARITY_OK` for the actual two-part `semantic-title-v2` generator. Read-only repeatable-read PostgreSQL census `.tmp/atlas/title-format-census-v1.json` checksum independently matched: `atlas_packets` has 61,718 rows, 61,660 titled, 58 null, 61,659 three-part, 0 two-part, 1 other shape, and 0 duplicate title groups. The census is diagnostic, not canonical authority; HIST-02/02b and writer alignment remain open.
+
+### FEATURE-LINEAGE-WIRE-01c - Trusted source-binding producers (detail; refines the decision above)
+
+**Decision: OPTION 4 - NONE YET.** Status: `BLOCKED_TRUST_CONFIGURATION` (decision recorded; trust not granted until the authorized reviewer identity/allowlist, signing-key trust anchor, and receipt-verification authority are configured and independently checked).
+
+No source-binding producer family is approved to confer feature-lineage admission authority. Live row counts show the producers exist, not that they are trustworthy admission authorities. The records stay valid inputs for read-only lineage diagnostics, digest comparisons and stale-source detection.
+
+Standing rules:
+- Keep the production producer allowlist EMPTY; treat all three observed families (graphify-execution-membership-v2, workspace-revision-content-reconciliation.v1, graphify-current-source-batch-v1) as diagnostic evidence only.
+- Preserve exact workspace revision, source revision, source reference, content digest and binding checksum.
+- Require independent source-byte readback and canonical packet-key/source reconciliation (`verifySourceBytesAgainstBindingV1`, `verifyBindingAgainstExactReaderV1`, `verifyPacketSourceLinkV1`).
+- Verify the binding checksum against its owning contract, not merely its format (today it is format-checked only).
+- Require a separately configured registry-reviewer allowlist and trust anchor.
+- Reject absent, ambiguous, stale or cross-cohort bindings.
+- A successful source-binding lookup is NOT an approved SourceVersionReceiptV1.
+- Keep ORF V2 materialization and database writes blocked; FEATURE-LINEAGE-WIRE-01b stays read-only; the 1,808 historical ORF rows stay unqualified.
+
+**Next gate:** evaluate each producer family against the same source-binding contract, with positive and negative tests, before proposing any narrowly scoped allowlist. Review priority (not a trust decision): `workspace-revision-content-reconciliation.v1` first, because its purpose most closely aligns with source-content verification.
+
+## 2026-10-11 N-API parser cache correctness and CPU matching guidance
+
+- The existing `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts` loads the native `tensorrt_bridge.node` parser when present and falls back to V8 `JSON.parse`; the repo also has `crates/turbovec-napi` using Rust `simd-json` for bounded JSONL parsing. These are separate implementations/owners, not proof that every run uses native SIMD.
+- Fixed a correctness hazard in the existing parser LRU: its sampled 32-bit FNV key is now only a bucket locator; a hit also requires exact original-input string equality. Replacing a colliding key subtracts the evicted entry's accounted bytes before inserting, and the bounded cache accounts for retained input text. Added a regression using two different JSON payloads with the same sampled key.
+- Focused tests pass 14/14: `simdjson-bridge.spec.ts` (2) and `atlas-pipeline-stage-contracts-v1.spec.ts` (12). This proves fixture cache isolation and CandidateOrdinal-to-row matrix checksums/readback, not a corpus-level performance result or production admission. `SIMD-AUDIT-01..09` remain open.
+- Parameter/feature matching should reuse the existing canonical lookup/feature-matrix owners: keep the small hot descriptor/LUT working set in process RAM as typed, contiguous data, key lookups by exact revision-qualified identity, and let the processor manage L1/L2/L3 hardware caching. Application cache tiers named L1/L2/L3 are not CPU cache levels. Do not retain mutable tensor/KV state or use approximate hashes as equality.
+- For larger immutable numeric matrices, reuse the existing read-only Arrow/mmap descriptor and bounded CPU worker path; use worker-thread shared/transferable buffers only where ownership and lifetime are explicit. GPU offload is a separate challenger after measured CPU baseline, frozen snapshot, parity tolerances, and the existing single-GPU resource lease. simdjson remains for JSON/JSONL control metadata, not numeric hot-loop payloads.
+- No package installation, database/cache/vector writes, or GPU execution occurred in this pass; no OpenSpec completion checkboxes were changed.
+- Existing WSL NetworkX CPU fixtures also pass 33/33 across the bounded GNN operator roster, deterministic BFS/SSSP/PageRank/CheiRank/SCC/topological traversal, and n-ary incidence alignment. These remain fixture-level CPU evidence; there is no live admitted graph snapshot and no cuGraph/GPU parity claim.
+
+### 2026-10-12 N-API parser objective alignment (source-only; no tests or invocation)
+
+- [x] Correct the stale parser-lane description in the workstation objective: the current workspace crate is `crates/atlas_packet_parser` (`@deeds/atlas-packet-parser`), included in the Cargo workspace. It streams JSON/NDJSON records into MessagePack chunk files; it does not parse TS/Svelte/Rust/SQL/Markdown into function symbols, imports/exports, or directory summaries. The objective's `crates/atlas-parser-napi` symbol-extractor scope is therefore not implemented by this crate.
+- [x] Confirm source snapshot coverage exists in `crates/atlas_packet_parser/src/lib.rs`: the test compares deterministic MessagePack bytes and decoded Unicode/number values across two temp output roots, and another rejects malformed JSON without creating a chunk. This is parser snapshot coverage, not symbol-extraction parity or a live addon execution receipt; tests were not run in this pass.
+- [x] Record the invocation side effects before promoting this parser as a read-only helper: `parse_large_json_to_msgpack` creates the caller-supplied output directory and chunk files, and also writes `memory/manifests/packet-index.json` relative to the process working directory. The package smoke script only checks that the wrapper exposes the function; it does not prove the addon is built/loaded or validate these writes.
+- [ ] Keep `SIMD-AUDIT-01..09` and symbol-extraction requirements open. Any actual multi-language symbol/index implementation must reuse the existing Tree-sitter/AST-grep/canonical symbol owners, not claim this JSON transport parser satisfies them. Before execution, give the manifest an explicit caller-controlled output root or otherwise isolate its side effect and prove bounded input/output behavior.
+
+The N-API inspection changed no code and invoked no addon, Rust tests, package build, stores, or GPU. Existing CPU/GNN evidence elsewhere in this ledger remains fixture-level and does not establish the objective's end-to-end query→evidence→ContextManifest→Ornith chain.

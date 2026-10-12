@@ -203,6 +203,9 @@ const openSpecs = records.filter((r) => r.documentKind === 'OPENSPEC_TASKS'
   && r.openspec.totalTasks !== null
   && r.openspec.completedTasks < r.openspec.totalTasks);
 const canonicalSourceDocs = records.filter((r) => r.status === 'CANONICAL_CURRENT');
+const agentInstructionDocs = records
+  .filter((r) => r.documentKind === 'AGENT_INSTRUCTIONS')
+  .sort((a, b) => a.path.localeCompare(b.path));
 const canonicalTopicOwners = new Map();
 for (const record of canonicalSourceDocs) {
   for (const topicId of record.canonicalForTopics) {
@@ -294,11 +297,33 @@ const toc = [
   '',
   `Registry checksum: \`${sha256(registryJson)}\``,
   '',
+  '## Revision definitions (canonical; identity is exact, not inferred)',
+  '',
+  '| Term | Definition | Owner |',
+  '| --- | --- | --- |',
+  '| `sourceRevision` | `sha256:<64 lowercase hex>` = SHA-256 of the exact UTF-8 bytes of one source file. No decoding, newline normalization, or reserialization. Empty content is rejected. | `sveltekit-frontend/src/lib/server/atlas/identity/code-source-revision-v1.ts` (`deriveCodeSourceRevisionV1`, schema `atlas.code.source-revision.v1`) |',
+  '| `contentDigest` | The bare 64-hex digest behind `sourceRevision`, without the `sha256:` prefix. | same as above |',
+  '| `byteLength` | UTF-8 byte count of the exact bytes hashed. | same as above |',
+  '| `workspaceRevision` | `sha256:` over a sorted manifest of `(sourceRef, sourceRevision, contentDigest, byteLength, gitBlobOid)` for the indexed source set. Git base commit/tree and `dirty` are recorded as provenance, not digested. Non-authoritative (`canonicalAuthority:false`). Known gap: files skipped for size, encoding, or read errors are not digested (see `codex.md`). | `sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts` and `.../atlas/indexing/workspace-revision-origin-runtime-v1.ts` |',
+  '| Not interchangeable | `sourceRevision` ≠ `workspaceRevision` ≠ `codebase_chunk_index.content_hash` ≠ `packet_key`. Never compare across grains or namespaces. | — |',
+  '',
   '## Canonical source documents',
   '',
   ...(canonicalSourceDocs.length
     ? canonicalSourceDocs.map((r) => `- [${r.path}](${r.path}) — ${r.documentKind} — \`${r.sha256.slice(0, 12)}\``)
     : ['- No source document is explicitly classified CANONICAL_CURRENT.']),
+  '',
+  '## AGENTS.md by directory scope',
+  '',
+  '> Navigation only. Each file governs its own directory subtree; a deeper instruction file takes precedence for its subtree.',
+  '',
+  ...(agentInstructionDocs.length
+    ? agentInstructionDocs.map((r) => {
+      const slash = r.path.lastIndexOf('/');
+      const scope = slash < 0 ? '.' : r.path.slice(0, slash);
+      return '- [' + scope + '/AGENTS.md](' + r.path + ') — `' + r.sha256.slice(0, 12) + '`';
+    })
+    : ['- No AGENTS.md files discovered.']),
   '',
   '## Canonical topics',
   '',

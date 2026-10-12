@@ -67,6 +67,7 @@ export const searchRouter = router({
             promotionAttempted: false,
           },
           ace: null,
+          contextManifestShadow: {},
           shadow: null,
           error: error instanceof Error ? error.message : 'Search workflow failed',
         };

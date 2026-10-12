@@ -186,6 +186,21 @@ describe('buildContextCacheKey', () => {
     expect(backendChanged).not.toBe(same);
     expect(repoChanged).not.toBe(same);
   });
+
+  it('separates context entries by the admitted revisioned retrieval identity', () => {
+    const base = makeIdentity();
+    const first = buildContextCacheKey({
+      ...base,
+      retrievalCacheIdentityKey: `ace:topk:v1:${'a'.repeat(64)}`,
+    });
+    const second = buildContextCacheKey({
+      ...base,
+      retrievalCacheIdentityKey: `ace:topk:v1:${'b'.repeat(64)}`,
+    });
+
+    expect(first).not.toBe(second);
+    expect(buildContextCacheKey(base)).not.toBe(first);
+  });
 });
 
 describe('resolveContextCacheSources', () => {

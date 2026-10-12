@@ -21,10 +21,15 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 from urllib.parse import urljoin, urlparse
 from urllib.request import Request, urlopen
 
-import numpy as np
-
-
 Json = dict[str, Any]
+
+
+def _require_numpy() -> Any:
+    try:
+        import numpy as np
+    except ImportError as error:
+        raise RuntimeError("NUMPY_REQUIRED_FOR_NUMERIC_EXTERNAL_DOC_OPERATION") from error
+    return np
 
 
 def _sha(text: str | bytes) -> str:
@@ -717,6 +722,7 @@ def embed_llama_server_768(
     The repo has recorded a prior physical-batch boundary on port 8081, so this
     caller deliberately keeps requests bounded and never substitutes zero vectors.
     """
+    np = _require_numpy()
     vectors: list[np.ndarray] = []
     for text in texts:
         bounded = text[:max_chars_per_request]
@@ -746,6 +752,7 @@ def low_rank_sample_query_features(matrix: np.ndarray, *, rank: int = 64) -> tup
     l2 sample/query idea over a bounded low-rank approximation. The returned
     probabilities nominate candidates only and carry no canonical authority.
     """
+    np = _require_numpy()
     source = np.asarray(matrix, dtype=np.float32)
     if source.ndim != 2 or source.shape[0] == 0 or source.shape[1] == 0:
         raise ValueError("matrix must be non-empty rank-2")
@@ -783,6 +790,7 @@ def deterministic_pagerank(
     """Small deterministic CPU PageRank oracle for documentation-link graphs."""
     if not node_ids:
         return {}, {"schema": "atlas.external-doc-pagerank-receipt.v1", "rows": 0, "canonical_authority": False}
+    np = _require_numpy()
     if not (0.0 < alpha < 1.0):
         raise ValueError("alpha must be between 0 and 1")
     ordered = list(dict.fromkeys(node_ids))
@@ -831,6 +839,7 @@ def qdrant_points(
     feature_rows: Mapping[str, Mapping[str, Any]] | None = None,
     producer_revision: str,
 ) -> list[Json]:
+    np = _require_numpy()
     source = np.asarray(embeddings, dtype=np.float32)
     if source.shape != (len(chunks), 768):
         raise ValueError(f"QDRANT_EMBEDDING_SHAPE_MISMATCH:{source.shape}")

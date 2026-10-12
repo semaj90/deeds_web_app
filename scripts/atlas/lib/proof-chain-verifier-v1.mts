@@ -7,6 +7,8 @@ import { OntologyLinkedTupleV1Schema } from '../../../sveltekit-frontend/src/lib
 import { ContextManifestV2Schema } from '../../../sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.js';
 import { canonicalSha256V1 } from '../../../sveltekit-frontend/src/lib/server/atlas/prefill/canonical-hash-v1.js';
 
+const SHA256_REVISION = /^sha256:[a-f0-9]{64}$/i;
+
 function canonicalJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
   if (value !== null && typeof value === 'object') {
@@ -28,7 +30,7 @@ function errorSummary(error: unknown): string {
   return error instanceof Error ? error.message : 'INVALID_INPUT';
 }
 
-export type ProofChainStageV1 = 'TASK_ADMISSION' | 'EVIDENCE_RECEIPT' | 'ONTOLOGY_TUPLE' | 'CONTEXT_MANIFEST';
+export type ProofChainStageV1 = 'TASK_ADMISSION' | 'EVIDENCE_RECEIPT' | 'ONTOLOGY_TUPLE_CONTRACT' | 'ONTOLOGY_SOURCE_SPAN' | 'CONTEXT_MANIFEST' | 'CONTEXT_MANIFEST_READBACK';
 
 export interface ProofChainVerifierInputV1 {
   taskCard: Record<string, any>;
@@ -37,7 +39,9 @@ export interface ProofChainVerifierInputV1 {
   receipt: Record<string, any>;
   receiptBindings: Record<string, any>[];
   ontologyTuple: Record<string, any> | null;
+  ontologySourceReadback?: Record<string, any> | null;
   contextManifest: Record<string, any> | null;
+  contextManifestReadback?: Record<string, any> | null;
   artifactReadback: {
     source: 'FIXTURE';
     independentlyReopened: boolean;
@@ -87,6 +91,11 @@ export function verifyProofChainV1(input: ProofChainVerifierInputV1): ProofChain
     receipt = verifiedReceipt;
     if (verifiedReceipt.verdict !== 'PROVEN' || verifiedReceipt.readbackRequired !== true || verifiedReceipt.readbackPerformed !== true) {
       failedGates.push('EVIDENCE_RECEIPT:PROVEN_READBACK_REQUIRED');
+    } else if (!SHA256_REVISION.test(input.taskCard.sourceRevision ?? '')
+      || !SHA256_REVISION.test(input.taskCard.workspaceRevision ?? '')
+      || !SHA256_REVISION.test(input.evidenceTask.taskHash ?? '')
+      || !verifiedReceipt.sourceRefs.every((sourceRef: Record<string, any>) => SHA256_REVISION.test(sourceRef.sourceRevision ?? ''))) {
+      failedGates.push('EVIDENCE_RECEIPT:REVISION_FORMAT_INVALID');
     } else if (verifiedReceipt.taskId !== input.evidenceTask.taskId
       || verifiedReceipt.changeId !== input.evidenceTask.changeId
       || verifiedReceipt.taskRevision !== input.evidenceTask.taskHash
@@ -112,17 +121,50 @@ export function verifyProofChainV1(input: ProofChainVerifierInputV1): ProofChain
       sourceRef?.file === parsedTuple.sourceRef && typeof sourceRef.sourceRevision === 'string');
     if (parsedTuple.evidenceState !== 'ACTIVE_VERIFIED'
       || matchingSourceRefs.length !== 1
+      || !SHA256_REVISION.test(provenance.sourceRevision ?? '')
+      || !SHA256_REVISION.test(provenance.workspaceRevision ?? '')
       || provenance.sourceRevision !== matchingSourceRefs[0]?.sourceRevision
       || provenance.workspaceRevision !== input.taskCard.workspaceRevision
       || provenance.taskRevision !== input.evidenceTask.taskHash
       || provenance.evidenceCardChecksum !== input.evidenceCard.checksum
       || !parsedTuple.evidenceRefs.includes(input.evidenceCard.taskRef)) {
-      failedGates.push('ONTOLOGY_TUPLE:ADMISSION_OR_LINEAGE_MISMATCH');
+      failedGates.push(!SHA256_REVISION.test(provenance.sourceRevision ?? '')
+        || !SHA256_REVISION.test(provenance.workspaceRevision ?? '')
+        ? 'ONTOLOGY_TUPLE:REVISION_FORMAT_INVALID'
+        : 'ONTOLOGY_TUPLE:ADMISSION_OR_LINEAGE_MISMATCH');
     } else {
-      passedStages.push('ONTOLOGY_TUPLE');
+      passedStages.push('ONTOLOGY_TUPLE_CONTRACT');
+      failedGates.push('ONTOLOGY_TUPLE_ADMISSION:AUTHORIZED_OWNER_READBACK_NOT_WIRED');
     }
   } catch (error) {
     failedGates.push(`ONTOLOGY_TUPLE:${errorSummary(error)}`);
+  }
+
+  const sourceReadback = input.ontologySourceReadback;
+  if (!tuple || !sourceReadback) {
+    failedGates.push('ONTOLOGY_SOURCE_SPAN:READBACK_MISSING');
+  } else if (sourceReadback.status === 'BLOCKED') {
+    failedGates.push(`ONTOLOGY_SOURCE_SPAN:${typeof sourceReadback.reason === 'string' && sourceReadback.reason ? sourceReadback.reason : 'OWNER_BLOCKED'}`);
+  } else if (sourceReadback.status !== 'SOURCE_BYTES_AND_SPAN_MATCH_NOT_ADMITTED'
+    || sourceReadback.canonicalAuthority !== false
+    || sourceReadback.admitted !== false
+    || sourceReadback.writesPerformed !== false
+    || sourceReadback.tupleReadback !== 'POSTGRES_REPEATABLE_READ_READ_ONLY'
+    || sourceReadback.tupleId !== tuple.tupleId
+    || sourceReadback.packetKey !== tuple.packetKey
+    || sourceReadback.sourceRef !== tuple.sourceRef
+    || sourceReadback.sourceRevision !== tuple.provenance?.sourceRevision
+    || sourceReadback.workspaceRevision !== tuple.provenance?.workspaceRevision
+    || sourceReadback.evidenceRef !== input.evidenceCard.taskRef
+    || sourceReadback.span?.start !== tuple.evidenceSpan?.start
+    || sourceReadback.span?.end !== tuple.evidenceSpan?.end
+    || sourceReadback.span?.checksum !== tuple.provenance?.evidenceSpanChecksum
+    || !SHA256_REVISION.test(sourceReadback.sourceRevision ?? '')
+    || !SHA256_REVISION.test(sourceReadback.workspaceRevision ?? '')
+    || !SHA256_REVISION.test(sourceReadback.span?.checksum ?? '')) {
+    failedGates.push('ONTOLOGY_SOURCE_SPAN:READBACK_IDENTITY_OR_REVISION_MISMATCH');
+  } else {
+    passedStages.push('ONTOLOGY_SOURCE_SPAN');
   }
 
   if (input.contextManifest === null) {
@@ -141,12 +183,34 @@ export function verifyProofChainV1(input: ProofChainVerifierInputV1): ProofChain
     } else if (typeof tuple?.sourceRef !== 'string'
       || !manifest.v1.evidenceRefs.includes(tuple.sourceRef)) {
       failedGates.push('CONTEXT_MANIFEST:EVIDENCE_REFERENCES_INCOMPLETE');
+    } else if (manifest.identityInput.evidenceRevisions.sourceRevision !== tuple.provenance.sourceRevision) {
+      failedGates.push('CONTEXT_MANIFEST:SOURCE_REVISION_MISMATCH');
+    } else if (!SHA256_REVISION.test(manifest.identityInput.evidenceRevisions.sourceRevision ?? '')) {
+      failedGates.push('CONTEXT_MANIFEST:SOURCE_REVISION_FORMAT_INVALID');
     } else {
       passedStages.push('CONTEXT_MANIFEST');
     }
     manifestChecksum = `sha256:${manifest.identityChecksum}`;
   } catch (error) {
     failedGates.push(`CONTEXT_MANIFEST:${errorSummary(error)}`);
+  }
+
+  const manifestReadback = input.contextManifestReadback;
+  if (!manifest || !manifestReadback) {
+    failedGates.push('CONTEXT_MANIFEST_READBACK:READBACK_MISSING');
+  } else if (manifestReadback.status === 'BLOCKED') {
+    failedGates.push(`CONTEXT_MANIFEST_READBACK:${typeof manifestReadback.reason === 'string' && manifestReadback.reason ? manifestReadback.reason : 'OWNER_BLOCKED'}`);
+  } else if (manifestReadback.schema !== 'atlas.context-manifest-v2-readback.v1'
+    || manifestReadback.status !== 'READBACK_MATCH_NOT_ADMITTED'
+    || manifestReadback.reason !== null
+    || manifestReadback.canonicalAuthority !== false
+    || manifestReadback.writesPerformed !== false
+    || manifestReadback.identityChecksum !== manifest.identityChecksum
+    || manifestReadback.payloadChecksum !== canonicalSha256V1(manifest)
+    || canonicalJson(manifestReadback.manifest) !== canonicalJson(manifest)) {
+    failedGates.push('CONTEXT_MANIFEST_READBACK:IDENTITY_OR_PAYLOAD_MISMATCH');
+  } else {
+    passedStages.push('CONTEXT_MANIFEST_READBACK');
   }
 
   const readbackValues: Record<string, unknown> = {
@@ -179,7 +243,7 @@ export function verifyProofChainV1(input: ProofChainVerifierInputV1): ProofChain
     if (failedGates.length === 0) failedGates.push('CHAIN:REQUIRED_STAGE_NOT_PROVEN');
   }
 
-  const complete = passedStages.length === 4 && failedGates.length === 0
+  const complete = passedStages.length === 6 && failedGates.length === 0
     && readbackValid;
   const status = complete ? 'FIXTURE_PROVEN' : 'BLOCKED';
 

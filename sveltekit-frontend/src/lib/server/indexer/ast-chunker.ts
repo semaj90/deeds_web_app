@@ -36,6 +36,8 @@ export interface ChunkMetadata {
 	tags: string[];
 	lineStart: number;
 	lineEnd: number;
+	sourceByteStart?: number;
+	sourceByteEnd?: number;
 }
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const;
@@ -158,8 +160,18 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
 		httpMethod?: string,
 		exports: string[] = []
 	) {
-		const content = node.getFullText().trim();
+		const fullText = node.getFullText();
+		const content = fullText.trim();
 		if (content.length < 10) return; // skip trivial nodes
+		const contentCharStart = node.getFullStart() + fullText.length - fullText.trimStart().length;
+		const contentCharEnd = contentCharStart + content.length;
+		const hasExactSourceSpan = fileContent.slice(contentCharStart, contentCharEnd) === content;
+		const sourceByteStart = hasExactSourceSpan
+			? Buffer.byteLength(fileContent.slice(0, contentCharStart), 'utf8')
+			: undefined;
+		const sourceByteEnd = sourceByteStart === undefined
+			? undefined
+			: sourceByteStart + Buffer.byteLength(content, 'utf8');
 
 		const lineStart = node.getStartLineNumber();
 		const lineEnd = node.getEndLineNumber();
@@ -174,7 +186,9 @@ function chunkSourceFile(sourceFile: SourceFile, rootDir: string): CodeChunk[] {
 			exports,
 			tags: [...tags],
 			lineStart,
-			lineEnd
+			lineEnd,
+			sourceByteStart,
+			sourceByteEnd
 		};
 
 		const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0, 12);

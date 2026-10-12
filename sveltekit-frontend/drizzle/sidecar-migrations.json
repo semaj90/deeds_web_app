@@ -655,6 +655,15 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "SELECT to_regclass('public.atlas_packet_incidence') AS table_name;"
+    },
+    {
+      "file": "manual/20261012_atlas_context_manifest_v2_readbacks.sql",
+      "status": "design_unapplied",
+      "reason": "Append-only persistence/readback for the existing ContextManifestV2 builder output. Does not create a builder, admit evidence, or authorize synthesis. Apply only after schema-owner review and explicit operator approval; no rows are written by this design entry.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only schema census for atlas_context_manifest_v2_readbacks after separately authorized migration application."
     }
   ]
 }

@@ -9,6 +9,8 @@ import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resol
 import { ENV } from '$lib/server/env.server.js';
 import { aceContextManifestAdmissionV1Schema } from '$lib/server/atlas/context/ace-context-manifest-admission-v1.js';
 import { buildContextManifestV2 } from '$lib/server/atlas/graph/context-manifest-v2.js';
+import { readContextManifestV2FromPostgresV1 } from '$lib/server/atlas/graph/context-manifest-v2-postgres-readback-v1.js';
+import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import { PromptPlanV1Schema } from '$lib/server/atlas/prefill/prompt-plan-v1.js';
 import { z } from 'zod';
 
@@ -70,6 +72,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   if (!bound) {
     return json({ success: false, error: 'CONTEXT_PROMPT_PLAN_BINDING_INVALID', writesPerformed: false }, { status: 422 });
   }
+
+  const manifestReadback = await readContextManifestV2FromPostgresV1(bound.admission.manifest.identityChecksum);
+  if (manifestReadback.status !== 'READBACK_MATCH_NOT_ADMITTED' || !manifestReadback.manifest) {
+    return json({
+      success: false,
+      error: 'CONTEXT_MANIFEST_READBACK_BLOCKED',
+      reason: manifestReadback.reason,
+      writesPerformed: false,
+    }, { status: 503 });
+  }
+  if (canonicalSha256V1(bound.admission.manifest) !== canonicalSha256V1(manifestReadback.manifest)) {
+    return json({ success: false, error: 'CONTEXT_MANIFEST_REQUEST_READBACK_MISMATCH', writesPerformed: false }, { status: 422 });
+  }
+
   if (!ENV.LLAMA_SERVER_URL) {
     return json({ success: false, error: 'LLAMA_SERVER_URL_UNCONFIGURED', writesPerformed: false }, { status: 503 });
   }

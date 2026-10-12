@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { canonicalSha256V1 } from '../prefill/canonical-hash-v1.js';
-import type { ContextManifestV1 } from './graph-runtime-contracts.js';
+import { ContextManifestV1Schema, type ContextManifestV1 } from './graph-runtime-contracts.js';
 
 /**
  * CM-02 (openspec/changes/parent-atlas-ace-rlm-bitfrost-integration).
@@ -13,9 +13,8 @@ import type { ContextManifestV1 } from './graph-runtime-contracts.js';
  * ContextManifestV1 or become a second manifest owner: it is a strict
  * superset — every V1 field is carried through unchanged, plus a checksum
  * over the evidence-revision set and the identity components that make one
- * manifest instance reproducible. Nothing here creates, ranks, or persists a
- * manifest; it is purely a stronger identity computed FROM an existing V1
- * manifest plus revision inputs the caller already has.
+ * manifest instance reproducible. The V1 shape is schema-validated before it
+ * is bound; this still does not establish source authority or evidence admission.
  */
 
 const revisionOrNull = z.union([z.string().min(1), z.null()]);
@@ -39,7 +38,7 @@ export type ContextManifestV2IdentityInput = z.infer<typeof ContextManifestV2Ide
 
 export const ContextManifestV2Schema = z.object({
   schema: z.literal('atlas.context-manifest.v2'),
-  v1: z.custom<ContextManifestV1>((value) => typeof value === 'object' && value !== null),
+  v1: ContextManifestV1Schema,
   identityInput: ContextManifestV2IdentityInputSchema,
   identityChecksum: z.string().regex(/^[a-f0-9]{64}$/),
 }).strict();
@@ -51,9 +50,8 @@ export type ContextManifestV2 = z.infer<typeof ContextManifestV2Schema>;
  * checksum. The checksum covers exactly the fields listed in Gap ACE-1:
  * selectedOrdinalSetChecksum + evidenceRevisionChecksum(-equivalent, folded
  * into the same digest) + ordinalMapChecksum + retrievalPolicyRevision +
- * acePlaybookRevision + modelRevision + promptTemplateRevision. It does not
- * recompute or validate V1's own fields (candidateCount, graphRevision,
- * etc.) — those stay owned by whatever already builds ContextManifestV1.
+ * acePlaybookRevision + modelRevision + promptTemplateRevision. The complete
+ * V1 shape is validated by its owning schema; source authority/admission remain separate.
  */
 export function buildContextManifestV2(
   v1: ContextManifestV1,

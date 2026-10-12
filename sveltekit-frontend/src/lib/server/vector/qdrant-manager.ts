@@ -85,6 +85,14 @@ export function deterministicPointId(key: string): number {
   return raw % 2147483648;
 }
 
+export {
+  QDRANT_DOCUMENT_POINT_NAMESPACE_V1,
+  canonicalQdrantDocumentPointNameV1,
+  deterministicQdrantDocumentPointIdV1,
+  describeQdrantDocumentPointIdentityV1,
+  type QdrantDocumentPointIdentityV1,
+} from './qdrant-document-point-id-v1.js';
+
 /**
  * Generate a deterministic UUID-like string from a SHA-256 hash.
  * Formats the hash as a valid UUID string (8-4-4-4-12) for Qdrant compatibility.

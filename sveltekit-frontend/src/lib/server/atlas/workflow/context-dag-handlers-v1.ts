@@ -1,8 +1,10 @@
 import type { ContextDagNodeHandlerV1 } from './context-tool-dag-contracts.js';
+export type { ContextDagNodeHandlerV1 };
 import { createHash } from 'node:crypto';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 import {
   AstGrepStructuralCandidateV1Schema,
+  extractAstGrepStructuralCandidates,
   type AstGrepStructuralCandidateV1,
 } from '../language/ast-grep-structural-topk.js';
 
@@ -24,7 +26,7 @@ export const PRE_AGENT_STAGE_OWNER_MAP_V1: Readonly<Record<string, { status: Sta
   CACHE_LOOKUP: { status: 'READY_WITH_CAVEAT', owner: 'ace/context-cache-planner.ts + ace/llm-context-cache.ts::getContextCacheWithSource', adapter: 'makeCacheLookupHandlerV1 + makeReadOnlyContextCacheLoaderV1', note: 'needs explicit non-sentinel repoGitSha/corpusHash/graphSnapshotHash; source of real values undecided' },
   LEXICAL: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveExactMatches', adapter: 'makeCandidateLaneHandlerV1', note: 'Postgres read; SearchRuntime is the long-term injection point' },
   AST: { status: 'READY_WITH_CAVEAT', owner: 'retrieval/retrieve-candidates.ts::retrieveASTMatches', adapter: 'makeCandidateLaneHandlerV1', note: 'weak ILIKE over tree_node_id, not structural parsing' },
-  AST_STRUCTURAL_REFINE: { status: 'READY_WITH_CAVEAT', owner: 'atlas/language/ast-grep-structural-topk.ts::extractAstGrepStructuralCandidates', adapter: 'makeAstHandlerV1', note: 'lexical-dependent source-span observations only; canonical tree/symbol join and production handler composition remain open' },
+  AST_STRUCTURAL_REFINE: { status: 'READY_WITH_CAVEAT', owner: 'atlas/language/ast-grep-structural-topk.ts::extractAstGrepStructuralCandidates', adapter: 'makeDefaultAstGrepRefinementHandlerV1', note: 'uses DAG request workspace revision; lexical-dependent observations only; canonical tree/symbol join and production caller remain open' },
   SEMANTIC_ROUTE: { status: 'READY', owner: 'retrieval/retrieve-candidates.ts::retrieveQdrant (dense_768, codebase_chunks_768)', adapter: 'makeCandidateLaneHandlerV1', note: 'embeds the query then Qdrant ANN (read-only network calls); SearchRuntime remains the sole fusion owner' },
   MEMORY_PRIOR: { status: 'NEEDS_OWNER', owner: 'memory/engram-memory.ts (not inspected)', adapter: null, note: 'Engram today, Claude-Mem adapter later; read function unverified' },
   GRAPH_EXPANSION: { status: 'NEEDS_OWNER', owner: 'ace/graph-expander.ts::fetchDeepImportGraphExpansion(filePaths): Promise<string>', adapter: null, note: 'returns an unstructured string, not revision-qualified refs; a structured read-only graph/PPR owner is still to be identified' },
@@ -668,7 +670,7 @@ export interface AstOutputV1 {
   schema: 'atlas.ast-grep-refinement-output.v1';
   declarations: AstDeclarationV1[];
   matchedLexicalFilePaths: string[];
-  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_SOURCE_BINDING' | 'SOURCE_REVISION_MISMATCH' | 'READ_FAILED' | 'INVALID_UTF8_SOURCE' | 'EXTRACT_FAILED' | 'EXTRACT_RESULT_MISMATCH' | 'INVALID_SPAN' }>;
+  skipped: Array<{ filePath: string; reason: 'NOT_TS_JS' | 'NO_SOURCE_BINDING' | 'WORKSPACE_REVISION_MISMATCH' | 'SOURCE_REVISION_MISMATCH' | 'READ_FAILED' | 'INVALID_UTF8_SOURCE' | 'EXTRACT_FAILED' | 'EXTRACT_RESULT_MISMATCH' | 'INVALID_SPAN' }>;
   producerRevision: string;
   canonicalAuthority: false;
 }
@@ -699,12 +701,13 @@ export type AstExtractLikeV1 = (input: {
 export function makeAstHandlerV1(deps: {
   extract: AstExtractLikeV1;
   readSourceBytes: (filePath: string) => Promise<Uint8Array>;
-  resolveSourceBinding: (filePath: string) => { sourceRef: string; workspaceRevision: string; sourceRevision: string } | null;
+  resolveSourceBinding: (filePath: string) => { sourceRef: string; workspaceRevision: string; sourceRevision: string } | null
+    | Promise<{ sourceRef: string; workspaceRevision: string; sourceRevision: string } | null>;
   symbols: readonly string[];
   producerRevision: string;
 }): ContextDagNodeHandlerV1 {
   const wanted = new Set(deps.symbols.map((s) => s.trim()).filter(Boolean));
-  return async ({ inputs }) => {
+  return async ({ inputs, context }) => {
     const lexical = inputs.LEXICAL as LexicalOutputV1 | undefined;
     if (!lexical || !Array.isArray(lexical.files)) throw new Error('AST handler requires the LEXICAL output');
     const declarations: AstDeclarationV1[] = [];
@@ -712,10 +715,15 @@ export function makeAstHandlerV1(deps: {
     await Promise.all(lexical.files.map(async ({ filePath }) => {
       const language = LANG_BY_EXT[filePath.split('.').pop()?.toLowerCase() ?? ''];
       if (!language) { skipped.push({ filePath, reason: 'NOT_TS_JS' }); return; }
-      const binding = deps.resolveSourceBinding(filePath);
+      const binding = await deps.resolveSourceBinding(filePath);
       if (!binding?.sourceRef.trim() || !/^sha256:[a-f0-9]{64}$/i.test(binding.workspaceRevision)
         || !/^sha256:[a-f0-9]{64}$/i.test(binding.sourceRevision)) {
         skipped.push({ filePath, reason: 'NO_SOURCE_BINDING' });
+        return;
+      }
+      if (!context || !/^sha256:[a-f0-9]{64}$/i.test(context.workspaceRevision)
+        || binding.workspaceRevision.toLowerCase() !== context.workspaceRevision.toLowerCase()) {
+        skipped.push({ filePath, reason: 'WORKSPACE_REVISION_MISMATCH' });
         return;
       }
       let sourceBytes: Buffer;
@@ -778,6 +786,10 @@ export function makeAstHandlerV1(deps: {
     };
     return out;
   };
+}
+
+export function makeDefaultAstGrepRefinementHandlerV1(deps: Omit<Parameters<typeof makeAstHandlerV1>[0], 'extract'>): ContextDagNodeHandlerV1 {
+  return makeAstHandlerV1({ ...deps, extract: extractAstGrepStructuralCandidates });
 }
 
 /**

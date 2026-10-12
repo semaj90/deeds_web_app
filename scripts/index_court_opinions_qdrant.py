@@ -160,21 +160,19 @@ def classify_tags(text: str) -> list[str]:
 
 def summarize_via_ollama(text: str, practice_area: str) -> str:
     """Generate a 2-sentence focused summary via Ollama."""
-    import requests
+    from config.llama_chat import llama_chat
     prompt = (
         f"In 2 sentences describe this {practice_area} US court opinion: "
         f"(1) the legal issue, (2) the key ruling. Legal terminology only.\n\n"
         f"{text[:1200]}"
     )
     try:
-        resp = requests.post(
-            f"{OLLAMA_URL}/api/generate",
-            json={"model": LLM_MODEL, "prompt": prompt, "stream": False,
-                  "options": EVAL_OPTIONS},
-            timeout=LLM_TIMEOUT,
-        )
-        resp.raise_for_status()
-        return resp.json().get("response", "").strip()
+        # llama-server (Ornith 1.5, :8090); Ollama is embeddings-only.
+        return llama_chat(
+            [{"role": "user", "content": prompt}],
+            max_tokens=EVAL_OPTIONS.get("num_predict", 150),
+            temperature=EVAL_OPTIONS.get("temperature", 0.1),
+        ).strip()
     except Exception:
         return ""
 

@@ -48,7 +48,9 @@ const leiden = receipts.leidenCanary.value ?? {};
 
 const sourceAuthority = source.admission?.status === 'CURRENT_SOURCE_AUTHORITY_PROVEN'
   || source.sourceAuthority?.status === 'CURRENT_SNAPSHOT_PROVEN';
-const graphAuthority = graph.status === 'CURRENT_SNAPSHOT_PROVEN';
+const graphAuthority = graph.status === 'CURRENT_SNAPSHOT_PROVEN'
+  && graph.canonicalAuthority === true
+  && graph.graphSnapshot?.status === 'GRAPH_CANONICAL_AUTHORITY_PROVEN';
 const semanticConfigured = semantic.embeddingDimension === 768
   && semantic.qdrantCollectionRoles?.configuredCanonical === 'codebase_chunks_768_v2';
 const semanticCurrent = semantic.canonicalAuthority === true && semantic.importAllowed === true;
@@ -61,7 +63,7 @@ const qdrantLineage = leiden.status === 'CANARY_QDRANT_IDENTITY_PROVEN';
 
 const blockers = [];
 if (!sourceAuthority) blockers.push('CURRENT_SOURCE_AUTHORITY_NOT_PROVEN');
-if (!graphAuthority) blockers.push('CURRENT_GRAPH_SNAPSHOT_NOT_PROVEN');
+if (!graphAuthority) blockers.push('CURRENT_GRAPH_CANONICAL_AUTHORITY_NOT_PROVEN');
 if (!semanticConfigured) blockers.push('SEMANTIC_768_CONFIGURATION_NOT_PROVEN');
 if (!semanticCurrent) blockers.push('SEMANTIC_768_CURRENT_MANIFEST_NOT_ADMITTED');
 if (!qdrantContract) blockers.push('QDRANT_V2_768_CONTENT_CONTRACT_NOT_PROVEN');

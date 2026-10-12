@@ -134,7 +134,8 @@ import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js
 import { eq, desc, sql as drizzleSql } from 'drizzle-orm';
 import { getLlmOutputHitsBulk, recordLlmOutputHit } from '$lib/server/cache/code-llm-index.js';
 import { getRedis } from '$lib/server/redis.js';
-import { aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { acePromptBundleKeyV2, aceTopkKey, type BifrostRetrievalCacheIdentityV3, type RetrievalCacheIdentityV1 } from '../../../ace/cache-keys.js';
+import { canonicalSha256V1 } from '$lib/server/atlas/prefill/canonical-hash-v1.js';
 import { persistRevisionedAceTopRetrievalCache } from '$lib/server/cache/ace-top-retrieval-cache.js';
 import {
   normalizeTelemetrySourceRefs,
@@ -405,10 +406,43 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
     return '';
   }
 
-  const scope = JSON.stringify({
-    files: topFiles.map((f) => f.stableKey ?? f.filePath).slice(0, 6),
-    clusters: clusters.map((c) => c.clusterKey ?? c.clusterId).slice(0, 3),
+  const fileLines = topFiles.map((f, i) => {
+    const topo = [
+      f.topoClass ? `topo=${f.topoClass}` : '',
+      f.gpuCluster != null ? `cluster=${f.gpuCluster}` : '',
+      f.somBmuRow != null && f.somBmuCol != null ? `SOM(${f.somBmuRow},${f.somBmuCol})` : '',
+      f.pageRankScore != null ? `PR=${f.pageRankScore.toFixed(2)}` : '',
+      f.graphAuthorityScore != null ? `auth=${f.graphAuthorityScore.toFixed(2)}` : '',
+    ]
+      .filter(Boolean)
+      .join(', ');
+    return `${i + 1}. ${f.filePath}${topo ? ` [${topo}]` : ''}`;
+  });
+
+  const clusterLines = clusters.map((c) => {
+    const domains = c.topoClasses?.slice(0, 3).join(', ') || c.topoClass || 'unknown';
+    const tags = c.topTags?.slice(0, 6).join(', ') || 'none';
+    return `- ${c.clusterKey ?? `cluster:gpu:${c.clusterId}`} [${domains}] tags=${tags}`;
+  });
+
+  const laneLine = context.multiLane
+    ? `Lanes hit: ${lanes.length ? lanes.join(', ') : 'none'}; top files: ${context.multiLane.topFiles.slice(0, 5).join(', ') || 'none'}`
+    : '';
+  const scope = buildTopologicalKagCacheScopeV1({
+    files: fileLines,
+    fileGraphBindings: topFiles.map((f) => ({
+      key: f.stableKey ?? f.filePath,
+      packetKey: f.packetKey ?? null,
+      sourceRef: f.sourceRef ?? null,
+      sourceRevision: f.sourceRevision ?? null,
+      workspaceRevision: f.workspaceRevision ?? null,
+      graphRevision: f.graphRevision ?? null,
+      projectionRevision: f.projectionRevision ?? null,
+      neighborhoodHash: f.neighborhoodHash ?? null,
+    })),
+    clusters: clusterLines,
     lanes,
+    laneTopFiles: context.multiLane?.topFiles.slice(0, 5) ?? [],
     agentsScope,
   });
   const cacheKey = aceTopologicalKagKey.forPrompt(query, scope);
@@ -419,29 +453,6 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
     if (cached) {
       return `${cached}\n_Source: Redis KV cache \`${cacheKey}\`_`;
     }
-
-    const fileLines = topFiles.map((f, i) => {
-      const topo = [
-        f.topoClass ? `topo=${f.topoClass}` : '',
-        f.gpuCluster != null ? `cluster=${f.gpuCluster}` : '',
-        f.somBmuRow != null && f.somBmuCol != null ? `SOM(${f.somBmuRow},${f.somBmuCol})` : '',
-        f.pageRankScore != null ? `PR=${f.pageRankScore.toFixed(2)}` : '',
-        f.graphAuthorityScore != null ? `auth=${f.graphAuthorityScore.toFixed(2)}` : '',
-      ]
-        .filter(Boolean)
-        .join(', ');
-      return `${i + 1}. ${f.filePath}${topo ? ` [${topo}]` : ''}`;
-    });
-
-    const clusterLines = clusters.map((c) => {
-      const domains = c.topoClasses?.slice(0, 3).join(', ') || c.topoClass || 'unknown';
-      const tags = c.topTags?.slice(0, 6).join(', ') || 'none';
-      return `- ${c.clusterKey ?? `cluster:gpu:${c.clusterId}`} [${domains}] tags=${tags}`;
-    });
-
-    const laneLine = context.multiLane
-      ? `Lanes hit: ${lanes.length ? lanes.join(', ') : 'none'}; top files: ${context.multiLane.topFiles.slice(0, 5).join(', ') || 'none'}`
-      : '';
 
     const block = [
       '## Topological KAG Prompt Injection',
@@ -459,6 +470,45 @@ async function buildTopologicalKagPromptBlock(query: string, context: ACEContext
   } catch {
     return '';
   }
+}
+
+export function buildTopologicalKagCacheScopeV1(input: {
+  files: string[];
+  fileGraphBindings: Array<{
+    key: string;
+    packetKey: string | null;
+    sourceRef: string | null;
+    sourceRevision: string | null;
+    workspaceRevision: string | null;
+    graphRevision: string | null;
+    projectionRevision: string | null;
+    neighborhoodHash: string | null;
+  }>;
+  clusters: string[];
+  lanes: string[];
+  laneTopFiles: string[];
+  agentsScope: string;
+}): string {
+  return JSON.stringify(input);
+}
+
+export function readAceCacheProjectionIdentityV1(input: Record<string, unknown>): {
+  packetKey: string | null;
+  sourceRef: string | null;
+  sourceRevision: string | null;
+  workspaceRevision: string | null;
+} {
+  const readString = (snakeCase: string, camelCase: string): string | null => {
+    const value = input[snakeCase] ?? input[camelCase];
+    return typeof value === 'string' ? value : null;
+  };
+
+  return {
+    packetKey: readString('packet_key', 'packetKey'),
+    sourceRef: readString('source_ref', 'sourceRef'),
+    sourceRevision: readString('source_revision', 'sourceRevision'),
+    workspaceRevision: readString('workspace_revision', 'workspaceRevision'),
+  };
 }
 
 /**
@@ -1612,6 +1662,7 @@ export async function assembleACEContext(opts: {
         filePath: String(c.source_ref ?? ''),
         content: String(c.snippet ?? ''),
         score: Number(c.score ?? 0),
+        ...readAceCacheProjectionIdentityV1(c),
         gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0], 10) : null,
         tags: [] as string[],
         featureId: String(c.feature_id ?? ''),
@@ -1997,6 +2048,7 @@ export async function assembleACEContext(opts: {
         corpusHash: opts.corpusHash,
         ragBundleHash: opts.ragBundleHash,
         graphSnapshotHash: opts.graphSnapshotHash,
+        retrievalCacheIdentity: opts.retrievalCacheIdentity,
       });
       const acePlannerHit = await loadAceContextPlannerHit(acePlannerState).catch(() => null);
 
@@ -4645,65 +4697,6 @@ export async function fetchCachedACEChunks(
   }
 }
 
-/**
- * Compute a stable fingerprint of the ACE context for cache keying.
- * Changes when any meaningful input changes (new chunks, neighbors, history, etc.).
- */
-function computeContextFingerprint(context: ACEContext, query: string): string {
-  const codebaseLabelSignature = (context.codebaseContext ?? [])
-    .slice(0, 3)
-    .map((c) =>
-      [
-        c.filePath ?? '',
-        c.clusterKey ?? '',
-        c.centroidLabel ?? '',
-        c.topologyLabel ?? c.topoClass ?? '',
-        c.hotnessBucket ?? '',
-        c.featureFamily ?? '',
-      ].join(':')
-    )
-    .join('|');
-
-  const clusterLabelSignature = (context.clusterContext ?? [])
-    .slice(0, 3)
-    .map((c) =>
-      [
-        c.clusterKey ?? '',
-        c.centroidLabel ?? '',
-        c.topoLabel ?? '',
-        c.hotnessBucket ?? '',
-        c.featureFamily ?? '',
-      ].join(':')
-    )
-    .join('|');
-
-  const parts = [
-    query.slice(0, 80),
-    context.caseContext?.slice(0, 40) ?? '',
-    String(context.ragChunks.length),
-    context.ragChunks[0]?.score.toFixed(3) ?? '0',
-    String(context.kbChunks?.length ?? 0),
-    String(context.caseChunks?.length ?? 0),
-    String(context.kagNeighbors.length),
-    String(context.chatHistory.length),
-    context.chatHistory.at(-1)?.content.slice(0, 30) ?? '',
-    String(context.evidenceMetadata?.length ?? 0),
-    String(context.evidenceConnections?.length ?? 0),
-    String(context.glossaryMatches?.length ?? 0),
-    context.persona ?? 'neutral',
-    codebaseLabelSignature,
-    clusterLabelSignature,
-  ];
-  // Fast non-crypto hash (FNV-1a 32-bit)
-  let h = 0x811c9dc5;
-  const s = parts.join('|');
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return (h >>> 0).toString(36);
-}
-
 /** Try Redis for a cached ACE prompt bundle. */
 async function getCachedACEBundle(key: string): Promise<ACEPrompt | null> {
   return traceCache('ace-prompt-get', { key }, async () => {
@@ -4769,7 +4762,7 @@ function buildACEContextWeightsBlock(
 
 /**
  * Build ACE prompt with Redis caching (Stage 4 — ace_context_bundle).
- * Returns cached prompt if context fingerprint hasn't changed (24h TTL).
+ * Returns cached prompt only for an exact rendered prompt and source identity (24h TTL).
  * Falls through to sync buildACEPrompt() on cache miss.
  */
 export async function buildACEPromptCached(
@@ -4805,23 +4798,28 @@ export async function buildACEPromptCached(
     // non-fatal
   }
 
-  const fingerprint = computeContextFingerprint(context, query);
-  const cacheKey = bundleCacheKey('ace', fingerprint);
+  if (statsOut?.attention_weights?.length) {
+    (context as unknown as Record<string, unknown>).__attentionWeights = statsOut.attention_weights;
+  }
+  const prompt = buildACEPrompt(context, query);
+  const promptChecksum = `sha256:${canonicalSha256V1(prompt)}`;
+  const sourceIdentityChecksum = `sha256:${canonicalSha256V1((context.codebaseContext ?? []).map((candidate) => ({
+    packetKey: candidate.packetKey ?? null,
+    sourceRef: candidate.sourceRef ?? null,
+    sourceRevision: candidate.sourceRevision ?? null,
+    workspaceRevision: candidate.workspaceRevision ?? null,
+  })))}`;
+  const cacheKey = acePromptBundleKeyV2({ promptChecksum, sourceIdentityChecksum });
 
   const cached = await getCachedACEBundle(cacheKey);
   if (cached) {
-    console.log(`[ACE Prompt] bundle cache HIT (key: ${fingerprint})`);
+    console.log(`[ACE Prompt] bundle cache HIT (key: ${cacheKey.slice(-12)})`);
     if (statsOut) {
       statsOut.packet_hit = true;
     }
     return cached;
   }
 
-  if (statsOut?.attention_weights?.length) {
-    (context as unknown as Record<string, unknown>).__attentionWeights = statsOut.attention_weights;
-  }
-
-  const prompt = buildACEPrompt(context, query);
   let acePacketTokens = countTokens(prompt.systemPrompt);
   const chunkCount =
     (context.ragChunks?.length ?? 0) +
@@ -6968,6 +6966,7 @@ export async function fetchCodebaseContext(
       filePath: String(r.chunk.path ?? r.chunk.relativePath ?? 'unknown'),
       content: String(r.chunk.content ?? ''),
       score: scoreOverride ?? r.score,
+      ...readAceCacheProjectionIdentityV1(r.chunk as Record<string, unknown>),
       lineStart: typeof r.chunk.lineStart === 'number' ? r.chunk.lineStart : undefined,
       lineEnd: typeof r.chunk.lineEnd === 'number' ? r.chunk.lineEnd : undefined,
       tags: Array.isArray(r.chunk.tags) ? (r.chunk.tags as string[]) : undefined,

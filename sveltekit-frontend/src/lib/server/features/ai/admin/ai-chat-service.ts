@@ -1,5 +1,5 @@
 import { pool } from '$lib/server/db/client';
-import { ENV } from '$lib/server/env.server.js';
+import { BIFROST_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { createHash } from 'node:crypto';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
 
@@ -163,7 +163,7 @@ MEMORY SNAPSHOT:
     try {
       const summary = await bifrostChat(
         [{ role: 'user', content: prompt }],
-        ENV.GEMMA4_MODEL,
+        BIFROST_CHAT_MODEL,
         { temperature: 0.1, maxTokens: 400 }
       );
 

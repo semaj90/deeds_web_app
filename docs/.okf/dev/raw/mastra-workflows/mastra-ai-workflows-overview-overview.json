@@ -1,0 +1,78 @@
+{
+  "schema_version": "okf.dev.corpus.v1",
+  "source_id": "mastra-workflows",
+  "source_ref": "mastra-workflows:mastra-ai-workflows-overview-overview",
+  "url": "https://mastra.ai/docs/workflows/overview",
+  "title": "Workflows | Mastra Docs",
+  "domain_class": "documentation",
+  "focus_tags": [
+    "llm_output",
+    "taskboard",
+    "agentic_error_fixing",
+    "canonical_api_recommendations"
+  ],
+  "llm_synthesis": "No model synthesis was run. This record contains fetched page metadata and a bounded excerpt only.",
+  "llm_output": {
+    "source": "fallback",
+    "title": "Workflows | Mastra Docs",
+    "markdown_excerpt": "Workflows | Mastra Docs Skip to main content Docs Models Integrations Reference Learn Platform Search Ask AI system mode Get Started Develop Build Agents Workflows Harness Memory Extend Subagents Skills Channels Sandboxes Browser Connections Develop / Deploy Storage Server Studio Auth Deploy Observe Traces Metrics Evals More Guides Workflows Overview Workflow State Control Flow Agents and Tools Dynamic Workflows Snapshots Suspend and Resume Human-in-the-Loop Time Travel Error Handling Scheduled Workflows Build Workflows On this page Workflows Workflows let you define complex task sequences with clear, structured steps instead of relying on one agent to reason through the entire process. You control the task breakdown along with the flow and timing of data. Workflows use the built-in execution engine by default, while managed infrastructure is available through workflow runners such as Inngest. For AI agents: Run npx mastra api workflow run start test-workflow '{\"inputData\":{\"message\":\"Hello, world!\"}}' to start this workflow directly instead of writing a temporary script. The command requires a running Mastra server; start the local server with npx mastra dev , or pass the reachabl",
+    "metadata": {}
+  },
+  "kanban": {
+    "board": "okf-dev",
+    "lane": "documentation",
+    "status": "open"
+  },
+  "taskboard": {
+    "task_id": "okf-dev:mastra-workflows:mastra-ai-workflows-overview-overview",
+    "title": "Workflows | Mastra Docs",
+    "status": "open"
+  },
+  "agentic_error_fixing": {
+    "symptom": "documentation gap or drift",
+    "likely_fix": "Refresh Mastra Workflows Documentation from official source and reclassify the corpus entry.",
+    "validation": "Run the Zod schema against the emitted corpus record."
+  },
+  "canonical_api_recommendations": [
+    {
+      "api": "Mastra workflows",
+      "recommendation": "Keep nodes bounded and side-effect free until the final validation boundary.",
+      "rationale": "Workflow orchestration fits the taskboard / kanban style agentic error-fixing loop."
+    },
+    {
+      "api": "Agent envelopes",
+      "recommendation": "Use a bounded task envelope with stable evidence refs and a concise action list.",
+      "rationale": "This keeps agentic error fixing inspectable and compatible with kanban/taskboard sync."
+    }
+  ],
+  "content_hash": "de61716ef3351518d77c14c0bb2886ef9f5f1783de9c23eb1f44b80cbc98c9ec",
+  "markdown_path": "docs/.okf/dev/raw/mastra-workflows/mastra-ai-workflows-overview-overview.md",
+  "fetched_at": "2026-10-11T19:44:37.856Z",
+  "metadata": {
+    "kind": "official_docs",
+    "source_id": "mastra-workflows",
+    "source_title": "Mastra Workflows Documentation",
+    "source_revision": "mastra-workflows-docs-2026-10-11",
+    "source_manifest": {
+      "manifest_revision": "okf-tooling-docs-r3",
+      "authority_class": "OFFICIAL_PRIMARY",
+      "output_namespace": "docs/.okf/mastra-workflows",
+      "maximum_pages": 2,
+      "maximum_depth": 0,
+      "allowed_domains": [
+        "mastra.ai"
+      ],
+      "provider": "mastra",
+      "product": "mastra-workflows",
+      "version_qualification": "CURRENT_UPSTREAM",
+      "language": "typescript",
+      "publisher": "Mastra"
+    },
+    "preferred_fetcher": "HTTP_FALLBACK",
+    "fetched_via": "http_fallback",
+    "domain_classification": "MANIFEST_SOURCE_HINT_UNREVIEWED",
+    "detected_domain_hint": "database",
+    "synthesis_status": "NOT_RUN"
+  },
+  "raw_path": "docs/.okf/dev/raw/mastra-workflows/mastra-ai-workflows-overview-overview.md"
+}

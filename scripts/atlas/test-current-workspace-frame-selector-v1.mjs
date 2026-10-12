@@ -51,6 +51,8 @@ test('conflicting authoritative receipts fail closed', () => {
     'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
     'docs/reports/current-graphify-snapshot-authority-v1.json': {
       status: 'CURRENT_SNAPSHOT_PROVEN',
+      canonicalAuthority: true,
+      graphSnapshot: { status: 'GRAPH_CANONICAL_AUTHORITY_PROVEN' },
       sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
     },
   });
@@ -64,6 +66,8 @@ test('explicit CLI revision resolves an authority conflict without mutating rece
     'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
     'docs/reports/current-graphify-snapshot-authority-v1.json': {
       status: 'CURRENT_SNAPSHOT_PROVEN',
+      canonicalAuthority: true,
+      graphSnapshot: { status: 'GRAPH_CANONICAL_AUTHORITY_PROVEN' },
       sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
     },
   });
@@ -159,6 +163,8 @@ test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: an explicit CLI override f
     'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:a'),
     'docs/reports/current-graphify-snapshot-authority-v1.json': {
       status: 'CURRENT_SNAPSHOT_PROVEN',
+      canonicalAuthority: true,
+      graphSnapshot: { status: 'GRAPH_CANONICAL_AUTHORITY_PROVEN' },
       sourceSnapshot: { workspaceRevision: 'sha256:b', snapshotRevision: 'sha256:snap' },
     },
   });
@@ -169,6 +175,23 @@ test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: an explicit CLI override f
   assert.equal(authority.frameAuthoritative, false);
   assert.equal(authority.canonicalAuthority, false);
   assert.equal(authority.promotionEligible, false);
+});
+
+test('diagnostic CURRENT_SNAPSHOT_PROVEN without canonical graph authority cannot override an admitted revision', () => {
+  const root = fixture({
+    'docs/reports/workspace-revision-tournament-admission-v1.json': admitted('sha256:admitted'),
+    'docs/reports/current-graphify-snapshot-authority-v1.json': {
+      status: 'CURRENT_SNAPSHOT_PROVEN',
+      canonicalAuthority: false,
+      graphSnapshot: { status: 'GRAPH_CANONICAL_AUTHORITY_UNPROVEN' },
+      sourceSnapshot: { workspaceRevision: 'sha256:diagnostic', snapshotRevision: 'sha256:snap' },
+    },
+  });
+  const result = resolveCurrentWorkspaceFrameV1({ root, argv: [], env: {} });
+  assert.equal(result.status, 'CURRENT_WORKSPACE_FRAME_SELECTED');
+  assert.equal(result.selectedWorkspaceRevision, 'sha256:admitted');
+  assert.equal(result.selectedAuthority, true);
+  assert.equal(result.authorityConflict, false);
 });
 
 test('CURRENT-WORKSPACE-FRAME-AUTHORITY-SEMANTICS-01: a clean admission receipt with no conflict and no blockers IS canonically authoritative', () => {

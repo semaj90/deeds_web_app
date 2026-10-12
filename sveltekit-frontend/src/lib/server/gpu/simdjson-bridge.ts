@@ -8,7 +8,7 @@
  *   - fastJsonExtractField(json, key) → string | null  (single-field fast path)
  *
  * Memory optimizations:
- *   - Byte-budget LRU (8 MB cap) instead of count-only — prevents unbounded heap growth
+ *   - Byte-budget LRU (32 MB cap) instead of count-only — prevents unbounded heap growth
  *   - Input size guard (64 MB max) — prevents OOM from malicious/huge payloads
  *   - SIMD-friendly FNV-1a: samples 64-byte prefix + stride tail — stays in L1 cache
  *   - Payloads < 1 KB bypass native (V8 JIT faster for small strings)
@@ -79,6 +79,7 @@ const LRU_TTL_MS       = 30_000;           // 30 s
 const MAX_ENTRY_BYTES  = 8 * 1024 * 1024;  // skip caching single entries > 8 MB
 
 interface CacheEntry {
+	input: string;
 	value: unknown;
 	expiresAt: number;
 	sizeBytes: number;  // approximate serialized size
@@ -139,9 +140,10 @@ function lruEvictExpired(): void {
 	}
 }
 
-function lruGet(key: string): unknown | undefined {
+function lruGet(key: string, input: string): unknown | undefined {
 	const entry = lruCache.get(key);
 	if (!entry) return undefined;
+	if (entry.input !== input) return undefined;
 	if (Date.now() > entry.expiresAt) {
 		cacheBytes -= entry.sizeBytes;
 		lruCache.delete(key);
@@ -154,14 +156,19 @@ function lruGet(key: string): unknown | undefined {
 	return entry.value;
 }
 
-function lruSet(key: string, value: unknown): void {
-	const sizeBytes = approximateSize(value);
+function lruSet(key: string, input: string, value: unknown): void {
+	const sizeBytes = input.length * 2 + approximateSize(value);
 
 	// Skip caching huge entries — they'd blow the budget on a single item
 	if (sizeBytes > MAX_ENTRY_BYTES) return;
 
 	// Evict expired entries first (free pass)
 	lruEvictExpired();
+	const existing = lruCache.get(key);
+	if (existing) {
+		cacheBytes -= existing.sizeBytes;
+		lruCache.delete(key);
+	}
 
 	// Evict LRU entries until budget allows insertion
 	while (cacheBytes + sizeBytes > LRU_BUDGET_BYTES && lruCache.size > 0) {
@@ -172,7 +179,7 @@ function lruSet(key: string, value: unknown): void {
 		lruCache.delete(oldest);
 	}
 
-	lruCache.set(key, { value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
+	lruCache.set(key, { input, value, expiresAt: Date.now() + LRU_TTL_MS, sizeBytes });
 	cacheBytes += sizeBytes;
 }
 
@@ -203,7 +210,7 @@ const MIN_NATIVE_BYTES = 1024;
 
 /**
  * Parse JSON with simdjson (large payloads) or V8 JSON.parse (small/fallback).
- * Results cached with 8 MB byte-budget LRU for 30 s.
+ * Results cached with 32 MB byte-budget LRU for 30 s.
  * Inputs > 64 MB throw RangeError to prevent OOM.
  */
 export type FastJsonParseBackend = 'SIMDJSON_NAPI' | 'V8_JSON_PARSE' | 'CACHE';
@@ -219,7 +226,7 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 
 	// Check LRU cache (hash computed over L1-friendly prefix)
 	const cacheKey = fnv1aKey(input);
-	const cached = lruGet(cacheKey);
+	const cached = lruGet(cacheKey, input);
 	if (cached !== undefined) return { value: cached as T, backend: 'CACHE' };
 
 	stats.misses++;
@@ -236,18 +243,18 @@ export function fastJsonParseWithBackend<T = unknown>(input: string): { value: T
 			result = JSON.parse(validated) as T;
 			stats.nativeParses++;
 			stats.nativeTimeMs += (performance.now() - start);
-			lruSet(cacheKey, result);
+			lruSet(cacheKey, input, result);
 			return { value: result, backend: 'SIMDJSON_NAPI' };
 		} catch {
 			stats.fallbackParses++;
 			result = JSON.parse(input) as T;
-			lruSet(cacheKey, result);
+			lruSet(cacheKey, input, result);
 			return { value: result, backend: 'V8_JSON_PARSE' };
 		}
 	} else {
 		stats.fallbackParses++;
 		result = JSON.parse(input) as T;
-		lruSet(cacheKey, result);
+		lruSet(cacheKey, input, result);
 		return { value: result, backend: 'V8_JSON_PARSE' };
 	}
 }

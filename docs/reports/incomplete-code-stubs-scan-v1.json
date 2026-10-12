@@ -1,0 +1,1094 @@
+{
+  "schema": "atlas.incomplete-code-stubs-scan.v1",
+  "gate": "STUB_SCAN_01",
+  "generatedAt": "2026-10-12T02:03:30.059Z",
+  "readOnly": true,
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "admissionAuthorized": false,
+  "summary": {
+    "totalFindings": 63,
+    "byCategory": {
+      "UNRESOLVED_DEPENDENCY": 13,
+      "TODO_WITH_OWNER": 50
+    },
+    "byReachability": {
+      "PROVEN": 13,
+      "UNKNOWN": 49,
+      "TEST_ONLY": 1
+    }
+  },
+  "findings": [
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 22805,
+      "endByte": 22883,
+      "sourceSpanSha256": "15ab20dd2b8c2dfaeed6b2c5fd5627549f58098e3e56a91b7d766ab50afa8f78",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:564"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 22894,
+      "endByte": 22924,
+      "sourceSpanSha256": "c6aaea4579eab79e50ae62f98e2f2441398f12844f87607c1d30e084d34a32fd",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:566"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 23124,
+      "endByte": 23159,
+      "sourceSpanSha256": "f6b3265f3c9fdc160f5ccf30eb50b67bb0e3203f54d836c3b07be79fb4a1a882",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:575"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 60623,
+      "endByte": 60782,
+      "sourceSpanSha256": "1471dc124d0c637a3295e1f618a5493e78d6c797c7297c9a527beca245ec18cd",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:1637"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 67107,
+      "endByte": 67171,
+      "sourceSpanSha256": "acd72ff1379472ec4fd14a1366518221296169f01d697004b3918d3c6bdc646a",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:1796"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 198582,
+      "endByte": 198658,
+      "sourceSpanSha256": "a8c7d3863b7fa6d1bee78ffdaa30e64c9378db3c0979f615908fd18064ce0f78",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:4793"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 198762,
+      "endByte": 198862,
+      "sourceSpanSha256": "5ddecea0f2b77d642d64de5ce18eb4e47b7f3232b4e8782959ac3dce8fc904ef",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:4802"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 201417,
+      "endByte": 201444,
+      "sourceSpanSha256": "ec4fb6993b2d43cd0cd7da8b22e86279960ce25faa56afd9ae1bbcb3004c0698",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:4875"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 290426,
+      "endByte": 290524,
+      "sourceSpanSha256": "cc2187f9faa104da3d66ea564c6f64d835858cd65a990b3d0b00906bb815e955",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:7118"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 293193,
+      "endByte": 293293,
+      "sourceSpanSha256": "634045c3e8c7e14ac1790b8be2e1e6f56bed94c65f4cdb22c0812416b624c59c",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:7179"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+      "sourceRevision": "sha256:e883149d55826fdede58c22a4733c135f81dfedf1edaa3c285a5fc3dadc56127",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 297438,
+      "endByte": 297506,
+      "sourceSpanSha256": "178f3b3fc7acdc30d7b4004124d7a00d72333851dac45290fc6c06b4f214f3b4",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\context-assembler.ts:7271"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/gemma4-packet-compiler.ts",
+      "sourceRevision": "sha256:05e40ec49f4d198880b184d90105448d03612113e43185bb7941590553faf6b7",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 2515,
+      "endByte": 2596,
+      "sourceSpanSha256": "d895749f3cb617ca88269127e6258a76ea6b8d741d0d7f350a91d1cab3dd6133",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\gemma4-packet-compiler.ts:94"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "sveltekit-frontend/src/lib/server/features/ai/ace/packet-reward-writer.ts",
+      "sourceRevision": "sha256:e1f3540f8e17ddba203315c6853b209e5bc2b83bc31cdaeed7645c52418aaf4b",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "ts",
+      "symbolName": null,
+      "startByte": 5733,
+      "endByte": 5782,
+      "sourceSpanSha256": "64f3c19d406c8dddcda7f8c2274ff226cbc3c8633097a42cbed4535f9b323c1c",
+      "category": "UNRESOLVED_DEPENDENCY",
+      "confidence": 0.6,
+      "productionReachability": "PROVEN",
+      "evidenceRefs": [
+        "sveltekit-frontend\\src\\lib\\server\\features\\ai\\ace\\packet-reward-writer.ts:153"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 263,
+      "endByte": 343,
+      "sourceSpanSha256": "8e6319a6ec8ad3dd1acbf9f9af712d8a5ce6b577d7d16eed89833914af3009a3",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:8"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 344,
+      "endByte": 427,
+      "sourceSpanSha256": "3ee4759b54873b481906e6ef9639b3af66464c570dfc830c1828b02ab5ff2d81",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:9"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 428,
+      "endByte": 504,
+      "sourceSpanSha256": "0f18da0777f4ebc3c889db1e6a91bda3948ec1190781eaa30fc99e92ef266ba1",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:10"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 505,
+      "endByte": 598,
+      "sourceSpanSha256": "a2ed286b8eb3fd0d2caedfbf56315e301a929316976901dc3f56bd53ff8c5949",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:11"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 599,
+      "endByte": 688,
+      "sourceSpanSha256": "9819c75e0df79cc7e1f173a8c7e28f18be2ad77e4c15e9d9bdd00db95fd64b71",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:12"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 689,
+      "endByte": 772,
+      "sourceSpanSha256": "7c87962580d4cdea2819635219fbfc93eb161e7ad56b48e8f893858c4c51f120",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:13"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 773,
+      "endByte": 859,
+      "sourceSpanSha256": "c33874aa0caaa6b170db7b0f996ac00b9be7259315ddf68de7863f513d48f0e1",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:14"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 860,
+      "endByte": 951,
+      "sourceSpanSha256": "c489572e62094b660e5bcd5c5b4803fc80bc3e485c8c89acc296113af59a89ac",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:15"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 952,
+      "endByte": 1037,
+      "sourceSpanSha256": "2c4672181a7c41e7a1508c94f846c1dc9a379db6e0510bd8ea551c2d9c5be062",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:16"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 1038,
+      "endByte": 1138,
+      "sourceSpanSha256": "243873a1b3315956c1911c17d5f71bbb828107568d30df068e6f3ff74ad39398",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:17"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 1139,
+      "endByte": 1232,
+      "sourceSpanSha256": "b6228852f4005dc09da3659ec4a587b7aa4eafd4f59ddd226f38b74c3906e23b",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:18"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 1233,
+      "endByte": 1305,
+      "sourceSpanSha256": "316fca5f4720c8baea0bf312a3da2259e0893231df8da3203ee7434462e0b9f3",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:19"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 1306,
+      "endByte": 1403,
+      "sourceSpanSha256": "69dbaf221fafe2b20194ebaa6cdf958d81f5f22014afc0a16c0e2806ba1736e7",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:20"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2093,
+      "endByte": 2224,
+      "sourceSpanSha256": "9ff7ab25d7c6737a2861badb058cdb6c9b8ad6913dfe8059c69dda98f9081275",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:32"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2225,
+      "endByte": 2359,
+      "sourceSpanSha256": "422a2aa90a7e80dc089e97af43643b9fb0aa2b378c52045e19ae4844800a97ed",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:33"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2360,
+      "endByte": 2468,
+      "sourceSpanSha256": "3837020ea3ad5896b048e0188d82c57e29224736ec7fca1dce238079a25e6d15",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:34"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2469,
+      "endByte": 2577,
+      "sourceSpanSha256": "b81e7ae9c0dbe26ad1334aebc0118b14e8e9cf9fbb569cdc644ce4769f1f8ef3",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:35"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2578,
+      "endByte": 2671,
+      "sourceSpanSha256": "5e3350dcbb10ee248ea65fea52843705b8f702c37ed6d66583a44e329bd07738",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:36"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2672,
+      "endByte": 2797,
+      "sourceSpanSha256": "cd3804f7eb34c97bea93d8f1bbfcbafbadf1cb14cf9ed288380c7fe5c8d792bc",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:37"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 3263,
+      "endByte": 3453,
+      "sourceSpanSha256": "1dccc28e5a4aa574af143f452a28b2b89c8615bfca7c407bb926d0363e394d8c",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:48"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 3857,
+      "endByte": 3968,
+      "sourceSpanSha256": "a3814e16198594e82f1b17f680288359368b9363b2f4e401893e3ea57139d586",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:56"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.mjs",
+      "sourceRevision": "sha256:c0898784004e9d02f54eaf34d010a626334aab629e8a5a5055677bbaf0c6f9e4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 4183,
+      "endByte": 4279,
+      "sourceSpanSha256": "b151dba4988824c0537b29f4bfc66fd9221040be43fc768fc86bd4289a3f89b3",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.mjs:61"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/agentic-repair-evidence-readiness-v1.test.mjs",
+      "sourceRevision": "sha256:02ebc6f37a2aad08227118eca0d9a25670dd24636bebbabe81cb22b5870db6ad",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 306,
+      "endByte": 372,
+      "sourceSpanSha256": "419cc9e9360c351e69a13091041a3b264298ca8950c780ec112155a060f6009a",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "TEST_ONLY",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\agentic-repair-evidence-readiness-v1.test.mjs:6"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-readonly-proof-adapters-v1.mjs",
+      "sourceRevision": "sha256:bc1313c376f6a813ad4e96f6fc30341de771bbbe42278f2a8e29e3f0b18fc421",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2687,
+      "endByte": 2772,
+      "sourceSpanSha256": "3e9ecded95c41526f0ae628d7dc23b90cdc10a43ed770ee98b717b4fb945d280",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-readonly-proof-adapters-v1.mjs:32"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-readonly-proof-adapters-v1.mjs",
+      "sourceRevision": "sha256:bc1313c376f6a813ad4e96f6fc30341de771bbbe42278f2a8e29e3f0b18fc421",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2773,
+      "endByte": 2864,
+      "sourceSpanSha256": "87be36a0961652d4387a911e759ac6bbbc05f1976c3c5ad91205524463a03857",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-readonly-proof-adapters-v1.mjs:33"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-readonly-proof-adapters-v1.mjs",
+      "sourceRevision": "sha256:bc1313c376f6a813ad4e96f6fc30341de771bbbe42278f2a8e29e3f0b18fc421",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2865,
+      "endByte": 2955,
+      "sourceSpanSha256": "1c781de024f3aaecb97419c11c32b9975e7bea8dc0b233279ac76b93c90c17d6",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-readonly-proof-adapters-v1.mjs:34"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-readonly-proof-adapters-v1.mjs",
+      "sourceRevision": "sha256:bc1313c376f6a813ad4e96f6fc30341de771bbbe42278f2a8e29e3f0b18fc421",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2956,
+      "endByte": 3042,
+      "sourceSpanSha256": "8062136e0f458d001159a0eee22181f7d89a51d6614e5687e2b2e1f4bf02fdc7",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-readonly-proof-adapters-v1.mjs:35"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-readonly-proof-adapters-v1.mjs",
+      "sourceRevision": "sha256:bc1313c376f6a813ad4e96f6fc30341de771bbbe42278f2a8e29e3f0b18fc421",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 3043,
+      "endByte": 3122,
+      "sourceSpanSha256": "6bbede3422a6d68f63a662b9c551084d73aa62a486c85e9e8fe77f9497be90c5",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-readonly-proof-adapters-v1.mjs:36"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-task-evidence-chain-crosswalk-v1.mjs",
+      "sourceRevision": "sha256:451b6e70ff33f49aaa984f8bb4e01f996249476d5e81547f8a8d3e02491e6ed4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 75,
+      "endByte": 154,
+      "sourceSpanSha256": "e51d2ea597916a180a5c48430e0a131cd22776a79384769b7e62316503a9b1fc",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-task-evidence-chain-crosswalk-v1.mjs:2"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-task-evidence-chain-crosswalk-v1.mjs",
+      "sourceRevision": "sha256:451b6e70ff33f49aaa984f8bb4e01f996249476d5e81547f8a8d3e02491e6ed4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2488,
+      "endByte": 2567,
+      "sourceSpanSha256": "42fd0947cd2157a63c2c9b74157bad75e61c0acb0370aa91cc3aa7fe3540467a",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-task-evidence-chain-crosswalk-v1.mjs:37"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-task-evidence-chain-crosswalk-v1.mjs",
+      "sourceRevision": "sha256:451b6e70ff33f49aaa984f8bb4e01f996249476d5e81547f8a8d3e02491e6ed4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2568,
+      "endByte": 2667,
+      "sourceSpanSha256": "09ef9f3158e97b9ff338013f8220c57dcdee9ae018ccdbe1749d7dbdc67e4822",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-task-evidence-chain-crosswalk-v1.mjs:38"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-task-evidence-chain-crosswalk-v1.mjs",
+      "sourceRevision": "sha256:451b6e70ff33f49aaa984f8bb4e01f996249476d5e81547f8a8d3e02491e6ed4",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2668,
+      "endByte": 2746,
+      "sourceSpanSha256": "f40ae29216b09528723c72b5dcfc8f15334037f4871e29b1af42df3bcc638d69",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-task-evidence-chain-crosswalk-v1.mjs:39"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/atlas-workstation-goal-gates-v1.mjs",
+      "sourceRevision": "sha256:b9536af6457622bfb1177462253bcd85b7c7033b22e8b9aee8fbd523e362a0b7",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 1759,
+      "endByte": 1849,
+      "sourceSpanSha256": "d5e7b606ca90c1f37f974004ed16445518ec378af6b62eb77e4ea64b5b67204e",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\atlas-workstation-goal-gates-v1.mjs:31"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/domain-normalization-review-v1.mjs",
+      "sourceRevision": "sha256:0924b133828d7862dac9438ecdb6113104b9f6c445584ba47ec030b248c0a42b",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 71,
+      "endByte": 147,
+      "sourceSpanSha256": "a13b4203cbfacc3fb5a588d377f502b446c28575dd5f59481467b650a358fc8e",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\domain-normalization-review-v1.mjs:2"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/feature-placeholder-regex-model.mjs",
+      "sourceRevision": "sha256:960e506fe9589993b2e75ea1928f8ca19f68b28bf9589b9847f2d0a98aa34fba",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 53,
+      "endByte": 128,
+      "sourceSpanSha256": "0037cd3ae89cf98c98b127baed236ea6fbc436099ddd209e79141e930cedb833",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\feature-placeholder-regex-model.mjs:2"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/feature-placeholder-regex-model.mjs",
+      "sourceRevision": "sha256:960e506fe9589993b2e75ea1928f8ca19f68b28bf9589b9847f2d0a98aa34fba",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 129,
+      "endByte": 204,
+      "sourceSpanSha256": "d7f92bdab3f54cc39c78c05a8d5096e1218d5fc80cb024916ef14fc59dbd9b60",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\feature-placeholder-regex-model.mjs:3"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 303,
+      "endByte": 378,
+      "sourceSpanSha256": "ee904fd86854b69329cde6a34e3145f366324653faabe5dbd8daeeb5b2fa805f",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:8"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 454,
+      "endByte": 527,
+      "sourceSpanSha256": "e05eefdfb82f1147da251a2bc1f2a11f29a96151e29568a0f74bf81319a89ebf",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:10"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 605,
+      "endByte": 677,
+      "sourceSpanSha256": "2b024d6c09c32e8f76cb453b8a066e2220cdc9a685611525c60bb11bedb5910c",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:12"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 825,
+      "endByte": 900,
+      "sourceSpanSha256": "2c391c029cdbbfd0ca97d12955506e10aa0fa223d8da6c9a0811cf71cbd8d37c",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.9,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:15"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 966,
+      "endByte": 1036,
+      "sourceSpanSha256": "c4c4afb391cc1dc1966108898d1a7d0cd8a7fb77900ceaa3c68a19a7cee0052c",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:17"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-registry-approval-boundary-v1.mjs",
+      "sourceRevision": "sha256:67e0a2cac5bc350a2c21b38df774a7d89c25d0873265df48005dc45de4f3ea5c",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 3518,
+      "endByte": 3713,
+      "sourceSpanSha256": "3d99e585e520c2e792106d62523c169b006a10526c72378a3c398033a7bb6565",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-registry-approval-boundary-v1.mjs:64"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-review-receipt-gate-v1.mjs",
+      "sourceRevision": "sha256:de97bb871cf4a8d2efa5886a4ca943d825a37280bf3df721d9ea8ffda27691da",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 66,
+      "endByte": 140,
+      "sourceSpanSha256": "1f90256074dea1556936271094d9478ab856a1b8549c515bae20cd454bb9f8be",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-review-receipt-gate-v1.mjs:2"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/orf-review-receipt-gate-v1.mjs",
+      "sourceRevision": "sha256:de97bb871cf4a8d2efa5886a4ca943d825a37280bf3df721d9ea8ffda27691da",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 141,
+      "endByte": 214,
+      "sourceSpanSha256": "1e8fee22e5ee24baa0fd9b9d20bb00ed5a5f500206df5886842fe488f693d5a9",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\orf-review-receipt-gate-v1.mjs:3"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-evidence-fabric-readback-v1.mjs",
+      "sourceRevision": "sha256:7b3d67b1817517979c2d898527e268d99e2e14e001ecfbb8492ec2cfc40fd922",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2324,
+      "endByte": 2415,
+      "sourceSpanSha256": "a13f0a5677d7700bad68951a5efe0069b9aa4f0ce8c4c7d960bc60af09fa15c7",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-evidence-fabric-readback-v1.mjs:27"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-evidence-fabric-readback-v1.mjs",
+      "sourceRevision": "sha256:7b3d67b1817517979c2d898527e268d99e2e14e001ecfbb8492ec2cfc40fd922",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2416,
+      "endByte": 2510,
+      "sourceSpanSha256": "cc9259e5a873a0982603412d63fe51b5679cb10ceb9f8cfcefaa97626cfb0bcd",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-evidence-fabric-readback-v1.mjs:28"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-evidence-fabric-readback-v1.mjs",
+      "sourceRevision": "sha256:7b3d67b1817517979c2d898527e268d99e2e14e001ecfbb8492ec2cfc40fd922",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 2511,
+      "endByte": 2602,
+      "sourceSpanSha256": "92a450e6241fefa120890c7a8a35e0c7de8ab8747a9d2544b6dc4e1881ebcd59",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-evidence-fabric-readback-v1.mjs:29"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-fact-manifest-readback-v1.mjs",
+      "sourceRevision": "sha256:a214bd1be47471df9c6a5f116cfa0fdbdef96199808dcc50b518a7260cde2602",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 86,
+      "endByte": 175,
+      "sourceSpanSha256": "881bf52686efb6892a5126dc7be7068f9112f8569dc2e82fa7c00a18b0c2877f",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-fact-manifest-readback-v1.mjs:2"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-fact-manifest-readback-v1.mjs",
+      "sourceRevision": "sha256:a214bd1be47471df9c6a5f116cfa0fdbdef96199808dcc50b518a7260cde2602",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 176,
+      "endByte": 253,
+      "sourceSpanSha256": "0fe128d491ee146dcd3df838dfc73608b6ee4c00a43025645fd906380e3b5aca",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-fact-manifest-readback-v1.mjs:3"
+      ],
+      "mutationAllowed": false
+    },
+    {
+      "sourceRef": "scripts/atlas/lib/verify-fact-manifest-readback-v1.mjs",
+      "sourceRevision": "sha256:a214bd1be47471df9c6a5f116cfa0fdbdef96199808dcc50b518a7260cde2602",
+      "workspaceRevision": "UNKNOWN_WORKSPACE_REV",
+      "language": "mjs",
+      "symbolName": null,
+      "startByte": 254,
+      "endByte": 343,
+      "sourceSpanSha256": "2ef45e3bbe0a7988c3ae15dd6d19c96757f1479b5331bed1cb8b9546ef3bed5a",
+      "category": "TODO_WITH_OWNER",
+      "confidence": 0.75,
+      "productionReachability": "UNKNOWN",
+      "evidenceRefs": [
+        "scripts\\atlas\\lib\\verify-fact-manifest-readback-v1.mjs:4"
+      ],
+      "mutationAllowed": false
+    }
+  ]
+}

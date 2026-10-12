@@ -30,6 +30,7 @@ describe('workspace exact promotion source reader', () => {
     expect(result.file_sha256).toBe(hash(bytes));
     expect(result.span_sha256).toBe(hash(Buffer.from('π', 'utf8')));
     expect(result.span_byte_length).toBe(2);
+    expect(result.span_utf8_valid).toBe(true);
   });
 
   it('rejects traversal and spans outside the file', async () => {
@@ -40,5 +41,18 @@ describe('workspace exact promotion source reader', () => {
 
     expect((await reader({ source_ref: '../outside.ts', span_start: 0, span_end: 1 })).file_found).toBe(false);
     expect((await reader({ source_ref: 'file.ts', span_start: 0, span_end: 99 })).file_found).toBe(false);
+  });
+
+  it('reports spans that split a multibyte UTF-8 character', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'atlas-exact-promotion-'));
+    roots.push(root);
+    const bytes = Buffer.from('π', 'utf8');
+    await writeFile(path.join(root, 'file.ts'), bytes);
+    const reader = createWorkspaceExactPromotionSourceReader(root);
+
+    const result = await reader({ source_ref: 'file.ts', span_start: 0, span_end: 1 });
+    expect(result.file_found).toBe(true);
+    expect(result.span_found).toBe(true);
+    expect(result.span_utf8_valid).toBe(false);
   });
 });

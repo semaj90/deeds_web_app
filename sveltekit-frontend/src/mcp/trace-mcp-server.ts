@@ -9520,6 +9520,14 @@ server.registerTool(
   }
 );
 
+// Stage-tagged dense-search failure. Keeps only the stage name and the underlying error code
+// (for example ECONNREFUSED). URLs, hosts, and raw messages are never copied into the error.
+function denseSearchStageError(stage: string, err: unknown): Error {
+  const code = (err as { cause?: { code?: unknown } } | null)?.cause?.code;
+  const safeCode = typeof code === 'string' && /^[A-Z][A-Z0-9_]{1,39}$/.test(code) ? code : 'UNKNOWN';
+  return new Error(`DENSE_SEARCH_STAGE_FAILED:${stage}:cause=${safeCode}`);
+}
+
 // ── atlas.packet_dense_search ────────────────────────────────────────────────
 // Two-stage retrieval: (1) Postgres bitmap-prefilter over atlas_packets, reusing the table's
 // existing GIN/btree indexes (feature_id/tags/concept_ids/domain_class/workspace_revision) so
@@ -9595,7 +9603,12 @@ server.registerTool(
 
       let vector = query_vector;
       if (!vector?.length) {
-        const embedded = await embedQueryForLane(query_text!, 'dense_768');
+        let embedded: Awaited<ReturnType<typeof embedQueryForLane>>;
+        try {
+          embedded = await embedQueryForLane(query_text!, 'dense_768');
+        } catch (err) {
+          throw denseSearchStageError('EMBED_QUERY', err);
+        }
         vector = Array.from(embedded.vector);
       }
 
@@ -9603,13 +9616,22 @@ server.registerTool(
         {
           db: pool,
           queryQdrantPoints: async (col, body) => {
-            const r = await fetch(`${QDRANT_URL}/collections/${col}/points/query`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(body),
-              signal: AbortSignal.timeout(8_000),
-            });
-            return (await r.json()) as Awaited<ReturnType<QdrantPointsQueryFn>>;
+            let r: Response;
+            try {
+              r = await fetch(`${QDRANT_URL}/collections/${col}/points/query`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: AbortSignal.timeout(8_000),
+              });
+            } catch (err) {
+              throw denseSearchStageError('QDRANT_QUERY', err);
+            }
+            try {
+              return (await r.json()) as Awaited<ReturnType<QdrantPointsQueryFn>>;
+            } catch (err) {
+              throw denseSearchStageError('QDRANT_RESPONSE', err);
+            }
           },
         },
         {

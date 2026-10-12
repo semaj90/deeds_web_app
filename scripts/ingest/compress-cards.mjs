@@ -16,8 +16,7 @@
  *   - cap total tokens (approx 4 chars per token)
  *
  * Outputs:
- *   .opencode/ace-packet.json        — compact ranked packet for ACE context
- *   .opencode/ace-packet-summary.md  — human-readable summary
+ *   .opencode/candidates/            — unadmitted packet and summary proposals
  *
  * Usage:
  *   node scripts/ingest/compress-cards.mjs --budget 6000
@@ -26,14 +25,13 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { CARDS_DIR } from '../atlas/_neschrom-paths.mjs';
 
 const ROOT        = process.cwd();
-const CARDS_DIR   = path.join(ROOT, '.opencode', 'cards');
 const TMP_DIR     = path.join(ROOT, '.tmp');
 const OUT_DIR     = path.join(ROOT, '.opencode');
+const CANDIDATE_DIR = path.join(OUT_DIR, 'candidates');
 const REPORT_IN   = path.join(TMP_DIR, 'retrieval-ranking-report.json');
-const OUT_PACKET  = path.join(OUT_DIR, 'ace-packet.json');
-const OUT_SUMMARY = path.join(OUT_DIR, 'ace-packet-summary.md');
 
 const args        = process.argv.slice(2);
 const DRY_RUN     = args.includes('--dry-run');
@@ -137,6 +135,10 @@ async function main() {
   console.log(`\n── Compress Cards ────────────────────────────────────────`);
   console.log(`  budget : ${TOKEN_BUDGET} tokens (~${CHAR_BUDGET} chars)${DRY_RUN ? '  [dry-run]' : ''}`);
 
+  if (args.includes('--promote')) {
+    throw new Error('ACE_PROMOTION_DISABLED: candidate packets require separate review and admission');
+  }
+
   // Load ranked report
   let report;
   try {
@@ -147,6 +149,9 @@ async function main() {
   }
 
   const { query, ranked: rankedEntries } = report;
+  if (!Array.isArray(rankedEntries) || rankedEntries.length === 0) {
+    throw new Error('NO_RANKED_CANDIDATES: ranking report must contain a non-empty ranked array');
+  }
   console.log(`  ranked entries: ${rankedEntries.length}`);
 
   // Load quarantine list (skip any quarantined card IDs)
@@ -176,10 +181,17 @@ async function main() {
   // Load full card texts for top candidates (load 2× budget to allow trimming)
   const candidates = deduped.slice(0, Math.min(deduped.length, TOP_LOAD));
   const cardMap = new Map();
-  const files = await fs.readdir(CARDS_DIR).catch(() => []);
+  let files;
+  try {
+    files = await fs.readdir(CARDS_DIR);
+  } catch (error) {
+    if (error?.code === 'ENOENT') throw new Error(`INPUT_DIRECTORY_MISSING: ${CARDS_DIR}`);
+    throw error;
+  }
+  const jsonFiles = files.filter((file) => file.endsWith('.json'));
+  if (jsonFiles.length === 0) throw new Error(`NO_SOURCE_CARDS: ${CARDS_DIR}`);
   let genIdCounter = 1;
-  for (const f of files) {
-    if (!/\.json$/.test(f)) continue;
+  for (const f of jsonFiles) {
     try {
       const c = JSON.parse(await fs.readFile(path.join(CARDS_DIR, f), 'utf8'));
       // ensure every card has a stable id
@@ -258,6 +270,8 @@ async function main() {
 
   // Build packet
   const packet = {
+    status: 'CANDIDATE_NOT_ADMITTED',
+    canonicalAuthority: false,
     generatedAt:   new Date().toISOString(),
     query,
     tokenBudget:   TOKEN_BUDGET,
@@ -270,7 +284,9 @@ async function main() {
 
   // Build summary markdown
     const summaryLines = [
-    `# ACE Packet Summary`,
+    `# ACE Packet Candidate Summary`,
+    ``,
+    `Status: CANDIDATE_NOT_ADMITTED (not active OpenCode context)`,
     ``,
     `Generated: ${packet.generatedAt}`,
     `Query: "${query}"`,
@@ -289,13 +305,31 @@ async function main() {
   const summaryMd = summaryLines.join('\n');
 
   if (!DRY_RUN) {
-    await fs.mkdir(OUT_DIR, { recursive: true });
-    await fs.writeFile(OUT_PACKET,  JSON.stringify(packet, null, 2), 'utf8');
-    await fs.writeFile(OUT_SUMMARY, summaryMd, 'utf8');
-    console.log(`\n  ✅ wrote ${OUT_PACKET}`);
-    console.log(`  ✅ wrote ${OUT_SUMMARY}`);
+    const { createHash } = await import('node:crypto');
+    const sha = (s) => `sha256:${createHash('sha256').update(s, 'utf8').digest('hex')}`;
+    const ts = packet.generatedAt.replace(/[:.]/g, '-');
+    await fs.mkdir(CANDIDATE_DIR, { recursive: true });
+    const candidatePath = path.join(CANDIDATE_DIR, `ace-packet-${ts}.json`);
+    const candidateSummaryPath = path.join(CANDIDATE_DIR, `ace-packet-summary-${ts}.md`);
+
+    if (packedCards.length === 0) {
+      await fs.writeFile(candidatePath, JSON.stringify(packet, null, 2), { encoding: 'utf8', flag: 'wx' });
+      await fs.writeFile(candidateSummaryPath, summaryMd, { encoding: 'utf8', flag: 'wx' });
+      console.error(`\n  ❌ NO_PACKABLE_CARDS: empty candidate preserved at ${candidatePath}; active packet unchanged`);
+      process.exitCode = 1;
+      console.log(`──────────────────────────────────────────────────────────\n`);
+      return;
+    }
+
+    const packetText = JSON.stringify(packet, null, 2);
+    const summaryText = `${summaryMd}\n\nCandidate packet checksum: ${sha(packetText)}\n`;
+    await fs.writeFile(candidatePath, packetText, { encoding: 'utf8', flag: 'wx' });
+    await fs.writeFile(candidateSummaryPath, summaryText, { encoding: 'utf8', flag: 'wx' });
+    console.log(`\n  ✅ candidate only: ${candidatePath}`);
+    console.log(`  ✅ candidate summary: ${candidateSummaryPath}`);
+    console.log('  ℹ active packet unchanged; promotion requires a separate reviewed owner');
   } else {
-    console.log(`\n  dry-run: would write ${packedCards.length} cards to ${OUT_PACKET}`);
+    console.log(`\n  dry-run: would write ${packedCards.length} cards under ${CANDIDATE_DIR}`);
   }
 
   console.log(`──────────────────────────────────────────────────────────\n`);

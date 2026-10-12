@@ -1180,3 +1180,176 @@ not establish a newly promoted model, admitted source classification, or an Open
   `NEURAL_DECODER_PREFILL_SHADOW_ENABLED` with default `false`; shadow output is documented not to
   affect ranking or canonical state. This is distinct from the learned domain-classifier bridge,
   for which no production call site was found.
+
+### Domain classification, documentation, and agentic retrieval implementation gates (2026-10-12)
+
+The implementation plan is `docs/.okf/architecture/domain-classification-indexing-implementation-v1.md`.
+It reuses existing owners and is non-authoritative. Do not add a parallel feature table, packet
+registry, vector index, or ranking/fusion owner.
+
+The proposal envelope JSON Schema is `docs/.okf/schemas/domain-classification-batch-v1.schema.json`;
+the runtime row/batch authority is the strict Zod contract in
+`sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts`, and the proposal
+adapter now validates emitted envelopes against it. JSON Schema/Zod parity is still unverified.
+This does not make proposal rows persistable.
+
+- [ ] CLASS-INDEX-01 Reconcile the bounded `.okf` `rows[]` proposal schema with the existing
+  `feature_domain_facts` Drizzle owner. The current unique key is
+  `(packet_key, classifier_version, content_hash)`; proposal identity also carries subject kind,
+  source/workspace, taxonomy, producer, and classifier revisions. Define a lossless key/revision
+  mapping and digest representation before proposing any upsert. Keep rows proposal-only until
+  canonical packet/source resolution and authorized readback exist.
+- [ ] CLASS-INDEX-01A Wire `resolveDomainClassificationPacketCrosswalkV1()` to a read-only exact
+  packet-row provider and the existing PacketKeyResolutionV2 owner. A repeatable-read, read-only
+  PostgreSQL provider now exists; its focused tests are authored but not run. Independently verify
+  the packet row scope and live caller; keep multiple source refs, stale workspace/source revisions,
+  duplicate packet matches, and unresolved aliases blocked. The provider's
+  `MATCHED_NOT_ADMITTED` is not a persistence or evidence-admission receipt.
+- [ ] CLASS-INDEX-02 Reconcile `.okf` publication envelopes to exact fetched document identity,
+  license/scope, extractor revision, and same-grain raw/normalized content digests. Preserve
+  missing, orphaned, and changed-content records as reason-coded cases; do not auto-publish or
+  embed unmatched pages.
+- [ ] CLASS-INDEX-03 After source/packet/chunk eligibility, use the existing EmbeddingGemma
+  `semantic_768` owner and PostgreSQL vector rows; reconcile the existing Qdrant `content`
+  projection. Keep FTS/trigram, AST/symbol, semantic, and graph retrieval as distinct lanes with
+  SearchRuntime as sole normalization/fusion owner.
+- [ ] CLASS-INDEX-04 Build a read-only symbol/document LUT from the integrity-checked candidate
+  ordinal map and canonical symbol/version rows. Bind exact UTF-8 spans, code/document revisions,
+  taxonomy revision, and checksums. Preserve one-to-many reverse lookup and reject ambiguous
+  names; do not publish a production TOC without authorized source and document owners.
+- [ ] CLASS-INDEX-05 Keep LangExtract/FastAPI and Ornith summaries grounded in qualified source
+  bytes. Record extractor/model/prompt revisions and exact evidence refs. NLP extraction and
+  summarization remain proposals; neither may mint byte spans, ontology tuples, or admission.
+- [ ] CLASS-INDEX-06 Evaluate the existing deterministic SearchRuntime ranking first on a frozen
+  query/candidate snapshot. HMM/Viterbi, feature labels, PCA/SVD/low-rank heads, centroids, radix
+  sort, and 4D coordinates may only recommend bounded routes/context after held-out evaluation;
+  none may add a retrieval vote or override tool permissions.
+- [ ] CLASS-INDEX-07 Keep DuckDB, worker pools, SIMDJSON/N-API, RAPIDS/cuGraph/cuVS, and GPU
+  batching as measured execution options over frozen qualified inputs. Retain current CPU/V8
+  fallbacks; no new Redis/Valkey keys, Qdrant collection, PostgreSQL index, or GPU work until
+  profiling and resource admission justify it.
+- [ ] CLASS-INDEX-08 Assemble only independently verified source evidence through the existing
+  ACE/ContextManifest owners, then bind synthesis to the exact verified manifest receipt. Keep
+  ontology-backed claims blocked without a grounded, admitted tuple and independent readback.
+- [ ] CLASS-INDEX-09 Propose any PostgreSQL 18 migration/index only after CLASS-INDEX-01 defines
+  a lossless conflict key and source lineage contract. Reuse Drizzle/migration ownership and
+  existing GIN/BTREE/pgvector indexes where appropriate; AIO/bitmap scans are planner behavior,
+  not a separate table or correctness contract. No migration, upsert, crawl, embedding, or store
+  write was performed for this ledger update.
+
+**2026-10-12 source-owner reconciliation:** The existing CPU CandidateFeatureMatrix adapter already
+owns the strict matrix receipt, row/matrix checksums, serialization, and independent serialized
+readback helper; reuse it rather than adding another receipt format. The default DAG AST-grep
+refinement handler already delegates to `extractAstGrepStructuralCandidates`; do not create a
+parallel extractor. These are source-owner findings, not fresh test or live-runtime evidence.
+The read-only PostgreSQL proposal crosswalk/provider remains `MATCHED_NOT_ADMITTED` and is not an
+upsert gate. Tests and live checks remain paused at the operator's request.
+
+**2026-10-12 matrix identity hardening (authored, not executed):** Serialized matrix readback now
+requires the original `CandidateOrdinalMapV1`, independently revalidates its schema and checksum,
+and compares each row's canonical ID, packet key, symbol version, source/workspace revisions, and
+ordinal. A self-consistent serialized payload can no longer self-assert its candidate map. Focused
+regressions now cover tampered rows and a valid-but-different frozen map; they were intentionally
+not run. This remains fixture-level code until an authorized live snapshot provider and independent
+readback are wired.
+
+**2026-10-12 diagnostic symbol LUT (authored, not executed):** The existing bounded symbol TOC
+diagnostic projection now emits deterministic key/value reverse lookups for candidate ordinal,
+symbol version, qualified name, source reference, and exact matched documentation revision. Values
+remain one-to-many arrays so ambiguous names are not silently collapsed. The LUT is included in the
+diagnostic checksum and remains unpublished, non-authoritative, and non-admissive. Focused fixtures
+were updated but not run; no canonical index or database/cache write was introduced.
+
+`lookupSymbolTocDiagnosticV1()` now performs bounded exact-key lookup against the projection,
+recomputes its checksum, and returns candidate ordinals with the frozen snapshot revisions only.
+Lookup results remain `NOT_ADMITTED`; missing, ambiguous, malformed, or oversized results fail
+closed. Fixtures were authored but not executed, and the helper does not call SearchRuntime.
+
+`resolveSymbolTocCandidatesV1()` additionally accepts the independently supplied
+`CandidateOrdinalMapV1`, verifies its checksum and snapshot/workspace identity against the projection,
+then checks each candidate's packet/source/revision identity against the source-readback-matched
+symbol row. It returns candidate-only records, never ranks or admits them. Its regressions are
+authored but not run; a live authorized map/source provider and SearchRuntime caller remain open.
+
+Validation was intentionally not run at the operator's request. These entries are open work,
+not test results or production proof.
+
+**2026-10-12 indexing layout decision (documentation only):** The CPU-first index is separated
+into reviewed documentation, canonical packet/chunk candidates, domain/feature facts, canonical
+`semantic_768` with Qdrant `content` as a rebuildable mirror, symbol/document reverse LUT, admitted
+graph projection, and revision-qualified cache hints. The strict `.okf` `rows[]` schema remains a
+proposal/interchange envelope, not a SQL table. `feature_label`, summary, domain class, taxonomy
+identity, three-part display `title_id`, packet identity, and ontology admission remain separate.
+Existing `feature_domain_facts` has `(packet_key, classifier_version, content_hash)` uniqueness but
+does not declare the proposal's full independent source/workspace/taxonomy/producer revision set.
+Therefore no new table, `ALTER`, upsert, index DDL, crawl, embedding, cache write, GPU run, or test is
+authorized by this implementation pass. Use existing PostgreSQL indexes and let its planner choose
+bitmap/AIO execution. Continue with source-cohort reconciliation and CPU/read-only owner wiring;
+performance challengers and low-rank/manifold routing remain later advisory work. This note is
+design direction only; no gate is complete and validation remains paused by the operator.
+
+**Proof-chain owner gap (source/DDL review only):** `createDrizzleContextManifestPersistence()`
+persists the legacy ACE `ContextManifest`, while `buildContextManifestV2()` is a separate builder;
+`atlas_context_manifests` stores legacy selection/token metrics, not the serialized V2 identity
+input, canonical checksum, selected evidence revisions, or independent readback receipt. The inspected
+`atlas_ontology_linked_tuples` receives `source_revision` and `workspace_revision` in the existing
+manual additive migration; those fields still require exact authoritative row readback and
+comparison with the evidence receipt. Therefore the existing fixture-only proof verifier cannot be promoted to `LIVE_PROVEN` from these persistence
+rows. Keep this gate open until an authorized owner supplies complete, immutable readback contracts;
+no migration, table, write, or status promotion was made by this review.
+
+The actual `POST /api/atlas/mastra-agent` caller recomputes the supplied V2 identity and checks
+PromptPlan/evidence-segment consistency, but all those values arrive in the same request; there is
+no independent manifest/source/task/tuple readback in that route. Its output remains
+`canonicalAuthority: false`. A checksum-consistent caller payload is not a readback receipt; keep
+the synthesis proof gate open until the route resolves each identity through its owning provider.
+
+The V2-aware Redis context-pack read validates a cached manifest checksum but has no caller outside
+its own module and is not canonical readback. `atlas_feature_snapshots.manifest_json` belongs to the
+graph-snapshot projection, not ContextManifestV2. No existing durable V2 readback owner was found
+in source; this is not a live-store census. Do not treat either as proof or add a second manifest
+authority to work around the missing owner.
+
+**ContextManifestV2 readback implementation (authored, unexecuted):** Added a design-unapplied
+Postgres readback table keyed by the existing V2 `identityChecksum`, a read/immutable-insert owner
+that validates the V2 identity and complete payload checksum, and a Mastra route gate that refuses
+model execution when the stored row is absent or differs from the request. The owner returns only
+`READBACK_MATCH_NOT_ADMITTED`; it never claims evidence admission or canonical authority. The
+migration remains unapplied, the V2 admission producer is not connected to the store, and source
+bytes/task receipts/ontology tuple are not yet independently read by this route. Focused regressions
+were authored but intentionally not run at the operator's request. Keep the production proof gate
+open.
+
+- [ ] CLASS-INDEX-00 Validate the new `.okf` batch JSON Schema against the runtime Zod contract
+  and representative proposal/unavailable envelopes; keep this validation separate from database
+  admission and do not run it until validation is resumed.
+
+**2026-10-12 live-shadow provider owner audit (source declarations only):**
+`ChunkRetrievalProfileV2` has a strict schema/checksum verifier and a pure hydration adapter, but
+the inspected application callers do not establish a persisted, request-scoped profile producer.
+`atlas_observation_feature_rows` contains `feature_revision`, `producer_revision`, source/workspace
+lineage, and evidence refs; it does not declare the three supplement values
+`retrieval_frequency`, `execution_utility`, and `process_fit`, nor distinct revisions for those
+producers. A repository source/schema search found those metrics in contracts and fixture/compiler
+logic, but not as persisted columns or a live request-scoped producer. `atlas_feature_profiles` is a
+label-keyed catalog and cannot substitute for chunk profiles. Do not invent a SQL join, default
+score, or `featureRevision` to manufacture a provider. Keep `contextManifestShadow.resolveFeatureSources`
+and the production route unwired until the actual profile producer and three independently
+revision-qualified supplement owners are identified and independently read back. Do not infer
+`featureRevision` or `ontologyRevision` from `producerRevision`. This was a source review only;
+tests, typechecks, DB queries, and live services remain paused at the operator's request.
+
+**2026-10-12 shadow source-binding boundary (authored, not executed):** The shadow preflight now
+requires a `GroundedExtractionSourceBindingReceiptV1` for the reopened UTF-8 source and reuses
+`assertGroundedExtractionSourceBindingReceiptV1()` to validate packet/source/workspace revisions,
+byte count, submitted-byte digest, source-binding digest, and receipt checksum. It also requires the
+declared source revision to match the reopened bytes and retains exact UTF-8 span checks. This
+prevents byte matching alone from being reported as canonical source authority. The callback is
+optional for production: the bridge now defaults to the existing read-only
+`resolveGroundedExtractionSourceBindingV1()` owner; fixture injection remains available. The
+existing AST-grep owner now exports `readConfinedRepositorySourceBytesV1()` and
+`createCandidateOrdinalSourceReaderV1()`. The shadow provider uses the latter by default, bound to
+its validated request ordinal map and trusted repository root; the injectable byte reader remains
+only as a fixture seam. The production route still does not supply its live SearchRuntime map/root.
+Profile/supplement owners also remain unresolved. Fixture receipts and negative regressions are
+unrun; the route remains unwired.

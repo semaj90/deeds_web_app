@@ -3,9 +3,16 @@ import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import pg from 'pg';
 import { buildPortfolioCensus } from './audit-openspec-evidence-fabric-v1.mjs';
 import { buildOpenSpecTaskCardReportV1, evaluateTaskEvidenceAdmissionV1 } from './lib/openspec-task-card-v1.mjs';
 import { verifyProofChainV1 } from './lib/proof-chain-verifier-v1.mts';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { verifyOntologyTupleSourceReadbackFromPostgresV1 } from './lib/ontology-tuple-source-readback-v1.mts';
+import {
+  CONTEXT_MANIFEST_V2_READONLY_SQL_V1,
+  verifyContextManifestV2ReadbackRowV1,
+} from '../../sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2-readback-contract-v1.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const artifactKeys = ['taskCard', 'evidenceTask', 'evidenceCard', 'receipt', 'receiptBindings', 'ontologyTuple', 'contextManifest'] as const;
@@ -54,7 +61,37 @@ function independentlyReadArtifacts(files: Record<string, string>): Record<strin
   return JSON.parse(child.stdout);
 }
 
-async function runCurrentTask(changeId: string, taskId: string, tuplePath?: string, manifestPath?: string): Promise<void> {
+async function readContextManifestOwnerV1(pool: pg.Pool, identityChecksum: string): Promise<Record<string, unknown>> {
+  let client: pg.PoolClient | null = null;
+  let transactionOpen = false;
+  try {
+    client = await pool.connect();
+    await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+    transactionOpen = true;
+    await client.query("SET LOCAL statement_timeout = '10000ms'");
+    const result = await client.query(CONTEXT_MANIFEST_V2_READONLY_SQL_V1, [identityChecksum]);
+    if (result.rows.length > 1) {
+      return {
+        schema: 'atlas.context-manifest-v2-readback.v1', status: 'BLOCKED',
+        reason: 'IDENTITY_CHECKSUM_AMBIGUOUS', manifest: null, identityChecksum: null,
+        payloadChecksum: null, canonicalAuthority: false, writesPerformed: false,
+      };
+    }
+    return verifyContextManifestV2ReadbackRowV1(result.rows[0] ?? null, identityChecksum);
+  } catch (error) {
+    return {
+      schema: 'atlas.context-manifest-v2-readback.v1', status: 'BLOCKED',
+      reason: 'MANIFEST_READBACK_OWNER_UNAVAILABLE', detail: error instanceof Error ? error.message : String(error),
+      manifest: null, identityChecksum: null, payloadChecksum: null,
+      canonicalAuthority: false, writesPerformed: false,
+    };
+  } finally {
+    if (client && transactionOpen) await client.query('ROLLBACK').catch(() => {});
+    client?.release();
+  }
+}
+
+async function runCurrentTask(changeId: string, taskId: string, tuplePath?: string, manifestPath?: string, tupleId?: string): Promise<void> {
   const workboardProcess = spawnSync(process.execPath, [
     path.join(ROOT, 'scripts/atlas/build-openspec-workboard-v1.mjs'),
     '--task-snapshot-stdout',
@@ -76,6 +113,26 @@ async function runCurrentTask(changeId: string, taskId: string, tuplePath?: stri
   if (evidenceTasks.length !== 1 || evidenceCards.length !== 1) throw new Error('CURRENT_TASK_EVIDENCE_CARD_CARDINALITY_INVALID');
   const evidenceTask = evidenceTasks[0];
   const evidenceCard = evidenceCards[0];
+  let ontologySourceReadback: Record<string, unknown> | null = null;
+  let ontologyTupleFromReadback: Record<string, any> | null = null;
+  if (tupleId) {
+    const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1 });
+    try {
+      const readback = await verifyOntologyTupleSourceReadbackFromPostgresV1({
+        tupleId,
+        expectedEvidenceRef: evidenceCard.taskRef,
+        repoRoot: ROOT,
+        connect: () => pool.connect(),
+      });
+      ontologySourceReadback = readback;
+      if (readback.status === 'SOURCE_BYTES_AND_SPAN_MATCH_NOT_ADMITTED'
+        && readback.tupleRecord && typeof readback.tupleRecord === 'object') {
+        ontologyTupleFromReadback = readback.tupleRecord as Record<string, any>;
+      }
+    } finally {
+      await pool.end();
+    }
+  }
   const receiptBindings = census.evidenceMatches.filter((binding: Record<string, any>) => evidenceCard.evidenceIds?.includes(binding.evidenceId));
   const admission = evaluateTaskEvidenceAdmissionV1({ taskCard, evidenceTask, evidenceCard, receiptBindings });
   const receiptId = admission.evidenceRefs[0] ?? evidenceCard.evidenceIds?.[0] ?? null;
@@ -92,8 +149,18 @@ async function runCurrentTask(changeId: string, taskId: string, tuplePath?: stri
     }
     receipt = JSON.parse(await readFile(resolvedReceiptPath, 'utf8'));
   }
-  const tuple = tuplePath ? (await readArtifact(tuplePath)).value as Record<string, any> : null;
+  const tupleFixture = tuplePath ? (await readArtifact(tuplePath)).value as Record<string, any> : null;
+  const tuple = ontologyTupleFromReadback ?? tupleFixture;
   const manifest = manifestPath ? (await readArtifact(manifestPath)).value as Record<string, any> : null;
+  let contextManifestReadback: Record<string, unknown> | null = null;
+  if (manifestPath && typeof manifest?.identityChecksum === 'string') {
+    const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1 });
+    try {
+      contextManifestReadback = await readContextManifestOwnerV1(pool, manifest.identityChecksum);
+    } finally {
+      await pool.end();
+    }
+  }
   const scratchDirectory = path.join(ROOT, '.tmp', 'atlas', `proof-chain-current-${Date.now()}`);
   await mkdir(scratchDirectory, { recursive: true });
   const values: Record<string, unknown> = {
@@ -131,7 +198,9 @@ async function runCurrentTask(changeId: string, taskId: string, tuplePath?: stri
     receipt: readbackValues.receipt,
     receiptBindings: readbackValues.receiptBindings,
     ontologyTuple: readbackValues.ontologyTuple,
+    ontologySourceReadback,
     contextManifest: readbackValues.contextManifest,
+    contextManifestReadback,
     artifactReadback: {
       source: 'FIXTURE',
       independentlyReopened: readbackStable,
@@ -153,7 +222,10 @@ async function runCurrentTask(changeId: string, taskId: string, tuplePath?: stri
     workspaceRevision: census.source.workspaceRevision,
     taskCardWorkspaceRevision: taskCard.workspaceRevision,
     taskSourceRevision: taskCard.sourceRevision,
-    tupleProvided: Boolean(tuplePath),
+    tupleProvided: Boolean(tuple),
+    tupleInputSource: ontologyTupleFromReadback ? 'POSTGRES_SOURCE_READBACK' : tupleFixture ? 'FIXTURE_FILE' : 'MISSING',
+    ontologySourceReadback,
+    contextManifestReadback,
     contextManifestProvided: Boolean(manifestPath),
     scratchReadbackDirectory: path.relative(ROOT, scratchDirectory).replaceAll(path.sep, '/'),
     scratchArtifactRawChecksums: Object.fromEntries(Object.entries(independentChecksums).map(([key, value]) => [key, value.rawChecksum])),
@@ -164,7 +236,7 @@ async function runCurrentTask(changeId: string, taskId: string, tuplePath?: stri
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) {
-    process.stdout.write('Usage: npm run atlas:proof-chain:verify -- --bundle=<repo-relative-json>\n       npm run atlas:proof-chain:verify -- --change-id=<id> --task-id=<id> [--ontology-tuple=<json>] [--context-manifest=<json>]\nCurrent-task mode reads existing TaskCard/receipt owners, writes bounded scratch projections under .tmp, and always reports fixture-only status.\n');
+    process.stdout.write('Usage: npm run atlas:proof-chain:verify -- --bundle=<repo-relative-json>\n       npm run atlas:proof-chain:verify -- --change-id=<id> --task-id=<id> [--tuple-id=<canonical tuple id>] [--ontology-tuple=<fixture json>] [--context-manifest=<fixture json>]\nCurrent-task mode reads existing TaskCard/receipt owners, optionally reads a canonical tuple and source bytes in a read-only transaction, writes scratch projections under .tmp, and remains fixture-only until every owner admits and independently reads back the complete chain.\n');
     return;
   }
   const changeId = args.find((arg) => arg.startsWith('--change-id='))?.slice('--change-id='.length);
@@ -176,6 +248,7 @@ async function main(): Promise<void> {
       taskId,
       args.find((arg) => arg.startsWith('--ontology-tuple='))?.slice('--ontology-tuple='.length),
       args.find((arg) => arg.startsWith('--context-manifest='))?.slice('--context-manifest='.length),
+      args.find((arg) => arg.startsWith('--tuple-id='))?.slice('--tuple-id='.length),
     );
     return;
   }
@@ -213,7 +286,9 @@ async function main(): Promise<void> {
     receipt: values.receipt,
     receiptBindings: values.receiptBindings,
     ontologyTuple: values.ontologyTuple,
+    ontologySourceReadback: null,
     contextManifest: values.contextManifest,
+    contextManifestReadback: null,
     artifactReadback: {
       source: 'FIXTURE',
       independentlyReopened: true,

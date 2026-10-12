@@ -1,8 +1,42 @@
 # Phase 17 — PyTorch Feature Extractor Upgrade
 
-**Status**: ⏳ **READY TO START** (Unblocked by Phase 10-19 ClusterCard implementation)  
-**Predecessor**: Phase 10-19 ClusterCard ✅ COMPLETE  
-**Estimated Duration**: 4-6 hours  
+## Status correction (2026-10-11)
+
+**Status: EXISTING FIXTURE-LEVEL IMPLEMENTATION; PRODUCTION UPGRADE BLOCKED.** This document's
+original “ready to start” checklist is historical: the TypeScript extractor, Zod schemas,
+metadata helpers, and focused fixture specs already exist under
+`sveltekit-frontend/src/lib/server/ml/`. The proposed new-file list and estimated duration are
+not current implementation facts.
+
+The current implementation does not establish the end-to-end PyTorch path described below:
+
+- The extractor reads a reconciliation score profile and produces derived metadata; its schema,
+  deterministic score fallbacks, and synthetic `sourceRef:featureId:hash` key are not canonical
+  packet identity or an approved ranking/fusion policy.
+- Semantic-vector pooling is optional over embeddings supplied by reconciliation. It is not a
+  PyTorch feature/model output and must not replace the existing EmbeddingGemma `semantic_768`
+  owner.
+- The extractor's SQL persistence function only logs intent; it does not execute the SQL. The
+  task-semantic-packet writer ledger independently identifies this path as intent-only, not an
+  active governed writer. Do not activate it or apply a schema migration as part of this phase.
+- Existing feature-provider admission requires revision-qualified inputs but remains a derived
+  feature boundary; it does not admit source evidence, ontology facts, or ContextManifest content.
+- Do not hard-code 0.4/0.35/0.25 fusion weights, invent defaults for missing lanes, or claim
+  PyTorch/CUDA acceleration without a separately qualified runtime receipt.
+
+**Next work:** reconcile the Phase 17 schema with the canonical packet/candidate owners; preserve
+SearchRuntime's existing lane normalization and fusion; identify qualified source, graph, and
+representation revisions; keep unavailable lanes explicitly unavailable; and leave persistence
+disabled until a governed writer and independent readback are established. CPU fixtures may validate
+the pure transformation contract; GPU benchmarking is downstream of a qualified frozen input.
+
+See `openspec/changes/parent-atlas-ace-rlm-bitfrost-integration/tasks.md` for the active owner and
+open gates. The remaining sections below are a historical design proposal and are not authorization
+to write `task_semantic_packets` or to mint packet keys.
+
+**Status**: ⚠️ **SUPERSEDED BY STATUS CORRECTION BELOW** (historical proposal; not a current readiness claim)
+**Predecessor**: Phase 10-19 ClusterCard ✅ COMPLETE
+**Estimated Duration**: 4-6 hours
 **Next Dependency**: Phase 18 (XGBoost Reranker)
 
 ---
@@ -13,7 +47,7 @@ Upgrade the existing Phase 17 PyTorch Feature Extractor with:
 - Robust error handling + fallbacks
 - Correct feature schema (sourceRef/featureId/alias_id alignment)
 - Integration with reconciled retrieval results
-- Score computation for 3-lane ranking (Qdrant/Cluster/Topological)
+- rank 0-100% computation for 3-lane ranking (Qdrant/Cluster/Topological)
 
 ---
 
@@ -285,6 +319,6 @@ Phase 19 Lane Completion ← INPUT
 
 ---
 
-**Status**: Ready to start  
-**Start Trigger**: User approval or automatic after Phase 10-19 validation  
-**Handoff Target**: Phase 18 XGBoost Reranker (can run Phases 18-19 in parallel)
+**Historical status (superseded 2026-10-11)**: Ready to start
+**Current start gate**: Resolve canonical identity, lane/revision ownership, and governed persistence/readback before production wiring.
+**Handoff target**: Phase 18 only after its input contract is qualified; no parallel production ranking claim.
