@@ -8,7 +8,7 @@ function hit(overrides: Partial<AtlasSemantic768ExactHitV1>): AtlasSemantic768Ex
     packetKey: 'p1',
     sourceRevision: 'r1',
     symbolVersionId: null,
-    sqeuclideanDistance: 0,
+    cosineDistance: 0,
     cosineSimilarity: 1,
     ...overrides,
   };

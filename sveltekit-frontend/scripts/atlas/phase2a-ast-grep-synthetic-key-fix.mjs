@@ -6,9 +6,10 @@
  *
  * SOLUTION: Attach deterministic AST facts to canonical packet identities from atlas_packets.
  * For each eligible code packet:
- * 1. Load canonical identity (packet_key + source_ref + content_hash)
+ * 1. Load canonical identity (packet_key + source_ref)
  * 2. Resolve filesystem location from source_ref
- * 3. Verify content_hash matches current file (version guard)
+ * 3. NOT IMPLEMENTED: the stored content_hash is not read or compared. The file is
+ *    hashed for tree_node_id input only; a mismatch does not skip the packet.
  * 4. Extract AST symbols and generate deterministic tree_node_id for each
  * 5. Write canonical facts to atlas_packet_features (packet_key + tree_node_ids + ast_symbols)
  *
@@ -16,7 +17,7 @@
  * They are NEVER persisted as canonical identity. All facts bind to:
  *   packet_key (database primary key)
  *   source_ref (immutable file path)
- *   content_hash (SHA-256 version guard)
+ *   content_hash (SHA-256 of current file bytes, used as tree_node_id input; not verified against storage)
  *   tree_node_id (deterministic symbol identity)
  *
  * INPUT:  atlas_packets (canonical identity source)
@@ -104,7 +105,7 @@ function generateTreeNodeId(params) {
 }
 
 /**
- * Extract AST symbols using ast-grep
+ * Extract symbols with REGEX patterns (NOT ast-grep; the name is historical).
  * Returns array of {name, kind, startLine, endLine} objects
  * filePath should be an absolute path to an existing file
  */
