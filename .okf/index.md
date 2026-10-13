@@ -53,3 +53,10 @@ OKF serves as curated knowledge export, not replacement.
 - [Parent Atlas Canonical Architecture](../docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md)
 - [Deep Research Infrastructure](../docs/DEEP-RESEARCH-INDEX.md)
 - [HyperRAG Control Panel Guide](../docs/architecture/trace-kag-web-development-guide.md)
+
+## Navigation and MCP tool-calling boundaries
+
+- [Schema-based OKF contract registry](../docs/.okf/registry.yaml) — contract navigation; points to live owners rather than copying their authority.
+- [OKF MCP tool-calling guide](../docs/.okf/architecture/okf-mcp-tool-calling-guide-v1.md) — read-only capability discovery, tool admission and receipt requirements.
+- Canonical ingestion glossary owner (workstation path pending GitHub synchronization): `.okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md`. Do not create a duplicate from this index.
+- MCP catalog owner: `sveltekit-frontend/src/lib/server/mcp/okf-resource-catalog.mjs`. Published resources are not automatically executable tools.
