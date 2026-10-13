@@ -183,6 +183,19 @@ async function main() {
           const downloadUrl = `http://127.0.0.1:6333/collections/${col}/snapshots/${snapshotName}`;
           await downloadFile(downloadUrl, snapDest);
           console.log(`      ${C.green}✔ Stream-downloaded vector collection snapshot: ${col}${C.reset}`);
+
+          // Retention is review-only until downloaded artifacts and recovery are verified.
+          try {
+            const listRes = await fetchJson(`http://127.0.0.1:6333/collections/${col}/snapshots`);
+            const snaps = listRes?.result || [];
+            if (snaps.length > 2) {
+              snaps.sort((a, b) => (b.creation_time || b.name).localeCompare(a.creation_time || a.name));
+              const reviewCandidates = snaps.slice(2).map((snapshot) => snapshot.name);
+              console.log(`      ${C.yellow}○ ${reviewCandidates.length} older snapshot(s) retained for explicit review: ${col}${C.reset}`);
+            }
+          } catch {
+            // Non-blocking cleanup failure
+          }
         }
       }
     } else {
