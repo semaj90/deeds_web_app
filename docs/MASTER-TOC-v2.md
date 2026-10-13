@@ -283,3 +283,112 @@ Registry checksum: `c98c5220b962d96b4b7e77b21eb2752b6ba730d544397f7fae7691cc1565
 - Decoder contract: `semantic_768` → physical `latent_256` → derived `latent_128`/`latent_64`; `canonicalAuthority=false`, `textSynthesis=false`, and `writesPerformed=false`.
 - Ornith remains the synthesis/tool-use owner; PostgreSQL remains canonical storage/lineage authority; Qdrant and GPU residency remain rebuildable execution/projection layers.
 - Open GPU gates: FEAT-04 envelope, owner-process residency reuse, decoder replay, cuTile parity, CUDA SIMT parity, and RMM allocator evaluation.
+- Quantization & Training Contract: NF4 (NormalFloat4) supported by Ampere RTX 3060 Ti via PyTorch/bitsandbytes for small LoRA adapters (1B–3B); concurrent QLoRA training of Ornith 9B blocked while llama-server (:8090) occupies VRAM. LibTorch and TensorRT remain independent inference backends.
+- Storage & Resource Precondition: C: free space stabilized to 9.42 GB free (10,113,802,240 bytes, up from 3.1 GB) via ClickHouse system log partition drops and Qdrant snapshot pruning. Docker AppData footprint lowered from 175 GB to ~145 GB.
+
+## Backend Table of Contents (TOC) mappings for agentic LUTs
+
+| Backend Storage Plane | Primary Index Key | Resolution / Coordinate Type | Role in Agentic LUT Routing | Gating / Mutation Authority |
+| :--- | :--- | :--- | :--- | :--- |
+| `feature_ontology_tuples` | `packet_key`, `feature_key` | Feature-level relations | Fine-grained symbol & AST concept relations | Non-admitted until `resolved_concept_id` matches active ontology revision |
+| `registry_ontology_tuples` | `packet_key`, `tuple_type` | Macro registry tuples | Cross-packet lineage and corroboration counts | Materialization version gate; tracks corroboration |
+| `ontology_domain_tuples` | `packet_key`, `domain_class` | Domain partition classes | Fast DAG dispatch (`backend`, `frontend`, `legal`) | Routing and budget allocation only; never promotes identity |
+| `codebase_chunk_index` | `chunk_id`, `source_ref` | `CHUNK_LEVEL_ORDINAL_MATCH` | Text span and vector retrieval target (`semantic_768`) | Read-only target for dense and lexical search lanes |
+| `atlas_packets` | `packet_id`, `source_ref` | `PACKET_LEVEL_ORDINAL_MATCH` | Canonical workspace provenance and source revision | Canonical storage owner; immutable source byte anchor |
+
+### Invariants for Agentic LUT Consumers
+- **Explicit Ordinal Match Scope**: Consumers must discriminate `PACKET_LEVEL_ORDINAL_MATCH` from `CHUNK_LEVEL_ORDINAL_MATCH` and `SYMBOL_VERSION_EXACT_MATCH`.
+- **Fail-Closed Resolution**: Concept relations missing a verified `resolved_concept_id` are strictly non-promotional.
+- **Outbox Write Isolation**: Agentic tools and MCP routines must route state modifications through `promotion_outbox` rather than directly mutating canonical LUT tables.
+
+## Lexical retrieval score-source labels (LUT, added 2026-10-12)
+
+| `scoreSource` | Backend | Built-in or extension | Produced by | Scoring treatment |
+|---|---|---|---|---|
+| `postgres_fts` | PostgreSQL native full-text search: `ts_rank(search_vector, to_tsquery('english', …))` on `codebase_chunk_index` (GIN index) | **Built-in** (not an extension) | `retrieveBM25` in `src/lib/server/retrieval/retrieve-candidates.ts` | Maps to `bm25Score` (`candidate-scorer.ts`). Summary hydration applies (`hydrate-candidates.ts`). |
+| `postgres_trigram` | PostgreSQL `pg_trgm` similarity / ILIKE substring fallback | `pg_trgm` is an **extension** | `retrieveBM25Trigram` (fallback) in `retrieve-candidates.ts` | Maps to `bm25Score` for backward compatibility. Excluded from summary hydration. |
+| `pg_search` BM25 | ParadeDB `pg_search` BM25 index (`idx_codebase_chunk_pgsearch_bm25`) | **Extension** (`pg_search` 0.25.1) | Not wired into the production lane | Challenger only. Not a retrieval vote. |
+| `rg_keyword` | ripgrep lexical scan | external CLI | ripgrep lane | Summary-stale check only. |
+
+Rules:
+- The label names the executor, not the algorithm. `postgres_fts` is not BM25 in the strict sense (`ts_rank` is not Okapi BM25).
+- A label change must update every consumer that branches on it: `candidate-scorer.ts`, `hydrate-candidates.ts`, and the spec fixtures.
+- Legacy codec `legacy_fnv1a_logtf_l2_v1` (`src/lib/server/vector/bm42-sparse.ts`) is not BM42 and has no `scoreSource`.
+- Verified 2026-10-12: a live `retrieveBM25('retrieval search')` returned 50 candidates, top score 0.97.
+
+## Ingestion and retrieval glossary
+
+Definitions are maintained in the canonical [`.okf` Parent Atlas ingestion glossary](../.okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md) (repo-root `.okf/`, the more detailed copy with source refs). The `docs/.okf/` copy is a older 67-line duplicate pending archive.
+
+| Term | Definition | Current role / boundary |
+|---|---|---|
+| `Firecrawl` | Optional web crawl/fetch acquisition; retain provider, URL, time, and content digest. | Acquisition and staging only; not source admission. Staged in crawler tables, never direct to `atlas_packets`. |
+| `BeautifulSoup` | Python HTML/XML tree parser (`beautifulsoup4` in Miniforge `:8095`). | Parsing/extraction only on already-acquired markup; does not fetch or write to stores. |
+| `n-gram` / `trigram` | N adjacent tokens/characters; `pg_trgm` provides PostgreSQL three-character similarity/pattern operators. | Feature/fuzzy lexical fallback (`postgres_trigram`), distinct from FTS. Excluded from summary hydration. |
+| PostgreSQL FTS | Built-in `tsvector` queries ranked by `ts_rank`/`ts_rank_cd`. | Primary lexical lane (`postgres_fts`); returns up to 50 candidates in <10ms; mapped to `bm25Score`. |
+| `BM25` | Term-frequency/inverse-document-frequency ranking. | `pg_search` (ParadeDB) installed as challenger (`idx_codebase_chunk_pgsearch_bm25`); not active production vote. |
+| `pgvector` / `HNSW` | PostgreSQL vector types/operators and an approximate-neighbor index option (`content_embedding_768`). | Existing `semantic_768` executor (219,998 vectors); canonical truth owner behind Qdrant. |
+| Qdrant snapshot / upsert | Snapshot captures collection state; upsert replaces point state for an ID. | 43 of 48 collections hold at least one snapshot (38 hold one, 5 hold two). Rebuildable only where a rebuild path is verified; none tested yet. |
+| Hash map / dictionary | In-memory key/value lookup. | Cache/lookup only; not durable identity, uniqueness, or admission. |
+| Bag-of-words / n-gram | Sparse term counts / adjacent token-or-character features. | Lexical feature representations with versioned tokenization. |
+| Tuple / graph | Typed record / nodes and typed edges. | Graph projections require evidence-bound edge admission; similarity is not ontology. |
+| Matrix / tensor / GEMM / cuBLAS | Dense numeric arrays and GPU matrix multiplication. | Numeric execution only; RTX 3060 Ti sidecar (`:8098`) is execution-only (`writesPerformed: false`). |
+| `rg` / `sed` | Ripgrep search / stream editing. | Source-navigation utilities, not parsers or canonical indexers. |
+| RAPIDS / cuVS / cuGraph | GPU data processing / vector search / graph analytics libraries. | Optional executors over frozen qualified inputs, never canonical owners. |
+| Agentic dense search / LUT | Dense candidate retrieval plus identity, revision, evidence, and tool-permission checks. | Advisory routing; one semantic vote, no direct mutation authority. |
+| Agentic error fixing LUT | Intended memory of diagnostic traces and verified fixes (`fixer_memory_768`). | Not yet populated: `fixer_memory_768` holds 0 points (verified 2026-10-12). No verified repair-pattern LUT exists; do not treat as active. |
+
+## Lineage and duplicate key findings (verified 2026-10-12)
+
+### `codebase_chunk_index` Uniqueness and Duplicate Key Analysis
+- **Constraint Facts**: In PostgreSQL `codebase_chunk_index`, unique constraints exist on `id (uuid)` (primary key) and `qdrant_id` (`codebase_chunk_index_qdrant_id_unique`). There is **no unique constraint on `(chunk_id, content_hash)`**.
+- **Duplicate Pairs**: Exactly 726 duplicate groups exist (1,452 total rows) sharing `(chunk_id, content_hash)` and `(chunk_id, source_ref)`. Each group has exactly 2 rows.
+- **Null Counts**: Exactly 37 rows have `chunk_id IS NULL` and 37 rows have `content_hash IS NULL`.
+- **Column-by-Column Diff Evidence**:
+  - `id`: Distinct UUIDs per row.
+  - `qdrant_id`: One row carries a legacy numeric string ID (e.g. `'1413774487'`), while the other row carries a modern UUID string ID (e.g. `'6462eb27-708f-9377-a9af-131453ce05c5'`).
+  - `summary`: Two slightly different generated summaries from separate historical indexing passes.
+  - `search_vector`: Differing tsvectors reflecting the slightly distinct summaries.
+  - `indexed_at` / `updated_at`: Timestamps from different ingestion epochs.
+- **Lineage Boundary Rule**: Joins between PostgreSQL and Qdrant must anchor on `qdrant_id` $\leftrightarrow$ `qdrant_point_id` or `id (uuid)`. Deduplication requires an explicit promotion receipt confirming active Qdrant point mapping before pruning legacy rows.
+
+### Qdrant Collection and Snapshot Census (live readback 2026-10-12)
+- **Current inventory**: `.tmp/atlas/production-hardening-seed-20261012/qdrant-pruning-audit-v2.json` records 18/18 collections, 18 API-visible snapshots totaling 5,163,315,712 bytes, zero aliases, zero empty collections, and no `*384*` collection. All collection and snapshot endpoints succeeded after bounded GET retries. The former 48-collection census is historical and must not be presented as current.
+- **Snapshot distribution**: 5 live collections have two snapshots, 8 have one, and 5 have none. The container has 43 collection-named snapshot directories plus `tmp`; 30 names are absent from the live collection API, of which 28 contain 7,403,776 bytes and 2 are empty (`codebase_chunks_384`, `codebase_chunks_384_hybrid`). Thus the 384 collections and snapshot payload files are gone, but their empty directory shells remain. The other non-current snapshot data is not classified for deletion. Snapshot retention, consumer/rollback value, and isolated restore compatibility remain open; no snapshot is deletion-authorized.
+- **Inventory fields**: the receipt captures point counts, reported vector counts, named vector dimensions/metrics, HNSW and optimizer configuration, payload schemas, aliases, snapshot names/checksums/bytes/times, and literal source-reference matches. `vectors_count` is not supplied by this API readback; source-reference matches do not prove runtime use.
+- **Representation separation**: `semantic_768` / EmbeddingGemma remains the canonical semantic contract. The live Qdrant API has no 384 collection, but PostgreSQL `atlas_packets.content_embedding_384` remains populated on 58,109 rows; its producer/model and archive provenance are unresolved. Do not claim that data was dropped or infer MiniLM from dimension alone.
+- **Sparse status**: no validated BM42 encoder or live sparse 384 collection is established. The historical hashed-sparse adapter is not BM42 and is explicit-opt-in; the default SearchRuntime does not enable it. PostgreSQL FTS remains the lexical baseline.
+- **Recovery rule**: PostgreSQL authority does not make Qdrant snapshots disposable. Do not prune or rebuild until exact backup/rollback roles, aliases, source lineage, and isolated restore/readback are proven.
+
+## Naive Bayes (readiness, 2026-10-13)
+
+Status: **NOT READY.** The dry run is READY, but the model cannot discriminate and the apply step is not gated.
+
+| Requirement | Status | Evidence | Needed |
+|---|---|---|---|
+| Multi-class model | NOT_PROVEN | `.tmp/semantic-naive-bayes-model.json` (`nb-packet-features-v1`): one class (`SemanticError`), trained on 20 rows | Reject any training run with fewer than two classes. Retrain on a reviewed set. |
+| Label source | NOT_PROVEN | Trainer assigns labels from keyword rules, defaulting to `VectorError` | Independently reviewed labels, at least 200 rows and 30 per class (the trust floor in CLAUDE.md). Rule labels may serve only as a labelled baseline, stated as such. |
+| Feature contract | NOT_PROVEN | Model tokens (`has_ast_symbols`, `has_lexical_features`, `has_used_concepts`, `qdrant_point_id_present`, `source:`) differ from apply tokens (`has_ast`, `has_lex`, `has_concepts`, `has_qdrant`, `*_tok:`). Most apply tokens are absent from the model. | One shared token schema, versioned, imported by both trainer and apply. |
+| Parameter coverage check | MISSING | Apply has no coverage report | Apply fails closed if too few tokens match the model vocabulary. Report coverage per run. |
+| Embedding presence flag | CREATED | `has_embedding` checks the 768 `embedding` (2026-10-13) | Retrain or re-verify after the feature contract changes. |
+| Held-out evaluation | NOT_PROVEN | None | Split by packet or source, not by row. Report macro F1 and calibration against a majority-class baseline. |
+| Dry run | DRY_RUN_PROVEN (mechanics only) | 500 rows READY, 0 written | Dry run must also show more than one distinct prediction before any write. Current: 1. |
+| Apply (DB write) | BLOCKED | `atlas_packet_metrics.naive_bayes_predictions` | Requires explicit approval after the gates above. |
+
+Blocking order: label review → feature contract → retrain with held-out evaluation → coverage check → dry run with more than one class → approved apply.
+
+The Naive Bayes model is not evidence for retrieval or routing until these gates pass. Its predictions must not be cited as classification results.
+
+### Naive Bayes: verified root cause, compute, and graph inputs (2026-10-13)
+
+| Item | Finding | Status |
+|---|---|---|
+| Training set size | Trainer SQL requires `array_length(apf.used_concepts, 1) > 0` (`sveltekit-frontend/scripts/atlas/train-naive-bayes-packet-classifier.py:125`). The saved model has 20 training rows, one class. | VERIFIED_READ_ONLY |
+| Feature mismatch | Trainer: TF-IDF over space-joined lexical strings. Apply: prefixed tokens (`ast_tok:`, `has_ast`, `has_embedding`). | VERIFIED_READ_ONLY |
+| RTX GPU | Not needed. Naive Bayes is scikit-learn on CPU. The GPU lane has no role in this classifier. | NOT_APPLICABLE |
+| NetworkX / PageRank | The apply step uses a PageRank value (`page_rank_score` or `pagerank`) as a presence token (`has_pagerank`). Its source is the CPU graph path; NetworkX is the CPU oracle, not GPU. A PageRank feature needs its own parity proof before it counts as evidence. | NOT_PROVEN as a feature |
+| cuGraph / cuVS | Not in this pipeline. | NOT_APPLICABLE |
+
+Requirement addition: any graph feature in the shared token schema must come from a frozen, revision-qualified graph snapshot, with the CPU NetworkX result as the reference. GPU graph execution is out of scope for Naive Bayes until that parity exists.
+
+`.tmp` cleanup note: `.tmp/merge-validation-20260912` and `.tmp/verify-merged-main-409a` are registered git worktrees. Remove them with `git worktree remove --force <path>`, not by deleting the folder. Removal deletes files and needs your approval.

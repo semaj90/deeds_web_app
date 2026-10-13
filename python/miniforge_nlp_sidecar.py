@@ -213,7 +213,7 @@ class AnalyzeRequest(BaseModel):
     source_type: SOURCE_TYPES = "plain_text"
     extraction_mode: EXTRACTION_MODES = "full"
     document_id: Optional[str] = None
-    source_ref: Optional[str] = None
+    source_ref: Optional[str] = Field(default=None, alias="sourceRef")
     source_revision: Optional[str] = Field(default=None, alias="sourceRevision")
     workspace_revision: Optional[str] = Field(default=None, alias="workspaceRevision")
     source_namespace: Optional[str] = Field(default=None, alias="sourceNamespace")

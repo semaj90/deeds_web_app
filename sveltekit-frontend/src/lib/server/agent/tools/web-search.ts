@@ -33,6 +33,12 @@ export interface SearchResult {
 	url: string;
 	snippet: string;
 	source: string;
+	/** Provider result position (1-based). Search rank is not relevance or identity. */
+	rank?: number;
+	/** ISO time the search response was received. */
+	retrievedAt?: string;
+	/** Search provider that returned this row (e.g. searxng, duckduckgo). */
+	provider?: string;
 }
 
 export interface WebSearchResult {
@@ -68,14 +74,18 @@ export async function webSearch(input: WebSearchInput): Promise<WebSearchResult>
 	// failures receive the same fallback behavior as the HTTP routes.
 	try {
 		const response = await sharedWebSearch(searchQuery, maxResults);
+		const retrievedAt = new Date().toISOString();
 		if (response.results.length > 0) {
 			return {
 				query,
-				results: response.results.map((result) => ({
+				results: response.results.map((result, index) => ({
 					title: result.title,
 					url: result.url,
 					snippet: result.snippet,
-					source: result.source
+					source: result.source,
+					rank: index + 1,
+					retrievedAt,
+					provider: response.provider
 				})),
 				totalResults: response.results.length,
 				duration: Date.now() - startTime,

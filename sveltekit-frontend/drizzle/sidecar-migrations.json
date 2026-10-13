@@ -664,6 +664,11 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "Read-only schema census for atlas_context_manifest_v2_readbacks after separately authorized migration application."
+    },
+    {
+      "file": "manual/20261012_atlas_directories.sql",
+      "status": "applied_additive",
+      "reason": "atlas_directories directory tree table with unique (repo_id, directory_path) and parent index; additive IF NOT EXISTS; mirrors atlasDirectories in schema/atlas-ast-nodes.ts"
     }
   ]
 }

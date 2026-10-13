@@ -273,6 +273,38 @@ contracts:
       - installed_package_inventory_required
       - version_qualification_is_explicit
       - no_datastore_write_authority
+  - name: parent-atlas-ingestion-glossary-v1
+    owner: .okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md
+    role: canonical glossary for ingestion, lexical, vector, and agentic terms (repo-root .okf/architecture copy)
+    notes:
+      - canonical_glossary
+      - docs_okf_architecture_copy_is_duplicate_pending_archive
+      - canonical_authority_false
+  - name: okf-root-index-luts-v1
+    owner: .okf/index.md
+    role: root OKF index with lexical score-source LUT and MCP tool-calling LUT (atlas-tools census 2026-10-12)
+    notes:
+      - lut_lexical_score_sources
+      - lut_mcp_tool_calling
+      - transport_success_is_not_validated_evidence
+      - canonical_authority_false
+  - name: okf-model-boundary-terms-v1
+    owner: .okf/architecture/parent-atlas-ingestion-agent-integrations-glossary-v1.md
+    role: model boundary definitions for Ornith 1.5 (llama-server :8090, qwen35 metadata), AtlasGemmaRankV1 (separate untrained scorer), EmbeddingGemma, and retired MiniLM
+    notes:
+      - ornith_is_synthesis_only
+      - gemma_rank_is_not_ornith
+      - rank_head_untrained
+      - canonical_authority_false
+  - name: okf-nlp-sidecar-alignment-v1
+    owner: python/miniforge_nlp_sidecar_v2.py
+    role: alignment of the :8095 NLP sidecar AST and analyze responses with the OKF structural fields (docs/.okf/schema.yaml)
+    notes:
+      - ast_v2_aligned_byte_offsets: start_byte/end_byte and source_revision match structural_fields
+      - ast_identity_names_differ: sidecar emits upstream_node_id/upstream_symbol_id; OKF names tree_node_id/symbol_version_id; no mapping is defined
+      - lexical_no_field_schema: .okf/manifest.yaml defines a lexical-v1 lane (keywords, path terms, imports) with no field-level schema
+      - analyze_response_no_okf_schema: AnalyzeResponse fields (features, pass_results, classification_proposal) have no OKF definition
+      - canonical_authority_false
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.
