@@ -563,6 +563,10 @@ function columnsForDirectSelect(alias) {
 }
 
 async function main() {
+  if (APPLY) {
+    throw new Error('UNSAFE_PATH_SELECTED_PACKET_PAYLOAD_APPLY_DISABLED');
+  }
+
   const pool = new Pool({ connectionString: DATABASE_URL });
 
   console.log(`\n═══ Upsert Qdrant Packet Payload ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══`);

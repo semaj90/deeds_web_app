@@ -151,7 +151,7 @@ function buildLexicalSignal(candidate: FusedCandidate) {
   // 'postgres_trigram' is a legacy label; the actual query (retrieve-candidates.ts)
   // is real ts_rank() BM25 full-text search against the GIN-indexed search_vector
   // column, pre-clamped to [0.5, 1.0]. Re-clamp defensively to the schema's [0,1].
-  if (candidate.scoreSource !== 'postgres_trigram') {
+  if (candidate.scoreSource !== 'postgres_fts') {
     return undefined;
   }
 
@@ -470,7 +470,7 @@ export async function hydrateCandidatesWithProof(
         }
         if (row.summary && row.summary.trim()) {
           proof.summaryResolvedCount += 1;
-        } else if (candidate.scoreSource === 'rg_keyword' || candidate.scoreSource === 'postgres_trigram') {
+        } else if (candidate.scoreSource === 'rg_keyword' || candidate.scoreSource === 'postgres_fts' || candidate.scoreSource === 'postgres_trigram') {
           proof.summaryStaleRejectedCount += 1;
         }
       } catch (buildError) {

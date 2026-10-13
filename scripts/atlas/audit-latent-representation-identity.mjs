@@ -302,10 +302,9 @@ async function main() {
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (treeNodeIds.length > 0) {
       treeNodeIdFormatMismatch = treeNodeIds.filter((id) => !UUID_RE.test(id)).length;
-      // atlas_packets.tree_node_id is `text`; atlas_tree_nodes.node_id is `uuid`. Cast the
-      // uuid side to text rather than assuming every text value is UUID-parseable — a hard
-      // cast the other way (::uuid[]) throws 22P02 on non-UUID values, which is itself the
-      // finding (see treeNodeIdFormatMismatch below), not something to paper over.
+      // atlas_packets.tree_node_id is text while atlas_tree_nodes.node_id is uuid. Compare as
+      // text and report the observed format separately. These are document-hierarchy locators;
+      // they are distinct from atlas_ast_nodes.tree_node_id, the code-AST hash identity.
       const { rows: treeRows } = await q(
         `SELECT node_id::text AS node_id FROM atlas_tree_nodes WHERE node_id::text = ANY($1::text[]);`,
         [treeNodeIds],
@@ -323,7 +322,7 @@ async function main() {
       stable_symbol_key_present_count: 0,
       symbol_version_id_present_count: 0,
       note:
-        `graphify_symbols does not exist live (confirmed via schema inventory) — all symbol-join metrics are structurally 0/ABSENT, not a bug in this audit. atlas_ast_nodes is the only live AST-adjacent table; atlas_tree_nodes is a separate, provisional structural-inventory table (GS1.10: "provisional structural inventory, not canonical graph identity"). REAL FINDING this pass: atlas_packets.tree_node_id is declared \`text\` but ${treeNodeIdFormatMismatch}/${treeNodeIds.length} sampled non-null values are NOT UUID-formatted (they look like content-hash strings, e.g. sha1/sha256-length hex) — while atlas_tree_nodes.node_id is declared \`uuid\`. A naive \`::uuid\` cast join throws 22P02; this audit casts the uuid side to text instead so the join can even be attempted. This is itself evidence of an unreconciled tree_node_id identity scheme, separate from GS1.10's already-known provisional-identity finding. Production writer/retrieval-path consumption of atlas_ast_nodes vs atlas_tree_nodes was not independently re-verified in this pass — see GS1.10-GS1.12 for prior findings.`,
+        `graphify_symbols does not exist live (confirmed via schema inventory), so graphify-symbol joins remain structurally unavailable. atlas_tree_nodes is a separate, provisional document-hierarchy table, not canonical code-AST identity (GS1.10). In this sample, ${treeNodeIds.length - treeNodeIdFormatMismatch}/${treeNodeIds.length} non-null atlas_packets.tree_node_id strings are UUID-formatted and ${treeJoined}/${treeNodeIds.length} match atlas_tree_nodes.node_id by exact text comparison; ${treeNodeIdFormatMismatch} malformed values were observed. This supports sample-level document-hierarchy joinability only, not source revision, byte-span, or canonical AST provenance. atlas_ast_nodes.tree_node_id is a distinct code-AST hash namespace; do not equate or cast between the two identity domains. Production writer/retrieval-path consumption was not independently re-verified in this pass.`,
     };
 
     // ── 8. BYTEA contract ────────────────────────────────────────────────────

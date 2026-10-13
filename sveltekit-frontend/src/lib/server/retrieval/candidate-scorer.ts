@@ -153,7 +153,7 @@ function deterministicScore(
     content: '',
     retrievedRank: candidate.rankBefore,
     denseScore:             candidate.denseScore ?? (candidate.scoreSource === 'qdrant' ? normalisedFusion : undefined),
-    bm25Score:              candidate.bm25Score ?? (candidate.scoreSource === 'postgres_trigram' ? normalisedFusion : undefined),
+    bm25Score:              candidate.bm25Score ?? ((candidate.scoreSource === 'postgres_fts' || candidate.scoreSource === 'postgres_trigram') ? normalisedFusion : undefined),
     astScore:               candidate.astScore ?? (candidate.scoreSource === 'ast_tree' ? normalisedFusion : undefined),
     graphScore:             candidate.graphScore,
     pagerankScore:          candidate.pagerankScore,

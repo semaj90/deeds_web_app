@@ -2156,3 +2156,9 @@ repair, to stay converged. That periodic-reverification need is a real follow-up
 → `RETRIEVAL-ABLATION-RUN-01` → `CONTEXT-SUBGRAPH-MANIFEST-01` → `GPU-ADMISSION-POLICY-V1`) is
 recorded here as the proposed next sequence but **not started** — each is a substantial, separate
 gate and none was requested explicitly this session.
+
+## FastAPI request-schema audit (2026-10-12; source-only)
+
+- `python/miniforge_nlp_sidecar.py` defines Pydantic request/response models for AST chunking, analysis, extraction, POS, classification, and file/web extraction. AST chunk requests carry a file path and source revision but not workspace revision, packet/chunk identity, or CandidateOrdinalMap. General analysis permits source/workspace revisions to be absent.
+- `/extract/web` accepts a generic dictionary and a caller-provided URL rather than a bounded, revision-qualified source manifest. This audit did not invoke the endpoint or fetch content.
+- Schema presence does not prove endpoint reachability, authorization, source binding, or persistence behavior. Keep those gates open; no service, database, or projection was changed, and no task is completed by this audit.

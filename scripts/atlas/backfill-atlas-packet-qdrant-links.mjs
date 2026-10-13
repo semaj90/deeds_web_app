@@ -195,6 +195,10 @@ async function updatePacket(pool, match) {
 }
 
 async function main() {
+  if (APPLY) {
+    throw new Error('UNSAFE_MULTI_KEY_PACKET_QDRANT_LINK_APPLY_DISABLED');
+  }
+
   const env = loadRepoEnv();
   const pool = new pg.Pool({
     connectionString: resolveDatabaseUrl(env),

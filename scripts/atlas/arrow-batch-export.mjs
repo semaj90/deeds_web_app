@@ -42,7 +42,8 @@ const OFFSET = parseIntegerFlag('--offset', 0);
 const DEFAULT_OUTPUT = path.join(REPO_ROOT, 'scripts', 'atlas', 'export', 'packets.arrow');
 const OUTPUT_FILE = path.resolve(REPO_ROOT, parseStringFlag('--output', DEFAULT_OUTPUT));
 const INDEX_FILE = replaceExtension(OUTPUT_FILE, '.index.json');
-const REPORT_FILE = path.join(REPO_ROOT, 'docs', 'reports', 'arrow-batch-export.json');
+const DEFAULT_REPORT = path.join('docs', 'reports', 'arrow-batch-export.json');
+const REPORT_FILE = path.resolve(REPO_ROOT, parseStringFlag('--report', DEFAULT_REPORT));
 
 const env = loadRepoEnv(process.env);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(env) });
@@ -204,7 +205,6 @@ async function loadRows() {
         ${featureColumns.has('lexical_features') ? 'COALESCE(apf.lexical_features, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS lexical_features,
         ${featureColumns.has('ast_symbols') ? 'COALESCE(apf.ast_symbols, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS ast_symbols,
         ${featureColumns.has('entities') ? 'COALESCE(apf.entities, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS entities,
-        ${selectIf(packetColumns, 'ap', 'content_embedding_384', 'legacy_embedding_384', '::text')},
         ${selectIf(packetColumns, 'ap', 'embedding', 'embedding_768', '::text')},
         ${selectIf(packetColumns, 'ap', 'latent_64')},
         ${selectIf(metricColumns, 'apm', 'pca_latent')},
@@ -224,12 +224,12 @@ async function loadRows() {
 
     const result = await client.query(sql, [LIMIT, OFFSET]);
     return result.rows.map((row) => {
-      const legacy384 = parsePgVector(row.legacy_embedding_384);
       const embedding768 = parsePgVector(row.embedding_768);
+      const semantic768 = embedding768.length === 768 ? embedding768 : [];
       const pca = Array.isArray(row.pca_latent) ? row.pca_latent.map(Number).filter(Number.isFinite) : [];
       const jepa = Array.isArray(row.jepa_latent) ? row.jepa_latent.map(Number).filter(Number.isFinite) : [];
-      const primaryVector = embedding768.length ? embedding768 : legacy384;
-      const vectorKind = embedding768.length ? 'semantic_768' : legacy384.length ? 'legacy_384' : 'none';
+      const primaryVector = semantic768;
+      const vectorKind = semantic768.length ? 'semantic_768' : 'none';
       const normalized = {
         ...row,
         packet_key: normalizeText(row.packet_key),
@@ -248,7 +248,7 @@ async function loadRows() {
         topology_label: normalizeText(row.topology_label),
         summary: normalizeText(row.summary),
         qdrant_point_id: normalizeText(row.qdrant_point_id),
-        representation_id: embedding768.length ? 'semantic_768' : legacy384.length ? 'legacy_384' : null,
+        representation_id: semantic768.length ? 'semantic_768' : null,
         representation_revision: Number.isFinite(Number(row.representation_revision)) ? Number(row.representation_revision) : null,
         embedding_digest: normalizeText(row.embedding_digest),
         keywords: uniqueStrings(row.keywords),
@@ -356,6 +356,7 @@ async function main() {
     outputs: {
       arrow_ipc: path.relative(REPO_ROOT, OUTPUT_FILE).replace(/\\/g, '/'),
       row_index: path.relative(REPO_ROOT, INDEX_FILE).replace(/\\/g, '/'),
+      report_json: path.relative(REPO_ROOT, REPORT_FILE).replace(/\\/g, '/'),
     },
       summary: {
         rows: rows.length,

@@ -216,10 +216,10 @@ async function main() {
     const chunkEmbeddings = chunkExists
       ? await countCoverage(client, 'codebase_chunk_index', [
           { key: 'relative_path', kind: 'text', candidates: ['relative_path', 'file_path'] },
-          { key: 'content_embedding', kind: 'value', candidates: ['content_embedding', 'content_embedding_384'] },
+          { key: 'content_embedding_768', kind: 'value', candidates: ['content_embedding_768'] },
           { key: 'qdrant_id', kind: 'text', candidates: ['qdrant_id', 'qdrantId'] },
         ])
-      : { exists: false, row: { total: 0, relative_path: 0, content_embedding: 0, qdrant_id: 0 }, columns: [] };
+      : { exists: false, row: { total: 0, relative_path: 0, content_embedding_768: 0, qdrant_id: 0 }, columns: [] };
 
     const packetTotal = Number(packets.row.total ?? 0);
     const featureTotal = Number(features.row.total ?? 0);
@@ -246,7 +246,7 @@ async function main() {
       ratio(Number(metrics.row.som ?? 0), metricTotal, 0.95) &&
       ratio(Number(metrics.row.pagerank_score ?? 0), metricTotal, 0.95);
 
-    const embeddingReady = chunkExists && ratio(Number(chunkEmbeddings.row.content_embedding ?? 0), chunkTotal, 0.95);
+    const embeddingReady = chunkExists && ratio(Number(chunkEmbeddings.row.content_embedding_768 ?? 0), chunkTotal, 0.95);
     const qdrantReady = ratio(Number(packets.row.qdrant_point_id ?? 0), packetTotal, 0.95);
     const topologyReady = ratio(Number(packets.row.som ?? 0), packetTotal, 0.95);
     const latentReady = ratio(Number(packets.row.latent_64 ?? 0), packetTotal, 0.95);
@@ -322,7 +322,7 @@ async function main() {
       {
         name: 'embedding corpus',
         status: embeddingReady ? 'PASS' : 'FAIL',
-        evidence: `${pct(Number(chunkEmbeddings.row.content_embedding ?? 0), chunkTotal)}% content_embedding`,
+        evidence: `${pct(Number(chunkEmbeddings.row.content_embedding_768 ?? 0), chunkTotal)}% content_embedding_768`,
         target: '>=95%',
       },
       {
@@ -377,7 +377,7 @@ async function main() {
       nextActions.push('Backfill atlas_packet_features.ast_symbols, lexical_features, and used_concepts, then rerun the progressive semantic compiler gate.');
     }
     if (!embeddingReady) {
-      nextActions.push('Backfill codebase_chunk_index.content_embedding with EmbeddingGemma vectors before widening any top-k mapping.');
+      nextActions.push('Backfill codebase_chunk_index.content_embedding_768 with qualified EmbeddingGemma semantic_768 vectors before widening any top-k mapping.');
     }
     if (!qdrantReady) {
       nextActions.push('Materialize the packet_key → qdrant_point_id bridge before any payload mutation or RRF fan-out.');
@@ -422,7 +422,7 @@ async function main() {
         lexical_features: pct(Number(features.row.lexical_features ?? 0), featureTotal),
         ast_symbols: pct(Number(features.row.ast_symbols ?? 0), featureTotal),
         entities: pct(Number(features.row.entities ?? 0), featureTotal),
-        content_embedding: pct(Number(chunkEmbeddings.row.content_embedding ?? 0), chunkTotal),
+        content_embedding_768: pct(Number(chunkEmbeddings.row.content_embedding_768 ?? 0), chunkTotal),
         naive_bayes_predictions: pct(Number(metrics.row.naive_bayes_predictions ?? 0), metricTotal),
         jepa_similarity: pct(Number(metrics.row.jepa_similarity ?? 0), metricTotal),
         kmeans_cluster: pct(Number(metrics.row.kmeans_cluster ?? 0), metricTotal),

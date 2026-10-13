@@ -198,6 +198,7 @@ export function classifyIntent(query: string): SubagentName {
 			'searchruntime',
 			'packet envelope',
 			'packet envelope',
+			'postgres_fts',
 			'postgres_trigram',
 			'qdrant',
 		])

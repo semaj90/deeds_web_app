@@ -135,6 +135,10 @@ async function upsertQdrantPayload(points) {
  * Main sync loop
  */
 async function syncQdrantPayload() {
+  if (isApply) {
+    throw new Error('UNSAFE_PACKET_ID_AS_QDRANT_POINT_ID_APPLY_DISABLED');
+  }
+
   console.log('📊 Syncing Qdrant payload from atlas_packets...\n');
 
   await connectServices();

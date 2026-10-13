@@ -109,6 +109,10 @@ async function upsertToQdrant(pointId, vector, payload) {
 }
 
 async function backfill(client) {
+  if (APPLY) {
+    throw new Error('UNQUALIFIED_PACKET_TO_CHUNK_COLLECTION_BACKFILL_DISABLED');
+  }
+
   console.log('📊 Step 1: Load packets with NULL qdrant_point_id\n');
 
   const result = await client.query(`

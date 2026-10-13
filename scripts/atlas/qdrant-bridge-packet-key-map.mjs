@@ -45,6 +45,10 @@ if (LIMIT) console.log(`Limit points: ${LIMIT}`);
 console.log();
 
 async function mapQdrantTPackets() {
+  if (isApply) {
+    throw new Error('UNSAFE_FEATURE_SOURCE_FIRST_MATCH_QDRANT_LINK_APPLY_DISABLED');
+  }
+
   const qdrant = new QdrantClient({ url: QDRANT_URL });
   const pgClient = new Client({ connectionString: POSTGRES_URL });
 

@@ -1,0 +1,218 @@
+schema: atlas.parent-atlas-agentic-retrieval-corpus.v1
+version: 1
+id: parent-atlas-agentic-retrieval-vocabulary
+type: corpus
+title: Parent Atlas agentic retrieval vocabulary
+status: reference_only
+authority: derived_reference
+canonical_authority: false
+source_refs:
+  - .okf/indexes/parent-atlas-code-explore.yaml
+  - .okf/domains/structured-value.yaml
+generated:
+  by: human-reviewed-repository-sources
+  at: 2026-10-12
+verified:
+  by: repository-source-review
+  at: 2026-10-12
+indexing:
+  populated: false
+  searchable: false
+  qdrant_written: false
+  admission_required: true
+entries:
+  - id: openwiki
+    terms: [OpenWiki, generated repository wiki, grounded claims, OKF]
+    definition: >-
+      OpenWiki is a generated documentation surface whose claims must be grounded
+      in repository evidence. Local downloaded OpenWiki documentation is reference
+      material; it is not proof that a current local wiki or live search integration
+      exists.
+    evidence_status: local_reference_docs_only
+    source_refs:
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md
+      - docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md
+    retrieval_policy: reference_only_until_source_revision_and_claim_receipts_are_verified
+
+  - id: deep-agents
+    terms: [Deep Agents, deepagents, agent harness, subagents, context management]
+    definition: >-
+      Deep Agents is documented as an agent harness built on LangGraph. The local
+      downloaded vendor documentation is a research source and does not establish
+      an installed package or production caller in Parent Atlas.
+    evidence_status: vendor_docs_only_runtime_unproven
+    source_refs:
+      - docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md
+      - docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md
+    retrieval_policy: reference_only_until_package_and_caller_are_independently_verified
+
+  - id: language-server-protocol
+    terms: [LSP, Language Server Protocol, tsserver, UTF-16 positions]
+    definition: >-
+      LSP/tsserver may provide optional incremental semantic observations. Protocol
+      positions are UTF-16 transport coordinates; canonical source spans remain
+      UTF-8 byte offsets owned by the structural/source evidence path.
+    evidence_status: contract_documented_runtime_caller_unproven
+    source_refs:
+      - .okf/domains/structured-value.yaml
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts
+    retrieval_policy: observations_only_convert_and_verify_before_source_span_matching
+
+  - id: viterbi-mcp-tool-routing
+    terms: [Viterbi, LUT, MCP tool selection, tool routing]
+    definition: >-
+      Existing Viterbi code proposes a tool from a supplied revisioned MCP registry.
+      It is not a symbol/content lookup table and does not itself retrieve indexed
+      source evidence or authorize tool execution.
+    evidence_status: proposal_logic_present_end_to_end_retrieval_unproven
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts
+      - docs/reports/mcp-tool-surface-live-v1.json
+    mcp_surface:
+      server_authority_id: parent-atlas:mcp:atlas-tools
+      tool_surface_revision: 9f7e3db94d93a310f75294cb11a0b71d3ec2621d9a9c66639102d30dd9a8e137
+      discovery_status: ALL_SERVERS_REACHABLE
+      captured_at: 2026-10-12T23:42:13.843Z
+      tools:
+        - tool_name: classify_intent
+          input_schema_digest: 14836a42ad0c9adde8d9f888eb6e0bcdc39b7f7a5fc804ffbdd8da080026b95b
+          output_schema_digest: null
+          execution_metadata_digest: null
+          invocation_verified: false
+        - tool_name: find_dependencies
+          input_schema_digest: 3bd2492f5f15e70a796a2ecd205ab48d390f1e2e771e27abc211b997b676ddbc
+          output_schema_digest: null
+          execution_metadata_digest: null
+          invocation_verified: false
+    retrieval_policy: registry_revision_and_permission_schema_checks_remain_required
+
+  - id: symbol-document-diagnostic-lut
+    terms: [symbol TOC, symbol LUT, reverse lookup, qualified symbol lookup, document crosswalk]
+    definition: >-
+      A bounded diagnostic projection provides exact-key, one-to-many symbol/document
+      candidate lookups against a supplied integrity-checked ordinal map. Its results
+      remain NOT_ADMITTED and are not wired to SearchRuntime; it is distinct from both
+      MCP tool selection and the proposed per-directory context LUT.
+    evidence_status: IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN
+    source_refs:
+      - scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts
+      - scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts
+      - scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs
+      - scripts/atlas/lib/symbol-toc-owner-readback-v1.mts
+      - openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md
+    retrieval_policy: require_independent_ordinal_map_source_readback_and_search_runtime_owner; never_admit_or_rank_from_lut_alone
+
+  - id: directory-source-lut
+    terms: [directory LUT, source tree lookup, directory fanout, per-directory retrieval]
+    definition: >-
+      A proposed rebuildable directory-context lookup derived from qualified source
+      bindings. It may group file and symbol candidates by directory, but directory
+      paths are not canonical identities, inherited context is not an extra ranking
+      vote, and stale or ambiguous source revisions must be excluded. The design
+      remains blocked until GPH-13 AST parity and source-binding qualification pass.
+    evidence_status: DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED
+    source_refs:
+      - docs/parent-atlas-workstation-gpu-runtime-backlog.md
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts
+      - openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md
+    retrieval_policy: no_build_or_search_until_ast_parity_and_revision_qualified_source_bindings_pass
+
+  - id: qdrant-projection
+    terms: [Qdrant, vector projection, semantic retrieval, collection alias]
+    definition: >-
+      Qdrant is a rebuildable vector projection. Point IDs and vector hits are not
+      canonical packet, source, chunk, or symbol identities; results require an
+      exact revision-qualified PostgreSQL/source readback before evidence use.
+    evidence_status: implementation_present_lineage_not_fully_proven
+    source_refs:
+      - .okf/indexes/parent-atlas-code-explore.yaml
+      - sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts
+      - sveltekit-frontend/src/lib/server/search/qdrant-search.ts
+      - .tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json
+    retrieval_policy: projection_hits_require_canonical_identity_revision_and_source_span_join
+
+  - id: agentic-query-to-prefill-workflow
+    terms: [agentic error fixing, query routing, DAG prefill, MCP tool call, ACE context, synthesis]
+    definition: >-
+      The repository has a CLI recommendation workflow with intent classification, local search,
+      identity lookup, ACE context assembly, retrieval, reranking, synthesis, and recommendation
+      stages. This is not yet a proven production search-to-prefill pipeline: its L4 code calls
+      lexical, dense, and graph tools separately instead of delegating fusion to SearchRuntime;
+      source now loads the existing SvelteKit env files and requires the configured Ornith 1.5
+      alias to appear in llama-server GET /v1/models, but no live call has verified that binding;
+      and the workflow writes diagnostic reports even when invoked with its documented --dry-run
+      flag. Tool recommendations and model output do not authorize execution or evidence admission.
+    evidence_status: CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN
+    source_refs:
+      - scripts/atlas/agentic-recommendation-workflow.mjs
+      - scripts/atlas/run-agentic-error-fixing-v1.mjs
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+      - sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts
+      - sveltekit-frontend/src/lib/server/llm/runtime-contract.ts
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: qualify_evidence_through_existing_identity_and_contextmanifest_owners_then_use_searchruntime_single_fusion; verify_side_effects_before_dry_run
+
+  - id: parameter-artifact-lookup
+    terms: [parameter fetching, parameter artifact, model revision, representation revision, DAG parameters]
+    definition: >-
+      The existing parameter resolver matches supplied revision-qualified artifact receipts and
+      returns RESOLVED, UNAVAILABLE, or AMBIGUOUS without writes. It does not fetch artifacts or
+      choose among multiple matches, and source inspection found no production caller beyond tests.
+      Retrieval must bind parameters to the requested producer, model, adapter, and representation
+      revisions rather than query intent or dimensions alone.
+    evidence_status: CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN
+    source_refs:
+      - sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts
+      - sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts
+    retrieval_policy: exact_revision_compatibility_only; ambiguous_or_unavailable_parameters_fail_closed
+
+  - id: web-search-research-dag
+    terms: [web search, SearXNG, DuckDuckGo, web-search fallback, research DAG, T4 external evidence]
+    definition: >-
+      Web search exists through multiple callers, not one unified DAG: research.web_search and
+      kag.web_search use the shared SearXNG/DuckDuckGo adapter; the agent tool-loop has an explicit
+      opt-in web_search path with cache, SearXNG, and Qdrant research_summaries fallback; ACE also
+      exposes a web-search fallback. A separate citation dependency DAG topologically orders
+      documents in retrieval/synthesis callers; it is not the agent tool-execution DAG. External
+      snippets are observations, not admitted source evidence. Search discovery, document
+      fetch/capture (Firecrawl), source/license review, corpus admission, and ContextManifest
+      inclusion are separate stages and are not proven by a successful search response.
+    evidence_status: MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN
+    source_refs:
+      - sveltekit-frontend/src/lib/server/retrieval/web-search.ts
+      - sveltekit-frontend/src/mcp/research_tools.ts
+      - sveltekit-frontend/src/mcp/trace-mcp-server.ts
+      - sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts
+      - sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts
+      - sveltekit-frontend/src/lib/server/ace/ace-agent.ts
+      - sveltekit-frontend/src/lib/server/retrieval/document-dag.ts
+      - sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts
+      - sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts
+    retrieval_policy: external_results_are_untrusted_observations; require_source_capture_license_scope_revision_and_admission_before_corpus_or_prompt_authority
+
+  - id: query-router-mlp-tournament
+    terms: [query router, classifier MLP, retrieval plan, MLP tournament, XGBoost baseline, shadow routing]
+    definition: >-
+      The query-router contract plans domain, operation, retrieval needs, and bounded budgets;
+      it is not a candidate ranker, evidence authority, or tool-execution permission. OpenSpec
+      records a 154-wide v1 tensor contract, while the v2 PyTorch trainer and v2 manifest declare
+      a separate 234-wide tensor. Their crosswalk and dataset-owner relationship are unresolved.
+      Non-toy revision-qualified training data, calibration, same-split XGBoost comparison,
+      held-out evaluation, shadow runtime, and promotion remain open. Do not use MLP output to
+      override SearchRuntime, MCP permission checks, or source/evidence admission.
+    evidence_status: V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN
+    source_refs:
+      - openspec/changes/parent-atlas-query-routing-classifier/tasks.md
+      - sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts
+      - sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts
+      - sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py
+      - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
+    retrieval_policy: classifier_outputs_are_shadow_route_recommendations_only_until_revisioned_dataset_calibration_held_out_comparison_and_promotion_gates_pass

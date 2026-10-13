@@ -6,6 +6,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { classifyCurrentExecutionRegistryCoverageV1 } from './lib/current-execution-registry-guard-v1.mjs';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const ADMISSION = resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
@@ -39,8 +40,11 @@ try {
   const members = await pool.query(`SELECT repository_id::text, repository_relative_path::text, source_ref::text, workspace_revision::text, code_source_revision::text, content_hash::text, byte_length::int FROM public.graphify_execution_file_membership_v2 WHERE execution_id=$1::uuid ORDER BY repository_id, repository_relative_path`, [executionId]);
   const root = members.rows.filter((m) => m.repository_id === 'repo:root');
   if (root.length !== expected.size) throw new Error('CURRENT_EXECUTION_WORKSPACE_BINDINGS_ROOT_COUNT_MISMATCH');
-  const refs = await pool.query(`SELECT source_ref_key::text FROM public.atlas_source_refs WHERE repo_id='deeds-web-app'`);
-  const refSet = new Set(refs.rows.map((r) => normalize(r.source_ref_key)));
+  const refs = await pool.query(`SELECT source_ref_key::text, relative_path::text, source_type::text,
+      content_hash::text, qualified_symbol::text, start_byte::text, end_byte::text
+      FROM public.atlas_source_refs WHERE repo_id='deeds-web-app'`);
+  const registryGuard = classifyCurrentExecutionRegistryCoverageV1(root, refs.rows);
+  const eligibleRefs = new Set(registryGuard.eligibleSourceRefs);
   const existing = await pool.query(`SELECT canonical_source_ref::text FROM public.atlas_workspace_source_bindings WHERE repo_id='deeds-web-app' AND workspace_revision=$1`, [admission.workspaceRevision]);
   const existingSet = new Set(existing.rows.map((r) => normalize(r.canonical_source_ref)));
   const rows = [];
@@ -53,7 +57,7 @@ try {
       || String(m.code_source_revision) !== String(source.sourceRevision)
       || String(m.content_hash).replace(/^sha256:/, '').toLowerCase() !== String(source.contentDigest).replace(/^sha256:/, '').toLowerCase()
       || Number(m.byte_length) !== Number(source.byteLength)) throw new Error(`CURRENT_EXECUTION_WORKSPACE_BINDINGS_MEMBER_MISMATCH:${relativePath}`);
-    if (!refSet.has(relativePath)) { missingRefs.push(relativePath); continue; }
+    if (!eligibleRefs.has(relativePath)) { missingRefs.push(relativePath); continue; }
     if (existingSet.has(relativePath)) continue;
     const sourceRevision = String(m.code_source_revision);
     const contentDigest = String(m.content_hash).replace(/^sha256:/, '').toLowerCase();
@@ -62,8 +66,8 @@ try {
     rows.push({ relativePath, sourceRevision, contentDigest, byteLength: Number(m.byte_length), producerRevision, bindingChecksum });
   }
   const candidateChecksum = `sha256:${hash(rows.map((r) => `${r.relativePath}\0${r.sourceRevision}\0${r.contentDigest}\0${r.byteLength}\0${r.bindingChecksum}`).join('\n'))}`;
-  report = { schema: 'atlas.current-execution-workspace-bindings.v1', mode: apply ? 'APPLY' : 'READ_ONLY_PLAN', executionId, workspaceRevision: admission.workspaceRevision, snapshotRevision: admission.snapshotRevision, counts: { executionMembers: members.rows.length, rootMembers: root.length, unresolvedOtherRepositories: members.rows.length - root.length, existingBindings: existingSet.size, missingSourceRefs: missingRefs.length, candidateBindings: rows.length }, missingSourceRefs: missingRefs.slice(0, 100), candidateChecksum, candidates: rows.slice(0, 100), committed: false, insertedCount: 0, readbackCount: 0, writesPerformed: false, safeToApply: !apply && missingRefs.length === 0 && rows.length > 0, status: missingRefs.length ? 'BLOCKED_SOURCE_REGISTRY_GAP' : (apply ? 'PLANNED_APPLY' : 'PLAN_READY') };
-  if (apply && missingRefs.length === 0 && rows.length > 0) {
+  report = { schema: 'atlas.current-execution-workspace-bindings.v1', mode: apply ? 'APPLY' : 'READ_ONLY_PLAN', executionId, workspaceRevision: admission.workspaceRevision, snapshotRevision: admission.snapshotRevision, counts: { executionMembers: members.rows.length, rootMembers: root.length, unresolvedOtherRepositories: members.rows.length - root.length, existingBindings: existingSet.size, missingSourceRefs: registryGuard.missingSourceRefs.length, registryPathMismatches: registryGuard.pathMismatches.length, ambiguousRegistryRefs: registryGuard.ambiguousSourceRefs.length, unqualifiedRegistryGrains: registryGuard.unqualifiedSourceRefs.length, registryDigestMismatches: registryGuard.digestMismatches.length, registrySourceTypesMissing: registryGuard.sourceTypeMissing.length, candidateBindings: rows.length }, registryQualification: { safeToApply: registryGuard.safeToApply, missingSourceRefs: registryGuard.missingSourceRefs.slice(0, 100), pathMismatches: registryGuard.pathMismatches.slice(0, 100), ambiguousSourceRefs: registryGuard.ambiguousSourceRefs.slice(0, 100), unqualifiedSourceRefs: registryGuard.unqualifiedSourceRefs.slice(0, 100), digestMismatches: registryGuard.digestMismatches.slice(0, 100), sourceTypeMissing: registryGuard.sourceTypeMissing.slice(0, 100) }, missingSourceRefs: missingRefs.slice(0, 100), candidateChecksum, candidates: rows.slice(0, 100), committed: false, insertedCount: 0, readbackCount: 0, writesPerformed: false, safeToApply: !apply && registryGuard.safeToApply && missingRefs.length === 0 && rows.length > 0, status: !registryGuard.safeToApply || missingRefs.length ? 'BLOCKED_SOURCE_REGISTRY_QUALIFICATION' : (apply ? 'PLANNED_APPLY' : 'PLAN_READY') };
+  if (apply && registryGuard.safeToApply && missingRefs.length === 0 && rows.length > 0) {
     await pool.query('BEGIN');
     try {
       for (const [ordinal, r] of rows.entries()) await pool.query(`INSERT INTO public.atlas_workspace_source_bindings (repo_id, workspace_revision, canonical_source_ref, source_revision, content_digest, byte_length, source_manifest_ordinal, producer_revision, binding_checksum) VALUES ('deeds-web-app',$1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT (repo_id, workspace_revision, canonical_source_ref) DO NOTHING`, [admission.workspaceRevision, r.relativePath, r.sourceRevision, r.contentDigest, r.byteLength, ordinal, r.producerRevision, r.bindingChecksum]);

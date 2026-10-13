@@ -1,5 +1,5 @@
 /**
- * Gemma 4 + local llama-server Multi-Step Tool-Calling Loop
+ * Ornith + local llama-server Multi-Step Tool-Calling Loop
  *
  * Implements the explicit agentic cycle:
  *   1. Define tools (JSON Schema function definitions)
@@ -21,13 +21,12 @@
  *   Tool result: { role: "tool", content: "<json>", tool_name: "<name>" }
  */
 
-import { VLM_MODELS } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace, type ToolTraceStatus } from '$lib/server/observability/tool-trace.js';
 import { parseToolCalls as parseToolCallsFromText } from '$lib/server/ai/tool-shim.js';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { ENV } from '$lib/server/env.server.js';
+import { resolveLlamaInferenceTarget } from './runtime-contract.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -49,7 +48,7 @@ export interface ToolParameterSchema {
 }
 
 /** A single tool definition in the tools array */
-export interface OllamaToolDef {
+export interface ChatToolDef {
   type: 'function';
   function: {
     name: string;
@@ -59,7 +58,7 @@ export interface OllamaToolDef {
 }
 
 /** A tool call emitted by the model */
-export interface OllamaToolCall {
+export interface ChatToolCall {
   function: {
     name: string;
     arguments: Record<string, unknown>;
@@ -70,19 +69,19 @@ export interface OllamaToolCall {
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
-  tool_calls?: OllamaToolCall[];
+  tool_calls?: ChatToolCall[];
   tool_name?: string;
   images?: string[];
 }
 
 /** The raw response object from the local chat endpoint */
-export interface OllamaChatResponse {
+export interface ChatCompletionResponse {
   model: string;
   created_at: string;
   message: {
     role: 'assistant';
     content: string;
-    tool_calls?: OllamaToolCall[];
+    tool_calls?: ChatToolCall[];
   };
   done: boolean;
   done_reason?: string;
@@ -97,9 +96,9 @@ export interface OllamaChatResponse {
 /** Handler function that executes a tool and returns a JSON-serializable result */
 export type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
-/** Configuration for callGemma4WithTools */
+/** Configuration for the local llama-server tool loop */
 export interface Gemma4ToolLoopOpts {
-  /** Model name (default: ENV.GEMMA4_MODEL / gemma4-rotorquant:latest) */
+  /** Optional explicit model; must match the active allowed llama-server model. */
   model?: string;
   /** Temperature (default: 0.1 for tool precision) */
   temperature?: number;
@@ -158,13 +157,13 @@ Be precise, accurate, and grounded in the tool output.`;
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Execute the full Gemma 4 + local server agentic tool-calling loop.
+ * Execute the local Ornith + llama-server agentic tool-calling loop.
  *
  * ```
  *  ┌──────────────────────────────────────────────────────┐
  *  │  USER provides:                                       │
  *  │    • query (string)                                   │
- *  │    • tools (OllamaToolDef[] + handlers Map)           │
+ *  │    • tools (ChatToolDef[] + handlers Map)              │
  *  │    • opts  (model, temp, system prompt, schema, …)    │
  *  └──────────────────┬───────────────────────────────────┘
  *                     │
@@ -174,7 +173,7 @@ Be precise, accurate, and grounded in the tool output.`;
  *  └──────────────────┬───────────────────────────────────┘
  *                     │
  *  ┌──────────────────▼───────────────────────────────────┐
- *  │  STEP 2: POST /api/chat { messages, tools, … }       │
+ *  │  STEP 2: POST /v1/chat/completions { messages, tools }│
  *  │    Server returns { choices[0].message.tool_calls? }  │
  *  └──────────────────┬───────────────────────────────────┘
  *                     │
@@ -195,11 +194,15 @@ Be precise, accurate, and grounded in the tool output.`;
  */
 export async function callGemma4WithTools(
   query: string,
-  tools: OllamaToolDef[],
+  tools: ChatToolDef[],
   handlers: Map<string, ToolHandler>,
   opts: Gemma4ToolLoopOpts = {}
 ): Promise<Gemma4ToolLoopResult> {
-  const model = opts.model ?? LOCAL_VLM_MODEL ?? VLM_MODELS.gemma4;
+  const target = await resolveLlamaInferenceTarget();
+  if (opts.model && opts.model !== target.model) {
+    throw new Error(`Requested chat model ${opts.model} does not match active llama-server model ${target.model}`);
+  }
+  const model = target.model;
   const maxIter = opts.maxIterations ?? 5;
   const timeout = opts.timeoutMs ?? 120_000;
   const loopStart = performance.now();
@@ -221,7 +224,7 @@ export async function callGemma4WithTools(
   for (let i = 0; i < maxIter; i++) {
     iterations = i + 1;
 
-    const ollamaBody: Record<string, unknown> = {
+    const chatRequest: Record<string, unknown> = {
       model,
       messages,
       tools: tools.length > 0 ? tools : undefined,
@@ -232,19 +235,19 @@ export async function callGemma4WithTools(
     };
 
     console.log(
-      `[gemma4-tool-loop] Iteration ${i + 1}/${maxIter} — ` +
+      `[ornith-tool-loop] Iteration ${i + 1}/${maxIter} — ` +
         `${messages.length} messages, ${tools.length} tools`
     );
 
     // ── POST /chat/completions ──────────────────────────────────────────
     const chatResponse = await traceLLM(
-      'gemma4-tool-loop',
+      'ornith-tool-loop',
       { model, prompt: query.slice(0, 500), iteration: i + 1 },
       async (gen) => {
-        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+        const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(ollamaBody),
+          body: JSON.stringify(chatRequest),
           signal: AbortSignal.timeout(timeout),
         });
 
@@ -254,7 +257,7 @@ export async function callGemma4WithTools(
         }
 
         const data = (await res.json()) as {
-          choices?: Array<{ message?: { content?: string; tool_calls?: OllamaToolCall[] } }>;
+          choices?: Array<{ message?: { content?: string; tool_calls?: ChatToolCall[] } }>;
           model?: string;
           created_at?: string;
           total_duration?: number;
@@ -281,7 +284,7 @@ export async function callGemma4WithTools(
           total_duration: data.total_duration,
           prompt_eval_count: data.prompt_eval_count,
           eval_count: data.eval_count,
-        } satisfies OllamaChatResponse;
+        } satisfies ChatCompletionResponse;
       }
     );
 
@@ -309,12 +312,12 @@ export async function callGemma4WithTools(
       logInference({
         type: 'llm',
         model,
-        backend: 'ollama',
+        backend: 'llama-server',
         latencyMs: Math.round(performance.now() - loopStart),
         tokenCount: chatResponse.eval_count ?? 0,
         cacheHit: false,
         metadata: {
-          source: 'gemma4-tool-loop',
+          source: 'ornith-tool-loop',
           iterations,
           toolCalls: toolCallLog.length,
         },
@@ -424,7 +427,7 @@ export async function callGemma4WithTools(
   }
 
   // ── Max iterations reached — force a text answer ──────────────────────
-  console.warn(`[gemma4-tool-loop] Max iterations (${maxIter}) reached, forcing final answer`);
+  console.warn(`[ornith-tool-loop] Max iterations (${maxIter}) reached, forcing final answer`);
 
   // One last call without tools to force a text response
   const finalBody = {
@@ -442,7 +445,7 @@ export async function callGemma4WithTools(
     ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
   };
 
-  const finalRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+  const finalRes = await fetch(`${target.baseUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(finalBody),
@@ -491,7 +494,7 @@ export function defineOllamaTool(
   description: string,
   properties: ToolParameterSchema['properties'],
   required?: string[]
-): OllamaToolDef {
+): ChatToolDef {
   return {
     type: 'function',
     function: {

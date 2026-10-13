@@ -1,7 +1,7 @@
 /**
  * POST /api/v1/agentic/tool-loop
  *
- * Demo endpoint showing the explicit multi-step Gemma 4 + local server tool-calling loop:
+ * Multi-step Ornith + local llama-server tool-calling loop:
  *
  *   1. Define tools (JSON Schema function defs)
  *   2. Send user query + tools → the local chat endpoint
@@ -39,10 +39,10 @@ import {
   TOOL_WIKI_GENERATE,
   TOOL_WEB_SEARCH,
   TOOL_ERROR_SUMMARIZE,
-  type OllamaToolDef,
+  type ChatToolDef,
   type ToolHandler,
 } from '$lib/server/llm/gemma4-tool-loop.js';
-import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 // ── Request schema ──────────────────────────────────────────────────────
 const bodySchema = z.object({
@@ -205,7 +205,7 @@ async function handleFixRecommend(args: Record<string, unknown>): Promise<unknow
 
   // Search for similar errors in the error brain
   try {
-    const { ENV } = await import('$lib/server/env.server.js');
+    const target = await resolveLlamaInferenceTarget();
 
     const prompt = `Analyze this error and suggest fixes.
 Error: ${error.slice(0, 2000)}
@@ -214,11 +214,11 @@ ${codeSnippet ? `Code:\n${codeSnippet.slice(0, 1000)}` : ''}
 
 Return JSON: { "suggestions": [{ "fix": "...", "confidence": 0.0-1.0, "explanation": "..." }] }`;
 
-    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+    const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: LOCAL_VLM_MODEL,
+        model: target.model,
         messages: [
           { role: 'system', content: 'You analyze code errors and return valid JSON suggestions.' },
           { role: 'user', content: prompt },
@@ -298,7 +298,7 @@ async function handleErrorSummarize(args: Record<string, unknown>): Promise<unkn
 
 // ── Tool registry map ───────────────────────────────────────────────────
 
-const ALL_TOOLS: Record<string, { def: OllamaToolDef; handler: ToolHandler }> = {
+const ALL_TOOLS: Record<string, { def: ChatToolDef; handler: ToolHandler }> = {
   codebase_search: { def: TOOL_CODEBASE_SEARCH, handler: handleCodebaseSearch },
   knowledge_search: { def: TOOL_KB_SEARCH, handler: handleKnowledgeSearch },
   read_file: { def: TOOL_READ_FILE, handler: handleReadFile },
@@ -328,7 +328,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // Select tools
   const enabledNames = toolNames ?? Object.keys(ALL_TOOLS);
-  const toolDefs: OllamaToolDef[] = [];
+  const toolDefs: ChatToolDef[] = [];
   const handlers = new Map<string, ToolHandler>();
 
   for (const name of enabledNames) {

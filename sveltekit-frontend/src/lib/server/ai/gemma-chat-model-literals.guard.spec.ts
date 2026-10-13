@@ -41,7 +41,6 @@ const ALLOWED_GEMMA_ARTIFACT_FILES: Record<string, string> = {
 /** Frozen 2026-10-03. Shrink only: migrate each file to the resolver, then delete its line. */
 const KNOWN_LITERAL_FILES: readonly string[] = [
 	'src/lib/server/adapters/service-integrations.ts',
-	'src/lib/server/ai/ab-test.ts',
 	'src/lib/server/ai/llama-tool-definitions.ts',
 	'src/lib/server/ai/openai-facade.ts',
 	'src/lib/server/ai/phase101-parent-atlas-packetizer.js',
@@ -67,7 +66,6 @@ const KNOWN_LITERAL_FILES: readonly string[] = [
 	'src/lib/server/features/ai/ai/information-gain-validator.ts',
 	'src/lib/server/features/ai/ai/kv-context-controller.ts',
 	'src/lib/server/features/ai/ai/token-tracker.ts',
-	'src/lib/server/features/cases/deep-research.ts',
 	'src/lib/server/features/cases/hypergraph-4d.ts',
 	'src/lib/server/features/cases/research-graph-rl.ts',
 	'src/lib/server/features/cases/web-research-crawler.ts',
@@ -75,7 +73,6 @@ const KNOWN_LITERAL_FILES: readonly string[] = [
 	'src/lib/server/inference/inference-router.ts',
 	'src/lib/server/learning/policy-trainer.ts',
 	'src/lib/server/llm-router.ts',
-	'src/lib/server/llm/gemma4-tool-loop.ts',
 	'src/lib/server/ollama-cached.ts',
 	'src/lib/server/queue/rabbitmq-manager-fixed.ts',
 	'src/lib/server/reconstruction/scene-intent-extractor.ts',

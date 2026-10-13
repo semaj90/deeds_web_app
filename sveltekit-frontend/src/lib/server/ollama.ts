@@ -69,7 +69,7 @@ import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { resolveOrnithRequestModelV1, TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
-import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
+import { LLM_MODEL_ID, resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
 import crypto from 'node:crypto';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
@@ -390,6 +390,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
 
   try {
     const startMs = performance.now();
+    const target = await resolveLlamaInferenceTarget();
 
     // Convert Ollama format → OpenAI messages format
     const openaiMessages: Array<{ role: string; content: string }> = [];
@@ -416,6 +417,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
 
     // Build TurboQuant request (OpenAI-compatible)
     const tqRequestBody: Record<string, unknown> = {
+      model: target.model,
       messages: openaiMessages,
       max_tokens: maxTokens,
       temperature,
@@ -428,7 +430,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
       tqRequestBody.tools = ollamaBody.tools;
     }
 
-    const tqRaw = await safeJsonPost(`${TURBOQUANT_BASE_URL}/v1/chat/completions`, tqRequestBody, {
+    const tqRaw = await safeJsonPost(`${target.baseUrl}/v1/chat/completions`, tqRequestBody, {
       timeoutMs: 120_000,
       maxResponseBytes: 2_000_000,
     });
@@ -490,7 +492,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
         message.tool_calls = ollamaToolCalls;
       }
       ollamaResponse = {
-        model: ollamaBody.model ?? VLM_MODELS.gemma4,
+        model: target.model,
         created_at: new Date().toISOString(),
         message,
         done: true,
@@ -504,7 +506,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
     } else {
       // /api/generate response format
       ollamaResponse = {
-        model: ollamaBody.model ?? VLM_MODELS.gemma4,
+        model: target.model,
         created_at: new Date().toISOString(),
         response: content,
         done: true,
@@ -532,7 +534,7 @@ async function tryTurboQuantIntercept(url: string, init?: RequestInit): Promise<
     });
   } catch (err) {
     console.debug(
-      `[turbo-intercept] Failed, falling back to Ollama: ${(err as Error)?.message?.slice(0, 100)}`
+      `[turbo-intercept] Fast path unavailable; retrying through the governed llama-server path: ${(err as Error)?.message?.slice(0, 100)}`
     );
     return null;
   }
@@ -596,17 +598,12 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       if (openaiMessages.length > 0 && ollamaBody.stream !== true) {
         const temperature = ollamaBody.options?.temperature ?? 0.7;
         const maxTokens = ollamaBody.options?.num_predict ?? 2048;
-        let loadedModel = ollamaBody.model ?? (isChatEndpoint ? VLM_MODELS.gemma4 : VLM_MODELS.tool);
-        try {
-          loadedModel = (await resolveLoadedLlamaModel(CHAT_BASE_URL, loadedModel)).resolvedModel;
-        } catch {
-          // Keep the configured compatibility fallback if discovery is unavailable.
-        }
-        const llamaResponse = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
+        const target = await resolveLlamaInferenceTarget();
+        const llamaResponse = await fetch(`${target.baseUrl}/v1/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: loadedModel,
+            model: target.model,
             messages: openaiMessages,
             temperature,
             max_tokens: maxTokens,
@@ -659,7 +656,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
 
           const response = isChatEndpoint
             ? {
-                model: loadedModel,
+                model: target.model,
                 created_at: new Date().toISOString(),
                 message: {
                   role: 'assistant',
@@ -675,7 +672,7 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
                 eval_duration: 0,
               }
             : {
-                model: loadedModel,
+                model: target.model,
                 created_at: new Date().toISOString(),
                 response: content,
                 done: true,

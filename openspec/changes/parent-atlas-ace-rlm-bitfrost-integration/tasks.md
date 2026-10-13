@@ -14150,6 +14150,222 @@ replay describes a separate earlier canary; it does not close this derivation
 gate. No E2E-02+ work, representation backfill, cache write, or apply is
 authorized by this diagnostic.
 
+#### LINEAGE-E2E-01 current-cohort identity recheck (2026-10-12)
+
+Read-only checks against the admitted workspace revision
+`sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`
+and selected Graphify execution `74d50c86-8194-45ea-8c3d-61aab737ef83`
+found a byte-exact diagnostic candidate, but did not close `LINEAGE-E2E-01A`:
+
+- For `packet:2d7811f7925c` / `docs/architecture/agentic-error-proposal-flow.md`,
+  the source SHA-256 and byte length (3,227) match the workspace binding, packet
+  source revision, packet workspace revision, and selected execution membership.
+  The stored chunk text exactly matches source bytes at lines 82–94 (bytes
+  2,800–3,227); the existing producer formula
+  `sha256(sourceRef + ':' + chunkOrdinal + ':' + chunkText)` independently
+  reproduces the stored chunk digest.
+- The canonical packet identity owner rejects this legacy key: there is no
+  `atlas_packet_identity_aliases` row for it, and `packet-key-resolution-v2.ts`
+  explicitly does not mint identity from `source_ref`. The pure packet digest
+  bridge therefore must not receive this key as if already canonical.
+- The existing `atlas_chunk_packet_identity_links` projection row is
+  `UNRESOLVED`, with `canonical_packet_minted=false`,
+  `canonical_writes_allowed=false`, no source revision, and an owner reason
+  that exact byte-span matching is structurally unavailable to that projection
+  producer. It cannot be used to bypass PacketKeyResolutionV2.
+- Refreshed the existing PacketKeyV2 legacy-population owner in a repeatable-
+  read, read-only transaction (scratch receipt
+  `.tmp/atlas/production-hardening-seed-20261012/packet-key-v2-legacy-census-current-v1.json`):
+  61,718 packets, 17,399 format-level derivations using Graphify membership
+  labels, and zero current `PACKET_KEY_V1_STORAGE_TO_V2` aliases. This census
+  does **not** establish canonical collisions or authorize migration because
+  `repo:root` is not canonical repository identity.
+- **Correction:** an exploratory `computePacketKeyV2(repo:root, sourceRef,
+  SOURCE_FILE)` call returned `packet:e5ed317e-495e-58cf-9cd1-e93f639e92bc`.
+  The repository-identity audit explicitly says `repo:root` is an execution
+  partition, not authoritative identity. Disregard that key; it is not a valid
+  canonical proposal and must not be stored or aliased.
+- Fresh live counts: `atlas_repository_identity=0`,
+  `atlas_stable_file_identity=0`, `atlas_stable_file_revision_binding=0`, and
+  `atlas_stable_file_alias=0`. Admitted workspace bindings use
+  `repo_id=deeds-web-app` (24,456 rows); the selected Graphify execution uses
+  `repository_id=repo:root` for those same 24,456 sources. The classifier has a
+  declared root-label bridge, but the canonical repository registry is empty.
+  The existing mint owner issues a random UUIDv7; it cannot be guessed or
+  independently rederived from `repo:root`.
+- Ran the existing canonical repository mint owner with `--dry-run` for
+  source-authority repository `deeds-web-app`, using the sealed snapshot's root
+  path and `ROOT` kind. It returned `MINT_NEW`, zero existing rows, and
+  `databaseWrites=0`; the UUIDv7 is intentionally not previewable. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/repository-identity-mint-dryrun-v1.json`.
+  This verified the precondition before the separately authorized bounded mint.
+- Operator authorized one root `RepositoryIdentityV1` mint only. The existing
+  `scripts/atlas/mint-stable-file-identity-v1.mjs` owner returned
+  `APPLY_PROVEN` / `MINTED_NEW`, with exactly one database write; no file
+  identity, revision binding, packet identity, alias, chunk mutation, or
+  projection write was requested. Scratch receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/repository-identity-mint-apply-v1.json`.
+- An independent read-only PostgreSQL query returned exactly one matching row:
+  repository UUID `01a13137-1378-7df9-9968-53738dbf0e48`, source-authority ID
+  `deeds-web-app`, root path `C:\\Users\\james\\Videos\\deeds-web-app`, kind
+  `ROOT`. Focused stable-file identity owner tests passed 33/33. These checks
+  prove this repository identity row only; they do not admit source bindings or
+  PacketKeyV2 aliases.
+- Rechecked the selected source bytes locally (SHA-256
+  `sha256:525ea82cdec0fc1ef160d9ca71c72973ea51732b211183a274c89bc394668b73`,
+  3,227 bytes) and independently read its workspace binding. The binding has
+  the admitted workspace revision and exact source digest. Its producer names
+  execution `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`; both that execution and
+  selected execution `74d50c86-8194-45ea-8c3d-61aab737ef83` are `COMPLETED` on
+  the same workspace revision and contain the exact same source revision,
+  digest, and byte length for this path. Thus the observed difference is
+  producer-run identity, not source/workspace revision drift. The inspected
+  stage census found `SOURCE_SELECTION` for both, but no structural extraction
+  or graph-build stage rows; this remains source-membership evidence only.
+- The exact stable-file owner dry-run verified the repository identity and
+  source authority binding, returning `SAFE_NEW_ID`, no active stable-file ID,
+  no binding for this workspace revision, and `databaseWrites=0`. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/single-source-stable-identity-preview-v1.json`.
+  This apply would create a stable-file identity plus revision binding; it is a
+  separate two-row mutation and has not been authorized or run.
+- Read-only inspection of the exact linked chunk row
+  `81f39e12-5e05-48d0-aa6d-a2a11e47bd69` confirms its relative path and lines
+  82–94, with 427 stored content bytes, but its `source_revision`,
+  `workspace_revision`, `representation_revision`, lineage checksum, and
+  lineage producer are NULL. Its `content_embedding_768` is NULL; only the
+  legacy `content_embedding` exists, tagged
+  `embeddinggemma:latest:eg-task-prefix-v1` without a representation revision.
+  No `atlas_packet_features` row matched the legacy packet key plus sourceRef,
+  so native AST feature provenance is not established for this candidate.
+  Do not retrieve or rank this row as a revision-qualified `semantic_768`
+  candidate.
+- Reconciled repository-scope ownership after minting the root identity. The
+  live schema has `atlas_repository_identity` but no separate repository-label
+  mapping table. `stable-file-backfill-classifier-v1.ts` contains the pure
+  `repo:root -> deeds-web-app` classification bridge; it is not a persisted
+  PacketKeyV2 authority. `packet-key-v2.ts` currently requires the Graphify
+  membership label as `repositoryScope`, while the repository-identity review
+  says PacketKeyV2 must use canonical repository identity after label mapping.
+  Do not wrap the UUID as a synthetic `repo:<uuid>` scope or reuse `repo:root`
+  as canonical identity without an owner decision/versioned mapping contract.
+  The earlier reconciliation report's zero repository-identity count is now
+  historical; current readback finds the one minted root row above. The
+  packet-identity mapping decision and live authorization remain unresolved.
+- Replayed the current pure `computePacketKeyV2` owner with the exact selected
+  execution membership `repo:root`; it returns
+  `packet:e5ed317e-495e-58cf-9cd1-e93f639e92bc`. This reproduces the earlier
+  exploratory value, not an admitted key: the input scope is still an
+  execution-partition label and the repository-identity mapping decision is
+  unresolved. A fresh database-enforced read-only query finds exactly one
+  legacy storage row (`packet:2d7811f7925c`), zero storage rows for that V2
+  value, and zero alias rows for either key. `PacketKeyResolutionV2` therefore
+  still cannot resolve the legacy key; no alias or packet row was written.
+- Added an optional `--output` argument to
+  `scripts/atlas/mint-stable-file-identity-v1.mjs`; explicit paths are accepted
+  only under repository `.tmp`, while default output behavior is unchanged.
+  `node --check` and the exact `--dry-run` passed; an output path under
+  `docs/reports` was rejected before any database query.
+- The old alias-kind SQL in
+  `20260925_atlas_packet_identity_alias_v1_storage_to_v2_PREPARED.sql` is
+  explicitly marked `SUPERSEDED`; do not apply it. The repository identity
+  review directs a registry-backed alias target, but the packet-scope mapping
+  and alias authorization remain unresolved. The root repository identity row
+  itself is now populated as recorded above. The prior packet-key decision
+  still withholds `writesAuthorized`.
+
+#### Current checkout revision gate (2026-10-12)
+
+- Captured the current checkout with the existing full-byte snapshot owner,
+  digest cache disabled, and a scratch-only output. It scanned 28,867 sources
+  across seven repositories with zero violations and produced workspace
+  revision
+  `sha256:0689ab572bc0fba5543579df72ca65d670b33d920de56cf21f185f9f8a544717`.
+  Receipt: `.tmp/atlas/production-hardening-seed-20261012/current-worktree-snapshot-v1.json`.
+- A database-enforced read-only comparison found zero
+  `atlas_workspace_source_bindings` rows, zero Graphify executions, and zero
+  Graphify membership rows for this exact revision. Revision `sha256:69e37be3...`
+  also has zero bindings; only the older admitted `sha256:e24bb971...` cohort
+  has 24,456 bindings. Do not combine any of those revisions or reuse the
+  prior `e24bb971...` candidate proof as evidence about the current checkout.
+- This directly blocks objective gate 1 for the current workspace. No source
+  binding backfill, Graphify run, relabel, stable-file mint, packet alias, or
+  projection action was performed for `0689ab...`. A new source/workspace
+  authority cohort must be established through its existing admitted owners
+  before restarting this candidate chain.
+
+The `0689ab...` capture above predates the edits that recorded that capture in
+this ledger and the roadmap; both files are snapshot inputs. The post-edit
+snapshot and its database readback are recorded in the scratch-only receipt
+`.tmp/atlas/production-hardening-seed-20261012/current-worktree-binding-readback-v1.json`.
+That receipt is historical after subsequent tracked source edits; do not treat
+its digest as the current checkout.
+
+### Production-hardening continuation — exact current cohort gate (2026-10-12)
+
+- [x] Recaptured the then-current full-byte workspace after the scratch-report
+  CLI hardening: `sha256:0a236b03c0cf12dd51942fcab70a33966919c30d7124d6bf61c097d15bb5f242`,
+  28,867 sources, seven repositories, zero capture violations. Capture artifact:
+  `.tmp/atlas/production-hardening-seed-20261012/current-worktree-after-hardening-v1.json`.
+- [x] Queried PostgreSQL in an explicit read-only transaction for that exact
+  revision: zero `atlas_workspace_source_bindings`, zero Graphify executions,
+  and zero `graphify_execution_file_membership_v2` rows. The older admitted
+  `sha256:e24bb971...` cohort is not interchangeable and must not be reused.
+- [x] Hardened the three source-authority audit CLIs to accept both
+  `--report PATH` and `--report=PATH`; explicit report destinations outside
+  repository `.tmp/` fail before processing. Focused path-guard checks passed.
+- [ ] Re-capture and re-read the exact workspace after this ledger edit. The
+  preceding digest is a verified historical checkpoint, not the current tree.
+- [ ] Establish an authorized source-binding and Graphify execution cohort for
+  that exact new revision through the existing owners. Until then, do not run
+  Graphify, bind historical rows, mint packet aliases, or write packet/chunk,
+  embedding, cache, graph, or retrieval projections.
+- [ ] Continue only after the exact source revision is admitted: independently
+  verify one packet/chunk identity, bytes, span, revisions, and digests; then
+  trace that same item through AST/features, retrieval, ACE, and ContextManifest
+  readback before any Ornith request.
+
+Status: `BLOCKED_NO_CURRENT_SOURCE_COHORT`; no inference or mutation is authorized
+by the root repository identity mint. The current-snapshot read-only query is
+recorded in the scratch-only pair
+`.tmp/atlas/production-hardening-seed-20261012/current-worktree-after-ledger-v1.json`
+and
+`.tmp/atlas/production-hardening-seed-20261012/current-worktree-after-ledger-readback-v1.json`.
+These artifacts bind the capture and readback for the checkout including this
+ledger update; after any further tracked edit, recapture before calling a
+revision current or using its digest for a subsequent gate.
+
+Status remains `BLOCKED` at current-workspace revision admission, before
+PacketKeyV2 resolution and before `LINEAGE-E2E-01A`. The previous `e24bb971...`
+source/binding checks remain historical diagnostic evidence only. Do not apply
+the prior one-file stable-identity preview to the current objective: first
+establish source bindings and a Graphify source-selection execution for the
+exact current revision `0689ab...`, then restart packet/chunk proof from that
+cohort. The PacketKeyV2 repository-scope decision remains a subsequent gate.
+Do not apply superseded DDL, backfill or relabel another execution, derive
+identity from an unqualified Graphify label, mint UUIDs in a side script, or
+write packet/alias/projection rows.
+- The linked `codebase_chunk_index` row has NULL `source_revision`,
+  `workspace_revision`, `representation_revision`, `lineage_binding_checksum`,
+  and `lineage_producer_revision`. Its related `atlas_packet_chunk_lineage`
+  row is `PROVEN` / `EXACT_MULTI_MEMBER`, but was created by the historical
+  promotion owner and is not independent current-workspace admission.
+- The matching workspace binding's `producer_revision` cites execution
+  `0dba1c0d-2cf7-4f35-a61b-c77956f60d3d`, not the selected execution above.
+  Equal source bytes across those executions do not establish shared execution
+  authority.
+- A read-only full-cohort join found 16,151 revision-matched packet rows,
+  14,564 revision-matched `PROVEN` lineage packets, zero direct PacketKeyV2
+  keys, zero legacy keys with a V2 alias, and zero linked chunk rows carrying
+  both source and workspace revisions.
+
+Status remains `BLOCKED`: the byte match is useful diagnostic evidence, not a
+canonical packet/chunk admission. Keep `LINEAGE-E2E-01A..E` open. Next, resolve
+the packet identity through the existing alias owner and establish current
+chunk revision binding/cohort authority; do not backfill, relabel, or infer
+missing revisions. Receipt:
+`.tmp/atlas/production-hardening-seed-20261012/one-candidate-source-lineage-readback-v1.json`.
+No database or projection writes were performed.
+
 ### MCP / OpenCode / agent-context alignment — verification and next steps (2026-10-05)
 
 Read-only verification pass (no datastore writes; one TRACE source fix, OpenCode config alignment, one new checker).
@@ -15209,3 +15425,124 @@ pipeline complete.
 and EmbeddingGemma via Ollama for embeddings; source compatibility routes still require caller
 audit. Intent caching, graph topology, TurboVec-in-ACE wiring, and prompt subagent handoff remain
 proposals. No database, Qdrant, Neo4j, Valkey, model, or GPU writes were performed in this audit.
+
+### Current source-inventory and binding gate (2026-10-12)
+
+- [x] Classified the repository-root `.archive/` directory as `BACKUP_OR_ARCHIVE` in
+  `scripts/atlas/lib/canonical-source-inventory-hygiene-v1.mts`; ordinary `archive/` directories
+  remain eligible. Bumped the inventory policy revision to
+  `atlas.canonical-source-inventory-hygiene-policy.2026-10-12.v2` and added focused regression tests.
+- [x] Focused hygiene regression tests passed **3/3**. The post-ledger two-pass snapshot
+  `.tmp/atlas/production-hardening-seed-20261012/current-worktree-goal-final-v2.json` captured
+  **28,871** entries across seven repositories; independent source-byte readback matched **28,871/28,871**.
+  The read-only hygiene audit passed with **28,662** canonical sources and zero known-junk matches.
+  Its candidate `sha256:2dd7cb8057c9913d561d35951d8ea2dc3e9f4557eb5dab4502e660a2b502a3af` remains
+  `authority=false` and `SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED`.
+- [x] The exact root selection census for that candidate contains **27,583** paths: **24,259** exact
+  `atlas_source_refs` matches, **3,323** paths with no registry row, and **1** ambiguous normalized
+  path (`services/go-health-aggregator/main.go`; nine normalized registry path rows). The exact
+  matches currently have `source_type='code'`; no type was inferred for missing rows. Census receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-goal-final-v1.json`.
+- [x] Extended the existing read-only registry planner to accept an explicit not-admitted snapshot
+  selection, exact `--source-ref`, and scratch `--report` path. It preserves `workspaceRevision=null`,
+  reports the candidate revision separately, and leaves missing-row `sourceType` unresolved. Focused
+  live planner checks found the registered code source present and the missing Markdown source absent;
+  both reported `writesPerformed=false`.
+- [x] Independently verified one diagnostic packet/chunk candidate: current source
+  `crates/atlas_packet_parser/index.js` is **9,875** bytes and matches source revision
+  `sha256:5bb2826a…`; exact packet key `packet:0ef4e5eff91e` and one `PROVEN` lineage row point to
+  one chunk row. The chunk text occurs exactly once at UTF-8 byte span `[0, 800)` and recomputes the
+  documented `sha256(relative_path:chunk_index:chunk_text)` digest. Packet stored byte offsets and
+  `atlas_packets.content_hash` are null; the independently verified span is diagnostic, not a stored
+  packet span. No current-workspace binding exists for the candidate revision.
+- [x] Recomputed the current workspace candidate after the ledger and planner updates. The
+  scratch snapshot `.tmp/atlas/production-hardening-seed-20261012/current-worktree-source-gate-final-v4.json`
+  (`sha256:3b66fb69…`) passed independent byte readback (**28,871/28,871**) and the hygiene audit
+  (**28,662** canonical sources; zero known-junk matches). Candidate revision
+  `sha256:f4e345ba…` remains not admitted. The earlier v3 hygiene failure was caused by two source
+  files changing after capture; it was not waived.
+- [x] Recomputed root registry coverage read-only from that exact selection: **27,583** root
+  candidates; **22,723** exact-key/content-digest matches; **1,536** exact-key digest mismatches;
+  **3,323** with no registry row or normalized-path match; **1** ambiguous normalized-path match.
+  No selected duplicate normalized paths were found. Exact classifications are in
+  `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-v4-full.json`.
+  Digest mismatches are not called stale without producer/digest-grain evidence; missing source
+  types remain unresolved. The earlier combined **3,324** gap count is superseded by the split
+  **3,323 + 1** classification.
+- [x] Reverified one current source → packet → chunk diagnostic against the fresh snapshot:
+  `crates/atlas_packet_parser/index.js`, exact registry row, source/packet/lineage revision
+  `sha256:5bb2826a…`, one canonical packet key, and **14/14** physical chunk lineages with
+  recomputed chunk digests and unique source-byte spans. The source packet's `content_hash` is
+  still null; diagnostic source-revision parity does not replace an admitted workspace binding.
+  Proposal-only receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/current-single-source-binding-proposal-v4.json`.
+- [x] Hardened the existing full-cohort binding planner to reject registry paths unless there is
+  exactly one unambiguous, exact-path, whole-file `atlas_source_refs` row with matching full-file
+  SHA-256 and explicit `source_type`; path identity preserves case, and aliases are considered only
+  when no exact key exists. Added seven focused cases; **7/7 passed**. This is writer-side fail-closed
+  protection, not a single-source persistence owner or authorization.
+- [x] Re-captured after the guard change: v6 snapshot
+  `.tmp/atlas/production-hardening-seed-20261012/current-worktree-source-gate-final-v6.json`,
+  revision `sha256:2d644a41…`, **28,873** sources/seven repositories; readback **28,873/28,873**;
+  hygiene **28,664** canonical sources, zero known-junk matches. Selection remains
+  `SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED`, candidate `sha256:82a703cb…`.
+- [x] Recomputed v6 root registry census: **27,787** root sources, **22,909** exact key/digest
+  matches, **1,538** exact-key digest mismatches, **3,339** with no normalized registry match,
+  **1** ambiguous normalized path. No normalized-only unambiguous aliases, non-whole-file rows,
+  or missing `source_type` were observed. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-v6-full.json`.
+- [x] Independently reopened the v6 candidate bytes and verified the existing packet's source
+  revision, then qualified **14/14** unique chunk spans and recomputed **14/14** documented
+  `sha256(sourceRef:chunkOrdinal:chunkText)` hashes. This is explicitly
+  `SOURCE_BYTES_SPANS_AND_CHUNK_DIGEST_MATCH_CROSS_COHORT`: the packet still has
+  `workspace_revision='0'` and null `content_hash`; it does not prove current binding or Graphify
+  ownership. Receipt: `.tmp/atlas/production-hardening-seed-20261012/current-source-packet-chunk-byte-readback-v6b.json`.
+- [x] Fresh v14 source proof after the incremental-inventory changes: the final snapshot
+  `.tmp/atlas/production-hardening-seed-20261012/current-worktree-source-gate-final-v14.json`
+  contains **28,880** sources across seven repositories; independent byte readback matched
+  **28,880/28,880** with zero violations. Hygiene passed for **28,671** selected sources, with
+  zero known-junk matches. The selected candidate `sha256:86ba32f7…` remains
+  `SOURCE_SELECTION_PLAN_READY_NOT_ADMITTED`.
+- [x] Recomputed the complete root registry and candidate-binding census against that exact v14
+  selection in a repeatable-read, read-only transaction: **27,592** root sources, **22,723** exact
+  key/content-digest matches, **1,536** exact-key digest mismatches, **3,333** missing registry
+  references, **0** normalized-only or ambiguous aliases, and **0/27,592** bindings for candidate
+  `sha256:86ba32f7…`. The earlier v6 counts are historical and must not be reused for this
+  candidate. No source type or digest grain was inferred for missing/mismatched rows. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-v14-full.json`.
+- [x] Updated the frozen census after recording the incremental byte-parity proof. v15 snapshot
+  `sha256:db833ac0…` again contains **28,880** sources across seven repositories and its independent
+  readback matched **28,880/28,880**. Hygiene remains **28,671** selected sources with zero known
+  junk; root registry classification remains **22,723** exact key/content-digest matches,
+  **1,536** exact-key digest mismatches, **3,333** missing references, zero normalized/ambiguous
+  aliases, and zero source bindings at candidate `sha256:d54b36f2…`. These counts are tied to the
+  v15 snapshot/candidate only; neither candidate is admitted. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-v15-full.json`.
+- [x] Re-captured and re-read the workspace after the v16→v17 incremental parity review and its ledger correction. v18 snapshot `sha256:9bccef97…` contains **28,880** sources across seven repositories; independent byte readback matched **28,880/28,880** with zero violations, and hygiene selected **28,671** sources. The full root registry census ran in a repeatable-read, read-only transaction against candidate `sha256:375c7a55…`: **27,592** root sources, **22,723** exact key/content-digest matches, **1,536** exact-key digest mismatches, **3,333** missing references, zero path mismatches/duplicates/normalized-only aliases, and **0/27,592** exact current-revision bindings. These are current-v18 counts; no source types or digest grains were inferred for missing/mismatched rows. Receipts: `.tmp/atlas/production-hardening-seed-20261012/current-worktree-source-gate-final-v18.json`, `.tmp/atlas/production-hardening-seed-20261012/current-snapshot-readback-source-gate-v18.json`, `.tmp/atlas/production-hardening-seed-20261012/current-hygiene-source-gate-v18.json`, `.tmp/atlas/production-hardening-seed-20261012/current-selection-source-gate-v18.json`, `.tmp/atlas/production-hardening-seed-20261012/current-registry-gap-classification-v18-full.json`. Candidate remains not admitted; no database writes were performed.
+- [x] The exact candidate source `crates/atlas_packet_parser/index.js` has one matching registry
+  row and digest, but its existing packet still records workspace revision `0`; its 14 chunk byte
+  spans/digests remain cross-cohort diagnostic evidence. The matching registry row does not repair
+  packet identity or authorize a binding write.
+- [x] Compared v5 and v6 frozen receipts: **2 added, 1 changed, 28,870 unchanged, 0 deleted**.
+  This delta plan reuses prior receipt arrays but still follows full source capture; it is not an
+  incremental capture implementation. Receipt:
+  `.tmp/atlas/production-hardening-seed-20261012/snapshot-delta-v5-to-v6.json`.
+- [ ] Establish an authorized current-revision source-binding and Graphify cohort. The v4
+  candidate has **zero** matching workspace bindings and **zero** Graphify executions. The
+  existing `apply-current-execution-workspace-bindings-v1.mjs` requires a completed admitted
+  Graphify execution, complete root membership, and registry coverage; it is not a single-source
+  writer. The prior `af4d084d…` authorization is for a different revision and does not transfer.
+- [ ] Use the existing binding owner only after exact-revision admission and its prerequisites.
+  `apply-current-execution-workspace-bindings-v1.mjs` requires a completed Graphify execution, full
+  root membership, exact registry coverage, and explicit apply. The other apply scripts are restricted
+  to historical fixed cohorts; the synthetic Graphify smoke writer is not an authority. No safe
+  single-source persistence writer is established. The earlier `af4d084d…` authorization is stale
+  and does not transfer; no database writes were made.
+- [ ] Continue the end-to-end chain only after independently read-back current workspace binding.
+  Then verify the same packet/chunk through native AST spans, feature/embedding revisions, retrieval,
+  ACE, and independent ContextManifest readback before bounded Ornith context.
+
+Status: `SNAPSHOT_HYGIENE_AND_REGISTRY_CENSUS_PROVEN; SINGLE_PACKET_CHUNK_DIAGNOSTIC_PROVEN; CURRENT_BINDING_AND_GRAPHIFY_ADMISSION_BLOCKED`.
+No registry, workspace-binding, Graphify, packet, chunk, retrieval, cache, or projection writes were
+performed. Do not promote the diagnostic candidate or proceed to ACE/ContextManifest/Ornith until the
+current exact-revision binding and admission owners independently read back their evidence.

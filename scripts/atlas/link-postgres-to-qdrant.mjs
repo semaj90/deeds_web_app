@@ -71,6 +71,10 @@ async function updatePostgresWithQdrantId(packetKey, qdrantPointId) {
 }
 
 async function linkPackets() {
+  if (APPLY) {
+    throw new Error('UNSAFE_NON_UNIQUE_PACKET_KEY_QDRANT_LINK_APPLY_DISABLED');
+  }
+
   log(`\n═══ Link Postgres → Qdrant Point IDs ═══\n`);
 
   try {

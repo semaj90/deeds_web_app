@@ -104,6 +104,10 @@ async function scrollQdrantPayloads() {
 }
 
 async function main() {
+  if (!DRY_RUN) {
+    throw new Error('UNSAFE_SOURCE_REF_ALIGNMENT_DISABLED: source_ref may map to multiple packet/chunk points');
+  }
+
   console.log(`=== Qdrant ↔ Postgres Alignment — ${DRY_RUN ? 'DRY RUN' : 'LIVE'} ===`);
   console.log(`Collection: ${QDRANT_COLLECTION}`);
   console.log('');

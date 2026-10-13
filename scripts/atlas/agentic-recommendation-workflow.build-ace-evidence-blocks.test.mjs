@@ -5,7 +5,7 @@
 // evidence-laundering chain this gate exists to prevent. Both acePacket and aceCards must be
 // gated on the same admission check.
 import assert from 'node:assert/strict';
-import { buildAceEvidenceBlocks } from './agentic-recommendation-workflow.mjs';
+import { buildAceEvidenceBlocks, resolveAgenticWorkflowModel } from './agentic-recommendation-workflow.mjs';
 
 const sampleCards = [{ title: 'unrelated cached card', sourceRef: 'src/some/unrelated/file.ts' }];
 
@@ -55,4 +55,38 @@ const sampleCards = [{ title: 'unrelated cached card', sourceRef: 'src/some/unre
   assert.equal(aceCards, '');
 }
 
+// The workflow must use the exact configured Ornith alias only when llama-server
+// reports that same model as loaded; it must not fall back to a GGUF filename.
+{
+  let requestedUrl = null;
+  const model = await resolveAgenticWorkflowModel({
+    baseUrl: 'http://127.0.0.1:8090/v1/',
+    expectedModel: 'ornith-1.5-9b',
+    fetchImpl: async (url) => {
+      requestedUrl = url;
+      return new Response(JSON.stringify({ data: [{ id: 'ornith-1.5-9b' }] }), { status: 200 });
+    },
+  });
+  assert.equal(requestedUrl, 'http://127.0.0.1:8090/v1/models');
+  assert.equal(model, 'ornith-1.5-9b');
+}
+
+{
+  await assert.rejects(
+    resolveAgenticWorkflowModel({
+      baseUrl: 'http://127.0.0.1:8090',
+      expectedModel: 'ornith-1.5-9b',
+      fetchImpl: async () => new Response(JSON.stringify({ data: [{ id: 'another-model' }] }), { status: 200 }),
+    }),
+    /AGENTIC_WORKFLOW_EXPECTED_MODEL_NOT_LOADED/,
+  );
+}
+
 console.log('agentic-recommendation-workflow.build-ace-evidence-blocks.test.mjs: all assertions passed');
+
+{
+  await assert.rejects(
+    resolveAgenticWorkflowModel({ expectedModel: 'gemma4-9b', fetchImpl: async () => { throw new Error('must not be called'); } }),
+    /AGENTIC_WORKFLOW_MODEL_NOT_ORNITH_1_5/,
+  );
+}

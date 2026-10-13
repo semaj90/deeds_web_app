@@ -31,6 +31,7 @@ export type WorkspaceRevisionOriginRuntimeV1 = {
   record: WorkspaceRevisionRecordV1;
   bindings: WorkspaceSourceBindingV1[];
   skipped: Array<{ sourceRef: string; reason: string }>;
+  gitChangedPaths: string[];
   runtimeRevision: typeof WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION;
 };
 
@@ -91,6 +92,8 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   generatedAt?: string;
   maxSourceBytes?: number;
   sourceExtensions?: ReadonlySet<string>;
+  sourceRefs?: readonly string[];
+  sourceBytesByRef?: ReadonlyMap<string, Uint8Array>;
   onProgress?: (progress: { completed: number; total: number; sourceRef: string }) => void;
   digestCache?: WorkspaceDigestCacheV1;
   /** Optional counters (observability only; not part of any checksum). */
@@ -110,7 +113,16 @@ export function materializeWorkspaceRevisionOriginV1(input: {
   const statusPorcelain = git(workspaceRoot, ['status', '--porcelain=v1', '--untracked-files=all']);
   const dirty = statusPorcelain.length > 0;
 
-  const trackedOutput = git(workspaceRoot, ['ls-tree', '-r', '-z', 'HEAD']);
+  const requestedSourceRefs = input.sourceRefs === undefined
+    ? null
+    : [...new Set(input.sourceRefs.map(normalizeSourceRef))];
+  const suppliedBytes = input.sourceBytesByRef === undefined
+    ? null
+    : new Map([...input.sourceBytesByRef].map(([sourceRef, bytes]) => [normalizeSourceRef(sourceRef), bytes]));
+  const literalPathspecs = requestedSourceRefs?.map((sourceRef) => `:(literal)${sourceRef}`) ?? [];
+  const trackedOutput = git(workspaceRoot, [
+    'ls-tree', '-r', '-z', 'HEAD', ...(requestedSourceRefs ? ['--', ...literalPathspecs] : []),
+  ]);
   const trackedBlobByPath = new Map<string, string>();
   for (const record of trackedOutput.split('\0').filter(Boolean)) {
     const separator = record.indexOf('\t');
@@ -121,15 +133,25 @@ export function materializeWorkspaceRevisionOriginV1(input: {
     if (sourceRef && blobOid) trackedBlobByPath.set(sourceRef, blobOid);
   }
   const trackedAtHead = new Set(trackedBlobByPath.keys());
-  const dirtyOutput = git(workspaceRoot, ['diff', '--name-only', '-z', 'HEAD']);
+  const dirtyOutput = git(workspaceRoot, [
+    'diff', '--name-only', '-z', 'HEAD', ...(requestedSourceRefs ? ['--', ...literalPathspecs] : []),
+  ]);
   const dirtyPaths = new Set(dirtyOutput.split('\0').filter(Boolean).map(normalizeSourceRef));
-  const currentOutput = git(workspaceRoot, ['ls-files', '--cached', '--others', '--exclude-standard', '-z']);
+  const untrackedOutput = git(workspaceRoot, ['ls-files', '--others', '--exclude-standard', '-z']);
+  const gitChangedPaths = [...new Set([
+    ...dirtyPaths,
+    ...untrackedOutput.split('\0').filter(Boolean).map(normalizeSourceRef),
+  ])].sort();
+  const currentOutput = git(workspaceRoot, [
+    'ls-files', '--cached', '--others', '--exclude-standard', '-z', ...(requestedSourceRefs ? ['--', ...literalPathspecs] : []),
+  ]);
   const files = [...new Set(currentOutput
     .split('\0')
     .filter(Boolean)
     .map(normalizeSourceRef)
     .filter((sourceRef) => !isGeneratedSourceArtifact(sourceRef))
-    .filter((sourceRef) => isSourceFile(sourceRef, extensions)))]
+    .filter((sourceRef) => isSourceFile(sourceRef, extensions))
+    .filter((sourceRef) => requestedSourceRefs === null || requestedSourceRefs.includes(sourceRef)))]
     .sort();
 
   const entries: WorkspaceSourceManifestEntryV1[] = [];
@@ -154,14 +176,19 @@ export function materializeWorkspaceRevisionOriginV1(input: {
         continue;
       }
       const mtimeNs = String(info.mtimeNs);
-      const cached = input.digestCache?.get(absolute);
+      const supplied = suppliedBytes?.get(sourceRef);
+      const cached = supplied ? undefined : input.digestCache?.get(absolute);
       let revision: { sourceRevision: string; contentDigest: string; byteLength: number };
       if (cached && cached.size === Number(info.size) && cached.mtimeNs === mtimeNs) {
         revision = { sourceRevision: cached.sourceRevision, contentDigest: cached.contentDigest, byteLength: cached.byteLength };
         if (input.digestStats) input.digestStats.reused += 1;
       } else {
         if (input.digestStats) input.digestStats.rehashed += 1;
-        const bytes = readFileSync(absolute);
+        const bytes = supplied ? Buffer.from(supplied) : readFileSync(absolute);
+        if (bytes.length !== Number(info.size)) {
+          skipped.push({ sourceRef, reason: 'SOURCE_BYTES_CHANGED_DURING_OBSERVATION' });
+          continue;
+        }
         const sourceText = bytes.toString('utf8');
         if (!Buffer.from(sourceText, 'utf8').equals(bytes)) {
           skipped.push({ sourceRef, reason: 'NOT_VALID_UTF8_SOURCE' });
@@ -218,6 +245,7 @@ export function materializeWorkspaceRevisionOriginV1(input: {
     record: built.record,
     bindings,
     skipped,
+    gitChangedPaths,
     runtimeRevision: WORKSPACE_REVISION_ORIGIN_RUNTIME_REVISION,
   };
 }

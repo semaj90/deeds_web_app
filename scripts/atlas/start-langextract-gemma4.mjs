@@ -21,7 +21,7 @@ const LLAMA_SERVER_URL = String(
     process.env.TURBOQUANT_BASE_URL ||
     'http://127.0.0.1:8090/v1',
   ).replace(/\/+$/, '');
-const LANGEXTRACT_MODEL = String(process.env.LANGEXTRACT_MODEL || 'gemma4-legal-iq4xs-direct');
+const LANGEXTRACT_MODEL = String(process.env.LANGEXTRACT_MODEL || 'ornith-1.5-9b');
 
 function writeReport(report) {
   fs.mkdirSync(path.dirname(REPORT_JSON), { recursive: true });
@@ -158,7 +158,7 @@ function startService() {
 
 async function main() {
   const notes = [
-    'LangExtract uses Gemma4 on the llama-server OpenAI-compatible lane; Ollama is not part of this backend.',
+    'LangExtract uses Ornith 1.5 on the llama-server OpenAI-compatible lane; Ollama is not part of this backend.',
     'Use explicit 127.0.0.1 instead of localhost to avoid IPv6 service collisions.',
   ];
 

@@ -34,6 +34,10 @@ const limitArg = process.argv.find(arg => arg.startsWith('--limit='));
 const LIMIT = limitArg ? parseInt(limitArg.split('=')[1]) : 1000;
 
 async function main() {
+  if (isApply && !isDryRun) {
+    throw new Error('UNSAFE_SOURCE_REF_PACKET_BACKFILL_DISABLED: source_ref is not a packet-to-chunk identity key');
+  }
+
   const client = await pool.connect();
   try {
     console.log('\n═══════════════════════════════════════════════════════════');

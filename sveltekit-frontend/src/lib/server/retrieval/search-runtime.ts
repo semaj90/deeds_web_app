@@ -217,6 +217,7 @@ export interface Candidate {
   content: string;
   score: number;
   scoreSource:
+    | 'postgres_fts'
     | 'postgres_trigram'
     | 'qdrant'
     | 'qdrant_768'
@@ -343,7 +344,7 @@ export interface SearchResult {
     };
   };
   provenance: {
-    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
+    retrievalSources: Array<'postgres_fts' | 'postgres_trigram' | 'qdrant' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
     fusionMethod: 'rrf';
     rerankModel: string;
     rerankerUsed: boolean;

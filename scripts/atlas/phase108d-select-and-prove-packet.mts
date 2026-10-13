@@ -98,10 +98,8 @@ interface AtlasPacketRow extends Record<string, unknown> {
   canonical?: boolean | null;
   updated_at?: string | null;
   created_at?: string | null;
-  content_embedding_384?: unknown;
   content_embedding_768?: unknown;
   embedding?: unknown;
-  embedding_384?: unknown;
   metadata?: Record<string, unknown> | null;
   payload?: Record<string, unknown> | null;
   vectors?: Record<string, unknown> | null;
@@ -179,8 +177,8 @@ function isConstantVector(vector: number[]): boolean {
 }
 
 function isValidEmbeddingArtifact(row: AtlasPacketRow): boolean {
-  const vector = parseVector(row.content_embedding_384 ?? row.embedding_384 ?? row.embedding ?? row.content_embedding_768);
-  if (vector.length !== 384 && vector.length !== 768) return false;
+  const vector = parseVector(row.embedding ?? row.content_embedding_768);
+  if (vector.length !== 768) return false;
   if (!vector.every((value) => Number.isFinite(value))) return false;
   if (isConstantVector(vector)) return false;
 
@@ -203,9 +201,9 @@ function isValidEmbeddingArtifact(row: AtlasPacketRow): boolean {
   const representationName =
     normalizeText(row.metadata?.representation_name)
     ?? normalizeText(row.payload?.representation_name)
-    ?? (vector.length === 384 ? 'dense_384' : 'dense_768');
+    ?? 'semantic_768';
 
-  return Boolean(producerModel && producerVersion && representationName);
+  return Boolean(producerModel && producerVersion && representationName === 'semantic_768');
 }
 
 function resolveWorkspaceRevision(row: AtlasPacketRow): string | null {
@@ -448,7 +446,7 @@ async function probeQdrantPacket(
     return 'UNAVAILABLE';
   }
 
-  const canonicalCollections = collections.filter((name) => /^codebase_chunks_/i.test(name));
+  const canonicalCollections = collections.filter((name) => name === 'codebase_chunks_768');
   if (canonicalCollections.length === 0) {
     packet.diagnostics.push('No canonical Qdrant collections discovered');
     return 'ABSENT';
@@ -492,8 +490,8 @@ async function probeQdrantPacket(
       const sourceRefMatches = !packet.sourceRef || pointSourceRef === packet.sourceRef;
       const hashMatches = !packet.contentHash || pointContentHash === packet.contentHash;
       const workspaceMatches = !packet.workspaceRevision || pointWorkspaceRevision === packet.workspaceRevision;
-      const laneValid = !representationName || ['dense_384', 'dense_768', 'latent_64'].includes(representationName);
-      const dimensionValid = !dimensions || [64, 384, 768].includes(dimensions);
+      const laneValid = representationName === 'semantic_768';
+      const dimensionValid = dimensions === 768;
 
       if (packetKeyMatches && sourceRefMatches && hashMatches && workspaceMatches && laneValid && dimensionValid) {
         sawMatch = true;
@@ -687,17 +685,17 @@ function selectPacketCoverage(candidates: PacketCoverage[], explicitPacketKey?: 
   };
 }
 
-function buildRepairActions(packet: PacketCoverage, row: AtlasPacketRow): RepairAction[] {
-  const qdrantCollection = normalizeText(row.qdrant_collection) ?? (parseVector(row.content_embedding_384).length === 768 ? 'codebase_chunks_768' : 'codebase_chunks_384');
+function buildRepairActions(packet: PacketCoverage): RepairAction[] {
+  const qdrantCollection = 'codebase_chunks_768';
   return [
     {
       order: 1,
       store: 'QDRANT',
       action: packet.qdrant === 'PRESENT'
         ? 'Qdrant projection already present; validate payload parity only.'
-        : 'Upsert one packet projection through the canonical Qdrant adapter.',
-      owner: 'scripts/atlas/phase108d-qdrant-single-point-upsert.mts',
-      validationCommand: `npx tsx scripts/atlas/phase108d-qdrant-single-point-upsert.mts ${packet.packetKey} ${qdrantCollection}`,
+        : 'Projection repair requires a separately authorized governed writer; this diagnostic does not write.',
+      owner: 'GOVERNED_QDRANT_ADMISSION_OWNER_NOT_ESTABLISHED',
+      validationCommand: 'NO_APPLY_COMMAND_AVAILABLE',
       expectedArtifact: `Qdrant point payload for ${packet.packetKey} in ${qdrantCollection}`,
       executed: false,
     },
@@ -706,7 +704,7 @@ function buildRepairActions(packet: PacketCoverage, row: AtlasPacketRow): Repair
       store: 'REDIS',
       action: packet.redis === 'PRESENT'
         ? 'Redis packet cache already present; verify read-back parity only.'
-        : 'Write one packet-sized ACE/Valkey projection through the canonical active-context path.',
+        : 'Cache repair requires a separately authorized governed owner; this diagnostic does not write.',
       owner: 'sveltekit-frontend/src/mcp/engram_tools.ts',
       validationCommand: `node scripts/atlas/atlas-live-reconciliation-audit.mjs --verbose`,
       expectedArtifact: `ace:packet:${packet.packetKey} and bifrost:packet:${packet.packetKey} Redis projections`,
@@ -790,7 +788,7 @@ function buildRepairPacket(packet: PacketCoverage, row: AtlasPacketRow) {
       { lane: 'HYPERRAG', status: packet.hyperrag, reason: 'HyperRAG projection state', evidenceRefs: [packet.packetKey] },
     ],
     violations: [
-      packet.qdrant !== 'PRESENT' ? { code: 'QDRANT_REPAIR_PENDING', lane: 'QDRANT', severity: 'WARN' as const, detail: 'Qdrant projection still needs one bounded packet repair.' } : null,
+      packet.qdrant !== 'PRESENT' ? { code: 'GOVERNED_QDRANT_REPAIR_OWNER_REQUIRED', lane: 'QDRANT', severity: 'WARN' as const, detail: 'A separately authorized governed writer is required; this diagnostic does not repair projections.' } : null,
       packet.redis !== 'PRESENT' ? { code: 'REDIS_REPAIR_PENDING', lane: 'REDIS', severity: 'WARN' as const, detail: 'Redis/Valkey cache still needs one bounded packet repair.' } : null,
       packet.ace !== 'PRESENT' ? { code: 'ACE_REPAIR_PENDING', lane: 'ACE', severity: 'WARN' as const, detail: 'ACE packet still needs one bounded packet repair.' } : null,
       packet.hyperrag !== 'PRESENT' ? { code: 'HYPERRAG_REPAIR_PENDING', lane: 'HYPERRAG', severity: 'WARN' as const, detail: 'HyperRAG projection still needs refresh or validation.' } : null,
@@ -949,6 +947,8 @@ export async function runPhase108dSelectAndProvePacket(cliArgs: Partial<CliArgs>
   proofGate: ProofGateResult | null;
   exitCode: number;
 }> {
+  if (cliArgs.repair) throw new Error('PHASE108D_REPAIR_DISABLED_GOVERNED_WRITER_REQUIRED');
+
   const startedAt = new Date().toISOString();
   const runId = `phase108d-${crypto.randomUUID().slice(0, 8)}`;
   const env = loadRepoEnv(process.env);
@@ -1132,7 +1132,7 @@ export async function runPhase108dSelectAndProvePacket(cliArgs: Partial<CliArgs>
     }
 
     const row = (candidates.find((candidate) => candidate.coverage.packetKey === selectedPacket!.packetKey)?.row) ?? null;
-    const repairPlan = row ? buildRepairActions(selectedPacket, row) : [];
+    const repairPlan = row ? buildRepairActions(selectedPacket) : [];
     repairActions.push(...repairPlan);
 
     const needsRealEmbedding = selectedPacket.qdrant !== 'PRESENT' && (!row || !isValidEmbeddingArtifact(row));
@@ -1140,117 +1140,6 @@ export async function runPhase108dSelectAndProvePacket(cliArgs: Partial<CliArgs>
       blockers.push('REAL_EMBEDDING_REQUIRED');
       const qdrantAction = repairActions.find((action) => action.store === 'QDRANT');
       if (qdrantAction) qdrantAction.result = 'SKIPPED';
-    }
-
-    if (repairRequested && row) {
-      const qdrantAction = repairActions.find((action) => action.store === 'QDRANT');
-      if (qdrantAction && !needsRealEmbedding) {
-        try {
-          const vector = parseVector(row.content_embedding_384 ?? row.embedding_384 ?? row.embedding ?? row.content_embedding_768);
-          const collection = normalizeText(row.qdrant_collection) ?? (vector.length === 768 ? 'codebase_chunks_768' : 'codebase_chunks_384');
-          const pointId = normalizeText(row.qdrant_point_id) ?? crypto.createHash('sha1').update(selectedPacket.packetKey).digest('hex').slice(0, 32);
-          const producerModel =
-            normalizeText(row.metadata?.producer_model)
-            ?? normalizeText(row.metadata?.embedding_model)
-            ?? normalizeText(row.metadata?.model_id)
-            ?? normalizeText(row.payload?.producer_model)
-            ?? normalizeText(row.payload?.embedding_model)
-            ?? normalizeText(row.payload?.model_id);
-          const producerVersion =
-            normalizeText(row.metadata?.producer_version)
-            ?? normalizeText(row.metadata?.embedding_version)
-            ?? normalizeText(row.metadata?.model_version)
-            ?? normalizeText(row.payload?.producer_version)
-            ?? normalizeText(row.payload?.embedding_version)
-            ?? normalizeText(row.payload?.model_version);
-          const representationName = vector.length === 768 ? 'dense_768' : 'dense_384';
-          const payload = {
-            packet_key: selectedPacket.packetKey,
-            source_ref: selectedPacket.sourceRef,
-            content_hash: selectedPacket.contentHash,
-            workspace_revision: selectedPacket.workspaceRevision,
-            feature_id: normalizeText(row.feature_id),
-            repository_id: selectedPacket.repositoryId,
-            representation_id: normalizeText(row.qdrant_point_id) ?? `${representationName}:${selectedPacket.packetKey}`,
-            representation_name: representationName,
-            producer_model: producerModel ?? 'unknown',
-            producer_version: producerVersion ?? 'unknown',
-            dimensions: vector.length,
-            normalization: 'l2',
-          };
-
-          if (vector.length === 0 || isConstantVector(vector)) {
-            blockers.push('REAL_EMBEDDING_REQUIRED');
-            qdrantAction.result = 'SKIPPED';
-          } else {
-            const response = await fetch(`${(process.env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/+$/, '')}/collections/${encodeURIComponent(collection)}/points?wait=true`, {
-              method: 'PUT',
-              headers: { 'content-type': 'application/json' },
-              body: JSON.stringify({
-                points: [
-                  {
-                    id: pointId,
-                    vector: { content: vector },
-                    payload,
-                  },
-                ],
-              }),
-              signal: AbortSignal.timeout(15000),
-            });
-            if (!response.ok) {
-              qdrantAction.result = 'FAIL';
-              blockers.push(`QDRANT_REPAIR_FAILED_${response.status}`);
-            } else {
-              qdrantAction.executed = true;
-              qdrantAction.result = 'PASS';
-            }
-          }
-        } catch (error) {
-          qdrantAction.executed = true;
-          qdrantAction.result = 'FAIL';
-          blockers.push(`QDRANT_REPAIR_FAILED_${String(error instanceof Error ? error.message : error)}`);
-        }
-      }
-
-      const redisAction = repairActions.find((action) => action.store === 'REDIS');
-      const aceAction = repairActions.find((action) => action.store === 'ACE');
-      if (redisAction && aceAction) {
-        const client = createClient({
-          url: resolveRedisUrl(env),
-          socket: { connectTimeout: 3000, reconnectStrategy: () => false },
-        });
-        client.on('error', () => {});
-        try {
-          await client.connect();
-          const packetJson = buildRepairPacket(selectedPacket, row);
-          const serialized = JSON.stringify(packetJson);
-          const packetCacheKey = `ace:packet:${selectedPacket.packetKey}`;
-          const aliasKey = `bifrost:packet:${selectedPacket.packetKey}`;
-          await client.set(packetCacheKey, serialized, { EX: 1800 });
-          await client.set(aliasKey, serialized, { EX: 1800 });
-          await client.set('ace:packet:latest', selectedPacket.packetKey, { EX: 1800 });
-          await client.set('bifrost:packet:latest', selectedPacket.packetKey, { EX: 1800 });
-          redisAction.executed = true;
-          redisAction.result = 'PASS';
-          aceAction.executed = true;
-          aceAction.result = 'PASS';
-        } catch (error) {
-          const text = String(error instanceof Error ? error.message : error);
-          redisAction.executed = true;
-          aceAction.executed = true;
-          if (/auth|password|denied/i.test(text)) {
-            redisAction.result = 'FAIL';
-            aceAction.result = 'FAIL';
-            blockers.push('REDIS_AUTH_REQUIRED');
-          } else {
-            redisAction.result = 'FAIL';
-            aceAction.result = 'FAIL';
-            blockers.push(`REDIS_ACE_REPAIR_FAILED_${text}`);
-          }
-        } finally {
-          await client.quit().catch(() => {});
-        }
-      }
     }
 
     const proofCommandValue = `npx tsx scripts/atlas/phase108d-single-packet-proof.mts ${selectedPacket.packetKey}`;

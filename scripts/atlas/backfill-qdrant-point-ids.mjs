@@ -46,6 +46,10 @@ async function qdrantScroll(offset, limit) {
 }
 
 async function main() {
+  if (APPLY) {
+    throw new Error('UNSAFE_SOURCE_REF_ONLY_BACKFILL_DISABLED: use a reviewed packet-key exact-match owner; source_ref is not a unique point-to-packet key');
+  }
+
   let offset = null;
   let totalScrolled = 0;
   let totalMatched = 0;

@@ -331,7 +331,7 @@
     "atlas:embedding:norms": "npx tsx scripts/atlas/audit-embedding-dimensions.mjs --verbose",
     "atlas:index:registry:init": "npx tsx scripts/atlas/validate-qdrant-bridge.mjs --apply --verbose",
     "atlas:packages:verify": "node scripts/atlas/verify-atlas-package-boundaries.mjs",
-    "atlas:phase1:indexing": "npm run atlas:index:qdrant:build & npm run atlas:index:turbovec:build & wait && npm run atlas:index:validate",
+    "atlas:phase1:indexing": "npm run atlas:index:validate && npm run atlas:index:qdrant:build && npm run atlas:index:turbovec:build",
     "atlas:index:qdrant:build": "npx tsx scripts/atlas/validate-qdrant-bridge-v2.mjs --verbose",
     "atlas:index:qdrant:build:dry": "npx tsx scripts/atlas/validate-qdrant-bridge.mjs --verbose",
     "atlas:index:turbovec:build": "npx tsx scripts/atlas/turbovec-pipeline-validation.mjs --verbose",

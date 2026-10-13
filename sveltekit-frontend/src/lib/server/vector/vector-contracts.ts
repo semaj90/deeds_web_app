@@ -230,8 +230,8 @@ export const CANONICAL_SOURCE_COLLECTION = 'codebase_chunks_768' as const;
 /** Comparison/challenger 768 collection; authority is not implied by its suffix. */
 export const REFERENCE_SOURCE_COLLECTION = 'codebase_chunks_768_v2' as const;
 
-/** @deprecated Legacy 384 hybrid migration/reference lane; never canonical. */
-export const CANONICAL_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;
+/** Legacy 384 hybrid migration/reference lane; never canonical. */
+export const LEGACY_REFERENCE_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;
 
-/** @deprecated Legacy 384 dense migration/reference lane; never canonical. */
-export const TRANSITIONAL_DENSE_COLLECTION = 'codebase_chunks_384' as const;
+/** Legacy 384 dense migration/reference lane; never canonical. */
+export const LEGACY_REFERENCE_DENSE_COLLECTION = 'codebase_chunks_384' as const;

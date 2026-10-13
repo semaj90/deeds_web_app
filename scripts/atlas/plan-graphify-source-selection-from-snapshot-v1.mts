@@ -2,18 +2,30 @@
 /** Read-only adapter from WorkspaceSnapshotV1 to Graphify source bindings. */
 import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { dirname, extname, resolve } from 'node:path';
+import { dirname, extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import { normalizeInventoryPath, sourceIdentityKey } from './lib/canonical-source-inventory-hygiene-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
 const HYGIENE = resolve(ROOT, 'docs/reports/canonical-source-inventory-hygiene-v1.json');
 const hash = (value: string) => `sha256:${createHash('sha256').update(value, 'utf8').digest('hex')}`;
 const jsonHash = (value: unknown) => `sha256:${createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex')}`;
 const normalize = normalizeInventoryPath;
-function argument(name: string) { const i = process.argv.indexOf(name); return i >= 0 ? process.argv[i + 1] : undefined; }
+function argument(name: string) {
+  const inline = process.argv.find((value) => value.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
+  const index = process.argv.indexOf(name);
+  if (index < 0) return undefined;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE_FOR_${name.slice(2).replaceAll('-', '_').toUpperCase()}`);
+  return value;
+}
+const reportArgument = argument('--report');
+const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/graphify-source-selection-plan-v1.json');
+if (reportArgument && !REPORT.startsWith(`${resolve(ROOT, '.tmp')}${sep}`)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 async function latestManifest() {
   const directory = resolve(ROOT, 'docs/reports/workspace-source-snapshots');
   const names = (await readdir(directory)).filter((name) => extname(name) === '.json');

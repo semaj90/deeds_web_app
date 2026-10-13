@@ -18,6 +18,9 @@
 
 import pg from 'pg';
 
+console.error('LEGACY_384_KMEANS_PAYLOAD_DISABLED: the target collection is retired; do not recreate or enrich it');
+process.exit(2);
+
 const args       = process.argv.slice(2);
 const DRY_RUN    = args.includes('--dry-run');
 const APPLY      = args.includes('--apply');

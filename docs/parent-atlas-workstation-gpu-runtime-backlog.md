@@ -96,6 +96,16 @@ parity evidence.
 
 - [ ] **CAGRA-00** Runtime/import/device proof: installed, reachable, RTX and cuVS detected.
 - [ ] **CAGRA-01** Snapshot contract: workspace/source/representation/ordinal-map revisions, checksum, 768 dimensions, float32, cosine, and `content` vector slot.
+- [ ] **CAGRA-01A** Precision and graph compression ladder:
+  - Phase A (Evaluation Oracle): CPU `float64` strictly for mathematical tie detection in testing. Never resident in GPU VRAM.
+  - Phase B (Canonical Float Baseline): `float32` cosine similarity / distance parity with PostgreSQL (`codebase_chunk_index.content_embedding_768`) and Qdrant (`codebase_chunks_768`).
+  - Phase C (SIMT Accelerated Precision): `fp16` half-precision cuVS brute force and CAGRA graph exploration to halve VRAM allocation on 8 GiB RTX 3060 Ti.
+  - Phase D (Scalar Quantized Graph): `int8` (SQ8) compressed graph representation for candidate pre-filtering and daily Graphify snapshots with $<0.5\%$ recall degradation.
+  - Phase E (Compressed CAGRA / Product Quantization): `int4` / PQ compression params evaluated with an exact `fp32` top-K rescore step, preserving the One Semantic Lane Rule.
+- [ ] **CAGRA-01B** CPU Multi-Threaded & PostgreSQL Constant Baseline:
+  - PostgreSQL 18 owns canonical packet identity, bitmap scans, FTS, and durable embeddings (`const PostgreSQL`).
+  - Host CPU multi-threaded workers (Node.js worker_threads / Python ProcessPoolExecutor / Go Retrieval) provide the baseline for AST semantic search, parameter indexing, LUT generation, DAG prefill, and repair candidate validation before any GPU offload.
+  - MCP tool calling and agentic error-fixing workflows consume pre-computed LUT caches and DAG plans without direct GPU dependency.
 - [ ] **CAGRA-02** 10K real Parent Atlas rows: exact cuVS versus CAGRA Recall@5/@10/@50, identity parity, and latency.
 - [ ] **CAGRA-03** 50K real Parent Atlas rows: repeat the same proof.
 - [ ] **CAGRA-04** Full frozen semantic snapshot: recall, latency, build cost, resident index size, and peak VRAM.
@@ -242,6 +252,23 @@ These remain outside GPH acceptance:
 - Valkey cache policy expansion
 
 The AST lane can prove structural evidence while this backlog remains deferred.
+
+## Per-directory LUT tree (design only, not implemented)
+
+Status: design. Not started. Derived and rebuildable; never canonical identity.
+
+| Element | Definition | Source and owner |
+|---|---|---|
+| Tree | One node per directory path, built from `source_ref` paths. 5,520 directories, 28,207 files, max depth 13 (`codebase_chunk_index`, 2026-10-12). No `atlas_directories` table exists; `atlas_source_refs` does. | Canonical identity chain: `directory_path` → `source_ref` |
+| Node LUT | Child list, file count, chunk count, symbol names, and per-file `sourceRevision` | AST owner (GPH-13) and binding owner |
+| Contextual inheritance | A query walks root → leaf. Each ancestor gives a bounded prior, not a vote. | SearchRuntime owns fusion (one lane vote) |
+| Fanout | CPU worker pool, one top-level subtree per worker. Deterministic sorted order. Parent nodes reduce from children. | CAGRA-01B CPU-first baseline; no GPU |
+| Admission | An entry is valid only if its `sourceRevision` matches the current binding. Mismatch is stale and excluded from prompts. | Binding owner |
+| Storage | JSONL under `.tmp/` until admitted. A Postgres table needs its own schema approval. | Derived projection |
+
+Per-tree LUT families, all derived: lexical score sources (`.okf/index.md`), MCP tool calling (`.okf/index.md`), symbol/AST, and this directory tree. Each is keyed by its owner's identity, never by a path string alone.
+
+Gate: GPH-13 AST parity comes first. No LUT build runs before that gate.
 
 ## Safe next task
 

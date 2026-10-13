@@ -41,6 +41,15 @@ if (mode !== 'repository' && mode !== 'file') {
 
 const isDryRun = has('--dry-run');
 const applyTokenSupplied = arg('--apply');
+const outputArg = arg('--output');
+const scratchRoot = `${path.resolve(root, '.tmp')}${path.sep}`;
+const reportPath = outputArg
+  ? path.resolve(root, outputArg)
+  : path.join(root, 'docs/reports/stable-file-identity-mint-v1.json');
+if (outputArg && !reportPath.startsWith(scratchRoot)) {
+  console.error('Refusing output path outside repository .tmp');
+  process.exit(2);
+}
 if (!isDryRun && applyTokenSupplied !== APPLY_TOKEN) {
   console.error(`Refusing to run: pass --dry-run, or --apply with the exact token. Got ${JSON.stringify(applyTokenSupplied)}`);
   process.exit(2);
@@ -173,8 +182,13 @@ try {
 
 const body = JSON.stringify(report, null, 2);
 const sha12 = crypto.createHash('sha256').update(body).digest('hex').slice(0, 12);
-fs.mkdirSync(path.join(root, 'docs/reports'), { recursive: true });
-fs.writeFileSync(path.join(root, 'docs/reports', `stable-file-identity-mint-v1.${sha12}.json`), body + '\n', { flag: 'wx' });
-fs.writeFileSync(path.join(root, 'docs/reports/stable-file-identity-mint-v1.json'), body + '\n');
+if (outputArg) {
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, body + '\n', { flag: 'wx' });
+} else {
+  fs.mkdirSync(path.join(root, 'docs/reports'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs/reports', `stable-file-identity-mint-v1.${sha12}.json`), body + '\n', { flag: 'wx' });
+  fs.writeFileSync(reportPath, body + '\n');
+}
 console.log(report.status, JSON.stringify({ mode: report.mode, decision: report.decision, outcome: report.outcome, error: report.error }));
 if (report.status !== 'DRY_RUN_PROVEN' && report.status !== 'APPLY_PROVEN') process.exit(1);

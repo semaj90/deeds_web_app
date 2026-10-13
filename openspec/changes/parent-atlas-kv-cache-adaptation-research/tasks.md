@@ -703,3 +703,75 @@ session given accumulated context.
 **Boundary:** these tasks are research proofs only. They do not create a new KV-cache owner, do not
 serialize Ornith recurrent/SSM state into ACE/BitFrost/Valkey, and do not alter ContextManifest,
 canonical evidence, or the existing `KvCompressionBackend` promotion gates.
+
+## CHALLENGER-LANE ALIGNMENT — WebGPU Gemma4 / Triton / TRT-LLM / IsoQuant / PolarQuant (added 2026-10-12)
+
+Scope: align the experimental lanes around the single live chat owner (llama-server `:8090`, Ornith 1.5 9B,
+alias `ornith-1.5-9b`). No lane here may become a second chat/synthesis owner. Each lane needs its own baseline,
+parity gate, and approval before any runtime change. Status vocabulary: CREATED / WIRED / DRY_RUN_PROVEN /
+APPLY_PROVEN / NOT_PROVEN (CLAUDE.md). Lane observations use: ABSENT / PRESENT / FIXTURE_PROVEN / RUNTIME_SMOKE_PROVEN / NOT_PROVEN.
+
+### A. Owner and baseline (must precede every lane)
+- [x] ALIGN-A1 Canonical chat owner confirmed live 2026-10-12: `GET :8090/props` → `model_alias: ornith-1.5-9b`,
+  `model_path: models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`. Evidence: session probe. Status: RUNTIME_SMOKE_PROVEN.
+- [ ] ALIGN-A2 Freeze the llama-server baseline receipt: build revision, model SHA-256, full command line,
+  context, KV cache types, and a fixed deterministic prompt set. Gate: every challenger compares against this receipt,
+  never against memory. Status: NOT_PROVEN.
+- [ ] ALIGN-A3 Pick the single admission metric set for all lanes: quality parity on a frozen prompt set, tokens/s,
+  time-to-first-token, peak VRAM (measured with nvidia-smi outside the CUDA process), and failure rate.
+
+### B. IsoQuant / PolarQuant (quantization challengers; not runtime-supported)
+- [x] ALIGN-B1 IsoQuant synthetic reconstruction harness exists (ISOQUANT-SYNTH-01, `scripts/atlas/prove-isoquant-synthetic-reconstruction-v1.mjs`).
+  Status: FIXTURE_PROVEN, synthetic only.
+- [ ] ALIGN-B2 = ISOQUANT-REAL-KV-02 (already open above): round-trip on REAL K/V tensors from the live runtime, compared
+  against fp16 and q8_0. Blocked until a capture method is approved (it touches the live `:8090` process).
+- [ ] ALIGN-B3 PolarQuant DEFINITION GATE: no PolarQuant method, parameters, or reference implementation is pinned in
+  this repo. Mentions exist only in proposal/tasks prose. Output required before any code: a one-page definition with
+  source citation, bit-width, the rotation/grouping scheme, and the parity metric. Status: NOT_PROVEN, undefined.
+- [ ] ALIGN-B4 Quantization format separation (do not conflate): llama-server `-ctk/-ctv` KV cache types (q8_0, turbo3),
+  GGUF K-quants (weights), pgvector binary/halfvec (vectors), and QLoRA NF4 (training) are different formats.
+  Record which one each experiment touches.
+- [ ] ALIGN-B5 Quant boost = TurboQuant profiles (`scripts/launch-turboquant.ps1`: stock / turboquant / turboquant-safe).
+  Any profile change is a live `:8090` change and needs an exact launcher receipt (see ORNITH-YARN-LAUNCH-02 pattern).
+
+### C. WebGPU Gemma4 small-model lane (client-side challenger)
+- [x] ALIGN-C1 Inventory: `sveltekit-frontend/static/gemma4_e2b_onnx/` (3.0 GB, ONNX with onnx/ folder). Status: PRESENT, not loaded
+  by any verified client path.
+- [ ] ALIGN-C2 Choose the small WebGPU target explicitly: (a) keep `gemma3_270m_onnx` (current CLIENT_LLM per CLAUDE.md), or
+  (b) Gemma4 E2B ONNX. Decision needed from the operator. Measure download size and load time in the browser for each.
+- [ ] ALIGN-C3 Parity gate: the browser lane must produce the same answer class as `:8090` on a frozen prompt set before it
+  is allowed to answer any query. It never becomes the fallback for legal or complex queries (CLAUDE.md client router rule).
+- [ ] ALIGN-C4 Client model identifiers must not hardcode Gemma4 names in code paths without the guard spec being updated
+  (`src/lib/server/ai/gemma-chat-model-literals.guard.spec.ts`).
+
+### D. Triton and TensorRT-LLM (server-side challengers; both NOT running)
+- [x] ALIGN-D1 Inventory: `triton-model-repository/gemma4_e2b_q4f16_{decoder,embed_tokens}` present; `scripts/start-triton.sh`,
+  `scripts/build-trt-engines.sh`, and a TensorRT INT4 export notebook present. No running Triton or TRT-LLM service and no
+  built engine found. Status: PRESENT, NOT_RUNNING.
+- [ ] ALIGN-D2 Pick ONE server challenger first (Triton OR TRT-LLM), not both. Admission is against ALIGN-A2's baseline.
+- [ ] ALIGN-D3 Triton repository: `TRITON_MODEL_NAME=gemma4-legal` in `.env.local` names a repository that is actually
+  `gemma4_e2b_*`. Fix the name only after D2 is decided; do not rename repository directories without approval.
+- [ ] ALIGN-D4 VRAM gate: RTX 3060 Ti 8 GB cannot hold llama-server `:8090` plus any second served model. Any D run must
+  stop `:8090` through the approved GPU task first and must be recorded as a separate lane run.
+
+### E. C++ and native alignment
+- [x] ALIGN-E1 `simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node` present (CUDA 13.0 / LibTorch cu130 per CLAUDE.md).
+  It is a native helper addon, not a model server. Status: PRESENT.
+- [ ] ALIGN-E2 No new C++ serving code until D2 and ALIGN-A2 are complete. Any addon change needs the native build-file rule
+  (no changes to CUDA/native build files without approval, per the global CLAUDE.md).
+
+### F. Ownership and config (the current, verified state)
+- [x] ALIGN-F1 `LANGEXTRACT_MODEL` now `ornith-1.5-9b` in `.env.local`; LangExtract `.mjs` default and bridge docs updated
+  (2026-10-12). Status: CREATED (syntax-checked). Runtime: NOT_PROVEN, no LangExtract run performed.
+- [ ] ALIGN-F2 Remaining Gemma4 literal references (about 20 src files, the guard spec allowlist, and launchers in `scripts/`):
+  per-file pass, guard spec run after each file, no blanket rename.
+- [ ] ALIGN-F3 Duplicate model copies for the Gemma4 files are proposed only (`.tmp/atlas/duplicate-audit-20261012/duplicates.json`).
+  No link or delete until F2 confirms no live consumer.
+
+### G. Execution order (each step needs its own approval)
+1. ALIGN-A2 baseline receipt (read-only capture of `:8090` state).
+2. ALIGN-B3 PolarQuant definition (document only).
+3. ALIGN-C2 operator decision on the WebGPU target; then C3 parity gate design.
+4. ALIGN-D2 choose one server challenger; D4 VRAM plan.
+5. ALIGN-F2 per-file Gemma4 pass, then F3 hardlink decisions.
+6. ALIGN-B2 real-KV capture only after A2 and an approved capture method.

@@ -19,17 +19,30 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const TMP_DIR = path.join(REPO_ROOT, '.tmp');
 const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const MODEL_JSON = path.join(TMP_DIR, 'semantic-naive-bayes-model.json');
-const OUTPUT_JSONL = path.join(TMP_DIR, 'naive-bayes-predictions.ndjson');
-const REPORT_JSON = path.join(REPORTS_DIR, 'naive-bayes-predictions.json');
-const REPORT_MD = path.join(REPORTS_DIR, 'naive-bayes-predictions.md');
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run') || argv.includes('--dry');
+const COMPARE_384_PRESENCE = argv.includes('--compare-384-presence');
 const LIMIT = parseIntFlag(argv, '--limit', 500);
 const OFFSET = parseIntFlag(argv, '--offset', 0);
+const RUN_ID = new Date().toISOString().replace(/[:.]/g, '-');
+const DRY_RUN_DIR = path.join(TMP_DIR, 'atlas', 'naive-bayes-dry-run', RUN_ID);
+const OUTPUT_JSONL = DRY_RUN
+  ? path.join(DRY_RUN_DIR, 'predictions.ndjson')
+  : path.join(TMP_DIR, 'naive-bayes-predictions.ndjson');
+const REPORT_JSON = DRY_RUN
+  ? path.join(DRY_RUN_DIR, 'report.json')
+  : path.join(REPORTS_DIR, 'naive-bayes-predictions.json');
+const REPORT_MD = DRY_RUN
+  ? path.join(DRY_RUN_DIR, 'report.md')
+  : path.join(REPORTS_DIR, 'naive-bayes-predictions.md');
 const MODEL = argv.find((arg) => arg.startsWith('--model='))?.split('=')[1]
   ? path.resolve(REPO_ROOT, argv.find((arg) => arg.startsWith('--model='))?.split('=')[1])
   : MODEL_JSON;
+
+if (COMPARE_384_PRESENCE && !DRY_RUN) {
+  throw new Error('--compare-384-presence requires --dry-run');
+}
 
 const env = loadRepoEnv(process.env);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(env) });
@@ -102,6 +115,16 @@ function buildTokens(row) {
   tokens.push(`has_qdrant:${row.has_qdrant_point_id ? '1' : '0'}`);
   tokens.push(`has_som:${row.has_som ? '1' : '0'}`);
   tokens.push(`has_pagerank:${row.has_pagerank ? '1' : '0'}`);
+
+  // Include direct feature text tokens aligned with TfidfVectorizer vocabulary (NB-FEATURE-PARITY-01)
+  const rawFeatureWords = [
+    ...(row.ast_symbols ?? []),
+    ...(row.lexical_features ?? []),
+    ...(row.used_concepts ?? []),
+    ...(row.entities ?? []),
+  ].flatMap((item) => tokenize(item));
+  tokens.push(...rawFeatureWords);
+
   return tokens.filter(Boolean);
 }
 
@@ -137,7 +160,12 @@ function predict(model, row) {
 
 async function loadRows(limit, offset) {
   const client = await pool.connect();
+  let readOnlyTransaction = false;
   try {
+    if (DRY_RUN) {
+      await client.query('BEGIN TRANSACTION READ ONLY');
+      readOnlyTransaction = true;
+    }
     const packetCols = await getColumns(client, 'atlas_packets');
     const featuresExists = await tableExists(client, 'atlas_packet_features');
     const metricsExists = await tableExists(client, 'atlas_packet_metrics');
@@ -160,7 +188,7 @@ async function loadRows(limit, offset) {
       'ap.concept_ids',
       'ap.keywords',
     ];
-    if (packetCols.has('content_embedding_384')) {
+    if (COMPARE_384_PRESENCE && packetCols.has('content_embedding_384')) {
       select.push('ap.content_embedding_384');
     }
     if (packetCols.has('used_concepts')) select.push('ap.used_concepts');
@@ -186,7 +214,7 @@ async function loadRows(limit, offset) {
       LIMIT $1 OFFSET $2
     `;
     const { rows } = await client.query(sql, [limit, offset]);
-    return rows.map((row) => ({
+    const mapped = rows.map((row) => ({
       ...row,
       used_concepts: row.used_concepts ?? row.features_used_concepts ?? row.concept_ids ?? [],
       entities: row.packet_entities ?? row.features_entities ?? [],
@@ -195,7 +223,8 @@ async function loadRows(limit, offset) {
       has_ast_symbols: Array.isArray(row.packet_ast_symbols ?? row.features_ast_symbols) && (row.packet_ast_symbols ?? row.features_ast_symbols).filter(Boolean).length > 0,
       has_lexical_features: Array.isArray(row.packet_lexical_features ?? row.features_lexical_features) && (row.packet_lexical_features ?? row.features_lexical_features).filter(Boolean).length > 0,
       has_used_concepts: Array.isArray(row.used_concepts ?? row.features_used_concepts ?? row.concept_ids) && (row.used_concepts ?? row.features_used_concepts ?? row.concept_ids).filter(Boolean).length > 0,
-      has_embedding: Boolean(row.embedding || row.content_embedding_384 || row.latent_64),
+      has_embedding: Boolean(row.embedding),
+      has_legacy_embedding: Boolean(row.embedding || row.content_embedding_384 || row.latent_64),
       has_qdrant_point_id: Boolean(normalizeText(row.qdrant_point_id)),
       has_som: Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col)),
       has_pagerank: Number.isFinite(Number(row.page_rank_score ?? row.pagerank)),
@@ -205,6 +234,11 @@ async function loadRows(limit, offset) {
       training_split: 'accepted',
       failure_reason: '',
     }));
+    if (readOnlyTransaction) await client.query('COMMIT');
+    return mapped;
+  } catch (error) {
+    if (readOnlyTransaction) await client.query('ROLLBACK').catch(() => {});
+    throw error;
   } finally {
     client.release();
   }
@@ -247,16 +281,34 @@ async function main() {
     source_ref: normalizeText(row.source_ref),
     prediction: predict(model, row),
   }));
+  const legacyPredictions = COMPARE_384_PRESENCE
+    ? rows.map((row) => predict(model, { ...row, has_embedding: row.has_legacy_embedding }))
+    : null;
+  const comparison = legacyPredictions
+    ? {
+      baseline: 'previous has_embedding = embedding OR content_embedding_384 OR latent_64',
+      current: 'has_embedding = embedding (768-D field only)',
+      rowsCompared: rows.length,
+      predictionChanges: legacyPredictions.filter((prediction, index) => prediction.predicted_label !== predictions[index].prediction.predicted_label).length,
+      confidenceChanges: legacyPredictions.filter((prediction, index) => prediction.confidence !== predictions[index].prediction.confidence).length,
+      sample: predictions.slice(0, 5).map((item, index) => ({
+        packet_key: item.packet_key,
+        source_ref: item.source_ref,
+        legacy: legacyPredictions[index],
+        current: item.prediction,
+      })),
+    }
+    : null;
 
-  await fs.mkdir(TMP_DIR, { recursive: true });
-  await fs.mkdir(REPORTS_DIR, { recursive: true });
+  await fs.mkdir(path.dirname(OUTPUT_JSONL), { recursive: true });
   await fs.writeFile(OUTPUT_JSONL, `${predictions.map((row) => JSON.stringify(row)).join('\n')}${predictions.length > 0 ? '\n' : ''}`, 'utf8');
 
-  const client = await pool.connect();
-  try {
-    await ensurePredictionColumn(client);
-    let written = 0;
-    if (!DRY_RUN) {
+  let written = 0;
+  if (!DRY_RUN) {
+    await fs.mkdir(REPORTS_DIR, { recursive: true });
+    const client = await pool.connect();
+    try {
+      await ensurePredictionColumn(client);
       for (const item of predictions) {
         await client.query(`
           INSERT INTO atlas_packet_metrics (packet_key, naive_bayes_predictions)
@@ -267,41 +319,44 @@ async function main() {
         `, [item.packet_key, JSON.stringify(item.prediction)]);
         written += 1;
       }
+    } finally {
+      client.release();
     }
+  }
 
-    const report = {
-      generatedAt: new Date().toISOString(),
-      mode: DRY_RUN ? 'dry-run' : 'apply',
-      inputs: { model: path.relative(REPO_ROOT, MODEL).replace(/\\/g, '/') },
-      outputs: {
-        jsonl: path.relative(REPO_ROOT, OUTPUT_JSONL).replace(/\\/g, '/'),
-      },
-      summary: {
-        rowsProcessed: predictions.length,
-        rowsWritten: DRY_RUN ? 0 : written,
-        distinctPredictions: [...new Set(predictions.map((row) => row.prediction.predicted_label))].length,
-      },
-      sample: predictions.slice(0, 5),
-      nextSafeAction: 'Use the predictions as soft evidence only; hard missing-field gaps still override routing.',
-    };
-
-    await fs.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-    await fs.writeFile(REPORT_MD, `${renderMarkdown(report)}\n`, 'utf8');
-
-    console.log(JSON.stringify({
-      status: 'READY',
+  const report = {
+    generatedAt: new Date().toISOString(),
+    mode: DRY_RUN ? 'dry-run' : 'apply',
+    inputs: { model: path.relative(REPO_ROOT, MODEL).replace(/\\/g, '/') },
+    outputs: {
+      jsonl: path.relative(REPO_ROOT, OUTPUT_JSONL).replace(/\\/g, '/'),
+    },
+    summary: {
       rowsProcessed: predictions.length,
       rowsWritten: DRY_RUN ? 0 : written,
-      distinctPredictions: report.summary.distinctPredictions,
-      output: path.relative(REPO_ROOT, OUTPUT_JSONL).replace(/\\/g, '/'),
-    }, null, 2));
-  } finally {
-    client.release();
-    await pool.end();
-  }
+      distinctPredictions: [...new Set(predictions.map((row) => row.prediction.predicted_label))].length,
+    },
+    ...(comparison ? { comparison } : {}),
+    sample: predictions.slice(0, 5),
+    nextSafeAction: 'Use the predictions as soft evidence only; hard missing-field gaps still override routing.',
+  };
+
+  await fs.writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  await fs.writeFile(REPORT_MD, `${renderMarkdown(report)}\n`, 'utf8');
+
+  console.log(JSON.stringify({
+    status: 'READY',
+    rowsProcessed: predictions.length,
+    rowsWritten: DRY_RUN ? 0 : written,
+    distinctPredictions: report.summary.distinctPredictions,
+    comparison,
+    output: path.relative(REPO_ROOT, OUTPUT_JSONL).replace(/\\/g, '/'),
+  }, null, 2));
 }
 
-main().catch((error) => {
-  console.error('[apply-naive-bayes-predictions] failed:', error?.stack || error?.message || String(error));
-  process.exit(1);
-});
+main()
+  .catch((error) => {
+    console.error('[apply-naive-bayes-predictions] failed:', error?.stack || error?.message || String(error));
+    process.exitCode = 1;
+  })
+  .finally(() => pool.end());

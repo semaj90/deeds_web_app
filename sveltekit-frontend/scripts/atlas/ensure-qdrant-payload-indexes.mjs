@@ -14,6 +14,9 @@ const QDRANT_URL  = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const COLLECTION  = 'codebase_chunks_384_hybrid';
 const DRY_RUN     = process.argv.includes('--dry-run');
 
+console.error('LEGACY_384_PAYLOAD_INDEX_DISABLED: the target collection is retired; do not recreate or enrich it');
+process.exit(2);
+
 // Only index filtering/routing fields — not large content
 const INDEXES = [
   { field_name: 'packet_key',       field_schema: 'keyword' },

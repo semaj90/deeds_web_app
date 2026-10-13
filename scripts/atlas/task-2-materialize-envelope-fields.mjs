@@ -72,7 +72,7 @@ async function materializeEnvelopeFields() {
 
     if (missing_tree_node_id > 0 && isDryRun) {
       const samples = await pgClient.query(`
-        SELECT packet_key, feature_id, source_ref, content_embedding_384
+        SELECT packet_key, feature_id, source_ref, embedding
         FROM atlas_packets
         WHERE tree_node_id IS NULL
         LIMIT 5
@@ -81,7 +81,7 @@ async function materializeEnvelopeFields() {
       samples.rows.forEach((row, idx) => {
         console.log(`  ${idx + 1}. ${row.packet_key} (feature=${row.feature_id})`);
         console.log(`     source=${row.source_ref}`);
-        console.log(`     has_embedding=${row.content_embedding_384 !== null}`);
+        console.log(`     has_embedding=${row.embedding !== null}`);
       });
       console.log();
     }

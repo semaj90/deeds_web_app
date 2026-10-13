@@ -129,6 +129,8 @@ async function syncPacket(packet) {
 }
 
 async function main() {
+  throw new Error('UNSAFE_FIRST_POINT_QDRANT_POSTGRES_REPAIR_DISABLED');
+
   console.log('🔧 P3g JOIN REPAIR: Qdrant payload ↔ Postgres qdrant_point_id sync\n');
 
   const candidates = await getPayloadMatchCandidates();

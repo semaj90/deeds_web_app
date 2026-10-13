@@ -130,6 +130,36 @@ redis.on('error', (err) => {
 - **Adaptive Retrieval & Cache Fabric (ARC)**: Multi-resolution shadow optimization layer governed by 13 gates (`ARC-00` through `ARC-12`). Manages `AtlasSampleFieldV1` (`NEAREST`, `LINEAR`, `KERNEL`, `CUBIC`, `GRAPH_DIFFUSION`, `EXACT`), versioned low-rank projections (128/64), cache tier residency (`VRAM_HOT`, `RAM_WARM`, `NVME_WARM`), and shadow grouped-relative policy comparison.
 - **Inviolable Boundary**: The ARC policy may learn where to spend compute, what to cache, which executor to use, and when to promote evidence; it may **never** learn or redefine what canonical identity, source revision, or factual evidence is true.
 
+### D. GPU Quantization & Workstation Resource Invariants
+- **NF4 (NormalFloat4) & QLoRA Usage Contract**:
+  - Official Hugging Face / bitsandbytes specification supports NVIDIA Pascal (SM60) and newer; the workstation's RTX 3060 Ti (Ampere SM86) comfortably meets hardware capability.
+  - NF4 is an asymmetric 4-bit quantile quantization designed for normally distributed neural weights. Theoretical weight compression vs. baseline (e.g. 3B model: FP32 ~12 GB, FP16/BF16 ~6 GB, NF4 ~1.5 GB).
+  - Actual NF4 runtime memory demands are higher due to double-quantization constants, LoRA adapter parameters, optimizer states, activations, and CUDA workspaces.
+  - **VRAM Contention Rule**: The RTX 3060 Ti (8 GiB VRAM) can run QLoRA training on small adapter models (e.g. 1B–3B parameter classifiers), but **cannot concurrently train Ornith 1.5 (9B)** while Ornith's live llama-server inference process (`:8090`) occupies VRAM.
+  - **Operator Boundary**: Use PyTorch + `bitsandbytes` exclusively for offline QLoRA training; keep LibTorch and TensorRT as independently tested inference backends (do not assume custom LibTorch/TensorRT operators natively support NF4).
+- **Critical Workstation Storage & Memory Pressure Alert**:
+  - **Host C: Drive Free Space**: **9.42 GB (10,113,802,240 bytes) — Stabilized from 3.1 GB** via ClickHouse system log partition drops and Qdrant snapshot pruning.
+  - **Free System RAM**: **0.8 / 31.9 GB** — severe memory pressure requiring active process hygiene.
+  - **Docker AppData Footprint**: **~145 GB** (reclaimed ~27 GB from Qdrant snapshot and ClickHouse trace log drops).
+  - **Duplicate File Estimate**: **~59 GB** identified for canonical deduplication.
+  - **Action Rule**: Block unreviewed model checkouts, container image pulls, or tensor weight downloads. Prefer NTFS hardlinks for identical model weights.
+
+### E. Backend Table of Contents (TOC) Mappings for Agentic LUTs
+To support agentic Look-Up Tables (LUTs) with deterministic routing, ontology and candidate tables are divided into distinct storage tiers, each with dedicated schema semantics, identity scopes, and admission gates:
+
+| Backend Table | Primary Key / Index | Scope / Resolution | Agentic LUT Role | Admission / State Gating |
+| :--- | :--- | :--- | :--- | :--- |
+| **`feature_ontology_tuples`** | `packet_key`, `feature_key` | Feature-level (`USES_CONCEPT`, `IMPLEMENTS_FEATURE`) | High-granularity symbol/AST relation LUT | Non-admitted until `resolved_concept_id` and `resolution_state` are proven |
+| **`registry_ontology_tuples`** | `packet_key`, `tuple_type` | Global registry relationships | Macro cross-packet lineage & corroboration | Tracks `corroboration_count` and `materialization_version` |
+| **`ontology_domain_tuples`** | `packet_key`, `domain_class` | Domain routing (`backend`, `frontend`, `legal`) | Fast domain classification & sub-DAG dispatch | Routes requests and bounds context budgets without promoting identity |
+| **`codebase_chunk_index`** | `chunk_id`, `source_ref` | Chunk-level (`CHUNK_LEVEL_ORDINAL_MATCH`) | Fine-grained text span and vector embedding index | Owns `content_embedding_768` for cosine distance queries |
+| **`atlas_packets`** | `packet_id`, `source_ref` | Packet-level (`PACKET_LEVEL_ORDINAL_MATCH`) | Canonical identity authority across workspace | Governs workspace revision, source revision, and cold provenance |
+
+#### Agentic LUT Invariants
+1. **Ordinal Scope Discrimination**: LUT consumers must explicitly distinguish `PACKET_LEVEL_ORDINAL_MATCH` from `CHUNK_LEVEL_ORDINAL_MATCH` and `SYMBOL_VERSION_EXACT_MATCH`. A packet-level ordinal must never be passed to a kernel expecting chunk or symbol coordinates.
+2. **Fail-Closed Resolution**: A tuple hit in `feature_ontology_tuples` is never an admitted relationship unless `resolved_concept_id` is populated and validated against the canonical ontology revision.
+3. **No Cross-Table Mutation**: Agentic error fixing workflows and MCP tools may read all LUT tiers but can only submit mutation proposals via `promotion_outbox` under explicit schema gates.
+
 ---
 *Maintained under Deeds Legal-AI Platform Guidelines.*
 

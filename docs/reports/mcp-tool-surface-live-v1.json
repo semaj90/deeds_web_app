@@ -1,6 +1,6 @@
 {
   "schema": "atlas.mcp-tool-surface-live.v1",
-  "generatedAt": "2026-10-11T08:17:50.827Z",
+  "generatedAt": "2026-10-12T23:42:13.843Z",
   "servers": {
     "atlas-tools": {
       "status": "REACHABLE",
@@ -124,7 +124,7 @@
         "toolCount": 10,
         "listChangedSupported": false,
         "discoveredAtRevision": "c372c8454bcf646ef3ad7031e48c7f54a2e5e240efc60018719484e9a7f90c5f",
-        "discoveredAt": "2026-10-11T08:17:50.743Z",
+        "discoveredAt": "2026-10-12T23:42:13.567Z",
         "toolSurfaceRevision": "9f7e3db94d93a310f75294cb11a0b71d3ec2621d9a9c66639102d30dd9a8e137",
         "canonicalAuthority": false,
         "authorityScope": "MCP_TOOL_SURFACE_DISCOVERY"
@@ -1505,6 +1505,17 @@
           {
             "ref": {
               "serverAuthorityId": "parent-atlas:mcp:trace",
+              "toolName": "openspec.search"
+            },
+            "title": null,
+            "description": "Search current OpenSpec task ledgers and proposals with the existing BM25 preview index. Results are claims only, not evidence admission.",
+            "inputSchemaDigest": "8d2b4c09bb9f765d6cf30cdefa36a7394177a84607f60617040d1f97e5db6fe7",
+            "outputSchemaDigest": null,
+            "executionMetadataDigest": null
+          },
+          {
+            "ref": {
+              "serverAuthorityId": "parent-atlas:mcp:trace",
               "toolName": "openspec.task"
             },
             "title": null,
@@ -2207,11 +2218,11 @@
             "executionMetadataDigest": null
           }
         ],
-        "toolCount": 188,
+        "toolCount": 189,
         "listChangedSupported": true,
-        "discoveredAtRevision": "f3907feac2d2de47318a8897c3d8c290ce65e4598de4726c210f40004a38bc6b",
-        "discoveredAt": "2026-10-11T08:17:50.825Z",
-        "toolSurfaceRevision": "e55b4515126b18e9622ec9573bca4de40b8f307f5e992991bf7b950c6150f680",
+        "discoveredAtRevision": "2d6d1cb8a9a177954802a639978f4d634f288f54c1712a30f1063dd3c2202ff1",
+        "discoveredAt": "2026-10-12T23:42:13.834Z",
+        "toolSurfaceRevision": "eb1fdd78f89306972ee50c68f1985f3cb02ec1f85018029b2bab8ec67639ab60",
         "canonicalAuthority": false,
         "authorityScope": "MCP_TOOL_SURFACE_DISCOVERY"
       }

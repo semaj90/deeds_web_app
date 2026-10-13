@@ -6,7 +6,7 @@
  *   [B] mapreduce-matrix  → cosine similarity hits (CouchDB glyph + rerank cache)
  *   [C] codebase-research → rg search patterns (TypeScript/SvelteKit 2)
  *   [D] web-research      → SearXNG + Firecrawl + GPU cosine rank
- *   [E] deep-research     → Ollama self-prompting with graph/feedback context
+ *   [E] deep-research     → llama-server self-prompting with graph/feedback context
  *   [F] awk-aggregations  → AWK-style SQL score distribution (chunk_hit_log)
  *
  * REDUCE:
@@ -15,7 +15,7 @@
  *
  * SYNTHESIZE:
  *   LangGraph supervisor state (multi-agent format)
- *   Ollama self-prompt chain (configurable depth)
+ *   Ornith self-prompt chain through the configured llama-server runtime
  *   FastMCP tool hints (which MCP tools apply to each topic)
  *
  * Cache:
@@ -30,8 +30,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { pool }     from '$lib/server/db/client';
 import { ENV }      from '$lib/server/env.server.js';
-import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
-import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -364,7 +363,7 @@ function buildLangGraphState(
   };
 }
 
-// ── Ollama self-prompt chain ───────────────────────────────────────────────────
+// ── Ornith self-prompt chain ───────────────────────────────────────────────────
 
 async function generateSelfPromptChain(
   seedTopics: UnifiedTopic[],
@@ -382,13 +381,12 @@ async function generateSelfPromptChain(
     `Output ONLY the ${depth} questions, one per line, no numbering, no extra text.`;
 
   try {
-    const { resolvedModel } = await resolveLoadedLlamaModel(
-      LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, ''), null);
-    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+    const target = await resolveLlamaInferenceTarget();
+    const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:   resolvedModel,
+        model:   target.model,
         messages: [{ role: 'user', content: prompt }],
         stream:  false,
         temperature: 0.55,
@@ -522,7 +520,7 @@ export async function executeUnifiedResearch(
         })()
       : Promise.resolve(null),
 
-    // [E] Deep research (Ollama + graph + feedback)
+    // [E] Deep research (Ornith via the shared llama-server chat boundary + graph + feedback)
     (async () => {
       const { generateDeepResearch } = await import('$lib/server/analytics/deep-research.js');
       const result = await generateDeepResearch(userId);
@@ -678,7 +676,7 @@ export async function invalidateUnifiedResearchCache(userId: string): Promise<nu
   }
 }
 
-/** Quick stats: pipeline aggregations only (no Ollama calls). */
+/** Quick stats: pipeline aggregations only (no model calls). */
 export async function getUnifiedAggregations(days = 7): Promise<{
   pipelineStats: AwkAggregation[];
   scoreBuckets:  ScoreBucket[];

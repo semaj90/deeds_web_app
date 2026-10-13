@@ -56,7 +56,11 @@ class DeterministicTopKTests(unittest.TestCase):
             canonical_candidate_ordinals([("pk-1", "rev-1"), ("pk-1", "rev-1")])
 
     def test_l2_normalize_f32_valid_and_fail_closed(self):
-        import numpy as np
+        try:
+            import numpy as np
+        except ImportError:
+            self.skipTest("numpy not installed in this Python environment")
+
         from knn_contract import l2_normalize_f32
 
         vecs = np.array([[3.0, 4.0], [1.0, 0.0]], dtype=np.float32)

@@ -32,6 +32,7 @@ registries:
   corpora:
     path: corpora/
     description: Keyword corpus, semantic ontology, and NLP-derived feature snapshots
+    schema_file: keyword-corpus.schema.json
     schemas:
       - keyword-corpus.yaml
 

@@ -102,7 +102,6 @@ async function loadRows(limit, offset) {
       'ap.topology',
       'ap.metadata',
     ];
-    if (packetCols.has('content_embedding_384')) select.push('ap.content_embedding_384');
     pushIfHas(select, packetCols.has('used_concepts'), 'ap', 'used_concepts');
     pushIfHas(select, packetCols.has('extracted_entities'), 'ap', 'extracted_entities', 'packet_entities');
     pushIfHas(select, packetCols.has('ast_symbols'), 'ap', 'ast_symbols', 'packet_ast_symbols');

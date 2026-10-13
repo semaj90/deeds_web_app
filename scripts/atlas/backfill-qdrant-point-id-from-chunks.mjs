@@ -19,6 +19,10 @@ const env = loadRepoEnv(process.env);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(env) });
 
 async function main() {
+  if (APPLY) {
+    throw new Error('UNSAFE_CHUNK_PROJECTION_TO_PACKET_ID_BACKFILL_DISABLED');
+  }
+
   const client = await pool.connect();
   try {
     console.log('Phase: Analyze packet-chunk join coverage');

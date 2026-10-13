@@ -17,8 +17,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl, REPO_ROOT } from './connection-config.mjs';
+import { classifyExactQdrantPacketLinksV1 } from './lib/classify-exact-qdrant-packet-link-v1.mjs';
 
 const APPLY = process.argv.includes('--apply');
+if (APPLY) {
+  throw new Error('SOURCE_REVISION_LINEAGE_REQUIRED_FOR_PACKET_QDRANT_ID_APPLY');
+}
 const COLLECTION = 'codebase_chunks_768';
 const QDRANT = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const stamp = new Date().toISOString().slice(0, 10);
@@ -32,7 +36,7 @@ if (dim !== 768) throw new Error(`UNEXPECTED_VECTOR_DIM:${dim}`);
 
 const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(loadRepoEnv(process.env)), max: 1 });
 const { rows: missing } = await pool.query(
-  `SELECT packet_key, qdrant_point_id, qdrant_collection, qdrant_vector_dim FROM atlas_packets WHERE qdrant_point_id IS NULL`);
+  `SELECT packet_key, source_ref, qdrant_point_id, qdrant_collection, qdrant_vector_dim FROM atlas_packets WHERE qdrant_point_id IS NULL`);
 const missingKeys = new Set(missing.map((r) => r.packet_key));
 
 const pointsByPacket = new Map();
@@ -40,29 +44,30 @@ let offset = null;
 do {
   const res = await fetch(`${QDRANT}/collections/${COLLECTION}/points/scroll`, {
     method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ limit: 5000, offset, with_payload: ['packet_key'], with_vector: false }),
+    body: JSON.stringify({ limit: 5000, offset, with_payload: ['packet_key', 'source_ref'], with_vector: false }),
   });
   const j = (await res.json()).result;
   for (const p of j.points) {
     const pk = p.payload?.packet_key;
     if (!pk || !missingKeys.has(pk)) continue;
     if (!pointsByPacket.has(pk)) pointsByPacket.set(pk, []);
-    pointsByPacket.get(pk).push(String(p.id));
+    pointsByPacket.get(pk).push({ pointId: String(p.id), sourceRef: p.payload?.source_ref ?? null });
   }
   offset = j.next_page_offset;
 } while (offset);
 
-const unique = [...pointsByPacket].filter(([, ids]) => ids.length === 1).map(([packetKey, [pointId]]) => ({ packetKey, pointId }));
-const ambiguous = pointsByPacket.size - unique.length;
+const { eligible: unique, ambiguousSkipped: ambiguous, sourceRefMismatchSkipped } =
+  classifyExactQdrantPacketLinksV1(missing, pointsByPacket);
 
 fs.writeFileSync(preImagePath, JSON.stringify({
   schema: 'atlas.qdrant-pid-backfill-preimage.v1', collection: COLLECTION,
-  rows: missing.filter((r) => unique.some((u) => u.packetKey === r.packet_key)),
+  rows: unique.map((u) => u.packetRow),
 }, null, 2));
 
 const client = await pool.connect();
 const receipt = { schema: 'atlas.qdrant-pid-backfill-exact.v1', mode: APPLY ? 'apply' : 'rehearsal', collection: COLLECTION, vectorDim: dim,
   packetsMissingPointId: missing.length, packetsWithAnyExactPoint: pointsByPacket.size, uniqueEligible: unique.length, ambiguousSkipped: ambiguous,
+  sourceRefMismatchSkipped,
   preImage: path.relative(REPO_ROOT, preImagePath) };
 try {
   await client.query('BEGIN');
@@ -70,7 +75,7 @@ try {
   for (const u of unique) {
     const r = await client.query(
       `UPDATE atlas_packets SET qdrant_point_id=$1, qdrant_collection=$2, qdrant_vector_dim=$3, updated_at=NOW()
-       WHERE packet_key=$4 AND qdrant_point_id IS NULL`, [u.pointId, COLLECTION, dim, u.packetKey]);
+       WHERE packet_key=$4 AND qdrant_point_id IS NULL AND source_ref=$5`, [u.pointId, COLLECTION, dim, u.packetKey, u.sourceRef]);
     updated += r.rowCount;
   }
   const { rows: [rb] } = await client.query(

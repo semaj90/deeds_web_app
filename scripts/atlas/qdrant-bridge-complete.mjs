@@ -43,6 +43,10 @@ console.log(`Batch size: ${BATCH_SIZE}`);
 console.log();
 
 async function bridgeQdrantComplete() {
+  if (isApply) {
+    throw new Error('UNSAFE_FEATURE_SOURCE_QDRANT_BRIDGE_APPLY_DISABLED');
+  }
+
   const qdrant = new QdrantClient({ url: QDRANT_URL });
   const pgClient = new Client({ connectionString: POSTGRES_URL });
 

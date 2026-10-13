@@ -1,19 +1,7 @@
 #!/usr/bin/env python3
 """
-K-means chunk clustering — targets codebase_chunks_384_hybrid Qdrant collection (384-dim content vectors)
-
-This is the PRODUCTION routing model, trained on the canonical 384-dim embedding space.
-The companion script (kmeans-chunk-cluster.py) targets content_embedding (768-dim) for analysis only.
-
-Model versioning:
-  mbk-spherical-content384-k{K}-v1  ← this script (production routing)
-  mbk-spherical-content768-k{K}-v1  ← companion script (analysis/legacy)
-
-Usage:
-  python kmeans-chunk-cluster-384.py --dry-run
-  python kmeans-chunk-cluster-384.py --apply --k 128
-  python kmeans-chunk-cluster-384.py --apply --k 64
-  python kmeans-chunk-cluster-384.py --apply --k 256
+Historical 384D KMeans implementation retained for audit/recovery only.
+The entrypoint is retired and fails closed before database or Qdrant access.
 """
 
 import argparse
@@ -22,11 +10,6 @@ import sys
 import os
 import time
 from datetime import datetime, timezone
-
-import numpy as np
-import psycopg2
-import psycopg2.extras
-import requests
 
 # ── CLI ──────────────────────────────────────────────────────────────────────
 parser = argparse.ArgumentParser(description="Spherical K-means for codebase_chunks_384_hybrid")
@@ -42,9 +25,17 @@ parser.add_argument("--vector-name",       default="content",
 parser.add_argument("--verbose", action="store_true")
 args = parser.parse_args()
 
-if not args.dry_run and not args.apply:
-    print("Pass --dry-run or --apply", file=sys.stderr)
-    sys.exit(1)
+print(
+    "LEGACY_384_KMEANS_DISABLED: 384-dimensional clustering is retired; "
+    "no database or Qdrant access is permitted.",
+    file=sys.stderr,
+)
+sys.exit(78)
+
+import numpy as np
+import psycopg2
+import psycopg2.extras
+import requests
 
 K              = args.k
 BATCH          = args.batch

@@ -27,6 +27,21 @@ with `sourceIdentityKey` binding repository identity to the relative path.
 
 ## Storage retention review — 2026-09-12
 
+**Current Qdrant recheck (2026-10-12 local):** the read-only receipt
+`.tmp/atlas/production-hardening-seed-20261012/qdrant-pruning-audit-v2.json`
+reports 18 collections and 18 API-visible snapshots totaling 5,163,315,712
+bytes, with zero aliases and zero empty collections. It supersedes older live
+collection/snapshot counts but does not classify snapshot rollback value or
+consumers. `STORAGE-REVIEW-03` remains open; no cleanup or restore was performed.
+The separate container readback
+`.tmp/atlas/production-hardening-seed-20261012/qdrant-volume-storage-readback-v1.json`
+reports 92 snapshot files in 43 collection-named directories plus `tmp`
+(5,170,720,640 bytes) and 12,003,695,240 bytes in `/qdrant/storage`. Thirty
+directory names are absent from the live API: 28 contain 7,403,776 bytes and
+two `codebase_chunks_384*` directories are empty. Current collection directory
+bytes differ from the API snapshot sum by 1,152 bytes. Snapshot file membership,
+consumer/rollback value, and restore compatibility remain open.
+
 The storage census is evidence only and does not authorize cleanup. The
 current report identifies 13 images without running or stopped container
 ancestry, including these review candidates:
@@ -58,15 +73,13 @@ snapshot, cache, package, or VHDX operation is authorized by this ledger.
 - [ ] **STORAGE-REVIEW-03 — Classify Qdrant snapshot retention.** For each
   snapshot, record collection, revision/checksum, generation time, consumer
   references, rollback value, and whether it is active, rollback, historical,
-  or unclassified. Produce candidates only; preserve all artifacts. The
-  collection-level breakdown now reports 45 collections, 13.39 GB of live
-  collection storage, and 24.94 GiB of API-visible snapshots with zero API
-  errors. All 70 API-visible snapshot records now have a retention candidate
-  classification (43 latest, 5 rollback, 22 older review); these labels are
-  not consumer or rollback proof, so per-snapshot consumer reconciliation
-  remains open. The repository-wide collection-name census is a file-level
-  inventory, not proof that any individual snapshot is still required; the
-  role audit separately classifies runtime `_v2` references.
+  or unclassified. Produce candidates only; preserve all artifacts. The earlier
+  45-collection/70-snapshot inventory and its candidate labels are historical
+  and superseded for live counts by the 2026-10-12 readback above. The latest
+  API census has 18 snapshot records; the container contains 28 non-current
+  non-empty collection directories plus two empty 384-named directories.
+  Per-snapshot checksum/consumer/rollback reconciliation and restore proof
+  remain open; file-level reference counts do not prove runtime use.
 - [ ] **STORAGE-REVIEW-04 — Require explicit cleanup admission.** A later
   cleanup change must name exact image IDs or snapshot paths, prove zero
   consumers and rollback coverage, capture a before/after inventory, and be

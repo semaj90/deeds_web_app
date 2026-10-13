@@ -50,6 +50,9 @@ import { fileURLToPath } from 'node:url';
   type AblationConfig,
 } from '../../src/lib/server/retrieval/feature-envelope.js';
 
+console.error('LEGACY_PHASE2F_384_STUB_DISABLED: this unregistered runner uses a synthetic 384-D query vector and is not a valid retrieval evaluator');
+process.exit(2);
+
 // ============================================================================
 // CONFIGURATION & INITIALIZATION
 // ============================================================================

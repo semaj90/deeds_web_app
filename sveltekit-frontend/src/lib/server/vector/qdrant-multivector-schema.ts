@@ -95,81 +95,7 @@ export async function createMultiVectorCollection(
   qdrantUrl: string,
   collectionName: string = 'codebase_chunks_384_hybrid'
 ): Promise<void> {
-  if (collectionName === 'codebase_chunks_768') {
-    throw new Error('Legacy 384 multi-vector schema cannot create the canonical codebase_chunks_768 collection');
-  }
-  const createRes = await fetch(`${qdrantUrl}/collections/${collectionName}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      vectors: {
-        // Each named vector is 384-dim
-        content_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        summary_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        title_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        signature_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        feature_embedding: {
-          size: 384,
-          distance: 'Cosine'
-        },
-        latent64: {
-          size: 64,
-          distance: 'Cosine'
-          // NOTE: latent64 is for clustering/SOM only, NOT retrieval
-        }
-      },
-      optimizers_config: {
-        default_optimizer_config: {
-          type: 'default'
-        }
-      },
-      hnsw_config: {
-        m: 16,
-        ef_construction: 200,
-        ef_runtime: 200
-      }
-    })
-  });
-
-  if (!createRes.ok) {
-    throw new Error(`Failed to create collection: ${await createRes.text()}`);
-  }
-
-  // Create indexes on named vectors
-  for (const vectorName of [
-    'content_embedding',
-    'summary_embedding',
-    'title_embedding',
-    'signature_embedding'
-  ]) {
-    const indexRes = await fetch(`${qdrantUrl}/collections/${collectionName}/index`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vectors: [vectorName],
-        hnsw_config: {
-          m: 16,
-          ef_construction: 200
-        }
-      })
-    });
-
-    if (!indexRes.ok) {
-      console.warn(`Index creation skipped for ${vectorName}: ${indexRes.status}`);
-    }
-  }
+  throw new Error('LEGACY_384_MULTIVECTOR_WRITE_DISABLED: historical multi-vector schema cannot create collections');
 }
 
 /**
@@ -347,23 +273,5 @@ export async function updateMultiVectors(
     latent64?: number[];
   }
 ): Promise<void> {
-  const updateRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/${pointId}`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vectors: Object.entries(vectors)
-          .filter(([, v]) => v !== undefined)
-          .reduce((acc, [k, v]) => {
-            acc[k] = { data: v };
-            return acc;
-          }, {} as Record<string, { data: number[] }>)
-      })
-    }
-  );
-
-  if (!updateRes.ok) {
-    throw new Error(`Update failed: ${await updateRes.text()}`);
-  }
+  throw new Error('LEGACY_384_MULTIVECTOR_WRITE_DISABLED: historical 384-D vectors cannot be written');
 }

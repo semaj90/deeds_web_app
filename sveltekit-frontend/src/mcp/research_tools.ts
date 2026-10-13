@@ -1,12 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { ENV } from '$lib/server/env.server.js';
 import { webSearch as canonicalWebSearch } from '$lib/server/retrieval/web-search.js';
-import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
+import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
-
-const LLAMA_SERVER_URL = ENV.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
 /**
  * Advanced research tools leveraging SearXNG and llama-server.
@@ -57,14 +54,14 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
 
   // == research.synthesize ====================================================
   /**
-   * Full RAG+KAG synthesis with llama-server (Gemma4).
+   * Full RAG+KAG synthesis with the active Ornith llama-server model.
    * Routes through L1 Redis exact-match → L2 Bifrost semantic → L3 llama-server.
    * Returns answer + confidence + cache tier.
    */
   server.registerTool(
     'research.synthesize',
     {
-      description: 'Full RAG+KAG legal synthesis with llama-server (Gemma4 + TurboQuant). Routes through L1 Redis (5ms) → L2 Bifrost semantic → L3 llama-server (Qdrant ANN + Neo4j KAG + ACE context).',
+      description: 'Full RAG+KAG legal synthesis with the active Ornith llama-server model. Routes through L1 Redis → L2 Bifrost semantic → L3 llama-server.',
       inputSchema: z.object({
         query:       z.string().min(3).max(4000).describe('Natural-language legal/research question'),
         case_id:     z.string().uuid().optional().describe('Optional UUID — scopes retrieval to a specific case'),
@@ -78,13 +75,13 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
       'research.synthesize',
       sessionId_synthesize,
       async ({ query, case_id, temperature, max_tokens, skip_cache }) => {
-        const loadedModel = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, null);
-        for (const model of [loadedModel.resolvedModel]) {
-          try {
-            const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
-              method:  'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body:    JSON.stringify({
+        try {
+          const target = await resolveLlamaInferenceTarget();
+          const model = target.model;
+          const res = await fetch(`${target.baseUrl}/v1/chat/completions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
                 model,
                 messages: [
                   { role: 'system', content: 'You are a legal research assistant. Provide accurate, well-reasoned legal analysis based on the given query.' },
@@ -94,35 +91,30 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
                 max_tokens: max_tokens ?? 800,
                 stream: false,
                 cache_prompt: !skip_cache,
-              }),
-              signal:  AbortSignal.timeout(90_000),
-            });
-            if (!res.ok) {
-              const text = await res.text().catch(() => '');
-              return {
-                content: [{ type: 'text', text: `synth failed: HTTP ${res.status} ${text.slice(0, 200)}` }],
-                isError: true,
-              };
-            }
-            const data = await res.json();
-            const answer = data.choices?.[0]?.message?.content ?? '';
+            }),
+            signal: AbortSignal.timeout(90_000),
+          });
+          if (!res.ok) {
+            const text = await res.text().catch(() => '');
             return {
-              content: [{
-                type: 'text',
-                text: JSON.stringify({ answer, model: data.model, usage: data.usage, case_id }, null, 2)
-              }]
-            };
-          } catch (err: any) {
-            return {
-              content: [{ type: 'text', text: `synth unreachable: ${err.message ?? String(err)}` }],
+              content: [{ type: 'text', text: `synth failed: HTTP ${res.status} ${text.slice(0, 200)}` }],
               isError: true,
             };
           }
+          const data = await res.json();
+          const answer = data.choices?.[0]?.message?.content ?? '';
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({ answer, model: data.model, usage: data.usage, case_id }, null, 2)
+            }]
+          };
+        } catch (err: unknown) {
+          return {
+            content: [{ type: 'text', text: `synth unreachable: ${err instanceof Error ? err.message : String(err)}` }],
+            isError: true,
+          };
         }
-        return {
-          content: [{ type: 'text', text: 'synth: no models available' }],
-          isError: true,
-        };
       }
     )
   );

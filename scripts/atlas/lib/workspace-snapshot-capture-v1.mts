@@ -223,6 +223,7 @@ export function observeSnapshot(rootInput: string, workspaceId: string, options:
     const after = state(directory);
     if (hash(before) !== hash(after)) violations.push(`GIT_CHANGED_DURING_CAPTURE:${relativePath}`);
     repositories.push({ relativePath, kind, ...before, dirty: observed.record.dirty,
+      gitChangedPaths: observed.gitChangedPaths,
       sourceMembershipChecksum: hash(observed.bindings.map(b => `${relativePath ? `repo:${sourceRef(relativePath)}` : 'repo:root'}:${sourceRef(b.sourceRef)}`)),
       sourceContentChecksum: hash(observed.bindings.map(b => [
         `${relativePath ? `repo:${sourceRef(relativePath)}` : 'repo:root'}:${sourceRef(b.sourceRef)}`,

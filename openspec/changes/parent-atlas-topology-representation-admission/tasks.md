@@ -1,5 +1,137 @@
 # Parent Atlas Topology Representation Admission — Tasks
 
+## Qdrant storage inventory refresh (2026-10-12)
+
+- [x] Current recheck supersedes the earlier 48-collection inventory for live
+  state: `.tmp/atlas/production-hardening-seed-20261012/qdrant-pruning-audit-v2.json`
+  reports 18/18 collection reads and snapshot-list reads successful, 18
+  snapshots totaling 5,163,315,712 bytes, no aliases, no empty collections,
+  and no `*384*` collection. The API provides `points_count` and sometimes
+  `indexed_vectors_count`, but did not provide `vectors_count`. The receipt
+  preserves config, payload schema, HNSW, optimizer, and snapshot metadata.
+  The earlier 48-collection report remains historical evidence; the inventory
+  discrepancy is not an explanation of which collections disappeared.
+- [x] Read-only container/host recheck: `.tmp/atlas/production-hardening-seed-20261012/qdrant-volume-storage-readback-v1.json`
+  records 92 files under `/qdrant/snapshots` across 43 collection-named
+  directories plus `tmp`,
+  5,170,720,640 bytes; `/qdrant/storage` is 12,003,695,240 bytes; C: has
+  7,297,048,576 free bytes. The two 384-named directories are empty; the 28
+  other non-current directories hold 7,403,776 bytes. The physical-vs-API
+  snapshot-byte difference is 7,404,928 bytes, and exact file-to-record mapping
+  remains unresolved.
+- [ ] Snapshot disposition remains open: 5 collections have two snapshots, 8
+  have one, and 5 have none. No consumer/rollback classification, restore drill,
+  pruning authorization, or collection reconstruction was performed.
+
+### Earlier inventory capture (historical; superseded for live counts)
+
+- [x] Refreshed the existing read-only collection/storage inventory to cover all
+  48 collections in `.tmp/atlas/production-hardening-seed-20261012/qdrant-complete-inventory-v4.json`.
+  The report includes aliases, vector configuration/count fields when exposed,
+  payload schemas, collection-name consumer references, API memory/snapshot
+  totals, and read-only Docker volume `du` measurements. No Qdrant or database
+  mutation was performed.
+- [x] Earlier measurements: Qdrant API live collection disk totals
+  16,894,092,591 bytes; API-visible snapshots 5,172,336,640 bytes across 48
+  snapshots; Docker `/qdrant/storage` 20,383,966,561 bytes,
+  `/qdrant/snapshots` 5,172,339,712 bytes, and `/qdrant` total
+  25,664,321,468 bytes. The ~3.49 GB difference between API collection totals
+  and storage-directory usage is unclassified; do not attribute it to a
+  collection without further evidence. Snapshot totals agree within 3,072
+  bytes. Alias endpoint returned an empty list.
+- [x] Collection configuration readback completed after adding bounded retries
+  for transient fetch failures: 48/48 collection-info responses returned, and
+  all 48 included payload schema. `vectors_count` is retained when supplied but
+  was not exposed for any collection (48/48 null); `points_count`,
+  `indexed_vectors_count`, named vector dimensions, HNSW config, optimizer state,
+  payload schemas/index fields, aliases, and snapshot filenames were captured.
+  The external objective mentions 56 collections, while the live API listed 48;
+  reconcile the expected inventory before treating those eight as missing.
+- [ ] Snapshot retention remains a review-only classification (43 latest
+  candidates and 5 rollback candidates); no snapshots were pruned or marked
+  deletion-authorized. Container volume measurements do not authorize cleanup.
+
+## Projection recovery and retention hardening (2026-10-12)
+
+- [x] Earlier read-only runtime identity: Docker reported `qdrant/qdrant:v1.19.0`
+  pinned to image digest `sha256:057ee3a8da769fe7310dd3537b4dc7583bf87a95ce8ac43c0af5a46bc580d1fc`.
+  That historical inventory reported 48 collections and 48 snapshots; the
+  later 2026-10-12 recheck reports 18 collections and 18 API-visible snapshots.
+- [x] The earlier inventory counted 384-dimensional collections as legacy reduced
+  semantic. The latest live API inventory has neither collection, and the latest
+  snapshot-file scan has no filename containing `384`. Historical static
+  references do not establish a live collection or caller. Do not treat 384
+  dimensions as interchangeable with `semantic_768`.
+- [ ] Snapshot cleanup is not authorized by age/count alone. Before proposing
+  retention changes, map each exact snapshot name/checksum to its collection,
+  backup manifest, last-known-good/rollback role, and restore compatibility;
+  run a separately approved restore drill into an isolated target and verify
+  points, named vectors, payload indexes, aliases, and lineage metadata. Then
+  prepare an exact deletion allowlist and rollback/space-impact plan. Keep the
+  current latest known-good plus an explicit pre-migration rollback checkpoint
+  for each admitted owner; no snapshot has been deleted by this audit.
+- [ ] Rebuild/upsert recovery contract: snapshots are point-in-time recovery
+  artifacts, not incremental update logs or a recalculation recipe. Recompute
+  from eligible canonical PostgreSQL rows and independently verified source
+  revisions; construct complete payloads and every configured named vector;
+  use deterministic projection IDs and an isolated versioned target; verify
+  source cohort digest, point count, vector dimensions/metric, payload indexes,
+  sampled vectors, query parity, and readback before any approved cutover.
+  Qdrant upsert replaces the point state for that ID, so partial payload/vector
+  upserts are prohibited. The current inventory reports no aliases; no
+  collection rebuild, upsert, or alias change was performed.
+- [ ] 384 retirement experiment: first resolve the 101-row static source set
+  into executable callers, tests, and historical references; measure whether
+  any admitted 384 consumer remains. Only then compare an isolated rebuild or
+  no-op retirement plan against the canonical 768 lane. Do not delete or
+  re-label the legacy collections based on naming or dimension alone.
+
+## Agentic retrieval and executor experiment gates (2026-10-12)
+
+- [ ] PostgreSQL `semantic_768`/HNSW and RTX/cuVS comparison uses the same
+  frozen, identity-qualified candidate snapshot, query vectors, cosine metric,
+  FP32 normalization policy, deterministic ordinal tie-break, and exact CPU
+  oracle. Record executor/image/model revisions, latency, memory/VRAM, recall,
+  and complete result identities. The existing PostgreSQL HNSW readback is
+  infrastructure evidence only; it does not establish live GPU-route parity.
+- [ ] Keep Qdrant, pgvector, TurboVec, and cuVS as physical executors of the
+  existing semantic lane; SearchRuntime remains the single fusion owner. One
+  canonical candidate contributes at most one semantic vote after identity-
+  qualified deduplication. Do not add a new index, retrieval service, or
+  fusion/RRF implementation to solve the current lineage gap.
+- [x] Source correction: removed an unmatched `postgres_fts` name from the
+  `rrf-integration.ts` lane-name array; this orchestration currently supplies
+  `bm25Hits` labeled `postgres_trigram` and has no separate FTS hit array. The
+  extra name shifted all subsequent lane labels. The `postgres_fts` type remains
+  available for a correctly wired caller; focused RRF tests were interrupted
+  and are not claimed as passed.
+- [ ] KMeans/domain/taxonomy/fanout and agentic error-fixing are downstream
+  read-only experiments over admitted indexed evidence. Token/feature mappings,
+  centroid/model revisions, task/error receipts, source spans, and retrieval
+  identities must be preserved. Results can recommend a bounded route or
+  repair plan, but MCP permission/schema checks and explicit mutation gates
+  remain authoritative; similarity edges are not ontology facts.
+
+## PostgreSQL vector and lexical index readback (2026-10-12)
+
+- [x] Read-only catalog census across `codebase_chunk_index`, `atlas_packets`,
+  and `atlas_packet_features`: PostgreSQL 18.4, pgvector 0.8.3, pg_trgm 1.6,
+  pg_search 0.25.1; `io_method=worker`, `effective_io_concurrency=16`, and
+  `max_parallel_workers_per_gather=2`. The census found 11 HNSW, 39 GIN, 1
+  pg_search BM25, and 1 trigram index among matching definitions on those
+  tables. Existing `codebase_chunk_index.search_vector` GIN and pg_search BM25
+  indexes are present; catalog presence does not prove a production caller.
+- [x] Bounded `EXPLAIN (ANALYZE, BUFFERS, SETTINGS)` over the existing
+  `content_embedding_768` lane used `idx_codebase_chunk_content_embedding_768_hnsw`
+  (10 rows, one index search). Two identical isolated runs measured about
+  447.8 ms and 2.35 ms respectively, illustrating cache sensitivity; these
+  single probes are not a performance benchmark. No indexes or settings were
+  changed. Receipt: `.tmp/atlas/production-hardening-seed-20261012/pgvector-index-readback-v1.json`.
+- [ ] Do not create a new index or claim end-to-end retrieval readiness from
+  this catalog/plan readback. Chunk source/workspace/representation revisions
+  remain absent, and FTS/BM25 production caller reachability and current-source
+  admission are separate gates.
+
 ## Current alignment checkpoint (2026-08-28)
 
 - `semantic_768 -> exact retrieval -> ContextManifestV1` is
@@ -13,6 +145,82 @@
 - The higher-hop audit table error is fixed and live read-only coverage is
   partial: SOM 49/50, Qdrant 100/100 sampled, Valkey 50/50, Neo4j 17/50,
   glyph records 0/50.
+
+## Read-only latent/topology audit update (2026-10-12)
+
+- [x] `latent_128` full-table derivation check was reported as passing for
+  55,169 rows against the normalized first 128 coordinates of `latent_256`
+  (minimum cosine 1.000000, no row below 0.9999; norms 0.9998–1.0000).
+  The detailed read-only receipt was not present in the inspected scratch
+  report directory, so this remains a reported result rather than independently
+  verified evidence for this ledger. It does not authorize routing promotion.
+- [x] Read-only `codebase_topology_64` family census completed: 105,761 points;
+  configured named vector `latent_64`, size 64, cosine. A 1,101-vector sample
+  was finite and unit-normalized (norm 0.9999999802–1.0000000198). Payloads
+  include 52,380 `semantic_768`/dimension-768 declarations that conflict with
+  the collection's actual 64D vector contract; 53,381 points lack dimension or
+  model revision; 101,236 lack `packet_kind`; 85,066 lack `chunk_id`; 4,510
+  are marked `qdrant_chunk`, and 15 `mcp_tool_stub`. This is an observation
+  census, not proof all non-chunk records are invalid. Collection was not
+  modified. Receipt: `.tmp/atlas/production-hardening-seed-20261012/topology-64-family-summary-v1.json`.
+- [x] Census count semantics reconciled by a fresh read-only 207-page Qdrant
+  scroll (105,761/105,761 points; payloads only, vectors disabled): `chunk_id`
+  is non-null on 20,695 points, explicitly null on 35,574, and absent on
+  49,492. Thus the earlier `85,066 lack chunk_id` count means null-or-absent;
+  `fieldCounts.chunk_id = 56,269` counted key presence, including nulls. The
+  earlier 85,066 and 56,269 figures are not contradictory once nulls are
+  separated. `source_ref` is non-empty on all 105,761; `packet_key` is present
+  on 54,017; `representation_id` is absent on one; `packet_kind` is absent on
+  101,236. This is payload classification only; no identity join, vector
+  lineage, admission, or mutation was performed. The collection remains
+  untouched. Fresh scroll result was observed in the read-only audit session;
+  the saved census receipt remains at
+  `.tmp/atlas/production-hardening-seed-20261012/topology-64-full-family-census-v1.json`.
+- [x] Read-only PostgreSQL 18/pgvector/index check (2026-10-12): server is
+  PostgreSQL 18.4 with vector 0.8.3, `io_method=worker`, and
+  `effective_io_concurrency=16`. `codebase_chunk_index` has the expected
+  `content_embedding_768 vector`, `content_embedding halfvec`, `latent_256/128
+  halfvec`, and `latent_64 vector` types; HNSW indexes exist for those lanes.
+  B-tree indexes exist on `chunk_id`, non-null `source_revision`, and
+  `(workspace_revision, source_ref)` with non-null predicates. However, the
+  read-only table check returned 274,465 rows, with **0** non-null
+  `source_revision` and **0** non-null `workspace_revision`. The indexes do not
+  provide lineage where row values are absent. A bounded top-10 cosine query
+  selected `idx_codebase_chunk_content_embedding_768_hnsw` (10 rows; one index
+  search; 430.519 ms in this run, 272 shared-buffer hits and 611 reads). This
+  demonstrates that the index is usable for that query shape only; it does not
+  establish representative performance, canonical source binding, or retrieval
+  admission. Read-only transaction rolled back; no database changes.
+- [ ] Topology query/contract reconciliation remains open: source inspection
+  found a multi-vector API route that encodes a 768D query through the Redis-
+  supplied autoencoder and searches `codebase_topology_64` using `latent_64`
+  (`sveltekit-frontend/src/routes/api/codebase/search/multi-vector/+server.ts`,
+  `sveltekit-frontend/src/lib/server/gpu/encode-768-to-64.ts`). Another
+  retrieval path directly queries that collection
+  (`sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`). The
+  collection/config contract names its vector `latent_64`, but
+  `sveltekit-frontend/src/lib/server/vector/lane-registry.ts` declares
+  `topology_ae64_v1` and separately says the legacy representation is not
+  interchangeable with `latent_64`. This is a source-level wiring/identity
+  mismatch, not proof of a live request or the producer of the 105,761 stored
+  vectors. Keep the route/reference lane from being promoted until vector key,
+  encoder/weights revision, stored-vector producer, and canonical identity
+  mapping agree. No code, Redis, Qdrant, or PostgreSQL changes were made.
+- [ ] Stored-vector producer remains unidentified: the legacy
+  `scripts/atlas/backfill-latent-vectors.mjs` reads `codebase_chunks_768` and
+  writes latent values to `atlas_packets` plus Valkey; it does not write
+  `codebase_topology_64`. The newer Python routing builder writes
+  `codebase_topology_64_v2`, a distinct collection. No matching owner for
+  populating the legacy `codebase_topology_64` collection was found in the
+  inspected writer/projection paths. Therefore neither the legacy 64D vectors
+  nor their `semantic_768` payload labels can be attributed to the current
+  autoencoder just because the current query path can encode 768D queries to
+  64D. Preserve points and block alignment pending the actual collection
+  writer, its source cohort, and weight/model digest being identified.
+- [ ] Keep topology alignment and relabeling blocked until each producer family
+  has an independently established representation identity, model/revision,
+  canonical identity mapping, and source/graph lineage. Do not infer equivalence
+  from dimension or unit norm; do not delete or relabel points.
 - No topology representation, SOM, CouchDB, Qdrant fan-out, or GPU topology
   write is authorized by the canary receipt.
 - Representation audit remains `NOT_PROVEN` for source-version and ledger
@@ -312,4 +520,36 @@
 
 Failure of any topology gate leaves the proven semantic retrieval canary
 unchanged and reports topology as unavailable or challenger-only.
+
+## FastAPI and manifold contract audit (2026-10-12; source-only)
+
+- `services/topology-gpu/schemas.py` defines four-value manifold coordinates, but the synthesis request does not bind inputs to a source/workspace revision, candidate snapshot, CandidateOrdinalMap, representation/model revision, or transform checksum. The zero-coordinate default is a schema default, not measured evidence.
+- Numeric shape/finiteness bounds are not established by the inspected schema. `services/topology-gpu/manifold.py` fits cuML UMAP or a PCA fallback per request and does not emit a frozen basis, cohort, or transform receipt; these coordinates are not a stable admitted representation.
+- `/manifold-synthesis` is non-persisting but accepts caller-supplied identities without canonical candidate admission. `/materialize-pathway` can persist to PostgreSQL/Redis/Qdrant and contains runtime DDL; it was not called.
+- Status: source surfaces identified; canonical lineage, finite-input validation, deterministic transform identity, and independent readback remain open. No task is completed by this audit; no service or store was changed.
+
+## Qdrant inventory and recovery-path audit (2026-10-13T02:45Z; read-only)
+
+- `scripts/atlas/audit-qdrant-pruning.mjs` queried `http://127.0.0.1:6333` with GET-only requests and wrote `.tmp/atlas/qdrant-pruning-audit-v1.json`. The endpoint returned 18 collections versus the requested expectation of 46; the count gate failed. The prior 48-collection receipt is not reconciled with this run.
+- The audit recorded 18 snapshots totaling 5,163,315,712 reported bytes and no aliases. It found zero collections with an explicit `points_count: 0`; one collection's detail request failed, so that collection's count is unknown. This does not verify the earlier claim of 27 empty collections. Literal source-reference counts are leads, not proof of runtime ownership or safe deletion.
+- Static inspection only: `scripts/operator/backup-atlas-state.mjs` creates snapshots using POST and its keep-two logic only reports older candidates. `scripts/operator/restore-atlas-state.mjs` guesses 384/768 dimensions from collection names, does not restore aliases or lineage, retries recovery without independent verification, and then logs success. Neither script was run.
+- Status: snapshot inventory is partial; restore/recovery is NOT_PROVEN; pruning is NOT_AUTHORIZED. No Qdrant, database, alias, or snapshot mutations were performed. Resolve endpoint/count scope and prove isolated restore/readback before any retention decision.
+
+## Preserved backup and runtime configuration cross-check (read-only)
+
+- The preserved `backups/qdrant-upgrade-20260825-211412` directory contains one Qdrant `.snapshot` file for `codebase_chunks_768` (1,585,911,296 bytes). Its recomputed SHA-256 matches the `.checksum`, Qdrant snapshot response, and backup manifest (`70d2ac05…`). This proves byte integrity for that one file, not restore compatibility or searchable recovery.
+- The same manifest lists four additional material snapshots that are absent from this backup directory. The backup is therefore not a complete collection-set recovery artifact. It records Qdrant 1.18.2; the current Compose image is Qdrant 1.19.0, so cross-version restore compatibility remains untested.
+- Root `.env` selects `QDRANT_COLLECTION=codebase_chunks_768`, while `sveltekit-frontend/.env.local` selects `legal_documents`; both use `http://127.0.0.1:6333`. This affects app collection selection but does not explain the API's 18-versus-46 inventory count.
+- No recovery, alias replay, or collection mutation was run. Keep snapshot recovery and pruning gates open.
+- Dashboard cross-check: the open Qdrant UI reports server version `1.19.0`. Its collection route was blocked in the in-app browser; the live collection count was therefore verified separately through the local GET-only audit.
+
+## Qdrant collection-deletion chronology (2026-10-13; log/read-only cross-check)
+
+- Qdrant access logs record two collection DELETE requests returning HTTP 200 at `2026-10-13T01:00:45Z`: `codebase_chunks_384` and `codebase_chunks_384_hybrid`. At `2026-10-13T02:38:50Z`–`02:38:51Z`, logs record 28 more collection DELETE requests returning HTTP 200. This explains the inventory sequence 48 → 46 → 18; it does not identify the initiating process or prove the authorization context.
+- The 28 later requests came from bridge address `172.18.0.1`; their logged user-agent is `-`. The two earlier requests show `curl/8.14.1`. These logs do not establish the human or process responsible. Do not infer intent or authorization from the address or user-agent.
+- The 28-request pattern is consistent with the historical `scripts/atlas/prune-empty-qdrant-collections.mjs` (Node `http.request` DELETEs without a configured user-agent), and the staging-planes ledger records that helper's `--apply` execution. This is corroboration, not process-level attribution. Source inspection found a safety defect: failed/missing collection info was normalized to `pointsCount=0`, so an API error could be treated as an empty collection. Static code/config references also exist for deleted `external_programming_docs_768` and `legal_documents`; therefore the earlier “empty/test only” classification is not independently established. The helper is now read-only and rejects unknown point counts; no apply behavior remains.
+- A read-only filesystem listing found 46 surviving `.snapshot` files under `/qdrant/snapshots`; files for all 28 collections deleted in the later batch remain there and total 7,401,984 bytes. Their presence is a recovery lead, not proof that the collections can be restored, that aliases/configuration are complete, or that source lineage is valid.
+- Per-file SHA-256 and byte lengths for those 28 surviving snapshots are recorded in `.tmp/atlas/production-hardening-seed-20261012/qdrant-deleted-collection-snapshot-hashes-v1.json` (2026-10-13T02:55:12Z). These are current-byte fingerprints; no pre-deletion checksum comparison or restore test was available.
+- The current GET-only audit ran after the logged deletes and made no Qdrant mutations. Preserve surviving snapshots and logs. Do not restore/recreate collections, prune snapshots, or issue further Qdrant writes until deletion history, consumer ownership, and isolated restore/readback are reviewed and authorized.
+- Status: current 18-collection readback and deletion chronology are verified from separate local surfaces; actor/authorization, full historical inventory scope, and recoverability remain `NOT_PROVEN`. No completion checkbox is warranted.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).

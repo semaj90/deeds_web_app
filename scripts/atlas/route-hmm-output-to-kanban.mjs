@@ -86,9 +86,6 @@ async function getRows(limit, offset) {
       'ap.concept_ids',
       'ap.keywords',
     ];
-    if (packetCols.has('content_embedding_384')) {
-      select.push('ap.content_embedding_384');
-    }
     if (packetCols.has('used_concepts')) select.push('ap.used_concepts');
     if (packetCols.has('extracted_entities')) select.push('ap.extracted_entities AS packet_entities');
     if (packetCols.has('ast_symbols')) select.push('ap.ast_symbols AS packet_ast_symbols');
@@ -134,7 +131,7 @@ function determineState(row) {
   if (!Array.isArray(row.ast_symbols) || row.ast_symbols.filter(Boolean).length === 0) return 'StructureError';
   if (!Array.isArray(row.lexical_features) || row.lexical_features.filter(Boolean).length === 0) return 'LexicalError';
   if (!Array.isArray(row.used_concepts) || row.used_concepts.filter(Boolean).length === 0) return 'SemanticError';
-  if (!row.embedding && !row.content_embedding_384 && !row.latent_64) return 'VectorError';
+  if (!row.embedding && !row.latent_64) return 'VectorError';
   if (!normalizeText(row.qdrant_point_id)) return 'QdrantBridgeError';
   if (!Number.isFinite(Number(row.som_row)) || !Number.isFinite(Number(row.som_col))) return 'TopologyError';
   if (!normalizeText(row.tree_node_id)) return 'TreePropagationError';

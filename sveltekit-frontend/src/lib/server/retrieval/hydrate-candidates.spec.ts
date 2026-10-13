@@ -19,7 +19,7 @@ function baseCandidate(overrides: Partial<FusedCandidate> = {}): FusedCandidate 
     summary: 'a summary',
     content: 'content',
     score: 0.75,
-    scoreSource: 'postgres_trigram',
+    scoreSource: 'postgres_fts',
     fusionScore: 0.5,
     rankBefore: 1,
     sourceCount: 1,
@@ -57,7 +57,7 @@ describe('hydrateCandidatesWithProof — BM25/lexical signal wiring', () => {
     mockExecute.mockResolvedValueOnce({ rows: [] }); // source_ref fallback query (unused here)
 
     const { envelopes } = await hydrateCandidatesWithProof([
-      baseCandidate({ score: 0.82, scoreSource: 'postgres_trigram' }),
+      baseCandidate({ score: 0.82, scoreSource: 'postgres_fts' }),
     ]);
 
     expect(envelopes).toHaveLength(1);
@@ -88,7 +88,7 @@ describe('hydrateCandidatesWithProof — BM25/lexical signal wiring', () => {
     mockExecute.mockResolvedValueOnce({ rows: [] });
 
     const { envelopes } = await hydrateCandidatesWithProof([
-      baseCandidate({ score: 1.4, scoreSource: 'postgres_trigram' }),
+      baseCandidate({ score: 1.4, scoreSource: 'postgres_fts' }),
     ]);
 
     expect(envelopes[0].lexical?.score).toBe(1);

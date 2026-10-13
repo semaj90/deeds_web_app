@@ -627,7 +627,13 @@
       "mcp__trace__karpathy_attention_rank_files",
       "Bash(git status *)",
       "Bash(ls -d claude-mem turbovec granite-docling-258M mcp-server-mcp \"sites/parent-atlas-gateboard\" \"models/embeddinggemma_300m\")",
-      "Bash(cat .gitmodules)"
+      "Bash(cat .gitmodules)",
+      "Skill(trace-mcp-tooling)",
+      "Bash(wc -l tasks.md)",
+      "Bash(tail -25 tasks.md)",
+      "Bash(git diff *)",
+      "PowerShell(Get-PSDrive C | Select-Object Used,Free | Format-List; $sizes = @{}; Get-ChildItem C:\\\\ -Force -ErrorAction SilentlyContinue | ForEach-Object { $s = \\(Get-ChildItem $_.FullName -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; [pscustomobject]@{GB=[math]::Round\\($s/1GB,2\\); Path=$_.FullName} } | Sort-Object GB -Descending | Select-Object -First 15 | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem *)"
     ],
     "deny": [],
     "ask": []

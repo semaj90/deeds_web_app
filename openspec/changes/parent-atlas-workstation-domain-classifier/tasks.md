@@ -1271,6 +1271,28 @@ then checks each candidate's packet/source/revision identity against the source-
 symbol row. It returns candidate-only records, never ranks or admits them. Its regressions are
 authored but not run; a live authorized map/source provider and SearchRuntime caller remain open.
 
+**2026-10-12 `.okf` vocabulary/LUT alignment (documentation only):** The reference corpus now
+distinguishes MCP Viterbi tool-selection proposals from the diagnostic symbol/document LUT and the
+proposed per-directory source-context LUT. The MCP surface entry is tied to its captured registry
+revision and schema digests; discovery does not prove tool invocation. The directory LUT remains
+design-only and gated on GPH-13 AST parity plus revision-qualified source bindings. CLASS-INDEX-04
+remains open: no production symbol TOC, searchable directory index, SearchRuntime caller, or Qdrant
+population was created or proven. No datastore writes or index builds were performed.
+
+**2026-10-12 agentic search code review:** The legacy
+`scripts/atlas/agentic-recommendation-workflow.mjs` has intent, ACE, retrieval, reranking,
+synthesis, and recommendation stages, but it must not be described as the production search-to-DAG
+prefill path. Its L4 issues lexical, dense, and graph calls independently rather than delegating
+normalization/fusion to SearchRuntime, and workflow report writes occur despite the documented
+`--dry-run` flag. Source-level model binding was updated to load the SvelteKit `.env.local`/`.env`
+files without overriding shell variables, require the configured Ornith 1.5 alias, and verify that
+exact ID via `GET /v1/models` before synthesis. This is not live runtime proof. The read-only
+parameter-artifact resolver has contract/fixture coverage but no production caller and does not
+fetch artifacts. Keep synthesis, parameter use, and task/tool execution blocked on qualified
+retrieval evidence, independent ContextManifest readback, explicit parameter revision matching,
+SearchRuntime integration, and the existing authorization gates. The focused model-binding tests
+are authored and pending execution.
+
 Validation was intentionally not run at the operator's request. These entries are open work,
 not test results or production proof.
 

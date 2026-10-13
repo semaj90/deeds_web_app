@@ -7,6 +7,7 @@ import { readLatestQdrantClusterTags, scoreClusterRelevance } from '$lib/server/
 
 export type RetrievalLaneName =
   | 'redis_ace'
+  | 'postgres_fts'
   | 'postgres_trigram'
   | 'qdrant_vector'
   | 'ast_symbol'
@@ -64,6 +65,7 @@ const LANE_WEIGHTS: Record<RetrievalLaneName, number> = {
   ast_symbol: 0.9,
   som_topology: 0.8,
   summary_lenses: 1.5,
+  postgres_fts: 0.75,
   postgres_trigram: 0.75,
   neo4j_graph: 0.85,
   web_research: 0.5,

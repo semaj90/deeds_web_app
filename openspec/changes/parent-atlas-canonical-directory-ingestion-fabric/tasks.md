@@ -211,3 +211,9 @@ environment can run the cuTile-versus-PyTorch SIMT comparison.
 - `A2A_GRPC_IDENTITY_ROUNDTRIP_PASS`
 
 No unchecked task in this change authorizes production writes by implication. Writes require the existing repo's explicit bounded apply path and readback proof.
+
+## Directory LUT storage audit (2026-10-12; source-only)
+
+- `atlas_directories` has a Drizzle definition and registered manual sidecar SQL with repository/path uniqueness and a parent-path index.
+- Source search found no producer, reader, population job, or query caller. The table definition has no source/workspace revision or evidence binding, so it is storage scaffolding, not a qualified searchable directory LUT.
+- The live row count was not re-read in this audit. Keep population and retrieval wiring open until source binding, packet/chunk identity, and the existing CandidateOrdinalMap/symbol-version join are proven. No database operation was performed and no task is completed here.

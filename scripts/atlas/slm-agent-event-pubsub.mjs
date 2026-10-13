@@ -169,8 +169,11 @@ async function listen() {
 }
 
 async function publish() {
-  console.log('📤 Publisher Mode\n');
+  console.error('LEGACY_SLM_EVENT_PUBLISH_DISABLED: publishing can dispatch unqualified 384-D packet inputs or load non-authoritative model artifacts; use the governed Ornith retrieval and inference path.');
+  process.exitCode = 2;
+  return;
 
+  console.log('📤 Publisher Mode\n');
   const eventArg = process.argv.find(arg => arg.startsWith('--event='));
   const payloadArg = process.argv.find(arg => arg.startsWith('--payload='));
 
@@ -202,8 +205,11 @@ async function publish() {
 }
 
 async function demo() {
-  console.log('🎬 Demo Mode\n');
+  console.error('LEGACY_SLM_EVENT_DEMO_DISABLED: demo events publish a synthetic 384-D packet and a non-authoritative model-load request.');
+  process.exitCode = 2;
+  return;
 
+  console.log('🎬 Demo Mode\n');
   try {
     await redis.connect();
 

@@ -54,7 +54,7 @@ describe('retrieveQdrant', () => {
     expect(mockDenseSearch).toHaveBeenCalledTimes(1);
     expect(mockDenseSearch).toHaveBeenCalledWith(
       expect.objectContaining({
-        collection: 'codebase_chunks_768_v2',
+        collection: 'codebase_chunks_768',
         limit: expect.any(Number),
         query: 'exact symbol proof',
         queryVector: expect.any(Array),

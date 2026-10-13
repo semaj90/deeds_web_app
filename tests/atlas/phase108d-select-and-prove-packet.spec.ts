@@ -23,6 +23,7 @@ import {
   mapProofGateStatus,
   probeQdrantPacket,
   probeRedisPacket,
+  runPhase108dSelectAndProvePacket,
   selectPacketCoverage,
 } from '../../scripts/atlas/phase108d-select-and-prove-packet.mts';
 
@@ -116,7 +117,7 @@ describe('phase108d packet selector', () => {
     ).toBe(false);
   });
 
-  it('accepts a valid embedding artifact shape', () => {
+  it('rejects legacy 384-D embedding artifacts', () => {
     const vector = Array.from({ length: 384 }, (_, index) => index + 1);
     expect(
       isValidEmbeddingArtifact({
@@ -128,7 +129,33 @@ describe('phase108d packet selector', () => {
         },
         payload: {},
       } as never),
-    ).toBe(true);
+    ).toBe(false);
+  });
+
+  it('accepts only qualified semantic_768 artifacts', () => {
+    const vector = Array.from({ length: 768 }, (_, index) => index + 1);
+    expect(isValidEmbeddingArtifact({
+      embedding: vector,
+      metadata: {
+        producer_model: 'embeddinggemma',
+        producer_version: '1.0.0',
+        representation_name: 'semantic_768',
+      },
+      payload: {},
+    } as never)).toBe(true);
+  });
+
+  it('refuses repair mode before connecting to any store', async () => {
+    const originalFetch = global.fetch;
+    const fetchSpy = vi.fn();
+    global.fetch = fetchSpy as never;
+    try {
+      await expect(runPhase108dSelectAndProvePacket({ repair: true }))
+        .rejects.toThrow('PHASE108D_REPAIR_DISABLED_GOVERNED_WRITER_REQUIRED');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 
   it('rejects fixture-only Redis payloads as canonical proof', async () => {
@@ -210,7 +237,7 @@ describe('phase108d packet selector', () => {
     global.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.endsWith('/collections')) {
-        return new Response(JSON.stringify({ result: { collections: [{ name: 'codebase_chunks_384' }] } }), { status: 200 });
+        return new Response(JSON.stringify({ result: { collections: [{ name: 'codebase_chunks_768' }] } }), { status: 200 });
       }
       return new Response(JSON.stringify({
         result: {
@@ -256,6 +283,39 @@ describe('phase108d packet selector', () => {
       );
 
       expect(state).toBe('SCHEMA_MISMATCH');
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('does not treat a legacy 384 collection as canonical Qdrant presence', async () => {
+    const originalFetch = global.fetch;
+    const fetchSpy = vi.fn(async () => new Response(JSON.stringify({
+      result: { collections: [{ name: 'codebase_chunks_384' }] },
+    }), { status: 200 }));
+    global.fetch = fetchSpy as never;
+    try {
+      const state = await probeQdrantPacket({
+        packetKey: 'packet-a',
+        sourceRef: 'src/file.ts',
+        contentHash: 'sha256:abc',
+        workspaceRevision: 'rev-1',
+        postgres: 'PRESENT',
+        qdrant: 'ABSENT',
+        redis: 'ABSENT',
+        ace: 'ABSENT',
+        hyperrag: 'ABSENT',
+        coverageScore: 0,
+        diagnostics: [],
+      }, {
+        packet_key: 'packet-a',
+        source_ref: 'src/file.ts',
+        content_hash: 'sha256:abc',
+        workspace_revision: 'rev-1',
+      } as never, 'http://127.0.0.1:6333');
+
+      expect(state).toBe('ABSENT');
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
     } finally {
       global.fetch = originalFetch;
     }

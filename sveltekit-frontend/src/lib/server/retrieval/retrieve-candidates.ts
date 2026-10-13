@@ -16,7 +16,6 @@ import { sql } from 'drizzle-orm';
 import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
-import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
 import { QDRANT_DENSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
@@ -29,9 +28,6 @@ const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
 const EXACT_LIMIT = RETRIEVAL_LIMITS.exactLexicalTopK;
 const AST_LIMIT = RETRIEVAL_LIMITS.topologyTopK;
 const RG_LIMIT = RETRIEVAL_LIMITS.maxGraphNeighbors;
-const SPARSE_LIMIT = RETRIEVAL_LIMITS.sparseTopK;
-
-let sparseRetriever: ReturnType<typeof createBm42SparseRetriever> | null = null;
 
 function pickString(...values: unknown[]): string | null {
   for (const value of values) {
@@ -146,13 +142,6 @@ async function getQdrantManager() {
   return mod.getQdrantManager();
 }
 
-function getSparseRetriever(): ReturnType<typeof createBm42SparseRetriever> {
-  if (!sparseRetriever) {
-    sparseRetriever = createBm42SparseRetriever();
-  }
-  return sparseRetriever;
-}
-
 /**
  * Retrieve candidates from all sources
  */
@@ -164,16 +153,15 @@ export async function retrieveAllCandidates(
 ): Promise<Candidate[]> {
   const includeVectorLanes = options?.includeVectorLanes ?? true;
 
-  const [bm25, qdrant, exact, ast, rg, sparse] = await Promise.all([
+  const [bm25, qdrant, exact, ast, rg] = await Promise.all([
     retrieveBM25(query),
     includeVectorLanes ? withTimeout(retrieveQdrant(query), 5000, []) : Promise.resolve([]),
     retrieveExactMatches(query),
     retrieveASTMatches(query),
     retrieveRipgrep(query),
-    includeVectorLanes ? withTimeout(retrieveBM42Sparse(query), 5000, []) : Promise.resolve([]),
   ]);
 
-  const combined = [...bm25, ...qdrant, ...exact, ...ast, ...rg, ...sparse];
+  const combined = [...bm25, ...qdrant, ...exact, ...ast, ...rg];
   if (!filters) {
     return combined;
   }
@@ -206,39 +194,6 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
 }
 
 /**
- * BM42 sparse retrieval via Qdrant named sparse vector (bm42 lane)
- * Runs against codebase_chunks_384_hybrid collection.
- */
-async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
-  try {
-    const laneCandidates = await getSparseRetriever().retrieve({ query, limit: SPARSE_LIMIT });
-    return laneCandidates.map(lc => ({
-      id: lc.qdrantPointId ?? lc.packetKey,
-      sourceRef: lc.sourceRef,
-      summary: (lc.metadata?.summary as string) || '',
-      content: (lc.metadata?.content as string) || '',
-      score: lc.score ?? 0,
-      scoreSource: 'qdrant' as const,
-      embeddingLane: 'bm42' as const, // Canonical sparse vector name per qdrant-collection-contracts.ts
-      workspaceRevision: pickString(lc.workspaceRevision, lc.metadata?.workspace_revision, lc.metadata?.workspaceRevision),
-      sourceRevision: pickNullableString(lc.sourceRevision, lc.metadata?.source_revision, lc.metadata?.sourceRevision),
-      representationId: pickNullableString(lc.representationId, lc.metadata?.representation_id, lc.metadata?.representationId),
-      representationRevision: pickNumber(lc.representationRevision, lc.metadata?.representation_revision, lc.metadata?.representationRevision),
-      qdrantPointId: lc.qdrantPointId ?? lc.packetKey,
-      ...deriveIdentity({
-        symbolVersionId: lc.symbolVersionId,
-        packetKey: lc.packetKey,
-        contentHash: lc.metadata?.content_hash ?? lc.metadata?.contentHash,
-        sourceRef: lc.sourceRef,
-        fallbackId: lc.qdrantPointId ?? lc.packetKey,
-      }),
-    }));
-  } catch {
-    return [];
-  }
-}
-
-/**
  * Canonical lexical retrieval via PostgreSQL ts_rank
  * Primary: uses search_vector tsvector with weighted field relevance
  * Fallback: trigram (ILIKE) on search failure
@@ -246,10 +201,10 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
 export async function retrieveBM25(query: string): Promise<Candidate[]> {
   try {
     const db = await getDb();
-    // Clean query for ts_rank (PostgreSQL Boolean query syntax)
+    // Clean query terms: remove operators and keep alphanumeric tokens
     const queryTerms = query
       .trim()
-      .replace(/[^\w\s&|!-]/g, ' ') // Remove special chars except &|!-
+      .replace(/[^\w\s]/g, ' ')
       .split(/\s+/)
       .filter(word => word.length > 0);
 
@@ -291,7 +246,7 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
       summary: row.summary || '',
       content: row.content || '',
         score: Math.max(0.5, Math.min(1.0, row.score)), // Normalize to 0.5-1.0 range
-        scoreSource: 'postgres_trigram' as const,
+        scoreSource: 'postgres_fts' as const,
         workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
         sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
         representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
@@ -395,7 +350,6 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 /**
  * Semantic retrieval via Qdrant ANN search
  * Primary: codebase_chunks_768 (declared dense 768-dim lane)
- * Legacy hybrid/sparse lanes remain available via separate call sites.
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
   const dense768 = await embedQueryForLane(query, 'dense_768').catch(() => null);
@@ -412,9 +366,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
   try {
     for (const collection of collections) {
       try {
-        // Keep dense retrieval as a raw logical lane. The BM42 adapter is a
-        // separate lane and SearchRuntime is the sole production fusion owner;
-        // Qdrant must not fuse dense+sparse here before SearchRuntime sees them.
+        // Keep dense retrieval as a raw logical lane; SearchRuntime owns fusion.
         const results = await qdrant.denseSearch({
           collection,
           query,

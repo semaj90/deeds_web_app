@@ -15,7 +15,7 @@ for (const envFile of [
   dotenv.config({ path: envFile, override: false });
 }
 
-const COLLECTIONS = ['codebase_chunks_384_hybrid', 'codebase_chunks_768'] as const;
+const COLLECTIONS = ['codebase_chunks_768'] as const;
 
 type Options = {
   packetKey: string;

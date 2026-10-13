@@ -4,7 +4,7 @@
 LangExtract Bridge using TurboQuant Gemma4 via llama-server (OpenAI compatible)
 
 Instead of Ollama, this uses:
-- llama-server.exe running locally with gemma4-legal-iq4xs-direct.gguf
+- llama-server.exe running locally with Ornith 1.5 (alias ornith-1.5-9b)
 - OpenAI-compatible /v1/chat/completions endpoint
 - Structured extraction via Gemma4 (better legal reasoning than generic models)
 
@@ -110,7 +110,7 @@ class LangExtractGemma4Bridge:
         except Exception as e:
             print("[FAIL] Cannot connect to llama-server at " + self.base_url + ": " + str(e))
             print(f"  Make sure llama-server.exe is running:")
-            print(f"    llama-server.exe -m models/gemma4-legal-iq4xs-direct.gguf -c 65536 -ngl 99 -fa on")
+            print(f"    llama-server.exe -m models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf --alias ornith-1.5-9b -c 65536 -ngl 99 -fa on")
             return False
 
     def extract(self, text: str) -> Dict[str, Any]:

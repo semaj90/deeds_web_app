@@ -5,17 +5,29 @@
  * It validates a candidate revision but never promotes it or writes a store.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { sealReadbackFromReceiptV1, validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const PLAN = resolve(ROOT, 'docs/reports/graphify-source-selection-plan-v1.json');
-const argValue = (name: string) => process.argv.slice(2).find((value) => value.startsWith(`${name}=`))?.slice(name.length + 1);
+const argValue = (name: string) => {
+  const inline = process.argv.slice(2).find((value) => value.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
+  const index = process.argv.indexOf(name);
+  if (index < 0) return undefined;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE_FOR_${name.slice(2).replaceAll('-', '_').toUpperCase()}`);
+  return value;
+};
+const PLAN = resolve(ROOT, argValue('--plan') ?? 'docs/reports/graphify-source-selection-plan-v1.json');
+const HYGIENE = resolve(ROOT, argValue('--hygiene') ?? 'docs/reports/canonical-source-inventory-hygiene-v1.json');
 const DERIVATION = resolve(ROOT, argValue('--derivation') ?? 'docs/reports/workspace-revision-from-sealed-multi-repo-snapshot-v1.json');
 const reportArg = argValue('--report');
 const REPORT = resolve(ROOT, reportArg ?? 'docs/reports/workspace-revision-tournament-source-authority-v1.json');
+if (reportArg && !REPORT.startsWith(`${resolve(ROOT, '.tmp')}${sep}`)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
+}
 const plan = JSON.parse(await readFile(PLAN, 'utf8'));
 const derivation = JSON.parse(await readFile(DERIVATION, 'utf8'));
 const hygiene = JSON.parse(await readFile(HYGIENE, 'utf8'));

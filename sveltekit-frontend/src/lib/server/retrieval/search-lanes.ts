@@ -483,135 +483,26 @@ export class QdrantLane768 extends QdrantLane {
 
 // ── Qdrant 384-dim lane (codebase_chunks_384_hybrid — legacy retrieval contract) ──
 
-/**
- * Dense retrieval lane targeting the 384-dim legacy collection.
- * Uses named vector "content" which `codebase_chunks_384_hybrid` exposes.
- * This lane remains available for migration, but the canonical dense contract is 768.
- * Falls back gracefully if the collection has 0 indexed points (TurboVec not yet
- * retargeted) — returns empty slice rather than throwing.
- */
+/** Retained API shell for the retired 384-D lane; it never contacts Qdrant. */
 export class QdrantLane384 extends SearchLaneBase {
   name = 'qdrant-384' as const;
 
-  private url: string;
-  private collection: string;
-  private namedVector: string;
-  private embeddingDimension: number;
-  private timeout: number;
-
   constructor(
-    url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
-    collection = 'codebase_chunks_384_hybrid',
-    namedVector = 'content',
-    embeddingDimension = 384,
-    timeout = 30000
+    _url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
+    _collection = 'codebase_chunks_384_hybrid',
+    _namedVector = 'content',
+    _embeddingDimension = 384,
+    _timeout = 30000
   ) {
     super();
-    this.url = url;
-    this.collection = collection;
-    this.namedVector = namedVector;
-    this.embeddingDimension = embeddingDimension;
-    this.timeout = timeout;
   }
 
   async health(): Promise<boolean> {
-    try {
-      const ac = new AbortController();
-      const t = setTimeout(() => ac.abort(), 5000);
-      const res = await fetch(`${this.url}/collections/${this.collection}`, { signal: ac.signal });
-      clearTimeout(t);
-      if (!res.ok) return false;
-      const data = (await res.json()) as { result?: { vectors_count?: number } };
-      // Degrade gracefully when collection is empty (indexed: 0 during TurboVec transition)
-      const count = data.result?.vectors_count ?? 0;
-      return count > 0;
-    } catch { return false; }
+    return false;
   }
 
-  async search(context: SearchLaneContext): Promise<SearchResult[]> {
-    const healthy = await this.health();
-    if (!healthy) return [];
-    const queryVector = getQueryVectorForLane(context, 'qdrant-768');
-    if (!queryVector || queryVector.length === 0) return [];
-
-    const qdrantFilter = buildQdrantFilter(context.filters);
-    const limit = context.topK;
-
-    // Use named vector syntax for collections with multiple vector configs
-    const body: Record<string, unknown> = {
-      query: Array.from(queryVector),
-      using: this.namedVector,
-      limit,
-      with_payload: true,
-    };
-    if (qdrantFilter) body.filter = qdrantFilter;
-
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), this.timeout);
-    const res = await fetch(`${this.url}/collections/${this.collection}/points/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: ac.signal,
-    });
-    clearTimeout(t);
-
-    if (!res.ok) {
-      console.warn(`[QdrantLane384] Search returned ${res.status}`);
-      return [];
-    }
-
-    const data = (await res.json()) as {
-      points: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
-    };
-
-    const results = (data.points ?? []).map((point, i) => ({
-      ...(() => {
-        const laneMetadata = getVectorLaneMetadata('dense_384');
-        const dense384Metadata = VECTOR_CONFIG_LANES.dense_384;
-
-        return {
-      id: point.id,
-      rank: i,
-      score: Math.min(1, Math.max(0, point.score)),
-      confidence: 0.88,
-      source: 'qdrant-384' as const,
-      lane_id: getVectorLaneMetadata('dense_384').laneId,
-      packet_key: (point.payload?.packet_key as string | null) ?? null,
-      symbol_version_id: (point.payload?.symbol_version_id as string | null) ?? (point.payload?.packet_key as string | null) ?? null,
-      tree_node_id: (point.payload?.tree_node_id as string | null) ?? null,
-      content_hash: (point.payload?.content_hash as string | null) ?? null,
-      workspace_revision: extractWorkspaceRevisionFromPayload(point.payload),
-      source_revision: extractSourceRevisionFromPayload(point.payload),
-      representation_id: extractRepresentationIdFromPayload(point.payload),
-      representation_revision: extractRepresentationRevisionFromPayload(point.payload),
-      feature_label: (point.payload?.feature_label as string | null) ?? null,
-      source_ref: (point.payload?.source_ref as string | null) ?? null,
-      feature_id: (point.payload?.feature_id as string | null) ?? null,
-      file_path: (point.payload?.file_path as string | null) ?? null,
-      summary: (point.payload?.summary as string | null) ?? null,
-      metadata: {
-        qdrant_point_id: point.id,
-        qdrant_collection: this.collection,
-        embedding_dim: this.embeddingDimension,
-        embedding_lane: (point.payload?.embedding_lane as SearchResult['metadata']['embedding_lane']) ?? 'dense_384',
-        embedding_role: (point.payload?.embedding_role as SearchResult['metadata']['embedding_role'])
-          ?? dense384Metadata.role,
-        embedding_status: (point.payload?.embedding_status as SearchResult['metadata']['embedding_status'])
-          ?? dense384Metadata.status,
-        embedding_native_dimension: Number(point.payload?.embedding_native_dimension ?? point.payload?.projection_source_dimension) || 768,
-        projection_source_dimension: Number(point.payload?.projection_source_dimension ?? point.payload?.embedding_native_dimension) || 768,
-        projection_method: (point.payload?.projection_method as SearchResult['metadata']['projection_method'])
-          ?? dense384Metadata.projectionMethod,
-        projection_version: (point.payload?.projection_version as string | undefined)
-          ?? dense384Metadata.projectionVersion,
-        payload: point.payload,
-      },
-        };
-      })(),
-    })) as SearchResult[];
-
-    return this.applyPostFetchFilters(results, context.filters);
+  async search(_context: SearchLaneContext): Promise<SearchResult[]> {
+    return [];
   }
 
   config(): SearchLaneConfig {

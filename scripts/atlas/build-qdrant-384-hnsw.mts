@@ -15,6 +15,9 @@ import { fileURLToPath } from 'url';
 import Database from 'duckdb-async';
 import { QdrantClient } from '@qdrant/js-client-rest';
 
+console.error('LEGACY_384_HNSW_BUILD_DISABLED: the 384-D collection is retired; use only an admitted representation owner');
+process.exit(2);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT_PATH = path.join(__dirname, '../../data/atlas-ml/snapshot_5k_384dim.parquet');
 

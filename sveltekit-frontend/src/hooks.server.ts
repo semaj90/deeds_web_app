@@ -30,6 +30,7 @@ import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
 import { ensureOpenTelemetry } from '$lib/server/observability/opentelemetry.js';
+import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 import { sql } from 'drizzle-orm';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -1047,6 +1048,22 @@ export const handleError: HandleServerError = ({ error, event }) => {
 		error instanceof Error ? error : new Error(String(error)),
 		{ requestId: event.locals.requestId, endpoint: event.url.pathname }
 	);
+
+	// Log to database error_logs table for P1 agentic error fixing (TODO-LOG-01)
+	const category = categorizeError(error);
+	const severity = categorizeSeverity(category);
+	logError({
+		category,
+		severity,
+		message: error instanceof Error ? error.message : String(error),
+		stack: error instanceof Error ? error.stack : undefined,
+		routePath: event.url.pathname,
+		contextKey: event.url.pathname.split('/').filter(Boolean).pop() || 'root',
+		userId: event.locals.user?.id,
+	}).catch((err) => {
+		// Non-fatal logging safeguard
+		console.warn('[hooks.server.ts] logError failed:', err);
+	});
 
 	return {
 		message: dev ? `${error instanceof Error ? error.message : String(error)}` : 'An unexpected error occurred',

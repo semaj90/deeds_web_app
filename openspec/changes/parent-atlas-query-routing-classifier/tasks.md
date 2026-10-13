@@ -300,3 +300,21 @@ writes are authorized by this change.
   extend the existing server-owned query taxonomy output with explicit primary
   domain and taxonomy revision, and bind any learned contribution to an
   independently verified model artifact before adding a shadow caller.
+
+### Web-search and MLP tournament alignment review (2026-10-12)
+
+- Web search has multiple callers: `research.web_search` and `kag.web_search` use
+  the shared SearXNG/DuckDuckGo adapter; the agent tool-loop has a separately
+  gated cache → SearXNG → Qdrant `research_summaries` path; ACE has another
+  fallback caller. These are not one verified web-search DAG. Search snippets
+  remain external observations until capture, license/scope review, revision
+  binding, admission, and ContextManifest readback pass.
+- NLP-5's PyTorch MLP architecture and the router tensor contract are present.
+  A newly found contract conflict must be resolved first: NLP-4 documents a
+  154-wide v1 tensor, while `train-query-router-pytorch-v2.py` and the v2
+  manifest use width 234. No crosswalk or common dataset owner is proven.
+  NLP-5 training/calibration, NLP-7 same-corpus comparison against static rules
+  and XGBoost, NLP-8 shadow routing, and NLP-9 promotion remain open. The model
+  is a query-plan classifier, not a content ranker or MCP authorization owner.
+- No web-search route was called, no page was crawled, and no training or
+  tournament run was performed. Existing unchecked tasks remain unchanged.

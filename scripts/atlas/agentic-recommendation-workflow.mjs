@@ -5,8 +5,8 @@
  * Parent Atlas Gate v2 — multi-stage identity-gated retrieval pipeline.
  *
  * Replaces the single checkParentAtlasRegistry() stub with a real 3-call
- * identity chain against the live TRACE MCP server, followed by hybrid
- * retrieval (BM25 + dense + graph) and bounded Gemma4 synthesis.
+ * identity chain against the live TRACE MCP server, followed by candidate
+ * retrieval and bounded Ornith 1.5 synthesis.
  *
  * Pipeline stages:
  *   L0  Intent classification
@@ -15,7 +15,7 @@
  *   L3  Memory: engram.chat_memory_recent + kag.recall_similar_fix
  *   L4  Hybrid retrieval: kag.multi_lane_search + ace.compact_search + graph.expand_neighborhood
  *   L5  Rerank: turbovec.rank_chunks
- *   L6  Synthesis: Gemma4 (bounded by evidence — no identity invention)
+ *   L6  Synthesis: Ornith 1.5 via the loaded llama-server model
  *   L7  Decision: patch_existing | merge_card | create_card | ask_permission
  *
  * Usage:
@@ -30,40 +30,50 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { createInterface } from 'node:readline';
+import dotenv from 'dotenv';
 import { evaluateTaskPromotion } from './lib/task-promotion-gate.mjs';
 import { decideRecommendationActionV1 } from './lib/recommendation-l7-decision-v1.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../..');
 
+dotenv.config({ path: path.join(REPO_ROOT, 'sveltekit-frontend', '.env.local'), quiet: true });
+dotenv.config({ path: path.join(REPO_ROOT, 'sveltekit-frontend', '.env'), quiet: true });
+
 const TRACE_MCP_URL = (process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '');
-const TURBOQUANT_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+const LLAMA_SERVER_BASE_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090')
+  .replace(/\/$/, '')
+  .replace(/\/v1$/i, '');
+const LLAMA_SERVER_MODEL = (process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b').trim();
 const ATLAS_TOOLS_MCP_SERVER = path.join(REPO_ROOT, 'sveltekit-frontend', 'scripts', 'mcp', 'atlas-tools-mcp.mjs');
 const WORKFLOW_REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'agentic-recommendation-workflow.json');
 const WORKFLOW_REPORT_PATH_ALT = path.join(REPO_ROOT, 'docs', 'reports', 'atlas', 'agentic-recommendation-workflow.json');
 
-function resolveLlamaServerModelId() {
-  const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
-  if (explicit) return explicit;
-
-  const modelPath = String(
-    process.env.ROTORQUANT_MODEL_PATH ??
-    process.env.TURBO_MODEL_PATH ??
-    process.env.TURBOQUANT_MODEL_PATH ??
-    '',
-  ).trim();
-  if (modelPath) {
-    const base = path.basename(modelPath).trim();
-    if (base) return base;
+export async function resolveAgenticWorkflowModel({ fetchImpl = fetch, baseUrl = LLAMA_SERVER_BASE_URL, expectedModel = LLAMA_SERVER_MODEL } = {}) {
+  if (!/^ornith[-_.]?1[-_.]5(?:[-_.]9b)?$/i.test(expectedModel)) {
+    throw new Error(`AGENTIC_WORKFLOW_MODEL_NOT_ORNITH_1_5:${expectedModel}`);
   }
 
-  const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
-  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+  let response;
+  try {
+    response = await fetchImpl(`${baseUrl.replace(/\/+$/, '').replace(/\/v1$/i, '')}/v1/models`, {
+      signal: AbortSignal.timeout(3_000),
+    });
+  } catch (error) {
+    throw new Error(`AGENTIC_WORKFLOW_LLAMA_SERVER_UNREACHABLE:${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (!response.ok) throw new Error(`AGENTIC_WORKFLOW_LLAMA_SERVER_MODELS_HTTP_${response.status}`);
 
-  return 'hforf.gguf';
+  const body = await response.json();
+  const loadedModels = Array.isArray(body?.data)
+    ? body.data.map((item) => typeof item?.id === 'string' ? item.id : null).filter(Boolean)
+    : [];
+  const loadedModel = loadedModels.find((id) => id === expectedModel);
+  if (!loadedModel) {
+    throw new Error(`AGENTIC_WORKFLOW_EXPECTED_MODEL_NOT_LOADED:${expectedModel}`);
+  }
+  return loadedModel;
 }
-
-const TURBOQUANT_MODEL = resolveLlamaServerModelId();
 
 let VERBOSE = false;
 
@@ -567,7 +577,7 @@ export function buildAceEvidenceBlocks(aceContext) {
   return { acePacket, aceCards, admittedCards };
 }
 
-// ── L6: Gemma4 synthesis (bounded) ───────────────────────────────────────────
+// ── L6: Ornith 1.5 synthesis (bounded) ────────────────────────────────────────
 
 async function l6Synthesis(query, identity, memory, aceContext = null) {
   const { acePacket, aceCards } = buildAceEvidenceBlocks(aceContext);
@@ -593,11 +603,12 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
   ].join('\n');
 
   try {
-    const res = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
+    const model = await resolveAgenticWorkflowModel();
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: TURBOQUANT_MODEL,
+        model,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 256,
         temperature: 0.1,
@@ -632,7 +643,7 @@ async function l6Synthesis(query, identity, memory, aceContext = null) {
     const jsonMatch = assembled.match(/\{[\s\S]*\}/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
   } catch (e) {
-    console.warn(`  [L6] Gemma4 synthesis: ${e.message}`);
+    console.warn(`  [L6] Ornith 1.5 synthesis: ${e.message}`);
   }
 
   return { summary: '(synthesis unavailable)', risk: 'unknown', rationale: '(no evidence synthesized)', priority: 'medium' };
@@ -759,7 +770,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   console.log(`top_score: ${rerankResult.top_score.toFixed(3)}, ${rerankResult.ranked.length} hits`);
 
   // L6 — Synthesis
-  process.stdout.write('  [L6] Gemma4 synthesis (bounded)... ');
+  process.stdout.write('  [L6] Ornith 1.5 synthesis (bounded)... ');
   const gemma4 = await l6Synthesis(userQuery, identity, memory, aceContext);
   appendWorkflowStage(workflow, 'synthesize', 'SYNTHESIZE', {
     dependsOn: ['rerank'],

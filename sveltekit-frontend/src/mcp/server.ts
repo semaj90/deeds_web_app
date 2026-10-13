@@ -1121,7 +1121,7 @@ export function setupToolHandlers() {
         name: 'analytics:deep_research',
         description:
           'Generate personalized deep research topics from RAG/KAG/DAG/ACE hit analytics, ' +
-          'thumbs-up/down feedback signals, Neo4j graph centrality, and Ollama self-prompting. ' +
+          'thumbs-up/down feedback signals, Neo4j graph centrality, and Ornith self-prompting via llama-server :8090. ' +
           'Returns up to 8 research topics with selfPrompt fields ready to execute, plus ' +
           'pipeline hit summary, feedback index, and graph insights. Cached 30 min per user.',
         inputSchema: {
@@ -1224,7 +1224,7 @@ export function setupToolHandlers() {
           'Execute MapReduce matrix analysis across RAG/KAG/DAG/ACE pipelines. ' +
           'MAP: extracts 5 data sources (chunk_hit_log, response_feedback, CouchDB glyph topology, ' +
           'Redis rerank cache, qlora_examples). REDUCE: builds 8-dimensional similarity matrix. ' +
-          'SYNTHESIZE: generates LangGraph-compatible research topics via Ollama. ' +
+          'SYNTHESIZE: generates LangGraph-compatible research topics via Ornith on llama-server :8090. ' +
           'Returns ranked chunks, pipeline coverage, glyph context, and self-prompting topics.',
         inputSchema: {
           type: 'object',
@@ -1242,7 +1242,7 @@ export function setupToolHandlers() {
             },
             synthesize: {
               type: 'boolean',
-              description: 'Run Ollama synthesis (default: true)',
+                description: 'Run Ornith synthesis through llama-server :8090 (default: true)',
               default: true,
             },
           },
@@ -1255,17 +1255,18 @@ export function setupToolHandlers() {
       {
         name: 'analytics:unified_research',
         description:
-          'Unified research query orchestrating: research-cache (qlora × feedback), ' +
-          'mapreduce-matrix (cosine similarity × CouchDB glyph), codebase rg/awk, ' +
-          'web search (Firecrawl), deep-research Ollama self-prompting, AWK-style SQL ' +
-          'score aggregations, and LangGraph supervisor state. Cached 20 min per user.',
+          'Unified research across feedback/cache signals, matrix similarity, codebase analysis, ' +
+          'optional web research, Ornith self-prompting through llama-server :8090, and score ' +
+          'aggregations. URL queries may use optional Firecrawl capture with an HTML fallback. ' +
+          'Retrieved web text is untrusted research input and is not automatically admitted or indexed. ' +
+          'Cached 20 min per user.',
         inputSchema: {
           type: 'object',
           properties: {
             userId: { type: 'string', description: 'User UUID' },
             query: {
               type: 'string',
-              description: 'Text query or URL (Firecrawl fetches URL content)',
+              description: 'Text query or URL. URL retrieval is optional external fetch, not corpus admission.',
             },
             pipeline: {
               type: 'string',
@@ -1293,7 +1294,7 @@ export function setupToolHandlers() {
         name: 'analytics:codebase_research',
         description:
           'Deep research codebase scanner using ripgrep pattern analysis, pipeline hit distribution, ' +
-          'feedback-weighted query insights, and Ollama synthesis. Generates TypeScript/SvelteKit-specific ' +
+          'feedback-weighted query insights, and Ornith synthesis via llama-server :8090. Generates TypeScript/SvelteKit-specific ' +
           'research topics with code patterns and self-prompts. Cached 30 min per user.',
         inputSchema: {
           type: 'object',
@@ -1310,7 +1311,7 @@ export function setupToolHandlers() {
             },
             synthesize: {
               type: 'boolean',
-              description: 'Run Ollama synthesis (default: true)',
+                description: 'Run Ornith synthesis through llama-server :8090 (default: true)',
               default: true,
             },
           },
@@ -1322,12 +1323,12 @@ export function setupToolHandlers() {
         name: 'codebase:concurrent_research',
         description:
           'LangGraph-style concurrent deep research over codebase_chunks_768. ' +
-          'Runs a supervisor → parallel domain workers → Ollama synthesizer DAG. ' +
+          'Runs a supervisor → parallel domain workers → Ornith synthesizer DAG via llama-server :8090. ' +
           'Domains: api-routes, state-machines, database, error-patterns, ml-inference, ' +
           'auth, cache, rag-pipeline, ui-components, graph-db, general. ' +
           'Returns supervisorSummary, keyFindings, actionItems, per-domain chunks + insights. ' +
           'format=markdown returns Claude-Code-ready context block with file paths. ' +
-          'All LLM calls via L1 Redis → L2 Bifrost → L3 Ollama (zero API cost).',
+          'Chat/synthesis uses the shared L1 Redis → L2 Bifrost → llama-server route; embeddings remain separate.',
         inputSchema: {
           type: 'object',
           properties: {

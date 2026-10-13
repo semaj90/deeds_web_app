@@ -2,7 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateSnapshot } from './lib/workspace-snapshot-capture-v1.mts';
 import {
@@ -21,11 +21,20 @@ import {
 } from './lib/whole-codebase-source-exclusions.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const REPORT = resolve(ROOT, 'docs/reports/canonical-source-inventory-hygiene-v1.json');
-
 function argument(name: string): string | undefined {
+  const inline = process.argv.find((value) => value.startsWith(`${name}=`));
+  if (inline) return inline.slice(name.length + 1);
   const index = process.argv.indexOf(name);
-  return index >= 0 ? process.argv[index + 1] : undefined;
+  if (index < 0) return undefined;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith('--')) throw new Error(`MISSING_VALUE_FOR_${name.slice(2).replaceAll('-', '_').toUpperCase()}`);
+  return value;
+}
+
+const reportArgument = argument('--report');
+const REPORT = resolve(ROOT, reportArgument ?? 'docs/reports/canonical-source-inventory-hygiene-v1.json');
+if (reportArgument && !REPORT.startsWith(`${resolve(ROOT, '.tmp')}${sep}`)) {
+  throw new Error('EXPLICIT_REPORT_PATH_MUST_BE_UNDER_REPOSITORY_TMP');
 }
 
 const manifestArgument = argument('--manifest');

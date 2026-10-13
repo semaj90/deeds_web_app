@@ -435,6 +435,10 @@ async function syncMissingPayloads(samplePoints) {
 
 // 7. Main execution
 async function main() {
+  if (!DRY_RUN) {
+    throw new Error('UNVERIFIED_QDRANT_PACKET_IDENTITY_TOPOLOGY_SYNC_DISABLED');
+  }
+
   try {
     const connected = await verifyQdrantConnection();
     if (!connected) {

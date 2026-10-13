@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-05T21:50:12.006Z",
+  "generatedAt": "2026-10-13T06:04:11.857Z",
   "mode": "dry-run",
   "inputs": {
     "model": ".tmp/semantic-naive-bayes-model.json"
@@ -8,20 +8,24 @@
     "jsonl": ".tmp/naive-bayes-predictions.ndjson"
   },
   "summary": {
-    "rowsProcessed": 20,
+    "rowsProcessed": 500,
     "rowsWritten": 0,
-    "distinctPredictions": 1
+    "distinctPredictions": 4
   },
   "sample": [
     {
       "packet_key": "0ba2345cd9c542fa",
       "source_ref": "proto:RetrievalService.Health",
       "prediction": {
-        "model_version": "nb-packet-features-v1",
-        "predicted_label": "SemanticError",
-        "confidence": 1,
+        "model_version": "nb-packet-features-v2-multiclass",
+        "predicted_label": "VectorError",
+        "confidence": 0.4950127430403844,
         "distribution": {
-          "SemanticError": 1
+          "VectorError": 0.4950127430403844,
+          "StructureError": 0.4619674918061839,
+          "TopologyError": 0.033463938863342146,
+          "LexicalError": 0.006707673678870104,
+          "SemanticError": 0.002848152611219339
         }
       }
     },
@@ -29,11 +33,15 @@
       "packet_key": "0bffe0382a0d44bb",
       "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
       "prediction": {
-        "model_version": "nb-packet-features-v1",
-        "predicted_label": "SemanticError",
-        "confidence": 1,
+        "model_version": "nb-packet-features-v2-multiclass",
+        "predicted_label": "VectorError",
+        "confidence": 0.5659691302399336,
         "distribution": {
-          "SemanticError": 1
+          "VectorError": 0.5659691302399336,
+          "StructureError": 0.39007549557720994,
+          "TopologyError": 0.027983106618011063,
+          "LexicalError": 0.011340464481424426,
+          "SemanticError": 0.004631803083421067
         }
       }
     },
@@ -41,11 +49,15 @@
       "packet_key": "0ee918abc8c53e8d",
       "source_ref": "proto:TurboVecCudaService.Transform",
       "prediction": {
-        "model_version": "nb-packet-features-v1",
-        "predicted_label": "SemanticError",
-        "confidence": 1,
+        "model_version": "nb-packet-features-v2-multiclass",
+        "predicted_label": "StructureError",
+        "confidence": 0.4465571322976995,
         "distribution": {
-          "SemanticError": 1
+          "StructureError": 0.4465571322976995,
+          "TopologyError": 0.21940031594262657,
+          "VectorError": 0.1897586842772578,
+          "LexicalError": 0.10127947817564667,
+          "SemanticError": 0.04300438930676941
         }
       }
     },
@@ -53,11 +65,15 @@
       "packet_key": "1703d9c005252a62",
       "source_ref": "proto:LibrarySearchService.Health",
       "prediction": {
-        "model_version": "nb-packet-features-v1",
-        "predicted_label": "SemanticError",
-        "confidence": 1,
+        "model_version": "nb-packet-features-v2-multiclass",
+        "predicted_label": "VectorError",
+        "confidence": 0.4950127430403844,
         "distribution": {
-          "SemanticError": 1
+          "VectorError": 0.4950127430403844,
+          "StructureError": 0.4619674918061839,
+          "TopologyError": 0.033463938863342146,
+          "LexicalError": 0.006707673678870104,
+          "SemanticError": 0.002848152611219339
         }
       }
     },
@@ -65,11 +81,15 @@
       "packet_key": "175066b8a4ceee3c",
       "source_ref": "proto:TurboVecService.Transform",
       "prediction": {
-        "model_version": "nb-packet-features-v1",
-        "predicted_label": "SemanticError",
-        "confidence": 1,
+        "model_version": "nb-packet-features-v2-multiclass",
+        "predicted_label": "StructureError",
+        "confidence": 0.4465571322976995,
         "distribution": {
-          "SemanticError": 1
+          "StructureError": 0.4465571322976995,
+          "TopologyError": 0.21940031594262657,
+          "VectorError": 0.1897586842772578,
+          "LexicalError": 0.10127947817564667,
+          "SemanticError": 0.04300438930676941
         }
       }
     }
