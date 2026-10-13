@@ -273,6 +273,21 @@ contracts:
       - installed_package_inventory_required
       - version_qualification_is_explicit
       - no_datastore_write_authority
+  - name: parent-atlas-root-okf-index
+    owner: .okf/index.md
+    role: root curated OKF knowledge graph index and navigation; not packet or retrieval authority
+    notes:
+      - canonical_authority_false
+      - curated_knowledge_export
+      - root_okf_index
+  - name: okf-mcp-tool-calling-guide-v1
+    owner: docs/.okf/architecture/okf-mcp-tool-calling-guide-v1.md
+    role: read-only navigation and evidence-admission guidance for MCP tool and resource routing
+    notes:
+      - no_automatic_tool_registration
+      - tools_require_registry_discovery
+      - source_revision_and_packet_lineage_required
+      - no_datastore_write_authority
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.
