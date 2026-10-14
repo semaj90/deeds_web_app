@@ -919,3 +919,280 @@ Evidence: `docs/reports/postgres-contract-mirrors-report.{json,md}`;
 `docs/reports/atlas-migration-owner-audit-v1.json`;
 `docs/reports/workspace-event-head-schema-audit-v1.json`;
 `docs/reports/task-semantic-packet-writer-column-matrix-v1.json`.
+
+## Drizzle contract audit run (2026-10-13; `npm run audit:drizzle`, read-only against the DB)
+
+- Reports regenerated: `docs/reports/postgres-contract-mirrors-report.{json,md}` (generatedAt 2026-10-14T01:15Z). Pre-run copies kept at `.tmp/pre-audit-postgres-contract-mirrors-report.{json,md}`.
+- Summary: 11 tables checked; static aligned 6; live aligned 3; live missing 4; blockers 13.
+- Live missing (declared in Drizzle, absent from PostgreSQL): `feature_registry`, `atlas_workspace_events`, `atlas_workspace_event_participants`, `atlas_workspace_heads`. The workspace-event tables correspond to the `planned_sidecar` migration `20260916_workspace_event_head_v1.sql`, which is not applied.
+- Live column drift (`onlyInA` = declared in schema, missing live; `onlyInB` = live, not declared):
+  - `atlas_packets`: 1 declared-not-live (`summary_model`); 58 live-not-declared (for example `chunk_id`, `content_embedding_384`, `embedding_status`, `som_cluster`, `pagerank_score`, `ontology`, `trigrams`). 43 declared indexes missing live; 50 live indexes not declared.
+  - `task_semantic_packets`: 16 declared-not-live; 30 declared indexes missing live.
+  - `parent_atlas_documents`: 13 declared-not-live (for example `summary`, `tree_node_id`, `alias_id`); 2 live-not-declared (`feature_label`, `packet_key`).
+  - `route_runtime_packets`: 12 declared-not-live (for example `reward`, `route_state`, `repair_method`, `git_sha`).
+  - `kanban_tasks`: static INDEX_MISMATCH; live aligned.
+  - `nes_chrom_packets`: static INDEX_MISMATCH; live aligned.
+- Safety: do not run `drizzle-kit push` on `atlas_packets`. The schema would drop 58 live columns. The Drizzle safety rule in CLAUDE.md applies.
+- Duplicate-index drops: all 10 drop-candidate index names are declared in `atlas-packets.ts` or `drizzle/schema.ts`. Applying the drops requires matching schema edits for all 10.
+- Next: resolve each blocker row by row (this change's open tasks), starting with `atlas_packets` (schema ownership of the 58 live columns).
+
+## feature_registry and workspace-event tables — migration drafts (2026-10-13; NOT applied)
+
+- `feature_registry`: draft `sveltekit-frontend/drizzle/manual/20261013_feature_registry_DRAFT.sql`. Matches `feature-registry.ts` (15 columns, unique `feature_key`). Rehearsal: 15 columns in-transaction; table absent afterward. Registry: `planned_sidecar`.
+- Workspace-event tables (`atlas_workspace_events`, `atlas_workspace_event_participants`, `atlas_workspace_heads`): not duplicated. Owner is `drizzle/manual/20260916_workspace_event_head_v1.sql`, whose header requires migration-owner review and a disposable Postgres readback canary before apply. The canary has not been run.
+- Not covered by the audit or the draft: `feature_tasks` and `agent_progress_log` (same schema file; not reported as missing).
+- Apply requires explicit approval for `feature_registry`, and the canary plus review for the workspace tables.
+
+## feature_label continuation — parent_atlas_documents (2026-10-13; schema-only change, no DB change)
+
+- Live facts (read-only): `feature_label` (text, nullable) populated on 61,660 of 61,718 rows; `packet_key` (text, nullable) populated on all 61,718.
+- Decision: the live table is the source of truth for these two columns. Declared them in `sveltekit-frontend/src/lib/server/db/schema/parent-atlas-documents.ts` (`featureLabel`, `packetKey`). No DDL.
+- Re-run `npm run audit:drizzle` from the repo root (an earlier attempt from the frontend directory did not run): `parent_atlas_documents` live-not-declared is now empty. Declared-not-live stays at 13 (alias_id, file_ext, index_lane, ingest_source, payload, profile_card_visible, source_kind, source_ref_id, summary, summary_lod0, summary_lod1, summary_lod2, tree_node_id). Audit blockers still 13 overall.
+- Runtime risk found while checking readers (not changed):
+  - `src/lib/server/features/ai/ace/telemetry-compressor.ts` selects `source_ref_id` from `parent_atlas_documents`. Live query confirms `column "source_ref_id" does not exist`.
+  - `src/lib/server/features/ai/ace/context-assembler.ts` (around line 1849) selects `som_cluster`, which is not in the live table. Whether that call is caught was not checked.
+- Open: resolve the 13 declared-not-live columns (add to live, or remove from schema), starting with `source_ref_id` and `som_cluster`, which are read by live code.
+
+## parent_atlas_documents — STOPPED: it is a VIEW, not a table (2026-10-13)
+
+- Rehearsal of `sveltekit-frontend/drizzle/manual/20261013_parent_atlas_documents_align_declared_columns.sql` failed: `ALTER action ADD COLUMN cannot be performed on relation "parent_atlas_documents" ... not supported for views`. Rolled back; nothing changed (view still 23 columns).
+- `pg_class.relkind = 'v'`. The view selects FROM `atlas_packets ap` WHERE `source_ref IS NOT NULL`. It maps `packet_key AS id`, `kmeans_cluster AS cluster_id`, `som_cluster AS centroid_id`, and `directory_path AS rel_path`.
+- Of the 13 declared-not-live columns, 6 exist on the underlying `atlas_packets`: `summary`, `payload`, `source_kind`, `tree_node_id`, `som_cluster`, `directory_path`. The other 7 exist nowhere in the database: `alias_id`, `file_ext`, `index_lane`, `ingest_source`, `profile_card_visible`, `summary_lod0`, `summary_lod1`, `summary_lod2`, `source_ref_id` (9 names listed; `source_ref_id` is read by live code and fails).
+- Adding the 7 missing columns through the view would need constant or NULL values, which would fabricate data. Not done.
+- Options (decision needed):
+  - A. Redefine the view to expose the 6 real columns from `atlas_packets` (CREATE OR REPLACE VIEW, additive at the end). Keep the 7 missing names out of the view and out of the schema.
+  - B. Align the Drizzle declaration to the view: drop the 13 declared names that aren't exposed, and change readers (`source_ref_id` in telemetry-compressor.ts; `som_cluster` in context-assembler.ts should read `centroid_id` or query `atlas_packets`).
+  - C. Keep the schema and change nothing else, accepting the runtime errors.
+- Audit defect: `audit-postgres-contract-mirrors.mjs` treats the view as a table. It should check `relkind`, and report views separately.
+
+## Review check — exporter proof and live readers (2026-10-13; read-only; no DB or code writes)
+
+- P0 exporter proof: `python/test_export_frozen_semantic768_snapshot_contract.py` run with the repo's existing `.venv` (system Python lacks numpy; no install). 4 of 4 tests pass: tag escape blocked; existing artifacts never overwritten; existing tag blocks before `psycopg2.connect` (asserted not called); manifest declares `lineageQualification: NOT_PROVEN`. Status: PROVEN for these four behaviors. The review's "tag collision" guard is the existing-tag block. Snapshot files were not written by the test run.
+- `telemetry-compressor.ts` (`source_ref_id`): query at ~line 64 has no `.catch`, so the live error (column does not exist) propagates. Status: BLOCKED. Decision needed: remove the dependency, or make the failure explicit.
+- `context-assembler.ts` (`som_cluster`, ~line 1849): query is wrapped in `.catch(() => empty)`, so the missing column is hidden and the code falls back to `atlas_feature_map`. Status: PROVEN silent fallback. Decision needed: read `centroid_id` from the view, or read `atlas_packets.som_cluster`, and remove the silent catch.
+- `atlas_packets` drift (58 live-only columns; 43 declared-missing indexes): not changed. Preserve live-only columns per the review; the field-level manifest is still to be generated.
+- Duplicate-index drops and `DROP`/`push`: not run.
+
+## atlas_packets field-level reconciliation manifest (2026-10-13; read-only; no DB or schema changes)
+
+- Manifest: `.tmp/atlas-packets-reconciliation-manifest.json` (144 live columns; one row per column with liveType, nullable, populatedRows of 61,718, declaredInDrizzle, referencingFiles, migrationDecision). Checksum: sha256:177f7fddf41b0df983761308d8839df46cff42e891f356b214004fae22a284ef.
+- Declared status comes from the audit diff (`postgres-contract-mirrors-report.json`). My own schema-file parser over-matched and under-matched, so it was not used.
+- Tally: 86 declared-aligned (verify type); 54 preserve-investigate (populated live-only); 4 investigate (empty live-only, do not drop). Declared-not-live: `summary_model` (1).
+- Still open: readers and writers per column (referencingFiles counts files only, not reader or writer role), type comparison against Drizzle, and the decision on `summary_model`.
+- Not done: no drops, no DDL, no `drizzle-kit push`.
+
+## Analysis schema inventory (2026-10-13; read-only)
+
+- File: `docs/reports/analysis-schema-inventory-2026-10-13.json` (copy of `.tmp/analysis-schema-inventory.json`).
+- Contents: 231 populated public tables (exact `count(*)`), Drizzle-declared flag (180 of 231), related-file count (unique files under `sveltekit-frontend/src`, `scripts`, `python`; whole-word text match), lane tags, and per-table caveats.
+- Caveat: related-file counts are lexical. Six single-word names (for example `evidence`, `reports`, `cases`, `users`) match ordinary text, so their counts are inflated. Lane tags come from name patterns and are not proof of use.
+- Lanes (name-based, unverified): dailyGraphify 37, kmeansClustering 20, topKRetrieval 26, pagination 50, pagerankCandidates 20.
+- Not done: custom NetworkX PageRank over these tables, and any verification of lane membership against code.
+
+## GraphRAG multi-hop inventory and identity note (2026-10-13; read-only)
+
+- `docs/reports/graphrag-multihop-analysis-2026-10-13.json`: 32 populated edge and graph tables, exact counts, columns, and endpoint-pair flags (8 tables). Descriptive only.
+- `title_id`: unique per packet (61,660 distinct non-null values) and title-derived. Not a semantic key.
+- CLAUDE.md: section added for dense-search and GraphRAG identity rules.
+- Not run: multi-hop traversal timing, NetworkX PageRank over these tables, endpoint identity checks per table.
+
+## Edge endpoint identity check (2026-10-13; read-only)
+
+| Table | Rows | Endpoint columns | Observed identity |
+|---|---|---|---|
+| ontology_edges | 252,102 | source_packet_key, target_packet_key | packet:<hash> (canonical packet key), 251,220 rows with packet: endpoints on both sides |
+| atlas_graph_edges_v2 | 224,764 | source_node_key, target_node_key | mixed: tree:<uuid> and packet: keys |
+| taxonomy_edges | 62,802 | source_key, target_key | topo:<class> to root (taxonomy ids) |
+| code_relations | 12,975 | source_file, target_key | path to symbol name |
+| agent_context_relations | 10,521 | source_key, target_key | agents:<path> |
+| code_feature_edges | 6,558 | from_feature_id, to_feature_id | composite path:symbol:kind |
+| atlas_feature_relationships | 4,097 | source_feature_id, target_feature_id | feature slugs |
+| codebase_relationship_reports | 1 | src_community, dst_community | community ids |
+
+Result: only ontology_edges uses packet_key on both ends. Multi-hop traversal across tables needs an explicit identity mapping per table. Cross-table multi-hop remains NOT_PROVEN.
+
+## HANDOFF SUMMARY (2026-10-13; for a fresh session)
+
+### Status by gate
+| Gate | Status | Evidence |
+|---|---|---|
+| Exporter contract (tag guard, no overwrite, lineage NOT_PROVEN) | PROVEN | `python/test_export_frozen_semantic768_snapshot_contract.py` run with `.venv`: 4 of 4 OK |
+| Diagnostic ingest (error_logs, 291 observations) | PROVEN for one-off write | 291 rows; repeat insert 0; table total 292 |
+| Diagnostic analysis writer (`diagnostics.record_analysis`) | PARTIAL | Dry-run only (rehearsal rolled back). Commit path not run. |
+| `source_ref` pattern indexes | PROVEN | `indisvalid=true`; live plan uses bitmap scan; 40 of 40 search calls OK |
+| `parent_atlas_documents` | BLOCKED | It is a VIEW over `atlas_packets`, not a table. ALTER rehearsal failed safely; nothing changed. |
+| `telemetry-compressor.ts` (`source_ref_id`) | BLOCKED | Query fails: column does not exist. No `.catch`, so the failure propagates. |
+| `context-assembler.ts` (`som_cluster`) | PROVEN silent fallback | Column absent from view. The `.catch` hides it and falls back to `atlas_feature_map`. |
+| `atlas_packets` reconciliation manifest | PARTIAL | 144 columns, checksum recorded. 58 live-only (54 populated, 4 empty). Readers/writers per column not yet determined. |
+| Duplicate-index drops (10 groups) | NOT_RUN | Draft and rehearsal only (94 to 84, then rollback). Needs schema edits and approval. |
+| `feature_registry` | NOT_RUN | Draft and rehearsal only. Not applied. |
+| Workspace-event tables (3) | NOT_RUN | Owner: `20260916_workspace_event_head_v1.sql`. Needs canary. |
+| Edge endpoint identity | PROVEN (descriptive) | Only `ontology_edges` uses packet keys on both ends. Cross-table multi-hop NOT_PROVEN. |
+| NetworkX PageRank | NOT_RUN | NetworkX 3.6.1 in `.venv`. No run over these tables. |
+| simdjson | NOT_RUN | Not a declared dependency. Profile first. |
+| EmbeddingGemma CPU workers | NOT_RUN | `scripts/workers/embedding-cpu-worker.mjs` exists. Not run or verified. |
+| Top-k pagination | NOT_RUN | `python/atlas_compute/topk_paginator.py` plus tests. Not run this session. |
+
+### Decisions pending (owner needed)
+1. `parent_atlas_documents`: option A (redefine the view to expose the six real columns from `atlas_packets`) or option B (align the Drizzle declaration to the view and change the readers). Recommended: A for the six, B for the seven with no physical backing.
+2. `telemetry-compressor.ts`: which canonical source identity replaces `source_ref_id`. Do not substitute `source_ref` by default.
+3. `context-assembler.ts`: read `centroid_id` from the view, or `atlas_packets.som_cluster`. Remove the silent catch either way.
+4. Approve applying the 10 duplicate-index drops, with matching `schema.ts` edits.
+5. Approve `feature_registry` apply.
+6. Authorize the disposable canary for the workspace-event tables.
+7. Diagnostic writer: retire `diagnostics.record_observations` once the new ingest owner exists. Add a `lineage_status` marker for unqualified historical rows.
+8. Commit the diagnostic analysis payload (`--wire --commit`).
+
+### Do not do without separate approval
+- `drizzle-kit push`, any `ALTER` on `atlas_packets`, placeholder columns, destructive view replacement.
+- Dropping indexes, Graphify runs, Qdrant or Valkey writes, cache hydration, AIO changes, restarts of PostgreSQL.
+
+### Re-run commands (from repo root unless noted)
+- Drizzle audit: `npm run audit:drizzle` (root). Output: `docs/reports/postgres-contract-mirrors-report.{json,md}`.
+- Exporter test: `.venv/Scripts/python.exe python/test_export_frozen_semantic768_snapshot_contract.py`.
+- Capture spec: `cd sveltekit-frontend && node --test scripts/svelte-check-capture.spec.mjs` (20 tests).
+- Extractor test: `node --test scripts/atlas/lib/ast-grep-symbol-extraction.test.mjs` (5 tests).
+- Read-only view inspection: `SELECT pg_get_viewdef('public.parent_atlas_documents'::regclass, true);` via `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db`.
+- OpenSpec gate: `openspec validate manual-migration-reconciliation --strict`.
+
+### Artifacts
+- Manifest: `.tmp/atlas-packets-reconciliation-manifest.json`
+- Inventory: `docs/reports/analysis-schema-inventory-2026-10-13.json`
+- GraphRAG inventory: `docs/reports/graphrag-multihop-analysis-2026-10-13.json`
+- Pre-audit report backups: `.tmp/pre-audit-postgres-contract-mirrors-report.{json,md}`
+- Duplicate-index archive: `.tmp/atlas-packets-duplicate-indexes-manifest.json`
+
+### Notes for the next session
+- Use `.venv` for Python (system Python has no numpy).
+- Do not run `npm run` from a subdirectory. Several scripts are root-only.
+- Bash heredocs collapse doubled backslashes. Write scripts with the file tool.
+- Node writes to `sidecar-migrations.json` failed intermittently with a Windows file-open error. The edit tool worked.
+
+## INPUT: Integration readiness review and production handoff instruction (pasted 2026-10-13)
+
+Status: reported input from an external review. The percentages are reported implementation and test outcomes, not independently verified live results. Keep the 68% overall figure as a historical heuristic for comparison only. Do not recalculate it from percentages that cover different kinds of work.
+
+### Reported readiness (not verified here)
+| Workstream | Reported | Primary remaining gate |
+|---|---|---|
+| Graph Phase 6 | 85% | Live multi-store write approval |
+| AST GPH-07 to 16 | 82% | graphify:daily owner integration |
+| Compiler-semantic / LSP | Live read-only proven | Stable-symbol canonicalization |
+| Canonical identity RF4 | 70% | Live candidate acceptance |
+| RF5 within-lane dedup | 40% | One entity, one lane, one vote |
+| Retrieval to ContextManifest | 65% | Runtime retrieval and manifest round trip |
+| Grounded execution | 45% | ExecutionReceipt feedback |
+| GPU / RAPIDS | 58% | Same-corpus identity parity |
+| TensorRT / LibTorch | 40% | Build and execution proof |
+| Performance | 25% | Representative benchmark |
+
+### Critical path (in order)
+1. AST production owner: GraphifyStructuralMaterializer to AstProvider to 8095. Prove live graphify:daily integration, source revision consistency, and production receipt emission.
+2. Canonical identity RF4: resolve one real packet, AST node, source span, and current representation. Do not use backend identifiers as canonical truth.
+3. RF5 within-lane dedup: one canonical entity gets at most one contribution from each logical retrieval lane, whatever the executor count.
+4. ContextManifest admission: round-trip exact evidence references, revisions, deterministic Top-K order, and manifest checksum.
+5. ExecutionReceipt feedback: claim or runId to worker to execution receipt to validation, with no implicit live mutation.
+
+### Architectural decisions (from the review)
+- Keep AST and compiler-semantic evidence complementary. Tree-sitter is structural. LSP adds type and definition information only after stable symbol mapping and revision checks. Neither mints canonical packet identities.
+- Finish RF5 before adding vector executors. cuVS exact, Qdrant HNSW, and future CAGRA belong under one logical semantic retrieval lane. GPU parity alone does not prove RRF correctness.
+- Defer performance promotion. SIMD JSON, CPU thread pools, TensorRT, and low-rank projections should respond to measured bottlenecks, and must not delay provenance, identity, or ContextManifest admission.
+
+### Coding-agent instruction (P0 to P4)
+Continue existing Graphify, AST, RF4/RF5, ContextManifest, and execution-receipt OpenSpec work. Reuse existing owners.
+- P0 Production AST owner: find the graphify:daily entrypoint and the existing structural materializer. Wire the existing AST owner with no alternative materialization path. Validate native source IDs, source revisions, AST spans, failure isolation, and tombstone propagation. Add a production receipt that distinguishes executed, skipped, failed, stale, and superseded work. Test orchestration with controlled fixtures before any approved production run.
+- P1 Canonical retrieval: prove one real candidate resolves through packet registry, source bytes, AST evidence, and representation revision. Implement or complete RF5 before RRF aggregation. Verify one logical lane gives at most one vote per canonical entity. Preserve the atlas.topk.v1 ordering contract.
+- P2 ContextManifest: run a bounded real retrieval-to-manifest round trip. Record ordered candidate IDs, source revisions, evidence references, token budgets, and checksums. Reject ambiguous, expired, or superseded evidence. Do not admit GPU-derived recommendations as canonical source evidence.
+- P3 Execution receipts: verify claim and runId linkage through the existing worker and Kanban owners. Emit typed ExecutionReceipts for success, failure, and rejection. Keep external writes and live action dispatch approval-gated.
+- P4 GPU comparison: reuse the existing 64 x 768 CPU and cuVS cosine parity proof. Compare Qdrant and cuVS on the same frozen, revision-qualified candidate cohort. Validate CandidateOrdinalMapV1, identity mapping, Top-K tie parity, recall, and memory. Keep CAGRA quarantined until the exact-oracle comparison passes.
+- Report each gate as PROVEN, PARTIAL, BLOCKED, or NOT_RUN, with exact test commands, exit codes, and receipts. Do not infer production readiness from fixture tests alone.
+
+### Highest-value next milestone (from the review)
+One real, revision-qualified source change should move through AST materialization, canonical packet resolution, deduplicated retrieval, and ContextManifest admission, with a reproducible receipt.
+
+### Gate status for this input
+| Gate | Status | Note |
+|---|---|---|
+| Reported readiness table | NOT_RUN here | External report; not reproduced |
+| P0 production AST owner | NOT_RUN | Not started in this change |
+| P1 RF4 and RF5 | NOT_RUN | Not started in this change |
+| P2 ContextManifest round trip | NOT_RUN | Not started in this change |
+| P3 execution receipts | NOT_RUN | Not started in this change |
+| P4 GPU comparison | NOT_RUN | Not started in this change |
+
+## 2026-10-13 session progress and next steps (append-only; read-only except the draft file)
+
+### Done this session (verified)
+| Item | Artifact | Status |
+|---|---|---|
+| Graph revision + traversal DDL draft | `sveltekit-frontend/drizzle/manual/20261013_graph_revision_and_traversal_CONCURRENT_DRAFT.sql` | DRAFT; NOT APPLIED; NOT rehearsed. Corrected: traversal file defines 5 indexes; revision CHECKs lack NOT VALID; plain CREATE INDEX blocks writes, not reads |
+| Domain taxonomy census (Phase 1, partial) | six of seven tables inspected via TRACE | PARTIAL. `domain_function_mapping` not live. No FK among domain tables. Row counts, active versions, EXPLAIN = NOT_RUN (no approved read path) |
+| Repo proof-status analysis | `docs/reports/repo-proof-status-analysis-2026-10-13.md` | Checkbox 61.6%; receipt-cited 4.3% of checked tasks; denominator mismatch 7,804 vs 7,228 unreconciled |
+| BitFrost FSM index | `docs/architecture/_bitfrost_fsm_index.md` | Index with findings F1–F15 |
+
+### Next step 1 — INDEX-01 (taxonomy / OAK / GraphRAG / NetworkX index)
+- One table-based index linking: the six live taxonomy tables; the PostgreSQL ontology boundary owner (`ontology-resolution-boundary-postgres.ts`); `hypergraph-retrieval-v1.ts` (proposed GraphRAG owner, caller unconfirmed); the NetworkX parity executor; the draft DDL above.
+- Gate: every cited path exists; any generated TOC is regenerated only after reviewing the diff.
+- Status: NOT_STARTED. Docs only.
+
+### Next step 2 — INVERSE-DAG-LOWRANK-01 (inverse DAG synthesis for low-rank recommendation)
+Proposal-only. `canonicalAuthority: false`. Reuse existing owners; do not add new ones.
+
+| Capability | Existing owner (reuse) | Constraint |
+|---|---|---|
+| Low-rank sampling | `python/atlas_compute/low_rank.py`, `sveltekit-frontend/src/lib/server/atlas/sampling/sample-query-matrix-v1.ts` | EXPERIMENT per CLAUDE.md; do not rebuild |
+| Recommendation evidence | `recommendation-evidence-bundle-v1.ts` | evidence only; no new vote |
+| Term resolution (OAK) | `ontology-resolution-boundary-postgres.ts` + Python OAK bridge (`:8095`) | PostgreSQL boundary is the owner |
+| DAG execution | existing agent execution spine and plan tournament | bounded; no direct writes |
+| Summarization | Ornith on llama-server `:8090` (chat only) | never used for embeddings; no hidden thoughts persisted |
+| Prompt/evaluation tuning (DSPy / GEPA) | shadow mode only, per CLAUDE.md `LearningOutcomeV1` ordering | no promotion |
+| Bounded recursive reasoning (RLM) | `parent-atlas-ace-rlm-bitfrost-integration` | bounded depth; receipt per step |
+
+Gates:
+| Gate | Required evidence | Status |
+|---|---|---|
+| LR-01 | Inverse DAG definition: output = the input set that produced a recommendation; proposal only | NOT_STARTED |
+| LR-02 | Replay parity against the deterministic recommendation on a frozen fixture | NOT_STARTED |
+| LR-03 | DSPy/GEPA evaluation on a reviewed set | BLOCKED: no reviewed set exists (CLAUDE.md trust floor: 200 reviewed rows, 30 per class) |
+| LR-04 | Ornith summary is bounded and persists no hidden thoughts | NOT_STARTED |
+| LR-05 | OAK term resolution reuses the PostgreSQL boundary; no second resolver | NOT_STARTED |
+
+Not started. No code, DDL or service changes were made for either step.
+
+### Update 2026-10-13 — attempt at all three items
+| Item | Result | Evidence |
+|---|---|---|
+| INDEX-01 | DONE (docs only) | `docs/architecture/_taxonomy_oak_graphrag_index.md`; cited paths checked |
+| LR-02 (replay parity) | PARTIAL | `python/test_atlas_compute.py -k "low_rank or recommend"`: 8 passed, 7 deselected, exit 0 (`.tmp/lr02-pytest.log`). Covers seeded repeatability and the advisory task-ordering builder. Not a domain-recommendation replay |
+| LR-01 (inverse DAG definition) | NOT_STARTED | no definition document written yet |
+| LR-05 (OAK via PostgreSQL boundary) | NOT_STARTED | owners exist; wiring needs the census below |
+| Taxonomy census: row counts, active versions, EXPLAIN | PARTIAL | catalog and columns inspected for 6 of 7 tables (read-only TRACE). Row counts and EXPLAIN NOT_RUN: no approved read path for them |
+| LR-03 (DSPy/GEPA evaluation) | BLOCKED | no reviewed set (trust floor: 200 reviewed rows, 30 per class) |
+| LR-04 (Ornith summary bounded) | NOT_STARTED | — |
+
+Not complete: three of the seven rows are still open. Closing the census needs an approved read-only path for row counts and EXPLAIN.
+
+### Update 2026-10-13 — read-only census closed (approved by operator: "yes you do it")
+Single `BEGIN READ ONLY` transaction via `docker exec legal-ai-postgres psql`; no writes; `EXPLAIN` without `ANALYZE`. Receipt: `.tmp/census-readonly-2026-10-13.out` (script `.tmp/census-readonly-2026-10-13.sql`), exit 0.
+
+| Table | Exact rows | Finding |
+|---|---|---|
+| `domain_taxonomy_v1` | 0 | no active versions, no replacement chains; OAK has nothing to resolve against |
+| `atlas_domain_ontology` | 17 | live count (earlier "13 groups" was from older repo docs, not the live table) |
+| `atlas_document_classification` | 0 | empty |
+| `feature_domain` | 61,659 | 40 distinct `domain_class` values |
+| `ontology_domain_tuples` | 61,659 | same 40 keys |
+| `classification_envelope` | 0 | empty |
+| `domain_function_mapping` | — | not live |
+
+Key matching: of 40 distinct `domain_class` values, **32 match no `atlas_domain_ontology.group_id`**; all 40 match no `domain_taxonomy_v1.domain_id`. Only 8 keys match an ontology group.
+
+EXPLAIN (no ANALYZE): taxonomy lookup uses `idx_domain_taxonomy_domain_id` (estimate 1 row, but the table is empty). Tuple lookup on `domain_class` plus `predicate='is_a'` chose the `predicate` index with an estimate of 1 row on 61,659 rows, which indicates stale statistics. `ANALYZE` has NOT been run and needs approval.
+
+Consequence for the gates: LR-05 (OAK through the PostgreSQL boundary) cannot be validated end to end until the taxonomy is populated and the 32 unmatched keys are reconciled. This is a data finding, not a code fix. Nothing was written or changed.
+
+### Update 2026-10-13 — taxonomy population (operator-approved write, 17 rows)
+- Source: `atlas_domain_ontology` (17 groups, read-only export). Plan: `.tmp/taxonomy-dryrun-plan-2026-10-13.json` (checksum `sha256:e335b805…c155b7bbc`).
+- Write: `INSERT INTO domain_taxonomy_v1 … ON CONFLICT (domain_id, version) DO NOTHING` in one transaction. Receipt: `.tmp/taxonomy-insert-2026-10-13.out` (exit 0, `INSERT 0 17`, 17 rows, 17 active).
+- Verification (read-only): orphan parents 0; taxonomy rows not in ontology 0; ontology groups not in taxonomy 0.
+- Not done: the 28 unmatched live `domain_class` keys (no decision); the NLP pass over indexed PostgreSQL 18 files (not defined: no inputs, label set, or reviewed set); `ANALYZE`.
