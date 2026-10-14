@@ -1,3 +1,5 @@
+import { ENV } from '$lib/server/env.server.js';
+
 export interface AtlasPageRankSeedV1 {
   nodeKey: string;
   weight?: number;
@@ -48,7 +50,6 @@ export interface AtlasPageRankReceiptV1 {
     resultSelectMs: number;
   };
 }
-
 export interface AtlasGraphProjectionLoadRequestV1 {
   artifactDir: string;
   expectedGraphRevision?: string;
@@ -96,6 +97,76 @@ export interface AtlasGraphResidentStatusV1 {
   } | null;
 }
 
+export interface AtlasGraphBfsRequestV1 {
+  graphRevision: string;
+  projectionRevision: string;
+  projectionChecksum: string;
+  startNodeKey: string;
+  depthLimit: number;
+  expectedArtifactChecksum: string;
+  expectedGraphOrdinalMapChecksum: string;
+}
+
+export interface AtlasGraphBfsReceiptV1 {
+  schema: 'atlas.graph-bfs-receipt.v1';
+  operation: 'bfs';
+  backend: 'cugraph.bfs';
+  graphRevision: string;
+  projectionRevision: string;
+  artifactChecksum: string;
+  graphOrdinalMapChecksum: string;
+  startNodeKey: string;
+  depthLimit: number;
+  results: Array<{
+    gpuNodeId: number;
+    nodeKey: string;
+    packetKey: string | null;
+    sourceRef?: string | null;
+    sourceRevision?: string | null;
+    workspaceRevision?: string | null;
+    distance: number;
+    pathGraphNodeKeys: string[];
+  }>;
+  writesPerformed: false;
+  canonicalAuthority: false;
+}
+
+export interface AtlasGraphSourceRefBfsRequestV1 {
+  graphRevision: string;
+  projectionRevision: string;
+  projectionChecksum: string;
+  sourceRef: string;
+  expectedSourceRevision: string;
+  expectedWorkspaceRevision: string;
+  depthLimit: number;
+  matchLimit?: number;
+  expectedArtifactChecksum: string;
+  expectedGraphOrdinalMapChecksum: string;
+}
+
+export interface AtlasGraphSourceRefBfsReceiptV1 {
+  schema: 'atlas.graph-source-ref-bfs-receipt.v1';
+  sourceRef: string;
+  sourceRevision: string;
+  workspaceRevision: string;
+  graphRevision: string;
+  projectionRevision: string;
+  projectionChecksum: string;
+  artifactChecksum: string;
+  graphOrdinalMapChecksum: string;
+  matches: Array<{
+    graphOrdinal: number;
+    nodeKey: string;
+    packetKey: string | null;
+    sourceRef: string;
+    sourceRevision: string;
+    workspaceRevision: string;
+    traversal: AtlasGraphBfsReceiptV1;
+  }>;
+  writesPerformed: false;
+  canonicalAuthority: false;
+}
+
 const MAX_SEEDS = 64;
 const MAX_CANDIDATES = 512;
 
@@ -123,8 +194,9 @@ function assertPageRankRequest(input: AtlasPageRankRequestV1): void {
 }
 
 export function createAtlasRapidsPageRankClient(
-  baseUrl = process.env.ATLAS_RAPIDS_SIDECAR_URL ?? 'http://127.0.0.1:8098',
+  baseUrl = ENV.ATLAS_RAPIDS_SIDECAR_URL,
 ) {
+  if (!baseUrl?.trim()) throw new Error('ATLAS_RAPIDS_SIDECAR_URL_REQUIRED');
   async function requestJson<T>(path: string, body: unknown, timeoutMs = 15_000): Promise<T> {
     const response = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
@@ -151,6 +223,90 @@ export function createAtlasRapidsPageRankClient(
     },
     loadProjection: (input: AtlasGraphProjectionLoadRequestV1) =>
       requestJson<AtlasGraphProjectionLoadReceiptV1>('/v1/graph/load', input, 60_000),
+    bfs: async (input: AtlasGraphBfsRequestV1): Promise<AtlasGraphBfsReceiptV1> => {
+      for (const [field, value] of Object.entries(input)) {
+        if (typeof value === 'string' && !value.trim()) throw new Error(`ATLAS_GRAPH_BFS_${field.toUpperCase()}_REQUIRED`);
+      }
+      if (!Number.isInteger(input.depthLimit) || input.depthLimit < 0 || input.depthLimit > 2) {
+        throw new Error('ATLAS_GRAPH_BFS_DEPTH_OUT_OF_BOUNDS');
+      }
+      const receipt = await requestJson<AtlasGraphBfsReceiptV1>('/v1/graph/bfs', input, 15_000);
+      if (
+        receipt.schema !== 'atlas.graph-bfs-receipt.v1' ||
+        receipt.operation !== 'bfs' ||
+        receipt.backend !== 'cugraph.bfs' ||
+        receipt.graphRevision !== input.graphRevision ||
+        receipt.projectionRevision !== input.projectionRevision ||
+        receipt.artifactChecksum !== input.expectedArtifactChecksum ||
+        receipt.graphOrdinalMapChecksum !== input.expectedGraphOrdinalMapChecksum ||
+        receipt.startNodeKey !== input.startNodeKey ||
+        receipt.depthLimit !== input.depthLimit ||
+        receipt.writesPerformed !== false ||
+        receipt.canonicalAuthority !== false
+      ) {
+        throw new Error('ATLAS_GRAPH_BFS_RECEIPT_MISMATCH');
+      }
+      return receipt;
+    },
+    sourceRefBfs: async (input: AtlasGraphSourceRefBfsRequestV1): Promise<AtlasGraphSourceRefBfsReceiptV1> => {
+      for (const field of [
+        'graphRevision', 'projectionRevision', 'projectionChecksum', 'sourceRef',
+        'expectedSourceRevision', 'expectedWorkspaceRevision', 'expectedArtifactChecksum',
+        'expectedGraphOrdinalMapChecksum',
+      ] as const) {
+        if (!input[field]?.trim()) throw new Error(`ATLAS_GRAPH_SOURCE_REF_${field.toUpperCase()}_REQUIRED`);
+      }
+      if (input.sourceRef !== input.sourceRef.trim()) throw new Error('ATLAS_GRAPH_SOURCE_REF_NOT_NORMALIZED');
+      if (!Number.isInteger(input.depthLimit) || input.depthLimit < 0 || input.depthLimit > 2) {
+        throw new Error('ATLAS_GRAPH_SOURCE_REF_DEPTH_OUT_OF_BOUNDS');
+      }
+      const matchLimit = input.matchLimit ?? 16;
+      if (!Number.isInteger(matchLimit) || matchLimit < 1 || matchLimit > 16) {
+        throw new Error('ATLAS_GRAPH_SOURCE_REF_MATCH_LIMIT_OUT_OF_BOUNDS');
+      }
+      const receipt = await requestJson<AtlasGraphSourceRefBfsReceiptV1>(
+        '/v1/graph/source-ref-bfs',
+        { ...input, matchLimit },
+        30_000,
+      );
+      if (
+        receipt.schema !== 'atlas.graph-source-ref-bfs-receipt.v1' ||
+        receipt.sourceRef !== input.sourceRef ||
+        receipt.sourceRevision !== input.expectedSourceRevision ||
+        receipt.workspaceRevision !== input.expectedWorkspaceRevision ||
+        receipt.graphRevision !== input.graphRevision ||
+        receipt.projectionRevision !== input.projectionRevision ||
+        receipt.projectionChecksum !== input.projectionChecksum ||
+        receipt.artifactChecksum !== input.expectedArtifactChecksum ||
+        receipt.graphOrdinalMapChecksum !== input.expectedGraphOrdinalMapChecksum ||
+        receipt.matches.length === 0 || receipt.matches.length > matchLimit ||
+        receipt.writesPerformed !== false || receipt.canonicalAuthority !== false
+      ) {
+        throw new Error('ATLAS_GRAPH_SOURCE_REF_BFS_RECEIPT_MISMATCH');
+      }
+      const ordinals = new Set<number>();
+      const nodeKeys = new Set<string>();
+      for (const match of receipt.matches) {
+        if (
+          !Number.isInteger(match.graphOrdinal) || match.graphOrdinal < 0 ||
+          !match.nodeKey.trim() || match.sourceRef !== input.sourceRef ||
+          match.sourceRevision !== input.expectedSourceRevision ||
+          match.workspaceRevision !== input.expectedWorkspaceRevision ||
+          ordinals.has(match.graphOrdinal) || nodeKeys.has(match.nodeKey) ||
+          match.traversal.graphRevision !== input.graphRevision ||
+          match.traversal.projectionRevision !== input.projectionRevision ||
+          match.traversal.artifactChecksum !== input.expectedArtifactChecksum ||
+          match.traversal.graphOrdinalMapChecksum !== input.expectedGraphOrdinalMapChecksum ||
+          match.traversal.startNodeKey !== match.nodeKey ||
+          match.traversal.writesPerformed !== false || match.traversal.canonicalAuthority !== false
+        ) {
+          throw new Error('ATLAS_GRAPH_SOURCE_REF_BFS_MATCH_MISMATCH');
+        }
+        ordinals.add(match.graphOrdinal);
+        nodeKeys.add(match.nodeKey);
+      }
+      return receipt;
+    },
     pagerank: async (input: AtlasPageRankRequestV1) => {
       assertPageRankRequest(input);
       return requestJson<AtlasPageRankReceiptV1>(

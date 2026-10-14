@@ -148,7 +148,7 @@ const SUGGESTED_ACTION: Record<ErrorState, string> = {
   missing_dependency:   'Verify npm install ran in sveltekit-frontend; check $lib alias resolution',
   stale_cache:          'Invalidate BitFrost keys for this packet_key; run cache warm after Postgres read',
   retrieval_miss:       'Check Qdrant collection count and Postgres codebase_chunk_index population',
-  worker_timeout:       'Increase AbortSignal.timeout; check Gemma4 :8090 health; reduce batch size',
+  worker_timeout:       'Increase AbortSignal.timeout; check Ornith 1.5 :8090 (llama-server) health; reduce batch size',
   codec_failure:        'Verify @msgpack/msgpack encode/decode round-trip; check BYTEA column integrity',
   audit_recommendation: 'Create review/refactor task in LangGraph Kanban; queue for operator review',
   unknown:              'Inspect error_signal_stream.evidence for raw error text; escalate to operator',

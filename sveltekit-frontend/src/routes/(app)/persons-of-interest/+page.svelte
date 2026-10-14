@@ -456,18 +456,18 @@
 							<div class="card-body">
 								{#if poi.description}
 									<div class="field-group">
-										<label class="field-label">DESCRIPTION</label>
+										<span class="field-label">DESCRIPTION</span>
 										<p class="field-value">{poi.description}</p>
 									</div>
 								{/if}
 								{#if poi.lastLocation}
 									<div class="field-group">
-										<label class="field-label">LAST KNOWN LOCATION</label>
+										<span class="field-label">LAST KNOWN LOCATION</span>
 										<p class="field-value">{poi.lastLocation}</p>
 									</div>
 								{/if}
 								<div class="field-group">
-									<label class="field-label">REGISTERED</label>
+									<span class="field-label">REGISTERED</span>
 									<p class="field-value">{new Date(poi.createdAt).toLocaleDateString()}</p>
 								</div>
 							</div>

@@ -67,6 +67,13 @@ export const DenseSignalSchema = z.object({
 
 export type DenseSignal = z.infer<typeof DenseSignalSchema>;
 
+export function isRetiredDenseSignal(signal: DenseSignal | undefined): boolean {
+  if (!signal) return false;
+  return signal.embedding_lane === 'dense_384' ||
+    signal.embedding_native_dimension === 384 ||
+    /(?:^|[-_:])(?:to[-_:])?384(?:[-_:]|$)/i.test(signal.projection_version ?? '');
+}
+
 /**
  * Lexical signal (BM25 Full-Text Search)
  * Keyword overlap and term frequency-inverse document frequency

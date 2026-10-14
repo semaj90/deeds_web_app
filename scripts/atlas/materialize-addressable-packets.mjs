@@ -859,7 +859,6 @@ function normalizePacketRow(row, evidence) {
     qdrant_collection: qdrantCollection || undefined,
     qdrant_vectors: row.qdrant_vectors || undefined,
     vector_source: row.vector_source || undefined,
-    embedding_384: row.embedding_384 || undefined,
     latent_64: row.latent_64 || undefined,
   };
 
@@ -1091,7 +1090,6 @@ async function loadRows(table, limit = 0, options = {}) {
     'topology_updated_at',
     'qdrant_vectors',
     'vector_source',
-    'embedding_384',
     'latent_64',
     'langextract_terms',
     'top10_neighbors',

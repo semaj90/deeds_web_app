@@ -55,7 +55,7 @@
 		</div>
 
 		<div class="panel">
-			<label>Count</label>
+			<span class="label">Count</span>
 			<div class="row">
 				<button type="button" onclick={() => bump(-1)}>-1</button>
 				<div class="count">{count}</div>
@@ -65,7 +65,7 @@
 		</div>
 
 		<div class="panel">
-			<label>Enabled</label>
+			<span class="label">Enabled</span>
 			<button type="button" class="toggle" onclick={() => { enabled = !enabled; push(`enabled → ${enabled}`); }}>
 				{enabled ? 'enabled' : 'paused'}
 			</button>
@@ -73,7 +73,7 @@
 		</div>
 
 		<div class="panel">
-			<label>Derived snapshot</label>
+			<span class="label">Derived snapshot</span>
 			<pre>{JSON.stringify(derivedSummary, null, 2)}</pre>
 		</div>
 	</section>
@@ -81,7 +81,7 @@
 	<section class="panel wide">
 		<div class="row between">
 			<div>
-				<label>Reactive trace</label>
+				<span class="label">Reactive trace</span>
 				<p class="meta">last action: <code>{lastAction}</code></p>
 			</div>
 			<button type="button" class="reset" onclick={reset}>Reset</button>
@@ -145,7 +145,8 @@
 		margin-top: 1rem;
 	}
 
-	label {
+	label,
+	.label {
 		display: block;
 		margin-bottom: 0.5rem;
 		font-size: 0.72rem;

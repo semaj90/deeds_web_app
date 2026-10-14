@@ -1,0 +1,338 @@
+{
+  "schema": "atlas.schema-topology-pagerank-receipt.v1",
+  "generatedAt": "2026-10-14T02:53:56.607Z",
+  "sourceTopologySnapshot": "snapshot-2026-10-14T02-53-56-607Z",
+  "relationCountsByKind": {
+    "TABLE": 565,
+    "VIEW": 25,
+    "MATERIALIZED_VIEW": 2
+  },
+  "graphMetrics": {
+    "nodeCount": 592,
+    "edgeCount": 230,
+    "qualifiedEdgeCount": 230,
+    "density": 0.0006573832715964696,
+    "weaklyConnectedComponents": 393,
+    "stronglyConnectedComponents": 591
+  },
+  "pagerankSettings": {
+    "alpha": 0.85,
+    "maxIter": 200,
+    "tolerance": 1e-08,
+    "converged": true,
+    "implementation": "NetworkX 3.6.1 (CPU Reference Oracle)"
+  },
+  "deterministicTopK": [
+    {
+      "rank": 1,
+      "id": "postgres:public.atlas_representations",
+      "relationName": "atlas_representations",
+      "kind": "TABLE",
+      "pagerankScore": 0.05733378099786878,
+      "inDegree": 8,
+      "outDegree": 1,
+      "rowCount": 0
+    },
+    {
+      "rank": 2,
+      "id": "postgres:public.atlas_fi_features",
+      "relationName": "atlas_fi_features",
+      "kind": "TABLE",
+      "pagerankScore": 0.03432934613297683,
+      "inDegree": 5,
+      "outDegree": 1,
+      "rowCount": 0
+    },
+    {
+      "rank": 3,
+      "id": "postgres:public.atlas_ast_nodes",
+      "relationName": "atlas_ast_nodes",
+      "kind": "TABLE",
+      "pagerankScore": 0.025789398844596623,
+      "inDegree": 4,
+      "outDegree": 1,
+      "rowCount": 514838
+    },
+    {
+      "rank": 4,
+      "id": "postgres:public.atlas_packets",
+      "relationName": "atlas_packets",
+      "kind": "TABLE",
+      "pagerankScore": 0.02502609512194627,
+      "inDegree": 22,
+      "outDegree": 0,
+      "rowCount": 61718
+    },
+    {
+      "rank": 5,
+      "id": "postgres:public.atlas_repository_identity",
+      "relationName": "atlas_repository_identity",
+      "kind": "TABLE",
+      "pagerankScore": 0.02381455208188613,
+      "inDegree": 4,
+      "outDegree": 1,
+      "rowCount": 0
+    },
+    {
+      "rank": 6,
+      "id": "postgres:public.users",
+      "relationName": "users",
+      "kind": "TABLE",
+      "pagerankScore": 0.010979024459143265,
+      "inDegree": 7,
+      "outDegree": 0,
+      "rowCount": 7
+    },
+    {
+      "rank": 7,
+      "id": "postgres:public.workspaces",
+      "relationName": "workspaces",
+      "kind": "TABLE",
+      "pagerankScore": 0.010479649284683147,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 1
+    },
+    {
+      "rank": 8,
+      "id": "postgres:public.atlas_graph_snapshots_v2",
+      "relationName": "atlas_graph_snapshots_v2",
+      "kind": "TABLE",
+      "pagerankScore": 0.00845681178822177,
+      "inDegree": 6,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 9,
+      "id": "postgres:public.atlas_test_registry",
+      "relationName": "atlas_test_registry",
+      "kind": "TABLE",
+      "pagerankScore": 0.006679254434807256,
+      "inDegree": 5,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 10,
+      "id": "postgres:public.graphify_runs",
+      "relationName": "graphify_runs",
+      "kind": "TABLE",
+      "pagerankScore": 0.006404772031307995,
+      "inDegree": 4,
+      "outDegree": 1,
+      "rowCount": 0
+    },
+    {
+      "rank": 11,
+      "id": "postgres:public.route_metadata",
+      "relationName": "route_metadata",
+      "kind": "TABLE",
+      "pagerankScore": 0.0058625374377001375,
+      "inDegree": 5,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 12,
+      "id": "postgres:public.atlas_relationships",
+      "relationName": "atlas_relationships",
+      "kind": "TABLE",
+      "pagerankScore": 0.005774459057915709,
+      "inDegree": 6,
+      "outDegree": 0,
+      "rowCount": 603
+    },
+    {
+      "rank": 13,
+      "id": "postgres:public.graphify_executions",
+      "relationName": "graphify_executions",
+      "kind": "TABLE",
+      "pagerankScore": 0.00538211725954644,
+      "inDegree": 5,
+      "outDegree": 2,
+      "rowCount": 36
+    },
+    {
+      "rank": 14,
+      "id": "postgres:public.kag_dag_runs",
+      "relationName": "kag_dag_runs",
+      "kind": "TABLE",
+      "pagerankScore": 0.004901697081392743,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 15,
+      "id": "postgres:public.atlas_schema_registry",
+      "relationName": "atlas_schema_registry",
+      "kind": "TABLE",
+      "pagerankScore": 0.004685512042592331,
+      "inDegree": 3,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 16,
+      "id": "postgres:public.atlas_tree_nodes",
+      "relationName": "atlas_tree_nodes",
+      "kind": "TABLE",
+      "pagerankScore": 0.0044933385828391835,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 262241
+    },
+    {
+      "rank": 17,
+      "id": "postgres:public.ldr_research_tasks",
+      "relationName": "ldr_research_tasks",
+      "kind": "TABLE",
+      "pagerankScore": 0.0044933385828391835,
+      "inDegree": 4,
+      "outDegree": 1,
+      "rowCount": 0
+    },
+    {
+      "rank": 18,
+      "id": "postgres:public.semantic_signals",
+      "relationName": "semantic_signals",
+      "kind": "TABLE",
+      "pagerankScore": 0.0044933385828391835,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 19,
+      "id": "postgres:public.encoder_provenance",
+      "relationName": "encoder_provenance",
+      "kind": "TABLE",
+      "pagerankScore": 0.004205091864438634,
+      "inDegree": 2,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 20,
+      "id": "postgres:public.specs",
+      "relationName": "specs",
+      "kind": "TABLE",
+      "pagerankScore": 0.004026099623548796,
+      "inDegree": 2,
+      "outDegree": 2,
+      "rowCount": 0
+    },
+    {
+      "rank": 21,
+      "id": "postgres:public.evaluation_queries",
+      "relationName": "evaluation_queries",
+      "kind": "TABLE",
+      "pagerankScore": 0.004012918404685487,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 112
+    },
+    {
+      "rank": 22,
+      "id": "postgres:public.atlas_symbol_registry",
+      "relationName": "atlas_symbol_registry",
+      "kind": "TABLE",
+      "pagerankScore": 0.004012918404685486,
+      "inDegree": 3,
+      "outDegree": 0,
+      "rowCount": 10504
+    },
+    {
+      "rank": 23,
+      "id": "postgres:public.code_features",
+      "relationName": "code_features",
+      "kind": "TABLE",
+      "pagerankScore": 0.004012918404685486,
+      "inDegree": 3,
+      "outDegree": 1,
+      "rowCount": 1477
+    },
+    {
+      "rank": 24,
+      "id": "postgres:public.agent_runs",
+      "relationName": "agent_runs",
+      "kind": "TABLE",
+      "pagerankScore": 0.003868795045485212,
+      "inDegree": 2,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 25,
+      "id": "postgres:public.atlas_evidence",
+      "relationName": "atlas_evidence",
+      "kind": "TABLE",
+      "pagerankScore": 0.0037807166657007835,
+      "inDegree": 4,
+      "outDegree": 0,
+      "rowCount": 603
+    },
+    {
+      "rank": 26,
+      "id": "postgres:public.atlas_tensor_artifacts",
+      "relationName": "atlas_tensor_artifacts",
+      "kind": "TABLE",
+      "pagerankScore": 0.003724671686284937,
+      "inDegree": 1,
+      "outDegree": 0,
+      "rowCount": 0
+    },
+    {
+      "rank": 27,
+      "id": "postgres:public.graphify_symbols",
+      "relationName": "graphify_symbols",
+      "kind": "TABLE",
+      "pagerankScore": 0.003636944626492326,
+      "inDegree": 2,
+      "outDegree": 2,
+      "rowCount": 66338
+    },
+    {
+      "rank": 28,
+      "id": "postgres:public.cases",
+      "relationName": "cases",
+      "kind": "TABLE",
+      "pagerankScore": 0.0035324982265317892,
+      "inDegree": 3,
+      "outDegree": 0,
+      "rowCount": 11
+    },
+    {
+      "rank": 29,
+      "id": "postgres:public.atlas_source_refs",
+      "relationName": "atlas_source_refs",
+      "kind": "TABLE",
+      "pagerankScore": 0.003324317047413799,
+      "inDegree": 2,
+      "outDegree": 0,
+      "rowCount": 45856
+    },
+    {
+      "rank": 30,
+      "id": "postgres:public.projects",
+      "relationName": "projects",
+      "kind": "TABLE",
+      "pagerankScore": 0.0033219169169876367,
+      "inDegree": 2,
+      "outDegree": 0,
+      "rowCount": 0
+    }
+  ],
+  "checksums": {
+    "sourceTopologyChecksum": "sha256:ea30206d8206f20b6ca1a27904170699d80d4cfe5fcbe9efa92e802af7aba3c6",
+    "topKCandidatesChecksum": "sha256:37fc112d71a126533816169aedad9ee32bf58de5b500d4eb0e98a5ad4d77996d"
+  },
+  "noWritesPerformed": true,
+  "gates": {
+    "GATE_A_CATALOG_QUALIFICATION": "PROVEN",
+    "GATE_B_TYPED_GRAPH_CONSTRUCTION": "PROVEN",
+    "GATE_C_NETWORKX_PAGERANK_ANALYSIS": "PROVEN",
+    "GATE_D_NO_WRITE_INSPECTION": "PROVEN"
+  }
+}

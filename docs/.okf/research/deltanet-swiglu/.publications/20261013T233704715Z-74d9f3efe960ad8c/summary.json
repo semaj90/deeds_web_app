@@ -1,0 +1,14 @@
+{
+  "schema_version": "okf.dev.summary.v1",
+  "generated_at": "2026-10-13T23:37:06.825Z",
+  "manifest": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\research\\deltanet-swiglu\\manifest.json",
+  "records": 2,
+  "summary": {
+    "deltanet-swiglu-primary-papers": {
+      "pages": 2,
+      "domains": {
+        "documentation": 2
+      }
+    }
+  }
+}

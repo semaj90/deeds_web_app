@@ -78,5 +78,18 @@ from .sparse_relations import (
 )
 from .spectral import SpectralReceipt, symmetric_eigenspace
 from .torch_kernel_experiment import TorchKernelExperimentReceipt, run_torch_kernel_experiment
+from .topk_paginator import (
+    CanonicalTopKResultV1,
+    RankedCandidateV1,
+    TopKResult,
+    stable_topk,
+    topk_paginate,
+)
+from .rff_transform import (
+    RFFReceipt,
+    build_rff,
+    rff_transform,
+)
 
 __all__ = [name for name in globals() if not name.startswith("_")]
+

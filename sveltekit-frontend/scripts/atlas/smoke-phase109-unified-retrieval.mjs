@@ -6,6 +6,10 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import neo4j from 'neo4j-driver';
+
+console.error('LEGACY_384_PHASE109_SMOKE_DISABLED: this historical dual-width smoke invokes the retired dense_384 lane; use an approved semantic_768 retrieval proof instead');
+process.exit(78);
+
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const frontendRoot = path.resolve(scriptDir, '..', '..');
 const frontendReportsRoot = path.resolve(frontendRoot, 'docs', 'reports');

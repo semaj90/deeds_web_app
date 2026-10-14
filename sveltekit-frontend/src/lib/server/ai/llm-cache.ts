@@ -10,12 +10,12 @@
  */
 
 import { qdrant, deterministicPointId } from '$lib/server/vector/qdrant-manager.js';
-import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEmbeddingEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { generateContextHash } from '$lib/server/cache-keys.js';
+import {
+  generateEmbedding,
+  resolveEmbeddingArtifactRevisionV1,
+} from '$lib/server/grpc/embedding-client.js';
 
-const OLLAMA_URL = getOllamaEmbeddingEndpoint();
-const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 
 // Cache hit threshold — only return cached response if similarity >= 0.88
 // Bumped from 0.85 to 0.88 for legal domain safety (incorrect cached answers are worse than cache misses)
@@ -59,18 +59,18 @@ interface CacheLookupResult {
 /**
  * Generate query embedding via Ollama
  */
-async function embedQuery(query: string): Promise<number[] | null> {
+async function embedQuery(
+	query: string,
+	knownModelRevision?: string,
+): Promise<{ vector: number[]; modelRevision: string } | null> {
   try {
-    const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: query }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!res.ok) return null;
-    const data = await res.json();
-    return Array.isArray(data.embedding) ? data.embedding : null;
+    const modelRevision = knownModelRevision ?? await resolveEmbeddingArtifactRevisionV1();
+    if (!modelRevision) return null;
+    const embedding = await generateEmbedding(query, { taskMode: 'unprompted_legacy' });
+    const confirmedRevision = await resolveEmbeddingArtifactRevisionV1();
+    return confirmedRevision === modelRevision && embedding?.length === 768 && embedding.every(Number.isFinite)
+      ? { vector: embedding, modelRevision }
+      : null;
   } catch (error) {
     console.warn('[LLM Cache] Embedding generation failed:', error);
     return null;
@@ -84,22 +84,26 @@ async function embedQuery(query: string): Promise<number[] | null> {
 export async function lookupCachedResponse(params: {
   query: string;
   queryEmbedding?: number[];
+  embeddingModelRevision?: string;
   context: string;
   model?: string;
 }): Promise<CacheLookupResult> {
   const {
     query,
     queryEmbedding: providedEmbedding,
+    embeddingModelRevision: providedModelRevision,
     context,
     model = process.env.LLAMA_SERVER_MODEL ?? 'ornith-1.5-9b',
   } = params;
 
   try {
-    // Generate query embedding if not provided
-    const queryEmbedding = providedEmbedding ?? (await embedQuery(query));
-    if (!queryEmbedding) {
-      return { hit: false };
-    }
+    const currentModelRevision = await resolveEmbeddingArtifactRevisionV1();
+    if (!currentModelRevision) return { hit: false };
+    const qualified = providedEmbedding && providedModelRevision === currentModelRevision
+      ? { vector: providedEmbedding, modelRevision: currentModelRevision }
+      : await embedQuery(query, currentModelRevision);
+    if (!qualified) return { hit: false };
+    const queryEmbedding = qualified.vector;
 
     const contextHash = generateContextHash(context);
     // Search for semantically similar cached queries
@@ -115,6 +119,7 @@ export async function lookupCachedResponse(params: {
         must: [
           { key: 'contextHash', match: { value: contextHash } },
           { key: 'model', match: { value: model } },
+          { key: 'embeddingModelRevision', match: { value: qualified.modelRevision } },
         ],
       },
     });
@@ -162,14 +167,23 @@ export async function lookupCachedResponse(params: {
 export async function storeCachedResponse(params: {
   query: string;
   queryEmbedding: number[];
+  embeddingModelRevision?: string;
   context: string;
   response: string;
   model: string;
   confidence?: number;
 }): Promise<void> {
-  const { query, queryEmbedding, context, response, model, confidence } = params;
+  const { query, queryEmbedding, embeddingModelRevision, context, response, model, confidence } = params;
 
   try {
+    const currentModelRevision = await resolveEmbeddingArtifactRevisionV1();
+    if (!currentModelRevision) return;
+    const qualified = embeddingModelRevision === currentModelRevision &&
+      queryEmbedding.length === 768 && queryEmbedding.every(Number.isFinite)
+      ? { vector: queryEmbedding, modelRevision: currentModelRevision }
+      : await embedQuery(query, currentModelRevision);
+    if (!qualified || qualified.modelRevision !== currentModelRevision) return;
+
     const contextHash = generateContextHash(context);
     const tier = classifyQueryTier(query);
     const ttlSeconds = CACHE_TTL[tier];
@@ -178,7 +192,9 @@ export async function storeCachedResponse(params: {
 
     // Generate deterministic point ID from query + context hash + model version
     // Model version ensures cache auto-invalidates when deploying a new fine-tuned model
-    const pointId = deterministicPointId(`${query}:${contextHash}:${model}:${CACHE_MODEL_VERSION}`);
+    const pointId = deterministicPointId(
+      `${query}:${contextHash}:${model}:${CACHE_MODEL_VERSION}:${currentModelRevision}`
+    );
 
     await qdrant.upsert({
       collection: qdrant.collections.llm_cache,
@@ -186,11 +202,12 @@ export async function storeCachedResponse(params: {
         {
           id: pointId,
           vector: {
-            query: queryEmbedding,
+            query: qualified.vector,
           },
           payload: {
             query,
             contextHash,
+            embeddingModelRevision: currentModelRevision,
             response,
             model,
             confidence,

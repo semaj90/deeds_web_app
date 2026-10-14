@@ -25,6 +25,12 @@
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { efForProfile, inferEfProfile } from './hnsw-ef-profiles.js';
 
+const RETIRED_CODEBASE_COLLECTIONS = new Set([
+  'codebase_chunks_384',
+  'codebase_chunks_384_hybrid',
+  'codebase_chunks_384_v2',
+]);
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -75,6 +81,10 @@ export async function batchSearch(
   queries: BatchSearchQuery[],
   efProfile?: 'interactive' | 'balanced' | 'thorough',
 ): Promise<BatchSearchResponse> {
+  if (RETIRED_CODEBASE_COLLECTIONS.has(collection)) {
+    throw new Error('LEGACY_384_BATCH_SEARCH_DISABLED');
+  }
+
   if (queries.length === 0) {
     return { results: [], collection, durationMs: 0, nativeBatch: false };
   }

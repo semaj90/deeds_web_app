@@ -32,7 +32,7 @@ export const acePromptPreflightTool: Gemma4Tool = {
       intent: (args.intent as AcePromptPreflightInput['intent']) ?? 'find',
       tokenBudget: Number(args.tokenBudget ?? 3500),
       backend: (args.backend as AcePromptPreflightInput['backend']) ?? 'turboquant',
-      modelName: 'gemma4-legal.gguf',
+      modelName: 'ornith-1.5-9b',
     });
     return JSON.stringify(preflight);
   },

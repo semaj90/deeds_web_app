@@ -140,6 +140,8 @@ import {
   atlasGraphPageRankInputSchema,
   graphCommunityForNodeInputSchema,
   graphExpandNeighborhoodInputSchema,
+  resolveGraphExpandHops,
+  graphNeighborhoodNeedsFallback,
   graphPageRankTopInputSchema,
   turbovecRankChunksInputSchema,
   ATLAS_COVERAGE_STATEMENT_TIMEOUT_MS,
@@ -1455,7 +1457,7 @@ server.registerTool(
       };
     }
 
-    const hops = maxHops === 2 || (depth ?? 2) >= 2 ? 2 : 1;
+    const hops = resolveGraphExpandHops({ maxHops, depth });
     const center = seedKeys[0] as string;
     const derivedFilePath = filePath ?? (center.startsWith('file:') ? center.slice(5) : undefined);
     const seedEnvelope = await buildSubgraphV1SeedNeighborhood({
@@ -1513,12 +1515,21 @@ server.registerTool(
             .filter(Boolean)
         )
       );
-      const confidence = Math.min(
-        1,
-        (seedKeys.length > 0 ? 0.45 : 0) +
-          Math.min(0.35, Array.from(nodesById.keys()).length / Math.max(1, seedKeys.length * 10)) +
-          (edges.length > 0 ? 0.2 : 0)
-      );
+      const confidence = edges.length === 0
+        ? 0
+        : Math.min(
+            1,
+            0.45 +
+              Math.min(0.35, Array.from(nodesById.keys()).length / Math.max(1, seedKeys.length * 10)) +
+              (Array.from(nodesById.values()).some((node) => {
+                const score = node.pagerank ?? node.pageRank;
+                return score !== null && score !== undefined && Number.isFinite(Number(score));
+              }) ? 0.2 : 0)
+          );
+
+      if (graphNeighborhoodNeedsFallback(edges)) {
+        throw new Error('SvelteKit graph traversal returned no edges');
+      }
 
       return {
         content: [
@@ -1608,10 +1619,9 @@ server.registerTool(
         ).values()
       );
       const sourceRefList = Array.from(new Set(nodes.map((node) => node.sourceRef)));
-      const confidence = Math.min(
-        1,
-        (seedKeys.length > 0 ? 0.5 : 0) + Math.min(0.5, neighbors.length / 20)
-      );
+      const confidence = graphNeighborhoodNeedsFallback(edges)
+        ? 0
+        : Math.min(1, 0.5 + Math.min(0.5, neighbors.length / 20));
       return {
         content: [
           {
@@ -2203,7 +2213,7 @@ server.registerTool(
     inputSchema: z.object({
       query: z.string().describe('Search query'),
       radius: z.number().int().min(0).max(2).default(1).describe('SOM neighbor radius'),
-      limit: z.number().int().default(10),
+      limit: z.number().int().min(1).max(200).default(10),
       jsonFilter: z
         .record(z.string(), z.any())
         .optional()
@@ -2327,7 +2337,7 @@ server.registerTool(
     inputSchema: z.object({
       query: z.string().describe('Semantic query'),
       jsonFilter: z.record(z.string(), z.any()).optional().describe('JSONB metadata filter'),
-      limit: z.number().int().default(10),
+      limit: z.number().int().min(1).max(100).default(10),
     }),
   },
   async ({ query, jsonFilter, limit }) => {
@@ -2492,7 +2502,7 @@ server.registerTool(
     description: 'Searches for previously synthesized and materialized pathways.',
     inputSchema: z.object({
       query: z.string().describe('Search for synthesized pathways'),
-      limit: z.number().int().default(5),
+      limit: z.number().int().min(1).max(100).default(5),
     }),
   },
   async ({ query, limit }) => {
@@ -2950,8 +2960,10 @@ server.registerTool(
                 notes: [
                   'Port 8788: TRACE MCP tool gateway',
                   'Port 11434: Ollama (embeddings + fast gen)',
-                  'Port 8090: Reranker (Optimized llama-server)',
-                  'Port 8080: TurboQuant (Long-context llama-server)',
+                  'Port 8090: llama-server, TurboQuant launcher profile, Ornith 1.5 with vision (NOT a reranker)',
+                  'Port 8080: SeaweedFS volume container (legal-ai-seaweed-volume), NOT TurboQuant',
+                  'Port 8099: Mixedbread reranker sidecar (scripts/launch-reranker.ps1); DOWN unless started',
+                  'Port 8101: Topology search (TOPOLOGY_SEARCH_URL); no tracked server; DOWN',
                   'Port 3040: Bifrost dispatcher',
                 ],
               },
@@ -2979,7 +2991,7 @@ server.registerTool(
     inputSchema: z.object({
       query: z.string().describe('The user query'),
       documents: z.array(z.string()).describe('List of document snippets to rerank'),
-      topN: z.number().int().default(5),
+      topN: z.number().int().min(1).max(100).default(5),
     }),
   },
   async ({ query, documents, topN }) => {
@@ -3078,8 +3090,8 @@ server.registerTool(
   {
     description: 'Explicit 4D manifold coordinate search with optional JSONB payload filters.',
     inputSchema: z.object({
-      som_x: z.number().describe('SOM X coordinate (BMU column, 0-based)'),
-      som_y: z.number().describe('SOM Y coordinate (BMU row, 0-based)'),
+      som_x: z.number().int().min(0).max(19).describe('SOM X coordinate (BMU column, 0-based)'),
+      som_y: z.number().int().min(0).max(19).describe('SOM Y coordinate (BMU row, 0-based)'),
       semantic_z: z
         .number()
         .min(0)
@@ -8933,7 +8945,7 @@ server.registerTool(
       'Use for ACE chunk reranking, evidence scoring, or any query-vs-corpus weighting.',
     inputSchema: z.object({
       query: z.array(z.number()).max(768).describe('Query vector (dim floats)'),
-      keys:  z.array(z.number()).describe('Flat key matrix [n × dim] row-major'),
+      keys:  z.array(z.number()).max(1_000_000).describe('Flat key matrix [n × dim] row-major'),
       n:     z.number().int().min(1).max(2048),
       dim:   z.number().int().min(1).max(768),
     }),
@@ -8963,7 +8975,7 @@ server.registerTool(
       'Returns normalised rank scores (sum to 1.0). ' +
       'Cached 300 s by shape+input hash.',
     inputSchema: z.object({
-      adj:     z.array(z.number()).describe('Flat n×n adjacency matrix row-major'),
+      adj:     z.array(z.number()).max(1_000_000).describe('Flat n×n adjacency matrix row-major'),
       n:       z.number().int().min(2).max(512),
       damping: z.number().min(0).max(1).default(0.85),
       iters:   z.number().int().min(1).max(200).default(50),
@@ -9401,10 +9413,297 @@ server.registerTool(
   }
 );
 
+// ── diagnostics.record_observations (bounded write, dry-run by default) ───────
+// Writes diagnostic observations (svelte-check or similar) into error_logs.
+// Idempotent per (diagnostic_log_sha256, diagnostic_log_line). dry_run=true writes nothing.
+// Authorization is not a string token: writes need dry_run=false in the call itself and
+// are bounded to 500 rows per call, inside one transaction with a statement timeout.
+const DIAGNOSTIC_SEVERITY: Record<string, string> = {
+  error: 'ERROR', ERROR: 'ERROR',
+  warning: 'WARNING', WARNING: 'WARNING',
+  critical: 'CRITICAL', CRITICAL: 'CRITICAL',
+  info: 'INFO', INFO: 'INFO',
+};
+
+server.registerTool(
+  'diagnostics.record_observations',
+  {
+    description:
+      'Records diagnostic observations into PostgreSQL error_logs. Default dry_run=true writes nothing. ' +
+      'Idempotent per (log sha256, log line); bounded to 500 rows per call.',
+    inputSchema: z.object({
+      dry_run: z.boolean().default(true),
+      run_id: z.string().min(1).max(80),
+      category: z.string().min(1).max(60).default('diagnostic'),
+      log_sha256: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+      observations: z
+        .array(
+          z.object({
+            severity: z.string().min(1).max(20),
+            message: z.string().min(1).max(2000),
+            file_path: z.string().max(400).nullable().optional(),
+            line: z.number().int().min(1).nullable().optional(),
+            source_ref: z.string().max(400).nullable().optional(),
+            log_line: z.number().int().min(1),
+            code: z.string().max(60).nullable().optional(),
+            fingerprint: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+          }),
+        )
+        .min(1)
+        .max(500),
+    }),
+  },
+  async ({ dry_run = true, run_id, category = 'diagnostic', log_sha256, observations }) => {
+    const rows: unknown[][] = [];
+    for (const o of observations) {
+      const severity = DIAGNOSTIC_SEVERITY[o.severity];
+      if (!severity) {
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ ok: false, error: `unsupported severity at log_line ${o.log_line}` }) }],
+          isError: true,
+        };
+      }
+      rows.push([
+        category, severity, o.message, o.file_path ?? null, o.line ?? null, o.source_ref ?? null,
+        run_id, log_sha256, o.log_line, o.code ?? null, o.fingerprint,
+      ]);
+    }
+    if (dry_run) {
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: true, dryRun: true, wouldInsert: rows.length, writesPerformed: false }) }],
+      };
+    }
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query("SELECT set_config('statement_timeout', $1, true)", ['30000ms']);
+      let inserted = 0;
+      for (const params of rows) {
+        const res = await client.query(
+          `INSERT INTO error_logs
+             (error_category, severity, message, file_path, line_number, source_ref,
+              diagnostic_run_id, diagnostic_log_sha256, diagnostic_log_line, diagnostic_code, diagnostic_fingerprint)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           ON CONFLICT (diagnostic_log_sha256, diagnostic_log_line) WHERE diagnostic_log_sha256 IS NOT NULL DO NOTHING`,
+          params,
+        );
+        inserted += res.rowCount ?? 0;
+      }
+      await client.query('COMMIT');
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({ ok: true, dryRun: false, inserted, skipped: rows.length - inserted, writesPerformed: true }),
+          },
+        ],
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: false, error: (err as Error).message, writesPerformed: false }) }],
+        isError: true,
+      };
+    } finally {
+      client.release();
+    }
+  },
+);
+
+// ── diagnostics.record_analysis (bounded write; dry-run rehearses then rolls back) ──
+// Writes diagnostic_ast_facts, diagnostic_dag_runs and diagnostic_recommendations (applied 2026-10-13).
+// dry_run=true runs the same statements inside a transaction and ROLLS BACK: it proves the write
+// path without persisting rows. dry_run=false commits. Recommendations always insert as PROPOSED.
+const ANALYSIS_SHA = /^sha256:[0-9a-f]{64}$/;
+const ANALYSIS_ANALYZERS = ['ast-grep', 'ts-morph', 'tree-sitter', 'svelte-compiler'] as const;
+const ANALYSIS_METHODS = ['rule', 'ast', 'low-rank'] as const;
+const ANALYSIS_JSON_MAX_BYTES = 8000;
+
+server.registerTool(
+  'diagnostics.record_analysis',
+  {
+    description:
+      'Records diagnostic analysis: AST facts, a repair DAG run, and ranked PROPOSED recommendations. ' +
+      'Default dry_run=true rehearses the writes and rolls back. Idempotent on identity keys.',
+    inputSchema: z.object({
+      dry_run: z.boolean().default(true),
+      ast_facts: z
+        .array(
+          z
+            .object({
+              fingerprint: z.string().regex(ANALYSIS_SHA),
+              log_sha256: z.string().regex(ANALYSIS_SHA).nullable().optional(),
+              source_ref: z.string().min(1).max(400),
+              source_sha256: z.string().regex(ANALYSIS_SHA),
+              analyzer: z.enum(ANALYSIS_ANALYZERS),
+              analyzer_version: z.string().min(1).max(60),
+              node_kind: z.string().max(80).nullable().optional(),
+              span_start: z.number().int().min(0).nullable().optional(),
+              span_end: z.number().int().min(0).nullable().optional(),
+              symbol_name: z.string().max(200).nullable().optional(),
+              facts: z.record(z.string(), z.unknown()).default({}),
+            })
+            .refine((o) => o.span_start == null || o.span_end == null || o.span_end >= o.span_start, {
+              message: 'span_end must be >= span_start',
+            }),
+        )
+        .max(500)
+        .default([]),
+      dag_run: z
+        .object({
+          run_id: z.string().min(1).max(80),
+          log_sha256: z.string().regex(ANALYSIS_SHA),
+          synthesizer_version: z.string().min(1).max(60),
+          node_count: z.number().int().min(0),
+          edge_count: z.number().int().min(0),
+          dag: z.record(z.string(), z.unknown()).default({}),
+        })
+        .nullable()
+        .optional(),
+      recommendations: z
+        .array(
+          z.object({
+            dag_run_id: z.string().min(1).max(80),
+            fingerprint: z.string().regex(ANALYSIS_SHA),
+            rank: z.number().int().min(1),
+            method: z.enum(ANALYSIS_METHODS),
+            score: z.number().nullable().optional(),
+            evidence_refs: z.array(z.string().max(300)).max(20).default([]),
+          }),
+        )
+        .max(500)
+        .default([]),
+    }),
+  },
+  async ({ dry_run = true, ast_facts = [], dag_run = null, recommendations = [] }) => {
+    const refuse = (error: string) => ({
+      content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error, writesPerformed: false }) }],
+      isError: true,
+    });
+    for (const f of ast_facts) {
+      if (JSON.stringify(f.facts).length > ANALYSIS_JSON_MAX_BYTES) return refuse('ast fact facts exceed 8000 bytes');
+    }
+    if (dag_run && JSON.stringify(dag_run.dag).length > ANALYSIS_JSON_MAX_BYTES) {
+      return refuse('dag exceeds 8000 bytes');
+    }
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query("SELECT set_config('statement_timeout', $1, true)", ['30000ms']);
+      let dagRuns = 0;
+      let astFacts = 0;
+      let recs = 0;
+      if (dag_run) {
+        const r = await client.query(
+          `INSERT INTO diagnostic_dag_runs (run_id, log_sha256, synthesizer_version, node_count, edge_count, dag)
+           VALUES ($1, $2, $3, $4, $5, $6::jsonb) ON CONFLICT DO NOTHING`,
+          [dag_run.run_id, dag_run.log_sha256, dag_run.synthesizer_version, dag_run.node_count, dag_run.edge_count, JSON.stringify(dag_run.dag)],
+        );
+        dagRuns = r.rowCount ?? 0;
+      }
+      for (const f of ast_facts) {
+        const r = await client.query(
+          `INSERT INTO diagnostic_ast_facts
+             (fingerprint, log_sha256, source_ref, source_sha256, analyzer, analyzer_version, node_kind, span_start, span_end, symbol_name, facts)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb) ON CONFLICT DO NOTHING`,
+          [f.fingerprint, f.log_sha256 ?? null, f.source_ref, f.source_sha256, f.analyzer, f.analyzer_version,
+           f.node_kind ?? null, f.span_start ?? null, f.span_end ?? null, f.symbol_name ?? null, JSON.stringify(f.facts)],
+        );
+        astFacts += r.rowCount ?? 0;
+      }
+      for (const rec of recommendations) {
+        const r = await client.query(
+          `INSERT INTO diagnostic_recommendations
+             (dag_run_id, fingerprint, rank, method, score, evidence_refs)
+           VALUES ($1, $2, $3, $4, $5, $6::jsonb) ON CONFLICT DO NOTHING`,
+          [rec.dag_run_id, rec.fingerprint, rec.rank, rec.method, rec.score ?? null, JSON.stringify(rec.evidence_refs)],
+        );
+        recs += r.rowCount ?? 0;
+      }
+      const counts = { astFacts, dagRuns, recommendations: recs };
+      if (dry_run) {
+        await client.query('ROLLBACK');
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, dryRun: true, rehearsedAndRolledBack: true, wouldInsert: counts, writesPerformed: false }) }],
+        };
+      }
+      await client.query('COMMIT');
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ ok: true, dryRun: false, inserted: counts, writesPerformed: true }) }],
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      return refuse((err as Error).message);
+    } finally {
+      client.release();
+    }
+  },
+);
+
 // ── atlas.packet_search ───────────────────────────────────────────────────────
 // Query atlas_packets table by source_ref prefix, feature_id, or free-text
 // summary search. Returns packet metadata without embeddings (safe for context).
 // Path variants are tried automatically so callers don't need to canonicalize.
+// ── atlas.packet_summary_census (read-only) ─────────────────────────────────
+// Counts canonical atlas_packets whose summary contains model drafting text
+// (LOG-13 / LOG-17). Returns totals and a bounded sample of packet keys.
+// Writes nothing: read-only transaction, bounded timeout.
+const PACKET_DRAFTING_MARKER_SQL = [
+  "summary ~* 'drafting (the )?summary'",
+  "summary ~* 'draft\\s*[0-9]*\\s*:'",
+  "summary ~* 'constraint checklist'",
+  "summary ~* 'the summary needs to be'",
+  "summary ~* 'draft the summary'",
+  "summary ~* 'synthesize the summary'",
+].join(' OR ');
+
+server.registerTool(
+  'atlas.packet_summary_census',
+  {
+    description:
+      'Read-only census of canonical atlas_packets summaries containing model drafting text. ' +
+      'Returns total and flagged counts plus a bounded sample of packet keys. Writes nothing.',
+    inputSchema: z.object({
+      sample: z.number().int().min(0).max(50).default(10),
+    }),
+  },
+  async ({ sample = 10 }) => {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN READ ONLY');
+      await client.query("SELECT set_config('statement_timeout', $1, true)", ['60000ms']);
+      const counts = await client.query(
+        `SELECT count(*)::int AS total,
+                count(*) FILTER (WHERE ${PACKET_DRAFTING_MARKER_SQL})::int AS flagged
+           FROM atlas_packets WHERE summary IS NOT NULL`,
+      );
+      const examples = await client.query(
+        `SELECT packet_key, source_ref FROM atlas_packets
+          WHERE ${PACKET_DRAFTING_MARKER_SQL}
+          ORDER BY packet_key LIMIT $1`,
+        [sample],
+      );
+      await client.query('ROLLBACK');
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({ ok: true, ...counts.rows[0], sample: examples.rows, writesPerformed: false }),
+          },
+        ],
+      };
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      return {
+        content: [{ type: 'text', text: JSON.stringify({ ok: false, error: (err as Error).message }) }],
+        isError: true,
+      };
+    } finally {
+      client.release();
+    }
+  },
+);
+
 server.registerTool(
   'atlas.packet_search',
   {
@@ -10352,6 +10651,7 @@ server.registerTool(
           limit: 1,
           with_payload: true,
         }),
+        signal: AbortSignal.timeout(5000),
       });
 
       if (!res.ok) {

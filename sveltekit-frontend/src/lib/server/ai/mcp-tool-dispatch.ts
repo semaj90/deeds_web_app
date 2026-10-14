@@ -10,9 +10,10 @@
  */
 
 import { join } from 'node:path';
+import { z } from 'zod';
 import { searchCodeLexical }       from '$lib/server/search/postgres-fts.js';
 import { searchQdrantCode }        from '$lib/server/search/qdrant-search.js';
-import { expandNeighbours }        from '$lib/server/search/neo4j-rerank.js';
+import { expandNeighbourPathEdges } from '$lib/server/search/neo4j-rerank.js';
 import { buildSubgraphV1SeedNeighborhood } from '$lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { fetchCodebaseContext }    from '$lib/server/ace/context-assembler.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
@@ -24,6 +25,9 @@ import { ENV } from '$lib/server/env.server.js';
 import { runRg } from '../../../../scripts/rg-atlas/run-rg.mjs';
 import { injectSummary, pickNextSemanticTaskPacket } from '$lib/server/ai/opencode-skill.js';
 import { runTaskSemanticPacketLifecycle } from '$lib/server/tasks/semantic-packets.js';
+import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
+import { runRapidsCommunityV1 } from '$lib/server/graph/rapids-community-client.js';
+import { graphExpandNeighborhoodInputSchema, resolveGraphExpandHops } from '../../../mcp/read-tool-bounds.js';
 
 // ── Shared result shape ───────────────────────────────────────────────────────
 
@@ -282,11 +286,21 @@ export async function tool_graph_expand_neighborhood(args: {
       );
     }
 
-    const maxHops: 1 | 2 = args.maxHops === 2 || Number(args.depth ?? 0) >= 2 ? 2 : 1;
+    const maxHops = resolveGraphExpandHops(args);
     const limit = Math.min(Math.max(Number(args.limit ?? 40), 1), 120);
 
-    const neighbourSets = await Promise.all(seedKeys.map((k) => expandNeighbours(k, maxHops)));
-    const neighborKeys = Array.from(new Set(neighbourSets.flat())).slice(0, limit);
+    const pathEdgeSets = await Promise.all(
+      seedKeys.map((k) => expandNeighbourPathEdges(k, maxHops, limit))
+    );
+    const edges = pathEdgeSets.flat().slice(0, limit).map((edge) => ({
+      from: edge.from,
+      to: edge.to,
+      relation: edge.relation,
+      hop: edge.hop,
+    }));
+    const seedKeySet = new Set(seedKeys);
+    const neighborKeys = Array.from(new Set(edges.flatMap(({ from, to }) => [from, to])
+      .filter((key) => !seedKeySet.has(key)))).slice(0, limit);
     const allKeys = Array.from(new Set([...seedKeys, ...neighborKeys]));
 
     // PageRank scores live in Redis at couchdb:pagerank_scores (written by run-pagerank.ts)
@@ -321,22 +335,8 @@ export async function tool_graph_expand_neighborhood(args: {
       isSeed: seedKeys.includes(key),
     }));
 
-    const edges = seedKeys.flatMap((seed) =>
-      neighborKeys
-        .filter((neighbor) => neighbor !== seed)
-        .map((neighbor) => ({
-          from: seed,
-          to: neighbor,
-          relation: 'IMPORTS',
-        }))
-    );
-
     const sourceRefs = Array.from(new Set(nodes.map((node) => node.sourceRef))).slice(0, limit);
-    const confidence = clamp01(
-      (seedKeys.length > 0 ? 0.45 : 0) +
-        Math.min(0.35, neighborKeys.length / Math.max(1, seedKeys.length * 8)) +
-        (Object.keys(pageRankMap).length > 0 ? 0.2 : 0)
-    );
+    const confidence = 0;
 
     const legacyNeighbors = neighborKeys.map((key) => ({
       stable_key: key,
@@ -361,6 +361,123 @@ export async function tool_graph_expand_neighborhood(args: {
     );
   } catch (e) {
     return err('graph.expand_neighborhood', String(e), Date.now() - t0);
+  }
+}
+
+export async function executeGraphExpandMcpTool(args: unknown): Promise<MCPToolResult> {
+  const parsed = graphExpandNeighborhoodInputSchema.safeParse(args);
+  if (!parsed.success) {
+    return err('graph:expand', parsed.error.issues.map((issue) => issue.message).join('; '), 0);
+  }
+
+  const { sourceRefs, stableKey, depth, ...options } = parsed.data;
+  const stableKeys = stableKey ? [stableKey] : undefined;
+  if (!sourceRefs?.length && !stableKeys?.length) {
+    return err('graph:expand', 'Provide at least one sourceRef or stableKey seed.', 0);
+  }
+
+  return tool_graph_expand_neighborhood({
+    ...options,
+    sourceRefs,
+    stableKeys,
+    depth,
+  });
+}
+
+const graphResidentBfsInputSchema = z.object({
+  graphRevision: z.string().trim().min(1),
+  projectionRevision: z.string().trim().min(1),
+  projectionChecksum: z.string().trim().min(1),
+  startNodeKey: z.string().trim().min(1),
+  depthLimit: z.number().int().min(0).max(2),
+  expectedArtifactChecksum: z.string().trim().min(1),
+  expectedGraphOrdinalMapChecksum: z.string().trim().min(1),
+}).strict();
+
+export async function executeGraphResidentBfsMcpTool(args: unknown): Promise<MCPToolResult> {
+  const startedAt = Date.now();
+  const parsed = graphResidentBfsInputSchema.safeParse(args);
+  if (!parsed.success) {
+    return err('graph:resident_bfs', parsed.error.issues.map((issue) => issue.message).join('; '), 0);
+  }
+
+  try {
+    const receipt = await createAtlasRapidsPageRankClient().bfs(parsed.data);
+    return ok('graph:resident_bfs', receipt, Date.now() - startedAt);
+  } catch (error) {
+    return err('graph:resident_bfs', error instanceof Error ? error.message : String(error), Date.now() - startedAt);
+  }
+}
+
+const graphResidentSourceRefBfsInputSchema = z.object({
+  graphRevision: z.string().trim().min(1),
+  projectionRevision: z.string().trim().min(1),
+  projectionChecksum: z.string().trim().min(1),
+  sourceRef: z.string().min(1),
+  expectedSourceRevision: z.string().trim().min(1),
+  expectedWorkspaceRevision: z.string().trim().min(1),
+  depthLimit: z.number().int().min(0).max(2),
+  matchLimit: z.number().int().min(1).max(16).optional(),
+  expectedArtifactChecksum: z.string().trim().min(1),
+  expectedGraphOrdinalMapChecksum: z.string().trim().min(1),
+}).strict();
+
+export async function executeGraphResidentSourceRefBfsMcpTool(args: unknown): Promise<MCPToolResult> {
+  const startedAt = Date.now();
+  const parsed = graphResidentSourceRefBfsInputSchema.safeParse(args);
+  if (!parsed.success) {
+    return err('graph:resident_source_ref_bfs', parsed.error.issues.map((issue) => issue.message).join('; '), 0);
+  }
+  if (parsed.data.sourceRef !== parsed.data.sourceRef.trim()) {
+    return err('graph:resident_source_ref_bfs', 'sourceRef must be normalized exactly', 0);
+  }
+
+  try {
+    const receipt = await createAtlasRapidsPageRankClient().sourceRefBfs(parsed.data);
+    return ok('graph:resident_source_ref_bfs', receipt, Date.now() - startedAt);
+  } catch (error) {
+    return err(
+      'graph:resident_source_ref_bfs',
+      error instanceof Error ? error.message : String(error),
+      Date.now() - startedAt,
+    );
+  }
+}
+
+const graphCommunityLeidenInputSchema = z.object({
+  graphRevision: z.string().trim().min(1),
+  topologyHash: z.string().trim().min(1),
+  projectionRevision: z.string().trim().min(1),
+  nodes: z.array(z.object({ nodeId: z.string().trim().min(1) }).strict()).min(1).max(512),
+  edges: z.array(z.object({
+    source: z.string().trim().min(1),
+    target: z.string().trim().min(1),
+    weight: z.number().finite().positive(),
+  }).strict()).max(4096),
+  resolution: z.number().finite().positive().max(10).optional(),
+  maxIterations: z.number().int().min(1).max(100).optional(),
+  randomState: z.number().int().min(0).max(2_147_483_647).optional(),
+}).strict();
+
+export async function executeGraphCommunityLeidenMcpTool(args: unknown): Promise<MCPToolResult> {
+  const startedAt = Date.now();
+  const parsed = graphCommunityLeidenInputSchema.safeParse(args);
+  if (!parsed.success) {
+    return err('graph:community_leiden', parsed.error.issues.map((issue) => issue.message).join('; '), 0);
+  }
+
+  try {
+    const response = await runRapidsCommunityV1({ ...parsed.data, algorithm: 'leiden' });
+    return ok('graph:community_leiden', {
+      schema: 'atlas.graph-community-advisory.v1',
+      status: 'DIAGNOSTIC_ONLY',
+      canonicalAuthority: false,
+      productionAdmitted: false,
+      writesPerformed: false,
+      response,
+    }, Date.now() - startedAt);
+  } catch (error) {
+    return err('graph:community_leiden', error instanceof Error ? error.message : String(error), Date.now() - startedAt);
   }
 }
 

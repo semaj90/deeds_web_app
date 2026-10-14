@@ -251,6 +251,7 @@
     "atlas:agentic:action-registry:owner-audit": "node scripts/atlas/audit-agentic-action-registry-owner-v1.mjs",
     "atlas:agentic:run-receipt:dry": "node scripts/atlas/record-agentic-run-receipt.mjs --dry-run",
     "test:atlas:agentic:run-receipt": "node scripts/atlas/record-agentic-run-receipt.smoke.mjs",
+    "test:atlas:legacy-384-policy": "node --test scripts/atlas/legacy-384-qdrant-policy.spec.mjs scripts/atlas/triton-trt-llm-batch-orchestrator.guard.test.mjs",
     "atlas:agentic:checkpoint-binding:audit": "node scripts/atlas/audit-agentic-checkpoint-binding-v1.mjs",
     "atlas:ranker:adapt:v3": "npm run atlas:docs:authority-text-review && node scripts/atlas/adapt-openspec-controller-to-ranker-v3.mjs",
     "atlas:docs:run-experience-owner": "node scripts/atlas/audit-agentic-run-experience-owner-v1.mjs",

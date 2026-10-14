@@ -492,6 +492,7 @@
 								type="button"
 								role="switch"
 								aria-checked={isOfficial}
+								aria-label="Official source"
 								onclick={() => { isOfficial = !isOfficial; }}
 								class="relative w-9 h-5 rounded-full transition-colors focus:outline-none focus:ring-2
 									focus:ring-indigo-500/50 {isOfficial ? 'bg-indigo-600' : 'bg-white/10'}"

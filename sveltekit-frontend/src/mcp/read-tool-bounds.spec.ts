@@ -19,6 +19,8 @@ import {
   graphAnalysisNeighborhoodInputSchema,
   graphCommunityForNodeInputSchema,
   graphExpandNeighborhoodInputSchema,
+  resolveGraphExpandHops,
+  graphNeighborhoodNeedsFallback,
   graphPageRankTopInputSchema,
   graphSemanticPathInputSchema,
   graphShortestPathInputSchema,
@@ -259,6 +261,18 @@ describe('ORF-7 read-tool input bounds', () => {
     expect(graphExpandNeighborhoodInputSchema.safeParse({
       sourceRefs: Array.from({ length: GRAPH_EXPAND_NEIGHBORHOOD_MAX_SEEDS + 1 }, (_, i) => `file:${i}`),
     }).success).toBe(false);
+  });
+
+  it('gives explicit maxHops precedence over the legacy depth default', () => {
+    expect(resolveGraphExpandHops({ maxHops: 1, depth: 2 })).toBe(1);
+    expect(resolveGraphExpandHops({ maxHops: 2, depth: 1 })).toBe(2);
+    expect(resolveGraphExpandHops({ depth: 1 })).toBe(1);
+    expect(resolveGraphExpandHops({})).toBe(2);
+  });
+
+  it('falls back when a graph traversal response has no edges', () => {
+    expect(graphNeighborhoodNeedsFallback([])).toBe(true);
+    expect(graphNeighborhoodNeedsFallback([{ from: 'a', to: 'b' }])).toBe(false);
   });
 
   it('rejects oversized graph identifiers and descriptive text', () => {

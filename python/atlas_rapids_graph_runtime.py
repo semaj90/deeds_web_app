@@ -14,6 +14,7 @@ import math
 import os
 import threading
 import time
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Callable, Literal
 
@@ -58,6 +59,61 @@ def _inside_root(path: Path, root: Path) -> bool:
 
 def _fail(code: str, message: str, status_code: int = 422) -> None:
     raise HTTPException(status_code=status_code, detail={"code": code, "message": message})
+
+
+def _js_json_value(value: Any) -> str:
+    if hasattr(value, "item"):
+        value = value.item()
+    if value is None or isinstance(value, bool) or isinstance(value, (str, int)):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ValueError("GRAPH_PARITY_ROW_NONFINITE_NUMBER")
+        if value == 0:
+            return "0"
+        absolute = abs(value)
+        if value.is_integer() and absolute < 1e21:
+            return str(int(value))
+        raw = repr(value).lower()
+        if "e" not in raw:
+            return raw
+        mantissa, exponent_text = raw.split("e", 1)
+        exponent = int(exponent_text)
+        if 1e-6 <= absolute < 1e21:
+            fixed = format(Decimal(raw), "f")
+            return fixed.rstrip("0").rstrip(".") if "." in fixed else fixed
+        return f"{mantissa}e{'+' if exponent >= 0 else ''}{exponent}"
+    raise ValueError("GRAPH_PARITY_ROW_VALUE_TYPE_INVALID")
+
+
+def _optional_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    if hasattr(value, "item"):
+        value = value.item()
+    if isinstance(value, float) and math.isnan(value):
+        return None
+    return str(value)
+
+
+def hash_graph_snapshot_parity_rows_v1(rows: list[dict[str, Any]]) -> str:
+    """Match the TypeScript exporter’s sorted-key JSON row hashing contract."""
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    for index, row in enumerate(rows):
+        if index:
+            digest.update(b",")
+        if not isinstance(row, dict):
+            raise ValueError("GRAPH_PARITY_ROW_INVALID")
+        fields = []
+        for key in sorted(row):
+            value = row[key]
+            if isinstance(value, float) and math.isnan(value):
+                value = None
+            fields.append(f"{json.dumps(key, ensure_ascii=False)}:{_js_json_value(value)}")
+        digest.update(("{" + ",".join(fields) + "}").encode("utf-8"))
+    digest.update(b"]")
+    return digest.hexdigest()
 
 
 class GraphLoadRequest(BaseModel):
@@ -113,6 +169,31 @@ class BFSRequest(BaseModel):
             self.depthLimit = bound
         elif self.depthLimit > bound:
             raise ValueError(f"GRAPH_BFS_DEPTH_EXCEEDS_{self.traversalMode}_BOUND_{bound}")
+        return self
+
+
+class SourceRefBFSRequest(BaseModel):
+    graphRevision: str = Field(min_length=1)
+    projectionRevision: str = Field(min_length=1)
+    projectionChecksum: str = Field(min_length=1)
+    sourceRef: str = Field(min_length=1)
+    expectedSourceRevision: str = Field(min_length=1)
+    expectedWorkspaceRevision: str = Field(min_length=1)
+    depthLimit: int = Field(ge=0, le=2)
+    matchLimit: int = Field(default=16, ge=1, le=16)
+    expectedArtifactChecksum: str = Field(min_length=1)
+    expectedGraphOrdinalMapChecksum: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def enforce_exact_identity(self) -> "SourceRefBFSRequest":
+        for name in (
+            "graphRevision", "projectionRevision", "projectionChecksum", "sourceRef",
+            "expectedSourceRevision", "expectedWorkspaceRevision", "expectedArtifactChecksum",
+            "expectedGraphOrdinalMapChecksum",
+        ):
+            value = getattr(self, name)
+            if value != value.strip():
+                raise ValueError(f"GRAPH_SOURCE_LOOKUP_{name.upper()}_NOT_NORMALIZED")
         return self
 
 
@@ -214,14 +295,25 @@ class ResidentGraph:
             raise ValueError("nodes.parquet and edges.parquet are required")
 
         t0 = time.perf_counter()
-        identity_gpu = cudf.read_parquet(
-            nodes_path,
-            columns=["gpu_node_id", "graph_node_key", "packet_key"],
-        )
-        self.edges_df = cudf.read_parquet(
-            edges_path,
-            columns=["src_gpu_node_id", "dst_gpu_node_id", "weight"],
-        )
+        identity_table_gpu = cudf.read_parquet(nodes_path)
+        parity_edges_gpu = cudf.read_parquet(edges_path)
+        node_rows = identity_table_gpu.to_pandas().sort_values("gpu_node_id").to_dict(orient="records")
+        edge_order = ["src_gpu_node_id", "dst_gpu_node_id"]
+        if "edge_type" in parity_edges_gpu.columns:
+            edge_order.append("edge_type")
+        edge_rows = parity_edges_gpu.to_pandas().sort_values(edge_order, kind="stable").to_dict(orient="records")
+        if hash_graph_snapshot_parity_rows_v1(node_rows) != self.node_table_hash:
+            raise ValueError("GRAPH_NODE_TABLE_CONTENT_HASH_MISMATCH")
+        if hash_graph_snapshot_parity_rows_v1(edge_rows) != self.edge_table_hash:
+            raise ValueError("GRAPH_EDGE_TABLE_CONTENT_HASH_MISMATCH")
+        identity_columns = [
+            "gpu_node_id", "graph_node_key", "packet_key", "source_ref",
+            "source_revision", "workspace_revision",
+        ]
+        identity_gpu = identity_table_gpu[[column for column in identity_columns if column in identity_table_gpu.columns]]
+        del identity_table_gpu
+        self.edges_df = parity_edges_gpu[["src_gpu_node_id", "dst_gpu_node_id", "weight"]]
+        del parity_edges_gpu
         # cugraph.pagerank's precomputed_vertex_out_weight requires a float sums
         # column; parquet exporters commonly emit integer edge weights (this
         # artifact's weight column is int64). Cast once here so both the graph's
@@ -281,7 +373,10 @@ class ResidentGraph:
         self.gpu_id_to_identity = {
             int(row.gpu_node_id): {
                 "nodeKey": str(row.graph_node_key),
-                "packetKey": None if row.packet_key is None else str(row.packet_key),
+                "packetKey": _optional_text(row.packet_key),
+                "sourceRef": _optional_text(getattr(row, "source_ref", None)),
+                "sourceRevision": _optional_text(getattr(row, "source_revision", None)),
+                "workspaceRevision": _optional_text(getattr(row, "workspace_revision", None)),
             }
             for row in identity_host.itertuples(index=False)
         }
@@ -877,6 +972,74 @@ class GraphRuntimeManager:
                 _fail("BFS_EXECUTION_FAILED", f"{type(exc).__name__}: {exc}", 500)
         raise AssertionError("unreachable")
 
+    def source_ref_bfs(self, req: SourceRefBFSRequest) -> dict[str, Any]:
+        with self._lock:
+            self._assert_request_identity(req)
+            resident = self._resident
+            if resident.workspace_revision != req.expectedWorkspaceRevision:
+                _fail("GRAPH_SOURCE_WORKSPACE_REVISION_MISMATCH", "requested workspace revision does not match resident graph", 409)
+
+            source_matches = [
+                (ordinal, identity)
+                for ordinal, identity in resident.gpu_id_to_identity.items()
+                if identity.get("sourceRef") == req.sourceRef
+            ]
+            if not source_matches:
+                _fail("GRAPH_SOURCE_REF_NOT_FOUND", "exact sourceRef is absent from the resident projection", 404)
+            if len(source_matches) > req.matchLimit:
+                _fail("GRAPH_SOURCE_REF_MATCH_LIMIT_EXCEEDED", "exact sourceRef exceeds the requested match limit")
+            for _, identity in source_matches:
+                if not identity.get("sourceRevision") or not identity.get("workspaceRevision"):
+                    _fail("GRAPH_SOURCE_METADATA_INCOMPLETE", "matched graph node lacks source/workspace revision metadata")
+                if identity["sourceRevision"] != req.expectedSourceRevision:
+                    _fail("GRAPH_SOURCE_REVISION_MISMATCH", "matched graph node source revision differs from request", 409)
+                if identity["workspaceRevision"] != req.expectedWorkspaceRevision:
+                    _fail("GRAPH_SOURCE_NODE_WORKSPACE_REVISION_MISMATCH", "matched graph node workspace revision differs from request", 409)
+
+            matches = []
+            for ordinal, identity in sorted(source_matches, key=lambda item: (item[0], item[1]["nodeKey"])):
+                bfs_receipt = resident.bfs(BFSRequest(
+                    graphRevision=req.graphRevision,
+                    projectionRevision=req.projectionRevision,
+                    projectionChecksum=req.projectionChecksum,
+                    startNodeKey=identity["nodeKey"],
+                    depthLimit=req.depthLimit,
+                    expectedArtifactChecksum=req.expectedArtifactChecksum,
+                    expectedGraphOrdinalMapChecksum=req.expectedGraphOrdinalMapChecksum,
+                ))
+                bfs_receipt["results"] = [
+                    {
+                        **row,
+                        "sourceRef": resident.gpu_id_to_identity[int(row["gpuNodeId"])].get("sourceRef"),
+                        "sourceRevision": resident.gpu_id_to_identity[int(row["gpuNodeId"])].get("sourceRevision"),
+                        "workspaceRevision": resident.gpu_id_to_identity[int(row["gpuNodeId"])].get("workspaceRevision"),
+                    }
+                    for row in bfs_receipt["results"]
+                ]
+                matches.append({
+                    "graphOrdinal": ordinal,
+                    "nodeKey": identity["nodeKey"],
+                    "packetKey": identity.get("packetKey"),
+                    "sourceRef": req.sourceRef,
+                    "sourceRevision": identity["sourceRevision"],
+                    "workspaceRevision": identity["workspaceRevision"],
+                    "traversal": bfs_receipt,
+                })
+            return {
+                "schema": "atlas.graph-source-ref-bfs-receipt.v1",
+                "sourceRef": req.sourceRef,
+                "sourceRevision": req.expectedSourceRevision,
+                "workspaceRevision": req.expectedWorkspaceRevision,
+                "graphRevision": resident.graph_revision,
+                "projectionRevision": resident.projection_revision,
+                "projectionChecksum": resident.projection_checksum,
+                "artifactChecksum": resident.artifact_checksum,
+                "graphOrdinalMapChecksum": resident.graph_ordinal_map_checksum,
+                "matches": matches,
+                "writesPerformed": False,
+                "canonicalAuthority": False,
+            }
+
 
 def install_graph_routes(
     app: FastAPI,
@@ -904,6 +1067,10 @@ def install_graph_routes(
     @router.post("/bfs")
     def graph_bfs(req: BFSRequest) -> dict[str, Any]:
         return manager.bfs(req)
+
+    @router.post("/source-ref-bfs")
+    def graph_source_ref_bfs(req: SourceRefBFSRequest) -> dict[str, Any]:
+        return manager.source_ref_bfs(req)
 
     @router.post("/connected-components")
     def graph_connected_components(req: ComponentsRequest) -> dict[str, Any]:

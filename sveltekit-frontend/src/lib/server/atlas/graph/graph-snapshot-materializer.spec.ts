@@ -160,6 +160,20 @@ const baseInput = {
 } as const;
 
 describe('graph snapshot materializer', () => {
+  it('includes an explicitly source-bound tree revision in the node row and inventory identity', () => {
+    const sourceRevision = `sha256:${'a'.repeat(64)}`;
+    const unbound = materializeGraphSnapshot(baseInput);
+    const bound = materializeGraphSnapshot({
+      ...baseInput,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`,
+      treeNodes: baseInput.treeNodes.map((node, index) => index === 0 ? { ...node, sourceRevision } : node),
+    });
+    const root = bound.graphSnapshotNodes.find((node) => node.nodeKey === 'tree:11111111-1111-4111-8111-111111111111');
+
+    expect(root?.properties).toMatchObject({ sourceRevision, workspaceRevision: `sha256:${'b'.repeat(64)}` });
+    expect(bound.graphSnapshotProof.sourceInventoryHash).not.toBe(unbound.graphSnapshotProof.sourceInventoryHash);
+  });
+
   it('materializes a deterministic immutable snapshot with exclusion accounting', () => {
     const left = materializeGraphSnapshot(baseInput);
     const right = materializeGraphSnapshot({

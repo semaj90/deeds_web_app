@@ -4517,3 +4517,6 @@ the already-running container image.
   complete expected-source coverage, or absence of rows skipped by older
   conflict-ignoring writers. The existing packet-write admission owner and
   revision/collision guards remain in force; no writer or schema was changed.
+# 2026-10-13 reranker default alignment (source-only)
+
+- `python/parent_atlas_neural_router/train_tool_cross_encoder.py` previously defaulted to `cross-encoder/ms-marco-MiniLM-L-6-v2`. This is a reranking cross-encoder, not the 384-D MiniLM embedding model, but it was an implicit model selection inconsistent with the active serving reranker. The default now matches `scripts/reranker-sidecar.py` (`mixedbread-ai/mxbai-rerank-base-v2`); `--model` remains available for an explicit experiment. No training, download, or model promotion was performed. This does not establish the training script is invoked or the selected model is quality-qualified for tool routing.

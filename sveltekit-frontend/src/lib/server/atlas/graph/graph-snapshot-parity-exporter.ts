@@ -12,6 +12,8 @@ export interface GraphSnapshotParityNodeInput {
 	nodeType: string;
 	sourceRef?: string | null;
 	packetKey?: string | null;
+	sourceRevision?: string | null;
+	workspaceRevision?: string | null;
 }
 
 export interface GraphSnapshotParityEdgeInput {
@@ -26,8 +28,8 @@ export interface GraphSnapshotParityNodeRow {
 	graph_node_key: string;
 	node_kind: string;
 	source_ref: string | null;
-	/** Not yet a proven identity axis (see memory: source_revision SOURCE_NOT_LOCATED). Always null until a real writer exists. */
 	source_revision: string | null;
+	workspace_revision: string | null;
 	packet_key: string | null;
 	/** Not yet wired to a symbol identity table. Always null until that axis is proven. */
 	symbol_id: string | null;
@@ -73,7 +75,8 @@ export function buildGraphSnapshotParityTables(input: {
 			graph_node_key: node.nodeKey,
 			node_kind: node.nodeType,
 			source_ref: node.sourceRef ?? null,
-			source_revision: null,
+			source_revision: node.sourceRevision ?? null,
+			workspace_revision: node.workspaceRevision ?? null,
 			packet_key: node.packetKey ?? null,
 			symbol_id: null,
 			symbol_version_id: null

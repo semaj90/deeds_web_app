@@ -16,6 +16,7 @@ export type GraphSnapshotParityArtifactPaths = z.infer<typeof GraphSnapshotParit
 export const GraphSnapshotParityManifestSchema = z
 	.object({
 		graphRevision: z.string().min(1),
+		workspaceRevision: z.string().min(1).optional(),
 		nodeCount: z.number().int().nonnegative(),
 		edgeCount: z.number().int().nonnegative(),
 		producerRevision: z.string().min(1),

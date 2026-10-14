@@ -1320,3 +1320,273 @@ The current-owner correction follows the repository's active instructions. It
 supersedes older task-history statements that called `content_embedding` the
 current pick; those dated measurements and V1 receipts remain historical
 evidence, not rewritten facts.
+
+### PACKET-REVISION-OWNER-QUALIFICATION-01 (2026-10-13; read-only, partial)
+
+- [x] Rechecked the bounded source call sites for
+      `persistCanonicalSemanticPacketEmbedding()` and
+      `persistAdmittedSemanticPacketEmbedding()`. No production caller was
+      found under `sveltekit-frontend/src`; the only route mention is a comment
+      in `routes/api/admin/batch-embeddings/embed/+server.ts`. This establishes
+      no in-repository production reachability in the inspected source, not the
+      absence of dynamic or external callers.
+- [x] Inspected the candidate writer, admission schema, packet-revision
+      derivation and transaction scaffold. `persistAdmitted...()` validates a
+      supplied admission envelope and attaches metadata, then reaches the same
+      `ON CONFLICT` upsert. The write path does not independently resolve the
+      execution/source binding, use revision-qualified compare-and-swap, check
+      affected-row count, or independently read back the stored vector.
+      `source_revision` can be null; on conflict a supplied revision replaces
+      the prior value while a missing revision preserves it. The separate
+      `executePacketWriteTransaction()` is explicitly scaffolding, is not wired
+      to this writer, and its INSERT handles identity fields rather than the
+      complete embedding write contract. It rejects checksum workspace
+      revisions because the existing storage field is integer-valued.
+- [x] Refreshed the read-only live schema/count census: `atlas_packets.embedding`
+      is declared `vector(768)`; `packet_id` is the primary key and
+      `packet_key` has a unique constraint. The inspected live columns include
+      nullable `source_ref`, nullable `source_revision`, integer
+      `workspace_revision` (observed value 0), integer
+      `representation_revision`, nullable `content_hash`, nullable
+      `embedding_digest`, and nullable `encoder_revision`. The observed census
+      had 61,718 rows, 16,151 non-null source revisions, 353 non-null content
+      hashes, and 1 non-null embedding digest. These aggregate counts do not
+      establish per-row current-source or model provenance. The live
+      `source_ref` nullability differs from the Drizzle declaration and remains
+      schema drift to reconcile.
+- [x] Recorded the adjacent read-only cohort gates: admitted workspace snapshot
+      exact-byte readback was 25,542/25,542 with zero violations, but that proves
+      snapshot bytes only. The bounded 128-source packet/chunk join returned
+      `CURRENT_PACKET_CHUNK_JOIN_MISSING`: 0 proven packet/chunk lineage sources
+      and 0 packet-content or chunk-file-content matches. These results do not
+      qualify a production packet writer.
+- [ ] Keep `semantic-packet-writer.ts` a provisional candidate only. Schema
+      compatibility is partial; canonical source derivation, active caller
+      qualification, idempotent replay, source-change supersession/invalidation,
+      single-writer authority, transactional vector write, and independent
+      readback remain unproven. Do not wire it into production or mark
+      `PacketRevisionOwnerV1` authoritative.
+- [ ] Continue D1 with source/caller and schema reconciliation, then design a
+      shared guarded write/readback path only if the existing owners can supply
+      the required bindings. Keep event-driven workboard integration behind
+      canonical task/evidence reconciliation; do not add a parallel scheduler
+      or let agent output declare task completion.
+
+Evidence: `.tmp/atlas/graphify-workspace-snapshot-binding-20261013.json`,
+`.tmp/atlas/current-workspace-packet-chunk-join-20261013.json`, live read-only
+schema/count query (2026-10-13), and source inspection of
+`sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts` and
+`sveltekit-frontend/src/lib/server/atlas/identity/packet-write-transaction-v1.ts`.
+The focused Vitest invocation produced no diagnostics and was stopped; no test
+pass is claimed. No database, Qdrant, Valkey, cache, or model writes occurred.
+
+### SEM768-MODEL-PROVENANCE-01 (2026-10-13; source-only recheck)
+
+- [x] Traced the current provider-to-lineage declarations. The embedding
+  provider resolves its model ID as mutable `embeddinggemma:latest`; the
+  canonical packet writer defaults `encoderRevision` to the semantic
+  projection contract revision, not an immutable model artifact digest. The
+  separate `EmbeddingModelManifestV1` requires a SHA-256 model checksum but has
+  no non-test consumer in `sveltekit-frontend/src`.
+- [x] Reconciled this with the current AST/source qualification receipt:
+  model-qualified producer rows are `0/55,169`, and fully qualified production
+  candidates are `0/55,169`. A 768-D width and `EmbeddingGemma` family label
+  therefore remain insufficient to qualify this historical cohort.
+- [ ] Keep canonical vector materialization and latent promotion blocked until
+  an active producer resolves an immutable model artifact identity, binds it
+  to the exact input/source/workspace revisions, and supplies independently
+  verifiable write/readback evidence. Do not populate the manifest from the
+  mutable tag or infer a digest from vector width.
+
+Evidence: `sveltekit-frontend/src/lib/server/embedding/embedding-provider-v1.ts`,
+`sveltekit-frontend/src/lib/server/embedding/semantic-lineage.ts`,
+`sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts`,
+`sveltekit-frontend/src/lib/server/atlas/embedding/embedding-model-manifest-v1.ts`,
+and `docs/reports/ast-source-lineage-qualification-2026-10-13.json`. Source and
+existing report inspection only; no store operations were performed.
+
+- **ONNX/API provenance follow-up (2026-10-13; source-only):**
+  `onnx-server.ts` hashes the loaded ONNX model bytes and constructs a
+  checksum-qualified `representationRevision` in `SessionInfo`, but
+  `runEmbedding()` discards both values and returns only the vector. The
+  `/api/embed` route then reports the mutable `embeddinggemma:latest` label
+  regardless of whether the ONNX result or the fallback `embedText()` result
+  supplied the vector. This is a source-level provenance gap, not proof of the
+  live provider or model artifact. Before using this endpoint for canonical
+  writes, preserve the selected provider and immutable model identity through
+  the response/execution receipt; fallback results must carry their own
+  independently resolved identity or fail closed. No endpoint call or store
+  write was performed.
+
+- **Embedding cache wrapper provenance follow-up (2026-10-13; source-only):**
+  `grpc/embedding-client.ts` has a stricter cache path: it resolves an Ollama
+  artifact digest, disables cache reuse when identity cannot be qualified,
+  and constructs a V2 key containing model artifact, representation, tokenizer,
+  input-policy and normalized-input identity. However, the exported
+  `embedding/embed.ts::embedText()` facade first reads the legacy Redis and
+  PostgreSQL caches, then asynchronously writes generated vectors back through
+  those caches using the mutable default model label. Its text-only in-flight
+  key is also not representation-qualified. This wrapper can therefore bypass
+  the stricter V2 identity gate on its own cache hits. Before using this facade
+  for canonical evidence, trace/remove legacy cache reads from that path or
+  migrate them behind the V2 identity contract; preserve read-only inspection
+  and do not bulk-delete existing entries. Source inspection only; no cache or
+  database operations were performed.
+
+- **Embedding facade cache boundary correction (2026-10-13; code/tests only):**
+  `embedText()` and `embedTexts()` no longer read or populate the legacy
+  text/model-label Redis and PostgreSQL caches, and no longer deduplicate
+  concurrent calls by text alone. They delegate cache behavior to
+  `grpc/embedding-client.ts`, whose V2 cache is used only when an immutable
+  Ollama artifact digest and the required input/provider identity are
+  available; otherwise the request proceeds without cache reuse/population.
+  The focused role/cache tests pass 9/9. This closes the facade bypass only;
+  direct imports of legacy cache helpers elsewhere in the repository remain
+  outside this change and require a caller census. No live endpoint or store
+  operation was run.
+- **Remaining cache-caller census leads (2026-10-13; source search only):**
+  `lib/server/batch-embedder.ts` still directly imports the legacy
+  `embedding-cache.ts` wrappers; `lib/server/rg-atlas/embed.ts` directly uses
+  `embeddingCacheService`; and the `embedding-persist.ts` module still exposes
+  PostgreSQL read/write helpers. These are reachability leads only, not proof
+  each path is active or canonical. Trace their actual callers and cache-key
+  identity before changing or retiring them.
+- **Direct cache-caller containment follow-up (2026-10-13; code/tests only):**
+  `batch-embedder.ts` now preserves its bounded batching window but delegates
+  generation and any permitted cache access to `grpc/embedding-client.ts`;
+  repository search found no other in-repo caller of its exports. The active
+  `rg-atlas/embed.ts` callers in `run.ts`, `qdrant-union.ts`, and
+  `karpathy-blend.ts` now use that same provider client and reject noncanonical
+  model labels instead of using alias-keyed `embeddingCacheService` entries.
+  The facade no longer imports `embedding-persist.ts`; source search found no
+  remaining non-test caller of that PostgreSQL cache module. These are bounded
+  in-repo source findings, not proof that external/dynamic consumers are absent.
+  Focused embedding/cache tests pass 13/13; no live endpoint or store was used.
+- **Retrieval cache caller follow-up (2026-10-13; code only):**
+  `retrieval/orchestrator.ts` and `features/rag/codebase-context.ts` no longer
+  read or write alias-keyed legacy embedding cache entries. Both request vectors
+  through `grpc/embedding-client.ts`; the orchestrator rejects non-finite or
+  non-768 outputs. Cache reuse remains governed by the provider client's
+  immutable model/input identity gate, so this change favors a cache miss over
+  unqualified reuse. The SSE chat route still has direct legacy cache and
+  embedding call sites and remains an open caller-census/migration item.
+  No live embedding endpoint or cache was accessed.
+- **SSE chat and semantic response-cache provenance gate (2026-10-13; code/tests):**
+  The SSE chat route and `ai/llm-cache.ts` now generate query vectors through
+  the shared embedding client instead of the mutable-label direct Ollama/cache
+  bypass. The Qdrant L2 response cache now requires the current immutable
+  embedding artifact digest in its query filter and stored payload; legacy
+  points without that field cannot hit. A write with an absent/mismatched
+  caller revision regenerates the query vector through the shared digest-gated
+  client, and no cache write occurs when the artifact revision is unavailable.
+  These are source and focused-test results, not live cache reconciliation or
+  runtime proof. The focused cache/embedding/retrieval suites passed 31/31;
+  esbuild syntax checks and strict OpenSpec validation passed. `npm run check`
+  did not complete: `svelte-check` remained silent while consuming about 5 GB
+  of memory and was stopped. Existing cache points were not read or deleted.
+
+### PacketRevisionOwnerV1 writer/schema/caller recheck (2026-10-13; source + read-only schema)
+
+- The strict `persistAdmittedSemanticPacketEmbedding()` wrapper validates an
+  admission envelope and derives a packet revision, then delegates to the
+  existing semantic packet writer. It stores `workspaceRevision` and the
+  binding checksum inside `metadata.canonical_packet_admission`; the delegated
+  insert/upsert does not populate the live `workspace_revision_key` column.
+  The lower-level compatibility writer also permits omitted `sourceRevision`
+  and `contentHash`, preserving null when not supplied.
+- Live read-only `information_schema.columns` confirms
+  `atlas_packets.workspace_revision_key` exists as nullable `text`, while
+  `workspace_revision` and `representation_revision` are non-null `integer`
+  columns defaulting to `0`. The tracked root manual migration
+  `drizzle/manual/20260916_atlas_packets_lineage.sql` explicitly adds this
+  nullable text field plus `lineage_binding_checksum` and
+  `lineage_producer_revision`; its comment explicitly preserves the legacy
+  integer field. Thus a new DDL proposal is not the next step for this observed
+  database. At the time of the first audit the frontend Drizzle `atlasPackets`
+  declaration lacked mappings for the three added text columns; the follow-up
+  below now maps them. The bounded search found no corresponding entry in
+  `sveltekit-frontend/drizzle/sidecar-migrations.json`, so reconcile the existing
+  manual migration’s deployment/registration owner before writer integration;
+  do not add duplicate DDL.
+- A non-test caller search found no call to
+  `persistAdmittedSemanticPacketEmbedding()`. The batch embedding route
+  explicitly defers canonical PostgreSQL persistence because it lacks a
+  server-owned source admission; it separately attempts a Valkey/Redis cache
+  write. That cache path was not invoked in this review and cannot establish
+  packet authority.
+- The single-ordinal probe recorded above is consistent with the missing
+  dedicated workspace binding, but does not attribute that historical row to
+  this writer. Writer authority, caller inputs, transaction/readback lifecycle,
+  and immutable model identity remain unproven.
+- [ ] Keep `PacketRevisionOwnerV1` provisional. Before wiring a caller, reconcile
+  the `workspace_revision_key` ORM/migration owner, require a trusted source
+  binding and immutable embedding-model digest, persist the admitted workspace
+  key through the owning contract, and prove conditional write plus independent
+  readback. Do not invoke the current route or writer to test this; the route
+  has a separate cache side effect.
+- [x] Focused `semantic-packet-writer.spec.ts` passes **10/10** with an injected
+  mock database. This validates local writer-contract behavior only; no live
+  persistence, transaction, or independent readback was exercised.
+
+Evidence: `sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts`,
+`sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.spec.ts`,
+`sveltekit-frontend/src/routes/api/admin/batch-embeddings/embed/+server.ts`,
+`sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts`, bounded live
+read-only `information_schema.columns` query, `drizzle/manual/20260916_atlas_packets_lineage.sql`, and
+`.tmp/atlas/session121-single-ordinal-lineage-check-20261013.json`. No database,
+Valkey, Redis, Qdrant, cache, model, or source-file writes were performed.
+
+### Existing packet-lineage columns mapped into the active Drizzle model (2026-10-13; code/test)
+
+- Added `workspaceRevisionKey`, `lineageBindingChecksum`, and
+  `lineageProducerRevision` to the active `atlasPackets` declaration imported by
+  `sveltekit-frontend/src/lib/server/db/schema.ts`. Declared the two partial
+  indexes using the exact names and predicates from the existing root manual SQL.
+- This is ORM metadata alignment only: no SQL was generated or applied, and no
+  writer was changed or invoked. The strict writer still puts workspace revision
+  and binding checksum in JSON metadata rather than the dedicated text columns;
+  the admission contract has no qualified producer-revision field.
+- Focused `semantic-packet-writer.spec.ts` passes **10/10** with a mock database.
+  Strict OpenSpec validation and `git diff --check` pass. This does not prove the
+  migration is registered for every runtime environment or prove persistence and
+  independent readback.
+
+Evidence: `sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts`,
+`sveltekit-frontend/src/lib/server/db/schema.ts`,
+`drizzle/manual/20260916_atlas_packets_lineage.sql`, the focused mocked writer
+suite, and the live read-only schema check. The migration-registration and
+PacketRevisionOwnerV1 authority gates remain open.
+
+### Migration registration readback (2026-10-13; read-only)
+
+- Live PostgreSQL read-only inspection confirms `drizzle.__drizzle_migrations`,
+  `public.migrations`, and all three lineage columns exist. A lookup in
+  `public.migrations` for `20260916_atlas_packets_lineage.sql` returned no row.
+  This proves the columns are present but does not identify which migration
+  applied them or establish deployment-wide registration.
+- The local SQL checksum is
+  `sha256:4261630f6b70bc18a28561b6cd566e5126421bb8b6035dede3563b9a33b168e4`;
+  a read-only comparison against `drizzle.__drizzle_migrations.hash` returned
+  zero matching rows. The SQL is therefore not evidenced as a Drizzle-journaled
+  migration in this database; manual application or another deployment history
+  remains possible but unproven.
+- The active SvelteKit Drizzle config points at
+  `sveltekit-frontend/src/lib/server/db/schema.ts` and outputs to
+  `sveltekit-frontend/drizzle`. The existing contract-map audit enumerates only
+  `sveltekit-frontend/drizzle/manual` plus its sidecar manifest; the lineage SQL
+  currently lives under root `drizzle/manual`. The current manual migration
+  runner executes an explicitly supplied SQL path and does not itself register
+  a filename receipt. Do not infer that the active migrator owns this root SQL.
+- `sveltekit-frontend/drizzle/sidecar-migrations.json` has concurrent local
+  edits; it was not modified. Do not duplicate or register the SQL there until
+  the migration owner resolves the root/frontend path and deployment history.
+- [ ] Reconcile the root manual SQL with the active migration/sidecar owner and
+  deployment receipt. Preserve the observed live columns; do not reapply DDL or
+  mark registration complete based on column presence alone.
+
+Evidence: read-only `information_schema` and migration-table queries;
+`sveltekit-frontend/drizzle.config.ts`;
+`scripts/atlas/audit-atlas-indexing-surfaces.mjs`;
+`sveltekit-frontend/scripts/db/apply-sidecar-migration.mjs`;
+`drizzle/manual/20260916_atlas_packets_lineage.sql`. No schema or data writes
+were performed.

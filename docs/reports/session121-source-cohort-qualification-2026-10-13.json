@@ -1,0 +1,145 @@
+{
+  "schema": "atlas.session121-source-cohort-qualification.v1",
+  "auditDate": "2026-10-13",
+  "status": "BLOCKED_CURRENT_LINEAGE_AND_MODEL_PROVENANCE",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseReadOnly": true,
+  "snapshot": {
+    "path": "docs/reports/semantic768-ae-training-snapshot-v4.json",
+    "statusInSourceManifest": "FROZEN_SNAPSHOT_PROVEN",
+    "generatedAt": "2026-08-30T20:30:36Z",
+    "rowCount": 55169,
+    "dimensions": 768,
+    "matrixChecksum": "bd36c163938a661f9c0b3f68dd1a0eb7e576405268ebe9c2221df689697441b0",
+    "ordinalMapPath": "docs/reports/semantic768/frozen_semantic_768_v4_ordinal_map.json",
+    "ordinalMapChecksum": "c9f1b6306d71cdf96315c639212ec53c26025e0223099142a7bd21da68f73c8b",
+    "ordinalMapRows": 55169,
+    "uniqueIds": 55169,
+    "uniqueOrdinals": 55169,
+    "ordinalRange": [0, 55168],
+    "rowsWithSourceRef": 52380,
+    "rowsWithoutSourceRef": 2789,
+    "distinctSourceRefStrings": 4480,
+    "sourceRefCoverageManifestMeaning": "distinct source-ref strings; not row coverage"
+  },
+  "producerQualification": {
+    "snapshotSourceColumn": "codebase_chunk_index.content_embedding",
+    "liveSqlType": "halfvec(768)",
+    "canonicalTargetColumn": "codebase_chunk_index.content_embedding_768",
+    "canonicalTargetSqlType": "vector(768)",
+    "manifestRepresentationLabel": "semantic_768",
+    "manifestProducerRevision": "embeddinggemma:latest",
+    "manifestExporterCodeRevision": null,
+    "verdict": "NOT_PROVEN",
+    "reasons": [
+      "The frozen snapshot selected the historical/transition halfvec column, not the canonical vector(768) target column.",
+      "The producer is a mutable model tag rather than an immutable model digest.",
+      "The snapshot manifest does not carry per-row model, source, workspace, or representation revisions."
+    ]
+  },
+  "livePostgresReadback": {
+    "database": "legal_ai_db",
+    "table": "public.codebase_chunk_index",
+    "totalRows": 274465,
+    "contentEmbedding768Rows": 219998,
+    "sourceRevisionPopulatedRows": 0,
+    "workspaceRevisionPopulatedRows": 0,
+    "representationRevisionPopulatedRows": 0,
+    "transactionMode": "READ ONLY",
+    "observed": "2026-10-13"
+  },
+  "liveRepresentationSchemaReadback": {
+    "database": "legal_ai_db",
+    "table": "public.codebase_chunk_index",
+    "transactionMode": "READ ONLY",
+    "totalRows": 274465,
+    "columns": {
+      "content_embedding": { "type": "halfvec(768)", "populatedRows": 55169 },
+      "content_embedding_768": { "type": "vector(768)", "populatedRows": 219998 },
+      "latent_128": { "type": "halfvec(128)", "populatedRows": 55169 },
+      "latent_256": { "type": "halfvec(256)", "populatedRows": 55169 },
+      "latent_64": { "type": "vector(64)", "populatedRows": 1703 }
+    },
+    "chunkRowRevisionCoverage": {
+      "sourceRevisionRows": 0,
+      "workspaceRevisionRows": 0,
+      "representationRevisionRows": 0
+    },
+    "observed": "2026-10-13",
+    "limitations": [
+      "Column presence and population do not establish model/checkpoint provenance or current-source lineage.",
+      "This current live readback supersedes historical ledger statements that latent_128 or latent_256 columns were absent; those statements describe earlier states or were incorrect for this readback."
+    ]
+  },
+  "snapshotOrdinalCrosswalk": {
+    "method": "Read-only CTE joined each frozen ordinal-map UUID to codebase_chunk_index.id, atlas_packet_chunk_lineage.chunk_row_id, atlas_packets.packet_key, and atlas_workspace_source_bindings using exact source revision and packet workspace revision.",
+    "snapshotIdsFoundInCurrentChunkIndex": 55169,
+    "nonNullMapPathsMatchingChunkSourceRef": 52380,
+    "nonNullMapPathMismatches": 0,
+    "idsWithPacketChunkLineage": 11314,
+    "idsWithProvenLineageStatus": 11314,
+    "packetLineageSourceRevisionMatches": 11241,
+    "uniqueWorkspaceQualifiedBindingsWithDigest": 11241,
+    "exactSnapshotChunkPacketBindingRows": 8863,
+    "exactBindingDefinition": "PROVEN lineage; map path, chunk source_ref, lineage source_ref, and packet source_ref agree; packet and lineage source revisions agree; one source binding matches the same source revision and packet workspace_revision_key and has content_digest.",
+    "exactBindingRowsWithValidPacketByteSpan": 0,
+    "exactBindingRowsWithSymbolId": 7479,
+    "exactBindingRowsWithPacketBindingChecksum": 8863,
+    "exactBindingRowsWithLineageProducerRevision": 8863,
+    "exactBindingRowsWithCurrentCanonicalVector768": 15,
+    "sourceByteAndPacketSpanVerification": "NOT_PROVEN; packet byte_start/byte_end are absent or invalid for all 8,863 exact packet-binding rows. A separate AST observation join is reported below and does not establish that source bytes were reopened during this audit."
+  },
+  "astObservationCrosswalk": {
+    "owner": "public.atlas_ast_nodes via existing Atlas AST evidence reader contract",
+    "method": "Read-only join of the 8,863 exact snapshot/chunk/packet/workspace-binding candidates to AST observations by relative_path and exact source_revision; compared AST source_content_hash with the unique workspace binding content_digest.",
+    "exactBindingCandidates": 8863,
+    "candidateIdsWithPathAndMatchingSourceRevisionAst": 1676,
+    "candidateIdsWithValidAstByteSpans": 1676,
+    "candidateIdsWithAstHashMatchingWorkspaceBindingDigest": 1676,
+    "astRowsWithBothHashesCompared": 147163,
+    "astRowsWithMatchingHashes": 147163,
+    "candidateIdsWithExactlyOnePathRevisionAstRow": 59,
+    "candidateIdsWithMultiplePathRevisionAstRows": 1617,
+    "candidateIdsWithPacketTreeNodeIdMatch": 0,
+    "candidateIdsWithPacketWorkspaceIdMatch": 0,
+    "candidateIdsWithSourceRefKeyAndRepoIdMatch": 0,
+    "candidateIdsWithBindingRepoIdMatch": 0,
+    "candidateIdsWithRepositoryRootMapping": 0,
+    "sourceBytesReopenedAndHashed": false,
+    "repoIdentityJoinVerified": false,
+    "verdict": "AST_PATH_REVISION_CANDIDATES_ONLY_IDENTITY_JOIN_BLOCKED",
+    "limitations": [
+      "The 1,676 path/revision candidate intersection was checked against the 8,863 packet/binding set, but candidate-to-AST identity is not established: packet tree_node_id matched zero AST tree_node_id values, packet workspace_id matched zero AST workspace_id values, and source-ref/repository identity joins matched zero.",
+      "Only 59 candidate IDs have exactly one AST row under the path/revision join; the other 1,617 have multiple AST rows and must not be resolved by arbitrary selection.",
+      "The AST table match is path and revision qualified, but this audit did not reopen the underlying file bytes.",
+      "Packet byte spans remain unverified; AST node spans are observations and were not independently checked against current source bytes.",
+      "The snapshot vectors still lack immutable per-row embedding-model and representation revisions; AST linkage does not establish vector producer lineage."
+    ]
+  },
+  "currentSnapshotRowMetadataReadback": {
+    "snapshotIdsFound": 55169,
+    "rowsWithHalfvec768": 55169,
+    "rowsWithVector768": 739,
+    "rowsWithEmbeddingGemmaModelLabel": 55169,
+    "distinctEmbeddingModelLabels": 3,
+    "rowsWithNonNullEmbeddingVersion": 52528,
+    "distinctEmbeddingVersionLabels": 737,
+    "rowsWithQdrantBackfillV1VersionLabel": 51789,
+    "rowsWith64HexVersionValues": 724,
+    "meaningOfEmbeddingVersionValues": "NOT_ESTABLISHED; do not assume these are immutable model digests.",
+    "readOnly": true
+  },
+  "relatedAdmissionEvidence": {
+    "candidateSnapshotReport": "docs/reports/current-semantic-candidate-snapshot-v1.json",
+    "candidateSnapshotReportRecordedStatus": "BLOCKED_CURRENT_LINEAGE",
+    "candidateSnapshotReportFreshness": "NOT_ESTABLISHED",
+    "firstFailureBoundary": "EXECUTION_SOURCE_AUTHORITY",
+    "nextGate": "CURRENT_PACKET_CHUNK_AST_LINEAGE_ADMISSION",
+    "lineageSlice": "docs/reports/lineage-e2e-01-derivation-slice-v1.json",
+    "lineageSliceGeneratedAt": "2026-10-06T00:46:24.971Z",
+    "lineageSliceProofUsable": false
+  },
+  "conclusion": "The frozen matrix is numerically 768-wide and its ordinal map is structurally complete. All 55,169 UUIDs currently resolve to chunk rows and all 52,380 non-null map paths match those rows. Of these, 8,863 satisfy the exact packet/source-binding crosswalk. A path/source-revision join yields 1,676 AST candidates whose stored AST hashes equal the workspace binding digest, but this does not establish AST identity: only 59 candidates have one matching AST row; packet tree-node, workspace, source-ref/repository and binding-repository joins all match zero. No current source bytes were reopened; packet spans remain invalid; vectors lack immutable per-row embedding-model and representation revisions; and only 15 crosswalk rows currently have a canonical vector(768) value. Do not use this historical cohort for production-qualified v2/v3 comparison, retrieval promotion, or materialization. Re-exporting a separately qualified cohort may be safer than treating historical matrix membership as current lineage.",
+  "nextSafeGate": "Use the existing AST/source owner to prove current bytes and byte spans for any candidate; independently bind the historical vector value to immutable model/input revisions. If the old halfvec cohort cannot be so proven, export a new frozen cohort from content_embedding_768 with qualified identity and independent readback."
+}

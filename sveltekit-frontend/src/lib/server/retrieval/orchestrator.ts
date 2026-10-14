@@ -10,7 +10,6 @@
  * and eventually /api/sse/chat (which currently has its own inline pipeline).
  */
 
-import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { getCachedDAG, setCachedDAG } from '$lib/server/cache/dag-cache.js';
 import { loadCodebaseContext, type RankedChunk } from './codebase-context.js';
 import {
@@ -48,7 +47,6 @@ export type { ContextDoc };
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-const EMBEDDING_MODEL = ENV.OLLAMA_EMBED_MODEL;
 // Ollama is retained here only for the EmbeddingGemma embedding lane.
 const RAG_MAX_CHUNKS = 12;
 const CORRECTIVE_RAG_THRESHOLD = 0.5;
@@ -126,14 +124,9 @@ async function fetchGlyphRewardScores(): Promise<Record<string, number>> {
 // ── Embedding ───────────────────────────────────────────────────────────────
 
 async function embedQuery(query: string): Promise<number[] | null> {
-	const cached = await getCachedEmbedding(query, EMBEDDING_MODEL).catch(() => null);
-	if (cached) return cached;
-
 	try {
 		const vec = await generateEmbedding(query, { taskMode: 'unprompted_legacy' });
-		if (!vec) return null;
-		setCachedEmbedding(query, EMBEDDING_MODEL, vec).catch(() => {});
-		return vec;
+		return vec?.length === 768 && vec.every(Number.isFinite) ? vec : null;
 	} catch {
 		return null;
 	}

@@ -7,7 +7,7 @@
  *
  * Steps Tested:
  *  1. ✅ BM25 search (PostgreSQL full-text tsvector)
- *  2. ✅ Qdrant dimension check (384-canonical)
+ *  2. ✅ Qdrant semantic_768 dimension check
  *  3. ✅ Candidate hydration (real schema columns)
  *  4. ✅ RRF fusion
  *  5. ✅ Reranking
@@ -120,13 +120,13 @@ async function test1_BM25() {
 }
 
 async function test2_QdrantDimension() {
-  console.log('\n--- Test 2: Qdrant Canonical Dimension (384) ---');
+    console.log('\n--- Test 2: Qdrant Canonical Dimension (semantic_768) ---');
   try {
-    const data = await http('GET', `${QDRANT_URL}/collections/codebase_chunks_384`);
+    const data = await http('GET', `${QDRANT_URL}/collections/codebase_chunks_768`);
     assert(data.result !== undefined, 'Qdrant collection exists');
 
     const vectorSize = data.result?.config?.params?.vectors?.size;
-    assert(vectorSize === 384, `Qdrant collection dimension is 384 (got ${vectorSize})`);
+    assert(vectorSize === 768, `Qdrant semantic_768 collection dimension is 768 (got ${vectorSize})`);
   } catch (err) {
     console.error('Test 2 error:', err);
     results.failed++;

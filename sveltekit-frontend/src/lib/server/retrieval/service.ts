@@ -40,6 +40,12 @@ function buildLaneFilter(
   };
 }
 
+export function isRetired384SearchResult(result: Pick<SearchResult, 'source' | 'metadata'>): boolean {
+  return result.source === 'qdrant-384' ||
+    result.metadata.embedding_lane === 'dense_384' ||
+    (result.metadata.embedding_lane == null && result.metadata.embedding_dim === 384);
+}
+
 export function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
   switch (tier) {
     case 'hot':
@@ -222,7 +228,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   });
 
   const laneResults = await Promise.all(laneSearches);
-  combinedResults = laneResults.flat();
+  combinedResults = laneResults.flat().filter((result) => !isRetired384SearchResult(result));
 
   // Step 3: Join Postgres for canonical metadata
   // 768-dim: join when source_ref missing and qdrant_point_id present
@@ -288,11 +294,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
 /**
  * Join Postgres for canonical metadata.
  *
- * Two join paths:
- *   - dense_768 results: join codebase_chunk_index by UUID qdrant_point_id
- *   - legacy dense_384 results: join atlas_packets by source_ref (payload always populated)
- *
- * Both paths are tried; first match wins so cross-dim results merge cleanly into one set.
+ * Dense results join codebase_chunk_index by the projection point ID.
  */
 async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
   if (results.length === 0) return results;
@@ -310,118 +312,38 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
       .map((r) => r.metadata?.qdrant_point_id)
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
-    // --- 384-dim legacy path: atlas_packets by source_ref ---
-    const sourceRefs384 = results
-      .filter((r) =>
-        r.source === 'qdrant-384' ||
-        r.metadata?.embedding_lane === 'dense_384' ||
-        (r.metadata?.embedding_lane == null && r.metadata?.embedding_dim === 384)
-      )
-      .map((r) => r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined)
-      .filter((ref): ref is string => typeof ref === 'string' && ref.length > 0);
-
-    const [chunkRows, packetRows] = await Promise.all([
-      qdrantPointIds.length > 0
-        ? db.execute(sql`
-            SELECT
-              id::text as id,
-              summary,
-              source_ref,
-              source_ref as file_path,
-              updated_at
-            FROM codebase_chunk_index
-            WHERE id::text = ANY(${qdrantPointIds})
-            LIMIT ${qdrantPointIds.length + 1}
-          `)
-        : Promise.resolve({ rows: [] }),
-
-      sourceRefs384.length > 0
-        ? db.execute(sql`
-            SELECT
-              source_ref,
-              file_path,
-              summary,
-              packet_key,
-              tree_node_id,
-              sha256 AS content_hash,
-              COALESCE(
-                metadata->>'workspace_revision',
-                metadata->>'workspaceRevision',
-                metadata->>'revision'
-              ) AS workspace_revision,
-              updated_at
-            FROM atlas_packets
-            WHERE source_ref = ANY(${sourceRefs384}::text[])
-            LIMIT ${sourceRefs384.length + 1}
-          `)
-        : Promise.resolve({ rows: [] }),
-    ]);
+    const chunkRows = qdrantPointIds.length > 0
+      ? await db.execute(sql`
+          SELECT
+            id::text as id,
+            summary,
+            source_ref,
+            source_ref as file_path,
+            updated_at
+          FROM codebase_chunk_index
+          WHERE id::text = ANY(${qdrantPointIds})
+          LIMIT ${qdrantPointIds.length + 1}
+        `)
+      : { rows: [] };
 
     type ChunkRow = { id: string; summary: string | null; source_ref: string | null; file_path: string | null; updated_at: Date };
-    type PacketRow = {
-      source_ref: string;
-      file_path: string | null;
-      summary: string | null;
-      packet_key: string | null;
-      tree_node_id: string | null;
-      content_hash: string | null;
-      workspace_revision: string | null;
-      updated_at: Date;
-    };
 
     const chunkMap = new Map(
       (chunkRows.rows as ChunkRow[]).map((p) => [p.id, p])
-    );
-    const packetMap = new Map(
-      (packetRows.rows as PacketRow[]).map((p) => [p.source_ref, p])
     );
 
     const joinedResults = results.map((r) => {
       // Try chunk join (768-dim path)
       const chunk = chunkMap.get(r.metadata?.qdrant_point_id as string);
       if (chunk) {
-        const ref = chunk.source_ref || r.source_ref;
-        const packet = ref ? packetMap.get(ref) : undefined;
         return {
           ...r,
-          source_ref: packet?.source_ref || chunk.source_ref || r.source_ref,
-          file_path: packet?.file_path || chunk.file_path || r.file_path,
-          summary: packet?.summary || chunk.summary || r.summary,
-          packet_key: packet?.packet_key || r.packet_key,
-          tree_node_id: packet?.tree_node_id || r.tree_node_id,
-          content_hash: String(packet?.content_hash || r.content_hash || r.metadata?.content_hash || ''),
-          workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
+          source_ref: chunk.source_ref || r.source_ref,
+          file_path: chunk.file_path || r.file_path,
+          summary: chunk.summary || r.summary,
           metadata: {
             ...r.metadata,
             updated_at: chunk.updated_at,
-            packet_key: packet?.packet_key || r.packet_key,
-            tree_node_id: packet?.tree_node_id || r.tree_node_id,
-            content_hash: String(packet?.content_hash || r.content_hash || r.metadata?.content_hash || ''),
-            workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
-          },
-        };
-      }
-
-      // Try packet join (384-dim legacy path)
-      const ref = r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined;
-      const packet = ref ? packetMap.get(ref) : undefined;
-      if (packet) {
-        return {
-          ...r,
-          source_ref: packet.source_ref || r.source_ref,
-          file_path: packet.file_path || r.file_path,
-          summary: packet.summary || r.summary,
-          packet_key: packet.packet_key || r.packet_key,
-          tree_node_id: packet.tree_node_id || r.tree_node_id,
-          content_hash: String(packet.content_hash || r.content_hash || r.metadata?.content_hash || ''),
-          workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
-          metadata: {
-            ...r.metadata,
-            updated_at: packet.updated_at,
-            packet_key: packet.packet_key || r.packet_key,
-            tree_node_id: packet.tree_node_id || r.tree_node_id,
-            content_hash: String(packet.content_hash || r.content_hash || r.metadata?.content_hash || ''),
-            workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
           },
         };
       }

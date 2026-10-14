@@ -301,14 +301,20 @@
 
 	<!-- AI Analysis Modal -->
 	{#if analysisResult || analysisError}
-		<div class="analysis-modal-overlay" onclick={closeAnalysis}>
-			<div class="analysis-modal" onclick={(e) => e.stopPropagation()}>
+		<div
+			class="analysis-modal-overlay"
+			role="button"
+			tabindex="0"
+			onclick={(e) => { if (e.target === e.currentTarget) closeAnalysis(); }}
+			onkeydown={(e) => { if (e.key === 'Escape') closeAnalysis(); }}
+		>
+			<div class="analysis-modal">
 				<div class="modal-header">
 					<div class="modal-title">
 						<Icon name="brain" />
 						LEGAL AI ANALYSIS
 					</div>
-					<button onclick={closeAnalysis} class="close-btn">
+					<button type="button" onclick={closeAnalysis} class="close-btn" aria-label="Close analysis">
 						<Icon name="x" />
 					</button>
 				</div>

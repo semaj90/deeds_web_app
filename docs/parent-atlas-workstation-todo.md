@@ -1950,8 +1950,7 @@ quality, Valkey MISS/HIT behavior, or decoder readiness.
 
 ### REL-01A current-workspace ontology cohort census
 
-`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs` now provides a
-read-only exact-source census against the observed workspace revision
+`scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs` now provides a read-only exact-source census against the observed workspace revision
 `sha256:b19b04b6b19a1fe0cfd48d2fa9507f9e7055f9f3dfed277d2e3d5dea3303f4dc`.
 The live result examined 90,600 tuples across 27,863 distinct source refs and
 found 144 unique current Graphify sources with 447 current-workspace tuples.

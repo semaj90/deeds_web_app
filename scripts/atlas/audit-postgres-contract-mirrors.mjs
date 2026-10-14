@@ -143,14 +143,12 @@ const TABLES = [
   },
   {
     tableName: 'parent_atlas_documents',
+    isView: true,
     schemaFiles: [
       path.join(FRONTEND_ROOT, 'src', 'lib', 'server', 'db', 'schema', 'parent-atlas-documents.ts'),
     ],
     manualFiles: [
       path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260601_add_alias_and_parent_atlas_indexes.sql'),
-      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260420_route_metadata.sql'),
-      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260404_add_lod_source_kind_columns.sql'),
-      path.join(FRONTEND_ROOT, 'drizzle', 'manual', '20260604_add_lod_source_kind_columns.sql'),
     ],
     staticIdentityFields: ['source_ref', 'feature_id', 'workspace_id', 'qdrant_point_id'],
   },
@@ -218,6 +216,8 @@ function extractTableBlock(text, tableName) {
   const markers = [
     `pgTable('${tableName}'`,
     `pgTable("${tableName}"`,
+    `pgView('${tableName}'`,
+    `pgView("${tableName}"`,
   ];
   let start = -1;
   for (const marker of markers) {
@@ -239,7 +239,8 @@ function parseSchemaBlock(block, tableName) {
 
   for (const rawLine of columnsBlock.split(/\r?\n/)) {
     const line = rawLine.trim();
-    const columnMatch = line.match(/^([A-Za-z0-9_]+)\s*:\s*[A-Za-z0-9_]+\('([^']+)'/);
+    if (/^(index|uniqueIndex|primaryKey|foreignKey|check)\s*\(/i.test(line)) continue;
+    const columnMatch = line.match(/^([A-Za-z0-9_]+)\s*:\s*[A-Za-z0-9_]+\(['"]([^'"]+)['"]/);
     if (columnMatch) {
       columns.add(columnMatch[2].toLowerCase());
       if (/\.unique\(\)\s*,?\s*$/.test(line)) {
@@ -250,9 +251,9 @@ function parseSchemaBlock(block, tableName) {
 
   for (const rawLine of indexesBlock.split(/\r?\n/)) {
     const line = rawLine.trim();
-    const indexMatch = line.match(/index\('([^']+)'\)/);
+    const indexMatch = line.match(/index\(['"]([^'"]+)['"]\)/);
     if (indexMatch) indexes.add(indexMatch[1].toLowerCase());
-    const uniqueIndexMatch = line.match(/uniqueIndex\('([^']+)'\)/);
+    const uniqueIndexMatch = line.match(/uniqueIndex\(['"]([^'"]+)['"]\)/);
     if (uniqueIndexMatch) indexes.add(uniqueIndexMatch[1].toLowerCase());
   }
 
@@ -419,7 +420,7 @@ function repairClassForTable({ staticColumnDiff, staticIndexDiff, liveColumnDiff
   return null;
 }
 
-function classifyTable({ schema, manual, live, tableName, staticIdentityFields }) {
+function classifyTable({ schema, manual, live, tableName, staticIdentityFields, isView: isViewSpec }) {
   const staticColumns = mergeSources([schema, manual].filter(Boolean)).columns;
   const staticIndexes = mergeSources([schema, manual].filter(Boolean)).indexes;
   const schemaColumns = schema?.columns ?? [];
@@ -427,11 +428,15 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
   const schemaIndexes = schema?.indexes ?? [];
   const manualIndexes = manual?.indexes ?? [];
 
-  const schemaManualColumnDiff = diff(schemaColumns, manualColumns);
-  const schemaManualIndexDiff = diff(schemaIndexes, manualIndexes);
+  const isView = Boolean(isViewSpec || live?.isView);
+
+  const schemaManualColumnDiff = isView ? { onlyInA: [], onlyInB: [] } : diff(schemaColumns, manualColumns);
+  const schemaManualIndexDiff = isView ? { onlyInA: [], onlyInB: [] } : diff(schemaIndexes, manualIndexes);
 
   let staticClassification = 'NEEDS_REVIEW';
-  if (!schema && !manual) {
+  if (isView) {
+    staticClassification = schema ? 'VIEW_ALIGNED' : 'NEEDS_REVIEW';
+  } else if (!schema && !manual) {
     staticClassification = 'NEEDS_REVIEW';
   } else if (schema && !manual) {
     staticClassification = 'DRIZZLE_ONLY';
@@ -445,8 +450,10 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
     staticClassification = 'SQL_AND_DRIZZLE_ALIGNED';
   }
 
-  const contractColumns = uniq(staticColumns);
-  const contractIndexes = uniq(staticIndexes);
+  const contractColumns = isView
+    ? uniq(schemaColumns.length ? schemaColumns : staticColumns)
+    : uniq(staticColumns);
+  const contractIndexes = isView ? [] : uniq(staticIndexes);
 
   let liveClassification = 'LIVE_DB_UNAVAILABLE';
   let liveColumns = [];
@@ -458,9 +465,9 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
   if (live?.reachable) {
     tableExists = Boolean(live.tableExists);
     liveColumns = live.columns ?? [];
-    liveIndexes = live.indexes ?? [];
+    liveIndexes = isView ? [] : (live.indexes ?? []);
     liveRowCount = live.rowCount ?? null;
-    const filteredLiveIndexDiff = filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
+    const filteredLiveIndexDiff = isView ? { onlyInA: [], onlyInB: [] } : filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
     if (!tableExists) {
       // A reachable database with no relation is not a column mismatch.
       // Keep this distinct so missing migrations cannot be mistaken for
@@ -482,21 +489,23 @@ function classifyTable({ schema, manual, live, tableName, staticIdentityFields }
   }
 
   const liveColumnDiff = diff(contractColumns, liveColumns);
-  const liveIndexDiff = filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
+  const liveIndexDiff = isView ? { onlyInA: [], onlyInB: [] } : filterImplicitLiveIndexes(diff(contractIndexes, liveIndexes));
   const overallClassification = live?.reachable
     ? liveClassification
-    : (staticClassification === 'SQL_AND_DRIZZLE_ALIGNED' ? 'LIVE_DB_UNAVAILABLE' : staticClassification);
+    : (staticClassification === 'SQL_AND_DRIZZLE_ALIGNED' || staticClassification === 'VIEW_ALIGNED' ? 'LIVE_DB_UNAVAILABLE' : staticClassification);
 
-  const repairClass = !live?.reachable && staticClassification === 'SQL_AND_DRIZZLE_ALIGNED'
-    ? 'NEEDS_REVIEW'
-    : repairClassForTable({
-      staticColumnDiff: schemaManualColumnDiff,
-      staticIndexDiff: schemaManualIndexDiff,
-      liveColumnDiff,
-      liveIndexDiff,
-      tableExists,
-      manualSourcePresent: Boolean(manual),
-    });
+  const repairClass = isView && liveClassification === 'LIVE_DB_ALIGNED'
+    ? 'NONE'
+    : (!live?.reachable && (staticClassification === 'SQL_AND_DRIZZLE_ALIGNED' || staticClassification === 'VIEW_ALIGNED')
+      ? 'NEEDS_REVIEW'
+      : repairClassForTable({
+        staticColumnDiff: schemaManualColumnDiff,
+        staticIndexDiff: schemaManualIndexDiff,
+        liveColumnDiff,
+        liveIndexDiff,
+        tableExists,
+        manualSourcePresent: Boolean(manual),
+      }));
 
   return {
     tableName,
@@ -587,11 +596,24 @@ async function loadLiveTables(tableNames) {
           ? await pool.query(`SELECT COUNT(*)::int AS count FROM public.${tableName}`)
           : { rows: [{ count: null }] };
 
+        const relRes = await pool.query(
+          `SELECT c.relkind
+             FROM pg_class c
+             JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = 'public'
+              AND c.relname = $1`,
+          [tableName],
+        );
+        const relkind = relRes.rows[0]?.relkind ?? null;
+        const isView = relkind === 'v' || relkind === 'm';
+
         tables[tableName] = {
           reachable: true,
           tableExists,
+          relkind: relkind === 'v' ? 'VIEW' : relkind === 'm' ? 'MATERIALIZED_VIEW' : 'TABLE',
+          isView,
           columns: columnsRes.rows.map((row) => row.column_name),
-          indexes: indexesRes.rows.map((row) => row.indexname),
+          indexes: isView ? [] : indexesRes.rows.map((row) => row.indexname),
           rowCount: rowCountRes.rows[0]?.count ?? null,
         };
       } catch (error) {
@@ -681,13 +703,14 @@ async function main() {
       live: liveTable ? { ...liveTable, tableName: spec.tableName } : { reachable: false, error: 'live unavailable' },
       tableName: spec.tableName,
       staticIdentityFields: spec.staticIdentityFields,
+      isView: Boolean(spec.isView),
     });
     tables.push(table);
   }
 
   const blockers = [];
   for (const table of tables) {
-    if (table.static.classification !== 'SQL_AND_DRIZZLE_ALIGNED') {
+    if (table.static.classification !== 'SQL_AND_DRIZZLE_ALIGNED' && table.static.classification !== 'VIEW_ALIGNED') {
       blockers.push(`${table.tableName}: static ${table.static.classification}`);
     }
     if (table.classification === 'COLUMN_MISMATCH' || table.classification === 'INDEX_MISMATCH' || table.classification === 'LIVE_TABLE_MISSING') {
@@ -697,7 +720,7 @@ async function main() {
 
   const summary = {
     tablesChecked: tables.length,
-    staticAligned: tables.filter((table) => table.static.classification === 'SQL_AND_DRIZZLE_ALIGNED').length,
+    staticAligned: tables.filter((table) => table.static.classification === 'SQL_AND_DRIZZLE_ALIGNED' || table.static.classification === 'VIEW_ALIGNED').length,
     liveAligned: tables.filter((table) => table.classification === 'LIVE_DB_ALIGNED').length,
     liveMissing: tables.filter((table) => table.classification === 'LIVE_TABLE_MISSING').length,
     liveUnavailable: tables.filter((table) => table.classification === 'LIVE_DB_UNAVAILABLE').length,

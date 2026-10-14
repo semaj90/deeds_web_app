@@ -106,6 +106,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   workspaceRevision: integer('workspace_revision').notNull().default(0),
   // Incremented by operator when embedding model changes. Used in cache key.
   // Cache stale rejection: if current workspace_revision > cached, skip cache.
+  workspaceRevisionKey: text('workspace_revision_key'),
 
   representationRevision: integer('representation_revision').notNull().default(0),
   // Tracks representation contract version (e.g., v1 = 384d, v2 = 768d).
@@ -121,6 +122,8 @@ export const atlasPackets = pgTable('atlas_packets', {
   projectionDimension: integer('projection_dimension'),
   encoderRevision: text('encoder_revision'),
   somRevision: text('som_revision'),
+  lineageBindingChecksum: text('lineage_binding_checksum'),
+  lineageProducerRevision: text('lineage_producer_revision'),
 
   embeddingDigest: text('embedding_digest'),
   // SHA-256 of embedding vector (hex string). Immutable anchor.
@@ -163,6 +166,12 @@ export const atlasPackets = pgTable('atlas_packets', {
   rewardPriorIdx: index('idx_atlas_packets_reward_prior').on(sql`${table.rewardPrior} DESC`),
   communityConfIdx: index('idx_atlas_packets_community_confidence').on(sql`${table.communityConfidence} DESC`),
   workspaceRevisionIdx: index('idx_atlas_packets_workspace_revision').on(table.workspaceRevision),
+  workspaceRevisionKeySourceIdx: index('idx_atlas_packets_workspace_revision_key_source')
+    .on(table.workspaceRevisionKey, table.sourceRef)
+    .where(sql`${table.workspaceRevisionKey} IS NOT NULL AND ${table.sourceRef} IS NOT NULL`),
+  lineageBindingChecksumIdx: index('idx_atlas_packets_lineage_binding_checksum')
+    .on(table.lineageBindingChecksum)
+    .where(sql`${table.lineageBindingChecksum} IS NOT NULL`),
   sourceRevisionIdx: index('idx_atlas_packets_source_revision')
     .on(table.sourceRevision)
     .where(sql`${table.sourceRevision} IS NOT NULL`),

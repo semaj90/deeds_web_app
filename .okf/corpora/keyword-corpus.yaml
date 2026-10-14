@@ -11,10 +11,10 @@ source_refs:
   - .okf/domains/structured-value.yaml
 generated:
   by: human-reviewed-repository-sources
-  at: 2026-10-12
+  at: 2026-10-13
 verified:
   by: repository-source-review
-  at: 2026-10-12
+  at: 2026-10-13
 indexing:
   populated: false
   searchable: false
@@ -216,3 +216,101 @@ entries:
       - sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py
       - sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts
     retrieval_policy: classifier_outputs_are_shadow_route_recommendations_only_until_revisioned_dataset_calibration_held_out_comparison_and_promotion_gates_pass
+
+  - id: swiglu-transformer-activation
+    terms: [SwiGLU, SiLU gate, transformer feed-forward activation, gated MLP]
+    definition: >-
+      SwiGLU is a gated feed-forward activation inside a transformer architecture. It is not a
+      post-hoc transform for EmbeddingGemma vectors, MiniLM vectors, or autoencoder latents, and
+      it does not establish that the active Ornith model uses SwiGLU. The supplied llama-server
+      model listing reports ornith-1.5-9b, n_embd 4096, n_ctx_train 262144, and completion
+      capability; those fields do not expose the activation implementation or prove the
+      effective runtime context window.
+    evidence_status: REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED
+    source_refs:
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - .okf/systems/parent-atlas-compute-ownership.md
+      - docs/.okf/research/deltanet-swiglu/manifest.json
+      - docs/.okf/research/deltanet-swiglu/published-current.json
+    retrieval_policy: architecture_reference_only; verify_exact_model_artifact_or_config_before_claiming_activation; never_use_as_embedding_conversion
+
+  - id: deltanet-attention-architecture
+    terms: [DeltaNet, Gated DeltaNet, delta-rule attention, recurrent linear attention]
+    definition: >-
+      DeltaNet refers to a delta-rule attention/memory architecture family; gated variants
+      combine state-update mechanisms with gating and may be hybridized with other attention
+      layers. It is model-internal, not a Parent Atlas retrieval lane, routing algorithm,
+      packet identity, embedding conversion, or evidence source. See the reference-only
+      primary-paper corpus under docs/.okf/research/deltanet-swiglu/.
+    evidence_status: PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE
+    source_refs:
+      - docs/.okf/research/deltanet-swiglu/manifest.json
+      - docs/.okf/research/deltanet-swiglu/published-current.json
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: architecture_reference_only; never_treat_as_retrieval_representation_or_packet_routing_contract
+
+  - id: atlas-topk-selection-receipt
+    terms: [selection receipt, TopK selection receipt, routing manifest binding, candidate selection provenance]
+    definition: >-
+      A proposed checksum- and revision-bound record linking a query/run, candidate feature
+      snapshot and ordinal map, optional routing manifest, ordered Top-K canonical candidates,
+      source/evidence and ontology tuple references, execution phase/gate, and ContextManifest
+      identity/admission. Routing IDs identify routing decisions/artifacts, not canonical
+      packets. Candidate lane masks record provenance and do not create extra logical-lane votes.
+      This is a design term; production end-to-end wiring is not proven.
+    evidence_status: DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN
+    source_refs:
+      - docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md
+      - sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts
+      - sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts
+      - sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts
+      - sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts
+    retrieval_policy: design_reference_only; preserve_canonical_identity_and_one_vote_per_logical_lane
+
+  - id: transformer-hidden-state-boundary
+    terms: [transformer hidden state, intermediate activation, hidden-state feature, activation extraction]
+    definition: >-
+      Intermediate model activations are distinct from canonical semantic embeddings and
+      source-derived AST/NLP features. They may be considered only through an explicitly
+      supported, revision-qualified experimental interface; do not persist hidden states,
+      tensors, KV cache, or hidden reasoning, and do not use activations as identity or evidence.
+    evidence_status: POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED
+    source_refs:
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - .okf/systems/parent-atlas-compute-ownership.md
+    retrieval_policy: ephemeral_experiment_only; model_layer_token_mapping_and_revision_required; no_persistent_state_or_evidence_authority
+
+  - id: synthesis-dag-kag-hypergraph
+    terms: [synthesis DAG, KAG, HyperGraphRAG, knowledge hypergraph, ContextManifest, PromptPlan]
+    definition: >-
+      The synthesis DAG plans bounded, ordered work and dependencies; KAG/HyperGraphRAG represent
+      typed, evidence-backed relations, including role-preserving n-ary relations. Keep these
+      structures separate. Similarity or cluster membership cannot create ontology facts.
+      Synthesis consumes verified ContextManifest evidence and may propose actions, but does not
+      authorize persistent mutations. Existing OpenSpec owners define the integration gates;
+      a complete live retrieval-to-synthesis proof remains open.
+    evidence_status: EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN
+    source_refs:
+      - .okf/systems/hyperrag.md
+      - openspec/changes/parent-atlas-agentic-completion/proposal.md
+      - openspec/changes/parent-atlas-agentic-completion/design.md
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+    retrieval_policy: require_admitted_revision_qualified_evidence_and_contextmanifest; dag_is_not_write_authority; preserve_hyperedge_roles
+
+  - id: topology-som-kmeans-advisory-features
+    terms: [TopologyFeature4, 4D topology coordinates, SOM 20x20, K-means, cluster assignment, feature remapping]
+    definition: >-
+      K-means assignments, SOM cells, and four-dimensional topology coordinates are separate,
+      revision-qualified derived features. They may be evaluated as advisory routing or ranking
+      features on a frozen, source-qualified cohort; they do not create canonical identity,
+      ontology edges, prompt evidence, or additional semantic retrieval votes. The 20x20 grid is
+      an existing experiment parameter, not a universal requirement or proof of production value.
+    evidence_status: IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN
+    source_refs:
+      - openspec/changes/parent-atlas-topology-representation-admission/proposal.md
+      - openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md
+      - openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md
+      - python/atlas_compute/som.py
+      - python/atlas_compute/aligned_snapshot_experiment.py
+      - .okf/systems/parent-atlas-compute-ownership.md
+    retrieval_policy: advisory_only_until_frozen_cohort_revision_feature_schema_and_held_out_ablation_pass; no_identity_or_evidence_promotion

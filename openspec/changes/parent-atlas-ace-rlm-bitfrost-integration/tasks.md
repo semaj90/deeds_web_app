@@ -15546,3 +15546,220 @@ Status: `SNAPSHOT_HYGIENE_AND_REGISTRY_CENSUS_PROVEN; SINGLE_PACKET_CHUNK_DIAGNO
 No registry, workspace-binding, Graphify, packet, chunk, retrieval, cache, or projection writes were
 performed. Do not promote the diagnostic candidate or proceed to ACE/ContextManifest/Ornith until the
 current exact-revision binding and admission owners independently read back their evidence.
+
+## RLM IMPLEMENTATION RESULTS AND END-TO-END VALIDATION — 2026-10-13
+
+Status: evidence record only. No existing checkbox in this file was changed. No end-to-end RLM run was performed. The results below cover the adjacent lanes this session touched, so the RLM gates can cite them without re-running them.
+
+### Implemented (repo, uncommitted)
+
+| Item | File | Owner class | Result |
+|---|---|---|---|
+| Error-signal evidence validator | `scripts/atlas/validate-error-signal-evidence-v1.mjs` | CANONICAL_OWNER (runtime-ownership-registry `error_signal_evidence`) | Read-only; live run over 6 rows: 1 NOT_REPRODUCED_NOW, 1 PARTIALLY_REPRODUCED, 1 UNVERIFIED, 3 PROPOSAL_ONLY; writesPerformed 0; every row `repairEligible: false`. |
+| Repair-proposal bridge (dry run) | `scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs` | BACKEND | Admits 1, rejects 5; executable 0; sourceEdits 0; maps reviews to registry action `AWAIT_OPERATOR`. Refuses a tampered receipt (digest mismatch, exit 1). |
+| Spec for both | `scripts/atlas/error-signal-evidence-v1.spec.mjs` | — | 8/8 pass (re-run 2026-10-13). |
+| RFF challenger registration | `docs/architecture/runtime-ownership-registry.json` (`random_fourier_features`) | OPTIONAL_CHALLENGER | Owner is the existing `python/atlas_compute/rff_transform.py`; a duplicate created this session was archived to `.archive/duplicates-2026-10-13/`. |
+| Ownership audit | `scripts/atlas/audit-runtime-ownership.mjs` | — | PASS; 22 capabilities; 0 violations. |
+| Packet/graph/cuTile index | `docs/architecture/_cuda_rtx_toc.md` | — | Points to existing owners; receipts re-attributed. |
+
+### End-to-end validation results
+
+| Path | Command or method | Result | Receipt |
+|---|---|---|---|
+| Error signal → validator → bridge | validator on live `error_signal_stream` (6 rows), then bridge | PASS for the gate. The bridge admits only reproducing verdicts and never executes. | `.tmp/atlas/error-signal-evidence-v1.json`, `.tmp/atlas/error-repair-proposals-v1.json` |
+| cuTile toolchain (existing owner) | `python/atlas_cuda_cutile_simt_probe_v1.py` in `atlas-cutile-cu132` on the RTX 3060 Ti, Ornith unloaded then restored | PASS: vector add finite and correct; FP16 SIMT GEMM finite; tileiras 13.2.78; torch 2.14.0+cu132 | `.tmp/atlas/cutile-owner-probe-receipt-v1.json` |
+| RFF challenger owner | `tests.test_rff_transform` in `atlas-rapids-cu13` (CPU) | PASS, 5/5 | none (test output only) |
+| Kafka/outbox proposal | `openspec validate parent-atlas-kafka-projection-initiative --strict` | valid | none |
+| Ownership registry | `audit-runtime-ownership.mjs` | PASS | none |
+| TRACE live read | `trace_system_health`, `atlas_packet_search` (summary query), `engram_redis_health`, `atlas_backend_info` | degraded: `:8099` rerank and `:8101` topology down; native backend `NATIVE_BACKEND_UNAVAILABLE`; Redis PONG; packet search returns canonical packets | session output only |
+
+### Not validated (do not cite as passed)
+
+- No end-to-end RLM loop, DAG synthesis, or OaK/DSPy-GEPA run was executed in this pass.
+- No BitFrost warm or revision-qualified cache hit was observed. `ace:packet` and `bitfrost:*` reads were not performed through TRACE.
+- `context.build_kv_packet` and `context_build_ace_packet` were deliberately not called, because they write to Redis.
+- HLL and rg routing were not verified. The `trace_search` call timed out after 300 seconds and was not retried.
+- A canonical packet summary (`packet:2e3047ea461b`) contains model drafting text. Tracked as LOG-13 in `openspec/changes/parent-atlas-runtime-log-remediation/tasks.md`.
+
+### Gates the RLM change still needs
+
+- RLM-E2E-01 (proposed, unchecked): run one bounded RLM loop end to end against live TRACE, with the rerank and topology services restored (LOG-09).
+- RLM-E2E-02 (proposed, unchecked): cache-hit proof for one revision-qualified key, with write, readback and expiry, under the existing BITFROST-LIVE-WARM-01 gate.
+- RLM-E2E-03 (proposed, unchecked): summary validator (LOG-13) applied to packets the RLM loop reads.
+
+### Graph-analysis → ACE execution plan (2026-10-13; proposal, not wired)
+
+Keep this work in the existing Graphify, CandidateFeatureMatrix, ContextManifest,
+BitFrost, and GPU owners. Do not add a parallel graph processor, canonical identity
+store, retrieval lane, or scheduler. The existing bounded JSONL/simdjson bridge owns
+parsing; NetworkX owns the CPU graph reference; SearchRuntime owns candidate
+normalization and fusion; ACE owns context admission; PostgreSQL remains canonical.
+
+- [ ] **GRAPH-INPUT-01** Inventory the current Graphify/AST snapshot, source namespaces,
+  parser/processor callers, stream format, age, workspace/source revisions, and checksums.
+  Treat stale or unbound snapshots as diagnostic-only. Preserve bounded chunk/stream
+  parsing and exact source spans; simdjson is only a parser/transport optimization.
+- [ ] **GRAPH-FEATURES-02** Freeze one admitted packet/chunk cohort and ordinal map before
+  decomposition or feature remapping. Bind every feature-matrix row/column to canonical
+  identity, feature schema/revision, source/representation revisions, and artifact digest.
+  Keep POS/token labels, ontology tuples, graph relations, and derived numeric features
+  typed and separately attributable; no synthetic labels or path-only joins.
+- [ ] **GRAPH-ROUTING-03** Reuse existing Top-K, KMeans, SOM, and graph-search owners.
+  Centroids, LOD/NES memory summaries, PageRank, and topology coordinates are advisory
+  routing features only; they cannot establish identity, source truth, or extra semantic
+  RRF votes. Record routing policy/ID, feature and graph revisions, selected canonical
+  IDs, and deterministic tie-breaks in the proposal receipt.
+- [ ] **GRAPH-ACE-04** Compose a proposal-only DAG from qualified query, packet, source,
+  graph, and feature evidence. Require bounded fanout, acyclic dependencies, explicit
+  phase/lane/gate, evidence refs, and a validation step for every proposed task. Build an
+  ACE JSON candidate only through the existing selected-candidate/ContextManifest owner;
+  independently verify manifest checksum and source freshness before any prefill.
+- [ ] **GRAPH-CACHE-05** Evaluate BitFrost/Valkey LRU/token-residency hints only after
+  ACE packet and ContextManifest readback passes. Keys must bind query, corpus snapshot,
+  routing ID, model/representation, feature/graph revisions, and evidence checksums.
+  Cache hits may reduce context work but cannot authorize a task or bypass source checks.
+  No cache warm/write in diagnostic or proposal-only runs.
+- [ ] **GRAPH-CPU-06** Establish a bounded CPU reference for graph traversal, chunking,
+  feature remapping, and ranking before parallel workers or acceleration. Measure memory,
+  throughput, determinism, cancellation, and per-worker limits. Add SIMDJSON/native N-API
+  workers only if this profile identifies parsing as a material bottleneck; AVX2 (256-bit)
+  and AVX-512 (512-bit) are implementation widths, not vector dimensions or registry sizes.
+- [ ] **GRAPH-GPU-07** Only after CPU parity, immutable mmap/Arrow artifact checksums,
+  ordinal-map readback, and explicit shared-GPU resource admission, compare PyTorch SIMT,
+  cuVS/cuGraph, and cuTile on identical inputs. Record device/kernel execution, numeric
+  deltas, latency, peak memory, and teardown. Do not persist tensors, hidden states, or KV
+  state; PostgreSQL stores metadata and artifact references only.
+- [ ] **GRAPH-E2E-08** Prove one bounded user query from current source evidence through
+  graph traversal, feature/routing proposal, Top-K canonical selection, ACE candidate,
+  ContextManifest verification, and a proposal-only task DAG. Record stage receipts and
+  attempted/committed side effects; require zero writes for this gate. Live MCP calls,
+  cache use, agent dispatch, and repair execution remain separate authorization gates.
+
+**Status:** all gates above are proposed and unchecked. Existing evidence establishes
+owners and isolated fixtures, not a wired live query path: the 2026-10-13 TRACE review
+reported degraded rerank/topology services, native backend unavailable, Redis PONG only,
+and no verified centroid/HLL result or BitFrost cache hit. Do not claim Graphify freshness,
+ACE packet admission, GPU parity, or end-to-end execution until the corresponding receipts
+and independent readbacks exist. No schema/index change or live-store mutation is authorized
+by this plan.
+
+### Graph/DAG local contract recheck (2026-10-13; fixtures only)
+
+- [x] Ran focused tests for BitFrost evidence-slot FSM (3), bounded CSR cursor traversal (3),
+  OpenSpec task-transition diff (13), and OAK ContextManifest handler (1): **20/20 passed**.
+- [x] Confirmed the OAK handler is instantiated by `oak-dag-runtime-registry-v1.ts`; the
+  registry has no non-test caller in `sveltekit-frontend/src`. The transition diff, CSR cursor,
+  and token FSM likewise have no non-test caller. The OAK integration test invokes the handler
+  directly with fixture `sourceRef`s; it does not call live OAK, PostgreSQL, TRACE, ACE, or
+  BitFrost services.
+- [ ] Keep GRAPH-ACE-04 and GRAPH-E2E-08 open until a real request-scoped caller supplies an
+  admitted canonical candidate/source set, traverses the registered DAG, and independently
+  reads back the resulting ContextManifest. Unit/fixture success does not establish live MCP,
+  graph snapshot, or cache wiring.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/context/bitfrost-token-fsm.spec.ts`,
+`sveltekit-frontend/src/lib/server/atlas/graph/csr-traversal-cursor.spec.ts`,
+`sveltekit-frontend/src/lib/server/atlas/openspec-board/task-transition-events-v1.spec.ts`,
+`sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-context-manifest-handler-v1.integration.spec.ts`,
+and a non-test caller search across `sveltekit-frontend/src`. No live services or stores were
+contacted.
+
+### DAG runtime-owner seam (2026-10-13; source audit)
+
+- [x] Located two distinct existing contracts: `executeContextToolDagV1` is a level-parallel,
+  read-only ContextToolDag executor whose receipts are explicitly noncanonical; the OAK
+  `createOakDagRuntimeRegistryV1` resolves `KernelDagExecutionBindingV1` action handlers,
+  including the ACE ContextManifest handler. They are not interchangeable DAG schemas.
+- [x] Confirmed by non-test source search that neither executor/registry has a production
+  caller. The ContextToolDag executor is referenced only by workflow tests; the OAK registry
+  is constructed only in tests and re-exported through its barrel. The handler-level integration
+  test therefore does not establish that a request reaches either DAG.
+- [x] **DAG-RUNTIME-OWNER-01** Identified the production request owner:
+  `runSemanticSearchWorkflow`, called by `/api/retrieval/search-unified` and the tRPC
+  `search` router. It executes `adapter.search` and passes its packets/provenance to
+  `runSearchRuntimeContextManifestShadowV1`; that result is explicitly shadow-only
+  (`canonicalAuthority: false`, `rankingPromotion: false`, `writesPerformed: false`).
+  The route does not invoke `executeContextToolDagV1` or the OAK DAG registry/ACE handler.
+  The workflow also fire-and-forgets `persistKagDagRunFromSteps`, which writes KAG audit
+  rows to PostgreSQL; those rows are not ACE packet or ContextManifest admission evidence.
+- [ ] **DAG-RUNTIME-OWNER-02** Trace a safe bridge from SearchRuntime's selected canonical
+  candidate/source set into the existing OAK/ACE ContextManifest owner. Require exact
+  identity and revision admission plus independent manifest readback; do not invoke the
+  live route during read-only qualification because it triggers the always-on KAG audit
+  write. Do not create a third DAG runner or treat shadow/audit receipts as canonical.
+
+Evidence: `sveltekit-frontend/src/lib/server/atlas/workflow/context-tool-dag-contracts.ts`,
+`sveltekit-frontend/src/lib/server/atlas/policy/oak-dag-runtime-registry-v1.ts`,
+`oak-dag-context-manifest-handler-v1.ts`,
+`sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts`,
+`sveltekit-frontend/src/routes/api/retrieval/search-unified/+server.ts`,
+`sveltekit-frontend/src/lib/server/trpc/routers/search.ts`, and the non-test caller census.
+Static source evidence only; no request, live executor, or database write was run here.
+
+### ACE bridge contract recheck (2026-10-13; local tests only)
+
+- [x] Focused adapter, selected-candidate-set, packet-to-ContextManifest bridge,
+  shadow-manifest, and QAS adapter suites pass **25/25**.
+- [x] Confirmed `searchWithAceManifest()` and
+  `createSearchRuntimeAceProductionSourceAdapterV1()` are reusable contracts, but
+  neither has a non-test caller. The production workflow still calls only `adapter.search`;
+  its shadow result cannot confer canonical authority.
+- [ ] Keep `DAG-RUNTIME-OWNER-02`, `GRAPH-ACE-04`, and `GRAPH-E2E-08` open. The missing
+  prerequisite is an authorized canonical source/feature provider with exact packet,
+  source/workspace, ordinal, and representation revisions. The current QAS projection
+  maps `packet_key ?? chunk_id` to `packetKey`, `source_ref ?? relative_path` to
+  `sourceRef`, and `stable_symbol_id` to `canonicalId`; this mapping does not invoke
+  `PacketKeyResolutionV2` and therefore is not proof of canonical packet identity or
+  current-source ownership. Resolve packet identity through the existing resolver and
+  source revisions through the existing source-binding owner before connecting the
+  projection to ACE. Do not treat paths, chunk IDs, symbol IDs, request-supplied
+  revisions, or fixture-derived values as substitutes.
+
+Validation: the five Vitest suites listed above, **25/25**. Tests are local contract
+coverage only; no production request, live MCP/ACE/BitFrost call, or datastore readback
+was performed. No stores were changed.
+
+Identity boundary evidence: `search-runtime-adapter.ts` QAS projection fields and
+`atlas/identity/packet-key-resolution-v2.ts` canonical packet resolver contract.
+The next implementation must preserve the distinction between canonical packet key,
+symbol identity, chunk identity, source reference, and source/workspace revisions.
+
+### Canonical source-owner caller recheck (2026-10-13; source and fixture audit)
+
+- [x] Confirmed `resolvePacketKeyResolutionV2()` is reached from SearchRuntime only
+  through the optional hypergraph-neighbor lookup; that lookup resolves packet keys
+  for graph reads and does not produce source-byte or ContextManifest admission.
+- [x] Found existing source-byte/binding contracts in
+  `grounded-extraction-source-binding-v1.ts` and
+  `source-authority-binding-adapter-v1.ts`; neither has a non-test caller in `src`.
+  They require trusted injected source-text, file-digest, and source-binding owners.
+- [x] Focused identity/source-binding contract suites pass **21/21**. These are
+  fixture/local tests and do not prove any trusted production dependency is assembled.
+- [ ] Keep the ACE bridge blocked until the owning source-byte and source-binding
+  dependencies are identified and revision-qualified; do not instantiate either
+  adapter with route/tool-supplied paths or revisions. No live reads or writes ran.
+
+Validation: `grounded-extraction-source-binding-v1.spec.ts`,
+`packet-key-resolution-v2.spec.ts`, and `source-authority-binding-adapter-v1.spec.ts`,
+**21/21**. No database, graph, cache, or model operation occurred.
+
+### Admitted AST source-reader safety (2026-10-13; local fixtures)
+
+- [x] Located reusable source owners: `resolveAdmittedSourceRevisionV1()` reads exactly
+  one admitted `(canonical_source_ref, workspace_revision)` binding and verifies that
+  `source_revision` matches `content_digest`; `readConfinedRepositorySourceBytesV1()`
+  resolves paths beneath a configured repository root. The admitted AST refinement
+  provider checks ordinal-map source/workspace revisions before using these owners.
+- [x] Added direct tests for byte-exact reads and traversal/absolute-path rejection.
+  They exposed that Windows drive-absolute paths fell through to `realpath`/`ENOENT`;
+  normalization now rejects native, POSIX, and Win32 absolute forms explicitly.
+- [x] Provider and resolver validation tests pass **5/5**; the resolver suite exercises
+  the pure row validator, not a live PostgreSQL query.
+- [ ] The source provider still has no production caller from the retrieval/ACE path.
+  Do not treat this helper proof as a selected-candidate crosswalk, live source readback,
+  or ACE admission. The authorized repository root, sealed ordinal map, and candidate
+  packet/source join must still be supplied by existing production owners.
+
+Validation: `admitted-ast-grep-provider-v1.spec.ts` and
+`admitted-source-revision-resolver-v1.spec.ts`, **5/5**. Temporary test files were
+removed by the fixture cleanup; no database or other live store was accessed.

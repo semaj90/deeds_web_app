@@ -44,3 +44,9 @@ test('empty source returns empty symbols, not an error', { skip: !isAstGrepAvail
   assert.deepEqual(result.symbols, []);
   assert.equal(result.coverage, 0);
 });
+
+test('extracts return-typed functions (regression: typed-return function was silently dropped)', { skip: !isAstGrepAvailable() }, () => {
+  const src = 'export function d(x: number): number {\n  return x;\n}\n';
+  const result = extractSymbolsViaAstGrep(src, 'typescript');
+  assert.ok(result.symbols.includes('d'), `expected 'd' in ${JSON.stringify(result.symbols)}`);
+});

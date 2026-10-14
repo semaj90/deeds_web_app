@@ -18,6 +18,10 @@ import { spawnSync } from 'node:child_process';
 
 const TS_JS_PATTERNS = [
   { kind: 'FUNCTION', pattern: 'function $NAME($$$ARGS) { $$$ }' },
+  // Return-typed functions (`export function f(x: number): number { ... }`) do not match the
+  // untyped pattern above; confirmed 2026-10-13 against src/lib/server/atlas/tensors/tile-key.ts,
+  // which the untyped pattern alone reported as 0 symbols.
+  { kind: 'FUNCTION', pattern: 'function $NAME($$$ARGS): $RET { $$$ }' },
   { kind: 'FUNCTION', pattern: 'const $NAME = ($$$ARGS) => $$$BODY' },
   // Typed const declarations (`export const load: PageServerLoad = async (...) => {...}`,
   // `export const POST: RequestHandler = ...`) are the dominant SvelteKit route-handler

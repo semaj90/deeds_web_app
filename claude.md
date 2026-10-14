@@ -1788,3 +1788,11 @@ Verbatim original: `docs/archive/claude-md-status-and-governance-2026-10-03.md`.
 @AGENTS.md
 
 <!-- OPENWIKI:END -->
+
+## Agentic dense search and GraphRAG identity (2026-10-13)
+
+- Dense search key: `semantic_768` (EmbeddingGemma) vector plus `packet_key`. Qdrant point IDs are projection IDs only.
+- AST and source join key: `source_ref` (with `sourceRevision` when qualified). Never join on `feature_id` alone.
+- `title_id` is a unique title-derived identity (`title:<source-slug>:<hash>`, 61,660 distinct values). It is not a semantic key. Do not use it for dense or AST matching.
+- Multi-hop inventory: `docs/reports/graphrag-multihop-analysis-2026-10-13.json` lists 32 populated edge and graph tables with exact counts and columns. It is descriptive. No traversal has been timed.
+- Not proven: bounded multi-hop traversal, NetworkX PageRank over these tables, and per-table edge endpoint identity.

@@ -295,6 +295,17 @@ test('persisted cold and warm captures are timed and produce the same source fra
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
+test('snapshot readback rejects a tampered snapshot revision', () => {
+  const root = makeRepo();
+  try {
+    const snapshot = captureStableSnapshot(root, 'ws-test');
+    const tampered = { ...snapshot, snapshotRevision: `sha256:${'0'.repeat(64)}` };
+    const readback = validateSnapshot(tampered);
+    assert.equal(readback.status, 'SNAPSHOT_READBACK_BLOCKED');
+    assert.ok(readback.violations.includes('MANIFEST_CHECKSUM_MISMATCH'));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
 test('uncached byte oracle invalidates persisted cache after same-size same-mtime drift', () => {
   const root = makeRepo();
   try {

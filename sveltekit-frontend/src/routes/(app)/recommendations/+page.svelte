@@ -514,6 +514,9 @@
 					</div>
 					<button
 						type="button"
+						role="switch"
+						aria-checked={gpuRerank}
+						aria-label="Toggle GPU Reranking"
 						class="rec-toggle"
 						class:on={gpuRerank}
 						onclick={() => { gpuRerank = !gpuRerank; }}

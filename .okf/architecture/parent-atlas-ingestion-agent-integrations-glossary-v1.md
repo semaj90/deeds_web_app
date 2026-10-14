@@ -10,6 +10,8 @@ source_refs:
   - AGENTS.md
   - .okf/pipelines/web-sources.md
   - .okf/systems/parent-atlas-compute-ownership.md
+  - docs/.okf/research/deltanet-swiglu/manifest.json
+  - docs/.okf/research/deltanet-swiglu/published-current.json
   - sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts
 related:
   - system/hyperrag
@@ -30,6 +32,18 @@ related:
 * **Definition**: Web crawl/fetch acquisition engine for dynamic and rendered documentation/pages.
 * **Boundary**: Acquisition and staging only. Raw fetched markup is retained with `source_url`, `crawl_timestamp`, provider, and byte hash.
 * **Ingestion Role**: Staged in external document/crawler tables (`external_programming_docs_768` or `crawled_documents`). It **never** writes directly into canonical workspace source registries (`atlas_packets` or `codebase_chunk_index`) without passing through explicit workspace source admission (`SOURCE-BINDING-03`).
+
+### DeltaNet
+* **Definition**: Attention/memory architecture family using delta-rule state updates; gated variants may be combined with other attention layers.
+* **Boundary**: Model-internal architecture, not a Parent Atlas retrieval lane, routing ID, packet field, or embedding conversion. Reference: Yang et al., [Gated Delta Networks](https://arxiv.org/abs/2412.06464); staged reference-only corpus: `docs/.okf/research/deltanet-swiglu/`.
+
+### SwiGLU
+* **Definition**: A gated feed-forward activation variant that combines a SiLU-transformed projection with a learned gate.
+* **Boundary**: Feed-forward block operation, distinct from attention architecture, embedding dimension, and autoencoder latent transform. Reference: Shazeer, [GLU Variants Improve Transformer](https://arxiv.org/abs/2002.05202). Model-specific use must be established from that model's architecture/configuration evidence.
+
+### Selection receipt
+* **Definition**: A revision/checksum-bound record linking a query run, candidate snapshot and ordinal map, optional routing manifest, ordered Top-K result, evidence/tuple references, task phase/gate, and ContextManifest identity/admission.
+* **Boundary**: A proposed cross-contract binding, not a new canonical identity owner. Routing IDs name routing artifacts/decisions; canonical packet/source IDs remain with existing identity contracts. `laneMask` records provenance and does not create additional votes.
 
 ### n-gram / Trigram (`pg_trgm`)
 * **Definition**: Substring n-tuples of adjacent characters or tokens. In PostgreSQL, `pg_trgm` provides 3-character fuzzy matching and trigram similarity over text fields.

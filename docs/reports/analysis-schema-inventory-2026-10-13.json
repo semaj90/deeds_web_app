@@ -1,0 +1,3596 @@
+{
+  "schema": "atlas.analysis-schema-inventory.v1",
+  "generatedAt": "2026-10-13",
+  "database": "PostgreSQL 18.4 legal_ai_db (public schema)",
+  "counting": "exact count(*) per base table; relatedFileCount = unique files under sveltekit-frontend/src, scripts, python whose text contains the table name as a whole word (excludes md, json, archive)",
+  "laneRules": {
+    "dailyGraphify": "graph|graphify|neo4j|hyperedge|topolog|community|edge|authority",
+    "kmeansClustering": "cluster|centroid|som_|kmeans|latent|embedding|semantic|vector|tensor|tile",
+    "topKRetrieval": "rank|rerank|retriev|search|candidate|score|ablation|eval|judg|relevance|fusion",
+    "pagination": "log|history|event|timeline|telemetry|audit|run|feed|queue|outbox",
+    "pagerankCandidates": "pagerank|authority|centrality|graph_node|node_metric|^atlas_packets$|packet_features|^feature_"
+  },
+  "populatedTables": 231,
+  "tables": [
+    {
+      "table": "evidence",
+      "liveRows": 806,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3315,
+      "relatedFilesSample": [
+        "python/atlas_compute/concept_tile_bridge_v1.py",
+        "python/atlas_compute/dag_snapshot_state_v1.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_struct_01_bfs.py",
+        "python/atlas_compute/graph_vector_alignment_v1.py",
+        "python/atlas_compute/interpolation.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "reports",
+      "liveRows": 20,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2133,
+      "relatedFilesSample": [
+        "python/atlas_compute/gpu_mini_fabric/bitfrost_sim_01.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_ann_01.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_ann_02_build_isolation.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_ann_02_itopk_sweep.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_ann_03_semantic_768.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "cases",
+      "liveRows": 11,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1089,
+      "relatedFilesSample": [
+        "python/atlas_compute/gpu_mini_fabric/semantic_exact_parity_01.py",
+        "python/atlas_doc_19_exact_semantic_search_v1.py",
+        "python/benchmark_latent256_silver_relevance.py",
+        "python/test_atlas_structural_provenance.py",
+        "scripts/api_repair.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "atlas_packets",
+      "liveRows": 61718,
+      "drizzleDeclared": true,
+      "relatedFileCount": 856,
+      "relatedFilesSample": [
+        "python/atlas_embeddinggemma_parity_v1.py",
+        "python/atlas_semantic512_exact_v2.py",
+        "python/atlas_semantic512_reconcile.py",
+        "python/build_live_graph_fixture_semantic512.py",
+        "python/freeze_real_semantic_snapshot_v2.py"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "codebase_chunk_index",
+      "liveRows": 274465,
+      "drizzleDeclared": true,
+      "relatedFileCount": 472,
+      "relatedFilesSample": [
+        "python/atlas_compute/gpu_mini_fabric/export_semantic_768_fixture.py",
+        "python/atlas_compute/gpu_mini_fabric/graph_ann_03_semantic_768.py",
+        "python/atlas_compute/gpu_mini_fabric/semantic_topk_01_real_canary.py",
+        "python/atlas_semantic512_reconcile.py",
+        "python/backfill_latent_256.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "users",
+      "liveRows": 7,
+      "drizzleDeclared": true,
+      "relatedFileCount": 350,
+      "relatedFilesSample": [
+        "scripts/agent/turbovec-search-memory.mjs",
+        "scripts/api-cleanup/categorizer.ts",
+        "scripts/api-cleanup/production-route-fixer.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/ollama/analyze-legal-document/+server.ts.backup-1757657384408",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/suggest/+server.ts.any-backup"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "sessions",
+      "liveRows": 101,
+      "drizzleDeclared": true,
+      "relatedFileCount": 242,
+      "relatedFilesSample": [
+        "python/atlas_embeddinggemma_parity_v1.py",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph/+server.ts.batch1000-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/admin/service-graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/multi-agent/+server.ts.any-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/multi-agent/+server.ts.backup-1757657384401"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "legal_documents",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 211,
+      "relatedFilesSample": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/autocomplete/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/graph/+server.ts.batch1000-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/clustering/kmeans/cluster/+server.ts.any-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/clustering/kmeans/cluster/+server.ts.batch1000-backup"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_workspace_source_bindings",
+      "liveRows": 47936,
+      "drizzleDeclared": false,
+      "relatedFileCount": 117,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v1.mjs",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+        "scripts/atlas/apply-current-workspace-source-bindings-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_packet_chunk_lineage",
+      "liveRows": 127927,
+      "drizzleDeclared": false,
+      "relatedFileCount": 98,
+      "relatedFilesSample": [
+        "python/prepare_golden_review_pool_v1.py",
+        "scripts/atlas/apply-codebase-chunk-lineage-backfill-v2.mjs",
+        "scripts/atlas/apply-pkt-lineage-09-historical-promotion-v1.mjs",
+        "scripts/atlas/apply-pkt-lineage-11-recon-canary-01-v1.mjs",
+        "scripts/atlas/audit-bridge-recon-dry-03-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_files",
+      "liveRows": 26014,
+      "drizzleDeclared": false,
+      "relatedFileCount": 97,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs",
+        "scripts/atlas/apply-file-level-source-refs-content-reconciled-v1.mjs",
+        "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+        "scripts/atlas/audit-ast-hash-grain-classification-v1.mjs",
+        "scripts/atlas/audit-ast-source-authority-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_map",
+      "liveRows": 4748,
+      "drizzleDeclared": true,
+      "relatedFileCount": 69,
+      "relatedFilesSample": [
+        "scripts/agentic/startup-briefing.mjs",
+        "scripts/atlas/_inspect-glyph-schema.mjs",
+        "scripts/atlas/audit-atlas-packet-join-gaps.mjs",
+        "scripts/atlas/audit-final-completion-report.mjs",
+        "scripts/atlas/audit-glyph-records.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_execution_file_membership_v2",
+      "liveRows": 351065,
+      "drizzleDeclared": false,
+      "relatedFileCount": 56,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+        "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
+        "scripts/atlas/audit-ast-provider-provenance-v1.mjs",
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "nes_chrom_packets",
+      "liveRows": 1992,
+      "drizzleDeclared": true,
+      "relatedFileCount": 56,
+      "relatedFilesSample": [
+        "scripts/atlas/_inspect-glyph-schema.mjs",
+        "scripts/atlas/audit-final-completion-report.mjs",
+        "scripts/atlas/audit-glyph-records.mjs",
+        "scripts/atlas/audit-lineage-chr97-validation.mjs",
+        "scripts/atlas/audit-lineage-validation.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "task_semantic_packets",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 56,
+      "relatedFilesSample": [
+        "scripts/atlas/alias-id-migration-preflight.mjs",
+        "scripts/atlas/align-grpc-proto-to-postgres-indexes.mjs",
+        "scripts/atlas/apply-task-semantic-packet-migration-v1.mjs",
+        "scripts/atlas/audit-final-completion-report.mjs",
+        "scripts/atlas/audit-lineage-validation.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_summary_layers",
+      "liveRows": 18437,
+      "drizzleDeclared": true,
+      "relatedFileCount": 55,
+      "relatedFilesSample": [
+        "scripts/atlas/ace-packet-assembly.mjs",
+        "scripts/atlas/analysis-pass-orchestrator.mts",
+        "scripts/atlas/audit-enrichment-lineage-gates-v1.mjs",
+        "scripts/atlas/audit-inference-sources.mjs",
+        "scripts/atlas/audit-july-gemma4-layer-vector-provenance-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_symbol_versions",
+      "liveRows": 479,
+      "drizzleDeclared": true,
+      "relatedFileCount": 55,
+      "relatedFilesSample": [
+        "python/miniforge_nlp_sidecar.py",
+        "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+        "scripts/atlas/audit-ast-explore-seed-v1.mjs",
+        "scripts/atlas/audit-atlas-indexing-surfaces.mjs",
+        "scripts/atlas/audit-atlas-symbol-registry-freshness-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_ast_nodes",
+      "liveRows": 523271,
+      "drizzleDeclared": true,
+      "relatedFileCount": 47,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-ast-declaration-canary-v1.mjs",
+        "scripts/atlas/atlas-ast-backfill-receipt-v1.mjs",
+        "scripts/atlas/audit-ast-authority-gap-derivation-v1.mjs",
+        "scripts/atlas/audit-ast-explore-seed-v1.mjs",
+        "scripts/atlas/audit-ast-hash-column-contract-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_executions",
+      "liveRows": 36,
+      "drizzleDeclared": false,
+      "relatedFileCount": 47,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+        "scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs",
+        "scripts/atlas/apply-graphify-execution-authority-import-v1.mts",
+        "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
+        "scripts/atlas/audit-critical-lineage-live-readback-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "library_documents",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 45,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/active/library_search.proto",
+        "scripts/backfill-qdrant-legal.mjs",
+        "scripts/constitution-pg-insert.mjs",
+        "scripts/constitution-pipeline.mjs",
+        "scripts/index-lawpdfs-to-rag.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "legal_nodes",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 43,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/active/library_search.proto",
+        "scripts/backfill-qdrant-legal.mjs",
+        "scripts/constitution-pg-insert.mjs",
+        "scripts/constitution-pipeline.mjs",
+        "scripts/index-lawpdfs-to-rag.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "workspaces",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 43,
+      "relatedFilesSample": [
+        "scripts/atlas/_atlas-utils.mjs",
+        "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+        "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+        "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs",
+        "scripts/atlas/audit-graphify-stale-run-reconciliation-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": "single common word: lexical matches may be unrelated code; not proof of use"
+    },
+    {
+      "table": "atlas_symbol_registry",
+      "liveRows": 10504,
+      "drizzleDeclared": true,
+      "relatedFileCount": 42,
+      "relatedFilesSample": [
+        "scripts/atlas/adapt-tree-bound-symbol-registry-to-materializer-v1.mjs",
+        "scripts/atlas/apply-current-tree-bound-symbol-registry-canary-v1.mjs",
+        "scripts/atlas/apply-symbol-registry-revision-repair-v1.mjs",
+        "scripts/atlas/apply-symbol-revision-repair-v1.mjs",
+        "scripts/atlas/audit-atlas-indexing-surfaces.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_runs",
+      "liveRows": 20,
+      "drizzleDeclared": false,
+      "relatedFileCount": 41,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
+        "scripts/atlas/apply-graphify-stale-run-reconciliation-v1.mjs",
+        "scripts/atlas/audit-ast-source-authority-v1.mjs",
+        "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+        "scripts/atlas/audit-current-graphify-source-revision-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_source_refs",
+      "liveRows": 46945,
+      "drizzleDeclared": true,
+      "relatedFileCount": 39,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-admitted-workspace-source-bindings-content-reconciled-v1.mjs",
+        "scripts/atlas/apply-current-execution-workspace-bindings-v1.mjs",
+        "scripts/atlas/apply-current-source-registry-reconciliation-v1.mjs",
+        "scripts/atlas/apply-current-workspace-source-bindings-v1.mjs",
+        "scripts/atlas/apply-feature-ontology-alias-target-registry-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "context_timeline",
+      "liveRows": 4895,
+      "drizzleDeclared": true,
+      "relatedFileCount": 39,
+      "relatedFilesSample": [
+        "scripts/atlas/build-feature-graph.mjs",
+        "scripts/atlas/devops-smoke-gan.mjs",
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/packets/inject-diversity-packets.mjs",
+        "sveltekit-frontend/src/lib/server/ace/types.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "legal_chunks",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 39,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/active/library_search.proto",
+        "scripts/backfill-legal-definitions.mjs",
+        "scripts/backfill-qdrant-legal.mjs",
+        "scripts/constitution-pg-insert.mjs",
+        "scripts/constitution-pipeline.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_tree_nodes",
+      "liveRows": 269972,
+      "drizzleDeclared": true,
+      "relatedFileCount": 38,
+      "relatedFilesSample": [
+        "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+        "scripts/atlas/adaptive-schema-recommendations.mjs",
+        "scripts/atlas/add-atlas-packets-columns.mjs",
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-enrichment-lineage-gates-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "research_summaries",
+      "liveRows": 56,
+      "drizzleDeclared": true,
+      "relatedFileCount": 37,
+      "relatedFilesSample": [
+        "scripts/atlas/build-feature-graph.mjs",
+        "scripts/tests/seed-research-summaries.mjs",
+        "sveltekit-frontend/src/lib/components/analytics/ResearchSummariesBrowser.svelte",
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/ace/ace-error-kag.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "route_runtime_packets",
+      "liveRows": 11,
+      "drizzleDeclared": true,
+      "relatedFileCount": 35,
+      "relatedFilesSample": [
+        "scripts/agentic/startup-briefing.mjs",
+        "scripts/atlas/align-grpc-proto-to-postgres-indexes.mjs",
+        "scripts/atlas/audit-contextual-tree-readiness.mjs",
+        "scripts/atlas/audit-live-service-env.mjs",
+        "scripts/atlas/audit-parent-atlas-production-readiness.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_ontology_tuples",
+      "liveRows": 539124,
+      "drizzleDeclared": true,
+      "relatedFileCount": 33,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-ast-authority-gap-derivation-v1.mjs",
+        "scripts/atlas/audit-current-feature-ontology-relationship-readback-v1.mjs",
+        "scripts/atlas/audit-feature-ontology-current-cohort-v1.mjs",
+        "scripts/atlas/audit-feature-ontology-evidence-freshness-v1.mjs",
+        "scripts/atlas/audit-feature-ontology-explicit-alias-v1.mjs"
+      ],
+      "analysisLanes": [
+        "pagination",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_higher_hop_index",
+      "liveRows": 58309,
+      "drizzleDeclared": true,
+      "relatedFileCount": 32,
+      "relatedFilesSample": [
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/apply-identity-lanes-full.mjs",
+        "scripts/atlas/audit-glyph-label-coverage.mjs",
+        "scripts/atlas/audit-metadata-contract-across-stores.mjs",
+        "scripts/atlas/audit-p4-higher-hop-enrichment.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "chunk_hit_log",
+      "liveRows": 32,
+      "drizzleDeclared": true,
+      "relatedFileCount": 29,
+      "relatedFilesSample": [
+        "scripts/atlas/devops-smoke-gan.mjs",
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "scripts/atlas/retrieval-e2e-benchmark.mjs",
+        "scripts/atlas/xgboost-hotness-score.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_packet_features",
+      "liveRows": 61718,
+      "drizzleDeclared": true,
+      "relatedFileCount": 28,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-naive-bayes-predictions.mjs",
+        "scripts/atlas/arrow-batch-export.mjs",
+        "scripts/atlas/audit-atlas-indexing-surfaces.mjs",
+        "scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs",
+        "scripts/atlas/audit-p2a-native-ast-source-crosswalk-v1.mjs"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_artifacts",
+      "liveRows": 58312,
+      "drizzleDeclared": true,
+      "relatedFileCount": 27,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-atlas-packet-content-hash-lineage.mjs",
+        "scripts/atlas/audit-atlas-packets-content-hash-source.mjs",
+        "scripts/atlas/audit-byte-scope-reconciliation.mjs",
+        "scripts/atlas/compare-source-manifest-to-projections-v1.mjs",
+        "scripts/atlas/parent-atlas-workstation-status.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "embedding_cache",
+      "liveRows": 122,
+      "drizzleDeclared": true,
+      "relatedFileCount": 26,
+      "relatedFilesSample": [
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/graph/+server.ts.batch1000-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/brain/graph/+server.ts",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/vector/search/+server.ts.any-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/vector/search/+server.ts.batch1000-backup",
+        "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/v1/vector/search/+server.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_topology_index",
+      "liveRows": 67189,
+      "drizzleDeclared": true,
+      "relatedFileCount": 25,
+      "relatedFilesSample": [
+        "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+        "scripts/atlas/adaptive-schema-recommendations.mjs",
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-feature-registry-gemma4.mjs",
+        "scripts/atlas/audit-inference-sources.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "cluster_summaries",
+      "liveRows": 20,
+      "drizzleDeclared": true,
+      "relatedFileCount": 25,
+      "relatedFilesSample": [
+        "scripts/atlas/materialize-task-cards.mjs",
+        "scripts/atlas/parent-atlas-turbovec-compression-plan.mjs",
+        "scripts/atlas/proto/active/codeintel.proto",
+        "scripts/atlas/proto/active/codeintel_enrichment.proto",
+        "scripts/atlas/wire-atlas-qdrant.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "analysis_pass_results",
+      "liveRows": 11104,
+      "drizzleDeclared": true,
+      "relatedFileCount": 24,
+      "relatedFilesSample": [
+        "scripts/atlas/analysis-pass-orchestrator.mts",
+        "scripts/atlas/audit-analysis-pass-metadata-gaps-v1.mjs",
+        "scripts/atlas/audit-enrichment-lineage-gates-v1.mjs",
+        "scripts/atlas/audit-live-source-lineage-tables.mjs",
+        "scripts/atlas/audit-parent-atlas-concept-fabric-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_traces",
+      "liveRows": 1100,
+      "drizzleDeclared": true,
+      "relatedFileCount": 24,
+      "relatedFilesSample": [
+        "scripts/atlas/atlas-startup-intelligence.mjs",
+        "scripts/atlas/audit-higher-hop-enrichment.mjs",
+        "scripts/atlas/audit-ranking-signal-coverage.mjs",
+        "scripts/atlas/audit-raw-concept-labels-v1.mjs",
+        "scripts/atlas/audit-xgboost-trace-label-candidates.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "taxonomy_nodes",
+      "liveRows": 5527,
+      "drizzleDeclared": true,
+      "relatedFileCount": 21,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs",
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/atlas/audit-taxonomy-forest-invariants-v1.mjs",
+        "scripts/atlas/build-kag-fixture.mts",
+        "scripts/atlas/embed-chunks.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_hyperedges",
+      "liveRows": 62802,
+      "drizzleDeclared": true,
+      "relatedFileCount": 20,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-graph-revision-owner-v1.mjs",
+        "scripts/atlas/audit-hypergraph-current-arity-census-v1.mjs",
+        "scripts/atlas/audit-kag-persistence-v1.mjs",
+        "scripts/atlas/build-kag-fixture-and-materialize.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_external_doc_chunks",
+      "liveRows": 852,
+      "drizzleDeclared": false,
+      "relatedFileCount": 20,
+      "relatedFilesSample": [
+        "python/atlas_doc_19_exact_semantic_search_v1.py",
+        "python/atlas_semantic_doc_01_parity_v1.py",
+        "python/atlas_summary_candidate_v1.py",
+        "python/atlas_summary_claim_judge_replay_v1.py",
+        "python/atlas_summary_faithfulness_v1.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_external_doc_pages",
+      "liveRows": 30,
+      "drizzleDeclared": false,
+      "relatedFileCount": 20,
+      "relatedFilesSample": [
+        "python/atlas_doc_19_exact_semantic_search_v1.py",
+        "python/atlas_doc_version_pin_audit_v1.py",
+        "python/atlas_semantic_doc_01_parity_v1.py",
+        "python/atlas_summary_candidate_v1.py",
+        "python/atlas_summary_claim_judge_replay_v1.py"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_observation_feature_rows",
+      "liveRows": 1808,
+      "drizzleDeclared": false,
+      "relatedFileCount": 19,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-atlas-indexing-surfaces.mjs",
+        "scripts/atlas/audit-atlas-migration-owners.mjs",
+        "scripts/atlas/audit-chunk-retrieval-profile-live-readback-v1.mjs",
+        "scripts/atlas/audit-enrichment-lineage-gates-v1.mjs",
+        "scripts/atlas/audit-observation-feature-registry-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "error_logs",
+      "liveRows": 292,
+      "drizzleDeclared": true,
+      "relatedFileCount": 19,
+      "relatedFilesSample": [
+        "scripts/atlas/adaptive-schema-contract-reconciler.mjs",
+        "scripts/atlas/adaptive-schema-recommendations.mjs",
+        "scripts/atlas/apply-error-fixes.mjs",
+        "scripts/atlas/audit-error-fixes.mjs",
+        "scripts/atlas/compute-hmm-transition-matrix.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "persons_of_interest",
+      "liveRows": 40,
+      "drizzleDeclared": true,
+      "relatedFileCount": 19,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "scripts/db-tests/add-missing-cols.cjs",
+        "scripts/db-tests/schema-audit.cjs",
+        "scripts/seed-neo4j.mjs",
+        "sveltekit-frontend/src/lib/server/db/0000_stiff_the_hood.sql"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_symbols",
+      "liveRows": 73309,
+      "drizzleDeclared": false,
+      "relatedFileCount": 18,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-latent-representation-identity.mjs",
+        "scripts/atlas/audit-source-revision-index.mjs",
+        "scripts/atlas/audit-stable-file-identity-owner-v1.mts",
+        "scripts/atlas/audit-symbol-producer-ownership-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_envelopes",
+      "liveRows": 58365,
+      "drizzleDeclared": true,
+      "relatedFileCount": 18,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-parent-atlas-missing-workstation.mjs",
+        "scripts/atlas/build-summary-envelopes-from-tuples.mjs",
+        "scripts/atlas/build-summary-semantics-workstation-tasks.mjs",
+        "scripts/atlas/export-parent-atlas-colab-bundle.mjs",
+        "scripts/atlas/export-summary-topology-pages.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_packet_metrics",
+      "liveRows": 67190,
+      "drizzleDeclared": true,
+      "relatedFileCount": 17,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-naive-bayes-predictions.mjs",
+        "scripts/atlas/arrow-batch-export.mjs",
+        "scripts/atlas/audit-topology-completion-gaps.mjs",
+        "scripts/atlas/domain-classification-readiness-audit.mjs",
+        "scripts/atlas/export-semantic-training-rows.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_packet_registry",
+      "liveRows": 61718,
+      "drizzleDeclared": true,
+      "relatedFileCount": 17,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-addressable-packet-materializers-v1.mjs",
+        "scripts/atlas/audit-mutation-site-census-v1.mjs",
+        "scripts/atlas/audit-packet-registry-gap-ws1-4-v1.mjs",
+        "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
+        "scripts/atlas/audit-registry-writer-ownership-v2.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_lexical_facts",
+      "liveRows": 73603,
+      "drizzleDeclared": true,
+      "relatedFileCount": 16,
+      "relatedFilesSample": [
+        "scripts/atlas/extract-lexical-features.mjs",
+        "scripts/atlas/fix-used-concepts-prefix-contamination.mjs",
+        "scripts/atlas/generate-ontology-tuples.mjs",
+        "scripts/atlas/materialize-registry-structural-lexical-domain.mts",
+        "scripts/atlas/phase-107-f-field-materializer.mts"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_execution_files",
+      "liveRows": 72486,
+      "drizzleDeclared": false,
+      "relatedFileCount": 16,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-critical-lineage-live-readback-v1.mjs",
+        "scripts/atlas/audit-critical-lineage-migration-dispositions-v1.mjs",
+        "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+        "scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
+        "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "error_events",
+      "liveRows": 159,
+      "drizzleDeclared": true,
+      "relatedFileCount": 16,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-phase78-cluster-assignment-cohort-v1.mts",
+        "scripts/atlas/plan-phase78-cluster-assignment-replacement-v1.mts",
+        "scripts/phase78-cluster-errors.mts",
+        "scripts/phase78-collect-errors.mts",
+        "sveltekit-frontend/src/lib/db/schema/cutlass.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "retrieval_telemetry",
+      "liveRows": 25,
+      "drizzleDeclared": true,
+      "relatedFileCount": 16,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-hyperrag-timing-coverage.mjs",
+        "scripts/atlas/audit-live-service-env.mjs",
+        "scripts/atlas/audit-replay-telemetry-breadth.mjs",
+        "scripts/atlas/generate-concept-records.mjs",
+        "scripts/atlas/generate-qlora-data.mjs"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "embedded_summaries",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 16,
+      "relatedFilesSample": [
+        "scripts/atlas/schema/pre-apply-check.mjs",
+        "scripts/hydrate-manifold.mjs",
+        "scripts/phase85/langextract-canonical-pipeline.mjs",
+        "scripts/phase85/p9-langextract-gpu-accelerated.mjs",
+        "sveltekit-frontend/src/lib/server/couchdb/memory-mirror.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "outcome_ledger",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 15,
+      "relatedFilesSample": [
+        "scripts/atlas/ace-domain-evidence-extractor.mts",
+        "scripts/atlas/audit-agentic-receipt-live-schema-v1.mjs",
+        "scripts/atlas/audit-agentic-receipt-owner-v1.mjs",
+        "scripts/atlas/run-agent-execution-spine-fixture-v1.mts",
+        "scripts/phase2a3-collect-traces.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "error_clusters",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 15,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-phase78-cluster-assignment-cohort-v1.mts",
+        "scripts/atlas/compute-hmm-transition-matrix.mjs",
+        "scripts/atlas/latent-and-cluster-writer-guards.spec.mjs",
+        "scripts/atlas/plan-phase78-cluster-assignment-replacement-v1.mts",
+        "scripts/phase78-cluster-errors.mts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_domain_facts",
+      "liveRows": 123376,
+      "drizzleDeclared": true,
+      "relatedFileCount": 14,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/atlas/experimental/domain-classifier-with-semantic-validation.mts",
+        "scripts/atlas/generate-ontology-tuples.mjs",
+        "scripts/atlas/materialize-registry-structural-lexical-domain.mts",
+        "scripts/atlas/phase-107-backfill-joins.mts"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graph_analysis_runs",
+      "liveRows": 24,
+      "drizzleDeclared": true,
+      "relatedFileCount": 14,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-graph-revision-owner-v1.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/graph/betweenness-analysis-adapter.spec.ts",
+        "sveltekit-frontend/src/lib/server/graph/betweenness-analysis-adapter.ts",
+        "sveltekit-frontend/src/lib/server/graph/cheirank-analysis-adapter.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "rag_query_log",
+      "liveRows": 11,
+      "drizzleDeclared": true,
+      "relatedFileCount": 14,
+      "relatedFilesSample": [
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/search-analytics.ts",
+        "sveltekit-frontend/src/lib/server/features/cases/deep-research.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "code_llm_index",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 14,
+      "relatedFilesSample": [
+        "scripts/atlas/batch-cluster-summarizer.mjs",
+        "scripts/atlas/build-feature-graph.mjs",
+        "scripts/promotion/audit-drizzle-promotion-drift.mjs",
+        "scripts/promotion/audit-postgres-promotion-schema.mjs",
+        "scripts/promotion/audit-typescript-promotion-bridge.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_hyperedge_members",
+      "liveRows": 125604,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-hypergraph-current-arity-census-v1.mjs",
+        "scripts/atlas/audit-kag-persistence-v1.mjs",
+        "scripts/atlas/build-kag-fixture-and-materialize.mjs",
+        "scripts/atlas/kag-hypergraph-roundtrip-proof-v1.mts",
+        "scripts/atlas/kag-persist-hyperedges-live-proof-v1.mts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_structural_facts",
+      "liveRows": 66717,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/ace-domain-evidence-extractor.mts",
+        "scripts/atlas/backfill-ast-symbols.mjs",
+        "scripts/atlas/experimental/domain-evidence-enrichment-pipeline.mts",
+        "scripts/atlas/generate-ontology-tuples.mjs",
+        "scripts/atlas/materialize-registry-structural-lexical-domain.mts"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "parent_atlas_vectors",
+      "liveRows": 9666,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-parent-atlas-consistency.mjs",
+        "scripts/atlas/backfill-atlas-links.mjs",
+        "scripts/atlas/check-db-state.mjs",
+        "scripts/atlas/enrich_atlas_packets.mjs",
+        "scripts/atlas/generate_parent_atlas_packets.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "parent_atlas_records",
+      "liveRows": 9571,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-parent-atlas-consistency.mjs",
+        "scripts/atlas/check-db-state.mjs",
+        "scripts/atlas/enrich_atlas_packets.mjs",
+        "scripts/atlas/generate_parent_atlas_packets.mjs",
+        "scripts/atlas/generate-gate3-report.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "cluster_cards",
+      "liveRows": 1906,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/export-atlas-cards.mjs",
+        "scripts/atlas/export-cards-for-weights.mjs",
+        "scripts/atlas/load-cluster-cards-postgres.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/rag-cards.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_execution_stages",
+      "liveRows": 160,
+      "drizzleDeclared": false,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-graphify-execution-run-bridge-v1.mjs",
+        "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+        "scripts/atlas/audit-current-graphify-snapshot-authority-v1.mts",
+        "scripts/atlas/audit-current-graphify-source-bridge-reconciliation-v1.mjs",
+        "scripts/atlas/audit-current-source-owner-reconciliation-v1.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_svg_glyphs",
+      "liveRows": 100,
+      "drizzleDeclared": true,
+      "relatedFileCount": 13,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-glyph-label-coverage.mjs",
+        "scripts/atlas/audit-higher-hop-enrichment-fields.mjs",
+        "scripts/atlas/backfill-higher-hop-enrichment-fields.mjs",
+        "scripts/atlas/create-svg-glyphs-table.mjs",
+        "scripts/atlas/logger-analytics-clustering-health.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_authority_scores",
+      "liveRows": 212398,
+      "drizzleDeclared": true,
+      "relatedFileCount": 12,
+      "relatedFilesSample": [
+        "python/benchmark_ga8_graph_feature_ablation.py",
+        "python/freeze_ga8_graph_authority_snapshot_v1.py",
+        "python/ga8_hardening.py",
+        "python/sweep_ga8_blend_weight.py",
+        "scripts/atlas/daily-graphify-concrete-dag.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "topKRetrieval",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_implementations",
+      "liveRows": 39556,
+      "drizzleDeclared": true,
+      "relatedFileCount": 12,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-registry-enrichment-joins.mts",
+        "scripts/atlas/build-feature-graph.mjs",
+        "scripts/atlas/materialize-registry-ontology-tuples.mts",
+        "scripts/atlas/materialize-registry-topology.mts",
+        "scripts/atlas/phase-107-backfill-joins.mts"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "analysis_jobs",
+      "liveRows": 18,
+      "drizzleDeclared": true,
+      "relatedFileCount": 12,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/analysis/analysis-jobs.ts",
+        "sveltekit-frontend/src/lib/server/analysis/code-feature-registry-enqueue.spec.ts",
+        "sveltekit-frontend/src/lib/server/analysis/code-feature-registry-enqueue.ts",
+        "sveltekit-frontend/src/lib/server/analysis/lexical-pass-executor-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/analysis/source-pos-concept-packet.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_execution_authority",
+      "liveRows": 1,
+      "drizzleDeclared": false,
+      "relatedFileCount": 12,
+      "relatedFilesSample": [
+        "scripts/atlas/apply-current-graphify-execution-owner-decision-v1.mjs",
+        "scripts/atlas/apply-graphify-execution-authority-import-v1.mts",
+        "scripts/atlas/audit-current-graphify-run-owner-v1.mjs",
+        "scripts/atlas/audit-graphify-authority-observation-v1.mts",
+        "scripts/atlas/audit-graphify-authority-reader-cutover-preflight-v1.mts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graph_node_metrics",
+      "liveRows": 351276,
+      "drizzleDeclared": true,
+      "relatedFileCount": 11,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/atlas/graph/graph-feature-snapshot.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/feature-matrix-contract.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/graph/betweenness-analysis-adapter.spec.ts",
+        "sveltekit-frontend/src/lib/server/graph/betweenness-analysis-adapter.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "taxonomy_edges",
+      "liveRows": 62802,
+      "drizzleDeclared": true,
+      "relatedFileCount": 11,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-pipeline-router-matrix-surfaces-v1.mjs",
+        "scripts/atlas/audit-taxonomy-forest-invariants-v1.mjs",
+        "scripts/atlas/populate-hyperedges-from-taxonomy-edges-v1.mts",
+        "sveltekit-frontend/src/lib/server/ace/ontology-tuple-enricher.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/oaklib/python-fastapi-oaklib-bridge-v1.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "ace_retrieval_runs",
+      "liveRows": 613,
+      "drizzleDeclared": true,
+      "relatedFileCount": 11,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "scripts/dev/test-ace-metrics.mjs",
+        "sveltekit-frontend/src/lib/server/ai/ace-schema-validator.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/metadata-spine.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-ace.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_relationships",
+      "liveRows": 603,
+      "drizzleDeclared": false,
+      "relatedFileCount": 11,
+      "relatedFilesSample": [
+        "python/build_live_graph_fixture_semantic512.py",
+        "scripts/atlas/audit-current-feature-ontology-relationship-readback-v1.mjs",
+        "scripts/atlas/audit-graph-revision-owner-v1.mjs",
+        "scripts/atlas/graph-prod-01-build-production-structural-snapshot-v1.mts",
+        "scripts/atlas/lib/feature-ontology-relationship-preview-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "gpu_cluster_centroids",
+      "liveRows": 64,
+      "drizzleDeclared": true,
+      "relatedFileCount": 11,
+      "relatedFilesSample": [
+        "scripts/atlas/dir-pipeline.mjs",
+        "scripts/atlas/neo4j-cluster-fanout.mjs",
+        "scripts/atlas/persist-kmeans-centroids.mjs",
+        "scripts/atlas/project-valkey-centroid-prefill.mjs",
+        "scripts/atlas/prove-query-fanout-bitfrost-v1.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "code_relations",
+      "liveRows": 12975,
+      "drizzleDeclared": true,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "scripts/atlas/neo4j-graph-enrich.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/prompt-mapper.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/metadata-spine.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_packet_identity_aliases",
+      "liveRows": 3294,
+      "drizzleDeclared": false,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs",
+        "scripts/atlas/audit-packet-key-v2-legacy-population-v1.mts",
+        "scripts/atlas/build-packet-key-v2-admission-manifest-v1.mts",
+        "scripts/atlas/reconcile-qdrant-postgres-identity-v1.mjs",
+        "scripts/atlas/register-orphaned-chunks.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "analytics_events",
+      "liveRows": 1234,
+      "drizzleDeclared": true,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/analytics/analytics-event-envelope.ts",
+        "sveltekit-frontend/src/lib/server/analytics/analytics-sink.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_evidence",
+      "liveRows": 603,
+      "drizzleDeclared": false,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-current-feature-ontology-relationship-readback-v1.mjs",
+        "scripts/atlas/audit-one-tuple-evidence-crosswalk-v1.mjs",
+        "scripts/atlas/materialize-feature-ontology-relationships-v1.mjs",
+        "scripts/atlas/plan-current-feature-ontology-evidence-lineage-repair-v1.mjs",
+        "scripts/atlas/preview-feature-ontology-relationships-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_domain_ontology",
+      "liveRows": 17,
+      "drizzleDeclared": true,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-ontology-population-decision-v1.mjs",
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/atlas/phase-b3-classify-domain.mjs",
+        "scripts/atlas/resolve-domain-tuples-exact-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/ontology-resolution-boundary-v1.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "library_document_versions",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 10,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/atlas/feature-doc-local-ingestion.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/library-document-versions.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/legal-corpus/legal/constitution-pipeline.ts",
+        "sveltekit-frontend/src/lib/server/features/legal-corpus/legal/ingestion-worker.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "api_audit_log",
+      "liveRows": 14967,
+      "drizzleDeclared": true,
+      "relatedFileCount": 9,
+      "relatedFilesSample": [
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "scripts/smoke-tests/phase3-workspace-validation.ps1",
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_context_files",
+      "liveRows": 1182,
+      "drizzleDeclared": false,
+      "relatedFileCount": 9,
+      "relatedFilesSample": [
+        "scripts/agent/idle-review.mjs",
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/skills/codebase-todo-aggregator.mjs",
+        "sveltekit-frontend/src/lib/server/agents-md/schema.ts",
+        "sveltekit-frontend/src/lib/server/atlas/types.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_symbol_aliases",
+      "liveRows": 388,
+      "drizzleDeclared": true,
+      "relatedFileCount": 9,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-symbol-identity-v1.mts",
+        "scripts/atlas/audit-symbol-producer-ownership-v1.mjs",
+        "scripts/atlas/audit-symbol-representation-table-census-v1.mjs",
+        "scripts/atlas/audit-symbol-revision-forward-qualification-v1.mjs",
+        "scripts/atlas/audit-symbol-revision-producer-census-v1.mts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "hypergraph_edges",
+      "liveRows": 282,
+      "drizzleDeclared": true,
+      "relatedFileCount": 9,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/cases/hypergraph-4d.ts",
+        "sveltekit-frontend/src/lib/server/hypergraph/hypergraph-builder.ts",
+        "sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_nodes_v2",
+      "liveRows": 483801,
+      "drizzleDeclared": true,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-source-revision-index.mjs",
+        "scripts/atlas/prove-ontology-tuple-graph-write-v1.mts",
+        "scripts/atlas/smoke-parent-atlas-graph-v2.mjs",
+        "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/graph/graph-traversal.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_authority_scores_v2",
+      "liveRows": 162234,
+      "drizzleDeclared": true,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "scripts/atlas/export-gpu-matrices.mjs",
+        "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/graph/graph-snapshot-materializer.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.test.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "topKRetrieval",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_chunk_packet_identity_links",
+      "liveRows": 105762,
+      "drizzleDeclared": false,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-current-packet-chunk-lineage-bridge-v1.mjs",
+        "scripts/atlas/audit-postgres-fts-identity-coverage.mjs",
+        "scripts/atlas/audit-postgres-fts-rejection-reasons-v1.mjs",
+        "scripts/atlas/audit-qdrant-representation-id-canonical-bridge-v1.mjs",
+        "scripts/atlas/audit-rpc-packet-registry-schema-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_file_edges",
+      "liveRows": 95995,
+      "drizzleDeclared": true,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-registry-enrichment-joins.mts",
+        "scripts/atlas/build-feature-graph.mjs",
+        "scripts/atlas/materialize-registry-structural-lexical-domain.mts",
+        "scripts/atlas/phase-107-backfill-joins.mts",
+        "scripts/atlas/phase-107-schema-audit.mts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_retrieval_eval_times",
+      "liveRows": 30,
+      "drizzleDeclared": true,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-glyph-label-coverage.mjs",
+        "scripts/atlas/audit-hyperrag-timing-coverage.mjs",
+        "scripts/atlas/parent-atlas-workstation-status.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/retrieval-eval-times.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "error_fingerprints",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 8,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/error-fingerprint.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/multi-lane-retrieval.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/ngram-retrieval.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "code_retrieval_chunks",
+      "liveRows": 41662,
+      "drizzleDeclared": false,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-large-corpus-qdrant-id-bridge-v1.mjs",
+        "scripts/eval-retrieval-harness.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/types.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ai/gemma4-agent.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "llm_synthesis_events",
+      "liveRows": 329,
+      "drizzleDeclared": true,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/atlas/eval-real-world-routing.mjs",
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/smoke-llm-synthesis-event.mjs",
+        "scripts/atlas/test-multi-tenant-isolation.mjs",
+        "scripts/phase76-mcp-server.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_callable_search",
+      "liveRows": 285,
+      "drizzleDeclared": true,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-atlas-migration-owners.mjs",
+        "scripts/atlas/enrich-ast-callable-search.mjs",
+        "scripts/atlas/generate-ontology-linked-tuple-fixture-v1.mts",
+        "scripts/atlas/materialize-ast-symbol-versions.mjs",
+        "scripts/atlas/plan-callable-enrichment-orf.mjs"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "tool_call_events",
+      "liveRows": 136,
+      "drizzleDeclared": true,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/phase2a3-collect-traces.mjs",
+        "scripts/test-agent-execute-telemetry.mjs",
+        "sveltekit-frontend/src/lib/server/agent/execution-review.integration.spec.ts",
+        "sveltekit-frontend/src/lib/server/agent/execution-review.ts",
+        "sveltekit-frontend/src/lib/server/router/telemetry-ranking-bridge.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_outbox",
+      "liveRows": 15,
+      "drizzleDeclared": false,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/hooks.server.ts",
+        "sveltekit-frontend/src/lib/server/queue/artifact-work-dispatch-v1.ts",
+        "sveltekit-frontend/src/lib/server/queue/code-evidence-outbox.spec.ts",
+        "sveltekit-frontend/src/lib/server/queue/outbox.ts",
+        "sveltekit-frontend/src/lib/server/queue/outbox-authority.spec.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "error_signal_stream",
+      "liveRows": 6,
+      "drizzleDeclared": true,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/atlas/agentic-error-mapreduce.mjs",
+        "scripts/atlas/create-agentic-error-tables.sql",
+        "scripts/atlas/lib/topology-recovery-selector.mjs",
+        "scripts/atlas/prove-agentic-error-temporal-event-mapping.mjs",
+        "scripts/atlas/validate-error-signal-evidence-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_snapshots_v2",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 7,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-graph-revision-owner-v1.mjs",
+        "scripts/atlas/prove-ontology-tuple-graph-write-v1.mts",
+        "scripts/atlas/smoke-parent-atlas-graph-v2.mjs",
+        "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/graph/mutation-awareness.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graph_community_assignments",
+      "liveRows": 1049522,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/atlas/graph/graph-feature-snapshot.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-analysis-types.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-dispatcher-proof.spec.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "graph_communities",
+      "liveRows": 790088,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/graph/community-taxonomy-policy.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-analysis-types.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-dispatcher-proof.spec.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "ontology_edges",
+      "liveRows": 252102,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/extract-keywords-from-ontology.mjs",
+        "scripts/atlas/materialize-ontology-node-index.mjs",
+        "scripts/atlas/populate-ontology-edges.mjs",
+        "scripts/ontology/ontology-edges-worker.mjs",
+        "scripts/ontology/resolve-edges-and-populate.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_edges_v2",
+      "liveRows": 224764,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/export-gpu-matrices.mjs",
+        "scripts/atlas/smoke-parent-atlas-graph-v2.mjs",
+        "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/graph/graph-traversal.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.test.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "packet_features",
+      "liveRows": 58304,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/agent/agent-scheduler-orchestrator.mjs",
+        "scripts/atlas/audit-parent-atlas-missing-workstation.mjs",
+        "scripts/atlas/build-gpu-feature-kanban-ranking.mjs",
+        "scripts/atlas/export-parent-atlas-colab-bundle.mjs",
+        "scripts/executive/executive-planner.mjs"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "code_features",
+      "liveRows": 1477,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/build-graphify-daily-feature-alignment.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/code-feature-registry-enqueue.ts",
+        "sveltekit-frontend/src/lib/server/analysis/source-pos-concept-packet.ts",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "ace_retrieval_hits",
+      "liveRows": 424,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "sveltekit-frontend/src/lib/server/ai/ace-schema-validator.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/metadata-spine.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-ace.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/ace-retrieval-logger.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_topology_eval_times",
+      "liveRows": 125,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/backfill-latent-vectors.mjs",
+        "scripts/atlas/backfill-packet-metadata-to-postgres.mjs",
+        "scripts/atlas/parent-atlas-health-check.mts",
+        "scripts/atlas/train-som-20x20.mjs",
+        "scripts/Test-ParentAtlasAlignment.ps1"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "outbox_events",
+      "liveRows": 6,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-critical-lineage-live-readback-v1.mjs",
+        "sveltekit-frontend/src/lib/server/agent/action-writer.ts",
+        "sveltekit-frontend/src/lib/server/agent/outbox-worker.ts",
+        "sveltekit-frontend/src/lib/server/atlas/acquisition/acquisition-stream.ts",
+        "sveltekit-frontend/src/lib/server/atlas/acquisition/acquisition-writer.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "rag_messages",
+      "liveRows": 5,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/packets/inject-diversity-packets.mjs",
+        "sveltekit-frontend/src/lib/server/db/0000_stiff_the_hood.sql",
+        "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "error_cluster_groups",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/agentic-error-mapreduce.mjs",
+        "scripts/atlas/create-agentic-error-tables.sql",
+        "scripts/atlas/generate-recovery-templates.mjs",
+        "scripts/atlas/latent-and-cluster-writer-guards.spec.mjs",
+        "sveltekit-frontend/src/lib/server/acp/ace-packet-swap.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "panel_activity_log",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/check-counts.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/ace/trust-tiers.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_authority_runs_v2",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/smoke-parent-atlas-graph-v2.mjs",
+        "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-analysis-runs.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.test.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_repository_identity",
+      "liveRows": 1,
+      "drizzleDeclared": false,
+      "relatedFileCount": 6,
+      "relatedFilesSample": [
+        "scripts/atlas/freeze-stable-file-population-apply-manifest-v1.mjs",
+        "scripts/atlas/mint-stable-file-identity-v1.mjs",
+        "scripts/atlas/plan-stable-file-population-preview-v1.mjs",
+        "scripts/atlas/prove-stable-file-canonical-writer-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/stable-file-identity-mint-v1.spec.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "symbol_resolver",
+      "liveRows": 58365,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/plan-symbol-resolver-revision-key-v1.mjs",
+        "scripts/atlas/populate-ontology-edges.mjs",
+        "scripts/atlas/symbol-reconciliation-writer-v1.mts",
+        "scripts/atlas/symbol-resolver-builder.mjs",
+        "scripts/atlas/verify-symbol-resolver.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_relationship_evidence",
+      "liveRows": 603,
+      "drizzleDeclared": false,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-current-feature-ontology-relationship-readback-v1.mjs",
+        "scripts/atlas/prove-feature-intelligence-database.mjs",
+        "scripts/atlas/prove-relationship-graph-readonly-replay-v1.mts",
+        "scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts",
+        "scripts/atlas/repair-current-feature-ontology-evidence-lineage-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "tool_registry",
+      "liveRows": 111,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/parent-atlas-memory-refresh.mjs",
+        "sveltekit-frontend/src/lib/server/ai/tool-schema-validator.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/phase10-ontology.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.deprecated-filter.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_statistics",
+      "liveRows": 11,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/phase102-step2-neo4j-gds.mjs",
+        "scripts/phase102-step3-qdrant-sync.mjs",
+        "sveltekit-frontend/src/lib/server/graph/neo4j-gds-orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evidence_audit_log",
+      "liveRows": 8,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "scripts/unsloth-training/generate_detective_mode_enhanced.py",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/routes/api/evidence/[id]/analyze/stream/+server.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "enrichment_jobs",
+      "liveRows": 7,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/active/codeintel.proto",
+        "sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/routes/api/codeintel/jobs/[jobId]/+server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_representations",
+      "liveRows": 7,
+      "drizzleDeclared": false,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "scripts/atlas/audit-enrichment-lineage-gates-v1.mjs",
+        "scripts/atlas/audit-qdrant-representations.mjs",
+        "scripts/atlas/audit-symbol-representation-table-census-v1.mjs",
+        "scripts/atlas/reconcile-promotion-critical-owners-v2.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_actions",
+      "liveRows": 3,
+      "drizzleDeclared": false,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/ai/dev-context-planner.ts",
+        "sveltekit-frontend/src/lib/server/ai/mcp-tool-dispatch.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/trace/trace-collector.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "community_reports",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 5,
+      "relatedFilesSample": [
+        "scripts/atlas/sourceRef-first-join-warmup.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/codebase-intel/indexer/directory-summarizer.ts",
+        "sveltekit-frontend/src/lib/server/graph/community-graph.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-synthesizer.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_domain",
+      "liveRows": 61659,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-registry-enrichment-joins.mts",
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/atlas/generate-ontology-tuples.mjs",
+        "scripts/atlas/populate-feature-lexical.mjs"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "qdrant_cluster_members",
+      "liveRows": 57751,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/atlas/types.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/kag-dag.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/hypergraph/search/+server.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "packet_vector_bundles",
+      "liveRows": 15652,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/export-classifier-dataset.mjs",
+        "scripts/atlas/populate-packet-vector-bundles.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/embedding-384-writers.guard.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "directory_context_bindings",
+      "liveRows": 2997,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-canonical-projection-fabric.mjs",
+        "sveltekit-frontend/src/lib/server/agents-md/resolve-directory-context.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "library_identities",
+      "liveRows": 1942,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/library-registry-scan.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/library-identities.ts",
+        "sveltekit-frontend/src/mcp/library-registry-tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_relationship_members",
+      "liveRows": 1206,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "python/build_live_graph_fixture_semantic512.py",
+        "scripts/atlas/prove-feature-intelligence-database.mjs",
+        "scripts/atlas/prove-relationship-graph-readonly-replay-v1.mts",
+        "scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_recommendation_index",
+      "liveRows": 1000,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/generate-feature-todos.mjs",
+        "scripts/atlas/materialize-feature-recommendation-index.mjs",
+        "scripts/atlas/refresh-feature-recommendations.mjs",
+        "scripts/atlas/refresh-semantic-fanout-topk.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_fi_evidence",
+      "liveRows": 603,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-current-feature-ontology-relationship-readback-v1.mjs",
+        "scripts/atlas/materialize-feature-ontology-relationships-v1.mjs",
+        "scripts/atlas/prove-feature-intelligence-database.mjs",
+        "scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "qdrant_centroid_clusters",
+      "liveRows": 202,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/check-centroid-clusters.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/kag-dag.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ai/raptor-summarizer.ts",
+        "sveltekit-frontend/src/lib/server/graph/neo4j-jsonl-exporter.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_queries",
+      "liveRows": 112,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-golden-review-corpus-v2.mjs",
+        "scripts/atlas/audit-golden-review-query-bindings-v1.mjs",
+        "scripts/atlas/bind-golden-review-query-ids-v1.mjs",
+        "scripts/crossencoder-benchmark.py"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "trace_events",
+      "liveRows": 45,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "scripts/validate-parent-atlas-integration-proof.mjs",
+        "sveltekit-frontend/src/lib/server/couchdb/mango-indexes.ts",
+        "sveltekit-frontend/src/lib/server/trace/trace-collector.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "indexing_jobs",
+      "liveRows": 28,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/features/ai/admin/ai-chat-context.ts",
+        "sveltekit-frontend/src/routes/api/admin/citations/discover/+server.ts",
+        "sveltekit-frontend/src/routes/api/admin/jobs/+server.ts",
+        "sveltekit-frontend/src/routes/api/admin/recommendations/+server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "trace_runs",
+      "liveRows": 15,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "scripts/validate-parent-atlas-integration-proof.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/feature-matrix-contract.ts",
+        "sveltekit-frontend/src/lib/server/trace/trace-collector.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "ai_usage_log",
+      "liveRows": 7,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "scripts/unsloth-training/generate_detective_mode_enhanced.py",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ai/token-tracker.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_runs",
+      "liveRows": 4,
+      "drizzleDeclared": false,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/governed-repair-v1.ts",
+        "sveltekit-frontend/src/lib/server/trpc/agent-run-service.ts",
+        "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts",
+        "sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_authority_runs",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/promote-neo4j-pagerank-to-postgres.mts",
+        "sveltekit-frontend/src/lib/server/graph/pagerank-analysis-adapter.ts",
+        "sveltekit-frontend/src/lib/server/graph/pagerank-promotion-gate.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/feature-matrix.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "codebase_relationship_reports",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/extract-sidecar-schemas.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/codebase-relationship-reports.ts",
+        "sveltekit-frontend/src/lib/server/features/ai/ace/relationship-fetcher.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-synthesizer.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "code_repos",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/active/codeintel_enrichment.proto",
+        "sveltekit-frontend/src/lib/server/db/schema/codebase-intelligence.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/index.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "codebase_audit_reports",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 4,
+      "relatedFilesSample": [
+        "scripts/atlas/feature-organization-planner.mjs",
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_topology_features",
+      "liveRows": 61659,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/export-gpu-matrices.mjs",
+        "scripts/atlas/kmeans-multi-k-experiment.mjs",
+        "scripts/atlas/offline-parent-atlas-mapreduce.sql"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_id_hierarchy_metadata",
+      "liveRows": 58365,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-stable-file-identity-owner-v1.mts",
+        "scripts/atlas/audit-symbol-producer-ownership-v1.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "packet_feature_keywords",
+      "liveRows": 50000,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/extract-keywords-from-ontology.mjs",
+        "scripts/atlas/phase3b2-sync-keywords-to-qdrant.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "tensor_analysis_cache",
+      "liveRows": 10077,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/topology.ts",
+        "sveltekit-frontend/src/lib/server/tensor/tensor-analysis-cache.ts",
+        "sveltekit-frontend/src/mcp/tools/cluster-lenses.tool.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "packet_source_features",
+      "liveRows": 8071,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/extract-ast-keywords.mjs",
+        "scripts/atlas/extract-source-kind-features.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "phase89_ast_signatures",
+      "liveRows": 5394,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/test-ast-lineage-proof.spec.mjs",
+        "scripts/seed-bifrost-ast.js",
+        "sveltekit-frontend/src/lib/server/db/schema-phase89-preserved.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "enhanced_graph_mappings",
+      "liveRows": 4979,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/graph-mappings.ts",
+        "sveltekit-frontend/src/lib/server/features/feature-storage.ts",
+        "sveltekit-frontend/src/routes/api/analytics/knowledge-triples/prune/+server.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_vector_registry",
+      "liveRows": 4480,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-vector-registry-ownership-v1.mjs",
+        "scripts/atlas/export-gpu-matrices.mjs",
+        "scripts/atlas/smoke-workstation-pgvector-stack-v1.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "recommendation_log",
+      "liveRows": 437,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/graphify-report-to-openspec-draft.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema-phase109a.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "failed_jobs",
+      "liveRows": 254,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/proto/archived/ingest-service.proto",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/queue/rabbitmq-manager-fixed.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graph_community_resolution_seeds",
+      "liveRows": 71,
+      "drizzleDeclared": false,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts",
+        "sveltekit-frontend/src/lib/server/graph/graph-dispatcher-proof.spec.ts",
+        "sveltekit-frontend/src/lib/server/graph/louvain-resolution-receipt.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "promotion_outbox",
+      "liveRows": 50,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs",
+        "scripts/phase-1-promotion-smoke.mjs",
+        "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "rg_search_hits",
+      "liveRows": 20,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-search.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/persist.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_fi_features",
+      "liveRows": 7,
+      "drizzleDeclared": false,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/materialize-feature-ontology-relationships-v1.mjs",
+        "scripts/atlas/prove-feature-intelligence-database.mjs",
+        "scripts/atlas/rel-fi-01-feature-relationship-persistence-live-proof-v1.mts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "rg_search_runs",
+      "liveRows": 5,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/db/schema-search.ts",
+        "sveltekit-frontend/src/lib/server/rg-atlas/persist.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "vector_index_registry",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-vector-registry-ownership-v1.mjs",
+        "scripts/atlas/init-vector-index-registry.mts",
+        "scripts/atlas/smoke-workstation-pgvector-stack-v1.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_tasks",
+      "liveRows": 4,
+      "drizzleDeclared": false,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/queue/outbox.ts",
+        "sveltekit-frontend/src/lib/server/trpc/routers/agent.ts",
+        "sveltekit-frontend/src/lib/server/trpc/routers/workflow.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "admin_ai_skills",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/admin-ai-skills.ts",
+        "sveltekit-frontend/src/routes/(app)/admin/unified-indexing-studio/+page.server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_os_events",
+      "liveRows": 3,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-acp-packet-transport.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/agent-os-registry.test.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/agent-os-registry.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_source_revisions",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-emb3a-upstream-revision-owner.mjs",
+        "scripts/atlas/audit-live-source-lineage-tables.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "encoder_provenance",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 3,
+      "relatedFilesSample": [
+        "scripts/atlas/train-packet-jepa.py",
+        "scripts/atlas/validate-encoder-provenance-gate2.mjs",
+        "sveltekit-frontend/src/lib/server/vector/encoder-validation-pipeline.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "ontology_domain_tuples",
+      "liveRows": 61659,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/check-ontology-seed.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_scheduler_jobs",
+      "liveRows": 58304,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/agent/agent-scheduler-orchestrator.mjs",
+        "scripts/executive/executive-planner.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "community_reports_leiden",
+      "liveRows": 57344,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/compute-leiden-neo4j.mjs",
+        "sveltekit-frontend/src/lib/server/graph/community-graph.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "ontology_keywords",
+      "liveRows": 31097,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-schema-tournament-v1.mjs",
+        "scripts/atlas/extract-keywords-from-ontology.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "hypergraph_edge_members",
+      "liveRows": 20709,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/hypergraph/hypergraph-builder.ts",
+        "sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_judgments",
+      "liveRows": 17536,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-golden-review-corpus-v2.mjs",
+        "sveltekit-frontend/src/lib/server/atlas/identity/packet-identity-resolver.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "code_feature_edges",
+      "liveRows": 6558,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/phase102-step2-neo4j-gds.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_semantic_facts",
+      "liveRows": 5000,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/generate-ontology-tuples.mjs",
+        "scripts/atlas/populate-semantic-facts.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering",
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "packet_qdrant_bridge",
+      "liveRows": 4725,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/hyperrag-packet-materializer.mjs",
+        "scripts/atlas/qdrant-point-id-bridge.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_class_search_index_v1",
+      "liveRows": 3675,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/backfill-class-search-index.mjs",
+        "scripts/atlas/rekey-ast-canary-rows-v1.mjs"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "file_summaries",
+      "liveRows": 3138,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/generate-file-summaries.mjs",
+        "scripts/atlas/generate-qdrant-source-cards.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "som_adjacency_matrix",
+      "liveRows": 2964,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/compute-som-tricubic-adjacency.mjs",
+        "scripts/atlas/validate-som-20x20-topology.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_observations",
+      "liveRows": 1431,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/mcp/memory-bridge.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_sessions",
+      "liveRows": 444,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/lib/server/graph/relationship-extractor.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "intent_eval_runs",
+      "liveRows": 411,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/analysis/agentic-proposal-join-spine.spec.ts",
+        "sveltekit-frontend/src/lib/server/db/schema/memory-registry.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "recommendation_events",
+      "liveRows": 395,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs",
+        "sveltekit-frontend/src/lib/server/retrieval/recommendation-events.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "cache_probe_results",
+      "liveRows": 240,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/cache-probe-analyze.mjs",
+        "scripts/sql/cache-probe-results.sql"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_external_doc_analyses",
+      "liveRows": 19,
+      "drizzleDeclared": false,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "python/atlas_summary_claim_eligibility_v1.py",
+        "sveltekit-frontend/src/lib/server/atlas/docs/external-doc-analyses-ddl.spec.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "grpo_memory_sticks",
+      "liveRows": 9,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/features.ts",
+        "sveltekit-frontend/src/lib/server/features/rag/ace-retrieval-logger.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "execution_reviews",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/agent/execution-review.integration.spec.ts",
+        "sveltekit-frontend/src/lib/server/agent/execution-review.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "ace_context_cache",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "user_analytics_events",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/atlas/repair-db-all-identities.mjs",
+        "sveltekit-frontend/src/lib/server/db/schema/analytics.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "model_registry",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts",
+        "sveltekit-frontend/src/routes/api/health/capabilities/+server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "cache_probe_runs",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 2,
+      "relatedFilesSample": [
+        "scripts/cache-probe-analyze.mjs",
+        "scripts/sql/cache-probe-results.sql"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "registry_enrichment_projection",
+      "liveRows": 61659,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/materialize-registry-structural-lexical-domain.mts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_vectors",
+      "liveRows": 58304,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/retrieval/phase2-autoencoder-bridge.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_results",
+      "liveRows": 33216,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/vector/quantization-recall-eval.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_relevance_corrected",
+      "liveRows": 33216,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-golden-review-corpus-v2.mjs"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_context_relations",
+      "liveRows": 10521,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "directory_cluster_checkpoints",
+      "liveRows": 8460,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/directory-clusters.ts"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "feature_lexical",
+      "liveRows": 6886,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/populate-feature-lexical.mjs"
+      ],
+      "analysisLanes": [
+        "pagerankCandidates"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_relationships",
+      "liveRows": 4097,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/phase-b4-relationships-graph.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_graph_snapshot_exclusions_v2",
+      "liveRows": 3355,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/graph-authority-v2.ts"
+      ],
+      "analysisLanes": [
+        "dailyGraphify"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_registry_alignment",
+      "liveRows": 2109,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/materialize-feature-registry-alignment.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_latent_fixture",
+      "liveRows": 1000,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/latent-identity-fixture.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "dispatcher_state_history",
+      "liveRows": 220,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/mcp/langgraph-bridge.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "tool_execution_audit",
+      "liveRows": 220,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/mcp/dispatcher-middleware.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_splits",
+      "liveRows": 137,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/crossencoder-benchmark.py"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "courtroom_animations",
+      "liveRows": 76,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_index_runs",
+      "liveRows": 28,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/phase-17-hyperrag-indexing-e2e.mjs"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "fix_attempts",
+      "liveRows": 23,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "authorization_audit_log",
+      "liveRows": 16,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/auth/tool-authorization-audit.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "courtroom_models",
+      "liveRows": 11,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_schema_registry",
+      "liveRows": 8,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-kag-persistence-v1.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "graphify_audit_kanban",
+      "liveRows": 7,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/graphify-audit/graphify-audit-gemma4.mjs"
+      ],
+      "analysisLanes": [
+        "dailyGraphify",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_fetch_attempts",
+      "liveRows": 6,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_artifact_events",
+      "liveRows": 6,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/queue/artifact-event-processing.ts"
+      ],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_cluster_models",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/kmeans-multi-k-experiment.mjs"
+      ],
+      "analysisLanes": [
+        "kmeansClustering"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_fetches",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_research_runs",
+      "liveRows": 4,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/db/schema/atlas-acquisition.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_runs",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/vector/quantization-recall-eval.ts"
+      ],
+      "analysisLanes": [
+        "topKRetrieval",
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_action_receipts",
+      "liveRows": 2,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/queue/action-single-flight-v1.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "workflow_action_leases",
+      "liveRows": 2,
+      "drizzleDeclared": false,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "sveltekit-frontend/src/lib/server/queue/action-single-flight-v1.ts"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "atlas_feature_snapshots",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/export-gpu-matrices.mjs"
+      ],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_corpora",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 1,
+      "relatedFilesSample": [
+        "scripts/atlas/audit-golden-review-corpus-compatibility-v1.mjs"
+      ],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "chrom97_packets",
+      "liveRows": 58304,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_evidence",
+      "liveRows": 33398,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_candidates",
+      "liveRows": 17536,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "codebase_chunk_index_backup",
+      "liveRows": 10077,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "vault_md_index",
+      "liveRows": 3991,
+      "drizzleDeclared": false,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "agent_context_files_history",
+      "liveRows": 1119,
+      "drizzleDeclared": false,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [
+        "pagination"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "phase2f_ground_truth_expectations",
+      "liveRows": 150,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_seed_queries",
+      "liveRows": 137,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    },
+    {
+      "table": "phase2f_ground_truth",
+      "liveRows": 50,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "screenshot_artifacts",
+      "liveRows": 30,
+      "drizzleDeclared": false,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "codebase_chunk_index_stats",
+      "liveRows": 2,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [],
+      "countCaveat": null
+    },
+    {
+      "table": "evaluation_datasets",
+      "liveRows": 1,
+      "drizzleDeclared": true,
+      "relatedFileCount": 0,
+      "relatedFilesSample": [],
+      "analysisLanes": [
+        "topKRetrieval"
+      ],
+      "countCaveat": null
+    }
+  ],
+  "lanes": {
+    "dailyGraphify": [
+      "graphify_files",
+      "graphify_execution_file_membership_v2",
+      "graphify_executions",
+      "graphify_runs",
+      "atlas_topology_index",
+      "atlas_hyperedges",
+      "graphify_symbols",
+      "graphify_execution_files",
+      "outcome_ledger",
+      "graph_analysis_runs",
+      "atlas_hyperedge_members",
+      "graphify_execution_stages",
+      "atlas_graph_authority_scores",
+      "graphify_execution_authority",
+      "graph_node_metrics",
+      "taxonomy_edges",
+      "hypergraph_edges",
+      "atlas_graph_nodes_v2",
+      "atlas_graph_authority_scores_v2",
+      "feature_file_edges",
+      "atlas_graph_snapshots_v2",
+      "graph_community_assignments",
+      "graph_communities",
+      "ontology_edges",
+      "atlas_graph_edges_v2",
+      "atlas_topology_eval_times",
+      "atlas_graph_authority_runs_v2",
+      "community_reports",
+      "atlas_graph_authority_runs",
+      "atlas_topology_features",
+      "enhanced_graph_mappings",
+      "graph_community_resolution_seeds",
+      "community_reports_leiden",
+      "hypergraph_edge_members",
+      "code_feature_edges",
+      "atlas_graph_snapshot_exclusions_v2",
+      "graphify_audit_kanban"
+    ],
+    "kmeansClustering": [
+      "task_semantic_packets",
+      "embedding_cache",
+      "cluster_summaries",
+      "error_clusters",
+      "parent_atlas_vectors",
+      "cluster_cards",
+      "gpu_cluster_centroids",
+      "error_cluster_groups",
+      "qdrant_cluster_members",
+      "packet_vector_bundles",
+      "qdrant_centroid_clusters",
+      "tensor_analysis_cache",
+      "atlas_vector_registry",
+      "vector_index_registry",
+      "feature_semantic_facts",
+      "som_adjacency_matrix",
+      "atlas_feature_vectors",
+      "directory_cluster_checkpoints",
+      "atlas_latent_fixture",
+      "atlas_cluster_models"
+    ],
+    "topKRetrieval": [
+      "research_summaries",
+      "retrieval_telemetry",
+      "atlas_graph_authority_scores",
+      "ace_retrieval_runs",
+      "atlas_graph_authority_scores_v2",
+      "atlas_retrieval_eval_times",
+      "code_retrieval_chunks",
+      "atlas_callable_search",
+      "ace_retrieval_hits",
+      "atlas_topology_eval_times",
+      "evaluation_queries",
+      "rg_search_hits",
+      "rg_search_runs",
+      "evaluation_judgments",
+      "atlas_class_search_index_v1",
+      "intent_eval_runs",
+      "evaluation_results",
+      "evaluation_relevance_corrected",
+      "evaluation_splits",
+      "atlas_research_runs",
+      "evaluation_runs",
+      "evaluation_corpora",
+      "evaluation_evidence",
+      "evaluation_candidates",
+      "evaluation_seed_queries",
+      "evaluation_datasets"
+    ],
+    "pagination": [
+      "graphify_runs",
+      "context_timeline",
+      "route_runtime_packets",
+      "feature_ontology_tuples",
+      "chunk_hit_log",
+      "atlas_topology_index",
+      "error_logs",
+      "error_events",
+      "retrieval_telemetry",
+      "graph_analysis_runs",
+      "rag_query_log",
+      "ace_retrieval_runs",
+      "analytics_events",
+      "atlas_domain_ontology",
+      "api_audit_log",
+      "llm_synthesis_events",
+      "tool_call_events",
+      "workflow_outbox",
+      "ontology_edges",
+      "atlas_topology_eval_times",
+      "outbox_events",
+      "panel_activity_log",
+      "atlas_graph_authority_runs_v2",
+      "evidence_audit_log",
+      "trace_events",
+      "trace_runs",
+      "ai_usage_log",
+      "workflow_runs",
+      "atlas_graph_authority_runs",
+      "codebase_audit_reports",
+      "atlas_topology_features",
+      "recommendation_log",
+      "promotion_outbox",
+      "rg_search_runs",
+      "agent_os_events",
+      "ontology_domain_tuples",
+      "ontology_keywords",
+      "intent_eval_runs",
+      "recommendation_events",
+      "user_analytics_events",
+      "cache_probe_runs",
+      "dispatcher_state_history",
+      "tool_execution_audit",
+      "atlas_index_runs",
+      "authorization_audit_log",
+      "graphify_audit_kanban",
+      "workflow_artifact_events",
+      "atlas_research_runs",
+      "evaluation_runs",
+      "agent_context_files_history"
+    ],
+    "pagerankCandidates": [
+      "atlas_packets",
+      "feature_ontology_tuples",
+      "atlas_packet_features",
+      "feature_lexical_facts",
+      "feature_domain_facts",
+      "feature_structural_facts",
+      "atlas_graph_authority_scores",
+      "feature_implementations",
+      "graphify_execution_authority",
+      "graph_node_metrics",
+      "atlas_graph_nodes_v2",
+      "atlas_graph_authority_scores_v2",
+      "feature_file_edges",
+      "packet_features",
+      "atlas_graph_authority_runs_v2",
+      "feature_statistics",
+      "feature_domain",
+      "atlas_graph_authority_runs",
+      "feature_semantic_facts",
+      "feature_lexical"
+    ]
+  },
+  "checksum": "sha256:3fe851926eb6821e13ff650d8a8e050441da811fff5515546da5bbd75393b93b"
+}

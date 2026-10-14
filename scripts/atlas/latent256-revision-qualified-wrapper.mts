@@ -194,6 +194,12 @@ if (!/^[a-f0-9]{64}$/i.test(modelChecksum)) {
 }
 
 const APPLY = args.apply === true;
+if (APPLY) {
+  fail('LATENT256_APPLY_BLOCKED',
+    'The producer update is keyed only by row ID and does not enforce per-row source/workspace ' +
+    'revision compare-and-swap or independent vector readback. Use dry-run until those gates pass.',
+  );
+}
 const limitArg = args.limit;
 if (APPLY && typeof limitArg !== 'string') {
   fail('APPLY_REQUIRES_LIMIT',

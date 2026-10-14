@@ -19,17 +19,14 @@
  */
 import Fuse from 'fuse.js';
 import { ENV } from '$lib/server/env.server.js';
-import { SERVER_CHAT_MODEL, SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { SERVER_CHAT_MODEL } from '$lib/ai/model-ids.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
 import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
-import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import {
-  getCachedEmbedding,
   getCachedSearchResults,
-  setCachedEmbedding,
   setCachedSearchResults,
 } from '$lib/server/knowledge-cache.js';
 
@@ -267,25 +264,11 @@ function isValidEmbedding(value: unknown): value is number[] {
 
 async function embedQuery(text: string): Promise<number[]> {
   const prompt = text.trim() || text;
-  const cached = await getCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL).catch(() => null);
-  if (isValidEmbedding(cached)) {
-    return cached;
+  const result = await generateEmbeddings([prompt], { taskMode: 'unprompted_legacy' });
+  const embedding = result.vectors[0];
+  if (!isValidEmbedding(embedding)) {
+    throw new Error('CODEBASE_CONTEXT_SEMANTIC_768_VECTOR_INVALID');
   }
-
-  const embeddingFetch: typeof fetch = (input, init) => ollamaFetch(String(input), init);
-  const { embedding } = await executeProviderEmbeddingV1({
-    text: prompt,
-    mode: 'unprompted_legacy',
-    provider: {
-      provider: 'ollama',
-      baseUrl: ENV.OLLAMA_BASE_URL,
-      modelId: SERVER_EMBEDDING_MODEL,
-    },
-    timeoutMs: 15_000,
-    keepAlive: '24h',
-    fetchImpl: embeddingFetch,
-  });
-  setCachedEmbedding(prompt, SERVER_EMBEDDING_MODEL, embedding).catch(() => {});
   return embedding;
 }
 

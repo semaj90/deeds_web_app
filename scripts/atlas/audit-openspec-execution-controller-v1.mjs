@@ -6,8 +6,10 @@
  * or mutates PostgreSQL, Qdrant, Valkey, Graphify, or model state.
  */
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { indexCurrentTaskEvidenceAdmissionsV1 } from './lib/task-evidence-join-controller-v1.mjs';
 
 const root = process.cwd();
 const reportsDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
@@ -15,7 +17,7 @@ const reportsDir = process.env.ATLAS_OPENSPEC_REPORTS_DIR
   : path.join(root, 'docs', 'reports');
 const workboardPath = process.env.ATLAS_OPENSPEC_WORKBOARD_PATH
   ? path.resolve(root, process.env.ATLAS_OPENSPEC_WORKBOARD_PATH)
-  : path.join(root, 'docs', 'reports', 'openspec-workboard-v1.json');
+  : null;
 
 const readJson = (file, fallback = {}) => {
   try { return JSON.parse(fs.readFileSync(path.join(root, file), 'utf8')); } catch { return fallback; }
@@ -33,6 +35,7 @@ const writeReport = (name, value) => {
   const body = `${JSON.stringify(value, null, 2)}\n`;
   const target = path.join(reportsDir, name);
   try {
+    fs.mkdirSync(reportsDir, { recursive: true });
     fs.writeFileSync(target, body);
     return target;
   } catch (error) {
@@ -68,10 +71,49 @@ function describeWriteError(error) {
 }
 
 const workboard = (() => {
-  try { return JSON.parse(fs.readFileSync(workboardPath, 'utf8')); }
-  catch { return {}; }
+  if (workboardPath) {
+    try { return JSON.parse(fs.readFileSync(workboardPath, 'utf8')); }
+    catch { return {}; }
+  }
+  try {
+    const snapshotScript = path.join(root, 'scripts', 'atlas', 'build-openspec-workboard-v1.mjs');
+    const snapshot = JSON.parse(execFileSync(process.execPath, [snapshotScript, '--task-snapshot-stdout'], {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    }));
+    return { ...snapshot, taskInventory: snapshot.tasks };
+  } catch (error) {
+    process.stderr.write(`FRESH_WORKBOARD_SNAPSHOT_FAILED: ${error.message}\n`);
+    process.exitCode = 1;
+    return {};
+  }
 })();
 const tasks = Array.isArray(workboard.taskInventory) ? workboard.taskInventory : [];
+const evidenceJoinPath = process.env.ATLAS_OPENSPEC_TASK_EVIDENCE_JOIN_PATH
+  ? path.resolve(root, process.env.ATLAS_OPENSPEC_TASK_EVIDENCE_JOIN_PATH)
+  : null;
+let evidenceJoinInput = null;
+let evidenceJoinLoadError = null;
+if (evidenceJoinPath) {
+  try { evidenceJoinInput = JSON.parse(fs.readFileSync(evidenceJoinPath, 'utf8')); }
+  catch (error) { evidenceJoinLoadError = error.message; }
+}
+let expectedHead = null;
+if (evidenceJoinInput) {
+  try {
+    expectedHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  } catch (error) {
+    evidenceJoinLoadError = `GIT_HEAD_UNAVAILABLE:${error.message}`;
+  }
+}
+const taskEvidenceJoin = evidenceJoinLoadError
+  ? {
+    status: 'TASK_EVIDENCE_JOIN_INVALID', reason: 'INPUT_READ_OR_HEAD_CHECK_FAILED', workspaceRevision: null,
+    reportChecksum: null, admissionsByTaskKey: new Map(), admittedTaskCount: 0, rejectedTaskCount: tasks.length,
+    unmatchedTaskCount: tasks.length, canonicalAuthority: false, writesPerformed: false,
+  }
+  : indexCurrentTaskEvidenceAdmissionsV1({ workboard, evidenceJoin: evidenceJoinInput, expectedHead });
 const receipts = {
   lineage: readJson('docs/reports/current-lineage-closure-v1.json'),
   semanticSnapshot: readJson('docs/reports/current-semantic-candidate-snapshot-v1.json'),
@@ -81,9 +123,10 @@ const receipts = {
   packetIdentity: readJson('docs/reports/current-packet-chunk-identity-reconciliation-v1.json'),
 };
 
-const classifyBlocker = (task) => {
+const classifyBlocker = (task, evidenceAdmission) => {
   const text = `${task.taskKey} ${task.text}`.toLowerCase();
-  if (task.state === 'DONE') return { state: 'PROVEN', blockerKey: null, retryWhen: null };
+  if (evidenceAdmission?.admitted === true) return { state: 'PROVEN', blockerKey: null, retryWhen: null };
+  if (task.state === 'DONE') return { state: 'CHECKED_UNVERIFIED', blockerKey: 'TASK_CHECKBOX_WITHOUT_RECEIPT', retryWhen: 'a current task-bound independently verified receipt is admitted' };
   if (task.executionState === 'SUPERSEDED_OR_HISTORICAL') return { state: 'SUPERSEDED', blockerKey: 'HISTORICAL_TASK', retryWhen: 'never' };
   if (task.executionState === 'INVARIANT') return { state: 'INVARIANT', blockerKey: null, retryWhen: 'never' };
   if (/promotion|human.?authorization|not authorized|canonical.*write|apply.*blocked|writes?.*false/.test(text)) {
@@ -107,16 +150,90 @@ const classifyBlocker = (task) => {
   return { state: 'ACTIONABLE', blockerKey: null, retryWhen: 'implementation or required receipt changes' };
 };
 
-const classifiedTasks = tasks.map((task) => ({
-  ...task,
-  controller: classifyBlocker(task),
-}));
+const classifiedTasks = tasks.map((task) => {
+  const evidenceAdmission = taskEvidenceJoin.admissionsByTaskKey.get(task.taskKey);
+  return {
+    ...task,
+    ...(evidenceAdmission ? {
+      taskEvidenceAdmission: {
+        canonicalTaskRef: evidenceAdmission.canonicalTaskRef,
+        evidenceRefs: evidenceAdmission.evidenceRefs,
+        checksum: evidenceAdmission.checksum,
+      },
+    } : {}),
+    controller: classifyBlocker(task, evidenceAdmission),
+  };
+});
+const taskByKey = new Map(classifiedTasks.map((task) => [task.taskKey, task]));
+const dependencyEdges = classifiedTasks.flatMap((task) => (Array.isArray(task.dependsOnTaskIds) ? task.dependsOnTaskIds : [])
+  .map((dependencyTaskKey) => ({ taskKey: task.taskKey, dependencyTaskKey })));
+const unresolvedDependencyEdges = dependencyEdges.filter((edge) => !taskByKey.has(edge.dependencyTaskKey));
+const dependencyAdjacency = new Map(classifiedTasks.map((task) => [task.taskKey, []]));
+for (const edge of dependencyEdges) {
+  if (taskByKey.has(edge.dependencyTaskKey)) dependencyAdjacency.get(edge.taskKey).push(edge.dependencyTaskKey);
+}
+const dependencyVisitState = new Map();
+const dependencyStack = [];
+const dependencyCycles = [];
+const visitDependency = (taskKey) => {
+  const state = dependencyVisitState.get(taskKey) ?? 0;
+  if (state === 2) return;
+  if (state === 1) {
+    const cycleStart = dependencyStack.indexOf(taskKey);
+    dependencyCycles.push([...dependencyStack.slice(cycleStart), taskKey]);
+    return;
+  }
+  dependencyVisitState.set(taskKey, 1);
+  dependencyStack.push(taskKey);
+  for (const dependencyTaskKey of dependencyAdjacency.get(taskKey) ?? []) visitDependency(dependencyTaskKey);
+  dependencyStack.pop();
+  dependencyVisitState.set(taskKey, 2);
+};
+for (const task of classifiedTasks) visitDependency(task.taskKey);
+const cyclicTaskKeys = new Set(dependencyCycles.flatMap((cycle) => cycle));
+for (const task of classifiedTasks) {
+  const dependencies = Array.isArray(task.dependsOnTaskIds) ? task.dependsOnTaskIds : [];
+  if (dependencies.length === 0) continue;
+  const unresolved = dependencies.filter((dependencyTaskKey) => !taskByKey.has(dependencyTaskKey));
+  const unproven = dependencies.filter((dependencyTaskKey) => taskByKey.get(dependencyTaskKey)?.controller.state !== 'PROVEN');
+  const cyclic = cyclicTaskKeys.has(task.taskKey);
+  task.dependencyReadiness = {
+    ready: unresolved.length === 0 && unproven.length === 0 && !cyclic,
+    unresolvedTaskKeys: unresolved,
+    unprovenTaskKeys: unproven,
+    cyclic,
+  };
+  if (task.controller.state === 'ACTIONABLE' && !task.dependencyReadiness.ready) {
+    task.controller = {
+      state: 'WAITING_ON_DEPENDENCY',
+      blockerKey: 'DECLARED_TASK_DEPENDENCY',
+      retryWhen: 'all declared prerequisites have current admitted task-bound proof receipts and the dependency graph is acyclic',
+    };
+  }
+}
+const dependencyGraphStatus = dependencyEdges.length === 0
+  ? 'NO_DECLARED_DEPENDENCIES'
+  : unresolvedDependencyEdges.length > 0
+    ? 'DECLARED_DEPENDENCIES_UNRESOLVED'
+    : dependencyCycles.length > 0
+      ? 'DECLARED_DEPENDENCIES_CYCLIC'
+      : 'DECLARED_DEPENDENCIES_PRESENT_RECEIPTS_UNADMITTED';
 const actionable = classifiedTasks.filter((task) => task.controller.state === 'ACTIONABLE');
 const waiting = classifiedTasks.filter((task) => task.controller.state === 'WAITING_ON_DEPENDENCY' || task.controller.state === 'WAITING_ON_AUTHORITY');
 const deferred = classifiedTasks.filter((task) => task.controller.state === 'DEFERRED' || task.controller.state === 'SUPERSEDED');
-const proven = classifiedTasks.filter((task) => task.controller.state === 'PROVEN' || task.controller.state === 'INVARIANT');
+const proven = classifiedTasks.filter((task) => task.controller.state === 'PROVEN');
+const invariantTasks = classifiedTasks.filter((task) => task.controller.state === 'INVARIANT');
+const checkedUnverified = classifiedTasks.filter((task) => task.controller.state === 'CHECKED_UNVERIFIED');
 
 const blockerDefinitions = {
+  TASK_CHECKBOX_WITHOUT_RECEIPT: {
+    state: 'CHECKED_UNVERIFIED',
+    owner: 'task evidence-card and independent receipt verifier',
+    meaning: 'The OpenSpec checkbox is checked, but this controller input does not establish a current task-bound independently verified receipt.',
+    releaseEvent: 'a current receipt is joined to the canonical task identity and independently verified',
+    retryPolicy: 're-evaluate only when the task or joined receipt revision changes',
+    selection: 'do not count as proven or dispatch follow-up work from checkbox state alone',
+  },
   DECLARED_TASK_DEPENDENCY: {
     state: 'WAITING_ON_DEPENDENCY',
     owner: 'declared OpenSpec dependency owner',
@@ -253,7 +370,22 @@ for (const goal of goals) {
 const report = {
   schema: 'atlas.openspec-execution-controller.v1',
   generatedAt: new Date().toISOString(),
-  source: path.relative(root, workboardPath).split(path.sep).join('/'),
+  source: workboardPath
+    ? path.relative(root, workboardPath).split(path.sep).join('/')
+    : workboard.source ?? 'fresh-openspec-task-snapshot',
+  sourceMode: workboardPath ? 'EXPLICIT_SNAPSHOT_PATH' : 'FRESH_READ_ONLY_TASK_SNAPSHOT',
+  taskEvidenceJoin: {
+    status: taskEvidenceJoin.status,
+    reason: taskEvidenceJoin.reason,
+    workspaceRevision: taskEvidenceJoin.workspaceRevision,
+    reportChecksum: taskEvidenceJoin.reportChecksum,
+    admittedTaskCount: taskEvidenceJoin.admittedTaskCount,
+    rejectedTaskCount: taskEvidenceJoin.rejectedTaskCount,
+    unmatchedTaskCount: taskEvidenceJoin.unmatchedTaskCount,
+    input: evidenceJoinPath ? path.relative(root, evidenceJoinPath).split(path.sep).join('/') : null,
+    canonicalAuthority: false,
+    writesPerformed: false,
+  },
   policy: 'RECOMMENDATION_ONLY_NO_LEDGER_OR_RUNTIME_MUTATION',
   summary: {
     totalTasks: classifiedTasks.length,
@@ -261,6 +393,8 @@ const report = {
     actionable: actionable.length,
     waiting: waiting.length,
     deferred: deferred.length,
+    invariants: invariantTasks.length,
+    checkedUnverified: checkedUnverified.length,
     blockerGroups: waitingGroups.length,
     writesPerformed: false,
   },
@@ -277,8 +411,21 @@ const report = {
   actionableTasks: actionable.sort((a, b) => a.priority - b.priority || a.change.localeCompare(b.change) || a.line - b.line),
   waitingTasks: waiting.slice(0, 300),
   deferredTasks: deferred.slice(0, 300),
+  invariantTasks: invariantTasks.slice(0, 300),
+  checkedUnverifiedTasks: checkedUnverified.slice(0, 300),
   blockerGroups: waitingGroups,
-  dependencyGraph: { status: 'TASK_LEDGER_DEPENDENCY_RECEIPTS_NOT_DECLARED', cycles: [], writesPerformed: false },
+  dependencyGraph: {
+    status: dependencyGraphStatus,
+    taskCount: classifiedTasks.length,
+    declaredEdgeCount: dependencyEdges.length,
+    unresolvedEdgeCount: unresolvedDependencyEdges.length,
+    unresolvedEdges: unresolvedDependencyEdges.slice(0, 200),
+    receiptAdmission: taskEvidenceJoin.admittedTaskCount > 0
+      ? 'TASK_RECEIPTS_ADMITTED_PREREQUISITE_RECEIPTS_REQUIRED'
+      : 'NO_TASK_BOUND_VERIFIED_RECEIPTS_ADMITTED',
+    cycles: dependencyCycles.slice(0, 200),
+    writesPerformed: false,
+  },
   blockerAudit: {
     schema: 'atlas.openspec-blocker-audit.v1',
     groups: blockerAuditGroups.map(({ taskKeys: _taskKeys, ...group }) => group),
@@ -290,7 +437,7 @@ writeReport('openspec-execution-controller-v1.json', report);
 writeReport('openspec-actionable-work-v1.json', { schema: 'atlas.openspec-actionable-work.v1', generatedAt: report.generatedAt, tasks: report.actionableTasks, writesPerformed: false });
 writeReport('openspec-waiting-dependencies-v1.json', { schema: 'atlas.openspec-waiting-dependencies.v1', generatedAt: report.generatedAt, blockerGroups: waitingGroups, tasks: report.waitingTasks, writesPerformed: false });
 writeReport('openspec-deferred-discoveries-v1.json', { schema: 'atlas.openspec-deferred-discoveries.v1', generatedAt: report.generatedAt, tasks: report.deferredTasks, writesPerformed: false });
-writeReport('openspec-dependency-cycles-v1.json', { schema: 'atlas.openspec-dependency-cycles.v1', generatedAt: report.generatedAt, status: 'NO_DECLARED_CYCLES', cycles: [], writesPerformed: false });
+writeReport('openspec-dependency-cycles-v1.json', { schema: 'atlas.openspec-dependency-cycles.v1', generatedAt: report.generatedAt, status: dependencyCycles.length === 0 ? 'NO_DECLARED_CYCLES' : 'DECLARED_CYCLES_FOUND', cycles: dependencyCycles.slice(0, 200), writesPerformed: false });
 writeReport('openspec-agent-error-receipts-v1.json', { schema: 'atlas.openspec-agent-error-receipts.v1', generatedAt: report.generatedAt, policy: report.retryPolicy, receipts: [], writesPerformed: false });
 writeReport('openspec-blocker-audit-v1.json', {
   schema: 'atlas.openspec-blocker-audit.v1',

@@ -1,3 +1,5 @@
+import { precedesNonFrontendRoot } from '../../lib/canonical-source-ref.mjs';
+
 const SOURCE_REF_ALIASES = [
   'source_ref',
   'sourceRef',
@@ -48,6 +50,11 @@ function normalizeSourceRef(value) {
 
   const srcIdx = cleanPath.indexOf('src/');
   if (srcIdx >= 0) {
+    // Safeguard: do not change the repo directory of a path that already lives
+    // under a non-frontend root (python/, packages/, crates/, ...).
+    if (precedesNonFrontendRoot(cleanPath.slice(0, srcIdx))) {
+      return cleanPath;
+    }
     return `sveltekit-frontend/${cleanPath.slice(srcIdx)}`;
   }
   const frontendIdx = cleanPath.indexOf('sveltekit-frontend/');

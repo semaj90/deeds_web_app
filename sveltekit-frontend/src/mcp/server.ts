@@ -16,7 +16,7 @@ import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 // import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 // TODO: fix broken retrieval module dependencies (rrf-fuse, noun-reranker not found)
 import { DISPATCHER_TOOLS_SCHEMAS } from './dispatcher-tools-schemas.js';
-import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolGraphExpand, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
+import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
 import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
@@ -2197,7 +2197,9 @@ export function setupToolHandlers() {
   async function handleToolCall(name: string, args: Record<string, any>): Promise<any> {
     return withToolCallRecord(
       { toolName: name, toolSource: 'mcp', arguments: args },
-      () => withMcpCache(name, args, () => _handleToolCallInner(name, args)),
+      () => name === 'graph:expand' || name === 'graph.expand' || name === 'graph:resident_bfs' || name === 'graph.resident_bfs' || name === 'graph:resident_source_ref_bfs' || name === 'graph.resident_source_ref_bfs' || name === 'graph:community_leiden' || name === 'graph.community_leiden'
+        ? _handleToolCallInner(name, args)
+        : withMcpCache(name, args, () => _handleToolCallInner(name, args)),
     );
   }
 
@@ -2475,30 +2477,42 @@ export function setupToolHandlers() {
       }
 
       case 'graph:expand': {
-        const { feature_ids, hops = 2, limit_per_hop = 10, relationship_types } = args as {
-          feature_ids: string[];
-          hops?: number;
-          limit_per_hop?: number;
-          relationship_types?: string[];
+        const { executeGraphExpandMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphExpandMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
         };
-        try {
-          // Query Neo4j for K-hop neighbors
-          console.log(`[MCP] graph:expand: ${feature_ids.length} features, ${hops} hops, ${limit_per_hop} limit/hop`);
-          // In production, this would run Cypher k-hop traversal
-          return {
-            content: [{
-              type: 'text',
-              text: JSON.stringify({
-                feature_ids,
-                hops,
-                neighbors_per_feature: limit_per_hop * hops,
-                total_neighbors: feature_ids.length * limit_per_hop * hops,
-              }),
-            }],
-          };
-        } catch (err) {
-          return { content: [{ type: 'text', text: JSON.stringify({ error: String(err) }) }] };
-        }
+      }
+
+      case 'graph.resident_bfs':
+      case 'graph:resident_bfs': {
+        const { executeGraphResidentBfsMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphResidentBfsMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
+      }
+
+      case 'graph.resident_source_ref_bfs':
+      case 'graph:resident_source_ref_bfs': {
+        const { executeGraphResidentSourceRefBfsMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphResidentSourceRefBfsMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
+      }
+
+      case 'graph.community_leiden':
+      case 'graph:community_leiden': {
+        const { executeGraphCommunityLeidenMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+        const result = await executeGraphCommunityLeidenMcpTool(args);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result) }],
+          ...(result.success ? {} : { isError: true }),
+        };
       }
 
       case 'retrieval:rerank': {

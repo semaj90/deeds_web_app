@@ -667,11 +667,17 @@
 
 <!-- New Case Modal -->
 {#if showNewCaseModal}
-	<div class="cs-modal-overlay" onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}>
+	<div
+		class="cs-modal-overlay"
+		role="button"
+		tabindex="0"
+		onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+		onkeydown={(e) => { if (e.key === 'Escape') closeModal(); }}
+	>
 		<div class="cs-modal">
 			<div class="cs-modal-header">
 				<h2 class="cs-modal-title">Create New Case</h2>
-				<button type="button" class="cs-modal-close" onclick={closeModal}>
+				<button type="button" class="cs-modal-close" onclick={closeModal} aria-label="Close modal">
 					<Icon name="x" />
 				</button>
 			</div>
@@ -736,14 +742,20 @@
 
 <!-- AI Analysis Modal -->
 {#if analysisResult || analysisError}
-	<div class="cs-modal-overlay" onclick={closeAnalysis}>
-		<div class="cs-analysis-modal" onclick={(e) => e.stopPropagation()}>
+	<div
+		class="cs-modal-overlay"
+		role="button"
+		tabindex="0"
+		onclick={(e) => { if (e.target === e.currentTarget) closeAnalysis(); }}
+		onkeydown={(e) => { if (e.key === 'Escape') closeAnalysis(); }}
+	>
+		<div class="cs-analysis-modal">
 			<div class="cs-modal-header">
 				<div class="cs-analysis-title">
 					<Icon name="brain" />
 					<span>AI Case Analysis</span>
 				</div>
-				<button type="button" class="cs-modal-close" onclick={closeAnalysis}>
+				<button type="button" class="cs-modal-close" onclick={closeAnalysis} aria-label="Close analysis">
 					<Icon name="x" />
 				</button>
 			</div>

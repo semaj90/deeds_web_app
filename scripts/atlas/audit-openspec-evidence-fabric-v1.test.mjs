@@ -71,6 +71,7 @@ test('requires complete uniquely identified assertions before a PROVEN receipt c
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ expectedAssertions: [], actualAssertions: [] })), /proven requires assertions/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'other', passed: true }] })), /assertion identity mismatch/);
   assert.throws(() => buildEvidenceReceiptV1(receiptInput({ actualAssertions: [{ id: 'assert-1', passed: false }] })), /unsatisfied assertion/);
+  assert.throws(() => buildEvidenceReceiptV1(receiptInput({ independentVerifier: undefined, verifier: 'legacy-self-attestation' })), /independent verifier required/);
 });
 
 test('verifies receipt checksum before report-output association', () => {

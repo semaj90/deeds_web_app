@@ -82,7 +82,7 @@ const SUGGESTED_ACTION = {
   missing_dependency:   'Verify npm install ran; check $lib alias resolution',
   stale_cache:          'Invalidate BitFrost keys; re-warm from Postgres',
   retrieval_miss:       'Check Qdrant collection count and chunk_index population',
-  worker_timeout:       'Increase AbortSignal.timeout; reduce batch size; check Gemma4 :8090',
+  worker_timeout:       'Increase AbortSignal.timeout; reduce batch size; check Ornith 1.5 :8090 (llama-server)',
   codec_failure:        'Verify @msgpack/msgpack round-trip; check BYTEA column integrity',
   audit_recommendation: 'Create review/refactor task in LangGraph Kanban; queue for operator review',
   unknown:              'Inspect evidence for raw error text; escalate to operator',

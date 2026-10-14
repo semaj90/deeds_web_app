@@ -2,6 +2,42 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "manual/20261013_feature_registry_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.feature_registry (declared in feature-registry.ts, missing live per the 2026-10-14 contract audit). Rehearsed in a rolled-back transaction (15 columns in-transaction; table absent afterward). Does not include the workspace-event tables, which are owned by 20260916_workspace_event_head_v1.sql (requires disposable canary). Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a column count; confirm 0 tables afterward."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_duplicate_indexes_DROP_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Drops 10 exact-duplicate indexes on atlas_packets (one per group; keeps the index with more scans). Archive: .tmp/atlas-packets-duplicate-indexes-manifest.json (20 definitions with sha256). Rehearsed in a rolled-back transaction: 94 indexes to 84 inside the transaction; 94 after rollback. Requires approval.",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT replaced by ROLLBACK and a count query; confirm 94 after."
+    },
+    {
+      "file": "manual/20261013_atlas_packets_source_ref_pattern_indexes_DRAFT.sql",
+      "status": "applied",
+      "reason": "Two text_pattern_ops indexes on atlas_packets (lower(source_ref), source_ref) created with CREATE INDEX CONCURRENTLY (no write lock). Both indisvalid=true. Live planner uses bitmap index scans. Fixes atlas.packet_search statement-timeout errors.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: pg_index indisvalid for both indexes; EXPLAIN shows Bitmap Index Scan on them."
+    },
+    {
+      "file": "manual/20261013_diagnostic_analysis_tables_DRAFT.sql",
+      "status": "applied",
+      "reason": "Three analysis tables (diagnostic_ast_facts, diagnostic_dag_runs, diagnostic_recommendations) applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. All tables empty; no writers exist yet.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only: three diagnostic_* tables exist; row counts 0."
+    },
+    {
       "file": "manual/20261001_openspec_task_identity_history_v1.sql",
       "status": "design_unapplied",
       "reason": "EVF stable identity/history companion: immutable canonical task keys, internal surrogate IDs, claim revision snapshots, and alias preservation. No rows are imported or source files mutated; apply only after deterministic identity parity and schema-owner authorization.",
@@ -46,6 +82,24 @@
       "appliedAt": "2026-09-25",
       "requiresJournalEntry": false,
       "validationCommand": "Read-only PostgreSQL 18.4 information_schema and row-null census; summary_provenance is nullable JSONB and populated=0."
+    },
+    {
+      "file": "manual/20261013_error_logs_diagnostic_provenance_DRAFT.sql",
+      "status": "applied",
+      "reason": "Additive diagnostic provenance columns, a stored tsvector, and indexes on the existing error_logs table. Applied in one transaction to PostgreSQL 18.4 legal_ai_db after a rolled-back rehearsal. Row count 1 before and after; both views still return rows.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: sed the final COMMIT to ROLLBACK and run with psql ON_ERROR_STOP=1; then confirm error_logs has 19 columns."
+    },
+    {
+      "file": "manual/model_analysis_runs.sql",
+      "status": "applied",
+      "reason": "Additive model analysis run and result tables (model_analysis_runs, model_analysis_results) with indexes. Applied in one transaction to PostgreSQL 18.4 legal_ai_db; both tables created empty.",
+      "appliedBy": "operator-approved-run",
+      "appliedAt": "2026-10-13",
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only information_schema check: model_analysis_results has sequence_id text and PK (run_id, sequence_id); row counts 0."
     },
     {
       "file": "manual/20260916_workspace_event_head_v1.sql",
@@ -416,6 +470,15 @@
       "appliedAt": null,
       "requiresJournalEntry": false,
       "validationCommand": "npx tsx scripts/atlas/audit-graph-snapshot-revision-migration-safety.mts"
+    },
+    {
+      "file": "20260819_atlas_graph_traversal_indexes.sql",
+      "status": "manual_sidecar",
+      "reason": "Unapplied snapshot-scoped graph traversal indexes. Read-only PostgreSQL catalog inspection found only base indexes; verify representative plans and obtain schema-owner approval before applying.",
+      "appliedBy": "operator",
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Read-only PostgreSQL catalog check for atlas_graph_edges_v2_forward_typed_idx, atlas_graph_edges_v2_reverse_typed_idx, atlas_graph_nodes_v2_snapshot_type_node_idx, atlas_graph_nodes_v2_snapshot_source_ref_idx, and atlas_graph_relation_participants_v2_node_role_idx."
     },
     {
       "file": "manual/20260822_graphify_revision_authority_v2.sql",

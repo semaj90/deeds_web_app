@@ -26,6 +26,7 @@
 | Fusion (RRF) | `retrieval/search-runtime.ts` | CANONICAL_OWNER |
 | Graph algorithms | `graph/graph-analysis-runner.ts` | CANONICAL_OWNER |
 | ACE assembly / validation | `ace/context-assembler.ts`, `atlas/envelope-validator.ts`, `db/packet-topology-envelope.ts` | CANONICAL_OWNER |
+| Error-signal evidence → repair proposal | `scripts/atlas/validate-error-signal-evidence-v1.mjs` (validator, read-only); `scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs` (dry-run proposals → registry action `AWAIT_OPERATOR`) | CANONICAL_OWNER (validator) / BACKEND (bridge); never executes, never edits source |
 | RPC packets | `routes/api/hyperrag/packet-rpc/+server.ts` | CANONICAL_OWNER |
 | Glyph / cartridge (NES, CHR97) | `routes/api/cartridge/export/+server.ts` | CANONICAL_OWNER |
 | Neural prefill | `ai/neural-decoder-prefill-caller-v1.ts` | CANONICAL_OWNER |
@@ -44,6 +45,8 @@
 
 ### Markdown
 
+- [_cuda_rtx_toc](./_cuda_rtx_toc.md)
+- [_topology_classifier_index](./_topology_classifier_index.md)
 - [ACP-GEMMA4-MEMORY-HIERARCHY](./ACP-GEMMA4-MEMORY-HIERARCHY.md)
 - [ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW](./ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md)
 - [AGENTIC-ERROR-FIXING-ARCHITECTURE](./AGENTIC-ERROR-FIXING-ARCHITECTURE.md)
@@ -107,6 +110,7 @@
 - [parent-atlas-native-dawn-viewer-contract-v1](./parent-atlas-native-dawn-viewer-contract-v1.md)
 - [parent-atlas-policy-routing](./parent-atlas-policy-routing.md)
 - [parent-atlas-representation-structural-contract](./parent-atlas-representation-structural-contract.md)
+- [parent-atlas-selection-receipt-and-model-boundaries-v1](./parent-atlas-selection-receipt-and-model-boundaries-v1.md)
 - [PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT](./PARENT-ATLAS-STUDIO-AWARENESS-TOURNAMENT.md)
 - [parent-atlas-unreal-client-contract-v1](./parent-atlas-unreal-client-contract-v1.md)
 - [pathway-cards-spec](./pathway-cards-spec.md)

@@ -3,6 +3,7 @@ import pytest
 from atlas_graph_runtime.graph_projection_manifest import (
     graph_ordinal_checksum_from_manifest_v1,
     graph_ordinal_map_checksum_v1,
+    resolve_graph_source_ref_v1,
     validate_graph_projection_ordinal_checksum_v1,
 )
 

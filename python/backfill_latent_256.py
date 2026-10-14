@@ -70,6 +70,14 @@ def main() -> None:
     parser.add_argument("--apply", action="store_true", help="write to Postgres; default is dry-run")
     args = parser.parse_args()
 
+    if args.apply:
+        print(
+            "LATENT256_APPLY_BLOCKED: per-row source/workspace revision compare-and-swap "
+            "and independent vector readback are not implemented.",
+            file=sys.stderr,
+        )
+        raise SystemExit(78)
+
     with open(args.receipt, "r", encoding="utf-8") as fh:
         receipt = json.load(fh)
     CHECKPOINT_REVISION = receipt["model_checksum"][:64]

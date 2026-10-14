@@ -128,8 +128,8 @@ function getQueryVectorForLane(
   context: SearchLaneContext,
   lane: 'gpu-cuvs' | 'qdrant' | 'qdrant-768'
 ): Float32Array | undefined {
-  const toVector = (value: SearchLaneContext['queryVectorBundle'][keyof NonNullable<SearchLaneContext['queryVectorBundle']>] | Float32Array | undefined) =>
-    value instanceof Float32Array ? value : value?.vector;
+  const toVector = (value: unknown) =>
+    value instanceof Float32Array ? value : (value as any)?.vector;
 
   if (lane === 'qdrant' || lane === 'qdrant-768') {
     return toVector(context.queryVectorBundle?.dense768)
@@ -345,12 +345,21 @@ export class QdrantLane extends SearchLaneBase {
 
   constructor(
     url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
-    collection = VECTOR_LANES.source768.collection,
+    collection: string = VECTOR_LANES.source768.collection,
     embeddingDimension = VECTOR_LANES.source768.dimension,
     embeddingLane: 'dense_384' | 'dense_768' = 'dense_768',
     timeout = 30000
   ) {
     super();
+    if (
+      embeddingLane !== 'dense_768' ||
+      embeddingDimension !== VECTOR_LANES.source768.dimension ||
+      collection === 'codebase_chunks_384' ||
+      collection === 'codebase_chunks_384_hybrid' ||
+      collection === 'evidence_items_384'
+    ) {
+      throw new Error('LEGACY_384_QDRANT_LANE_DISABLED');
+    }
     this.url = url;
     this.collection = collection;
     this.embeddingDimension = embeddingDimension;
@@ -610,9 +619,9 @@ export class LexicalLane extends SearchLaneBase {
         metadata: {
           ts_rank: row.ts_rank,
           keywords: queryTokens,
-          kmeans_cluster_id: row.kmeans_cluster_id,
-          som_cell_x: row.som_row,
-          som_cell_y: row.som_col,
+          kmeans_cluster_id: row.kmeans_cluster_id ?? undefined,
+          som_cell_x: row.som_row ?? undefined,
+          som_cell_y: row.som_col ?? undefined,
         },
       }));
 

@@ -19,10 +19,10 @@ function parsePort(url, fallback) {
 export function resolveTurboVec4BitConfig(env = process.env) {
   const buildUrl = String(env.TURBOVEC_BUILD_URL ?? 'http://127.0.0.1:8795').replace(/\/+$/, '');
   return {
-    collection: String(env.CODEBASE_QDRANT_COLLECTION ?? 'codebase_chunks_384_hybrid'),
+    collection: String(env.CODEBASE_QDRANT_COLLECTION ?? 'codebase_chunks_768'),
     vectorName: String(env.TURBOVEC_VECTOR_NAME ?? 'content'),
     bits: Math.max(1, Number(env.TURBOVEC_BITS ?? 4)),
-    dimension: Math.max(1, Number(env.TURBOVEC_DIMENSION ?? 384)),
+    dimension: Math.max(1, Number(env.TURBOVEC_DIMENSION ?? 768)),
     limit: Math.max(1, Number(env.TURBOVEC_BUILD_LIMIT ?? 1000)),
     buildUrl,
     buildPort: Math.max(1, Number(env.TURBOVEC_BUILD_PORT ?? parsePort(buildUrl, 8795))),
@@ -69,7 +69,7 @@ export function extractVector(point, vectorName = 'content') {
 }
 
 export async function scrollQdrantVectors({
-  collection = 'codebase_chunks_384_hybrid',
+  collection = 'codebase_chunks_768',
   vectorName = 'content',
   limit = 1000,
   pageSize = 200,
@@ -110,7 +110,7 @@ export async function scrollQdrantVectors({
 }
 
 export async function fetchQdrantVectorsByIds({
-  collection = 'codebase_chunks_384_hybrid',
+  collection = 'codebase_chunks_768',
   ids = [],
   vectorName = 'content',
 }) {

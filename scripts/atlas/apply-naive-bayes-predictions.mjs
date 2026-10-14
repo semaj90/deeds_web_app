@@ -22,7 +22,6 @@ const MODEL_JSON = path.join(TMP_DIR, 'semantic-naive-bayes-model.json');
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run') || argv.includes('--dry');
-const COMPARE_384_PRESENCE = argv.includes('--compare-384-presence');
 const LIMIT = parseIntFlag(argv, '--limit', 500);
 const OFFSET = parseIntFlag(argv, '--offset', 0);
 const RUN_ID = new Date().toISOString().replace(/[:.]/g, '-');
@@ -39,10 +38,6 @@ const REPORT_MD = DRY_RUN
 const MODEL = argv.find((arg) => arg.startsWith('--model='))?.split('=')[1]
   ? path.resolve(REPO_ROOT, argv.find((arg) => arg.startsWith('--model='))?.split('=')[1])
   : MODEL_JSON;
-
-if (COMPARE_384_PRESENCE && !DRY_RUN) {
-  throw new Error('--compare-384-presence requires --dry-run');
-}
 
 const env = loadRepoEnv(process.env);
 const pool = new Pool({ connectionString: resolveDatabaseUrl(env) });
@@ -184,13 +179,9 @@ async function loadRows(limit, offset) {
       'ap.page_rank_score',
       'ap.pagerank',
       'ap.embedding',
-      'ap.latent_64',
       'ap.concept_ids',
       'ap.keywords',
     ];
-    if (COMPARE_384_PRESENCE && packetCols.has('content_embedding_384')) {
-      select.push('ap.content_embedding_384');
-    }
     if (packetCols.has('used_concepts')) select.push('ap.used_concepts');
     if (packetCols.has('extracted_entities')) select.push('ap.extracted_entities AS packet_entities');
     if (packetCols.has('ast_symbols')) select.push('ap.ast_symbols AS packet_ast_symbols');
@@ -224,7 +215,6 @@ async function loadRows(limit, offset) {
       has_lexical_features: Array.isArray(row.packet_lexical_features ?? row.features_lexical_features) && (row.packet_lexical_features ?? row.features_lexical_features).filter(Boolean).length > 0,
       has_used_concepts: Array.isArray(row.used_concepts ?? row.features_used_concepts ?? row.concept_ids) && (row.used_concepts ?? row.features_used_concepts ?? row.concept_ids).filter(Boolean).length > 0,
       has_embedding: Boolean(row.embedding),
-      has_legacy_embedding: Boolean(row.embedding || row.content_embedding_384 || row.latent_64),
       has_qdrant_point_id: Boolean(normalizeText(row.qdrant_point_id)),
       has_som: Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col)),
       has_pagerank: Number.isFinite(Number(row.page_rank_score ?? row.pagerank)),
@@ -281,24 +271,6 @@ async function main() {
     source_ref: normalizeText(row.source_ref),
     prediction: predict(model, row),
   }));
-  const legacyPredictions = COMPARE_384_PRESENCE
-    ? rows.map((row) => predict(model, { ...row, has_embedding: row.has_legacy_embedding }))
-    : null;
-  const comparison = legacyPredictions
-    ? {
-      baseline: 'previous has_embedding = embedding OR content_embedding_384 OR latent_64',
-      current: 'has_embedding = embedding (768-D field only)',
-      rowsCompared: rows.length,
-      predictionChanges: legacyPredictions.filter((prediction, index) => prediction.predicted_label !== predictions[index].prediction.predicted_label).length,
-      confidenceChanges: legacyPredictions.filter((prediction, index) => prediction.confidence !== predictions[index].prediction.confidence).length,
-      sample: predictions.slice(0, 5).map((item, index) => ({
-        packet_key: item.packet_key,
-        source_ref: item.source_ref,
-        legacy: legacyPredictions[index],
-        current: item.prediction,
-      })),
-    }
-    : null;
 
   await fs.mkdir(path.dirname(OUTPUT_JSONL), { recursive: true });
   await fs.writeFile(OUTPUT_JSONL, `${predictions.map((row) => JSON.stringify(row)).join('\n')}${predictions.length > 0 ? '\n' : ''}`, 'utf8');
@@ -336,7 +308,6 @@ async function main() {
       rowsWritten: DRY_RUN ? 0 : written,
       distinctPredictions: [...new Set(predictions.map((row) => row.prediction.predicted_label))].length,
     },
-    ...(comparison ? { comparison } : {}),
     sample: predictions.slice(0, 5),
     nextSafeAction: 'Use the predictions as soft evidence only; hard missing-field gaps still override routing.',
   };
@@ -349,7 +320,6 @@ async function main() {
     rowsProcessed: predictions.length,
     rowsWritten: DRY_RUN ? 0 : written,
     distinctPredictions: report.summary.distinctPredictions,
-    comparison,
     output: path.relative(REPO_ROOT, OUTPUT_JSONL).replace(/\\/g, '/'),
   }, null, 2));
 }

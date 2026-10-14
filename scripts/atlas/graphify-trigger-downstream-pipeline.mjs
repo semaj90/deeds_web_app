@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { summarizePipelineStages } from './graphify-downstream-summary.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -594,12 +595,19 @@ async function main() {
       }
     }
 
-    // Success
-    report.summary.success = true;
-    report.summary.message = 'Pipeline complete';
+    const stageSummary = summarizePipelineStages(report.stages);
+    report.summary.success = stageSummary.success;
+    report.summary.message = stageSummary.success
+      ? 'Pipeline complete'
+      : `Pipeline incomplete; unsuccessful stages: ${stageSummary.failedStages.join(', ')}`;
     report.summary.elapsed_ms = Date.now() - startTime;
 
-    log(`✅ Pipeline complete (${report.summary.elapsed_ms}ms)`);
+    if (stageSummary.success) {
+      log(`✅ Pipeline complete (${report.summary.elapsed_ms}ms)`);
+    } else {
+      process.exitCode = 1;
+      err(report.summary.message);
+    }
 
   } catch (e) {
     report.errors.push(e.message);

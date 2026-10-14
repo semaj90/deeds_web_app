@@ -1,12 +1,11 @@
 /**
- * Stage 6 — Batched Ollama /api/embed with Redis cache
- * Reuses embeddingCacheService for L1 exact-match persistence.
- * Backend validation wired via fingerprintBackend on module init.
+ * Stage 6 — Batched canonical semantic_768 embeddings through the shared provider.
+ * Cache access remains behind the provider client's immutable-artifact gate.
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { embeddingCacheService } from '$lib/server/embedding-cache-service.js';
-import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
+import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
+import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import {
 	validateResolvedBackend,
 	resolveEmbeddingBackend,
@@ -26,6 +25,11 @@ export async function getBatchedEmbeddings(
 	inputs: string[],
 	model: string = 'embeddinggemma:latest'
 ): Promise<number[][]> {
+	if (model !== SERVER_EMBEDDING_MODEL) {
+		throw new Error('RG_ATLAS_EMBEDDING_MODEL_MUST_BE_CANONICAL_SEMANTIC_768');
+	}
+	if (inputs.length === 0) return [];
+
 	// P0: Validate backend on first call (prevent silent provider-URL mismatch)
 	if (!backendValidated) {
 		const resolution = resolveEmbeddingBackend(model, {
@@ -67,43 +71,6 @@ export async function getBatchedEmbeddings(
 		);
 	}
 
-	const results = new Array<number[] | null>(inputs.length).fill(null);
-	const misses: { text: string; index: number }[] = [];
-
-	// 1. Check Redis cache for each input
-	for (let i = 0; i < inputs.length; i++) {
-		const cached = await embeddingCacheService.getEmbedding(inputs[i], model);
-		if (cached) {
-			results[i] = cached;
-		} else {
-			misses.push({ text: inputs[i], index: i });
-		}
-	}
-
-	if (misses.length === 0) return results as number[][];
-
-	// 2. Batch call the canonical embedding lane for misses
-	try {
-		// 3. Populate results and update cache
-		for (let i = 0; i < misses.length; i++) {
-			const embedded = await tryEmbedCanonical(misses[i].text, {
-				baseUrl: ENV.SELF_URL,
-				model,
-				timeoutMs: 60_000,
-			});
-
-			if (!embedded?.embedding?.length) {
-				throw new Error(`Canonical embedding lane returned no vector for miss index ${i}`);
-			}
-
-			results[misses[i].index] = embedded.embedding;
-			void embeddingCacheService.cacheEmbedding(misses[i].text, embedded.embedding, model);
-		}
-	} catch (err) {
-		const errorMsg = err instanceof Error ? err.message : String(err);
-		console.error(`[rg-atlas-embed] Failed to embed ${misses.length} texts: ${errorMsg}`);
-		throw new Error(`Embedding service error: ${errorMsg}`);
-	}
-
-	return results as number[][];
+	const generated = await generateEmbeddings(inputs);
+	return generated.vectors;
 }

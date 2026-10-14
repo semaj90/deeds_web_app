@@ -109,15 +109,6 @@ export const VECTOR_CONFIG = {
       vectors: ['content', 'signature', 'error'],
       on_disk_payload: true,
     },
-    codebase_chunks_384_hybrid: {
-      vectors: ['content'],
-      on_disk_payload: true,
-      sparse_vectors: ['bm42'], // Legacy projection metadata; not an active sparse owner
-    },
-    codebase_chunks_384: {
-      vectors: ['content'],
-      on_disk_payload: true,
-    },
     codebase_topology_128: {
       vectors: ['latent_128'],
       on_disk_payload: true,

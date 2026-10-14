@@ -17,8 +17,8 @@
  *              and the stored cosine_score). Gracefully skipped when isCudaAvailable()
  *              is false — fail-open with gpu_cosine_source: 'skipped'.
  *   Stage 2: Neo4j contextual expansion via USED_CONCEPT edges → ~150
- *   Stage 3: Feature generation + RRF fusion
- *            (cosine, BM25, TurboVec, concept_overlap, pagerank, reward, freshness)
+ *   Stage 3: Candidate scoring blend
+ *            (Qdrant cosine rank, concept overlap, and advisory priors)
  *   Stage 4: XGBoost tabular reranker → top 20 (supervised, fast, explainable)
  *            Falls back to Gemma4 cross-encoder if sidecar offline.
  *
@@ -47,17 +47,9 @@ import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
-import { embedSemantic768Canonical, tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
+import { embedAtlasSearchQuery } from './embedding.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
-import {
-	checkRedisLRU,
-	checkBitfrostSemantic,
-	queryQdrantCascade,
-	writeRedisLRU,
-	getAtlasCacheVersions,
-	type AtlasCacheHit,
-} from '$lib/server/cache/atlas-cache-cascade.js';
 import { unifiedSearch } from '$lib/server/retrieval/service.js';
 import type { RequestHandler } from './$types';
 
@@ -217,31 +209,15 @@ function rrfScore(ranks: number[]): number {
 // ── Stage 0: Embed query ───────────────────────────────────────────────────────
 
 async function embedQuery(query: string): Promise<number[] | null> {
-  if (ENV.ATLAS_CANONICAL_EMBEDDING_STRICT) {
-    const model = ENV.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma';
-    const modelArtifactRevision = ENV.EMBEDDING_MODEL_ARTIFACT_REVISION;
-    const tokenizerRevision = ENV.EMBEDDING_TOKENIZER_REVISION;
-    const inputPolicyRevision = ENV.EMBEDDING_INPUT_POLICY_REVISION;
-    if (!modelArtifactRevision || !tokenizerRevision || !inputPolicyRevision) {
-      throw new Error('SEMANTIC_768_STRICT_LINEAGE_CONFIGURATION_REQUIRED');
-    }
-    const embedded = await embedSemantic768Canonical(query, {
-      model,
-      modelArtifactRevision,
-      tokenizerRevision,
-      inputPolicyRevision,
-      // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
-      baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
-      timeoutMs: 20_000,
-    });
-    return embedded.embedding;
-  }
-
-  const embedded = await tryEmbedCanonical(query.slice(0, 1024), {
-    model: 'embeddinggemma:latest',
-    timeoutMs: 20_000,
-  }).catch(() => null);
-  return embedded?.embedding ?? null;
+  return embedAtlasSearchQuery(query, {
+    strict: ENV.ATLAS_CANONICAL_EMBEDDING_STRICT,
+    model: ENV.EMBEDDING_SERVER_MODEL ?? 'embeddinggemma',
+    modelArtifactRevision: ENV.EMBEDDING_MODEL_ARTIFACT_REVISION,
+    tokenizerRevision: ENV.EMBEDDING_TOKENIZER_REVISION,
+    inputPolicyRevision: ENV.EMBEDDING_INPUT_POLICY_REVISION,
+    // EMB-PROV-01: dedicated strict-lane URL, not the shared EMBEDDING_BASE_URL.
+    baseUrl: ENV.EMBEDDING_STRICT_BASE_URL ?? 'http://127.0.0.1:8081',
+  });
 }
 
 // ── Stage 1: Qdrant ANN with optional pre-filter ───────────────────────────────
@@ -598,7 +574,7 @@ async function fetchBifrostRecency(
   }
 }
 
-// ── Stage 3: Feature generation + RRF fusion ───────────────────────────────────
+// ── Stage 3: Candidate score blend ─────────────────────────────────────────────
 
 function buildCascadeScore(
   hit: QdrantHit,
@@ -636,7 +612,8 @@ function buildCascadeScore(
     String(p.domain_class ?? '').includes(c) || String(p.ontology_tags ?? '').includes(c)
   ) ? 1 : 0;
 
-  // RRF + weighted blend
+  // Reciprocal-rank-inspired blend of semantic rank and concept-overlap rank;
+  // this route does not fuse independent lexical or AST/KAG retrieval lanes.
   const rrfBase   = WEIGHTS.cosine   * (1 / (RRF_K + cosineRank))
                   + WEIGHTS.concept  * (1 / (RRF_K + conceptRank));
   const boostMul  = 1
@@ -823,33 +800,18 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   }
 
   const stats: Record<string, number | string | boolean | null> = {};
-  let cacheEnvelope: AtlasCacheHit | null = null;
+  // Legacy envelope keys omit request filters, immutable model identity, a
+  // corpus snapshot revision, and revision-qualified result hydration. They
+  // also contain packet references rather than usable search results, so this
+  // route must not admit them as cache hits.
+  stats.cache_l1_hit = false;
+  stats.cache_l1_latency_ms = 0;
+  stats.cache_l2_hit = false;
+  stats.cache_l2_latency_ms = 0;
+  stats.cache_l3_hit = false;
+  stats.cache_l3_latency_ms = 0;
+  stats.cache_bypass = 'LEGACY_ENVELOPE_NOT_ADMITTED';
 
-  // ── Unified 3-tier cache cascade (L1 Redis → L2 Bifrost → L3 Qdrant) ────────
-  // L1: Check Redis LRU exact-match cache
-  const t_l1 = Date.now();
-  cacheEnvelope = await checkRedisLRU(query);
-  const l1_latency = Date.now() - t_l1;
-  stats.cache_l1_hit = cacheEnvelope !== null;
-  stats.cache_l1_latency_ms = l1_latency;
-
-  if (cacheEnvelope) {
-    // L1 hit — return immediately with cache metadata
-    return json({
-      results: [],  // Degraded: cache envelope only, no full packet retrieval
-      cascade_stats: {
-        ...stats,
-        cache_source: 'redis_lru',
-        cache_envelope: cacheEnvelope.envelope,
-        total_ms: Date.now() - t0,
-      },
-      embed_ok: true,
-      source: 'cache',
-      cache_hit: true,
-    });
-  }
-
-  // L2: Check Bifrost semantic cache (requires embedding)
   const vector = await embedQuery(query);
   stats.embed_ms = Date.now() - t0;
 
@@ -862,47 +824,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     });
   }
 
-  const t_l2 = Date.now();
-  cacheEnvelope = await checkBitfrostSemantic(query, vector);
-  const l2_latency = Date.now() - t_l2;
-  stats.cache_l2_hit = cacheEnvelope !== null;
-  stats.cache_l2_latency_ms = l2_latency;
-
-  if (cacheEnvelope) {
-    // L2 hit — return with Bifrost envelope
-    return json({
-      results: [],  // Degraded: cache envelope only
-      cascade_stats: {
-        ...stats,
-        cache_source: 'bifrost_semantic',
-        cache_envelope: cacheEnvelope.envelope,
-        total_ms: Date.now() - t0,
-      },
-      embed_ok: true,
-      source: 'cache',
-      cache_hit: true,
-    });
-  }
-
-  // L3: Query Qdrant multi-vector with payload filters
-  const t_l3 = Date.now();
-  cacheEnvelope = await queryQdrantCascade(vector, { feature_id, community_id, domain_class, topology_label, ontology_label, cluster_key, kmeans_cluster }, top_k * 5);
-  const l3_latency = Date.now() - t_l3;
-  stats.cache_l3_hit = cacheEnvelope !== null;
-  stats.cache_l3_latency_ms = l3_latency;
-
-  // If L3 (Qdrant) returned no results, fail gracefully
-  if (!cacheEnvelope) {
-    return json({
-      results: [],
-      cascade_stats: { ...stats, error: 'no_qdrant_hits', cache_source: 'none' },
-      embed_ok: true,
-      source: 'fallback',
-    });
-  }
-
-  // Extract Qdrant hits — re-fetch full payloads for downstream processing
-  // (cache envelope contains metadata but needs vector data for reranking)
+  // One live Qdrant query supplies the candidates and inline vectors needed
+  // for downstream scoring. The former envelope probe issued a duplicate query.
   const t1   = Date.now();
   const hits = await qdrantSearch(vector, { topK: top_k * 5, featureId: feature_id, communityId: community_id, domainClass: domain_class, topologyLabel: topology_label, ontologyLabel: ontology_label, clusterKey: cluster_key, kmeansCluster: kmeans_cluster });
   stats.qdrant_ms   = Date.now() - t1;
@@ -1112,48 +1035,14 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
   // ── Write L1 Redis LRU cache for future exact-match queries ────────────────
   // Build envelope from final results for Redis caching
-  let versions = {
-    graph_version: 0,
-    qdrant_version: 0,
-    rpc_version: 0,
-    som_version: 0,
-    kmeans_version: 0,
-    cache_epoch: 0,
-  };
-  try {
-    versions = await getAtlasCacheVersions();
-  } catch {
-    // Redis unavailable or closed: keep neutral cache versions and return hits.
-  }
-  const cacheWriteEnvelope = {
-    query,
-    packet_keys: final.map(p => p.packet_key).filter(Boolean),
-    feature_ids: [...new Set(final.map(p => p.feature_id).filter(Boolean))],
-    source_refs: [...new Set(final.map(p => p.source_ref).filter(Boolean))],
-    qdrant_point_ids: final.map(p => String(p.qdrant_id)).filter(Boolean),
-    redis_hit: false,
-    bitfrost_hit: false,
-    qdrant_hit: true,
-    graph_version: versions.graph_version,
-    cache_epoch: versions.cache_epoch,
-    ttl_seconds: 300,
-    latency_ms: stats.total_ms,
-  };
-
-  let cacheWriteOk = false;
-  try {
-    cacheWriteOk = await writeRedisLRU(query, cacheWriteEnvelope);
-  } catch {
-    cacheWriteOk = false;
-  }
-  stats.cache_l1_write = cacheWriteOk;
+  stats.cache_l1_write = false;
 
   return json({
     results:       final,
     cascade_stats: {
       ...stats,
       cache_source: 'qdrant_live',
-      cache_envelope: cacheWriteEnvelope,
+      cache_envelope: null,
     },
     embed_ok:      true,
     source:        'cascade',

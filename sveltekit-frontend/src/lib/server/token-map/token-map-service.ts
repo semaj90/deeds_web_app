@@ -255,7 +255,7 @@ export async function persistTokenMapCartridge(
   deps: PersistenceDeps = {}
 ): Promise<PersistedTokenMapCartridge> {
   const { db, redis } = deps.db && deps.redis ? deps : await resolveServices();
-  const model = deps.model ?? 'turboquant/gemma4-legal.gguf';
+  const model = deps.model ?? 'turboquant/ornith-1.5-9b.gguf';
   const ttlSeconds = Math.max(60, deps.ttlSeconds ?? 3600);
 
   const packet = toPacket(runId, payload);

@@ -2,7 +2,7 @@
  * Smoke test: real query through the full SearchRuntime pipeline
  *
  * Requires dev server running at http://localhost:5173
- * and all backing services (Postgres, Qdrant, Ollama) up.
+ * and the PostgreSQL, Qdrant, and Ollama embedding services up.
  *
  * Usage:
  *   node scripts/atlas/smoke-search-runtime.mjs
@@ -16,12 +16,11 @@ const BASE = process.env.SVELTEKIT_URL ?? 'http://localhost:5173';
 const OLLAMA = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const QDRANT = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const TIMEOUT_MS = 30_000;
-const EXPECTED_DIM = 384;
-const NATIVE_DIM = 768; // embeddinggemma:latest native output; app slices to 384
+const EXPECTED_DIM = 768;
 
 const GATE = {
   embed:  `${OLLAMA}/api/embed`,
-  qdrant: `${QDRANT}/collections/codebase_chunks_384_hybrid`,
+  qdrant: `${QDRANT}/collections/codebase_chunks_768`,
   search: `${BASE}/api/retrieval/search-unified`,
 };
 
@@ -37,9 +36,7 @@ async function check(label, fn) {
   }
 }
 
-// ── Gate 1: Ollama /api/embed returns a usable vector ────────────────────────
-// embeddinggemma:latest is a 768-dim model; the application truncates to 384
-// before storing in Qdrant. Gate checks: model responds, returns ≥384 dims.
+// ── Gate 1: Ollama embedding endpoint returns semantic_768 ──────────────────
 async function checkOllama() {
   const res = await fetch(GATE.embed, {
     method: 'POST',
@@ -52,24 +49,23 @@ async function checkOllama() {
   // /api/embed returns { embeddings: [[...]] }
   const vec = data?.embeddings?.[0] ?? data?.embedding;
   if (!Array.isArray(vec)) throw new Error(`unexpected response shape: ${JSON.stringify(data).slice(0, 100)}`);
-  if (vec.length < EXPECTED_DIM) {
-    throw new Error(`got ${vec.length}-dim — need ≥${EXPECTED_DIM} (app truncates to ${EXPECTED_DIM} before Qdrant)`);
+  if (vec.length !== EXPECTED_DIM) {
+    throw new Error(`got ${vec.length}-dim — semantic_768 requires exactly ${EXPECTED_DIM}`);
   }
-  const note = vec.length === NATIVE_DIM ? ` (native ${NATIVE_DIM}-dim, app truncates to ${EXPECTED_DIM})` : '';
-  return `embeddinggemma:latest → ${vec.length}-dim${note} ✓`;
+  return `embeddinggemma:latest → ${vec.length}-dim semantic_768 ✓`;
 }
 
-// ── Gate 2: Qdrant codebase_chunks_384_hybrid collection exists + has points ───
+// ── Gate 2: canonical semantic_768 Qdrant projection exists ─────────────────
 async function checkQdrant() {
   const res = await fetch(GATE.qdrant, { signal: AbortSignal.timeout(5_000) });
-  if (res.status === 404) throw new Error('codebase_chunks_384_hybrid missing — run npm run atlas:backfill:hybrid');
+  if (res.status === 404) throw new Error('codebase_chunks_768 missing — reconcile the canonical projection owner; do not run a legacy 384 backfill');
   if (!res.ok) throw new Error(`HTTP ${res.status} — is Qdrant running at ${QDRANT}?`);
   const { result } = await res.json();
   // Qdrant v1.x uses points_count; v1.7+ also has vectors_count
   const count = result?.points_count ?? result?.vectors_count;
-  if (count === 0) throw new Error('collection exists but has 0 points — run npm run atlas:backfill:hybrid');
+  if (count === 0) throw new Error('canonical collection exists but has 0 points — verify the qualified projection plan; this smoke test does not authorize a backfill');
   if (count === undefined) throw new Error(`unexpected payload shape: ${JSON.stringify(result).slice(0, 100)}`);
-  return `codebase_chunks_384_hybrid — ${count.toLocaleString()} points`;
+  return `codebase_chunks_768 — ${count.toLocaleString()} points`;
 }
 
 // ── Gate 3: Dev server responds ───────────────────────────────────────────────
@@ -114,8 +110,8 @@ else console.log('');
 
 console.log('Infrastructure gates:');
 const [ollamaOk, qdrantOk, serverOk] = await Promise.all([
-  check('Ollama /api/embed ≥384-dim', checkOllama),
-  check('Qdrant codebase_chunks_384_hybrid', checkQdrant),
+  check('Ollama /api/embed semantic_768 (768D)', checkOllama),
+  check('Qdrant codebase_chunks_768', checkQdrant),
   check('Dev server reachable', checkDevServer),
 ]);
 
@@ -186,8 +182,8 @@ console.log('\n--- Verdict ---');
 if (packets.length === 0) {
   // Zero results is a warning, not a hard failure — index may be sparsely populated
   console.log('⚠️  WARN: zero packets returned');
-  console.log('    Check: does codebase_chunks_384_hybrid have points? Is Postgres populated?');
-  console.log('    Run: npm run atlas:backfill:hybrid');
+  console.log('    Check: is the canonical semantic_768 projection populated and lineage-qualified?');
+  console.log('    Do not backfill or promote until its source and representation receipts pass.');
   process.exit(0);
 } else if (identityErrors > 0) {
   console.log(`❌ FAIL: ${identityErrors} packet(s) with missing identity fields (chunk_id / packet_key / source_ref)`);

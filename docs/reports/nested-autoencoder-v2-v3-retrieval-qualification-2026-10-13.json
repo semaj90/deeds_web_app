@@ -1,0 +1,161 @@
+{
+  "schema": "atlas.nested-autoencoder-qualification.v1",
+  "generatedAt": "2026-10-13T10:25:00Z",
+  "qualificationGateStatus": {
+    "historicalJulyGate4": "FAILED_AS_EXECUTED",
+    "juneAeLatent64": "REJECTED_RECALL_COLLAPSE",
+    "v2NestedCheckpoint": "DIAGNOSTIC_UNPROMOTED",
+    "v3NestedCheckpoint": "CHALLENGER_DIAGNOSTIC_UNPROMOTED",
+    "frozenSnapshotV4Lineage": "REJECTED_MISSING_SOURCE_REVISIONS",
+    "productionAdmission": "BLOCKED"
+  },
+  "snapshotCensus": {
+    "snapshotMetaPath": "docs/reports/semantic768-ae-training-snapshot-v4.json",
+    "ordinalMapPath": "docs/reports/semantic768/frozen_semantic_768_v4_ordinal_map.json",
+    "declaredRowCount": 55169,
+    "actualOrdinalCount": 55169,
+    "validSourceRefCount": 52380,
+    "uniqueSourceRefCount": 4480,
+    "nullSourceRefCount": 2789,
+    "nullSourceRefPercent": 5.055375,
+    "lineageFieldCompleteness": {
+      "sourceRevision": "0 / 55169 (0%)",
+      "workspaceRevision": "0 / 55169 (0%)",
+      "sourceDigest": "0 / 55169 (0%)",
+      "embeddingModelRevision": "0 / 55169 (0%)"
+    },
+    "producerRevision": "embeddinggemma:latest",
+    "producerRevisionStatus": "UNPINNED_MUTABLE_TAG",
+    "canonicalSourceColumn": "codebase_chunk_index.content_embedding",
+    "canonicalSourceColumnStatus": "UNQUALIFIED_HISTORICAL_COLUMN",
+    "sampleNullSourceRefRows": [
+      { "ordinal": 3, "id": "00032bfb-f581-415c-9edd-a8fc7f154f3f", "sourceRef": null },
+      { "ordinal": 23, "id": "001a0301-8425-4701-b0e2-898b99f76f15", "sourceRef": null },
+      { "ordinal": 27, "id": "001f9967-c068-4c51-9609-0036c0c005f9", "sourceRef": null },
+      { "ordinal": 53, "id": "003bda98-e7b0-4f63-8f06-d9c0e96ee9cb", "sourceRef": null },
+      { "ordinal": 66, "id": "004cef1c-4068-49f5-85ec-af9832e69fe6", "sourceRef": null }
+    ]
+  },
+  "checkpointDescriptors": {
+    "june_autoencoder": {
+      "checkpointDigest": "sha256:ae_meta_2026_06_june_npy_weights",
+      "format": "NPY_WEIGHT_ARRAYS",
+      "architectureRevision": "atlas.ae.768-128-64-128-768.v1",
+      "parameters": 214080,
+      "layers": "768 -> 128 -> 64 -> 128 -> 768",
+      "inputRepresentation": "semantic_768",
+      "outputRepresentation": "latent_64",
+      "activationTraining": "torch.tanh",
+      "activationEvaluation": "torch.relu / linear (mismatch in July Gate 4)",
+      "recallAt10Reported": 0.085,
+      "promotionStatus": "REJECTED"
+    },
+    "v2_nested_autoencoder": {
+      "checkpointDigest": "38A57D50446EADD8BE9E17B4D1FCA326793DD16EE5B68C50200B0857C42BA894",
+      "checkpointFile": "python/checkpoints/nested_semantic_autoencoder_v2_full01.pt",
+      "sizeBytes": 2704017,
+      "architectureRevision": "atlas.nested-ae.768-384-256.v2",
+      "inputRepresentation": "semantic_768",
+      "outputRepresentations": ["latent_128", "latent_64"],
+      "overlapAt10Reported": {
+        "latent_128": 0.8047,
+        "latent_64": 0.7469
+      },
+      "promotionStatus": "DIAGNOSTIC"
+    },
+    "v3_nested_autoencoder": {
+      "checkpointDigest": "AC5C069D714BD1B07EFDBE5ABB1AEA993C11B3851D427C508CE76E4EEBB616C5",
+      "checkpointFile": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+      "sizeBytes": 5825981,
+      "architectureRevision": "atlas.nested-ae.768-384-256.v3",
+      "parametersEncoder": 394368,
+      "parametersTotal": 1454592,
+      "layers": "768 -> 384 -> 256 (prefix-nested to 128 and 64)",
+      "inputRepresentation": "semantic_768",
+      "outputRepresentations": ["latent_256", "latent_128", "latent_64"],
+      "overlapAt10Reported": {
+        "latent_256": 0.8875,
+        "latent_128": 0.8266,
+        "latent_64": 0.7516
+      },
+      "promotionStatus": "CHALLENGER"
+    },
+    "candidate_code_definition": {
+      "architectureRevision": "atlas.latent-ae.768-512-256-128.v2",
+      "checkpointDigest": null,
+      "status": "UNBOUND_CODE_ONLY"
+    }
+  },
+  "retrievalParityComparison": [
+    { "representation": "semantic_768 (Canonical Oracle)", "dimensions": 768, "overlapAt10": 1.0, "status": "CANONICAL_ORACLE" },
+    { "representation": "v3 latent-256 (Learned Challenger)", "dimensions": 256, "overlapAt10": 0.8875, "status": "DIAGNOSTIC_CHALLENGER" },
+    { "representation": "v3 latent-128 (Learned Prefix)", "dimensions": 128, "overlapAt10": 0.8266, "status": "DIAGNOSTIC_CHALLENGER" },
+    { "representation": "v2 latent-128 (Learned Prefix)", "dimensions": 128, "overlapAt10": 0.8047, "status": "DIAGNOSTIC" },
+    { "representation": "v3 latent-64 (Learned Prefix)", "dimensions": 64, "overlapAt10": 0.7516, "status": "DIAGNOSTIC_CHALLENGER" },
+    { "representation": "v2 latent-64 (Learned Prefix)", "dimensions": 64, "overlapAt10": 0.7469, "status": "DIAGNOSTIC" },
+    { "representation": "June latent-64 (Learned Bottleneck)", "dimensions": 64, "overlapAt10": 0.085, "status": "FAILED_GATE_4" },
+    { "representation": "semantic_mrl_512 (Native Unlearned)", "dimensions": 512, "overlapAt10": 0.825, "status": "UNLEARNED_ZERO_PARAM" },
+    { "representation": "semantic_mrl_256 (Native Unlearned)", "dimensions": 256, "overlapAt10": 0.713, "status": "UNLEARNED_ZERO_PARAM" }
+  ],
+  "writerGuardAudit": {
+    "latent128PostgresStorage": "PRESENT (public.codebase_chunk_index.latent_128 halfvec(128), live read-only schema census: 55,169 populated rows)",
+    "latent256CasRequired": "WHERE id = $1 AND content_hash = $2 AND source_revision = $3",
+    "backfillScriptGuards": "ENFORCED (scripts/atlas/latent-and-cluster-writer-guards.spec.mjs 7/7 passing)"
+  },
+  "storedLatentCheckpointParity": {
+    "auditDate": "2026-10-13",
+    "status": "CHECKPOINT_NUMERICAL_PARITY_PROVEN_FOR_SAMPLED_ROWS_SOURCE_LINEAGE_NOT_PROVEN",
+    "database": "legal_ai_db",
+    "transactionReadOnly": true,
+    "historicalModelCodeRevision": "0cddd29d39",
+    "writerReviewed": "python/backfill_latent_256.py reads codebase_chunk_index.content_embedding and calls NestedSemanticAutoencoder.encode(); current code writes latent_256 plus its checkpoint revision and latent_64, but does not persist latent_128. Historical v3 model uses 768->384->256, GELU, L2-normalized latent256, then normalized 128/64 prefixes. The exact process that populated each live row/latent_128 remains unproven.",
+    "latent128WriterCandidates": {
+      "postgresSliceBackfill": "scripts/atlas/backfill-latent-128-slice.mjs derives the normalized first-128 prefix from latent_256, but --apply exits 78 before constructing the DB pool; its guard test passes 1/1. It cannot be the verified live writer from current source evidence.",
+      "postgresSliceBackfillHistoricalEvidence": "Docker PostgreSQL log at 2026-09-12T17:59:22Z records the same parameterized SELECT as the slice-backfill (WHERE latent_256 IS NOT NULL AND latent_128 IS NULL ORDER BY id LIMIT $1), which failed because latent_128 did not yet exist. On 2026-09-15T15:45:22Z autovacuum references idx_codebase_chunk_latent_128_hnsw, proving that the column/index existed by then. This brackets schema creation and a failed pre-schema writer attempt, but does not show a successful latent_128 UPDATE.",
+      "likelyWriterAssessment": "PROBABLE_MECHANISM_ONLY: the normalized-prefix slice-backfill matches the full live value relationship and the logged pre-schema SELECT; successful post-schema execution remains unverified.",
+      "historicalWriteAuditAvailabilityAsOf2026-10-13": "pg_stat_statements extension is not installed. Observed PostgreSQL settings: logging_collector=off, log_statement=none, log_min_duration_statement=-1. Retained Docker logs expose the failed pre-schema SELECT and later index maintenance but no successful UPDATE. Docker Desktop became unavailable during the follow-up read-only check; no service restart was attempted.",
+      "legacyQdrantHelper": "scripts/atlas/backfill-latent-128.mjs writes a Qdrant named vector using modulo-folding of raw 768D values followed by tanh; it does not write PostgreSQL and is not the autoencoder prefix transform.",
+      "historicalDryRunReceipt": "docs/reports/latent-128-backfill.json (2026-08-23) records DRY_RUN for 16 Qdrant points, provisional-fold-tanh-768-to-128, qdrantUpdated=0, redisWritten=0; it is not evidence for PostgreSQL latent_128 writes.",
+      "separateLatent64Receipt": "docs/reports/backfill-latent-vectors-writeback.json (2026-08-03) concerns latent_64 PostgreSQL updates and does not establish latent_128 provenance.",
+      "databasePopulationOwner": "UNRESOLVED: no active, in-repository PostgreSQL latent_128 writer was found that explains the existing 55,169 stored rows. Historical execution evidence is missing."
+    },
+    "checkpoint": {
+      "path": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
+      "fileSha256": "ac5c069d714bd1b07efdbe5abb1aea993c11b3851d427c508ce76e4eebb616c5",
+      "bytes": 5825981,
+      "stateDictChecksum": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "parameters": 1454592,
+      "strictLoad": true
+    },
+    "sample": {
+      "selection": "first five UUID-ordered rows with nonnull content_embedding, latent_256, latent_128, and matching latent_256_checkpoint_revision",
+      "rowsRead": 5,
+      "revisionLabelMatchesStateDictChecksum": 5,
+      "latent256": { "width": 256, "maxAbsoluteErrorAcrossRows": 0.00011298060417175293, "cosineMinimum": 0.9999999403953552, "storage": "halfvec; differences consistent with half-precision storage" },
+      "latent128": { "width": 128, "maxAbsoluteErrorAcrossRows": 0.0002455413341522217, "cosineMinimum": 0.9999999403953552, "storage": "halfvec; prefix is independently normalized as in historical encode()" },
+      "latent64": { "width": 64, "maxAbsoluteErrorAcrossRows": 5.364418029785156e-7, "cosineMinimum": 1.0, "storage": "vector; writer formats values to six decimal places" }
+    },
+    "fullCohortPrefixAudit": {
+      "transactionReadOnly": true,
+      "rowsWithBothLatents": 55169,
+      "checkpointLabelDistinctCount": 1,
+      "checkpointLabel": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
+      "badWidths": 0,
+      "invalidPrefixNorms": 0,
+      "comparison": "normalize(first 128 coordinates of stored latent_256) versus stored latent_128",
+      "maxAbsoluteErrorMaximum": 0.0002435445785522461,
+      "maxAbsoluteErrorP50": 0.00009498000144958496,
+      "maxAbsoluteErrorP95": 0.00011995434761047363,
+      "meanAbsoluteErrorAcrossRows": 0.000011217536550967342,
+      "rowsWithinMaxAbsoluteError1e3": 55169,
+      "minimumCosine": 0.9999997615814209,
+      "sourceRevisionPopulated": 0,
+      "workspaceRevisionPopulated": 0,
+      "representationRevisionPopulated": 0,
+      "interpretation": "All stored latent_128 values are numerically consistent with normalized prefixes of their stored latent_256 values at halfvec precision. This establishes representation relationship, not the writer process, checkpoint execution history, canonical input provenance, or source admission."
+    },
+    "sourceAdmission": "NOT_PROVEN: source_revision, workspace_revision, and representation_revision remain absent on these rows; exact source-byte and embedding-producer provenance are not established",
+    "interpretation": "The sample strongly supports that the stored latent values were computed from the matching v3 checkpoint and the row's stored halfvec(768) content_embedding using the historical encode path. It does not establish which process wrote each row; the latent_128 writer remains specifically unresolved. Nor does it establish that the input embedding is canonical/current or production eligibility.",
+    "mutations": "none; SELECTs ran in a PostgreSQL read-only transaction; no checkpoint or content_embedding_384 changes"
+  }
+}

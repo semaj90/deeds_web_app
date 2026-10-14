@@ -23,6 +23,7 @@ export type GraphSnapshotManifestStatus = z.infer<typeof GraphSnapshotManifestSt
 export interface GraphSnapshotManifest {
   snapshotId: string;
   workspaceId: string;
+  workspaceRevision?: string | null;
   sourceInventorySnapshotId: string;
   identityContractVersion: string;
   parserContractVersion: string;
@@ -74,10 +75,11 @@ export interface GraphSnapshotMaterialization {
 export interface GraphSnapshotMaterializerInput {
   snapshotId: string;
   workspaceId: string;
+  workspaceRevision?: string | null;
   sourceInventorySnapshotId: string;
   identityContractVersion: string;
   parserContractVersion: string;
-  treeNodes: readonly Pick<
+  treeNodes: readonly (Pick<
     AtlasTreeNode,
     | 'nodeId'
     | 'parentId'
@@ -98,7 +100,7 @@ export interface GraphSnapshotMaterializerInput {
     | 'metadata'
     | 'ledgerType'
     | 'lineageVersion'
-  >[];
+  > & { sourceRevision?: string | null })[];
   packets: readonly Pick<
     AtlasPacket,
     | 'packetKey'
@@ -113,6 +115,7 @@ export interface GraphSnapshotMaterializerInput {
     | 'communityId'
     | 'clusterId'
     | 'sha256'
+    | 'sourceRevision'
     | 'sourceKind'
     | 'sourcePath'
     | 'topology'
@@ -281,6 +284,18 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     packetMap.set(packet.packetKey, packet);
   }
 
+  const sourceRevisionByRef = new Map<string, string | null>();
+  for (const packet of packetMap.values()) {
+    const revision = typeof packet.sourceRevision === 'string' && packet.sourceRevision.trim()
+      ? packet.sourceRevision
+      : null;
+    if (!sourceRevisionByRef.has(packet.sourceRef)) {
+      sourceRevisionByRef.set(packet.sourceRef, revision);
+    } else if (sourceRevisionByRef.get(packet.sourceRef) !== revision) {
+      sourceRevisionByRef.set(packet.sourceRef, null);
+    }
+  }
+
   const graphSnapshotNodes: NewGraphNodeV2Row[] = [];
   const includedPacketKeys = new Set<string>();
 
@@ -320,6 +335,11 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     }
 
     const nodeKey = `tree:${treeNode.nodeId}`;
+    const packetRevision = treeNode.packetKey ? packetMap.get(treeNode.packetKey)?.sourceRevision : null;
+    if (treeNode.sourceRevision && packetRevision && treeNode.sourceRevision !== packetRevision) {
+      throw new Error(`GRAPH_TREE_PACKET_SOURCE_REVISION_MISMATCH:${treeNode.nodeId}`);
+    }
+    const sourceRevision = treeNode.sourceRevision ?? packetRevision ?? sourceRevisionByRef.get(treeNode.sourceRef) ?? null;
     graphSnapshotNodes.push(
       parseGraphNode({
         snapshotId,
@@ -335,6 +355,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           nodeType: treeNode.nodeType,
           treeDepth: treeNode.treeDepth,
           sourceRef: treeNode.sourceRef,
+          sourceRevision,
+          workspaceRevision: input.workspaceRevision ?? null,
           filePath: treeNode.filePath,
           packetKey: treeNode.packetKey ?? null,
           featureId: treeNode.featureId ?? null,
@@ -356,6 +378,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           nodeType: treeNode.nodeType,
           treeDepth: treeNode.treeDepth,
           sourceRef: treeNode.sourceRef,
+          sourceRevision,
+          workspaceRevision: input.workspaceRevision ?? null,
           filePath: treeNode.filePath,
           packetKey: treeNode.packetKey ?? null,
           featureId: treeNode.featureId ?? null,
@@ -419,6 +443,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
         contentHash: packet.sha256 ?? hashStableRecord({
           packetKey: packet.packetKey,
           sourceRef: packet.sourceRef,
+          sourceRevision: packet.sourceRevision ?? null,
           canonicalSourceRef: packet.canonicalSourceRef ?? null,
           directoryPath: packet.directoryPath,
           filePath: packet.filePath ?? null,
@@ -442,6 +467,8 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           materializedFrom: 'atlas_packets',
           packetKey: packet.packetKey,
           sourceRef: packet.sourceRef,
+          sourceRevision: packet.sourceRevision ?? null,
+          workspaceRevision: input.workspaceRevision ?? null,
           canonicalSourceRef: packet.canonicalSourceRef ?? null,
           directoryPath: packet.directoryPath,
           filePath: packet.filePath ?? null,
@@ -560,6 +587,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
   const sourceInventoryHash = hashStableRecord({
     snapshotId,
     workspaceId,
+    workspaceRevision: input.workspaceRevision ?? null,
     sourceInventorySnapshotId,
     identityContractVersion,
     parserContractVersion,
@@ -580,6 +608,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
   const graphSnapshotManifest: GraphSnapshotManifest = {
     snapshotId,
     workspaceId,
+    workspaceRevision: input.workspaceRevision ?? null,
     sourceInventorySnapshotId,
     identityContractVersion,
     parserContractVersion,
@@ -739,7 +768,7 @@ function buildExclusion(
   };
 }
 
-function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'][number], 'nodeId' | 'parentId' | 'rootId' | 'pageIndexPath' | 'nodeType' | 'treeDepth' | 'sourceRef' | 'filePath' | 'packetKey' | 'featureId' | 'title' | 'summary' | 'contentPreview' | 'domain' | 'somCluster' | 'communityId' | 'metadata' | 'ledgerType' | 'lineageVersion'>) {
+function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'][number], 'nodeId' | 'parentId' | 'rootId' | 'pageIndexPath' | 'nodeType' | 'treeDepth' | 'sourceRef' | 'sourceRevision' | 'filePath' | 'packetKey' | 'featureId' | 'title' | 'summary' | 'contentPreview' | 'domain' | 'somCluster' | 'communityId' | 'metadata' | 'ledgerType' | 'lineageVersion'>) {
   return {
     nodeId: node.nodeId,
     parentId: node.parentId ?? null,
@@ -748,6 +777,7 @@ function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'
     nodeType: node.nodeType,
     treeDepth: node.treeDepth,
     sourceRef: node.sourceRef,
+    sourceRevision: node.sourceRevision ?? null,
     filePath: node.filePath,
     packetKey: node.packetKey ?? null,
     featureId: node.featureId ?? null,
@@ -763,7 +793,7 @@ function normalizeTreeNode(node: Pick<GraphSnapshotMaterializerInput['treeNodes'
   };
 }
 
-function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][number], 'packetKey' | 'sourceRef' | 'canonicalSourceRef' | 'directoryPath' | 'filePath' | 'functionSymbol' | 'featureId' | 'featureLabel' | 'titleId' | 'communityId' | 'clusterId' | 'sha256' | 'sourceKind' | 'sourcePath' | 'topology' | 'vectors' | 'metadata' | 'domainClass' | 'tags' | 'lineageVersion' | 'ledgerType' | 'canonical' | 'treeNodeId' | 'qdrantCollection' | 'qdrantVectorDim'>) {
+function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][number], 'packetKey' | 'sourceRef' | 'canonicalSourceRef' | 'directoryPath' | 'filePath' | 'functionSymbol' | 'featureId' | 'featureLabel' | 'titleId' | 'communityId' | 'clusterId' | 'sha256' | 'sourceRevision' | 'sourceKind' | 'sourcePath' | 'topology' | 'vectors' | 'metadata' | 'domainClass' | 'tags' | 'lineageVersion' | 'ledgerType' | 'canonical' | 'treeNodeId' | 'qdrantCollection' | 'qdrantVectorDim'>) {
   return {
     packetKey: node.packetKey,
     sourceRef: node.sourceRef,
@@ -777,6 +807,7 @@ function normalizePacket(node: Pick<GraphSnapshotMaterializerInput['packets'][nu
     communityId: node.communityId ?? null,
     clusterId: node.clusterId ?? null,
     sha256: node.sha256 ?? null,
+    sourceRevision: node.sourceRevision ?? null,
     sourceKind: node.sourceKind ?? null,
     sourcePath: node.sourcePath ?? null,
     topology: node.topology ?? {},

@@ -16,7 +16,8 @@
 import postgres from 'postgres';
 import { existsSync, writeFileSync } from 'fs';
 import path from 'path';
-import { generateCachedEmbedding } from '../src/lib/ai/ollama-config';
+import { generateEmbedding as generateOllamaEmbedding } from '../src/lib/ai/ollama-config';
+import { requireSemantic768Vector } from './atlas/lib/semantic-768-vector.mjs';
 
 // ============================================================================
 // TYPES
@@ -53,25 +54,18 @@ const K = parseInt(process.argv.find(arg => arg.startsWith('--k='))?.split('=')[
 const BATCH_SIZE = parseInt(process.argv.find(arg => arg.startsWith('--batch='))?.split('=')[1] ?? '50', 10);
 const FORCE_RECOMPUTE = process.argv.includes('--force-recompute');
 const DATABASE_URL = process.env.DATABASE_URL;
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 
 // ============================================================================
 // UTILITIES
 // ============================================================================
 
 async function generateEmbedding(text: string): Promise<number[]> {
-	/**
-	 * Call Ollama embedding endpoint with Redis caching.
-	 */
 	try {
-		return await generateCachedEmbedding(text, {
-			baseUrl: OLLAMA_URL,
-			forceRefresh: FORCE_RECOMPUTE
-		});
+		const vector = await generateOllamaEmbedding(text);
+		return requireSemantic768Vector(vector);
 	} catch (error) {
 		console.warn(`   ⚠️  Embedding failed for: "${text.substring(0, 50)}..."`, error);
-		// Return zero vector as fallback
-		return Array(384).fill(0);
+		throw error;
 	}
 }
 

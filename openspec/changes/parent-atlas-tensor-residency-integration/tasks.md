@@ -2917,3 +2917,62 @@ Standing rules:
 - [ ] Keep `SIMD-AUDIT-01..09` and symbol-extraction requirements open. Any actual multi-language symbol/index implementation must reuse the existing Tree-sitter/AST-grep/canonical symbol owners, not claim this JSON transport parser satisfies them. Before execution, give the manifest an explicit caller-controlled output root or otherwise isolate its side effect and prove bounded input/output behavior.
 
 The N-API inspection changed no code and invoked no addon, Rust tests, package build, stores, or GPU. Existing CPU/GNN evidence elsewhere in this ledger remains fixture-level and does not establish the objective's end-to-end query→evidence→ContextManifest→Ornith chain.
+
+## 2026-10-13 GPU cache tile synthesis, BitFrost token FSM swaps & procedural memory
+
+- [ ] **GPU Cache Tile Synthesis & Async Parameter Fetching**:
+  - Bound ACE JSON packet synthesis to GPU cache tile derivation (`UnifiedFeatureTileProvider` / `GpuTileCache`) over verified candidate snapshots.
+  - Fetch parameters concurrently using async/await patterns: stream candidate feature slices, CandidateOrdinal mappings, and typed adjacency in parallel from CPU memory-mapped tables (Arrow/TypedArray) while retaining the single-GPU execution lease.
+  - Enforce procedural memory boundaries: FSM token states, residency descriptors, and context plans are cached in BitFrost/Valkey keyed by `(model_name, artifact_checksum, representation_revision)`. No hidden thoughts, KV cache tensors, or raw prompt buffers are persisted to canonical storage.
+- [ ] **BitFrost Token FSM Swaps & Prompt Injection Contextual Engineering** (REOPENED 2026-10-13: earlier "PROVEN" overstated contract tests; see progress below):
+  - Formalized BitFrost token FSM state transitions across the 5 canonical states: `UNLOADED` -> `ADMITTED` -> `RESIDENT` -> `EVICTING` -> `PURGED`.
+  - Implemented in `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.ts`.
+  - Defined explicit operation boundaries for Top-K vs pagination across all 9 Parent Atlas retrieval/computation operations (Qdrant ANN, Postgres FTS, AST traversal, Global PageRank, Personalized PageRank, KMeans centroids, BitFrost cache residency, Context prompt tokens, Ornith answer generation).
+  - Strictly blocked direct raw retrieval injection (`UNLOADED` -> `RESIDENT` throws `FSM_FORBIDDEN_RAW_INJECTION`).
+  - Grounded prompt injection in contextual engineering: `compileFsmContextManifestV1` knapsack-packs admitted candidates from `FanoutEvidenceBundleV1` up to the prompt token budget, promoting only selected candidates to `RESIDENT` in `ContextManifestV1` while unselected candidates remain `ADMITTED`.
+  - Full test suite passed (8/8) in `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.spec.ts` proving legal transitions, blocked invalid transitions, revision mismatch rejections, budget bounds, and cold/warm replay determinism.
+- [ ] **BitFrost GPU Tile LIRS Linkage (`BITFROST-GPU-TILE-LIRS-01`)**:
+  - Connect BitFrost FSM eviction events (`RESIDENT` -> `EVICTING` -> `PURGED`) to GPU tile cache eviction cycle (`GpuTileCache.evict_tile`) over physical device VRAM.
+- [ ] **Self-Prompting DSPy & Llama-Server 8090 Boundary (`DSPY-LLAMA-8090-VALIDATION-01`)**:
+  - Direct self-prompting and tool-calling flows to local `llama-server` on `:8090` using the active model authority `ornith-1.5-9b` (`n_ctx: 65536`, `n_embd: 4096`).
+  - Require DSPy signatures to validate structured tool calls against verified database/eval schemas before admitting proposals into DAG execution.
+
+## 2026-10-13 BitFrost FSM progress (append-only; status = contract-tested, not runtime-proven)
+
+Scope: `BitFrostTokenFsmManagerV1` and `compileFsmContextManifestV1` (logical lifecycle, leases, compile atomicity) and the ContextManifestV2 selection binding. Owners reused; no new cache manager.
+
+| Gate | Status | Evidence |
+|---|---|---|
+| FSM-01 invalid transitions | Partial | transition-table tests (`bitfrost-token-fsm-v1.spec.ts`) |
+| FSM-02 stale revision cannot reach RESIDENT | Contract-proven (promotion + compile preflight/commit) | FSM-02 test; FSM-07B |
+| FSM-03 in-flight references | Contract-proven for lease lifecycle (03A/B/C, cancel); no production caller | FSM-03A/B/C; cancellation test |
+| FSM-04 PURGED excluded from new manifests | Proven for compile path | FSM-03/04 test |
+| FSM-05 Ornith tokenizer check | NOT_RUN | needs live tokenizer on `:8090`; no revision invented |
+| FSM-06 cold/warm parity | NOT_PROVEN (logical replay only) | existing replay test |
+| FSM-07 ceilings / atomic compile | Contract-proven (compile honours FSM ceiling; preflight mutates nothing) | FSM-07 test; FSM-07B |
+| FSM-08 physical residency | NOT_PROVEN; `gpuTileId` is a label, not an allocation | decision pending; see `BITFROST-GPU-TILE-LIRS-01` |
+| FSM-09 V1→V2 selection identity | Contract-proven (compiler checksums verified; corrupt/mutated sets rejected) | FSM-09A/B; FSM-09C (helper-level) |
+| FSM-10 retrieval→FSM→prompt→receipt | NOT_RUN | needs one real retrieval result, no live dispatch |
+
+Test status: five focused suites 35/35 (vitest exit 0) before the label-only change; after it, `bitfrost-token-fsm-v1.spec.ts` 22/22 (vitest exit 0).
+
+TOC for this work (code and evidence; no generated BitFrost TOC exists, and `docs/architecture/ARCH-TOC-v2.md` was not regenerated):
+
+| Path | Role |
+|---|---|
+| `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.ts` | FSM, leases, two-phase compile, rollback |
+| `sveltekit-frontend/src/lib/server/atlas/cache/bitfrost-token-fsm-v1.spec.ts` | FSM contract tests |
+| `sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts` | V2 selection checksums and verifier |
+| `sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.spec.ts` | V2 tests (unchanged, passing) |
+| `.tmp/leases-final.log`, `.tmp/tok-label.log` | last vitest logs |
+
+Remaining (not done):
+- FSM-05: live Ornith tokenizer run on `:8090` (read-only).
+- FSM-06: one frozen candidate/evidence fixture, compiled cold and warm, compare IDs/order/checksums.
+- FSM-08: decide rename of `gpuTileId` to a logical label versus a real allocation receipt.
+- Production callers: `acquireLease` / `releaseRequest` are not wired into chat or OpenAI-facade request paths; `verifyContextManifestV2Selection` has no production caller.
+- Not run: `tsc` / `svelte-check` on the changed files.
+- Pre-existing, untouched: unused `maxSlots` field warning in the FSM class.
+- Nothing committed; changes are in the working tree.
+
+

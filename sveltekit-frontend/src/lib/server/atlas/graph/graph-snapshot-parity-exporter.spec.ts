@@ -18,6 +18,7 @@ describe('graph snapshot parity exporter (pure mapping)', () => {
 				node_kind: 'file',
 				source_ref: 'src/a.ts',
 				source_revision: null,
+				workspace_revision: null,
 				packet_key: null,
 				symbol_id: null,
 				symbol_version_id: null
@@ -28,6 +29,7 @@ describe('graph snapshot parity exporter (pure mapping)', () => {
 				node_kind: 'symbol',
 				source_ref: 'src/a.ts',
 				source_revision: null,
+				workspace_revision: null,
 				packet_key: 'packet:a',
 				symbol_id: null,
 				symbol_version_id: null
@@ -37,6 +39,21 @@ describe('graph snapshot parity exporter (pure mapping)', () => {
 		expect(result.unresolvedEdgeCount).toBe(0);
 		expect(result.nodeTableHash).toMatch(/^[a-f0-9]{64}$/);
 		expect(result.edgeTableHash).toMatch(/^[a-f0-9]{64}$/);
+	});
+
+	it('preserves explicit node source and workspace revisions', () => {
+		const result = buildGraphSnapshotParityTables({
+			nodes: [{
+				nodeKey: 'packet:a', nodeType: 'packet', sourceRef: 'src/a.ts', packetKey: 'packet:a',
+				sourceRevision: 'sha256:source-a', workspaceRevision: 'sha256:workspace-a'
+			}],
+			edges: []
+		});
+
+		expect(result.nodeRows[0]).toMatchObject({
+			source_revision: 'sha256:source-a',
+			workspace_revision: 'sha256:workspace-a'
+		});
 	});
 
 	it('drops and counts edges whose endpoints are missing from the node set instead of fabricating ids', () => {

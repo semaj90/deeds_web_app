@@ -735,24 +735,3 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
     return [];
   }
 }
-
-/**
- * Legacy helper: embed query text using an explicit lane contract.
- * Prefer `embedQueryForLane()` at call sites.
- */
-async function embedQuery(
-  text: string,
-  lane: 'dense_384' | 'dense_768' = 'dense_768'
-): Promise<number[] | null> {
-  try {
-    if (!text || text.trim().length === 0) {
-      return null;
-    }
-    const { embedQueryForLane } = await import('./embedding-service.js');
-    const result = await embedQueryForLane(text, lane);
-    return Array.from(result.vector);
-  } catch (error) {
-    console.warn('Query embedding failed:', error);
-    return null;
-  }
-}

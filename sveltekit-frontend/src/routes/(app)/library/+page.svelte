@@ -420,35 +420,6 @@
 	.lib-submit-btn:hover { background: rgba(96, 165, 250, 0.25); }
 	.lib-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-	/* ── Progress ── */
-	.lib-progress {
-		margin-top: 0.75rem;
-		padding: 0.75rem;
-		background: rgba(0, 0, 0, 0.2);
-		border: 1px solid rgba(212, 199, 163, 0.06);
-		border-radius: 0.5rem;
-	}
-	.lib-progress-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 0.375rem;
-		font-size: 0.7rem;
-		color: rgba(212, 199, 163, 0.5);
-	}
-	.lib-progress-track {
-		height: 0.375rem;
-		background: rgba(212, 199, 163, 0.08);
-		border-radius: 9999px;
-		overflow: hidden;
-	}
-	.lib-progress-fill {
-		height: 100%;
-		background: rgba(96, 165, 250, 0.7);
-		border-radius: 9999px;
-		transition: width 0.3s;
-	}
-	.lib-progress-done { font-size: 0.7rem; color: #34d399; margin-top: 0.375rem; }
 	.lib-error { font-size: 0.7rem; color: #f87171; margin-top: 0.5rem; }
 
 	/* ── Filters ── */

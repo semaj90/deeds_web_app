@@ -13,7 +13,7 @@
 import crypto from 'crypto';
 import pg from 'pg';
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
-import { setACECursor, type ACECursor } from '$lib/server/cache/ace-cursor-cache.js';
+import { setACECursor, validateACECursor, type ACECursor } from '$lib/server/cache/ace-cursor-cache.js';
 export {
   assembleACEContext,
   buildACEPromptCached,
@@ -39,6 +39,10 @@ export interface ACEPacket {
   candidates: Array<{
     packet_key: string;
     source_ref: string;
+    content_hash?: string;
+    source_revision?: string;
+    workspace_revision?: string;
+    representation_revision?: string;
     feature_id: string;
     domain_class?: string;
     authority_score: number;
@@ -315,14 +319,27 @@ export class ACEContextAssembler {
       const cursorData = await this.redis.get(cursorKey);
       if (!cursorData) return null;
 
-      const cursor = JSON.parse(cursorData) as ACECursor;
+      const cursor = validateACECursor(JSON.parse(cursorData));
+      if (!cursor) return null;
 
       // Validate all gates are PASS
-      const allGatesPassed = Object.values(cursor.validation_gates).every((gate) => gate === 'PASS');
+      const allGatesPassed = cursor.validation_gates !== undefined
+        && Object.keys(cursor.validation_gates).length > 0
+        && Object.values(cursor.validation_gates).every((gate) => gate === 'PASS');
       if (!allGatesPassed) return null;
 
       // Verify dimension is canonical 768
       if (cursor.dimension_verified !== 768) return null;
+      if (cursor.embedding_lane !== 'dense_768') return null;
+
+      if (
+        !cursor.packet_key
+        || !cursor.source_ref
+        || !cursor.content_hash
+        || !cursor.source_revision
+        || !cursor.workspace_revision
+        || !cursor.representation_revision
+      ) return null;
 
       // Cursor is valid; packet_key is the top candidate
       // Return a minimal ACEPacket for session recovery
@@ -334,10 +351,14 @@ export class ACEContextAssembler {
         candidates: [
           {
             packet_key: cursor.packet_key,
-            source_ref: '',
+            source_ref: cursor.source_ref,
+            content_hash: cursor.content_hash,
+            source_revision: cursor.source_revision,
+            workspace_revision: cursor.workspace_revision,
+            representation_revision: cursor.representation_revision,
             feature_id: '',
             authority_score: 0,
-            final_score: 1.0,
+            final_score: cursor.last_score,
             retrieval_trace: [],
           },
         ],
@@ -347,7 +368,7 @@ export class ACEContextAssembler {
         lanes_used: ['cache'],
         total_candidates_considered: 1,
         cached_at: cursor.last_retrieved_at,
-      } as ACEPacket;
+      };
     } catch (err) {
       console.warn('[ACEContext] Failed to retrieve cached cursor for session', sessionId, ':', err);
       return null;

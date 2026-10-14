@@ -23,7 +23,7 @@ export const errorClusterTable = pgTable('error_cluster',
         category: text('category'),
         affectedRoutes: jsonb('affected_routes'),
 
-        // Vector embedding (384 dimensions for embeddinggemma)
+        // Historical 384-D vector storage; not the canonical EmbeddingGemma semantic lane.
         embedding: vector('embedding', { dimensions: 384 }),
 
         // Timestamps

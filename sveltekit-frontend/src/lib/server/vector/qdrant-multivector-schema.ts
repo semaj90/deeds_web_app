@@ -108,26 +108,7 @@ export async function searchByContentEmbedding(
   topK: number = 20,
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
-  const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/query`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: queryEmbedding,
-        using: 'content_embedding',
-        limit: topK,
-        filter
-      })
-    }
-  );
-
-  if (!searchRes.ok) {
-    throw new Error(`Search failed: ${await searchRes.text()}`);
-  }
-
-  const { points, result } = await searchRes.json();
-  return points ?? result ?? [];
+  throw new Error('LEGACY_384_MULTIVECTOR_SEARCH_DISABLED: use the admitted semantic_768 retrieval owner');
 }
 
 /**
@@ -148,113 +129,7 @@ export async function hybridSearch(
   topK: number = 20,
   filter?: Record<string, unknown>
 ): Promise<QdrantPoint[]> {
-  // Normalize weights to sum to 1
-  const total =
-    (weights.content || 0) +
-    (weights.summary || 0) +
-    (weights.title || 0) +
-    (weights.signature || 0) +
-    (weights.feature || 0);
-
-  const normalized = {
-    content: weights.content ? weights.content / total : 0,
-    summary: weights.summary ? weights.summary / total : 0,
-    title: weights.title ? weights.title / total : 0,
-    signature: weights.signature ? weights.signature / total : 0,
-    feature: weights.feature ? weights.feature / total : 0
-  };
-
-  // Execute searches in parallel
-  const searches = [];
-
-  if (normalized.content > 0) {
-    searches.push(
-      searchByContentEmbedding(qdrantUrl, collectionName, queryEmbedding, topK * 3, filter)
-    );
-  }
-  if (normalized.summary > 0) {
-    searches.push(
-      searchByEmbedding(
-        qdrantUrl,
-        collectionName,
-        'summary_embedding',
-        queryEmbedding,
-        topK * 3,
-        filter
-      )
-    );
-  }
-  if (normalized.signature > 0) {
-    searches.push(
-      searchByEmbedding(
-        qdrantUrl,
-        collectionName,
-        'signature_embedding',
-        queryEmbedding,
-        topK * 3,
-        filter
-      )
-    );
-  }
-
-  const results = await Promise.all(searches);
-
-  // RRF fusion of multiple vector results
-  const scoreMap: Map<string, number> = new Map();
-  const pointMap: Map<string, QdrantPoint> = new Map();
-
-  results.forEach((result, idx) => {
-    const vectorType = ['content', 'summary', 'signature'][idx];
-    const weight = normalized[vectorType as keyof typeof normalized];
-
-    result.forEach((point, rank) => {
-      const key = String(point.id);
-      const rrfScore = weight / (rank + 60); // Reciprocal rank fusion
-      scoreMap.set(key, (scoreMap.get(key) || 0) + rrfScore);
-      pointMap.set(key, point);
-    });
-  });
-
-  // Sort by RRF score and return top-K
-  const sorted = Array.from(scoreMap.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, topK)
-    .map(([key]) => pointMap.get(key)!);
-
-  return sorted;
-}
-
-/**
- * Generic search by named vector
- */
-async function searchByEmbedding(
-  qdrantUrl: string,
-  collectionName: string,
-  vectorName: string,
-  queryEmbedding: number[],
-  topK: number,
-  filter?: Record<string, unknown>
-): Promise<QdrantPoint[]> {
-  const searchRes = await fetch(
-    `${qdrantUrl}/collections/${collectionName}/points/query`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: queryEmbedding,
-        using: vectorName,
-        limit: topK,
-        filter
-      })
-    }
-  );
-
-  if (!searchRes.ok) {
-    throw new Error(`Search (${vectorName}) failed: ${await searchRes.text()}`);
-  }
-
-  const { points, result } = await searchRes.json();
-  return points ?? result ?? [];
+  throw new Error('LEGACY_384_MULTIVECTOR_SEARCH_DISABLED: use the admitted semantic_768 retrieval owner');
 }
 
 /**

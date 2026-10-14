@@ -136,6 +136,7 @@ function mapTreeNode(r: Record<string, any>) {
     nodeType: r.node_type,
     treeDepth: r.tree_depth,
     sourceRef: r.source_ref ?? '',
+    sourceRevision: r.source_revision ?? null,
     filePath: r.file_path ?? r.source_ref ?? '',
     packetKey: r.packet_key,
     featureId: r.feature_id,
@@ -278,15 +279,34 @@ async function main() {
 
     const build = () => {
       const snapshotId = randomUUID();
+      const boundTreeInputs = bindGraphSnapshotNodeSourceRevisionsV1({
+        workspaceRecord: manifest.origin.record,
+        bindings: manifest.origin.bindings,
+        nodes: treeNodes.map((node, index) => ({ ...node, nodeKey: `tree-input:${index}` })),
+        producerRevision: PRODUCER_REVISION,
+      });
+      const boundPacketInputs = bindGraphSnapshotNodeSourceRevisionsV1({
+        workspaceRecord: manifest.origin.record,
+        bindings: manifest.origin.bindings,
+        nodes: packetRows.map((packet) => ({ ...packet, nodeKey: `packet-input:${packet.packetKey}` })),
+        producerRevision: PRODUCER_REVISION,
+      });
+      if (!boundTreeInputs.receipt.completeCoverage || !boundPacketInputs.receipt.completeCoverage) {
+        const missing = [...boundTreeInputs.receipt.missingSourceRefs, ...boundPacketInputs.receipt.missingSourceRefs];
+        throw new Error(`GRAPH_INPUT_SOURCE_REVISION_COVERAGE_INCOMPLETE:${[...new Set(missing)].sort().join('|')}`);
+      }
+      const boundTreeNodes = boundTreeInputs.nodes.map(({ nodeKey: _nodeKey, ...node }) => node);
+      const boundPacketRows = boundPacketInputs.nodes.map(({ nodeKey: _nodeKey, ...packet }) => packet);
       const input = {
         snapshotId,
         workspaceId: 'workspace:parent-atlas',
+        workspaceRevision,
         sourceInventorySnapshotId: `sha256:${manifest.origin.record.sourceManifestDigest}`,
         identityContractVersion: 'identity-contract-v1',
         parserContractVersion: 'tree-sitter-typescript-v1',
         generatedAt: new Date().toISOString(),
-        treeNodes,
-        packets: packetRows,
+        treeNodes: boundTreeNodes,
+        packets: boundPacketRows,
       };
       const graph = materializeGraphSnapshot(input);
       const sourceBinding = bindGraphSnapshotNodeSourceRevisionsV1({

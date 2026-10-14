@@ -15,18 +15,11 @@
 import { db } from '$lib/server/db/client';
 import { embeddingCache } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
-import { createHash } from 'crypto';
 import { assertCanonicalSemanticEmbedding } from '$lib/server/embedding/semantic-lineage.js';
 import { CANONICAL_EMBEDDING_DIM } from '$lib/server/embedding/embedding-contract.js';
+import { buildEmbeddingCacheTextHashV1 } from './embedding-cache-key-v1.js';
 
 const DEFAULT_MODEL = 'embeddinggemma:latest';
-
-/**
- * Hash text to create deterministic cache key
- */
-function hashText(text: string): string {
-	return createHash('md5').update(text).digest('hex');
-}
 
 /**
  * Serialize number[] to pgvector literal '[0.1,0.2,...]'
@@ -45,10 +38,10 @@ export async function getPersistedEmbedding(
 	model: string = DEFAULT_MODEL
 ): Promise<number[] | null> {
 	try {
-		const hash = hashText(text);
+		const hash = buildEmbeddingCacheTextHashV1(text, model);
 		// Cast vector column to text for JS retrieval; pgvector returns '[0.1,...]' strings
 		const result = await db.execute<{ embedding: string }>(
-			sql`SELECT embedding::text AS embedding FROM embedding_cache WHERE text_hash = ${hash} LIMIT 1`
+			sql`SELECT embedding::text AS embedding FROM embedding_cache WHERE text_hash = ${hash} AND model = ${model} LIMIT 1`
 		);
 
 		if (!result.rows[0]?.embedding) return null;
@@ -76,7 +69,7 @@ export async function persistEmbedding(
 	model: string = DEFAULT_MODEL
 ): Promise<void> {
 	try {
-		const hash = hashText(text);
+		const hash = buildEmbeddingCacheTextHashV1(text, model);
 		assertCanonicalSemanticEmbedding(embedding);
 		const vectorLiteral = toVectorLiteral(embedding);
 
@@ -118,16 +111,17 @@ export async function batchPersistEmbeddings(
  * @returns Array of embedding vectors | null (preserves order)
  */
 export async function batchGetPersistedEmbeddings(
-	texts: string[]
+	texts: string[],
+	model: string = DEFAULT_MODEL,
 ): Promise<Array<number[] | null>> {
 	if (texts.length === 0) return [];
 
 	try {
-		const hashes = texts.map(hashText);
+		const hashes = texts.map((text) => buildEmbeddingCacheTextHashV1(text, model));
 		const result = await db.execute<{ text_hash: string; embedding: string }>(
 			sql`SELECT text_hash, embedding::text AS embedding
 			    FROM embedding_cache
-			    WHERE text_hash = ANY(${hashes})`
+			    WHERE text_hash = ANY(${hashes}) AND model = ${model}`
 		);
 
 		const hashMap = new Map<string, number[]>();

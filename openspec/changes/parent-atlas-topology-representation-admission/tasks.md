@@ -287,6 +287,7 @@
   Reuse existing `semantic_mrl_*` IDs rather than adding bare `mrl_*` aliases.
   MRL, AE, KMeans/SOM assignments, topology coordinates, and ACE residency
   remain distinct representation/state families.
+- Trainer owner recheck (2026-10-13): `python python/train_latent_autoencoder.py --plan-only` returns `TRAINING_BLOCKED` because semantic writer and admitted input provenance are not proven; receipt declares `databaseRead:false`, `trainingPerformed:false`, and `checkpointWritten:false`. Current candidate architecture is `[768,512,256,128]` with a proposed normalized 64-D prefix. This is separate from the historical v3 trained artifact and is not evidence of a current retrain or promotion.
   The existing AE artifact owner now rejects unknown/same-dimension MRL IDs and
   mismatched family labels; its regression tests freeze `latent_64` as a
   normalized prefix of `latent_128`. This closes only the AE-family validator
@@ -553,3 +554,14 @@ unchanged and reports topology as unavailable or challenger-only.
 - The current GET-only audit ran after the logged deletes and made no Qdrant mutations. Preserve surviving snapshots and logs. Do not restore/recreate collections, prune snapshots, or issue further Qdrant writes until deletion history, consumer ownership, and isolated restore/readback are reviewed and authorized.
 - Status: current 18-collection readback and deletion chronology are verified from separate local surfaces; actor/authorization, full historical inventory scope, and recoverability remain `NOT_PROVEN`. No completion checkbox is warranted.
 - [ ] CANONICAL-IDENTITY-V1 POINTER (2026-09-21): canonical object identity (symbol/file/chunk discriminants, mandatory workspaceRevision + sourceRevision, no 'unknown'/latest-row inference, representation/execution/transport ids and CandidateOrdinal are NOT canonical identity) is owned by `CANONICAL-IDENTITY-V1-SPEC-01` in `openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md`. This change SHALL reference that contract and not define its own identity rules; it may add representation-, execution-, feature-, cache-, transport- or projection-specific identities only. Pointer only; no scope change here. Spec status: SPEC_DRAFT (not signed off).
+
+## Streaming graph indexing and component boundary alignment (2026-10-13)
+
+- [x] Bounded streaming graph ingestion: Demonstrated streaming parser (`scripts/atlas/streaming-graph-indexer.mjs`) extracting structural nodes and edge relationships without loading full 400 MB graph payloads into Node.js heap or VRAM.
+- [x] Decoupled retrieval and clustering concerns:
+  - Qdrant: ANN TopK retrieval (HNSW / scalar quantization) on canonical `content_embedding_768`. Does not require RFF.
+  - cuML / cuVS: KMeans centroids on candidate feature matrix. Does not require TopK to train.
+  - RFF: Offline/challenger kernel projection approximating Gaussian RBF with frozen seed. Not an admitted Qdrant representation.
+  - PostgreSQL 18: Canonical authority for `sourceRef`, `CandidateOrdinal`, and `content_embedding_768`.
+- [x] Active synthesis model identity: Synchronized active synthesis model to `ornith-1.5-9b` (served on `:8090`), retiring stale `gemma4-legal` references across database error clusters, BitFrost repair templates, and evaluation contracts.
+

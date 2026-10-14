@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-10-13T19:05:52.386Z",
+  "isDryRun": true,
+  "numNodes": 5000,
+  "numEdges": 9998,
+  "candidatesForEmbedding": 5000,
+  "batchSize": 128,
+  "vectorDim": 768,
+  "batchVramBytes": 393216,
+  "status": "STREAMING_PIPELINE_VERIFIED"
+}

@@ -15,7 +15,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
-import type { FeatureEnvelope } from './feature-envelope.js';
+import { isRetiredDenseSignal, type FeatureEnvelope } from './feature-envelope.js';
 import {
   BlendWeightsSchema,
   blendScores,
@@ -971,6 +971,9 @@ export async function rerankCanonicalFeatureEnvelopes(
   envelopes: CanonicalRerankEnvelope[],
   options: CanonicalRerankOptions = {},
 ): Promise<CanonicalRerankResult> {
+  if (envelopes.some((envelope) => isRetiredDenseSignal(envelope.dense))) {
+    throw new Error('RETIRED_EMBEDDING_LANE:dense_384');
+  }
   const startedAt = Date.now();
   const authScope = normalizeAuthScope(options.authScope);
   const rendererVersion = options.rendererVersion?.trim() || DEFAULT_RENDERER_VERSION;

@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { DenseRepresentationName } from '../atlas/contracts/dense-lane-policy.js';
+import { CANONICAL_DENSE_LANES, DenseLifecycle, DenseRepresentationName, isPolicyActive } from '../atlas/contracts/dense-lane-policy.js';
 import { EmbeddingLaneTelemetryReason, gateEmbeddingLaneResolution, resolveEmbeddingLane } from './resolve-embedding-lane.js';
 
 describe('resolveEmbeddingLane', () => {
@@ -23,6 +23,14 @@ describe('resolveEmbeddingLane', () => {
     expect(byDim.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
     expect(byVector.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
     expect(byCollection.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
+  });
+
+  it('keeps the 384 representation superseded and inactive for historical reference only', () => {
+    const policy = CANONICAL_DENSE_LANES[DenseRepresentationName.SEMANTIC_384];
+
+    expect(policy.lifecycle).toBe(DenseLifecycle.SUPERSEDED);
+    expect(policy.role).toBe('recall_reference');
+    expect(isPolicyActive(policy)).toBe(false);
   });
 
   it('gates legacy 384 dimension-only hits', () => {

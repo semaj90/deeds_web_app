@@ -1,65 +1,61 @@
-import { boolean, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
-import { atlasTreeNodes } from './atlas-tree-nodes.js';
+import { boolean, integer, pgView, text, timestamp } from 'drizzle-orm/pg-core';
 
 /**
- * Parent Atlas document mirror.
+ * Parent Atlas document read model (PostgreSQL View).
  *
- * This table is the promotion target for source_ref-first codebase indexing.
- * It mirrors the manual SQL sidecar in drizzle/manual/20260601_add_alias_and_parent_atlas_indexes.sql.
+ * This view is a projected read model over atlas_packets.
+ * PostgreSQL relkind = 'v'. It does NOT have physical table columns or indexes.
+ *
+ * Underlying atlas_packets mapping:
+ *   packet_key -> id (text)
+ *   source_ref -> source_ref (text)
+ *   directory_path -> rel_path (text)
+ *   feature_id -> feature_id (text)
+ *   COALESCE((payload ->> 'line_count')::int, 0) -> line_count (integer)
+ *   COALESCE((payload ->> 'is_route')::bool, false) -> is_route (boolean)
+ *   COALESCE((payload ->> 'is_svelte_comp')::bool, false) -> is_svelte_comp (boolean)
+ *   COALESCE((payload ->> 'has_zod')::bool, false) -> has_zod (boolean)
+ *   COALESCE(ARRAY(...), ARRAY[]::text[]) -> drizzle_refs (text[])
+ *   COALESCE(ARRAY(...), ARRAY[]::text[]) -> imports (text[])
+ *   COALESCE(ARRAY(...), ARRAY[]::text[]) -> exports (text[])
+ *   qdrant_point_id -> qdrant_point_id (text)
+ *   COALESCE(ARRAY(...), ARRAY[]::text[]) -> related_feature_ids (text[])
+ *   COALESCE((payload ->> 'has_auth')::bool, false) -> has_auth (boolean)
+ *   COALESCE(ARRAY(...), ARRAY[]::text[]) -> route_handlers (text[])
+ *   COALESCE(tags, ARRAY[]::text[]) -> tags (text[])
+ *   kmeans_cluster::text -> cluster_id (text)
+ *   som_cluster -> centroid_id (text)
+ *   packet_key -> packet_key (text)
+ *   feature_label -> feature_label (text)
+ *   created_at -> created_at (timestamptz)
+ *   workspace_id -> workspace_id (varchar)
+ *   updated_at -> updated_at (timestamptz)
  */
-export const parentAtlasDocuments = pgTable('parent_atlas_documents', {
-  id: integer('id').primaryKey(),
-  sourceRef: text('source_ref').notNull(),
-  featureId: text('feature_id'),
-  workspaceId: text('workspace_id'),
+export const parentAtlasDocuments = pgView('parent_atlas_documents', {
+  id: text('id'),
+  sourceRef: text('source_ref'),
   relPath: text('rel_path'),
-  fileExt: text('file_ext'),
-  tags: text('tags').array(),
-  summary: text('summary'),
+  featureId: text('feature_id'),
   lineCount: integer('line_count'),
-  isRoute: boolean('is_route').default(false),
-  isSvelteComp: boolean('is_svelte_comp').default(false),
-  hasAuth: boolean('has_auth').default(false),
-  hasZod: boolean('has_zod').default(false),
-  drizzleRefs: jsonb('drizzle_refs'),
-  imports: jsonb('imports'),
-  exports: jsonb('exports'),
-  routeHandlers: jsonb('route_handlers'),
-  payload: jsonb('payload'),
+  isRoute: boolean('is_route'),
+  isSvelteComp: boolean('is_svelte_comp'),
+  hasZod: boolean('has_zod'),
+  drizzleRefs: text('drizzle_refs').array(),
+  imports: text('imports').array(),
+  exports: text('exports').array(),
+  qdrantPointId: text('qdrant_point_id'),
+  relatedFeatureIds: text('related_feature_ids').array(),
+  hasAuth: boolean('has_auth'),
+  routeHandlers: text('route_handlers').array(),
+  tags: text('tags').array(),
   clusterId: text('cluster_id'),
   centroidId: text('centroid_id'),
-  qdrantPointId: text('qdrant_point_id'),
-  treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
-  aliasId: text('alias_id'),
-  relatedFeatureIds: jsonb('related_feature_ids').notNull().default(sql`'[]'::jsonb`),
-  sourceKind: text('source_kind').default('source'),
-  profileCardVisible: boolean('profile_card_visible').default(true),
-  indexLane: text('index_lane').default('source'),
-  summaryLod0: text('summary_lod0'),
-  summaryLod1: text('summary_lod1'),
-  summaryLod2: text('summary_lod2'),
-  sourceRefId: integer('source_ref_id'),
-  ingestSource: text('ingest_source').notNull().default('codebase-graph'),
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-}, (table) => ({
-  sourceRefWorkspaceUq: uniqueIndex('parent_atlas_documents_source_ref_workspace_uq').on(table.sourceRef, table.workspaceId),
-  sourceRefIdx: index('idx_pad_source_ref').on(table.sourceRef),
-  indexLaneIdx: index('idx_pad_index_lane').on(table.indexLane),
-  lod1Idx: index('idx_pad_lod1').on(table.summaryLod1),
-  featureIdIdx: index('idx_pad_feature_id').on(table.featureId),
-  workspaceIdIdx: index('idx_pad_workspace_id').on(table.workspaceId),
-  clusterIdIdx: index('idx_pad_cluster_id').on(table.clusterId),
-  aliasIdIdx: index('idx_pad_alias_id').on(table.aliasId),
-  sourceKindIdx: index('idx_pad_source_kind').on(table.sourceKind),
-  sourceRefIdIdx: index('idx_pad_source_ref_id').on(table.sourceRefId),
-  relatedFeatureIdsGin: index('idx_parent_atlas_documents_related_feature_ids_gin').using('gin', table.relatedFeatureIds),
-  qdrantPointIdIdx: index('idx_pad_qdrant_point_id').on(table.qdrantPointId),
-  treeNodeIdIdx: index('idx_pad_tree_node_id').on(table.treeNodeId),
-  tagsGin: index('idx_pad_tags_gin').using('gin', table.tags),
-  payloadGin: index('idx_pad_payload_gin').using('gin', table.payload),
-}));
+  packetKey: text('packet_key'),
+  featureLabel: text('feature_label'),
+  createdAt: timestamp('created_at', { withTimezone: true }),
+  workspaceId: text('workspace_id'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }),
+}).existing();
 
 export type ParentAtlasDocument = typeof parentAtlasDocuments.$inferSelect;
-export type NewParentAtlasDocument = typeof parentAtlasDocuments.$inferInsert;
+

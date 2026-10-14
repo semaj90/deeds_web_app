@@ -37,8 +37,9 @@ const DispatcherToolSchemas = {
     create_edges: z.boolean().default(true),
   }),
   graphExpand: z.object({
-    feature_id: z.string(),
-    max_depth: z.number().default(2),
+    sourceRefs: z.array(z.string().min(1).max(1024)).min(1).max(8),
+    maxHops: z.number().int().min(1).max(2).default(2),
+    limit: z.number().int().min(1).max(100).default(40),
   }),
   retrievalRerank: z.object({
     candidates: z.array(z.object({ id: z.string(), score: z.number() })),
@@ -117,7 +118,16 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'codeIntel',
       proto: 'codeintel.proto',
       methods: ['TraverseGraph'],
-      inputSchema: {} as any,
+      inputSchema: {
+        type: 'object',
+        properties: {
+          sourceRefs: { type: 'array', items: { type: 'string', maxLength: 1024 }, minItems: 1, maxItems: 8 },
+          maxHops: { type: 'integer', enum: [1, 2], default: 2 },
+          limit: { type: 'integer', minimum: 1, maximum: 100, default: 40 },
+        },
+        required: ['sourceRefs'],
+        additionalProperties: false,
+      },
       outputSchema: {} as any,
       tags: ['dispatcher', 'graph', 'traversal', 'read-only'],
       quicOptional: true,
@@ -223,7 +233,7 @@ export async function executeACPTool(invocation: ACPToolInvocation): Promise<ACP
 
     return {
       toolId,
-      success: true,
+      success: typeof result?.success === 'boolean' ? result.success : true,
       result,
       metrics: {
         execution_ms: Date.now() - startTime,
@@ -246,13 +256,17 @@ export async function executeACPTool(invocation: ACPToolInvocation): Promise<ACP
  * Maps ACP tool IDs to actual TypeScript implementations.
  */
 async function dispatchToMCPTool(toolId: string, args: Record<string, any>): Promise<any> {
+  if (toolId === 'graph:expand') {
+    const { executeGraphExpandMcpTool } = await import('$lib/server/ai/mcp-tool-dispatch.js');
+    return executeGraphExpandMcpTool(args);
+  }
+
   // Dynamic imports to avoid circular dependencies
   const {
     toolIdentityRecover,
     toolEnvelopeValidate,
     toolMirrorSyncQdrant,
     toolMirrorSyncNeo4j,
-    toolGraphExpand,
     toolRetrievalRerank,
     toolAnswerSynthesize,
     toolEscalationRoute,
@@ -264,7 +278,6 @@ async function dispatchToMCPTool(toolId: string, args: Record<string, any>): Pro
     'envelope:validate': toolEnvelopeValidate,
     'mirror:sync_qdrant': toolMirrorSyncQdrant,
     'mirror:sync_neo4j': toolMirrorSyncNeo4j,
-    'graph:expand': toolGraphExpand,
     'retrieval:rerank': toolRetrievalRerank,
     'answer:synthesize': toolAnswerSynthesize,
     'escalation:route': toolEscalationRoute,

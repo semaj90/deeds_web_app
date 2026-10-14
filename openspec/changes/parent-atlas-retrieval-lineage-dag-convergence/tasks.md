@@ -16773,3 +16773,30 @@ Interpretation: numeric `qdrant_id` values in Postgres are almost entirely stale
 Consequence: any retrieval path that resolves a candidate through numeric `qdrant_id` must fail closed. The admitted join is `chunk_id`, `source_ref`, and `content_hash`, with payload checks, not numeric point IDs.
 
 Next gates: attribute the 10,159 orphan IDs to a producer if receipts exist (`ID-COHORT-03` writer attribution), and decide whether `qdrant_id` is dropped from the join contract or rebuilt as a deterministic UUID owned by the projection writer.
+
+### Session 121 single-ordinal lineage probe (2026-10-13; read-only)
+
+- The frozen ordinal map and row-major float32 matrix both match their manifest checksums.
+  Ordinal `25625` maps to chunk row `76266fe6-4285-4dbb-8724-270c139fd4f8`, and the
+  `atlas_packet_chunk_lineage` record links it to `packet:8589ed47d789` with a `PROVEN`
+  lineage row and source digest `sha256:aa7d2ac01ee024deb2df8891a498123bb7c15d9303fb767f6085a9aac92f0d4f`.
+- The current local file bytes hash to that same source digest. This is a local byte-hash
+  match, not independent source-owner or workspace admission. No matching native AST row
+  exists for the path and digest, so exact source-span correspondence remains unproven.
+- The matrix row matches `codebase_chunk_index.content_embedding` (halfvec(768)) within
+  max component error `3.60e-9` and cosine `1.0`; it does not match the same row's
+  `content_embedding_768` vector (max component error `0.0495`, cosine `0.9371`). Treat this
+  as `VECTOR_MISMATCH`, not as proof of shared model provenance or harmless quantization.
+- The packet row has null `source_revision`, null `workspace_revision_key`, null
+  `embedding_digest`, numeric-zero `workspace_revision` and `representation_revision`, and
+  `workspace_id='crates'`. Two source-binding workspace revisions contain the same file
+  digest; the packet row does not identify which revision owns it. The producer label
+  `embeddinggemma:latest` is mutable and is not an immutable model digest.
+- **Disposition: NOT_QUALIFIED.** This one-row probe establishes snapshot integrity,
+  ordinal-to-row identity, packet/chunk linkage, and local file digest parity; it does not
+  establish a qualified current-source embedding candidate. Keep source-byte span, unique
+  workspace, immutable producer identity, and canonical-vector reconciliation gates open.
+
+Receipt: `.tmp/atlas/session121-single-ordinal-lineage-check-20261013.json`.
+All SQL ran in `BEGIN READ ONLY` transactions with rollback; no database, Qdrant, Valkey,
+cache, model, or source-file writes occurred.

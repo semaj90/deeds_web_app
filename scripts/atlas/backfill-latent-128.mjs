@@ -26,6 +26,11 @@ const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const DRY_RUN = args.includes('--dry-run') || !APPLY;
 
+if (APPLY) {
+  console.error('LATENT128_APPLY_BLOCKED: provisional 768-to-128 folding is not an admitted representation and lacks revision-qualified lineage');
+  process.exit(78);
+}
+
 const limitIdx = args.indexOf('--limit');
 const LIMIT =
   limitIdx !== -1

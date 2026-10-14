@@ -21,7 +21,7 @@ const treeRows = [
     domain: 'docs',
     somCluster: 1,
     communityId: 1,
-    metadata: { lane: 'root' },
+    metadata: { lane: 'root', source: 'atlas_packets' },
     ledgerType: 'canonical',
     lineageVersion: 'tree-v1'
   },
@@ -42,7 +42,7 @@ const treeRows = [
     domain: 'docs',
     somCluster: 2,
     communityId: 1,
-    metadata: { lane: 'page' },
+    metadata: { lane: 'page', source: 'atlas_packets' },
     ledgerType: 'canonical',
     lineageVersion: 'tree-v1'
   }
@@ -62,6 +62,7 @@ const packetRows = [
     communityId: 7,
     clusterId: 3,
     sha256: 'sha-alpha',
+    sourceRevision: 'sha256:source-alpha',
     sourceKind: 'codebase',
     sourcePath: 'src/root.md',
     topology: { lane: 'alpha' },
@@ -92,6 +93,7 @@ const snakeCasePacketRows = [
     community_id: 7,
     cluster_id: 3,
     sha256: 'sha-alpha',
+    source_revision: 'sha256:source-alpha',
     source_kind: 'codebase',
     source_path: 'src/root.md',
     topology: { lane: 'alpha' },
@@ -135,6 +137,8 @@ describe('canonical graph snapshot postgres loader', () => {
     expect(loaded.treeNodes).toHaveLength(2);
     expect(loaded.packets).toHaveLength(1);
     expect(loaded.packets[0].packetKey).toBe('packet:alpha');
+    expect(loaded.packets[0].sourceRevision).toBe('sha256:source-alpha');
+    expect(loaded.workspaceRevision).toBe('sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc');
     expect(loaded.treeNodes[1].packetKey).toBe('packet:alpha');
 
     const materialized = await materializeCanonicalGraphSnapshotFromPostgres(pool, {
@@ -150,6 +154,21 @@ describe('canonical graph snapshot postgres loader', () => {
 
     expect(materialized.graphSnapshot.snapshotId).toBe(snapshotId);
     expect(materialized.graphSnapshotManifest.status).toBe('MATERIALIZED');
+    expect(materialized.graphSnapshotManifest.workspaceRevision).toBe('sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc');
+    expect(materialized.graphSnapshotNodes.find((node) => node.nodeType === 'packet')?.properties).toMatchObject({
+      sourceRevision: 'sha256:source-alpha',
+      workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc'
+    });
+    const treeNodeProperties = materialized.graphSnapshotNodes
+      .filter((node) => node.treeNodeId)
+      .map((node) => node.properties);
+    expect(treeNodeProperties).toHaveLength(2);
+    for (const properties of treeNodeProperties) {
+      expect(properties).toMatchObject({
+        sourceRevision: 'sha256:source-alpha',
+        workspaceRevision: 'sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc'
+      });
+    }
     expect(materialized.graphSnapshotNodes.map((node) => node.nodeKey)).toEqual([
       // NOT 'packet:packet:alpha' -- packets[0].packetKey ('packet:alpha',
       // asserted at line 135 above) already carries the canonical prefix.
@@ -187,6 +206,7 @@ describe('canonical graph snapshot postgres loader', () => {
 
     expect(loaded.packets).toHaveLength(1);
     expect(loaded.packets[0].packetKey).toBe('packet:alpha');
+    expect(loaded.packets[0].sourceRevision).toBe('sha256:source-alpha');
     expect(loaded.treeNodes).toHaveLength(2);
   });
 

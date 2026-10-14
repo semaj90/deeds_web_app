@@ -25,6 +25,15 @@ function normalizeDirection(value: GraphTraversalDirection | undefined): GraphTr
 export async function traverseGraphV1(input: GraphTraverseRequestV1): Promise<GraphViewPacketV1> {
   if (!input.snapshotId?.trim()) throw new Error('snapshotId is required');
 
+  const snapshot = await pool.query<{ status: string }>(
+    `SELECT status FROM atlas_graph_snapshots_v2 WHERE snapshot_id = $1::uuid`,
+    [input.snapshotId],
+  );
+  const snapshotStatus = snapshot.rows[0]?.status;
+  if (snapshotStatus !== 'VALIDATED') {
+    throw new Error(`GRAPH_SNAPSHOT_NOT_TRAVERSABLE:${snapshotStatus ?? 'MISSING'}`);
+  }
+
   const seedNodeKeys = [...new Set(input.seedNodeKeys?.filter(Boolean) ?? [])].slice(0, MAX_SEEDS);
   if (seedNodeKeys.length === 0) throw new Error('at least one seedNodeKey is required');
 
@@ -71,6 +80,10 @@ export async function traverseGraphV1(input: GraphTraverseRequestV1): Promise<Gr
         )
        WHERE w.hop < $3::int
          AND (cardinality($4::text[]) = 0 OR e.edge_type = ANY($4::text[]))
+         AND EXISTS (
+           SELECT 1 FROM atlas_graph_snapshots_v2 s
+           WHERE s.snapshot_id = e.snapshot_id AND s.status = 'VALIDATED'
+         )
          AND NOT (
            CASE
              WHEN $5::text = 'inbound' THEN e.source_node_key
@@ -91,6 +104,10 @@ export async function traverseGraphV1(input: GraphTraverseRequestV1): Promise<Gr
      JOIN atlas_graph_nodes_v2 n
        ON n.snapshot_id = $1::uuid
       AND n.node_key = r.node_key
+     WHERE EXISTS (
+       SELECT 1 FROM atlas_graph_snapshots_v2 s
+       WHERE s.snapshot_id = n.snapshot_id AND s.status = 'VALIDATED'
+     )
      ORDER BY r.hop, n.node_key`,
     [input.snapshotId, seedNodeKeys, maxHops, edgeTypes, direction, maxNodes + 1],
   );
@@ -129,6 +146,10 @@ export async function traverseGraphV1(input: GraphTraverseRequestV1): Promise<Gr
            SELECT * FROM unnest($2::text[], $3::int[]) AS t(node_key, hop)
          ) dst ON dst.node_key = e.target_node_key
          WHERE e.snapshot_id = $1::uuid
+           AND EXISTS (
+             SELECT 1 FROM atlas_graph_snapshots_v2 s
+             WHERE s.snapshot_id = e.snapshot_id AND s.status = 'VALIDATED'
+           )
            AND (cardinality($4::text[]) = 0 OR e.edge_type = ANY($4::text[]))
          ORDER BY hop, e.edge_key`,
         [input.snapshotId, nodeKeys, nodeRows.map((row) => row.hop), edgeTypes],

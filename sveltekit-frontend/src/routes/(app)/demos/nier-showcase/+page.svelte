@@ -214,7 +214,7 @@
 			</p>
 
 			<div class="mb-4">
-				<label class="text-sm text-gray-400 block mb-2">Palette</label>
+				<span class="text-sm text-gray-400 block mb-2">Palette</span>
 				<div class="flex flex-wrap gap-2">
 					{#each ['nes', 'snes', 'ps1', 'n64', 'ps2'] as p}
 						<button
@@ -228,7 +228,7 @@
 			</div>
 
 			<div class="mb-6">
-				<label class="text-sm text-gray-400 block mb-2">Size</label>
+				<span class="text-sm text-gray-400 block mb-2">Size</span>
 				<div class="flex flex-wrap gap-2">
 					{#each ['small', 'medium', 'large'] as s}
 						<button

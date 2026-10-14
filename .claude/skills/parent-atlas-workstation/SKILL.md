@@ -26,6 +26,7 @@ Rule: identity owns identity, representation owns representation, transport and 
 | Fusion (RRF) | `retrieval/search-runtime.ts` | CANONICAL_OWNER |
 | Graph algorithms | `graph/graph-analysis-runner.ts` | CANONICAL_OWNER |
 | ACE assembly / validation | `ace/context-assembler.ts`, `atlas/envelope-validator.ts`, `db/packet-topology-envelope.ts` | CANONICAL_OWNER |
+| Error-signal evidence → repair proposal | `scripts/atlas/validate-error-signal-evidence-v1.mjs` (validator, read-only); `scripts/atlas/bridge-error-signal-to-repair-proposal-v1.mjs` (dry-run proposals → registry action `AWAIT_OPERATOR`) | CANONICAL_OWNER (validator) / BACKEND (bridge); never executes, never edits source |
 | RPC packets | `routes/api/hyperrag/packet-rpc/+server.ts` | CANONICAL_OWNER |
 | Glyph / cartridge (NES, CHR97) | `routes/api/cartridge/export/+server.ts` | CANONICAL_OWNER |
 | Neural prefill | `ai/neural-decoder-prefill-caller-v1.ts` | CANONICAL_OWNER |

@@ -183,7 +183,7 @@ materialization), not GRAPH-06D itself — do not manufacture a snapshot to forc
 Full diagnosis (including the identity/evidence/projection/executor 4-layer distinction this
 surfaced) recorded at the `GRAPH-06D` line in
 `openspec/changes/parent-atlas-candidate-feature-execution-fabric/tasks.md`. Reusable binding
-harness left in place either way: `sveltekit-frontend/scripts/atlas/bind-graph-ordinal-map-to-snapshot-parity-v1.mts`.
+harness left in place either way: `sveltekit-frontend/scripts/atlas/bind-graph-ordinal-map-to-snapshot-parity-v1.mts`; it requires an explicit workspace revision and does not substitute `producerRevision`.
 
 **Next tranche proposed (2026-09-01, NOT started, NOT yet its own OpenSpec change)** — wiring
 `/evidence/web` into a broader FastAPI `:8095` evidence/retrieval orchestration pipeline, reviewed

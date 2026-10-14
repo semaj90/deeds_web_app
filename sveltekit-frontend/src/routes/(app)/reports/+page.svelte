@@ -153,7 +153,7 @@
 		</div>
 	{:else if reports.length === 0}
 		<div class="empty-state">
-			<Icon name="file-text" class="empty-icon" />
+			<Icon name="file-text" class="w-12 h-12 mx-auto mb-4 text-neutral-500" />
 			<h3 class="empty-title">No reports yet</h3>
 			<p class="empty-desc">
 				Create your first report to get started
@@ -367,14 +367,6 @@
 		background: rgb(23 23 23 / 0.3);
 		padding: 3rem;
 		text-align: center;
-	}
-
-	.empty-icon {
-		width: 3rem;
-		height: 3rem;
-		margin: 0 auto;
-		color: rgb(82 82 82);
-		margin-bottom: 1rem;
 	}
 
 	.empty-title {

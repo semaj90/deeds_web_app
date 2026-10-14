@@ -7,7 +7,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import { FeatureEnvelopeSchema } from '$lib/server/retrieval/feature-envelope.js';
+import { FeatureEnvelopeSchema, isRetiredDenseSignal } from '$lib/server/retrieval/feature-envelope.js';
 import {
   rerankCanonicalFeatureEnvelopes,
   type CanonicalRerankEnvelope,
@@ -23,6 +23,16 @@ const CanonicalRerankRequestSchema = z.object({
   topK: z.number().int().positive().max(200).optional(),
   rerankTier: z.enum(['deep', 'fast']).optional(),
   cachePolicy: z.enum(['enabled', 'disabled']).optional(),
+}).superRefine((request, context) => {
+  request.envelopes.forEach((envelope, index) => {
+    if (isRetiredDenseSignal(envelope.dense)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['envelopes', index, 'dense'],
+        message: 'Retired 384-D dense signals are not accepted by canonical reranking',
+      });
+    }
+  });
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {

@@ -28,25 +28,22 @@ describe('Autoencoder Weights & Encoding', () => {
 		vi.clearAllMocks();
 	});
 
-	it('should load weights from Redis', async () => {
+	it('rejects unadmitted checkpoint weights before reading Redis', async () => {
 		const hgetall = Redis.prototype.hgetall as any;
 		hgetall.mockResolvedValueOnce(mockWeights).mockResolvedValueOnce(mockMeta);
 
-		const weights = await loadAutoencoderWeights();
-
-		expect(weights.W1.length).toBe(256 * 768);
-		expect(weights.b1.length).toBe(256);
-		expect(weights.trainedAt).toBe(mockMeta.trainedAt);
-		expect(weights.bestLoss).toBe(0.05);
+		await expect(loadAutoencoderWeights()).rejects.toThrow(/AUTOENCODER_CHECKPOINT_NOT_ADMITTED/);
+		expect(hgetall).not.toHaveBeenCalled();
 	});
 
-	it('should pass health probe when weights are valid', async () => {
+	it('health probe reports the unadmitted checkpoint as unavailable', async () => {
 		const hgetall = Redis.prototype.hgetall as any;
 		hgetall.mockResolvedValueOnce(mockWeights).mockResolvedValueOnce(mockMeta);
 
 		const probe = await probeAutoencoderWeights();
-		expect(probe.ok).toBe(true);
-		expect(probe.shapeOk).toBe(true);
+		expect(probe.ok).toBe(false);
+		expect(probe.reason).toMatch(/AUTOENCODER_CHECKPOINT_NOT_ADMITTED/);
+		expect(hgetall).not.toHaveBeenCalled();
 	});
 
 	it('should fail health probe when weights are missing', async () => {
@@ -57,18 +54,12 @@ describe('Autoencoder Weights & Encoding', () => {
 		expect(probe.ok).toBe(false);
 	});
 
-	it('should encode 768d vector to 64d', async () => {
+	it('does not encode with an unadmitted checkpoint', async () => {
 		const hgetall = Redis.prototype.hgetall as any;
 		hgetall.mockResolvedValueOnce(mockWeights).mockResolvedValueOnce(mockMeta);
 
 		const input = new Float32Array(768).fill(0.5);
-		const encoded = await encode768to64(input, { preferGpu: false });
-
-		expect(encoded.length).toBe(64);
-		// Tanh should keep values in [-1, 1]
-		encoded.forEach(v => {
-			expect(v).toBeGreaterThanOrEqual(-1);
-			expect(v).toBeLessThanOrEqual(1);
-		});
+		await expect(encode768to64(input, { preferGpu: false })).rejects.toThrow(/AUTOENCODER_CHECKPOINT_NOT_ADMITTED/);
+		expect(hgetall).not.toHaveBeenCalled();
 	});
 });

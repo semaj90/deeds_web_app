@@ -25,7 +25,7 @@
  *
  * Usage:
  *   node phase7-cuda-accelerator-correct.mjs --encode-latent --batch=100 --dry-run
- *   node phase7-cuda-accelerator-correct.mjs --encode-latent --batch=100 --apply
+ *   node phase7-cuda-accelerator-correct.mjs --encode-latent --batch=100 --apply (blocked)
  *   node phase7-cuda-accelerator-correct.mjs --validate-quality --batch=50
  */
 
@@ -37,6 +37,14 @@ const require = createRequire(import.meta.url);
 dotenv.config({ path: '.env' });
 
 const { Pool } = pg;
+
+// This legacy encoder writes latent_64 by row ID and has no source-revision CAS/readback.
+const encodeLatent = process.argv.includes('--encode-latent');
+const apply = process.argv.includes('--apply');
+if (encodeLatent && apply) {
+  console.error('PHASE7_LATENT_APPLY_BLOCKED: revision-qualified source CAS and independent readback are required.');
+  process.exit(78);
+}
 
 // Load CUDA bridge
 let addon;
@@ -56,11 +64,9 @@ const DB_PASSWORD = process.env.DATABASE_PASSWORD || '123456';
 const DB_NAME = process.env.DATABASE_NAME || 'legal_ai_db';
 
 // Args
-const encodeLatent = process.argv.includes('--encode-latent');
 const validateQuality = process.argv.includes('--validate-quality');
 const batchSize = parseInt(process.argv.find(a => a.startsWith('--batch='))?.split('=')[1] || '100');
 const dryRun = process.argv.includes('--dry-run');
-const apply = process.argv.includes('--apply');
 const MODE = dryRun ? 'DRY_RUN' : apply ? 'APPLY' : 'DRY_RUN';
 
 const pool = new Pool({
@@ -214,7 +220,7 @@ async function main() {
       console.log('  --validate-quality       Quality check via GPU reranking');
       console.log('  --batch=N                Batch size (default 100)');
       console.log('  --dry-run                Plan only');
-      console.log('  --apply                  Execute');
+      console.log('  --apply                  Rejected for latent writes until source CAS/readback exists');
       return;
     }
 

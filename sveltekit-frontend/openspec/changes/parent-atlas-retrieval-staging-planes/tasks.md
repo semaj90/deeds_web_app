@@ -579,9 +579,11 @@ Results by fix item:
 ### Verified findings
 - [x] ERR-10 `error_logs` has 0 rows. Cause: the writer `withErrorCapture` in `src/lib/server/error-logging-middleware.ts`
   has no importers, so nothing calls it. `handleError` (`src/hooks.server.ts:1036`) does not write to `error_logs`.
-- [x] ERR-11 BM42 sparse lane is wired but silent. `retrieve-candidates.ts` runs it in `Promise.all` with a 5 s timeout, and
-  `retrieveBM42Sparse` catches all errors and returns `[]`. The Qdrant sparse vector `bm42` does not exist, so the lane
-  contributes nothing and reports nothing. The `combined` array is a plain concatenation; fusion happens later in SearchRuntime.
+- [x] ERR-11 Historical finding (2026-10-12; superseded by 2026-10-13 source recheck): the then-current `retrieve-candidates.ts`
+  path invoked a sparse adapter that swallowed failures. Current source search shows no production caller of
+  `createBm42SparseRetriever()` or `createQdrantBM42Retriever()`; both adapters are intentionally inert and return no
+  candidates. No live BM42 sparse-vector field/producer is proven. Do not describe this as a wired lane or claim an
+  `UNAVAILABLE_NO_SPARSE_VECTOR` runtime status is emitted unless a typed status path is implemented and verified.
 - [x] ERR-12 Legacy codec identity is correct: `LEGACY_HASHED_SPARSE_ALGORITHM_ID = 'legacy_fnv1a_logtf_l2_v1'` in `bm42-sparse.ts`.
 - [x] ERR-13 `retrieveQdrant` requests dense `dense_768` only, with an explicit comment that Qdrant must not fuse dense and
   sparse. This matches the 768-only dense rule.
@@ -590,8 +592,9 @@ Results by fix item:
 - [x] TODO-LOG-01 Wire `logError` into `hooks.server.ts` so uncaught errors reach `error_logs`. Wired `logError` with
   `categorizeError`/`categorizeSeverity` in `handleError`. Verified live against PostgreSQL 18 `:5434`: 404 test error inserted
   row `id: '6d17f96b-afa5-4f85-9ed8-50a538defaaa'` into `error_logs`.
-- [x] TODO-SPARSE-01 Retire BM42 sparse lane; emit lane-level status (`UNAVAILABLE_NO_SPARSE_VECTOR`).
-  FastEmbed and MiniLM are fully removed from the codebase; `EmbeddingGemma` is the sole canonical dense embedding authority.
+- [x] TODO-SPARSE-01 Retire the historical hashed-sparse retrieval lane. Runtime inertness is source-verified; a typed
+  lane-level status (`UNAVAILABLE_NO_SPARSE_VECTOR`) is not proven to be emitted. MiniLM/FastEmbed are not canonical
+  embedding authorities; historical references and retired artifacts may remain in the repository.
   BM42 required FastEmbed's MiniLM model for attention-derived token importance. With FastEmbed/MiniLM removed, true BM42
   has no model authority. The legacy hashed codec (`bm42-sparse.ts`) is documented as a compatibility fallback and fails-closed.
 - [x] TODO-RETRIEVAL-02 Prove that RRF uses dense and lexical lanes only until a BM42 model is admitted. Proven via

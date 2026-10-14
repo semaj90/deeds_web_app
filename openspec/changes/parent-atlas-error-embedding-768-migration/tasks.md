@@ -78,6 +78,14 @@ started" or "done but untracked," and only a live check tells you which.
 - [x] 5.4 Verified live: every one of the 20 `error_embedding_latent_256`-populated rows also has
       `error_embedding_latent_128` populated (both count to exactly 20). For `content_embedding`'s
       lane, `latent_256` (55,169) and `latent_128` (55,169) also match exactly.
+- [ ] 5.5 Requalify the 5.2/5.3 population evidence before any retrieval or promotion claim. The
+      existing `backfill-latent-128-slice.mjs` `--apply` path writes by row UUID with only a
+      target-is-null predicate; it does not compare source/workspace/parent-representation revisions
+      or independently read back the vector digest. The counts above establish populated rows, not
+      current-source eligibility. Its `--apply` path now exits 78 before pool creation; focused guard
+      test confirms no database query is reached (1/1, 2026-10-13). Keep registry promotion explicitly
+      skipped and do not re-enable apply until a revision-qualified owner and independent readback
+      exist. No database operation performed.
 
 ## 6. Read-side wiring (closes the "write-only lane" gap)
 

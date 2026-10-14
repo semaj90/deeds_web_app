@@ -38,6 +38,7 @@ type ExistingReceipt = {
 	graphRevision: string;
 	manifest: {
 		graphRevision: string;
+		workspaceRevision?: string;
 		nodeCount: number;
 		edgeCount: number;
 		producerRevision: string;
@@ -54,6 +55,18 @@ type ExistingReceipt = {
 	louvainCommunityAgreement: number;
 	status: string;
 };
+
+export function requireGraphWorkspaceRevisionV1(manifest: {
+	workspaceRevision?: string | null;
+}): string {
+	if (typeof manifest.workspaceRevision !== 'string' || !manifest.workspaceRevision.trim()) {
+		throw new Error('GRAPH_06D_WORKSPACE_REVISION_REQUIRED');
+	}
+	if (manifest.workspaceRevision !== manifest.workspaceRevision.trim()) {
+		throw new Error('GRAPH_06D_WORKSPACE_REVISION_NOT_NORMALIZED');
+	}
+	return manifest.workspaceRevision;
+}
 
 function main(): void {
 	const existingReceipt: ExistingReceipt = JSON.parse(readFileSync(`${REPORTS_DIR}/receipt.json`, 'utf8'));
@@ -73,12 +86,10 @@ function main(): void {
 		);
 	}
 
-	// workspaceRevision: the existing artifact has no separate field named
-	// "workspaceRevision" -- producerRevision is the closest real, meaningful
-	// revision string already bound to this exact artifact (not fabricated).
+	const workspaceRevision = requireGraphWorkspaceRevisionV1(existingReceipt.manifest);
 	const map = buildGraphOrdinalMapV1({
 		graphRevision: existingReceipt.manifest.graphRevision,
-		workspaceRevision: existingReceipt.manifest.producerRevision,
+		workspaceRevision,
 		graphNodeKeys: nodeKeys,
 	});
 
@@ -124,7 +135,7 @@ function main(): void {
 		},
 		graphOrdinalMapBinding: {
 			graphRevision: map.graphRevision,
-			workspaceRevisionSource: 'existingReceipt.manifest.producerRevision (no separate workspaceRevision field exists on the source artifact)',
+			workspaceRevisionSource: 'existingReceipt.manifest.workspaceRevision',
 			workspaceRevision: map.workspaceRevision,
 			rowCount: map.rowCount,
 			graphOrdinalMapChecksum: map.graphOrdinalMapChecksum,

@@ -12,6 +12,8 @@ from .graph_projection_manifest import (
     build_bfs_path_receipt_v1,
     graph_ordinal_checksum_from_manifest_v1,
     graph_ordinal_map_checksum_v1,
+    lookup_networkx_source_ref_v1,
+    resolve_graph_source_ref_v1,
     validate_graph_projection_artifact_v1,
     validate_graph_projection_ordinal_checksum_v1,
 )
@@ -52,6 +54,8 @@ __all__ = [
     "VerifiedGraphProjectionSnapshotV1",
     "graph_ordinal_checksum_from_manifest_v1",
     "graph_ordinal_map_checksum_v1",
+    "lookup_networkx_source_ref_v1",
+    "resolve_graph_source_ref_v1",
     "validate_graph_projection_artifact_v1",
     "validate_graph_projection_ordinal_checksum_v1",
     "GraphCpuGpuParityReceiptV1",

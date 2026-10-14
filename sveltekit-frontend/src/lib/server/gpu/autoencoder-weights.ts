@@ -21,11 +21,22 @@ export interface AutoencoderWeights {
 
 let cachedWeights: AutoencoderWeights | null = null;
 let cachedTrainedAt: string | null = null;
+const AUTOENCODER_RUNTIME_ADMISSION = {
+	status: 'NOT_ADMITTED' as 'NOT_ADMITTED' | 'ADMITTED',
+	reason: 'no immutable checkpoint descriptor and retrieval qualification receipt are approved'
+} as const;
+
+function assertAutoencoderRuntimeAdmission(): void {
+	if (AUTOENCODER_RUNTIME_ADMISSION.status !== 'ADMITTED') {
+		throw new Error(`AUTOENCODER_CHECKPOINT_NOT_ADMITTED: ${AUTOENCODER_RUNTIME_ADMISSION.reason}`);
+	}
+}
 
 /**
  * Loads weights from Redis hashes `ace:autoencoder:weights` and `ace:autoencoder:meta`.
  */
 export async function loadAutoencoderWeights(): Promise<AutoencoderWeights> {
+	assertAutoencoderRuntimeAdmission();
 	const redis = getRedis();
 	const [weightsData, metaData] = await Promise.all([
 		redis.hgetall('ace:autoencoder:weights'),
@@ -64,6 +75,7 @@ export async function loadAutoencoderWeights(): Promise<AutoencoderWeights> {
  * Re-fetches when Redis reports a newer training run.
  */
 export async function getCachedAutoencoderWeights(): Promise<AutoencoderWeights> {
+	assertAutoencoderRuntimeAdmission();
 	if (cachedWeights) {
 		try {
 			const latestAt = await getRedis().hget('ace:autoencoder:meta', 'trainedAt');

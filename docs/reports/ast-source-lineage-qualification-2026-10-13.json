@@ -1,0 +1,46 @@
+{
+  "schema": "atlas.ast-source-lineage-qualification.v1",
+  "generatedAt": "2026-10-13T10:43:00Z",
+  "status": "STOPPED_PERMISSIVE_RESCUE_REQUALIFICATION_REQUIRED",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "databaseReadOnly": true,
+  "summary": {
+    "frozenCohortTotalRows": 55169,
+    "packetBindingAgreement": 8863,
+    "astPathRevisionCandidates": 1676,
+    "validPacketSourceByteSpans": 0,
+    "canonicalVector768MatchesInSnapshot": 739,
+    "canonicalVector768MatchesInExactCandidates": 15,
+    "sourceBytesVerifiedProductionCandidates": 0,
+    "verdict": "RESCUE_HALTED_REQUALIFICATION_GATE_LOCKED"
+  },
+  "p0AstJoinSemantics": {
+    "relativePathContract": "Relative file path from workspace root; prefix variations (sveltekit-frontend/ vs root) require canonical workspace prefix normalization.",
+    "sourceContentHashContract": "Whole-file raw-byte SHA-256 digest (verified to match current disk bytes on proven sample files like sveltekit-frontend/docs/milestones/phase-10b-turbovec.md).",
+    "sourceRevisionContract": "Revision string formatted with sha256:<digest>; matches whole-file content digest at commit time.",
+    "astSpanCoordinates": "0-indexed UTF-8 byte offsets (start_byte, end_byte).",
+    "ambiguityFinding": "A single chunk ID joins to multiple microscopic AST syntactic field/function/heading nodes (1-to-many fanout). Because packet byte_start and byte_end are NULL in atlas_packets, no unambiguous binding exists between an arbitrary AST node span and the chunk's text representation."
+  },
+  "p0VectorProvenanceAudit": {
+    "totalRowsWithEmbeddingVersion": 52585,
+    "qdrantBackfillBatchTagRows": 51789,
+    "qdrantBackfillPercent": 98.48626,
+    "sha256HexVersionRows": 744,
+    "distinctVersionLabels": 758,
+    "finding": "The '737 version labels' are not 737 different embedding models. 98.5% of rows carry the ingestion batch tag 'qdrant-backfill-v1', while the remaining rows carry per-file content hashes. The model family is tagged EmbeddingGemma, but no immutable model digest was recorded per chunk at creation time."
+  },
+  "p1CoverageFunnel": {
+    "totalSnapshotOrdinals": 55169,
+    "stage1_packetBindingAgreement": 8863,
+    "stage2_astPathRevisionAgreement": 1676,
+    "stage3_intersectionBoth": 1676,
+    "stage4_unambiguousNativeSpanOwnership": 0,
+    "stage5_sourceFileDigestParity": "Verified on sample files",
+    "stage6_extractedSpanDigestParity": 0,
+    "stage7_embeddingProducerModelQualification": 0,
+    "stage8_canonicalVectorAgreement": 15,
+    "stage9_fullyQualifiedProductionCandidates": 0
+  },
+  "recommendation": "Cease further permissive join attempts to rescue the August v4 frozen matrix. Upstream embedding and lineage producers must be repaired to write exact sourceRef, source_revision, workspace_revision, byte spans, and immutable model digests into canonical content_embedding_768, followed by a clean, qualified cohort export."
+}

@@ -144,4 +144,30 @@ describe('ACEContextAssembler Redis connection ownership (T2 item 1)', () => {
     quitSpy.mockRestore();
     endSpy.mockRestore();
   });
+
+  it('does not restore an evidence packet from a cursor missing source and representation lineage', async () => {
+    const assembler = new ACEContextAssembler();
+    const redis = (assembler as unknown as { redis: { get: (key: string) => Promise<string | null> } }).redis;
+    const getSpy = vi.spyOn(redis, 'get').mockResolvedValue(JSON.stringify({
+      id: '00000000-0000-4000-8000-000000000001',
+      query_text: 'test',
+      query_hash: 'a'.repeat(64),
+      last_rank: 0,
+      last_score: 0.9,
+      candidates_retrieved: 1,
+      lanes_completed: ['qdrant'],
+      session_id: 'session-1',
+      created_at: '2026-10-13T00:00:00.000Z',
+      last_accessed_at: '2026-10-13T00:00:00.000Z',
+      ttl_seconds: 3600,
+      packet_key: 'packet-1',
+      last_retrieved_at: '2026-10-13T00:00:00.000Z',
+      validation_gates: { gate_1: 'PASS' },
+      dimension_verified: 768,
+      embedding_lane: 'dense_768',
+    }));
+
+    await expect(assembler.getCachedCursorPacket('session-1')).resolves.toBeNull();
+    getSpy.mockRestore();
+  });
 });

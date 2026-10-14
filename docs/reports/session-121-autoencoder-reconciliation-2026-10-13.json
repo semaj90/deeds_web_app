@@ -1,0 +1,145 @@
+{
+  "report_id": "session-121-autoencoder-reconciliation-2026-10-13",
+  "timestamp": "2026-10-13T10:10:00Z",
+  "gate_status": {
+    "gate_name": "Gate 4: Latent64 Autoencoder Ranking & Reconstruction",
+    "verdict": "FAIL_PRESERVED",
+    "historical_session": "Session 121 (2026-07-07)",
+    "benchmark_file": "scratch/benchmarks/correlation-autoencoder-2026-07-07T19-14-44-471Z.jsonl"
+  },
+  "historical_metrics": {
+    "spearman_correlation_coordinate": {
+      "measured": 0.5336,
+      "required": ">0.85",
+      "verdict": "FAIL"
+    },
+    "reconstruction_cosine": {
+      "measured": 0.5706,
+      "required": ">0.95",
+      "verdict": "FAIL"
+    },
+    "simple_averaging_baseline_spearman": {
+      "measured": 0.595,
+      "verdict": "FAIL"
+    },
+    "autoencoder_delta_vs_averaging": {
+      "measured": -0.0614,
+      "verdict": "WORSE"
+    }
+  },
+  "parameter_and_architecture_audit": {
+    "checkpoint_dir": "models/autoencoder",
+    "metadata_file": "models/autoencoder/ae_meta.json",
+    "architecture": "768 -> 128 -> 64 -> 128 -> 768",
+    "activation": "ReLU (encoder layer 1, decoder layer 1), Linear (bottleneck, output)",
+    "input_normalization": "None in forward pass (assumes L2 normalized input)",
+    "output_normalization": "None",
+    "weights_verified": {
+      "W_enc_768_128": { "shape": [128, 768], "params": 98304 },
+      "b_enc_128": { "shape": [128], "params": 128 },
+      "W_enc_128_64": { "shape": [64, 128], "params": 8192 },
+      "b_enc_64": { "shape": [64], "params": 64 },
+      "W_dec_64_128": { "shape": [128, 64], "params": 8192 },
+      "b_dec_128": { "shape": [128], "params": 128 },
+      "W_dec_128_768": { "shape": [768, 128], "params": 98304 },
+      "b_dec_768": { "shape": [768], "params": 768 }
+    },
+    "total_parameters_measured": 214080,
+    "total_parameters_reported": 214080,
+    "parameter_count_match": true
+  },
+  "training_vector_cohort_audit": {
+    "vector_file": "models/autoencoder/training_vectors.npy",
+    "vector_count": 10000,
+    "dimension": 768,
+    "dtype": "float32",
+    "mean_l2_norm": 1.0000000092456276,
+    "min_l2_norm": 0.9999994876673773,
+    "max_l2_norm": 1.0000005227888091,
+    "normalization_status": "UNIT_NORMALIZED_FLOAT32"
+  },
+  "root_cause_analysis": {
+    "metric_target_divergence": {
+      "finding": "The benchmark calculated coordinate-wise Spearman rank correlation across the 768 coordinate values of a single vector, NOT pairwise query-to-document ranking correlation across a retrieval corpus.",
+      "code_ref": "scripts/atlas/correlation-benchmark-autoencoder.mjs:286"
+    },
+    "objective_function_mismatch": {
+      "finding": "Trained purely on element-wise MSE loss (~0.00074) with no contrastive, triplet, or cosine ranking loss. An MSE of 0.00074 on 768-D unit vectors yields an L2 residual of ~0.75, which geometrically constrains reconstruction cosine to ~0.57.",
+      "training_meta_ref": "models/autoencoder/ae_meta.json:best_val_loss"
+    },
+    "architecture_fragmentation": {
+      "architecture_A": "768 -> 128 -> 64 -> 128 -> 768 (214,080 params, in models/autoencoder)",
+      "architecture_B": "768 -> 256 -> 64 -> 256 -> 768 (426,752 params, in train-autoencoder-768-64.mjs & autoencoder-weights.ts)",
+      "architecture_C": "768 -> 512 -> 256 -> 128 (in python/atlas_compute/latent_autoencoder.py)"
+    }
+  },
+  "frozen_validation_benchmark_receipt": {
+    "cohort": "100 queries vs 900 corpus candidates (held-out validation split of training_vectors.npy)",
+    "oracle": "Exact cosine similarity on full canonical semantic_768",
+    "comparative_metrics": [
+      {
+        "method": "MRL-512",
+        "dimension": 512,
+        "pairwise_spearman": 0.9630,
+        "recall_at_10": 0.8250,
+        "recall_at_50": 0.8540,
+        "learned_weights": false
+      },
+      {
+        "method": "MRL-256",
+        "dimension": 256,
+        "pairwise_spearman": 0.9012,
+        "recall_at_10": 0.7130,
+        "recall_at_50": 0.7514,
+        "learned_weights": false
+      },
+      {
+        "method": "MRL-128",
+        "dimension": 128,
+        "pairwise_spearman": 0.8029,
+        "recall_at_10": 0.5960,
+        "recall_at_50": 0.6296,
+        "learned_weights": false
+      },
+      {
+        "method": "MRL-64",
+        "dimension": 64,
+        "pairwise_spearman": 0.6711,
+        "recall_at_10": 0.4340,
+        "recall_at_50": 0.4762,
+        "learned_weights": false
+      },
+      {
+        "method": "SimpleAvg-64",
+        "dimension": 64,
+        "pairwise_spearman": 0.6644,
+        "recall_at_10": 0.4260,
+        "recall_at_50": 0.4710,
+        "learned_weights": false
+      },
+      {
+        "method": "AE-Latent-64 (Historical)",
+        "dimension": 64,
+        "pairwise_spearman": 0.4989,
+        "recall_at_10": 0.0970,
+        "recall_at_50": 0.2506,
+        "learned_weights": true
+      },
+      {
+        "method": "AE-Recon-768 (Historical)",
+        "dimension": 768,
+        "pairwise_spearman": 0.4595,
+        "recall_at_10": 0.0920,
+        "recall_at_50": 0.2388,
+        "learned_weights": true
+      }
+    ]
+  },
+  "governance_and_admission_policy": {
+    "canonical_semantic_owner": "semantic_768 (PostgreSQL 18 codebase_chunk_index.content_embedding_768)",
+    "autoencoder_checkpoint_status": "UNPROMOTED_HISTORICAL_FAILURE",
+    "recommended_compression_challenger": "MRL-256 (preserves 90.12% pairwise Spearman and 71.30% Recall@10 with zero parameters)",
+    "redis_weight_key_status": "DORMANT_READ_ONLY_INVENTORY (no mutations executed)",
+    "path_b_multivector_rule": "Named vectors (title, summary, keyword) require independent relevance proof before receiving additional fusion/RRF votes; single logical semantic lane enforced."
+  }
+}

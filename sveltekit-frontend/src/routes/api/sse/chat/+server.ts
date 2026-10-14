@@ -6,8 +6,6 @@ import { eq, desc, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import {
   getChatModelKeepAlive,
-  getEmbeddingModelKeepAlive,
-  ollamaFetch,
 } from '$lib/server/ollama.js';
 import { loadCodebaseContext } from '$lib/server/features/rag/index.js';
 import { buildSummaryCardPromptSection, retrieveSummaryCards } from '$lib/server/retrieval/summary-card-retrieval.js';
@@ -34,7 +32,6 @@ import { classifyQuerySection, getInterimInference } from '$lib/server/analysis/
 import { orderByDependency, extractCitationRefs } from '$lib/server/retrieval/document-dag.js';
 import type { DAGDocument } from '$lib/server/retrieval/document-dag.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
-import { getCachedEmbedding, setCachedEmbedding } from '$lib/server/knowledge-cache.js';
 import { getCachedDAG, setCachedDAG } from '$lib/server/cache/dag-cache.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace } from '$lib/server/observability/tool-trace.js';
@@ -58,6 +55,7 @@ import { determineACEPolicy } from '$lib/server/ace/policy.js';
 import type { ACEContext, ACEPolicyDecision } from '$lib/server/ace/types.js';
 import type { ContextualToolResult } from '$lib/server/ai/contextual-tools.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import {
   getCachedStreamResponse,
   storeCachedStreamResponse,
@@ -193,11 +191,22 @@ const sseChatSchema = z.object({
   enableTools: z.boolean().optional(),
 });
 
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
 
 // Embedding model used for both indexing and retrieval — must match
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
+
+async function embedSemanticQuery(text: string): Promise<number[] | null> {
+  try {
+    const embedding = await traceEmbedding(text, EMBEDDING_MODEL, () =>
+      generateEmbedding(text, { taskMode: 'unprompted_legacy' }),
+      { expectedDimensions: 768 }
+    );
+    return embedding?.length === 768 && embedding.every(Number.isFinite) ? embedding : null;
+  } catch {
+    return null;
+  }
+}
 
 // Token budget caps (chars, ~4 chars per token) — expanded for 128K+ context models
 const CASE_CONTEXT_MAX_CHARS = 3200;
@@ -582,52 +591,10 @@ async function retrieveContext(
   graphFilter?: Record<string, unknown>
 ): Promise<ContextDoc[]> {
   try {
-    // 0. Check embedding cache — skip Ollama call on hit
-    const cachedVector = await getCachedEmbedding(query, EMBEDDING_MODEL).catch(() => null);
-    let vector: number[];
-    let embeddingDims: number;
-    let embeddingModel: string;
-
-    if (cachedVector) {
-      vector = cachedVector;
-      embeddingDims = cachedVector.length;
-      embeddingModel = EMBEDDING_MODEL;
-      console.log(`[RAG] Embedding cache HIT (${embeddingDims} dims)`);
-    } else {
-      // 1. Generate embedding for the user query
-      const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
-        ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: EMBEDDING_MODEL,
-            prompt: query,
-            keep_alive: getEmbeddingModelKeepAlive(),
-          }),
-          signal: AbortSignal.timeout(8000),
-        })
-      );
-
-      if (!embedRes.ok) return [];
-      // GPU-accelerated JSON parsing via simdjson (5× faster for embedding responses)
-      const embedRawText = await embedRes.text();
-      const embedData = fastJsonParse<{ embedding?: number[]; model?: string }>(embedRawText);
-      vector = embedData.embedding;
-      if (!Array.isArray(vector) || vector.length === 0) return [];
-
-      embeddingDims = vector.length;
-      embeddingModel = String(embedData.model ?? EMBEDDING_MODEL);
-
-      if (embeddingDims !== 768) {
-        console.warn(`[RAG] Embedding dimension mismatch: expected 768, got ${embeddingDims}`);
-        return [];
-      }
-
-      // Store in cache for future queries (fire-and-forget)
-      setCachedEmbedding(query, EMBEDDING_MODEL, vector).catch((err) => {
-        console.warn('[SSE chat] embedding cache persist failed:', (err as Error)?.message ?? err);
-      });
-    }
+    const vector = await embedSemanticQuery(query);
+    if (!vector) return [];
+    const embeddingDims = vector.length;
+    const embeddingModel = EMBEDDING_MODEL;
 
     // 2. Search tiered: KB corpus (no graph filter) + Case evidence (graph-filtered)
     const [kbHits, caseHits] = await Promise.all([
@@ -710,25 +677,8 @@ async function retrieveAttachmentContext(
   limit = RAG_MAX_CHUNKS
 ): Promise<ContextDoc[]> {
   try {
-    const embedRes = await traceEmbedding(query, EMBEDDING_MODEL, () =>
-      ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: EMBEDDING_MODEL,
-          prompt: query,
-          keep_alive: getEmbeddingModelKeepAlive(),
-        }),
-        signal: AbortSignal.timeout(8000),
-      })
-    );
-
-    if (!embedRes.ok) return [];
-    // GPU-accelerated JSON parsing via simdjson (5× faster for embedding responses)
-    const embedRawText = await embedRes.text();
-    const embedData = fastJsonParse<{ embedding?: number[] }>(embedRawText);
-    const vector = embedData.embedding;
-    if (!Array.isArray(vector) || vector.length === 0) return [];
+    const vector = await embedSemanticQuery(query);
+    if (!vector) return [];
 
     const shouldFilterCase = typeof caseUuid === 'string' && caseUuid.length > 0;
     const filter = {
@@ -1501,31 +1451,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       let authStatutesCount = 0;
       let authCasesCount = 0;
       {
-        const authQueryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(
-          () => null
-        );
+        const authQueryVector = await embedSemanticQuery(message);
         if (authQueryVector && contextDocs.length > 0) {
-          const embedAuthority: EmbedFn = async (text) => {
-            try {
-              const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  model: EMBEDDING_MODEL,
-                  prompt: text,
-                  keep_alive: getEmbeddingModelKeepAlive(),
-                }),
-                signal: AbortSignal.timeout(5000),
-              });
-              if (!res.ok) return null;
-              // GPU-accelerated JSON parsing via simdjson (5× faster for embedding responses)
-              const rawText = await res.text();
-              const data = fastJsonParse<{ embedding?: number[] }>(rawText);
-              return Array.isArray(data.embedding) ? data.embedding : null;
-            } catch {
-              return null;
-            }
-          };
+          const embedAuthority: EmbedFn = embedSemanticQuery;
 
           const authResult = await authorityChainExpansion(
             authQueryVector,
@@ -1607,7 +1535,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       const graphExpandStart = performance.now();
       let expandedCount = 0;
       if (graphContext?.neighbors?.length) {
-        const queryVector = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
+        const queryVector = await embedSemanticQuery(message);
         if (queryVector) {
           const expandInput = contextDocs.map((d) => ({
             id: d.documentId,
@@ -2690,55 +2618,38 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         // Store response in LLM cache for future lookups (non-blocking)
         try {
-          const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: EMBEDDING_MODEL,
-              prompt: message,
-              keep_alive: getEmbeddingModelKeepAlive(),
-            }),
-            signal: AbortSignal.timeout(8000),
-          }).catch(() => null);
+          const queryEmbedding = await embedSemanticQuery(message);
+          if (queryEmbedding) {
+            storeCachedResponse({
+              query: message,
+              queryEmbedding,
+              context: systemPrompt,
+              response: fullResponse,
+              model: model ?? 'LLM_MODEL_ID',
+              confidence,
+            }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
 
-          if (embedRes?.ok) {
-            // GPU-accelerated JSON parsing via simdjson (5× faster for embedding responses)
-            const embedRawText = await embedRes.text();
-            const embedData = fastJsonParse<{ embedding?: number[] }>(embedRawText);
-            if (Array.isArray(embedData.embedding)) {
-              // Store in L2 Qdrant semantic cache
-              storeCachedResponse({
-                query: message,
-                queryEmbedding: embedData.embedding,
-                context: systemPrompt,
-                response: fullResponse,
-                model: model ?? 'LLM_MODEL_ID',
-                confidence,
-              }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
-
-              // Store in L1 Redis exact-match cache (for instant 2ms future hits)
-              import('$lib/server/cache/redis-exact-match.js')
-                .then(({ generateCacheKey, setExactMatchCache }) => {
-                  const exactCacheKey = generateCacheKey({
-                    model: model ?? 'LLM_MODEL_ID',
-                    messages: [
-                      { role: 'system', content: systemPrompt },
-                      ...conversationHistory,
-                      { role: 'user', content: message },
-                    ],
-                    temperature: 0.7,
-                    maxTokens: 2048,
-                  });
-                  setExactMatchCache(exactCacheKey, {
-                    content: fullResponse,
-                    model: model ?? 'LLM_MODEL_ID',
-                    backend: inferenceBackend,
-                  }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
-                })
-                .catch(() => {
-                  /* L1 cache unavailable */
+            import('$lib/server/cache/redis-exact-match.js')
+              .then(({ generateCacheKey, setExactMatchCache }) => {
+                const exactCacheKey = generateCacheKey({
+                  model: model ?? 'LLM_MODEL_ID',
+                  messages: [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationHistory,
+                    { role: 'user', content: message },
+                  ],
+                  temperature: 0.7,
+                  maxTokens: 2048,
                 });
-            }
+                setExactMatchCache(exactCacheKey, {
+                  content: fullResponse,
+                  model: model ?? 'LLM_MODEL_ID',
+                  backend: inferenceBackend,
+                }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
+              })
+              .catch(() => {
+                /* L1 cache unavailable */
+              });
           }
         } catch (cacheErr) {
           console.warn(
@@ -2772,10 +2683,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Reuses the embedding already cached from the RAG retrieval step — no extra Ollama call.
         let topHyperedgeHash: string | undefined;
         try {
-          const cachedEmb = await getCachedEmbedding(message, EMBEDDING_MODEL).catch(() => null);
-          if (cachedEmb && cachedEmb.length === 768) {
+          const queryEmbedding = await embedSemanticQuery(message);
+          if (queryEmbedding) {
             const { selectAdaptiveMemory } = await import('$lib/server/graph/hypergraph-4d.js');
-            const modules = await selectAdaptiveMemory(cachedEmb, 1).catch(() => []);
+            const modules = await selectAdaptiveMemory(queryEmbedding, 1).catch(() => []);
             topHyperedgeHash = modules[0]?.hyperedgeHash;
           }
         } catch {

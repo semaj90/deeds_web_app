@@ -91,6 +91,7 @@ function exactMutationForTarget(source, target) {
 
 function classify(relative, source, target) {
   if (relative.endsWith('audit-semantic-768-writer-ownership-v1.mjs')) return null;
+  if (/(?:^|[\\/])test[-_]/i.test(relative)) return null;
   if (/\.(?:test|spec)\.(?:mjs|mts|ts|sql)$/i.test(relative)) return null;
   const applies = target.patterns.some((pattern) => pattern.test(source));
   if (!applies) return null;
@@ -245,8 +246,6 @@ async function main() {
     },
     writers,
     mutationWriters,
-    physicalOwnerMutationWriters,
-    fullyQualifiedPhysicalWriters,
     operatorEntrypoints: [
       { command: 'npm run atlas:graphify:embedding:daily:apply', target: 'codebase_chunk_index.content_embedding', status: 'HISTORICAL_SURFACE_REQUIRES_OWNER_REVIEW' },
     ],
@@ -274,8 +273,6 @@ async function main() {
     reportPath: REPORT_PATH,
     verdict: report.verdict,
     writerCount: writers.length,
-    physicalOwnerMutationWriterCount: physicalOwnerMutationWriters.length,
-    fullyQualifiedPhysicalWriterCount: fullyQualifiedPhysicalWriters.length,
     live,
   }, null, 2));
   const reportTempPath = `${REPORT_PATH}.${process.pid}.tmp`;

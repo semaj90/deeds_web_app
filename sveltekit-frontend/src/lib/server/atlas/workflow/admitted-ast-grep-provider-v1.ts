@@ -14,7 +14,8 @@ import {
 
 function normalizeRelativeSourceRef(value: string): string {
   const normalized = value.replaceAll('\\', '/').replace(/^\.\/+/, '').trim();
-  if (!normalized || path.posix.isAbsolute(normalized) || normalized.split('/').includes('..')) {
+  if (!normalized || path.isAbsolute(normalized) || path.posix.isAbsolute(normalized)
+    || path.win32.isAbsolute(normalized) || normalized.split('/').includes('..')) {
     throw new Error('AST_GREP_SOURCE_PATH_NOT_CONTAINED');
   }
   return normalized;

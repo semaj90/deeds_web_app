@@ -89,6 +89,7 @@ type PacketRow = Pick<
   | 'communityId'
   | 'clusterId'
   | 'sha256'
+  | 'sourceRevision'
   | 'sourceKind'
   | 'sourcePath'
   | 'topology'
@@ -135,6 +136,7 @@ const PACKET_SELECT_SQL = `
     p.community_id,
     p.cluster_id,
     p.sha256,
+    p.source_revision,
     p.source_kind,
     p.source_path,
     p.topology,
@@ -212,6 +214,7 @@ export async function loadCanonicalGraphSnapshotInputFromPostgres(
   return {
     ...rest,
     workspaceId: workspaceRevision,
+    workspaceRevision,
     treeNodes: treeNodeResult.rows.map(normalizeTreeNodeRow),
     packets
   };
@@ -268,6 +271,7 @@ function normalizePacketRow(row: DbRow): PacketRow {
     communityId: readDbValue(row, 'communityId', 'community_id') ?? null,
     clusterId: readDbValue(row, 'clusterId', 'cluster_id') ?? null,
     sha256: readDbValue(row, 'sha256', 'sha256') ?? null,
+    sourceRevision: readDbValue(row, 'sourceRevision', 'source_revision') ?? null,
     sourceKind: readDbValue(row, 'sourceKind', 'source_kind') ?? null,
     sourcePath: readDbValue(row, 'sourcePath', 'source_path') ?? null,
     topology: (readDbValue(row, 'topology', 'topology') ?? {}) as Record<string, unknown>,

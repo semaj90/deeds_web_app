@@ -51,11 +51,6 @@ const MirrorSyncNeo4jInputSchema = z.object({
   feature_id: z.string(),
 });
 
-const GraphExpandInputSchema = z.object({
-  feature_id: z.string().min(1),
-  max_hops: z.number().min(1).max(5).default(3),
-});
-
 const RetrievalRerankInputSchema = z.object({
   candidates: z.array(z.object({
     packet_key: z.string(),
@@ -514,55 +509,6 @@ async function toolMirrorSyncNeo4jImpl(args: unknown): Promise<ToolResult> {
 export const toolMirrorSyncNeo4j = withMcpToolTelemetry(
   'mirror:sync_neo4j',
   toolMirrorSyncNeo4jImpl,
-  getRedis
-);
-
-// ──────────────────────────────────────────────────────────────────────
-// Tool 5: graph:expand (Read-only, no Postgres write)
-// ──────────────────────────────────────────────────────────────────────
-
-async function toolGraphExpandImpl(args: unknown): Promise<ToolResult> {
-  const startTime = Date.now();
-
-  try {
-    const input = GraphExpandInputSchema.parse(args);
-
-    // Read candidates by feature_id (Neo4j would do this, but we read from Postgres for now)
-    const candidates = await db
-      .select()
-      .from(atlas_packets)
-      .where(eq(atlas_packets.feature_id, input.featureId))
-      .limit(10);
-
-    return {
-      success: true,
-      metrics: {
-        postgres_written: 0,
-        redis_invalidated: 0,
-        events_emitted: 1,
-        duration_ms: Date.now() - startTime,
-      },
-      tool_name: 'graph:expand',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      metrics: {
-        postgres_written: 0,
-        redis_invalidated: 0,
-        events_emitted: 0,
-        duration_ms: Date.now() - startTime,
-      },
-      tool_name: 'graph:expand',
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
-
-// Export wrapped with telemetry instrumentation
-export const toolGraphExpand = withMcpToolTelemetry(
-  'graph:expand',
-  toolGraphExpandImpl,
   getRedis
 );
 

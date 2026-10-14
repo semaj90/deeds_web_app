@@ -24,12 +24,11 @@ export interface FeatureExtractorConfig {
   maxVocabulary: number;
   embedding: {
     model: string;
-    dimension: number; // Total output dimension (e.g., 512 for MRL)
   };
   semanticEmbedding?: {
     enabled: boolean; // Enable 512-dim MRL semantic embeddings
     model: string; // embeddinggemma:latest (canonical 512-dim MRL)
-    fallbackDimension: number; // 768 (primary) or 384 (routing reference)
+    fallbackDimension: 768;
   };
 }
 
@@ -50,12 +49,10 @@ export interface FeatureExtractorConfig {
 export class FeatureVectorGenerator {
   private vocabulary: Map<string, number> = new Map();
   private config: FeatureExtractorConfig;
-  private dimension: number;
   private semanticEmbeddingEnabled: boolean;
 
   constructor(config: FeatureExtractorConfig) {
     this.config = config;
-    this.dimension = config.embedding.dimension;
     this.semanticEmbeddingEnabled = config.semanticEmbedding?.enabled ?? false;
   }
 
@@ -210,33 +207,11 @@ export class FeatureVectorGenerator {
       }
     }
 
-    // Determine output vector based on configuration
-    let outputVector: number[];
-
-    if (embeddingVector) {
-      // Use embedding as primary output (512-dim MRL or 768-dim fallback)
-      outputVector = embeddingVector;
-    } else {
-      // Fallback to hand-crafted features only (40-dim)
-      outputVector = handCraftedVector;
-    }
-
-    // Pad or trim to configured dimension if needed
-    if (outputVector.length < this.dimension) {
-      const padded = new Array(this.dimension).fill(0);
-      for (let i = 0; i < outputVector.length; i++) {
-        padded[i] = outputVector[i];
-      }
-      outputVector = padded;
-    } else if (outputVector.length > this.dimension) {
-      outputVector = outputVector.slice(0, this.dimension);
-    }
-
     return {
       packetKey,
       sourceRef,
       features: handCraftedVector.map(f => Number(f.toFixed(6))),
-      dimension: this.dimension,
+      dimension: handCraftedVector.length,
       modelVersion: this.config.embedding.model,
       embedding: embeddingVector ? embeddingVector.map(f => Number(f.toFixed(6))) : undefined,
       embeddingDimension: embeddingDim,

@@ -37,6 +37,9 @@ describe('full corpus graph snapshot workspace authority', () => {
     expect(binding).toBeGreaterThan(-1);
     expect(persistence).toBeGreaterThan(binding);
     expect(source).toContain('GRAPH_SOURCE_REVISION_COVERAGE_INCOMPLETE');
+    expect(source).toContain('GRAPH_INPUT_SOURCE_REVISION_COVERAGE_INCOMPLETE');
+    expect(source.indexOf('boundTreeInputs')).toBeLessThan(source.indexOf('materializeGraphSnapshot(input)'));
+    expect(source).toContain('workspaceRevision,');
     expect(source).toContain('(snapshot_id,node_key,node_type,packet_key,tree_node_id,source_ref,source_revision,content_hash,properties)');
   });
 

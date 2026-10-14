@@ -633,7 +633,10 @@
       "Bash(tail -25 tasks.md)",
       "Bash(git diff *)",
       "PowerShell(Get-PSDrive C | Select-Object Used,Free | Format-List; $sizes = @{}; Get-ChildItem C:\\\\ -Force -ErrorAction SilentlyContinue | ForEach-Object { $s = \\(Get-ChildItem $_.FullName -Recurse -Force -File -ErrorAction SilentlyContinue | Measure-Object Length -Sum\\).Sum; [pscustomobject]@{GB=[math]::Round\\($s/1GB,2\\); Path=$_.FullName} } | Sort-Object GB -Descending | Select-Object -First 15 | Format-Table -AutoSize)",
-      "PowerShell(Get-ChildItem *)"
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 8788 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { \"listener pid=$\\($c.OwningProcess\\)\" } else { \"no listener on 8788\" })",
+      "Bash(rg -c \"registerTool\\\\\\(\" src/mcp/trace-mcp-server.ts)",
+      "Bash(rg -n \"z\\\\.record\\\\\\(\" src/mcp/)"
     ],
     "deny": [],
     "ask": []

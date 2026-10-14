@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { DenseSignalSchema } from './feature-envelope.js';
+import { DenseSignalSchema, isRetiredDenseSignal } from './feature-envelope.js';
 
 describe('feature-envelope dense lineage', () => {
-  it('accepts dense_384 lineage metadata for the canonical retrieval lane', () => {
+  it('retains archived 384-D provenance without treating it as current evidence', () => {
     const parsed = DenseSignalSchema.parse({
       name: 'dense',
       score: 0.91,
       qdrant_point_id: 'point-1',
       embedding_lane: 'dense_384',
-      embedding_status: 'ACTIVE',
+      embedding_status: 'REFERENCE_ONLY',
       embedding_native_dimension: 768,
       projection_source_dimension: 768,
       projection_method: 'direct_slice',
@@ -20,6 +20,7 @@ describe('feature-envelope dense lineage', () => {
 
     expect(parsed.embedding_lane).toBe('dense_384');
     expect(parsed.projection_source_dimension).toBe(768);
+    expect(isRetiredDenseSignal(parsed)).toBe(true);
   });
 
   it('accepts dense_768 lineage metadata for the native semantic lane', () => {

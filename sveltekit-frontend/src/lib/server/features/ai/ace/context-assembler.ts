@@ -1844,26 +1844,26 @@ export async function assembleACEContext(opts: {
         };
         const resolveSomClusterFromSourceRefs = async (refs: string[]) => {
           if (!refs.length) return '';
-          const somRows = await pgPool.query<{ som_cluster: number | null }>(
-            `SELECT som_cluster
+          const somRows = await pgPool.query<{ centroid_id: string | null }>(
+            `SELECT centroid_id
                FROM parent_atlas_documents
               WHERE source_ref = ANY($1::text[])
-                AND som_cluster IS NOT NULL
+                AND centroid_id IS NOT NULL
               ORDER BY source_ref
               LIMIT 1`,
             [refs]
-          ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
-          const som = somRows.rows[0]?.som_cluster;
+          );
+          const som = somRows.rows[0]?.centroid_id;
           if (som != null) return String(som);
           const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
             `SELECT som_cluster
-               FROM atlas_feature_map
+               FROM atlas_packets
               WHERE source_ref = ANY($1::text[])
                 AND som_cluster IS NOT NULL
               ORDER BY source_ref
               LIMIT 1`,
             [refs]
-          ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+          );
           const atlasSom = atlasRows.rows[0]?.som_cluster;
           return atlasSom != null ? String(atlasSom) : '';
         };
@@ -4223,26 +4223,26 @@ export async function assembleACEContext(opts: {
         let telemetrySomCluster = String(_p.som_cluster ?? '');
         if (!telemetrySomCluster && telemetrySourceRefs.length > 0) {
           telemetrySomCluster = await (async () => {
-            const somRows = await pgPool.query<{ som_cluster: number | null }>(
-              `SELECT som_cluster
+            const somRows = await pgPool.query<{ centroid_id: string | null }>(
+              `SELECT centroid_id
                  FROM parent_atlas_documents
                 WHERE source_ref = ANY($1::text[])
-                  AND som_cluster IS NOT NULL
+                  AND centroid_id IS NOT NULL
                 ORDER BY source_ref
                 LIMIT 1`,
               [telemetrySourceRefs]
-            ).catch(() => ({ rows: [] as Array<{ som_cluster: number | null }> }));
-            const som = somRows.rows[0]?.som_cluster;
+            );
+            const som = somRows.rows[0]?.centroid_id;
             if (som != null) return String(som);
             const atlasRows = await pgPool.query<{ som_cluster: string | number | null }>(
               `SELECT som_cluster
-                 FROM atlas_feature_map
+                 FROM atlas_packets
                 WHERE source_ref = ANY($1::text[])
                   AND som_cluster IS NOT NULL
                 ORDER BY source_ref
                 LIMIT 1`,
               [telemetrySourceRefs]
-            ).catch(() => ({ rows: [] as Array<{ som_cluster: string | number | null }> }));
+            );
             const atlasSom = atlasRows.rows[0]?.som_cluster;
             return atlasSom != null ? String(atlasSom) : '';
           })();

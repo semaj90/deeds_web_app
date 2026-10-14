@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   canonicalEnvelopeToRerankCandidate,
+  rerankCanonicalFeatureEnvelopes,
   rerankedCandidateToCanonicalEnvelope,
   type CanonicalRerankEnvelope,
 } from './canonical-rerank-executor.js';
@@ -19,12 +20,12 @@ describe('canonical rerank executor bridge', () => {
         name: 'dense',
         score: 0.91,
         qdrant_point_id: 'q-1',
-        embedding_lane: 'dense_384',
+        embedding_lane: 'dense_768',
         embedding_status: 'ACTIVE',
         embedding_native_dimension: 768,
         projection_source_dimension: 768,
-        projection_method: 'direct_slice',
-        projection_version: 'embeddinggemma-768-to-384-direct-slice-v1',
+        projection_method: 'none',
+        projection_version: 'embeddinggemma-full768-v1',
         metric: 'cosine',
         confidence: 0.9,
       },
@@ -50,11 +51,33 @@ describe('canonical rerank executor bridge', () => {
     expect(candidate.content).toBe('hello world');
     expect(candidate.retrievedRank).toBe(7);
     expect(candidate.denseScore).toBe(0.91);
-    expect(candidate.embeddingLane).toBe('dense_384');
+    expect(candidate.embeddingLane).toBe('dense_768');
     expect(candidate.embeddingStatus).toBe('ACTIVE');
-    expect(candidate.projectionVersion).toBe('embeddinggemma-768-to-384-direct-slice-v1');
+    expect(candidate.projectionVersion).toBe('embeddinggemma-full768-v1');
     expect(candidate.bm25Score).toBe(0.8);
     expect(candidate.pagerankScore).toBe(0.42);
+  });
+
+  it('rejects retired 384-D envelopes before cache or model work', async () => {
+    const envelope: CanonicalRerankEnvelope = {
+      chunk_id: 'legacy-chunk',
+      dense: {
+        name: 'dense',
+        score: 0.91,
+        qdrant_point_id: 'legacy-point',
+        embedding_lane: 'dense_384',
+        embedding_status: 'ACTIVE',
+        embedding_native_dimension: 768,
+        projection_source_dimension: 768,
+        projection_method: 'direct_slice',
+        projection_version: 'embeddinggemma-768-to-384-direct-slice-v1',
+        metric: 'cosine',
+        confidence: 0.9,
+      },
+    };
+
+    await expect(rerankCanonicalFeatureEnvelopes('query', [envelope], { cachePolicy: 'disabled' }))
+      .rejects.toThrow('RETIRED_EMBEDDING_LANE:dense_384');
   });
 
   it('round-trips a reranked candidate back into the canonical envelope', () => {

@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, sep } from 'node:path';
+import { filterBoundedTocSources, buildTocSkipReceipt, MAX_TOC_SOURCE_BYTES } from './document-governance-source-bounds-v1.mjs';
 
 const { documentGovernanceRegistryV1Schema } = await (await import('tsx/esm/api')).tsImport(
   '../../packages/parent-atlas/src/core/document-governance-record-v1.ts',
@@ -36,6 +37,18 @@ const readJson = (pathname) => {
     return null;
   }
 };
+
+function safeWriteFileSync(filePath, data, encoding = 'utf8') {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      writeFileSync(filePath, data, encoding);
+      return;
+    } catch (err) {
+      if (attempt === 4) throw err;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 150);
+    }
+  }
+}
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
@@ -102,7 +115,7 @@ function documentKindFor(pathname, kind) {
   return 'DOCUMENT';
 }
 
-const candidates = [
+const candidatePaths = [
   ...discoverInstructionFiles(),
   ...walk(join(repoRoot, 'docs')).filter((p) => /\.md$/i.test(p) || /\.json$/i.test(p)),
   ...walk(join(repoRoot, 'openspec', 'changes')).filter((p) => /\.(md|json|ya?ml)$/i.test(p)),
@@ -116,7 +129,8 @@ const candidates = [
     if (/^docs\/reports\/(?:document-(governance|supersession)-|claude-instruction-supersession-plan-)/.test(path)) return false;
     if (path === 'docs/reports/document-governance-validation-v1.json'
       || path === 'docs/reports/graphify-daily-workflow-receipt.json'
-      || path === 'docs/reports/openspec-workboard-v1.json') return false;
+      || path === 'docs/reports/openspec-workboard-v1.json'
+      || path === 'docs/reports/toc-oversized-source-skips-v1.json') return false;
     // Session run receipts summarize this build and must not feed the registry
     // whose checksum they record, or each report refresh invalidates its input.
     if (/^docs\/reports\/(?:openspec-workboard-run-[^/]+|document-reference-census-v1)\.json$/.test(path)) return false;
@@ -127,6 +141,9 @@ const candidates = [
     return true;
   })
   .sort();
+const boundedSources = filterBoundedTocSources(candidatePaths, repoRoot);
+const candidates = boundedSources.included;
+const oversizedCandidates = boundedSources.skipped;
 
 const extractedRecords = candidates.map((absolute) => {
   const path = repoPath(absolute);
@@ -334,6 +351,7 @@ const toc = [
   '## Architecture index',
   '',
   '- [Parent Atlas Architecture TOC V2](architecture/ARCH-TOC.md) — complete navigation, workstation owner map, and explicit temporal snapshot receipts.',
+  '- [Master feature roadmap and evidence ledger](master_feature_todo_1011.md) — phase register 1–24, current blockers, and dated audit-note navigation; phase labels remain evidence-qualified.',
   '',
   '## Code Capability Knowledge and Agentic DAG Retrieval',
   '',
@@ -415,6 +433,7 @@ const toc = [
   '## Neural decoder and GPU runtime separation',
   '',
   `- [Neural decoder separation](reports/neural-decoder-runtime-separation-v1.json) — ${neuralDecoderSeparation?.status ?? 'NOT_FOUND'} — host PyTorch ${neuralDecoderSeparation?.separation?.hostReference?.torchVersion ?? 'n/a'} is reference-only; decoder ${neuralDecoderSeparation?.separation?.decoderService?.torchVersion ?? 'n/a'} on ${neuralDecoderSeparation?.separation?.decoderService?.url ?? 'n/a'} owns learned projection only.`,
+  '- [Python ML runtime inventory (2026-10-13)](reports/python-ml-runtime-inventory-2026-10-13.md) — Windows `.venv`: PyTorch CPU-only and XGBoost CUDA 12.9; WSL RAPIDS: CUDA-enabled PyTorch and XGBoost CUDA 13.3. Package capability is not workload or service proof.',
   '- Decoder contract: `semantic_768` → physical `latent_256` → derived `latent_128`/`latent_64`; `canonicalAuthority=false`, `textSynthesis=false`, and `writesPerformed=false`.',
   '- Ornith remains the synthesis/tool-use owner; PostgreSQL remains canonical storage/lineage authority; Qdrant and GPU residency remain rebuildable execution/projection layers.',
   '- Open GPU gates: FEAT-04 envelope, owner-process residency reuse, decoder replay, cuTile parity, CUDA SIMT parity, and RMM allocator evaluation.',
@@ -432,9 +451,15 @@ if (checkOnly) {
     console.log(`MASTER_TOC_CHECK_OK ${sha256(registryJson)}`);
   }
 } else {
-  writeFileSync(registryPath, registryJson, 'utf8');
-  writeFileSync(tocPath, toc, 'utf8');
-  writeFileSync(architectureTocPath, architectureToc, 'utf8');
+  safeWriteFileSync(registryPath, registryJson, 'utf8');
+  safeWriteFileSync(tocPath, toc, 'utf8');
+  safeWriteFileSync(architectureTocPath, architectureToc, 'utf8');
+  const skipReceiptPath = join(repoRoot, 'docs', 'reports', 'toc-oversized-source-skips-v1.json');
+  const skipReceipt = buildTocSkipReceipt(oversizedCandidates, candidatePaths.length, MAX_TOC_SOURCE_BYTES);
+  safeWriteFileSync(skipReceiptPath, JSON.stringify(skipReceipt, null, 2) + '\n', 'utf8');
   console.log(`MASTER_TOC_BUILT ${sha256(registryJson)}`);
   console.log(`records=${records.length} openspecTasks=${openSpecs.length} archiveEligible=${records.filter((record) => record.archive.eligible).length}`);
+  if (oversizedCandidates.length) {
+    console.log(`oversizedSourcesSkipped=${oversizedCandidates.length} maxBytes=${MAX_TOC_SOURCE_BYTES}`);
+  }
 }

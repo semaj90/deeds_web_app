@@ -38,8 +38,9 @@ test('writer census matches content_embedding exactly rather than content_embedd
   assert.match(census, /\\bcontent_embedding\\b\(\?!_768\)/);
   assert.match(census, /content_embedding_768/);
 
-  // The live index-stream route is a legacy _768 mirror. It must not be
-  // reclassified as the physical content_embedding writer by prefix matching.
-  assert.match(legacyRoute, /content_embedding_768/);
+  // The live index-stream route mirrors chunk metadata and auxiliary vectors,
+  // not either semantic embedding column.
+  assert.match(legacyRoute, /INSERT INTO codebase_chunk_index/);
+  assert.doesNotMatch(legacyRoute, /content_embedding_768/i);
   assert.doesNotMatch(legacyRoute, /\bcontent_embedding\b(?!_768)\s*=/);
 });

@@ -43,7 +43,7 @@ function buildEvidenceReceiptV1Internal(input, { requireTaskRevision }) {
       || expectedIds.some((id) => !actualIds.includes(id))) throw new Error('EvidenceReceiptV1 assertion identity mismatch');
     if (input.actualAssertions.some((assertion) => assertion.passed !== true)) throw new Error('EvidenceReceiptV1 unsatisfied assertion');
   }
-  if (input.verdict === 'PROVEN' && !input.independentVerifier && !input.verifier) throw new Error('EvidenceReceiptV1 independent verifier required');
+  if (input.verdict === 'PROVEN' && !input.independentVerifier) throw new Error('EvidenceReceiptV1 independent verifier required');
   if (input.verdict === 'PROVEN' && input.readbackRequired && !input.readbackPerformed) throw new Error('EvidenceReceiptV1 readback required');
   if (input.verdict === 'STALE' && !input.staleReason) throw new Error('EvidenceReceiptV1 stale reason required');
   const { checksum: _checksum, ...unsigned } = input;

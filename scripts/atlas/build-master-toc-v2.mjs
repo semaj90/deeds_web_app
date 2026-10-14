@@ -12,6 +12,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, join, relative, sep } from 'node:path';
+import { filterBoundedTocSources, buildTocSkipReceipt, MAX_TOC_SOURCE_BYTES } from './document-governance-source-bounds-v1.mjs';
 
 const { documentGovernanceRegistryV1Schema } = await (await import('tsx/esm/api')).tsImport(
   '../../packages/parent-atlas/src/core/document-governance-record-v1.ts',
@@ -125,14 +126,18 @@ const candidates = [
     if (/^docs\/reports\/(?:document-(governance|supersession)-|claude-instruction-supersession-plan-)/.test(path)) return false;
     if (path === 'docs/reports/document-governance-validation-v1.json'
       || path === 'docs/reports/graphify-daily-workflow-receipt.json'
-      || path === 'docs/reports/openspec-workboard-v1.json') return false;
+      || path === 'docs/reports/openspec-workboard-v1.json'
+      || /^docs\/reports\/toc-oversized-source-skips-v[12]\.json$/.test(path)) return false;
     if (/^docs\/reports\/(?:openspec-workboard-run-[^/]+|document-reference-census-v1)\.json$/.test(path)) return false;
     if (path === 'docs/OPENSPEC-WORKBOARD.md' || path === 'docs/reports/openspec-workboard-v1.json') return false;
     return true;
   })
   .sort();
 
-const extractedRecords = candidates.map((absolute) => {
+const boundedSources = filterBoundedTocSources(candidates, repoRoot);
+const oversizedCandidates = boundedSources.skipped;
+
+const extractedRecords = boundedSources.included.map((absolute) => {
   const path = repoPath(absolute);
   const content = readFileSync(absolute);
   const text = content.toString('utf8');
@@ -503,6 +508,12 @@ if (checkOnly) {
   writeFileSync(registryPath, registryJson, 'utf8');
   writeFileSync(tocPath, toc, 'utf8');
   writeFileSync(architectureTocPath, architectureToc, 'utf8');
+  const skipReceiptPath = join(repoRoot, 'docs', 'reports', 'toc-oversized-source-skips-v2.json');
+  const skipReceipt = buildTocSkipReceipt(oversizedCandidates, candidates.length, MAX_TOC_SOURCE_BYTES);
+  writeFileSync(skipReceiptPath, JSON.stringify(skipReceipt, null, 2) + '\n', 'utf8');
   console.log(`MASTER_TOC_V2_BUILT ${sha256(registryJson)}`);
   console.log(`records=${records.length} openspecTasks=${openSpecs.length} archiveEligible=${records.filter((record) => record.archive.eligible).length}`);
+  if (oversizedCandidates.length) {
+    console.log(`oversizedSourcesSkipped=${oversizedCandidates.length} maxBytes=${MAX_TOC_SOURCE_BYTES}`);
+  }
 }

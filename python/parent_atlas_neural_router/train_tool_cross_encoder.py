@@ -48,7 +48,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--train-jsonl", type=Path, required=True)
     parser.add_argument("--eval-jsonl", type=Path, required=True)
-    parser.add_argument("--model", default="cross-encoder/ms-marco-MiniLM-L-6-v2")
+    parser.add_argument("--model", default="mixedbread-ai/mxbai-rerank-base-v2")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--max-length", type=int, default=384)
     parser.add_argument("--batch-size", type=int, default=16)
