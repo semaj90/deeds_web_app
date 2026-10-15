@@ -35,3 +35,9 @@ Offline Diagnostic Report: `docs/reports/svelte-check-all-warnings-errors-2026-1
 - [x] TSK-A11Y-13 Correct non-interactive role on interactive element (`a11y_no_interactive_element_to_noninteractive_role`, 1 item). Status: APPLY_PROVEN (`EvidenceRecall.svelte`: removed `role="listitem"` from a `<button>`; rule absent in 2026-10-14 run).
 - [ ] TSK-A11Y-14 Execute full validation gate `npm run check` to prove 0 errors and 0 warnings. Not met (2026-10-14): 0 errors, 197 warnings remain repo-wide (was 215; 291 in the original report).
 - [ ] TSK-A11Y-15 Execute test suite `npm run test:run` to verify zero functional regressions. Not met (2026-10-14): no `test:run` script exists (`npx vitest run` used instead); the full run crashed mid-suite (`ERR_IPC_CHANNEL_CLOSED` in the tinypool worker pool) with no summary. Targeted run: 2 files / 4 tests passed (`knowledge-base`, `atlas-admin-page-loader`). Serial run (one file at a time, cache file excluded) also crashed with `ERR_IPC_CHANNEL_CLOSED` after `tests/errors-feedback-fictional-routes.spec.ts`; that file alone: 8 failed, 40 passed (pre-existing, file not changed by this work). Blocked until the crash source and those failures are resolved.
+## Resume here — 2026-10-15
+
+- Committed and pushed: ee756a3bcd (TSK-04, 05, 07, 08, 10, 12, 13 evidence; svelte-check 215 -> 181 warnings, 0 errors).
+- Open: TSK-14 (repo-wide svelte-check warnings, 181 left; deferred by request).
+- Open: TSK-15 (test gate). Full-suite run crashes with ERR_IPC_CHANNEL_CLOSED after tests/errors-feedback-fictional-routes.spec.ts; that file alone has 8 failing tests. Shard runs (4 shards, cache file excluded) completed without crash: 425 failing tests across 112 files in total before the spec-contract fixes.
+- Next: triage the 8 failures in errors-feedback-fictional-routes.spec.ts, then rerun shards to confirm the crash source.
