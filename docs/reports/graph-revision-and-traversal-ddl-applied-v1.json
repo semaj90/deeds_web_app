@@ -1,0 +1,111 @@
+{
+  "receiptVersion": "1.0.0",
+  "contract": "GraphRevisionAndTraversalDDLV1",
+  "timestamp": "2026-10-14T19:24:00Z",
+  "database": "legal_ai_db",
+  "port": 5434,
+  "status": "APPLIED_AND_VERIFIED",
+  "changes": {
+    "sectionA": {
+      "status": "APPLIED",
+      "tablesModified": ["atlas_graph_snapshots_v2", "atlas_graph_nodes_v2"],
+      "columnsAdded": [
+        "atlas_graph_snapshots_v2.workspace_revision",
+        "atlas_graph_snapshots_v2.source_inventory_revision",
+        "atlas_graph_snapshots_v2.graph_revision",
+        "atlas_graph_snapshots_v2.identity_contract_version",
+        "atlas_graph_snapshots_v2.parser_contract_version",
+        "atlas_graph_snapshots_v2.revision_checksum",
+        "atlas_graph_nodes_v2.source_revision"
+      ],
+      "constraintsAddedNotValid": [
+        "atlas_graph_snapshots_v2_workspace_revision_sha256_v2",
+        "atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2",
+        "atlas_graph_snapshots_v2_graph_revision_sha256",
+        "atlas_graph_snapshots_v2_revision_checksum_sha256",
+        "atlas_graph_nodes_v2_source_revision_nonempty"
+      ]
+    },
+    "sectionB": {
+      "status": "VALIDATED",
+      "constraintsValidated": [
+        "atlas_graph_snapshots_v2_workspace_revision_sha256_v2",
+        "atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2",
+        "atlas_graph_snapshots_v2_graph_revision_sha256",
+        "atlas_graph_snapshots_v2_revision_checksum_sha256",
+        "atlas_graph_nodes_v2_source_revision_nonempty"
+      ]
+    },
+    "sectionC": {
+      "status": "APPLIED_CONCURRENTLY",
+      "indexes": [
+        {
+          "name": "atlas_graph_nodes_v2_snapshot_source_ref_idx",
+          "target": "atlas_graph_nodes_v2 (snapshot_id, source_ref) WHERE source_ref IS NOT NULL",
+          "indisvalid": true,
+          "indisready": true,
+          "costReduction": "92,728.25 -> 12.42 (7,466x reduction)",
+          "executionTimeMs": 0.043
+        },
+        {
+          "name": "atlas_graph_nodes_v2_snapshot_type_node_idx",
+          "target": "atlas_graph_nodes_v2 (snapshot_id, node_type, node_key)",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_edges_v2_forward_typed_idx",
+          "target": "atlas_graph_edges_v2 (snapshot_id, source_node_key, edge_type, target_node_key)",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_edges_v2_reverse_typed_idx",
+          "target": "atlas_graph_edges_v2 (snapshot_id, target_node_key, edge_type, source_node_key)",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_relation_participants_v2_node_role_idx",
+          "target": "atlas_graph_relation_participants_v2 (snapshot_id, node_key, role, relation_id)",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_snapshots_v2_workspace_revision_idx",
+          "target": "atlas_graph_snapshots_v2 (workspace_revision, created_at DESC) WHERE workspace_revision IS NOT NULL",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_snapshots_v2_graph_revision_idx",
+          "target": "atlas_graph_snapshots_v2 (graph_revision, created_at DESC) WHERE graph_revision IS NOT NULL",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_snapshots_v2_source_inventory_revision_idx",
+          "target": "atlas_graph_snapshots_v2 (source_inventory_revision, created_at DESC) WHERE source_inventory_revision IS NOT NULL",
+          "indisvalid": true,
+          "indisready": true
+        },
+        {
+          "name": "atlas_graph_nodes_v2_source_revision_idx",
+          "target": "atlas_graph_nodes_v2 (snapshot_id, source_revision) WHERE source_revision IS NOT NULL",
+          "indisvalid": true,
+          "indisready": true
+        }
+      ]
+    },
+    "sectionD": {
+      "status": "APPLIED",
+      "commentsAdded": [
+        "atlas_graph_snapshots_v2.workspace_revision",
+        "atlas_graph_snapshots_v2.source_inventory_revision",
+        "atlas_graph_snapshots_v2.graph_revision",
+        "atlas_graph_snapshots_v2.revision_checksum",
+        "atlas_graph_nodes_v2.source_revision"
+      ]
+    }
+  }
+}

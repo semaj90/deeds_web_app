@@ -10,6 +10,9 @@ import {
   type QueryEvidenceExpectationV1,
   verifyAcePacketV3,
 } from '@deeds/parent-atlas';
+import { attachDomainTaxonomyHintFromAcePacketV1 } from './domain-taxonomy-ace-packet-v1.js';
+
+export type DomainClassificationCompositionStatusV1 = 'ATTACHED' | 'NO_QUALIFIED_CLASSIFICATION' | 'ALREADY_PRESENT' | 'UNAVAILABLE';
 
 export type HyperRagFusionRuntimePacketV1 = {
   packet_key?: string | null;
@@ -41,6 +44,7 @@ export type HyperRagFusionRuntimeResultV1 = {
   acePayloads: AceHypergraphPayloadV1[];
   facade: HypergraphFusionFacadeResult | null;
   reason?: string;
+  domainClassificationStatus?: DomainClassificationCompositionStatusV1;
 };
 
 function toFirstStageHit(
@@ -197,7 +201,13 @@ export async function enrichAcePacketV3WithHyperRagV1(input: {
     };
   }
   try {
-    return { ...result, packet: attachHypergraphEvidenceToAcePacketV3(packet, matching[0]) };
+    const graphEnrichedPacket = attachHypergraphEvidenceToAcePacketV3(packet, matching[0]);
+    try {
+      const classified = attachDomainTaxonomyHintFromAcePacketV1(graphEnrichedPacket);
+      return { ...result, packet: classified.packet, domainClassificationStatus: classified.status };
+    } catch {
+      return { ...result, packet: graphEnrichedPacket, domainClassificationStatus: 'UNAVAILABLE' };
+    }
   } catch (error) {
     return {
       ...result, status: 'UNAVAILABLE', acePayloads: [], packet,

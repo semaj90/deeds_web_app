@@ -1,0 +1,66 @@
+# Rust Language Specification for OKF
+
+version: 1
+language: rust
+name: Rust
+
+extensions:
+  - .rs
+
+exclude_paths:
+  - "**/target/**"
+  - "**/target/debug/**"
+  - "**/target/release/**"
+  - "**/build/**"
+  - "**/.tmp/**"
+
+# Symbol extraction rules (ast-grep / tree-sitter patterns)
+symbol_kinds:
+  function:
+    weight: 1.0
+    description: Function and method declarations
+    ast_labels:
+      - function_item
+    evidence_weight: high
+
+  struct:
+    weight: 0.95
+    description: Struct definitions
+    ast_labels:
+      - struct_item
+    evidence_weight: high
+
+  enum:
+    weight: 0.95
+    description: Enum definitions
+    ast_labels:
+      - enum_item
+    evidence_weight: high
+
+  trait:
+    weight: 0.9
+    description: Trait definitions
+    ast_labels:
+      - trait_item
+    evidence_weight: high
+
+  impl:
+    weight: 0.85
+    description: Inherent and trait implementation blocks
+    ast_labels:
+      - impl_item
+    evidence_weight: medium
+
+  macro:
+    weight: 0.8
+    description: Macro declarations
+    ast_labels:
+      - macro_definition
+    evidence_weight: medium
+
+  test_case:
+    weight: 0.7
+    description: Rust unit and integration tests
+    attributes:
+      - test
+    evidence_weight: medium

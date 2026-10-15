@@ -1,6 +1,6 @@
 {
   "schema": "atlas.validation-progress.v1",
-  "generatedAt": "2026-10-14T04:47:39.833Z",
+  "generatedAt": "2026-10-14T16:08:50.367Z",
   "scope": "only the gates listed here; unscoped phases are N/A, not 0%",
   "gates": [
     {

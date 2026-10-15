@@ -1,6 +1,3 @@
-// Minimal LibTorch-aware shim for GPU operations.
-// This file is selected by CMake only when LibTorch is present.
-
 #include <cstdint>
 #include <cstring>
 #include <algorithm>
@@ -8,7 +5,9 @@
 #include <limits>
 #include <vector>
 #include <string>
+#include <chrono>
 #include <torch/torch.h>
+#include <torch/cuda.h>
 #include "gpu_error_codes.h"
 #include "native_execution_counters.h"
 #include "native_runtime_info.h"
@@ -267,3 +266,127 @@ extern "C" int clusterEmbeddings(const float* embeddings, int n, int dim, int k,
   atlasNativeCounterRecord(AtlasExecutionCounter::cpu_fallback);
   return 0;
 }
+
+// ── graphCandidateGatherGPU ──────────────────────────────────────────────────
+// Performs candidate index gathering on GPU via LibTorch index_select,
+// with optional GEMM cosine rescoring against a query vector,
+// and separately measures host-to-device transfer time and GPU kernel time.
+extern "C" int graphCandidateGatherGPU(
+    const int32_t* candidate_indices, int32_t candidate_count,
+    const float* embeddings, int32_t num_nodes, int32_t dim,
+    const float* query,
+    int32_t top_k,
+    float* out_gathered_embeddings,
+    float* out_scores,
+    int32_t* out_topk_indices,
+    double* out_transfer_ms,
+    double* out_kernel_ms,
+    int32_t* out_backend
+) {
+  if (!candidate_indices || !embeddings || candidate_count <= 0 || num_nodes <= 0 || dim <= 0) {
+    return GPU_ERR_INVALID_ARGS;
+  }
+  // Validate candidate indices against corpus bounds [0, num_nodes)
+  for (int32_t i = 0; i < candidate_count; ++i) {
+    if (candidate_indices[i] < 0 || candidate_indices[i] >= num_nodes) {
+      return GPU_ERR_INVALID_ARGS;
+    }
+  }
+
+  try {
+    torch::NoGradGuard ng;
+    const bool use_cuda = torch::cuda::is_available();
+    const auto dev = use_cuda ? torch::Device(torch::kCUDA) : torch::Device(torch::kCPU);
+
+    auto t_start = std::chrono::high_resolution_clock::now();
+
+    // 1. Host -> Device Memory Transfer
+    auto cpu_idx = torch::from_blob(
+        const_cast<int32_t*>(candidate_indices),
+        {candidate_count},
+        torch::TensorOptions().dtype(torch::kInt32).device(torch::kCPU)
+    );
+    auto gpu_idx = cpu_idx.to(torch::kInt64).to(dev, /*non_blocking=*/use_cuda);
+
+    auto cpu_emb = torch::from_blob(
+        const_cast<float*>(embeddings),
+        {num_nodes, dim},
+        torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU)
+    );
+    auto gpu_emb = cpu_emb.to(dev, /*non_blocking=*/use_cuda);
+
+    torch::Tensor gpu_query;
+    if (query != nullptr) {
+      auto cpu_q = torch::from_blob(
+          const_cast<float*>(query),
+          {1, dim},
+          torch::TensorOptions().dtype(torch::kFloat32).device(torch::kCPU)
+      );
+      gpu_query = cpu_q.to(dev, /*non_blocking=*/use_cuda);
+    }
+
+    if (use_cuda) {
+      torch::cuda::synchronize();
+    }
+    auto t_transfer_done = std::chrono::high_resolution_clock::now();
+    double transfer_ms = std::chrono::duration<double, std::milli>(t_transfer_done - t_start).count();
+    if (out_transfer_ms) *out_transfer_ms = transfer_ms;
+
+    // 2. Kernel Execution (index_select + optional GEMM top-k)
+    auto t_kernel_start = std::chrono::high_resolution_clock::now();
+
+    auto gathered = torch::index_select(gpu_emb, 0, gpu_idx); // [candidate_count, dim]
+
+    if (out_gathered_embeddings != nullptr) {
+      auto cpu_gathered = gathered.to(torch::kCPU).contiguous();
+      std::memcpy(out_gathered_embeddings, cpu_gathered.data_ptr<float>(),
+                  static_cast<size_t>(candidate_count) * dim * sizeof(float));
+    }
+
+    if (query != nullptr && (out_scores != nullptr || out_topk_indices != nullptr)) {
+      auto q_norm = torch::nn::functional::normalize(
+          gpu_query, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+      auto g_norm = torch::nn::functional::normalize(
+          gathered, torch::nn::functional::NormalizeFuncOptions().p(2).dim(1));
+      auto scores = torch::mm(q_norm, g_norm.t()).squeeze(0); // [candidate_count]
+
+      if (top_k > 0 && out_topk_indices != nullptr) {
+        int32_t actual_k = std::min(top_k, candidate_count);
+        auto topk_res = torch::topk(scores, actual_k, /*dim=*/-1, /*largest=*/true, /*sorted=*/true);
+        auto cpu_topk_idx = std::get<1>(topk_res).to(torch::kCPU).to(torch::kInt32).contiguous();
+        auto cpu_topk_scores = std::get<0>(topk_res).to(torch::kCPU).contiguous();
+        std::memcpy(out_topk_indices, cpu_topk_idx.data_ptr<int32_t>(),
+                    static_cast<size_t>(actual_k) * sizeof(int32_t));
+        if (out_scores != nullptr) {
+          std::memcpy(out_scores, cpu_topk_scores.data_ptr<float>(),
+                      static_cast<size_t>(actual_k) * sizeof(float));
+        }
+      } else if (out_scores != nullptr) {
+        auto cpu_scores = scores.to(torch::kCPU).contiguous();
+        std::memcpy(out_scores, cpu_scores.data_ptr<float>(),
+                    static_cast<size_t>(candidate_count) * sizeof(float));
+      }
+    }
+
+    if (use_cuda) {
+      torch::cuda::synchronize();
+    }
+    auto t_kernel_done = std::chrono::high_resolution_clock::now();
+    double kernel_ms = std::chrono::duration<double, std::milli>(t_kernel_done - t_kernel_start).count();
+    if (out_kernel_ms) *out_kernel_ms = kernel_ms;
+
+    if (out_backend) *out_backend = use_cuda ? 1 : 2;
+    atlasNativeCounterRecord(use_cuda ? AtlasExecutionCounter::cuda_execution : AtlasExecutionCounter::cpu_fallback);
+    return GPU_SUCCESS;
+  } catch (const c10::Error& e) {
+    atlasNativeCounterRecord(AtlasExecutionCounter::cuda_error_fallback);
+    if (std::string(e.what()).find("out of memory") != std::string::npos) {
+      atlasNativeCounterRecord(AtlasExecutionCounter::oom_fallback);
+      return GPU_ERR_CUDA_OOM;
+    }
+    return GPU_ERR_TORCH_EXCEPTION;
+  } catch (...) {
+    return GPU_ERR_UNKNOWN;
+  }
+}
+

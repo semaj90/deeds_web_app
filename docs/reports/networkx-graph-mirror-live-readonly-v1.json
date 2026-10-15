@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.networkx-graph-mirror-live-readonly-proof.v1",
+  "status": "LIVE_READ_ONLY_NETWORKX_PARITY_PROVEN_NOT_PROMOTED",
+  "databaseReadOnlyTransaction": true,
+  "databaseWrites": false,
+  "canonicalAuthority": false,
+  "promotionEligible": false,
+  "scope": {
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "executionId": "74d50c86-8194-45ea-8c3d-61aab737ef83",
+    "repositoryId": "repo:root",
+    "sourceInventorySnapshotId": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+    "membershipRows": 24456,
+    "distinctSources": 24456,
+    "matchingCanonicalPackets": 16151
+  },
+  "snapshot": {
+    "snapshotId": "c2509a44-e250-4f94-bdcf-8d51a179a534",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "graphRevision": "15bd9e20a53ef76fc11ff73b11b74f01cdcb1815063db3d2048726cb6e16effc",
+    "revisionChecksum": "bdce4a4c516ecbe13847d5de7974aea18f78ed10b9a1f208219829f799e61d9b",
+    "topologyHash": "4926f7a0987d788b431df7a8db6833d39696d0bc1b2a693778ba910e7813d6c1",
+    "nodeCount": 48339,
+    "directedEdgeCount": 32226,
+    "relationshipTypes": ["CONTAINS", "DERIVED_FROM"]
+  },
+  "networkxReceipt": {
+    "schema": "atlas.networkx-graph-mirror-receipt.v1",
+    "status": "PARITY_PROVEN",
+    "directedNodeAndEdgeParity": true,
+    "workspaceRevisionQualified": true,
+    "graphRevisionQualified": true,
+    "sourceRowsChecksum": "2e650c31244b6c77f125614793df62289e376fdbf5c97760f581a81e8b4175da",
+    "receiptChecksum": "6bb7d09cbac624b8345c0805cd6b9a5236cc04901dcde42bb4285cfef7139fbf"
+  },
+  "artifacts": {
+    "snapshotExportPath": ".tmp/goal/graph-snapshot-root-readonly-v2.json",
+    "snapshotExportBytes": 160612017,
+    "snapshotExportSha256": "423c08162249fadaba391a472926b60bdecdaa45862c3e01666fe6b4c964e11b",
+    "networkxReceiptPath": ".tmp/goal/networkx-graph-mirror-readonly-v1.json"
+  },
+  "limitations": [
+    "The graph revision was derived locally by the canonical GraphSnapshotRevisionV1 owner and was not persisted to PostgreSQL.",
+    "The export is not an ACTIVE or promoted database snapshot; the live snapshot owner still has two superseded rows without revision bindings.",
+    "This materialization contains CONTAINS and DERIVED_FROM edges only; it does not prove ontology tuple admission, CALLS coverage, or HyperGraphRAG/ACE consumption.",
+    "No cuGraph or PyTorch parity run was performed."
+  ]
+}

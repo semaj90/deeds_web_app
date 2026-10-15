@@ -1,0 +1,129 @@
+{
+  "schema": "atlas.ace-4d-manifold-e2e-pipeline-receipt.v1",
+  "timestamp": "2026-10-15T06:08:06.226Z",
+  "status": "PROVEN",
+  "hardware": {
+    "device": "NVIDIA GeForce RTX 3060 Ti",
+    "smArch": 86,
+    "cudaAvailable": true,
+    "driverVersion": 13000
+  },
+  "cpuWorkers": {
+    "poolSize": 4,
+    "workerScript": "compute-worker.mjs",
+    "sharedArrayBufferProtocol": true,
+    "atomicCounters": {
+      "submitted": 9,
+      "completed": 9,
+      "inflight": 0,
+      "failed": 0
+    },
+    "parityMaxDelta": 1.4901161193847656e-8,
+    "topKRankAgreement": true
+  },
+  "pipelineStages": {
+    "tensorIngestion": "Float32Array_zero_copy_torch_from_blob",
+    "somTraining": "trainSOM_cuda_kernel",
+    "kmeansCentroids": "kmeansWithCentroids_libtorch_cuda",
+    "grpoRewardScoring": "rewardScoreGPU_libtorch_cuda",
+    "topKSelection": "topKIndicesGPU_libtorch_cuda",
+    "cpuWorkerSimilarityFallback": "SharedArrayBuffer_zero_copy_worker_threads",
+    "naryHyperGraphRAG": "ontology_tuple_nary_proposal_v1",
+    "oakPredicateValidation": "OKF_SCHEMA_GROUNDED",
+    "acePacketSynthesis": "SUCCESS"
+  },
+  "samplePacket": {
+    "schema": "atlas.ace.packet.proposal.v1",
+    "proposalId": "ace:packet:mv950n69-s28w",
+    "status": "PROPOSED_VERIFIED",
+    "identity": {
+      "canonicalId": "pkt_0_be3670e6fe1b",
+      "candidateOrdinal": 0,
+      "sourceRef": {
+        "filePath": "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "symbol": "RetrievalOrchestrator",
+        "byteSpan": [
+          0,
+          1024
+        ],
+        "fileSizeBytes": 27314,
+        "evidenceHash": "be3670e6fe1b88e993a17b1ae829ee1512bbd99d9c9b0def364eb40ae5c58af3"
+      },
+      "workspaceRevision": "git:35871d115516bc5e6df18cf60dd773b7958d7a11",
+      "sourceRevision": "sha256:503d6dac8f06df5b6823a595c7eae9ebd53a81114cfb104acc1839c96a19a639",
+      "graphRevision": "graph:snapshot:20261014:v1"
+    },
+    "manifold_4d": {
+      "coordinates": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "labels": [
+        "som_x",
+        "som_y",
+        "semantic_z",
+        "grpo_w"
+      ],
+      "hardwareExecution": "CUDA_SM86_RTX_3060_TI",
+      "clusterId": 0
+    },
+    "scoring": {
+      "attentionScore": 0.125095,
+      "grpoReward": 1,
+      "topKRanks": [
+        0,
+        1,
+        2
+      ]
+    },
+    "cpuWorkerParity": {
+      "workers": 4,
+      "maxDelta": 1.4901161193847656e-8,
+      "rankAgreement": true,
+      "gpuDurationMs": 276.971,
+      "cpuDurationMs": 2.754,
+      "atomicCounters": {
+        "submitted": 9,
+        "completed": 9,
+        "inflight": 0,
+        "failed": 0
+      }
+    },
+    "hypergraph": {
+      "naryHyperedge": {
+        "hyperedgeId": "nary:auth_guard:01",
+        "predicate": "regulates",
+        "roles": {
+          "subject": "entity:RetrievalOrchestrator",
+          "predicate": "regulates",
+          "object": "entity:QdrantSearchBackend",
+          "scope": "domain:retrieval_fusion",
+          "context": "workspace:parent_atlas"
+        },
+        "degree": 4,
+        "participantCount": 4
+      },
+      "oakClosureVerified": true,
+      "maxHopsBounded": 2
+    },
+    "residency": {
+      "tier": "L1",
+      "bitfrostKey": "atlas:bitfrost:v1:0:4a09c971",
+      "requestedPrefetch": true,
+      "ttlSeconds": 900
+    },
+    "guardrails": {
+      "canonicalDatabaseWrites": 0,
+      "qdrantWrites": 0,
+      "neo4jWrites": 0,
+      "hiddenThoughtsPersisted": false
+    }
+  },
+  "invariants": {
+    "writes": 0,
+    "zeroCopyTypedArrays": true,
+    "noHiddenThoughts": true
+  }
+}

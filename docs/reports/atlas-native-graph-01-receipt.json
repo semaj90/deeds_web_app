@@ -1,0 +1,250 @@
+{
+  "milestone": "ATLAS-NATIVE-GRAPH-01",
+  "schema_version": "1.0.0",
+  "timestamp": "2026-10-15T06:36:15.840Z",
+  "status": "VERIFIED",
+  "total_duration_ms": 1423,
+  "hardware": {
+    "cuda_available": 1,
+    "device_name": "NVIDIA GeForce RTX 3060 Ti",
+    "total_native_exports": 51
+  },
+  "writes_guardrail": {
+    "canonical_postgres_writes": 0,
+    "qdrant_vector_writes": 0,
+    "neo4j_graph_writes": 0
+  },
+  "tests": [
+    {
+      "name": "Cyclic Graph Traversal",
+      "passed": true,
+      "details": {
+        "visited": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "distances": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "preds": [
+          -1,
+          0,
+          1,
+          2
+        ],
+        "truncated": 0
+      }
+    },
+    {
+      "name": "Disconnected Components",
+      "passed": true,
+      "details": {
+        "visited": [
+          0,
+          1
+        ],
+        "distances": [
+          0,
+          1,
+          -1,
+          -1,
+          -1
+        ],
+        "preds": [
+          -1,
+          0,
+          -1,
+          -1,
+          -1
+        ],
+        "truncated": 0
+      }
+    },
+    {
+      "name": "Directed Edge Asymmetry",
+      "passed": true,
+      "details": {
+        "visited": [
+          1
+        ],
+        "distances": [
+          -1,
+          0
+        ]
+      }
+    },
+    {
+      "name": "Depth Budget Truncation",
+      "passed": true,
+      "details": {
+        "visited": [
+          0,
+          1,
+          2
+        ],
+        "distances": [
+          0,
+          1,
+          2,
+          -1,
+          -1
+        ],
+        "truncated": 1
+      }
+    },
+    {
+      "name": "Edge Scan Budget Truncation",
+      "passed": true,
+      "details": {
+        "edgesScanned": 2,
+        "truncated": 1
+      }
+    },
+    {
+      "name": "Visited Node Budget Truncation",
+      "passed": true,
+      "details": {
+        "visited": [
+          0,
+          1
+        ],
+        "truncated": 1
+      }
+    },
+    {
+      "name": "Strict CSR Validation",
+      "passed": true,
+      "details": {
+        "caughtOffsetsNonZero": true,
+        "caughtColOutOfBounds": true,
+        "caughtDecreasingOffsets": true
+      }
+    },
+    {
+      "name": "Worker: graph.bfs",
+      "passed": true,
+      "details": {
+        "result": [
+          0,
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "name": "Worker: graph.bfs_extended",
+      "passed": true,
+      "details": {
+        "visited": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "distances": [
+          0,
+          1,
+          1,
+          2
+        ],
+        "predecessors": [
+          -1,
+          0,
+          0,
+          1
+        ],
+        "truncated": false,
+        "edgesScanned": 4
+      }
+    },
+    {
+      "name": "Worker: graph.astar",
+      "passed": true,
+      "details": {
+        "path": [
+          0,
+          1,
+          3
+        ]
+      }
+    },
+    {
+      "name": "Worker: graph.greedy",
+      "passed": true,
+      "details": {
+        "path": [
+          0,
+          1,
+          3
+        ]
+      }
+    },
+    {
+      "name": "Worker: graph.ast_traverse",
+      "passed": true,
+      "details": {
+        "nodes": [
+          0,
+          1,
+          3,
+          2
+        ]
+      }
+    },
+    {
+      "name": "Worker: tree.predict",
+      "passed": true,
+      "details": {
+        "scores": [
+          10,
+          20
+        ]
+      }
+    },
+    {
+      "name": "Worker: manifold.slerp",
+      "passed": true,
+      "details": {
+        "mid": [
+          0.7071067690849304,
+          0.7071067690849304,
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "name": "Worker: manifold.interpolate4d",
+      "passed": true,
+      "details": {
+        "synthesized": [
+          0.9999545812606812,
+          0.006737641058862209,
+          0.006737641058862209,
+          0
+        ]
+      }
+    },
+    {
+      "name": "Worker: graph.json_to_csr",
+      "passed": true,
+      "details": {
+        "numNodes": 4,
+        "numEdges": 4
+      }
+    }
+  ],
+  "execution_counters": {
+    "cuda_execution": 0,
+    "cpu_fallback": 14,
+    "stub_invocation": 0,
+    "cuda_error_fallback": 0,
+    "oom_fallback": 0
+  }
+}

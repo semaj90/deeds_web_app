@@ -103,4 +103,36 @@ describe('ts-morph semantic enrichment bridge', () => {
       producerRevision: 'semantic-test',
     })).toThrow(/TS_MORPH_FILE_PATH_MISMATCH/);
   });
+
+  it('refuses candidate metadata paired with changed source bytes', async () => {
+    const original = `export function alpha() { return 1; }`;
+    const candidate = await candidateFor(original, 'alpha');
+
+    expect(() => enrichAstCandidateWithTsMorph({
+      schema: 'atlas.ts-morph-semantic-enrichment-input.v1',
+      candidate,
+      code: `export function alpha() { return 2; }`,
+      filePath: '/workspace/example.ts',
+      tsConfigFilePath: null,
+      semanticEngineRevision: 'ts-morph-27-test',
+      producerRevision: 'semantic-test',
+    })).toThrow(/TS_MORPH_SOURCE_CONTENT_HASH_MISMATCH/);
+  });
+
+  it('refuses legacy candidates without a source content digest', async () => {
+    const code = `export function alpha() { return 1; }`;
+    const candidate = await candidateFor(code, 'alpha');
+    const legacyCandidate = { ...candidate };
+    delete legacyCandidate.sourceContentSha256;
+
+    expect(() => enrichAstCandidateWithTsMorph({
+      schema: 'atlas.ts-morph-semantic-enrichment-input.v1',
+      candidate: legacyCandidate,
+      code,
+      filePath: '/workspace/example.ts',
+      tsConfigFilePath: null,
+      semanticEngineRevision: 'ts-morph-27-test',
+      producerRevision: 'semantic-test',
+    })).toThrow(/TS_MORPH_SOURCE_CONTENT_HASH_MISSING/);
+  });
 });

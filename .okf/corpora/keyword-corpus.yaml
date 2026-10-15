@@ -92,6 +92,21 @@ entries:
           invocation_verified: false
     retrieval_policy: registry_revision_and_permission_schema_checks_remain_required
 
+  - id: http-query-quic-context
+    terms: [HTTP QUERY, RFC 10008, request-body search, Accept-Query, HTTP/3, RFC 9114, QUIC, RFC 9000, query cache key]
+    definition: >-
+      RFC 10008 defines a safe, idempotent HTTP query method with request content;
+      RFC 9114 maps HTTP semantics onto QUIC for HTTP/3. These are separate method
+      and transport layers. This entry is a local reference lookup only: it does
+      not establish Atlas route, HTTP/3, QUIC-RPC, cache, or agent-workflow support.
+    evidence_status: external_protocol_reference_firecrawl_retrieved_beautifulsoup_validation_blocked
+    source_refs:
+      - docs/.okf/rfc-http-query/README.md
+      - https://www.rfc-editor.org/rfc/rfc10008.html
+      - https://www.rfc-editor.org/rfc/rfc9114.html
+      - https://www.rfc-editor.org/rfc/rfc9000.html
+    retrieval_policy: reference_only; require route_server_client_and_cache_key_proof_before_runtime_use
+
   - id: symbol-document-diagnostic-lut
     terms: [symbol TOC, symbol LUT, reverse lookup, qualified symbol lookup, document crosswalk]
     definition: >-

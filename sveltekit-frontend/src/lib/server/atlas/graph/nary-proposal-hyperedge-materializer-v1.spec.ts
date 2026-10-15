@@ -6,6 +6,7 @@ import {
   buildAdmittedNaryHyperEdgeEvidenceV1,
   materializeAdmittedNaryFactProposalV1,
 } from './nary-proposal-hyperedge-materializer-v1.js';
+import { hyperedgeToLegacyHyperRelationV1 } from '../integration/hyperedge-projection-adapters-v1.js';
 
 const owners = [
   { canonicalId: 'route:search', entityType: 'ROUTE', entityRevision: 'source:v1' },
@@ -46,6 +47,18 @@ describe('admitted NaryFactProposalV1 materializer', () => {
       role,
       ...(ordinal !== undefined ? { ordinal } : {}),
     })));
+  });
+
+  it('preserves the graph revision when projecting to the existing retrieval relation', () => {
+    const proposal = makeProposal();
+    const relation = hyperedgeToLegacyHyperRelationV1(materializeAdmittedNaryFactProposalV1(proposal));
+
+    expect(relation.graphRevision).toBe(proposal.graphRevision);
+    expect(relation.workspaceRevision).toBe(proposal.workspaceRevision);
+    expect(relation.sourceRevision).toBe(proposal.sourceRevision);
+    expect(relation.participants.map((participant) => participant.canonicalId)).toEqual(
+      proposal.participants.map((participant) => participant.canonicalId),
+    );
   });
 
   it('rejects a proposal that has not passed admission', () => {

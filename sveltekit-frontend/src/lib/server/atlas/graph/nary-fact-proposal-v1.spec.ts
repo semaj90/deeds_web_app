@@ -1,10 +1,22 @@
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import {
   createNaryFactProposalV1,
+  NaryFactProposalV1Schema,
   verifyNaryFactProposalChecksumV1,
 } from './nary-fact-proposal-v1.js';
 
 describe('NaryFactProposalV1', () => {
+  it('keeps the checked-in .okf JSON Schema aligned with the TypeScript owner', async () => {
+    const schemaPath = resolve(process.cwd(), '..', '.okf', 'schemas', 'nary-fact-proposal-v1.schema.json');
+    const publishedSchema = JSON.parse(await readFile(schemaPath, 'utf8')) as Record<string, unknown>;
+    delete publishedSchema.$id;
+    delete publishedSchema.title;
+    expect(publishedSchema).toEqual(z.toJSONSchema(NaryFactProposalV1Schema));
+  });
+
   it('creates a deterministic, non-canonical n-ary proposal', () => {
     const proposal = createNaryFactProposalV1({
       sourceRef: 'src/routes.ts',
@@ -65,4 +77,34 @@ describe('NaryFactProposalV1', () => {
 
     expect(first.proposalChecksum).not.toBe(second.proposalChecksum);
   });
+
+  it('binds the current predicate policy digests into the proposal checksum', () => {
+    const policy = {
+      schema: 'atlas.okf.predicate-policy-ref.v1' as const,
+      registryDocumentSha256: 'a'.repeat(64),
+      registrySchemaSha256: 'b'.repeat(64),
+    };
+    const first = createNaryFactProposalV1({ ...basePolicyFixture(), predicatePolicy: policy });
+    const second = createNaryFactProposalV1({
+      ...basePolicyFixture(),
+      predicatePolicy: { ...policy, registryDocumentSha256: 'c'.repeat(64) },
+    });
+
+    expect(first.proposalChecksum).not.toBe(second.proposalChecksum);
+  });
 });
+
+function basePolicyFixture() {
+  return {
+    sourceRef: 'src/policy.ts', sourceRevision: 'source:v1', workspaceRevision: 'workspace:v1',
+    packetKey: 'packet:policy', graphRevision: 'graph:v1', producerRevision: 'policy-test:v1',
+    predicate: 'uses_concept',
+    participants: [
+      { canonicalId: 'a', role: 'subject', entityType: 'SYMBOL' },
+      { canonicalId: 'b', role: 'concept', entityType: 'CONCEPT' },
+      { canonicalId: 'c', role: 'evidence', entityType: 'PACKET' },
+    ],
+    evidenceRefs: ['evidence:policy'],
+    admission: 'PROPOSED' as const,
+  };
+}

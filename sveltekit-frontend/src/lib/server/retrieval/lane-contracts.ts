@@ -48,6 +48,7 @@ export interface RetrievalInput {
   query: string;
   limit: number;
   filters?: Record<string, unknown>;
+  workspaceRevision?: string;
 }
 
 export interface RerankInput {

@@ -7,6 +7,7 @@ import {
   MAX_HOTNESS_SNAPSHOT_TOP_N,
   buildBucketWarmPlanV1,
   buildHotnessSnapshotV1,
+  buildResidencyBudgetPlanV1,
   computeResidencyScoreV1,
   executeBucketWarmPlanV1,
   readAcePacketV3FromBitfrostV1,
@@ -241,6 +242,52 @@ describe('buildHotnessSnapshotV1', () => {
     const first = buildHotnessSnapshotV1(candidates, 3);
     const second = buildHotnessSnapshotV1(candidates, 3);
     expect(first.artifacts.map((a) => a.key)).toEqual(second.artifacts.map((a) => a.key));
+  });
+});
+
+describe('buildResidencyBudgetPlanV1', () => {
+  const qualified = (key: string, score: number, bytes: number) => ({
+    ...makeArtifact(key, score),
+    eligibility: 'QUALIFIED' as const,
+    sourceRevision: 'source-r1',
+    representationRevision: 'representation-r1',
+    residencyScore: computeResidencyScoreV1({
+      frequency: score,
+      breadth: 1,
+      recencyMs: 0,
+      reconstructionCostMs: 0,
+      latencySavedMs: 0,
+      byteCost: bytes,
+    }),
+  });
+
+  it('assigns deterministic tiers within byte budgets and excludes ineligible entries', () => {
+    const candidates = [
+      qualified('b', 8, 8),
+      qualified('a', 6, 4),
+      { ...qualified('stale', 100, 1), eligibility: 'INELIGIBLE' as const },
+      { ...qualified('missing-revision', 100, 1), sourceRevision: null },
+    ];
+    const plan = buildResidencyBudgetPlanV1({ hotBudgetBytes: 4, warmBudgetBytes: 8, candidates });
+    expect(plan.entries.map(({ key, tier }) => [key, tier])).toEqual([
+      ['a', 'HOT'],
+      ['b', 'WARM'],
+      ['missing-revision', 'COLD'],
+      ['stale', 'COLD'],
+    ]);
+    expect(plan.hotBytes).toBe(4);
+    expect(plan.warmBytes).toBe(8);
+    expect(plan.writesPerformed).toBe(false);
+    expect(plan.eligibleForAuthority).toBe(false);
+    expect(buildResidencyBudgetPlanV1({ hotBudgetBytes: 4, warmBudgetBytes: 8, candidates })).toEqual(plan);
+  });
+
+  it('rejects duplicate identities and invalid byte budgets', () => {
+    const candidate = qualified('same', 1, 1);
+    expect(() => buildResidencyBudgetPlanV1({ hotBudgetBytes: 2, warmBudgetBytes: 2, candidates: [candidate, candidate] }))
+      .toThrow('RESIDENCY_CANDIDATE_KEY_INVALID_OR_DUPLICATE');
+    expect(() => buildResidencyBudgetPlanV1({ hotBudgetBytes: -1, warmBudgetBytes: 2, candidates: [] }))
+      .toThrow('RESIDENCY_BUDGET_INVALID');
   });
 });
 

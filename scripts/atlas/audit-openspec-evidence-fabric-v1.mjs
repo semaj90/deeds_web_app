@@ -1048,6 +1048,16 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
   });
   const proofReceiptMatches = receiptMatches.filter((match) => match.proofEligible);
   const supersededEvidenceIds = new Set(receipts.map((receipt) => receipt.supersedesEvidenceId).filter(Boolean));
+  const taskLocalEvidenceCandidates = receiptMatches.filter((match) =>
+    match.canonicalSchemaValid
+    && match.resolution === 'BOUND'
+    && ['BOUND_EXACT', 'BOUND_ALIAS', 'BOUND_SOURCE_REF'].includes(match.bindingType)
+    && match.taskRevisionCurrent
+    && match.sourceCurrent
+    && match.taskSpanMatched
+    && match.sourceRefsCurrent
+    && match.verdict === 'PROVEN'
+    && !supersededEvidenceIds.has(match.evidenceId));
   const cards = taskRows.map((task) => {
     const matches = proofReceiptMatches.filter((receipt) => receipt.canonicalTaskRef === task.canonicalTaskRef);
     const activeMatches = matches.filter((receipt) => !supersededEvidenceIds.has(receipt.evidenceId));
@@ -1129,6 +1139,8 @@ export function buildPortfolioCensus(root = DEFAULT_ROOT) {
       checkedWithEvidence,
       checkedWithoutEvidence,
       uncheckedButProven,
+      taskLocalEvidenceCandidateReceipts: taskLocalEvidenceCandidates.length,
+      tasksWithTaskLocalEvidenceCandidates: new Set(taskLocalEvidenceCandidates.map((match) => match.canonicalTaskRef)).size,
       taskIdMissing: taskRows.filter((task) => task.taskId === null).length,
       tasks_total: taskRows.length,
       explicit_task_ids: taskRows.filter((task) => task.taskIdentity.identityState === 'DECLARED_ID').length,

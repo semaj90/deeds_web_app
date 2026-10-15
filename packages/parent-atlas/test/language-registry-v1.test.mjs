@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildLanguageRegistryV1, resolveLanguageLabelV1 } from '../dist/core/language-registry-v1.js';
+import { buildLanguageRegistryV1, resolveLanguageLabelV1, treeSitterCatalogToVocabularyV1 } from '../dist/core/language-registry-v1.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const vocabularies = [
   { sourceOwner: 'ast-schema', sourceRevision: 'ddl:rev1', namespace: 'AST_PARSER_LANGUAGE', labels: ['typescript', 'svelte'] },
@@ -59,4 +61,26 @@ test('rejects alias bindings whose source or target was not observed in its owne
       authorityOwner: 'owner', authorityRevision: 'r1', evidenceRefs: ['proof'],
     }],
   }), /LANGUAGE_ALIAS_SOURCE_NOT_IN_VOCABULARY/);
+});
+
+test('adapts frozen Tree-sitter grammar candidates without claiming parser or LSP readiness', () => {
+  const catalogPath = fileURLToPath(new URL('../../../.okf/languages/tree-sitter-language-pack-catalog-v1.json', import.meta.url));
+  const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+  const vocabulary = treeSitterCatalogToVocabularyV1(catalog);
+  assert.equal(vocabulary.labels.length, 371);
+  assert.equal(vocabulary.namespace, 'PARSER_GRAMMAR_ID');
+  assert.equal(vocabulary.sourceOwner, 'tree-sitter-language-pack@1.14.0');
+  const registry = buildLanguageRegistryV1({ vocabularies: [vocabulary], bindings: [] });
+  assert.equal(resolveLanguageLabelV1(registry, { namespace: 'PARSER_GRAMMAR_ID', label: 'python' }).status, 'UNMAPPED');
+  assert.equal(resolveLanguageLabelV1(registry, { namespace: 'PARSER_GRAMMAR_ID', label: 'not-a-grammar' }).status, 'UNSUPPORTED');
+  assert.equal(catalog.lspServerBindings.length, 0);
+  assert.equal(catalog.canonicalAuthority, false);
+  assert.equal(catalog.writesPerformed, false);
+});
+
+test('rejects a modified Tree-sitter catalog before registry admission', () => {
+  const catalogPath = fileURLToPath(new URL('../../../.okf/languages/tree-sitter-language-pack-catalog-v1.json', import.meta.url));
+  const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+  catalog.entries[0].grammarId = 'tampered';
+  assert.throws(() => treeSitterCatalogToVocabularyV1(catalog), /TREE_SITTER_CATALOG_CHECKSUM_MISMATCH/);
 });

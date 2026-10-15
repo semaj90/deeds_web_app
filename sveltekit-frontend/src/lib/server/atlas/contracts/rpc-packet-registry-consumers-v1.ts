@@ -48,6 +48,54 @@ export const FutureConsumerReceiptV1Schema = z.object({
 
 export type FutureConsumerReceiptV1 = z.infer<typeof FutureConsumerReceiptV1Schema>;
 
+export const TorchAnalysisRpcReceiptV1Schema = z.object({
+  schema: z.literal('atlas.torch-analysis-rpc-receipt.v1'),
+  requestId: id,
+  runId: id,
+  workerId: id,
+  operation: z.enum(['graph_tensor_metrics', 'exact_semantic', 'feature_projection']),
+  status: z.enum(['SUCCEEDED', 'FAILED', 'INCOMPLETE']),
+  workspaceId: id,
+  workspaceRevision: id,
+  registryManifestChecksum: digest,
+  candidateSnapshotRevision: id,
+  ordinalMapChecksum: digest,
+  inputArtifactId: id,
+  inputArtifactUri: id,
+  inputArtifactChecksum: digest,
+  inputShape: z.array(z.number().int().nonnegative()).min(1),
+  inputDtype: z.enum(['float32', 'float16', 'bfloat16', 'int8', 'uint32']),
+  outputArtifactId: id.nullable(),
+  outputArtifactUri: id.nullable(),
+  outputArtifactChecksum: digest.nullable(),
+  outputShape: z.array(z.number().int().nonnegative()).min(1).nullable(),
+  outputDtype: z.enum(['float32', 'float16', 'bfloat16', 'int8', 'uint32']).nullable(),
+  metricReceiptSchema: id,
+  metricReceiptChecksum: digest,
+  replayChecksum: digest,
+  torchVersion: id,
+  producerRevision: id,
+  device: z.enum(['cpu', 'cuda']),
+  generatedAt: z.string().datetime(),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+}).strict().superRefine((value, ctx) => {
+  const outputFields = [value.outputArtifactId, value.outputArtifactUri, value.outputArtifactChecksum, value.outputShape, value.outputDtype];
+  const hasOutput = outputFields.every((field) => field !== null);
+  const noOutput = outputFields.every((field) => field === null);
+  if (!hasOutput && !noOutput) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['outputArtifactId'], message: 'TORCH_OUTPUT_ARTIFACT_FIELDS_MUST_BE_ALL_PRESENT_OR_NULL' });
+  }
+  if (value.status === 'SUCCEEDED' && !hasOutput) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['outputArtifactId'], message: 'TORCH_SUCCEEDED_REQUIRES_OUTPUT_ARTIFACT' });
+  }
+  if (value.status !== 'SUCCEEDED' && hasOutput) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['outputArtifactId'], message: 'TORCH_NON_SUCCESS_CANNOT_CLAIM_OUTPUT_ARTIFACT' });
+  }
+});
+
+export type TorchAnalysisRpcReceiptV1 = z.infer<typeof TorchAnalysisRpcReceiptV1Schema>;
+
 export const AgenticDenseSearchAdmissionV1Schema = z.object({
   schema: z.literal('atlas.agentic-dense-search-admission.v1'),
   workspaceId: id,

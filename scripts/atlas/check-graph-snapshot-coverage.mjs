@@ -1,17 +1,23 @@
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
+const databaseUrl = resolveDatabaseUrl(loadRepoEnv(process.env));
 const client = new pg.Client({
-  host: '127.0.0.1',
-  port: 5434,
-  user: 'legal_admin',
-  password: '123456',
-  database: 'legal_ai_db',
+  connectionString: databaseUrl,
   statement_timeout: 5000,
 });
 
 async function main() {
   await client.connect();
+  let transactionOpen = false;
   try {
+    await client.query('BEGIN READ ONLY');
+    transactionOpen = true;
+    const readOnlyResult = await client.query('SHOW transaction_read_only');
+    if (readOnlyResult.rows[0]?.transaction_read_only !== 'on') {
+      throw new Error('POSTGRES_TRANSACTION_NOT_READ_ONLY');
+    }
+
     // 1. Catalog row estimates for graph tables
     const tableStats = await client.query(`
       SELECT relname, GREATEST(0, reltuples)::bigint AS estimated_rows
@@ -72,17 +78,25 @@ async function main() {
       edgeSummary = [{ error: e.message }];
     }
 
-    // 3. Check indexes on atlas_graph_nodes_v2 and atlas_graph_edges_v2
+    // 6. Capture index definitions and readiness for graph tables
     const indexRes = await client.query(`
-      SELECT tablename, indexname, indisvalid, indisready
-      FROM pg_indexes
-      JOIN pg_class ON pg_class.relname = pg_indexes.indexname
-      JOIN pg_index ON pg_index.indexrelid = pg_class.oid
-      WHERE tablename IN ('atlas_graph_nodes_v2', 'atlas_graph_edges_v2', 'atlas_graph_snapshots_v2')
-      ORDER BY tablename, indexname;
+      SELECT table_ns.nspname AS schemaname,
+             table_class.relname AS tablename,
+             index_class.relname AS indexname,
+             index_state.indisvalid,
+             index_state.indisready,
+             pg_get_indexdef(index_class.oid) AS indexdef
+      FROM pg_index AS index_state
+      JOIN pg_class AS index_class ON index_class.oid = index_state.indexrelid
+      JOIN pg_class AS table_class ON table_class.oid = index_state.indrelid
+      JOIN pg_namespace AS table_ns ON table_ns.oid = table_class.relnamespace
+      WHERE table_class.relname IN ('atlas_graph_nodes_v2', 'atlas_graph_edges_v2', 'atlas_graph_snapshots_v2')
+      ORDER BY table_ns.nspname, table_class.relname, index_class.relname;
     `);
 
     console.log(JSON.stringify({
+      transactionReadOnly: true,
+      databaseWrites: false,
       tableStats: tableStats.rows,
       snapshotCols,
       snapshots,
@@ -91,6 +105,7 @@ async function main() {
       indexes: indexRes.rows,
     }, null, 2));
   } finally {
+    if (transactionOpen) await client.query('ROLLBACK').catch(() => undefined);
     await client.end();
   }
 }

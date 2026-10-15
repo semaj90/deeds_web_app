@@ -366,6 +366,7 @@ export interface SearchResult {
      * than throwing.
      */
     hypergraphNeighbors?: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
+    hypergraphGraphRevision?: string;
     /**
      * True when this SearchRuntime instance was constructed with
    * `readOnly: true` (see `SearchRuntimeConfig.readOnly`) — i.e. this call
@@ -400,6 +401,12 @@ export interface SearchRuntimeConfig {
   caseId?: string;
   /** Injected retrieval adapters. When absent, production singletons are used. */
   retrievers?: Retriever[];
+  /** Optional, read-only, revision-qualified function discovery supplement. */
+  functionRegistry?: {
+    enabled: boolean;
+    repoRoot: string;
+    maxCandidates?: number;
+  };
   /** Injected reranker. When absent, `rerankCanonicalFeatureEnvelopes` is used. */
   reranker?: Reranker;
   /** Options for Stage 3b: candidate scorer. */
@@ -472,6 +479,7 @@ export class SearchRuntime {
   private userId?: string;
   private caseId?: string;
   private injectedRetrievers?: Retriever[];
+  private functionRegistry?: SearchRuntimeConfig['functionRegistry'];
   private injectedReranker?: Reranker;
   private scorerOptions?: ScorerOptions;
   private postProcessConfig?: Partial<PostProcessConfig>;
@@ -483,6 +491,7 @@ export class SearchRuntime {
     this.userId = config.userId;
     this.caseId = config.caseId;
     this.injectedRetrievers = config.retrievers;
+    this.functionRegistry = config.functionRegistry?.enabled ? config.functionRegistry : undefined;
     this.injectedReranker = config.reranker;
     this.scorerOptions = config.scorerOptions;
     this.postProcessConfig = config.postProcessConfig;
@@ -640,7 +649,10 @@ export class SearchRuntime {
             rerankerUsed: false,
             promotionAttempted: false,
             readOnly: this.readOnly,
-            ...(hypergraphNeighborsDegraded ? { hypergraphNeighbors: hypergraphNeighborsDegraded } : {}),
+            ...(hypergraphNeighborsDegraded ? {
+              hypergraphNeighbors: hypergraphNeighborsDegraded.neighbors,
+              hypergraphGraphRevision: hypergraphNeighborsDegraded.graphRevision,
+            } : {}),
           },
         };
       }
@@ -853,7 +865,10 @@ export class SearchRuntime {
           rerankerUsed: reranked.length > 0,
           promotionAttempted: !this.readOnly,
           readOnly: this.readOnly,
-          ...(hypergraphNeighbors ? { hypergraphNeighbors } : {}),
+          ...(hypergraphNeighbors ? {
+            hypergraphNeighbors: hypergraphNeighbors.neighbors,
+            hypergraphGraphRevision: hypergraphNeighbors.graphRevision,
+          } : {}),
         },
       };
     } catch (error) {
@@ -874,13 +889,17 @@ export class SearchRuntime {
   ): Promise<Candidate[]> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
       const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
-      return applySearchMetadataFilter(
-        await retrieveAllCandidates(query.text, query.filters, undefined, options),
-        query.filters
-      );
+      const baseCandidates = await retrieveAllCandidates(query.text, query.filters, undefined, options);
+      const functionCandidates = await this.retrieveFunctionRegistryCandidates(query);
+      return applySearchMetadataFilter([...baseCandidates, ...functionCandidates], query.filters);
     }
 
-    const input = { query: query.text, limit: query.topK * 5, filters: query.filters as Record<string, unknown> };
+    const input = {
+      query: query.text,
+      limit: query.topK * 5,
+      filters: query.filters as Record<string, unknown>,
+      ...(query.workspaceRevision ? { workspaceRevision: query.workspaceRevision } : {}),
+    };
     const perLane = await Promise.all(
       this.injectedRetrievers.map(r => r.retrieve(input).catch(err => {
         console.warn(`[search-runtime] retriever(${r.lane}) failed:`, (err as Error).message);
@@ -933,6 +952,46 @@ export class SearchRuntime {
             ? 'bm42'
             : undefined,
     })), query.filters);
+  }
+
+  private async retrieveFunctionRegistryCandidates(query: SearchQuery): Promise<Candidate[]> {
+    if (!this.functionRegistry || !query.workspaceRevision) return [];
+    try {
+      const { createPostgresFunctionRegistryRetrieverV1 } = await import(
+        '../atlas/function-registry/function-registry-postgres-snapshot-loader-v1.js'
+      );
+      const retriever = createPostgresFunctionRegistryRetrieverV1({
+        repoRoot: this.functionRegistry.repoRoot,
+        expectedWorkspaceRevision: query.workspaceRevision,
+        maxCandidates: Math.min(this.functionRegistry.maxCandidates ?? 8, 16),
+      });
+      const rows = await retriever.retrieve({
+        query: query.text,
+        limit: Math.min(query.topK * 2, 32),
+        workspaceRevision: query.workspaceRevision,
+      });
+      return rows.map((row) => ({
+        id: row.packetKey,
+        packetKey: row.packetKey,
+        symbolVersionId: row.symbolVersionId ?? null,
+        sourceRef: row.sourceRef,
+        summary: '',
+        content: '',
+        score: row.score ?? 0,
+        scoreSource: 'ast_tree',
+        workspaceRevision: row.workspaceRevision ?? query.workspaceRevision,
+        sourceRevision: row.sourceRevision ?? undefined,
+        retrievalExecutor: 'function_registry_verified_snapshot',
+        treeNodeId: typeof row.metadata?.['tree_node_id'] === 'string'
+          ? String(row.metadata['tree_node_id'])
+          : undefined,
+        identityStatus: 'canonical',
+        identitySource: 'symbol_version_id',
+      }));
+    } catch (error) {
+      console.warn('[search-runtime] function registry supplement unavailable:', (error as Error).message);
+      return [];
+    }
   }
 
   /**
@@ -1108,7 +1167,10 @@ export class SearchRuntime {
    */
   private async lookupHypergraphNeighbors(
     packets: FeatureEnvelope[],
-  ): Promise<Array<{ canonicalId: string; hyperedgeIds: string[] }> | undefined> {
+  ): Promise<{
+    graphRevision: string;
+    neighbors: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
+  } | undefined> {
     const workspaceRevisions = new Set(packets.map((packet) => packet.workspace_revision?.trim()).filter(Boolean));
     const graphRevisions = new Set(packets.map((packet) => packet.graph_revision?.trim()).filter(Boolean));
     if (
@@ -1138,7 +1200,9 @@ export class SearchRuntime {
         workspaceRevision: [...workspaceRevisions][0]!,
         graphRevision: [...graphRevisions][0]!,
       });
-      return receipt.neighbors.length > 0 ? receipt.neighbors : undefined;
+      return receipt.neighbors.length > 0
+        ? { graphRevision: [...graphRevisions][0]!, neighbors: receipt.neighbors }
+        : undefined;
     } catch (error) {
       console.warn('[search-runtime] hypergraph neighbor lookup failed (non-blocking):', error);
       return undefined;
@@ -1517,7 +1581,12 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
  * Factory for creating search runtime instances (production path — no injected adapters).
  * Backward-compatible: existing callers require no changes.
  */
-export function createSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
+export function createSearchRuntime(config?: {
+  userId?: string;
+  caseId?: string;
+  readOnly?: boolean;
+  functionRegistry?: SearchRuntimeConfig['functionRegistry'];
+}): SearchRuntime {
   return new SearchRuntime(config ?? {});
 }
 
@@ -1525,6 +1594,11 @@ export function createSearchRuntime(config?: { userId?: string; caseId?: string;
  * Production factory with explicitly wired DI adapters.
  * Each adapter is fail-closed: returns [] on any error, never throws.
  */
-export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string; readOnly?: boolean }): SearchRuntime {
+export function createProductionSearchRuntime(config?: {
+  userId?: string;
+  caseId?: string;
+  readOnly?: boolean;
+  functionRegistry?: SearchRuntimeConfig['functionRegistry'];
+}): SearchRuntime {
   return new SearchRuntime({ ...(config ?? {}) });
 }

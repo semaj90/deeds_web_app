@@ -74,6 +74,9 @@ napi_status napi_create_object(napi_env, napi_value*);
 
 #include "gpu_error_codes.h"
 #include "native_runtime_info.h"
+#include "graph_search.h"
+#include "tree_ensemble.h"
+#include "manifold_interpolate.h"
 
 extern "C" napi_callback atlas_core_napi_page_rank_callback(void);
 
@@ -106,6 +109,7 @@ static ExportBackendClassification classifyExportBackend(
         "graphSimilarity", "graphSimilarityHalf", "clusterEmbeddings",
         "computeCaseEmbedding", "poolStats", "simdJsonParse",
         "simdJsonValidate", "simdJsonExtractNumbers", "simdJsonBackend",
+        "simdJsonToCSR",
         "getBackendInfo", "checkCudaAvailable"})) {
     return {"cpu_fallback", "source_declares_cpu_implementation"};
   }
@@ -114,7 +118,11 @@ static ExportBackendClassification classifyExportBackend(
     return {"cpu_fallback", "host_counter_control_only"};
   }
 
-  if (name == "batchCosineSimilarity" || name == "batchCosineTopK") {
+  if (exportNameIn(name, {"graphBFS", "graphBFSExtended", "graphAStar", "graphGreedySearch", "traverseAstLinkedList", "forestPredict", "slerpEmbeddings", "manifoldInterpolate4D"})) {
+    return {"cpu_reference", "bounded_graph_search_and_manifold_interpolation"};
+  }
+
+  if (name == "batchCosineSimilarity" || name == "batchCosineTopK" || name == "graphCandidateGatherGPU") {
 #if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
     return torch_cuda_available
       ? ExportBackendClassification{"libtorch_cuda", "libtorch_cuda_runtime_available"}
@@ -182,6 +190,12 @@ extern "C" int batchCosineSimilarity_fp16(const float* query, int dim, const flo
 extern "C" int batchCosineSimilarity(const float* query, int dim, const float* corpus, int n, float* scores, int scores_len);
 extern "C" int batchCosineTopK(const float* query, const float* corpus, int n, int dim, int k,
                                int32_t* indices, float* scores, int output_len, int* backend_out);
+extern "C" int graphCandidateGatherGPU(
+    const int32_t* candidate_indices, int32_t candidate_count,
+    const float* embeddings, int32_t num_nodes, int32_t dim,
+    const float* query, int32_t top_k,
+    float* out_gathered_embeddings, float* out_scores, int32_t* out_topk_indices,
+    double* out_transfer_ms, double* out_kernel_ms, int32_t* out_backend);
 extern "C" int kmeansWithCentroids(const float* embeddings, int n, int dim, int k, int max_iters,
                                     int* assignments_out, int assignments_len,
                                     float* centroids_out, int centroids_len,
@@ -246,6 +260,7 @@ extern "C" napi_value RegisterSimdJsonParse(napi_env env, napi_callback_info inf
 extern "C" napi_value RegisterSimdJsonValidate(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonExtractNumbers(napi_env env, napi_callback_info info);
 extern "C" napi_value RegisterSimdJsonBackend(napi_env env, napi_callback_info info);
+extern "C" napi_value RegisterSimdJsonToCSR(napi_env env, napi_callback_info info);
 
 // ── ArrayBuffer pool ─────────────────────────────────────────────────────────
 //
@@ -831,6 +846,201 @@ static napi_value BatchCosineTopKWrapper(napi_env env, napi_callback_info info) 
   napi_set_named_property(env, result, "scores", scores);
   napi_set_named_property(env, result, "backend", backend_value);
   return result;
+}
+
+// ── graphCandidateGatherGPU(options | args) ──────────────────────────
+// Performs candidate index gathering on GPU via LibTorch index_select,
+// with optional GEMM cosine rescoring against a query vector,
+// and separately measures host-to-device transfer time and GPU kernel time.
+static napi_value GraphCandidateGatherGPUWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+
+  if (argc < 1) {
+    return throw_type_error(env, "graphCandidateGatherGPU: expected object or positional arguments");
+  }
+
+  napi_value v_cand_indices = nullptr;
+  napi_value v_embeddings = nullptr;
+  int32_t num_nodes = 0;
+  int32_t dim = 0;
+  napi_value v_query = nullptr;
+  int32_t top_k = 0;
+
+  napi_valuetype arg0_type;
+  napi_typeof(env, argv[0], &arg0_type);
+
+  if (arg0_type == napi_object) {
+    bool is_ta = false;
+    napi_is_typedarray(env, argv[0], &is_ta);
+    if (!is_ta) {
+      napi_get_named_property(env, argv[0], "candidateIndices", &v_cand_indices);
+      napi_get_named_property(env, argv[0], "embeddings", &v_embeddings);
+      napi_value v_nn, v_d, v_q, v_tk;
+      if (napi_get_named_property(env, argv[0], "numNodes", &v_nn) == napi_ok) {
+        napi_get_value_int32(env, v_nn, &num_nodes);
+      }
+      if (napi_get_named_property(env, argv[0], "dim", &v_d) == napi_ok) {
+        napi_get_value_int32(env, v_d, &dim);
+      }
+      if (napi_get_named_property(env, argv[0], "query", &v_q) == napi_ok) {
+        napi_valuetype vt_q;
+        napi_typeof(env, v_q, &vt_q);
+        if (vt_q != napi_undefined && vt_q != napi_null) v_query = v_q;
+      }
+      if (napi_get_named_property(env, argv[0], "topK", &v_tk) == napi_ok) {
+        napi_valuetype vt_tk;
+        napi_typeof(env, v_tk, &vt_tk);
+        if (vt_tk == napi_number) napi_get_value_int32(env, v_tk, &top_k);
+      }
+    } else {
+      v_cand_indices = argv[0];
+      if (argc > 1) v_embeddings = argv[1];
+      if (argc > 2) napi_get_value_int32(env, argv[2], &num_nodes);
+      if (argc > 3) napi_get_value_int32(env, argv[3], &dim);
+      if (argc > 4) {
+        napi_valuetype vt;
+        napi_typeof(env, argv[4], &vt);
+        if (vt != napi_undefined && vt != napi_null) v_query = argv[4];
+      }
+      if (argc > 5) napi_get_value_int32(env, argv[5], &top_k);
+    }
+  } else {
+    return throw_type_error(env, "graphCandidateGatherGPU: invalid arguments");
+  }
+
+  if (!v_cand_indices || !v_embeddings || num_nodes <= 0 || dim <= 0) {
+    return throw_type_error(env, "graphCandidateGatherGPU: missing required parameters (candidateIndices, embeddings, numNodes, dim)");
+  }
+
+  size_t cand_len = 0;
+  void* cand_data = nullptr;
+  napi_typedarray_type cand_ta_type;
+  if (napi_get_typedarray_info(env, v_cand_indices, &cand_ta_type, &cand_len, &cand_data, nullptr, nullptr) != napi_ok ||
+      cand_ta_type != napi_int32_array || cand_len == 0) {
+    return throw_type_error(env, "graphCandidateGatherGPU: candidateIndices must be a non-empty Int32Array");
+  }
+
+  size_t emb_len = 0;
+  void* emb_data = nullptr;
+  napi_typedarray_type emb_ta_type;
+  if (napi_get_typedarray_info(env, v_embeddings, &emb_ta_type, &emb_len, &emb_data, nullptr, nullptr) != napi_ok ||
+      emb_ta_type != napi_float32_array || emb_len < static_cast<size_t>(num_nodes) * static_cast<size_t>(dim)) {
+    return throw_type_error(env, "graphCandidateGatherGPU: embeddings must be Float32Array of size >= numNodes * dim");
+  }
+
+  void* query_data = nullptr;
+  if (v_query != nullptr) {
+    size_t q_len = 0;
+    napi_typedarray_type q_ta_type;
+    if (napi_get_typedarray_info(env, v_query, &q_ta_type, &q_len, &query_data, nullptr, nullptr) != napi_ok ||
+        q_ta_type != napi_float32_array || q_len < static_cast<size_t>(dim)) {
+      return throw_type_error(env, "graphCandidateGatherGPU: query must be Float32Array of size >= dim");
+    }
+  }
+
+  int32_t candidate_count = static_cast<int32_t>(cand_len);
+
+  void* gathered_data = nullptr;
+  napi_value ab_gathered;
+  size_t gathered_bytes = static_cast<size_t>(candidate_count) * static_cast<size_t>(dim) * sizeof(float);
+  if (create_pooled_ab(env, gathered_bytes, &gathered_data, &ab_gathered) != napi_ok) {
+    return throw_error(env, "graphCandidateGatherGPU: output allocation failed");
+  }
+
+  void* scores_data = nullptr;
+  napi_value ab_scores = nullptr;
+  void* topk_idx_data = nullptr;
+  napi_value ab_topk_idx = nullptr;
+  int32_t actual_k = 0;
+
+  if (query_data != nullptr) {
+    if (top_k > 0) {
+      actual_k = std::min(top_k, candidate_count);
+      create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(float), &scores_data, &ab_scores);
+      create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(int32_t), &topk_idx_data, &ab_topk_idx);
+    } else {
+      create_pooled_ab(env, static_cast<size_t>(candidate_count) * sizeof(float), &scores_data, &ab_scores);
+    }
+  }
+
+  double transfer_ms = 0.0;
+  double kernel_ms = 0.0;
+  int32_t backend = 0;
+
+  int rc = graphCandidateGatherGPU(
+      static_cast<const int32_t*>(cand_data), candidate_count,
+      static_cast<const float*>(emb_data), num_nodes, dim,
+      static_cast<const float*>(query_data),
+      actual_k,
+      static_cast<float*>(gathered_data),
+      static_cast<float*>(scores_data),
+      static_cast<int32_t*>(topk_idx_data),
+      &transfer_ms,
+      &kernel_ms,
+      &backend
+  );
+
+  if (rc != 0) {
+    return throw_error(env, "graphCandidateGatherGPU: execution failed (check bounds or CUDA device)");
+  }
+
+  napi_value result_obj;
+  napi_create_object(env, &result_obj);
+
+  napi_value ta_gathered;
+  napi_create_typedarray(env, napi_float32_array, static_cast<size_t>(candidate_count) * static_cast<size_t>(dim), ab_gathered, 0, &ta_gathered);
+  napi_set_named_property(env, result_obj, "gatheredEmbeddings", ta_gathered);
+
+  if (query_data != nullptr) {
+    if (actual_k > 0) {
+      napi_value ta_scores, ta_topk_idx, ta_cand_ordinals;
+      napi_create_typedarray(env, napi_float32_array, actual_k, ab_scores, 0, &ta_scores);
+      napi_create_typedarray(env, napi_int32_array, actual_k, ab_topk_idx, 0, &ta_topk_idx);
+      napi_set_named_property(env, result_obj, "scores", ta_scores);
+      napi_set_named_property(env, result_obj, "topKIndices", ta_topk_idx);
+
+      void* ord_data = nullptr;
+      napi_value ab_ord;
+      if (create_pooled_ab(env, static_cast<size_t>(actual_k) * sizeof(int32_t), &ord_data, &ab_ord) == napi_ok) {
+        int32_t* dst_ord = static_cast<int32_t*>(ord_data);
+        const int32_t* src_cand = static_cast<const int32_t*>(cand_data);
+        const int32_t* src_sub = static_cast<const int32_t*>(topk_idx_data);
+        for (int32_t i = 0; i < actual_k; ++i) {
+          int32_t sub = src_sub[i];
+          dst_ord[i] = (sub >= 0 && sub < candidate_count) ? src_cand[sub] : -1;
+        }
+        napi_create_typedarray(env, napi_int32_array, actual_k, ab_ord, 0, &ta_cand_ordinals);
+        napi_set_named_property(env, result_obj, "candidateOrdinals", ta_cand_ordinals);
+      }
+    } else {
+      napi_value ta_scores;
+      napi_create_typedarray(env, napi_float32_array, candidate_count, ab_scores, 0, &ta_scores);
+      napi_set_named_property(env, result_obj, "scores", ta_scores);
+    }
+  }
+
+  napi_value telemetry_obj;
+  napi_create_object(env, &telemetry_obj);
+  napi_value val_trans, val_kern, val_tot, val_cnt, val_dim, val_backend;
+  napi_create_double(env, transfer_ms, &val_trans);
+  napi_create_double(env, kernel_ms, &val_kern);
+  napi_create_double(env, transfer_ms + kernel_ms, &val_tot);
+  napi_create_int32(env, candidate_count, &val_cnt);
+  napi_create_int32(env, dim, &val_dim);
+  const char* bname = backend == 1 ? "cuda_libtorch" : "cpu_fallback";
+  napi_create_string_utf8(env, bname, NAPI_AUTO_LENGTH, &val_backend);
+
+  napi_set_named_property(env, telemetry_obj, "transferDurationMs", val_trans);
+  napi_set_named_property(env, telemetry_obj, "kernelDurationMs", val_kern);
+  napi_set_named_property(env, telemetry_obj, "totalDurationMs", val_tot);
+  napi_set_named_property(env, telemetry_obj, "candidateCount", val_cnt);
+  napi_set_named_property(env, telemetry_obj, "dim", val_dim);
+  napi_set_named_property(env, telemetry_obj, "backend", val_backend);
+
+  napi_set_named_property(env, result_obj, "telemetry", telemetry_obj);
+  return result_obj;
 }
 
 // ── GraphSimilarityHalf(Float32Array embeddings, n, dim, Float32Array output, outputLen) → number ─
@@ -1576,6 +1786,478 @@ static napi_value ResetExecutionCountersWrapper(napi_env env, napi_callback_info
   return result;
 }
 
+// ── Graph Search: BFS ────────────────────────────────────────────────
+static napi_value GraphBFSWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 4;
+  napi_value argv[4];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 4) return throw_type_error(env, "graphBFS(Int32Array rowPtr, Int32Array colIndices, startNode, maxNodes)");
+
+  size_t row_len, col_len;
+  void *row_data, *col_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &row_len, &row_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "rowPtr must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &col_len, &col_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "colIndices must be an Int32Array");
+
+  int32_t start_node, max_nodes;
+  napi_get_value_int32(env, argv[2], &start_node);
+  napi_get_value_int32(env, argv[3], &max_nodes);
+
+  if (row_len < 2 || max_nodes <= 0 || max_nodes > 4096)
+    return throw_type_error(env, "Invalid graph dimensions or max_nodes budget");
+
+  int32_t num_nodes = static_cast<int32_t>(row_len - 1);
+  int32_t num_edges = static_cast<int32_t>(col_len);
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(max_nodes) * sizeof(int32_t), &out_data, &ab) != napi_ok)
+    return throw_error(env, "graphBFS: allocation failed");
+
+  int32_t out_count = 0;
+  int rc = graphBFS(
+      reinterpret_cast<const int32_t*>(row_data), num_nodes,
+      reinterpret_cast<const int32_t*>(col_data), num_edges,
+      start_node, max_nodes,
+      reinterpret_cast<int32_t*>(out_data), max_nodes,
+      &out_count
+  );
+
+  if (rc != GRAPH_SEARCH_SUCCESS) {
+    if (rc == GRAPH_SEARCH_ERR_BUDGET_EXCEEDED) return throw_error(env, "BFS_BUDGET");
+    return throw_error(env, "graphBFS failed");
+  }
+
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, out_count, ab, 0, &result);
+  return result;
+}
+
+// ── Graph Search: BFS Extended ───────────────────────────────────────
+static napi_value GraphBFSExtendedWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 3) return throw_type_error(env, "graphBFSExtended(Int32Array rowPtr, Int32Array colIndices, startNode, [maxDepth], [maxVisited], [maxEdgesScanned])");
+
+  size_t row_len, col_len;
+  void *row_data, *col_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &row_len, &row_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "rowPtr must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &col_len, &col_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "colIndices must be an Int32Array");
+
+  int32_t start_node;
+  napi_get_value_int32(env, argv[2], &start_node);
+
+  if (row_len < 2)
+    return throw_type_error(env, "Invalid graph dimensions: rowPtr must have at least 2 elements");
+
+  int32_t num_nodes = static_cast<int32_t>(row_len - 1);
+  int32_t num_edges = static_cast<int32_t>(col_len);
+
+  int32_t max_depth = 1000000;
+  int32_t max_visited = num_nodes;
+  double max_edges_double = 0.0;
+
+  if (argc > 3) {
+    napi_get_value_int32(env, argv[3], &max_depth);
+  }
+  if (argc > 4) {
+    napi_get_value_int32(env, argv[4], &max_visited);
+  }
+  if (argc > 5) {
+    napi_get_value_double(env, argv[5], &max_edges_double);
+  }
+
+  uint64_t max_edges_scanned = (max_edges_double > 0) ? static_cast<uint64_t>(max_edges_double) : 0;
+
+  // Allocate typed arrays for results:
+  // 1. visited: capacity max_visited
+  void* visited_data;
+  napi_value visited_ab;
+  if (create_pooled_ab(env, static_cast<size_t>(max_visited) * sizeof(int32_t), &visited_data, &visited_ab) != napi_ok)
+    return throw_error(env, "graphBFSExtended: visited allocation failed");
+
+  // 2. distances: capacity num_nodes
+  void* distances_data;
+  napi_value distances_ab;
+  if (create_pooled_ab(env, static_cast<size_t>(num_nodes) * sizeof(int32_t), &distances_data, &distances_ab) != napi_ok)
+    return throw_error(env, "graphBFSExtended: distances allocation failed");
+
+  // 3. predecessors: capacity num_nodes
+  void* preds_data;
+  napi_value preds_ab;
+  if (create_pooled_ab(env, static_cast<size_t>(num_nodes) * sizeof(int32_t), &preds_data, &preds_ab) != napi_ok)
+    return throw_error(env, "graphBFSExtended: predecessors allocation failed");
+
+  int32_t visited_count = 0;
+  int32_t truncated = 0;
+  uint64_t edges_scanned = 0;
+
+  int rc = graphBFSExtended(
+      reinterpret_cast<const int32_t*>(row_data), num_nodes,
+      reinterpret_cast<const int32_t*>(col_data), num_edges,
+      start_node, max_depth, max_visited, max_edges_scanned,
+      reinterpret_cast<int32_t*>(visited_data), &visited_count,
+      reinterpret_cast<int32_t*>(distances_data),
+      reinterpret_cast<int32_t*>(preds_data),
+      &truncated, &edges_scanned
+  );
+
+  if (rc != GRAPH_SEARCH_SUCCESS) {
+    return throw_error(env, "graphBFSExtended failed: invalid arguments or corrupted CSR layout");
+  }
+
+  napi_value visited_val, distances_val, preds_val;
+  napi_create_typedarray(env, napi_int32_array, visited_count, visited_ab, 0, &visited_val);
+  napi_create_typedarray(env, napi_int32_array, num_nodes, distances_ab, 0, &distances_val);
+  napi_create_typedarray(env, napi_int32_array, num_nodes, preds_ab, 0, &preds_val);
+
+  napi_value trunc_val, edges_val;
+  napi_create_int32(env, truncated, &trunc_val);
+  napi_create_double(env, static_cast<double>(edges_scanned), &edges_val);
+
+  napi_value result_obj;
+  napi_create_object(env, &result_obj);
+  napi_set_named_property(env, result_obj, "visited", visited_val);
+  napi_set_named_property(env, result_obj, "distances", distances_val);
+  napi_set_named_property(env, result_obj, "predecessors", preds_val);
+  napi_set_named_property(env, result_obj, "truncated", trunc_val);
+  napi_set_named_property(env, result_obj, "edgesScanned", edges_val);
+
+  return result_obj;
+}
+
+// ── Graph Search: A* ─────────────────────────────────────────────────
+static napi_value GraphAStarWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 7;
+  napi_value argv[7];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 7) return throw_type_error(env, "graphAStar(rowPtr, colIndices, edgeWeights, heuristics, start, goal, maxExpansions)");
+
+  size_t row_len, col_len, w_len;
+  void *row_data, *col_data, *w_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &row_len, &row_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "rowPtr must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &col_len, &col_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "colIndices must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[2], nullptr, &w_len, &w_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "edgeWeights must be a Float32Array");
+
+  const float* h_ptr = nullptr;
+  napi_valuetype h_type;
+  napi_typeof(env, argv[3], &h_type);
+  if (h_type == napi_object) {
+    size_t h_len;
+    void* h_data;
+    if (napi_get_typedarray_info(env, argv[3], nullptr, &h_len, &h_data, nullptr, nullptr) == napi_ok) {
+      h_ptr = reinterpret_cast<const float*>(h_data);
+    }
+  }
+
+  int32_t start, goal, max_expansions;
+  napi_get_value_int32(env, argv[4], &start);
+  napi_get_value_int32(env, argv[5], &goal);
+  napi_get_value_int32(env, argv[6], &max_expansions);
+
+  if (row_len < 2 || max_expansions <= 0)
+    return throw_type_error(env, "Invalid graph dimensions or max_expansions");
+
+  int32_t num_nodes = static_cast<int32_t>(row_len - 1);
+  int32_t num_edges = static_cast<int32_t>(col_len);
+
+  std::vector<int32_t> temp_out(static_cast<size_t>(num_nodes));
+  int32_t out_count = 0;
+  int rc = graphAStar(
+      reinterpret_cast<const int32_t*>(row_data), num_nodes,
+      reinterpret_cast<const int32_t*>(col_data), num_edges,
+      reinterpret_cast<const float*>(w_data),
+      h_ptr, start, goal, max_expansions,
+      temp_out.data(), num_nodes, &out_count
+  );
+
+  if (rc == GRAPH_SEARCH_ERR_HEURISTIC_INVALID) return throw_error(env, "ASTAR_HEURISTIC_INVALID");
+  if (rc == GRAPH_SEARCH_ERR_EDGE_WEIGHT_INVALID) return throw_error(env, "ASTAR_EDGE_WEIGHT_INVALID");
+  if (rc == GRAPH_SEARCH_ERR_BUDGET_EXCEEDED) return throw_error(env, "ASTAR_BUDGET");
+
+  if (rc != GRAPH_SEARCH_SUCCESS || out_count == 0) {
+    void* out_data;
+    napi_value ab;
+    create_pooled_ab(env, sizeof(int32_t), &out_data, &ab);
+    napi_value result;
+    napi_create_typedarray(env, napi_int32_array, 0, ab, 0, &result);
+    return result;
+  }
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(out_count) * sizeof(int32_t), &out_data, &ab) != napi_ok)
+    return throw_error(env, "graphAStar: allocation failed");
+
+  std::memcpy(out_data, temp_out.data(), static_cast<size_t>(out_count) * sizeof(int32_t));
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, out_count, ab, 0, &result);
+  return result;
+}
+
+// ── Graph Search: Greedy Best-First ──────────────────────────────────
+static napi_value GraphGreedySearchWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 6) return throw_type_error(env, "graphGreedySearch(rowPtr, colIndices, heuristics, start, goal, maxExpansions)");
+
+  size_t row_len, col_len, h_len;
+  void *row_data, *col_data, *h_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &row_len, &row_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "rowPtr must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &col_len, &col_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "colIndices must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[2], nullptr, &h_len, &h_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "heuristics must be a Float32Array");
+
+  int32_t start, goal, max_expansions;
+  napi_get_value_int32(env, argv[3], &start);
+  napi_get_value_int32(env, argv[4], &goal);
+  napi_get_value_int32(env, argv[5], &max_expansions);
+
+  if (row_len < 2 || max_expansions <= 0)
+    return throw_type_error(env, "Invalid graph dimensions or max_expansions");
+
+  int32_t num_nodes = static_cast<int32_t>(row_len - 1);
+  int32_t num_edges = static_cast<int32_t>(col_len);
+
+  std::vector<int32_t> temp_out(static_cast<size_t>(num_nodes));
+  int32_t out_count = 0;
+  int rc = graphGreedySearch(
+      reinterpret_cast<const int32_t*>(row_data), num_nodes,
+      reinterpret_cast<const int32_t*>(col_data), num_edges,
+      reinterpret_cast<const float*>(h_data),
+      start, goal, max_expansions,
+      temp_out.data(), num_nodes, &out_count
+  );
+
+  if (rc == GRAPH_SEARCH_ERR_HEURISTIC_INVALID) return throw_error(env, "GREEDY_HEURISTIC_INVALID");
+  if (rc == GRAPH_SEARCH_ERR_BUDGET_EXCEEDED) return throw_error(env, "GREEDY_BUDGET");
+
+  if (rc != GRAPH_SEARCH_SUCCESS || out_count == 0) {
+    void* out_data;
+    napi_value ab;
+    create_pooled_ab(env, sizeof(int32_t), &out_data, &ab);
+    napi_value result;
+    napi_create_typedarray(env, napi_int32_array, 0, ab, 0, &result);
+    return result;
+  }
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(out_count) * sizeof(int32_t), &out_data, &ab) != napi_ok)
+    return throw_error(env, "graphGreedySearch: allocation failed");
+
+  std::memcpy(out_data, temp_out.data(), static_cast<size_t>(out_count) * sizeof(int32_t));
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, out_count, ab, 0, &result);
+  return result;
+}
+
+// ── AST Linked-List Traversal ────────────────────────────────────────
+static napi_value TraverseAstLinkedListWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 5;
+  napi_value argv[5];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 5) return throw_type_error(env, "traverseAstLinkedList(firstChild, nextSibling, startNode, maxDepth, maxNodes)");
+
+  size_t fc_len, ns_len;
+  void *fc_data, *ns_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &fc_len, &fc_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "firstChild must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &ns_len, &ns_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "nextSibling must be an Int32Array");
+
+  int32_t start_node, max_depth, max_nodes;
+  napi_get_value_int32(env, argv[2], &start_node);
+  napi_get_value_int32(env, argv[3], &max_depth);
+  napi_get_value_int32(env, argv[4], &max_nodes);
+
+  if (fc_len != ns_len || max_nodes <= 0)
+    return throw_type_error(env, "Mismatched AST arrays or invalid max_nodes");
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(max_nodes) * sizeof(int32_t), &out_data, &ab) != napi_ok)
+    return throw_error(env, "traverseAstLinkedList: allocation failed");
+
+  int32_t out_count = 0;
+  int rc = traverseAstLinkedList(
+      reinterpret_cast<const int32_t*>(fc_data),
+      reinterpret_cast<const int32_t*>(ns_data),
+      static_cast<int32_t>(fc_len),
+      start_node, max_depth,
+      reinterpret_cast<int32_t*>(out_data), max_nodes,
+      &out_count
+  );
+
+  if (rc != GRAPH_SEARCH_SUCCESS) return throw_error(env, "traverseAstLinkedList failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_int32_array, out_count, ab, 0, &result);
+  return result;
+}
+
+// ── Decision Tree & Forest Predict ───────────────────────────────────
+static napi_value ForestPredictWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 9;
+  napi_value argv[9];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 9) return throw_type_error(env, "forestPredict(features, nRows, nCols, featureIndices, thresholds, leftChildren, rightChildren, leafValues, treeRoots)");
+
+  size_t feat_len, fi_len, th_len, lc_len, rc_len, lv_len, tr_len;
+  void *feat_data, *fi_data, *th_data, *lc_data, *rc_data, *lv_data, *tr_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &feat_len, &feat_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "features must be a Float32Array");
+
+  int32_t n_rows, n_cols;
+  napi_get_value_int32(env, argv[1], &n_rows);
+  napi_get_value_int32(env, argv[2], &n_cols);
+
+  if (napi_get_typedarray_info(env, argv[3], nullptr, &fi_len, &fi_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "featureIndices must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[4], nullptr, &th_len, &th_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "thresholds must be a Float32Array");
+  if (napi_get_typedarray_info(env, argv[5], nullptr, &lc_len, &lc_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "leftChildren must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[6], nullptr, &rc_len, &rc_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "rightChildren must be an Int32Array");
+  if (napi_get_typedarray_info(env, argv[7], nullptr, &lv_len, &lv_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "leafValues must be a Float32Array");
+  if (napi_get_typedarray_info(env, argv[8], nullptr, &tr_len, &tr_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "treeRoots must be an Int32Array");
+
+  if (fi_len != th_len || fi_len != lc_len || fi_len != rc_len || fi_len != lv_len) {
+    return throw_type_error(env, "Tree node parameter array lengths must match");
+  }
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(n_rows) * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "forestPredict: allocation failed");
+
+  int rc = forestPredict(
+      reinterpret_cast<const float*>(feat_data), n_rows, n_cols,
+      reinterpret_cast<const int32_t*>(fi_data),
+      reinterpret_cast<const float*>(th_data),
+      reinterpret_cast<const int32_t*>(lc_data),
+      reinterpret_cast<const int32_t*>(rc_data),
+      reinterpret_cast<const float*>(lv_data),
+      static_cast<int32_t>(fi_len),
+      reinterpret_cast<const int32_t*>(tr_data),
+      static_cast<int32_t>(tr_len),
+      reinterpret_cast<float*>(out_data), n_rows
+  );
+
+  if (rc != TREE_ENSEMBLE_SUCCESS) return throw_error(env, "forestPredict failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, n_rows, ab, 0, &result);
+  return result;
+}
+
+// ── Manifold: SLERP Embeddings ───────────────────────────────────────
+static napi_value SlerpEmbeddingsWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 3;
+  napi_value argv[3];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 3) return throw_type_error(env, "slerpEmbeddings(Float32Array v1, Float32Array v2, float t)");
+
+  size_t v1_len, v2_len;
+  void *v1_data, *v2_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &v1_len, &v1_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "v1 must be a Float32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &v2_len, &v2_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "v2 must be a Float32Array");
+
+  if (v1_len != v2_len || v1_len == 0)
+    return throw_type_error(env, "v1 and v2 must have matching non-zero lengths");
+
+  double t_val;
+  napi_get_value_double(env, argv[2], &t_val);
+
+  int32_t dim = static_cast<int32_t>(v1_len);
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(dim) * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "slerpEmbeddings: allocation failed");
+
+  int rc = slerpEmbeddings(
+      reinterpret_cast<const float*>(v1_data),
+      reinterpret_cast<const float*>(v2_data),
+      static_cast<float>(t_val),
+      dim,
+      reinterpret_cast<float*>(out_data),
+      dim
+  );
+
+  if (rc != MANIFOLD_INTERP_SUCCESS) return throw_error(env, "slerpEmbeddings failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, dim, ab, 0, &result);
+  return result;
+}
+
+// ── Manifold: 4D RBF Interpolation ───────────────────────────────────
+static napi_value ManifoldInterpolate4DWrapper(napi_env env, napi_callback_info info) {
+  size_t argc = 6;
+  napi_value argv[6];
+  napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr);
+  if (argc < 5) return throw_type_error(env, "manifoldInterpolate4D(Float32Array coords4D, Float32Array embeddings, int32_t n, int32_t dim, Float32Array query4D, [float epsilon])");
+
+  size_t c_len, e_len, q_len;
+  void *c_data, *e_data, *q_data;
+  if (napi_get_typedarray_info(env, argv[0], nullptr, &c_len, &c_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "coords4D must be a Float32Array");
+  if (napi_get_typedarray_info(env, argv[1], nullptr, &e_len, &e_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "embeddings must be a Float32Array");
+
+  int32_t n, dim;
+  napi_get_value_int32(env, argv[2], &n);
+  napi_get_value_int32(env, argv[3], &dim);
+
+  if (napi_get_typedarray_info(env, argv[4], nullptr, &q_len, &q_data, nullptr, nullptr) != napi_ok)
+    return throw_type_error(env, "query4D must be a Float32Array");
+
+  if (c_len < static_cast<size_t>(n) * 4 || e_len < static_cast<size_t>(n) * static_cast<size_t>(dim) || q_len < 4) {
+    return throw_type_error(env, "Array dimension mismatch for 4D manifold interpolation");
+  }
+
+  double eps_val = 2.0;
+  if (argc > 5) {
+    napi_get_value_double(env, argv[5], &eps_val);
+  }
+
+  void* out_data;
+  napi_value ab;
+  if (create_pooled_ab(env, static_cast<size_t>(dim) * sizeof(float), &out_data, &ab) != napi_ok)
+    return throw_error(env, "manifoldInterpolate4D: allocation failed");
+
+  int rc = manifoldInterpolate4D(
+      reinterpret_cast<const float*>(c_data),
+      reinterpret_cast<const float*>(e_data),
+      n, dim,
+      reinterpret_cast<const float*>(q_data),
+      static_cast<float>(eps_val),
+      reinterpret_cast<float*>(out_data),
+      dim
+  );
+
+  if (rc != MANIFOLD_INTERP_SUCCESS) return throw_error(env, "manifoldInterpolate4D failed");
+
+  napi_value result;
+  napi_create_typedarray(env, napi_float32_array, dim, ab, 0, &result);
+  return result;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -1594,6 +2276,7 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "getCudaMemory", GetCudaMemoryWrapper);
   registerFn(env, exports, "batchCosineSimilarity", BatchCosineSimilarityWrapper);
   registerFn(env, exports, "batchCosineTopK", BatchCosineTopKWrapper);
+  registerFn(env, exports, "graphCandidateGatherGPU", GraphCandidateGatherGPUWrapper);
   registerFn(env, exports, "graphSimilarityHalf", GraphSimilarityHalfWrapper);
   // pytorch_graph: graph analysis + ML ops
   registerFn(env, exports, "pageRankGPU", PageRankGPUWrapper);
@@ -1617,12 +2300,23 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);
   registerFn(env, exports, "simdJsonExtractNumbers", RegisterSimdJsonExtractNumbers);
   registerFn(env, exports, "simdJsonBackend", RegisterSimdJsonBackend);
+  registerFn(env, exports, "simdJsonToCSR", RegisterSimdJsonToCSR);
   // CUDA Graph capture/replay (Phase H1 + Phase H2 stream support)
   registerFn(env, exports, "captureGraph", CaptureGraphWrapper);
   registerFn(env, exports, "replayGraph", ReplayGraphWrapper);
   registerFn(env, exports, "replayGraphOnStream", ReplayGraphOnStreamWrapper);
   registerFn(env, exports, "cudaGraphCount", CudaGraphCountWrapper);
   registerFn(env, exports, "cuvsCompressEmbedding", RegisterCuvsCompress);
+  // Graph search & tree ensemble helpers
+  registerFn(env, exports, "graphBFS", GraphBFSWrapper);
+  registerFn(env, exports, "graphBFSExtended", GraphBFSExtendedWrapper);
+  registerFn(env, exports, "graphAStar", GraphAStarWrapper);
+  registerFn(env, exports, "graphGreedySearch", GraphGreedySearchWrapper);
+  registerFn(env, exports, "traverseAstLinkedList", TraverseAstLinkedListWrapper);
+  registerFn(env, exports, "forestPredict", ForestPredictWrapper);
+  // Manifold interpolation helpers
+  registerFn(env, exports, "slerpEmbeddings", SlerpEmbeddingsWrapper);
+  registerFn(env, exports, "manifoldInterpolate4D", ManifoldInterpolate4DWrapper);
   registerFn(env, exports, "getExecutionCounters", GetExecutionCountersWrapper);
   registerFn(env, exports, "resetExecutionCounters", ResetExecutionCountersWrapper);
   // Register last so getBackendInfo can enumerate every other native export.

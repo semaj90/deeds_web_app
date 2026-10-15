@@ -14,18 +14,61 @@
  */
 
 import { createHash } from 'crypto';
+import { z } from 'zod';
 import { getRedis } from '$lib/server/redis.js';
+import { stableStringify } from '$lib/server/analysis/stable-hash.js';
 import type { RpcCacheResult, RpcHitLevel, RpcProvenance, RpcTransport } from '$lib/types/rpc-cache.js';
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 3;
+
+export interface RpcCacheStore {
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string, expiry: 'EX', ttlSeconds: number): Promise<unknown>;
+  del(key: string): Promise<unknown>;
+}
+
+const rpcCacheEnvelopeSchema = z.object({
+  schemaVersion: z.literal(SCHEMA_VERSION),
+  transport: z.enum(['remote-function', 'grpc', 'mcp', 'qdrant', 'gpu', 'http']),
+  method: z.string().min(1),
+  argsHash: z.string().regex(/^[a-f0-9]{64}$/),
+  cacheKey: z.string().min(1),
+  ttlSeconds: z.number().int().positive(),
+  createdAt: z.string().datetime(),
+  expiresAt: z.string().datetime(),
+  hitLevel: z.literal('MISS'),
+  payloadChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/),
+  payload: z.unknown(),
+  provenance: z.object({
+    qdrantIds: z.array(z.string()).optional(),
+    graphNodeIds: z.array(z.string()).optional(),
+    hyperedgeIds: z.array(z.string()).optional(),
+    clusterIds: z.array(z.number()).optional(),
+    somCells: z.array(z.string()).optional(),
+    grpcMethod: z.string().optional(),
+    mcpTool: z.string().optional(),
+  }).optional(),
+});
 
 // ── Stable hash ────────────────────────────────────────────────────────────
 
 export function stableHash(args: unknown): string {
   return createHash('sha256')
-    .update(JSON.stringify(args))
+    .update(stableStringify(args))
     .digest('hex')
-    .slice(0, 16);
+}
+
+function payloadChecksum(payload: unknown): string {
+  return `sha256:${createHash('sha256').update(stableStringify(payload)).digest('hex')}`;
+}
+
+function createRedisCacheStore(): RpcCacheStore {
+  const redis = getRedis();
+  return {
+    get: (key) => redis.get(key),
+    set: (key, value, expiry, ttlSeconds) => redis.set(key, value, expiry, ttlSeconds),
+    del: (key) => redis.del(key),
+  };
 }
 
 // ── Core wrapper ───────────────────────────────────────────────────────────
@@ -34,8 +77,10 @@ export interface RpcCacheOptions {
   transport: RpcTransport;
   method: string;
   ttlSeconds: number;
-  /** If set, deadline exceeded kills the compute promise (ms) */
+  /** If set, reject the waiting request after this deadline (ms); underlying work is not cancellable. */
   deadlineMs?: number;
+  /** Injected store for deterministic tests; production defaults to the existing Redis owner. */
+  cacheStore?: RpcCacheStore;
 }
 
 /**
@@ -52,16 +97,30 @@ export async function withRpcCache<T>(
 ): Promise<RpcCacheResult<T>> {
   const argsHash = stableHash(args);
   const key = `rpc:${opts.transport}:${opts.method}:v${SCHEMA_VERSION}:${argsHash}`;
+  let store = opts.cacheStore;
 
   // ── L1: Redis exact hit ──────────────────────────────────────────────────
   try {
-    const redis = getRedis();
-    const cached = await redis.get(key);
+    const activeStore = store ?? (store = createRedisCacheStore());
+    const cached = await activeStore.get(key);
     if (cached) {
-      return {
-        value: JSON.parse(cached) as T,
-        cache: { hit: true, hitLevel: 'L1_REDIS', key, ttlSeconds: opts.ttlSeconds },
-      };
+      const parsed = rpcCacheEnvelopeSchema.safeParse(JSON.parse(cached));
+      if (
+        parsed.success &&
+        parsed.data.transport === opts.transport &&
+        parsed.data.method === opts.method &&
+        parsed.data.argsHash === argsHash &&
+        parsed.data.cacheKey === key &&
+        parsed.data.ttlSeconds === opts.ttlSeconds &&
+        Date.parse(parsed.data.expiresAt) > Date.now() &&
+        parsed.data.payloadChecksum === payloadChecksum(parsed.data.payload)
+      ) {
+        return {
+          value: parsed.data.payload as T,
+          cache: { hit: true, hitLevel: 'L1_REDIS', key, ttlSeconds: opts.ttlSeconds },
+        };
+      }
+      await activeStore.del(key).catch(() => undefined);
     }
   } catch {
     // Redis down — fall through to compute
@@ -70,17 +129,25 @@ export async function withRpcCache<T>(
   // ── Miss: compute with optional deadline ─────────────────────────────────
   let value: T;
   if (opts.deadlineMs) {
-    const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error(`[rpc-cache] deadline ${opts.deadlineMs}ms exceeded: ${opts.method}`)), opts.deadlineMs)
-    );
-    value = await Promise.race([compute(), timeout]);
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(
+          () => reject(new Error(`[rpc-cache] deadline ${opts.deadlineMs}ms exceeded: ${opts.method}`)),
+          opts.deadlineMs,
+        );
+      });
+      value = await Promise.race([compute(), timeout]);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   } else {
     value = await compute();
   }
 
   // ── Write to Redis ────────────────────────────────────────────────────────
   try {
-    const redis = getRedis();
+    const activeStore = store ?? (store = createRedisCacheStore());
     const now = Date.now();
     const envelope = {
       schemaVersion: SCHEMA_VERSION,
@@ -92,10 +159,11 @@ export async function withRpcCache<T>(
       createdAt: new Date(now).toISOString(),
       expiresAt: new Date(now + opts.ttlSeconds * 1000).toISOString(),
       hitLevel: 'MISS' as RpcHitLevel,
+      payloadChecksum: payloadChecksum(value),
       payload: value,
       provenance,
     };
-    await redis.set(key, JSON.stringify(envelope.payload), 'EX', opts.ttlSeconds);
+    await activeStore.set(key, JSON.stringify(envelope), 'EX', opts.ttlSeconds);
   } catch {
     // Redis write failure is non-fatal
   }
@@ -111,7 +179,7 @@ export async function withRpcCache<T>(
 /**
  * Delete all cache keys matching a transport:method prefix.
  * E.g. invalidateRpcPrefix('grpc', 'GetClusterSummary') clears all
- * rpc:grpc:GetClusterSummary:v1:* keys.
+ * rpc:grpc:GetClusterSummary:v3:* keys.
  */
 export async function invalidateRpcPrefix(transport: RpcTransport, method: string): Promise<number> {
   try {

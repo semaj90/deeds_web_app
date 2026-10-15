@@ -1,12 +1,24 @@
+import asyncio
 import sys
 from pathlib import Path
 
-from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / ".." / "services" / "atlas-gpu-8098"))
 
 import app as gpu_executor_app  # noqa: E402
+
+
+def _request(method, path, payload=None):
+    async def send():
+        async with AsyncClient(
+            transport=ASGITransport(app=gpu_executor_app.app),
+            base_url="http://testserver",
+        ) as client:
+            return await client.request(method, path, json=payload)
+
+    return asyncio.run(send())
 
 
 def test_kmeans_route_is_mounted_and_uses_existing_runtime(monkeypatch):
@@ -53,10 +65,9 @@ def test_kmeans_route_is_mounted_and_uses_existing_runtime(monkeypatch):
         "residencyLease": lease,
     }
 
-    with TestClient(gpu_executor_app.app) as client:
-        schema = client.get("/openapi.json").json()
-        assert "/v1/semantic512/kmeans" in schema["paths"]
-        response = client.post("/v1/semantic512/kmeans", json=payload)
+    schema = _request("GET", "/openapi.json").json()
+    assert "/v1/semantic512/kmeans" in schema["paths"]
+    response = _request("POST", "/v1/semantic512/kmeans", payload)
 
     assert response.status_code == 200
     result = response.json()
@@ -94,8 +105,7 @@ def test_kmeans_route_rejects_wrong_residency_executor(monkeypatch):
         },
     }
 
-    with TestClient(gpu_executor_app.app) as client:
-        response = client.post("/v1/semantic512/kmeans", json=payload)
+    response = _request("POST", "/v1/semantic512/kmeans", payload)
 
     assert response.status_code == 428
     assert response.json()["detail"] == "GPU_RESIDENCY_EXECUTOR_MISMATCH:cuvs:cuml"

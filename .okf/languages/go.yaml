@@ -1,0 +1,53 @@
+# Go Language Specification for OKF
+
+version: 1
+language: go
+name: Go
+
+extensions:
+  - .go
+
+exclude_paths:
+  - "**/vendor/**"
+  - "**/bin/**"
+  - "**/build/**"
+  - "**/.tmp/**"
+
+# Symbol extraction rules (ast-grep / tree-sitter patterns)
+symbol_kinds:
+  function:
+    weight: 1.0
+    description: Top-level function declarations
+    ast_labels:
+      - function_declaration
+    evidence_weight: high
+
+  method:
+    weight: 1.0
+    description: Receiver method declarations
+    ast_labels:
+      - method_declaration
+    evidence_weight: high
+
+  struct:
+    weight: 0.95
+    description: Struct type definitions
+    ast_labels:
+      - type_spec
+    evidence_weight: high
+
+  interface:
+    weight: 0.95
+    description: Interface type definitions
+    ast_labels:
+      - type_spec
+    evidence_weight: high
+
+  test_case:
+    weight: 0.7
+    description: Go test functions
+    function_patterns:
+      - "Test*"
+      - "Benchmark*"
+      - "Example*"
+    evidence_weight: medium

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atlas.okf.feature-relationships.v1",
+  "title": "Parent Atlas feature relationship predicate registry",
+  "type": "object",
+  "required": [
+    "version",
+    "registry_id",
+    "status",
+    "owner",
+    "degree_semantics",
+    "canonical_relationship",
+    "predicates",
+    "cardinality",
+    "quality_gates"
+  ],
+  "properties": {
+    "version": {"const": 1},
+    "registry_id": {"const": "atlas.feature-relationships"},
+    "status": {"const": "active"},
+    "owner": {"type": "string", "minLength": 1},
+    "degree_semantics": {
+      "type": "object",
+      "required": ["definition", "participant_count_is_degree", "graph_node_degree_is_relationship_degree", "cardinality_is_relationship_degree", "kinds"],
+      "properties": {
+        "definition": {"const": "number_of_distinct_participating_entity_types"},
+        "participant_count_is_degree": {"const": false},
+        "graph_node_degree_is_relationship_degree": {"const": false},
+        "cardinality_is_relationship_degree": {"const": false},
+        "kinds": {
+          "type": "object",
+          "required": ["unary", "binary", "ternary", "nary"],
+          "properties": {
+            "unary": {"const": 1},
+            "binary": {"const": 2},
+            "ternary": {"const": 3},
+            "nary": {"const": ">=4"}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "canonical_relationship": {
+      "type": "object",
+      "required": ["required_fields", "participant_fields", "optional_participant_fields", "projection_rule"],
+      "properties": {
+        "required_fields": {
+          "const": ["relationship_id", "relationship_type", "participants", "participant_count", "relationship_degree", "relationship_degree_kind", "source_ref", "source_revision", "relationship_revision", "producer_revision"]
+        },
+        "participant_fields": {"const": ["role", "entity_type", "entity_id"]},
+        "optional_participant_fields": {"const": ["entity_revision", "source_ref"]},
+        "projection_rule": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "predicates": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": "object",
+        "required": ["allowed_degree", "pagerank_eligible", "traversal_eligible"],
+        "properties": {
+          "allowed_degree": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["unary", "binary", "ternary", "nary"]}},
+          "required_entity_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "recommended_entity_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "pagerank_eligible": {"type": "boolean"},
+          "traversal_eligible": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "cardinality": {
+      "type": "object",
+      "required": ["representation", "max_values"],
+      "properties": {
+        "representation": {"const": "per_role_min_max"},
+        "max_values": {"const": ["positive_integer", "many"]}
+      },
+      "additionalProperties": false
+    },
+    "quality_gates": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["reject_declared_degree_mismatch", "reject_duplicate_cardinality_role", "reject_unknown_cardinality_role", "require_revision_qualified_source", "require_relationship_id_on_pairwise_projection"]}
+    }
+  },
+  "additionalProperties": false
+}

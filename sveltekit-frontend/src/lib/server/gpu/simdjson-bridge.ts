@@ -288,7 +288,7 @@ export function fastJsonValidate(input: string): boolean {
 
 /**
  * Extract a numeric array at a JSON Pointer path directly into a Float64Array.
- * Zero-copy for embedding vectors — avoids full JS object allocation.
+ * Avoids full JS object allocation, but materializes a Float64Array copy; it is not zero-copy.
  * Returns null if addon unavailable or path not found.
  */
 export function fastJsonExtractNumbers(input: string, pointer: string): Float64Array | null {

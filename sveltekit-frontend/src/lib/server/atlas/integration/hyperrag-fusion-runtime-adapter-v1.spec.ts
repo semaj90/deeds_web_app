@@ -7,14 +7,14 @@ const sha = (c: string) => `sha256:${c.repeat(64)}`;
 function packetV3() {
 	const pending = <T>(data: T) => ({ status: 'PENDING' as const, revision: null, evidence_refs: [], data });
 	return buildAcePacketV3({
-		base: {
+			base: {
 			packet_revision: 'packet-rev-1',
-			envelope: { packet_key: 'packet:1', source_ref: 'src/example.ts', canonical_source_ref: 'src/example.ts', feature_id: 'feature:1', source_revision: 'source-rev-1' },
+			envelope: { packet_key: 'packet:1', source_ref: 'src/retrieval/search.ts', canonical_source_ref: 'src/retrieval/search.ts', feature_id: 'feature:retrieval-search', source_revision: 'source-rev-1' },
 			hypergraph: null,
 			producer_revision: 'packet-producer-1',
 		},
 		identity: {
-			packet_key: 'packet:1', source_ref: 'src/example.ts', workspace_revision: 'workspace:1', source_revision: 'source-rev-1',
+			packet_key: 'packet:1', source_ref: 'src/retrieval/search.ts', workspace_revision: 'workspace:1', source_revision: 'source-rev-1',
 			packet_revision: 'packet-rev-1', producer_revision: 'packet-producer-1', representation_id: 'semantic_768', representation_revision: null,
 			feature_revision: null, graph_revision: null, symbol_version_id: null, tree_node_id: null,
 		},
@@ -81,8 +81,8 @@ describe('HyperRAG live fusion adapter', () => {
 			relationship_id: 'relationship:feature-evidence', relationship_type: 'supported_by',
 			participants: [
 				{ role: 'feature', entity_type: 'feature', entity_id: 'feature:1' },
-				{ role: 'source', entity_type: 'source', entity_id: 'src/example.ts' },
-			], cardinality: [], source_ref: 'src/example.ts', source_revision: 'source-rev-1',
+				{ role: 'source', entity_type: 'source', entity_id: 'src/retrieval/search.ts' },
+			], cardinality: [], source_ref: 'src/retrieval/search.ts', source_revision: 'source-rev-1',
 			relationship_revision: 'relationship-rev-1', producer_revision: 'relationship-producer-1',
 			evidence_refs: ['evidence:exact-source'], confidence: 0.9, metadata: {},
 		});
@@ -98,5 +98,9 @@ describe('HyperRAG live fusion adapter', () => {
 		expect(result.packet.base.hypergraph?.retrieval.graph_hops_executed).toBeLessThanOrEqual(2);
 		expect(result.packet.base.hypergraph?.retrieval.fanout_limit).toBe(3);
 		expect(result.packet.base.hypergraph?.relationship_evidence[0]?.relationship_id).toBe('relationship:feature-evidence');
+		expect(result.domainClassificationStatus).toBe('ATTACHED');
+		expect(result.packet.classification?.status).toBe('HINT');
+		expect(result.packet.classification?.data.predictedDomain).toBe('retrieval');
+		expect(result.packet.classification?.data.sourceRevision).toBe(result.packet.identity.source_revision);
 	});
 });

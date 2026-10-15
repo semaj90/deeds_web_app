@@ -3,9 +3,6 @@ type: integration architecture
 title: Protocol and Service Adapters
 description: Maps the repository's retrieval, agent, GPU, storage, and generated-protobuf surfaces to their callers and ownership boundaries. Distinguishes implemented adapters from design-only or fail-closed surfaces so protocol changes do not become business-logic or persistence changes.
 tags: [protocols, adapters, retrieval, grpc, mcp, a2a, gpu, protobuf, ownership]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Protocol and Service Adapters

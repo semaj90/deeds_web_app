@@ -1,0 +1,66 @@
+{
+  "milestone": "ATLAS-CUDA-GATHER-01",
+  "schema_version": "1.0.0",
+  "timestamp": "2026-10-15T06:35:27.650Z",
+  "status": "VERIFIED",
+  "total_duration_ms": 2039,
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 3060 Ti",
+    "free_vram_gb": 6.90625
+  },
+  "tests": [
+    {
+      "name": "CUDA-01: Candidate Gather & Parity",
+      "passed": true,
+      "details": {
+        "candidateCount": 6,
+        "maxDiff": 0,
+        "top1Ordinal": 123,
+        "top1Score": 1.000000238418579,
+        "backend": "cuda_libtorch"
+      }
+    },
+    {
+      "name": "CUDA-02: Isolated Latency Measurement",
+      "passed": true,
+      "details": {
+        "transferDurationMs": 0.6861,
+        "kernelDurationMs": 0.9844,
+        "totalDurationMs": 1.6705,
+        "ratioTransferToKernel": 0.7
+      }
+    },
+    {
+      "name": "Bounds Validation: Fail-Closed Protection",
+      "passed": true,
+      "details": {
+        "caughtNegative": true,
+        "caughtExcess": true
+      }
+    },
+    {
+      "name": "Pure Gather (No Query Vector)",
+      "passed": true,
+      "details": {
+        "outputElements": 3072,
+        "rows": 4,
+        "dim": 768
+      }
+    },
+    {
+      "name": "VRAM Headroom Check",
+      "passed": true,
+      "details": {
+        "freeVramGb": 6.91,
+        "threshold": 1
+      }
+    }
+  ],
+  "invariants": {
+    "zero_canonical_mutations": true,
+    "h2d_transfer_isolated": true,
+    "bounds_checked": true,
+    "memory_lifetime_safe": true
+  }
+}

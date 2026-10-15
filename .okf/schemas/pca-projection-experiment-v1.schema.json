@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parent-atlas.local/schemas/pca-projection-experiment-v1.schema.json",
+  "title": "Parent Atlas PCA Projection Experiment V1",
+  "description": "A non-authoritative, revision-bound PCA projection artifact receipt. This schema does not authorize persistence or retrieval promotion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "canonical_authority",
+    "source_snapshot_checksum",
+    "row_ordinal_checksum",
+    "input_representation",
+    "input_dimensions",
+    "output_dimensions",
+    "projection_revision",
+    "mean_digest",
+    "components_digest",
+    "output_dtype",
+    "output_shape",
+    "output_byte_length",
+    "output_digest"
+  ],
+  "properties": {
+    "schema": { "const": "atlas.pca-projection-experiment.v1" },
+    "status": { "enum": ["CANDIDATE", "VALIDATED", "REJECTED"] },
+    "canonical_authority": { "const": false },
+    "source_snapshot_checksum": { "$ref": "#/$defs/sha256" },
+    "row_ordinal_checksum": { "$ref": "#/$defs/sha256" },
+    "input_representation": { "const": "semantic_768" },
+    "input_dimensions": { "const": 768 },
+    "output_dimensions": { "type": "integer", "minimum": 1, "maximum": 768 },
+    "projection_revision": { "type": "string", "minLength": 1 },
+    "mean_digest": { "$ref": "#/$defs/sha256" },
+    "components_digest": { "$ref": "#/$defs/sha256" },
+    "output_dtype": { "enum": ["float32-le", "float16-le", "int8"] },
+    "output_shape": {
+      "type": "array",
+      "prefixItems": [{ "type": "integer", "minimum": 1 }, { "type": "integer", "minimum": 1, "maximum": 768 }],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "output_byte_length": { "type": "integer", "minimum": 1 },
+    "output_digest": { "$ref": "#/$defs/sha256" },
+    "artifact_ref": { "type": "string", "minLength": 1 },
+    "quantization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "scale", "zero_point", "calibration_checksum"],
+      "properties": {
+        "scheme": { "const": "symmetric-per-tensor-int8" },
+        "scale": { "type": "number", "exclusiveMinimum": 0 },
+        "zero_point": { "const": 0 },
+        "calibration_checksum": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "reference_dtype": { "const": "float32-le" },
+        "max_absolute_error": { "type": "number", "minimum": 0 },
+        "mean_squared_error": { "type": "number", "minimum": 0 },
+        "retrieval_recall_at_k": { "type": "number", "minimum": 0, "maximum": 1 },
+        "validation_dataset_checksum": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "output_dtype": { "const": "int8" } }, "required": ["output_dtype"] },
+      "then": { "required": ["quantization"] },
+      "else": { "not": { "required": ["quantization"] } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "VALIDATED" } }, "required": ["status"] },
+      "then": { "required": ["artifact_ref", "validation"] }
+    }
+  ],
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

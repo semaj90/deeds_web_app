@@ -1,5 +1,13 @@
+import { createHash } from 'node:crypto';
 import { candidateFeatureGpuPackV1Schema, type CandidateFeatureGpuPackV1 } from '../features/candidate-feature-gpu-pack-v1.js';
 import { descriptorCacheKey, UnifiedResidencyAdapter, validateUnifiedDescriptor, type FeatureTileProvider, type UnifiedResidencyDescriptor } from './unified-residency-adapter-v1.js';
+
+function float32LeChecksum(values: Float32Array): string {
+  const bytes = new Uint8Array(values.length * Float32Array.BYTES_PER_ELEMENT);
+  const view = new DataView(bytes.buffer);
+  values.forEach((value, index) => view.setFloat32(index * Float32Array.BYTES_PER_ELEMENT, value, true));
+  return createHash('sha256').update(bytes).digest('hex');
+}
 
 export type UnifiedResidencyFeaturePackInputV1 = {
   pack: CandidateFeatureGpuPackV1;
@@ -39,6 +47,7 @@ export function prepareUnifiedResidencyFeaturePackBatchV1(input: UnifiedResidenc
       ropeRevision: input.ropeRevision,
       candidateOrdinal: ordinal,
       artifactChecksum: pack.gpuPackChecksum,
+      payloadChecksum: float32LeChecksum(featureBuffer),
       shape: [1, pack.featureCount],
       dtype: 'float32',
       byteLength: featureBuffer.byteLength,
@@ -101,6 +110,7 @@ export function prepareUnifiedResidencyFeaturePackV1(input: UnifiedResidencyFeat
     // the complete ordered population.
     candidateOrdinal: 0,
     artifactChecksum: pack.gpuPackChecksum,
+    payloadChecksum: pack.featureValuesChecksum,
     shape: [pack.physicalRows, pack.featureCount],
     dtype: 'float32',
     byteLength: pack.featureValues.length * Float32Array.BYTES_PER_ELEMENT,

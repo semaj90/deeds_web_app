@@ -1,0 +1,126 @@
+{
+  "schema": "atlas.vector-index-inventory.v1",
+  "observedAt": "2026-10-14T18:50:39.796Z",
+  "status": "READ_ONLY_INVENTORY_COMPLETE_CROSS_STORE_PARITY_UNPROVEN",
+  "proofLevel": "LIVE_READ_ONLY_CATALOG_AND_COLLECTION_METADATA",
+  "canonicalAuthority": "postgres",
+  "writesPerformed": false,
+  "sourceInventoryReceipt": {
+    "path": ".tmp/atlas/atlas-indexing-surfaces-20261014.json",
+    "sha256": "e504789be9974c44e7109bd338ca6d9faf7e8756097e0eeffa8337d81e653768",
+    "generatedAt": "2026-10-14T18:50:39.796Z"
+  },
+  "postgres": {
+    "serverVersion": "18.4 (Debian 18.4-1)",
+    "extensions": {
+      "vector": "0.8.3",
+      "pg_trgm": "1.6",
+      "pg_search": "0.25.1"
+    },
+    "table": "public.codebase_chunk_index",
+    "rows": 274465,
+    "columns": {
+      "content_embedding_768": { "type": "vector(768)", "populatedRows": 219998 },
+      "content_embedding": { "type": "halfvec(768)", "populatedRows": 55169 },
+      "summary_embedding": { "type": "halfvec(768)", "populatedRows": 1160 },
+      "summary_embedding_384": { "type": "vector(384)" },
+      "search_vector": { "type": "tsvector", "populatedRows": 274465 },
+      "source_revision": { "type": "text" },
+      "workspace_revision": { "type": "text" },
+      "representation_revision": { "type": "text" }
+    },
+    "indexes": [
+      {
+        "name": "idx_codebase_chunk_content_embedding_768_hnsw",
+        "column": "content_embedding_768",
+        "operatorClass": "vector_cosine_ops",
+        "m": 16,
+        "efConstruction": 64,
+        "ready": true,
+        "valid": true
+      },
+      {
+        "name": "codebase_chunk_index_content_hnsw",
+        "column": "content_embedding",
+        "operatorClass": "halfvec_cosine_ops",
+        "m": 16,
+        "efConstruction": 200,
+        "ready": true,
+        "valid": true
+      },
+      {
+        "name": "codebase_chunk_index_summary_hnsw",
+        "column": "summary_embedding",
+        "operatorClass": "halfvec_cosine_ops",
+        "m": 16,
+        "efConstruction": 200,
+        "ready": true,
+        "valid": true
+      },
+      {
+        "name": "idx_codebase_chunk_summary_embedding_384_hnsw",
+        "column": "summary_embedding_384",
+        "operatorClass": "vector_cosine_ops",
+        "m": 12,
+        "efConstruction": 48,
+        "ready": true,
+        "valid": true
+      },
+      {
+        "name": "idx_codebase_chunk_bm25_search",
+        "column": "search_vector",
+        "method": "GIN",
+        "ready": true,
+        "valid": true
+      },
+      {
+        "name": "idx_codebase_chunk_pgsearch_bm25",
+        "method": "BM25",
+        "ready": true,
+        "valid": true
+      }
+    ],
+    "pgTrgmIndexOnCodebaseChunkIndex": false,
+    "note": "pg_trgm extension is installed, but no gin_trgm_ops index was found on codebase_chunk_index. This does not mean trigram search is unavailable on other tables."
+  },
+  "qdrant": {
+    "collection": "codebase_chunks_768",
+    "status": "green",
+    "pointsCount": 328348,
+    "vectorsCount": null,
+    "indexedVectorsCount": 328386,
+    "namedVectors": {
+      "content": { "size": 768, "distance": "Cosine" },
+      "error": { "size": 768, "distance": "Cosine" },
+      "signature": { "size": 768, "distance": "Cosine" }
+    },
+    "hnswConfig": {
+      "m": 16,
+      "ef_construct": 200,
+      "full_scan_threshold": 10000,
+      "on_disk": false
+    },
+    "quantizationConfig": {
+      "scalar": {
+        "type": "int8",
+        "quantile": 0.99,
+        "always_ram": false
+      }
+    },
+    "note": "The API did not return vectors_count. points_count and indexed_vectors_count are distinct reported fields; do not reinterpret the latter as points or use these totals as PostgreSQL parity."
+  },
+  "comparison": {
+    "postgresChunkRows": 274465,
+    "postgresContentEmbedding768Rows": 219998,
+    "postgresRowsWithoutContentEmbedding768": 54467,
+    "qdrantPoints": 328348,
+    "qdrantPointsMinusPostgresChunkRows": 53883,
+    "identityAndRevisionParity": "UNPROVEN",
+    "promotionEligible": false
+  },
+  "interpretation": [
+    "The canonical PostgreSQL vector(768) HNSW index exists and is valid; adding another HNSW index is not justified by this inventory.",
+    "PostgreSQL full-text GIN/BM25 indexing is present; trigram indexing is a separate capability and no trigram index was found on the codebase chunk table.",
+    "Qdrant is a multi-vector projection with a larger point count than the PostgreSQL chunk table. Counts alone cannot establish identity mapping, revision lineage, or vector parity."
+  ]
+}

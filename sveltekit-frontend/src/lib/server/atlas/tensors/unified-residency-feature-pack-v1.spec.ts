@@ -42,6 +42,13 @@ describe('unified residency feature-pack adapter', () => {
     return expect(loadUnifiedResidencyFeaturePackV1(result)).resolves.toMatchObject({ state: 'RESIDENT', residencyKey: result.descriptor.residencyKey });
   });
 
+  it('rejects feature bytes changed after pack qualification', async () => {
+    const result = prepareUnifiedResidencyFeaturePackV1({ pack: makePack(['source:one']), ...revisions });
+    result.featureBuffer[0] = result.featureBuffer[0]! + 1;
+
+    await expect(loadUnifiedResidencyFeaturePackV1(result)).rejects.toThrow('RESIDENCY_PAYLOAD_CHECKSUM_MISMATCH');
+  });
+
   it('rejects a mixed-source pack instead of collapsing revisions', () => {
     expect(() => prepareUnifiedResidencyFeaturePackV1({ pack: makePack(['source:one', 'source:two']), ...revisions })).toThrow('UNIFIED_RESIDENCY_FEATURE_PACK_MIXED_SOURCE_REVISIONS');
   });

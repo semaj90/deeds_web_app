@@ -1,0 +1,127 @@
+{
+  "schema": "atlas.taxonomy-groups-snapshot.v1",
+  "source": "atlas_domain_ontology (live read-only export 2026-10-13)",
+  "writesPerformed": false,
+  "groups": [
+    {
+      "group_id": "api",
+      "group_label": "API Design & Integration",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "REST, gRPC, and service communication"
+    },
+    {
+      "group_id": "auth",
+      "group_label": "Authentication & Authorization",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "User authentication, sessions, and permissions"
+    },
+    {
+      "group_id": "cache",
+      "group_label": "Caching",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Hot-path caching layers (Redis/Valkey/BitFrost), distinct from canonical storage."
+    },
+    {
+      "group_id": "compiler",
+      "group_label": "Compiler & Language Tooling",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Parsers, ASTs, type checkers, and build/compile tooling."
+    },
+    {
+      "group_id": "database",
+      "group_label": "Database & Persistence",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Relational storage, ORM layers, and vector-capable extensions."
+    },
+    {
+      "group_id": "database.postgresql",
+      "group_label": "PostgreSQL",
+      "parent_group_id": "database",
+      "taxonomy_level": 1,
+      "description": "PostgreSQL specifically, including pgvector and Drizzle-managed schema."
+    },
+    {
+      "group_id": "devops",
+      "group_label": "DevOps & Infrastructure",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Deployment, monitoring, and operational tasks"
+    },
+    {
+      "group_id": "devops.env-config",
+      "group_label": "Environment Configuration",
+      "parent_group_id": "devops",
+      "taxonomy_level": 1,
+      "description": "Configuration management and environment setup"
+    },
+    {
+      "group_id": "devops.process-mgmt",
+      "group_label": "Process Management",
+      "parent_group_id": "devops",
+      "taxonomy_level": 1,
+      "description": "Running, monitoring, and orchestrating processes"
+    },
+    {
+      "group_id": "error-handling",
+      "group_label": "Error Handling & Recovery",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Error detection, logging, and recovery strategies"
+    },
+    {
+      "group_id": "frontend",
+      "group_label": "Frontend & UI",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Client-side application code: components, styling, client state, browser rendering."
+    },
+    {
+      "group_id": "frontend.sveltekit",
+      "group_label": "SvelteKit / Svelte",
+      "parent_group_id": "frontend",
+      "taxonomy_level": 1,
+      "description": "SvelteKit routing, load functions, Svelte 5 runes-based components."
+    },
+    {
+      "group_id": "gpu",
+      "group_label": "GPU & CUDA Acceleration",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "CUDA/GPU-accelerated compute: tensor ops, RAPIDS, LibTorch bridges."
+    },
+    {
+      "group_id": "graph",
+      "group_label": "Graph & Topology",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Graph algorithms, graph databases, and topology mirrors."
+    },
+    {
+      "group_id": "machine-learning",
+      "group_label": "Machine Learning",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Embeddings, autoencoders, clustering, and model training/inference."
+    },
+    {
+      "group_id": "retrieval",
+      "group_label": "Information Retrieval",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Search, indexing, and retrieval strategies"
+    },
+    {
+      "group_id": "test",
+      "group_label": "Testing",
+      "parent_group_id": null,
+      "taxonomy_level": 0,
+      "description": "Automated test suites: unit, integration, and end-to-end."
+    }
+  ],
+  "checksum": "sha256:6a7b71393d25ffb56fd1c697beb0cd6e29b789583fb8a3372d3ba0d53b9161a5"
+}

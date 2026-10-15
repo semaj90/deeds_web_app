@@ -56,3 +56,35 @@
 - [x] 6.3 Added agentic dense-search context admission (`AgenticDenseSearchAdmissionV1Schema` and `admitAgenticDenseSearchContextV1`) requiring canonical packet identity and bounded evidence.
 - [x] 6.4 Ran full focused tests (10/10 test suites passed), OpenSpec strict validation (valid), and live read-only schema proofs without mutations.
 
+## 7. PyTorch analysis RPC receipt alignment
+
+- [x] 7.1 Added `TorchAnalysisRpcReceiptV1Schema` as a derived execution receipt, not a canonical packet or a new identity owner. It binds the workspace/registry snapshot, candidate snapshot and ordinal-map checksum, input/output artifact references and checksums, metric receipt, replay checksum, worker/runtime, and status. Raw tensor values are rejected; canonical authority and writes are fixed false.
+- [ ] 7.2 Wire the receipt to the existing `TensorArtifactManifestV1` and Python metric receipt, including independent checksum/readback verification. Contract-only tests do not prove cross-runtime interoperability.
+- [ ] 7.3 Resolve the canonical packet-revision owner before emitting packet-level or live RPC records. The 2026-09-17 registry census reported no `atlas_packets.packet_revision` and status `BLOCKED_CANONICAL_REVISION_OWNER`; refresh this read-only census before relying on its live counts.
+- [ ] 7.4 Add a bounded two-worker RPC smoke test using CPU tensors only. Do not run `DistributedOptimizer.step()` or distributed autograd as part of analysis; CUDA distributed autograd is documented unsupported, and optimizer steps mutate model parameters.
+- [ ] 7.5 Promote only after artifact checksum/shape/dtype readback, canonical identity/revision resolution, replay parity, and an independently validated metric receipt. No database, cache, or tensor-payload writes are authorized by this contract.
+- [x] 7.6 Added a transport-only, operation-discriminated custom RPC packet envelope. It carries the existing UUIDv5-backed `packetKey`, separates `titleId`, validates UUIDv7 call/mutation event IDs, and keeps packet-class LUT revision/code as optional encoding metadata. It does not mint canonical identity or execute a mutation.
+- [ ] 7.7 Specify mutation events as revisioned, idempotent transitions with before/after checksums, actor/worker, authorization, and independent readback. Keep packet creation, artifact creation, and canonical Postgres mutation as separate effects; the transport contract must not imply that an RPC call authorized them.
+- [ ] 7.8 Qualify retrieval indexing only after selecting the existing canonical packet/artifact owner and inspecting current indexes. Index logical packet identity, title label, run/mutation time, status, and snapshot/revision filters as justified by measured queries; never index raw tensor bytes or use a LUT byte as the primary key. The 2026-09-17 registry census is historical evidence and must be refreshed before DDL or live-packet claims.
+
+### 2026-10-15 worker/cache implementation evidence
+
+The existing SvelteKit GPU worker pool now tracks busy worker slots explicitly
+and dispatches queued work to an available slot, instead of deriving worker
+selection from active-task count. Expired queued work is removed, duplicate task
+IDs are rejected, and a late response cannot settle a timed-out request. RPC
+cache arguments are canonically serialized and hashed with full SHA-256 under a
+new v2 key namespace. Four focused unit tests pass. This is scheduler/key
+contract evidence only: task 7.4's bounded two-worker CPU RPC smoke, live RPC
+transport, durable task status, cache-tier revision admission, and independent
+artifact readback remain open. No DB/cache/service writes occurred.
+
+#### Cache envelope integrity follow-up (2026-10-15)
+
+The RPC cache now stores and validates the v3 envelope rather than raw payload
+JSON. Reads verify transport, method, argument digest, exact key, expiry, and
+payload SHA-256; malformed, stale, or tampered entries are discarded and
+recomputed. The key namespace was advanced to v3 after the earlier v2 change.
+The updated focused worker/cache suite passes **10/10**. This does not close the
+bounded two-worker RPC smoke or live cache/revision-readback gates above.
+

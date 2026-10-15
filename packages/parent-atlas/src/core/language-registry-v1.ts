@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 
 /**
  * A vocabulary label is always namespaced and attributed to the owner that
@@ -21,6 +22,50 @@ export const LanguageVocabularyV1Schema = z.object({
   labels: z.array(z.string().min(1)),
 }).strict();
 export type LanguageVocabularyV1 = z.infer<typeof LanguageVocabularyV1Schema>;
+
+export const TreeSitterLanguageCatalogV1Schema = z.object({
+  schema: z.literal('atlas.okf-tree-sitter-language-catalog.v1'),
+  catalogId: z.literal('tree-sitter-language-pack'),
+  source: z.object({
+    packageName: z.literal('tree-sitter-language-pack'),
+    packageVersion: z.string().min(1),
+    sourceRef: z.string().min(1),
+    manifestSha256: z.string().regex(/^[0-9a-f]{64}$/),
+    observedPythonVersion: z.string().min(1),
+  }).strict(),
+  namespace: z.literal('PARSER_GRAMMAR_ID'),
+  entries: z.array(z.object({ grammarId: z.string().min(1), qualification: z.literal('CANDIDATE') }).strict()).min(1),
+  lspServerBindings: z.tuple([]),
+  canonicalAuthority: z.literal(false),
+  writesPerformed: z.literal(false),
+  catalogSha256: z.string().regex(/^[0-9a-f]{64}$/),
+}).strict();
+export type TreeSitterLanguageCatalogV1 = z.infer<typeof TreeSitterLanguageCatalogV1Schema>;
+
+export function treeSitterCatalogToVocabularyV1(catalogInput: TreeSitterLanguageCatalogV1): LanguageVocabularyV1 {
+  const catalog = TreeSitterLanguageCatalogV1Schema.parse(catalogInput);
+  const canonicalize = (value: unknown): unknown => {
+    if (Array.isArray(value)) return value.map(canonicalize);
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right, 'en-US'))
+        .map(([key, item]) => [key, canonicalize(item)]));
+    }
+    return value;
+  };
+  const { catalogSha256, ...payload } = catalog;
+  const actualChecksum = createHash('sha256').update(JSON.stringify(canonicalize(payload))).digest('hex');
+  if (actualChecksum !== catalogSha256) throw new Error('TREE_SITTER_CATALOG_CHECKSUM_MISMATCH');
+  const labels = catalog.entries.map((entry) => entry.grammarId);
+  if (new Set(labels.map((label) => label.toLocaleLowerCase('en-US'))).size !== labels.length) {
+    throw new Error('TREE_SITTER_CATALOG_GRAMMAR_ID_COLLISION');
+  }
+  return LanguageVocabularyV1Schema.parse({
+    sourceOwner: `${catalog.source.packageName}@${catalog.source.packageVersion}`,
+    sourceRevision: `sha256:${catalog.source.manifestSha256}`,
+    namespace: catalog.namespace,
+    labels,
+  });
+}
 
 export const LanguageAliasBindingV1Schema = z.object({
   fromNamespace: LanguageLabelNamespaceV1Schema,

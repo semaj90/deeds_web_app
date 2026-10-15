@@ -253,7 +253,7 @@ export async function tool_search_qdrant_topology(args: {
 export async function tool_graph_expand_neighborhood(args: {
   sourceRefs?: string[];
   stableKeys?: string[];
-  maxHops?: 1 | 2;
+  maxHops?: number;
   depth?: number;
   limit?: number;
   query?: string;

@@ -27,6 +27,7 @@ export function hyperedgeToLegacyHyperRelationV1(edge: HyperedgeV1): HyperRelati
     schema: 'atlas.hyper-relation.v1',
     relationId: edge.hyperedgeId,
     relationType: edge.predicate,
+		graphRevision: edge.graphRevision,
     participants: orderedParticipants(edge),
     evidenceRefs: [...edge.evidenceRefs],
     workspaceRevision: edge.workspaceRevision,

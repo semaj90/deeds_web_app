@@ -23,7 +23,9 @@ import { traceWorker } from '$lib/server/observability/langfuse.js';
 
 export type TaskType =
   | 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity'
-  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract';
+  | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
+  | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
+  | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).

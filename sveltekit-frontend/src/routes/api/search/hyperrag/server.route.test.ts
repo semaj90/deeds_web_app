@@ -5,12 +5,29 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   search: vi.fn(),
   bifrostChat: vi.fn(),
+  runtimeConfigs: [] as Array<Record<string, unknown>>,
+  env: {
+    ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED: false,
+    ATLAS_FUNCTION_REGISTRY_REPO_ROOT: undefined as string | undefined,
+  },
 }));
 
 vi.mock('$lib/server/retrieval/search-runtime.js', () => ({
-  createSearchRuntime: () => ({
-    search: (...args: unknown[]) => mocks.search(...args),
-  }),
+  createSearchRuntime: (config: Record<string, unknown>) => {
+    mocks.runtimeConfigs.push(config);
+    return { search: (...args: unknown[]) => mocks.search(...args) };
+  },
+}));
+
+vi.mock('$lib/server/env.server.js', () => ({ ENV: mocks.env }));
+
+vi.mock('$lib/server/db/client.js', () => ({ pool: { connect: vi.fn() } }));
+vi.mock('@deeds/parent-atlas', () => ({ createFeatureIntelligenceRepository: vi.fn() }));
+vi.mock('$lib/server/atlas/agentic/oak-query-enrichment-v1.js', () => ({
+  enrichQueryClassificationWithOakV1: vi.fn(async (classification: { requestId: string }) => ({
+    requestId: classification.requestId,
+    evidence: [],
+  })),
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
@@ -57,6 +74,9 @@ describe('/api/search/hyperrag', () => {
   beforeEach(() => {
     mocks.search.mockReset();
     mocks.bifrostChat.mockReset();
+    mocks.runtimeConfigs.length = 0;
+    mocks.env.ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED = false;
+    mocks.env.ATLAS_FUNCTION_REGISTRY_REPO_ROOT = undefined;
 
     mocks.search.mockResolvedValue(baseResult);
     mocks.bifrostChat.mockResolvedValue('Synthesized summary');
@@ -150,6 +170,29 @@ describe('/api/search/hyperrag', () => {
       semanticRepresentation: 'semantic_768',
     }));
     expect(mocks.search).toHaveBeenCalledWith(expect.objectContaining({ topK: 7 }));
+  });
+
+  it('keeps function-registry retrieval off by default and enables it only with explicit config plus workspace revision', async () => {
+    const { POST } = await import('./+server.js');
+    const makeRequest = () => new Request('http://localhost/api/search/hyperrag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'find parser', workspaceRevision: 'sha256:workspace-1' }),
+    });
+
+    const disabledRequest = makeRequest();
+    await POST({ request: disabledRequest, url: new URL(disabledRequest.url), locals: { user: { id: 'u1' } } } as any);
+    expect(mocks.runtimeConfigs.at(-1)?.['functionRegistry']).toBeUndefined();
+
+    mocks.env.ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED = true;
+    mocks.env.ATLAS_FUNCTION_REGISTRY_REPO_ROOT = 'C:/repo';
+    const enabledRequest = makeRequest();
+    await POST({ request: enabledRequest, url: new URL(enabledRequest.url), locals: { user: { id: 'u1' } } } as any);
+    expect(mocks.runtimeConfigs.at(-1)?.['functionRegistry']).toEqual({
+      enabled: true,
+      repoRoot: 'C:/repo',
+      maxCandidates: 4,
+    });
   });
 
   it('fails open when synthesis is requested but Gemma4/Bifrost is unavailable', async () => {

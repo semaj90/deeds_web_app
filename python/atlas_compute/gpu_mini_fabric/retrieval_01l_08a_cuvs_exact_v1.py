@@ -19,6 +19,8 @@ import sys
 
 import numpy as np
 
+from atlas_compute.cuvs_analytics import validate_cuvs_cosine_knn_result
+
 
 def cosine_distance_matrix(query, population):
     q = query / np.linalg.norm(query)
@@ -83,10 +85,16 @@ def main():
     cuvs_vs_cpu_set = set(cuvs_ids) == set(cpu_ids)
     cuvs_vs_cpu_rank = cuvs_ids == cpu_ids
     max_score_delta = float(np.max(np.abs(np.array(distances_host) - cpu_distances[indices_host])))
+    output_validation = validate_cuvs_cosine_knn_result(
+        vectors,
+        query_vector.reshape(1, -1),
+        np.asarray(indices_host, dtype=np.int64).reshape(1, -1),
+        np.asarray(distances_host, dtype=np.float32).reshape(1, -1),
+    )
 
     status = (
         "CUVS_POSTGRES_CPU_TRIPLE_EXACT_PARITY"
-        if cuvs_vs_postgres_set and cuvs_vs_cpu_set
+        if cuvs_vs_postgres_set and cuvs_vs_cpu_set and output_validation["valid"]
         else "PARITY_MISMATCH_INVESTIGATE"
     )
 
@@ -104,6 +112,7 @@ def main():
         "cuvsVsCpuOracleExactSetParity": cuvs_vs_cpu_set,
         "cuvsVsCpuOracleRankParity": cuvs_vs_cpu_rank,
         "maxScoreDeltaCuvsVsCpu": max_score_delta,
+        "outputValidation": output_validation,
         "status": status,
         "canonicalProductionDataTouched": False,
         "writesPerformed": False,

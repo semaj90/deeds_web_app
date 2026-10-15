@@ -10,6 +10,7 @@ import { pool } from '$lib/server/db/client.js';
 import { createFeatureIntelligenceRepository } from '@deeds/parent-atlas';
 import { runHyperRagFusionRuntimeV1, type HyperRagFusionRuntimeResultV1 } from '$lib/server/atlas/integration/hyperrag-fusion-runtime-adapter-v1.js';
 import { enrichQueryClassificationWithOakV1 } from '$lib/server/atlas/agentic/oak-query-enrichment-v1.js';
+import { ENV } from '$lib/server/env.server.js';
 
 const requestSchema = z.object({
   query: z.string().trim().min(1, 'Query string is required').max(1024, 'Query string is too long'),
@@ -114,7 +115,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       requestId,
       evidence: [],
     }));
-    const runtime = createSearchRuntime({ userId: locals.user.id });
+    const functionRegistryEnabled = ENV.ATLAS_FUNCTION_REGISTRY_RETRIEVAL_ENABLED
+      && Boolean(ENV.ATLAS_FUNCTION_REGISTRY_REPO_ROOT)
+      && Boolean(input.workspaceRevision);
+    const runtime = createSearchRuntime({
+      userId: locals.user.id,
+      ...(functionRegistryEnabled ? {
+        functionRegistry: {
+          enabled: true,
+          repoRoot: ENV.ATLAS_FUNCTION_REGISTRY_REPO_ROOT!,
+          maxCandidates: 4,
+        },
+      } : {}),
+    });
     const result = await runtime.search({
       text: input.query,
       topK: retrievalPlan?.candidateBudget ?? input.topK ?? 15,

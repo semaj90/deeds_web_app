@@ -5,6 +5,7 @@ import { buildHypergraphFusionEvidenceV1, retrieveHypergraphContextV1 } from './
 function relation(input: {
 	relationId: string;
 	relationType: string;
+	graphRevision?: string;
 	participants: Array<{ canonicalId: string; role: string; ordinal: number }>;
 	evidenceRefs?: string[];
 }) {
@@ -12,6 +13,7 @@ function relation(input: {
 		schema: 'atlas.hyper-relation.v1',
 		relationId: input.relationId,
 		relationType: input.relationType,
+		...(input.graphRevision ? { graphRevision: input.graphRevision } : {}),
 		participants: input.participants,
 		evidenceRefs: input.evidenceRefs ?? [`evidence:${input.relationId}`],
 		workspaceRevision: 'workspace:r1',
@@ -29,6 +31,32 @@ const budget = {
 };
 
 describe('retrieveHypergraphContextV1', () => {
+	it('binds graph expansion to the requested graph revision', () => {
+		const result = retrieveHypergraphContextV1({
+			workspaceRevision: 'workspace:r1',
+			sourceRevision: 'source:r1',
+			graphRevision: 'graph:r1',
+			queryRevision: 'query:r1',
+			mode: 'hybrid',
+			seeds: [{ canonicalId: 'symbol:A', score: 1, source: 'human', evidenceRef: 'seed:A' }],
+			relations: [
+				relation({ relationId: 'current', relationType: 'CALLS', graphRevision: 'graph:r1', participants: [
+					{ canonicalId: 'symbol:A', role: 'caller', ordinal: 0 },
+					{ canonicalId: 'symbol:B', role: 'callee', ordinal: 1 },
+				] }),
+				relation({ relationId: 'stale', relationType: 'CALLS', graphRevision: 'graph:old', participants: [
+					{ canonicalId: 'symbol:A', role: 'caller', ordinal: 0 },
+					{ canonicalId: 'symbol:C', role: 'callee', ordinal: 1 },
+				] }),
+			],
+			budget,
+		});
+
+		expect(result.graphRevision).toBe('graph:r1');
+		expect(result.relations.map((item) => item.relationId)).toEqual(['current']);
+		expect(buildHypergraphFusionEvidenceV1(result, ['symbol:A'])[0].graphRevision).toBe('graph:r1');
+	});
+
 	it('projects n-ary evidence to existing candidates without pairwise expansion', () => {
 		const result = retrieveHypergraphContextV1({
 			workspaceRevision: 'workspace:r1', sourceRevision: 'source:r1', queryRevision: 'query:r1', mode: 'hybrid',

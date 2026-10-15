@@ -1,17 +1,7 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:cbe83b66de06403c20130cd34a67b8029a9ca318ac3c3a31064f74d273d5d83f",
+  "pageVersion": "sha256:a113138f25b9f76cc4602e614e3664748c49df37e325d6e9202964ed068b7b5f",
   "claims": [
-    {
-      "id": "claim_8fb86a6580244781a83e951789427ebf",
-      "statement": "A Packet is the fundamental unit of data encapsulation, carrying payload, metadata, and routing information between ingestion and storage layers.",
-      "evidence": [
-        {
-          "resource": "repo://ACE-QUICK-REFERENCE.md",
-          "version": "repo-file-v1:sha256:e94bb0ee99ae96dd476ffffc0cee9d696a6de58dba4b00f804225faf5b597d09"
-        }
-      ]
-    },
     {
       "id": "claim_184f44093d924ea49d4f5b49b9561427",
       "statement": "Bitfrost is the caching and memory-streaming layer that manages high-priority hot data buckets to reduce retrieval latency.",
@@ -23,32 +13,236 @@
       ]
     },
     {
-      "id": "claim_e95eca83615b4d069a7a4914adf727b6",
-      "statement": "Graphify constructs and maintains a semantic graph structure over data to enable complex traversal and retrieval.",
+      "id": "claim_5acc96efbc014ce8ab0f2c78f8d046ba",
+      "statement": "PostgreSQL `atlas_packets` is the canonical packet/source record; packet identity fields such as `packet_key`, `source_ref`, and `feature_id` are distinct from mutable enrichment and external projection references such as embeddings, Qdrant points, graph nodes, and caches.",
       "evidence": [
         {
-          "resource": "repo://AUDIT-GRAPHIFY-READINESS-INFRASTRUCTURE.md",
-          "version": "repo-file-v1:sha256:f2368151d3bbdc3abc848ba13f2527eae4feddb25c19095ffbb573d142624864"
+          "resource": "repo://openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md#L3-L13",
+          "version": "repo-lines-v1:sha256:afdd96194c44c8ccbb48be6fde5e4ba783fc6158ae65ec5340970ccd2c59dbf0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZjUwYTIyMmYyNDMyZjE3ZjQ3N2Q2MDE0OTlkODEyZGNkNmY1ZTQzNzQyZDBkNGJmOGNjZTlhMmJiZDVlNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZDgxOWM4NDlkZjRjNmM4M2JjMGIyZDU3MjZmM2ZlNGUyOWZjZGE2MTNkNzNmOTE3NmEwOTMwOTYwMGM0ZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhNDE1NjA3Y2Y5N2QwNTVkYzcyNmM4YmZlM2YwOGYyYzIwZDZmMTY4OTIxNDBlNWZiODFlZDAwNjg2ZTZmZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L102-L140",
+          "version": "repo-lines-v1:sha256:e5775b7dc03a193b8857682b774d7146c0ac0fbbf1a09dfed0153c090e5e62ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYjg5YzBjNjljOWZhMTFhZWZhNmQ4OWU2YzZjNDk2MjcxYjU0ZGNjZmU4ZTk2NzE2YjRjYjQzZmZlM2VhMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNjdiY2NjZjI4ZDUzMjc3YjAyYjdlMTdmZWZhZjQyYzg3ZTQ3ODc1MzFkZWQ3YjY3Zjc1NmE3ZTI2NzgyMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhMTM0OWU5MGE2MWE5OGY0ODBkNmEyZWQ5NzMwNjY3N2IzYTFmZjNiOWE1ZWM0MDZjMjc5YTg0ZWFkNTIwZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNWQ4Y2RkNzI5MjE5NTBhZDQ1YTVkMWE3NzE3ZWFmN2Y5MGZhYmJhZDAyM2RiMjYzY2ViZTZkNmFjOGVkMGQifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts#L30-L44",
+          "version": "repo-lines-v1:sha256:7eebf041f0c1584b9161401ccc24ec78538479f97c05ef92cdebd7ab15574ae1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzMzNjU4NTE5ODZjNjIyNGFlNGMwMThhYTYzMzZiZGE1ODI5YTBlMDI2NTcwOGE4NWRiZmQ5NmY0ODMyOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmNWE5MThjNDIyYTQ4ZTJlYmY3YjQ1OWE4NDY3NjE0OWIzMGYyYWViOGE5ZTgwODk5NDFiZmY5NWZmYTI1NmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiYjU2YzcwZmJiYjMzNGZkYmY4MjJmNGEyODIxNWJmYzg5ODk4YWQ4OGM0NDExY2RkYjZlZjA5ZjkxNzFjZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNDZhOGRjYTg2NmFhMjJmYjk3MTFlMzI4YmFlNWNlNjE0MWNkN2RmMmJhZWY4MTJlZWViMWQ2NmFkN2FhMjQifQ"
         }
       ]
     },
     {
-      "id": "claim_84329ee6329342a1a8018017a610fcc9",
-      "statement": "The ACE Pipeline is the multi-stage engine responsible for orchestrating data flow, context enrichment, and retrieval from ingestion to output.",
+      "id": "claim_70fccecad0c2466980e19c81cec76a99",
+      "statement": "Packet Key V2 computes immutable `packet_key` identity from exactly `repositoryScope`, canonical `sourceRef`, and `packetKind`; source/workspace revisions, Qdrant IDs, graph-node keys, ordinals, and `latest`/`current` are not key inputs, while revisions qualify the key.",
       "evidence": [
         {
-          "resource": "repo://ACE-SUMMARY-LATENCY-IMPACT.md",
-          "version": "repo-file-v1:sha256:0d0844c5f5a88d5497eebcfd43dbd4e8b5863d3fe6172108fe18e37c12c70e12"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L2-L21",
+          "version": "repo-lines-v1:sha256:4d9a9ad2cc5da21960dd9e3040103cab3f8f095b493c38c0f89bbb713d6e4f26:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MTFhYWI5ZWJkOTJjOTU2MmYzYWFiNjQ5NjkyMDY5NGFkY2QzMzRiNmJmOGYzODljOWY3ZWQ1N2E5ZTEzMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5NWQ1YTUwMmU3Y2Q3MDFiM2IwYWFhMzljMmEzMjU1NGYxODlkNDM5NTc5MDNlNzBiYWQ1MTVmYjkyMmRmODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoxLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk2ZDM4MzFmODUyMDFiODY2MGY3Yjg4YTdmMTM5NTJlMzBhNTIyZTI0OGYzNDRmOGU3YTIzYzRjOGQ2NjQyODgifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts#L44-L94",
+          "version": "repo-lines-v1:sha256:03d7ed4803e6397a408e8ee1f13a63fce63fc2eb30c35517d96098c4fda6b045:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkOTBiZjhiZmMyOGQ4ODNjZDVjMmFiMDc5ZDk5NTFhYjgwNGFhZjVhYmRjMDVkNjI2NzU3MTk5M2E0ODM0N2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzMDUyMjkyYTZjZGVkZWY2ZGNlMjE2Njk1MTE4Y2ZkZWFhNmY4MjlhOGY1ZjUyODFkNzIyODExN2JjYzMzMTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYyOTY0MDc5YzNjNWM4MTUyMGVmMzNhMmI5ZDJlMTVhMWI4NGQ3MjgwZGI4NTkwZGNkNjU3NDdlM2UwMTJhNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
         }
       ]
     },
     {
-      "id": "claim_6f2f91130c5947ada4ef24b29cfa9d87",
-      "statement": "Tensor Residency defines the strategy for pre-staging and pinning tensor data in GPU memory to minimize retrieval and inference latency.",
+      "id": "claim_77b552195517415ebd2e36a6ae91065e",
+      "statement": "The workspace source contract treats `sourceRef` as a repository-relative, traversal-free physical path and binds each `sourceRevision` to the exact content digest; the workspace revision is a digest of the sorted source manifest rather than merely a Git HEAD.",
       "evidence": [
         {
-          "resource": "repo://openspec/changes/parent-atlas-tensor-residency-integration/specs/tensor-residency/spec.md",
-          "version": "repo-file-v1:sha256:1c1255b089b95f15b53292e6452f18b57cf579f0730154b79b6b5e0734078d30"
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts#L121-L177",
+          "version": "repo-lines-v1:sha256:71e4e5bc51e680849fa83f1d0b94bbe2dd4306536713b41f9a1c65c3644a0d23:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzMDhjYzcwOTdhN2QxN2E3ZjNhMDdiNjk2MWUyNjI0Y2E3YmM1ZWYyZWIyZTUzZDFmZTQ0ZDQ3Zjg4ZWY0ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmI5M2VjY2ZhYzExNmZjN2Q4OGQ3OTk1ZGRkOTJiOTdiMmEyZDQ5YjMxZDM5NmU2ZWEyYjFhZmFlOGQ4MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MTkwNTE5NTRkYzE4ZGViMzIyNzJjYWZlYzI1YTFhMDViYzRkMTRmOTU3NWQ5OWNjMjE3OGRmMjIwODgyNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4NTRiNzQ0ODI4YTJiYThiNTA0NDM2NDZkY2UzOTEzZDFkNWIzZjUxYjYzZjdhNWNiYjNhNjJhNDcwZGQ5NTMifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts#L26-L37",
+          "version": "repo-lines-v1:sha256:987c25ad92894605d113a7189940bf49c13f7459de609efa35d8d9226e0751e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkYjQ1YmQ3YTEzMzc4YmM1YmZmNDBjMzgyNDcyOGM0MWI1MmMyNDFmMjY0YTFkYjdjODkxNDQ2MTg0OWI3OGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZGRlZjcyNDc4NmI0YWY0NWFiN2NhZDgxZDM3N2FlNTQzYmI3ODQxMjk2NTY4ZmI1MjI2OTk4YWVjMjE2MzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZGU2NmY3OGFkMGQ5YjQxMjY1ODE5OGQ0ZTkwNmExMDFmNjVlMTI2NjBiY2FjZGE4NDljNjAzNmQ0ZGVhMGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkYmJjMGM0NDFiY2VkMWQyZjE3ZDc5MjE0ODYzZTBhZDgxMzc5ZDk3ZmMzY2Y0YzVkYzM2ZjNkNjRhZGI2YmUifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts#L7-L16",
+          "version": "repo-lines-v1:sha256:fdb8ff41b03d3ef7f2f70d948b07af8374a0172655dd1cda619c4c46ec182a8c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NzBlYWJhMzkwYzI4YmU5NWYyNjM4YmFkZTAyZmVlOTJlY2MzNDMzZGU3NzRmMDU3MGY5NjNhZWQ1OWJiMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZjViNDBiMTU4NDU3ZDE3ODY0ZjIxNzkwNzg2ZGQ1YTJlY2RiNjRiNjZhNjUxZjc4OGQ0ZTI1Y2QzMzAzZDIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljMTBlZGNmY2VmN2I1Yzc1ODI4NTljOTNhNjVjYTlhMWRiNjkzNGE1ODFlYTgyNTNlY2ZlNGUyMjM0MmYyOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyODQ0Zjg2MmI2NzBmYzZjY2YzYzhiM2IxZDBjZjZjNjA3ZGEwMDgxNjg1ZDkxYjIyMTkzNmRiNjdiNTA1OTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d3281c7e55f24eb09b16089fcdbdf029",
+      "statement": "Parent Atlas keeps source, workspace, graph, representation, and packet revision axes distinct so derived artifacts can be rejected or recomputed when their qualifying revision changes.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/atlas-feature-state/spec.md#L66-L85",
+          "version": "repo-lines-v1:sha256:43b32063cd7d2180527bf923c274fefaafdfa3dd84f416850675b1207a0c8deb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjNmYzYTcxNDZkYjc1YTQ1MWQxMjUyNDU2MjhiZjc5NmVhNGQzMTA2MzM4YjUxZjAyNTE0ZDNkZmQzZWJmMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlNzllNjJmNjcwZTkyZTNhMGEwYzJmMzE1YWI5YmU4ZGZkNDc3MzNiZjYxMGZjYzg4Y2RiMjczZmMzMThiNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/atlas-feature-state/spec.md#L83-L85",
+          "version": "repo-lines-v1:sha256:7295ca3383ec9451e5f0c7853c63e3ff24c9f527fe4234f8dc93cfc33088e4fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmRlYTRlOWFiYWU2NWNmNGMzZmU5Yjc4OGI4ZjM2MjU3YTYzNjYxZWE5ODEzNGU4YzI4NGRlNDlmYWE3YTc4NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWU3OWU2MmY2NzBlOTJlM2EwYTBjMmYzMTVhYjliZThkZmQ0NzczM2JmNjEwZmNjODhjZGIyNzNmYzMxOGI0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODNlMGRlZjg3NTUwMGE0Y2RkMmZmMTlmZjg3MThlZjcyMGUxZjdiMTQ5YTE0NGI2YmIxZDdkMjQxNmJmZTM4NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts#L56-L118",
+          "version": "repo-lines-v1:sha256:2e455b9b70a434e9fe0dc8df264202e554a043b96de14cedd7265e24e5a77b14:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyZDYwYWQyMTUzZDkyYzBiMGI0Y2EwNGIxYmI4ZTE0NmU5YTVkYzJkZmE5NDUzMTEyZTAxYjk2M2ZkZGE4N2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkyZTBhYjA4ZjE2OGQzNmFkYzA1ZmFlNzFlNjI4YmM5N2IzZDU5ZmRhMTZlZDk2NTFkYzMwMmVkYmE5ZGU2ZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlZDA5N2Q4ZmM2N2I5YTM0MWQ0ZTAyMmYwMDYzZDQxNjZjYTgyOTk4NDgwMjJjMTE1NzdkMGMzOTg2YWYwNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5Y2Q3MTkwNGRhNGM4NTc1ZTg4MTg3ODg0MWU3ZWVjMzI0YTE0YTg5ZmQ4NGRiMDNlYmUyMDQ4NzA1YzVlNGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_42d68917a1084f17b552913cdfbe70fa",
+      "statement": "Representations attach to resolved identity rather than minting identity: `semantic_768` is the canonical EmbeddingGemma semantic representation, MRL widths are derived views, and learned latent representations are a separate coordinate family; Qdrant is a rebuildable retrieval projection rather than canonical vector storage.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/parent-atlas-representation-structural-contract.md#L104-L142",
+          "version": "repo-lines-v1:sha256:856021ef5c3bc69169970dfc50a505f013c82b82a379bad227e1d996a093a545:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiOWU0YTA4YTVmYWU1YzIwMzNhMTk4ZWU2YWNlMzQzYmMzODI3NmUxNjk0Zjg2MjI4Y2YwNjhhMjBlZDE3ZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjM2RmZDNhNzZhNGRjNmU1NzI3NWI5NWQ4MjRmZDkxMzBkZWFmNzJlOWNlMThiNTNiNjY0YThkNDJkNDY4NjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlNTMzMjU4M2Y4OTc3OThiZTIyNjJhYWY4YWQ3MDlkM2I5MjcxNTg1Mjc3NDAxNWU0NTc1ODliMjdjZWQyNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzNjgzNDkxNTFhOTQ1MzA2ZjM5MDEwMmVkMTllZTI0ODhiZjQzZTI2Mjg0Zjk5Yzc0MGNlOTY1Y2Y3NDRlNmYifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/parent-atlas-representation-structural-contract.md#L29-L81",
+          "version": "repo-lines-v1:sha256:43dc2c455bac824b345a7eb3af6ea07520bb523ce9a87fdd5e0e75d48a368efa:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4YTMxMGJhMzI0OGZjN2JlNWRjZTYwMGZkZmM1OGU0MTI4MTBkY2M3Y2E3MjczYmE0N2Q0ZmY3OWY2OGJlZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA3NDE2NTc4NjU5Y2ZiN2MzYzc3MmZkYmNiMzljMjliOGJhM2ZhNDkxNjA1MzBlNDU4MThiMzVkZTBiNWZlMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1YjYwODk1ZDExOTc2OTcwYmFjYWRlOTczMDk0YzFjNTk1ZGJjMTJjNTc3ZWYzY2I3NGIzMzYzNTFjYjJiY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzMjEwMjQxM2MzMDZmMWIyNGI3ODgxNmNhMTQwZTFkZWUyNmZkYzEwYzg1OGNiYTg1NmRjYmEwYzBjZjAxYzUifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/atlas-retrieval-reconciliation/spec.md#L96-L119",
+          "version": "repo-lines-v1:sha256:1759474f1a277d614d4a62b27ca199e151c5d3a6bf69c2b77a711ec01d0c874c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzOGIxZjc5NzEyM2JiNmJiN2YyMjAzM2UyZGE5ZWQ2ZDJmNzZmZmQ2ZTE1NzYxMDM3ZTE3M2UyY2RkYTljOGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1NzE5NDY2Mzc5ZjhmYmRhNGNjNjZjZjQxODQyY2NkNDExZDYyYTE0YWFmMjMyZWZiMjAyZmEzYjYzYjE3MjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e5f49c74a2e64d8fa6cbf6e382f45a5d",
+      "statement": "Feature evidence is an explicit revision-qualified many-to-many relation with typed edges, source lineage, evidence references, and confidence; evidence confidence is distinct from feature completion, which must be derived from acceptance evidence rather than similarity, topology, or model confidence alone.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/atlas-feature-evidence-graph/spec.md#L118-L166",
+          "version": "repo-lines-v1:sha256:bffd555aacf142f47b6b466ff49b93e4be73c4f7d36ccab207a9144fd0f1a7f0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2Y2EwMzM3ZTU1ZjNkOWJmYjc3NmEwM2Y3M2RiZDkzZWE1NmQzZGQzYTcxOTE0MzU0ZDc4NWYwMjBmOWMxYjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmMzEwZmQ3MzY0MGNhYWRiNjk4NWNmOGUyZDVhYWJkMDQ2YzQ5MDM0ZDc4OTFkNTdhOWVjZTBkYTJkNWYzMjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/atlas-feature-evidence-graph/spec.md#L9-L37",
+          "version": "repo-lines-v1:sha256:d77cb1f14d6071bbc468a24a57a086945aec9adf16ac725ca5092ca445db1542:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmNWYyYTA1ZGE1NThjMWFiMmE3M2I0OWZhOGRkMDEwY2EyMDkxNzcwZWM2ZGEwOTg4MDEwOGNkZTA1YmIyNDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1YjVlMjJmYmVmNDRhYjdkNTllOWE0YWI5MGM0NzNhMDAwNTk2MWUwYjhiYWI3ZTUwZTBiNmI2YjdjOTFhYTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZDc3OTMxM2ZhYjQxOWQ3Nzk0MzNlNjkyM2NmNWVlYjIwNWZkMjYwMWY3YzgyYzI3NTZkY2YzMzczMTdlOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/atlas-feature-state/spec.md#L9-L23",
+          "version": "repo-lines-v1:sha256:6cd4d7481f865a0fb9065e24ac5abf291bc76ac465f4923849cb9827c1b69bac:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4NGNiMTk2ZWE0OTM4MjFmODQ2MTFlMTY4MTQ1OWVmMzYxYWZmZDI0MDU4YzkxMDUwZDE2ODM4YmQxZDI5NzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE5MzUzYTkyMDM0NTI1ZGFjODhhMGJkNmFmNTlhZTNlNWY1MGFlOTFhOTg4ZTg4NTc5NmNkZjk4ZDFkNWUxOTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZDc3OTMxM2ZhYjQxOWQ3Nzk0MzNlNjkyM2NmNWVlYjIwNWZkMjYwMWY3YzgyYzI3NTZkY2YzMzczMTdlOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_36c466d2c46b452fba197811c2c9de33",
+      "statement": "N-ary evidence relationships may be preserved as canonical hyperedges, while pairwise graph edges are traversal projections that must retain a mapping to the canonical relationship; relationship degree is distinct from participant count and graph degree.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/atlas-feature-evidence-graph/spec.md#L41-L114",
+          "version": "repo-lines-v1:sha256:b3f800c225c5ac3b81283c4e9724bc28ce5d70860358af869a7578edbe75a5e6:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhMzgyNjQwNTQwMjIzMDQyZjY1OGQxMjA0Y2RiMWQ4ODA4NTU4ZDQ5M2Q2NzkzNGI0NTFkYjk2ZTAxMmZiM2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlNGI5YWM3MzdmZmI4OWM0MTliY2QyYTI1MjU0YTAyNjg0ZjJhYWY0ZWMyYzRkMWYwZDU4MjRiZTk1ZmMyMzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b7d52dd5bb2144d9a86feed4f6993b85",
+      "statement": "Retrieval reconciliation preserves logical lane identity and grants one fusion vote per logical lane rather than per physical executor; candidate identity must be resolved before cross-lane fusion and degraded identity remains observable.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/atlas-retrieval-reconciliation/spec.md#L63-L84",
+          "version": "repo-lines-v1:sha256:609e74e227d920b62eff02e2ca89c1bd4230ed3e7e86f3c14dbf4c83a30984a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwMzIzMTM2YjQwNzBlNzAwOTJkOWUwODViZmQwZWI1OWI2NDNkMzYzZmY1NmU2MWZkMDVjNjI5MTczZjc0NTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE4NjdmOTZiNzVhMzI0MzdhMDc2NzY0NWVhYTcxYjJhMzJkMzgxM2FhYzI3MTEwMjkyMzA1ZDgyNjBlMGUzM2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/atlas-retrieval-reconciliation/spec.md#L9-L15",
+          "version": "repo-lines-v1:sha256:442aee7c96d5fd1a6467f1d8280abe184a121280f0c771f944d4eeb585f25199:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTdjYTc1YmYwNjc3MWIyNTAyNDIxNmUwMzRiZjMyNDRiNGNlMDdiMTgxNzQ2MTg4NjM3MTRjZWZiNjQ3MTA2NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjFhYzQ1MTM1MGVkYTQ2OTQ1MTg0ZTY0OWYyMjYwYTgyZjBhYTU4N2UzMDlhNTAyMDNkZjU5NGU0OGE3YjI5MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODNkNzc5MzEzZmFiNDE5ZDc3OTQzM2U2OTIzY2Y1ZWViMjA1ZmQyNjAxZjdjODJjMjc1NmRjZjMzNzMxN2U4ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODdjYWFjMTYzOTVkZTI4Y2MwOTU4OTZkOGVlMmNlYTAxYzliMzQ3YWQ4NDMzZWJiM2U3M2U2ZWY2YzRmYmI4NiJ9"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L267-L289",
+          "version": "repo-lines-v1:sha256:dcfbc04a392143d070aebd54a2fd128ec30a1d9d5e406accd20e27d18b8c7cdc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZDVhYmFjYTIyNjgwYWU5NTMzNjcwMGRmNzY2MzYxOTdhN2NiNmMwMDRmNGNkNzlhYzFiMWZkMmYwYWM0YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyMmZhYTUzNWJkMmVhM2Q1MmU3NDFlZDQ1NDQzNWI3ZmU0OWU4MzU4NmU5NDNkOThkODJiYmZiMjRkMWY1YzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5NjVlZGU1ODM0NTkwZTQ5OTFmZmQ2ZTI1ZjNjNWEzZWNiZWZjN2Y0MjViYmY1NDhmYjMwYjM2N2U0MjUxZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhNWQ1ZWUzNmY2NzM0NjI5OTYzYTE1ZmE5ZDdjNDA4ODMwYzUwMWUyNmM1MTU3MDhkMmZhYjRhOGQ5YjZkMWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cd07879be54644a7a3ae96d02a7a4394",
+      "statement": "`SearchRuntime.search()` is the unified retrieval entrypoint that validates queries, retrieves candidates, fuses with RRF, scores, hydrates with proof, reranks, post-processes, and optionally queues non-blocking promotion/exposure writes; its `readOnly` mode suppresses known write side effects.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L505-L581",
+          "version": "repo-lines-v1:sha256:89837939d78218bbc5646b02d7ac7d82f3e653352b221fad8adb65aa76a4d756:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMzVkOTg2NjE2NzYzM2ZlYjhhNWEwYWRiNGUyZjhlZTQ4YTk1ZjgyYmVkZjcyMDg1ZGM4Mzk3ZjcyNDY1MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI5MDFhMTFmMmQ4MTcyMGMwMjU1ZDVlMTUyMjJiMTE4NTFmYTJmN2QxMjNjZjc0MzkyZGZkNWRmNmFlYTBmYWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyYTk1YjlkMWI0YmE5YjNkZGZiNGY5Njk0YTg0ZWEyZTc3Yjg0ZmQ1ZjIwYmE4ZWVhZTdhMzVkZGVlNjI0ZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZjNWVjOGZmZWEzYTY0NTA3NjFmMGM3ZDIzYzUyZDI0YzVjNzdkZTM2ZGY3MGQxNWIxNDhlYjU4MTVjMmQ2ODAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts#L584-L878",
+          "version": "repo-lines-v1:sha256:6df23f315bd5643b0319ac2c6ae46646ca15d6800adf4c07b890e21771bb4843:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjk1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0NWMzMjU2NmRiYjg1ZjQ3NWZlNzYwMjBjZjcxYjk4N2IxOTdlMmEzZTg4ZWEwZDRjZDg5YjJkM2JlMWY5OTcxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3MTM0NTE4MDEwNWIwYzY2YTc3ZGFkNTFiYjM3OTAxYTM3MzJjOTY1NGJhNGRlMzk4MWY4MWUxODE3NTI0OGJmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzNTNjMWRjZTI5MThkMmQ0NzE0MDQ1ZmMyM2NmZmZlMmJiZTNkMGJkOGFjZWE4ZTEwOGNhNDMyZDM1MDM2ZTliIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwN2JkZjQzMjBjOWY3NGRkYWVkNjhhOGQ5MzQ3NTdlMTRmN2Q0MTcyZTIwOTNkM2RhMTZkMzY4NmZmZmZjYTIxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2d698198c9047aeb11a5a1c46ae086a",
+      "statement": "Graphify's daily coordinator owns revision-qualified execution identity and stage transitions across source selection, inventory, AST/structural processing, semantic enrichment, graph build, projection, validation, and close, while deliberately not reimplementing those producer pipelines.",
+      "evidence": [
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts#L42-L62",
+          "version": "repo-lines-v1:sha256:6880805fcdd0b09d33789ec2dc63fe13e6157ef406a1d234a351c3d89bae38c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIzMjY4MGY5YmY1NTYyM2QwZWExMThmYTNiM2IwMTVhMTI5NzI4NDVjMThhNTAyZTFiYzEyNmUzM2ZkYjc1MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhYTc2NjE1ZGZlMDQ2ZTEwYTM1NmY4OGFjNjE2MzMyZTBhMmMwZTk2ZjU0ODUxYWJiODJhMWUyN2Y3MjgwMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxM2NlMTRkZTYzNzE5ZGFlYWQzNDk3ZTY5YzYxZGU5MmU5NDhlYTI4OWY3MzYyZmQ0MWEyYzJmZjhiYjhiNWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiY2Y1NTViMDFjMTYxMjgzNDA0OWMwOWNkOTFlODQ3ZmMyY2FiYzEzMzk2NjE0YmJiMDUzMjdiNTZmMDIzZDAifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts#L7-L26",
+          "version": "repo-lines-v1:sha256:069a00faa054105baf290e31da5c422495b06ae74ca2fca8d8d71e84758fa5d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MmE0MjkzODJiMmUxNDcxOGUwZTM3YjA1NzBhOGExNzAyOTkxZmNkODQ5OGNkODQwNjBhOGJmNGYwNTAxN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlNDRlY2FmN2UzNDViMTdkYTY0YWQ0YTgwMzg5NTUxMjZhMzE1YzA4OTdkNmU4ZmUxOTk0MTYzNzg1Y2NiOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZkNWJhMGFkN2M5YmQ4YjkyNTM3MTg0NjFlZTA4MTBkZWIzNDc2NDc5YjU3MzY3NTMyNjNmMGQzOGM0YzFlMTcifQ"
+        },
+        {
+          "resource": "repo://sveltekit-frontend/src/lib/server/atlas/indexing/graphify-daily-coordinator-v1.ts#L87-L155",
+          "version": "repo-lines-v1:sha256:e24d738e730af066a75168a9ddd5af83eabed4dae665ed2ea934110aced417d4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNmEyNzEwZmZjNTA0M2EyZWI1ZDRhNjk3ZmVlYzI4NGM2ODcwYzVhMzE5YzY4NjEzYjY3NDZhYTZiN2ZjYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiMjYwMmI0ZDUwY2E5NTM5ODU0NmI1MDJjZTE5NzNmNWFjZTgxYWY3ZWUzNGMyNDNmOTJmZDdmNjEzNTMyNzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMDI1YWI3ZDU0ZmVlMTE2ZjNkZmEzZDliNzYxNmNiMjZlNWUwNTQwNTg0YWVjYzY0MTNhNTY4NmE1MDlkYTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiMGEzNjRiOTZmNmU0MGNkZjNjYzQ4ODI0NTRiOTJiYjk2MDUyMmQyMDU0ODhhMjAxMjM3OTZjMzZkOThlNjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3763704e5ce54e1f81d752b88d7bd4f8",
+      "statement": "Parent Atlas distinguishes DAG relationships, which represent dependency or execution ordering, from KAG-style relationships, which represent facts, claims, evidence, concepts, and authority; hyperedges may represent genuinely n-ary relationships.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md#L67-L75",
+          "version": "repo-lines-v1:sha256:33621d5cf84199b8943f32c5e17a8e6afa2165292bbde5dfe0f00003fc4c6f0f:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJkZWFjZjk4NTEzZDIyMmY3YzRmMGVhYzk5MTE1ZmM2OTNhMmU5Nzk3MzBkNmMyZDc0OGJjZmJmMGEwNDE3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDc1OGE0ZjQ3ZGJiZTM1N2FjYTc0YzEyMWEyM2I3NWM0ZjY1YWFlNzYyOTFlM2U3ZmE2ZmM1Njg3YmRjZDViZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODNlMGRlZjg3NTUwMGE0Y2RkMmZmMTlmZjg3MThlZjcyMGUxZjdiMTQ5YTE0NGI2YmIxZDdkMjQxNmJmZTM4NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODNlMGRlZjg3NTUwMGE0Y2RkMmZmMTlmZjg3MThlZjcyMGUxZjdiMTQ5YTE0NGI2YmIxZDdkMjQxNmJmZTM4NyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ae4802f7e36b4a9aa7af0f38dedfced7",
+      "statement": "OpenSpec is the canonical behavioral specification surface for Parent Atlas feature intelligence; planning artifacts may derive from its requirements but do not become competing semantic authorities, and feature completion remains distinct from phase completion and application readiness.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/README.md#L1-L8",
+          "version": "repo-lines-v1:sha256:51c426b29d48ed0dff4aafa83fc66d403b1d20b2476e2b5488b5168e217ef856:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjk5M2E4ODZiMjMzNTAxY2M4OTdlZjc4ZWE0ZjIxMWFhYzUzYmVmOGRhYTJmNDY2MGU5OWNlNGM3YmVmMmVhMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiN2ViNzAyNTc1OTNkYTA2ZjY4MmEzZGRkYTU0YTlkMjYwZDRmYzUxNGY2NDUyMzdmNWNhNzRiMDhmOGRhNjFhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2EyNGU5OTIyYWJmNDRlMTFiMThlMjc3ZjAyZmY1YmZmOGI3NmM5NjQwYjUwYjQ1ZGJlMjQzZWNmOTI3N2I2MSJ9"
+        },
+        {
+          "resource": "repo://openspec/README.md#L28-L49",
+          "version": "repo-lines-v1:sha256:b2dbc3c6d41cfd3448fc62f3d9027a1f0a9676c63c70d2e13730590e1a7c120e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkZmIzMzc0MDBiOTIyZjk2NmVmM2RmOTRlZDdmNDU4ZmJkZTNjNmI1MDUyY2VmMzU5ZDNjNWZlNzBiYjFmOTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhYjk3MjAzY2IyYTAyMThkYTY0NGY2ZGU4ZWI4ZGNhNmYxYjVhNTQ0ZTJiNGRiMjIxMDk0MjVkNmQwN2ExNTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlNGY5ODYyY2RkZjI3MjFmZDc4ZjdiNWI5OTBjMmU1N2Q0YTdhY2U3YjE1MTlhZmVmMDEyZWZkNzVkYzBkNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNhN2M1MjgxNjk4M2ZhNmJlNzY5YTA3NzEzZWI2OWZhODRjZmRmM2QxZGZkMDExMzU3M2E1MzUyMGFkMjE2ZWIifQ"
+        },
+        {
+          "resource": "repo://openspec/README.md#L81-L85",
+          "version": "repo-lines-v1:sha256:ea5d6aa06ce2da675e6bb9606361044d85a3a675cc03e3c830038e6f347c027b:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzc2ZWQ3NTliODA4ODVjODA5OWNhZGFjZWMyZWJhMjQ4Y2YxZDJhODYxNTU1OThlY2JiMDU3MzYwMTE2NjI5NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGExM2YwOTNkNWFlZGE2MmQwNjgyNmYxZjhiZmVmY2ZiNDY3NWIwYTY3OTBhY2ZlZjFmZmVmYjM5MjYxZTZiMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTg4ODkyNDk4YTljZTJmZWEzOTcxYzFkNmI0NDY3YmExY2QxNGYzYTY0NDg2YTRjNTUxMmQwOWI2OWY3ODljOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c9611d4f222f489db6b1a7c8104c1be5",
+      "statement": "The repository's `.okf` registry and validation profile define OKF as an internal navigation/interchange and derived-documentation layer that does not create canonical packet, source, ontology, vector, graph, or cache authority.",
+      "evidence": [
+        {
+          "resource": "repo://docs/.okf/registry.yaml#L1-L15",
+          "version": "repo-lines-v1:sha256:7f390adfdbe307a31f198a98130e10c5317196f703d25a6cbf5f0c50e45e0dff:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmOTI0OWU4ZDBmZjM3YzA1MWRlN2E3YTU2MzkxZTJkOGZkNDM2MjI1MDJjYjQ3YjNmYWI5OTBlNmRjNGYzZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhODdmZjI2YzEyYWRlZjUwZTZhYzZhMzIzNDM3NDkzNGNkMzllZGNiYmRiYmRmM2JiMGE3Yzk0NjhiMzFkOGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4ZTM3MjZiMTlmNDI5MGQ0ZTBkMjk5YTA0NGJkZGEyNGFiOTFmNTBjYzVkNTgwM2U1MjBmMTNhOTllN2UwZTUifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/okf-v02-validation-profile-v1.md#L1-L11",
+          "version": "repo-lines-v1:sha256:4e1015b3ca1cc014370073ebb921c418e020b6b9ccac4e70c429b0b49248011a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMGU3OTBiOTE4MzZiYmNjODQ3NzlhNzQ3YmMxNDcwOGFmYmMwMmQzOTlkYWY1NDVkYzI4N2RiM2M2ODZkY2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NmQ3ODJlYjE0M2RhYTVmYmNmMWVhN2MxMjZmN2U1YjA1NTUzNzRmZThkN2UzODliNjA0ZjVjYjdhYzE1NTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/okf/parent-atlas/architecture/canonical-authority.md#L11-L15",
+          "version": "repo-lines-v1:sha256:13571ca128eb63fb1bd48adbabf4500e921cdf78559fc0b26b75d0fd35f909b0:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWRkMDZiYjkwOTU4NzdiNGM3NzkxMGY2ZDE1ZTZjMzI1ODMxMTYxMjdiNzBlZDdhZGVmM2Y1ZjMxN2QyYzBiMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMTAxZjJmMzkxYWFlYjllMDUxMjk2YzcyMzc3M2ZlOGNhN2U5MDZhYzU3ZDQ5ZjgwOWRhYzQ3OTVjMDFjZDRlMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjA1MTAzYzE5NzZmNTNhNmVkOWViNDQwODBmM2MzMjc5NzMwMDA2NjZiYTkxMWFiYzc5MzhkNWQ3NzUwM2RhMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8deee3c171fd4a55a6444ad913faf0e5",
+      "statement": "The agentic runtime contract assigns ACP to an optional client/IDE boundary, A2A to interoperability between independently deployable agents when needed, MCP to auditable policy-controlled tool/resource access, tRPC to internal typed RPC, and orchestration frameworks such as Mastra to replaceable workflow management.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md#L117-L159",
+          "version": "repo-lines-v1:sha256:34a13968da204314f0dca60bd01d9491f1f52cec761efaca9d13b51e99095074:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2Y2VlYzFkMGJmM2E4NDA3NzI3YjdkY2MyN2Q3OTlkNjVmNTU1YWMyZTZhYjYyZWYyMDVjMDlkOWYxM2ZhNGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2ZmNhMDljYzRkZjZkMDZiODBjMDhhNmIzMDczZmMxOTlkMGUzMjQ2MzZlOGU0Y2JkYzNhMzNhODBhYjllMDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ec0b3e1eb9ee4948ba37a662b670f2fa",
+      "statement": "Autonomous repair requires an evidence manifest and validation-gated completion, and completed runs must be replayable from persisted evidence, configuration, tool-call, mutation, validation, and outcome records rather than depending on an old KV cache.",
+      "evidence": [
+        {
+          "resource": "repo://openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md#L17-L51",
+          "version": "repo-lines-v1:sha256:f85165745b4613436dcc98ae31bc0768ff9ac6dce31752f41ccdacf5c858af9f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwZGIxZWU3NGM3Y2VkOTQyODQxYzA2M2Y3Njg4OGFlMWUwMmRjMzcwNmZkOTBjNzhhNWNjYTZjOGU1MjlhYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4YWRjMzE4ODU3ZTk4MjIzOTA5MDUzYmVlMmIzNGY5OTY4N2E3ZmRjNzljM2I1ZTFlYjc3ZGU5ZTViNWExMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
+        },
+        {
+          "resource": "repo://openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md#L188-L207",
+          "version": "repo-lines-v1:sha256:0fa9b814ef1164fa95e22a353a26fdec97dcb6baec299cb57131497a4dfd5128:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiNTY1MTYyYTM5YWJjNzkyYzM4MmM5ZTNkYmY0MjE1ZmQxYjU0Y2IzYjkwNzNmODc0ZDlkYmVhOGRhOTcxOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NzZjMDMwMGE1YTJjOGY4YjcwMDZjMjVjNzQzMmRhZmVmZGVkYWNlNjllNWM1Y2M3ZTM2NWE5ZGNmOTJlODAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgzZTBkZWY4NzU1MDBhNGNkZDJmZjE5ZmY4NzE4ZWY3MjBlMWY3YjE0OWExNDRiNmJiMWQ3ZDI0MTZiZmUzODcifQ"
         }
       ]
     }

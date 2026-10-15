@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "runId": "ed436c5a-18e6-47c8-a18e-0feceae162b0",
   "mode": "init",
-  "phase": "planning",
+  "phase": "generating",
   "startedAt": "2026-10-07T02:11:06.802Z",
   "language": "en",
   "languageChanged": false,
   "requiredRewritePages": [],
   "initialPages": [],
-  "sourceFingerprint": "sha256:ffdbffb25626d2d5e701721b15f05f51ed30645214f37e2136539c383a4ac513",
-  "targetGitHead": "35871d115516bc5e6df18cf60dd773b7958d7a11",
+  "sourceFingerprint": "sha256:c79802b65c2c357df3d54f68e5c2348e933a053f349d4a3951997bf6c17e6f10",
+  "targetGitHead": "9f5257eeafe88e738568ad7666439a2cf3a7d924",
   "planningContext": "Create an evidence-grounded Parent Atlas repository wiki only in ./openwiki/. Inspect docs/.okf, docs/atlas, OpenSpec, Graphify, packet-registry, source and tests. Preserve PostgreSQL packet/source/workspace authority; label claims proven, experimental, blocked, proposed, or unknown with exact repo-relative refs. Do not change anything outside ./openwiki/, access/write datastores, refresh Graphify, index, or manage services/workflows. Report pages and gaps.",
   "actor": {
     "producerActor": "openwiki/0.7.1",
@@ -19,5 +19,510 @@
   "beforeContentSnapshot": "ffa63583dfa6706b87d284b86b0d693a161e4840aad2c5cf6b5d27c3b9621f7d",
   "preparedWiki": {
     "generatedProvenance": []
+  },
+  "plan": {
+    "pages": [
+      {
+        "id": "27a8b89d-d2d0-4433-ad14-cdcbfff78f81",
+        "path": "/openwiki/architecture/boundaries-and-authority.md",
+        "title": "Ownership, Authority, and Write Boundaries",
+        "purpose": "Define safe dependency direction and mutation boundaries, especially PostgreSQL packet/source/workspace authority versus Qdrant, Neo4j, Redis or Valkey, queues, caches, RPC, and GPU projections.",
+        "seedPaths": [
+          "docs/.okf/registry.yaml",
+          "docs/architecture/PARENT_ATLAS_PACKAGE_BOUNDARIES.md",
+          "docs/atlas/parent-atlas-data-spine.md",
+          "openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md",
+          "openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md",
+          "packages/atlas/lib/packet-registry.mjs",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts",
+          "sveltekit-frontend/src/lib/server/hooks.server.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+          "/openwiki/testing/contracts-and-boundaries.md"
+        ],
+        "instructions": [
+          "Cite exact repo-relative refs for every boundary and include source-grounded Mermaid flowcharts for request and mutation-gate behavior.",
+          "Document read-only, dry-run, explicit-apply, independent-readback, and checksum gates; do not perform datastore, Graphify, index, service, or workflow operations while researching or documenting.",
+          "Preserve PostgreSQL packet, source, and workspace authority; explicitly mark any competing registry or projection authority as proposed, blocked, or unknown unless current source and tests prove otherwise."
+        ],
+        "status": "complete",
+        "completedBy": "openwiki/0.7.1"
+      },
+      {
+        "id": "cdea8281-9c29-422d-a408-aa242489a4b9",
+        "path": "/openwiki/architecture/overview.md",
+        "title": "Parent Atlas Architecture Overview",
+        "purpose": "Explain the smallest useful architectural shape: SvelteKit application boundary, portable contracts, Parent Atlas runtime and adapters, PostgreSQL packet/source/workspace authority, rebuildable projections, and optional compute or agent lanes.",
+        "seedPaths": [
+          "README.md",
+          "docs/PARENT-ATLAS-SYSTEM-BOUNDARIES.md",
+          "docs/architecture/PARENT_ATLAS_PACKAGE_BOUNDARIES.md",
+          "packages/atlas/README.md",
+          "packages/parent-atlas-core/src/index.ts",
+          "packages/parent-atlas-runtime/src/facade/retrieval-facade.ts",
+          "sveltekit-frontend/src/lib/server/atlas/atlas-index.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/architecture/system-map.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/integrations/protocol-and-service-adapters.md"
+        ],
+        "instructions": [
+          "Mark each architectural claim [proven], [experimental], [blocked], [proposed], or [unknown] and cite exact repo-relative source, spec, schema, or test paths.",
+          "Separate documented target architecture from executable behavior; do not treat package exports, plans, or README claims as proof of a live deployment.",
+          "Use one source-grounded Mermaid component/data-flow diagram with a caption; do not invent services or authorities."
+        ],
+        "status": "complete",
+        "completedBy": "openwiki/0.7.1"
+      },
+      {
+        "id": "3d256d7b-a08a-44e5-867e-fb6ec3804ca9",
+        "path": "/openwiki/architecture/system-map.md",
+        "title": "System Map and Runtime Domains",
+        "purpose": "Map the implemented runtime domains and their control/data boundaries from SvelteKit routes and server modules through retrieval, ingestion, evidence, orchestration, storage, and optional service adapters.",
+        "seedPaths": [
+          "packages/atlas-orchestrator/package.json",
+          "packages/parent-atlas-client/package.json",
+          "packages/parent-atlas-core/src/index.ts",
+          "packages/parent-atlas-runtime/src/facade/retrieval-facade.ts",
+          "sveltekit-frontend/src/lib/server/atlas/atlas-index.ts",
+          "sveltekit-frontend/src/lib/server/packet-pipeline.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+          "sveltekit-frontend/src/routes/+layout.server.ts",
+          "sveltekit-frontend/src/routes/api/search/+server.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/architecture/overview.md",
+          "/openwiki/integrations/protocol-and-service-adapters.md",
+          "/openwiki/workflows/evidence-to-feature-state.md",
+          "/openwiki/workflows/retrieval-request.md"
+        ],
+        "instructions": [
+          "Cite exact source and focused-test references for callers, persistence, fallbacks, and ownership; label unimplemented facade stages and optional lanes rather than flattening them into one runtime.",
+          "Include a concise Mermaid sequence diagram grounded in inspected callers and adapters.",
+          "Repair stale or broken wiki links while updating this page, and distinguish the SvelteKit Platform Search route from the canonical SearchRuntime path."
+        ],
+        "status": "complete",
+        "completedBy": "openwiki/0.7.1"
+      },
+      {
+        "id": "55214e4a-7f08-422f-b224-238415741684",
+        "path": "/openwiki/concepts/glossary.md",
+        "title": "Parent Atlas Glossary",
+        "purpose": "Provide a compact vocabulary for packet, source_ref, packet_key, workspace and source revisions, representations, evidence, projections, logical lanes, receipts, Graphify, OKF, OpenSpec, KAG, DAG, and agent protocols.",
+        "seedPaths": [
+          "docs/.okf/registry.yaml",
+          "openspec/README.md",
+          "openspec/specs/atlas-feature-state/spec.md",
+          "openspec/specs/atlas-retrieval-reconciliation/spec.md",
+          "packages/atlas/lib/packet-registry.mjs",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/evidence/status-and-gaps.md"
+        ],
+        "instructions": [
+          "Define terms from live contracts or exact repository references, and identify conflicting legacy terminology instead of silently normalizing it.",
+          "Use the evidence labels [proven], [experimental], [blocked], [proposed], and [unknown] for terms whose implementation status is not uniform."
+        ],
+        "status": "complete",
+        "completedBy": "openwiki/0.7.1"
+      },
+      {
+        "id": "c5c71336-2ae3-45dd-bf58-28c4a204b328",
+        "path": "/openwiki/concepts/packet-identity-and-provenance.md",
+        "title": "Packet Identity, Revisions, and Provenance",
+        "purpose": "Explain how canonical packet identity, source bytes, workspace state, representation lineage, chunk membership, graph snapshots, and receipts qualify one another without allowing projections to mint identity.",
+        "seedPaths": [
+          "packages/parent-atlas/src/core/canonical-packet-bridge.ts",
+          "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+          "sveltekit-frontend/src/lib/server/atlas/identity/packet-revision-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/identity/source-lineage-axes-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/lineage/graph-revision-snapshot-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/lineage/packet-chunk-membership-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+          "/openwiki/testing/contracts-and-boundaries.md",
+          "/openwiki/workflows/graphify-ingestion.md"
+        ],
+        "instructions": [
+          "Preserve the distinction between packet_key, source_ref, source revision, workspace revision, repository revision, packet revision, and representation revision; cite exact contract and test paths for each.",
+          "Treat receipts and observations as evidence rather than authority, and label legacy normalization or registry claims when they conflict with current source contracts.",
+          "Use a Mermaid ER diagram or lifecycle flow only where it is directly supported by the inspected schemas and identity tests."
+        ],
+        "status": "complete",
+        "completedBy": "openwiki/0.7.1"
+      },
+      {
+        "id": "41aee6a6-771d-4161-ad95-e496167e13ac",
+        "path": "/openwiki/concepts/packet-registry.md",
+        "title": "Packet Registry and Projection Health",
+        "purpose": "Describe the current additive packet-registry projection contract, lane descriptors, status and write-policy semantics, title-backfill safety constants, and the unresolved writer-ownership or live-DDL questions.",
+        "seedPaths": [
+          "docs/reports/packet-registry-writer-ownership-v1.json",
+          "openspec/changes/parent-atlas-rpc-packet-registry-fabric/design.md",
+          "packages/atlas/lib/packet-registry.mjs",
+          "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
+          "sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-client-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packet-registry.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/evidence/status-and-gaps.md",
+          "/openwiki/testing/contracts-and-boundaries.md",
+          "/openwiki/workflows/graphify-ingestion.md"
+        ],
+        "instructions": [
+          "Do not apply DDL, backfill packets, warm caches, write Qdrant, or refresh services; cite exact report and test paths and include a source-grounded Mermaid lifecycle diagram.",
+          "Label the wide registry design, schema declarations, writer census, and parity reports separately as [proposed], [experimental], [blocked], or [unknown]; a report must not be presented as a live database fact.",
+          "Preserve PostgreSQL atlas_packets as packet identity authority and describe atlas_packet_registry_projections as projection metadata unless a current read-only audit proves otherwise."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "16525b45-a673-45e6-82cd-ecad0b7421b3",
+        "path": "/openwiki/evidence/status-and-gaps.md",
+        "title": "Evidence Status and Known Gaps",
+        "purpose": "Maintain the repository-specific evidence ledger: what source, schema, focused tests, or read-only reports prove; what is experimental, blocked, proposed, or unknown; and which gaps must be resolved before a coding agent changes the system.",
+        "seedPaths": [
+          "PROJECT-STATUS-CORRECTED.md",
+          "docs/.okf/registry.yaml",
+          "docs/reports/atlas-packet-registry-gap-ws1.4.json",
+          "docs/reports/packet-registry-writer-ownership-v1.json",
+          "graphify/README.md",
+          "openspec/README.md",
+          "openspec/specs/atlas-feature-state/spec.md",
+          "openspec/specs/atlas-repository-evidence-ingestion/spec.md",
+          "openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md",
+          "sveltekit-frontend/src/lib/server/db/schema/atlas-packets.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+          "/openwiki/workflows/evidence-to-feature-state.md"
+        ],
+        "instructions": [
+          "Every ledger entry must use [proven], [experimental], [blocked], [proposed], or [unknown] and include exact repo-relative references with line anchors where available.",
+          "Report contradictions explicitly, especially packet-registry ownership, dated counts, Graphify output location, evaluation readiness, and live service or datastore state.",
+          "This page is read-only evidence reporting: do not access datastores, refresh Graphify or indexes, or manage services or workflows."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "e960addf-ef0a-45b0-86a0-951944b05331",
+        "path": "/openwiki/integrations/protocol-and-service-adapters.md",
+        "title": "Protocol and Service Adapters",
+        "purpose": "Map public and internal integration surfaces—SvelteKit routes, tRPC, Go retrieval gRPC or HTTP, MCP, A2A, FastAPI GPU execution, Qdrant, Neo4j, Redis or Valkey, embedding services, and generated protobufs—to their callers, fallbacks, and authority limits.",
+        "seedPaths": [
+          "packages/parent-atlas-client/package.json",
+          "packages/parent-atlas-client/src/a2a/client.ts",
+          "proto/active/retrieval.proto",
+          "services/atlas-gpu-8098/app.py",
+          "services/go-retrieval-service/generate.sh",
+          "services/go-retrieval-service/identity_propagation_test.go",
+          "services/go-retrieval-service/lanes.go",
+          "services/go-retrieval-service/main.go",
+          "services/go-retrieval-service/representation_test.go",
+          "sveltekit-frontend/src/lib/server/env.server.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/go-retrieval-client.ts",
+          "sveltekit-frontend/src/mcp/trace-mcp-server.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/architecture/system-map.md",
+          "/openwiki/operations/monitoring.md",
+          "/openwiki/testing/contracts-and-boundaries.md",
+          "/openwiki/workflows/retrieval-request.md"
+        ],
+        "instructions": [
+          "Document configuration and failure fallback paths without contacting services, and include Mermaid request sequences only for flows supported by inspected source.",
+          "Label generated, partial, optional, fail-closed, and design-only surfaces with exact source and test evidence; do not infer protocol availability from package metadata alone.",
+          "Separate transport ownership from runtime ranking, identity, graph traversal, and durable persistence; preserve PostgreSQL packet/source/workspace authority."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "213ca139-20e7-4322-9bff-2644ffb5b00d",
+        "path": "/openwiki/operations/monitoring.md",
+        "title": "Runtime Configuration, Readiness, and Monitoring",
+        "purpose": "Give coding agents an operational map of environment parsing, startup hooks, readiness and health endpoints, service dependencies, timeouts, rate limits, logs, optional lanes, and safe interpretation of degraded health.",
+        "seedPaths": [
+          "docker-compose.dev.yml",
+          "docker-compose.yml",
+          "docs/DOCKER_STARTUP_GUIDE.md",
+          "docs/ENVIRONMENT_CONNECTION_REFERENCE.md",
+          "sveltekit-frontend/Dockerfile",
+          "sveltekit-frontend/src/hooks.server.ts",
+          "sveltekit-frontend/src/lib/server/env.server.ts",
+          "sveltekit-frontend/src/routes/api/health/+server.ts",
+          "sveltekit-frontend/src/routes/api/health/qdrant/+server.ts",
+          "sveltekit-frontend/src/routes/api/health/ready/+server.ts",
+          "sveltekit-frontend/src/routes/api/health/services/+server.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/integrations/protocol-and-service-adapters.md",
+          "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+          "/openwiki/testing/validation.md"
+        ],
+        "instructions": [
+          "Document environment names, defaults, optional services, boot-task ownership, timeouts, and failure behavior from source; never expose secrets or treat a default URL as proof that a service is running.",
+          "Preserve the rule that production rejects dev-only secrets and that missing optional dependencies should produce explicit degraded or unavailable state.",
+          "This is a read-only operational map: do not probe services, access datastores, refresh indexes or Graphify, or manage workflows. Label dated operational claims [unknown] unless current repository evidence proves them."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "9f04c4ce-efce-47c0-b51d-7d95002630d3",
+        "path": "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+        "title": "Safe Rebuilds and Failure Handling",
+        "purpose": "Describe how agents should diagnose stale or missing projections, identity conflicts, revision mismatches, failed enrichment, unavailable services, migration drift, and promotion gates without repairing the wrong authority.",
+        "seedPaths": [
+          "docs/VERIFIED-VS-PLANNED-ARCHITECTURE.md",
+          "docs/atlas/parent-atlas-data-spine.md",
+          "scripts/atlas/audit-packet-registry-writer-ownership-v1.mjs",
+          "sveltekit-frontend/src/lib/server/atlas/drizzle-sidecar-policy.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/identity/packet-write-decision-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts",
+          "sveltekit-frontend/src/lib/server/hooks.server.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+          "sveltekit-frontend/tests/mutation-gate.spec.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/operations/monitoring.md",
+          "/openwiki/workflows/graphify-ingestion.md"
+        ],
+        "instructions": [
+          "Do not access or write datastores, refresh Graphify or indexes, or manage services or workflows while producing this page. Cite exact reports, source, and test paths and label all gaps.",
+          "Make inspection, dry-run, ownership review, explicit authorization, bounded mutation, and independent readback the only safe progression; never recommend rewriting PostgreSQL identity from a projection.",
+          "Preserve fail-closed behavior for source/workspace/packet conflicts, stale Graphify results, unavailable optional retrieval lanes, undocumented SQL, and unproven registry writers."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "c0d6d505-f0b1-49d9-9c3e-a8e901bd2e47",
+        "path": "/openwiki/testing/contracts-and-boundaries.md",
+        "title": "Contract, Identity, and Boundary Tests",
+        "purpose": "Collect the focused tests that protect packet identity, revision qualification, registry lane admission, Graphify CAS and replay semantics, retrieval fusion ordering, transport receipts, mutation gates, and package ownership boundaries.",
+        "seedPaths": [
+          "packages/parent-atlas/test/canonical-surface.test.mjs",
+          "packages/parent-atlas/test/identity-continuity.test.mjs",
+          "services/go-retrieval-service/identity_propagation_test.go",
+          "services/go-retrieval-service/rpc_registry_adapter_test.go",
+          "sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-client-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/contracts/rpc-packet-registry-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/drizzle-sidecar-policy.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/fusion-lane-dedupe.spec.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
+          "sveltekit-frontend/tests/mutation-gate.spec.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/testing/validation.md",
+          "/openwiki/workflows/graphify-ingestion.md",
+          "/openwiki/workflows/retrieval-request.md"
+        ],
+        "instructions": [
+          "Explain which invariants each focused test protects and which tests are pure fixtures versus dependent on live services or datastores; cite exact repo-relative paths and test names.",
+          "Preserve the authority and no-write constraints in test interpretation: a schema or contract test does not prove migration application, writer ownership, parity in the live database, or service availability.",
+          "Use a Mermaid flowchart only if it clarifies the validation gates; keep diagrams grounded in the inspected test and source contracts."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "89142519-092c-4ecd-810f-de817ef536f1",
+        "path": "/openwiki/testing/validation.md",
+        "title": "Testing and Validation",
+        "purpose": "Document the repository's executable verification layers—focused unit and contract tests, SvelteKit/Vitest suites, Go service tests, package tests, smoke tests, and end-to-end checks—and what each can or cannot prove.",
+        "seedPaths": [
+          "packages/parent-atlas/package.json",
+          "packages/parent-atlas/test/feature-intelligence.test.mjs",
+          "services/go-retrieval-service/identity_propagation_test.go",
+          "services/go-retrieval-service/receipt_v2_test.go",
+          "sveltekit-frontend/package.json",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator-degrade.spec.ts",
+          "sveltekit-frontend/tests/mutation-gate.spec.ts",
+          "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts",
+          "sveltekit-frontend/tests/runtime-connection-contract.spec.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/evidence/status-and-gaps.md",
+          "/openwiki/operations/monitoring.md",
+          "/openwiki/testing/contracts-and-boundaries.md",
+          "/openwiki/workflows/graphify-ingestion.md",
+          "/openwiki/workflows/retrieval-request.md"
+        ],
+        "instructions": [
+          "Do not claim a test passed from file presence or a documented plan; cite the exact test path and scope, and label runtime or datastore-dependent verification [unknown] unless a repository receipt proves it.",
+          "Keep validation read-only for this documentation task: do not run workflows, refresh indexes or Graphify, access datastores, or manage services.",
+          "Replace generic or nonexistent commands with commands actually present in the manifests; distinguish test discovery, static contract checks, integration tests, live-service tests, and passing results."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "09929afd-d3bd-4dc6-be1d-dbabce8768c9",
+        "path": "/openwiki/workflows/evidence-to-feature-state.md",
+        "title": "Evidence to Feature State and Agent Work",
+        "purpose": "Explain how OpenSpec, OKF, manifests, source/AST facts, schemas, routes, tests, and runtime receipts become evidence candidates, feature evidence, state receipts, Kanban projections, and bounded agent context without equating plans or topology with completion.",
+        "seedPaths": [
+          "docs/.okf/IMPLEMENTATION_GUIDE.md",
+          "docs/.okf/registry.yaml",
+          "openspec/README.md",
+          "openspec/specs/atlas-feature-evidence-graph/spec.md",
+          "openspec/specs/atlas-feature-state/spec.md",
+          "openspec/specs/atlas-kanban-materializer/spec.md",
+          "openspec/specs/atlas-repository-evidence-ingestion/spec.md",
+          "openspec/specs/openspec/specs/parent-atlas-agentic-runtime/spec.md",
+          "packages/parent-atlas/src/core/feature-intelligence-repository.ts",
+          "packages/parent-atlas/src/core/openspec-evidence-compiler.ts",
+          "packages/parent-atlas/src/core/openspec-repository-ingestion.ts",
+          "packages/parent-atlas/test/openspec-evidence-compiler.test.mjs",
+          "packages/parent-atlas/test/openspec-repository-ingestion.test.mjs",
+          "packages/parent-atlas/test/vitest-test-evidence-compiler.test.mjs"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/concepts/glossary.md",
+          "/openwiki/evidence/status-and-gaps.md",
+          "/openwiki/testing/contracts-and-boundaries.md",
+          "/openwiki/workflows/graphify-ingestion.md"
+        ],
+        "instructions": [
+          "Keep completion, confidence, priority, and staleness separate; explicitly state that phase completion, feature completion, and application readiness are not equivalent.",
+          "Mark implementation versus specification evidence with exact repo-relative refs and include a Mermaid flowchart for evidence candidate to state receipt to projection. Do not run ingestion, indexing, or workflow actions.",
+          "Treat OpenSpec requirements as behavioral authority and Spec Kit or GSD artifacts as planning adapters; treat OKF registry references as navigation and admission metadata, not a second packet authority."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "4d3c5b24-1d92-499c-8c4b-57b0d77817cc",
+        "path": "/openwiki/workflows/graphify-ingestion.md",
+        "title": "Graphify and Workspace-Scoped Ingestion",
+        "purpose": "Trace the representative source-change flow from workspace/source revisions through Graphify delta classification, CAS and stale-result rejection, invalidation, event admission planning, structural evidence, packet lineage, and rebuildable downstream projections.",
+        "seedPaths": [
+          "docs/CONCRETE-DAILY-GRAPHIFY-DAG.md",
+          "docs/GRAPHIFY-SCHEMA-VALIDATION-DEDUPLICATION.md",
+          "docs/atlas/parent-atlas-data-spine.md",
+          "graphify/README.md",
+          "scripts/atlas/daily-graphify-concrete-dag.mjs",
+          "scripts/atlas/daily-graphify-orchestrator.mjs",
+          "scripts/atlas/graphify-packet-contract.mjs",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.spec.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-daily-incremental-plan-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/graphify-delta-v1.ts",
+          "sveltekit-frontend/src/lib/server/atlas/workspace/workspace-event-sourcing-v1.ts",
+          "sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/concepts/packet-registry.md",
+          "/openwiki/operations/safe-rebuilds-and-failure-handling.md",
+          "/openwiki/testing/validation.md",
+          "/openwiki/workflows/evidence-to-feature-state.md"
+        ],
+        "instructions": [
+          "Document the read-only plan flags canonicalAuthority=false, promotionEligible=false, and writesPerformed=false, plus CAS conflicts, superseded sources, compaction replay mismatch, and requeue behavior.",
+          "Include a Mermaid sequence or state diagram grounded in the workspace and Graphify contracts.",
+          "Mark the 17-stage or production-complete workflow prose [proposed] or [experimental] unless the named source and focused tests prove the stage; do not run Graphify, indexing, services, or workflows.",
+          "Reconcile the implementation evidence with graphify/README.md: the root directory is infrastructure-only and historical scripts still write elsewhere; do not imply that all generated artifacts live in graphify/."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "196826ed-8697-4dd2-82d0-65a65b2152fd",
+        "path": "/openwiki/workflows/retrieval-request.md",
+        "title": "Retrieval Request Lifecycle",
+        "purpose": "Trace a search request from public SvelteKit callers through query validation, lexical and vector candidate acquisition, identity resolution, RRF fusion, scoring, hydration proof, reranking, post-processing, optional promotion, and degraded responses.",
+        "seedPaths": [
+          "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/hydrate-candidates.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/retrieve-candidates.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.spec.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+          "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator-degrade.spec.ts",
+          "sveltekit-frontend/src/routes/api/search/+server.ts",
+          "sveltekit-frontend/tests/retrieval-path-wiring.spec.ts"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/system-map.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/integrations/protocol-and-service-adapters.md",
+          "/openwiki/operations/monitoring.md",
+          "/openwiki/testing/validation.md"
+        ],
+        "instructions": [
+          "Distinguish the Platform Search route's Go gRPC/HTTP/SQL fallback tree from SearchRuntime's canonical retrieve-fuse-rerank path; cite both callers and focused tests.",
+          "Label optional embeddings, Qdrant, graph, learned reranking, and promotion as [proven], [experimental], [blocked], [proposed], or [unknown] from source evidence; include an accurate Mermaid sequence diagram.",
+          "Preserve the ordering invariant that canonical identity resolution precedes fusion, the one-logical-lane rule, workspace/source/representation rejection proof, and readOnly versus promotion-outbox behavior."
+        ],
+        "status": "pending"
+      },
+      {
+        "id": "6295ab53-e831-42cb-bab4-8be7e83fb3e1",
+        "path": "/openwiki/quickstart.md",
+        "title": "Parent Atlas Wiki Quickstart",
+        "purpose": "Entry point for initializing the repository wiki and routing coding agents through architecture, authority, workflows, integrations, operations, evidence gaps, and focused tests.",
+        "seedPaths": [
+          "INSTALL.md",
+          "README.md",
+          "docs/.okf/README.md",
+          "graphify/README.md",
+          "openspec/README.md",
+          "openwiki/architecture/overview.md",
+          "openwiki/evidence/status-and-gaps.md"
+        ],
+        "relatedPages": [
+          "/openwiki/architecture/boundaries-and-authority.md",
+          "/openwiki/architecture/overview.md",
+          "/openwiki/concepts/packet-identity-and-provenance.md",
+          "/openwiki/evidence/status-and-gaps.md",
+          "/openwiki/workflows/graphify-ingestion.md",
+          "/openwiki/workflows/retrieval-request.md"
+        ],
+        "instructions": [
+          "Refresh the routing map so every linked page exists; route readers by task rather than mirroring source directories.",
+          "State that this wiki is evidence-grounded and documentation-only: do not access or write datastores, refresh Graphify or indexes, or manage services or workflows."
+        ],
+        "status": "pending"
+      }
+    ],
+    "deletePages": []
   }
 }

@@ -24,7 +24,12 @@ function proposal() {
     graphRevision: 'graph:v1',
     producerRevision: 'proposal:v1',
     ontologyRevision: 'ontology-revision:v1',
-    predicate: 'API_CONTRACT_OBSERVED',
+    predicate: 'uses_concept',
+    predicatePolicy: {
+      schema: 'atlas.okf.predicate-policy-ref.v1',
+      registryDocumentSha256: 'a'.repeat(64),
+      registrySchemaSha256: 'b'.repeat(64),
+    },
     participants: owners.map((owner) => ({ ...owner, role: owner.entityType.toLowerCase() })),
     evidenceRefs: ['evidence:api'],
     admission: 'PROPOSED',
@@ -44,6 +49,7 @@ describe('NaryFactProposal admission', () => {
     expect(admitted.admission).toBe('ADMITTED');
     expect(admitted.canonicalAuthority).toBe(false);
     expect(admitted.ontologyRevision).toBe('ontology-revision:v1');
+    expect(admitted.predicatePolicy).toEqual(proposal().predicatePolicy);
   });
 
   it('rejects revision drift and never returns an admitted proposal', () => {

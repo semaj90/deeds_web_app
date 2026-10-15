@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.agent-retrieval-execution.v1",
+  "receiptVersion": "1.0.0",
+  "requestId": "req:trace:20261014-computePacketKeyV2-unified",
+  "workspaceRevision": "sha256:69e37be3a985552b9195b07fb8848ba42f5f137ebfe688a209b5eb02446f25cb",
+  "sourceRevision": "sha256:805b339b4374f53f568b166ea7115bbf25d2cdbb28f7f7fcc9e68c1b618b55b4",
+  "graphRevision": "sha256:0000000000000000000000000000000000000000000000000000000000000001",
+  "status": "PARTIAL",
+  "functionRegistry": {
+    "qualifiedSymbols": [
+      {
+        "symbolName": "computePacketKeyV2",
+        "symbolVersionId": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+        "packetKey": "packet:9aec19d8-8e0a-5470-bef2-9b8fca6c313a",
+        "sourceRef": "sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+        "byteSpan": {
+          "startByte": 4702,
+          "endByte": 4852,
+          "startLine": 81,
+          "endLine": 82
+        }
+      }
+    ],
+    "rejectedCandidates": [],
+    "sourceReadbackVerified": true
+  },
+  "retrieval": {
+    "astLaneRegistered": true,
+    "semanticLaneVerified": true,
+    "rrfSingleVoteVerified": true,
+    "contextManifestChecksum": "sha256:d580b939e2f21655abbcc1575dc1e3e7edc6e9f05956257f64bd8a2978b6f2b0"
+  },
+  "graph": {
+    "graphRevision": "sha256:0000000000000000000000000000000000000000000000000000000000000001",
+    "maxHops": 2,
+    "endpointsVerified": true,
+    "qualifiedEndpointIds": [
+      "file:sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts",
+      "file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts",
+      "pkg:zod",
+      "sym:PACKET_AGGREGATE_NAMESPACE_V1",
+      "sym:canonicalNameV2"
+    ],
+    "directionalEdges": [
+      {
+        "from": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+        "to": "file:sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts",
+        "relation": "IMPORTS",
+        "direction": "caller_to_imported"
+      },
+      {
+        "from": "sym:a4b46bb48216db9a41cda8e13d72fb1e0fe43dbdf68e009cb4607831aafbf5b9",
+        "to": "file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts",
+        "relation": "IMPORTS",
+        "direction": "caller_to_imported"
+      },
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts",
+        "to": "pkg:zod",
+        "relation": "DEPENDS_ON",
+        "direction": "module_to_external_pkg"
+      },
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/atlas-uuid-namespaces-v1.ts",
+        "to": "sym:PACKET_AGGREGATE_NAMESPACE_V1",
+        "relation": "EXPORTS",
+        "direction": "module_to_symbol"
+      },
+      {
+        "from": "file:sveltekit-frontend/src/lib/server/atlas/identity/packet-key-v2.ts",
+        "to": "sym:canonicalNameV2",
+        "relation": "CALLS",
+        "direction": "callee_reference"
+      }
+    ]
+  },
+  "ace": {
+    "proposalChecksum": "sha256:e5d51bf75f7edf8a7258a803c1bae69fabda4b304354b05b65418a5a24767590",
+    "admissionApproved": false,
+    "policyDecision": "ADMIT"
+  },
+  "cache": {
+    "mode": "dry_run",
+    "valkeyKey": "atlas:bitfrost:v1:centroid_lookup:5203f8dd218c3b3bb9670c7daca6969f",
+    "physicalResidencyVerified": false,
+    "coldWarmParity": true,
+    "writesPerformed": 0
+  },
+  "agent": {
+    "mcpDispatchVerified": true,
+    "acpPipelineVerified": true
+  }
+}

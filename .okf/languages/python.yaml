@@ -1,0 +1,96 @@
+# Python Language Specification for OKF
+
+version: 1
+language: python
+name: Python
+
+extensions:
+  - .py
+  - .pyi
+
+exclude_paths:
+  - "**/__pycache__/**"
+  - "**/.venv/**"
+  - "**/venv/**"
+  - "**/.pytest_cache/**"
+  - "**/.mypy_cache/**"
+  - "**/build/**"
+  - "**/dist/**"
+  - "**/coverage/**"
+  - "**/archive/**"
+  - "**/.tmp/**"
+
+# Symbol extraction rules (ast-grep / tree-sitter patterns)
+symbol_kinds:
+  function:
+    weight: 1.0
+    description: Function and method definitions
+    ast_labels:
+      - function_definition
+    evidence_weight: high
+
+  async_function:
+    weight: 1.0
+    description: Asynchronous function and coroutine definitions
+    ast_labels:
+      - function_definition
+    modifiers:
+      - async
+    evidence_weight: high
+
+  class:
+    weight: 0.95
+    description: Class definitions
+    ast_labels:
+      - class_definition
+    evidence_weight: high
+
+  dataclass:
+    weight: 0.9
+    description: Data structure classes with @dataclass decorator
+    decorators:
+      - dataclass
+    ast_labels:
+      - class_definition
+    evidence_weight: high
+
+  pydantic_model:
+    weight: 0.9
+    description: Typed schemas inheriting from Pydantic BaseModel
+    base_classes:
+      - BaseModel
+    imports:
+      - pydantic
+    ast_labels:
+      - class_definition
+    evidence_weight: high
+
+  fastapi_endpoint:
+    weight: 1.0
+    description: HTTP API route handlers in FastAPI / Starlette
+    decorators:
+      - "app.get"
+      - "app.post"
+      - "app.put"
+      - "app.delete"
+      - "router.get"
+      - "router.post"
+      - "router.put"
+      - "router.delete"
+    evidence_weight: high
+
+  test_case:
+    weight: 0.7
+    description: Unit test functions and test classes
+    function_patterns:
+      - "test_*"
+    class_patterns:
+      - "Test*"
+    evidence_weight: medium
+
+  module_variable:
+    weight: 0.6
+    description: Top-level module variables and constants
+    ast_labels:
+      - assignment
+    evidence_weight: low

@@ -3,9 +3,6 @@ type: architectural concept
 title: Canonical Packet Registry and Projection Health
 description: Defines the packet registry identity contract, immutable identity spine, projection-only enrichment, lane status, and references back to PostgreSQL packet authority. Separates the documented all-in-one registry proposal from the current additive projection schema and its unresolved writer-ownership gates.
 tags: [packet registry, packet identity, projections, PostgreSQL, health]
-verified:
-  - by: openwiki/0.7.1
-    at: 2026-10-07T02:11:06.802Z
 ---
 
 # Canonical Packet Registry and Projection Health

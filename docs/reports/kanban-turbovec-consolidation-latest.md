@@ -1,6 +1,6 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-10-13T17:31:17.845Z
+Generated: 2026-10-14T16:21:39.080Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
@@ -29,7 +29,7 @@ simdjson parses: 3957402 bytes
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Re-run the assistant-path comparison after each boundary change and record the result in `IMPLEMENTATION_STATUS.md`.
 - **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared
+  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:28**: 4 records, 4 open, clusters=28, 45, 59, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats | Install Unsloth + PyTorch (`uv pip install unsloth --torch-backend=auto`) | Keep CPU fallback paths available for dev and rollback | todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md

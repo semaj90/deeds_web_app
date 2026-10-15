@@ -375,6 +375,7 @@ describe('search runtime bridge', () => {
     expect(result.provenance.hypergraphNeighbors).toEqual([
       { canonicalId: 'packet:00000000-0000-5000-8000-000000000001', hyperedgeIds: ['hyperedge:abc123'] },
     ]);
+    expect(result.provenance.hypergraphGraphRevision).toBe('graph:r1');
 
     mockReadKagHypergraphNeighborsV1.mockClear();
     mockRerankCanonicalFeatureEnvelopes.mockResolvedValueOnce({
@@ -521,6 +522,7 @@ describe('search runtime bridge', () => {
     });
     const expandedQuery = [query, ...expansion.expansions.map((term) => term.term)].join(' ');
     const observedQueries: string[] = [];
+    const observedWorkspaceRevisions: Array<string | undefined> = [];
 
     mockRecordPromotionIntent.mockReset();
     mockAppendSearchRuntimeTrainingRow.mockReset();
@@ -583,8 +585,9 @@ describe('search runtime bridge', () => {
 
     const makeRetriever = (lane: 'sparse' | 'dense') => ({
       lane,
-      async retrieve(input: { query: string; limit: number; filters?: Record<string, unknown> }) {
+      async retrieve(input: { query: string; limit: number; filters?: Record<string, unknown>; workspaceRevision?: string }) {
         observedQueries.push(`${lane}:${input.query}`);
+        observedWorkspaceRevisions.push(input.workspaceRevision);
         const candidates = [{
           packetKey: `${lane}-shared`,
           sourceRef: `src/${lane}-shared.ts`,
@@ -626,6 +629,7 @@ describe('search runtime bridge', () => {
     expect(observedQueries.filter((value) => value.startsWith('dense:'))).toHaveLength(2);
     expect(observedQueries.some((value) => value === `sparse:${query}`)).toBe(true);
     expect(observedQueries.some((value) => value === `dense:${expandedQuery}`)).toBe(true);
+    expect(observedWorkspaceRevisions).toEqual(Array(4).fill(baseRequest.workspaceRevision));
     expect(literalResult.provenance.readOnly).toBe(true);
     expect(expandedResult.provenance.readOnly).toBe(true);
     expect(literalResult.provenance.promotionAttempted).toBe(false);

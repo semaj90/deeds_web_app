@@ -120,6 +120,7 @@ import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
 import { registerOpenSpecEvidenceTools } from './openspec-evidence-tools.js';
+import { registerAtlasKeywordCorpusTools } from './atlas-keyword-corpus-tools.js';
 import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
 import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
 import {
@@ -628,6 +629,7 @@ registerLegalSkillsTools(server);
 registerEngramTools(server, REDIS_URL, dispatcherMiddleware);
 registerAtlasEmbeddingTools(server, REDIS_URL, dispatcherMiddleware);
 registerOpenSpecEvidenceTools(server);
+registerAtlasKeywordCorpusTools(server);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server, dispatcherMiddleware);
   registerResearchTools(server, dispatcherMiddleware);

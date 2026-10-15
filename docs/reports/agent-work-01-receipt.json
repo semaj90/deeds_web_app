@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "atlas.agent-work-01.receipt.v1",
+  "milestone": "AGENT-WORK-01",
+  "timestamp": "2026-10-15T06:43:23.980Z",
+  "status": "VERIFIED",
+  "elapsedMs": 8990,
+  "environment": {
+    "platform": "win32",
+    "nodeVersion": "v22.23.3"
+  },
+  "verificationGates": {
+    "targetQualification": {
+      "status": "VERIFIED",
+      "targetFile": "sveltekit-frontend/src/lib/server/atlas/contracts/atlas-action-dag-v1.ts",
+      "sourceRevision": "sha256:6486bb2a84ef8d00e1e973898c79e2e4e1dd48c3d361973b0180dd9791f8fc1f"
+    },
+    "idempotency": {
+      "status": "VERIFIED",
+      "idempotencyKey": "sha256:6404d3d9a474291a076114d23fb2c6bd9c22e0af09f35fc4eb5e22a8307e48f9",
+      "isIdempotent": true
+    },
+    "staleRevisionGuardrail": {
+      "status": "VERIFIED",
+      "testedRevision": "sha256:f7c0dfdd3b8341cebfbec26e72c1d077a164fa791d8be902fdb376f24a2c52f2",
+      "terminalState": "STALE_REVISION_REQUALIFY",
+      "trippedStaleRequalification": true
+    },
+    "affectedTestSelection": {
+      "status": "VERIFIED",
+      "selectedShards": [
+        "src/lib/server/atlas/contracts/atlas-action-dag-v1.spec.ts"
+      ]
+    },
+    "shardedTestExecution": {
+      "status": "VERIFIED",
+      "exitCode": 0,
+      "durationMs": 8980,
+      "outputSummary": "4 passed (4)"
+    },
+    "actionDagLifecycle": {
+      "status": "VERIFIED",
+      "editAction": {
+        "actionId": "act-edit-action-dag-001",
+        "finalState": "VERIFIED",
+        "transitions": 5
+      },
+      "testAction": {
+        "actionId": "act-run-tests-002",
+        "finalState": "VERIFIED",
+        "transitions": 5
+      }
+    },
+    "guardrails": {
+      "writesPerformed": false,
+      "canonicalAuthority": false,
+      "zeroCanonicalMutations": true
+    }
+  }
+}

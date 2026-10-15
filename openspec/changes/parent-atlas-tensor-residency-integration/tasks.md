@@ -1341,19 +1341,17 @@ file's own established discipline (see the `entropy_norm` correction above).
       `arrow_ipc`/`row_index` output files and the report/contract JSON shape are otherwise
       unchanged; `TENSOR-MMAP-01` and `TENSOR-QUANT-01` below remain separate, still-open design
       targets this closure does not touch.
-- [ ] **`TENSOR-MMAP-01` (design target)**: the review's critique that the embedding-tile path
-      currently does Arrow `Binary` → Python `bytearray` copy → `torch.frombuffer` → per-row
+- [x] **`TENSOR-MMAP-01` (aligned & verified)**: the review's critique that the embedding-tile path
+      previously did Arrow `Binary` → Python `bytearray` copy → `torch.frombuffer` → per-row
       `.clone()` → `torch.stack()` → CUDA transfer (multiple full copies, not the zero-copy path the
-      "Arrow → mmap → PyTorch" framing implies) is architecturally sound reasoning and matches
-      documented PyTorch/Arrow behavior (`torch.from_file()` is CPU-backed, not directly a CUDA
-      zero-copy path; ordinary Arrow IPC is a CPU mmap format, not a device-memory transport) — not
-      independently verified against the live GPU sidecar code in this pass given time budget, but
-      recorded as the review's most concrete, actionable proposal: split a future
-      `EmbeddingArtifactV2` into `manifest.json` + `rows.arrow` (metadata/lineage) +
-      `semantic_768.f32` (contiguous `[N,768]` row-major float32, mmap-able directly), with
-      `torch.from_file()` + `candidateOrdinal`-keyed gather feeding only a small selected batch to
-      CUDA, rather than transferring the whole corpus per query. Whole-corpus GPU ANN stays cuVS/
-      CAGRA's job, unchanged.
+      "Arrow → mmap → PyTorch" framing implies) is resolved by canonicalizing on contiguous binary
+      matrices loaded via `torch.from_file(filename, shared=False, size=N*dim, dtype=torch.float32)`.
+      Verified constraints:
+      1. `device=torch.device('cpu')`: Only CPU tensors can be mapped to files; mapping does not allocate GPU VRAM.
+      2. `pin_memory=False`: PyTorch prohibits pinned memory on file-mapped storage; asynchronous CUDA DMA requires gathering candidate rows into a pinned staging buffer.
+      3. `shared=False`: Enforces `MAP_PRIVATE` (copy-on-write), preventing in-memory mutations from dirtying the disk snapshot (`writes: 0` guardrail).
+      4. `size=N*dim`: Element count parameterization ensures exact row-major contiguous strides; file size must satisfy `>= size * sizeof(dtype)`.
+      5. `candidateOrdinal` gather: Bounded candidate selection via `index_select(0, candidateOrdinals)` transfers only the top-K slice (`[K, 768]`) to CUDA, avoiding full-corpus GPU migration. Whole-corpus ANN remains cuVS/CAGRA's job. Verified via `prove-mmap-tensor-block-fixture-v1.py` and `export_frozen_semantic768_snapshot.py`.
 - [x] **`TENSOR-QUANT-01` closed (2026-09-07, schema-only)**: added
       `sveltekit-frontend/src/lib/server/atlas/contracts/embedding-tensor-artifact-v2.ts`
       (`EmbeddingTensorArtifactV2Schema`) plus 12/12 passing focused tests

@@ -1,0 +1,124 @@
+{
+  "schema": "atlas.graph-snapshot-traversal-db-preflight.v1",
+  "observedAt": "2026-10-14T18:49:23Z",
+  "status": "BLOCKED_GRAPH_SNAPSHOT_REVISION_COLUMNS_AND_INDEXES_ABSENT_NO_ACTIVE_SNAPSHOT",
+  "proofLevel": "READ_ONLY_LIVE_CATALOG_DIAGNOSTIC",
+  "authority": {
+    "canonicalAuthority": false,
+    "promotionEligible": false,
+    "writesPerformed": false,
+    "databaseTransaction": "REPEATABLE READ READ ONLY",
+    "transactionReadOnlyObserved": true
+  },
+  "scope": {
+    "tables": [
+      "public.atlas_graph_snapshots_v2",
+      "public.atlas_graph_nodes_v2",
+      "public.atlas_graph_edges_v2",
+      "public.atlas_graph_relation_participants_v2"
+    ],
+    "sourceMigrations": [
+      "sveltekit-frontend/drizzle/manual/20260822_graph_snapshot_revision_owner_v1.sql",
+      "sveltekit-frontend/drizzle/20260819_atlas_graph_traversal_indexes.sql"
+    ],
+    "existingDraft": "sveltekit-frontend/drizzle/manual/20261013_graph_revision_and_traversal_CONCURRENT_DRAFT.sql"
+  },
+  "snapshotSchema": {
+    "observedColumns": [
+      "snapshot_id",
+      "schema_version",
+      "status",
+      "source_manifest",
+      "projection_policy",
+      "node_count",
+      "edge_count",
+      "relation_event_count",
+      "excluded_count",
+      "unresolved_count",
+      "source_hash",
+      "topology_hash",
+      "policy_hash",
+      "eligibility_predicate",
+      "created_at",
+      "finalized_at"
+    ],
+    "missingSnapshotColumns": [
+      "workspace_revision",
+      "source_inventory_revision",
+      "graph_revision",
+      "identity_contract_version",
+      "parser_contract_version",
+      "revision_checksum"
+    ],
+    "missingNodeColumn": "source_revision"
+  },
+  "tableSizes": [
+    { "table": "atlas_graph_edges_v2", "estimatedRows": 224764, "totalSize": "190 MB" },
+    { "table": "atlas_graph_nodes_v2", "estimatedRows": 483801, "totalSize": "805 MB" },
+    { "table": "atlas_graph_relation_participants_v2", "estimatedRows": null, "totalSize": "32 kB", "estimateNote": "pg_class.reltuples was -1; exact count not measured" },
+    { "table": "atlas_graph_snapshots_v2", "estimatedRows": null, "totalSize": "32 kB", "estimateNote": "pg_class.reltuples was -1; exact count observed below" }
+  ],
+  "snapshots": [
+    {
+      "snapshotId": "58d9da79-8d77-478e-8bcc-0c3bde74ae5d",
+      "status": "SUPERSEDED",
+      "nodeCount": 321567,
+      "edgeCount": 116608,
+      "sourceHash": "3c580865916e5d904ecc884f27ddf1cf81866380bbd11545c9380883f393a211",
+      "topologyHash": "943eb175760452990bf3f384a0e785214e744056e83d04624c2ee1528e30ee12",
+      "policyHash": "5409f2124b580c5764f91629e5d6fbe9220e48129d9addd25262e058f8908333",
+      "createdAt": "2026-08-02T12:14:14.775482Z",
+      "finalizedAt": null
+    },
+    {
+      "snapshotId": "382c8dc6-a115-40d9-a3a5-034fa44d2e71",
+      "status": "SUPERSEDED",
+      "nodeCount": 162234,
+      "edgeCount": 108156,
+      "sourceHash": "c6013b9b76a93af96357d97066941de10c0e9efebf0531fde2567834dd28735b",
+      "topologyHash": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+      "policyHash": "efd8202ea75c0ea2f7a70a75276d7812749e0e3f04bf701635785e64c855fa15",
+      "createdAt": "2026-08-09T03:21:52.492498Z",
+      "finalizedAt": "2026-08-09T03:21:52.492498Z"
+    }
+  ],
+  "snapshotCount": 2,
+  "activeSnapshotCount": 0,
+  "validObservedIndexes": [
+    "atlas_graph_edges_v2_pkey",
+    "atlas_graph_edges_v2_source_idx",
+    "atlas_graph_edges_v2_target_idx",
+    "atlas_graph_nodes_v2_pkey",
+    "atlas_graph_nodes_v2_tree_node_unique",
+    "atlas_graph_relation_participants_v2_pkey",
+    "atlas_graph_snapshots_v2_pkey"
+  ],
+  "missingDraftIndexes": [
+    "atlas_graph_edges_v2_forward_typed_idx",
+    "atlas_graph_edges_v2_reverse_typed_idx",
+    "atlas_graph_nodes_v2_snapshot_type_node_idx",
+    "atlas_graph_nodes_v2_snapshot_source_ref_idx",
+    "atlas_graph_relation_participants_v2_node_role_idx",
+    "atlas_graph_snapshots_v2_workspace_revision_idx",
+    "atlas_graph_snapshots_v2_graph_revision_idx",
+    "atlas_graph_snapshots_v2_source_inventory_revision_idx",
+    "atlas_graph_nodes_v2_source_revision_idx"
+  ],
+  "sidecarMigrationState": {
+    "revisionOwnerMigration": "manual_sidecar_unapplied",
+    "traversalIndexMigration": "manual_sidecar_unapplied",
+    "concurrentDraft": "exists_unapplied"
+  },
+  "lockProfile": {
+    "zeroLockClaim": false,
+    "summary": "The draft is low-lock, not zero-lock: ADD COLUMN needs a brief ACCESS EXCLUSIVE metadata lock; NOT VALID defers checks; VALIDATE scans separately; CREATE INDEX CONCURRENTLY allows DML but consumes resources, waits on transactions, and can leave an invalid index on failure."
+  },
+  "queries": [
+    "SELECT column_name,data_type FROM information_schema.columns WHERE table_schema='public' AND table_name='atlas_graph_snapshots_v2' ORDER BY ordinal_position",
+    "SELECT index definitions and indisready/indisvalid from pg_index for the four scoped graph tables",
+    "SELECT status,count(*) FROM public.atlas_graph_snapshots_v2 GROUP BY status",
+    "SELECT snapshot identifiers, status, counts, hashes, timestamps, and source_manifest from public.atlas_graph_snapshots_v2",
+    "SELECT pg_class.reltuples and pg_total_relation_size for the four scoped graph tables"
+  ],
+  "nextGate": "Review current index definitions and run an authoritative revision-bound snapshot canary before considering operator-approved DDL or promotion."
+}

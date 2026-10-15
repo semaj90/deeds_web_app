@@ -8,10 +8,12 @@
 -- Transaction boundaries (read before running):
 --   Section A runs inside one transaction. It is metadata-only ADD COLUMN plus constraints
 --     added NOT VALID, so the transaction holds only short locks.
---   Section B: VALIDATE CONSTRAINT takes SHARE UPDATE EXCLUSIVE. It does not block reads or writes,
---     but it must run outside a transaction block with the other B statements.
+--   Section B: VALIDATE CONSTRAINT takes SHARE UPDATE EXCLUSIVE. It permits normal reads and DML,
+--     but can conflict with maintenance/schema operations and may scan the table; run and monitor
+--     each validation separately outside a transaction block.
 --   Section C: CREATE INDEX CONCURRENTLY cannot run inside a transaction block. Run each statement
---     on its own. Each one blocks writes only for the duration of its second table pass, not reads.
+--     on its own. It does not lock out concurrent INSERT/UPDATE/DELETE, but performs two scans,
+--     waits for relevant transactions, adds I/O/CPU load, and may leave an INVALID index on failure.
 --
 -- Lock facts (checked against PostgreSQL semantics, not measured here):
 --   ADD COLUMN without default/NOT NULL on PG18: metadata-only, brief ACCESS EXCLUSIVE.
@@ -21,10 +23,14 @@
 --
 -- Pre-flight (read-only, run through an approved read path before executing anything here):
 --   1. Row counts on atlas_graph_nodes_v2 and atlas_graph_edges_v2 (review figures are unverified).
---   2. SELECT indexrelid::regclass, indisvalid FROM pg_index WHERE indrelid IN
---        ('atlas_graph_nodes_v2'::regclass, 'atlas_graph_edges_v2'::regclass);
---      Any INVALID index from an earlier attempt must be reviewed before a retry.
---   3. Confirm atlas_graph_snapshots_v2 has no graph_revision column yet (it does not, 2026-10-13).
+--   2. SELECT indexrelid::regclass, indisready, indisvalid, pg_get_indexdef(indexrelid)
+--        FROM pg_index WHERE indrelid IN
+--        ('atlas_graph_nodes_v2'::regclass, 'atlas_graph_edges_v2'::regclass,
+--         'atlas_graph_relation_participants_v2'::regclass);
+--      Review invalid indexes and same-name indexes with definitions that differ from this draft;
+--      IF NOT EXISTS checks the name, not semantic equivalence.
+--   3. Refresh the read-only schema check for atlas_graph_snapshots_v2 revision columns and inspect
+--      the exact current snapshot rows before any operator approval.
 
 -- ===========================================================================
 -- Section A — additive revision columns (one transaction, short locks only)
@@ -45,27 +51,27 @@ ALTER TABLE atlas_graph_nodes_v2
 -- NOT VALID: checks new rows immediately, validates existing rows in Section B.
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'atlas_graph_snapshots_v2_workspace_revision_sha256_v2') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'atlas_graph_snapshots_v2'::regclass AND conname = 'atlas_graph_snapshots_v2_workspace_revision_sha256_v2') THEN
     ALTER TABLE atlas_graph_snapshots_v2
       ADD CONSTRAINT atlas_graph_snapshots_v2_workspace_revision_sha256_v2
       CHECK (workspace_revision IS NULL OR workspace_revision ~ '^sha256:[a-f0-9]{64}$') NOT VALID;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'atlas_graph_snapshots_v2'::regclass AND conname = 'atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2') THEN
     ALTER TABLE atlas_graph_snapshots_v2
       ADD CONSTRAINT atlas_graph_snapshots_v2_source_inventory_revision_sha256_v2
       CHECK (source_inventory_revision IS NULL OR source_inventory_revision ~ '^sha256:[a-f0-9]{64}$') NOT VALID;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'atlas_graph_snapshots_v2_graph_revision_sha256') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'atlas_graph_snapshots_v2'::regclass AND conname = 'atlas_graph_snapshots_v2_graph_revision_sha256') THEN
     ALTER TABLE atlas_graph_snapshots_v2
       ADD CONSTRAINT atlas_graph_snapshots_v2_graph_revision_sha256
       CHECK (graph_revision IS NULL OR graph_revision ~ '^[a-f0-9]{64}$') NOT VALID;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'atlas_graph_snapshots_v2_revision_checksum_sha256') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'atlas_graph_snapshots_v2'::regclass AND conname = 'atlas_graph_snapshots_v2_revision_checksum_sha256') THEN
     ALTER TABLE atlas_graph_snapshots_v2
       ADD CONSTRAINT atlas_graph_snapshots_v2_revision_checksum_sha256
       CHECK (revision_checksum IS NULL OR revision_checksum ~ '^[a-f0-9]{64}$') NOT VALID;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'atlas_graph_nodes_v2_source_revision_nonempty') THEN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'atlas_graph_nodes_v2'::regclass AND conname = 'atlas_graph_nodes_v2_source_revision_nonempty') THEN
     ALTER TABLE atlas_graph_nodes_v2
       ADD CONSTRAINT atlas_graph_nodes_v2_source_revision_nonempty
       CHECK (source_revision IS NULL OR length(btrim(source_revision)) > 0) NOT VALID;

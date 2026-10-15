@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parent-atlas.invalid/.okf/schemas/tree-sitter-language-catalog-v1.schema.json",
+  "title": "Parent Atlas Tree-sitter language-pack candidate catalog",
+  "type": "object",
+  "required": ["schema", "catalogId", "source", "namespace", "entries", "lspServerBindings", "canonicalAuthority", "writesPerformed", "catalogSha256"],
+  "properties": {
+    "schema": {"const": "atlas.okf-tree-sitter-language-catalog.v1"},
+    "catalogId": {"const": "tree-sitter-language-pack"},
+    "source": {
+      "type": "object",
+      "required": ["packageName", "packageVersion", "sourceRef", "manifestSha256", "observedPythonVersion"],
+      "properties": {
+        "packageName": {"const": "tree-sitter-language-pack"},
+        "packageVersion": {"type": "string", "minLength": 1},
+        "sourceRef": {"type": "string", "minLength": 1},
+        "manifestSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "observedPythonVersion": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "namespace": {"const": "PARSER_GRAMMAR_ID"},
+    "entries": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["grammarId", "qualification"], "properties": {"grammarId": {"type": "string", "minLength": 1}, "qualification": {"const": "CANDIDATE"}}, "additionalProperties": false}},
+    "lspServerBindings": {"const": []},
+    "canonicalAuthority": {"const": false},
+    "writesPerformed": {"const": false},
+    "catalogSha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

@@ -9,6 +9,37 @@
 
 import { parentPort } from 'worker_threads';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+let nativeBridge = null;
+function getNativeBridge() {
+	if (nativeBridge !== null) return nativeBridge;
+	const candidates = [
+		process.env.TENSORRT_BRIDGE_NODE_PATH,
+		resolve(__dirname, '../../../../simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node'),
+		resolve(__dirname, '../../../../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build-x64-cuda/Release/tensorrt_bridge.node',
+		'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node'
+	].filter(Boolean);
+
+	for (const p of candidates) {
+		try {
+			if (existsSync(p)) {
+				nativeBridge = require(p);
+				break;
+			}
+		} catch {
+			// continue
+		}
+	}
+	return nativeBridge;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // MATH PRIMITIVES
@@ -624,17 +655,147 @@ function runQdrantPayload({ chunk, metadata, contentHash }) {
 	};
 }
 
+function toInt32(arr) {
+	return arr instanceof Int32Array ? arr : new Int32Array(arr);
+}
+
+function toFloat32(arr) {
+	return arr instanceof Float32Array ? arr : new Float32Array(arr);
+}
+
+function runGraphBFS({ rowPtr, colIndices, startNode, maxNodes }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.graphBFS) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: graphBFS');
+	const rp = toInt32(rowPtr);
+	const ci = toInt32(colIndices);
+	const res = bridge.graphBFS(rp, ci, startNode, maxNodes ?? 4096);
+	return Array.from(res);
+}
+
+function runGraphBFSExtended({ rowPtr, colIndices, startNode, maxDepth, maxVisited, maxEdgesScanned }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.graphBFSExtended) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: graphBFSExtended');
+	const rp = toInt32(rowPtr);
+	const ci = toInt32(colIndices);
+	const numNodes = rp.length - 1;
+	const res = bridge.graphBFSExtended(
+		rp,
+		ci,
+		startNode,
+		maxDepth ?? 1000000,
+		maxVisited ?? numNodes,
+		maxEdgesScanned ?? 0
+	);
+	return {
+		visited: Array.from(res.visited),
+		distances: Array.from(res.distances),
+		predecessors: Array.from(res.predecessors),
+		truncated: Boolean(res.truncated),
+		edgesScanned: res.edgesScanned
+	};
+}
+
+function runGraphAStar({ rowPtr, colIndices, edgeWeights, heuristics, start, goal, maxExpansions }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.graphAStar) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: graphAStar');
+	const rp = toInt32(rowPtr);
+	const ci = toInt32(colIndices);
+	const ew = toFloat32(edgeWeights);
+	const h = heuristics ? toFloat32(heuristics) : null;
+	const res = bridge.graphAStar(rp, ci, ew, h, start, goal, maxExpansions ?? 100000);
+	return Array.from(res);
+}
+
+function runGraphGreedy({ rowPtr, colIndices, heuristics, start, goal, maxExpansions }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.graphGreedySearch) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: graphGreedySearch');
+	const rp = toInt32(rowPtr);
+	const ci = toInt32(colIndices);
+	const h = toFloat32(heuristics);
+	const res = bridge.graphGreedySearch(rp, ci, h, start, goal, maxExpansions ?? 100000);
+	return Array.from(res);
+}
+
+function runAstTraverse({ firstChild, nextSibling, startNode, maxDepth, maxNodes }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.traverseAstLinkedList) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: traverseAstLinkedList');
+	const fc = toInt32(firstChild);
+	const ns = toInt32(nextSibling);
+	const res = bridge.traverseAstLinkedList(fc, ns, startNode, maxDepth ?? 1000, maxNodes ?? fc.length);
+	return Array.from(res);
+}
+
+function runForestPredict({ features, nRows, nCols, featureIndices, thresholds, leftChildren, rightChildren, leafValues, treeRoots }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.forestPredict) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: forestPredict');
+	const res = bridge.forestPredict(
+		toFloat32(features),
+		nRows,
+		nCols,
+		toInt32(featureIndices),
+		toFloat32(thresholds),
+		toInt32(leftChildren),
+		toInt32(rightChildren),
+		toFloat32(leafValues),
+		toInt32(treeRoots)
+	);
+	return Array.from(res);
+}
+
+function runManifoldSlerp({ v1, v2, t }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.slerpEmbeddings) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: slerpEmbeddings');
+	const res = bridge.slerpEmbeddings(toFloat32(v1), toFloat32(v2), t);
+	return Array.from(res);
+}
+
+function runManifoldInterpolate4D({ coords4D, embeddings, n, dim, query4D, epsilon }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.manifoldInterpolate4D) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: manifoldInterpolate4D');
+	const res = bridge.manifoldInterpolate4D(
+		toFloat32(coords4D),
+		toFloat32(embeddings),
+		n,
+		dim,
+		toFloat32(query4D),
+		epsilon ?? 2.0
+	);
+	return Array.from(res);
+}
+
+function runJsonToCSR({ json }) {
+	const bridge = getNativeBridge();
+	if (!bridge?.simdJsonToCSR) throw new Error('NATIVE_BRIDGE_UNAVAILABLE: simdJsonToCSR');
+	const res = bridge.simdJsonToCSR(json);
+	return {
+		numNodes: res.numNodes,
+		numEdges: res.numEdges,
+		rowPtr: Array.from(res.rowPtr),
+		colIndices: Array.from(res.colIndices),
+		edgeWeights: res.edgeWeights ? Array.from(res.edgeWeights) : null
+	};
+}
+
 const HANDLERS = {
-	kmeans:                runKMeans,
-	som:                   runSOM,
-	forensics:             runForensics,
-	silhouette:            ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
-	similarity:            runSimilarity,
-	'langextract.extract': runLangExtract,
-	chunk:                 runChunk,
-	hash:                  runHash,
-	metadata:              runMetadata,
-	qdrant_payload:        runQdrantPayload,
+	kmeans:                   runKMeans,
+	som:                      runSOM,
+	forensics:                runForensics,
+	silhouette:               ({ embeddings, assignments, k }) => computeSilhouette(embeddings, assignments, k),
+	similarity:               runSimilarity,
+	'langextract.extract':    runLangExtract,
+	chunk:                    runChunk,
+	hash:                     runHash,
+	metadata:                 runMetadata,
+	qdrant_payload:           runQdrantPayload,
+	'graph.bfs':              runGraphBFS,
+	'graph.bfs_extended':     runGraphBFSExtended,
+	'graph.astar':            runGraphAStar,
+	'graph.greedy':           runGraphGreedy,
+	'graph.ast_traverse':     runAstTraverse,
+	'tree.predict':           runForestPredict,
+	'manifold.slerp':         runManifoldSlerp,
+	'manifold.interpolate4d': runManifoldInterpolate4D,
+	'graph.json_to_csr':      runJsonToCSR,
 };
 
 parentPort?.on('message', (msg) => {

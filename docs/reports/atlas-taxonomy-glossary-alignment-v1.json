@@ -1,0 +1,1542 @@
+{
+  "schema": "atlas.okf-keyword-taxonomy-crosswalk.v1",
+  "status": "PARTIAL",
+  "generatedAt": "2026-10-15T02:44:46.753Z",
+  "mode": "READ_ONLY_DERIVATION",
+  "authority": "DERIVED_REFERENCE_ONLY",
+  "inputs": {
+    "corpusPath": ".okf/corpora/keyword-corpus.yaml",
+    "corpusSha256": "c39a6e8096f02b49543d71e5ab6aa7cf7d289cdc8b6801eb0f2580219503cd57",
+    "schemaPath": ".okf/corpora/keyword-corpus.schema.json",
+    "schemaSha256": "fa446d24882271074f1e935dbd7c975b9194c4485571b54bfb40206c7c938e9c",
+    "mappingOwner": "python/parent_atlas_ontology/domain_mapping.py",
+    "mappingRevision": "sha256:b1fe99ea1b85f0ad0deecbe359f6565a28f1dd435008f260e0d52d2f03595a0e"
+  },
+  "corpusSchemaValidation": "VALID",
+  "counts": {
+    "corpusEntries": 17,
+    "termOccurrences": 81,
+    "uniqueNormalizedTerms": 81,
+    "exactDomainAliasCandidates": 0,
+    "ambiguousDomainAliasCandidates": 0,
+    "termsWithoutExactDomainAliasMatch": 81,
+    "missingSourceRefs": 0
+  },
+  "termToTopicStatus": "DERIVED_FROM_REFERENCE_CORPUS_ENTRY_IDS",
+  "exactDomainAliasScan": "CANDIDATE_DISCOVERY_ONLY_NOT_TAXONOMY_RESOLUTION",
+  "keywordClusteringStatus": "NOT_RUN_NO_REVIEWED_CLUSTERING_POLICY",
+  "canonicalResolutionStatus": "NOT_RUN",
+  "canonicalEntityResolutionStatus": "NOT_RUN",
+  "sourceReferenceCheck": "PATH_EXISTS_ONLY_NOT_SOURCE_LINEAGE_PROOF",
+  "corpusIndexingStatus": "REFERENCE_ONLY_NOT_SEARCHABLE",
+  "missingSourceRefs": [],
+  "rows": [
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "ACE context",
+      "normalizedTerm": "ace-context",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "agentic error fixing",
+      "normalizedTerm": "agentic-error-fixing",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "DAG prefill",
+      "normalizedTerm": "dag-prefill",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "MCP tool call",
+      "normalizedTerm": "mcp-tool-call",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "query routing",
+      "normalizedTerm": "query-routing",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "agentic-query-to-prefill-workflow",
+      "term": "synthesis",
+      "normalizedTerm": "synthesis",
+      "evidenceStatus": "CLI_WORKFLOW_PRESENT_PRODUCTION_CALLER_LINEAGE_AND_RUNTIME_ALIGNMENT_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "scripts/atlas/agentic-recommendation-workflow.mjs",
+        "scripts/atlas/run-agentic-error-fixing-v1.mjs",
+        "sveltekit-frontend/src/lib/server/llm/runtime-contract.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-policy-classifier-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "atlas-topk-selection-receipt",
+      "term": "candidate selection provenance",
+      "normalizedTerm": "candidate-selection-provenance",
+      "evidenceStatus": "DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN",
+      "sourceRefs": [
+        "docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "atlas-topk-selection-receipt",
+      "term": "routing manifest binding",
+      "normalizedTerm": "routing-manifest-binding",
+      "evidenceStatus": "DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN",
+      "sourceRefs": [
+        "docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "atlas-topk-selection-receipt",
+      "term": "selection receipt",
+      "normalizedTerm": "selection-receipt",
+      "evidenceStatus": "DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN",
+      "sourceRefs": [
+        "docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "atlas-topk-selection-receipt",
+      "term": "TopK selection receipt",
+      "normalizedTerm": "topk-selection-receipt",
+      "evidenceStatus": "DESIGN_ONLY_BINDING_AND_INTEGRATION_TESTS_OPEN",
+      "sourceRefs": [
+        "docs/architecture/parent-atlas-selection-receipt-and-model-boundaries-v1.md",
+        "sveltekit-frontend/src/lib/server/atlas/features/candidate-feature-row-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/graph/context-manifest-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/retrieval/topk-algorithm-tournament.ts",
+        "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deep-agents",
+      "term": "agent harness",
+      "normalizedTerm": "agent-harness",
+      "evidenceStatus": "vendor_docs_only_runtime_unproven",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deep-agents",
+      "term": "context management",
+      "normalizedTerm": "context-management",
+      "evidenceStatus": "vendor_docs_only_runtime_unproven",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deep-agents",
+      "term": "Deep Agents",
+      "normalizedTerm": "deep-agents",
+      "evidenceStatus": "vendor_docs_only_runtime_unproven",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deep-agents",
+      "term": "deepagents",
+      "normalizedTerm": "deepagents",
+      "evidenceStatus": "vendor_docs_only_runtime_unproven",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deep-agents",
+      "term": "subagents",
+      "normalizedTerm": "subagents",
+      "evidenceStatus": "vendor_docs_only_runtime_unproven",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-python/docs-langchain-com-langgraph-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langchain-overview-overview.md",
+        "docs/.okf/dev/raw/langchain-langgraph-typescript/docs-langchain-com-langgraph-overview-overview.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deltanet-attention-architecture",
+      "term": "delta-rule attention",
+      "normalizedTerm": "delta-rule-attention",
+      "evidenceStatus": "PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE",
+      "sourceRefs": [
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deltanet-attention-architecture",
+      "term": "DeltaNet",
+      "normalizedTerm": "deltanet",
+      "evidenceStatus": "PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE",
+      "sourceRefs": [
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deltanet-attention-architecture",
+      "term": "Gated DeltaNet",
+      "normalizedTerm": "gated-deltanet",
+      "evidenceStatus": "PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE",
+      "sourceRefs": [
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "deltanet-attention-architecture",
+      "term": "recurrent linear attention",
+      "normalizedTerm": "recurrent-linear-attention",
+      "evidenceStatus": "PRIMARY_PAPER_REFERENCE_CAPTURED_MODEL_SPECIFIC_USE_REQUIRES_ARTIFACT_EVIDENCE",
+      "sourceRefs": [
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "directory-source-lut",
+      "term": "directory fanout",
+      "normalizedTerm": "directory-fanout",
+      "evidenceStatus": "DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "docs/parent-atlas-workstation-gpu-runtime-backlog.md",
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "directory-source-lut",
+      "term": "directory LUT",
+      "normalizedTerm": "directory-lut",
+      "evidenceStatus": "DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "docs/parent-atlas-workstation-gpu-runtime-backlog.md",
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "directory-source-lut",
+      "term": "per-directory retrieval",
+      "normalizedTerm": "per-directory-retrieval",
+      "evidenceStatus": "DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "docs/parent-atlas-workstation-gpu-runtime-backlog.md",
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "directory-source-lut",
+      "term": "source tree lookup",
+      "normalizedTerm": "source-tree-lookup",
+      "evidenceStatus": "DESIGN_ONLY_GPH13_AND_SOURCE_BINDING_GATED",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "docs/parent-atlas-workstation-gpu-runtime-backlog.md",
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "sveltekit-frontend/src/lib/server/atlas/identity/workspace-source-binding-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "language-server-protocol",
+      "term": "Language Server Protocol",
+      "normalizedTerm": "language-server-protocol",
+      "evidenceStatus": "contract_documented_runtime_caller_unproven",
+      "sourceRefs": [
+        ".okf/domains/structured-value.yaml",
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "language-server-protocol",
+      "term": "LSP",
+      "normalizedTerm": "lsp",
+      "evidenceStatus": "contract_documented_runtime_caller_unproven",
+      "sourceRefs": [
+        ".okf/domains/structured-value.yaml",
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "language-server-protocol",
+      "term": "tsserver",
+      "normalizedTerm": "tsserver",
+      "evidenceStatus": "contract_documented_runtime_caller_unproven",
+      "sourceRefs": [
+        ".okf/domains/structured-value.yaml",
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "language-server-protocol",
+      "term": "UTF-16 positions",
+      "normalizedTerm": "utf-16-positions",
+      "evidenceStatus": "contract_documented_runtime_caller_unproven",
+      "sourceRefs": [
+        ".okf/domains/structured-value.yaml",
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/code-exploration-index-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "openwiki",
+      "term": "generated repository wiki",
+      "normalizedTerm": "generated-repository-wiki",
+      "evidenceStatus": "local_reference_docs_only",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "openwiki",
+      "term": "grounded claims",
+      "normalizedTerm": "grounded-claims",
+      "evidenceStatus": "local_reference_docs_only",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "openwiki",
+      "term": "OKF",
+      "normalizedTerm": "okf",
+      "evidenceStatus": "local_reference_docs_only",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "openwiki",
+      "term": "OpenWiki",
+      "normalizedTerm": "openwiki",
+      "evidenceStatus": "local_reference_docs_only",
+      "sourceRefs": [
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-code-mode-md-code-mode-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-integrations-md-integrations-md.md",
+        "docs/.okf/dev/raw/openwiki-agent-docs/docs-langchain-com-openwiki-overview-md-overview-md.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "parameter-artifact-lookup",
+      "term": "DAG parameters",
+      "normalizedTerm": "dag-parameters",
+      "evidenceStatus": "CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "parameter-artifact-lookup",
+      "term": "model revision",
+      "normalizedTerm": "model-revision",
+      "evidenceStatus": "CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "parameter-artifact-lookup",
+      "term": "parameter artifact",
+      "normalizedTerm": "parameter-artifact",
+      "evidenceStatus": "CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "parameter-artifact-lookup",
+      "term": "parameter fetching",
+      "normalizedTerm": "parameter-fetching",
+      "evidenceStatus": "CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "parameter-artifact-lookup",
+      "term": "representation revision",
+      "normalizedTerm": "representation-revision",
+      "evidenceStatus": "CONTRACT_AND_FIXTURES_PRESENT_PRODUCTION_CALLER_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.spec.ts",
+        "sveltekit-frontend/src/lib/server/atlas/agentic/contracts/parameter-resolver-v1.ts",
+        "sveltekit-frontend/src/lib/server/atlas/contracts/parameter-artifact-lookup-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "qdrant-projection",
+      "term": "collection alias",
+      "normalizedTerm": "collection-alias",
+      "evidenceStatus": "implementation_present_lineage_not_fully_proven",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        ".tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+        "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "qdrant-projection",
+      "term": "Qdrant",
+      "normalizedTerm": "qdrant",
+      "evidenceStatus": "implementation_present_lineage_not_fully_proven",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        ".tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+        "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "qdrant-projection",
+      "term": "semantic retrieval",
+      "normalizedTerm": "semantic-retrieval",
+      "evidenceStatus": "implementation_present_lineage_not_fully_proven",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        ".tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+        "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "qdrant-projection",
+      "term": "vector projection",
+      "normalizedTerm": "vector-projection",
+      "evidenceStatus": "implementation_present_lineage_not_fully_proven",
+      "sourceRefs": [
+        ".okf/indexes/parent-atlas-code-explore.yaml",
+        ".tmp/atlas/production-hardening-seed-20261012/lineage-01-qdrant-payload-integrity-sample-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/identity-resolution.ts",
+        "sveltekit-frontend/src/lib/server/search/qdrant-search.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "classifier MLP",
+      "normalizedTerm": "classifier-mlp",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "MLP tournament",
+      "normalizedTerm": "mlp-tournament",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "query router",
+      "normalizedTerm": "query-router",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "retrieval plan",
+      "normalizedTerm": "retrieval-plan",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "shadow routing",
+      "normalizedTerm": "shadow-routing",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "query-router-mlp-tournament",
+      "term": "XGBoost baseline",
+      "normalizedTerm": "xgboost-baseline",
+      "evidenceStatus": "V1_V2_TENSOR_WIDTH_CONFLICT_TOURNAMENT_AND_RUNTIME_PROMOTION_OPEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-query-routing-classifier/tasks.md",
+        "sveltekit-frontend/scripts/atlas/train-query-router-pytorch-v2.py",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-classification-v2.ts",
+        "sveltekit-frontend/src/lib/server/atlas/neural-routing/query-routing-v2.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "swiglu-transformer-activation",
+      "term": "gated MLP",
+      "normalizedTerm": "gated-mlp",
+      "evidenceStatus": "REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "swiglu-transformer-activation",
+      "term": "SiLU gate",
+      "normalizedTerm": "silu-gate",
+      "evidenceStatus": "REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "swiglu-transformer-activation",
+      "term": "SwiGLU",
+      "normalizedTerm": "swiglu",
+      "evidenceStatus": "REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "swiglu-transformer-activation",
+      "term": "transformer feed-forward activation",
+      "normalizedTerm": "transformer-feed-forward-activation",
+      "evidenceStatus": "REFERENCE_DEFINITION_PRESENT_ACTIVE_MODEL_ACTIVATION_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "docs/.okf/research/deltanet-swiglu/manifest.json",
+        "docs/.okf/research/deltanet-swiglu/published-current.json",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "symbol-document-diagnostic-lut",
+      "term": "document crosswalk",
+      "normalizedTerm": "document-crosswalk",
+      "evidenceStatus": "IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts",
+        "scripts/atlas/lib/symbol-toc-owner-readback-v1.mts",
+        "scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "symbol-document-diagnostic-lut",
+      "term": "qualified symbol lookup",
+      "normalizedTerm": "qualified-symbol-lookup",
+      "evidenceStatus": "IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts",
+        "scripts/atlas/lib/symbol-toc-owner-readback-v1.mts",
+        "scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "symbol-document-diagnostic-lut",
+      "term": "reverse lookup",
+      "normalizedTerm": "reverse-lookup",
+      "evidenceStatus": "IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts",
+        "scripts/atlas/lib/symbol-toc-owner-readback-v1.mts",
+        "scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "symbol-document-diagnostic-lut",
+      "term": "symbol LUT",
+      "normalizedTerm": "symbol-lut",
+      "evidenceStatus": "IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts",
+        "scripts/atlas/lib/symbol-toc-owner-readback-v1.mts",
+        "scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "symbol-document-diagnostic-lut",
+      "term": "symbol TOC",
+      "normalizedTerm": "symbol-toc",
+      "evidenceStatus": "IMPLEMENTATION_AND_FIXTURES_PRESENT_LIVE_PROVIDER_AND_SEARCH_RUNTIME_UNPROVEN",
+      "sourceRefs": [
+        "openspec/changes/parent-atlas-workstation-domain-classifier/tasks.md",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.mts",
+        "scripts/atlas/lib/symbol-toc-diagnostic-projection-v1.test.mts",
+        "scripts/atlas/lib/symbol-toc-owner-readback-v1.mts",
+        "scripts/atlas/lib/symbol-toc-row-qualification-v1.mjs"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "ContextManifest",
+      "normalizedTerm": "contextmanifest",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "HyperGraphRAG",
+      "normalizedTerm": "hypergraphrag",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "KAG",
+      "normalizedTerm": "kag",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "knowledge hypergraph",
+      "normalizedTerm": "knowledge-hypergraph",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "PromptPlan",
+      "normalizedTerm": "promptplan",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "synthesis-dag-kag-hypergraph",
+      "term": "synthesis DAG",
+      "normalizedTerm": "synthesis-dag",
+      "evidenceStatus": "EXISTING_CONTRACTS_AND_OPENSPEC_PRESENT_LIVE_END_TO_END_PROOF_OPEN",
+      "sourceRefs": [
+        ".okf/systems/hyperrag.md",
+        "openspec/changes/parent-atlas-agentic-completion/design.md",
+        "openspec/changes/parent-atlas-agentic-completion/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "4D topology coordinates",
+      "normalizedTerm": "4d-topology-coordinates",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "cluster assignment",
+      "normalizedTerm": "cluster-assignment",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "feature remapping",
+      "normalizedTerm": "feature-remapping",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "K-means",
+      "normalizedTerm": "k-means",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "SOM 20x20",
+      "normalizedTerm": "som-20x20",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "topology-som-kmeans-advisory-features",
+      "term": "TopologyFeature4",
+      "normalizedTerm": "topologyfeature4",
+      "evidenceStatus": "IMPLEMENTATIONS_AND_OPENSPEC_GATES_PRESENT_COHORT_ADMISSION_AND_PROMOTION_OPEN",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md",
+        "openspec/changes/parent-atlas-topology-representation-admission/proposal.md",
+        "python/atlas_compute/aligned_snapshot_experiment.py",
+        "python/atlas_compute/som.py"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "transformer-hidden-state-boundary",
+      "term": "activation extraction",
+      "normalizedTerm": "activation-extraction",
+      "evidenceStatus": "POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "transformer-hidden-state-boundary",
+      "term": "hidden-state feature",
+      "normalizedTerm": "hidden-state-feature",
+      "evidenceStatus": "POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "transformer-hidden-state-boundary",
+      "term": "intermediate activation",
+      "normalizedTerm": "intermediate-activation",
+      "evidenceStatus": "POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "transformer-hidden-state-boundary",
+      "term": "transformer hidden state",
+      "normalizedTerm": "transformer-hidden-state",
+      "evidenceStatus": "POLICY_BOUNDARY_DOCUMENTED_EXPORT_INTERFACE_UNVERIFIED",
+      "sourceRefs": [
+        ".okf/systems/parent-atlas-compute-ownership.md",
+        "openspec/changes/parent-atlas-neural-prefill-encoder/tasks.md"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "viterbi-mcp-tool-routing",
+      "term": "LUT",
+      "normalizedTerm": "lut",
+      "evidenceStatus": "proposal_logic_present_end_to_end_retrieval_unproven",
+      "sourceRefs": [
+        "docs/reports/mcp-tool-surface-live-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "viterbi-mcp-tool-routing",
+      "term": "MCP tool selection",
+      "normalizedTerm": "mcp-tool-selection",
+      "evidenceStatus": "proposal_logic_present_end_to_end_retrieval_unproven",
+      "sourceRefs": [
+        "docs/reports/mcp-tool-surface-live-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "viterbi-mcp-tool-routing",
+      "term": "tool routing",
+      "normalizedTerm": "tool-routing",
+      "evidenceStatus": "proposal_logic_present_end_to_end_retrieval_unproven",
+      "sourceRefs": [
+        "docs/reports/mcp-tool-surface-live-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "viterbi-mcp-tool-routing",
+      "term": "Viterbi",
+      "normalizedTerm": "viterbi",
+      "evidenceStatus": "proposal_logic_present_end_to_end_retrieval_unproven",
+      "sourceRefs": [
+        "docs/reports/mcp-tool-surface-live-v1.json",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-registry-types-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-bridge-v1.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/mcp-tool-viterbi-frame-compiler-v1.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "DuckDuckGo",
+      "normalizedTerm": "duckduckgo",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "research DAG",
+      "normalizedTerm": "research-dag",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "SearXNG",
+      "normalizedTerm": "searxng",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "T4 external evidence",
+      "normalizedTerm": "t4-external-evidence",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "web search",
+      "normalizedTerm": "web-search",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    },
+    {
+      "topicKey": "web-search-research-dag",
+      "term": "web-search fallback",
+      "normalizedTerm": "web-search-fallback",
+      "evidenceStatus": "MULTIPLE_CALLERS_AND_SHARED_ADAPTER_PRESENT_UNIFIED_DAG_AND_ADMISSION_UNPROVEN",
+      "sourceRefs": [
+        "sveltekit-frontend/src/lib/server/ace/ace-agent.ts",
+        "sveltekit-frontend/src/lib/server/atlas/docs/firecrawl-v2-capture.ts",
+        "sveltekit-frontend/src/lib/server/llm/gemma4-tool-loop.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/document-dag.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/orchestrator.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/web-search.ts",
+        "sveltekit-frontend/src/mcp/research_tools.ts",
+        "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+        "sveltekit-frontend/src/routes/api/v1/agentic/tool-loop/+server.ts"
+      ],
+      "topicMembership": "REFERENCE_CORPUS_ENTRY",
+      "exactDomainAliasComparison": "NO_EXACT_DOMAIN_ALIAS_MATCH",
+      "localMappingClassId": null,
+      "conceptResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_CONCEPT_FIELD",
+      "entityResolution": "NOT_ATTEMPTED_CORPUS_HAS_NO_CANONICAL_ENTITY_FIELD",
+      "canonicalAuthority": false
+    }
+  ],
+  "repositoryDataWritesPerformed": false,
+  "reportArtifactWritten": true,
+  "canonicalAuthority": false,
+  "nextGate": "REVIEW_LOCAL_MATCHES_THEN_RESOLVE_CANONICAL_CONCEPTS_WITH_LIVE_POSTGRESQL_OAK_OWNER",
+  "snapshotChecksum": "sha256:2ff9c34eaa15e7027a02954adf5b0d82da58a76eee5afaf9a5f9422ca712efae"
+}

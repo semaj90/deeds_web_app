@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import type { SgNode } from '@ast-grep/napi';
 
@@ -80,6 +81,7 @@ export const AstGrepStructuralCandidateV1Schema = z.object({
   symbolVersionId: z.string().min(1).nullable(),
   workspaceRevision: z.string().min(1),
   sourceRevision: z.string().min(1),
+  sourceContentSha256: z.string().regex(/^sha256:[a-f0-9]{64}$/).optional(),
   engine: z.literal('AST_GREP_NAPI'),
   structuralMatchExactForDeclaredRule: z.literal(true),
   requiresCanonicalTreeJoin: z.literal(true),
@@ -230,6 +232,7 @@ function toCandidate(input: AstGrepStructuralExtractionInputV1, node: SgNode, va
     symbolVersionId: null,
     workspaceRevision: input.workspaceRevision,
     sourceRevision: input.sourceRevision,
+    sourceContentSha256: `sha256:${createHash('sha256').update(input.code, 'utf8').digest('hex')}`,
     engine: 'AST_GREP_NAPI',
     structuralMatchExactForDeclaredRule: true,
     requiresCanonicalTreeJoin: true,

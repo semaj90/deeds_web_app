@@ -3099,6 +3099,7 @@ _AST_LANGUAGE_EXTENSIONS: dict[str, str] = {
     ".ts": "typescript", ".tsx": "tsx", ".mts": "typescript", ".cts": "typescript",
     ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
     ".py": "python", ".pyi": "python", ".rs": "rust", ".go": "go", ".java": "java",
+    ".svelte": "svelte",
 }
 
 

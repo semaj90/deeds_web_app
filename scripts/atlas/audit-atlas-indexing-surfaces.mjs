@@ -28,6 +28,7 @@ const pool = new pg.Pool({
   max: 2,
   connectionTimeoutMillis: 5000,
   statement_timeout: 10000,
+  options: '-c default_transaction_read_only=on',
 });
 
 const report = {
@@ -107,6 +108,12 @@ async function auditAst() {
 
 async function auditPostgres() {
   try {
+    const transactionReadOnly = (await query('SHOW transaction_read_only'))[0]?.transaction_read_only === 'on';
+    if (!transactionReadOnly) {
+      report.postgres = { reachable: true, transactionReadOnly: false, error: 'POSTGRES_READ_ONLY_NOT_ENFORCED' };
+      finding('POSTGRES_READ_ONLY_NOT_ENFORCED', 'critical', 'The audit connection did not enforce PostgreSQL read-only mode; database inventory was stopped.');
+      return;
+    }
     const version = await query('SELECT current_setting(\'server_version\') AS version');
     const extensions = await query("SELECT extname, extversion FROM pg_extension WHERE extname IN ('vector', 'pg_search', 'pg_trgm') ORDER BY extname");
     const extension = extensions.find((row) => row.extname === 'vector');
@@ -174,6 +181,7 @@ async function auditPostgres() {
     const pgSearch = extensions.find((row) => row.extname === 'pg_search');
     report.postgres = {
       reachable: true,
+      transactionReadOnly,
       serverVersion: version[0]?.version ?? null,
       extensions: Object.fromEntries(extensions.map((row) => [row.extname, row.extversion])),
       vectorExtension: extension?.extversion ?? null,
@@ -236,7 +244,15 @@ async function auditQdrant() {
         name,
         vectors: info.result?.config?.params?.vectors ?? null,
         points: info.result?.points_count ?? null,
+        pointsCount: info.result?.points_count ?? null,
+        vectorsCount: info.result?.vectors_count ?? null,
         indexedVectors: info.result?.indexed_vectors_count ?? null,
+        indexedVectorsCount: info.result?.indexed_vectors_count ?? null,
+        hnswConfig: info.result?.config?.hnsw_config ?? null,
+        payloadIndexes: info.result?.payload_schema ?? null,
+        quantizationConfig: info.result?.config?.quantization_config ?? null,
+        segmentsCount: info.result?.segments_count ?? null,
+        optimizerStatus: info.result?.optimizer_status ?? null,
         status: info.result?.status ?? null,
       });
     }

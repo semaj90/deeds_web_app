@@ -116,6 +116,24 @@ Duplication Prevention rule ("record what you found, even when you don't fix it"
   than inventing from nothing) — needs an explicit decision before a real
   validator can be built; reconciling the manifest/filesystem drift found
   above (5 declared vs. 3 present domain schemas).
+
+  **2026-10-14 follow-up**: all four current language profiles validate
+  against `.okf/schemas/language-profile-v1.schema.json` (4/4, 31 total
+  symbol kinds; TypeScript has 8 feature rules). Registered the previously
+  omitted Go, Python, and Rust profiles in `.okf/manifest.yaml` and added a
+  regression asserting registry/profile parity. The broader manifest audit
+  now resolves 20/27 references; 7 declared domain/symbol/tool/predicate
+  targets remain missing, plus 2 additional structured files and 1
+  unregistered pipeline file. The blanket `audit-okf-v02-bundle-v1.mjs`
+  result (364 files, 0 meeting its three-field profile) is not whole-corpus
+  conformance proof: the internal v0.2 contract is unratified, the scan
+  applies fields to arbitrary Markdown/YAML, and its parser suppresses YAML
+  syntax errors. Do not bulk-edit metadata or equate it to Google OKF
+  conformance. A path-scoped `git log --all` found no reachable history for
+  any of the seven missing references, so there is no tracked artifact to
+  restore; the owner still needs to choose retirement versus source-backed
+  schemas. Details and commands:
+  `docs/reports/okf-schema-registry-alignment-2026-10-14.md`.
 - [x] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
 
   **Unblocked and done, 2026-08-24**: added a minimal `concepts` registry
