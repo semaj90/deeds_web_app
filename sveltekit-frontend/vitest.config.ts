@@ -27,6 +27,12 @@ export default defineConfig({
     // Ensure Svelte components render in client mode for tests
     conditions: ['browser'],
   },
+  server: {
+    // Specs load repo-level scripts (../scripts/atlas/*.mjs) that sit outside the app root
+    fs: {
+      allow: [path.resolve(__dirname, '..')],
+    },
+  },
   test: {
     include: [
       'src/**/*.{test,spec}.{js,ts}',

@@ -117,6 +117,7 @@
       />
       <button
         type="submit"
+        aria-label="Send message"
         class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl bg-accent text-black flex items-center justify-center transition-all hover:scale-110 active:scale-90 disabled:opacity-30 disabled:scale-100"
         disabled={!inputVal.trim() || snapshot.matches('thinking')}
       >

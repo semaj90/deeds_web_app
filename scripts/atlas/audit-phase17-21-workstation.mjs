@@ -155,8 +155,26 @@ function inspectSummaryCoverage() {
   };
 }
 
+// Receipts mapped to each phase by its owner. A receipt counts toward receipt_backed_pct only
+// when its status is in PASSING_RECEIPT_STATUSES. Blocked, partial, and sanity-only receipts are
+// listed but never counted. Mappings are empty until an owner maps them; no receipt is mapped
+// by default. completion_pct stays the hand-set audit judgment and is NOT changed by receipts.
+const PASSING_RECEIPT_STATUSES = new Set(['VERIFIED', 'PROVEN', 'APPLIED_AND_VERIFIED']);
+const PHASE_RECEIPTS = { 17: [], 18: [], 19: [], 20: [], 21: [] };
+
+function receiptBacked(id) {
+  const receipts = PHASE_RECEIPTS[id] ?? [];
+  if (receipts.length === 0) return { receipt_backed_pct: null, mapped_receipts: 0, passing_receipts: 0 };
+  const passing = receipts.filter(({ status }) => PASSING_RECEIPT_STATUSES.has(status)).length;
+  return {
+    receipt_backed_pct: Number(((passing / receipts.length) * 100).toFixed(1)),
+    mapped_receipts: receipts.length,
+    passing_receipts: passing,
+  };
+}
+
 function phase(id, status, completion_pct, have, need, evidence = []) {
-  return { id, status, completion_pct, have, need, evidence };
+  return { id, status, completion_pct, have, need, evidence, ...receiptBacked(id) };
 }
 
 async function main() {
@@ -383,10 +401,10 @@ async function main() {
     '',
     '## Phase Matrix',
     '',
-    '| Phase | Status | Complete | What exists | What remains |',
-    '|---:|---|---:|---|---|',
+    '| Phase | Status | Complete | Receipt-backed | What exists | What remains |',
+    '|---:|---|---:|---:|---|---|',
     ...phases.map((item) =>
-      `| ${item.id} | ${item.status} | ${item.completion_pct}% | ${item.have.join(' ')} | ${item.need.join(' ')} |`
+      `| ${item.id} | ${item.status} | ${item.completion_pct}% | ${item.receipt_backed_pct === null ? 'no mapped receipts' : `${item.receipt_backed_pct}% (${item.passing_receipts}/${item.mapped_receipts})`} | ${item.have.join(' ')} | ${item.need.join(' ')} |`
     ),
     '',
     '## NDJSON And Storage',

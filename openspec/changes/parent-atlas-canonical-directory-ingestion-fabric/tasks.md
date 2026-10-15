@@ -217,3 +217,9 @@ No unchecked task in this change authorizes production writes by implication. Wr
 - `atlas_directories` has a Drizzle definition and registered manual sidecar SQL with repository/path uniqueness and a parent-path index.
 - Source search found no producer, reader, population job, or query caller. The table definition has no source/workspace revision or evidence binding, so it is storage scaffolding, not a qualified searchable directory LUT.
 - The live row count was not re-read in this audit. Keep population and retrieval wiring open until source binding, packet/chunk identity, and the existing CandidateOrdinalMap/symbol-version join are proven. No database operation was performed and no task is completed here.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

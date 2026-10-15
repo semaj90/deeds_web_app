@@ -3,7 +3,7 @@
 > Generated projection from `docs/reports/document-governance-registry-v2.json`.
 > This file is navigation, not canonical architecture or supersession authority.
 
-Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f36ff`
+Registry checksum: `34ad328dcfdadcf6462891a605dec94fd1f6878ff6bd06e3cd3a62aac08525dd`
 
 ## Revision definitions (canonical; identity is exact, not inferred)
 
@@ -25,7 +25,7 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 | `BeautifulSoup` | Python HTML/XML tree parser for already acquired markup. | Parsing/extraction only; it does not fetch pages. |
 | `n-gram` / `trigram` | N adjacent tokens/characters; `pg_trgm` provides PostgreSQL three-character similarity/pattern operators. | Feature/fuzzy lexical path, distinct from FTS. |
 | PostgreSQL FTS | Built-in `tsvector` queries ranked by `ts_rank`/`ts_rank_cd`. | Existing lexical lane; not strict Okapi BM25. |
-| `BM25` | Term-frequency/inverse-document-frequency ranking. | `pg_search` is installed as a challenger; production caller is unproven. |
+| `BM25` | Term-frequency/inverse-document-frequency ranking. | The compatibility-named `bm25-search.ts` path uses PostgreSQL FTS (`tsvector` / `ts_rank`); do not infer a separate BM25 index or production `pg_search` owner without caller evidence. |
 | `pgvector` / `HNSW` | PostgreSQL vector types/operators and an approximate-neighbor index option. | Existing `semantic_768` executor; lineage admission is separate. |
 | Qdrant snapshot / upsert | Snapshot captures collection state; upsert replaces point state for an ID. | Rebuild from qualified canonical rows; verify full payload/vectors and readback before cutover. |
 | Hash map / dictionary | In-memory key/value lookup. | Cache/lookup only; not durable identity, uniqueness, or admission. |
@@ -36,11 +36,31 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 | RAPIDS / cuVS / cuGraph | GPU data processing / vector search / graph analytics libraries. | Optional executors over frozen qualified inputs, never canonical owners. |
 | Agentic dense search / LUT | Dense candidate retrieval plus identity, revision, evidence, and tool-permission checks. | Advisory routing; one semantic vote, no direct mutation authority. |
 
+## Retrieval and learning distinctions
+
+| Method / owner | What it does | Boundary and proof requirement |
+| --- | --- | --- |
+| Candidate generation: lexical, AST, dense KNN | Finds a bounded candidate set from names, text, syntax, or vector similarity. | SearchRuntime normalizes and deduplicates candidates; alternative semantic executors (Qdrant, exact cuVS, CAGRA) remain one logical semantic vote. |
+| PCA / truncated SVD | Unsupervised low-rank projection or approximation of a frozen feature/vector matrix. | A representation challenger, not a relevance learner; compare numerical correctness, snapshot identity, and Recall@K against the full-dimensional exact baseline. |
+| K-Means / SOM | Unsupervised clustering or topology over qualified numeric features. | Can propose routing or neighborhood features; cluster labels are not ordinal relevance, identity, or additional retrieval votes. |
+| Naive Bayes / logistic regression / XGBoost / MLP | Supervised classification or ranking from labeled query-candidate examples. | Requires independently reviewed labels, query-grouped held-out evaluation, leakage controls, and an advisory shadow gate before promotion; no synthetic-label production claims. |
+| HMM / query intent | Models sequential or intent state to select tools, budgets, or retrieval lanes. | Routing only; it does not establish candidate relevance or rewrite canonical identity. |
+| Did-you-mean / keyword suggestions | Offers lexical alternatives for a query. | Keep suggestions explicit and user-visible; do not silently mutate the original query or evidence identity. |
+| Neo4j / NetworkX / cuGraph | Neo4j is a relationship projection; NetworkX can serve as a CPU reference; cuGraph is an optional GPU executor. | Compare the same frozen graph revision and node/edge mapping; preserve typed edge direction. N-ary facts require role-labeled incidence, not arbitrary pair flattening. |
+| Trilinear / tricubic interpolation | Interpolates values on a defined regular grid or qualified topology. | Not a generic embedding ranker, Top-K method, or quantum computation; require explicit grid coordinates, boundary rules, and error evaluation. |
+| Tang-inspired low-rank sampling | Samples a low-rank approximation under a specified data-access model. | Not drop-in Top-K; qualify l2-sampling assumptions and include preprocessing and query costs before an Atlas challenger. |
+| Quaternion / QVM | Quaternion algebra can represent rotations; QVM provides math and interoperability utilities. | Atlas embeddings are not rotations by default; trait interoperability does not prove zero-copy. Defer without a rotation-specific workload. |
+| Node-API / native bridge | Stabilizes the Node-facing addon ABI across supported Node versions. | Does not stabilize LibTorch, CUDA, TensorRT, or other C++ ABIs; qualify toolchain, dependencies, device, and buffer lifetime separately. |
+| MLP / probability output | A learned model can score a fixed candidate pool. | Sigmoid/softmax scores are not automatically calibrated; use held-out calibration and retain deterministic RRF fallback and evidence admission. |
+| AlphaGo / TabFM research analogies | External research can suggest evaluation methods or experiments. | AlphaGo self-play is not Atlas unsupervised learning; evaluate a named TabFM configuration only on a frozen, independently labeled Atlas dataset. |
+
+These methods are separate experiment stages: candidate generation → deterministic fusion → optional feature/reranking challengers → source qualification → ContextManifest admission. A passing fixture or algorithm test does not prove live corpus quality or production integration.
+
 ## Canonical source documents
 
 - [.claude/CLAUDE.md](.claude/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `13bc6179f4ad`
-- [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `8951bea50d28`
-- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `e9502d0d4d0e`
+- [AGENTS.md](AGENTS.md) — AGENT_INSTRUCTIONS — `d06ea1d57e70`
+- [CLAUDE.md](CLAUDE.md) — CLAUDE_INSTRUCTIONS — `0eb92a191251`
 - [claude-mem/CLAUDE.md](claude-mem/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `a6f297acd125`
 - [llm/claude.md](llm/claude.md) — CLAUDE_INSTRUCTIONS — `fdcdba7c73d7`
 - [mcp-server-mcp/CLAUDE.md](mcp-server-mcp/CLAUDE.md) — CLAUDE_INSTRUCTIONS — `1707a6375458`
@@ -57,7 +77,7 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 
 > Navigation only. Each file governs its own directory subtree; a deeper instruction file takes precedence for its subtree.
 
-- [./AGENTS.md](AGENTS.md) — `8951bea50d28`
+- [./AGENTS.md](AGENTS.md) — `d06ea1d57e70`
 - [mcp-server-mcp/documentation/docs/20-instructions/.generated/AGENTS.md](mcp-server-mcp/documentation/docs/20-instructions/.generated/agents.md) — `d2a3fb0c935c`
 - [mcp-server-mcp/tools/instructions/AGENTS.md](mcp-server-mcp/tools/instructions/AGENTS.md) — `d2a3fb0c935c`
 - [sveltekit-frontend/AGENTS.md](sveltekit-frontend/AGENTS.md) — `cad0382cca39`
@@ -86,7 +106,9 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 
 ## Architecture documents
 
+- [_bitfrost_fsm_index](docs/architecture/_bitfrost_fsm_index.md) — UNCLASSIFIED
 - [_cuda_rtx_toc](docs/architecture/_cuda_rtx_toc.md) — UNCLASSIFIED
+- [_taxonomy_oak_graphrag_index](docs/architecture/_taxonomy_oak_graphrag_index.md) — UNCLASSIFIED
 - [_topology_classifier_index](docs/architecture/_topology_classifier_index.md) — UNCLASSIFIED
 - [ACP-GEMMA4-MEMORY-HIERARCHY](docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md) — UNCLASSIFIED
 - [ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW](docs/architecture/ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md) — UNCLASSIFIED
@@ -196,7 +218,7 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [local-llm-offload-ownership](openspec/changes/local-llm-offload-ownership) — 49/82 tasks (60%)
 - [manual-migration-reconciliation](openspec/changes/manual-migration-reconciliation) — 98/131 tasks (75%)
 - [parent-atlas-ace-bitfrost-cache-correctness](openspec/changes/parent-atlas-ace-bitfrost-cache-correctness) — 56/108 tasks (52%)
-- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 922/1380 tasks (67%)
+- [parent-atlas-ace-rlm-bitfrost-integration](openspec/changes/parent-atlas-ace-rlm-bitfrost-integration) — 924/1383 tasks (67%)
 - [parent-atlas-adaptive-dag-fabric](openspec/changes/parent-atlas-adaptive-dag-fabric) — 11/13 tasks (85%)
 - [parent-atlas-agentic-completion](openspec/changes/parent-atlas-agentic-completion) — 10/11 tasks (91%)
 - [parent-atlas-agentic-file-compiler](openspec/changes/parent-atlas-agentic-file-compiler) — 56/81 tasks (69%)
@@ -216,11 +238,11 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [parent-atlas-error-embedding-768-migration](openspec/changes/parent-atlas-error-embedding-768-migration) — 12/26 tasks (46%)
 - [parent-atlas-gate2-chunk-lineage-convergence](openspec/changes/parent-atlas-gate2-chunk-lineage-convergence) — 3/20 tasks (15%)
 - [parent-atlas-governed-compute-fabric](openspec/changes/parent-atlas-governed-compute-fabric) — 2/178 tasks (1%)
-- [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 2/27 tasks (7%)
+- [parent-atlas-gpu-graph-vector-substrate](openspec/changes/parent-atlas-gpu-graph-vector-substrate) — 3/56 tasks (5%)
 - [parent-atlas-gpu-prellm-recommendation-v1](openspec/changes/parent-atlas-gpu-prellm-recommendation-v1) — 35/37 tasks (95%)
 - [parent-atlas-gpu-runtime-abi-alignment](openspec/changes/parent-atlas-gpu-runtime-abi-alignment) — 17/22 tasks (77%)
 - [parent-atlas-gpu-sidecar-patch-tournament](openspec/changes/parent-atlas-gpu-sidecar-patch-tournament) — 18/121 tasks (15%)
-- [parent-atlas-graph-analysis-contract](openspec/changes/parent-atlas-graph-analysis-contract) — 63/97 tasks (65%)
+- [parent-atlas-graph-analysis-contract](openspec/changes/parent-atlas-graph-analysis-contract) — 68/128 tasks (53%)
 - [parent-atlas-graph-pagerank-okf-fanout-hardening](openspec/changes/parent-atlas-graph-pagerank-okf-fanout-hardening) — 6/10 tasks (60%)
 - [parent-atlas-graph-retrieval-proof](openspec/changes/parent-atlas-graph-retrieval-proof) — 165/293 tasks (56%)
 - [parent-atlas-graph-runtime-enhancement](openspec/changes/parent-atlas-graph-runtime-enhancement) — 4/10 tasks (40%)
@@ -235,10 +257,10 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [parent-atlas-multi-agent-wave-plan](openspec/changes/parent-atlas-multi-agent-wave-plan) — 21/36 tasks (58%)
 - [parent-atlas-native-acceleration-cabi](openspec/changes/parent-atlas-native-acceleration-cabi) — 39/63 tasks (62%)
 - [parent-atlas-neural-prefill-encoder](openspec/changes/parent-atlas-neural-prefill-encoder) — 1539/2239 tasks (69%)
-- [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 102/154 tasks (66%)
+- [parent-atlas-nlp-sidecar-feature-compiler](openspec/changes/parent-atlas-nlp-sidecar-feature-compiler) — 102/160 tasks (64%)
 - [parent-atlas-nlp-sidecar-okf-alignment](openspec/changes/parent-atlas-nlp-sidecar-okf-alignment) — 8/16 tasks (50%)
 - [parent-atlas-observation-routing-fabric](openspec/changes/parent-atlas-observation-routing-fabric) — 19/26 tasks (73%)
-- [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/53 tasks (74%)
+- [parent-atlas-okf-knowledge-layers](openspec/changes/parent-atlas-okf-knowledge-layers) — 39/63 tasks (62%)
 - [parent-atlas-onnx-webgpu-embedding-promotion](openspec/changes/parent-atlas-onnx-webgpu-embedding-promotion) — 15/21 tasks (71%)
 - [parent-atlas-ontology-kernel](openspec/changes/parent-atlas-ontology-kernel) — 227/360 tasks (63%)
 - [parent-atlas-ontology-oaklib-fanout-bitmap](openspec/changes/parent-atlas-ontology-oaklib-fanout-bitmap) — 33/36 tasks (92%)
@@ -256,16 +278,17 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [parent-atlas-retire-384-lane](openspec/changes/parent-atlas-retire-384-lane) — 17/31 tasks (55%)
 - [parent-atlas-retrieval-executor-compatibility-convergence](openspec/changes/parent-atlas-retrieval-executor-compatibility-convergence) — 39/48 tasks (81%)
 - [parent-atlas-retrieval-fusion-reachability](openspec/changes/parent-atlas-retrieval-fusion-reachability) — 119/144 tasks (83%)
-- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 824/1080 tasks (76%)
+- [parent-atlas-retrieval-lineage-dag-convergence](openspec/changes/parent-atlas-retrieval-lineage-dag-convergence) — 825/1082 tasks (76%)
 - [parent-atlas-retrieval-lod-algorithm-taxonomy](openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy) — 52/109 tasks (48%)
 - [parent-atlas-retrieval-logic-convergence](openspec/changes/parent-atlas-retrieval-logic-convergence) — 32/74 tasks (43%)
+- [parent-atlas-rpc-packet-registry-fabric](openspec/changes/parent-atlas-rpc-packet-registry-fabric) — 29/35 tasks (83%)
 - [parent-atlas-rrf-fusion-consolidation](openspec/changes/parent-atlas-rrf-fusion-consolidation) — 5/6 tasks (83%)
 - [parent-atlas-runtime-log-remediation](openspec/changes/parent-atlas-runtime-log-remediation) — 0/18 tasks (0%)
 - [parent-atlas-search-classifier-sidecar](openspec/changes/parent-atlas-search-classifier-sidecar) — 70/88 tasks (80%)
 - [parent-atlas-semantic-512-canonicalization](openspec/changes/parent-atlas-semantic-512-canonicalization) — 23/31 tasks (74%)
 - [parent-atlas-semantic-768-canonical-contract](openspec/changes/parent-atlas-semantic-768-canonical-contract) — 59/90 tasks (66%)
 - [parent-atlas-telemetry-lowrank-recommendation-okf-integration](openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration) — 2/31 tasks (6%)
-- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 121/205 tasks (59%)
+- [parent-atlas-tensor-residency-integration](openspec/changes/parent-atlas-tensor-residency-integration) — 121/206 tasks (59%)
 - [parent-atlas-topology-representation-admission](openspec/changes/parent-atlas-topology-representation-admission) — 37/58 tasks (64%)
 - [parent-atlas-transport-memory-boundaries](openspec/changes/parent-atlas-transport-memory-boundaries) — 44/93 tasks (47%)
 - [parent-atlas-unordered-execution-contract](openspec/changes/parent-atlas-unordered-execution-contract) — 7/26 tasks (27%)
@@ -275,7 +298,7 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [parent-atlas-workstation-domain-classifier](openspec/changes/parent-atlas-workstation-domain-classifier) — 127/190 tasks (67%)
 - [parent-atlas-xgboost-cuda-runtime-proof](openspec/changes/parent-atlas-xgboost-cuda-runtime-proof) — 12/30 tasks (40%)
 - [route-import-infra-isolation](openspec/changes/route-import-infra-isolation) — 16/17 tasks (94%)
-- [svelte-a11y-warning-remediation](openspec/changes/svelte-a11y-warning-remediation) — 6/15 tasks (40%)
+- [svelte-a11y-warning-remediation](openspec/changes/svelte-a11y-warning-remediation) — 13/15 tasks (87%)
 
 ## Ordered workboard
 
@@ -306,6 +329,17 @@ Registry checksum: `1bbb4d14ee86200fe818516fd10720ace09c8cd93e293165c592d435754f
 - [Qdrant projection targets](reports/lineage-qdrant-projection-targets-v1.json) — QDRANT_PROJECTION_TARGETS_CENSUSED — same-collection duplicates 15, missing 0.
 - Rebuild safety warning: the existing Qdrant backfill tool reads canonical vectors but still requires packet/workspace lineage reconciliation before apply; it is not a promotion-ready blue/green rebuild.
 - Promotion note: Qdrant remains a rebuildable projection; duplicate ownership must be reconciled before cutover or deletion.
+
+## Test suite and ACP/A2A lookups (operator reference, verified 2026-10-14)
+
+- Targeted vitest (run from `sveltekit-frontend/`): `npx vitest run <spec paths>`. Parity, PageRank-contract, ACE-cache, and admin-page specs pass this way.
+- Full suite is not a usable gate yet: the default and serial pools crash with `ERR_IPC_CHANNEL_CLOSED`. Run shards instead: `npx vitest run --shard=N/4 --reporter=dot --exclude tests/runtime-cache-promotion.spec.ts` for N=1..4, one shard at a time. `npm run test:run` does not exist.
+- Container-dependent spec: `tests/runtime-cache-promotion.spec.ts` needs `legal-ai-postgres` and `legal-ai-valkey` running (`docker start` them; the test passes 26/26 with them up). Do not start GPU containers for tests.
+- Type and a11y gate: `cd sveltekit-frontend && npx svelte-check --tsconfig ./tsconfig.json --output machine`. Last run 2026-10-14: 0 errors, 181 warnings.
+- ACP tool list (read): `GET /api/acp/tools` — route `sveltekit-frontend/src/routes/api/acp/tools/+server.ts`.
+- ACP execute: `POST /api/acp/execute` — route `sveltekit-frontend/src/routes/api/acp/execute/+server.ts`; tool registry `sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts`.
+- A2A agent card (discovery): `GET /.well-known/agent.json` — route `sveltekit-frontend/src/routes/.well-known/agent.json/+server.ts`.
+- Regenerate this TOC: `npm run atlas:docs:toc:v2` (rewrites the registry v2, `docs/MASTER-TOC-v2.md`, and `docs/architecture/ARCH-TOC-v2.md`). Check only: `npm run atlas:docs:toc:v2 -- --check`. Edit this section in `scripts/atlas/build-master-toc-v2.mjs`, not the generated markdown.
 
 ## Neural decoder and GPU runtime separation
 

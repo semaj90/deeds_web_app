@@ -539,3 +539,9 @@ Safe next steps: reconcile this remote ledger with local HEAD, inspect existing 
 **2026-10-11 verifier blocked-reason fidelity (authored; validation paused):** When tuple/source or manifest readback owners return `BLOCKED`, `ProofChainVerifierV1` now propagates the owner's reason as the gate suffix instead of relabeling it as an identity/checksum mismatch. A focused regression assertion was authored; tests remain unrun per operator instruction.
 
 **2026-10-11 tuple contract versus admission separation (authored; validation paused):** A valid `OntologyLinkedTupleV1` shape and `ACTIVE_VERIFIED` marker now pass only `ONTOLOGY_TUPLE_CONTRACT`; the proof chain separately reports `ONTOLOGY_TUPLE_ADMISSION:AUTHORIZED_OWNER_READBACK_NOT_WIRED`. This reflects the source audit: `evaluateOntologyFanoutAuthorityV1()` is a policy evaluator, and no authorized envelope issuer/readback or production admission caller was found. No caller-supplied boolean or fixture receipt can satisfy the missing authority gate. Regression assertion updated; tests remain unrun per operator instruction.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

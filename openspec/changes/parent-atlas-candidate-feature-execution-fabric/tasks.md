@@ -2023,3 +2023,9 @@ These findings broaden the census beyond chunk-index columns. They do not establ
   - MRL-256 is confirmed as the primary low-cost dense compression challenger, achieving $3\times$ compression and $71.3\%$ Recall@10 with zero additional models or learned parameters.
   - Redis weight keys (`autoencoder:weights:*` and `ace:autoencoder:weights`) inventoried read-only; no cache mutations executed.
   - Path B alignment: Named vectors (title, summary, keyword) require independent relevance proof before allocating extra RRF votes. Report: `docs/reports/session-121-autoencoder-reconciliation-2026-10-13.json`.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

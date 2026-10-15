@@ -1,0 +1,26 @@
+{
+  "fetchedAt": "2026-10-15T03:30:38.157596Z",
+  "sources": [
+    {
+      "url": "https://huggingface.co/api/models/google/embeddinggemma-2",
+      "file": "hf-model-api.json",
+      "status": 200,
+      "bytes": 4018,
+      "sha256": "7809bbcbcafb3345cdbd078f7f763a9a3edc7b441bc9724ae95f640f24c59b5f"
+    },
+    {
+      "url": "https://huggingface.co/google/embeddinggemma-2/raw/main/README.md",
+      "file": "hf-README.md",
+      "status": 200,
+      "bytes": 21730,
+      "sha256": "b677a0ee2818c36f091b65fd3d9b4baea9f04d53b02b49cae916c74bf9682037"
+    },
+    {
+      "url": "https://ollama.com/library/embeddinggemma",
+      "file": "ollama-library-embeddinggemma.html",
+      "status": 200,
+      "bytes": 74061,
+      "sha256": "ae438c4e0a00164e6dff4b70fac5e1568e0b540fe66683c11e588b06b60b4ca5"
+    }
+  ]
+}

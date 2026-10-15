@@ -148,7 +148,7 @@
 		/>
 
 		<button
-			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir"
+			class="px-3 py-2 border border-beige text-sm hover:bg-beige hover:text-noir" aria-label="Send message"
 			onclick={sendMessage}
 		>
 			<span class="i-lucide-send w-4 h-4 inline-block"></span>

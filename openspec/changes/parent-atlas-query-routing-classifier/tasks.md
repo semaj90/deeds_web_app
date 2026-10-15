@@ -318,3 +318,9 @@ writes are authorized by this change.
   is a query-plan classifier, not a content ranker or MCP authorization owner.
 - No web-search route was called, no page was crawled, and no training or
   tournament run was performed. Existing unchecked tasks remain unchanged.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

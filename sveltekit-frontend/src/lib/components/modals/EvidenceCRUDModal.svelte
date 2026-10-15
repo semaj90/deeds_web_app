@@ -460,7 +460,7 @@
                           #{tag}
                           {#if !isReadonly}
                             <button
-                              onclick={() => removeTag(tag)}
+                              onclick={() => removeTag(tag)} aria-label={`Remove tag ${tag}`}
                               class="hover:text-danger transition-colors"
                             >
                               <span class="i-lucide-x w-3 h-3 inline-block"></span>

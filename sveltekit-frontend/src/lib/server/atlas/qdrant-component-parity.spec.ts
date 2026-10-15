@@ -33,13 +33,9 @@ function makeCanonicalCollectionInfo() {
       config: {
         params: {
           vectors: {
-            content_384: { size: 384, distance: 'Cosine' },
-            summary_384: { size: 384, distance: 'Cosine' },
-            signature_384: { size: 384, distance: 'Cosine' },
-            latent64: { size: 64, distance: 'Cosine' },
-          },
-          sparse_vectors: {
-            bm42: { index: true }, // Canonical sparse vector name per qdrant-collection-contracts.ts
+            content: { size: 768, distance: 'Cosine' },
+            signature: { size: 768, distance: 'Cosine' },
+            error: { size: 768, distance: 'Cosine' },
           },
         },
       },
@@ -87,22 +83,22 @@ function makeCanonicalPoint(overrides = {}) {
 describe('qdrant component parity logic', () => {
   it('resolves sample configuration in precedence order', () => {
     const cli = resolveSampleConfiguration(['node', 'x', '--sample', '12'], {});
-    expect(cli.requested).toBe(12);
-    expect(cli.source).toBe('cli');
+    expect(cli.value).toBe(12);
+    expect(cli.source).toBe('argument');
 
     const env = resolveSampleConfiguration(['node', 'x'], { ATLAS_QDRANT_PARITY_SAMPLE: '18' });
-    expect(env.requested).toBe(18);
+    expect(env.value).toBe(18);
     expect(env.source).toBe('environment');
 
     const npm = resolveSampleConfiguration(['node', 'x'], { npm_config_sample: '21' });
-    expect(npm.requested).toBe(21);
+    expect(npm.value).toBe(21);
     expect(npm.source).toBe('npm_config');
   });
 
   it('resolves explicit canonical and legacy collection contracts', () => {
-    const canonical = resolveCollectionConfiguration(['node', 'x', '--collection=codebase_chunks_384'], {});
-    expect(canonical.requested).toBe('codebase_chunks_384');
-    expect(canonical.contract).toEqual(COLLECTION_CONTRACTS.codebase_chunks_384);
+    const canonical = resolveCollectionConfiguration(['node', 'x', '--collection=codebase_chunks_768_v2'], {});
+    expect(canonical.requested).toBe('codebase_chunks_768_v2');
+    expect(canonical.contract).toEqual(COLLECTION_CONTRACTS.codebase_chunks_768_v2);
 
     const legacy = resolveCollectionConfiguration(['node', 'x', '--collection', 'codebase_chunks_768'], {});
     expect(legacy.requested).toBe('codebase_chunks_768');
@@ -110,7 +106,7 @@ describe('qdrant component parity logic', () => {
   });
 
   it('validates canonical vector contracts', () => {
-    const validation = validateVectorContract(makeCanonicalCollectionInfo(), COLLECTION_CONTRACTS.codebase_chunks_384);
+    const validation = validateVectorContract(makeCanonicalCollectionInfo(), COLLECTION_CONTRACTS.codebase_chunks_768_v2);
     expect(validation.status).toBe('PASS');
     expect(validation.collection_exists).toBe(true);
     expect(validation.legacy_collection).toBe(false);
@@ -118,10 +114,10 @@ describe('qdrant component parity logic', () => {
 
   it('fails vector contract validation on wrong dimensions', () => {
     const info = makeCanonicalCollectionInfo();
-    info.result.config.params.vectors.summary_384.size = 768;
-    const validation = validateVectorContract(info, COLLECTION_CONTRACTS.codebase_chunks_384);
+    info.result.config.params.vectors.content.size = 384;
+    const validation = validateVectorContract(info, COLLECTION_CONTRACTS.codebase_chunks_768_v2);
     expect(validation.status).toBe('FAIL');
-    expect(validation.issues.some((issue) => issue.startsWith('dimension_mismatch:summary_384'))).toBe(true);
+    expect(validation.issues.some((issue) => issue.startsWith('dimension_mismatch:content'))).toBe(true);
   });
 
   it('classifies row parity states without touching stores', () => {

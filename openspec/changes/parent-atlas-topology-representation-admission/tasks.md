@@ -565,3 +565,9 @@ unchanged and reports topology as unavailable or challenger-only.
   - PostgreSQL 18: Canonical authority for `sourceRef`, `CandidateOrdinal`, and `content_embedding_768`.
 - [x] Active synthesis model identity: Synchronized active synthesis model to `ornith-1.5-9b` (served on `:8090`), retiring stale `gemma4-legal` references across database error clusters, BitFrost repair templates, and evaluation contracts.
 
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

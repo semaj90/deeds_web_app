@@ -18209,3 +18209,9 @@ Cross-owner references: hot/warm/cold leases, prefill/KV lifetime, and GPU resid
 - Read-only `strings /proc/1/exe` inspection inside the container finds `/health` and `/stats`, but not `/ready`, `/embed/v2`, `model_artifact_revision`, or `service_build_revision`. Together with the live 404 and checked-in route definitions, this is direct evidence that the running executable predates the inspected API contract; it still does not identify the exact source commit or model artifact loaded by Ollama.
 - A separate read-only `GET http://127.0.0.1:11434/api/tags` reports `embeddinggemma:latest` digest `82f094e4c0e19bc4208c692996d4f1ecf14e82a8dee579ee1d2ca1175260058e`, family `gemma-embedding`, embedding length 768, GGUF BF16, and context length 2048. Tag digest metadata does not prove that this exact digest produced historical v4 rows or any specific persisted row.
 - No embedding request, model inference, service restart, or persistent-store operation was performed. Remaining gate: reconcile the running image/build with checked-in source and expose/read back an immutable resident-model artifact identity before claiming live producer qualification.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

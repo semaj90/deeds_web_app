@@ -1249,7 +1249,10 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						class="evidence-card"
 						class:selected={selectedEvidence?.id === item.id}
 						class:on-board={placedEvidenceIds.has(item.id)}
+						role="button"
+						tabindex="0"
 						onclick={() => (selectedEvidence = item)}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedEvidence = item; } }}
 						draggable="true"
 						ondragstart={(e: DragEvent) => {
 							if (!e.dataTransfer) return;
@@ -1297,6 +1300,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		</aside>
 
 		<!-- Center Canvas / Alt Views -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="canvas-area" bind:this={canvasAreaEl} onmousemove={handleCanvasMouseMove}>
 			{#if activeView === 'wall'}
 				{#key caseId}
@@ -1356,7 +1360,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 						<thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Location</th></tr></thead>
 						<tbody>
 							{#each evidenceItems as item (item.id)}
-								<tr class:selected={selectedEvidence?.id === item.id} onclick={() => (selectedEvidence = item)}>
+								<tr class:selected={selectedEvidence?.id === item.id} tabindex="0" onclick={() => (selectedEvidence = item)} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectedEvidence = item; } }}>
 									<td class="list-title">{item.title}</td>
 									<td>{item.type}</td>
 									<td>{item.date || '—'}</td>
@@ -1381,8 +1385,9 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 				<div class="details-content">
 					<div class="detail-section">
-						<label class="note-label">Title</label>
+						<label class="note-label" for="note-title-input">Title</label>
 						<input
+							id="note-title-input"
 							class="note-title-input"
 							type="text"
 							bind:value={noteTitle}
@@ -1392,8 +1397,9 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 					</div>
 
 					<div class="detail-section">
-						<label class="note-label">Content</label>
+						<label class="note-label" for="note-body-input">Content</label>
 						<textarea
+							id="note-body-input"
 							class="note-body-input"
 							bind:value={noteBody}
 							oninput={saveNoteEdits}
@@ -1729,7 +1735,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 	{#if contextMenu}
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div class="ctx-backdrop" onclick={closeContextMenu} onkeydown={(e) => e.key === 'Escape' && closeContextMenu()}>
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
 			<div class="ctx-menu" style="left:{contextMenu.x}px;top:{contextMenu.y}px" onclick={(e) => e.stopPropagation()}>
 				<button class="ctx-item" onclick={ctxDuplicate}>
 					<Icon name="copy" />
@@ -1757,7 +1763,7 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 			onclick={() => (showCaseSwitcher = false)}
 			onkeydown={(e) => e.key === 'Escape' && (showCaseSwitcher = false)}
 		>
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
 			<div class="case-switcher-dropdown" onclick={(e) => e.stopPropagation()}>
 				<div class="case-switcher-header">
 					<Icon name="search" />
@@ -2887,21 +2893,6 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		margin: 0;
 	}
 
-	.insights-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
-	.insights-list li {
-		padding: 0.5rem;
-		margin-bottom: 0.5rem;
-		background: #f3f4f6;
-		border-left: 2px solid #3b82f6;
-		font-size: 0.75rem;
-		color: #1f2937;
-	}
-
 	.stats-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
@@ -3019,10 +3010,6 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 		transform: scale(1.2);
 	}
 
-	.timeline-node.active .node-dot {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
 
 	.node-dot.gray {
 		background: #9ca3af;
@@ -3399,10 +3386,6 @@ IMPORTANT: Always include position coordinates for each item in the exact format
 
 	@keyframes spin {
 		to { transform: rotate(360deg); }
-	}
-
-	.action-btn [class*="loader"] {
-		animation: spin 1s linear infinite;
 	}
 
 	/* Context Menu */

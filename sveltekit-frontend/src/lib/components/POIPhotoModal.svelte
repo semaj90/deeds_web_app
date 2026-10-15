@@ -132,6 +132,7 @@
 						<button
 							class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
 							onclick={prevPhoto}
+							aria-label="Previous photo"
 							disabled={currentIndex === 0}
 						>
 							<span class="i-lucide-chevron-left w-6 h-6 inline-block"></span>
@@ -139,6 +140,7 @@
 						<button
 							class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
 							onclick={nextPhoto}
+							aria-label="Next photo"
 							disabled={currentIndex === photos.length - 1}
 						>
 							<span class="i-lucide-chevron-right w-6 h-6 inline-block"></span>

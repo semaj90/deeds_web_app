@@ -1673,8 +1673,12 @@
 									{@const selected = selectedNode?.id === node.id}
 									<g
 										class="atlas-node"
+										role="button"
+										tabindex="0"
+										aria-label={`Select node ${node.id}`}
 										transform={`translate(${node.position.x},${node.position.y})`}
 										onclick={() => clickNode(node)}
+										onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clickNode(node); } }}
 										style="cursor:pointer"
 									>
 										<!-- YoRHa Square/Brackets Border on Selected -->

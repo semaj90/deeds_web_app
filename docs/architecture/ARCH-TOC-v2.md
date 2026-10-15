@@ -45,7 +45,9 @@
 
 ### Markdown
 
+- [_bitfrost_fsm_index](./_bitfrost_fsm_index.md)
 - [_cuda_rtx_toc](./_cuda_rtx_toc.md)
+- [_taxonomy_oak_graphrag_index](./_taxonomy_oak_graphrag_index.md)
 - [_topology_classifier_index](./_topology_classifier_index.md)
 - [ACP-GEMMA4-MEMORY-HIERARCHY](./ACP-GEMMA4-MEMORY-HIERARCHY.md)
 - [ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW](./ACP-TELEMETRY-DAILY-GRAPHIFY-FLOW.md)

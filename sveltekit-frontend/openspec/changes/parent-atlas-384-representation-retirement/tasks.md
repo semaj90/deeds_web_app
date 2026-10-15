@@ -89,3 +89,35 @@
 - Live PostgreSQL family counts (2026-10-13, read-only): `atlas_packets` contains 58,109 `content_embedding_384` values (53,109 with the single historical version key, 5,000 without `embedding_version`; all report status `success`). `codebase_chunk_index` contains no `content_embedding_384` column, but does contain 10 `summary_embedding_384` values and zero populated `kmeans384_*` assignment/version fields. This updates inventory only; source lineage and full family retirement remain open.
 - Canonical rerank route/executor (2026-10-13): route source and existing regression fixture proved that current API validation accepted 384-D as `ACTIVE`, including a 768→384 direct-slice claim. Route validation now rejects retired 384 markers with HTTP 400; the executor independently rejects them before caching or scoring. Focused six-file suite passes 16/16, including route and direct-executor rejection tests. This is source-level boundary proof, not a live deployment test or full caller census.
 - Scope clarification (2026-10-13): the requested 768 alignment means align only active canonical semantic-embedding call paths to registered EmbeddingGemma `semantic_768`; do not mechanically rewrite every `384` occurrence. Preserve historical MiniLM/schema/fixture references and separate TF-IDF, feature-width, MRL, autoencoder-latent, and topology contracts. Never pad, truncate, or relabel to bridge spaces. The root `parent-atlas-retire-384-lane` change owns `atlas_packets.content_embedding_384` disposition; this frontend change remains the repository-wide owner/caller census. Current persisted values and external/dynamic callers remain unresolved; no data migration or runtime promotion is authorized by this clarification.
+
+## Test-contract alignment and latent/MRL facts — 2026-10-14
+
+- Parity spec fixture and assertions moved from retired `codebase_chunks_384` (`*_384` named vectors) to the canonical `codebase_chunks_768_v2` contract (`atlas-qdrant-768-v2`: `content`, `signature`, `error` at 768). Evidence: `sveltekit-frontend/src/lib/server/atlas/qdrant-component-parity.spec.ts` and the PageRank contract spec pass. `tests/ace-code-cache.spec.ts` passes alone (5/5) but failed one test in a combined three-file run; that flake is unresolved. This is a fixture/test change only; no live Qdrant or Postgres write.
+- The parity script `scripts/atlas/qdrant-parity-repair-core.mjs` already resolves its default to `codebase_chunks_768`, which is `legacy: true`; the v2 contract is canonical. Whether that default should change is an operator decision, not made here.
+- Latent and MRL equations (from code, recorded in root `CLAUDE.md`): `z128` is a separately learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL `v_k = normalize(v_768[:k])`. The DB `latent_128` rows described as a slice of `latent_256` conflict with that code and must be re-verified before citation.
+- Not done here: the census tasks 2-12 above remain open. No `atlas_packets.content_embedding_384` change; that stays with `parent-atlas-retire-384-lane`.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.
+## Handoff — 2026-10-15 (EmbeddingGemma 2 challenger index)
+
+Done (evidence in repo):
+- Challenger executor `src/lib/server/atlas/embedding/embeddinggemma2-challenger-executor-v1.ts`; 8 tests pass (`embeddinggemma2-challenger-executor-v1.spec.ts`). Never claims `semantic_768`.
+- Separate Postgres table `codebase_chunk_eg2_embeddings` (halfvec 768, HNSW cosine, domain index), migration `drizzle/manual/codebase_chunk_eg2_embeddings.sql`, applied. Domain view `codebase_chunk_eg2_domain_registry` applied.
+- First batch: 1,000 chunks, 0 failures, readback 1,000 joined / 1,000 at 768 dims (`docs/reports/eg2-index-batch-2026-10-15.json`).
+- Known-item sanity eval, 100 queries over 776 chunks (`docs/reports/eg2-known-item-eval-2026-10-15.json`): challenger R@1 34%, R@5 54%, R@10 63%; canonical `content_embedding_768` R@1 55%, R@5 70%, R@10 80%. Self-retrieval only, not relevance.
+- Qdrant collection `codebase_chunks_eg2_768_q8` exists, empty, 768-dim cosine.
+- Ollama model `embeddinggemma2:q8_0` built from unsloth Q8_0 GGUF (SHA-256 6f1bd4ac…aed8bc, local only, not committed).
+
+Not done / open:
+- Golden retrieval test with reviewed labels (none exists; no invented ground truth).
+- Full backfill (only the 1,000-row batch is written).
+- Prompt format for EmbeddingGemma 2 unverified; the task helper's prefixes come from the 300M model.
+- Equivalence to official weights not checked (GGUF vs safetensors).
+- Domain-filtered retrieval not exercised in a receipt.
+- Canonical default unchanged; the challenger is not wired into any route.
+
+Next steps (need decisions): choose labeled query set; decide backfill scope; verify prompt format; compare GGUF to official safetensors on a fixed sample.

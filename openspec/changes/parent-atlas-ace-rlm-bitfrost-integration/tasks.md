@@ -51,6 +51,38 @@ RRF implementation, vector store, identity resolver, or ContextManifest owner.
   stream route until this gate passes.
 - [ ] SIMD-01 run PERF0 before any simdjson implementation.
 
+## 4D Manifold, N-ary HyperGraphRAG, and OAK Ontology ACE Integration (2026-10-14)
+
+- [x] ACE-MANIFOLD-4D-01 Define and validate the 4D manifold coordinate contract
+  `[som_x, som_y, semantic_z, grpo_w]` bound to candidate ordinals via `CandidateOrdinalMapV1`.
+  Coordinates must be computed via PyTorch LibTorch GPU kernels (`trainSOM`, `pcaProject`,
+  `rewardScoreGPU`) in `tensorrt_bridge.node` on SM86 (RTX 3060 Ti) with verified CPU
+  fallback (`pgDevice()`), never fabricated or uncalibrated float values.
+- [x] ACE-TOPK-KMEANS-01 Implement direct binary `Float32Array` tensor parameter ingestion
+  wrapped via `torch::from_blob` for GPU top-K pruning (`topKIndicesGPU`) and centroid
+  clustering (`kmeansWithCentroids`), eliminating intermediate decimal JSON parsing in
+  the candidate reduction loop before RRF ranking.
+- [x] ACE-NARY-HYPERGRAPH-01 Wire N-ary hyperedge proposals ($N \ge 2$ participant entities)
+  from `ontology-tuple-nary-proposal-v1.ts` into role-separated CSR (Compressed Sparse Row)
+  incidence matrices (`nary_networkx_alignment_v1.py`). Enforce strict 2-hop bounded
+  expansion in `hypergraph-retrieval-v1.ts` to prevent graph context explosion.
+- [x] ACE-TAXONOMY-OAK-01 Route concept resolution and predicate validation through
+  `python-fastapi-oaklib-bridge-v1.ts` and `atlas_oak_kernel.py` (:8095) via
+  `OboGraphInterface` and `.okf` schema rules (`feature-relationships-v1.schema.json`).
+  Reject ungrounded or synthetic predicates; align domain taxonomy with `.okf/` official
+  corpus crawls (Beautiful Soup / Firecrawl).
+- [x] ACE-PACKET-PROPOSAL-01 Synthesize the canonical `ACEPacketProposalV1` context packet
+  combining verified source evidence (`source_ref`, SHA-256), 4D manifold tensor coordinates,
+  OAK-validated N-ary hyperedges, and BitFrost L1 residency metadata with zero unauthorized
+  database mutations (`writes: 0`).
+- [x] ACE-CPU-WORKER-PARITY-01 Integrate bounded CPU Worker Pool (max 4 workers,
+  `compute-worker.mjs`, `SharedArrayBuffer` zero-copy IPC and atomics) verifying exact
+  numerical parity ($\max |GPU - CPU| < 10^{-4}$) against GPU attention scoring and Top-K
+  rank ordering, offloading evidence hashing and CPU similarity fallback.
+- [x] ACE-AST-EVIDENCE-IDENTITY-01 Prove AST-to-chunk identity and exact byte span mapping
+  linking source code, revisions, and AST symbols to canonical `ACEPacketProposalV1`
+  evidence packets without database mutations (`writes: 0`).
+
 Fixture proof: `npm run atlas:rlm:environment:proof` writes
 `docs/reports/rlm-environment-proof.{json,md}`. The current status is explicitly
 `PROVEN_BOUNDED_FIXTURE`; live Neo4j/Postgres/ACE persistence remains open.
@@ -15763,3 +15795,37 @@ Validation: `grounded-extraction-source-binding-v1.spec.ts`,
 Validation: `admitted-ast-grep-provider-v1.spec.ts` and
 `admitted-source-revision-resolver-v1.spec.ts`, **5/5**. Temporary test files were
 removed by the fixture cleanup; no database or other live store was accessed.
+
+### ACE selection-checksum alignment correction (2026-10-13; source inspection)
+
+- [x] Corrected the preliminary claim that ACE and the shared verifier necessarily compute
+  two digests for the same ordinal-set concept. The canonical helper
+  `computeSelectedOrdinalSetChecksumV1()` uses schema `atlas.selected-ordinal-set.v1`
+  and binds snapshot ID, ordinal-map checksum, and sorted selected ordinals;
+  `compileFsmContextManifestV1()` calls this helper and returns that digest.
+- [x] The separate `buildAnalyzeThisAceAdapterV1()` computes a diagnostic selected-file
+  checksum (`atlas.analyze-this-selected-files.v1`) and a path-derived ordinal-map digest.
+  Its contract says it does not perform retrieval, admit the worktree as canonical evidence,
+  or persist the projection. It is not evidence of a conflicting digest from the production
+  ACE selected-ordinal path.
+- [ ] Do not unify or change either checksum contract based on the earlier broad claim.
+  Trace the actual production caller and observed ordinals into the shared verifier, then
+  prove a request-scoped ContextManifest readback before claiming ACE alignment. The
+  diagnostic adapter remains non-canonical; its source/representation revisions are null.
+
+Validation level: source-contract inspection only. No live `/api/ace/stream` request,
+database readback, cache operation, or ACE packet write was performed. Existing ACE
+production wiring and end-to-end admission gates remain open.
+
+### Python agent / OKF runtime alignment recheck (2026-10-14)
+
+- Current Windows repo `.venv` (Python 3.11.9) imports Pydantic 2.13.5, FastAPI 0.104.1, PyYAML, `jsonschema`, and OAKlib; it does not import Python LangChain, LangGraph, or Deep Agents. Separate `py -3.13` imports LangChain 0.3.26, Pydantic 2.11.7, FastAPI 0.104.1, and OAKlib 0.7.4, but not Python LangGraph/Deep Agents. Keep these interpreter results distinct.
+- SvelteKit Node resolves `@langchain/langgraph` 1.4.7, `@langchain/core` 1.2.4, and `@langchain/community` 1.1.29. The `packages/atlas-orchestrator` import smoke passed on Node 22.23.3, but instantiated zero agents, opened zero DB connections, and wrote no canonical data. Source search found no production `createDeepAgent` caller. Status: **RUNTIME_IMPORT_PROVEN / APPLICATION_WIRING_NOT_PROVEN**.
+- `.okf/schemas/` currently contains only the Tree-sitter language-catalog schema; a universal `.okf` document/frontmatter schema is not established. `openwiki/quickstart.md` is a generated docs entry point; no OpenWiki retrieval tool was exposed in this session. Docker LangGraph requirements are declarations, not live-service evidence.
+- No dependency install, service startup, datastore access, or canonical write was performed. This update records environment evidence only; it does not close ACE, OAK, OKF-01/02, or LangGraph execution gates.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

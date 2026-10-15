@@ -1,6 +1,6 @@
 {
   "schema": "phase17_21_workstation_audit.v1",
-  "generated_at": "2026-09-09T19:47:41.599Z",
+  "generated_at": "2026-10-15T07:04:06.686Z",
   "overall": "PARTIAL",
   "completion_pct": 67,
   "canonical_truth": "Postgres",
@@ -75,8 +75,8 @@
     "turbovec_napi": {
       "path": "crates/turbovec-napi/turbovec-napi.win32-x64-msvc.node",
       "exists": true,
-      "bytes": 1394688,
-      "modified_at": "2026-06-06T23:58:21.918Z"
+      "bytes": 2155520,
+      "modified_at": "2026-09-26T06:30:18.820Z"
     },
     "rust_simdjson": {
       "path": "simd-bridge/rust-simdjson/target/release/simd_bridge_rs.node",
@@ -87,8 +87,8 @@
     "atlas_packet_parser_source": {
       "path": "crates/atlas_packet_parser/src/lib.rs",
       "exists": true,
-      "bytes": 5074,
-      "modified_at": "2026-06-20T15:34:17.979Z"
+      "bytes": 7566,
+      "modified_at": "2026-10-09T17:40:31.032Z"
     },
     "atlas_packet_parser_binary": {
       "path": "crates/atlas_packet_parser/atlas-packet-parser.win32-x64-msvc.node",
@@ -211,7 +211,10 @@
         "sveltekit-frontend/scripts/atlas/phase17-pytorch-feature-extractor.mjs",
         "sveltekit-frontend/src/lib/server/gpu/libtorch-bridge.ts",
         "simd-bridge/cpp/build/Release/tensorrt_bridge.node"
-      ]
+      ],
+      "receipt_backed_pct": null,
+      "mapped_receipts": 0,
+      "passing_receipts": 0
     },
     {
       "id": 18,
@@ -228,7 +231,10 @@
       "evidence": [
         "sveltekit-frontend/scripts/atlas/phase18-xgboost-reranker.mjs",
         "scripts/atlas/train-policy-reranker.py"
-      ]
+      ],
+      "receipt_backed_pct": null,
+      "mapped_receipts": 0,
+      "passing_receipts": 0
     },
     {
       "id": 19,
@@ -245,7 +251,10 @@
       "evidence": [
         "sveltekit-frontend/scripts/atlas/phase19-retrieval-loop-seed.mjs",
         ".tmp/atlas-retrieval-loop.jsonl"
-      ]
+      ],
+      "receipt_backed_pct": null,
+      "mapped_receipts": 0,
+      "passing_receipts": 0
     },
     {
       "id": 20,
@@ -266,7 +275,10 @@
         "sveltekit-frontend/src/lib/server/packets/packet-contract.ts",
         "crates/turbovec-napi/src/lib.rs",
         "crates/atlas_packet_parser/src/lib.rs"
-      ]
+      ],
+      "receipt_backed_pct": null,
+      "mapped_receipts": 0,
+      "passing_receipts": 0
     },
     {
       "id": 21,
@@ -285,7 +297,10 @@
         "packages/parent-atlas/docs/atlas/PROOF-SYSTEM.md",
         "docs/reports/parent-atlas-proof-of-truth.json",
         "docs/reports/runtime-degradation-proof.json"
-      ]
+      ],
+      "receipt_backed_pct": null,
+      "mapped_receipts": 0,
+      "passing_receipts": 0
     }
   ],
   "aliases": {

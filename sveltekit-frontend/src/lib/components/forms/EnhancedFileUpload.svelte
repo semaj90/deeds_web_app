@@ -346,7 +346,7 @@
                   {/if}
                 </div>
 
-                <button onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
+                <button aria-label={`Remove ${file.name}`} onclick={() => removeFile(file.name)} disabled={isUploading} class="flex-shrink-0 p-1 hover:bg-sand/10 rounded">
                   <span class="i-lucide-x h-4 w-4 inline-block"></span>
                 </button>
               </div>

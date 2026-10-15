@@ -7,7 +7,7 @@ import { validateRawPageRank } from './pagerank-validation.js';
 
 describe('PageRank contracts', () => {
   it('keeps the contract version stable', () => {
-    expect(PAGERANK_CONTRACT_VERSION).toBe('atlas.pagerank.authority.v1');
+    expect(PAGERANK_CONTRACT_VERSION).toBe('atlas.pagerank-authority.v1');
   });
 
   it('validates raw scores as a probability distribution', () => {

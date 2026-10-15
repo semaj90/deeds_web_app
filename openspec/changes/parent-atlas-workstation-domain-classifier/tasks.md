@@ -1375,3 +1375,38 @@ its validated request ordinal map and trusted repository root; the injectable by
 only as a fixture seam. The production route still does not supply its live SearchRuntime map/root.
 Profile/supplement owners also remain unresolved. Fixture receipts and negative regressions are
 unrun; the route remains unwired.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.
+
+## `.okf` keyword corpus / taxonomy alignment checkpoint — 2026-10-14
+
+- [x] Added `scripts/atlas/taxonomy/build-okf-keyword-taxonomy-crosswalk-v1.mjs` to schema-validate the existing reference corpus, read the existing Python domain-alias mapper, preserve topic membership, check referenced repository paths, and emit a checksummed candidate report. It does not change corpus admission or write canonical stores.
+- [x] Generated `docs/reports/atlas-taxonomy-glossary-alignment-v1.json`: 17 corpus entries, 81 term occurrences, 81 unique normalized terms, 0 exact domain-alias candidates, 0 missing referenced paths. Report checksum: `sha256:2ff9c34eaa15e7027a02954adf5b0d82da58a76eee5afaf9a5f9422ca712efae`.
+- [x] Focused Node tests pass 2/2; the report is `PARTIAL`, `canonicalResolutionStatus: NOT_RUN`, `canonicalEntityResolutionStatus: NOT_RUN`, and `repositoryDataWritesPerformed: false`.
+- [ ] Review/author a governed mapping from topic terms to taxonomy concepts. Do not infer one from string similarity; the current corpus schema has no canonical concept/domain/entity IDs.
+- [ ] Reconcile mapped concepts with the current PostgreSQL/OAK owner and independently read back revisions before any corpus promotion, graph incidence, semantic indexing, or retrieval use.
+
+## Parent Atlas workstation navigation and token-budget shortlist — 2026-10-14
+
+- [x] Documented the Atlas-map model and existing ownership path: ACP/A2A control projection → existing SearchRuntime/RRF → advisory recommendation → exact source qualification → ACE/ContextManifestV2 → existing DAG gate. No parallel identity, fusion, packet, or injection owner was introduced.
+- [x] Hardened `low-rank-helper-recommender-v1.ts`: artifact schema now enforces finite factors, exact declared rank, bounded rates/costs, and unique task/helper keys; added a deterministic hard-token-budget shortlist receipt marked advisory and write-disabled.
+- [x] Added focused regression cases for dimension rejection, allowed-helper filtering, deterministic budget selection, and advisory/write-disabled boundaries.
+- [x] Clarified that estimated token counts are not measured savings, low-rank routing cannot replace `semantic_768`, and ACE remains the exact selector/admission owner. Ewin Tang's quantum-inspired recommendation is research-only here because its required \(\ell^2\)-sampling input structure and assumptions are not proven for Atlas.
+- [x] Focused proof passed: `low-rank-helper-recommender-v1.spec.ts` 3/3, `unified-context-pipeline-v1.spec.ts` 6/6, and `ace-packet-v3-context-manifest-bridge-v1.spec.ts` 8/8 (17 tests total). Direct local Vitest invocation used one worker; startup was slow but completed.
+- [ ] Live ACP→A2A→SearchRuntime→ACE/DAG request trace, tokenizer-measured savings, independently labeled recommendation evaluation, and live GPU/GraphRAG execution remain unproven.
+
+## `.okf` corpus keyword MCP lookup — 2026-10-14
+
+- [x] Added `searchKeywordCorpusV1()` to parse the bounded YAML corpus with unique-key checking and validate against the adjacent `.okf/corpora/keyword-corpus.schema.json`; the corpus remains reference-only and canonical authority remains false.
+- [x] Added deterministic keyword-overlap Top-K, bounded page size, and a stateless cursor bound to corpus and normalized-query SHA-256 checksums. Corpus changes or query reuse reject the cursor.
+- [x] Reused `PacketClassLutV1` over corpus entry IDs; results carry both `lutCode` and `lutEncodingRevision`, never use the LUT as entity identity.
+- [x] Registered the read-only `atlas.keyword_corpus_search` MCP tool. It searches only `.okf/corpora/keyword-corpus.yaml`; it does not search canonical source packets, mutate corpus indexing flags, query Postgres/OAK, add a SearchRuntime lane, or write Qdrant.
+- [x] Added a strict `KeywordCorpusSearchResultV1Schema`; both success and stable error results are runtime-validated before return. MCP responses expose the same result as `structuredContent` and JSON text for client compatibility.
+- [x] Earlier focused fixture run passed 4/4 before the structured-output change: corpus/schema, Top-K/LUT mapping, cursor pagination/stale query, and MCP registration/call. Command: `npx vitest run --pool=threads --maxWorkers=1 --minWorkers=1 src/lib/server/atlas/keyword-corpus-search-v1.spec.ts src/mcp/atlas-keyword-corpus-tools.spec.ts` (exit 0).
+- [ ] Re-run focused tests after structured-output change. Latest run did not complete or emit assertions; it was interrupted after Node/Vitest memory usage rose substantially. Do not treat earlier 4/4 as proof of the new response contract.
+- [ ] `npm run check` remains unverified: the full Svelte check was interrupted after several minutes at approximately 3 GB working set with no diagnostics, to avoid further workstation memory pressure. `git diff --check` passed.
+- [ ] Live MCP `tools/list` and `tools/call` against the running Atlas server are not verified. The current output remains a reference-vocabulary result, not canonical taxonomy resolution or evidence admission.

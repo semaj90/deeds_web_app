@@ -1,0 +1,22 @@
+{
+  "schema": "atlas.eg2-known-item-eval.v1",
+  "generatedAt": "2026-10-15T06:49:11.347Z",
+  "kind": "SELF_RETRIEVAL_SANITY_NOT_RELEVANCE",
+  "subsetSize": 776,
+  "queries": 100,
+  "challenger": {
+    "model": "embeddinggemma2:q8_0",
+    "modelRevision": "unsloth/embeddinggemma-2-GGUF:embeddinggemma-2-Q8_0.gguf@sha256:6f1bd4ac6c5df7444f9cca7ca36cafe6cfa34cd6f49fefb1e0b4be8143aed8bc",
+    "recallAt1Pct": 34,
+    "recallAt5Pct": 54,
+    "recallAt10Pct": 63
+  },
+  "canonical": {
+    "model": "embeddinggemma:latest",
+    "column": "codebase_chunk_index.content_embedding_768",
+    "recallAt1Pct": 55,
+    "recallAt5Pct": 70,
+    "recallAt10Pct": 80
+  },
+  "canonicalDefaultChanged": false
+}

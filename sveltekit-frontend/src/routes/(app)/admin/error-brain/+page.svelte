@@ -492,8 +492,8 @@ import SuggestionsList from '../../../(admin)/error-brain/components/Suggestions
 				<input id="kag-error-id" type="text" placeholder="e.g. error-uuid or synthetic-error-id" bind:value={kagErrorId} class="flex-1 px-2 py-1.5 border border-gray-300 rounded font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
 			</div>
 			<div class="flex gap-3 items-center">
-				<label class="text-sm font-semibold min-w-20">Action:</label>
-				<div class="flex gap-2">
+				<span id="kag-action-label" class="text-sm font-semibold min-w-20">Action:</span>
+				<div class="flex gap-2" role="group" aria-labelledby="kag-action-label">
 					{#each (['root-cause', 'similar', 'traverse'] as const) as act}
 						<button
 							onclick={() => { kagAction = act; }}

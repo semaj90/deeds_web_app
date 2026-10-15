@@ -2084,8 +2084,8 @@
 	<section class="panel span2">
 		<div class="research-controls">
 			<div class="ctrl-group">
-				<label class="ctrl-label">Pipeline</label>
-				<select bind:value={researchPipeline} class="ctrl-select" onchange={() => fetch_research_topics()}>
+				<label class="ctrl-label" for="research-pipeline">Pipeline</label>
+				<select id="research-pipeline" bind:value={researchPipeline} class="ctrl-select" onchange={() => fetch_research_topics()}>
 					<option value="all">All pipelines</option>
 					<option value="ace">ACE</option>
 					<option value="rag">RAG</option>
@@ -2095,8 +2095,9 @@
 				</select>
 			</div>
 			<div class="ctrl-group" style="flex:1">
-				<label class="ctrl-label">Domains (comma-separated)</label>
+				<label class="ctrl-label" for="research-domains">Domains (comma-separated)</label>
 				<input
+					id="research-domains"
 					type="text"
 					bind:value={researchDomains}
 					class="ctrl-input"

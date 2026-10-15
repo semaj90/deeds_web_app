@@ -4000,7 +4000,7 @@ Operator plan: `catalog -> classify -> acquire -> normalize -> cite -> admit -> 
 | CE-MCP-04 `selectMcpToolSubset` caller | static call at `src/mcp/server.ts:2093` in the `tools/list` handler (ACTIVE_CALLER_PROVEN, static) | EXISTS statically; a runtime proof is still the gate |
 | Incremental recrawl / revision drift | DOC-26 incremental version recrawl (open, `NEW`), DOC-27 stale version rejection (done) | OPEN under DOC-26 |
 | CE-DOMAIN-01/02, CE-TOPIC-01, CE-ALGO-01 catalogs | `.okf/domains` holds 3 yaml files (`feature-intelligence`, `parent-atlas-execution`, `structured-value`) and Postgres `atlas_domain_ontology` has 13 top-level groups; no computer-engineering topic or algorithm catalog was found in this pass | NEW, but reuse the 13-group ontology and `CANONICAL_DOMAINS` mappings first (DOMAIN-TAXONOMY-AUDIT-01, DOMAIN-01) |
-| CE-LANG-01 `ProgrammingLanguageCatalogV1` | Owner found: `sveltekit-frontend/src/lib/server/atlas/language/language-intelligence-plan.ts` (+ spec), with `ts-morph-semantic-enrichment.ts` and `api-contract-observation-v1.ts` beside it (contents not read in this pass, so what languages and readiness fields it already models is unverified). `.okf/languages` contains only `typescript.yaml` | EXTEND the language-intelligence plan; read it first; do not mark `treeSitterReady` or `lspReady` without a live probe |
+| CE-LANG-01 `ProgrammingLanguageCatalogV1` | Existing `.okf/languages/typescript.yaml` plus candidate-only Tree-sitter manifest snapshot (371 grammar IDs; package 1.14.0, WSL Python 3.14.6, source and catalog checksums recorded); existing `LanguageRegistryV1` now consumes it as `PARSER_GRAMMAR_ID`. The catalog has no LSP bindings and does not claim parser availability. | PARTIAL: continue extending the language-intelligence owner; do not mark `treeSitterReady` or `lspReady` without executable probes |
 | CE-LSP-01 LSP enrichment | not audited here | NEW, optional, after admission |
 | CE-E2E-01/02 replay fixture | not present; the DOC admission canary receipts are the closest precedent | NEW |
 
@@ -4520,3 +4520,9 @@ the already-running container image.
 # 2026-10-13 reranker default alignment (source-only)
 
 - `python/parent_atlas_neural_router/train_tool_cross_encoder.py` previously defaulted to `cross-encoder/ms-marco-MiniLM-L-6-v2`. This is a reranking cross-encoder, not the 384-D MiniLM embedding model, but it was an implicit model selection inconsistent with the active serving reranker. The default now matches `scripts/reranker-sidecar.py` (`mixedbread-ai/mxbai-rerank-base-v2`); `--model` remains available for an explicit experiment. No training, download, or model promotion was performed. This does not establish the training script is invoked or the selected model is quality-qualified for tool routing.
+## Canonical-state correction — 2026-10-14
+
+- Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
+- Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
+- Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
+- This note changes no database, Qdrant, or runtime state.

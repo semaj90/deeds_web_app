@@ -1,0 +1,1 @@
+FROM ./embeddinggemma-2-Q8_0.gguf
