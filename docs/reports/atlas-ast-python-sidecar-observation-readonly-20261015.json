@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.ast-python-sidecar-observation-readonly.v1",
+  "generatedAt": "2026-10-15T22:17:33.966Z",
+  "status": "OBSERVATION_VERIFIED",
+  "source": {
+    "sourceRef": "fixture/atlas-language-dispatch.py",
+    "sourceRevision": "sha256:35ba044f85eb53ff4b9984bfc53d9cede32ed5f6f21c22f5014b80905649b87a",
+    "byteLength": 61,
+    "fixtureOnly": true
+  },
+  "sidecar": {
+    "endpoint": "http://127.0.0.1:8095",
+    "engine": "treesitter-chunker",
+    "engineVersion": "4.0.0",
+    "language": "python",
+    "responseSchema": "atlas.ast.evidence.v1"
+  },
+  "observation": {
+    "responseStatus": 200,
+    "sourceRevisionMatched": true,
+    "filePathMatched": true,
+    "chunkCount": 1,
+    "target": {
+      "name": "calculate_score",
+      "upstreamNodeId": "5d06a5466af0eab064d3cadfe621068a2da6ebcc",
+      "upstreamChunkId": "5d06a5466af0eab064d3cadfe621068a2da6ebcc",
+      "signature": "def calculate_score(value: int) -> int:\n    ",
+      "startByte": 0,
+      "endByte": 60,
+      "ancestry": []
+    }
+  },
+  "boundaries": {
+    "canonicalAuthority": false,
+    "databaseRead": false,
+    "databaseWrite": false,
+    "searchRuntimeRegistered": false,
+    "contextManifestAdmitted": false,
+    "writesPerformed": false
+  }
+}

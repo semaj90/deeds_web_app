@@ -21,27 +21,6 @@
       "launcherProfile": "ornith-1.5-vlm",
       "compatibility": "EXACT_FAMILY_ONLY",
       "status": "PRODUCTION_PROFILE"
-    },
-    {
-      "id": "GEMMA_VISION_PRODUCTION",
-      "modelFamily": "gemma4",
-      "modelId": "gemma4-rotorquant:latest",
-      "projectorFamily": "gemma4",
-      "projectorId": "gemma4-mmproj",
-      "projectorSha256": "4b3bf6e16b19d7f85fe4dd4ab2f8c8037ec14e656f8017fcfb42b30c3db26f67",
-      "launcherProfile": "gemma4-direct",
-      "compatibility": "EXACT_FAMILY_ONLY",
-      "status": "PRODUCTION_PROFILE"
-    },
-    {
-      "id": "ORNITH_MODEL_GEMMA_PROJECTOR",
-      "modelFamily": "ornith-1.5",
-      "projectorFamily": "gemma4",
-      "modelId": "hforf-gguf",
-      "projectorId": "gemma4-mmproj",
-      "compatibility": "COMPATIBILITY_EXPERIMENT_ONLY",
-      "status": "NON_PRODUCTION",
-      "loadAllowed": false
     }
   ],
   "models": [
@@ -54,54 +33,32 @@
       "localPath": "models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf",
       "filename": "hforf.gguf",
       "modelFamily": "ornith-1.5",
-      "productionProfiles": ["ORNITH_VISION_PRODUCTION"],
+      "productionProfiles": [
+        "ORNITH_VISION_PRODUCTION"
+      ],
       "notes": "Verified by GET /v1/models and /props on 2026-09-03. Active runtime reports vision=false and audio=false; no projector is attached. See docs/reports/synthesis-model-identity-audit-v1.json.",
       "embeddingDim": null,
       "port": 8090,
       "contextLen": 65536,
       "quantization": "q5_k/q4_k",
       "modelAlias": "ornith-1.5-9b",
-      "capabilities": ["chat-completions", "streaming", "tool-calling", "text-synthesis"],
-      "modalities": {"vision": false, "audio": false},
-      "tags": ["chat", "agentic", "gguf", "current-default", "text-only"]
-    },
-    {
-      "id": "gemma4-rotorquant:latest",
-      "displayName": "Gemma 4 Legal VLM (merged)",
-      "description": "Legacy Gemma 4 E4B legal VLM candidate. Not the currently loaded :8090 synthesis model.",
-      "runtime": "llama-server",
-      "pathEnv": "TURBO_MODEL_PATH",
-      "filename": null,
-      "modelFamily": "gemma4",
-      "productionProfiles": ["GEMMA_VISION_PRODUCTION"],
-      "notes": "STALE NOTE CORRECTED 2026-09-06: this used to be stored as an Ollama blob at %USERPROFILE%\\.ollama\\blobs\\sha256-a79de882..., but that blob no longer exists on disk and the tag no longer appears in `ollama list` (verified live 2026-09-06 — only embeddinggemma:latest, ibm/granite-docling:258m, and nomic-embed-text:latest are currently pulled). This model must be sourced from a converted GGUF (see productionProfiles/GEMMA_VISION_PRODUCTION and models/gemma4-legal-iq4xs-direct.gguf) via TURBO_MODEL_PATH, not from an Ollama blob. Requires TURBO_NGL=99 on RTX 3060 Ti.",
-      "embeddingDim": null,
-      "port": 8090,
-      "contextLen": 64000,
-      "quantization": "q4_K_M",
-      "tags": ["chat", "legal", "vlm", "legacy", "non-current"]
-    },
-    {
-      "id": "gemma4-mmproj",
-      "displayName": "Gemma 4 SigLIP mmproj (vision tower)",
-      "description": "Multimodal projector sidecar for Gemma 4. Loaded alongside the primary model for vision input.",
-      "runtime": "llama-server",
-      "pathEnv": "TURBOQUANT_MMPROJ_PATH",
-      "pathEnvFallback": "MMPROJ_PATH",
-      "localFallback": "models/mmproj-F16.gguf",
-      "filename": "mmproj-F16.gguf",
-      "notes": "Place at models/mmproj-F16.gguf to use the repo-local fallback. If absent, launch-turboquant.ps1 skips --mmproj (text-only mode). BF16 precision. Vision tower frozen during GRPO legal training — compatible with legal fine-tune.",
-      "embeddingDim": null,
-      "port": null,
-      "contextLen": null,
-      "quantization": "bf16",
-      "modelFamily": "gemma4",
-      "projectorFamily": "gemma4",
-      "artifactSha256": "4b3bf6e16b19d7f85fe4dd4ab2f8c8037ec14e656f8017fcfb42b30c3db26f67",
-      "artifactSizeBytes": 990372800,
-      "verifiedAt": "2026-09-06",
-      "compatibleModelIds": ["gemma4-rotorquant:latest", "gemma4-legal-iq4xs-direct", "gemma4-rotorquant-iq4xs-base"],
-      "tags": ["vlm", "sidecar", "vision"]
+      "capabilities": [
+        "chat-completions",
+        "streaming",
+        "tool-calling",
+        "text-synthesis"
+      ],
+      "modalities": {
+        "vision": false,
+        "audio": false
+      },
+      "tags": [
+        "chat",
+        "agentic",
+        "gguf",
+        "current-default",
+        "text-only"
+      ]
     },
     {
       "id": "ornith-1.5-mmproj",
@@ -122,8 +79,16 @@
       "quantization": "bf16",
       "modelFamily": "ornith-1.5",
       "projectorFamily": "ornith-1.5",
-      "compatibleModelIds": ["hforf-gguf"],
-      "tags": ["vlm", "sidecar", "vision", "ornith-1.5", "production-profile"]
+      "compatibleModelIds": [
+        "hforf-gguf"
+      ],
+      "tags": [
+        "vlm",
+        "sidecar",
+        "vision",
+        "ornith-1.5",
+        "production-profile"
+      ]
     },
     {
       "id": "embeddinggemma-300m-768d",
@@ -147,7 +112,13 @@
       "contextLen": 2048,
       "quantization": "f16",
       "canonical": true,
-      "tags": ["embeddings", "768d", "semantic_768", "canonical", "primary"]
+      "tags": [
+        "embeddings",
+        "768d",
+        "semantic_768",
+        "canonical",
+        "primary"
+      ]
     },
     {
       "id": "gemma3-270m-onnx",
@@ -162,7 +133,12 @@
       "port": null,
       "contextLen": 4096,
       "quantization": "q4f16",
-      "tags": ["client-side", "onnx", "webgpu", "270m"]
+      "tags": [
+        "client-side",
+        "onnx",
+        "webgpu",
+        "270m"
+      ]
     },
     {
       "id": "embeddinggemma-300m-onnx",
@@ -180,37 +156,14 @@
       "contextLen": null,
       "quantization": "int8",
       "canonical": false,
-      "tags": ["client-side", "onnx", "embeddings", "768d", "semantic_768", "fallback"]
-    },
-    {
-      "id": "gemma4-rotorquant:latest-vendor-gguf",
-      "displayName": "Gemma 4 Legal (vendor canonical GGUF)",
-      "description": "Canonical merged Gemma 4 legal GGUF in vendor/models/. Used when TURBO_MODEL_PATH points here.",
-      "runtime": "llama-server",
-      "pathEnv": "TURBO_MODEL_PATH",
-      "localPath": "vendor/models/gemma4-rotorquant:latest.gguf",
-      "filename": "gemma4-rotorquant:latest.gguf",
-      "notes": "gitignored binary blob in vendor/models/. Set TURBO_MODEL_PATH to this absolute path in .env.",
-      "embeddingDim": null,
-      "port": 8090,
-      "contextLen": 64000,
-      "quantization": "q4_K_M",
-      "tags": ["chat", "legal", "vlm", "vendor", "primary"]
-    },
-    {
-      "id": "gemma4-mmproj-vendor",
-      "displayName": "Gemma 4 mmproj (vendor canonical)",
-      "description": "VLM projector sidecar in vendor/models/.",
-      "runtime": "llama-server",
-      "pathEnv": "TURBO_MMPROJ_PATH",
-      "localPath": "vendor/models/mmproj-gemma4.gguf",
-      "filename": "mmproj-gemma4.gguf",
-      "notes": "gitignored binary in vendor/models/. Set TURBO_MMPROJ_PATH to this path in .env.",
-      "embeddingDim": null,
-      "port": null,
-      "contextLen": null,
-      "quantization": "f16",
-      "tags": ["vlm", "sidecar", "vision", "vendor"]
+      "tags": [
+        "client-side",
+        "onnx",
+        "embeddings",
+        "768d",
+        "semantic_768",
+        "fallback"
+      ]
     },
     {
       "id": "gemma4-legal-iq4xs-direct",
@@ -224,7 +177,13 @@
       "filename": "gemma4-legal-iq4xs-direct.gguf",
       "endpoint": "http://127.0.0.1:8090",
       "openAICompatible": true,
-      "capabilities": ["chat-completions", "streaming", "tool-calling", "vision", "ace-synthesis"],
+      "capabilities": [
+        "chat-completions",
+        "streaming",
+        "tool-calling",
+        "vision",
+        "ace-synthesis"
+      ],
       "gpu": {
         "device": "cuda",
         "offloadLayers": 99,
@@ -249,21 +208,14 @@
       "contextLen": 65536,
       "quantization": "iq4_xs",
       "canonical": false,
-      "tags": ["chat", "legal", "rotorquant", "legacy", "non-current", "merged"]
-    },
-    {
-      "id": "gemma4-rotorquant-iq4xs-base",
-      "displayName": "Gemma 4 E4B RotorQuant IQ4_XS (base, no legal)",
-      "description": "Base weight-quantized Gemma 4 E4B without legal fine-tune. Use LEGAL_LORA_PATH to inject legal LoRA at runtime.",
-      "runtime": "llama-server",
-      "pathEnv": "ROTORQUANT_MODEL_PATH",
-      "filename": "gemma-4-E4B-RotorQuant-GGUF-IQ4_XS.gguf",
-      "notes": "Non-merged base model. 21.6 tok/s, 1762ms TTFT on RTX 3060 Ti — use gemma4-rotorquant:latest-iq4xs-direct instead for production. Only keep if round-trip LoRA injection testing is needed.",
-      "embeddingDim": null,
-      "port": 8090,
-      "contextLen": 64000,
-      "quantization": "iq4_xs",
-      "tags": ["chat", "rotorquant", "base-model", "non-canonical"]
+      "tags": [
+        "chat",
+        "legal",
+        "rotorquant",
+        "legacy",
+        "non-current",
+        "merged"
+      ]
     },
     {
       "id": "gemma4-e2b-rotorquant-iq4xs-base",
@@ -281,7 +233,14 @@
       "contextLen": 128000,
       "quantization": "iq4_xs",
       "canonical": false,
-      "tags": ["draft", "mtp", "speculative", "assistant", "rotorquant", "e2b"]
+      "tags": [
+        "draft",
+        "mtp",
+        "speculative",
+        "assistant",
+        "rotorquant",
+        "e2b"
+      ]
     },
     {
       "id": "gemma4-e4b-assistant-mtp-q4km",
@@ -305,7 +264,15 @@
       "contextLen": null,
       "quantization": "q4_K_M",
       "canonical": false,
-      "tags": ["draft", "mtp", "speculative", "assistant", "e4b", "mode-c", "75mb"]
+      "tags": [
+        "draft",
+        "mtp",
+        "speculative",
+        "assistant",
+        "e4b",
+        "mode-c",
+        "75mb"
+      ]
     },
     {
       "id": "gemma4-e4b-qat-assistant-donor-b",
@@ -323,7 +290,14 @@
       "contextLen": null,
       "quantization": "bf16-unquantized-qat",
       "canonical": false,
-      "tags": ["agmr", "donor-candidate", "assistant", "e4b", "qat", "unverified-forward-pass"]
+      "tags": [
+        "agmr",
+        "donor-candidate",
+        "assistant",
+        "e4b",
+        "qat",
+        "unverified-forward-pass"
+      ]
     }
   ],
   "retrieval": {
@@ -332,7 +306,6 @@
     "fusionAuthority": "typescript-search-runtime",
     "_legacyCollection": "codebase_chunks_384_hybrid",
     "_legacyNote": "384-dimensional collections and artifacts are migration/reference evidence only. All new semantic retrieval uses codebase_chunks_768_v2 with semantic_768.",
-
     "denseVectors": {
       "content": {
         "name": "content",
@@ -365,7 +338,6 @@
         "canonicalAuthority": false
       }
     },
-
     "sparseVectors": {
       "canonical": {
         "name": "bm42_sparse",
@@ -373,13 +345,11 @@
         "purpose": "lexical and exact-term recall"
       }
     },
-
     "fusion": {
       "algorithm": "rrf",
       "postFusionTopK": 100,
       "deduplicateBy": "packet_key"
     },
-
     "graphExpansion": {
       "store": "neo4j",
       "seedTopK": 5,
@@ -388,15 +358,20 @@
       "phase": "after-semantic-retrieval",
       "_note": "Graph expansion runs AFTER initial fused semantic retrieval, seeded from top-5 results. Not an unseeded PageRank query.",
       "allowedRelationships": [
-        "IMPORTS", "CALLS", "CONTAINS", "IMPLEMENTS",
-        "USES_CONCEPT", "SIMILAR_TOPOLOGY", "IN_SOM", "BELONGS_TO_CLUSTER"
+        "IMPORTS",
+        "CALLS",
+        "CONTAINS",
+        "IMPLEMENTS",
+        "USES_CONCEPT",
+        "SIMILAR_TOPOLOGY",
+        "IN_SOM",
+        "BELONGS_TO_CLUSTER"
       ],
       "pageRank": {
         "mode": "static-prior",
         "weightCap": 0.1
       }
     },
-
     "ranking": {
       "candidateHydrationAuthority": "postgres",
       "stages": [
@@ -413,7 +388,6 @@
       ],
       "finalEvidenceTopK": 12
     },
-
     "cuvs": {
       "enabledEnv": "ATLAS_CUVS_ENABLED",
       "environment": "miniforge-wsl2",
@@ -432,10 +406,15 @@
       ]
     }
   },
-
   "summaries": {
     "canonicalTable": "atlas_summary_layers",
-    "levels": ["chunk", "symbol", "file", "feature", "domain"],
+    "levels": [
+      "chunk",
+      "symbol",
+      "file",
+      "feature",
+      "domain"
+    ],
     "retrieval": {
       "vector": "summary_384",
       "candidateTopK": 40,
@@ -444,29 +423,38 @@
       "requirePacketKey": true
     }
   },
-
   "topology": {
     "autoencoder": {
       "modelPath": "models/autoencoder",
       "latentIndexPath": "models/autoencoder/autoencoder_latent_index.json",
       "status": "LEGACY_ROUTING_ARTIFACT",
-      "architecture": [768, 128, 64],
+      "architecture": [
+        768,
+        128,
+        64
+      ],
       "inputDim": 768,
       "latentDim": 64,
-      "uses": ["historical-som-input", "historical-kmeans-routing", "historical-coarse-prefiltering"],
+      "uses": [
+        "historical-som-input",
+        "historical-kmeans-routing",
+        "historical-coarse-prefiltering"
+      ],
       "role": "legacy-routing-feature-lane",
       "sourceOfTruth": false,
       "canonicalAuthority": false,
       "notes": "The ignored 5,000-packet index is retained for historical replay only. It is not the current latent representation or an ANN authority. Do not rebuild it against 384-dimensional inputs."
     },
-
     "nestedSemanticAutoencoder": {
       "metadataPath": "models/nested-semantic-autoencoder/ae_meta.json",
       "checkpointPath": "python/checkpoints/nested_semantic_autoencoder_v3_full01.pt",
       "status": "DERIVED_EXPERIMENTAL_TRANSFORM",
       "sourceRepresentation": "semantic_768",
       "physicalRepresentation": "latent_256",
-      "derivedRepresentations": ["latent_128", "latent_64"],
+      "derivedRepresentations": [
+        "latent_128",
+        "latent_64"
+      ],
       "checkpointRevision": "d6e9395e60f0bb039dd03368012697c5c393d36bb001b8f020b6d7ba22654259",
       "postgresColumn": "codebase_chunk_index.latent_256",
       "qdrantCollection": "codebase_chunks_latent256",
@@ -475,7 +463,6 @@
       "canonicalAuthority": false,
       "notes": "latent_256 is the physical learned bottleneck. latent_128 and latent_64 are prefix-plus-L2-normalized derived views; they do not require separate weights or storage."
     },
-
     "som": {
       "rows": 20,
       "columns": 20,
@@ -483,7 +470,6 @@
       "adjacentRadius": 1,
       "maxExpansionCandidates": 20
     },
-
     "kmeans": {
       "vector": "latent64",
       "nearestCentroids": 4,
@@ -492,24 +478,24 @@
     }
   },
   "envVarPolicy": {
-    "TURBO_MODEL_PATH":           "Absolute path to primary Gemma 4 GGUF. Required for llama-server launch. Points to models/gemma4-rotorquant:latest-iq4xs-direct.gguf in canonical setup.",
-    "ROTORQUANT_MODEL_PATH":      "Alias for TURBO_MODEL_PATH — read first by vlm-lifecycle.ts fallback chain. Same value in canonical setup.",
-    "TURBOQUANT_MODEL_PATH":      "Alias for TURBO_MODEL_PATH — read first by inference-router.ts fallback chain.",
-    "TURBOQUANT_MMPROJ_PATH":     "Absolute path to mmproj-F16.gguf. Read first by vlm-lifecycle.ts. Falls back to MMPROJ_PATH.",
-    "MMPROJ_PATH":                "Fallback mmproj path. Set in .env — used when TURBOQUANT_MMPROJ_PATH is not set.",
-    "TURBOQUANT_EXE_PATH":        "Path to llama-server.exe. Read first by inference-router.ts. Falls back to LLAMA_SERVER_PATH.",
-    "LLAMA_SERVER_PATH":          "Fallback path to llama-server.exe. Set in .env — used when TURBOQUANT_EXE_PATH is not set.",
-    "MTP_DRAFT_MODEL":            "Absolute path to the speculative draft / assistant model GGUF used by the MTP wrapper at 8090. Companion lane only; do not treat as the canonical synthesis model.",
-    "TURBO_PORT":                 "Port for llama-server (default: 8090).",
-    "TURBO_PROFILE":              "KV cache profile: stock | turboquant | turboquant-safe | atomicbot (default: stock).",
-    "TURBO_KV_K":                 "Override KV key cache type (e.g. q8_0, turbo3).",
-    "TURBO_KV_V":                 "Override KV value cache type (e.g. q8_0, turbo3).",
-    "TURBO_CTX":                  "Context length (default: 16384).",
-    "TURBO_NGL":                  "GPU offload layers (default: 99 for full-GPU on RTX 3060 Ti).",
-    "DRAFT_MODEL_PATH":           "Optional speculative decoding draft model path. Set to empty string to disable in VLM mode.",
-    "DRAFT_N":                    "Number of speculative tokens (default: 5).",
-    "LEGAL_LORA_PATH":            "Optional LoRA adapter GGUF for runtime injection into base-model GGUFs. Not needed for gemma4-rotorquant:latest-iq4xs-direct (LoRA already merged).",
-    "LEGAL_LORA_SCALE":           "LoRA adapter strength 0.0-1.0 (default: 0.8).",
-    "MTP_HEAD_PATH":              "AtomicBot MTP sidecar .mtp file path (optional)."
+    "TURBO_MODEL_PATH": "absolute path to primary Ornith 1.5 GGUF. Required for llama-server launch. Points to models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf in canonical setup.",
+    "ROTORQUANT_MODEL_PATH": "Alias for TURBO_MODEL_PATH — read first by vlm-lifecycle.ts fallback chain. Same value in canonical setup.",
+    "TURBOQUANT_MODEL_PATH": "Alias for TURBO_MODEL_PATH — read first by inference-router.ts fallback chain.",
+    "TURBOQUANT_MMPROJ_PATH": "Absolute path to mmproj-F16.gguf. Read first by vlm-lifecycle.ts. Falls back to MMPROJ_PATH.",
+    "MMPROJ_PATH": "Fallback mmproj path. Set in .env — used when TURBOQUANT_MMPROJ_PATH is not set.",
+    "TURBOQUANT_EXE_PATH": "Path to llama-server.exe. Read first by inference-router.ts. Falls back to LLAMA_SERVER_PATH.",
+    "LLAMA_SERVER_PATH": "Fallback path to llama-server.exe. Set in .env — used when TURBOQUANT_EXE_PATH is not set.",
+    "MTP_DRAFT_MODEL": "Absolute path to the speculative draft / assistant model GGUF used by the MTP wrapper at 8090. Companion lane only; do not treat as the canonical synthesis model.",
+    "TURBO_PORT": "Port for llama-server (default: 8090).",
+    "TURBO_PROFILE": "KV cache profile: stock | turboquant | turboquant-safe | atomicbot (default: stock).",
+    "TURBO_KV_K": "Override KV key cache type (e.g. q8_0, turbo3).",
+    "TURBO_KV_V": "Override KV value cache type (e.g. q8_0, turbo3).",
+    "TURBO_CTX": "Context length (default: 16384).",
+    "TURBO_NGL": "GPU offload layers (default: 99 for full-GPU on RTX 3060 Ti).",
+    "DRAFT_MODEL_PATH": "Optional speculative decoding draft model path. Set to empty string to disable in VLM mode.",
+    "DRAFT_N": "Number of speculative tokens (default: 5).",
+    "LEGAL_LORA_PATH": "Optional LoRA adapter GGUF for runtime injection into base-model GGUFs. Not needed for ornith-1.5-9b (LoRA already merged).",
+    "LEGAL_LORA_SCALE": "LoRA adapter strength 0.0-1.0 (default: 0.8).",
+    "MTP_HEAD_PATH": "AtomicBot MTP sidecar .mtp file path (optional)."
   }
 }

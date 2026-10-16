@@ -14,7 +14,7 @@ import { pgRows } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 
 // Types
 export interface ErrorPattern {
@@ -131,7 +131,7 @@ export class KnowledgeBase {
 	 */
 	private async generateEmbedding(text: string): Promise<number[]> {
 		try {
-			const response = await ollamaFetch(`${this.ollamaUrl}/api/embeddings`, {
+			const response = await embedOrChatFetch(`${this.ollamaUrl}/api/embeddings`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

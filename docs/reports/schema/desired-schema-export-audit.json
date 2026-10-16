@@ -1,10 +1,10 @@
 {
   "status": "FAIL",
   "configuredSchemaEntrypoint": "src\\lib\\server\\db\\schema.ts",
-  "reachableFileCount": 82,
+  "reachableFileCount": 83,
   "tableCount": 384,
   "enumCount": 40,
-  "viewCount": 0,
+  "viewCount": 1,
   "sequenceCount": 0,
   "duplicateDatabaseNames": {
     "tables": [
@@ -806,6 +806,7 @@
       "tool_traces",
       "atlas_facts",
       "atlas_fact_arguments",
+      "atlas_packet_class_lut_validation_receipts",
       "evidence_items",
       "evidence_media_assets",
       "evidence_transcript_segments",
@@ -908,7 +909,6 @@
       "atlas_cards",
       "synthesis_logs",
       "parent_atlas_jobs",
-      "parent_atlas_documents",
       "atlas_feature_map_synthesized",
       "route_runtime_packets",
       "concept_records",
@@ -1000,10 +1000,19 @@
       "src\\lib\\server\\db\\graph-authority-v2-db.ts",
       "src\\lib\\server\\db\\graph-authority-v2.repository.test.ts",
       "src\\lib\\server\\db\\graph-authority-v2.ts",
+      "src\\lib\\server\\db\\health-database-route.spec.ts",
+      "src\\lib\\server\\db\\health-ready-route.spec.ts",
       "src\\lib\\server\\db\\jsonb-legal-schema.ts",
       "src\\lib\\server\\db\\legal-db-init.ts",
       "src\\lib\\server\\db\\metadata-schema.ts",
       "src\\lib\\server\\db\\migrate-test-rag.ts",
+      "src\\lib\\server\\db\\openspec-evidence-schema.spec.ts",
+      "src\\lib\\server\\db\\openspec-evidence-schema.ts",
+      "src\\lib\\server\\db\\read-only-query-scope.spec.ts",
+      "src\\lib\\server\\db\\read-only-query-scope.ts",
+      "src\\lib\\server\\db\\readiness.spec.ts",
+      "src\\lib\\server\\db\\readiness.ts",
+      "src\\lib\\server\\db\\repair-loop-startup-guard.spec.ts",
       "src\\lib\\server\\db\\schema\\ace-web-crawl.ts",
       "src\\lib\\server\\db\\schema\\admin-raptor-summaries.ts",
       "src\\lib\\server\\db\\schema\\agent-memory-registry.ts",
@@ -1083,6 +1092,7 @@
   },
   "reachableFiles": [
     "src\\lib\\db\\schema\\ace-web.ts",
+    "src\\lib\\server\\db\\schema-atlas-lut-validation.ts",
     "src\\lib\\server\\db\\schema-canvas-autosaves.ts",
     "src\\lib\\server\\db\\schema-canvas.ts",
     "src\\lib\\server\\db\\schema-chat.ts",
@@ -1165,5 +1175,5 @@
     "src\\lib\\server\\db\\schema\\workspace-events.ts",
     "src\\lib\\server\\db\\warden-schema.ts"
   ],
-  "generatedAt": "2026-09-28T20:56:55.866Z"
+  "generatedAt": "2026-10-15T16:27:43.420Z"
 }

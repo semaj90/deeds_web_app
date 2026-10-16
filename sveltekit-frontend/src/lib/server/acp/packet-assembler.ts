@@ -69,7 +69,9 @@ export function assemblePacketFromGrpcResponse(
     // Identity layer (required)
     packet_id: randomUUID(),
     packet_key: identity.packet_key,
-    title_id: semantics?.title_id ?? `title:${identity.packet_key.slice(0, 8)}`,
+    title_id: semantics?.title_id ?? generateTitleIdentity(identity.packet_key, {
+      featureLabel: identity.feature_label,
+    }).titleId,
     created_at: metadata.timestamp.toISOString(),
     source_ref: identity.source_ref,
     directory_path: identity.file_path.split(/[\\/]/).slice(0, -1).join('/'),

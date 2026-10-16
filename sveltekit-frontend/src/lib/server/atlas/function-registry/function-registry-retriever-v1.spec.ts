@@ -6,6 +6,7 @@ import {
   createQualifiedFunctionRegistryRetrieverV1,
   createFunctionRegistryRetrieverV1,
   functionRegistrySnapshotToLaneCandidatesV1,
+  resolveFunctionRegistryChunkRowV1,
 } from './function-registry-retriever-v1.js';
 import type { FunctionSnapshotLoaderV1 } from './function-registry-snapshot-loader-v1.js';
 
@@ -66,6 +67,41 @@ function makeSnapshot() {
 }
 
 describe('function registry retrieval adapter v1', () => {
+  it('resolves a unique proven chunk containing the exact source-qualified function span', () => {
+    const bytes = Buffer.from('header\nfunction run() {}\nfooter\n', 'utf8');
+    const digest = createHash('sha256').update(bytes).digest('hex');
+    const startByte = bytes.indexOf(Buffer.from('function run() {}'));
+    const result = resolveFunctionRegistryChunkRowV1({
+      sourceBytes: bytes,
+      sourceRevision: `sha256:${digest}`,
+      sourceContentHash: digest,
+      startByte,
+      endByte: startByte + Buffer.byteLength('function run() {}'),
+      rows: [{ chunkRowId: 'chunk-row-1', canonicalChunkId: 'canonical-chunk-1', content: 'function run() {}', lineStart: 2, lineEnd: 2 }],
+    });
+    expect(result).toEqual({ chunkRowId: 'chunk-row-1', canonicalChunkId: 'canonical-chunk-1' });
+  });
+
+  it('rejects repeated, ambiguous, stale, or non-containing chunk evidence', () => {
+    const bytes = Buffer.from('function run() {}\nfunction run() {}\n', 'utf8');
+    const digest = createHash('sha256').update(bytes).digest('hex');
+    const startByte = bytes.indexOf(Buffer.from('function run() {}'));
+    const base = {
+      sourceBytes: bytes,
+      sourceRevision: `sha256:${digest}`,
+      sourceContentHash: digest,
+      startByte,
+      endByte: startByte + Buffer.byteLength('function run() {}'),
+    };
+    const row = { chunkRowId: 'chunk-row-1', canonicalChunkId: 'canonical-chunk-1', content: 'function run() {}', lineStart: 1, lineEnd: 1 };
+    expect(resolveFunctionRegistryChunkRowV1({ ...base, rows: [row] })).toBeNull();
+    expect(resolveFunctionRegistryChunkRowV1({ ...base, rows: [
+      { ...row, content: 'function run() {}\nfunction run() {}\n', lineEnd: 2 },
+    ] })).toBeNull();
+    expect(resolveFunctionRegistryChunkRowV1({ ...base, sourceRevision: `sha256:${'0'.repeat(64)}`, rows: [row] })).toBeNull();
+    expect(resolveFunctionRegistryChunkRowV1({ ...base, rows: [row, { ...row, chunkRowId: 'chunk-row-2', canonicalChunkId: 'canonical-chunk-2' }] })).toBeNull();
+  });
+
   it('maps qualified snapshot rows to the existing AST lane with version identity', () => {
     const candidates = functionRegistrySnapshotToLaneCandidatesV1({
       snapshot: makeSnapshot(),
@@ -132,6 +168,7 @@ describe('function registry retrieval adapter v1', () => {
         { symbolVersionId: 'version:findPacket:stale', sourceRevision: 'source-stale' },
       ],
       loader,
+      resolveChunkRow: async () => ({ chunkRowId: 'chunk-row-1', canonicalChunkId: 'canonical-chunk-1' }),
       expectedWorkspaceRevision: workspaceRevision,
       maxCandidates: 8,
     });
@@ -141,7 +178,9 @@ describe('function registry retrieval adapter v1', () => {
     expect(candidates).toHaveLength(1);
     expect(candidates[0]).toMatchObject({
       packetKey: 'packet:findPacket',
+      packetId: 'chunk-row-1',
       symbolVersionId: 'version:findPacket:r1',
+      metadata: { canonical_chunk_row_id: 'chunk-row-1', canonical_chunk_id: 'canonical-chunk-1' },
       lane: 'ast',
       rank: 1,
     });

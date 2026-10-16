@@ -25,20 +25,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const TEST_USER_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 const TEST_CASE_ID = 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e';
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async () =>
 	new Response(JSON.stringify({
 		message: { content: 'Mock LLM response' },
 		response: 'Mock LLM response',
-		model: 'gemma4-rotorquant:latest',
+		model: 'ornith-1.5-9b',
 	}), { status: 200, headers: { 'Content-Type': 'application/json' } })
 );
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+	embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── ENV mock ──
@@ -456,7 +456,7 @@ describe('/api/v1/evidence/analyze (POST)', () => {
 		}) as any);
 		const data = await jsonBody(res);
 		expect(data.analysis).toBeTruthy();
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe('ornith-1.5-9b');
 	});
 
 	it('returns 400 for no content or evidenceId', async () => {

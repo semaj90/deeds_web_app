@@ -10,6 +10,7 @@ import {
   type FunctionRegistrySnapshotV1,
 } from './function-registry-snapshot-v1.js';
 import { qualifyFunctionRegistryEvidenceV1 } from './function-registry-v1.js';
+import { matchesAstNodeStoragePathV1, type AstNodeStoragePathBindingV1 } from './ast-node-storage-path-v1.js';
 
 type SymbolVersionOwnerRowV1 = Pick<AtlasSymbolVersionRow,
   | 'symbolVersionId'
@@ -48,8 +49,9 @@ type AstNodeOwnerRowV1 = Pick<AtlasAstNode,
   | 'grammarVersion'
 >;
 
-type AstParserObservationV1 = {
+export type AstParserObservationV1 = {
   node: AstNodeOwnerRowV1;
+  pathBinding?: AstNodeStoragePathBindingV1;
   astPath: string;
   signature: string;
   declarationText: string;
@@ -104,10 +106,6 @@ export type FunctionRegistryReadRejectionV1 =
 export type FunctionRegistryReadOutcomeV1 =
   | { status: 'QUALIFIED'; snapshot: FunctionRegistrySnapshotV1; evidenceRefs: string[] }
   | { status: 'REJECTED'; reason: FunctionRegistryReadRejectionV1; evidenceRefs: string[] };
-
-function normalizedRepoPath(value: string): string {
-  return value.replaceAll('\\', '/').replace(/^\.\//, '').replace(/^sveltekit-frontend\//, '');
-}
 
 function sha256(bytes: Uint8Array): string {
   return createHash('sha256').update(bytes).digest('hex');
@@ -196,9 +194,9 @@ async function qualifyFunctionRegistryReadOnlyInternalV1(input: {
   }
 
   const astCandidates = await input.ports.getAstCandidates(symbol, binding, sourceBytes);
-  const sameDeclaredSpan = astCandidates.filter(({ node }) =>
+  const sameDeclaredSpan = astCandidates.filter(({ node, pathBinding }) =>
     node.treeNodeId
-      && normalizedRepoPath(node.relativePath) === normalizedRepoPath(symbol.sourceRef)
+      && matchesAstNodeStoragePathV1({ canonicalSourceRef: symbol.sourceRef, storedRelativePath: node.relativePath, pathBinding })
       && node.qualifiedSymbol === symbol.qualifiedName
       && node.startByte === symbol.byteStart
       && node.endByte === symbol.byteEnd,
@@ -231,7 +229,7 @@ async function qualifyFunctionRegistryReadOnlyInternalV1(input: {
   if (spanText !== ast.declarationText) {
     return reject('BYTE_SPAN_MISMATCH', symbol.symbolVersionId, treeNodeId);
   }
-  if (ast.astPath.length === 0 || ast.signature.length === 0
+  if (ast.astPath.trim().length === 0 || ast.signature.trim().length === 0
     || (symbol.signatureNormalized !== null
       && ast.node.normalizedSignature !== symbol.signatureNormalized)) {
     return reject('AST_PROVENANCE_MISMATCH', symbol.symbolVersionId, treeNodeId);

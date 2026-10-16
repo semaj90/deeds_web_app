@@ -83,7 +83,7 @@ describe('src/routes/api/v1/chat/completions/+server.ts', () => {
         id: 'chatcmpl-test',
         object: 'chat.completion',
         created: 1,
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
         choices: [
           {
             index: 0,

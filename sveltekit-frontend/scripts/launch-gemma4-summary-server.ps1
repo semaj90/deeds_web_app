@@ -11,7 +11,7 @@ This script ONLY handles summary generation. Embeddings are produced separately:
   - Browser Lane: @xenova/transformers ONNX (client-side fallback, also 768-dim)
 
 Gemma4 Summary Architecture:
-  - Model: models/gemma4-legal-iq4xs-direct.gguf (5.3GB, IQ4_XS quantized)
+  - Model: models/ornith-1.5-9b (5.3GB, IQ4_XS quantized)
   - Port: :8090 (/v1/chat/completions, /v1/models)
   - Context: 16384 (conservative) → 32768 (proven) → 65536 (aggressive, verify VRAM)
   - KV Cache: -ctk q8_0 -ctv q8_0 (stock llama.cpp, stable on RTX 3060 Ti 8GB)
@@ -98,7 +98,7 @@ Write-Status ""
 # Configuration
 # ─────────────────────────────────────────────────────────────────────────────
 
-$ModelPath = "models/gemma4-legal-iq4xs-direct.gguf"
+$ModelPath = "models/ornith-1.5-9b"
 $LlamaServerExe = "llama-server.exe"
 $Port = 8090
 $CachePrompt = $true

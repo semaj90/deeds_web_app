@@ -61,7 +61,7 @@ try {
 Write-Host "3️⃣  Sending tool-calling request..." -ForegroundColor Yellow
 
 $body = @{
-    model = "gemma4-legal-iq4xs-direct.gguf"
+    model = "ornith-1.5-9b"
     messages = @(
         @{
             role = "user"

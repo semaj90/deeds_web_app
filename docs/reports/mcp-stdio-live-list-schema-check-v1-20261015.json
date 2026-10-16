@@ -1,0 +1,41 @@
+{
+  "schema": "atlas.mcp-stdio-live-list-schema-check.v1",
+  "observedAt": "2026-10-15T22:38:30Z",
+  "scope": "read-only JSON-RPC initialize, notifications/initialized, tools/list",
+  "servers": {
+    "atlas-tools": {
+      "status": "LIVE_TOOL_LIST_AND_SCHEMA_COMPILE_PASS",
+      "exitCode": 0,
+      "toolCount": 10,
+      "uniqueNames": 10,
+      "duplicateNames": [],
+      "compiledSchemas": 10,
+      "schemaErrors": [],
+      "toolsetSha256": "9d9f6e8209a5a507555b2c187beb13eb0670fb5fe44edcbc4dd89ec0ef9f3bc5",
+      "validator": "Ajv from sveltekit-frontend dependencies; schema drafts selected from each input schema",
+      "transport": "stdio",
+      "toolCalls": 0
+    },
+    "atlas-task-kernel": {
+      "status": "REGISTRY_LIST_ONLY_SCHEMA_COMPILE_PASS",
+      "toolCount": 6,
+      "uniqueNames": 6,
+      "compiledSchemas": 6,
+      "schemaErrors": [],
+      "toolsetSha256": "2d12425b2d56c782578f637506557ecc1e4054bbc6d3e9203f12a18b680d3b12",
+      "lifecycleInitialization": "PROBE_TIMEOUT_NO_RESULT",
+      "toolCalls": 0,
+      "writesPerformed": false,
+      "note": "A direct tools/list registry inspection succeeded and compiled all six schemas. The normal initialize handshake did not complete in the earlier bounded probe, so lifecycle/transport readiness remains unverified."
+    }
+  },
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "limitations": [
+    "Schema compilation checks advertised input-schema syntax, not handler behavior or authorization enforcement.",
+    "The live Atlas-tools and task-kernel tool lists were not compared byte-for-byte with their source registrations in this probe.",
+    "The task-kernel result used a direct tools/list request without a completed initialize handshake; it proves registry serialization only.",
+    "No MCP tools/call request was made.",
+    "The root and frontend OpenCode MCP configurations remain different; this receipt does not resolve that drift."
+  ]
+}

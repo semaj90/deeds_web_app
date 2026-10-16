@@ -1,0 +1,99 @@
+{
+  "schema": "atlas.mbvh4-stackless-traversal-receipt.v1",
+  "generatedAt": "2026-10-16T01:19:01.093Z",
+  "writesPerformed": false,
+  "files": {
+    "wgslShader": {
+      "path": "sveltekit-frontend/src/lib/webgpu/shaders/mbvh4_traversal.wgsl",
+      "sha256": "sha256:a26e760f9c9eb0634136e5ae35ca9fcf30067871f7b42ca00e65c279655638c4"
+    },
+    "tsAccelerator": {
+      "path": "sveltekit-frontend/src/lib/webgpu/mbvh4-accelerator.ts",
+      "sha256": "sha256:4f41fa672a889febbb8985e4b5b79c2105f86cb013d3b04edb38ba340706a4a0"
+    },
+    "karpathyManifoldSubhelper": {
+      "path": "sveltekit-frontend/src/lib/server/indexer/karpathy-dag-subhelpers.ts",
+      "sha256": "sha256:9365837df705cd30630d304fc1bed63c19462fce27c57690a4af74dcbd18f0b4"
+    }
+  },
+  "soaLayoutContract": {
+    "nodeStrideBytes": 128,
+    "gpuCacheLinesPerNode": 2,
+    "nodeCount": 2,
+    "totalPackedBytes": 256,
+    "packedBufferSha256": "sha256:f48dffadb54df268388abaa7a21844c227a9079659cf7ed810eeec6b3b0bac82"
+  },
+  "stacklessRayTraversalParity": {
+    "raysTested": 6,
+    "rayMismatches": 0,
+    "perThreadStackArrayAllocated": false,
+    "bitstackRegisterBits": 32,
+    "maxSupportedLeaves4WayDepth8": 65536,
+    "rayResults": [
+      {
+        "ray": "prosecution_table_occludes_evidence",
+        "stacklessLeafId": 2,
+        "oracleLeafId": 2,
+        "closestT": 4.25,
+        "promotedLodTier": 0,
+        "nodesVisited": 2,
+        "exactMatch": true
+      },
+      {
+        "ray": "evidence_stand_upper_plane",
+        "stacklessLeafId": 3,
+        "oracleLeafId": 3,
+        "closestT": 6.4,
+        "promotedLodTier": 0,
+        "nodesVisited": 2,
+        "exactMatch": true
+      },
+      {
+        "ray": "defense_table_direct",
+        "stacklessLeafId": 0,
+        "oracleLeafId": 0,
+        "closestT": 4,
+        "promotedLodTier": 1,
+        "nodesVisited": 1,
+        "exactMatch": true
+      },
+      {
+        "ray": "judge_bench_center",
+        "stacklessLeafId": 1,
+        "oracleLeafId": 1,
+        "closestT": 10,
+        "promotedLodTier": 1,
+        "nodesVisited": 1,
+        "exactMatch": true
+      },
+      {
+        "ray": "witness_stand_direct",
+        "stacklessLeafId": 4,
+        "oracleLeafId": 4,
+        "closestT": 7,
+        "promotedLodTier": 0,
+        "nodesVisited": 2,
+        "exactMatch": true
+      },
+      {
+        "ray": "sky_miss_ray",
+        "stacklessLeafId": -1,
+        "oracleLeafId": -1,
+        "closestT": 1000,
+        "promotedLodTier": 3,
+        "nodesVisited": 1,
+        "exactMatch": true
+      }
+    ]
+  },
+  "phase14ManifoldStacklessTraversal": {
+    "bestClusterId": 201,
+    "admittedClusterIds": [
+      201
+    ],
+    "minCosineDistance": 0,
+    "promotedLodTier": 4,
+    "wideNodesVisited": 2
+  },
+  "status": "PASS"
+}

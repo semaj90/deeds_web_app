@@ -23,7 +23,7 @@ sourceRoots.forEach(walk);
 const rows = files.map((file) => ({ path: relative(root, file).split(sep).join('/'), text: readFileSync(file, 'utf8') }));
 const find = (pattern) => rows.filter((row) => pattern.test(row.text)).map((row) => row.path);
 const count = (pattern) => rows.reduce((total, row) => total + (row.text.match(pattern) ?? []).length, 0);
-const legacyModels = find(/gemma4-legal-iq4xs-direct|models\/hfor|hforf-gguf/i);
+const legacyModels = find(/ornith-1.5-9b|models\/hfor|hforf-gguf/i);
 const embeddingFallbacks = find(/OLLAMA_EMBED_BASE_URL|OLLAMA_EMBED_MODEL|embeddinggemma:latest|\/api\/embed|onnx_directml/i);
 const unsafeFeatureSurfaces = find(/latentLocalityScore|latent256Available|1\s*<<\s*9/);
 const cacheTextOnly = find(/text_hash\s*=|ON CONFLICT\s*\(\s*text_hash\s*\)/i);

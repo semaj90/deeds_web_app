@@ -103,9 +103,9 @@ async function enrichTranscription(
 		// LLM summary of transcription + context
 		if (enrichment.ragContext && enrichment.ragContext.length > 0) {
 			try {
-				const { ollamaFetch } = await import('$lib/server/ollama.js');
+				const { embedOrChatFetch } = await import('$lib/server/ollama.js');
 				const contextSnippets = enrichment.ragContext.map(r => r.text).join('\n---\n');
-				const summaryResp = await ollamaFetch('/api/generate', {
+				const summaryResp = await embedOrChatFetch('/api/generate', {
 					method: 'POST',
 					body: JSON.stringify({
 						model: LLM_MODEL_ID,

@@ -82,7 +82,8 @@ for (const row of identity.slice(0, limit)) {
   planned.push({
     packetKey: row.packet_key || null,
     sourceRef: row.source_ref || null,
-    treeNodeId: row.tree_node_id || null,
+    packetTreeNodeId: row.packet_tree_node_id || null,
+    treeNodeOccurrenceId: row.tree_node_occurrence_id || null,
     sourceRevision: row.source_revision || null,
     symbolName: row.symbol_name || row.name || null,
     symbolKind: row.symbol_kind || row.entity_kind || null,

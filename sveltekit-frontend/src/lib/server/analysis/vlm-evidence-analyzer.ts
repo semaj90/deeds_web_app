@@ -286,7 +286,7 @@ export async function analyzeEvidenceImage(input: VLMAnalysisInput): Promise<VLM
 	if (!responseText) {
 		responseText = await inferTurboQuantVLM(base64Image, prompt, maxTokens);
 		if (responseText) {
-			model = 'gemma4-rotorquant:latest-q8_0 (turboquant)';
+			model = 'ornith-1.5-9b (turboquant)';
 			console.log(`[VLM] TurboQuant inference complete for ${input.fileName}`);
 		}
 	}

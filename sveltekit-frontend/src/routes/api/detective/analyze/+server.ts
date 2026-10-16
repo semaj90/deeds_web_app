@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
  */
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 
@@ -119,7 +119,7 @@ async function streamOllamaAnalysis(
 	step: string,
 	signal?: AbortSignal
 ): Promise<string> {
-	const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+	const response = await embedOrChatFetch(`${OLLAMA_URL}/api/generate`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({

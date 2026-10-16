@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-23T01:50:14.439Z",
+  "generated_at": "2026-10-15T20:15:32.044Z",
   "status": "WARN",
-  "query": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
+  "query": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Ornith summarization flow",
   "rule": "LIVE_PASS means real service, real port, real data. Fallbacks and warnings are visible, not green.",
   "lanes": {
     "embeddinggemma": {
@@ -9,7 +9,7 @@
       "url": "http://localhost:11434",
       "model": "embeddinggemma:latest",
       "dimension": 768,
-      "duration_ms": 478
+      "duration_ms": 1649
     },
     "qdrant": {
       "status": "LIVE_PASS",
@@ -18,7 +18,15 @@
       "vector_name": "content",
       "hits": 16,
       "identity_hits": 16,
-      "duration_ms": 2342
+      "duration_ms": 17264
+    },
+    "postgres_pgvector": {
+      "status": "LIVE_PASS",
+      "table": "codebase_chunk_index",
+      "column": "content_embedding_768",
+      "index": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "hits": 16,
+      "duration_ms": 6961
     },
     "turbovec_grpc": {
       "status": "LIVE_PASS",
@@ -27,132 +35,418 @@
       "backend": "bridge:py(python)+addon(cuda)",
       "in_dim": 768,
       "out_dim": 64,
-      "duration_ms": 1017
+      "duration_ms": 3834
     },
     "go_retrieval": {
       "status": "LIVE_PASS",
       "url": "http://127.0.0.1:8100",
       "endpoint": "/search/codebase",
-      "query_used": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
+      "query_used": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Ornith summarization flow",
       "results": 8,
-      "total_ms": 5972,
-      "duration_ms": 6007
+      "total_ms": 223,
+      "duration_ms": 236
     },
     "postgres_truth_join": {
       "status": "LIVE_PASS",
       "table": "atlas_packets",
-      "packet_keys_in": 24,
-      "source_refs_in": 23,
-      "rows": 20,
-      "identity_rows": 20,
-      "duration_ms": 2525
+      "packet_keys_in": 40,
+      "source_refs_in": 40,
+      "rows": 18,
+      "identity_rows": 18,
+      "duration_ms": 68
     },
     "langextract": {
-      "status": "FALLBACK_PASS",
-      "url": "http://127.0.0.1:8095",
-      "fallback_url": "http://127.0.0.1:8090/v1",
-      "fallback_used": true,
-      "reason": "LangExtract unavailable: fetch failed",
-      "entities": 0,
-      "structure_keys": 2,
-      "duration_ms": 21306
-    },
-    "gemma4_summary": {
       "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8095",
+      "entities": 7,
+      "structure_keys": 5,
+      "duration_ms": 356
+    },
+    "ornith_synthesis": {
+      "status": "DIAGNOSTIC_PASS",
       "url": "http://127.0.0.1:8090/v1",
-      "model": "gemma4-legal-iq4xs-direct.gguf",
+      "model": "ornith-1.5-9b",
       "reasoning_leak_stripped": true,
       "json_parsed": true,
-      "output_chars": 1286,
-      "duration_ms": 13838
+      "output_chars": 2422,
+      "citation_verification": {
+        "status": "CITATION_MEMBERSHIP_PASS",
+        "admittedCount": 8,
+        "raw_citations": [
+          {
+            "evidence_id": "ev_57ed2a03ba19da73",
+            "source_revision": "sha256:09c87d1289a1e4a6b4f360f831c6ac962e828f489c9ecb2ed74164448b8862c1",
+            "start_byte": 0,
+            "end_byte": 37226
+          },
+          {
+            "evidence_id": "ev_a4602a70e2cf27da",
+            "source_revision": "sha256:4a911c46c0339f1c2952d1077ca07e6a2a9f0101d7bdcc62062522fd492bcd45",
+            "start_byte": 0,
+            "end_byte": 20106
+          },
+          {
+            "evidence_id": "ev_b3d11fe818984353",
+            "source_revision": "sha256:30574833cd4906e8439dfb7fd5074c2ca21466c1d137b38d26666e434c4c20f8",
+            "start_byte": 0,
+            "end_byte": 20889
+          },
+          {
+            "evidence_id": "ev_53963d6d8dc3594e",
+            "source_revision": "sha256:88306ba3685d6e58c066c602fe18a82edbd2d2fc1a20dbce1ac032ba1d4aa9fb",
+            "start_byte": 0,
+            "end_byte": 3792
+          },
+          {
+            "evidence_id": "ev_c252472110fcba13",
+            "source_revision": "sha256:68a3940991abed3366506fc132799dbd08ff0eed25f1e476a304fd089abb6cbf",
+            "start_byte": 0,
+            "end_byte": 12030
+          },
+          {
+            "evidence_id": "ev_2c53de3128d5f211",
+            "source_revision": "sha256:0c9b963a36343ed19632bc87cd06dbf6f5015941ef3b3f840d7278ee2d798dcd",
+            "start_byte": 0,
+            "end_byte": 16948
+          }
+        ],
+        "accepted": [
+          {
+            "evidence_id": "ev_57ed2a03ba19da73",
+            "source_ref": "scripts/atlas/summary-ranking-retrieval-pipeline.mjs",
+            "source_revision": "sha256:09c87d1289a1e4a6b4f360f831c6ac962e828f489c9ecb2ed74164448b8862c1",
+            "start_byte": 0,
+            "end_byte": 37226
+          },
+          {
+            "evidence_id": "ev_a4602a70e2cf27da",
+            "source_ref": "sveltekit-frontend/src/lib/server/cache/phase101-summary-cache.ts",
+            "source_revision": "sha256:4a911c46c0339f1c2952d1077ca07e6a2a9f0101d7bdcc62062522fd492bcd45",
+            "start_byte": 0,
+            "end_byte": 20106
+          },
+          {
+            "evidence_id": "ev_b3d11fe818984353",
+            "source_ref": "sveltekit-frontend/docs/hyperrag-turbovec-rtx-pipeline.md",
+            "source_revision": "sha256:30574833cd4906e8439dfb7fd5074c2ca21466c1d137b38d26666e434c4c20f8",
+            "start_byte": 0,
+            "end_byte": 20889
+          },
+          {
+            "evidence_id": "ev_53963d6d8dc3594e",
+            "source_ref": "sveltekit-frontend/src/lib/types/atlas.ts",
+            "source_revision": "sha256:88306ba3685d6e58c066c602fe18a82edbd2d2fc1a20dbce1ac032ba1d4aa9fb",
+            "start_byte": 0,
+            "end_byte": 3792
+          },
+          {
+            "evidence_id": "ev_c252472110fcba13",
+            "source_ref": "scripts/atlas/graphify-summary-ranking-pipeline.mjs",
+            "source_revision": "sha256:68a3940991abed3366506fc132799dbd08ff0eed25f1e476a304fd089abb6cbf",
+            "start_byte": 0,
+            "end_byte": 12030
+          },
+          {
+            "evidence_id": "ev_2c53de3128d5f211",
+            "source_ref": "src/lib/server/ace/codeintel-datastore.ts",
+            "source_revision": "sha256:0c9b963a36343ed19632bc87cd06dbf6f5015941ef3b3f840d7278ee2d798dcd",
+            "start_byte": 0,
+            "end_byte": 16948
+          }
+        ],
+        "rejected": []
+      },
+      "cited_source_refs": 6,
+      "accepted_source_refs": 6,
+      "rejected_source_refs": [],
+      "duration_ms": 26475
     }
   },
   "candidates": {
     "qdrant": [
       {
-        "id": "d42f4cb1-a3d9-4611-8c10-71f20d8a3959",
-        "score": 0.59015274,
-        "packet_key": "d42f4cb1-a3d9-4611-8c10-71f20d8a3959",
-        "source_ref": "docs/PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md",
-        "feature_id": "docs-phase-2-part-4-multivector-enrichment.md-phase-2-part-4-multivector-enrichment",
-        "feature_label": null
-      },
-      {
-        "id": "74ef13dc-3cbf-4c8a-8ebd-a18e835e87bf",
-        "score": 0.57709885,
-        "packet_key": "74ef13dc-3cbf-4c8a-8ebd-a18e835e87bf",
-        "source_ref": "docs/PHASE_A_STATUS.md",
-        "feature_id": "docs-phase_a_status.md-phase_a_status",
-        "feature_label": null
-      },
-      {
-        "id": "423d1420-a065-41b7-9a74-4beb9bf2af9e",
-        "score": 0.5741825,
-        "packet_key": "423d1420-a065-41b7-9a74-4beb9bf2af9e",
+        "id": "af227b06-96f0-4868-8876-2ff00834199e",
+        "score": 0.56095123,
+        "packet_key": "packet:0a992d54bee1",
         "source_ref": "docs/P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md",
-        "feature_id": "docs-p4-gap-analysis-summary-indexing-som-ae.md-p4-gap-analysis-summary-indexing-som-ae",
+        "feature_id": "docs.P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE",
+        "feature_label": "P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md"
+      },
+      {
+        "id": "36941",
+        "score": 0.56095123,
+        "packet_key": "packet:0a992d54bee1",
+        "source_ref": "docs/P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md",
+        "feature_id": "docs.P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE",
+        "feature_label": "P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md"
+      },
+      {
+        "id": "88e1657c-0ebf-4b51-a085-8f9cebc6241b",
+        "score": 0.55179405,
+        "packet_key": "88e1657c-0ebf-4b51-a085-8f9cebc6241b",
+        "source_ref": "scripts/atlas/build-gpu-retrieval-summary-envelope.mjs",
+        "feature_id": "scripts-atlas-build-gpu-retrieval-summary-envelope.mjs-build-gpu-retrieval-summary-envelope",
         "feature_label": null
       },
       {
-        "id": "fa34afff-be70-4d6f-9b8c-f96ac9788c31",
-        "score": 0.5732689,
-        "packet_key": "fa34afff-be70-4d6f-9b8c-f96ac9788c31",
-        "source_ref": "docs/PHASE_A_STATUS.md",
-        "feature_id": "docs-phase_a_status.md-phase_a_status",
+        "id": "87483662-f5d5-4b3c-af88-9fea7dd714fb",
+        "score": 0.54985046,
+        "packet_key": "87483662-f5d5-4b3c-af88-9fea7dd714fb",
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+        "feature_id": "sveltekit-frontend-src-lib-server-retrieval-unified-orchestrator.ts-unified-orchestrator",
         "feature_label": null
       },
       {
-        "id": "17331fba-9fad-4b4a-ac6a-78acd4c95834",
-        "score": 0.57299805,
-        "packet_key": "17331fba-9fad-4b4a-ac6a-78acd4c95834",
-        "source_ref": "docs/PHASE-85-P5-P9-INTEGRATION-SUMMARY.md",
-        "feature_id": "docs-phase-85-p5-p9-integration-summary.md-phase-85-p5-p9-integration-summary",
+        "id": "4fcf098e-39af-48ae-b79d-eefe0d4d26d8",
+        "score": 0.5480881,
+        "packet_key": "4fcf098e-39af-48ae-b79d-eefe0d4d26d8",
+        "source_ref": "sveltekit-frontend/docs/hyperrag-turbovec-rtx-pipeline.md",
+        "feature_id": "sveltekit-frontend-docs-hyperrag-turbovec-rtx-pipeline.md-hyperrag-turbovec-rtx-pipeline",
         "feature_label": null
       },
       {
-        "id": "6a571057-6a1b-4f3b-83be-9f3c36487ea3",
-        "score": 0.5724125,
-        "packet_key": "6a571057-6a1b-4f3b-83be-9f3c36487ea3",
-        "source_ref": "docs/PHASE-B-EXECUTION-READY.md",
-        "feature_id": "docs-phase-b-execution-ready.md-phase-b-execution-ready",
-        "feature_label": null
+        "id": "6f56d318-9a0a-454e-8057-ea3e83442e29",
+        "score": 0.5476284,
+        "packet_key": "packet:9036bef7bee8",
+        "source_ref": "docs/P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md",
+        "feature_id": "docs.P4-PHASE-1-SUMMARY-INDEXING-COMPLETE",
+        "feature_label": "P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md"
       },
       {
-        "id": "a1be6369-1e4b-49e3-bd70-beec3fb09e67",
-        "score": 0.57240486,
-        "packet_key": "a1be6369-1e4b-49e3-bd70-beec3fb09e67",
-        "source_ref": "docs/PHASE_A_COMMANDS.md",
-        "feature_id": "docs-phase_a_commands.md-phase_a_commands",
-        "feature_label": null
+        "id": "24020",
+        "score": 0.5476284,
+        "packet_key": "packet:9036bef7bee8",
+        "source_ref": "docs/P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md",
+        "feature_id": "docs.P4-PHASE-1-SUMMARY-INDEXING-COMPLETE",
+        "feature_label": "P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md"
       },
       {
-        "id": "ca2b9d33-43ac-4d63-b679-1b70678ceb92",
-        "score": 0.5700245,
-        "packet_key": "ca2b9d33-43ac-4d63-b679-1b70678ceb92",
-        "source_ref": "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
-        "feature_id": "docs-phase-85-p9-langextract-agentic-integration.md-phase-85-p9-langextract-agentic-integration",
+        "id": "da86ba94-f59c-411e-9963-3b91dafd85eb",
+        "score": 0.5425892,
+        "packet_key": "da86ba94-f59c-411e-9963-3b91dafd85eb",
+        "source_ref": "scripts/atlas/audit-langextract-ornith-classifier-fanout-v1.mjs",
+        "feature_id": "scripts-atlas-audit-langextract-ornith-classifier-fanout-v1.mjs-audit-langextract-ornith-classifier-fanout-v1",
         "feature_label": null
+      }
+    ],
+    "postgres_pgvector": [
+      {
+        "id": "10f62783-d03a-40af-b08b-0e7cb914a9fb",
+        "qdrant_id": "87483662-f5d5-4b3c-af88-9fea7dd714fb",
+        "score": 0.546515241316975,
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 19
+      },
+      {
+        "id": "085432b0-798c-4699-89df-9a963904133e",
+        "qdrant_id": "c5fa078a-208a-49a5-917f-d6342e334163",
+        "score": 0.5339280935704093,
+        "source_ref": "sveltekit-frontend/docs/PHASE-8-EXECUTION-STATUS-LIVE.md",
+        "symbol": null,
+        "kind": null,
+        "line_start": 21,
+        "line_end": 37
+      },
+      {
+        "id": "41106600-0af2-45f8-859c-a2039ffcbb0e",
+        "qdrant_id": "2f79639e-25c1-4da2-9c92-36f7c1f73514",
+        "score": 0.5314508753037157,
+        "source_ref": "scripts/atlas/phase8-step3-langextract-entities.py",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 19
+      },
+      {
+        "id": "374aea4e-b53e-445f-8f1d-ea8e27453387",
+        "qdrant_id": "18faf561-9fa5-4332-bb49-9d48a2917a47",
+        "score": 0.5282535165039302,
+        "source_ref": "scripts/atlas/phase8-step3-langextract-entities.py",
+        "symbol": null,
+        "kind": null,
+        "line_start": 17,
+        "line_end": 35
+      },
+      {
+        "id": "c37f2c38-beba-49bc-87c4-88de7d5ffa7b",
+        "qdrant_id": "038ce0b3-21b2-4a28-af6d-435c8492aba6",
+        "score": 0.5237434897557026,
+        "source_ref": "scripts/atlas/graphify-summary-ranking-pipeline.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 22
+      },
+      {
+        "id": "d9dfa7a3-4ade-4bfc-b3f9-707a1ec9b46f",
+        "qdrant_id": "f60eabd8-520c-43c7-8b9a-d4978ba0e566",
+        "score": 0.5234996077032007,
+        "source_ref": "sveltekit-frontend/src/lib/server/cache/phase101-summary-cache.ts",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 21
+      },
+      {
+        "id": "8cd7d366-f783-48be-9e9d-6258469447da",
+        "qdrant_id": "3ffe6ad9-191a-462c-ae6d-262d537a7743",
+        "score": 0.5211003576965787,
+        "source_ref": "scripts/atlas/summary-ranking-retrieval-pipeline.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 15,
+        "line_end": 37
+      },
+      {
+        "id": "018cce3f-4a57-4909-8e11-138cb273e8b1",
+        "qdrant_id": "9645ecab-32cf-4178-8e8a-26648f71b534",
+        "score": 0.5180128212225178,
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+        "symbol": null,
+        "kind": null,
+        "line_start": 111,
+        "line_end": 148
       }
     ],
     "go_retrieval_count": 8
   },
   "summary": {
-    "summary": "The provided source references point to various components involved in AI/ML integration, context assembly, and data processing, such as multi-vector enrichment, model orchestration, and language extraction services. The summary should synthesize how these components relate to a retrieval and summarization flow.",
-    "domain_class": "AI/ML Integration & Retrieval",
-    "ontology_label": "Parent Atlas Feature Envelope",
-    "topology_label": "Retrieval-Augmented Generation (RAG) Summarization Flow",
-    "source_refs": [
-      "docs/PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md",
-      "sveltekit-frontend/src/lib/components/ai/IntelligentModelOrchestrator.svelte",
-      "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-      "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts",
-      "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
-      "sveltekit-frontend/src/lib/server/services/langextract-service.ts",
-      "sveltekit-frontend/src/lib/types.ts",
-      "docs/BIFROST-ATLAS-INTEGRATION.md"
+    "summary": "The Parent Atlas summarization flow is a multi-stage retrieval pipeline. It begins with a summary-ranking-retrieval-pipeline.mjs that ranks and retrieves feature summaries, then feeds them into a Qdrant/TurboVec embedding store for vector search. Retrieved summaries are extracted via LangExtract (LangChain) and enriched with tree-sitter chunking and AST-grep parsing. Results are cached in a phase101-summary-cache.ts layer and ranked by a graphify-summary-ranking-pipeline.mjs graph-based ranking step. The flow supports SOM/AE dimensionality reduction for gap-analysis summaries and context-for-file retrieval, with a semantic-loop-types orchestration layer.",
+    "domain_class": "retrieval_summarization_flow",
+    "ontology_label": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Ornith summarization flow",
+    "topology_label": "multi-stage retrieval -> embedding -> extraction -> ranking pipeline",
+    "citations": [
+      {
+        "evidence_id": "ev_57ed2a03ba19da73",
+        "source_revision": "sha256:09c87d1289a1e4a6b4f360f831c6ac962e828f489c9ecb2ed74164448b8862c1",
+        "start_byte": 0,
+        "end_byte": 37226
+      },
+      {
+        "evidence_id": "ev_a4602a70e2cf27da",
+        "source_revision": "sha256:4a911c46c0339f1c2952d1077ca07e6a2a9f0101d7bdcc62062522fd492bcd45",
+        "start_byte": 0,
+        "end_byte": 20106
+      },
+      {
+        "evidence_id": "ev_b3d11fe818984353",
+        "source_revision": "sha256:30574833cd4906e8439dfb7fd5074c2ca21466c1d137b38d26666e434c4c20f8",
+        "start_byte": 0,
+        "end_byte": 20889
+      },
+      {
+        "evidence_id": "ev_53963d6d8dc3594e",
+        "source_revision": "sha256:88306ba3685d6e58c066c602fe18a82edbd2d2fc1a20dbce1ac032ba1d4aa9fb",
+        "start_byte": 0,
+        "end_byte": 3792
+      },
+      {
+        "evidence_id": "ev_c252472110fcba13",
+        "source_revision": "sha256:68a3940991abed3366506fc132799dbd08ff0eed25f1e476a304fd089abb6cbf",
+        "start_byte": 0,
+        "end_byte": 12030
+      },
+      {
+        "evidence_id": "ev_2c53de3128d5f211",
+        "source_revision": "sha256:0c9b963a36343ed19632bc87cd06dbf6f5015941ef3b3f840d7278ee2d798dcd",
+        "start_byte": 0,
+        "end_byte": 16948
+      }
     ],
-    "missing_evidence": "Specific details on the 'Qdrant TurboVec Go Retrieval' implementation within the context of the 'Parent Atlas' flow are not explicitly detailed in the provided source file names or snippets, requiring synthesis from the general integration points.",
-    "confidence": "High"
+    "missing_evidence": [
+      "Qdrant/TurboVec embedding store implementation details (vectorization step)",
+      "LangExtract extraction pipeline code (LangChain integration)",
+      "Ornith component definition and role in the flow",
+      "graphify-summary-ranking-pipeline.mjs full content (only header present)",
+      "phase101-summary-cache.ts full content (only header present)",
+      "summary-ranking-retrieval-pipeline.mjs full content (only header present)"
+    ],
+    "confidence": 0.55
   },
-  "elapsed_ms": 47516
+  "parity_pgvector_qdrant": {
+    "top_k_evaluated": 8,
+    "pgvector_hits": 16,
+    "qdrant_hits": 16,
+    "id_overlap_count": 1,
+    "source_ref_overlap_count": 1,
+    "id_overlap_ratio": 0.125,
+    "parity_status": "PARTIAL_PARITY",
+    "overlap_samples": [
+      {
+        "qdrant_id": "87483662-f5d5-4b3c-af88-9fea7dd714fb",
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts",
+        "qdrant_score": 0.54985046,
+        "pg_score": 0.546515241316975
+      }
+    ]
+  },
+  "dag_alignment": [
+    {
+      "layer": 1,
+      "name": "source_bytes_sha256",
+      "status": "LIVE_PASS",
+      "evidence": {
+        "digested": 18,
+        "of": 18
+      }
+    },
+    {
+      "layer": 2,
+      "name": "candidate_ordinal_map",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "reason": "proof does not seal a CandidateOrdinalMapV1"
+      }
+    },
+    {
+      "layer": 3,
+      "name": "ace_packet_v3_sealed",
+      "status": "BLOCKED",
+      "evidence": {
+        "chunk_rows_with_source_revision": 0,
+        "chunk_rows_total": 274465,
+        "reason": "source_revision NULL for most rows; workspace_revision is an integer default 0 in atlas_packets"
+      }
+    },
+    {
+      "layer": 4,
+      "name": "context_manifest_admission",
+      "status": "BLOCKED",
+      "evidence": {
+        "projection_admission": "NOT_SAFE_TO_PROJECT",
+        "reason": "9/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=PARTIAL_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+      }
+    },
+    {
+      "layer": 5,
+      "name": "context_compression_headroom",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "canonicalAuthority": false,
+        "note": "downstream of ContextManifest only"
+      }
+    },
+    {
+      "layer": 6,
+      "name": "bitfrost_key",
+      "status": "NOT_PROVEN",
+      "evidence": {
+        "note": "no manifest-keyed cache key built for this run"
+      }
+    },
+    {
+      "layer": 7,
+      "name": "ornith_synthesis",
+      "status": "DIAGNOSTIC_PASS",
+      "evidence": {
+        "model": "ornith-1.5-9b",
+        "ungrounded": null
+      }
+    }
+  ],
+  "chain_status": "NOT_ALIGNED",
+  "elapsed_ms": 51341
 }

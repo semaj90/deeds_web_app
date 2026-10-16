@@ -1,0 +1,299 @@
+{
+ "schema": "atlas.pagerank-frozen-candidates.v1",
+ "authoritySource": "NETWORKX_CUGRAPH_SNAPSHOT (graph snapshot receipt; not Neo4j GDS)",
+ "graphRevision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+ "nodeTableHash": "e68fe788fd4f408267b8932fc8da29ba5a7baadd07dbbe272b5fe7c93fbe378e",
+ "edgeTableHash": "f1145664774c77184ab8f9a5d23b1468adfa3688011b46297691eac4c6e9eb10",
+ "nodeCount": 162234,
+ "edgeCount": 108156,
+ "pagerankParameters": {
+  "damping": 0.85,
+  "tolerance": 1e-12,
+  "maxIterations": 1000,
+  "dangling": "uniform redistribution"
+ },
+ "topK": 50,
+ "candidates": [
+  {
+   "rank": 1,
+   "nodeKey": "tree:000002f4-8075-4ba4-bb4d-41b27f3327f8",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 2,
+   "nodeKey": "tree:00007a89-2235-4ee7-b71f-f5ea17a740cd",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 3,
+   "nodeKey": "tree:000130f3-b40e-41fb-b309-d1ed9a4c0341",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 4,
+   "nodeKey": "tree:000223ad-0272-49f3-8404-f1088327e545",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 5,
+   "nodeKey": "tree:0002a93b-81e8-46a8-a117-5082d7b340f6",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 6,
+   "nodeKey": "tree:0002b523-d480-440d-92d0-c788c6b3cc10",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 7,
+   "nodeKey": "tree:0002ea92-d4a3-46ee-86ef-feb79f9bea3d",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 8,
+   "nodeKey": "tree:00069141-7f9f-4f10-add8-cbaebbad170a",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 9,
+   "nodeKey": "tree:00071a35-1ec3-4688-9c74-ec6c6c23348d",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 10,
+   "nodeKey": "tree:00071dd1-bb14-435e-be4e-170016fb5cde",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 11,
+   "nodeKey": "tree:00074238-a6e0-44a5-8677-cfa9a9fe2313",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 12,
+   "nodeKey": "tree:000764da-9725-45a0-858b-b9fd5d98adf0",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 13,
+   "nodeKey": "tree:0007c93f-4cec-4ac0-b04d-a50208641988",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 14,
+   "nodeKey": "tree:000ac128-2271-4296-bd35-37fe4cdbaacb",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 15,
+   "nodeKey": "tree:000bf354-9782-4f99-a318-63e49bfb69e2",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 16,
+   "nodeKey": "tree:000cad25-ab21-4318-87ae-a242484e2078",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 17,
+   "nodeKey": "tree:000e1e0c-2dd2-45a3-85ab-b0b7266cc6b4",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 18,
+   "nodeKey": "tree:000f7a46-1615-4280-878e-adddd6762c06",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 19,
+   "nodeKey": "tree:000f946b-9b17-498c-9081-7f244e894806",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 20,
+   "nodeKey": "tree:00136610-dc0d-4303-b943-1a8080ee0e83",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 21,
+   "nodeKey": "tree:00139957-3c79-461b-9b84-9413e105e7db",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 22,
+   "nodeKey": "tree:0013eadc-4347-4d68-b310-4112d3bbb05a",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 23,
+   "nodeKey": "tree:0014418a-c470-4b49-98c8-13f22da85bb9",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 24,
+   "nodeKey": "tree:00165faf-1088-40b8-b2c1-70e08b677601",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 25,
+   "nodeKey": "tree:0018958f-8566-47e8-970b-7dfbe9f85997",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 26,
+   "nodeKey": "tree:0019978f-c3cc-45a9-bddf-8151b252431d",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 27,
+   "nodeKey": "tree:0019f92f-f9a3-4736-9d1b-86917d65eb79",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 28,
+   "nodeKey": "tree:001a193e-6a80-42e2-86a3-1000ef7803d0",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 29,
+   "nodeKey": "tree:001b8806-4226-46b6-b2e9-494539916b6d",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 30,
+   "nodeKey": "tree:001d63b9-ae3c-4f36-8177-5a3d40046d73",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 31,
+   "nodeKey": "tree:001dc046-9e39-453e-ad6f-95a0af0202a7",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 32,
+   "nodeKey": "tree:001e7e28-faf5-469a-a3d5-a76a0bf11fcc",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 33,
+   "nodeKey": "tree:001eb49f-fe81-4e7d-af5d-517fe75961c5",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 34,
+   "nodeKey": "tree:0022af55-709e-4112-8f53-d462c48b07ad",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 35,
+   "nodeKey": "tree:0025378c-5e08-427f-b890-f22093b0677f",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 36,
+   "nodeKey": "tree:002740a2-cde0-4cae-bb54-2c4157fe81ca",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 37,
+   "nodeKey": "tree:002857a0-f501-4ae7-aff4-b3c388e83cd1",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 38,
+   "nodeKey": "tree:002aa66c-26a7-44cc-a232-9af7c609ea5a",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 39,
+   "nodeKey": "tree:002acc2d-1fad-4bb6-a98a-a4f830a9d108",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 40,
+   "nodeKey": "tree:002c5b1e-c7cd-4316-a342-b386d677de84",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 41,
+   "nodeKey": "tree:002ca4ea-dd4e-4ca5-99b0-83b07ac4e1fe",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 42,
+   "nodeKey": "tree:002e88b9-113b-43b0-864a-c6663ca9542b",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 43,
+   "nodeKey": "tree:002f0a1c-3b4d-452f-9f4e-dcaa00cf65f7",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 44,
+   "nodeKey": "tree:00306e7e-b649-4bc1-81de-4da30512bc7b",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 45,
+   "nodeKey": "tree:00329f0b-f3b5-4c4c-9e4c-60d15bfc6be1",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 46,
+   "nodeKey": "tree:0032b738-eb91-498c-a3fc-5bd3afb5fecb",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 47,
+   "nodeKey": "tree:00330b87-2394-48a0-b0bf-85cd80f8631f",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 48,
+   "nodeKey": "tree:0034f49a-1551-41e0-ab58-18bfec72951b",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 49,
+   "nodeKey": "tree:00354a9b-f5ae-4877-bcdb-01a846dc3eab",
+   "pagerankRaw": 0.000010622953606018551
+  },
+  {
+   "rank": 50,
+   "nodeKey": "tree:0037e4f1-e6e7-427f-b602-b3d302654fc8",
+   "pagerankRaw": 0.000010622953606018551
+  }
+ ],
+ "candidatesChecksum": "sha256:d050415455bfe0178361d5c9bde1b477276d512d3049014f0b64897553e7ce88",
+ "scoreSumChecksum": "sha256:657db61d02161280e59cbd59888118b47853836b0e4e9f7040915984043b316e",
+ "canonicalAuthority": false,
+ "writesPerformed": false,
+ "contextManifestAdmitted": false,
+ "freezeRule": "Candidates are fixed by graphRevision + candidatesChecksum. Any change to the snapshot or parameters produces a new revision; never edit a frozen set in place.",
+ "admissionGate": {
+  "status": "NOT_ADMITTED_AS_AUTHORITY",
+  "criteria": {
+   "distinctScoresAtLeast": 100,
+   "referenceEdgeTypesRequired": [
+    "CALLS",
+    "IMPORTS",
+    "REFERENCES",
+    "RESOLVED_CALL"
+   ],
+   "nonDegenerateTopK": true,
+   "sourceRevisionPresentOnNodes": "deferred to Phase 10; graph revision checksum required now"
+  },
+  "measured": {
+   "distinctScores": 2,
+   "nodesAtMaxScore": 54078,
+   "edgeTypes": [
+    "DERIVED_FROM",
+    "CONTAINS"
+   ],
+   "referenceEdgeTypesPresent": []
+  },
+  "reason": "Two score values and containment-only edges. The ranking is structural tree shape, not authority. Top-K is a key tie-break over 54,078 equal nodes."
+ },
+ "candidatesNote": "Top-K order is a deterministic key tie-break among equal scores. Not a usable authority ranking; retained as a frozen fixture only."
+}

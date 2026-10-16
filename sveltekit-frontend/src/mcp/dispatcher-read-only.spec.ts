@@ -51,3 +51,21 @@ describe('DispatcherMiddleware strict READ_ONLY', () => {
     expect(recordObservation).not.toHaveBeenCalled();
   });
 });
+
+describe('DispatcherMiddleware operator gate fails closed', () => {
+	it('refuses an ops.* tool when no operator token registry is provisioned', async () => {
+		const handler = vi.fn(async () => ({ content: [{ type: 'text', text: 'should not run' }] }));
+		const middleware = new DispatcherMiddleware({ connect: vi.fn() } as any, { recordObservation: vi.fn() } as any, null, false);
+		const tool = middleware.wrap(handler as any, 'ops.test_tool', 'session-ops', 'READ_ONLY');
+		await expect(tool({ operator_token: 'anything' })).rejects.toThrow('NO_OPERATOR_TOKEN_REGISTRY');
+		expect(handler).not.toHaveBeenCalled();
+	});
+
+	it('refuses an ops.* tool when the registry is empty', async () => {
+		const handler = vi.fn(async () => ({ content: [{ type: 'text', text: 'should not run' }] }));
+		const middleware = new DispatcherMiddleware({ connect: vi.fn() } as any, { recordObservation: vi.fn() } as any, null, false, []);
+		const tool = middleware.wrap(handler as any, 'ops.test_tool', 'session-ops-empty', 'READ_ONLY');
+		await expect(tool({})).rejects.toThrow('NO_OPERATOR_TOKEN_REGISTRY');
+		expect(handler).not.toHaveBeenCalled();
+	});
+});

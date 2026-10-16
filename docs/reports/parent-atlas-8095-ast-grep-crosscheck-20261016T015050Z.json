@@ -1,0 +1,40 @@
+{
+  "schema": "parent-atlas.8095-ast-grep-crosscheck-summary.v1",
+  "observedAtUtc": "2026-10-16T01:50:50.758Z",
+  "status": "PARSER_FIXTURE_CROSSCHECK_PASS_IDENTITY_UNPROVEN",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "writesPerformed": false,
+  "canonicalAuthority": false,
+  "input": {
+    "path": "sveltekit-frontend/src/lib/server/atlas/indexing/structural-language-dispatch-v1.ts",
+    "sourceRevision": "sha256:785a510c2f8be124e6cfa351b53009a321383c6232b50f2ee4cbdde3cafdd4f2",
+    "bytes": 3777,
+    "independentDiskHashMatched": true
+  },
+  "parser": {
+    "endpoint": "http://127.0.0.1:8095/ast/chunk",
+    "engine": "treesitter-chunker",
+    "engineVersion": "4.0.0",
+    "syntaxStatus": "CLEAN"
+  },
+  "crosscheck": {
+    "astGrepMatches": 14,
+    "coveredByNativeObservations": 14,
+    "exactTypeCoverage": 3,
+    "enclosedByCoarserNativeChunk": 11,
+    "disagreements": 0,
+    "nativeChunks": 22,
+    "nativeDuplicates": 0,
+    "nativeOutOfBounds": 0
+  },
+  "executionReceipt": {
+    "path": ".tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-50-50-765Z-structural-language-dispatch-v1.ts.json",
+    "checksum": "sha256:291245e19f3d3c9395963d0f2be4af0ce046bc86cd59d2df098c88bc288c3250",
+    "independentChecksumMatched": true
+  },
+  "limits": [
+    "This compares diagnostic AST-grep matches with sidecar chunks; 11 matches are only enclosed by a coarser function/export chunk, not exact node-type matches.",
+    "No canonical parse_node_id, tree_node_id, symbol identity, packet/chunk binding, persistence, KNN retrieval, or ContextManifest admission was tested.",
+    "This fixture does not repair the separate stale manifest label attached to the regex-based legacy materializer."
+  ]
+}

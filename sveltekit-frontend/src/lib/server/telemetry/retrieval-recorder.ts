@@ -9,6 +9,9 @@
 
 import { pool } from '$lib/server/db/client.js';
 import crypto from 'node:crypto';
+import type { PacketCentricContext } from './packet-centric-telemetry.js';
+import { TransportTelemetrySchema, type TransportTelemetry } from '../grpc/transport-telemetry.js';
+import { ResourceOperationObservationSchema, type ResourceOperationObservation } from './gpu-telemetry.js';
 
 /** One retrieved packet pointer — no payload, no body. */
 export interface RetrievalHit {
@@ -21,6 +24,9 @@ export interface RetrievalHit {
 
 /** Per-query hit summary stored in atlas_retrieval_eval_times.payload. */
 export interface RetrievalHitsPayload {
+  resource_observation?: ResourceOperationObservation;
+  packet_context?: PacketCentricContext;
+  transport_telemetry?: TransportTelemetry;
   hits?:   RetrievalHit[];
   counts?: {
     packet_hits?:      number;
@@ -42,6 +48,7 @@ export interface RetrievalTelemetrySignal {
   featureIds?: string[];
   fusionScore?: number;
   cacheHit?: boolean;
+  cacheHitSource?: string | null;
   surface: string;
   environment: string;
   retrievalStrategy?: 'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom';
@@ -108,6 +115,35 @@ function getConceptIdForFeatureOrPacket(id: string): string {
   return 'general';
 }
 
+export type RetrievalEvalTelemetrySignal = Omit<RetrievalTelemetrySignal, 'query' | 'latencyMs'> & { query?: string; queryHash?: string | null; latencyMs?: number | null };
+
+export async function recordRetrievalEvalTelemetry(signal: RetrievalEvalTelemetrySignal): Promise<void> {
+  const hitsPayload = { ...signal.hitsPayload };
+  if (hitsPayload.transport_telemetry) hitsPayload.transport_telemetry = TransportTelemetrySchema.parse(hitsPayload.transport_telemetry);
+  if (hitsPayload.resource_observation) hitsPayload.resource_observation = ResourceOperationObservationSchema.parse(hitsPayload.resource_observation);
+  const queryHash = typeof signal.query === 'string' ? crypto.createHash('sha256').update(signal.query).digest('hex')
+    : typeof signal.queryHash === 'string' && /^[a-f0-9]{64}$/.test(signal.queryHash) ? signal.queryHash : null;
+  const selectedPacketKeys = cleanStringArray(signal.selectedPacketKeys);
+  await pool.query(
+    `INSERT INTO atlas_retrieval_eval_times
+       (query_hash, packet_key, feature_id, domain_class, source_ref,
+        qdrant_ms, bm25_ms, redis_ms, bitfrost_ms, neo4j_ms, rerank_ms, total_ms,
+        cache_hit_source, result_count, protocol, accelerator, cuda_available, cuvs_enabled,
+        matmul_ms, embedding_ms, verdict, payload, created_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22::jsonb,now())
+     ON CONFLICT DO NOTHING`,
+    [queryHash, signal.selectedPacketKey ?? selectedPacketKeys[0] ?? null,
+      signal.selectedFeatureId ?? null, signal.domainClass ?? null, signal.sourceRef ?? null,
+      signal.timings?.qdrant_ms ?? null, signal.timings?.bm25_ms ?? null,
+      signal.timings?.redis_ms ?? null, null, signal.timings?.neo4j_ms ?? null,
+      signal.timings?.rerank_ms ?? null, typeof signal.latencyMs === 'number' && Number.isFinite(signal.latencyMs) && signal.latencyMs >= 0 ? Math.round(signal.latencyMs) : null,
+      signal.cacheHitSource ?? null, selectedPacketKeys.length,
+      signal.protocol ?? null, signal.accelerator ?? null, signal.cudaAvailable ?? null,
+      signal.cuvsEnabled ?? null, signal.matmulMs ?? null, signal.embeddingMs ?? null,
+      signal.verdict ?? null, JSON.stringify(hitsPayload)],
+  );
+}
+
 /**
  * Record a retrieval telemetry signal.
  *
@@ -171,39 +207,7 @@ export async function recordRetrievalTelemetry(signal: RetrievalTelemetrySignal)
 
     // ── atlas_retrieval_eval_times: one row per query, JSONB hits summary ────
     // Pointer-only: no packet bodies, no vectors stored here.
-    if (signal.writeEvalTimes !== false) void pool.query(
-      `INSERT INTO atlas_retrieval_eval_times
-         (query_hash, packet_key, feature_id, domain_class, source_ref,
-          qdrant_ms, bm25_ms, redis_ms, bitfrost_ms, neo4j_ms, rerank_ms, total_ms,
-          cache_hit_source, result_count, protocol, accelerator, cuda_available, cuvs_enabled,
-          matmul_ms, embedding_ms, verdict, payload, created_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22::jsonb,now())
-       ON CONFLICT DO NOTHING`,
-      [
-        queryHash,
-        signal.selectedPacketKey ?? selectedPacketKeys[0] ?? '',
-        signal.selectedFeatureId ?? featureIds[0] ?? null,
-        signal.domainClass ?? null,
-        signal.sourceRef ?? null,
-        signal.timings?.qdrant_ms  ?? null,
-        signal.timings?.bm25_ms    ?? null,
-        signal.timings?.redis_ms   ?? null,
-        null,                                          // bitfrost_ms — set by ACE emitter
-        signal.timings?.neo4j_ms   ?? null,
-        signal.timings?.rerank_ms  ?? null,
-        Math.max(0, Math.round(Number(signal.latencyMs ?? 0))),
-        signal.cacheHit ? 'redis' : null,
-        (selectedPacketKeys.length || 0),
-        signal.protocol ?? 'http',
-        signal.accelerator ?? 'cpu',
-        signal.cudaAvailable ?? null,
-        signal.cuvsEnabled ?? null,
-        signal.matmulMs ?? null,
-        signal.embeddingMs ?? null,
-        signal.verdict ?? null,
-        JSON.stringify(signal.hitsPayload ?? {}),
-      ],
-    ).catch((e: unknown) =>
+    if (signal.writeEvalTimes !== false) void recordRetrievalEvalTelemetry(signal).catch((e: unknown) =>
       console.error('[Telemetry] atlas_retrieval_eval_times insert failed:',
         e instanceof Error ? e.message : String(e))
     );

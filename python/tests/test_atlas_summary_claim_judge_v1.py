@@ -93,7 +93,7 @@ def test_every_failure_mode_is_judge_error_never_a_pass() -> None:
 def test_model_gate_requires_ornith_listed_by_the_server_and_never_ollama_or_other_models() -> None:
     ok = {"/props": {"model_alias": "ornith-1.5-9b", "model_path": "C:\\models\\hforf.gguf"}, "/v1/models": {"data": [{"id": "ornith-1.5-9b"}]}}
     assert resolve_model("http://x", lambda p: ok[p])["revision"] == "ornith-1.5-9b:hforf.gguf"
-    for alias in ("gemma4-legal-iq4xs-direct.gguf", "llama3", "hforf"):
+    for alias in ("ornith-1.5-9b", "llama3", "hforf"):
         bad = {"/props": {"model_alias": alias}, "/v1/models": {"data": [{"id": alias}]}}
         with pytest.raises(RuntimeError, match="JUDGE_MODEL_NOT_APPROVED"):
             resolve_model("http://x", lambda p, b=bad: b[p])

@@ -1,0 +1,111 @@
+{
+  "schema": "atlas.graphify-daily-discovery.v1",
+  "observedAt": "2026-10-16T02:36:48.765Z",
+  "mode": "search",
+  "status": "SEARCH_FAILED",
+  "canonicalAuthority": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "localArtifactWritesPerformed": true,
+  "promotionAuthorized": false,
+  "ownership": {
+    "path": "docs/architecture/runtime-ownership-registry.json",
+    "checksum": "sha256:fae1b52462b65245012ac0777b65ef1ea6aa2bb68c1d492afd0399ea4c88292a",
+    "declaredGeneratedAt": "2026-08-09",
+    "totalMatchingRecords": 0,
+    "records": [],
+    "truncated": false,
+    "promotionAuthorized": false
+  },
+  "search": {
+    "status": "SEARCH_FAILED",
+    "query": "FunctionRegistryEntryV1",
+    "limit": 8,
+    "matches": [
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-snapshot-v1.ts",
+        "line": 3,
+        "excerpt": "import { FunctionRegistryEntryV1Schema } from './function-registry-v1.js';",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-snapshot-v1.ts",
+        "line": 67,
+        "excerpt": "  entries: z.array(FunctionRegistryEntryV1Schema),",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-v1.ts",
+        "line": 37,
+        "excerpt": "export const FunctionRegistryEntryV1Schema = z.object({",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-v1.ts",
+        "line": 73,
+        "excerpt": "export type FunctionRegistryEntryV1 = z.infer<typeof FunctionRegistryEntryV1Schema>;",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-v1.ts",
+        "line": 86,
+        "excerpt": "  | { status: 'QUALIFIED_ADVISORY'; entry: FunctionRegistryEntryV1; failures: [] }",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-v1.ts",
+        "line": 99,
+        "excerpt": "function sha256Json(value: Omit<FunctionRegistryEntryV1, 'evidenceChecksum'>): string {",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "sveltekit-frontend/src/lib/server/atlas/function-registry/function-registry-v1.ts",
+        "line": 180,
+        "excerpt": "  const entry = FunctionRegistryEntryV1Schema.parse({",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      }
+    ],
+    "truncated": true,
+    "error": "RG_TIMEOUT",
+    "scope": {
+      "roots": [
+        "sveltekit-frontend/src",
+        "packages",
+        "python",
+        "simd-bridge",
+        "scripts/atlas"
+      ],
+      "selected": [
+        "docs/architecture/_topology_classifier_index.md",
+        "docs/architecture/_cuda_rtx_toc.md"
+      ],
+      "maxFileBytes": 2097152,
+      "maxMatchesPerFile": 5,
+      "sourceCandidateCount": 10664,
+      "unavailableSourceFiles": 0,
+      "oversizedSourceFiles": 0,
+      "discoveryBasis": "GIT_TRACKED_AND_NONIGNORED_UNTRACKED_REGULAR_SOURCE_FILES",
+      "resultOrder": "EXPLICIT_EVIDENCE_THEN_FILENAME_HINT_BATCHES_THEN_PATH_LINE",
+      "exclusions": [
+        "!**/node_modules/**",
+        "!**/.git/**",
+        "!**/.venv*/**",
+        "!**/.python*/**",
+        "!**/.tmp/**",
+        "!**/.cache/**",
+        "!**/.svelte-kit/**",
+        "!**/__pycache__/**",
+        "!**/dist/**",
+        "!**/build*/**",
+        "!**/target/**",
+        "!**/vendor/**",
+        "!**/archive*/**",
+        "!**/docs/**",
+        "!**/reports/**",
+        "!**/.env*"
+      ]
+    },
+    "scopeIsExhaustive": false,
+    "rankingOwner": "SearchRuntime; lexical discovery creates no retrieval vote"
+  }
+}

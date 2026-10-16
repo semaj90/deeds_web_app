@@ -51,7 +51,7 @@
 			const res = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: prompt, model: 'gemma4-legal' })
+				body: JSON.stringify({ message: prompt, model: 'ornith-1.5-9b' })
 			});
 			if (res.ok) {
 				const data = await res.json();

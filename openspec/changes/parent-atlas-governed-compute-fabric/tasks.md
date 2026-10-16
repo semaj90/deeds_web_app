@@ -376,10 +376,15 @@ type-checked, fixture-tested, and live-proven at the appropriate gate.
 
 ## 16. Policy, DSPy/RL, and orchestration boundaries
 
+- [ ] [workstation-p19] `POLICY-BASELINE-REPLAY-01`: Replay the existing deterministic policy against one frozen, already-legal action set and qualified input snapshot; require stable output under fixed seed, explicit tie/missing-feature behavior, bounded resource use, and a checksummed receipt with `writesPerformed=false`. Do not train a policy, authorize actions from scores, or create/persist revision fields before workstation P20 closes.
 - [ ] 16.1 Keep deterministic DAG legality, mutation authorization, exact promotion, and
       resource hard limits outside DSPy/RL/LLM control.
-- [ ] 16.2 Permit DSPy/GEPA to optimize skill/program selection only inside an already
-      legal host action set; require held-out evaluation and a revisioned policy receipt.
+- [ ] 16.2 [workstation-p20] Permit DSPy to optimize skill/program selection only inside an already
+      legal host action set; require held-out evaluation and a checksummed policy-artifact receipt.
+      Do not add persisted `*_revision` fields before workstation P20 closes.
+- [ ] 16.2a [workstation-p21] Evaluate GEPA reflective program/prompt optimization only against
+      frozen RouteTrace/eval receipts with a held-out comparison; emit a checksummed challenger
+      receipt and keep the optimized prompt/program in shadow (no production mutation or promotion).
 - [ ] 16.3 Permit PyTorch policy/RL experiments to learn expected utility/cost from
       `WorkflowActionEventV1` + `ExecutionReceiptV1` history only after packet/action-level
       outcome attribution is populated and validated.

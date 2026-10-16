@@ -137,8 +137,8 @@ function Get-TurboStartupProfiles {
     [pscustomobject]@{
       Id = 'gemma4-direct'
       DisplayName = 'Gemma 4 Legal - Direct Tools'
-      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
-      Alias = 'gemma4-legal'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'
+      Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
       Reasoning = 'off'
       ReasoningBudget = 0
@@ -201,8 +201,8 @@ function Get-TurboStartupProfiles {
     [pscustomobject]@{
       Id = 'gemma4-thinking'
       DisplayName = 'Gemma 4 Legal - Thinking'
-      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
-      Alias = 'gemma4-legal-thinking'
+      Model = Join-Path $modelRoot 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'
+      Alias = 'ornith-1.5-9b'
       TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
       Reasoning = 'on'
       ReasoningBudget = 2048
@@ -291,7 +291,7 @@ if ($StartupProfile) {
 #   4. Legacy model variables, in order: ROTORQUANT_MODEL_PATH >
 #      TURBO_MODEL_PATH > TURBO_MODEL > LOCAL_GEMMA_MODEL
 #   5. Auto-discovery (models/hfor/hforf.gguf > vendor/models/*.gguf >
-#      models/gemma4-legal-iq4xs-direct.gguf > Ollama blob store)
+#      models/ornith-1.5-9b > Ollama blob store)
 # When none of 1-3 select a profile, $activeTurboProfile stays $null and
 # resolution falls through to tier 4/5 below. Whichever tier resolves $model,
 # the chat-template decision downstream is derived from the FINAL resolved
@@ -448,10 +448,10 @@ $model = if ($activeTurboProfile) {
 } elseif ($env:LOCAL_GEMMA_MODEL) {
     Resolve-TurboModelRef $env:LOCAL_GEMMA_MODEL
 } else {
-    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
-    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant.gguf"
+    $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
+    $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
     $hforfModel   = Join-Path $PSScriptRoot "..\models\hfor\hforf.gguf"
-    $localModel   = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
+    $localModel   = Join-Path $PSScriptRoot "..\models\ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf"
     $localLegacy  = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
 
     # Auto-discover RotorQuant/Gemma4 GGUF from Ollama blob store.
@@ -460,7 +460,7 @@ $model = if ($activeTurboProfile) {
     $ollamaBlob = $null
     $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
     $blobRoot     = Join-Path $env:USERPROFILE '.ollama\models\blobs'
-    $preferredTags = @('gemma4-legal', 'gemma4-rotorquant')
+    $preferredTags = @('ornith-1.5-9b', 'ornith-1.5-9b')
     foreach ($tag in $preferredTags) {
         $mf = Join-Path $manifestRoot "$tag\latest"
         if (-not (Test-Path $mf)) { continue }
@@ -663,7 +663,7 @@ if ($supportedKv -notcontains $kvV) {
 
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at $llama" }
 if (-not $model) {
-  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place gemma4-legal.gguf in vendor/models/, or ensure gemma4-rotorquant is pulled in Ollama (~/.ollama/models/)."
+  throw "No model GGUF found. Set ROTORQUANT_MODEL_PATH=<path to GGUF>, or place ornith-1.5-9b in vendor/models/, or ensure ornith-1.5-9b is pulled in Ollama (~/.ollama/models/)."
 }
 if (-not (Test-Path $model)) { throw "TurboQuant model GGUF not found at: $model" }
 

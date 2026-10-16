@@ -206,6 +206,7 @@ export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 export interface Candidate {
   id: string;
   packetKey: string;
+  packetId?: string | null;
   symbolVersionId?: string | null;
   symbol_version_id?: string | null;
   packet_key?: string | null;
@@ -237,6 +238,7 @@ export interface Candidate {
   treeNodeId?: string | null;
   pageRankScore?: number | null;
   stableSymbolId?: string | null;
+  functionRegistryEvidence?: FunctionRegistryCandidateEvidenceV1;
 
   /**
    * Which field `packetKey`/`symbolVersionId` actually resolved from, per
@@ -262,6 +264,141 @@ export interface Candidate {
    * `identityStatus` precedence above. Wiring it into V2-based dedup is a separate, later step.
    */
   canonicalChunkId?: string | null;
+}
+
+export const FunctionRegistryCandidateEvidenceV1Schema = z.object({
+  snapshotChecksum: z.string().regex(/^[a-f0-9]{64}$/i),
+  canonicalId: z.string().min(1),
+  symbolVersionId: z.string().min(1),
+  treeNodeId: z.string().min(1),
+  sourceContentHash: z.string().regex(/^[a-f0-9]{64}$/i),
+  startByte: z.number().int().nonnegative(),
+  endByte: z.number().int().positive(),
+  evidenceChecksum: z.string().regex(/^[a-f0-9]{64}$/i),
+}).strict().refine((value) => value.endByte > value.startByte, 'Function registry span must be non-empty');
+
+export type FunctionRegistryCandidateEvidenceV1 = z.infer<typeof FunctionRegistryCandidateEvidenceV1Schema>;
+
+export interface FunctionRegistryRetrievalProofV1 {
+  status: 'DISABLED' | 'NO_QUALIFIED_CANDIDATES' | 'QUALIFIED_CANDIDATES_PRESENT';
+  qualifiedCandidateCount: number;
+  qualifiedFinalCandidateCount: number;
+  candidates: Array<FunctionRegistryCandidateEvidenceV1 & {
+    packetKey: string;
+    sourceRef: string;
+    sourceRevision: string;
+    workspaceRevision: string;
+    presentAfterHydration: boolean;
+    presentAfterRerank: boolean;
+    presentAfterPostProcess: boolean;
+    presentInFinalTopK: boolean;
+    dropStage: 'NONE' | 'HYDRATION' | 'RERANKER' | 'POST_PROCESS' | 'TOP_K';
+    postProcessDecision: { decision: 'KEEP' | 'DROP'; reason: string; detail: string } | null;
+  }>;
+  contextManifestAdmitted: false;
+  canonicalAuthority: false;
+  writesSuppressed: boolean;
+}
+
+export function functionRegistryEvidenceFromMetadataV1(input: {
+  metadata: Record<string, unknown> | undefined;
+  packetKey: string;
+  symbolVersionId: string | null | undefined;
+  treeNodeId: string | null | undefined;
+  sourceRevision: string | null | undefined;
+}): FunctionRegistryCandidateEvidenceV1 | null {
+  const metadata = input.metadata;
+  if (!metadata) return null;
+  const parsed = FunctionRegistryCandidateEvidenceV1Schema.safeParse({
+    snapshotChecksum: metadata['function_registry_snapshot_checksum'],
+    canonicalId: metadata['canonical_function_id'],
+    symbolVersionId: metadata['symbol_version_id'],
+    treeNodeId: metadata['tree_node_id'],
+    sourceContentHash: metadata['source_content_hash'],
+    startByte: metadata['byte_start'],
+    endByte: metadata['byte_end'],
+    evidenceChecksum: metadata['evidence_checksum'],
+  });
+  if (!parsed.success || parsed.data.symbolVersionId !== input.symbolVersionId
+    || parsed.data.treeNodeId !== input.treeNodeId
+    || !input.packetKey || !input.sourceRevision) return null;
+  return parsed.data;
+}
+
+export function buildFunctionRegistryRetrievalProofV1(input: {
+  enabled: boolean;
+  readOnly: boolean;
+  candidates: readonly Candidate[];
+  hydratedPackets?: readonly FeatureEnvelope[];
+  rerankedPackets?: readonly FeatureEnvelope[];
+  postProcessedPacketKeys?: readonly string[];
+  postProcessDecisions?: readonly import('./post-process-reranker.js').PostProcessDecision[];
+  finalPackets: readonly FeatureEnvelope[];
+}): FunctionRegistryRetrievalProofV1 {
+  const seen = new Set<string>();
+  const candidates = input.candidates.flatMap((candidate) => {
+    const evidence = candidate.functionRegistryEvidence;
+    const sourceRevision = candidate.sourceRevision;
+    const workspaceRevision = candidate.workspaceRevision;
+    if (!evidence || !sourceRevision || !workspaceRevision || seen.has(evidence.symbolVersionId)) return [];
+    seen.add(evidence.symbolVersionId);
+    const matchesQualifiedIdentity = (packet: FeatureEnvelope) => {
+      return packet.symbol_version_id === evidence.symbolVersionId
+        && packet.tree_node_id === evidence.treeNodeId
+        && packet.source_revision === sourceRevision
+        && packet.workspace_revision === workspaceRevision
+        && packet.source_ref === candidate.sourceRef;
+    };
+    const presentAfterHydration = input.hydratedPackets?.some(matchesQualifiedIdentity) ?? false;
+    const presentAfterRerank = input.rerankedPackets?.some(matchesQualifiedIdentity) ?? false;
+    const rerankedIdentityKeys = new Set((input.rerankedPackets ?? [])
+      .filter(matchesQualifiedIdentity)
+      .map((packet) => packet.packet_key ?? packet.chunk_id)
+      .filter((key): key is string => typeof key === 'string' && key.length > 0));
+    const postProcessedKeys = new Set(input.postProcessedPacketKeys ?? []);
+    const presentAfterPostProcess = [...rerankedIdentityKeys].some((key) => postProcessedKeys.has(key));
+    const postProcessDecision = [...rerankedIdentityKeys]
+      .map((key) => input.postProcessDecisions?.find((decision) => decision.packetKey === key))
+      .find((decision) => decision !== undefined) ?? null;
+    const presentInFinalTopK = input.finalPackets.some(matchesQualifiedIdentity);
+    const dropStage: FunctionRegistryRetrievalProofV1['candidates'][number]['dropStage'] = presentInFinalTopK
+      ? 'NONE'
+      : !presentAfterHydration ? 'HYDRATION'
+        : !presentAfterRerank ? 'RERANKER'
+          : !presentAfterPostProcess ? 'POST_PROCESS'
+            : 'TOP_K';
+    return [{
+      ...evidence,
+      packetKey: candidate.packetKey,
+      sourceRef: candidate.sourceRef,
+      sourceRevision,
+      workspaceRevision,
+      presentAfterHydration,
+      presentAfterRerank,
+      presentAfterPostProcess,
+      presentInFinalTopK,
+      dropStage,
+      postProcessDecision: postProcessDecision ? {
+        decision: postProcessDecision.decision,
+        reason: postProcessDecision.reason,
+        detail: postProcessDecision.detail,
+      } : null,
+    }];
+  }).sort((left, right) => left.symbolVersionId.localeCompare(right.symbolVersionId));
+  const qualifiedCandidateCount = new Set(input.candidates
+    .map((candidate) => candidate.functionRegistryEvidence?.symbolVersionId)
+    .filter((symbolVersionId): symbolVersionId is string => typeof symbolVersionId === 'string')).size;
+  return {
+    status: !input.enabled ? 'DISABLED'
+      : qualifiedCandidateCount === 0 ? 'NO_QUALIFIED_CANDIDATES'
+        : 'QUALIFIED_CANDIDATES_PRESENT',
+    qualifiedCandidateCount,
+    qualifiedFinalCandidateCount: candidates.filter((candidate) => candidate.presentInFinalTopK).length,
+    candidates,
+    contextManifestAdmitted: false,
+    canonicalAuthority: false,
+    writesSuppressed: input.readOnly,
+  };
 }
 
 /**
@@ -314,6 +451,8 @@ export interface RetrievalProofSummary {
   rrfOutputCount: number;
   finalContextCount: number;
   validationReasons: Record<string, number>;
+  hydrationCandidateResolutions?: HydrationProofSummary['candidateResolutions'];
+  functionRegistry: FunctionRegistryRetrievalProofV1;
 }
 
 /**
@@ -565,6 +704,7 @@ export class SearchRuntime {
               summaryResolvedCount: 0,
               summaryStaleRejectedCount: 0,
               validationReasons: {},
+              candidateResolutions: [],
             },
             finalPackets: [],
             postProcessedCount: 0,
@@ -661,7 +801,7 @@ export class SearchRuntime {
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
       const { scoreCandidates } = await import('./candidate-scorer.js');
-      const scored = await scoreCandidates(
+      const scoredValues = await scoreCandidates(
         query.text,
         fused.map(c => ({
           packetKey: c.packetKey,
@@ -687,6 +827,20 @@ export class SearchRuntime {
         })) as any,
         this.scorerOptions,
       );
+      const fusedByPacketKey = new Map(fused.map((candidate) => [candidate.packetKey, candidate]));
+      const scored = scoredValues.map((candidate) => {
+        const source = fusedByPacketKey.get(candidate.packetKey);
+        if (!source) return candidate;
+        return {
+          ...candidate,
+          packetId: source.packetId ?? candidate.packetId,
+          symbolVersionId: source.symbolVersionId ?? null,
+          treeNodeId: source.treeNodeId ?? null,
+          workspaceRevision: source.workspaceRevision ?? null,
+          sourceRevision: source.sourceRevision ?? null,
+          functionRegistryEvidence: source.functionRegistryEvidence,
+        };
+      });
       stageTiming.score = Date.now() - scoreStart;
 
       // Sort by blendedScore before hydration so we hydrate the best candidates first
@@ -700,9 +854,10 @@ export class SearchRuntime {
         scoredSorted.slice(0, query.topK).map((sc) => {
           const scoreCandidate = sc as any;
           return {
-            id: sc.packetKey,
+            id: sc.packetId ?? sc.packetKey,
             packetKey: sc.packetKey,
-            symbolVersionId: scoreCandidate.symbolVersionId ?? sc.packetKey,
+            packetId: sc.packetId ?? null,
+            symbolVersionId: scoreCandidate.symbolVersionId ?? null,
             sourceRef: sc.sourceRef,
             summary: '',
             content: '',
@@ -854,6 +1009,10 @@ export class SearchRuntime {
           rawCandidates: candidates,
           fusedCandidates: fused,
           hydrationProof: hydrated.proof,
+          hydratedPackets: envelopes,
+          rerankedPackets: reranked,
+          postProcessedPacketKeys: postProcessed.map((candidate) => candidate.packetKey),
+          postProcessDecisions: ppAudit.decisions,
           finalPackets,
           postProcessedCount: postProcessed.length,
           rerankedCount: reranked.length,
@@ -917,7 +1076,8 @@ export class SearchRuntime {
     return applySearchMetadataFilter(stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
-      symbolVersionId: lc.symbolVersionId ?? lc.packetKey ?? null,
+      packetId: lc.packetId ?? null,
+      symbolVersionId: lc.symbolVersionId ?? null,
       sourceRef: lc.sourceRef,
       summary: String(lc.metadata?.['summary'] ?? ''),
       content: String(lc.metadata?.['content'] ?? ''),
@@ -970,24 +1130,37 @@ export class SearchRuntime {
         limit: Math.min(query.topK * 2, 32),
         workspaceRevision: query.workspaceRevision,
       });
-      return rows.map((row) => ({
-        id: row.packetKey,
-        packetKey: row.packetKey,
-        symbolVersionId: row.symbolVersionId ?? null,
-        sourceRef: row.sourceRef,
-        summary: '',
-        content: '',
-        score: row.score ?? 0,
-        scoreSource: 'ast_tree',
-        workspaceRevision: row.workspaceRevision ?? query.workspaceRevision,
-        sourceRevision: row.sourceRevision ?? undefined,
-        retrievalExecutor: 'function_registry_verified_snapshot',
-        treeNodeId: typeof row.metadata?.['tree_node_id'] === 'string'
+      return rows.flatMap((row) => {
+        const treeNodeId = typeof row.metadata?.['tree_node_id'] === 'string'
           ? String(row.metadata['tree_node_id'])
-          : undefined,
-        identityStatus: 'canonical',
-        identitySource: 'symbol_version_id',
-      }));
+          : undefined;
+        const evidence = functionRegistryEvidenceFromMetadataV1({
+          metadata: row.metadata,
+          packetKey: row.packetKey,
+          symbolVersionId: row.symbolVersionId,
+          treeNodeId,
+          sourceRevision: row.sourceRevision,
+        });
+        if (!evidence) return [];
+        return [{
+          functionRegistryEvidence: evidence,
+          id: row.packetId ?? row.packetKey,
+          packetKey: row.packetKey,
+          packetId: row.packetId ?? null,
+          symbolVersionId: row.symbolVersionId ?? null,
+          sourceRef: row.sourceRef,
+          summary: '',
+          content: '',
+          score: row.score ?? 0,
+          scoreSource: 'ast_tree',
+          workspaceRevision: row.workspaceRevision ?? query.workspaceRevision,
+          sourceRevision: row.sourceRevision ?? undefined,
+          retrievalExecutor: 'function_registry_verified_snapshot',
+          treeNodeId,
+          identityStatus: 'canonical',
+          identitySource: 'symbol_version_id',
+        }];
+      });
     } catch (error) {
       console.warn('[search-runtime] function registry supplement unavailable:', (error as Error).message);
       return [];
@@ -1168,16 +1341,12 @@ export class SearchRuntime {
   private async lookupHypergraphNeighbors(
     packets: FeatureEnvelope[],
   ): Promise<{
-    graphRevision: string;
+    graphRevision?: string;
     neighbors: Array<{ canonicalId: string; hyperedgeIds: string[] }>;
   } | undefined> {
-    const workspaceRevisions = new Set(packets.map((packet) => packet.workspace_revision?.trim()).filter(Boolean));
+    // Revisions are informational here: provenance only, never ranking. Attach one only when the packets agree.
     const graphRevisions = new Set(packets.map((packet) => packet.graph_revision?.trim()).filter(Boolean));
-    if (
-      packets.some((packet) => !packet.workspace_revision?.trim() || !packet.graph_revision?.trim()) ||
-      workspaceRevisions.size !== 1 ||
-      graphRevisions.size !== 1
-    ) return undefined;
+    const graphRevision = graphRevisions.size === 1 ? [...graphRevisions][0] : undefined;
 
     const packetKeys = [...new Set(packets.map((packet) => packet.packet_key?.trim()).filter((key): key is string => Boolean(key)))];
     if (packetKeys.length === 0) return undefined;
@@ -1195,14 +1364,12 @@ export class SearchRuntime {
         .map((resolution) => resolution?.canonicalPacketKey)
         .filter((key): key is string => Boolean(key)))];
       if (canonicalIds.length === 0) return undefined;
-      const { readKagHypergraphNeighborsStrictV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
-      const receipt = await readKagHypergraphNeighborsStrictV1(canonicalIds, {
-        workspaceRevision: [...workspaceRevisions][0]!,
-        graphRevision: [...graphRevisions][0]!,
-      });
-      return receipt.neighbors.length > 0
-        ? { graphRevision: [...graphRevisions][0]!, neighbors: receipt.neighbors }
-        : undefined;
+      // Non-strict read: no revision filter, fail-open. Strict lineage reads stay in kag-hypergraph-reader-v1.
+      const { readKagHypergraphNeighborsV1 } = await import('../atlas/integration/kag-hypergraph-reader-v1.js');
+      const receipt = await readKagHypergraphNeighborsV1(canonicalIds);
+      // catch-all bucket, not a topic; excluded from provenance (hyperparameter, see OpenSpec visual/graph notes)
+      const neighbors = receipt.neighbors.filter((n) => n.canonicalId !== 'topo:unclassified');
+      return neighbors.length > 0 ? { graphRevision, neighbors } : undefined;
     } catch (error) {
       console.warn('[search-runtime] hypergraph neighbor lookup failed (non-blocking):', error);
       return undefined;
@@ -1227,6 +1394,10 @@ export class SearchRuntime {
     rawCandidates: Candidate[];
     fusedCandidates: FusedCandidate[];
     hydrationProof: HydrationProofSummary;
+    hydratedPackets?: FeatureEnvelope[];
+    rerankedPackets?: FeatureEnvelope[];
+    postProcessedPacketKeys?: string[];
+    postProcessDecisions?: import('./post-process-reranker.js').PostProcessDecision[];
     finalPackets: FeatureEnvelope[];
     postProcessedCount: number;
     rerankedCount: number;
@@ -1280,6 +1451,17 @@ export class SearchRuntime {
       rrfOutputCount: fusedCandidates.length,
       finalContextCount: finalPackets.length,
       validationReasons: hydrationProof.validationReasons,
+      hydrationCandidateResolutions: hydrationProof.candidateResolutions,
+      functionRegistry: buildFunctionRegistryRetrievalProofV1({
+        enabled: this.functionRegistry !== undefined,
+        readOnly: this.readOnly,
+        candidates: rawCandidates,
+        hydratedPackets: input.hydratedPackets,
+        rerankedPackets: input.rerankedPackets,
+        postProcessedPacketKeys: input.postProcessedPacketKeys,
+        postProcessDecisions: input.postProcessDecisions,
+        finalPackets,
+      }),
     };
   }
 }

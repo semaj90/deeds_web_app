@@ -17,7 +17,7 @@ test('CLI emits only well-shaped declarations and writes receipts to scratch whe
     const report = path.join(scratch, 'receipt.json');
     const sourceRevision = `sha256:${'a'.repeat(64)}`;
     const candidates = [
-      { source_ref: 'src/a.ts', source_revision: sourceRevision, symbol_name: 'work', symbol_kind: 'function', language: 'typescript', start_byte: 0, end_byte: 10 },
+      { source_ref: 'src/a.ts', source_revision: sourceRevision, symbol_name: 'work', symbol_kind: 'function', language: 'typescript', start_byte: 0, end_byte: 10, tree_node_id: 'sha256:occurrence-legacy-alias', tree_node_occurrence_id: 'sha256:occurrence', packet_tree_node_id: 'packet-tree:1' },
       { source_ref: 'src/a.ts', source_revision: sourceRevision, symbol_name: "import { x } from 'x'", symbol_kind: 'function', language: 'typescript', start_byte: 10, end_byte: 20 },
       { source_ref: 'src/a.ts', source_revision: sourceRevision, symbol_name: 'unknownLang', symbol_kind: 'function', language: 'unknown', start_byte: 20, end_byte: 30 },
     ];
@@ -29,6 +29,9 @@ test('CLI emits only well-shaped declarations and writes receipts to scratch whe
     assert.equal(nominations[0].qualified_name, 'work');
     assert.equal(nominations[0].source_revision, sourceRevision);
     assert.equal(nominations[0].workspace_revision, null);
+    assert.equal(nominations[0].upstream_node_id, null);
+    assert.equal(nominations[0].tree_node_occurrence_id, 'sha256:occurrence');
+    assert.equal(nominations[0].packet_tree_node_id, 'packet-tree:1');
     assert.equal(receipt.invalid_candidates, 2);
     assert.equal(receipt.stale_source_revision_candidates, 0);
     assert.equal(receipt.database_writes, false);

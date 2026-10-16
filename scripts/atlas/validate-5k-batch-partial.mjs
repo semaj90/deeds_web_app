@@ -80,7 +80,7 @@ async function importAndValidate() {
         feature_id: feature_id || null,
         summary,
         layer_type: 'gemma4_offline',
-        model_name: 'gemma4-legal-iq4xs-direct.gguf',
+        model_name: 'ornith-1.5-9b',
         summary_level: 'packet',
         pass_key: 'gemma4_summary_v1',
       });

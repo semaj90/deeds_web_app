@@ -7,7 +7,7 @@ Capture the current runtime truth, required infra fixes, validation steps that b
 
 ## 1. Current runtime truth
 - `TURBO_KV_K=q8_0` and `TURBO_KV_V=turbo3` are the active KV flags in `sveltekit-frontend/.env`.
-- `sveltekit-frontend/scripts/ensure-llama-server.mjs` already wires these via `-ctk` / `-ctv` and now prefers `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` when present.
+- `sveltekit-frontend/scripts/ensure-llama-server.mjs` already wires these via `-ctk` / `-ctv` and now prefers `models/ornith-1.5-9b/.gguf` when present.
 - `LLAMA_SERVER_PATH` is configured to the local CUDA llama-server binary.
 - `simdjson-bridge.ts` is already in use across Redis, Qdrant, GraphRAG, codebase indexing, and inference tooling.
 
@@ -61,7 +61,7 @@ Use AVX2/simdjson parsing to normalize connection payloads into stable labels, t
   - JSONL export records used by cluster summary generators
   - ClusterCards and codebase graph artifacts
 - Feed labels into downstream scoring:
-  - Hermes routing / tool selection
+  - Hermes kanban taskboard routing / tool selection
   - ACE compaction / prompt assembly
   - GraphRAG / Karpathy cluster-summary prompt templates
 
@@ -76,15 +76,15 @@ Use AVX2/simdjson parsing to normalize connection payloads into stable labels, t
   - `src/routes/api/codebase-index/*`
 - Create a production TODO list for each live artifact, including:
   - `ClusterCard` schema changes
-  - `Qdrant` label writes
-  - `Redis` label cache writes
+  - `pg vector mirroed graph rag Qdrant 1.19 ` label writes
+  - `Redis-valkey centroids` label cache writes
   - codebase traversal edge extraction
   - prompt template consumption
 - Consolidate the multi-hop traversal feature-labeling playbook with exactly these artifacts:
   1. `simdjson-bridge.ts` connection parse paths → stable label schema
   2. `cluster-tags-cache.ts` / `karpathy-gpu-enrich.mjs` cluster metadata writes
   3. `context-assembler.ts` retrieval rerank / semantic boost wiring
-  4. `trace-mcp-server.ts` MCP JSON tool support and `gemma4-offload` help
+  4. `trace-mcp-server.ts` MCP JSON tool support and `change to ornith-offload after reviewing contents update llama-server 8090 ornith 1.5 not gemma4-offload` help load json packet card dpsy gepa ace redis-valkey centroid bitfrost token cache ace prompt injection contextual engineering from title_id = file_path? with rg helpers number range 0-300 for example retrieve? cluster library can produce use this library for this file? directory repo enhancements, low rank recommendations pca svd topk kmeans clustering pagntion inverse ace json packet bitfrost creatiion dag synthesis from user query domain classification mcp tool calling.
   5. cluster-summary prompt templates / JSONL export paths
 - Deliver an actionable production TODO for each of the five paths above, with one `rg` command per path and one verify test per pipeline.
 

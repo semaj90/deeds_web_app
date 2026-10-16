@@ -2974,3 +2974,354 @@ Remaining (not done):
 - Nothing committed; changes are in the working tree.
 
 
+
+## 2026-10-15 Phase 23 integration validation checks (append-only; all NOT_PROVEN)
+
+Gate sources: `docs/experiments/phase23-reap-cerebras-quantization.md` (PH23-*), `docs/experiments/phase23-edge-gemma4-litert-eval-crosswalk.md` (P23-EDGE-*), `openspec/changes/parent-atlas-kafka-projection-initiative/tasks.md` (KAFKA-*). Nothing here has run. `:8090` Ornith stays the chat authority; the WebGPU Gemma4 eval may not replace it.
+
+- [ ] P23-INT-01 Tensor-head analysis (PH23-TENSOR-01..04) on the WebGPU Gemma4 artifact `sveltekit-frontend/static/gemma4_e2b_onnx/`: read-only SHA256 per file, graph input/output names and dtypes, no weight download. Status: NOT_PROVEN.
+- [ ] P23-INT-02 Kafka WAL readiness (KAFKA-01): read-only `wal_level`, `pg_replication_slots`, `pg_publication` census recorded with a timestamp before any Kafka or CDC integration. Current last census (2026-10-13): `wal_level=replica`, 0 slots, 0 publications. KAFKA-05/15 stay BLOCKED until an approved restart. Status: NOT_PROVEN.
+- [ ] P23-INT-03 Real-time inference logging: no gate exists in the Phase 23 docs or any tasks.md. Needs an owner decision (Langfuse or another sink) and a new gate ID before work starts. Status: BLOCKED_NO_GATE.
+- [ ] P23-INT-04 WebGPU E2B eval (P23-EDGE-02, 03, 09, 10) runs only after P23-INT-01 and P23-INT-02 have receipts. Hard gates from the crosswalk: no synthetic citations, no silent fallback to `:8090`, server-only actions uncallable from the client. Status: NOT_PROVEN.
+- [ ] P23-INT-05 Evidence receipt for each check above, written as a new immutable file; no edits to existing receipts. Status: NOT_PROVEN.
+
+### Review queue: Gemma4 to Ornith identity migration and related follow-ups (2026-10-15, append-only)
+
+Verified done (evidence recorded; not runtime-proven):
+- [x] MIG-01 Live code has zero `gemma4-rotorquant` references (sweep of `sveltekit-frontend/src`, `tests`, `scripts`, `packages`, `python`, hidden paths included). Evidence: `rg` count 0 on the same scope.
+- [x] MIG-02 Gemma4 legal identities replaced with `ornith-1.5-9b` in code. Excluded on purpose: the guard spec, `scripts/vlm-server/app.py` (see MIG-09). Evidence: `rg` count 0 outside those two.
+- [x] MIG-03 Regex-literal damage from the batch sweep repaired against git HEAD (4 `.mjs` files plus the guard pattern). Evidence: grep for `ornith-1.5-9b)?` returns nothing.
+- [x] MIG-04 `models/.gitignore` ignores `mmproj*.gguf`. Evidence: `git check-ignore` matches both projector files.
+- [x] MIG-05 `.env` `TURBO_MMPROJ_PATH` points at `mmproj-Ornith-1.5-9B-BF16.gguf`. Evidence: key-name check; secrets not printed.
+- [x] MIG-06 `models/model-manifest.json` retains only the Ornith vision profile; JSON parses. Evidence: `JSON.parse` succeeds.
+- [x] MIG-07 Guard `gemma-chat-model-literals` passes (3/3) with the frozen lists emptied and the regex banning `gemma4-rotorquant|gemma4-legal|gemma4:e4b`.
+- [x] MIG-08 `openai-facade.spec.ts` passes (17/17) after the routing changes.
+
+Open:
+- [ ] MIG-09 Retire `scripts/vlm-server/app.py`. It loads a Hugging Face Gemma model with a PEFT adapter, not the llama-server Ornith lane. `:8085` is currently down. Needs operator approval; archive, do not delete.
+- [ ] MIG-10 Vision on `:8090` is off (`vision:false`). Relaunch with the `ornith-1.5-vlm` profile needs operator approval because it restarts the GPU server. Until then, no doc may claim Ornith vision is active.
+- [ ] MIG-11 Deduplicate candidate paths in `scripts/ensure-llama-server.mjs`. Blocked by a Windows file lock (errno -4094). Find the holding process before retrying. Harmless until then.
+- [ ] MIG-12 `scripts/turboquant/bench-model.mjs` compares the same file as baseline and candidate after the sweep. Benchmark is meaningless until a real second model is named.
+- [ ] MIG-13 Stale documentation: `scripts/INFERENCE_INFRASTRUCTURE.md` still describes an Ollama VLM fallback with `gemma4:e4b-it-q4_K_M`. Update after operator review.
+- [ ] MIG-14 Remaining Ollama-as-chat wording in UI and MCP text. Partial fix applied; a grep for `Ollama` next to `ornith` lists the remaining files.
+- [ ] MIG-15 Gemma4 E2B browser lane (`sveltekit-frontend/static/gemma4_e2b_onnx/`, 28 `src` files reference E2B, including `inference/inference-router.ts` and `models/model-registry.ts`). Decide: keep as a documented browser exception to the llama-server rule, or retire. Feeds P23-INT-04.
+- [ ] MIG-16 Unsloth training notebooks still deploy through Ollama (`FROM gemma4:e4b` in `scripts/unsloth-training/Gemma4_E4B_Legal_GRPO.ipynb`; Modelfile steps in the `Gemma4_Legal_2B_Export*` notebooks). Operator said the WebGPU Gemma4 model will be evaluated later; do not retarget until that decision is made. Options: retarget to a llama-server GGUF, or add a WebGPU ONNX export. Not started.
+- [ ] MIG-17 Python judge gate `python/tests/test_atlas_summary_claim_judge_v1.py` (negative case with bare alias `hforf`) is NOT_PROVEN in this session. Host lacks pytest and pydantic; the sidecar container does not mount the fixture at `sveltekit-frontend/src/lib/server/atlas/docs/__fixtures__/`. Run after the fixture is mounted or dependencies are approved.
+- [ ] MIG-18 Remove the bare `hforf` term from the TypeScript guard regex. Not applied yet; interrupted for review. Keep the Python negative case.
+- [ ] MIG-19 Langfuse or real-time inference logging gate: see P23-INT-03. Not started.
+- [ ] MIG-20 The `langgraph-optionalization` spec has one failing test (`should skip LangGraph state machine when langgraphEnabled=false`). The spec is unchanged from HEAD and has no model references, so this predates this work. Triage separately.
+- [ ] MIG-21 The `rag/search` route test expects 200 and gets 307. It is a deprecated redirect to `search-unified`. Predates this work; triage separately.
+
+### Review queue: Langfuse, SeaweedFS cold storage, and acceptance checklist (2026-10-15, append-only)
+
+Source of truth for the live stack is the root `docker-compose.yml` (project `deeds-web-app`). `docker/langfuse.yml` is a stale parallel definition and is left unchanged.
+
+Verified (runtime evidence from this session):
+- [x] LF-01 Langfuse stack running: `langfuse-server` healthy, `langfuse-clickhouse` healthy, `langfuse-worker` up; web health endpoint returns HTTP 200 on `localhost:3030`.
+- [x] LF-02 Trace round-trip: one test trace POSTed to `/api/public/ingestion` returned 201; `GET /api/public/traces/{id}` returned 200 with the same id. Test id prefix `smoke-`.
+- [x] LF-03 App `LANGFUSE_PUBLIC_KEY` in `.env` matches the project public key seeded in the root compose (hash comparison; no secret printed).
+- [x] LF-04 Startup scripts `scripts/start-dev-environment.ps1` and `scripts/wire-phase66-env.ps1` now list `legal-ai-seaweed-s3` instead of the missing `phase66-minio`.
+
+Open:
+- [ ] LF-05 Worker integration queues (`blobstorage-integration`, `posthog-integration`, `webhook`) log 30 s socket timeouts. Confirm they are outbound-only and disabled or harmless, then disable the unused queues. Not changed.
+- [ ] LF-06 Redact telemetry: the root compose hardcodes Langfuse project keys, `NEXTAUTH_SECRET`, `SALT`, `ENCRYPTION_KEY`, and the `legal_admin` database password. Move to `.env` references. Operator approval needed.
+- [ ] LF-07 SDK trace path: `traceLLM` is wired in `api/ai/chat` and `api/synthesis/generate`. Prove a real request emits a trace, not just the synthetic ingestion above.
+- [ ] STOR-01 Storage audit (replaces the phase66-minio audit): SeaweedFS (`legal-ai-seaweed-s3`, `:8333`) becomes the cold tier for original files: `.txt`, `.md`, `.json`, `.jsonl`, `.ndjson` and similar. Scope:
+  - classify every original-file class by extension and owner
+  - define the bucket and prefix per class
+  - record the NVMe/SSD placement of the SeaweedFS volume server, measured not assumed
+  - write a SHA-256 manifest per object and never delete originals (archive-not-delete)
+  - confirm the `MINIO_*` to `SEAWEED_*` env mapping in `sveltekit-frontend/src/lib/config/env.server.ts`
+- [ ] KAFKA-REVIEW-01 Kafka WAL "send and receive" is NOT built. KAFKA-05 and KAFKA-15 stay blocked until an approved `wal_level=logical` restart. Any Kafka transport needs its own approval gate with messages carrying model revision, packet and execution identity.
+
+Acceptance checklist (from the 2026-10-15 review; 1 of 10 done):
+- [ ] ACC-01 Audit the full 111-file migration diff for incorrect substitutions, including regexes, tests, configs and documentation.
+- [x] ACC-02 Verify active Ornith model identity through `:8090`. Evidence: `/props` reports `model_alias: ornith-1.5-9b`, `vision: false`. This is the only live `:8090` check so far; no request-level identity receipt yet.
+- [ ] ACC-03 Resolve duplicate llama-server launcher paths (`scripts/ensure-llama-server.mjs`; file write blocked by a Windows lock).
+- [ ] ACC-04 Reject benchmarks that compare identical artifact digests (`scripts/turboquant/bench-model.mjs`).
+- [ ] ACC-05 Keep Gemma4 E2B, E4B, REAP, VLM and PEFT manifests intact; do not relabel as Ornith.
+- [ ] ACC-06 Record WebGPU tensor head and Eval Gym receipts (PH23-TENSOR-01..04, P23-EDGE-02/03/09/10).
+- [ ] ACC-07 Define redacted Langfuse telemetry and event identity (LF-06, LF-07).
+- [ ] ACC-08 Keep Kafka CDC blocked pending an approved WAL change (KAFKA-05, KAFKA-15).
+- [ ] ACC-09 Prove one live AST, Function Registry and ContextManifest request on `:8095`. Not yet proven.
+- [ ] ACC-10 Refresh Graphify after source validation and validate OpenWiki update evidence. Graph snapshot is stale.
+
+Gate boundaries (from the review):
+- Model identity, adapter compatibility, Kafka transport identity, REAP benchmark identity, AST/Graphify evidence, Function Registry and ContextManifest are separate gates. Passing the chat-model guard does not close any of them.
+- Historical Gemma4 WebGPU E2B, E4B, REAP, HF VLM and PEFT artifacts keep their real identities. The guard should reject obsolete active chat routing, not legitimate experiment references.
+- Vision stays disabled until a GPU relaunch with the `ornith-1.5-vlm` profile and a capability test. An mmproj file alone does not prove multimodal inference.
+
+### TRACE status of open review items (2026-10-15 16:33 UTC; read-only; nothing checked off)
+
+Evidence source: `mcp__trace__trace_system_health` and `mcp__trace__openspec_search` (claim search only, `canonicalAuthority:false`, `evidenceAdmission:false`).
+
+Service state relevant to open items:
+
+| Service | Port | Status | Blocks |
+|---|---|---|---|
+| TRACE MCP gateway | 8788 | ok | none |
+| llama-server (Ornith) | 8090 | ok | none; `/health` only, identity still from `/props` |
+| Bifrost | 3040 | ok | none |
+| PostgreSQL | - | ok | none |
+| Redis | - | ok | none |
+| Qdrant | 6333 | ok | none |
+| Go Retrieval | 8100 | 503 | ACC-09 |
+| Neo4j | 7687 | down (ECONNREFUSED) | ACC-09, graph expansion |
+| Topology search | 8101 | down (no tracked server) | ACC-09 |
+| Reranker | 8099 | down | ACC-09 rerank step |
+| Function Registry | 8095 | not in TRACE health set | ACC-09; not verified |
+
+Open items, with TRACE evidence:
+- LF-06 / ACC-07 (redact Langfuse telemetry): OPEN in ledger. No change found in code. Blocked on operator approval.
+- STOR-01 (SeaweedFS cold storage audit): OPEN in ledger. Related QUEUE-01A (`parent-atlas-candidate-feature-execution-fabric`) is IMPLEMENTED_UNPROVEN; its audit reports legacy MinIO adapters still have active callers and a `.local_storage` fallback in `sveltekit-frontend/src/lib/server/minio/client.ts`. Do not rename or remove the fallback until caller cutover is proven. DEC-384-03 (archive destination for 58,109 populated 384 values) is DECISION_NEEDED.
+- KAFKA-01 / P23-INT-02: OPEN. The WAL census is read-only and not re-run in this pass.
+- KAFKA-05 / KAFKA-15 / ACC-08 / KAFKA-REVIEW-01: OPEN and blocked. Logical WAL needs an approved restart. `parent-atlas-agentic-repair-bundle-integration` T15.0c says CDC must not be a dependency of T15.0.
+- ACC-09 (live AST, Function Registry and ContextManifest request): OPEN. Blocked by Go Retrieval 503, Neo4j down, topology down and reranker down. Not proven in this session.
+- ACC-01 / ACC-03 / ACC-04 / ACC-05 / ACC-06 / ACC-10 and MIG-09 to MIG-21: not searched in this pass; status unchanged from the entries above.
+
+Stop rule: do not mark any item above complete from search hits. A search hit is a claim, not evidence.
+
+### Follow-up verification pass (2026-10-15, read-only; nothing checked off)
+
+Verified directly from files (TRACE `file_read_window`), not from search hits:
+- ACC-04 / MIG-12 still OPEN: `sveltekit-frontend/scripts/turboquant/bench-model.mjs` defaults `BASELINE_MODEL` and `CANDIDATE_MODEL` to the same path, `ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf`. The script does not reject identical digests.
+- ACC-03 / MIG-11 still OPEN: `sveltekit-frontend/scripts/ensure-llama-server.mjs` `MODEL_CANDIDATES` still lists the same Ornith path four times under `models/` and again twice under `vendor/models/`.
+- NEW finding for ACC-05 / MIG-10: `MMPROJ_CANDIDATES` in the same file still includes `models/mmproj-F16.gguf`, `models/mmproj-BF16.gguf` and `vendor/models/mmproj-gemma4.gguf`. These are Gemma projectors. The Ornith projector `mmproj-Ornith-1.5-9B-BF16.gguf` is not in the list. Vision must not be enabled through this loader until the list is fixed and vision is proven at runtime.
+
+Checked for receipts (ACC-06, P23-INT-01, P23-INT-04, P23-INT-05):
+- `docs/reports/` has no file whose name contains `phase23`, `ph23` or `p23`. ACC-06 and P23-INT-01/04/05 remain OPEN with no receipt on disk.
+
+Graphify / OpenWiki (ACC-10):
+- Ledger search reports a read-only Graphify audit with `qualifyingExecutions=0` for the current workspace. That is a claim from the ledger, not a fresh run. No OpenWiki update evidence was found. ACC-10 remains OPEN.
+
+Not checked in this pass: ACC-01 (111-file diff audit) and ACC-05 (Gemma4 E2B/E4B manifest integrity). Both remain OPEN.
+
+### Gap register: what the alignment pass missed (2026-10-15)
+
+Fixed in this pass (syntax-checked or guard-tested only; nothing executed against a live model):
+- [x] GAP-01 bench identity guard. `scripts/turboquant/bench-model.mjs --auto-compare` now throws `BENCH_IDENTICAL_ARTIFACT` when baseline and candidate resolve to the same file, or to two files with the same SHA-256. Verified: default flags stop with that error before any model load.
+- [x] GAP-02 launcher duplicates and projector selection. `scripts/ensure-llama-server.mjs`: `MODEL_CANDIDATES` has one entry per path. `MMPROJ_CANDIDATES` now comes only from `MMPROJ_PATH`, so no Gemma projector is auto-selected and vision stays off by default. Verified: `node --check` passes; not launched.
+- [x] GAP-03 stray `test` line appended to `bench-model.mjs` during a writability check. Removed; the file ends with `}`.
+
+Still missed:
+- [ ] GAP-04 No manifest-driven model registry. `AtlasModelBinding` (role, modelId, backend, endpoint, artifactPath, artifactSha256, tokenizerRevision, adapterRevision, capabilities) does not exist. Model identity is still scattered across constants and scripts.
+- [ ] GAP-05 The guard only bans legacy names. It does not reject forbidden active routing configurations, such as a chat route bound to a non-`:8090` backend, or an active route pointing at a Gemma projector.
+- [ ] GAP-06 ACC-01 (111-file migration diff audit) not done. Semantic substitutions were not reviewed file by file.
+- [ ] GAP-07 Manifest integrity for Gemma4 E2B, E4B, REAP, HF VLM and PEFT entries not verified (ACC-05).
+- [ ] GAP-08 Live `:8090` identity is confirmed only from `/props`. No request-level receipt with model, backend and digest.
+- [ ] GAP-09 Three test failures were labelled "predates this work" without checking HEAD: `langgraph-optionalization` (one test), `rag/search` (307 vs 200), and `parent-atlas-workstation` (timeout in the combined run). Re-run each against HEAD before keeping that label.
+- [ ] GAP-10 Agent hook error `PreToolUse:Bash ... Unknown command: hook` appeared in tool output. Not diagnosed; it is a harness configuration issue, not inference.
+- [ ] GAP-11 Graphify snapshot is stale and was not refreshed. OpenWiki was not updated. (ACC-10)
+- [ ] GAP-12 `docker/langfuse.yml` is a stale parallel definition of the Langfuse stack. Decide: archive it, or align it to the root `docker-compose.yml`.
+- [ ] GAP-13 `scripts/unify-models.mjs` is a no-op after the sweep (maps Ornith to Ornith). Archive it or remove the mapping.
+- [ ] GAP-14 `docs/INFERENCE_INFRASTRUCTURE.md` (`scripts/INFERENCE_INFRASTRUCTURE.md`) still describes an Ollama VLM fallback (MIG-13).
+- [ ] GAP-15 Kafka WAL "send and receive" not built (KAFKA-REVIEW-01). Expected; needs its own approval gate.
+- [ ] GAP-16 Langfuse telemetry redaction (LF-06, ACC-07) not done.
+- [ ] GAP-17 Live ContextManifest request (ACC-09) not proven. Go Retrieval returns 503, Neo4j and topology are down, and the reranker is down (TRACE health).
+
+### Model registry (2026-10-15)
+
+Owner: the existing `sveltekit-frontend/src/lib/server/models/model-registry.ts` (`MODEL_REGISTRY`). Extended, not duplicated.
+
+Done (verified by spec run):
+- [x] REG-01 `AtlasModelBinding` type and `ATLAS_MODEL_BINDINGS` list added to `model-registry.ts`: role, modelId, backend, endpoint, artifactPath, artifactSha256, tokenizerRevision, adapterRevision, enabled, capabilities.
+- [x] REG-02 `getActiveChatBinding()` throws unless exactly one enabled chat binding exists and it is `llama-server` at `http://127.0.0.1:8090/v1`.
+- [x] REG-03 Vision binding (`ornith-1.5-9b` mmproj, sha256 from the manifest) is `enabled: false` on `llama-server`. The old Gemma4 `transformers` vision entry is gone.
+- [x] REG-04 `SERVER_GEMMA4_MODEL` restored to the legacy tag `gemma4:e4b-it-q4_K_M`. The sweep had set it to `ornith-1.5-9b`, which collided with the chat key in the model-card map in `src/lib/ai/model-ids.ts`. Disabled in the registry.
+- [x] REG-05 `artifactSha256` for the chat weights is `null`. The manifest records no digest for `hforf.gguf`, and none was computed.
+- [x] REG-06 Spec: `model-registry.spec.ts` gained 5 tests (one chat binding on `:8090`, vision disabled, no enabled non-llama-server chat, legacy Gemma4 disabled and distinct, no unverified digest). Result: 9 of 9 pass in that file, and the chat-model guard passes 3 of 3.
+- [x] REG-07 `tests/openai-facade.spec.ts` exit status 0 after the `model-ids` change.
+
+Still needed:
+- [ ] REG-08 Fill `artifactSha256` for `hforf.gguf` by hashing the file, and record it. Requires a read of the 5 GB weight file.
+- [ ] REG-09 Route callers through `getActiveChatBinding()` instead of the constants. Callers still read `SERVER_CHAT_MODEL` directly.
+- [ ] REG-10 Add a guard for forbidden active routing (GAP-05), using the binding list rather than string bans.
+- [ ] REG-11 Replace the test-only model-card map collision check with an explicit uniqueness test over `(role, modelId)`.
+- [ ] REG-12 Move the `import` in `model-registry.spec.ts` to the top of the file (currently appended after the first describe block; valid, but untidy).
+- [ ] REG-13 Live check: `GET :8090/v1/models` and `/props` return the `chat` binding's `modelId` before any route trusts it (GAP-08).
+
+### Implementation audit of docs/master_feature_todo_1011.md (2026-10-15; read-only; nothing promoted)
+
+Claims checked directly against disk or live endpoints:
+- [x] AUD-01 Phase 23 edge artifact: roadmap says `static/models/gemma4-e2b/model.litertlm` is MODEL_MISSING. Confirmed: directory absent; `scripts/phase23-edge-status.mjs` reports the same. Mismatch: the WebGPU model in use is an ONNX bundle at `sveltekit-frontend/static/gemma4_e2b_onnx/` (config, `download.sh`, decoder and embedding graphs). The status script checks LiteRT only, so it cannot report the WebGPU model. Decision needed: add an ONNX check to the status script, or keep LiteRT as the only Phase 23 lane.
+- [x] AUD-02 Phase 23 eval gym, artifact integrity, cache identity and agent repair source files exist (`src/lib/ai/edge/phase23-*.ts`). Existence only. Roadmap itself says "run against a real artifact", which has not happened.
+- [x] AUD-03 Registry chat digest recorded (REG-08): `a9a8d6d859b540502f57c53ef78a4a608df818061b180022a32b9af46698d5c6`, computed with `sha256sum` (42 s). Registry spec 9/9 and chat guard 3/3 after the change.
+- [x] AUD-04 `:8098` health returns 200, CUDA available on RTX 3060 Ti, `executionOnly: true`, no writes. Health has no `resident` field, so the roadmap's `resident=null` claim is NOT verified here. `torchAvailable: false` is consistent with "WSL has PyTorch, service does not use it".
+- [~] AUD-05 `:8095` returns 200 and reports `model: ornith-1.5-9b`, `torch: false`. Not verified: that the sidecar calls `:8090` for any LLM work. Treat the model field as a claim until a request receipt shows it.
+- [~] AUD-06 ContextManifest: code exists in several server files (`ace-context-pack-cache.ts`, `openai-facade.ts`, `unified-residency-ace-bridge-v1.ts`, `context-manifest-traversal-adapter-v1.ts`). No live request run. Still NOT_PROVEN (matches ACC-09).
+
+Not checked: the 2026-10-11 test log (Viterbi, telemetry, operator token, repair contract). Its suites were not re-run here.
+Roadmap register labels for Phases 19–22 remain NAMESPACE_CONFLICT. Not resolved by this audit; each needs an owner decision.
+
+### Phase 1–10 audit of the proposed master pipeline (2026-10-15; read-only; nothing promoted)
+
+Verdicts use the exit gates in `docs/master_feature_todo_1011.md` (proposed pipeline). Probes are one read-only check per phase.
+
+| Phase | Verdict | Evidence (probe, result) |
+|---|---|---|
+| 1 Source bytes and workspace snapshot | PARTIAL | `workspaceRevision` code in `packages/semantic-contracts/src/`; receipts exist under `docs/reports/`. The v2 hardening (digest of skipped and oversized files) has no code match. Known gap stands. |
+| 2 Tree-sitter / AST-grep parse | PARTIAL | `tree-sitter` is a dependency in `sveltekit-frontend/package.json`. The script named in older notes, `scripts/atlas/lib/ast-grep-symbol-extraction.mjs`, does not exist. Producer needs locating before a receipt can be checked. |
+| 3 Packet and chunk identity binding | PARTIAL (packets only) | `atlas_packets`: 61,718 rows, 0 null `source_ref`, 61,718 distinct `source_ref`, 61,718 distinct `packet_key`. Chunk-to-packet binding not probed. |
+| 4 `.okf` vocabulary and proposals | PARTIAL | `docs/.okf/schema.yaml` exists. No validator run in this pass; roadmap says the index is incomplete. |
+| 5 Canonical `semantic_768` with revisions | FAILS exit gate | `codebase_chunk_index`: 219,998 rows with `content_embedding_768`; all 219,998 have `source_revision` NULL. The gate requires immutable input and source revisions. |
+| 6 Projections and indexes at parity | FAILS parity | Qdrant `codebase_chunks_768_v2`: 52,816 points, against 219,998 embedded chunks in Postgres. Parity is only shown for the 15-candidate canary (roadmap). |
+| 7 Retrieval, dedupe, ranking | NOT PROBED | Needs a live query and a deterministic Top-K receipt. |
+| 8 Graph snapshot and bounded traversal | FAILS freshness | `docs/graph/codebase-graph.json` last modified 2026-08-30. Stale, as the roadmap states. |
+| 9 ContextManifest admission and cache | NOT_PROVEN | Code exists; no live request. Same as ACC-09. |
+| 10 Governed agent execution | GATE INACTIVE | `DispatcherMiddleware` enforces the operator-token check only when a registry is passed. The only production construction (`src/mcp/trace-mcp-server.ts:622`) passes none, so `ops.*` tools run without the check. Roadmap "not wired" is correct. |
+
+Gaps to add as work items (not started here):
+- P5-GAP: populate `source_revision` for the 219,998 `semantic_768` rows from a verified source cohort. Do not backfill from file mtimes or guesses.
+- P6-GAP: reconcile Qdrant `codebase_chunks_768_v2` (52,816) to Postgres (219,998) before any cutover.
+- P8-GAP: refresh `codebase-graph.json` from a verified source revision, then run the CPU oracle.
+- P10-GAP: pass a real operator-token registry in production construction, and add a test that fails when `ops.*` runs unchecked.
+- P1-GAP: implement the workspaceRevision v2 digest for skipped and oversized files.
+
+### Gap to-do board in PostgreSQL (2026-10-15)
+
+Tracked in the existing `kanban_tasks` table (PostgreSQL 18.4, `legal-ai-postgres`, database `legal_ai_db`). No DDL was run; the table was empty before and its schema already fits. Progress events go to `kanban_task_events`.
+
+- [x] BOARD-01 21 rows inserted: 15 `todo` gaps (priorities 30–95), 1 `blocked` (KAFKA), 5 `done` items with evidence in the validation command. Idempotent: `ON CONFLICT (task_id) DO NOTHING`.
+- [x] BOARD-02 Proof runs recorded as `proof_run` events:
+  - GAP-P5: 219,998 embedded chunks, all with NULL `source_revision`.
+  - GAP-P6: Qdrant `codebase_chunks_768_v2` 52,816 points against 219,998 embedded chunks in Postgres; `parity: false`.
+- [ ] BOARD-03 Run the remaining validation commands (P1, P2, P3, P7, P8, P9, LIVE8090, TESTS, PHASE23, LF06, STOR01, REG09, P10) and record each as a `proof_run` event.
+- [ ] BOARD-04 Move a row to `done` only with a `proof_run` event that cites a receipt.
+
+Retrieve the board:
+```sql
+select task_id, status, priority, feature_label from kanban_tasks order by priority desc, task_id;
+select task_id, event_type, payload, created_at from kanban_task_events where task_id like 'GAP-%' order by created_at desc;
+```
+
+### Board pass 2 (2026-10-15, read-only probes; events in kanban_task_events, run_id proof-2026-10-15)
+
+Recorded results (11 proof events total in this run, including the earlier P5 and P6):
+- GAP-LIVE8090: identity PASS (`/v1/models` and `/props` both `ornith-1.5-9b`, `vision:false`). Stays `pending`: the task requires a saved request receipt, which this probe did not produce.
+- GAP-P3: 22,664 of 61,718 packets (36.7%) have a chunk with a matching `source_ref`. PARTIAL.
+- GAP-P2: four candidate producer files found; owner not confirmed. OWNER_NOT_CONFIRMED.
+- GAP-P8: graph snapshot mtime 2026-08-30. STALE.
+- GAP-PHASE23: edge status still reports MODEL_MISSING for the LiteRT path. OPEN.
+- GAP-LF06: 4 literal secret lines remain in `docker-compose.yml`. OPEN.
+- GAP-REG09: 36 non-spec files read `SERVER_CHAT_MODEL` directly. OPEN.
+- GAP-P10: production dispatcher still constructed without an operator-token registry. GATE_INACTIVE.
+- GAP-P9: Go Retrieval `:8100` returns 503. BLOCKED; the task is `blocked`.
+
+Not run in this pass: GAP-P1 (workspaceRevision v2 receipt), GAP-P7 (Top-K receipt), GAP-TESTS (clean-HEAD triage, heavy), GAP-STOR01 (storage manifest), and GAP-KAFKA (blocked by approval). These stay as listed on the board.
+
+Board now: 5 done, 15 pending, 1 blocked.
+
+### Board pass 3 (2026-10-15): P10 gate fixed, P9 unblocked
+
+- [x] GAP-P10 Operator gate fails closed. `sveltekit-frontend/src/mcp/dispatcher-middleware.ts`: an `ops.*` tool is denied with `NO_OPERATOR_TOKEN_REGISTRY` when no registry is passed or it is empty. Production still passes none, so `ops.*` tools are refused in production until an operator provisions a registry. Proof: `dispatcher-read-only.spec.ts` 4/4 (two new tests); the five-file dispatcher, shell-boundary, operator-token, langgraph and operator-tools run exited 0. Event `code_change` recorded.
+  - Behaviour change: any caller that used `ops.*` tools without a registry now gets a refusal. That is the intended fail-closed state; say if an operator wants a registry file provisioned instead.
+- [ ] GAP-P9 Go Retrieval `:8100` was unhealthy because its required `embedding_service` was down. Started the stopped `legal-ai-go-embedding` container; `:8100` now reports `READY_FULL`. P9 stays pending until one live ContextManifest request returns a receipt.
+- [ ] GAP-EMB-GPU New: `:8097` reports `device: "cpu"` while its container sets `EMBEDDING_REQUIRE_GPU=true`. Decide whether the GPU requirement is real, then fix the device or the setting.
+
+Board: 6 done, 16 pending, 1 blocked. Events for this pass use `run_id` `proof-2026-10-15`.
+
+### Board pass 4 (2026-10-15): writer map and secret inventory (read-only)
+
+- [x] GAP-P5 writers located (not yet fixed):
+  - `routes/api/codebase-index/index-stream/+server.ts`: INSERT into `codebase_chunk_index`
+  - `scripts/batch-upsert-codeintel.mjs`: INSERT
+  - `scripts/mirror-qdrant-to-postgres.ts`: INSERT copied from Qdrant, which can introduce unverified rows
+  - `scripts/atlas/backfill-codebase-chunk-embeddings.mjs`: sets `content_embedding_768`
+  - `scripts/atlas/apply-lineage-qualified-semantic-768-backfill-v1.mjs`: sets `content_embedding_768`, but not `source_revision`
+- Finding: the apply receipt `docs/reports/lineage-qualified-semantic-768-backfill-apply-v1.json` reports `SEMANTIC_768_BACKFILL_AND_PROJECTION_PROVEN` for 15 rows. That proves the embedding write. It does not prove lineage, because no UPDATE found sets `source_revision`. The 219,998 NULL revisions remain. Do not backfill revisions from file times or guesses.
+- [ ] GAP-LF06 secret inventory (masked; no value printed here). Literal lines in `docker-compose.yml`: `SALT`, `ENCRYPTION_KEY`, `NEXTAUTH_SECRET`, `LANGFUSE_INIT_PROJECT_SECRET_KEY`, `LANGFUSE_INIT_USER_PASSWORD`, `DATABASE_URL` literals in 5 services, and a `POSTGRES_PASSWORD` default of `123456`. Replacing them with `.env` references is a config change. Rotating them needs operator approval; rotation breaks running services until restarted.
+
+### Daily Graphify kanban count (2026-10-15)
+
+- [x] KANBAN-01 Counted the claimed ">1k" tasks. The Postgres board `kanban_tasks` has 22 rows, all of them ours. The file feed `sveltekit-frontend/.tmp/kanban_tasks.jsonl` has 3,313 lines but only 143 distinct task IDs, with every status `todo` except one. Its mtime is 2026-06-23, so it is stale and not the current daily output. The ">1k" is duplicate lines, not tasks.
+- [x] KANBAN-02 Why the daily writer never reached Postgres: `sveltekit-frontend/scripts/agents/repair-loop.ts` `upsertTaskCard` inserts `id`, `title`, `payload`, which the live `kanban_tasks` lacks (`task_id`, `feature_label`, `lane`, and so on). The error is caught and logged as "table may not exist", so the failure is silent.
+- [ ] KANBAN-03 Decide the writer contract. Options: (a) map card fields to existing columns (`task_id`, `feature_label`, `lane`, `status`, `validation_command`) and store the rest in `kanban_task_events.payload`, no DDL; (b) add a `payload` column, which is DDL and needs approval. Only after that should the daily run write, with deduplication on `task_id`.
+- [ ] KANBAN-04 Dedupe the file feed to one row per `task_id` before any import, keeping the latest `line_number`.
+
+### Kanban mapping, migration, and cache policy (2026-10-15)
+
+- [x] KANBAN-03 Option 1 chosen and applied: `repair-loop.ts` maps to live columns, no DDL. Snapshot in `kanban_task_events`. Not executed; needs a dry run before the daily job uses it.
+- [x] KANBAN-05 Migrated 143 deduped feed tasks into `kanban_tasks` (pending). Board now: 159 todo pending, 1 blocked, 6 done lane-done, plus the file-feed rows.
+- [ ] KANBAN-06 No index added. Per the decision file, index DDL needs approval. 143 rows do not justify one.
+- [x] CACHE-01 Valkey `maxmemory-policy` `noeviction` to `volatile-lru` (runtime only; not persisted).
+- [x] CACHE-02 Centroid TTL 7 days in `ace/code-intel-service.ts`.
+- [ ] CACHE-03 Persist the Valkey policy: `CONFIG REWRITE` or the Valkey config file. Not done; a restart reverts it.
+- [ ] GRAPH-01 Daily Graphify not run. `graphify:validate` requires SAFE_TO_PROJECT; admission is not confirmed.
+- [x] REFUSED BitFrost token inference KV cache persisted to Valkey: conflicts with AGENTS.md (no kv_cache or hidden thoughts in any store).
+
+### Integration alignment sweep (2026-10-15, read-only)
+
+- [x] INT-01 Health, HTTP status at check time: Langfuse :3030 200; llama-server :8090 200; Bifrost :3040 200; Qdrant :6333 200; embedding :8097 200; sidecar :8095 200; GPU :8098 200; Go Retrieval :8100 200; TRACE MCP :8788 200.
+- [x] INT-02 Containers healthy: legal-ai-postgres, legal-ai-valkey, legal-ai-go-retrieval, legal-ai-go-embedding (started 2026-10-15), langfuse-server, langfuse-clickhouse. langfuse-worker up without a health check.
+- [x] INT-03 Board: `kanban_tasks` 166 rows: 6 done, 160 pending (the blocked Kafka item is pending with lane `blocked`).
+- [ ] INT-04 Not verified in this sweep: `embedding` reports CPU (GAP-EMB-GPU); a live ContextManifest request (GAP-P9); the repair-loop writer dry run; the Valkey policy persistence (CACHE-03).
+- Not run: `graphify:daily` (admission gate not confirmed).
+
+### LangExtract and :8095 alignment (2026-10-15, read-only)
+
+- [x] LX-01 `:8095` health: status ok, LangExtract capability true, label `model: ornith-1.5-9b`. The label does not prove the sidecar calls `:8090`.
+- [ ] LX-02 `python/langextract_ollama.py` `call_ollama` posts to Ollama `:11434` (`OLLAMA_URL` default). Its `DEFAULT_MODEL` is already `ornith-1.5-9b`, so the model name and the endpoint disagree. Chat must go through llama-server `:8090` `/v1/chat/completions`. Fix: change the endpoint and keep the Ornith alias. Not started.
+- [ ] LX-03 `python/langextract_service.py` `model_id` default and `scripts/langextract/langextract-gemma4-bridge.py` still name Gemma4 identities. Audit before changing: they may be historical bridges.
+
+- [x] LX-02 wired: `python/langextract_ollama.py` `call_ollama` now posts to llama-server `LLAMA_SERVER_URL` (default `http://127.0.0.1:8090/v1`) `/chat/completions` with the Ornith alias. Compiles (`py_compile`). Runtime probe against `:8090` with the same extraction prompt returned a parseable JSON array (`PARSED_ARRAY: True`). The `:8095` service has not been restarted, so the live service path is still unverified.
+- [ ] LX-04 Health response field `ollama_url` still carries the Ollama base URL. It is no longer a chat backend. Rename or relabel the schema field deliberately, since consumers may read it.
+
+### Finish-open status (2026-10-15, end of session; context nearly exhausted)
+
+- CORRECTION to LX-02: the process listening on `:8095` is not `python/langextract_ollama.py`. Per `CLAUDE.md` it is the miniforge NLP sidecar (`miniforge_nlp_sidecar_v2.py`). `langextract_ollama.py` runs as its own service on a port not yet identified. So the LX-02 probe verified the endpoint and request shape, not the `:8095` service. Live verification of `langextract_ollama.py` still needs its port and launcher.
+- Open, not done this session: LX-03 (Gemma4-named LangExtract scripts), LX-04 (`ollama_url` health field), GAP-P9 (live ContextManifest request), GAP-EMB-GPU, CACHE-03 (persist Valkey policy), KANBAN-04 (feed dedupe is done in the migration; keep as checked only if the migration is accepted), GRAPH-01 (daily Graphify, admission gate), KANBAN-GRAPHIFY-CROSSWALK-01 (reconciliation of the Graphify task set), GAP-LF06 (secret rotation, needs approval), STOR-01, and the Phase 11–23 audits.
+
+- [x] LX-05 Schema restored. My first rewrite dropped the Ollama `format` JSON schema, which enforced an array of objects with required `type` and `text`. `call_ollama` now sends an OpenAI-style `response_format` `json_schema` with the same array schema. Verified on `:8090`: the output parses as an array and every item has `type` and `text`. `keep_alive` was dropped on purpose because it is Ollama-only. `py_compile` passes.
+- [x] LX-04 Fixed. The health response field `ollama_url` is renamed `llama_server_url`, populated from `LLAMA_SERVER_URL`. No other code reads that field (checked by search). `py_compile` passes.
+
+### LangExtract live verification (2026-10-15)
+
+- [x] LX-06 Port collision fixed. `langextract_ollama.py` defaulted to port 8095, which is the production miniforge NLP sidecar. Default is now 8101 (`LANGEXTRACT_PORT` overrides). Bind is `0.0.0.0` inside the container.
+- [x] LX-07 Live: started from the sidecar image (`deeds-miniforge-nlp-sidecar:latest`) as container `langextract-8101`, `python/` mounted read-only, host publish `127.0.0.1:8101`, `LLAMA_SERVER_URL=http://host.docker.internal:8090/v1`. `GET /health` returns 200 with `llama_server_url` set to `:8090`. `POST /extract` on a legal sentence returns 4 typed extractions (PARTY, LOCATION, DATE), model `ornith-1.5-9b`, HTTP 200.
+- Note: the host Python lacks `httpx`, `fastapi` and `uvicorn`. I did not install them; the service runs from the container.
+- Not verified: `/extract/file`, `/cache/stats`, and whether the sidecar on `:8095` uses `:8090` for its own LLM calls.
+
+## SESSION STATUS 2026-10-15 (read this first)
+
+### Verified this session (evidence on disk or live)
+- Ornith chat identity on `:8090`: `/v1/models` and `/props` report `ornith-1.5-9b`, vision off. Identity only; no request receipt yet.
+- `hforf.gguf` sha256 `a9a8d6d859b540502f57c53ef78a4a608df818061b180022a32b9af46698d5c6`, recorded in the model registry (`src/lib/server/models/model-registry.ts`).
+- Model registry: `ATLAS_MODEL_BINDINGS` plus `getActiveChatBinding()`. Registry spec 9/9; chat guard 3/3.
+- Langfuse: stack healthy; trace round-trip 201 then 200.
+- Operator-token gate: `ops.*` denied without a registry (`NO_OPERATOR_TOKEN_REGISTRY`); dispatcher spec 4/4.
+- Valkey: runtime `maxmemory-policy` `volatile-lru` (not persisted); centroid TTL 604800 s in `code-intel-service.ts`.
+- Kanban: `kanban_tasks` has 166 rows, with 143 migrated from the file feed. Writer mapping in `repair-loop.ts` written but NOT executed.
+- LangExtract: service on `:8101` (container `langextract-8101`); `/health` 200; `/extract` returns typed extractions from `:8090`.
+- Integration sweep: all listed services return 200 at check time.
+
+### Done in code, not verified at runtime
+- `repair-loop.ts` writer mapping (never executed).
+- `bench-model.mjs` identity guard (guard path verified only by default flags).
+- `ensure-llama-server.mjs` candidate lists (syntax only; not launched).
+
+### Open (priority order)
+1. Decide and run a dry run of the `repair-loop.ts` writer before the daily job uses it (KANBAN-03/04).
+2. Live ContextManifest request through Go Retrieval with a receipt (GAP-P9). Go Retrieval is healthy; the request has not run.
+3. Audit Gemma4-named LangExtract scripts (LX-03): `langextract_service.py`, `scripts/langextract/langextract-gemma4-bridge.py`.
+4. Verify whether the `:8095` sidecar uses `:8090` for its own LLM calls.
+5. Embedding service reports `device: cpu` while `EMBEDDING_REQUIRE_GPU=true` (GAP-EMB-GPU). Decide the requirement, then fix.
+6. Persist the Valkey eviction policy (CACHE-03). Currently reverts on restart.
+7. Daily Graphify: held. Validator requires `SAFE_TO_PROJECT`; admission not confirmed.
+8. Graphify task reconciliation (KANBAN-GRAPHIFY-CROSSWALK-01). Counts: consolidation report 6,889 raw inputs, 6,747 unique, 6,725 scoped; board 122 tasks.
+9. Phase 11–23 audits, in bounded batches.
+
+### Decisions needed from the operator
+- Rotate Compose secrets (GAP-LF06). Rotation restarts services.
+- Source authority for the 219,998 `semantic_768` rows with NULL `source_revision` (P5). The lineage backfill's PROVEN receipt covers embeddings only.
+- Provision an operator-token registry, or keep `ops.*` refused in production.
+- Embedding GPU requirement: keep or drop.
+- Approve or refuse the BitFrost KV-cache-in-Valkey request. AGENTS.md forbids it.
+- Approve index or column DDL (none created).
+
+### Refused
+- Persisting BitFrost token inference KV cache to Valkey (conflicts with AGENTS.md).
+
+### Not done
+- TENSOR-IO-02 gates (pasted review, not started).
+- Phase 11–23 audits.
+- Kanban learning ranker (not started; needs historical outcomes first).

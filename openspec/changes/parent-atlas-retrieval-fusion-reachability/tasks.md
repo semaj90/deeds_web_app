@@ -1883,9 +1883,10 @@ Next gate: reviewer completion and sealed judgment-set validation.
 - [x] Reran the live-caller identity-envelope audit in read-only mode.
 - [x] Confirmed the route is reachable, but all `20/20` sampled callers lack
   the complete revision envelope.
-- [ ] Bind the existing RRF callers to canonical source/workspace/
+- [ ] [workstation-p15] Bind the existing RRF callers to canonical source/workspace/
   representation revisions through the current SearchRuntime owner; do not
-  create a second fusion or identity owner.
+  create a second fusion or identity owner. Defer creating or persisting revision
+  fields until after workstation P20; missing identity continues to fail closed.
 
 Status: `IDENTITY_ENVELOPE_PARTIAL`; `authority=false`; `writesPerformed=false`.
 Evidence: `docs/reports/rrf-real-caller-identity-envelope-v1.json`.

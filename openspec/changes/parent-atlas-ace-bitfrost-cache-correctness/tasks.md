@@ -87,9 +87,10 @@
   The facade seam regression now passes 15/15; combined cache-key/facade coverage
   passes 29/29.
 
-- [ ] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,
+- [ ] [workstation-p14] CACHE-PREFILL-01 audit the existing Ornith query-synthesis/prompt-build path,
   then bind its exact cache identity to ContextManifestV2.identityChecksum,
-  modelRevision, chatTemplateRevision, toolSchemaRevision, promptTemplateRevision.
+  modelRevision, chatTemplateRevision, toolSchemaRevision, promptTemplateRevision. Audit is read-only;
+  creation/persistence of new revision fields remains deferred until after workstation P20.
   Include exact rendered request/prompt and generation parameters where output reuse
   depends on them; a manifest alone does not cover a changed user question.
   Use canonical structured serialization, not ambiguous string concatenation.

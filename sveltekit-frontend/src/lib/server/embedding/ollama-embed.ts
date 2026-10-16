@@ -24,7 +24,7 @@ import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { countTokens } from '$lib/server/llm/token-budget.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/vector/embedding-dimension-guard.js';
 import {
   type EmbeddingProvider,
@@ -233,7 +233,7 @@ export async function tryEmbed(
           };
 
           const response =
-            provider === 'ollama' ? await ollamaFetch(candidate.url, request) : await fetch(candidate.url, request);
+            provider === 'ollama' ? await embedOrChatFetch(candidate.url, request) : await fetch(candidate.url, request);
 
           const raw = await response.text();
 

@@ -10,7 +10,7 @@ describe('isVlmOrMmprojRequestModel', () => {
   });
 
   it('leaves text-only models alone', () => {
-    expect(isVlmOrMmprojRequestModel('gemma4-rotorquant:latest')).toBe(false);
+    expect(isVlmOrMmprojRequestModel('ornith-1.5-9b')).toBe(false);
     expect(isVlmOrMmprojRequestModel('embeddinggemma:latest')).toBe(false);
   });
 });

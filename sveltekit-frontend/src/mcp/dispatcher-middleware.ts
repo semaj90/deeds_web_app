@@ -181,6 +181,12 @@ export class DispatcherMiddleware {
       }
 
       const isOperatorGated = options?.operatorGated ?? toolName.startsWith('ops.');
+      // Fail closed: an operator-gated tool with no provisioned token registry is denied, never allowed.
+      if (isOperatorGated && (this.operatorTokenRegistry === null || this.operatorTokenRegistry.length === 0)) {
+        throw new Error(
+          `SECURITY_VIOLATION: Operator token gate denied execution of '${toolName}': NO_OPERATOR_TOKEN_REGISTRY`
+        );
+      }
       if (isOperatorGated && this.operatorTokenRegistry !== null) {
         const presentedToken =
           typeof input === 'object' && input !== null

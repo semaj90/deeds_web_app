@@ -1,0 +1,347 @@
+{
+  "generated_at": "2026-10-15T19:57:30.420Z",
+  "status": "WARN",
+  "query": "Explain the Parent Atlas retrieval pipeline",
+  "rule": "LIVE_PASS means real service, real port, real data. Fallbacks and warnings are visible, not green.",
+  "lanes": {
+    "embeddinggemma": {
+      "status": "LIVE_PASS",
+      "url": "http://localhost:11434",
+      "model": "embeddinggemma:latest",
+      "dimension": 768,
+      "duration_ms": 367
+    },
+    "qdrant": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:6333",
+      "collection": "codebase_chunks_768",
+      "vector_name": "content",
+      "hits": 10,
+      "identity_hits": 10,
+      "duration_ms": 139
+    },
+    "postgres_pgvector": {
+      "status": "LIVE_PASS",
+      "table": "codebase_chunk_index",
+      "column": "content_embedding_768",
+      "index": "idx_codebase_chunk_content_embedding_768_hnsw",
+      "hits": 10,
+      "duration_ms": 49
+    },
+    "turbovec_grpc": {
+      "status": "LIVE_PASS",
+      "grpc_url": "127.0.0.1:50062",
+      "transport": "grpc",
+      "backend": "bridge:py(python)+addon(cuda)",
+      "in_dim": 768,
+      "out_dim": 64,
+      "duration_ms": 421
+    },
+    "go_retrieval": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8100",
+      "endpoint": "/search/codebase",
+      "query_used": "Explain the Parent Atlas retrieval pipeline",
+      "results": 4,
+      "total_ms": 18,
+      "duration_ms": 32
+    },
+    "postgres_truth_join": {
+      "status": "LIVE_PASS",
+      "table": "atlas_packets",
+      "packet_keys_in": 14,
+      "source_refs_in": 14,
+      "rows": 6,
+      "identity_rows": 6,
+      "duration_ms": 30
+    },
+    "langextract": {
+      "status": "LIVE_PASS",
+      "url": "http://127.0.0.1:8095",
+      "entities": 4,
+      "structure_keys": 5,
+      "duration_ms": 78
+    },
+    "ornith_synthesis": {
+      "status": "WARN",
+      "url": "http://127.0.0.1:8090/v1",
+      "model": "ornith-1.5-9b",
+      "reasoning_leak_stripped": true,
+      "json_parsed": true,
+      "output_chars": 2411,
+      "citation_verification": {
+        "status": "PARTIAL_UNGROUNDED",
+        "admittedCount": 4,
+        "raw_citations": [
+          {
+            "evidence_id": "ev_ea563b42c0b22fd5",
+            "source_revision": "sha256:99a8c740439a2992ac06aa804b5cee283e7a1dca3fec3565ef555b048e0cff61",
+            "start_byte": 0,
+            "end_byte": 18232
+          },
+          {
+            "evidence_id": "ev_5e4895ea8128b33b",
+            "source_revision": "sha256:d94d32587b09ad859e25dc9a4ced6351892d8227b3ee76f68a68d363616671da",
+            "start_byte": 0,
+            "end_byte": 12450
+          },
+          {
+            "evidence_id": "ev_23ab39e21b3e7528",
+            "source_revision": "sha256:4b816bcceb0592cd2a3d913e338ac3eec6a13f97e9ab1970db5f43d323f32cb9",
+            "start_byte": 0,
+            "end_byte": 13128
+          },
+          {
+            "evidence_id": "ev_58e83f2893247cfc",
+            "source_revision": "sha256:ae6860037f5ea18ceba7a992433ba4d29fd3da67d52d37287f804832616a5c",
+            "start_byte": 0,
+            "end_byte": 4226
+          }
+        ],
+        "accepted": [
+          {
+            "evidence_id": "ev_ea563b42c0b22fd5",
+            "source_ref": "src/lib/server/atlas/context-for-file.ts",
+            "source_revision": "sha256:99a8c740439a2992ac06aa804b5cee283e7a1dca3fec3565ef555b048e0cff61",
+            "start_byte": 0,
+            "end_byte": 18232
+          },
+          {
+            "evidence_id": "ev_5e4895ea8128b33b",
+            "source_ref": "docs/PARENT-ATLAS-IDENTITY-RECONCILIATION.md",
+            "source_revision": "sha256:d94d32587b09ad859e25dc9a4ced6351892d8227b3ee76f68a68d363616671da",
+            "start_byte": 0,
+            "end_byte": 12450
+          },
+          {
+            "evidence_id": "ev_23ab39e21b3e7528",
+            "source_ref": "scripts/atlas/query-parent-atlas-packets.mjs",
+            "source_revision": "sha256:4b816bcceb0592cd2a3d913e338ac3eec6a13f97e9ab1970db5f43d323f32cb9",
+            "start_byte": 0,
+            "end_byte": 13128
+          }
+        ],
+        "rejected": [
+          {
+            "citation": {
+              "evidence_id": "ev_58e83f2893247cfc",
+              "source_revision": "sha256:ae6860037f5ea18ceba7a992433ba4d29fd3da67d52d37287f804832616a5c",
+              "start_byte": 0,
+              "end_byte": 4226
+            },
+            "reason": "REVISION_MISMATCH"
+          }
+        ]
+      },
+      "cited_source_refs": 4,
+      "accepted_source_refs": 3,
+      "rejected_source_refs": [
+        {
+          "citation": {
+            "evidence_id": "ev_58e83f2893247cfc",
+            "source_revision": "sha256:ae6860037f5ea18ceba7a992433ba4d29fd3da67d52d37287f804832616a5c",
+            "start_byte": 0,
+            "end_byte": 4226
+          },
+          "reason": "REVISION_MISMATCH"
+        }
+      ],
+      "duration_ms": 19268
+    }
+  },
+  "candidates": {
+    "qdrant": [
+      {
+        "id": "aa5c43e4-1a14-4ded-ab64-5ba363a9d3d5",
+        "score": 0.53974724,
+        "packet_key": "aa5c43e4-1a14-4ded-ab64-5ba363a9d3d5",
+        "source_ref": "scripts/atlas/generate_parent_atlas_packets.mjs",
+        "feature_id": "scripts-atlas-generate_parent_atlas_packets.mjs-generate_parent_atlas_packets",
+        "feature_label": null
+      },
+      {
+        "id": "82e90f29-61fb-4aba-8f99-5ca84a7d8539",
+        "score": 0.5391674,
+        "packet_key": "82e90f29-61fb-4aba-8f99-5ca84a7d8539",
+        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/parent-atlas-bridge.ts",
+        "feature_id": "sveltekit-frontend-src-lib-server-retrieval-parent-atlas-bridge.ts-parent-atlas-bridge",
+        "feature_label": null
+      },
+      {
+        "id": "18505eb2-7eee-4073-9905-d47535eb0145",
+        "score": 0.52088165,
+        "packet_key": "18505eb2-7eee-4073-9905-d47535eb0145",
+        "source_ref": "sveltekit-frontend/docs/reports/parents_atlas_dashboard_report.md",
+        "feature_id": "sveltekit-frontend-docs-reports-parents_atlas_dashboard_report.md-parents_atlas_dashboard_report",
+        "feature_label": null
+      },
+      {
+        "id": "dacb6130-4a75-4d9e-a0af-e0e9abd4898c",
+        "score": 0.50982666,
+        "packet_key": "packet:9db885981ced",
+        "source_ref": "docs/PARENT-ATLAS-IDENTITY-RECONCILIATION.md",
+        "feature_id": "docs.PARENT-ATLAS-IDENTITY-RECONCILIATION",
+        "feature_label": "PARENT-ATLAS-IDENTITY-RECONCILIATION.md"
+      }
+    ],
+    "postgres_pgvector": [
+      {
+        "id": "c0c29392-9289-4364-a5a0-f3a25b673084",
+        "qdrant_id": "d93c7c76-5a2c-4d32-a41d-9cdb21534df3",
+        "score": 0.499456469307775,
+        "source_ref": "scripts/sql/parent_atlas_join.sql",
+        "symbol": null,
+        "kind": null,
+        "line_start": 12,
+        "line_end": 29
+      },
+      {
+        "id": "d90258c3-187c-43a4-8b11-1b63aebb2030",
+        "qdrant_id": "9e3aa920-4f1a-4291-a9cc-c65e4e77e13a",
+        "score": 0.4960830999186765,
+        "source_ref": "scripts/atlas/query-parent-atlas-packets.mjs",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 18
+      },
+      {
+        "id": "1926ce7b-9e58-470c-aad5-3978590520ab",
+        "qdrant_id": "1e4a1b1d-df48-4278-a14f-b474392ab609",
+        "score": 0.4937911814735959,
+        "source_ref": "scripts/atlas/plan_domain_classification_integration.md",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 13
+      },
+      {
+        "id": "9519738a-48dc-4d7c-92d4-48fbb10dbb63",
+        "qdrant_id": "bac542f5-fba0-4b96-acbe-45535e71487e",
+        "score": 0.48953658890421137,
+        "source_ref": "sveltekit-frontend/drizzle/manual/parent_atlas_documents_view_widen.sql",
+        "symbol": null,
+        "kind": null,
+        "line_start": 1,
+        "line_end": 11
+      }
+    ],
+    "go_retrieval_count": 4
+  },
+  "summary": {
+    "summary": "The Parent Atlas retrieval pipeline is a diagnostic-only, evidence-bound summarization flow that does not describe a real runtime retrieval system. It is a structured packet corpus: each packet has a packet_key, source_ref (a file path), feature_id, feature_label, and a summary field, separated by '---' paragraph delimiters. The corpus contains 4 indexed packets plus 2 additional packet headers (generate_parent_atlas_packets.mjs, parent_atlas_join.sql) that appear in the extraction structure but are not present in the provided source_refs. Named-entity extraction (spacy) and structural chunking (treesitter_chunker, ast_grep) are applied, but no actual retrieval, indexing, or serving pipeline is described. The packet_status explicitly flags that canonical_authority is false and indexed source_revision is NULL for most chunk rows (GAP-P5), and all authorities are DIAGNOSTIC_ONLY.",
+    "domain_class": "diagnostic_only_packet_corpus",
+    "ontology_label": "parent_atlas_packet_envelope",
+    "topology_label": "flat_packet_list_with_missing_summaries",
+    "citations": [
+      {
+        "evidence_id": "ev_ea563b42c0b22fd5",
+        "source_revision": "sha256:99a8c740439a2992ac06aa804b5cee283e7a1dca3fec3565ef555b048e0cff61",
+        "start_byte": 0,
+        "end_byte": 18232
+      },
+      {
+        "evidence_id": "ev_5e4895ea8128b33b",
+        "source_revision": "sha256:d94d32587b09ad859e25dc9a4ced6351892d8227b3ee76f68a68d363616671da",
+        "start_byte": 0,
+        "end_byte": 12450
+      },
+      {
+        "evidence_id": "ev_23ab39e21b3e7528",
+        "source_revision": "sha256:4b816bcceb0592cd2a3d913e338ac3eec6a13f97e9ab1970db5f43d323f32cb9",
+        "start_byte": 0,
+        "end_byte": 13128
+      },
+      {
+        "evidence_id": "ev_58e83f2893247cfc",
+        "source_revision": "sha256:ae6860037f5ea18ceba7a992433ba4d29fd3da67d52d37287f804832616a5c",
+        "start_byte": 0,
+        "end_byte": 4226
+      }
+    ],
+    "missing_evidence": [
+      "packet_key: packet:82a9d7085d2a (generate_parent_atlas_packets.mjs) - present in extraction.structure.chunks but absent from source_refs",
+      "packet_key: packet:bf70c27c607a (parent_atlas_join.sql) - present in extraction.structure.chunks but absent from source_refs",
+      "All summary fields are empty (truncated at 'summary:') for every packet, so no actual pipeline description is available",
+      "indexed source_revision is NULL for most chunk rows (GAP-P5) per packet_status",
+      "canonical_authority is false and all authorities are DIAGNOSTIC_ONLY, so no authoritative pipeline semantics are provided"
+    ],
+    "confidence": 0.72
+  },
+  "parity_pgvector_qdrant": {
+    "top_k_evaluated": 4,
+    "pgvector_hits": 10,
+    "qdrant_hits": 10,
+    "id_overlap_count": 0,
+    "source_ref_overlap_count": 0,
+    "id_overlap_ratio": 0,
+    "parity_status": "DIVERGENT",
+    "overlap_samples": []
+  },
+  "dag_alignment": [
+    {
+      "layer": 1,
+      "name": "source_bytes_sha256",
+      "status": "LIVE_PASS",
+      "evidence": {
+        "digested": 6,
+        "of": 6
+      }
+    },
+    {
+      "layer": 2,
+      "name": "candidate_ordinal_map",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "reason": "proof does not seal a CandidateOrdinalMapV1"
+      }
+    },
+    {
+      "layer": 3,
+      "name": "ace_packet_v3_sealed",
+      "status": "BLOCKED",
+      "evidence": {
+        "chunk_rows_with_source_revision": 0,
+        "chunk_rows_total": 274465,
+        "reason": "source_revision NULL for most rows; workspace_revision is an integer default 0 in atlas_packets"
+      }
+    },
+    {
+      "layer": 4,
+      "name": "context_manifest_admission",
+      "status": "BLOCKED",
+      "evidence": {
+        "projection_admission": "NOT_SAFE_TO_PROJECT",
+        "reason": "9/11 predicates below PASS: IDENTITY_ALIGNED=PARTIAL_PROVEN, REVISION_QUALIFIED=PARTIAL_PROVEN, SYMBOLS_RESOLVED=PARTIAL_PROVEN, SEMANTIC_OWNER_PROVEN=PARTIAL_PROVEN, LATENT_FAMILY_PROVEN=PARTIAL_PROVEN, ORDINAL_MAP_SEALED=PARTIAL_PROVEN, PROJECTIONS_CHECKSUM_ALIGNED=NOT_PROVEN, BITFROST_KEYS_DERIVABLE=NOT_PROVEN, ACE_EVIDENCE_GROUNDED=NOT_PROVEN"
+      }
+    },
+    {
+      "layer": 5,
+      "name": "context_compression_headroom",
+      "status": "NOT_BUILT",
+      "evidence": {
+        "canonicalAuthority": false,
+        "note": "downstream of ContextManifest only"
+      }
+    },
+    {
+      "layer": 6,
+      "name": "bitfrost_key",
+      "status": "NOT_PROVEN",
+      "evidence": {
+        "note": "no manifest-keyed cache key built for this run"
+      }
+    },
+    {
+      "layer": 7,
+      "name": "ornith_synthesis",
+      "status": "WARN",
+      "evidence": {
+        "model": "ornith-1.5-9b",
+        "ungrounded": null
+      }
+    }
+  ],
+  "chain_status": "NOT_ALIGNED",
+  "elapsed_ms": 21004
+}

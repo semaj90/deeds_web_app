@@ -97,7 +97,7 @@ export function getOllamaEndpoint(): string {
   return CHAT_BASE_URL;
 }
 
-export function getOllamaChatEndpoint(): string {
+export function getLlamaChatEndpoint(): string {
   return CHAT_BASE_URL;
 }
 
@@ -105,7 +105,7 @@ export function getOllamaEmbeddingEndpoint(): string {
   return EMBED_BASE_URL;
 }
 
-export function getOllamaGenerationEndpoint(): string {
+export function getLlamaGenerationEndpoint(): string {
   return CHAT_BASE_URL;
 }
 
@@ -322,7 +322,7 @@ function logBifrostCacheTrace(
 }
 
 // ── TurboQuant Intercept ──────────────────────────────────────────────────
-// When enabled, ollamaFetch() transparently routes compatibility /api/chat and
+// When enabled, embedOrChatFetch() transparently routes compatibility /api/chat and
 // /api/generate calls through llama-server (:8090). Ollama remains embeddings-
 // only in this deployment; it is never a chat fallback.
 // Toggle: TURBOQUANT_INTERCEPT=false to disable.
@@ -556,7 +556,114 @@ async function isGpuCongested(): Promise<boolean> {
  * `/api/chat` and `/api/generate` are compatibility shapes only. Their
  * inference owner is llama-server :8090; Ollama is reserved for embeddings.
  */
-export async function ollamaFetch(url: string, init?: RequestInit): Promise<Response> {
+/**
+ * Serve a streaming (`stream: true`) /api/chat or /api/generate request from
+ * llama-server :8090. Returns Ollama-shaped NDJSON, or null when llama-server
+ * cannot stream it (the caller then fails closed with 503).
+ */
+async function tryLlamaStreamAsOllama(
+  isChatEndpoint: boolean,
+  body: string,
+  signal: AbortSignal | undefined,
+  meta: ReturnType<typeof extractOllamaRequestMeta>,
+  startedAt: number
+): Promise<Response | null> {
+  let ollamaBody: Record<string, any>;
+  try {
+    ollamaBody = JSON.parse(body);
+  } catch {
+    return null;
+  }
+  if (ollamaBody.stream !== true) return null;
+
+  const openaiMessages: Array<{ role: string; content: string }> = [];
+  if (isChatEndpoint) {
+    if (Array.isArray(ollamaBody.messages)) {
+      for (const msg of ollamaBody.messages) {
+        openaiMessages.push({ role: msg.role, content: msg.content });
+      }
+    }
+  } else {
+    if (ollamaBody.system) {
+      openaiMessages.push({ role: 'system', content: ollamaBody.system });
+    }
+    openaiMessages.push({ role: 'user', content: ollamaBody.prompt ?? '' });
+  }
+  if (openaiMessages.length === 0) return null;
+
+  try {
+    const target = await resolveLlamaInferenceTarget();
+    const upstream = await fetch(`${target.baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: target.model,
+        messages: openaiMessages,
+        temperature: ollamaBody.options?.temperature ?? 0.7,
+        max_tokens: ollamaBody.options?.num_predict ?? 2048,
+        stream: true,
+        cache_prompt: true,
+      }),
+      signal,
+    });
+    if (!upstream.ok || !upstream.body) return null;
+
+    const encoder = new TextEncoder();
+    const decoder = new TextDecoder();
+    const reader = upstream.body.getReader();
+    const frame = (content: string, done: boolean) =>
+      JSON.stringify(
+        isChatEndpoint
+          ? { model: target.model, created_at: new Date().toISOString(), message: { role: 'assistant', content }, done }
+          : { model: target.model, created_at: new Date().toISOString(), response: content, done }
+      ) + '\n';
+
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        let buffer = '';
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+            for (const raw of lines) {
+              const line = raw.trim();
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (!payload || payload === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+                const text = parsed.choices?.[0]?.delta?.content ?? '';
+                if (text) controller.enqueue(encoder.encode(frame(text, false)));
+              } catch {
+                /* skip partial SSE frame */
+              }
+            }
+          }
+          controller.enqueue(encoder.encode(frame('', true)));
+          controller.close();
+        } catch (err) {
+          controller.error(err);
+        }
+      },
+      cancel() {
+        reader.cancel().catch(() => {});
+      },
+    });
+
+    logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200, undefined, 'llama-server');
+    return new Response(stream, {
+      status: 200,
+      headers: { 'Content-Type': 'application/x-ndjson' },
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function embedOrChatFetch(url: string, init?: RequestInit): Promise<Response> {
   const meta = extractOllamaRequestMeta(url, init);
   const startedAt = Date.now();
 
@@ -693,6 +800,13 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
       }
     } catch {
       // Fall through to the non-chat/generate handling below.
+    }
+
+    // Streaming callers (stream: true) are served by llama-server too. The SSE
+    // deltas are re-emitted as Ollama-shaped NDJSON so the callers' parsers hold.
+    if (typeof init?.body === 'string') {
+      const streamed = await tryLlamaStreamAsOllama(isChatEndpoint, init.body, init.signal ?? undefined, meta, startedAt);
+      if (streamed) return streamed;
     }
   }
 
@@ -1084,7 +1198,7 @@ export async function bifrostChat(
               // Direct-to-llama-server path: announce what this server actually has
               // loaded (LLM_MODEL_ID), not the caller's gateway-routing tag (which may
               // name a different backend, e.g. a Docker Ollama model like
-              // gemma4-legal-vlm:latest that only the Bifrost gateway can resolve).
+              // ornith-1.5-9b that only the Bifrost gateway can resolve).
               model: LLM_MODEL_ID,
               messages: messagesForInference,
               temperature: options?.temperature ?? 0.7,
@@ -1541,7 +1655,7 @@ export async function checkOllamaHealth(): Promise<boolean> {
 	try {
 		const healthy = await ollamaBreaker.call(
 			async () => {
-				const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/tags`, {
+				const res = await embedOrChatFetch(`${OLLAMA_BASE_URL}/api/tags`, {
 					signal: AbortSignal.timeout(5000),
 				});
 				return res.ok;
@@ -1556,7 +1670,7 @@ export async function checkOllamaHealth(): Promise<boolean> {
 
 export async function listAvailableModels(): Promise<string[]> {
 	try {
-		const res = await ollamaFetch(`${OLLAMA_BASE_URL}/api/tags`, {
+		const res = await embedOrChatFetch(`${OLLAMA_BASE_URL}/api/tags`, {
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) return [];

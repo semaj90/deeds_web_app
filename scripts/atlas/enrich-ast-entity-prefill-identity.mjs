@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { buildAstEntityIdentityRowV1 } from './lib/ast-entity-identity-envelope-v1.mjs';
 
 const { Pool } = pg;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -50,17 +51,7 @@ function dockerIdentityLookup(sourceRefs) {
 function appendResolvedRows(lookup) {
   for (const candidate of candidates) {
     const identity = lookup.get(candidate.source_ref);
-    result.rows.push({
-      ...candidate,
-      packet_key: identity?.packet_key ?? null,
-      feature_id: identity?.feature_id ?? null,
-      title_id: identity?.title_id ?? null,
-      tree_node_id: identity?.tree_node_id ?? null,
-      identity_status: identity?.packet_key ? 'RESOLVED_CANDIDATE' : 'UNRESOLVED_CANDIDATE',
-      // Preserve the exporter-provided revision. Never replace it with a
-      // placeholder; missing lineage remains observable for later repair.
-      source_revision: candidate.source_revision ?? null,
-    });
+    result.rows.push(buildAstEntityIdentityRowV1(candidate, identity));
     if (identity?.packet_key) result.resolved += 1;
     else result.unresolved += 1;
   }

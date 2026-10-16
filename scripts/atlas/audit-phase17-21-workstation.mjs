@@ -345,7 +345,7 @@ async function main() {
       batch_size: 500,
       concurrency: 1,
       chat_backend: 'llama-server',
-      chat_model: 'gemma4-legal-iq4xs-direct.gguf',
+      chat_model: 'ornith-1.5-9b',
       embedding_backend: 'Ollama/EmbeddingGemma',
       dry_command: 'npm run atlas:summaries:gemma4:500:dry',
       apply_command: 'npm run atlas:summaries:gemma4:500:apply',

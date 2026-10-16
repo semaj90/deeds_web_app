@@ -1,11 +1,9 @@
 // @ts-nocheck
 /**
- * GPU Pipeline — stream-aware async queuing + Redis shape-cache for MCP tool calls.
+ * GPU Pipeline — bounded async queuing for MCP tool calls.
  *
- * TypeScript emulation of CUDA Graph replay:
- *   - Fixed-shape results (same fn + n + dim) are cached in Redis at
- *     gpu:graph:{fn}:{n}:{dim}:{inputHash} (TTL 300 s) so identical GPU calls
- *     replay in ~0.1 ms instead of ~15 ms.
+ * Legacy numeric Redis result storage is disabled; qualified residency descriptors
+ * remain with the existing ACE/BitFrost owner, not this compute executor.
  *   - A semaphore (StreamQueue) caps concurrent GPU Promises at CUDA_MAX_STREAMS
  *     (default 4) to avoid serialising all calls through a single hidden stream.
  *
@@ -23,6 +21,7 @@
 
 import { createHash } from 'node:crypto';
 import { getAddonInternal, gpuHasRoom, vramNeededMB } from './libtorch-bridge.js';
+import { recordResourceOperation } from '../telemetry/gpu-telemetry.js';
 
 // Phase 3: Packet-centric telemetry (optional — pipeline works without it)
 let recordPacketCentricTelemetry: ((event: any) => Promise<void>) | null = null;
@@ -121,21 +120,11 @@ function inputHash(data: Float32Array, extra?: string): string {
 }
 
 async function cacheGet<T>(key: string, decode: (raw: string) => T): Promise<T | null> {
-  try {
-    const { getRedis } = await import('$lib/server/redis.js');
-    const raw = await getRedis().get(key);
-    if (!raw) return null;
-    return decode(raw);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
 async function cacheSet(key: string, value: Buffer | string): Promise<void> {
-  try {
-    const { getRedis } = await import('$lib/server/redis.js');
-    await getRedis().setex(key, GRAPH_CACHE_TTL, value instanceof Buffer ? value.toString('base64') : value);
-  } catch { /* non-fatal */ }
+  return;
 }
 
 function f32ToBase64(arr: Float32Array): string {
@@ -172,6 +161,16 @@ const MAX_TELEMETRY = 200;
 function record(t: PipelineTelemetry) {
   _telemetry.push(t);
   if (_telemetry.length > MAX_TELEMETRY) _telemetry.shift();
+  const names = { attn: ['attention', 'attentionScoreGPU'], pr: ['pagerank', 'pageRankGPU'],
+    reward: ['reward', 'rewardScoreGPU'], topk: ['topk', 'topKIndicesGPU'],
+    kmeans: ['kmeans', 'kmeansWithCentroids'], softmax: ['softmax', 'softmaxGPU'] };
+  const [operation, nativeExport] = names[t.fn];
+  void recordResourceOperation({ schema: 'atlas.resource-operation.v1', operation,
+    native_export: t.source === 'gpu' ? nativeExport : null, requested_kernel: null,
+    kernel_name: null, kernel_ms: null, wall_ms: t.durationMs, duration_scope: 'PIPELINE_WALL_TIME',
+    execution_backend: t.source === 'cpu' ? 'CPU_REFERENCE' : t.source === 'cache' ? 'CACHE' : 'NATIVE_EXPORT_UNVERIFIED',
+    reported_backend: null, candidate_count: t.n, input_dim: t.dim, output_dim: null, canonicalAuthority: false,
+  });
 }
 
 // ── CPU fallbacks ─────────────────────────────────────────────────────────────
@@ -763,6 +762,7 @@ function cpuKmeans(
 // ── Diagnostics ──────────────────────────────────────────────────────────────
 
 export interface GpuPipelineStats {
+  resultCachePolicy: 'DISABLED_LEGACY_NUMERIC_STORAGE';
   deviceId:      number;
   maxStreams:    number;
   activeStreams:  number;
@@ -775,6 +775,7 @@ export function gpuPipelineStats(): GpuPipelineStats {
   const recent = _telemetry.slice(-50);
   const hits   = recent.filter((t) => t.source === 'cache').length;
   return {
+    resultCachePolicy: 'DISABLED_LEGACY_NUMERIC_STORAGE',
     deviceId:     _deviceId,
     maxStreams:   _maxStreams,
     activeStreams: _queue?.active  ?? 0,

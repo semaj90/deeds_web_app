@@ -63,7 +63,7 @@ $DatabaseUrl = $env:DATABASE_URL -or "postgresql://legal_admin:123456@127.0.0.1:
 $RedisUrl = $env:REDIS_URL -or "redis://:redis@127.0.0.1:6379"
 
 # Model IDs
-$GemmaModel = $env:GEMMA4_MODEL -or "gemma4-legal-iq4xs-direct.gguf"
+$GemmaModel = $env:GEMMA4_MODEL -or "ornith-1.5-9b"
 $EmbeddingModel = $env:EMBEDDING_MODEL -or "embeddinggemma:latest"
 
 # ============================================================================

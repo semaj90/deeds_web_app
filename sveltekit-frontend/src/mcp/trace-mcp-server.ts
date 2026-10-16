@@ -122,6 +122,7 @@ import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
 import { registerOpenSpecEvidenceTools } from './openspec-evidence-tools.js';
 import { registerAtlasKeywordCorpusTools } from './atlas-keyword-corpus-tools.js';
 import { registerNativeAccelerationTools } from './native-acceleration-tools.js';
+import { registerLlamaRuntimeTools } from './llama-runtime-tools.js';
 import { tracedQuery, withCanonicalReadOnlyQueryBudget } from '../lib/server/db/client.js';
 import {
   atlasCoverageInputSchema,
@@ -624,6 +625,9 @@ const dispatcherMiddleware = new DispatcherMiddleware(pool, engramBridge, langgr
 // Register core tools with dispatcher middleware
 registerNewTools(server, { rerankUrl: RERANK_URL, pgPool: pool }, dispatcherMiddleware, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server, dispatcherMiddleware);
+if (['127.0.0.1', '::1', 'localhost'].includes(HOST)) {
+  registerLlamaRuntimeTools(server);
+}
 registerSkillTools(server, dispatcherMiddleware);
 registerLegalSkillsTools(server);
 registerEngramTools(server, REDIS_URL, dispatcherMiddleware);
@@ -682,6 +686,10 @@ registerNativeAccelerationTools(server, async () => {
     backendInfo: () => addon.getBackendInfo!(),
     executionCounters: () => addon.getExecutionCounters!(),
     exactTopK: (query, corpus, rows, dimensions, topK) => addon.batchCosineTopK!(query, corpus, rows, dimensions, topK),
+    simdjsonTensorMetrics: async () => {
+      const helper = await import(new URL('../../../scripts/atlas/lib/simdjson-graph-gather-v1.mjs', import.meta.url).href);
+      return helper.proveSimdjsonGraphGather({ addon, input: helper.buildGraphGatherFixture() });
+    },
   };
 });
 

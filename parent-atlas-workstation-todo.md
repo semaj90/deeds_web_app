@@ -467,7 +467,7 @@ and Rust SIMD/N-API sources exist, while AST-grep/Tree-sitter Python/Node
 providers and C++/CUDA GEMM sources are present as separate adapters or
 challengers. Their runtime parity and production ownership remain distinct
 proof gates.
-
+latent256?
 Latent `128/64` values appear as derived routing/cache representations. They
 must remain revision-qualified features and never be treated as replacements
 for the canonical EmbeddingGemma representation or as independent retrieval
@@ -983,7 +983,7 @@ status; this table does not create a second control plane.
 | Canonical phase | Current lane | Existing owner(s) | Status / boundary |
 |---|---|---|---|
 | P11 | Experience and memory wiring | `parent-atlas-agentic-run-receipt-binding`, `parent-atlas-ace-rlm-bitfrost-integration`, `parent-atlas-kv-cache-adaptation-research` | Partial. OpenCode observations, workflow receipts, ACE admission, and model runtime cache remain separate; no hidden state becomes knowledge. |
-| P12 | Source, revision, and chunk authority | `parent-atlas-retrieval-lineage-dag-convergence` | Partial. Fresh source authority, exact chunk materialization, and revision-qualified joins precede all derived projections. |
+| P12 | Source, revision, and chunk authority | `parent-atlas-retrieval-lineage-dag-convergence`; producer dependency: `parent-atlas-chunk-index-whole-file-hash` | Partial; strict live census: 14,564/24,456 bound sources pass packet source-revision/provenance plus packet-key chunk lineage; one source (`crates/atlas_packet_parser/index.js`) passed exact DB-to-disk SHA-256 readback (9,875 bytes) with 14 chunk rows. Earlier 14,628 count omitted canonical packet revision/provenance; 64 rows fail that stricter boundary. Full 25,542 execution cohort also has 1,086 nested namespace gaps. Legacy `graphify_files` remains absent for the linked run, and the 100-source generic preflight is a bounded diagnostic only. AST/function qualification, SearchRuntime, and ContextManifest gates remain open; no backfill/promotion authorized. The chunk-index producer apply/backfill tasks are deferred until post-P20. See `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`. |
 | P13 | Feature registry and capability classification | `parent-atlas-candidate-feature-execution-fabric` plus the existing registry owner | Partial. Taxonomy/classification is descriptive; feature identity is not source identity. |
 | P14 | Exact context cache and residency | `parent-atlas-ace-bitfrost-cache-correctness`, `parent-atlas-ace-rlm-bitfrost-integration` | Implemented contracts, live wiring/measurement still gated. BitFrost/Valkey is derived cache state only. |
 | P15 | Semantic retrieval and single fusion owner | `parent-atlas-retrieval-fusion-reachability` | SearchRuntime owns lane normalization, deduplication, and production RRF. Qdrant, TurboVec, cuVS, and CAGRA are executors/projections. |
@@ -991,13 +991,39 @@ status; this table does not create a second control plane.
 | P17 | NLP, structural facts, and numeric feature assembly | `parent-atlas-governed-compute-fabric`, `parent-atlas-candidate-feature-execution-fabric`, GPU ABI owners | Partial. 8095, Arrow/NDJSON, Python, and GPU sidecars produce revisioned observations and feature inputs. |
 | P18 | Learned reranking evaluation | `parent-atlas-best-fit-score-fabric` | Partial/evaluation surface. mxbai remains the dedicated reranker; XGBoost and AtlasGemma are challengers until frozen parity and promotion evidence exist. |
 | P19 | Deterministic policy baseline | `parent-atlas-candidate-feature-execution-fabric`, `parent-atlas-governed-compute-fabric` | Partial. HMM/linear policy work consumes qualified features and receipts; it is not a retrieval or identity owner. |
-| P20 | Program/workflow contracts | `parent-atlas-governed-compute-fabric` | Planned. DSPy is an optional program contract behind bounded tools and workflow receipts. |
-| P21 | Reflective program optimization | `parent-atlas-governed-compute-fabric` | Planned. GEPA remains an evaluation lane over RouteTrace/eval receipts. |
+| P20 | Program/workflow contracts | `parent-atlas-governed-compute-fabric`; evaluation dependency: `parent-atlas-compute-rank-cache-eval-dspy-gepa` | Planned. DSPy is an optional program contract behind bounded tools and workflow receipts; the evaluation change owns isolated sidecar and held-out proof gates, not a second policy authority. |
+| P21 | Reflective program optimization | `parent-atlas-governed-compute-fabric`; evaluation dependency: `parent-atlas-compute-rank-cache-eval-dspy-gepa` | Planned. GEPA remains an offline evaluation lane over frozen RouteTrace/eval receipts; no production prompt mutation or promotion. |
 | P22 | RL and later learned-policy experiments | `parent-atlas-best-fit-score-fabric`, `parent-atlas-governed-compute-fabric` | Experimental only. XGBoost evaluation belongs to P18; P22 is not a second XGBoost owner. |
 | P23 | Transport validation | existing transport/MCP/ACP/A2A owners | Separate transport lane. QUIC/UDP/gRPC labels must not be confused with the model-training P23 label retained in older notes. |
 | P24 | GPU/vector residency experiments | `parent-atlas-gpu-graph-vector-substrate`, `parent-atlas-gpu-runtime-abi-alignment` | Derived execution lane. CUDA/cuGraph/cuVS/TensorRT/WebGPU do not replace Postgres or SearchRuntime authority. |
 | P25 | PPO or other model-policy training | `parent-atlas-best-fit-score-fabric` | Eval-only and not graded. No training or promotion is implied by the phase label. |
 | P27–P30 | OKF/HMM, hierarchy, routing geometry, and hypergraph experiments | existing retrieval LOD / governed-compute owners | Separate analytical lanes; SOM, KMeans, manifold, and hypergraph outputs remain routing/evidence hints. |
+
+### Post-P20 backlog (operator-sequenced, 2026-10-15)
+
+Do not start until the workstation phase gates through P20 are complete, and the `parent-atlas-gpu-sidecar-patch-tournament` tasks are closed (confirm scope; thematic match is not ownership). Canonical P-numbers are unchanged.
+
+| Item | Scope | Owner / boundary |
+|---|---|---|
+| Source revision: change detection and invalidation | Moved from the adaptive-backprop change Phases 1–2 | Gated; source authority and backfill gates still apply |
+| ast-grep symbol and function ranking | Rank symbols and functions by structural match | Existing ast-grep observation owner; no new parser |
+| Adaptive fine-tuned backprop | Challenger training | Phase 8 rules; promotion needs approval |
+| Hot / warm / cold MLP | Tiered residency and ranking | Tier decisions trace to receipts, not HLL counts alone |
+| User +1/-1 feedback from queries | Reviewed outcome events | Never changes ranking or training until reviewed |
+| Query summaries and keyword analysis | Summaries and keyword extraction | Existing summary and keyword owners; non-authoritative |
+| "Did you mean" suggestions | Query correction suggestions | From qualified lexical and symbol indexes; never silently replaces the query |
+
+### Operator-sequenced item: graph PageRank authority after P18 (2026-10-15)
+
+Sequenced after XGBoost/PyTorch reranker training (P18) and before the P20 workflow-contract lane. Canonical lane remains P16 (graph); this entry does not renumber any phase.
+
+| Item | State | Evidence / boundary |
+|---|---|---|
+| NetworkX PageRank mirror (read-only consumer of the graph snapshot) | Present: `python/atlas_compute/atlas_graph_networkx_mirror_v1.py` | Non-authoritative receipt; no writes |
+| Custom PageRank reference vs NetworkX on the parity snapshot | PARITY on 162,234 nodes: max abs diff 4.9e-9, Spearman 1.0, top-20 overlap 20/20 | `docs/reports/pagerank-networkx-custom-parity-v1.json`; NetworkX run parameters not recorded |
+| Authority table refresh (`atlas_graph_authority_scores`) | BLOCKED: Neo4j unreachable; source choice pending | Owner decision: NetworkX/cuGraph path (recommended) versus re-enabled GDS |
+| Mirror of the authority result into the candidate set (Phase 7 in the openspec change) | Not started | Requires the authority refresh first |
+
 
 ### Duplicate labels found and disposition
 
@@ -1157,7 +1183,7 @@ performed.
 
 ### Historical optional downstream phases (legacy labels; use the canonical index above)
 
-1. Phase 10B TurboVec + Qdrant optimization.
+1. Phase 10B TurboVec + pgvector hnsw indexes Qdrant optimization.
 2. Phase 11 cuVS / CUDA sidecar benchmark.
 3. Phase 12 CUDA streams / tensor bridge / RNN experiments.
 4. Phase 13 graph synthesis + feature MapReduce.
@@ -4516,3 +4542,25 @@ SOM-KMEANS-FIXTURE-01
   → bounded projection write
   → independent readback
 ```
+
+### Phase gate sequencing map (2026-10-15, operator directive)
+
+Work order through the canonical P-numbers. Revision-dependent work waits until after P20 (`source_revision` deferral rule in CLAUDE.md). A phase that cannot close without revisions records a BLOCKED_REVISION_DEFERRED receipt and does not promote.
+
+| Order | Phase | Owner (existing) | Revision dependency | Gate to close |
+|---|---|---|---|---|
+| 1 | P11 experience and memory | agentic run receipt binding; ACE RLM BitFrost | none | receipt binding proven |
+| 2 | P12 source, revision, chunk authority | retrieval lineage DAG convergence; chunk-index producer dependency | **yes: deferred to after P20** | revision-qualified lineage (post-P20) |
+| 3 | P13 feature registry | candidate feature execution fabric | partial (qualified candidates need revisions) | eligible candidates > 0 without revision claims |
+| 4 | P14 exact context cache | ACE BitFrost cache correctness | keys use revisions; defer live revision keys | live wiring measured |
+| 5 | P15 semantic retrieval and single fusion | retrieval fusion reachability | none for lane wiring | one fusion vote per lane, proven |
+| 6 | P16 graph, KAG, ontology | retrieval lineage DAG; LOD taxonomy | authority table needs admissible snapshot | admissible PageRank snapshot (reference edges) |
+| 7 | P17 NLP and feature assembly | governed compute fabric; candidate execution | none | feature assembly receipt |
+| 8 | P18 learned reranking evaluation | best-fit score fabric | none | frozen parity vs challengers |
+| 9 | P19 deterministic policy baseline | candidate execution; governed compute | consumes features | baseline receipt |
+| 10 | P20 program and workflow contracts | governed compute fabric | none | contracts proven; **gate for revision work** |
+| 11+ | Post-P20: source revision (Phases 1–2 of the adaptive-backprop change), ContextManifest admission, ast-grep ranking, MLP tiers, feedback, "did you mean" | adaptive-backprop change PX-01 to PX-07 | yes | after P20 gates pass |
+
+Canonical P21 to P30 keep their existing owners and are sequenced after this block. Trilinear mapping: the term appears only in docs/master_feature_todo_1011.md, not as a separate mapping file. Confirm that document is the intended trilinear source before using it as an owner.
+
+Known conflict: P12 is numbered before P20 and is the revision phase. The operator directive moves revision work after P20. Resolve by treating P12 as deferred and listing its open gate in the post-P20 queue, or by renumbering. Do not renumber without a decision.

@@ -5,7 +5,7 @@
 .DESCRIPTION
   Checks:
   1. TurboQuant health (:8090)
-  2. Legal model loaded (gemma4-legal-iq4xs-direct.gguf)
+  2. Legal model loaded (ornith-1.5-9b)
   3. Context length configured
   4. Inference working (legal prompt test)
   5. Bifrost integration ready
@@ -18,7 +18,7 @@ $ErrorActionPreference = 'Continue'
 
 $TURBO_URL = "http://127.0.0.1:8090"
 $BIFROST_URL = "http://127.0.0.1:3040"
-$MODEL = "gemma4-legal-iq4xs-direct.gguf"
+$MODEL = "ornith-1.5-9b"
 
 Write-Host "🧪 Testing Legal GGUF via TurboQuant..." -ForegroundColor Cyan
 Write-Host ""
@@ -39,7 +39,7 @@ Write-Host ""
 Write-Host "2️⃣  Checking loaded model..." -ForegroundColor Yellow
 try {
   $models = Invoke-RestMethod "$TURBO_URL/v1/models" -ErrorAction Stop
-  $hasLegal = $models.data | Where-Object { $_.id -like "*gemma4-legal*" }
+  $hasLegal = $models.data | Where-Object { $_.id -like "*ornith-1.5-9b*" }
 
   if ($hasLegal) {
     Write-Host "   ✅ Legal GGUF model is loaded" -ForegroundColor Green

@@ -184,14 +184,58 @@ async def extract_typescript_compiler(file_path: str, content: str) -> Optional[
         return None
 
 
+async def extract_svelte_compiler(file_path: str, content: str) -> Optional[List[Dict[str, Any]]]:
+    """
+    Extract AST symbols from Svelte files using Svelte 5 AST + TypeScript compiler.
+    """
+    if not file_path.endswith('.svelte'):
+        return None
+
+    try:
+        svelte_extractor = REPO_ROOT / 'scripts' / 'graphify' / 'lib' / 'svelte-ast-extractor.mjs'
+        if not svelte_extractor.exists():
+            logger.debug("Svelte extractor not found, skipping")
+            return None
+
+        result = subprocess.run(
+            ['node', str(svelte_extractor), file_path],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=str(REPO_ROOT / 'sveltekit-frontend')
+        )
+
+        if result.returncode != 0:
+            logger.debug(f"Svelte extractor returned {result.returncode} for {file_path}")
+            return None
+
+        try:
+            symbols = json.loads(result.stdout)
+            return symbols if symbols else None
+        except json.JSONDecodeError:
+            logger.debug(f"Failed to parse Svelte extractor output for {file_path}")
+            return None
+
+    except FileNotFoundError:
+        logger.debug("Node.js not found")
+        return None
+    except subprocess.TimeoutExpired:
+        logger.warning(f"Svelte extractor timeout on {file_path}")
+        return None
+    except Exception as e:
+        logger.warning(f"Svelte extractor error on {file_path}: {e}")
+        return None
+
+
 async def extract_ast_symbols(packet: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     """
     Extract AST symbols from a packet.
 
     Priority:
-      1. TypeScript Compiler API (most accurate for TS/JS)
-      2. ast-grep (fast, pattern-based)
-      3. Return None if no content or file not available
+      1. Svelte AST Extractor (for .svelte components)
+      2. TypeScript Compiler API (most accurate for TS/JS)
+      3. ast-grep (fast, pattern-based)
+      4. Return None if no content or file not available
     """
     source_ref = packet.get('source_ref')
     if not source_ref:
@@ -208,6 +252,12 @@ async def extract_ast_symbols(packet: Dict[str, Any]) -> Optional[List[Dict[str,
     except Exception as e:
         logger.warning(f"Failed to read {source_ref}: {e}")
         return None
+
+    # Try Svelte AST extractor for .svelte files
+    if str(file_path).endswith('.svelte'):
+        symbols = await extract_svelte_compiler(str(file_path), content)
+        if symbols:
+            return symbols
 
     # Try TypeScript Compiler first (most accurate)
     symbols = await extract_typescript_compiler(str(file_path), content)

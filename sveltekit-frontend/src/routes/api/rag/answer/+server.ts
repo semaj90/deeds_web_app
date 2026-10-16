@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import type { RequestHandler } from './$types';
 import type {
 	AnswerRequest,
@@ -124,7 +124,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				return { answerText: text.trim(), genTime: performance.now() - startTime, evalCount: Math.ceil(text.length / 4) as number | undefined };
 			}
 
-			const genResp = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+			const genResp = await embedOrChatFetch(`${OLLAMA_URL}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

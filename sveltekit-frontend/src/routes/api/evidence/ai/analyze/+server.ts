@@ -37,11 +37,11 @@ export const POST: RequestHandler = async (event) => {
 			);
 		}
 
-		const { node, useComplexModel = false } = parsed.data;
+		const { node } = parsed.data;
 		const text = node.description || node.title || '';
 
-		// Choose model: gemma3:270m (fast, 4.5s avg) or the canonical local synthesis model (complex)
-		const model = useComplexModel ? LOCAL_VLM_MODEL : 'gemma3:270m';
+		// Both lanes run on the canonical llama-server :8090 model (Ornith 1.5); Ollama is not a chat fallback.
+		const model = LOCAL_VLM_MODEL;
 
 		// ── L1 Redis Cache Lookup (5ms) ──
 		const cacheKey = generateCacheKey({

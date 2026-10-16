@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 const CHECK_CMD = 'npm --prefix sveltekit-frontend run check';
-const MODEL = 'gemma4-rotorquant';
+const MODEL = 'ornith-1.5-9b';
 
 const OUT = {
   log: '.tmp/svelte-check.log',

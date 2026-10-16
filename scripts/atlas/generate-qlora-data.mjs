@@ -306,7 +306,7 @@ async function main() {
             JSON.stringify([0, 1]),
             JSON.stringify({ fts: 1, vector: 1 }),
             JSON.stringify([featureId]),
-            'gemma4-rotorquant:latest',
+            'ornith-1.5-9b',
             'train',
             'fusion'
           ]);
@@ -496,7 +496,7 @@ async function main() {
           JSON.stringify([0]),
           JSON.stringify({ [trace.retrieval_strategy || 'fusion']: 1 }),
           JSON.stringify(conceptIds.length > 0 ? conceptIds : [featureId]),
-          'gemma4-rotorquant:latest',
+          'ornith-1.5-9b',
           'train',
           trace.retrieval_strategy || 'fusion'
         ]);

@@ -33,7 +33,7 @@
  *   curl http://127.0.0.1:8795/v1/models
  *   curl -X POST http://127.0.0.1:8795/v1/chat/completions \
  *     -H "Content-Type: application/json" \
- *     -d '{"model":"gemma4-legal","messages":[{"role":"user","content":"hello"}],"stream":false}'
+ *     -d '{"model":"ornith-1.5-9b","messages":[{"role":"user","content":"hello"}],"stream":false}'
  */
 
 import http from 'node:http';

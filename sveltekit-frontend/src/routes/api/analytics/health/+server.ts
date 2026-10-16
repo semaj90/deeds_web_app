@@ -4,7 +4,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { getRedis } from '$lib/server/redis.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { isRerankerReady } from '$lib/server/retrieval/triton-reranker.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
@@ -69,7 +69,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
     // 4. Ollama Heartbeat
     try {
-        const modelsRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
+        const modelsRes = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
         if (modelsRes.ok) {
             const data = await modelsRes.json();
             const models = data.models.map((m: any) => m.name);
@@ -77,7 +77,7 @@ export const GET: RequestHandler = async ({ locals }) => {
             stats.models = {
                 chat: models.includes(LLM_MODEL_ID) ? 'Available' : 'Missing',
                 embed: models.includes(ENV.OLLAMA_EMBED_MODEL) ? 'Available' : 'Missing',
-                rerank: models.includes('gemma4-rotorquant:latest') ? 'Available' : 'Missing',
+                rerank: models.includes('ornith-1.5-9b') ? 'Available' : 'Missing',
             };
         } else {
             stats.services.ollama = `Error (${modelsRes.status})`;

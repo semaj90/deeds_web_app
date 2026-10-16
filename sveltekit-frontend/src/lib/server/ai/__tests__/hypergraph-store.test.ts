@@ -59,7 +59,7 @@ describe('hypergraph-store timestamp persistence', () => {
 			lane: AgentLane.Interactive,
 			taskType: 'streaming-chat',
 			startTime,
-			metadata: { model: 'gemma4-rotorquant:latest' },
+			metadata: { model: 'ornith-1.5-9b' },
 		});
 
 		expect(mockInsertValues).toHaveBeenCalledTimes(1);

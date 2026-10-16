@@ -1,0 +1,31 @@
+{
+  "schema": "atlas.pagerank-networkx-custom-parity.v1",
+  "generated_at": "2026-10-15T20:26:19.735Z",
+  "mode": "READ_ONLY_COMPARISON",
+  "graph": {
+    "revision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+    "artifact_dir": "sveltekit-frontend/docs/reports/graph-snapshot-parity",
+    "nodes": 162234,
+    "edges": 108156
+  },
+  "reference": "python/parent_atlas_pagerank_reference.py (dependency-free oracle; damping 0.85, tolerance 1e-12, max_iterations 1000)",
+  "comparison_target": "sveltekit-frontend/docs/reports/graph-snapshot-parity/networkx-scores.ndjson",
+  "networkx_parameters_recorded": false,
+  "result": {
+    "common_nodes": 162234,
+    "max_abs_diff": 4.888450062898948e-9,
+    "mean_abs_diff": 3.2589667047035117e-9,
+    "spearman": 1,
+    "top20_overlap": 20,
+    "custom_sum": 1,
+    "networkx_sum": 0.9999999999993681
+  },
+  "verdict": "PARITY_WITH_NETWORKX_ON_THIS_SNAPSHOT (NetworkX run parameters not recorded; agreement is at 5e-9)",
+  "canonical_authority": false,
+  "writes_performed": false,
+  "not_proven": [
+    "authority table is not refreshed from this result",
+    "cuGraph parity for this graph is a separate receipt",
+    "custom reference speed and memory not measured"
+  ]
+}

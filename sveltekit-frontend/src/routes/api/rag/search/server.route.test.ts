@@ -68,7 +68,7 @@ vi.mock('$lib/server/observability/langfuse.js', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
-	ollamaFetch: vi.fn(),
+	embedOrChatFetch: vi.fn(),
 }));
 
 vi.mock('$lib/server/vector/qdrant-manager.js', () => ({

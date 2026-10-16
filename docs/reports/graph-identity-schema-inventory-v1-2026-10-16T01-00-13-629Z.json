@@ -1,0 +1,1426 @@
+{
+  "schema": "atlas.graph-identity-schema-inventory.v1",
+  "generatedAt": "2026-10-16T01:00:13.629Z",
+  "mode": "POSTGRES_REPEATABLE_READ_READ_ONLY",
+  "status": "SCHEMA_INVENTORY_CAPTURED",
+  "databaseError": null,
+  "requestedTables": [
+    "atlas_packets",
+    "atlas_tree_nodes",
+    "atlas_ast_nodes",
+    "atlas_symbol_registry",
+    "atlas_symbol_versions",
+    "graphify_files",
+    "graphify_symbols",
+    "graphify_edges",
+    "atlas_topology_clusters",
+    "atlas_topology_features",
+    "atlas_topology_index",
+    "atlas_graph_authority_runs",
+    "atlas_graph_authority_scores",
+    "atlas_graph_authority_runs_v2",
+    "atlas_graph_authority_scores_v2",
+    "registry_topology_projection",
+    "topology_positions",
+    "topology_snapshots"
+  ],
+  "columns": [
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "tree_node_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "structural_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "repo_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "node_kind",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "qualified_symbol",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "normalized_node_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_content_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "parent_tree_node_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_ref_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "workspace_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs",
+      "column_name": "run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs",
+      "column_name": "graph_snapshot_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs",
+      "column_name": "did_converge",
+      "data_type": "boolean",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs",
+      "column_name": "node_count",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "snapshot_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "topology_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "node_count",
+      "data_type": "bigint",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "edge_count",
+      "data_type": "bigint",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "result_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "column_name": "did_converge",
+      "data_type": "boolean",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "graph_snapshot_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "node_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "column_name": "did_converge",
+      "data_type": "boolean",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "column_name": "run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "column_name": "snapshot_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "column_name": "node_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "column_name": "topology_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "artifact_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_ref_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "feature_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "feature_label",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "community_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "concept_ids",
+      "data_type": "ARRAY",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "cluster_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_kind",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_path",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "group_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_universe",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "qdrant_point_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "identity_lane",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "identity_confidence",
+      "data_type": "double precision",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "som_cluster",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "kmeans_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "neo4j_node_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "redis_centroid_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "function_symbol",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "keywords",
+      "data_type": "ARRAY",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "feature_group_id",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_ulid",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "title_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "canonical_source_ref",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "kmeans_cluster_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "tree_node_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "community_source",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "community_confidence",
+      "data_type": "numeric",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "ledger_type",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "used_concepts",
+      "data_type": "ARRAY",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "topolog_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "topolog_confidence",
+      "data_type": "real",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "repository_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "directory_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "file_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "module_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "symbol_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "chunk_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "som_cluster_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_type_test",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_type",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "packet_ontology",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "parent_packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "related_packets",
+      "data_type": "ARRAY",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "summary_hash",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "feature_envelope",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "domain_confidence",
+      "data_type": "double precision",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "openspec_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "gsd_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "rerank_features",
+      "data_type": "jsonb",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "workspace_id",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "content_hash",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "workspace_revision",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "representation_revision",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_representation_id",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_dimension",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "projection_representation_id",
+      "data_type": "character varying",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "encoder_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "som_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "workspace_revision_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_packets",
+      "column_name": "lineage_producer_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "stable_symbol_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "canonical_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "symbol_kind",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "created_from_nomination_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "created_from_source_ref",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "created_from_source_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "column_name": "registry_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "symbol_version_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "stable_symbol_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "workspace_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_node_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_file_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_symbol_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "upstream_chunk_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "declaration_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "producer_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "column_name": "candidate_ordinal",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_clusters",
+      "column_name": "cluster_id",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_clusters",
+      "column_name": "som_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "id",
+      "data_type": "bigint",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "feature_version",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "feature_vector",
+      "data_type": "ARRAY",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "feature_dim",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "kmeans_cluster",
+      "data_type": "smallint",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "column_name": "snapshot_id",
+      "data_type": "bigint",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "som_source",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "community_id",
+      "data_type": "bigint",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "tree_node_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "pagerank_run_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "column_name": "graph_snapshot_hash",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "node_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "root_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "parent_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "feature_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "feature_label",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "node_type",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "ledger_type",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "community_id",
+      "data_type": "bigint",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "som_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "qdrant_point_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "neo4j_node_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "column_name": "glyph_record_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "edge_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "workspace_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "subject_symbol_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "object_symbol_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "evidence_kind",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "evidence_span",
+      "data_type": "jsonb",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "confidence",
+      "data_type": "real",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_edges",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "file_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "workspace_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_ref",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "content_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "first_seen_run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "last_seen_run_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "code_source_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "workspace_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "source_revision_authority",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "producer_revision",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_files",
+      "column_name": "git_blob_oid",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "symbol_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "file_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "stable_symbol_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "symbol_kind",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "parent_symbol_id",
+      "data_type": "uuid",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "column_name": "source_text_hash",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "id",
+      "data_type": "integer",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "packet_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "tree_node_id",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "community_id",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "som_cluster",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "column_name": "kmeans_cluster",
+      "data_type": "integer",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "topology_positions",
+      "column_name": "snapshot_id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "topology_positions",
+      "column_name": "stable_key",
+      "data_type": "text",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "topology_positions",
+      "column_name": "cluster_key",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "topology_positions",
+      "column_name": "source_kind",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "topology_positions",
+      "column_name": "source_hash",
+      "data_type": "text",
+      "is_nullable": "YES"
+    },
+    {
+      "table_name": "topology_snapshots",
+      "column_name": "id",
+      "data_type": "uuid",
+      "is_nullable": "NO"
+    },
+    {
+      "table_name": "topology_snapshots",
+      "column_name": "run_id",
+      "data_type": "text",
+      "is_nullable": "NO"
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "atlas_ast_nodes",
+      "constraint_name": "atlas_ast_nodes_parent_tree_node_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{parent_tree_node_id}"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "constraint_name": "atlas_ast_nodes_superseded_by_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{superseded_by}"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "constraint_name": "atlas_ast_nodes_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{tree_node_id}"
+    },
+    {
+      "table_name": "atlas_ast_nodes",
+      "constraint_name": "atlas_ast_nodes_repo_id_relative_path_node_kind_qualified_s_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{repo_id,relative_path,node_kind,qualified_symbol,normalized_node_hash}"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs",
+      "constraint_name": "atlas_graph_authority_runs_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{run_id}"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "constraint_name": "atlas_graph_authority_runs_v2_snapshot_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{snapshot_id}"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "constraint_name": "atlas_graph_authority_runs_v2_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{run_id}"
+    },
+    {
+      "table_name": "atlas_graph_authority_runs_v2",
+      "constraint_name": "atlas_graph_authority_runs_v2_run_id_snapshot_id_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{run_id,snapshot_id}"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores",
+      "constraint_name": "atlas_graph_authority_scores_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{graph_snapshot_id,node_key}"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "constraint_name": "atlas_graph_authority_scores_v2_run_id_snapshot_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{run_id,snapshot_id}"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "constraint_name": "atlas_graph_authority_scores_v2_snapshot_id_node_key_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{snapshot_id,node_key}"
+    },
+    {
+      "table_name": "atlas_graph_authority_scores_v2",
+      "constraint_name": "atlas_graph_authority_scores_v2_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{run_id,node_key}"
+    },
+    {
+      "table_name": "atlas_packets",
+      "constraint_name": "atlas_packets_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{packet_id}"
+    },
+    {
+      "table_name": "atlas_packets",
+      "constraint_name": "atlas_packets_packet_key_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{packet_key}"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "constraint_name": "atlas_symbol_registry_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{stable_symbol_id}"
+    },
+    {
+      "table_name": "atlas_symbol_registry",
+      "constraint_name": "atlas_symbol_registry_canonical_key_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{canonical_key}"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "constraint_name": "atlas_symbol_versions_stable_symbol_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{stable_symbol_id}"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "constraint_name": "atlas_symbol_versions_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{symbol_version_id}"
+    },
+    {
+      "table_name": "atlas_symbol_versions",
+      "constraint_name": "atlas_symbol_versions_stable_symbol_id_source_revision_decl_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{stable_symbol_id,source_revision,declaration_hash,upstream_node_id}"
+    },
+    {
+      "table_name": "atlas_topology_clusters",
+      "constraint_name": "atlas_topology_clusters_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{cluster_id}"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "constraint_name": "atlas_topology_features_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{id}"
+    },
+    {
+      "table_name": "atlas_topology_features",
+      "constraint_name": "atlas_topology_features_packet_key_feature_version_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{packet_key,feature_version}"
+    },
+    {
+      "table_name": "atlas_topology_index",
+      "constraint_name": "atlas_topology_index_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{packet_key}"
+    },
+    {
+      "table_name": "atlas_tree_nodes",
+      "constraint_name": "atlas_tree_nodes_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{node_id}"
+    },
+    {
+      "table_name": "graphify_edges",
+      "constraint_name": "graphify_edges_object_symbol_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{object_symbol_id}"
+    },
+    {
+      "table_name": "graphify_edges",
+      "constraint_name": "graphify_edges_subject_symbol_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{subject_symbol_id}"
+    },
+    {
+      "table_name": "graphify_edges",
+      "constraint_name": "graphify_edges_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{edge_id}"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_first_seen_run_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{first_seen_run_id}"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_last_seen_run_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{last_seen_run_id}"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_workspace_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{workspace_id}"
+    },
+    {
+      "table_name": "graphify_files",
+      "constraint_name": "graphify_files_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{file_id}"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "constraint_name": "graphify_symbols_file_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{file_id}"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "constraint_name": "graphify_symbols_parent_symbol_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{parent_symbol_id}"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "constraint_name": "graphify_symbols_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{symbol_id}"
+    },
+    {
+      "table_name": "graphify_symbols",
+      "constraint_name": "graphify_symbols_file_key_v1",
+      "constraint_type": "UNIQUE",
+      "columns": "{file_id,stable_symbol_key}"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "constraint_name": "registry_topology_projection_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{id}"
+    },
+    {
+      "table_name": "registry_topology_projection",
+      "constraint_name": "registry_topology_projection_packet_key_key",
+      "constraint_type": "UNIQUE",
+      "columns": "{packet_key}"
+    },
+    {
+      "table_name": "topology_positions",
+      "constraint_name": "topology_positions_snapshot_id_fkey",
+      "constraint_type": "FOREIGN KEY",
+      "columns": "{snapshot_id}"
+    },
+    {
+      "table_name": "topology_positions",
+      "constraint_name": "topology_positions_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{snapshot_id,stable_key}"
+    },
+    {
+      "table_name": "topology_snapshots",
+      "constraint_name": "topology_snapshots_pkey",
+      "constraint_type": "PRIMARY KEY",
+      "columns": "{id}"
+    }
+  ],
+  "findings": {
+    "atlasPacketsPacketKeyUnique": true,
+    "atlasTreeNodesPacketKeyUnique": false,
+    "atlasTreeNodesSourceRefUnique": false,
+    "graphifyFilesSourceRevisionUnique": false,
+    "graphifySymbolsFileStableKeyUnique": true,
+    "graphifyEdgesSemanticTupleUnique": false
+  },
+  "authority": false,
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false
+  },
+  "caveats": [
+    "Schema constraints describe declared uniqueness/foreign-key rules, not runtime population quality.",
+    "Indexes that are not declared constraints are not treated as canonical uniqueness invariants.",
+    "No DDL or data changes were performed."
+  ],
+  "likely_cause": "Identity fields are distributed across canonical packet, tree, parser, symbol, graph, and topology tables with different keys and constraint coverage.",
+  "evidence": [
+    "PostgreSQL information_schema.columns",
+    "PostgreSQL information_schema.table_constraints"
+  ],
+  "patch_targets": [
+    "scripts/atlas/audit-graph-identity-schema-inventory-v1.mjs",
+    "openspec/changes/parent-atlas-retrieval-lineage-dag-convergence/tasks.md"
+  ],
+  "safe_next_command": "node scripts/atlas/audit-graph-identity-schema-inventory-v1.mjs",
+  "smoke_command": "node scripts/atlas/audit-graph-identity-schema-inventory-v1.mjs",
+  "reportPath": "docs/reports/graph-identity-schema-inventory-v1-2026-10-16T01-00-13-629Z.json",
+  "checksum": "sha256:b7582cf9bbd92d1506d30354f04f023c14b6eb3bc371c26e42757deaba9f479f"
+}

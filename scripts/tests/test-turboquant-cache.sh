@@ -21,7 +21,7 @@ if [ "$TURBOQUANT_STATUS" != "200" ]; then
   echo "❌ TurboQuant not running on port 8090"
   echo ""
   echo "To start TurboQuant, run:"
-  echo "  llama-server.exe -m \"C:\\Users\\james\\Downloads\\gemma4-legal-vlm-q4_k_m.gguf\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 --cache-type-k turbo3 --n-gpu-layers 99"
+  echo "  llama-server.exe -m \"C:\\Users\\james\\Downloads\\ornith-1.5-9b\" --mmproj \"C:\\Users\\james\\Downloads\\gemma4-mmproj\\mmproj-BF16.gguf\" --port 8090 --cache-type-k turbo3 --n-gpu-layers 99"
   echo ""
   exit 1
 fi
@@ -47,7 +47,7 @@ START=$(date +%s%3N)
 RESPONSE1=$(curl -s -X POST http://localhost:8090/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d "{
-    \"model\": \"gemma4-legal\",
+    \"model\": \"ornith-1.5-9b\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200
@@ -74,7 +74,7 @@ RESPONSE2=$(curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "x-bf-cache-key: turboquant-test-001" \
   -d "{
-    \"model\": \"ollama/gemma4-legal\",
+    \"model\": \"ollama/ornith-1.5-9b\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200
@@ -98,7 +98,7 @@ RESPONSE3=$(curl -s -X POST http://localhost:3040/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "x-bf-cache-key: turboquant-test-001" \
   -d "{
-    \"model\": \"ollama/gemma4-legal\",
+    \"model\": \"ollama/ornith-1.5-9b\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$TEST_QUERY\"}],
     \"temperature\": 0.3,
     \"max_tokens\": 200

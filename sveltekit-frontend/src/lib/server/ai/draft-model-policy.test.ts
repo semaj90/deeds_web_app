@@ -3,7 +3,7 @@ import { shouldUseDraftModel } from './draft-model-policy.js';
 
 describe('shouldUseDraftModel', () => {
   it('enables draft for TurboQuant text requests', () => {
-    expect(shouldUseDraftModel('gemma4-rotorquant:latest', true)).toBe(true);
+    expect(shouldUseDraftModel('ornith-1.5-9b', true)).toBe(true);
   });
 
   it('disables draft for VLM/mmproj-style requests', () => {
@@ -12,6 +12,6 @@ describe('shouldUseDraftModel', () => {
   });
 
   it('disables draft when TurboQuant is unavailable', () => {
-    expect(shouldUseDraftModel('gemma4-rotorquant:latest', false)).toBe(false);
+    expect(shouldUseDraftModel('ornith-1.5-9b', false)).toBe(false);
   });
 });

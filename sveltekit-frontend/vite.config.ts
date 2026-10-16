@@ -188,21 +188,7 @@ export default defineConfig(({ mode }) => {
       stubNativeAddons,
       stripDashedDefineKeys,
       ENABLE_CJS_RESOLVER_PATCH && esbuildCommonJsResolverPatch,
-      sveltekit({
-        compilerOptions: {
-          runes: true, // Enable runes mode for Svelte 5
-        },
-        onwarn(warning, handler) {
-          // Suppress $$props warnings from lucide-svelte (Svelte 4 library in Svelte 5)
-          if (
-            warning.code === 'legacy_props_invalid' &&
-            warning.filename?.includes('node_modules/lucide-svelte')
-          ) {
-            return;
-          }
-          handler(warning);
-        },
-      }),
+      sveltekit(),
       UnoCSS(),
       vscodeErrorLogger({ enabled: mode === 'development' }),
       devRequestLoggerPlugin(mode === 'development'),

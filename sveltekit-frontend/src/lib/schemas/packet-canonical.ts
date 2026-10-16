@@ -277,7 +277,7 @@ export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
 export const PACKET_EXAMPLE_LAYER_3: PacketAfterLayer3 = {
   ...PACKET_EXAMPLE_LAYER_2,
   summary_text: 'Authentication session validation follows Lucia convention: session created via createSession(user), validated server-side in middleware, stored in Postgres via sql client. Depends on db/client for connection pool.',
-  summary_model: 'gemma4-legal-iq4xs-direct.gguf',
+  summary_model: 'ornith-1.5-9b',
   summary_generated_at: new Date().toISOString(),
   used_concepts: ['authentication', 'session', 'validation', 'lucia', 'postgres'],
   lexical_nouns: ['session', 'middleware', 'client', 'connection', 'pool'],

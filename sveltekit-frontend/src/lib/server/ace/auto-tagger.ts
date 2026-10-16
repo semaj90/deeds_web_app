@@ -8,7 +8,7 @@ import { generateTags } from './tag-generator.js';
 import { mirrorTags } from './tag-sync.js';
 import type { GeneratedTag } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 
 export interface AutoTagResult {
 	documentId: string;

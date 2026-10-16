@@ -33,13 +33,13 @@ vi.mock('$lib/server/db/client', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mockBifrostChat(...args),
-  ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  embedOrChatFetch: (...args: unknown[]) => mockOllamaFetch(...args),
   VLM_MODELS: {
-    legal: 'gemma4-rotorquant:latest',
-    vision: 'gemma4-rotorquant:latest',
+    legal: 'ornith-1.5-9b',
+    vision: 'ornith-1.5-9b',
     embedding: 'embeddinggemma:latest',
-    gemma4: 'gemma4-rotorquant:latest',
-    tool: 'gemma4-rotorquant:latest',
+    gemma4: 'ornith-1.5-9b',
+    tool: 'ornith-1.5-9b',
   },
 }));
 

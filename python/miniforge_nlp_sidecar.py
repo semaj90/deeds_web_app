@@ -362,11 +362,13 @@ class AstUnit(BaseModel):
     packet_key: Optional[str] = None
     tree_node_id: str
     symbol_version_id: Optional[str] = None
-    # tree_node_id/symbol_version_id are sidecar-local digests (digest(source_ref, symbol,
-    # start, end, idx) / digest(source_ref, symbol, structural_revision)) — proposal
-    # coordinates, never authoritative Atlas identity. Consumers must not write these into
-    # atlas_symbol_versions, CandidateOrdinal, GraphNodeKey, or structural edges without an
-    # independent reviewed resolution. Literal[False] so this can never be silently flipped.
+    # These are sidecar-local proposal coordinates, never authoritative Atlas identity.
+    # _build_ast_units uses a revision-qualified SHA-256 tree_node_id when source_revision
+    # is known, and a legacy fallback digest otherwise. symbol_version_id is also a local
+    # digest, not the canonical registry's revision-bound identity. Consumers must not
+    # promote either value into atlas_symbol_versions, CandidateOrdinal, GraphNodeKey, or
+    # structural edges without independent reviewed resolution. Literal[False] prevents
+    # this claim from being silently flipped.
     canonical_authority: Literal[False] = False
     language: str
     node_kind: str
@@ -889,6 +891,18 @@ class PosTagResponse(BaseModel):
 
 def _utf8_byte_offset(text: str, character_offset: int) -> int:
     return len(text[:character_offset].encode("utf-8"))
+
+
+def _strict_utf8_to_utf16_offset(source_bytes: bytes, utf8_offset: int) -> int:
+    """CANDIDATE, unwired, review-only. Map a UTF-8 byte offset to a UTF-16 code-unit offset.
+    Fails closed: an out-of-range offset, or one that cuts a multi-byte sequence, raises ValueError."""
+    if utf8_offset < 0 or utf8_offset > len(source_bytes):
+        raise ValueError(f"FAIL_CLOSED: UTF-8 offset {utf8_offset} outside 0..{len(source_bytes)}")
+    try:
+        prefix = source_bytes[:utf8_offset].decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"FAIL_CLOSED: UTF-8 offset {utf8_offset} cuts a code point") from exc
+    return len(prefix.encode("utf-16-le")) // 2
 
 
 def _spacy_pos_tags(text: str) -> PosTagResponse:
@@ -1581,6 +1595,25 @@ def _slice_utf8_bytes(text: str, start_byte: int, end_byte: int) -> str:
         raise ValueError("UTF-8 byte span splits a code point") from exc
 
 
+def _suffix_for_language(language: str) -> str:
+    lang = language.lower()
+    if lang == "svelte":
+        return ".svelte"
+    if lang in {"tsx", "typescriptreact"}:
+        return ".tsx"
+    if lang in {"javascript", "js", "mjs", "cjs"}:
+        return ".js"
+    if lang in {"python", "py"}:
+        return ".py"
+    if lang in {"rust", "rs"}:
+        return ".rs"
+    if lang in {"go"}:
+        return ".go"
+    if lang in {"html"}:
+        return ".html"
+    return ".ts"
+
+
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     # Canonical structural chunking prefers the installed treesitter-chunker package in the
     # Python sidecar. The local tree-sitter parser remains a compatibility fallback only.
@@ -1589,7 +1622,7 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
         if callable(chunk_file):
             temp_path: Optional[str] = None
             try:
-                suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+                suffix = _suffix_for_language(language)
                 with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
                     handle.write(text)
                     temp_path = handle.name
@@ -1910,6 +1943,48 @@ def _digest_parts(*parts: Any) -> str:
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
+def _mint_revision_qualified_tree_node_id(
+    file_path: str,
+    source_revision: str,
+    ast_kind: str,
+    symbol_fqn: str,
+    utf8_start: int,
+    utf8_end: int,
+) -> str:
+    """Single-owner sidecar coordinate digest (canonical_authority=False)."""
+    if not source_revision or source_revision == "unknown":
+        raise ValueError("FAIL_CLOSED: source_revision is required for revision-qualified tree_node_id")
+    raw = f"tn_v1|{file_path}|{source_revision}|{ast_kind}|{symbol_fqn}|{utf8_start}:{utf8_end}".encode("utf-8")
+    return f"tn_v1_{hashlib.sha256(raw).hexdigest()[:32]}"
+
+
+def strict_utf8_to_utf16_offset(source_bytes: bytes, utf8_offset: int) -> int:
+    """Fails closed if utf8_offset slices inside a multi-byte UTF-8 sequence."""
+    if utf8_offset < 0 or utf8_offset > len(source_bytes):
+        raise ValueError(f"UTF-8 offset {utf8_offset} out of bounds (len={len(source_bytes)})")
+    try:
+        prefix = source_bytes[:utf8_offset].decode("utf-8", errors="strict")
+    except UnicodeDecodeError as exc:
+        raise ValueError(f"UTF-8 offset {utf8_offset} cuts mid-codepoint: {exc}") from exc
+    return len(prefix.encode("utf-16-le")) // 2
+
+
+def mint_sorted_hyperedge_id(
+    source_file: str,
+    source_revision: str,
+    relation_kind: str,
+    member_tree_node_ids: list[str],
+) -> tuple[str, list[str]]:
+    """Sorts member_tree_node_ids first so set membership is order-independent."""
+    if not source_revision or source_revision == "unknown":
+        raise ValueError("FAIL_CLOSED: source_revision is required for revision-qualified hyperedge_id")
+    sorted_members = sorted(set(member_tree_node_ids))
+    if len(sorted_members) < 2:
+        raise ValueError("Hyperedge requires at least 2 distinct member_tree_node_ids")
+    raw = f"he_v1|{source_file}|{source_revision}|{relation_kind}|{'|'.join(sorted_members)}".encode("utf-8")
+    return f"he_v1_{hashlib.sha256(raw).hexdigest()[:32]}", sorted_members
+
+
 def _unique_nonempty(values: list[Any]) -> list[str]:
     return list(dict.fromkeys(str(value).strip() for value in values if str(value).strip()))
 
@@ -1939,13 +2014,18 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
         end = max(start, int(chunk.end))
         line_start = text.encode("utf-8")[:start].count(b"\n") + 1
         line_end = line_start + max(0, chunk.text.count("\n"))
+        tree_node_id = (
+            _mint_revision_qualified_tree_node_id(source_ref, source_revision, chunk.kind, symbol, start, end)
+            if source_revision != "unknown"
+            else _digest_parts(source_ref, source_revision, symbol, start, end, idx)[:24]
+        )
         ast_units.append(
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
                 packet_key=req.packet_key,
-                tree_node_id=_digest_parts(source_ref, symbol, start, end, idx)[:24],
-                symbol_version_id=_digest_parts(source_ref, symbol, structural_revision)[:24],
+                tree_node_id=tree_node_id,
+                symbol_version_id=_digest_parts(source_ref, source_revision, symbol, structural_revision)[:24],
                 language=language or "unknown",
                 node_kind=chunk.kind,
                 qualified_symbol=symbol,
@@ -1972,12 +2052,18 @@ def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], langua
         )
 
     if not ast_units:
+        fallback_end = len(text.encode("utf-8"))
+        fallback_tree_node_id = (
+            _mint_revision_qualified_tree_node_id(source_ref, source_revision, "module", "fallback", 0, fallback_end)
+            if source_revision != "unknown"
+            else _digest_parts(source_ref, source_revision, "fallback", language)[:24]
+        )
         ast_units.append(
             AstUnit(
                 source_ref=source_ref,
                 source_revision=source_revision,
                 packet_key=req.packet_key,
-                tree_node_id=_digest_parts(source_ref, "fallback", language)[:24],
+                tree_node_id=fallback_tree_node_id,
                 symbol_version_id=None,
                 language=language or "unknown",
                 node_kind="module",
@@ -3052,7 +3138,7 @@ def _symbol_graph_evidence(source: str, language: str, file_path: str) -> tuple[
     if not callable(extractor):
         return [], ["treesitter-chunker symbol_graph API unavailable; edge evidence omitted"]
 
-    suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+    suffix = _suffix_for_language(language)
     temp_path: Optional[str] = None
     try:
         with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:

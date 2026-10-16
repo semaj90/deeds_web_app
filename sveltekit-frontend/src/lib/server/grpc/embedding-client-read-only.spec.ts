@@ -24,7 +24,7 @@ vi.mock('../redis.js', () => ({ getRedis: () => redisMock }));
 vi.mock('../env.server.js', () => ({
   ENV: envMock,
 }));
-vi.mock('../ollama.js', () => ({ ollamaFetch: embeddingFetchMock }));
+vi.mock('../ollama.js', () => ({ embedOrChatFetch: embeddingFetchMock }));
 vi.mock('../embedding/embedding-provider-v1.js', async (importOriginal) => ({
   ...await importOriginal<typeof import('../embedding/embedding-provider-v1.js')>(),
   resolveEmbeddingProviderV1: () => ({

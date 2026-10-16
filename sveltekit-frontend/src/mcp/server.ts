@@ -530,7 +530,7 @@ export function setupToolHandlers() {
             },
             useAI: {
               type: 'boolean',
-              description: 'Use AI (Ollama gemma4-rotorquant:latest) to generate case-specific content',
+              description: 'Use AI (llama-server Ornith 1.5 :8090) to generate case-specific content',
               default: false,
             },
           },
@@ -626,7 +626,7 @@ export function setupToolHandlers() {
           type: 'object',
           properties: {
             prompt: { type: 'string', description: 'The inference prompt' },
-            model: { type: 'string', description: 'Model name (default: gemma4-rotorquant:latest)' },
+            model: { type: 'string', description: 'Model name (default: ornith-1.5-9b)' },
             maxTokens: { type: 'number', description: 'Max output tokens', default: 2048 },
             temperature: { type: 'number', description: 'Sampling temperature', default: 0.3 },
             stream: { type: 'boolean', description: 'Enable streaming', default: false },
@@ -857,12 +857,12 @@ export function setupToolHandlers() {
       },
       // ─────────────────────────────────────────────────────────────────────
       // LangExtract Tools — Google's official structured extraction library
-      // Uses local Ollama (gemma4-rotorquant:latest) instead of Gemini API
+      // Uses local llama-server Ornith 1.5 :8090 instead of Gemini API
       // ─────────────────────────────────────────────────────────────────────
       {
         name: 'langextract:legal',
         description:
-          'Extract structured legal entities from text using Google LangExtract + gemma4-rotorquant:latest. Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
+          'Extract structured legal entities from text using Google LangExtract + ornith-1.5-9b Returns parties (plaintiff/defendant), dates, citations, money amounts, statutes, obligations with exact text locations for source grounding.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -2699,13 +2699,13 @@ export function setupToolHandlers() {
         }
 
         // 4. Generate embeddings via Ollama
-        const { ollamaFetch } = await import('../lib/server/ollama.js');
+        const { embedOrChatFetch } = await import('../lib/server/ollama.js');
         const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
         const embeddings: number[][] = [];
 
         for (const chunk of chunks) {
           try {
-            const res = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
+            const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embed`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ model: 'embeddinggemma:latest', input: chunk }),
@@ -4389,7 +4389,7 @@ export function setupToolHandlers() {
             'Compute avg search_time_ms per pipeline grouped by day.',
           ],
           ollama: [
-            'Optimal KV cache quantisation for gemma4-rotorquant:latest at 8K context?',
+            'Optimal KV cache quantisation for ornith-1.5-9b at 8K context?',
             'Flash Attention trade-offs on RTX 3060 Ti.',
           ],
         };

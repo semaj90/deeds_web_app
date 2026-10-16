@@ -133,7 +133,7 @@ test('ACE packet persistence contract', async () => {
       token_count: 500
     }),
     token_count: 500,
-    model: 'gemma4-legal'
+    model: 'ornith-1.5-9b'
   };
 
   const result = await pgPool.query(`

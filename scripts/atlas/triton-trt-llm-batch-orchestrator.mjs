@@ -263,7 +263,7 @@ class BatchOrchestrator extends EventEmitter {
       try {
         // Prepare inference payload
         const payload = {
-          model_name: 'gemma4-rotorquant',
+          model_name: 'ornith-1.5-9b',
           inputs: [
             {
               name: 'input_ids',
@@ -279,7 +279,7 @@ class BatchOrchestrator extends EventEmitter {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-rotorquant',
+            model: 'ornith-1.5-9b',
             prompt: `Analyze packet ${item.packet_key}`,
             max_tokens: 256,
             temperature: 0.3,
@@ -329,7 +329,7 @@ class BatchOrchestrator extends EventEmitter {
         // Publish error event for recovery
         await redis.publish('slm:error:recovery', JSON.stringify({
           packet_key: item.packet_key,
-          model: 'gemma4-rotorquant',
+          model: 'ornith-1.5-9b',
           error: err.message,
           fallback_model: 'native',
         }));

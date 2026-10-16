@@ -734,7 +734,7 @@
 		const llmModelId = data.llmModelId ?? 'ornith-1.5-9b';
 		const embeddingOnnxPath = data.embeddingOnnxPath ?? 'models/embeddinggemma_300m_onnx/model.onnx';
 		const packetJepaPath = data.packetJepaPath ?? 'models/packet-jepa/packet-jepa.pt';
-		const rotorquantModel = 'gemma4-rotorquant:latest';
+		const rotorquantModel = 'ornith-1.5-9b';
 		const embedModel = data.embedModel ?? 'embeddinggemma:latest';
 		const graniteDoclingModel = data.graniteDoclingModel ?? 'ibm/granite-docling:258m';
 		const profile = data.kvProfile ?? 'stock';
@@ -1615,7 +1615,7 @@
 										<div>[QDRANT] Named vector mapping codebase_chunks_768 validated successfully</div>
 										<div>[REDIS] Sub-millisecond exact cache indexer ready</div>
 										<div>[BIFROST] OpenAI L2 semantic proxy bound on port 3040</div>
-										<div>[ROTORQUANT] Chat server running from models/gemma4-rotorquant:latest-iq4xs-direct.gguf</div>
+										<div>[ROTORQUANT] Chat server running from models/ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf</div>
 										{#if health?.neo4j?.ok}
 											<div>[NEO4J] Manifold database containing {health.neo4j.nodeCount ?? 0} active topological nodes connected</div>
 										{/if}

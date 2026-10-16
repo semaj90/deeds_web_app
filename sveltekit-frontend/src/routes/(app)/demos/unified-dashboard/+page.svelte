@@ -364,7 +364,7 @@
 						<div class="settings-form">
 							<div class="form-field">
 								<label for="unified-active-model">Active Model</label>
-								<select id="unified-active-model"><option>gemma4-legal:latest (11.8B)</option><option>llama3:8b</option></select>
+								<select id="unified-active-model"><option>ornith-1.5-9b (11.8B)</option><option>llama3:8b</option></select>
 							</div>
 							<div class="form-field">
 								<label for="unified-temperature">Temperature</label>

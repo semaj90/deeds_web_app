@@ -30,7 +30,7 @@
         notifications: true
       },
       ai: {
-        model: 'gemma4-legal',
+        model: 'ornith-1.5-9b',
         temperature: 0.7,
         maxTokens: 2048,
         ollamaEndpoint: '/api/embed',
@@ -365,7 +365,7 @@
       <div class="form-group">
        <label for="model">Primary Model</label>
        <select id="model" bind:value={config.ai.model}>
-        <option value="gemma4-legal">Gemma 3 Legal (Fine-tuned)</option>
+        <option value="ornith-1.5-9b">Gemma 3 Legal (Fine-tuned)</option>
         <option value="gpt-4o">GPT-4o (OpenAI)</option>
         <option value="claude-3-5-sonnet">Claude 3.5 Sonnet</option>
        </select>
@@ -477,7 +477,7 @@
        <p class="text-xs text-gray-400 mt-1">768-dim, 6 collections, GPU-accelerated</p>
       </SystemStatusCard>
       <SystemStatusCard title="Ollama LLM" status="OK" updatedAt={new Date()}>
-       <p class="text-xs text-gray-400 mt-1">gemma4-legal + embeddinggemma</p>
+       <p class="text-xs text-gray-400 mt-1">ornith-1.5-9b + embeddinggemma</p>
       </SystemStatusCard>
       <SystemStatusCard title="RabbitMQ" status="WARN" updatedAt={new Date()}>
        <p class="text-xs text-gray-400 mt-1">7 queues, 5 exchanges</p>

@@ -80,7 +80,7 @@ function Test-DirectLlamaCpp {
     param([string]$CaseId, [string]$SystemContent, [string]$UserContent)
 
     $body = @{
-        model = "gemma4-legal-iq4xs-direct.gguf"
+        model = "ornith-1.5-9b"
         temperature = 0
         max_tokens = 96
         stream = $false
@@ -139,7 +139,7 @@ function Test-OpenCodeAdapter {
     param([string]$CaseId, [string]$SystemContent, [string]$UserContent)
 
     $body = @{
-        model = "gemma4-legal-iq4xs-direct.gguf"
+        model = "ornith-1.5-9b"
         temperature = 0
         max_tokens = 96
         stream = $false

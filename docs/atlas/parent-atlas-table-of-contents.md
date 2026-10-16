@@ -209,6 +209,7 @@ The next derived surfaces are compare-only until the live contract exists:
 - kanban task spec board consolidation from grouped stale-document hits
 
 ### Graphify / Structural Discovery
+- Routine inspection and focused owner/source lookup: [Daily Graphify discovery helpers](../architecture/graphify-daily-discovery-helpers-v1.md). Commands: `graphify:daily:inspect`, `graphify:daily:search`, `graphify:daily:helpers:test`; use the existing ownership registry and task ledgers, with explicit ignored-graph inspection and bounded lexical results.
 - Graphify is the structural discovery lane: file, import, call, and topology scanning for codebase shape.
 - Parent Atlas is the canonical join lane: `source_ref`, `feature_id`, `feature_label`, `packet_key`, and provenance contracts.
 - Graphify may classify and surface gaps, but it must not replace the canonical storage spine.
@@ -303,3 +304,22 @@ Durable mutations must go through: promotion queue, schema gates, validation rep
 - This TOC is intentionally short and stable.
 - Use the linked docs for lane details, and the master todo for execution state.
 - The canonical join spine remains `sourceRef + feature_id`.
+
+## Proposed frontier: LOD, glyph streaming, tensor analysis (2026-10-15, not started)
+
+Ideas from the operator list, mapped to existing owners. Nothing here is started or promoted. Each row needs its gate before work begins.
+
+| Idea | Owner / existing item | Status and boundary |
+|---|---|---|
+| Frozen baked LOD textures, hot/warm/cold streaming | `parent-atlas-retrieval-lod-algorithm-taxonomy` LOD-01 to LOD-08 | Owned. Tier decisions must trace to a receipt (LOD-08). |
+| Folded-polynomial score-to-tier mapping on cosine similarity (input transform s = (cos+1)/2, since raw cosine is in [-1, 1]) | Proposed PX-04 (adaptive-backprop change) | Proposed. Baked table with checksum; CPU reference parity; never changes retrieval ranking. |
+| NES glyph streaming, ROM-bank style packet frames | Existing "Pokémon ROM-bank / LOD frame" memory reference | Analogy for packet framing only. No NES data path exists in the repo. |
+| "Camera" as viewpoint for LOD | No owner | Not a retrieval input. Proposed mapping: the query and bounded user context act as the viewpoint, not a camera. Needs a definition before work. |
+| Shader-like or renderman-style tensor compilation | No owner | Deferred. No compilation target is defined. The GPU candidate checklist (FT-08) covers alignment only. |
+| GRPO training, gRPC buffers | GRPO: PX-03 and Phase 8. gRPC: existing port map | GRPO is challenger training behind the reviewed-label gate. gRPC buffers stay transport only; no tensor payloads inline. |
+| DLSS-style upscaling or low-rank reconstruction | Ewin Tang low-rank sampling (`TANG-BRANCH-DECISION-01`) | Analogy only. DLSS is a graphics upscaler; Tang sampling is challenger evidence, not reconstruction for retrieval. |
+| Tensor analysis from SOM / 4D topology manifold | SOM and manifold as experimental routing; `parent-atlas-graph-analysis-contract` | Routing only. SOM and manifold coordinates never replace the 768-dim `semantic_768` contract without measured gains. |
+| Indexed corpus of JSON packets as tensor source | Canonical packet persistence (Postgres); JSON as control envelope only | Bulk numeric arrays go through Arrow or mmap, never JSON (wire-format rule). |
+| BitFrost token matrix cache on GPU | BitFrost residency owners (`parent-atlas-ace-bitfrost-cache-correctness`) | Refused for token or KV state: AGENTS.md forbids persisting `kv_cache` or token state. Revision-keyed descriptors only. |
+
+Open questions before any row moves: define the viewpoint for LOD (query or user context), name an owner for shader-style compilation or drop it, and confirm the Tang branch decision before any low-rank reconstruction work.

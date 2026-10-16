@@ -42,7 +42,7 @@ interface StreamChunk {
 async function* streamLlamaServer(request: StreamRequest): AsyncGenerator<StreamChunk> {
   // Model label only — llama-server ignores the `model` field and serves whatever
   // GGUF is currently loaded (verified live: hforf.gguf, an alias of
-  // gemma4-legal-iq4xs-direct.gguf). ollama-config registry still picks a sensible
+  // ornith-1.5-9b). ollama-config registry still picks a sensible
   // label for logging/metadata.
   const model = request.model ?? (
     isLegalTask(request.prompt)

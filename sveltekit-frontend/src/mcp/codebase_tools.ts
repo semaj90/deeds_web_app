@@ -62,6 +62,8 @@ export function registerCodebaseTools(server: McpServer, dispatcherMiddleware?: 
         };
       }
       }
+    ,
+    'READ_ONLY'
     )
   );
 }

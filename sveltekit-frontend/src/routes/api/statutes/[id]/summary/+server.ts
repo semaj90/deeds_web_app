@@ -9,7 +9,7 @@ import { db } from '$lib/server/db/client';
 import { statutes, statuteChunks } from '$lib/server/db/schema-postgres';
 import { eq } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { getChatModelKeepAlive, getOllamaGenerationEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { getChatModelKeepAlive, getLlamaGenerationEndpoint, embedOrChatFetch } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
@@ -80,7 +80,7 @@ Respond in JSON format:
 }`;
 
   try {
-    const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+    const res = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

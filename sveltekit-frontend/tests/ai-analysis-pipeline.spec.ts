@@ -11,7 +11,7 @@
  *
  * Prerequisites:
  *   - Dev server running (npm run dev)
- *   - Ollama running with embeddinggemma + gemma4-rotorquant:latest loaded
+ *   - Ollama running with embeddinggemma + ornith-1.5-9b loaded
  *   - Qdrant accessible (port 6333)
  *
  * All tests gracefully skip if services are unavailable.
@@ -110,7 +110,7 @@ test.describe('AI Analysis Pipeline', () => {
 
 		const res = await apiContext.post(`${BASE_URL}/api/ollama/generate`, {
 			data: {
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 				prompt:
 					'In one sentence, summarize the holding in Miranda v. Arizona, 384 U.S. 436 (1966).',
 				stream: false,

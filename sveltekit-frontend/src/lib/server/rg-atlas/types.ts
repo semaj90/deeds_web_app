@@ -5,21 +5,25 @@
 import { z } from 'zod';
 
 export const rgSearchAtlasOptionsSchema = z.object({
-  query: z.string().min(1).describe('Search query (regex for Stage 1, NL for stages 4-8)'),
-  paths: z.array(z.string()).optional().describe('Filter by directory paths (e.g. ["src/lib"])'),
-  fileTypes: z.array(z.string()).optional().describe('Filter by file extensions (e.g. [".ts", ".svelte"])'),
+  query: z.string().trim().min(1).max(512).describe('Search query (regex for Stage 1, NL for stages 4-8)'),
+  paths: z.array(z.string().trim().min(1).max(256)
+    .refine((value) => !value.includes(String.fromCharCode(0)) && !/^(?:[\\/]|[A-Za-z]:)/.test(value)
+      && !value.split(/[\\/]+/).includes('..'), 'Paths must stay inside the repository'))
+    .max(8).optional().describe('Repository-relative directory paths'),
+  fileTypes: z.array(z.string().trim().regex(/^\.[A-Za-z0-9_-]{1,16}$/))
+    .max(16).optional().describe('File extensions (e.g. [".ts", ".svelte"])'),
   variantCount: z.number().int().min(1).max(5).optional().describe('Number of query variations to generate (default: 3)'),
   topKPerLane: z.number().int().min(1).max(100).optional().describe('Hits to fetch per variant from Qdrant (default: 20)'),
   enableMarcoRerank: z.boolean().optional().describe('Enable the configured cross-encoder reranking tier'),
   enableLangExtract: z.boolean().optional().describe('Enable LangExtract GRPO validation'),
   persist: z.boolean().optional().describe('Persist result to PostgreSQL for replay (default: true)'),
   weights: z.object({
-    marco: z.number(),
-    karpathy: z.number(),
-    cos: z.number(),
-    lang: z.number()
-  }).optional().describe('Weights for final blend score')
-});
+    marco: z.number().finite().min(0).max(1),
+    karpathy: z.number().finite().min(0).max(1),
+    cos: z.number().finite().min(0).max(1),
+    lang: z.number().finite().min(0).max(1)
+  }).strict().optional().describe('Weights for final blend score')
+}).strict();
 
 export interface RgSearchAtlasOptions {
   /** Search query — regex for stage 1, NL for stages 4-8 */

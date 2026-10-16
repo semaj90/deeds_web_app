@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
  */
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 
@@ -61,7 +61,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				send({ step: 'extracting', percentage: 20, message: 'Extracting entities from case...' }, 'progress');
 
 				const prompt = buildGraphPrompt(caseId, focusTypes, context);
-				const response = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+				const response = await embedOrChatFetch(`${OLLAMA_URL}/api/generate`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

@@ -2527,7 +2527,7 @@ The following remain open and block training, activation, and any ownership clai
       trace, packet, feature label, workspace/source revision, and canonical identity
       are all joined explicitly. Current dry-run evidence is `1,100` traces, `0` indexed
       packets, `0` feature rows, and `0` positive rows; all training gates fail.
-- [ ] **XGBOOST-LEAKAGE-FREE-TRAINING-01** — regenerate the feature CSV only from the
+- [ ] [workstation-p18] **XGBOOST-LEAKAGE-FREE-TRAINING-01** — regenerate the feature CSV only from the
       admitted bridge, validate the trace-score/label relationship, and run a genuine
       held-out training/evaluation. The existing empty CSV, historical CSV, fabricated
       V2 metrics, and one-row smoke artifact are not training evidence.

@@ -2,7 +2,7 @@
 // migrated from Ollama's /api/generate to a direct fetch() against llama-server's OpenAI-
 // compatible /chat/completions endpoint (LLAMA_SERVER_BASE_URL + LOCAL_VLM_MODEL from
 // $lib/server/ai/local-llama-provider.js). It never imports $lib/server/ollama.js at all -- the
-// old ollamaFetch mock below was inert (mocked a module the route doesn't touch), so
+// old embedOrChatFetch mock below was inert (mocked a module the route doesn't touch), so
 // mockOllamaFetch was never called and the route's real fetch() calls fell through to the
 // live network in test runs. Fixed by stubbing global fetch to match the real request shape
 // (choices[0].message.content, non-streaming) instead.

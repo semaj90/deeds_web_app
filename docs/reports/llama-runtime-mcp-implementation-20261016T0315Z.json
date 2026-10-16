@@ -1,0 +1,35 @@
+{
+  "schema": "atlas.llama-runtime-mcp-implementation.v1",
+  "status": "IMPLEMENTED_CONTRACT_TESTED_LIVE_STATUS_PROVEN",
+  "likely_cause": "Existing VS Code process controls were not exposed as bounded TRACE MCP tools.",
+  "evidence": [
+    "sveltekit-frontend/src/mcp/llama-runtime-tools.spec.ts: 9 MCP tests passed",
+    "scripts/atlas/test-llama-server-control.ps1: 16 isolated PowerShell guard and lifecycle fixture checks passed; real service mutations 0",
+    "docs/reports/llama-runtime-types-20261015T201501.txt: focused strict TypeScript check exit 0",
+    "docs/reports/llama-runtime-openspec-20261015T201306.txt: strict owning OpenSpec validation passed",
+    "docs/reports/llama-runtime-live-status-20261015T201221.json: actual MCP in-memory list/call with real Windows/NVIDIA status readback; STOPPED; mutation false",
+    "VS Code tasks JSONC parsed successfully and stop task binding to shared controller verified",
+    "Scoped git diff whitespace check passed"
+  ],
+  "patch_targets": [
+    "scripts/atlas/llama-server-control.ps1",
+    "scripts/atlas/test-llama-server-control.ps1",
+    "sveltekit-frontend/src/mcp/llama-runtime-tools.ts",
+    "sveltekit-frontend/src/mcp/llama-runtime-tools.spec.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "sveltekit-frontend/scripts/mcp/smoke-llama-runtime-tools.mjs",
+    ".vscode/tasks.json",
+    "docs/architecture/llama-runtime-mcp-controls.md",
+    "openspec/changes/parent-atlas-agent-framework-integration-hardening/tasks.md"
+  ],
+  "safe_next_command": "pwsh -NoProfile -File scripts/atlas/llama-server-control.ps1 -Action status",
+  "smoke_command": "cd sveltekit-frontend; node --import tsx scripts/mcp/smoke-llama-runtime-tools.mjs",
+  "report_path": "docs/reports/llama-runtime-mcp-implementation-20261016T0315Z.json",
+  "limits": {
+    "deployedTraceDiscoveryProven": false,
+    "liveStartUnloadCycleProven": false,
+    "sharedTraceRestarted": false,
+    "serviceMutationsPerformedDuringValidation": false,
+    "svelteCheckRun": false
+  }
+}

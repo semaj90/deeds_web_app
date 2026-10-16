@@ -77,7 +77,7 @@ describe('workflow-lineage contract', () => {
         retrieval_run_id: '99999999-9999-4999-8999-999999999999',
         model_provider: 'ollama',
         model_name: 'gemma4',
-        model_revision: 'gemma4-legal-iq4xs-direct.gguf',
+        model_revision: 'ornith-1.5-9b',
       },
     });
 
@@ -165,7 +165,7 @@ describe('workflow-lineage contract', () => {
           retrieval_run_id: '99999999-9999-4999-8999-999999999999',
           model_provider: 'ollama',
           model_name: 'gemma4',
-          model_revision: 'gemma4-legal-iq4xs-direct.gguf',
+          model_revision: 'ornith-1.5-9b',
         },
       })
     ).toThrow();

@@ -13,7 +13,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { createHash } from 'node:crypto';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
 import {
   prepareEmbeddingInputV1,
@@ -492,7 +492,7 @@ async function generateViaHttp(
 
   const batchStart = performance.now();
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
+    const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: texts }),
@@ -588,7 +588,7 @@ async function fetchOllamaEmbeddingSingle(
         ? JSON.stringify({ model: SERVER_EMBEDDING_MODEL, input: text })
         : JSON.stringify({ model: SERVER_EMBEDDING_MODEL, prompt: text });
 
-      const res = await ollamaFetch(url, {
+      const res = await embedOrChatFetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body,
@@ -661,7 +661,7 @@ async function resolveQualifiedCacheArtifactRevision(): Promise<string | null> {
     if (!ollamaBaseUrl || provider.provider === 'onnx_directml' || provider.baseUrl?.replace(/\/$/, '') !== ollamaBaseUrl) {
       return null;
     }
-    const response = await ollamaFetch(`${ollamaBaseUrl}/api/tags`);
+    const response = await embedOrChatFetch(`${ollamaBaseUrl}/api/tags`);
     if (!response.ok) return null;
     const payload = await response.json() as { models?: Array<{ name?: string; model?: string; digest?: string }> };
     const model = payload.models?.find((candidate) =>

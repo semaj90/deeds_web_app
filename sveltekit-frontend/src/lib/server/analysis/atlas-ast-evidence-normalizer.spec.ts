@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { normalizeAtlasAstEvidence } from './atlas-ast-evidence-normalizer.js';
+import { normalizeAtlasAstEvidence, validateAtlasAstEvidenceBytes } from './atlas-ast-evidence-normalizer.js';
 
 const evidence = (
   lineStart: number,
@@ -53,6 +53,29 @@ const evidence = (
 });
 
 describe('atlas AST evidence normalizer', () => {
+  it('validates source-byte spans and UTF-8 boundaries without minting identity', () => {
+    const source = Buffer.from('const café = 1;\n', 'utf8');
+    const valid = evidence(1);
+    valid.chunks[0]!.start_byte = 0;
+    valid.chunks[0]!.end_byte = source.byteLength;
+    expect(validateAtlasAstEvidenceBytes(valid, source)).toEqual([]);
+
+    valid.chunks[0]!.start_byte = 10;
+    valid.chunks[0]!.end_byte = 11;
+    expect(validateAtlasAstEvidenceBytes(valid, source)).toContainEqual({ index: 0, code: 'SPAN_NOT_UTF8_BOUNDARY' });
+
+    valid.chunks[0]!.start_byte = 0;
+    valid.chunks[0]!.end_byte = source.byteLength + 1;
+    expect(validateAtlasAstEvidenceBytes(valid, source)).toContainEqual({ index: 0, code: 'SPAN_OUT_OF_BOUNDS' });
+
+    valid.chunks[0]!.start_byte = 0;
+    valid.chunks[0]!.end_byte = 2;
+    expect(validateAtlasAstEvidenceBytes(valid, new Uint8Array([0xc0, 0xaf]))).toContainEqual({
+      index: 0,
+      code: 'SPAN_NOT_UTF8_BOUNDARY',
+    });
+  });
+
   it('repeats the same normalized graph deterministically for the same revision', () => {
     const first = normalizeAtlasAstEvidence(evidence(1));
     const second = normalizeAtlasAstEvidence(evidence(1));

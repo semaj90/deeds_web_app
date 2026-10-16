@@ -8,10 +8,10 @@ allowed-tools:
   - mcp__trace__graph_pagerank_top
   - mcp__trace__topology_search_4d
   - mcp__trace__context_build_kv_packet
-  - mcp__gemma4-offload__gemma4_chat
-  - mcp__gemma4-offload__gemma4_summarize
-  - mcp__gemma4-offload__gemma4_classify
-  - mcp__gemma4-offload__gemma4_health
+  - mcp__gemma4-offload__repo_chat
+  - mcp__gemma4-offload__repo_summarize
+  - mcp__gemma4-offload__repo_classify
+  - mcp__gemma4-offload__repo_llm_health
 ---
 
 # TRACE MCP tooling
@@ -57,7 +57,7 @@ Use `mcporter` for shell-level smoke testing:
 ```bash
 npx mcporter list                                          # discover registered tools
 npx mcporter call trace.kag_search query:"reranker topology"
-npx mcporter call gemma4-offload.gemma4_health  # compatibility registration; resolves the active local model
+npx mcporter call gemma4-offload.repo_llm_health  # registered server name is a compatibility alias
 ```
 
 Validator gates `G30` and `G31` already cover handshake + round-trip

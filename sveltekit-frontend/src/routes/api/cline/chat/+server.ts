@@ -9,7 +9,7 @@
  *   curl -N http://localhost:5173/api/cline/chat \
  *     -H "Content-Type: application/json" \
  *     -d '{
- *       "model": "gemma4-legal-iq4xs-direct.gguf",
+ *       "model": "ornith-1.5-9b",
  *       "messages": [{"role": "user", "content": "explain this code"}],
  *       "stream": true,
  *       "use_kv_cache": true

@@ -29,7 +29,7 @@ const CACHE_DIR = path.join(ROOT, '.cache', 'ace', 'context-packs');
 const REDIS_CONTAINER = process.env.REDIS_CONTAINER ?? process.env.DEEDS_REDIS_CONTAINER ?? 'legal-ai-valkey';
 const POSTGRES_CONTAINER = process.env.DEEDS_POSTGRES_CONTAINER || '94823593eb8e_legal-ai-postgres';
 const BASE_URL = (process.env.TURBO_BASE ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-const MODEL = process.env.TURBO_MODEL_NAME ?? 'gemma4-rotorquant:latest';
+const MODEL = process.env.TURBO_MODEL_NAME ?? 'ornith-1.5-9b';
 const CHAT_TIMEOUT_MS = Number(process.env.TURBO_BENCH_CHAT_TIMEOUT_MS ?? '120000');
 
 const BASE_PROMPT =
@@ -154,7 +154,7 @@ INSERT INTO llm_context_cache (
   last_used_at
 ) VALUES (
   ${sqlLiteral(cacheKey)},
-  'gemma4-rotorquant:latest',
+  'ornith-1.5-9b',
   'n/a',
   'phase7-benchmark',
   ${sqlLiteral(metadata.tokenizerHash)},

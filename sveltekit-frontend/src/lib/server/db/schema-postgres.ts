@@ -1771,7 +1771,7 @@ export const ldrSynthesis = pgTable('ldr_synthesis', {
     .unique()
     .references(() => ldrResearchTasks.id, { onDelete: 'cascade' }),
   synthesisText: text('synthesis_text').notNull(),
-  model: varchar('model', { length: 100 }).notNull(), // gemma4-rotorquant:latest, etc.
+  model: varchar('model', { length: 100 }).notNull(), // ornith-1.5-9b, etc.
   confidence: real('confidence'),
   citedResultIds: text('cited_result_ids'), // comma-separated UUIDs
   keyFindings: jsonb('key_findings'), // array of extracted findings
@@ -5433,7 +5433,7 @@ export const deepResearchReports = pgTable('deep_research_reports', {
   userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   query: text('query').notNull(),
   reportType: varchar('report_type', { length: 50 }).default('full').notNull(),
-  modelUsed: varchar('model_used', { length: 100 }).default('gemma4-rotorquant:latest'),
+  modelUsed: varchar('model_used', { length: 100 }).default('ornith-1.5-9b'),
   markdownContent: text('markdown_content'),
   citations: jsonb('citations'), // Array of {num, title, url, snippet}
   recommendations: jsonb('recommendations'), // Array of {id, title, description, action_type, confidence}

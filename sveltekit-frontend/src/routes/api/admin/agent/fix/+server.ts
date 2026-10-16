@@ -4,7 +4,7 @@ import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 function broadcastAgentProgress(_data: unknown) { /* no-op: progress tracked via returned fixes array */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, embedOrChatFetch } from '$lib/server/ollama.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -25,7 +25,7 @@ interface AgentProgress {
 async function queryKnowledgeBase(filePath: string, errorContext: string): Promise<string> {
 	try {
 		// Generate embedding for the error context
-		const embedResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedResponse = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest',

@@ -48,9 +48,9 @@ const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  embedOrChatFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
 
 // ── DB mock ────────────────────────────────────────────────────
@@ -280,7 +280,7 @@ describe('/api/infrastructure/status (GET)', () => {
         return { ok: false };
       })
     );
-    // ollamaFetch uses the mocked version
+    // embedOrChatFetch uses the mocked version
     mockOllamaFetch.mockResolvedValue({ ok: true });
     const mod = await import('../src/routes/api/infrastructure/status/+server');
     GET = mod.GET;
@@ -477,7 +477,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
     // /api/ollama/pull is Ollama-scoped, and Ollama is embeddings-only per this repo's hard rule
     // (root CLAUDE.md, "Ollama vs llama-server Boundary") — the route correctly reports the
     // embedding model here, never a chat/generation model name. This was a stale hardcoded
-    // 'gemma4-rotorquant:latest' assertion until 2026-09-06 (parent-atlas-retrieval-staging-planes,
+    // 'ornith-1.5-9b' assertion until 2026-09-06 (parent-atlas-retrieval-staging-planes,
     // OPENAI-FACADE-02) — the route never changed, only this test's expectation was wrong.
     expect(data.model).toBe('embeddinggemma:latest');
     expect(data.url).toBe('http://ollama.test');
@@ -485,7 +485,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
 
   // POST
   it('POST returns 401 when unauthenticated', async () => {
-    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: anonLocals });
+    const res = await POST({ request: mkRequest({ model: 'ornith-1.5-9b' }), locals: anonLocals });
     expect(res.status).toBe(401);
   });
 
@@ -500,7 +500,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
   });
 
   it('POST pulls model successfully', async () => {
-    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: authedLocals });
+    const res = await POST({ request: mkRequest({ model: 'ornith-1.5-9b' }), locals: authedLocals });
     const data = await res.json();
     expect(res.status).toBe(200);
     expect(data.ok).toBe(true);
@@ -535,7 +535,7 @@ describe('/api/ollama/pull (GET/POST)', () => {
       })
     );
 
-    const res = await POST({ request: mkRequest({ model: 'gemma4-rotorquant:latest' }), locals: authedLocals });
+    const res = await POST({ request: mkRequest({ model: 'ornith-1.5-9b' }), locals: authedLocals });
     const data = await res.json();
     expect(res.status).toBe(500);
     expect(data.ok).toBe(false);
@@ -574,7 +574,7 @@ describe('/api/ollama/generate (POST)', () => {
       body: null,
       json: async () => ({
         response: 'Legal analysis complete.',
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
         done: true,
       }),
     });
@@ -609,17 +609,17 @@ describe('/api/ollama/generate (POST)', () => {
     mockOllamaFetch.mockResolvedValueOnce({
       ok: true,
       body: null,
-      json: async () => ({ response: 'done', model: 'gemma4-rotorquant:latest' }),
+      json: async () => ({ response: 'done', model: 'ornith-1.5-9b' }),
     });
 
     await POST({
-      request: mkRequest({ prompt: 'test', model: 'gemma4-rotorquant:latest', stream: false }),
+      request: mkRequest({ prompt: 'test', model: 'ornith-1.5-9b', stream: false }),
       locals: authedLocals,
     });
 
     expect(mockOllamaFetch).toHaveBeenCalledOnce();
     const callBody = JSON.parse((mockOllamaFetch.mock.calls[0] as any[])[1].body);
-    expect(callBody.model).toBe('gemma4-rotorquant:latest');
+    expect(callBody.model).toBe('ornith-1.5-9b');
   });
 
   it('returns 503 when Ollama fails', async () => {
@@ -846,7 +846,7 @@ describe('/api/case-theory (POST)', () => {
 		expect(res.status).toBe(200);
 		expect(data.success).toBe(true);
 		expect(data.plan.masterTheory).toBeTruthy();
-		expect(data.metadata.model).toBe('gemma4-rotorquant:latest');
+		expect(data.metadata.model).toBe('ornith-1.5-9b');
 	});
 
 	it('returns 422 when LLM returns non-JSON', async () => {

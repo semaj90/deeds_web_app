@@ -135,7 +135,7 @@ async function main() {
         source: 'atlas_packets',
         generated_at: new Date().toISOString(),
         worker: 'export-gemma4-summaries-ndjson',
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: 'ornith-1.5-9b',
       },
       summary_packet_key: `${row.packet_key}:summary`,
       qdrant_payload: {

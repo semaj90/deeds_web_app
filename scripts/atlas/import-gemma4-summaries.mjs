@@ -177,7 +177,7 @@ async function processInputFile(filePath, summariesToInsert, summaryPackets, sta
         feature_id: featureIdFor(obj),
         summary,
         layer_type: 'gemma4_offline',
-        model_name: 'gemma4-legal-iq4xs-direct.gguf',
+        model_name: 'ornith-1.5-9b',
         summary_level: 'packet',
         metadata,
       };

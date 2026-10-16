@@ -31,12 +31,12 @@ vi.mock('$lib/config/env.server.js', () => ({
 
 const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
-  ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+  embedOrChatFetch: (...args: unknown[]) => mockOllamaFetch(...args),
   VLM_MODELS: {
-    vision: 'gemma4-rotorquant:latest',
+    vision: 'ornith-1.5-9b',
     embedding: 'embeddinggemma:latest',
-    legal: 'gemma4-rotorquant:latest',
-    gemma4: 'gemma4-rotorquant:latest',
+    legal: 'ornith-1.5-9b',
+    gemma4: 'ornith-1.5-9b',
   },
 }));
 

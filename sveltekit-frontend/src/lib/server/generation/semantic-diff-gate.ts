@@ -15,7 +15,7 @@
 
 import { createHash } from 'crypto';
 import { getRedis } from '$lib/server/redis.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { db } from '$lib/server/db/client.js';
 import { atlas_semantic_diffs } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
@@ -42,7 +42,7 @@ interface SemanticDiffResult {
 
 async function embedText(text: string): Promise<number[] | null> {
   try {
-    const res = await ollamaFetch('/v1/embeddings', {
+    const res = await embedOrChatFetch('/v1/embeddings', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

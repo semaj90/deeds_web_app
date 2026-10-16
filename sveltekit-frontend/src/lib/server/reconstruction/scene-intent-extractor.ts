@@ -31,7 +31,7 @@ export interface SceneIntentExtractInput {
   evidenceIds?:  string[];
   aceContext?:   string;
   aestheticHint?: 'ps1' | 'n64' | 'modern-low-poly';
-  model?:        string;     // default: gemma4-rotorquant:latest
+  model?:        string;     // default: ornith-1.5-9b
   temperature?:  number;     // default: 0.2 — deterministic intent extraction
 }
 

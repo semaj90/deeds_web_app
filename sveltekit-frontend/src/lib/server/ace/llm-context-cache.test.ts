@@ -94,7 +94,7 @@ import {
 function makeIdentity(overrides: Partial<ContextCacheIdentity> = {}): ContextCacheIdentity {
   return {
     queryHash: 'query-hash',
-    modelName: 'gemma4-rotorquant:latest',
+    modelName: 'ornith-1.5-9b',
     modelQuant: 'rotorquant',
     kvQuant: 'q8_0/q8_0',
     draftModel: true,
@@ -125,7 +125,7 @@ function makePacket(overrides: Partial<CachedContextPacket> = {}): CachedContext
     cacheHit: true,
     retrievalSkipped: true,
     backend: 'turboquant',
-    modelName: 'gemma4-rotorquant:latest',
+    modelName: 'ornith-1.5-9b',
     modelQuant: 'rotorquant',
     kvQuant: 'q8_0/q8_0',
     draftModel: true,

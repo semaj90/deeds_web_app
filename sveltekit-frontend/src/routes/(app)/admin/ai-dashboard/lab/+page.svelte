@@ -38,7 +38,7 @@
 		casesProcessed: 0,
 		assistantSessions: 0,
 		embeddingModel: 'embeddinggemma:latest',
-		llmModel: 'gemma4-legal:latest',
+		llmModel: 'ornith-1.5-9b',
 		ollamaStatus: 'unknown',
 	});
 	let loading = $state(true);

@@ -128,7 +128,7 @@ export function makeGemma4SummaryPacket(row: Record<string, unknown>, index = 0)
       source: 'atlas_packets',
       generated_at: new Date().toISOString(),
       worker: 'packages-parent-atlas-summary-packets',
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: 'ornith-1.5-9b',
     },
     summary_packet_key: normalizeText(row.summary_packet_key || `${packetKey}:summary`),
     qdrant_payload: {

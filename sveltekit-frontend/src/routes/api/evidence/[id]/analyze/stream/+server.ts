@@ -15,7 +15,7 @@
  * SSE event shape (mirrors /api/chat/stream for client reuse):
  *   data: {"type":"start","evidenceId":"...","timestamp":"..."}
  *   data: {"type":"token","content":"..."}    (repeated)
- *   data: {"type":"done","durationMs":1234,"model":"gemma4-rotorquant:latest","auditId":"..."}
+ *   data: {"type":"done","durationMs":1234,"model":"ornith-1.5-9b","auditId":"..."}
  *   data: {"type":"error","error":"..."}      (terminal on failure)
  *
  * Auth: requires locals.user (DEV_BYPASS_AUTH honored upstream).

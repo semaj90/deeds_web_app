@@ -3699,9 +3699,15 @@
       "command": "pwsh",
       "args": [
         "-NoProfile",
-        "-Command",
-        "$p = Get-CimInstance Win32_Process -Filter \"Name='llama-server.exe'\" | Where-Object { $_.CommandLine -match '--port 8090( |$)' }; if (-not $p) { Write-Host 'No llama-server on :8090 - nothing to stop' } else { $p | ForEach-Object { Write-Host ('Stopping PID ' + $_.ProcessId + ' (port 8090) gracefully; the Ollama runner and other llama-server processes are not touched'); Stop-Process -Id $_.ProcessId }; Start-Sleep -Seconds 4; if (Get-Process -Id ($p | Select-Object -First 1).ProcessId -ErrorAction SilentlyContinue) { Write-Host 'Still running after graceful stop - not forcing. Re-run Status or stop it manually.' } else { Write-Host 'Stopped.' } }; nvidia-smi --query-gpu=memory.used,memory.free --format=csv,noheader"
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/atlas/llama-server-control.ps1",
+        "-Action",
+        "unload",
+        "-ConfirmControl"
       ],
+      "options": { "cwd": "${workspaceFolder}" },
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -3709,7 +3715,7 @@
         "clear": false
       },
       "problemMatcher": [],
-      "detail": "Graceful stop of ONLY the :8090 llama-server by PID (frees ~6.4 GiB for cuVS KMeans or other GPU jobs). Anything calling :8090 fails until it is started again. Never use taskkill /IM llama-server.exe: Ollama's embedding runner shares the image name."
+      "detail": "Shared TRACE MCP controller: stop ONLY an idle, ownership-checked :8090 llama-server by PID; verify shutdown and report measured used/free VRAM. Refuses busy or unavailable slots. Does not stop Ollama or force-kill other servers."
     },
     {
       "label": "⚡ TurboQuant: Start (vision, CPU projector, :8090)",
@@ -12110,6 +12116,32 @@
         "clear": false
       },
       "detail": "Runs the existing OpenCode agent against the bounded unified-residency proof. The command is read-only and does not use --auto; no migration, datastore, projection, cleanup, or GPU-state mutation is authorized."
+    },
+    {
+      "label": "Atlas: Graph Tests",
+      "type": "process",
+      "command": "npm",
+      "args": [
+        "exec",
+        "--",
+        "vitest",
+        "run",
+        "src/lib/server/atlas/graph-query.spec.ts"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/sveltekit-frontend"
+      },
+      "problemMatcher": [],
+      "detail": "Runs the Vitest suite for the unified atlas.graph.query boundary and OAKLIB ontology helper."
+    },
+    {
+      "label": "Atlas: Graph Proof",
+      "dependsOn": [
+        "Atlas: Graph Tests"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "detail": "Validates the unified graph Top-K, OAKLIB ontology sidecar, and SearchRuntime integration."
     }
   ]
 }

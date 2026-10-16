@@ -54,7 +54,7 @@
 	// D3 Knowledge Provenance Graph — maps tech stack + evidence relationships
 	const graphEntities = [
 		'SvelteKit 2', 'Svelte 5 Runes', 'Drizzle ORM 0.44', 'PostgreSQL 16',
-		'Qdrant Vector DB', 'Ollama gemma4-legal', 'WebGPU', 'ONNX Runtime',
+		'Qdrant Vector DB', 'Ollama ornith-1.5-9b', 'WebGPU', 'ONNX Runtime',
 		'Fabric.js', 'D3.js v7', 'Canvas API', 'IndexedDB + LokiJS',
 		'Redis Cache', 'RabbitMQ', 'Evidence Pipeline', 'RAG Pipeline'
 	];
@@ -64,11 +64,11 @@
 		{ from: 'SvelteKit 2', to: 'Drizzle ORM 0.44', type: 'DEPENDS_ON' },
 		{ from: 'Drizzle ORM 0.44', to: 'PostgreSQL 16', type: 'DEPENDS_ON' },
 		{ from: 'SvelteKit 2', to: 'Qdrant Vector DB', type: 'USES' },
-		{ from: 'Evidence Pipeline', to: 'Ollama gemma4-legal', type: 'USES' },
+		{ from: 'Evidence Pipeline', to: 'Ollama ornith-1.5-9b', type: 'USES' },
 		{ from: 'Evidence Pipeline', to: 'Qdrant Vector DB', type: 'DEPENDS_ON' },
 		{ from: 'Evidence Pipeline', to: 'RabbitMQ', type: 'USES' },
 		{ from: 'RAG Pipeline', to: 'Qdrant Vector DB', type: 'DEPENDS_ON' },
-		{ from: 'RAG Pipeline', to: 'Ollama gemma4-legal', type: 'USES' },
+		{ from: 'RAG Pipeline', to: 'Ollama ornith-1.5-9b', type: 'USES' },
 		{ from: 'ONNX Runtime', to: 'WebGPU', type: 'USES' },
 		{ from: 'Fabric.js', to: 'Canvas API', type: 'IMPLEMENTS' },
 		{ from: 'D3.js v7', to: 'SvelteKit 2', type: 'IMPLEMENTS' },
@@ -186,7 +186,7 @@
 			{ name: 'Drizzle ORM 0.44', status: 'active', detail: '70+ tables, pgvector' },
 			{ name: 'Redis Cache', status: 'active', detail: 'Configurable TTL, cross-request' },
 			{ name: 'Qdrant Vector DB', status: 'active', detail: '768-dim, 6 collections' },
-			{ name: 'Ollama LLM', status: 'active', detail: 'gemma4-legal + embeddinggemma' }
+			{ name: 'Ollama LLM', status: 'active', detail: 'ornith-1.5-9b + embeddinggemma' }
 		],
 		pipeline: [
 			{ name: 'Evidence Pipeline', status: 'active', detail: '8 stages: upload → embedding' },
@@ -472,7 +472,7 @@
 	<div class="ec-footer">
 		<h3 class="ec-footer-title"><Icon name="cpu" size={14} /> Full Tech Stack</h3>
 		<div class="ec-footer-tags">
-			{#each ['Svelte 5 Runes', 'SvelteKit 2', 'Drizzle ORM 0.44', 'PostgreSQL 16 + pgvector', 'Qdrant (768-dim)', 'Ollama gemma4-legal', 'Redis Cache', 'RabbitMQ', 'WebGPU + ONNX', 'IndexedDB + LokiJS', 'Fabric.js', 'D3.js v7', 'Canvas 2D', 'SVG Force', 'XState v5', 'FastMCP (9 tools)'] as tech}
+			{#each ['Svelte 5 Runes', 'SvelteKit 2', 'Drizzle ORM 0.44', 'PostgreSQL 16 + pgvector', 'Qdrant (768-dim)', 'Ollama ornith-1.5-9b', 'Redis Cache', 'RabbitMQ', 'WebGPU + ONNX', 'IndexedDB + LokiJS', 'Fabric.js', 'D3.js v7', 'Canvas 2D', 'SVG Force', 'XState v5', 'FastMCP (9 tools)'] as tech}
 				<span class="ec-footer-tag">{tech}</span>
 			{/each}
 		</div>

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-// Test gemma4-rotorquant:latest-fast with 3-tier cache
+// Test ornith-1.5-9b with 3-tier cache
 
 const query = 'What is hearsay evidence in California criminal law?';
 
 async function test() {
-  console.log('Testing cache with gemma4-rotorquant:latest-fast model...\n');
+  console.log('Testing cache with ornith-1.5-9b model...\n');
 
   console.log('Run 1 (Cold - L3 Ollama)...');
   let start = Date.now();

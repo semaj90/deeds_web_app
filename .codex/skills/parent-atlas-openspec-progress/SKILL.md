@@ -14,6 +14,93 @@ Never change a task from `WAITING` to `ACTIONABLE` because of similarity, graph 
 
 ## Audit sequence
 
+### Workstation phase and revision crosswalk
+
+When asked to work through Parent Atlas workstation phases, build a three-way
+crosswalk rather than infer phase ownership from filenames or the generated
+workboard:
+
+`workstation phase ID ↔ OpenSpec change/task IDs ↔ field family + canonical owner`
+
+For each row record the acceptance gate, current evidence/receipt, status
+(`CREATED`, `WIRED`, `PROVEN`, `DONE`, `PARTIAL`, or `WAITING`), blocker owner,
+and release condition. The OpenSpec task ledger and admitted receipts remain
+authoritative; workboards are navigation/projection only. Do not transfer a
+checked box or a report percentage into a proof claim.
+
+Search revision-bearing work narrowly across the workstation ledger and
+candidate OpenSpec owners, then inspect the matching task context:
+
+```bash
+rg -n "source_revision|workspace_revision|registry_revision|feature_revision|representation_revision|graph_revision|producer_revision" docs/parent-atlas-workstation-todo.md openspec/changes
+rg -n "Phase [0-9]+|P[0-9]+|Post-P20|DEFERRED" docs/parent-atlas-workstation-todo.md openspec/changes/*/tasks.md
+```
+
+Operator sequencing rule (2026-10-15): defer implementation that creates,
+persists, propagates, changes writer policy for, invalidates from, or backfills
+`*_revision` fields until workstation P20+ gates and the GPU-sidecar patch
+tournament are closed. Read-only audits and current runtime freshness checks
+continue; missing/mismatched evidence still fails closed. Keep legacy phase
+labels distinct from canonical workstation phase IDs, and surface any mapping
+as unresolved until an owning ledger provides it.
+
+Current namespace and owner-map sources:
+
+- The canonical phase-to-owner index is in the root
+  `parent-atlas-workstation-todo.md` under “Canonical phase index” (P11–P25);
+  its “Post-P20 backlog” and operator work-order sections define sequencing.
+  `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json` corroborates
+  the stable IDs and selected live updates.
+- `docs/parent-atlas-workstation-todo.md` is a separate status projection with
+  legacy summary rows; use it for dated evidence, not to replace the root
+  canonical owner map.
+
+- Canonical workstation phases are stable IDs `workstation-p11` through
+  `workstation-p25`; legacy workstation rows 1–10 are unmapped.
+- The legacy summary ordinals 22–24 are not the same as canonical P22–P24.
+- The 2026-10-15 workboard snapshot has 1,075 task records but no
+  `workstationPhaseId`/`roadmapId` field on each task. It is not a direct
+  machine-joinable phase-to-task crosswalk. Use the root canonical owner index
+  to locate existing changes, then join to exact task IDs and acceptance
+  criteria. If a specific owner/task link is absent, mark that link
+  `PHASE_MAPPING_UNRESOLVED` rather than guessing.
+- Explicit task links remain a sparse, reviewed crosswalk, not a claim that
+  the phase is done. The 2026-10-15 generated map has 20 links across P11–P21:
+  Prime/RLM integration and route ownership, deferred P12 writer gates, one explicit owner gate
+  each for P13–P19, DSPy P20, and GEPA P21. Inspect the live generator summary
+  rather than hard-coding counts after edits. Add links only with the exact
+  `workstation-pNN` tag after confirming task scope against the canonical
+  phase index. Do not infer a phase link from task prose containing `P24`,
+  `P12`, or similar.
+- In particular, local phase labels such as `P24-LINEAGE-*` in
+  `parent-atlas-agent-framework-integration-hardening/tasks.md` describe a
+  local workstream and must not be silently mapped to canonical workstation
+  P24 (GPU/vector residency). Require an explicit crosswalk row.
+- “Trilinear mapping” is not a phase-owner map: the root ledger only points to
+  `docs/master_feature_todo_1011.md`, where trilinear is mentioned among
+  unverified research paths. Do not use that mention to assign phases or
+  owners.
+- Treat that workboard as a dated navigation snapshot, not live completion
+  evidence. Refresh it only through its existing read-only builder after
+  checking that the output path and side effects are safe.
+- Generate a bounded owner/task crosswalk with
+  `node scripts/atlas/build-parent-atlas-phase-task-crosswalk-v1.mjs --summary`.
+  The full JSON output is suitable for piping to an explicitly chosen report
+  destination. Exact owner matches are navigation candidates; only explicit
+  canonical phase IDs create task links. Review each linked `taskRef` against
+  its owner `tasks.md` acceptance criteria and current admitted receipt before
+  deciding whether a phase gate is closed.
+- The current `scripts/atlas/audit-phase17-21-workstation.mjs` is not a safe
+  refresh command yet: it uses an inline database credential and overwrites
+  fixed JSON/Markdown report paths. Do not run it until credentials are
+  environment-backed and reports are written immutably/versioned.
+
+Before claiming all phases are mapped, reconcile the current phase review,
+canonical roadmap index, owner `tasks.md` files, and workboard task records.
+Report mapped/unmapped counts per namespace; never flatten them into one
+completion percentage. Phase closure requires each gate's current proof and
+acceptance, not merely a task-to-file or field-name match.
+
 Run from repository root:
 
 ```bash

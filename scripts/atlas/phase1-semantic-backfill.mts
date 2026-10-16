@@ -142,7 +142,7 @@ Do NOT invent capabilities, imports, or features not shown.
           // (3) Call Gemma4 via bifrostChat (cache-enabled)
           const response = await bifrostChat(
             [{ role: 'user', content: prompt }],
-            'gemma4-rotorquant:latest',
+            'ornith-1.5-9b',
             {
               temperature: 0.3,
               maxTokens: 200,

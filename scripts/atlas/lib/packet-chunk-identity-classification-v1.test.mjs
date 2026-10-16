@@ -137,3 +137,30 @@ test('source-ref chunk presence remains a diagnostic separate from packet lineag
     },
   }).sourceRefChunkDiagnostic, 'SOURCE_REF_CHUNKS_PRESENT_REVISION_UNQUALIFIED');
 });
+
+test('source and relative-path chunk crosswalk remains diagnostic without promoting identity', () => {
+  const classification = classifyPacketChunkIdentityV1({
+    ...base,
+    packet_rows: [{ packet_key: 'p1' }],
+    source_chunk_diagnostic: {
+      exactSourceRefChunkCount: 0,
+      exactRelativePathChunkCount: 3,
+      wholeSourceDigestMatchCount: 2,
+      sourceWorkspaceRevisionMatchCount: 1,
+      lineageEnvelopeMatchCount: 0,
+      provenPacketChunkLineageCount: 0,
+      sourceRevisionAndWorkspaceColumnsVerified: true,
+    },
+  });
+
+  assert.equal(classification.category, 'PACKET_PRESENT_NO_CHUNK_BINDING');
+  assert.deepEqual(classification.sourceChunkCrosswalk, {
+    exactSourceRefChunkCount: 0,
+    exactRelativePathChunkCount: 3,
+    wholeSourceDigestMatchCount: 2,
+    sourceWorkspaceRevisionMatchCount: 1,
+    lineageEnvelopeMatchCount: 0,
+    provenPacketChunkLineageCount: 0,
+    sourceRevisionAndWorkspaceColumnsVerified: true,
+  });
+});

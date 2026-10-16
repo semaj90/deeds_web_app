@@ -7059,7 +7059,7 @@ artifact ACE/ContextManifest consumes — not raw per-lane hits.
   file with 8 live callers and deserves its own change, not a drive-by edit).
 - [x] `ACE-DOMAIN-CLASSIFICATION-HINT-01` (2026-10-14): ACE Packet V3 now accepts an optional, provenance-bearing `classification` section and exposes `attachDomainClassificationHintToAcePacketV3()`. It requires `canonicalId === packet_key`, exact `sourceRevision`, schema-valid classifier metadata, and non-empty evidence refs; it always stores classifier output as `HINT` with `canonicalAuthority:false`, then reseals the packet checksum. Legacy packets without the optional section remain valid. Validation: `node ..\..\node_modules\typescript\bin\tsc -p tsconfig.json` (from `packages/parent-atlas`) exit 0; `node --test ./test/ace-packet-v3.test.mjs` exit 0, 15/15 passed. This composes one existing rules/learned `DomainClassificationV1` result into ACE; it does not write the taxonomy, index it, inject it into ContextManifest, or prove live source/database lineage. Learned family attribution and production consumer wiring remain open.
 - [x] `ACE-DOMAIN-TAXONOMY-WIRE-01` (2026-10-14): added `domain-taxonomy-ace-packet-v1.ts` and wired it into the existing `enrichAcePacketV3WithHyperRagV1()` composition path. It classifies only canonical packet source/path metadata and a summary whose input digest exactly matches the source digest; low-confidence/no-evidence cases leave the packet unchanged, and an existing classification hint is not overwritten. Direct runtime proof via `node --import tsx --input-type=module -` composed one revision-bound `supported_by` relation plus deterministic `retrieval` classification: `ENRICHED`, classification `ATTACHED`, source revision matched, packet checksum verified; repeat helper call returned `ALREADY_PRESENT`. Focused Vitest attempt stalled at startup (`RUN`) and was interrupted, so the authored adapter regression spec is NOT_VERIFIED by Vitest. This is a local synthetic-fixture execution, not live DB/graph/ContextManifest proof; taxonomy remains advisory, GPU and indexing remain unwired.
-- [ ] `GRAPH-PAGERANK-PARITY-01` — build NetworkX and cuGraph projections from the *same*
+- [ ] [workstation-p16] `GRAPH-PAGERANK-PARITY-01` — build NetworkX and cuGraph projections from the *same*
   `StructuralGraphSnapshotV1` (the one frozen by `GRAPHIFY-OPEN-CLOSE-LIVE-WIRING-01`'s completed
   run above), binding identical `graphRevision`/`vertexMapChecksum`/`edgeSetChecksum`. NetworkX =
   CPU correctness oracle; cuGraph = GPU executor (reuses `wsl::atlas-rapids-cu13`'s already-proven
@@ -7111,7 +7111,7 @@ artifact ACE/ContextManifest consumes — not raw per-lane hits.
 - [ ] `CANDIDATE-FEATURE-MATRIX-01` — join lexical scores, semantic exact score/rank, domain
   probability vector, PageRank/structural signals, and representation state by canonical identity
   and exact revisions into `CandidateFeatureMatrixV1`.
-- [ ] `XGBOOST-RERANKER-EVAL-01` — train/evaluate only on the frozen `CandidateFeatureMatrixV1`.
+- [ ] [workstation-p18] `XGBOOST-RERANKER-EVAL-01` — train/evaluate only on the frozen `CandidateFeatureMatrixV1`.
   Use GPU (`device=cuda, tree_method=hist`) only if `runtime-capability-registry-v1.json` proves it
   live in an existing runtime first (currently `HARNESS_EXISTS_NOT_YET_RUN` — run
   `prove_atlas_xgboost_gpu_runtime_v1.py` and record a real `liveProof` before relying on GPU here;
@@ -16725,6 +16725,7 @@ signals in the controller rows (`priority`, `kind`, `eta`, `lastUpdatedAt`, `dep
 - **2026-10-13 `qdrant_point_id` writer audit (static; historical execution NOT_PROVEN):** `scripts/atlas/backfill-qdrant-point-ids.mjs` scrolls `codebase_chunks_768`, collects `(point_id, payload.source_ref)`, then on `--apply` updates every `atlas_packets` row with that `source_ref` when its current ID is null **or different**. The write has no `packet_key`, uniqueness/cardinality guard, or chunk identity predicate, so multiple points/packets for one source can overwrite one another; this is a plausible mechanism for the observed point-ID conflicts, but no execution log ties it to the 575 rows. `scripts/atlas/backfill-qdrant-point-id-from-chunks.mjs` instead joins `atlas_packets.chunk_id=codebase_chunk_index.id` and fills only missing IDs. `scripts/atlas/backfill-packet-qdrant-pid-exact-v1.mjs` uses packet-key identity and skips non-unique point matches, but also remains a backfill owner requiring separate review. Search found no package-script/runtime caller for the path-based updater; manual invocation remains possible. Do not run it with `--apply`; no source code or data changed in this audit.
 - **Containment applied after writer audit:** `scripts/atlas/backfill-qdrant-point-ids.mjs` now rejects `--apply` at the start of `main()` before Qdrant or PostgreSQL access, with `UNSAFE_SOURCE_REF_ONLY_BACKFILL_DISABLED`; its read-only dry-run path remains available. `node --check` passed. Invoking it with `--apply` exited 1 with the expected error before scanning; no datastore writes occurred. This blocks future use of the known unsafe mapping but does not prove whether historical runs caused any current mismatches or repair existing rows.
 - **Exact packet-key updater hardening (code/fixture proof only):** `scripts/atlas/backfill-packet-qdrant-pid-exact-v1.mjs` now requests point `source_ref` with `packet_key` and accepts a backfill proposal only when exactly one missing Postgres packet row and exactly one Qdrant point exist for the key and their normalized source refs agree. Duplicate packet rows, multiple points, and missing/mismatched source refs are skipped; the guarded UPDATE also predicates on the packet's source ref. The pure rule lives in `scripts/atlas/lib/classify-exact-qdrant-packet-link-v1.mjs`; focused Node tests pass 4/4 and the updater/helper syntax plus diff checks pass. This improves a future ID-mirror proposal only; no updater rehearsal/apply was run, no database or Qdrant writes occurred, and packet/source revision, representation lineage, and independent readback authority remain separate open gates.
+- **CURRENT-SOURCE-OWNER-RECONCILIATION-01 live drift refresh (2026-10-15; read-only planner):** Ran `npx --no-install tsx scripts/atlas/plan-current-source-authority-repair-v1.mts --output=.tmp/atlas/current-source-authority-live-recheck-20261015.json`; exit `0`. The current canonical execution remains `74d50c86-8194-45ea-8c3d-61aab737ef83` at admitted revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`. Against 25,542 membership rows and 28,093 current source bindings, the planner classified 22,532 `EXACT_CURRENT_BINDING`, 1,909 `CURRENT_BINDING_MISMATCH` (all reported as `CONTENT_DIGEST_MISMATCH` and `SOURCE_REVISION_MISMATCH`), 1,086 excluded nested-repository rows, and 15 source-unavailable rows. Among the 1,909 mismatches, 1,511 are tracked-clean current files and 398 tracked-dirty; this is divergence from the sealed source snapshot, not proof of authorized current-source membership. The current-workspace candidate is `sha256:a99c44e3ff5ea03393c2bff88be3c3da1a88d3f18c5a2745f38871fa097e108c`; it is not promoted. Receipt status `REPAIR_PLAN_PARTIAL_EXACT_BLOCKED`, `canonicalAuthority=false`, `authorizationRequired=true`. PostgreSQL queries are SELECT-only; no Postgres/Qdrant/Neo4j/Valkey writes occurred. The only write is the new, non-overwriting diagnostic under `.tmp/atlas`; `filesystem=true` is explicitly recorded. Receipt SHA-256 `A80D61B15A76C4E1EC94D1C76F85C565E19E6CBD9A5824DEBD30DEAD4E15E3D8`. This updates the live drift observation only; the sealed cohort remains historical authority, and no backfill, Graphify run, projection apply, or source promotion is authorized.
 - **Additional unsafe packet-ID writer containment:** static inspection found `p0-identify-recoverable-packets.mjs` joining normalized source path to chunk path, `p0-qdrant-bridge-deterministic.mjs` joining packet source ref to CCI source ref, and `qdrant-postgres-align.mjs` selecting a point by source ref/lexicographic UUID before mass updates. Each now fails closed on its apply/live path before DB/Qdrant access; the explicit dry-run paths remain. `node --check` passed for all three; direct invocation of each live path exited nonzero with its specific unsafe-join error (exit codes 1, 1, 2). This is containment, not proof those scripts caused the existing data conflicts; no database/Qdrant writes occurred.
 
 - **Additional Qdrant projection-ID writer containment (2026-10-13):** `backfill-qdrant-point-id-from-chunks.mjs` copies `codebase_chunk_index.qdrant_id` into packet-level `atlas_packets.qdrant_point_id` by `ap.chunk_id = cci.id`; this does not establish that a chunk projection point ID is the packet-level point ID and conflicts with the observed cross-entity ID collision. `upsert-qdrant-packet-payload.mjs` selects a packet for each chunk by normalized path alternatives, orders candidates, and applies `LIMIT 1`; its `--require-lineage` predicate checks matching content hashes and non-null packet source revision but does not establish unique packet/chunk binding or current workspace revision. Both `--apply` paths now fail before database/Qdrant access (`UNSAFE_CHUNK_PROJECTION_TO_PACKET_ID_BACKFILL_DISABLED` and `UNSAFE_PATH_SELECTED_PACKET_PAYLOAD_APPLY_DISABLED`); dry-run inspection remains. `node --check` passed for both; explicit `--apply` attempts exited 1 with the expected guards before database/Qdrant access; scoped `git diff --check` passed. The repository-wide whitespace check still reports unrelated existing issues in `docker-compose.yml` and generated CMake logs. No datastore writes occurred. Historical execution and causal attribution remain NOT_PROVEN.
@@ -16826,3 +16827,1354 @@ cache, model, or source-file writes occurred.
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+## AST writer safety recheck — 2026-10-15
+
+- Read-only PostgreSQL census found 274,465 `codebase_chunk_index` rows and
+  zero populated `source_revision` or `workspace_revision` values. The canonical
+  repository identity maps `deeds-web-app` to UUID
+  `01a13137-1378-7df9-9968-53738dbf0e48`; the legacy materializer instead
+  inserts the all-zero UUID and derives rows from chunk symbols without native
+  Tree-sitter node IDs or exact byte spans.
+- Disabled the legacy materializer's `--apply` path before all writes. Dry-run
+  remains diagnostic. This is containment, not a replacement native AST writer
+  and not proof of a live Function Registry snapshot.
+- Corrected the three `atlas:ast-nodes:*` npm aliases to target the existing
+  `sveltekit-frontend/scripts/atlas` file; the prior `../scripts` target did
+  not exist. Invoking the apply alias now reaches the explicit guard and exits
+  before connecting to PostgreSQL.
+- `node --check` passed; the focused hydration and Function Registry proof
+  specs passed 8/8. No PostgreSQL, Qdrant, graph, cache, or service writes.
+- Receipt: `docs/reports/parent-atlas-ast-writer-guard-20261015.json`.
+- Open gates: implement the revision-qualified native Tree-sitter writer,
+  establish exact packet/source readback, then replay one candidate through
+  SearchRuntime and ContextManifest. Keep current source authority blocked.
+
+### Retrieval-summary execution receipt review (2026-10-15; not admitted)
+
+- The timestamped receipt
+  `docs/reports/retrieval-summarization-flow-proof-2026-10-15T20-07-08-610Z.json`
+  reports `status=FAIL`, `chain_status=NOT_ALIGNED`, and `elapsed_ms=57995`.
+  Its per-lane `LIVE_PASS` entries cover EmbeddingGemma, Qdrant, pgvector/HNSW,
+  TurboVec gRPC, Go Retrieval, PostgreSQL truth join, and 8095 extraction only.
+- pgvector and Qdrant returned 16 hits each, with only 1/8 compared IDs and
+  paths overlapping (`PARTIAL_PARITY`). No CandidateOrdinalMapV1 was sealed;
+  ACE packet sealing, ContextManifest admission, and BitFrost key derivation
+  remain blocked by this receipt.
+- Ornith 1.5 took 48,109 ms, returned 3,259 characters, failed JSON parsing,
+  and supplied no citations (0/8 admitted). The output is not grounded evidence
+  and must not be used for training labels, title assignment, or context.
+- **Output-shape follow-up (2026-10-15; receipt inspection):** the captured
+  synthesis output begins with a JSON object serialized inside the outer
+  `summary` string, but that nested object is incomplete at the end of the
+  3,259-character response. The API receipt has no `finish_reason`, so token
+  exhaustion is plausible but not proven. Do not merely raise the token cap:
+  require JSON response mode, constrain `summary` to plain bounded text, parse
+  and validate the actual completion object, and reject explicit length
+  termination. A narrow patch was not applied because
+  `scripts/atlas/prove-retrieval-summarization-flow.mjs` has active uncommitted
+  edits; preserve those and integrate after its owner is available. Current
+  receipt remains `FAIL`, with no citations or context admission.
+- A direct `tsx` Function Registry probe failed before loading because the
+  PostgreSQL client received a non-string password
+  (`SASL: SCRAM-SERVER-FIRST-MESSAGE`). This is an environment/configuration
+  failure, not `QUALIFIED` or `AST_NOT_FOUND`; that attempt produced no snapshot
+  or ContextManifest receipt. No database write was made.
+- Do not derive `title_id` from fused ranks, nouns/adverbs, generated summaries,
+  or CST/AST observations. The title field remains an unresolved semantic
+  grouping owner; canonical identity remains with packet/symbol owners.
+  Grounded AST names and lexical/semantic terms may enrich revision-bound
+  feature/search projections with provenance, but cannot change packet
+  identity. Keep `FI-TITLE-ADDRESS-01` open.
+- **Disposition:** retrieval/extraction lanes were exercised individually;
+  vector parity, source-to-candidate mapping, grounded synthesis, and
+  ContextManifest admission remain unproven. Do not check off the end-to-end
+  gate.
+
+### Function Registry live recheck (2026-10-15; snapshot only)
+
+- Re-ran `loadFunctionRegistrySnapshotFromPostgresV1` for the exact
+  `getErrorClustering` symbol version using the live 8095 parser provider and
+  the app's existing environment-backed database configuration. Result:
+  `QUALIFIED`; exact source revision/hash, workspace revision, canonical packet
+  key, Tree-sitter node ID and byte span were returned. The snapshot checksum
+  `242661a300928b3e860ac98aeecc7404856eb978de1152242be7bbc2a29c8091` and
+  loader-receipt checksum match the preserved prior readback.
+- The source-to-chunk handoff remains rejected by
+  `docs/reports/candidate-hydration-proof-v1-function-registry-seed.json`:
+  two chunk rows share the source ref and neither carries source revision or
+  the seed symbol version. SearchRuntime final Top-K and ContextManifest are
+  still false. Do not loosen source uniqueness or synthesize chunk IDs.
+- A separate `validatePacket` seed was rejected: its canonical stored byte
+  span/native AST ID did not match the live 8095 observation. This is a
+  revision-qualified identity mismatch, not a parser failure; do not reconcile
+  by name/path alone.
+- Receipt: `docs/reports/parent-atlas-function-registry-live-recheck-20261015.json`.
+  Read-only qualification only; `writesPerformed=false` and
+  `canonicalAuthority=false`.
+
+### Function-span to ACE admission boundary (2026-10-15; contract audit)
+
+- The live Function Registry snapshot contains a canonical symbol version,
+  packet key, source reference, source/workspace revisions, native Tree-sitter
+  node, exact byte span and source digest. It does **not** establish a unique
+  canonical chunk row or a row-level feature revision.
+- The current `CandidateOrdinalMapV1` and `CandidateFeatureSnapshotV1`
+  contracts are candidate/feature-row based. `admitCurrentCandidateFeatureSnapshotV1`
+  explicitly requires `sourceChunkCohortStatus=REVISION_QUALIFIED`, an admitted
+  semantic cohort and admitted graph-feature status. A function span must not
+  be relabeled as a chunk or used to claim those gates passed.
+- Safe next implementation: add a separately typed, read-only Function
+  Registry source-span evidence adapter at the existing ACE boundary, or first
+  establish an exact canonical packet/chunk lineage row with source and
+  feature revisions. Any adapter must preserve the symbol/packet/native-node
+  tuple, exact source digest/span, and explicit null/missing semantic or graph
+  features; it must not synthesize `CandidateOrdinal`, chunk IDs, scores or
+  lane-admission statuses.
+- Acceptance remains a real SearchRuntime final-Top-K disposition followed
+  by the existing ACE/ContextManifest admission and independent readback. The
+  current seed has not passed this gate. No behavior was changed and no writes
+  were performed in this contract audit.
+- The producer-side repair already exists in
+  `openspec/changes/parent-atlas-chunk-index-whole-file-hash/tasks.md` under
+  `ATLAS-SOURCE-REVISION-01`: `scripts/atlas/index-full-repo-for-search.mjs`
+  hashes the exact bytes read and includes that digest in chunk-row INSERT and
+  conflict updates; its one-file dry run passed. Apply/readback is explicitly
+  blocked on `EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED`. Do not
+  treat the patch or dry run as repair of the current rows. After authorization,
+  apply only the approved bounded source cohort and independently verify
+  packet/chunk identity, exact bytes, workspace/source revisions and feature
+  revision before retrying the ACE handoff.
+- **Current bounded validation (2026-10-15):** `node --check
+  scripts/atlas/index-full-repo-for-search.mjs` passed; `node --test
+  scripts/atlas/lib/graphify-file-index-source-revision-v1.test.mjs
+  scripts/atlas/lib/packet-source-revision-admission-v1.test.mjs` passed 7/7.
+  These tests cover adjacent source-revision admission/export contracts, not
+  the writer's PostgreSQL apply/readback and not the current historical rows.
+  No database, Qdrant, cache or corpus writes were performed.
+- **Exact seed-file dry run (2026-10-15; read-only):** ran
+  `node scripts/atlas/index-full-repo-for-search.mjs
+  --file=sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts
+  --no-redis --verbose`. With no AST manifest, it used text fallback, planned
+  two chunks, and classified both `SOURCE_SPAN_METADATA_MISMATCH`; zero rows
+  were indexed and the script confirmed no data was written. This does not
+  produce the symbol's native AST span, workspace revision, canonical
+  packet/chunk-lineage edge, or feature revision. Do not apply this text-fallback
+  plan as a purported Function Registry repair. Next, resolve an existing
+  source-qualified AST/chunk-lineage producer and dry-run that exact evidence
+  before considering any separately authorized apply.
+- **AST artifact cross-check (2026-10-15; read-only):** the existing
+  `.tmp/atlas/ast-declaration-candidates-current-v1.jsonl` row for
+  `getErrorClustering` matches the live recheck's source digest, workspace and
+  source revisions, and byte span (`979..1154`), and identifies parser
+  `ast-grep-napi` 0.44.0. It has no `tree_node_id` or `symbol_version_id`, and
+  the row itself has no producer/run provenance fields. The separate live
+  Function Registry recheck qualifies native IDs and exact source bytes, but
+  its receipt explicitly reports `searchRuntimeFinalTopK=false` and
+  `contextManifestAdmitted=false`. Therefore the JSONL artifact cannot serve as
+  the native AST-to-canonical-chunk bridge; the end-to-end status remains
+  **PARTIAL**. Next proof must use a source-qualified sidecar observation with
+  native identity and producer provenance, then resolve a unique canonical
+  packet-chunk lineage before final Top-K/ContextManifest admission. No writes
+  or promotion performed.
+
+- **P24 live SearchRuntime follow-up (2026-10-15; read-only):** A fresh
+  PostgreSQL/source/8095 replay supersedes the earlier candidate-drop status
+  above for the exact `getErrorClustering` seed. Existing
+  `atlas_packet_chunk_lineage` plus `atlas_workspace_source_bindings` rows
+  resolve uniquely through `resolveFunctionRegistryChunkRowV1()` to chunk row
+  `751464de-b878-45d1-a123-b416bdca780b` and canonical chunk
+  `fullrepo:sveltekit-frontend/src/lib/server/services/error-analysis/ErrorClustering.ts:1`.
+  The read-only SearchRuntime replay then reports the same qualified function
+  present after hydration, reranking, post-processing, and final Top-K
+  (`qualifiedFinalCandidateCount=1`, `dropStage=NONE`); it uses the existing
+  AST retrieval lane and suppresses writes. A reranker-sidecar miss fell back
+  to the configured XGBoost fallback; this proves fallback-path execution, not
+  learned-reranker quality. The replay found a callable-search projection
+  revision difference, while canonical symbol/workspace/source readback and
+  source bytes remained aligned; projection data was not treated as authority.
+  **ContextManifest remains unadmitted.** The existing shadow resolver is
+  called by `semantic-search-workflow.ts`, but the live call has no configured
+  feature-source provider. The bounded profile census still lacks row-level
+  `feature_revision`; semantic and graph cohort admission are also not proven.
+  Do not synthesize profile revisions, graph features, or supplements to pass
+  the ACE gate. No canonical/cache/GPU writes occurred. Status advances to
+  `SEARCH_RUNTIME_FINAL_TOPK_PROVEN / CONTEXT_MANIFEST_BLOCKED`, not E2E done.
+  Next: find an existing producer/read owner for row-level profile revisions
+  and semantic/graph supplements, then run the existing shadow admission
+  against this same frozen candidate and independently read back its checksum.
+- **P24 live ORF-provider check (2026-10-15; PostgreSQL read-only):** The
+  existing `atlas_observation_feature_rows` table was checked for the
+  qualified seed packet and `ErrorClustering.ts` source reference; it returned
+  zero rows. `information_schema.columns` confirms the live table has neither
+  `source_revision` nor `registry_revision`, although the Drizzle schema and
+  `OrfDbRowV1` reader contract declare those fields. A first SELECT against
+  those absent columns failed and the read-only session rolled back; the
+  subsequent schema and candidate checks succeeded. The ORF reader cannot
+  qualify this seed and is not a usable feature-source provider in the current
+  database state. Do not synthesize a profile from the Function Registry
+  snapshot or apply a schema migration/materializer as an audit fix. Next:
+  reconcile deployed ORF schema with its existing migration owner, census
+  relevant feature rows read-only, then use only rows passing the existing
+  source/workspace/representation/feature/graph gates. ContextManifest remains
+  blocked; no database writes.
+
+- **Repeatable ORF source audit (2026-10-15; read-only):** Added
+  `scripts/atlas/audit-function-orf-feature-source-v1.mjs`, requiring explicit
+  packet key, source ref, workspace revision, and expected source revision.
+  `node --check` passed. A live read-only run for the existing
+  `getErrorClustering` seed returned `BLOCKED_SCHEMA`, zero matching ORF rows,
+  and missing live `source_revision`/`registry_revision` columns; report:
+  `.tmp/atlas/function-orf-feature-source-2026-10-15T210246994Z.json`.
+  The audit writes only a timestamped local diagnostic receipt
+  (`writesPerformed=false`); it does not migrate, materialize, or backfill data.
+  Revision-production work remains deferred until post-P20; current runtime
+  checks remain fail-closed.
+
+### Parser and structural-observation handoff recheck (2026-10-15; diagnostic only)
+
+- The live `http://127.0.0.1:8095/health` response reports `tree_sitter=true`,
+  `treesitter_chunker=true`, `ast_grep=true`, `networkx=true`, and
+  `cugraph=false`; the active synthesis model is `ornith-1.5-9b`. This is a
+  component-capability observation, not proof that graph edges are persisted
+  or that any accelerator is available.
+- Ran the existing read-only `scripts/atlas/ast-chunk-keyed-map-v1.mjs` against
+  `sveltekit-frontend/src/lib/components/ui/AccessibilityPanel.svelte`.
+  Sidecar AST and ast-grep stages returned successfully, but the Svelte file
+  produced one native `script_element` chunk, zero ast-grep matches, and zero
+  compared pairs. This does not validate template markup, rune spans, handlers,
+  or full Svelte CST coverage. Receipt:
+  `.tmp/atlas/ast-chunk-keyed-map-v3-AccessibilityPanel.svelte.json`.
+- Ran the same diagnostic against
+  `packages/parent-atlas/src/core/ast-grep-tree-node-resolution-v1.ts`.
+  Tree-sitter produced 73 chunks; ast-grep found 29 matches, of which 27 were
+  covered under the diagnostic's compatibility rule. Two `const_binding`
+  observations (`SHA256_HEX` and `treeNodeCandidateV1Schema`) had no compatible
+  native covering node. The `await_call` ast-grep invocation exited non-zero,
+  so the overall receipt is `FAILED`, not a parity pass:
+  `.tmp/atlas/ast-chunk-keyed-map-v3-ast-grep-tree-node-resolution-v1.ts.json`.
+- Both runs validate only bounded parser observations. They write local
+  gitignored diagnostic receipts; no PostgreSQL, graph, Qdrant, Valkey, or
+  canonical identity writes were performed.
+- Do not fix these differences by loosening the native node resolver or
+  promoting ast-grep's path/rule/span keys. Before any identity change, define
+  and independently test the roles of `parse_node_id`, occurrence
+  `tree_node_id`, stable `stable_symbol_id`, revision-bound
+  `symbol_version_id`, `packet_key`, and graph-node identity. Existing resolver
+  `packages/parent-atlas/src/core/ast-grep-tree-node-resolution-v1.ts` resolves
+  an observation to an already-existing revision-qualified AST node; it does
+  not mint canonical IDs.
+- Open follow-up: classify the two TypeScript mismatches against parser-kind
+  expectations; repair the ast-grep non-zero/JSON handling without accepting
+  malformed results; separately prove Svelte template/rune/handler spans with
+  independent parsers. Keep graph snapshot apply, symbol minting, and source
+  revision writes gated; no completion status is advanced by this diagnostic.
+
+### ast-grep clean no-match exit correction (2026-10-15; bounded proof)
+
+- The `await_call` TypeScript rule returned exit code `1`, empty stderr, and
+  valid JSON `[]` because there were no matches. The old wrapper treated that
+  normal result as a failed stage.
+- Added `scripts/atlas/lib/ast-grep-result-v1.mjs` and a focused Node test.
+  Only a clean empty array with exit code `1` is accepted; malformed output,
+  non-array JSON, stderr, and non-empty results with nonzero status fail closed.
+  Focused tests passed 5/5.
+- Updated `scripts/atlas/ast-chunk-keyed-map-v1.mjs`; live reruns completed all
+  stages. TypeScript is still not parity: 73 native chunks, 29 ast-grep
+  matches, 27 covered, 2 unmatched. Svelte is still partial: one script chunk,
+  zero ast-grep matches; template/rune/handler coverage is unproven.
+- Updated local receipt checksums: TypeScript
+  `sha256:3c8943c299744aa481ba67d84f83e2b52b89a70b7214f369df9ab13857d9100e`;
+  Svelte `sha256:234a0f14a9406064ae0bf11e98241a250a27384d02755d6e7e2bb820236316dd`.
+  No canonical, database, cache, or graph writes occurred.
+- This corrects exit-code handling only. Identity contracts, the two parser
+  coverage differences, graph-edge creation, and packet/chunk qualification
+  remain open; no promotion gate advances.
+- **Svelte parser cross-check (2026-10-15; 10-file bounded sample):** the
+  existing `svelte-dom-splitter-v1.mjs` passed parse, template walk, rune,
+  script-block, and UTF-8 span checks for 10 components (865 template nodes,
+  28 runes, 31 handlers). The `svelte-rune-crosscheck-v1.mjs` matched all 28
+  runes found in script blocks to ast-grep calls with zero mismatches. The
+  independent markup scan in that receipt and
+  `svelte-handler-crosscheck-v1.mjs` matched all 31 handlers with zero
+  mismatches. These are sampled parser checks; the markup handler scan is a
+  regex/scanner, not a second full Svelte AST. This proves the local Svelte
+  splitter covers more than the 8095 `/ast/chunk` script-element output for
+  these files, not that 8095 emits equivalent template observations or that
+  any span resolves to canonical Atlas identity. Receipts remain gitignored
+  local diagnostics; no canonical writes occurred.
+- **Existing structural owner/caller audit (2026-10-15; source inspection):**
+  reuse `packages/parent-atlas/src/core/ast-grep-observation-adapter.ts` to
+  produce the existing `AstGrepObservationV1` records. They bind
+  `source_ref`, `source_revision`, rule, byte span, matched-text hash, capture
+  fields, and extractor revision, with `canonical_authority=false`. The
+  existing `ace-structural-section-v1.ts` composes those records into the ACE
+  structural section. The `live-structural-lane-provider.ts` implementation
+  calls the 8095 `astChunk` client, validates exact UTF-8 spans, adapts
+  ast-grep features, and resolves only against supplied candidate entries;
+  repository import search found no production caller outside its own module
+  and spec. Its language dispatch rejects `.svelte`, despite the 8095 parser
+  capability and local Svelte splitter. Thus the missing work is a qualified
+  producer-to-consumer caller and Svelte structural adapter—not a new identity
+  schema or a second graph store. No live caller or ContextManifest admission
+  is proven by this source inspection.
+- **Provider contract test (2026-10-15):**
+  `npx vitest run --pool=threads
+  src/lib/server/retrieval/adapters/live-structural-lane-provider.spec.ts`
+  passed 6/6. The tests cover UTF-8 byte-span validation and language routing;
+  they do not call a production retriever, prove that SearchRuntime invokes
+  this provider, or establish ACE/ContextManifest admission.
+- **Six optional MCP source/search tools (2026-10-15; source inspection):**
+  all six are already created and registered by the existing MCP tool owners:
+  `codebase.rg_search` (`src/mcp/codebase_tools.ts`),
+  `kb.rg_atlas_search` (`src/mcp/rg_atlas_tools.ts`),
+  `research.web_search`, `research.synthesize`, and
+  `research.deep_analyze` (`src/mcp/research_tools.ts`), and
+  `trace.bifrost_dispatch` (`src/mcp/bifrost_tools.ts`). The focused contract
+  spec declares all six `READ_ONLY`, checks repository-escape and payload
+  bounds, and verifies the registered names. This is not evidence that these
+  tools edit source files: no source-editing tool is to be duplicated here;
+  source changes remain behind the existing authorized action-DAG/apply path.
+  TRACE startup imports and invokes all four registration functions. Two
+  focused attempts (`npx vitest run` and single-thread `npx vitest run
+  --pool=threads --maxWorkers=1 --minWorkers=1`) printed `RUN v3.2.7` but
+  produced no test result before manual interruption. Mark runtime contract
+  execution `NOT_VERIFIED`; source registration is `CREATED` and wired to the
+  server bootstrap, while live `tools/list` exposure/caller execution remains
+  unproven.
+- **Tree occurrence identity owner reconciliation (2026-10-15; source audit):**
+  the canonical `TreeNodeOccurrenceV1` derivation already exists in
+  `sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts`
+  with a plain-Node mirror used by `run-ast-entity-prefill-yaml.mjs`. It hashes
+  `(sourceRef, sourceRevision, nodeType, startByte, endByte, astPath)`. The
+  separate `atlas-ast-nodes-writer.mjs` and
+  `atlas-ast-backfill-receipt-v1.mjs` still derive `tree_node_id` from
+  `(repoId, normalizedPath, language, nodeKind, qualifiedSymbol, parentKey,
+  normalizedSig)`, which omits source revision and is not byte-identical to the
+  occurrence contract. Clarification: the persisted `atlas_ast_nodes.tree_node_id`
+  is a structural-table identity; `TreeNodeOccurrenceV1.occurrenceId` is a
+  declaration/source-revision identity used in local AST prefill artifacts.
+  The prior paragraph identified distinct formulas but did not establish a
+  shared database column. A separate confirmed handoff defect was that the
+  prefill spread packet `tree_node_id`, replaced it with an occurrence ID, then
+  the enrichment step overwrote it with the packet ID; nomination then treated
+  the ambiguous field as `upstream_node_id`.
+- **AST identity handoff correction (2026-10-15; code + focused tests):**
+  prefill now emits `tree_node_occurrence_id` and `packet_tree_node_id` without
+  the ambiguous `tree_node_id` alias. Enrichment drops that legacy alias and
+  preserves the two named identities. Observation aggregation/materialization
+  plans use `packetTreeNodeId` explicitly and retain occurrence IDs separately.
+  AST symbol nomination now uses only an explicitly supplied native upstream
+  ID; absent that evidence it leaves `upstream_node_id=null`, allowing later
+  resolution by source/revision/span rather than fabricating a native ID from
+  an occurrence or packet ID. New pure-envelope and CLI regression tests pass
+  11/11, and all changed Node scripts pass `node --check`. No live pipeline,
+  canonical datastore, graph, or cache writes were run; live source alignment
+  and ContextManifest admission remain unproven.
+
+### Graph identity audit continuation (2026-10-15; bounded live parser proof)
+
+- The live `http://127.0.0.1:8095/health` reports Tree-sitter and ast-grep
+  enabled, `treesitter-chunker` 4.0.0 available, and CPU-only execution
+  (`torch=false`, RAPIDS/cuGraph/cuVS unavailable in this sidecar). This is a
+  runtime capability observation, not proof of graph persistence or GPU work.
+- Read-only `node scripts/atlas/ast-chunk-keyed-map-v1.mjs
+  packages/parent-atlas/src/core/graph-node-key-v1.ts` completed against 8095
+  and the local ast-grep binary. The receipt
+  `.tmp/atlas/ast-chunk-keyed-map-v3-graph-node-key-v1.ts.json` reports 9
+  native chunks, 3 ast-grep matches, 3 covered matches, 0 duplicate/out-of-
+  bounds spans, 2 exact + 1 enclosed structural agreement, and 0 disagreements.
+  Independent readback verified the receipt checksum and disk-source SHA-256;
+  `canonicalAuthority=false` and `writesPerformed=false`.
+- This proves one live parser/ast-grep observation pair can be represented in
+  bounded local maps. Its keys remain diagnostic `(path, native node/rule,
+  byte span)` keys; they do not establish `parse_node_id`, `symbol_id`,
+  `symbol_version_id`, packet/chunk identity, graph-node identity, or a
+  PostgreSQL join.
+- `graph-identity-contracts.ts` already defines branded identity types and
+  separate parse-node, stable-symbol, symbol-version, chunk, packet, concept,
+  tree-node, and graph-node contracts. This is source-level contract presence;
+  per-table writer/reader/constraint inventory and live uniqueness proofs are
+  still open.
+- Page-index writer audit: repository `.mjs` producer implementations
+  `scripts/atlas/backfill-tree-nodes.mjs` and
+  `scripts/atlas/ingest-tree-nodes.mjs` derive root and chunk path segments
+  with a slug plus a stable SHA-256 suffix. The older
+  `packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts` still uses
+  lossy slug-only segments, but it is excluded from that package's TypeScript
+  build and no caller was found in the audited package/scripts paths. Treat it
+  as a dormant legacy risk; do not run its apply mode or use
+  `page_index_path` as canonical identity. The canonical graph writer reachability
+  and database uniqueness remain unproven.
+- No source-revision writes, backfill, graph apply, cache/GPU write, or
+  ContextManifest admission was performed. Next gates: finish writer/caller and
+  identity-field inventory, then prove one exact AST observation resolves to a
+  qualified canonical candidate before any graph ranking or persistence.
+
+### Live identity and uniqueness census (2026-10-15; PostgreSQL 18 read-only)
+
+- Ran schema and uniqueness checks in a `REPEATABLE READ READ ONLY`
+  transaction and rolled it back. `atlas_tree_nodes` has `node_id` as its
+  primary key; the live schema has no `source_revision` or `tree_node_id`
+  column and no unique index for canonical `source_ref`, `packet_key`, or
+  `page_index_path`.
+- The current canonical tree population has 61,658 document roots and 61,659
+  chunks. The checked roots have 0 missing `source_ref`, 0 duplicate
+  `source_ref` groups, and 0 duplicate `page_index_path` groups. The checked
+  chunks have 0 missing `packet_key`, 0 duplicate `packet_key` groups, and 0
+  duplicate `page_index_path` groups. This proves the observed snapshot is
+  collision-free; it does **not** prove the corresponding uniqueness
+  invariants are enforced for future writes.
+- `atlas_packets.packet_key` is protected by a live `UNIQUE (packet_key)`
+  constraint. `graphify_files` has a partial unique key on
+  `(workspace_id, source_ref, code_source_revision)` when the code revision is
+  non-null. `graphify_symbols` has a unique `(file_id, stable_symbol_key)` and
+  an FK to `graphify_files`; `graphify_edges` has endpoint FKs and an
+  `edge_id` primary key, but no uniqueness constraint over its evidence tuple
+  was found. These are table-local contracts, not proof of cross-store
+  identity equivalence.
+- Observed topology uniqueness is projection-scoped: `atlas_topology_index`
+  by `packet_key`, `atlas_topology_features` by `(packet_key, feature_version)`,
+  `graph_community_assignments` by `(run_id, packet_key)`, and
+  `topology_positions` by `(snapshot_id, stable_key)`. These keys preserve
+  packet/run/snapshot scope; they do not establish canonical graph-node IDs or
+  PageRank authority.
+- **Gate result:** `TREE_NODE_UNIQUENESS_CHANGE` remains blocked pending a
+  reviewed migration/producer contract. Do not loosen the `node_id` primary
+  key, apply DDL, or infer a canonical identity from `page_index_path`. The
+  next design should decide whether to enforce partial unique indexes for
+  canonical document `source_ref` and chunk `packet_key`, after all writer
+  paths are reconciled and the existing collision census is independently
+  refreshed.
+
+### Cross-runtime AST span validation helpers (2026-10-15)
+
+- Added a read-only byte-span validation helper to the TypeScript structural
+  evidence normalizer, Python 8095 evidence facade, diagnostic keyed-map
+  script, and SIMDJSON/N-API bridge. TS/Python/Node checks cover schema/span
+  shape, source-byte bounds, UTF-8 validity/boundaries, and duplicate
+  upstream-node/span pairs. Native N-API accepts span pairs plus the actual
+  `Uint8Array` source and checks pair shape, bounds, UTF-8 validity, and byte
+  boundaries; it cannot check identity-aware duplicate pairs because the ABI
+  carries no upstream node IDs.
+- Added focused regression cases for Unicode byte boundaries, duplicate spans,
+  and native N-API bounds/type behavior. The native test is source-level until
+  the workstation addon is rebuilt; it does not claim native execution.
+- These helpers validate parser observations only. They do not mint or align
+  `tree_node_id`, `symbol_id`, `symbol_version_id`, packet/chunk identity, or
+  source/workspace revisions, and they do not authorize persistence or graph
+  incidence. Canonical source-lineage and Phase 20 sequencing gates remain
+  unchanged.
+- **Validation update (2026-10-15):** an earlier TypeScript Vitest run passed
+  9/9 before the latest extra malformed-UTF-8/bounds assertions. The subsequent
+  focused rerun stalled after Vitest startup and was stopped without a result;
+  the newest TypeScript assertions are therefore NOT_VERIFIED. The mounted
+  `miniforge-nlp-sidecar` Python suite passed 6/6 with the added malformed UTF-8
+  and out-of-bounds cases. The x64 CUDA-configured CMake target rebuilt, and
+  `simd-bridge/cpp/test-addon.cjs` passed 39/39 against the loaded addon,
+  including actual source-byte UTF-8 validation. The Windows Python interpreter
+  lacks pytest; the container run is the Python test evidence.
+- Status: `HELPERS_PROVEN; LIVE AST IDENTITY/JOIN AND CANONICAL ADMISSION
+  STILL OPEN`. The proof validates spans, not parser-independent identity or
+  source lineage. No database, cache, graph, or GPU writes were performed.
+
+### Live identity-domain reconciliation (2026-10-15; PostgreSQL 18.4 read-only)
+
+- Queried identity columns, unique indexes, and foreign keys inside a
+  `REPEATABLE READ READ ONLY` transaction and rolled it back. The live schema
+  distinguishes `atlas_tree_nodes.node_id` (`uuid`) from
+  `atlas_ast_nodes.tree_node_id` (`text`); `atlas_packets.tree_node_id` is
+  also `text`. The AST table has its own text primary key and unique structural
+  tuple `(repo_id, relative_path, node_kind, qualified_symbol,
+  normalized_node_hash)`, while its parent/supersession links are self-FKs.
+- Exact read-only join census: 61,718 `atlas_packets` rows; 61,659 populated
+  packet `tree_node_id` values; 0 exact matches to `atlas_ast_nodes.tree_node_id`;
+  61,659 matches to `atlas_tree_nodes.node_id::text`. This establishes that
+  the packet field currently links to the UUID packet-tree projection in this
+  snapshot, not to AST-node IDs. No implicit cast is a valid AST identity
+  bridge.
+- `atlas_packets.symbol_id` is `uuid`, while
+  `atlas_symbol_registry.stable_symbol_id` is `text`; among 58,365 populated
+  packet symbol IDs, the exact text-form join found 0 matches. The registry
+  owns a unique `stable_symbol_id` and `canonical_key`; versions reference it
+  by FK and have unique `symbol_version_id` plus a composite uniqueness key on
+  stable symbol, source revision, declaration hash, and upstream node ID.
+  `graphify_symbols.symbol_id` is a different UUID projection-local key, with
+  edge FKs scoped to that Graphify table. Do not equate these IDs by name or
+  representation.
+- A bounded read-only crosswalk candidate exists through
+  `atlas_symbol_versions.packet_key`: 479 version rows total, 285 rows with a
+  packet key, 30 distinct packet keys, and 285 exact packet-key/source-ref
+  joins to `atlas_packets`. Only 144/285 joined rows have equal packet and
+  symbol-version source revisions. The remaining rows must not be accepted by
+  packet key alone; even the 144 revision-equal rows still need a qualified
+  AST source-span join and downstream evidence proof.
+- A bounded exact bridge check over those revision-equal packet/version rows
+  found 0 `atlas_ast_nodes` matches using the existing path normalization
+  (slash normalization, optional `sveltekit-frontend/` prefix removal, case
+  preserved) plus exact `source_revision`. Thus the packet-key relation alone
+  is not a usable AST crosswalk in the observed snapshot. A broader
+  source-reference registry expansion was canceled after exceeding the bounded
+  wait; it produced no result and made no writes.
+- The current packet-to-AST and packet-to-stable-symbol paths are
+  `UNRESOLVED` until an explicit, evidence-backed crosswalk is identified.
+  This does not authorize schema changes, casts, source-revision writes,
+  backfill, or graph projection. The parser helper proof validates spans only;
+  live source-to-canonical joins and ContextManifest admission remain
+  unproven.
+- Durable read-only census: `docs/reports/graph-identity-live-domain-census-20261015-v1.json`.
+- No canonical writes were performed. An initial read-only query failed on an
+  ambiguous column reference; the qualified retry succeeded and rolled back.
+
+### Legacy symbol-materializer cohort integrity check (2026-10-15; local read-only)
+
+- Inspected, but did not execute, `scripts/atlas/materialize-ast-symbol-versions.mjs`.
+  Its default dry run writes a fixed report path; its apply path is a retired
+  direct-SQL bypass writer and is gated behind an explicit environment override
+  and row limit. Neither mode was run.
+- Compared the existing scratch inputs entirely in memory. The nomination file
+  has 461 rows (last write 2026-09-09); the resolution file has 42,524 rows
+  (last write 2026-09-09); their exact `nomination_id` intersection is 0. The
+  structural snapshot is also stale (last write 2026-09-17). Consequently the
+  materializer's current default inputs do not form a shared nomination cohort;
+  no bridge outcome can be computed from this input set. This is a cohort
+  integrity failure, not evidence that current live identities fail.
+- The later saved structural proof (2026-09-20) reports 461 `SOURCE_ONLY`,
+  0 AST matches, and 0 tree-bound rows; its downstream current registry plan
+  is empty with `TREE_NODE_IDENTITY_REQUIRED`. The saved 09-20 resolution
+  audit is `READ_ONLY_BLOCKED` and explicitly has a zero-row plan plus stale
+  461-row structural/registry artifacts. These artifacts are historical, not
+  current live-state evidence.
+- Current source/workspace authority receipts available to the lineage audit
+  are dated 2026-09-25/26, so the guarded live lineage audit was not run against
+  them as if they represented the 2026-10-15 worktree. Regeneration requires a
+  freshly admitted workspace/cohort and a nomination-resolution-snapshot trio
+  that shares exact IDs and checksums. P12 revision writes/backfill remain
+  deferred until after P20; this diagnostic performed no database, cache, or
+  graph writes.
+- Checksum-bound diagnostic receipt:
+  `docs/reports/legacy-symbol-materializer-input-integrity-20261015-v1.json`.
+
+### `page_index_path` producer/use audit (2026-10-15; static)
+
+- The active-looking root scripts `scripts/atlas/ingest-tree-nodes.mjs` and
+  `scripts/atlas/backfill-tree-nodes.mjs` construct document paths from
+  `canonicalPathSlug(sourceRef)`, which appends a SHA-256 prefix; chunk paths
+  append a similarly hashed `packet_key`. This is a tree-path coordinate, not
+  a replacement for packet, AST, symbol, or graph identity.
+- A duplicate package implementation,
+  `packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts`, still constructs
+  the document coordinate as `doc:${safeSlug(sourceRef)}` without a hash.
+  Distinct source refs that normalize to the same slug can collide. Static
+  search found no package/runtime caller for that TS pipeline; the root audit
+  guidance points to the hashed `.mjs` script. The TS writer's liveness is
+  therefore NOT_VERIFIED, but its implementation is inconsistent and should
+  not be used for a future apply without reconciliation.
+- `atlas_tree_nodes.page_index_path` has a non-unique B-tree index; the observed
+  canonical uniqueness check is a separate property established by the live
+  census. The code search found path construction, persistence, duplicate
+  detection, and collision repair uses, but no proven join that treats this
+  coordinate as `tree_node_id`, `packet_key`, or `symbol_id`.
+- Status: `STATIC_USE_CLASSIFIED; DUPLICATE_WRITER_DIVERGENCE_OPEN`. No writer,
+  migration, or database operation was run. Preserve the existing uniqueness
+  invariant and do not apply the stale package writer.
+
+### Identity-role and phase-claim reconciliation (2026-10-15; read-only)
+
+- The repository has several typed/derived identity contracts, but they do not
+  establish one compatible live identity map. Keep the dimensions separate:
+
+  | Identity | Intended scope / current contract | Live qualification |
+  |---|---|---|
+  | `parse_node_id` | Parser observation; source + source revision + parser/node/span facts | Span validators check shape and UTF-8 boundaries; they do not mint or prove a live canonical parse-node ID. |
+  | `tree_node_id` | Existing structural/tree projection coordinate; observed packet field joins `atlas_tree_nodes.node_id::text`, not `atlas_ast_nodes.tree_node_id` | Live census: 61,659 exact packet-to-tree matches, 0 packet-to-AST-node matches. Do not cast/alias across domains. |
+  | `symbol_id` / `stable_symbol_id` | Stable logical symbol key vs projection/database-specific symbol ID | Live census: `atlas_packets.symbol_id` is UUID and `atlas_symbol_registry.stable_symbol_id` is text; 0 exact matches among 58,365 populated packet IDs. `graphify_symbols.symbol_id` is projection-local. |
+  | `symbol_version_id` | Revision-bound symbol instance; existing derivation is stable symbol + source revision + declaration hash + upstream node ID | Registry/version contract exists; live crosswalk remains unresolved. Of 285 packet-key joins, only 144 had equal packet/version source revisions, and none of those matched AST rows under the tested path/revision join. |
+  | `chunk_id` | Chunk-row identity; distinct from packet and parser occurrence identity | Canonical derivation is explicitly `NOT_DEFINED_UNTIL_CHUNK_OWNER_AUDIT`; existing UUID/text representations must not be equated by field name. |
+  | `packet_key` | Packet/join identity | `packet-key-builder.ts` documents a live source-ref-only short key that conflicts with its source-ref + tree-node + title derivation. Grain and single-owner lifecycle remain unresolved. |
+  | `concept_id` | Concept-record identity | `concept_records.concept_id` is a text primary key in the inspected Drizzle schema; it does not imply equivalence to other concept tables/projection IDs. |
+  | `graph_node_key` | Derived graph-projection address | Existing helper prefers symbol-version, packet, chunk, then a qualified occurrence; it explicitly does not promote tree-node IDs or executor ordinals. |
+
+- `deriveStructuralOccurrenceKeyV1` and `deriveSymbolVersionIdV1` are
+  deterministic helper formulas, not evidence that their outputs match the
+  live AST, packet, or symbol registries. In particular, the occurrence helper
+  hashes source/revision/parser/upstream/span inputs; the symbol-version helper
+  preserves a NUL-delimited compatibility formula. Keep their algorithm
+  revisions and identity kinds distinct.
+- Occurrence-like formulas also differ across owners: `deriveTreeNodeOccurrenceId`
+  hashes source/ref revision, node type, byte span, and optional AST path;
+  `deriveStructuralOccurrenceKeyV1` hashes source/ref revision, parser revision,
+  optional upstream node/chunk IDs, and byte span; `deriveGraphNodeKeyV1`'s
+  fallback hashes source/ref revision, upstream node ID, and byte span. They may
+  serve different scopes, but no equivalence/translation proof exists. Do not
+  use one as another's `parse_node_id` or `tree_node_id`; define and test the
+  adapter contract before joining or persisting them. The only
+  `deriveParseNodeId` hit in the searched identity directory is a local helper
+  inside `two-revision-symbol-proof.spec.ts`; no production TS, Python 8095,
+  script, or native SIMDJSON/N-API producer was found in the scoped search.
+  The branded `ParseNodeId` TypeScript type alone does not establish a minting
+  owner. This is `PRODUCTION_PARSE_NODE_ID_MINT_OWNER_NOT_FOUND`, not proof that
+  no other out-of-scope producer exists.
+- The live source contract confirms the distinction: FastAPI `/ast/chunk`
+  (`python/miniforge_nlp_sidecar.py::_ast_evidence`) returns
+  `upstream_chunk_id` derived from file path, requested source revision, node
+  type/name, and byte span; its response model does not contain
+  `parse_node_id` or `tree_node_id`. The TypeScript client checks schema,
+  requested path, and source-revision correlation, then preserves the value as
+  `upstream_chunk_id`.
+- FastAPI `/analyze` separately places `AstUnit` observations in
+  `pass_results[].artifacts.ast_units`. Those units contain sidecar-derived
+  `tree_node_id` and `symbol_version_id`, with `canonical_authority: false`;
+  the tree ID is minted from source ref/revision, chunk kind, symbol, and byte
+  span when revision is present, while the legacy missing-revision fallback
+  uses a different digest including the loop index. This is a proposal
+  coordinate, not `parse_node_id` or canonical Atlas identity. No direct
+  `/ast/chunk` → AST-grep → canonical persistence edge was demonstrated by this
+  static trace.
+- Phase-claim reconciliation: `phase7-topk-hydration-receipt.json` is a
+  READ_ONLY_REPLAY with a passing sample gate: 25 sampled, 1 hydrated and
+  admitted to ContextManifest, 24 rejected (10 missing and 14 ambiguous source
+  refs), and zero writes. This proves that bounded replay gate only; it does
+  not close the legacy Phase 7 namespace or prove broad retrieval quality.
+  `parent-atlas-phases-01-24-evidence-review-v1.json` explicitly labels legacy
+  ordinals UNMAPPED and Phase 7 NOT_VERIFIED for lack of an owning phase ledger.
+  Do not replace that classification with `PROVEN_CLOSED` without resolving
+  the namespace and attaching this receipt to an authoritative acceptance
+  ledger.
+- Golden relevance queue validation records 60 queries and 313 candidate
+  judgment rows, but 0 completed judgments and 313 blank judgments; therefore
+  `49/200 reviewed` is not supported by that current receipt and training remains
+  gated. Candidate rows are not human-reviewed labels.
+- Status: `IDENTITY_DOMAINS_DISTINGUISHED; LIVE_CROSSWALK_UNRESOLVED`.
+  No code, schema, database, graph, cache, or corpus writes were performed.
+
+### Keyed AST observation receipt v4 (2026-10-15; two-file live diagnostic)
+
+- Corrected `scripts/atlas/ast-chunk-keyed-map-v1.mjs`: `/ast/chunk` emits
+  `upstream_chunk_id`, not `upstream_node_id`; the previous keyed map therefore
+  lost its intended native observation identity. The prior receipt also omitted
+  the Map entries entirely. V4 keys native observations by
+  `path|upstream_chunk_id|byteSpan`, preserves both native and ast-grep Maps as
+  `{key,value}` arrays, validates echoed path/revision and opaque bounded chunk
+  IDs, and keeps `canonicalAuthority:false` / `writesPerformed:false`. Timestamped
+  filenames preserve earlier v3 and v4 diagnostic artifacts.
+- Live 8095 run for `graph-identity-contracts.ts`: 36 native observations,
+  zero ast-grep matches, no invalid spans; checksum verified. Receipt:
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T00-36-36-013Z-graph-identity-contracts.ts.json`.
+- Live 8095 run for `packet-key-builder.ts`: 15 native observations and 8
+  ast-grep observations; all 8 were covered (4 exact, 4 enclosing, 0
+  disagreement); checksum verified. Receipt:
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T00-36-45-103Z-packet-key-builder.ts.json`.
+- These are parser/rule observations over two source files, not corpus-wide
+  parser parity, canonical node identity, PostgreSQL admission, or graph-edge
+  proof. The upstream chunk IDs remain sidecar observations only.
+- Status: `TWO_FILE_AST_GREP_ALIGNMENT_DIAGNOSTIC_PROVEN; CANONICAL_IDENTITY_UNRESOLVED`.
+  No database, cache, or graph writes were performed.
+- **Svelte boundary probe (2026-10-15):** the same v4 diagnostic on
+  `sveltekit-frontend/src/lib/components/ActionPopup.svelte` returned two
+  native observations (`script_element` bytes `0..405`, `style_element` bytes
+  `1321..1541`) and no ast-grep observations; the receipt checksum matches and
+  records `canonicalAuthority:false`, `writesPerformed:false`. The source also
+  contains `<div>`/`<button>` template markup at lines 21–34, absent from the
+  returned spans. This confirms the current sidecar route does not cover this
+  Svelte template; do not call this full Svelte AST parity. Receipt:
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T00-37-37-902Z-ActionPopup.svelte.json`.
+- The existing `svelte/compiler` diagnostic receipts are for the exact same
+  source digest and both independently checksum-verified: the splitter
+  reports 29 template nodes (6 regular elements), 3 event handlers, and 1
+  rune; the cross-check reports 1/1 rune agreement with ast-grep and 0 span
+  mismatches. Its markup check matches 6 elements and 3 handlers with zero
+  span mismatches, but explicitly says `independentSyntaxParser:false` (regex
+  scan), so markup parser parity is still unproven. Receipts:
+  `.tmp/atlas/svelte-dom-split-v1-ActionPopup.svelte.json` and
+  `.tmp/atlas/svelte-rune-crosscheck-v2-2026-10-16T00-04-16-321Z-eac96e178d23-ActionPopup.svelte.json`.
+  Together these show that the repo has a separate Svelte compiler owner for
+  template observations; they do not make the 8095 `/ast/chunk` output complete
+  or establish canonical identity.
+- **Second Svelte sample (2026-10-15):** checksum-verified existing receipts
+  for `AIChatAssistant.svelte` match the current source SHA-256
+  `sha256:ae3d7ef858768071995db67190c3f7358d5e1408a23dcbf4901dc547e651234a`.
+  The Svelte compiler splitter reports 60 template nodes, 2 handlers, and 5
+  runes; ast-grep agrees on all 5 runes with 0 mismatches. The regex markup
+  cross-check agrees on 11 elements and 2 handlers with 0 span mismatches, but
+  remains `independentSyntaxParser:false`. Receipts:
+  `.tmp/atlas/svelte-dom-split-v1-AIChatAssistant.svelte.json` and
+  `.tmp/atlas/svelte-rune-crosscheck-v2-2026-10-16T00-04-16-321Z-19546b16bbc0-AIChatAssistant.svelte.json`.
+  This strengthens the bounded local-parser observation, not 8095 Svelte
+  template coverage or canonical identity.
+
+### Read-only uniqueness recheck (2026-10-15; PostgreSQL 18)
+
+- Re-ran the tree uniqueness census in a `REPEATABLE READ READ ONLY`
+  transaction and rolled it back. `atlas_tree_nodes` currently has only the
+  `node_id` primary-key unique index; no unique index/constraint enforces
+  document-root `source_ref` or chunk-node `packet_key`. `atlas_packets` does
+  enforce `UNIQUE (packet_key)`; that does not enforce uniqueness in the tree
+  projection.
+- Current observed tree contents: 61,658 `document` rows with zero missing
+  `source_ref`, zero duplicate groups, and zero duplicate excess; 61,659
+  `chunk` rows with zero missing `packet_key`, zero duplicate groups, and zero
+  duplicate excess. This is a data snapshot result, not a future-write
+  invariant.
+- **Gate remains open:** no migration or writer change was made. Before adding
+  partial unique indexes, audit all tree-node producers/upserts and define
+  conflict behavior for repeated roots/chunks. Do not use the packet-table
+  constraint as proof that tree lineage is protected.
+- Database and cache writes: 0. Graph/projection writes: 0.
+
+### `page_index_path` writer/use audit (2026-10-15; static)
+
+- `scripts/atlas/backfill-tree-nodes.mjs` builds root and chunk paths with
+  `canonicalPathSlug()` (sanitized readable slug plus a 10-hex SHA-256 suffix),
+  but assigns each new `node_id` with `randomUUID()` and conflicts only on
+  `node_id`. Path uniqueness is therefore not a durable identity/upsert
+  contract. The sibling TypeScript pipeline
+  `packages/parent-atlas/src/pipelines/backfill-tree-nodes.ts` still uses
+  lossy `safeSlug()` for both root and packet-key path segments and also inserts
+  random UUIDs with `ON CONFLICT DO NOTHING`.
+- `scripts/atlas/ingest-tree-nodes.mjs` separately uses `canonicalPathSlug()`
+  for constructed root/chunk paths. The SvelteKit-local
+  `sveltekit-frontend/scripts/atlas/ingest-tree-nodes.mjs` constructs
+  `/${sourceRef}` paths and upserts by `node_id`; it is a distinct legacy
+  producer. Static caller search found no runtime application caller for these
+  writers; the root topology audit only names the backfill as a suggested
+  command, and the frontend package exposes a tree-node audit alias.
+- Snapshot materialization's `page_index_path ?? node:<node_id>` is a fallback
+  coordinate for projection input, not a canonical identity resolver. No
+  evidence found that permits using `page_index_path` as `packet_key`,
+  `tree_node_id`, or stable symbol identity.
+- **Gate remains open:** reconcile/retire or quarantine divergent legacy
+  writers, then test replay and conflict behavior before proposing uniqueness
+  DDL. No writer was executed and no database state changed.
+
+### Parser manifest/runtime alignment recheck (2026-10-15)
+
+- The old `sveltekit-frontend/docs/reports/graph-snapshot-parity/manifest.json`
+  labels its producer `identity-contract-v1+tree-sitter-typescript-v1`. The
+  corresponding `batch-a-structural-materializer.mts` source does not use a
+  Tree-sitter parser: its caller invokes `extractNodesHeuristic()`, which uses
+  language-specific regexes and approximate fixed-window end offsets. It marks
+  output `regex_heuristic`, `structuralTruth:false`, and `boundaryPrecision:approximate`.
+  Treat that manifest label as stale/misleading for this producer, not proof of
+  parser execution.
+- A fresh read-only `GET http://127.0.0.1:8095/capabilities` reports the active
+  AST engine as `treesitter-chunker`, version `4.0.0`; `tree-sitter-language-pack`
+  `0.9.0` and `ast-grep-py` `0.45.3` import, while the chunker capability says
+  `fixtureVerified:false`. The capability response's language-map revision is
+  a hash of the map, not a whole-file source revision. `AstEvidenceResponse`
+  reports the chunker engine/version but no independently identified grammar
+  revision; package import availability is not grammar fixture proof.
+- A bounded live `POST /ast/chunk` over the current 3,419-byte
+  `sveltekit-frontend/src/lib/server/atlas/identity/graph-identity-contracts.ts`
+  returned HTTP 200, schema `atlas.ast.evidence.v1`, engine `treesitter-chunker`
+  `4.0.0`, clean syntax status, 36 chunks, no diagnostics, exact echoed
+  SHA-256 value computed locally from the source bytes, and in-range byte
+  spans. The route echoes the supplied revision but does not verify it against
+  the request source, so this is not a source-revision validation proof. It
+  proves one live sidecar parse/chunk response only; it does not establish a
+  canonical `tree_node_id`, stable symbol identity, independent parser parity,
+  or production persistence. No Postgres, cache, Qdrant, or graph writes
+  occurred.
+- Frontend `tree-sitter-typescript` `0.23.2` / `web-tree-sitter` and the Python
+  sidecar's `tree-sitter-language-pack` are distinct parser stacks. The
+  separate `ast-treesitter-facts.mjs` source uses `web-tree-sitter` plus WASM,
+  but its existence does not establish that it is the live source of
+  `atlas_tree_nodes` rows. Keep the manifest/provider alignment gate open until
+  each producer's actual parser, grammar revision, spans, caller, and output
+  identity are bound in a current receipt.
+- **Live TypeScript parser recheck (2026-10-16; read-only):** queried the
+  active `:8095` service and then POSTed the current
+  `sveltekit-frontend/src/lib/server/atlas/indexing/structural-language-dispatch-v1.ts`
+  bytes to `/ast/chunk` with a locally computed SHA-256 digest. The endpoint
+  returned schema `atlas.ast.evidence.v1`, language `typescript`, engine
+  `treesitter-chunker` `4.0.0`, `CLEAN`, 22 chunks, 110 edges, and no
+  diagnostics. The live capability inventory also reports
+  `tree-sitter-language-pack` `0.9.0` and `ast-grep-py` `0.45.3`, while
+  `treesitter-chunker.fixtureVerified` remains false. The chunk sample
+  contains both enclosing `export_statement` and nested declaration spans;
+  chunk count therefore is not a unique-symbol count. The response echoes the
+  request digest but does not independently hash/verify it. This confirms one
+  parser-backed TypeScript request, not exact grammar revision, source-byte
+  verification, independent parser parity, canonical identity, or persistence.
+  The legacy manifest claim
+  `identity-contract-v1+tree-sitter-typescript-v1` belongs to a different
+  structural materializer whose source is regex/heuristic-based; do not use
+  that claim as the `:8095` parser manifest. Keep `PARSER_MANIFEST_ALIGNMENT`
+  open until manifests are bound to each actual producer and grammar/runtime
+  version. No database, cache, Qdrant, or graph writes occurred.
+- **Structural lane source-digest preflight (2026-10-15; adapter fixture proof):**
+  `live-structural-lane-provider.ts` now hashes the loaded UTF-8 source bytes
+  against the candidate's `sha256:` source revision before calling `:8095`.
+  This is intentionally enforced at the retrieval adapter, where a
+  revision-qualified candidate and source loader meet; the generic
+  `/ast/chunk` diagnostic API continues to accept correlation tokens and only
+  echoes them. A regression fixture supplies stale source text with the
+  candidate's old digest and verifies the adapter returns no AST candidate and
+  makes zero sidecar calls. Focused Vitest result: 1 file, 7 tests passed;
+  complete output is in `%TEMP%\atlas-live-structural-lane-provider-vitest.txt`.
+  No database, cache, graph, or projection writes occurred. This proves only
+  local source-byte/revision agreement before sidecar invocation; it does not
+  establish canonical parse-node identity, live candidate lineage, parser
+  manifest alignment, or ContextManifest admission.
+- **Identity-owner contract refresh (2026-10-15; static source audit):**
+  `scripts/atlas/audit-graph-identity-contracts-v1.mjs` found seven declared
+  identity type contracts and three supporting identity modules. Fresh report:
+  `docs/reports/graph-identity-contracts-audit-v1-2026-10-16T00-50-13-625Z.json`,
+  status `DEFINITION_CONTRACTS_PROVEN_POPULATION_UNPROVEN`; the existing
+  `graph-identity-contracts-audit-v1.json` was preserved. Definitions separate
+  parse occurrence, stable symbol, symbol version, chunk, packet, concept, and
+  graph projection address. This is type/marker evidence only, not proof that
+  producers mint compatible identities or that live rows satisfy those
+  contracts. In particular, `scripts/atlas/lib/atlas-ast-nodes-writer.mjs`
+  derives `tree_node_id` from repo/path/parser/node-kind/qualified-symbol/
+  parent/signature and omits source revision and byte span; it must not be
+  treated as a revision-bound parse-node identity. Keep the canonical writer
+  and graph promotion gates open; no schema or persistent data was changed.
+- **Occurrence/symbol derivation reconciliation (2026-10-15; source + focused
+  fixture proof):** the repository already has a distinct occurrence identity
+  in `tree-node-occurrence-v1.ts`, mirrored by
+  `scripts/atlas/lib/tree-node-occurrence-v1.mjs`. It hashes
+  `(sourceRef, sourceRevision, nodeType, startByte, endByte, astPath)`; the
+  prefill caller computes UTF-8 byte offsets and emits it as
+  `tree_node_occurrence_id`, preserving packet hierarchy as
+  `packet_tree_node_id`. Its focused suite passes 8/8. This is a separate
+  observation identity, not the database projection's `tree_node_id`; the
+  prefill uses packet-provided revision and therefore still depends on a
+  qualified source-binding producer. The symbol registry derives stable IDs
+  from `(language, kind, symbol_key)` and version IDs from
+  `(stable_symbol_id, source_revision, upstream_node_id, declaration_hash)`.
+  Those derivations are defined in `symbol-registry-repository.ts`, but this
+  source audit did not prove their continuity or exact join to current AST rows.
+  The observed identity split is therefore: occurrence ID = revision/span
+  observation; `tree_node_id` = legacy/projection row; `stable_symbol_id` =
+  logical registry key; `symbol_version_id` = revision-bound registry version.
+  No code changed in this reconciliation; the exact row-level producer join,
+  source qualification, and live population remain open.
+- **Occurrence ID implementation parity (2026-10-15; pure fixture proof):**
+  corrected the JavaScript helper's stale comment, which claimed its TypeScript
+  parity was tested when the spec only exercised the TS implementation. Added
+  `scripts/atlas/test-tree-node-occurrence-parity-v1.mts` to compare the actual
+  TypeScript and JavaScript functions on three fixtures, including changed
+  revisions, optional AST paths, and a Unicode source reference. Result:
+  `parity=PASS`, 3/3 fixtures; no writes and no canonical authority. This
+  proves implementation parity for those fixtures, not correctness of the
+  identity formula, production consumer reachability, or live row admission.
+- **Live symbol-version ↔ AST crosswalk (2026-10-15; PostgreSQL repeatable-read,
+  read-only):** added `scripts/atlas/audit-symbol-ast-identity-crosswalk-v1.mjs`
+  with a 15-second statement timeout, exact-path indexed join, no inferred path
+  normalization, and unique timestamped receipts. Fresh receipt
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T00-56-49-383Z.json`
+  reports 479 symbol-version rows / 479 stable IDs / 479 SHA-256 source
+  revisions; 0 `upstream_node_id = atlas_ast_nodes.tree_node_id` matches; 64
+  versions join by exact source path; 38 also match source revision and exact
+  byte span. `tree_node_occurrence_id` is not present as a column in either
+  audited table. These 38 exact tuple matches are a partial crosswalk, not
+  proof of canonical promotion or a repair cohort. The two first broad OR-path
+  scans exceeded the bounded runtime; both were explicitly cancelled, then
+  replaced with the indexed exact-path audit. PostgreSQL transaction was
+  `REPEATABLE READ READ ONLY`; no data or projection writes occurred. Keep the
+  source/identity population and canonical graph gates open.
+- **Live identity schema/constraint inventory (2026-10-15; PostgreSQL
+  repeatable-read/read-only):** added
+  `scripts/atlas/audit-graph-identity-schema-inventory-v1.mjs`, which captures
+  identity/revision columns and declared PK/UNIQUE/FK constraints for 18
+  canonical, Graphify, symbol, graph-authority, and topology tables. Receipt
+  `docs/reports/graph-identity-schema-inventory-v1-2026-10-16T01-00-13-629Z.json`
+  contains 187 relevant columns and 40 declared constraints. Key findings:
+  `atlas_packets.packet_key` is UNIQUE; `atlas_tree_nodes` has only its
+  `node_id` primary key (no unique packet_key/source_ref); `graphify_files`
+  has only `file_id` PK (no source/revision uniqueness); `graphify_symbols`
+  has UNIQUE `(file_id, stable_symbol_key)`; `graphify_edges` has only
+  `edge_id` PK (no semantic endpoint tuple uniqueness). Authority score
+  projections have snapshot/node or run/node keys; topology tables use their
+  own packet/snapshot/position keys and are not canonical identity owners.
+  No DDL or data change was made. Data-level uniqueness counts remain separate
+  from these schema constraints, and adding constraints requires its own
+  duplicate census and migration review.
+- **Canonical tree key population census (2026-10-15; repeatable-read/read-only):**
+  `scripts/atlas/audit-canonical-tree-uniqueness-v1.mjs` independently queried
+  the explicitly scoped canonical cohorts and wrote immutable receipt
+  `docs/reports/canonical-tree-uniqueness-v1-2026-10-16T01-01-05-031Z.json`.
+  Current snapshot: 61,658 canonical document rows, all with distinct non-null
+  `source_ref` and non-null `page_index_path` (0 duplicate groups); 61,659
+  canonical chunk rows, all with distinct non-null `packet_key` (0 duplicate
+  groups). Status is `DATA_UNIQUE_SCHEMA_UNCONSTRAINED`: this confirms current
+  cohort population only, not a database invariant. `atlas_tree_nodes` has no
+  unique constraint on either key. Synthetic AST rows were excluded because
+  they reuse source refs and are a different cohort. No DDL/data writes; do not
+  add uniqueness constraints without separately assessing all writers and
+  future insert behavior.
+- **Packet/tree expansion of the same identity census (2026-10-15; fresh
+  repeatable-read snapshot):** extended the audit with indexed joins through
+  `atlas_packets.packet_key` and `atlas_tree_nodes.packet_key`. The new immutable
+  receipt `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T00-57-36-214Z.json`
+  confirms all 285 symbol versions carrying a packet key join one packet and a
+  tree row, with source-ref agreement in both; only 144/285 agree on packet
+  `source_revision`. The remaining 194 symbol versions have no packet key.
+  Combined with the earlier AST join, this shows packet/tree linkage is not
+  equivalent to exact AST lineage: only 38/479 match source path, source
+  revision, and byte span against `atlas_ast_nodes`, and zero upstream IDs
+  equal AST `tree_node_id`. No inference is made that the 141 packet revision
+  mismatches are safe to repair; revision axes and producer authority need
+  resolution first. Receipt is read-only, timestamped, checksum-validated;
+  identity promotion remains blocked.
+- **Packet revision gap classification (2026-10-15; same bounded live audit):**
+  the latest receipt
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T00-58-43-864Z.json`
+  distinguishes absence from conflict for the 285 packet-linked versions:
+  144 packet rows have source revisions equal to their symbol versions; 141
+  packet rows have `source_revision IS NULL` and
+  `workspace_revision_key IS NULL`; there are zero non-null revision conflicts.
+  Thus the observed 141 cases are missing packet lineage fields, not proven
+  disagreements between two revision values. This is diagnostic only: no
+  packet revision or workspace binding was inferred or written. Keep them
+  unqualified and defer any source-revision mutation to the existing post-P20
+  authorization gate.
+- **Semantic retrieval gate recheck (2026-10-16; repeatable-read/read-only):**
+  reran `scripts/atlas/audit-lineage-semantic-768-cohort-v1.mjs` against the
+  frozen 15-candidate map into a new `.tmp/atlas/` receipt. It failed closed
+  before candidate-row evaluation: the current `codebase_chunk_index` schema
+  lacks required `embedding_digest`, and the frozen map declares
+  `identityAuthority: false`; therefore zero of 15 candidates were newly
+  qualified by this run. A separate live `information_schema` query confirmed
+  the table has `content_hash`, `file_content_hash`, and embedding/model/revision
+  fields, but no `embedding_digest`. Do not alias a chunk/source content hash
+  to an embedding-output digest. The older 2026-09-15 `SEMANTIC_768_COHORT_PROVEN`
+  receipt remains a historical frozen-canary result, not a fresh live pass.
+  Existing KNN evidence is also scoped: the 2026-09-18 pgvector/HNSW replay is
+  `BLOCKED_NO_SOURCE_REVISION`; the semantic Top-K canary proves only its frozen
+  candidate/ordinal parity; the SOM/KMeans alignment receipt remains
+  `OPEN_ALIGNMENT_GAPS`. No current end-to-end semantic→KNN→KMeans→SOM→PageRank
+  chain is proven. No DDL, DB writes, projection writes, or vector generation
+  occurred. Receipt:
+  `.tmp/atlas/lineage-semantic-768-cohort-live-20261016T010229607Z.json`.
+- **Packet/chunk semantic-owner crosswalk (2026-10-16; bounded
+  repeatable-read/read-only):** corrected the schema interpretation: the
+  repository's semantic lineage writer stores `embedding_digest` on
+  `atlas_packets`, alongside its packet-level `embedding`; the canonical
+  chunk vector is separately stored in
+  `codebase_chunk_index.content_embedding_768`, and packet-to-chunk identity
+  is joined through `atlas_packet_chunk_lineage`. Added diagnostic-only
+  `scripts/atlas/audit-semantic-packet-chunk-crosswalk-v1.mjs` and immutable
+  receipt `.tmp/atlas/semantic-packet-chunk-crosswalk-20261016T010518596Z.json`
+  (receipt payload SHA-256 `cd2dd4a2dda171cdc5f5ed6446d97e0e2f6b295d8f84b60dad8fd54940a84965`).
+  On the frozen 15-candidate map, all 15 resolve one proven lineage row, one
+  packet row, and one exact chunk row; all 15 lineage source revisions match
+  the map. However, 0/15 packet source revisions match, 0/15 chunk source or
+  workspace revisions match, 0/15 packet embedding digests are populated,
+  and 0/15 packet vectors exactly match their chunk vectors. The packet and
+  chunk vectors are both 768-dimensional but are distinct representations in
+  these rows; neither hash nor vector may be substituted across those owners.
+  The frozen map remains `identityAuthority:false`, so this is a diagnostic
+  crosswalk, not semantic admission or current-corpus coverage. No schema,
+  canonical data, or projection was changed. Resolve the writer/representation
+  ownership and revision binding before revising the cohort gate or running
+  retrieval-quality promotion.
+- **8095 + AST-grep language probe (2026-10-16; read-only diagnostics):**
+  fixed `scripts/atlas/ast-chunk-keyed-map-v1.mjs` so its extension gate admits
+  Python files already advertised by live 8095 capabilities, and supplied
+  language-appropriate Python patterns instead of reusing JavaScript syntax.
+  The same mapper now allows `.cc`, `.cpp`, and `.hpp` as an explicit local
+  C++ AST-grep-only diagnostic path when 8095 has no C++ binding; it does not
+  synthesize native AST spans for C++ or require 8095 to be running for a
+  C++-only invocation. Live probes passed: TypeScript `semantic-lineage.ts`
+  produced 28 sidecar spans and 12 AST-grep observations (4 exact, 8 enclosed,
+  0 disagreement); Python `networkx_executor.py` produced 15 spans and 59
+  AST-grep observations (11 function-definition matches, 48 assignments,
+  0 disagreement); N-API `binding.cc` produced 53 AST-grep observations (1
+  `NAPI_MODULE`, 52 `registerFn` calls), with sidecar explicitly skipped;
+  Svelte `ActionPopup.svelte` returned 2 sidecar spans, with AST-grep skipped.
+  This confirms parser/helper outputs can be held as in-memory maps and emitted
+  as deterministic-keyed `{key,value}` observation arrays, but those keys are
+  still path/rule/span or path/upstream-chunk/span diagnostics—not canonical
+  `tree_node_id`, `symbol_version_id`, or packet identity. Svelte template
+  coverage and live 8095 C++ parsing remain absent. All four receipts are under
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-08-44-049Z-semantic-lineage.ts.json`,
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-08-44-809Z-networkx_executor.py.json`,
+  `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-08-45-396Z-binding.cc.json`,
+  and `.tmp/atlas/ast-chunk-keyed-map-v4-2026-10-16T01-09-13-068Z-ActionPopup.svelte.json`;
+  checksums verified. No persistent stores were written; all receipts are
+  diagnostic and `canonicalAuthority:false`.
+
+- **Tree identity resolver ambiguity follow-up (2026-10-16; static source audit):**
+  confirmed that the root JavaScript backfill, root JavaScript ingestion, and
+  package TypeScript backfill do not resolve rows by `page_index_path`; they
+  query `node_type` plus whichever of `source_ref` and `packet_key` are supplied.
+  However, both inspected resolver implementations order matches by timestamps
+  and return the first row (`LIMIT 1`) without detecting duplicate matches or
+  requiring the expected ledger scope. This means the path is not being used as
+  catch-all identity, but an ambiguous identity lookup can still silently select
+  an arbitrary tree node. Treat these writers as non-authoritative and keep
+  replay/apply gated until duplicate behavior and canonical-ledger filtering are
+  specified and tested. This was a static audit only: no writer was run and no
+  database state changed.
+
+- **Sidecar / hypergraph ground-truth correction (2026-10-16; static source
+  audit):** `python/miniforge_nlp_sidecar.py` is already the owner of
+  `_mint_revision_qualified_tree_node_id`, `strict_utf8_to_utf16_offset`, and
+  `mint_sorted_hyperedge_id`; do not add a second Python helper. `_build_ast_units`
+  uses the revision-qualified SHA-256-derived tree ID when a non-`unknown`
+  source revision is supplied, otherwise it emits a shorter fallback digest.
+  `AstUnit.canonical_authority` is false. `mint_sorted_hyperedge_id` sorts and
+  deduplicates members, but source search found no caller, so its behavior is a
+  helper definition, not evidence that N-ary edges are minted or persisted.
+  Existing persistence owners are `atlas_hyperedges` / `atlas_hyperedge_members`
+  and the separate legacy `hypergraph_edges` / `hypergraph_edge_members`; do not
+  create `atlas_hypergraph_edges` without first resolving ownership and mapping
+  its requirements onto the existing schema. The Auto-Mode gate currently
+  accepts `hyperedgeMatchCount: number`; a positive caller-supplied count is not
+  a revision-bound verified edge receipt. Thus classifier N-ary routing is not
+  production-qualified. Svelte structural ownership remains
+  `phase3b2-semantic-splitter-pipeline.mjs` / `svelte/compiler`, with the
+  recorded rune, handler, and template crosschecks; no Svelte grammar DLL is a
+  prerequisite for that path. Static inspection only; no DB writes or service
+  changes.
+- **Hyperedge table-count decision (2026-10-16; static DDL/source review):** no
+  third hyperedge table is justified by the pasted proposal. The existing
+  `atlas_hyperedges` header plus `atlas_hyperedge_members` role-bearing incidence
+  rows already represent an N-ary relation. `atlas_taxonomy_assignment_candidates`
+  is a distinct review/workflow queue that may point to a promoted hyperedge; it
+  is not another incidence store. The proposed `atlas_hypergraph_edges` would
+  duplicate the header/member authority. Add columns or constraints only through
+  the owning schema change if a concrete missing field is established. No DDL,
+  data, or cache writes were performed.
+- **8095 live parser-runtime recheck (2026-10-16; read-only HTTP):** GET
+  `/health` and `/capabilities` returned `ok`, active synthesis model
+  `ornith-1.5-9b`, and parser engine `treesitter-chunker` 4.0.0 with
+  `tree-sitter-language-pack` 0.9.0 and `ast-grep-py` 0.45.3. The capability
+  response exposes one extension-map owner,
+  `python/miniforge_nlp_sidecar.py::_AST_LANGUAGE_EXTENSIONS`, SHA-256
+  `4407f506bcdde65937a4a76c2239f49bea71a9df2be68687fa84de546be5c039`, including
+  `.svelte`; however `fixtureVerified=false`. This establishes current service
+  availability and runtime metadata only, not parser fixture parity, source-byte
+  digest validation, identity crosswalk, persistence, or retrieval admission.
+  Receipt: `docs/reports/parent-atlas-8095-runtime-observation-20261016T014959Z.json`.
+  No database/cache writes or service changes.
+- **8095 + ast-grep bounded parser fixture (2026-10-16; read-only):** ran
+  `node scripts/atlas/ast-chunk-keyed-map-v1.mjs
+  sveltekit-frontend/src/lib/server/atlas/indexing/structural-language-dispatch-v1.ts`.
+  The sidecar returned `CLEAN` under `treesitter-chunker@4.0.0`; the disk
+  SHA-256 independently matched the request/receipt digest. Fourteen ast-grep
+  matches were all covered by the 22 native chunks (3 exact compatible node
+  types, 11 covered only by a coarser enclosing function/export, 0
+  disagreements); no duplicates or out-of-bounds spans. The original execution
+  receipt checksum was independently recomputed and matched. Summary receipt:
+  `docs/reports/parent-atlas-8095-ast-grep-crosscheck-20261016T015050Z.json`;
+  full diagnostic receipt remains under `.tmp/atlas/`. This proves one parser
+  fixture and crosscheck only. It does not prove canonical identity, source to
+  packet/chunk lineage, persistence, retrieval, or ContextManifest admission;
+  parser-manifest alignment remains open. No database/cache writes or service
+  changes.
+- **8095 Python parser fixture (2026-10-16; read-only, partial crosscheck):** ran
+  `node scripts/atlas/ast-chunk-keyed-map-v1.mjs
+  python/atlas_contract_parity/hyperedge_evidence_v1.py`. The sidecar returned
+  `CLEAN` under `treesitter-chunker@4.0.0`; the independent disk SHA-256 and
+  recomputed execution-receipt checksum matched. Eight native chunks had no
+  duplicate or out-of-bounds spans. AST-grep emitted 20 matches, of which 16
+  were covered by native chunks and 4 were not. Only 2 structural matches had
+  declared native node types and both matched exactly; the zero-disagreement
+  count must not be read as full 20-match parity. The four uncovered assignments
+  are module-level type aliases `NonEmpty`, `Sha256`, `HexChecksum`, and
+  `ProposalChecksum`; this is an extraction-coverage gap, not an observed
+  disagreement on a comparable function/class node. Receipt:
+  `docs/reports/parent-atlas-8095-python-ast-grep-crosscheck-20261016T015157Z.json`.
+  Classify parser execution as proven for this fixture and crosscheck coverage
+  as partial. No identity, lineage, persistence, retrieval, or ContextManifest
+  admission was exercised; no database/cache writes or service changes.
+- **Sidecar identity helper regression tests (2026-10-16; fixture-only):**
+  added `python/test_miniforge_nlp_sidecar_identity_contract.py` and ran
+  `pytest -q python/test_miniforge_nlp_sidecar_identity_contract.py`; all 6
+  tests passed. Coverage includes deterministic/revision-scoped sidecar node
+  IDs, rejection of absent/`unknown` revisions, strict UTF-8-to-UTF-16 byte
+  boundaries including a supplementary-plane character, order-independent
+  sorted/deduplicated hyperedge IDs, and minimum hyperedge arity. This tests
+  helper behavior only; outputs remain `canonical_authority=false`, no
+  hyperedge caller/persistence or parser-to-registry identity crosswalk was
+  proven, and no database or service state changed.
+- **Fresh symbol/AST identity crosswalk (2026-10-16; PostgreSQL repeatable-read,
+  read-only):** reran the bounded existing audit against current database state.
+  Receipt: `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-15-44-869Z.json`;
+  status `CROSSWALK_PARTIAL`, `databaseError: null`. It found 479 symbol-version
+  rows and 479 stable IDs; 64 exact source-path matches, of which 38 also match
+  source revision and byte span; zero `upstream_node_id = atlas_ast_nodes.tree_node_id`
+  matches. Of 285 version rows with a packet key, all 285 join by packet key and
+  source ref, but only 144 have a matching packet source revision; 141 packet
+  source revisions and workspace revision keys are missing. This confirms that
+  the declared stable-symbol/version contracts exist but current AST/packet
+  linkage does not yet establish the full identity chain. It is diagnostic only:
+  no backfill, canonical writes, or promotion occurred.
+- **Live hypergraph table decision census (2026-10-16; SELECT-only):** ran the
+  existing `audit-hypergraph-current-arity-census-v1.mjs` against PostgreSQL;
+  receipt `.tmp/atlas/hypergraph-census-for-table-decision.json`, SHA-256
+  `6350d8d29c078c332d04024926f25def97c2016d99f3280468edf5b9a30a3198`.
+  `atlas_hyperedges` / `atlas_hyperedge_members` already contain 62,802 edges
+  and 125,604 members, all exactly binary (`CONCEPT_PART_OF` and
+  `CONCEPT_BROADER_THAN`); there are zero rows in `atlas_ontology_tuples`, zero
+  orphans, and no duplicate `(hyperedge_id, member_id, member_role)` groups.
+  The data is stamped `taxonomy-edges-v1-2026-05-08` / `git:0084288f26`; the
+  script reports `CENSUS_COMPLETE_CURRENTNESS_UNPROVEN` and runs separate SELECTs,
+  not a repeatable-read snapshot. This supports reusing the existing schema, not
+  creating a third table; it does not prove any current N-ary code hyperedges.
+  No database writes occurred.
+- **Symbol-version ↔ workspace-source-binding crosswalk extension (2026-10-16;
+  PostgreSQL `REPEATABLE READ READ ONLY`):** extended the existing identity audit
+  to join exact `source_ref` values against
+  `atlas_workspace_source_bindings.canonical_source_ref`, then compare source
+  and workspace revisions without path normalization or inferred repo choice.
+  Latest receipt:
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-17-59-406Z.json`,
+  status `CROSSWALK_PARTIAL`, `databaseError: null`. Of 479 symbol-version rows,
+  402 have at least one exact-path binding, 208 have exact source-revision and
+  workspace-revision binding, and zero have multiple exact binding rows across
+  repos. Within the 141 packet-linked versions whose packet source and workspace
+  revisions are both missing, 64 have one exact symbol-to-source-binding match;
+  77 have no exact binding match; zero are ambiguous. The 64 are only a
+  reconciliation candidate set: packet/source ownership, content-digest parity,
+  and independent readback still need qualification before any proposed write.
+  No database rows were changed.
+
+- **Bounded exact-binding candidate inspection (2026-10-16; PostgreSQL
+  `REPEATABLE READ READ ONLY`):** extended the existing crosswalk audit to emit
+  bounded metadata for rows where `atlas_packets` is missing both source and
+  workspace revision keys but the symbol version joins exactly to one
+  `atlas_workspace_source_bindings` row. Fresh receipt:
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-19-59-644Z.json`;
+  `databaseError: null`, 64 candidate rows, all one exact binding in repo
+  `deeds-web-app`. All 64 symbol revisions equal the binding revision and
+  `sha256:` + binding `content_digest`; all 64 symbol workspace revisions equal
+  the binding workspace revision. The corresponding packet rows have both
+  revision fields missing and `content_hash` missing. This is stronger
+  source-binding evidence, but not yet proof of current filesystem bytes, packet
+  writer ownership, packet preimages, or independent post-write readback.
+  Accordingly, this is a reconciliation/approval candidate only; no packet
+  repair, backfill, table change, or promotion is authorized. The packet
+  `content_hash` is intentionally not substituted for the binding digest: the
+  existing packet-digest bridge documents its historical recipe as distinct
+  from source lineage. `node --check` and the read-only audit passed; PostgreSQL
+  canonical rows were not changed.
+- **Current-worktree byte comparison for the 64 candidates (2026-10-16;
+  filesystem read-only):** the same audit records SHA-256 and byte length for
+  each candidate source path, with repository-root containment checks and no
+  source contents stored. All paths were readable (9 unique files), but **0/64**
+  current files matched the source-binding digest and **0/64** matched its byte
+  length. All candidates refer to one recorded workspace revision, which is
+  not thereby proven to be the current checkout. This disproves using the
+  present worktree as the source-byte preimage for packet repair; establish the
+  exact bound workspace snapshot or a newly qualified binding first. Keep
+  packet revision repair and promotion blocked. Receipt:
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-21-13-910Z.json`.
+  No database, cache, projection, or source-file writes occurred.
+- **Admitted snapshot located and integrity-rechecked (2026-10-16; local
+  read-only):** the subsequent crosswalk now verifies the tournament admission,
+  snapshot file digest, source-membership checksum, source-content checksum,
+  and zero-violation manifest before comparing candidates. Receipt:
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-23-58-052Z.json`.
+  The admitted snapshot has 24,456 root sources and its metadata matches all
+  64 candidate bindings (source revision, content digest, and byte length).
+  This reconciles why the current checkout differs: it is not the bound
+  snapshot. Important limit: the snapshot is marked
+  `CAPTURE_VERIFIED_REQUIRES_PROCESSING_READBACK` and
+  `canonicalAuthority: false`; it contains source metadata, not source bytes.
+  Therefore this establishes integrity of the frozen manifest and exact
+  metadata alignment, not canonical source authority, current-file parity, or
+  packet-write permission. Keep the post-P20 source-revision gate and packet
+  readback requirement intact; no database or source writes occurred.
+- **Materialized admitted-snapshot byte and span proof (2026-10-16; read-only):**
+  extended and reran the same crosswalk so it hashes the bounded candidate files
+  under the snapshot-revision directory using both lexical and real-path
+  containment checks. Latest receipt:
+  `docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-25-21-889Z.json`.
+  All **64/64** materialized source files match the exact binding SHA-256,
+  `source_revision`, and byte length; all are valid UTF-8 and their recorded
+  symbol byte spans are in bounds and on UTF-8 boundaries. This proves byte
+  preimage and coordinate-range consistency for this frozen cohort, not that
+  every span semantically identifies the intended AST symbol, that the
+  snapshot is canonical authority, or that packet updates are authorized.
+  Current worktree parity remains 0/64. No source contents are copied into the
+  receipt and no database, cache, or projection writes occurred.
+- **Symbol-version spans against the live 8095 AST owner (2026-10-16;
+  read-only parser calls):** added
+  `scripts/atlas/prove-symbol-candidate-snapshot-ast-parity-v1.mts`, which
+  consumes the qualified crosswalk receipt, verifies each materialized file
+  against its exact revision/digest/length, and calls the existing ACP
+  `nlp:ast-chunk` owner for the 9 unique candidate files. Receipt:
+  `docs/reports/symbol-candidate-snapshot-ast-parity-v1-2026-10-16T01-29-03-070Z.json`.
+  All 9 responses returned `atlas.ast.evidence.v1`, matching file path and
+  source revision; 63/64 symbol-version spans match one parser chunk exactly,
+  including the qualified-name leaf. One row (`buildErrorFixingGraph`) does
+  not: the symbol-version range ends at byte 9858 while the parser function
+  chunk ends at byte 9836; the extra 22 bytes include the later
+  `export default` object reference. Do not widen parser matching or repair the
+  symbol row from this observation. The exact source snapshot is proven, but
+  this row's producer/span semantics need reconciliation. Sidecar calls were
+  parse-only; no canonical or projection writes occurred. This remains a
+  frozen-snapshot diagnostic, not current-worktree or canonical authority.
+- **Discrepancy producer trace (2026-10-16; read-only source inspection):**
+  traced the `buildErrorFixingGraph` outlier through the existing
+  `scripts/atlas/graphify-symbol-extractor-v1.mts` and
+  `scripts/graphify/lib/ts-ast-extractor.mjs` path. The TypeScript Compiler API
+  reports decoded JavaScript-string offsets; the Graphify owner explicitly
+  converts these through `decodedOffsetToRawByte` before persisting spans, so
+  the earlier suspicion that this writer simply stores UTF-16 offsets is not
+  supported. Replaying the extractor on the exact materialized snapshot yields
+  decoded offsets `[8969, 9822]`, correctly normalized to UTF-8 byte range
+  `[8983, 9836]` (the `export_statement` wrapper). The Tree-sitter
+  `function_declaration` is `[8990, 9836]`, while the database symbol-version
+  row is `[8990, 9858]`. Thus the stored range matches neither the current
+  Graphify full-export span nor the Tree-sitter function span; the extra 22
+  bytes remain unexplained and could reflect a different producer or prior
+  materialization. Do not infer which producer wrote it or repair it without
+  provenance/readback. This narrows the discrepancy but does not close it.
+  No source, database, cache, or projection writes occurred.
+- **Exact row producer and occurrence-identity attribution (2026-10-16;
+  PostgreSQL `REPEATABLE READ READ ONLY` plus local artifact inspection):**
+  looked up the discrepant `symbol_version_id` directly. The row records
+  `producer_revision='atlas-ast-symbol-version-materializer-v1'`,
+  `upstream_node_id='8f47e0d5-d14a-49a1-9d49-a9d71b4d8909'`, source revision
+  `sha256:602c58c20fe982d0ab26c58f32ac4d55cef70ae6397e10d0d7aa2f779d3b34d3`,
+  workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+  and span `[8990,9858]`. The existing
+  `.tmp/atlas/graphify-file-index-v1/ast-entities.jsonl` uses that same
+  `upstream_node_id`/`tree_node_id` on many declarations in the file, so it is
+  a shared packet/tree-root reference, not a unique declaration-occurrence ID.
+  A current local nomination for the same named function has range
+  `[8990,9836]` but workspace revision
+  `sha256:e2e80507d1ad16c5d41d527a24c889c9062bd27c34f4bb6022beb7413cec9f57`;
+  it is not the row's exact historical input and cannot establish what the
+  materializer consumed. Thus the write owner is identified, but its exact
+  input artifact is not. Keep the 22-byte discrepancy and overloaded upstream
+  ID unresolved; do not equate packet/tree IDs with parse-node IDs or promote
+  this occurrence. No database writes occurred.
+- **Live upstream-ID reuse census (2026-10-16;
+  PostgreSQL `REPEATABLE READ READ ONLY`):** grouped all current
+  `atlas_symbol_versions` by `producer_revision`. The legacy materializer has
+  285 rows but only 109 distinct `upstream_node_id` values; 200 rows join by
+  that ID to `atlas_packets.tree_node_id`. Within identical producer/source/
+  revision groups, 22 upstream IDs are reused across multiple declarations,
+  with a maximum of 24 symbol versions sharing one ID. In contrast,
+  `symbol-reconciliation-writer-v1` has 194 rows and 194 distinct upstream
+  IDs, with zero direct matches to packet tree roots. This confirms the
+  `upstream_node_id` problem is systematic in the legacy-materializer
+  population, not limited to the single span outlier. These counts characterize
+  the live table only; they do not establish the intended semantics of every
+  legacy ID or authorize repairs. Keep those rows non-promotable until each
+  upstream reference is requalified as a unique parser occurrence or explicitly
+  typed as a packet/tree reference. Query used only SELECTs in a read-only
+  transaction; no rows changed.
+- **Newer-writer live source-binding crosscheck (2026-10-16;
+  PostgreSQL `REPEATABLE READ READ ONLY`):** joined all 194
+  `symbol-reconciliation-writer-v1` rows to `graphify_symbols` through
+  `upstream_symbol_id`. All 194 join and match the graphify symbol ID, source
+  path, qualified name, declaration hash, and byte span. However, **0/194**
+  match the joined `graphify_files` `code_source_revision` and
+  `workspace_revision` simultaneously; **0/194** match an
+  `atlas_workspace_source_bindings` row on path + source revision + workspace
+  revision. All 194 stored version rows have identical `source_revision` and
+  `workspace_revision`; all 194 paths have bindings, but none has the stored
+  source revision. Example: the version stores both revisions as
+  `sha256:322ed1a6...`, while the current Graphify file and bindings record
+  source revision `sha256:e7f11e49...` and workspace revisions
+  `sha256:322ed1a6...` or `sha256:e24bb971...`. This proves identity/span
+  parity without current source-lineage parity; it does not establish whether
+  the old source revision was valid when written. Do not count these 194 rows as
+  currently revision-qualified or promote them until a matching frozen-source
+  binding/readback receipt exists. No rows changed.
+- **Applied writer input-artifact availability (2026-10-16; report + local
+  artifact inspection):** the applied receipt
+  `docs/reports/symbol-reconciliation-writer-v1-1789271595289.json` records
+  `apply=true`, target workspace revision
+  `sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`,
+  23,369 bound source refs, 194 symbol rows, and 194 inserted symbol versions.
+  Its schema contains no input path/checksum or per-row source-binding manifest.
+  The later receipt
+  `docs/reports/symbol-reconciliation-writer-v1-1790649436604.json` is
+  explicitly `apply=false`, target workspace
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`,
+  and reports 194 candidates but zero version writes. The currently present
+  `.tmp/atlas/graphify-file-index-v1/ast-symbol-nominations.jsonl` has 461 rows
+  under workspace `sha256:e2e80507...`, so it is not the exact 194-row applied
+  input. The historical applied cohort therefore cannot be reconstructed from
+  these receipts/current nomination artifact alone. Keep applied rows
+  unqualified pending a source-bound input manifest and independent readback;
+  do not treat `GROUNDED` or `apply=true` as proof of row-level revision
+  correctness.
+- **Retained snapshot-store search for applied cohort (2026-10-16;
+  filesystem read-only):** searched the snapshot manifests/source trees under
+  `docs/reports/workspace-source-snapshots/` and
+  `.tmp/workspace-source-snapshots/` for the applied target workspace revision
+  `sha256:322ed1a6...`. No matching manifest/source entry was found; the actual
+  materialized `.tmp` snapshot directories are keyed by other snapshot
+  revisions. The present nomination artifact remains a distinct 461-row
+  `sha256:e2e80507...` cohort. This bounded search does not rule out an external
+  backup, but no retained in-repo snapshot currently supplies the missing
+  per-row source preimage/binding evidence. No files or databases were changed.
+
+### Packet/chunk uniqueness semantics clarification (2026-10-16; read-only)
+
+- Rechecked the live catalog and data in a `REPEATABLE READ READ ONLY`
+  transaction. The 61,658 `atlas_tree_nodes` rows of `node_type='document'`
+  with `parent_id IS NULL` have non-null, unique `source_ref` values; they
+  have no `packet_key`. The unfiltered root query also included function and
+  other AST nodes, so its 18,597 duplicate-source groups are not document-root
+  collisions.
+- `atlas_packets.packet_key` has a live unique index; the null and duplicate
+  packet-key counts are both zero.
+- `atlas_packet_chunk_lineage` is intentionally one-to-many: it has 127,927
+  membership rows, 13,720 packet keys with multiple chunks, and zero duplicate
+  `(packet_key, canonical_chunk_id)` pairs. Its enforced uniqueness is the
+  composite membership key, not `packet_key` alone. Do not add a unique
+  `packet_key` constraint to this relation; that would reject legitimate
+  multi-chunk packets. This read-only query does not independently establish
+  every `canonical_chunk_id`'s upstream row binding.
+- No DDL or data writes were performed. The open design question is whether
+  document-root uniqueness should be enforced at the producer/schema boundary;
+  packet identity and packet-to-chunk membership already have distinct
+  uniqueness contracts.
+
+### Identity-audit helper proof-boundary correction (2026-10-16)
+
+- Static review found `auditGraphIdentityPopulation()` could mark packet/tree,
+  parse-node, stable-symbol, symbol-version, and parser-manifest gates proven
+  from unique identifier arrays, matching counts, or equal backend-name
+  strings. Those inputs do not prove authoritative joins, source/revision
+  bindings, cross-revision stability, grammar identity, or parser parity.
+- Changed the helper to retain collision/count diagnostics while leaving all
+  authority gates false and reporting the missing proof classes in
+  `proofLimitations`. This helper has no production caller in the searched
+  source tree; its result is not live population evidence.
+- Focused Vitest: `graph-identity-audit.spec.ts`, 5/5 passed. Full output:
+  `.tmp/atlas/graph-identity-audit-vitest.txt`. No database, cache, graph,
+  migration, or service writes were performed. The phase identity gates remain
+  open until source-qualified population receipts and independent joins prove
+  them.
+
+### Canonical tree key uniqueness refresh (2026-10-16; live read-only)
+
+- Re-ran `scripts/atlas/audit-canonical-tree-uniqueness-v1.mjs` against the
+  current PostgreSQL snapshot in `REPEATABLE READ READ ONLY`. All 61,658
+  canonical document roots have non-null, distinct `source_ref`; all 61,659
+  canonical chunk rows have non-null, distinct `packet_key`; duplicate groups
+  and extra rows are zero. Receipt:
+  `docs/reports/canonical-tree-uniqueness-v1-2026-10-16T02-00-30-018Z.json`.
+- Status remains `DATA_UNIQUE_SCHEMA_UNCONSTRAINED`: this proves only the
+  observed cohort, not a durable uniqueness invariant. No constraint or data
+  change is authorized by this census; adding DDL still requires writer review,
+  a full duplicate census, and a separate migration decision.
+
+### Parser identity namespace clarification (2026-10-16; static source audit)
+
+- Compared `python/miniforge_nlp_sidecar.py::_mint_revision_qualified_tree_node_id`
+  with `sveltekit-frontend/src/lib/server/atlas/identity/tree-node-occurrence-v1.ts::deriveTreeNodeOccurrenceId`.
+  These are not cross-runtime implementations of one ID contract: the sidecar
+  hashes a delimited tuple including file path, source revision, AST kind,
+  qualified symbol, and byte span into a truncated `tn_v1_` value; the TS
+  occurrence contract hashes canonical JSON of source ref, source revision,
+  node type, byte span, and optional AST path into a full `sha256:` value.
+- Preserve them as distinct namespaces until an explicit contract says
+  otherwise. Do not require equality, alias either to `parse_node_id`, or use
+  either as `symbol_id`, `symbol_version_id`, `packet_key`, or graph projection
+  identity. Existing `tree_node_occurrence_id` forward-correction proof covers
+  its own producer, not the 8095 sidecar-to-PostgreSQL identity crosswalk.
+- This comparison is static and does not prove uniqueness across a live sidecar
+  corpus, exact source-revision alignment, or persistence/admission. No IDs,
+  schema, or database rows were changed.

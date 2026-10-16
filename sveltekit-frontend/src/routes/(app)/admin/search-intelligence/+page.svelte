@@ -607,7 +607,7 @@
 	type ValidateResult  = { query: string; candidateScore: number; baselineScore: number; delta: number; candidateIssues: string[]; candidateMs: number };
 	type ValidateReport  = { verdict: ValidateVerdict; model: string; baseline: string; avgCandidate: number; avgBaseline: number; delta: number; improvements: number; regressions: number; results: ValidateResult[]; validatedAt: string };
 	let ckptModel       = $state('');
-	let ckptBaseline    = $state('gemma4-legal:latest');
+	let ckptBaseline    = $state('ornith-1.5-9b');
 	let ckptRunning     = $state(false);
 	let ckptReport      = $state<ValidateReport | null>(null);
 	let ckptError       = $state<string | null>(null);
@@ -1876,7 +1876,7 @@
 		<div class="ckpt-fields">
 			<label class="field">
 				<span>Candidate model</span>
-				<input class="text-input" style="width:220px" placeholder="gemma4-legal-v2:latest"
+				<input class="text-input" style="width:220px" placeholder="ornith-1.5-9b"
 					bind:value={ckptModel} />
 			</label>
 			<label class="field">
@@ -2245,7 +2245,7 @@
 	<!-- ── Corpus Search ─────────────────────────────────────────────────── -->
 	<section class="panel corpus-panel">
 		<h3 class="section-title">Local Legal Search</h3>
-		<p class="corpus-desc">Search authoritative sources in <code>legal_canon_chunks</code> and <code>court_opinions</code>, plus contextual records in <code>legal_documents</code>, via gemma4-legal — offline, no external calls.</p>
+		<p class="corpus-desc">Search authoritative sources in <code>legal_canon_chunks</code> and <code>court_opinions</code>, plus contextual records in <code>legal_documents</code>, via ornith-1.5-9b — offline, no external calls.</p>
 		<div class="corpus-controls">
 			<input
 				class="corpus-input"

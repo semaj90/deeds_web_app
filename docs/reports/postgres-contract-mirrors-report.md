@@ -1,6 +1,6 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-14T02:49:16.225Z
+Generated: 2026-10-16T03:53:29.829Z
 
 ## Summary
 
@@ -28,7 +28,7 @@ Generated: 2026-10-14T02:49:16.225Z
 - static indexes: kanban_ready_idx, kanban_running_heartbeat_idx
 - live columns: task_id, feature_id, feature_label, source_refs, lane, status, validation_command, assignee, priority, claim_token, claim_expires_at, last_heartbeat_at, current_run_id, attempt_count, failure_count, max_retries, started_at, completed_at, idempotency_key, created_at, updated_at
 - live indexes: kanban_ready_idx, kanban_running_heartbeat_idx, kanban_tasks_pkey
-- live rows: 0
+- live rows: 166
 
 ## feature_registry
 

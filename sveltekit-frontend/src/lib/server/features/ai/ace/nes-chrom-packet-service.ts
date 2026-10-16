@@ -45,7 +45,7 @@ export async function persistNesChromPacket(input: NesChromPacketInput): Promise
     featureId: input.featureId,
     packetType: 'nes_chrom',
     lane: input.lane ?? 'semantic_packet',
-    model: input.model ?? 'gemma4-rotorquant:latest',
+    model: input.model ?? 'ornith-1.5-9b',
     summary: input.summary ?? null,
     payload: {
       ...(input.payload ?? {}),

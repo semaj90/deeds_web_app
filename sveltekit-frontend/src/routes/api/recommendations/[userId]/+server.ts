@@ -26,7 +26,7 @@ import { MultiModalRanker, type DocumentCandidate, type RankedDocument } from '$
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
 import { ENV } from '$lib/server/env.server.js';
 
@@ -52,7 +52,7 @@ const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
  */
 async function embedQuery(query: string): Promise<number[] | null> {
 	try {
-		const resp = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+		const resp = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: query }),

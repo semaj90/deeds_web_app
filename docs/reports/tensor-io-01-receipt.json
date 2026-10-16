@@ -1,9 +1,9 @@
 {
   "milestone": "TENSOR-IO-01",
   "schema_version": "1.0.0",
-  "timestamp": "2026-10-15T06:35:35.667Z",
+  "timestamp": "2026-10-16T01:36:55.927Z",
   "status": "VERIFIED",
-  "total_duration_ms": 1202,
+  "total_duration_ms": 1048,
   "parameters": {
     "corpus_rows": 1000,
     "dimensions": 768,
@@ -21,7 +21,7 @@
     "total_vram_gb": 7.99951171875
   },
   "benchmarks": {
-    "gemm_duration_ms": 243.21579999999994,
+    "gemm_duration_ms": 246.67450000000008,
     "max_oracle_discrepancy": 1.7881393432617188e-7,
     "tolerance": 0.00001
   },

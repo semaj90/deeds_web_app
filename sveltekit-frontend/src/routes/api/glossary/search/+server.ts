@@ -16,7 +16,7 @@ import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { executeEmbeddingInputV1 } from '$lib/server/embedding/embedding-execution-adapter-v1.js';
 
@@ -48,7 +48,7 @@ async function embedQuery(query: string): Promise<number[] | null> {
 			text: query,
 			mode: 'unprompted_legacy',
 			executor: async (prompt) => {
-				const res = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+				const res = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ model: EMBEDDING_MODEL, prompt }),

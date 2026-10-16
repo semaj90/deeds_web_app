@@ -10,7 +10,7 @@
 		language: 'en',
 		autoSave: true,
 		notifications: true,
-		model: 'gemma4-legal',
+		model: 'ornith-1.5-9b',
 		temperature: 0.7,
 		maxTokens: 2048,
 		enableGPU: true,
@@ -105,7 +105,7 @@
 							<div class="dark-field">
 								<label for="dark-model">Active Model</label>
 								<select id="dark-model" bind:value={config.model}>
-									<option value="gemma4-legal">gemma4-legal:latest</option>
+									<option value="ornith-1.5-9b">ornith-1.5-9b</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>
@@ -235,7 +235,7 @@
 							<div class="warm-field">
 								<label for="warm-model">Active Model</label>
 								<select id="warm-model" bind:value={config.model}>
-									<option value="gemma4-legal">gemma4-legal:latest</option>
+									<option value="ornith-1.5-9b">ornith-1.5-9b</option>
 									<option value="llama3">llama3:8b</option>
 								</select>
 							</div>

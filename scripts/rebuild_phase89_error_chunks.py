@@ -87,7 +87,7 @@ BIFROST_ENABLED = env_bool("BIFROST_ENABLED", True)
 BIFROST_URL = os.getenv("BIFROST_URL", "http://127.0.0.1:3040")
 ROTORQUANT_MODEL_PATH = os.getenv(
     "ROTORQUANT_MODEL_PATH",
-    r"C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
+    r"C:\Users\james\Videos\deeds-web-app\models\ornith-1.5-9b",
 )
 TURBO_NGL = int(os.getenv("TURBO_NGL", "99"))
 TURBOQUANT_ENABLED = env_bool("TURBOQUANT_ENABLED", True)

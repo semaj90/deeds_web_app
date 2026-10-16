@@ -1,8 +1,8 @@
 import {
   getOllamaEndpoint as getChatEndpoint,
   getOllamaEmbeddingEndpoint,
-  getOllamaGenerationEndpoint,
-  getOllamaChatEndpoint,
+  getLlamaGenerationEndpoint,
+  getLlamaChatEndpoint,
 } from '$lib/server/utils/ollama-endpoint.js';
 
 /**
@@ -13,7 +13,7 @@ export function getOllamaEndpoint(): string {
 }
 
 export function getOllamaChatUrl(): string {
-	return getOllamaChatEndpoint();
+	return getLlamaChatEndpoint();
 }
 
 export function getOllamaEmbeddingUrl(): string {
@@ -21,5 +21,5 @@ export function getOllamaEmbeddingUrl(): string {
 }
 
 export function getOllamaGenerationUrl(): string {
-	return getOllamaGenerationEndpoint();
+	return getLlamaGenerationEndpoint();
 }

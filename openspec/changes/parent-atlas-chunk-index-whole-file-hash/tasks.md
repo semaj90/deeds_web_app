@@ -301,3 +301,16 @@
       `CURRENT_PACKET_CHUNK_JOIN_UNPROVEN`, not `CURRENT_STRUCTURAL_LINEAGE_EXACT`).
       Recorded in `parent-atlas-retrieval-lineage-dag-convergence/tasks.md`
       (this change's owner), cross-referenced back here.
+
+## ATLAS-SOURCE-REVISION-01 — producer-owned source_revision propagation (2026-10-15)
+
+Status: PRODUCER_PATCHED, DRY_RUN_PROVEN, APPLY_NOT_PROVEN (blocked on operator authorization).
+
+- [x] Chunk writer `scripts/atlas/index-full-repo-for-search.mjs` computes `source_revision = sha256:<hex of exact bytes read>` at its single file read; the value was never persisted before (no column in the INSERT).
+- [x] INSERT writes `source_revision`; `ON CONFLICT` rewrites it together with `content`, so the revision cannot go stale against new content.
+- [x] A claimed revision (AST observation row) that differs from the bytes read throws `SOURCE_REVISION_MISMATCH` (fail closed).
+- [x] Dry run, one file (`scripts/atlas/connection-config.mjs`): 9 chunks planned, nothing written.
+- [ ] [workstation-p12; DEFERRED_UNTIL_POST_P20] Apply and readback. Refused by the guard `EXPLICIT_SEMANTIC_768_BACKFILL_AUTHORIZATION_REQUIRED`; needs `ATLAS_AUTHORIZE_SEMANTIC_768_BACKFILL=1` from the operator. Expected readback: 9 rows with the digest above.
+- [x] `sveltekit-frontend/src/routes/api/codebase-index/index-stream/+server.ts` is a Qdrant-to-Postgres mirror. It never reads source bytes and its conflict update does not touch `source_revision`. No change: it must not invent a revision.
+- [ ] [workstation-p12; DEFERRED_UNTIL_POST_P20] Historical rows: 219,998 `codebase_chunk_index` rows still have NULL `source_revision`. Not backfilled. A backfill must reprocess the source, not assign a revision from the current worktree.
+- [ ] `file_hash` still hashes decoded UTF-8 text, not raw bytes. Differs only for invalid UTF-8. Left unchanged; `source_revision` is the canonical field.

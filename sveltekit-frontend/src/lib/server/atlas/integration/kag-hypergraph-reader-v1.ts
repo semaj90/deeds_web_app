@@ -92,7 +92,7 @@ interface OntologyLinkedTupleRow {
 
 interface HyperedgeMemberRow {
   hyperedge_id: string;
-  contract_hyperedge_id: string;
+  contract_hyperedge_id: string | null;
   relation_type: string;
   workspace_revision: string;
   source_revision: string;
@@ -286,8 +286,7 @@ export async function readKagHypergraphNeighborsV1(
                  h.evidence_refs, h.checksum, h.properties, m.member_id, m.member_type, m.member_role, m.ordinal
           FROM atlas_hyperedges h
           JOIN atlas_hyperedge_members m ON m.hyperedge_id = h.hyperedge_id
-          WHERE h.contract_hyperedge_id IS NOT NULL
-            AND h.hyperedge_id IN (
+          WHERE h.hyperedge_id IN (
               SELECT DISTINCT hyperedge_id FROM atlas_hyperedge_members WHERE member_id = ANY($1::text[])
             )${hyperedgeRevisionFilter}
         `,
@@ -298,10 +297,12 @@ export async function readKagHypergraphNeighborsV1(
     const tuples = tupleResult.rows.map(rowToOntologyLinkedTupleV1);
 
     const membersByContractId = new Map<string, HyperedgeMemberRow[]>();
+    // Bridge-produced edges (e.g. taxonomy edges) have no contract_hyperedge_id; key them by hyperedge_id.
     for (const row of memberResult.rows) {
-      const existing = membersByContractId.get(row.contract_hyperedge_id);
+      const key = row.contract_hyperedge_id ?? row.hyperedge_id;
+      const existing = membersByContractId.get(key);
       if (existing) existing.push(row);
-      else membersByContractId.set(row.contract_hyperedge_id, [row]);
+      else membersByContractId.set(key, [row]);
     }
     const hyperedges = [...membersByContractId.entries()]
       .map(([contractHyperedgeId, rows]) => rowsToHyperedgeV1(contractHyperedgeId, rows))

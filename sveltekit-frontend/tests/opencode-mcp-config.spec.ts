@@ -124,7 +124,7 @@ describe('opencode MCP wiring', () => {
 
   it('keeps root opencode jsonc aligned with bifrost provider and MCP endpoints', () => {
     const cfg = readJson(rootConfigPath);
-    expect(cfg.model).toBe('ollama/gemma4-rotorquant:latest');
+    expect(cfg.model).toBe('ollama/ornith-1.5-9b');
     expect(cfg.provider?.['ollama']).toBeTruthy();
     expect(cfg.permission).toMatchObject({
       skill: 'allow',

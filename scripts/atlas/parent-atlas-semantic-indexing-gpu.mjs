@@ -325,7 +325,7 @@ ${contentPreview}`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: 'ornith-1.5-9b',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 100,
         temperature: 0.3,

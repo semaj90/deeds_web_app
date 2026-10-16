@@ -48,7 +48,7 @@ $services = @(
     "phase66-tensorrt-llm",
     "phase66-postgres",
     "phase66-redis",
-    "phase66-minio",
+    "legal-ai-seaweed-s3",
     "phase66-qdrant",
     "phase66-rabbitmq"
 )

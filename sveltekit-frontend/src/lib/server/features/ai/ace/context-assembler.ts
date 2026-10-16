@@ -4113,7 +4113,7 @@ export async function assembleACEContext(opts: {
                   directoryKagCount: (directoryKagContext ?? []).length,
                 },
                 lane: 'ace_context',
-                model: (packet as any).model ?? 'gemma4-rotorquant:latest',
+                model: (packet as any).model ?? 'ornith-1.5-9b',
                 tokenBudget: packet.tokenBudget?.estimatedInputTokens ?? null,
               },
               packetHits
@@ -4380,11 +4380,6 @@ export async function assembleACEContext(opts: {
         fromParentAtlas: opts.mode === 'parent_atlas',
         // Phase 2: Packet-centric context (8 mandatory fields)
         somCell,
-        schemaVersion: 1,
-        embeddingVersion: 'embeddinggemma:latest',
-        toolVersion: 'mcp:1.0',
-        gpuKernelVersion: (process.env.TENSORRT_BRIDGE_VERSION ?? 'tensorrt_bridge:1.0'),
-        rpcTransport: 'jsonrpc',
       }).catch(() => {
         // Telemetry failure is non-fatal
       });

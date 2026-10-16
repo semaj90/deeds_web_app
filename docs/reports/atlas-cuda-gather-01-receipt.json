@@ -1,9 +1,9 @@
 {
   "milestone": "ATLAS-CUDA-GATHER-01",
   "schema_version": "1.0.0",
-  "timestamp": "2026-10-15T06:35:27.650Z",
+  "timestamp": "2026-10-16T01:36:54.422Z",
   "status": "VERIFIED",
-  "total_duration_ms": 2039,
+  "total_duration_ms": 1079,
   "hardware": {
     "cuda_available": true,
     "device_name": "NVIDIA GeForce RTX 3060 Ti",
@@ -25,10 +25,10 @@
       "name": "CUDA-02: Isolated Latency Measurement",
       "passed": true,
       "details": {
-        "transferDurationMs": 0.6861,
-        "kernelDurationMs": 0.9844,
-        "totalDurationMs": 1.6705,
-        "ratioTransferToKernel": 0.7
+        "transferDurationMs": 0.5251,
+        "kernelDurationMs": 0.4177,
+        "totalDurationMs": 0.9428,
+        "ratioTransferToKernel": 1.26
       }
     },
     {

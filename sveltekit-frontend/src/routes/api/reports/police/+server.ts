@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { reports } from '$lib/server/db/schema';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { embedOrChatFetch, getLlamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
@@ -57,7 +57,7 @@ Output ONLY HTML content. Use h1, h2, h3, p, ul, li, strong, em tags.`;
 
 		// Try LLM generation
 		try {
-			const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+			const res = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

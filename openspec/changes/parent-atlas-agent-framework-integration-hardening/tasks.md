@@ -113,6 +113,14 @@ Sources: `scripts/atlas/audit-phase17-21-workstation.mjs` (read-only SELECTs; re
 - P24 DPO: no trainer found; only a mention in a readiness report generator. Not started.
 - Unresolved: the audit reports summary schema MIGRATION_PENDING while its `summary_missing` field is null. The migration status needs a direct column check before anyone acts on it.
 
+## Local Ornith runtime MCP controls — 2026-10-15
+
+- [x] Register bounded `llama_server.status`, `llama_server.start`, and `llama_server.unload` on loopback TRACE only, with strict schemas and explicit mutation confirmation. Reuse `scripts/launch-turboquant.ps1 -Detached -NoEvict` and share the idle/ownership-checked controller with the existing VS Code stop task. Implementation: `sveltekit-frontend/src/mcp/llama-runtime-tools.ts`, `scripts/atlas/llama-server-control.ps1`.
+- [x] Prove MCP schema/list/call boundaries and PowerShell confirmation, ownership, busy-slot, idempotency, launch-argument, shutdown/readback and memory-delta guards using isolated fixtures. Record actual results separately from live runtime evidence; see `docs/architecture/llama-runtime-mcp-controls.md` for bounded commands.
+- [x] Record 9 passing MCP tests, 16 passing isolated guard/lifecycle checks, focused strict TypeScript and OpenSpec validation, plus a real read-only MCP status exchange in `docs/reports/llama-runtime-mcp-implementation-20261016T0315Z.json`. The live status proof uses an in-memory MCP transport with actual Windows/NVIDIA readback; it does not establish deployed TRACE discovery or a live start/unload cycle.
+- [ ] Prove discovery on the refreshed deployed TRACE server/client; do not restart shared TRACE automatically or equate source registration with session tool availability.
+- [ ] After separate operator authorization, prove an actual idle start/unload lifecycle with independent process/listener/model and per-GPU used/free readbacks. Keep the currently unloaded service stopped during read-only validation.
+
 ## 11. Phase 24 — Live Source Lineage and Governed Document Editing
 
 Parent Atlas: the next blocker is **live source lineage**, not GPU performance. The latest investigation changes the priority. RTX gather, tensor I/O, native graph helpers, and focused integration tests have passed their respective proof gates. But attempting to run a real Function Registry lookup exposed a more fundamental problem: the registry (`atlas_callable_search`), AST projection (`atlas_ast_nodes`), workspace revision, and source-byte verifier do not yet agree on identity and revision semantics (0/85 matched in live census). Another CUDA benchmark, embedding model, or HyperGraphRAG traversal will not resolve the current integration blocker.

@@ -112,7 +112,7 @@ describe('Deep Research Task API', () => {
         'Evidence is admissible in court if it is relevant and probative. ' +
         'Federal Rules of Evidence Rule 401 defines relevant evidence as evidence having any tendency to make the existence of any fact more or less probable. ' +
         'Recent case law has reinforced these standards while allowing for limited exceptions in specialized circumstances.',
-      model: 'gemma4-legal-iq4xs',
+      model: 'ornith-1.5-9b',
       confidence: 0.89,
       citedResultIds: 'qdrant-chunk-001,web-result-002,ldr-research-003',
       keyFindings: [
@@ -183,7 +183,7 @@ describe('Deep Research Task API', () => {
         userId: 1,
         taskId: testTaskId,
         action: 'synthesis_generated',
-        details: { model: 'gemma4-legal-iq4xs', confidence: 0.89 },
+        details: { model: 'ornith-1.5-9b', confidence: 0.89 },
         durationMs: 12000,
         success: true,
       },

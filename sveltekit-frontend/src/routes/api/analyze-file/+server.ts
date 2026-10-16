@@ -16,7 +16,7 @@ import { resolve } from 'path';
 import { promisify } from 'util';
 
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 const execFileAsync = promisify(execFile);
@@ -203,7 +203,7 @@ Provide:
 Be concise and actionable.`;
 
 	try {
-		const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
+		const response = await embedOrChatFetch(`${OLLAMA_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: LLM_MODEL_ID,
@@ -264,7 +264,7 @@ async function generateEnhancedTag(filePath: string, analysis: { summary: string
 
 	try {
 		// Generate embedding for summary
-		const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedRes = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ model: 'embeddinggemma:latest',

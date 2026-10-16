@@ -7,7 +7,7 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const DEFAULT_URL = LLAMA_SERVER_BASE_URL;
@@ -254,7 +254,7 @@ export async function checkOllamaHealth(): Promise<{
 }> {
 	try {
 		// @ts-ignore
-		const response = await ollamaFetch(`${DEFAULT_URL}/api/tags`, {
+		const response = await embedOrChatFetch(`${DEFAULT_URL}/api/tags`, {
 			method: 'GET',
 			signal: AbortSignal.timeout(5000),
 		});

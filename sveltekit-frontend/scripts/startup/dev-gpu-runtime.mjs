@@ -621,7 +621,7 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'gemma4-legal', 'gemma4-thinking': 'gemma4-legal-thinking' };
+      const profileAliasMap = { 'ornith-1.5': 'ornith-1.5-9b', 'ornith-1.5-vlm': 'ornith-1.5-9b', 'ornith': 'ornith-9b', 'gemma4-direct': 'ornith-1.5-9b', 'gemma4-thinking': 'ornith-1.5-9b' };
       const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? profileAliasMap[startupProfile] ?? 'ornith-1.5-9b';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);

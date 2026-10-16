@@ -1,0 +1,40 @@
+{
+  "schema": "atlas.simdjson-tensor-analysis-closeout.v1",
+  "status": "CPU_AND_CUDA_NUMERICAL_FIXTURE_PROVEN_MCP_CONTRACT_PROVEN",
+  "likely_cause": "New native simdjson exports and the existing LibTorch gather required a shared bounded oracle, array metrics and a typed diagnostic handoff rather than another retrieval owner.",
+  "evidence": [
+    { "command": "node --test scripts/atlas/lib/simdjson-graph-gather-v1.test.mjs", "result": "9 passed", "receipt": "docs/reports/simdjson-array-final-20261015T204137.txt" },
+    { "command": "npx vitest run src/mcp/native-acceleration-tools.spec.ts src/mcp/llama-runtime-tools.spec.ts --environment node --maxWorkers=1 --minWorkers=1", "cwd": "sveltekit-frontend", "result": "6 native MCP tests plus 9 runtime regression tests passed", "receipt": "docs/reports/simdjson-tensor-mcp-tests-20261015T204029.txt" },
+    { "command": "node scripts/atlas/prove-simdjson-graph-gather-v1.mjs --gpu", "result": "CPU_CUDA_FIXTURE_PARITY_PASSED", "backend": "cuda_libtorch", "receipt": "docs/reports/simdjson-graph-gather-2026-10-16T03-41-40-101Z.json" },
+    { "command": "node --import tsx scripts/mcp/smoke-simdjson-tensor-tools.mjs", "cwd": "sveltekit-frontend", "result": "Actual in-memory MCP list/call using real native addon; CPU_NATIVE_PARITY_PASSED", "receipt": "docs/reports/simdjson-tensor-mcp-20261015T204232.json" },
+    { "command": "tsc --noEmit --skipLibCheck --strict --types node --target es2022 --module esnext --moduleResolution bundler src/mcp/native-acceleration-tools.ts", "cwd": "sveltekit-frontend", "result": "exit 0", "receipt": "docs/reports/simdjson-tensor-types-20261015T204237.txt" }
+  ],
+  "patch_targets": [
+    "scripts/atlas/lib/simdjson-graph-gather-v1.mjs",
+    "scripts/atlas/lib/simdjson-graph-gather-v1.test.mjs",
+    "scripts/atlas/prove-simdjson-graph-gather-v1.mjs",
+    "sveltekit-frontend/src/mcp/native-acceleration-tools.ts",
+    "sveltekit-frontend/src/mcp/native-acceleration-tools.spec.ts",
+    "sveltekit-frontend/src/mcp/trace-mcp-server.ts",
+    "sveltekit-frontend/scripts/mcp/smoke-simdjson-tensor-tools.mjs",
+    "sveltekit-frontend/package.json",
+    "openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy/tasks.md",
+    "docs/architecture/simdjson-tensor-array-analysis-v1.md"
+  ],
+  "safe_next_command": "cd sveltekit-frontend; npm run atlas:simdjson:tensor:cpu",
+  "smoke_command": "cd sveltekit-frontend; npm run atlas:simdjson:tensor:mcp",
+  "report_path": "docs/reports/simdjson-tensor-analysis-closeout-20261016T0343Z.json",
+  "limits": {
+    "syntheticNumericalFixtureOnly": true,
+    "statisticsComputedOnCpu": true,
+    "gpuGatherAndCosineTopKExercised": true,
+    "tensorRtInferenceExercised": false,
+    "embeddingModelInvoked": false,
+    "trainingPerformed": false,
+    "persistentResidencyProven": false,
+    "sourceOrDatastoreWritesPerformed": false,
+    "evidenceAdmissionProven": false,
+    "deployedTraceToolDiscoveryProven": false,
+    "productionQualificationProven": false
+  }
+}

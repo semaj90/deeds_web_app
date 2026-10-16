@@ -4,12 +4,12 @@ import path from 'path';
 const ROOT_DIR = path.resolve('.');
 
 const searchReplace = [
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' },
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' },
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' },
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' },
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' },
-    { from: /gemma4-rotorquant:latest/g, to: 'gemma4-rotorquant:latest' }
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' },
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' },
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' },
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' },
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' },
+    { from: /ornith-1.5-9b/g, to: 'ornith-1.5-9b' }
 ];
 
 function processDirectory(dir) {
@@ -36,8 +36,8 @@ function processDirectory(dir) {
                 }
 
                 if (modified) {
-                    // special cleanup for cases where replacing 'gemma4-rotorquant:latest' resulted in 'gemma4-rotorquant:latest'
-                    content = content.replace(/gemma4-rotorquant:latest/g, 'gemma4-rotorquant:latest');
+                    // special cleanup for cases where replacing 'ornith-1.5-9b' resulted in 'ornith-1.5-9b'
+                    content = content.replace(/ornith-1.5-9b/g, 'ornith-1.5-9b');
                     fs.writeFileSync(fullPath, content, 'utf8');
                     console.log(`Updated ${fullPath}`);
                 }

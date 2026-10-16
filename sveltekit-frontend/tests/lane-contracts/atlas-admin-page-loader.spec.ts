@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
-    OLLAMA_CHAT_MODEL: 'gemma4-legal-vlm:latest',
+    OLLAMA_CHAT_MODEL: 'ornith-1.5-9b',
     OLLAMA_EMBED_MODEL: 'embeddinggemma:latest',
   },
 }));

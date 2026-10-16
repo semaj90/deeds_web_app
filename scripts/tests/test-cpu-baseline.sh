@@ -28,7 +28,7 @@ echo ""
 START=$(date +%s%3N)
 CPU_RESPONSE=$(curl -s -X POST http://localhost:11434/api/chat \
   -d "{
-    \"model\": \"gemma4-legal\",
+    \"model\": \"ornith-1.5-9b\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$QUERY\"}],
     \"stream\": false,
     \"options\": {
@@ -83,7 +83,7 @@ echo ""
 START=$(date +%s%3N)
 GPU_RESPONSE=$(curl -s -X POST http://localhost:11434/api/chat \
   -d "{
-    \"model\": \"gemma4-legal\",
+    \"model\": \"ornith-1.5-9b\",
     \"messages\": [{\"role\": \"user\", \"content\": \"$QUERY\"}],
     \"stream\": false,
     \"options\": {\"num_predict\": 200, \"temperature\": 0.3}

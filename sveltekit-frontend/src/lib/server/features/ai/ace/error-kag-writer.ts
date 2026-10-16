@@ -17,7 +17,7 @@
  */
 
 import { pool } from '$lib/server/db/client';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
@@ -83,7 +83,7 @@ function extractErrorTags(error: string, filePath?: string): string[] {
 
 async function embedText(text: string): Promise<number[] | null> {
   try {
-    const res = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
+    const res = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

@@ -65,22 +65,13 @@ const LLAMA_EXE_CANDIDATES = [
 const MODEL_CANDIDATES = [
   process.env.ROTORQUANT_MODEL_PATH,
   process.env.TURBO_MODEL_PATH,
-  path.join(workspaceRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs-direct.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-iq4xs.gguf'),
-  path.join(workspaceRoot, 'models', 'gemma4-rotorquant:latest-q4_k_m.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-legal.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'gemma4-rotorquant:latest.gguf'),
-  path.join(projectRoot, 'models', 'gemma4-legal-iq4xs-direct.gguf'),
+  path.join(workspaceRoot, 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+  path.join(workspaceRoot, 'vendor', 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
+  path.join(projectRoot, 'models', 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf'),
 ].filter(Boolean);
 
-const MMPROJ_CANDIDATES = [
-  process.env.MMPROJ_PATH,
-  path.join(workspaceRoot, 'models', 'mmproj-F16.gguf'),
-  path.join(workspaceRoot, 'models', 'mmproj-BF16.gguf'),
-  path.join(workspaceRoot, 'vendor', 'models', 'mmproj-gemma4.gguf'),
-  path.join(projectRoot, 'models', 'mmproj-F16.gguf'),
-].filter(Boolean);
+// Vision is OFF by default. Only an explicit MMPROJ_PATH enables a projector; Gemma4 projectors are never auto-selected.
+const MMPROJ_CANDIDATES = [process.env.MMPROJ_PATH].filter(Boolean);
 
 function firstExisting(candidates) {
   return candidates.find((candidate) => typeof candidate === 'string' && existsSync(candidate));

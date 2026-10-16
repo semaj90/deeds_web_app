@@ -28,6 +28,9 @@ export default {
     // Existing external-doc tables are declared for runtime Drizzle typing;
     // their generated-column and GIN/HNSW DDL remains in the registered manual sidecar.
     '!atlas_external_doc_pages', '!atlas_external_doc_chunks',
+    // Runtime Drizzle typing; generated tsvector and GIN indexes are owned by
+    // manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql.
+    '!atlas_packet_class_lut_validation_receipts',
     '!collection_citations', '!directory_context_bindings', '!document_topics',
     '!feature_dependency_edges', '!file_hotness_scores', '!file_summaries', '!fix_attempts',
     '!fixer_patterns', '!fixer_run_log', '!hypergraph_edge_members', '!indexing_jobs',

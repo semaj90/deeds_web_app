@@ -4,8 +4,8 @@
  * Chat/generation routes in this repo call llama-server's OpenAI-compatible endpoints
  * directly via the global `fetch()` (see `$lib/server/ai/local-llama-provider.js`'s
  * `LLAMA_SERVER_BASE_URL`/`LOCAL_VLM_MODEL`) — they do NOT go through `$lib/server/ollama.js`'s
- * `ollamaFetch`, which per this repo's own hard rule (CLAUDE.md, "Ollama vs llama-server
- * Boundary") is reserved for embeddings only. A route can still legitimately call `ollamaFetch`
+ * `embedOrChatFetch`, which per this repo's own hard rule (CLAUDE.md, "Ollama vs llama-server
+ * Boundary") is reserved for embeddings only. A route can still legitimately call `embedOrChatFetch`
  * for `/api/embeddings` in the same request — that mock stays separate and untouched by this
  * helper.
  *

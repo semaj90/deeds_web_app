@@ -38,7 +38,7 @@ vi.mock('$lib/config/env.server.js', () => ({
   getOllamaUrl: () => 'http://localhost:11434',
 }));
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
   const body = opts?.body ? JSON.parse(opts.body) : {};
   if (body.stream === true) {
@@ -77,7 +77,7 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
         didYouMean: ['alternative query'],
         predictiveSignals: ['signal 1'],
       }),
-      model: 'gemma4-rotorquant:latest',
+      model: 'ornith-1.5-9b',
     }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
   );
@@ -85,9 +85,9 @@ const mockOllamaFetch = vi.fn(async (_url: string, opts?: any) => {
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+  embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── Neo4j mock ──

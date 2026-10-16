@@ -9,17 +9,17 @@ import '$lib/server/env.server.js';
 
 import {
   getOllamaApiEndpoint as getSharedOllamaApiEndpoint,
-  getOllamaChatEndpoint as getSharedOllamaChatEndpoint,
+  getLlamaChatEndpoint as getSharedOllamaChatEndpoint,
   getOllamaEmbeddingEndpoint as getSharedOllamaEmbeddingEndpoint,
   getOllamaEndpoint as getSharedOllamaEndpoint,
-  getOllamaGenerationEndpoint as getSharedOllamaGenerationEndpoint,
+  getLlamaGenerationEndpoint as getSharedOllamaGenerationEndpoint,
 } from '$lib/utils/ollama-endpoint.js';
 
 export function getOllamaEndpoint(): string {
   return getSharedOllamaEndpoint();
 }
 
-export function getOllamaChatEndpoint(): string {
+export function getLlamaChatEndpoint(): string {
   return getSharedOllamaChatEndpoint();
 }
 
@@ -27,7 +27,7 @@ export function getOllamaEmbeddingEndpoint(): string {
   return getSharedOllamaEmbeddingEndpoint();
 }
 
-export function getOllamaGenerationEndpoint(): string {
+export function getLlamaGenerationEndpoint(): string {
   return getSharedOllamaGenerationEndpoint();
 }
 

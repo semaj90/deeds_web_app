@@ -316,7 +316,7 @@ function rowForInsert(chunkRow, packetRow) {
     summary_text: summary,
     layer_type: 'gemma4_offline',
     summary_level: 'chunk',
-    model_name: cleanText(chunkRow.summary_model) || 'gemma4-legal-iq4xs-direct.gguf',
+    model_name: cleanText(chunkRow.summary_model) || 'ornith-1.5-9b',
     keywords: buildKeywords(chunkRow, packetRow, summaryContext),
     entities: buildEntities(chunkRow, packetRow),
     metadata,

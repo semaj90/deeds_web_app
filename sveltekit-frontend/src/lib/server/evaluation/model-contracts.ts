@@ -7,7 +7,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 
-export type ModelIdentifier = 'gemma4-legal' | 'ornith-1.5-9b' | 'hforf-7b' | 'qwen3-7b' | 'unknown';
+export type ModelIdentifier = 'ornith-1.5-9b' | 'hforf-7b' | 'qwen3-7b' | 'unknown';
 
 export interface ModelCapabilities {
   supportsStreaming: boolean;
@@ -54,16 +54,6 @@ export const MODEL_CAPABILITIES: Record<ModelIdentifier, ModelCapabilities> = {
     supportsReasoningBlock: true,
     nativeKvCacheSupport: true,
     maxContextTokens: 65536,
-    recommendedMaxContextTokens: 65536,
-    maxOutputTokens: 8192,
-  },
-  'gemma4-legal': {
-    supportsStreaming: true,
-    supportsCaching: true,
-    supportsToolCalls: true,
-    supportsReasoningBlock: true,
-    nativeKvCacheSupport: true,
-    maxContextTokens: 131072,
     recommendedMaxContextTokens: 65536,
     maxOutputTokens: 8192,
   },
@@ -126,7 +116,6 @@ export function createCodeExtensionContract(model: ModelIdentifier): CodeExtensi
   // Model-specific instruction-following assessment
   const instructionFollowing: Record<ModelIdentifier, 'strict' | 'flexible' | 'poor'> = {
     'ornith-1.5-9b': 'strict',
-    'gemma4-legal': 'strict',
     'hforf-7b': 'flexible', // HForF is less precise
     'qwen3-7b': 'strict',
     unknown: 'poor',
@@ -134,7 +123,6 @@ export function createCodeExtensionContract(model: ModelIdentifier): CodeExtensi
 
   const multiTurn: Record<ModelIdentifier, 'excellent' | 'good' | 'degraded'> = {
     'ornith-1.5-9b': 'excellent',
-    'gemma4-legal': 'excellent',
     'hforf-7b': 'degraded', // Known issues with long conversations
     'qwen3-7b': 'good',
     unknown: 'degraded',
@@ -142,7 +130,6 @@ export function createCodeExtensionContract(model: ModelIdentifier): CodeExtensi
 
   const errorRecovery: Record<ModelIdentifier, 'self_aware' | 'partial' | 'none'> = {
     'ornith-1.5-9b': 'self_aware',
-    'gemma4-legal': 'self_aware',
     'hforf-7b': 'none', // Loops into repetition
     'qwen3-7b': 'partial',
     unknown: 'none',
@@ -168,11 +155,6 @@ export function getModelWarnings(model: ModelIdentifier): string[] {
       '✅ Active production synthesis & tool-use model on :8090',
       '✅ Full tool-calling & reasoning support',
       '✅ Qwen3.5 architecture (4096 hidden, 64K context)',
-    ],
-    'gemma4-legal': [
-      '✅ Historical reference model',
-      '✅ Full tool-calling support',
-      '✅ Excellent instruction following',
     ],
     'hforf-7b': [
       '⚠️  Known KV cache corruption after 1000+ turns',
@@ -255,7 +237,6 @@ export async function checkModelHealth(model: ModelIdentifier, baseUrl: string):
 function getModelFileName(model: ModelIdentifier): string {
   const fileMap: Record<ModelIdentifier, string> = {
     'ornith-1.5-9b': 'hforf.gguf',
-    'gemma4-legal': 'gemma4-legal-iq4xs-direct.gguf',
     'hforf-7b': 'hforf-7b.gguf',
     'qwen3-7b': 'qwen3-7b-instruct-q4_k_m.gguf',
     unknown: 'unknown.gguf',

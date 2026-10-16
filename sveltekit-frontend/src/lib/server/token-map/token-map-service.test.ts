@@ -59,7 +59,7 @@ describe('token-map service', () => {
       {
         db: db as never,
         redis: redis as never,
-        model: 'turboquant/gemma4-legal.gguf',
+        model: 'turboquant/ornith-1.5-9b',
         ttlSeconds: 1800,
       }
     );

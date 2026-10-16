@@ -19,7 +19,7 @@
     1. WHISPER_MODEL_PATH env var (full path to a .bin file)
     2. <whisper-dir>/models/ggml-<WHISPER_MODEL>.bin   (WHISPER_MODEL default: base)
 
-  VRAM budget: ggml-base.bin ≈ 142MB; fits alongside gemma4-legal-vlm ≈ 5.8GB on 8GB RTX 3060 Ti.
+  VRAM budget: ggml-base.bin ≈ 142MB; fits alongside ornith-1.5-9b ≈ 5.8GB on 8GB RTX 3060 Ti.
 
 .PARAMETER Detached
   Start with -WindowStyle Hidden, poll /health, return after PID is stable.

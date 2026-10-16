@@ -180,7 +180,7 @@ export async function buildKvContextPacket(opts: {
     taskId,
     stablePrefixHash,
     level1Runtime: {
-      model:       'gemma4-rotorquant:latest',
+      model:       'ornith-1.5-9b',
       cachePolicy: 'reuse-stable-prefix',
       cacheTypeK:  'q8_0',
       cacheTypeV:  'q8_0',

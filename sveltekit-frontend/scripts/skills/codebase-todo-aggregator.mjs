@@ -272,7 +272,7 @@ async function gemma4Rerank(top, agentsRules, timelineMd) {
   ].join('\n');
 
   // Wrap the prompt in explicit Gemma turn markers. The fine-tuned
-  // gemma4-rotorquant:latest breaks Ollama's auto-applied chat template AND
+  // ornith-1.5-9b breaks Ollama's auto-applied chat template AND
   // TurboQuant's /v1/chat/completions endpoint (both return empty when GPU
   // is under VRAM pressure). Raw /v1/completions with explicit
   // <start_of_turn>...<end_of_turn> tokens works reliably (~3s, 800+ chars

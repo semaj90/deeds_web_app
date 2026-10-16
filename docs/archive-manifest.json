@@ -649,5 +649,12 @@
     "sha256": "483bb3020926105104345947d4d22afa0a9b365b3f960ac7ed3ce7e7a1175ef2",
     "archived": "2026-10-04T00:00:00Z",
     "reason": "Misfiled: SvelteKit server-action TypeScript (streams from Ollama /api/generate, publishes SSE deltas to Redis) saved under a .py name, so it cannot run as Python and had no code callers (only generated source-inventory reports mention it). Archived, not deleted; recovery: git mv back or cp from archive_path (sha256 above). Removes one raw Ollama chat caller from the frozen guard list."
+  },
+  {
+    "path": "docs/reports/source-revision-backfill-disposition-v1.json",
+    "archive_path": "docs/archive/2026-10-15/source-revision-backfill-disposition-v1.json",
+    "sha256": "e97b9de71d53da69252967268deb329001bb93ce1eda80416d15265aa80b1da9",
+    "archived": "2026-10-15T19:03:59.283Z",
+    "reason": "Superseded: duplicates SOURCE-REVISION-BACKFILL-PLAN-01 (docs/reports/source-revision-backfill-plan-v1.json, safeToBackfill=false). Classifies by content match only, the conflation that gate corrected; not source authority."
   }
 ]

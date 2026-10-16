@@ -53,7 +53,7 @@ describe('atlas runtime registry', () => {
     );
     expect(model?.items.map((item) => item.key)).toEqual(
       expect.arrayContaining([
-        'gemma4-rotorquant-iq4xs-direct',
+        'ornith-1.5-9b-direct',
         'embeddinggemma-768d',
         'ornith-1.5-9b',
         'embeddinggemma-300m-onnx',

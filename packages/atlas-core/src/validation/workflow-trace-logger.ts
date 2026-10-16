@@ -38,7 +38,7 @@ export interface WorkflowTrace {
   tokens_sent_to_model: number;
 
   // LLM synthesis
-  model_name: string; // "gemma4-rotorquant:latest"
+  model_name: string; // "ornith-1.5-9b"
   model_version: string;
   llm_synthesis_input: string; // system + user + packet context
   llm_synthesis_output: string; // full response

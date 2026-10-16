@@ -78,7 +78,7 @@ if (Test-Path $unsloth) {
 Write-Host ""
 Write-Host "Environment Setup:" -ForegroundColor Yellow
 
-$env:TURBO_MODEL_PATH = "$repoRoot\models\gemma4-legal-iq4xs-direct.gguf"
+$env:TURBO_MODEL_PATH = "$repoRoot\models\ornith-1.5-9b"
 $env:TURBO_PORT = "8090"
 $env:TURBO_CTX = "65536"
 $env:TURBO_NGL = "99"
@@ -158,7 +158,7 @@ Write-Host "Validating template and tool support..." -ForegroundColor Yellow
 
 $testUrl = "http://127.0.0.1:8090/v1/chat/completions"
 $testPayload = @{
-  model = "gemma4-legal-iq4xs-direct.gguf"
+  model = "ornith-1.5-9b"
   messages = @(
     @{ role = "system"; content = "Reply exactly: SYSTEM_OK" }
     @{ role = "user"; content = "test" }
@@ -187,7 +187,7 @@ try {
 Write-Host "Testing tool-calling support..." -ForegroundColor Yellow
 
 $toolPayload = @{
-  model = "gemma4-legal-iq4xs-direct.gguf"
+  model = "ornith-1.5-9b"
   messages = @(
     @{ role = "user"; content = "Use the test_tool to get info" }
   )

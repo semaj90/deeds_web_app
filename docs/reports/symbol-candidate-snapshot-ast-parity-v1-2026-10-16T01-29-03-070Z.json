@@ -1,0 +1,2829 @@
+{
+  "schema": "atlas.symbol-candidate-snapshot-ast-parity.v1",
+  "crosswalkReceipt": "docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-26-54-778Z.json",
+  "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+  "snapshotRevision": "sha256:6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b",
+  "candidateRows": 64,
+  "uniqueSourceFiles": 9,
+  "exactSpanMatches": 63,
+  "qualifiedNameLeafMatches": 63,
+  "parserResponsesValid": true,
+  "files": [
+    {
+      "sourceRef": "packages/atlas-core/src/cli.ts",
+      "candidateCount": 1,
+      "sourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:496a7cc81264603ce3bfc5c1e4edc0ddad65718963ad31810fb4c632bfcd29b3",
+      "returnedFilePath": "packages/atlas-core/src/cli.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 14,
+      "exactSpanMatches": 1,
+      "qualifiedNameLeafMatches": 1,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:c348581151cac882c6b2964e40aa9722185e23cc6c78492d04be677e1cf1c373",
+          "byteSpan": [
+            302,
+            2366
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                302,
+                2366
+              ],
+              "name": "main",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                334,
+                362
+              ],
+              "name": "args",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                372,
+                409
+              ],
+              "name": "isDryRun",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                419,
+                457
+              ],
+              "name": "isVerbose",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                467,
+                505
+              ],
+              "name": "enableGPU",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts",
+      "candidateCount": 10,
+      "sourceRevision": "sha256:602c58c20fe982d0ab26c58f32ac4d55cef70ae6397e10d0d7aa2f779d3b34d3",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:602c58c20fe982d0ab26c58f32ac4d55cef70ae6397e10d0d7aa2f779d3b34d3",
+      "returnedFilePath": "packages/atlas-core/src/langgraph/kanban-error-fixing-agent.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 60,
+      "exactSpanMatches": 9,
+      "qualifiedNameLeafMatches": 9,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:d291bce275ae7ef8eda92e19ce37104baec35c7e10d0c957013ee81f87611e49",
+          "byteSpan": [
+            1811,
+            1869
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1804,
+                1869
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1811,
+                1869
+              ],
+              "name": "ErrorFixingStateType",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:652d338e6657ca590ed95f2b63cd936d9966071ba8d7699287c6128be5003b05",
+          "byteSpan": [
+            1918,
+            2255
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1911,
+                2255
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1918,
+                2255
+              ],
+              "name": "KanbanErrorFixingTask",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:c58dad11c96cedaac3860c46b07060c13ac724d77295ae22183ffe23fcc27e6f",
+          "byteSpan": [
+            2308,
+            2548
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2301,
+                2548
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                2308,
+                2548
+              ],
+              "name": "ErrorFixSuggestion",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:5d209108aa6e96d1052956ab0bf07b400e9044da374c2651236a36e2a4088513",
+          "byteSpan": [
+            2611,
+            3550
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2611,
+                3550
+              ],
+              "name": "loadErrorFixingPackets",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2732,
+                2902
+              ],
+              "name": "orchestrator",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2923,
+                2965
+              ],
+              "name": "packets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                3013,
+                3153
+              ],
+              "name": "errorFixingPackets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                3049,
+                3152
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:0fb1521dc5eb2d8084ed56dce5aaa91093a8ed2466bb1c2203171548c9b7ff37",
+          "byteSpan": [
+            3608,
+            4140
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                3608,
+                4140
+              ],
+              "name": "classifyErrorFixingTasks",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                3838,
+                3880
+              ],
+              "name": "classified",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                3933,
+                3966
+              ],
+              "name": "task",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:41a7a30dbbb051f920dceab6d132aa435616de0e774232d8fb2d0e40e6960be3",
+          "byteSpan": [
+            4181,
+            5146
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                4181,
+                5146
+              ],
+              "name": "createKanbanTasks",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                4413,
+                4454
+              ],
+              "name": "kanbanTasks",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4507,
+                4559
+              ],
+              "name": "task",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4597,
+                4613
+              ],
+              "name": "now",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4625,
+                4978
+              ],
+              "name": "kanbanTask",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:4b17ace38259cc5995a7b38f12f13d55b095293ee281658fdea313421e617b11",
+          "byteSpan": [
+            5191,
+            6153
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                5191,
+                6153
+              ],
+              "name": "scoreWithPolicyModel",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                5384,
+                5490
+              ],
+              "name": "orchestrator",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5511,
+                5574
+              ],
+              "name": "scores",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5880,
+                5922
+              ],
+              "name": "fallbackScores",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5978,
+                6011
+              ],
+              "name": "task",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:1a941dd2156673281198bee0d4dfe2b481986201d32874595939d86eb4e62487",
+          "byteSpan": [
+            6227,
+            7598
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                6227,
+                7598
+              ],
+              "name": "synthesizeErrorFixes",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                6450,
+                6482
+              ],
+              "name": "fixes",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                6512,
+                6724
+              ],
+              "name": "sorted",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                6552,
+                6723
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                6574,
+                6626
+              ],
+              "name": "scoreA",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:cceffec96a2ab6d61b4dc619af6d2ee93719bc681f642cd3eb3c60c307626aa5",
+          "byteSpan": [
+            7645,
+            8935
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                7645,
+                8935
+              ],
+              "name": "updateKanbanStatus",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                7867,
+                7904
+              ],
+              "name": "updated",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                7966,
+                8035
+              ],
+              "name": "fix",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                7989,
+                8034
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                8107,
+                8301
+              ],
+              "name": "updatedTask",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:3a1c9c4e4a6fd00200cac971b6f911d164121477786a8e4c79f8bc06edf2ce37",
+          "byteSpan": [
+            8990,
+            9858
+          ],
+          "qualifiedNameLeafMatch": false,
+          "exactSpanMatchCount": 0,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                8983,
+                9836
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                8990,
+                9836
+              ],
+              "name": "buildErrorFixingGraph",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                9838,
+                10046
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
+      "candidateCount": 1,
+      "sourceRevision": "sha256:aef97b36ec6ed2a20b5cde417fce68f9ddc14b6230c8c266a00bfa1c2c520032",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:aef97b36ec6ed2a20b5cde417fce68f9ddc14b6230c8c266a00bfa1c2c520032",
+      "returnedFilePath": "packages/atlas-core/src/langgraph/run-error-fixing-agent.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 8,
+      "exactSpanMatches": 1,
+      "qualifiedNameLeafMatches": 1,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:09e7db585a13d8546aa3426817aef2ebf40acd19995e196e7124afd8365a7aa3",
+          "byteSpan": [
+            240,
+            2770
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                240,
+                2770
+              ],
+              "name": "main",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                272,
+                300
+              ],
+              "name": "args",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                310,
+                347
+              ],
+              "name": "isDryRun",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                357,
+                395
+              ],
+              "name": "isVerbose",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                657,
+                688
+              ],
+              "name": "graph",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/policy-task-router.ts",
+      "candidateCount": 6,
+      "sourceRevision": "sha256:e90bf59ea8b5700b3de484cc4f560d850e92d594d9930af22996b34e05f3ec1d",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:e90bf59ea8b5700b3de484cc4f560d850e92d594d9930af22996b34e05f3ec1d",
+      "returnedFilePath": "packages/atlas-core/src/policy-task-router.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 24,
+      "exactSpanMatches": 6,
+      "qualifiedNameLeafMatches": 6,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:4b66b662be544543a2ef72514903bb8beb70e21b2ba30fb25c2b902eabf943b8",
+          "byteSpan": [
+            543,
+            688
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                536,
+                688
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                543,
+                688
+              ],
+              "name": "PolicyTaskType",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:d15ba14f174bb61ed4468b5c8d651e7c11cd4f0f2868236841c782b44f8d81ce",
+          "byteSpan": [
+            697,
+            924
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                690,
+                924
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                697,
+                924
+              ],
+              "name": "PolicyTask",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:8dc3f6dd33878225d49cf488f09f54e8e17f5984c2d8ba6648be90bfd2ef568e",
+          "byteSpan": [
+            933,
+            1121
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                926,
+                1121
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                933,
+                1121
+              ],
+              "name": "TaskRoute",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:b6e205825e35704467ca92c41fb0a3f777b01d903a699faa6ecb52f9bcedfd23",
+          "byteSpan": [
+            1197,
+            2946
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1190,
+                2946
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1197,
+                2946
+              ],
+              "name": "classifyPacketTask",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                1260,
+                1331
+              ],
+              "name": null,
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:adbe5107ab09bd6a479503ea76987388ba48697a524288da3f4bc27fdb0e757a",
+          "byteSpan": [
+            4758,
+            4875
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                4751,
+                4875
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                4758,
+                4875
+              ],
+              "name": "getTaskRoute",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:e033c41635a298c09ae19e88c840c2be270e5bf2615a987b86849372204ce97c",
+          "byteSpan": [
+            4935,
+            5805
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                4928,
+                5805
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                4935,
+                5805
+              ],
+              "name": "groupPacketsByTask",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                5019,
+                5060
+              ],
+              "name": "groups",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5107,
+                5140
+              ],
+              "name": "task",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5313,
+                5357
+              ],
+              "name": "batched",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/atlas-core/src/workstation-orchestrator.ts",
+      "candidateCount": 14,
+      "sourceRevision": "sha256:42fbe3eada809916f3e38bf75577b3c3c5fde80ef787cdec81e21b2898434e25",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:42fbe3eada809916f3e38bf75577b3c3c5fde80ef787cdec81e21b2898434e25",
+      "returnedFilePath": "packages/atlas-core/src/workstation-orchestrator.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 51,
+      "exactSpanMatches": 14,
+      "qualifiedNameLeafMatches": 14,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:99660f2ad93b38b90d3479ef02db4861359f3cc8b69be1e0fc77321aa68ca941",
+          "byteSpan": [
+            702,
+            1082
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                695,
+                1082
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                702,
+                1082
+              ],
+              "name": "WorkstationConfig",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:357a5d75b1c6326af29994c3b1fe9c89371d36b48864673101fc7482e6ada56a",
+          "byteSpan": [
+            1091,
+            1521
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1084,
+                1521
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1091,
+                1521
+              ],
+              "name": "WorkstationResult",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:9f27a016ea72eec0e6b594da48b9aac7c78367545ee83179d19c7f995cb554c3",
+          "byteSpan": [
+            1620,
+            10515
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                1822,
+                2398
+              ],
+              "name": "constructor",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                2473,
+                3168
+              ],
+              "name": "loadPackets",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                2536,
+                2699
+              ],
+              "name": "packets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:6d6b027afee9d4232ca072518bbb280da3c4de503ce18a99eecec62731942a55",
+          "byteSpan": [
+            1822,
+            2398
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                1822,
+                2398
+              ],
+              "name": "constructor",
+              "nodeType": "method_definition",
+              "kind": "method"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:02ffe66ca545ac4ebda7fff388329e343177cb29dd0c8a746e9fde73f740a5a0",
+          "byteSpan": [
+            2473,
+            3168
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                2473,
+                3168
+              ],
+              "name": "loadPackets",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                2536,
+                2699
+              ],
+              "name": "packets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2774,
+                2908
+              ],
+              "name": "invalid",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:d7d35020391444f46687e4d75728b3699d2866d9cfddaeaff55127ed8ac98413",
+          "byteSpan": [
+            3235,
+            3627
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                3235,
+                3627
+              ],
+              "name": "classifyPackets",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                3313,
+                3361
+              ],
+              "name": "classified",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                3412,
+                3445
+              ],
+              "name": "task",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:a7b181ab689e0d81383575803ad8ff4e362c86134cc20bf7619e23d9b910c309",
+          "byteSpan": [
+            3697,
+            3870
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                3697,
+                3870
+              ],
+              "name": "batchPackets",
+              "nodeType": "method_definition",
+              "kind": "method"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:285c00a19b5ddee9735903e3039b2ecccdb36781d33d939b812a280089cd7ac4",
+          "byteSpan": [
+            3993,
+            5516
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                3993,
+                5516
+              ],
+              "name": "scoreWithPolicyModel",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                4081,
+                4115
+              ],
+              "name": "scores",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4173,
+                4645
+              ],
+              "name": "response",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:0dc72cbf4d00648285ed926b78e426fdccb7013dd029e64ed28b78a04bbcbd83",
+          "byteSpan": [
+            5653,
+            6229
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                5653,
+                6229
+              ],
+              "name": "warmBitFrostCache",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                5919,
+                5964
+              ],
+              "name": "packetKeys",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5944,
+                5963
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:3a35a13b57897030ed5a7c0426c953210911c503f3e1dfd41947a1efd1f62ed5",
+          "byteSpan": [
+            6343,
+            6749
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                6343,
+                6749
+              ],
+              "name": "gatherKAGDAGHits",
+              "nodeType": "method_definition",
+              "kind": "method"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:9686165586de39e8cbc551f7ac08f195f1da992e3611fab2148d55a74588f4c5",
+          "byteSpan": [
+            6876,
+            7779
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                6876,
+                7779
+              ],
+              "name": "inferOnRTXTensors",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                7045,
+                7083
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                7119,
+                7147
+              ],
+              "name": "results",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:0b48952f551b18b5edc79d019ab29fc3c8bc03242c9c0dda0e9b8d51abba92a2",
+          "byteSpan": [
+            7852,
+            9386
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                7852,
+                9386
+              ],
+              "name": "orchestrateTaskType",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                7975,
+                8011
+              ],
+              "name": "startTime",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                8024,
+                8054
+              ],
+              "name": "route",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:4aca080bdcdf39263a49e7839a63a81c9801dcf4f4a19c81b3041b5b5c71f68c",
+          "byteSpan": [
+            9457,
+            10444
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                9457,
+                10444
+              ],
+              "name": "orchestrate",
+              "nodeType": "method_definition",
+              "kind": "method"
+            },
+            {
+              "byteSpan": [
+                9603,
+                9637
+              ],
+              "name": "packets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                9744,
+                9786
+              ],
+              "name": "classified",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:bedd7449360bdb93f479e0fd03ab19df0252bc092e6993dba7bf094100e25bfa",
+          "byteSpan": [
+            10448,
+            10513
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1613,
+                10515
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                1620,
+                10515
+              ],
+              "name": "WorkstationOrchestrator",
+              "nodeType": "class_declaration",
+              "kind": "class"
+            },
+            {
+              "byteSpan": [
+                10448,
+                10513
+              ],
+              "name": "close",
+              "nodeType": "method_definition",
+              "kind": "method"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/parent-atlas/src/core/service-contract.ts",
+      "candidateCount": 4,
+      "sourceRevision": "sha256:47da70322aeb191f3bb4d980ec920dc104eb1a37f4ec29fd15f14994de11d46e",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:47da70322aeb191f3bb4d980ec920dc104eb1a37f4ec29fd15f14994de11d46e",
+      "returnedFilePath": "packages/parent-atlas/src/core/service-contract.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 16,
+      "exactSpanMatches": 4,
+      "qualifiedNameLeafMatches": 4,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:85083e5d78cac745b9a5787ad2acc80220b10f9466d5dc7492e8a9e7fdcdd9e2",
+          "byteSpan": [
+            92,
+            154
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                85,
+                154
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                92,
+                154
+              ],
+              "name": "ServiceProbeStatus",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:d9827033da2be28846a49d21326a6b2c01e86b325a601e937296ec3d0748e9b6",
+          "byteSpan": [
+            260,
+            327
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                253,
+                327
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                260,
+                327
+              ],
+              "name": "ServiceProbeTransport",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:ec668418e54a4a64085cb667b715e4e5080135eb06fd03ac26bd204a43638d79",
+          "byteSpan": [
+            557,
+            622
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                550,
+                622
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                557,
+                622
+              ],
+              "name": "CanonicalServiceName",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:c9280631b0b4f31678993d0c4b21a75f4c797c613158c9cf620b7ae67a51ebe0",
+          "byteSpan": [
+            631,
+            857
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                624,
+                857
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                631,
+                857
+              ],
+              "name": "ServiceProbe",
+              "nodeType": "type_alias_declaration",
+              "kind": "type"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/parent-atlas/src/core/summary-context.ts",
+      "candidateCount": 10,
+      "sourceRevision": "sha256:f9f0faa0674eb1033fe1e7a1fa6b1df6edbb1d8b03917548641f8f9179a7d087",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:f9f0faa0674eb1033fe1e7a1fa6b1df6edbb1d8b03917548641f8f9179a7d087",
+      "returnedFilePath": "packages/parent-atlas/src/core/summary-context.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 56,
+      "exactSpanMatches": 10,
+      "qualifiedNameLeafMatches": 10,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:bd490e538a645b2246dce806390e5a5e086efb069791de120693dc584c115e58",
+          "byteSpan": [
+            1291,
+            1477
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1291,
+                1477
+              ],
+              "name": "objectValue",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:53eb530aa75a539095f31ad42a057a5c237610bb9ded7012aa1d2b4e99f7c182",
+          "byteSpan": [
+            1479,
+            1661
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1479,
+                1661
+              ],
+              "name": "firstText",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                1579,
+                1612
+              ],
+              "name": "text",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:19c7bb299e97c63b1e230db5aa084cb8516d10175e90f96a711877aae2dd42cc",
+          "byteSpan": [
+            1663,
+            1930
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1663,
+                1930
+              ],
+              "name": "firstNumber",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                1838,
+                1860
+              ],
+              "name": "number",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:c454136537cdf253a0e9ebf9d982310aad3ed0f7a4f600cc34e9adf8356dfae9",
+          "byteSpan": [
+            1932,
+            2220
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1932,
+                2220
+              ],
+              "name": "normalizedPathDir",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2000,
+                2033
+              ],
+              "name": "text",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2111,
+                2175
+              ],
+              "name": "dir",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:e9411bd8aa9a113d72d1712d14648153507ba37d9b44b1c9a40eb29e9e9af728",
+          "byteSpan": [
+            2222,
+            2381
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2222,
+                2381
+              ],
+              "name": "missingFields",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2331,
+                2377
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:080c0381e1a116314bd80aa3a79ffcd1adc27246a2abd980d0768b61efd93670",
+          "byteSpan": [
+            2390,
+            2949
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2383,
+                2949
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                2390,
+                2949
+              ],
+              "name": "classifyDomain",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2478,
+                2541
+              ],
+              "name": "haystack",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2652,
+                2718
+              ],
+              "name": "topDir",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:dc0a59baad5b41ea1e6d35a4e2b9bf09958d8e7d74003b57a8681875f6cb1c22",
+          "byteSpan": [
+            2958,
+            3913
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2951,
+                3913
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                2958,
+                3913
+              ],
+              "name": "classifyOntology",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                3055,
+                3121
+              ],
+              "name": "text",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:ae47bb7b9b8a83fcde9831d784b17a6cdbe966d77f8a5fd9b9128d74bf089d64",
+          "byteSpan": [
+            3922,
+            4739
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                3915,
+                4739
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                3922,
+                4739
+              ],
+              "name": "classifyTopology",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                4016,
+                4079
+              ],
+              "name": "text",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:361d5ef2e6d81f38fc63fbdfb14821e02b36630a7c9f26e1b4991a4e20fd12d8",
+          "byteSpan": [
+            4748,
+            9590
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                4741,
+                9590
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                4748,
+                9590
+              ],
+              "name": "buildSummaryContext",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                4847,
+                4883
+              ],
+              "name": "metadata",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4893,
+                4927
+              ],
+              "name": "payload",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                4937,
+                4973
+              ],
+              "name": "topology",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:7a914c92771f2b6eb306937b09ec7b42bfa85510ea70d0ae1efbad6cafba049f",
+          "byteSpan": [
+            9599,
+            11176
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                9592,
+                11176
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                9599,
+                11176
+              ],
+              "name": "formatSummaryContext",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "packages/parent-atlas/src/pipelines/summary-packets.ts",
+      "candidateCount": 11,
+      "sourceRevision": "sha256:cd7dbaec010c2d79ec442873a56fa722cf2eaf269fe99acda738a72a6706a63d",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:cd7dbaec010c2d79ec442873a56fa722cf2eaf269fe99acda738a72a6706a63d",
+      "returnedFilePath": "packages/parent-atlas/src/pipelines/summary-packets.ts",
+      "syntaxStatus": "CLEAN",
+      "parserChunkCount": 48,
+      "exactSpanMatches": 11,
+      "qualifiedNameLeafMatches": 11,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:5e3fe512c08cad21a028f751bc4084430db3555dd487027e30e69fbf964edf80",
+          "byteSpan": [
+            223,
+            965
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                216,
+                965
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                223,
+                965
+              ],
+              "name": "Gemma4SummaryPacket",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:cb89bb66186e241290cb02c84437461f56253ed3de168f43595609eb1c1ad9e1",
+          "byteSpan": [
+            974,
+            1556
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                967,
+                1556
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                974,
+                1556
+              ],
+              "name": "Chrom97SummaryPacket",
+              "nodeType": "interface_declaration",
+              "kind": "interface"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:eccf1d209e3dbdf13596a3e85c63928953f38823af44746f29e66641aebf7cb5",
+          "byteSpan": [
+            1558,
+            1672
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1558,
+                1672
+              ],
+              "name": "sha256",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:151d385a05797c83854951fa578b65548d8dda6d6311492aba0c9ee3ec75de77",
+          "byteSpan": [
+            1674,
+            1761
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1674,
+                1761
+              ],
+              "name": "normalizeText",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:4f29ffce2828073958b63e6e57e44920554348b11b63639d4093570a0e6377f4",
+          "byteSpan": [
+            1763,
+            2239
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1763,
+                2239
+              ],
+              "name": "stableJson",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                1855,
+                1881
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2024,
+                2211
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2052,
+                2116
+              ],
+              "name": "normalized",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:07d4c32baafef6f9b8b7cfecf6370945e97045247a93eb2518c0dcd128dda0f6",
+          "byteSpan": [
+            2241,
+            2345
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2241,
+                2345
+              ],
+              "name": "stableStringify",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:399bfbb823dc1ce194d78cd70caba226e424fcecae9a2e2d5861c352fb942665",
+          "byteSpan": [
+            2347,
+            2479
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2347,
+                2479
+              ],
+              "name": "dedupe",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2426,
+                2457
+              ],
+              "name": null,
+              "nodeType": "arrow_function",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:6067d2a4e7efe3ee22824efb2f802f9b13a620309869a6666b23617fee481bc4",
+          "byteSpan": [
+            2481,
+            2648
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2481,
+                2648
+              ],
+              "name": "firstText",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2574,
+                2601
+              ],
+              "name": "text",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:10fda83e9aa225c9896717bc79bb66de728535159b7289bd400bfd218126c839",
+          "byteSpan": [
+            2657,
+            5234
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                2650,
+                5234
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                2657,
+                5234
+              ],
+              "name": "makeGemma4SummaryPacket",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                2762,
+                2798
+              ],
+              "name": "summary",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2808,
+                2987
+              ],
+              "name": "summaryContext",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2997,
+                3146
+              ],
+              "name": "featureId",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:4c00e4ec08ae05530d59e553ad126177f725553fb7f070c6df2539a4c88f9731",
+          "byteSpan": [
+            5243,
+            10856
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                5236,
+                10856
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                5243,
+                10856
+              ],
+              "name": "makeChrom97Packet",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                5343,
+                5379
+              ],
+              "name": "summary",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5389,
+                5568
+              ],
+              "name": "summaryContext",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5578,
+                5719
+              ],
+              "name": "featureId",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:01c5ae1be5086a4236a2cde657fb3163ee97d8d82071d721f0861bc5ea62489b",
+          "byteSpan": [
+            10865,
+            10947
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                10858,
+                10947
+              ],
+              "name": null,
+              "nodeType": "export_statement",
+              "kind": "export"
+            },
+            {
+              "byteSpan": [
+                10865,
+                10947
+              ],
+              "name": "toNdjsonLine",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        }
+      ],
+      "diagnostics": []
+    },
+    {
+      "sourceRef": "scripts/agent/agent-scheduler-orchestrator.mjs",
+      "candidateCount": 7,
+      "sourceRevision": "sha256:fbdd1e00d5d8c17c6d46689b8f316ac55a2587b68bad3d2dd650036d2e6dd4a2",
+      "parserSuccess": true,
+      "schema": "atlas.ast.evidence.v1",
+      "engine": "treesitter-chunker",
+      "engineVersion": "4.0.0",
+      "returnedSourceRevision": "sha256:fbdd1e00d5d8c17c6d46689b8f316ac55a2587b68bad3d2dd650036d2e6dd4a2",
+      "returnedFilePath": "scripts/agent/agent-scheduler-orchestrator.mjs",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "parserChunkCount": 42,
+      "exactSpanMatches": 7,
+      "qualifiedNameLeafMatches": 7,
+      "candidateMatches": [
+        {
+          "symbolVersionId": "symbol-version:cd9e7190657c186c6a3e413df0539d803cbfc1500dbd057ef9bd747c9b288e65",
+          "byteSpan": [
+            1323,
+            1461
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1323,
+                1461
+              ],
+              "name": "initDb",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:6e37c6a3f939d169388c1a831d243354763c00c1130636bdb2dfb44a36db6ac3",
+          "byteSpan": [
+            1463,
+            1530
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1463,
+                1530
+              ],
+              "name": "closeDb",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:a8045adbc13754bf948c0b959559dd3839b64ef06eb6f01808ab6c219e236fda",
+          "byteSpan": [
+            1858,
+            5387
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                1858,
+                5387
+              ],
+              "name": "evaluateJobsNeeded",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                1904,
+                1930
+              ],
+              "name": "db_client",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                1940,
+                1949
+              ],
+              "name": "jobs",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2052,
+                2245
+              ],
+              "name": "lastIndexRun",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                2659,
+                2893
+              ],
+              "name": "stalePackets",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:96039574c5f0b85b5a9f5f697231b222323b08ebab0f652bda0e71212fe34579",
+          "byteSpan": [
+            5719,
+            6910
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                5719,
+                6910
+              ],
+              "name": "dispatchJobs",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                5763,
+                5789
+              ],
+              "name": "db_client",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5799,
+                5817
+              ],
+              "name": "dispatchedIds",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                5916,
+                6168
+              ],
+              "name": "existing",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                6353,
+                6373
+              ],
+              "name": "jobId",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:a6ba027dff6ed622d45232e1c784246c5ca90f10d9a9131e3f1cfcf47c9b7e3b",
+          "byteSpan": [
+            7248,
+            9031
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                7248,
+                9031
+              ],
+              "name": "assignJobs",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                7286,
+                7312
+              ],
+              "name": "db_client",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                7320,
+                7337
+              ],
+              "name": "assignedCount",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                7405,
+                7594
+              ],
+              "name": "pendingJobs",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                7688,
+                7709
+              ],
+              "name": "assignedWorker",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:79f9edf2b1d7f0586e3facb5c044ec9d845c2c7b455f027a7161f8ba3f094a63",
+          "byteSpan": [
+            9384,
+            10358
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                9384,
+                10358
+              ],
+              "name": "HotnessMetrics",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                9439,
+                9465
+              ],
+              "name": "db_client",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                9541,
+                9839
+              ],
+              "name": "signals",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                10011,
+                10096
+              ],
+              "name": "hotness",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        },
+        {
+          "symbolVersionId": "symbol-version:014a67a93d91f73979ddc436f1df6be243291c10d2b752fedbbb102848be241f",
+          "byteSpan": [
+            10550,
+            11879
+          ],
+          "qualifiedNameLeafMatch": true,
+          "exactSpanMatchCount": 1,
+          "sameNameChunkCount": 1,
+          "overlappingChunks": [
+            {
+              "byteSpan": [
+                10550,
+                11879
+              ],
+              "name": "run",
+              "nodeType": "function_declaration",
+              "kind": "function"
+            },
+            {
+              "byteSpan": [
+                10581,
+                10610
+              ],
+              "name": "startTime",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                10835,
+                10874
+              ],
+              "name": "jobsNeeded",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                11050,
+                11096
+              ],
+              "name": "dispatchedIds",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            },
+            {
+              "byteSpan": [
+                11276,
+                11310
+              ],
+              "name": "assignedCount",
+              "nodeType": "variable_declarator",
+              "kind": "fragment"
+            }
+          ]
+        }
+      ],
+      "diagnostics": [
+        "Tree-sitter ERROR at line 312, column 16: ERROR"
+      ]
+    }
+  ],
+  "writes": {
+    "postgres": false,
+    "qdrant": false,
+    "neo4j": false,
+    "valkey": false,
+    "sourceFiles": false
+  },
+  "canonicalAuthority": false,
+  "status": "PARSER_OUTPUT_OBSERVED_SPAN_PARITY_PARTIAL",
+  "likely_cause": "Candidate symbol spans require comparison with parser output from their exact admitted source snapshot.",
+  "evidence": [
+    "docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-26-54-778Z.json",
+    "docs/reports/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b.json",
+    ".tmp/workspace-source-snapshots/6288726b73626ae58905b5ebdea42e709cb1af67b3e16186bcd8b2b88a89d98b"
+  ],
+  "patch_targets": [
+    "scripts/atlas/prove-symbol-candidate-snapshot-ast-parity-v1.mts"
+  ],
+  "safe_next_command": "npx tsx scripts/atlas/prove-symbol-candidate-snapshot-ast-parity-v1.mts docs/reports/symbol-ast-identity-crosswalk-v1-2026-10-16T01-26-54-778Z.json",
+  "smoke_command": "npx openspec validate parent-atlas-retrieval-lineage-dag-convergence --strict",
+  "reportPath": "docs/reports/symbol-candidate-snapshot-ast-parity-v1-2026-10-16T01-29-03-070Z.json"
+}

@@ -165,6 +165,9 @@ Verbatim original (forensic trace of the 5 policy flips, live Qdrant census, lat
 - **Derived lanes only after a validated 768 source:** MRL-prefix + L2-renorm 512/256/128 are optional secondary lanes (Qdrant `codebase_chunks_512` exists, derived; `_256`/`_128` do not exist — don't build them speculatively). Never primary retrieval authority; never computed ahead of or in place of an incomplete 768 index; a cache/collection miss must not block retrieval.
 - **384 is retired from active retrieval, not physically dropped:** the 2026-10-12 read-only PostgreSQL audit found `atlas_packets.content_embedding_384` populated on 58,109 rows. Its producer/model and archive/readback evidence are unresolved; retain the column and values until a checksummed archive and separately authorized DDL plan exist. Do not reintroduce a 384-D retrieval lane or cite `gpu:warden:cache:384d:*` as current.
 - **Autoencoder latents are a separate, learned mechanism (not MRL):** `latent_256` real (55,169 rows PG + Qdrant `codebase_chunks_latent256`); `latent_128` derived by `SLICE_FIRST_N`+renorm of latent_256 (55,169 rows, PG only, registry promotion skipped); `latent_64` 1,703 rows PG only (autoencoder weights recorded untrained). Routing prefilters, never retrieval truth.
+  - **Equations (from `python/atlas_compute/latent_autoencoder.py`, the code is authoritative):** `z256 = normalize(LayerNorm(GELU(W2·GELU(W1·x+b1)+b2)))`; `z128 = normalize(LayerNorm(W3·z256+b3))` (a separately learned bottleneck, **not** a slice of z256); `z64 = normalize(z128[:64])`. `x` is the L2-normalized 768-d semantic vector.
+  - **MRL prefix (`python/atlas_compute/mrl_gpu_fanout_evaluation_v1.py`):** `v_k = normalize(v_768[:k])` for k in {512, 256, 128, 64}; rejects zero-norm prefixes (`MRL_<k>_PREFIX_HAS_ZERO_NORM`).
+  - **Conflict to resolve before citing PG rows:** the `latent_128` "SLICE_FIRST_N+renorm of latent_256" description above does not match the current model code. Re-check how the 55,169 `latent_128` rows were produced before relying on them.
 - **Qdrant collection inventory is volatile:** earlier counts and point totals are historical. The 2026-10-12 live inventory reported 18 collections and did not include `codebase_chunks_384` or `codebase_chunks_384_hybrid`; verify the live endpoint before relying on collection existence or counts. Do not merge, delete or cut over 768 collections without the owning gate.
 - **`embedding_dimension` metadata column is unreliable** (was mistagged 384 on 52,402 real 768-dim rows; backfilled 2026-08-30). Never gate an audit/backfill on it — verify with `vector_dims(col::vector)` or the column type.
 - **Hard rules:** (1) 768 from embeddinggemma is the primary source for Qdrant and Postgres; (2) any 512/256/128 projection comes from an indexed, validated 768 source; (3) projection lanes are optional and never block retrieval; (4) no truncated lane is the primary retrieval authority; (5) no 384 lane; (6) don't silently re-decide.
@@ -1796,3 +1799,60 @@ Verbatim original: `docs/archive/claude-md-status-and-governance-2026-10-03.md`.
 - `title_id` is a unique title-derived identity (`title:<source-slug>:<hash>`, 61,660 distinct values). It is not a semantic key. Do not use it for dense or AST matching.
 - Multi-hop inventory: `docs/reports/graphrag-multihop-analysis-2026-10-13.json` lists 32 populated edge and graph tables with exact counts and columns. It is descriptive. No traversal has been timed.
 - Not proven: bounded multi-hop traversal, NetworkX PageRank over these tables, and per-table edge endpoint identity.
+
+## Test environment and contract facts (2026-10-14)
+
+- **Env loading:** `sveltekit-frontend/src/test-setup.ts` calls `loadRuntimeEnv()`, so vitest does load the workspace `.env`. Specs that mock `$lib/server/env.server.js` must supply every var a transitively imported module reads at import time (e.g. `ROTORQUANT_MODEL_PATH` for `llm/runtime-contract.ts`).
+- **PageRank authority version:** `atlas.pagerank-authority.v1` (hyphen). It matches `graph-contract.ts`, the DB CHECK constraint, and the promotion scripts. `topology/pagerank-contract.ts` carries a duplicate of this constant; keep them in sync.
+- **Authority engine:** the authority table is fed by Neo4j GDS (`implementation: 'neo4j-gds'`, `promote-pagerank-authority-from-neo4j.mjs`). NetworkX is the CPU parity reference, not the table's source.
+- **Qdrant parity canonical:** `codebase_chunks_768_v2` (`atlas-qdrant-768-v2`). `codebase_chunks_768` is `legacy: true`; the 384 contracts are retired and must not be used as canonical in specs or fixtures.
+
+## Parent Atlas — Canonical Source, AST, and Retrieval Invariants (2026-10-15)
+
+Permanent rules only. Phase status, receipts, and implementation tasks live in the OpenSpec owners (`openspec/changes/parent-atlas-retrieval-lineage-dag-convergence`, `parent-atlas-chunk-index-whole-file-hash`, `parent-atlas-retrieval-lod-algorithm-taxonomy`, `parent-atlas-adaptive-backprop-hll-monitoring`).
+
+**Source identity and authority**
+- `source_revision` is the SHA-256 digest of the exact source-file bytes consumed by the authoritative producer.
+- A matching SHA-256 proves byte identity. It does not prove source authority, workspace admission, supersession status, or chunk lineage.
+- `workspace_revision` must come from an admitted workspace snapshot. Never coerce an integer default such as `0` into a canonical workspace revision.
+- Preserve historical revisions. Never backfill them from current worktree bytes without independently verified producer evidence.
+- Honor CURRENT-SOURCE-OWNER-RECONCILIATION-01 and SOURCE-REVISION-BACKFILL-PLAN-01. No bulk backfill while `safeToBackfill=false`.
+- **Deferral rule (operator, 2026-10-15): source_revision is deferred until after Phase 20.** Until the workstation phase gates through P20 are complete, do not run any source_revision write: no chunk apply, no backfill, no propagation. Do not propose one as the next step.
+
+**Native AST provenance**
+- Canonical AST nodes keep native parser IDs, exact byte spans, source revisions, repository namespaces, and source-to-symbol identity.
+- Pseudo-AST rows built from chunk symbols or synthetic objects are diagnostic only. They never replace native AST evidence.
+- Map frontend-relative and repository-relative source paths through an explicit, revision-qualified namespace. Fuzzy path matching is prohibited.
+- A native AST span is not automatically a qualified semantic chunk.
+- Missing packet-to-chunk links, ambiguous hydration, or missing revisions produce explicit rejection receipts.
+- Legacy AST materializer apply guards stay enabled. Do not bypass them to populate canonical AST tables.
+
+**Canonical writers and projections**
+- The authoritative producer establishes source-byte identity. Packet and chunk writers propagate verified revisions without inventing or silently overwriting history.
+- A conflicting revision requires compare-and-swap validation, a qualified new representation, or an explicit rejection.
+- Graphify, Qdrant, Neo4j, and other derived indexes are projections of admitted canonical evidence.
+- No broad Graphify projection writes without SAFE_TO_PROJECT admission.
+
+**Retrieval and grounded synthesis**
+- SearchRuntime owns canonical retrieval and candidate fusion.
+- One logical semantic lane may use several executors without inflating fusion votes.
+- ContextManifest must admit revision-qualified evidence before production synthesis.
+- Ornith citations must resolve to admitted evidence IDs, with matching revisions and verified spans.
+- Preserve raw model outputs and rejected citations. Never silently filter unsupported citations and report LIVE_PASS.
+- Unsealed synthesis proofs are DIAGNOSTIC_ONLY.
+
+**LOD, WebGPU, and GPU boundaries**
+- `N64TextureLODSystem.ts` and `shader-cache-manager.ts` are browser rendering precedents, not server retrieval or cache authorities.
+- Retrieval LOD work belongs to `parent-atlas-retrieval-lod-algorithm-taxonomy`.
+- Query relevance may inform prefetch and hot/warm/cold residency. It must not redefine source authority or final ranking.
+- Raw cosine similarity ranges over [-1, 1]. Use an explicitly versioned normalization for any policy that needs [0, 1], such as `(cos + 1) / 2`.
+- GPU tensor execution belongs to existing compute executors. LangGraph remains an orchestration and validation layer.
+- BitFrost must not persist prohibited token-state or KV-cache contents. Cache only representations the residency contract permits.
+- SOM, low-rank sampling, folded-polynomial LUTs, BitNet, GRPO, and tensor-compilation proposals stay challengers until their own proof gates pass.
+
+**Evidence-based completion**
+- Statuses CREATED, WIRED, PARTIAL, PROVEN, BLOCKED, and DONE are distinct.
+- A passing unit test, an existing source file, a checked OpenSpec task, or a healthy service does not prove end-to-end integration.
+- Each completed gate needs its authoritative owner, the exact test command, a revision-qualified input, an output receipt, and independent readback.
+- Keep OpenSpec phase IDs distinct from legacy phase numbering.
+- Do not overwrite unrelated uncommitted worktree changes.

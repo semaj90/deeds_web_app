@@ -24,7 +24,7 @@
 
 .PARAMETER Model
     Model name to pass in the request body.
-    Default: gemma4-legal-iq4xs-direct.gguf
+    Default: ornith-1.5-9b
 
 .PARAMETER DryRun
     Preview prompts without calling llama-server or writing to DB.
@@ -42,7 +42,7 @@ param(
     [string]$Level    = 'chunk',
     [int]   $Limit    = 50,
     [string]$LlamaUrl = 'http://127.0.0.1:8090',
-    [string]$Model    = 'gemma4-legal-iq4xs-direct.gguf',
+    [string]$Model    = 'ornith-1.5-9b',
     [switch]$DryRun,
     [int]   $MaxTokens = 200
 )

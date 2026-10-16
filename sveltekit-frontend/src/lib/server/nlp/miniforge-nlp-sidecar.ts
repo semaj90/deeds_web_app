@@ -75,6 +75,8 @@ export interface AtlasStructuralEvidenceChunk {
   name?: string | null;
   parent_route?: string[];
   parent_context?: string | null;
+  signature_text?: string | null;
+  syntax_ancestry?: Array<{ node_type: string; start_byte: number; end_byte: number }>;
   start_byte: number;
   end_byte: number;
   start_line: number;
@@ -696,6 +698,12 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           name: chunk.name ?? null,
           parent_route: Array.isArray(chunk.parent_route) ? chunk.parent_route.map(String) : undefined,
           parent_context: chunk.parent_context ?? null,
+          signature_text: typeof chunk.signature_text === 'string' ? chunk.signature_text : null,
+          syntax_ancestry: Array.isArray(chunk.syntax_ancestry) ? chunk.syntax_ancestry.map((node) => ({
+            node_type: String(node.node_type ?? ''),
+            start_byte: Number(node.start_byte),
+            end_byte: Number(node.end_byte),
+          })) : [],
           start_byte: Number(chunk.start_byte),
           end_byte: Number(chunk.end_byte),
           start_line: Number(chunk.start_line),

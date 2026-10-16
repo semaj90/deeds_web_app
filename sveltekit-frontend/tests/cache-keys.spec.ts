@@ -16,7 +16,7 @@ import { buildContextPrefixIdentityV1 } from '$lib/server/atlas/prefill/context-
 describe('ACE cache keys', () => {
   it('derives a stable packet key from routing inputs', () => {
     const key = buildAcePacketCacheKey({
-      model: 'gemma4-rotorquant:latest-iq4xs.gguf',
+      model: 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
       stablePrefixHash: hashStr('stable-prefix'),
       userIntent: 'summarize cluster 42',
       routingSignature: 'atlas+trace',
@@ -29,7 +29,7 @@ describe('ACE cache keys', () => {
 
   it('separates completion cache entries by user query hash', () => {
     const packetKey = buildAcePacketCacheKey({
-      model: 'gemma4-rotorquant:latest-iq4xs.gguf',
+      model: 'ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf',
       stablePrefixHash: hashStr('stable-prefix'),
       userIntent: 'legal retrieval',
       routingSignature: 'atlas+trace',

@@ -330,7 +330,7 @@
 						</div>
 						<div class="service-info">
 							<strong>Service:</strong> Legal AI Orchestrator (Port 8102)<br/>
-							<strong>Backend:</strong> Ollama gemma4-legal:latest
+							<strong>Backend:</strong> Ollama ornith-1.5-9b
 						</div>
 						<button
 							class="retry-btn"

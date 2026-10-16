@@ -1,0 +1,32 @@
+{
+  "schema": "atlas.tensor-gemm-parity.v1",
+  "generated_at": "2026-10-15T23:39:03Z",
+  "mode": "READ_ONLY_BENCHMARK",
+  "writes_performed": false,
+  "environment": {
+    "pytorch_version": "2.13.0+cu130",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 3060 Ti"
+  },
+  "dimensions": {
+    "query_count_N": 16,
+    "candidate_pool_M": 10000,
+    "vector_dimension_D": 768,
+    "matrix_element_bytes": 4,
+    "theoretical_flop_count": 245760000
+  },
+  "metrics": {
+    "cpu_latency_ms": 202.938,
+    "cpu_gflops": 1.21,
+    "cuda_latency_ms": 0.748,
+    "cuda_gflops": 328.37,
+    "speedup_cuda_vs_cpu": 271.15,
+    "max_abs_difference": 1.4156103134155273e-07,
+    "mean_abs_difference": 1.0470531996986665e-08,
+    "parity_threshold": 0.0001,
+    "peak_vram_bytes": 41306112,
+    "peak_vram_mib": 39.39
+  },
+  "status": "PASSED",
+  "operator_notes": "Dense similarity projection passes numerical parity check; peak memory footprint easily accommodates 8 GiB VRAM ceiling."
+}

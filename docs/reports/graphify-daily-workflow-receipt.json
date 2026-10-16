@@ -1,9 +1,9 @@
 {
   "schemaVersion": "atlas.graphify-daily-workflow-receipt.v1",
   "workflowId": "graphify:daily:v1",
-  "runId": "990730be-ac9c-46e4-aa1b-2393ef4cccfe",
-  "repositoryRevision": "acecc0ea7f641675f6349dc0bbca8a39d2ac9259",
-  "generatedAt": "2026-10-04T15:13:08.471Z",
+  "runId": "b82a974f-7df7-43ee-be99-ecd6ded1e30b",
+  "repositoryRevision": "9de1faa659053b4d6761d4de43c2074a1a29dc38",
+  "generatedAt": "2026-10-16T05:51:35.097Z",
   "readOnly": true,
   "canonicalWriteAttempted": false,
   "stages": {
@@ -11,8 +11,8 @@
       "status": "PROVEN",
       "totalFiles": 25542,
       "totalBytes": 473214249,
-      "currentRevision": "acecc0ea7f641675f6349dc0bbca8a39d2ac9259",
-      "priorRevision": "88ae5c7d56c59d724962d5654eea7dcc775ace62"
+      "currentRevision": "9de1faa659053b4d6761d4de43c2074a1a29dc38",
+      "priorRevision": "9de1faa659053b4d6761d4de43c2074a1a29dc38"
     },
     "inventory": {
       "status": "PROVEN",
@@ -75,15 +75,15 @@
     "structural": {
       "status": "PROVEN",
       "filesProcessed": 25542,
-      "filesWithStructure": 12143,
-      "factCount": 129011,
-      "functionCount": 48401,
-      "classCount": 1884,
+      "filesWithStructure": 12116,
+      "factCount": 124599,
+      "functionCount": 47285,
+      "classCount": 1203,
       "interfaceCount": 1583,
-      "methodCount": 6421,
+      "methodCount": 4191,
       "importCount": 36489,
       "constCount": 7576,
-      "arrowCount": 26657,
+      "arrowCount": 26272,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -289,10 +289,10 @@
     },
     "identity": {
       "status": "PARTIAL",
-      "uniqueIds": 128535,
-      "duplicateIds": 476,
-      "reusedIds": 128535,
-      "supersededIds": 476
+      "uniqueIds": 124594,
+      "duplicateIds": 5,
+      "reusedIds": 124594,
+      "supersededIds": 5
     },
     "lexical": {
       "status": "PROVEN",
@@ -2161,10 +2161,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 294511,
-      "containsEdges": 129011,
+      "entries": 285687,
+      "containsEdges": 124599,
       "importEdges": 36489,
-      "declaresEdges": 129011,
+      "declaresEdges": 124599,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2373,28 +2373,28 @@
       "filesProcessed": 25542,
       "domainCounts": {
         "test": 822,
-        "feature": 2469,
-        "config": 956,
-        "graph": 785,
-        "api": 3508,
+        "feature": 2475,
+        "config": 954,
+        "graph": 787,
+        "api": 3510,
         "ai": 180,
-        "ui": 7538,
-        "gpu": 1233,
-        "auth": 1315,
-        "retrieval": 3707,
-        "indexer": 1474,
-        "cache": 1501,
-        "vector": 54
+        "ui": 7548,
+        "gpu": 1235,
+        "auth": 1309,
+        "retrieval": 3692,
+        "indexer": 1470,
+        "cache": 1505,
+        "vector": 55
       },
       "ontologyCounts": {
-        "utility": 17929,
-        "model": 3634,
-        "adapter": 1174,
-        "handler": 362,
+        "utility": 17942,
+        "model": 3627,
+        "adapter": 1173,
+        "handler": 367,
         "bridge": 80,
-        "manager": 999,
+        "manager": 995,
         "client": 33,
-        "service": 1331
+        "service": 1325
       },
       "tierCounts": {
         "test": 2780,
@@ -2506,7 +2506,7 @@
       "status": "PROVEN",
       "postgresCanonicalRecords": 25542,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 294511,
+      "neo4jProjectionRecords": 285687,
       "redisProjectionRecords": 25542,
       "representationName": "semantic_768",
       "denseVectorName": "content",

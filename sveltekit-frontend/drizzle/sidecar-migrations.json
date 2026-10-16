@@ -732,6 +732,15 @@
       "file": "manual/20261012_atlas_directories.sql",
       "status": "applied_additive",
       "reason": "atlas_directories directory tree table with unique (repo_id, directory_path) and parent index; additive IF NOT EXISTS; mirrors atlasDirectories in schema/atlas-ast-nodes.ts"
+    },
+    {
+      "file": "manual/20261015_atlas_packet_class_lut_validation_receipts_v1.sql",
+      "status": "applied_additive",
+      "reason": "Append-only validation evidence for derived PacketClassLutV1 artifacts. Includes source/workspace revision and outcome B-tree indexes plus GIN search indexes for repository-analysis text and bounded JSON evidence. Applied additively after rollback rehearsal; no receipts backfilled.",
+      "appliedBy": "operator-authorized-run",
+      "appliedAt": "2026-10-15",
+      "requiresJournalEntry": false,
+      "validationCommand": "SELECT current_setting('server_version_num'), to_regclass('public.atlas_packet_class_lut_validation_receipts');"
     }
   ]
 }

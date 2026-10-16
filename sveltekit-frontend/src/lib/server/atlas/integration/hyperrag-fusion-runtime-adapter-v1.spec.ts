@@ -76,11 +76,31 @@ describe('HyperRAG live fusion adapter', () => {
     expect(result.acePayloads).toEqual([]);
   });
 
+  it('returns a non-sensitive failure reason when graph lookup fails', async () => {
+    const result = await runHyperRagFusionRuntimeV1({
+      queryId: 'query:fixture',
+      workspaceRevision: 'workspace:1',
+      producerRevision: 'hyperrag-test-v1',
+      repository: { findRelationshipsForEntities: async () => { throw new Error('postgres://secret-host/internal'); } } as any,
+      packets: [{
+        packet_key: 'packet:1',
+        source_ref: 'src/example.ts',
+        feature_id: 'feature:1',
+        workspace_revision: 'workspace:1',
+        identity_status: 'canonical',
+        score: 0.8,
+      }],
+    });
+
+    expect(result.status).toBe('UNAVAILABLE');
+    expect(result.reason).toBe('HYPERRAG_FUSION_UNAVAILABLE');
+  });
+
 	it('runs bounded typed HyperRAG evidence through the v3 composition boundary', async () => {
 		const relation = buildFeatureRelationship({
 			relationship_id: 'relationship:feature-evidence', relationship_type: 'supported_by',
 			participants: [
-				{ role: 'feature', entity_type: 'feature', entity_id: 'feature:1' },
+				{ role: 'feature', entity_type: 'feature', entity_id: 'feature:retrieval-search' },
 				{ role: 'source', entity_type: 'source', entity_id: 'src/retrieval/search.ts' },
 			], cardinality: [], source_ref: 'src/retrieval/search.ts', source_revision: 'source-rev-1',
 			relationship_revision: 'relationship-rev-1', producer_revision: 'relationship-producer-1',

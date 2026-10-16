@@ -1,0 +1,45 @@
+{
+  "schema": "atlas.goal-progress.v1",
+  "goalStatus": "ACTIVE_PARTIAL",
+  "previousGoalTurnClassification": "PROGRESS",
+  "likely_cause": "The enriched telemetry table is absent live, while the previous fallback targeted a legacy table without its required query fields or a JSONB provenance payload. ACE also supplied guessed runtime labels and independently mirrored a second eval event.",
+  "evidence": [
+    { "type": "LIVE_READ_ONLY_SCHEMA", "tool": "db.table_inspect via deployed TRACE MCP", "receipt": "docs/reports/parent-atlas-existing-telemetry-schema-20261016T0410Z.json", "result": "phase_2_telemetry absent; existing atlas_retrieval_eval_times has 33 columns, all 23 expected INSERT columns, nullable provenance fields and JSONB payload" },
+    { "type": "FOCUSED_TESTS", "result": "5 files / 21 tests passed", "receipt": "docs/reports/telemetry-writer-final-20261015T234043.txt" },
+    { "type": "FINAL_NULL_METRIC_REGRESSION", "result": "10 packet telemetry tests passed after missing-latency-to-null correction", "receipt": "docs/reports/packet-telemetry-null-metrics-20261015T234147.txt" },
+    { "type": "FOCUSED_STRICT_TYPES", "result": "transport telemetry schema/helper and its spec exit 0", "receipt": "docs/reports/transport-telemetry-schema-types-20261015T234053.txt" },
+    { "type": "SYNTAX", "result": "Modified recorder, packet/ACE telemetry and ACE caller parsed successfully with TypeScript parser" }
+  ],
+  "implementation": [
+    "Factor existing eval INSERT into recordRetrievalEvalTelemetry and reuse it for both existing call paths; no new table/client or second eval writer",
+    "Preserve packet context, source reference and validated codec observations in the existing JSONB payload",
+    "Disable the ACE legacy signal's generic eval mirror, leaving the enriched packet writer responsible for its eval record",
+    "Keep absent latency/query hash/protocol/accelerator/cache source null rather than inventing measured zero, HTTP, CPU or Redis",
+    "Remove guessed version/protocol labels from the inspected production ACE telemetry caller",
+    "Validate transport payload shape and finite nonnegative codec metrics; reject extra tensor or arbitrary payload keys before writer invocation"
+  ],
+  "patch_targets": [
+    "sveltekit-frontend/src/lib/server/telemetry/retrieval-recorder.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/packet-centric-telemetry.spec.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.ts",
+    "sveltekit-frontend/src/lib/server/telemetry/ace-telemetry-emitter.spec.ts",
+    "sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts",
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.ts",
+    "sveltekit-frontend/src/lib/server/grpc/transport-telemetry.spec.ts",
+    "docs/architecture/packet-telemetry-existing-writer-v1.md",
+    "openspec/changes/parent-atlas-telemetry-lowrank-recommendation-okf-integration/tasks.md"
+  ],
+  "safe_next_command": "Review a bounded telemetry-only write/readback plan through the existing owner; do not authorize source-revision writes or apply the historical phase_2 migration as a shortcut.",
+  "smoke_command": "cd sveltekit-frontend; npx vitest run src/lib/server/telemetry/packet-centric-telemetry.spec.ts src/lib/server/telemetry/ace-telemetry-emitter.spec.ts src/lib/server/grpc/transport-telemetry.spec.ts --environment node --maxWorkers=1 --minWorkers=1",
+  "report_path": "docs/reports/parent-atlas-telemetry-existing-writer-progress-20261016T0643Z.json",
+  "remaining": [
+    "Explicitly approved live telemetry insertion and independent readback through the existing owner",
+    "Production caller propagation of actual observed transport metadata and qualified packet source context",
+    "Per-operation GPU/Redis/Qdrant/Neo4j observations; other GPU telemetry producers still require runtime-provenance audit",
+    "The full original identity/parser/symbol lineage, retrieval, topology and ContextManifest gates"
+  ],
+  "limits": { "canonicalAuthority": false, "liveWriterReadbackProven": false, "liveInsertCommandRun": false,
+    "ddlPerformed": false, "sourceRevisionWritesPerformed": false, "sharedServicesRestarted": false,
+    "gpuJobRun": false, "svelteCheckRun": false, "productionQualificationProven": false, "goalComplete": false }
+}

@@ -1,0 +1,56 @@
+{
+  "schema": "atlas.ast-sidecar-observation-readonly.v1",
+  "generatedAt": "2026-10-15T22:15:05.421Z",
+  "status": "OBSERVATION_VERIFIED",
+  "source": {
+    "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/structural-lane-retriever.ts",
+    "sourceRevision": "sha256:34eb6cf82665dbc2912d1cb76da3e6d12715656debd19cfb60d5e1f9a01e61f9",
+    "byteLength": 3329
+  },
+  "sidecar": {
+    "endpoint": "http://127.0.0.1:8095",
+    "healthStatus": "ok",
+    "contract": "provenance-v2",
+    "engine": "treesitter-chunker",
+    "engineVersion": "4.0.0",
+    "language": "typescript",
+    "runtimeBindings": {
+      "miniforge_nlp_sidecar_v2": "sha256:bb64e344ac204646042bf50df60c8c442ab786d05031dc8264bbe894dae45635",
+      "miniforge_nlp_sidecar": "sha256:4a61e29b321021e28412cafe2dd9f55afe6a1a081fd4747fc6655f9ea0ccc2c8"
+    }
+  },
+  "observation": {
+    "responseSchema": "atlas.ast.evidence.v1",
+    "responseStatus": 200,
+    "filePathMatched": true,
+    "sourceRevisionMatched": true,
+    "chunkCount": 16,
+    "target": {
+      "name": "structuralLaneHitsToCandidates",
+      "upstreamNodeId": "e1b2c4fa1b5be80e4be3dd275947ecb75edd5482",
+      "upstreamChunkId": "e1b2c4fa1b5be80e4be3dd275947ecb75edd5482",
+      "upstreamFileId": "0ea9a26f494669e8ff782abbd24df250b2449230",
+      "upstreamSymbolId": "c4ea2c4770810cb87e924720e3a66fc97e0fa639",
+      "signature": "function structuralLaneHitsToCandidates(hits: readonly StructuralLaneHit[], workspaceRevision: string): LaneCandidate[] ",
+      "startByte": 1072,
+      "endByte": 2894,
+      "spanSha256": "31795983185397c17a7629cb92b89c218e68536dc0ebe2644087b714c0e48504",
+      "ancestry": [
+        {
+          "node_type": "export_statement",
+          "start_byte": 1065,
+          "end_byte": 2894
+        }
+      ]
+    }
+  },
+  "boundaries": {
+    "sourceWriter": false,
+    "databaseRead": false,
+    "databaseWrite": false,
+    "searchRuntimeRegistered": false,
+    "contextManifestAdmitted": false,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

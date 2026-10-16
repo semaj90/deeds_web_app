@@ -135,28 +135,55 @@ async function lookupPacket(pool: pg.Pool, featureId: string): Promise<PacketRow
   } catch { return null; }
 }
 
+// Maps a repair card onto the live kanban_tasks columns (task_id, feature_label, lane, status,
+// validation_command, source_refs). Fields with no column go to kanban_task_events.payload. No DDL.
+const CARD_LANE: Record<RepairTaskCard['status'], string> = {
+  pending: 'todo',
+  ready_for_dry_run: 'todo',
+  dry_run_done: 'review',
+  applied: 'done',
+  failed: 'blocked',
+};
+
 async function upsertTaskCard(pool: pg.Pool, card: RepairTaskCard): Promise<void> {
+  const client = await pool.connect();
   try {
-    await pool.query(
+    await client.query('BEGIN');
+    await client.query(
       `INSERT INTO kanban_tasks
-         (id, title, feature_id, source_refs, status, payload, created_at, updated_at)
-       VALUES ($1, $2, $3, $4::jsonb, $5, $6::jsonb, now(), now())
-       ON CONFLICT (id) DO UPDATE SET
-         status     = EXCLUDED.status,
-         payload    = EXCLUDED.payload,
-         updated_at = now()`,
+         (task_id, feature_id, feature_label, source_refs, lane, status, validation_command, priority, idempotency_key, updated_at)
+       VALUES ($1, $2, $3, $4::jsonb, $5, $6, $7, 0, $1, now())
+       ON CONFLICT (task_id) DO UPDATE SET
+         -- A verified completion is never reset by a re-generated card.
+         status             = CASE WHEN kanban_tasks.status = 'done' THEN kanban_tasks.status ELSE EXCLUDED.status END,
+         lane               = CASE WHEN kanban_tasks.status = 'done' THEN kanban_tasks.lane ELSE EXCLUDED.lane END,
+         validation_command = EXCLUDED.validation_command,
+         source_refs        = EXCLUDED.source_refs,
+         updated_at         = now()`,
       [
         card.id,
-        card.title,
         card.feature_id,
+        card.title,
         JSON.stringify(card.source_refs),
+        CARD_LANE[card.status] ?? 'todo',
         card.status,
-        JSON.stringify(card),
+        card.checks.join('; ') || null,
       ]
     );
+    await client.query(
+      `INSERT INTO kanban_task_events (task_id, run_id, event_type, payload)
+       VALUES ($1, 'repair-loop', 'card_snapshot', $2::jsonb)`,
+      [card.id, JSON.stringify(card)]
+    );
+    await client.query('COMMIT');
     verbose(`Upserted kanban task: ${card.id}`);
   } catch (err) {
-    verbose(`kanban_tasks upsert skipped (table may not exist): ${(err as Error).message}`);
+    await client.query('ROLLBACK').catch(() => undefined);
+    // Surface the failure to the caller: a logged-and-swallowed write hid the schema mismatch before.
+    console.error(`kanban_tasks upsert FAILED for ${card.id}: ${(err as Error).message}`);
+    throw err;
+  } finally {
+    client.release();
   }
 }
 

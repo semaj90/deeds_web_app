@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
-const toolNames = ['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report'] as const;
+const toolNames = ['atlas.backend_info', 'atlas.exact_topk_oracle', 'atlas.parity_report', 'atlas.simdjson_tensor_metrics'] as const;
 const countersSchema = z.object({
   cuda_execution: z.number().finite().nonnegative(),
   cpu_fallback: z.number().finite().nonnegative(),
@@ -36,6 +36,7 @@ const fixture = Object.freeze({
 });
 
 export type NativeAccelerationToolPort = {
+  simdjsonTensorMetrics?(): unknown | Promise<unknown>;
   backendInfo(): unknown;
   executionCounters(): unknown;
   exactTopK(query: Float32Array, corpus: Float32Array, rows: number, dimensions: number, topK: number): {
@@ -155,6 +156,32 @@ export function registerNativeAccelerationTools(server: ToolServer, getPort: () 
       return response(toolNames[2], result, result.backend, port.executionCounters(), result.status !== 'PARITY_MATCH');
     } catch {
       return response(toolNames[2], { status: 'UNAVAILABLE', code: 'NATIVE_PARITY_UNAVAILABLE' }, null, null, true);
+    }
+  });
+
+  server.registerTool(toolNames[3], {
+    description: 'Analyze a fixed 4x768 FP32 numerical fixture using native simdjson validation, extraction, CSR and BFS. Return CPU array shape/bytes/min/max/mean/population variance/sparsity/L2 norms and exact Top-K with checksum-bound receipts. No caller corpus, model calls, CUDA kernel dispatch, stores or evidence admission.',
+    inputSchema: z.object({}).strict(),
+  }, async () => {
+    try {
+      const port = await getPort();
+      if (!port.simdjsonTensorMetrics) throw new Error('SIMDJSON_TENSOR_METRICS_UNAVAILABLE');
+      const result = z.object({
+        schema: z.literal('atlas.simdjson-graph-gather.v1'),
+        status: z.literal('CPU_NATIVE_PARITY_PASSED'),
+        inputKind: z.literal('NUMERICAL_FIXTURE'),
+        parserBackend: z.string().min(1),
+        canonicalAuthority: z.literal(false),
+        promotionAuthorized: z.literal(false),
+        sourceWritesPerformed: z.literal(false),
+        datastoreWritesPerformed: z.literal(false),
+        gpu: z.object({ status: z.literal('NOT_REQUESTED') }).passthrough(),
+        arrayMetrics: z.object({ embeddings: z.object({ shape: z.tuple([z.literal(4), z.literal(768)]),
+          byteLength: z.literal(12288), dtype: z.literal('float32') }).passthrough() }).passthrough(),
+      }).passthrough().parse(await port.simdjsonTensorMetrics());
+      return response(toolNames[3], result, result.parserBackend, port.executionCounters());
+    } catch {
+      return response(toolNames[3], { status: 'UNAVAILABLE', code: 'SIMDJSON_TENSOR_ANALYSIS_FAILED' }, null, null, true);
     }
   });
 }

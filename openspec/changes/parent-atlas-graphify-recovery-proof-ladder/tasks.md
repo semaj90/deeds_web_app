@@ -588,6 +588,14 @@ receipt, and tighten the acceptance gates.
 - `OPENCODE_REPLAY_TURN2_PROVEN`
 - `VALKEY_OPENCODE_RULES_SEED_PROVEN`
 
+## Daily local discovery helpers (2026-10-15; companion CLI)
+
+- [x] `GRAPHIFY-DISCOVERY-01` Add `scripts/atlas/graphify-daily-discovery-v1.mjs` and its CLI helper module. Reuse the existing runtime-ownership registry, focused architecture TOCs, `repo-scan-roots.mjs`, and an explicitly selected OpenSpec ledger/receipt. Inventory uses NUL-delimited Git records; routine discovery has no service/database/GPU/cache access. `--sizes` and bounded streamed graph hashing are explicit options. Optional local receipts use exclusive creation so prior artifacts are preserved.
+- [x] `GRAPHIFY-DISCOVERY-02` Register `graphify:daily:inspect`, `graphify:daily:search`, and `graphify:daily:helpers:test` in the existing frontend package. Search uses literal shell-free `rg` arguments, filename-prioritized batches, a 250-source-file budget, bounded excerpts and subprocess limits; failures retain an explicit error status. Nine focused Node tests cover inventory, Unicode paths, dependency/build exclusions, size limits, declarations versus authority, ignored graphs, missing executables, untracked opt-in and path/selection guards.
+- [x] `GRAPHIFY-DISCOVERY-03` Exercise inspection and bounded source search through the actual npm aliases. Inspection receipt: `docs/reports/graphify-daily-discovery-inspect-20261016T023157929Z.json` (about 2.4 s with small graph hashes). Search receipt: `docs/reports/graphify-daily-discovery-search-20261016T023817737Z.json` (8 bounded `SearchRuntime` hits, about 2.6 s). Existing timeout receipts remain preserved. Documentation: `docs/architecture/graphify-daily-discovery-helpers-v1.md`; navigation linked from the Atlas TOC.
+  Validation receipt: `docs/reports/graphify-daily-discovery-validation-20261016T024005203Z.json`; full 9/9 test output: `docs/reports/graphify-daily-discovery-tests-20261016T024005203Z.txt`. Strict OpenSpec validation, JavaScript syntax, package JSON/alias checks and scoped whitespace passed. An actual duplicate-output invocation returned `EEXIST`/exit 1 and independently preserved the prior report's SHA-256.
+- [ ] Maintenance refresh, current graph provenance, source qualification, SearchRuntime-to-ContextManifest proof and production mutation admission retain their existing gates. Discovery completion and graph mtime/hash observations do not close them. No daily maintenance command was run by this tranche.
+
 ## Stop boundary (unchanged)
 
 Stop after: proof-ladder runner, global Graphify lock, feature-envelope lock/concurrency proof,

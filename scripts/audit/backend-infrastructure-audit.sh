@@ -135,7 +135,7 @@ STRICT_TIMEOUT=180
 STRICT_START=$(date +%s%3N)
 STRICT_RES=$(curl -s -X POST --max-time ${STRICT_TIMEOUT} http://${APP_HOST}:3040/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"ollama-local/gemma4-rotorquant:latest","messages":[{"role":"user","content":"Define negligence in one sentence."}],"max_tokens":50,"temperature":0.0,"stream":false}' 2>/dev/null || true)
+  -d '{"model":"ollama-local/ornith-1.5-9b","messages":[{"role":"user","content":"Define negligence in one sentence."}],"max_tokens":50,"temperature":0.0,"stream":false}' 2>/dev/null || true)
 STRICT_END=$(date +%s%3N)
 STRICT_LATENCY=$((STRICT_END - STRICT_START))
 if [ -z "$STRICT_RES" ]; then
@@ -201,7 +201,7 @@ fi
 # G8: Model Files Exist
 echo -n "G8: Required models... "
 MODELS=$(curl -s ${OLLAMA_URL}/api/tags 2>/dev/null)
-HAS_LEGAL=$(echo "$MODELS" | grep -c 'gemma4-legal\|gemma3-legal')
+HAS_LEGAL=$(echo "$MODELS" | grep -c 'ornith-1.5-9b\|gemma3-legal')
 HAS_EMBED=$(echo "$MODELS" | grep -c 'embeddinggemma')
 if [ "$HAS_LEGAL" -gt 0 ] && [ "$HAS_EMBED" -gt 0 ]; then
   echo "✅ PASS (legal + embedding models present)"
@@ -215,7 +215,7 @@ fi
 echo -n "G9: Inference latency... "
 START=$(date +%s%3N)
 RESPONSE=$(curl -s -X POST ${OLLAMA_URL}/api/chat \
-  -d '{"model":"gemma4-legal","messages":[{"role":"user","content":"Hi"}],"stream":false,"options":{"num_predict":5}}' 2>/dev/null)
+  -d '{"model":"ornith-1.5-9b","messages":[{"role":"user","content":"Hi"}],"stream":false,"options":{"num_predict":5}}' 2>/dev/null)
 END=$(date +%s%3N)
 LATENCY=$((END - START))
 

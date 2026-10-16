@@ -132,14 +132,14 @@ export async function runHyperRagFusionRuntimeV1(
       acePayloads: facade.ace_payloads,
       facade,
     };
-  } catch (error) {
+  } catch {
     return {
       status: 'UNAVAILABLE',
       acceptedCandidateCount: adapted.accepted.length,
       rejectedCandidateCount: adapted.rejected.length,
       acePayloads: [],
       facade: null,
-      reason: error instanceof Error ? error.message : 'HYPERRAG_FUSION_UNAVAILABLE',
+      reason: 'HYPERRAG_FUSION_UNAVAILABLE',
     };
   }
 }

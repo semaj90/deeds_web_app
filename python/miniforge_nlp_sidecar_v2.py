@@ -56,6 +56,8 @@ class AstEvidenceChunkV2(BaseModel):
     name: Optional[str] = None
     parent_route: list[str] = Field(default_factory=list)
     parent_context: Optional[str] = None
+    signature_text: Optional[str] = None
+    syntax_ancestry: list[dict[str, Any]] = Field(default_factory=list)
     start_byte: int
     end_byte: int
     start_line: int
@@ -79,6 +81,29 @@ class AstEvidenceResponseV2(BaseModel):
     diagnostics: list[str] = Field(default_factory=list)
     error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
     syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+
+
+def validate_ast_evidence_byte_spans(chunks: list[AstEvidenceChunkV2], source_bytes: bytes) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    seen: set[tuple[str | None, int, int]] = set()
+    for index, chunk in enumerate(chunks):
+        start, end = chunk.start_byte, chunk.end_byte
+        if start < 0 or end <= start:
+            issues.append({"index": index, "code": "SPAN_INVALID"})
+            continue
+        if end > len(source_bytes):
+            issues.append({"index": index, "code": "SPAN_OUT_OF_BOUNDS"})
+            continue
+        try:
+            source_bytes[start:end].decode("utf-8", errors="strict")
+        except UnicodeDecodeError:
+            issues.append({"index": index, "code": "SPAN_NOT_UTF8_BOUNDARY"})
+            continue
+        key = (chunk.upstream_node_id, start, end)
+        if key in seen:
+            issues.append({"index": index, "code": "DUPLICATE_SPAN"})
+        seen.add(key)
+    return issues
 
 
 class WebEvidenceRequestV1(BaseModel):
@@ -750,6 +775,55 @@ def _declarator_kind_override(node_type: str, span_text: str) -> str | None:
     return None
 
 
+def _syntax_signature_and_ancestry(
+    source_bytes: bytes,
+    root: Any,
+    node_type: str,
+    start_byte: int,
+    end_byte: int,
+    name: str | None,
+) -> tuple[str | None, list[dict[str, Any]]]:
+    stack = [root]
+    matches = []
+    while stack:
+        node = stack.pop()
+        if (str(getattr(node, "type", "")) == node_type
+            and int(getattr(node, "start_byte", -1)) >= start_byte
+            and int(getattr(node, "end_byte", -1)) <= end_byte):
+            name_node = node.child_by_field_name("name") if hasattr(node, "child_by_field_name") else None
+            observed_name = source_bytes[name_node.start_byte:name_node.end_byte].decode("utf-8") if name_node else None
+            if name is None or observed_name == name:
+                matches.append(node)
+        stack.extend(reversed(list(getattr(node, "children", []))))
+    if len(matches) != 1:
+        return None, []
+
+    node = matches[0]
+    body = node.child_by_field_name("body") if hasattr(node, "child_by_field_name") else None
+    if body is None and node_type in _DECLARATOR_NODE_TYPES:
+        descendants = list(getattr(node, "children", []))
+        while descendants and body is None:
+            child = descendants.pop()
+            if str(getattr(child, "type", "")) in {"arrow_function", "function_expression", "function"}:
+                body = child.child_by_field_name("body") if hasattr(child, "child_by_field_name") else None
+            descendants.extend(reversed(list(getattr(child, "children", []))))
+    signature_text = None
+    if body is not None and node.start_byte <= body.start_byte <= node.end_byte:
+        signature_text = source_bytes[node.start_byte:body.start_byte].decode("utf-8")
+
+    ancestors = []
+    ancestor = getattr(node, "parent", None)
+    while ancestor is not None and getattr(ancestor, "parent", None) is not None:
+        ancestors.append({
+            "node_type": str(ancestor.type),
+            "start_byte": int(ancestor.start_byte),
+            "end_byte": int(ancestor.end_byte),
+        })
+        ancestor = ancestor.parent
+    ancestors.reverse()
+    return signature_text, ancestors
+
+
 def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
     """Return raw chunks plus whether logical identity_path was honored.
 
@@ -986,6 +1060,12 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         )
 
     diagnostics.extend(legacy._syntax_diagnostics(req.source, language))
+    syntax_root = None
+    if legacy.TREE_SITTER_AVAILABLE and legacy.get_parser is not None:
+        try:
+            syntax_root = legacy.get_parser(language).parse(req.source.encode("utf-8")).root_node
+        except Exception:
+            diagnostics.append("Tree-sitter signature and ancestry extraction unavailable")
     evidence_chunks: list[AstEvidenceChunkV2] = []
     dependencies_by_chunk: list[list[str]] = []
 
@@ -1038,6 +1118,16 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         node_type = str(normalized.get("node_type") or "fragment")
         span_text = req.source.encode("utf-8")[start:end].decode("utf-8", errors="ignore")
         kind_node_type = _declarator_kind_override(node_type, span_text) or node_type
+        signature_text, syntax_ancestry = (None, [])
+        if syntax_root is not None:
+            signature_text, syntax_ancestry = _syntax_signature_and_ancestry(
+                req.source.encode("utf-8"),
+                syntax_root,
+                node_type,
+                start,
+                end,
+                _structural_symbol_name(normalized.get("name")),
+            )
 
         evidence_chunks.append(
             AstEvidenceChunkV2(
@@ -1050,6 +1140,8 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
                 name=_structural_symbol_name(normalized.get("name")),
                 parent_route=list(normalized.get("parent_route") or []),
                 parent_context=normalized.get("parent_context"),
+                signature_text=signature_text,
+                syntax_ancestry=syntax_ancestry,
                 start_byte=start,
                 end_byte=end,
                 start_line=start_row,
@@ -1147,6 +1239,10 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
         fallback_edges, edge_diagnostics = legacy._symbol_graph_evidence(req.source, language, req.file_path)
         edges.extend(fallback_edges)
         diagnostics.extend(edge_diagnostics)
+
+    span_issues = validate_ast_evidence_byte_spans(evidence_chunks, req.source.encode("utf-8"))
+    if span_issues:
+        diagnostics.append(f"ChunkingError: AST_SPAN_VALIDATION_FAILED:{span_issues[:8]}")
 
     fatal_diagnostics = legacy._fatal_structural_diagnostics(diagnostics)
     return AstEvidenceResponseV2(

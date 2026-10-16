@@ -1,0 +1,93 @@
+{
+  "schema": "atlas.parent-atlas-consolidation-recheck.v1",
+  "observedDate": "2026-10-15",
+  "status": "PARTIAL",
+  "canonicalAuthority": false,
+  "writesPerformed": false,
+  "toolsCalled": 0,
+  "skills": {
+    "claudeCount": 14,
+    "openCodeCount": 10,
+    "sharedCount": 7,
+    "byteIdenticalShared": 4,
+    "syntaxOnlySharedDifferences": 3,
+    "supersededCopiesProven": 0,
+    "notes": [
+      "No skill was archived or modified.",
+      "TRACE skill aliases use underscore-style tool names while the live MCP list uses dotted names for several corresponding tools; namespace normalization is not verified.",
+      "atlas-tools-mcp includes write-capable record_outcome and separately references five atlas-task-kernel tools whose live list was not probed."
+    ]
+  },
+  "mcp": {
+    "surfaces": [
+      {
+        "name": "trace",
+        "transport": "streamable-http",
+        "url": "http://127.0.0.1:8788/mcp",
+        "toolsListed": 193,
+        "schemasCompiled": 193,
+        "schemaErrors": 0,
+        "status": "LIVE_LIST_AND_SCHEMA_COMPILE"
+      },
+      {
+        "name": "local-llm-offload",
+        "transport": "stdio",
+        "toolsListed": 9,
+        "schemasCompiled": 9,
+        "schemaErrors": 0,
+        "status": "LOCAL_LIST_AND_SCHEMA_COMPILE",
+        "notes": [
+          "Five repo_* names and four deprecated gemma4_* compatibility aliases were listed.",
+          "No model health or synthesis call was made; active model identity is not freshly verified."
+        ]
+      },
+      {
+        "name": "atlas-tools",
+        "transport": "stdio",
+        "toolsListed": 10,
+        "schemasCompiled": 10,
+        "schemaErrors": 0,
+        "status": "MOCK_LIST_AND_SCHEMA_COMPILE",
+        "notes": ["ATLAS_TOOLS_MOCK=1; not production handler proof."]
+      },
+      {
+        "name": "atlas-task-kernel",
+        "transport": "local-stdio-facade",
+        "toolsListed": 6,
+        "schemasCompiled": 6,
+        "schemaErrors": 0,
+        "status": "LOCAL_LIST_AND_SCHEMA_COMPILE",
+        "notes": ["Initialization spawned the Atlas-tools child; no tools/call was issued. This verifies the local facade, not OpenCode's deployed agent wiring."]
+      }
+    ],
+    "taskKernelLiveList": "LOCAL_FACADE_VERIFIED",
+    "otherConfiguredServers": "NOT_RUN",
+    "handlerBehavior": "NOT_PROVEN",
+    "toolSurfaceCapture": ".tmp/atlas-mcp-tool-surface-live-20261015.json"
+  },
+  "gan": {
+    "scriptFiles": 22,
+    "scope": "12 GAN validators/probes under scripts/atlas; 7 agentic-toolgan files; plus scripts/phase85/audit-production-gan-readiness.mjs, scripts/verify/rpc-validation-gan.mjs, and sveltekit-frontend/scripts/atlas/validate-gan-tool-calls.mjs",
+    "writeRisks": [
+      "Three legacy validators have --apply database proof-write branches.",
+      "gan-validate-live-packets.mts reads PostgreSQL and writes a fixed .tmp report.",
+      "Tool-GAN plan/dedupe/outcome/follow-up scripts write local plans or ledgers; execute remains separately gated."
+    ],
+    "supersededScriptsProven": 0,
+    "scriptsExecuted": 0,
+    "scriptsArchived": 0,
+    "existingAdversarialReceipt": {
+      "path": "docs/reports/gan-adversarial-proof-v1-consolidation-20261015.json",
+      "sha256": "716d1970bce3a5e816954bfdb05e3be38e013463cf426fc38f5066a63eaaa7f7",
+      "meaning": "Previously produced fixture-only proof; receipt hash matches the current file."
+    },
+    "liveDataQualification": "NOT_PROVEN"
+  },
+  "openGates": [
+    "Resolve MCP tool-name normalization for skill allowlists against exact live protocol names.",
+    "Probe atlas-task-kernel and remaining configured MCP servers with bounded read-only list calls.",
+    "Complete the 24-file MCP registry-to-handler/source/runtime audit.",
+    "Trace GAN callers, test coverage, and owner contracts sufficiently to prove supersession or retain parallel owners.",
+    "Do not treat fixture proof as live data validation or production readiness."
+  ]
+}

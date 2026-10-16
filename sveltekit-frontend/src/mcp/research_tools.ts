@@ -4,6 +4,7 @@ import { webSearch as canonicalWebSearch } from '$lib/server/retrieval/web-searc
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
+import { readBoundedJsonResponse, MCP_UPSTREAM_JSON_MAX_BYTES } from './read-tool-bounds.js';
 
 /**
  * Advanced research tools leveraging SearXNG and llama-server.
@@ -19,10 +20,11 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
     {
       description: 'Search the web using the canonical SearXNG/DuckDuckGo adapter.',
       inputSchema: z.object({
-        query: z.string().describe('The search query'),
-        engines: z.string().optional().describe('Comma-separated list of engines (e.g. "google,bing")'),
-        limit: z.number().default(5).describe('Number of results to return')
-      })
+        query: z.string().trim().min(1).max(512).describe('The search query'),
+        engines: z.string().max(128).regex(/^[A-Za-z0-9_, -]*$/).optional()
+          .describe('Comma-separated search engine identifiers'),
+        limit: z.number().int().min(1).max(10).default(5).describe('Number of results to return')
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -49,26 +51,26 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
           return { content: [{ type: 'text', text: `Web search failed: ${err.message}` }], isError: true };
         }
       }
+    ,
+    'READ_ONLY'
     )
   );
 
   // == research.synthesize ====================================================
   /**
-   * Full RAG+KAG synthesis with the active Ornith llama-server model.
-   * Routes through L1 Redis exact-match → L2 Bifrost semantic → L3 llama-server.
-   * Returns answer + confidence + cache tier.
+   * Direct bounded model generation. This handler does not retrieve or verify evidence.
    */
   server.registerTool(
     'research.synthesize',
     {
-      description: 'Full RAG+KAG legal synthesis with the active Ornith llama-server model. Routes through L1 Redis → L2 Bifrost semantic → L3 llama-server.',
+      description: 'Generate a response to a bounded question with the active model. This tool does not retrieve, cite, or verify source evidence; do not use it as a grounded legal answer.',
       inputSchema: z.object({
-        query:       z.string().min(3).max(4000).describe('Natural-language legal/research question'),
-        case_id:     z.string().uuid().optional().describe('Optional UUID — scopes retrieval to a specific case'),
+        query:       z.string().trim().min(3).max(2000).describe('Natural-language research question'),
+        case_id:     z.string().uuid().optional().describe('Optional case reference echoed for caller correlation; it does not scope retrieval'),
         temperature: z.number().min(0).max(2).default(0.3).optional().describe('LLM temperature (default 0.3 for legal precision)'),
         max_tokens:  z.number().int().min(50).max(4000).default(800).optional().describe('Max output tokens'),
-        skip_cache:  z.boolean().default(false).optional().describe('Bypass L1/L2 caches and force a fresh generation'),
-      })
+        skip_cache:  z.boolean().default(false).optional().describe('Disable llama-server prompt-cache reuse for this request'),
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -101,7 +103,11 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
               isError: true,
             };
           }
-          const data = await res.json();
+          const data = await readBoundedJsonResponse(res, MCP_UPSTREAM_JSON_MAX_BYTES) as {
+            choices?: Array<{ message?: { content?: string } }>;
+            model?: string;
+            usage?: unknown;
+          };
           const answer = data.choices?.[0]?.message?.content ?? '';
           return {
             content: [{
@@ -116,6 +122,8 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
           };
         }
       }
+    ,
+    'READ_ONLY'
     )
   );
 
@@ -126,11 +134,11 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
   server.registerTool(
     'research.deep_analyze',
     {
-      description: 'Performs a multi-query expansion and synthesis of search results.',
+      description: 'Runs a bounded set of web searches for research facets and reports source counts; it does not synthesize or verify conclusions.',
       inputSchema: z.object({
-        topic: z.string().describe('The research topic to analyze in depth'),
+        topic: z.string().trim().min(1).max(512).describe('The research topic to analyze in depth'),
         depth: z.enum(['standard', 'exhaustive']).default('standard')
-      })
+      }).strict()
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -145,6 +153,9 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
           `${topic} best practices and limitations`
         ];
 
+        if (depth === 'exhaustive') {
+          facets.push(topic + ' risks and failure modes', topic + ' primary documentation');
+        }
         const searchResults = await Promise.all(
           facets.map(async (facet) => (await canonicalWebSearch(facet, 3)).results)
         );
@@ -156,6 +167,8 @@ export function registerResearchTools(server: McpServer, dispatcherMiddleware?: 
           }]
         };
       }
+    ,
+    'READ_ONLY'
     )
   );
 }

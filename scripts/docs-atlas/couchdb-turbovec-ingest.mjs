@@ -186,7 +186,7 @@ Summary:`;
     console.warn(`⚠️ TurboQuant not available for summary, falling back to Ollama: ${e.message}`);
   }
 
-  // 2. Try Ollama (gemma4-rotorquant:latest)
+  // 2. Try Ollama (ornith-1.5-9b)
   try {
     console.log(`💬 Summarizing Cluster ${clusterId} via llama-server (Ornith 1.5)...`);
     const content = await llamaChat([{ role: 'user', content: prompt }], { maxTokens: 400, timeoutMs: 20000 });

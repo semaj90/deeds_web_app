@@ -1,0 +1,19 @@
+{
+  "schema": "atlas.telemetry-schema-readonly.v1",
+  "access": "READ_ONLY_SCHEMA_METADATA_VIA_TRACE_MCP",
+  "tool": "db.table_inspect",
+  "results": [
+    { "table": "public.phase_2_telemetry", "status": "TABLE_NOT_FOUND" },
+    { "table": "public.retrieval_telemetry", "status": "PRESENT", "payloadColumn": false, "requiresQueryText": true },
+    { "table": "public.atlas_retrieval_eval_times", "status": "PRESENT", "columnCount": 33,
+      "expectedInsertColumns": 23, "missingExpectedInsertColumns": [],
+      "nonNullableColumns": ["id"], "payloadColumnType": "jsonb",
+      "nullableConfirmed": ["query_hash", "packet_key", "feature_id", "source_ref", "protocol", "accelerator", "payload"] }
+  ],
+  "decision": "Reuse the existing atlas_retrieval_eval_times writer and JSONB payload; no third table or migration is needed for the examined metadata.",
+  "canonicalAuthority": false,
+  "rowDataRead": false,
+  "datastoreWritesPerformed": false,
+  "ddlPerformed": false,
+  "liveInsertReadbackProven": false
+}

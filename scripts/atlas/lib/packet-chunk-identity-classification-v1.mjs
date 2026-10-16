@@ -25,6 +25,15 @@ export function classifyPacketChunkIdentityV1(row) {
   const sourceRefChunkDiagnostic = exactSourceRefChunkCount > 0
     ? 'SOURCE_REF_CHUNKS_PRESENT_REVISION_UNQUALIFIED'
     : 'NO_CHUNKS_AT_EXACT_SOURCE_REF';
+  const sourceChunkCrosswalk = {
+    exactSourceRefChunkCount,
+    exactRelativePathChunkCount: Number(sourceChunkDiagnostic.exactRelativePathChunkCount ?? 0),
+    wholeSourceDigestMatchCount: Number(sourceChunkDiagnostic.wholeSourceDigestMatchCount ?? 0),
+    sourceWorkspaceRevisionMatchCount: Number(sourceChunkDiagnostic.sourceWorkspaceRevisionMatchCount ?? 0),
+    lineageEnvelopeMatchCount: Number(sourceChunkDiagnostic.lineageEnvelopeMatchCount ?? 0),
+    provenPacketChunkLineageCount: Number(sourceChunkDiagnostic.provenPacketChunkLineageCount ?? 0),
+    sourceRevisionAndWorkspaceColumnsVerified: sourceChunkDiagnostic.sourceRevisionAndWorkspaceColumnsVerified === true,
+  };
   const result = (category, packetKeyCount, reasonCode) => ({
     sourceRef: row.source_ref,
     sourceRevision: row.source_revision,
@@ -33,6 +42,7 @@ export function classifyPacketChunkIdentityV1(row) {
     packetKeyCount,
     reasonCode,
     sourceRefChunkDiagnostic,
+    sourceChunkCrosswalk,
   });
 
   if (packetKeys.length > 1) {

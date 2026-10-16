@@ -32,7 +32,7 @@ vi.mock('$lib/server/atlas/agentic/oak-query-enrichment-v1.js', () => ({
 
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mocks.bifrostChat(...args),
-  VLM_MODELS: { legal: 'gemma4-legal-iq4xs-direct.gguf' },
+  VLM_MODELS: { legal: 'ornith-1.5-9b' },
 }));
 
 // The repository-root Vitest runner does not install SvelteKit's `$lib`
@@ -124,6 +124,7 @@ describe('/api/search/hyperrag', () => {
 
     const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
     expect(response.status).toBe(200);
+    expect(mocks.runtimeConfigs.at(-1)).toEqual(expect.objectContaining({ readOnly: true }));
 
     const body = await response.json();
     expect(body.query).toBe('graph retrieval');
@@ -146,7 +147,7 @@ describe('/api/search/hyperrag', () => {
         lexicalBoost: 0.7,
       })
     );
-    expect(body.provenance).toEqual(expect.objectContaining({ qdrant: true, neo4j: true, redis: true, turbovec: false, ace: false }));
+    expect(body.provenance).toEqual(expect.objectContaining({ pgvector: false, qdrant: true, neo4j: false, redis: false, turbovec: false, ace: false }));
     expect(body.synthesis).toBeNull();
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
   });
@@ -195,9 +196,7 @@ describe('/api/search/hyperrag', () => {
     });
   });
 
-  it('fails open when synthesis is requested but Gemma4/Bifrost is unavailable', async () => {
-    mocks.bifrostChat.mockRejectedValueOnce(new Error('Gemma4 unavailable'));
-
+  it('blocks synthesis until admitted ContextManifest evidence is wired', async () => {
     const { POST } = await import('./+server.js');
     const request = new Request('http://localhost/api/search/hyperrag', {
       method: 'POST',
@@ -210,7 +209,23 @@ describe('/api/search/hyperrag', () => {
 
     const body = await response.json();
     expect(body.synthesis).toBeNull();
+    expect(body.synthesisStatus).toBe('BLOCKED_CONTEXT_MANIFEST_REQUIRED');
     expect(body.hits).toHaveLength(1);
-    expect(mocks.bifrostChat).toHaveBeenCalledTimes(1);
+    expect(mocks.bifrostChat).not.toHaveBeenCalled();
+  });
+
+  it('redacts internal retrieval errors', async () => {
+    const { POST } = await import('./+server.js');
+    mocks.search.mockRejectedValueOnce(new Error('secret-host/internal-db'));
+    const request = new Request('http://localhost/api/search/hyperrag', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: 'graph retrieval' }),
+    });
+    const response = await POST({ request, url: new URL(request.url), locals: { user: { id: 'u1' } } } as any);
+    const body = await response.json();
+    expect(response.status).toBe(500);
+    expect(body.error).toBe('Search unavailable');
+    expect(JSON.stringify(body)).not.toContain('secret-host');
   });
 });

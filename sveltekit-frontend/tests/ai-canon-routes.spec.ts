@@ -23,7 +23,7 @@ const TEST_USER_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d';
 const TEST_CASE_ID = 'b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e';
 const TEST_DOC_ID = 'c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f';
 
-// ── ollamaFetch mock ──
+// ── embedOrChatFetch mock ──
 const mockOllamaFetch = vi.fn(async (url: string, opts?: any) => {
 	const body = opts?.body ? JSON.parse(opts.body) : {};
 	const isStream = body.stream === true;
@@ -54,7 +54,7 @@ const mockOllamaFetch = vi.fn(async (url: string, opts?: any) => {
 	return new Response(
 		JSON.stringify({
 			message: { content: 'AI response: The legal analysis indicates...' },
-			model: 'gemma4-rotorquant:latest',
+			model: 'ornith-1.5-9b',
 			response: 'AI response: The legal analysis indicates...',
 		}),
 		{ status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -70,9 +70,9 @@ vi.mock('$lib/server/middleware/cache-headers.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	ollamaFetch: (...args: any[]) => mockOllamaFetch(...args),
+	embedOrChatFetch: (...args: any[]) => mockOllamaFetch(...args),
 }));
 
 // ── ENV mock ──
@@ -104,7 +104,7 @@ const mockGlobalFetch = vi.fn(async (url: string) => {
 		return new Response(
 			JSON.stringify({
 				models: [
-					{ name: 'gemma4-rotorquant:latest', size: 4000000000, modified_at: '2026-03-01', digest: 'abc123def456' },
+					{ name: 'ornith-1.5-9b', size: 4000000000, modified_at: '2026-03-01', digest: 'abc123def456' },
 					{ name: 'embeddinggemma:latest', size: 1000000000, modified_at: '2026-03-01', digest: 'def456abc123' },
 				],
 			}),
@@ -245,7 +245,7 @@ describe('/api/ai/models (GET)', () => {
 		const res = await GET(event as any);
 		const data = await jsonBody(res);
 		expect(data.models).toHaveLength(2);
-		expect(data.models[0].name).toBe('gemma4-rotorquant:latest');
+		expect(data.models[0].name).toBe('ornith-1.5-9b');
 	});
 
 	it('returns 401 for unauthenticated', async () => {
@@ -442,7 +442,7 @@ describe('/api/ai/ask (POST)', () => {
 
 	it('handles Ollama error', async () => {
 		// ai/ask calls fetch() directly against LLAMA_SERVER_BASE_URL (post-Ollama
-		// phase-out), not ollamaFetch — mock the layer the route actually uses.
+		// phase-out), not embedOrChatFetch — mock the layer the route actually uses.
 		mockGlobalFetch.mockResolvedValueOnce(new Response('', { status: 500 }));
 		const { POST } = await import('../src/routes/api/ai/ask/+server.js');
 		const event = makeEvent('POST', 'http://localhost/api/ai/ask', {

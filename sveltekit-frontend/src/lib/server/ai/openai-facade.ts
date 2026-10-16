@@ -255,15 +255,15 @@ function resolveInternalModel(requested: string): string {
   const m = requested.toLowerCase().replace(/:latest$/, '');
   if (m === 'yorha-ldr') return 'yorha-ldr';
   // `m` has already had a trailing `:latest` removed above.
-  if (m === 'gemma4-rotorquant') return LLM_MODEL_ID;
+  if (m === 'ornith-1.5-9b') return LLM_MODEL_ID;
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
     return LLM_MODEL_ID;
   }
   if (m === 'gemma4-agent' || m === 'gemma4-raw' || m.startsWith('gemma4')) {
     return LLM_MODEL_ID;
   }
-  if (m.startsWith('gemma3')) return 'gemma3-legal:latest';
-  if (m.startsWith('gemma270') || m.startsWith('gemma3:270')) return 'gemma3:270m';
+  // gemma3 / 270m ids are legacy client aliases; chat is served by llama-server (Ornith 1.5).
+  if (m.startsWith('gemma3') || m.startsWith('gemma270')) return LLM_MODEL_ID;
   // Default — use as-is so direct Ollama tags pass through
   return requested;
 }
@@ -2433,7 +2433,7 @@ export const ADVERTISED_MODELS = [
   { id: 'yorha-legal',    owned_by: 'yorha' },   // → canonical local model (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
   { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL)
-  { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // legacy alias, resolved to canonical local model
+  { id: 'ornith-1.5-9b',   owned_by: 'yorha' },   // legacy alias, resolved to canonical local model
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;

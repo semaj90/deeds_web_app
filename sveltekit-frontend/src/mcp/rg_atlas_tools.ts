@@ -4,6 +4,8 @@ import { rgSearchAtlasOptionsSchema } from '../lib/server/rg-atlas/types.js';
 import type { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
+const rgSearchAtlasToolInputSchema = rgSearchAtlasOptionsSchema.omit({ persist: true }).strict();
+
 /**
  * Register RG-Atlas search tools.
  */
@@ -13,8 +15,8 @@ export function registerRgAtlasTools(server: McpServer, dispatcherMiddleware?: D
   server.registerTool(
     'kb.rg_atlas_search',
     {
-      description: 'Execute high-authority deep search using the RG-Atlas pipeline (rg + GPU Karpathy + Qdrant union + MARCO rerank). Better for deep research than standard trace_search.',
-      inputSchema: rgSearchAtlasOptionsSchema
+      description: 'Run an advisory multi-lane repository search. Results are candidates only and are not source-qualified evidence or ContextManifest admission.',
+      inputSchema: rgSearchAtlasToolInputSchema
     },
     createToolWithDispatcher(
       dispatcherMiddleware,
@@ -22,7 +24,7 @@ export function registerRgAtlasTools(server: McpServer, dispatcherMiddleware?: D
       sessionId_rg_atlas_search,
       async (opts) => {
         try {
-          const result = await runRgSearchAtlas(opts as any);
+          const result = await runRgSearchAtlas({ ...(opts as any), persist: false });
           return {
             content: [{
               type: 'text' as const,
@@ -46,6 +48,8 @@ export function registerRgAtlasTools(server: McpServer, dispatcherMiddleware?: D
           };
         }
       }
+    ,
+    'READ_ONLY'
     )
   );
 }

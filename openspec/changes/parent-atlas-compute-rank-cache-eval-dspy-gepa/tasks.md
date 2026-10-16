@@ -161,8 +161,8 @@ must not write to PostgreSQL, Qdrant, Valkey, Neo4j, Graphify, or canonical iden
 - [ ] SUBPROMPT-CENSUS-01 — classify existing prompt/sub-agent surfaces by orchestration, evidence acquisition, and model proposal.
 - [ ] SUBPROMPT-CONTRACT-01 — add a serialized request/response boundary carrying ContextManifest checksum and allowed evidence IDs.
 - [x] SUBPROMPT-REPLAY-01 — add read-only prompt replay mode comparing stable prompt-selection projections and checksums; live ACE-backed replay remains required for runtime proof.
-- [ ] DSPY-SIDECAR-01 — connect the TypeScript evidence owner to an isolated DSPy worker; no store access from the worker.
-- [ ] GEPA-VERSION-01 — prove pinned DSPy/GEPA imports in an isolated WSL2/container environment.
+- [ ] [workstation-p20] DSPY-SIDECAR-01 — connect the TypeScript evidence owner to an isolated DSPy worker; no store access from the worker.
+- [ ] [workstation-p21] GEPA-VERSION-01 — prove pinned DSPy/GEPA imports in an isolated WSL2/container environment.
 - [ ] GEPA-768-INPUT-01 — prove a revision-qualified `semantic_768` retrieval trace converts into
       this change's existing DSPy/GEPA training/eval schema without: (a) raw vector duplication —
       identity is frozen as `source_ref + source_revision + content_hash + representation_revision`,
@@ -181,10 +181,18 @@ must not write to PostgreSQL, Qdrant, Valkey, Neo4j, Graphify, or canonical iden
       it does not optimize the representation). This gate is data/schema work and can be attempted
       read-only, without a live DSPy/GEPA runtime — it does not depend on `DSPY-SIDECAR-01`/
       `GEPA-VERSION-01` passing first, but `GEPA-HELDOUT-01`/`GEPA-SHADOW-01` below depend on it.
-- [ ] GEPA-HELDOUT-01 — freeze train/validation/test IDs and enforce held-out isolation.
-- [ ] GEPA-SHADOW-01 — run a bounded validation-only GEPA experiment with fixed seed, resumable log, and candidate checksum.
+- [ ] [workstation-p21] GEPA-HELDOUT-01 — freeze train/validation/test IDs and enforce held-out isolation.
+- [ ] [workstation-p21] GEPA-SHADOW-01 — run a bounded validation-only GEPA experiment with fixed seed, resumable log, and candidate checksum.
 - [ ] OAK-JUDGE-01 — map real bounded execution receipts to judge feedback and repair suggestions without auto-promotion.
 - [ ] PROMOTION-01 — require human review, held-out non-regression, and an immutable promotion receipt before any candidate is promoted.
+
+### Parent Atlas agent handoff dependency (2026-10-15)
+
+DSPy/GEPA optimize a constrained program or routing policy; they do not own the Parent Atlas agent, retrieval, context admission, tool authorization, or durable task state. The runtime integration owner remains `parent-atlas-ace-rlm-bitfrost-integration` (`agent-execution-spine-v1.ts` for Prime/RLM contracts; ACE/ContextManifest for admitted evidence; governed-compute for deterministic DAG legality).
+
+The production dependency order is: server-owned ContextManifest admission and readback → bounded Prime/RLM caller proof → isolated DSPy worker consuming a serialized evidence-handle request → `semantic_768` trace conversion without raw-vector duplication → pinned GEPA runtime → frozen train/validation/held-out split → shadow-only evaluation → human-reviewed promotion receipt. The Prime/RLM runtime path and offline DSPy/GEPA optimization are separate; feedback from production can become training data only after validator-backed outcome qualification and split assignment. No GEPA result may alter evidence identity, capability permissions, DAG legality, validator truth, or production prompts automatically.
+
+Current evidence remains contract/source-level only: the execution-spine and DSPy-output specs passed 18/18 in the 2026-10-15 focused run; no live Prime caller, DSPy worker, GEPA optimizer run, qualified training cohort, or held-out evaluation was proven. Keep all checkboxes above open until their individual receipts and readbacks exist.
 
 ### Agentic repair evidence admission — 2026-10-07
 
@@ -285,6 +293,13 @@ must not write to PostgreSQL, Qdrant, Valkey, Neo4j, Graphify, or canonical iden
 - Code-only progress: `build_semantic_768_gepa_example_v1()` in `python/parent_atlas_dspy_repair.py` validates the stated metadata-only example shape, rejects missing/placeholder revisions, non-768 representations, lane/executor conflation, and unknown/raw-vector fields, and emits a deterministic checksum over the source/revision/content/representation identity tuple. Focused tests cover admission and fail-closed cases; this is not a live trace or canonical admission proof.
 - Result: `GEPA-768-INPUT-01` remains OPEN. A real admitted trace, explicit duplicate-row handling in the future loader, and semantic-768 ownership reconciliation remain required before marking the gate complete. `DSPY-SIDECAR-01`, `GEPA-VERSION-01`, and held-out/shadow gates remain separate.
 - No database, Qdrant, Valkey, model, or training-artifact writes were performed. The existing export files were read only.
+
+### Workstation P20/P21 owner and runtime recheck — 2026-10-15
+
+- Canonical P20/P21 remain governed by `parent-atlas-governed-compute-fabric`; this change is the secondary DSPy/GEPA evaluation owner. Its phase-tagged tasks are the isolated DSPy sidecar gate and GEPA version, held-out, and shadow gates.
+- Source search confirmed DSPy signatures/modules and a GEPA constructor exist, plus TypeScript/Python output guards. The searched production paths showed no wired TypeScript-to-DSPy worker or executed GEPA optimizer. This remains source-level evidence only; no training/runtime or production prompt mutation occurred.
+- The four Python DSPy output-guard unit cases passed. The adjacent pytest-based Python test could not import because `pytest` is not installed. TypeScript control-plane/output-guard specs passed in the separate 30/30 contract run recorded in the Prime/RLM owner ledger.
+- Keep training/evaluation rows blocked until the admitted, lineage-qualified cohort exists. The old 64-D export audit remains historical and cannot qualify current `semantic_768` data.
 
 ### JEPA / REPRESENTATION-ROSTER-768-01 — forward contract update (2026-09-27)
 

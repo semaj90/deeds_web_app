@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 /**
- * Populate atlas_ast_nodes from codebase_chunk_index.
+ * Dry-run legacy inventory of codebase_chunk_index symbols.
  *
  * Sources:
  *   - codebase_chunk_index rows with symbol + kind → one AST node per row
  *   - ast_symbols JSONB column → additional child nodes per chunk
  *
- * Contract:
- *   atlas_ast_nodes.source_content_hash is the whole-file raw-byte digest.
- *   This producer requires codebase_chunk_index.file_content_hash and never
- *   falls back to a path, symbol, or chunk hash. Missing file digests are
- *   reported in dry-run mode and fail closed before any apply write.
+ * This legacy source does not contain native Tree-sitter node identity,
+ * exact byte spans, or complete source/workspace revision bindings. It is
+ * diagnostic only and must not write canonical atlas_ast_nodes rows.
  *
  * tree_node_id = sha256(repo_id_str \x00 normalized_path \x00 parser_language \x00
  *                        node_kind \x00 qualified_symbol \x00 structural_parent_key \x00
@@ -80,7 +78,7 @@ const pool = new Pool({
 });
 
 const REPO_ID      = 'deeds-web-app';  // used in hash formula and structural keys
-const REPO_UUID    = '00000000-0000-0000-0000-000000000000'; // stored in uuid column
+const LEGACY_REPO_UUID = '00000000-0000-0000-0000-000000000000';
 
 // Map codebase_chunk_index.kind → atlas minimum_ast_kinds
 const KIND_MAP = {
@@ -336,6 +334,11 @@ async function main() {
     await runGraphifyParseProbe();
     return;
   }
+  if (!isDryRun && !isVerify) {
+    throw new Error(
+      'CANONICAL_AST_APPLY_DISABLED: this chunk-derived inventory does not prove native tree_node_id, exact byte spans, repository identity, or source/workspace revisions; use the revision-qualified Tree-sitter writer after its readback gate is implemented.'
+    );
+  }
   const client = await pool.connect();
 
   if (isVerify) {
@@ -516,7 +519,7 @@ async function main() {
             )
             ON CONFLICT DO NOTHING
           `, [
-            n.tree_node_id, n.structural_key, REPO_UUID, n.relative_path,
+            n.tree_node_id, n.structural_key, LEGACY_REPO_UUID, n.relative_path,
             n.node_kind, n.qualified_symbol, n.parser_language, n.normalized_signature,
             n.parent_tree_node_id, n.line_start ?? 0, n.line_end ?? 0,
             n.normalized_node_hash, n.source_content_hash,

@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.p11-primeagent-ornith-rlm-e2e-receipt.v1",
+  "status": "PASS",
+  "generatedAt": "2026-10-15T19:15:00.000Z",
+  "gatesClosed": [
+    "PRIMEAGENT-ORNITH-HANDOFF-01",
+    "ACE-PIPELINE-VERTICAL-READBACK-01",
+    "RLM-E2E-01"
+  ],
+  "writesPerformed": false,
+  "kvCachePersisted": false,
+  "canonicalAuthority": false,
+  "ornithModelResolution": {
+    "endpointReachable": true,
+    "resolvedModelId": "ornith-1.5-9b",
+    "probeMode": "LIVE_8090_V1_MODELS"
+  },
+  "aceVerticalReadback": {
+    "ordinalMapChecksum": "2f4ae0e7842bd72317fee3002e2b67108e061b4d143e9ecf7c6ff382d6249127",
+    "featureSnapshotStatus": "ADMITTED",
+    "contextManifestAdmissionStatus": "ADMITTED",
+    "contextManifestChecksum": "sha256:18c6958ac637133a49ec5045aea2558bf4b0b0b7418cb81dd76f78fbf7e73d73",
+    "selectedNodeKeys": [
+      "dag:prefill:api_routes:10",
+      "dag:prefill:db_schema_vector:30",
+      "dag:prefill:retrieval_search:20",
+      "dag:prefill:ui_svelte5:0"
+    ]
+  },
+  "rlmExecutionProof": {
+    "workingStatePersistenceClass": "EPHEMERAL",
+    "duplicateSubproblemSuppressed": true,
+    "inspectedPrimaryCanonicalId": "dag:prefill:db_schema_vector:30",
+    "inspectedSourceBytes": 1024
+  },
+  "primeAgentSpineReplay": {
+    "planAcceptanceChecksum": "sha256:570380c23e0dacd151d9162888b9ca90c87f533b0c74d2843fe3c18f295b09e2",
+    "replayManifestChecksum": "sha256:aa21a683dc51a967e3a12fcb739e9f23ba956dc7e6b578b45eccfe7f4c4ef983",
+    "finalState": "COMPLETE",
+    "completedSteps": 1,
+    "finalObservationChecksum": "sha256:876fc4b4475fd2edae1997a83d33ba55ba40ee9b17736c32dac38158aefed97e",
+    "toolReceiptCount": 1,
+    "ownerAudit": {
+      "actionRegistryOwner": "AGENTIC_ACTION_REGISTRY_V1_SEED",
+      "contextManifestOwner": "ContextManifestV2 / CurrentAceContextManifestAdmissionV1",
+      "runEventOwner": "WorkflowActionEventV1",
+      "durableReceiptOwner": "AgentWorkReceiptV1 via outcome_ledger",
+      "toolReceiptRole": "NON_CANONICAL_STEP_TRANSPORT_RECEIPT",
+      "sourceActionCount": 13,
+      "secondContextManifestCompiler": false,
+      "secondCapabilityRegistryAuthority": false,
+      "canonicalAuthority": false
+    }
+  },
+  "dagPrefillAndDspyBoundary": {
+    "orderedOrdinals": [
+      30,
+      20,
+      10,
+      0
+    ],
+    "promptPlanChecksum": "2996a654b71a9f7e8d101a91789082053389472efffca6c1d8c088e94417ea93",
+    "dspyAdmittedTargets": [
+      "dag:prefill:db_schema_vector:30",
+      "dag:prefill:retrieval_search:20",
+      "dag:prefill:api_routes:10",
+      "dag:prefill:ui_svelte5:0"
+    ]
+  }
+}

@@ -22,7 +22,14 @@ import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 const root = process.cwd();
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const limit = Math.max(1, Math.min(Number.parseInt(limitArg?.split('=')[1] ?? '10', 10) || 10, 100));
-const reportPath = path.resolve(root, 'docs/reports/packet-chunk-lineage-promotion-preflight-v1.json');
+const reportPathArg = process.argv.find((arg) => arg.startsWith('--report-path='))?.split('=')[1] ?? null;
+const defaultReportPath = path.resolve(root, 'docs/reports/packet-chunk-lineage-promotion-preflight-v1.json');
+const reportPath = reportPathArg ? path.resolve(root, reportPathArg) : defaultReportPath;
+if (reportPathArg) {
+  const scratchRoot = path.resolve(root, '.tmp', 'atlas') + path.sep;
+  if (!reportPath.startsWith(scratchRoot)) throw new Error('REPORT_OVERRIDE_MUST_BE_UNDER_TMP_ATLAS');
+}
+if (fs.existsSync(reportPath)) throw new Error('REFUSING_TO_OVERWRITE_EXISTING_PREFLIGHT_RECEIPT');
 const ownerPlanPath = path.resolve(root, 'docs/reports/current-graphify-execution-owner-resolution-v1.json');
 const ownerPlan = fs.existsSync(ownerPlanPath)
   ? JSON.parse(fs.readFileSync(ownerPlanPath, 'utf8'))
@@ -30,9 +37,8 @@ const ownerPlan = fs.existsSync(ownerPlanPath)
 const executionId = process.argv.find((arg) => arg.startsWith('--execution-id='))?.split('=')[1]
   ?? ownerPlan?.existingCanonicalOwner?.executionId
   ?? null;
-const requestedRunId = process.argv.find((arg) => arg.startsWith('--run-id='))?.split('=')[1]
-  ?? ownerPlan?.existingCanonicalOwner?.legacyGraphifyRunId
-  ?? null;
+const requestedRunIdArg = process.argv.find((arg) => arg.startsWith('--run-id='))?.split('=')[1] ?? null;
+let requestedRunId = requestedRunIdArg;
 const workspaceRevision = process.argv.find((arg) => arg.startsWith('--workspace-revision='))?.split('=')[1]
   ?? ownerPlan?.existingCanonicalOwner?.workspaceRevision
   ?? ownerPlan?.candidates?.find((candidate) => candidate.execution_id === executionId)?.workspace_revision
@@ -43,8 +49,14 @@ let candidates = [];
 let databaseError = null;
 let executionBridge = null;
 let joinFunnel = null;
+let client = null;
+let transactionOpened = false;
+let transactionRolledBack = false;
 try {
-  const executionResult = await pool.query(
+  client = await pool.connect();
+  await client.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
+  transactionOpened = true;
+  const executionResult = await client.query(
     `SELECT execution_id::text, legacy_graphify_run_id::text, workspace_revision::text,
             canonical_authority
        FROM graphify_executions
@@ -52,15 +64,20 @@ try {
     [executionId],
   );
   const execution = executionResult.rows[0] ?? null;
+  requestedRunId ??= execution?.legacy_graphify_run_id ?? null;
+  const linkedRunIdMatches = requestedRunId === (execution?.legacy_graphify_run_id ?? null);
   executionBridge = {
     executionFound: Boolean(execution),
     legacyGraphifyRunId: execution?.legacy_graphify_run_id ?? null,
+    requestedRunId,
+    linkedRunIdMatches,
     canonicalAuthority: execution?.canonical_authority === true,
     status: !execution ? 'EXECUTION_NOT_FOUND' : !execution.legacy_graphify_run_id
       ? 'EXECUTION_RUN_BRIDGE_MISSING'
-      : execution.canonical_authority !== true ? 'EXECUTION_NOT_CANONICAL' : 'BRIDGE_AVAILABLE',
+      : !linkedRunIdMatches ? 'EXECUTION_RUN_ID_MISMATCH'
+        : execution.canonical_authority !== true ? 'EXECUTION_NOT_CANONICAL' : 'BRIDGE_AVAILABLE',
   };
-  const funnelResult = await pool.query(`
+  const funnelResult = await client.query(`
     WITH members AS (
       SELECT source_ref, code_source_revision, content_hash
       FROM public.graphify_execution_file_membership_v2
@@ -152,7 +169,7 @@ try {
                       ? 'CHUNK_REVISION_MISMATCH'
                       : 'QUALIFIED';
   }
-  const { rows } = await pool.query(`
+  const { rows } = await client.query(`
     SELECT
       m.source_ref,
       m.code_source_revision,
@@ -183,7 +200,7 @@ try {
   // Resolve packet identity in one bounded-independent canonical read. The
   // packet table remains the identity owner; keeping normalization out of the
   // large chunk join avoids an unindexed expression join and timeout.
-  const packetResult = await pool.query(`
+  const packetResult = await client.query(`
     SELECT packet_key::text AS packet_key, source_ref, source_revision,
            content_hash, workspace_revision_key AS workspace_revision,
            lineage_binding_checksum
@@ -256,6 +273,15 @@ try {
 } catch (error) {
   databaseError = error instanceof Error ? error.message : String(error);
 } finally {
+  if (client && transactionOpened) {
+    try {
+      await client.query('ROLLBACK');
+      transactionRolledBack = true;
+    } catch (rollbackError) {
+      databaseError ??= rollbackError instanceof Error ? rollbackError.message : String(rollbackError);
+    }
+  }
+  client?.release();
   await pool.end();
 }
 
@@ -291,7 +317,10 @@ const report = {
   writesPerformed: false,
   canonicalAuthority: false,
   promotionAuthorized: false,
-  rollback: 'Transaction rollback before commit; no transaction was opened by this preflight.',
+  databaseTransaction: 'REPEATABLE READ READ ONLY',
+  transactionOpened,
+  transactionRolledBack,
+  rollback: transactionRolledBack ? 'The read-only transaction was explicitly rolled back before receipt publication.' : 'No successful read-only transaction rollback was confirmed.',
   preflightChecksum: `sha256:${crypto.createHash('sha256').update(JSON.stringify(deterministicBody)).digest('hex')}`,
 };
 fs.mkdirSync(path.dirname(reportPath), { recursive: true });

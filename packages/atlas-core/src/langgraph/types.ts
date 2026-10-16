@@ -107,8 +107,8 @@ export const agentDefinitionSchema = z.object({
 
   /** Which llama-server / Ollama model policy this agent uses */
   modelPolicy: z.enum([
-    'gemma4-legal-iq4xs',     // canonical reasoning — llama-server :8090
-    'gemma4-rotorquant',      // Ollama fallback
+    'ornith-1.5-9b',     // canonical reasoning — llama-server :8090
+    'ornith-1.5-9b',      // Ollama fallback
     'gemma4-fast',            // short-context fast tasks
   ]),
 
@@ -145,7 +145,7 @@ export const AGENT_DEFINITIONS: Record<string, AgentDefinition> = {
   'query-analysis-agent': {
     agentId: 'query-analysis-agent',
     version: '1.0.0',
-    modelPolicy: 'gemma4-legal-iq4xs',
+    modelPolicy: 'ornith-1.5-9b',
     allowedTools: ['trace.kag_search', 'context.build_kv_packet'],
     maxIterations: 3,
     timeoutMs: 30_000,
@@ -155,7 +155,7 @@ export const AGENT_DEFINITIONS: Record<string, AgentDefinition> = {
   'retrieval-planner-agent': {
     agentId: 'retrieval-planner-agent',
     version: '1.0.0',
-    modelPolicy: 'gemma4-legal-iq4xs',
+    modelPolicy: 'ornith-1.5-9b',
     allowedTools: ['trace.kag_search', 'topology.search_near', 'clusters.get_summary_lenses'],
     maxIterations: 5,
     timeoutMs: 60_000,
@@ -165,7 +165,7 @@ export const AGENT_DEFINITIONS: Record<string, AgentDefinition> = {
   'code-investigator-agent': {
     agentId: 'code-investigator-agent',
     version: '1.0.0',
-    modelPolicy: 'gemma4-legal-iq4xs',
+    modelPolicy: 'ornith-1.5-9b',
     allowedTools: ['trace.kag_search', 'graph.expand_neighborhood', 'graph.shortest_path'],
     maxIterations: 10,
     timeoutMs: 120_000,
@@ -175,7 +175,7 @@ export const AGENT_DEFINITIONS: Record<string, AgentDefinition> = {
   'patch-proposer-agent': {
     agentId: 'patch-proposer-agent',
     version: '1.0.0',
-    modelPolicy: 'gemma4-legal-iq4xs',
+    modelPolicy: 'ornith-1.5-9b',
     allowedTools: ['trace.kag_search', 'context.build_kv_packet'],
     maxIterations: 5,
     timeoutMs: 90_000,
@@ -195,7 +195,7 @@ export const AGENT_DEFINITIONS: Record<string, AgentDefinition> = {
   'evidence-review-agent': {
     agentId: 'evidence-review-agent',
     version: '1.0.0',
-    modelPolicy: 'gemma4-legal-iq4xs',
+    modelPolicy: 'ornith-1.5-9b',
     allowedTools: ['trace.kag_search', 'trace.explain_retrieval'],
     maxIterations: 5,
     timeoutMs: 60_000,

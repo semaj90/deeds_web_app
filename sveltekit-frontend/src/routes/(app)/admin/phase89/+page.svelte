@@ -605,7 +605,7 @@ cluster_id: cluster.cluster_id,
 						<li>📊 Embeddings: embeddinggemma, latest (768-dim)</li>
 						<li>💾 Cache: Redis (7-day TTL)</li>
 						<li>🎯 Clustering: DBSCAN with cosine similarity</li>
-						<li>🧠 Summarization: gemma4-legal</li>
+						<li>🧠 Summarization: ornith-1.5-9b</li>
 					</ul>
 				</div>
 			</section>
@@ -661,7 +661,7 @@ cluster_id: cluster.cluster_id,
 					<!-- Ollama narrative -->
 					{#if analysisData.analysis}
 						<div class="ollama-summary">
-							<span class="ollama-badge">gemma4-legal</span>
+							<span class="ollama-badge">ornith-1.5-9b</span>
 							<p>{analysisData.analysis}</p>
 						</div>
 					{/if}

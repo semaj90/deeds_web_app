@@ -7,7 +7,7 @@ import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { resolveLlamaInferenceTarget } from '$lib/server/llm/runtime-contract.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { getRedis } from '$lib/server/redis.js';
 import { z } from 'zod';

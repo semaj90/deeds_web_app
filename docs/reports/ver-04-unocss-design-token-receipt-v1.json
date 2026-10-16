@@ -1,0 +1,194 @@
+{
+  "schema": "atlas.ver04-unocss-design-token-receipt.v1",
+  "generatedAt": "2026-10-16T01:05:57.272Z",
+  "openspecChange": "visual-element-rendering",
+  "testCommand": "node scripts/atlas/prove-ver01-ver02-ver04-visual-rendering-v1.mjs",
+  "writesPerformed": false,
+  "unoConfigSha256": "sha256:376f0d1e695d02787b9f813d08f9875d25772a566874004ca8a20b6a441d7d4b",
+  "tokenInventory": [
+    {
+      "token": "accent",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "accentSoft",
+      "definedInUnoConfig": false
+    },
+    {
+      "token": "sand",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "sandDark",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "panel",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "panelSoft",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "app-bg",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "danger",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "warning",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "info",
+      "definedInUnoConfig": true
+    },
+    {
+      "token": "research-accent-soft",
+      "definedInUnoConfig": true
+    }
+  ],
+  "shortcutInventory": [
+    {
+      "shortcut": "app-bg",
+      "definedInUnoConfig": true
+    },
+    {
+      "shortcut": "panel",
+      "definedInUnoConfig": false
+    },
+    {
+      "shortcut": "btn",
+      "definedInUnoConfig": false
+    },
+    {
+      "shortcut": "btn-base",
+      "definedInUnoConfig": false
+    },
+    {
+      "shortcut": "btn-primary",
+      "definedInUnoConfig": true
+    },
+    {
+      "shortcut": "nes-tags",
+      "definedInUnoConfig": true
+    },
+    {
+      "shortcut": "tag",
+      "definedInUnoConfig": false
+    }
+  ],
+  "missingTokensNote": "accentSoft is not a top-level theme.colors key (research-accent-soft, amberSoft, inkSoft, panelSoft exist); btn-base and tag are not top-level shortcuts (btn, btn-primary, nes-tags exist).",
+  "cohortSize": 9,
+  "cohortSummary": {
+    "totalInlineStyles": 0,
+    "totalArbitraryHex": 11,
+    "totalSemanticElements": 8,
+    "totalLegacySlots": 0
+  },
+  "componentAudits": [
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/AccessibilityPanel.svelte",
+      "sha256": "sha256:53bac27bf13d07efa7d3eac5c4d05658edb20721ceb598b52ac536083669ee91",
+      "bytes": 4838,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 1,
+      "childSnippetCount": 0,
+      "semanticElementCount": 4,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Button.svelte",
+      "sha256": "sha256:ce645d82647f6a3fd798d0c81d9c559d13cc5aea90a50ad5e1e3ddc85a10caf1",
+      "bytes": 1901,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 1,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Modal.svelte",
+      "sha256": "sha256:74ab4a701513ee1afcb8c9bb635ec332817c23c721a650227dc8993e9b874bac",
+      "bytes": 5861,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 1,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Tooltip.svelte",
+      "sha256": "sha256:d3a0b045bb92ecc5f85a828977b7e4dca2862dd40daad97daee37ec402a5d9ef",
+      "bytes": 1181,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 1,
+      "childSnippetCount": 0,
+      "semanticElementCount": 0,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Badge.svelte",
+      "sha256": "sha256:fc133c798cec7400e84a24422f4c2189987fbad046f85f2018879102f6b02126",
+      "bytes": 1187,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 0,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Card.svelte",
+      "sha256": "sha256:67bcf2ca7d2ee28d22de45bfb2f19b8c0c62a7f17b07f6da9afce17d709e0a1b",
+      "bytes": 884,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 0,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Select.svelte",
+      "sha256": "sha256:c77066be94feea9f4d5c5e86796153f2cf338fb10ee735213b985e60ba010313",
+      "bytes": 1168,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 6,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 0,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Checkbox.svelte",
+      "sha256": "sha256:c97de4b47ba6fcb8d1c260e042171acc65352e7683b7c49d0a5f05d51dc9e3f1",
+      "bytes": 1478,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 5,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 1,
+      "legacySlotCount": 0
+    },
+    {
+      "file": "sveltekit-frontend/src/lib/components/ui/Dialog.svelte",
+      "sha256": "sha256:ad76bd7c403f8b3ff54343136702878377372712fb10248689e8a2e069badb29",
+      "bytes": 2650,
+      "inlineStyleCount": 0,
+      "arbitraryHexCount": 0,
+      "bitsUiNamespaceImports": 0,
+      "childSnippetCount": 0,
+      "semanticElementCount": 1,
+      "legacySlotCount": 0
+    }
+  ],
+  "status": "PROVEN"
+}

@@ -355,7 +355,7 @@
 				<div class="chat-msg">
 					<p class="chat-text">The statute of limitations for fraud under 18 U.S.C. § 1341 is 5 years from the date of the offense.</p>
 					<div class="chat-meta">
-						<span class="chat-source">gemma4-legal</span>
+						<span class="chat-source">ornith-1.5-9b</span>
 						<ChatFeedback messageIndex={0} source="demo" onfeedback={handleFeedback} />
 					</div>
 				</div>

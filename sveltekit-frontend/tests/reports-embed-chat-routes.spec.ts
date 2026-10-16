@@ -74,9 +74,9 @@ const mockOllamaFetch = vi.fn();
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	ollamaFetch: (...args: unknown[]) => mockOllamaFetch(...args),
+	embedOrChatFetch: (...args: unknown[]) => mockOllamaFetch(...args),
 }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -667,7 +667,7 @@ describe('/api/summarize (POST)', () => {
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.summary).toBe('The court held that the defendant was liable for damages.');
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe('ornith-1.5-9b');
 		expect(data.confidence).toBeGreaterThan(0.5);
 	});
 
@@ -826,7 +826,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'In tort law, negligence requires duty, breach, causation, and damages.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -837,7 +837,7 @@ describe('/api/chat (POST)', () => {
 		const data = await res.json();
 		expect(res.status).toBe(200);
 		expect(data.response).toContain('negligence');
-		expect(data.model).toBe('gemma4-rotorquant:latest');
+		expect(data.model).toBe('ornith-1.5-9b');
 	});
 
 	it('supports messages array format', async () => {
@@ -845,7 +845,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'Yes, that is correct.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -869,7 +869,7 @@ describe('/api/chat (POST)', () => {
 			ok: true,
 			json: async () => ({
 				message: { content: 'Legal response here.' },
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			}),
 		});
 
@@ -886,7 +886,7 @@ describe('/api/chat (POST)', () => {
 		const { trackTokenUsage } = await import('$lib/server/ai/token-tracker.js');
 		mockOllamaFetch.mockResolvedValueOnce({
 			ok: true,
-			json: async () => ({ message: { content: 'Response' }, model: 'gemma4-rotorquant:latest' }),
+			json: async () => ({ message: { content: 'Response' }, model: 'ornith-1.5-9b' }),
 		});
 
 		await POST({
@@ -896,7 +896,7 @@ describe('/api/chat (POST)', () => {
 		expect(trackTokenUsage).toHaveBeenCalledWith(
 			expect.objectContaining({
 				endpoint: '/api/chat',
-				model: 'gemma4-rotorquant:latest',
+				model: 'ornith-1.5-9b',
 			})
 		);
 	});

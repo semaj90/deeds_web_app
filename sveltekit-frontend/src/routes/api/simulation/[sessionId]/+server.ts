@@ -14,7 +14,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaChatEndpoint } from '$lib/server/ollama.js';
+import { embedOrChatFetch, getLlamaChatEndpoint } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import type { SimulationSession } from '../+server';
 
@@ -383,7 +383,7 @@ RULES:
 		: `Recent proceedings:\n${recentDialogue}\n\nContinue the ${phase.replace(/_/g, ' ')} phase. Deliver your next statement as ${speaker}.`;
 
 	try {
-		const res = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
+		const res = await embedOrChatFetch(`${getLlamaChatEndpoint()}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

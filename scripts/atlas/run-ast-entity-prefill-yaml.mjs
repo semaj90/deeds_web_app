@@ -8,6 +8,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { deriveTreeNodeOccurrenceId } from './lib/tree-node-occurrence-v1.mjs';
+import { buildAstEntityPrefillIdentityEnvelopeV1 } from './lib/ast-entity-identity-envelope-v1.mjs';
 import { isSha256SourceRevisionV1, sourceBytesMatchRevisionV1 } from './lib/source-byte-revision-v1.mjs';
 import { classifyAstPrefillDeclarationV1 } from './lib/ast-prefill-declaration-classification-v1.mjs';
 import { resolveAstGrepExtractorRevisionV1 } from './lib/ast-grep-extractor-revision-v1.mjs';
@@ -140,17 +141,14 @@ function extract(text, file, packet) {
         const signature = node.text().split('{', 1)[0].trim().slice(0, 512);
         const startByte = utf8ByteOffset(text, range.start.index);
         const endByte = utf8ByteOffset(text, range.end.index);
-        // S01-09D forward fix: `...packet` below carries the PACKET's own tree_node_id, which is one value per
-        // FILE, not per declaration (root cause: docs/reports/tree-node-occurrence-producer-census-v1.json).
-        // Every declaration row must override it with a genuinely declaration-scoped occurrence id, derived from
-        // (sourceRef, sourceRevision, nodeType, startByte, endByte) -- never inherited verbatim from the packet.
         const resolvedPath = path.relative(ROOT, file).replaceAll('\\', '/');
         const occurrenceId = deriveTreeNodeOccurrenceId({
           sourceRef: packet.source_ref, sourceRevision: packet.source_revision ?? '',
           nodeType: node.kind(), startByte, endByte,
         });
         rows.push({
-          schema: 'atlas.ast-entity-prefill-row.v2', ...packet,
+          schema: 'atlas.ast-entity-prefill-row.v2',
+          ...buildAstEntityPrefillIdentityEnvelopeV1(packet, occurrenceId),
           resolved_path: resolvedPath,
           language: path.extname(file).toLowerCase().replace('.', ''),
           symbol_name: declaration.symbolName, symbol_kind: declaration.symbolKind,
@@ -161,12 +159,6 @@ function extract(text, file, packet) {
           end_byte: endByte,
           start_line: range.start.line + 1, start_column: range.start.column,
           end_line: range.end.line + 1, end_column: range.end.column,
-          // Declaration-scoped occurrence identity (S01-09D) -- overrides the packet-level tree_node_id the
-          // `...packet` spread above would otherwise leave file-scoped. packet_tree_node_id preserves the
-          // original packet-level value for provenance/debugging only; it is never used as occurrence identity.
-          tree_node_id: occurrenceId,
-          tree_node_occurrence_id: occurrenceId,
-          packet_tree_node_id: packet.tree_node_id ?? null,
           extractor: 'ast-grep', extractor_revision: astGrepExtractorRevision,
           prefill_pipeline_revision: astPrefillPipelineRevision,
           identity_status: packet.identity_status ?? 'CANDIDATE', canonical_symbol_id: null, symbol_version_id: null,

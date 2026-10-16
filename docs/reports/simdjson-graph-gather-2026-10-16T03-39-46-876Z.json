@@ -1,0 +1,127 @@
+{
+  "observedAt": "2026-10-16T03:39:45.985Z",
+  "schema": "atlas.simdjson-graph-gather.v1",
+  "status": "CPU_CUDA_FIXTURE_PARITY_PASSED",
+  "inputKind": "NUMERICAL_FIXTURE",
+  "canonicalAuthority": false,
+  "promotionAuthorized": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "inputChecksums": {
+    "graph": "sha256:773a006e56e96aa1083a37929dbd10a3b7b7d0df588308a35e89a75c2433e31c",
+    "embeddings": "sha256:1c52d3fd16fbfd2ae4ac8aa73ce699355966676d712124cd73d13df2741607ee",
+    "query": "sha256:e61a2e3c81d6733c0f44e35ebb53f04f82a640202c6657e4fdeadd95a28857ff"
+  },
+  "parserBackend": "icelake (Intel/AMD AVX512)",
+  "arrayMetrics": {
+    "embeddings": {
+      "computation": "CPU_FLOAT64_ACCUMULATION",
+      "dtype": "float32",
+      "shape": [
+        4,
+        768
+      ],
+      "elementCount": 3072,
+      "byteLength": 12288,
+      "minimum": -1,
+      "maximum": 1,
+      "mean": 0.0007812500116415303,
+      "populationVariance": 0.0013014729972746864,
+      "zeroCount": 3067,
+      "zeroFraction": 0.9983723958333334,
+      "rowL2Norms": [
+        1,
+        1.000000023841858,
+        1,
+        1
+      ]
+    },
+    "query": {
+      "computation": "CPU_FLOAT64_ACCUMULATION",
+      "dtype": "float32",
+      "shape": [
+        1,
+        768
+      ],
+      "elementCount": 768,
+      "byteLength": 3072,
+      "minimum": 0,
+      "maximum": 1,
+      "mean": 0.0013020833333333354,
+      "populationVariance": 0.0013003879123263896,
+      "zeroCount": 767,
+      "zeroFraction": 0.9986979166666666,
+      "rowL2Norms": [
+        1
+      ]
+    }
+  },
+  "cpu": {
+    "csrParity": true,
+    "bfsParity": true,
+    "queryExtractionParity": true,
+    "utf8BoundaryFixtureParity": true,
+    "candidateOrdinals": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "topK": [
+      {
+        "ordinal": 0,
+        "score": 1
+      },
+      {
+        "ordinal": 1,
+        "score": 0.7999999928474427
+      },
+      {
+        "ordinal": 2,
+        "score": 0
+      }
+    ]
+  },
+  "gpu": {
+    "status": "PARITY_PASSED",
+    "preflightFreeBytes": 6364856320,
+    "reserveBytes": 2147483648,
+    "estimatedWorkingBytes": 268496896,
+    "telemetry": {
+      "transferDurationMs": 20.0454,
+      "kernelDurationMs": 341.2832,
+      "totalDurationMs": 361.32860000000005,
+      "candidateCount": 4,
+      "dim": 768,
+      "backend": "cuda_libtorch"
+    },
+    "gatheredArrayMetrics": {
+      "computation": "CPU_FLOAT64_ACCUMULATION",
+      "dtype": "float32",
+      "shape": [
+        4,
+        768
+      ],
+      "elementCount": 3072,
+      "byteLength": 12288,
+      "minimum": -1,
+      "maximum": 1,
+      "mean": 0.0007812500116415303,
+      "populationVariance": 0.0013014729972746864,
+      "zeroCount": 3067,
+      "zeroFraction": 0.9983723958333334,
+      "rowL2Norms": [
+        1,
+        1.000000023841858,
+        1,
+        1
+      ]
+    },
+    "freeBytesBefore": 7472152576,
+    "freeBytesAfter": 7415529472,
+    "transfers": "Supplied full embedding matrix, candidate indices and query; no persistent residency proof",
+    "tensorRtInferenceExercised": false
+  },
+  "evidenceAdmission": "NOT_EXERCISED",
+  "preflightError": null
+}

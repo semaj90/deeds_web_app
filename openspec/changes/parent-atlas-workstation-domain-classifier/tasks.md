@@ -271,6 +271,23 @@ Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`.
 Evidence: `docs/reports/domain-classifier-parity-v1.json`,
 `sveltekit-frontend/src/lib/server/ace/features/domain-classifier-parity-v1.ts`.
 
+## P13 current-cohort and contract recheck (2026-10-15)
+
+- [x] Re-ran the bounded admission planner against the already selected
+  Graphify execution `74d50c86-8194-45ea-8c3d-61aab737ef83` and workspace
+  `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc`:
+  `node scripts/atlas/plan-domain-classifier-cohort-admission-v1.mjs --execution-id 74d50c86-8194-45ea-8c3d-61aab737ef83 --workspace-revision sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc --limit 35`; exit `0`, actual selected row count `13`, `6 PACKET_MISSING`, `4 CONTENT_DIGEST_MISMATCH`, `3 PACKET_AMBIGUOUS`, `promotionEligible=false`, `writesPerformed=false`.
+- [x] Re-ran focused tests:
+  `npx vitest run src/lib/server/atlas/domain-classification-adapter-v1.spec.ts src/lib/server/atlas/domain-taxonomy.spec.ts src/lib/server/atlas/classifier-feature-manifest.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose`; exit `0`, 3 files / 15 tests passed.
+- [ ] Do not train, export, promote, or wire classifier output as canonical labels. Fixture/contract tests pass, but the selected real cohort still has zero eligible rows; resolve packet lineage, source digest mismatches, and ambiguous identities before a new frozen training/evaluation cohort is admitted.
+
+Evidence: `docs/reports/domain-classifier-cohort-admission-v1.json`
+(generated `2026-10-15T20:12:49.105Z`, SHA-256
+`A9EB9AFEC7CE5756610EC40D4F7D9C925FCE13B46E7982031881E40BA88F9EC9`). The
+planner used a repeatable-read, read-only PostgreSQL transaction and writes
+only its local diagnostic report; it did not modify PostgreSQL or classifier
+state. Status remains `PARTIAL / TRAINING BLOCKED`.
+
 - [x] Hardened the admission planner so it no longer derives an expected `packet_key` from
   `source_ref`. Packet identity must come from the canonical PostgreSQL packet row; UUIDv5
   namespace keys remain a separate projection/index concern and cannot participate in

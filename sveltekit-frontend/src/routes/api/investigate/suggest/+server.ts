@@ -16,7 +16,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { embedOrChatFetch, getLlamaGenerationEndpoint } from '$lib/server/ollama.js';
 
 /** GBNF-constrained response schema for investigation suggestions */
 const suggestResponseSchema = z.array(z.object({
@@ -81,7 +81,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// 3. Generate follow-up investigation suggestions with confidence ranking via Ollama
 		let suggestedQueries: Array<{ query: string; confidence: number; reason: string }> = [];
 		try {
-			const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+			const res = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({

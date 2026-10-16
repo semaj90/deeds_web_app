@@ -1157,7 +1157,7 @@ export class ChatSession {
   }
 
   /**
-   * Server SSE inference via /api/sse/chat (Ollama gemma4-rotorquant:latest + RAG).
+   * Server SSE inference via /api/sse/chat (Ollama ornith-1.5-9b + RAG).
    */
   private async _handleServerInference(
     message: string,

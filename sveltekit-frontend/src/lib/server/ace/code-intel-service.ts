@@ -714,7 +714,7 @@ async function materializeDomainCentroids(redis: Redis): Promise<void> {
     for (const [domain, centroid] of Object.entries(centroids)) {
       await redis.setex(
         `corpus:centroids:${domain}`,
-        86400, // 24h TTL
+        604800, // 7-day TTL (rebuildable centroid cache; Valkey volatile-lru evicts it under pressure)
         JSON.stringify({
           domain,
           centroid: centroid.map(v => Number(v.toFixed(6))),

@@ -25,7 +25,7 @@ import { storeCachedResponse } from '$lib/server/ai/llm-cache.js';
 import { ENV } from '$lib/server/env.server.js';
 import { isAdminRole } from '$lib/server/auth-utils.js';
 import type { Handle, HandleServerError } from '@sveltejs/kit';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
@@ -544,7 +544,7 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
 
   // Quick connectivity check — skip entirely if Ollama is unreachable
   try {
-    const ping = await ollamaFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    const ping = await embedOrChatFetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
     if (!ping.ok) return { status: 'skipped', reason: `Ollama returned ${ping.status}` };
   } catch {
     return { status: 'skipped', reason: 'Ollama unreachable' };
@@ -587,7 +587,7 @@ async function warmupLLMCache(): Promise<WarmupStatus> {
 
   for (const item of commonQueries) {
     try {
-      const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+      const embedRes = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: EMBEDDING_MODEL, prompt: item.query }),

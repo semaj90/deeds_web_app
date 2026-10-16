@@ -7,7 +7,7 @@
     query: string; model?: string; intent?: string; endpoint?: string;
     contextIds?: string[]; onToken: (t: string) => void; onDone: () => void; onError: (e: Error) => void;
   }) {
-    const { query, model = 'gemma4-legal:latest', intent = 'legal-analysis',
+    const { query, model = 'ornith-1.5-9b', intent = 'legal-analysis',
       endpoint = '/api/sse/chat', contextIds = [], onToken, onDone, onError } = opts;
     try {
       ragStatus = 'streaming';
@@ -115,7 +115,7 @@
       let responseContent = '';
       await streamRag({
         query,
-        model: 'gemma4-legal',
+        model: 'ornith-1.5-9b',
         intent: getIntentForRole(userRole),
         endpoint: '/api/rag/stream',
         contextIds: evidenceItems.map((item) => item.id),

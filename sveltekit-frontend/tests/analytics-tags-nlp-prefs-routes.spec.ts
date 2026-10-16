@@ -132,7 +132,7 @@ vi.mock('$lib/server/ai/token-tracker.js', () => ({
     promptTokens: 30000,
     completionTokens: 20000,
     requestCount: 200,
-    byModel: { 'gemma4-rotorquant:latest': { tokens: 50000, requests: 200 } },
+    byModel: { 'ornith-1.5-9b': { tokens: 50000, requests: 200 } },
   })),
 }));
 
@@ -195,9 +195,9 @@ vi.mock('$lib/server/ace/tag-sync.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-  ollamaFetch: vi.fn(async () => ({
+  embedOrChatFetch: vi.fn(async () => ({
     ok: true,
     json: async () => ({ embeddings: [[0.1, 0.2, 0.3]] }),
   })),
@@ -686,8 +686,8 @@ describe('/api/tags/search (GET)', () => {
   });
 
   it('returns 503 when embedding fails', async () => {
-    const { ollamaFetch } = await import('$lib/server/ollama.js');
-    (ollamaFetch as any).mockResolvedValueOnce({ ok: false });
+    const { embedOrChatFetch } = await import('$lib/server/ollama.js');
+    (embedOrChatFetch as any).mockResolvedValueOnce({ ok: false });
 
     const res = await GET({
       url: mkUrl('/api/tags/search', { q: 'test' }),

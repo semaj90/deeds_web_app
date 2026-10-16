@@ -1,0 +1,220 @@
+{
+  "schema": "atlas.polyglot-aten-dspy-gepa-oak-receipt.v1",
+  "status": "PASS",
+  "generatedAt": "2026-10-15T19:05:00Z",
+  "writesPerformed": false,
+  "kvCachePersisted": false,
+  "canonicalAuthority": false,
+  "plane1_tieredMemoryHierarchy": {
+    "tier0ColdStore": {
+      "backing": "NVMe .f32bin",
+      "path": "sveltekit-frontend/data/atlas-tensor-proof/retrieval_dag_prefill_768.f32bin",
+      "totalBytes": 153600,
+      "sha256": "00c838c8fb5098161ec919421299bafdefc9521bc250df629787ba59da534afd"
+    },
+    "tier1WarmBank": {
+      "backing": "Host Pinned RAM (cudaHostAlloc / pin_memory) + NES LUT JSON",
+      "lutRevision": "atlas.retrieval-dag-prefill-lut.rev1",
+      "lutChecksumSha256": "36eed1e0f905d2cca8f792ddb2db68944408efe1115322c1190e8da58166c687",
+      "entryCount": 50
+    },
+    "tier2HotScratchpad": {
+      "backing": "GPU VRAM Scratchpad via non_blocking DMA + ATen contiguous tensor",
+      "selectedTierStrategy": "PS2_VU1_DOUBLE_BUFFER_DMA"
+    }
+  },
+  "plane2_polyglotSubhelperAudit": {
+    "totalAuditedEntries": 50,
+    "languageDistribution": {
+      "svelte": 10,
+      "typescript": 40
+    },
+    "dma4ByteAlignedCount": 50,
+    "unalignedDmaCount": 0,
+    "orphanedDependencyEdges": 0,
+    "subhelperAuditPassCount": 50,
+    "meanTokenSavingsRatio": 0.8862,
+    "minTokenSavingsRatio": 0.7019,
+    "tokenSavingsGateThreshold": 0.65,
+    "sampleEntries": [
+      {
+        "ordinal": 30,
+        "feature_label": "dag:prefill:db_schema_vector:30",
+        "bitmask_id": 1073741824,
+        "compressed_synopsis": "[30:DB_SCHEMA_VECTOR:additional-tables.ts] syms=evidenceChainOfCustody deps=root",
+        "rlm_pointer_tag": "<rlm_call label=\"dag:prefill:db_schema_vector:30\" />",
+        "dma_offset_bytes": 92160,
+        "dma_length_bytes": 3072,
+        "vector_sha256": "fc6c53e6bb0cdb77b98a5c5ddc06392a91cbf96b9db68ee26dac92a3b0e20076",
+        "raw_span_bytes": 1024,
+        "synopsis_bytes": 80,
+        "token_savings_ratio": 0.9219,
+        "dependencies": [],
+        "subhelper_audit": {
+          "file_path": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+          "language": "typescript",
+          "ast_node_count": 42,
+          "cyclomatic_complexity": 1,
+          "has_unbounded_loops": false,
+          "dma_aligned_bytes": true,
+          "audit_passed": true
+        }
+      },
+      {
+        "ordinal": 20,
+        "feature_label": "dag:prefill:retrieval_search:20",
+        "bitmask_id": 1048576,
+        "compressed_synopsis": "[20:RETRIEVAL_SEARCH:ace-retrieval-logger.ts] syms=ace-retrieval-logger deps",
+        "rlm_pointer_tag": "<rlm_call label=\"dag:prefill:retrieval_search:20\" />",
+        "dma_offset_bytes": 61440,
+        "dma_length_bytes": 3072,
+        "vector_sha256": "5680cac761a609fe10e638afba8455cf5d052ee1217b9640a7f8418bb7a29bf7",
+        "raw_span_bytes": 256,
+        "synopsis_bytes": 76,
+        "token_savings_ratio": 0.7031,
+        "dependencies": [
+          "dag:prefill:db_schema_vector:30"
+        ],
+        "subhelper_audit": {
+          "file_path": "sveltekit-frontend/src/lib/server/retrieval/ace-retrieval-logger.ts",
+          "language": "typescript",
+          "ast_node_count": 2,
+          "cyclomatic_complexity": 1,
+          "has_unbounded_loops": false,
+          "dma_aligned_bytes": true,
+          "audit_passed": true
+        }
+      },
+      {
+        "ordinal": 10,
+        "feature_label": "dag:prefill:api_routes:10",
+        "bitmask_id": 1024,
+        "compressed_synopsis": "[10:API_ROUTES:+server.ts] syms=POST deps=dag:prefill:retrieval_search:20",
+        "rlm_pointer_tag": "<rlm_call label=\"dag:prefill:api_routes:10\" />",
+        "dma_offset_bytes": 30720,
+        "dma_length_bytes": 3072,
+        "vector_sha256": "e40b5f3fe2b881052717a1e8dbb6dc650f1553e48b6757b1818aac2f7451dc3d",
+        "raw_span_bytes": 1024,
+        "synopsis_bytes": 73,
+        "token_savings_ratio": 0.9287,
+        "dependencies": [
+          "dag:prefill:retrieval_search:20"
+        ],
+        "subhelper_audit": {
+          "file_path": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+          "language": "typescript",
+          "ast_node_count": 42,
+          "cyclomatic_complexity": 2,
+          "has_unbounded_loops": false,
+          "dma_aligned_bytes": true,
+          "audit_passed": true
+        }
+      },
+      {
+        "ordinal": 0,
+        "feature_label": "dag:prefill:ui_svelte5:0",
+        "bitmask_id": 1,
+        "compressed_synopsis": "[0:UI_SVELTE5:ActionPopup.svelte] syms=choose deps=dag:prefill:api_routes:10",
+        "rlm_pointer_tag": "<rlm_call label=\"dag:prefill:ui_svelte5:0\" />",
+        "dma_offset_bytes": 0,
+        "dma_length_bytes": 3072,
+        "vector_sha256": "a765705cc77bbd6e344ad690f066decdf4d6f2c13d67d81b455ce7d75c105b28",
+        "raw_span_bytes": 1024,
+        "synopsis_bytes": 76,
+        "token_savings_ratio": 0.9258,
+        "dependencies": [
+          "dag:prefill:api_routes:10"
+        ],
+        "subhelper_audit": {
+          "file_path": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+          "language": "svelte",
+          "ast_node_count": 42,
+          "cyclomatic_complexity": 2,
+          "has_unbounded_loops": false,
+          "dma_aligned_bytes": true,
+          "audit_passed": true
+        }
+      }
+    ]
+  },
+  "plane3_inverseHardwareSearchAndAtenSmoke": {
+    "hardwareReadinessVector": {
+      "device_name": "NVIDIA GeForce RTX 3060 Ti",
+      "vram_free_mb": 7126,
+      "sm_count": 38,
+      "supports_fp16_tensor_core": true,
+      "pcie_pinned_bandwidth_gbps": 14.2,
+      "nvme_queue_depth": 64
+    },
+    "selectedPagingStrategy": "PS2_VU1_DOUBLE_BUFFER_DMA",
+    "selectedTopologicalOrdinals": [
+      30,
+      20,
+      10,
+      0
+    ],
+    "atenConcatSmokeMetrics": {
+      "device": "cuda:0",
+      "shape": [
+        4,
+        768
+      ],
+      "dtype": "torch.float32",
+      "isContiguous": true,
+      "stride": [
+        768,
+        1
+      ],
+      "hasNan": false,
+      "hasInf": false,
+      "dmaAndConcatMs": 842.7556,
+      "concatTensorSha256": "46a05542c1a8bcc7663b2e3e9346043a5d21f448562c8bcb10d807ebd1c23581"
+    }
+  },
+  "plane4_dspyGepaOakRlmSynthesis": {
+    "lutSynopsisBlock": "dag:prefill:db_schema_vector:30 -> [30:DB_SCHEMA_VECTOR:additional-tables.ts] syms=evidenceChainOfCustody deps=root (rlm=<rlm_call label=\"dag:prefill:db_schema_vector:30\" />)\ndag:prefill:retrieval_search:20 -> [20:RETRIEVAL_SEARCH:ace-retrieval-logger.ts] syms=ace-retrieval-logger deps (rlm=<rlm_call label=\"dag:prefill:retrieval_search:20\" />)\ndag:prefill:api_routes:10 -> [10:API_ROUTES:+server.ts] syms=POST deps=dag:prefill:retrieval_search:20 (rlm=<rlm_call label=\"dag:prefill:api_routes:10\" />)\ndag:prefill:ui_svelte5:0 -> [0:UI_SVELTE5:ActionPopup.svelte] syms=choose deps=dag:prefill:api_routes:10 (rlm=<rlm_call label=\"dag:prefill:ui_svelte5:0\" />)",
+    "oakOptionInsert": "OPTION[verify_dag_lineage]: traverse(dag:prefill:db_schema_vector:30 -> dag:prefill:retrieval_search:20 -> dag:prefill:api_routes:10 -> dag:prefill:ui_svelte5:0) using RLM pointer swaps <rlm_call label=\"dag:prefill:db_schema_vector:30\" /> <rlm_call label=\"dag:prefill:retrieval_search:20\" /> before proposing repair.",
+    "rlmSwapDirectives": [
+      "<rlm_call label=\"dag:prefill:db_schema_vector:30\" />",
+      "<rlm_call label=\"dag:prefill:retrieval_search:20\" />",
+      "<rlm_call label=\"dag:prefill:api_routes:10\" />",
+      "<rlm_call label=\"dag:prefill:ui_svelte5:0\" />"
+    ],
+    "gepaReflectiveMetric": {
+      "score": 1.0,
+      "tracePassed": true,
+      "meanTokenSavingsRatio": 0.8699,
+      "feedback": "PASS: High-efficiency OaK/RLM prefill."
+    },
+    "dspyRepairProposal": {
+      "schema": "atlas.dspy-repair-output.v1",
+      "contextManifestChecksum": "sha256:caf2d58555b52060bda8c5acebf92d3e1b4940ceb59b8c12ab06915cebb26308",
+      "diagnosis": "Topological LUT prefill verified across 4 nodes (87.0% token savings); all subhelper audits and ATen DMA contiguity checks passed.",
+      "targetCandidates": [
+        "dag:prefill:db_schema_vector:30",
+        "dag:prefill:retrieval_search:20",
+        "dag:prefill:api_routes:10",
+        "dag:prefill:ui_svelte5:0"
+      ],
+      "patchPlan": "OPTION[verify_dag_lineage]: traverse(dag:prefill:db_schema_vector:30 -> dag:prefill:retrieval_search:20 -> dag:prefill:api_routes:10 -> dag:prefill:ui_svelte5:0) using RLM pointer swaps <rlm_call label=\"dag:prefill:db_schema_vector:30\" /> <rlm_call label=\"dag:prefill:retrieval_search:20\" /> before proposing repair.",
+      "validationPlan": "Run Vitest polyglot-dag-oak-rlm-prefill.spec.ts and verify ATen contiguous slice checksum.",
+      "evidenceRefs": [
+        "dag:prefill:api_routes:10",
+        "dag:prefill:db_schema_vector:30",
+        "dag:prefill:retrieval_search:20",
+        "dag:prefill:ui_svelte5:0",
+        "sha256:5680cac761a609fe10e638afba8455cf5d052ee1217b9640a7f8418bb7a29bf7",
+        "sha256:a765705cc77bbd6e344ad690f066decdf4d6f2c13d67d81b455ce7d75c105b28",
+        "sha256:e40b5f3fe2b881052717a1e8dbb6dc650f1553e48b6757b1818aac2f7451dc3d",
+        "sha256:fc6c53e6bb0cdb77b98a5c5ddc06392a91cbf96b9db68ee26dac92a3b0e20076"
+      ]
+    }
+  },
+  "plane5_dagClosureInvariants": {
+    "zeroOrphanedEdges": true,
+    "allDmaOffsets4ByteAligned": true,
+    "allTokenSavingsAbove65Pct": true,
+    "atenTensorContiguousAndFinite": true,
+    "gepaReflectiveScore": 1.0
+  }
+}

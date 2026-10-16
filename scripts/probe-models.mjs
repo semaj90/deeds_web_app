@@ -65,8 +65,8 @@ async function probeOllama() {
       console.log(`  ${ok(m.name.padEnd(40))}  ${dim(gb + 'GB')}  ${dim(q)}  ${dim(fam)}`);
     }
     console.log();
-    console.log(dim(`  → opencode.json ollama lane uses: gemma4-rotorquant:latest (65536-ctx alias of gemma4-rotorquant:latest)`));
-    console.log(dim(`    if missing: run VS Code task "Hermes: Create gemma4-rotorquant:latest model in Ollama"`));
+    console.log(dim(`  → opencode.json ollama lane uses: ornith-1.5-9b (65536-ctx alias of ornith-1.5-9b)`));
+    console.log(dim(`    if missing: run VS Code task "Hermes: Create ornith-1.5-9b model in Ollama"`));
   } catch (e) {
     console.log(bad(`Ollama unreachable at ${base}: ${e.message}`));
     console.log(dim('  Run: ollama serve'));

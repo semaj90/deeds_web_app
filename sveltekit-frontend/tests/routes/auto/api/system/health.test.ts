@@ -13,7 +13,7 @@ const { mockDb, mockOllama, mockEnv, mockQuic } = vi.hoisted(() => ({
     execute: vi.fn().mockResolvedValue([])
   },
   mockOllama: {
-    ollamaFetch: vi.fn().mockResolvedValue({
+    embedOrChatFetch: vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ models: [{ name: 'llama3' }] })
     })
@@ -36,7 +36,7 @@ vi.mock('$lib/server/env.server.ts', () => ({
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
-  ollamaFetch: mockOllama.ollamaFetch
+  embedOrChatFetch: mockOllama.embedOrChatFetch
 }));
 
 vi.mock('$lib/server/grpc/embedding-client.js', () => ({
@@ -57,7 +57,7 @@ describe('src/routes/api/system/health/+server.ts', () => {
     
     // Re-establish implementations
     mockDb.execute.mockResolvedValue([]);
-    mockOllama.ollamaFetch.mockResolvedValue({
+    mockOllama.embedOrChatFetch.mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve({ models: [{ name: 'llama3' }] })

@@ -87,6 +87,14 @@ feature, or recommendation truth owner.
 
 ## Lane C — telemetry and provenance breadth
 
+- [x] `PACKET-TELEMETRY-PROVENANCE-01` Preserve supplied nested packet context and `source_ref`; keep unobserved model/tool/kernel/schema/protocol values null. Bind primary packet feature/SOM/source metadata to the same candidate, without changing canonical identity or adding a telemetry store. Existing owners: `packet-centric-telemetry.ts` and `ace-telemetry-emitter.ts`. Focused regression result: 3 files / 11 tests passed; DB writer was mocked. Receipt: `docs/reports/parent-atlas-goal-provenance-progress-20261016T0352Z.json`.
+- [ ] `PACKET-TELEMETRY-TRANSPORT-01` Measure real protobuf encode/decode and JSON stringify/parse boundaries, and record the observed wire protocol/version. The Go adapter's unimplemented gRPC stub and MessagePack fixture-only caller are not live transport proof. Reuse existing actual gRPC/HTTP owners; do not introduce a second transport implementation.
+  - [x] Existing retrieval client now measures real protobuf encode/decode and HTTP JSON stringify/parse in per-request isolated scopes; response mappers retain observations. Fixed `shared_ids.proto` include resolution discovered by real network tests. Loopback receipt: `docs/reports/retrieval-transport-loopback-2026-10-16T04-00-01-535Z.json`; 15 focused tests passed. Guide: `docs/architecture/retrieval-transport-codec-telemetry-v1.md`.
+  - [ ] Production endpoint replay, negotiated HTTP version where observable, failed-attempt retention, cache/origin distinction, packet-qualified durable trace/readback remain open. Loopback fixture proof does not close production or source-revision gates.
+- [ ] `PACKET-TELEMETRY-READBACK-01` Verify an explicitly approved live telemetry-only insert/readback through the existing writer; component/schema proofs do not authorize a live insert or close production qualification. Source-revision writes remain deferred after P20.
+  - [x] Live read-only TRACE schema inspection: `phase_2_telemetry` absent; existing `atlas_retrieval_eval_times` has JSONB payload and all 23 INSERT columns. No new table or DDL needed. Schema receipt: `docs/reports/parent-atlas-existing-telemetry-schema-20261016T0410Z.json`.
+  - [x] Reuse `recordRetrievalEvalTelemetry` for enriched fallback; preserve packet/source/codec observations, validate strict transport payloads, remove guessed ACE versions, and avoid the duplicate legacy eval mirror. Unknown measurements/protocols remain null. Five suites / 21 tests passed, plus 10 passing final packet regressions with mocked DB. Receipt: `docs/reports/parent-atlas-telemetry-existing-writer-progress-20261016T0643Z.json`.
+
 - [ ] Add HyperLogLog breadth telemetry for workflows, symbols, sessions, users, and neighborhoods.
 - [ ] Keep HyperLogLog as a telemetry projection only; it must not mutate
       event truth, packet identity, or policy ownership.

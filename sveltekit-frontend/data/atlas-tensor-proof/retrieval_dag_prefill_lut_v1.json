@@ -1,0 +1,985 @@
+{
+  "schema": "atlas.retrieval-dag-prefill-lut.v1",
+  "lutRevision": "atlas.retrieval-dag-prefill-lut.rev1",
+  "workspaceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+  "graphRevision": "sha256:5d00f097941fd064238b9f5c445cbf2c13efd9a0edb7c82b83dd56dac60facbf",
+  "representationRevision": "semantic_768:v1",
+  "f32BinRelativePath": "sveltekit-frontend/data/atlas-tensor-proof/retrieval_dag_prefill_768.f32bin",
+  "f32BinTotalBytes": 153600,
+  "f32BinSha256": "00c838c8fb5098161ec919421299bafdefc9521bc250df629787ba59da534afd",
+  "entries": [
+    {
+      "ordinal": 0,
+      "canonicalId": "dag:prefill:ui_svelte5:0",
+      "packetKey": "pkt:tn_v1_5c25c1b9152277105e2ec9e65b8480a5",
+      "treeNodeId": "tn_v1_5c25c1b9152277105e2ec9e65b8480a5",
+      "sourceRef": "sveltekit-frontend/src/lib/components/ActionPopup.svelte",
+      "sourceRevision": "sha256:3d369f17e307238e6b9e37b620be4d15d7fba1d0c8576e717894bcd03726ef32",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 0,
+      "byteLength": 3072,
+      "vectorSha256": "a765705cc77bbd6e344ad690f066decdf4d6f2c13d67d81b455ce7d75c105b28",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        10
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 1,
+      "canonicalId": "dag:prefill:ui_svelte5:1",
+      "packetKey": "pkt:tn_v1_a15d201c6d8519ec57a9fcd4ff41850e",
+      "treeNodeId": "tn_v1_a15d201c6d8519ec57a9fcd4ff41850e",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminChatAssistant.svelte",
+      "sourceRevision": "sha256:34f4b2e15c2217aab06becb9943538b38ccd7731717ae5f4468b5b7914b14389",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 3072,
+      "byteLength": 3072,
+      "vectorSha256": "2a210b56f42d24f6d40bf3715536f909555797377d6b80cf60129146bd28fa92",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        11
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 2,
+      "canonicalId": "dag:prefill:ui_svelte5:2",
+      "packetKey": "pkt:tn_v1_dc61756c0c87ab7aa12a2a0308d2a653",
+      "treeNodeId": "tn_v1_dc61756c0c87ab7aa12a2a0308d2a653",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AdminMonitoringDashboard.svelte",
+      "sourceRevision": "sha256:ae37bb669f79805745ee57cfed637d7b63cfdc8c9b2bf5253983244e2813bd1e",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 6144,
+      "byteLength": 3072,
+      "vectorSha256": "8047f65c8c402001b3df06a674d667feb9af00b36d087599c4701e947f409daf",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        12
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 3,
+      "canonicalId": "dag:prefill:ui_svelte5:3",
+      "packetKey": "pkt:tn_v1_9bb60fa8092303a39d5c98e88d95dcd1",
+      "treeNodeId": "tn_v1_9bb60fa8092303a39d5c98e88d95dcd1",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/AiAnalysisPopup.svelte",
+      "sourceRevision": "sha256:6a83c8f8c3c5b93b7ec369b72fd42d3567d77d698585e8f8c4346e47c3786bb6",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 9216,
+      "byteLength": 3072,
+      "vectorSha256": "af8a33fb21d765ac740d6788fbee0da7d9ebfd3e5a8ddcbacf73d65ca68048c4",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        13
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 4,
+      "canonicalId": "dag:prefill:ui_svelte5:4",
+      "packetKey": "pkt:tn_v1_4f9013df758ec1f86ae0da8f8d05c860",
+      "treeNodeId": "tn_v1_4f9013df758ec1f86ae0da8f8d05c860",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/BatchSummaryUI.svelte",
+      "sourceRevision": "sha256:8f1fab0a99ae60c8dd00e695365c64f1875c347ee70bf13b45d960a439e5d2f9",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 12288,
+      "byteLength": 3072,
+      "vectorSha256": "1f78a34e6e6a72d9463816f3fabb7bbc161d3a2b7fe92e5300834fbbaf604b3b",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        14
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 5,
+      "canonicalId": "dag:prefill:ui_svelte5:5",
+      "packetKey": "pkt:tn_v1_77e9c6267b1a821596edaae0712210c8",
+      "treeNodeId": "tn_v1_77e9c6267b1a821596edaae0712210c8",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/BundlePreview.svelte",
+      "sourceRevision": "sha256:145b64aa0da55a3073bdf8d206b8ab9f91aa4b26eb1e252c0d1cbbacec36618b",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 15360,
+      "byteLength": 3072,
+      "vectorSha256": "667c303912cf6b5540cacacb3e8ebee9f2269ec4f081ec453f32e6076c2becd9",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        15
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 6,
+      "canonicalId": "dag:prefill:ui_svelte5:6",
+      "packetKey": "pkt:tn_v1_bf38316381c0e24387d6f49154a49f94",
+      "treeNodeId": "tn_v1_bf38316381c0e24387d6f49154a49f94",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/CommandSuggestPanel.svelte",
+      "sourceRevision": "sha256:884f8ffc6e2f04b52c640592440c2f2f1a47fe86fd2eac879878b4a642cc1ee1",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 18432,
+      "byteLength": 3072,
+      "vectorSha256": "ba6661a1ac76741cc99b30733b7df7c3fa2c3092467474c312cfe538a42e6939",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        16
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 7,
+      "canonicalId": "dag:prefill:ui_svelte5:7",
+      "packetKey": "pkt:tn_v1_b2cbb044efa16a0c5b10baf47102c249",
+      "treeNodeId": "tn_v1_b2cbb044efa16a0c5b10baf47102c249",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/ContextualAssistantModal.svelte",
+      "sourceRevision": "sha256:55042a26b619a6c00b8241cf90873f56f86551c9cc2717449f4cbf63638a5a7c",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 21504,
+      "byteLength": 3072,
+      "vectorSha256": "9f6f715f1b7880e58d9f6d69ec2a5e4e3c9e42439966c4349d6b1fca6865365e",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        17
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 8,
+      "canonicalId": "dag:prefill:ui_svelte5:8",
+      "packetKey": "pkt:tn_v1_32ec01a0c6f5800c4afe771b49bbc0cb",
+      "treeNodeId": "tn_v1_32ec01a0c6f5800c4afe771b49bbc0cb",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/EvidenceDataGrid.svelte",
+      "sourceRevision": "sha256:257947744b111ac340514e85d7dd6e00c9906409bd60bf5eacf568d39cf592d2",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 24576,
+      "byteLength": 3072,
+      "vectorSha256": "61d45bc9b48448c1af1b712dd6a3d3d846195a229673c29d6fb7c0041342fda5",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        18
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 9,
+      "canonicalId": "dag:prefill:ui_svelte5:9",
+      "packetKey": "pkt:tn_v1_7d205820d8abf8a24d3243f2b6072abd",
+      "treeNodeId": "tn_v1_7d205820d8abf8a24d3243f2b6072abd",
+      "sourceRef": "sveltekit-frontend/src/lib/components/admin/EvidenceDrawer.svelte",
+      "sourceRevision": "sha256:5395d73e0783157ebe883586d1f50be79be2f6e62a690c8dda29d9b05466d525",
+      "stratum": "UI_SVELTE5",
+      "byteOffset": 27648,
+      "byteLength": 3072,
+      "vectorSha256": "8e69712d55e697685be9e2ebe3e1906b3d9f01b05c5edf97222948c036d0517d",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        19
+      ],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 10,
+      "canonicalId": "dag:prefill:api_routes:10",
+      "packetKey": "pkt:tn_v1_658a5fa33870e49393dbbac98ca75032",
+      "treeNodeId": "tn_v1_658a5fa33870e49393dbbac98ca75032",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/agent/+server.ts",
+      "sourceRevision": "sha256:72c5d6042fd4c59b2203cc582cf4fc5b8262b7d24ad988b081688bbf5c955fae",
+      "stratum": "API_ROUTES",
+      "byteOffset": 30720,
+      "byteLength": 3072,
+      "vectorSha256": "e40b5f3fe2b881052717a1e8dbb6dc650f1553e48b6757b1818aac2f7451dc3d",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        20
+      ],
+      "dependentOrdinals": [
+        0
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 11,
+      "canonicalId": "dag:prefill:api_routes:11",
+      "packetKey": "pkt:tn_v1_218df5dc4b20bd423cb68f556a4d1809",
+      "treeNodeId": "tn_v1_218df5dc4b20bd423cb68f556a4d1809",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/ask/+server.ts",
+      "sourceRevision": "sha256:b8361513a8434b616c2fe9e064a4e55490ebf9a6e4ec4cb461bd6937574cc8db",
+      "stratum": "API_ROUTES",
+      "byteOffset": 33792,
+      "byteLength": 3072,
+      "vectorSha256": "79142dbf84311ca5e0b43714fa31acf8ff174616a09c5e8aece3aadeb6c804d6",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        21
+      ],
+      "dependentOrdinals": [
+        1
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 12,
+      "canonicalId": "dag:prefill:api_routes:12",
+      "packetKey": "pkt:tn_v1_d19b0a51cc088d81cb685af4f370548f",
+      "treeNodeId": "tn_v1_d19b0a51cc088d81cb685af4f370548f",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/context/+server.ts",
+      "sourceRevision": "sha256:2fd171509a7bd7668812fa17b8df81c475b0023922d1ef50472d603e49d95ebe",
+      "stratum": "API_ROUTES",
+      "byteOffset": 36864,
+      "byteLength": 3072,
+      "vectorSha256": "bb309a3e972b63894a52dfe8421b126a062b70e7ac4505dc5e878bcf37bb6ac6",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        22
+      ],
+      "dependentOrdinals": [
+        2
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 13,
+      "canonicalId": "dag:prefill:api_routes:13",
+      "packetKey": "pkt:tn_v1_c20868ea34d27dbd04e698838fd0479c",
+      "treeNodeId": "tn_v1_c20868ea34d27dbd04e698838fd0479c",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/error-kag/+server.ts",
+      "sourceRevision": "sha256:ef645a05258aca24074ecbe4a36489091f04960028bf92d8ffbcab6908f6ec76",
+      "stratum": "API_ROUTES",
+      "byteOffset": 39936,
+      "byteLength": 3072,
+      "vectorSha256": "9ee3ba9eec64d8ee00a3658e3da7fd5c5bb1f4bad99cbb175a2e17a058418ffe",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        23
+      ],
+      "dependentOrdinals": [
+        3
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 14,
+      "canonicalId": "dag:prefill:api_routes:14",
+      "packetKey": "pkt:tn_v1_5dd24a97947c6d3b33ef67e0dc6e6c99",
+      "treeNodeId": "tn_v1_5dd24a97947c6d3b33ef67e0dc6e6c99",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/health/+server.ts",
+      "sourceRevision": "sha256:a9f896b9dcc35486ccb4e66bc4540f18623d261973b6f81f7969a2d7fe9c31f3",
+      "stratum": "API_ROUTES",
+      "byteOffset": 43008,
+      "byteLength": 3072,
+      "vectorSha256": "f387829ee38a3bf25de43b47c4be434ba243b54d164648d376151c00eb21edff",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        24
+      ],
+      "dependentOrdinals": [
+        4
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 15,
+      "canonicalId": "dag:prefill:api_routes:15",
+      "packetKey": "pkt:tn_v1_68d4a2a1148b0012677ce780c7d65d15",
+      "treeNodeId": "tn_v1_68d4a2a1148b0012677ce780c7d65d15",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/ingest/+server.ts",
+      "sourceRevision": "sha256:d93dfdb97a6ef515b3fe6314162178560e8bb12e1c1023478cdcbc79c829c801",
+      "stratum": "API_ROUTES",
+      "byteOffset": 46080,
+      "byteLength": 3072,
+      "vectorSha256": "282fa1ec378d5997bbffd06848f3575ffc946f8f62450eaa0465640135df9819",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        25
+      ],
+      "dependentOrdinals": [
+        5
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 16,
+      "canonicalId": "dag:prefill:api_routes:16",
+      "packetKey": "pkt:tn_v1_b5fd5a4b0d4269a336466f9f9b4c075f",
+      "treeNodeId": "tn_v1_b5fd5a4b0d4269a336466f9f9b4c075f",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/packet/+server.ts",
+      "sourceRevision": "sha256:0e9b081e1ac3fd637fc94efe0a1c522013bcc9296e6798b1d605677cabc33a40",
+      "stratum": "API_ROUTES",
+      "byteOffset": 49152,
+      "byteLength": 3072,
+      "vectorSha256": "c5a1032502b16e661eb8622331ac0c6d2dba3c8e8773e41e241261595d42e086",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        26
+      ],
+      "dependentOrdinals": [
+        6
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 17,
+      "canonicalId": "dag:prefill:api_routes:17",
+      "packetKey": "pkt:tn_v1_8d6fc18c75c1b388c843840052fb5283",
+      "treeNodeId": "tn_v1_8d6fc18c75c1b388c843840052fb5283",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/packets/+server.ts",
+      "sourceRevision": "sha256:c8766ce6bf8c3e18d63887945587325a241e8cdf92bc1296dc81b25d8d727143",
+      "stratum": "API_ROUTES",
+      "byteOffset": 52224,
+      "byteLength": 3072,
+      "vectorSha256": "110f77c10eac4748ee401543cd57f4c9a9bc8d491fb157a36b289252817045fd",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        27
+      ],
+      "dependentOrdinals": [
+        7
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 18,
+      "canonicalId": "dag:prefill:api_routes:18",
+      "packetKey": "pkt:tn_v1_8a6cbca9860b3d2b34bef8b79312f93c",
+      "treeNodeId": "tn_v1_8a6cbca9860b3d2b34bef8b79312f93c",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/policy-orchestrator/+server.ts",
+      "sourceRevision": "sha256:40925e319b63422635726ea80db02838bddb2484712f054330174fbdd5a44f70",
+      "stratum": "API_ROUTES",
+      "byteOffset": 55296,
+      "byteLength": 3072,
+      "vectorSha256": "009c727494072b6a6f2eac298ffd4e5706d5663a7806f7d380fdd4557884811c",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        28
+      ],
+      "dependentOrdinals": [
+        8
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 19,
+      "canonicalId": "dag:prefill:api_routes:19",
+      "packetKey": "pkt:tn_v1_8a865cbc891d9d83d908c4a631def280",
+      "treeNodeId": "tn_v1_8a865cbc891d9d83d908c4a631def280",
+      "sourceRef": "sveltekit-frontend/src/routes/api/ace/rank/+server.ts",
+      "sourceRevision": "sha256:f476743324dd1d63a58753288dc90c02761f04efac74ebcc50b3e1b64564ceb4",
+      "stratum": "API_ROUTES",
+      "byteOffset": 58368,
+      "byteLength": 3072,
+      "vectorSha256": "f38bb47d01e34bc4ffb938c086840117afc0dabca76120ac52a9fe341b6e5263",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        29
+      ],
+      "dependentOrdinals": [
+        9
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 20,
+      "canonicalId": "dag:prefill:retrieval_search:20",
+      "packetKey": "pkt:tn_v1_b42778b266efb6b448f20c1ec00685d6",
+      "treeNodeId": "tn_v1_b42778b266efb6b448f20c1ec00685d6",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/ace-retrieval-logger.ts",
+      "sourceRevision": "sha256:65a7b0db503120a63f25dece681b138455fb9a928146119f0afbcf6ee0f20499",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 61440,
+      "byteLength": 3072,
+      "vectorSha256": "5680cac761a609fe10e638afba8455cf5d052ee1217b9640a7f8418bb7a29bf7",
+      "sourceStartByte": 0,
+      "sourceEndByte": 66,
+      "dependencyOrdinals": [
+        30
+      ],
+      "dependentOrdinals": [
+        10
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 21,
+      "canonicalId": "dag:prefill:retrieval_search:21",
+      "packetKey": "pkt:tn_v1_065ee25d0ce78e4ec9d120fd4b6bfcd0",
+      "treeNodeId": "tn_v1_065ee25d0ce78e4ec9d120fd4b6bfcd0",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/bm42-sparse-retriever.ts",
+      "sourceRevision": "sha256:0812d955b7f7d156a4a5368d4cf420906c075a8ff0530a690adbefebe5ca77f2",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 64512,
+      "byteLength": 3072,
+      "vectorSha256": "ba9054ce7efe86f816689c3948125aad32fc44f172af95521b93f63bf7c30e39",
+      "sourceStartByte": 0,
+      "sourceEndByte": 504,
+      "dependencyOrdinals": [
+        31
+      ],
+      "dependentOrdinals": [
+        11
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 22,
+      "canonicalId": "dag:prefill:retrieval_search:22",
+      "packetKey": "pkt:tn_v1_c9c233dd36f3377f8c1c58149c38ccb4",
+      "treeNodeId": "tn_v1_c9c233dd36f3377f8c1c58149c38ccb4",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/disabled-retriever.ts",
+      "sourceRevision": "sha256:aff87a2b80fab62deb57fdf88a47d5e11b1f52cb5dfdb0361757da36b11de889",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 67584,
+      "byteLength": 3072,
+      "vectorSha256": "787efc372eaf41244b4a5c4501d45b9d537bac3d432e97fe488d8c8653bf7264",
+      "sourceStartByte": 0,
+      "sourceEndByte": 573,
+      "dependencyOrdinals": [
+        32
+      ],
+      "dependentOrdinals": [
+        12
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 23,
+      "canonicalId": "dag:prefill:retrieval_search:23",
+      "packetKey": "pkt:tn_v1_cfa50a6a36c363b410ae91643358259b",
+      "treeNodeId": "tn_v1_cfa50a6a36c363b410ae91643358259b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/live-structural-lane-provider.ts",
+      "sourceRevision": "sha256:97fc94285ed95d9c8ea46fdeabbefde572cbe3bb611f8d6de3e6f2732b5e3dd1",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 70656,
+      "byteLength": 3072,
+      "vectorSha256": "26a1791573c424fa42434e1f3c12d45eb291da817b0e0b27dc77b0114cc99a3f",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        33
+      ],
+      "dependentOrdinals": [
+        13
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 24,
+      "canonicalId": "dag:prefill:retrieval_search:24",
+      "packetKey": "pkt:tn_v1_60cda8c4924bd4930fe9eba4e511ff79",
+      "treeNodeId": "tn_v1_60cda8c4924bd4930fe9eba4e511ff79",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-ast-retriever.ts",
+      "sourceRevision": "sha256:3186286609077d0f4658546557fa5da826160274070af94ccd56228ef7be71b4",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 73728,
+      "byteLength": 3072,
+      "vectorSha256": "271e227e9ccc415a0b0d814fc25763a866f1e58175a2d880dd84a48e4ce534e7",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        25,
+        34
+      ],
+      "dependentOrdinals": [
+        14
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 25,
+      "canonicalId": "dag:prefill:retrieval_search:25",
+      "packetKey": "pkt:tn_v1_f779fe7f248e39bbeb8636699f78795b",
+      "treeNodeId": "tn_v1_f779fe7f248e39bbeb8636699f78795b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/postgres-exact-retriever.ts",
+      "sourceRevision": "sha256:fcf37e9e044724494f13cf3e6ab28449eded7ce939a07affcce64f0511caa573",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 76800,
+      "byteLength": 3072,
+      "vectorSha256": "4827bd3ab18925bf012f5b4229627fd42e8d1bca09d6c7b3ba716c943e64a900",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        35
+      ],
+      "dependentOrdinals": [
+        15,
+        24
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 26,
+      "canonicalId": "dag:prefill:retrieval_search:26",
+      "packetKey": "pkt:tn_v1_32c7475306948294d16ec9ccd12d5686",
+      "treeNodeId": "tn_v1_32c7475306948294d16ec9ccd12d5686",
+      "sourceRef": "sveltekit-frontend/src/lib/server/retrieval/adapters/qdrant-bm42-retriever.ts",
+      "sourceRevision": "sha256:ceeadfadb6e5b31371c3af5c65ead580c9949481352464104113418fbf219bd2",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 79872,
+      "byteLength": 3072,
+      "vectorSha256": "093369b07f618002a17bd59ba6b687fe02cdeec51a7fb1a99fdb09ecb50bca74",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        36
+      ],
+      "dependentOrdinals": [
+        16
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 27,
+      "canonicalId": "dag:prefill:retrieval_search:27",
+      "packetKey": "pkt:tn_v1_2fa46c25779b38a75953a72b9f63015d",
+      "treeNodeId": "tn_v1_2fa46c25779b38a75953a72b9f63015d",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/bow-utils.ts",
+      "sourceRevision": "sha256:905f09a7070d2555d54ee02459876c300f587a30c14e7f71d3f30502c4505626",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 82944,
+      "byteLength": 3072,
+      "vectorSha256": "ae999d5d51f41b0d9a1b8f2f78c03597eca65369143317064b6cb1c77654639e",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        37
+      ],
+      "dependentOrdinals": [
+        17
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 28,
+      "canonicalId": "dag:prefill:retrieval_search:28",
+      "packetKey": "pkt:tn_v1_c4ec3585602cf1fce0654dfc10f4524c",
+      "treeNodeId": "tn_v1_c4ec3585602cf1fce0654dfc10f4524c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/codebase-ann-backend.ts",
+      "sourceRevision": "sha256:d943498c945a0d932440b0150a3305705f34a7d4f119549046736c65d5b609de",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 86016,
+      "byteLength": 3072,
+      "vectorSha256": "4307b4994c90075d7ca7a8912516e65f9c89964e4acf15502de4b26b2f3c70fa",
+      "sourceStartByte": 0,
+      "sourceEndByte": 296,
+      "dependencyOrdinals": [
+        38
+      ],
+      "dependentOrdinals": [
+        18
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 29,
+      "canonicalId": "dag:prefill:retrieval_search:29",
+      "packetKey": "pkt:tn_v1_9513a2c43d03066a7c10ac86ca545b41",
+      "treeNodeId": "tn_v1_9513a2c43d03066a7c10ac86ca545b41",
+      "sourceRef": "sveltekit-frontend/src/lib/server/search/create-codebase-search-backend.ts",
+      "sourceRevision": "sha256:361877c019ea7a989f0f8d6c681401d075792bb17da30c2b307117f70c0da2f8",
+      "stratum": "RETRIEVAL_SEARCH",
+      "byteOffset": 89088,
+      "byteLength": 3072,
+      "vectorSha256": "2a2858dd036ca89666959ed44b7b7749828a0c243d8dae50c470322ecd4ba6d4",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [
+        39
+      ],
+      "dependentOrdinals": [
+        19
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 30,
+      "canonicalId": "dag:prefill:db_schema_vector:30",
+      "packetKey": "pkt:tn_v1_19703f97f24453cf855cf50924366232",
+      "treeNodeId": "tn_v1_19703f97f24453cf855cf50924366232",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+      "sourceRevision": "sha256:06410ea7efb5f7c39fe842a6b3b11e7f5fc5dec01a7beb43825fa0e6c36121e9",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 92160,
+      "byteLength": 3072,
+      "vectorSha256": "fc6c53e6bb0cdb77b98a5c5ddc06392a91cbf96b9db68ee26dac92a3b0e20076",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        20
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 31,
+      "canonicalId": "dag:prefill:db_schema_vector:31",
+      "packetKey": "pkt:tn_v1_05c152094b39093e364f266e1898501f",
+      "treeNodeId": "tn_v1_05c152094b39093e364f266e1898501f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/enhanced-legal-schema.ts",
+      "sourceRevision": "sha256:c717e906db89f355c5bc72ef07b81d6669a27fed0fc0291031aaf84dafba014a",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 95232,
+      "byteLength": 3072,
+      "vectorSha256": "9d3e2e447e3d733efa2cfc50e6a4bf9b3219692f3c65fb1a6cb0e3c40b291ede",
+      "sourceStartByte": 0,
+      "sourceEndByte": 272,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        21
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 32,
+      "canonicalId": "dag:prefill:db_schema_vector:32",
+      "packetKey": "pkt:tn_v1_7aab586d9e127bc11af4f3d2b7571f78",
+      "treeNodeId": "tn_v1_7aab586d9e127bc11af4f3d2b7571f78",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/legal-schema.ts",
+      "sourceRevision": "sha256:7ce9c4b0279cebd0e9db609118b5da91776c1ec18b5622f00a8cf11727aecd24",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 98304,
+      "byteLength": 3072,
+      "vectorSha256": "79fce9e889565d12a46156b34363801701db8c43c6bd098053f229c6822526bb",
+      "sourceStartByte": 0,
+      "sourceEndByte": 117,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        22
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 33,
+      "canonicalId": "dag:prefill:db_schema_vector:33",
+      "packetKey": "pkt:tn_v1_76db4fc1b98c87f88e05181cdf836efd",
+      "treeNodeId": "tn_v1_76db4fc1b98c87f88e05181cdf836efd",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/lucia-schema.ts",
+      "sourceRevision": "sha256:e8334a788f46e63720df2a2d68819cef3bc7237df8b7f18cfbef4ce89e139b21",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 101376,
+      "byteLength": 3072,
+      "vectorSha256": "0c597db6d4fe59358989ba46ffd9b7c014e4d9c43f37f8a74c2e409b6f23b4bd",
+      "sourceStartByte": 0,
+      "sourceEndByte": 687,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        23
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 34,
+      "canonicalId": "dag:prefill:db_schema_vector:34",
+      "packetKey": "pkt:tn_v1_4a31c65e0a77c5b044986a170da7735a",
+      "treeNodeId": "tn_v1_4a31c65e0a77c5b044986a170da7735a",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
+      "sourceRevision": "sha256:93f243042c0c5a5b29816f5ab77ac1522d84be0a4292fc9a6829078920c726c2",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 104448,
+      "byteLength": 3072,
+      "vectorSha256": "474c90dd29bd9f40dd7d74a570ea7115788fc7e74c7c5740c2997dcaad46f349",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        24
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 35,
+      "canonicalId": "dag:prefill:db_schema_vector:35",
+      "packetKey": "pkt:tn_v1_ca2d3cec691ba3d520005ba5b2db833f",
+      "treeNodeId": "tn_v1_ca2d3cec691ba3d520005ba5b2db833f",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-old.ts",
+      "sourceRevision": "sha256:818c16794b39e5e6c930045bc5bd6558b66a7ee5a20fd08a5e8c1e050d5ec4b5",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 107520,
+      "byteLength": 3072,
+      "vectorSha256": "31ef5f564b4a610fa4addc1f50f47ecc5a20bf85c4c7dec356e190902087684e",
+      "sourceStartByte": 0,
+      "sourceEndByte": 724,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        25
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 36,
+      "canonicalId": "dag:prefill:db_schema_vector:36",
+      "packetKey": "pkt:tn_v1_6be271ee35db0c9ef042338fbd782feb",
+      "treeNodeId": "tn_v1_6be271ee35db0c9ef042338fbd782feb",
+      "sourceRef": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-postgres-enhanced.ts",
+      "sourceRevision": "sha256:277ddc1f289f5228efb7d6a0da31a39a8290085b10dd8e9d4a86488e8a89d99d",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 110592,
+      "byteLength": 3072,
+      "vectorSha256": "f216d3810299944668d93d59c0400186007c19707c4618e5cee7cc261be5deb6",
+      "sourceStartByte": 0,
+      "sourceEndByte": 265,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        26
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 37,
+      "canonicalId": "dag:prefill:db_schema_vector:37",
+      "packetKey": "pkt:tn_v1_4970d07c030280da776ccde1b0a6cb28",
+      "treeNodeId": "tn_v1_4970d07c030280da776ccde1b0a6cb28",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/agentic-search.ts",
+      "sourceRevision": "sha256:c94ebb1fe9c74adc62ce2131f0762927f402b6e17a673978958bc8b907e0d49f",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 113664,
+      "byteLength": 3072,
+      "vectorSha256": "afa9049df6481cc76030abcba7346bf6ba96351919ea61531017c3c9ff06a1e1",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        27
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 38,
+      "canonicalId": "dag:prefill:db_schema_vector:38",
+      "packetKey": "pkt:tn_v1_fea8803c15df0506ea3ec9137b6e046b",
+      "treeNodeId": "tn_v1_fea8803c15df0506ea3ec9137b6e046b",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts",
+      "sourceRevision": "sha256:720d5e657b9a2c9df9466ef1556471766ae5df3cac21743f249bb109708bce82",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 116736,
+      "byteLength": 3072,
+      "vectorSha256": "18db496e28d28332fa88d3b749979bf25dfa79fa41cdae101942acdee37ddc27",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        28
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 39,
+      "canonicalId": "dag:prefill:db_schema_vector:39",
+      "packetKey": "pkt:tn_v1_f9798cc49900b5d62611ca8194721f2c",
+      "treeNodeId": "tn_v1_f9798cc49900b5d62611ca8194721f2c",
+      "sourceRef": "sveltekit-frontend/src/lib/server/vector/clustering-service.ts",
+      "sourceRevision": "sha256:8d6883aed6d86cba1f55864aad73b1a0d46338ebba50560d0773fc51a3569979",
+      "stratum": "DB_SCHEMA_VECTOR",
+      "byteOffset": 119808,
+      "byteLength": 3072,
+      "vectorSha256": "dc304950126f6eceb203d1b9e728fc0ccf6d37c904dd817fa7f9f9564554ee8d",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [
+        29
+      ],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 40,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:40",
+      "packetKey": "pkt:tn_v1_d98d42fc1af0d064fce8ea35586d413c",
+      "treeNodeId": "tn_v1_d98d42fc1af0d064fce8ea35586d413c",
+      "sourceRef": "sveltekit-frontend/src/mcp/admin_tools.ts",
+      "sourceRevision": "sha256:9d61bdff7812c81772d838cb6591dece0e3240d5ea115ea2574a52786d54b96d",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 122880,
+      "byteLength": 3072,
+      "vectorSha256": "1de45bd8f0dbe2cc628c0a6079a6995526f4b4fea6174d439516da7518c1902b",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 41,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:41",
+      "packetKey": "pkt:tn_v1_b387210727f32c878f12e1f12c3405b3",
+      "treeNodeId": "tn_v1_b387210727f32c878f12e1f12c3405b3",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas_embedding_tools.ts",
+      "sourceRevision": "sha256:0f4e8c91587764110d50a34757f11b9c8049cdba7a4cf1b0430b82cfe1638eef",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 125952,
+      "byteLength": 3072,
+      "vectorSha256": "c45f5a11c8913b826f411951960532a2fb6cac05ba9e994e042d2acae67092fc",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 42,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:42",
+      "packetKey": "pkt:tn_v1_4a0245ac14ffaa0519efc8eb60d7b9b1",
+      "treeNodeId": "tn_v1_4a0245ac14ffaa0519efc8eb60d7b9b1",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas_identity_audit_tools.ts",
+      "sourceRevision": "sha256:2c7d822790065f1223ce4cb83d14b888046aa2dc255e7f3a407519cb599d0e6b",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 129024,
+      "byteLength": 3072,
+      "vectorSha256": "3e64fbc6966ac266df315ef84d5cbe8ae871e428de2660012a0fdcd8b5683abf",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 43,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:43",
+      "packetKey": "pkt:tn_v1_788170e194ff2082b323d8f185fd2bd3",
+      "treeNodeId": "tn_v1_788170e194ff2082b323d8f185fd2bd3",
+      "sourceRef": "sveltekit-frontend/src/mcp/atlas-actions-server.ts",
+      "sourceRevision": "sha256:bca4248634a0fde65486ae7fcb5aa8f1d96ab0c125643305083ed2e8528c2ab7",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 132096,
+      "byteLength": 3072,
+      "vectorSha256": "0175609722ec8727b551a0ca4d255e0e15519cae6ec4fb4fbb2dcbbe6606131f",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 44,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:44",
+      "packetKey": "pkt:tn_v1_47e463cd032d50fd8efcb6c472aed719",
+      "treeNodeId": "tn_v1_47e463cd032d50fd8efcb6c472aed719",
+      "sourceRef": "scripts/atlas/_atlas-utils.mjs",
+      "sourceRevision": "sha256:905f6eb7252daf5b0d6e28ddd3695008529b2eeaea24a86d1c99bdbde089a12e",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 135168,
+      "byteLength": 3072,
+      "vectorSha256": "aa16dc6fbdb1406fba17b543ef0204d78e8f6e3ae529fa14e5a7dd40dad77438",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 45,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:45",
+      "packetKey": "pkt:tn_v1_29fdc5b5dc09b1c5668b777620b29131",
+      "treeNodeId": "tn_v1_29fdc5b5dc09b1c5668b777620b29131",
+      "sourceRef": "scripts/atlas/_inspect-glyph-schema.mjs",
+      "sourceRevision": "sha256:97653c909b695b962fc39532b6d2d729562838320545a0d2ee763f539d9514c7",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 138240,
+      "byteLength": 3072,
+      "vectorSha256": "8bf9d48130aa62129f80e56a7585453bdae53dba179e081663237cb54a30ee1e",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 46,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:46",
+      "packetKey": "pkt:tn_v1_44092c4b8dc8fe9a548b7abc79c65b02",
+      "treeNodeId": "tn_v1_44092c4b8dc8fe9a548b7abc79c65b02",
+      "sourceRef": "scripts/atlas/_neschrom-paths.mjs",
+      "sourceRevision": "sha256:acbcef7f5f5e25b4564cd238f8052ec46610084f320dd5e2bcb5037c4886b41b",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 141312,
+      "byteLength": 3072,
+      "vectorSha256": "e15102494450fb5fcd72018901b162542a3a92f1cb6997aeb8c820e81e988f06",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 47,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:47",
+      "packetKey": "pkt:tn_v1_64abbae60da1be7a29b83c9cb730e725",
+      "treeNodeId": "tn_v1_64abbae60da1be7a29b83c9cb730e725",
+      "sourceRef": "scripts/atlas/ace-domain-evidence-extractor.mts",
+      "sourceRevision": "sha256:df1dc962aeaad67b0c38c584ec79432a9b2de7d454f1bc1e45bfae4cac2b439f",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 144384,
+      "byteLength": 3072,
+      "vectorSha256": "cfdd35191104697c278b1b3063c96894e70308c45946340efc5f004668771f0a",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 48,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:48",
+      "packetKey": "pkt:tn_v1_216826d30ebf8700b56081ef8bc22d0c",
+      "treeNodeId": "tn_v1_216826d30ebf8700b56081ef8bc22d0c",
+      "sourceRef": "scripts/atlas/ace-packet-assembly.mjs",
+      "sourceRevision": "sha256:b372f84c955605adc0052b693968257f2bbfc6e50ff54fcef9799b73b1815ca1",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 147456,
+      "byteLength": 3072,
+      "vectorSha256": "3a6f27894f0db4f665107e617f656f1ecb226152b862391df82fd40e9ec7de44",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    },
+    {
+      "ordinal": 49,
+      "canonicalId": "dag:prefill:mcp_atlas_tools:49",
+      "packetKey": "pkt:tn_v1_3f9eee75a597c6f3aa6d1b94c047570f",
+      "treeNodeId": "tn_v1_3f9eee75a597c6f3aa6d1b94c047570f",
+      "sourceRef": "scripts/atlas/ace-radix-01/boundary-fixture-v1.mjs",
+      "sourceRevision": "sha256:7be4a98c485e5efc02d4905c58baa66428c2af4f92858cbb5d5f66ee5b415757",
+      "stratum": "MCP_ATLAS_TOOLS",
+      "byteOffset": 150528,
+      "byteLength": 3072,
+      "vectorSha256": "d84be1c6a3f018a16a2c14468f9cef190f32321512874f60e65fa475a9277c79",
+      "sourceStartByte": 0,
+      "sourceEndByte": 1024,
+      "dependencyOrdinals": [],
+      "dependentOrdinals": [],
+      "representationRevision": "semantic_768:v1"
+    }
+  ],
+  "checksumSha256": "36eed1e0f905d2cca8f792ddb2db68944408efe1115322c1190e8da58166c687"
+}

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { LaneCandidate, Retriever, RetrievalInput } from '../../retrieval/lane-contracts.js';
 import { validateCandidate } from '../../retrieval/lane-contracts.js';
 import {
@@ -9,6 +10,53 @@ import type {
 } from './function-registry-snapshot-loader-v1.js';
 
 export type FunctionRegistrySnapshotLoaderV1 = () => Promise<unknown>;
+
+export type FunctionRegistryChunkRowV1 = {
+  chunkRowId: string;
+  canonicalChunkId: string;
+  content: string;
+  lineStart: number;
+  lineEnd: number;
+};
+
+export function resolveFunctionRegistryChunkRowV1(input: {
+  sourceBytes: Uint8Array;
+  sourceRevision: string;
+  sourceContentHash: string;
+  startByte: number;
+  endByte: number;
+  rows: readonly FunctionRegistryChunkRowV1[];
+}): { chunkRowId: string; canonicalChunkId: string } | null {
+  if (!/^sha256:[a-f0-9]{64}$/i.test(input.sourceRevision)
+    || !/^[a-f0-9]{64}$/i.test(input.sourceContentHash)
+    || input.sourceRevision.slice(7).toLowerCase() !== input.sourceContentHash.toLowerCase()
+    || createHash('sha256').update(input.sourceBytes).digest('hex') !== input.sourceContentHash.toLowerCase()
+    || !Number.isSafeInteger(input.startByte) || !Number.isSafeInteger(input.endByte)
+    || input.startByte < 0 || input.endByte <= input.startByte || input.endByte > input.sourceBytes.byteLength
+    || input.rows.length === 0 || input.rows.length > 64) return null;
+
+  const sourceBuffer = Buffer.from(input.sourceBytes);
+  const matches = input.rows.filter((row) => {
+    if (!row.chunkRowId || !row.canonicalChunkId || !Number.isInteger(row.lineStart)
+      || !Number.isInteger(row.lineEnd) || row.lineStart < 1 || row.lineEnd < row.lineStart
+      || !row.content) return false;
+    const chunkBytes = Buffer.from(row.content, 'utf8');
+    let occurrence = sourceBuffer.indexOf(chunkBytes);
+    if (occurrence < 0) return false;
+    const firstOccurrence = occurrence;
+    occurrence = sourceBuffer.indexOf(chunkBytes, occurrence + 1);
+    if (occurrence >= 0) return false;
+    const chunkEnd = firstOccurrence + chunkBytes.byteLength;
+    if (firstOccurrence > input.startByte || chunkEnd < input.endByte) return false;
+    const chunkLineStart = 1 + sourceBuffer.subarray(0, firstOccurrence).reduce((count, byte) => count + Number(byte === 10), 0);
+    const chunkLineEnd = chunkLineStart + chunkBytes.reduce((count, byte) => count + Number(byte === 10), 0);
+    return row.lineStart === chunkLineStart && row.lineEnd === chunkLineEnd;
+  });
+
+  return matches.length === 1
+    ? { chunkRowId: matches[0].chunkRowId, canonicalChunkId: matches[0].canonicalChunkId }
+    : null;
+}
 
 function queryTokens(query: string): string[] {
   return [...new Set(query.toLocaleLowerCase().match(/[\p{L}\p{N}_$.-]+/gu) ?? [])];
@@ -104,6 +152,7 @@ export function createQualifiedFunctionRegistryRetrieverV1(input: {
     limit: number;
   }) => Promise<FunctionRegistrySearchCandidateV1[]>;
   loader: FunctionSnapshotLoaderV1;
+  resolveChunkRow?: (entry: FunctionRegistrySnapshotV1['entries'][number]) => Promise<{ chunkRowId: string; canonicalChunkId: string } | null>;
   expectedWorkspaceRevision: string;
   maxCandidates?: number;
 }): Retriever {
@@ -148,12 +197,26 @@ export function createQualifiedFunctionRegistryRetrieverV1(input: {
             expectedWorkspaceRevision: input.expectedWorkspaceRevision,
           });
           if (loaded.status !== 'QUALIFIED') continue;
-          qualifiedCandidates.push(...functionRegistrySnapshotToLaneCandidatesV1({
+          const laneCandidates = functionRegistrySnapshotToLaneCandidatesV1({
             snapshot: loaded.snapshot,
             expectedWorkspaceRevision: input.expectedWorkspaceRevision,
             query: request.query,
             limit: 1,
-          }));
+          });
+          for (const laneCandidate of laneCandidates) {
+            const entry = loaded.snapshot.entries.find((item) => item.symbolVersionId === laneCandidate.symbolVersionId);
+            if (!input.resolveChunkRow) {
+              qualifiedCandidates.push(laneCandidate);
+              continue;
+            }
+            const chunkRow = entry ? await input.resolveChunkRow(entry) : null;
+            if (!chunkRow) continue;
+            qualifiedCandidates.push({
+              ...laneCandidate,
+              packetId: chunkRow.chunkRowId,
+              metadata: { ...laneCandidate.metadata, canonical_chunk_row_id: chunkRow.chunkRowId, canonical_chunk_id: chunkRow.canonicalChunkId },
+            });
+          }
         } catch {
           continue;
         }

@@ -681,3 +681,25 @@ timed-out request. Added focused queue-removal regression tests. This is local
 contract hardening only; it does not prove CPU-core affinity, GPU parallel
 speedup, durable RPC dispatch, cache tier transitions, or end-to-end execution.
 Do not close CPU-WORKER-BOUNDS-01 or the transport gates on this evidence.
+
+#### ACP gRPC channel-pool runtime defect correction (2026-10-15)
+
+The focused source review found that `ACPGrpcChannelPool.getChannel()` referenced an undeclared `channel`, treated connectivity state `3` as READY (the installed grpc-js enum defines READY as `2` and `3` as TRANSIENT_FAILURE), and claimed an HTTP fallback it could not return through its `Promise<Channel>` contract. Replaced that broken probe with lazy `Client`/`getChannel()` construction, keyed pooling by service/address/TLS mode, and service-scoped client closure. The transport selection/fallback decision remains the caller's responsibility. Focused command `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts` exited **0**, **4/4** tests passed, including lazy channel creation/reuse and closing only the requested service. Implementation SHA-256: `abc5424045c2c3d5aab5337b3dbb145a2d82559313749e1c2baa707bb6da6742`; spec SHA-256: `68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5`.
+
+This closes only a local channel-pool contract defect. Source search found no production caller of `acpChannelPool.getChannel()`; no service connection was attempted. QUIC/HTTP3, RPC packet protobuf mapping, real gRPC business-method parity, and ACP/MCP → SearchRuntime → ContextManifest → DAG execution remain **NOT_PROVEN**. Do not close `QUIC-RPC-01`, `RPC-PACKET-PROTO-01`, `AGENT-WORKFLOW-E2E-01`, or `HTTP3-ASGI-01` based on this unit test.
+
+Follow-up fail-closed advertisement correction: QUIC defaults false in A2A metadata; `negotiateQuicTransport()` now requires both `enabled` and explicit `listenerVerified`; `/api/acp/service-ports` sets both false, reports `quicSupport.enabled=false`, omits the Alt-Svc response header, and returns null/no advertised Alt-Svc metadata. Focused command `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts` exited **0**, **6/6** tests passed. Current source hashes: bridge `ca41415eb4b43f128f94bfb16de86149b7dee137cb420e8a8d3144b56d7e6b4c`, original bridge spec `68e922e3392519d74773e84a0c6b2e3371cfe46845fc42e2d637b219c5ddd7d5`, new QUIC spec `f7ac9b5fbfa47897bdb4e366110bfd43594812e5cc42dbba9204e56e892db54b`, route `fba3cfe7b5c37fa5b1412943e1ee7083358e0f3624c4339c98db60a3958dc49e`.
+
+This corrects false capability advertisement; it does not implement or verify HTTP/3, QUIC, or the application route at runtime. No service, network listener, datastore, or GPU was touched. Keep P23 transport proof gates open.
+
+#### P23 live gRPC health-only recheck (2026-10-15)
+
+The existing bounded read-only probe reached retrieval Health on `127.0.0.1:50053` (exit 0), but that service reported `unhealthy` because `embeddingServiceUp=false`; PostgreSQL/pgvector, Qdrant, and Redis were reported connected. Search Health on `127.0.0.1:50055` and embedding Health on `127.0.0.1:50051` each returned `14 UNAVAILABLE / ECONNREFUSED` (exit 1). This proves only mixed Health RPC reachability—not business RPC parity, HTTP/2 or QUIC/HTTP3 negotiation, production caller wiring, or agent-to-DAG execution. No writes or service changes occurred. Keep P23 runtime and E2E gates open. Receipt: `docs/reports/parent-atlas-phase-roadmap-reconciliation-v1.json`.
+
+#### P23 focused transport-contract replay (2026-10-15)
+
+Re-ran `cd sveltekit-frontend && npx vitest run src/lib/server/acp/acp-grpc-quic-bridge.spec.ts src/lib/server/acp/acp-quic-advertisement-v1.spec.ts --pool=threads --maxWorkers=1 --minWorkers=1 --reporter=verbose`; exit **0**, 2 files / **6 tests passed**. Log: `.tmp/atlas/p23-transport-contract-tests-20261015.txt` (SHA-256 `9CC47E4C6F650F304ADB0051220551581EF4452CD39728CEE952292D716FC623`). This is current contract evidence only; it does not promote the local channel helper to a live caller or prove protocol negotiation/business parity. No service, network listener, database, or cache was changed; P23 remains partial.
+
+#### P23 live Health refresh (2026-10-15)
+
+Ran the read-only, 2-second-timeout Health probe against the existing local Go service endpoints. Retrieval on `127.0.0.1:50053` is now `healthy` with pgvector, Qdrant, Redis, and embedding dependency flags true (exit 0). Embedding on `127.0.0.1:50051` is `healthy`, `modelLoaded=true`, device `cpu` (exit 0); this is not GPU evidence. Search on `127.0.0.1:50055` remains unreachable with `ECONNREFUSED` (exit 1). Full captured outputs and per-service exit codes: `.tmp/atlas/p23-live-health-20261015.json` (SHA-256 `F25522219662CA57C31949A98DE15C374659B1FF5EFF2AFA992138FD49221431`). This updates service Health only; no business method, QUIC/HTTP3 negotiation, ACP caller, or DAG path was exercised. No writes or service changes occurred; P23 remains partial.

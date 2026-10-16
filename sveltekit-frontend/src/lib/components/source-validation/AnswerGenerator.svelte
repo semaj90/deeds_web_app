@@ -20,7 +20,7 @@ let {
 	caseId,
 	query,
 	onAnswerGenerated,
-	llmProvider = 'gemma4-legal'
+	llmProvider = 'ornith-1.5-9b'
 }: AnswerGeneratorProps = $props();
 
 // State

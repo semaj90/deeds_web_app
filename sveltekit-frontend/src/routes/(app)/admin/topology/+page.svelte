@@ -43,7 +43,7 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					message: `Analyze this codebase node and suggest fixes: "${node.name}" (type: ${node.type}, errors: ${node.errors}, complexity: ${node.complexity}, recommended action: ${node.recommended_action}). List 3 specific, actionable fixes.`,
-					model: 'gemma4-legal'
+					model: 'ornith-1.5-9b'
 				}),
 				signal: AbortSignal.timeout(120_000)
 			});

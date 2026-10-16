@@ -119,6 +119,41 @@ describe('function registry read adapter v1', () => {
     expect(result).toMatchObject({ status: 'REJECTED', reason: 'AST_PROVENANCE_MISMATCH' });
   });
 
+  it('preserves canonical source identity through an explicit stored-path crosswalk', async () => {
+    const base = ports();
+    const sourceRef = 'sveltekit-frontend/src/ResolveFunction.ts';
+    const original = await base.getSymbolVersion(symbolVersionId);
+    if (!original) throw new Error('FIXTURE_SYMBOL_MISSING');
+    const symbol = { ...original, sourceRef };
+    const binding = { ...(await base.getWorkspaceSourceBindings(original.sourceRef, sourceRevision, workspaceRevision))[0],
+      canonicalSourceRef: sourceRef };
+    const observations = (await base.getAstCandidates(original, binding, sourceBytes)).map((observation) => ({
+      ...observation,
+      node: { ...observation.node, relativePath: sourceRef.toLowerCase() },
+      pathBinding: { policy: 'ATLAS_AST_NODES_REPO_RELATIVE_LOWERCASE_V1' as const,
+        canonicalSourceRef: sourceRef, storedRelativePath: sourceRef.toLowerCase() },
+    }));
+    const mapped = ports({
+      getSymbolVersion: async () => symbol,
+      getPackets: async () => [{ packetKey: symbol.packetKey!, sourceRef, sourceRevision, workspaceRevisionKey: workspaceRevision }],
+      getWorkspaceSourceBindings: async () => [binding],
+      getAstCandidates: async () => observations,
+    });
+    const request = { symbolVersionId, expectedWorkspaceRevision: workspaceRevision, expectedSourceRevision: sourceRevision };
+    const result = await qualifyFunctionRegistryReadOnlyV1({ ...request, ports: mapped });
+    expect(result.status).toBe('QUALIFIED');
+    if (result.status === 'QUALIFIED') expect(result.snapshot.entries[0].sourceRef).toBe(sourceRef);
+
+    const unbound = { ...mapped, getAstCandidates: async () => observations.map(({ pathBinding, ...observation }) => observation) };
+    expect(await qualifyFunctionRegistryReadOnlyV1({ ...request, ports: unbound }))
+      .toMatchObject({ status: 'REJECTED', reason: 'AST_NOT_FOUND' });
+    const wrongRoot = { ...mapped, getAstCandidates: async () => observations.map((observation) => ({
+      ...observation, node: { ...observation.node, relativePath: 'src/resolvefunction.ts' },
+    })) };
+    expect(await qualifyFunctionRegistryReadOnlyV1({ ...request, ports: wrongRoot }))
+      .toMatchObject({ status: 'REJECTED', reason: 'AST_NOT_FOUND' });
+  });
+
   it('rejects a mismatched expected workspace revision', async () => {
     const result = await qualifyFunctionRegistryReadOnlyV1({
       symbolVersionId,
@@ -127,6 +162,17 @@ describe('function registry read adapter v1', () => {
       ports: ports(),
     });
     expect(result).toMatchObject({ status: 'REJECTED', reason: 'REVISION_MISMATCH' });
+  });
+
+  it('rejects blank signature or ancestry evidence rather than treating whitespace as parser proof', async () => {
+    const base = ports();
+    for (const field of ['signature', 'astPath'] as const) {
+      const incomplete = { ...base, getAstCandidates: async (...args: Parameters<FunctionRegistryReadPortsV1['getAstCandidates']>) =>
+        (await base.getAstCandidates(...args)).map((observation) => ({ ...observation, [field]: ' \n\t' })) };
+      expect(await qualifyFunctionRegistryReadOnlyV1({ symbolVersionId,
+        expectedWorkspaceRevision: workspaceRevision, expectedSourceRevision: sourceRevision, ports: incomplete }))
+        .toMatchObject({ status: 'REJECTED', reason: 'AST_PROVENANCE_MISMATCH' });
+    }
   });
 
   it('rejects a stale AST source revision', async () => {

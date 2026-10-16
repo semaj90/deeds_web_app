@@ -401,7 +401,7 @@ async function importSummaries(summaryFile) {
         b.source_ref,
         b.summary,
         'gemma4_offline',
-        'gemma4-legal-iq4xs-direct.gguf',
+        'ornith-1.5-9b',
         'packet',
       ]);
 

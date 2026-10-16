@@ -226,6 +226,8 @@ function deriveInputs(cap: RepairCapability): string[] {
   }
 }
 
+import { createHash } from 'node:crypto';
+
 // ── Task card factory ─────────────────────────────────────────────────────────
 
 export function buildTaskCard(opts: {
@@ -238,7 +240,8 @@ export function buildTaskCard(opts: {
   const meta = repairSkillManifest[skillId];
   const now = new Date().toISOString();
   return {
-    id:          `task:repair:${skillId}:${Date.now()}`,
+    // Deterministic: one task per skill x source. A timestamp here made every run insert a duplicate row.
+    id:          `task:repair:${skillId}:${createHash('sha256').update(`${sourceRef}|${title}`).digest('hex').slice(0, 12)}`,
     title,
     feature_id:  meta.feature_id,
     source_refs: [sourceRef, ...extraSourceRefs].filter(Boolean),

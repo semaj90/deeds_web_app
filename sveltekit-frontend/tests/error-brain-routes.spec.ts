@@ -69,11 +69,11 @@ vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
 	getChatModelKeepAlive: () => '2m',
 	getEmbeddingModelKeepAlive: () => '24h',
-	getChatModel: () => 'gemma4-rotorquant:latest',
+	getChatModel: () => 'ornith-1.5-9b',
 	getEmbedModel: () => 'embeddinggemma:latest',
-	getOllamaGenerationEndpoint: () => 'http://ollama.test',
+	getLlamaGenerationEndpoint: () => 'http://ollama.test',
 	callLlamaServerChat: mockCallOllamaChat,
-	ollamaFetch: mockOllamaFetch,
+	embedOrChatFetch: mockOllamaFetch,
 }));
 
 vi.mock('$lib/server/cache.js', () => ({

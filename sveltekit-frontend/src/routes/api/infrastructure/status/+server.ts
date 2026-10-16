@@ -17,7 +17,7 @@ import { healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
 import { healthCheckModel as tritonModelHealthCheck } from '$lib/server/triton-llm.js';
 import { isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import { NODE_RUNTIME_CONFIG, GPU_MARKDOWN_ENV } from '$lib/gpu/runtime-optimizations.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { validateQdrantCollections } from '$lib/server/config/vector-config.js';
 import { getAdapterStatus } from '$lib/server/inference/adapter-manifest.js';
 import { getDispatchStats } from '$lib/server/queue/dispatch-inline.js';
@@ -61,7 +61,7 @@ export const GET: RequestHandler = async ({ locals }) => {
       getGpuLeaseStatus().catch(() => null),
 
       // Ollama
-      ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
+      embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(TIMEOUT) })
         .then((r) => r.ok)
         .catch(() => false),
 

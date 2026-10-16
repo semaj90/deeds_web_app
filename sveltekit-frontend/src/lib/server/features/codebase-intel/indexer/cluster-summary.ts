@@ -10,7 +10,7 @@
  * and in Claude / Copilot context enrichment.
  */
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { executeProviderEmbeddingV1 } from '$lib/server/embedding/embedding-provider-executor-v1.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { resolveLoadedLlamaModel } from '$lib/server/ai/llama-server-model-resolver.js';
@@ -179,7 +179,7 @@ async function fetchClusterChunks(clusterId: number): Promise<QdrantPoint[]> {
 
 async function embedSummary(summary: string): Promise<number[] | null> {
   try {
-    const embeddingFetch: typeof fetch = (input, init) => ollamaFetch(String(input), init);
+    const embeddingFetch: typeof fetch = (input, init) => embedOrChatFetch(String(input), init);
     const { embedding } = await executeProviderEmbeddingV1({
       text: summary,
       mode: 'unprompted_legacy',

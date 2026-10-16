@@ -5,7 +5,7 @@ import { parsePdfBuffer } from '$lib/server/pdf/pdf-parser.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
@@ -92,7 +92,7 @@ function chunkText(text: string, chunkSize = 500, overlap = 100): string[] {
  */
 async function generateEmbedding(text: string): Promise<number[]> {
   try {
-    const response = await ollamaFetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
+    const response = await embedOrChatFetch(`${OLLAMA_URL_VAR}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

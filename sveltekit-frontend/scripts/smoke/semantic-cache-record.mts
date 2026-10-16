@@ -21,12 +21,12 @@ async function main(): Promise<void> {
 	try {
 		const suffix = crypto.randomUUID().slice(0, 12);
 		const queryHash = crypto.createHash('sha256').update(`semantic-cache-record:${suffix}`).digest('hex');
-		const semanticCacheKey = buildSemanticCacheKey(queryHash, 'gemma4-rotorquant:latest', 'llama-server');
+		const semanticCacheKey = buildSemanticCacheKey(queryHash, 'ornith-1.5-9b', 'llama-server');
 		const sourceRef = `docs/phase101/semantic-record/${suffix}.md`;
 		const record: SemanticCacheRecord = {
 			queryHash,
 			semanticCacheKey,
-			model: 'gemma4-rotorquant:latest',
+			model: 'ornith-1.5-9b',
 			provider: 'llama-server',
 			sourceRefs: [sourceRef],
 			chunkIds: [`chunk-${suffix}`],

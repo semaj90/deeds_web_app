@@ -69,7 +69,7 @@ vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
   },
 }));
 
-import { createSearchRuntime } from './search-runtime.js';
+import { buildFunctionRegistryRetrievalProofV1, createSearchRuntime } from './search-runtime.js';
 import type { SearchResult } from './search-runtime.js';
 import { classifyAtlasQuery } from '../atlas/agentic-file-compiler/query-classifier.js';
 import { compileTaxonomyScopeV1 } from '../atlas/agentic-file-compiler/taxonomy-scope-v1.js';
@@ -632,6 +632,13 @@ describe('search runtime bridge', () => {
     expect(observedWorkspaceRevisions).toEqual(Array(4).fill(baseRequest.workspaceRevision));
     expect(literalResult.provenance.readOnly).toBe(true);
     expect(expandedResult.provenance.readOnly).toBe(true);
+    const hydratedCandidates = mockHydrateCandidatesWithProof.mock.calls[0]?.[0] as Array<{
+      packetKey: string;
+      symbolVersionId: string | null;
+    }>;
+    expect(hydratedCandidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ packetKey: 'sparse-shared', symbolVersionId: null }),
+    ]));
     expect(literalResult.provenance.promotionAttempted).toBe(false);
     expect(expandedResult.provenance.promotionAttempted).toBe(false);
     expect(mockRecordPromotionIntent).not.toHaveBeenCalled();
@@ -820,5 +827,127 @@ describe('SearchResult.provenance.hypergraphNeighbors — KAG-01/02 additive int
       hypergraphNeighbors: [{ canonicalId: 'packet:a', hyperedgeIds: ['hyperedge:1', 'hyperedge:2'] }],
     };
     expect(provenance.hypergraphNeighbors?.[0].canonicalId).toBe('packet:a');
+  });
+});
+
+describe('Function Registry final Top-K proof identity', () => {
+  it('matches the exact symbol, AST node, source, and revisions when packet keys differ', () => {
+    const candidate = {
+      packetKey: 'packet:registry-key',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
+      functionRegistryEvidence: {
+        snapshotChecksum: 'a'.repeat(64),
+        canonicalId: 'function:example',
+        symbolVersionId: 'symbol-version:example',
+        treeNodeId: 'tree-node:example',
+        sourceContentHash: 'b'.repeat(64),
+        startByte: 1,
+        endByte: 10,
+        evidenceChecksum: 'c'.repeat(64),
+      },
+    };
+    const matchingFinalPacket = {
+      packet_key: 'canonical-chunk-key',
+      symbol_version_id: 'symbol-version:example',
+      tree_node_id: 'tree-node:example',
+      source_revision: 'sha256:source',
+      workspace_revision: 'sha256:workspace',
+      source_ref: 'src/example.ts',
+    };
+
+    const proof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      hydratedPackets: [matchingFinalPacket] as any,
+      rerankedPackets: [matchingFinalPacket] as any,
+      postProcessedPacketKeys: ['canonical-chunk-key'],
+      postProcessDecisions: [{
+        packetKey: 'canonical-chunk-key',
+        decision: 'KEEP',
+        reason: 'TOP_K',
+        detail: 'kept',
+      }] as any,
+      finalPackets: [matchingFinalPacket] as any,
+    });
+
+    expect(proof.qualifiedFinalCandidateCount).toBe(1);
+    expect(proof.candidates[0].presentInFinalTopK).toBe(true);
+    expect(proof.candidates[0]).toMatchObject({
+      presentAfterHydration: true,
+      presentAfterRerank: true,
+      presentAfterPostProcess: true,
+      dropStage: 'NONE',
+      postProcessDecision: { decision: 'KEEP', reason: 'TOP_K', detail: 'kept' },
+    });
+
+    const diversityDroppedProof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      hydratedPackets: [matchingFinalPacket] as any,
+      rerankedPackets: [matchingFinalPacket] as any,
+      postProcessedPacketKeys: [],
+      postProcessDecisions: [{
+        packetKey: 'canonical-chunk-key',
+        decision: 'DROP',
+        reason: 'SOURCE_DIVERSITY',
+        detail: 'dedupPrefixDepth=2 prefix=sveltekit-frontend/src',
+      }] as any,
+      finalPackets: [] as any,
+    });
+
+    expect(diversityDroppedProof.candidates[0]).toMatchObject({
+      presentAfterHydration: true,
+      presentAfterRerank: true,
+      presentAfterPostProcess: false,
+      presentInFinalTopK: false,
+      dropStage: 'POST_PROCESS',
+      postProcessDecision: {
+        decision: 'DROP',
+        reason: 'SOURCE_DIVERSITY',
+        detail: 'dedupPrefixDepth=2 prefix=sveltekit-frontend/src',
+      },
+    });
+  });
+
+  it('does not match symbol identity when any source qualification differs', () => {
+    const candidate = {
+      packetKey: 'packet:registry-key',
+      sourceRef: 'src/example.ts',
+      sourceRevision: 'sha256:source',
+      workspaceRevision: 'sha256:workspace',
+      functionRegistryEvidence: {
+        snapshotChecksum: 'a'.repeat(64),
+        canonicalId: 'function:example',
+        symbolVersionId: 'symbol-version:example',
+        treeNodeId: 'tree-node:example',
+        sourceContentHash: 'b'.repeat(64),
+        startByte: 1,
+        endByte: 10,
+        evidenceChecksum: 'c'.repeat(64),
+      },
+    };
+    const staleFinalPacket = {
+      packet_key: 'canonical-chunk-key',
+      symbol_version_id: 'symbol-version:example',
+      tree_node_id: 'tree-node:example',
+      source_revision: 'sha256:stale',
+      workspace_revision: 'sha256:workspace',
+      source_ref: 'src/example.ts',
+    };
+
+    const proof = buildFunctionRegistryRetrievalProofV1({
+      enabled: true,
+      readOnly: true,
+      candidates: [candidate] as any,
+      finalPackets: [staleFinalPacket] as any,
+    });
+
+    expect(proof.qualifiedFinalCandidateCount).toBe(0);
+    expect(proof.candidates[0].presentInFinalTopK).toBe(false);
+    expect(proof.candidates[0].dropStage).toBe('HYDRATION');
   });
 });

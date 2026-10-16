@@ -50,7 +50,7 @@ export type ContextPack = {
   created_at: string;
 
   model: {
-    synth: "gemma4-rotorquant:latest";
+    synth: "ornith-1.5-9b";
     embed: "embeddinggemma:latest"
   };
 

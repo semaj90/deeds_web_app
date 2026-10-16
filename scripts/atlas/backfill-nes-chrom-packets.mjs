@@ -258,7 +258,7 @@ async function main() {
           queryHash,
           'nes_glyph_backfill',
           'completed',
-          'gemma4-rotorquant:latest',
+          'ornith-1.5-9b',
           0,
           'NES/Glyph backfill seed packets generated from the missing-features analysis.',
           JSON.stringify({ ok: true, packets: packets.length, source: runMetadata.sourceReportPath }),
@@ -278,7 +278,7 @@ async function main() {
             )
             VALUES (
               $1, $2, $3, $4, $5::jsonb, $6,
-              'nes_chrom', 'semantic_packet', 'gemma4-rotorquant:latest', $7, $8::jsonb, NULL, NULL,
+              'nes_chrom', 'semantic_packet', 'ornith-1.5-9b', $7, $8::jsonb, NULL, NULL,
               $9, $10, 6000, NOW(), NOW()
             )
             ON CONFLICT (packet_key) DO UPDATE SET

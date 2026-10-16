@@ -1,0 +1,67 @@
+{
+  "schema": "atlas.unified-7stage-execution-flow-receipt.v1",
+  "generatedAt": "2026-10-16T01:36:21.514Z",
+  "writesPerformed": false,
+  "stages": {
+    "STAGE_01_DOMAIN_FRUSTUM_QUERY": {
+      "status": "PASS",
+      "unitQuaternionNorm": 1,
+      "mbvh4HitLeafId": 0,
+      "mbvh4ClosestT": 4.25
+    },
+    "STAGE_02_SOM_MANIFOLD_BITMASK_PRUNING": {
+      "status": "PASS",
+      "cohortTotalRows": 50,
+      "bitmaskPrunedEligibleRows": 48,
+      "manifoldBestClusterId": 0,
+      "promotedLodTier": 4
+    },
+    "STAGE_03_NES_F32BIN_LUT_STREAMING": {
+      "status": "PASS",
+      "lutTotalEntries": 1000,
+      "streamedOrdinals": [
+        0,
+        1,
+        2
+      ],
+      "bytesPerVector": 3072,
+      "sampleCanonicalId": "packet:source:legal_2710"
+    },
+    "STAGE_04_ISOQUANT_SO4_QUATERNION_ROTATION": {
+      "status": "PASS",
+      "blocks4DCount": 192,
+      "vectorDimension": 768,
+      "innerProductPreservationDiff": 1.3010426069826053e-17,
+      "roundTripMaxAbsDiff": 3.3977788013728194e-9
+    },
+    "STAGE_05_CUBLAS_RERANK_AND_QLORA_GATE": {
+      "status": "PASS",
+      "baseEmbeddingOwner": "PostgreSQL 18 (semantic_768 / EmbeddingGemma)",
+      "activeSynthesisModel": "ornith-1.5-9b (:8090)",
+      "adapterMutatesBaseEmbeddings": false,
+      "sourceSha256Verified": true,
+      "cudaGemmMaxAbsDiff": 1.4156103134155273e-7,
+      "cudaGemmSpeedup": 271.15
+    },
+    "STAGE_06_BITFROST_RESIDENCY_KNAPSACK": {
+      "status": "PASS",
+      "budgetMaxBytes": 40960,
+      "usedBytes": 6144,
+      "selectedCount": 2,
+      "bitfrostReadbackVerified": true
+    },
+    "STAGE_07_ACTION_DAG_EXECUTION": {
+      "status": "PASS",
+      "finalState": "VERIFIED",
+      "transitionCount": 5,
+      "transitions": [
+        "PROPOSED->QUALIFIED",
+        "QUALIFIED->QUEUED",
+        "QUEUED->LEASED",
+        "LEASED->RUNNING",
+        "RUNNING->VERIFIED"
+      ]
+    }
+  },
+  "status": "PASS"
+}

@@ -17,6 +17,12 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  createGoldenReviewJudgmentEventV1,
+  hashGoldenReviewCohortV1,
+  isDuplicateGoldenReviewDecisionV1,
+  readGoldenReviewJournalV1,
+} from './lib/golden-review-journal-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const arg = (name, dflt) => (process.argv.find((a) => a.startsWith(`--${name}=`)) ?? '').split('=')[1] ?? dflt;
@@ -26,11 +32,13 @@ const defaultReviewer = arg('reviewer', '');
 const queuePath = path.join(repoRoot, '.tmp/atlas/golden-relevance-review-queue-pooled-v1.ndjson');
 const outDir = path.resolve(repoRoot, arg('out-dir', '.tmp/atlas'));
 fs.mkdirSync(outDir, { recursive: true });
-const judgmentsPath = path.join(outDir, 'golden-relevance-judgments-v1.ndjson');
-const judgedQueuePath = path.join(outDir, 'golden-relevance-review-queue-pooled-judged-v1.ndjson');
+const judgmentsPath = path.join(outDir, 'golden-relevance-judgment-events-v2.ndjson');
+const judgedQueuePath = path.join(outDir, 'golden-relevance-review-queue-pooled-judged-v2.ndjson');
 
 if (!fs.existsSync(queuePath)) throw new Error(`Missing queue: ${queuePath} (run prepare_golden_review_pool_v1.py --pooled then --bind-adapt)`);
-const allQueue = fs.readFileSync(queuePath, 'utf8').split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
+const queueText = fs.readFileSync(queuePath, 'utf8');
+const cohortChecksum = hashGoldenReviewCohortV1(queueText);
+const allQueue = queueText.split(/\r?\n/).filter(Boolean).map((l) => JSON.parse(l));
 
 // GATE-00F0: query eligibility. Only VALID queries are graded; the pilot takes the first N VALID queries (not necessarily the first N).
 const ELIGIBILITY_STATUSES = ['VALID', 'UNCLEAR', 'INVALID_META_PROMPT', 'INVALID_ARTIFACT'];
@@ -58,23 +66,22 @@ function rebuild() {
 }
 rebuild();
 
-const saved = new Map(); // `${queryPacketKey}|${packetKey}` -> judgment record
+const saved = new Map();
 if (fs.existsSync(judgmentsPath)) {
-  for (const line of fs.readFileSync(judgmentsPath, 'utf8').split(/\r?\n/).filter(Boolean)) {
-    const r = JSON.parse(line);
-    saved.set(`${r.queryPacketKey}|${r.packetKey}`, r);
-  }
+  const journal = readGoldenReviewJournalV1(fs.readFileSync(judgmentsPath, 'utf8'), cohortChecksum);
+  for (const [key, event] of journal.latest) saved.set(key, event);
 }
 
 function persist() {
-  fs.writeFileSync(judgmentsPath, [...saved.values()].map((r) => JSON.stringify(r)).join('\n') + (saved.size ? '\n' : ''), 'utf8');
   const merged = queue.map((q) => ({
     ...q,
     reviewStatus: q.judgments.every((j) => saved.has(`${q.queryPacketKey}|${j.packetKey}`)) ? 'COMPLETE' : 'PENDING',
     judgments: q.judgments.map(({ display, ...j }) => {
       const s = saved.get(`${q.queryPacketKey}|${j.packetKey}`);
       return s ? { ...j, relevanceGrade: s.relevanceGrade, confidence: s.confidence, judgmentSource: s.judgmentSource,
-        reviewerId: s.reviewerId, notes: s.notes ?? null, isHardNegative: s.isHardNegative === true } : j;
+        reviewerId: s.reviewerId, notes: s.notes ?? null, isHardNegative: s.isHardNegative === true,
+        trainingEligible: false, canonicalAuthority: false,
+        sourceAuthorityStatus: 'NOT_ESTABLISHED_BY_RELEVANCE_REVIEW' } : j;
     }),
   }));
   fs.writeFileSync(judgedQueuePath, merged.map((m) => JSON.stringify(m)).join('\n') + '\n', 'utf8');
@@ -223,12 +230,26 @@ const server = http.createServer((req, res) => {
           if (typeof b.confidence !== 'number' || b.confidence < 0 || b.confidence > 1) throw new Error('confidence 0-1');
           if (!b.reviewerId) throw new Error('reviewerId required');
           if (b.isHardNegative && b.relevanceGrade !== 0) throw new Error('hard negative must be grade 0');
-          saved.set(`${q.queryPacketKey}|${j.packetKey}`, {
-            schema: 'atlas.golden-relevance-judgment.v1', queryPacketKey: q.queryPacketKey, packetKey: j.packetKey,
-            evaluationUnit: 'SOURCE_FILE', relevanceGrade: b.relevanceGrade, confidence: b.confidence,
-            judgmentSource: 'HUMAN_REVIEWED', trainingEligible: true, reviewerId: b.reviewerId,
-            notes: b.notes ?? null, isHardNegative: b.isHardNegative === true, judgedAt: new Date().toISOString(),
+          const key = `${q.queryPacketKey}|${j.packetKey}`;
+          const previousEvent = saved.get(key) ?? null;
+          if (isDuplicateGoldenReviewDecisionV1(previousEvent, b)) {
+            res.writeHead(200, { 'content-type': 'application/json' });
+            res.end('{"ok":true,"duplicate":true}');
+            return;
+          }
+          const event = createGoldenReviewJudgmentEventV1({
+            cohortChecksum,
+            queryPacketKey: q.queryPacketKey,
+            packetKey: j.packetKey,
+            relevanceGrade: b.relevanceGrade,
+            confidence: b.confidence,
+            reviewerId: b.reviewerId,
+            notes: b.notes ?? null,
+            isHardNegative: b.isHardNegative === true,
+            previousEvent,
           });
+          fs.appendFileSync(judgmentsPath, `${JSON.stringify(event)}\n`, { encoding: 'utf8', flag: 'a' });
+          saved.set(key, event);
           persist();
           res.writeHead(200, { 'content-type': 'application/json' }); res.end('{"ok":true}');
         } catch (e) { res.writeHead(400, { 'content-type': 'application/json' }); res.end(JSON.stringify({ error: String(e.message) })); }
@@ -241,5 +262,7 @@ const server = http.createServer((req, res) => {
 server.listen(port, '127.0.0.1', () => {
   console.log(`golden review: http://127.0.0.1:${port}  eligible items=${items.length} valid queries=${queue.length}/${allQueue.length}${pilot ? ` (PILOT: first ${pilot} VALID)` : ''} graded=${saved.size}`);
   console.log(`open http://127.0.0.1:${port}/eligibility first to mark query eligibility (only VALID queries are graded)`);
-  console.log(`writes: ${path.relative(repoRoot, judgmentsPath)} and ${path.relative(repoRoot, judgedQueuePath)}`);
+  console.log(`cohort checksum: ${cohortChecksum}`);
+  console.log(`append-only decisions: ${path.relative(repoRoot, judgmentsPath)}`);
+  console.log(`rebuildable review projection: ${path.relative(repoRoot, judgedQueuePath)}`);
 });

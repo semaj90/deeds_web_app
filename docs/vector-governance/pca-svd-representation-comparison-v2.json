@@ -1,0 +1,112 @@
+{
+  "schema": "atlas.pca-svd-representation-baseline.v2",
+  "generatedAt": "2026-10-15T16:08:56.877059+00:00",
+  "mode": "READ_ONLY_EVALUATION",
+  "readOnlyInvariants": {
+    "writesPerformed": false,
+    "postgresModified": false,
+    "qdrantModified": false
+  },
+  "sampleSize": 2000,
+  "candidateIdsChecksum": "ef6f1f7ed36e16e16db1eb0d3dc85c7d9ccf81a865538e0fa339a2dd4488ca93",
+  "cohortQualification": "DATABASE_ROWS_ONLY_SOURCE_LINEAGE_NOT_VERIFIED",
+  "referenceDimensions": 768,
+  "svdImplementation": "sklearn.decomposition.TruncatedSVD",
+  "comparison": {
+    "schema": "atlas.representation-comparison-receipt.v1",
+    "reference_dimensions": 768,
+    "row_count": 2000,
+    "k": 10,
+    "reference_checksum": "a215024e5c4014450a847a374ace4718c46e16ca10691bf398892260f9794356",
+    "representations": [
+      {
+        "name": "pca_svd_512",
+        "dimensions": 512,
+        "mean_neighbor_overlap_at_k": 0.9835,
+        "mean_distance_correlation": 0.9998744064911136,
+        "latent_checksum": "24ff78e7fbca684b5abf58b932c1c767fabbba6edddf27f7f500e92a31a0fb60"
+      },
+      {
+        "name": "pca_svd_256",
+        "dimensions": 256,
+        "mean_neighbor_overlap_at_k": 0.8987500000000002,
+        "mean_distance_correlation": 0.9919353212147941,
+        "latent_checksum": "23b0d19823bb382d5bc728e5ec6410a4b4711c092f17576bc9cac718e0a64aac"
+      },
+      {
+        "name": "mrl_512",
+        "dimensions": 512,
+        "mean_neighbor_overlap_at_k": 0.8449000000000001,
+        "mean_distance_correlation": 0.9732840228253572,
+        "latent_checksum": "bae75ac8547826ccb47bcd4723210b939769ce1a481828a5e20d8ad5b8ea5727"
+      },
+      {
+        "name": "pca_svd_128",
+        "dimensions": 128,
+        "mean_neighbor_overlap_at_k": 0.7738,
+        "mean_distance_correlation": 0.9493561611112293,
+        "latent_checksum": "2b15bf0a50966054304342971e4ed9e4021bed81dd949b59f8becc4ad00e817f"
+      },
+      {
+        "name": "mrl_256",
+        "dimensions": 256,
+        "mean_neighbor_overlap_at_k": 0.7280500000000001,
+        "mean_distance_correlation": 0.9211882321563221,
+        "latent_checksum": "c8e27a5e4665540556528294864db0a44c55e5edd290be0e15e1272ee077ff16"
+      },
+      {
+        "name": "pca_svd_64",
+        "dimensions": 64,
+        "mean_neighbor_overlap_at_k": 0.64095,
+        "mean_distance_correlation": 0.872634060961878,
+        "latent_checksum": "629ffe7d61b8b4781a7487d6cd8a28efa6ff2714171bffffd3a42a6270dc07c1"
+      },
+      {
+        "name": "mrl_128",
+        "dimensions": 128,
+        "mean_neighbor_overlap_at_k": 0.59375,
+        "mean_distance_correlation": 0.8374538271955286,
+        "latent_checksum": "c4932edde0f01e912bc84a0c74163790e4e25aae0fa72bd715e89dd4ae4dac80"
+      }
+    ],
+    "recommended_representation": "pca_svd_512",
+    "canonical_authority": false
+  },
+  "autoencoderCohort": {
+    "sampleSize": 1703,
+    "candidateIdsChecksum": "39df36ca4f900708e7063a92b756b6f20afbbe0f09701412a312fea4c0832071",
+    "comparison": {
+      "schema": "atlas.representation-comparison-receipt.v1",
+      "reference_dimensions": 768,
+      "row_count": 1703,
+      "k": 10,
+      "reference_checksum": "584140101982de53f80dcf6e8a792893e9d65b5c605496c5085911189705d294",
+      "representations": [
+        {
+          "name": "autoencoder_latent_256",
+          "dimensions": 256,
+          "mean_neighbor_overlap_at_k": 0.8363476218438052,
+          "mean_distance_correlation": 0.9662135275381757,
+          "latent_checksum": "33d4f2327eb1b6ec8c99d25fc4f1dfcd9d2cbe8591e469e6858746393cd406ff"
+        },
+        {
+          "name": "autoencoder_latent_128",
+          "dimensions": 128,
+          "mean_neighbor_overlap_at_k": 0.7978273634762186,
+          "mean_distance_correlation": 0.9451321129668626,
+          "latent_checksum": "76a09f1804dc121c466b0b14909ab08eadba81d06042b45e9bd5af110f4e2d0a"
+        },
+        {
+          "name": "autoencoder_latent_64",
+          "dimensions": 64,
+          "mean_neighbor_overlap_at_k": 0.7357604227833235,
+          "mean_distance_correlation": 0.9229619626657152,
+          "latent_checksum": "39c2a7acbf6f6e1637d014a1049f8bd422570561b2d3f469a1c26c5e3ba7d554"
+        }
+      ],
+      "recommended_representation": "autoencoder_latent_256",
+      "canonical_authority": false
+    }
+  },
+  "canonicalAuthority": false
+}

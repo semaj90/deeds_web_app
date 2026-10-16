@@ -24,7 +24,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { embedOrChatFetch, getLlamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { createHash } from 'crypto';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
@@ -129,7 +129,7 @@ Respond with JSON only:
   "dependencies": ["key", "imports", "this", "file", "uses"]
 }`;
 
-		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const res = await embedOrChatFetch(`${getLlamaGenerationEndpoint()}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

@@ -141,7 +141,7 @@ export const qloraExamples = pgTable('qlora_examples', {
 	somClusters:    jsonb('som_clusters').notNull().default(sql`'[]'::jsonb`),
 	pipelineHits:   jsonb('pipeline_hits').notNull().default(sql`'{}'::jsonb`),
 	entityTags:     jsonb('entity_tags').notNull().default(sql`'[]'::jsonb`),  // extracted statute + case entity tags
-	modelVersion:   text('model_version'),  // e.g. 'gemma4-rotorquant:latest'
+	modelVersion:   text('model_version'),  // e.g. 'ornith-1.5-9b'
 	datasetSplit:   text('dataset_split'),   // 'train'|'eval'|'test' — frozen after first assignment
 	retrievalStrategy: text('retrieval_strategy').$type<'vector_only' | 'lexical_only' | 'structural_only' | 'fusion' | 'cold_neschrom'>().default('fusion'),
 	createdAt:      timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),

@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
 import postgres from 'postgres';
 import type { RequestHandler } from './$types';
 
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
 import { ENV } from '$lib/server/env.server.js';
 const sql = postgres(ENV.DATABASE_URL);
@@ -16,7 +16,7 @@ const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 const KNOWLEDGE_COLLECTION = 'phase76_knowledge_base';
 
 async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+  const response = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

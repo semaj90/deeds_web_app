@@ -12,6 +12,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import type { ResearchSource } from '$lib/server/research/web-research-ingester.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
+import { instrumentGrpcPackageCodecs, measureTransportCodec, observeTransport, type TransportTelemetry } from './transport-telemetry.js';
 import { withRpcCache } from '$lib/server/cache/rpc-cache.js';
 import { RPC_TTL_SECONDS, RPC_DEADLINES_MS } from '$lib/types/rpc-cache.js';
 // Proto types were in generated/proto (archived — regenerate from proto/*.proto if gRPC revived)
@@ -89,6 +90,7 @@ export interface SearchTiming {
 }
 
 export interface EvidenceSearchResponse {
+  transportTelemetry?: TransportTelemetry;
   results: SearchResult[];
   bundles: ContextBundle[];
   timing: SearchTiming;
@@ -129,6 +131,7 @@ export interface RetrievedCodebaseChunk {
 }
 
 export interface SearchChunksResponse {
+  transportTelemetry?: TransportTelemetry;
   results: RetrievedCodebaseChunk[];
   totalMs: number;
 }
@@ -143,6 +146,7 @@ export interface RetrievalClusterContext {
 }
 
 export interface ClusterSummaryLookupResponse {
+  transportTelemetry?: TransportTelemetry;
   clusterId: number;
   summary: string;
   patterns: string[];
@@ -164,11 +168,13 @@ export interface AstEdge {
 }
 
 export interface AstExpansionResponse {
+  transportTelemetry?: TransportTelemetry;
   neighbors: AstNode[];
   edges: AstEdge[];
 }
 
 export interface TopologyContextResponse {
+  transportTelemetry?: TransportTelemetry;
   neighbors: RetrievedCodebaseChunk[];
   somMetadataJson?: string;
   clusterMetadata?: RetrievalClusterContext;
@@ -202,6 +208,7 @@ export interface ResearchContextChunk {
 }
 
 export interface ResearchContextResponse {
+  transportTelemetry?: TransportTelemetry;
   research: ResearchContextChunk[];
   totalMs: number;
   source: 'grpc' | 'unavailable';
@@ -242,6 +249,7 @@ async function getGrpcClient(): Promise<any> {
     const PROTO_PATH = resolve(process.cwd(), '../proto/active/retrieval.proto');
 
     const packageDefinition = await protoLoader.load(PROTO_PATH, {
+      includeDirs: [resolve(process.cwd(), '../proto')],
       keepCase: false,
       longs: Number,
       enums: String,
@@ -249,6 +257,7 @@ async function getGrpcClient(): Promise<any> {
       oneofs: true,
     });
 
+    instrumentGrpcPackageCodecs(packageDefinition);
     const protoDescriptor = grpc.loadPackageDefinition(packageDefinition) as any;
     const RetrievalService = protoDescriptor.yorha.retrieval.RetrievalService;
 
@@ -343,7 +352,7 @@ async function callGrpcMethod<T>(
     return null;
   }
 
-  return new Promise((resolve) => {
+  return observeTransport('grpc', () => new Promise<T | null>((resolve) => {
     const deadline = new Date(Date.now() + timeoutMs);
     method.call(client, request, { deadline }, (err: Error | null, response: T | null) => {
       if (err) {
@@ -354,7 +363,7 @@ async function callGrpcMethod<T>(
 
       resolve(response ?? null);
     });
-  });
+  }), methodName);
 }
 
 // ── gRPC evidence search ────────────────────────────────────────────────
@@ -372,7 +381,7 @@ export async function searchEvidenceViaGrpc(
   const client = await getGrpcClient();
   if (!client) return null;
 
-  return new Promise((resolve) => {
+  return observeTransport('grpc', () => new Promise<EvidenceSearchResponse | null>((resolve) => {
     const deadline = new Date(Date.now() + timeoutMs);
 
     client.searchEvidence(
@@ -400,7 +409,7 @@ export async function searchEvidenceViaGrpc(
         resolve(mapProtoResponse(response));
       }
     );
-  });
+  }), 'searchEvidence');
 }
 
 // ── Response mapping (proto → TS) ───────────────────────────────────────
@@ -545,6 +554,7 @@ function mapClusterContext(clusterMetadata: any): RetrievalClusterContext | unde
 
 function mapSearchChunksResponse(response: any): SearchChunksResponse {
   return {
+    transportTelemetry: response.transportTelemetry,
     results: Array.isArray(response?.results) ? response.results.map(mapCodebaseChunk) : [],
     totalMs: Number(response?.totalMs ?? 0),
   };
@@ -552,6 +562,7 @@ function mapSearchChunksResponse(response: any): SearchChunksResponse {
 
 function mapClusterSummaryResponse(response: any): ClusterSummaryLookupResponse {
   return {
+    transportTelemetry: response.transportTelemetry,
     clusterId: Number(response?.clusterId ?? 0),
     summary: response?.summary ?? '',
     patterns: Array.isArray(response?.patterns) ? response.patterns : [],
@@ -562,6 +573,7 @@ function mapClusterSummaryResponse(response: any): ClusterSummaryLookupResponse 
 
 function mapAstExpansionResponse(response: any): AstExpansionResponse {
   return {
+    transportTelemetry: response.transportTelemetry,
     neighbors: Array.isArray(response?.neighbors)
       ? response.neighbors.map((neighbor: any) => ({
           id: neighbor?.id ?? '',
@@ -582,6 +594,7 @@ function mapAstExpansionResponse(response: any): AstExpansionResponse {
 
 function mapTopologyResponse(response: any): TopologyContextResponse {
   return {
+    transportTelemetry: response.transportTelemetry,
     neighbors: Array.isArray(response?.neighbors) ? response.neighbors.map(mapCodebaseChunk) : [],
     somMetadataJson: response?.somMetadataJson || undefined,
     clusterMetadata: mapClusterContext(response?.clusterMetadata),
@@ -590,6 +603,7 @@ function mapTopologyResponse(response: any): TopologyContextResponse {
 
 function mapResearchContextResponse(response: any): ResearchContextResponse {
   return {
+    transportTelemetry: response.transportTelemetry,
     research: Array.isArray(response?.research)
       ? response.research.map((chunk: any) => ({
           id: chunk?.id ?? chunk?.chunkId ?? '',
@@ -674,7 +688,7 @@ export async function getClusterSummaryViaGrpc(
         await recordKagAnswer(`cluster:${clusterType}:${clusterId}`, mapped.summary, {
           glyphClusterId: clusterId,
           tokensUsed:     Math.ceil(mapped.summary.length / 4),
-          model:          'gemma4-rotorquant:latest',
+          model:          'ornith-1.5-9b',
         });
       } catch { /* non-fatal */ }
     })();
@@ -827,6 +841,7 @@ export async function searchEvidenceViaHttp(
 ): Promise<EvidenceSearchResponse | null> {
   if (!RETRIEVAL_HTTP_ENABLED) return null;
 
+  return observeTransport('http', async () => {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -835,12 +850,12 @@ export async function searchEvidenceViaHttp(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
-      body: JSON.stringify({
+      body: measureTransportCodec('json_stringify', () => JSON.stringify({
         query:        params.query,
         case_id:      params.caseId ?? '',
         limit:        params.limit ?? 10,
         jurisdiction: params.jurisdiction ?? '',
-      }),
+      }), (value) => Buffer.byteLength(value)),
     });
     clearTimeout(timer);
 
@@ -849,7 +864,8 @@ export async function searchEvidenceViaHttp(
       return null;
     }
 
-    const data = await res.json() as Record<string, unknown>;
+    const text = await res.text();
+    const data = measureTransportCodec('json_parse', () => JSON.parse(text), () => Buffer.byteLength(text)) as Record<string, unknown>;
     // The Go service returns proto-shaped JSON — reuse the proto mapper
     return mapProtoResponse(data);
   } catch (err) {
@@ -858,6 +874,7 @@ export async function searchEvidenceViaHttp(
     }
     return null;
   }
+  }, '/search/evidence');
 }
 
 export async function searchCodebaseViaHttp(params: {
@@ -867,6 +884,7 @@ export async function searchCodebaseViaHttp(params: {
 }, timeoutMs = 8_000): Promise<SearchChunksResponse | null> {
   if (!RETRIEVAL_HTTP_ENABLED) return null;
 
+  return observeTransport('http', async () => {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -875,11 +893,11 @@ export async function searchCodebaseViaHttp(params: {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       signal:  controller.signal,
-      body: JSON.stringify({
+      body: measureTransportCodec('json_stringify', () => JSON.stringify({
         query: params.query,
         limit: params.limit ?? 10,
         ...(params.topoClass ? { topo_class: params.topoClass } : {}),
-      }),
+      }), (value) => Buffer.byteLength(value)),
     });
     clearTimeout(timer);
 
@@ -888,7 +906,8 @@ export async function searchCodebaseViaHttp(params: {
       return null;
     }
 
-    const data = await res.json() as { results?: unknown[]; hits?: unknown[]; items?: unknown[]; chunks?: unknown[]; total_ms?: number };
+    const text = await res.text();
+    const data = measureTransportCodec('json_parse', () => JSON.parse(text), () => Buffer.byteLength(text)) as { results?: unknown[]; hits?: unknown[]; items?: unknown[]; chunks?: unknown[]; total_ms?: number };
     const raw =
       Array.isArray(data.results) ? data.results :
       Array.isArray(data.hits) ? data.hits :
@@ -927,6 +946,7 @@ export async function searchCodebaseViaHttp(params: {
     }
     return null;
   }
+  }, '/search/codebase');
 }
 
 // ── Health check ────────────────────────────────────────────────────────

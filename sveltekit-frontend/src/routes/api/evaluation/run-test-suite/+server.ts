@@ -7,7 +7,7 @@
  *
  * Request:
  *   {
- *     "model": "gemma4-legal" | "hforf-7b" | "qwen3-7b",
+ *     "model": "ornith-1.5-9b" | "hforf-7b" | "qwen3-7b",
  *     "testCaseIds": ["test-1", "test-2"] (optional, runs all if omitted),
  *     "maxConcurrent": 1 (default, prevent rate limiting)
  *   }
@@ -321,7 +321,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 function getModelFileName(model: ModelIdentifier): string {
   const fileMap: Record<ModelIdentifier, string> = {
     'ornith-1.5-9b': 'ornith-1.5-9b.gguf',
-    'gemma4-legal': 'gemma4-legal-iq4xs-direct.gguf',
     'hforf-7b': 'hforf-7b.gguf',
     'qwen3-7b': 'qwen3-7b-instruct-q4_k_m.gguf',
     unknown: 'unknown.gguf',

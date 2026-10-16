@@ -348,6 +348,34 @@ describe('miniforge-nlp-sidecar', () => {
     await expect(client.astChunk(request)).rejects.toThrow(/file_path does not match/);
   });
 
+  it('preserves native declarator signature and ancestry evidence when the sidecar provides it', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
+      schema: 'atlas.ast.evidence.v1',
+      engine: 'treesitter-chunker',
+      engine_version: '4',
+      language: 'typescript',
+      file_path: 'src/example.ts',
+      source_revision: 'rev-1',
+      syntax_status: 'CLEAN',
+      chunks: [{
+        upstream_node_id: 'native-node-1', node_type: 'function_declaration', kind: 'function', name: 'resolve',
+        start_byte: 0, end_byte: 40, start_line: 1, start_column: 0, end_line: 1, end_column: 40,
+        calls: [], imports: [], exports: [], signature_text: 'function resolve() ',
+        syntax_ancestry: [{ node_type: 'program', start_byte: 0, end_byte: 40 }],
+      }],
+      edges: [], diagnostics: [],
+    }), { status: 200 }));
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const result = await createMiniforgeNlpSidecarClient().astChunk({
+      source: 'function resolve() { return true; }', language: 'typescript',
+      filePath: 'src/example.ts', sourceRevision: 'rev-1',
+    });
+
+    expect(result.chunks[0]?.signature_text).toBe('function resolve() ');
+    expect(result.chunks[0]?.syntax_ancestry).toEqual([{ node_type: 'program', start_byte: 0, end_byte: 40 }]);
+  });
+
   it('rejects malformed occurrence coordinates instead of dropping span evidence', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(new Response(JSON.stringify({
       schema: 'atlas.ast.evidence.v1',

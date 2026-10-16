@@ -1,6 +1,6 @@
 {
   "schema": "atlas.golden-review-corpus.v2",
-  "generatedAt": "2026-09-12T19:12:14.008Z",
+  "generatedAt": "2026-10-15T19:03:07.981Z",
   "mode": "READ_ONLY_AUDIT",
   "admittedWorkspaceRevision": "sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf",
   "registeredQueryCount": 60,

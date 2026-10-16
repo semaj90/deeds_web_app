@@ -137,6 +137,13 @@ function sha256(s) {
   return crypto.createHash('sha256').update(s).digest('hex');
 }
 
+// A claimed revision (from an AST observation row) must equal the bytes this writer just read; otherwise fail closed.
+function assertClaimedRevision(claimed, actual, relPath) {
+  if (claimed == null) return actual;
+  if (claimed !== actual) throw new Error(`SOURCE_REVISION_MISMATCH:${relPath}:claimed=${claimed}:actual=${actual}`);
+  return actual;
+}
+
 function hashToUuid(hex) {
   const clean = String(hex ?? '').replace(/[^a-f0-9]/gi, '').padEnd(32, '0').slice(0, 32).split('');
   clean[12] = '4';
@@ -485,12 +492,12 @@ async function upsertPostgresMetadata(pool, chunk) {
         language, extension, embedding_model, embedding_dimension, content_hash,
         file_content_hash, content_hash_scope, content_hash_algorithm,
         content_hash_length, content_hash_version,
-        line_start, line_end, indexed_at, updated_at)
+        line_start, line_end, source_revision, indexed_at, updated_at)
      VALUES ($1, $2, $3, $3, $4,
              $5, $6::jsonb, $7::jsonb,
              $8, $9, $10, $11, $12,
              $13, $14, $15, $16, $17,
-             $18, $19, NOW(), NOW())
+             $18, $19, $20, NOW(), NOW())
      ON CONFLICT (qdrant_id) DO UPDATE SET
        content           = EXCLUDED.content,
        source_ref       = EXCLUDED.source_ref,
@@ -500,6 +507,7 @@ async function upsertPostgresMetadata(pool, chunk) {
        content_hash_algorithm = EXCLUDED.content_hash_algorithm,
        content_hash_length = EXCLUDED.content_hash_length,
        content_hash_version = EXCLUDED.content_hash_version,
+       source_revision   = EXCLUDED.source_revision,
        domain            = EXCLUDED.domain,
        tags              = EXCLUDED.tags,
        metadata          = EXCLUDED.metadata,
@@ -531,6 +539,7 @@ async function upsertPostgresMetadata(pool, chunk) {
       1,
       chunk.line_start ?? null,
       chunk.line_end ?? null,
+      chunk.source_revision ?? null,
     ]
   );
 }
@@ -571,6 +580,8 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
   if (text.trim().length < 40) return;
 
   const fileHash = sha256(text);
+  // ATLAS-SOURCE-REVISION-01: canonical source_revision = sha256 of the exact bytes read here (not the decoded text).
+  const sourceRevision = `sha256:${crypto.createHash('sha256').update(sourceBytes).digest('hex')}`;
   const isLarge  = fileSize > LARGE_FILE_BYTES;
   const maxChunks = isGeneratedFile(relPath) ? 10 : MAX_CHUNKS_PER_FILE;
 
@@ -649,7 +660,7 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
       symbol_name:    c.symbol_name ?? null,
       tree_node_id:   c.tree_node_id ?? null,
       symbol_version_id: c.symbol_version_id ?? null,
-      source_revision: c.source_revision ?? null,
+      source_revision: assertClaimedRevision(c.source_revision, sourceRevision, relPath),
       workspace_revision: c.workspace_revision ?? null,
       signature: c.signature ?? null,
       direct_members: c.direct_members ?? null,
@@ -679,7 +690,7 @@ async function processFile(absPath, pool, stats, sourceRefOverride = null) {
         symbol_name: c.symbol_name ?? null,
         tree_node_id: c.tree_node_id ?? null,
         symbol_version_id: c.symbol_version_id ?? null,
-        source_revision: c.source_revision ?? null,
+        source_revision: assertClaimedRevision(c.source_revision, sourceRevision, relPath),
         workspace_revision: c.workspace_revision ?? null,
         signature: c.signature ?? null,
         direct_members: c.direct_members ?? null,

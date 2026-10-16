@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 const QDRANT_URL = ENV.QDRANT_URL;
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
@@ -161,7 +161,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { query, limit } = parsed.data;
 
 		// Get embedding from Ollama
-		const embedResponse = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
+		const embedResponse = await embedOrChatFetch(`${OLLAMA_URL}/api/embeddings`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

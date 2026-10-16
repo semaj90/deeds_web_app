@@ -5,7 +5,7 @@
  * model via `llama-server-model-resolver.ts` / `SERVER_CHAT_MODEL` (`ai/model-ids.ts`), never by
  * pasting another model-id literal.
  *
- * Flagged literals: `gemma4-rotorquant`, `gemma4-legal-iq4xs`, and a quoted `hforf`.
+* Flagged literals: `gemma4-rotorquant`, `gemma4-legal*`, `gemma4:e4b`. The bare alias `hforf` is not flagged here; the Python judge gate (python/tests/test_atlas_summary_claim_judge_v1.py) rejects it as a negative case.
  *
  * Two-way ratchet:
  *  - a file NOT in KNOWN_LITERAL_FILES that contains a literal fails (new offender);
@@ -26,81 +26,13 @@ const FRONTEND_ROOT = resolve(__dirname, '../../../..');
 const SCAN_ROOTS = ['src/lib/server', 'src/routes', 'src/mcp'];
 const SCANNED_EXTENSION = /\.(ts|mts|js|mjs|svelte)$/;
 const SKIPPED_FILE = /\.(spec|test)\.[a-z]+$/;
-const GEMMA_CHAT_LITERAL = /gemma4-rotorquant|gemma4-legal-iq4xs|['"`]hforf['"`]/;
+const GEMMA_CHAT_LITERAL = /gemma4-rotorquant|gemma4-legal|gemma4:e4b/;
 
 /** Real Gemma4 artifacts that legitimately keep the name (reason required). */
-const ALLOWED_GEMMA_ARTIFACT_FILES: Record<string, string> = {
-	'src/lib/server/analysis/vlm-evidence-analyzer.ts':
-		'VLM lane (:8085, Gemma4 vision): the literal is the model label written into analysis metadata; Ornith 1.5 has no vision projector.',
-	'src/lib/server/ocr/hybrid.ts':
-		'VLM lane (:8085): VLM_MODEL env default for vision OCR; a real Gemma4 vision artifact, not the chat/synthesis model.',
-	'src/routes/api/persons-of-interest/[id]/face-rerank/+server.ts':
-		'VLM lane: the literal appears only in a doc comment naming the Gemma4 vision model used for face-rerank visual reasoning.',
-};
+const ALLOWED_GEMMA_ARTIFACT_FILES: Record<string, string> = {};
 
 /** Frozen 2026-10-03. Shrink only: migrate each file to the resolver, then delete its line. */
-const KNOWN_LITERAL_FILES: readonly string[] = [
-	'src/lib/server/adapters/service-integrations.ts',
-	'src/lib/server/ai/llama-tool-definitions.ts',
-	'src/lib/server/ai/openai-facade.ts',
-	'src/lib/server/ai/phase101-parent-atlas-packetizer.js',
-	'src/lib/server/ai/prompt-packet.ts',
-	'src/lib/server/ai/tiered-llm-cache.ts',
-	'src/lib/server/analysis/evidence-analysis-pipeline.ts',
-	'src/lib/server/atlas/phase101-parent-atlas-packetizer.mjs',
-	'src/lib/server/atlas/runtime-registry.ts',
-	'src/lib/server/cache/code-llm-index.ts',
-	'src/lib/server/cache/semantic-cache.ts',
-	'src/lib/server/cache/warm-up.ts',
-	'src/lib/server/codeintel/fix-recommender.ts',
-	'src/lib/server/db/archived-schemas/additional-tables.ts',
-	'src/lib/server/db/schema-postgres.ts',
-	'src/lib/server/db/schema/ace-web-crawl.ts',
-	'src/lib/server/db/schema/nes-chrom-packets.ts',
-	'src/lib/server/db/schema/search-analytics.ts',
-	'src/lib/server/evaluation/model-contracts.ts',
-	'src/lib/server/features/ai/ace/context-assembler.ts',
-	'src/lib/server/features/ai/ace/nes-chrom-packet-service.ts',
-	'src/lib/server/features/ai/agents/trace-subagent-orchestrator.ts',
-	'src/lib/server/features/ai/ai/gemma4-agent.ts',
-	'src/lib/server/features/ai/ai/information-gain-validator.ts',
-	'src/lib/server/features/ai/ai/kv-context-controller.ts',
-	'src/lib/server/features/ai/ai/token-tracker.ts',
-	'src/lib/server/features/cases/hypergraph-4d.ts',
-	'src/lib/server/features/cases/research-graph-rl.ts',
-	'src/lib/server/features/cases/web-research-crawler.ts',
-	'src/lib/server/grpc/retrieval-client.ts',
-	'src/lib/server/inference/inference-router.ts',
-	'src/lib/server/learning/policy-trainer.ts',
-	'src/lib/server/llm-router.ts',
-	'src/lib/server/ollama-cached.ts',
-	'src/lib/server/queue/rabbitmq-manager-fixed.ts',
-	'src/lib/server/reconstruction/scene-intent-extractor.ts',
-	'src/lib/server/research/research-gain-validator.ts',
-	'src/lib/server/research/task-runner.ts',
-	'src/lib/server/retrieval/promote-results.ts',
-	'src/lib/server/rg-atlas/multi-query.ts',
-	'src/lib/server/services/knowledge-search/KnowledgeSearcher.ts',
-	'src/lib/server/services/langextract-service.ts',
-	'src/lib/server/services/report-auto-populator.ts',
-	'src/lib/server/vector-cache.ts',
-	'src/lib/server/wiki/wiki-card-writer.ts',
-	'src/mcp/server.ts',
-	'src/routes/(app)/admin/ast-topology/+page.server.ts',
-	'src/routes/(app)/admin/atlas/+page.svelte',
-	'src/routes/.well-known/llms.txt/+server.ts',
-	'src/routes/api/ace/health/+server.ts',
-	'src/routes/api/admin/inference-stats/+server.ts',
-	'src/routes/api/analytics/deep-research/+server.ts',
-	'src/routes/api/analytics/health/+server.ts',
-	'src/routes/api/cache/warm-up/+server.ts',
-	'src/routes/api/cline/chat/+server.ts',
-	'src/routes/api/codebase-index/evidence-analyze/+server.ts',
-	'src/routes/api/evaluation/run-test-suite/+server.ts',
-	'src/routes/api/evidence/[id]/analyze/stream/+server.ts',
-	'src/routes/api/pgai/analyze/+server.ts',
-	'src/routes/api/reconstruction/scene-intent/+server.ts',
-];
+const KNOWN_LITERAL_FILES: readonly string[] = [];
 
 function findFilesWithGemmaChatLiterals(): string[] {
 	const found: string[] = [];

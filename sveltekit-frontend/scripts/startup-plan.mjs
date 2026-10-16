@@ -164,9 +164,9 @@ const MLA_MATH = `
 > into a single latent vector of dim 512, then applies standard KV quant on top.
 > Gemma4 does NOT implement MLA natively — turbo3 alone is sufficient for 8GB GPU.
 
-**Verified dev command** (gemma4-rotorquant:latest + VLM, asymmetric, Flash Attention required):
+**Verified dev command** (ornith-1.5-9b + VLM, asymmetric, Flash Attention required):
 \`\`\`bash
-llama-server.exe -m gemma4-rotorquant:latest.gguf --mmproj mmproj-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 --port 8090 -c 65536
+llama-server.exe -m ornith-1_5-9b-ad-q5_k-q4_k/hforf.gguf --mmproj mmproj-Ornith-1.5-9B-BF16.gguf -ctk turbo3 -ctv turbo4 -fa on -ngl 99 --port 8090 -c 65536
 \`\`\`
 VRAM estimate: 5.3GB model + 192MB KV + 200MB overhead ≈ **5.7GB** → 2.3GB free for batch
 

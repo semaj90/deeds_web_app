@@ -13,7 +13,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -115,7 +115,7 @@ ${textB.slice(0, 1500)}
 
 Respond with JSON only: {"contradicts": true/false, "explanation": "brief reason"}`;
 
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await embedOrChatFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

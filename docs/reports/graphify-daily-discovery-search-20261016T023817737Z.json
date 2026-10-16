@@ -1,0 +1,131 @@
+{
+  "schema": "atlas.graphify-daily-discovery.v1",
+  "observedAt": "2026-10-16T02:38:20.280Z",
+  "mode": "search",
+  "status": "DIAGNOSTIC_COMPLETE",
+  "canonicalAuthority": false,
+  "sourceWritesPerformed": false,
+  "datastoreWritesPerformed": false,
+  "localArtifactWritesPerformed": true,
+  "promotionAuthorized": false,
+  "ownership": {
+    "path": "docs/architecture/runtime-ownership-registry.json",
+    "checksum": "sha256:fae1b52462b65245012ac0777b65ef1ea6aa2bb68c1d492afd0399ea4c88292a",
+    "declaredGeneratedAt": "2026-08-09",
+    "totalMatchingRecords": 1,
+    "records": [
+      {
+        "registryPointer": "/capabilities/rrf_fusion/owner",
+        "declaredPath": "sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts",
+        "matchedTerms": [
+          "searchruntime"
+        ],
+        "declaredStatus": null,
+        "classification": "CANONICAL_OWNER",
+        "declaredUnproven": null,
+        "evidence": "Read-only importer census and focused cross-primitive parity evidence recorded in parent-atlas-rrf-fusion-consolidation/tasks.md; owns production cross-executor normalization and one-vote-per-logical-lane fusion.",
+        "verification": "REGISTRY_DECLARATION_ONLY"
+      }
+    ],
+    "truncated": false,
+    "promotionAuthorized": false
+  },
+  "search": {
+    "status": "BOUNDED_MATCHES",
+    "query": "SearchRuntime",
+    "limit": 8,
+    "matches": [
+      {
+        "path": "docs/architecture/_topology_classifier_index.md",
+        "line": 96,
+        "excerpt": "  → existing SearchRuntime candidate lanes and canonical lane dedup/RRF",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "docs/architecture/_topology_classifier_index.md",
+        "line": 105,
+        "excerpt": "The “DLSS-like” analogy is limited to a coarse-to-refined pipeline: low-rank features may narrow or order candidates, then the existing exact identity/source checks and ACE selection refine the result. Do not reconstruct, interpolate, or replace canonical `semantic_768` from a latent representation. Keep one semantic r",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "docs/architecture/_topology_classifier_index.md",
+        "line": 109,
+        "excerpt": "**Current proof boundary:** focused local tests pass for strict factor dimensions, deterministic bounded shortlist selection, advisory/write-disabled output, the existing unified-context descriptor, and ACE packet-to-ContextManifest bridge (17/17 fixtures). They do not prove live ACP→A2A→SearchRuntime→ACE/DAG execution",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "docs/architecture/_topology_classifier_index.md",
+        "line": 111,
+        "excerpt": "The `.okf/corpora/keyword-corpus.yaml` vocabulary has a separate read-only lexical MCP surface, `atlas.keyword_corpus_search`. It validates the adjacent JSON Schema and YAML unique keys, ranks by deterministic keyword overlap, returns bounded Top-K pages with a corpus/query-checksum-bound cursor, and attaches `PacketCl",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "docs/architecture/_cuda_rtx_toc.md",
+        "line": 28,
+        "excerpt": "| `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts` | Existing strict KAG hypergraph readback now retains the selected graph revision in retrieval provenance alongside neighbor IDs | Additive, post-ranking evidence only; does not alter RRF or verify live graph-currentness | SearchRuntime fixture asserts t",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs",
+        "line": 5,
+        "excerpt": " * Proves the new `SearchRuntime` `readOnly` config option (added 2026-09-04,",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs",
+        "line": 6,
+        "excerpt": " * see search-runtime.ts's `SearchRuntimeConfig.readOnly` doc comment) actually",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      },
+      {
+        "path": "scripts/atlas/prove-search-runtime-readonly-boundary-v1.mjs",
+        "line": 10,
+        "excerpt": " * the actual `createProductionSearchRuntime()` path, not a fixture).",
+        "admission": "LEXICAL_DISCOVERY_ONLY"
+      }
+    ],
+    "truncated": true,
+    "error": null,
+    "scope": {
+      "roots": [
+        "sveltekit-frontend/src",
+        "packages",
+        "python",
+        "simd-bridge",
+        "scripts/atlas"
+      ],
+      "selected": [
+        "docs/architecture/_topology_classifier_index.md",
+        "docs/architecture/_cuda_rtx_toc.md"
+      ],
+      "maxFileBytes": 2097152,
+      "maxMatchesPerFile": 5,
+      "sourceCandidateCount": 10601,
+      "maxSourceFiles": 250,
+      "unavailableSourceFiles": 0,
+      "oversizedSourceFiles": 0,
+      "discoveryBasis": "GIT_TRACKED_SOURCE_FILES",
+      "resultOrder": "EXPLICIT_EVIDENCE_THEN_FILENAME_HINT_BATCHES_THEN_PATH_LINE",
+      "exclusions": [
+        "!**/node_modules/**",
+        "!**/.git/**",
+        "!**/.venv*/**",
+        "!**/.python*/**",
+        "!**/.tmp/**",
+        "!**/.cache/**",
+        "!**/.svelte-kit/**",
+        "!**/__pycache__/**",
+        "!**/dist/**",
+        "!**/build*/**",
+        "!**/target/**",
+        "!**/vendor/**",
+        "!**/archive*/**",
+        "!**/docs/**",
+        "!**/reports/**",
+        "!**/.env*"
+      ]
+    },
+    "scopeIsExhaustive": false,
+    "rankingOwner": "SearchRuntime; lexical discovery creates no retrieval vote"
+  }
+}

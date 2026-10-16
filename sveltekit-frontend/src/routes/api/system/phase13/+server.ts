@@ -3,7 +3,7 @@ import { db } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 
 /**
@@ -57,7 +57,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 		// Check Ollama
 		try {
-			const resp = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+			const resp = await embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
         signal: AbortSignal.timeout(10_000),
       });
 			const data = await resp.json();

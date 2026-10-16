@@ -1,0 +1,78 @@
+{
+  "schema": "atlas.mcp-source-live-reconciliation.v1",
+  "observedAt": "2026-10-15T23:26:55.189Z",
+  "status": "PARTIAL",
+  "mode": "READ_ONLY_SOURCE_AND_TOOLS_LIST_AUDIT",
+  "canonicalAuthority": false,
+  "eligibleForPromotion": false,
+  "writesPerformed": true,
+  "datastoreWritesPerformed": false,
+  "toolCallsMade": false,
+  "scope": {
+    "sourceRoot": "sveltekit-frontend/src/mcp/**/*.ts",
+    "testFilesExcluded": true,
+    "literalRegistrationShape": "server.registerTool with literal name and object schema",
+    "liveEndpoint": "http://127.0.0.1:8788/mcp",
+    "liveMethod": "tools/list"
+  },
+  "source": {
+    "filesScanned": 46,
+    "filesWithLiteralRegistrations": 17,
+    "registrationSites": 191,
+    "uniqueLiteralNames": 190,
+    "snapshotChecksum": "sha256:cd1384b7a01bf26d58be248cf991a4d863243ef9c48c65938193af7f3f3c4fa8"
+  },
+  "live": {
+    "httpStatus": 200,
+    "toolCount": 193,
+    "uniqueNames": 193,
+    "toolsetChecksum": "sha256:169436d9faf51d0b9c7e81d8fb23f358e54b344919b20556b11c69c238c159db",
+    "schemasCompiled": 193,
+    "schemaDraftCounts": {
+      "draft7": 16,
+      "draft2020-12": 177
+    },
+    "schemaErrors": 0
+  },
+  "comparison": {
+    "overlap": 184,
+    "sourceOnly": [
+      "codebase.rg_search",
+      "kb.rg_atlas_search",
+      "research.deep_analyze",
+      "research.synthesize",
+      "research.web_search",
+      "trace.bifrost_dispatch"
+    ],
+    "runtimeOnly": [
+      "atlas.backend_info",
+      "atlas.exact_topk_oracle",
+      "atlas.parity_report",
+      "phase109a_archive_signal",
+      "phase109a_promote_recommendation",
+      "phase109a_query_signal_history",
+      "phase109a_supersede_recommendation",
+      "phase109a_supersede_signal",
+      "phase109a_validate_state_transition"
+    ],
+    "sourceCollision": {
+      "name": "context.prefetch_feature_context",
+      "locations": [
+        "src/mcp/new_tools.ts:487",
+        "src/mcp/trace-mcp-server.ts:7892"
+      ]
+    },
+    "dynamicRegistrationOwners": [
+      "src/lib/server/mcp/phase109a-mcp-tools.ts",
+      "src/mcp/native-acceleration-tools.ts"
+    ]
+  },
+  "limitations": [
+    "Literal-registration scan does not cover every factory, array, or runtime registration path.",
+    "Ajv compilation proves schema compilability, not equivalence to source-side Zod schemas.",
+    "The six source-only names are currently absent from tools/list; the 2026-09-14 disabled-tools receipt is stale and does not establish the current cause.",
+    "No tools/call was made; handler behavior, deployed build identity, and authorization enforcement remain unverified.",
+    "The previously stated 24-file registry denominator is unsupported by this scoped inventory."
+  ],
+  "receiptFileWrite": "docs/reports/mcp-source-live-reconciliation-20261015T232655Z.json"
+}

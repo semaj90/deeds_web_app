@@ -10,8 +10,10 @@
 import { recordRetrievalTelemetry, type RetrievalTelemetrySignal } from './retrieval-recorder.js';
 import { recordPacketCentricTelemetry, normalizePacketContext, type PacketCentricContext } from './packet-centric-telemetry.js';
 import { ENV } from '$lib/server/env.server.js';
+import type { TransportTelemetry } from '../grpc/transport-telemetry.js';
 
 export interface ACERetrievalMetrics {
+  transportTelemetry?: TransportTelemetry;
   query: string;
   vectorHits?: number;
   trigramHits?: number;
@@ -68,6 +70,7 @@ export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics):
     surface: metrics.surface ?? 'ace',
     environment: ENV.NODE_ENV ?? 'development',
     retrievalStrategy: metrics.retrievalStrategy,
+    writeEvalTimes: false,
   }).catch((err) => {
     console.debug('[ACE Telemetry] Legacy emit failed (non-blocking):', {
       query: metrics.query.slice(0, 50),
@@ -78,6 +81,7 @@ export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics):
 
   // Emit packet-centric telemetry (Phase 2)
   recordPacketCentricTelemetry({
+    transport_telemetry: metrics.transportTelemetry,
     query: metrics.query,
     query_hash: metrics.query.slice(0, 64),
     latency_ms: metrics.latencyMs,
@@ -93,16 +97,16 @@ export async function recordACERetrievalTelemetry(metrics: ACERetrievalMetrics):
     selected_packet_keys: metrics.selectedPacketKeys,
     selected_feature_id: metrics.selectedFeatureId,
     feature_ids: metrics.featureIds,
-    packet_context: metrics.packetContext ?? {
+    packet_context: { ...(metrics.packetContext ?? {
       packet_id: metrics.selectedPacketKey,
       feature_id: metrics.selectedFeatureId,
       som_cell: metrics.somCell,
-      schema_version: metrics.schemaVersion ?? 1,
-      embedding_version: metrics.embeddingVersion ?? 'embeddinggemma:latest',
-      tool_version: metrics.toolVersion ?? 'mcp:1.0',
-      gpu_kernel_version: metrics.gpuKernelVersion ?? 'tensorrt_bridge:1.0',
-      rpc_transport: metrics.rpcTransport ?? 'jsonrpc',
-    },
+      schema_version: metrics.schemaVersion ?? null,
+      embedding_version: metrics.embeddingVersion ?? null,
+      tool_version: metrics.toolVersion ?? null,
+      gpu_kernel_version: metrics.gpuKernelVersion ?? null,
+      rpc_transport: metrics.rpcTransport ?? null,
+    }), ...(metrics.transportTelemetry ? { rpc_transport: metrics.transportTelemetry.rpc_transport } : {}) },
   }).catch((err) => {
     console.debug('[Packet-Centric Telemetry] Emit failed (non-blocking):', {
       packet_id: metrics.selectedPacketKey,

@@ -17,7 +17,7 @@ Winner: highest chunks/min with stable summaries
 
 param(
   [string]$BinaryPath = "C:\Users\james\Videos\deeds-web-app\.tmp\atomic-mtp\bin\build\bin\llama-server.exe",
-  [string]$ModelPath = "C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
+  [string]$ModelPath = "C:\Users\james\Videos\deeds-web-app\models\ornith-1.5-9b",
   [string]$DraftModelPath = "C:\Users\james\Videos\deeds-web-app\.tmp\atomic-mtp\gemma-4-E4B-it-assistant.Q4_K_M.gguf",
   [string]$Port = "8091",
   [int]$TestDurationSec = 120
@@ -127,7 +127,7 @@ function Test-Throughput {
         -H "Content-Type: application/json" `
         -d @"
 {
-  "model":"gemma4-legal-iq4xs-direct.gguf",
+  "model":"ornith-1.5-9b",
   "messages":[{"role":"user","content":"$prompt"}],
   "max_tokens":150,
   "temperature":0.3

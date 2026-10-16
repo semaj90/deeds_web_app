@@ -58,7 +58,7 @@ export const nesChromPackets = pgTable('nes_chrom_packets', {
   featureLabel: text('feature_label'),
   packetType: text('packet_type').notNull().default('nes_chrom'),
   lane: text('lane').notNull().default('semantic_packet'),
-  model: text('model').notNull().default('gemma4-rotorquant:latest'),
+  model: text('model').notNull().default('ornith-1.5-9b'),
   summary: text('summary'),
   filePath: text('file_path'),
   communityId: integer('community_id'),

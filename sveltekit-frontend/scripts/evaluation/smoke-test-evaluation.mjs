@@ -22,7 +22,7 @@ const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const SVELTEKIT_URL = process.env.SVELTEKIT_URL || 'http://127.0.0.1:5173';
 
 const args = process.argv.slice(2);
-const model = args.includes('--model') ? args[args.indexOf('--model') + 1] : 'gemma4-legal';
+const model = args.includes('--model') ? args[args.indexOf('--model') + 1] : 'ornith-1.5-9b';
 const dryRun = args.includes('--dry-run');
 const verbose = args.includes('--verbose');
 
@@ -195,7 +195,7 @@ async function testModelContracts() {
     // Log model-specific warnings
     console.log(`\n   Warnings/Notes:`);
     const warnings = {
-      'gemma4-legal': [
+      'ornith-1.5-9b': [
         '✅ Recommended for production',
         '✅ Full tool-calling support',
       ],

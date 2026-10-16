@@ -4,7 +4,7 @@
  * GRPO-style multi-pass face reranker for POI identity matching.
  *
  * Pass 1 — embedding cosine similarity (768-dim face vectors from pgvector)
- * Pass 2 — VLM visual reasoning (gemma4-rotorquant:latest / gemma3 via the local server):
+ * Pass 2 — VLM visual reasoning (ornith-1.5-9b / gemma3 via the local server):
  *           "Do these photos show the same person?"  → confidence 0–100
  *           "Do these photos show the same person?"  → confidence 0–100
  * Pass 3 — GRPO reward: 0.35 * pass1 + 0.65 * pass2  (preference-weighted)

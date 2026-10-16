@@ -15,7 +15,7 @@ import {
 	type RuntimeRequirementState,
 } from '$lib/server/runtime-profile.js';
 import type { RequestHandler } from '@sveltejs/kit';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { embedOrChatFetch } from '$lib/server/ollama.js';
 import { HEALTHY_DATABASE, classifyPostgresError, type DatabaseReadinessClassification } from '$lib/server/db/readiness.js';
 
 const PROBE_TIMEOUT = 3000;
@@ -98,7 +98,7 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 		safe(probePostgres(), DB_PROBE_TIMEOUT),
 		redisRequirement === 'disabled' ? Promise.resolve(true) : safe(redis.ping().then(() => true), false),
 		safe(
-			ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(PROBE_TIMEOUT) })
+			embedOrChatFetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: AbortSignal.timeout(PROBE_TIMEOUT) })
 				.then((r) => r.ok),
 			false,
 		),

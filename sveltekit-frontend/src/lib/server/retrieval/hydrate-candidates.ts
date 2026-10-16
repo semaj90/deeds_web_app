@@ -91,11 +91,8 @@ function extractRowIdentity(row: RowLike): {
     symbolVersionId: pickString(
       metadata.symbol_version_id,
       metadata.symbolVersionId,
-      metadata.packet_key,
       outputMeta.symbol_version_id,
       outputMeta.symbolVersionId,
-      outputMeta.packet_key,
-      row.id,
     ),
     stableSymbolId: pickString(
       metadata.stable_symbol_id,
@@ -140,6 +137,15 @@ export interface HydrationProofSummary {
   summaryResolvedCount: number;
   summaryStaleRejectedCount: number;
   validationReasons: Record<string, number>;
+  candidateResolutions: Array<{
+    packetKey: string;
+    symbolVersionId: string | null;
+    sourceRef: string;
+    status: 'HYDRATED' | 'AMBIGUOUS_IDENTITY' | 'AMBIGUOUS_SOURCE_REF' | 'CANONICAL_JOIN_MISSING' | 'REVISION_REJECTED' | 'ENVELOPE_REJECTED';
+    matchedBy?: 'EXACT_IDENTITY' | 'UNIQUE_SOURCE_REF';
+    rowId?: string;
+    reason?: string;
+  }>;
 }
 
 export interface HydratedCandidatesWithProof {
@@ -220,6 +226,7 @@ export async function hydrateCandidatesWithProof(
         summaryResolvedCount: 0,
         summaryStaleRejectedCount: 0,
         validationReasons: {},
+        candidateResolutions: [],
       },
     };
   }
@@ -230,6 +237,7 @@ export async function hydrateCandidatesWithProof(
     const packetKeys = [...new Set(candidates.map(c => c.packetKey).filter(Boolean))];
     const candidateIds = [...new Set([
       ...packetKeys,
+      ...candidates.map((candidate) => candidate.packetId).filter((value): value is string => Boolean(value)),
       ...candidates.map(c => c.symbolVersionId).filter((v): v is string => Boolean(v)),
     ])];
 
@@ -271,6 +279,10 @@ export async function hydrateCandidatesWithProof(
           WHERE chunk.id::text IN (${valueList(candidateIds)})
              OR (chunk.metadata->>'packet_key') IN (${valueList(candidateIds)})
              OR (chunk.output_meta->>'packet_key') IN (${valueList(candidateIds)})
+             OR (chunk.metadata->>'symbol_version_id') IN (${valueList(candidateIds)})
+             OR (chunk.output_meta->>'symbol_version_id') IN (${valueList(candidateIds)})
+             OR (chunk.metadata->>'tree_node_id') IN (${valueList(candidateIds)})
+             OR (chunk.output_meta->>'tree_node_id') IN (${valueList(candidateIds)})
           LIMIT ${candidateIds.length + 10}
         `)
       : { rows: [] as unknown[] };
@@ -319,16 +331,6 @@ export async function hydrateCandidatesWithProof(
       unambiguousFallbackRows.push(row);
     }
 
-    const seenRowIds = new Set<string>();
-    const mergedRows: unknown[] = [];
-    for (const row of [...exactResult.rows, ...unambiguousFallbackRows]) {
-      const id = (row as { id: string }).id;
-      if (seenRowIds.has(id)) continue;
-      seenRowIds.add(id);
-      mergedRows.push(row);
-    }
-    const result = { rows: mergedRows };
-
     type ChunkRow = {
       id: string;
       qdrant_id: string | null;
@@ -350,22 +352,36 @@ export async function hydrateCandidatesWithProof(
       output_meta: Record<string, unknown> | null;
     };
 
-    const rows = result.rows as ChunkRow[];
-    const rowsByKey = new Map<string, ChunkRow>();
-    for (const row of rows) {
+    const rowsByIdentity = new Map<string, Map<string, ChunkRow>>();
+    const rowsByUniqueSource = new Map<string, ChunkRow>();
+    const addIdentity = (key: string | null | undefined, row: ChunkRow) => {
+      if (!key) return;
+      const matches = rowsByIdentity.get(key) ?? new Map<string, ChunkRow>();
+      matches.set(row.id, row);
+      rowsByIdentity.set(key, matches);
+    };
+    const addRowIdentities = (row: ChunkRow) => {
       const keys = [
-        row.source_ref || row.relative_path || row.id,
+        row.id,
         (row.metadata?.packet_key as string | undefined) || row.id,
         (row.output_meta?.packet_key as string | undefined) || null,
+        (row.metadata?.symbol_version_id as string | undefined) || null,
+        (row.output_meta?.symbol_version_id as string | undefined) || null,
+        (row.metadata?.tree_node_id as string | undefined) || null,
+        (row.output_meta?.tree_node_id as string | undefined) || null,
         row.qdrant_id || null,
       ].filter((value): value is string => Boolean(value));
-
-      for (const key of keys) {
-        if (!rowsByKey.has(key)) {
-          rowsByKey.set(key, row);
-        }
-      }
+      for (const key of keys) addIdentity(key, row);
+    };
+    const exactRows = exactResult.rows as ChunkRow[];
+    const fallbackRows = unambiguousFallbackRows as ChunkRow[];
+    for (const row of exactRows) addRowIdentities(row);
+    for (const row of fallbackRows) {
+      addRowIdentities(row);
+      if (row.source_ref) rowsByUniqueSource.set(row.source_ref, row);
     }
+    const rowsById = new Map([...exactRows, ...fallbackRows].map((row) => [row.id, row]));
+    const rows = [...rowsById.values()];
 
     const proof: HydrationProofSummary = {
       canonicalJoinedCount: 0,
@@ -380,6 +396,7 @@ export async function hydrateCandidatesWithProof(
       summaryResolvedCount: 0,
       summaryStaleRejectedCount: 0,
       validationReasons: {},
+      candidateResolutions: [],
     };
 
     const bumpReason = (reason: string) => {
@@ -389,8 +406,35 @@ export async function hydrateCandidatesWithProof(
     // Map candidates to envelopes, preserving order
     const envelopes: FeatureEnvelope[] = [];
     for (const candidate of candidates) {
-      const candidateKey = candidate.symbolVersionId || candidate.packetKey;
-      const row = rowsByKey.get(candidate.sourceRef) || rowsByKey.get(candidateKey) || rowsByKey.get(candidate.packetKey);
+      const identityKeys = [...new Set([
+        candidate.packetId,
+        candidate.id,
+        candidate.symbolVersionId,
+        candidate.packetKey,
+        candidate.treeNodeId,
+      ].filter((value): value is string => Boolean(value)))];
+      const identityMatches = new Map<string, ChunkRow>();
+      for (const key of identityKeys) {
+        for (const [id, row] of rowsByIdentity.get(key) ?? []) identityMatches.set(id, row);
+      }
+      if (identityMatches.size > 1) {
+        proof.candidateResolutions.push({
+          packetKey: candidate.packetKey,
+          symbolVersionId: candidate.symbolVersionId ?? null,
+          sourceRef: candidate.sourceRef,
+          status: 'AMBIGUOUS_IDENTITY',
+          reason: 'MULTIPLE_EXACT_IDENTITY_ROWS',
+        });
+        proof.canonicalJoinMissingCount += 1;
+        bumpReason('ambiguous_identity');
+        continue;
+      }
+      const exactRow = identityMatches.values().next().value as ChunkRow | undefined;
+      const sourceRow = !candidate.functionRegistryEvidence && candidate.sourceRef
+        ? rowsByUniqueSource.get(candidate.sourceRef)
+        : undefined;
+      const row = exactRow ?? sourceRow;
+      const matchedBy = exactRow ? 'EXACT_IDENTITY' as const : sourceRow ? 'UNIQUE_SOURCE_REF' as const : undefined;
       if (!row) {
         if (candidate.sourceRef && ambiguousSourceRefs.has(candidate.sourceRef)) {
           // More than one row shares this source_ref and no exact id/packet_key
@@ -398,6 +442,13 @@ export async function hydrateCandidatesWithProof(
           // from a genuine missing-row case so it can be triaged separately
           // (this is a data-quality symptom, not a hydration bug).
           bumpReason('ambiguous_source_ref');
+          proof.candidateResolutions.push({
+            packetKey: candidate.packetKey,
+            symbolVersionId: candidate.symbolVersionId ?? null,
+            sourceRef: candidate.sourceRef,
+            status: 'AMBIGUOUS_SOURCE_REF',
+            reason: 'SOURCE_REF_MATCHES_MULTIPLE_ROWS',
+          });
           console.warn('[hydrate:ambiguous_source_ref]', {
             sourceRef: candidate.sourceRef,
             packetKey: candidate.packetKey,
@@ -412,42 +463,62 @@ export async function hydrateCandidatesWithProof(
           sourceRef: candidate.sourceRef,
           packetKey: candidate.packetKey,
           symbolVersionId: candidate.symbolVersionId,
-          candidateKey,
+          candidateKey: identityKeys[0] ?? candidate.packetKey,
           scoreSource: candidate.scoreSource,
-          rowsByKeyHasSourceRef: rowsByKey.has(candidate.sourceRef),
-          rowsByKeyHasCandidateKey: rowsByKey.has(candidateKey),
-          rowsByKeyHasPacketKey: rowsByKey.has(candidate.packetKey),
+          rowsByUniqueSourceHasSourceRef: rowsByUniqueSource.has(candidate.sourceRef),
+          rowsByIdentityHasCandidateIdentity: identityKeys.some((key) => rowsByIdentity.has(key)),
+          rowsByIdentityHasPacketKey: rowsByIdentity.has(candidate.packetKey),
           totalRowsFetched: rows.length,
+        });
+        proof.candidateResolutions.push({
+          packetKey: candidate.packetKey,
+          symbolVersionId: candidate.symbolVersionId ?? null,
+          sourceRef: candidate.sourceRef,
+          status: 'CANONICAL_JOIN_MISSING',
+          reason: 'NO_EXACT_IDENTITY_OR_UNIQUE_SOURCE_REF',
         });
         continue;
       }
+
+      const resolution = {
+        packetKey: candidate.packetKey,
+        symbolVersionId: candidate.symbolVersionId ?? null,
+        sourceRef: candidate.sourceRef,
+        matchedBy,
+        rowId: row.id,
+      };
 
       const rowIdentity = extractRowIdentity(row);
 
       if (expected?.workspaceId && rowIdentity.workspaceId && rowIdentity.workspaceId !== expected.workspaceId) {
         proof.workspaceRejectedCount += 1;
         bumpReason('workspace_mismatch');
+        proof.candidateResolutions.push({ ...resolution, status: 'REVISION_REJECTED', reason: 'WORKSPACE_MISMATCH' });
         continue;
       }
       if (expected?.workspaceRevision && rowIdentity.workspaceRevision && rowIdentity.workspaceRevision !== expected.workspaceRevision) {
         proof.workspaceRevisionRejectedCount += 1;
         bumpReason('workspace_revision_stale');
+        proof.candidateResolutions.push({ ...resolution, status: 'REVISION_REJECTED', reason: 'WORKSPACE_REVISION_STALE' });
         continue;
       }
       if (expected?.sourceRevision && rowIdentity.sourceRevision && rowIdentity.sourceRevision !== expected.sourceRevision) {
         proof.sourceRevisionRejectedCount += 1;
         bumpReason('source_revision_stale');
+        proof.candidateResolutions.push({ ...resolution, status: 'REVISION_REJECTED', reason: 'SOURCE_REVISION_STALE' });
         continue;
       }
       if (expected?.representationId && rowIdentity.representationId && rowIdentity.representationId !== expected.representationId) {
         proof.representationRejectedCount += 1;
         bumpReason('representation_mismatch');
+        proof.candidateResolutions.push({ ...resolution, status: 'REVISION_REJECTED', reason: 'REPRESENTATION_MISMATCH' });
         continue;
       }
       if (expected?.representationRevision !== undefined && expected.representationRevision !== null) {
         if (rowIdentity.representationRevision !== null && rowIdentity.representationRevision !== expected.representationRevision) {
           proof.representationRevisionRejectedCount += 1;
           bumpReason('representation_revision_stale');
+          proof.candidateResolutions.push({ ...resolution, status: 'REVISION_REJECTED', reason: 'REPRESENTATION_REVISION_STALE' });
           continue;
         }
       }
@@ -462,6 +533,7 @@ export async function hydrateCandidatesWithProof(
         // Validate envelope shape
         FeatureEnvelopeSchema.parse(envelope);
         envelopes.push(envelope);
+        proof.candidateResolutions.push({ ...resolution, status: 'HYDRATED' });
         proof.canonicalJoinedCount += 1;
         if (rowIdentity.pageRankScore !== null) {
           proof.graphScoreAttachedCount += 1;
@@ -476,6 +548,7 @@ export async function hydrateCandidatesWithProof(
       } catch (buildError) {
         console.warn(`Failed to build envelope for candidate ${candidate.packetKey}:`, buildError);
         bumpReason('envelope_build_failed');
+        proof.candidateResolutions.push({ ...resolution, status: 'ENVELOPE_REJECTED', reason: 'ENVELOPE_BUILD_FAILED' });
         continue;
       }
     }
@@ -532,10 +605,11 @@ function buildFeatureEnvelope(input: {
   const fusionRank = asFiniteNumber(candidate.rankBefore, 1);
 
   return {
+    ...(row.metadata || {}),
     // Canonical identity (source_ref is the primary key from retrieval)
     chunk_id: row.id,
     packet_key: (row.metadata?.packet_key as string) || candidate.packetKey || row.id,
-    symbol_version_id: rowIdentity.symbolVersionId || candidate.symbolVersionId || candidate.packetKey || row.id,
+    symbol_version_id: rowIdentity.symbolVersionId || candidate.symbolVersionId || undefined,
     source_ref: row.source_ref || row.relative_path,
     content_hash: row.content_hash || '',
     workspace_revision: rowIdentity.workspaceRevision || candidate.workspaceRevision || null,
@@ -543,6 +617,7 @@ function buildFeatureEnvelope(input: {
     representation_id: rowIdentity.representationId || candidate.representationId || null,
     representation_revision: rowIdentity.representationRevision ?? candidate.representationRevision ?? null,
     stable_symbol_id: rowIdentity.stableSymbolId || candidate.stableSymbolId || null,
+    tree_node_id: rowIdentity.treeNodeId || candidate.treeNodeId || undefined,
     title_id: generateTitleIdentity((row.metadata?.packet_key as string) || candidate.packetKey || row.id, {
       featureLabel: String((row.metadata?.feature_label ?? row.metadata?.feature_id ?? row.symbol ?? row.kind ?? 'packet')),
       symbolName: row.symbol || undefined,
@@ -590,10 +665,7 @@ function buildFeatureEnvelope(input: {
     language: row.language || undefined,
     kind: row.kind || undefined,
 
-    // Forward all JSONB fields if present
-    ...(row.metadata || {}),
-
-    // Re-assert canonical normalized domain after metadata spread
+    // Keep the derived domain classification authoritative over metadata.
     domain_class: normalizedDomainClass,
   };
 }

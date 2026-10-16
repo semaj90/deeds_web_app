@@ -2,7 +2,7 @@ import { pgRows } from '$lib/server/db/client';
 /**
  * Evidence Analysis Pipeline
  *
- * Orchestrates: YOLO detection → Redis cache → LLM escalation (gemma4-rotorquant:latest)
+ * Orchestrates: YOLO detection → Redis cache → LLM escalation (ornith-1.5-9b)
  * → graph connection creation → Drizzle analysis cache persist → Qdrant tag update
  *
  * Called from evidence upload route (step 6b) and RabbitMQ evidence.process handler.
@@ -240,7 +240,7 @@ async function synthesizeWithLLM(
   yolo: YOLOResult | null,
   tags: string[]
 ): Promise<LLMSynthesis | null> {
-  const { ollamaFetch } = await import('$lib/server/ollama.js');
+  const { embedOrChatFetch } = await import('$lib/server/ollama.js');
   const { ENV } = await import('$lib/server/env.server.js');
   const { getOllamaEndpoint } = await import('$lib/server/utils/ollama-endpoint.js');
 

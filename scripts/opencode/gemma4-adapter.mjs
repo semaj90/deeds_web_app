@@ -53,7 +53,7 @@ function resolveLlamaServerModelId() {
   }
 
   const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
-  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
+  if (gemma4 && !/^ornith-1.5-9b(?::latest)?$/i.test(gemma4)) return gemma4;
 
   return 'ornith-1.5-9b';
 }

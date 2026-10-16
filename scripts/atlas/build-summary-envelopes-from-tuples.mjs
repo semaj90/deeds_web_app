@@ -475,7 +475,7 @@ function buildSummaryJobs(envelopes) {
       top_symbols: envelope.top_symbols,
         candidate_refs: envelope.candidate_refs,
         max_tokens: 512,
-      model: 'gemma4-legal-iq4xs-direct.gguf',
+      model: 'ornith-1.5-9b',
       created_at: new Date().toISOString(),
     });
   }

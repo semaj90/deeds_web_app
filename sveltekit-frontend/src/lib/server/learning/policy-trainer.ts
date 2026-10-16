@@ -72,7 +72,7 @@ export interface PolicyTrainingExample {
 
 export interface PolicyTrainerConfig {
   type: PolicyTrainerType;
-  model_name: string; // e.g., 'models/gemma4-legal-iq4xs-direct.gguf'
+  model_name: string; // e.g., 'models/ornith-1.5-9b'
   adapter_name: string;
   device: string;
   // QLoRA configuration

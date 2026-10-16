@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
 	dbExecute: vi.fn(),
 	redisPing: vi.fn(),
-	ollamaFetch: vi.fn(),
+	embedOrChatFetch: vi.fn(),
 	profile: null as unknown,
 	env: {
 		OLLAMA_BASE_URL: 'http://ollama.test',
@@ -17,7 +17,7 @@ vi.mock('$lib/server/db/client', () => ({ db: { execute: mocks.dbExecute } }));
 vi.mock('drizzle-orm', () => ({ sql: (...parts: unknown[]) => parts }));
 vi.mock('$lib/server/redis.js', () => ({ getRedis: () => ({ ping: mocks.redisPing }) }));
 vi.mock('$lib/server/env.server.js', () => ({ ENV: mocks.env }));
-vi.mock('$lib/server/ollama.js', () => ({ ollamaFetch: mocks.ollamaFetch }));
+vi.mock('$lib/server/ollama.js', () => ({ embedOrChatFetch: mocks.embedOrChatFetch }));
 vi.mock('$lib/server/runtime-profile.js', () => ({
 	getParentAtlasRuntimeProfileManifest: () => mocks.profile,
 }));
@@ -59,7 +59,7 @@ describe('GET /api/health/ready', () => {
 		vi.clearAllMocks();
 		mocks.dbExecute.mockResolvedValue({ rows: [{ ok: 1 }] });
 		mocks.redisPing.mockResolvedValue('PONG');
-		mocks.ollamaFetch.mockResolvedValue({ ok: true });
+		mocks.embedOrChatFetch.mockResolvedValue({ ok: true });
 		mocks.env.TURBOVEC_SIDECAR_JSONRPC_URL = undefined;
 		mocks.env.TURBOVEC_SIDECAR = undefined;
 	});

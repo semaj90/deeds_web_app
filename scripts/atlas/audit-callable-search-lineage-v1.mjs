@@ -52,7 +52,9 @@ try {
         COALESCE(ast.ast_revision_rows, 0) AS ast_revision_rows,
         COALESCE(ast.ast_hash_rows, 0) AS ast_hash_rows,
         COALESCE(ast.ast_symbol_rows, 0) AS ast_symbol_rows,
-        COALESCE(ast.canonical_node_rows, 0) AS canonical_node_rows
+        COALESCE(ast.canonical_node_rows, 0) AS canonical_node_rows,
+        COALESCE(ast.legacy_nil_repo_path_rows, 0) AS legacy_nil_repo_path_rows,
+        COALESCE(ast.legacy_nil_repo_exact_span_rows, 0) AS legacy_nil_repo_exact_span_rows
       FROM projection p
       LEFT JOIN LATERAL (
         SELECT count(*) AS packet_rows,
@@ -86,41 +88,52 @@ try {
             AND b.workspace_revision = p.projection_workspace_revision)
       ) binding ON true
       LEFT JOIN LATERAL (
-        SELECT count(*) AS mapping_rows
-        FROM public.code_repos cr
-        WHERE cr.name = binding.source_repo_key
+        SELECT count(*) AS mapping_rows,
+          CASE WHEN count(*) = 1 THEN max(ri.repository_id::text) END AS repository_uuid
+        FROM public.atlas_repository_identity ri
+        WHERE ri.source_authority_repo_id = binding.source_repo_key
       ) repo_mapping ON true
       LEFT JOIN LATERAL (
         SELECT count(*) FILTER (WHERE n.tree_node_id = p.projection_tree_node_id) AS projection_node_rows,
-          count(*) FILTER (WHERE cr.repo_id = n.repo_id
+          count(*) FILTER (WHERE n.repo_id::text = repo_mapping.repository_uuid
             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')) AS ast_path_rows,
-          count(*) FILTER (WHERE cr.repo_id = n.repo_id
+          count(*) FILTER (WHERE n.repo_id::text = repo_mapping.repository_uuid
             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')
             AND n.source_revision = p.source_revision) AS ast_revision_rows,
-          count(*) FILTER (WHERE cr.repo_id = n.repo_id
+          count(*) FILTER (WHERE n.repo_id::text = repo_mapping.repository_uuid
             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')
             AND n.source_revision = p.source_revision
             AND n.source_content_hash IN (b.content_digest, regexp_replace(b.content_digest, '^sha256:', ''))) AS ast_hash_rows,
-          count(*) FILTER (WHERE cr.repo_id = n.repo_id
+          count(*) FILTER (WHERE n.repo_id::text = repo_mapping.repository_uuid
             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')
             AND n.source_revision = p.source_revision
             AND n.source_content_hash IN (b.content_digest, regexp_replace(b.content_digest, '^sha256:', ''))
             AND n.qualified_symbol = p.symbol_qualified_name) AS ast_symbol_rows,
-          count(*) FILTER (WHERE cr.repo_id = n.repo_id
+          count(*) FILTER (WHERE n.repo_id::text = repo_mapping.repository_uuid
             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')
             AND n.source_revision = p.source_revision
             AND n.source_content_hash IN (b.content_digest, regexp_replace(b.content_digest, '^sha256:', ''))
             AND n.qualified_symbol = p.symbol_qualified_name
             AND n.start_byte = p.byte_start
-            AND n.end_byte = p.byte_end) AS canonical_node_rows
+            AND n.end_byte = p.byte_end) AS canonical_node_rows,
+          count(*) FILTER (WHERE n.repo_id = '00000000-0000-0000-0000-000000000000'::uuid
+            AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')) AS legacy_nil_repo_path_rows,
+          count(*) FILTER (WHERE n.repo_id = '00000000-0000-0000-0000-000000000000'::uuid
+            AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', '')
+            AND n.source_revision = p.source_revision
+            AND n.source_content_hash IN (b.content_digest, regexp_replace(b.content_digest, '^sha256:', ''))
+            AND n.qualified_symbol = p.symbol_qualified_name
+            AND n.start_byte = p.byte_start
+            AND n.end_byte = p.byte_end) AS legacy_nil_repo_exact_span_rows
         FROM public.atlas_ast_nodes n
         LEFT JOIN public.atlas_workspace_source_bindings b
           ON b.canonical_source_ref = p.source_ref
           AND b.source_revision = p.source_revision
           AND b.workspace_revision = p.workspace_revision
-        LEFT JOIN public.code_repos cr ON cr.name = b.repo_id AND cr.repo_id = n.repo_id
         WHERE n.tree_node_id = p.projection_tree_node_id
-           OR (cr.repo_id = n.repo_id
+           OR (n.repo_id::text = repo_mapping.repository_uuid
+             AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', ''))
+           OR (n.repo_id = '00000000-0000-0000-0000-000000000000'::uuid
              AND n.relative_path = regexp_replace(replace(p.source_ref, '\\', '/'), '^sveltekit-frontend/', ''))
       ) ast ON true
     )
@@ -150,6 +163,9 @@ try {
       count(*) FILTER (WHERE ast_symbol_rows > 0) AS ast_symbol_candidate_rows,
       count(*) FILTER (WHERE canonical_node_rows = 1) AS unique_canonical_ast_match,
       count(*) FILTER (WHERE canonical_node_rows > 1) AS ambiguous_canonical_ast_match,
+      count(*) FILTER (WHERE legacy_nil_repo_path_rows > 0) AS legacy_nil_repo_ast_path_candidates,
+      count(*) FILTER (WHERE legacy_nil_repo_exact_span_rows = 1) AS unique_legacy_nil_repo_ast_span_matches,
+      count(*) FILTER (WHERE legacy_nil_repo_exact_span_rows > 1) AS ambiguous_legacy_nil_repo_ast_span_matches,
       (SELECT jsonb_agg(jsonb_build_object(
         'symbolVersionId', sample.symbol_version_id,
         'projectionSourceRef', sample.projection_source_ref,
@@ -163,8 +179,8 @@ try {
           WHERE b.canonical_source_ref = sample.source_ref
             AND b.source_revision = sample.source_revision
             AND b.workspace_revision = sample.workspace_revision LIMIT 1),
-        'astRepoUuids', (SELECT jsonb_agg(cr.repo_id::text ORDER BY cr.repo_id)
-          FROM public.code_repos cr WHERE cr.name = (SELECT b.repo_id
+        'canonicalRepositoryUuids', (SELECT jsonb_agg(ri.repository_id::text ORDER BY ri.repository_id)
+          FROM public.atlas_repository_identity ri WHERE ri.source_authority_repo_id = (SELECT b.repo_id
             FROM public.atlas_workspace_source_bindings b
             WHERE b.canonical_source_ref = sample.source_ref
               AND b.source_revision = sample.source_revision
