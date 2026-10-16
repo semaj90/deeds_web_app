@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   AtlasHllTelemetryClient,
+  buildDailyHllWindowId,
+  buildHllEntityKey,
   buildHllRegisterKeys,
   type HllRedisAdapter,
 } from './atlas-hll-telemetry.js';
@@ -81,5 +83,48 @@ describe('AtlasHllTelemetryClient', () => {
     expect(envelope.registerBytes).toBe(12288);
     expect(envelope.estimates.errors).toBe(1);
     expect(envelope.producerId).toBe('opencode-agent-governor');
+  });
+});
+
+describe('AtlasHllTelemetryClient entity registers (HLL-ALIGN)', () => {
+  it('builds per-kind keys in the shared scheme and rejects unsafe kinds', () => {
+    expect(buildHllEntityKey('bitfrost-agent-warm', '2026-10-16', 'packets')).toBe(
+      'atlas:hll:bitfrost-agent-warm:2026-10-16:packets'
+    );
+    expect(buildHllEntityKey('ns', 'w', 'sources')).toBe(buildHllRegisterKeys('ns', 'w').sourceHllKey);
+    for (const bad of ['', 'Packets', '1x', 'a:b', 'a b', 'x'.repeat(33)]) {
+      expect(() => buildHllEntityKey('ns', 'w', bad)).toThrow();
+    }
+    expect(buildDailyHllWindowId(new Date('2026-10-16T23:59:59Z'))).toBe('2026-10-16');
+  });
+
+  it('keeps entity kinds in separate registers (regression: the old single mixed register)', async () => {
+    const client = new AtlasHllTelemetryClient(new MockHllRedisAdapter());
+    await client.recordEntityBatch('ns', 'w', {
+      tasks: ['t1', 't2'],
+      stories: ['s1'],
+      packets: ['p1', 'p2', 'p3'],
+      features: ['f1'],
+      sources: ['src/a.ts', 'src/b.ts'],
+    });
+    const estimates = await client.queryEntityEstimates('ns', 'w', ['tasks', 'stories', 'packets', 'features', 'sources']);
+    expect(estimates).toEqual({ tasks: 2, stories: 1, packets: 3, features: 1, sources: 2 });
+  });
+
+  it('de-duplicates, drops empty ids and chunks PFADD by combined length', async () => {
+    const calls: string[][] = [];
+    const adapter: HllRedisAdapter = {
+      async pfadd(_key, ...elements) { calls.push(elements); return undefined as unknown as number; },
+      async pfcount() { return 0; },
+    };
+    const client = new AtlasHllTelemetryClient(adapter);
+    const result = await client.recordEntityBatch(
+      'ns', 'w',
+      { sources: ['aaaa', 'bbbb', 'aaaa', '', 'cccc', 'dddd'] },
+      { maxChunkChars: 8 }
+    );
+    expect(calls).toEqual([['aaaa', 'bbbb'], ['cccc', 'dddd']]);
+    expect(result.added).toBe(0); // adapter returned nothing: coerced, not NaN
+    expect(result.keys.sources).toBe('atlas:hll:ns:w:sources');
   });
 });

@@ -198,6 +198,13 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       host: '0.0.0.0',
       allowedHosts: ['host.docker.internal', 'localhost', '127.0.0.1'],
+      // Same isolation headers as hooks.server.ts. Vite serves /src/**/*.worker.ts itself
+      // (before SvelteKit hooks run); without COEP a page that sets require-corp blocks the
+      // worker script (net::ERR_BLOCKED_BY_RESPONSE).
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+      },
       // Pre-transform frequently imported modules on dev server start
       warmup: {
         clientFiles: [

@@ -27,9 +27,17 @@ import {
   shouldPreferValkeyCli,
 } from '../../sveltekit-frontend/scripts/atlas/lib/redis-valkey.mjs';
 
+const { tsImport } = await import('tsx/esm/api');
+const { AtlasHllTelemetryClient, buildDailyHllWindowId } = await tsImport(
+  '../../sveltekit-frontend/src/lib/server/atlas/telemetry/atlas-hll-telemetry.ts',
+  import.meta.url,
+);
+
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
 const REPO_ROOT = process.cwd();
-const HLL_KEY = 'bitfrost:agent:hll:keys';
+// One HyperLogLog register per entity kind (shared client key scheme); breadth telemetry only, never identity.
+const HLL_NAMESPACE = 'bitfrost-agent-warm';
+const HLL_KINDS = ['tasks', 'stories', 'packets', 'features', 'sources'];
 
 const pool = new pg.Pool({ connectionString: DB_URL });
 let cache;
@@ -68,6 +76,7 @@ async function warmAgentCache() {
         async pfadd(key, ...members) {
           const result = runRedisCli(container, ['PFADD', key, ...members], password);
           if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
         },
         async pfcount(key) {
           const result = runRedisCli(container, ['PFCOUNT', key], password);
@@ -108,6 +117,7 @@ async function warmAgentCache() {
     console.log(`📊 Found ${rows.length} agent registry entries to warm\n`);
 
     let warmed = 0;
+    const hllBatch = { tasks: [], stories: [], packets: [], features: [], sources: [] };
 
     for (const row of rows) {
       const ttl = getTTL(row.status);
@@ -128,7 +138,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
-        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.task_id);
+        hllBatch.tasks.push(String(row.task_id));
         warmed++;
       }
 
@@ -139,7 +149,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
-        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.story_id);
+        hllBatch.stories.push(String(row.story_id));
         warmed++;
       }
 
@@ -150,7 +160,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
-        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.packet_key);
+        hllBatch.packets.push(String(row.packet_key));
         warmed++;
       }
 
@@ -161,7 +171,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
-        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.feature_id);
+        hllBatch.features.push(String(row.feature_id));
         warmed++;
       }
 
@@ -172,14 +182,18 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
-        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.source_ref);
+        hllBatch.sources.push(String(row.source_ref));
         warmed++;
       }
     }
 
     console.log(`\n✅ Warmed ${warmed} BitFrost cache entries\n`);
-    if (typeof cache.pfcount === 'function') {
-      console.log(`HyperLogLog summary: ${HLL_KEY} = ${await cache.pfcount(HLL_KEY)}`);
+    if (typeof cache.pfadd === 'function' && typeof cache.pfcount === 'function') {
+      const hll = new AtlasHllTelemetryClient(cache);
+      const windowId = buildDailyHllWindowId();
+      await hll.recordEntityBatch(HLL_NAMESPACE, windowId, hllBatch);
+      const estimates = await hll.queryEntityEstimates(HLL_NAMESPACE, windowId, HLL_KINDS);
+      console.log(`HyperLogLog summary (atlas:hll:${HLL_NAMESPACE}:${windowId}:<kind>): ${JSON.stringify(estimates)}`);
     }
     console.log(`Cache Keys Pattern:`);
     console.log(`  bitfrost:agent:task:<task_id>`);

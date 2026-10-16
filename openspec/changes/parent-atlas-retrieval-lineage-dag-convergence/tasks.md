@@ -18178,3 +18178,27 @@ cache, model, or source-file writes occurred.
 - This comparison is static and does not prove uniqueness across a live sidecar
   corpus, exact source-revision alignment, or persistence/admission. No IDs,
   schema, or database rows were changed.
+
+## PARENT-ATLAS-LINEAGE-VERTICAL-SLICE-01 result (2026-10-16, read-only; typed rejection)
+
+Receipt: `docs/reports/lineage-vertical-slice-01-2026-10-16.json` (sha256 `58a64fb3b6d372b2d5dd15616e10bb94bc82ebd21c1241adc612679b00cc6d51`). Subject: `validatePacket` in `packages/atlas-core/src/packet-reader.ts`, `symbol-version:30a12af2…a7df`, packet `ace:packet:bf0f0228d6c8`. No database, cache, Qdrant, GPU or `graphify:daily` activity; no identity invented, no history backfilled, no revision assigned. Verdict `REJECTED_AT_NATIVE_AST_SPAN`.
+
+**SLICE-SPAN-01 read-only refresh (2026-10-16):** `docs/reports/lineage-slice-span-01-refresh-20261016.json` (payload checksum `sha256:ab06540ca53c7860f28b12873ba1c06d989145921742d596b20053ff53d66fbd`) refines the earlier parser finding. The exact source bytes still match the stored `source_revision` (`5216` bytes; SHA-256 `d4083d3c…64b0024`). The database span `[4433,4911)` is not the `validatePacket` method span: a direct read-only `:8095/ast/chunk` call with `language=typescript` returned `[4620,5110)` for the method, matching current `ast-entities.jsonl` and `ast-symbol-nominations.jsonl`; the local `ast-entity-identity.jsonl` instead matches the incorrect database span. This locates an artifact/producer disagreement, but the historical input that first introduced the bad range is no longer established. The current nomination has `language=ts`, while the sidecar requires `typescript`; `ts` returns `UnsupportedLanguageError`, and the readback auditor also rejects `ts` in its own preflight before making the request. Do not report that earlier local rejection as proof the sidecar was contacted. The stored `upstream_node_id` is the packet's file-level tree ID, not the method node ID. Verdict `PRODUCER_MISMATCH`; source-coordinate cause and workspace lineage remain unresolved. No task is closed and no write/promotion is authorized.
+
+| Stage | Verdict | Where it stops |
+|---|---|---|
+| source bytes + `source_revision` | PASS | existing `audit-function-source-readback-v1.mjs`: exact bytes found, digest matches, unique valid workspace binding |
+| native AST symbol + byte span | BLOCKED | `:8095` sidecar `REJECTED NATIVE_LANGUAGE_UNSUPPORTED`; registry span [4433,4911) starts 187 bytes before the declaration and ends mid-statement (file is CRLF; LF-normalized text also misaligned; cause not established) |
+| first-insert writer + `packet_key` | PARTIAL | row created 2026-07-20 (orphan cohort); writer known only from alias provenance (`register-orphaned-chunks.mjs`, source not read); symbol `upstream_chunk_id` is the packet key, matching no chunk row |
+| `codebase_chunk_index` exact row | BLOCKED | symbol lines 150-165 overlap two chunk rows; both have NULL `source_revision`/`workspace_revision` and `metadata.packet_key` equal to their own `qdrant_id`; `atlas_packet_chunk_lineage` has EXACT_MULTI_MEMBER/PROVEN rows but `canonicalAdmissionProven:false` |
+| `semantic_768` | BLOCKED | `content_embedding_768` NULL on both covering chunks (0 of 8 for the file) |
+| SearchRuntime candidate + RRF | NOT_EXERCISED | no write-free harness; live route not called |
+| sealed ordinal map | BLOCKED | `candidate_ordinal` NULL on all 479 `atlas_symbol_versions` rows |
+| ContextManifest + ACE evidence | BLOCKED | `atlas_context_manifests` has 0 rows |
+
+Side finding (answers an open question): chunk-index `metadata.packet_key` equals the chunk's `qdrant_id`, which is the pattern that later appears as Qdrant payload `packet_key` (94.5% of mismatches earlier); the writer of the chunk rows, not a Qdrant backfill, is the lead for the older writer.
+
+- [ ] SLICE-SPAN-01 Establish an independent native check and identify the historical producer/input that introduced the unaligned registry span; current source/parser agreement is proven for this symbol, but the historical span writer and its offset base remain unresolved. Do not treat the registry span or this diagnostic as canonical admission.
+- [ ] SLICE-CHUNK-01 Resolve the chunk join without inventing revisions: use `atlas_packet_chunk_lineage` as the revision-qualified binding, decide how to handle overlapping chunks (146-179 fully contains the symbol), and record why the chunk rows themselves carry no revision.
+- [ ] SLICE-768-01 Decide whether chunks without `content_embedding_768` are in scope for the canonical lane; do not substitute the legacy halfvec column.
+- [ ] SLICE-ORD-01 / SLICE-MANIFEST-01 Nothing to seal or manifest until the upstream stages pass; revisit with a write-free SearchRuntime harness.

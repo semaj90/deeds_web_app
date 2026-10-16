@@ -850,7 +850,7 @@ export async function embedOrChatFetch(url: string, init?: RequestInit): Promise
     return response;
   } catch (error) {
     const duration = Date.now() - startedAt;
-    logOllamaDiagnostics('error', meta, duration, undefined, error);
+    logOllamaDiagnostics('error', meta, duration, undefined, error, 'ollama');
 
     // Normalize error response so agents get a consistent JSON envelope
     return new Response(

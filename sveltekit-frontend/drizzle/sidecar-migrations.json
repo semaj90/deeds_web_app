@@ -741,6 +741,15 @@
       "appliedAt": "2026-10-15",
       "requiresJournalEntry": false,
       "validationCommand": "SELECT current_setting('server_version_num'), to_regclass('public.atlas_packet_class_lut_validation_receipts');"
+    },
+    {
+      "file": "manual/20261016_atlas_source_locations_DRAFT.sql",
+      "status": "planned_sidecar",
+      "reason": "DRAFT, NOT APPLIED. Creates public.atlas_source_locations (UNIQUE (source_namespace, source_ref), case-preserving, repo-namespace path-safety CHECK, sha256 revision shape CHECK, uuidv7 surrogate) and the append-only public.atlas_source_location_conflicts ledger, for SRCREF-UNIQUE-01 in parent-atlas-graphify-recovery-proof-ladder. Rehearsed in a rolled-back transaction on PostgreSQL 18.4: 2 tables and 10 columns in-transaction, 12/12 invalid rows rejected (duplicate, traversal, absolute, backslash, URL, drive, ./, //, blank, padded, upper-case namespace, bad revision), case-only twin and proto: id in its own namespace accepted, 0 tables afterward. Does NOT alter atlas_packets and does NOT decide namespaces or case folding (owner decisions).",
+      "appliedBy": null,
+      "appliedAt": null,
+      "requiresJournalEntry": false,
+      "validationCommand": "Rehearsal: run the draft with COMMIT removed, exercise the constraints, ROLLBACK, and confirm 0 tables afterward (script kept in the session scratchpad); production apply needs explicit operator approval, a backup, and CREATE ... IF NOT EXISTS re-run to prove idempotence."
     }
   ]
 }

@@ -1,0 +1,48 @@
+{
+  "schema": "atlas.eg2-couchdb-ocr-qualification-receipt.v1",
+  "generatedAt": "2026-10-16T18:20:00Z",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "gitHead": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
+  "workingTreeDirty": true,
+  "writesPerformed": { "postgres": false, "qdrant": false, "couchdb": false, "redis": false, "queues": false },
+  "canonicalDefaultChanged": false,
+  "eg2": {
+    "ollamaTag": "embeddinggemma2:q8_0",
+    "note": "Local import of unsloth Q8_0 GGUF; not the embeddinggemma-2:270m registry tag named in task 9.1",
+    "ggufPath": "models/embeddinggemma2/unsloth-q8/embeddinggemma-2-Q8_0.gguf",
+    "ggufSha256": "6f1bd4ac6c5df7444f9cca7ca36cafe6cfa34cd6f49fefb1e0b4be8143aed8bc",
+    "probe": { "endpoint": "/api/embed", "prefix": "none", "texts": 4, "dim": 768, "allFinite": true, "rawNorm": 1.0, "replayMaxAbsDiff": 0, "coldLoadMs": 8044, "warmMsRange": [45, 79] },
+    "canonicalComparator": { "model": "embeddinggemma:latest", "dim": 768, "allFinite": true, "replayMaxAbsDiff": 0, "coldLoadMs": 6977, "warmMsRange": [41, 66] },
+    "frozenCohort": { "table": "codebase_chunk_eg2_embeddings", "storedRows": 1000, "joinedToCanonical768": 776, "queries": 100, "k": 10, "meanTop10Overlap": 0.402, "sameTop1": 39, "caveat": "EG2 vectors embed raw text; canonical recipe per row not verified; overlap is not a quality metric" },
+    "notRun": ["Hugging Face google/embeddinggemma-2 reference comparison", "Recall@K/MRR on golden corpus (1,287 unjudged pairs)", "pooling configuration capture", "peak VRAM/RAM"]
+  },
+  "couchdb": {
+    "version": "3.3.3", "containerStartedBy": "operator-approved docker start legal-ai-couchdb",
+    "rootStatus": 200, "unauthenticatedAllDbs": 401, "authenticatedAllDbsIncludesDagCache": true, "dagCacheDbResponds": true,
+    "findings": ["Prior 'Cleanup failed (non-fatal)' coincided with the container being stopped 46h", "dag-cache.ts cleanup calls couchdb.createDb before allDocs: not read-only, so no cleanup dry run exists", "COUCHDB_URL is defined in root .env only"],
+    "cleanupRun": false
+  },
+  "ocr": {
+    "tesseractPath": "C:/Program Files/Tesseract-OCR/tesseract.exe", "tesseractVersion": "5.5.0.20241111", "onPath": true,
+    "tsSpawn": "src/lib/server/ocr/tesseract.ts spawn('tesseract', [... -l eng --psm 3 txt])",
+    "fixtureSha256": "8c13f25f0975a512582c3f4624b762a1fa3e9244eae7cdcb0b2c710799f6387e",
+    "txtOutput": "The court granted the motion / to suppress. Case No. 24-1187",
+    "tsvAvailable": true, "tsvFirstWord": { "page": 1, "left": 28, "top": 37, "width": 64, "height": 29, "conf": 96.6, "text": "The" },
+    "gap": "tesseract.ts requests txt only: page number, word boxes, confidence and engine version are discarded. Coordinates are image pixels, not AST byte offsets.",
+    "notRun": ["real PDF", "tesseract.js fallback in hybrid.ts", "OCR-03 job ownership / dummy worker queue check"]
+  },
+  "ornith": {
+    "alias": "ornith-1.5-9b", "mmprojFile": "models/mmproj-Ornith-1.5-9B-BF16.gguf", "mmprojBytes": 921704672,
+    "before": { "visionModality": false, "mmprojLoaded": false },
+    "relaunch": { "approvedBy": "operator", "idleSlotsConfirmed": true, "stoppedOnly": "single llama-server process owning --port 8090", "command": "pwsh -File scripts/launch-turboquant.ps1 -Detached -StartupProfile ornith-1.5-vlm", "env": { "LLAMA_ARG_MMPROJ_OFFLOAD": "0" } },
+    "after": { "visionModality": true, "gpuMiB": "7939 of 8192" },
+    "visionTest": { "fixtureSha256": "8c13f25f0975a512582c3f4624b762a1fa3e9244eae7cdcb0b2c710799f6387e", "stream": true, "temperature": 0, "ms": 381, "output": "The court granted the motion\nto suppress. Case No. 24-1187", "matchesTesseractText": true, "limits": "one large-print synthetic image; no scan-quality test; no coordinates" },
+    "port8085Health": "empty response; vision-OCR lane not verified"
+  },
+  "launcherChange": {
+    "file": "scripts/launch-turboquant.ps1",
+    "change": "'already healthy' short-circuit now also requires /props modalities.vision=true when the profile wants vision and the projector file exists (both branches)",
+    "verified": ["PowerShell parse: 0 errors", "healthy case: vision server not restarted (same PID), exit 0"],
+    "notVerified": ["negative case: text-only server + vision profile restarting automatically"]
+  }
+}

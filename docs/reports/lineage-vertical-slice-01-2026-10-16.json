@@ -1,0 +1,116 @@
+{
+  "schema": "atlas.lineage-vertical-slice.v1",
+  "assignment": "PARENT-ATLAS-LINEAGE-VERTICAL-SLICE-01",
+  "generatedAt": "2026-10-16T20:27:39.054Z",
+  "mode": "READ_ONLY_DIAGNOSTIC",
+  "writesPerformed": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "queues": false,
+    "gpu": false,
+    "graphifyDaily": false,
+    "files": [
+      "this receipt"
+    ]
+  },
+  "subject": {
+    "symbolVersionId": "symbol-version:30a12af2b96b0b4450d045f4b8900d55175b690bf17b9879da806ac63b2aa7df",
+    "qualifiedName": "validatePacket",
+    "sourceRef": "packages/atlas-core/src/packet-reader.ts",
+    "packetKey": "ace:packet:bf0f0228d6c8",
+    "sourceRevision": "sha256:d4083d3c5b3fa768657b4d7122200ba726ef7abcfbc418b6c9c28d80964b0024",
+    "workspaceRevision": "sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc",
+    "registrySpan": {
+      "byteStart": 4433,
+      "byteEnd": 4911
+    },
+    "registrySpanLines": {
+      "start": 150,
+      "end": 165
+    }
+  },
+  "verdict": "REJECTED_AT_NATIVE_AST_SPAN",
+  "firstBlockingStage": "native_ast_symbol_span",
+  "stages": [
+    {
+      "stage": "source_bytes_and_source_revision",
+      "verdict": "PASS",
+      "evidence": [
+        "existing owner scripts/atlas/audit-function-source-readback-v1.mjs: status EXACT_SOURCE_BYTES_FOUND",
+        "transactionReadOnly true",
+        "working-tree digest matches sourceRevision",
+        "workspace binding unique and valid (5,216 bytes; contentDigestMatchesSourceRevision true)",
+        "gitBlobOidPresent false"
+      ]
+    },
+    {
+      "stage": "native_ast_symbol_span",
+      "verdict": "BLOCKED",
+      "evidence": [
+        "native sidecar :8095 /ast/chunk: REJECTED NATIVE_LANGUAGE_UNSUPPORTED (no independent native confirmation)",
+        "registry span [4433,4911) contains the declaration (byte 4620) but starts 187 bytes before it and ends mid-statement (...if (!packet.feature_id) errors)",
+        "file uses CRLF (179 line breaks): on LF-normalized text the span starts ~23 characters inside the JSDoc above the declaration and ends mid-return; neither base aligns to a node boundary; cause not established"
+      ]
+    },
+    {
+      "stage": "first_insert_packet_writer_and_packet_key",
+      "verdict": "PARTIAL",
+      "evidence": [
+        "atlas_packets row ace:packet:bf0f0228d6c8 (1 row), created 2026-07-20, source_kind codebase_chunk, identity_lane qdrant_chunk",
+        "writer named only by alias provenance (atlas_packet_identity_aliases producer_id register-orphaned-chunks.mjs); its source was not read in this slice",
+        "one file-level packet serves all 8 symbols of the file",
+        "symbol.upstream_chunk_id equals the PACKET key, not a chunk id (matches no codebase_chunk_index row)"
+      ]
+    },
+    {
+      "stage": "codebase_chunk_index_exact_row",
+      "verdict": "BLOCKED",
+      "evidence": [
+        "8 chunk rows for the file; symbol lines 150-165 overlap two (lines 119-152 and 146-179); only 146-179 fully contains them",
+        "both rows: source_revision NULL and workspace_revision NULL",
+        "both rows: metadata.packet_key equals the chunk own qdrant_id (a point id, not the atlas packet key)",
+        "atlas_packet_chunk_lineage has 8 rows EXACT_MULTI_MEMBER / revision PROVEN, canonicalAdmissionProven false",
+        "chunk line coverage: missingLineCount 1, conflictingLineCount 11, reconstructedDigestMatches false"
+      ]
+    },
+    {
+      "stage": "semantic_768_representation",
+      "verdict": "BLOCKED",
+      "evidence": [
+        "content_embedding_768 is NULL for both covering chunks and for all 8 chunk rows of this file",
+        "legacy content_embedding (halfvec) is present on the covering rows but its recipe and lineage are unproven and it is not the canonical column"
+      ]
+    },
+    {
+      "stage": "searchruntime_candidate_and_rrf",
+      "verdict": "NOT_EXERCISED",
+      "evidence": [
+        "no write-free harness identified; the live retrieval route was not called (assignment forbids DB/cache writes)"
+      ]
+    },
+    {
+      "stage": "sealed_ordinal_map",
+      "verdict": "BLOCKED",
+      "evidence": [
+        "candidate_ordinal is NULL on all 479 atlas_symbol_versions rows, including this symbol; there is no candidate to seal"
+      ]
+    },
+    {
+      "stage": "context_manifest_and_ace_evidence",
+      "verdict": "BLOCKED",
+      "evidence": [
+        "atlas_context_manifests has 0 rows; no stored manifest references this packet or symbol"
+      ]
+    }
+  ],
+  "promotion": {
+    "eligible": false,
+    "reason": "chain stops at native AST span; chunk join, semantic_768, ordinal and manifest stages also blocked"
+  },
+  "notInvented": [
+    "no packet identity created",
+    "no history backfilled",
+    "no revision assigned to the chunk rows"
+  ]
+}
