@@ -45,7 +45,8 @@ import { extractMarkdownSymbols, extractMarkdownFences } from './lib/markdown-sy
 import { requestDocumentSymbolsOnce, mapLspSymbolKind, fileUriFor } from './lib/lsp-client.mjs';
 import { decodeSourceTextEnvelope, decodedOffsetToRawByte, classifySourceKind, MARKDOWN_FENCE_LANGUAGE_TO_EXT } from './lib/source-text-envelope.mjs';
 import { writeAtlasAstNodes, indexSafeQualifiedSymbolV1 } from './lib/atlas-ast-nodes-writer.mjs';
-import { isGraphifySymbolExcludedArtifactV1, selectBoundedSupportedExtractorCandidates } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { isGraphifySymbolExcludedArtifactV2, selectBoundedSupportedExtractorCandidates } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { resolveSourceReadRootV1 } from './lib/source-read-root-v1.mjs';
 import { buildSymbolBatchPlan, validateSymbolBatchPlan, buildSymbolBaselineShards, selectLiveSymbolPlanRows, verifySymbolObservationReadback, requireSymbolBatchHeadroom, findSymbolIdentityConflicts, disambiguateSymbolOccurrenceKeysV1, disambiguateAstOccurrenceNamesV1 } from './lib/graphify-symbol-batch-plan-v1.mjs';
 
 type ExtractedSymbol = {
@@ -86,6 +87,12 @@ const batches = Number(opt('--batches', '1'));
 const maxFilesPerRun = Number(opt('--max-files', '250'));
 const workspaceIdFilter = opt('--workspace-id', '');
 const workspaceRevisionFilter = opt('--workspace-revision', '');
+// Source bytes come from the working tree unless ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT names the admitted, materialized snapshot (fail-closed).
+const SOURCE_READ = resolveSourceReadRootV1({
+  repoRoot: REPO_ROOT, env: process.env, workspaceRevision: workspaceRevisionFilter,
+  admission: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT
+    ? JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'docs', 'reports', 'workspace-revision-tournament-admission-v1.json'), 'utf8')) : null,
+});
 const sourceRefsFilter = opt('--source-refs', '')
   .split(',')
   .map((s) => s.trim())
@@ -181,7 +188,7 @@ const LSP_LANGUAGE_ID: Record<string, string> = {
 type FileKind = 'ts_js' | 'json' | 'markdown' | 'text' | 'unsupported';
 
 function classify(sourceRef: string): FileKind {
-  if (isGraphifySymbolExcludedArtifactV1(sourceRef)) return 'unsupported';
+  if (isGraphifySymbolExcludedArtifactV2(sourceRef)) return 'unsupported';
   const kind = classifySourceKind(sourceRef);
   if (!kind) return 'unsupported';
   if (kind.documentKind === 'code') return 'ts_js';
@@ -579,7 +586,7 @@ async function main(currentShard = shardIndex) {
 
   const checkCurrentSourceBytes = workspaceRevisionFilter
     ? (row: { source_ref: string; source_revision: string }): boolean | 'MISSING' | 'READ_ERROR' => {
-      const absPath = path.join(REPO_ROOT, row.source_ref);
+      const absPath = path.join(SOURCE_READ.root, row.source_ref);
       if (!fs.existsSync(absPath)) return 'MISSING';
       try {
         return sourceDigestForFile(absPath) === row.source_revision;
@@ -666,7 +673,7 @@ async function main(currentShard = shardIndex) {
   if (apply && frozenPlan) availableBytes = diskHeadroom();
   for (const { row, kind } of supportedRows) {
     byFileKind[kind] = (byFileKind[kind] ?? 0) + 1;
-    const absPath = path.join(REPO_ROOT, row.source_ref);
+    const absPath = path.join(SOURCE_READ.root, row.source_ref);
     if (frozenPlan && apply && row.parse_status !== 'PROCESSED' && filesProcessed >= maxFilesPerRun) {
       plan.push({ fileId: row.file_id, sourceRef: row.source_ref, sourceRevision: row.source_revision,
         workspaceRevision: row.workspace_revision, graphifyWorkspaceRevision: row.graphify_workspace_revision,
@@ -991,6 +998,8 @@ async function main(currentShard = shardIndex) {
     workspaceIdFilter: workspaceIdFilter || null,
     workspaceRevisionFilter: workspaceRevisionFilter || null,
     admissionMode: workspaceRevisionFilter ? 'CANONICAL_WORKSPACE_SOURCE_BINDING' : 'GRAPHIFY_OBSERVATION_ONLY',
+    sourceReadMode: SOURCE_READ.mode,
+    sourceReadSnapshotRevision: SOURCE_READ.snapshotRevision,
     workspaceRevisionCount: workspaceRevisions.size,
     graphifyWorkspaceRevisionMismatchCount,
     sourceRevisionMismatchCount,

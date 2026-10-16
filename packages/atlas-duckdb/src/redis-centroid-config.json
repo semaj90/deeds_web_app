@@ -162,7 +162,7 @@
         "SMEMBERS cluster:members:{cluster_id} → load candidates",
         "GET centroid:som:{neighbor_1..K} → load neighbor centroids"
       ],
-      "total_keys_accessed": 1 + 1 + 2 + 5 + 5,
+      "total_keys_accessed": 14,
       "cache_hit_rate": 0.95,
       "latency_ms": 8
     },
@@ -183,7 +183,7 @@
         "GET cache:metadata:{query_hash} → check if cached",
         "HGETALL rerank:scores:{query_hash}:* → fetch cached scores"
       ],
-      "total_keys_accessed": 1 + 5,
+      "total_keys_accessed": 6,
       "cache_hit_rate": 0.15,
       "latency_ms": 3
     }

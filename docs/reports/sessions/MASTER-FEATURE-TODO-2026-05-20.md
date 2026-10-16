@@ -208,7 +208,7 @@ The live workstation flow is:
 - Arrow IPC, mmap, JSON, MsgPack, and gRPC are transport layers only.
 - PyTorch and XGBoost are ranker / reranker layers only.
 - ACE packages are validated evidence bundles.
-- Gemma4 writes the recommendation from bounded evidence.
+- Ornith 1.5 (`ornith-1.5-9b` via llama-server `:8090`) writes the recommendation from bounded evidence (Gemma4 represents base model family lineage, not the active synthesis authority).
 - The task board stores proposed and verified outcomes, not canonical truth.
 
 **Current blocker**
@@ -572,13 +572,13 @@ dependency graph, sourceRefs, startup context, package scripts.
 
 ## Phase 101C — Local Deep Research / OpenCode / LangGraph Alignment
 
-**Goal**: Make `local-deep-research` a research backend for ornith 1.5, Gemma4/OpenCode, not a competing assistant stack.
+**Goal**: Make `local-deep-research` a research backend for Ornith 1.5 (`ornith-1.5-9b` on llama-server `:8090`) and OpenCode, not a competing assistant stack.
 
 **Reference**: `docs/architecture/local-deep-research-boundary.md`, `docs/architecture/scheduler-gpu-bridge-roadmap.md`
 
 **Tasks**:
 - [ ] Inventory the current `local-deep-research` compose and note the current boundary: local postgresql to replace sqlite state on the research side, canonical backend stores in the repo.
-- [ ] Compare the local-deep-research container against the repo's current OpenCode/ornith 1.5 update from Gemma4 function-calling path and document the exact role split.
+- [ ] Compare the local-deep-research container against the repo's current OpenCode/Ornith 1.5 function-calling path (migrated from Gemma4) and document the exact role split.
 - [ ] Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model boundary before promoting it to the checklist.
 - [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes archived in deeds_labs/test-only unless it proves useful as a separate lane.
 - [ ] Add the export/import bridge that turns local SQLite research state into canonical backend rows before ACE packet generation.
@@ -625,7 +625,7 @@ dependency graph, sourceRefs, startup context, package scripts.
     - the seam now includes GPU-safe load shedding and SOM/AE-aware rerank for oversubscribed batches
   - [x] Add a backend-toggle smoke (`scripts/smoke/turbovec-ann-backend-smoke.mjs`) so the default Qdrant vs `CODEBASE_ANN_BACKEND=turbovec` selection stays testable without loading the full ANN stack.
 - [ ] Keep LangGraph optional as orchestration only.
-  - LangGraph nodes may validate, route, inspect, and call  ornith 1.5 llama-server 8090 update it from Gemma4/function tools.
+  - LangGraph nodes may validate, route, inspect, and call Ornith 1.5 on llama-server `:8090` through function tools (resolve the served model via the resolver; formerly Gemma4).
   - LangGraph nodes must not directly write to Postgres, Qdrant, Redis, Neo4j, DuckDB, or SeaweedFS.
   - Durable writes must go through existing promotion queues, validation gates, and bounded apply scripts.
   - LangGraph is for agentic testing/planning/subagent coordination, not a replacement for SvelteKit routes, MCP tools, or the promotion ledger.
@@ -1234,15 +1234,15 @@ output: .tmp/domain-topology.json + graphify refresh manifest
 
 ## Phase 11H — Prompt Engineering + Agentic Research Fallback
 
-**Goal**: Gemma4 tool-calling prompt generator with cascading fallback chain.
+**Goal**: Ornith 1.5 (`ornith-1.5-9b` via `llama-server:8090`) tool-calling prompt generator with cascading fallback chain.
 
-**Fallback chain** (caveman: local first, deep research last):
+**Fallback chain** (local first, deep research last):
 ```
 1. local rg (ripgrep) — always free, instant
 2. ACE cache (Valkey hot packet) — 1–7 day TTL
 3. Qdrant vector search — semantic recall
 4. SearXNG fallback (localhost:8889) — web search
-5. Gemma4 deep research + tool calling — last resort
+5. Ornith 1.5 deep research + tool calling — last resort
 ```
 
 **Prompt cache** (Redis `prompt:{intent_hash}`):
@@ -1252,21 +1252,20 @@ output: .tmp/domain-topology.json + graphify refresh manifest
 
 **Sub-agentic orchestration** (`scripts/agent/prompt-generator.mjs`):
 ```
-intent → feature_labels → ACE context chunks → tool signatures make sure updated not gemma, call  ornith 1.5 llama-server 8090
-       → Gemma4 system prompt with NES/glyph memory hints
+intent → feature_labels → ACE context chunks → tool signatures
+       → Ornith 1.5 system prompt with NES/glyph memory hints
        → sub-agent task list with sourceRef anchors
 ```
-ot gemma, call  ornith 1.5 llama-server 8090
-- Embedded intent vectors (768-dim compressed to 64-dim via autoencoder) through mrl embeddinggemma 512, 256, 128, for latent256, latent128. latent64
+
 **TurboVec search memory** (Redis hash `turbovec:memory:{user_id}`):
-- Embedded intent vectors (768-dim compressed to 64-dim via autoencoder)
+- Embedded intent vectors (768-dim compressed to 64-dim via autoencoder) through MRL embeddinggemma (512, 256, 128, for latent256, latent128, latent64)
 - TTL: 7 days
 - Used for: attention head selection, personalized rerank boosts
 
-**Tasks**: make sure updated not gemma, call  ornith 1.5 llama-server 8090
-- [x] `scripts/agent/prompt-generator.mjs` — intent → structured Gemma4 system prompt (2026-05-28)
+**Tasks**:
+- [x] `scripts/agent/prompt-generator.mjs` — intent → structured Ornith 1.5 system prompt (2026-05-28)
 - [x] `scripts/agent/turbovec-search-memory.mjs` — user intent embedding cache with TTL (2026-05-28)
-- [x] Gemma4 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs
+- [x] Ornith 1.5 tool-calling manifest: `rg`, `ace_search`, `qdrant_search`, `searxng_search` — embedded in prompt-generator.mjs
 - [x] Add `agent:prompt` and `agent:search-memory` npm scripts (2026-05-28)
 - [x] Wire SearXNG fallback (localhost:8889) into research chain (Phase 20 / Unsloth lane)
 
@@ -1298,7 +1297,7 @@ changed files (git diff --name-only HEAD~1) → hot errors → hot sourceRefs
 
 ---
 
-## NES/Glyph Architecture Notes (CHR97 ↔ ACE ↔ Gemma4)
+## NES/Glyph Architecture Notes (CHR97 ↔ ACE ↔ Ornith 1.5)
 
 **Core principle**: swap only what's needed, when needed. Never load full state.
 
@@ -1308,7 +1307,7 @@ User intent
   → Redis lookup: intent:{hash} → featureLabels + sourceRefs + acePacketId
   → ACE packet load (Valkey hot cache → disk fallback)
   → Glyph tile selection: only tiles matching featureLabels
-  → Gemma4 context: system prompt + selected tiles (≤6k tokens)
+  → Ornith 1.5 context: system prompt + selected tiles (≤6k tokens)
   → Tool calls: rg / qdrant / searxng (local first)
   → Response + RL signal (dwell, thumbs, citation save)
   → Update: intent cache TTL refresh + turbovec search memory
@@ -1317,7 +1316,7 @@ User intent
 **Attention head selection** (future, after TurboVec rerank verified):
 - Use turbovec 64-dim intent embeddings to select which attention heads to bias
 - Store per-user head weights in `turbovec:memory:{user_id}`
-- Apply as soft prompt prefix (≤128 tokens) before Gemma4 context
+- Apply as soft prompt prefix (≤128 tokens) before Ornith 1.5 context
 
 **Kernel training corpus** (offline, Unsloth A6000):
 - Source: nightly summaries + cold archive + RL signal traces

@@ -7353,7 +7353,7 @@ registry, ontology owner, or agent memory store.
 - [x] Record Paperclip as an outer job/session orchestration adapter only;
       it must not own candidate ranking, ACE admission, skill truth, source
       identity, or canonical writes.
-- [ ] Add adapter contract fixtures proving all three integrations preserve
+- [ ] [workstation-p11] Add adapter contract fixtures proving Prime/Hermes/Paperclip integrations preserve
       canonical IDs, workspace/source/representation revisions, timeout and
       session identity, and the no-unauthorized-write boundary. No live
       integration is claimed by this ledger entry.
@@ -7899,6 +7899,65 @@ collection-role audit) into one `ParentAtlasPromotionBoardV2` snapshot.
         automation will resolve it.
       Cross-references
       `RETRIEVAL-JUDGMENT-SET-01` in `PARENT-ATLAS-PROMOTION-GATES-01`.
+- [ ] `GOLDEN-RELEVANCE-REVIEW-01` — **opened 2026-10-15**, status
+      `REVIEW_POOL_PREPARED_GRADES_PENDING`. Reuses the 60 registered queries
+      (`GOLDEN-REVIEW-CORPUS-02`); does not generate a new gold corpus.
+      Evidence now: `scripts/atlas/validate-golden-relevance-review-pool-v1.mjs`
+      → 60 queries, 2,433 candidates, 0 graded, 0 revision-bound
+      (`REVIEW_POOL_STRUCTURALLY_VALID_GRADES_PENDING`);
+      `scripts/atlas/validate-golden-relevance-review-queue-v1.mjs` → 313
+      proposed judgments, 0 graded, 0 hard negatives
+      (`INCOMPLETE_FAIL_CLOSED`). Done only when every sub-task below passes
+      its validator. Review UI: `scripts/atlas/serve-golden-review-v1.mjs`
+      (127.0.0.1 only, writes `.tmp/atlas/golden-relevance-judgments-v1.ndjson`).
+  - [ ] `GOLDEN-RELEVANCE-ELIGIBILITY-01` — a human reviewer marks each of the
+        60 queries `VALID`, `UNCLEAR`, `INVALID_META_PROMPT` or
+        `INVALID_ARTIFACT` at `/eligibility`. Only `VALID` queries are graded.
+        Requires a reviewer ID. Blocker: no reviewer assigned; the server
+        starts with 0/60 valid.
+  - [ ] `GOLDEN-RELEVANCE-RUBRIC-01` — operator ratifies the meaning of grades
+        0–3 before any grading. The review UI defines the keys but not the
+        semantics. Proposed (not ratified): 3 = answers the query directly;
+        2 = supports the query with a material part; 1 = same topic, does not
+        answer; 0 = unrelated or looks related but is not (hard negative).
+  - [ ] `GOLDEN-RELEVANCE-GRADE-01` — blinded grades 0–3 for every candidate
+        under a `VALID` query, with confidence in [0, 1], a reviewer ID and
+        notes. Hard negatives are grade 0 only. Validator: grade range,
+        confidence range and reviewer ID on every completed row.
+  - [ ] `GOLDEN-RELEVANCE-BIND-01` — bind each judged candidate to an admitted
+        workspace revision (`sha256:322ed1a6f8ffc52576314fde9a33afd1faba015c3fc8cd60609052c5ca2dfbaf`)
+        and an ordinal-map checksum. The pool has null
+        `candidateSnapshotRevision` and `ordinalMapChecksum` today, so the
+        judgments stay revision-unqualified until a candidate snapshot is
+        frozen. Do not infer the binding from paths or packet keys.
+  - [ ] `GOLDEN-RELEVANCE-IMPORT-01` — import reviewed judgments into an
+        immutable receipt, only after the validators pass. Target table:
+        `evaluation_relevance` (FK to `evaluation_queries`). Not
+        `evaluation_judgments`: it has no FK to the registered queries and
+        cannot be joined to them. Needs an explicit write authorization.
+  - [ ] `GOLDEN-RELEVANCE-METRICS-01` — compute Recall@K, MRR and nDCG only
+        after the coverage threshold is set and met. Report judged-query
+        coverage and handle incomplete pools explicitly. The threshold is an
+        operator decision and is not set yet.
+  - [ ] `GOLDEN-RELEVANCE-PROXY-01` — LangExtract entity-overlap labels in
+        `.tmp/atlas/golden-langextract-proxy-labels-v1.csv` (2,433 rows: 622
+        likely, 108 possibly, 1,703 not relevant) are triage only. They carry
+        `label_source = LANGEXTRACT_ENTITY_OVERLAP_PROXY`, are never counted as
+        judgments, and are not importable.
+  - Relevance and source authority are separate gates. A reviewer may judge a
+    source relevant while its revision is unqualified; that judgment does not
+    admit the source to a canonical ContextManifest.
+  - Derivation procedure (the order to run, one step per gate):
+    1. Run the two validators; record the counts.
+    2. Start `scripts/atlas/serve-golden-review-v1.mjs --pilot=10 --port=8899 --reviewer=<id>`.
+    3. Ratify the rubric (`GOLDEN-RELEVANCE-RUBRIC-01`).
+    4. Mark eligibility for all 60 queries, then grade the pilot 10.
+    5. Re-run validators. Stop if any error is listed.
+    6. Bind revisions, import, then compute metrics only after the threshold.
+  - Not in this change: training labels for the packet NB and domain
+    classifiers (`parent-atlas-nlp-sidecar-feature-compiler`, reviewed-label
+    trust floor 200 rows, 30 per class). These are a different dataset from
+    the 60 golden queries.
 - [x] `RRF-CALLER-CLASSIFICATION-02` — **classified 2026-09-12**, verdict
       `RRF_CALLER_CLASSIFICATION_BLOCKED`. Built
       `scripts/atlas/classify-rrf-callers-v1.mjs` (read-only; does not modify
@@ -15440,18 +15499,20 @@ pipeline complete.
   SearchRuntime normalization/fusion. Preserve one semantic-lane vote, source references,
   deterministic fallbacks, and ACE assembly when TurboVec is unavailable. Record the rerank trace
   as observability; do not mutate Qdrant or canonical graph state.
-- [ ] `PRIMEAGENT-ORNITH-HANDOFF-01`: Reuse the existing PrimeAgent/DAG, MCP registry, and
+- [ ] [workstation-p11] `PRIMEAGENT-ORNITH-HANDOFF-01`: Reuse the existing PrimeAgent/DAG, MCP registry, and
   ContextManifest owners. Resolve the synthesis model from the live `:8090/v1/models` response;
   provide Ornith only admitted, bounded context. Do not introduce a parallel Gemma4 model owner or
-  expose mutation tools through a generated prompt plan.
+  expose mutation tools through a generated prompt plan. Reuse existing read-only identity evidence;
+  do not create or persist revision fields before workstation P20 closes.
 - [ ] `ACE-SUMMARY-TRAINING-ISOLATION-01`: Nightly/weekly summaries must retain their source and
   validation references and remain outside hot exact caches unless the existing cache policy
   qualifies them. Training-candidate exports are offline proposals; never turn routing feedback,
   attention/hidden state, or cache telemetry into canonical evidence or model updates.
-- [ ] `ACE-PIPELINE-VERTICAL-READBACK-01`: Prove one current, source-bound candidate through
+- [ ] [workstation-p11] `ACE-PIPELINE-VERTICAL-READBACK-01`: Prove one current, source-bound candidate through
   retrieval, canonical identity resolution, admitted ACE packet, independent ContextManifest
   readback, and an Ornith request receipt. Missing workspace/source binding, ontology tuple, or
   manifest readback remains `BLOCKED`; do not backfill or warm Valkey to manufacture the proof.
+  This is a read-only consumer proof and does not authorize revision-field persistence.
 
 **Current disposition:** architecture aligned to Ornith 1.5 on llama-server `:8090` for synthesis
 and EmbeddingGemma via Ollama for embeddings; source compatibility routes still require caller
@@ -15615,9 +15676,35 @@ Status: evidence record only. No existing checkbox in this file was changed. No 
 
 ### Gates the RLM change still needs
 
-- RLM-E2E-01 (proposed, unchecked): run one bounded RLM loop end to end against live TRACE, with the rerank and topology services restored (LOG-09).
+- [ ] [workstation-p11] RLM-E2E-01: Run one bounded RLM loop end to end against live TRACE, with rerank/topology readiness recorded; consume existing qualified identity evidence without creating or persisting revision fields. This remains open until a live receipt is captured.
 - RLM-E2E-02 (proposed, unchecked): cache-hit proof for one revision-qualified key, with write, readback and expiry, under the existing BITFROST-LIVE-WARM-01 gate.
 - RLM-E2E-03 (proposed, unchecked): summary validator (LOG-13) applied to packets the RLM loop reads.
+
+### Workstation P11 caller recheck — 2026-10-15
+
+- Static source search found `PrimeAgentRuntimeV1`, `RlmWorkingStateV1`, and `runReadOnlyAgentReplayV1` in the execution-spine owner and its fixture runner, but no production route importing or invoking the replay runner. This is a bounded source search, not proof against dynamic invocation.
+- The execution-spine, control-plane, and DSPy output-guard TypeScript specs passed **30/30**. These establish contract behavior only; they do not establish a live ContextManifest caller, RLM loop, Prime adapter, MCP dispatch, or Ornith request.
+- `PRIMEAGENT-ORNITH-HANDOFF-01`, `ACE-PIPELINE-VERTICAL-READBACK-01`, and `RLM-E2E-01` are explicit unchecked workstation P11 gates. No service, database, cache, or model was invoked; no revision fields were persisted.
+- **Focused contract recheck (2026-10-15):** `npx vitest run src/lib/server/atlas/agentic/agent-execution-spine-v1.spec.ts src/lib/server/atlas/evals/dspy-repair-output-v1.test.ts` passed **18/18** (14 execution-spine, 4 DSPy output-guard). This confirms local contract tests only; it does not close the missing production caller, live ContextManifest/Prime handoff, RLM loop, isolated DSPy worker, or GEPA runtime/evaluation gates.
+- **Production route-owner census (2026-10-15; source only):** existing entry points include `/api/ai/agent` (A2A/native, delegates to `runGemma4Agent`), `/api/v1/agentic/tool-loop` (direct local tool loop; `codebase_search` returns source text from `rerankChunks`), and `/api/atlas/mastra-agent` (requires an already-admitted manifest and PostgreSQL readback). None imports the Prime execution spine. Do not wire Prime to the raw tool-loop or create a fourth agent route; settle the canonical route owner and a server-owned admitted-manifest handoff first.
+- [ ] [workstation-p11] `PRIME-ROUTE-OWNER-01`: select one existing production request owner for the Prime adapter and prove its caller supplies the server-owned admitted `ContextManifestV2`, exact evidence refs, bounded capability registry, and readback receipt. Raw search/tool results are not admissible context. Keep the Prime/Ornith handoff disabled until the source-lineage gate and this route-owner proof pass.
+
+### Parent Atlas agent optimization handoff — owner alignment (2026-10-15)
+
+Status: **PARTIAL / NOT WIRED**. This section sequences existing owners; it does not create another agent, prompt store, optimizer, or workflow scheduler.
+
+| Stage | Existing owner | Required handoff / proof | Authority boundary |
+|---|---|---|---|
+| Query and candidate discovery | Existing agent route + SearchRuntime | Prove one selected route calls the canonical retrieval/context path; raw tool-loop search output is not prompt context. | SearchRuntime owns fusion; no extra lane vote. |
+| Context admission | ACE/ContextManifest owners | Server-owned admission, exact evidence refs, checksum binding, and independent PostgreSQL readback for the same request. | Client-supplied manifests are input claims, not admission. |
+| Prime/RLM execution | `agent-execution-spine-v1.ts` | Adapt the admitted manifest checksum into the existing Prime runtime; bounded capability/tool registry; live step receipts and bounded RLM state. | Fixture replay is not a production caller; RLM state stays ephemeral. |
+| DSPy program selection | `parent-atlas-compute-rank-cache-eval-dspy-gepa` | Isolated worker consumes only serialized, lineage-qualified evidence handles and may choose among already-legal program/actions. Require frozen splits and deterministic replay. | No store credentials, authorization, production prompt mutation, or writes. |
+| GEPA optimization | Same evaluation owner | Run only after DSPy runtime/input and held-out gates; emit a checksummed shadow candidate and compare on held-out evidence. | No same-run held-out feedback and no automatic promotion. |
+| Ornith synthesis | Existing configured llama-server caller | Consume only the admitted ContextManifest/PromptPlan; verify citations against admitted evidence and record model resolution. | Synthesis cannot establish identity or evidence; do not persist hidden reasoning/KV. |
+
+Ordered closure gates: `PRIME-ROUTE-OWNER-01` → ACE manifest admission/readback → `PRIMEAGENT-ORNITH-HANDOFF-01` → `RLM-E2E-01`; separately, deterministic DAG/capability legality → `DSPY-SIDECAR-01` + `GEPA-768-INPUT-01` → `GEPA-VERSION-01` → `GEPA-HELDOUT-01` → `GEPA-SHADOW-01` → human-reviewed promotion receipt. The two branches may share the same frozen, admitted evidence handles but must not share mutable state or train on the held-out partition.
+
+Do not connect these branches to the raw `/api/v1/agentic/tool-loop` until it consumes the canonical admitted-context owner. The manifest-bound Mastra route is a relevant existing seam, not an automatically selected Prime owner. Keep the A2A/native route, Mastra route, and direct tool-loop behavior unchanged until route ownership and exact caller dataflow are proven. Existing revision-field writes/backfill remain deferred until after P20; read-only checks must still reject mismatched source evidence.
 
 ### Graph-analysis → ACE execution plan (2026-10-13; proposal, not wired)
 
@@ -15823,9 +15910,35 @@ production wiring and end-to-end admission gates remain open.
 - SvelteKit Node resolves `@langchain/langgraph` 1.4.7, `@langchain/core` 1.2.4, and `@langchain/community` 1.1.29. The `packages/atlas-orchestrator` import smoke passed on Node 22.23.3, but instantiated zero agents, opened zero DB connections, and wrote no canonical data. Source search found no production `createDeepAgent` caller. Status: **RUNTIME_IMPORT_PROVEN / APPLICATION_WIRING_NOT_PROVEN**.
 - `.okf/schemas/` currently contains only the Tree-sitter language-catalog schema; a universal `.okf` document/frontmatter schema is not established. `openwiki/quickstart.md` is a generated docs entry point; no OpenWiki retrieval tool was exposed in this session. Docker LangGraph requirements are declarations, not live-service evidence.
 - No dependency install, service startup, datastore access, or canonical write was performed. This update records environment evidence only; it does not close ACE, OAK, OKF-01/02, or LangGraph execution gates.
+
+### TRACE six source-only tool hardening — 2026-10-15
+
+- [x] Confirm the six missing live names already have source registrations in `codebase_tools.ts`, `rg_atlas_tools.ts`, `research_tools.ts`, and `bifrost_tools.ts`; all are registered only when `MCP_OPTIONAL_REGISTRIES=true`. Do not enable that broad gate or restart TRACE as part of this change.
+- [x] Mark all six handlers `READ_ONLY` for dispatcher policy. Force `kb.rg_atlas_search` to `persist: false` and omit persistence from its MCP input schema; constrain repository search paths, list sizes, research query sizes, and Bifrost JSON payload/response sizes. Add finite timeouts to Bifrost dispatch.
+- [x] Correct advertised semantics: RG-Atlas results are advisory candidates, research synthesis does not retrieve or verify evidence, and deep analysis performs bounded search only. `research.deep_analyze` now uses its exhaustive setting for two additional facets.
+- [x] Existing read-tool bounds suite passed **43/43**. This is adjacent coverage only; it does not prove the new registration spec or tool execution.
+- [ ] Run `optional-search-tool-contract.spec.ts` successfully. The focused Vitest process stalled before reporting this spec; it was interrupted. Do not mark handler behavior proven from source presence or schema compilation.
+- [ ] After independent approval, decide whether a narrower per-tool exposure policy should replace the existing family-wide opt-in. Until then the six remain absent from live TRACE by policy; no service restart or live tool call was performed.
+
+Status: **SOURCE_HARDENED / TEST_UNVERIFIED / LIVE_NOT_ENABLED**. Report: `docs/reports/trace-optional-six-tool-source-hardening-20261015.md`.
 ## Canonical-state correction — 2026-10-14
 
 - Canonical dense representation is `semantic_768` (EmbeddingGemma, 768-d). The 384 representation is retired from active retrieval; 384 references above are historical and are not current canonical claims.
 - Latent/MRL facts (code is authoritative; root `CLAUDE.md` "Autoencoder latents"): `z128` is a learned bottleneck, not a slice of `z256`; `z64 = normalize(z128[:64])`; MRL prefix `v_k = normalize(v_768[:k])`. Existing `latent_128` rows described as a slice of `latent_256` must be re-verified before citation.
 - Parity canonical contract is `codebase_chunks_768_v2`; `codebase_chunks_768` is legacy.
 - This note changes no database, Qdrant, or runtime state.
+
+### Workstation P12 sealed-source authority recheck — 2026-10-15
+
+- Ran `node_modules/.bin/tsx.cmd scripts/atlas/audit-current-source-authority-v1.mts --stdout-only`; exit code **0**. Script SHA-256: `0d28c6a8214ebb1b57d1e93eb0775fa49f609079603a8a338a3aca57a9a6b778`.
+- The existing admitted workspace revision `sha256:e24bb97187ea6394eeba457dd849915f570045b7a1867780fdc7aa9ea62b9acc` has **25,542/25,542** selected sources qualified: zero missing revisions, revision mismatches, namespace ambiguities, or non-admitted members. Independent selection checksum matched (`sha256:da4d765d0cd0a399605ebde21a0fb58f7d6a251aba9a572ddbc265c56b89985b`); membership checksum matched admission (`sha256:dccaf9f6e84b1d3b1c49f2b6f110b9b9946b895703ac0987cbb70a3608223efb`).
+- This proves authority/readback for that **sealed admitted cohort only**, not the current dirty worktree or current source→packet→chunk admission. Live drift was `DRIFT_PRESENT`: **719 changed**, **1,086 excluded nested**, **8 unavailable**, and **1,813 total drift findings**. Registry coverage was **24,456 exact**, **1,086 absent**, **0 mismatch**. Preserve these as separate populations; do not interpret the exclusions or absent registry rows as proven stale sources.
+- `--stdout-only` reported `reportWritten=false`; implementation uses a `REPEATABLE READ READ ONLY` transaction and rolls it back. No Graphify execution, database mutation, vector/cache write, ACE promotion, or report write occurred. Status: **SEALED_COHORT_AUTHORITY_PROVEN / CURRENT_WORKTREE_LINEAGE_PARTIAL**. Keep current source binding, packet/chunk lineage, ContextManifest admission, and downstream P12 exit gates open; this result does not authorize reusing the old revision for edits or training.
+
+### GRAPHIFY-DAILY-PARSE-FAILURES-01 — symbol-gate parse failures, partial fix (2026-10-16)
+
+- [x] Added `GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2` (+ `isGraphifySymbolExcludedArtifactV2`) in `scripts/atlas/lib/graphify-symbol-candidate-selection-v1.mjs` for 7 generated tool-output JSON files that are not strict JSON; V1 left unchanged. Switched the extractor, selection filter, `audit-json-source-shape-policy-v1.mjs` and `audit-canonical-projection-fabric.mjs` to V2. Result: parse failures in the admitted set 10 -> 4, excluded generated artifacts 834 -> 840, `SYMBOLS_RESOLVED` still `PARTIAL_PROVEN` (704 unprocessed, 1,155 missing an exact revision row). Overall verdict still `NOT_SAFE_TO_PROJECT` (7/11). JSON shape audit PASS (270/270 frozen rows excluded). Selection tests 6/6.
+- [x] Fixed `packages/atlas-duckdb/src/redis-centroid-config.json` (two arithmetic values `1 + 1 + 2 + 5 + 5` -> `14`, `1 + 5` -> `6`; now valid JSON). Bytes changed: `sha256:035c837a...` -> `sha256:6b843440...`. This file is in the admitted snapshot (`sha256:6288726b...`), so its working-tree bytes no longer match the admitted revision; expect `SOURCE_REVISION_MISMATCH` for it until the next workspace admission. `source_revision` writes stay deferred until after Phase 20.
+- [ ] Remaining parse failures (2): `sveltekit-frontend/tsconfig.frontend.json` and `sveltekit-frontend/.vscode/tasks.json` (JSONC; needs a JSON-shape policy v2 decision).
+- [x] `sveltekit-frontend/PACKAGE_SCRIPTS_SNIPPET.json` (`SOURCE_TEXT_ENVELOPE_OFFSET_SPLITS_SURROGATE`) looks like a stale `graphify_files` row, not a live bug: reproduced the real pipeline (`decodeSourceTextEnvelope` -> `extractJsonSymbols` -> `decodedOffsetToRawByte`) on 2026-10-16 with 0 failures across 52 symbols and 6 emoji keys. The row was last updated 2026-09-30 16:01Z and the envelope/extractor code changed in commit `68dedecf14` (2026-09-30); commit-vs-failure ordering not proven. Clears on the next authorized `--apply` extractor run; no code change.
+- [ ] Still blocking admission, unchanged: `ORDINAL_MAP_SEALED` (1,587 packets without chunk lineage; 223 AST + 1,337 text candidate chunks dry-run under `.tmp/atlas/candidate-chunk-dry-run-2026-10-15/`, text chunker owner UNDECIDED, 27 stale), `PROJECTIONS_CHECKSUM_ALIGNED`, `BITFROST_KEYS_DERIVABLE`, `ACE_EVIDENCE_GROUNDED`. Chunk and lineage writes need explicit authorization.

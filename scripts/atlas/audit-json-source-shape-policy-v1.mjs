@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { isGraphifySymbolExcludedArtifactV1 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { isGraphifySymbolExcludedArtifactV2 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const manifestPath = path.join(ROOT, 'docs/reports/graphify-symbol-baseline-freeze-20260930-v6.json');
@@ -17,7 +17,7 @@ for (const row of rows) {
   const sourceRef = String(row.sourceRef ?? '');
   if (!sourceRef || seen.has(sourceRef) || row.fileKind !== 'json') invalid.push({ sourceRef, reason: 'DUPLICATE_OR_INVALID_MANIFEST_MEMBER' });
   seen.add(sourceRef);
-  if (!isGraphifySymbolExcludedArtifactV1(sourceRef)) invalid.push({ sourceRef, reason: 'JSON_ARTIFACT_NOT_EXCLUDED' });
+  if (!isGraphifySymbolExcludedArtifactV2(sourceRef)) invalid.push({ sourceRef, reason: 'JSON_ARTIFACT_NOT_EXCLUDED' });
 }
 
 const result = {

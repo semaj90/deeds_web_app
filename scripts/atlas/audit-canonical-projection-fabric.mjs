@@ -26,7 +26,7 @@ import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 import { readSubmodulePaths, classifyRepositoryId } from './lib/gitmodules-registry.mjs';
-import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
+import { GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2 } from './lib/graphify-symbol-candidate-selection-v1.mjs';
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 loadAtlasEnv(REPO_ROOT);
@@ -286,7 +286,7 @@ async function main() {
            ON gf.source_ref = s.canonical_source_ref
           AND gf.code_source_revision = s.source_revision
          LEFT JOIN graphify_symbols gs ON gs.file_id = gf.file_id;`,
-        [admittedWorkspaceRevision, GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V1],
+        [admittedWorkspaceRevision, GRAPHIFY_SYMBOL_EXCLUDED_ARTIFACT_REGEX_V2],
       );
       reconciliationGate = {
         status: population.bound_source_ref_count === 0

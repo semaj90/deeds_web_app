@@ -704,6 +704,13 @@ try {
   // snapshot-bound execution receipt. Never fall back from its read-only
   // chain into the legacy startup path, which may contain apply-capable work.
   if (!allowFallback || process.env.ATLAS_GRAPHIFY_TERMINAL_AUTHORIZATION === TERMINAL_RUN_AUTHORIZATION) {
+    // The admission gate is a deliberate stop, not a crash: no lifecycle row was opened and no
+    // chain step ran. Say so explicitly. 'complete' stays as the lifecycle marker for tasks.json.
+    const blockedByAdmission = String(err.message).includes(PROMOTION_ADMISSION_SCRIPT);
+    console.error(blockedByAdmission
+      ? '[graphify:daily] Projection admission is NOT_SAFE_TO_PROJECT; the run stopped before the lifecycle row and before any chain step. Exit 1 is expected until admission is proven.'
+      : `[graphify:daily] Failed before completion: ${String(err.message).split('\n')[0]}`);
+    console.log(blockedByAdmission ? 'graphify:daily status: BLOCKED_BY_PROJECTION_ADMISSION' : 'graphify:daily status: FAILED');
     console.error('[graphify:daily] Fallback disabled; exiting with failure.');
     console.log('graphify:daily complete');
     process.exit(1);
