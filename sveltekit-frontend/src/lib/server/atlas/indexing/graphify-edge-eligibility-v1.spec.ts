@@ -95,6 +95,7 @@ function referenceFact(edge: TreesitterChunkerXrefEdgeV1, targetText = edge.dst)
 
 function fileInput(input: {
   sourceRef?: string;
+  sourceRevision?: string | null;
   authority?: 'PROVEN' | 'UNPROVEN';
   chunks?: TreesitterChunkerChunkV1[];
   edges?: TreesitterChunkerXrefEdgeV1[];
@@ -106,6 +107,7 @@ function fileInput(input: {
   const facts = input.facts ?? (input.edges ?? []).map((edge) => referenceFact(edge));
   return {
     sourceRef,
+    sourceRevision: input.sourceRevision === undefined ? 'source-r1' : input.sourceRevision,
     sourceRevisionAuthority: input.authority ?? 'PROVEN',
     fabric: {
       chunks: input.chunks ?? [],
@@ -154,6 +156,47 @@ describe('graphify raw edge eligibility gate v1', () => {
     expect(report.edges[0].rejectionReasons).toContain('SOURCE_AUTHORITY_UNPROVEN');
     expect(report.perFileMatrix[0].qualified).toBe(1);
     expect(report.perFileMatrix[0].eligible).toBe(0);
+  });
+
+  it('rejects structural facts bound to a different source revision', () => {
+    const edge = { src: 'src-fn', dst: 'dst-fn', type: 'CALLS', weight: 1 };
+    const file = fileInput({
+      chunks: [
+        chunk({ upstream_node_id: 'src-fn', source_ref: 'src/caller.ts', symbol_name: 'caller' }),
+        chunk({ upstream_node_id: 'dst-fn', source_ref: 'src/caller.ts', symbol_name: 'target' }),
+      ],
+      edges: [edge],
+      nominations: [
+        nomination({ nodeId: 'src-fn', sourceRef: 'src/caller.ts', name: 'caller' }),
+        nomination({ nodeId: 'dst-fn', sourceRef: 'src/caller.ts', name: 'target' }),
+      ],
+      facts: [{ ...referenceFact(edge), source_revision: 'source-r0' }],
+    });
+    const report = classifyRawStructuralEdgesV1([file]);
+
+    expect(report.edges[0]).toMatchObject({ status: 'SOURCE_REVISION_MISMATCH', resolution: 'REJECTED', admissionStatus: 'NOT_ADMISSIBLE' });
+    expect(report.edges[0].rejectionReasons).toContain('SOURCE_REVISION_MISMATCH');
+    expect(report.perFileMatrix[0].eligible).toBe(0);
+  });
+
+  it('rejects an otherwise proven edge when the current source revision is absent', () => {
+    const edge = { src: 'src-fn', dst: 'dst-fn', type: 'CALLS', weight: 1 };
+    const file = fileInput({
+      sourceRevision: null,
+      chunks: [
+        chunk({ upstream_node_id: 'src-fn', source_ref: 'src/caller.ts', symbol_name: 'caller' }),
+        chunk({ upstream_node_id: 'dst-fn', source_ref: 'src/caller.ts', symbol_name: 'target' }),
+      ],
+      edges: [edge],
+      nominations: [
+        nomination({ nodeId: 'src-fn', sourceRef: 'src/caller.ts', name: 'caller' }),
+        nomination({ nodeId: 'dst-fn', sourceRef: 'src/caller.ts', name: 'target' }),
+      ],
+    });
+    const report = classifyRawStructuralEdgesV1([file]);
+
+    expect(report.edges[0]).toMatchObject({ status: 'SOURCE_REVISION_MISSING', resolution: 'REJECTED', admissionStatus: 'NOT_ADMISSIBLE' });
+    expect(report.edges[0].rejectionReasons).toContain('SOURCE_REVISION_MISSING');
   });
 
   it('classifies exact built-ins separately and never admits them as graph endpoints', () => {

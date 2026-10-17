@@ -2431,6 +2431,30 @@ unproven.
       gate is `BLOCKED` pending explicit authorization to produce a new
       exact-snapshot cohort. Do not widen historical search or produce it by
       refreshing Graphify without that authorization.
+      **Clarification (2026-10-17):** `graphify-edge-replay-identity-v1.ts`
+      now provides a pure deterministic semantic edge key, evidence-set
+      checksum, and fail-closed replay plan. This does not change the blocked
+      status: the key is not persisted, the current `graphify_edges` schema has
+      no unique semantic-key arbiter or workspace/graph/target-revision binding,
+      and no edge writer/readback owner exists. The source-bound
+      `GraphifyEdgeProjectionCandidateV1` → packet-incidence materializer is the
+      existing candidate path; do not route it through the empty legacy
+      `atlas_structural_reference_resolutions` table. Any additive DDL/writer
+      requires owner review and a separately authorized exact-snapshot cohort.
+      The pure replay key now includes `workspaceId` in addition to workspace
+      and graph revisions, preventing otherwise-identical symbol paths in
+      separate repositories from sharing a key; focused fixture coverage was
+      added. This remains contract code only, not live persistence evidence.
+      **Fresh live census (2026-10-17):** in a verified PostgreSQL
+      `BEGIN READ ONLY` transaction, `graphify_edges=0`,
+      `atlas_ontology_tuples=0`, `atlas_ontology_linked_tuples=0`,
+      `atlas_graph_relation_events_v2=0`, and
+      `atlas_graph_relation_participants_v2=0`. The 62,802 existing
+      `atlas_hyperedges` remain the separate binary taxonomy cohort.
+      `atlas_graph_snapshots_v2` has two rows and both are `SUPERSEDED`;
+      `atlas_graph_edges_v2` has 224,764 rows, but none belong to a currently
+      validated snapshot. This confirms there is no live source graph cohort
+      for a persistence writer or retrieval fanout to consume. No writes ran.
 - [ ] HYPERRAG-LINEAGE-03 — resolve both structural edge endpoints to exact
       canonical packet identity using revision-qualified identity evidence.
       No path/fuzzy/semantic/taxonomy identity fallback is allowed. A live

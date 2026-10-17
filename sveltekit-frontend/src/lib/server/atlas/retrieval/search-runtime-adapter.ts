@@ -188,22 +188,50 @@ export function projectAtlasSearchResponseToQas(input: {
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  response: Pick<AtlasSearchResponse, 'packets'>;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
   projections: CandidateProjectionInput[];
   resolveFeatures: SearchRuntimeQasFeatureResolver;
 }): SearchRuntimeQasProjectionResult {
-  const candidates = input.response.packets.map((packet) => ({
-    packetKey: packet.packet_key ?? packet.chunk_id,
-    sourceRef: packet.source_ref ?? packet.relative_path ?? '',
-    stableSymbolId: packet.stable_symbol_id ?? null,
-    symbolVersionId: packet.symbol_version_id ?? null,
-    workspaceRevision: packet.workspace_revision ?? null,
-    sourceRevision: packet.source_revision ?? null,
-    representationRevision: packet.representation_revision ?? null,
-    score: packet.retrieval_score,
-    fusionScore: packet.fusion_score,
-    rankBefore: packet.fusion_rank,
-  }));
+  const graphEvidenceByPacket = new Map<string, string[]>();
+  const packetsByKey = new Map<string, Array<Record<string, unknown>>>();
+  for (const packet of input.response.packets) {
+    const packetKey = String(packet.packet_key ?? packet.chunk_id ?? '');
+    const rows = packetsByKey.get(packetKey) ?? [];
+    rows.push(packet as Record<string, unknown>);
+    packetsByKey.set(packetKey, rows);
+  }
+  for (const evidence of input.response.provenance?.graphCandidateEvidence ?? []) {
+    const packets = packetsByKey.get(evidence.packetKey) ?? [];
+    if (packets.length !== 1) continue;
+    const packet = packets[0]!;
+    if (!packet
+      || packet.source_ref !== evidence.sourceRef
+      || packet.source_revision !== evidence.sourceRevision
+      || packet.workspace_revision !== evidence.workspaceRevision
+      || packet.graph_revision !== evidence.graphRevision
+      || !/^sha256:[a-f0-9]{64}$/i.test(evidence.sourceRevision)
+      || !/^sha256:[a-f0-9]{64}$/i.test(evidence.workspaceRevision)
+      || !evidence.graphRevision.trim()) continue;
+    const refs = evidence.evidenceRefs.filter((ref) => typeof ref === 'string' && ref.trim().length > 0);
+    if (refs.length === 0) continue;
+    graphEvidenceByPacket.set(evidence.packetKey, [...new Set([...(graphEvidenceByPacket.get(evidence.packetKey) ?? []), ...refs])].sort());
+  }
+  const candidates = input.response.packets.map((packet) => {
+    const packetKey = packet.packet_key ?? packet.chunk_id;
+    return {
+      packetKey,
+      sourceRef: packet.source_ref ?? packet.relative_path ?? '',
+      graphEvidenceRefs: graphEvidenceByPacket.get(packetKey ?? '') ?? [],
+      stableSymbolId: packet.stable_symbol_id ?? null,
+      symbolVersionId: packet.symbol_version_id ?? null,
+      workspaceRevision: packet.workspace_revision ?? null,
+      sourceRevision: packet.source_revision ?? null,
+      representationRevision: packet.representation_revision ?? null,
+      score: packet.retrieval_score,
+      fusionScore: packet.fusion_score,
+      rankBefore: packet.fusion_rank,
+    };
+  });
 
   const result: SearchRuntimeQasAdapterResult = buildSearchRuntimeQasRows({
     requestId: input.requestId,
@@ -253,7 +281,7 @@ export function projectAtlasSearchResponseToQasFromSources(input: {
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  response: Pick<AtlasSearchResponse, 'packets'>;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
   sources: SearchRuntimeQasFeatureSources;
 }): SearchRuntimeQasProjectionResult {
   const candidates = input.response.packets.map((packet) => ({
@@ -286,7 +314,7 @@ export async function projectAtlasSearchResponseToQasFromAsyncSources(input: {
   policyRevision: string;
   workspaceRevision: string;
   representationRevision: string;
-  response: Pick<AtlasSearchResponse, 'packets'>;
+  response: Pick<AtlasSearchResponse, 'packets'> & Partial<Pick<AtlasSearchResponse, 'provenance'>>;
   sources: SearchRuntimeQasAsyncFeatureSources;
 }): Promise<SearchRuntimeQasProjectionResult> {
   const candidates = input.response.packets.map((packet) => ({

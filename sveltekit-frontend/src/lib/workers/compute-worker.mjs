@@ -776,6 +776,46 @@ function runJsonToCSR({ json }) {
 	};
 }
 
+// ═══════════════════════════════════════════════════════════════
+// SCHEMA ENCODER (FEATURE SCORING / EMBEDDING METRIC)
+// ═══════════════════════════════════════════════════════════════
+
+function runSchemaEncode({ sharedFeatures, sharedScores, features, docs, n }) {
+	let count = n;
+	let featArr;
+	if (sharedFeatures) {
+		featArr = new Float32Array(sharedFeatures);
+		count = count ?? Math.floor(featArr.length / 5);
+	} else if (features) {
+		featArr = new Float32Array(features);
+		count = count ?? Math.floor(featArr.length / 5);
+	} else if (docs && Array.isArray(docs)) {
+		count = docs.length;
+		featArr = new Float32Array(count * 5);
+		for (let i = 0; i < count; i++) {
+			const off = i * 5;
+			featArr[off + 0] = docs[i].trustTier ?? 0;
+			featArr[off + 1] = docs[i].somCluster ?? 0;
+			featArr[off + 2] = docs[i].karpathyBlend ?? 0;
+			featArr[off + 3] = docs[i].pagerank ?? 0;
+			featArr[off + 4] = docs[i].riskScore ?? 0;
+		}
+	} else {
+		throw new Error('SCHEMA_ENCODE_INVALID_INPUT: missing features or docs');
+	}
+
+	const scores = sharedScores ? new Float32Array(sharedScores) : new Float32Array(count);
+	for (let i = 0; i < count; i++) {
+		const off = i * 5;
+		const trustTier = featArr[off + 0];
+		const karpathyBlend = featArr[off + 2];
+		const riskScore = featArr[off + 4];
+		scores[i] = (trustTier * 0.3) + (karpathyBlend * 0.5) + ((1.0 - riskScore) * 0.2);
+	}
+
+	return sharedScores ? { n: count, shared: true } : { scores: Array.from(scores), n: count };
+}
+
 const HANDLERS = {
 	kmeans:                   runKMeans,
 	som:                      runSOM,
@@ -796,6 +836,7 @@ const HANDLERS = {
 	'manifold.slerp':         runManifoldSlerp,
 	'manifold.interpolate4d': runManifoldInterpolate4D,
 	'graph.json_to_csr':      runJsonToCSR,
+	'schema.encode':          runSchemaEncode,
 };
 
 parentPort?.on('message', (msg) => {

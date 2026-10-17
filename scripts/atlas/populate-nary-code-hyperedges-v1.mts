@@ -2,13 +2,14 @@
 // receipts and prints them. Never connects to Postgres; never writes. --apply is refused (fail closed).
 // Usage: npx tsx scripts/atlas/populate-nary-code-hyperedges-v1.mts <repo-relative .svelte file> [...]
 import crypto from 'node:crypto';
+import { svelteReceiptFileNameV1, receiptMismatchReasonV1 } from './lib/svelte-receipt-name-v1.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveSvelteSourceFileV1 } from './lib/resolve-svelte-source-file-v1.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const RE_SHA256 = /^sha256:[0-9a-f]{64}$/;
-const RE_REL = /^[A-Za-z0-9_.\-/()[\]]+\.svelte$/;
 
 export type EntityRole = 'CONTAINER_FILE' | 'SYNTAX_NODE' | 'SEMANTIC_CONCEPT' | 'HANDLER_TARGET' | 'EMBEDDING';
 const ROLE_ORDER: Record<EntityRole, number> = {
@@ -83,21 +84,25 @@ function main(): void {
   const edges: NaryEdge[] = [];
   const refusals: Array<{ file: string; reason: string }> = [];
   for (const rel of files) {
-    if (!RE_REL.test(rel) || rel.includes('..') || path.isAbsolute(rel)) { refusals.push({ file: rel, reason: 'PATH_REJECTED' }); continue; }
     try {
-      const bytes = fs.readFileSync(path.join(repoRoot, rel));
+      const target = resolveSvelteSourceFileV1(repoRoot, rel);
+      const bytes = fs.readFileSync(target.absolutePath);
       const revision = `sha256:${crypto.createHash('sha256').update(bytes).digest('hex')}`;
-      const receiptPath = path.join(repoRoot, '.tmp', 'atlas', `svelte-dom-split-v1-${path.basename(rel)}.json`);
+      // Must match the splitter's receipt naming (it sanitizes the basename; '+page.svelte' -> '_page.svelte').
+      // Same-named files in different folders share a receipt name; the disk_sha256 check below
+      // refuses a receipt that belongs to another file (SPLITTER_RECEIPT_STALE) instead of misusing it.
+      const receiptPath = path.join(repoRoot, '.tmp', 'atlas', svelteReceiptFileNameV1(rel));
       const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
-      if (receipt.source.disk_sha256 !== revision) { refusals.push({ file: rel, reason: 'SPLITTER_RECEIPT_STALE' }); continue; }
+      const mismatch = receiptMismatchReasonV1(receipt, rel, revision);
+      if (mismatch) { refusals.push({ file: rel, reason: mismatch }); continue; }
       // SYNTAX_NODE identity is provisional: the splitter emits byte spans, not tn_v1 ids yet.
       const syntaxNode = (n: { kind: string; byteStart: number; byteEnd: number }) =>
-        `svelte-span:${rel}#${n.kind}@${n.byteStart}-${n.byteEnd}`;
+        `svelte-span:${target.relativePath}#${n.kind}@${n.byteStart}-${n.byteEnd}`;
       for (const r of receipt.runes as Array<{ rune: string; byteStart: number; byteEnd: number }>) {
         edges.push(buildNaryEdge({
-          sourceRef: rel, sourceRevision: revision, relationKind: 'RUNE_DEPENDENCY',
+          sourceRef: target.relativePath, sourceRevision: revision, relationKind: 'RUNE_DEPENDENCY',
           members: [
-            { role: 'CONTAINER_FILE', memberId: rel },
+            { role: 'CONTAINER_FILE', memberId: target.relativePath },
             { role: 'SYNTAX_NODE', memberId: syntaxNode({ kind: 'rune', byteStart: r.byteStart, byteEnd: r.byteEnd }) },
             { role: 'SEMANTIC_CONCEPT', memberId: `rune:${r.rune.split('.')[0]}` },
           ],
@@ -105,9 +110,9 @@ function main(): void {
       }
       for (const h of receipt.eventHandlers as Array<{ event: string; byteStart: number; byteEnd: number }>) {
         edges.push(buildNaryEdge({
-          sourceRef: rel, sourceRevision: revision, relationKind: 'EVENT_DISPATCH',
+          sourceRef: target.relativePath, sourceRevision: revision, relationKind: 'EVENT_DISPATCH',
           members: [
-            { role: 'CONTAINER_FILE', memberId: rel },
+            { role: 'CONTAINER_FILE', memberId: target.relativePath },
             { role: 'SYNTAX_NODE', memberId: syntaxNode({ kind: 'handler', byteStart: h.byteStart, byteEnd: h.byteEnd }) },
             { role: 'HANDLER_TARGET', memberId: `event:${h.event}` },
           ],
@@ -124,12 +129,22 @@ function main(): void {
     writesPerformed: false,
     canonicalAuthority: false,
     filesRequested: files.length,
+    filesProcessed: files.length - refusals.length,
+    filesFailed: refusals.filter((r) => !/PATH|SYMLINK|WORKSPACE|OUTSIDE/.test(r.reason)).length,
+    filesRejected: refusals.filter((r) => /PATH|SYMLINK|WORKSPACE|OUTSIDE/.test(r.reason)).length,
+    filesSkipped: 0,
     edgeCount: edges.length,
     uniqueHyperedgeIds: ids.size,
     minArity: edges.length ? Math.min(...edges.map((e) => e.arity)) : null,
     refusals,
     sampleEdge: edges[0] ?? null,
   };
+  // --emit=<repo-relative .json under .tmp/atlas/> writes every edge for a downstream dry-run consumer (still no DB access).
+  const emit = argv.find((a) => a.startsWith('--emit='))?.slice('--emit='.length);
+  if (emit) {
+    if (!/^\.tmp\/atlas\/[A-Za-z0-9_.\-]+\.json$/.test(emit)) { console.error('NARY_EMIT_PATH_REJECTED: must be .tmp/atlas/<name>.json'); process.exit(2); }
+    fs.writeFileSync(path.join(repoRoot, emit), JSON.stringify({ schema: 'atlas.nary-code-hyperedges.v1', canonicalAuthority: false, edges }, null, 2) + '\n', 'utf8');
+  }
   console.log(JSON.stringify(report, null, 2));
   process.exit(refusals.length ? 1 : 0);
 }

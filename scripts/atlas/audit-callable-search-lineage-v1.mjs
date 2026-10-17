@@ -6,9 +6,17 @@ const revisionArg = process.argv.find((arg) => arg.startsWith('--workspace-revis
 const workspaceRevision = revisionArg?.slice('--workspace-revision='.length).trim();
 const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
 const limit = Number(limitArg?.slice('--limit='.length) ?? 500);
+const sourceRefArg = process.argv.find((arg) => arg.startsWith('--source-ref='));
+const sourceRef = sourceRefArg?.slice('--source-ref='.length).trim() || null;
+const sourceRefIsSafe = sourceRef === null || (
+  !sourceRef.startsWith('/')
+  && !/^[A-Za-z]:[\\/]/.test(sourceRef)
+  && !sourceRef.includes('\\')
+  && sourceRef.split('/').every((part) => part.length > 0 && part !== '.' && part !== '..')
+);
 
-if (!workspaceRevision || !Number.isInteger(limit) || limit < 1 || limit > 2000) {
-  console.error('Usage: node scripts/atlas/audit-callable-search-lineage-v1.mjs --workspace-revision=<revision> [--limit=1..2000]');
+if (!workspaceRevision || !Number.isInteger(limit) || limit < 1 || limit > 2000 || !sourceRefIsSafe) {
+  console.error('Usage: node scripts/atlas/audit-callable-search-lineage-v1.mjs --workspace-revision=<revision> [--source-ref=<repo-relative-path>] [--limit=1..2000]');
   process.exit(2);
 }
 
@@ -35,6 +43,7 @@ try {
       FROM public.atlas_callable_search c
       LEFT JOIN public.atlas_symbol_versions sv USING (symbol_version_id)
       WHERE c.workspace_revision = $1
+        AND ($3::text IS NULL OR c.source_ref = $3 OR sv.source_ref = $3)
       ORDER BY c.symbol_version_id
       LIMIT $2
     ), evidence AS (
@@ -192,7 +201,7 @@ try {
       ) ORDER BY sample.symbol_version_id)
       FROM (SELECT * FROM evidence ORDER BY symbol_version_id LIMIT 3) sample) AS diagnostic_samples
     FROM evidence
-  `, [workspaceRevision, limit]);
+  `, [workspaceRevision, limit, sourceRef]);
   const repoInventory = await client.query(`
     SELECT COALESCE(jsonb_agg(jsonb_build_object(
       'repoUuid', repo_id::text, 'repoName', name, 'astNodeRows', ast_node_rows
@@ -204,11 +213,17 @@ try {
       GROUP BY cr.repo_id, cr.name
     ) inventory
   `);
+  const workspaceProjectionCount = await client.query(
+    'SELECT count(*)::bigint AS rows FROM public.atlas_callable_search WHERE workspace_revision = $1',
+    [workspaceRevision],
+  );
   await client.query('ROLLBACK');
   console.log(JSON.stringify({
     schema: 'atlas.callable-search-lineage-census.v1',
     workspaceRevision,
+    sourceRef,
     limit,
+    workspaceProjectionRows: workspaceProjectionCount.rows[0].rows,
     ...result.rows[0],
     codeRepoInventory: repoInventory.rows[0].rows,
     databaseWrites: false,

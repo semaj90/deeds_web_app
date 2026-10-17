@@ -1,0 +1,31 @@
+# Local Deep Research (LDR) override: chat via the host llama-server (:8090), no bundled Ollama.
+# NOT started by anything; this file only defines how to run it. Base file is the vendored
+#   tools/agentic-research/src/local-deep-research/docker-compose.yml  (left unmodified).
+#
+# Validate without starting:
+#   docker compose -f tools/agentic-research/src/local-deep-research/docker-compose.yml -f docker/ldr-llama-server.override.yml config
+#
+# Chat: OpenAI-compatible llama-server on the host. Requires :8090 up (start it via the VS Code task).
+# Embeddings: LDR's own indexing only. Points at the HOST Ollama (embeddinggemma:latest), the current
+#   embeddings lane; Ollama is not used for chat. LDR vectors are LDR-private and must never be written
+#   into atlas_packets / codebase_chunk_index / Qdrant. Change only after the embeddings replacement
+#   (Go :8097 vs EG-GGUF vs EmbeddingGemma 2) is decided. :8097 has no /v1/embeddings (it serves /embed).
+services:
+  local-deep-research:
+    # 1.10.1 index digest = what `docker pull ...:1.10.1` fetched (matches the vendored 1.10.1 source).
+    # `latest` is a different build (amd64 manifest 3d1b654b...), so it is not used here.
+    image: localdeepresearch/local-deep-research:1.10.1@sha256:422230f302c2aa96844c2c575e23c4d40544651a6e8eba853ea84460892afc88
+    environment:
+      # `llamacpp` is classified CONTAINED (local) by LDR's egress policy; `openai_endpoint` is EXPOSING
+      # (fail closed) and could be blocked in Private/Adaptive modes.
+      - LDR_LLM_PROVIDER=llamacpp
+      - LDR_LLM_LLAMACPP_URL=http://host.docker.internal:8090/v1
+      - LDR_LLM_MODEL=ornith-1.5-9b
+      - LDR_EMBEDDINGS_OLLAMA_URL=http://host.docker.internal:11434
+      - LDR_EMBEDDINGS_REQUIRE_LOCAL=true
+    depends_on: !override
+      searxng:
+        condition: service_started
+  # Bundled Ollama is not wanted; this profile name is never activated.
+  ollama:
+    profiles: ["ldr-bundled-ollama-disabled"]

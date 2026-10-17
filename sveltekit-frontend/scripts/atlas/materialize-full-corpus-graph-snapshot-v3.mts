@@ -18,6 +18,10 @@ import {
   verifyGraphSnapshotRevisionV1,
 } from '../../src/lib/server/atlas/graph/graph-snapshot-revision-v1.js';
 import { bindGraphSnapshotNodeSourceRevisionsV1 } from '../../src/lib/server/atlas/graph/graph-snapshot-source-revision-binding-v1.js';
+import {
+  persistGraphSnapshotRelationsV1,
+  type GraphSnapshotRelationReadbackV1,
+} from '../../src/lib/server/atlas/graph/graph-snapshot-relation-persistence-v1.js';
 import { materializeWorkspaceRevisionOriginV1 } from '../../src/lib/server/atlas/indexing/workspace-revision-origin-runtime-v1.js';
 import { evaluateGraphifyWorkspaceManifestCompletenessV1 } from '../../src/lib/server/atlas/indexing/graphify-workspace-manifest-completeness-v1.js';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
@@ -184,13 +188,26 @@ function mapPacket(r: Record<string, any>) {
 async function assertGraphSchemaReady(client: PoolClient) {
   const snapshot = await columns(client, 'atlas_graph_snapshots_v2');
   const node = await columns(client, 'atlas_graph_nodes_v2');
+  const edge = await columns(client, 'atlas_graph_edges_v2');
+  const relation = await columns(client, 'atlas_graph_relation_events_v2');
+  const participant = await columns(client, 'atlas_graph_relation_participants_v2');
+  const exclusion = await columns(client, 'atlas_graph_snapshot_exclusions_v2');
   const requiredSnapshot = [
     'workspace_revision', 'source_inventory_revision', 'graph_revision',
     'identity_contract_version', 'parser_contract_version', 'revision_checksum',
   ];
   const missing = requiredSnapshot.filter((name) => !snapshot.has(name));
-  if (missing.length || !node.has('source_revision')) {
-    throw new Error(`GRAPH_SNAPSHOT_REVISION_MIGRATION_REQUIRED:${missing.join(',')}:${node.has('source_revision') ? '' : 'source_revision'}`);
+  const requiredByTable = [
+    ['atlas_graph_nodes_v2', node, ['snapshot_id', 'node_key', 'source_revision']],
+    ['atlas_graph_edges_v2', edge, ['snapshot_id', 'edge_key', 'source_node_key', 'target_node_key']],
+    ['atlas_graph_relation_events_v2', relation, ['snapshot_id', 'relation_id', 'relation_type', 'source_ref', 'evidence_span', 'confidence', 'topology_hash']],
+    ['atlas_graph_relation_participants_v2', participant, ['snapshot_id', 'relation_id', 'node_key', 'role', 'ordinal']],
+    ['atlas_graph_snapshot_exclusions_v2', exclusion, ['snapshot_id', 'candidate_key', 'exclusion_stage', 'exclusion_reason']],
+  ] as const;
+  const missingByTable = requiredByTable.flatMap(([table, actual, required]) =>
+    required.filter((name) => !actual.has(name)).map((name) => `${table}.${name}`));
+  if (missing.length || missingByTable.length) {
+    throw new Error(`GRAPH_SNAPSHOT_SCHEMA_REQUIRED:${[...missing, ...missingByTable].join(',')}`);
   }
 }
 
@@ -248,6 +265,7 @@ async function persistSnapshot(client: PoolClient, run: ReturnType<typeof materi
       (snapshot_id,edge_key,source_node_key,target_node_key,edge_type,weight,confidence,provenance,properties)
       VALUES ${placeholders}`, values);
   }
+  const relationReadback = await persistGraphSnapshotRelationsV1(client, run);
   for (let i = 0; i < run.graphSnapshotExclusions.length; i += BATCH) {
     const batch = run.graphSnapshotExclusions.slice(i, i + BATCH);
     const values: unknown[] = [];
@@ -260,6 +278,7 @@ async function persistSnapshot(client: PoolClient, run: ReturnType<typeof materi
       (snapshot_id,candidate_key,packet_key,source_ref,exclusion_stage,exclusion_reason,evidence)
       VALUES ${placeholders}`, values);
   }
+  return relationReadback;
 }
 
 async function main() {
@@ -342,9 +361,10 @@ async function main() {
       }
     }
 
+    let relationReadback: GraphSnapshotRelationReadbackV1 | null = null;
     if (mode === 'apply') {
       await assertGraphSchemaReady(client);
-      await persistSnapshot(client, first.graph, first.revisionWrite.revision, first.sourceBinding.nodes);
+      relationReadback = await persistSnapshot(client, first.graph, first.revisionWrite.revision, first.sourceBinding.nodes);
       const readback = await client.query(`
         SELECT snapshot_id,source_manifest,source_hash,topology_hash,policy_hash,
                workspace_revision,source_inventory_revision,graph_revision,
@@ -381,6 +401,7 @@ async function main() {
       revisionChecksum: first.revisionWrite.revision.revisionChecksum,
       topologyHash: first.graph.graphSnapshotManifest.topologyHash,
       sourceInventoryHash: first.graph.graphSnapshotProof.sourceInventoryHash,
+      relationReadback,
       nodeSourceBinding: first.sourceBinding.receipt,
       nodeCount: first.graph.graphSnapshotManifest.nodeCount,
       edgeCount: first.graph.graphSnapshotManifest.edgeCount,

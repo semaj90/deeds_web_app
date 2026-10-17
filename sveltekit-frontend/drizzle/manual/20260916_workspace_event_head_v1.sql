@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS public.atlas_workspace_heads (
   workspace_id text PRIMARY KEY,
   base_snapshot_revision text NOT NULL,
   last_event_sequence bigint NOT NULL DEFAULT 0 CHECK (last_event_sequence >= 0),
-  last_event_id uuid REFERENCES public.atlas_workspace_events(event_id),
+  last_event_id uuid,
   last_event_checksum text CHECK (last_event_checksum IS NULL OR last_event_checksum ~ '^(sha256:)?[0-9a-f]{64}$'),
   delta_root_checksum text NOT NULL CHECK (delta_root_checksum ~ '^(sha256:)?[0-9a-f]{64}$'),
   event_count_since_snapshot integer NOT NULL DEFAULT 0 CHECK (event_count_since_snapshot >= 0),

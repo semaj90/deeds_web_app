@@ -19,7 +19,7 @@ function fakePool(initialHead: WorkspaceHeadV1) {
   const client = {
     async query<T = Record<string, unknown>>(text: string, values: unknown[] = []) {
       if (text === 'BEGIN' || text === 'COMMIT' || text === 'ROLLBACK') return { rows: [] as T[] };
-      if (text.includes('SELECT event_id, workspace_id')) {
+      if (text.includes('SELECT e.event_id, e.workspace_id')) {
         const event = events.get(String(values[0]));
         return { rows: event ? [{
           event_id: event.eventId, workspace_id: event.workspaceId, sequence: event.sequence.toString(),
@@ -29,6 +29,10 @@ function fakePool(initialHead: WorkspaceHeadV1) {
           causation_id: event.causationId, producer_revision: event.producerRevision,
           before_state_checksum: event.beforeStateChecksum, after_state_checksum: event.afterStateChecksum,
           event_checksum: event.eventChecksum,
+          // legacy event: no provenance, no observation (the live-DB harness proves the provenance round-trip)
+          task_id: null, execution_run_id: null, lease_id: null, lease_fence_token: null, lease_fence_epoch: null,
+          worktree_id: null, branch: null, base_commit: null, actor: null, idempotency_key: null, supersedes_event_id: null,
+          obs_recorded_at: null, obs_tool: null, obs_approval: null,
         }] as T[] : [] };
       }
       if (text.includes('SELECT participant_ordinal')) {

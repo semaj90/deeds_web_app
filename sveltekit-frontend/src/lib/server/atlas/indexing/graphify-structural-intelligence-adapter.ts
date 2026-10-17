@@ -20,6 +20,10 @@ import type {
   GraphifyNativeSymbolCoordinateV1,
   GraphifyReferenceEvidenceV1,
 } from './graphify-symbol-projection-v1.js';
+import {
+  classifyRawStructuralEdgesV1,
+  type AstEdgeEligibilityReportV1,
+} from './graphify-edge-eligibility-v1.js';
 
 export type StructuralFabricCompilationStatus =
   | 'COMPILED_NATIVE'
@@ -65,11 +69,14 @@ export type GraphifyStructuralIntelligenceReceipt = {
   relationGraphChecksum: string | null;
   relationGraphNodeCount: number;
   relationGraphEdgeCount: number;
+  eligibleStructuralEdgeCount: number;
+  structuralEdgeEligibilityChecksum: string | null;
 };
 
 export type GraphifyStructuralIntelligenceResult = {
   fabric: StructuralExtractionFabricResultV1 | null;
   relationGraph: AstRelationGraphAdapterResultV1 | null;
+  edgeEligibility: AstEdgeEligibilityReportV1 | null;
   groundedDomainCandidates: GroundedDomainCandidateV1[];
   projectionEvidence: {
     schema: 'atlas.graphify-symbol-projection-evidence.v1';
@@ -315,6 +322,7 @@ export function compileGraphifyStructuralIntelligence(input: {
     return {
         fabric: null,
       relationGraph: null,
+      edgeEligibility: null,
       groundedDomainCandidates: [],
       projectionEvidence: null,
       receipt: {
@@ -356,6 +364,8 @@ export function compileGraphifyStructuralIntelligence(input: {
         relationGraphChecksum: null,
         relationGraphNodeCount: 0,
         relationGraphEdgeCount: 0,
+        eligibleStructuralEdgeCount: 0,
+        structuralEdgeEligibilityChecksum: null,
       },
     };
   }
@@ -461,6 +471,24 @@ export function compileGraphifyStructuralIntelligence(input: {
       fabric,
     })
     : null;
+  const edgeEligibility = projectionEvidence
+    ? classifyRawStructuralEdgesV1([{
+      sourceRef: materialization.sourceRef,
+      sourceRevision: materialization.sourceRevision,
+      sourceRevisionAuthority: materialization.sourceRevisionAuthority === 'PROVEN'
+        && /^sha256:[a-f0-9]{64}$/i.test(materialization.sourceRevision ?? '')
+        ? 'PROVEN'
+        : 'UNPROVEN',
+      fabric,
+      referenceEvidenceByReferenceId: Object.fromEntries(
+        Object.entries(projectionEvidence.referenceEvidenceByReferenceId).map(([referenceId, evidence]) => [referenceId, {
+          startByte: evidence.startByte,
+          endByte: evidence.endByte,
+          evidenceRefs: evidence.evidenceRefs,
+        }]),
+      ),
+    }])
+    : null;
 
   const groundedDomainCandidates = input.groundedDomainMapping
     ? buildGroundedDomainCandidates({
@@ -496,6 +524,7 @@ export function compileGraphifyStructuralIntelligence(input: {
   return {
     fabric,
     relationGraph,
+    edgeEligibility,
     groundedDomainCandidates,
     projectionEvidence,
     receipt: {
@@ -545,6 +574,8 @@ export function compileGraphifyStructuralIntelligence(input: {
       relationGraphChecksum: relationGraph.graph?.checksum ?? null,
       relationGraphNodeCount: relationGraph.graph?.nodes.length ?? 0,
       relationGraphEdgeCount: relationGraph.graph?.edges.length ?? 0,
+      eligibleStructuralEdgeCount: edgeEligibility?.edges.filter((edge) => edge.resolution === 'ELIGIBLE').length ?? 0,
+      structuralEdgeEligibilityChecksum: edgeEligibility?.checksum ?? null,
     },
   };
 }

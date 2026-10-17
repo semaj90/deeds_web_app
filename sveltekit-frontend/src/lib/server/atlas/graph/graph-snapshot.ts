@@ -110,10 +110,50 @@ export function validateGraphSnapshotIdentity(input: {
 		if (!nodeKeys.has(participant.nodeKey)) throw new GraphIdentityValidationError({ kind: 'RELATION_PARTICIPANT_NODE_MISSING', nodeKey: participant.nodeKey });
 	}
 
-	return topologyHash(nodes, edges);
+	const participantsByRelation = new Map<string, GraphRelationParticipant[]>();
+	for (const participant of participants) {
+		participantsByRelation.set(participant.relationId, [...(participantsByRelation.get(participant.relationId) ?? []), participant]);
+	}
+	for (const relation of relations) {
+		const relationParticipants = participantsByRelation.get(relation.relationId) ?? [];
+		const participantNodeKeys = new Set(relationParticipants.map((participant) => participant.nodeKey));
+		if (participantNodeKeys.size < 3) {
+			throw new GraphIdentityValidationError({ kind: 'RELATION_ARITY_BELOW_THREE', relationId: relation.relationId, participantCount: participantNodeKeys.size });
+		}
+		const sourceNode = relationParticipants
+			.map((participant) => nodes.find((node) => node.nodeKey === participant.nodeKey))
+			.find((node) => node?.sourceRef === relation.sourceRef);
+		if (!sourceNode
+			|| typeof sourceNode.properties.sourceRevision !== 'string'
+			|| !/^sha256:[a-f0-9]{64}$/i.test(sourceNode.properties.sourceRevision)
+			|| typeof sourceNode.properties.workspaceRevision !== 'string'
+			|| !/^sha256:[a-f0-9]{64}$/i.test(sourceNode.properties.workspaceRevision)) {
+			throw new GraphIdentityValidationError({ kind: 'RELATION_SOURCE_NODE_UNQUALIFIED', relationId: relation.relationId, sourceRef: relation.sourceRef });
+		}
+		for (const participant of relationParticipants) {
+			const node = nodes.find((candidate) => candidate.nodeKey === participant.nodeKey)!;
+			if (typeof node.properties.sourceRevision !== 'string'
+				|| !/^sha256:[a-f0-9]{64}$/i.test(node.properties.sourceRevision)
+				|| node.properties.workspaceRevision !== sourceNode.properties.workspaceRevision) {
+				throw new GraphIdentityValidationError({ kind: 'RELATION_PARTICIPANT_REVISION_UNQUALIFIED', relationId: relation.relationId, nodeKey: participant.nodeKey });
+			}
+		}
+	}
+	const digest = topologyHash(nodes, edges, relations, participants);
+	for (const relation of relations) {
+		if (relation.topologyHash !== digest) {
+			throw new GraphIdentityValidationError({ kind: 'RELATION_TOPOLOGY_HASH_MISMATCH', relationId: relation.relationId, expected: digest, actual: relation.topologyHash });
+		}
+	}
+	return digest;
 }
 
-export function topologyHash(nodes: readonly GraphNode[], edges: readonly GraphEdge[]): string {
+export function topologyHash(
+	nodes: readonly GraphNode[],
+	edges: readonly GraphEdge[],
+	relationEvents: readonly GraphRelationEvent[] = [],
+	relationParticipants: readonly GraphRelationParticipant[] = [],
+): string {
 	// Streamed into the hash incrementally rather than materialized as one JS
 	// string: for full-corpus snapshots (hundreds of thousands of nodes/edges)
 	// building the whole normalized document as a single string via
@@ -127,6 +167,15 @@ export function topologyHash(nodes: readonly GraphNode[], edges: readonly GraphE
 	const sortedEdges = edges
 		.map(({ snapshotId: _snapshotId, properties, ...edge }) => ({ ...edge, properties }))
 		.sort((a, b) => a.edgeKey.localeCompare(b.edgeKey));
+	const sortedRelations = relationEvents
+		.map(({ snapshotId: _snapshotId, topologyHash: _topologyHash, ...relation }) => relation)
+		.sort((a, b) => a.relationId.localeCompare(b.relationId));
+	const sortedParticipants = relationParticipants
+		.map(({ snapshotId: _snapshotId, ...participant }) => participant)
+		.sort((a, b) => a.relationId.localeCompare(b.relationId)
+			|| a.ordinal - b.ordinal
+			|| a.role.localeCompare(b.role)
+			|| a.nodeKey.localeCompare(b.nodeKey));
 
 	// stableJson sorts ALL object keys alphabetically, including this
 	// top-level envelope — "edges" < "nodes" — so the legacy monolithic
@@ -144,7 +193,21 @@ export function topologyHash(nodes: readonly GraphNode[], edges: readonly GraphE
 		if (index > 0) hash.update(',');
 		hash.update(stableJson(node));
 	});
-	hash.update(']}');
+	hash.update(']');
+	if (sortedRelations.length > 0 || sortedParticipants.length > 0) {
+		hash.update(',"relationEvents":[');
+		sortedRelations.forEach((relation, index) => {
+			if (index > 0) hash.update(',');
+			hash.update(stableJson(relation));
+		});
+		hash.update('],"relationParticipants":[');
+		sortedParticipants.forEach((participant, index) => {
+			if (index > 0) hash.update(',');
+			hash.update(stableJson(participant));
+		});
+		hash.update(']');
+	}
+	hash.update('}');
 	return hash.digest('hex');
 }
 

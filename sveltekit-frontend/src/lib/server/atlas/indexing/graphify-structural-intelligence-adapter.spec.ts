@@ -81,6 +81,7 @@ describe('Graphify structural intelligence adapter', () => {
     const workspaceRevision = `sha256:${createHash('sha256').update('workspace snapshot', 'utf8').digest('hex')}`;
     const exactMaterialization = materialization('PROVEN');
     exactMaterialization.sourceRevision = sourceRevision;
+    exactMaterialization.parserSourceRevisionToken = sourceRevision;
     exactMaterialization.evidence!.source_revision = sourceRevision;
     const result = compileGraphifyStructuralIntelligence({
       parserBuffer: Buffer.from(source, 'utf8'),
@@ -95,6 +96,9 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.relationGraphChecksum).toBe(result.relationGraph?.graph?.checksum);
     expect(result.receipt.relationGraphNodeCount).toBe(1);
     expect(result.receipt.canonicalIdentityCreated).toBe(false);
+    expect(result.edgeEligibility).toMatchObject({ canonicalAuthority: false, writesPerformed: false, edges: [] });
+    expect(result.receipt.structuralEdgeEligibilityChecksum).toBe(result.edgeEligibility?.checksum);
+    expect(result.receipt.eligibleStructuralEdgeCount).toBe(0);
   });
 
   it('fails closed when structural evidence is absent', () => {
@@ -110,6 +114,7 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.receipt.langExtractParserBufferPresent).toBe(false);
     expect(result.receipt.langExtractParserBufferMatchesSource).toBe(false);
     expect(result.receipt.canonicalPromotionMayBeAttempted).toBe(false);
+    expect(result.edgeEligibility).toBeNull();
     expect(result.relationGraph).toBeNull();
   });
 
@@ -261,6 +266,9 @@ describe('Graphify structural intelligence adapter', () => {
     expect(result.projectionEvidence?.diagnostics ?? []).not.toEqual(
       expect.arrayContaining([expect.stringContaining('EXACT_SPAN_MISSING')]),
     );
+    expect(result.edgeEligibility?.edges).toHaveLength(1);
+    expect(result.edgeEligibility?.edges.every((edge) => edge.evidence.startByte !== null && edge.evidence.endByte !== null)).toBe(true);
+    expect(result.edgeEligibility?.edges.every((edge) => edge.resolution === 'REJECTED')).toBe(true);
   });
 
   it('compiles recovered evidence for search but blocks canonical promotion', () => {

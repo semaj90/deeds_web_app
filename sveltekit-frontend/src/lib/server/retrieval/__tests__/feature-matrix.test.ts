@@ -53,6 +53,16 @@ describe('fetchAuthorityScores', () => {
       { packetKey: 'pkt:2', sourceRef: 'src/bar.ts', sourceRevision: sourceRevisionTwo },
     ]));
 
+    const { PgDialect } = await import('drizzle-orm/pg-core');
+    const query = executeMock.mock.calls[0]?.[0] as Parameters<InstanceType<typeof PgDialect>['sqlToQuery']>[0];
+    const queryText = new PgDialect().sqlToQuery(query).sql;
+    expect(queryText).toContain('atlas_graph_authority_scores_v2');
+    expect(queryText).toContain('atlas_graph_authority_runs_v2');
+    expect(queryText).toContain('atlas_graph_nodes_v2');
+    expect(queryText).not.toContain('FROM atlas_graph_authority_scores ');
+    expect(queryText).toContain("source_manifest->>'workspaceRevision'");
+    expect(queryText).toContain('topology_hash');
+
     expect(result.get('pkt:1')).toBe(0.8);
     expect(result.get('src/foo.ts')).toBe(0.8);
     expect(result.get('pkt:2')).toBe(0.4);
@@ -96,6 +106,39 @@ describe('fetchAuthorityScores', () => {
     expect(result.has('src/foo.ts')).toBe(false);
   });
 
+  it('rejects an ambiguous packet score when qualified runs disagree', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.4 },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.has('pkt:1')).toBe(false);
+    expect(result.has('src/foo.ts')).toBe(false);
+  });
+
+  it('accepts duplicate identical packet scores from qualified runs', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 0.8 },
+        { matched_packet_key: 'pkt:1', matched_source_ref: 'src/foo.ts', matched_source_revision: sourceRevisionOne, authority_percentile: '0.8' },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:1', sourceRef: 'src/foo.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.get('pkt:1')).toBe(0.8);
+  });
+
   it('degrades to an empty map (does not throw) when the db call fails', async () => {
     executeMock.mockRejectedValueOnce(new Error('connection refused'));
     const { fetchAuthorityScores } = await import('../feature-matrix.js');
@@ -121,6 +164,27 @@ describe('fetchAuthorityScores', () => {
 
     expect(result.has('pkt:bad')).toBe(false);
     expect(result.get('pkt:good')).toBe(0.55);
+  });
+
+  it('rejects authority percentiles outside the normalized range', async () => {
+    executeMock.mockResolvedValueOnce({
+      rows: [
+        { matched_packet_key: 'pkt:low', matched_source_ref: 'src/low.ts', matched_source_revision: sourceRevisionOne, authority_percentile: -0.01 },
+        { matched_packet_key: 'pkt:high', matched_source_ref: 'src/high.ts', matched_source_revision: sourceRevisionTwo, authority_percentile: 1.01 },
+        { matched_packet_key: 'pkt:edge', matched_source_ref: 'src/edge.ts', matched_source_revision: sourceRevisionOne, authority_percentile: 1 },
+      ],
+    });
+
+    const { fetchAuthorityScores } = await import('../feature-matrix.js');
+    const result = await fetchAuthorityScores(authorityInput([
+      { packetKey: 'pkt:low', sourceRef: 'src/low.ts', sourceRevision: sourceRevisionOne },
+      { packetKey: 'pkt:high', sourceRef: 'src/high.ts', sourceRevision: sourceRevisionTwo },
+      { packetKey: 'pkt:edge', sourceRef: 'src/edge.ts', sourceRevision: sourceRevisionOne },
+    ]));
+
+    expect(result.has('pkt:low')).toBe(false);
+    expect(result.has('pkt:high')).toBe(false);
+    expect(result.get('pkt:edge')).toBe(1);
   });
 });
 

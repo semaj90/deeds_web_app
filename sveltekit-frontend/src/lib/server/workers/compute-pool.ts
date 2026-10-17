@@ -25,7 +25,8 @@ export type TaskType =
   | 'kmeans' | 'som' | 'forensics' | 'silhouette' | 'similarity'
   | 'chunk' | 'hash' | 'metadata' | 'qdrant_payload' | 'langextract.extract'
   | 'graph.bfs' | 'graph.bfs_extended' | 'graph.astar' | 'graph.greedy'
-  | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d';
+  | 'graph.ast_traverse' | 'tree.predict' | 'manifold.slerp' | 'manifold.interpolate4d'
+  | 'schema.encode';
 
 export interface RunOptions {
 	/** Soft-affinity key: same key → same worker (warm JIT, hot caches).
@@ -494,6 +495,32 @@ export class ComputePool {
 			scores.push(...new Float32Array(sharedScores));
 		}
 		return { scores, source: 'cpu-worker' };
+	}
+
+	/**
+	 * Compute document relevance scores in worker thread using SharedArrayBuffer zero-copy.
+	 * Formula: score = (trustTier * 0.3) + (karpathyBlend * 0.5) + ((1.0 - riskScore) * 0.2)
+	 */
+	async encodeDocumentScores(
+		features: Float32Array | SharedArrayBuffer,
+		count: number,
+		options?: RunOptions
+	): Promise<Float32Array> {
+		if (count <= 0) return new Float32Array(0);
+		let sharedFeatures: SharedArrayBuffer;
+		if (features instanceof SharedArrayBuffer) {
+			sharedFeatures = features;
+		} else {
+			sharedFeatures = new SharedArrayBuffer(count * 5 * Float32Array.BYTES_PER_ELEMENT);
+			new Float32Array(sharedFeatures).set(features.subarray(0, count * 5));
+		}
+		const sharedScores = new SharedArrayBuffer(count * Float32Array.BYTES_PER_ELEMENT);
+		await this.run<{ n: number; shared: boolean }>(
+			'schema.encode',
+			{ sharedFeatures, sharedScores, n: count },
+			options
+		);
+		return new Float32Array(sharedScores);
 	}
 
 	/**

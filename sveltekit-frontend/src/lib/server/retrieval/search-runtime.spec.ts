@@ -31,6 +31,9 @@ const { mockReadKagCodeHyperedgesV1, mockResolveKagPacketBindingsV1 } = vi.hoist
   mockReadKagCodeHyperedgesV1: vi.fn(),
   mockResolveKagPacketBindingsV1: vi.fn(),
 }));
+const { mockExecuteGraphV2BoundedTraversalV1 } = vi.hoisted(() => ({
+  mockExecuteGraphV2BoundedTraversalV1: vi.fn(),
+}));
 
 vi.mock('./retrieve-candidates.js', () => ({
   retrieveAllCandidates: mockRetrieveAllCandidates,
@@ -63,6 +66,10 @@ vi.mock('../atlas/integration/kag-hypergraph-reader-v1.js', () => ({
   resolveKagPacketCandidateBindingsStrictV1: mockResolveKagPacketBindingsV1,
 }));
 
+vi.mock('../atlas/integration/graph-v2-bounded-traversal-v1.js', () => ({
+  executeGraphV2BoundedTraversalV1: mockExecuteGraphV2BoundedTraversalV1,
+}));
+
 vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
   resolvePacketKeyResolutionV2: async (key: string) => {
     const identities: Record<string, string> = {
@@ -76,13 +83,32 @@ vi.mock('../atlas/identity/packet-identity-resolver.js', () => ({
   },
 }));
 
-import { buildFunctionRegistryRetrievalProofV1, createSearchRuntime, SearchRuntime } from './search-runtime.js';
+import { buildFunctionRegistryRetrievalProofV1, buildGraphCandidateEvidenceV1, createSearchRuntime, SearchRuntime } from './search-runtime.js';
 import type { SearchResult } from './search-runtime.js';
 import { classifyAtlasQuery } from '../atlas/agentic-file-compiler/query-classifier.js';
 import { compileTaxonomyScopeV1 } from '../atlas/agentic-file-compiler/taxonomy-scope-v1.js';
 import { buildQueryExpansionBundleV1 } from '../atlas/agentic-file-compiler/query-expansion-v1.js';
 
 describe('search runtime bridge', () => {
+  it('carries graph edge evidence to final packets only when packet and revisions match', () => {
+    const candidate = {
+      id: 'packet-a', packetKey: 'packet-a', sourceRef: 'src/a.ts', summary: '', content: '', score: 0.8,
+      scoreSource: 'ast_tree' as const, sourceRevision: `sha256:${'a'.repeat(64)}`,
+      workspaceRevision: `sha256:${'b'.repeat(64)}`, graphRevision: 'c'.repeat(64),
+      graphEvidenceRefs: ['kag:edge-2', 'kag:edge-1'],
+    };
+    const packet = {
+      packet_key: 'packet-a', source_ref: 'src/a.ts', source_revision: candidate.sourceRevision,
+      workspace_revision: candidate.workspaceRevision, graph_revision: candidate.graphRevision,
+    } as any;
+    expect(buildGraphCandidateEvidenceV1([candidate], [packet])).toEqual([{
+      packetKey: 'packet-a', sourceRef: 'src/a.ts', sourceRevision: candidate.sourceRevision,
+      workspaceRevision: candidate.workspaceRevision, graphRevision: candidate.graphRevision,
+      evidenceRefs: ['kag:edge-1', 'kag:edge-2'],
+    }]);
+    expect(buildGraphCandidateEvidenceV1([candidate], [{ ...packet, source_revision: `sha256:${'d'.repeat(64)}` }])).toEqual([]);
+  });
+
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
@@ -96,6 +122,8 @@ describe('search runtime bridge', () => {
     mockAppendSearchRuntimeTrainingRow.mockReset();
     mockAppendSearchRuntimeTrainingRow.mockResolvedValue({});
     mockReadKagHypergraphNeighborsV1.mockReset();
+    mockExecuteGraphV2BoundedTraversalV1.mockReset();
+    mockExecuteGraphV2BoundedTraversalV1.mockResolvedValue([]);
     mockReadKagCodeHyperedgesV1.mockReset();
     mockResolveKagPacketBindingsV1.mockReset();
     mockReadKagCodeHyperedgesV1.mockResolvedValue([]);
@@ -491,6 +519,73 @@ describe('search runtime bridge', () => {
       .toContain('packet-2');
     expect(result.packets.map((packet) => packet.packet_key)).toContain('packet-2');
     expect(result.provenance.retrievalSources).toContain('ast_tree');
+  });
+
+  it('carries a bounded GraphV2 multi-hop path through hydration, final Top-K, and graph evidence provenance', async () => {
+    const workspaceRevision = `sha256:${'5'.repeat(64)}`;
+    const graphRevision = '6'.repeat(64);
+    const sourceRevision = `sha256:${'7'.repeat(64)}`;
+    mockExecuteGraphV2BoundedTraversalV1.mockResolvedValue([{
+      packetKey: 'packet-2',
+      sourceRef: 'src/server/neighbor.ts',
+      sourceRevision,
+      workspaceRevision,
+      graphRevision,
+      relationId: 'edge:last',
+      relationKind: 'CALLS',
+      relationConfidence: 0.72,
+      traversalDepth: 2,
+      relationPathIds: ['edge:first', 'edge:last'],
+    }]);
+    mockHydrateCandidatesWithProof.mockImplementation(async (items: Array<Record<string, unknown>>) => ({
+      envelopes: items.map((candidate, index) => ({
+        chunk_id: String(candidate.packetKey),
+        packet_key: String(candidate.packetKey),
+        source_ref: String(candidate.sourceRef),
+        relative_path: String(candidate.sourceRef),
+        source_revision: String(candidate.sourceRevision),
+        workspace_revision: String(candidate.workspaceRevision),
+        graph_revision: graphRevision,
+        summary: 'qualified graph candidate',
+        content: 'qualified graph candidate content',
+        retrieved_rank: index + 1,
+      })),
+      proof: {
+        canonicalJoinedCount: items.length, canonicalJoinMissingCount: 0, workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0, sourceRevisionRejectedCount: 0, representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0, graphScoreAttachedCount: 0, graphScoreMissingCount: items.length,
+        summaryResolvedCount: items.length, summaryStaleRejectedCount: 0, validationReasons: {},
+      },
+    }));
+    mockRerankCanonicalFeatureEnvelopes.mockImplementation(async (_query: string, items: Array<Record<string, unknown>>) => ({
+      results: items.map((item, index) => ({ ...item, retrieved_rank: index + 1, rank_after: index + 1 })),
+      provenance: {
+        cacheStatus: 'miss', cacheKey: 'test', modelVersion: 'none', rendererVersion: 'search-runtime-v1',
+        authScope: 'public', topK: 2, maxLength: 1024, crossEncoderAttempted: false,
+        crossEncoderUsed: false, fallbackUsed: false, latencyMs: 0,
+      },
+    }));
+    const runtime = new SearchRuntime({ readOnly: true, retrievers: [{
+      lane: 'ast',
+      retrieve: async () => [{
+        packetKey: 'packet-1', sourceRef: 'src/client/seed.ts', sourceRevision,
+        workspaceRevision, rank: 1, score: 0.9, lane: 'ast', metadata: { graph_revision: graphRevision },
+      }],
+    }] });
+
+    const result = await runtime.search({ text: 'follow graph path', topK: 2, workspaceRevision });
+
+    expect(mockExecuteGraphV2BoundedTraversalV1).toHaveBeenCalledWith(expect.objectContaining({
+      workspaceRevision, graphRevision, maxDepth: 3,
+      seeds: [{ packetKey: 'packet-1', sourceRef: 'src/client/seed.ts', sourceRevision }],
+    }));
+    expect(mockHydrateCandidatesWithProof.mock.calls[0]?.[0].map((item: { packetKey: string }) => item.packetKey))
+      .toContain('packet-2');
+    expect(result.packets.map((packet) => packet.packet_key)).toContain('packet-2');
+    expect(result.provenance.graphCandidateEvidence).toContainEqual(expect.objectContaining({
+      packetKey: 'packet-2',
+      evidenceRefs: ['graph-v2:edge:first', 'graph-v2:edge:last'],
+    }));
   });
 
   it('routes a bounded n-ary code fact through packet binding, hydration, and final Top-K', async () => {

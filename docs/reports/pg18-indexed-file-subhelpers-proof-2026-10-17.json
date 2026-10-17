@@ -1,0 +1,47 @@
+{
+  "schema": "atlas.pg18-indexed-file-subhelpers-proof.v1",
+  "generatedAt": "2026-10-17T12:10:42.621Z",
+  "readOnlyTransaction": "ROLLED_BACK",
+  "datastoreWrites": false,
+  "canonicalAuthority": false,
+  "indexedCohortComparison": {
+    "sampledIndexedFiles": 100,
+    "brokenFragmentQuery_source_ref_key_matches": 0,
+    "fixedPathQuery_relative_path_matches": 312,
+    "distinctFilesWithAstNodes": 72,
+    "graphifySymbolMatches": 661,
+    "distinctFilesWithGraphifySymbols": 98,
+    "verifiedRepresentationRegistryRows": 4
+  },
+  "latent1000PacketComparison": {
+    "sampledLatentPackets": 1000,
+    "distinctCandidatePathsChecked": 2211,
+    "brokenFragmentQuery_source_ref_key_matches": 0,
+    "fixedPathQuery_relative_path_matches": 3534,
+    "distinctPacketPathsWithAstNodes": 615,
+    "graphifySymbolMatches": 3883,
+    "distinctPacketPathsWithGraphifySymbols": 503,
+    "workspaceSourceBindingsMatched": 1643
+  },
+  "indexedCohortQualificationSummary": {
+    "totalPackets": 100,
+    "sourceVersionJoinedCount": 100,
+    "astSpanJoinedCount": 72,
+    "symbolSpanJoinedCount": 98,
+    "representationJoinedCount": 100,
+    "fullyQualifiedCount": 100
+  },
+  "liveSubHelperProof": {
+    "sourceRef": "sveltekit-frontend/src/ambient-legacy.d.ts",
+    "fileId": "dbfbaba3-9ce8-4650-abb2-386bfbb9afa6",
+    "sourceRevisionMatchesSnapshot": true,
+    "treeSitterChunkCount": 5,
+    "astGrepObservationCount": 3,
+    "lspExactCanonicalSymbolCoverage": true,
+    "lspMatchedCount": 3,
+    "nlpStatus": "GROUNDED_OK",
+    "nlpGroundedSpanCount": 1,
+    "canonicalAuthority": false,
+    "writesPerformed": false
+  }
+}

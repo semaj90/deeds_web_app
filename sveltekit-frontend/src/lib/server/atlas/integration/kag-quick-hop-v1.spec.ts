@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1, runKagQuickHopV1 } from './kag-quick-hop-v1.js';
+import { createPostgresKagQuickHopReaderV1, executeKagQuickHopV1, quickHopEvidenceByTargetV1, runKagQuickHopV1 } from './kag-quick-hop-v1.js';
 import { createHyperedgeV1, type HyperedgeV1 } from '../../graph/hyperedge-contract.js';
 
 const edge = (id: string, a: string, b: string, predicate = 'RELATED') => ({
@@ -8,6 +8,17 @@ const edge = (id: string, a: string, b: string, predicate = 'RELATED') => ({
 }) as HyperedgeV1;
 
 describe('bounded KAG quick-hop', () => {
+  it('attributes each traversed relation only to its reached target', () => {
+    expect(quickHopEvidenceByTargetV1([
+      { hyperedgeId: 'edge-b', predicate: 'CALLS', fromCanonicalId: 'seed', toCanonicalId: 'target-b', fromRole: 'caller', toRole: 'callee', depth: 1, score: 1 },
+      { hyperedgeId: 'edge-a', predicate: 'IMPORTS', fromCanonicalId: 'seed', toCanonicalId: 'target-a', fromRole: 'importer', toRole: 'module', depth: 1, score: 1 },
+      { hyperedgeId: 'edge-b', predicate: 'CALLS', fromCanonicalId: 'other', toCanonicalId: 'target-b', fromRole: 'caller', toRole: 'callee', depth: 2, score: 1 },
+    ])).toEqual(new Map([
+      ['target-a', ['edge-a']],
+      ['target-b', ['edge-b']],
+    ]));
+  });
+
   it('preserves a multi-participant fact without clique expansion', () => {
     const result = runKagQuickHopV1({ seedCanonicalIds: ['a'], workspaceRevision: 'ws-1', graphRevision: 'graph-1', hyperedges: [{
       ...edge('edge-1', 'a', 'b'), participants: [{ canonicalId: 'a', role: 'requirement', ordinal: 0 }, { canonicalId: 'b', role: 'symbol', ordinal: 1 }, { canonicalId: 'c', role: 'test', ordinal: 2 }],

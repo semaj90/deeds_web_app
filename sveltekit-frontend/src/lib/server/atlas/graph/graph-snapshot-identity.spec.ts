@@ -57,6 +57,49 @@ describe('Parent Atlas graph snapshot identity', () => {
 			relationParticipants: [{ snapshotId, relationId: 'call:1', nodeKey: 'missing', role: 'callee', ordinal: 0 }]
 		})).toThrow(/RELATION_PARTICIPANT_NODE_MISSING/);
 	});
+
+	it('binds N-ary participants and roles into the topology checksum', () => {
+		const workspaceRevision = `sha256:${'a'.repeat(64)}`;
+		const sourceRevision = `sha256:${'b'.repeat(64)}`;
+		const nodes = [
+			{ ...baseNodes[0], properties: { sourceRevision, workspaceRevision } },
+			{ ...baseNodes[1], properties: { sourceRevision, workspaceRevision } },
+			{ snapshotId, nodeKey: 'packet:c', nodeType: 'packet' as const, packetKey: 'packet:c', treeNodeId: null, sourceRef: 'c.ts', properties: { sourceRevision, workspaceRevision } },
+		];
+		const participants = [
+			{ snapshotId, relationId: 'fact:1', nodeKey: 'file:a', role: 'source', ordinal: 0 },
+			{ snapshotId, relationId: 'fact:1', nodeKey: 'packet:b', role: 'callee', ordinal: 1 },
+			{ snapshotId, relationId: 'fact:1', nodeKey: 'packet:c', role: 'context', ordinal: 2 },
+		];
+		const relation = { snapshotId, relationId: 'fact:1', relationType: 'CALLS_WITH_CONTEXT', sourceRef: 'a.ts', evidenceSpan: 'utf8:[4,12)', confidence: 0.9, topologyHash: '' };
+		const expected = topologyHash(nodes, baseEdges, [relation], participants);
+		const boundRelation = { ...relation, topologyHash: expected };
+
+		expect(validateGraphSnapshotIdentity({ snapshotId, nodes, edges: baseEdges, relationEvents: [boundRelation], relationParticipants: participants })).toBe(expected);
+		expect(topologyHash(nodes, baseEdges, [relation], participants)).not.toBe(topologyHash(nodes, baseEdges));
+		expect(() => validateGraphSnapshotIdentity({
+			snapshotId,
+			nodes,
+			edges: baseEdges,
+			relationEvents: [boundRelation],
+			relationParticipants: participants.map((participant) => participant.role === 'context' ? { ...participant, role: 'other' } : participant),
+		})).toThrow(/RELATION_TOPOLOGY_HASH_MISMATCH/);
+	});
+
+	it('rejects binary or unrevisioned relation incidence before hashing', () => {
+		const baseHash = validateGraphSnapshotIdentity({ snapshotId, nodes: baseNodes, edges: baseEdges });
+		const event = { snapshotId, relationId: 'fact:binary', relationType: 'CALLS', sourceRef: 'a.ts', evidenceSpan: 'utf8:[0,1)', confidence: 1, topologyHash: baseHash };
+		expect(() => validateGraphSnapshotIdentity({
+			snapshotId,
+			nodes: baseNodes,
+			edges: baseEdges,
+			relationEvents: [event],
+			relationParticipants: [
+				{ snapshotId, relationId: event.relationId, nodeKey: 'file:a', role: 'source', ordinal: 0 },
+				{ snapshotId, relationId: event.relationId, nodeKey: 'packet:b', role: 'target', ordinal: 1 },
+			],
+		})).toThrow(/RELATION_ARITY_BELOW_THREE/);
+	});
 });
 
 describe('topologyHash streaming/legacy byte compatibility', () => {

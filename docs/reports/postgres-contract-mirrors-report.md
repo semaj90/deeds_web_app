@@ -1,14 +1,14 @@
 # Postgres Contract Mirrors Report
 
-Generated: 2026-10-16T03:53:29.829Z
+Generated: 2026-10-17T09:39:41.835Z
 
 ## Summary
 
 - tables checked: 11
-- static aligned: 7
+- static aligned: 6
 - live aligned: 4
 - live unavailable: 0
-- blockers: 11
+- blockers: 12
 
 ## Packet Spine
 
@@ -47,13 +47,13 @@ Generated: 2026-10-16T03:53:29.829Z
 ## atlas_workspace_events
 
 - classification: LIVE_TABLE_MISSING
-- repair_class: APPLY_EXISTING_SQL
-- static: SQL_AND_DRIZZLE_ALIGNED
+- repair_class: ADD_DRIZZLE_MIRROR
+- static: COLUMN_MISMATCH
 - live: LIVE_TABLE_MISSING
 - schema sources: sveltekit-frontend/src/lib/server/db/schema/workspace-events.ts
-- manual sources: sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql
-- static columns: after_state_checksum, base_snapshot_revision, before_state_checksum, causation_id, correlation_id, created_at, delta_root_checksum, event_checksum, event_id, event_type, occurred_at, previous_head_revision, producer_revision, sequence, workspace_head_revision, workspace_id
-- static indexes: atlas_workspace_events_workspace_sequence_idx
+- manual sources: sveltekit-frontend/drizzle/manual/20260916_workspace_event_head_v1.sql, sveltekit-frontend/drizzle/manual/20261017_workspace_event_provenance_v1_DRAFT.sql
+- static columns: after_state_checksum, base_snapshot_revision, before_state_checksum, causation_id, correlation_id, created_at, delta_root_checksum, event_checksum, event_id, event_type, occurred_at, previous_head_revision, producer_revision, sequence, task_id, workspace_head_revision, workspace_id
+- static indexes: atlas_workspace_events_idempotency_uidx, atlas_workspace_events_task_idx, atlas_workspace_events_workspace_sequence_idx
 - live columns: none
 - live indexes: none
 - live rows: n/a
@@ -174,6 +174,7 @@ Generated: 2026-10-16T03:53:29.829Z
 
 - kanban_tasks: static INDEX_MISMATCH
 - feature_registry: live LIVE_TABLE_MISSING
+- atlas_workspace_events: static COLUMN_MISMATCH
 - atlas_workspace_events: live LIVE_TABLE_MISSING
 - atlas_workspace_event_participants: live LIVE_TABLE_MISSING
 - atlas_workspace_heads: live LIVE_TABLE_MISSING

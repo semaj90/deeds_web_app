@@ -167,10 +167,16 @@ describe('SearchRuntime QAS projection boundary', () => {
             chunk_id: 'chunk:one', packet_key: 'packet:one', stable_symbol_id: 'symbol:one',
             symbol_version_id: 'symbol-version:one', source_ref: 'src/one.ts',
             workspace_revision: workspaceRevision, source_revision: sourceRevision,
+            graph_revision: 'graph:r1',
             representation_revision: 1, retrieval_score: 0.9, fusion_score: 0.8, fusion_rank: 1,
           }],
           metadata: {} as any,
-          provenance: {} as any,
+          provenance: {
+            graphCandidateEvidence: [{
+              packetKey: 'packet:one', sourceRef: 'src/one.ts', sourceRevision,
+              workspaceRevision, graphRevision: 'graph:r1', evidenceRefs: ['graph-v2:relation:one'],
+            }],
+          } as any,
         } as any),
       },
     });
@@ -199,6 +205,7 @@ describe('SearchRuntime QAS projection boundary', () => {
     expect(result.response.packets).toHaveLength(1);
     expect(result.qas.accepted).toHaveLength(1);
     expect(result.qas.exactBaseline[0]?.canonicalId).toBe('symbol:one');
+    expect(result.qas.accepted[0]?.evidenceRefs).toContain('graph-v2:relation:one');
 
     const manifestResult = await adapter.searchWithAceManifest({ query: 'inspect', topK: 1 }, {
       requestId: 'request:one', policyRevision: 'policy:r1', workspaceRevision,
@@ -237,6 +244,7 @@ describe('SearchRuntime QAS projection boundary', () => {
       },
     });
     expect(manifestResult.admission.manifest.v1.snapshotId).toBe('snapshot:search:r1');
+    expect(manifestResult.admission.manifest.v1.evidenceRefs).toContain('graph-v2:relation:one');
     expect(manifestResult.snapshot.rowCount).toBe(1);
     expect(manifestResult.snapshot.rows[0]?.canonicalId).toBe('symbol:one');
     expect(manifestResult.snapshot.identityAuthority).toBe(false);
@@ -373,5 +381,86 @@ describe('SearchRuntime QAS projection boundary', () => {
     expect(result.accepted[0].canonicalId).toBe('symbol:one');
     expect(result.exactBaseline).toEqual([{ canonicalId: 'symbol:one', rank: 1, score: 0.8 }]);
     expect(result.rejected).toHaveLength(0);
+  });
+
+  it('excludes graph evidence whose packet revisions do not exactly match', () => {
+    const result = projectAtlasSearchResponseToQas({
+      requestId: 'request:graph-revision-mismatch',
+      policyRevision: 'policy:r1',
+      workspaceRevision,
+      representationRevision: 'semantic_768:r1',
+      response: {
+        packets: [{
+          chunk_id: 'chunk:one', packet_key: 'packet:one', stable_symbol_id: 'symbol:one',
+          symbol_version_id: 'symbol-version:one', source_ref: 'src/one.ts',
+          workspace_revision: workspaceRevision, source_revision: sourceRevision, graph_revision: 'graph:r1',
+          representation_revision: 1, retrieval_score: 0.9, fusion_score: 0.8, fusion_rank: 1,
+        }],
+        provenance: {
+          graphCandidateEvidence: [{
+            packetKey: 'packet:one', sourceRef: 'src/one.ts', sourceRevision,
+            workspaceRevision: `sha256:${'f'.repeat(64)}`, graphRevision: 'graph:r1',
+            evidenceRefs: ['graph-v2:stale'],
+          }],
+        },
+      } as any,
+      projections: [{
+        packet_key: 'packet:one', semantic_similarity_768: 0.9, lexical_score: 0.8,
+        ast_signal: 0.7, authority_norm: 0.6, domain_fit_query: 0.5, recency: 0.4,
+        retrieval_frequency: 0.3, execution_utility: 0.2, process_fit: 0.1,
+      }],
+      resolveFeatures: () => ({
+        graphRevision: 'graph:r1', featureRevision: 'features:r1',
+        representationRevision: 'semantic_768:r1', taskKind: 'DEBUG',
+        features: {
+          semanticAffinity: 0, lexicalAffinity: 0, graphAuthority: 0, astAffinity: 0,
+          processAffinity: 0, domainAffinity: 0, priorExecutionSuccess: 0,
+          reuseProbability: 0, recency: 0,
+        },
+        evidenceRefs: ['source:one'],
+      }),
+    });
+
+    expect(result.accepted[0]?.evidenceRefs).toEqual(['source:one']);
+  });
+
+  it('carries exact graph relation evidence into the QAS evidence row', () => {
+    const result = projectAtlasSearchResponseToQas({
+      requestId: 'request:graph-evidence',
+      policyRevision: 'policy:r1',
+      workspaceRevision,
+      representationRevision: 'semantic_768:r1',
+      response: {
+        packets: [{
+          chunk_id: 'chunk:one', packet_key: 'packet:one', stable_symbol_id: 'symbol:one',
+          symbol_version_id: 'symbol-version:one', source_ref: 'src/one.ts',
+          workspace_revision: workspaceRevision, source_revision: sourceRevision, graph_revision: 'graph:r1',
+          representation_revision: 1, retrieval_score: 0.9, fusion_score: 0.8, fusion_rank: 1,
+        }],
+        provenance: {
+          graphCandidateEvidence: [{
+            packetKey: 'packet:one', sourceRef: 'src/one.ts', sourceRevision,
+            workspaceRevision, graphRevision: 'graph:r1', evidenceRefs: ['graph-v2:relation:one'],
+          }],
+        },
+      } as any,
+      projections: [{
+        packet_key: 'packet:one', semantic_similarity_768: 0.9, lexical_score: 0.8,
+        ast_signal: 0.7, authority_norm: 0.6, domain_fit_query: 0.5, recency: 0.4,
+        retrieval_frequency: 0.3, execution_utility: 0.2, process_fit: 0.1,
+      }],
+      resolveFeatures: () => ({
+        graphRevision: 'graph:r1', featureRevision: 'features:r1',
+        representationRevision: 'semantic_768:r1', taskKind: 'DEBUG',
+        features: {
+          semanticAffinity: 0, lexicalAffinity: 0, graphAuthority: 0, astAffinity: 0,
+          processAffinity: 0, domainAffinity: 0, priorExecutionSuccess: 0,
+          reuseProbability: 0, recency: 0,
+        },
+        evidenceRefs: ['source:one'],
+      }),
+    });
+
+    expect(result.accepted[0]?.evidenceRefs).toEqual(['graph-v2:relation:one', 'source:one']);
   });
 });

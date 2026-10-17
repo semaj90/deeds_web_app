@@ -5,12 +5,21 @@ import {
   type GraphSnapshotMaterialization,
   type GraphSnapshotMaterializerInput
 } from './graph-snapshot-materializer.js';
+import type { GraphRevisionSnapshotV1 } from '../lineage/graph-revision-snapshot-v1.js';
+import type { GraphifyEdgeReplayContextV1 } from '../indexing/graphify-edge-replay-identity-v1.js';
+import {
+  buildGraphifyPacketEdgeSourceBatchesV1,
+  resolveGraphifyPacketEdgesForSnapshotV1,
+  type GraphifyPacketEdgeSourceBatchV1
+} from '../indexing/graphify-packet-incidence-materializer-v1.js';
+import type { GraphifyStructuralProjectionPipelineV1 } from '../indexing/graphify-structural-projection-pipeline-v1.js';
+import { verifyGraphifyStructuralProjectionBatchV1, type GraphifyStructuralProjectionBatchV1 } from '../indexing/graphify-structural-projection-batch-v1.js';
 
 export interface QueryLike {
   query<T = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<{ rows: T[] }>;
 }
 
-export interface PostgresGraphSnapshotInput extends Omit<GraphSnapshotMaterializerInput, 'treeNodes' | 'packets' | 'workspaceId'> {
+export interface PostgresGraphSnapshotInput extends Omit<GraphSnapshotMaterializerInput, 'treeNodes' | 'packets' | 'workspaceId' | 'graphifyPacketEdgeCandidates'> {
   /**
    * The admitted workspace revision (sha256:<64-hex>), matched against
    * atlas_packets.workspace_revision_key. This is NOT atlas_packets.workspace_id
@@ -50,6 +59,14 @@ export interface PostgresGraphSnapshotInput extends Omit<GraphSnapshotMaterializ
    * information_schema.columns before this field was added).
    */
   repositoryId: string;
+  graphifyEdgeBatch?: {
+    snapshot: GraphRevisionSnapshotV1;
+    replayContext: GraphifyEdgeReplayContextV1;
+    batches?: readonly GraphifyPacketEdgeSourceBatchV1[];
+    pipelines?: readonly GraphifyStructuralProjectionPipelineV1[];
+    structuralProjectionBatch?: GraphifyStructuralProjectionBatchV1;
+    sourceBytesBySourceRef?: ReadonlyMap<string, Uint8Array>;
+  };
 }
 
 type TreeNodeRow = Pick<
@@ -90,6 +107,8 @@ type PacketRow = Pick<
   | 'clusterId'
   | 'sha256'
   | 'sourceRevision'
+  | 'byteStart'
+  | 'byteEnd'
   | 'sourceKind'
   | 'sourcePath'
   | 'topology'
@@ -137,6 +156,8 @@ const PACKET_SELECT_SQL = `
     p.cluster_id,
     p.sha256,
     p.source_revision,
+    p.byte_start,
+    p.byte_end,
     p.source_kind,
     p.source_path,
     p.topology,
@@ -210,7 +231,7 @@ export async function loadCanonicalGraphSnapshotInputFromPostgres(
   // downstream-consumed contract. Here at the Postgres-loader boundary we populate it FROM the
   // admitted workspaceRevision used to scope the query, so the resulting snapshot's own identity
   // correctly reflects the admitted revision rather than a directory-bucket workspace_id.
-  const { workspaceRevision, executionId, repositoryId, ...rest } = input;
+  const { workspaceRevision, executionId, repositoryId, graphifyEdgeBatch, ...rest } = input;
   return {
     ...rest,
     workspaceId: workspaceRevision,
@@ -225,6 +246,56 @@ export async function materializeCanonicalGraphSnapshotFromPostgres(
   input: PostgresGraphSnapshotInput
 ): Promise<GraphSnapshotMaterialization> {
   const materializerInput = await loadCanonicalGraphSnapshotInputFromPostgres(source, input);
+  if (input.graphifyEdgeBatch) {
+    if (input.graphifyEdgeBatch.snapshot.workspaceRevisionKey !== input.workspaceRevision) {
+      throw new Error('GRAPHIFY_GRAPH_SNAPSHOT_WORKSPACE_REVISION_MISMATCH');
+    }
+    const { batches, pipelines, structuralProjectionBatch, sourceBytesBySourceRef, ...context } = input.graphifyEdgeBatch;
+    const pipelineInput = pipelines ?? structuralProjectionBatch?.pipelines;
+    if (
+      Boolean(batches) === Boolean(pipelineInput)
+      || (pipelines && structuralProjectionBatch)
+      || (pipelineInput && !sourceBytesBySourceRef)
+    ) {
+      throw new Error('GRAPHIFY_EDGE_BATCH_INPUT_SHAPE_INVALID');
+    }
+    if (structuralProjectionBatch && (
+      !verifyGraphifyStructuralProjectionBatchV1(structuralProjectionBatch)
+      || structuralProjectionBatch.workspaceRevision !== input.workspaceRevision
+    )) {
+      throw new Error('GRAPHIFY_STRUCTURAL_PROJECTION_BATCH_NOT_ADMISSIBLE');
+    }
+    const assembly = pipelineInput ? buildGraphifyPacketEdgeSourceBatchesV1({
+      pipelines: pipelineInput,
+      sourceBytesBySourceRef: sourceBytesBySourceRef!
+    }) : null;
+    const sourceBatches = batches ?? assembly!.batches;
+    const resolved = await resolveGraphifyPacketEdgesForSnapshotV1({
+      ...context,
+      batches: sourceBatches,
+      source
+    });
+    const materialization = materializeGraphSnapshot({
+      ...materializerInput,
+      graphifyPacketEdgeCandidates: resolved.candidates
+    });
+    return {
+      ...materialization,
+      graphifyReplayProof: {
+        structuralBatchChecksum: structuralProjectionBatch?.checksum ?? null,
+        batchAssemblyChecksum: assembly?.checksum ?? null,
+        replayPlanChecksum: resolved.replayPlanChecksum,
+        replayCounts: resolved.replayCounts,
+        candidateCount: resolved.candidates.length,
+        rejectedReferences: [
+          ...(assembly?.rejected ?? []).map(({ referenceId, reason }) => ({ referenceId, reason })),
+          ...resolved.rejectedReferenceIds.map(({ referenceId, admission }) => ({ referenceId, reason: admission }))
+        ].sort((left, right) => left.referenceId.localeCompare(right.referenceId) || left.reason.localeCompare(right.reason)),
+        canonicalAuthority: false,
+        writesPerformed: false
+      }
+    };
+  }
   return materializeGraphSnapshot(materializerInput);
 }
 
@@ -272,6 +343,8 @@ function normalizePacketRow(row: DbRow): PacketRow {
     clusterId: readDbValue(row, 'clusterId', 'cluster_id') ?? null,
     sha256: readDbValue(row, 'sha256', 'sha256') ?? null,
     sourceRevision: readDbValue(row, 'sourceRevision', 'source_revision') ?? null,
+    byteStart: readDbValue(row, 'byteStart', 'byte_start') == null ? null : Number(readDbValue(row, 'byteStart', 'byte_start')),
+    byteEnd: readDbValue(row, 'byteEnd', 'byte_end') == null ? null : Number(readDbValue(row, 'byteEnd', 'byte_end')),
     sourceKind: readDbValue(row, 'sourceKind', 'source_kind') ?? null,
     sourcePath: readDbValue(row, 'sourcePath', 'source_path') ?? null,
     topology: (readDbValue(row, 'topology', 'topology') ?? {}) as Record<string, unknown>,
