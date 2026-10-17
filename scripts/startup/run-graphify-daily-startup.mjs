@@ -50,7 +50,11 @@ let neuralBaselineStatus = 'NOT_RUN';
 let derivedContextStatus = 'NOT_RUN';
 let dailyEmbeddingStatus = 'NOT_REQUESTED';
 let nesPacketStatus = 'NOT_REQUESTED';
-const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
+// Opt-in (GRAPHIFY_LIVE_EMBEDDER=1): real EmbeddingGemma via Ollama, read-only. Default stays the
+// deterministic hash smoke so the daily run does not depend on Ollama being up.
+const provenanceScript = process.env.GRAPHIFY_LIVE_EMBEDDER === '1'
+  ? 'npm run atlas:phase109b:workflow:dry -- --live-embedder'
+  : 'npm run atlas:phase109b:workflow:dry';
 const TERMINAL_RUN_AUTHORIZATION = 'AUTHORIZE_GRAPHIFY_POST_PHASE16_TERMINAL_RUN_V1';
 const ADMISSION_REPORT = path.resolve(ROOT, 'docs/reports/workspace-revision-tournament-admission-v1.json');
 const ADMITTED_SNAPSHOT_DIR = path.resolve(ROOT, 'docs/reports/workspace-source-snapshots');

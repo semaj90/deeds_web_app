@@ -1,0 +1,70 @@
+{
+  "schema": "atlas.graphify-daily-contract-reconciliation.v1",
+  "task": "GRAPHIFY-DAILY-CONTRACT-RECONCILIATION-02",
+  "generatedAt": "2026-10-17T00:44:10.756Z",
+  "mode": "READ_ONLY_PREFLIGHT",
+  "writesPerformed": {
+    "postgres": false,
+    "qdrant": false,
+    "valkey": false,
+    "graphifyDailyRun": false,
+    "files": [
+      "startup script opt-in",
+      "admission-order spec",
+      "workflow evidenceClass",
+      "this receipt"
+    ]
+  },
+  "baseline": {
+    "receiptRunId": "c2dd8f24-ae69-4283-ab91-caf2cff46971",
+    "receiptRevision": "c9ef99d42c3615a22ce5a34dac34e5ce220fc16d",
+    "headAtReview": "9d4e19b152dd09927ab91c5837a1a0e9d4e0623e",
+    "receiptPredatesFixes": true,
+    "receiptOverwritten": false
+  },
+  "semanticEvidence": {
+    "hashSmoke": "11:28 receipt: deterministic-hash-embedder, PARTIAL",
+    "liveSample": "scratch run (not authoritative): 8/8 embeddinggemma:latest via ollama, 0 failed, PROVEN, class LIVE_SAMPLE_PROVEN",
+    "fullCohort": "NOT_PROVEN",
+    "liveEmbedderDailyDefault": "OPT_IN via GRAPHIFY_LIVE_EMBEDDER=1"
+  },
+  "admissionOrderSpec": {
+    "finding": "current startup has no fallback path; failure handler exits 1",
+    "fix": "assert invariant (no fallback script, exit 1) instead of variable name allowFallback",
+    "result": "5/5 pass"
+  },
+  "collectionOwnership": {
+    "decision": "UNRESOLVED_OWNER_DECISION",
+    "qdrant": {
+      "codebase_chunks_768": {
+        "points": 328348
+      },
+      "codebase_chunks_768_v2": {
+        "points": 52816
+      },
+      "aliases": []
+    },
+    "postgresContent768Rows": 219998,
+    "evidence": [
+      "embedding-contract-768.ts constant changed from codebase_chunks_768 to _v2 in the working tree during this session by another session (uncommitted; HEAD says codebase_chunks_768)",
+      "vector-index-registry.ts contradicts itself: one note calls _v2 canonical production retrieval, another calls _v2 a comparison challenger and the plain name the declared projection"
+    ],
+    "spec": "now compares to the shared constant, so it passes under either value"
+  },
+  "provenanceTests": "5/5 pass",
+  "dailyDagWriteSurface": {
+    "beforeAdmission": "local files, dry plans, build, startup lock; feature-recommendations:refresh target not audited",
+    "afterAdmission": "Postgres graphify_runs lifecycle row + apply chain (dedup apply, material, phase8 fanout, qdrant tag-mirror, feature-map-sync)",
+    "gatedByFlag": [
+      "native structural --apply",
+      "NES packets apply"
+    ],
+    "admission": "NOT_SAFE_TO_PROJECT (7/11 predicates below PASS at 11:37 PDT; audit predates the 15:24 ordinal-map PASS)"
+  },
+  "nextGate": "GRAPHIFY_RUN_WRITER_AND_SOURCE_BINDING_READBACK",
+  "notDone": [
+    "24-file live dry run",
+    "dry-run side-effect audit of graphify:daily:dry subprocesses",
+    "admission audit rerun"
+  ]
+}

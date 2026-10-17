@@ -153,6 +153,8 @@ export type RepositoryProvenanceWorkflowReport = {
       heuristicFiles: number;
       canonicalDimension: number;
       modelNames: string[];
+      /** HASH_SMOKE = plumbing only; LIVE_SAMPLE_* = real model on the sampled files (not a full-cohort proof). */
+      evidenceClass: 'NONE' | 'HASH_SMOKE' | 'LIVE_SAMPLE_PARTIAL' | 'LIVE_SAMPLE_PROVEN';
       samples: SemanticEnrichmentEntry[];
     };
     relationships: {
@@ -1170,13 +1172,29 @@ export async function runRepositoryProvenanceWorkflow(
         samples: lexicalEntries.slice(0, 12),
       },
       semantic: {
-        status: semanticEntries.length > 0 ? 'PARTIAL' : 'SKIPPED',
+        // PROVEN only when every sample carries a real (non-deterministic) 768-d embedding.
+        status: semanticEntries.length === 0
+          ? 'SKIPPED'
+          : embeddedFiles === semanticEntries.length &&
+              failedEmbeddings === 0 &&
+              semanticEntries.every((entry) => entry.source !== 'deterministic' && entry.source !== 'unavailable')
+            ? 'PROVEN'
+            : 'PARTIAL',
         sampledFiles: semanticEntries.length,
         embeddedFiles,
         failedEmbeddings,
         heuristicFiles,
         canonicalDimension: CANONICAL_EMBEDDING_DIMENSION,
         modelNames: [...new Set(semanticEntries.map((entry) => entry.model).filter((value): value is string => Boolean(value)))],
+        evidenceClass: semanticEntries.length === 0
+          ? 'NONE'
+          : semanticEntries.every((entry) => entry.source === 'deterministic')
+            ? 'HASH_SMOKE'
+            : embeddedFiles === semanticEntries.length &&
+                failedEmbeddings === 0 &&
+                semanticEntries.every((entry) => entry.source !== 'deterministic' && entry.source !== 'unavailable')
+              ? 'LIVE_SAMPLE_PROVEN'
+              : 'LIVE_SAMPLE_PARTIAL',
         samples: semanticEntries.slice(0, 12),
       },
       relationships: {

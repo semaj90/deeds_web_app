@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { CANONICAL_QDRANT_COLLECTION } from '../embedding/embedding-contract-768.js';
 import { runRepositoryProvenanceWorkflow } from './repository-provenance-workflow.js';
 
 function makeTempRepo() {
@@ -73,7 +74,9 @@ describe('repository provenance workflow', () => {
 
     expect(second.stages.incremental.priorReportFound).toBe(true);
     expect(second.stages.incremental.reusedFiles).toBeGreaterThan(0);
-    expect(second.stages.projection.collectionName).toBe('codebase_chunks_768_v2');
+    // Single source: the declared embedding contract (a literal here drifted from it; whether the
+    // contract should name the _v2 collection is an open owner decision, not a spec concern).
+    expect(second.stages.projection.collectionName).toBe(CANONICAL_QDRANT_COLLECTION);
     expect(second.stages.projection.denseVectorName).toBe('content');
 
     const latest = JSON.parse(fs.readFileSync(second.outputs.latestReportPath, 'utf8'));

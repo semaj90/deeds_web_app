@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runRepositoryProvenanceWorkflow } from '../../sveltekit-frontend/src/lib/server/atlas/repository-provenance-workflow.ts';
 
 type WorkflowProfile = 'structural' | 'semantic-sample' | 'semantic-full' | 'production-projection';
@@ -15,7 +16,31 @@ type CliOptions = {
   lexicalTokenLimit: number;
   queryCorpusPath: string | null;
   representationId: string | null;
+  liveEmbedder: boolean;
 };
+
+// Opt-in: real EmbeddingGemma through Ollama /api/embed. Throws on any failure so the
+// workflow counts failedEmbeddings instead of silently substituting the hash embedder.
+export function createOllamaEmbedder(env: NodeJS.ProcessEnv = process.env) {
+  // 0.0.0.0 is a bind address, not connectable; a bare host needs the default Ollama port.
+  const raw = (env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace('0.0.0.0', '127.0.0.1');
+  const withScheme = /^https?:\/\//.test(raw) ? raw : `http://${raw}`;
+  const base = /:\d+\/?$/.test(withScheme) ? withScheme : `${withScheme.replace(/\/$/, '')}:11434`;
+  const model = env.ATLAS_PROVENANCE_EMBED_MODEL ?? 'embeddinggemma:latest';
+  return async (input: { filePath: string; text: string }) => {
+    const res = await fetch(`${base.replace(/\/$/, '')}/api/embed`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ model, input: input.text }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!res.ok) throw new Error(`ollama embed HTTP ${res.status}`);
+    const json = (await res.json()) as { embeddings?: number[][] };
+    const embedding = json.embeddings?.[0];
+    if (!embedding?.length) throw new Error('ollama embed returned no vector');
+    return { model, embedding, source: 'ollama' };
+  };
+}
 
 export function valueAfterEquals(arg: string): string | undefined {
   const separator = arg.indexOf('=');
@@ -56,7 +81,7 @@ export function parseArgs(argv: string[]): CliOptions {
   const knownPrefixes = ['--repo-root=', '--root=', '--output-dir=', '--sample-limit=', '--lexical-token-limit=', '--query-corpus=', '--profile=', '--representation-id='];
 
   for (const arg of argv) {
-    if (arg === '--apply' || arg === '--dry-run') continue;
+    if (arg === '--apply' || arg === '--dry-run' || arg === '--live-embedder') continue;
     if (!knownPrefixes.some((prefix) => arg.startsWith(prefix))) {
       throw new Error(`Unknown argument: ${arg}`);
     }
@@ -97,6 +122,7 @@ export function parseArgs(argv: string[]): CliOptions {
     lexicalTokenLimit: parsePositiveInteger(lexicalArg, 'lexical-token-limit', 32, 4_096),
     queryCorpusPath: corpusValue,
     representationId: representationArg ?? null,
+    liveEmbedder: argv.includes('--live-embedder'),
   };
 }
 
@@ -155,6 +181,7 @@ async function main(): Promise<void> {
       representationId: options.representationId ?? undefined,
       sourceSnapshotPath: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_PATH ?? undefined,
       sourceReadRoot: process.env.ATLAS_GRAPHIFY_SOURCE_SNAPSHOT_ROOT ?? undefined,
+      embedder: options.liveEmbedder ? createOllamaEmbedder() : undefined,
       signal: controller.signal,
     });
 
@@ -211,7 +238,7 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((error: unknown) => {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((error: unknown) => {
   if (error instanceof Error && error.message === 'Repository provenance workflow aborted') {
     process.exitCode = 130;
     return;
